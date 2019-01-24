@@ -1,0 +1,10 @@
+enable_navigator_downsample: true
+sample_param {
+  straight_sample_interval: 3.0
+  small_kappa_sample_interval: 1.0
+  middle_kappa_sample_interval: 0.4
+  large_kappa_sample_interval: 0.1
+  small_kappa: 0.002
+  middle_kappa: 0.008
+  large_kappa: 0.02
+}

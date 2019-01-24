@@ -60,6 +60,7 @@ using PbSignalType = apollo::hdmap::Signal_Type;
 using PbSubSignalType = apollo::hdmap::Subsignal_Type;
 using PbStopSignType = apollo::hdmap::StopSign_StopType;
 using PbBoundaryEdgeType = apollo::hdmap::BoundaryEdge_Type;
+using PbRoadType = apollo::hdmap::Road_Type;
 
 struct StopLineInternal {
   std::string id;
@@ -124,6 +125,8 @@ struct RoadInternal {
 
   bool in_junction;
   std::string junction_id;
+
+  std::string type;
 
   std::vector<RoadSectionInternal> sections;
 

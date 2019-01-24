@@ -46,7 +46,9 @@ class Node3d {
                   const std::vector<double>& XYbounds,
                   const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~Node3d() = default;
-  Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_);
+  static Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_,
+                              const double& x, const double& y,
+                              const double& phi);
   double GetCost() { return traj_cost_ + heuristic_cost_; }
   double GetTrajCost() { return traj_cost_; }
   double GetHeuCost() { return heuristic_cost_; }
@@ -58,12 +60,13 @@ class Node3d {
   double GetPhi() { return phi_; }
   bool operator==(const std::shared_ptr<Node3d> right) const;
   size_t GetIndex() { return index_; }
+  size_t GetStepSize() { return step_size_; }
   bool GetDirec() { return direction_; }
   double GetSteer() { return steering_; }
   std::shared_ptr<Node3d> GetPreNode() { return pre_node_; }
-  std::vector<double> GetXs() { return traversed_x_; }
-  std::vector<double> GetYs() { return traversed_y_; }
-  std::vector<double> GetPhis() { return traversed_phi_; }
+  const std::vector<double>& GetXs() { return traversed_x_; }
+  const std::vector<double>& GetYs() { return traversed_y_; }
+  const std::vector<double>& GetPhis() { return traversed_phi_; }
   size_t GetSize();
   void SetPre(std::shared_ptr<Node3d> pre_node) { pre_node_ = pre_node; }
   void SetDirec(bool direction) { direction_ = direction; }
@@ -75,6 +78,7 @@ class Node3d {
   double x_ = 0.0;
   double y_ = 0.0;
   double phi_ = 0.0;
+  size_t step_size_ = 1;
   std::vector<double> traversed_x_;
   std::vector<double> traversed_y_;
   std::vector<double> traversed_phi_;

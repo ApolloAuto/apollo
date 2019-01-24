@@ -1,5 +1,8 @@
 header {
   timestamp_sec: 1502920656.46
+  lidar_timestamp: 0
+  camera_timestamp: 0
+  radar_timestamp: 0
   status {
     error_code: PLANNING_ERROR
     msg: "Failed to create reference line"

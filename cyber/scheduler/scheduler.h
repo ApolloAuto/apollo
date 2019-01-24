@@ -28,11 +28,13 @@
 #include <vector>
 
 #include "cyber/base/atomic_rw_lock.h"
+#include "cyber/base/atomic_hash_map.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_factory.h"
+#include "cyber/scheduler/common/mutex_wrapper.h"
 
 namespace apollo {
 namespace cyber {
@@ -40,6 +42,7 @@ namespace scheduler {
 
 using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::base::ReadLockGuard;
+using apollo::cyber::base::AtomicHashMap;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
@@ -73,7 +76,7 @@ class Scheduler {
   void ParseCpuset(const std::string&, std::vector<int>*);
 
   AtomicRWLock id_cr_lock_;
-  std::unordered_map<uint64_t, std::mutex> id_cr_wl_;
+  AtomicHashMap<uint64_t, MutexWrapper*> id_map_mutex_;
   std::mutex cr_wl_mtx_;
 
   std::unordered_map<uint64_t, std::shared_ptr<CRoutine>> id_cr_;

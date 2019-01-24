@@ -40,8 +40,10 @@ class PlannigAnalyzer:
         self.frechet_distance_list = []
         self.is_simulation = is_simulation
         self.hard_break_list = []
+        self.total_cycle_num = 0
 
     def put(self, adc_trajectory):
+        self.total_cycle_num += 1
         """put"""
         if not self.is_simulation:
             latency = adc_trajectory.latency_stats.total_time_ms
@@ -155,4 +157,13 @@ class PlannigAnalyzer:
         results['frechet_dist'] = sum(self.frechet_distance_list) /\
             len(self.frechet_distance_list)
         results['hard_brake_cycle_num'] = len(self.hard_break_list)
+        results['overall_score'] = 1- results['hard_brake_cycle_num'] /\
+            float(self.total_cycle_num)
+        if results['frechet_dist'] > 10:
+            results['overall_score'] += 0.0
+        else:
+            results['overall_score'] += (1- results['frechet_dist'] / 10.0)
+        results['overall_score'] /= 2.0
+        
+
         print str(results)

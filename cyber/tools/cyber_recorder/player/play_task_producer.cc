@@ -19,6 +19,7 @@
 #include <iostream>
 
 #include "cyber/common/log.h"
+#include "cyber/common/time_conversion.h"
 #include "cyber/cyber.h"
 #include "cyber/message/protobuf_factory.h"
 #include "cyber/record/record_viewer.h"
@@ -81,12 +82,6 @@ void PlayTaskProducer::Start() {
   }
 
   produce_th_.reset(new std::thread(&PlayTaskProducer::ThreadFunc, this));
-
-  auto preload_sec = kPreloadTimeSec;
-  while (preload_sec > 0 && !is_stopped_.load()) {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    --preload_sec;
-  }
 }
 
 void PlayTaskProducer::Stop() {
@@ -148,9 +143,18 @@ bool PlayTaskProducer::ReadRecordInfo() {
       latest_end_time_ = header.end_time();
     }
 
+    auto begin_time_s = static_cast<double>(header.begin_time()) / 1e9;
+    auto end_time_s = static_cast<double>(header.end_time()) / 1e9;
+    auto begin_time_str =
+        common::UnixSecondsToString(static_cast<int>(begin_time_s));
+    auto end_time_str =
+        common::UnixSecondsToString(static_cast<int>(end_time_s));
+
     std::cout << "file: " << file << ", chunk_number: " << header.chunk_number()
-              << ", begin_time: " << header.begin_time()
-              << ", end_time: " << header.end_time()
+              << ", begin_time: " << header.begin_time() << " ("
+              << begin_time_str << ")"
+              << ", end_time: " << header.end_time() << " (" << end_time_str
+              << ")"
               << ", message_number: " << header.message_number() << std::endl;
   }
 
@@ -177,6 +181,11 @@ bool PlayTaskProducer::UpdatePlayParam() {
            << ", begin_time_ns=" << play_param_.begin_time_ns
            << ", end_time_ns=" << play_param_.end_time_ns;
     return false;
+  }
+  if (play_param_.preload_time_s == 0) {
+    AINFO << "preload time is zero, we will use defalut value: "
+          << kPreloadTimeSec << " seconds.";
+    play_param_.preload_time_s = kPreloadTimeSec;
   }
   return true;
 }
@@ -221,7 +230,8 @@ void PlayTaskProducer::ThreadFunc() {
 
   double avg_freq_hz = static_cast<double>(total_msg_num_) /
                        (static_cast<double>(loop_time_ns) * 1e-9);
-  uint32_t preload_size = (uint32_t)avg_freq_hz * kPreloadTimeSec;
+  uint32_t preload_size = (uint32_t)avg_freq_hz * play_param_.preload_time_s;
+  AINFO << "preload_size: " << preload_size;
   if (preload_size < kMinTaskBufferSize) {
     preload_size = kMinTaskBufferSize;
   }
@@ -241,8 +251,7 @@ void PlayTaskProducer::ThreadFunc() {
         std::this_thread::sleep_for(
             std::chrono::nanoseconds(avg_interval_time_ns));
       }
-
-      for (; itr != itr_end; ++itr) {
+      for (; itr != itr_end && !is_stopped_.load(); ++itr) {
         if (task_buffer_->Size() > preload_size) {
           break;
         }

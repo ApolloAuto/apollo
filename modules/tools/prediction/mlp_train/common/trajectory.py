@@ -392,7 +392,7 @@ class TrajectoryToSample(object):
             exit_pos_dict = dict()
             for junction_exit in fea.junction_feature.junction_exit:
                 if junction_exit.HasField('exit_lane_id'):
-                    exit_dict[junction_exit.exit_lane_id] =
+                    exit_dict[junction_exit.exit_lane_id] = \
                     BoundingRectangle(junction_exit.exit_position.x,
                                       junction_exit.exit_position.y,
                                       junction_exit.exit_heading,
@@ -418,7 +418,10 @@ class TrajectoryToSample(object):
                         label = [0 for idx in range(12)]
                         label[d_idx] = 1
                         fea.junction_feature.junction_mlp_label.extend(label)
-                        break
+                        break # actually break two level
+                else:
+                    continue
+                break
         return trajectory
 
     @abc.abstractmethod

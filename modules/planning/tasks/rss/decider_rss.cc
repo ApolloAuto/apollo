@@ -223,8 +223,14 @@ Status RssDecider::Process(Frame *frame,
     }
   }
 
-  reference_line_info->mutable_rss_info()->set_cur_dist_lon(
-      front_obstacle_distance);
+  static const double kTrajectoryLenFactor = 10.0;
+  // skip to populate RSS cur_dist_lon if it is too large.
+  if (front_obstacle_distance <
+      kTrajectoryLenFactor * reference_line_info->TrajectoryLength()) {
+    reference_line_info->mutable_rss_info()->set_cur_dist_lon(
+        front_obstacle_distance);
+  }
+
   reference_line_info->mutable_rss_info()->set_rss_safe_dist_lon(dMin_lon);
   reference_line_info->mutable_rss_info()->set_acc_lon_range_minimum(
       accelerationRestriction.longitudinalRange.minimum);

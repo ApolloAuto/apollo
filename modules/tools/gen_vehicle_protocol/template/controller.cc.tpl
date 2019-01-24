@@ -275,7 +275,7 @@ void %(car_type_cap)sController::Brake(double pedal) {
   // TODO(All) :  Update brake value based on mode
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
-    AINFO << "The current drive mode does not need to set acceleration.";
+    AINFO << "The current drive mode does not need to set brake pedal.";
     return;
   }
   /* ADD YOUR OWN CAR CHASSIS OPERATION
@@ -288,11 +288,24 @@ void %(car_type_cap)sController::Brake(double pedal) {
 void %(car_type_cap)sController::Throttle(double pedal) {
   if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
         driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
-    AINFO << "The current drive mode does not need to set acceleration.";
+    AINFO << "The current drive mode does not need to set throttle pedal.";
     return;
   }
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   throttle_62_->set_pedal(pedal);
+  */
+}
+
+// confirm the car is driven by acceleration command or throttle/brake pedal
+// drive with acceleration/deceleration
+// acc:-7.0 ~ 5.0, unit:m/s^2
+void %(car_type_cap)sController::Acceleration(double acc) {
+  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+    AINFO << "The current drive mode does not need to set acceleration.";
+    return;
+  }
+  /* ADD YOUR OWN CAR CHASSIS OPERATION
   */
 }
 

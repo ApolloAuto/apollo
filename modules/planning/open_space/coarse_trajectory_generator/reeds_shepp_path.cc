@@ -30,6 +30,9 @@ ReedShepp::ReedShepp(const common::VehicleParam& vehicle_param,
   max_kappa_ = std::tan(vehicle_param_.max_steer_angle() /
                         vehicle_param_.steer_ratio()) /
                vehicle_param_.wheel_base();
+  if (FLAGS_enable_parallel_hybrid_a) {
+    AINFO << "parallel REEDShepp";
+  }
 }
 
 std::pair<double, double> ReedShepp::calc_tau_omega(const double& u,
@@ -66,8 +69,9 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
   double optimal_path_length = std::numeric_limits<double>::infinity();
   size_t optimal_path_index = 0;
   size_t paths_size = all_possible_paths.size();
-  for (size_t i = 0; i < paths_size; i++) {
-    if (all_possible_paths.at(i).total_length < optimal_path_length) {
+  for (size_t i = 0; i < paths_size; ++i) {
+    if (all_possible_paths.at(i).total_length > 0 &&
+        all_possible_paths.at(i).total_length < optimal_path_length) {
       optimal_path_index = i;
       optimal_path_length = all_possible_paths.at(i).total_length;
     }
@@ -75,7 +79,7 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
 
   if (!GenerateLocalConfigurations(start_node, end_node,
                                    &(all_possible_paths[optimal_path_index]))) {
-    AERROR << "Fail to generate local configurations(x, y, phi) in ShortestRSP";
+    AERROR << "Fail to generate local configurations(x, y, phi) in SetRSP";
     return false;
   }
 
@@ -87,13 +91,24 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
                end_node->GetPhi()) > 1e-3) {
     AERROR << "RSP end position not right";
     for (size_t i = 0;
-         i < all_possible_paths[optimal_path_index].segs_types.size(); i++) {
+         i < all_possible_paths[optimal_path_index].segs_types.size(); ++i) {
       AERROR << "types are "
              << all_possible_paths[optimal_path_index].segs_types[i];
     }
+    AERROR << "x, y, phi are: "
+        << all_possible_paths[optimal_path_index].x.back()
+        << ", "
+        << all_possible_paths[optimal_path_index].y.back()
+        << ", "
+        << all_possible_paths[optimal_path_index].phi.back();
+    AERROR << "end x, y, phi are: "
+        << end_node->GetX()
+        << ", "
+        << end_node->GetY()
+        << ", "
+        << end_node->GetPhi();
     return false;
   }
-
   (*optimal_path).x = all_possible_paths[optimal_path_index].x;
   (*optimal_path).y = all_possible_paths[optimal_path_index].y;
   (*optimal_path).phi = all_possible_paths[optimal_path_index].phi;
@@ -110,9 +125,17 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
 bool ReedShepp::GenerateRSPs(const std::shared_ptr<Node3d> start_node,
                              const std::shared_ptr<Node3d> end_node,
                              std::vector<ReedSheppPath>* all_possible_paths) {
-  if (!GenerateRSP(start_node, end_node, all_possible_paths)) {
-    AERROR << "Fail to generate general profile of different RSPs";
-    return false;
+  if (FLAGS_enable_parallel_hybrid_a) {
+    // AINFO << "parallel hybrid a*";
+    if (!GenerateRSPPar(start_node, end_node, all_possible_paths)) {
+      AERROR << "Fail to generate general profile of different RSPs";
+      return false;
+    }
+  } else {
+    if (!GenerateRSP(start_node, end_node, all_possible_paths)) {
+      AERROR << "Fail to generate general profile of different RSPs";
+      return false;
+    }
   }
   return true;
 }
@@ -164,6 +187,7 @@ bool ReedShepp::SCS(const double& x, const double& y, const double& phi,
     AERROR << "Fail at SetRSP with SLS_param";
     return false;
   }
+
   RSPParam SRS_param;
   SLS(x, -y, -phi, &SRS_param);
   double SRS_lengths[3] = {SRS_param.t, SRS_param.u, SRS_param.v};
@@ -889,7 +913,7 @@ bool ReedShepp::SetRSP(const int& size, const double* lengths,
   path.segs_lengths = length_vec;
   path.segs_types = type_vec;
   double sum = 0.0;
-  for (int i = 0; i < size; i++) {
+  for (int i = 0; i < size; ++i) {
     sum += std::abs(lengths[i]);
   }
   path.total_length = sum;
@@ -904,7 +928,8 @@ bool ReedShepp::SetRSP(const int& size, const double* lengths,
 // TODO(Jinyun) : reformulate GenerateLocalConfigurations.
 bool ReedShepp::GenerateLocalConfigurations(
     const std::shared_ptr<Node3d> start_node,
-    const std::shared_ptr<Node3d> end_node, ReedSheppPath* shortest_path) {
+    const std::shared_ptr<Node3d> end_node,
+    ReedSheppPath* shortest_path) {
   double step_scaled =
       planner_open_space_config_.warm_start_config().step_size() * max_kappa_;
 
@@ -928,7 +953,7 @@ bool ReedShepp::GenerateLocalConfigurations(
     d = -step_scaled;
   }
   pd = d;
-  for (size_t i = 0; i < shortest_path->segs_types.size(); i++) {
+  for (size_t i = 0; i < shortest_path->segs_types.size(); ++i) {
     char m = shortest_path->segs_types.at(i);
     double l = shortest_path->segs_lengths.at(i);
     if (l > 0.0) {
@@ -964,7 +989,7 @@ bool ReedShepp::GenerateLocalConfigurations(
     pphi.pop_back();
     pgear.pop_back();
   }
-  for (size_t i = 0; i < px.size(); i++) {
+  for (size_t i = 0; i < px.size(); ++i) {
     shortest_path->x.push_back(std::cos(-start_node->GetPhi()) * px.at(i) +
                                std::sin(-start_node->GetPhi()) * py.at(i) +
                                start_node->GetX());
@@ -975,7 +1000,7 @@ bool ReedShepp::GenerateLocalConfigurations(
         common::math::NormalizeAngle(pphi.at(i) + start_node->GetPhi()));
   }
   shortest_path->gear = pgear;
-  for (size_t i = 0; i < shortest_path->segs_lengths.size(); i++) {
+  for (size_t i = 0; i < shortest_path->segs_lengths.size(); ++i) {
     shortest_path->segs_lengths.at(i) =
         shortest_path->segs_lengths.at(i) / max_kappa_;
   }
@@ -1021,6 +1046,276 @@ void ReedShepp::Interpolation(const int& index, const double& pd, const char& m,
   } else if (m == 'R') {
     pphi->at(index) = ophi - pd;
   }
+}
+
+bool ReedShepp::SetRSPPar(const int& size,
+                          const double* lengths,
+                          const std::string& types,
+                          std::vector<ReedSheppPath>* all_possible_paths,
+                          const int& idx) {
+  ReedSheppPath path;
+  std::vector<double> length_vec(lengths, lengths + size);
+  std::vector<char> type_vec(types.begin(), types.begin() + size);
+  path.segs_lengths = length_vec;
+  path.segs_types = type_vec;
+  double sum = 0.0;
+  for (int i = 0; i < size; ++i) {
+    sum += std::abs(lengths[i]);
+  }
+  path.total_length = sum;
+  if (path.total_length <= 0.0) {
+    AERROR << "total length smaller than 0";
+    return false;
+  }
+
+  all_possible_paths->at(idx) = path;
+  return true;
+}
+
+bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
+                               const std::shared_ptr<Node3d> end_node,
+                               std::vector<ReedSheppPath>* all_possible_paths) {
+  double dx = end_node->GetX() - start_node->GetX();
+  double dy = end_node->GetY() - start_node->GetY();
+  double dphi = end_node->GetPhi() - start_node->GetPhi();
+  double c = std::cos(start_node->GetPhi());
+  double s = std::sin(start_node->GetPhi());
+  // normalize the initial point to (0,0,0)
+  double x = (c * dx + s * dy) * this->max_kappa_;
+  double y = (-s * dx + c * dy) * this->max_kappa_;
+  // backward
+  double xb = x * std::cos(dphi) + y * std::sin(dphi);
+  double yb = x * std::sin(dphi) - y * std::cos(dphi);
+
+  int RSP_nums = 46;
+  all_possible_paths->resize(RSP_nums);
+  bool succ = true;
+  #pragma omp parallel for schedule(dynamic, 2) num_threads(8)
+  for (int i = 0; i < RSP_nums; ++i) {
+    RSPParam RSP_param;
+    int tmp_length = 0;
+    double RSP_lengths[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
+    double x_param = 1.0;
+    double y_param = 1.0;
+    std::string rd_type;
+
+    if (i > 2 && i % 2) {
+      x_param = -1.0;
+    }
+    if (i > 2 && i % 4 < 2) {
+      y_param = -1.0;
+    }
+
+    if (i < 2) {  // SCS case
+      if (i == 1) {
+        y_param = -1.0;
+        rd_type = "SRS";
+      } else {
+        rd_type = "SLS";
+      }
+      SLS(x,
+          y_param * y,
+          y_param * dphi,
+          &RSP_param);
+      tmp_length = 3;
+      RSP_lengths[0] = RSP_param.t;
+      RSP_lengths[1] = RSP_param.u;
+      RSP_lengths[2] = RSP_param.v;
+    } else if (i < 6) {  // CSC, LSL case
+      LSL(x_param * x,
+          y_param * y,
+          x_param * y_param * dphi,
+          &RSP_param);
+      if (y_param > 0) {
+        rd_type = "LSL";
+      } else {
+        rd_type = "RSR";
+      }
+      tmp_length = 3;
+      RSP_lengths[0] = x_param * RSP_param.t;
+      RSP_lengths[1] = x_param * RSP_param.u;
+      RSP_lengths[2] = x_param * RSP_param.v;
+    } else if (i < 10) {  // CSC, LSR case
+      LSR(x_param * x,
+          y_param * y,
+          x_param * y_param * dphi,
+          &RSP_param);
+      if (y_param > 0) {
+        rd_type = "LSR";
+      } else {
+        rd_type = "RSL";
+      }
+      tmp_length = 3;
+      RSP_lengths[0] = x_param * RSP_param.t;
+      RSP_lengths[1] = x_param * RSP_param.u;
+      RSP_lengths[2] = x_param * RSP_param.v;
+    } else if (i < 14) {  // CCC, LRL case
+      LRL(x_param * x,
+          y_param * y,
+          x_param * y_param * dphi,
+          &RSP_param);
+      if (y_param > 0) {
+        rd_type = "LRL";
+      } else {
+        rd_type = "RLR";
+      }
+      tmp_length = 3;
+      RSP_lengths[0] = x_param * RSP_param.t;
+      RSP_lengths[1] = x_param * RSP_param.u;
+      RSP_lengths[2] = x_param * RSP_param.v;
+    } else if (i < 18) {  // CCC, LRL case, backward
+      LRL(x_param * xb,
+          y_param * yb,
+          x_param * y_param * dphi,
+          &RSP_param);
+      if (y_param > 0) {
+        rd_type = "LRL";
+      } else {
+        rd_type = "RLR";
+      }
+      tmp_length = 3;
+      RSP_lengths[0] = x_param * RSP_param.v;
+      RSP_lengths[1] = x_param * RSP_param.u;
+      RSP_lengths[2] = x_param * RSP_param.t;
+    } else if (i < 22) {  // CCCC, LRLRn
+      LRLRn(x_param * x,
+            y_param * y,
+            x_param * y_param * dphi,
+            &RSP_param);
+      if (y_param > 0.0) {
+        rd_type = "LRLR";
+      } else {
+        rd_type = "RLRL";
+      }
+      tmp_length = 4;
+      RSP_lengths[0] = x_param * RSP_param.t;
+      RSP_lengths[1] = x_param * RSP_param.u;
+      RSP_lengths[2] = -x_param * RSP_param.u;
+      RSP_lengths[3] = x_param * RSP_param.v;
+    } else if (i < 26) {  // CCCC, LRLRp
+      LRLRp(x_param * x,
+            y_param * y,
+            x_param * y_param * dphi,
+            &RSP_param);
+      if (y_param > 0.0) {
+        rd_type = "LRLR";
+      } else {
+        rd_type = "RLRL";
+      }
+      tmp_length = 4;
+      RSP_lengths[0] = x_param * RSP_param.t;
+      RSP_lengths[1] = x_param * RSP_param.u;
+      RSP_lengths[2] = -x_param * RSP_param.u;
+      RSP_lengths[3] = x_param * RSP_param.v;
+    } else if (i < 30) {  // CCSC, LRLRn
+      tmp_length = 4;
+      LRLRn(x_param * x,
+            y_param * y,
+            x_param * y_param * dphi,
+            &RSP_param);
+      if (y_param > 0.0) {
+        rd_type = "LRSL";
+      } else {
+        rd_type = "RLSR";
+      }
+      RSP_lengths[0] = x_param * RSP_param.t;
+      if (x_param < 0 && y_param > 0) {
+        RSP_lengths[1] = 0.5 * M_PI;
+      } else {
+        RSP_lengths[1] = -0.5 * M_PI;
+      }
+      if (x_param > 0 && y_param < 0) {
+        RSP_lengths[2] = RSP_param.u;
+      } else {
+        RSP_lengths[2] = -RSP_param.u;
+      }
+      RSP_lengths[3] = x_param * RSP_param.v;
+    } else if (i < 34) {  // CCSC, LRLRp
+      tmp_length = 4;
+      LRLRp(x_param * x,
+            y_param * y,
+            x_param * y_param * dphi,
+            &RSP_param);
+      if (y_param) {
+        rd_type = "LRSR";
+      } else {
+        rd_type = "RLSL";
+      }
+      RSP_lengths[0] = x_param * RSP_param.t;
+      if (x_param < 0 && y_param > 0) {
+        RSP_lengths[1] = 0.5 * M_PI;
+      } else {
+        RSP_lengths[1] = -0.5 * M_PI;
+      }
+      RSP_lengths[2] = x_param * RSP_param.u;
+      RSP_lengths[3] = x_param * RSP_param.v;
+    } else if (i < 38) {  // CCSC, LRLRn, backward
+      tmp_length = 4;
+      LRLRn(x_param * xb,
+            y_param * yb,
+            x_param * y_param * dphi,
+            &RSP_param);
+      if (y_param > 0) {
+        rd_type = "LSRL";
+      } else {
+        rd_type = "RSLR";
+      }
+      RSP_lengths[0] = x_param * RSP_param.v;
+      RSP_lengths[1] = x_param * RSP_param.u;
+      RSP_lengths[2] = -x_param * 0.5 * M_PI;
+      RSP_lengths[3] = x_param * RSP_param.t;
+    } else if (i < 42) {  // CCSC, LRLRp, backward
+      tmp_length = 4;
+      LRLRp(x_param * xb,
+            y_param * yb,
+            x_param * y_param * dphi,
+            &RSP_param);
+      if (y_param > 0) {
+        rd_type = "RSRL";
+      } else {
+        rd_type = "LSLR";
+      }
+      RSP_lengths[0] = x_param * RSP_param.v;
+      RSP_lengths[1] = x_param * RSP_param.u;
+      RSP_lengths[2] = -x_param * M_PI * 0.5;
+      RSP_lengths[3] = x_param * RSP_param.t;
+    } else {  // CCSCC, LRSLR
+      tmp_length = 5;
+      LRSLR(x_param * x,
+            y_param * y,
+            x_param * y_param * dphi,
+            &RSP_param);
+      if (y_param > 0.0) {
+        rd_type = "LRSLR";
+      } else {
+        rd_type = "RLSRL";
+      }
+      RSP_lengths[0] = x_param * RSP_param.t;
+      RSP_lengths[1] = -x_param * 0.5 * M_PI;
+      RSP_lengths[2] = x_param * RSP_param.u;
+      RSP_lengths[3] = -x_param * 0.5 * M_PI;
+      RSP_lengths[4] = x_param * RSP_param.v;
+    }
+
+    if (tmp_length > 0) {
+      if (RSP_param.flag &&
+          !SetRSPPar(tmp_length, RSP_lengths, rd_type,
+            all_possible_paths, i)) {
+        AERROR << "Fail at SetRSP, idx#: " << i;
+        succ = false;
+      }
+    }
+  }
+
+  if (succ != true) {
+    AERROR << "RSP parallel fails";
+    return false;
+  }
+  if (all_possible_paths->size() == 0) {
+    AERROR << "No path generated by certain two configurations";
+    return false;
+  }
+  return true;
 }
 
 }  // namespace planning

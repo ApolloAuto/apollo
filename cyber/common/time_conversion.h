@@ -126,13 +126,14 @@ inline std::string UnixSecondsToString(
     uint64_t unix_seconds,
     const std::string& format_str = "%Y-%m-%d %H:%M:%S") {
   std::time_t t = unix_seconds;
-  struct tm* pt = std::localtime(&t);
-  if (pt == nullptr) {
+  struct tm ptm;
+  struct tm* ret = localtime_r(&t, &ptm);
+  if (ret == nullptr) {
     return std::string("");
   }
   uint32_t length = 64;
   std::vector<char> buff(length, '\0');
-  strftime(buff.data(), length, format_str.c_str(), pt);
+  strftime(buff.data(), length, format_str.c_str(), ret);
   return std::string(buff.data());
 }
 

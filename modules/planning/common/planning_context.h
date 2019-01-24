@@ -28,6 +28,7 @@
 #include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -49,6 +50,7 @@ class PlanningContext {
   struct ScenarioInfo {
     apollo::hdmap::PathOverlap next_stop_sign_overlap;
     apollo::hdmap::PathOverlap next_traffic_light_overlap;
+    apollo::perception::TrafficLight_Color traffic_light_color;
     apollo::hdmap::PathOverlap next_crosswalk_overlap;
     // still in the scenario for this overlap, but stop already done
     // => no stop fence from decider_rule_based_stop task

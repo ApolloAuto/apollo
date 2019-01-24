@@ -20,7 +20,7 @@
 
 DECLARE_string(relative_map_adapter_config_filename);
 DECLARE_string(relative_map_config_filename);
+DECLARE_string(navigator_config_filename);
 DECLARE_int32(relative_map_loop_rate);
 DECLARE_bool(enable_cyclic_rerouting);
 DECLARE_bool(relative_map_generate_left_boundray);
-DECLARE_bool(navigator_down_sample);

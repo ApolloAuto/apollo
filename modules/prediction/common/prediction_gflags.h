@@ -25,10 +25,15 @@ DECLARE_double(prediction_trajectory_time_length);
 DECLARE_double(prediction_trajectory_time_resolution);
 DECLARE_double(min_prediction_trajectory_spatial_length);
 DECLARE_bool(enable_trajectory_validation_check);
+DECLARE_bool(enable_tracking_adaptation);
 
 DECLARE_double(vehicle_max_linear_acc);
 DECLARE_double(vehicle_min_linear_acc);
 DECLARE_double(vehicle_max_speed);
+
+// Tracking Adaptation
+DECLARE_double(max_tracking_time);
+DECLARE_double(max_tracking_dist);
 
 // Map
 DECLARE_double(lane_search_radius);
@@ -138,3 +143,6 @@ DECLARE_int32(road_graph_max_search_horizon);
 // scenario feature extraction
 DECLARE_double(lane_distance_threshold);
 DECLARE_double(lane_angle_difference_threshold);
+
+// Trajectory evaluation
+DECLARE_double(distance_threshold_on_lane);

@@ -41,6 +41,21 @@ cc_library(
     deps = [
         "//cyber/croutine",
         "//cyber/scheduler:processor",
+        "//cyber/scheduler:mutex_wrapper",
+    ],
+)
+
+cc_library(
+    name = "mutex_wrapper",
+    hdrs = [
+        "common/mutex_wrapper.h",
+    ],
+)
+
+cc_library(
+    name = "cv_wrapper",
+    hdrs = [
+        "common/cv_wrapper.h",
     ],
 )
 
@@ -115,6 +130,8 @@ cc_library(
         "//cyber/croutine",
         "//cyber/proto:classic_conf_cc_proto",
         "//cyber/scheduler:processor",
+        "//cyber/scheduler:mutex_wrapper",
+        "//cyber/scheduler:cv_wrapper",
     ],
 )
 

@@ -30,6 +30,11 @@ DEFINE_string(prediction_adapter_config_filename,
 DEFINE_string(prediction_data_dir,
               "/apollo/modules/prediction/data/prediction/",
               "Prefix of files to store feature data");
+DEFINE_string(offline_feature_proto_file_name, "",
+              "The bin file including a series of feature proto messages");
+DEFINE_string(output_filename, "", "The filename for offline process.");
+DEFINE_string(extract_feature_type, "",
+              "The extract feature type, either cruise or junction");
 
 DEFINE_bool(prediction_test_mode, false, "Set prediction to test mode");
 DEFINE_double(
@@ -37,12 +42,14 @@ DEFINE_double(
     "The runtime duration in test mode (in seconds). Negative value will not "
     "restrict the runtime duration.");
 
-DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
 DEFINE_string(
     prediction_offline_bags, "",
     "a list of bag files or directories for offline mode. The items need to be "
     "separated by colon ':'.  If this value is not set, the prediction module "
     "will use the listen to published ros topic mode.");
+DEFINE_bool(prediction_offline_mode, false, "Prediction offline mode");
+DEFINE_bool(prediction_offline_dataforlearning, false, "Whether to extract "
+            "the features for offline learning-models training.");
 
 // Bag replay timestamp gap
 DEFINE_double(replay_timestamp_gap, 10.0,

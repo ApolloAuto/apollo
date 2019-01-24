@@ -14,17 +14,21 @@ source scripts/apollo_base.sh
 This tool records trajectory information from gateway into a csv file, the file
 name is defined in filename_path.
 
-```bash
-python modules/tools/record_play/recorder_path.py
-```
-
 ## Player
 
 This tool reads information from a csv file and publishes planning trajectory in
 the same format as real planning node.
 
-Argument: Speed multiplier (default: 100)
+Default enable recorder and play under `/apollo` utilizing:
 
 ```bash
-python modules/tools/record_play/player_path.py [-s speed_multiplier]
+bash scripts/rtk_recorder.sh
 ```
+
+and 
+
+```bash
+bash scripts/rtk_player.sh
+```
+
+Or using button on Dreamview

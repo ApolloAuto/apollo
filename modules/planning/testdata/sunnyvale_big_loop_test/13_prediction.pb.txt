@@ -98,8 +98,6 @@ prediction_obstacle {
     tracking_time: 22.411610126495361
     type: VEHICLE
     timestamp: 1518741713.5442126
-    confidence: 0.9815029501914978
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1518741713.5442126
   predicted_period: 5
@@ -174,8 +172,6 @@ prediction_obstacle {
     tracking_time: 11.561245441436768
     type: VEHICLE
     timestamp: 1518741713.5442126
-    confidence: 0.94690805673599243
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1518741713.5442126
   predicted_period: 5
@@ -898,8 +894,6 @@ prediction_obstacle {
     tracking_time: 8.9887542724609375
     type: VEHICLE
     timestamp: 1518741713.5442126
-    confidence: 0.97840923070907593
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1518741713.5442126
   predicted_period: 5
@@ -1102,8 +1096,6 @@ prediction_obstacle {
     tracking_time: 4.1021320819854736
     type: VEHICLE
     timestamp: 1518741713.5442126
-    confidence: 0.96542096138000488
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1518741713.5442126
   predicted_period: 5
@@ -1203,8 +1195,6 @@ prediction_obstacle {
     tracking_time: 0.400205135345459
     type: VEHICLE
     timestamp: 1518741713.5442126
-    confidence: 0.98961108922958374
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1518741713.5442126
   predicted_period: 5
@@ -1279,8 +1269,6 @@ prediction_obstacle {
     tracking_time: 0.1000511646270752
     type: VEHICLE
     timestamp: 1518741713.5442126
-    confidence: 0.74285876750946045
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1518741713.5442126
   predicted_period: 5
@@ -1330,8 +1318,6 @@ prediction_obstacle {
     tracking_time: 0
     type: PEDESTRIAN
     timestamp: 1518741713.5442126
-    confidence: 0.67592930793762207
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1518741713.5442126
   predicted_period: 5

@@ -29,6 +29,8 @@ DEFINE_double(min_prediction_trajectory_spatial_length, 20.0,
               "Minimal spatial length of predicted trajectory");
 DEFINE_bool(enable_trajectory_validation_check, false,
             "If check the validity of prediction trajectory.");
+DEFINE_bool(enable_tracking_adaptation, false,
+            "If enable prediction tracking adaptation");
 
 DEFINE_double(vehicle_max_linear_acc, 4.0,
               "Upper bound of vehicle linear acceleration");
@@ -36,6 +38,12 @@ DEFINE_double(vehicle_min_linear_acc, -4.0,
               "Lower bound of vehicle linear deceleration");
 DEFINE_double(vehicle_max_speed, 35.0,
               "Max speed of vehicle");
+
+// Tracking Adaptation
+DEFINE_double(max_tracking_time, 0.5,
+              "Max tracking time for disappear obstacles");
+DEFINE_double(max_tracking_dist, 3.0,
+              "Max tracking distance for disappear obstacles");
 
 // Map
 DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
@@ -231,3 +239,7 @@ DEFINE_double(lane_distance_threshold, 3.0,
 DEFINE_double(lane_angle_difference_threshold, M_PI * 0.25,
               "The threshold for distance to ego/neighbor lane "
               "in feature extraction");
+
+// Trajectory evaluation
+DEFINE_double(distance_threshold_on_lane, 1.5,
+              "The threshold of distance in on-lane situation");

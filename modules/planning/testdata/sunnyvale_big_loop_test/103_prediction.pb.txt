@@ -63,8 +63,6 @@ prediction_obstacle {
     tracking_time: 33.479150772094727
     type: VEHICLE
     timestamp: 1527023661.4651275
-    confidence: 0.993561863899231
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1527023661.4651275
   predicted_period: 5
@@ -732,8 +730,6 @@ prediction_obstacle {
     tracking_time: 8.9063498973846436
     type: VEHICLE
     timestamp: 1527023661.4651275
-    confidence: 0.96568238735198975
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1527023661.4651275
   predicted_period: 5

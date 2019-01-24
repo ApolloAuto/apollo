@@ -1,5 +1,8 @@
 header {
   timestamp_sec: 1505249215.127552
+  lidar_timestamp: 0
+  camera_timestamp: 0
+  radar_timestamp: 0
 }
 total_path_length: 15.226646896516572
 total_path_time: 6.999999999999992

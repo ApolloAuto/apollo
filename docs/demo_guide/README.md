@@ -37,14 +37,13 @@ Setup steps:
     bash scripts/bootstrap.sh
     ```
 
-5. Now you can play the rosbag:
+5. Now you can play the record:
 
     ```
-    sudo python docs/demo_guide/rosbag_helper.py demo_2.0.bag #download rosbag
-    rosbag play demo_2.0.bag --loop
+    cyber_recorder play -f docs/demo_guide/demo_3.5.record --loop
     ```
 
-    The `--loop` option enables rosbag to keep playing the bag in a loop
+    The `--loop` option enables record to keep playing the bag in a loop
     playback mode.
 
 6. Open Chrome and go to **localhost:8888** to access Apollo Dreamview, which

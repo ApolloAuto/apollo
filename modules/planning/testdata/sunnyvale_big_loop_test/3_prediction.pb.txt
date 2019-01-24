@@ -118,8 +118,6 @@ prediction_obstacle {
     tracking_time: 5.5028550624847412
     type: VEHICLE
     timestamp: 1516822372.5761156
-    confidence: 0.93228888511657715
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1516822372.5761156
   predicted_period: 5
@@ -767,8 +765,6 @@ prediction_obstacle {
     tracking_time: 4.7024462223052979
     type: VEHICLE
     timestamp: 1516822372.5761156
-    confidence: 0.62303239107131958
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1516822372.5761156
   predicted_period: 5
@@ -853,8 +849,6 @@ prediction_obstacle {
     tracking_time: 4.6023950576782227
     type: VEHICLE
     timestamp: 1516822372.5761156
-    confidence: 0.96297764778137207
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1516822372.5761156
   predicted_period: 5
@@ -939,8 +933,6 @@ prediction_obstacle {
     tracking_time: 4.2021760940551758
     type: VEHICLE
     timestamp: 1516822372.5761156
-    confidence: 0.98930126428604126
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1516822372.5761156
   predicted_period: 5
@@ -1643,8 +1635,6 @@ prediction_obstacle {
     tracking_time: 3.7019200325012207
     type: VEHICLE
     timestamp: 1516822372.5761156
-    confidence: 0.85720396041870117
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1516822372.5761156
   predicted_period: 5
@@ -1709,8 +1699,6 @@ prediction_obstacle {
     tracking_time: 2.20113205909729
     type: VEHICLE
     timestamp: 1516822372.5761156
-    confidence: 0.72404372692108154
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1516822372.5761156
   predicted_period: 5
@@ -1775,8 +1763,6 @@ prediction_obstacle {
     tracking_time: 1.0005180835723877
     type: VEHICLE
     timestamp: 1516822372.5761156
-    confidence: 0.62865364551544189
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1516822372.5761156
   predicted_period: 5
@@ -1821,8 +1807,6 @@ prediction_obstacle {
     tracking_time: 0.1000521183013916
     type: VEHICLE
     timestamp: 1516822372.5761156
-    confidence: 0.2280762791633606
-    confidence_type: CONFIDENCE_CNN
   }
   timestamp: 1516822372.5761156
   predicted_period: 5

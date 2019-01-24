@@ -1,5 +1,8 @@
 header {
   timestamp_sec: 1518648377.318433
+  lidar_timestamp: 0
+  camera_timestamp: 0
+  radar_timestamp: 0
 }
 is_replan: true
 gear: GEAR_DRIVE

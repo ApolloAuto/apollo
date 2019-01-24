@@ -53,13 +53,11 @@ if [ ${GDBSERVER_NUMS} -ne 0 ]; then
   sudo pkill -SIGKILL -f "gdbserver"
 fi
 
+echo ${MODULE_NAME}
 # Because the "grep ${MODULE_NAME}" always generates a process with the name of 
 # "${MODULE_NAME}", I added another grep to remove grep itself from the output.
-# The following command got a wrong result and I can't find the reason. 
-#PROCESS_ID=$(ps -eo pid,command | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $1}')
-# This one is OK.
-PROCESS_ID=$(pgrep -o -x "${MODULE_NAME}")
-#echo ${PROCESS_ID}
+PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
+echo ${PROCESS_ID}
 
 # If the moudle is not started, start it first. 
 if [ -z ${PROCESS_ID} ]; then       
@@ -70,7 +68,8 @@ if [ -z ${PROCESS_ID} ]; then
   # run command_name module_name
   run ${MODULE_NAME} "$@"
 
-  PROCESS_ID=$(pgrep -o -x "${MODULE_NAME}")
+  PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
+  echo ${PROCESS_ID}
 fi 
 
 sudo gdbserver :${PORT_NUM} --attach ${PROCESS_ID}

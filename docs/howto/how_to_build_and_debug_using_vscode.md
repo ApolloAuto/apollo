@@ -119,12 +119,12 @@ The following is the specific configuration code, please refer to the comments i
 This is due to inconsistencies in the bazel internal cache. 
 #### Solution: 
 Press any key to exit the compilation process. In the command terminal window of VSCode (if it is not open, press the shortcut key **Ctrl + `** to open) execute the following command to enter the Docker environment:
-```
+```bash
 bash docker/scripts/dev_into.sh
 ```
 
 Enter the following command in the Docker environment to perform the bazel cleanup cache task (must keep the network unblocked in order to successfully download the dependencies, otherwise the command will not work even if it is executed multiple times):
-```
+```bash
 bazel query //...
 ```
 
@@ -137,11 +137,11 @@ This is due to the existence of multiple different versions of Docker or bazel i
 Press the shortcut key **Ctrl+C** to terminate the current build process. In the command terminal window of VSCode (if it is not open, press the shortcut key **Ctrl + `** to open), use any of the following methods to stop:
     
 1. Stop all current running processes in Docker
-    ```
+    ```bash
     docker stop $(docker ps -a | grep apollo | awk '{print $1}')
     ```
 2. Stop all instances of Docker
-    ```
+    ```bash
     docker stop $(docker ps -aq)
     ```
 3. Execute the VSCode menu command: `Tasks -> Run Tasks (R)...`
@@ -156,14 +156,22 @@ Press the shortcut key `Ctrl+C` to terminate the current build process. In the c
 
 1. Enter Docker
 
-    ```Bash docker/scripts/dev_into.sh```
+    ```bash
+    bash docker/scripts/dev_into.sh
+    ```
 
 2. Kill the remaining compilation process in Docker
     
-    ```Pkill bazel-real```
+    ```bash
+    pkill bazel-real
+    ```
 
 3. Check if the bazel-real process remains in the Docker. If yes, press `q` to exit and perform step 2 again. Also use `ps aux | grep bazel-real` to view
-4. Exit Docker using ```exit```
+4. Exit Docker using 
+    
+    ```bash
+    exit
+    ```
 
 5. Press the shortcut key `Ctrl+Shift+B` to re-execute the build task.
 
@@ -182,7 +190,9 @@ When compiling Apollo projects, you will need to use debugging information optio
 
 After entering Docker, you can use the following command to view if the GDBServer is present:
 
-``` gdbserver --version```
+``` bash
+gdbserver --version
+```
 
 If the prompt is similar to the following information:
 
@@ -195,10 +205,14 @@ This gdbserver was configured as "x86_64-linux-gnu"
 
 It means that GDBServer has been installed inside Docker. You should be able to view the prompt below. But if the GDBServer is not present and  if you are prompted with the following information:
 
-``` bash: gdbserver: command not found```
+``` 
+bash: gdbserver: command not found
+```
 
 Then you would need to install the GDBServer using 
-```sudo apt-get install gdbserver```
+```bash
+sudo apt-get install gdbserver
+```
 
 ### Docker Internal Operations
 
@@ -232,15 +246,8 @@ Click the `Default Routing` tab on the left toolbar, select `Route: Reverse Earl
 #### Viewing the "Planning" Process ID
 
 Use the following command to view the "Planning" process ID:
-``` top ```
-
-The result is similar to the following figure, you can see that the `Planning` process ID is **4147**, please note down the ID. Press `q` to exit the `top` interface.
-
-![10](images/vscode/planning_id_top.png)
-
-Conversely, you can also use the following command to view the process ID:
 ``` bash
-ps aux | grep planning
+ps aux | grep mainboard | grep planning
 ```
 The result in the following figure is similar to the previous figure, you can see that the `Planning` process ID is 4147.
 
@@ -319,19 +326,17 @@ MODULE_NAME=$1
 PORT_NUM=$2
 shift 2
 
-# If there is a gdbserver process running, first stop it
+# If there is a gdbserver process running, stop it first. 
 GDBSERVER_NUMS=$(pgrep -c -x "gdbserver")
 if [ ${GDBSERVER_NUMS} -ne 0 ]; then
-  sudo pkill -f "gdbserver"
+  sudo pkill -SIGKILL -f "gdbserver"
 fi
 
+echo ${MODULE_NAME}
 # Because the "grep ${MODULE_NAME}" always generates a process with the name of 
 # "${MODULE_NAME}", I added another grep to remove grep itself from the output.
-# The following command got a wrong result and I can't find the reason. 
-#PROCESS_ID=$(ps -eo pid,command | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $1}')
-# This one is OK.
-PROCESS_ID=$(pgrep -o -x "${MODULE_NAME}")
-#echo ${PROCESS_ID}
+PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
+echo ${PROCESS_ID}
 
 # If the moudle is not started, start it first. 
 if [ -z ${PROCESS_ID} ]; then       
@@ -342,7 +347,8 @@ if [ -z ${PROCESS_ID} ]; then
   # run command_name module_name
   run ${MODULE_NAME} "$@"
 
-  PROCESS_ID=$(pgrep -o -x "${MODULE_NAME}")
+  PROCESS_ID=$(ps -ef | grep "mainboard" | grep "${MODULE_NAME}" | grep -v "grep" | awk '{print $2}')
+  echo ${PROCESS_ID}
 fi 
 
 sudo gdbserver :${PORT_NUM} --attach ${PROCESS_ID}
@@ -421,16 +427,14 @@ The `.vscode/launch.json` file is configured to connect to the debug service pro
         "name": "C++ Launch",
         "type": "cppdbg",
         "request": "launch",
-        // You can change the "planning" to your module name, but it should be 
-        // same as in gdbserver of the docker container. 
-        "program": "${workspaceRoot}/bazel-bin/modules/planning/planning",
+        "program": "${workspaceRoot}/bazel-bin/cyber/mainboard",
         // You can change "localhost:1111" to another "IP:port" name, but it 
-        // should be same as in gdbserver of the docker container.  
+        // should be same as those in gdbserver of the docker container.  
         "miDebuggerServerAddress": "localhost:1111",
-        // You can change the task to meet your demands in the 
-        // ".vscode/tasks.json" file (search the label:  
-        // "start gdbserver", but the module name and the port 
-        // number should be consistent with this file.        
+        // You can set the name of the module to be debugged in the 
+        // ".vscode/tasks.json" file, for example "planning".
+        // Tips: search the label "start gdbserver" in ".vscode/tasks.json".
+        // The port number should be consistent with this file.        
         "preLaunchTask": "start gdbserver",
         "args": [],
         "stopAtEntry": false,
@@ -454,13 +458,12 @@ The `.vscode/launch.json` file is configured to connect to the debug service pro
 The task for starting GDBServer in the `.vscode/tasks.json` file is configured as follows:
 
 ```
-	{
+        {
             "label": "start gdbserver",
             "type": "shell",
             // you can change the "planning" module name to another one and 
-            // change the "1111" to another port number.
-            // Note: the module name and port number should be same as in 
-            // the "launch.json" file. 
+            // change the "1111" to another port number. The port number should 
+            // be same as that in the "launch.json" file. 
             "command": "bash docker/scripts/dev_start_gdb_server.sh planning 1111",            
             "isBackground": true,
             "problemMatcher": {
@@ -470,7 +473,7 @@ The task for starting GDBServer in the `.vscode/tasks.json` file is configured a
                 },
                 "background": { 
                     "activeOnStart": true,
-                     // Don't change the following two lines, otherwise the 
+                    // Don't change the following two lines, otherwise the 
                     // gdbserver can't run in the background.
                     "beginsPattern": "^Listening on port$",
                     "endsPattern": "^$"

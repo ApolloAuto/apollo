@@ -16,7 +16,7 @@
 
 #include "modules/prediction/common/feature_output.h"
 
-#include <string>
+#include <vector>
 
 #include "modules/common/util/file.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -25,19 +25,26 @@ namespace apollo {
 namespace prediction {
 
 Features FeatureOutput::features_;
-DataForLearning FeatureOutput::data_for_learning_;
-std::size_t FeatureOutput::index_ = 0;
+ListDataForLearning FeatureOutput::list_data_for_learning_;
+std::size_t FeatureOutput::idx_feature_ = 0;
+std::size_t FeatureOutput::idx_learning_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
-  Write();
+  if (FLAGS_prediction_offline_mode) {
+    Write();
+  }
+  if (FLAGS_prediction_offline_dataforlearning) {
+    WriteDataForLearning();
+  }
   Clear();
 }
 
 void FeatureOutput::Clear() {
-  index_ = 0;
+  idx_feature_ = 0;
+  idx_learning_ = 0;
   features_.Clear();
-  data_for_learning_.Clear();
+  list_data_for_learning_.Clear();
 }
 
 bool FeatureOutput::Ready() {
@@ -49,24 +56,17 @@ void FeatureOutput::Insert(const Feature& feature) {
   features_.add_feature()->CopyFrom(feature);
 }
 
-void FeatureOutput::InsertIntoLearningData(const Feature& feature) {
-  data_for_learning_.set_id(feature.id());
-  data_for_learning_.set_timestamp(feature.timestamp());
-
-  for (int i = 0; i < feature.lane().lane_graph().lane_sequence_size();
-       i ++) {
-    DataForLearning::LaneSequenceData lane_sequence_data;
-    auto curr_lane_sequence = feature.lane().lane_graph().lane_sequence(i);
-
-    lane_sequence_data.set_lane_sequence_id(
-        curr_lane_sequence.lane_sequence_id());
-    for (int j = 0; j < curr_lane_sequence.features().mlp_features_size();
-         j ++) {
-      lane_sequence_data.add_features_lane_learning(
-          curr_lane_sequence.features().mlp_features(j));
-    }
-    data_for_learning_.add_lane_sequence_data()->CopyFrom(lane_sequence_data);
+void FeatureOutput::InsertDataForLearning(
+    const Feature& feature, const std::vector<double>& feature_values,
+    const std::string& category) {
+  DataForLearning* data_for_learning =
+      list_data_for_learning_.add_data_for_learning();
+  data_for_learning->set_id(feature.id());
+  data_for_learning->set_timestamp(feature.timestamp());
+  for (size_t i = 0; i < feature_values.size(); ++i) {
+    data_for_learning->add_features_for_learning(feature_values[i]);
   }
+  data_for_learning->set_category(category);
 }
 
 void FeatureOutput::Write() {
@@ -75,24 +75,31 @@ void FeatureOutput::Write() {
   } else {
     const std::string file_name =
         FLAGS_prediction_data_dir + "/feature." +
-        std::to_string(index_) + ".bin";
+        std::to_string(idx_feature_) + ".bin";
     common::util::SetProtoToBinaryFile(features_, file_name);
     features_.Clear();
-    ++index_;
+    ++idx_feature_;
   }
+}
 
-  if (!data_for_learning_.has_id()) {
+void FeatureOutput::WriteDataForLearning() {
+  if (list_data_for_learning_.data_for_learning_size() <= 0) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
     const std::string file_name =
         FLAGS_prediction_data_dir + "/datalearn." +
-        std::to_string(index_) + ".bin";
-    common::util::SetProtoToBinaryFile(data_for_learning_, file_name);
-    data_for_learning_.Clear();
+        std::to_string(idx_learning_) + ".bin";
+    common::util::SetProtoToBinaryFile(list_data_for_learning_, file_name);
+    list_data_for_learning_.Clear();
+    ++idx_learning_;
   }
 }
 
 int FeatureOutput::Size() { return features_.feature_size(); }
+
+int FeatureOutput::SizeOfDataForLearning() {
+  return list_data_for_learning_.data_for_learning_size();
+}
 
 }  // namespace prediction
 }  // namespace apollo

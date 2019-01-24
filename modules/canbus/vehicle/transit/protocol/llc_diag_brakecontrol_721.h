@@ -19,6 +19,8 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
+#include "gtest/gtest_prod.h"
+
 namespace apollo {
 namespace canbus {
 namespace transit {
@@ -81,6 +83,9 @@ class Llcdiagbrakecontrol721 : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_unit': 'mrev'}
   Llcdiagbrakecontrol721* set_llc_dbg_brakefeedforward(
       double llc_dbg_brakefeedforward);
+
+  FRIEND_TEST(llc_diag_brakecontrol_721Test, part1);
+  FRIEND_TEST(llc_diag_brakecontrol_721Test, part2);
 
  private:
   // config detail: {'description': 'Brake control loop P contribution',

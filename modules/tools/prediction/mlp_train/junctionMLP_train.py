@@ -30,7 +30,7 @@ import proto.fnn_model_pb2
 from proto.fnn_model_pb2 import FnnModel, Layer
 from sklearn.model_selection import train_test_split
 
-dim_input = 3 + 60
+dim_input = 3 + 72
 dim_output = 12
 
 
@@ -111,7 +111,7 @@ if __name__ == "__main__":
                   loss='categorical_crossentropy',
                   # loss='MSE',
                   metrics=['accuracy'])
-    model.fit(X_train, Y_train, epochs=10)
+    model.fit(X_train, Y_train, epochs=5)
     model_path = os.path.join(os.getcwd(), "junction_mlp_vehicle_model.bin")
     save_model(model, model_path)
     print("Model saved to: " + model_path)

@@ -64,7 +64,7 @@ cc_library(
     hdrs = [
         "distance_approach_ipopt_interface.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",

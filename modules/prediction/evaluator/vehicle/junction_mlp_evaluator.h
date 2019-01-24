@@ -57,6 +57,11 @@ class JunctionMLPEvaluator : public Evaluator {
   void ExtractFeatureValues(Obstacle* obstacle_ptr,
                             std::vector<double>* feature_values);
 
+  /**
+    * @brief Get the name of evaluator.
+    */
+  std::string GetName() override {return "JUNCTION_MLP_EVALUATOR";}
+
  private:
   /**
    * @brief Set obstacle feature vector
@@ -96,7 +101,7 @@ class JunctionMLPEvaluator : public Evaluator {
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 3;
-  static const size_t JUNCTION_FEATURE_SIZE = 60;
+  static const size_t JUNCTION_FEATURE_SIZE = 72;
 
   std::unique_ptr<FnnVehicleModel> model_ptr_;
 };

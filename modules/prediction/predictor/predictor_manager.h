@@ -54,10 +54,19 @@ class PredictorManager {
   Predictor* GetPredictor(const ObstacleConf::PredictorType& type);
 
   /**
-   * @brief Execute the predictor generation on perception obstacles
-   * @param Perception obstacles
+   * @brief Execute the predictor generation
    */
-  void Run(const perception::PerceptionObstacles& perception_obstacles);
+  void Run();
+
+  /**
+   * @brief Predict a single obstacle
+   * @param A pointer to the specific obstacle
+   * @param A pointer to prediction_obstacle
+   * @param A pointer to adc_trajectory_container
+   */
+  void PredictObstacle(Obstacle* obstacle,
+      PredictionObstacle* const prediction_obstacle,
+      ADCTrajectoryContainer* adc_trajectory_container);
 
   /**
    * @brief Get prediction obstacles

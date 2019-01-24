@@ -25,6 +25,8 @@ from modules.canbus.proto import chassis_pb2
 from modules.drivers.proto import pointcloud_pb2
 from module_control_analyzer import ControlAnalyzer
 from module_planning_analyzer import PlannigAnalyzer
+from modules.perception.proto import perception_obstacle_pb2
+from modules.prediction.proto import prediction_obstacle_pb2
 from lidar_endtoend_analyzer import LidarEndToEndAnalyzer
 
 
@@ -57,13 +59,21 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer, is_sim
             planning_analyzer.put(adc_trajectory)
             lidar_endtoend_analyzer.put_planning(adc_trajectory)
 
-        if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2":
+        if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2" or \
+            msg.topic == "/apollo/sensor/lidar128/compensator/PointCloud2":
             if not is_auto_drive or is_simulation:
                 continue
             point_cloud = pointcloud_pb2.PointCloud()
             point_cloud.ParseFromString(msg.message)
             lidar_endtoend_analyzer.put_lidar(point_cloud)
 
+        if msg.topic == "/apollo/perception/obstacles":
+            perception = perception_obstacle_pb2.PerceptionObstacles()
+            perception.ParseFromString(msg.message)
+
+        if msg.topic == "/apollo/prediction":
+            prediction = prediction_obstacle_pb2.PredictionObstacles()
+            prediction.ParseFromString(msg.message)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

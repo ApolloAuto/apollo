@@ -42,58 +42,6 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
   return (count == 0) ? 0.0 : sum / count;
 }
 
-Eigen::MatrixXf VectorToMatrixXf(const std::vector<double>& nums,
-    const int start_index, const int end_index) {
-  CHECK_LT(start_index, end_index);
-  CHECK_GE(start_index, 0);
-  CHECK_LE(end_index, static_cast<int>(nums.size()));
-  Eigen::MatrixXf output_matrix;
-  output_matrix.resize(1, end_index - start_index);
-  for (int i = start_index; i < end_index; ++i) {
-    output_matrix(0, i - start_index) = static_cast<float>(nums[i]);
-  }
-  return output_matrix;
-}
-
-Eigen::MatrixXf VectorToMatrixXf(const std::vector<double>& nums,
-    const int start_index, const int end_index,
-    const int output_num_row, const int output_num_col) {
-  CHECK_LT(start_index, end_index);
-  CHECK_GE(start_index, 0);
-  CHECK_LE(end_index, static_cast<int>(nums.size()));
-  CHECK_EQ(end_index - start_index, output_num_row * output_num_col);
-  Eigen::MatrixXf output_matrix;
-  output_matrix.resize(output_num_row, output_num_col);
-  int input_index = start_index;
-  for (int i = 0; i < output_num_row; ++i) {
-    for (int j = 0; j < output_num_col; ++j) {
-      output_matrix(i, j) = static_cast<float>(nums[input_index]);
-      ++input_index;
-    }
-  }
-  CHECK_EQ(input_index, end_index);
-  return output_matrix;
-}
-
-// Helper function for converting world coordinate of a point
-// to relative coordinate with respect to the object (obstacle or ADC).
-std::pair<double, double> WorldCoordToObjCoord
-    (std::pair<double, double> input_world_coord,
-     std::pair<double, double> obj_world_coord,
-     double obj_world_angle) {
-  double x_diff = input_world_coord.first - obj_world_coord.first;
-  double y_diff = input_world_coord.second - obj_world_coord.second;
-  double rho = std::sqrt(x_diff * x_diff + y_diff * y_diff);
-  double theta = std::atan2(y_diff, x_diff) - obj_world_angle;
-
-  return std::make_pair(std::cos(theta)*rho, std::sin(theta)*rho);
-}
-
-double WorldAngleToObjAngle(double input_world_angle,
-                            double obj_world_angle) {
-  return common::math::NormalizeAngle(input_world_angle - obj_world_angle);
-}
-
 CruiseMLPEvaluator::CruiseMLPEvaluator() {
   LoadModels(FLAGS_evaluator_cruise_vehicle_go_model_file,
              FLAGS_evaluator_cruise_vehicle_cutin_model_file);
@@ -163,12 +111,6 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       lane_sequence_ptr->set_probability(probability);
       lane_sequence_ptr->set_time_to_lane_center(finish_time);
     }
-  }
-
-  // For offline training, append each proto output to the offline file.
-  if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::Insert(*latest_feature_ptr);
-    ADEBUG << "Insert cruise feature into feature output";
   }
 }
 
