@@ -61,16 +61,10 @@ Stage::StageStatus StageCreep::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the traffic_light is still along referenceline
-  std::string traffic_light_overlap_id = GetContext()->traffic_light_id;
-  const std::vector<PathOverlap>& traffic_light_overlaps =
-      reference_line_info.reference_line().map_path().signal_overlaps();
-  auto traffic_light_overlap_it =
-      std::find_if(traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
-                   [&traffic_light_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == traffic_light_overlap_id;
-                   });
-  if (traffic_light_overlap_it == traffic_light_overlaps.end()) {
+  // check if the traffic_light is still along reference_line
+  std::string traffic_light_overlap_id =
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
+  if (CheckTrafficLightDone(reference_line_info, traffic_light_overlap_id)) {
     return FinishScenario();
   }
 
@@ -84,16 +78,18 @@ Stage::StageStatus StageCreep::Process(
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout = scenario_config_.creep_timeout();
   auto *task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
-  if (task && task->CheckCreepDone(*frame, reference_line_info,
-                                   traffic_light_overlap_it->end_s,
-                                   wait_time, timeout)) {
+  if (task && task->CheckCreepDone(
+      *frame, reference_line_info,
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s,
+      wait_time, timeout)) {
     return FinishStage();
   }
 
   // set param for PROCEED_WITH_CAUTION_SPEED
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-      ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
-                                        traffic_light_overlap_it->end_s);
+      ->SetProceedWithCautionSpeedParam(
+          *frame, reference_line_info,
+          PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
