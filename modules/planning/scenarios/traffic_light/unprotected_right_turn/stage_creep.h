@@ -32,9 +32,9 @@ namespace traffic_light {
 
 struct TrafficLightUnprotectedRightTurnContext;
 
-class StageCreep : public Stage {
+class TrafficLightUnprotectedRightTurnStageCreep : public Stage {
  public:
-  explicit StageCreep(
+  explicit TrafficLightUnprotectedRightTurnStageCreep(
       const ScenarioConfig::StageConfig& config) : Stage(config) {}
 
  private:

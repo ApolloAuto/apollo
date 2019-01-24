@@ -43,7 +43,7 @@ using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 using perception::TrafficLight;
 
-Stage::StageStatus StageCreep::Process(
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
@@ -56,7 +56,7 @@ Stage::StageStatus StageCreep::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageCreep planning error";
+    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -93,12 +93,12 @@ Stage::StageStatus StageCreep::Process(
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageCreep planning error";
+    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
   }
   return Stage::RUNNING;
 }
 
-Stage::StageStatus StageCreep::FinishStage() {
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::FinishStage() {
   next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
