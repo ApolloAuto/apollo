@@ -30,8 +30,8 @@ cc_binary(
 )
 
 cc_binary(
-   name = "records_to_data_for_learning",
-    srcs = ["records_to_data_for_learning.cc"],
+   name = "records_to_offline_data",
+    srcs = ["records_to_offline_data.cc"],
     deps = [
         "//modules/prediction/common:message_process",
     ],

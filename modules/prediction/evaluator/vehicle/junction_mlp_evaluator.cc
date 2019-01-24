@@ -73,10 +73,11 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   std::vector<double> feature_values;
   ExtractFeatureValues(obstacle_ptr, &feature_values);
+
   // Insert features to DataForLearning
-  if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         "junction");
+  if (FLAGS_prediction_offline_dataforlearning) {
+    FeatureOutput::InsertDataForLearning(
+        *latest_feature_ptr, feature_values, "junction");
     ADEBUG << "Save extracted features for learning locally.";
     return;  // Skip Compute probability for offline mode
   }
@@ -165,13 +166,6 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
   feature_values->insert(feature_values->end(),
                          junction_feature_values.begin(),
                          junction_feature_values.end());
-  if (FLAGS_prediction_offline_mode) {
-    SaveOfflineFeatures(obstacle_ptr->mutable_latest_feature(),
-                        *feature_values);
-    ADEBUG << "Save junction mlp features for obstacle ["
-           << obstacle_ptr->id() << "] with dim ["
-           << feature_values->size() << "]";
-  }
 }
 
 void JunctionMLPEvaluator::SetObstacleFeatureValues(
@@ -256,15 +250,6 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
         std::sqrt(diff_x * diff_x + diff_y * diff_y) / junction_range;
     feature_values->operator[](idx * 6 + 4) = diff_heading;
     feature_values->operator[](idx * 6 + 5) = cost;
-  }
-}
-
-void JunctionMLPEvaluator::SaveOfflineFeatures(
-    Feature* feature_ptr,
-    const std::vector<double>& feature_values) {
-  for (double feature_value : feature_values) {
-    feature_ptr->mutable_junction_feature()
-               ->add_junction_mlp_feature(feature_value);
   }
 }
 

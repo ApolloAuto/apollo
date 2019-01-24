@@ -19,6 +19,7 @@
 #include "modules/common/util/string_util.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/message_process.h"
+#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/util/data_extraction.h"
 
@@ -26,11 +27,15 @@ namespace apollo {
 namespace prediction {
 
 void GenerateDataForLearning() {
+  apollo::hdmap::HDMapUtil::ReloadMaps();
   if (!FeatureOutput::Ready()) {
     AERROR << "Feature output is not ready.";
     return;
   }
   if (FLAGS_prediction_offline_bags.empty()) {
+    return;
+  }
+  if (!MessageProcess::Init()) {
     return;
   }
   std::vector<std::string> inputs;

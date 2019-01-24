@@ -67,6 +67,7 @@ void FeatureOutput::InsertDataForLearning(
     data_for_learning->add_features_for_learning(feature_values[i]);
   }
   data_for_learning->set_category(category);
+  ADEBUG << "Insert [" << category << "] data for learning";
 }
 
 void FeatureOutput::Write() {
