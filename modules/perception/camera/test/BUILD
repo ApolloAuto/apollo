@@ -2,30 +2,30 @@ load("//tools:cpplint.bzl", "cpplint")
 
 package(default_visibility = ["//visibility:public"])
 
-cc_test(
-    name = "camera_app_obstacle_camera_perception_test",
-    size = "medium",
-    srcs = [
-        "camera_app_obstacle_camera_perception_test.cc",
-    ],
-    linkopts = [
-        "-lopencv_core",
-        "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
-    deps = [
-        "//modules/perception/camera/app:obstacle_camera_perception",
-        "//modules/perception/common:perception_gflags",
-        "//modules/perception/inference:inference_factory_lib",
-        "//modules/perception/inference/operators:perception_inference_operators",
-        "@caffe",
-        "@com_google_protobuf//:protobuf",
-        "@gtest//:main",
-        "@tensorrt",
-        "@yaml_cpp//:yaml",
-    ],
-)
+#cc_test(
+#    name = "camera_app_obstacle_camera_perception_test",
+#    size = "medium",
+#    srcs = [
+#        "camera_app_obstacle_camera_perception_test.cc",
+#    ],
+#    linkopts = [
+#        "-lopencv_core",
+#        "-lnvinfer_plugin",
+#        "-lopencv_imgproc",
+#        "-lopencv_highgui",
+#    ],
+#    deps = [
+#        "//modules/perception/camera/app:obstacle_camera_perception",
+#        "//modules/perception/common:perception_gflags",
+#        "//modules/perception/inference:inference_factory_lib",
+#        "//modules/perception/inference/operators:perception_inference_operators",
+#        "@caffe",
+#        "@com_google_protobuf//:protobuf",
+#        "@gtest//:main",
+#        "@tensorrt",
+#        "@yaml_cpp//:yaml",
+#    ],
+#)
 
 #cc_test(
 #    name = "camera_app_traffic_light_camera_perception_test",
@@ -49,6 +49,7 @@ cc_test(
 #        "@yaml_cpp//:yaml",
 #    ]
 #)
+
 cc_test(
     name = "camera_common_camera_ground_plane_test",
     size = "small",
@@ -443,42 +444,42 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test",
-    size = "medium",
-    srcs = [
-        "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test.cc",
-    ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
-    deps = [
-        "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
-        "//modules/perception/common/io:io_util",
-        "//modules/perception/inference/utils:inference_cuda_util_lib",
-        "//modules/perception/inference/utils:inference_util_lib",
-        "@gtest//:main",
-        "@yaml_cpp//:yaml",
-    ],
-)
+#cc_test(
+#    name = "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test",
+#    size = "medium",
+#    srcs = [
+#        "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test.cc",
+#    ],
+#    linkopts = [
+#        "-lopencv_core",
+#        "-lopencv_imgproc",
+#        "-lopencv_highgui",
+#    ],
+#    deps = [
+#        "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
+#        "//modules/perception/common/io:io_util",
+#        "//modules/perception/inference/utils:inference_cuda_util_lib",
+#        "//modules/perception/inference/utils:inference_util_lib",
+#        "@gtest//:main",
+#        "@yaml_cpp//:yaml",
+#    ],
+#)
 
-cc_test(
-    name = "camera_lib_obstacle_postprocessor_location_refiner_test",
-    size = "small",
-    srcs = [
-        "camera_lib_obstacle_postprocessor_location_refiner_test.cc",
-    ],
-    deps = [
-        "//cyber",
-        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
-        "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
-        "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
-        "//modules/perception/common/io:io_util",
-        "@gtest//:main",
-    ],
-)
+#cc_test(
+#    name = "camera_lib_obstacle_postprocessor_location_refiner_test",
+#    size = "small",
+#    srcs = [
+#        "camera_lib_obstacle_postprocessor_location_refiner_test.cc",
+#    ],
+#    deps = [
+#        "//cyber",
+#        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
+#        "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
+#        "//modules/perception/camera/lib/obstacle/postprocessor/location_refiner:location_refiner_obstacle_postprocessor",
+#        "//modules/perception/common/io:io_util",
+#        "@gtest//:main",
+#    ],
+#)
 
 cc_test(
     name = "camera_lib_obstacle_tracker_common_test",
