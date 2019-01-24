@@ -14,25 +14,31 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/planner/std_planner_dispatcher.h"
+/**
+ * @file
+ **/
 
-#include "modules/common/util/file.h"
-#include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#include "gtest/gtest.h"
+
+#include "modules/planning/planner/on_lane_planner_dispatcher.h"
+#include "modules/planning/planner/planner_dispatcher.h"
 
 namespace apollo {
 namespace planning {
 
-std::unique_ptr<Planner> StdPlannerDispatcher::DispatchPlanner() {
-  PlanningConfig planning_config;
-  apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                         &planning_config);
-  if (FLAGS_open_space_planner_switchable) {
-    return planner_factory_.CreateObject(
-        planning_config.standard_planning_config().planner_type(1));
-  }
-  return planner_factory_.CreateObject(
-      planning_config.standard_planning_config().planner_type(0));
+class OnLanePlannerDispatcherTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {}
+
+ protected:
+  std::unique_ptr<PlannerDispatcher> pd_;
+};
+
+TEST_F(OnLanePlannerDispatcherTest, Simple) {
+  pd_.reset(new OnLanePlannerDispatcher());
+  pd_->Init();
+  auto planner = pd_->DispatchPlanner();
+  EXPECT_EQ(planner->Name(), "PUBLIC_ROAD");
 }
 
 }  // namespace planning
