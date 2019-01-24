@@ -41,7 +41,7 @@ using common::time::Clock;
 using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
-Stage::StageStatus StageCreep::Process(
+Stage::StageStatus StopSignUnprotectedStageCreep::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
@@ -54,7 +54,7 @@ Stage::StageStatus StageCreep::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageCreep planning error";
+    AERROR << "StopSignUnprotectedStageCreep planning error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
@@ -85,12 +85,12 @@ Stage::StageStatus StageCreep::Process(
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageCreep planning error";
+    AERROR << "StopSignUnprotectedStageCreep planning error";
   }
   return Stage::RUNNING;
 }
 
-Stage::StageStatus StageCreep::FinishStage() {
+Stage::StageStatus StopSignUnprotectedStageCreep::FinishStage() {
   next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
