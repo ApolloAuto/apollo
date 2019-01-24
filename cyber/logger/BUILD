@@ -41,7 +41,6 @@ cc_library(
         "//cyber/base:macros",
         "//cyber/common",
         "//cyber/logger:log_file_object",
-        "//cyber/scheduler:scheduler_factory",
     ],
 )
 
