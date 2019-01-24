@@ -29,4 +29,12 @@ cc_binary(
     ],
 )
 
+cc_binary(
+   name = "records_to_data_for_learning",
+    srcs = ["records_to_data_for_learning.cc"],
+    deps = [
+        "//modules/prediction/common:message_process",
+    ],
+)
+
 cpplint()
