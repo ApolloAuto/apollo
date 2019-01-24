@@ -17,6 +17,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include "modules/prediction/proto/offline_features.pb.h"
 
@@ -58,7 +59,7 @@ class FeatureOutput {
     */
   static void InsertDataForLearning(
       const Feature& feature, const std::vector<double>& feature_values,
-      const std::vector<double>& labels);
+      const std::string& category);
 
   /**
    * @brief Write features to a file
