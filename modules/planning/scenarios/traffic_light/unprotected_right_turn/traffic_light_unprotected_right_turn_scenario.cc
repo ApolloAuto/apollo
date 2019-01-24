@@ -59,10 +59,9 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
     return;
   }
 
-  context_.traffic_light_id = traffic_light_overlap_id;
-  traffic_light_ = HDMapUtil::BaseMap().GetSignalById(
+  hdmap::SignalInfoConstPtr traffic_light = HDMapUtil::BaseMap().GetSignalById(
       hdmap::MakeMapId(traffic_light_overlap_id));
-  if (!traffic_light_) {
+  if (!traffic_light) {
     AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
     return;
   }
