@@ -158,7 +158,7 @@ void PlanningTestBase::SetUp() {
     // TODO(all)
     // planning_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
   } else {
-    planning_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    planning_ = std::unique_ptr<PlanningBase>(new OnLanePlanning());
   }
 
   CHECK(FeedTestData()) << "Failed to feed test data";
