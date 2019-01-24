@@ -253,3 +253,4 @@ DECLARE_bool(side_pass_use_actual_laneinfo_for_path_generation);
 DECLARE_double(side_pass_driving_width_l_buffer);
 
 DECLARE_bool(enable_parallel_hybrid_a);
+DECLARE_bool(enable_parallel_open_space_smoother);

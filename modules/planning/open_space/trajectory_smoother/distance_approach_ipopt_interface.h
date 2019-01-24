@@ -19,20 +19,19 @@
  */
 
 #pragma once
+#include <omp.h>
 
 #include <limits>
 #include <vector>
-
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
+
 #include "adolc/adolc.h"
 #include "adolc/adolc_sparse.h"
 #include "adolc/adouble.h"
-
 // TO-DO[runxin]: still have issue with adolc parallel
 #ifdef _OPENMP
-#include <omp.h>
 #include <adolc/adolc_openmp.h>
 #endif
 
@@ -97,6 +96,12 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
    */
   bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
                   int* iRow, int* jCol, double* values) override;
+  // sequential implementation to jac_g
+  bool eval_jac_g_ser(int n, const double* x, bool new_x, int m, int nele_jac,
+                      int* iRow, int* jCol, double* values);
+  // parallel implementation to jac_g
+  bool eval_jac_g_par(int n, const double* x, bool new_x, int m, int nele_jac,
+                      int* iRow, int* jCol, double* values);
 
   /** Method to return:
    *   1) The structure of the hessian of the lagrangian (if "values" is
