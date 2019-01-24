@@ -35,6 +35,6 @@ if __name__ == "__main__":
         if file.split('.')[-1] == 'bin' and \
            file.split('.')[0] == 'datalearn':
             label_path = args.labels_dirpath
-            CombineFeaturesAndLabels(full_file_path, label_path + 'labels.npy')
+            CombineFeaturesAndLabels(full_file_path, label_path + '/labels.npy')
 
     MergeCombinedFeaturesAndLabels(args.features_dirpath)
