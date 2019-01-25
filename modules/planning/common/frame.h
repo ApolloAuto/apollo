@@ -39,7 +39,6 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
-// #include "modules/planning/common/lag_prediction.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
@@ -212,8 +211,6 @@ class Frame {
   // output trajectory pb
   ADCTrajectory *output_trajectory_ = nullptr;  // not owned
 
-  // TODO(All): add lag_predictor back
-  // std::unique_ptr<LagPrediction> lag_predictor_;
   const ReferenceLineProvider *reference_line_provider_ = nullptr;
 
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
