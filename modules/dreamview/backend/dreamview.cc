@@ -29,7 +29,6 @@ namespace dreamview {
 
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
-using apollo::common::time::Clock;
 using apollo::common::util::PathExists;
 
 Dreamview::~Dreamview() { Stop(); }

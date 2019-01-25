@@ -15,10 +15,7 @@
 *****************************************************************************/
 #pragma once
 
-#include <assert.h>
-#include <Eigen/Eigen>
 #include <algorithm>
-#include <cstdlib>
 #include <fstream>
 #include <string>
 #include <vector>

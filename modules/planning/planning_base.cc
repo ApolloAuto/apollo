@@ -16,32 +16,25 @@
 
 #include "modules/planning/planning_base.h"
 
-#include <algorithm>
-#include <list>
-#include <vector>
-
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_internal.pb.h"
-#include "modules/planning/toolkits/task_factory.h"
+#include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::TrajectoryPoint;
-using apollo::common::time::Clock;
 using apollo::dreamview::Chart;
-using apollo::hdmap::HDMapUtil;
 using apollo::planning_internal::SLFrameDebug;
 using apollo::planning_internal::SpeedPlan;
 using apollo::planning_internal::STGraphDebug;
 
 PlanningBase::~PlanningBase() {}
 
-apollo::common::Status PlanningBase::Init(const PlanningConfig& config) {
+Status PlanningBase::Init(const PlanningConfig& config) {
   PlanningContext::Instance()->Init();
   TaskFactory::Init(config);
   return Status::OK();
@@ -50,7 +43,7 @@ apollo::common::Status PlanningBase::Init(const PlanningConfig& config) {
 void PlanningBase::FillPlanningPb(const double timestamp,
                                   ADCTrajectory* const trajectory_pb) {
   trajectory_pb->mutable_header()->set_timestamp_sec(timestamp);
-  if (!local_view_.prediction_obstacles->has_header()) {
+  if (local_view_.prediction_obstacles->has_header()) {
     trajectory_pb->mutable_header()->set_lidar_timestamp(
         local_view_.prediction_obstacles->header().lidar_timestamp());
     trajectory_pb->mutable_header()->set_camera_timestamp(

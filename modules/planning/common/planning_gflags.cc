@@ -31,19 +31,27 @@ DEFINE_bool(enable_collision_detection, false,
 // scenario related
 DEFINE_string(
     scenario_lane_follow_config_file,
-    "/apollo/modules/planning/conf/scenario_lane_follow_config.pb.txt",
+    "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt",
     "The lane follow scenario configuration file");
 DEFINE_string(scenario_side_pass_config_file,
-              "/apollo/modules/planning/conf/scenario_side_pass_config.pb.txt",
+              "/apollo/modules/planning/conf/scenario/side_pass_config.pb.txt",
               "side pass scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
-              "scenario_stop_sign_unprotected_config.pb.txt",
+              "scenario/stop_sign_unprotected_config.pb.txt",
               "stop_sign_unprotected scenario configuration file");
-DEFINE_string(scenario_traffic_light_right_turn_unprotected_config_file,
+DEFINE_string(scenario_traffic_light_protected_config_file,
               "/apollo/modules/planning/conf/"
-              "scenario_traffic_light_right_turn_unprotected_config.pb.txt",
-              "scenario_traffic_light_right_turn_unprotected config file");
+              "scenario/traffic_light_protected_config.pb.txt",
+              "scenario_traffic_light_protected config file");
+DEFINE_string(scenario_traffic_light_unprotected_left_turn_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/traffic_light_unprotected_left_turn_config.pb.txt",
+              "scenario_traffic_light_unprotected_left_turn config file");
+DEFINE_string(scenario_traffic_light_unprotected_right_turn_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/traffic_light_unprotected_right_turn_config.pb.txt",
+              "scenario_traffic_light_unprotected_right_turn config file");
 
 DEFINE_bool(enable_scenario_side_pass, true,
             "enable side pass scenario in planning");
@@ -54,10 +62,10 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
 
-DEFINE_bool(enable_scenario_stop_sign_unprotected, true,
-            "enable stop_sign_unprotected scenario in planning");
-DEFINE_bool(enable_scenario_traffic_light_right_turn_unprotected, false,
-            "enable traffic_light_right_turn_unprotected scenario in planning");
+DEFINE_bool(enable_scenario_stop_sign, true,
+            "enable stop_sign scenarios in planning");
+DEFINE_bool(enable_scenario_traffic_light, false,
+            "enable traffic_light scenarios in planning");
 
 DEFINE_string(traffic_rule_config_filename,
               "/apollo/modules/planning/conf/traffic_rule_config.pb.txt",
@@ -421,11 +429,6 @@ DEFINE_bool(enable_perception_obstacles, true,
 DEFINE_bool(enable_open_space_planner_thread, true,
             "Enable thread in open space planner for trajectory publish.");
 
-DEFINE_bool(
-    parking_inwards, false,
-    "true for parking the car inwards in parking spot, false for parking "
-    "the car towards the street");
-
 DEFINE_bool(open_space_planner_switchable, false,
             "true for std planning being able to switch to open space planner "
             "when close enough to target parking spot");
@@ -454,7 +457,7 @@ DEFINE_double(
 DEFINE_double(max_trajectory_len, 1000.0,
               "(unit: meter) max possible trajectory length.");
 DEFINE_bool(enable_rss_fallback, false, "trigger rss fallback");
-DEFINE_bool(enable_rss_info, false, "enable rss_info in trajectory_pb");
+DEFINE_bool(enable_rss_info, true, "enable rss_info in trajectory_pb");
 
 DEFINE_bool(
     enable_planning_smoother, true,
@@ -482,3 +485,6 @@ DEFINE_bool(side_pass_use_actual_laneinfo_for_path_generation, false,
             " or to use the planning starting-point's laneinfo all the time.");
 DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
               "(unit: meter) for side pass driving width l buffer");
+
+DEFINE_bool(enable_parallel_hybrid_a, false,
+            "True to enable hybrid a* implementation.");

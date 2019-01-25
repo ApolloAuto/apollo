@@ -20,6 +20,7 @@ message ObstacleConf {
     CRUISE_MLP_EVALUATOR = 3;
     JUNCTION_MLP_EVALUATOR = 4;
     CYCLIST_KEEP_LANE_EVALUATOR = 5;
+    LANE_SCANNING_EVALUATOR = 6;
   }
 
   enum PredictorType {

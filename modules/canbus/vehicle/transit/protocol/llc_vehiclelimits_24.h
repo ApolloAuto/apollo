@@ -18,6 +18,7 @@
 
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
+#include "gtest/gtest_prod.h"
 
 namespace apollo {
 namespace canbus {
@@ -30,6 +31,7 @@ class Llcvehiclelimits24 : public ::apollo::drivers::canbus::ProtocolData<
   Llcvehiclelimits24();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ChassisDetail* chassis) const override;
+  FRIEND_TEST(Vehiclelimits_24_test, General);
 
  private:
   // config detail: {'description': 'Steering angle feedback', 'offset': 0.0,

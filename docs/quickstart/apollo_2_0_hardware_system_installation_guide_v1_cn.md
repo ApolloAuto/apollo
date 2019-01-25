@@ -948,32 +948,32 @@ psrdiffsource auto any
 
 SETIMUTOANTOFFSET 0.00 1.10866 1.14165 0.05 0.05 0.08
 SETINSOFFSET 0 0 0
-EVENTOUTCONTROLMARK2 ENABLE POSITIVE 999999990 10
-EVENTOUTCONTROLMARK1 ENABLE POSITIVE 500000000 500000000
+EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10
+EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000
 
 
 LOG COM2 GPRMC ONTIME 1.0 0.25
-LOG GPGGA ONTIME 1.0
+LOG USB1 GPGGA ONTIME 1.0
 
-log bestgnssposb ontime 1
-log bestgnssvelb ontime 1
-log bestposb ontime 1
-log INSPVAXB ontime 1
-log INSPVASB ontime 0.01
-log CORRIMUDATASB ontime 0.01
-log RAWIMUSXB onnew 0 0
-log mark1pvab onnew
+log USB1 bestgnssposb ontime 1
+log USB1 bestgnssvelb ontime 1
+log USB1 bestposb ontime 1
+log USB1 INSPVAXB ontime 1
+log USB1 INSPVASB ontime 0.01
+log USB1 CORRIMUDATASB ontime 0.01
+log USB1 RAWIMUSXB onnew 0 0
+log USB1 mark1pvab onnew
 
-log rangeb ontime 1
-log bdsephemerisb
-log gpsephemb
-log gloephemerisb
-log bdsephemerisb ontime 15
-log gpsephemb ontime 15
-log gloephemerisb ontime 15
+log USB1 rangeb ontime 1
+log USB1 bdsephemerisb
+log USB1 gpsephemb
+log USB1 gloephemerisb
+log USB1 bdsephemerisb ontime 15
+log USB1 gpsephemb ontime 15
+log USB1 gloephemerisb ontime 15
 
-log imutoantoffsetsb once
-log vehiclebodyrotationb onchanged
+log USB1 imutoantoffsetsb once
+log USB1 vehiclebodyrotationb onchanged
  
 SAVECONFIG
 
@@ -1001,32 +1001,32 @@ rtksource auto any
 psrdiffsource auto any
 SETIMUTOANTOFFSET 0.00 1.10866 1.14165 0.05 0.05 0.08
 SETINSOFFSET 0 0 0
-EVENTOUTCONTROLMARK2 ENABLE POSITIVE 999999990 10
-EVENTOUTCONTROLMARK1 ENABLE POSITIVE 500000000 500000000
+EVENTOUTCONTROL MARK2 ENABLE POSITIVE 999999990 10
+EVENTOUTCONTROL MARK1 ENABLE POSITIVE 500000000 500000000
 
 
 LOG COM2 GPRMC ONTIME 1.0 0.25
 LOG GPGGA ONTIME 1.0
 
-log bestgnssposb ontime 1
-log bestgnssvelb ontime 1
-log bestposb ontime 1
-log INSPVAXB ontime 1
-log INSPVASB ontime 0.01
-log CORRIMUDATASB ontime 0.01
-log RAWIMUSXB onnew 0 0
-log mark1pvab onnew
+log USB1 bestgnssposb ontime 1
+log USB1 bestgnssvelb ontime 1
+log USB1 bestposb ontime 1
+log USB1 INSPVAXB ontime 1
+log USB1 INSPVASB ontime 0.01
+log USB1 CORRIMUDATASB ontime 0.01
+log USB1 RAWIMUSXB onnew 0 0
+log USB1 mark1pvab onnew
 
-log rangeb ontime 1
-log bdsephemerisb
-log gpsephemb
-log gloephemerisb
-log bdsephemerisb ontime 15
-log gpsephemb ontime 15
-log gloephemerisb ontime 15
+log USB1 rangeb ontime 1
+log USB1 bdsephemerisb
+log USB1 gpsephemb
+log USB1 gloephemerisb
+log USB1 bdsephemerisb ontime 15
+log USB1 gpsephemb ontime 15
+log USB1 gloephemerisb ontime 15
 
-log imutoantoffsetsb once
-log vehiclebodyrotationb onchanged
+log USB1 imutoantoffsetsb once
+log USB1 vehiclebodyrotationb onchanged
  
 SAVECONFIG
 ```

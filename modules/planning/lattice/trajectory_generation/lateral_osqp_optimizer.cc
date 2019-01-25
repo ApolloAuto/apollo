@@ -16,8 +16,6 @@
 
 #include "modules/planning/lattice/trajectory_generation/lateral_osqp_optimizer.h"
 
-#include <algorithm>
-
 #include "cyber/common/log.h"
 #include "modules/common/math/matrix_operations.h"
 #include "modules/planning/common/planning_gflags.h"

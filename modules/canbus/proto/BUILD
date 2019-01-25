@@ -13,8 +13,10 @@ proto_library(
         "canbus_conf.proto",
         "chassis.proto",
         "chassis_detail.proto",
+        "ge3.proto",
         "lexus.proto",
         "transit.proto",
+        "wey.proto",
         "vehicle_parameter.proto",
     ],
     deps = [

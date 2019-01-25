@@ -16,9 +16,6 @@
 
 #include "modules/perception/base/box.h"
 
-#include <limits>
-#include <vector>
-
 #include "gtest/gtest.h"
 
 namespace apollo {

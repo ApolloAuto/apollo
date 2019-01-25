@@ -10,7 +10,7 @@ cc_library(
     hdrs = [
         "open_space_planner.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         "//cyber/common:log",
         "//external:gflags",
@@ -25,6 +25,7 @@ cc_library(
         "//modules/planning/common:planning_common",
         "//modules/planning/open_space/constraints_formulation:open_space_ROI",
         "//modules/planning/open_space:open_space_trajectory_generator",
+        "//modules/planning/open_space/trajectory_partition:trajectory_partitioner",
         "//modules/planning/planner",
         "//modules/planning/proto:planning_proto",
         "@eigen",
@@ -37,6 +38,7 @@ cc_test(
     srcs = [
         "open_space_planner_test.cc",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         ":open_space_planner",
         "@gtest//:main",

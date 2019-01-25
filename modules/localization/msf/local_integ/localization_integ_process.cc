@@ -16,8 +16,6 @@
 
 #include "modules/localization/msf/local_integ/localization_integ_process.h"
 
-#include <iomanip>
-
 #include "yaml-cpp/yaml.h"
 
 #include "cyber/common/log.h"

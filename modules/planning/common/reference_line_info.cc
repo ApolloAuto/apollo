@@ -20,10 +20,6 @@
 
 #include "modules/planning/common/reference_line_info.h"
 
-#include <algorithm>
-#include <functional>
-#include <utility>
-
 #include "cyber/task/task.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
@@ -40,7 +36,6 @@ namespace planning {
 
 using apollo::canbus::Chassis;
 using apollo::common::EngageAdvice;
-using apollo::common::SLPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::VehicleSignal;
@@ -119,6 +114,10 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
 
   // set lattice planning target speed limit;
   SetCruiseSpeed(FLAGS_default_cruise_speed);
+
+  // set path_turn_type
+  SetPathTurnType();
+
   is_safe_to_change_lane_ = CheckChangeLane();
   is_inited_ = true;
   return true;
@@ -214,6 +213,10 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
     }
   }
   return ADCTrajectory::UNPROTECTED;
+}
+
+const hdmap::Lane::LaneTurn& ReferenceLineInfo::GetPathTurnType() const {
+  return path_turn_type_;
 }
 
 bool ReferenceLineInfo::CheckChangeLane() const {
@@ -541,25 +544,6 @@ void ReferenceLineInfo::ExportTurnSignal(VehicleSignal* signal) const {
   }
 }
 
-bool ReferenceLineInfo::IsRightTurnPath(const double forward_buffer) const {
-  double route_s = 0.0;
-  const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
-  for (const auto& seg : Lanes()) {
-    if (route_s > adc_s + forward_buffer) {
-      break;
-    }
-    route_s += seg.end_s - seg.start_s;
-    if (route_s < adc_s) {
-      continue;
-    }
-    const auto& turn = seg.lane->lane().turn();
-    if (turn == hdmap::Lane::RIGHT_TURN) {
-      return true;
-    }
-  }
-  return false;
-}
-
 bool ReferenceLineInfo::ReachedDestination() const {
   constexpr double kDestinationDeltaS = 0.05;
   return SDistanceToDestination() <= kDestinationDeltaS;
@@ -778,5 +762,31 @@ void ReferenceLineInfo::MakeEStopDecision(
     object_decision->add_object_decision()->mutable_avoid();
   }
 }
+
+void ReferenceLineInfo::SetPathTurnType() {
+  const double forward_buffer = 20.0;
+  double route_s = 0.0;
+  const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
+  for (const auto& seg : Lanes()) {
+    if (route_s > adc_s + forward_buffer) {
+      break;
+    }
+    route_s += seg.end_s - seg.start_s;
+    if (route_s < adc_s) {
+      continue;
+    }
+    const auto& turn_type = seg.lane->lane().turn();
+    if (turn_type == hdmap::Lane::LEFT_TURN ||
+        turn_type == hdmap::Lane::RIGHT_TURN ||
+        turn_type == hdmap::Lane::U_TURN) {
+      path_turn_type_ = turn_type;
+      return;
+    }
+  }
+
+  path_turn_type_ = hdmap::Lane::NO_TURN;
+  return;
+}
+
 }  // namespace planning
 }  // namespace apollo

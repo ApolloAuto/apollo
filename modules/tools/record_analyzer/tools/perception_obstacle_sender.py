@@ -48,10 +48,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    record_file = args.file
-
     cyber.init()
-
     node = cyber.Node("perception_obstacle_sender")
     perception_pub = node.create_writer(
         "/apollo/perception/obstacles",

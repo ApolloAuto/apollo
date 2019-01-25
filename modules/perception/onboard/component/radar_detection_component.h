@@ -35,11 +35,8 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-using apollo::cyber::FAIL;
-using apollo::cyber::SUCC;
 using apollo::drivers::ContiRadar;
 using apollo::localization::LocalizationEstimate;
-using apollo::perception::onboard::RadarComponentConfig;
 
 class RadarDetectionComponent : public cyber::Component<ContiRadar> {
  public:

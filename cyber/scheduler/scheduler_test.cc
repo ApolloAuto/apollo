@@ -33,10 +33,10 @@ namespace scheduler {
 void proc() {}
 
 TEST(SchedulerTest, create_task) {
-  GlobalData::Instance()->SetProcessGroup("example_classic_sched");
+  GlobalData::Instance()->SetProcessGroup("example_sched_classic");
   auto sched = Instance();
   cyber::Init("scheduler_test");
-  // read example_classic_sched.conf task 'ABC' prio
+  // read example_sched_classic.conf task 'ABC' prio
   std::string croutine_name = "ABC";
 
   EXPECT_TRUE(sched->CreateTask(&proc, croutine_name));

@@ -3,9 +3,10 @@ syntax = "proto2";
 package apollo.dreamview;
 
 import "modules/common/monitor_log/proto/monitor_log.proto";
-import "modules/planning/proto/planning_internal.proto";
-import "modules/perception/proto/perception_obstacle.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/perception/proto/perception_obstacle.proto";
+import "modules/planning/proto/planning_internal.proto";
+import "modules/prediction/proto/feature.proto";
 import "modules/routing/proto/routing.proto";
 
 // Next-id: 4
@@ -144,14 +145,7 @@ message Object {
 
   // perception confidence level. Range: [0,1]
   optional double confidence = 31 [default = 1];
-
-  enum ObstaclePriority {
-      CAUTION = 1;
-      NORMAL = 2;
-      IGNORE = 3;
-  }
-
-  optional ObstaclePriority obstacle_priority = 33 [default = NORMAL];
+  optional apollo.prediction.ObstaclePriority obstacle_priority = 33;
 }
 
 message DelaysInMs {

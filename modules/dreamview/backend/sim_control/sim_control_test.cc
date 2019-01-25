@@ -16,8 +16,6 @@
 
 #include "modules/dreamview/backend/sim_control/sim_control.h"
 
-#include <cmath>
-
 #include "cyber/blocker/blocker_manager.h"
 
 #include "gmock/gmock.h"
@@ -35,7 +33,6 @@ using apollo::cyber::blocker::BlockerManager;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::prediction::PredictionObstacles;
-using apollo::routing::RoutingResponse;
 
 namespace apollo {
 namespace dreamview {

@@ -22,7 +22,6 @@
 #include "modules/planning/navi/decider/navi_speed_decider.h"
 
 #include <algorithm>
-#include <cmath>
 #include <limits>
 
 #include "cyber/common/log.h"
@@ -38,7 +37,6 @@ using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Clamp;
-using apollo::common::util::MakePathPoint;
 
 namespace {
 constexpr double kTsGraphSStep = 0.4;

@@ -1,5 +1,8 @@
 header {
   timestamp_sec: 1527023638.1240931
+  lidar_timestamp: 0
+  camera_timestamp: 0
+  radar_timestamp: 0
 }
 is_replan: true
 gear: GEAR_DRIVE
@@ -24,8 +27,8 @@ decision {
         follow {
           distance_s: -5.4097223281860352
           fence_point {
-            x: 586426.49820628366
-            y: 4140685.4595480911
+            x: 586426.49820631114
+            y: 4140685.4595482079
             z: 0
           }
           fence_heading: 1.3387142186783652

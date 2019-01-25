@@ -23,7 +23,6 @@
 #pragma once
 
 #include <algorithm>
-#include <functional>
 #include <vector>
 
 #include "Eigen/Core"

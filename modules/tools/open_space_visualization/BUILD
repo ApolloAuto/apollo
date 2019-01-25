@@ -21,6 +21,7 @@ cc_binary(
     ],
     linkshared = True,
     linkstatic = False,
+    copts = ["-fopenmp"],
     deps = [
         "//modules/planning/open_space/trajectory_smoother:distance_approach_problem",
         "//modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_problem",

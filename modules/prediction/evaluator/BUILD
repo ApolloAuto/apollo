@@ -11,6 +11,7 @@ cc_library(
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:mlp_evaluator",
+        "//modules/prediction/evaluator/vehicle:lane_scanning_evaluator",
         "//modules/prediction/evaluator/vehicle:rnn_evaluator",
         "//modules/prediction/evaluator/cyclist:cyclist_keep_lane_evaluator",
         "//modules/prediction/proto:prediction_conf_proto",

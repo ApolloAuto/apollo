@@ -35,7 +35,7 @@ sys.path.append(CYBER_DIR + "/cyber/")
 
 _CYBER_RECORD = importlib.import_module('_cyber_record')
 PyBagMessage = collections.namedtuple('PyBagMessage',
-                    'topic message data_type timestamp')
+                                      'topic message data_type timestamp')
 #//////////////////////////////record file class//////////////////////////////
 class RecordReader(object):
     """

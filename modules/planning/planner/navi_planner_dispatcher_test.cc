@@ -20,8 +20,6 @@
 
 #include "modules/planning/planner/navi_planner_dispatcher.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 
 #include "modules/planning/planner/planner_dispatcher.h"
@@ -41,7 +39,7 @@ TEST_F(NaviPlannerDispatcherTest, Simple) {
   pd_.reset(new NaviPlannerDispatcher());
   pd_->Init();
   auto planner = pd_->DispatchPlanner();
-  EXPECT_EQ(planner->Name(), "PUBLIC_ROAD");
+  EXPECT_EQ(planner->Name(), "NAVI");
 }
 
 }  // namespace planning

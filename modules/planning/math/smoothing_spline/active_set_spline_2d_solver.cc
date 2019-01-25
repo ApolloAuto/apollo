@@ -22,7 +22,6 @@
 
 #include <algorithm>
 
-#include "Eigen/Core"
 #include "cyber/common/log.h"
 
 #include "modules/common/math/qp_solver/qp_solver_gflags.h"

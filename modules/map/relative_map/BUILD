@@ -70,7 +70,8 @@ cc_library(
 
 cc_binary(
     name = "librelative_map_component.so",
-    linkopts = ["-shared"],
+    linkshared = True,
+    linkstatic = False,
     deps = [":relative_map_component_lib"],
 )
 
@@ -81,21 +82,22 @@ filegroup(
     ]),
 )
 
-#cc_test(
-#    name = "navigation_lane_test",
-#    size = "small",
-#    srcs = [
-#        "navigation_lane_test.cc",
-#    ],
-#    data = [
-#        ":testdata",
-#    ],
-#    deps = [
-#        "@gtest//:main",
-#        ":relative_map_component_lib",
-#        "//modules/common",
-#        "//third_party/json",
-#    ],
-#)
+cc_test(
+    name = "navigation_lane_test",
+    size = "small",
+    srcs = [
+        "navigation_lane_test.cc",
+    ],
+    data = [
+        ":relative_map_conf",
+        ":testdata",
+    ], 
+    deps = [
+        "@gtest//:main",
+        ":relative_map_component_lib",
+        "//modules/common",
+        "//third_party/json",
+    ],
+)
 
 cpplint()

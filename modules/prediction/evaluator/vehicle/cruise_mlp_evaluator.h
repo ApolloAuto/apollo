@@ -52,6 +52,12 @@ class CruiseMLPEvaluator : public Evaluator {
   void ExtractFeatureValues(Obstacle* obstacle_ptr,
                             LaneSequence* lane_sequence_ptr,
                             std::vector<double>* feature_values);
+
+  /**
+    * @brief Get the name of evaluator.
+    */
+  std::string GetName() override {return "CRUISE_MLP_EVALUATOR";}
+
   void Clear();
 
  private:

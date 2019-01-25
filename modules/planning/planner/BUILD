@@ -24,14 +24,14 @@ cc_library(
     srcs = [
         "navi_planner_dispatcher.cc",
         "planner_dispatcher.cc",
-        "std_planner_dispatcher.cc",
+        "on_lane_planner_dispatcher.cc",
     ],
     hdrs = [
         "navi_planner_dispatcher.h",
         "planner_dispatcher.h",
-        "std_planner_dispatcher.h",
+        "on_lane_planner_dispatcher.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         "//modules/common/status",
         "//modules/common/util",
@@ -41,20 +41,14 @@ cc_library(
         "//modules/planning/planner/public_road:public_road_planner",
         "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/proto:planning_proto",
-        # for open space planner
-        "//modules/common/math",
-        "//modules/common/vehicle_state:vehicle_state_provider",
-        "//modules/map/pnc_map",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/proto:planning_config_proto",
     ],
 )
 
 cc_test(
-    name = "std_planner_dispatcher_test",
+    name = "on_lane_planner_dispatcher_test",
     size = "small",
     srcs = [
-        "std_planner_dispatcher_test.cc",
+        "on_lane_planner_dispatcher_test.cc",
     ],
     deps = [
         ":planner_dispatcher",

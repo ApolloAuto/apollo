@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/tracker/common/tracked_object.h"
 
-#include <sstream>
-#include <string>
-
 #include "cyber/common/log.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/base/point_cloud.h"

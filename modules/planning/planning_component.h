@@ -17,7 +17,6 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
 
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
@@ -27,15 +26,12 @@
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/planning_base.h"
 #include "modules/planning/proto/pad_msg.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
-
-#include "modules/planning/open_space_planning.h"
-#include "modules/planning/planning_base.h"
-#include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace planning {

@@ -70,20 +70,23 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   planner_open_space_config_.CopyFrom(planner_open_space_config);
   distance_approach_config_ =
       planner_open_space_config_.distance_approach_config();
-  weight_state_x_ = distance_approach_config_.weight_state(0);
-  weight_state_y_ = distance_approach_config_.weight_state(1);
-  weight_state_phi_ = distance_approach_config_.weight_state(2);
-  weight_state_v_ = distance_approach_config_.weight_state(3);
-  weight_input_steer_ = distance_approach_config_.weight_u(0);
-  weight_input_a_ = distance_approach_config_.weight_u(1);
-  weight_rate_steer_ = distance_approach_config_.weight_u_rate(0);
-  weight_rate_a_ = distance_approach_config_.weight_u_rate(1);
-  weight_stitching_steer_ = distance_approach_config_.weight_stitching(0);
-  weight_stitching_a_ = distance_approach_config_.weight_stitching(1);
-  weight_first_order_time_ = distance_approach_config_.weight_time(0);
-  weight_second_order_time_ = distance_approach_config_.weight_time(1);
+  weight_state_x_ = distance_approach_config_.weight_x();
+  weight_state_y_ = distance_approach_config_.weight_y();
+  weight_state_phi_ = distance_approach_config_.weight_phi();
+  weight_state_v_ = distance_approach_config_.weight_v();
+  weight_input_steer_ = distance_approach_config_.weight_steer();
+  weight_input_a_ = distance_approach_config_.weight_a();
+  weight_rate_steer_ = distance_approach_config_.weight_steer_rate();
+  weight_rate_a_ = distance_approach_config_.weight_a_rate();
+  weight_stitching_steer_ = distance_approach_config_.weight_steer_stitching();
+  weight_stitching_a_ = distance_approach_config_.weight_a_stitching();
+  weight_first_order_time_ =
+      distance_approach_config_.weight_first_order_time();
+  weight_second_order_time_ =
+      distance_approach_config_.weight_second_order_time();
   min_safety_distance_ = distance_approach_config_.min_safety_distance();
-  max_steer_angle_ = distance_approach_config_.max_steer_angle();
+  max_steer_angle_ =
+      vehicle_param_.max_steer_angle() / vehicle_param_.steer_ratio();
   max_speed_forward_ = distance_approach_config_.max_speed_forward();
   max_speed_reverse_ = distance_approach_config_.max_speed_reverse();
   max_acceleration_forward_ =
@@ -94,7 +97,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       distance_approach_config_.min_time_sample_scaling();
   max_time_sample_scaling_ =
       distance_approach_config_.max_time_sample_scaling();
-  max_steer_rate_ = distance_approach_config_.max_steer_rate();
+  max_steer_rate_ =
+      vehicle_param_.max_steer_angle_rate() / vehicle_param_.steer_ratio();
   use_fix_time_ = distance_approach_config_.use_fix_time();
   wheelbase_ = vehicle_param_.wheel_base();
 }
@@ -319,7 +323,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   g_u[constraint_index + 3] = x0_(3, 0);
   constraint_index += 4;
 
-  for (int i = 1; i < horizon_; i++) {
+  for (int i = 1; i < horizon_; ++i) {
     g_l[constraint_index] = XYbounds_[0];
     g_u[constraint_index] = XYbounds_[1];
     g_l[constraint_index + 1] = XYbounds_[2];
@@ -340,7 +344,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
   g_u[constraint_index + 3] = xf_(3, 0);
   constraint_index += 4;
 
-  for (int i = 0; i < horizon_; i++) {
+  for (int i = 0; i < horizon_; ++i) {
     g_l[constraint_index] = -max_steer_angle_;
     g_u[constraint_index] = max_steer_angle_;
     g_l[constraint_index + 1] = -max_acceleration_reverse_;
@@ -348,7 +352,7 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
     constraint_index += 2;
   }
 
-  for (int i = 0; i < horizon_ + 1; i++) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
     if (!use_fix_time_) {
       g_l[constraint_index] = min_time_sample_scaling_;
       g_u[constraint_index] = max_time_sample_scaling_;
@@ -755,7 +759,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     constraint_index += 4;
     state_index += 4;
 
-    for (int i = 1; i < horizon_; i++) {
+    for (int i = 1; i < horizon_; ++i) {
       iRow[nz_index] = constraint_index;
       jCol[nz_index] = state_index;
       nz_index++;
@@ -785,7 +789,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     constraint_index += 4;
     state_index += 4;
 
-    for (int i = 0; i < horizon_; i++) {
+    for (int i = 0; i < horizon_; ++i) {
       iRow[nz_index] = constraint_index;
       jCol[nz_index] = control_index;
       nz_index++;
@@ -796,7 +800,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
       control_index += 2;
     }
 
-    for (int i = 0; i < horizon_ + 1; i++) {
+    for (int i = 0; i < horizon_ + 1; ++i) {
       iRow[nz_index] = constraint_index;
       jCol[nz_index] = time_index;
       nz_index++;
@@ -1222,7 +1226,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     values[nz_index] = 1.0;
     nz_index++;
 
-    for (int i = 1; i < horizon_; i++) {
+    for (int i = 1; i < horizon_; ++i) {
       values[nz_index] = 1.0;
       nz_index++;
       values[nz_index] = 1.0;
@@ -1241,14 +1245,14 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
     values[nz_index] = 1.0;
     nz_index++;
 
-    for (int i = 0; i < horizon_; i++) {
+    for (int i = 0; i < horizon_; ++i) {
       values[nz_index] = 1.0;
       nz_index++;
       values[nz_index] = 1.0;
       nz_index++;
     }
 
-    for (int i = 0; i < horizon_ + 1; i++) {
+    for (int i = 0; i < horizon_ + 1; ++i) {
       values[nz_index] = 1.0;
       nz_index++;
     }
@@ -1328,7 +1332,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     control_result_(0, i) = x[control_index];
     control_result_(1, i) = x[control_index + 1];
     time_result_(0, i) = x[time_index];
-    for (int j = 0; j < obstacles_edges_sum_; j++) {
+    for (int j = 0; j < obstacles_edges_sum_; ++j) {
       dual_l_result_(j, i) = x[dual_l_index + j];
     }
     for (int k = 0; k < 4 * obstacles_num_; k++) {
@@ -1351,7 +1355,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   state_result_(3, horizon_) = xf_(3, 0);
   time_result_(0, horizon_) = x[time_index];
   time_result_ = ts_ * time_result_;
-  for (int j = 0; j < obstacles_edges_sum_; j++) {
+  for (int j = 0; j < obstacles_edges_sum_; ++j) {
     dual_l_result_(j, horizon_) = x[dual_l_index + j];
   }
   for (int k = 0; k < 4 * obstacles_num_; k++) {
@@ -1627,7 +1631,8 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   constraint_index += 4;
   state_index += 4;
 
-  for (int i = 1; i < horizon_; i++) {
+  // constraints on x,y,v
+  for (int i = 1; i < horizon_; ++i) {
     g[constraint_index] = x[state_index];
     g[constraint_index + 1] = x[state_index + 1];
     g[constraint_index + 2] = x[state_index + 3];
@@ -1643,14 +1648,14 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   constraint_index += 4;
   state_index += 4;
 
-  for (int i = 0; i < horizon_; i++) {
+  for (int i = 0; i < horizon_; ++i) {
     g[constraint_index] = x[control_index];
     g[constraint_index + 1] = x[control_index + 1];
     constraint_index += 2;
     control_index += 2;
   }
 
-  for (int i = 0; i < horizon_ + 1; i++) {
+  for (int i = 0; i < horizon_ + 1; ++i) {
     g[constraint_index] = x[time_index];
     constraint_index++;
     time_index++;

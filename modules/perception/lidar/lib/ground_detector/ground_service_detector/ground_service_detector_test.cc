@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 #include <fstream>
-#include <sstream>
 
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"

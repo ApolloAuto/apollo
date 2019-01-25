@@ -27,48 +27,30 @@ from common.feature_io import load_protobuf
 from common.feature_io import save_protobuf
 from common.feature_io import build_trajectory
 from common.trajectory import TrajectoryToSample
-from common.online_to_offline import OnlineRawDataToDataTrain
+from common.online_to_offline import LabelGenerator
 
 
-def label_file(input_file, output_file):
-    """
-    label each feature file
-    """
-    # read input file and save them in dict
-    features = load_protobuf(input_file)
+import os
+import sys
+import glob
+import argparse
+import logging
 
-    # for each obstacle ID, sort dict by their timestamp
-    fea_trajs = build_trajectory(features)
-
-    # For each obstacle ID, remove those that cannot be labeled,
-    # and label the rest.
-    for fea_key, fea_traj in fea_trajs.items():
-        fea_traj = fea_trajs[fea_key]
-        # fea_traj = TrajectoryToSample.clean(fea_traj)
-        fea_traj = TrajectoryToSample.label_cruise(fea_traj)
-        for i, fea in enumerate(fea_traj):
-            if not fea.HasField('label_update_time_delta'):
-                del fea_traj[i]
-                continue
-            if fea.label_update_time_delta < parameters['feature']['threshold_label_time_delta']:
-                del fea_traj[i]
-        fea_trajs[fea_key] = fea_traj
-    # save them in the output file with the same format as the input file
-    save_protobuf(output_file, fea_trajs.values())
+from common.configure import parameters
+from common.online_to_offline import LabelGenerator
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Generate labels')
     parser.add_argument('input', type=str, help='input file')
-    parser.add_argument('output', type=str, help='output file')
     args = parser.parse_args()
 
-    data_conversion = OnlineRawDataToDataTrain()
+    label_gen = LabelGenerator()
 
-    print("Create Label {} -> {}".format(args.input, args.output))
+    print("Create Label {}".format(args.input))
     if os.path.isfile(args.input):
-        label_file(args.input, args.output)
-        #data_conversion.LoadFeaturePBAndSaveLabelFiles(args.input, args.output)
+        label_gen.LoadFeaturePBAndSaveLabelFiles(args.input)
+        label_gen.LabelSingleLane()
     else:
         print("{} is not a valid file".format(args.input))

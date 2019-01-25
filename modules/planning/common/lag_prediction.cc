@@ -20,16 +20,10 @@
 
 #include "modules/planning/common/lag_prediction.h"
 
-#include <algorithm>
-
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
-
-using apollo::perception::PerceptionObstacle;
-using apollo::prediction::PredictionObstacle;
-using apollo::prediction::PredictionObstacles;
 
 LagPrediction::LagPrediction(uint32_t min_appear_num,
                              uint32_t max_disappear_num)

@@ -16,9 +16,6 @@
 
 #include "modules/localization/msf/local_tool/local_visualization/online_visual/online_visualizer_component.h"
 
-#include <memory>
-#include <sstream>
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/time/time.h"
@@ -33,9 +30,6 @@
 namespace apollo {
 namespace localization {
 namespace msf {
-
-using apollo::common::Status;
-using ::Eigen::Vector3d;
 
 OnlineVisualizerComponent::OnlineVisualizerComponent() {}
 

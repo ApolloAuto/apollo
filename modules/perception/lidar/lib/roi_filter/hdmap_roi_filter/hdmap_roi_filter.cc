@@ -29,7 +29,6 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using Eigen::Matrix4d;
 using DirectionMajor = Bitmap2D::DirectionMajor;
 using apollo::common::util::GetAbsolutePath;
 using base::PolygonDType;

@@ -32,12 +32,20 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
+
 
 // gflags
 DEFINE_double(throttle_inc_delta, 2.0,
               "throttle pedal command delta percentage.");
 DEFINE_double(brake_inc_delta, 2.0, "brake pedal delta percentage");
 DEFINE_double(steer_inc_delta, 2.0, "steer delta percentage");
+// TODO(ALL) : switch the acceleration cmd or pedal cmd
+// default : use pedal cmd
+DEFINE_bool(use_acceleration, false,
+       "switch to use acceleration instead of throttle pedal and brake pedal");
+
 
 namespace {
 
@@ -126,6 +134,8 @@ class Teleop {
     int32_t level = 0;
     double brake = 0;
     double throttle = 0;
+    double acc = 0;
+    double dec = 0;
     double steering = 0;
     struct termios cooked_;
     struct termios raw_;
@@ -134,6 +144,10 @@ class Teleop {
     Chassis::GearPosition gear = Chassis::GEAR_INVALID;
     PadMessage pad_msg;
     ControlCommand &control_command_ = control_command();
+    apollo::common::VehicleParam vehicle_params_;
+    vehicle_params_.CopyFrom(
+        apollo::common::VehicleConfigHelper::Instance()->
+              GetConfig().vehicle_param());
 
     // get the console in raw mode
     tcgetattr(kfd_, &cooked_);
@@ -157,31 +171,63 @@ class Teleop {
       switch (c) {
         case KEYCODE_UP1:  // accelerate
         case KEYCODE_UP2:
-          brake = control_command_.brake();
-          throttle = control_command_.throttle();
+          if (!FLAGS_use_acceleration) {
+              brake = control_command_.brake();
+              throttle = control_command_.throttle();
+            }
           if (brake > 1e-6) {
             brake = GetCommand(brake, -FLAGS_brake_inc_delta);
-            control_command_.set_brake(brake);
+            if (!FLAGS_use_acceleration) {
+              control_command_.set_brake(brake);
+            } else {
+              dec = brake / 100 * vehicle_params_.max_deceleration();
+              control_command_.set_acceleration(dec);
+            }
           } else {
             throttle = GetCommand(throttle, FLAGS_throttle_inc_delta);
-            control_command_.set_throttle(throttle);
+            if (!FLAGS_use_acceleration) {
+              control_command_.set_throttle(throttle);
+            } else {
+              acc = throttle / 100 * vehicle_params_.max_acceleration();
+              control_command_.set_acceleration(acc);
+            }
           }
-          AINFO << "Throttle = " << control_command_.throttle()
-                << ", Brake = " << control_command_.brake();
+          if (!FLAGS_use_acceleration) {
+            AINFO << "Throttle = " << control_command_.throttle()
+                  << ", Brake = " << control_command_.brake();
+          } else {
+            AINFO << "Acceleration = " << control_command_.acceleration();
+          }
           break;
         case KEYCODE_DN1:  // decelerate
         case KEYCODE_DN2:
-          brake = control_command_.brake();
-          throttle = control_command_.throttle();
+          if (!FLAGS_use_acceleration) {
+              brake = control_command_.brake();
+              throttle = control_command_.throttle();
+            }
           if (throttle > 1e-6) {
             throttle = GetCommand(throttle, -FLAGS_throttle_inc_delta);
-            control_command_.set_throttle(throttle);
+            if (!FLAGS_use_acceleration) {
+              control_command_.set_throttle(throttle);
+            } else {
+              acc = throttle / 100 * vehicle_params_.max_acceleration();
+              control_command_.set_acceleration(acc);
+            }
           } else {
             brake = GetCommand(brake, FLAGS_brake_inc_delta);
-            control_command_.set_brake(brake);
+            if (!FLAGS_use_acceleration) {
+              control_command_.set_brake(brake);
+            } else {
+              dec = brake / 100 * vehicle_params_.max_deceleration();
+              control_command_.set_acceleration(dec);
+            }
           }
-          AINFO << "Throttle = " << control_command_.throttle()
-                << ", Brake = " << control_command_.brake();
+          if (!FLAGS_use_acceleration) {
+            AINFO << "Throttle = " << control_command_.throttle()
+                  << ", Brake = " << control_command_.brake();
+          } else {
+            AINFO << "Acceleration = " << control_command_.acceleration();
+          }
           break;
         case KEYCODE_LF1:  // left
         case KEYCODE_LF2:

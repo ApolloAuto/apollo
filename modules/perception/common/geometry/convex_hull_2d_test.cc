@@ -15,10 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/common/geometry/convex_hull_2d.h"
 
-#include <cfloat>
-#include <limits>
-#include <memory>
-
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/point.h"

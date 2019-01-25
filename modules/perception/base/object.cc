@@ -16,8 +16,6 @@
 
 #include "modules/perception/base/object.h"
 
-#include <sstream>
-
 namespace apollo {
 namespace perception {
 namespace base {

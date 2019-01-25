@@ -47,7 +47,12 @@ class Obstacle {
   /**
    * @brief Constructor
    */
-  Obstacle();
+  static std::unique_ptr<Obstacle>
+  Create(const perception::PerceptionObstacle& perception_obstacle,
+      const double timestamp, const int prediction_id);
+
+  static std::unique_ptr<Obstacle>
+  Create(const Feature& feature);
 
   /**
    * @brief Destructor
@@ -59,8 +64,14 @@ class Obstacle {
    * @param perception_obstacle The obstacle from perception.
    * @param timestamp The timestamp when the perception obstacle was detected.
    */
-  void Insert(const perception::PerceptionObstacle& perception_obstacle,
-              const double timestamp);
+  bool Insert(const perception::PerceptionObstacle& perception_obstacle,
+              const double timestamp, const int prediction_id);
+
+  /**
+   * @brief Insert a feature proto message.
+   * @param feature proto message.
+   */
+  bool InsertFeature(const Feature& feature);
 
   /**
    * @brief Get the type of perception obstacle's type.
@@ -80,19 +91,21 @@ class Obstacle {
    */
   double timestamp() const;
 
+  bool ReceivedNewerMessage(const double timestamp) const;
+
   /**
    * @brief Get the ith feature from latest to earliest.
    * @param i The index of the feature.
    * @return The ith feature.
    */
-  const Feature& feature(size_t i) const;
+  const Feature& feature(const size_t i) const;
 
   /**
    * @brief Get a pointer to the ith feature from latest to earliest.
    * @param i The index of the feature.
    * @return A pointer to the ith feature.
    */
-  Feature* mutable_feature(size_t i);
+  Feature* mutable_feature(const size_t i);
 
   /**
    * @brief Get the latest feature.
@@ -143,12 +156,6 @@ class Obstacle {
   bool IsOnLane() const;
 
   /**
-   * @brief Check if the obstacle is near or on any lane.
-   * @return If the obstacle is near or on any lane.
-   */
-  bool IsNearLane() const;
-
-  /**
    * @brief Check if the obstacle can be ignored.
    * @return If the obstacle can be ignored.
    */
@@ -168,10 +175,10 @@ class Obstacle {
   bool IsInJunction(const std::string& junction_id);
 
   /**
-   * @brief Check if the obstacle is closed to a junction exit.
+   * @brief Check if the obstacle is close to a junction exit.
    * @return If the obstacle is closed to a junction exit.
    */
-  bool IsClosedToJunctionExit();
+  bool IsCloseToJunctionExit();
 
   /**
    * @brief Check if the obstacle has junction feature.
@@ -219,18 +226,18 @@ class Obstacle {
   bool RNNEnabled() const;
 
  private:
+  Obstacle() = default;
+
   void SetStatus(const perception::PerceptionObstacle& perception_obstacle,
                  double timestamp, Feature* feature);
 
   void UpdateStatus(Feature* feature);
 
-  common::ErrorCode SetId(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  bool SetId(const perception::PerceptionObstacle& perception_obstacle,
+             Feature* feature, const int prediction_id = -1);
 
-  common::ErrorCode SetType(
-      const perception::PerceptionObstacle& perception_obstacle,
-      Feature* feature);
+  bool SetType(const perception::PerceptionObstacle& perception_obstacle,
+               Feature* feature);
 
   void SetIsNearJunction(
       const perception::PerceptionObstacle& perception_obstacle,
@@ -278,7 +285,7 @@ class Obstacle {
 
   void SetLanePoints(Feature* feature);
 
-  void SetLanePoints(Feature* feature, double lane_point_spacing,
+  void SetLanePoints(const Feature* feature, double lane_point_spacing,
                      LaneGraph* const lane_graph);
 
   void SetLaneSequencePath(LaneGraph* const lane_graph);
@@ -298,7 +305,7 @@ class Obstacle {
 
   void SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr);
 
-  void Trim();
+  void DiscardOutdatedHistory();
 
  private:
   int id_ = -1;
@@ -311,8 +318,6 @@ class Obstacle {
   common::math::KalmanFilter<double, 6, 2, 0> kf_motion_tracker_;
 
   common::math::KalmanFilter<double, 2, 2, 4> kf_pedestrian_tracker_;
-
-  common::DigitalFilter heading_filter_;
 
   std::vector<std::shared_ptr<const hdmap::LaneInfo>> current_lanes_;
 

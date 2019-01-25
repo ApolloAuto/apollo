@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <fstream>
-#include <iomanip>
 
 #include "Eigen/Dense"
 #include "gflags/gflags.h"
@@ -212,7 +210,7 @@ class OfflineLidarObstaclePerception {
                                    const std::string& path) {
     std::ofstream fout(path);
     if (!fout.is_open()) {
-      AERROR << "Fail to open " << path << std::endl;
+      AERROR << "Failed to open: " << path << std::endl;
       return false;
     }
     fout << frame_id << " " << objects.size() << std::endl;
@@ -226,7 +224,7 @@ class OfflineLidarObstaclePerception {
       if (object->type == base::ObjectType::UNKNOWN ||
           object->type == base::ObjectType::UNKNOWN_MOVABLE ||
           object->type == base::ObjectType::UNKNOWN_UNMOVABLE) {
-        type = "unknow";
+        // type is unknow in this case
       } else if (object->type == base::ObjectType::PEDESTRIAN) {
         type = "pedestrian";
       } else if (object->type == base::ObjectType::VEHICLE) {

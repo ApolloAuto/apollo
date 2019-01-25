@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 
-#include <algorithm>
-#include <limits>
-
 #include "modules/common/util/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto/pbf_gatekeeper_config.pb.h"

@@ -20,8 +20,6 @@
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 #include <algorithm>
-#include <limits>
-#include <string>
 #include <utility>
 
 #include "modules/common/proto/pnc_point.pb.h"

@@ -62,7 +62,7 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:traffic_rule_config_proto",
-        "//modules/planning/toolkits:task",
+        "//modules/planning/tasks:task",
     ],
 )
 

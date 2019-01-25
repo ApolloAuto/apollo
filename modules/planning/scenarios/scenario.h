@@ -23,7 +23,6 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
 
 #include "modules/planning/proto/planning_config.pb.h"
 
@@ -31,7 +30,7 @@
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/scenarios/stage.h"
-#include "modules/planning/toolkits/task.h"
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {
@@ -60,7 +59,7 @@ class Scenario {
   }
 
   /**
-   * Each scenario should define it's own stages object's creation
+   * Each scenario should define its own stages object's creation
    * scenario will call stage's Stage::Process function following a configured
    * order, The return value of Stage::Process function determines the
    * transition from one stage to another.
@@ -69,7 +68,7 @@ class Scenario {
       const ScenarioConfig::StageConfig& stage_config) = 0;
 
   // Each scenario should define its own transfer condition, i.e., when it
-  // should allow to transfer from other scenario ot itself.
+  // should allow to transfer from other scenario to itself.
   virtual bool IsTransferable(const Scenario& other_scenario,
                               const common::TrajectoryPoint& ego_point,
                               const Frame& frame) = 0;

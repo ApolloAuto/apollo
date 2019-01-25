@@ -15,10 +15,7 @@
  *****************************************************************************/
 #pragma once
 
-#include <Eigen/Core>
-#include <memory>
 #include <string>
-#include <vector>
 
 #include "cyber/cyber.h"
 #include "modules/perception/base/frame.h"

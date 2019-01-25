@@ -15,7 +15,6 @@
 *****************************************************************************/
 #include "modules/perception/camera/common/camera_ground_plane.h"
 
-#include <algorithm>
 #include <utility>
 
 #include "cyber/common/log.h"

@@ -21,14 +21,11 @@
 
 #include "modules/map/relative_map/navigation_lane.h"
 
-#include <string>
-#include <vector>
-
 #include "gtest/gtest.h"
 #include "third_party/json/json.hpp"
 
+#include "cyber/common/file.h"
 #include "modules/canbus/proto/chassis.pb.h"
-#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
@@ -38,9 +35,6 @@ namespace apollo {
 namespace relative_map {
 
 using apollo::common::VehicleStateProvider;
-using apollo::common::adapter::AdapterConfig;
-using apollo::common::adapter::AdapterManager;
-using apollo::common::adapter::AdapterManagerConfig;
 using apollo::relative_map::NavigationInfo;
 using apollo::relative_map::NavigationLane;
 using apollo::relative_map::NavigationPath;
@@ -98,12 +92,8 @@ bool GenerateNavigationInfo(
 class NavigationLaneTest : public testing::Test {
  public:
   virtual void SetUp() {
-    common::adapter::AdapterManagerConfig adapter_conf;
     RelativeMapConfig config;
-
-    EXPECT_TRUE(common::util::GetProtoFromFile(
-        FLAGS_relative_map_adapter_config_filename, &adapter_conf));
-    EXPECT_TRUE(common::util::GetProtoFromFile(
+    EXPECT_TRUE(cyber::common::GetProtoFromFile(
         FLAGS_relative_map_config_filename, &config));
 
     navigation_lane_.SetConfig(config.navigation_lane());
@@ -115,9 +105,9 @@ class NavigationLaneTest : public testing::Test {
 
     localization::LocalizationEstimate localization;
     canbus::Chassis chassis;
-    EXPECT_TRUE(common::util::GetProtoFromFile(
+    EXPECT_TRUE(cyber::common::GetProtoFromFile(
         data_file_dir_ + "localization_info.pb.txt", &localization));
-    EXPECT_TRUE(common::util::GetProtoFromFile(
+    EXPECT_TRUE(cyber::common::GetProtoFromFile(
         data_file_dir_ + "chassis_info.pb.txt", &chassis));
     VehicleStateProvider::Instance()->Update(localization, chassis);
   }
@@ -131,8 +121,6 @@ class NavigationLaneTest : public testing::Test {
 };
 
 TEST_F(NavigationLaneTest, GenerateOneLaneMap) {
-  navigation_line_filenames_.clear();
-  navigation_info_.Clear();
   navigation_line_filenames_.emplace_back(data_file_dir_ + "left.smoothed");
   EXPECT_TRUE(
       GenerateNavigationInfo(navigation_line_filenames_, &navigation_info_));
@@ -143,11 +131,17 @@ TEST_F(NavigationLaneTest, GenerateOneLaneMap) {
   MapMsg map_msg;
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
   EXPECT_EQ(1, map_msg.hdmap().lane_size());
+
+  auto iter = map_msg.navigation_path().begin();
+  EXPECT_EQ(0, iter->second.path_priority());
+  const auto& path = iter->second.path();
+  EXPECT_DOUBLE_EQ(-1.1603367640051669, path.path_point(0).x())
+      << "Path 0: actual x: " << path.path_point(0).x();
+  EXPECT_DOUBLE_EQ(2.760810222539626, path.path_point(0).y())
+      << "Path 0: actual y: " << path.path_point(0).y();
 }
 
 TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
-  navigation_line_filenames_.clear();
-  navigation_info_.Clear();
   navigation_line_filenames_.emplace_back(data_file_dir_ + "left.smoothed");
   navigation_line_filenames_.emplace_back(data_file_dir_ + "right.smoothed");
   EXPECT_TRUE(
@@ -159,11 +153,32 @@ TEST_F(NavigationLaneTest, GenerateTwoLaneMap) {
   MapMsg map_msg;
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
   EXPECT_EQ(2, map_msg.hdmap().lane_size());
+
+  for (auto iter = map_msg.navigation_path().begin();
+       iter != map_msg.navigation_path().end(); ++iter) {
+    const auto& path = iter->second.path();
+    switch (iter->second.path_priority()) {
+      case 0:
+        EXPECT_DOUBLE_EQ(-1.1603367640051669, path.path_point(0).x())
+            << "Path 0: actual x: " << path.path_point(0).x();
+        EXPECT_DOUBLE_EQ(2.760810222539626, path.path_point(0).y())
+            << "Path 0: actual y: " << path.path_point(0).y();
+        break;
+
+      case 1:
+        EXPECT_DOUBLE_EQ(-1.3377519530092672, path.path_point(0).x())
+            << "Path 1: actual x: " << path.path_point(0).x();
+        EXPECT_DOUBLE_EQ(-3.1906635795653755, path.path_point(0).y())
+            << "Path 1: actual y: " << path.path_point(0).y();
+        break;
+
+      default:
+        FAIL() << "We shouldn't get here.";
+    }
+  }
 }
 
 TEST_F(NavigationLaneTest, GenerateThreeLaneMap) {
-  navigation_line_filenames_.clear();
-  navigation_info_.Clear();
   navigation_line_filenames_.emplace_back(data_file_dir_ + "left.smoothed");
   navigation_line_filenames_.emplace_back(data_file_dir_ + "middle.smoothed");
   navigation_line_filenames_.emplace_back(data_file_dir_ + "right.smoothed");
@@ -176,6 +191,36 @@ TEST_F(NavigationLaneTest, GenerateThreeLaneMap) {
   MapMsg map_msg;
   EXPECT_TRUE(navigation_lane_.CreateMap(map_param_, &map_msg));
   EXPECT_EQ(3, map_msg.hdmap().lane_size());
+
+  for (auto iter = map_msg.navigation_path().begin();
+       iter != map_msg.navigation_path().end(); ++iter) {
+    const auto& path = iter->second.path();
+    switch (iter->second.path_priority()) {
+      case 0:
+        EXPECT_DOUBLE_EQ(-1.2892630711168522, path.path_point(0).x())
+            << "Path 0: actual x: " << path.path_point(0).x();
+        EXPECT_DOUBLE_EQ(3.0675669139329176, path.path_point(0).y())
+            << "Path 0: actual y: " << path.path_point(0).y();
+        break;
+
+      case 1:
+        EXPECT_DOUBLE_EQ(-1.1466795765610884, path.path_point(0).x())
+            << "Path 1: actual x: " << path.path_point(0).x();
+        EXPECT_DOUBLE_EQ(-0.092193218761606729, path.path_point(0).y())
+            << "Path 1: actual y: " << path.path_point(0).y();
+        break;
+
+      case 2:
+        EXPECT_DOUBLE_EQ(-1.3377519530092672, path.path_point(0).x())
+            << "Path 2: actual x: " << path.path_point(0).x();
+        EXPECT_DOUBLE_EQ(-3.1906635795653755, path.path_point(0).y())
+            << "Path 2: actual y: " << path.path_point(0).y();
+        break;
+
+      default:
+        FAIL() << "We shouldn't get here.";
+    }
+  }
 }
 
 }  // namespace relative_map

@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/fusion_system/probabilistic_fusion/probabilistic_fusion.h"
 
-#include <gflags/gflags.h>
-
-#include <iomanip>
 #include <map>
 #include <utility>
 

@@ -15,9 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/fused_classifier.h"
 
-#include <map>
-#include <mutex>
-
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/object.h"
@@ -31,8 +28,6 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using base::Object;
-using base::ObjectPtr;
 class FusedClassifierTest : public testing::Test {
  protected:
   void SetUp() override {

@@ -16,11 +16,6 @@
 
 #include "modules/planning/integration_tests/planning_test_base.h"
 
-#include <unistd.h>
-#include <chrono>
-#include <cstdlib>
-#include <thread>
-
 #include "cyber/common/log.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
@@ -163,7 +158,7 @@ void PlanningTestBase::SetUp() {
     // TODO(all)
     // planning_ = std::unique_ptr<PlanningBase>(new NaviPlanning());
   } else {
-    planning_ = std::unique_ptr<PlanningBase>(new StdPlanning());
+    planning_ = std::unique_ptr<PlanningBase>(new OnLanePlanning());
   }
 
   CHECK(FeedTestData()) << "Failed to feed test data";

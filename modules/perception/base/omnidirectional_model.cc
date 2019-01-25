@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/base/omnidirectional_model.h"
 
-#include <cmath>
 #include <limits>
 
 #include "cyber/common/log.h"

@@ -21,8 +21,6 @@
 #define private public
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
-#include <memory>
-
 #include "gtest/gtest.h"
 
 #include "cyber/common/log.h"
@@ -44,17 +42,17 @@ class LaneFollowScenarioTest : public ::testing::Test {
 
 TEST_F(LaneFollowScenarioTest, VerifyConf) {
   FLAGS_scenario_lane_follow_config_file =
-      "/apollo/modules/planning/conf/scenario_lane_follow_config.pb.txt";
+      "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_side_pass_config_file, &config));
+      FLAGS_scenario_lane_follow_config_file, &config));
 }
 
 TEST_F(LaneFollowScenarioTest, Init) {
   FLAGS_scenario_lane_follow_config_file =
       "/apollo/modules/planning/testdata/conf/"
-      "scenario_lane_follow_config.pb.txt";
+      "scenario/lane_follow_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::common::util::GetProtoFromFile(

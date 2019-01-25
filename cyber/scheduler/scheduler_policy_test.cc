@@ -49,7 +49,6 @@ TEST(SchedulerPolicyTest, classic) {
   auto processor = std::make_shared<Processor>();
   auto ctx = std::make_shared<ClassicContext>();
   processor->BindContext(ctx);
-  ctx->SetGroupName(DEFAULT_GROUP_NAME);
   std::vector<std::future<void>> res;
 
   // test single routine
@@ -71,10 +70,12 @@ TEST(SchedulerPolicyTest, classic) {
   }
   res.clear();
   ctx->Shutdown();
+  processor->Stop();
 }
 
 TEST(SchedulerPolicyTest, sched_classic) {
-  GlobalData::Instance()->SetProcessGroup("example_classic_sched");
+  // read example_sched_classic.conf
+  GlobalData::Instance()->SetProcessGroup("example_sched_classic");
   auto sched1 = dynamic_cast<SchedulerClassic*>(scheduler::Instance());
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   auto task_id = GlobalData::RegisterTaskName("ABC");
@@ -111,3 +112,11 @@ TEST(SchedulerPolicyTest, sched_classic) {
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo
+
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::Init(argv[0]);
+  auto res = RUN_ALL_TESTS();
+  apollo::cyber::Clear();
+  return res;
+}

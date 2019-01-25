@@ -16,10 +16,6 @@
 
 #include "modules/monitor/hardware/gps_monitor.h"
 
-#include <algorithm>
-#include <string>
-#include <vector>
-
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/map_util.h"

@@ -3,8 +3,10 @@ syntax = "proto2";
 package apollo.canbus;
 
 import "modules/canbus/proto/chassis.proto";
+import "modules/canbus/proto/ge3.proto";
 import "modules/canbus/proto/lexus.proto";
 import "modules/canbus/proto/transit.proto";
+import "modules/canbus/proto/wey.proto";
 
 message ChassisDetail {
   enum Type {
@@ -31,6 +33,8 @@ message ChassisDetail {
   optional Gem gem = 18;
   optional Lexus lexus = 19;
   optional Transit transit = 20;
+  optional Ge3 ge3 = 21;
+  optional Wey wey = 22;
 }
 
 // CheckResponseSignal

@@ -30,7 +30,7 @@
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/toolkits/task.h"
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {
@@ -82,6 +82,17 @@ class Stage {
   bool ExecuteTaskOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
+  virtual Stage::StageStatus FinishScenario();
+
+  bool CheckStopSignDone(
+      const ReferenceLineInfo& reference_line_info,
+      const std::string& stop_sign_overlap_id);
+
+  bool CheckTrafficLightDone(
+      const ReferenceLineInfo& reference_line_info,
+      const std::string& traffic_light_overlap_id);
+
+ protected:
   std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;
   std::vector<Task*> task_list_;
   ScenarioConfig::StageConfig config_;

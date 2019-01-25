@@ -17,7 +17,6 @@
 #include "modules/map/relative_map/navigation_lane.h"
 
 #include <algorithm>
-#include <cmath>
 #include <limits>
 
 #include "modules/map/proto/map_lane.pb.h"
@@ -32,13 +31,12 @@
 namespace apollo {
 namespace relative_map {
 
-using apollo::common::Path;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Vec2d;
 using apollo::common::util::DistanceXY;
 using apollo::hdmap::Lane;
 using apollo::common::util::operator+;
-using apollo::perception::PerceptionObstacles;
+using apollo::common::util::IsFloatEqual;
 
 NavigationLane::NavigationLane(const NavigationLaneConfig &config)
     : config_(config) {}
@@ -80,6 +78,9 @@ bool NavigationLane::GeneratePath() {
     current_navi_path_tuple_ =
         std::make_tuple(0, left_width, right_width, current_navi_path);
   };
+
+  ADEBUG << "Beginning of NavigationLane::GeneratePath().";
+  ADEBUG << "navigation_line_num: " << navigation_line_num;
 
   // priority: merge > navigation line > perception lane marker
   if (config_.lane_source() == NavigationLaneConfig::OFFLINE_GENERATED &&
@@ -145,6 +146,17 @@ bool NavigationLane::GeneratePath() {
                                                     : default_left_width_;
     double right_width = perceived_right_width_ > 0.0 ? perceived_right_width_
                                                       : default_right_width_;
+    if (!IsFloatEqual(left_width, default_left_width_) &&
+        !IsFloatEqual(right_width, default_right_width_)) {
+      left_width = left_width > default_left_width_ ? left_width - min_d
+                                                    : left_width + min_d;
+      right_width = right_width > default_right_width_ ? right_width - min_d
+                                                       : right_width + min_d;
+    }
+
+    ADEBUG << "The left width of current lane is: " << left_width
+           << " and the right width of current lane is: " << right_width;
+
     std::get<1>(current_navi_path_tuple_) = left_width;
     std::get<2>(current_navi_path_tuple_) = right_width;
     auto curr_navi_path_iter = std::find_if(
@@ -181,8 +193,8 @@ bool NavigationLane::GeneratePath() {
         }
         double width = lateral_distance_sum /
                        static_cast<double>(average_point_size) / 2.0;
-        width = common::math::Clamp(width, FLAGS_min_lane_half_width,
-                                    FLAGS_max_lane_half_width);
+        width = common::math::Clamp(width, config_.min_lane_half_width(),
+                                    config_.max_lane_half_width());
 
         auto &curr_left_width = std::get<1>(*iter);
         auto &prev_right_width = std::get<2>(*prev_iter);
@@ -207,8 +219,8 @@ bool NavigationLane::GeneratePath() {
         }
         double width = lateral_distance_sum /
                        static_cast<double>(average_point_size) / 2.0;
-        width = common::math::Clamp(width, FLAGS_min_lane_half_width,
-                                    FLAGS_max_lane_half_width);
+        width = common::math::Clamp(width, config_.min_lane_half_width(),
+                                    config_.max_lane_half_width());
 
         auto &curr_right_width = std::get<2>(*iter);
         auto &next_left_width = std::get<1>(*next_iter);
@@ -266,7 +278,7 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(const int line_index,
   }
 
   int lane_marker_index = 0;
-  const double kWeight = 0.9;
+  double navigation_line_weight = 1.0 - config_.lane_marker_weight();
   for (int i = 0; i < path->path_point_size(); ++i) {
     auto *point = path->mutable_path_point(i);
     double s = point->s();
@@ -277,12 +289,14 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(const int line_index,
     // used for merging.
     const int marker_size = lane_marker_path.path_point_size();
     if (lane_marker_index < 0 || lane_marker_index > (marker_size - 1)) {
-      point->set_y(kWeight * point->y() + (1 - kWeight) * lane_maker_point.y());
+      point->set_y(navigation_line_weight * point->y() +
+                   (1 - navigation_line_weight) * lane_maker_point.y());
       lane_marker_index = 0;
       continue;
     }
     *point = common::util::GetWeightedAverageOfTwoPathPoints(
-        *point, lane_maker_point, kWeight, 1 - kWeight);
+        *point, lane_maker_point, navigation_line_weight,
+        1 - navigation_line_weight);
   }
 }
 
@@ -369,39 +383,40 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
     }
   };
 
-  auto gen_navi_path_loop_func = [this, &navigation_path, &enu_to_flu_func](
-      const int start, const int end, const double ref_s_base,
-      const double max_length, common::Path *path) {
-    CHECK_NOTNULL(path);
-    const double ref_s = navigation_path.path_point(start).s();
-    for (int i = start; i < end; ++i) {
-      auto *point = path->add_path_point();
-      point->CopyFrom(navigation_path.path_point(i));
+  auto gen_navi_path_loop_func =
+      [this, &navigation_path, &enu_to_flu_func](
+          const int start, const int end, const double ref_s_base,
+          const double max_length, common::Path *path) {
+        CHECK_NOTNULL(path);
+        const double ref_s = navigation_path.path_point(start).s();
+        for (int i = start; i < end; ++i) {
+          auto *point = path->add_path_point();
+          point->CopyFrom(navigation_path.path_point(i));
 
-      double flu_x = 0.0;
-      double flu_y = 0.0;
-      double flu_theta = 0.0;
-      enu_to_flu_func(point->x(), point->y(), point->theta(), &flu_x, &flu_y,
-                      &flu_theta);
+          double flu_x = 0.0;
+          double flu_y = 0.0;
+          double flu_theta = 0.0;
+          enu_to_flu_func(point->x(), point->y(), point->theta(), &flu_x,
+                          &flu_y, &flu_theta);
 
-      point->set_x(flu_x);
-      point->set_y(flu_y);
-      point->set_theta(flu_theta);
-      const double accumulated_s =
-          navigation_path.path_point(i).s() - ref_s + ref_s_base;
-      point->set_s(accumulated_s);
+          point->set_x(flu_x);
+          point->set_y(flu_y);
+          point->set_theta(flu_theta);
+          const double accumulated_s =
+              navigation_path.path_point(i).s() - ref_s + ref_s_base;
+          point->set_s(accumulated_s);
 
-      if (accumulated_s > max_length) {
-        break;
-      }
-    }
-  };
+          if (accumulated_s > max_length) {
+            break;
+          }
+        }
+      };
 
   double dist = navigation_path.path_point().rbegin()->s() -
                 navigation_path.path_point(current_project_index).s();
   // Stitch current position to the beginning for a cyclic/circular route.
   if (FLAGS_enable_cyclic_rerouting &&
-      dist < FLAGS_max_len_from_navigation_line) {
+      dist < config_.max_len_from_navigation_line()) {
     auto item_iter = stitch_index_map_.find(line_index);
     if (item_iter != stitch_index_map_.end()) {
       int stitch_start_index =
@@ -424,12 +439,12 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
                       navigation_path.path_point(current_project_index).s();
       gen_navi_path_loop_func(std::max(0, current_project_index - 3),
                               stitch_start_index + 1, 0.0, length, path);
-      if (length > FLAGS_max_len_from_navigation_line) {
+      if (length > config_.max_len_from_navigation_line()) {
         return true;
       }
       gen_navi_path_loop_func(stitch_end_index,
                               navigation_path.path_point_size(), length,
-                              FLAGS_max_len_from_navigation_line, path);
+                              config_.max_len_from_navigation_line(), path);
       return true;
     }
   }
@@ -439,7 +454,7 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
   }
   gen_navi_path_loop_func(std::max(0, current_project_index - 3),
                           navigation_path.path_point_size(), 0.0,
-                          FLAGS_max_len_from_navigation_line, path);
+                          config_.max_len_from_navigation_line(), path);
   return true;
 }
 
@@ -460,8 +475,9 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
 
   // A lambda expression for checking the distance between the vehicle's inital
   // position and the starting point of  the current navigation line.
-  auto check_distance_func = [this, &path,
-                              &path_size](const int project_index) {
+  auto check_distance_func = [this, &path, &path_size](
+                                 const int project_index,
+                                 double *project_distance) {
     // Convert the starting point of the current navigation line from the
     // ENU coordinates to the FLU coordinates. For the multi-lane situation,
     // the distance in the Y-axis direction can be appropriately enlarged,
@@ -484,8 +500,13 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
         (enu_x - x_shift) * cos_angle + (enu_y - y_shift) * sin_angle;
     double flu_y =
         (enu_y - y_shift) * cos_angle - (enu_x - x_shift) * sin_angle;
-    if (std::fabs(flu_x) < FLAGS_max_distance_to_navigation_line / 2.0 &&
-        std::fabs(flu_y) < FLAGS_max_distance_to_navigation_line * 2.0) {
+
+    if (project_distance != nullptr) {
+      *project_distance = std::fabs(flu_y);
+    }
+
+    if (std::fabs(flu_x) < config_.max_distance_to_navigation_line() / 2.0 &&
+        std::fabs(flu_y) < config_.max_distance_to_navigation_line() * 2.0) {
       return true;
     }
     return false;
@@ -504,7 +525,7 @@ ProjIndexPair NavigationLane::UpdateProjectionIndex(const common::Path &path,
     }
   }
 
-  if (check_distance_func(index)) {
+  if (check_distance_func(index, &min_d)) {
     if (FLAGS_enable_cyclic_rerouting) {
       // We create a condition here that sets the "current_project_index" to
       // 0, should the vehicle reach the end point of a cyclic/circular
@@ -566,11 +587,12 @@ void NavigationLane::ConvertLaneMarkerToPath(
 
   const double current_speed =
       VehicleStateProvider::Instance()->vehicle_state().linear_velocity();
-  double path_range = current_speed * FLAGS_ratio_navigation_lane_len_to_speed;
-  if (path_range <= FLAGS_min_len_for_navigation_lane) {
-    path_range = FLAGS_min_len_for_navigation_lane;
+  double path_range =
+      current_speed * config_.ratio_navigation_lane_len_to_speed();
+  if (path_range <= config_.min_len_for_navigation_lane()) {
+    path_range = config_.min_len_for_navigation_lane();
   } else {
-    path_range = FLAGS_max_len_for_navigation_lane;
+    path_range = config_.max_len_for_navigation_lane();
   }
 
   const double unit_z = 1.0;
@@ -579,8 +601,8 @@ void NavigationLane::ConvertLaneMarkerToPath(
   for (double z = start_s; z <= path_range; z += unit_z) {
     double x1 = z;
     double y1 = 0;
-    if (left_lane.view_range() > FLAGS_min_view_range_to_use_lane_marker ||
-        right_lane.view_range() > FLAGS_min_view_range_to_use_lane_marker) {
+    if (left_lane.view_range() > config_.min_view_range_to_use_lane_marker() ||
+        right_lane.view_range() > config_.min_view_range_to_use_lane_marker()) {
       y1 = EvaluateCubicPolynomial(path_c0, path_c1, path_c2, path_c3, z);
     }
     auto *point = path->add_path_point();
@@ -601,13 +623,16 @@ void NavigationLane::ConvertLaneMarkerToPath(
     point->set_dkappa((k2 - k1) / 0.0002);
   }
 
-  perceived_left_width_ = (std::fabs(left_lane.c0_position()) +
-                           std::fabs(right_lane.c0_position())) /
-                          2.0;
-  perceived_left_width_ =
-      common::math::Clamp(perceived_left_width_, FLAGS_min_lane_half_width,
-                          FLAGS_max_lane_half_width);
-  perceived_right_width_ = perceived_left_width_;
+  perceived_left_width_ = std::fabs(left_lane.c0_position());
+  perceived_right_width_ = std::fabs(right_lane.c0_position());
+  // If the perceived lane width is incorrect, use the default lane width
+  // directly.
+  double perceived_lane_width = perceived_left_width_ + perceived_right_width_;
+  if (perceived_lane_width < 2.0 * config_.min_lane_half_width() ||
+      perceived_lane_width > 2.0 * config_.max_lane_half_width()) {
+    perceived_left_width_ = default_left_width_;
+    perceived_right_width_ = default_right_width_;
+  }
 }
 
 bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
@@ -676,18 +701,16 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
         left_sample->set_s(path_point.s());
         left_sample->set_width(lane_left_width);
         left_segment->add_point()->CopyFrom(
-            *point +
-            lane_left_width *
-                Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
+            *point + lane_left_width *
+                         Vec2d::CreateUnitVec2d(path_point.theta() + M_PI_2));
       }
 
       auto *right_sample = lane->add_right_sample();
       right_sample->set_s(path_point.s());
       right_sample->set_width(lane_right_width);
       right_segment->add_point()->CopyFrom(
-          *point +
-          lane_right_width *
-              Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
+          *point + lane_right_width *
+                       Vec2d::CreateUnitVec2d(path_point.theta() - M_PI_2));
     }
     return true;
   };
@@ -710,7 +733,7 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
   FLAGS_relative_map_generate_left_boundray = true;
   for (auto iter = navigation_path_list_.cbegin();
        iter != navigation_path_list_.cend(); ++iter) {
-    size_t index = std::distance(navigation_path_list_.cbegin(), iter);
+    std::size_t index = std::distance(navigation_path_list_.cbegin(), iter);
     if (!create_map_func(*iter)) {
       AWARN << "Failed to generate lane: " << index;
       ++fail_num;
@@ -762,10 +785,12 @@ bool NavigationLane::CreateMap(const MapGenerationParam &map_config,
     if (i > 0) {
       lane->add_left_neighbor_forward_lane_id()->CopyFrom(
           hdmap->lane(i - 1).id());
+      ADEBUG << "Left neighbor is: " << hdmap->lane(i - 1).id().id();
     }
     if (i < lane_num - 1) {
       lane->add_right_neighbor_forward_lane_id()->CopyFrom(
           hdmap->lane(i + 1).id());
+      ADEBUG << "Right neighbor is: " << hdmap->lane(i + 1).id().id();
     }
   }
   return true;
@@ -779,7 +804,7 @@ void NavigationLane::UpdateStitchIndexInfo() {
     return;
   }
 
-  constexpr int kMinPathPointSize = 100;
+  constexpr int kMinPathPointSize = 10;
   for (int i = 0; i < navigation_line_num; ++i) {
     const auto &navigation_path = navigation_info_.navigation_path(i).path();
     if (!navigation_info_.navigation_path(i).has_path() ||
@@ -795,13 +820,13 @@ void NavigationLane::UpdateStitchIndexInfo() {
     const double end_s = navigation_path.path_point(path_size - 1).s();
     for (int m = 0; m < path_size; ++m) {
       double forward_s = navigation_path.path_point(m).s() - start_s;
-      if (forward_s > FLAGS_max_len_from_navigation_line) {
+      if (forward_s > config_.max_len_from_navigation_line()) {
         break;
       }
 
       for (int n = path_size - 1; n >= 0; --n) {
         double reverse_s = end_s - navigation_path.path_point(n).s();
-        if (reverse_s > FLAGS_max_len_from_navigation_line) {
+        if (reverse_s > config_.max_len_from_navigation_line()) {
           break;
         }
         if (m == n) {
@@ -817,7 +842,7 @@ void NavigationLane::UpdateStitchIndexInfo() {
       }
     }
 
-    if (min_distance < FLAGS_min_lane_half_width) {
+    if (min_distance < config_.min_lane_half_width()) {
       AINFO << "The stitching pair is: (" << min_index_pair.first << ", "
             << min_index_pair.second << ") for the navigation line: " << i;
       stitch_index_map_[i] = min_index_pair;

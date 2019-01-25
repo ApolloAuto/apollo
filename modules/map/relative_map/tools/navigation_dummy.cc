@@ -14,57 +14,46 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <chrono>
-#include <thread>
-
 #include "gflags/gflags.h"
-#include "ros/ros.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "cyber/cyber.h"
+#include "cyber/time/rate.h"
+#include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/util/message_util.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"
+
+using apollo::cyber::Rate;
 
 DEFINE_string(navigation_dummy_file,
               "modules/map/testdata/navigation_dummy/navigation_info.pb.txt",
               "Used for sending navigation result to relative_map node.");
 
 int main(int argc, char** argv) {
-  using std::this_thread::sleep_for;
-
-  using apollo::common::adapter::AdapterConfig;
-  using apollo::common::adapter::AdapterManager;
-  using apollo::common::adapter::AdapterManagerConfig;
-
-  google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
-  ros::init(argc, argv, "relative_map_tester");
-
+  // Init the cyber framework
+  apollo::cyber::Init(argv[0]);
   FLAGS_alsologtostderr = true;
-  AdapterManagerConfig config;
-  config.set_is_ros(true);
-  auto* sub_config = config.add_config();
-  sub_config->set_mode(AdapterConfig::PUBLISH_ONLY);
-  sub_config->set_type(AdapterConfig::NAVIGATION);
-
-  AdapterManager::Init(config);
-  AINFO << "AdapterManager is initialized.";
 
   apollo::relative_map::NavigationInfo navigation_info;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_navigation_dummy_file,
-                                              &navigation_info)) {
+  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_navigation_dummy_file,
+                                               &navigation_info)) {
     AERROR << "failed to load file: " << FLAGS_navigation_dummy_file;
     return -1;
   }
 
-  ros::Rate loop_rate(0.3);  // frequency
+  std::shared_ptr<apollo::cyber::Node> node(
+      apollo::cyber::CreateNode("navigation_info"));
+  auto writer = node->CreateWriter<apollo::relative_map::NavigationInfo>(
+      FLAGS_navigation_topic);
+  Rate rate(0.3);
 
-  while (ros::ok()) {
-    AdapterManager::FillNavigationHeader("navigation_dummy", &navigation_info);
-    AdapterManager::PublishNavigation(navigation_info);
-    AINFO << "Sending navigation info:" << navigation_info.DebugString();
-    ros::spinOnce();  // yield
-    loop_rate.sleep();
+  while (apollo::cyber::OK()) {
+    apollo::common::util::FillHeader(node->Name(), &navigation_info);
+    writer->Write(navigation_info);
+    ADEBUG << "Sending navigation info:" << navigation_info.DebugString();
+    rate.Sleep();
   }
 
   return 0;

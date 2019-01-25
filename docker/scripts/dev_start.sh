@@ -20,7 +20,7 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20181210_1500"
+VERSION_X86_64="dev-x86_64-20190115_1100"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
@@ -56,6 +56,10 @@ function check_host_environment() {
     echo 'Check https://git-lfs.github.com for more information.'
     exit 1
   fi
+
+  # Fetch lfs managed files for current HEAD.
+  git lfs fetch
+
   if ! [ -d ${APOLLO_ROOT_DIR}/.git/lfs/objects ]; then
     echo 'You need to install and run git-lfs when working with apollo.'
     echo 'New versions of git manage it automotically, but old versions may '
@@ -114,6 +118,9 @@ VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
   sunnyvale_big_loop
   sunnyvale_loop
+  sunnyvale_with_two_offices
+  san_mateo
+  san_mateo_hdl64
 )
 MAP_VOLUME_CONF=""
 

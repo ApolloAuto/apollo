@@ -15,8 +15,6 @@
 *****************************************************************************/
 #include <opencv2/opencv.hpp>
 #include <gtest/gtest.h>
-#include <fstream>
-#include <string>
 
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"

@@ -25,6 +25,9 @@ cc_binary(
         "//modules/common",
         "//modules/common/adapters:adapter_gflags",
         "//modules/control/proto:control_proto",
+        "//modules/canbus/common:canbus_common",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/canbus/vehicle:vehicle_controller_base",
     ],
 )
 

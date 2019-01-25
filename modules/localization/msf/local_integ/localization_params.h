@@ -21,10 +21,7 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "modules/localization/proto/localization.pb.h"
 

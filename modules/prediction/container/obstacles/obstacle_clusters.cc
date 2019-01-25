@@ -151,7 +151,8 @@ bool ObstacleClusters::BackwardNearbyObstacle(
   // Search current lane
   if (lane_obstacles_.find(lane_id) != lane_obstacles_.end() &&
       !lane_obstacles_[lane_id].empty()) {
-    for (std::size_t i = lane_obstacles_[lane_id].size() - 1; i >= 0; --i) {
+    for (int i = static_cast<int>(lane_obstacles_[lane_id].size()) - 1;
+        i >= 0; --i) {
       const LaneObstacle& lane_obstacle = lane_obstacles_[lane_id][i];
       if (lane_obstacle.obstacle_id() == obstacle_id) {
         continue;

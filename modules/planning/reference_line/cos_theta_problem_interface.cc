@@ -16,10 +16,7 @@
 
 #include "modules/planning/reference_line/cos_theta_problem_interface.h"
 
-#include <math.h>
 #include <algorithm>
-#include <iostream>
-#include <random>
 
 #include "cyber/common/log.h"
 

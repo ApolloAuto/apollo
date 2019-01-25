@@ -19,6 +19,8 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
+#include "gtest/gtest_prod.h"
+
 namespace apollo {
 namespace canbus {
 namespace transit {
@@ -123,6 +125,11 @@ class Adcmotioncontrol110 : public ::apollo::drivers::canbus::ProtocolData<
   Adcmotioncontrol110* set_adc_cmd_longitudinalcontrolmode(
       Adc_motioncontrol1_10::Adc_cmd_longitudinalcontrolmodeType
           adc_cmd_longitudinalcontrolmode);
+
+  FRIEND_TEST(adc_motioncontrol1_10Test, part1);
+  FRIEND_TEST(adc_motioncontrol1_10Test, part2);
+  FRIEND_TEST(adc_motioncontrol1_10Test, part3);
+  FRIEND_TEST(adc_motioncontrol1_10Test, part4);
 
  private:
   // config detail: {'description': 'Setpoint for steering wheel angle. Positive

@@ -52,43 +52,33 @@ bool IsClosed(const double x0, const double y0, const double theta0,
 
 }  // namespace
 
-Obstacle::Obstacle() {
-  double heading_filter_param = FLAGS_heading_filter_param;
-  CHECK_LT(heading_filter_param, 1.0);
-  CHECK_GT(heading_filter_param, 0.0);
-  heading_filter_ = common::DigitalFilter{{1.0, 1.0 - heading_filter_param},
-                                          {heading_filter_param}};
-}
-
 PerceptionObstacle::Type Obstacle::type() const { return type_; }
 
 int Obstacle::id() const { return id_; }
 
 double Obstacle::timestamp() const {
-  if (feature_history_.size() > 0) {
-    return feature_history_.front().timestamp();
-  } else {
-    return 0.0;
-  }
+  CHECK(!feature_history_.empty());
+  return feature_history_.front().timestamp();
 }
 
-const Feature& Obstacle::feature(size_t i) const {
+const Feature& Obstacle::feature(const size_t i) const {
   CHECK(i < feature_history_.size());
   return feature_history_[i];
 }
 
-Feature* Obstacle::mutable_feature(size_t i) {
+Feature* Obstacle::mutable_feature(const size_t i) {
+  CHECK(!feature_history_.empty());
   CHECK(i < feature_history_.size());
   return &feature_history_[i];
 }
 
 const Feature& Obstacle::latest_feature() const {
-  CHECK_GT(feature_history_.size(), 0);
+  CHECK(!feature_history_.empty());
   return feature_history_.front();
 }
 
 Feature* Obstacle::mutable_latest_feature() {
-  CHECK_GT(feature_history_.size(), 0);
+  CHECK(!feature_history_.empty());
   return &(feature_history_.front());
 }
 
@@ -121,28 +111,15 @@ bool Obstacle::IsOnLane() const {
   return false;
 }
 
-bool Obstacle::IsNearLane() const {
-  if (feature_history_.size() > 0) {
-    if (feature_history_.front().has_lane() &&
-        (feature_history_.front().lane().current_lane_feature_size() > 0 ||
-         feature_history_.front().lane().nearby_lane_feature_size() > 0)) {
-      ADEBUG << "Obstacle [" << id_ << "] is on lane.";
-      return true;
-    }
-  }
-  ADEBUG << "Obstacle [" << id_ << "] is not on lane.";
-  return false;
-}
-
 bool Obstacle::ToIgnore() {
-  if (history_size() == 0) {
+  if (feature_history_.empty()) {
     return true;
   }
   return latest_feature().priority().priority() == ObstaclePriority::IGNORE;
 }
 
 bool Obstacle::IsNearJunction() {
-  if (feature_history_.size() <= 0) {
+  if (feature_history_.empty()) {
     return false;
   }
   double pos_x = latest_feature().position().x();
@@ -151,24 +128,30 @@ bool Obstacle::IsNearJunction() {
                                      FLAGS_junction_search_radius);
 }
 
-void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
-                      const double timestamp) {
-  if (feature_history_.size() > 0 &&
-      timestamp <= feature_history_.front().timestamp()) {
+bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
+                      const double timestamp,
+                      const int prediction_obstacle_id) {
+  if (!perception_obstacle.has_id() || !perception_obstacle.has_type()) {
+    AERROR << "Perception obstacle has incomplete information; "
+        "skip insertion";
+    return false;
+  }
+
+  if (ReceivedNewerMessage(timestamp)) {
     AERROR << "Obstacle [" << id_ << "] received an older frame ["
            << std::setprecision(20) << timestamp
            << "] than the most recent timestamp [ "
-           << feature_history_.front().timestamp() << "].";
-    return;
+           << this->timestamp() << "].";
+    return false;
   }
 
   // Set ID, Type, and Status of the feature.
   Feature feature;
-  if (SetId(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
-    return;
+  if (!SetId(perception_obstacle, &feature, prediction_obstacle_id)) {
+    return false;
   }
-  if (SetType(perception_obstacle, &feature) == ErrorCode::PREDICTION_ERROR) {
-    return;
+  if (!SetType(perception_obstacle, &feature)) {
+    return false;
   }
   SetStatus(perception_obstacle, timestamp, &feature);
 
@@ -213,12 +196,20 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   }
 
   // Trim historical features
-  Trim();
+  DiscardOutdatedHistory();
+  return true;
+}
+
+bool Obstacle::InsertFeature(const Feature& feature) {
+  InsertFeatureToHistory(feature);
+  type_ = feature.type();
+  id_ = feature.id();
+  return true;
 }
 
 bool Obstacle::IsInJunction(const std::string& junction_id) {
   // TODO(all) Consider if need to use vehicle front rather than position
-  if (feature_history_.size() == 0) {
+  if (feature_history_.empty()) {
     AERROR << "Obstacle [" << id_ << "] has no history";
     return false;
   }
@@ -230,7 +221,7 @@ bool Obstacle::IsInJunction(const std::string& junction_id) {
 }
 
 void Obstacle::BuildJunctionFeature() {
-  if (feature_history_.size() == 0) {
+  if (feature_history_.empty()) {
     AERROR << "Obstacle [" << id_ << "] has no history";
     return;
   }
@@ -257,7 +248,7 @@ void Obstacle::BuildJunctionFeature() {
   }
 }
 
-bool Obstacle::IsClosedToJunctionExit() {
+bool Obstacle::IsCloseToJunctionExit() {
   if (!HasJunctionFeatureWithExits()) {
     AERROR << "No junction feature found";
     return false;
@@ -317,10 +308,6 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(
 
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
                          const double timestamp, Feature* feature) {
-  if (SetId(perception_obstacle, feature) == ErrorCode::PREDICTION_ERROR) {
-    AERROR << "Obstacle has no ID";
-    return;
-  }
   SetTimestamp(perception_obstacle, timestamp, feature);
   SetPolygonPoints(perception_obstacle, feature);
   SetPosition(perception_obstacle, feature);
@@ -406,14 +393,10 @@ void Obstacle::UpdateStatus(Feature* feature) {
   }
 }
 
-ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
-                          Feature* feature) {
-  if (!perception_obstacle.has_id()) {
-    AERROR << "Obstacle has no ID.";
-    return ErrorCode::PREDICTION_ERROR;
-  }
-
-  int id = perception_obstacle.id();
+bool Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
+                     Feature* feature, const int prediction_obstacle_id) {
+  int id = prediction_obstacle_id > 0 ?
+      prediction_obstacle_id : perception_obstacle.id();
   if (id_ < 0) {
     id_ = id;
     ADEBUG << "Obstacle has id [" << id_ << "].";
@@ -421,24 +404,19 @@ ErrorCode Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
     if (id_ != id) {
       AERROR << "Obstacle [" << id_ << "] has a mismatched ID [" << id
              << "] from perception obstacle.";
-      return ErrorCode::PREDICTION_ERROR;
+      return false;
     }
   }
   feature->set_id(id);
-  return ErrorCode::OK;
+  return true;
 }
 
-ErrorCode Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
-                            Feature* feature) {
-  if (perception_obstacle.has_type()) {
-    type_ = perception_obstacle.type();
-    ADEBUG << "Obstacle [" << id_ << "] has type [" << type_ << "].";
-    feature->set_type(type_);
-  } else {
-    AERROR << "Obstacle [" << id_ << "] has no type.";
-    return ErrorCode::PREDICTION_ERROR;
-  }
-  return ErrorCode::OK;
+bool Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
+                       Feature* feature) {
+  type_ = perception_obstacle.type();
+  ADEBUG << "Obstacle [" << id_ << "] has type [" << type_ << "].";
+  feature->set_type(type_);
+  return true;
 }
 
 void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
@@ -563,30 +541,25 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
         feature->position().x() - feature_history_.front().position().x();
     double diff_y =
         feature->position().y() - feature_history_.front().position().y();
-    double prev_obstacle_size = std::max(feature_history_.front().length(),
+    double prev_obstacle_size = std::fmax(feature_history_.front().length(),
                                          feature_history_.front().width());
     double obstacle_size =
-        std::max(perception_obstacle.length(), perception_obstacle.width());
+        std::fmax(perception_obstacle.length(), perception_obstacle.width());
     double size_diff = std::abs(obstacle_size - prev_obstacle_size);
     double shift_thred =
-        std::max(obstacle_size * FLAGS_valid_position_diff_rate_threshold,
+        std::fmax(obstacle_size * FLAGS_valid_position_diff_rate_threshold,
                  FLAGS_valid_position_diff_threshold);
     double size_diff_thred =
         FLAGS_split_rate * std::min(obstacle_size, prev_obstacle_size);
     if (std::fabs(diff_x) > shift_thred && std::fabs(diff_y) > shift_thred &&
         size_diff < size_diff_thred) {
       double shift_heading = std::atan2(diff_y, diff_x);
-      double angle_diff = ::apollo::common::math::NormalizeAngle(
+      double angle_diff = common::math::NormalizeAngle(
           shift_heading - velocity_heading);
       if (std::fabs(angle_diff) > FLAGS_max_lane_angle_diff) {
         ADEBUG << "Shift velocity heading to be " << shift_heading;
         velocity_heading = shift_heading;
       }
-    }
-    double filtered_heading = heading_filter_.Filter(velocity_heading);
-    if (type_ == PerceptionObstacle::BICYCLE ||
-        type_ == PerceptionObstacle::PEDESTRIAN) {
-      velocity_heading = filtered_heading;
     }
     velocity_x = speed * std::cos(velocity_heading);
     velocity_y = speed * std::sin(velocity_heading);
@@ -630,7 +603,7 @@ void Obstacle::UpdateVelocity(const double theta, double* velocity_x,
                               double* speed) {
   *speed = std::hypot(*velocity_x, *velocity_y);
   double angle_diff =
-      ::apollo::common::math::NormalizeAngle(*velocity_heading - theta);
+      common::math::NormalizeAngle(*velocity_heading - theta);
   if (std::fabs(angle_diff) <= FLAGS_max_lane_angle_diff) {
     *velocity_heading = theta;
     *velocity_x = *speed * std::cos(*velocity_heading);
@@ -1159,7 +1132,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   // No need to BuildLaneGraph for those non-moving obstacles.
   Feature* feature = mutable_latest_feature();
   if (feature->is_still()) {
-    ADEBUG << "Not build lane graph for still obstacle";
+    ADEBUG << "Don't build lane graph for non-moving obstacle.";
     return;
   }
   double speed = feature->speed();
@@ -1172,11 +1145,14 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Treat the most probable lane_segment as the center, put its left
   // and right neighbors into a vector following the left-to-right order.
+  if (!feature->has_lane() || !feature->lane().has_lane_feature()) {
+    return;
+  }
   std::shared_ptr<const LaneInfo> center_lane_info =
       PredictionMap::LaneById(feature->lane().lane_feature().lane_id());
   std::vector<std::string> lane_ids_ordered;
   for (int i = center_lane_info->lane().left_neighbor_forward_lane_id().size()
-       - 1; i >= 0; i --) {
+       - 1; i >= 0; --i) {
     if (center_lane_info->lane().left_neighbor_forward_lane_id(i).has_id()) {
       lane_ids_ordered.push_back(
           center_lane_info->lane().left_neighbor_forward_lane_id(i).id());
@@ -1194,7 +1170,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_graph for every lane_segment and update it into proto.
   int seq_id = 0;
-  for (size_t i = 0; i < lane_ids_ordered.size(); i ++) {
+  for (size_t i = 0; i < lane_ids_ordered.size(); ++i) {
     // Construct the local lane_graph based on the current lane_segment.
     bool vehicle_is_on_lane = (lane_ids_ordered[i] ==
                                center_lane_info->lane().id().id());
@@ -1236,7 +1212,7 @@ void Obstacle::SetLanePoints(Feature* feature) {
 }
 
 // The generic SetLanePoints
-void Obstacle::SetLanePoints(Feature* feature, double lane_point_spacing,
+void Obstacle::SetLanePoints(const Feature* feature, double lane_point_spacing,
                              LaneGraph* const lane_graph) {
   // Sanity checks.
   if (feature == nullptr || !feature->has_velocity_heading()) {
@@ -1370,10 +1346,7 @@ void Obstacle::SetLaneSequencePath(LaneGraph* const lane_graph) {
 void Obstacle::SetNearbyObstacles() {
   // This function runs after all basic features have been set up
   Feature* feature_ptr = mutable_latest_feature();
-  if (feature_ptr == nullptr) {
-    AERROR << "Null feature received.";
-    return;
-  }
+
   LaneGraph* lane_graph =
       feature_ptr->mutable_lane()->mutable_lane_graph();
   for (int i = 0; i < lane_graph->lane_sequence_size(); ++i) {
@@ -1467,7 +1440,7 @@ void Obstacle::SetMotionStatus() {
 }
 
 void Obstacle::SetMotionStatusBySpeed() {
-  int history_size = static_cast<int>(feature_history_.size());
+  auto history_size = feature_history_.size();
   if (history_size < 2) {
     ADEBUG << "Obstacle [" << id_ << "] has no history and "
            << "is considered moving.";
@@ -1494,20 +1467,40 @@ void Obstacle::InsertFeatureToHistory(const Feature& feature) {
   ADEBUG << "Obstacle [" << id_ << "] inserted a frame into the history.";
 }
 
-void Obstacle::Trim() {
-  if (feature_history_.size() < 2) {
-    return;
+std::unique_ptr<Obstacle> Obstacle::Create(
+    const PerceptionObstacle& perception_obstacle,
+    const double timestamp, const int prediction_id) {
+  std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle());
+  if (!ptr_obstacle->Insert(perception_obstacle, timestamp, prediction_id)) {
+    return nullptr;
   }
-  int count = 0;
+  return ptr_obstacle;
+}
+
+std::unique_ptr<Obstacle> Obstacle::Create(const Feature& feature) {
+  std::unique_ptr<Obstacle> ptr_obstacle(new Obstacle());
+  ptr_obstacle->InsertFeatureToHistory(feature);
+  return ptr_obstacle;
+}
+
+bool Obstacle::ReceivedNewerMessage(const double timestamp) const {
+  if (feature_history_.empty()) {
+    return false;
+  }
+  auto last_timestamp_received = feature_history_.front().timestamp();
+  return timestamp <= last_timestamp_received;
+}
+
+void Obstacle::DiscardOutdatedHistory() {
+  auto num_of_frames = feature_history_.size();
   const double latest_ts = feature_history_.front().timestamp();
-  while (!feature_history_.empty() &&
-         latest_ts - feature_history_.back().timestamp() >=
+  while (latest_ts - feature_history_.back().timestamp() >=
              FLAGS_max_history_time) {
     feature_history_.pop_back();
-    ++count;
   }
-  if (count > 0) {
-    ADEBUG << "Obstacle [" << id_ << "] trimmed " << count
+  auto num_of_discarded_frames = num_of_frames - feature_history_.size();
+  if (num_of_discarded_frames > 0) {
+    ADEBUG << "Obstacle [" << id_ << "] discards " << num_of_discarded_frames
            << " historical features";
   }
 }

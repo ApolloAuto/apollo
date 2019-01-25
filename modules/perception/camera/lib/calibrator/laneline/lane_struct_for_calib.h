@@ -15,10 +15,8 @@
 *****************************************************************************/
 #pragma once
 
-#include <float.h>
 #include <Eigen/Eigen>
 #include <vector>
-#include <algorithm>
 
 namespace apollo {
 namespace perception {

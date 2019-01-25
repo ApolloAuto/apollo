@@ -17,41 +17,21 @@
 #include "modules/map/relative_map/common/relative_map_gflags.h"
 
 DEFINE_string(relative_map_adapter_config_filename,
-              "modules/map/relative_map/conf/adapter.conf",
+              "/apollo/modules/map/relative_map/conf/adapter.conf",
               "gflags conf file for relative map");
-DEFINE_string(relative_map_config_filename,
-              "modules/map/relative_map/conf/relative_map_config.pb.txt",
-              "Relative map configuration file");
+DEFINE_string(
+    relative_map_config_filename,
+    "/apollo/modules/map/relative_map/conf/relative_map_config.pb.txt",
+    "Relative map configuration file");
+
+DEFINE_string(navigator_config_filename,
+              "/apollo/modules/map/relative_map/conf/navigator_config.pb.txt",
+              "navigator config file name.");
 
 DEFINE_int32(relative_map_loop_rate, 10, "Loop rate for relative_map node");
-
-DEFINE_double(max_len_from_navigation_line, 250.0,
-              "max navigation path length from navigation line");
-
-DEFINE_double(min_len_for_navigation_lane, 150.0,
-              "min generated navigation lane length");
-
-DEFINE_double(max_len_for_navigation_lane, 250.0,
-              "max generated navigation lane length");
-
-DEFINE_double(ratio_navigation_lane_len_to_speed, 8.0,
-              "navigation lane length to adv speed ratio");
-
-DEFINE_double(max_distance_to_navigation_line, 15.0,
-              "max distance to navigation line in navigation mode");
-
-DEFINE_double(min_view_range_to_use_lane_marker, 0.5,
-              "min view range to use lane_marker");
-
-DEFINE_double(min_lane_half_width, 1.5, "min lane half width in meters");
-DEFINE_double(max_lane_half_width, 2.0, "max lane half width in meters");
 
 DEFINE_bool(enable_cyclic_rerouting, false,
             "Enable auto rerouting in a in a cyclic/circular navigaton line.");
 
 DEFINE_bool(relative_map_generate_left_boundray, true,
             "Generate left boundary for detected lanes.");
-
-DEFINE_bool(navigator_down_sample, true,
-            "When a navigation line is sent, the original data is downsampled "
-            "to reduce unnecessary memory consumption.");

@@ -88,10 +88,6 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     probability *= centripetal_acc_probability;
     lane_sequence_ptr->set_probability(probability);
   }
-
-  if (FLAGS_prediction_offline_mode) {
-    FeatureOutput::Insert(*latest_feature_ptr);
-  }
 }
 
 void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,

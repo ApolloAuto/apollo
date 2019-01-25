@@ -21,7 +21,6 @@
 #include "modules/planning/lattice/trajectory_generation/end_condition_sampler.h"
 
 #include <algorithm>
-#include <utility>
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -63,10 +62,12 @@ std::vector<Condition> EndConditionSampler::SampleLonEndConditionsForCruising(
   // time interval is one second plus the last one 0.01
   constexpr size_t num_of_time_samples = 9;
   std::array<double, num_of_time_samples> time_samples;
-  for (size_t i = 0; i + 1 < num_of_time_samples; ++i) {
-    time_samples[i] = FLAGS_trajectory_time_length - static_cast<double>(i);
+  for (size_t i = 1; i < num_of_time_samples; ++i) {
+    auto ratio = static_cast<double>(i) /
+        static_cast<double>(num_of_time_samples - 1);
+    time_samples[i] = FLAGS_trajectory_time_length * ratio;
   }
-  time_samples[num_of_time_samples - 1] = FLAGS_polynomial_minimal_param;
+  time_samples[0] = FLAGS_polynomial_minimal_param;
 
   std::vector<Condition> end_s_conditions;
   for (const auto& time : time_samples) {
@@ -101,15 +102,17 @@ std::vector<Condition> EndConditionSampler::SampleLonEndConditionsForCruising(
 std::vector<Condition> EndConditionSampler::SampleLonEndConditionsForStopping(
     const double ref_stop_point) const {
   // time interval is one second plus the last one 0.01
-  constexpr size_t num_time_section = 9;
-  std::array<double, num_time_section> time_sections;
-  for (size_t i = 0; i + 1 < num_time_section; ++i) {
-    time_sections[i] = FLAGS_trajectory_time_length - static_cast<double>(i);
+  constexpr size_t num_of_time_samples = 9;
+  std::array<double, num_of_time_samples> time_samples;
+  for (size_t i = 1; i < num_of_time_samples; ++i) {
+    auto ratio = static_cast<double>(i) /
+        static_cast<double>(num_of_time_samples - 1);
+    time_samples[i] = FLAGS_trajectory_time_length * ratio;
   }
-  time_sections[num_time_section - 1] = FLAGS_polynomial_minimal_param;
+  time_samples[0] = FLAGS_polynomial_minimal_param;
 
   std::vector<Condition> end_s_conditions;
-  for (const auto& time : time_sections) {
+  for (const auto& time : time_samples) {
     State end_s = {std::max(init_s_[0], ref_stop_point), 0.0, 0.0};
     end_s_conditions.emplace_back(end_s, time);
   }

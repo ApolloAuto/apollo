@@ -20,9 +20,6 @@
 
 #include "modules/planning/traffic_rules/signal_light.h"
 
-#include <limits>
-#include <vector>
-
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
@@ -160,9 +157,9 @@ void SignalLight::MakeDecisions(Frame* const frame,
         (signal.color() == TrafficLight::YELLOW &&
          stop_deceleration <
              config_.signal_light().max_stop_deacceleration_yellow_light())) {
-      const double forward_buffer = 1.0;
       if (config_.signal_light().righ_turn_creep().enabled() &&
-          reference_line_info->IsRightTurnPath(forward_buffer)) {
+          reference_line_info->GetPathTurnType() ==
+              hdmap::Lane::RIGHT_TURN) {
         SetCreepForwardSignalDecision(reference_line_info, &signal_light);
       }
       if (BuildStopDecision(frame, reference_line_info, &signal_light)) {

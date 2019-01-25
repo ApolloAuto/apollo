@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <limits>
 #include <map>
-#include <string>
 #include <utility>
 
 #include "boost/format.hpp"

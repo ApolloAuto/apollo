@@ -12,9 +12,12 @@ cc_library(
         "-DMODULE_NAME=\\\"prediction\\\"",
     ],
     deps = [
+        "//cyber/common:file",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/prediction/common:message_process",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
+        "//modules/prediction/proto:offline_features_proto",
         "//modules/prediction/scenario:scenario_manager",
         "//modules/prediction/util:data_extraction",
     ],
@@ -38,9 +41,7 @@ cc_binary(
     name = "libprediction_component.so",
     linkshared = True,
     linkstatic = False,
-    deps = [
-        ":prediction_component_lib",
-    ],
+    deps = [":prediction_component_lib"],
 )
 
 filegroup(

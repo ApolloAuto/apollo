@@ -55,10 +55,12 @@ Node3d::Node3d(double x, double y, double phi,
           (XYbounds[3] - XYbounds[2]) +
       static_cast<double>(y_grid_) * (XYbounds[1] - XYbounds[0]) +
       static_cast<double>(x_grid_));
+  traversed_x_.push_back(x);
+  traversed_y_.push_back(y);
+  traversed_phi_.push_back(phi);
 }
 
-Node3d::Node3d(std::vector<double> traversed_x,
-               std::vector<double> traversed_y,
+Node3d::Node3d(std::vector<double> traversed_x, std::vector<double> traversed_y,
                std::vector<double> traversed_phi,
                const std::vector<double>& XYbounds,
                const PlannerOpenSpaceConfig& open_space_conf) {
@@ -89,23 +91,31 @@ Node3d::Node3d(std::vector<double> traversed_x,
   traversed_x_ = traversed_x;
   traversed_y_ = traversed_y;
   traversed_phi_ = traversed_phi;
+  step_size_ = traversed_x.size();
 }
 
-Box2d Node3d::GetBoundingBox(const common::VehicleParam& vehicle_param_) {
+Box2d Node3d::GetBoundingBox(const common::VehicleParam& vehicle_param_,
+                             const double& x, const double& y,
+                             const double& phi) {
   double ego_length = vehicle_param_.length();
   double ego_width = vehicle_param_.width();
-  Box2d ego_box({x_, y_}, phi_, ego_length, ego_width);
   double shift_distance =
       ego_length / 2.0 - vehicle_param_.back_edge_to_center();
-  Vec2d shift_vec{shift_distance * std::cos(phi_),
-                  shift_distance * std::sin(phi_)};
-  ego_box.Shift(shift_vec);
+  Box2d ego_box(
+      {x + shift_distance * std::cos(phi), y + shift_distance * std::sin(phi)},
+      phi, ego_length, ego_width);
   return ego_box;
 }
 
 bool Node3d::operator==(const std::shared_ptr<Node3d> right) const {
   return x_grid_ == right->GetGridX() && y_grid_ == right->GetGridY() &&
          phi_grid_ == right->GetGridPhi();
+}
+
+size_t Node3d::GetSize() {
+  DCHECK(traversed_x_.size() == traversed_y_.size() &&
+         traversed_x_.size() == traversed_phi_.size());
+  return traversed_x_.size();
 }
 
 }  // namespace planning

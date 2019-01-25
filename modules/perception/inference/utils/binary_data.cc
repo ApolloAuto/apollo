@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <thrust/copy.h>
 
-#include <string>
 #include <vector>
 
 #include "cyber/common/log.h"

@@ -16,8 +16,6 @@
 
 #include "modules/perception/inference/caffe/caffe_net.h"
 
-#include <iostream>
-
 #include "cyber/common/log.h"
 
 namespace apollo {

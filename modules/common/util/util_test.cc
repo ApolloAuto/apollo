@@ -81,6 +81,18 @@ TEST(Util, uniform_slice) {
   EXPECT_DOUBLE_EQ(-10.0, result[3]);
 }
 
+TEST(Util, IsFloatEqual) {
+  double d1 = 0.2;
+  double d2 = 1 / std::sqrt(5) / std::sqrt(5);
+  EXPECT_TRUE(IsFloatEqual(d1, d2));
+  double d3 = 0.999999999999999999;
+  double d4 = 0.999999999999999998;
+  EXPECT_TRUE(IsFloatEqual(d3, d4));
+  double d5 = 0.11;
+  double d6 = 0.12;
+  EXPECT_FALSE(IsFloatEqual(d5, d6));
+}
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo

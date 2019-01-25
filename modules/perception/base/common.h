@@ -19,10 +19,7 @@
 #ifndef PERCEPTION_CPU_ONLY
 
 #include <cublas_v2.h>
-#include <cuda.h>
 #include <cuda_runtime.h>
-#include <curand.h>
-#include <driver_types.h>  // cuda driver types
 
 #endif
 

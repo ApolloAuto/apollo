@@ -16,10 +16,6 @@
 
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
-#include <chrono>
-#include <memory>
-#include <vector>
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
@@ -59,8 +55,6 @@ using apollo::canbus::Chassis;
 using apollo::common::DriveEvent;
 using apollo::common::KVDB;
 using apollo::common::time::Clock;
-using apollo::common::util::ContainsKey;
-using apollo::common::util::FindOrNull;
 using apollo::common::util::StrAppend;
 using apollo::common::util::StrCat;
 using apollo::control::DrivingAction;

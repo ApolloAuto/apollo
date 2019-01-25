@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/control/controller/lon_controller.h"
 
-#include <cstdio>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -43,8 +42,9 @@ LonController::LonController()
     time_t rawtime;
     char name_buffer[80];
     std::time(&rawtime);
-    strftime(name_buffer, 80, "/tmp/speed_log__%F_%H%M%S.csv",
-             localtime(&rawtime));
+    std::tm time_tm;
+    localtime_r(&rawtime, &time_tm);
+    strftime(name_buffer, 80, "/tmp/speed_log__%F_%H%M%S.csv", &time_tm);
     speed_log_file_ = fopen(name_buffer, "w");
     if (speed_log_file_ == nullptr) {
       AERROR << "Fail to open file:" << name_buffer;
@@ -256,6 +256,7 @@ Status LonController::ComputeControlCommand(
       (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
           ? -acceleration_cmd
           : acceleration_cmd;
+
   if (FLAGS_use_preview_speed_for_table) {
     calibration_value = control_interpolation_->Interpolate(
         std::make_pair(debug->preview_speed_reference(), acceleration_lookup));
@@ -301,8 +302,10 @@ Status LonController::ComputeControlCommand(
             debug->is_full_stop());
   }
 
+  // if the car is driven by acceleration, disgard the cmd->throttle and brake
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
+  cmd->set_acceleration(acceleration_cmd);
 
   if (std::fabs(VehicleStateProvider::Instance()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||

@@ -54,7 +54,7 @@ TEST_F(EvaluatorManagerTest, General) {
   obstacles_container->Insert(perception_obstacles_);
 
   EvaluatorManager::Instance()->Init(prediction_conf_);
-  EvaluatorManager::Instance()->Run(perception_obstacles_);
+  EvaluatorManager::Instance()->Run();
 
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(1);
   EXPECT_TRUE(obstacle_ptr != nullptr);

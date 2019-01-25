@@ -17,7 +17,6 @@
 #include "modules/dreamview/backend/map/map_service.h"
 
 #include <algorithm>
-#include <fstream>
 #include <utility>
 
 #include "modules/common/util/json_util.h"
@@ -28,7 +27,6 @@ namespace apollo {
 namespace dreamview {
 
 using apollo::common::PointENU;
-using apollo::common::util::JsonUtil;
 using apollo::hdmap::ClearAreaInfoConstPtr;
 using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::HDMapUtil;
@@ -41,15 +39,10 @@ using apollo::hdmap::MapPathPoint;
 using apollo::hdmap::PNCJunctionInfoConstPtr;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
-using apollo::hdmap::PncMap;
-using apollo::hdmap::RoadInfoConstPtr;
-using apollo::hdmap::RouteSegments;
 using apollo::hdmap::SignalInfoConstPtr;
-using apollo::hdmap::SimMapFile;
 using apollo::hdmap::SpeedBumpInfoConstPtr;
 using apollo::hdmap::StopSignInfoConstPtr;
 using apollo::hdmap::YieldSignInfoConstPtr;
-using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 using google::protobuf::RepeatedPtrField;
 

@@ -17,9 +17,7 @@
 #include "modules/control/controller/mpc_controller.h"
 
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -37,7 +35,6 @@ namespace apollo {
 namespace control {
 
 using apollo::common::ErrorCode;
-using apollo::common::Point3D;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
@@ -51,8 +48,12 @@ std::string GetLogFileName() {
   time_t raw_time;
   char name_buffer[80];
   std::time(&raw_time);
-  strftime(name_buffer, 80, "/tmp/mpc_controller_%F_%H%M%S.csv",
-           localtime(&raw_time));
+
+  std::tm time_tm;
+  localtime_r(&raw_time, &time_tm);
+  strftime(name_buffer, sizeof(name_buffer),
+          "/tmp/mpc_controller_%F_%H%M%S.csv",
+           &time_tm);
   return std::string(name_buffer);
 }
 
@@ -73,7 +74,7 @@ MPCController::~MPCController() { CloseLogFile(); }
 
 bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   if (!control_conf) {
-    AERROR << "[MPCController] control_conf == nullptr";
+    AERROR << "[MPCController] control_conf = nullptr";
     return false;
   }
   vehicle_param_ = VehicleConfigHelper::Instance()->GetConfig().vehicle_param();
@@ -349,8 +350,6 @@ Status MPCController::ComputeControlCommand(
           matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
           mpc_eps_, mpc_max_iteration_, &control) != true) {
     AERROR << "MPC solver failed";
-    steer_angle_feedback = 0.0;
-    acc_feedback = 0.0;
   } else {
     ADEBUG << "MPC problem solved! ";
     steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
@@ -429,8 +428,10 @@ Status MPCController::ComputeControlCommand(
   }
 
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
+  // if the car is driven by acceleration, disgard the cmd->throttle and brake
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
+  cmd->set_acceleration(acceleration_cmd);
 
   debug->set_heading(VehicleStateProvider::Instance()->heading());
   debug->set_steering_position(chassis->steering_percentage());

@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include <gtest/gtest.h>
 
-#include <cmath>
-
 #include "modules/perception/lib/utils/time_util.h"
 
 namespace apollo {

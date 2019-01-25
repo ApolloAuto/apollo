@@ -14,9 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 #pragma once
-#include <map>
 #include <string>
-#include <vector>
 
 #include "cyber/common/macros.h"
 #include "modules/perception/lib/registerer/registerer.h"

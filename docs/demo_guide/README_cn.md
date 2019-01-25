@@ -2,27 +2,26 @@
 
 如果你没有车辆及车载硬件， Apollo还提供了一个计算机模拟环境，可用于演示和代码调试。 
 
-线下演示需要设置docker的release环境，请参照 [how_to_build_and_release](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md)文档中的[Install docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#docker)章节。
+线下演示首先要Fork并且Clone Apollo在GitHub的代码，然后需要设置docker的release环境，请参照 [how_to_build_and_release](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md)文档中的[Install docker](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_build_and_release.md#docker)章节。
 
 Apollo演示的安装步骤：
 
 1. 运行如下命令启动docker的release环境:
 
     ```
-    bash docker/scripts/release_start.sh
+    bash docker/scripts/dev_start.sh
     ```
 
 2. 运行如下命令进入docker的release环境:
 
     ```
-    bash docker/scripts/release_into.sh
+    bash docker/scripts/dev_into.sh
     ```
 
-3. 运行如下命令回放位rosbag:
+3. 运行如下命令回放record:
 
     ```
-    python docs/demo_guide/rosbag_helper.py demo_1.5.bag # 下载rosbag
-    rosbag play demo_1.5.bag --loop
+    cyber_recorder play -f docs/demo_guide/demo_3.5.record --loop
     ```
 
     选项 `--loop` 用于设置循环回放模式.

@@ -21,7 +21,6 @@
 #include "modules/planning/math/smoothing_spline/spline_2d.h"
 
 #include <algorithm>
-#include <utility>
 
 namespace apollo {
 namespace planning {

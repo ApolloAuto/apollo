@@ -31,8 +31,6 @@ namespace planning {
 
 using apollo::common::Status;
 using apollo::common::time::Clock;
-using apollo::perception::TrafficLight;
-using apollo::perception::TrafficLightDetection;
 
 Rerouting::Rerouting(const TrafficRuleConfig& config) : TrafficRule(config) {}
 

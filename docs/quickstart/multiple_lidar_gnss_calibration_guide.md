@@ -1,5 +1,9 @@
 # Multiple-LiDAR GNSS Calibration Guide
 
+```
+NOTE: Supports upto Apollo 3.0. Apollo 3.5 is not supported yet.
+```
+
 Welcome to use the Multiple-LiDAR GNSS calibration tool. This guide will show you the steps to successfully calibrate multiple LiDARs.
 
 ## Contents

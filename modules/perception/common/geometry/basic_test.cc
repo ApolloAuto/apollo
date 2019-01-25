@@ -15,8 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/common/geometry/basic.h"
 
-#include <limits>
-
 #include "gtest/gtest.h"
 
 #include "modules/perception/base/point_cloud.h"

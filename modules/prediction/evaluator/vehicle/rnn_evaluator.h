@@ -55,6 +55,11 @@ class RNNEvaluator : public Evaluator {
       std::unordered_map<int, Eigen::MatrixXf>* const lane_feature_mats);
 
   /**
+    * @brief Get the name of evaluator.
+    */
+  std::string GetName() override {return "RNN_EVALUATOR";}
+
+  /**
    * @brief Clear
    */
   void Clear();

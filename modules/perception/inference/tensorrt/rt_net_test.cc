@@ -16,12 +16,6 @@
 
 #include "modules/perception/inference/tensorrt/rt_net.h"
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/highgui/highgui_c.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <string>
-
 #include "gtest/gtest.h"
 #include "gtest/gtest_prod.h"
 

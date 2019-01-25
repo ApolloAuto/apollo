@@ -14,10 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <string>
-
-#include "gtest/gtest.h"
-
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -52,10 +48,11 @@ class GarageTest : public PlanningTestBase {
     FLAGS_test_localization_file = "";
     FLAGS_test_chassis_file = "";
     FLAGS_enable_lag_prediction = false;
+    FLAGS_enable_rss_info = false;
 
     FLAGS_enable_scenario_side_pass = false;
-    FLAGS_enable_scenario_stop_sign_unprotected = false;
-    FLAGS_enable_scenario_traffic_light_right_turn_unprotected = false;
+    FLAGS_enable_scenario_stop_sign = false;
+    FLAGS_enable_scenario_traffic_light = false;
   }
 };
 

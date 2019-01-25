@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "gtest/gtest_prod.h"
+
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
 
@@ -30,6 +32,8 @@ class Llcauxiliaryfeedback120 : public ::apollo::drivers::canbus::ProtocolData<
   Llcauxiliaryfeedback120();
   void Parse(const std::uint8_t* bytes, int32_t length,
              ChassisDetail* chassis) const override;
+
+  FRIEND_TEST(llc_auxiliaryfeedback_120Test, General);
 
  private:
   // config detail: {'description': 'Inverter enabled', 'offset': 0.0,

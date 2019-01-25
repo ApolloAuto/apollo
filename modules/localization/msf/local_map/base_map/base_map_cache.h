@@ -16,12 +16,12 @@
 
 #pragma once
 
-#include <deque>
 #include <list>
 #include <map>
 #include <utility>
 
 #include "boost/thread.hpp"
+#include "cyber/common/log.h"
 #include "modules/localization/msf/local_map/base_map/base_map_fwd.h"
 
 namespace apollo {
@@ -101,7 +101,7 @@ bool LRUCache<Key, Element>::Get(const Key &key, Element **value) {
 template <class Key, class Element>
 Element *LRUCache<Key, Element>::Put(const Key &key, Element *value) {
   if (value == nullptr) {
-    std::cout << "LRUCache Warning: put a nullptr" << std::endl;
+    AWARN << "LRUCache Warning: put a nullptr";
     return nullptr;
   }
   Element *node_remove = nullptr;
@@ -133,8 +133,7 @@ Element *LRUCache<Key, Element>::Put(const Key &key, Element *value) {
     // }
   }
   if (static_cast<int>(map_.size()) >= capacity_) {
-    std::cout << "LRUCache Warning: the cache size is temporarily increased!"
-              << std::endl;
+    AWARN << "LRUCache Warning: the cache size is temporarily increased!";
   }
   list_.emplace_front(key, value);  // push_front
   map_[key] = list_.begin();
@@ -170,7 +169,6 @@ Element *LRUCache<Key, Element>::Remove(const Key &key) {
 
 template <class Key, class Element>
 Element *LRUCache<Key, Element>::ClearOne() {
-  // std::cout << "clear_one start" << std::endl;
   Element *node_remove = nullptr;
   ListReverseIterator ritr = list_.rbegin();
   while (ritr != list_.rend()) {
@@ -182,7 +180,6 @@ Element *LRUCache<Key, Element>::ClearOne() {
     }
     ++ritr;
   }
-  // std::cout << "clear_one end" << std::endl;
   return node_remove;
 }
 

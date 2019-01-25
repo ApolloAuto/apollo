@@ -20,11 +20,7 @@
 
 #pragma once
 
-#include <atomic>
-#include <condition_variable>
 #include <memory>
-#include <mutex>
-#include <queue>
 #include <string>
 #include <vector>
 
@@ -53,8 +49,6 @@ Borrelli
  */
 namespace apollo {
 namespace planning {
-
-using apollo::common::Status;
 
 struct OpenSpaceThreadData {
   std::vector<common::TrajectoryPoint> stitching_trajectory;
@@ -118,9 +112,9 @@ class OpenSpacePlanner : public Planner {
                                 const Vec2d& translate_origin);
 
  private:
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-  apollo::planning::DistanceApproachConfig distance_approach_config_;
-  std::unique_ptr<::apollo::planning::OpenSpaceTrajectoryGenerator>
+  PlannerOpenSpaceConfig planner_open_space_config_;
+  DistanceApproachConfig distance_approach_config_;
+  std::unique_ptr<OpenSpaceTrajectoryGenerator>
       open_space_trajectory_generator_;
   std::unique_ptr<OpenSpaceROI> open_space_roi_generator_;
 
@@ -138,7 +132,7 @@ class OpenSpacePlanner : public Planner {
 
   planning_internal::OpenSpaceDebug open_space_debug_;
   apollo::common::Trajectory trajectory_to_end_;
-  apollo::planning::ADCTrajectory trajectory_to_end_pb_;
+  ADCTrajectory trajectory_to_end_pb_;
 
   OpenSpaceThreadData thread_data_;
   std::future<void> task_future_;

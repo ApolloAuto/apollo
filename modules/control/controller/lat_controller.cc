@@ -17,9 +17,7 @@
 #include "modules/control/controller/lat_controller.h"
 
 #include <algorithm>
-#include <cmath>
 #include <iomanip>
-#include <string>
 #include <utility>
 #include <vector>
 
@@ -38,7 +36,6 @@ namespace apollo {
 namespace control {
 
 using apollo::common::ErrorCode;
-using apollo::common::Point3D;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::VehicleStateProvider;
@@ -52,8 +49,10 @@ std::string GetLogFileName() {
   time_t raw_time;
   char name_buffer[80];
   std::time(&raw_time);
+  std::tm time_tm;
+  localtime_r(&raw_time, &time_tm);
   strftime(name_buffer, 80, "/tmp/steer_log_simple_optimal_%F_%H%M%S.csv",
-           localtime(&raw_time));
+           &time_tm);
   return std::string(name_buffer);
 }
 
@@ -426,7 +425,7 @@ Status LatController::ComputeControlCommand(
     steer_angle = digital_filter_.Filter(steer_angle);
   }
 
-  if (vehicle_state->linear_velocity() < FLAGS_lock_steer_speed &&
+  if (std::abs(vehicle_state->linear_velocity()) < FLAGS_lock_steer_speed &&
       (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||
        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) &&
       chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {

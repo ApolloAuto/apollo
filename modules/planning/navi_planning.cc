@@ -19,9 +19,6 @@
 #include <algorithm>
 #include <list>
 #include <map>
-#include <memory>
-#include <utility>
-#include <vector>
 
 #include "google/protobuf/repeated_field.h"
 
@@ -137,8 +134,9 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   // recreate reference line provider in every cycle
   hdmap_ = HDMapUtil::BaseMapPtr(*local_view.relative_map);
   // Prefer "std::make_unique" to direct use of "new".
-  // Reference "https://herbsutter.com/gotw/_102/" for details.
-  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
+  // Refer to "https://herbsutter.com/gotw/_102/" for details.
+  reference_line_provider_ =
+      std::make_unique<ReferenceLineProvider>(hdmap_, local_view_.relative_map);
 
   // localization
   ADEBUG << "Get localization:"
@@ -549,7 +547,7 @@ Status NaviPlanning::Plan(
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
   // Navi Panner doesn't need to stitch the last path planning
-  // trajectory.Otherwise, it will cause the Dremview planning track to display
+  // trajectory.Otherwise, it will cause the Dreamview planning track to display
   // flashing or bouncing
   if (FLAGS_enable_stitch_last_trajectory) {
     last_publishable_trajectory_->PrependTrajectoryPoints(

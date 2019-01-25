@@ -15,8 +15,6 @@
  *****************************************************************************/
 #pragma once
 
-#include <string>
-
 #include "modules/perception/base/light_object_pool.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_cluster.h"

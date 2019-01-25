@@ -16,7 +16,6 @@
 
 #include "modules/monitor/hardware/resource_monitor.h"
 
-#include <sstream>
 #include <string>
 
 #include "boost/filesystem.hpp"
@@ -38,7 +37,6 @@ DEFINE_double(resource_monitor_interval, 5,
 namespace apollo {
 namespace monitor {
 
-using apollo::common::util::FindOrNull;
 using apollo::common::util::StrCat;
 
 ResourceMonitor::ResourceMonitor()

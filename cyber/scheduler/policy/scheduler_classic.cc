@@ -68,9 +68,9 @@ SchedulerClassic::SchedulerClassic() {
     }
     task_pool_size_ = proc_num;
 
-    sched_group_ = classic_conf_.add_groups();
-    sched_group_->set_name(DEFAULT_GROUP_NAME);
-    sched_group_->set_processor_num(proc_num);
+    auto sched_group = classic_conf_.add_groups();
+    sched_group->set_name(DEFAULT_GROUP_NAME);
+    sched_group->set_processor_num(proc_num);
   }
 
   CreateProcessor();
@@ -90,21 +90,15 @@ void SchedulerClassic::CreateProcessor() {
     std::vector<int> cpuset;
     ParseCpuset(group.cpuset(), &cpuset);
 
-    ClassicContext::cr_group_[group_name];
-    ClassicContext::rq_locks_[group_name];
-    ClassicContext::mtx_wq_[group_name];
-    ClassicContext::cv_wq_[group_name];
-
     for (uint32_t i = 0; i < proc_num; i++) {
-      auto ctx = std::make_shared<ClassicContext>();
-      ctx->SetGroupName(group_name);
+      auto ctx = std::make_shared<ClassicContext>(group_name);
       pctxs_.emplace_back(ctx);
 
       auto proc = std::make_shared<Processor>();
       proc->BindContext(ctx);
       proc->SetAffinity(cpuset, affinity, i);
       proc->SetSchedPolicy(processor_policy, processor_prio);
-      processors_.push_back(std::move(proc));
+      processors_.emplace_back(proc);
     }
   }
 }
@@ -112,15 +106,17 @@ void SchedulerClassic::CreateProcessor() {
 bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  if (likely(id_cr_wl_.find(cr->id()) == id_cr_wl_.end())) {
+  MutexWrapper *wrapper = nullptr;
+  if (!id_map_mutex_.Get(cr->id(), &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
-      if (id_cr_wl_.find(cr->id()) == id_cr_wl_.end()) {
-        id_cr_wl_[cr->id()];
+      if (!id_map_mutex_.Get(cr->id(), &wrapper)) {
+        wrapper = new MutexWrapper();
+        id_map_mutex_.Set(cr->id(), wrapper);
       }
     }
   }
-  std::lock_guard<std::mutex> lg(id_cr_wl_[cr->id()]);
+  std::lock_guard<std::mutex> lg(wrapper->Mutex());
 
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
@@ -192,15 +188,17 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
 bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  if (unlikely(id_cr_wl_.find(crid) == id_cr_wl_.end())) {
+  MutexWrapper *wrapper = nullptr;
+  if (!id_map_mutex_.Get(crid, &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
-      if (id_cr_wl_.find(crid) == id_cr_wl_.end()) {
-        id_cr_wl_[crid];
+      if (!id_map_mutex_.Get(crid, &wrapper)) {
+        wrapper = new MutexWrapper();
+        id_map_mutex_.Set(crid, wrapper);
       }
     }
   }
-  std::lock_guard<std::mutex> lg(id_cr_wl_[crid]);
+  std::lock_guard<std::mutex> lg(wrapper->Mutex());
 
   std::shared_ptr<CRoutine> cr = nullptr;
   int prio;

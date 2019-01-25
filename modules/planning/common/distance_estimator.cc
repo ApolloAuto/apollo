@@ -31,11 +31,9 @@ namespace apollo {
 namespace planning {
 
 using common::math::Vec2d;
-using common::math::Box2d;
 using common::TrajectoryPoint;
 using hdmap::RouteSegments;
 using hdmap::HDMapUtil;
-using common::util::MakePointENU;
 
 DistanceEstimator::DistanceEstimator(const TrajectoryPoint& ego_point,
                                      const RouteSegments& route_segments)
