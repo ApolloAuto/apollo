@@ -48,7 +48,7 @@ class PyNodeManager {
     std::vector<RoleAttributes> nodes;
     topology_->node_manager()->GetNodes(&nodes);
     if (nodes.empty()) {
-        AINFO << "no node found.";
+        AERROR << "no node found.";
         return false;
     }
     std::sort(nodes.begin(), nodes.end(),
