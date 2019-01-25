@@ -36,6 +36,7 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -47,35 +48,6 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::routing::RoutingResponse;
-
-namespace {
-
-bool IsVehicleStateValid(const VehicleState& vehicle_state) {
-  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
-      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
-      std::isnan(vehicle_state.linear_acceleration())) {
-    return false;
-  }
-  return true;
-}
-
-bool IsDifferentRouting(const RoutingResponse& first,
-                        const RoutingResponse& second) {
-  if (first.has_header() && second.has_header()) {
-    if (first.header().sequence_num() != second.header().sequence_num()) {
-      return true;
-    }
-    if (first.header().timestamp_sec() != second.header().timestamp_sec()) {
-      return true;
-    }
-    return false;
-  } else {
-    return true;
-  }
-}
-}  // namespace
 
 OpenSpacePlanning::~OpenSpacePlanning() {
   planner_->Stop();
