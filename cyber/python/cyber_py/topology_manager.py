@@ -14,7 +14,7 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-"""Module for init environment."""
+"""Module for cyber topology manager."""
 
 import sys
 import os
@@ -48,33 +48,33 @@ class Topology_Manager(object):
         print("init successful")
         self.node_manager = "null"
 
-    def cyber_Py_HasNode(self, nodename):
+    def cyber_py_has_node(self, node_name):
         """
         check Node_manager has node.
         """
-        print("nodename:", nodename)
+        print("node name:", node_name)
         self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
-        flag = _CYBER_TOPOLOGY_MANAGER.Py_HasNode(self.node_manager, nodename)
+        flag = _CYBER_TOPOLOGY_MANAGER.Py_HasNode(self.node_manager, node_name)
         return flag
 
-    def cyber_Py_GetNodes(self):
+    def cyber_py_get_nodes_name(self):
         """
         Get Node_manager nodes.
         """
         self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
-        flag = _CYBER_TOPOLOGY_MANAGER.Py_GetNodes(self.node_manager)
-        print(flag)
-        if(flag):
+        nodes = _CYBER_TOPOLOGY_MANAGER.Py_GetNodesName(self.node_manager)
+        if(len(nodes)):
             print("get all nodes completed")
         else:
             print("get all nodes failed")
+        return nodes
 
-    def cyber_Py_ShowNodeInfo(self, nodename):
+    def cyber_py_show_node_info(self, node_name):
         """
         Show node Info.
         """
         self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
-        ret = _CYBER_TOPOLOGY_MANAGER.Py_ShowNodeInfo(self.node_manager, nodename)
+        ret = _CYBER_TOPOLOGY_MANAGER.Py_ShowNodeInfo(self.node_manager, node_name)
         return ret
 
 if __name__=="__main__":

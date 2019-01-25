@@ -46,13 +46,13 @@ static PyObject *cyber_Py_HasNode(PyObject *self, PyObject *args) {
     PyNodeManager *py_node_manager = 0;
     if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_Py_HasNode"),
                          &py_node_manager_obj, &node_name, &len)) {
-    AINFO << "cyber_Py_HasNode:cyber_Py_HasNode failed!";
-    return Py_None;
+        AERROR << "cyber_Py_HasNode:cyber_Py_HasNode failed!";
+        return Py_None;
     }
     std::string data_str(node_name, len);
     py_node_manager = reinterpret_cast<PyNodeManager *>(
         PyCapsule_GetPointer(py_node_manager_obj, "apollo_cyber_node_manager"));
-    bool hasNode = py_node_manager->hasNode(data_str);
+    bool hasNode = py_node_manager->HasNode(data_str);
     if (hasNode) {
         Py_RETURN_TRUE;
     } else {
@@ -60,21 +60,21 @@ static PyObject *cyber_Py_HasNode(PyObject *self, PyObject *args) {
     }
 }
 
-static PyObject *cyber_Py_GetNodes(PyObject *self, PyObject *args) {
+static PyObject *cyber_Py_GetNodesName(PyObject *self, PyObject *args) {
     PyObject *py_node_manager_obj = 0;
     PyNodeManager *py_node_manager = 0;
     if (!PyArg_ParseTuple(args, const_cast<char *>("O:cyber_Py_GetNodes"),
                          &py_node_manager_obj)) {
-        AINFO << "cyber_Py_GetNodes:cyber_Py_GetNodes failed!";
+        AERROR << "cyber_Py_GetNodes:cyber_Py_GetNodes failed!";
         return Py_None;
     }
     py_node_manager = reinterpret_cast<PyNodeManager *>(PyCapsule_GetPointer(
                     py_node_manager_obj, "apollo_cyber_node_manager"));
-    bool getNodes = py_node_manager->getNodes();
-    if (getNodes) {
-     Py_RETURN_TRUE;
+    bool getNodesName = py_node_manager->GetNodesName();
+    if (getNodesName) {
+        Py_RETURN_TRUE;
     } else {
-     Py_RETURN_FALSE;
+        Py_RETURN_FALSE;
     }
 }
 
@@ -91,8 +91,7 @@ static PyObject *cyber_Py_ShowNodeInfo(PyObject *self, PyObject *args) {
     std::string data_str(node_name, len);
     py_node_manager = reinterpret_cast<PyNodeManager *>(PyCapsule_GetPointer(
                 py_node_manager_obj, "apollo_cyber_node_manager"));
-    PyObject *showNodeInfo = py_node_manager->showNodeInfo(data_str);
-    std::cout << "show node info has finished";
+    PyObject *showNodeInfo = py_node_manager->ShowNodeInfo(data_str);
     return showNodeInfo;
 }
 /////////////////////////////////////////////////////////////////////
@@ -102,7 +101,7 @@ static PyMethodDef _topology_manager_methods[] = {
     // PyWriter fun
     {"new_Node_Manager", cyber_new_Node_Manager, METH_VARARGS, ""},
     {"Py_HasNode", cyber_Py_HasNode, METH_VARARGS, ""},
-    {"Py_GetNodes", cyber_Py_GetNodes, METH_VARARGS, ""},
+    {"Py_GetNodesName", cyber_Py_GetNodesName, METH_VARARGS, ""},
     {"Py_ShowNodeInfo", cyber_Py_ShowNodeInfo, METH_VARARGS, ""},
     {NULL, NULL, 0, NULL} /* sentinel */
 };

@@ -40,16 +40,16 @@ class PyNodeManager {
      channel_manager_ = topology_->channel_manager();
   }
 
-  int hasNode(const std::string& node_name) {
+  bool HasNode(const std::string& node_name) {
     return node_manager_->HasNode(node_name);
   }
 
-  bool getNodes() {
+  bool GetNodesName() {
     std::vector<RoleAttributes> nodes;
     topology_->node_manager()->GetNodes(&nodes);
     if (nodes.empty()) {
         AINFO << "no node found.";
-        return 0;
+        return false;
     }
     std::sort(nodes.begin(), nodes.end(),
             [](const RoleAttributes& na, const RoleAttributes& nb) -> bool {
@@ -59,21 +59,22 @@ class PyNodeManager {
                 return false;
               }
             });
-    std::cout << nodes.size() << std::endl;
+    AINFO << nodes.size();
+    AINFO << "node list info get successful:";
     for (auto& node : nodes) {
-        AINFO << "node list info get successful:" + node.node_name();
+        AINFO << node.node_name();
     }
     return true;
   }
 
-  const char *connectChar(const char* temp1, const char* temp2) {
-    const char* result = NULL;
+  const char *ConnectChar(const char* temp1, const char* temp2) {
+    const char* result = nullptr;
     std::string temp = std::string(temp1) + std::string(temp2);
     result = temp.c_str();
     return result;
   }
 
-  PyObject* showNodeInfo(const std::string& _node) {
+  PyObject* ShowNodeInfo(const std::string& _node) {
       bool notFound = true;
       PyObject *pyobj_list = PyList_New(0);
       if (node_manager_->HasNode(_node)) {
@@ -83,12 +84,12 @@ class PyNodeManager {
         for (auto& node : nodes) {
           if (node.node_name() == _node) {
             PyList_Append(pyobj_list, Py_BuildValue("s",
-                connectChar("nodename:  ", node.node_name().c_str())));
+                ConnectChar("nodename:  ", node.node_name().c_str())));
             temps << node.process_id();
             PyList_Append(pyobj_list, Py_BuildValue("s",
-                    connectChar("processid: ", temps.str().c_str())));
+                    ConnectChar("processid: ", temps.str().c_str())));
             PyList_Append(pyobj_list, Py_BuildValue("s",
-                    connectChar("hostname:  ", node.host_name().c_str())));
+                    ConnectChar("hostname:  ", node.host_name().c_str())));
             std::vector<RoleAttributes> readers;
             channel_manager_->GetReadersOfNode(_node, &readers);
             PyList_Append(pyobj_list, Py_BuildValue("s",
@@ -98,9 +99,8 @@ class PyNodeManager {
                 continue;
               }
               PyList_Append(pyobj_list, Py_BuildValue("s",
-                    connectChar("    ", reader.channel_name().c_str())));
+                    ConnectChar("    ", reader.channel_name().c_str())));
             }
-            std::cout << std::endl;
             PyList_Append(pyobj_list, Py_BuildValue("s",
                     "[Writing Channels]:  "));
             std::vector<RoleAttributes> writers;
@@ -110,16 +110,15 @@ class PyNodeManager {
                 continue;
               }
               PyList_Append(pyobj_list, Py_BuildValue("s",
-                    connectChar("    ", writer.channel_name().c_str())));
+                    ConnectChar("    ", writer.channel_name().c_str())));
             }
-            std::cout << std::endl;
             notFound = false;
           }
         }
       }
     if (notFound) {
         PyList_Append(pyobj_list, Py_BuildValue("s",
-                    connectChar("Node cannot be found: ", _node.c_str())));
+                    ConnectChar("Node cannot be found: ", _node.c_str())));
     }
     return pyobj_list;
   }
