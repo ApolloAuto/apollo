@@ -85,7 +85,7 @@ TEST(ObstacleCameraPerceptionTest, perception_test) {
   init_option.root_dir = "/apollo/modules/perception/testdata/"
     "camera/app/conf/perception/camera/obstacle";
   init_option.conf_file =  "obstacle.pt";
-  init_option.lane_calibration_working_sensor_name = "onsemi_obstacle";
+  init_option.lane_calibration_working_sensor_name = "front_6mm";
   ASSERT_TRUE(perception.Init(init_option));
 
   const int FRAME_CAPACITY = 20;
@@ -95,7 +95,7 @@ TEST(ObstacleCameraPerceptionTest, perception_test) {
   data_options.image_width = FLAGS_width;
   data_options.do_undistortion = false;
   data_options.device_id = 0;
-  data_options.sensor_name = "onsemi_obstacle";
+  data_options.sensor_name = "front_6mm";
   DataProvider data_provider;
   CHECK(data_provider.Init(data_options));
   for (auto &frame : frame_list) {
@@ -111,8 +111,8 @@ TEST(ObstacleCameraPerceptionTest, perception_test) {
   std::string image_name;
   std::map<std::string, float> name_camera_ground_height_map;
   std::map<std::string, float> name_camera_pitch_angle_diff_map;
-  name_camera_ground_height_map["onsemi_obstacle"] = 1.6f;
-  name_camera_pitch_angle_diff_map["onsemi_obstacle"] = 0.0;
+  name_camera_ground_height_map["front_6mm"] = 1.6f;
+  name_camera_pitch_angle_diff_map["front_6mm"] = 0.0;
   float pitch_angle = 0.f;
   perception.SetCameraHeightAndPitch(name_camera_ground_height_map,
                                      name_camera_pitch_angle_diff_map,
