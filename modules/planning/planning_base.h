@@ -53,6 +53,7 @@ namespace planning {
 class PlanningBase {
  public:
   PlanningBase() = default;
+
   virtual ~PlanningBase();
 
   virtual apollo::common::Status Init(const PlanningConfig& config);
@@ -73,6 +74,7 @@ class PlanningBase {
  protected:
   virtual void FillPlanningPb(const double timestamp,
                               ADCTrajectory* const trajectory_pb);
+
   void SetFallbackTrajectory(ADCTrajectory* const trajectory_pb);
 
   virtual void ExportChart(const planning_internal::Debug& debug_info,
