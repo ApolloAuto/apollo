@@ -48,7 +48,7 @@ class Topology_Manager(object):
         print("init successful")
         self.node_manager = "null"
 
-    def cyber_py_has_node(self, node_name):
+    def has_node(self, node_name):
         """
         check Node_manager has node.
         """
@@ -57,27 +57,23 @@ class Topology_Manager(object):
         flag = _CYBER_TOPOLOGY_MANAGER.Py_HasNode(self.node_manager, node_name)
         return flag
 
-    def cyber_py_get_nodes_name(self):
+    def get_nodes_name(self):
         """
         Get Node_manager nodes.
         """
         self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
         nodes = _CYBER_TOPOLOGY_MANAGER.Py_GetNodesName(self.node_manager)
-        if(len(nodes)):
+        if(len(nodes) > 0):
             print("get all nodes completed")
         else:
             print("get all nodes failed")
         return nodes
 
-    def cyber_py_show_node_info(self, node_name):
+    def show_node_info(self, node_name):
         """
         Show node Info.
         """
         self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
         ret = _CYBER_TOPOLOGY_MANAGER.Py_ShowNodeInfo(self.node_manager, node_name)
         return ret
-
-if __name__=="__main__":
-     _tm = Topology_Manager()
-
 
