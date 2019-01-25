@@ -15,17 +15,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
-#
-# Usage:
-# sudo bash /apollo/modules/tools/prediction/mlp_train/scripts/generate_labels.sh <input_feature.bin>
-#
-# The input feature.X.bin will generate 4 files: .npy, .furture_status.npy, cruise_label.npy, junction_label.npy
 
-SRC_FILE=$1
+SRC_DIR=$1
+TARGET_DIR=$2
 
 set -e
 
 source /apollo/scripts/apollo_base.sh
-source /apollo/cyber/setup.bash 
+source /apollo/cyber/setup.bash
 
-python modules/tools/prediction/mlp_train/generate_labels.py ${SRC_FILE}
+sudo mkdir -p ${TARGET_DIR}
+
+if [ -z "$3" ]; then
+    MAP_DIR="sunnyvale_with_two_offices"
+else
+    MAP_DIR=$3
+fi
+
+./bazel-bin/modules/prediction/pipeline/records_to_offline_data \
+    --flagfile=/apollo/modules/prediction/conf/prediction.conf \
+    --map_dir=/apollo/modules/map/data/${MAP_DIR} \
+    --prediction_offline_mode \
+    --prediction_offline_dataforlearning \
+    --prediction_offline_bags=${SRC_DIR} \
+    --prediction_data_dir=${TARGET_DIR}

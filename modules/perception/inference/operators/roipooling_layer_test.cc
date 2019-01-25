@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+// This function was not verified yet
+
 #include "modules/perception/inference/operators/roipooling_layer.h"
 
 #include "gtest/gtest.h"

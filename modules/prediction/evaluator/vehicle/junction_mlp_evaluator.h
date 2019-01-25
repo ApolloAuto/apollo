@@ -80,14 +80,6 @@ class JunctionMLPEvaluator : public Evaluator {
                                 std::vector<double>* feature_values);
 
   /**
-   * @brief Save offline feature values in proto
-   * @param Obstacle feature
-   * @param Vector of feature values
-   */
-  void SaveOfflineFeatures(Feature* feature_ptr,
-                           const std::vector<double>& feature_values);
-
-  /**
    * @brief Load mode file
    * @param Model file name
    */

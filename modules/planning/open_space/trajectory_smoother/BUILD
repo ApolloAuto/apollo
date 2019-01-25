@@ -46,7 +46,7 @@ cc_library(
     hdrs = [
         "distance_approach_problem.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         "distance_approach_ipopt_interface",
         "//cyber/common:log",
@@ -85,6 +85,7 @@ cc_test(
     srcs = [
         "distance_approach_ipopt_interface_test.cc",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         ":distance_approach_ipopt_interface",
         "//cyber/common:log",
@@ -98,6 +99,7 @@ cc_test(
     srcs = [
         "distance_approach_problem_test.cc",
     ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         ":distance_approach_problem",
         "//cyber/common:log",
