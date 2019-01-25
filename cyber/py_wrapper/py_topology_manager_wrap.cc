@@ -26,7 +26,7 @@ template <typename T>
 T PyObjectToPtr(PyObject *pyobj, const std::string &type_ptr) {
   T obj_ptr = (T)PyCapsule_GetPointer(pyobj, type_ptr.c_str());
   if (obj_ptr == nullptr) {
-    AINFO << "PyObjectToPtr failed,type->" << type_ptr << "pyobj: " << pyobj;
+    AERROR << "PyObjectToPtr failed,type->" << type_ptr << "pyobj: " << pyobj;
   }
   return obj_ptr;
 }
