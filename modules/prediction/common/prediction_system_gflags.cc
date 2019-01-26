@@ -51,7 +51,7 @@ DEFINE_int32(prediction_offline_mode, 0,
              "0: online mode, no dump file"
              "1: dump feature proto to feature.x.bin"
              "2: dump data for learning to datalearn.x.bin"
-             "3: dump predicted trajectory to predict_obstacles.x.bin");
+             "3: dump predicted trajectory to predict_result.x.bin");
 
 // Bag replay timestamp gap
 DEFINE_double(replay_timestamp_gap, 10.0,
