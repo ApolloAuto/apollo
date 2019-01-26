@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.prediction;
 
 import "modules/prediction/proto/feature.proto";
+import "modules/prediction/proto/prediction_obstacle.proto";
 
 message Features {
   repeated Feature feature = 1;
@@ -31,4 +32,14 @@ message DataForLearning {
 
 message ListDataForLearning {
   repeated DataForLearning data_for_learning = 1;
+}
+
+message PredictionResult {
+  optional int32 id = 1;
+  optional double timestamp = 2;
+  repeated Trajectory trajectory = 3;
+}
+
+message ListPredictionResult {
+  repeated PredictionResult prediction_result = 1;
 }
