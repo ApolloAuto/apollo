@@ -80,6 +80,14 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     CHECK(lane_sequence_ptr != nullptr);
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
+    // Insert features to DataForLearning
+    if (FLAGS_prediction_offline_mode == 2 &&
+        !obstacle_ptr->IsNearJunction()) {
+      FeatureOutput::InsertDataForLearning(
+          *latest_feature_ptr, feature_values, "mlp");
+      ADEBUG << "Save extracted features for learning locally.";
+      return;  // Skip Compute probability for offline mode
+    }
     double probability = ComputeProbability(feature_values);
 
     double centripetal_acc_probability =
@@ -124,10 +132,6 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
                          obstacle_feature_values.end());
   feature_values->insert(feature_values->end(), lane_feature_values.begin(),
                          lane_feature_values.end());
-
-  if (FLAGS_prediction_offline_mode && !obstacle_ptr->IsNearJunction()) {
-    SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
-  }
 }
 
 void MLPEvaluator::SaveOfflineFeatures(
