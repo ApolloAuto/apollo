@@ -83,31 +83,6 @@ bool PredictionComponent::Init() {
   prediction_writer_ =
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
-  if (FLAGS_prediction_offline_mode) {
-    if (!FeatureOutput::Ready()) {
-      AERROR << "Feature output is not ready.";
-      return false;
-    }
-    if (FLAGS_prediction_offline_bags.empty()) {
-      return true;  // use listen to ROS topic mode
-    }
-    std::vector<std::string> inputs;
-    common::util::Split(FLAGS_prediction_offline_bags, ':', &inputs);
-    for (const auto& input : inputs) {
-      std::vector<std::string> offline_bags;
-      GetRecordFileNames(boost::filesystem::path(input), &offline_bags);
-      std::sort(offline_bags.begin(), offline_bags.end());
-      AINFO << "For input " << input << ", found " << offline_bags.size()
-            << "  rosbags to process";
-      for (std::size_t i = 0; i < offline_bags.size(); ++i) {
-        AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
-              << " ]: " << offline_bags[i];
-        MessageProcess::ProcessOfflineData(offline_bags[i]);
-      }
-    }
-    FeatureOutput::Close();
-    return false;
-  }
   return true;
 }
 
