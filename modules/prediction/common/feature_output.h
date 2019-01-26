@@ -20,7 +20,6 @@
 #include <string>
 
 #include "modules/prediction/proto/offline_features.pb.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -63,6 +62,15 @@ class FeatureOutput {
       const std::string& category);
 
   /**
+    * @brief Insert a prediction result with predicted trajectories
+    * @param Obstacle id
+    * @param prediction_obstacle
+    */
+  static void InsertPredictionResult(
+    const int obstacle_id,
+    const PredictionObstacle& prediction_obstacle);
+
+  /**
    * @brief Write features to a file
    */
   static void WriteFeatureProto();
@@ -71,6 +79,11 @@ class FeatureOutput {
     * @brief Write DataForLearning features to a file
     */
   static void WriteDataForLearning();
+
+  /**
+    * @brief Write PredictionResult to a file
+    */
+  static void WritePredictionResult();
 
   /**
    * @brief Get feature size
@@ -89,8 +102,8 @@ class FeatureOutput {
   static std::size_t idx_feature_;
   static ListDataForLearning list_data_for_learning_;
   static std::size_t idx_learning_;
-  static PredictionObstacles prediction_obstacles_;
-  static std::size_t idx_prediction_obstacle_;
+  static ListPredictionResult list_prediction_result_;
+  static std::size_t idx_prediction_result_;
 };
 
 }  // namespace prediction
