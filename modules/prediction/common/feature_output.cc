@@ -26,15 +26,17 @@ namespace prediction {
 
 Features FeatureOutput::features_;
 ListDataForLearning FeatureOutput::list_data_for_learning_;
+PredictionObstacles prediction_obstacles_;
 std::size_t FeatureOutput::idx_feature_ = 0;
 std::size_t FeatureOutput::idx_learning_ = 0;
+std::size_t idx_prediction_obstacle_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
-  if (FLAGS_prediction_offline_mode) {
-    Write();
+  if (FLAGS_prediction_offline_mode == 1) {
+    WriteFeatureProto();
   }
-  if (FLAGS_prediction_offline_dataforlearning) {
+  if (FLAGS_prediction_offline_mode == 2) {
     WriteDataForLearning();
   }
   Clear();
@@ -52,7 +54,7 @@ bool FeatureOutput::Ready() {
   return true;
 }
 
-void FeatureOutput::Insert(const Feature& feature) {
+void FeatureOutput::InsertFeatureProto(const Feature& feature) {
   features_.add_feature()->CopyFrom(feature);
 }
 
@@ -70,7 +72,7 @@ void FeatureOutput::InsertDataForLearning(
   ADEBUG << "Insert [" << category << "] data for learning";
 }
 
-void FeatureOutput::Write() {
+void FeatureOutput::WriteFeatureProto() {
   if (features_.feature_size() <= 0) {
     ADEBUG << "Skip writing empty feature.";
   } else {

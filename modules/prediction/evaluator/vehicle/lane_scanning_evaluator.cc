@@ -72,7 +72,7 @@ void LaneScanningEvaluator::Evaluate(
   std::vector<double> feature_values;
   ExtractFeatures(obstacle_ptr, lane_graph_ptr, &feature_values);
   std::vector<double> labels = {0.0};
-  if (FLAGS_prediction_offline_dataforlearning) {
+  if (FLAGS_prediction_offline_mode == 2) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "cruise");
     ADEBUG << "Save extracted features for learning locally.";
