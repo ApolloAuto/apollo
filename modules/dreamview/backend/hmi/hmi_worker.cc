@@ -134,7 +134,8 @@ void System(const std::string& cmd) {
 
 std::string GetDockerImage() {
   const char* docker_image = std::getenv("DOCKER_IMG");
-  return docker_image != nullptr ? docker_image : "";
+  return docker_image != nullptr
+      ? std::string(docker_image) : std::string("");
 }
 
 }  // namespace
