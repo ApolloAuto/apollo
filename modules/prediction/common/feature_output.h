@@ -97,6 +97,12 @@ class FeatureOutput {
     */
   static int SizeOfDataForLearning();
 
+  /**
+    * @brief Get the size of prediction results.
+    * @return The size of prediction results.
+    */
+  static int SizeOfPredictionResult();
+
  private:
   static Features features_;
   static std::size_t idx_feature_;
