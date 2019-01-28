@@ -33,11 +33,16 @@ std::size_t FeatureOutput::idx_prediction_result_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
-  if (FLAGS_prediction_offline_mode == 1) {
-    WriteFeatureProto();
-  }
-  if (FLAGS_prediction_offline_mode == 2) {
-    WriteDataForLearning();
+  switch (FLAGS_prediction_offline_mode) {
+    case 1: {
+      WriteFeatureProto();
+    }
+    case 2: {
+      WriteDataForLearning();
+    }
+    case 3: {
+      WritePredictionResult();
+    }
   }
   Clear();
 }
@@ -128,6 +133,10 @@ int FeatureOutput::Size() { return features_.feature_size(); }
 
 int FeatureOutput::SizeOfDataForLearning() {
   return list_data_for_learning_.data_for_learning_size();
+}
+
+int FeatureOutput::SizeOfPredictionResult() {
+  return list_prediction_result_.prediction_result_size();
 }
 
 }  // namespace prediction
