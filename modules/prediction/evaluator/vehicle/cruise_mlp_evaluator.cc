@@ -92,25 +92,31 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       continue;
     }
 
-    if (!FLAGS_prediction_offline_mode) {
-      Eigen::MatrixXf obs_feature_mat = VectorToMatrixXf(feature_values, 0,
-          OBSTACLE_FEATURE_SIZE);
-      Eigen::MatrixXf lane_feature_mat = VectorToMatrixXf(feature_values,
-          OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE,
-          static_cast<int>(feature_values.size()), SINGLE_LANE_FEATURE_SIZE,
-                           LANE_POINTS_SIZE);
-      Eigen::MatrixXf model_output;
-      if (lane_sequence_ptr->vehicle_on_lane()) {
-        go_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
-      } else {
-        cutin_model_ptr_->Run(
-            {lane_feature_mat, obs_feature_mat}, &model_output);
-      }
-      double probability = model_output(0, 0);
-      double finish_time = model_output(0, 1);
-      lane_sequence_ptr->set_probability(probability);
-      lane_sequence_ptr->set_time_to_lane_center(finish_time);
+    // Insert features to DataForLearning
+    if (FLAGS_prediction_offline_mode == 2) {
+      FeatureOutput::InsertDataForLearning(
+          *latest_feature_ptr, feature_values, "junction");
+      ADEBUG << "Save extracted features for learning locally.";
+      return;  // Skip Compute probability for offline mode
     }
+
+    Eigen::MatrixXf obs_feature_mat = VectorToMatrixXf(feature_values, 0,
+        OBSTACLE_FEATURE_SIZE);
+    Eigen::MatrixXf lane_feature_mat = VectorToMatrixXf(feature_values,
+        OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE,
+        static_cast<int>(feature_values.size()), SINGLE_LANE_FEATURE_SIZE,
+                         LANE_POINTS_SIZE);
+    Eigen::MatrixXf model_output;
+    if (lane_sequence_ptr->vehicle_on_lane()) {
+      go_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
+    } else {
+      cutin_model_ptr_->Run(
+          {lane_feature_mat, obs_feature_mat}, &model_output);
+    }
+    double probability = model_output(0, 0);
+    double finish_time = model_output(0, 1);
+    lane_sequence_ptr->set_probability(probability);
+    lane_sequence_ptr->set_time_to_lane_center(finish_time);
   }
 }
 
@@ -166,14 +172,6 @@ void CruiseMLPEvaluator::ExtractFeatureValues
   feature_values->insert(feature_values->end(),
                          lane_feature_values.begin(),
                          lane_feature_values.end());
-
-  // For offline training, write the extracted features into proto.
-  if (FLAGS_prediction_offline_mode) {
-    SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
-    ADEBUG << "Save cruise mlp features for obstacle ["
-           << obstacle_ptr->id() << "] with dim ["
-           << feature_values->size() << "]";
-  }
 }
 
 void CruiseMLPEvaluator::SetObstacleFeatureValues(

@@ -99,7 +99,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
 }
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::FinishStage() {
-  next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
+  next_stage_ =
+      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
 

@@ -19,7 +19,7 @@
 # Usage:
 # sudo bash /apollo/modules/tools/prediction/mlp_train/scripts/generate_labels.sh <input_feature.bin>
 #
-# The input feature.X.bin will generate furture_status.label, cruise.label, junction.label
+# The input feature.X.bin will generate 4 files: .npy, .furture_status.npy, cruise_label.npy, junction_label.npy
 
 SRC_FILE=$1
 

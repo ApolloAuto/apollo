@@ -67,13 +67,13 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
            << timestamp_ << "].";
     return;
   }
-  if (FLAGS_prediction_offline_mode) {
+  if (FLAGS_prediction_offline_mode == 1) {
     if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
         FeatureOutput::Size() > FLAGS_max_num_dump_feature) {
-      FeatureOutput::Write();
+      FeatureOutput::WriteFeatureProto();
     }
   }
-  if (FLAGS_prediction_offline_dataforlearning) {
+  if (FLAGS_prediction_offline_mode == 2) {
     if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
         FeatureOutput::SizeOfDataForLearning() > FLAGS_max_num_dump_feature) {
       FeatureOutput::WriteDataForLearning();

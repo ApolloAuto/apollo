@@ -144,7 +144,7 @@ void MessageProcess::OnPerception(
   auto end_time6 = std::chrono::system_clock::now();
 
   // Insert features to FeatureOutput for offline_mode
-  if (FLAGS_prediction_offline_mode) {
+  if (FLAGS_prediction_offline_mode == 1) {
     for (const int id :
         ptr_obstacles_container->curr_frame_predictable_obstacle_ids()) {
       Obstacle* obstacle_ptr = ptr_obstacles_container->GetObstacle(id);
@@ -155,7 +155,7 @@ void MessageProcess::OnPerception(
         AERROR << "Obstacle [" << id << "] has no latest feature.";
         return;
       }
-      FeatureOutput::Insert(obstacle_ptr->latest_feature());
+      FeatureOutput::InsertFeatureProto(obstacle_ptr->latest_feature());
       ADEBUG << "Insert feature into feature output";
     }
     // Not doing evaluation on offline mode

@@ -47,7 +47,7 @@ cc_library(
         "planning_base.h",
         "on_lane_planning.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
     deps = [
         "//modules/common",
         "//modules/common/configs:config_gflags",
@@ -70,6 +70,7 @@ cc_library(
         "//modules/planning/tasks/smoothers:smoother",
         "//modules/planning/traffic_rules:traffic_decider",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/planning/util:util_lib",
     ],
 )
 

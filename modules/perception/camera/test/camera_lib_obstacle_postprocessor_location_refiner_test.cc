@@ -129,7 +129,7 @@ TEST(LocationRefinedObstaclePostProcessorTestOnlineCalibration,
     frame.track_feature_blob.reset(new base::Blob<float>());
   }
   DataProvider::InitOptions dp_init_options;
-  dp_init_options.sensor_name = "onsemi_obstacle";
+  dp_init_options.sensor_name = "front_12mm";
   dp_init_options.image_height = height;
   dp_init_options.image_width = width;
   dp_init_options.device_id = 0;
@@ -205,10 +205,10 @@ TEST(LocationRefinedObstaclePostProcessorTestOnlineCalibration,
                k_mat[6],  k_mat[7],  k_mat[8];
   std::map<std::string, Eigen::Matrix3f> name_intrinsic_map;
   name_intrinsic_map.insert(std::pair<std::string, Eigen::Matrix3f>(
-        "onsemi_obstacle", intrinsic));
+        "front_12mm", intrinsic));
   CalibrationServiceInitOptions calibration_service_init_options;
   calibration_service_init_options.calibrator_working_sensor_name
-              = "onsemi_obstacle";
+              = "front_12mm";
   calibration_service_init_options.name_intrinsic_map = name_intrinsic_map;
   calibration_service_init_options.calibrator_method = "LaneLineCalibrator";
   calibration_service_init_options.image_height = 1080;
@@ -216,15 +216,15 @@ TEST(LocationRefinedObstaclePostProcessorTestOnlineCalibration,
   online_calib_service.Init(calibration_service_init_options);
   std::map<std::string, float> name_camera_ground_height_map;
   std::map<std::string, float> name_camera_pitch_angle_diff_map;
-  name_camera_ground_height_map["onsemi_obstacle"] = camera_height;
-  name_camera_pitch_angle_diff_map["onsemi_obstacle"] = 0;
+  name_camera_ground_height_map["front_12mm"] = camera_height;
+  name_camera_pitch_angle_diff_map["front_12mm"] = 0;
   online_calib_service.SetCameraHeightAndPitch(
                                             name_camera_ground_height_map,
                                             name_camera_pitch_angle_diff_map,
                                             camera_pitch);
   frame.calibration_service =
       dynamic_cast<BaseCalibrationService *>(&online_calib_service);
-  EXPECT_FALSE(postprocessor->Process(postprocessor_options, &frame));
+  EXPECT_TRUE(postprocessor->Process(postprocessor_options, &frame));
 
   frame.calibration_service->BuildIndex();
   AINFO << "number of objects: " << frame.detected_objects.size();

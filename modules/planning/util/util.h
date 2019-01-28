@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,39 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
-
 #pragma once
 
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
 
-class LagPrediction {
- public:
-  LagPrediction(uint32_t min_appear_num, uint32_t max_disappear_num);
-  void GetLaggedPrediction(prediction::PredictionObstacles* obstacles) const;
+bool IsVehicleStateValid(const apollo::common::VehicleState& vehicle_state);
 
-  struct LagInfo {
-    uint32_t last_observed_seq = 0;
-    double last_observed_time = 0.0;
-    uint32_t count = 0;
-    const prediction::PredictionObstacle* obstacle_ptr = nullptr;
-  };
-
- private:
-  void AddObstacleToPrediction(
-      double delay_sec, const prediction::PredictionObstacle& obstacle,
-      prediction::PredictionObstacles* obstacles) const;
-
-  uint32_t min_appear_num_ = 0;
-  uint32_t max_disappear_num_ = 0;
-};
+bool IsDifferentRouting(const apollo::routing::RoutingResponse& first,
+                        const apollo::routing::RoutingResponse& second);
 
 }  // namespace planning
 }  // namespace apollo
-
-#endif  // namespace MODULES_PLANNING_COMMON_LAG_PREDICTION_H_

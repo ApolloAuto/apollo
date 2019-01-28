@@ -45,7 +45,7 @@ class LabelGenerator(object):
         '''
         observation_dict contains the important observations of the subsequent
         Features for each obstacle at every timestamp:
-            (obstacle_ID, timestamp) --> dictionary of observations
+            obstacle_ID@timestamp --> dictionary of observations
         where dictionary of observations contains:
             'obs_traj': the trajectory points (x, y, vel_heading) up to
                         max_observation_time this trajectory poitns must
@@ -65,6 +65,9 @@ class LabelGenerator(object):
         functions.
         '''
         self.observation_dict = dict()
+        self.future_status_dict = dict()
+        self.cruise_label_dict = dict()
+        self.junction_label_dict = dict()
 
 
     def LoadFeaturePBAndSaveLabelFiles(self, input_filepath):
@@ -137,7 +140,7 @@ class LabelGenerator(object):
             for idx, feature in enumerate(feature_sequence):
                 if not feature.HasField('lane') or \
                    not feature.lane.HasField('lane_feature'):
-                    print 'No lane feature, cancel labeling'
+                    # print('No lane feature, cancel labeling')
                     continue
                 self.ObserveFeatureSequence(feature_sequence, idx)
         np.save(self.filepath + '.npy', self.observation_dict)
@@ -157,7 +160,8 @@ class LabelGenerator(object):
     def ObserveFeatureSequence(self, feature_sequence, idx_curr):
         # Initialization.
         feature_curr = feature_sequence[idx_curr]
-        if (feature_curr.id, feature_curr.timestamp) in self.observation_dict.keys():
+        dict_key = "{}@{:.3f}".format(feature_curr.id, feature_curr.timestamp)
+        if dict_key in self.observation_dict.keys():
             return
 
         # Record all the lane segments belonging to the lane sequence that the
@@ -168,7 +172,7 @@ class LabelGenerator(object):
                 for lane_segment in lane_sequence.lane_segment:
                     curr_lane_segments.add(lane_segment.lane_id)
         if len(curr_lane_segments) == 0:
-            print "Obstacle is not on any lane."
+            # print("Obstacle is not on any lane.")
             return
 
         # Declare needed varables.
@@ -240,7 +244,7 @@ class LabelGenerator(object):
                             lane_change_finish_time = time_span
 
         if len(obs_actual_lane_ids) == 0:
-            print "No lane id"
+            # print("No lane id")
             return
 
         # Update the observation_dict:
@@ -255,7 +259,7 @@ class LabelGenerator(object):
         dict_val['is_jittering'] = is_jittering
         dict_val['new_lane_id'] = new_lane_id
         dict_val['total_observed_time_span'] = total_observed_time_span
-        self.observation_dict[(feature_curr.id, feature_curr.timestamp)] = dict_val
+        self.observation_dict["{}@{:.3f}".format(feature_curr.id, feature_curr.timestamp)] = dict_val
         return
 
 
@@ -266,26 +270,26 @@ class LabelGenerator(object):
               - if there is lane chage, label the time it takes to get to that lane.
     '''
     def LabelSingleLane(self, period_of_interest=3.0):
-        output_dict = self.feature_dict
         output_features = offline_features_pb2.Features()
-        for obs_id, feature_sequence in output_dict.items():
+        for obs_id, feature_sequence in self.feature_dict.items():
             feature_seq_len = len(feature_sequence)
             for idx, feature in enumerate(feature_sequence):
                 if not feature.HasField('lane') or \
                    not feature.lane.HasField('lane_feature'):
-                    print "No lane feature, cancel labeling"
+                    # print "No lane feature, cancel labeling"
                     continue
 
                 # Observe the subsequent Features
-                if (feature.id, feature.timestamp) not in self.observation_dict:
+                if "{}@{:.3f}".format(feature.id, feature.timestamp) not in self.observation_dict:
                     continue
-                observed_val = self.observation_dict[(feature.id, feature.timestamp)]
+                observed_val = self.observation_dict["{}@{:.3f}".format(feature.id, feature.timestamp)]
 
+                lane_sequence_dict = dict()
                 # Based on the observation, label data.
                 for lane_sequence in feature.lane.lane_graph.lane_sequence:
                     # Sanity check.
                     if len(lane_sequence.lane_segment) == 0:
-                        print ('There is no lane segment in this sequence.')
+                        print('There is no lane segment in this sequence.')
                         continue
 
                     # Handle jittering data
@@ -378,42 +382,41 @@ class LabelGenerator(object):
                                 lane_sequence.time_to_lane_edge = -1.0
                                 lane_sequence.time_to_lane_center = -1.0
                 
-                output_features.feature.add().CopyFrom(feature)
-
-            output_dict[obs_id] = feature_sequence
-        self.SaveOutputPB(self.filepath + '.cruise.label', output_features)
+                for lane_sequence in feature.lane.lane_graph.lane_sequence:
+                    lane_sequence_dict[lane_sequence.lane_sequence_id] = [lane_sequence.label, \
+                   lane_sequence.time_to_lane_center, lane_sequence.time_to_lane_edge]
+                self.cruise_label_dict["{}@{:.3f}".format(feature.id, feature.timestamp)] = lane_sequence_dict
+        np.save(self.filepath + '.cruise_label.npy', self.cruise_label_dict)
 
 
     def LabelTrajectory(self, period_of_interest=3.0):
-        output_dict = self.feature_dict
         output_features = offline_features_pb2.Features()
-        for obs_id, feature_sequence in output_dict.items():
+        for obs_id, feature_sequence in self.feature_dict.items():
             for idx, feature in enumerate(feature_sequence):
                 # Observe the subsequent Features
-                if (feature.id, feature.timestamp) not in self.observation_dict:
+                if "{}@{:.3f}".format(feature.id, feature.timestamp) not in self.observation_dict:
                     continue
-                observed_val = self.observation_dict[(feature.id, feature.timestamp)]
+                observed_val = self.observation_dict["{}@{:.3f}".format(feature.id, feature.timestamp)]
+                self.future_status_dict["{}@{:.3f}".format(feature.id, feature.timestamp)] = observed_val['obs_traj']
+        np.save(self.filepath + '.future_status.npy', self.future_status_dict)
+        #         for point in observed_val['obs_traj']:
+        #             traj_point = feature.future_trajectory_points.add()
+        #             traj_point.path_point.x = point[0]
+        #             traj_point.path_point.y = point[1]
+        #             traj_point.path_point.velocity_heading = point[2]
+        #             traj_point.timestamp = point[3]
 
-                for point in observed_val['obs_traj']:
-                    traj_point = feature.future_trajectory_points.add()
-                    traj_point.path_point.x = point[0]
-                    traj_point.path_point.y = point[1]
-                    traj_point.path_point.velocity_heading = point[2]
-                    traj_point.timestamp = point[3]
+        #         output_features.feature.add().CopyFrom(feature)
 
-                output_features.feature.add().CopyFrom(feature)
-
-            output_dict[obs_id] = feature_sequence
-        self.SaveOutputPB(self.filepath + '.future_status.label', output_features)
+        # self.SaveOutputPB(self.filepath + '.future_status.label', output_features)
 
 
     def LabelJunctionExit(self):
         '''
         label feature trajectory according to real future lane sequence in 7s
         '''
-        output_dict = self.feature_dict
         output_features = offline_features_pb2.Features()
-        for obs_id, feature_sequence in output_dict.items():
+        for obs_id, feature_sequence in self.feature_dict.items():
             feature_seq_len = len(feature_sequence)
             for i, fea in enumerate(feature_sequence):
                 # Sanity check.
@@ -458,16 +461,17 @@ class LabelGenerator(object):
                             label = [0 for idx in range(12)]
                             label[d_idx] = 1
                             fea.junction_feature.junction_mlp_label.extend(label)
-                            break # actually break two level
+                            self.junction_label_dict["{}@{:.3f}".format(fea.id, fea.timestamp)] = label
+                            break  # actually break two level
                     else:
                         continue
                     break
-                if fea.HasField('junction_feature') and \
-                   len(fea.junction_feature.junction_mlp_label) > 0:
-                    output_features.feature.add().CopyFrom(fea)
+        np.save(self.filepath + '.junction_label.npy', self.junction_label_dict)
+        #         if fea.HasField('junction_feature') and \
+        #            len(fea.junction_feature.junction_mlp_label) > 0:
+        #             output_features.feature.add().CopyFrom(fea)
 
-            output_dict[obs_id] = feature_sequence
-        self.SaveOutputPB(self.filepath + '.junction.label', output_features)
+        # self.SaveOutputPB(self.filepath + '.junction.label', output_features)
 
 
     def Label(self):
