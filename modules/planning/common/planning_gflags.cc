@@ -487,4 +487,8 @@ DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
               "(unit: meter) for side pass driving width l buffer");
 
 DEFINE_bool(enable_parallel_hybrid_a, false,
-            "True to enable hybrid a* implementation.");
+            "True to enable hybrid a* parallel implementation.");
+DEFINE_bool(enable_parallel_open_space_smoother, false,
+            "True to enable open space smoother parallel implementation.");
+DEFINE_bool(enable_derivative_check, false,
+            "True to enable derivative check inside open space planner.");
