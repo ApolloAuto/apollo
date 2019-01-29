@@ -108,3 +108,8 @@ message Feature {
   // Obstacle ground-truth labels:
   repeated PredictionTrajectoryPoint future_trajectory_points = 31;
 }
+
+message FrameEnv {
+  optional double timestamp = 1;
+  repeated Feature obstacle_feature = 2;
+}
