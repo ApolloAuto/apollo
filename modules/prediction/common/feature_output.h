@@ -70,6 +70,8 @@ class FeatureOutput {
     const int obstacle_id,
     const PredictionObstacle& prediction_obstacle);
 
+  static void InsertFrameEnv(const FrameEnv& frame_env);
+
   /**
    * @brief Write features to a file
    */
@@ -84,6 +86,8 @@ class FeatureOutput {
     * @brief Write PredictionResult to a file
     */
   static void WritePredictionResult();
+
+  static void WriteFrameEnv();
 
   /**
    * @brief Get feature size
@@ -103,6 +107,8 @@ class FeatureOutput {
     */
   static int SizeOfPredictionResult();
 
+  static int SizeOfFrameEnv();
+
  private:
   static Features features_;
   static std::size_t idx_feature_;
@@ -110,6 +116,8 @@ class FeatureOutput {
   static std::size_t idx_learning_;
   static ListPredictionResult list_prediction_result_;
   static std::size_t idx_prediction_result_;
+  static ListFrameEnv list_frame_env_;
+  static std::size_t idx_frame_env_;
 };
 
 }  // namespace prediction
