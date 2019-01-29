@@ -18,6 +18,8 @@
 
 #include <vector>
 
+#include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
@@ -112,6 +114,8 @@ void EvaluatorManager::Run() {
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
 
+  BuildCurrentFrameEnv();
+
   std::vector<Obstacle*> dynamic_env;
   for (int id : obstacles_container->curr_frame_predictable_obstacle_ids()) {
     if (id < 0) {
@@ -185,6 +189,31 @@ void EvaluatorManager::EvaluateObstacle(
 void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle) {
   std::vector<Obstacle*> dummy_dynamic_env;
   EvaluateObstacle(obstacle, dummy_dynamic_env);
+}
+
+void EvaluatorManager::BuildCurrentFrameEnv() {
+  auto obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  CHECK_NOTNULL(obstacles_container);
+  FrameEnv curr_frame_env;
+  curr_frame_env.set_timestamp(obstacles_container->timestamp());
+  for (int id : obstacles_container->curr_frame_predictable_obstacle_ids()) {
+    Obstacle* obstacle = obstacles_container->GetObstacle(id);
+    if (obstacle == nullptr || obstacle->history_size() == 0) {
+      continue;
+    }
+    const Feature& obstacle_feature = obstacle->latest_feature();
+    Feature feature;
+    feature.set_id(obstacle_feature.id());
+    feature.set_timestamp(obstacles_container->timestamp());
+    feature.set_velocity_heading(obstacle_feature.velocity_heading());
+    feature.mutable_polygon_point()->CopyFrom(obstacle_feature.polygon_point());
+    curr_frame_env.add_obstacle_feature()->CopyFrom(feature);
+  }
+  if (FLAGS_prediction_offline_mode == 4) {
+    FeatureOutput::InsertFrameEnv(curr_frame_env);
+  }
 }
 
 std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
