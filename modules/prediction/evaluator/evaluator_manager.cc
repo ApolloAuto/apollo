@@ -22,6 +22,7 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/container/pose/pose_container.h"
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
@@ -196,8 +197,22 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
+  auto ego_pose_container =
+      ContainerManager::Instance()->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
+  CHECK_NOTNULL(ego_pose_container);
   FrameEnv curr_frame_env;
   curr_frame_env.set_timestamp(obstacles_container->timestamp());
+  auto ego_obstacle = ego_pose_container->ToPerceptionObstacle();
+  curr_frame_env.mutable_ego_feature()->set_id(-1);
+  curr_frame_env.mutable_ego_feature()->set_timestamp(
+      obstacles_container->timestamp());
+  curr_frame_env.mutable_ego_feature()->set_velocity_heading(std::atan2(
+      ego_obstacle->velocity().y(), ego_obstacle->velocity().x()));
+  curr_frame_env.mutable_ego_feature()->mutable_position()
+                                      ->CopyFrom(ego_obstacle->position());
+  curr_frame_env.mutable_ego_feature()->set_length(5.0);
+  curr_frame_env.mutable_ego_feature()->set_width(2.1);
   for (int id : obstacles_container->curr_frame_predictable_obstacle_ids()) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
     if (obstacle == nullptr || obstacle->history_size() == 0) {
@@ -208,7 +223,10 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
     feature.set_id(obstacle_feature.id());
     feature.set_timestamp(obstacles_container->timestamp());
     feature.set_velocity_heading(obstacle_feature.velocity_heading());
+    feature.mutable_position()->CopyFrom(obstacle_feature.position());
     feature.mutable_polygon_point()->CopyFrom(obstacle_feature.polygon_point());
+    feature.set_length(obstacle_feature.length());
+    feature.set_width(obstacle_feature.width());
     curr_frame_env.add_obstacle_feature()->CopyFrom(feature);
   }
   if (FLAGS_prediction_offline_mode == 4) {
