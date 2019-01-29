@@ -88,6 +88,12 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
         FeatureOutput::WritePredictionResult();
       }
     }
+    case 4: {
+      if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+          FeatureOutput::SizeOfFrameEnv() > FLAGS_max_num_dump_feature) {
+        FeatureOutput::WriteFrameEnv();
+      }
+    }
   }
 
   timestamp_ = timestamp;
@@ -383,6 +389,10 @@ bool ObstaclesContainer::IsPredictable(
     return false;
   }
   return true;
+}
+
+double ObstaclesContainer::timestamp() {
+  return timestamp_;
 }
 
 }  // namespace prediction
