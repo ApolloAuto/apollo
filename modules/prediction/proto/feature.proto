@@ -111,5 +111,6 @@ message Feature {
 
 message FrameEnv {
   optional double timestamp = 1;
-  repeated Feature obstacle_feature = 2;
+  optional Feature ego_feature = 2;
+  repeated Feature obstacle_feature = 3;
 }
