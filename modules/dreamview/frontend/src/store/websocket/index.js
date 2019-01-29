@@ -23,7 +23,7 @@ function deduceWebsocketServerAddr(type) {
             path = "pointcloud";
             break;
         case "sim_world":
-            path = OFFLINE_PLAYBACK ? "RosPlayBack" : "websocket";
+            path = OFFLINE_PLAYBACK ? "offlineView" : "websocket";
             break;
     }
     return `${protocol}://${link.hostname}:${port}/${path}`;
