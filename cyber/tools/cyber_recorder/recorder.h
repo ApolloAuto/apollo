@@ -26,6 +26,7 @@
 #include "cyber/base/signal.h"
 #include "cyber/cyber.h"
 #include "cyber/message/raw_message.h"
+#include "cyber/proto/record.pb.h"
 #include "cyber/proto/topology_change.pb.h"
 #include "cyber/record/record_writer.h"
 
@@ -47,6 +48,9 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
  public:
   Recorder(const std::string& output, bool all_channels,
            const std::vector<std::string>& channel_vec);
+  Recorder(const std::string& output, bool all_channels,
+           const std::vector<std::string>& channel_vec,
+           const proto::Header& header);
   ~Recorder();
   bool Start();
   bool Stop();
@@ -61,6 +65,7 @@ class Recorder : public std::enable_shared_from_this<Recorder> {
   std::string output_;
   bool all_channels_ = true;
   std::vector<std::string> channel_vec_;
+  proto::Header header_;
   std::unordered_map<std::string, std::shared_ptr<ReaderBase>>
       channel_reader_map_;
   uint64_t message_count_;
