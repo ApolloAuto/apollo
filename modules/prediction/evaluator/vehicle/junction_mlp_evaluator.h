@@ -69,7 +69,15 @@ class JunctionMLPEvaluator : public Evaluator {
    *        Feature container in a vector for receiving the feature values
    */
   void SetObstacleFeatureValues(Obstacle* obstacle_ptr,
-                                std::vector<double>* feature_values);
+                                std::vector<double>* const feature_values);
+
+  /**
+   * @brief Set ego vehicle feature vector
+   * @param Obstacle pointer
+   *        Feature container in a vector for receiving the feature values
+   */
+  void SetEgoVehicleFeatureValues(Obstacle* obstacle_ptr,
+                                  std::vector<double>* const feature_values);
 
   /**
    * @brief Set junction feature vector
@@ -77,7 +85,7 @@ class JunctionMLPEvaluator : public Evaluator {
    *        Feature container in a vector for receiving the feature values
    */
   void SetJunctionFeatureValues(Obstacle* obstacle_ptr,
-                                std::vector<double>* feature_values);
+                                std::vector<double>* const feature_values);
 
   /**
    * @brief Load mode file
@@ -93,6 +101,7 @@ class JunctionMLPEvaluator : public Evaluator {
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 3;
+  static const size_t EGO_VEHICLE_FEATURE_SIZE = 4;
   static const size_t JUNCTION_FEATURE_SIZE = 72;
 
   std::unique_ptr<FnnVehicleModel> model_ptr_;
