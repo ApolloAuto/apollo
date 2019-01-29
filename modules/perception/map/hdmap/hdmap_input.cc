@@ -68,7 +68,7 @@ bool HDMapInput::Reset() {
 
 bool HDMapInput::InitHDMap() {
   hdmap_.reset(new apollo::hdmap::HDMap());
-  std::string model_name = "HDMapInput";
+  const std::string model_name = "HDMapInput";
   std::string filename;
   const lib::ModelConfig* model_config = nullptr;
   if (!lib::ConfigManager::Instance()->GetModelConfig(model_name,
@@ -163,9 +163,8 @@ void HDMapInput::MergeBoundaryJunction(
   road_boundaries_ptr->resize(polygon_size);
   int polygons_index = 0;
   // merege boundary
-  int step = hdmap_sample_step_;
   PointDCloudPtr temp_cloud = base::PointDCloudPool::Instance().Get();
-  for (int i = 0; i < polygon_size; i++) {
+  for (int step, i = 0; i < polygon_size; i++) {
     temp_cloud->clear();
     const LineBoundary& left_boundary = boundary[i]->left_boundary;
     const std::vector<apollo::common::PointENU>& left_line_points =
