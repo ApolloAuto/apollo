@@ -19,15 +19,20 @@
 #include <algorithm>
 #include <unordered_map>
 
+#include "modules/common/math/vec2d.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
 
+using apollo::common::adapter::AdapterConfig;
 using apollo::prediction::math_util::EvaluateCubicPolynomial;
 using apollo::prediction::math_util::ComputePolynomial;
 
@@ -151,6 +156,15 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
     return;
   }
 
+  std::vector<double> ego_vehicle_feature_values;
+  SetEgoVehicleFeatureValues(obstacle_ptr, &ego_vehicle_feature_values);
+  if (ego_vehicle_feature_values.size() != EGO_VEHICLE_FEATURE_SIZE) {
+    AERROR << "Obstacle [" << id << "] has fewer than "
+           << "expected ego vehicle feature_values"
+           << ego_vehicle_feature_values.size() << ".";
+    return;
+  }
+
   std::vector<double> junction_feature_values;
   SetJunctionFeatureValues(obstacle_ptr, &junction_feature_values);
   if (junction_feature_values.size() != JUNCTION_FEATURE_SIZE) {
@@ -163,6 +177,9 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
   feature_values->insert(feature_values->end(),
                          obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
+  feature_values->insert(feature_values->end(),
+                         ego_vehicle_feature_values.begin(),
+                         ego_vehicle_feature_values.end());
   feature_values->insert(feature_values->end(),
                          junction_feature_values.begin(),
                          junction_feature_values.end());
@@ -180,6 +197,41 @@ void JunctionMLPEvaluator::SetObstacleFeatureValues(
   feature_values->push_back(feature.speed());
   feature_values->push_back(feature.acc());
   feature_values->push_back(feature.junction_feature().junction_range());
+}
+
+void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
+    Obstacle* obstacle_ptr, std::vector<double>* const feature_values) {
+  feature_values->clear();
+  *feature_values = std::vector<double>(4, 0.0);
+  auto ego_pose_container_ptr = ContainerManager::Instance()->GetContainer<
+      PoseContainer>(AdapterConfig::LOCALIZATION);
+  if (ego_pose_container_ptr == nullptr) {
+    (*feature_values)[0] = 100.0;
+    (*feature_values)[1] = 100.0;
+    return;
+  }
+  const auto ego_pose_obstacle_ptr =
+      ego_pose_container_ptr->ToPerceptionObstacle();
+  const auto ego_position = ego_pose_obstacle_ptr->position();
+  const auto ego_velocity = ego_pose_obstacle_ptr->velocity();
+  CHECK_GT(obstacle_ptr->history_size(), 0);
+  const Feature& obstacle_feature = obstacle_ptr->latest_feature();
+  apollo::common::math::Vec2d ego_relative_position(
+      ego_position.x() - obstacle_feature.position().x(),
+      ego_position.y() - obstacle_feature.position().y());
+  apollo::common::math::Vec2d ego_relative_velocity(
+      ego_velocity.x(), ego_velocity.y());
+  ego_relative_velocity.rotate(-obstacle_feature.velocity_heading());
+  (*feature_values)[0] = ego_relative_position.x();
+  (*feature_values)[1] = ego_relative_position.y();
+  (*feature_values)[2] = ego_relative_velocity.x();
+  (*feature_values)[3] = ego_relative_velocity.y();
+  ADEBUG << "ego relative pos = {"
+         << ego_relative_position.x() << ", "
+         << ego_relative_position.y() << "} "
+         << "ego_relative_velocity = {"
+         << ego_relative_velocity.x() << ", "
+         << ego_relative_velocity.y() << "}";
 }
 
 void JunctionMLPEvaluator::SetJunctionFeatureValues(
