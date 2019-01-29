@@ -78,7 +78,6 @@ bool HDMapInput::InitHDMap() {
   }
   if (!model_config->get_value("hdmap_sample_step", &hdmap_sample_step_)) {
     AERROR << "hdmap_sample_step not found.";
-    hdmap_sample_step_ = 5;
   }
 
   // TO DO: Decide which map to use
@@ -107,7 +106,8 @@ bool HDMapInput::GetRoiHDMapStruct(
     std::shared_ptr<base::HdmapStruct> hdmap_struct_prt) {
   lib::MutexLock lock(&mutex_);
   CHECK_NOTNULL(hdmap_.get());
-  // get original road boundary and junction
+
+  // Get original road boundary and junction
   std::vector<RoadRoiPtr> road_boundary_vec;
   std::vector<JunctionInfoConstPtr> junctions_vec;
   apollo::common::PointENU point;
@@ -130,7 +130,8 @@ bool HDMapInput::GetRoiHDMapStruct(
   } else {
     return false;
   }
-  // merge boundary and junction
+
+  // Merge boundary and junction
   std::vector<RoadBoundary> road_boundaries;
   MergeBoundaryJunction(
       road_boundary_vec,
@@ -143,6 +144,7 @@ bool HDMapInput::GetRoiHDMapStruct(
       road_boundaries,
       hdmap_struct_prt->junction_polygons,
       &(hdmap_struct_prt->road_boundary));
+
   return true;
 }
 
@@ -173,7 +175,7 @@ void HDMapInput::MergeBoundaryJunction(
     ADEBUG << "input left road_boundary size = " <<
     left_line_points.size();
     step = (left_line_points.size() > 2) ? hdmap_sample_step_ : 1;
-    for (unsigned int idx = 0; idx < left_line_points.size(); idx += step) {
+    for (size_t idx = 0; idx < left_line_points.size(); idx += step) {
       PointD pointd;
       pointd.x = left_line_points.at(idx).x();
       pointd.y = left_line_points.at(idx).y();
@@ -182,7 +184,7 @@ void HDMapInput::MergeBoundaryJunction(
     }
     DownsamplePoints(temp_cloud,
         &(road_boundaries_ptr->at(polygons_index).left_boundary));
-    for (unsigned int index = 0;
+    for (size_t index = 0;
         index < road_boundaries_ptr->at(polygons_index).left_boundary.size();
         ++index) {
       road_polygons_ptr->at(polygons_index).push_back(
@@ -197,7 +199,7 @@ void HDMapInput::MergeBoundaryJunction(
     ADEBUG << "input right road_boundary size = "
       << right_line_points.size();
     step = (right_line_points.size() > 2) ? hdmap_sample_step_ : 1;
-    for (unsigned int idx = 0; idx < right_line_points.size(); idx += step) {
+    for (size_t idx = 0; idx < right_line_points.size(); idx += step) {
       PointD pointd;
       pointd.x = right_line_points.at(idx).x();
       pointd.y = right_line_points.at(idx).y();
@@ -206,7 +208,7 @@ void HDMapInput::MergeBoundaryJunction(
     }
     DownsamplePoints(temp_cloud,
         &(road_boundaries_ptr->at(polygons_index).right_boundary));
-    for (unsigned int index = 0;
+    for (size_t index = 0;
         index <
         road_boundaries_ptr->at(polygons_index).right_boundary.size();
         ++index) {
@@ -217,10 +219,10 @@ void HDMapInput::MergeBoundaryJunction(
     }
     ADEBUG << "right road_boundary downsample size = "
       << road_polygons_ptr->at(polygons_index).size();
-    polygons_index++;
+    ++polygons_index;
   }
   // merge junctions
-  for (int idx = 0; idx < junctions_size; idx++) {
+  for (int idx = 0; idx < junctions_size; ++idx) {
     const Polygon2d& polygon = junctions[idx]->polygon();
     const std::vector<Vec2d>& points = polygon.points();
     for (size_t idj = 0; idj < points.size(); ++idj) {
@@ -273,7 +275,7 @@ void HDMapInput::DownsamplePoints(
   const double radian_to_degree = 57.29577951308232;
   const size_t raw_cloud_size = raw_cloud.size();
   if (raw_cloud_size <= min_points_num_for_sample) {
-    for (size_t i = 0; i < raw_cloud_size; i++) {
+    for (size_t i = 0; i < raw_cloud_size; ++i) {
       polygon_ptr->push_back(raw_cloud[i]);
     }
     return;
@@ -334,8 +336,7 @@ void HDMapInput::SplitBoundary(
       line_index.push_back(static_cast<int>(i - 1));
       line_index.push_back(static_cast<int>(i));
     } else if (line_index.size() > 1) {
-      std::vector<int>::iterator pos;
-      pos = std::unique(line_index.begin(), line_index.end());
+      auto pos = std::unique(line_index.begin(), line_index.end());
       line_index.erase(pos, line_index.end());
       for (size_t j = 0; j < line_index.size(); ++j) {
         const PointD& pointd = boundary_line[line_index[j]];
@@ -348,8 +349,7 @@ void HDMapInput::SplitBoundary(
   }
   // in case the last several unjunctioned points in the  "boundary_line"
   if (line_index.size() > 1) {
-    std::vector<int>::iterator pos;
-    pos = std::unique(line_index.begin(), line_index.end());
+    auto pos = std::unique(line_index.begin(), line_index.end());
     line_index.erase(pos, line_index.end());
     for (size_t j = 0; j < line_index.size(); ++j) {
       const PointD& pointd = boundary_line[line_index[j]];
