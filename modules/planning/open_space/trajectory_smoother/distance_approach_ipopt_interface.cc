@@ -1534,16 +1534,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
     for (int i = 0; i < horizon_ + 1; ++i) {
       for (int j = 0; j < obstacles_num_; ++j) {
         int current_edges_num = obstacles_edges_num_(j, 0);
-/*
-        AINFO << "i: " << i
-            << ", j: " << j
-            << ", current_edges_num_: " << current_edges_num
-            << ", nz_index: " << nz_index
-            << ", n_index: " << n_index
-            << ", l_index: " << l_index
-            << ", state_index: " << state_index
-            << ", constraint_index: " << constraint_index;
-*/
+
         // 1. norm(A* lambda == 1)
         for (int k = 0; k < current_edges_num; ++k) {
           // with respect to l
@@ -2451,7 +2442,6 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
 
   // 4. Three obstacles related equal constraints, one equality constraints,
   // [0, horizon_] * [0, obstacles_num_-1] * 4
-
   state_index = state_start_index_;
   int l_index = l_start_index_;
   int n_index = n_start_index_;
