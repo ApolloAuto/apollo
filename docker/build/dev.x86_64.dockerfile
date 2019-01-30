@@ -13,7 +13,6 @@ RUN apt-get update -y && \
     curlftpfs \
     debconf-utils \
     doxygen \
-    expect-dev \
     gdb \
     git \
     google-perftools \
