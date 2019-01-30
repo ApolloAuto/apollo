@@ -109,8 +109,12 @@ message Feature {
   repeated PredictionTrajectoryPoint future_trajectory_points = 31;
 }
 
+message Features {
+  repeated Feature feature = 1;
+}
+
 message FrameEnv {
   optional double timestamp = 1;
-  optional Feature ego_feature = 2;
-  repeated Feature obstacle_feature = 3;
+  optional Features ego_features = 2;
+  repeated Features list_obstacle_features = 3;
 }
