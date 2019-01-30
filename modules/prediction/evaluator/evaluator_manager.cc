@@ -202,32 +202,39 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
           AdapterConfig::LOCALIZATION);
   CHECK_NOTNULL(ego_pose_container);
   FrameEnv curr_frame_env;
-  curr_frame_env.set_timestamp(obstacles_container->timestamp());
-  auto ego_obstacle = ego_pose_container->ToPerceptionObstacle();
-  curr_frame_env.mutable_ego_feature()->set_id(-1);
-  curr_frame_env.mutable_ego_feature()->set_timestamp(
-      obstacles_container->timestamp());
-  curr_frame_env.mutable_ego_feature()->set_velocity_heading(std::atan2(
-      ego_obstacle->velocity().y(), ego_obstacle->velocity().x()));
-  curr_frame_env.mutable_ego_feature()->mutable_position()
-                                      ->CopyFrom(ego_obstacle->position());
-  curr_frame_env.mutable_ego_feature()->set_length(5.0);
-  curr_frame_env.mutable_ego_feature()->set_width(2.1);
-  for (int id : obstacles_container->curr_frame_predictable_obstacle_ids()) {
+  std::vector<int> obstacle_ids =
+      obstacles_container->curr_frame_predictable_obstacle_ids();
+  obstacle_ids.push_back(-1);
+  for (int id : obstacle_ids) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
     if (obstacle == nullptr || obstacle->history_size() == 0) {
       continue;
     }
-    const Feature& obstacle_feature = obstacle->latest_feature();
-    Feature feature;
-    feature.set_id(obstacle_feature.id());
-    feature.set_timestamp(obstacles_container->timestamp());
-    feature.set_velocity_heading(obstacle_feature.velocity_heading());
-    feature.mutable_position()->CopyFrom(obstacle_feature.position());
-    feature.mutable_polygon_point()->CopyFrom(obstacle_feature.polygon_point());
-    feature.set_length(obstacle_feature.length());
-    feature.set_width(obstacle_feature.width());
-    curr_frame_env.add_obstacle_feature()->CopyFrom(feature);
+    size_t num_frames = std::min(static_cast<size_t>(10),
+                                 obstacle->history_size());
+    Features features;
+    for (size_t i = 0; i < num_frames; ++i) {
+      const Feature& obstacle_feature = obstacle->feature(i);
+      Feature feature;
+      feature.set_id(obstacle_feature.id());
+      feature.set_timestamp(obstacles_container->timestamp());
+      feature.mutable_position()->CopyFrom(obstacle_feature.position());
+      feature.set_theta(obstacle_feature.velocity_heading());
+      if (obstacle_feature.id() != -1) {
+        feature.mutable_polygon_point()->CopyFrom(obstacle_feature.polygon_point());
+        feature.set_length(obstacle_feature.length());
+        feature.set_width(obstacle_feature.width());
+      } else {
+        feature.set_length(5.0);
+        feature.set_width(2.1);
+      }
+      features.add_feature()->CopyFrom(feature);
+    }
+    if (obstacle->id() != -1) {
+      curr_frame_env.add_list_obstacle_features()->CopyFrom(features);
+    } else {
+      curr_frame_env.mutable_ego_features()->CopyFrom(features);
+    }
   }
   if (FLAGS_prediction_offline_mode == 4) {
     FeatureOutput::InsertFrameEnv(curr_frame_env);
