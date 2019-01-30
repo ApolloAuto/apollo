@@ -202,6 +202,7 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
           AdapterConfig::LOCALIZATION);
   CHECK_NOTNULL(ego_pose_container);
   FrameEnv curr_frame_env;
+  curr_frame_env.set_timestamp(obstacles_container->timestamp());
   std::vector<int> obstacle_ids =
       obstacles_container->curr_frame_predictable_obstacle_ids();
   obstacle_ids.push_back(-1);
