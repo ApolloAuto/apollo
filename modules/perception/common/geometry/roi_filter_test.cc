@@ -164,47 +164,6 @@ TEST(ObjectInRoiTest, test_roi) {
   EXPECT_EQ(valid_objects.size(), 0);
 }
 
-TEST(ObjectInRoiSlackTest, test_roi) {
-  HdmapStructPtr hdmap = nullptr;
-  std::vector<ObjectPtr> objects;
-  std::vector<ObjectPtr> valid_objects;
-  ObjectPtr obj(new Object);
-  obj->center = Eigen::Vector3d(0, 0, 0);
-  obj->direction = Eigen::Vector3f(1, 0, 0);
-  objects.push_back(obj);
-
-  ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
-  EXPECT_EQ(valid_objects.size(), 1);
-
-  hdmap.reset(new HdmapStruct());
-  valid_objects.clear();
-  ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
-  EXPECT_EQ(valid_objects.size(), 1);
-
-  hdmap->road_polygons.resize(1);
-  PointD pt;
-  pt.x = -1.0;
-  pt.y = -1.0;
-  pt.z = 0;
-  hdmap->road_polygons[0].push_back(pt);
-  pt.x = 1.0;
-  pt.y = -1.0;
-  pt.z = 0;
-  hdmap->road_polygons[0].push_back(pt);
-  pt.x = 0;
-  pt.y = 1;
-  pt.z = 0;
-  hdmap->road_polygons[0].push_back(pt);
-  valid_objects.clear();
-  ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
-  EXPECT_EQ(valid_objects.size(), 1);
-
-  hdmap->road_polygons[0][2].y = -2;
-  valid_objects.clear();
-  ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
-  EXPECT_EQ(valid_objects.size(), 0);
-}
-
 }  // namespace common
 }  // namespace perception
 }  // namespace apollo
