@@ -123,10 +123,11 @@ bool GetContent(const std::string &file_name, std::string *content) {
 }
 
 std::string GetAbsolutePath(const std::string &prefix,
-                            const std::string &relative_path) {
+                            const std::string &relative_path) const {
   if (relative_path.empty()) {
     return prefix;
   }
+
   // If prefix is empty or relative_path is already absolute.
   if (prefix.empty() || relative_path.front() == '/') {
     return relative_path;
@@ -135,6 +136,7 @@ std::string GetAbsolutePath(const std::string &prefix,
   if (prefix.back() == '/') {
     return prefix + relative_path;
   }
+
   return prefix + "/" + relative_path;
 }
 

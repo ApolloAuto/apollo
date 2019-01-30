@@ -112,7 +112,7 @@ bool GetContent(const std::string &file_name, std::string *content);
  * @return The absolute path.
  */
 std::string GetAbsolutePath(const std::string &prefix,
-                            const std::string &relative_path);
+                            const std::string &relative_path) const;
 
 /**
  * @brief Check if the path exists.
