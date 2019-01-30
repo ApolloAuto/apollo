@@ -68,26 +68,33 @@ class PlannigAnalyzer:
                 if point.a <= -2.0:
                     self.hard_break_list.append(point.a)
 
-        if self.last_adc_trajectory is not None:
+        if self.last_adc_trajectory is not None and self.is_simulation:
             current_path, last_path = self.find_common_path(adc_trajectory,
                                                             self.last_adc_trajectory)
             if len(current_path) == 0 or len(last_path) == 0:
                 dist = 0
             else:
                 dist = frechet_distance(current_path, last_path)
-                self.frechet_distance_list.append(dist)
+                if dist is not None:
+                    self.frechet_distance_list.append(dist)
 
         self.last_adc_trajectory = adc_trajectory
 
     def find_common_path(self, current_adc_trajectory, last_adc_trajectory):
         current_path_points = current_adc_trajectory.trajectory_point
         last_path_points = last_adc_trajectory.trajectory_point
+
         current_path = []
         for point in current_path_points:
             current_path.append([point.path_point.x, point.path_point.y])
+            if point.path_point.s > 5.0:
+                break
         last_path = []
         for point in last_path_points:
             last_path.append([point.path_point.x, point.path_point.y])
+            if point.path_point.s > 5.0:
+                break
+
         if len(current_path) == 0 or len(last_path) == 0:
             return [], []
 
@@ -165,5 +172,15 @@ class PlannigAnalyzer:
             results['overall_score'] += (1- results['frechet_dist'] / 10.0)
         results['overall_score'] /= 2.0
         
-
         print str(results)
+
+    def plot_path(self, plt, adc_trajectory):
+        path_points = adc_trajectory.trajectory_point
+        x = []
+        y = []
+        for point in path_points:
+            x.append(point.path_point.x)
+            y.append(point.path_point.y)
+            if point.path_point.s > 3.0:
+                break
+        plt.plot(x, y)
