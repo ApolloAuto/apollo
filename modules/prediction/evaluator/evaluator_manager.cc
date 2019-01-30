@@ -218,7 +218,7 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
       const Feature& obstacle_feature = obstacle->feature(i);
       Feature feature;
       feature.set_id(obstacle_feature.id());
-      feature.set_timestamp(obstacles_container->timestamp());
+      feature.set_timestamp(obstacle_feature.timestamp());
       feature.mutable_position()->CopyFrom(obstacle_feature.position());
       feature.set_theta(obstacle_feature.velocity_heading());
       if (obstacle_feature.id() != -1) {
