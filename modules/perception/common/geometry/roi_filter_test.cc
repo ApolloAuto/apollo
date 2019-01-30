@@ -138,7 +138,7 @@ TEST(ObjectInRoiTest, test_roi) {
   hdmap.reset(new HdmapStruct());
   valid_objects.clear();
   ObjectInRoiCheck(hdmap, objects, &valid_objects);
-  EXPECT_EQ(valid_objects.size(), 1);
+  EXPECT_EQ(valid_objects.size(), 0);
 
   hdmap->road_polygons.resize(1);
   PointD pt;
