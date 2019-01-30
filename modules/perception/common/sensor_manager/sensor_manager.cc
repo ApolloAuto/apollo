@@ -45,7 +45,7 @@ bool SensorManager::Init() {
   distort_model_map_.clear();
   undistort_model_map_.clear();
 
-  std::string file_path = apollo::common::util::GetAbsolutePath(
+  const std::string file_path = apollo::common::util::GetAbsolutePath(
       lib::ConfigManager::Instance()->work_root(), FLAGS_obs_sensor_meta_path);
 
   MultiSensorMeta sensor_list_proto;
@@ -75,7 +75,7 @@ bool SensorManager::Init() {
           new BrownCameraDistortionModel());
       if (!LoadBrownCameraIntrinsic(IntrinsicPath(sensor_info.frame_id),
                                     distort_model.get())) {
-        AERROR << "Failed to load camera intrinsic";
+        AERROR << "Failed to load camera intrinsic.";
         return false;
       }
       distort_model_map_.insert(make_pair(
@@ -101,11 +101,8 @@ bool SensorManager::Init() {
 
 bool SensorManager::IsSensorExist(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  if (itr == sensor_info_map_.end()) {
-    return false;
-  } else {
-    return true;
-  }
+
+  return itr == sensor_info_map_.end() ? false : true;
 }
 
 bool SensorManager::GetSensorInfo(const std::string& name,
@@ -118,40 +115,34 @@ bool SensorManager::GetSensorInfo(const std::string& name,
   const auto& itr = sensor_info_map_.find(name);
   if (itr == sensor_info_map_.end()) {
     return false;
-  } else {
-    *sensor_info = itr->second;
   }
+
+  *sensor_info = itr->second;
   return true;
 }
 
 std::shared_ptr<BaseCameraDistortionModel> SensorManager::GetDistortCameraModel(
     const std::string& name) const {
   const auto& itr = distort_model_map_.find(name);
-  if (itr == distort_model_map_.end()) {
-    return nullptr;
-  } else {
-    return itr->second;
-  }
+
+  return itr == distort_model_map_.end() ? nullptr : itr->second;
 }
 
 std::shared_ptr<BaseCameraModel> SensorManager::GetUndistortCameraModel(
     const std::string& name) const {
   const auto& itr = undistort_model_map_.find(name);
-  if (itr == undistort_model_map_.end()) {
-    return nullptr;
-  } else {
-    return itr->second;
-  }
+
+  return itr == undistort_model_map_.end() ? nullptr : itr->second;
 }
 
 bool SensorManager::IsHdLidar(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
   if (itr == sensor_info_map_.end()) {
     return false;
-  } else {
-    SensorType type = itr->second.type;
-    return this->IsHdLidar(type);
   }
+
+  SensorType type = itr->second.type;
+  return this->IsHdLidar(type);
 }
 
 bool SensorManager::IsHdLidar(const SensorType& type) const {
@@ -165,10 +156,10 @@ bool SensorManager::IsLdLidar(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
   if (itr == sensor_info_map_.end()) {
     return false;
-  } else {
-    SensorType type = itr->second.type;
-    return this->IsLdLidar(type);
   }
+
+  SensorType type = itr->second.type;
+  return this->IsLdLidar(type);
 }
 
 bool SensorManager::IsLdLidar(const SensorType& type) const {
@@ -179,10 +170,10 @@ bool SensorManager::IsLidar(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
   if (itr == sensor_info_map_.end()) {
     return false;
-  } else {
-    SensorType type = itr->second.type;
-    return this->IsLidar(type);
   }
+
+  SensorType type = itr->second.type;
+  return this->IsLidar(type);
 }
 
 bool SensorManager::IsLidar(const SensorType& type) const {
@@ -193,10 +184,10 @@ bool SensorManager::IsRadar(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
   if (itr == sensor_info_map_.end()) {
     return false;
-  } else {
-    SensorType type = itr->second.type;
-    return this->IsRadar(type);
   }
+
+  SensorType type = itr->second.type;
+  return this->IsRadar(type);
 }
 
 bool SensorManager::IsRadar(const SensorType& type) const {
@@ -208,10 +199,10 @@ bool SensorManager::IsCamera(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
   if (itr == sensor_info_map_.end()) {
     return false;
-  } else {
-    SensorType type = itr->second.type;
-    return this->IsCamera(type);
   }
+
+  SensorType type = itr->second.type;
+  return this->IsCamera(type);
 }
 
 bool SensorManager::IsCamera(const SensorType& type) const {
@@ -223,10 +214,10 @@ bool SensorManager::IsUltrasonic(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
   if (itr == sensor_info_map_.end()) {
     return false;
-  } else {
-    SensorType type = itr->second.type;
-    return this->IsUltrasonic(type);
   }
+
+  SensorType type = itr->second.type;
+  return this->IsUltrasonic(type);
 }
 
 bool SensorManager::IsUltrasonic(const SensorType& type) const {
@@ -235,11 +226,8 @@ bool SensorManager::IsUltrasonic(const SensorType& type) const {
 
 std::string SensorManager::GetFrameId(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  if (itr == sensor_info_map_.end()) {
-    return std::string("");
-  } else {
-    return itr->second.frame_id;
-  }
+  return itr == sensor_info_map_.end()
+      ? std::string("") : itr->second.frame_id;
 }
 
 }  // namespace common
