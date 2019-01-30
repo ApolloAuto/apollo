@@ -17,6 +17,8 @@
 #include "modules/prediction/predictor/predictor_manager.h"
 
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
@@ -230,6 +232,9 @@ void PredictorManager::PredictObstacle(
   }
   prediction_obstacle->set_timestamp(obstacle->timestamp());
   prediction_obstacle->set_is_static(obstacle->IsStill());
+  if (FLAGS_prediction_offline_mode == 3) {
+    FeatureOutput::InsertPredictionResult(obstacle->id(), *prediction_obstacle);
+  }
 }
 
 std::unique_ptr<Predictor> PredictorManager::CreatePredictor(

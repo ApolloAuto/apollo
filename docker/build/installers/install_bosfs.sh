@@ -16,25 +16,22 @@
 # limitations under the License.
 ###############################################################################
 
-SRC_DIR=$1
-TARGET_DIR=$2
-
+# Fail on first error.
 set -e
 
-source /apollo/scripts/apollo_base.sh
-source /apollo/cyber/setup.bash
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
-sudo mkdir -p ${TARGET_DIR}
+# Prepair.
+apt-get update -y
+apt-get install -y libfuse-dev
+wget http://sdk.bce.baidu.com/console-sdk/bosfs-1.0.0.8.tar.gz
+tar zxf bosfs-1.0.0.8.tar.gz
 
-if [ -z "$3" ]; then
-    MAP_DIR="sunnyvale_with_two_offices"
-else
-    MAP_DIR=$3
-fi
+# Build and install.
+pushd bosfs-1.0.0
+  bash build.sh
+popd
 
-./bazel-bin/modules/prediction/pipeline/records_to_offline_data \
-    --flagfile=/apollo/modules/prediction/conf/prediction.conf \
-    --map_dir=/apollo/modules/map/data/${MAP_DIR} \
-    --prediction_offline_mode=1 \
-    --prediction_offline_bags=${SRC_DIR} \
-    --prediction_data_dir=${TARGET_DIR}
+# Clean
+rm -fr bosfs-1.0.0.8.tar.gz bosfs-1.0.0
+apt-get autoremove -y libfuse-dev

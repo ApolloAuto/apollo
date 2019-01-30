@@ -67,18 +67,29 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
            << timestamp_ << "].";
     return;
   }
-  if (FLAGS_prediction_offline_mode) {
-    if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
-        FeatureOutput::Size() > FLAGS_max_num_dump_feature) {
-      FeatureOutput::Write();
+
+  switch (FLAGS_prediction_offline_mode) {
+    case 1: {
+      if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+          FeatureOutput::Size() > FLAGS_max_num_dump_feature) {
+        FeatureOutput::WriteFeatureProto();
+      }
+    }
+    case 2: {
+      if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+          FeatureOutput::SizeOfDataForLearning() > FLAGS_max_num_dump_feature) {
+        FeatureOutput::WriteDataForLearning();
+      }
+    }
+    case 3: {
+      if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+          FeatureOutput::SizeOfPredictionResult() >
+              FLAGS_max_num_dump_feature) {
+        FeatureOutput::WritePredictionResult();
+      }
     }
   }
-  if (FLAGS_prediction_offline_dataforlearning) {
-    if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
-        FeatureOutput::SizeOfDataForLearning() > FLAGS_max_num_dump_feature) {
-      FeatureOutput::WriteDataForLearning();
-    }
-  }
+
   timestamp_ = timestamp;
   ADEBUG << "Current timestamp is [" << timestamp_ << "]";
 

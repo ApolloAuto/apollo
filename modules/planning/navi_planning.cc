@@ -34,6 +34,7 @@
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
+#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -45,20 +46,6 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
-
-namespace {
-
-bool IsVehicleStateValid(const VehicleState& vehicle_state) {
-  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
-      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
-      std::isnan(vehicle_state.linear_acceleration())) {
-    return false;
-  }
-  return true;
-}
-}  // namespace
 
 NaviPlanning::~NaviPlanning() {
   last_publishable_trajectory_.reset(nullptr);

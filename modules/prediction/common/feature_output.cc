@@ -26,16 +26,23 @@ namespace prediction {
 
 Features FeatureOutput::features_;
 ListDataForLearning FeatureOutput::list_data_for_learning_;
+ListPredictionResult FeatureOutput::list_prediction_result_;
 std::size_t FeatureOutput::idx_feature_ = 0;
 std::size_t FeatureOutput::idx_learning_ = 0;
+std::size_t FeatureOutput::idx_prediction_result_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
-  if (FLAGS_prediction_offline_mode) {
-    Write();
-  }
-  if (FLAGS_prediction_offline_dataforlearning) {
-    WriteDataForLearning();
+  switch (FLAGS_prediction_offline_mode) {
+    case 1: {
+      WriteFeatureProto();
+    }
+    case 2: {
+      WriteDataForLearning();
+    }
+    case 3: {
+      WritePredictionResult();
+    }
   }
   Clear();
 }
@@ -52,7 +59,7 @@ bool FeatureOutput::Ready() {
   return true;
 }
 
-void FeatureOutput::Insert(const Feature& feature) {
+void FeatureOutput::InsertFeatureProto(const Feature& feature) {
   features_.add_feature()->CopyFrom(feature);
 }
 
@@ -70,7 +77,20 @@ void FeatureOutput::InsertDataForLearning(
   ADEBUG << "Insert [" << category << "] data for learning";
 }
 
-void FeatureOutput::Write() {
+void FeatureOutput::InsertPredictionResult(
+    const int obstacle_id,
+    const PredictionObstacle& prediction_obstacle) {
+  PredictionResult* prediction_result =
+      list_prediction_result_.add_prediction_result();
+  prediction_result->set_id(obstacle_id);
+  prediction_result->set_timestamp(prediction_obstacle.timestamp());
+  for (int i = 0; i < prediction_obstacle.trajectory_size(); ++i) {
+    prediction_result->add_trajectory()->CopyFrom(
+        prediction_obstacle.trajectory(i));
+  }
+}
+
+void FeatureOutput::WriteFeatureProto() {
   if (features_.feature_size() <= 0) {
     ADEBUG << "Skip writing empty feature.";
   } else {
@@ -96,10 +116,27 @@ void FeatureOutput::WriteDataForLearning() {
   }
 }
 
+void FeatureOutput::WritePredictionResult() {
+  if (list_prediction_result_.prediction_result_size() <= 0) {
+    ADEBUG << "Skip writing empty prediction_result.";
+  } else {
+    const std::string file_name =
+        FLAGS_prediction_data_dir + "/prediction_result." +
+        std::to_string(idx_prediction_result_) + ".bin";
+    common::util::SetProtoToBinaryFile(list_prediction_result_, file_name);
+    list_prediction_result_.Clear();
+    ++idx_prediction_result_;
+  }
+}
+
 int FeatureOutput::Size() { return features_.feature_size(); }
 
 int FeatureOutput::SizeOfDataForLearning() {
   return list_data_for_learning_.data_for_learning_size();
+}
+
+int FeatureOutput::SizeOfPredictionResult() {
+  return list_prediction_result_.prediction_result_size();
 }
 
 }  // namespace prediction

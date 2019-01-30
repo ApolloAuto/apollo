@@ -13,7 +13,6 @@ RUN apt-get update -y && \
     curlftpfs \
     debconf-utils \
     doxygen \
-    expect-dev \
     gdb \
     git \
     google-perftools \
@@ -47,6 +46,7 @@ COPY installers /tmp/installers
 RUN bash /tmp/installers/install_adv_plat.sh
 RUN bash /tmp/installers/install_bazel.sh
 RUN bash /tmp/installers/install_bazel_packages.sh
+RUN bash /tmp/installers/install_bosfs.sh
 RUN bash /tmp/installers/install_conda.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_glew.sh

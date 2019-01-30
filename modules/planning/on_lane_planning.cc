@@ -33,6 +33,7 @@
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
+#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -46,35 +47,6 @@ using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::routing::RoutingResponse;
-
-namespace {
-
-bool IsVehicleStateValid(const VehicleState& vehicle_state) {
-  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
-      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
-      std::isnan(vehicle_state.linear_acceleration())) {
-    return false;
-  }
-  return true;
-}
-
-bool IsDifferentRouting(const RoutingResponse& first,
-                        const RoutingResponse& second) {
-  if (first.has_header() && second.has_header()) {
-    if (first.header().sequence_num() != second.header().sequence_num()) {
-      return true;
-    }
-    if (first.header().timestamp_sec() != second.header().timestamp_sec()) {
-      return true;
-    }
-    return false;
-  } else {
-    return true;
-  }
-}
-}  // namespace
 
 OnLanePlanning::~OnLanePlanning() {
   if (reference_line_provider_) {
