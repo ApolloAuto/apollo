@@ -37,6 +37,26 @@ namespace prediction {
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
 
+namespace {
+
+bool IsTrainable(const ObstacleHistory& obstacle_history) {
+  if (obstacle_history.feature_size() == 0) {
+    return false;
+  }
+  const Feature& latest_feature = obstacle_history.feature(0);
+  if (latest_feature.id() == -1) {
+    return false;
+  }
+  if (latest_feature.priority().priority() == ObstaclePriority::IGNORE ||
+      latest_feature.is_still() ||
+      latest_feature.type() != PerceptionObstacle::VEHICLE) {
+    return false;
+  }
+  return true;
+}
+
+}  // namespace
+
 EvaluatorManager::EvaluatorManager() { RegisterEvaluators(); }
 
 void EvaluatorManager::RegisterEvaluators() {
@@ -213,7 +233,7 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
     }
     size_t num_frames = std::min(static_cast<size_t>(10),
                                  obstacle->history_size());
-    Features features;
+    ObstacleHistory obstacle_history;
     for (size_t i = 0; i < num_frames; ++i) {
       const Feature& obstacle_feature = obstacle->feature(i);
       Feature feature;
@@ -222,19 +242,23 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
       feature.mutable_position()->CopyFrom(obstacle_feature.position());
       feature.set_theta(obstacle_feature.velocity_heading());
       if (obstacle_feature.id() != -1) {
-        feature.mutable_polygon_point()->CopyFrom(obstacle_feature.polygon_point());
+        feature.mutable_polygon_point()->CopyFrom(
+            obstacle_feature.polygon_point());
         feature.set_length(obstacle_feature.length());
         feature.set_width(obstacle_feature.width());
       } else {
         feature.set_length(5.0);
         feature.set_width(2.1);
       }
-      features.add_feature()->CopyFrom(feature);
+      obstacle_history.add_feature()->CopyFrom(feature);
     }
+    obstacle_history.set_is_trainable(IsTrainable(obstacle_history));
     if (obstacle->id() != -1) {
-      curr_frame_env.add_list_obstacle_features()->CopyFrom(features);
+      curr_frame_env.add_obstacles_history()
+                    ->CopyFrom(obstacle_history);
     } else {
-      curr_frame_env.mutable_ego_features()->CopyFrom(features);
+      curr_frame_env.mutable_ego_history()
+                    ->CopyFrom(obstacle_history);
     }
   }
   if (FLAGS_prediction_offline_mode == 4) {
