@@ -39,17 +39,13 @@ using apollo::perception::PerceptionObstacle;
 
 namespace {
 
-bool IsTrainable(const ObstacleHistory& obstacle_history) {
-  if (obstacle_history.feature_size() == 0) {
+bool IsTrainable(const Feature& feature) {
+  if (feature.id() == -1) {
     return false;
   }
-  const Feature& latest_feature = obstacle_history.feature(0);
-  if (latest_feature.id() == -1) {
-    return false;
-  }
-  if (latest_feature.priority().priority() == ObstaclePriority::IGNORE ||
-      latest_feature.is_still() ||
-      latest_feature.type() != PerceptionObstacle::VEHICLE) {
+  if (feature.priority().priority() == ObstaclePriority::IGNORE ||
+      feature.is_still() ||
+      feature.type() != PerceptionObstacle::VEHICLE) {
     return false;
   }
   return true;
@@ -252,7 +248,7 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
       }
       obstacle_history.add_feature()->CopyFrom(feature);
     }
-    obstacle_history.set_is_trainable(IsTrainable(obstacle_history));
+    obstacle_history.set_is_trainable(IsTrainable(obstacle->latest_feature()));
     if (obstacle->id() != -1) {
       curr_frame_env.add_obstacles_history()
                     ->CopyFrom(obstacle_history);
