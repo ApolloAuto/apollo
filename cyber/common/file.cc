@@ -122,8 +122,8 @@ bool GetContent(const std::string &file_name, std::string *content) {
   return true;
 }
 
-std::string GetAbsolutePath(const std::string &prefix,
-                            const std::string &relative_path) const {
+const std::string GetAbsolutePath(const std::string &prefix,
+                            const std::string &relative_path) {
   if (relative_path.empty()) {
     return prefix;
   }
