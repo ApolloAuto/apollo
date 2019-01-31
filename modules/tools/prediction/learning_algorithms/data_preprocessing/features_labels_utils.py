@@ -20,6 +20,11 @@ import os
 
 from modules.prediction.proto import offline_features_pb2
 
+
+junction_label_feature_dim = 79
+junction_label_label_dim = 12
+future_status_label_dim = 30
+
 '''
 Read a single dataforlearn.bin file and output a list of DataForLearning
 that is contained in that file.
@@ -49,28 +54,29 @@ def MergeTwoDicts(dict1, dict2):
 '''
 Merge all dictionaries directly under a directory
 '''
-def MergeDicts(dirpath):
+def MergeDicts(dirpath, dict_name='future_status'):
     list_of_files = os.listdir(dirpath)
     dict_merged = None
 
     for file in list_of_files:
         full_path = os.path.join(dirpath, file)
-        if file.split('.')[-1] == 'npy' and file.split('.')[0] != 'labels':
+        if file.split('.')[-1] == 'npy' and file.split('.')[-2] == dict_name:
             dict_curr = LoadLabels(full_path)
             if dict_merged is None:
                 dict_merged = dict_curr.copy()
             else:
                 dict_merged.update(dict_curr)
 
-    np.save(dirpath + '/labels.npy', dict_merged)
+    np.save(dirpath + '/' + dict_name + '.npy', dict_merged)
     return dict_merged
+
 
 '''
 Go through every entry of data_for_learn proto and get the corresponding labels.
 Save the output file into h5 format (array of lists with each list being a data
 point for training/validating).
 '''
-def CombineFeaturesAndLabels(feature_path, label_path):
+def CombineFeaturesAndLabels(feature_path, label_path, dict_name='future_status'):
     list_of_data_for_learning = LoadDataForLearning(feature_path)
     dict_labels = LoadLabels(label_path)
 
@@ -78,28 +84,33 @@ def CombineFeaturesAndLabels(feature_path, label_path):
     for data_for_learning in list_of_data_for_learning:
         # features_for_learning: list of doubles
         features_for_learning = list(data_for_learning.features_for_learning)
-        key = (data_for_learning.id, data_for_learning.timestamp)
+        key = "{}@{:.3f}".format(data_for_learning.id, data_for_learning.timestamp)
 
-        # future_traj: list of tuples
-        # Only retain those data with > 3sec future traj.
+        # Sanity checks to see if this data-point is valid or not.
         if key not in dict_labels:
             print ('Cannot find a feature-to-label mapping.')
             continue
-        if 'obs_traj' not in dict_labels[key]:
-            continue
-        if len(dict_labels[key]['obs_traj']) < 30:
-            continue
-        future_traj = \
-            dict_labels[(data_for_learning.id, data_for_learning.timestamp)]\
-            ['obs_traj'][:30]
 
-        list_curr = [len(features_for_learning)] + features_for_learning + \
-                    future_traj
+        labels = None
+        list_curr = None
+        if dict_name == 'junction_label':
+            if len(features_for_learning) != junction_label_feature_dim or \
+               len(dict_labels[key]) != junction_label_label_dim:
+                continue
+            labels = dict_labels[key]
+            list_curr = features_for_learning + labels
+        else if dict_name == 'future_status':
+            if len(dict_labels[key]) < future_status_label_dim:
+                continue
+            labels = dict_labels[key][:30]
+            list_curr = [len(features_for_learning)] + \
+                        features_for_learning + labels
+
         output_np_array.append(list_curr)
 
     output_np_array = np.array(output_np_array)
 
-    np.save(feature_path + '.labels.npy', output_np_array)
+    np.save(feature_path + 'features+' + dict_name + '.npy', output_np_array)
 
 '''
 Merge all files of features+labels into a single one
