@@ -48,11 +48,12 @@ class IndexedList {
       AWARN << "object " << id << " is already in container";
       *obs = object;
       return obs;
+    } else {
+      object_dict_.insert({id, object});
+      auto* ptr = &object_dict_.at(id);
+      object_list_.push_back(ptr);
+      return ptr;
     }
-    object_dict_.insert({id, object});
-    auto* ptr = &object_dict_.at(id);
-    object_list_.push_back(ptr);
-    return ptr;
   }
 
   /**
