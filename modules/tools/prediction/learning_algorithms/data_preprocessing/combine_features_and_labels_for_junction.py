@@ -18,84 +18,7 @@ import argparse
 import os
 import re
 
-import h5py
-import numpy as np
-
-from modules.prediction.proto import offline_features_pb2
-
-dim_feature = 79
-dim_label = 12
-
-
-'''
-Read a single .npy dictionary file and get its content.
-'''
-def LoadLabels(filepath):
-    mydict = np.load(filepath).item()
-    return mydict
-
-
-'''
-Read a single dataforlearn.bin file and output a list of DataForLearning
-that is contained in that file.
-'''
-def LoadDataForLearning(filepath):
-    list_of_data_for_learning = \
-        offline_features_pb2.ListDataForLearning()
-    with open(filepath, 'rb') as file_in:
-        list_of_data_for_learning.ParseFromString(file_in.read())
-    return list_of_data_for_learning.data_for_learning
-
-
-'''
-Merge all dictionaries directly under a directory
-'''
-def MergeDicts(dirpath):
-    list_of_files = os.listdir(dirpath)
-    dict_merged = None
-
-    for file in list_of_files:
-        full_path = os.path.join(dirpath, file)
-        if file.split('.')[-1] == 'npy' and file.split('.')[-2] == 'junction_label':
-            dict_curr = LoadLabels(full_path)
-            if dict_merged is None:
-                dict_merged = dict_curr.copy()
-            else:
-                dict_merged.update(dict_curr)
-
-    np.save(dirpath + '/junction_labels.npy', dict_merged)
-    return dict_merged
-
-
-'''
-Go through every entry of data_for_learn proto and get the corresponding labels.
-Save the output file into h5 format (array of lists with each list being a data
-point for training/validating).
-'''
-def CombineFeaturesAndLabels(feature_path, label_path):
-    list_of_data_for_learning = LoadDataForLearning(feature_path)
-    dict_labels = LoadLabels(label_path)
-
-    output_np_array = []
-    for data_for_learning in list_of_data_for_learning:
-        # features_for_learning: list of doubles
-        features_for_learning = list(data_for_learning.features_for_learning)
-        key = "{}@{:.3f}".format(data_for_learning.id, data_for_learning.timestamp)
-
-        # future_traj: list of tuples
-        # Only retain those data with > 3sec future traj.
-        if key not in dict_labels:
-            print ('Cannot find a feature-to-label mapping.')
-            continue
-        labels = dict_labels[key]
-        if len(features_for_learning) == dim_feature and len(labels) == 12:
-            data = features_for_learning+labels
-            output_np_array.append(data)
-
-    output_np_array = np.array(output_np_array)
-
-    np.save(feature_path + '.junction_feature+labels.npy', output_np_array)
-
+from features_labels_utils import *
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -113,4 +36,4 @@ if __name__ == "__main__":
            file.split('.')[0] == 'datalearn':
             label_path = args.labels_dirpath
             CombineFeaturesAndLabels(full_file_path, label_path + \
-                                     '/junction_labels.npy')
+                '/junction_labels.npy', 'junction_label')
