@@ -23,10 +23,15 @@
 
 SRC_FILE=$1
 LBL_FILE=$2
+SCENARIO=$3
 
 set -e
 
 source /apollo/scripts/apollo_base.sh
 source /apollo/cyber/setup.bash 
 
-python modules/tools/prediction/learning_algorithms/data_preprocessing/combine_features_and_labels.py ${SRC_FILE} ${LBL_FILE}
+if [ ${SCENARIO} == "junction" ]; then
+    python /apollo/modules/tools/prediction/learning_algorithms/data_preprocessing/combine_features_and_labels_for_junction.py ${SRC_FILE} ${LBL_FILE}
+else
+    python /apollo/modules/tools/prediction/learning_algorithms/data_preprocessing/combine_features_and_labels.py ${SRC_FILE} ${LBL_FILE}	
+fi
