@@ -316,16 +316,10 @@ int WriteCalibrationOutput(bool enable,
                                           &camera_ground_height,
                                           &pitch_angle);
   FILE *file_save = fopen(out_path.data(), "wt");
-  if (file_save == nullptr) {
-    AERROR << "Failed to open calibration output file: " << out_path.data();
-    return -1;
-  }
-
   fprintf(file_save, "camera_ground_height:\t%f\n",
     camera_ground_height);
   fprintf(file_save, "pitch_angle:\t%f\n",
     pitch_angle);
-
   fclose(file_save);
   return 0;
 }
