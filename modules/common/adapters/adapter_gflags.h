@@ -66,6 +66,7 @@ DECLARE_string(gnss_rtk_eph_topic);
 DECLARE_string(gnss_best_pose_topic);
 DECLARE_string(localization_gnss_topic);
 DECLARE_string(localization_lidar_topic);
+DECLARE_string(localization_ndt_topic);
 DECLARE_string(localization_sins_pva_topic);
 DECLARE_string(localization_msf_status);
 DECLARE_string(relative_map_topic);
