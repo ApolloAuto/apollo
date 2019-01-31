@@ -241,6 +241,9 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
       feature.set_timestamp(obstacle_feature.timestamp());
       feature.mutable_position()->CopyFrom(obstacle_feature.position());
       feature.set_theta(obstacle_feature.velocity_heading());
+      feature.set_is_still(obstacle_feature.is_still());
+      feature.mutable_priority()->CopyFrom(obstacle_feature.priority());
+      feature.set_type(obstacle_feature.type());
       if (obstacle_feature.id() != -1) {
         feature.mutable_polygon_point()->CopyFrom(
             obstacle_feature.polygon_point());
