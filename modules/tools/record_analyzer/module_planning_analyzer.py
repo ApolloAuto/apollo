@@ -181,6 +181,20 @@ class PlannigAnalyzer:
         for point in path_points:
             x.append(point.path_point.x)
             y.append(point.path_point.y)
-            if point.path_point.s > 3.0:
+            if point.path_point.s > 5.0:
                 break
-        plt.plot(x, y)
+        plt.plot(x, y, 'r-', alpha=0.5)
+
+    def plot_refpath(self, plt, adc_trajectory):
+        for path in adc_trajectory.debug.planning_data.path:
+            if path.name != 'planning_reference_line':
+                continue
+            x = []
+            y = []
+            for point in path.path_point:
+                if point.s < 20.0 or point.s > 50.0:
+                    continue
+                x.append(point.x)
+                y.append(point.y)
+
+            plt.plot(x, y, 'b--', alpha=0.5)
