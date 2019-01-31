@@ -88,6 +88,10 @@ class OnlineVisualizerComponent final
   std::shared_ptr<cyber::Reader<LocalizationEstimate>>
       fusion_local_listener_ = nullptr;
   std::string fusion_local_topic_ = "";
+
+  std::shared_ptr<cyber::Reader<LocalizationEstimate>>
+      ndt_local_listener_ = nullptr;
+  std::string ndt_local_topic_ = "";
 };
 
 CYBER_REGISTER_COMPONENT(OnlineVisualizerComponent);
