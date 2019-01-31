@@ -341,13 +341,9 @@ bool ObstacleCameraPerception::Perception(
   std::string save_calibration_path =
       perception_param_.debug_param().calibration_out_dir()
       + "/" + std::to_string(frame->frame_id) + ".txt";
-
-  if (WriteCalibrationOutput(perception_param_.has_debug_param() &&
+  WriteCalibrationOutput(perception_param_.has_debug_param() &&
       perception_param_.debug_param().has_calibration_out_dir(),
-      save_calibration_path, frame) < 0) {
-    AERROR << "Failed to write calibration output.";
-    return false;
-  }
+      save_calibration_path, frame);
 
   // obstacle
   if (!tracker_->Predict(tracker_options, frame)) {
