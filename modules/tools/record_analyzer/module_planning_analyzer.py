@@ -164,37 +164,56 @@ class PlannigAnalyzer:
         results['frechet_dist'] = sum(self.frechet_distance_list) /\
             len(self.frechet_distance_list)
         results['hard_brake_cycle_num'] = len(self.hard_break_list)
-        results['overall_score'] = 1- results['hard_brake_cycle_num'] /\
+        results['overall_score'] = 1 - results['hard_brake_cycle_num'] /\
             float(self.total_cycle_num)
         if results['frechet_dist'] > 10:
             results['overall_score'] += 0.0
         else:
-            results['overall_score'] += (1- results['frechet_dist'] / 10.0)
+            results['overall_score'] += (1 - results['frechet_dist'] / 10.0)
         results['overall_score'] /= 2.0
-        
+
         print str(results)
 
     def plot_path(self, plt, adc_trajectory):
-        path_points = adc_trajectory.trajectory_point
+        path_coords = self.trim_path_by_distance(adc_trajectory, 5.0)
         x = []
         y = []
-        for point in path_points:
-            x.append(point.path_point.x)
-            y.append(point.path_point.y)
-            if point.path_point.s > 5.0:
-                break
+        for point in path_coords:
+            x.append(point[0])
+            y.append(point[1])
         plt.plot(x, y, 'r-', alpha=0.5)
 
     def plot_refpath(self, plt, adc_trajectory):
         for path in adc_trajectory.debug.planning_data.path:
             if path.name != 'planning_reference_line':
                 continue
+            path_coords = self.trim_path_by_distance(adc_trajectory, 5.0)
+
+            ref_path_coord = []
+            for point in path.path_point:
+                ref_path_coord.append([point.x, point.y])
+            ref_path = LineString(ref_path_coord)
+
+            start_point = Point(path_coords[0])
+            dist = ref_path.project(start_point)
+            ref_path = self.cut(ref_path, dist)[1]
+
+            end_point = Point(path_coords[-1])
+            dist = ref_path.project(end_point)
+            ref_path = self.cut(ref_path, dist)[0]
+
             x = []
             y = []
-            for point in path.path_point:
-                if point.s < 20.0 or point.s > 50.0:
-                    continue
-                x.append(point.x)
-                y.append(point.y)
+            for point in ref_path.coords:
+                x.append(point[0])
+                y.append(point[1])
 
             plt.plot(x, y, 'b--', alpha=0.5)
+
+    def trim_path_by_distance(self, adc_trajectory, s):
+        path_coords = []
+        path_points = adc_trajectory.trajectory_point
+        for point in path_points:
+            if point.path_point.s <= s:
+                path_coords.append([point.path_point.x, point.path_point.y])
+        return path_coords
