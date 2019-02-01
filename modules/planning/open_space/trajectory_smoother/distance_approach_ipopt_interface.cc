@@ -442,7 +442,105 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
 
 bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
                                                  bool new_x, double* grad_f) {
-  gradient(tag_f, n, x, grad_f);
+  if (!FLAGS_enable_hand_derivative) {
+    gradient(tag_f, n, x, grad_f);
+  } else {
+    eval_grad_f_hand(n, x, new_x, grad_f);
+  }
+  return true;
+}
+
+bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
+    bool new_x, double* grad_f) {
+  ADEBUG << "eval_grad_f by hand";
+  // Objective is from eval_f:
+  // min control inputs
+  // min input rate
+  // min time (if the time step is not fixed)
+  // regularization wrt warm start trajectory
+  DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
+  int control_index = control_start_index_;
+  int time_index = time_start_index_;
+  int state_index = state_start_index_;
+
+  if (grad_f == NULL) {
+    AERROR << "grad_f pt is nullptr";
+    return false;
+  } else {
+    std::fill(grad_f, grad_f + n, 0.0);
+    // 1. objective to minimize state diff to warm up
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      grad_f[state_index] += 2 * weight_state_x_ *
+          (x[state_index] - xWS_(0, i));
+      grad_f[state_index + 1] += 2 * weight_state_y_ *
+          (x[state_index + 1] - xWS_(1, i));
+      grad_f[state_index + 2] += 2 * weight_state_phi_ *
+          (x[state_index + 2] - xWS_(2, i));
+      grad_f[state_index + 3] = 2 * weight_state_v_ *
+          x[state_index + 3];
+      state_index += 4;
+    }
+
+    // 2. objective to minimize u square
+    for (int i = 0; i < horizon_; ++i) {
+      grad_f[control_index] += 2 * weight_input_steer_ * x[control_index];
+      grad_f[control_index] += 2 * weight_input_a_ * x[control_index + 1];
+      control_index += 2;
+    }
+
+    // 3. objective to minimize input change rate for first horizon
+    // assume: x[time_index] > 0
+
+    control_index = control_start_index_;
+    double last_time_steer_rate =
+        (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
+    double last_time_a_rate =
+       (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
+
+    grad_f[control_index] += 2.0 * last_time_steer_rate *
+        (weight_stitching_steer_ / x[time_index] / ts_);
+    grad_f[control_index + 1] += 2.0 * last_time_a_rate *
+        (weight_stitching_a_ / x[time_index] / ts_);
+    grad_f[time_index] += -2.0 * (
+        weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
+        weight_stitching_a_ * last_time_a_rate * last_time_a_rate) /
+        x[time_index];
+
+    // 4. objective to minimize input change rates, [0- horizon_ -2]
+    // assume: x[time_index] > 0
+    time_index++;
+    for (int i = 0; i < horizon_ - 1; ++i) {
+      double steering_rate =
+          (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
+      grad_f[control_index + 2] += 2.0 * steering_rate *
+          (weight_rate_steer_ / x[time_index] / ts_);
+      grad_f[control_index] += -2.0 * steering_rate *
+          (weight_rate_steer_ / x[time_index] / ts_);
+      grad_f[time_index] += -2.0 * weight_rate_steer_ *
+          steering_rate * steering_rate / x[time_index];
+
+      double a_rate =
+          (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
+      grad_f[control_index + 3] += 2.0 * a_rate *
+          (weight_rate_a_ / x[time_index] / ts_);
+      grad_f[control_index + 1] += -2.0 * a_rate *
+          (weight_rate_a_ / x[time_index] / ts_);
+      grad_f[time_index] += -2.0 * weight_rate_a_*
+          a_rate * a_rate / x[time_index];
+
+      control_index += 2;
+      time_index++;
+    }
+
+    // 5. objective to minimize total time [0, horizon_]
+    time_index = time_start_index_;
+    for (int i = 0; i < horizon_ + 1; ++i) {
+        grad_f[time_index] += weight_first_order_time_ +
+            2.0 * weight_second_order_time_ * x[time_index];
+        time_index++;
+    }
+  }
+
   return true;
 }
 
