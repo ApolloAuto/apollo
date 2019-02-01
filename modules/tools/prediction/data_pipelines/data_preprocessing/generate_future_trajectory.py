@@ -20,8 +20,9 @@ import glob
 import argparse
 import logging
 
-from common.configure import parameters
-from common.online_to_offline import LabelGenerator
+sys.path.append('/apollo/modules/tools/prediction/data_pipelines/common/')
+
+from online_to_offline import LabelGenerator
 
 
 if __name__ == "__main__":
@@ -35,6 +36,6 @@ if __name__ == "__main__":
     print("Create Label {}".format(args.input))
     if os.path.isfile(args.input):
         label_gen.LoadFeaturePBAndSaveLabelFiles(args.input)
-        label_gen.LabelJunctionExit()
+        label_gen.LabelTrajectory()
     else:
         print("{} is not a valid file".format(args.input))
