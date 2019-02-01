@@ -121,7 +121,7 @@ class MainWindow : public QMainWindow {
 
   Grid* grid_;
   QCheckBox* enable_grid_checkBox_;
-  QTreeWidgetItem* grid_root_Item_;
+  QTreeWidgetItem* grid_root_item_;
 
   QTreeWidgetItem* pointcloud_top_item_;
   QComboBox* pointcloud_comboBox_;
