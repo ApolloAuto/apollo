@@ -127,6 +127,7 @@ class KalmanMotionFusion : public BaseMotionFusion {
 
   static int s_eval_window_;
   static size_t s_history_size_maximum_;
+  double velocity_length_change_thresh_ = 5.0f;  // diff < 5 m/s
 };
 
 }  // namespace fusion
