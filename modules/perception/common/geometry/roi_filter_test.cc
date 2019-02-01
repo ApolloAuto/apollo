@@ -132,12 +132,12 @@ TEST(ObjectInRoiTest, test_roi) {
   ObjectPtr obj(new Object);
   obj->center = Eigen::Vector3d(0, 0, 0);
   objects.push_back(obj);
-  ObjectInRoiCheck(hdmap, objects, &valid_objects);
+  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), true);
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap.reset(new HdmapStruct());
   valid_objects.clear();
-  ObjectInRoiCheck(hdmap, objects, &valid_objects);
+  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), false);
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons.resize(1);
@@ -155,12 +155,12 @@ TEST(ObjectInRoiTest, test_roi) {
   pt.z = 0;
   hdmap->road_polygons[0].push_back(pt);
   valid_objects.clear();
-  ObjectInRoiCheck(hdmap, objects, &valid_objects);
+  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), false);
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons[0][2].y = -0.1;
   valid_objects.clear();
-  ObjectInRoiCheck(hdmap, objects, &valid_objects);
+  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), false);
   EXPECT_EQ(valid_objects.size(), 0);
 }
 

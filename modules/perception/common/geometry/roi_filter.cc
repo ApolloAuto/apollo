@@ -108,7 +108,8 @@ bool ObjectInRoiCheck(const HdmapStructConstPtr roi,
       valid_objects->push_back(objects[i]);
     }
   }
-  return true;
+
+  return valid_objects->size() > 0 ? true : false;
 }
 
 bool ObjectInRoiSlackCheck(const HdmapStructConstPtr roi,
