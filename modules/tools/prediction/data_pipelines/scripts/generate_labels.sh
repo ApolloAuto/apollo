@@ -28,4 +28,4 @@ set -e
 source /apollo/scripts/apollo_base.sh
 source /apollo/cyber/setup.bash 
 
-python modules/tools/prediction/mlp_train/generate_labels.py ${SRC_FILE}
+python modules/tools/prediction/data_pipelines/data_preprocessing/generate_labels.py ${SRC_FILE}

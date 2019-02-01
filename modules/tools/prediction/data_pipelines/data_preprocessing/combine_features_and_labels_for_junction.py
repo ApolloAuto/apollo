@@ -36,4 +36,4 @@ if __name__ == "__main__":
            file.split('.')[0] == 'datalearn':
             label_path = args.labels_dirpath
             CombineFeaturesAndLabels(full_file_path, label_path + \
-                '/junction_labels.npy', 'junction_label')
+                '/junction_label.npy', 'junction_label')

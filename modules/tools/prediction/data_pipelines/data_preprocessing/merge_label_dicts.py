@@ -24,4 +24,6 @@ if __name__ == "__main__":
     parser.add_argument('dirpath', type=str, help='Path of terminal folder.')
     args = parser.parse_args()
 
-    MergeDicts(args.dirpath)
+    MergeDicts(args.dirpath, dict_name='future_status')
+    MergeDicts(args.dirpath, dict_name='junction_label')
+    MergeDicts(args.dirpath, dict_name='cruise_label')

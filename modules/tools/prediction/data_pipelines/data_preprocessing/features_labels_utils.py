@@ -99,7 +99,7 @@ def CombineFeaturesAndLabels(feature_path, label_path, dict_name='future_status'
                 continue
             labels = dict_labels[key]
             list_curr = features_for_learning + labels
-        else if dict_name == 'future_status':
+        elif dict_name == 'future_status':
             if len(dict_labels[key]) < future_status_label_dim:
                 continue
             labels = dict_labels[key][:30]
@@ -110,7 +110,7 @@ def CombineFeaturesAndLabels(feature_path, label_path, dict_name='future_status'
 
     output_np_array = np.array(output_np_array)
 
-    np.save(feature_path + 'features+' + dict_name + '.npy', output_np_array)
+    np.save(feature_path + '.features+' + dict_name + '.npy', output_np_array)
 
 '''
 Merge all files of features+labels into a single one
