@@ -21,8 +21,8 @@
 #
 # The input feature.X.bin will generate furture_status.label, cruise.label, junction.label
 
-SRC_FILE=$1
-LBL_FILE=$2
+SRC_DIR=$1
+LBL_DIR=$2
 SCENARIO=$3
 
 set -e
@@ -31,7 +31,7 @@ source /apollo/scripts/apollo_base.sh
 source /apollo/cyber/setup.bash 
 
 if [ ${SCENARIO} == "junction" ]; then
-    python /apollo/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels_for_junction.py ${SRC_FILE} ${LBL_FILE}
+    python /apollo/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels_for_junction.py ${SRC_DIR} ${LBL_DIR}
 else
-    python /apollo/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels.py ${SRC_FILE} ${LBL_FILE}
+    python /apollo/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels.py ${SRC_DIR} ${LBL_DIR}
 fi
