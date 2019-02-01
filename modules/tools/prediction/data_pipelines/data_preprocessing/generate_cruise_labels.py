@@ -22,22 +22,9 @@ import glob
 import argparse
 import logging
 
-from common.configure import parameters
-from common.feature_io import load_protobuf
-from common.feature_io import save_protobuf
-from common.feature_io import build_trajectory
-from common.trajectory import TrajectoryToSample
-from common.online_to_offline import LabelGenerator
+sys.path.append('/apollo/modules/tools/prediction/data_pipelines/common/')
 
-
-import os
-import sys
-import glob
-import argparse
-import logging
-
-from common.configure import parameters
-from common.online_to_offline import LabelGenerator
+from online_to_offline import LabelGenerator
 
 
 if __name__ == "__main__":
