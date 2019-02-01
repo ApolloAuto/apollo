@@ -17,6 +17,8 @@
 /**
  * @file
  **/
+#include <iostream>
+#include <fstream>
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 
 #include "gtest/gtest.h"
@@ -167,6 +169,28 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_jac_g_par) {
   for (int i = 0; i < kNnzJac; ++i) {
     EXPECT_EQ(values_ser[i], values_par[i]) <<
         "values differ at index " << i;
+  }
+}
+
+TEST_F(DistanceApproachIPOPTInterfaceTest, eval_grad_f_hand) {
+  int n = 1274;
+  double x[1274];
+  std::fill_n(x, n, 1.2);
+  bool new_x = false;
+
+  double grad_f_adolc[1274];
+  double grad_f_hand[1274];
+  std::fill_n(grad_f_adolc, n, 0.0);
+  std::fill_n(grad_f_hand, n, 0.0);
+
+  bool res = ptop_->eval_grad_f(n, x, new_x, grad_f_adolc);
+  EXPECT_TRUE(res);
+  bool res2 = ptop_->eval_grad_f_hand(n, x, new_x, grad_f_hand);
+  EXPECT_TRUE(res2);
+
+  for (int i = 0; i < n; ++i) {
+    EXPECT_EQ(grad_f_adolc[i], grad_f_hand[i]) <<
+        "grad_f differ at index " << i;
   }
 }
 }  // namespace planning
