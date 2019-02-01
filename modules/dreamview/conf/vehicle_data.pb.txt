@@ -3,7 +3,7 @@ data_files {
   dest_path: "/apollo/modules/common/data/vehicle_param.pb.txt"
 }
 data_files {
-  source_path: "calibration_table.pb.txt"
+  source_path: "control_conf.pb.txt"
   dest_path: "/apollo/modules/control/conf/control_conf.pb.txt"
 }
 data_files {
