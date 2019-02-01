@@ -108,6 +108,18 @@ class PyRecordReader {
 class PyRecordWriter {
  public:
   PyRecordWriter() {}
+
+  PyRecordWriter(const uint64_t file_segmentation_size_kb,
+                 const uint64_t file_segmentation_interval_sec) {
+    if (file_segmentation_size_kb > 0) {
+      recored_writer_.SetSizeOfFileSegmentation(file_segmentation_size_kb);
+    }
+    if (file_segmentation_interval_sec > 0) {
+      recored_writer_.SetIntervalOfFileSegmentation(
+          file_segmentation_interval_sec);
+    }
+  }
+
   ~PyRecordWriter() {}
 
   bool Open(const std::string& path) { return recored_writer_.Open(path); }

@@ -59,6 +59,7 @@ void test_read(const std::string &readfile) {
 
   AINFO << "reader msg count = " << count;
 }
+
 int main(int argc, char *argv[]) {
   apollo::cyber::Init("cyber_python");
   test_write(TEST_RECORD_FILE);
