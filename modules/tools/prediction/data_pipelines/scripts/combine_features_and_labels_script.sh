@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 #
@@ -13,28 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+#
+# Usage:
+# sudo bash /apollo/modules/tools/prediction/mlp_train/scripts/generate_labels.sh <input_feature.bin>
+#
+# The input feature.X.bin will generate furture_status.label, cruise.label, junction.label
 
-import os
-import sys
-import glob
-import argparse
-import logging
+SRC_FILE=$1
+LBL_FILE=$2
+SCENARIO=$3
 
-from common.configure import parameters
-from common.online_to_offline import LabelGenerator
+set -e
 
+source /apollo/scripts/apollo_base.sh
+source /apollo/cyber/setup.bash 
 
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description='Generate labels')
-    parser.add_argument('input', type=str, help='input file')
-    args = parser.parse_args()
-
-    label_gen = LabelGenerator()
-
-    print("Create Label {}".format(args.input))
-    if os.path.isfile(args.input):
-        label_gen.LoadFeaturePBAndSaveLabelFiles(args.input)
-        label_gen.Label()
-    else:
-        print("{} is not a valid file".format(args.input))
+if [ ${SCENARIO} == "junction" ]; then
+    python /apollo/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels_for_junction.py ${SRC_FILE} ${LBL_FILE}
+else
+    python /apollo/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels.py ${SRC_FILE} ${LBL_FILE}
+fi
