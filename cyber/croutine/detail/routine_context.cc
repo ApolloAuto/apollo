@@ -20,6 +20,23 @@ namespace apollo {
 namespace cyber {
 namespace croutine {
 
+//  The stack layout looks as follows:
+//
+//              +------------------+
+//              |      Reserved    |
+//              +------------------+
+//              |  Return Address  |   f1
+//              +------------------+
+//              |        RDI       |   arg
+//              +------------------+
+//              |        R12       |
+//              +------------------+
+//              |        R13       |
+//              +------------------+
+//              |        ...       |
+//              +------------------+
+// ctx->sp  =>  |        RBP       |
+//              +------------------+
 void MakeContext(const func &f1, const void *arg, RoutineContext *ctx) {
   ctx->sp = ctx->stack + STACK_SIZE - 2 * sizeof(void *) - REGISTERS_SIZE;
   std::memset(ctx->sp, 0, REGISTERS_SIZE);
