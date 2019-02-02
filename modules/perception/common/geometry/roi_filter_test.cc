@@ -137,7 +137,7 @@ TEST(ObjectInRoiTest, test_roi) {
 
   hdmap.reset(new HdmapStruct());
   valid_objects.clear();
-  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), false);
+  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), true);
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons.resize(1);
@@ -155,7 +155,7 @@ TEST(ObjectInRoiTest, test_roi) {
   pt.z = 0;
   hdmap->road_polygons[0].push_back(pt);
   valid_objects.clear();
-  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), false);
+  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), true);
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons[0][2].y = -0.1;
