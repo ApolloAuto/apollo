@@ -31,7 +31,7 @@ namespace apollo {
 namespace cyber {
 namespace croutine {
 
-constexpr size_t STACK_SIZE = 8 * 1024 * 1024;
+constexpr size_t STACK_SIZE = 2 * 1024 * 1024;
 constexpr size_t REGISTERS_SIZE = 56;
 
 typedef void (*func)(void*);
