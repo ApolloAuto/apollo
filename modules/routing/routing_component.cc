@@ -58,7 +58,10 @@ bool RoutingComponent::Init() {
         if (ptr) {
           std::lock_guard<std::mutex> guard(this->mutex_);
           if (this->response_.get() != nullptr) {
-            this->response_history_writer_->Write(response_);
+            auto response = *response_;
+            auto timestamp = apollo::common::time::Clock::NowInSeconds();
+            response.mutable_header()->set_timestamp_sec(timestamp);
+            this->response_history_writer_->Write(response);
           }
         }
       },
