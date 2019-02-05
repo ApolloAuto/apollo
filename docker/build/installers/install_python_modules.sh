@@ -21,14 +21,15 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-apt-get install -y \
-   libgeos-dev \
-   python-matplotlib \
-   python-pip \
-   python-psutil \
-   python-scipy \
-   python-software-properties \
-   python3-psutil
+apt-get -y update && \
+  apt-get install -y \
+    libgeos-dev \
+    python-matplotlib \
+    python-pip \
+    python-psutil \
+    python-scipy \
+    python-software-properties \
+    python3-psutil
 
 pip install -r py27_requirements.txt
 
