@@ -21,6 +21,7 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+add-apt-repository universe && apt-get -y update
 apt-get install -y libblas-dev liblapack-dev gfortran
 
 wget https://www.coin-or.org/download/source/Ipopt/Ipopt-3.12.11.zip -O Ipopt-3.12.11.zip
