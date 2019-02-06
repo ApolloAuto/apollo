@@ -547,6 +547,7 @@ bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
   eval_constraints(n, x, m, g);
+  if (FLAGS_enable_constraints_check) check_g(n, x, m, g);
   return true;
 }
 
@@ -2657,6 +2658,90 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
     n_index++;
   }
 
+  return true;
+}
+
+bool DistanceApproachIPOPTInterface::check_g(
+    int n, const double* x, int m, double* g) {
+  int kN = n;
+  int kM = m;
+  double x_u_tmp[kN];
+  double x_l_tmp[kN];
+  double g_u_tmp[kM];
+  double g_l_tmp[kM];
+
+  get_bounds_info(n, x_l_tmp, x_u_tmp,
+      m, g_l_tmp, g_u_tmp);
+
+  double delta_v = 1e-4;
+  for (int idx = 0; idx < n; ++idx) {
+    x_u_tmp[idx] = x_u_tmp[idx] + delta_v;
+    x_l_tmp[idx] = x_l_tmp[idx] - delta_v;
+    if (x[idx] > x_u_tmp[idx] ||
+          x[idx] < x_l_tmp[idx]) {
+        AINFO << "x idx unfeasible: " << idx
+          << ", x: " << x[idx]
+          << ", lower: " << x_l_tmp[idx]
+          << ", upper: " << x_u_tmp[idx];
+      }
+  }
+
+  // m1 : dynamics constatins
+  int m1 = 4 * horizon_;
+
+  // m2 : control rate constraints (only steering)
+  int m2 = m1 + horizon_;
+
+  // m3 : sampling time equality constraints
+  int m3 = m2 + horizon_;
+
+  // m4 : obstacle constraints
+  int m4 = m3 + 4 * obstacles_num_ * (horizon_ + 1);
+
+  // 5. load variable bounds as constraints
+  // start configuration
+  int m5 = m4 + 3 + 1;
+
+  // constraints on x,y,v
+  int m6 = m5 + 3 * (horizon_ - 1);
+
+  // end configuration
+  int m7 = m6 + 3 + 1;
+
+  // control variable bnd
+  int m8 = m7 + 2 * horizon_;
+
+  // time interval variable bnd
+  int m9 = m8 + (horizon_ + 1);
+
+  // lambda_horizon_
+  int m10 = m9 + lambda_horizon_;
+
+  // miu_horizon_
+  int m11 = m10 + miu_horizon_;
+
+  AINFO << "dynamics constatins to: " << m1;
+  AINFO << "control rate constraints (only steering) to: " << m2;
+  AINFO << "sampling time equality constraints to: " << m3;
+  AINFO << "obstacle constraints to: " << m4;
+  AINFO << "start conf constraints to: " << m5;
+  AINFO << "constraints on x,y,v to: " << m6;
+  AINFO << "end constraints to: " << m7;
+  AINFO << "control bnd to: " << m8;
+  AINFO << "time interval constraints to: " << m9;
+  AINFO << "lambda constraints to: " << m10;
+  AINFO << "miu constraints to: " << m11;
+  AINFO << "total variables: " << num_of_variables_;
+
+  for (int idx = 0; idx < m; ++idx) {
+    if (g[idx] > g_u_tmp[idx] + delta_v
+        || g[idx] < g_l_tmp[idx] - delta_v) {
+      AINFO << "constratins idx unfeasible: " << idx
+          << ", g: " << g[idx]
+          << ", lower: " << g_l_tmp[idx]
+          << ", upper: " << g_u_tmp[idx];
+    }
+  }
   return true;
 }
 
