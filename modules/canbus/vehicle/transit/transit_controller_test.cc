@@ -18,12 +18,12 @@
 
 #include <string>
 
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/vehicle/transit/transit_message_manager.h"
-#include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
@@ -39,7 +39,7 @@ class TransitControllerTest : public ::testing::Test {
   virtual void SetUp() {
     std::string canbus_conf_file =
         "/apollo/modules/canbus/testdata/conf/transit_canbus_conf_test.pb.txt";
-    ::apollo::common::util::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
+    cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
   }
 
