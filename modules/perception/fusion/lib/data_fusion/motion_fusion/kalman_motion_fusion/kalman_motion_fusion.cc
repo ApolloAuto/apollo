@@ -443,11 +443,7 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
     if (common::SensorManager::Instance()->IsRadar(history_type)) {
       trace_count++;
       Eigen::Vector3d radar_velocity = history_velocity_[history_index];
-      /* abandon radar history, if its velocity is close to zero*/
       double radar_velocity_norm = radar_velocity.norm();
-      if (radar_velocity_norm < DBL_EPSILON) {
-        continue;
-      }
       /* abandon radar history, if their velocity lengths are too different*/
       if (fabs(radar_velocity_norm - lidar_velocity_norm) >
           velocity_length_change_thresh_) {
@@ -511,7 +507,7 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
   fused_acceleration(1) = kalman_filter_.GetStates()(5);
   /* return if camera velocity is already small enough */
   double camera_velocity_norm = camera_velocity.norm();
-  if (camera_velocity.norm() < DBL_EPSILON) {
+  if (camera_velocity_norm < DBL_EPSILON) {
     return pseudo_measurement;
   }
   /* trace back radar velocity history, try to find good radar measurement
@@ -522,12 +518,8 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
     if (common::SensorManager::Instance()->IsRadar(history_type)) {
       trace_count++;
       Eigen::Vector3d radar_velocity = history_velocity_[history_index];
-      /* abandon radar history, if its velocity is close to zero*/
       double radar_velocity_norm = radar_velocity.norm();
-      if (radar_velocity_norm < DBL_EPSILON) {
-        continue;
-      }
-      /* abandon radar history, if their velocity lengths are too different*/
+      // //  abandon radar history, if their velocity lengths are too different
       if (fabs(radar_velocity_norm - camera_velocity_norm) >
           velocity_length_change_thresh_) {
         continue;
