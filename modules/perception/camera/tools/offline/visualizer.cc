@@ -41,13 +41,9 @@ bool Visualizer::Init(const std::vector<std::string> &camera_names,
   tf_server_ = tf_server;
   CHECK(tf_server_ != nullptr);
   last_timestamp_ = 0;
-  int width = 1920;
-  int height = 1080;
-  small_h_ = static_cast<int>(height * 0.7);
-  small_w_ = static_cast<int>(width * 0.7);
+  small_h_ = static_cast<int>(image_height_ * scale_ratio_);
+  small_w_ = static_cast<int>(image_width_ * scale_ratio_);
   world_h_ = 2 * small_h_;
-  wide_pixel_ = 800;
-  m2pixel_ = 6;
 
   for (size_t i = 0; i < camera_names.size(); ++i) {
     camera_image_[camera_names[i]] =
@@ -60,17 +56,16 @@ bool Visualizer::Init(const std::vector<std::string> &camera_names,
 bool Visualizer::Init_all_info_single_camera(const std::string &camera_name,
             std::map<std::string, Eigen::Matrix3f> intrinsic_map,
             std::map<std::string, Eigen::Matrix4d> extrinsic_map,
-            Eigen::Matrix4d ex_lidar2imu, double pitch_adj) {
+            Eigen::Matrix4d ex_lidar2imu, double pitch_adj,
+            int image_height, int image_width) {
+  image_height_ = image_height;
+  image_width_ = image_width;
   intrinsic_map_ = intrinsic_map;
   extrinsic_map_ = extrinsic_map;
   last_timestamp_ = 0;
-  int width = 1920;
-  int height = 1080;
-  small_h_ = static_cast<int>(height * 0.6);
-  small_w_ = static_cast<int>(width * 0.6);
+  small_h_ = static_cast<int>(image_height_ * scale_ratio_);
+  small_w_ = static_cast<int>(image_width_ * scale_ratio_);
   world_h_ = 2 * small_h_;
-  wide_pixel_ = 800;
-  m2pixel_ = 6;
 
   camera_image_[camera_name + "_2D"] =
       cv::Mat(small_h_, small_w_, CV_8UC3, cv::Scalar(0, 0, 0));
@@ -109,6 +104,20 @@ bool Visualizer::Init_all_info_single_camera(const std::string &camera_name,
   homography_im2ground_ = H.inverse();
 
   AINFO << "homography_im2ground_: " << homography_im2ground_;
+
+  // compute FOV points
+  p_fov_1_.x = 0;
+  p_fov_1_.y = static_cast<int>(image_height_/fov_cut_ratio_);
+
+  p_fov_2_.x = 1920-1;
+  p_fov_2_.y = static_cast<int>(image_height_/fov_cut_ratio_);
+
+  p_fov_3_.x = 0;
+  p_fov_3_.y = image_height_-1;
+
+  p_fov_4_.x = 1920-1;
+  p_fov_4_.y = image_height_-1;
+
   return true;
 }
 
@@ -253,45 +262,29 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
                                       Eigen::Matrix4d extrinsic) {
   cv::Mat img2 = img;
   // plot FOV
-  cv::Point p_fov_1;
-  p_fov_1.x = 0;
-  p_fov_1.y = static_cast<int>(1080/1.5);
-
-  cv::Point p_fov_2;
-  p_fov_2.x = 1920-1;
-  p_fov_2.y = static_cast<int>(1080/1.5);
-
-  cv::Point p_fov_3;
-  p_fov_3.x = 0;
-  p_fov_3.y = 1080-1;
-
-  cv::Point p_fov_4;
-  p_fov_4.x = 1920-1;
-  p_fov_4.y = 1080-1;
-
-  cv::line(img2, p_fov_1, p_fov_2,
+  cv::line(img2, p_fov_1_, p_fov_2_,
           cv::Scalar(255, 255, 255), 2);
-  cv::line(img2, p_fov_1, p_fov_3,
+  cv::line(img2, p_fov_1_, p_fov_3_,
           cv::Scalar(255, 255, 255), 2);
-  cv::line(img2, p_fov_2, p_fov_4,
+  cv::line(img2, p_fov_2_, p_fov_4_,
           cv::Scalar(255, 255, 255), 2);
   cv::line(world_image_,
-      world_point_to_bigimg(image2ground(p_fov_1)),
-      world_point_to_bigimg(image2ground(p_fov_2)),
+      world_point_to_bigimg(image2ground(p_fov_1_)),
+      world_point_to_bigimg(image2ground(p_fov_2_)),
       cv::Scalar(255, 255, 255), 2);
   cv::line(world_image_,
-      world_point_to_bigimg(image2ground(p_fov_1)),
-      world_point_to_bigimg(image2ground(p_fov_3)),
+      world_point_to_bigimg(image2ground(p_fov_1_)),
+      world_point_to_bigimg(image2ground(p_fov_3_)),
       cv::Scalar(255, 255, 255), 2);
   cv::line(world_image_,
-      world_point_to_bigimg(image2ground(p_fov_2)),
-      world_point_to_bigimg(image2ground(p_fov_4)),
+      world_point_to_bigimg(image2ground(p_fov_2_)),
+      world_point_to_bigimg(image2ground(p_fov_4_)),
       cv::Scalar(255, 255, 255), 2);
 
-  AINFO << "FOV point 1: " << image2ground(p_fov_1);
-  AINFO << "FOV point 2: " << image2ground(p_fov_2);
-  AINFO << "FOV point 3: " << image2ground(p_fov_3);
-  AINFO << "FOV point 4: " << image2ground(p_fov_4);
+  AINFO << "FOV point 1: " << image2ground(p_fov_1_);
+  AINFO << "FOV point 2: " << image2ground(p_fov_2_);
+  AINFO << "FOV point 3: " << image2ground(p_fov_3_);
+  AINFO << "FOV point 4: " << image2ground(p_fov_4_);
 
   // plot laneline on image and ground plane
   for (const auto &object : frame.lane_objects) {

@@ -226,7 +226,8 @@ bool LaneDetectionComponent::Init() {
     AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
     CHECK(visualize_.Init_all_info_single_camera(visual_camera_,
-                     intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj));
+                     intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj,
+                     image_height_, image_width_));
     visualize_.SetDirectory(visual_debug_folder_);
   }
 
