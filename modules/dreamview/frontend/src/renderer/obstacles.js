@@ -308,20 +308,12 @@ export default class PerceptionObstacles {
     }
 
     drawTexts(content, position, scene) {
-        const text = this.textRender.composeText(content);
-        if (text === null) {
-            return;
+        const text = this.textRender.drawText(content, scene);
+        if (text) {
+            text.position.set(position.x, position.y, position.z);
+            this.ids.push(text);
+            scene.add(text);
         }
-
-        text.position.set(position.x, position.y, position.z );
-        const camera = scene.getObjectByName("camera");
-        if (camera !== undefined) {
-            text.quaternion.copy(camera.quaternion);
-        }
-        text.children.forEach(c => c.visible = true);
-        text.visible = true;
-        this.ids.push(text);
-        scene.add(text);
     }
 
     updateLaneMarkers(world, coordinates, scene) {
