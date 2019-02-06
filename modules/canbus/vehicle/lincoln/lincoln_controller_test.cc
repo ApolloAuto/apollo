@@ -16,6 +16,7 @@
 
 #include "modules/canbus/vehicle/lincoln/lincoln_controller.h"
 
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
 #include "modules/canbus/proto/canbus_conf.pb.h"
@@ -23,7 +24,6 @@
 #include "modules/canbus/proto/chassis_detail.pb.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_message_manager.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
-#include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
@@ -40,7 +40,7 @@ class LincolnControllerTest : public ::testing::Test {
   virtual void SetUp() {
     std::string canbus_conf_file =
         "/apollo/modules/canbus/testdata/conf/mkz_canbus_conf_test.pb.txt";
-    common::util::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
+    cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
     control_cmd_.set_throttle(20.0);
     control_cmd_.set_brake(0.0);
