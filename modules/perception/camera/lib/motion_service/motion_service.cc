@@ -15,6 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/camera/lib/motion_service/motion_service.h"
 
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 #include <limits>
 #include <string>
 #include <unordered_map>
@@ -34,9 +36,31 @@ bool MotionService::Init() {
   // node_.reset(new cyber::Node("MotionService"));
   vehicle_planemotion_ = new PlaneMotion(motion_buffer_size_);
 
+  // the macro READ_CONF would return cyber::FAIL if config not exists
+  apollo::perception::onboard::MotionService motion_service_param;
+  if (!GetProtoConfig(&motion_service_param)) {
+    AINFO << "load lane detection component proto param failed";
+    return false;
+  }
+
+  std::string camera_names_str = motion_service_param.camera_names();
+  boost::algorithm::split(camera_names_, camera_names_str,
+                          boost::algorithm::is_any_of(","));
+
+  std::string input_camera_channel_names_str =
+      motion_service_param.input_camera_channel_names();
+  boost::algorithm::split(input_camera_channel_names_,
+                          input_camera_channel_names_str,
+                          boost::algorithm::is_any_of(","));
+  if (input_camera_channel_names_.size() != camera_names_.size()) {
+    AERROR << "wrong input_camera_channel_names_.size(): "
+           << input_camera_channel_names_.size();
+    return cyber::FAIL;
+  }
+
   // initialize image listener
-  const std::string &channel_name_img = "/apollo/sensor/camera/front_6mm/image";
-  const std::string &camera_name = "front_6mm";
+  const std::string &channel_name_img = input_camera_channel_names_[0];
+  const std::string &camera_name = camera_names_[0];
   std::function<void(const ImageMsgType &)> camera_callback =
         std::bind(&MotionService::OnReceiveImage, this,
                   std::placeholders::_1, camera_name);
@@ -44,7 +68,8 @@ bool MotionService::Init() {
       node_->CreateReader(channel_name_img, camera_callback);
 
   // initialize localization listener
-  const std::string &channel_name_local = "/apollo/localization/pose";
+  const std::string &channel_name_local =
+                  motion_service_param.input_localization_channel_name();
   std::function<void(const LocalizationMsgType &)> localization_callback =
         std::bind(&MotionService::OnLocalization, this,
                   std::placeholders::_1);
@@ -52,9 +77,8 @@ bool MotionService::Init() {
       node_->CreateReader(channel_name_local, localization_callback);
 
   // initialize writer to output channel
-  writer_ = node_->
-            CreateWriter<Motion_Service>("/apollo/perception/motion_service");
-
+  writer_ = node_->CreateWriter<Motion_Service>(
+                    motion_service_param.output_topic_channel_name());
   AINFO << "init MotionService success.";
   return true;
 }
@@ -65,7 +89,7 @@ void MotionService::OnReceiveImage(
     const std::string &camera_name) {
   std::lock_guard<std::mutex> lock(mutex_);
   const double curr_timestamp = message->measurement_time() + timestamp_offset_;
-  AINFO << "image received: "
+  ADEBUG << "image received: "
         << " camera_name: " << camera_name
         << " image ts: " + std::to_string(curr_timestamp);
   camera_timestamp_ = curr_timestamp;
@@ -76,7 +100,7 @@ void MotionService::OnReceiveImage(
 void MotionService::OnLocalization(
     const LocalizationMsgType &message) {
   std::lock_guard<std::mutex> lock(mutex_);
-  AINFO << "localization received: "
+  ADEBUG << "localization received: "
         << " localization ts: " + std::to_string(message->measurement_time());
   const auto& velocity = message->pose().linear_velocity();
   // Get base::VehicleStatus
@@ -115,7 +139,7 @@ void MotionService::OnLocalization(
   // double camera_timestamp = camera_shared_data_->GetLatestTimestamp();
   double camera_timestamp = 0;
   camera_timestamp = camera_timestamp_;
-  AINFO << "motion processed for camera timestamp: "
+  ADEBUG << "motion processed for camera timestamp: "
         << std::to_string(camera_timestamp);
 
   if (start_flag_) {

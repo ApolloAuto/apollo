@@ -73,6 +73,20 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "motion_service_proto",
+    deps = [
+        ":motion_service_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "motion_service_proto_lib",
+    srcs = [
+        "motion_service.proto",
+    ],
+)
+
+cc_proto_library(
     name = "lidar_component_config_proto",
     deps = [
         ":lidar_component_config_proto_lib",

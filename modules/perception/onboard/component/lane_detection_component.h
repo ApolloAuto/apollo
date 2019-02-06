@@ -150,6 +150,8 @@ class LaneDetectionComponent :
   double timestamp_offset_ = 0.0;
 
   bool enable_visualization_ = false;
+  std::string visual_debug_folder_;
+  std::string visual_camera_;
 
   std::string output_lanes_channel_name_;
 
@@ -166,7 +168,6 @@ class LaneDetectionComponent :
   const int motion_buffer_size_ = 100;
 
   camera::Visualizer visualize_;
-  std::string visual_camera_ = "front_6mm";
 };
 
 CYBER_REGISTER_COMPONENT(LaneDetectionComponent);

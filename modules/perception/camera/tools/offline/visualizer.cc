@@ -106,9 +106,9 @@ bool Visualizer::Init_all_info_single_camera(const std::string &camera_name,
 
   H.block(0, 0, 3, 2) = (K * R.transpose()).block(0, 0, 3, 2);
   H.block(0, 2, 3, 1) = -K * R.transpose() * T;
-  homography_ = H.inverse();
+  homography_im2ground_ = H.inverse();
 
-  AINFO << "homography_: " << homography_;
+  AINFO << "homography_im2ground_: " << homography_im2ground_;
   return true;
 }
 
@@ -626,7 +626,7 @@ cv::Point Visualizer::world_point_to_bigimg(const Eigen::Vector2d &p) {
 Eigen::Vector2d Visualizer::image2ground(cv::Point p_img) {
   Eigen::Vector3d p_homo;
   p_homo << p_img.x, p_img.y, 1;
-  p_homo = homography_ * p_homo;
+  p_homo = homography_im2ground_ * p_homo;
   p_homo[0] = p_homo[0] / p_homo[2];
   p_homo[1] = p_homo[1] / p_homo[2];
   return p_homo.block(0, 0, 2, 1);

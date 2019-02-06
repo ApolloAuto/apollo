@@ -20,4 +20,6 @@ message LaneDetection {
     optional string calib_service_name = 15 [default = "OnlineCalibrationService"];
     optional bool run_calib_service = 16 [default = true];
     optional double ts_diff = 17 [default = 0.1];
+    optional string visual_debug_folder = 18 [default = "/apollo/debug_output"];
+    optional string visual_camera = 19 [default = "front_6mm"];
 }

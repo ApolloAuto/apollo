@@ -25,4 +25,6 @@ message FusionCameraDetection {
     optional string camera_debug_channel_name = 20 [default = "/perception/obstacles_camera_debug"];
     optional double ts_diff = 21 [default = 0.1];
     optional bool output_final_obstacles = 22 [default = false];
+    optional string visual_debug_folder = 23 [default = "/apollo/debug_output"];
+    optional string visual_camera = 24 [default = "front_6mm"];
 }

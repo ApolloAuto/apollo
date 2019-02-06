@@ -45,7 +45,7 @@ cc_library(
         "//modules/perception/camera/lib/traffic_light/preprocessor:multi_camera_projection",
         "//modules/perception/camera/lib/traffic_light/preprocessor:pose",
         "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
-	"//modules/perception/camera/lib/motion_service:motion_service_lib",
+	    "//modules/perception/camera/lib/motion_service:motion_service_lib",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/sensor_manager",
         "//modules/perception/fusion/app:obstacle_multi_sensor_fusion",

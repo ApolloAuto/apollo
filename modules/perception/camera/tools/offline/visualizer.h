@@ -62,8 +62,8 @@ class Visualizer {
   std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
   std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
 
-  // homograph between image and lider ground plane
-  Eigen::Matrix3d homography_;
+  // homograph between image and ground plane
+  Eigen::Matrix3d homography_im2ground_;
 };
 
 }  // namespace camera

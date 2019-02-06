@@ -212,18 +212,22 @@ bool LaneDetectionComponent::Init() {
   SetCameraHeightAndPitch();
 
   if (enable_visualization_) {
+    // Init visualizer
+    // TODO(techoe, yg13): homography from image to ground should be
+    // computed from camera height and pitch.
+    // Apply online calibration to adjust pitch/height automatically
+    // Temporary code is used here for test
+    double pitch_adj = -0.1;
     // load in lidar to imu extrinsic
     Eigen::Matrix4d ex_lidar2imu;
     LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
                     "velodyne128_novatel_extrinsics.yaml", &ex_lidar2imu);
     ex_lidar2imu.block(0, 3, 3, 1) =  - ex_lidar2imu.block(0, 3, 3, 1);
     AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
-    // Init visualizer
-    // TODO(techoe, yg13): use online calibration to adjust pitch automatically
-    double pitch_adj = -0.1;
-    CHECK(visualize_.Init_all_info_single_camera("front_6mm",
-         intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj));
-    visualize_.SetDirectory("/apollo/debug_output");
+
+    CHECK(visualize_.Init_all_info_single_camera(visual_camera_,
+                     intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj));
+    visualize_.SetDirectory(visual_debug_folder_);
   }
 
   AINFO << "Init processes all succeed";
@@ -269,7 +273,7 @@ void LaneDetectionComponent::OnMotionService(
 
   mot_buffer_->push_back(vehicledata);
 
-  // output motion in text file
+  // TODO(@yg13): output motion in text file
 }
 
 void LaneDetectionComponent::OnReceiveImage(
@@ -365,6 +369,8 @@ int LaneDetectionComponent::InitConfig() {
   image_channel_num_ = lane_detection_param.image_channel_num();
   enable_undistortion_ = lane_detection_param.enable_undistortion();
   enable_visualization_ = lane_detection_param.enable_visualization();
+  visual_debug_folder_ = lane_detection_param.visual_debug_folder();
+  visual_camera_ = lane_detection_param.visual_camera();
   output_lanes_channel_name_ =
       lane_detection_param.output_lanes_channel_name();
   default_camera_pitch_ =
@@ -382,12 +388,15 @@ int LaneDetectionComponent::InitConfig() {
       image_channel_num:    %d
       enable_undistortion:    %d
       enable_visualization:    %d
+      visual_debug_folder_:     %s
+      visual_camera_:     %s
       output_lanes_channel_name:    %s)";
   std::string config_info_str =
       str(boost::format(format_str.c_str()) % camera_names_[0] %
           camera_names_[1] % camera_perception_init_options_.root_dir %
           camera_perception_init_options_.conf_file % frame_capacity_ %
           image_channel_num_ % enable_undistortion_ % enable_visualization_ %
+          visual_debug_folder_ % visual_camera_ %
           output_lanes_channel_name_);
   AINFO << config_info_str;
 

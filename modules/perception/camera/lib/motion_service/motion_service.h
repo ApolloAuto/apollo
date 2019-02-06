@@ -17,6 +17,7 @@
 #include <Eigen/Core>
 #include <list>
 #include <string>
+#include <vector>
 #include <mutex>
 #include <memory>
 
@@ -27,6 +28,7 @@
 #include "modules/perception/camera/lib/motion/plane_motion.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/lib/registerer/registerer.h"
+#include "modules/perception/onboard/proto/motion_service.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -67,8 +69,10 @@ class MotionService :
   const int motion_buffer_size_ = 100;
   double timestamp_offset_ = 0.0;
 
+  std::vector<std::string> camera_names_;  // camera sensor names
+  std::vector<std::string> input_camera_channel_names_;
   std::mutex mutex_;
-  std::mutex image_mutex_;
+//   std::mutex image_mutex_;
   std::mutex motion_mutex_;
   std::shared_ptr<apollo::cyber::Writer<
       apollo::perception::Motion_Service>> writer_;

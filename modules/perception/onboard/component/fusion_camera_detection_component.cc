@@ -166,20 +166,19 @@ bool GetProjectMatrix(
 FusionCameraDetectionComponent::~FusionCameraDetectionComponent() {}
 
 bool FusionCameraDetectionComponent::Init() {
-  // TODO(someone): read output-channel name from config
-  writer_ = node_->CreateWriter<PerceptionObstacles>("/perception/obstacles");
-  sensorframe_writer_ = node_->CreateWriter<SensorFrameMessage>(
-      "/perception/inner/PrefusedObjects");
-  camera_viz_writer_ = node_->CreateWriter<CameraPerceptionVizMessage>(
-      "/perception/inner/camera_viz_msg");
-  camera_debug_writer_ =
-    node_->CreateWriter<apollo::perception::camera::CameraDebug>(
-        "/perception/camera_debug");
-
   if (InitConfig() != cyber::SUCC) {
     AERROR << "InitConfig() failed.";
     return false;
   }
+  writer_ = node_->CreateWriter<PerceptionObstacles>(
+      output_obstacles_channel_name_);
+  sensorframe_writer_ = node_->CreateWriter<SensorFrameMessage>(
+      prefused_channel_name_);
+  camera_viz_writer_ = node_->CreateWriter<CameraPerceptionVizMessage>(
+      camera_perception_viz_message_channel_name_);
+  camera_debug_writer_ =
+    node_->CreateWriter<apollo::perception::camera::CameraDebug>(
+        camera_debug_channel_name_);
   if (InitSensorInfo() != cyber::SUCC) {
     AERROR << "InitSensorInfo() failed.";
     return false;
@@ -203,18 +202,22 @@ bool FusionCameraDetectionComponent::Init() {
   SetCameraHeightAndPitch();
 
   if (enable_visualization_) {
+    // Init visualizer
+    // TODO(techoe, yg13): homography from image to ground should be
+    // computed from camera height and pitch.
+    // Apply online calibration to adjust pitch/height automatically
+    // Temporary code is used here for test
+    double pitch_adj = -0.1;
     // load in lidar to imu extrinsic
     Eigen::Matrix4d ex_lidar2imu;
     LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
                     "velodyne128_novatel_extrinsics.yaml", &ex_lidar2imu);
     ex_lidar2imu.block(0, 3, 3, 1) =  - ex_lidar2imu.block(0, 3, 3, 1);
     AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
-    // Init visualizer
-    // TODO(techoe, yg13): use online calibration to adjust pitch automatically
-    double pitch_adj = -0.1;
+
     CHECK(visualize_.Init_all_info_single_camera(visual_camera_,
                      intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj));
-    visualize_.SetDirectory("/apollo/debug_output");
+    visualize_.SetDirectory(visual_debug_folder_);
   }
 
   return true;
@@ -336,6 +339,10 @@ int FusionCameraDetectionComponent::InitConfig() {
   camera_perception_viz_message_channel_name_ =
       fusion_camera_detection_param
           .camera_perception_viz_message_channel_name();
+  visual_debug_folder_ =
+      fusion_camera_detection_param.visual_debug_folder();
+  visual_camera_ =
+      fusion_camera_detection_param.visual_camera();
   output_final_obstacles_ =
       fusion_camera_detection_param.output_final_obstacles();
   prefused_channel_name_ =
@@ -361,6 +368,8 @@ int FusionCameraDetectionComponent::InitConfig() {
       enable_visualization:    %d
       output_obstacles_channel_name:    %s
       camera_perception_viz_message_channel_name:    %s
+      visual_debug_folder_:     %s
+      visual_camera_:     %s
       output_final_obstacles:    %s
       prefused_channel_name:    %s)";
   std::string config_info_str =
@@ -370,7 +379,10 @@ int FusionCameraDetectionComponent::InitConfig() {
           image_channel_num_ % enable_undistortion_ % enable_visualization_ %
           output_obstacles_channel_name_ %
           camera_perception_viz_message_channel_name_ %
-          output_final_obstacles_ % prefused_channel_name_);
+          visual_debug_folder_ %
+          visual_camera_ %
+          output_final_obstacles_ %
+          prefused_channel_name_);
   AINFO << config_info_str;
 
   return cyber::SUCC;

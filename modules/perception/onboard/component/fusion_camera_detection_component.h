@@ -153,6 +153,8 @@ class FusionCameraDetectionComponent :
 
   bool enable_visualization_ = false;
   std::string camera_perception_viz_message_channel_name_;
+  std::string visual_debug_folder_;
+  std::string visual_camera_;
 
   bool output_final_obstacles_ = false;
   std::string output_obstacles_channel_name_;
@@ -179,7 +181,6 @@ class FusionCameraDetectionComponent :
         apollo::perception::camera::CameraDebug>> camera_debug_writer_;
 
   camera::Visualizer visualize_;
-  std::string visual_camera_ = "front_6mm";
 };
 
 CYBER_REGISTER_COMPONENT(FusionCameraDetectionComponent);
