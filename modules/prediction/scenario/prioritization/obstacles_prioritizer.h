@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,38 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
-
-#pragma once
-
 #include <memory>
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
-#include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
+#include "modules/prediction/scenario/scenario_features/scenario_features.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
 
 namespace apollo {
 namespace prediction {
 
-class ScenarioManager {
+class ObstaclesPrioritizer {
  public:
-  /**
-   * @brief Run scenario analysis
-   */
-  void Run();
+  ObstaclesPrioritizer() = delete;
 
-  /**
-   * @brief Get scenario analysis result
-   */
-  const Scenario& scenario() const;
+  static void PrioritizeObstacles(
+      const EnvironmentFeatures& environment_features,
+      const std::shared_ptr<ScenarioFeatures> scenario_features);
 
  private:
-  Scenario current_scenario_;
+  static void AssignIgnoreLevel(
+      const EnvironmentFeatures& environment_features,
+      const std::shared_ptr<ScenarioFeatures> scenario_features);
 
-  DECLARE_SINGLETON(ScenarioManager)
+  static void AssignIgnoreLevelForCruiseScenario(
+      const EnvironmentFeatures& environment_features,
+      const std::shared_ptr<CruiseScenarioFeatures> scenario_features,
+      ObstaclesContainer* ptr_obstacle_contrainer);
 };
 
 }  // namespace prediction
