@@ -27,4 +27,5 @@ message FusionCameraDetection {
     optional bool output_final_obstacles = 22 [default = false];
     optional string visual_debug_folder = 23 [default = "/apollo/debug_output"];
     optional string visual_camera = 24 [default = "front_6mm"];
+    optional bool write_visual_img = 25 [default = false];
 }

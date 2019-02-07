@@ -168,6 +168,7 @@ class LaneDetectionComponent :
   const int motion_buffer_size_ = 100;
 
   camera::Visualizer visualize_;
+  bool write_visual_img_;
 };
 
 CYBER_REGISTER_COMPONENT(LaneDetectionComponent);

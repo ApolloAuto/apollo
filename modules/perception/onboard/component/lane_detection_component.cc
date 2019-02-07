@@ -228,7 +228,10 @@ bool LaneDetectionComponent::Init() {
     CHECK(visualize_.Init_all_info_single_camera(visual_camera_,
                      intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj,
                      image_height_, image_width_));
-    visualize_.SetDirectory(visual_debug_folder_);
+    if (write_visual_img_) {
+      visualize_.write_out_img_ = true;
+      visualize_.SetDirectory(visual_debug_folder_);
+    }
   }
 
   AINFO << "Init processes all succeed";
@@ -379,6 +382,7 @@ int LaneDetectionComponent::InitConfig() {
   default_camera_height_ =
     static_cast<float>(lane_detection_param.default_camera_height());
   ts_diff_ = lane_detection_param.ts_diff();
+  write_visual_img_ = lane_detection_param.write_visual_img();
 
     std::string format_str = R"(
       LaneDetectionComponent InitConfig success
@@ -391,14 +395,16 @@ int LaneDetectionComponent::InitConfig() {
       enable_visualization:    %d
       visual_debug_folder_:     %s
       visual_camera_:     %s
-      output_lanes_channel_name:    %s)";
+      output_lanes_channel_name:    %s
+      write_visual_img_:    %s)";
   std::string config_info_str =
       str(boost::format(format_str.c_str()) % camera_names_[0] %
           camera_names_[1] % camera_perception_init_options_.root_dir %
           camera_perception_init_options_.conf_file % frame_capacity_ %
           image_channel_num_ % enable_undistortion_ % enable_visualization_ %
           visual_debug_folder_ % visual_camera_ %
-          output_lanes_channel_name_);
+          output_lanes_channel_name_ %
+          write_visual_img_);
   AINFO << config_info_str;
 
   return cyber::SUCC;

@@ -181,6 +181,7 @@ class FusionCameraDetectionComponent :
         apollo::perception::camera::CameraDebug>> camera_debug_writer_;
 
   camera::Visualizer visualize_;
+  bool write_visual_img_;
 };
 
 CYBER_REGISTER_COMPONENT(FusionCameraDetectionComponent);

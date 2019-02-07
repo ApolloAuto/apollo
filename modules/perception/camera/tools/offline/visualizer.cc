@@ -75,6 +75,7 @@ bool Visualizer::Init_all_info_single_camera(const std::string &camera_name,
 
   extrinsic_map_.at(camera_name).block(0, 3, 3, 1) =
                    - extrinsic_map_.at(camera_name).block(0, 3, 3, 1);
+  // rotate 90 degree around z axis to make x point forward
   Eigen::Matrix4d Rz;
   Rz << 0, 1, 0, 0,
        -1, 0, 0, 0,
@@ -82,8 +83,7 @@ bool Visualizer::Init_all_info_single_camera(const std::string &camera_name,
         0, 0, 0, 1;
   extrinsic_map_.at(camera_name) = extrinsic_map_.at(camera_name) *
                                    ex_lidar2imu * Rz;
-  extrinsic_map_.at(camera_name)(2, 3) -= 1.6;
-  // adj of pitch in camera coords
+  // adjust pitch in camera coords
   Eigen::Matrix4d Rx;
   Rx << 1, 0, 0, 0,
         0, cos(pitch_adj), -sin(pitch_adj), 0,
@@ -107,10 +107,10 @@ bool Visualizer::Init_all_info_single_camera(const std::string &camera_name,
 
   // compute FOV points
   p_fov_1_.x = 0;
-  p_fov_1_.y = static_cast<int>(image_height_/fov_cut_ratio_);
+  p_fov_1_.y = static_cast<int>(image_height_*fov_cut_ratio_);
 
   p_fov_2_.x = 1920-1;
-  p_fov_2_.y = static_cast<int>(image_height_/fov_cut_ratio_);
+  p_fov_2_.y = static_cast<int>(image_height_*fov_cut_ratio_);
 
   p_fov_3_.x = 0;
   p_fov_3_.y = image_height_-1;
@@ -173,16 +173,16 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     Eigen::Vector2d v_2d;
     v_2d << v[0] + pos_2d[0], v[1] + pos_2d[1];
     Eigen::Vector2d p1;
-    p1 << object->size[0] / 2, object->size[1] / 2;
+    p1 << object->size[0] * 0.5, object->size[1] * 0.5;
     p1 = rotate * p1 + pos_2d;
     Eigen::Vector2d p2;
-    p2 << -object->size[0] / 2, object->size[1] / 2;
+    p2 << -object->size[0] * 0.5, object->size[1] * 0.5;
     p2 = rotate * p2 + pos_2d;
     Eigen::Vector2d p3;
-    p3 << -object->size[0] / 2, -object->size[1] / 2;
+    p3 << -object->size[0] * 0.5, -object->size[1] * 0.5;
     p3 = rotate * p3 + pos_2d;
     Eigen::Vector2d p4;
-    p4 << object->size[0] / 2, -object->size[1] / 2;
+    p4 << object->size[0] * 0.5, -object->size[1] * 0.5;
     p4 = rotate * p4 + pos_2d;
 
     cv::line(world_image_, world_point_to_bigimg(p1),
@@ -222,11 +222,15 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
                                                           small_w_,
                                                           small_h_)));
     world_image_.copyTo(bigimg(cv::Rect(small_w_, 0, wide_pixel_, world_h_)));
-    char path[1000];
-    snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(), frame.frame_id);
-    AINFO << path;
+    if (write_out_img_) {
+      char path[1000];
+      snprintf(path, sizeof(path), "%s/%06d.jpg",
+               path_.c_str(), frame.frame_id);
+      AINFO << path;
+      cv::imwrite(path, bigimg);
+    }
+
     cv::imshow("", bigimg);
-    cv::imwrite(path, bigimg);
     cvWaitKey(30);
     world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
     draw_range_circle();
@@ -385,30 +389,25 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
     rotate_ry << cos(theta), 0, sin(theta),
                           0, 1, 0,
                 -sin(theta), 0, cos(theta);
-    Eigen::Vector3d p1;
-    p1 << object->size[0] / 2, object->size[2] / 2, object->size[1] / 2;
-    p1 = rotate_ry * p1 + pos;
-    Eigen::Vector3d p2;
-    p2 << -object->size[0] / 2, object->size[2] / 2, object->size[1] / 2;
-    p2 = rotate_ry * p2 + pos;
-    Eigen::Vector3d p3;
-    p3 << -object->size[0] / 2, object->size[2] / 2, -object->size[1] / 2;
-    p3 = rotate_ry * p3 + pos;
-    Eigen::Vector3d p4;
-    p4 << object->size[0] / 2, object->size[2] / 2, -object->size[1] / 2;
-    p4 = rotate_ry * p4 + pos;
-    Eigen::Vector3d p5;
-    p5 << object->size[0] / 2, -object->size[2] / 2, object->size[1] / 2;
-    p5 = rotate_ry * p5 + pos;
-    Eigen::Vector3d p6;
-    p6 << -object->size[0] / 2, -object->size[2] / 2, object->size[1] / 2;
-    p6 = rotate_ry * p6 + pos;
-    Eigen::Vector3d p7;
-    p7 << -object->size[0] / 2, -object->size[2] / 2, -object->size[1] / 2;
-    p7 = rotate_ry * p7 + pos;
-    Eigen::Vector3d p8;
-    p8 << object->size[0] / 2, -object->size[2] / 2, -object->size[1] / 2;
-    p8 = rotate_ry * p8 + pos;
+    std::vector<Eigen::Vector3d> p(8);
+    p[0] << object->size[0] * 0.5, object->size[2] * 0.5,
+            object->size[1] * 0.5;
+    p[1] << -object->size[0] * 0.5, object->size[2] * 0.5,
+            object->size[1] * 0.5;
+    p[2] << -object->size[0] * 0.5, object->size[2] * 0.5,
+            -object->size[1] * 0.5;
+    p[3] << object->size[0] * 0.5, object->size[2] * 0.5,
+            -object->size[1] * 0.5;
+    p[4] << object->size[0] * 0.5, -object->size[2] * 0.5,
+            object->size[1] * 0.5;
+    p[5] << -object->size[0] * 0.5, -object->size[2] * 0.5,
+            object->size[1] * 0.5;
+    p[6] << -object->size[0] * 0.5, -object->size[2] * 0.5,
+            -object->size[1] * 0.5;
+    p[7] << object->size[0] * 0.5, -object->size[2] * 0.5,
+            -object->size[1] * 0.5;
+    for (uint i = 0; i < p.size(); i++)
+      p[i] =  rotate_ry * p[i] + pos;
 
     // compute 4 bottom vetices in lidar coordinate
     // Eigen::Vector3d p1_l_3d = extrinsic.block(0,0,3,3) * p1 +
@@ -436,16 +435,16 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
                  -sin(theta), cos(theta);
     // plot obstacles on ground plane in lidar coordinates
     Eigen::Vector2d p1_l;
-    p1_l << object->size[0] / 2, object->size[1] / 2;
+    p1_l << object->size[0] * 0.5, object->size[1] * 0.5;
     p1_l = rotate_rz * p1_l + c_2D_l;
     Eigen::Vector2d p2_l;
-    p2_l << -object->size[0] / 2, object->size[1] / 2;
+    p2_l << -object->size[0] * 0.5, object->size[1] * 0.5;
     p2_l = rotate_rz * p2_l + c_2D_l;
     Eigen::Vector2d p3_l;
-    p3_l << -object->size[0] / 2, -object->size[1] / 2;
+    p3_l << -object->size[0] * 0.5, -object->size[1] * 0.5;
     p3_l = rotate_rz * p3_l + c_2D_l;
     Eigen::Vector2d p4_l;
-    p4_l << object->size[0] / 2, -object->size[1] / 2;
+    p4_l << object->size[0] * 0.5, -object->size[1] * 0.5;
     p4_l = rotate_rz * p4_l + c_2D_l;
     cv::line(world_image_, world_point_to_bigimg(p1_l),
              world_point_to_bigimg(p2_l),
@@ -461,61 +460,38 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
              colorlist[object->track_id % colorlist.size()], 2);
 
     // plot projected 3D box on image_3D
-    p1 = intrinsic * p1;
-    p2 = intrinsic * p2;
-    p3 = intrinsic * p3;
-    p4 = intrinsic * p4;
-    p5 = intrinsic * p5;
-    p6 = intrinsic * p6;
-    p7 = intrinsic * p7;
-    p8 = intrinsic * p8;
-    cv::Point p1_proj;
-    p1_proj.x = static_cast<int>(p1[0] / p1[2]);
-    p1_proj.y = static_cast<int>(p1[1] / p1[2]);
-    cv::Point p2_proj;
-    p2_proj.x = static_cast<int>(p2[0] / p2[2]);
-    p2_proj.y = static_cast<int>(p2[1] / p2[2]);
-    cv::Point p3_proj;
-    p3_proj.x = static_cast<int>(p3[0] / p3[2]);
-    p3_proj.y = static_cast<int>(p3[1] / p3[2]);
-    cv::Point p4_proj;
-    p4_proj.x = static_cast<int>(p4[0] / p4[2]);
-    p4_proj.y = static_cast<int>(p4[1] / p4[2]);
-    cv::Point p5_proj;
-    p5_proj.x = static_cast<int>(p5[0] / p5[2]);
-    p5_proj.y = static_cast<int>(p5[1] / p5[2]);
-    cv::Point p6_proj;
-    p6_proj.x = static_cast<int>(p6[0] / p6[2]);
-    p6_proj.y = static_cast<int>(p6[1] / p6[2]);
-    cv::Point p7_proj;
-    p7_proj.x = static_cast<int>(p7[0] / p7[2]);
-    p7_proj.y = static_cast<int>(p7[1] / p7[2]);
-    cv::Point p8_proj;
-    p8_proj.x = static_cast<int>(p8[0] / p8[2]);
-    p8_proj.y = static_cast<int>(p8[1] / p8[2]);
-    cv::line(image_3D, p1_proj, p2_proj,
+    for (uint i = 0; i < p.size(); i++)
+      p[i] = intrinsic * p[i];
+
+    std::vector<cv::Point> p_proj(8);
+    for (uint i = 0; i < p_proj.size(); i++) {
+      p_proj[i].x = static_cast<int>(p[i][0] / p[i][2]);
+      p_proj[i].y = static_cast<int>(p[i][1] / p[i][2]);
+    }
+
+    cv::line(image_3D, p_proj[0], p_proj[1],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p2_proj, p3_proj,
+    cv::line(image_3D, p_proj[1], p_proj[2],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p3_proj, p4_proj,
+    cv::line(image_3D, p_proj[2], p_proj[3],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p4_proj, p1_proj,
+    cv::line(image_3D, p_proj[3], p_proj[0],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p5_proj, p6_proj,
+    cv::line(image_3D, p_proj[4], p_proj[5],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p6_proj, p7_proj,
+    cv::line(image_3D, p_proj[5], p_proj[6],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p7_proj, p8_proj,
+    cv::line(image_3D, p_proj[6], p_proj[7],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p8_proj, p5_proj,
+    cv::line(image_3D, p_proj[7], p_proj[4],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p1_proj, p5_proj,
+    cv::line(image_3D, p_proj[0], p_proj[4],
              cv::Scalar(255, 255, 255), 2);
-    cv::line(image_3D, p2_proj, p6_proj,
+    cv::line(image_3D, p_proj[1], p_proj[5],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p3_proj, p7_proj,
+    cv::line(image_3D, p_proj[2], p_proj[6],
              colorlist[object->track_id % colorlist.size()], 2);
-    cv::line(image_3D, p4_proj, p8_proj,
+    cv::line(image_3D, p_proj[3], p_proj[7],
              colorlist[object->track_id % colorlist.size()], 2);
   }
   last_timestamp_ = frame.timestamp;
@@ -543,11 +519,14 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
                                                           small_w_,
                                                           small_h_)));
     world_image_.copyTo(bigimg(cv::Rect(small_w_, 0, wide_pixel_, world_h_)));
-    char path[1000];
-    snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(), frame.frame_id);
-    AINFO << path;
+    if (write_out_img_) {
+      char path[1000];
+      snprintf(path, sizeof(path), "%s/%06d.jpg",
+               path_.c_str(), frame.frame_id);
+      AINFO << path;
+      cv::imwrite(path, bigimg);
+    }
     cv::imshow("", bigimg);
-    cv::imwrite(path, bigimg);
     cvWaitKey(30);
     world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
     draw_range_circle();
@@ -611,7 +590,7 @@ void Visualizer::draw_range_circle() {
 
 cv::Point Visualizer::world_point_to_bigimg(const Eigen::Vector2d &p) {
   cv::Point point;
-  point.x = static_cast<int>(-p[1] * m2pixel_ + wide_pixel_ / 2);
+  point.x = static_cast<int>(-p[1] * m2pixel_ + wide_pixel_ * 0.5);
   point.y = static_cast<int>(world_h_ - p[0] * m2pixel_);
   return point;
 }
@@ -619,10 +598,11 @@ cv::Point Visualizer::world_point_to_bigimg(const Eigen::Vector2d &p) {
 Eigen::Vector2d Visualizer::image2ground(cv::Point p_img) {
   Eigen::Vector3d p_homo;
   p_homo << p_img.x, p_img.y, 1;
-  p_homo = homography_im2ground_ * p_homo;
-  p_homo[0] = p_homo[0] / p_homo[2];
-  p_homo[1] = p_homo[1] / p_homo[2];
-  return p_homo.block(0, 0, 2, 1);
+  Eigen::Vector3d p_ground;
+  p_ground = homography_im2ground_ * p_homo;
+  p_ground[0] = p_ground[0] / p_ground[2];
+  p_ground[1] = p_ground[1] / p_ground[2];
+  return p_ground.block(0, 0, 2, 1);
 }
 }  // namespace camera
 }  // namespace perception

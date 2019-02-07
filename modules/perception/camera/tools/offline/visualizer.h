@@ -45,6 +45,7 @@ class Visualizer {
                                       Eigen::Matrix4d extrinsic);
   cv::Point world_point_to_bigimg(const Eigen::Vector2d &p);
   Eigen::Vector2d image2ground(cv::Point p_img);
+  bool write_out_img_ = false;
 
  private:
   std::map<std::string, cv::Mat> camera_image_;
@@ -60,7 +61,7 @@ class Visualizer {
   int small_w_ = 0;
   int world_h_ = 0;
   int m2pixel_ = 6;
-  double fov_cut_ratio_ = 1.5;
+  double fov_cut_ratio_ = 0.6;
   cv::Point p_fov_1_;
   cv::Point p_fov_2_;
   cv::Point p_fov_3_;

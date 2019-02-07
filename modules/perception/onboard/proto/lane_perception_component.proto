@@ -22,4 +22,5 @@ message LaneDetection {
     optional double ts_diff = 17 [default = 0.1];
     optional string visual_debug_folder = 18 [default = "/apollo/debug_output"];
     optional string visual_camera = 19 [default = "front_6mm"];
+    optional bool write_visual_img = 20 [default = false];
 }

@@ -218,7 +218,10 @@ bool FusionCameraDetectionComponent::Init() {
     CHECK(visualize_.Init_all_info_single_camera(visual_camera_,
                      intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj,
                      image_height_, image_width_));
-    visualize_.SetDirectory(visual_debug_folder_);
+    if (write_visual_img_) {
+      visualize_.write_out_img_ = true;
+      visualize_.SetDirectory(visual_debug_folder_);
+    }
   }
 
   return true;
@@ -357,6 +360,7 @@ int FusionCameraDetectionComponent::InitConfig() {
   camera_debug_channel_name_ =
       fusion_camera_detection_param.camera_debug_channel_name();
   ts_diff_ = fusion_camera_detection_param.ts_diff();
+  write_visual_img_ = fusion_camera_detection_param.write_visual_img();
 
   std::string format_str = R"(
       FusionCameraDetectionComponent InitConfig success
@@ -372,7 +376,8 @@ int FusionCameraDetectionComponent::InitConfig() {
       visual_debug_folder_:     %s
       visual_camera_:     %s
       output_final_obstacles:    %s
-      prefused_channel_name:    %s)";
+      prefused_channel_name:    %s
+      write_visual_img_:    %s)";
   std::string config_info_str =
       str(boost::format(format_str.c_str()) % camera_names_[0] %
           camera_names_[1] % camera_perception_init_options_.root_dir %
@@ -383,7 +388,8 @@ int FusionCameraDetectionComponent::InitConfig() {
           visual_debug_folder_ %
           visual_camera_ %
           output_final_obstacles_ %
-          prefused_channel_name_);
+          prefused_channel_name_ %
+          write_visual_img_);
   AINFO << config_info_str;
 
   return cyber::SUCC;
