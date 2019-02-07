@@ -82,9 +82,8 @@ void PlaneMotion::generate_motion_matrix(base::VehicleStatus *vehicledata) {
     float displacement = time_d * vehicledata->velocity;
     Eigen::Vector3f trans;
     trans(0) = static_cast<float>(sqrt(
-                     displacement * displacement /
-                    (tan(yaw_delta) * tan(yaw_delta) +
-                     +tan(pitch_delta) * tan(pitch_delta) + 1)));
+        displacement * displacement / (tan(yaw_delta) * tan(yaw_delta) +
+        tan(pitch_delta) * tan(pitch_delta) + 1)));
     trans(1) = static_cast<float>(tan(yaw_delta) * trans(0));
     trans(2) = static_cast<float>(tan(pitch_delta) * trans(0));
 

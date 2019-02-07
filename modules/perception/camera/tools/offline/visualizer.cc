@@ -36,8 +36,9 @@ std::vector<cv::Scalar> colorlist = {
     cv::Scalar(0, 255, 0),
     cv::Scalar(100, 255, 100)};
 
-bool Visualizer::Init(const std::vector<std::string> &camera_names,
-                      TransformServer *tf_server) {
+bool Visualizer::Init(
+    const std::vector<std::string> &camera_names,
+    TransformServer *tf_server) {
   tf_server_ = tf_server;
   CHECK(tf_server_ != nullptr);
   last_timestamp_ = 0;
@@ -53,11 +54,12 @@ bool Visualizer::Init(const std::vector<std::string> &camera_names,
   return true;
 }
 
-bool Visualizer::Init_all_info_single_camera(const std::string &camera_name,
-            std::map<std::string, Eigen::Matrix3f> intrinsic_map,
-            std::map<std::string, Eigen::Matrix4d> extrinsic_map,
-            Eigen::Matrix4d ex_lidar2imu, double pitch_adj,
-            int image_height, int image_width) {
+bool Visualizer::Init_all_info_single_camera(
+    const std::string &camera_name,
+    std::map<std::string, Eigen::Matrix3f> intrinsic_map,
+    std::map<std::string, Eigen::Matrix4d> extrinsic_map,
+    Eigen::Matrix4d ex_lidar2imu, double pitch_adj,
+    int image_height, int image_width) {
   image_height_ = image_height;
   image_width_ = image_width;
   intrinsic_map_ = intrinsic_map;
@@ -74,15 +76,15 @@ bool Visualizer::Init_all_info_single_camera(const std::string &camera_name,
   world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
 
   extrinsic_map_.at(camera_name).block(0, 3, 3, 1) =
-                   - extrinsic_map_.at(camera_name).block(0, 3, 3, 1);
+      - extrinsic_map_.at(camera_name).block(0, 3, 3, 1);
   // rotate 90 degree around z axis to make x point forward
   Eigen::Matrix4d Rz;
   Rz << 0, 1, 0, 0,
        -1, 0, 0, 0,
         0, 0, 1, 0,
         0, 0, 0, 1;
-  extrinsic_map_.at(camera_name) = extrinsic_map_.at(camera_name) *
-                                   ex_lidar2imu * Rz;
+  extrinsic_map_.at(camera_name) =
+      extrinsic_map_.at(camera_name) * ex_lidar2imu * Rz;
   // adjust pitch in camera coords
   Eigen::Matrix4d Rx;
   Rx << 1, 0, 0, 0,
@@ -160,7 +162,7 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     float yaw = static_cast<float>(atan2(theta[1], theta[0]));
     Eigen::Matrix2d rotate;
     rotate << cos(yaw), -sin(yaw),
-      sin(yaw), cos(yaw);
+              sin(yaw), cos(yaw);
 
     Eigen::Vector3d pos;
     pos << object->center[0], object->center[1], object->center[2];
@@ -214,13 +216,13 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
   if (frame.timestamp - last_timestamp_ > 0.02) {
     cv::Mat bigimg(world_h_, small_w_ + wide_pixel_, CV_8UC3);
     camera_image_["front_6mm"].copyTo(bigimg(cv::Rect(0,
-                                                            0,
-                                                            small_w_,
-                                                            small_h_)));
+                                                      0,
+                                                      small_w_,
+                                                      small_h_)));
     camera_image_["front_12mm"].copyTo(bigimg(cv::Rect(0,
-                                                          small_h_,
-                                                          small_w_,
-                                                          small_h_)));
+                                                       small_h_,
+                                                       small_w_,
+                                                       small_h_)));
     world_image_.copyTo(bigimg(cv::Rect(small_w_, 0, wide_pixel_, world_h_)));
     if (write_out_img_) {
       char path[1000];
@@ -260,30 +262,29 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
   Draw2Dand3D(image, frame);
 }
 
-void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
-                                      const CameraFrame &frame,
-                                      Eigen::Matrix3d intrinsic,
-                                      Eigen::Matrix4d extrinsic) {
+void Visualizer::Draw2Dand3D_all_info_single_camera(
+    const cv::Mat &img, const CameraFrame &frame,
+    Eigen::Matrix3d intrinsic, Eigen::Matrix4d extrinsic) {
   cv::Mat img2 = img;
   // plot FOV
   cv::line(img2, p_fov_1_, p_fov_2_,
-          cv::Scalar(255, 255, 255), 2);
+           cv::Scalar(255, 255, 255), 2);
   cv::line(img2, p_fov_1_, p_fov_3_,
-          cv::Scalar(255, 255, 255), 2);
+           cv::Scalar(255, 255, 255), 2);
   cv::line(img2, p_fov_2_, p_fov_4_,
-          cv::Scalar(255, 255, 255), 2);
+           cv::Scalar(255, 255, 255), 2);
   cv::line(world_image_,
-      world_point_to_bigimg(image2ground(p_fov_1_)),
-      world_point_to_bigimg(image2ground(p_fov_2_)),
-      cv::Scalar(255, 255, 255), 2);
+           world_point_to_bigimg(image2ground(p_fov_1_)),
+           world_point_to_bigimg(image2ground(p_fov_2_)),
+           cv::Scalar(255, 255, 255), 2);
   cv::line(world_image_,
-      world_point_to_bigimg(image2ground(p_fov_1_)),
-      world_point_to_bigimg(image2ground(p_fov_3_)),
-      cv::Scalar(255, 255, 255), 2);
+           world_point_to_bigimg(image2ground(p_fov_1_)),
+           world_point_to_bigimg(image2ground(p_fov_3_)),
+           cv::Scalar(255, 255, 255), 2);
   cv::line(world_image_,
-      world_point_to_bigimg(image2ground(p_fov_2_)),
-      world_point_to_bigimg(image2ground(p_fov_4_)),
-      cv::Scalar(255, 255, 255), 2);
+           world_point_to_bigimg(image2ground(p_fov_2_)),
+           world_point_to_bigimg(image2ground(p_fov_4_)),
+           cv::Scalar(255, 255, 255), 2);
 
   AINFO << "FOV point 1: " << image2ground(p_fov_1_);
   AINFO << "FOV point 2: " << image2ground(p_fov_2_);
@@ -511,13 +512,13 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   if (frame.timestamp - last_timestamp_ > 0.02) {
     cv::Mat bigimg(world_h_, small_w_ + wide_pixel_, CV_8UC3);
     camera_image_[camera_name + "_2D"].copyTo(bigimg(cv::Rect(0,
-                                                            0,
-                                                            small_w_,
-                                                            small_h_)));
+                                                              0,
+                                                              small_w_,
+                                                              small_h_)));
     camera_image_[camera_name + "_3D"].copyTo(bigimg(cv::Rect(0,
-                                                          small_h_,
-                                                          small_w_,
-                                                          small_h_)));
+                                                              small_h_,
+                                                              small_w_,
+                                                              small_h_)));
     world_image_.copyTo(bigimg(cv::Rect(small_w_, 0, wide_pixel_, world_h_)));
     if (write_out_img_) {
       char path[1000];

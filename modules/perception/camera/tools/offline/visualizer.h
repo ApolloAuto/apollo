@@ -26,24 +26,26 @@
 namespace apollo {
 namespace perception {
 namespace camera {
+
 class Visualizer {
  public:
-  bool Init(const std::vector<std::string> &camera_names,
-            TransformServer *tf_server);
-  bool Init_all_info_single_camera(const std::string &camera_name,
-            std::map<std::string, Eigen::Matrix3f> intrinsic_map,
-            std::map<std::string, Eigen::Matrix4d> extrinsic_map,
-            Eigen::Matrix4d ex_lidar2imu, double pitch_adj,
-            int image_height, int image_width);
+  bool Init(
+      const std::vector<std::string> &camera_names,
+      TransformServer *tf_server);
+  bool Init_all_info_single_camera(
+      const std::string &camera_name,
+      std::map<std::string, Eigen::Matrix3f> intrinsic_map,
+      std::map<std::string, Eigen::Matrix4d> extrinsic_map,
+      Eigen::Matrix4d ex_lidar2imu, double pitch_adj,
+      int image_height, int image_width);
   void SetDirectory(const std::string &path);
   void ShowResult(const cv::Mat &img, const CameraFrame &frame);
   void Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame);
-  void ShowResult_all_info_single_camera(const cv::Mat &img,
-                                      const CameraFrame &frame);
-  void Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
-                                      const CameraFrame &frame,
-                                      Eigen::Matrix3d intrinsic,
-                                      Eigen::Matrix4d extrinsic);
+  void ShowResult_all_info_single_camera(
+      const cv::Mat &img, const CameraFrame &frame);
+  void Draw2Dand3D_all_info_single_camera(
+      const cv::Mat &img, const CameraFrame &frame,
+      Eigen::Matrix3d intrinsic, Eigen::Matrix4d extrinsic);
   cv::Point world_point_to_bigimg(const Eigen::Vector2d &p);
   Eigen::Vector2d image2ground(cv::Point p_img);
   bool write_out_img_ = false;

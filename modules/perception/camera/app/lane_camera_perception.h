@@ -38,30 +38,29 @@ namespace camera {
 class LaneCameraPerception : public BaseCameraPerception {
  public:
   LaneCameraPerception() : lane_detector_(nullptr),
-                              lane_postprocessor_(nullptr),
-                              calibration_service_(nullptr) {
+      lane_postprocessor_(nullptr), calibration_service_(nullptr) {
   }
   LaneCameraPerception(
-    const LaneCameraPerception &) =  delete;
+      const LaneCameraPerception &) =  delete;
   LaneCameraPerception &operator=(
-    const LaneCameraPerception &) = delete;
+      const LaneCameraPerception &) = delete;
   ~LaneCameraPerception() = default;
   bool Init(const CameraPerceptionInitOptions &options) override;
   void InitLane(const std::string &work_root,
-    base::BaseCameraModelPtr &model, //NOLINT
-    const app::PerceptionParam &perception_param);
+      base::BaseCameraModelPtr &model, //NOLINT
+      const app::PerceptionParam &perception_param);
   void InitCalibrationService(const std::string &work_root,
-    const base::BaseCameraModelPtr model,
-    const app::PerceptionParam &perception_param);
+      const base::BaseCameraModelPtr model,
+      const app::PerceptionParam &perception_param);
   void SetCameraHeightAndPitch(
-        const std::map<std::string, float> &name_camera_ground_height_map,
-        const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
-        const float &pitch_angle_calibrator_working_sensor);
+      const std::map<std::string, float> name_camera_ground_height_map,
+      const std::map<std::string, float> name_camera_pitch_angle_diff_map,
+      const float &pitch_angle_calibrator_working_sensor);
   bool GetCalibrationService(BaseCalibrationService** calibration_service);
   bool Perception(const CameraPerceptionOptions &options,
-                  CameraFrame *frame) override;
+      CameraFrame *frame) override;
   std::string Name() const override {
-    return "LaneCameraPerception";
+      return "LaneCameraPerception";
   }
 
  private:
@@ -71,8 +70,6 @@ class LaneCameraPerception : public BaseCameraPerception {
   std::shared_ptr<BaseCalibrationService> calibration_service_;
   app::PerceptionParam perception_param_;
   std::string lane_calibration_working_sensor_name_ = "";
-
- protected:
 };
 
 }  // namespace camera

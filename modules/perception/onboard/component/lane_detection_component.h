@@ -43,7 +43,7 @@
 #include "modules/perception/camera/tools/offline/visualizer.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
-                                         MotionServiceMsgType;
+    MotionServiceMsgType;
 
 namespace apollo {
 namespace perception {
@@ -162,7 +162,7 @@ class LaneDetectionComponent :
   double ts_diff_ = 1.0;
 
   std::shared_ptr<apollo::cyber::Writer<
-        apollo::perception::PerceptionLanes>> writer_;
+      apollo::perception::PerceptionLanes>> writer_;
 
   base::MotionBufferPtr mot_buffer_;
   const int motion_buffer_size_ = 100;

@@ -65,8 +65,9 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
 }
 
 static bool SetCameraHeight(const std::string &sensor_name,
-                     const std::string &params_dir, float default_camera_height,
-                     float *camera_height) {
+                            const std::string &params_dir,
+                            float default_camera_height,
+                            float *camera_height) {
   float base_h = default_camera_height;
   float camera_offset = 0.0f;
   try {
@@ -96,7 +97,7 @@ static bool SetCameraHeight(const std::string &sensor_name,
 
 // @description: load camera extrinsics from yaml file
 static bool LoadExtrinsics(const std::string &yaml_file,
-                    Eigen::Matrix4d *camera_extrinsic) {
+                           Eigen::Matrix4d *camera_extrinsic) {
   if (!apollo::common::util::PathExists(yaml_file)) {
     AINFO << yaml_file << " not exist!";
     return false;
@@ -225,9 +226,9 @@ bool LaneDetectionComponent::Init() {
     ex_lidar2imu.block(0, 3, 3, 1) =  - ex_lidar2imu.block(0, 3, 3, 1);
     AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
-    CHECK(visualize_.Init_all_info_single_camera(visual_camera_,
-                     intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj,
-                     image_height_, image_width_));
+    CHECK(visualize_.Init_all_info_single_camera(
+        visual_camera_, intrinsic_map_, extrinsic_map_,
+        ex_lidar2imu, pitch_adj, image_height_, image_width_));
     if (write_visual_img_) {
       visualize_.write_out_img_ = true;
       visualize_.SetDirectory(visual_debug_folder_);
@@ -377,10 +378,10 @@ int LaneDetectionComponent::InitConfig() {
   visual_camera_ = lane_detection_param.visual_camera();
   output_lanes_channel_name_ =
       lane_detection_param.output_lanes_channel_name();
-  default_camera_pitch_ =
-    static_cast<float>(lane_detection_param.default_camera_pitch());
-  default_camera_height_ =
-    static_cast<float>(lane_detection_param.default_camera_height());
+  default_camera_pitch_ = static_cast<float>(
+      lane_detection_param.default_camera_pitch());
+  default_camera_height_ = static_cast<float>(
+      lane_detection_param.default_camera_height());
   ts_diff_ = lane_detection_param.ts_diff();
   write_visual_img_ = lane_detection_param.write_visual_img();
 
@@ -516,8 +517,7 @@ int LaneDetectionComponent::InitCameraFrames() {
           << intrinsic_map_[camera_name];
     Eigen::Matrix4d extrinsic;
     LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" + camera_name +
-                       "_extrinsics.yaml",
-                   &extrinsic);
+        "_extrinsics.yaml", &extrinsic);
     extrinsic_map_[camera_name] = extrinsic;
   }
 
@@ -554,10 +554,11 @@ int LaneDetectionComponent::InitProjectMatrix() {
 int LaneDetectionComponent::InitMotionService() {
   const std::string &channel_name_local = "/apollo/perception/motion_service";
   std::function<void(const MotionServiceMsgType &)> motion_service_callback =
-        std::bind(&LaneDetectionComponent::OnMotionService, this,
+        std::bind(&LaneDetectionComponent::OnMotionService,
+                  this,
                   std::placeholders::_1);
   auto  motion_service_reader =
-          node_->CreateReader(channel_name_local,  motion_service_callback);
+      node_->CreateReader(channel_name_local,  motion_service_callback);
   // initialize motion buffer
   if (mot_buffer_ == nullptr) {
     mot_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
@@ -609,8 +610,8 @@ int LaneDetectionComponent::InternalProc(
 
   // Get sensor to world pose from TF
   Eigen::Affine3d camera2world_trans;
-  if (!camera2world_trans_wrapper_map_[camera_name]->GetSensor2worldTrans(
-          msg_timestamp, &camera2world_trans)) {
+  if (!camera2world_trans_wrapper_map_[camera_name]->
+      GetSensor2worldTrans(msg_timestamp, &camera2world_trans)) {
     std::string err_str = "failed to get camera to world pose, ts: " +
                           std::to_string(msg_timestamp) +
                           " camera_name: " + camera_name;
@@ -696,11 +697,9 @@ int LaneDetectionComponent::InternalProc(
   // send out lane message
   // TODO(yg13): add lanes in world coordinates
   std::shared_ptr<apollo::perception::PerceptionLanes>
-      lanes_msg(
-          new(std::nothrow) apollo::perception::PerceptionLanes);
+      lanes_msg(new(std::nothrow) apollo::perception::PerceptionLanes);
   if (MakeProtobufMsg(msg_timestamp, camera_name,
-                        camera_frame, lanes_msg.get())
-      != cyber::SUCC) {
+                      camera_frame, lanes_msg.get()) != cyber::SUCC) {
     AERROR << "make lanes_msg failed";
     return cyber::FAIL;
   }
@@ -710,55 +709,55 @@ int LaneDetectionComponent::InternalProc(
 }
 
 int LaneDetectionComponent::ConvertLaneToCameraLaneline(
-  const base::LaneLine& lane_line,
-  apollo::perception::camera::CameraLaneLine* camera_laneline) {
+    const base::LaneLine& lane_line,
+    apollo::perception::camera::CameraLaneLine* camera_laneline) {
   CHECK_NOTNULL(camera_laneline);
   // fill the lane line attribute
   apollo::perception::camera::LaneLineType line_type =
-    static_cast<apollo::perception::camera::LaneLineType>
-    (lane_line.type);
+      static_cast<apollo::perception::camera::LaneLineType>
+      (lane_line.type);
   camera_laneline->set_type(line_type);
   apollo::perception::camera::LaneLinePositionType pos_type =
-    static_cast<apollo::perception::camera::LaneLinePositionType>
-    (lane_line.pos_type);
+      static_cast<apollo::perception::camera::LaneLinePositionType>
+      (lane_line.pos_type);
   camera_laneline->set_pos_type(pos_type);
   camera_laneline->set_track_id(lane_line.track_id);
   camera_laneline->set_confidence(lane_line.confidence);
   apollo::perception::camera::LaneLineUseType use_type =
-    static_cast<apollo::perception::camera::LaneLineUseType>
-    (lane_line.use_type);
+      static_cast<apollo::perception::camera::LaneLineUseType>
+      (lane_line.use_type);
   camera_laneline->set_use_type(use_type);
   // fill the curve camera coord
   camera_laneline->mutable_curve_camera_coord()->set_longitude_min(
-    lane_line.curve_camera_coord.x_start);
+      lane_line.curve_camera_coord.x_start);
   camera_laneline->mutable_curve_camera_coord()->set_longitude_max(
-    lane_line.curve_camera_coord.x_end);
+      lane_line.curve_camera_coord.x_end);
   camera_laneline->mutable_curve_camera_coord()->set_a(
-    lane_line.curve_camera_coord.a);
+      lane_line.curve_camera_coord.a);
   camera_laneline->mutable_curve_camera_coord()->set_b(
-    lane_line.curve_camera_coord.b);
+      lane_line.curve_camera_coord.b);
   camera_laneline->mutable_curve_camera_coord()->set_c(
-    lane_line.curve_camera_coord.c);
+      lane_line.curve_camera_coord.c);
   camera_laneline->mutable_curve_camera_coord()->set_d(
-    lane_line.curve_camera_coord.d);
+      lane_line.curve_camera_coord.d);
   // fill the curve image coord
   camera_laneline->mutable_curve_image_coord()->set_longitude_min(
-    lane_line.curve_image_coord.x_start);
+      lane_line.curve_image_coord.x_start);
   camera_laneline->mutable_curve_image_coord()->set_longitude_max(
-    lane_line.curve_image_coord.x_end);
+      lane_line.curve_image_coord.x_end);
   camera_laneline->mutable_curve_image_coord()->set_a(
-    lane_line.curve_image_coord.a);
+      lane_line.curve_image_coord.a);
   camera_laneline->mutable_curve_image_coord()->set_b(
-    lane_line.curve_image_coord.b);
+      lane_line.curve_image_coord.b);
   camera_laneline->mutable_curve_image_coord()->set_c(
-    lane_line.curve_image_coord.c);
+      lane_line.curve_image_coord.c);
   camera_laneline->mutable_curve_image_coord()->set_d(
-    lane_line.curve_image_coord.d);
+      lane_line.curve_image_coord.d);
   // fill the curve image point set
   for (size_t i = 0; i < lane_line.curve_image_point_set.size(); i++) {
     const base::Point2DF& image_point2d = lane_line.curve_image_point_set[i];
     apollo::common::Point2D *lane_point_2d =
-      camera_laneline->add_curve_image_point_set();
+        camera_laneline->add_curve_image_point_set();
     lane_point_2d->set_x(image_point2d.x);
     lane_point_2d->set_y(image_point2d.y);
   }
@@ -766,7 +765,7 @@ int LaneDetectionComponent::ConvertLaneToCameraLaneline(
   for (size_t i = 0; i < lane_line.curve_camera_point_set.size(); i++) {
     const base::Point3DF& point3d = lane_line.curve_camera_point_set[i];
     apollo::common::Point3D *lane_point_3d =
-      camera_laneline->add_curve_camera_point_set();
+        camera_laneline->add_curve_camera_point_set();
     lane_point_3d->set_x(point3d.x);
     lane_point_3d->set_y(point3d.y);
     lane_point_3d->set_z(point3d.z);
@@ -775,7 +774,7 @@ int LaneDetectionComponent::ConvertLaneToCameraLaneline(
   for (size_t i = 0; i < lane_line.image_end_point_set.size(); i++) {
     const base::EndPoints& end_points = lane_line.image_end_point_set[i];
     apollo::perception::camera::EndPoints *lane_end_points =
-      camera_laneline->add_image_end_point_set();
+        camera_laneline->add_image_end_point_set();
     lane_end_points->mutable_start()->set_x(end_points.start.x);
     lane_end_points->mutable_start()->set_y(end_points.start.y);
     lane_end_points->mutable_end()->set_x(end_points.end.x);
@@ -789,7 +788,8 @@ int LaneDetectionComponent::MakeProtobufMsg(
     const camera::CameraFrame& camera_frame,
     apollo::perception::PerceptionLanes *lanes_msg) {
   CHECK_NOTNULL(lanes_msg);
-  auto itr = std::find(camera_names_.begin(), camera_names_.end(),
+  auto itr = std::find(camera_names_.begin(),
+                       camera_names_.end(),
                        camera_name);
   if (itr == camera_names_.end()) {
     AERROR << "invalid camera_name: " << camera_name;
@@ -802,9 +802,9 @@ int LaneDetectionComponent::MakeProtobufMsg(
   if (input_camera_channel_names_idx < 0 ||
       input_camera_channel_names_idx >= input_camera_channel_names_size) {
     AERROR << "invalid input_camera_channel_names_idx: "
-              << input_camera_channel_names_idx
-              << " input_camera_channel_names_.size(): "
-              << input_camera_channel_names_.size();
+           << input_camera_channel_names_idx
+           << " input_camera_channel_names_.size(): "
+           << input_camera_channel_names_.size();
     return cyber::FAIL;
   }
   std::string source_channel_name =

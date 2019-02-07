@@ -49,7 +49,7 @@ bool LaneCameraPerception::Init(
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
   CHECK(apollo::common::util::GetProtoFromFile(
-        config_file, &perception_param_)) << "Read config failed: ";
+      config_file, &perception_param_)) << "Read config failed: ";
   CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
   lane_calibration_working_sensor_name_ =
@@ -70,8 +70,7 @@ void LaneCameraPerception::InitLane(
     base::BaseCameraModelPtr &model,
     const app::PerceptionParam &perception_param) {
   // Init lane
-  CHECK(perception_param.has_lane_param())
-        << "Failed to include lane_param";
+  CHECK(perception_param.has_lane_param()) << "Failed to include lane_param";
   {
     //  initialize lane detector
     auto lane_param = perception_param.lane_param();
@@ -113,7 +112,7 @@ void LaneCameraPerception::InitLane(
         lane_postprocessor_param.config_file();
     lane_postprocessor_.reset(
         BaseLanePostprocessorRegisterer::GetInstanceByName(
-            lane_postprocessor_param.name()));
+        lane_postprocessor_param.name()));
     CHECK(lane_postprocessor_ != nullptr);
     CHECK(lane_postprocessor_->Init(postprocessor_init_options))
         << "Failed to init " << lane_postprocessor_param.name();
@@ -122,28 +121,28 @@ void LaneCameraPerception::InitLane(
 }
 
 void LaneCameraPerception::InitCalibrationService(
-            const std::string &work_root,
-            const base::BaseCameraModelPtr model,
-            const app::PerceptionParam &perception_param) {
+    const std::string &work_root,
+    const base::BaseCameraModelPtr model,
+    const app::PerceptionParam &perception_param) {
   // Init calibration service
   CHECK(perception_param.has_calibration_service_param())
       << "Failed to include calibration_service_param";
   {
     auto calibration_service_param =
-                      perception_param.calibration_service_param();
+        perception_param.calibration_service_param();
     CalibrationServiceInitOptions calibration_service_init_options;
-    calibration_service_init_options.calibrator_working_sensor_name
-                    = lane_calibration_working_sensor_name_;
+    calibration_service_init_options.calibrator_working_sensor_name =
+        lane_calibration_working_sensor_name_;
     calibration_service_init_options.name_intrinsic_map = name_intrinsic_map_;
     calibration_service_init_options.calibrator_method =
-                            calibration_service_param.calibrator_method();
+        calibration_service_param.calibrator_method();
     calibration_service_init_options.image_height =
-      static_cast<int>(model->get_height());
+        static_cast<int>(model->get_height());
     calibration_service_init_options.image_width =
-      static_cast<int>(model->get_width());
+        static_cast<int>(model->get_width());
     calibration_service_.reset(
-          BaseCalibrationServiceRegisterer::GetInstanceByName(
-                            calibration_service_param.plugin_param().name()));
+    BaseCalibrationServiceRegisterer::GetInstanceByName(
+        calibration_service_param.plugin_param().name()));
     CHECK(calibration_service_ != nullptr);
     CHECK(calibration_service_->Init(calibration_service_init_options))
         << "Failed to init " << calibration_service_param.plugin_param().name();
@@ -152,18 +151,18 @@ void LaneCameraPerception::InitCalibrationService(
 }
 
 void LaneCameraPerception::SetCameraHeightAndPitch(
-       const std::map<std::string, float> &name_camera_ground_height_map,
-       const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
-       const float &pitch_angle_calibrator_working_sensor) {
+    const std::map<std::string, float> name_camera_ground_height_map,
+    const std::map<std::string, float> name_camera_pitch_angle_diff_map,
+    const float &pitch_angle_calibrator_working_sensor) {
   CHECK(calibration_service_ != nullptr);
   calibration_service_->SetCameraHeightAndPitch(
-                                  name_camera_ground_height_map,
-                                  name_camera_pitch_angle_diff_map,
-                                  pitch_angle_calibrator_working_sensor);
+      name_camera_ground_height_map,
+      name_camera_pitch_angle_diff_map,
+      pitch_angle_calibrator_working_sensor);
 }
 
 bool LaneCameraPerception::GetCalibrationService(
-                 BaseCalibrationService** calibration_service) {
+    BaseCalibrationService** calibration_service) {
   *calibration_service = calibration_service_.get();
   return true;
 }

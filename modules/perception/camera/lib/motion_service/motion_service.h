@@ -53,12 +53,12 @@ class MotionService :
  private:
   void OnLocalization(const LocalizationMsgType &localization);
   void OnReceiveImage(
-    const ImageMsgType &message,
-    const std::string &camera_name);
+      const ImageMsgType &message,
+      const std::string &camera_name);
   void PublishEvent(const double timestamp);
   void ConvertVehicleMotionToMsgOut(
-        base::VehicleStatus vs,
-        apollo::perception::VehicleStatus *v_status_msg);
+      base::VehicleStatus vs,
+      apollo::perception::VehicleStatus *v_status_msg);
 
   PlaneMotion *vehicle_planemotion_ = nullptr;
   std::string device_id_;

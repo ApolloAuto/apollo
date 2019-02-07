@@ -169,16 +169,16 @@ class FusionCameraDetectionComponent :
   double ts_diff_ = 1.0;
 
   std::shared_ptr<apollo::cyber::Writer<
-        apollo::perception::PerceptionObstacles>> writer_;
+      apollo::perception::PerceptionObstacles>> writer_;
 
   std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>>
-        sensorframe_writer_;
+      sensorframe_writer_;
 
   std::shared_ptr<apollo::cyber::Writer<
-        CameraPerceptionVizMessage>> camera_viz_writer_;
+      CameraPerceptionVizMessage>> camera_viz_writer_;
 
   std::shared_ptr<apollo::cyber::Writer<
-        apollo::perception::camera::CameraDebug>> camera_debug_writer_;
+      apollo::perception::camera::CameraDebug>> camera_debug_writer_;
 
   camera::Visualizer visualize_;
   bool write_visual_img_;

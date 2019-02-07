@@ -62,46 +62,44 @@ bool MotionService::Init() {
   const std::string &channel_name_img = input_camera_channel_names_[0];
   const std::string &camera_name = camera_names_[0];
   std::function<void(const ImageMsgType &)> camera_callback =
-        std::bind(&MotionService::OnReceiveImage, this,
-                  std::placeholders::_1, camera_name);
+      std::bind(&MotionService::OnReceiveImage, this,
+      std::placeholders::_1, camera_name);
   auto camera_reader =
       node_->CreateReader(channel_name_img, camera_callback);
 
   // initialize localization listener
   const std::string &channel_name_local =
-                  motion_service_param.input_localization_channel_name();
-  std::function<void(const LocalizationMsgType &)> localization_callback =
-        std::bind(&MotionService::OnLocalization, this,
-                  std::placeholders::_1);
+      motion_service_param.input_localization_channel_name();
+  std::function<void(const LocalizationMsgType &)>
+      localization_callback = std::bind(&MotionService::OnLocalization,
+      this, std::placeholders::_1);
   auto localization_reader =
       node_->CreateReader(channel_name_local, localization_callback);
 
   // initialize writer to output channel
   writer_ = node_->CreateWriter<Motion_Service>(
-                    motion_service_param.output_topic_channel_name());
+      motion_service_param.output_topic_channel_name());
   AINFO << "init MotionService success.";
   return true;
 }
 
 // On receiving image input, just need to record its timestamp
 void MotionService::OnReceiveImage(
-    const ImageMsgType &message,
-    const std::string &camera_name) {
+    const ImageMsgType &message, const std::string &camera_name) {
   std::lock_guard<std::mutex> lock(mutex_);
   const double curr_timestamp = message->measurement_time() + timestamp_offset_;
   ADEBUG << "image received: "
-        << " camera_name: " << camera_name
-        << " image ts: " + std::to_string(curr_timestamp);
+         << " camera_name: " << camera_name
+         << " image ts: " + std::to_string(curr_timestamp);
   camera_timestamp_ = curr_timestamp;
 }
 
 // On reveiving localization input, register it to camera timestamp,
 // compute motion between camera time stamps
-void MotionService::OnLocalization(
-    const LocalizationMsgType &message) {
+void MotionService::OnLocalization(const LocalizationMsgType &message) {
   std::lock_guard<std::mutex> lock(mutex_);
   ADEBUG << "localization received: "
-        << " localization ts: " + std::to_string(message->measurement_time());
+         << " localization ts: " + std::to_string(message->measurement_time());
   const auto& velocity = message->pose().linear_velocity();
   // Get base::VehicleStatus
   base::VehicleStatus vehicle_status;
@@ -140,7 +138,7 @@ void MotionService::OnLocalization(
   double camera_timestamp = 0;
   camera_timestamp = camera_timestamp_;
   ADEBUG << "motion processed for camera timestamp: "
-        << std::to_string(camera_timestamp);
+         << std::to_string(camera_timestamp);
 
   if (start_flag_) {
     if (std::abs(camera_timestamp - pre_camera_timestamp_) <
@@ -190,8 +188,8 @@ void MotionService::PublishEvent(const double timestamp) {
 
 // convert vehicle status buffer to output message
 void MotionService::ConvertVehicleMotionToMsgOut(
-      base::VehicleStatus vs,
-      apollo::perception::VehicleStatus *v_status_msg) {
+    base::VehicleStatus vs,
+    apollo::perception::VehicleStatus *v_status_msg) {
   v_status_msg -> set_roll_rate(vs.roll_rate);
   v_status_msg -> set_pitch_rate(vs.pitch_rate);
   v_status_msg -> set_yaw_rate(vs.yaw_rate);
@@ -233,8 +231,8 @@ double MotionService::GetLatestTimestamp() {
 }
 
 // retrieve vehiclestattus at the closeset cameratimestamp
-bool MotionService::GetMotionInformation(double timestamp,
-                                   base::VehicleStatus* vs) {
+bool MotionService::GetMotionInformation(
+    double timestamp, base::VehicleStatus* vs) {
   return vehicle_planemotion_->find_motion_with_timestamp(timestamp, vs);
 }
 
