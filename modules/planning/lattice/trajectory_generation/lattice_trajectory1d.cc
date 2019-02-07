@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/trajectory1d/lattice_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/lattice_trajectory1d.h"
 
 #include "cyber/common/log.h"
 

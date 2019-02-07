@@ -19,7 +19,7 @@
  **/
 
 
-#include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
+#include "modules/planning/common/trajectory1d/constant_jerk_trajectory1d.h"
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
