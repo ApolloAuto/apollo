@@ -494,6 +494,4 @@ DEFINE_bool(enable_derivative_check, false,
             "True to enable derivative check inside open space planner.");
 DEFINE_bool(enable_hand_derivative, false,
     "True to enable hand derived derivative inside open space planner.");
-DEFINE_bool(enable_constraints_check, false,
-    "True to enable constraint checking inside open space planner smoother.");
 

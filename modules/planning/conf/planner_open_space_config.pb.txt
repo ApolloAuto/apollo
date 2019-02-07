@@ -66,6 +66,7 @@ distance_approach_config {
     ipopt_alpha_for_y: "min"
     ipopt_recalc_y: "yes"
   }
+  enable_constraint_check: false
 }
 trajectory_partition_config {
   interpolated_pieces_num: 50
