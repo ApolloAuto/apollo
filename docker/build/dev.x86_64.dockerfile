@@ -51,6 +51,7 @@ RUN bash /tmp/installers/install_conda.sh
 RUN bash /tmp/installers/install_gflags_glog.sh
 RUN bash /tmp/installers/install_glew.sh
 RUN bash /tmp/installers/install_gpu_caffe.sh
+RUN bash /tmp/installers/install_fast_rtps.sh
 RUN bash /tmp/installers/install_ipopt.sh
 RUN bash /tmp/installers/install_osqp.sh
 RUN bash /tmp/installers/install_libjsonrpc-cpp.sh
