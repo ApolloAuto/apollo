@@ -65,21 +65,4 @@ cc_test(
     ],
 )
 
-cc_library(
-    name = "trajectory_stitcher",
-    srcs = [
-        "trajectory_stitcher.cc",
-    ],
-    hdrs = [
-        "trajectory_stitcher.h",
-    ],
-    deps = [
-        ":publishable_trajectory",
-        "//cyber/common:log",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/reference_line",
-    ],
-)
-
 cpplint()

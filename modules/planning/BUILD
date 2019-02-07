@@ -60,7 +60,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common/trajectory:trajectory_stitcher",
+        "//modules/planning/common:trajectory_stitcher",
         "//modules/planning/planner",
         "//modules/planning/planner:planner_dispatcher",
         "//modules/planning/proto:planning_config_proto",
