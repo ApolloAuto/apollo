@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/lattice/trajectory1d/piecewise_acceleration_trajectory1d.h"
+#include "modules/planning/common/trajectory1d/piecewise_acceleration_trajectory1d.h"
 
 #include <algorithm>
 

@@ -62,20 +62,6 @@ cc_library(
 )
 
 cc_library(
-    name = "lattice_trajectory1d",
-    srcs = [
-        "lattice_trajectory1d.cc",
-    ],
-    hdrs = [
-        "lattice_trajectory1d.h",
-    ],
-    deps = [
-        "//cyber/common:log",
-        "//modules/planning/math/curve1d",
-    ],
-)
-
-cc_library(
     name = "constant_jerk_trajectory1d",
     srcs = [
         "constant_jerk_trajectory1d.cc",
