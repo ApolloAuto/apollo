@@ -71,15 +71,14 @@ void LaneCameraPerception::InitLane(
     const app::PerceptionParam &perception_param) {
   // Init lane
   CHECK(perception_param.has_lane_param())
-  << "Failed to include lane_param";
+        << "Failed to include lane_param";
   {
     //  initialize lane detector
     auto lane_param = perception_param.lane_param();
     CHECK(lane_param.has_lane_detector_param())
-    << "Failed to include lane_detector_param";
+        << "Failed to include lane_detector_param";
     LaneDetectorInitOptions lane_detector_init_options;
-    auto lane_detector_param =
-        lane_param.lane_detector_param();
+    auto lane_detector_param = lane_param.lane_detector_param();
     auto lane_detector_plugin_param = lane_detector_param.plugin_param();
     lane_detector_init_options.conf_file =
         lane_detector_plugin_param.config_file();
@@ -87,7 +86,7 @@ void LaneCameraPerception::InitLane(
         GetAbsolutePath(work_root, lane_detector_plugin_param.root_dir());
     lane_detector_init_options.gpu_id = perception_param_.gpu_id();
     model = common::SensorManager::Instance()->GetUndistortCameraModel(
-            lane_detector_param.camera_name());
+        lane_detector_param.camera_name());
     auto pinhole = static_cast<base::PinholeCameraModel *> (model.get());
     name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
         lane_detector_param.camera_name(), pinhole->get_intrinsic_params()));
@@ -97,7 +96,7 @@ void LaneCameraPerception::InitLane(
         lane_detector_plugin_param.name()));
     CHECK(lane_detector_ != nullptr);
     CHECK(lane_detector_->Init(lane_detector_init_options))
-    << "Failed to init " << lane_detector_plugin_param.name();
+        << "Failed to init " << lane_detector_plugin_param.name();
     AINFO << "detector: " << lane_detector_->Name();
 
     //  initialize lane postprocessor
@@ -117,7 +116,7 @@ void LaneCameraPerception::InitLane(
             lane_postprocessor_param.name()));
     CHECK(lane_postprocessor_ != nullptr);
     CHECK(lane_postprocessor_->Init(postprocessor_init_options))
-    << "Failed to init " << lane_postprocessor_param.name();
+        << "Failed to init " << lane_postprocessor_param.name();
     AINFO << "lane_postprocessor: " << lane_postprocessor_->Name();
   }
 }
@@ -128,7 +127,7 @@ void LaneCameraPerception::InitCalibrationService(
             const app::PerceptionParam &perception_param) {
   // Init calibration service
   CHECK(perception_param.has_calibration_service_param())
-  << "Failed to include calibration_service_param";
+      << "Failed to include calibration_service_param";
   {
     auto calibration_service_param =
                       perception_param.calibration_service_param();
@@ -147,7 +146,7 @@ void LaneCameraPerception::InitCalibrationService(
                             calibration_service_param.plugin_param().name()));
     CHECK(calibration_service_ != nullptr);
     CHECK(calibration_service_->Init(calibration_service_init_options))
-    << "Failed to init " << calibration_service_param.plugin_param().name();
+        << "Failed to init " << calibration_service_param.plugin_param().name();
     AINFO << "calibration_service:: " << calibration_service_->Name();
   }
 }

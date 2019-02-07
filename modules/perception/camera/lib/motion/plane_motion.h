@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_PLANE_MOTION_H_
-#define MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_PLANE_MOTION_H_
+#pragma once
 
 #include <cmath>
 #include <cstdio>
@@ -88,6 +87,3 @@ class PlaneMotion {
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo
-
-#endif  // MODULES_PERCEPTION_OBSTACLE_CAMERA_MOTION_PLANE_MOTION_H_
-

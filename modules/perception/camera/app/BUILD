@@ -97,7 +97,7 @@ cc_library(
         "lane_camera_perception.h",
     ],
     deps = [
-	":camera_app_lib_proto",
+	    ":camera_app_lib_proto",
         ":debug_info",
         "//cyber",
         "//external:gflags",

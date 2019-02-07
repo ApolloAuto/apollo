@@ -14,6 +14,7 @@
 * limitations under the License.
 *****************************************************************************/
 #pragma once
+
 #include <opencv2/opencv.hpp>
 #include <map>
 #include <string>

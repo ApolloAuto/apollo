@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
  *****************************************************************************/
 
 #include "modules/perception/camera/lib/motion/plane_motion.h"
+
 #include <limits>
 #include <list>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -94,7 +96,8 @@ void PlaneMotion::generate_motion_matrix(base::VehicleStatus *vehicledata) {
   }
 }
 
-void PlaneMotion::accumulate_motion(double start_time, double end_time) {
+void PlaneMotion::accumulate_motion(const double start_time,
+                                    const double end_time) {
   // accumulate CAN+IMU / Localization motion
   auto iter = raw_motion_queue_.begin();
   for (; iter != raw_motion_queue_.end() && iter->time_ts <= end_time; ++iter) {
