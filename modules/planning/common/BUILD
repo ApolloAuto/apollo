@@ -458,25 +458,6 @@ cc_library(
 )
 
 cc_library(
-    name = "distance_estimator",
-    srcs = [
-        "distance_estimator.cc",
-    ],
-    hdrs = [
-        "distance_estimator.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        "//modules/common/configs:vehicle_config_helper",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/map/pnc_map:route_segments",
-        "//modules/planning/common/path:path_data",
-    ],
-)
-
-cc_library(
     name = "trajectory_stitcher",
     srcs = [
         "trajectory_stitcher.cc",
