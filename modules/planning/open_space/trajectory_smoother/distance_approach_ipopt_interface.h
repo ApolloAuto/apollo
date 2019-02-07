@@ -158,6 +158,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd last_time_u_;
   std::vector<double> XYbounds_;
 
+  // debug flag
+  bool enable_constraint_check_;
+
   // penalty
   double weight_state_x_ = 0.0;
   double weight_state_y_ = 0.0;

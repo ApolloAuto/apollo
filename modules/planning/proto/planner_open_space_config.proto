@@ -74,6 +74,7 @@ message DistanceApproachConfig {
   optional double max_time_sample_scaling = 19 [default = 10.0];
   optional bool use_fix_time = 20 [default = false];
   optional IpoptConfig ipopt_config = 21;
+  optional bool enable_constraint_check = 22;
 }
 
 message IpoptConfig {
