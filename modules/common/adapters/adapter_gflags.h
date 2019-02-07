@@ -44,6 +44,7 @@ DECLARE_string(traffic_light_detection_topic);
 DECLARE_string(perception_lane_mask_segmentation_topic);
 DECLARE_string(routing_request_topic);
 DECLARE_string(routing_response_topic);
+DECLARE_string(routing_response_history_topic);
 DECLARE_string(relative_odometry_topic);
 DECLARE_string(ins_stat_topic);
 DECLARE_string(ins_status_topic);
