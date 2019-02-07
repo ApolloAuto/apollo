@@ -106,6 +106,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       vehicle_param_.max_steer_angle_rate() / vehicle_param_.steer_ratio();
   use_fix_time_ = distance_approach_config_.use_fix_time();
   wheelbase_ = vehicle_param_.wheel_base();
+  enable_constraint_check_ =
+      distance_approach_config_.enable_constraint_check();
 }
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
@@ -412,7 +414,8 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
 
   // 2. time scale variable initialization, horizon_ + 1
   for (int i = 0; i < horizon_ + 1; ++i) {
-    x[time_start_index_ + i] = 0.5;
+    x[time_start_index_ + i] = 0.5 * (
+      min_time_sample_scaling_ + max_time_sample_scaling_);
   }
 
   // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
@@ -547,7 +550,7 @@ bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
   eval_constraints(n, x, m, g);
-  if (FLAGS_enable_constraints_check) check_g(n, x, m, g);
+  if (enable_constraint_check_) check_g(n, x, m, g);
   return true;
 }
 

@@ -257,4 +257,3 @@ DECLARE_bool(enable_parallel_hybrid_a);
 DECLARE_bool(enable_parallel_open_space_smoother);
 DECLARE_bool(enable_derivative_check);
 DECLARE_bool(enable_hand_derivative);
-DECLARE_bool(enable_constraints_check);
