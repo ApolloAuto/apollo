@@ -29,7 +29,7 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"

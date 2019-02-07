@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
 
 #include <algorithm>
 

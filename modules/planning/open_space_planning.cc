@@ -35,7 +35,7 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
 #include "modules/planning/util/util.h"
 
 namespace apollo {
