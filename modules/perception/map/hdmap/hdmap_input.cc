@@ -164,7 +164,7 @@ void HDMapInput::MergeBoundaryJunction(
   int polygons_index = 0;
   // merege boundary
   PointDCloudPtr temp_cloud = base::PointDCloudPool::Instance().Get();
-  for (int step, i = 0; i < polygon_size; i++) {
+  for (int step = 0, i = 0; i < polygon_size; i++) {
     temp_cloud->clear();
     const LineBoundary& left_boundary = boundary[i]->left_boundary;
     const std::vector<apollo::common::PointENU>& left_line_points =
