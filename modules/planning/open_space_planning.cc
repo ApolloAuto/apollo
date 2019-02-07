@@ -585,10 +585,6 @@ void OpenSpacePlanning::FillPlanningPb(const double timestamp,
   ptr_trajectory_pb->mutable_routing_header()->CopyFrom(
       local_view_.routing->header());
 
-  if (FLAGS_use_planning_fallback &&
-      ptr_trajectory_pb->trajectory_point_size() == 0) {
-    SetFallbackTrajectory(ptr_trajectory_pb);
-  }
   const double dt = timestamp - Clock::NowInSeconds();
   for (auto& p : *ptr_trajectory_pb->mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() - dt);
