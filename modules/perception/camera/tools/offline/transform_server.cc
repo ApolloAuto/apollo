@@ -195,8 +195,7 @@ bool TransformServer::QueryTransform(const std::string &child_frame_id,
     visited[item] = false;
   }
 
-  bool bfound = FindTransform(child_frame_id, frame_id, transform, &visited);
-  return bfound;
+  return FindTransform(child_frame_id, frame_id, transform, &visited);
 }
 
 bool TransformServer::FindTransform(const std::string &child_frame_id,
