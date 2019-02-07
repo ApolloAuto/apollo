@@ -16,10 +16,10 @@
 
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 
+#include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/message_util.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -179,7 +179,7 @@ HMIConfig HMIWorker::LoadConfig() {
 
 HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
   HMIMode mode;
-  CHECK(common::util::GetProtoFromFile(mode_config_path, &mode))
+  CHECK(cyber::common::GetProtoFromFile(mode_config_path, &mode))
       << "Unable to parse HMIMode from file " << mode_config_path;
   // Translate cyber_modules to regular modules.
   for (const auto& iter : mode.cyber_modules()) {
