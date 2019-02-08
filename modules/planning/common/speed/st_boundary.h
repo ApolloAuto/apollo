@@ -21,6 +21,7 @@
 #pragma once
 
 #include <limits>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -37,34 +38,42 @@
 namespace apollo {
 namespace planning {
 
-class StBoundary : public common::math::Polygon2d {
+class STBoundary : public common::math::Polygon2d {
  public:
-  StBoundary() = default;
+  STBoundary() = default;
 
-  explicit StBoundary(
+  explicit STBoundary(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs);
 
-  explicit StBoundary(const common::math::Box2d& box) = delete;
-  explicit StBoundary(std::vector<common::math::Vec2d> points) = delete;
+  explicit STBoundary(const common::math::Box2d& box) = delete;
 
-  ~StBoundary() = default;
+  explicit STBoundary(std::vector<common::math::Vec2d> points) = delete;
+
+  static STBoundary CreateInstance(
+      const std::vector<STPoint>& lower_points,
+      const std::vector<STPoint>& upper_points);
+
+  static std::unique_ptr<STBoundary> CreateInstance(
+      const std::vector<std::pair<STPoint, STPoint>>& point_pairs);
+
+  ~STBoundary() = default;
 
   bool IsEmpty() const { return lower_points_.empty(); }
   bool IsPointInBoundary(const STPoint& st_point) const;
 
-  STPoint UpperLeftPoint() const;
-  STPoint UpperRightPoint() const;
+  STPoint upper_left_point() const;
+  STPoint upper_right_point() const;
 
-  STPoint BottomLeftPoint() const;
-  STPoint BottomRightPoint() const;
+  STPoint bottom_left_point() const;
+  STPoint bottom_right_point() const;
 
   void set_upper_left_point(STPoint st_point);
   void set_upper_right_point(STPoint st_point);
   void set_bottom_left_point(STPoint st_point);
   void set_bottom_right_point(STPoint st_point);
 
-  StBoundary ExpandByS(const double s) const;
-  StBoundary ExpandByT(const double t) const;
+  STBoundary ExpandByS(const double s) const;
+  STBoundary ExpandByT(const double t) const;
 
   // if you need to add boundary type, make sure you modify
   // GetUnblockSRange accordingly.
@@ -103,11 +112,7 @@ class StBoundary : public common::math::Polygon2d {
   std::vector<STPoint> upper_points() const { return upper_points_; }
   std::vector<STPoint> lower_points() const { return lower_points_; }
 
-  static StBoundary GenerateStBoundary(
-      const std::vector<STPoint>& lower_points,
-      const std::vector<STPoint>& upper_points);
-
-  StBoundary CutOffByT(const double t) const;
+  STBoundary CutOffByT(const double t) const;
 
  private:
   bool IsValid(
@@ -134,7 +139,6 @@ class StBoundary : public common::math::Polygon2d {
 
   std::string id_;
   double characteristic_length_ = 1.0;
-  double s_high_limit_ = 200.0;
   double min_s_ = std::numeric_limits<double>::max();
   double max_s_ = std::numeric_limits<double>::lowest();
   double min_t_ = std::numeric_limits<double>::max();

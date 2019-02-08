@@ -176,7 +176,7 @@ bool KeepClear::BuildKeepClearObstacle(
     return false;
   }
   path_obstacle->SetReferenceLineStBoundaryType(
-      StBoundary::BoundaryType::KEEP_CLEAR);
+      STBoundary::BoundaryType::KEEP_CLEAR);
 
   return true;
 }
