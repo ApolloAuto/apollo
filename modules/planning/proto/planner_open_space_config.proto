@@ -75,6 +75,10 @@ message DistanceApproachConfig {
   optional bool use_fix_time = 20 [default = false];
   optional IpoptConfig ipopt_config = 21;
   optional bool enable_constraint_check = 22;
+  optional bool enable_hand_derivative = 23;
+  // True to enable hand derived derivative inside open space planner
+  optional bool enable_derivative_check = 24;
+  // True to enable derivative check inside open space planner
 }
 
 message IpoptConfig {
@@ -90,6 +94,8 @@ message IpoptConfig {
   optional string ipopt_print_timing_statistics = 9;
   optional string ipopt_alpha_for_y = 10;
   optional string ipopt_recalc_y = 11;
+  optional double ipopt_mu_init = 12 [default = 0.1];
+  // ipopt barrier parameter, default 0.1
 }
 
 message TrajectoryPartitionConfig {
