@@ -27,9 +27,9 @@
 namespace apollo {
 namespace planning {
 
-class ReferenceLineDecider : public Decider {
+class PathBoundsDecider : public Decider {
  public:
-  explicit ReferenceLineDecider(const TaskConfig& config);
+  explicit PathBoundsDecider(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(
