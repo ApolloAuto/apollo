@@ -29,6 +29,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/planning/proto:planning_proto",
         "@gtest",
+        "//modules/planning/common:planning_gflags",
     ],
 )
 

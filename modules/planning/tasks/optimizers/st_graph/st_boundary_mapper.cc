@@ -300,8 +300,8 @@ bool StBoundaryMapper::MapStopDecision(
   point_pairs.emplace_back(
       STPoint(s_min, planning_time_),
       STPoint(s_max + st_boundary_config_.boundary_buffer(), planning_time_));
-  auto boundary = StBoundary(point_pairs);
-  boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
+  auto boundary = STBoundary(point_pairs);
+  boundary.SetBoundaryType(STBoundary::BoundaryType::STOP);
   boundary.SetCharacteristicLength(st_boundary_config_.boundary_buffer());
   boundary.set_id(stop_obstacle->Id());
   stop_obstacle->SetStBoundary(boundary);
@@ -317,7 +317,7 @@ Status StBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
     return Status::OK();
   }
 
-  auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+  auto boundary = STBoundary::CreateInstance(lower_points, upper_points)
                       .ExpandByS(boundary_s_buffer)
                       .ExpandByT(boundary_t_buffer);
   boundary.set_id(obstacle->Id());
@@ -496,24 +496,24 @@ Status StBoundaryMapper::MapWithDecision(
     lower_points.emplace_back(extend_lower_s, planning_time_);
   }
 
-  auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+  auto boundary = STBoundary::CreateInstance(lower_points, upper_points)
                       .ExpandByS(boundary_s_buffer)
                       .ExpandByT(boundary_t_buffer);
 
   // get characteristic_length and boundary_type.
-  StBoundary::BoundaryType b_type = StBoundary::BoundaryType::UNKNOWN;
+  STBoundary::BoundaryType b_type = STBoundary::BoundaryType::UNKNOWN;
   double characteristic_length = 0.0;
   if (decision.has_follow()) {
     characteristic_length = std::fabs(decision.follow().distance_s());
-    b_type = StBoundary::BoundaryType::FOLLOW;
+    b_type = STBoundary::BoundaryType::FOLLOW;
   } else if (decision.has_yield()) {
     characteristic_length = std::fabs(decision.yield().distance_s());
-    boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+    boundary = STBoundary::CreateInstance(lower_points, upper_points)
                    .ExpandByS(characteristic_length);
-    b_type = StBoundary::BoundaryType::YIELD;
+    b_type = STBoundary::BoundaryType::YIELD;
   } else if (decision.has_overtake()) {
     characteristic_length = std::fabs(decision.overtake().distance_s());
-    b_type = StBoundary::BoundaryType::OVERTAKE;
+    b_type = STBoundary::BoundaryType::OVERTAKE;
   } else {
     DCHECK(false) << "Obj decision should be either yield or overtake: "
                   << decision.DebugString();

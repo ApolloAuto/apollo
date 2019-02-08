@@ -89,7 +89,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                   "Mapping obstacle for qp st speed optimizer failed!");
   }
 
-  std::vector<const StBoundary*> boundaries;
+  std::vector<const STBoundary*> boundaries;
   for (auto* obstacle : path_decision->obstacles().Items()) {
     auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {
