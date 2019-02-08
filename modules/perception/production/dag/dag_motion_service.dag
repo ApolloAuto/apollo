@@ -1,0 +1,11 @@
+module_config {
+  module_library : "/apollo/bazel-bin/modules/perception/camera/lib/motion_service/libmotion_service.so"
+  components {
+    class_name : "MotionService"
+    config {
+    name : "camera_motionService"
+    config_file_path : "/apollo/modules/perception/production/conf/perception/camera/motion_service.config"
+    flag_file_path: "/apollo/modules/perception/production/conf/perception/perception_common.flag"
+    }
+  }
+}
