@@ -10,6 +10,7 @@ cc_library(
         "decider_rule_based_stop.cc",
         "side_pass_path_decider.cc",
         "side_pass_safety.cc",
+        "reference_line_decider.cc",
     ],
     hdrs = [
         "decider.h",
@@ -17,6 +18,7 @@ cc_library(
         "decider_rule_based_stop.h",
         "side_pass_path_decider.h",
         "side_pass_safety.h",
+        "reference_line_decider.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
