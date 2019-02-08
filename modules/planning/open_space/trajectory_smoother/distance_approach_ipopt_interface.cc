@@ -17,7 +17,6 @@
 /*
  * @file
  */
-
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 
 namespace apollo {
@@ -2384,6 +2383,62 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   *time_result = time_result_;
   *dual_l_result = dual_l_result_;
   *dual_n_result = dual_n_result_;
+
+  if (!distance_approach_config_.enable_initial_final_check()) return;
+  CHECK_EQ(state_result_.cols(), xWS_.cols());
+  CHECK_EQ(state_result_.rows(), xWS_.rows());
+  double state_diff_max = 0.0;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      state_diff_max = std::max(std::abs(
+        xWS_(j, i) - state_result_(j, i)),
+        state_diff_max);
+    }
+  }
+
+  // 2. control variable initialization, 2 * horizon_
+  // CHECK_EQ(control_result_.cols(), uWS_.cols());
+  CHECK_EQ(control_result_.rows(), uWS_.rows());
+  double control_diff_max = 0.0;
+  for (int i = 0; i < horizon_; ++i) {
+    control_diff_max = std::max(std::abs(
+      uWS_(0, i) - control_result_(0, i)),
+      control_diff_max);
+    control_diff_max = std::max(std::abs(
+      uWS_(1, i) - control_result_(1, i)),
+      control_diff_max);
+  }
+
+  // 2. time scale variable initialization, horizon_ + 1, no
+
+  // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
+  CHECK_EQ(dual_l_result_.cols(), l_warm_up_.cols());
+  CHECK_EQ(dual_l_result_.rows(), l_warm_up_.rows());
+  double l_diff_max = 0.0;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_edges_sum_; ++j) {
+      l_diff_max = std::max(std::abs(
+        l_warm_up_(j, i) - dual_l_result_(j, i)),
+        l_diff_max);
+    }
+  }
+
+  // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
+  CHECK_EQ(n_warm_up_.cols(), dual_n_result_.cols());
+  CHECK_EQ(n_warm_up_.rows(), dual_n_result_.rows());
+  double n_diff_max = 0.0;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < 4 * obstacles_num_; ++j) {
+       n_diff_max = std::max(std::abs(
+         n_warm_up_(j, i) - dual_n_result_(j, i)),
+         n_diff_max);
+    }
+  }
+
+  AINFO << "state_diff_max: " << state_diff_max;
+  AINFO << "control_diff_max: " << control_diff_max;
+  AINFO << "dual_l_diff_max: " << l_diff_max;
+  AINFO << "dual_n_diff_max: " << n_diff_max;
 }
 
 //***************    start ADOL-C part ***********************************
