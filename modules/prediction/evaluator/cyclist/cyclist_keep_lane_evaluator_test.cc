@@ -28,7 +28,7 @@ class CyclistKeepLaneEvaluatorTest : public KMLMapBasedTest {
   void SetUp() override {
     std::string file =
         "modules/prediction/testdata/single_perception_cyclist_onlane.pb.txt";
-    CHECK(apollo::cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:

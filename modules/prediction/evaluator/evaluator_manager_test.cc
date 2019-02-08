@@ -31,7 +31,7 @@ class EvaluatorManagerTest : public KMLMapBasedTest {
   virtual void SetUp() {
     std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    CHECK(apollo::cyber::common::GetProtoFromFile(file, &perception_obstacles_));
+    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:
