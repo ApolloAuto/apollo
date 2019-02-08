@@ -123,7 +123,7 @@ Status QpPiecewiseStGraph::Search(
 
 Status QpPiecewiseStGraph::AddConstraint(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-    const std::vector<const StBoundary*>& boundaries,
+    const std::vector<const STBoundary*>& boundaries,
     const std::pair<double, double>& accel_bound) {
   auto* constraint = generator_->mutable_constraint();
   // position, velocity, acceleration
@@ -212,7 +212,7 @@ Status QpPiecewiseStGraph::AddConstraint(
 }
 
 Status QpPiecewiseStGraph::AddKernel(
-    const std::vector<const StBoundary*>& boundaries,
+    const std::vector<const STBoundary*>& boundaries,
     const SpeedLimit& speed_limit) {
   auto* kernel = generator_->mutable_kernel();
   DCHECK_NOTNULL(kernel);
@@ -284,7 +284,7 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
 }
 
 Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
-    const std::vector<const StBoundary*>& boundaries, const double weight) {
+    const std::vector<const STBoundary*>& boundaries, const double weight) {
   auto* follow_kernel = generator_->mutable_kernel();
   std::vector<double> ref_s;
   std::vector<double> filtered_evaluate_t;
@@ -294,7 +294,7 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
     double s_min = std::numeric_limits<double>::infinity();
     bool success = false;
     for (const auto* boundary : boundaries) {
-      if (boundary->boundary_type() != StBoundary::BoundaryType::FOLLOW) {
+      if (boundary->boundary_type() != STBoundary::BoundaryType::FOLLOW) {
         continue;
       }
       if (curr_t < boundary->min_t() || curr_t > boundary->max_t()) {
@@ -336,12 +336,12 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
 }
 
 Status QpPiecewiseStGraph::GetSConstraintByTime(
-    const std::vector<const StBoundary*>& boundaries, const double time,
+    const std::vector<const STBoundary*>& boundaries, const double time,
     const double total_path_s, double* const s_upper_bound,
     double* const s_lower_bound) const {
   *s_upper_bound = total_path_s;
 
-  for (const StBoundary* boundary : boundaries) {
+  for (const STBoundary* boundary : boundaries) {
     double s_upper = 0.0;
     double s_lower = 0.0;
 
@@ -349,12 +349,12 @@ Status QpPiecewiseStGraph::GetSConstraintByTime(
       continue;
     }
 
-    if (boundary->boundary_type() == StBoundary::BoundaryType::STOP ||
-        boundary->boundary_type() == StBoundary::BoundaryType::FOLLOW ||
-        boundary->boundary_type() == StBoundary::BoundaryType::YIELD) {
+    if (boundary->boundary_type() == STBoundary::BoundaryType::STOP ||
+        boundary->boundary_type() == STBoundary::BoundaryType::FOLLOW ||
+        boundary->boundary_type() == STBoundary::BoundaryType::YIELD) {
       *s_upper_bound = std::fmin(*s_upper_bound, s_upper);
     } else {
-      DCHECK(boundary->boundary_type() == StBoundary::BoundaryType::OVERTAKE);
+      DCHECK(boundary->boundary_type() == STBoundary::BoundaryType::OVERTAKE);
       *s_lower_bound = std::fmax(*s_lower_bound, s_lower);
     }
   }

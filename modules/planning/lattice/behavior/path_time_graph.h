@@ -47,10 +47,10 @@ class PathTimeGraph {
                 const double s_start, const double s_end, const double t_start,
                 const double t_end, const std::array<double, 3>& init_d);
 
-  const std::vector<StBoundary>& GetPathTimeObstacles() const;
+  const std::vector<STBoundary>& GetPathTimeObstacles() const;
 
   bool GetPathTimeObstacle(const std::string& obstacle_id,
-      StBoundary* path_time_obstacle);
+      STBoundary* path_time_obstacle);
 
   std::vector<std::pair<double, double>> GetPathBlockingIntervals(
       const double t) const;
@@ -102,8 +102,8 @@ class PathTimeGraph {
   const ReferenceLineInfo* ptr_reference_line_info_;
   std::array<double, 3> init_d_;
 
-  std::unordered_map<std::string, StBoundary> path_time_obstacle_map_;
-  std::vector<StBoundary> path_time_obstacles_;
+  std::unordered_map<std::string, STBoundary> path_time_obstacle_map_;
+  std::vector<STBoundary> path_time_obstacles_;
   std::vector<SLBoundary> static_obs_sl_boundaries_;
 };
 

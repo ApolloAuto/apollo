@@ -38,10 +38,10 @@ TEST(StBoundaryTest, basic_test) {
   point_pairs.emplace_back(lower_points[0], upper_points[0]);
   point_pairs.emplace_back(lower_points[1], upper_points[1]);
 
-  StBoundary boundary(point_pairs);
+  STBoundary boundary(point_pairs);
 
   EXPECT_EQ(boundary.id(), "");
-  EXPECT_EQ(boundary.boundary_type(), StBoundary::BoundaryType::UNKNOWN);
+  EXPECT_EQ(boundary.boundary_type(), STBoundary::BoundaryType::UNKNOWN);
   EXPECT_DOUBLE_EQ(0.0, boundary.min_s());
   EXPECT_DOUBLE_EQ(5.0, boundary.max_s());
   EXPECT_DOUBLE_EQ(0.0, boundary.min_t());
@@ -62,9 +62,9 @@ TEST(StBoundaryTest, boundary_range) {
   point_pairs.emplace_back(lower_points[0], upper_points[0]);
   point_pairs.emplace_back(lower_points[1], upper_points[1]);
 
-  StBoundary boundary(point_pairs);
+  STBoundary boundary(point_pairs);
 
-  boundary.SetBoundaryType(StBoundary::BoundaryType::YIELD);
+  boundary.SetBoundaryType(STBoundary::BoundaryType::YIELD);
   double t = -10.0;
   const double dt = 0.01;
   while (t < 10.0) {
@@ -103,7 +103,7 @@ TEST(StBoundaryTest, get_index_range) {
   point_pairs.emplace_back(lower_points[0], upper_points[0]);
   point_pairs.emplace_back(lower_points[1], upper_points[1]);
 
-  StBoundary boundary(point_pairs);
+  STBoundary boundary(point_pairs);
 
   size_t left = 0;
   size_t right = 0;
@@ -136,7 +136,7 @@ TEST(StBoundaryTest, remove_redundant_points) {
 
   EXPECT_EQ(points.size(), 5);
 
-  StBoundary st_boundary;
+  STBoundary st_boundary;
   st_boundary.RemoveRedundantPoints(&points);
 
   EXPECT_EQ(points.size(), 2);

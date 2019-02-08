@@ -156,7 +156,7 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
 
 Status QpSplineStGraph::AddConstraint(
     const common::TrajectoryPoint& init_point, const SpeedLimit& speed_limit,
-    const std::vector<const StBoundary*>& boundaries,
+    const std::vector<const STBoundary*>& boundaries,
     const std::pair<double, double>& accel_bound) {
   Spline1dConstraint* constraint = spline_solver_->mutable_spline_constraint();
 
@@ -253,7 +253,7 @@ Status QpSplineStGraph::AddConstraint(
   bool has_follow = false;
   double delta_s = 1.0;
   for (const auto* boundary : boundaries) {
-    if (boundary->boundary_type() == StBoundary::BoundaryType::FOLLOW) {
+    if (boundary->boundary_type() == STBoundary::BoundaryType::FOLLOW) {
       has_follow = true;
       delta_s = std::fmin(
           delta_s, boundary->min_s() - fabs(boundary->characteristic_length()));
@@ -280,7 +280,7 @@ Status QpSplineStGraph::AddConstraint(
 }
 
 Status QpSplineStGraph::AddKernel(
-    const std::vector<const StBoundary*>& boundaries,
+    const std::vector<const STBoundary*>& boundaries,
     const SpeedLimit& speed_limit) {
   Spline1dKernel* spline_kernel = spline_solver_->mutable_spline_kernel();
 
@@ -369,7 +369,7 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(const double weight) {
 }
 
 Status QpSplineStGraph::AddFollowReferenceLineKernel(
-    const std::vector<const StBoundary*>& boundaries, const double weight) {
+    const std::vector<const STBoundary*>& boundaries, const double weight) {
   auto* spline_kernel = spline_solver_->mutable_spline_kernel();
   std::vector<double> ref_s;
   std::vector<double> filtered_evaluate_t;
@@ -378,7 +378,7 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
     double s_min = std::numeric_limits<double>::infinity();
     bool success = false;
     for (const auto* boundary : boundaries) {
-      if (boundary->boundary_type() != StBoundary::BoundaryType::FOLLOW) {
+      if (boundary->boundary_type() != STBoundary::BoundaryType::FOLLOW) {
         continue;
       }
       if (curr_t < boundary->min_t() || curr_t > boundary->max_t()) {
@@ -421,7 +421,7 @@ Status QpSplineStGraph::AddFollowReferenceLineKernel(
 }
 
 Status QpSplineStGraph::AddYieldReferenceLineKernel(
-    const std::vector<const StBoundary*>& boundaries, const double weight) {
+    const std::vector<const STBoundary*>& boundaries, const double weight) {
   auto* spline_kernel = spline_solver_->mutable_spline_kernel();
   std::vector<double> ref_s;
   std::vector<double> filtered_evaluate_t;
@@ -430,7 +430,7 @@ Status QpSplineStGraph::AddYieldReferenceLineKernel(
     double s_min = std::numeric_limits<double>::infinity();
     bool success = false;
     for (const auto* boundary : boundaries) {
-      if (boundary->boundary_type() != StBoundary::BoundaryType::YIELD) {
+      if (boundary->boundary_type() != STBoundary::BoundaryType::YIELD) {
         continue;
       }
       if (curr_t < boundary->min_t() || curr_t > boundary->max_t()) {
@@ -484,12 +484,12 @@ bool QpSplineStGraph::AddDpStReferenceKernel(const double weight) const {
 }
 
 Status QpSplineStGraph::GetSConstraintByTime(
-    const std::vector<const StBoundary*>& boundaries, const double time,
+    const std::vector<const STBoundary*>& boundaries, const double time,
     const double total_path_s, double* const s_upper_bound,
     double* const s_lower_bound) const {
   *s_upper_bound = total_path_s;
 
-  for (const StBoundary* boundary : boundaries) {
+  for (const STBoundary* boundary : boundaries) {
     double s_upper = 0.0;
     double s_lower = 0.0;
 
@@ -497,16 +497,16 @@ Status QpSplineStGraph::GetSConstraintByTime(
       continue;
     }
 
-    if (boundary->boundary_type() == StBoundary::BoundaryType::STOP ||
-        boundary->boundary_type() == StBoundary::BoundaryType::FOLLOW ||
-        boundary->boundary_type() == StBoundary::BoundaryType::YIELD) {
+    if (boundary->boundary_type() == STBoundary::BoundaryType::STOP ||
+        boundary->boundary_type() == STBoundary::BoundaryType::FOLLOW ||
+        boundary->boundary_type() == STBoundary::BoundaryType::YIELD) {
       *s_upper_bound = std::fmin(*s_upper_bound, s_upper);
     } else if (boundary->boundary_type() ==
-               StBoundary::BoundaryType::OVERTAKE) {
+               STBoundary::BoundaryType::OVERTAKE) {
       *s_lower_bound = std::fmax(*s_lower_bound, s_lower);
     } else {
       AWARN << "Unhandled boundary type: "
-            << StBoundary::TypeName(boundary->boundary_type());
+            << STBoundary::TypeName(boundary->boundary_type());
     }
   }
 

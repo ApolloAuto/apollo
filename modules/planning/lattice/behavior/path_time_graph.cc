@@ -203,13 +203,13 @@ STPoint PathTimeGraph::SetPathTimePoint(const std::string& obstacle_id,
   return path_time_point;
 }
 
-const std::vector<StBoundary>& PathTimeGraph::GetPathTimeObstacles()
+const std::vector<STBoundary>& PathTimeGraph::GetPathTimeObstacles()
     const {
   return path_time_obstacles_;
 }
 
 bool PathTimeGraph::GetPathTimeObstacle(const std::string& obstacle_id,
-    StBoundary* path_time_obstacle) {
+    STBoundary* path_time_obstacle) {
   if (path_time_obstacle_map_.find(obstacle_id) ==
       path_time_obstacle_map_.end()) {
     return false;
@@ -226,13 +226,14 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetPathBlockingIntervals(
     if (t > pt_obstacle.max_t() || t < pt_obstacle.min_t()) {
       continue;
     }
-    double s_upper = lerp(pt_obstacle.UpperLeftPoint().s(),
-        pt_obstacle.UpperLeftPoint().t(), pt_obstacle.UpperRightPoint().s(),
-        pt_obstacle.UpperRightPoint().t(), t);
+    double s_upper = lerp(pt_obstacle.upper_left_point().s(),
+        pt_obstacle.upper_left_point().t(), pt_obstacle.upper_right_point().s(),
+        pt_obstacle.upper_right_point().t(), t);
 
-    double s_lower = lerp(pt_obstacle.BottomLeftPoint().s(),
-        pt_obstacle.BottomLeftPoint().t(), pt_obstacle.BottomRightPoint().s(),
-        pt_obstacle.BottomRightPoint().t(), t);
+    double s_lower = lerp(pt_obstacle.bottom_left_point().s(),
+        pt_obstacle.bottom_left_point().t(),
+        pt_obstacle.bottom_right_point().s(),
+        pt_obstacle.bottom_right_point().t(), t);
 
     intervals.emplace_back(s_lower, s_upper);
   }
@@ -276,17 +277,17 @@ std::vector<STPoint> PathTimeGraph::GetObstacleSurroundingPoints(
   double t0 = 0.0;
   double t1 = 0.0;
   if (s_dist > 0.0) {
-    s0 = pt_obstacle.UpperLeftPoint().s();
-    s1 = pt_obstacle.UpperRightPoint().s();
+    s0 = pt_obstacle.upper_left_point().s();
+    s1 = pt_obstacle.upper_right_point().s();
 
-    t0 = pt_obstacle.UpperLeftPoint().t();
-    t1 = pt_obstacle.UpperRightPoint().t();
+    t0 = pt_obstacle.upper_left_point().t();
+    t1 = pt_obstacle.upper_right_point().t();
   } else {
-    s0 = pt_obstacle.BottomLeftPoint().s();
-    s1 = pt_obstacle.BottomRightPoint().s();
+    s0 = pt_obstacle.bottom_left_point().s();
+    s1 = pt_obstacle.bottom_right_point().s();
 
-    t0 = pt_obstacle.BottomLeftPoint().t();
-    t1 = pt_obstacle.BottomRightPoint().t();
+    t0 = pt_obstacle.bottom_left_point().t();
+    t1 = pt_obstacle.bottom_right_point().t();
   }
 
   double time_gap = t1 - t0;

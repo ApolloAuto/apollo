@@ -126,8 +126,8 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
           creep_config.min_boundary_t()) {
         const double kepsilon = 1e-6;
         double obstacle_traveled_s =
-            obstacle->reference_line_st_boundary().BottomLeftPoint().s() -
-            obstacle->reference_line_st_boundary().BottomRightPoint().s();
+            obstacle->reference_line_st_boundary().bottom_left_point().s() -
+            obstacle->reference_line_st_boundary().bottom_right_point().s();
         ADEBUG << "obstacle[" << obstacle->Id()
             << "] obstacle_st_min_t["
             << obstacle->reference_line_st_boundary().min_t()

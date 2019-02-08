@@ -75,7 +75,7 @@ class AutotuningRawFeatureGenerator {
   /**
    * Convert st boundaries to discretized boundaries
    */
-  void ConvertToDiscretizedBoundaries(const StBoundary& boundary,
+  void ConvertToDiscretizedBoundaries(const STBoundary& boundary,
                                       const double speed);
 
   common::Status EvaluateSpeedPoint(const common::SpeedPoint& speed_point,
@@ -88,7 +88,7 @@ class AutotuningRawFeatureGenerator {
   const ReferenceLineInfo& reference_line_info_;
   const Frame& frame_;
   const SpeedLimit& speed_limit_;
-  std::vector<const StBoundary*> boundaries_;
+  std::vector<const STBoundary*> boundaries_;
 
   // covers the boundary info lower s upper s as well as the speed of obs
   std::vector<std::vector<std::array<double, 3>>> obs_boundaries_;

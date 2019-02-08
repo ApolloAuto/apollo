@@ -109,9 +109,9 @@ TEST_F(DpStGraphTest, simple) {
   point_pairs.emplace_back(lower_points[0], upper_points[0]);
   point_pairs.emplace_back(lower_points[1], upper_points[1]);
 
-  obstacle_list_.back().SetStBoundary(StBoundary(point_pairs));
+  obstacle_list_.back().SetStBoundary(STBoundary(point_pairs));
 
-  std::vector<const StBoundary*> boundaries;
+  std::vector<const STBoundary*> boundaries;
   boundaries.push_back(&(obstacles_.back()->st_boundary()));
 
   init_point_.mutable_path_point()->set_x(0.0);

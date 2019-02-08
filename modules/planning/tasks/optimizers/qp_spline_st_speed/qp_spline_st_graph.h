@@ -59,11 +59,11 @@ class QpSplineStGraph {
   // Add st graph constraint
   common::Status AddConstraint(const common::TrajectoryPoint& init_point,
                                const SpeedLimit& speed_limit,
-                               const std::vector<const StBoundary*>& boundaries,
+                               const std::vector<const STBoundary*>& boundaries,
                                const std::pair<double, double>& accel_bound);
 
   // Add objective function
-  common::Status AddKernel(const std::vector<const StBoundary*>& boundaries,
+  common::Status AddKernel(const std::vector<const STBoundary*>& boundaries,
                            const SpeedLimit& speed_limit);
 
   // solve
@@ -71,7 +71,7 @@ class QpSplineStGraph {
 
   // extract upper lower bound for constraint;
   common::Status GetSConstraintByTime(
-      const std::vector<const StBoundary*>& boundaries, const double time,
+      const std::vector<const STBoundary*>& boundaries, const double time,
       const double total_path_s, double* const s_upper_bound,
       double* const s_lower_bound) const;
 
@@ -80,11 +80,11 @@ class QpSplineStGraph {
 
   // follow line kernel
   common::Status AddFollowReferenceLineKernel(
-      const std::vector<const StBoundary*>& boundaries, const double weight);
+      const std::vector<const STBoundary*>& boundaries, const double weight);
 
   // yield line kernel
   common::Status AddYieldReferenceLineKernel(
-      const std::vector<const StBoundary*>& boundaries, const double weight);
+      const std::vector<const STBoundary*>& boundaries, const double weight);
 
   const SpeedData GetHistorySpeed() const;
   common::Status EstimateSpeedUpperBound(

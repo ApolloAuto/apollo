@@ -51,12 +51,12 @@ bool DpStSpeedOptimizer::SearchStGraph(
     const SpeedLimitDecider& speed_limit_decider, const PathData& path_data,
     SpeedData* speed_data, PathDecision* path_decision,
     STGraphDebug* st_graph_debug) const {
-  std::vector<const StBoundary*> boundaries;
+  std::vector<const STBoundary*> boundaries;
   for (auto* obstacle : path_decision->obstacles().Items()) {
     auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {
       if (obstacle->st_boundary().boundary_type() ==
-          StBoundary::BoundaryType::KEEP_CLEAR) {
+          STBoundary::BoundaryType::KEEP_CLEAR) {
         path_decision->Find(id)->SetBlockingObstacle(false);
       } else {
         path_decision->Find(id)->SetBlockingObstacle(true);
