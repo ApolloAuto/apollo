@@ -65,8 +65,11 @@ distance_approach_config {
     ipopt_print_timing_statistics: "yes"
     ipopt_alpha_for_y: "min"
     ipopt_recalc_y: "yes"
+    ipopt_mu_init: 0.1
   }
   enable_constraint_check: false
+  enable_hand_derivative: false
+  enable_derivative_check: false
 }
 trajectory_partition_config {
   interpolated_pieces_num: 50

@@ -255,5 +255,3 @@ DECLARE_double(side_pass_driving_width_l_buffer);
 
 DECLARE_bool(enable_parallel_hybrid_a);
 DECLARE_bool(enable_parallel_open_space_smoother);
-DECLARE_bool(enable_derivative_check);
-DECLARE_bool(enable_hand_derivative);
