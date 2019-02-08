@@ -117,6 +117,25 @@ void LaneCameraPerception::InitLane(
     CHECK(lane_postprocessor_->Init(postprocessor_init_options))
         << "Failed to init " << lane_postprocessor_param.name();
     AINFO << "lane_postprocessor: " << lane_postprocessor_->Name();
+
+    // Init output file folder
+    if (perception_param_.has_debug_param() &&
+        perception_param_.debug_param().has_lane_out_dir()) {
+      write_out_lane_file_ =  true;
+      out_lane_dir_ = perception_param_.debug_param().lane_out_dir();
+      std::string command;
+      command = "mkdir -p " + out_lane_dir_;
+      system(command.c_str());
+    }
+
+    if (perception_param_.has_debug_param() &&
+        perception_param_.debug_param().has_calibration_out_dir()) {
+      write_out_calib_file_ =  true;
+      out_calib_dir_ = perception_param_.debug_param().calibration_out_dir();
+      std::string command;
+      command = "mkdir -p " + out_calib_dir_;
+      system(command.c_str());
+    }
   }
 }
 
@@ -208,12 +227,13 @@ bool LaneCameraPerception::Perception(
     PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
         frame->data_provider->sensor_name(), "LanePostprocessor3D");
 
-    std::string save_path = perception_param_.debug_param().lane_out_dir()
-        + "/" + std::to_string(frame->frame_id) + ".txt";
-    WriteLanelines(perception_param_.has_debug_param() &&
-                       perception_param_.debug_param().has_lane_out_dir(),
-                   save_path,
-                   frame->lane_objects);
+    if (write_out_lane_file_) {
+      std::string lane_file_path =
+      out_lane_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
+      WriteLanelines(write_out_lane_file_,
+                     lane_file_path,
+                     frame->lane_objects);
+    }
   } else {
     AINFO << "Skip lane detection & calibration due to sensor mismatch.";
     AINFO << "Will use service sync from obstacle camera instead.";
@@ -223,13 +243,13 @@ bool LaneCameraPerception::Perception(
         frame->data_provider->sensor_name(), "CalibrationService");
   }
 
-  std::string save_calibration_path =
-      perception_param_.debug_param().calibration_out_dir()
-      + "/" + std::to_string(frame->frame_id) + ".txt";
-  WriteCalibrationOutput(perception_param_.has_debug_param() &&
-      perception_param_.debug_param().has_calibration_out_dir(),
-      save_calibration_path, frame);
-
+  if (write_out_calib_file_) {
+    std::string calib_file_path =
+        out_calib_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
+    WriteCalibrationOutput(write_out_calib_file_,
+                           calib_file_path,
+                           frame);
+  }
   return true;
 }
 }  // namespace camera
