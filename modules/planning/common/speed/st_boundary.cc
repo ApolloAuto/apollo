@@ -172,6 +172,16 @@ bool StBoundary::IsPointInBoundary(const STPoint& st_point) const {
   return (check_upper * check_lower < 0);
 }
 
+STPoint StBoundary::UpperLeftPoint() const {
+  DCHECK(!upper_points_.empty()) << "StBoundary has zero points.";
+  return upper_points_.front();
+}
+
+STPoint StBoundary::UpperRightPoint() const {
+  DCHECK(!upper_points_.empty()) << "StBoundary has zero points.";
+  return upper_points_.back();
+}
+
 STPoint StBoundary::BottomLeftPoint() const {
   DCHECK(!lower_points_.empty()) << "StBoundary has zero points.";
   return lower_points_.front();
@@ -254,7 +264,7 @@ void StBoundary::SetBoundaryType(const BoundaryType& boundary_type) {
 
 const std::string& StBoundary::id() const { return id_; }
 
-void StBoundary::SetId(const std::string& id) { id_ = id; }
+void StBoundary::set_id(const std::string& id) { id_ = id; }
 
 double StBoundary::characteristic_length() const {
   return characteristic_length_;
@@ -390,5 +400,22 @@ StBoundary StBoundary::CutOffByT(const double t) const {
   return GenerateStBoundary(lower_points, upper_points);
 }
 
+void StBoundary::set_upper_left_point(STPoint st_point) {
+  upper_left_point_ = std::move(st_point);
+}
+
+void StBoundary::set_upper_right_point(STPoint st_point) {
+  upper_right_point_ = std::move(st_point);
+}
+
+void StBoundary::set_bottom_left_point(STPoint st_point) {
+  bottom_left_point_ = std::move(st_point);
+}
+
+void StBoundary::set_bottom_right_point(STPoint st_point) {
+  bottom_right_point_ = std::move(st_point);
+}
+
 }  // namespace planning
 }  // namespace apollo
+

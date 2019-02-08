@@ -303,7 +303,7 @@ bool StBoundaryMapper::MapStopDecision(
   auto boundary = StBoundary(point_pairs);
   boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
   boundary.SetCharacteristicLength(st_boundary_config_.boundary_buffer());
-  boundary.SetId(stop_obstacle->Id());
+  boundary.set_id(stop_obstacle->Id());
   stop_obstacle->SetStBoundary(boundary);
   return true;
 }
@@ -320,7 +320,7 @@ Status StBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
   auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
                       .ExpandByS(boundary_s_buffer)
                       .ExpandByT(boundary_t_buffer);
-  boundary.SetId(obstacle->Id());
+  boundary.set_id(obstacle->Id());
   const auto& prev_st_boundary = obstacle->st_boundary();
   const auto& ref_line_st_boundary = obstacle->reference_line_st_boundary();
   if (!prev_st_boundary.IsEmpty()) {
@@ -519,7 +519,7 @@ Status StBoundaryMapper::MapWithDecision(
                   << decision.DebugString();
   }
   boundary.SetBoundaryType(b_type);
-  boundary.SetId(obstacle->Id());
+  boundary.set_id(obstacle->Id());
   boundary.SetCharacteristicLength(characteristic_length);
   obstacle->SetStBoundary(boundary);
 

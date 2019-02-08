@@ -52,8 +52,16 @@ class StBoundary : public common::math::Polygon2d {
   bool IsEmpty() const { return lower_points_.empty(); }
   bool IsPointInBoundary(const STPoint& st_point) const;
 
+  STPoint UpperLeftPoint() const;
+  STPoint UpperRightPoint() const;
+
   STPoint BottomLeftPoint() const;
   STPoint BottomRightPoint() const;
+
+  void set_upper_left_point(STPoint st_point);
+  void set_upper_right_point(STPoint st_point);
+  void set_bottom_left_point(STPoint st_point);
+  void set_bottom_right_point(STPoint st_point);
 
   StBoundary ExpandByS(const double s) const;
   StBoundary ExpandByT(const double t) const;
@@ -75,7 +83,7 @@ class StBoundary : public common::math::Polygon2d {
   const std::string& id() const;
   double characteristic_length() const;
 
-  void SetId(const std::string& id);
+  void set_id(const std::string& id);
   void SetBoundaryType(const BoundaryType& boundary_type);
   void SetCharacteristicLength(const double characteristic_length);
 
@@ -131,6 +139,11 @@ class StBoundary : public common::math::Polygon2d {
   double max_s_ = std::numeric_limits<double>::lowest();
   double min_t_ = std::numeric_limits<double>::max();
   double max_t_ = std::numeric_limits<double>::lowest();
+
+  STPoint bottom_left_point_;
+  STPoint bottom_right_point_;
+  STPoint upper_left_point_;
+  STPoint upper_right_point_;
 };
 
 }  // namespace planning
