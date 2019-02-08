@@ -72,7 +72,3 @@ object_template_param {
   }
 }
 
-debug_param {
-  lane_out_dir : "/apollo/debug_output/lane/"
-  calibration_out_dir : "/apollo/debug_output/calib/"
-}

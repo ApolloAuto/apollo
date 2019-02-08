@@ -87,6 +87,10 @@ class ObstacleCameraPerception : public BaseCameraPerception {
   std::ofstream out_track_;
   std::ofstream out_pose_;
   std::string lane_calibration_working_sensor_name_ = "";
+  bool write_out_lane_file_ = false;
+  bool write_out_calib_file_ = false;
+  std::string out_lane_dir_;
+  std::string out_calib_dir_;
 
  protected:
   ObjectTemplateManager *object_template_manager_ = nullptr;

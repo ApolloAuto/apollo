@@ -70,6 +70,10 @@ class LaneCameraPerception : public BaseCameraPerception {
   std::shared_ptr<BaseCalibrationService> calibration_service_;
   app::PerceptionParam perception_param_;
   std::string lane_calibration_working_sensor_name_ = "";
+  bool write_out_lane_file_ = false;
+  bool write_out_calib_file_ = false;
+  std::string out_lane_dir_;
+  std::string out_calib_dir_;
 };
 
 }  // namespace camera
