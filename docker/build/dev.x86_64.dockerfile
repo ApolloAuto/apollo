@@ -25,6 +25,7 @@ RUN apt-get update -y && \
     liblapack-dev \
     libpcap-dev \
     libsqlite3-dev \
+    libgtest-dev \
     locate \
     lsof \
     nfs-common \
