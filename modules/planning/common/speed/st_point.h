@@ -33,6 +33,9 @@ class STPoint : public common::math::Vec2d {
   STPoint(const double s, const double t);
   explicit STPoint(const common::math::Vec2d& vec2d_point);
 
+  double x() const = delete;
+  double y() const = delete;
+
   double s() const;
   double t() const;
   void set_s(const double s);
