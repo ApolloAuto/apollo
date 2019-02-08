@@ -117,19 +117,19 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   ADEBUG << "get_nlp_info";
   // n1 : states variables, 4 * (N+1)
   int n1 = 4 * (horizon_ + 1);
-
+  AINFO << "n1: " << n1;
   // n2 : control inputs variables
   int n2 = 2 * horizon_;
-
+  AINFO << "n2: " << n2;
   // n3 : sampling time variables
   int n3 = horizon_ + 1;
-
+  AINFO << "n3: " << n3;
   // n4 : dual multiplier associated with obstacle shape
   lambda_horizon_ = obstacles_edges_num_.sum() * (horizon_ + 1);
-
+  AINFO << "lambda_horizon_: " << lambda_horizon_;
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
   miu_horizon_ = obstacles_num_ * 4 * (horizon_ + 1);
-
+  AINFO << "miu_horizon_: " << miu_horizon_;
   // m1 : dynamics constatins
   int m1 = 4 * horizon_;
 
@@ -445,10 +445,26 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
 
 bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
                                                  bool new_x, double* grad_f) {
-  if (!FLAGS_enable_hand_derivative) {
-    gradient(tag_f, n, x, grad_f);
-  } else {
+  if (distance_approach_config_.enable_hand_derivative()) {
     eval_grad_f_hand(n, x, new_x, grad_f);
+    if (distance_approach_config_.enable_derivative_check()) {
+      // check gradients
+      int kN = n;
+      double grad_f_check[kN];
+      std::fill(grad_f_check, grad_f_check + n, 0.0);
+      gradient(tag_f, n, x, grad_f_check);
+      double delta_v = 1e-6;
+      for (int i = 0; i < n; ++i) {
+        if (std::abs(grad_f_check[i] - grad_f[i])
+            > delta_v) {
+          AERROR << "cost gradient not match at: " << i
+              << ", grad by hand: " << grad_f[i]
+              << ", grad by adolc: " << grad_f_check[i];
+        }
+      }
+    }
+  } else {
+    gradient(tag_f, n, x, grad_f);
   }
   return true;
 }
@@ -487,13 +503,12 @@ bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
     // 2. objective to minimize u square
     for (int i = 0; i < horizon_; ++i) {
       grad_f[control_index] += 2 * weight_input_steer_ * x[control_index];
-      grad_f[control_index] += 2 * weight_input_a_ * x[control_index + 1];
+      grad_f[control_index + 1] += 2 * weight_input_a_ * x[control_index + 1];
       control_index += 2;
     }
 
     // 3. objective to minimize input change rate for first horizon
     // assume: x[time_index] > 0
-
     control_index = control_start_index_;
     double last_time_steer_rate =
         (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
