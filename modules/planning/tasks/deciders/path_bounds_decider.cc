@@ -14,17 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/tasks/deciders/reference_line_decider.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
 
-ReferenceLineDecider::ReferenceLineDecider(const TaskConfig &config)
+PathBoundsDecider::PathBoundsDecider(const TaskConfig &config)
     : Decider(config) {}
 
-Status ReferenceLineDecider::Process(
+Status PathBoundsDecider::Process(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   // TODO(all) implement
   return Status::OK();
