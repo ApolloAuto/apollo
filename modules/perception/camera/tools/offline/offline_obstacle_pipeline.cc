@@ -25,16 +25,21 @@
 #include "modules/perception/common/io/io_util.h"
 
 DEFINE_string(test_list, "full_test_list.txt", "exe image list");
-DEFINE_string(image_root, "", "root dir of images");
+DEFINE_string(image_root,
+   "/apollo/modules/perception/testdata/camera/lib/obstacle/detector/yolo/img/",
+   "root dir of images");
 DEFINE_string(image_ext, ".jpg", "extension of image name");
 DEFINE_string(image_color, "bgr", "color space of image");
-DEFINE_string(config_root, "conf/perception/camera/", "config_root");
+DEFINE_string(config_root,
+             "/apollo/modules/perception/production/conf/perception/camera/",
+             "config_root");
 DEFINE_string(tf_file, "", "tf file");
 DEFINE_string(config_file, "obstacle.pt", "config_file");
 DEFINE_string(narrow_name, "front_12mm", " camera for projecting");
 DEFINE_string(base_camera_name, "front_6mm", "camera to be peojected");
 DEFINE_string(sensor_name, "front_6mm,front_12mm", "camera to use");
-DEFINE_string(params_dir, "/home/caros/cyber/params", "params dir");
+DEFINE_string(params_dir, "/apollo/modules/perception/data/params",
+             "params dir");
 DEFINE_string(visualize_dir, "/tmp/0000", "visualize dir");
 DEFINE_double(camera_fps, 15, "camera_fps");
 DEFINE_bool(do_undistortion, false, "do_undistortion");
@@ -61,9 +66,12 @@ int work() {
   ObstacleCameraPerception perception;
   CameraPerceptionInitOptions init_option;
   CameraPerceptionOptions options;
+  AERROR << "config_root: " << FLAGS_config_root;
   init_option.root_dir = FLAGS_config_root;
+  AERROR << "config_file: " << FLAGS_config_file;
   init_option.conf_file = FLAGS_config_file;
   init_option.lane_calibration_working_sensor_name = FLAGS_base_camera_name;
+  init_option.use_cyber_work_root = true;
   CHECK(perception.Init(init_option));
 
   // Init frame

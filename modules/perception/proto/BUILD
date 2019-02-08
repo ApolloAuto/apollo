@@ -14,6 +14,9 @@ proto_library(
     srcs = [
         "perception_obstacle.proto",
         "traffic_light_detection.proto",
+        "perception_lane.proto",
+	"motion_service.proto",
+	"perception_camera.proto",
     ],
     deps = [
         "//modules/common/proto:error_code_proto_lib",
