@@ -22,6 +22,7 @@
 #include <omp.h>
 #include <limits>
 #include <vector>
+#include <algorithm>
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
