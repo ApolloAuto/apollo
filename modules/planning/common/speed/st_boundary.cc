@@ -45,10 +45,10 @@ STBoundary::STBoundary(
   }
 
   for (auto it = lower_points_.begin(); it != lower_points_.end(); ++it) {
-    points_.emplace_back(it->x(), it->y());
+    points_.emplace_back(it->t(), it->s());
   }
   for (auto rit = upper_points_.rbegin(); rit != upper_points_.rend(); ++rit) {
-    points_.emplace_back(rit->x(), rit->y());
+    points_.emplace_back(rit->t(), rit->s());
   }
 
   BuildFromPoints();
@@ -82,7 +82,7 @@ std::string STBoundary::TypeName(BoundaryType type) {
   } else if (type == BoundaryType::UNKNOWN) {
     return "UNKNOWN";
   }
-  AWARN << "Unkown boundary type " << static_cast<int>(type)
+  AWARN << "Unknown boundary type " << static_cast<int>(type)
         << ", treated as UNKNOWN";
   return "UNKNOWN";
 }
@@ -200,8 +200,8 @@ STBoundary STBoundary::ExpandByS(const double s) const {
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
   for (size_t i = 0; i < lower_points_.size(); ++i) {
     point_pairs.emplace_back(
-        STPoint(lower_points_[i].y() - s, lower_points_[i].x()),
-        STPoint(upper_points_[i].y() + s, upper_points_[i].x()));
+        STPoint(lower_points_[i].s() - s, lower_points_[i].t()),
+        STPoint(upper_points_[i].s() + s, upper_points_[i].t()));
   }
   return STBoundary(std::move(point_pairs));
 }
@@ -219,10 +219,10 @@ STBoundary STBoundary::ExpandByT(const double t) const {
   const double upper_left_delta_s = upper_points_[1].s() - upper_points_[0].s();
 
   point_pairs.emplace_back(
-      STPoint(lower_points_[0].y() - t * lower_left_delta_s / left_delta_t,
-              lower_points_[0].x() - t),
-      STPoint(upper_points_[0].y() - t * upper_left_delta_s / left_delta_t,
-              upper_points_.front().x() - t));
+      STPoint(lower_points_[0].s() - t * lower_left_delta_s / left_delta_t,
+              lower_points_[0].t() - t),
+      STPoint(upper_points_[0].s() - t * upper_left_delta_s / left_delta_t,
+              upper_points_.front().t() - t));
 
   const double kMinSEpsilon = 1e-3;
   point_pairs.front().first.set_s(
@@ -243,12 +243,12 @@ STBoundary STBoundary::ExpandByT(const double t) const {
   const double upper_right_delta_s =
       upper_points_[length - 1].s() - upper_points_[length - 2].s();
 
-  point_pairs.emplace_back(STPoint(lower_points_.back().y() +
+  point_pairs.emplace_back(STPoint(lower_points_.back().s() +
                                        t * lower_right_delta_s / right_delta_t,
-                                   lower_points_.back().x() + t),
-                           STPoint(upper_points_.back().y() +
+                                   lower_points_.back().t() + t),
+                           STPoint(upper_points_.back().s() +
                                        t * upper_right_delta_s / right_delta_t,
-                                   upper_points_.back().x() + t));
+                                   upper_points_.back().t() + t));
   point_pairs.back().second.set_s(
       std::fmax(point_pairs.back().second.s(),
                 point_pairs.back().first.s() + kMinSEpsilon));

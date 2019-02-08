@@ -133,7 +133,7 @@ DEFINE_double(max_collision_distance, 0.1,
               "equal to this (meters)");
 
 DEFINE_bool(ignore_overlapped_obstacle, false,
-            "ingore obstacle that overlapps with ADC. Only enable this flag "
+            "ignore obstacle that overlapps with ADC. Only enable this flag "
             "when you found fake obstacle result from poorly lidar");
 
 DEFINE_double(replan_lateral_distance_threshold, 0.5,
@@ -423,7 +423,7 @@ DEFINE_double(open_space_prediction_time_horizon, 2.0,
               "given by prediction");
 
 DEFINE_bool(enable_perception_obstacles, true,
-            "enable the open space planner to take percetion obstacles into "
+            "enable the open space planner to take perception obstacles into "
             "consideration");
 
 DEFINE_bool(enable_open_space_planner_thread, true,
@@ -464,7 +464,7 @@ DEFINE_bool(
     "True to enable planning smoother among different planning cycles.");
 DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
-              "within this threshold, current planning will be smoothered.");
+              "within this threshold, current planning will be smoothed.");
 
 DEFINE_double(side_pass_road_buffer, 0.05,
               "(unit: meter) for side pass scenario ");
