@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 
 namespace apollo {
@@ -97,7 +97,7 @@ void FeatureOutput::WriteFeatureProto() {
     const std::string file_name =
         FLAGS_prediction_data_dir + "/feature." +
         std::to_string(idx_feature_) + ".bin";
-    common::util::SetProtoToBinaryFile(features_, file_name);
+    cyber::common::SetProtoToBinaryFile(features_, file_name);
     features_.Clear();
     ++idx_feature_;
   }
@@ -110,7 +110,7 @@ void FeatureOutput::WriteDataForLearning() {
     const std::string file_name =
         FLAGS_prediction_data_dir + "/datalearn." +
         std::to_string(idx_learning_) + ".bin";
-    common::util::SetProtoToBinaryFile(list_data_for_learning_, file_name);
+    cyber::common::SetProtoToBinaryFile(list_data_for_learning_, file_name);
     list_data_for_learning_.Clear();
     ++idx_learning_;
   }
@@ -123,7 +123,7 @@ void FeatureOutput::WritePredictionResult() {
     const std::string file_name =
         FLAGS_prediction_data_dir + "/prediction_result." +
         std::to_string(idx_prediction_result_) + ".bin";
-    common::util::SetProtoToBinaryFile(list_prediction_result_, file_name);
+    cyber::common::SetProtoToBinaryFile(list_prediction_result_, file_name);
     list_prediction_result_.Clear();
     ++idx_prediction_result_;
   }

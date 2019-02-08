@@ -50,7 +50,7 @@ void OfflineProcessFeatureProtoFile(
   AERROR << "start";
   // Load prediction conf
   PredictionConf prediction_conf;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_prediction_conf_file,
+  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
                                       &prediction_conf)) {
     AERROR << "Unable to load prediction conf file: "
            << FLAGS_prediction_conf_file;
@@ -60,7 +60,7 @@ void OfflineProcessFeatureProtoFile(
             << prediction_conf.ShortDebugString();
 
   apollo::common::adapter::AdapterManagerConfig adapter_conf;
-  if (!apollo::common::util::GetProtoFromFile(
+  if (!apollo::cyber::common::GetProtoFromFile(
     FLAGS_prediction_adapter_config_filename, &adapter_conf)) {
     AERROR << "Unable to load adapter conf file: "
            << FLAGS_prediction_adapter_config_filename;
