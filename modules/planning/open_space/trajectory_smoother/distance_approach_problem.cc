@@ -85,13 +85,9 @@ bool DistanceApproachProblem::Solve(
   app->Options()->SetStringValue("recalc_y",
       planner_open_space_config_.distance_approach_config().\
         ipopt_config().ipopt_recalc_y());
-  if (FLAGS_enable_derivative_check) {
-    AINFO << "checking jacobians ...";
-    app->Options()->SetStringValue("derivative_test",
-        "first-order");
-    app->Options()->SetStringValue("derivative_test_print_all",
-        "No");
-  }
+  app->Options()->SetNumericValue("mu_init",
+      planner_open_space_config_.distance_approach_config().\
+        ipopt_config().ipopt_mu_init());
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
