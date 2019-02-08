@@ -132,6 +132,60 @@ void Visualizer::SetDirectory(const std::string &path) {
   path_ = path;
 }
 
+std::string Visualizer::type_to_string(
+  const apollo::perception::base::ObjectType type) {
+  switch (type) {
+    case apollo::perception::base::ObjectType::UNKNOWN:
+     return "UNKN";
+    case apollo::perception::base::ObjectType::UNKNOWN_MOVABLE:
+     return "U_MO";
+    case apollo::perception::base::ObjectType::UNKNOWN_UNMOVABLE:
+     return "UNMO";
+    case apollo::perception::base::ObjectType::PEDESTRIAN:
+     return "PED";
+    case apollo::perception::base::ObjectType::BICYCLE:
+     return "CYC";
+    case apollo::perception::base::ObjectType::VEHICLE:
+     return "VEH";
+    default:
+     return "WRNG";
+  }
+  return "WRNG";
+}
+
+std::string Visualizer::sub_type_to_string(
+  const apollo::perception::base::ObjectSubType type) {
+  switch (type) {
+    case apollo::perception::base::ObjectSubType::UNKNOWN:
+     return "UNKN";
+    case apollo::perception::base::ObjectSubType::UNKNOWN_MOVABLE:
+     return "U_MO";
+    case apollo::perception::base::ObjectSubType::UNKNOWN_UNMOVABLE:
+     return "UNMO";
+    case apollo::perception::base::ObjectSubType::CAR:
+     return "CAR";
+    case apollo::perception::base::ObjectSubType::VAN:
+     return "VAN";
+    case apollo::perception::base::ObjectSubType::TRUCK:
+     return "TRUC";
+    case apollo::perception::base::ObjectSubType::BUS:
+     return "BUS";
+    case apollo::perception::base::ObjectSubType::CYCLIST:
+     return "CYC";
+    case apollo::perception::base::ObjectSubType::MOTORCYCLIST:
+     return "MCYC";
+    case apollo::perception::base::ObjectSubType::TRICYCLIST:
+     return "TCYC";
+    case apollo::perception::base::ObjectSubType::PEDESTRIAN:
+     return "PED";
+    case apollo::perception::base::ObjectSubType::TRAFFICCONE:
+     return "CONE";
+    default:
+     return "WRNG";
+  }
+  return "WRNG";
+}
+
 void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
   cv::Mat image = img.clone();
   Eigen::Affine3d pose;
@@ -377,6 +431,16 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
                 1,
                 cv::Scalar(0, 0, 255),
                 2);
+
+    cv::putText(image_2D,
+                // type_to_string(object->type) + "->" +
+                sub_type_to_string(object->sub_type),
+                cv::Point(static_cast<int>(rect.x),
+                          static_cast<int>(rect.y) + 30),
+                cv::FONT_HERSHEY_DUPLEX,
+                1,
+                cv::Scalar(255, 0, 0),
+                1);
 
     // compute 8 vetices in camera coodinates
     Eigen::Vector3d pos;

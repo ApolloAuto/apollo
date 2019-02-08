@@ -48,6 +48,10 @@ class Visualizer {
       Eigen::Matrix3d intrinsic, Eigen::Matrix4d extrinsic);
   cv::Point world_point_to_bigimg(const Eigen::Vector2d &p);
   Eigen::Vector2d image2ground(cv::Point p_img);
+  std::string type_to_string(const apollo::perception::base::ObjectType type);
+  std::string sub_type_to_string(
+    const apollo::perception::base::ObjectSubType type);
+
   bool write_out_img_ = false;
 
  private:
