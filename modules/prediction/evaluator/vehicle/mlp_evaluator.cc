@@ -18,7 +18,7 @@
 
 #include <limits>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -333,7 +333,7 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
 void MLPEvaluator::LoadModel(const std::string& model_file) {
   model_ptr_.reset(new FnnVehicleModel());
   CHECK(model_ptr_ != nullptr);
-  CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
+  CHECK(cyber::common::GetProtoFromFile(model_file, model_ptr_.get()))
       << "Unable to load model file: " << model_file << ".";
 
   AINFO << "Succeeded in loading the model file: " << model_file << ".";
