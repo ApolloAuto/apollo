@@ -18,7 +18,7 @@
 #include <limits>
 #include <utility>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -30,7 +30,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
-using apollo::common::util::GetProtoFromFile;
+using apollo::cyber::common::GetProtoFromFile;
 
 LaneScanningEvaluator::LaneScanningEvaluator() {
 }
