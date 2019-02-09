@@ -15,7 +15,7 @@ export default class DriveEventEditor extends React.Component {
         super(props);
 
         this.state = {
-            eventTime: new Date(),
+            eventTime: new Date(STORE.timestamp),
             eventMessage: "",
             eventTypes: new Set(),
             popupReminder: this.props.newDisengagementReminder,
@@ -42,7 +42,7 @@ export default class DriveEventEditor extends React.Component {
     }
 
     handleTimestampUpdate() {
-        this.setState({ eventTime: new Date() });
+        this.setState({ eventTime: new Date(STORE.timestamp) });
     }
 
     handleSubmit(event) {
