@@ -15,8 +15,6 @@ class DreamviewStore {
     // Mutable States
     @observable timestamp = 0;
 
-    @observable worldTimestamp = 0;
-
     @observable sceneDimension = {
         width: window.innerWidth,
         height: window.innerHeight,
