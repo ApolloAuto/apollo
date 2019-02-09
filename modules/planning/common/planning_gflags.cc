@@ -404,9 +404,6 @@ DEFINE_double(speed_bump_speed_limit, 4.4704,
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
               "The time range of fallback cruise under navigation mode.");
 
-DEFINE_bool(enable_stitch_last_trajectory, true,
-            "To control whether to stitch last trajectory or not.");
-
 DEFINE_bool(enable_planning_pad_msg, false,
             "To control whether to enable planning pad message.");
 
