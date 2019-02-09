@@ -107,8 +107,6 @@ class STBoundary : public common::math::Polygon2d {
   double max_s() const;
   double max_t() const;
 
-  double Area() const;
-
   std::vector<STPoint> upper_points() const { return upper_points_; }
   std::vector<STPoint> lower_points() const { return lower_points_; }
 
@@ -134,8 +132,6 @@ class STBoundary : public common::math::Polygon2d {
 
   std::vector<STPoint> upper_points_;
   std::vector<STPoint> lower_points_;
-
-  double area_ = 0.0;
 
   std::string id_;
   double characteristic_length_ = 1.0;

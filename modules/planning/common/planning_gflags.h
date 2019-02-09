@@ -214,8 +214,6 @@ DECLARE_double(speed_bump_speed_limit);
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
 
-// control whether to stitch last trajectory to current plan trajectory
-DECLARE_bool(enable_stitch_last_trajectory);
 DECLARE_bool(enable_planning_pad_msg);
 
 // open space planner
