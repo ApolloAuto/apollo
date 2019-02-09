@@ -282,11 +282,9 @@ Status OpenSpacePlanning::Plan(
 
     ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-    if (FLAGS_enable_stitch_last_trajectory) {
-      last_publishable_trajectory_->PrependTrajectoryPoints(
-          std::vector<TrajectoryPoint>(last_stitching_trajectory_.begin(),
-                                       last_stitching_trajectory_.end() - 1));
-    }
+    last_publishable_trajectory_->PrependTrajectoryPoints(
+        std::vector<TrajectoryPoint>(last_stitching_trajectory_.begin(),
+                                     last_stitching_trajectory_.end() - 1));
 
     // save the publishable trajectory for use when no planning is generated
     last_trajectory_ = std::make_unique<PublishableTrajectory>(

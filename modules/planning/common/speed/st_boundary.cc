@@ -162,7 +162,7 @@ bool STBoundary::IsPointInBoundary(const STPoint& st_point) const {
   size_t left = 0;
   size_t right = 0;
   if (!GetIndexRange(lower_points_, st_point.t(), &left, &right)) {
-    AERROR << "fait to get index range.";
+    AERROR << "failed to get index range.";
     return false;
   }
   const double check_upper = common::math::CrossProd(

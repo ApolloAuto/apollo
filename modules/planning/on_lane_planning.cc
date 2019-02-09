@@ -151,6 +151,8 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
+
+// TODO(all): fix this! this will cause unexpected behavior from controller
 void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
   trajectory_pb->clear_trajectory_point();
 
@@ -230,7 +232,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
-  const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
+  const double planning_cycle_time = 1.0 /
+      static_cast<double>(FLAGS_planning_loop_rate);
 
   std::vector<TrajectoryPoint> stitching_trajectory;
   std::string replan_reason;
@@ -444,11 +447,9 @@ Status OnLanePlanning::Plan(
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  if (FLAGS_enable_stitch_last_trajectory) {
-    last_publishable_trajectory_->PrependTrajectoryPoints(
-        std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
-                                     stitching_trajectory.end() - 1));
-  }
+  last_publishable_trajectory_->PrependTrajectoryPoints(
+      std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
+          stitching_trajectory.end() - 1));
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
 

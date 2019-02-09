@@ -536,11 +536,14 @@ Status NaviPlanning::Plan(
   // Navi Panner doesn't need to stitch the last path planning
   // trajectory.Otherwise, it will cause the Dreamview planning track to display
   // flashing or bouncing
+  // TODO(Yifei): remove this if navi-planner doesn't need stitching
+  /**
   if (FLAGS_enable_stitch_last_trajectory) {
     last_publishable_trajectory_->PrependTrajectoryPoints(
         std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
                                      stitching_trajectory.end() - 1));
   }
+  **/
 
   for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
     if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >
