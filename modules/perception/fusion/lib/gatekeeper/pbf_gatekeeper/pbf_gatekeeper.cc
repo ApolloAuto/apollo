@@ -65,7 +65,6 @@ bool PbfGatekeeper::Init() {
 std::string PbfGatekeeper::Name() const { return "PbfGatekeeper"; }
 
 bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
-  bool able_to_pub = false;
   bool invisible_in_lidar = !(track->IsLidarVisible());
   bool invisible_in_radar = !(track->IsRadarVisible());
   bool invisible_in_camera = !(track->IsCameraVisible());
@@ -80,15 +79,9 @@ bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
   struct tm timeinfo;
   localtime_r(&rawtime, &timeinfo);
   bool is_night = (timeinfo.tm_hour >= 23);
-  if (LidarAbleToPublish(track)) {
-    able_to_pub = true;
-  } else if (RadarAbleToPublish(track, is_night)) {
-    able_to_pub = true;
-  } else if (CameraAbleToPublish(track, is_night)) {
-    able_to_pub = true;
-  }
-
-  if (!able_to_pub) {
+  if (!LidarAbleToPublish(track) ||
+      !RadarAbleToPublish(track, is_night) ||
+      !CameraAbleToPublish(track, is_night)) {
     return false;
   }
 
