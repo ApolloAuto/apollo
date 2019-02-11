@@ -18,6 +18,8 @@
 """
 Message Handle
 """
+
+import ast
 import curses
 import importlib
 from curses import panel
@@ -42,7 +44,7 @@ class ModuleConf(object):
 
     def parse_from_file(self):
         mod = importlib.import_module(self.proto_file)
-        self.proto = eval("mod." + self.proto_class)
+        self.proto = ast.literal_eval("mod." + self.proto_class)
 
         try:
             with open(APOLLO_ROOT + self.conf_file, 'r') as prototxt:
@@ -216,7 +218,6 @@ class element(object):
         if self.is_repeated:
             printstring = "[Repeated Item: " + str(len(self.value)) + "]"
             win.addstr(printstring, attr)
-
         elif self.descriptor.type == self.descriptor.TYPE_ENUM:
             enum_type = self.descriptor.enum_type.values_by_number[
                 self.value].name
@@ -311,7 +312,7 @@ class element(object):
                     value = float(s)
                     self.modified = True
                     self.value = value
-                except:
+                except ValueError:
                     pass
             elif self.descriptor.type == self.descriptor.TYPE_STRING:
                 if s != self.value:
@@ -322,7 +323,7 @@ class element(object):
                     value = int(s)
                     self.modified = True
                     self.value = value
-                except:
+                except ValueError:
                     pass
             curses.noecho()
 
