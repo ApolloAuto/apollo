@@ -380,7 +380,8 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
   // TODO(xiaoxq): Here we reuse the header time field as the event occuring
   // time. A better solution might be adding the field to DriveEvent proto to
   // make it clear.
-  drive_event->mutable_header()->set_timestamp_sec(event_time_ms / 1000.0);
+  drive_event->mutable_header()->set_timestamp_sec(
+      static_cast<double>(event_time_ms) / 1000.0);
   drive_event->set_event(event_msg);
   for (const auto& type_name : event_types) {
     DriveEvent::Type type;
