@@ -27,14 +27,14 @@ using apollo::common::ErrorCode;
 std::string Routing::Name() const { return FLAGS_routing_node_name; }
 
 Routing::Routing()
-    : monitor_logger_buffer_(
-          common::monitor::MonitorMessageItem::ROUTING) {}
+    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::ROUTING) {}
 
 apollo::common::Status Routing::Init() {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
   AINFO << "Use routing topology graph path: " << routing_map_file;
   navigator_ptr_.reset(new Navigator(routing_map_file));
-  CHECK(common::util::GetProtoFromFile(FLAGS_routing_conf_file, &routing_conf_))
+  CHECK(cyber::common::GetProtoFromFile(FLAGS_routing_conf_file,
+                                        &routing_conf_))
       << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
