@@ -14,11 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/common/file.h"
 #include "cyber/cyber.h"
 #include "cyber/time/rate.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/routing/proto/routing.pb.h"
 
 DEFINE_bool(enable_remove_lane_id, true,
@@ -38,8 +38,8 @@ int main(int argc, char *argv[]) {
   FLAGS_alsologtostderr = true;
 
   apollo::routing::RoutingRequest routing_request;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_routing_test_file,
-                                              &routing_request)) {
+  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_routing_test_file,
+                                               &routing_request)) {
     AERROR << "failed to load file: " << FLAGS_routing_test_file;
     return -1;
   }

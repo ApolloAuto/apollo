@@ -16,7 +16,7 @@
 
 #include "modules/routing/core/navigator.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/strategy/a_star_strategy.h"
@@ -94,7 +94,7 @@ void PrintDebugData(const std::vector<NodeWithRange>& nodes) {
 
 Navigator::Navigator(const std::string& topo_file_path) {
   Graph graph;
-  if (!common::util::GetProtoFromFile(topo_file_path, &graph)) {
+  if (!cyber::common::GetProtoFromFile(topo_file_path, &graph)) {
     AERROR << "Failed to read topology graph from " << topo_file_path;
     return;
   }
