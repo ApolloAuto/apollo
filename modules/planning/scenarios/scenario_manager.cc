@@ -27,6 +27,7 @@
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
+#include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 
 namespace apollo {
@@ -66,6 +67,11 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
           new scenario::traffic_light::TrafficLightProtectedScenario(
               config_map_[scenario_type], &scenario_context_));
       break;
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+      ptr.reset(
+          new scenario::traffic_light::TrafficLightUnprotectedLeftTurnScenario(
+              config_map_[scenario_type], &scenario_context_));
+      break;
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
       ptr.reset(
           new scenario::traffic_light::TrafficLightUnprotectedRightTurnScenario(
@@ -82,16 +88,25 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 }
 
 void ScenarioManager::RegisterScenarios() {
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
-                             &config_map_[ScenarioConfig::LANE_FOLLOW]));
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_side_pass_config_file,
-                             &config_map_[ScenarioConfig::SIDE_PASS]));
+  // lane_follow
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_lane_follow_config_file,
+      &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  // side_pass
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_side_pass_config_file,
+      &config_map_[ScenarioConfig::SIDE_PASS]));
+  // stop_sign
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_stop_sign_unprotected_config_file,
       &config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]));
+  // traffic_light
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_protected_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]));
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_traffic_light_unprotected_left_turn_config_file,
+      &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]));
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
@@ -279,6 +294,10 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
       continue;
     }
     if (scenario == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED &&
+        !FLAGS_enable_scenario_traffic_light) {
+      continue;
+    }
+    if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN &&
         !FLAGS_enable_scenario_traffic_light) {
       continue;
     }
