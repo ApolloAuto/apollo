@@ -20,6 +20,7 @@
 
 #include "modules/planning/planner/open_space/open_space_planner.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -34,8 +35,8 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
   AINFO << "In OpenSpacePlanner::Init()";
 
   // TODO(QiL): integrate open_space planner into task config when refactor done
-  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
-                                       &planner_open_space_config_))
+  CHECK(cyber::common::GetProtoFromFile(
+      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
 

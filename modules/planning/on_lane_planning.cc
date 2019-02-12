@@ -17,6 +17,7 @@
 #include <list>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "gtest/gtest_prod.h"
 
 #include "modules/routing/proto/routing.pb.h"
@@ -75,7 +76,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
   planner_dispatcher_->Init();
 
-  CHECK(apollo::common::util::GetProtoFromFile(
+  CHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
