@@ -17,7 +17,7 @@ cc_library(
         "//modules/common/configs:config_gflags",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
-        "//modules/common/vehicle_model/proto:vehicle_model_proto",
+        "//modules/common/vehicle_model/proto:vehicle_model_config_proto",
     ],
 )
 
