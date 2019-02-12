@@ -471,6 +471,7 @@ cc_library(
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/reference_line",
+        "//modules/common/vehicle_model",
     ],
 )
 
