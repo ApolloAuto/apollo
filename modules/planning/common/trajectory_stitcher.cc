@@ -63,13 +63,10 @@ TrajectoryStitcher::ComputeReinitStitchingTrajectory(
     reinit_point = ComputeTrajectoryPointFromVehicleState(vehicle_state);
   } else {
     VehicleState predicted_vehicle_state;
-    if (VehicleModel::Predict(planning_cycle_time, vehicle_state,
-                              &predicted_vehicle_state)) {
-      reinit_point =
-          ComputeTrajectoryPointFromVehicleState(predicted_vehicle_state);
-    } else {
-      reinit_point = ComputeTrajectoryPointFromVehicleState(vehicle_state);
-    }
+    predicted_vehicle_state = VehicleModel::Predict(
+        planning_cycle_time, vehicle_state);
+    reinit_point =
+        ComputeTrajectoryPointFromVehicleState(predicted_vehicle_state);
   }
 
   return std::vector<TrajectoryPoint>(1, reinit_point);
