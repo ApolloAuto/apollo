@@ -79,8 +79,8 @@ bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
   struct tm timeinfo;
   localtime_r(&rawtime, &timeinfo);
   bool is_night = (timeinfo.tm_hour >= 23);
-  if (!LidarAbleToPublish(track) ||
-      !RadarAbleToPublish(track, is_night) ||
+  if (!LidarAbleToPublish(track) &&
+      !RadarAbleToPublish(track, is_night) &&
       !CameraAbleToPublish(track, is_night)) {
     return false;
   }
