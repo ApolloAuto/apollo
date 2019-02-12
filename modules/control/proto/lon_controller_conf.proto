@@ -3,7 +3,7 @@ syntax = "proto2";
 package apollo.control;
 
 import "modules/control/proto/calibration_table.proto";
-
+import "modules/control/proto/leadlag_conf.proto";
 import "modules/control/proto/pid_conf.proto";
 
 message FilterConf {
@@ -29,5 +29,8 @@ message LonControllerConf {
   optional PidConf reverse_speed_pid_conf = 13;
   optional FilterConf pitch_angle_filter_conf = 14;
 
-  optional calibrationtable.ControlCalibrationTable calibration_table = 15;
+  optional LeadlagConf reverse_station_leadlag_conf = 15;
+  optional LeadlagConf reverse_speed_leadlag_conf = 16;
+
+  optional calibrationtable.ControlCalibrationTable calibration_table = 17;
 }

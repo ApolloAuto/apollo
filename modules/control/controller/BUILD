@@ -62,6 +62,7 @@ cc_library(
         "//modules/control/common:control_gflags",
         "//modules/control/common:interpolation_2d",
         "//modules/control/common:pid_controller",
+        "//modules/control/common:leadlag_controller",
         "//modules/control/common:trajectory_analyzer",
         "//modules/localization/common:localization_common",
     ],

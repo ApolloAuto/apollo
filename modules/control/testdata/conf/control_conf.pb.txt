@@ -143,6 +143,18 @@ lon_controller_conf {
     ki: 0.0
     kd: 0.0
   }
+  reverse_station_leadlag_conf {
+    innerstate_saturation_level: 100
+    alpha: 0.2
+    beta: 1.0
+    tau: 0.1
+  }
+  reverse_speed_leadlag_conf {
+    innerstate_saturation_level: 30
+    alpha: 0.35
+    beta: 1.0
+    tau: 0.1
+  }
   pitch_angle_filter_conf {
     cutoff_freq: 5
   }
