@@ -5,6 +5,9 @@ standard_planning_config {
      scenario_type: LANE_FOLLOW
      scenario_type: SIDE_PASS
      scenario_type: STOP_SIGN_UNPROTECTED
+     scenario_type: TRAFFIC_LIGHT_PROTECTED
+     scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
+     scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
   }
 }
 
