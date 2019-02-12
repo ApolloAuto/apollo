@@ -30,6 +30,7 @@
 #include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/interpolation_2d.h"
+#include "modules/control/common/leadlag_controller.h"
 #include "modules/control/common/pid_controller.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
@@ -126,6 +127,9 @@ class LonController : public Controller {
 
   PIDController speed_pid_controller_;
   PIDController station_pid_controller_;
+
+  LeadlagController speed_leadlag_controller_;
+  LeadlagController station_leadlag_controller_;
 
   FILE *speed_log_file_ = nullptr;
 
