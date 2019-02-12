@@ -470,6 +470,7 @@ body {
         .card-content-column {
             display: flex;
             flex-flow: column nowrap;
+            justify-content: flex-start;
 
             overflow-x: hidden;
             overflow-y: auto;
@@ -493,7 +494,7 @@ body {
             line-height: 40px;
 
             span {
-                padding-left: 20px;
+                margin-left: 15px;
             }
         }
 
@@ -510,7 +511,7 @@ body {
 
         position: relative;
         width: 40px;
-        transform: translate(35%, 25%);
+        transform: translate(10%, 25%);
 
         .toggle-switch {
             display: none;
@@ -611,7 +612,7 @@ body {
         .radio-selector-label {
             display: inline-block;
             position: relative;
-            transform: translate(65%, 30%);
+            transform: translate(10%, 30%);
             box-sizing: border-box;
             -webkit-box-sizing: border-box;
             width: 25px;
@@ -1082,6 +1083,10 @@ body {
             min-width: 180px;
             max-width: 260px;
         }
+
+        .others-checkbox {
+            margin-left: 10px;
+        }
     }
 
     .delay {
@@ -1350,11 +1355,11 @@ body {
             white-space: nowrap;
 
             @include small-screen {
-                width: 60px;
+                width: 75px;
             }
         }
 
-        .drive-event-time-row {
+        .drive-event-row {
             span {
                 position: relative;
                 padding: 10px 5px 10px 10px;

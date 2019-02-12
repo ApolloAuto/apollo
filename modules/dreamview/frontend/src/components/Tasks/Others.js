@@ -27,6 +27,7 @@ export default class Others extends React.Component {
                                   title={"PNC Monitor"}
                                   isChecked={options.showPNCMonitor}
                                   disabled={disablePanel}
+                                  extraClasses="others-checkbox"
                                   onClick={() => {
                                       this.props.store.handleOptionToggle('showPNCMonitor');
                                   }}/>
@@ -34,6 +35,7 @@ export default class Others extends React.Component {
                                   title={"Sim Control"}
                                   isChecked={options.enableSimControl}
                                   disabled={options.lockTaskPanel}
+                                  extraClasses="others-checkbox"
                                   onClick={() => {
                                       WS.toggleSimControl(!options.enableSimControl);
                                       this.props.store.handleOptionToggle('enableSimControl');
@@ -42,6 +44,7 @@ export default class Others extends React.Component {
                                   title={"Camera Sensor"}
                                   isChecked={options.showVideo}
                                   disabled={disablePanel}
+                                  extraClasses="others-checkbox"
                                   onClick={() => {
                                       this.props.store.handleOptionToggle('showVideo');
                                   }}/>
@@ -49,6 +52,7 @@ export default class Others extends React.Component {
                                   title={"Lock Task Panel"}
                                   isChecked={options.lockTaskPanel}
                                   disabled={false}
+                                  extraClasses="others-checkbox"
                                   onClick={() => {
                                     this.props.store.handleOptionToggle('lockTaskPanel');
                                   }}/>

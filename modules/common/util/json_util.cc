@@ -90,6 +90,21 @@ bool JsonUtil::GetStringVectorFromJson(const Json &json, const std::string &key,
   return ret;
 }
 
+bool JsonUtil::GetBooleanFromJson(const nlohmann::json &json,
+                                  const std::string &key, bool *value) {
+  const auto iter = json.find(key);
+  if (iter == json.end()) {
+    AERROR << "The json has no such key: " << key;
+    return false;
+  }
+  if (!iter->is_boolean()) {
+    AERROR << "The value of json[" << key << "] is not a boolean";
+    return false;
+  }
+  *value = *iter;
+  return true;
+}
+
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
