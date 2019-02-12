@@ -283,6 +283,9 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   return Status::OK();
 }
 
+// TODO(all): remove this
+// 1. the estimation is not accurate
+// 2. the constraint satisfaction will be handled in speed planning.
 std::vector<std::tuple<double, double, double>>
 QpPiecewiseJerkPathOptimizer::GetLateralSecondOrderDerivativeBounds(
     const common::TrajectoryPoint& init_point, const double qp_delta_s) {
