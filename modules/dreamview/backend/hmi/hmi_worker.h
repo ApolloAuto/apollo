@@ -63,7 +63,7 @@ class HMIWorker {
   void SubmitDriveEvent(const uint64_t event_time_ms,
                         const std::string& event_msg,
                         const std::vector<std::string>& event_types,
-                        const bool& is_an_issue_to_report);
+                        const bool& is_reportable);
 
   // Get current HMI status.
   HMIStatus GetStatus() const;

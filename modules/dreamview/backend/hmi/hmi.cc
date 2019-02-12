@@ -113,16 +113,16 @@ void HMI::RegisterMessageHandlers() {
         uint64_t event_time_ms;
         std::string event_msg;
         std::vector<std::string> event_types;
-        bool is_an_issue_to_report;
+        bool is_reportable;
         if (JsonUtil::GetNumberFromJson(json, "event_time_ms",
                                         &event_time_ms) &&
             JsonUtil::GetStringFromJson(json, "event_msg", &event_msg) &&
             JsonUtil::GetStringVectorFromJson(json, "event_type",
                                               &event_types) &&
-            JsonUtil::GetBooleanFromJson(json, "is_an_issue_to_report",
-                                         &is_an_issue_to_report)) {
+            JsonUtil::GetBooleanFromJson(json, "is_reportable",
+                                         &is_reportable)) {
           hmi_worker_->SubmitDriveEvent(event_time_ms, event_msg, event_types,
-                                        is_an_issue_to_report);
+                                        is_reportable);
           monitor_log_buffer_.INFO("Drive event added.");
         } else {
           AERROR << "Truncated SubmitDriveEvent request.";

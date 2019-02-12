@@ -265,13 +265,13 @@ export default class RealtimeWebSocketEndpoint {
         }));
     }
 
-    submitDriveEvent(eventTimeMs, eventMessage, eventTypes, isAnIssueToReport) {
+    submitDriveEvent(eventTimeMs, eventMessage, eventTypes, isReportable) {
     	this.websocket.send(JSON.stringify({
             type: "SubmitDriveEvent",
             event_time_ms: eventTimeMs,
             event_msg: eventMessage,
             event_type: eventTypes,
-            is_an_issue_to_report: isAnIssueToReport,
+            is_reportable: isReportable,
         }));
     }
 

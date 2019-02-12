@@ -20,7 +20,7 @@ export default class DriveEventEditor extends React.Component {
             eventMessage: "",
             eventTypes: new Set(),
             popupReminder: this.props.newDisengagementReminder,
-            isAnIssueToReport: false,
+            isReportable: false,
         };
 
         this.handleMessageChange = this.handleMessageChange.bind(this);
@@ -61,7 +61,7 @@ export default class DriveEventEditor extends React.Component {
             this.state.eventTime.getTime(),
             this.state.eventMessage,
             this.state.eventTypes,
-            this.state.isAnIssueToReport,
+            this.state.isReportable,
         );
         STORE.handleOptionToggle('showDataRecorder');
     }
@@ -82,7 +82,7 @@ export default class DriveEventEditor extends React.Component {
 
     toggleTicket() {
         this.setState((prevState) => {
-            return { isAnIssueToReport: !prevState.isAnIssueToReport };
+            return { isReportable: !prevState.isReportable };
         });
     }
 
@@ -136,7 +136,7 @@ export default class DriveEventEditor extends React.Component {
                                 <td>
                                     <CheckboxItem
                                         id={"showPNCMonitor"}
-                                        isChecked={this.state.isAnIssueToReport}
+                                        isChecked={this.state.isReportable}
                                         disabled={false}
                                         onClick={this.toggleTicket}
                                     />
