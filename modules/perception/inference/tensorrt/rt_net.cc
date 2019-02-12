@@ -456,7 +456,7 @@ void RTNet::addLayer(const LayerParameter &layer_param,
 bool RTNet::loadWeights(const std::string &model_file, WeightMap *weight_map) {
   NetParameter net;
   if (!ReadProtoFromBinaryFile(model_file.c_str(), &net)) {
-    AFATAL << "open file " << model_file << " failed";
+    AFATAL << "Failed to read proto from binary file: " << model_file;
     return false;
   }
   for (int i = 0; i < net.layer_size(); i++) {

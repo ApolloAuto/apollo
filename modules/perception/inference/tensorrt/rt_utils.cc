@@ -28,39 +28,50 @@ bool ReadProtoFromTextFile(const std::string &filename,
                            google::protobuf::Message *proto) {
   int fd = open(filename.c_str(), O_RDONLY);
   if (fd < 0) {
-    AERROR << "cannot open file " << filename;
+    AERROR << "Failed to open file: " << filename;
     return false;
   }
   google::protobuf::io::FileInputStream raw_input(fd);
+  raw_input.setCloseOnDelete(true);
 
-  bool success = google::protobuf::TextFormat::Parse(&raw_input, proto);
+  if (!google::protobuf::TextFormat::Parse(&raw_input, proto)) {
+    AERROR << "Failed to parse proto file: " << filename;
+    return false;
+  }
 
   close(fd);
-  return success;
+  return true;
 }
 
 bool ReadProtoFromBinaryFile(const std::string &filename,
                              google::protobuf::Message *proto) {
   int fd = open(filename.c_str(), O_RDONLY);
   if (fd < 0) {
-    AERROR << "cannot open file " << filename;
+    AERROR << "Failed to open file: " << filename;
     return false;
   }
   google::protobuf::io::FileInputStream raw_input(fd);
+  raw_input.setCloseOnDelete(true);
   google::protobuf::io::CodedInputStream coded_input(&raw_input);
   coded_input.SetTotalBytesLimit(INT_MAX, 536870912);
 
-  bool success = proto->ParseFromCodedStream(&coded_input);
+  if (!proto->ParseFromCodedStream(&coded_input)) {
+    AERROR << "Failed to parse proto file: " << filename;
+    return false;
+  }
 
   close(fd);
-  return success;
+  return true;
 }
+
 bool loadNetParams(const std::string &param_file, NetParameter *param) {
   return ReadProtoFromTextFile(param_file, param);
 }
+
 std::string locateFile(const std::string &network, const std::string &input) {
   return network + "/" + input;
 }
+
 }  // namespace inference
 }  // namespace perception
 }  // namespace apollo
