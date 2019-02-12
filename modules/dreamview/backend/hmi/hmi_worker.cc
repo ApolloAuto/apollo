@@ -374,7 +374,7 @@ bool HMIWorker::Trigger(const HMIAction action, const std::string& value) {
 void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
                                  const std::string& event_msg,
                                  const std::vector<std::string>& event_types,
-                                 const bool& is_reportable) {
+                                 const bool is_reportable) {
   std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
   apollo::common::util::FillHeader("HMI", drive_event.get());
   // TODO(xiaoxq): Here we reuse the header time field as the event occuring
