@@ -26,7 +26,6 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/optimizers/qp_spline_st_speed/qp_piecewise_st_graph.h"

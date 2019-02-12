@@ -20,6 +20,7 @@
 #include <list>
 #include <map>
 
+#include "cyber/common/file.h"
 #include "google/protobuf/repeated_field.h"
 
 #include "modules/common/math/quaternion.h"
@@ -68,7 +69,7 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
 
   planner_dispatcher_->Init();
 
-  CHECK(apollo::common::util::GetProtoFromFile(
+  CHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;

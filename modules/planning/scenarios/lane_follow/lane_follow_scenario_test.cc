@@ -23,8 +23,8 @@
 
 #include "gtest/gtest.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -45,7 +45,7 @@ TEST_F(LaneFollowScenarioTest, VerifyConf) {
       "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_lane_follow_config_file, &config));
 }
 
@@ -55,7 +55,7 @@ TEST_F(LaneFollowScenarioTest, Init) {
       "scenario/lane_follow_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_lane_follow_config_file, &config));
   ScenarioContext context;
   scenario_.reset(new LaneFollowScenario(config, &context));
