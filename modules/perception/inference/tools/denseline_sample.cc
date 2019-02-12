@@ -44,7 +44,6 @@ DEFINE_int32(mean_r, 96, "image r");
 
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  std::vector<float> output_data_vec1;
 
   const int height = FLAGS_height;
   const int width = FLAGS_width;
@@ -69,14 +68,10 @@ int main(int argc, char **argv) {
     AINFO << "outputs name: " << name;
   }
 
-  // std::shared_ptr<nvinfer1::Int8EntropyCalibrator> calibrator = nullptr;
   apollo::perception::inference::BatchStream stream(2, 50, "./batches/");
   nvinfer1::Int8EntropyCalibrator *calibrator =
       new nvinfer1::Int8EntropyCalibrator(stream, 0, true, "./");
   if (FLAGS_int8) {
-    // apollo::perception::inference::BatchStream stream(2, 50, "./batches/");
-    // calibrator
-    //    .reset(new nvinfer1::Int8EntropyCalibrator(stream, 0, true, "./"));
     AINFO << "int8";
     rt_net = new apollo::perception::inference::RTNet(
         proto_file, weight_file, outputs, inputs, calibrator);
