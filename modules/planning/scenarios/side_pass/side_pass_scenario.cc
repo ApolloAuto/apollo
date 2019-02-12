@@ -133,7 +133,7 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
     // to SIDE_PASS scenario.
     return false;
   } else {
-    // If originally in LANE_FOLLOW, then decide whether we shoudl
+    // If originally in LANE_FOLLOW, then decide whether we should
     // switch to SIDE_PASS scenario.
     bool is_side_pass = IsSidePassScenario(frame);
     if (is_side_pass) {
