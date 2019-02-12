@@ -18,8 +18,8 @@
 
 #include <algorithm>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/geometry/common.h"
@@ -90,7 +90,7 @@ bool HDMapInput::InitHDMap() {
   hdmap_file_ =
     apollo::common::util::StrCat(FLAGS_map_dir, "/base_map.bin", filename);
   AINFO << "hdmap_file_: " << hdmap_file_;
-  if (!apollo::common::util::PathExists(hdmap_file_)) {
+  if (!apollo::cyber::common::PathExists(hdmap_file_)) {
     AERROR << "Failed to find hadmap file: " << hdmap_file_;
     return false;
   }

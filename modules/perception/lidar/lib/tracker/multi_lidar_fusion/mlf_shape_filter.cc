@@ -14,19 +14,18 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/util/file.h"
-#include "modules/perception/lib/config_manager/config_manager.h"
-
-#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
-
-#include "modules/perception/lidar/common/lidar_object_util.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_shape_filter.h"
+
+#include "cyber/common/file.h"
+#include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/lidar/common/lidar_object_util.h"
+#include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool MlfShapeFilter::Init(const MlfFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -39,7 +38,7 @@ bool MlfShapeFilter::Init(const MlfFilterInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_shape_filter.conf");
   MlfShapeFilterConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   bottom_points_ignore_threshold_ = config.bottom_points_ignore_threshold();
   top_points_ignore_threshold_ = config.top_points_ignore_threshold();

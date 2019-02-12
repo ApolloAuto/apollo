@@ -15,18 +15,17 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/map_manager/map_manager.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
-#include "modules/perception/proto/map_manager_config.pb.h"
-
-#include "modules/common/util/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
+#include "modules/perception/proto/map_manager_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool MapManager::Init(const MapManagerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -39,7 +38,7 @@ bool MapManager::Init(const MapManagerInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "map_manager.conf");
   MapManagerConfig config;
-  CHECK(common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   update_pose_ = config.update_pose();
   roi_search_distance_ = config.roi_search_distance();
   hdmap_input_ = map::HDMapInput::Instance();

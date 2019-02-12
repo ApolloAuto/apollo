@@ -15,13 +15,14 @@
  *****************************************************************************/
 #include "modules/perception/onboard/component/fusion_camera_detection_component.h"
 
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <yaml-cpp/yaml.h>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time_util.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/time_util.h"
@@ -32,7 +33,7 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-using apollo::common::util::GetAbsolutePath;
+using apollo::cyber::common::GetAbsolutePath;
 
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
@@ -41,7 +42,7 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  if (!apollo::common::util::GetProtoFromFile(config_file, &perception_param)) {
+  if (!cyber::common::GetProtoFromFile(config_file, &perception_param)) {
     AERROR << "Read config failed: " << config_file;
     return -1;
   }
@@ -86,7 +87,7 @@ bool SetCameraHeight(const std::string &sensor_name,
 // @description: load camera extrinsics from yaml file
 bool LoadExtrinsics(const std::string &yaml_file,
                     Eigen::Matrix4d *camera_extrinsic) {
-  if (!apollo::common::util::PathExists(yaml_file)) {
+  if (!apollo::cyber::common::PathExists(yaml_file)) {
     AINFO << yaml_file << " not exist!";
     return false;
   }

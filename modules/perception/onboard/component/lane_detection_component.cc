@@ -43,7 +43,7 @@ FILE *motion_history;
 namespace apollo {
 namespace perception {
 namespace onboard {
-using apollo::common::util::GetAbsolutePath;
+using apollo::cyber::common::GetAbsolutePath;
 using apollo::localization::LocalizationEstimate;
 
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
@@ -98,7 +98,7 @@ static bool SetCameraHeight(const std::string &sensor_name,
 // @description: load camera extrinsics from yaml file
 static bool LoadExtrinsics(const std::string &yaml_file,
                            Eigen::Matrix4d *camera_extrinsic) {
-  if (!apollo::common::util::PathExists(yaml_file)) {
+  if (!apollo::cyber::common::PathExists(yaml_file)) {
     AINFO << yaml_file << " not exist!";
     return false;
   }

@@ -18,7 +18,7 @@
 
 #include <utility>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/common/track_pool_types.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -40,7 +40,7 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_engine.conf");
   MlfEngineConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   main_sensor_.clear();
   for (int i = 0; i < config.main_sensor_size(); ++i) {

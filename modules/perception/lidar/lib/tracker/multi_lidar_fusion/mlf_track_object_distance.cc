@@ -16,7 +16,7 @@
 
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_distance.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/association/distance_collection.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
@@ -47,11 +47,11 @@ bool MlfTrackObjectDistance::Init(
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = apollo::common::util::GetAbsolutePath(work_root, root_path);
-  config_file = apollo::common::util::GetAbsolutePath(
+  config_file = cyber::common::GetAbsolutePath(work_root, root_path);
+  config_file = cyber::common::GetAbsolutePath(
       config_file, "mlf_track_object_distance.conf");
   MlfDistanceConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   foreground_weight_table_.clear();
   background_weight_table_.clear();
