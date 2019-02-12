@@ -37,7 +37,6 @@
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"

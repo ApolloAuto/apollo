@@ -20,12 +20,12 @@
 
 #include "modules/planning/common/obstacle.h"
 
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 
-#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -61,7 +61,7 @@ class ObstacleTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     prediction::PredictionObstacles prediction_obstacles;
-    ASSERT_TRUE(common::util::GetProtoFromFile(
+    ASSERT_TRUE(cyber::common::GetProtoFromFile(
         "modules/planning/common/testdata/sample_prediction.pb.txt",
         &prediction_obstacles));
     auto obstacles = Obstacle::CreateObstacles(prediction_obstacles);

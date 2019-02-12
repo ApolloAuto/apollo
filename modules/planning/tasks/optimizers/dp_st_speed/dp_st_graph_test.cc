@@ -25,14 +25,14 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::util::GetProtoFromFile;
+using apollo::cyber::common::GetProtoFromFile;
 
 class DpStGraphTest : public ::testing::Test {
  public:

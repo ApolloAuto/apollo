@@ -16,6 +16,7 @@
 
 #include "modules/planning/integration_tests/planning_test_base.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
@@ -25,7 +26,6 @@
 #include "modules/routing/proto/routing.pb.h"
 
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -85,7 +85,7 @@ bool PlanningTestBase::FeedTestData() {
     AERROR << "Requires FLAGS_test_chassis_file to be set";
     return false;
   }
-  if (!apollo::common::util::GetProtoFromFile(
+  if (!apollo::cyber::common::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_chassis_file, &chassis)) {
     AERROR << "failed to load file: " << FLAGS_test_chassis_file;
     return false;
@@ -96,7 +96,7 @@ bool PlanningTestBase::FeedTestData() {
     return false;
   }
   LocalizationEstimate localization;
-  if (!apollo::common::util::GetProtoFromFile(
+  if (!apollo::cyber::common::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_localization_file,
           &localization)) {
     AERROR << "failed to load file: " << FLAGS_test_localization_file;
@@ -111,7 +111,7 @@ bool PlanningTestBase::FeedTestData() {
     return false;
   }
   PredictionObstacles prediction;
-  if (!apollo::common::util::GetProtoFromFile(
+  if (!apollo::cyber::common::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_prediction_file,
           &prediction)) {
     AERROR << "failed to load file: " << FLAGS_test_prediction_file;
@@ -123,7 +123,7 @@ bool PlanningTestBase::FeedTestData() {
     return false;
   }
   RoutingResponse routing_response;
-  if (!apollo::common::util::GetProtoFromFile(
+  if (!apollo::cyber::common::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_routing_response_file,
           &routing_response)) {
     AERROR << "failed to load file: " << FLAGS_test_routing_response_file;
@@ -132,7 +132,7 @@ bool PlanningTestBase::FeedTestData() {
   // traffic_light_detection
   // optional
   TrafficLightDetection traffic_light_detection;
-  if (!apollo::common::util::GetProtoFromFile(
+  if (!apollo::cyber::common::GetProtoFromFile(
           FLAGS_test_data_dir + "/" + FLAGS_test_traffic_light_file,
           &traffic_light_detection)) {
     AERROR << "failed to load file: " << FLAGS_test_traffic_light_file;
@@ -163,8 +163,8 @@ void PlanningTestBase::SetUp() {
 
   CHECK(FeedTestData()) << "Failed to feed test data";
 
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                               &config_))
+  CHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
+                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
 
   CHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
@@ -176,7 +176,7 @@ void PlanningTestBase::SetUp() {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
     ADCTrajectory prev_planning;
-    CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
+    CHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
     planning_->last_publishable_trajectory_.reset(
         new PublishableTrajectory(prev_planning));
   }
@@ -195,7 +195,7 @@ void PlanningTestBase::UpdateData() {
     const auto prev_planning_file =
         FLAGS_test_data_dir + "/" + FLAGS_test_previous_planning_file;
     ADCTrajectory prev_planning;
-    CHECK(common::util::GetProtoFromFile(prev_planning_file, &prev_planning));
+    CHECK(cyber::common::GetProtoFromFile(prev_planning_file, &prev_planning));
     planning_->last_publishable_trajectory_.reset(
         new PublishableTrajectory(prev_planning));
   }

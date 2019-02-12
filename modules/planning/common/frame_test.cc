@@ -20,10 +20,10 @@
 
 #include "modules/planning/common/frame.h"
 
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 
@@ -33,7 +33,7 @@ namespace planning {
 class FrameTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    ASSERT_TRUE(common::util::GetProtoFromFile(
+    ASSERT_TRUE(cyber::common::GetProtoFromFile(
         "modules/planning/common/testdata/sample_prediction.pb.txt",
         &prediction_obstacles_));
   }
