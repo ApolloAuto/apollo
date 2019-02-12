@@ -285,26 +285,28 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
     if (rejected_scenarios.find(scenario) != rejected_scenarios.end()) {
       continue;
     }
-    if (scenario == ScenarioConfig::SIDE_PASS &&
-        !FLAGS_enable_scenario_side_pass) {
-      continue;
+    if (!FLAGS_enable_scenario_side_pass) {
+      if (scenario == ScenarioConfig::SIDE_PASS) {
+        continue;
+      }
     }
-    if (scenario == ScenarioConfig::STOP_SIGN_UNPROTECTED &&
-        !FLAGS_enable_scenario_stop_sign) {
-      continue;
+    if (!FLAGS_enable_scenario_stop_sign) {
+      if (scenario == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
+        continue;
+      }
     }
-    if (scenario == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED &&
-        !FLAGS_enable_scenario_traffic_light) {
-      continue;
+    if (!FLAGS_enable_scenario_traffic_light) {
+      if (scenario == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED) {
+        continue;
+      }
+      if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN) {
+        continue;
+      }
+      if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
+        continue;
+      }
     }
-    if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN &&
-        !FLAGS_enable_scenario_traffic_light) {
-      continue;
-    }
-    if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN &&
-        !FLAGS_enable_scenario_traffic_light) {
-      continue;
-    }
+
     if (SelectScenario(scenario, ego_point, frame)) {
       AINFO << "select transferable scenario: "
             << ScenarioConfig::ScenarioType_Name(scenario);
