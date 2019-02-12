@@ -36,6 +36,7 @@
 namespace apollo {
 namespace planning {
 
+// TODO(all): change name to PiecewiseJerkPathOptimizer
 class QpPiecewiseJerkPathOptimizer : public PathOptimizer {
  public:
   explicit QpPiecewiseJerkPathOptimizer(const TaskConfig& config);

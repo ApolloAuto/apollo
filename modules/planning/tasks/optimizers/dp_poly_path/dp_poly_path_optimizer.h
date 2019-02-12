@@ -32,6 +32,8 @@ namespace planning {
  * @brief DpPolyPathOptimizer does path planning with dynamic programming
  * algorithm.
  */
+
+// TODO(all): remove this class as the method has a number of defects.
 class DpPolyPathOptimizer : public PathOptimizer {
  public:
   explicit DpPolyPathOptimizer(const TaskConfig &config);
