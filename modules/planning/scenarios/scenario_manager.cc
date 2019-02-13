@@ -233,13 +233,13 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   Observe(frame);
 
   if (FLAGS_enable_scenario_dispatcher) {
-    Scenario_Dispatcher(ego_point, frame);
+    ScenarioDispatch(ego_point, frame);
   } else {
-    Scenario_Voter(ego_point, frame);
+    ScenarioSelfVote(ego_point, frame);
   }
 }
 
-void ScenarioManager::Scenario_Dispatcher(
+void ScenarioManager::ScenarioDispatch(
     const common::TrajectoryPoint& ego_point,
     const Frame& frame) {
   CHECK(!frame.reference_line_info().empty());
@@ -260,7 +260,7 @@ void ScenarioManager::Scenario_Dispatcher(
   // TODO(all): to be added
 }
 
-void ScenarioManager::Scenario_Voter(
+void ScenarioManager::ScenarioSelfVote(
     const common::TrajectoryPoint& ego_point,
     const Frame& frame) {
   CHECK(!frame.reference_line_info().empty());

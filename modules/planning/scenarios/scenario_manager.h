@@ -56,8 +56,8 @@ class ScenarioManager final {
                                 const Frame& frame);
 
   // functions for scenario voter implementation
-  void Scenario_Voter(const common::TrajectoryPoint& ego_point,
-                      const Frame& frame);
+  void ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
+                        const Frame& frame);
   bool ReuseCurrentScenario(const common::TrajectoryPoint& ego_point,
                             const Frame& frame);
   bool SelectScenario(const ScenarioConfig::ScenarioType type,
@@ -65,8 +65,8 @@ class ScenarioManager final {
                       const Frame& frame);
 
   // functions for scenario dispatch implementation
-  void Scenario_Dispatcher(const common::TrajectoryPoint& ego_point,
-                           const Frame& frame);
+  void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
+                        const Frame& frame);
 
   // ScenarioConfig::ScenarioType DecideCurrentScenario(
   //      const common::TrajectoryPoint& ego_point, const Frame& frame);
