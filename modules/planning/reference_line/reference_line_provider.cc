@@ -176,7 +176,11 @@ void ReferenceLineProvider::UpdateReferenceLine(
 void ReferenceLineProvider::GenerateThread() {
   while (!is_stop_) {
     std::this_thread::yield();
+#ifdef __x86_64__
     constexpr int32_t kSleepTime = 50;  // milliseconds
+#else
+    constexpr int32_t kSleepTime = 100;  // milliseconds
+#endif
     std::this_thread::sleep_for(
         std::chrono::duration<double, std::milli>(kSleepTime));
     double start_time = Clock::NowInSeconds();

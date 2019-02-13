@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  if (ros::ok()) {
+  while/*if*/ (ros::ok()) {
     AdapterManager::FillNavigationHeader("relative_map", &navigation_info);
     AdapterManager::PublishNavigation(navigation_info);
     ADEBUG << "Sending navigation info:" << navigation_info.DebugString();
@@ -104,10 +104,10 @@ int main(int argc, char** argv) {
     // prematurely.
     ros::Rate r(1);  // 1 hz
     r.sleep();
-  } else {
+  }/* else {
     AERROR << "ROS status is wrong.";
     return -1;
-  }
+  }*/
 
   return 0;
 }
@@ -166,7 +166,7 @@ bool GetNavigationPathFromFile(const std::string& filename,
                                          (diff_s >= kLargeKappaSampleInterval &&
                                           current_kappa > kLargeKappa)
                                    : true;
-      if (not_down_sampling) {
+      if (true/*not_down_sampling*/) {
         last_sampled_s = current_sampled_s;
         auto* point = navigation_path->mutable_path()->add_path_point();
         point->set_x(json_obj["x"]);
