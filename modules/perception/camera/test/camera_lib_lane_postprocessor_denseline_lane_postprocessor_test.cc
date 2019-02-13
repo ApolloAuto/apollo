@@ -16,8 +16,8 @@
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"  // NOLINT
@@ -37,7 +37,7 @@ TEST(DenselineLanePostprocessor, camera_lane_postprocessor_point_test) {
   LaneDetectorOptions detetor_options;
   init_options.conf_file = "config.pt";
   init_options.root_dir = "/apollo/modules/perception/testdata/"
-    "camera/lib/lane/postprocessor/denseline/data/";
+      "camera/lib/lane/postprocessor/denseline/data/";
   base::BrownCameraDistortionModel model;
   common::LoadBrownCameraIntrinsic("/apollo/modules/perception/testdata/"
     "camera/lib/lane/postprocessor/denseline/params/"
@@ -64,7 +64,7 @@ TEST(DenselineLanePostprocessor, camera_lane_postprocessor_point_test) {
   lane_postprocessor->Init(postprocessor_init_options);
   LanePostprocessorOptions postprocessor_options;
   const std::string result_dir = "./result";
-  apollo::common::util::EnsureDirectory(result_dir);
+  cyber::common::EnsureDirectory(result_dir);
 
   //  set pitch angle
   float pitch_angle = 0.0f;
@@ -151,23 +151,23 @@ TEST(DenselineLanePostprocessor, lane_postprocessor_init_test) {
   LanePostprocessorInitOptions postprocessor_init_options;
 
   postprocessor_init_options.detect_config_root =
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/lane/postprocessor/denseline/data/";
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/lane/postprocessor/denseline/data/";
   postprocessor_init_options.detect_config_name =
       "error_config.pt";
   postprocessor_init_options.root_dir =
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/lane/postprocessor/denseline/data/";
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/lane/postprocessor/denseline/data/";
   postprocessor_init_options.conf_file = "lane_postprocessor_config.pt";
   EXPECT_FALSE(lane_postprocessor->Init(postprocessor_init_options));
 
   postprocessor_init_options.detect_config_root =
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/lane/postprocessor/denseline/data/";
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/lane/postprocessor/denseline/data/";
   postprocessor_init_options.detect_config_name = "config.pt";
   postprocessor_init_options.root_dir =
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/lane/postprocessor/denseline/data/";
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/lane/postprocessor/denseline/data/";
   postprocessor_init_options.conf_file = "error_lane_postprocessor_config.pt";
   EXPECT_FALSE(lane_postprocessor->Init(postprocessor_init_options));
 }

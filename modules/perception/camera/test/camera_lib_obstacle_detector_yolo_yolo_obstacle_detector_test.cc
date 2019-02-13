@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 
+#include "cyber/common/file.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
 #include "modules/perception/common/io/io_util.h"
@@ -25,12 +26,12 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 TEST(YoloCameraDetectorTest, demo_test) {
   inference::CudaUtil::set_device_id(0);
   cv::Mat cv_img = cv::imread("/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/detector/yolo/img/test.jpg");
+      "camera/lib/obstacle/detector/yolo/img/test.jpg");
   CHECK(!cv_img.empty()) << "image is empty.";
 
   base::Image8U image(cv_img.rows, cv_img.cols, base::Color::BGR);
@@ -146,7 +147,7 @@ TEST(YoloCameraDetectorTest, inference_init_test) {
   std::string config_path =
       GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
-  apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
+  cyber::common::GetProtoFromFile(config_path, &yolo_param);
   yolo::YoloParam origin_yolo_param;
   origin_yolo_param.CopyFrom(yolo_param);
   yolo_param.mutable_model_param()->set_model_type("Unknownnet");
@@ -188,7 +189,7 @@ TEST(YoloCameraDetectorTest, anchor_init_test) {
       GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   yolo::YoloParam origin_yolo_param;
-  apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
+  cyber::common::GetProtoFromFile(config_path, &yolo_param);
   origin_yolo_param.CopyFrom(yolo_param);
   yolo_param.mutable_model_param()->set_anchors_file("unknown_anchor.txt");
   {
@@ -228,7 +229,7 @@ TEST(YoloCameraDetectorTest, type_init_test) {
       GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   yolo::YoloParam origin_yolo_param;
-  apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
+  cyber::common::GetProtoFromFile(config_path, &yolo_param);
   origin_yolo_param.CopyFrom(yolo_param);
   yolo_param.mutable_model_param()->set_types_file("config.pt");
   {
@@ -268,7 +269,7 @@ TEST(YoloCameraDetectorTest, feature_init_test) {
       GetAbsolutePath(init_options.root_dir, init_options.conf_file);
   yolo::YoloParam yolo_param;
   yolo::YoloParam origin_yolo_param;
-  apollo::common::util::GetProtoFromFile(config_path, &yolo_param);
+  cyber::common::GetProtoFromFile(config_path, &yolo_param);
   origin_yolo_param.CopyFrom(yolo_param);
   yolo_param.mutable_model_param()->set_feature_file("unknown.pt");
   {

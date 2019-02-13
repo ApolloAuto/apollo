@@ -16,7 +16,7 @@
 
 #include <iomanip>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
@@ -266,7 +266,7 @@ int work() {
     // save distortion images
     std::string save_dir = FLAGS_undistortion_save_dir + "/" + camera_name;
     if (FLAGS_do_undistortion && (FLAGS_undistortion_save_dir != "") &&
-        apollo::common::util::PathExists(save_dir)) {
+        cyber::common::PathExists(save_dir)) {
       base::Image8U image1;
       DataProvider::ImageOptions image_options;
       image_options.target_color = base::Color::BGR;

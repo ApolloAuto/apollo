@@ -18,7 +18,7 @@
 
 #include <algorithm>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool MlfMotionRefiner::Init(const MlfMotionRefinerInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -40,7 +40,7 @@ bool MlfMotionRefiner::Init(const MlfMotionRefinerInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_motion_refiner.conf");
   MlfMotionRefinerConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   // read from proto config
   claping_speed_threshold_ = config.claping_speed_threshold();
   claping_acceleration_threshold_ = config.claping_acceleration_threshold();

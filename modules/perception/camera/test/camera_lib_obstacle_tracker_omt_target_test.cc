@@ -13,14 +13,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
+#include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
+
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
-#include "modules/common/util/file.h"
+
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt.pb.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
 
 namespace apollo {
 namespace perception {
@@ -36,13 +38,13 @@ TEST(TargetTest, target_test) {
   CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
-  std::string omt_config = apollo::common::util::GetAbsolutePath(
+  std::string omt_config = cyber::common::GetAbsolutePath(
     "/apollo/modules/perception/testdata/"
     "camera/lib/obstacle/tracker/omt/data/models/"
     "omt_obstacle_tracker",
     "config.pt");
 
-  ASSERT_TRUE(apollo::common::util::GetProtoFromFile(omt_config, &omt_param));
+  ASSERT_TRUE(cyber::common::GetProtoFromFile(omt_config, &omt_param));
 
   // first frame with one car object
   std::string sensor_name = "onsemi_obstacle";
@@ -209,13 +211,12 @@ TEST(TargetTest, clapping_velocity_test) {
   CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
-  std::string omt_config = apollo::common::util::GetAbsolutePath(
+  std::string omt_config = cyber::common::GetAbsolutePath(
     "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/tracker/omt/data/models/"
-    "omt_obstacle_tracker",
+    "camera/lib/obstacle/tracker/omt/data/models/omt_obstacle_tracker",
     "config.pt");
 
-  ASSERT_TRUE(apollo::common::util::GetProtoFromFile(omt_config, &omt_param));
+  ASSERT_TRUE(cyber::common::GetProtoFromFile(omt_config, &omt_param));
 
   auto read_pos_and_theta_vec = [](const std::string& fname)
       -> std::vector<std::vector<double> > {

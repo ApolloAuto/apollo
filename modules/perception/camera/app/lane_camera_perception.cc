@@ -37,7 +37,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using apollo::cyber::common::GetAbsolutePath;
 
 bool LaneCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {

@@ -14,9 +14,12 @@
 * limitations under the License.
 *****************************************************************************/
 
+#include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
+
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
-#include "modules/common/util/file.h"
+
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/base/object.h"
@@ -25,7 +28,6 @@
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_detector.h"
 #include "modules/perception/camera/lib/interface/base_obstacle_tracker.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/common/io/io_util.h"
 
@@ -123,7 +125,7 @@ int write_track_imgs(const std::string &out_path, const cv::Mat &frame,
 // @description: load camera extrinsics from yaml file
 bool LoadExtrinsics(const std::string &yaml_file,
                     Eigen::Matrix4d *camera_extrinsic) {
-  if (!apollo::common::util::PathExists(yaml_file)) {
+  if (!apollo::cyber::common::PathExists(yaml_file)) {
     AINFO << yaml_file << " not exist!";
     return false;
   }
@@ -211,7 +213,7 @@ bool GetProjectMatrix(const std::string &camera_name,
 // intrinsic_parm_ is a protected filed, cannot get directly
 bool LoadCameraIntrinsics(const std::string &yaml_file,
                           Eigen::Matrix3f *camera_intrinsic) {
-  if (!apollo::common::util::PathExists(yaml_file)) {
+  if (!apollo::cyber::common::PathExists(yaml_file)) {
     AINFO << yaml_file << " not exist!";
     return false;
   }

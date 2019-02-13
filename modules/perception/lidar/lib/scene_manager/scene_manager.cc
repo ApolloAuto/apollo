@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/scene_manager/scene_manager.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/scene_manager/proto/scene_manager_config.pb.h"
 #include "modules/perception/lidar/lib/scene_manager/scene_service.h"
@@ -25,7 +25,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool SceneManager::InitInternal(const SceneManagerInitOptions& options) {
   if (initialized_) {
@@ -41,7 +41,7 @@ bool SceneManager::InitInternal(const SceneManagerInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "scene_manager.conf");
   SceneManagerConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   services_.clear();
   for (int i = 0; i < config.service_name_size(); ++i) {
     const auto& name = config.service_name(i);

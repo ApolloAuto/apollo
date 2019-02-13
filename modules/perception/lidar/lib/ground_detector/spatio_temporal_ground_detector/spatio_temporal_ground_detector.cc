@@ -16,7 +16,7 @@
 
 #include "modules/perception/lidar/lib/ground_detector/spatio_temporal_ground_detector/spatio_temporal_ground_detector.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/common/point_cloud_processing/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetProtoFromFile;
+using apollo::cyber::common::GetProtoFromFile;
 
 bool SpatioTemporalGroundDetector::Init(
     const GroundDetectorInitOptions& options) {
@@ -42,8 +42,8 @@ bool SpatioTemporalGroundDetector::Init(
   CHECK(model_config->get_value("root_path", &root_path))
       << "Failed to get value of root_path.";
   std::string config_file;
-  config_file = apollo::common::util::GetAbsolutePath(work_root, root_path);
-  config_file = apollo::common::util::GetAbsolutePath(
+  config_file = apollo::cyber::common::GetAbsolutePath(work_root, root_path);
+  config_file = apollo::cyber::common::GetAbsolutePath(
       config_file, "spatio_temporal_ground_detector.conf");
 
   // get config params

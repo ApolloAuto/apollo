@@ -15,8 +15,8 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/preprocessor/tl_preprocessor.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/utils/time_util.h"

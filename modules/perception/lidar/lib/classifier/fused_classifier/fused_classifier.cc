@@ -17,7 +17,7 @@
 
 #include <vector>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/proto/fused_classifier_config.pb.h"
 
 namespace apollo {
@@ -25,7 +25,7 @@ namespace perception {
 namespace lidar {
 
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
-using apollo::common::util::GetAbsolutePath;
+using apollo::cyber::common::GetAbsolutePath;
 using apollo::perception::base::ObjectType;
 
 bool FusedClassifier::Init(const ClassifierInitOptions& options) {
@@ -39,7 +39,7 @@ bool FusedClassifier::Init(const ClassifierInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "fused_classifier.conf");
   FusedClassifierConfig config;
-  CHECK(common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   temporal_window_ = config.temporal_window();
   enable_temporal_fusion_ = config.enable_temporal_fusion();
   use_tracked_objects_ = config.use_tracked_objects();

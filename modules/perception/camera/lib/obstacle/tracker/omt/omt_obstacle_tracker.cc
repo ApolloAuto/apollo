@@ -18,7 +18,7 @@
 #include <algorithm>
 #include <functional>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/base/point.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/math_functions.h"
@@ -29,11 +29,11 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   std::string omt_config = GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!apollo::common::util::GetProtoFromFile(omt_config, &omt_param_)) {
+  if (!cyber::common::GetProtoFromFile(omt_config, &omt_param_)) {
     AERROR << "Read config failed: " << omt_config;
     return false;
   }

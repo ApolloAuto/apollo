@@ -17,8 +17,8 @@
 
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/app/debug_info.h"
 #include "modules/perception/camera/common/global_config.h"
@@ -31,7 +31,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool ObstacleCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {
@@ -42,8 +42,8 @@ bool ObstacleCameraPerception::Init(
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  CHECK(apollo::common::util::GetProtoFromFile(
-        config_file, &perception_param_)) << "Read config failed: ";
+  CHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
+      << "Read config failed: ";
   CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
   // Init detector
