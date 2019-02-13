@@ -54,8 +54,8 @@ module.exports = {
                     {
                         loader: "babel-loader",
                         options: {
-                            // Use es2015 so that async/await are available.
-                            presets: ["es2015", "stage-0", "react"],
+                            // Use env so that async/await are available.
+                            presets: ["env", "stage-0", "react"],
                             // Enable decorators for mobx.
                             plugins: ["transform-decorators-legacy",
                                       "transform-runtime"],
@@ -161,7 +161,7 @@ module.exports = {
                 {
                     loader: "babel-loader",
                     options: {
-                        presets: ["es2015"],
+                        presets: ["env"],
                     }
                 }]
             }, {
