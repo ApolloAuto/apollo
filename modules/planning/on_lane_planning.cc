@@ -17,6 +17,7 @@
 #include <list>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "gtest/gtest_prod.h"
 
 #include "modules/routing/proto/routing.pb.h"
@@ -28,11 +29,12 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
 #include "modules/planning/on_lane_planning.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
+#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -46,35 +48,6 @@ using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::routing::RoutingResponse;
-
-namespace {
-
-bool IsVehicleStateValid(const VehicleState& vehicle_state) {
-  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
-      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
-      std::isnan(vehicle_state.linear_acceleration())) {
-    return false;
-  }
-  return true;
-}
-
-bool IsDifferentRouting(const RoutingResponse& first,
-                        const RoutingResponse& second) {
-  if (first.has_header() && second.has_header()) {
-    if (first.header().sequence_num() != second.header().sequence_num()) {
-      return true;
-    }
-    if (first.header().timestamp_sec() != second.header().timestamp_sec()) {
-      return true;
-    }
-    return false;
-  } else {
-    return true;
-  }
-}
-}  // namespace
 
 OnLanePlanning::~OnLanePlanning() {
   if (reference_line_provider_) {
@@ -103,7 +76,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
   planner_dispatcher_->Init();
 
-  CHECK(apollo::common::util::GetProtoFromFile(
+  CHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
@@ -179,6 +152,8 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
+
+// TODO(all): fix this! this will cause unexpected behavior from controller
 void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
   trajectory_pb->clear_trajectory_point();
 
@@ -258,7 +233,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
-  const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
+  const double planning_cycle_time = 1.0 /
+      static_cast<double>(FLAGS_planning_loop_rate);
 
   std::vector<TrajectoryPoint> stitching_trajectory;
   std::string replan_reason;
@@ -472,11 +448,9 @@ Status OnLanePlanning::Plan(
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  if (FLAGS_enable_stitch_last_trajectory) {
-    last_publishable_trajectory_->PrependTrajectoryPoints(
-        std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
-                                     stitching_trajectory.end() - 1));
-  }
+  last_publishable_trajectory_->PrependTrajectoryPoints(
+      std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
+          stitching_trajectory.end() - 1));
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
 

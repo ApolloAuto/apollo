@@ -149,7 +149,7 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
 
 TEST_F(LonControllerTest, Init) {
   common::Status status = Init(nullptr);
-  EXPECT_EQ(status.code() == common::ErrorCode::CONTROL_INIT_ERROR, true);
+  EXPECT_EQ(status.code(), common::ErrorCode::CONTROL_INIT_ERROR);
 }
 
 }  // namespace control

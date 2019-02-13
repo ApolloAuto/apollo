@@ -92,6 +92,7 @@ proto_library(
     ],
     deps = [
         "//modules/prediction/proto:feature_proto_lib",
+        "//modules/prediction/proto:prediction_proto_lib",
     ],
 )
 

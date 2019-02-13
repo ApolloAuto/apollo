@@ -17,4 +17,5 @@ message DriveEvent {
   optional string event = 2;
   optional apollo.localization.Pose location = 3;
   repeated Type type = 4;
+  optional bool is_reportable = 5;
 }

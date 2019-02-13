@@ -290,7 +290,7 @@ std::string Dst::PrintBba() const {
   for (const auto &fod_subset_name : fod_subset_names) {
     header += (boost::format("%20s") % fod_subset_name).str();
   }
-  res = res + header + "\n";
+  res += header + "\n";
   res += print_row("belief_mass", bba_vec_);
   // res += print_row("support", support_vec_);
   // res += print_row("uncertainty", uncertainty_vec_);

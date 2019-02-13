@@ -109,8 +109,10 @@ cc_library(
         "junction_mlp_evaluator.h",
     ],
     deps = [
+        "//modules/common/math:geometry",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_util",
+        "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
     ],

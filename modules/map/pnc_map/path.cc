@@ -376,9 +376,8 @@ void Path::InitPoints() {
     } else {
       segments_.emplace_back(path_points_[i], path_points_[i + 1]);
       heading = path_points_[i + 1] - path_points_[i];
-      // TODO(lianglia_apollo):
-      // use heading.length when all adjacent lanes are guarantee to be
-      // connected.
+      // TODO(All): use heading.length when all adjacent lanes are guarantee to
+      // be connected.
       s += heading.Length();
     }
     heading.Normalize();

@@ -18,10 +18,10 @@
 
 #include <string>
 
+#include "cyber/common/file.h"
 #include "gflags/gflags.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/kv_db/kv_db.h"
-#include "modules/common/util/file.h"
 #include "modules/routing/proto/routing.pb.h"
 
 DEFINE_string(static_info_conf_file,
@@ -33,7 +33,7 @@ namespace data {
 namespace {
 
 using apollo::common::KVDB;
-using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::cyber::common::GetProtoFromASCIIFile;
 using google::protobuf::Map;
 using google::protobuf::RepeatedPtrField;
 
@@ -43,7 +43,7 @@ Map<std::string, std::string> LoadFiles(
   Map<std::string, std::string> result;
   std::string content;
   for (const auto &file : files) {
-    if (apollo::common::util::GetContent(file, &content)) {
+    if (cyber::common::GetContent(file, &content)) {
       result.insert({file, content});
     } else {
       AERROR << "Cannot load file " << file;

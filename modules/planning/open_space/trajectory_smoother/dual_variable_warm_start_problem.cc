@@ -46,8 +46,16 @@ bool DualVariableWarmStartProblem::Solve(
           horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
           obstacles_b, xWS, planner_open_space_config_);
 
-  Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
+  DualVariableWarmStartIPOPTQPInterface* ptop2 =
+      new DualVariableWarmStartIPOPTQPInterface(
+          horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
+          obstacles_b, xWS, planner_open_space_config_);
 
+  Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
+  if (planner_open_space_config_.dual_variable_warm_start_config().
+      qp_format()) {
+    problem = ptop2;
+  }
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
@@ -79,6 +87,11 @@ bool DualVariableWarmStartProblem::Solve(
       ipopt_config().ipopt_alpha_for_y());
   app->Options()->SetStringValue("recalc_y", planner_open_space_config_.
       dual_variable_warm_start_config().ipopt_config().ipopt_recalc_y());
+  // for qp problem speed up
+  if (planner_open_space_config_.dual_variable_warm_start_config().
+      qp_format()) {
+    app->Options()->SetStringValue("mehrotra_algorithm", "yes");
+  }
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
@@ -106,7 +119,12 @@ bool DualVariableWarmStartProblem::Solve(
     AINFO << "Solve not succeeding, return status: " << int(status);
   }
 
-  ptop->get_optimization_results(l_warm_up, n_warm_up);
+  if (planner_open_space_config_.dual_variable_warm_start_config().
+      qp_format()) {
+    ptop2->get_optimization_results(l_warm_up, n_warm_up);
+  } else {
+    ptop->get_optimization_results(l_warm_up, n_warm_up);
+  }
 
   return status == Ipopt::Solve_Succeeded ||
          status == Ipopt::Solved_To_Acceptable_Level;

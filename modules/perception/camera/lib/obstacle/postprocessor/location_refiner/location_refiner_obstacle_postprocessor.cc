@@ -15,8 +15,8 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"  // NOLINT
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/lib/interface/base_calibration_service.h"
 
@@ -28,11 +28,11 @@ namespace camera {
 
 bool LocationRefinerObstaclePostprocessor::Init(
     const ObstaclePostprocessorInitOptions &options) {
-  std::string postprocessor_config = apollo::common::util::GetAbsolutePath(
+  std::string postprocessor_config = cyber::common::GetAbsolutePath(
       options.root_dir, options.conf_file);
 
-  if (!apollo::common::util::GetProtoFromFile(postprocessor_config,
-                                              &location_refiner_param_)) {
+  if (!cyber::common::GetProtoFromFile(postprocessor_config,
+                                       &location_refiner_param_)) {
     AERROR << "Read config failed: " << postprocessor_config;
     return false;
   }

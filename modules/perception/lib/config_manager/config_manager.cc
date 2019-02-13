@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lib/config_manager/config_manager.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
 
@@ -24,8 +24,8 @@ namespace apollo {
 namespace perception {
 namespace lib {
 
-using apollo::common::util::GetAbsolutePath;
-using apollo::common::util::GetProtoFromASCIIFile;
+using cyber::common::GetAbsolutePath;
+using cyber::common::GetProtoFromASCIIFile;
 
 ConfigManager::ConfigManager() {
   work_root_ = FLAGS_work_root;

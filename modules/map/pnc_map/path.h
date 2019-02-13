@@ -188,7 +188,7 @@ class PathApproximation {
   std::vector<common::math::LineSegment2d> segments_;
   std::vector<double> max_error_per_segment_;
 
-  // TODO(@lianglia_apollo): use direction change checks to early stop.
+  // TODO(All): use direction change checks to early stop.
 
   // Projection of points onto the diluated segments.
   std::vector<double> projections_;

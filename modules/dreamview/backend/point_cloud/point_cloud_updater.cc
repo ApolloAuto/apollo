@@ -18,10 +18,10 @@
 
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/proto/point_cloud.pb.h"
 #include "pcl/filters/voxel_grid.h"
@@ -48,7 +48,7 @@ PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
 PointCloudUpdater::~PointCloudUpdater() { Stop(); }
 
 void PointCloudUpdater::LoadLidarHeight(const std::string& file_path) {
-  if (!common::util::PathExists(file_path)) {
+  if (!cyber::common::PathExists(file_path)) {
     AWARN << "No such file: " << FLAGS_lidar_height_yaml
           << ". Using default lidar height:" << kDefaultLidarHeight;
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);

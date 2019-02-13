@@ -253,21 +253,6 @@ cc_test(
     ],
 )
 
-#cc_library(
-#    name = "lag_prediction",
-#    srcs = [
-#        "lag_prediction.cc",
-#    ],
-#    hdrs = [
-#        "lag_prediction.h",
-#    ],
-#    deps = [
-#        ":planning_gflags",
-#        "//modules/prediction/proto:prediction_proto",
-#        "//cyber/common:log",
-#    ],
-#)
-
 cc_library(
     name = "change_lane_decider",
     srcs = [
@@ -321,7 +306,6 @@ cc_library(
         ":change_lane_decider",
         ":indexed_queue",
         ":local_view",
-        #":lag_prediction",
         ":obstacle",
         ":reference_line_info",
         ":trajectory_info",
@@ -474,21 +458,19 @@ cc_library(
 )
 
 cc_library(
-    name = "distance_estimator",
+    name = "trajectory_stitcher",
     srcs = [
-        "distance_estimator.cc",
+        "trajectory_stitcher.cc",
     ],
     hdrs = [
-        "distance_estimator.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
+        "trajectory_stitcher.h",
     ],
     deps = [
-        "//modules/common/configs:vehicle_config_helper",
+        "//modules/planning/common/trajectory:publishable_trajectory",
+        "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/map/pnc_map:route_segments",
-        "//modules/planning/common/path:path_data",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/reference_line",
     ],
 )
 

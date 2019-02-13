@@ -18,8 +18,8 @@
 #include <map>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "modules/common/time/time_util.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/track_pool_types.h"
@@ -36,7 +36,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 ProbabilisticFusion::ProbabilisticFusion() {}
 
@@ -56,7 +56,7 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   ProbabilisticFusionConfig params;
 
-  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
+  if (!cyber::common::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

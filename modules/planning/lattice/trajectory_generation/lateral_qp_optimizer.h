@@ -25,7 +25,7 @@
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
+#include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
 
 namespace apollo {
 namespace planning {

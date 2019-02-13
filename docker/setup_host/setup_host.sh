@@ -24,7 +24,7 @@ if [ -e /proc/sys/kernel ]; then
       sudo tee /proc/sys/kernel/core_pattern
 fi
 
-# Setup ntpdate to run once per second. Log at /var/log/syslog.
+# Setup ntpdate to run once per minute. Log at /var/log/syslog.
 grep -q ntpdate /etc/crontab
 if [ $? -ne 0 ]; then
   echo "*/1 * * * * root ntpdate -v -u us.pool.ntp.org" | \

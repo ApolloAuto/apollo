@@ -35,7 +35,8 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
+#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -47,35 +48,6 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::routing::RoutingResponse;
-
-namespace {
-
-bool IsVehicleStateValid(const VehicleState& vehicle_state) {
-  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
-      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
-      std::isnan(vehicle_state.linear_acceleration())) {
-    return false;
-  }
-  return true;
-}
-
-bool IsDifferentRouting(const RoutingResponse& first,
-                        const RoutingResponse& second) {
-  if (first.has_header() && second.has_header()) {
-    if (first.header().sequence_num() != second.header().sequence_num()) {
-      return true;
-    }
-    if (first.header().timestamp_sec() != second.header().timestamp_sec()) {
-      return true;
-    }
-    return false;
-  } else {
-    return true;
-  }
-}
-}  // namespace
 
 OpenSpacePlanning::~OpenSpacePlanning() {
   planner_->Stop();
@@ -310,11 +282,9 @@ Status OpenSpacePlanning::Plan(
 
     ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-    if (FLAGS_enable_stitch_last_trajectory) {
-      last_publishable_trajectory_->PrependTrajectoryPoints(
-          std::vector<TrajectoryPoint>(last_stitching_trajectory_.begin(),
-                                       last_stitching_trajectory_.end() - 1));
-    }
+    last_publishable_trajectory_->PrependTrajectoryPoints(
+        std::vector<TrajectoryPoint>(last_stitching_trajectory_.begin(),
+                                     last_stitching_trajectory_.end() - 1));
 
     // save the publishable trajectory for use when no planning is generated
     last_trajectory_ = std::make_unique<PublishableTrajectory>(
@@ -613,10 +583,6 @@ void OpenSpacePlanning::FillPlanningPb(const double timestamp,
   ptr_trajectory_pb->mutable_routing_header()->CopyFrom(
       local_view_.routing->header());
 
-  if (FLAGS_use_planning_fallback &&
-      ptr_trajectory_pb->trajectory_point_size() == 0) {
-    SetFallbackTrajectory(ptr_trajectory_pb);
-  }
   const double dt = timestamp - Clock::NowInSeconds();
   for (auto& p : *ptr_trajectory_pb->mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() - dt);

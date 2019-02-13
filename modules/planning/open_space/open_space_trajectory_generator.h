@@ -38,7 +38,7 @@
 
 /*
 Initially inspired by "Optimization-Based Collision Avoidance" from Xiaojing
-Zhanga , Alexander Linigerb and Francesco Borrellia
+Zhang, Alexander Linigerb and Francesco Borrellia
 */
 
 /**

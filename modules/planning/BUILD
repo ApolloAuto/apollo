@@ -60,7 +60,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/common/trajectory:trajectory_stitcher",
+        "//modules/planning/common:trajectory_stitcher",
         "//modules/planning/planner",
         "//modules/planning/planner:planner_dispatcher",
         "//modules/planning/proto:planning_config_proto",
@@ -70,6 +70,7 @@ cc_library(
         "//modules/planning/tasks/smoothers:smoother",
         "//modules/planning/traffic_rules:traffic_decider",
         "//modules/prediction/proto:prediction_proto",
+        "//modules/planning/util:util_lib",
     ],
 )
 

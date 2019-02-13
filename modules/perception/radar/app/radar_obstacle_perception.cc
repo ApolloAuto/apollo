@@ -79,8 +79,9 @@ bool RadarObstaclePerception::Perceive(
   ADEBUG << "Detected frame objects number: "
            << detect_frame_ptr->objects.size();
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "detector");
-  CHECK(roi_filter_->RoiFilter(options.roi_filter_options,
-                               detect_frame_ptr)) << "radar roi filter error";
+  if (!roi_filter_->RoiFilter(options.roi_filter_options, detect_frame_ptr)) {
+    ADEBUG << "All radar objects were filtered out";
+  }
   ADEBUG << "RoiFiltered frame objects number: "
            << detect_frame_ptr->objects.size();
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "roi_filter");

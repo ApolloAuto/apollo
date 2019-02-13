@@ -35,9 +35,9 @@ double STPoint::s() const { return y_; }
 
 double STPoint::t() const { return x_; }
 
-void STPoint::set_s(const double s) { return set_y(s); }
+void STPoint::set_s(const double s) { y_ = s; }
 
-void STPoint::set_t(const double t) { return set_x(t); }
+void STPoint::set_t(const double t) { x_ = t; }
 
 std::string STPoint::DebugString() const {
   return StringPrintf("{ \"s\" : %.6f, \"t\" : %.6f }", s(), t());

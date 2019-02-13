@@ -19,7 +19,6 @@
  **/
 #include "modules/planning/tasks/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
 
-#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/optimizers/qp_spline_path/qp_spline_path_generator.h"

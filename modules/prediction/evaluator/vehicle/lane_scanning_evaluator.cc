@@ -18,7 +18,7 @@
 #include <limits>
 #include <utility>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -30,7 +30,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
-using apollo::common::util::GetProtoFromFile;
+using apollo::cyber::common::GetProtoFromFile;
 
 LaneScanningEvaluator::LaneScanningEvaluator() {
 }
@@ -72,7 +72,7 @@ void LaneScanningEvaluator::Evaluate(
   std::vector<double> feature_values;
   ExtractFeatures(obstacle_ptr, lane_graph_ptr, &feature_values);
   std::vector<double> labels = {0.0};
-  if (FLAGS_prediction_offline_dataforlearning) {
+  if (FLAGS_prediction_offline_mode == 2) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "cruise");
     ADEBUG << "Save extracted features for learning locally.";

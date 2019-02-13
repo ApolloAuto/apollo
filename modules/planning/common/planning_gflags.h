@@ -31,6 +31,8 @@ DECLARE_string(scenario_traffic_light_protected_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_left_turn_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
 
+DECLARE_bool(enable_scenario_dispatcher);
+
 DECLARE_bool(enable_scenario_side_pass);
 DECLARE_double(side_pass_min_signal_intersection_distance);
 DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
@@ -214,8 +216,6 @@ DECLARE_double(speed_bump_speed_limit);
 // navigation mode
 DECLARE_double(navigation_fallback_cruise_time);
 
-// control whether to stitch last trajectory to current plan trajectory
-DECLARE_bool(enable_stitch_last_trajectory);
 DECLARE_bool(enable_planning_pad_msg);
 
 // open space planner
@@ -254,3 +254,4 @@ DECLARE_bool(side_pass_use_actual_laneinfo_for_path_generation);
 DECLARE_double(side_pass_driving_width_l_buffer);
 
 DECLARE_bool(enable_parallel_hybrid_a);
+DECLARE_bool(enable_parallel_open_space_smoother);

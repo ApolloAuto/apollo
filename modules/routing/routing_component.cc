@@ -39,7 +39,7 @@ bool RoutingComponent::Init() {
   response_writer_ = node_->CreateWriter<RoutingResponse>(attr);
 
   apollo::cyber::proto::RoleAttributes attr_history;
-  attr_history.set_channel_name(FLAGS_routing_response_topic + "_history");
+  attr_history.set_channel_name(FLAGS_routing_response_history_topic);
   auto qos_history = attr_history.mutable_qos_profile();
   qos_history->set_history(
       apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
@@ -58,7 +58,10 @@ bool RoutingComponent::Init() {
         if (ptr) {
           std::lock_guard<std::mutex> guard(this->mutex_);
           if (this->response_.get() != nullptr) {
-            this->response_history_writer_->Write(response_);
+            auto response = *response_;
+            auto timestamp = apollo::common::time::Clock::NowInSeconds();
+            response.mutable_header()->set_timestamp_sec(timestamp);
+            this->response_history_writer_->Write(response);
           }
         }
       },

@@ -18,9 +18,9 @@
 
 #include <vector>
 
+#include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 

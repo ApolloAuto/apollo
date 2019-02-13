@@ -559,7 +559,7 @@ void DualVariableWarmStartIPOPTInterface::finalize_solution(
   // horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      l_warm_up_(0, i) = x[variable_index];
+      l_warm_up_(j, i) = x[variable_index];
       ++variable_index;
     }
   }
@@ -568,7 +568,7 @@ void DualVariableWarmStartIPOPTInterface::finalize_solution(
   // 2. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      n_warm_up_(0, i) = x[variable_index];
+      n_warm_up_(j, i) = x[variable_index];
       ++variable_index;
     }
   }
@@ -621,6 +621,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_constraints(int n, const T* x,
 
   for (int i = 0; i < horizon_ + 1; ++i) {
     int edges_counter = 0;
+    // assume: stationary obstacles
     for (int j = 0; j < obstacles_num_; ++j) {
       int current_edges_num = obstacles_edges_num_(j, 0);
       Eigen::MatrixXd Aj =

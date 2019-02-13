@@ -14,8 +14,8 @@
 * limitations under the License.
 *****************************************************************************/
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
@@ -58,7 +58,7 @@ void lane_postprocessor_eval() {
   postprocessor_init_options.conf_file = "lane_postprocessor_config.pt";
   lane_postprocessor->Init(postprocessor_init_options);
   LanePostprocessorOptions postprocessor_options;
-  apollo::common::util::EnsureDirectory(FLAGS_save_dir);
+  cyber::common::EnsureDirectory(FLAGS_save_dir);
 
   //  read image list
   std::ifstream list_file(FLAGS_list.c_str());

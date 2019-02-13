@@ -68,26 +68,33 @@ class PlannigAnalyzer:
                 if point.a <= -2.0:
                     self.hard_break_list.append(point.a)
 
-        if self.last_adc_trajectory is not None:
+        if self.last_adc_trajectory is not None and self.is_simulation:
             current_path, last_path = self.find_common_path(adc_trajectory,
                                                             self.last_adc_trajectory)
             if len(current_path) == 0 or len(last_path) == 0:
                 dist = 0
             else:
                 dist = frechet_distance(current_path, last_path)
-                self.frechet_distance_list.append(dist)
+                if dist is not None:
+                    self.frechet_distance_list.append(dist)
 
         self.last_adc_trajectory = adc_trajectory
 
     def find_common_path(self, current_adc_trajectory, last_adc_trajectory):
         current_path_points = current_adc_trajectory.trajectory_point
         last_path_points = last_adc_trajectory.trajectory_point
+
         current_path = []
         for point in current_path_points:
             current_path.append([point.path_point.x, point.path_point.y])
+            if point.path_point.s > 5.0:
+                break
         last_path = []
         for point in last_path_points:
             last_path.append([point.path_point.x, point.path_point.y])
+            if point.path_point.s > 5.0:
+                break
+
         if len(current_path) == 0 or len(last_path) == 0:
             return [], []
 
@@ -157,13 +164,56 @@ class PlannigAnalyzer:
         results['frechet_dist'] = sum(self.frechet_distance_list) /\
             len(self.frechet_distance_list)
         results['hard_brake_cycle_num'] = len(self.hard_break_list)
-        results['overall_score'] = 1- results['hard_brake_cycle_num'] /\
+        results['overall_score'] = 1 - results['hard_brake_cycle_num'] /\
             float(self.total_cycle_num)
         if results['frechet_dist'] > 10:
             results['overall_score'] += 0.0
         else:
-            results['overall_score'] += (1- results['frechet_dist'] / 10.0)
+            results['overall_score'] += (1 - results['frechet_dist'] / 10.0)
         results['overall_score'] /= 2.0
-        
 
         print str(results)
+
+    def plot_path(self, plt, adc_trajectory):
+        path_coords = self.trim_path_by_distance(adc_trajectory, 5.0)
+        x = []
+        y = []
+        for point in path_coords:
+            x.append(point[0])
+            y.append(point[1])
+        plt.plot(x, y, 'r-', alpha=0.5)
+
+    def plot_refpath(self, plt, adc_trajectory):
+        for path in adc_trajectory.debug.planning_data.path:
+            if path.name != 'planning_reference_line':
+                continue
+            path_coords = self.trim_path_by_distance(adc_trajectory, 5.0)
+
+            ref_path_coord = []
+            for point in path.path_point:
+                ref_path_coord.append([point.x, point.y])
+            ref_path = LineString(ref_path_coord)
+
+            start_point = Point(path_coords[0])
+            dist = ref_path.project(start_point)
+            ref_path = self.cut(ref_path, dist)[1]
+
+            end_point = Point(path_coords[-1])
+            dist = ref_path.project(end_point)
+            ref_path = self.cut(ref_path, dist)[0]
+
+            x = []
+            y = []
+            for point in ref_path.coords:
+                x.append(point[0])
+                y.append(point[1])
+
+            plt.plot(x, y, 'b--', alpha=0.5)
+
+    def trim_path_by_distance(self, adc_trajectory, s):
+        path_coords = []
+        path_points = adc_trajectory.trajectory_point
+        for point in path_points:
+            if point.path_point.s <= s:
+                path_coords.append([point.path_point.x, point.path_point.y])
+        return path_coords

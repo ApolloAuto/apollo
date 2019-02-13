@@ -112,6 +112,11 @@ class RecordWriter(object):
     def __init__(self):
         self.record_writer = _CYBER_RECORD.new_PyRecordWriter()
 
+    def __init__(self, file_segmentation_size_kb,
+                 file_segmentation_interval_sec):
+        self.record_writer = _CYBER_RECORD.new_PyRecordWriter(
+            file_segmentation_size_kb, file_segmentation_interval_sec)
+
     def __del__(self):
         _CYBER_RECORD.delete_PyRecordWriter(self.record_writer)
 
