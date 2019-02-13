@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
@@ -28,7 +28,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool MlfMotionFilter::Init(const MlfFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -41,7 +41,7 @@ bool MlfMotionFilter::Init(const MlfFilterInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_motion_filter.conf");
   MlfMotionFilterConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   use_adaptive_ = config.use_adaptive();
   use_breakdown_ = config.use_breakdown();
   use_convergence_boostup_ = config.use_convergence_boostup();

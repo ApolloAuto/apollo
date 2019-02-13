@@ -20,8 +20,8 @@
 #include <tuple>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 
@@ -56,10 +56,10 @@ bool ObjectTemplateManager::Init(
 
   nr_dim_per_tmplt_ = 3;
 
-  std::string config = apollo::common::util::GetAbsolutePath(options.root_dir,
-                                                             options.conf_file);
+  std::string config = cyber::common::GetAbsolutePath(options.root_dir,
+                                                      options.conf_file);
   ObjectTemplateMeta proto;
-  if (!apollo::common::util::GetProtoFromFile(config, &proto)) {
+  if (!cyber::common::GetProtoFromFile(config, &proto)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

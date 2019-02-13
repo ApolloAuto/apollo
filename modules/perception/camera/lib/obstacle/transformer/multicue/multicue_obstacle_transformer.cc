@@ -15,8 +15,8 @@
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"
 
 namespace apollo {
@@ -25,11 +25,10 @@ namespace camera {
 
 bool MultiCueObstacleTransformer::Init(
     const ObstacleTransformerInitOptions &options) {
-  std::string transformer_config = apollo::common::util::GetAbsolutePath(
+  std::string transformer_config = cyber::common::GetAbsolutePath(
       options.root_dir, options.conf_file);
 
-  if (!apollo::common::util::GetProtoFromFile(transformer_config,
-                                              &multicue_param_)) {
+  if (!cyber::common::GetProtoFromFile(transformer_config, &multicue_param_)) {
     AERROR << "Read config failed: " << transformer_config;
     return false;
   }

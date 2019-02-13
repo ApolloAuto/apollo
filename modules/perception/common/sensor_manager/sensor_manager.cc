@@ -17,8 +17,8 @@
 
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/proto/sensor_meta_schema.pb.h"
@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace common {
 
-using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::cyber::common::GetProtoFromASCIIFile;
 using apollo::perception::base::BrownCameraDistortionModel;
 using apollo::perception::base::SensorInfo;
 using apollo::perception::base::SensorOrientation;
@@ -45,7 +45,7 @@ bool SensorManager::Init() {
   distort_model_map_.clear();
   undistort_model_map_.clear();
 
-  const std::string file_path = apollo::common::util::GetAbsolutePath(
+  const std::string file_path = cyber::common::GetAbsolutePath(
       lib::ConfigManager::Instance()->work_root(), FLAGS_obs_sensor_meta_path);
 
   MultiSensorMeta sensor_list_proto;

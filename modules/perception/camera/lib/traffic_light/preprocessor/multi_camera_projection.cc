@@ -18,8 +18,8 @@
 #include <algorithm>
 #include <limits>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"

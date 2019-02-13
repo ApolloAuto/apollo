@@ -13,15 +13,16 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *****************************************************************************/
-
-#include "modules/common/util/file.h"
 #include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
+
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace perception {
 namespace camera {
-bool TrackingFeatureExtractor::Init(const FeatureExtractorInitOptions
-                                    &init_options) {
+
+bool TrackingFeatureExtractor::Init(
+    const FeatureExtractorInitOptions &init_options) {
   //  setup bottom and top
   int feat_height = init_options.feat_blob->shape(2);
   int feat_width = init_options.feat_blob->shape(3);
@@ -30,10 +31,9 @@ bool TrackingFeatureExtractor::Init(const FeatureExtractorInitOptions
   input_width_ =
       init_options.input_width == 0 ? feat_width : init_options.input_width;
   tracking_feature::FeatureParam feat_param;
-  std::string config_path =
-      apollo::common::util::GetAbsolutePath(init_options.root_dir,
-                                            init_options.conf_file);
-  if (!apollo::common::util::GetProtoFromFile(config_path, &feat_param)) {
+  std::string config_path = cyber::common::GetAbsolutePath(
+      init_options.root_dir, init_options.conf_file);
+  if (!cyber::common::GetProtoFromFile(config_path, &feat_param)) {
     AERROR << "read proto_config fail";
     return false;
   }
