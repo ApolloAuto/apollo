@@ -32,14 +32,14 @@ void InternalUnLock(T *t);
  * @brief override these two routines for other synchronization methods.
  */
 void InternalLock(std::mutex *t) noexcept(false) {
-    if ( !t )
+    if (!t)
         throw std::errc::bad_address;
     else
         t->lock();
 }
 
 void InternalUnLock(std::mutex *t) noexcept(false) {
-    if ( !t )
+    if (!t)
         throw std::errc::bad_address;
     else
         t->unlock();
@@ -47,11 +47,11 @@ void InternalUnLock(std::mutex *t) noexcept(false) {
 
 
 template<typename T = std::mutex>
-class AutoLock{
+class AutoLock {
  public:
     explicit AutoLock(std::mutex *t) noexcept(false):
         t_(t),
-        lock_(false){
+        lock_(false) {
         Lock();
     }
 
