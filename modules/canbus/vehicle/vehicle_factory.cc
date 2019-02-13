@@ -21,6 +21,7 @@
 #include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
 #include "modules/canbus/vehicle/transit/transit_vehicle_factory.h"
 #include "modules/canbus/vehicle/ge3/ge3_vehicle_factory.h"
+#include "modules/canbus/vehicle/wey/wey_vehicle_factory.h"
 
 namespace apollo {
 namespace canbus {
@@ -40,6 +41,9 @@ void VehicleFactory::RegisterVehicleFactory() {
   });
   Register(VehicleParameter::GE3, []() -> AbstractVehicleFactory * {
     return new Ge3VehicleFactory();
+  });
+  Register(VehicleParameter::WEY, []() -> AbstractVehicleFactory * {
+    return new WeyVehicleFactory();
   });
 }
 

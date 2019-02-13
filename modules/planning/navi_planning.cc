@@ -20,6 +20,7 @@
 #include <list>
 #include <map>
 
+#include "cyber/common/file.h"
 #include "google/protobuf/repeated_field.h"
 
 #include "modules/common/math/quaternion.h"
@@ -29,11 +30,12 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
+#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -45,20 +47,6 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
-
-namespace {
-
-bool IsVehicleStateValid(const VehicleState& vehicle_state) {
-  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
-      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
-      std::isnan(vehicle_state.linear_acceleration())) {
-    return false;
-  }
-  return true;
-}
-}  // namespace
 
 NaviPlanning::~NaviPlanning() {
   last_publishable_trajectory_.reset(nullptr);
@@ -81,7 +69,7 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
 
   planner_dispatcher_->Init();
 
-  CHECK(apollo::common::util::GetProtoFromFile(
+  CHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
@@ -134,8 +122,9 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   // recreate reference line provider in every cycle
   hdmap_ = HDMapUtil::BaseMapPtr(*local_view.relative_map);
   // Prefer "std::make_unique" to direct use of "new".
-  // Reference "https://herbsutter.com/gotw/_102/" for details.
-  reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
+  // Refer to "https://herbsutter.com/gotw/_102/" for details.
+  reference_line_provider_ =
+      std::make_unique<ReferenceLineProvider>(hdmap_, local_view_.relative_map);
 
   // localization
   ADEBUG << "Get localization:"
@@ -548,11 +537,14 @@ Status NaviPlanning::Plan(
   // Navi Panner doesn't need to stitch the last path planning
   // trajectory.Otherwise, it will cause the Dreamview planning track to display
   // flashing or bouncing
+  // TODO(Yifei): remove this if navi-planner doesn't need stitching
+  /**
   if (FLAGS_enable_stitch_last_trajectory) {
     last_publishable_trajectory_->PrependTrajectoryPoints(
         std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
                                      stitching_trajectory.end() - 1));
   }
+  **/
 
   for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
     if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >

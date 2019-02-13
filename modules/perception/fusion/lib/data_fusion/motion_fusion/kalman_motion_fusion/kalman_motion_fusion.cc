@@ -431,7 +431,8 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
   fused_acceleration(0) = kalman_filter_.GetStates()(4);
   fused_acceleration(1) = kalman_filter_.GetStates()(5);
   /* return if lidar velocity is already small enough */
-  if (lidar_velocity.norm() < DBL_EPSILON) {
+  double lidar_velocity_norm = lidar_velocity.norm();
+  if (lidar_velocity_norm < DBL_EPSILON) {
     return pseudo_measurement;
   }
   /* trace back radar velocity history, try to find good radar measurement
@@ -442,6 +443,12 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
     if (common::SensorManager::Instance()->IsRadar(history_type)) {
       trace_count++;
       Eigen::Vector3d radar_velocity = history_velocity_[history_index];
+      double radar_velocity_norm = radar_velocity.norm();
+      /* abandon radar history, if their velocity lengths are too different*/
+      if (fabs(radar_velocity_norm - lidar_velocity_norm) >
+          velocity_length_change_thresh_) {
+        continue;
+      }
       /* abandon radar history, if its velocity angle change is too large */
       double velocity_angle_change =
           common::CalculateTheta2DXY(radar_velocity, lidar_velocity);
@@ -499,7 +506,8 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
   fused_acceleration(0) = kalman_filter_.GetStates()(4);
   fused_acceleration(1) = kalman_filter_.GetStates()(5);
   /* return if camera velocity is already small enough */
-  if (camera_velocity.norm() < DBL_EPSILON) {
+  double camera_velocity_norm = camera_velocity.norm();
+  if (camera_velocity_norm < DBL_EPSILON) {
     return pseudo_measurement;
   }
   /* trace back radar velocity history, try to find good radar measurement
@@ -510,6 +518,12 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
     if (common::SensorManager::Instance()->IsRadar(history_type)) {
       trace_count++;
       Eigen::Vector3d radar_velocity = history_velocity_[history_index];
+      double radar_velocity_norm = radar_velocity.norm();
+      // //  abandon radar history, if their velocity lengths are too different
+      if (fabs(radar_velocity_norm - camera_velocity_norm) >
+          velocity_length_change_thresh_) {
+        continue;
+      }
       /* abandon radar history, if its velocity angle change is too large */
       double velocity_angle_change =
           common::CalculateTheta2DXY(radar_velocity, camera_velocity);

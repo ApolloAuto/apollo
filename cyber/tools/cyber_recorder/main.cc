@@ -33,6 +33,7 @@
 using apollo::cyber::common::GetFileName;
 using apollo::cyber::common::StringToUnixSeconds;
 using apollo::cyber::common::UnixSecondsToString;
+using apollo::cyber::record::HeaderBuilder;
 using apollo::cyber::record::Info;
 using apollo::cyber::record::Player;
 using apollo::cyber::record::PlayParam;
@@ -41,8 +42,8 @@ using apollo::cyber::record::Recoverer;
 using apollo::cyber::record::Spliter;
 
 const char INFO_OPTIONS[] = "h";
-const char RECORD_OPTIONS[] = "o:ac:h";
-const char PLAY_OPTIONS[] = "f:c:lr:b:e:s:d:h";
+const char RECORD_OPTIONS[] = "o:ac:i:m:h";
+const char PLAY_OPTIONS[] = "f:c:lr:b:e:s:d:p:h";
 const char SPLIT_OPTIONS[] = "f:o:c:k:b:e:h";
 const char RECOVER_OPTIONS[] = "f:o:h";
 
@@ -132,6 +133,18 @@ void DisplayUsage(const std::string& binary, const std::string& command,
         std::cout << "\t-d, --delay <seconds>\t\t\t" << command
                   << " delayed n seconds" << std::endl;
         break;
+      case 'p':
+        std::cout << "\t-p, --preload <seconds>\t\t\t" << command
+                  << " after trying to preload n second(s)" << std::endl;
+        break;
+      case 'i':
+        std::cout << "\t-i, --segment-interval <seconds>\t" << command
+                  << " segmented every n second(s)" << std::endl;
+        break;
+      case 'm':
+        std::cout << "\t-m, --segment-size <MB>\t\t\t" << command
+                  << " segmented every n megabyte(s)" << std::endl;
+        break;
       case 'h':
         std::cout << "\t-h, --help\t\t\t\tshow help message" << std::endl;
         break;
@@ -157,7 +170,7 @@ int main(int argc, char** argv) {
   }
 
   int long_index = 0;
-  const std::string short_opts = "f:c:k:o:alr:b:e:s:d:h";
+  const std::string short_opts = "f:c:k:o:alr:b:e:s:d:p:i:m:h";
   static const struct option long_opts[] = {
       {"files", required_argument, nullptr, 'f'},
       {"white-channel", required_argument, nullptr, 'c'},
@@ -170,6 +183,9 @@ int main(int argc, char** argv) {
       {"end", required_argument, nullptr, 'e'},
       {"start", required_argument, nullptr, 's'},
       {"delay", required_argument, nullptr, 'd'},
+      {"preload", required_argument, nullptr, 'p'},
+      {"segment-interval", required_argument, nullptr, 'i'},
+      {"segment-size", required_argument, nullptr, 'm'},
       {"help", no_argument, nullptr, 'h'}};
 
   std::vector<std::string> opt_file_vec;
@@ -183,6 +199,8 @@ int main(int argc, char** argv) {
   uint64_t opt_end = UINT64_MAX;
   uint64_t opt_start = 0;
   uint64_t opt_delay = 0;
+  uint32_t opt_preload = 3;
+  auto opt_header = HeaderBuilder::GetHeader();
 
   do {
     int opt =
@@ -277,6 +295,57 @@ int main(int argc, char** argv) {
           return -1;
         }
         break;
+      case 'p':
+        try {
+          opt_preload = std::stoi(optarg);
+        } catch (std::invalid_argument& ia) {
+          std::cout << "Invalid argument: -p/--preload " << std::string(optarg)
+                    << std::endl;
+          return -1;
+        } catch (const std::out_of_range& e) {
+          std::cout << "Argument is out of range: -p/--preload "
+                    << std::string(optarg) << std::endl;
+          return -1;
+        }
+        break;
+      case 'i':
+        try {
+          int interval_s = std::stoi(optarg);
+          if (interval_s < 0) {
+            std::cout << "Argument is less than zero: -i/--segment-interval "
+                      << std::string(optarg) << std::endl;
+            return -1;
+          }
+          opt_header.set_segment_interval(interval_s * 1000000000ULL);
+        } catch (std::invalid_argument& ia) {
+          std::cout << "Invalid argument: -i/--segment-interval "
+                    << std::string(optarg) << std::endl;
+          return -1;
+        } catch (const std::out_of_range& e) {
+          std::cout << "Argument is out of range: -i/--segment-interval "
+                    << std::string(optarg) << std::endl;
+          return -1;
+        }
+        break;
+      case 'm':
+        try {
+          int size_mb = std::stoi(optarg);
+          if (size_mb < 0) {
+            std::cout << "Argument is less than zero: -m/--segment-size "
+                      << std::string(optarg) << std::endl;
+            return -1;
+          }
+          opt_header.set_segment_raw_size(size_mb * 1024 * 1024ULL);
+        } catch (std::invalid_argument& ia) {
+          std::cout << "Invalid argument: -m/--segment-size "
+                    << std::string(optarg) << std::endl;
+          return -1;
+        } catch (const std::out_of_range& e) {
+          std::cout << "Argument is out of range: -m/--segment-size "
+                    << std::string(optarg) << std::endl;
+          return -1;
+        }
+        break;
       case 'h':
         DisplayUsage(binary, command);
         return 0;
@@ -329,6 +398,7 @@ int main(int argc, char** argv) {
     play_param.end_time_ns = opt_end;
     play_param.start_time_s = opt_start;
     play_param.delay_time_s = opt_delay;
+    play_param.preload_time_s = opt_preload;
     play_param.files_to_play.insert(opt_file_vec.begin(), opt_file_vec.end());
     play_param.channels_to_play.insert(opt_white_channels.begin(),
                                        opt_white_channels.end());
@@ -355,7 +425,7 @@ int main(int argc, char** argv) {
     bool record_result = true;
     ::apollo::cyber::Init(argv[0]);
     auto recorder = std::make_shared<Recorder>(opt_output_vec[0], opt_all,
-                                               opt_white_channels);
+                                               opt_white_channels, opt_header);
     record_result = record_result && recorder->Start() ? true : false;
     if (record_result) {
       while (!::apollo::cyber::IsShutdown()) {

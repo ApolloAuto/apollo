@@ -23,18 +23,18 @@ namespace inference {
 
 std::shared_ptr<float> load_binary_data(const std::string &filename) {
   std::ifstream ifs(filename, std::ifstream::binary);
-  if (ifs) {
-    ifs.seekg(0, ifs.end);
-    int length = static_cast<int>(ifs.tellg() / sizeof(float));
-    ifs.seekg(0, ifs.beg);
-    std::shared_ptr<float> outputs;
-    outputs.reset(new float[length]);
-    ifs.read( reinterpret_cast<char *>(outputs.get()), sizeof(float) * length);
-    ifs.close();
-    return outputs;
-  } else {
+  if (!ifs) {
     return nullptr;
   }
+
+  ifs.seekg(0, ifs.end);
+  int length = static_cast<int>(ifs.tellg() / sizeof(float));
+  ifs.seekg(0, ifs.beg);
+  std::shared_ptr<float> outputs;
+  outputs.reset(new float[length]);
+  ifs.read( reinterpret_cast<char *>(outputs.get()), sizeof(float) * length);
+  ifs.close();
+  return outputs;
 }
 
 bool write_result(const std::string &out_path,

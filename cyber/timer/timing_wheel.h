@@ -18,6 +18,7 @@
 #define CYBER_TIMER_TIMING_WHEEL_H_
 
 #include <algorithm>
+#include <functional>
 #include <iostream>
 #include <list>
 #include <map>

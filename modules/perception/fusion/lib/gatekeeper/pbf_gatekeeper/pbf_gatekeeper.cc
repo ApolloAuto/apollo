@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto/pbf_gatekeeper_config.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -24,7 +24,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 PbfGatekeeper::PbfGatekeeper() {}
 
@@ -42,7 +42,7 @@ bool PbfGatekeeper::Init() {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   PbfGatekeeperConfig params;
 
-  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
+  if (!cyber::common::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }
@@ -65,7 +65,6 @@ bool PbfGatekeeper::Init() {
 std::string PbfGatekeeper::Name() const { return "PbfGatekeeper"; }
 
 bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
-  bool able_to_pub = false;
   bool invisible_in_lidar = !(track->IsLidarVisible());
   bool invisible_in_radar = !(track->IsRadarVisible());
   bool invisible_in_camera = !(track->IsCameraVisible());
@@ -80,15 +79,9 @@ bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
   struct tm timeinfo;
   localtime_r(&rawtime, &timeinfo);
   bool is_night = (timeinfo.tm_hour >= 23);
-  if (LidarAbleToPublish(track)) {
-    able_to_pub = true;
-  } else if (RadarAbleToPublish(track, is_night)) {
-    able_to_pub = true;
-  } else if (CameraAbleToPublish(track, is_night)) {
-    able_to_pub = true;
-  }
-
-  if (!able_to_pub) {
+  if (!LidarAbleToPublish(track) &&
+      !RadarAbleToPublish(track, is_night) &&
+      !CameraAbleToPublish(track, is_night)) {
     return false;
   }
 

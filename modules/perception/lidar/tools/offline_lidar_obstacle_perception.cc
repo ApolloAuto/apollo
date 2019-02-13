@@ -21,7 +21,7 @@
 #include "pcl/kdtree/kdtree.h"
 #include "pcl/kdtree/kdtree_flann.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
@@ -50,7 +50,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetFileName;
+using cyber::common::GetFileName;
 
 class OfflineLidarObstaclePerception {
  public:
@@ -128,7 +128,7 @@ class OfflineLidarObstaclePerception {
       if (pose_folder != "") {
         std::string pose_file_name = pose_folder + "/" + file_name + ".pose";
         AINFO << "Pose file: " << pose_file_name;
-        if (!apollo::common::util::PathExists(pose_file_name)) {
+        if (!apollo::cyber::common::PathExists(pose_file_name)) {
           pose_file_name = pose_folder + "/" + file_name + ".pcd.pose";
         }
         int idt = 0;
@@ -210,7 +210,7 @@ class OfflineLidarObstaclePerception {
                                    const std::string& path) {
     std::ofstream fout(path);
     if (!fout.is_open()) {
-      AERROR << "Fail to open " << path << std::endl;
+      AERROR << "Failed to open: " << path << std::endl;
       return false;
     }
     fout << frame_id << " " << objects.size() << std::endl;
@@ -224,7 +224,7 @@ class OfflineLidarObstaclePerception {
       if (object->type == base::ObjectType::UNKNOWN ||
           object->type == base::ObjectType::UNKNOWN_MOVABLE ||
           object->type == base::ObjectType::UNKNOWN_UNMOVABLE) {
-        type = "unknow";
+        // type is unknow in this case
       } else if (object->type == base::ObjectType::PEDESTRIAN) {
         type = "pedestrian";
       } else if (object->type == base::ObjectType::VEHICLE) {

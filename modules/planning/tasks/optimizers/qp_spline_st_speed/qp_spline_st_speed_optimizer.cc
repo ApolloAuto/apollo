@@ -26,7 +26,6 @@
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/optimizers/qp_spline_st_speed/qp_piecewise_st_graph.h"
@@ -89,7 +88,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
                   "Mapping obstacle for qp st speed optimizer failed!");
   }
 
-  std::vector<const StBoundary*> boundaries;
+  std::vector<const STBoundary*> boundaries;
   for (auto* obstacle : path_decision->obstacles().Items()) {
     auto id = obstacle->Id();
     if (!obstacle->st_boundary().IsEmpty()) {

@@ -256,6 +256,7 @@ Status LonController::ComputeControlCommand(
       (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
           ? -acceleration_cmd
           : acceleration_cmd;
+
   if (FLAGS_use_preview_speed_for_table) {
     calibration_value = control_interpolation_->Interpolate(
         std::make_pair(debug->preview_speed_reference(), acceleration_lookup));
@@ -301,8 +302,10 @@ Status LonController::ComputeControlCommand(
             debug->is_full_stop());
   }
 
+  // if the car is driven by acceleration, disgard the cmd->throttle and brake
   cmd->set_throttle(throttle_cmd);
   cmd->set_brake(brake_cmd);
+  cmd->set_acceleration(acceleration_cmd);
 
   if (std::fabs(VehicleStateProvider::Instance()->linear_velocity()) <=
           vehicle_param_.max_abs_speed_when_stopped() ||

@@ -572,6 +572,17 @@ void Ge3Controller::Steer(double angle) {
   pc_eps_204_->set_pc_steerangreq(real_angle)->set_pc_steerspdreq(500);
 }
 
+// drive with acceleration/deceleration
+// acc:-7.0 ~ 5.0, unit:m/s^2
+void Ge3Controller::Acceleration(double acc) {
+  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
+        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+    AINFO << "The current drive mode does not need to set acceleration.";
+    return;
+  }
+  // None
+}
+
 // steering with new angle speed
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 // angle_spd:0.00~99.99, unit:deg/s

@@ -16,16 +16,25 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
+#include <algorithm>
 #include <unordered_map>
 
+#include "modules/common/math/vec2d.h"
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
+
+using apollo::common::adapter::AdapterConfig;
+using apollo::prediction::math_util::EvaluateCubicPolynomial;
+using apollo::prediction::math_util::ComputePolynomial;
 
 namespace {
 
@@ -69,12 +78,20 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   std::vector<double> feature_values;
   ExtractFeatureValues(obstacle_ptr, &feature_values);
+
+  // Insert features to DataForLearning
+  if (FLAGS_prediction_offline_mode == 2) {
+    FeatureOutput::InsertDataForLearning(
+        *latest_feature_ptr, feature_values, "junction");
+    ADEBUG << "Save extracted features for learning locally.";
+    return;  // Skip Compute probability for offline mode
+  }
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
     probability = ComputeProbability(feature_values);
   } else {
     for (int i = 0; i < 12; ++i) {
-      probability.push_back(feature_values[3 + 5 * i]);
+      probability.push_back(feature_values[3 + 6 * i]);
     }
   }
   for (double prob : probability) {
@@ -139,6 +156,15 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
     return;
   }
 
+  std::vector<double> ego_vehicle_feature_values;
+  SetEgoVehicleFeatureValues(obstacle_ptr, &ego_vehicle_feature_values);
+  if (ego_vehicle_feature_values.size() != EGO_VEHICLE_FEATURE_SIZE) {
+    AERROR << "Obstacle [" << id << "] has fewer than "
+           << "expected ego vehicle feature_values"
+           << ego_vehicle_feature_values.size() << ".";
+    return;
+  }
+
   std::vector<double> junction_feature_values;
   SetJunctionFeatureValues(obstacle_ptr, &junction_feature_values);
   if (junction_feature_values.size() != JUNCTION_FEATURE_SIZE) {
@@ -152,15 +178,11 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
                          obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
   feature_values->insert(feature_values->end(),
+                         ego_vehicle_feature_values.begin(),
+                         ego_vehicle_feature_values.end());
+  feature_values->insert(feature_values->end(),
                          junction_feature_values.begin(),
                          junction_feature_values.end());
-  if (FLAGS_prediction_offline_mode) {
-    SaveOfflineFeatures(obstacle_ptr->mutable_latest_feature(),
-                        *feature_values);
-    ADEBUG << "Save junction mlp features for obstacle ["
-           << obstacle_ptr->id() << "] with dim ["
-           << feature_values->size() << "]";
-  }
 }
 
 void JunctionMLPEvaluator::SetObstacleFeatureValues(
@@ -175,6 +197,41 @@ void JunctionMLPEvaluator::SetObstacleFeatureValues(
   feature_values->push_back(feature.speed());
   feature_values->push_back(feature.acc());
   feature_values->push_back(feature.junction_feature().junction_range());
+}
+
+void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
+    Obstacle* obstacle_ptr, std::vector<double>* const feature_values) {
+  feature_values->clear();
+  *feature_values = std::vector<double>(4, 0.0);
+  auto ego_pose_container_ptr = ContainerManager::Instance()->GetContainer<
+      PoseContainer>(AdapterConfig::LOCALIZATION);
+  if (ego_pose_container_ptr == nullptr) {
+    (*feature_values)[0] = 100.0;
+    (*feature_values)[1] = 100.0;
+    return;
+  }
+  const auto ego_pose_obstacle_ptr =
+      ego_pose_container_ptr->ToPerceptionObstacle();
+  const auto ego_position = ego_pose_obstacle_ptr->position();
+  const auto ego_velocity = ego_pose_obstacle_ptr->velocity();
+  CHECK_GT(obstacle_ptr->history_size(), 0);
+  const Feature& obstacle_feature = obstacle_ptr->latest_feature();
+  apollo::common::math::Vec2d ego_relative_position(
+      ego_position.x() - obstacle_feature.position().x(),
+      ego_position.y() - obstacle_feature.position().y());
+  apollo::common::math::Vec2d ego_relative_velocity(
+      ego_velocity.x(), ego_velocity.y());
+  ego_relative_velocity.rotate(-obstacle_feature.velocity_heading());
+  (*feature_values)[0] = ego_relative_position.x();
+  (*feature_values)[1] = ego_relative_position.y();
+  (*feature_values)[2] = ego_relative_velocity.x();
+  (*feature_values)[3] = ego_relative_velocity.y();
+  ADEBUG << "ego relative pos = {"
+         << ego_relative_position.x() << ", "
+         << ego_relative_position.y() << "} "
+         << "ego_relative_velocity = {"
+         << ego_relative_velocity.x() << ", "
+         << ego_relative_velocity.y() << "}";
 }
 
 void JunctionMLPEvaluator::SetJunctionFeatureValues(
@@ -201,6 +258,7 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     feature_values->push_back(1.0);
     feature_values->push_back(1.0);
     feature_values->push_back(0.0);
+    feature_values->push_back(0.0);
   }
   int num_junction_exit = feature_ptr->junction_feature().junction_exit_size();
   for (int i = 0; i < num_junction_exit; ++i) {
@@ -215,21 +273,35 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     double angle = std::atan2(diff_y, diff_x);
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
-    feature_values->operator[](idx * 5) = 1.0;
-    feature_values->operator[](idx * 5 + 1) = diff_x / junction_range;
-    feature_values->operator[](idx * 5 + 2) = diff_y / junction_range;
-    feature_values->operator[](idx * 5 + 3) =
+    double speed = std::max(0.1, feature_ptr->speed());
+    double exit_time = std::hypot(diff_x, diff_y) / speed;
+    std::array<double, 2> start_x = {0, speed};
+    std::array<double, 2> end_x = {diff_x, std::cos(diff_heading) * speed};
+    std::array<double, 2> start_y = {0, 0};
+    std::array<double, 2> end_y = {diff_y, std::sin(diff_heading) * speed};
+    std::array<double, 4> x_coeffs =
+        ComputePolynomial<3>(start_x, end_x, exit_time);
+    std::array<double, 4> y_coeffs =
+        ComputePolynomial<3>(start_y, end_y, exit_time);
+    double t = 0.0;
+    double cost = 0.0;
+    while (t <= exit_time) {
+      double x_1 = EvaluateCubicPolynomial(x_coeffs, t, 1);
+      double x_2 = EvaluateCubicPolynomial(x_coeffs, t, 2);
+      double y_1 = EvaluateCubicPolynomial(y_coeffs, t, 1);
+      double y_2 = EvaluateCubicPolynomial(y_coeffs, t, 2);
+      // cost = curvature * v^2
+      cost = std::max(cost, std::abs(x_1 * y_2 - y_1 * x_2) /
+                            std::hypot(x_1, y_1));
+      t += FLAGS_prediction_trajectory_time_resolution;
+    }
+    feature_values->operator[](idx * 6) = 1.0;
+    feature_values->operator[](idx * 6 + 1) = diff_x / junction_range;
+    feature_values->operator[](idx * 6 + 2) = diff_y / junction_range;
+    feature_values->operator[](idx * 6 + 3) =
         std::sqrt(diff_x * diff_x + diff_y * diff_y) / junction_range;
-    feature_values->operator[](idx * 5 + 4) = diff_heading;
-  }
-}
-
-void JunctionMLPEvaluator::SaveOfflineFeatures(
-    Feature* feature_ptr,
-    const std::vector<double>& feature_values) {
-  for (double feature_value : feature_values) {
-    feature_ptr->mutable_junction_feature()
-               ->add_junction_mlp_feature(feature_value);
+    feature_values->operator[](idx * 6 + 4) = diff_heading;
+    feature_values->operator[](idx * 6 + 5) = cost;
   }
 }
 

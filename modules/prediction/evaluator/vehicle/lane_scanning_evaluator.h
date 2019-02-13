@@ -44,12 +44,25 @@ class LaneScanningEvaluator : public Evaluator {
   void Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
+    * @brief Override Evaluate
+    * @param Obstacle pointer
+    * @param vector of all Obstacles
+    */
+  void Evaluate(
+      Obstacle* obstacle_ptr, std::vector<Obstacle*> dynamic_env) override;
+
+  /**
    * @brief Extract features for learning model's input
    * @param Obstacle pointer
    */
   bool ExtractFeatures(const Obstacle* obstacle_ptr,
                        const LaneGraph* lane_graph_ptr,
                        std::vector<double>* feature_values);
+
+  /**
+    * @brief Get the name of evaluator.
+    */
+  std::string GetName() override {return "LANE_SCANNING_EVALUATOR";}
 
  private:
   /**

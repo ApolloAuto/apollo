@@ -24,8 +24,8 @@
 
 #include "gtest/gtest.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -47,7 +47,7 @@ TEST_F(StopSignUnprotectedScenarioTest, VerifyConf) {
       "scenario/stop_sign_unprotected_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_stop_sign_unprotected_config_file, &config));
 }
 
@@ -57,7 +57,7 @@ TEST_F(StopSignUnprotectedScenarioTest, Init) {
       "scenario/stop_sign_unprotected_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_stop_sign_unprotected_config_file, &config));
 
   ScenarioContext context;

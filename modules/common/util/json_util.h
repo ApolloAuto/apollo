@@ -65,6 +65,13 @@ class JsonUtil {
   }
 
   /**
+   * @brief Get a boolean value from the given json[key].
+   * @return Whether the field exists and is a valid boolean.
+   */
+  static bool GetBooleanFromJson(const nlohmann::json &json,
+                                 const std::string &key, bool *value);
+
+  /**
    * @brief Get a string vector from the given json[key].
    * @return Whether the field exists and is a valid string vector.
    */

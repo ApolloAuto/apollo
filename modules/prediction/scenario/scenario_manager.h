@@ -43,16 +43,6 @@ class ScenarioManager {
   const Scenario& scenario() const;
 
  private:
-  void PrioritizeObstacles(
-      const EnvironmentFeatures& environment_features,
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
-
-  void PrioritizeObstaclesForCruiseScenario(
-      const EnvironmentFeatures& environment_features,
-      const std::shared_ptr<CruiseScenarioFeatures> scenario_features,
-      ObstaclesContainer* ptr_obstacle_contrainer);
-
- private:
   Scenario current_scenario_;
 
   DECLARE_SINGLETON(ScenarioManager)

@@ -16,6 +16,8 @@
 
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
+#include <vector>
+
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
@@ -110,6 +112,7 @@ void EvaluatorManager::Run() {
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
 
+  std::vector<Obstacle*> dynamic_env;
   for (int id : obstacles_container->curr_frame_predictable_obstacle_ids()) {
     if (id < 0) {
       ADEBUG << "The obstacle has invalid id [" << id << "].";
@@ -125,12 +128,14 @@ void EvaluatorManager::Run() {
       continue;
     }
 
-    EvaluateObstacle(obstacle);
+    EvaluateObstacle(obstacle, dynamic_env);
   }
 }
 
-void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle) {
+void EvaluatorManager::EvaluateObstacle(
+    Obstacle* obstacle, std::vector<Obstacle*> dynamic_env) {
   Evaluator* evaluator = nullptr;
+  // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
     case PerceptionObstacle::VEHICLE: {
       if (obstacle->HasJunctionFeatureWithExits() &&
@@ -140,6 +145,9 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle) {
       } else if (obstacle->IsOnLane()) {
         evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
         CHECK_NOTNULL(evaluator);
+      } else {
+        ADEBUG << "Obstacle: " << obstacle->id() << " is neither "
+               "on lane, nor in junction. Skip evaluating.";
       }
       break;
     }
@@ -161,9 +169,22 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle) {
       break;
     }
   }
+
+  // Evaluate using the selected evaluator.
   if (evaluator != nullptr) {
-    evaluator->Evaluate(obstacle);
+    if (evaluator->GetName() == "LANE_SCANNING_EVALUATOR") {
+      // For evaluators that need surrounding obstacles' info.
+      evaluator->Evaluate(obstacle, dynamic_env);
+    } else {
+      // For evaluators that don't need surrounding info.
+      evaluator->Evaluate(obstacle);
+    }
   }
+}
+
+void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle) {
+  std::vector<Obstacle*> dummy_dynamic_env;
+  EvaluateObstacle(obstacle, dummy_dynamic_env);
 }
 
 std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(

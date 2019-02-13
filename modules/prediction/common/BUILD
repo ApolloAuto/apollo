@@ -68,6 +68,7 @@ cc_library(
         "//modules/common/util",
         "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:offline_features_proto",
+        "//modules/prediction/proto:prediction_proto",
     ],
 )
 
@@ -180,6 +181,23 @@ cc_test(
         ":junction_analyzer",
         ":kml_map_based_test",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "message_process",
+    srcs = ["message_process.cc"],
+    hdrs = [
+        "message_process.h",
+    ],
+    deps = [
+        "//cyber/common:file",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/prediction/evaluator:evaluator_manager",
+        "//modules/prediction/predictor:predictor_manager",
+        "//modules/prediction/proto:offline_features_proto",
+        "//modules/prediction/scenario:scenario_manager",
+        "//modules/prediction/util:data_extraction",
     ],
 )
 

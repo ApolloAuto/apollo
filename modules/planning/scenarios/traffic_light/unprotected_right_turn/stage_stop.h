@@ -34,9 +34,9 @@ namespace traffic_light {
 
 struct TrafficLightUnprotectedRightTurnContext;
 
-class StageStop : public Stage {
+class TrafficLightUnprotectedRightTurnStageStop : public Stage {
  public:
-  explicit StageStop(
+  explicit TrafficLightUnprotectedRightTurnStageStop(
       const ScenarioConfig::StageConfig& config) : Stage(config) {}
 
  private:
@@ -48,6 +48,7 @@ class StageStop : public Stage {
   }
 
  private:
+  Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage();
 
  private:

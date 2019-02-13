@@ -17,8 +17,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/base/camera.h"
 #include "yaml-cpp/yaml.h"
@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace common {
 
-using apollo::common::util::PathExists;
+using cyber::common::PathExists;
 
 bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
                   int *frame_id, double *time_stamp) {

@@ -17,8 +17,8 @@
 
 #include <algorithm>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/camera/lib/lane/common/denseline.pb.h"
@@ -28,7 +28,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool DenselineLanePostprocessor::Init(
   const LanePostprocessorInitOptions& options) {
@@ -36,7 +36,7 @@ bool DenselineLanePostprocessor::Init(
   denseline::DenselineParam denseline_param;
   const std::string& proto_path =
       GetAbsolutePath(options.detect_config_root, options.detect_config_name);
-  if (!apollo::common::util::GetProtoFromFile(proto_path, &denseline_param)) {
+  if (!cyber::common::GetProtoFromFile(proto_path, &denseline_param)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }
@@ -55,7 +55,7 @@ bool DenselineLanePostprocessor::Init(
   const std::string& postprocessor_config =
       GetAbsolutePath(root_dir, conf_file);
   AINFO << "postprocessor_config:" << postprocessor_config;
-  if (!apollo::common::util::GetProtoFromFile(
+  if (!cyber::common::GetProtoFromFile(
     postprocessor_config, &lane_postprocessor_param_)) {
     AERROR << "Read config detect_param failed: " << postprocessor_config;
     return false;

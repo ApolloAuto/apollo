@@ -71,16 +71,16 @@ void StopSignUnprotectedScenario::Init() {
     return;
   }
 
-  context_.stop_sign_id = stop_sign_overlap_id;
-  stop_sign_ = HDMapUtil::BaseMap().GetStopSignById(
-      hdmap::MakeMapId(stop_sign_overlap_id));
-  if (!stop_sign_) {
+  hdmap::StopSignInfoConstPtr stop_sign =
+      HDMapUtil::BaseMap().GetStopSignById(
+          hdmap::MakeMapId(stop_sign_overlap_id));
+  if (!stop_sign) {
     AERROR << "Could not find stop sign: " << stop_sign_overlap_id;
     return;
   }
   context_.watch_vehicles.clear();
 
-  GetAssociatedLanes(*stop_sign_);
+  GetAssociatedLanes(*stop_sign);
 
   init_ = true;
 }
@@ -92,22 +92,22 @@ void StopSignUnprotectedScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_PRE_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StagePreStop(config);
+        return new StopSignUnprotectedStagePreStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageStop(config);
+        return new StopSignUnprotectedStageStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageCreep(config);
+        return new StopSignUnprotectedStageCreep(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageIntersectionCruise(config);
+        return new StopSignUnprotectedStageIntersectionCruise(config);
       });
 }
 

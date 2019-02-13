@@ -14,6 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+/**
+ * @file
+ * @brief This file provides the declaration of the class `NavigationLane`.
+ */
+
 #pragma once
 
 #include <list>
@@ -28,6 +33,10 @@
 #include "modules/map/relative_map/proto/relative_map_config.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
 
+/**
+ * @namespace apollo::relative_map
+ * @brief apollo::relative_map
+ */
 namespace apollo {
 namespace relative_map {
 
@@ -63,28 +72,81 @@ typedef std::pair<int, int> StitchIndexPair;
 // projection position in the current navigation line.
 typedef std::pair<int, double> ProjIndexPair;
 
+/**
+ * @class NavigationLane
+ * @brief NavigationLane generates a real-time relative map based on navagation
+ * lines.
+ *
+ * First, several navigation lines are received from the `NavigationInfo`
+ * object;
+ *
+ * Second, several navigation line segments with the length of about 250 m are
+ * cut from the whole navigation lines and the UTM coordinates are converted
+ * into local coordinates with the current position of the vehicle as the
+ * origin;
+ *
+ * Third, the navigation line segment of the vehicle's current lane is merged
+ * with the perceived lane centerline.
+ *
+ * Fourth, a real-time relative map is dynamically created based on navigation
+ * line segments and perceived lane width;
+ *
+ * Fifth, the relative map is output as a `MapMsg` object pointer.
+ */
 class NavigationLane {
  public:
   NavigationLane() = default;
   explicit NavigationLane(const NavigationLaneConfig& config);
   ~NavigationLane() = default;
 
+  /**
+   * @brief Set the configuration information required by the `NavigationLane`.
+   * @param config Configuration object.
+   * @return None.
+   */
   void SetConfig(const NavigationLaneConfig& config);
 
+  /**
+   * @brief Update navigation line information.
+   * @param navigation_info Navigation line information to be updated.
+   * @return None.
+   */
   void UpdateNavigationInfo(const NavigationInfo& navigation_info);
 
+  /**
+   * @brief Set the default width of a lane.
+   * @param left_width Left half width of a lane.
+   * @param right_width Right half width of a lane.
+   * @return None.
+   */
   void SetDefaultWidth(const double left_width, const double right_width) {
     default_left_width_ = left_width;
     default_right_width_ = right_width;
   }
 
+  /**
+   * @brief Generate a suitable path (i.e. a navigation line segment).
+   * @param
+   * @return True if a suitable path is created; false otherwise.
+   */
   bool GeneratePath();
 
+  /**
+   * @brief Update perceived lane line information.
+   * @param perception_obstacles Perceived lane line information to be updated.
+   * @return None.
+   */
   void UpdatePerception(
       const perception::PerceptionObstacles& perception_obstacles) {
     perception_obstacles_ = perception_obstacles;
   }
 
+  /**
+   * @brief Get the generated lane segment where the vehicle is currently
+   * located.
+   * @param
+   * @return The generated lane segment where the vehicle is currently located.
+   */
   NavigationPath Path() const {
     const auto& current_navi_path = std::get<3>(current_navi_path_tuple_);
     if (current_navi_path) {
@@ -93,33 +155,113 @@ class NavigationLane {
     return NavigationPath();
   }
 
-  bool CreateMap(const MapGenerationParam& map_config, MapMsg* map_msg) const;
+  /**
+   * @brief Generate a real-time relative map of approximately 250 m in length
+   * based on several navigation line segments and map generation configuration
+   * information.
+   * @param map_config Map generation configuration information.
+   * @param map_msg A pointer which outputs the real-time relative map.
+   * @return True if the real-time relative map is created; false otherwise.
+   */
+  bool CreateMap(const MapGenerationParam& map_config,
+                 MapMsg* const map_msg) const;
 
  private:
+  /**
+   * @brief Calculate the value of a cubic polynomial according to the given
+   * coefficients and an independent variable.
+   * @param c0 Cubic polynomial coefficient.
+   * @param c1 Cubic polynomial coefficient.
+   * @param c2 Cubic polynomial coefficient.
+   * @param c3 Cubic polynomial coefficient.
+   * @param x Independent variable.
+   * @return Calculated value of the cubic polynomial.
+   */
   double EvaluateCubicPolynomial(const double c0, const double c1,
                                  const double c2, const double c3,
-                                 const double z) const;
+                                 const double x) const;
 
+  /**
+   * @brief Calculate the curvature value based on the cubic polynomial's
+   * coefficients and an independent variable.
+   * @param c1 Cubic polynomial coefficient.
+   * @param c2 Cubic polynomial coefficient.
+   * @param c3 Cubic polynomial coefficient.
+   * @param x Independent variable.
+   * @return Calculated curvature value.
+   */
   double GetKappa(const double c1, const double c2, const double c3,
                   const double x);
 
-  void MergeNavigationLineAndLaneMarker(const int line_index,
-                                        common::Path* path);
-
+  /**
+   * @brief In a navigation line segment, starting from the point given by
+   * `start_index`, the matched point after the distance `s` is calculated, and
+   * the index of the matched point is given.
+   * @param path The specific navigation line segment.
+   * @param start_index The index of the starting point.
+   * @param s The distance from the starting point.
+   * @param matched_index The pointer storing the index of the matched point.
+   * @return The matched point after the distance `s`.
+   */
   common::PathPoint GetPathPointByS(const common::Path& path,
                                     const int start_index, const double s,
-                                    int* matched_index);
+                                    int* const matched_index);
 
+  /**
+   * @brief Generate a lane centerline from the perceived lane markings and
+   * convert it to a navigation line segment.
+   * @param lane_marker The perceived lane markings.
+   * @param path The converted navigation line segment.
+   * @return None.
+   */
   void ConvertLaneMarkerToPath(const perception::LaneMarkers& lane_marker,
-                               common::Path* path);
+                               common::Path* const path);
 
-  bool ConvertNavigationLineToPath(const int line_index, common::Path* path);
+  /**
+   * @brief A navigation line segment with the length of about 250 m are cut
+   * from the whole navigation lines and the UTM coordinates are converted
+   * into local coordinates with the current position of the vehicle as the
+   * origin.
+   * @param line_index The index of the navigation line segment vector.
+   * @param path The converted navigation line segment.
+   * @return True if a suitable path is created; false otherwise.
+   */
+  bool ConvertNavigationLineToPath(const int line_index,
+                                   common::Path* const path);
 
-  ProjIndexPair UpdateProjectionIndex(const common::Path& path, int line_index);
+  /**
+   * @brief Merge the navigation line segment of the vehicle's current lane and
+   * the perceived lane centerline.
+   * @param line_index The index of the navigation line segment vector.
+   * @param path The merged navigation line segment.
+   * @return None.
+   */
+  void MergeNavigationLineAndLaneMarker(const int line_index,
+                                        common::Path* const path);
 
+  /**
+   * @brief Update the index of the vehicle's current location in an entire
+   * navigation line.
+   * @param path The entire navigation line. Note that the path here refers to
+   * the entire navigation line stored in UTM coordinates.
+   * @param line_index The index of the whole navigation line vector stored in a
+   * `NavigationInfo` object.
+   * @return Updated projection index pair.
+   */
+  ProjIndexPair UpdateProjectionIndex(const common::Path& path,
+                                      const int line_index);
+
+  /**
+   * @brief If an entire navigation line is a cyclic/circular
+   * route, the closest matching point at the starting and end positions is
+   * recorded so that the vehicle can drive cyclically.
+   * @param
+   * @return None.
+   */
   void UpdateStitchIndexInfo();
 
  private:
+  // the configuration information required by the `NavigationLane`
   NavigationLaneConfig config_;
 
   // received from topic: /apollo/perception_obstacles
@@ -134,7 +276,7 @@ class NavigationLane {
   std::list<NaviPathTuple> navigation_path_list_;
 
   // the navigation path which the vehicle is currently on.
-  NaviPathTuple current_navi_path_tuple_;  // when invalid, left_width_ < 0
+  NaviPathTuple current_navi_path_tuple_;
 
   // when invalid, left_width_ < 0
   double perceived_left_width_ = -1.0;

@@ -127,6 +127,12 @@ class VehicleController {
   virtual void Throttle(double throttle) = 0;
 
   /*
+   * @brief drive with new acceleration/deceleration:-7.0~7.0, unit:m/s^2,
+   * acc:-7.0~7.0, unit:m/s^2
+   */
+  virtual void Acceleration(double acc) = 0;
+
+  /*
    * @brief steering with old angle speed angle:-99.99~0.00~99.99, unit:%,
    * left:+, right:-
    */

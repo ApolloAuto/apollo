@@ -15,25 +15,24 @@
  *****************************************************************************/
 #include <map>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
-#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_config.pb.h"
-
-#include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/cnn_segmentation.h"
+#include "modules/perception/lidar/lib/segmentation/cnnseg/proto/cnnseg_config.pb.h"
 #include "modules/perception/lidar/lib/segmentation/cnnseg/util.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
-using apollo::common::util::GetProtoFromFile;
+using apollo::cyber::common::GetAbsolutePath;
+using apollo::cyber::common::GetProtoFromFile;
 using base::AttributePointCloud;
 using base::PointF;
 using base::Object;
@@ -438,7 +437,7 @@ bool CNNSegmentation::GetConfigs(std::string* param_file,
   config_file = GetAbsolutePath(config_file, "cnnseg.conf");
 
   CNNSegConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config))
+  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config))
       << "Failed to parse CNNSeg config file";
   *param_file = GetAbsolutePath(work_root, config.param_file());
   *proto_file = GetAbsolutePath(work_root, config.proto_file());

@@ -41,7 +41,7 @@ using common::time::Clock;
 using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
-Stage::StageStatus StageCreep::Process(
+Stage::StageStatus StopSignUnprotectedStageCreep::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
@@ -54,48 +54,43 @@ Stage::StageStatus StageCreep::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageCreep planning error";
+    AERROR << "StopSignUnprotectedStageCreep planning error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the stop_sign is still along referenceline
-  std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it =
-      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
-                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == stop_sign_overlap_id;
-                   });
-  if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
-    next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+  // check if the stop_sign is still along reference_line
+  std::string stop_sign_overlap_id =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+  if (CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
+    return FinishScenario();
   }
 
   const double wait_time =
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout = scenario_config_.creep_timeout();
   auto *task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
-  if (task && task->CheckCreepDone(*frame, reference_line_info,
-                                   stop_sign_overlap_it->end_s,
-                                   wait_time, timeout)) {
+  if (task && task->CheckCreepDone(
+      *frame, reference_line_info,
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s,
+      wait_time, timeout)) {
     return FinishStage();
   }
 
   // set param for PROCEED_WITH_CAUTION_SPEED
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-      ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
-                                        stop_sign_overlap_it->end_s);
+      ->SetProceedWithCautionSpeedParam(
+          *frame, reference_line_info,
+          PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageCreep planning error";
+    AERROR << "StopSignUnprotectedStageCreep planning error";
   }
   return Stage::RUNNING;
 }
 
-Stage::StageStatus StageCreep::FinishStage() {
+Stage::StageStatus StopSignUnprotectedStageCreep::FinishStage() {
   next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }

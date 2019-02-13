@@ -43,8 +43,7 @@ export default class TileGround {
         };
 
         this.mapId = metadata.mapid;
-        this.mapUrlPrefix = this.metadata.imageUrl
-                ? `${this.metadata.imageUrl}/${this.mapId}` : `${serverUrl}/map/getMapPic`;
+        this.mapUrlPrefix = `${this.metadata.imageUrl}/${this.mapId}`;
         this.initialized = true;
     }
 

@@ -18,15 +18,15 @@
 #include <string>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/proto/tracker_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace radar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 HMMatcher::HMMatcher() { name_ = "HMMatcher"; }
 
@@ -51,7 +51,7 @@ bool HMMatcher::Init() {
   config_file = GetAbsolutePath(config_file, "hm_matcher.conf");
   // get config params
   MatcherConfig config_params;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config_params))
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config_params))
        << "Failed to parse MatcherConfig config file.";
   double max_match_distance = config_params.max_match_distance();
   double bound_match_distance = config_params.bound_match_distance();

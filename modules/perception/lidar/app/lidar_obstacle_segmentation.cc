@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lidar/app/lidar_obstacle_segmentation.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_segmentation_config.pb.h"
@@ -37,13 +37,13 @@ bool LidarObstacleSegmentation::Init(
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = apollo::common::util::GetAbsolutePath(work_root, root_path);
-  config_file = apollo::common::util::GetAbsolutePath(config_file, sensor_name);
-  config_file = apollo::common::util::GetAbsolutePath(config_file,
+  config_file = cyber::common::GetAbsolutePath(work_root, root_path);
+  config_file = cyber::common::GetAbsolutePath(config_file, sensor_name);
+  config_file = cyber::common::GetAbsolutePath(config_file,
       "lidar_obstacle_segmentation.conf");
 
   LidarObstacleSegmentationConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   segmentor_name_ = config.segmentor();
   use_map_manager_ = config.use_map_manager();
   use_object_filter_bank_ = config.use_object_filter_bank();

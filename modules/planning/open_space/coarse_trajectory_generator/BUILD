@@ -33,11 +33,29 @@ cc_library(
 )
 
 cc_library(
+    name = "grid_search",
+    srcs = [
+        "grid_search.cc",
+    ],
+    hdrs = [
+        "grid_search.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/math",
+        "//modules/planning/proto:planner_open_space_config_proto",
+    ],
+)
+
+cc_library(
     name = "open_space_utils",
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/open_space/coarse_trajectory_generator:node3d",
         "//modules/planning/open_space/coarse_trajectory_generator:reeds_shepp_path",
+        "//modules/planning/open_space/coarse_trajectory_generator:grid_search",
+
     ],
 )
 

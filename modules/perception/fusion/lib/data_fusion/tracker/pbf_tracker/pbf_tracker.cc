@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 
+#include "cyber/common/file.h"
 #include "modules/common/time/time_util.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/motion_fusion/kalman_motion_fusion/kalman_motion_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion/pbf_shape_fusion.h"
@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 // TODO(all) fix the static string lint issue
 std::string PbfTracker::s_type_fusion_method_ = "DstTypeFusion";  // NOLINT
@@ -51,7 +51,7 @@ bool PbfTracker::InitParams() {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   AINFO << "Config file : " << config;
   PbfTrackerConfig params;
-  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
+  if (!cyber::common::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }

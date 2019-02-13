@@ -40,11 +40,10 @@
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
-// #include
-// "modules/planning/reference_line/cos_theta_reference_line_smoother.h"
+#include "modules/planning/reference_line/cos_theta_reference_line_smoother.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
-// #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
+#include "modules/planning/reference_line/spiral_reference_line_smoother.h"
 
 /**
  * @namespace apollo::planning
@@ -61,7 +60,9 @@ namespace planning {
 class ReferenceLineProvider {
  public:
   ReferenceLineProvider() = default;
-  explicit ReferenceLineProvider(const hdmap::HDMap* base_map);
+  explicit ReferenceLineProvider(
+      const hdmap::HDMap* base_map,
+      const std::shared_ptr<relative_map::MapMsg>& relative_map = nullptr);
 
   /**
    * @brief Default destructor.
@@ -136,7 +137,6 @@ class ReferenceLineProvider {
                              double s) const;
 
   bool GetReferenceLinesFromRelativeMap(
-      const relative_map::MapMsg& relative_map,
       std::list<ReferenceLine>* reference_lines,
       std::list<hdmap::RouteSegments>* segments);
 
@@ -161,6 +161,9 @@ class ReferenceLineProvider {
 
   std::mutex pnc_map_mutex_;
   std::unique_ptr<hdmap::PncMap> pnc_map_;
+
+  // Used in Navigation mode
+  std::shared_ptr<relative_map::MapMsg> relative_map_;
 
   std::mutex vehicle_state_mutex_;
   common::VehicleState vehicle_state_;

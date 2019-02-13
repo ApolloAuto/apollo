@@ -25,10 +25,9 @@ bool HdmapRadarRoiFilter::RoiFilter(
           const RoiFilterOptions& options,
           base::FramePtr radar_frame) {
   std::vector<base::ObjectPtr> origin_objects = radar_frame->objects;
-  common::ObjectInRoiCheck(options.roi,
+  return common::ObjectInRoiCheck(options.roi,
                            origin_objects,
                            &radar_frame->objects);
-  return true;
 }
 
 std::string HdmapRadarRoiFilter::Name() const {

@@ -34,6 +34,8 @@
 #include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/proto/perception_camera.pb.h"
+#include "modules/perception/camera/tools/offline/visualizer.h"
 
 namespace apollo {
 namespace perception {
@@ -79,6 +81,16 @@ class FusionCameraDetectionComponent :
 
   int ConvertObjectToPb(const base::ObjectPtr& object_ptr,
       apollo::perception::PerceptionObstacle* pb_msg);
+
+  int ConvertObjectToCameraObstacle(const base::ObjectPtr& object_ptr,
+      apollo::perception::camera::CameraObstacle* camera_obstacle);
+
+  int ConvertLaneToCameraLaneline(const base::LaneLine& lane_line,
+      apollo::perception::camera::CameraLaneLine* camera_laneline);
+
+  int MakeCameraDebugMsg(double msg_timestamp, const std::string& camera_name,
+      const camera::CameraFrame& camera_frame,
+      apollo::perception::camera::CameraDebug* camera_debug_msg);
 
  private:
   std::mutex mutex_;
@@ -141,6 +153,8 @@ class FusionCameraDetectionComponent :
 
   bool enable_visualization_ = false;
   std::string camera_perception_viz_message_channel_name_;
+  std::string visual_debug_folder_;
+  std::string visual_camera_;
 
   bool output_final_obstacles_ = false;
   std::string output_obstacles_channel_name_;
@@ -155,13 +169,19 @@ class FusionCameraDetectionComponent :
   double ts_diff_ = 1.0;
 
   std::shared_ptr<apollo::cyber::Writer<
-        apollo::perception::PerceptionObstacles>> writer_;
+      apollo::perception::PerceptionObstacles>> writer_;
 
   std::shared_ptr<apollo::cyber::Writer<SensorFrameMessage>>
-        sensorframe_writer_;
+      sensorframe_writer_;
 
   std::shared_ptr<apollo::cyber::Writer<
-        CameraPerceptionVizMessage>> camera_viz_writer_;
+      CameraPerceptionVizMessage>> camera_viz_writer_;
+
+  std::shared_ptr<apollo::cyber::Writer<
+      apollo::perception::camera::CameraDebug>> camera_debug_writer_;
+
+  camera::Visualizer visualize_;
+  bool write_visual_img_;
 };
 
 CYBER_REGISTER_COMPONENT(FusionCameraDetectionComponent);

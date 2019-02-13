@@ -15,8 +15,8 @@
 *****************************************************************************/
 #include "modules/perception/camera/app/traffic_light_camera_perception.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/traffic_light/detector/detection/detection.h"
 #include "modules/perception/camera/lib/traffic_light/detector/recognition/recognition.h"
@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool TrafficLightCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {
@@ -38,7 +38,7 @@ bool TrafficLightCameraPerception::Init(
   std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);
   proto_path = GetAbsolutePath(work_root, proto_path);
   AINFO << "proto_path " << proto_path;
-  if (!apollo::common::util::GetProtoFromFile(proto_path, &tl_param_)) {
+  if (!cyber::common::GetProtoFromFile(proto_path, &tl_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }

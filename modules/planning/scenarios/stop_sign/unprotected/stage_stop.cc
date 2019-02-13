@@ -42,14 +42,13 @@ using common::TrajectoryPoint;
 using common::time::Clock;
 using hdmap::HDMapUtil;
 using hdmap::LaneInfoConstPtr;
-using hdmap::PathOverlap;
 using hdmap::OverlapInfoConstPtr;
 using perception::PerceptionObstacle;
 
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 
-Stage::StageStatus StageStop::Process(
+Stage::StageStatus StopSignUnprotectedStageStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Stop";
   CHECK_NOTNULL(frame);
@@ -63,25 +62,17 @@ Stage::StageStatus StageStop::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the stop_sign is still along referenceline
-  std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it =
-      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
-                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == stop_sign_overlap_id;
-                   });
-  if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
-    next_stage_ = ScenarioConfig::NO_STAGE;
-    return Stage::FINISHED;
+  // check if the stop_sign is still along reference_line
+  std::string stop_sign_overlap_id =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+  if (CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
+    return FinishScenario();
   }
 
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double distance_adc_pass_stop_sign =
-      adc_front_edge_s - stop_sign_overlap_it->start_s;
   constexpr double kPassStopLineBuffer = 1.0;  // unit: m
-
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double distance_adc_pass_stop_sign = adc_front_edge_s -
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
   // passed stop line too far
   if (distance_adc_pass_stop_sign > kPassStopLineBuffer) {
     return FinishStage();
@@ -144,7 +135,7 @@ Stage::StageStatus StageStop::Process(
 /**
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
-int StageStop::RemoveWatchVehicle(
+int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     const PathDecision& path_decision,
     StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
@@ -221,9 +212,17 @@ int StageStop::RemoveWatchVehicle(
   return 0;
 }
 
-Stage::StageStatus StageStop::FinishStage() {
+Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
+  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+
+  next_stage_ = ScenarioConfig::NO_STAGE;
+  return Stage::FINISHED;
+}
+
+Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
-      GetContext()->stop_sign_id;
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
   GetContext()->creep_start_time = Clock::NowInSeconds();
 

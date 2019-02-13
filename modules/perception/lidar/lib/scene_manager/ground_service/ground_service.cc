@@ -17,7 +17,7 @@
 
 #include <limits>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/common/i_lib/geometry/i_plane.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/scene_manager/ground_service/proto/ground_service_config.pb.h"
@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 void GroundServiceContent::GetCopy(SceneServiceContent* content) const {
   GroundServiceContent* ground_content =
@@ -152,7 +152,7 @@ bool GroundService::Init(const SceneServiceInitOptions& options) {
   config_file = GetAbsolutePath(config_file, "ground_service.conf");
 
   GroundServiceConfig config_params;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config_params))
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config_params))
       << "Failed to parse GroundServiceConfig config file.";
 
   double roi_region_rad_x = config_params.roi_rad_x();

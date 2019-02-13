@@ -71,3 +71,4 @@ object_template_param {
     config_file : "object_template.pt"
   }
 }
+

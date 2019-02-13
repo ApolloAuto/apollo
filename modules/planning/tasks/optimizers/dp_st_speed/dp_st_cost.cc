@@ -59,7 +59,7 @@ void DpStCost::AddToKeepClearRange(
       continue;
     }
     if (obstacle->st_boundary().boundary_type() !=
-        StBoundary::BoundaryType::KEEP_CLEAR) {
+        STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
 

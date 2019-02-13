@@ -70,6 +70,9 @@ DEFINE_string(routing_request_topic, "/apollo/routing_request",
               "routing request topic name");
 DEFINE_string(routing_response_topic, "/apollo/routing_response",
               "routing response topic name");
+DEFINE_string(routing_response_history_topic,
+              "/apollo/routing_response_history",
+              "routing response history topic name");
 DEFINE_string(relative_odometry_topic, "/apollo/calibration/relative_odometry",
               "relative odometry topic name");
 DEFINE_string(ins_stat_topic, "/apollo/sensor/gnss/ins_stat",
@@ -117,6 +120,8 @@ DEFINE_string(localization_gnss_topic, "/apollo/localization/msf_gnss",
               "Gnss localization measurement topic name");
 DEFINE_string(localization_lidar_topic, "/apollo/localization/msf_lidar",
               "Lidar localization measurement topic name");
+DEFINE_string(localization_ndt_topic, "/apollo/localization/ndt_lidar",
+              "NDT localization lidar measurement topic name");
 DEFINE_string(localization_sins_pva_topic, "/apollo/localization/msf_sins_pva",
               "Localization sins pva topic name");
 DEFINE_string(localization_msf_status, "/apollo/localization/msf_status",

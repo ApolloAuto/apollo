@@ -25,14 +25,14 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::util::GetProtoFromFile;
+using apollo::cyber::common::GetProtoFromFile;
 
 class DpStGraphTest : public ::testing::Test {
  public:
@@ -109,9 +109,9 @@ TEST_F(DpStGraphTest, simple) {
   point_pairs.emplace_back(lower_points[0], upper_points[0]);
   point_pairs.emplace_back(lower_points[1], upper_points[1]);
 
-  obstacle_list_.back().SetStBoundary(StBoundary(point_pairs));
+  obstacle_list_.back().SetStBoundary(STBoundary(point_pairs));
 
-  std::vector<const StBoundary*> boundaries;
+  std::vector<const STBoundary*> boundaries;
   boundaries.push_back(&(obstacles_.back()->st_boundary()));
 
   init_point_.mutable_path_point()->set_x(0.0);

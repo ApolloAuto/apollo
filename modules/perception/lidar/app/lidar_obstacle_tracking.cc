@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lidar/app/lidar_obstacle_tracking.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/lidar/app/proto/lidar_obstacle_tracking_config.pb.h"
@@ -36,13 +36,13 @@ bool LidarObstacleTracking::Init(
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = apollo::common::util::GetAbsolutePath(work_root, root_path);
-  config_file = apollo::common::util::GetAbsolutePath(config_file, sensor_name);
-  config_file = apollo::common::util::GetAbsolutePath(config_file,
+  config_file = cyber::common::GetAbsolutePath(work_root, root_path);
+  config_file = cyber::common::GetAbsolutePath(config_file, sensor_name);
+  config_file = cyber::common::GetAbsolutePath(config_file,
       "lidar_obstacle_tracking.conf");
 
   LidarObstacleTrackingConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   multi_target_tracker_name_ = config.multi_target_tracker();
   fusion_classifier_name_ = config.fusion_classifier();
 

@@ -28,7 +28,7 @@ class SingleLanePredictorTest : public KMLMapBasedTest {
   virtual void SetUp() {
     std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
+    apollo::cyber::common::GetProtoFromFile(file, &perception_obstacles_);
   }
 
  protected:
