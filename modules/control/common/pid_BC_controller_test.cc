@@ -18,8 +18,8 @@
 
 #include <string>
 
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
-#include "modules/common/util/file.h"
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/control/proto/pid_conf.pb.h"
 
@@ -31,8 +31,7 @@ class PidBCControllerTest : public ::testing::Test {
   virtual void SetUp() {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
-    CHECK(common::util::GetProtoFromFile(control_conf_file,
-                                                   &control_conf_));
+    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
     lon_controller_conf_ = control_conf_.lon_controller_conf();
   }
 
