@@ -33,7 +33,6 @@ namespace planning {
  * algorithm.
  */
 
-// TODO(all): remove this class as the method has a number of defects.
 class DpPolyPathOptimizer : public PathOptimizer {
  public:
   explicit DpPolyPathOptimizer(const TaskConfig &config);
