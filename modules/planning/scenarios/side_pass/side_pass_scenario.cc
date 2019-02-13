@@ -172,11 +172,14 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
   for (const auto& overlap : first_encountered_overlaps) {
     ADEBUG << "AdcSL: " << adc_sl_boundary.ShortDebugString();
     ADEBUG << overlap.first << ", " << overlap.second.DebugString();
-    if (overlap.first != ReferenceLineInfo::CROSSWALK &&
+    if (overlap.first != ReferenceLineInfo::CLEAR_AREA &&
+        overlap.first != ReferenceLineInfo::CROSSWALK &&
+        overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
         overlap.first != ReferenceLineInfo::SIGNAL &&
         overlap.first != ReferenceLineInfo::STOP_SIGN) {
       continue;
     }
+
     auto distance = overlap.second.start_s - adc_sl_boundary.end_s();
     if (overlap.first == ReferenceLineInfo::SIGNAL) {
       if (distance < FLAGS_side_pass_min_signal_intersection_distance) {

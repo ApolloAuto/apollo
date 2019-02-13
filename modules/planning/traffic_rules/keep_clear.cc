@@ -100,7 +100,7 @@ Status KeepClear::ApplyRule(Frame* const frame,
 
     if (pnc_junction_overlap != nullptr) {
       // adjust pnc_junction start_s to align with
-      // the start_s of other "stop type"overlaps
+      // the start_s of other "stop type" overlaps
       double pnc_junction_start_s = pnc_junction_overlap->start_s;
       const double kPncJunctionStartSDiffBuffer = 3.0;
       // traffic_light, stop_sign, and then crosswalk if neither
