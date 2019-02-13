@@ -58,6 +58,7 @@ class AutoLock {
     ~AutoLock() noexcept(false) {
         UnLock();
     }
+
  public:
     void UnLock() noexcept(false) {
         if (!t_)
@@ -67,6 +68,7 @@ class AutoLock {
             lock_ = false;
         }
     }
+
  private:
     void Lock() noexcept(false) {
         if (!t_)
@@ -76,9 +78,11 @@ class AutoLock {
             lock_ = true;
         }
     }
+
  private:
     T *t_;
     std::atomic_bool lock_;
+
  private:
     AutoLock &operator= (const AutoLock &rhs);
 };

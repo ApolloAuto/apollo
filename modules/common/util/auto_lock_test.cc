@@ -24,12 +24,13 @@
 std::mutex g_mutex;
 int g_int = 0;
 
-void function(){
-    for( int i = 0;i < MAX_COUNT; i++){
+void function() {
+    for (int i = 0; i < MAX_COUNT; i++) {
         AutoLock<std::mutex> autolock(&g_mutex);
-        g_int ++;
+        g_int++;
     }
 }
+
 TEST(AutoLockTest, test_autolock) {
     std::thread t1(function);
     std::thread t2(function);
@@ -38,6 +39,6 @@ TEST(AutoLockTest, test_autolock) {
     t2.join();
 
     AutoLock<std::mutex> autolock(&g_mutex);
-    EXPECT_EQ(g_int,EXPECTED_RESULT);
+    EXPECT_EQ(g_int, EXPECTED_RESULT);
     autolock.UnLock();
 }
