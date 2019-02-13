@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
 
@@ -52,7 +53,13 @@ class Visualizer {
   std::string type_to_string(const apollo::perception::base::ObjectType type);
   std::string sub_type_to_string(
       const apollo::perception::base::ObjectSubType type);
-
+  Eigen::Matrix3d homography_im2car() {
+      return homography_im2car_;}
+  void Set_ROI(int input_offset_y, int crop_height, int crop_width) {
+    roi_start_ = input_offset_y;
+    roi_height_ = crop_height;
+    roi_width_ = crop_width;
+  }
   bool write_out_img_ = false;
 
  private:
@@ -74,6 +81,9 @@ class Visualizer {
   cv::Point p_fov_2_;
   cv::Point p_fov_3_;
   cv::Point p_fov_4_;
+  int roi_height_ = 768;
+  int roi_start_ = 312;
+  int roi_width_ = 1920;
 
   void draw_range_circle();
 
@@ -82,7 +92,7 @@ class Visualizer {
   std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
 
   // homograph between image and ground plane
-  Eigen::Matrix3d homography_im2ground_;
+  Eigen::Matrix3d homography_im2car_;
 };
 
 }  // namespace camera

@@ -52,6 +52,10 @@ class BaseLanePostprocessor {
   virtual bool Process3D(const LanePostprocessorOptions& options,
                          CameraFrame* frame) = 0;
 
+  virtual void SetIm2CarHomography(Eigen::Matrix3d homography_im2car) {
+    // do nothing
+  }
+
   virtual std::string Name() const = 0;
 
   BaseLanePostprocessor(const BaseLanePostprocessor&) = delete;

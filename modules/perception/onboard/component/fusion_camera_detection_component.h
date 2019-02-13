@@ -122,6 +122,7 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
   // map for store params
   std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
   std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
+  Eigen::Matrix3d homography_im2car_;
 
   // camera obstacle pipeline
   camera::CameraPerceptionInitOptions camera_perception_init_options_;
