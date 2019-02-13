@@ -93,7 +93,7 @@ Status NaviPlanning::InitFrame(const uint32_t sequence_num,
                                const VehicleState& vehicle_state,
                                ADCTrajectory* output_trajectory) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
-                         start_time, vehicle_state,
+                         vehicle_state,
                          reference_line_provider_.get(), output_trajectory));
 
   std::list<ReferenceLine> reference_lines;

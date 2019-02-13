@@ -34,7 +34,6 @@
 namespace apollo {
 namespace planning {
 
-// TODO(all): remove this; this has not been used.
 class PolyVTSpeedOptimizer : public Task {
  public:
   explicit PolyVTSpeedOptimizer(const TaskConfig& config);
