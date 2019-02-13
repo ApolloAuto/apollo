@@ -31,14 +31,14 @@ void InternalUnLock(T *t);
 /**
  * @brief override these two routines for other synchronization methods.
  */
-void InternalLock( std::mutex *t) noexcept(false) {
+void InternalLock(std::mutex *t) noexcept(false) {
     if ( !t )
         throw std::errc::bad_address;
     else
         t->lock();
 }
 
-void InternalUnLock( std::mutex *t) noexcept(false) {
+void InternalUnLock(std::mutex *t) noexcept(false) {
     if ( !t )
         throw std::errc::bad_address;
     else
@@ -48,37 +48,37 @@ void InternalUnLock( std::mutex *t) noexcept(false) {
 
 template<typename T = std::mutex>
 class AutoLock{
-public:
-    AutoLock(std::mutex *t) noexcept(false):
+ public:
+    explicit AutoLock(std::mutex *t) noexcept(false):
         t_(t),
         lock_(false){
-        Lock(); 
-    };
+        Lock();
+    }
 
-    ~AutoLock() noexcept(false){
+    ~AutoLock() noexcept(false) {
         UnLock();
-    };
-public:
-    void UnLock() noexcept(false){
-        if( !t_)
+    }
+ public:
+    void UnLock() noexcept(false) {
+        if (!t_)
             throw std::errc::bad_address;
-        if( lock_) {
+        if (lock_) {
             InternalUnLock(t_);
-            lock_=false;
+            lock_ = false;
         }
-    } 
-private:
-    void Lock() noexcept(false){
-        if(!t_)
+    }
+ private:
+    void Lock() noexcept(false) {
+        if (!t_)
             throw std::errc::bad_address;
-        if ( !lock_ ){
+        if (!lock_) {
             InternalLock(t_);
             lock_ = true;
         }
     }
-private:
+ private:
     T *t_;
-    std::atomic_bool lock_ ;
-private:
+    std::atomic_bool lock_;
+ private:
     AutoLock &operator= (const AutoLock &rhs);
 };
