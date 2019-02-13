@@ -174,7 +174,9 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
     ADEBUG << overlap.first << ", " << overlap.second.DebugString();
     if (overlap.first != ReferenceLineInfo::CLEAR_AREA &&
         overlap.first != ReferenceLineInfo::CROSSWALK &&
-        overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
+        // TODO(yifei) temporarily enable side pass at pnc junction without
+        // stop sign and traffic light.
+        // overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
         overlap.first != ReferenceLineInfo::SIGNAL &&
         overlap.first != ReferenceLineInfo::STOP_SIGN) {
       continue;
