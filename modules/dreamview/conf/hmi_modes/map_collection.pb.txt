@@ -1,20 +1,29 @@
 cyber_modules {
-  key: "Computer"
+  key: "GPS"
   value: {
-    dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"
     dag_files: "/apollo/modules/drivers/gnss/dag/gnss.dag"
     dag_files: "/apollo/modules/localization/dag/dag_streaming_rtk_localization.dag"
-    dag_files: "/apollo/modules/drivers/radar/conti_radar/dag/conti_radar.dag"
-    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
     dag_files: "/apollo/modules/transform/dag/static_transform.dag"
     process_group: "compute_sched"
+  }
+}
+cyber_modules {
+  key: "Velodyne"
+  value: {
+    dag_files: "/apollo/modules/drivers/velodyne/dag/velodyne.dag"
+  }
+}
+cyber_modules {
+  key: "Camera"
+  value: {
+    dag_files: "/apollo/modules/drivers/camera/dag/camera.dag"
   }
 }
 modules {
   key: "Recorder"
   value: {
-    start_command: "/apollo/scripts/record_map_data.py --start"
-    stop_command: "/apollo/scripts/record_map_data.py --stop"
+    start_command: "python /apollo/scripts/record_map_data.py --start"
+    stop_command: "python /apollo/scripts/record_map_data.py --stop"
     process_monitor_config {
       command_keywords: "cyber_recorder record"
     }
@@ -68,3 +77,11 @@ monitored_components {
     }
   }
 }
+#monitored_components {
+#  key: "Camer Long"
+#  value: {
+#    channel {
+#      name: "/apollo/sensor/camera/front_12mm/image/compressed"
+#    }
+#  }
+#}
