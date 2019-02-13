@@ -13,8 +13,7 @@ new_http_archive(
 new_local_repository(
     name = "com_github_gflags_gflags",
     build_file = "third_party/gflags.BUILD",
-    #path = "/usr/local/include/gflags",
-    path = "/usr/local/include",
+    path = "/usr/local/include/gflags",
 )
 
 bind(
