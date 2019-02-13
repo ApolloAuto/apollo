@@ -27,6 +27,7 @@
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
+#include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 
 namespace apollo {
@@ -66,6 +67,11 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
           new scenario::traffic_light::TrafficLightProtectedScenario(
               config_map_[scenario_type], &scenario_context_));
       break;
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+      ptr.reset(
+          new scenario::traffic_light::TrafficLightUnprotectedLeftTurnScenario(
+              config_map_[scenario_type], &scenario_context_));
+      break;
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
       ptr.reset(
           new scenario::traffic_light::TrafficLightUnprotectedRightTurnScenario(
@@ -82,16 +88,28 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 }
 
 void ScenarioManager::RegisterScenarios() {
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
-                             &config_map_[ScenarioConfig::LANE_FOLLOW]));
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_side_pass_config_file,
-                             &config_map_[ScenarioConfig::SIDE_PASS]));
+  // lane_follow
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_lane_follow_config_file,
+      &config_map_[ScenarioConfig::LANE_FOLLOW]));
+
+  // side_pass
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_side_pass_config_file,
+      &config_map_[ScenarioConfig::SIDE_PASS]));
+
+  // stop_sign
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_stop_sign_unprotected_config_file,
       &config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]));
+
+  // traffic_light
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_protected_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]));
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_traffic_light_unprotected_left_turn_config_file,
+      &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN]));
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
@@ -120,6 +138,10 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
                                      const Frame& frame) {
   if (current_scenario_->scenario_type() == type) {
     return true;
+  }
+
+  if (FLAGS_enable_scenario_dispatcher) {
+    return true;
   } else {
     auto scenario = CreateScenario(type);
     if (scenario->IsTransferable(*current_scenario_, ego_point, frame)) {
@@ -127,8 +149,8 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
       current_scenario_ = std::move(scenario);
       return true;
     }
+    return false;
   }
-  return false;
 }
 
 void ScenarioManager::Observe(const Frame& frame) {
@@ -207,7 +229,42 @@ void ScenarioManager::Observe(const Frame& frame) {
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
                              const Frame& frame) {
   CHECK(!frame.reference_line_info().empty());
+
   Observe(frame);
+
+  if (FLAGS_enable_scenario_dispatcher) {
+    ScenarioDispatch(ego_point, frame);
+  } else {
+    ScenarioSelfVote(ego_point, frame);
+  }
+}
+
+void ScenarioManager::ScenarioDispatch(
+    const common::TrajectoryPoint& ego_point,
+    const Frame& frame) {
+  CHECK(!frame.reference_line_info().empty());
+
+  if (current_scenario_->GetStatus() !=
+      Scenario::ScenarioStatus::STATUS_DONE) {
+    ADEBUG << "continue current scenario: " << current_scenario_->Name();
+    return;
+  }
+
+  // change lane case, currently default to LANE_FOLLOW in change lane case.
+  // TODO(all) implement change lane scenario.
+  if (SelectChangeLaneScenario(ego_point, frame)) {
+    ADEBUG << "Use change lane scenario (temporarily use LANE_FOLLOW)";
+    return;
+  }
+
+  // TODO(all): to be added
+}
+
+void ScenarioManager::ScenarioSelfVote(
+    const common::TrajectoryPoint& ego_point,
+    const Frame& frame) {
+  CHECK(!frame.reference_line_info().empty());
+
   // change lane case, currently default to LANE_FOLLOW in change lane case.
   // TODO(all) implement change lane scenario.
   if (SelectChangeLaneScenario(ego_point, frame)) {
@@ -224,29 +281,31 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
   }
   rejected_scenarios.insert(current_scenario_->scenario_type());
 
-  // prefer to use first encountered overlaps/objects
-  const auto& reference_line_info = frame.reference_line_info().front();
-  const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
 
   std::vector<ScenarioConfig::ScenarioType> preferred_scenarios;
   preferred_scenarios.push_back(ScenarioConfig::LANE_FOLLOW);
+
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
   for (const auto& overlap : first_overlaps) {
-    if (overlap.first == ReferenceLineInfo::OBSTACLE &&
-        FLAGS_enable_scenario_side_pass) {
+    // side_pass
+    if (overlap.first == ReferenceLineInfo::OBSTACLE) {
       preferred_scenarios.push_back(ScenarioConfig::SIDE_PASS);
-    } else if (overlap.first == ReferenceLineInfo::STOP_SIGN) {
-      // stop_sign scenarios
-      if (FLAGS_enable_scenario_stop_sign) {
-        preferred_scenarios.push_back(ScenarioConfig::STOP_SIGN_UNPROTECTED);
-      }
-    } else if (overlap.first == ReferenceLineInfo::SIGNAL) {
-      // traffic_light scenarios
-      if (FLAGS_enable_scenario_traffic_light) {
-        preferred_scenarios.push_back(
-            ScenarioConfig::TRAFFIC_LIGHT_PROTECTED);
-        preferred_scenarios.push_back(
-            ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
-      }
+    }
+
+    // stop_sign scenarios
+    if (overlap.first == ReferenceLineInfo::STOP_SIGN) {
+      preferred_scenarios.push_back(ScenarioConfig::STOP_SIGN_UNPROTECTED);
+    }
+
+    // traffic_light scenarios
+    if (overlap.first == ReferenceLineInfo::SIGNAL) {
+      preferred_scenarios.push_back(
+          ScenarioConfig::TRAFFIC_LIGHT_PROTECTED);
+      preferred_scenarios.push_back(
+          ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN);
+      preferred_scenarios.push_back(
+          ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
     }
   }
 
@@ -270,22 +329,28 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
     if (rejected_scenarios.find(scenario) != rejected_scenarios.end()) {
       continue;
     }
-    if (scenario == ScenarioConfig::SIDE_PASS &&
-        !FLAGS_enable_scenario_side_pass) {
-      continue;
+    if (!FLAGS_enable_scenario_side_pass) {
+      if (scenario == ScenarioConfig::SIDE_PASS) {
+        continue;
+      }
     }
-    if (scenario == ScenarioConfig::STOP_SIGN_UNPROTECTED &&
-        !FLAGS_enable_scenario_stop_sign) {
-      continue;
+    if (!FLAGS_enable_scenario_stop_sign) {
+      if (scenario == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
+        continue;
+      }
     }
-    if (scenario == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED &&
-        !FLAGS_enable_scenario_traffic_light) {
-      continue;
+    if (!FLAGS_enable_scenario_traffic_light) {
+      if (scenario == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED) {
+        continue;
+      }
+      if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN) {
+        continue;
+      }
+      if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
+        continue;
+      }
     }
-    if (scenario == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN &&
-        !FLAGS_enable_scenario_traffic_light) {
-      continue;
-    }
+
     if (SelectScenario(scenario, ego_point, frame)) {
       AINFO << "select transferable scenario: "
             << ScenarioConfig::ScenarioType_Name(scenario);

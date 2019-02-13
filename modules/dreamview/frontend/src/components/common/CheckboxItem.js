@@ -6,18 +6,27 @@ export default class CheckboxItem extends React.Component {
         const { id, title, isChecked, onClick, disabled, extraClasses } = this.props;
         return (
             <ul className={classNames({
-                        "disabled": disabled
-                    }, extraClasses)}>
-                <li id={id} onClick={() => {
-                                if (!disabled) {
-                                    onClick();
-                                }}}>
+                            "disabled": disabled
+                        }, extraClasses)}>
+                <li id={id}
+                    tabIndex="0"
+                    onClick={() => {
+                        if (!disabled) {
+                            onClick();
+                        }
+                    }}
+                    onKeyPress={(event) => {
+                        event.preventDefault();
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            onClick();
+                        }
+                    }}>
                     <div className="switch">
                         <input type="checkbox" className="toggle-switch"
-                               name={id} checked={isChecked} disabled={disabled} readOnly />
+                            name={id} checked={isChecked} disabled={disabled} readOnly />
                         <label className="toggle-switch-label" htmlFor={id} />
                     </div>
-                    <span>{title}</span>
+                    {title && <span>{title}</span>}
                 </li>
             </ul>
         );

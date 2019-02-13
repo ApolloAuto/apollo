@@ -18,7 +18,7 @@
 #include <boost/bind.hpp>
 #include <map>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace perception {
@@ -37,9 +37,9 @@ bool compare(const SemanticTable& s1, const SemanticTable& s2) {
 }
 
 bool SemanticReviser::Init(const TrafficLightTrackerInitOptions& options) {
-  std::string proto_path = apollo::common::util::GetAbsolutePath(
-      options.root_dir, options.conf_file);
-  if (!apollo::common::util::GetProtoFromFile(proto_path, &semantic_param_)) {
+  std::string proto_path = cyber::common::GetAbsolutePath(options.root_dir,
+                                                          options.conf_file);
+  if (!cyber::common::GetProtoFromFile(proto_path, &semantic_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }

@@ -77,7 +77,7 @@ BoundedQueue<T>::~BoundedQueue() {
     BreakAllWait();
   }
   if (pool_) {
-    for (int i = 0; i < pool_size_; ++i) {
+    for (uint64_t i = 0; i < pool_size_; ++i) {
       pool_[i].~T();
     }
     std::free(pool_);
@@ -97,7 +97,7 @@ bool BoundedQueue<T>::Init(uint64_t size, WaitStrategy* strategy) {
   if (pool_ == nullptr) {
     return false;
   }
-  for (int i = 0; i < pool_size_; ++i) {
+  for (uint64_t i = 0; i < pool_size_; ++i) {
     new (&(pool_[i])) T();
   }
   wait_strategy_.reset(strategy);

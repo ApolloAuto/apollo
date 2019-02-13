@@ -50,19 +50,28 @@ class ScenarioManager final {
   std::unique_ptr<Scenario> CreateScenario(
       ScenarioConfig::ScenarioType scenario_type);
 
+  void RegisterScenarios();
+
   bool SelectChangeLaneScenario(const common::TrajectoryPoint& ego_point,
                                 const Frame& frame);
+
+  // functions for scenario voter implementation
+  void ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
+                        const Frame& frame);
   bool ReuseCurrentScenario(const common::TrajectoryPoint& ego_point,
                             const Frame& frame);
   bool SelectScenario(const ScenarioConfig::ScenarioType type,
                       const common::TrajectoryPoint& ego_point,
                       const Frame& frame);
 
-  void RegisterScenarios();
+  // functions for scenario dispatch implementation
+  void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
+                        const Frame& frame);
 
-  ScenarioConfig::ScenarioType DecideCurrentScenario(
-      const common::TrajectoryPoint& ego_point, const Frame& frame);
+  // ScenarioConfig::ScenarioType DecideCurrentScenario(
+  //      const common::TrajectoryPoint& ego_point, const Frame& frame);
 
+ private:
   std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
                      std::hash<int>>
       config_map_;

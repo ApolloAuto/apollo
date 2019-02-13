@@ -18,7 +18,7 @@
 #include <map>
 #include <vector>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/camera/common/global_config.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/inference/inference_factory.h"
@@ -28,13 +28,13 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool ExternalFeatureExtractor::Init(const FeatureExtractorInitOptions
                                     &options) {
   std::string efx_config = GetAbsolutePath(options.root_dir, options.conf_file);
-  CHECK(apollo::common::util::GetProtoFromFile(efx_config, &param_))
-  << "Read config failed: " << efx_config;
+  CHECK(cyber::common::GetProtoFromFile(efx_config, &param_))
+      << "Read config failed: " << efx_config;
   AINFO << "Load config Success: " << param_.ShortDebugString();
   std::string proto_file =
       GetAbsolutePath(options.root_dir, param_.proto_file());

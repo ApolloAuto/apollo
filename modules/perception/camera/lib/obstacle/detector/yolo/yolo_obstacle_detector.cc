@@ -14,7 +14,10 @@
 * limitations under the License.
 *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
+
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
+
 #include "modules/perception/base/common.h"
 #include "modules/perception/camera/common/timer.h"
 #include "modules/perception/inference/inference_factory.h"
@@ -25,7 +28,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 void YoloObstacleDetector::LoadInputShape(const yolo::ModelParam &model_param) {
   float offset_ratio = model_param.offset_ratio();
@@ -202,7 +205,7 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   CHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
   std::string config_path =
       GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!apollo::common::util::GetProtoFromFile(config_path, &yolo_param_)) {
+  if (!cyber::common::GetProtoFromFile(config_path, &yolo_param_)) {
     AERROR << "read proto_config fail";
     return false;
   }

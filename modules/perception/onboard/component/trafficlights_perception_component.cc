@@ -15,17 +15,18 @@
 *****************************************************************************/
 #include "modules/perception/onboard/component/trafficlights_perception_component.h"
 
+#include <boost/algorithm/string.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <limits>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/time/time.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time_util.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/data_provider.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/perf.h"
@@ -36,8 +37,8 @@
 namespace apollo {
 namespace perception {
 namespace onboard {
-typedef apollo::perception::TrafficLightDetection::CameraID TLCamID;
-using apollo::common::util::GetAbsolutePath;
+using TLCamID = apollo::perception::TrafficLightDetection::CameraID;
+using apollo::cyber::common::GetAbsolutePath;
 using apollo::perception::common::SensorManager;
 
 static int GetGpuId(
@@ -48,8 +49,7 @@ static int GetGpuId(
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  if (!apollo::common::util::GetProtoFromFile(config_file,
-                                              &trafficlight_param)) {
+  if (!cyber::common::GetProtoFromFile(config_file, &trafficlight_param)) {
     AERROR << "Read config failed: " << config_file;
     return -1;
   }

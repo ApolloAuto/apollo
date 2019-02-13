@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/classifier/fused_classifier/ccrf_type_fusion.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -27,7 +27,7 @@ namespace perception {
 namespace lidar {
 
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
-using apollo::common::util::GetAbsolutePath;
+using apollo::cyber::common::GetAbsolutePath;
 using apollo::perception::base::ObjectType;
 
 bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
@@ -41,7 +41,7 @@ bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
-  CHECK(common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   std::string classifiers_property_file_path = GetAbsolutePath(
       work_root, config.classifiers_property_file_path());
   CHECK(util::LoadMultipleMatricesFile(classifiers_property_file_path,
@@ -135,7 +135,7 @@ bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
-  CHECK(common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   std::string transition_property_file_path = GetAbsolutePath(
       work_root, config.transition_property_file_path());
   s_alpha_ = config.transition_matrix_alpha();

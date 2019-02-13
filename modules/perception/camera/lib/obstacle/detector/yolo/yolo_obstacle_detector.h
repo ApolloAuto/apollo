@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/base/box.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/util.h"
@@ -35,6 +35,7 @@
 namespace apollo {
 namespace perception {
 namespace camera {
+
 class YoloObstacleDetector : public BaseObstacleDetector {
  public:
   YoloObstacleDetector() : BaseObstacleDetector() {

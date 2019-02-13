@@ -27,7 +27,7 @@ namespace planning {
 
 TEST(AutotuningSpeedMLPModel, test_case_one) {
   AutotuningSpeedMLPModel speed_model;
-  EXPECT_TRUE(speed_model.SetParams() == common::Status::OK());
+  EXPECT_TRUE(speed_model.SetParams().ok());
 }
 
 }  // namespace planning

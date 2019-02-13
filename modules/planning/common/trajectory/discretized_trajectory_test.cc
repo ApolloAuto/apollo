@@ -20,9 +20,8 @@
 
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
-
-#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace planning {
@@ -31,8 +30,8 @@ TEST(basic_test, DiscretizedTrajectory) {
   const std::string path_of_standard_trajectory =
       "modules/planning/testdata/trajectory_data/standard_trajectory.pb.txt";
   ADCTrajectory trajectory;
-  EXPECT_TRUE(
-      common::util::GetProtoFromFile(path_of_standard_trajectory, &trajectory));
+  EXPECT_TRUE(cyber::common::GetProtoFromFile(path_of_standard_trajectory,
+                                              &trajectory));
   DiscretizedTrajectory discretized_trajectory(trajectory);
   EXPECT_DOUBLE_EQ(discretized_trajectory.GetTemporalLength(),
                    7.9999999999999885);

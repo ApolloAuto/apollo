@@ -20,6 +20,8 @@
 
 #include "modules/planning/common/reference_line_info.h"
 
+#include <algorithm>
+
 #include "cyber/task/task.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
@@ -175,6 +177,16 @@ void ReferenceLineInfo::InitFirstOverlaps() {
   if (GetFirstOverlap(map_path.pnc_junction_overlaps(),
                       &pnc_junction_overlap)) {
     first_encounter_overlaps_.push_back({PNC_JUNCTION, pnc_junction_overlap});
+  }
+
+  // sort by start_s
+  if (!first_encounter_overlaps_.empty()) {
+    std::sort(first_encounter_overlaps_.begin(),
+              first_encounter_overlaps_.end(),
+              [](const std::pair<OverlapType, hdmap::PathOverlap> &a,
+                 const std::pair<OverlapType, hdmap::PathOverlap> &b) {
+                return a.second.start_s < b.second.start_s;
+              });
   }
 }
 
