@@ -60,7 +60,6 @@ monitored_components {
     }
   }
 }
-
 monitored_components {
   key: "Front up lidar 16"
   value: {
