@@ -106,6 +106,8 @@ cc_library(
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
+        "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/utils",

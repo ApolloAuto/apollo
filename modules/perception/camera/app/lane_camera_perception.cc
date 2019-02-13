@@ -176,6 +176,12 @@ void LaneCameraPerception::SetCameraHeightAndPitch(
       pitch_angle_calibrator_working_sensor);
 }
 
+void LaneCameraPerception::SetIm2CarHomography(
+    Eigen::Matrix3d homography_im2car) {
+  CHECK(calibration_service_ != nullptr);
+  lane_postprocessor_->SetIm2CarHomography(homography_im2car);
+}
+
 bool LaneCameraPerception::GetCalibrationService(
     BaseCalibrationService **calibration_service) {
   *calibration_service = calibration_service_.get();
