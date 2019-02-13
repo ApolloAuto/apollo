@@ -18,8 +18,8 @@
 #include <thread>
 #include "gtest/gtest.h"
 
-#define MAX_COUNT       1000000000
-#define EXPECTED_RESULT 2000000000
+#define MAX_COUNT       10000000
+#define EXPECTED_RESULT 20000000
 
 std::mutex g_mutex;
 int g_int = 0;
