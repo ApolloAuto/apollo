@@ -31,6 +31,8 @@ DECLARE_string(scenario_traffic_light_protected_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_left_turn_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
 
+DECLARE_bool(enable_scenario_dispatcher);
+
 DECLARE_bool(enable_scenario_side_pass);
 DECLARE_double(side_pass_min_signal_intersection_distance);
 DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
