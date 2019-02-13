@@ -126,8 +126,48 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
     const Frame& frame) {
-  // TODO(all):
-  return ScenarioConfig::STOP_SIGN_UNPROTECTED;
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double stop_sign_overlap_start_s =
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
+  const double adc_distance_to_stop_sign =
+      stop_sign_overlap_start_s - adc_front_edge_s;
+  ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign
+         << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s << "]";
+
+  bool stop_sign = (adc_distance_to_stop_sign > 0 &&
+      adc_distance_to_stop_sign <=
+      config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]
+                  .stop_sign_unprotected_config()
+                  .start_stop_sign_scenario_distance());
+  bool stop_sign_all_way = false;  // TODO(all)
+
+  switch (current_scenario_->scenario_type()) {
+    case ScenarioConfig::LANE_FOLLOW:
+    case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::APPROACH:
+      if (stop_sign) {
+        return stop_sign_all_way ? ScenarioConfig::STOP_SIGN_PROTECTED:
+            ScenarioConfig::STOP_SIGN_UNPROTECTED;
+      }
+      break;
+    case ScenarioConfig::STOP_SIGN_PROTECTED:
+      break;
+    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      if (current_scenario_->GetStatus() ==
+              Scenario::ScenarioStatus::STATUS_DONE) {
+        return ScenarioConfig::LANE_FOLLOW;
+      }
+      break;
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+    default:
+      break;
+  }
+
+  return current_scenario_->scenario_type();
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
@@ -258,12 +298,6 @@ void ScenarioManager::ScenarioDispatch(
     const common::TrajectoryPoint& ego_point,
     const Frame& frame) {
   CHECK(!frame.reference_line_info().empty());
-
-  if (current_scenario_->GetStatus() !=
-      Scenario::ScenarioStatus::STATUS_DONE) {
-    ADEBUG << "continue current scenario: " << current_scenario_->Name();
-    return;
-  }
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const auto& first_encountered_overlaps =
