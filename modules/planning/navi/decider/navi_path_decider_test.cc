@@ -161,7 +161,7 @@ TEST_F(NaviPathDeciderTest, KeepLane) {
   navi_path_decider.reference_line_info_ = new ReferenceLineInfo(
       vehicle_state, plan_start_point, ref_line, route_segments);
   LocalView local_view;
-  navi_path_decider.frame_ = new Frame(1, local_view, plan_start_point, 0,
+  navi_path_decider.frame_ = new Frame(1, local_view, plan_start_point,
                                        vehicle_state, nullptr, nullptr);
   DCHECK_NOTNULL(navi_path_decider.reference_line_info_);
   DCHECK_NOTNULL(navi_path_decider.frame_);

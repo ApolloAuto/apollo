@@ -54,9 +54,6 @@ OnLanePlanning::~OnLanePlanning() {
     reference_line_provider_->Stop();
   }
   planner_->Stop();
-  last_publishable_trajectory_.reset(nullptr);
-  frame_.reset(nullptr);
-  planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
   PlanningContext::MutablePlanningStatus()->Clear();
   last_routing_.Clear();
@@ -106,12 +103,11 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
 Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
                               const TrajectoryPoint& planning_start_point,
-                              const double start_time,
                               const VehicleState& vehicle_state,
                               ADCTrajectory* output_trajectory) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
-                         start_time, vehicle_state,
-                         reference_line_provider_.get(), output_trajectory));
+                         vehicle_state, reference_line_provider_.get(),
+                         output_trajectory));
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
@@ -245,7 +241,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   bool update_ego_info =
       EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
-  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
+  status = InitFrame(frame_num, stitching_trajectory.back(),
                      vehicle_state, trajectory_pb);
 
   if (update_ego_info && status.ok()) {
