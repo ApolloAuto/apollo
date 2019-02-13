@@ -258,4 +258,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "auto_lock",
+    hdrs = ["auto_lock.h"],
+)
+
+cc_test(
+    name = "auto_lock_test",
+    size = "small",
+    srcs = [
+        "auto_lock_test.cc",
+    ],
+    deps = [
+        "//modules/common/util:auto_lock",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
