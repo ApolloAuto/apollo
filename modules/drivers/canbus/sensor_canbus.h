@@ -28,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/common/file.h"
 #include "cyber/component/component.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -109,7 +110,7 @@ class SensorCanbus : public apollo::cyber::Component {
 template <typename SensorType>
 bool SensorCanbus<SensorType>::Init() {
   // load conf
-  if (!common::util::GetProtoFromFile(FLAGS_sensor_conf_file, &canbus_conf_)) {
+  if (!cyber::common::GetProtoFromFile(FLAGS_sensor_conf_file, &canbus_conf_)) {
     return OnError("Unable to load canbus conf file: " +
                    FLAGS_sensor_conf_file);
   }

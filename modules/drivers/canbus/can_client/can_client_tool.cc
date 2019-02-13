@@ -19,12 +19,12 @@
 #include <memory>
 #include <thread>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
 #include "modules/common/proto/error_code.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/factory.h"
-#include "modules/common/util/file.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/common/byte.h"
@@ -265,8 +265,8 @@ int main(int32_t argc, char **argv) {
   auto can_client_factory = CanClientFactory::Instance();
   can_client_factory->RegisterCanClients();
 
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_can_client_conf_file_a,
-                                              &can_client_conf_a)) {
+  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_can_client_conf_file_a,
+                                               &can_client_conf_a)) {
     AERROR << "Unable to load canbus conf file: "
            << FLAGS_can_client_conf_file_a;
     return 1;
@@ -287,8 +287,8 @@ int main(int32_t argc, char **argv) {
   CANCardParameter can_client_conf_b;
   std::unique_ptr<CanClient> client_b;
   if (!FLAGS_only_one_send) {
-    if (!apollo::common::util::GetProtoFromFile(FLAGS_can_client_conf_file_b,
-                                                &can_client_conf_b)) {
+    if (!apollo::cyber::common::GetProtoFromFile(FLAGS_can_client_conf_file_b,
+                                                 &can_client_conf_b)) {
       AERROR << "Unable to load canbus conf file: "
              << FLAGS_can_client_conf_file_b;
       return 1;

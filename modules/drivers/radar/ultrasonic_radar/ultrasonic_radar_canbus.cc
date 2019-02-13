@@ -14,9 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_canbus.h"
+
+#include "cyber/common/file.h"
 #include "modules/common/util/util.h"
 #include "modules/drivers/proto/ultrasonic_radar.pb.h"
-#include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_canbus.h"
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
 
 /**
@@ -44,8 +46,7 @@ std::string UltrasonicRadarCanbus::Name() const {
 apollo::common::Status UltrasonicRadarCanbus::Init(
   const std::string& config_path,
   const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>>& writer) {
-  if (!apollo::common::util::GetProtoFromFile(config_path,
-                                              &ultrasonic_radar_conf_)) {
+  if (!cyber::common::GetProtoFromFile(config_path, &ultrasonic_radar_conf_)) {
     return OnError("Unable to load canbus conf file: " + config_path);
   }
 
