@@ -32,9 +32,9 @@ TEST(AutotuningSpeedFeatureBuilder, test_case_two) {
   autotuning::TrajectoryFeature input_feature;
   autotuning::TrajectoryPointwiseFeature point_feature;
   auto status = feature_builder.BuildFeature(raw_feature, &input_feature);
-  EXPECT_TRUE(status == common::Status::OK());
+  EXPECT_TRUE(status.ok());
   status = feature_builder.BuildPointFeature(raw_point_feature, &point_feature);
-  EXPECT_TRUE(status == common::Status::OK());
+  EXPECT_TRUE(status.ok());
 }
 
 }  // namespace planning
