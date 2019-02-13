@@ -51,7 +51,7 @@ bool OfflineLocalVisualizer::Init(
   lidar_stds_.clear();
   fusion_stds_.clear();
 
-  std::string config_file = map_folder_ + "/config.xml";
+  const std::string config_file = map_folder_ + "/config.xml";
   map_config_.map_version_ = "lossy_map";
   bool success = map_config_.Load(config_file);
   if (!success) {
@@ -122,7 +122,7 @@ bool OfflineLocalVisualizer::Init(
 }
 
 void OfflineLocalVisualizer::Visualize() {
-  for (unsigned int idx = 0; idx < pcd_timestamps_.size(); idx++) {
+  for (unsigned int idx = 0; idx < pcd_timestamps_.size(); ++idx) {
     LocalizatonInfo lidar_loc_info;
     LocalizatonInfo gnss_loc_info;
     LocalizatonInfo fusion_loc_info;
@@ -185,19 +185,18 @@ bool OfflineLocalVisualizer::PCDTimestampFileHandler() {
   pcd_timestamps_.clear();
 
   FILE *file = fopen(pcd_timestamp_file_.c_str(), "r");
-  if (file) {
-    unsigned int index;
-    double timestamp;
-    int kSize = 2;
-    while (fscanf(file, "%u %lf\n", &index, &timestamp) == kSize) {
-      pcd_timestamps_.push_back(timestamp);
-    }
-    fclose(file);
-  } else {
+  if (!file) {
     AERROR << "Can't open file to read: " << pcd_timestamp_file_;
     return false;
   }
 
+  unsigned int index;
+  double timestamp;
+  while (fscanf(file, "%u %lf\n", &index, &timestamp) == 2) {
+    pcd_timestamps_.push_back(timestamp);
+  }
+
+  fclose(file);
   return true;
 }
 
@@ -249,50 +248,47 @@ void OfflineLocalVisualizer::PoseAndStdInterpolationByTime(
   unsigned int index = 0;
   for (size_t i = 0; i < ref_timestamps.size(); ++i) {
     double ref_timestamp = ref_timestamps[i];
-    // unsigned int ref_frame_id = i;
-    // unsigned int matched_index = 0;
     while (index < in_timestamps.size() &&
            in_timestamps.at(index) < ref_timestamp) {
       ++index;
     }
 
-    if (index < in_timestamps.size()) {
-      if (index >= 1) {
-        double cur_timestamp = in_timestamps[index];
-        double pre_timestamp = in_timestamps[index - 1];
-        DCHECK_NE(cur_timestamp, pre_timestamp);
-
-        double t =
-            (cur_timestamp - ref_timestamp) / (cur_timestamp - pre_timestamp);
-        DCHECK_GE(t, 0.0);
-        DCHECK_LE(t, 1.0);
-
-        Eigen::Affine3d pre_pose = in_poses[index - 1];
-        Eigen::Affine3d cur_pose = in_poses[index];
-        Eigen::Quaterniond pre_quatd(pre_pose.linear());
-        Eigen::Translation3d pre_transd(pre_pose.translation());
-        Eigen::Quaterniond cur_quatd(cur_pose.linear());
-        Eigen::Translation3d cur_transd(cur_pose.translation());
-
-        Eigen::Quaterniond res_quatd = pre_quatd.slerp(1 - t, cur_quatd);
-
-        Eigen::Translation3d re_transd;
-        re_transd.x() = pre_transd.x() * t + cur_transd.x() * (1 - t);
-        re_transd.y() = pre_transd.y() * t + cur_transd.y() * (1 - t);
-        re_transd.z() = pre_transd.z() * t + cur_transd.z() * (1 - t);
-        (*out_poses)[static_cast<unsigned int>(i)] = re_transd * res_quatd;
-
-        Eigen::Vector3d pre_std = in_stds[index - 1];
-        Eigen::Vector3d cur_std = in_stds[index];
-        Eigen::Vector3d std;
-        std[0] = pre_std[0] * t + cur_std[0] * (1 - t);
-        std[1] = pre_std[1] * t + cur_std[1] * (1 - t);
-        std[2] = pre_std[2] * t + cur_std[2] * (1 - t);
-        (*out_stds)[static_cast<unsigned int>(i)] = std;
-      }
-    } else {
+    if (index >= in_timestamps.size()) {
       AERROR << "[ERROR] No more poses. Exit now.";
       break;
+    }
+    if (index >= 1) {
+      double cur_timestamp = in_timestamps[index];
+      double pre_timestamp = in_timestamps[index - 1];
+      DCHECK_NE(cur_timestamp, pre_timestamp);
+
+      double t =
+          (cur_timestamp - ref_timestamp) / (cur_timestamp - pre_timestamp);
+      DCHECK_GE(t, 0.0);
+      DCHECK_LE(t, 1.0);
+
+      Eigen::Affine3d pre_pose = in_poses[index - 1];
+      Eigen::Affine3d cur_pose = in_poses[index];
+      Eigen::Quaterniond pre_quatd(pre_pose.linear());
+      Eigen::Translation3d pre_transd(pre_pose.translation());
+      Eigen::Quaterniond cur_quatd(cur_pose.linear());
+      Eigen::Translation3d cur_transd(cur_pose.translation());
+
+      Eigen::Quaterniond res_quatd = pre_quatd.slerp(1 - t, cur_quatd);
+
+      Eigen::Translation3d re_transd;
+      re_transd.x() = pre_transd.x() * t + cur_transd.x() * (1 - t);
+      re_transd.y() = pre_transd.y() * t + cur_transd.y() * (1 - t);
+      re_transd.z() = pre_transd.z() * t + cur_transd.z() * (1 - t);
+      (*out_poses)[static_cast<unsigned int>(i)] = re_transd * res_quatd;
+
+      Eigen::Vector3d pre_std = in_stds[index - 1];
+      Eigen::Vector3d cur_std = in_stds[index];
+      Eigen::Vector3d std;
+      std[0] = pre_std[0] * t + cur_std[0] * (1 - t);
+      std[1] = pre_std[1] * t + cur_std[1] * (1 - t);
+      std[2] = pre_std[2] * t + cur_std[2] * (1 - t);
+      (*out_stds)[static_cast<unsigned int>(i)] = std;
     }
   }
 }
@@ -310,16 +306,15 @@ bool OfflineLocalVisualizer::GetZoneIdFromMapFolder(
     boost::filesystem::directory_iterator iter_south(folder_south);
     if (iter_south == directory_end) {
       return false;
-    } else {
-      std::string zone_id_full_path = (*iter_south).path().string();
-      std::size_t pos = zone_id_full_path.find_last_of("/");
-      std::string zone_id_str =
-          zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
-
-      *zone_id = -(std::stoi(zone_id_str));
-      AINFO << "Find zone id: " << *zone_id;
-      return true;
     }
+    std::string zone_id_full_path = (*iter_south).path().string();
+    std::size_t pos = zone_id_full_path.find_last_of("/");
+    std::string zone_id_str =
+        zone_id_full_path.substr(pos + 1, zone_id_full_path.length());
+
+    *zone_id = -(std::stoi(zone_id_str));
+    AINFO << "Find zone id: " << *zone_id;
+    return true;
   }
   std::string zone_id_full_path = (*iter_north).path().string();
   std::size_t pos = zone_id_full_path.find_last_of("/");
