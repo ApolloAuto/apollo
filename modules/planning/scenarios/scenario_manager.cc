@@ -115,16 +115,31 @@ void ScenarioManager::RegisterScenarios() {
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
 }
 
-bool ScenarioManager::SelectChangeLaneScenario(
-    const common::TrajectoryPoint& ego_point, const Frame& frame) {
+ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
+    const Frame& frame) {
   if (frame.reference_line_info().size() > 1) {
-    if (current_scenario_->scenario_type() != ScenarioConfig::LANE_FOLLOW) {
-      current_scenario_ = CreateScenario(ScenarioConfig::LANE_FOLLOW);
-    }
-    return true;
-  } else {
-    return false;
+    // TODO(all): to be implemented
+    return  ScenarioConfig::LANE_FOLLOW;
   }
+  return ScenarioConfig::LANE_FOLLOW;
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
+    const Frame& frame) {
+  // TODO(all):
+  return ScenarioConfig::STOP_SIGN_UNPROTECTED;
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
+    const Frame& frame) {
+  // TODO(all):
+  return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
+    const Frame& frame) {
+  // TODO(all):
+  return ScenarioConfig::LANE_FOLLOW;
 }
 
 bool ScenarioManager::ReuseCurrentScenario(
@@ -250,14 +265,69 @@ void ScenarioManager::ScenarioDispatch(
     return;
   }
 
-  // change lane case, currently default to LANE_FOLLOW in change lane case.
-  // TODO(all) implement change lane scenario.
-  if (SelectChangeLaneScenario(ego_point, frame)) {
-    ADEBUG << "Use change lane scenario (temporarily use LANE_FOLLOW)";
-    return;
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const auto& first_encountered_overlaps =
+      reference_line_info.FirstEncounteredOverlaps();
+  std::pair<ReferenceLineInfo::OverlapType, hdmap::PathOverlap>
+      *junction_with_sign_overlap = nullptr;
+  std::pair<ReferenceLineInfo::OverlapType, hdmap::PathOverlap>
+      *junction_overlap = nullptr;
+  for (const auto& overlap : first_encountered_overlaps) {
+    if (!junction_with_sign_overlap &&
+        (overlap.first == ReferenceLineInfo::STOP_SIGN ||
+            overlap.first == ReferenceLineInfo::SIGNAL)) {
+          junction_with_sign_overlap = const_cast<
+              std::pair<ReferenceLineInfo::OverlapType, hdmap::PathOverlap>*>
+              (&overlap);
+    } else if (!junction_overlap &&
+        overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
+      junction_overlap = const_cast<
+          std::pair<ReferenceLineInfo::OverlapType, hdmap::PathOverlap>*>
+          (&overlap);
+    }
   }
 
-  // TODO(all): to be added
+  ////////////////////////////////////////
+  // default: LANE_FOLLOW
+  ScenarioConfig::ScenarioType scenario_type = ScenarioConfig::LANE_FOLLOW;
+
+  ////////////////////////////////////////
+  // intersection scenarios
+  if (junction_with_sign_overlap) {
+    switch (junction_with_sign_overlap->first) {
+      case ReferenceLineInfo::STOP_SIGN:
+        if (!FLAGS_enable_scenario_stop_sign) {
+          scenario_type = SelectStopSignScenario(frame);
+        }
+        break;
+      case ReferenceLineInfo::SIGNAL:
+        if (!FLAGS_enable_scenario_traffic_light) {
+          scenario_type = SelectTrafficLightScenario(frame);
+        }
+        break;
+      default:
+        break;
+    }
+  } else if (junction_overlap) {
+    // junction with no signs(stop_sign/traffic_light/etc)
+    // TODO(all): to be added
+  }
+
+  ////////////////////////////////////////
+  // CHANGE_LANE scenario
+  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
+    SelectChangeLaneScenario(frame);
+  }
+
+  ////////////////////////////////////////
+  // SIDE_PASS scenario
+  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
+    SelectSidePassScenario(frame);
+  }
+
+  ADEBUG << "select scenario: "
+      << ScenarioConfig::ScenarioType_Name(scenario_type);
+  current_scenario_ = CreateScenario(scenario_type);
 }
 
 void ScenarioManager::ScenarioSelfVote(
@@ -265,12 +335,11 @@ void ScenarioManager::ScenarioSelfVote(
     const Frame& frame) {
   CHECK(!frame.reference_line_info().empty());
 
+  const auto& reference_line_info = frame.reference_line_info().front();
+
   // change lane case, currently default to LANE_FOLLOW in change lane case.
   // TODO(all) implement change lane scenario.
-  if (SelectChangeLaneScenario(ego_point, frame)) {
-    ADEBUG << "Use change lane scenario (temporarily use LANE_FOLLOW)";
-    return;
-  }
+  // SelectChangeLaneScenario(reference_line_info);
 
   // non change lane case
   std::set<ScenarioConfig::ScenarioType> rejected_scenarios;
@@ -285,7 +354,6 @@ void ScenarioManager::ScenarioSelfVote(
   std::vector<ScenarioConfig::ScenarioType> preferred_scenarios;
   preferred_scenarios.push_back(ScenarioConfig::LANE_FOLLOW);
 
-  const auto& reference_line_info = frame.reference_line_info().front();
   const auto& first_overlaps = reference_line_info.FirstEncounteredOverlaps();
   for (const auto& overlap : first_overlaps) {
     // side_pass

@@ -52,8 +52,10 @@ class ScenarioManager final {
 
   void RegisterScenarios();
 
-  bool SelectChangeLaneScenario(const common::TrajectoryPoint& ego_point,
-                                const Frame& frame);
+  ScenarioConfig::ScenarioType SelectChangeLaneScenario(const Frame& frame);
+  ScenarioConfig::ScenarioType SelectStopSignScenario(const Frame& frame);
+  ScenarioConfig::ScenarioType SelectTrafficLightScenario(const Frame& frame);
+  ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
 
   // functions for scenario voter implementation
   void ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
