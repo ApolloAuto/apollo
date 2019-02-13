@@ -53,7 +53,7 @@ DEFINE_string(scenario_traffic_light_unprotected_right_turn_config_file,
               "scenario/traffic_light_unprotected_right_turn_config.pb.txt",
               "scenario_traffic_light_unprotected_right_turn config file");
 
-DEFINE_bool(enable_scenario_dispatcher, true,
+DEFINE_bool(enable_scenario_dispatcher, false,
             "enable dispatcher inside scenario manager to select scenario");
 
 DEFINE_bool(enable_scenario_side_pass, true,
