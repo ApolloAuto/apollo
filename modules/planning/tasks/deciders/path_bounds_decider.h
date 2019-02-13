@@ -41,6 +41,7 @@ class PathBoundsDecider : public Decider {
 
   bool InitPathBoundaries(
       const ReferenceLine& reference_line,
+      const common::TrajectoryPoint& planning_start_point,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundariesFromRoadsAndADC(
@@ -51,6 +52,8 @@ class PathBoundsDecider : public Decider {
   bool GetBoundariesFromStaticObstacles(
       const IndexedList<std::string, Obstacle>& indexed_obstacles,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
+
+  double GetBufferBetweenADCCenterAndEdge();
 };
 
 }  // namespace planning
