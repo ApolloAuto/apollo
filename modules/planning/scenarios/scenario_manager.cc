@@ -403,13 +403,13 @@ void ScenarioManager::ScenarioDispatch(
 
   ////////////////////////////////////////
   // CHANGE_LANE scenario
-  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
+  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
     SelectChangeLaneScenario(frame);
   }
 
   ////////////////////////////////////////
   // SIDE_PASS scenario
-  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
+  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
     SelectSidePassScenario(frame);
   }
 
