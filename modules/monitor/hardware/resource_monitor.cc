@@ -64,7 +64,7 @@ void ResourceMonitor::UpdateStatus(
   status->clear_status();
   // Monitor available disk space.
   for (const auto& disk_space : config.disk_spaces()) {
-    for (const auto& path : apollo::common::util::Glob(disk_space.path())) {
+    for (const auto& path : cyber::common::Glob(disk_space.path())) {
       const auto space = boost::filesystem::space(path);
       const int available_gb = static_cast<int>(space.available >> 30);
       if (available_gb < disk_space.insufficient_space_error()) {

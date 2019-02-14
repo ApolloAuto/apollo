@@ -21,7 +21,6 @@
 #include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
-
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 namespace apollo {
@@ -29,7 +28,7 @@ namespace dreamview {
 
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
-using apollo::common::util::PathExists;
+using cyber::common::PathExists;
 
 Dreamview::~Dreamview() { Stop(); }
 

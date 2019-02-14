@@ -23,8 +23,8 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/app/debug_info.h"
 #include "modules/perception/camera/common/global_config.h"
@@ -48,7 +48,7 @@ bool LaneCameraPerception::Init(
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  CHECK(apollo::common::util::GetProtoFromFile(
+  CHECK(cyber::common::GetProtoFromFile(
       config_file, &perception_param_)) << "Read config failed: ";
   CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
