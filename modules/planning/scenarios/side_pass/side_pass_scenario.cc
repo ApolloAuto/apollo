@@ -133,7 +133,7 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
     // to SIDE_PASS scenario.
     return false;
   } else {
-    // If originally in LANE_FOLLOW, then decide whether we shoudl
+    // If originally in LANE_FOLLOW, then decide whether we should
     // switch to SIDE_PASS scenario.
     bool is_side_pass = IsSidePassScenario(frame);
     if (is_side_pass) {
@@ -174,7 +174,9 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
     ADEBUG << overlap.first << ", " << overlap.second.DebugString();
     if (overlap.first != ReferenceLineInfo::CLEAR_AREA &&
         overlap.first != ReferenceLineInfo::CROSSWALK &&
-        overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
+        // TODO(yifei) temporarily enable side pass at pnc junction without
+        // stop sign and traffic light.
+        // overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
         overlap.first != ReferenceLineInfo::SIGNAL &&
         overlap.first != ReferenceLineInfo::STOP_SIGN) {
       continue;

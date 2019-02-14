@@ -17,6 +17,7 @@
 #include "modules/dreamview/backend/map/map_service.h"
 
 #include <algorithm>
+#include <fstream>
 #include <utility>
 
 #include "modules/common/util/json_util.h"

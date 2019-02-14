@@ -18,13 +18,11 @@ limitations under the License.
 #include <memory>
 #include <string>
 
-#include "modules/map/proto/map_id.pb.h"
-#include "modules/map/relative_map/proto/navigation.pb.h"
-
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap.h"
+#include "modules/map/proto/map_id.pb.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 
 /**
  * @namespace apollo::hdmap

@@ -24,8 +24,8 @@
 //   absolute (x,y,z) is still correct. Then we can find the nearest point on
 //   the new map as the new end point.
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/routing/proto/poi.pb.h"
 #include "modules/routing/proto/routing.pb.h"
@@ -61,8 +61,7 @@ double XYZDistance(const apollo::common::PointENU& p1,
 
 void RefreshDefaultEndPoint() {
   apollo::routing::POI old_poi;
-  CHECK(
-      apollo::common::util::GetProtoFromASCIIFile(EndWayPointFile(), &old_poi));
+  CHECK(cyber::common::GetProtoFromASCIIFile(EndWayPointFile(), &old_poi));
 
   apollo::routing::POI new_poi;
   for (const auto& old_landmark : old_poi.landmark()) {
@@ -102,7 +101,7 @@ void RefreshDefaultEndPoint() {
             << XYZDistance(old_xyz, new_xyz);
     }
   }
-  CHECK(apollo::common::util::SetProtoToASCIIFile(new_poi, EndWayPointFile()));
+  CHECK(cyber::common::SetProtoToASCIIFile(new_poi, EndWayPointFile()));
 }
 
 }  // namespace hdmap
