@@ -94,6 +94,10 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   c_float ub[kNumConst];
   for (int i = 0; i < kNumConst; ++i) {
     lb[i] = 0.0;
+    if (i >= 2 * obstacles_num_ * (horizon_ + 1) &&
+        i < 3 * obstacles_num_ * (horizon_ + 1)) {
+      lb[i] = 0.0;
+    }
     if (i < 2 * obstacles_num_ * (horizon_ + 1)) {
       ub[i] = 0.0;
     } else {
