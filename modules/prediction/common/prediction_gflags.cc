@@ -174,6 +174,8 @@ DEFINE_double(default_s_if_no_obstacle_in_lane_sequence, 1000.0,
               "The default s value if no obstacle in the lane sequence.");
 DEFINE_double(default_l_if_no_obstacle_in_lane_sequence, 10.0,
               "The default l value if no obstacle in the lane sequence.");
+DEFINE_bool(enable_build_current_frame_env, false,
+            "If build current frame environment");
 
 // Obstacle trajectory
 DEFINE_bool(enable_cruise_regression, false,
