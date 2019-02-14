@@ -20,7 +20,7 @@ limitations under the License.
 #include <set>
 #include <unordered_set>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 
@@ -53,7 +53,7 @@ int HDMapImpl::LoadMapFromFile(const std::string& map_filename) {
     if (!adapter::OpendriveAdapter::LoadData(map_filename, &map_)) {
       return -1;
     }
-  } else if (!apollo::common::util::GetProtoFromFile(map_filename, &map_)) {
+  } else if (!cyber::common::GetProtoFromFile(map_filename, &map_)) {
     return -1;
   }
 

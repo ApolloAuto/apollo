@@ -19,6 +19,7 @@
 #include <memory>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 
@@ -110,7 +111,7 @@ void RNNEvaluator::Clear() {}
 
 void RNNEvaluator::LoadModel(const std::string& model_file) {
   NetParameter net_parameter;
-  CHECK(common::util::GetProtoFromFile(model_file, &net_parameter))
+  CHECK(cyber::common::GetProtoFromFile(model_file, &net_parameter))
       << "Unable to load model file: " << model_file << ".";
 
   ADEBUG << "Succeeded in loading the model file: " << model_file << ".";

@@ -17,16 +17,15 @@
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 #include "boost/filesystem.hpp"
-
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-using apollo::common::util::DirectoryExists;
-using apollo::common::util::EnsureDirectory;
+using cyber::common::DirectoryExists;
+using cyber::common::EnsureDirectory;
 
 #define PI 3.1415926535897932346
 
@@ -647,7 +646,7 @@ void VisualizationEngine::GenerateMutiResolutionImages(
             snprintf(ss, sizeof(ss), "%s/%08d/%08d_%d.png",
                      image_visual_path_dst.c_str(), pt_y + i * step,
                      pt_x + j * step, lvl - 1);
-            if (apollo::common::util::PathExists(ss)) {
+            if (cyber::common::PathExists(ss)) {
               flag = true;
               cv::Mat img = cv::imread(ss);
               img.copyTo(large(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
@@ -840,7 +839,7 @@ bool VisualizationEngine::LoadImageToCache(const MapImageKey &key) {
     snprintf(path, sizeof(path), "%s/%02d/%08d/%08d_%d.png",
              image_visual_leaf_path_.c_str(), key.zone_id, key.node_north_id,
              key.node_east_id, key.level);
-    if (apollo::common::util::PathExists(path)) {
+    if (cyber::common::PathExists(path)) {
       img = cv::imread(path);
       AINFO << "visualizer load: " << path;
       map_image_cache_.Set(key, img);

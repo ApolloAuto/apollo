@@ -16,6 +16,7 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
+#include "cyber/common/file.h"
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -30,7 +31,7 @@ class JunctionMLPEvaluatorTest : public KMLMapBasedTest {
     std::string file =
         "modules/prediction/testdata/"
         "single_perception_vehicle_injunction.pb.txt";
-    CHECK(apollo::common::util::GetProtoFromFile(file, &perception_obstacles_));
+    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
     FLAGS_enable_all_junction = true;
     JunctionAnalyzer::Init("j2");
   }
