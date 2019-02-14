@@ -235,6 +235,11 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
     const Frame& frame) {
   // TODO(all): to be updated when SIDE_PASS obstacle decisions
   //            from ReferenceLine is ready
+  if (current_scenario_->scenario_type() == ScenarioConfig::SIDE_PASS &&
+      current_scenario_->IsTransferable(*current_scenario_, frame)) {
+    return ScenarioConfig::SIDE_PASS;
+  }
+
   auto scenario = CreateScenario(ScenarioConfig::SIDE_PASS);
   if (scenario->IsTransferable(*current_scenario_, frame)) {
     return ScenarioConfig::SIDE_PASS;
@@ -254,17 +259,13 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
     return true;
   }
 
-  if (FLAGS_enable_scenario_dispatcher) {
+  auto scenario = CreateScenario(type);
+  if (scenario->IsTransferable(*current_scenario_, frame)) {
+    AINFO << "switch to scenario: " << scenario->Name();
+    current_scenario_ = std::move(scenario);
     return true;
-  } else {
-    auto scenario = CreateScenario(type);
-    if (scenario->IsTransferable(*current_scenario_, frame)) {
-      AINFO << "switch to scenario: " << scenario->Name();
-      current_scenario_ = std::move(scenario);
-      return true;
-    }
-    return false;
   }
+  return false;
 }
 
 void ScenarioManager::Observe(const Frame& frame) {
@@ -389,12 +390,12 @@ void ScenarioManager::ScenarioDispatch(
   if (junction_with_sign_overlap) {
     switch (junction_with_sign_overlap->first) {
       case ReferenceLineInfo::STOP_SIGN:
-        if (!FLAGS_enable_scenario_stop_sign) {
+        if (FLAGS_enable_scenario_stop_sign) {
           scenario_type = SelectStopSignScenario(frame);
         }
         break;
       case ReferenceLineInfo::SIGNAL:
-        if (!FLAGS_enable_scenario_traffic_light) {
+        if (FLAGS_enable_scenario_traffic_light) {
           scenario_type = SelectTrafficLightScenario(frame);
         }
         break;
@@ -418,9 +419,12 @@ void ScenarioManager::ScenarioDispatch(
     scenario_type = SelectSidePassScenario(frame);
   }
 
-  ADEBUG << "select scenario: "
+  ADEBUG << "select cenario: "
       << ScenarioConfig::ScenarioType_Name(scenario_type);
-  current_scenario_ = CreateScenario(scenario_type);
+
+  if (current_scenario_->scenario_type() != scenario_type) {
+    current_scenario_ = CreateScenario(scenario_type);
+  }
 }
 
 void ScenarioManager::ScenarioSelfVote(
