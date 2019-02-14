@@ -18,6 +18,18 @@
 #include "eigen_conversions/eigen_msg.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/transform_input.h"
+#include <opencv2/core/version.hpp>
+#if (CV_MAJOR_VERSION == 2)
+#include <opencv2/opencv.hpp>
+#include <opencv2/gpu/gpu.hpp>
+#include <opencv2/core/gpumat.hpp>
+#else
+#include <opencv2/core.hpp>
+#include <opencv2/cudaimgproc.hpp>
+#include <opencv2/cudawarping.hpp>
+#include <opencv2/cudaarithm.hpp>
+#include <opencv2/cudafilters.hpp>
+#endif
 
 namespace apollo {
 namespace perception {
@@ -30,6 +42,19 @@ bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
   std::unordered_map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
+
+#if (CV_MAJOR_VERSION == 2)
+  using cv::gpu::getCudaEnabledDeviceCount;
+  using cv::gpu::GpuMat;
+#else
+  using cv::cuda::getCudaEnabledDeviceCount
+  using cv::cuda::GpuMat;
+#endif
+  FLAGS_enable_opencv_gpu = getCudaEnabledDeviceCount();
+  if (FLAGS_enable_opencv_gpu) {
+    cv::Mat cmat = cv::Mat::zeros(cv::Size(1920, 1080), CV_16UC1);
+    GpuMat gmat(cmat);
+  }
 
   if (fields.count("device_id")) {
     device_id_ = fields["device_id"];
@@ -129,7 +154,21 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
     img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
   }
 
-  cv::resize(img, img, cv::Size(1920, 1080), 0, 0);
+  if ( FLAGS_enable_opencv_gpu < 1 ) {
+    cv::resize(img, img, cv::Size(1920, 1080), 0, 0);
+  } else {
+#if (CV_MAJOR_VERSION == 2)
+    cv::gpu::GpuMat matsrc, matdst;
+    matsrc.upload(img);
+    cv::gpu::resize(matsrc, matdst, cv::Size(1920, 1080));
+    matdst.download(img);
+#else
+    cv::cuda::GpuMat matsrc, matdst;
+    matsrc.upload(img);
+    cv::cuda::resize(matsrc, matdst, cv::Size(1920, 1080));
+    matdst.download(img);
+#endif
+  }
   std::vector<std::shared_ptr<VisualObject>> objects;
   cv::Mat mask;
 

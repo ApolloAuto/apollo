@@ -1,3 +1,14 @@
+#licenses(["notice"])
+
+#package(default_visibility = ["//visibility:public"])
+
+#cc_library(
+#    name = "yaml",
+#    includes = ["."],
+#    linkopts = [
+#        "-lyaml-cpp",
+#    ],
+#)
 cc_library(
     name = "yaml",
     srcs = glob([
@@ -13,3 +24,4 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
 )
+
