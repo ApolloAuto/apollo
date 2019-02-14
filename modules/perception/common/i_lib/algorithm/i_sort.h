@@ -22,16 +22,19 @@ namespace perception {
 namespace common {
 
 // Strictly less
-template <typename T> inline bool ILess(const T &a, const T &b) {
+template <typename T>
+inline bool ILess(const T &a, const T &b) {
   return a < b;
 }
 
 // Strictly larger
-template <typename T> inline bool ILarger(const T &a, const T &b) {
+template <typename T>
+inline bool ILarger(const T &a, const T &b) {
   return a > b;
 }
 
-template <typename T> inline T IMedian3(const T &a, const T &b, const T &c) {
+template <typename T>
+inline T IMedian3(const T &a, const T &b, const T &c) {
   if (a <= b) {
     if (c > a) {
       if (c <= b) {

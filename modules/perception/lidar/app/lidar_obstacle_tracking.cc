@@ -39,7 +39,7 @@ bool LidarObstacleTracking::Init(
   config_file = cyber::common::GetAbsolutePath(work_root, root_path);
   config_file = cyber::common::GetAbsolutePath(config_file, sensor_name);
   config_file = cyber::common::GetAbsolutePath(config_file,
-      "lidar_obstacle_tracking.conf");
+                                               "lidar_obstacle_tracking.conf");
 
   LidarObstacleTrackingConfig config;
   CHECK(cyber::common::GetProtoFromFile(config_file, &config));

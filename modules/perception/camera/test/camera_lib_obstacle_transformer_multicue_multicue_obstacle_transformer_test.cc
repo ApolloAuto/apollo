@@ -1,20 +1,20 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
-#include <opencv2/opencv.hpp>
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include <gtest/gtest.h>
+#include <opencv2/opencv.hpp>
 
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
@@ -30,14 +30,15 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
   // Init object template
   ObjectTemplateManagerInitOptions object_template_init_options;
   object_template_init_options.root_dir =
-    "/apollo/modules/perception/testdata/"
-    "camera/app/data/perception/camera/common/object_template/";
+      "/apollo/modules/perception/testdata/"
+      "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
   CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   inference::CudaUtil::set_device_id(0);
-  cv::Mat cv_img = cv::imread("/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/transformer/multicue/test.jpg");
+  cv::Mat cv_img = cv::imread(
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/obstacle/transformer/multicue/test.jpg");
   base::Image8U image(cv_img.rows, cv_img.cols, base::Color::BGR);
   for (int y = 0; y < cv_img.rows; ++y) {
     memcpy(image.mutable_cpu_ptr(y), cv_img.ptr<uint8_t>(y),
@@ -65,16 +66,16 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
   ObstacleTransformerInitOptions transformer_init_options;
 
   detector_init_options.root_dir =
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/transformer/multicue/data/";
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/obstacle/transformer/multicue/data/";
   detector_init_options.conf_file = "config.pt";
 
   base::BrownCameraDistortionModel model;
   common::LoadBrownCameraIntrinsic(
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/transformer/multicue/params/"
-    "onsemi_obstacle_intrinsics.yaml",
-    &model);
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/obstacle/transformer/multicue/params/"
+      "onsemi_obstacle_intrinsics.yaml",
+      &model);
   detector_init_options.base_camera_model = model.get_camera_model();
   auto pinhole =
       static_cast<base::PinholeCameraModel *>(model.get_camera_model().get());
@@ -89,8 +90,9 @@ TEST(MultiCueObstacleTransformerTest, multicue_obstacle_transformer_test) {
 
   EXPECT_FALSE(transformer->Init(transformer_init_options));
 
-  transformer_init_options.root_dir = "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/transformer/multicue/";
+  transformer_init_options.root_dir =
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/obstacle/transformer/multicue/";
   transformer_init_options.conf_file = "config.pt";
   EXPECT_TRUE(transformer->Init(transformer_init_options));
 

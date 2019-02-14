@@ -170,7 +170,8 @@ class HdmapROIFilterTest : public ::testing::Test {
     putenv(cyber_path);
     char module_path[50] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+    FLAGS_work_root =
+        "/apollo/modules/perception/testdata/"
         "lidar/lib/roi_filter/hdmap_roi_filter";
   }
 

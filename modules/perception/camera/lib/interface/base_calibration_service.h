@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <map>
@@ -35,8 +35,7 @@ struct CalibrationServiceInitOptions : public BaseInitOptions {
   std::map<std::string, Eigen::Matrix3f> name_intrinsic_map;
 };
 
-struct CalibrationServiceOptions {
-};
+struct CalibrationServiceOptions {};
 
 class BaseCalibrationService {
  public:
@@ -44,8 +43,8 @@ class BaseCalibrationService {
 
   virtual ~BaseCalibrationService() = default;
 
-  virtual bool Init(const CalibrationServiceInitOptions &options
-  = CalibrationServiceInitOptions()) = 0;
+  virtual bool Init(const CalibrationServiceInitOptions &options =
+                        CalibrationServiceInitOptions()) = 0;
 
   virtual bool BuildIndex() = 0;
 
@@ -68,34 +67,30 @@ class BaseCalibrationService {
   // @brief query ground plane in camera frame, parameterized as
   // [n^T, d] with n^T*x+d=0
   virtual bool QueryGroundPlaneInCameraFrame(
-                                      Eigen::Vector4d *plane_param) const {
+      Eigen::Vector4d *plane_param) const {
     return false;
   }
 
   // @brief query camera to ground height and pitch angle
-  virtual bool QueryCameraToGroundHeightAndPitchAngle(
-      float *height, float *pitch) const {
+  virtual bool QueryCameraToGroundHeightAndPitchAngle(float *height,
+                                                      float *pitch) const {
     return false;
   }
 
-  virtual float QueryCameraToGroundHeight() const {
-    return 0.f;
-  }
+  virtual float QueryCameraToGroundHeight() const { return 0.f; }
 
-  virtual float QueryPitchAngle() const {
-    return 0.f;
-  }
+  virtual float QueryPitchAngle() const { return 0.f; }
 
   // @brief using calibrator to update pitch angle
-  virtual void Update(CameraFrame* frame) {
+  virtual void Update(CameraFrame *frame) {
     // do nothing
   }
 
   // @brief set camera height, pitch and project matrix
   virtual void SetCameraHeightAndPitch(
-          const std::map<std::string, float> &name_camera_ground_height_map,
-          const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
-          const float &pitch_angle_master_sensor) {
+      const std::map<std::string, float> &name_camera_ground_height_map,
+      const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
+      const float &pitch_angle_master_sensor) {
     // do nothing
   }
 

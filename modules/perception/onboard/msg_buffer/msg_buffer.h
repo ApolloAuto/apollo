@@ -108,15 +108,17 @@ int MsgBuffer<T>::LookupNearest(double timestamp, ConstPtr* msg) {
   if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
       timestamp) {
     AERROR << "Your timestamp (" << std::to_string(timestamp)
-           << ") is earlier than the oldest " << "timestamp ("
-           << std::to_string(buffer_queue_.front().first) << ").";
+           << ") is earlier than the oldest "
+           << "timestamp (" << std::to_string(buffer_queue_.front().first)
+           << ").";
     return false;
   }
   if (buffer_queue_.back().first + FLAGS_obs_buffer_match_precision <
       timestamp) {
     AERROR << "Your timestamp (" << std::to_string(timestamp)
-           << ") is newer than the latest " << "timestamp ("
-           << std::to_string(buffer_queue_.back().first) << ").";
+           << ") is newer than the latest "
+           << "timestamp (" << std::to_string(buffer_queue_.back().first)
+           << ").";
     return false;
   }
 

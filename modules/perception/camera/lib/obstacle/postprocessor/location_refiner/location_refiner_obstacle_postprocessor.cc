@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"  // NOLINT
 
 #include "cyber/common/file.h"
@@ -28,8 +28,8 @@ namespace camera {
 
 bool LocationRefinerObstaclePostprocessor::Init(
     const ObstaclePostprocessorInitOptions &options) {
-  std::string postprocessor_config = cyber::common::GetAbsolutePath(
-      options.root_dir, options.conf_file);
+  std::string postprocessor_config =
+      cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
 
   if (!cyber::common::GetProtoFromFile(postprocessor_config,
                                        &location_refiner_param_)) {
@@ -38,32 +38,29 @@ bool LocationRefinerObstaclePostprocessor::Init(
   }
 
   AINFO << "Load postprocessor parameters from " << postprocessor_config
-           << " \nmin_dist_to_camera: "
-           << location_refiner_param_.min_dist_to_camera()
-           << " \nroi_h2bottom_scale: "
-           << location_refiner_param_.roi_h2bottom_scale();
+        << " \nmin_dist_to_camera: "
+        << location_refiner_param_.min_dist_to_camera()
+        << " \nroi_h2bottom_scale: "
+        << location_refiner_param_.roi_h2bottom_scale();
   return true;
 }
 
 bool LocationRefinerObstaclePostprocessor::Process(
-    const ObstaclePostprocessorOptions &options,
-    CameraFrame *frame) {
-  if (frame->detected_objects.empty()
-      || frame->calibration_service == nullptr
-      || !options.do_refinement_with_calibration_service) {
+    const ObstaclePostprocessorOptions &options, CameraFrame *frame) {
+  if (frame->detected_objects.empty() ||
+      frame->calibration_service == nullptr ||
+      !options.do_refinement_with_calibration_service) {
     ADEBUG << "Do not run obstacle postprocessor.";
     return true;
   }
   Eigen::Vector4d plane;
-  if (options.do_refinement_with_calibration_service == true
-      && !frame->calibration_service->QueryGroundPlaneInCameraFrame(&plane)
-      ) {
+  if (options.do_refinement_with_calibration_service == true &&
+      !frame->calibration_service->QueryGroundPlaneInCameraFrame(&plane)) {
     AINFO << "No valid ground plane in the service.";
   }
-  float query_plane[4] = {static_cast<float>(plane(0)),
-                          static_cast<float>(plane(1)),
-                          static_cast<float>(plane(2)),
-                          static_cast<float>(plane(3))};
+  float query_plane[4] = {
+      static_cast<float>(plane(0)), static_cast<float>(plane(1)),
+      static_cast<float>(plane(2)), static_cast<float>(plane(3))};
   const auto &camera_k_matrix = frame->camera_k_matrix;
   float k_mat[9] = {0};
   for (size_t i = 0; i < 3; i++) {
@@ -73,9 +70,9 @@ bool LocationRefinerObstaclePostprocessor::Process(
     }
   }
   AINFO << "Camera k matrix input to obstacle postprocessor: \n"
-            << k_mat[0] << ", " << k_mat[1] << ", " << k_mat[2] << "\n"
-            << k_mat[3] << ", " << k_mat[4] << ", " << k_mat[5] << "\n"
-            << k_mat[6] << ", " << k_mat[7] << ", " << k_mat[8] << "\n";
+        << k_mat[0] << ", " << k_mat[1] << ", " << k_mat[2] << "\n"
+        << k_mat[3] << ", " << k_mat[4] << ", " << k_mat[5] << "\n"
+        << k_mat[6] << ", " << k_mat[7] << ", " << k_mat[8] << "\n";
 
   const int width_image = frame->data_provider->src_width();
   const int height_image = frame->data_provider->src_height();
@@ -89,40 +86,34 @@ bool LocationRefinerObstaclePostprocessor::Process(
                               obj->camera_supplement.local_center(1),
                               obj->camera_supplement.local_center(2)};
     float bbox2d[4] = {
-        obj->camera_supplement.box.xmin,
-        obj->camera_supplement.box.ymin,
-        obj->camera_supplement.box.xmax,
-        obj->camera_supplement.box.ymax};
+        obj->camera_supplement.box.xmin, obj->camera_supplement.box.ymin,
+        obj->camera_supplement.box.xmax, obj->camera_supplement.box.ymax};
 
     float bottom_center[2] = {(bbox2d[0] + bbox2d[2]) / 2, bbox2d[3]};
-    float h_down = (static_cast<float>(height_image) - k_mat[5])
-        * location_refiner_param_.roi_h2bottom_scale();
-    bool is_in_rule_roi = is_in_roi(bottom_center,
-                                    static_cast<float>(width_image),
-                                    static_cast<float>(height_image),
-                                    k_mat[5],
-                                    h_down);
-    float dist2camera = common::ISqrt(
-        common::ISqr(object_center[0]) + common::ISqr(object_center[2]));
+    float h_down = (static_cast<float>(height_image) - k_mat[5]) *
+                   location_refiner_param_.roi_h2bottom_scale();
+    bool is_in_rule_roi =
+        is_in_roi(bottom_center, static_cast<float>(width_image),
+                  static_cast<float>(height_image), k_mat[5], h_down);
+    float dist2camera = common::ISqrt(common::ISqr(object_center[0]) +
+                                      common::ISqr(object_center[2]));
 
-    if (dist2camera > location_refiner_param_.min_dist_to_camera()
-        || !is_in_rule_roi) {
+    if (dist2camera > location_refiner_param_.min_dist_to_camera() ||
+        !is_in_rule_roi) {
       ADEBUG << "Pass for obstacle postprocessor.";
       continue;
     }
 
-    float dimension_hwl[3] = {obj->size(2),
-                              obj->size(1),
-                              obj->size(0)};
+    float dimension_hwl[3] = {obj->size(2), obj->size(1), obj->size(0)};
     float box_cent_x = (bbox2d[0] + bbox2d[2]) / 2;
     Eigen::Vector3f image_point_low_center(box_cent_x, bbox2d[3], 1);
     Eigen::Vector3f point_in_camera =
-      static_cast<Eigen::Matrix<float, 3, 1, 0, 3, 1>>
-      (camera_k_matrix.inverse() * image_point_low_center);
+        static_cast<Eigen::Matrix<float, 3, 1, 0, 3, 1>>(
+            camera_k_matrix.inverse() * image_point_low_center);
     float theta_ray =
-          static_cast<float>(atan2(point_in_camera.x(), point_in_camera.z()));
+        static_cast<float>(atan2(point_in_camera.x(), point_in_camera.z()));
     float rotation_y =
-          theta_ray + static_cast<float>(obj->camera_supplement.alpha);
+        theta_ray + static_cast<float>(obj->camera_supplement.alpha);
 
     // enforce the ry to be in the range [-pi, pi)
     const float PI = common::Constant<float>::PI();
@@ -135,10 +126,8 @@ bool LocationRefinerObstaclePostprocessor::Process(
     // process
     memcpy(obj_postprocessor_options.bbox, bbox2d, sizeof(float) * 4);
     obj_postprocessor_options.check_lowerbound = true;
-    camera::LineSegment2D<float> line_seg(bbox2d[0],
-                                                           bbox2d[3],
-                                                           bbox2d[2],
-                                                           bbox2d[3]);
+    camera::LineSegment2D<float> line_seg(bbox2d[0], bbox2d[3], bbox2d[2],
+                                          bbox2d[3]);
     obj_postprocessor_options.line_segs.push_back(line_seg);
     memcpy(obj_postprocessor_options.hwl, dimension_hwl, sizeof(float) * 3);
     obj_postprocessor_options.ry = rotation_y;
@@ -148,22 +137,17 @@ bool LocationRefinerObstaclePostprocessor::Process(
 
     // changed to touching-ground center
     object_center[1] += dimension_hwl[0] / 2;
-    postprocessor_->PostProcessObjWithGround(obj_postprocessor_options,
-                                             object_center,
-                                             dimension_hwl,
-                                             &rotation_y);
+    postprocessor_->PostProcessObjWithGround(
+        obj_postprocessor_options, object_center, dimension_hwl, &rotation_y);
     object_center[1] -= dimension_hwl[0] / 2;
 
-    float z_diff_camera = object_center[2]
-        - obj->camera_supplement.local_center(2);
+    float z_diff_camera =
+        object_center[2] - obj->camera_supplement.local_center(2);
 
     // fill back results
-    obj->camera_supplement.local_center(0)
-        = object_center[0];
-    obj->camera_supplement.local_center(1)
-        = object_center[1];
-    obj->camera_supplement.local_center(2)
-        = object_center[2];
+    obj->camera_supplement.local_center(0) = object_center[0];
+    obj->camera_supplement.local_center(1) = object_center[1];
+    obj->camera_supplement.local_center(2) = object_center[2];
 
     obj->center(0) = static_cast<double>(object_center[0]);
     obj->center(1) = static_cast<double>(object_center[1]);
