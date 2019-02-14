@@ -63,7 +63,6 @@ class PathDecision {
                          const SLBoundary &adc_sl_boundary);
 
  private:
-  std::mutex obstacle_mutex_;
   IndexedList<std::string, Obstacle> obstacles_;
   MainStop main_stop_;
   double stop_reference_line_s_ = std::numeric_limits<double>::max();
