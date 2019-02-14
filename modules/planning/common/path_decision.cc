@@ -26,7 +26,6 @@ namespace apollo {
 namespace planning {
 
 Obstacle *PathDecision::AddObstacle(const Obstacle &obstacle) {
-  std::lock_guard<std::mutex> lock(obstacle_mutex_);
   return obstacles_.Add(obstacle.Id(), obstacle);
 }
 
@@ -87,7 +86,7 @@ bool PathDecision::MergeWithMainStop(const ObjectStop &obj_stop,
                                      const std::string &obj_id,
                                      const ReferenceLine &reference_line,
                                      const SLBoundary &adc_sl_boundary) {
-  apollo::common::PointENU stop_point = obj_stop.stop_point();
+  common::PointENU stop_point = obj_stop.stop_point();
   common::SLPoint stop_line_sl;
   reference_line.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
 
