@@ -45,26 +45,27 @@ class DpStCost {
   double GetObstacleCost(const StGraphPoint& point);
 
   double GetReferenceCost(const STPoint& point,
-                         const STPoint& reference_point) const;
+                          const STPoint& reference_point) const;
 
   double GetSpeedCost(const STPoint& first, const STPoint& second,
-                     const double speed_limit) const;
+                      const double speed_limit,
+                      const double soft_speed_limit) const;
 
   double GetAccelCostByTwoPoints(const double pre_speed, const STPoint& first,
-                                const STPoint& second);
+                                 const STPoint& second);
   double GetAccelCostByThreePoints(const STPoint& first, const STPoint& second,
-                                  const STPoint& third);
+                                   const STPoint& third);
 
   double GetJerkCostByTwoPoints(const double pre_speed, const double pre_acc,
-                               const STPoint& pre_point,
-                               const STPoint& curr_point);
+                                const STPoint& pre_point,
+                                const STPoint& curr_point);
   double GetJerkCostByThreePoints(const double first_speed,
-                                 const STPoint& first_point,
-                                 const STPoint& second_point,
-                                 const STPoint& third_point);
+                                  const STPoint& first_point,
+                                  const STPoint& second_point,
+                                  const STPoint& third_point);
 
   double GetJerkCostByFourPoints(const STPoint& first, const STPoint& second,
-                                const STPoint& third, const STPoint& fourth);
+                                 const STPoint& third, const STPoint& fourth);
 
  private:
   double GetAccelCost(const double accel);
