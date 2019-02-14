@@ -20,13 +20,12 @@
 #include "cyber/common/log.h"
 
 #include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/routing/proto/routing.pb.h"
-
-#include "modules/common/adapters/adapter_gflags.h"
-#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -163,8 +162,7 @@ void PlanningTestBase::SetUp() {
 
   CHECK(FeedTestData()) << "Failed to feed test data";
 
-  CHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
-                                                &config_))
+  CHECK(cyber::common::GetProtoFromFile(FLAGS_planning_config_file, &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
 
   CHECK(planning_->Init(config_).ok()) << "Failed to init planning module";
@@ -243,17 +241,17 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
   TrimPlanning(&adc_trajectory_, no_trajectory_point);
   if (FLAGS_test_update_golden_log) {
     AINFO << "The golden file is regenerated:" << full_golden_path;
-    common::util::SetProtoToASCIIFile(adc_trajectory_, full_golden_path);
+    cyber::common::SetProtoToASCIIFile(adc_trajectory_, full_golden_path);
   } else {
     ADCTrajectory golden_result;
     bool load_success =
-        common::util::GetProtoFromASCIIFile(full_golden_path, &golden_result);
+        cyber::common::GetProtoFromASCIIFile(full_golden_path, &golden_result);
     TrimPlanning(&golden_result, no_trajectory_point);
     if (!load_success ||
         !common::util::IsProtoEqual(golden_result, adc_trajectory_)) {
       char tmp_fname[100] = "/tmp/XXXXXX";
       int fd = mkstemp(tmp_fname);
-      if (!common::util::SetProtoToASCIIFile(adc_trajectory_, fd)) {
+      if (!cyber::common::SetProtoToASCIIFile(adc_trajectory_, fd)) {
         AERROR << "Failed to write to file " << tmp_fname;
       }
       AERROR << "found error\ndiff -y " << tmp_fname << " " << full_golden_path;

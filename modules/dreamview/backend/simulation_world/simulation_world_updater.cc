@@ -16,6 +16,7 @@
 
 #include "modules/dreamview/backend/simulation_world/simulation_world_updater.h"
 
+#include "cyber/common/file.h"
 #include "google/protobuf/util/json_util.h"
 #include "modules/common/util/json_util.h"
 #include "modules/common/util/map_util.h"
@@ -27,7 +28,7 @@ namespace dreamview {
 
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::util::ContainsKey;
-using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::cyber::common::GetProtoFromASCIIFile;
 using apollo::hdmap::EndWayPointFile;
 using apollo::relative_map::NavigationInfo;
 using apollo::routing::RoutingRequest;

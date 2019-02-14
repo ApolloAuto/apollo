@@ -28,10 +28,10 @@
 #include <string>
 #include <tuple>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time_util.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
 #include "modules/perception/lib/utils/time_util.h"
@@ -53,7 +53,7 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  if (!apollo::common::util::GetProtoFromFile(config_file, &perception_param)) {
+  if (!cyber::common::GetProtoFromFile(config_file, &perception_param)) {
     AERROR << "Read config failed: " << config_file;
     return -1;
   }

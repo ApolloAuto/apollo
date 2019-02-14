@@ -160,7 +160,7 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
         cyber::common::GetProtoFromASCIIFile(full_golden_path, &golden_result);
     if (!load_success) {
       AERROR << "Failed to load golden file: " << full_golden_path;
-      common::util::SetProtoToASCIIFile(control_command_, tmp_golden_path);
+      cyber::common::SetProtoToASCIIFile(control_command_, tmp_golden_path);
       AINFO << "Current result is written to " << tmp_golden_path;
       return false;
     }

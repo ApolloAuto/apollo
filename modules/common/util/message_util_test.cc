@@ -31,8 +31,8 @@ TEST(MessageUtilTest, DumpMessage) {
   auto simple_msg = std::make_shared<test::SimpleMessage>();
   FillHeader("test", simple_msg.get());
   EXPECT_TRUE(DumpMessage(simple_msg));
-  EXPECT_TRUE(
-      PathExists("/tmp/apollo.common.util.test.SimpleMessage/0.pb.txt"));
+  EXPECT_TRUE(cyber::common::PathExists(
+      "/tmp/apollo.common.util.test.SimpleMessage/0.pb.txt"));
 }
 
 TEST(MessageUtilTest, MessageFingerprint) {
