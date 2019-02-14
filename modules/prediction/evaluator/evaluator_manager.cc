@@ -19,6 +19,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -247,8 +248,10 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
         feature.set_length(obstacle_feature.length());
         feature.set_width(obstacle_feature.width());
       } else {
-        feature.set_length(5.0);
-        feature.set_width(2.1);
+        const auto& vehicle_config =
+            common::VehicleConfigHelper::Instance()->GetConfig();
+        feature.set_length(vehicle_config.vehicle_param().length());
+        feature.set_width(vehicle_config.vehicle_param().width());
       }
       obstacle_history.add_feature()->CopyFrom(feature);
     }
