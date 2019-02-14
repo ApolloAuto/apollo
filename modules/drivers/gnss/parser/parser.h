@@ -61,6 +61,8 @@ class Parser {
   // Return a pointer to rtcm v3 parser. The caller should take ownership.
   static Parser *CreateRtcmV3(bool is_base_station = false);
 
+  static Parser* createZhd(const config::Config& config);
+
   virtual ~Parser() {}
 
   // Updates the parser with new data. The caller must keep the data valid until
@@ -92,6 +94,7 @@ class Parser {
     GLOEPHEMERIDES,
     BEST_GNSS_POS,
     HEADING,
+    ZHD_GPS,
   };
 
   // Gets a parsed protobuf message. The caller must consume the message before

@@ -14,6 +14,9 @@ message Stream {
 
     UBLOX_TEXT = 20;
     UBLOX_BINARY = 21;
+
+    ZHD_TEXT = 40;
+    ZHD_BINARY = 41;
   }
   optional Format format = 1;
 
@@ -61,6 +64,16 @@ message NovatelConfig {
 message UbloxConfig {
 }
 
+message ZhdConfig {
+  enum AngHead {
+    eANG_0 = 0;
+    eANG_90 = 90;
+    eANG_180 = 180;
+    eANG_270 = 270;
+    eANG_360 = 360;
+  }
+  optional float angle_heading = 1;
+}
 
 enum ImuType {
   // We currently use the following IMUs. We'll extend this list when a new IMU
@@ -117,4 +130,5 @@ message Config {
   optional TF tf = 12;
   // If given, the driver will send velocity info to novatel with command stream
   optional string wheel_parameters = 13;
+  optional ZhdConfig zhd_config = 14;
 }

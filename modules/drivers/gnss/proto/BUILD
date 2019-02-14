@@ -12,6 +12,7 @@ cc_library(
         ":imu_proto",
         ":gnss_status_proto",
         ":gnss_proto_proto",
+        ":zhd_gps_proto",
     ],
 )
 
@@ -154,6 +155,23 @@ proto_library(
         "//modules/common/proto:common_proto_lib",
         "//modules/common/proto:error_code_proto_lib",
         "//modules/common/proto:header_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "zhd_gps_proto",
+    deps = [
+        ":zhd_gps_lib",
+    ],
+)
+
+proto_library(
+    name = "zhd_gps_lib",
+    srcs = [
+        "zhd_gps.proto",
+    ],
+    deps = [
+        "//modules/common/proto:common_proto_lib",
     ],
 )
 
