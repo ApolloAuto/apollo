@@ -68,6 +68,7 @@ void show_detect_point_set(const cv::Mat& image,
   cv::imwrite(save_path, draw_mat);
   return;
 }
+
 void show_all_infer_point_set(const cv::Mat& image,
   const std::vector<LanePointInfo>& infer_point_set,
   const std::string& save_path) {
@@ -85,6 +86,7 @@ void show_all_infer_point_set(const cv::Mat& image,
   cv::imwrite(save_path, draw_mat);
   return;
 }
+
 void show_lane_lines(const cv::Mat& image,
   const std::vector<base::LaneLine>& lane_marks,
   const std::string& save_path) {
@@ -94,7 +96,6 @@ void show_lane_lines(const cv::Mat& image,
   const int ipm_height = static_cast<int>(range_x * pixels_per_meter);
   const int ipm_width = static_cast<int>(range_y * pixels_per_meter);
   cv::Mat draw_ipm = cv::Mat::zeros(ipm_height, ipm_width, CV_8UC3);
-  //
   cv::Scalar color = cv::Scalar(0, 255, 0);
   int draw_size = 2;
   cv::Mat draw_mat = image.clone();
@@ -109,7 +110,7 @@ void show_lane_lines(const cv::Mat& image,
     } else {
         color = cv::Scalar(255, 255, 0);
     }
-    //  draw image curve
+    // Draw image curve
     float fa = lane_marks[i].curve_image_coord.a;
     float fb = lane_marks[i].curve_image_coord.b;
     float fc = lane_marks[i].curve_image_coord.c;
@@ -121,7 +122,7 @@ void show_lane_lines(const cv::Mat& image,
               fb * pow(j, 2) + fc * static_cast<float>(j) + fd);
       cv::circle(draw_mat, cv::Point(x, j), draw_size, color);
     }
-    //  draw ipm curve
+    // Draw ipm curve
     float camera_xs = lane_marks[i].curve_camera_coord.x_start;
     float camera_xe = lane_marks[i].curve_camera_coord.x_end;
     float camera_fa = lane_marks[i].curve_camera_coord.a;
@@ -162,6 +163,7 @@ void show_lane_lines(const cv::Mat& image,
   cv::imwrite(save_path, draw_mat);
   return;
 }
+
 void show_lane_ccs(const std::vector<unsigned char>& lane_map,
   const int lane_map_width, const int lane_map_height,
   const std::vector<ConnectedComponent>& lane_ccs,
@@ -217,7 +219,12 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
 
 void output_laneline_to_json(const std::vector<base::LaneLine> &lane_objects,
   const std::string& save_path) {
-  FILE *file_save = fopen(save_path.data(), "wt");
+  FILE *file_save = fopen(save_path.c_str(), "wt");
+  if (!file_save) {
+    AERROR << "Failed to open file: " << save_path;
+    return;
+  }
+
   int lane_line_size = static_cast<int>(lane_objects.size());
   AINFO << "lane line num: " << lane_line_size;
   std::string msg = "lane line info: ";
@@ -293,7 +300,11 @@ void output_laneline_to_json(const std::vector<base::LaneLine> &lane_objects,
 
 void output_laneline_to_txt(const std::vector<base::LaneLine> &lane_objects,
   const std::string& save_path) {
-  FILE *file_save = fopen(save_path.data(), "wt");
+  FILE *file_save = fopen(save_path.c_str(), "wt");
+  if (!file_save) {
+    AERROR << "Failed to open file: " << save_path;
+    return;
+  }
   int lane_line_size = static_cast<int>(lane_objects.size());
   AINFO << "lane line num: " << lane_line_size;
   fprintf(file_save, "lane_line_num=%d\n", lane_line_size);
