@@ -154,7 +154,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
       }
       break;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
-      break;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       if (current_scenario_->GetStatus() ==
               Scenario::ScenarioStatus::STATUS_DONE) {
