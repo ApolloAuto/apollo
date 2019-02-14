@@ -25,7 +25,9 @@ message DpStSpeedConfig {
   optional double default_speed_cost = 13 [default = 1.0];
   optional double exceed_speed_penalty = 14 [default = 10.0];
   optional double low_speed_penalty = 15 [default = 2.5];
-  optional double keep_clear_low_speed_penalty = 16 [default = 10.0];
+  optional double exceed_soft_speed_penalty = 16 [default = 0.0];
+  optional double low_soft_speed_penalty = 17 [default = 0.0];
+  optional double keep_clear_low_speed_penalty = 18 [default = 10.0];
 
   // accel cost config
   optional double accel_penalty = 20 [default = 2.0];
