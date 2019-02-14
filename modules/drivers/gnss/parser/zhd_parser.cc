@@ -18,11 +18,12 @@
 #include <limits>
 #include <memory>
 
-#include <vector>
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
+#include <vector>
+#include <iomanip>
 
 #include "ros/include/ros/ros.h"
 
@@ -37,13 +38,10 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/gnss/util/time_conversion.h"
-#include "modules/drivers/gnss/parser/rtcm_decode.h"
 
 #include "modules/drivers/gnss/proto/zhd_gps.pb.h"
 
-#include <iomanip>
-
-using namespace std;
+//using namespace std;
 
 namespace apollo {
 namespace drivers {
@@ -54,11 +52,11 @@ namespace {
     constexpr double DEG_TO_RAD = M_PI / 180.0;
     
     constexpr float FLOAT_NAN = std::numeric_limits<float>::quiet_NaN();
-    constexpr double azimuth_deg_to_yaw_rad(double azimuth,double angle) {
-      return (angle - azimuth) * DEG_TO_RAD;  //90.0
+    constexpr double azimuth_deg_to_yaw_rad(double azimuth, double angle) {
+      return (angle - azimuth) * DEG_TO_RAD;
     }
 
-}// namespace
+} // namespace
 
 class ZhdParser : public Parser {
  public:
@@ -69,7 +67,6 @@ class ZhdParser : public Parser {
  private:
     Parser::MessageType PrepareMessage(MessagePtr* message_ptr);
     // -1 is an unused value.
-    Parser::MessageType prepare_message(MessagePtr& message_ptr);
     bool check_checksum(void);
 
     std::vector<uint8_t> buffer_;
@@ -77,14 +74,14 @@ class ZhdParser : public Parser {
 
     ::apollo::drivers::gnss::Ins  ins_;
     ::apollo::drivers::gnss::ZhdGps zhdgps_;
-    //add ycy for zhd gps
+    // add ycy for zhd gps
     config::ZhdConfig zhd_config_;
 };
 
 Parser* Parser::createZhd(const config::Config& config) {
   return new ZhdParser(config);
 }
-    
+
 ZhdParser::ZhdParser() {
   buffer_.reserve(BUFFER_SIZE);
   buffer_.reserve(BUFFER_SIZE);
@@ -111,14 +108,14 @@ ZhdParser::ZhdParser(const config::Config& config) {
   else {
     /* code */
     zhd_config_.set_angle_heading(90);
-     AERROR<<"zhd_config- not config so set angle_heading="<<hex<<zhd_config_.angle_heading();
+    AERROR<<"angle_heading="<<hex<<zhd_config_.angle_heading();
   }
 }
 
 Parser::MessageType ZhdParser::GetMessage(MessagePtr* message_ptr) {
   if (data_ == nullptr) {
     return MessageType::NONE;
-  } 
+  }
 
   while (data_ < data_end_) {
     if (buffer_.size() == 0) {
@@ -133,34 +130,28 @@ Parser::MessageType ZhdParser::GetMessage(MessagePtr* message_ptr) {
       // Looking for SYNC1
       if (*data_ == zhd::SYNC_1) {
         buffer_.push_back(*data_++);
-      }
-      else {
+      } else {
         buffer_.clear();
         total_length_ = 0;
       }
-    }
-    else if (buffer_.size() == 2) {
+    } else if (buffer_.size() == 2) {
       // Looking for VERSION_2
       if (*data_ == zhd::VERSION_2) {
         buffer_.push_back(*data_++);
-      }
-      else {
+      } else {
         buffer_.clear();
         total_length_ = 0;
       }
-    }
-    else if (buffer_.size() == 3) {
+    } else if (buffer_.size() == 3) {
       // Looking for VERSION_3
       if (*data_ == zhd::VERSION_3) {
         buffer_.push_back(*data_++);
         total_length_ = 6;
-      }
-      else {
+      } else {
         buffer_.clear();
         total_length_ = 0;
       }
-    }
-    else if (total_length_ > 0) {
+    } else if (total_length_ > 0) {
         if(buffer_.size() >256) {
           AERROR << "buffer_.size() >256 ";
           buffer_.clear();
@@ -168,9 +159,10 @@ Parser::MessageType ZhdParser::GetMessage(MessagePtr* message_ptr) {
         }
         if (buffer_.size() < total_length_) {
             buffer_.push_back(*data_++);
-            if(buffer_.size() == 6) {
-              total_length_= (*reinterpret_cast<uint16_t*>(buffer_.data() + 4)) +2;
-              if(total_length_ > 138) {
+            if (buffer_.size() == 6) {
+              total_length_= 
+                (*reinterpret_cast<uint16_t*>(buffer_.data() + 4)) +2;
+              if (total_length_ > 138) {
                 AERROR << "buffer_.size()1 >138 ";
                 total_length_ = 0;
                 buffer_.clear();
@@ -191,7 +183,7 @@ Parser::MessageType ZhdParser::GetMessage(MessagePtr* message_ptr) {
 }
 
 Parser::MessageType ZhdParser::PrepareMessage(MessagePtr* message_ptr) {
-    if(false == check_checksum()) {
+    if (false == check_checksum()) {
         AERROR << "check_checksum check failed.";
         return MessageType::NONE;
     }
@@ -206,13 +198,13 @@ Parser::MessageType ZhdParser::PrepareMessage(MessagePtr* message_ptr) {
     timeinfo.tm_year = stZhdData->year_utc - 1900;
     timeinfo.tm_hour = stZhdData->hour_utc;
     timeinfo.tm_min = stZhdData->min_utc;
-    timeinfo.tm_sec = stZhdData->sec_utc / 100; //10ms to second
+    timeinfo.tm_sec = stZhdData->sec_utc / 100;
     timeinfo.tm_isdst = 0;
 
-    double milliseconds_a = (stZhdData->sec_utc  % 100) * 10; // ms
+    double milliseconds_a = (stZhdData->sec_utc  % 100) * 10;
     double seconds = milliseconds_a / 1000;
     time_t epoch = mktime(&timeinfo);
-    double time_stamp = (double)epoch + seconds;
+    double time_stamp = static_cast<double>epoch + seconds;
 
     zhdgps_.set_measurement_time(time_stamp);
     zhdgps_.set_longitude(stZhdData->longitude);
@@ -231,7 +223,7 @@ Parser::MessageType ZhdParser::PrepareMessage(MessagePtr* message_ptr) {
     zhdgps_.set_vel_n_m_s(stZhdData->vel_n_m_s);
 
     zhdgps_.set_vel_u_m_s(azimuth_deg_to_yaw_rad(
-        stZhdData->angle_heading ,zhd_config_.angle_heading()));
+      stZhdData->angle_heading ,zhd_config_.angle_heading()));
 
     zhdgps_.set_satellites_used(stZhdData->satellites_used);
     zhdgps_.set_satellites_track(stZhdData->satellites_track);
