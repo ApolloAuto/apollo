@@ -37,12 +37,6 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
-/*
-Initially inspired by "Optimization-Based Collision Avoidance"
-(arXiv:1711.03449) from Xiaojing Zhang , Alexander Liniger and Francesco
-Borrelli
-*/
-
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
