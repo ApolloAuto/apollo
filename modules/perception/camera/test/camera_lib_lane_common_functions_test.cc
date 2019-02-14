@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 
@@ -57,7 +57,7 @@ TEST(CommonFunctions, poly_fit_error_test) {
     for (int i = 0; i < n; i++) {
       Eigen::Matrix<float, 2, 1> pos;
       pos << static_cast<float>(i),
-        static_cast<float>(pow(i, 3) + pow(i, 2) + i);
+          static_cast<float>(pow(i, 3) + pow(i, 2) + i);
       pos_vec.push_back(pos);
     }
     EXPECT_TRUE(PolyFit(pos_vec, order, &coeff, true));
@@ -146,8 +146,9 @@ TEST(CommonFunctions, find_cc_invalid_test) {
 TEST(CommonFunctions, find_cc_test) {
   std::vector<unsigned char> src;
   std::vector<ConnectedComponent> cc;
-  std::string impath = "/apollo/modules/perception/testdata/"
-    "camera/lib/lane/common/data/test_cc.png";
+  std::string impath =
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/lane/common/data/test_cc.png";
   cv::Mat img = cv::imread(impath);
   int width = img.cols;
   int height = img.rows;
@@ -195,8 +196,8 @@ TEST(CommonFunctions, FindKSmallValueTest) {
   unsigned int seed = 0;
   for (int i = 0; i < nsize; i++) {
     int rand_value = rand_r(&seed) % 10;
-    float value = 0.32f * static_cast<float>(rand_value) +
-                  static_cast<float>(rand_value);
+    float value =
+        0.32f * static_cast<float>(rand_value) + static_cast<float>(rand_value);
     value_vec.push_back(value);
     snprintf(tmp, sizeof(tmp), "[%d %f] ", i, value);
     msg += tmp;
@@ -272,8 +273,8 @@ TEST(CommonFunctions, FindKLargeValueTest) {
   unsigned int seed = 5;
   for (int i = 0; i < nsize; i++) {
     int rand_value = rand_r(&seed) % 10;
-    float value = 0.2f * static_cast<float>(rand_value) +
-                  static_cast<float>(rand_value);
+    float value =
+        0.2f * static_cast<float>(rand_value) + static_cast<float>(rand_value);
     value_vec.push_back(value);
     snprintf(tmp, sizeof(tmp), "[%d %f] ", i, value);
     msg += tmp;

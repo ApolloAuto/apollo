@@ -27,7 +27,12 @@ namespace perception {
 namespace lidar {
 
 enum class SppClassType {
-  OTHERS = 0, SMALLMOT = 1, BIGMOT = 2, CYCLIST = 3, PEDESTRIAN = 4, CONE = 5,
+  OTHERS = 0,
+  SMALLMOT = 1,
+  BIGMOT = 2,
+  CYCLIST = 3,
+  PEDESTRIAN = 4,
+  CONE = 5,
   MAX_TYPE = 6,
 };
 
@@ -78,9 +83,9 @@ struct SppCluster {
     std::vector<int> indices(points.size(), 0);
     std::iota(indices.begin(), indices.end(), 0);
     std::sort(indices.begin(), indices.end(),
-              [&](const int & lhs, const int & rhs) {
-      return points[lhs].z < points[rhs].z;
-    });
+              [&](const int& lhs, const int& rhs) {
+                return points[lhs].z < points[rhs].z;
+              });
     std::vector<SppPoint> points_target(points.size());
     std::vector<uint32_t> point_ids_target(points.size());
     for (size_t i = 0; i < points.size(); ++i) {

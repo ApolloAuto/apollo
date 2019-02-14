@@ -68,7 +68,6 @@ void MlfTrackObjectMatcher::Match(
     std::vector<std::pair<size_t, size_t> > *assignments,
     std::vector<size_t> *unassigned_tracks,
     std::vector<size_t> *unassigned_objects) {
-
   assignments->clear();
   unassigned_objects->clear();
   unassigned_tracks->clear();
@@ -84,9 +83,9 @@ void MlfTrackObjectMatcher::Match(
   matcher_options.cost_thresh = max_match_distance_;
   matcher_options.bound_value = bound_value_;
 
-  BaseBipartiteGraphMatcher *matcher =
-      objects[0]->is_background ? background_matcher_.get()
-                                : foreground_matcher_.get();
+  BaseBipartiteGraphMatcher *matcher = objects[0]->is_background
+                                           ? background_matcher_.get()
+                                           : foreground_matcher_.get();
 
   common::SecureMat<float> *association_mat = matcher->cost_matrix();
 
@@ -97,7 +96,8 @@ void MlfTrackObjectMatcher::Match(
   for (size_t i = 0; i < assignments->size(); ++i) {
     objects[assignments->at(i).second]->association_score =
         (*association_mat)(assignments->at(i).first,
-                           assignments->at(i).second) / max_match_distance_;
+                           assignments->at(i).second) /
+        max_match_distance_;
   }
 }
 

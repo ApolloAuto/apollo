@@ -50,8 +50,7 @@ bool SensorManager::Init() {
 
   MultiSensorMeta sensor_list_proto;
   if (!GetProtoFromASCIIFile(file_path, &sensor_list_proto)) {
-    AERROR << "Invalid MultiSensorMeta file: "
-           << FLAGS_obs_sensor_meta_path;
+    AERROR << "Invalid MultiSensorMeta file: " << FLAGS_obs_sensor_meta_path;
     return false;
   }
 
@@ -146,10 +145,8 @@ bool SensorManager::IsHdLidar(const std::string& name) const {
 }
 
 bool SensorManager::IsHdLidar(const SensorType& type) const {
-  return type == SensorType::VELODYNE_128 ||
-         type == SensorType::VELODYNE_64 ||
-         type == SensorType::VELODYNE_32 ||
-         type == SensorType::VELODYNE_16;
+  return type == SensorType::VELODYNE_128 || type == SensorType::VELODYNE_64 ||
+         type == SensorType::VELODYNE_32 || type == SensorType::VELODYNE_16;
 }
 
 bool SensorManager::IsLdLidar(const std::string& name) const {
@@ -226,8 +223,7 @@ bool SensorManager::IsUltrasonic(const SensorType& type) const {
 
 std::string SensorManager::GetFrameId(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  return itr == sensor_info_map_.end()
-      ? std::string("") : itr->second.frame_id;
+  return itr == sensor_info_map_.end() ? std::string("") : itr->second.frame_id;
 }
 
 }  // namespace common

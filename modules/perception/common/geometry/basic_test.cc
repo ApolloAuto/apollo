@@ -24,8 +24,8 @@ namespace apollo {
 namespace perception {
 namespace common {
 
-using base::PointF;
 using base::PointCloud;
+using base::PointF;
 
 TEST(GeometryBasicTest, cross_product_test) {
   Eigen::Vector2f p1(0.0, 0.0);
@@ -234,8 +234,8 @@ TEST(GeometryCommonTest, calculate_bbox_size_center_2d_xy) {
   cloud.push_back(temp);
 
   Eigen::Vector3f direction(1.0, 0.0, 0.0);
-  CalculateBBoxSizeCenter2DXY<PointCloud<PointF>>(cloud, direction,
-                                                           &size, &center);
+  CalculateBBoxSizeCenter2DXY<PointCloud<PointF>>(cloud, direction, &size,
+                                                  &center);
   EXPECT_NEAR(size(0), 30.f, std::numeric_limits<float>::epsilon());
   EXPECT_NEAR(size(1), 25.f, std::numeric_limits<float>::epsilon());
   EXPECT_NEAR(size(2), 20.f, std::numeric_limits<float>::epsilon());

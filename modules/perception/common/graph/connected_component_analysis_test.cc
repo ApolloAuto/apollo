@@ -33,8 +33,8 @@ class ConnectedComponentAnalysisTest : public testing::Test {
 
 TEST_F(ConnectedComponentAnalysisTest, test_ConnectedComponenetAnalysis) {
   Eigen::MatrixXf association_mat(3, 4);
-  association_mat << 0.3f, 1.2f, 4.0f, 3.0f, 0.9f, 2.0f,
-                     3.0f, 8.0f, 4.0f, 3.0f, 0.3f, 0.1f;
+  association_mat << 0.3f, 1.2f, 4.0f, 3.0f, 0.9f, 2.0f, 3.0f, 8.0f, 4.0f, 3.0f,
+      0.3f, 0.1f;
   const float connected_threshold = 2.1f;
   // Compute connected components within given threshold
   int no_track = static_cast<int>(association_mat.rows());

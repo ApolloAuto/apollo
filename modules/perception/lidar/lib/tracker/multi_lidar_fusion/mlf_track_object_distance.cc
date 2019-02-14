@@ -29,14 +29,12 @@ namespace lidar {
 // point num dist weight, histogram dist weight, centroid shift dist weight
 // bbox iou dist weight
 const std::vector<float> MlfTrackObjectDistance::kForegroundDefaultWeight = {
-  0.6f, 0.2f, 0.1f, 0.1f, 0.5f, 0.f, 0.f
-};
+    0.6f, 0.2f, 0.1f, 0.1f, 0.5f, 0.f, 0.f};
 // location dist weight, irection dist weight, bbox size dist weight,
 // point num dist weight, histogram dist weight, centroid shift dist weight
 // bbox iou dist weight
 const std::vector<float> MlfTrackObjectDistance::kBackgroundDefaultWeight = {
-  0.f, 0.f, 0.f, 0.f, 0.f, 0.2f, 0.8f
-};
+    0.f, 0.f, 0.f, 0.f, 0.f, 0.2f, 0.8f};
 
 bool MlfTrackObjectDistance::Init(
     const MlfTrackObjectDistanceInitOptions& options) {
@@ -142,9 +140,9 @@ float MlfTrackObjectDistance::ComputeDistance(
                                            object, time_diff);
   }
   if (weights->at(5) > delta) {
-    distance += weights->at(5) *
-                CentroidShiftDistance(latest_object, track->predict_.state,
-                                      object, time_diff);
+    distance += weights->at(5) * CentroidShiftDistance(latest_object,
+                                                       track->predict_.state,
+                                                       object, time_diff);
   }
   if (weights->at(6) > delta) {
     distance += weights->at(6) *

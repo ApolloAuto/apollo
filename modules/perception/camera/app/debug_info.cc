@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/app/debug_info.h"
 
 #include <iomanip>
@@ -23,26 +23,23 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-std::vector<std::string>
-    type_string = {"Unknown", "Unknown", "Unknown", "Pedestrian", "Cyclist",
-                   "Car", "Unknown"};
+std::vector<std::string> type_string = {
+    "Unknown", "Unknown", "Unknown", "Pedestrian", "Cyclist", "Car", "Unknown"};
 
 std::vector<std::string> sub_type_string = {"UNKNOWN",
- "UNKNOWN_MOVABLE",
- "UNKNOWN_UNMOVABLE",
- "CAR",
- "VAN",
- "TRUCK",
- "BUS",
- "CYCLIST",
- "MOTORCYCLIST",
- "TRICYCLIST",
- "PEDESTRIAN",
- "TRAFFICCONE",
- "MAX_OBJECT_TYPE"
-};
-void WriteCamera2World(std::ofstream &fout,
-                       int frame_num,
+                                            "UNKNOWN_MOVABLE",
+                                            "UNKNOWN_UNMOVABLE",
+                                            "CAR",
+                                            "VAN",
+                                            "TRUCK",
+                                            "BUS",
+                                            "CYCLIST",
+                                            "MOTORCYCLIST",
+                                            "TRICYCLIST",
+                                            "PEDESTRIAN",
+                                            "TRAFFICCONE",
+                                            "MAX_OBJECT_TYPE"};
+void WriteCamera2World(std::ofstream &fout, int frame_num,
                        const Eigen::Affine3d &pose) {
   if (!fout.is_open()) {
     AERROR << "cannot write Camera2World!";
@@ -50,7 +47,8 @@ void WriteCamera2World(std::ofstream &fout,
   }
   fout << frame_num;
   const auto old_flags = fout.flags();  // save the current format flags
-  const auto old_precision = fout.precision();  // save previous precision setting //NOLINT
+  const auto old_precision =
+      fout.precision();  // save previous precision setting //NOLINT
   fout << std::fixed << std::setprecision(9);
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 4; ++j) {
@@ -58,11 +56,10 @@ void WriteCamera2World(std::ofstream &fout,
     }
   }
   fout << std::endl;
-  fout.flags(old_flags);  // restore the output format flags
+  fout.flags(old_flags);          // restore the output format flags
   fout.precision(old_precision);  // restore the precision
 }
-void WriteTracking(std::ofstream &fout,
-                   int frame_num,
+void WriteTracking(std::ofstream &fout, int frame_num,
                    const std::vector<base::ObjectPtr> &tracked_object) {
   if (!fout.is_open()) {
     AERROR << "cannot write tracking!";
@@ -71,37 +68,24 @@ void WriteTracking(std::ofstream &fout,
   char output[500];
   for (size_t i = 0; i < tracked_object.size(); ++i) {
     base::ObjectPtr ptr = tracked_object[i];
-    snprintf(output,
-             sizeof(output),
+    snprintf(output, sizeof(output),
              "%d %d %s -1 -1 %2.3f %4.3f %4.3f %4.3f %4.3f "
              "%2.6f %2.6f %2.6f %2.3f %2.3f %2.3f %2.3f %.3f "
              "%2.6f %2.6f %2.6f %.30s",
-             frame_num,
-             ptr->track_id,
+             frame_num, ptr->track_id,
              sub_type_string[static_cast<int>(ptr->sub_type)].c_str(),
-             ptr->camera_supplement.alpha,
-             ptr->camera_supplement.box.xmin,
-             ptr->camera_supplement.box.ymin,
-             ptr->camera_supplement.box.xmax,
-             ptr->camera_supplement.box.ymax,
-             ptr->size[2],
-             ptr->size[1],
-             ptr->size[0],
-             ptr->center[0],
-             ptr->center[1],
-             ptr->center[2],
-             ptr->theta,
-             ptr->type_probs[static_cast<int>(ptr->type)],
-             ptr->velocity[0],
-             ptr->velocity[1],
-             ptr->velocity[2],
+             ptr->camera_supplement.alpha, ptr->camera_supplement.box.xmin,
+             ptr->camera_supplement.box.ymin, ptr->camera_supplement.box.xmax,
+             ptr->camera_supplement.box.ymax, ptr->size[2], ptr->size[1],
+             ptr->size[0], ptr->center[0], ptr->center[1], ptr->center[2],
+             ptr->theta, ptr->type_probs[static_cast<int>(ptr->type)],
+             ptr->velocity[0], ptr->velocity[1], ptr->velocity[2],
              ptr->camera_supplement.sensor_name.c_str());
     fout << output << std::endl;
   }
 }
 
-int WriteDetections(const bool enable,
-                    const std::string &out_path,
+int WriteDetections(const bool enable, const std::string &out_path,
                     const std::vector<base::ObjectPtr> &objects) {
   if (!enable) {
     return -1;
@@ -125,25 +109,28 @@ int WriteDetections(const bool enable,
    * 4    bbox         2D bounding box of object in the image (0-based index):
    *                   contains left, top, right, bottom pixel coordinates
    * 3    dimensions   3D object dimensions: height, width, length (in meters)
-   * 3    location     3D object location x,y,z in camera coordinates (in meters)
-   * 1    rotation_y   Rotation ry around Y-axis in camera coordinates [-pi..pi]
-   * 1    score        Only for results: Float, indicating confidence in
-   *                   detection, needed for p/r curves, higher is better.
+   * 3    location     3D object location x,y,z in camera coordinates (in
+   * meters) 1    rotation_y   Rotation ry around Y-axis in camera coordinates
+   * [-pi..pi] 1    score        Only for results: Float, indicating confidence
+   * in detection, needed for p/r curves, higher is better.
    */
 
   for (const auto &obj : objects) {
     switch (obj->type) {
-      case base::ObjectType::VEHICLE:outf << "Car";
+      case base::ObjectType::VEHICLE:
+        outf << "Car";
         break;
-      case base::ObjectType::BICYCLE:outf << "Cyclist";
+      case base::ObjectType::BICYCLE:
+        outf << "Cyclist";
         break;
-      case base::ObjectType::PEDESTRIAN:outf << "Pedestrian";
+      case base::ObjectType::PEDESTRIAN:
+        outf << "Pedestrian";
         break;
         // case UNKNOWN_UNMOVABLE:
         //     outf << "TrafficCone";
         //     break;
-      default:AERROR << "Unknown object type: "
-                        << static_cast<int>(obj->type);
+      default:
+        AERROR << "Unknown object type: " << static_cast<int>(obj->type);
         outf << "Unknown";
     }
 
@@ -162,18 +149,18 @@ int WriteDetections(const bool enable,
     outf << " " << obj->center[2];
     outf << " " << obj->theta;
     outf << " " << obj->type_probs[static_cast<int>(obj->type)];
-//    if (FLAGS_with_front) {
-//      outf << " " << obj->front_upper_left[0];
-//      outf << " " << obj->front_upper_left[1];
-//      outf << " " << obj->front_lower_right[0];
-//      outf << " " << obj->front_lower_right[1];
-//    }
-//    if (FLAGS_with_rear) {
-//      outf << " " << obj->back_upper_left[0];
-//      outf << " " << obj->back_upper_left[1];
-//      outf << " " << obj->back_lower_right[0];
-//      outf << " " << obj->back_lower_right[1];
-//    }
+    //    if (FLAGS_with_front) {
+    //      outf << " " << obj->front_upper_left[0];
+    //      outf << " " << obj->front_upper_left[1];
+    //      outf << " " << obj->front_lower_right[0];
+    //      outf << " " << obj->front_lower_right[1];
+    //    }
+    //    if (FLAGS_with_rear) {
+    //      outf << " " << obj->back_upper_left[0];
+    //      outf << " " << obj->back_upper_left[1];
+    //      outf << " " << obj->back_lower_right[0];
+    //      outf << " " << obj->back_lower_right[1];
+    //    }
     outf << " " << obj->car_light.brake_visible;
     outf << " " << obj->car_light.brake_switch_on;
     outf << " " << obj->car_light.left_turn_visible;
@@ -186,8 +173,7 @@ int WriteDetections(const bool enable,
   outf.close();
   return 0;
 }
-int WriteDetections(const bool enable,
-                    const std::string &out_path,
+int WriteDetections(const bool enable, const std::string &out_path,
                     CameraFrame *frame) {
   if (!enable) {
     return -1;
@@ -221,8 +207,7 @@ int WriteDetections(const bool enable,
   }
   return 0;
 }
-int WriteLanelines(const bool enable,
-                   const std::string &save_path,
+int WriteLanelines(const bool enable, const std::string &save_path,
                    const std::vector<base::LaneLine> &lane_objects) {
   if (!enable) {
     return -1;
@@ -236,59 +221,55 @@ int WriteLanelines(const bool enable,
   AINFO << "lane line num: " << lane_line_size;
   fprintf(file_save, "[\n");
   for (int j = 0; j < lane_line_size; j++) {
-    const base::LaneLineCubicCurve& curve_camera
-      = lane_objects[j].curve_camera_coord;
-    const base::LaneLineCubicCurve& curve_img
-      = lane_objects[j].curve_image_coord;
-    const std::vector<base::Point3DF>& camera_point_set =\
-      lane_objects[j].curve_camera_point_set;
-    const std::vector<base::Point2DF>& image_point_set =\
-      lane_objects[j].curve_image_point_set;
+    const base::LaneLineCubicCurve &curve_camera =
+        lane_objects[j].curve_camera_coord;
+    const base::LaneLineCubicCurve &curve_img =
+        lane_objects[j].curve_image_coord;
+    const std::vector<base::Point3DF> &camera_point_set =
+        lane_objects[j].curve_camera_point_set;
+    const std::vector<base::Point2DF> &image_point_set =
+        lane_objects[j].curve_image_point_set;
     fprintf(file_save, "{\n");
     fprintf(file_save, "\"type\":%d,\n", lane_objects[j].type);
     fprintf(file_save, "\"pos_type\":%d,\n", lane_objects[j].pos_type);
     //  camera curve
     fprintf(file_save, "\"camera_curve\":\n");
-    fprintf(file_save,
-      "{\"a\":%.10f,\"b\":%.10f,\"c\":%.10f,\"d\":%.10f,",
-      curve_camera.a, curve_camera.b, curve_camera.c, curve_camera.d);
-    fprintf(file_save,
-      "\"x0\":%.10f,\"x1\":%.10f},\n",
-      curve_camera.x_start, curve_camera.x_end);
+    fprintf(file_save, "{\"a\":%.10f,\"b\":%.10f,\"c\":%.10f,\"d\":%.10f,",
+            curve_camera.a, curve_camera.b, curve_camera.c, curve_camera.d);
+    fprintf(file_save, "\"x0\":%.10f,\"x1\":%.10f},\n", curve_camera.x_start,
+            curve_camera.x_end);
     // camera_image_point_set
     fprintf(file_save, "\"camera_point_set\":\n");
     fprintf(file_save, "[");
     for (size_t k = 0; k < camera_point_set.size(); k++) {
       if (k < camera_point_set.size() - 1) {
         fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f,\"z\":%.4f},",
-          camera_point_set[k].x, camera_point_set[k].y,
-          camera_point_set[k].z);
+                camera_point_set[k].x, camera_point_set[k].y,
+                camera_point_set[k].z);
       } else {
         fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f,\"z\":%.4f}",
-          camera_point_set[k].x, camera_point_set[k].y,
-          camera_point_set[k].z);
+                camera_point_set[k].x, camera_point_set[k].y,
+                camera_point_set[k].z);
       }
     }
     fprintf(file_save, "],");
     fprintf(file_save, "\n");
     //  image curve
     fprintf(file_save, "\"image_curve\":\n");
-    fprintf(file_save,
-      "{\"a\":%.10f,\"b\":%.10f,\"c\":%.10f,\"d\":%.10f,",
-      curve_img.a, curve_img.b, curve_img.c, curve_img.d);
-    fprintf(file_save,
-      "\"x0\":%.10f,\"x1\":%.10f},\n",
-      curve_img.x_start, curve_img.x_end);
+    fprintf(file_save, "{\"a\":%.10f,\"b\":%.10f,\"c\":%.10f,\"d\":%.10f,",
+            curve_img.a, curve_img.b, curve_img.c, curve_img.d);
+    fprintf(file_save, "\"x0\":%.10f,\"x1\":%.10f},\n", curve_img.x_start,
+            curve_img.x_end);
     //  curve_image_point_set
     fprintf(file_save, "\"image_point_set\":\n");
     fprintf(file_save, "[");
     for (size_t k = 0; k < image_point_set.size(); k++) {
       if (k < image_point_set.size() - 1) {
-        fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f},",
-          image_point_set[k].x, image_point_set[k].y);
+        fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f},", image_point_set[k].x,
+                image_point_set[k].y);
       } else {
-        fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f}",
-          image_point_set[k].x, image_point_set[k].y);
+        fprintf(file_save, "{\"x\":%.4f,\"y\":%.4f}", image_point_set[k].x,
+                image_point_set[k].y);
       }
     }
     fprintf(file_save, "]");
@@ -304,28 +285,23 @@ int WriteLanelines(const bool enable,
   return 0;
 }
 
-int WriteCalibrationOutput(bool enable,
-                    const std::string &out_path,
-                    const CameraFrame *frame) {
+int WriteCalibrationOutput(bool enable, const std::string &out_path,
+                           const CameraFrame *frame) {
   if (!enable) {
     return -1;
   }
   float pitch_angle = 0.f;
   float camera_ground_height = 0.f;
   frame->calibration_service->QueryCameraToGroundHeightAndPitchAngle(
-                                          &camera_ground_height,
-                                          &pitch_angle);
+      &camera_ground_height, &pitch_angle);
   FILE *file_save = fopen(out_path.data(), "wt");
-  fprintf(file_save, "camera_ground_height:\t%f\n",
-    camera_ground_height);
-  fprintf(file_save, "pitch_angle:\t%f\n",
-    pitch_angle);
+  fprintf(file_save, "camera_ground_height:\t%f\n", camera_ground_height);
+  fprintf(file_save, "pitch_angle:\t%f\n", pitch_angle);
   fclose(file_save);
   return 0;
 }
 
-void WriteFusionTracking(std::ofstream &fout,
-                         int frame_num,
+void WriteFusionTracking(std::ofstream &fout, int frame_num,
                          const std::string &camera_name,
                          const std::vector<base::ObjectPtr> &tracked_object) {
   if (!fout.is_open()) {
@@ -337,60 +313,39 @@ void WriteFusionTracking(std::ofstream &fout,
     for (size_t i = 0; i < tracked_object.size(); ++i) {
       base::ObjectPtr ptr = tracked_object[i];
       char output[300];
-      snprintf(output,
-               sizeof(output),
+      snprintf(output, sizeof(output),
                "%d %d %s -1 -1 %2.3f %4.3f %4.3f %4.3f %4.3f "
                "%2.6f %2.6f %2.6f %2.3f %2.3f %2.3f %2.3f %.3f "
                "%2.6f %2.6f %2.6f",
-               frame_num,
-               ptr->track_id,
+               frame_num, ptr->track_id,
                sub_type_string[static_cast<int>(ptr->sub_type)].c_str(),
-               ptr->camera_supplement.alpha,
-               ptr->camera_supplement.box.xmin,
-               ptr->camera_supplement.box.ymin,
-               ptr->camera_supplement.box.xmax,
-               ptr->camera_supplement.box.ymax,
-               ptr->size[2],
-               ptr->size[1],
-               ptr->size[0],
-               ptr->center[0],
-               ptr->center[1],
-               ptr->center[2],
-               ptr->theta,
-               ptr->type_probs[static_cast<int>(ptr->type)],
-               ptr->velocity[0],
-               ptr->velocity[1],
-               ptr->velocity[2]);
+               ptr->camera_supplement.alpha, ptr->camera_supplement.box.xmin,
+               ptr->camera_supplement.box.ymin, ptr->camera_supplement.box.xmax,
+               ptr->camera_supplement.box.ymax, ptr->size[2], ptr->size[1],
+               ptr->size[0], ptr->center[0], ptr->center[1], ptr->center[2],
+               ptr->theta, ptr->type_probs[static_cast<int>(ptr->type)],
+               ptr->velocity[0], ptr->velocity[1], ptr->velocity[2]);
       fout << output << std::endl;
     }
   } else if (camera_name == "front_6mm") {
     for (size_t i = 0; i < tracked_object.size(); ++i) {
       base::ObjectPtr ptr = tracked_object[i];
       char output[300];
-      snprintf(output,
-               sizeof(output),
+      snprintf(output, sizeof(output),
                "%d %d %s -1 -1 %2.3f %4.3f %4.3f %4.3f %4.3f "
                "%2.6f %2.6f %2.6f %2.3f %2.3f %2.3f %2.3f %.3f "
                "%2.6f %2.6f %2.6f",
-               frame_num,
-               ptr->track_id,
+               frame_num, ptr->track_id,
                sub_type_string[static_cast<int>(ptr->sub_type)].c_str(),
                ptr->camera_supplement.alpha,
                ptr->camera_supplement.projected_box.xmin,
                ptr->camera_supplement.projected_box.ymin,
                ptr->camera_supplement.projected_box.xmax,
-               ptr->camera_supplement.projected_box.ymax,
-               ptr->size[2],
-               ptr->size[1],
-               ptr->size[0],
-               ptr->center[0],
-               ptr->center[1],
-               ptr->center[2],
-               ptr->theta,
-               ptr->type_probs[static_cast<int>(ptr->type)],
-               ptr->velocity[0],
-               ptr->velocity[1],
-               ptr->velocity[2]);
+               ptr->camera_supplement.projected_box.ymax, ptr->size[2],
+               ptr->size[1], ptr->size[0], ptr->center[0], ptr->center[1],
+               ptr->center[2], ptr->theta,
+               ptr->type_probs[static_cast<int>(ptr->type)], ptr->velocity[0],
+               ptr->velocity[1], ptr->velocity[2]);
       fout << output << std::endl;
     }
   } else {

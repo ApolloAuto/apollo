@@ -59,7 +59,7 @@ class RadarDetectionComponent : public cyber::Component<ContiRadar> {
  private:
   int InitAlgorithmPlugin();
   bool InternalProc(const std::shared_ptr<ContiRadar>& in_message,
-                   std::shared_ptr<SensorFrameMessage> out_message);
+                    std::shared_ptr<SensorFrameMessage> out_message);
   int GetCarLocalizationSpeed(double timestamp,
                               Eigen::Vector3f* car_linear_speed,
                               Eigen::Vector3f* car_angular_speed);

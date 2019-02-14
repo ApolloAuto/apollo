@@ -104,7 +104,7 @@ bool GetRegisteredClasses(
           AERROR << "Instance:" << c.first;                           \
         }                                                             \
         AERROR << "Get instance " << name << " failed.";              \
-        return nullptr;                                                  \
+        return nullptr;                                               \
       }                                                               \
       Any object = iter->second->NewInstance();                       \
       return *(object.AnyCast<base_class *>());                       \

@@ -63,8 +63,8 @@ bool FusedClassifier::Classify(const ClassifierOptions& options,
     return false;
   }
   std::vector<ObjectPtr>* objects = use_tracked_objects_
-                                              ? &(frame->tracked_objects)
-                                              : &(frame->segmented_objects);
+                                        ? &(frame->tracked_objects)
+                                        : &(frame->segmented_objects);
   if (enable_temporal_fusion_ && frame->timestamp > 0.0) {
     // sequence fusion
     AINFO << "Combined classifier, temporal fusion";

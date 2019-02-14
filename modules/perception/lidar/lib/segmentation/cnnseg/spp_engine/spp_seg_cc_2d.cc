@@ -42,12 +42,10 @@ bool SppCCDetector::BuildNodes(int start_row_index, int end_row_index) {
   for (int row = start_row_index; row < end_row_index; ++row) {
     for (int col = 0; col < cols_; ++col) {
       node_ptr->set_is_object(*prob_map_ptr++ >= objectness_threshold_);
-      int center_row =
-          static_cast<int>(*offset_row_ptr++ * scale_ +
-                           static_cast<float>(row) + 0.5f);
-      int center_col =
-          static_cast<int>(*offset_col_ptr++ * scale_ +
-                           static_cast<float>(col) + 0.5f);
+      int center_row = static_cast<int>(*offset_row_ptr++ * scale_ +
+                                        static_cast<float>(row) + 0.5f);
+      int center_col = static_cast<int>(*offset_col_ptr++ * scale_ +
+                                        static_cast<float>(col) + 0.5f);
       center_row = std::max(0, std::min(rows_ - 1, center_row));
       center_col = std::max(0, std::min(cols_ - 1, center_col));
       (node_ptr++)->center_node = center_row * cols_ + center_col;

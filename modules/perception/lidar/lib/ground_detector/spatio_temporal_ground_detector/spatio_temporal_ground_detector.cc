@@ -33,8 +33,8 @@ bool SpatioTemporalGroundDetector::Init(
     const GroundDetectorInitOptions& options) {
   const lib::ModelConfig* model_config = nullptr;
   auto config_manager = lib::ConfigManager::Instance();
-  CHECK(config_manager->GetModelConfig(
-      "SpatioTemporalGroundDetector", &model_config))
+  CHECK(config_manager->GetModelConfig("SpatioTemporalGroundDetector",
+                                       &model_config))
       << "Failed to get model config: SpatioTemporalGroundDetector";
 
   const std::string& work_root = config_manager->work_root();
@@ -152,14 +152,12 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
   base::PointIndices& non_ground_indices = frame->non_ground_indices;
   AINFO << "input of ground detector:" << valid_point_num;
 
-  if (!pfdetector_->Detect(data_.data(),
-              ground_height_signed_.data(),
-              valid_point_num,
-              nr_points_element)) {
-     AINFO << "failed to call ground detector!";
-    non_ground_indices.indices.insert(non_ground_indices.indices.end(),
-                               point_indices_temp_.begin(),
-                               point_indices_temp_.begin() + valid_point_num);
+  if (!pfdetector_->Detect(data_.data(), ground_height_signed_.data(),
+                           valid_point_num, nr_points_element)) {
+    AINFO << "failed to call ground detector!";
+    non_ground_indices.indices.insert(
+        non_ground_indices.indices.end(), point_indices_temp_.begin(),
+        point_indices_temp_.begin() + valid_point_num);
     return false;
   }
 
@@ -191,8 +189,8 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
       unsigned int index = 0;
       for (unsigned int r = 0; r < rows; ++r) {
         for (unsigned int c = 0; c < cols; ++c) {
-          const common::GroundPlaneLiDAR* plane
-            = pfdetector_->GetGroundPlane(r, c);
+          const common::GroundPlaneLiDAR* plane =
+              pfdetector_->GetGroundPlane(r, c);
           if (plane->IsValid()) {
             index = r * cols + c;
             GroundNode* node = node_ptr + index;

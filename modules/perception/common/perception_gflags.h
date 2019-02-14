@@ -18,7 +18,6 @@
 
 #include "gflags/gflags.h"
 
-
 namespace apollo {
 namespace perception {
 

@@ -66,7 +66,7 @@ Eigen::Vector2f BrownCameraDistortionModel::Project(
 }
 
 std::shared_ptr<BaseCameraModel>
-    BrownCameraDistortionModel::get_camera_model() {
+BrownCameraDistortionModel::get_camera_model() {
   std::shared_ptr<PinholeCameraModel> camera_model(new PinholeCameraModel());
   camera_model->set_width(width_);
   camera_model->set_height(height_);
