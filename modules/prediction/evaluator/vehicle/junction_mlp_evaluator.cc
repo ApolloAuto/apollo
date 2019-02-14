@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <unordered_map>
 
+#include "cyber/common/file.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/prediction/common/feature_output.h"
@@ -308,7 +309,7 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
 void JunctionMLPEvaluator::LoadModel(const std::string& model_file) {
   model_ptr_.reset(new FnnVehicleModel());
   CHECK(model_ptr_ != nullptr);
-  CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
+  CHECK(cyber::common::GetProtoFromFile(model_file, model_ptr_.get()))
       << "Unable to load model file: " << model_file << ".";
 
   AINFO << "Succeeded in loading the model file: " << model_file << ".";
