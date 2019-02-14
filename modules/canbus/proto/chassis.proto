@@ -46,22 +46,31 @@ message Chassis {
   }
 
   optional bool engine_started = 3;
+
   // Engine speed in RPM.
   optional float engine_rpm = 4 [default = nan];
+
   // Vehicle Speed in meters per second.
   optional float speed_mps = 5 [default = nan];
+
   // Vehicle odometer in meters.
   optional float odometer_m = 6 [default = nan];
+
   // Fuel range in meters.
   optional int32 fuel_range_m = 7;
+
   // Real throttle location in [%], ranging from 0 to 100.
   optional float throttle_percentage = 8 [default = nan];
+
   // Real brake location in [%], ranging from 0 to 100.
   optional float brake_percentage = 9 [default = nan];
-  // Real gear location.
-  // optional int32 gear_location = 10; deprecated use enum replace this [id 23]
-  // Real steering location in [%], ranging from 0 to 100.
+
+  // Real steering location in [%], ranging from -100 to 100.
+  // steering_angle / max_steering_angle
+  // Clockwise: negative
+  // CountClockwise: positive
   optional float steering_percentage = 11 [default = nan];
+
   // Applied steering torque in [Nm].
   optional float steering_torque_nm = 12 [default = nan];
 
@@ -102,6 +111,9 @@ message Chassis {
 
   // Vehicle registration information
   optional License license = 32;
+
+  // Real gear location.
+  // optional int32 gear_location = 10; deprecated use enum replace this [id 23]
 }
 
 message ChassisGPS {
