@@ -17,9 +17,12 @@
 #include "modules/planning/tasks/deciders/path_bounds_decider.h"
 
 #include <algorithm>
+#include <functional>
 #include <limits>
+#include <set>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -36,6 +39,8 @@ constexpr double kPathBoundsDeciderResolution = 0.1;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
 constexpr double kRoadEdgeBuffer = 0.2;
+constexpr double kObstacleSBuffer = 1.0;
+constexpr double kObstacleLBuffer = 0.5;
 
 PathBoundsDecider::PathBoundsDecider(const TaskConfig &config)
     : Decider(config) {}
@@ -66,7 +71,7 @@ Status PathBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  // 2. Finetune the boundary based on static obstacles
+  // 2. Fine-tune the boundary based on static obstacles
   // TODO(all): in the future, add side-pass functionality.
   if (!GetBoundariesFromStaticObstacles(
           reference_line_info->path_decision()->obstacles(),
@@ -92,10 +97,12 @@ bool PathBoundsDecider::InitPathBoundaries(
 
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
-  common::FrenetFramePoint adc_frenet_position = reference_line.GetFrenetPoint(
-      planning_start_point.path_point());
-  for (double curr_s = adc_frenet_position.s();
-       curr_s < std::min(adc_frenet_position.s() + kPathBoundsDeciderHorizon,
+  adc_frenet_s_ =
+      reference_line.GetFrenetPoint(planning_start_point.path_point()).s();
+  adc_frenet_l_ =
+      reference_line.GetFrenetPoint(planning_start_point.path_point()).l();
+  for (double curr_s = adc_frenet_s_;
+       curr_s < std::min(adc_frenet_s_ + kPathBoundsDeciderHorizon,
                          reference_line.Length());
        curr_s += kPathBoundsDeciderResolution) {
     path_boundaries->emplace_back(
@@ -167,9 +174,128 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
   return true;
 }
 
+// Currently, it processes each obstacle based on its frenet-frame
+// projection. Therefore, it might be overly conservative when processing
+// obstacles whose headings differ from road-headings a lot.
+// TODO(all): (future work) this can be improved in the future.
 bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
     const IndexedList<std::string, Obstacle>& indexed_obstacles,
     std::vector<std::tuple<double, double, double>>* const path_boundaries) {
+  // Preprocessing.
+  auto sorted_obstacles = SortObstaclesForSweepLine(indexed_obstacles);
+  double center_line = adc_frenet_l_;
+  size_t obs_idx = 0;
+  int path_blocked_idx = -1;
+  std::multiset<double, std::greater<double>> right_bounds;
+  right_bounds.insert(std::numeric_limits<double>::lowest());
+  std::multiset<double> left_bounds;
+  left_bounds.insert(std::numeric_limits<double>::max());
+  // Maps obstacle ID's to the decided ADC pass direction, if ADC should
+  // pass from left, then true; otherwise, false.
+  std::unordered_map<std::string, bool> obs_id_to_direction;
+
+  // Step through every path point.
+  for (size_t i = 0; i < path_boundaries->size(); ++i) {
+    double curr_s = std::get<0>((*path_boundaries)[i]);
+    // Check and see if there is any obstacle change:
+    bool is_no_obstacle_change = true;
+    while (obs_idx < sorted_obstacles.size() &&
+           std::get<1>(sorted_obstacles[obs_idx]) < curr_s) {
+      is_no_obstacle_change = false;
+      auto curr_obstacle = sorted_obstacles[obs_idx];
+      double curr_obstacle_l_min = std::get<2>(curr_obstacle);
+      double curr_obstacle_l_max = std::get<3>(curr_obstacle);
+      std::string curr_obstacle_id = std::get<4>(curr_obstacle);
+      if (std::get<0>(curr_obstacle)) {
+        // A new obstacle enters into our scope:
+        //   Decide which direction for the ADC to pass, and update the
+        //   left/right bound accordingly.
+        // TODO(all): (future work) can make this DFS all possible
+        // directions. (with proper early stopping mechanisms to save time)
+        if (curr_obstacle_l_min + curr_obstacle_l_max < center_line * 2) {
+          // Obstacle is to the right of center-line, should pass from left.
+          obs_id_to_direction[curr_obstacle_id] = true;
+          right_bounds.insert(curr_obstacle_l_max);
+        } else {
+          // Obstacle is to the left of center-line, should pass from right.
+          obs_id_to_direction[curr_obstacle_id] = false;
+          left_bounds.insert(curr_obstacle_l_min);
+        }
+      } else {
+        // An existing obstacle exits our scope.
+        if (obs_id_to_direction[curr_obstacle_id]) {
+          right_bounds.erase(right_bounds.find(curr_obstacle_l_max));
+        } else {
+          left_bounds.erase(left_bounds.find(curr_obstacle_l_min));
+        }
+        obs_id_to_direction.erase(curr_obstacle_id);
+      }
+      // Update the bounds and center_line.
+      // (This seems to be redundant as after the while loop, there exists
+      //  code that does the same thing. However, this code is supposed to
+      //  deal with the rare case when multiple obstacle changes happen
+      //  during a small (0.1m) path interval.)
+      std::get<1>((*path_boundaries)[i]) = std::fmax(
+          std::get<1>((*path_boundaries)[i]),
+          *left_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
+      std::get<2>((*path_boundaries)[i]) = std::fmin(
+          std::get<2>((*path_boundaries)[i]),
+          *right_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
+      if (std::get<1>((*path_boundaries)[i]) >
+          std::get<2>((*path_boundaries)[i])) {
+        ADEBUG << "Path is blocked at s = " << curr_s;
+        path_blocked_idx = static_cast<int>(i);
+        // Currently, no side-pass when blocked.
+        // TODO(all): implement the side-pass feature by considering
+        // borrowing the adjacent lane.
+        break;
+      } else {
+        center_line = (std::get<1>((*path_boundaries)[i]) +
+            std::get<2>((*path_boundaries)[i])) / 2.0;
+      }
+
+      ++obs_idx;
+    }
+
+    // If no obstacle change, still need to update
+    if (is_no_obstacle_change) {
+      // Update the bounds and center_line.
+      std::get<1>((*path_boundaries)[i]) = std::fmax(
+          std::get<1>((*path_boundaries)[i]),
+          *left_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
+      std::get<2>((*path_boundaries)[i]) = std::fmin(
+          std::get<2>((*path_boundaries)[i]),
+          *right_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
+      if (std::get<1>((*path_boundaries)[i]) >
+          std::get<2>((*path_boundaries)[i])) {
+        ADEBUG << "Path is blocked at s = " << curr_s;
+        path_blocked_idx = static_cast<int>(i);
+        // Currently, no side-pass when blocked.
+        // TODO(all): implement the side-pass feature by considering
+        // borrowing the adjacent lane.
+        break;
+      } else {
+        center_line = (std::get<1>((*path_boundaries)[i]) +
+            std::get<2>((*path_boundaries)[i])) / 2.0;
+      }
+    }
+
+    // Early exit if path is blocked.
+    if (path_blocked_idx != -1) {
+      break;
+    }
+  }
+
+  // Remove the blocked part. Don't generate path for it.
+  if (path_blocked_idx != -1) {
+    if (path_blocked_idx == 0) {
+      ADEBUG << "Completely blocked. Cannot move at all.";
+    }
+    for (int i = 0; i < static_cast<int>(path_boundaries->size()) -
+         path_blocked_idx; ++i) {
+      path_boundaries->pop_back();
+    }
+  }
 
   return true;
 }
@@ -182,6 +308,54 @@ double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
   constexpr double kAdcEdgeBuffer = 0.5;
 
   return (adc_half_width + kAdcEdgeBuffer);
+}
+
+// The tuple contains (is_start_s, s, l_min, l_max, obstacle_id)
+std::vector<std::tuple<int, double, double, double, std::string>>
+PathBoundsDecider::SortObstaclesForSweepLine(
+    const IndexedList<std::string, Obstacle>& indexed_obstacles) {
+  std::vector<std::tuple<int, double, double, double, std::string>>
+    sorted_obstacles;
+
+  // Go through every obstacle and preprocess it.
+  for (const auto* obstacle : indexed_obstacles.Items()) {
+    // Only focus on non-virtual obstacles.
+    if (obstacle->IsVirtual()) {
+      continue;
+    }
+    // Only focus on static obstacles.
+    if (!obstacle->IsStatic()) {
+      continue;
+    }
+    // Only focus on obstaclse that are ahead of ADC.
+    if (obstacle->PerceptionSLBoundary().end_s() < adc_frenet_s_) {
+      continue;
+    }
+    // Decompose each obstacle's rectangle into two edges: one at
+    // start_s; the other at end_s.
+    const auto obstacle_sl = obstacle->PerceptionSLBoundary();
+    sorted_obstacles.emplace_back(
+        1, obstacle_sl.start_s() - kObstacleSBuffer,
+        obstacle_sl.start_l() - kObstacleLBuffer,
+        obstacle_sl.end_l() + kObstacleLBuffer, obstacle->Id());
+    sorted_obstacles.emplace_back(
+        0, obstacle_sl.end_s() + kObstacleSBuffer,
+        obstacle_sl.start_l() - kObstacleLBuffer,
+        obstacle_sl.end_l() + kObstacleLBuffer, obstacle->Id());
+  }
+
+  // Sort.
+  sort(sorted_obstacles.begin(), sorted_obstacles.end(),
+       [ ](const std::tuple<int, double, double, double, std::string>& lhs,
+           const std::tuple<int, double, double, double, std::string>& rhs) {
+         if (std::get<1>(lhs) != std::get<1>(rhs)) {
+           return std::get<1>(lhs) < std::get<1>(rhs);
+         } else {
+           return std::get<0>(lhs) < std::get<0>(rhs);
+         }
+       });
+
+  return sorted_obstacles;
 }
 
 }  // namespace planning
