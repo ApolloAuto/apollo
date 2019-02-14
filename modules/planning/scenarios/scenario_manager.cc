@@ -233,7 +233,12 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
     const Frame& frame) {
-  // TODO(all):
+  // TODO(all): to be updated when SIDE_PASS obstacle decisions
+  //            from ReferenceLine is ready
+  auto scenario = CreateScenario(ScenarioConfig::SIDE_PASS);
+  if (scenario->IsTransferable(*current_scenario_, frame)) {
+    return ScenarioConfig::SIDE_PASS;
+  }
   return ScenarioConfig::LANE_FOLLOW;
 }
 
@@ -404,13 +409,13 @@ void ScenarioManager::ScenarioDispatch(
   ////////////////////////////////////////
   // CHANGE_LANE scenario
   if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
-    SelectChangeLaneScenario(frame);
+    scenario_type = SelectChangeLaneScenario(frame);
   }
 
   ////////////////////////////////////////
   // SIDE_PASS scenario
   if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
-    SelectSidePassScenario(frame);
+    scenario_type = SelectSidePassScenario(frame);
   }
 
   ADEBUG << "select scenario: "
