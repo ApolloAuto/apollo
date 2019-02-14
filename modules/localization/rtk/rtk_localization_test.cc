@@ -19,6 +19,7 @@
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/util/util.h"
 
@@ -32,7 +33,7 @@ class RTKLocalizationTest : public ::testing::Test {
  protected:
   template <class T>
   void load_data(const std::string &filename, T *data) {
-    CHECK(common::util::GetProtoFromFile(filename, data))
+    CHECK(cyber::common::GetProtoFromFile(filename, data))
         << "Failed to open file " << filename;
   }
 

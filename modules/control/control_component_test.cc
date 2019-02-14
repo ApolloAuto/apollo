@@ -201,8 +201,8 @@ bool ControlComponentTest::RunControl(const std::string& test_case_name) {
     cyber::common::SetProtoToASCIIFile(control_command_, golden_result_file);
   } else {
     ControlCommand golden_result;
-    bool load_success =
-        common::util::GetProtoFromASCIIFile(full_golden_path, &golden_result);
+    bool load_success = cyber::common::GetProtoFromASCIIFile(
+        full_golden_path, &golden_result);
     if (!load_success) {
       AERROR << "Failed to load golden file: " << full_golden_path;
       cyber::common::SetProtoToASCIIFile(control_command_, tmp_golden_path);
