@@ -58,6 +58,8 @@ class PlanningContext {
     ProceedWithCautionSpeedParam proceed_with_caution_speed;
     std::vector<std::string> stop_sign_wait_for_obstacles;
     std::vector<std::string> crosswalk_wait_for_obstacles;
+    // TODO(all): to be removed when SidePass obstacle decision impl is done
+    std::string side_pass_front_blocking_obstacle_id;
   };
 
   static void Clear();
