@@ -201,8 +201,9 @@ void PredictorManager::PredictObstacle(
         break;
       }
       case PerceptionObstacle::BICYCLE: {
-        if (obstacle->IsOnLane() && !obstacle->IsNearJunction()) {
+        if (obstacle->IsOnLane()) {
           predictor = GetPredictor(cyclist_on_lane_predictor_);
+          // TODO(kechxu) add a specific predictor in junction
         } else {
           predictor = GetPredictor(cyclist_off_lane_predictor_);
         }
