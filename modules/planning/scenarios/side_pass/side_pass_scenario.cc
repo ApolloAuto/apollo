@@ -27,6 +27,7 @@
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/scenarios/side_pass/stage_approach_obstacle.h"
@@ -88,6 +89,10 @@ SidePassScenario::SidePassScenario(const ScenarioConfig& config,
                                    const ScenarioContext* scenario_context)
     : Scenario(config, scenario_context) {
   side_pass_context_.scenario_config_.CopyFrom(config.side_pass_config());
+
+  // TODO(all): to be removed when SidePass obstacle decision impl is ready
+  side_pass_context_.front_blocking_obstacle_id_ =
+      PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id;
 }
 
 std::unique_ptr<Stage> SidePassScenario::CreateStage(
@@ -232,6 +237,9 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
             distance_between_adc_and_obstacle;
         front_blocking_obstacle_id_ = obstacle->Id() + "_0";
         side_pass_context_.front_blocking_obstacle_id_ = obstacle->Id();
+        // TODO(all): to be removed when SidePass obstacle decision impl is ready
+        PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id =
+            side_pass_context_.front_blocking_obstacle_id_;
       }
     }
   }
@@ -239,6 +247,9 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     return true;
   } else {
     side_pass_context_.front_blocking_obstacle_id_ = "";
+    // TODO(all): to be removed when SidePass obstacle decision impl is ready
+    PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id =
+        side_pass_context_.front_blocking_obstacle_id_;
     return false;
   }
 }
