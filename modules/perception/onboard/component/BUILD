@@ -106,7 +106,6 @@ cc_library(
         "//modules/common/proto:geometry_proto",
         "//modules/common/proto:header_proto",
         "//modules/common/time:time",
-        "//modules/common/util:file_util",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//modules/map/proto:map_proto",

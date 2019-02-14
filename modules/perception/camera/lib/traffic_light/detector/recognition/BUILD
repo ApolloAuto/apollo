@@ -47,7 +47,7 @@ cc_library(
     deps = [
         ":classify",
         ":trafficlight_detector_recognition_proto",
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_lib",
     ],

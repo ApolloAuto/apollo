@@ -48,8 +48,8 @@ bool LaneCameraPerception::Init(
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  CHECK(cyber::common::GetProtoFromFile(
-      config_file, &perception_param_)) << "Read config failed: ";
+  CHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
+      << "Read config failed: " << config_file;
   CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
   lane_calibration_working_sensor_name_ =

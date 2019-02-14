@@ -28,7 +28,6 @@ cc_library(
         ":location_refiner_proto",
         ":obj_postprocessor",
         "//cyber",
-        "//modules/common/util:file_util",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
     ],

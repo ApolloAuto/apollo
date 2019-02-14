@@ -77,7 +77,7 @@ cc_library(
         ":obstacle_reference",
         ":omt_proto",
         ":target",
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/obstacle/tracker/common",

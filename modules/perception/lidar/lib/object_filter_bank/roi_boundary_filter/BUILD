@@ -12,7 +12,6 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/util:file_util",
         "//modules/perception/base:point_cloud",
         "//modules/perception/common/geometry:common",
         "//modules/perception/lib/config_manager",

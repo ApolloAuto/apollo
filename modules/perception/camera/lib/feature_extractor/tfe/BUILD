@@ -26,7 +26,7 @@ cc_library(
     ],
     deps = [
         ":tracking_feature_proto",
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_factory_lib",
@@ -46,7 +46,7 @@ cc_library(
     ],
     deps = [
         ":tracking_feature_proto",
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/inference:inference_factory_lib",
@@ -65,7 +65,7 @@ cc_library(
     ],
     deps = [
         ":tracking_feature_proto",
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",

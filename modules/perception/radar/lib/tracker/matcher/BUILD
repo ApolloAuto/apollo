@@ -24,7 +24,7 @@ cc_library(
         "hm_matcher.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/common/util:string_util",
         "//modules/perception/base",
         "//modules/perception/common/graph",
