@@ -18,17 +18,6 @@
  * @file
  */
 
-/*
- * Inspired by
- *
- * Dolgov, Dmitri, et al. "Path Planning for Autonomous Vehicles in Unknown
- * Semi-Structured Environments." The International Journal of Robotics
- * Research, vol. 29, no. 5, 2010, pp. 485-501., doi:10.1177/0278364909359210.
- *
- * Xiaojing, et al. "Optimization-Based Collision Avoidance" (arXiv:1711.03449)
- * and its implementation (https://github.com/XiaojingGeorgeZhang/H-OBCA).
- */
-
 #pragma once
 
 #include <memory>
