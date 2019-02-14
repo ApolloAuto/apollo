@@ -145,7 +145,7 @@ void FeatureOutput::WriteFrameEnv() {
     const std::string file_name =
         FLAGS_prediction_data_dir + "/frame_env." +
         std::to_string(idx_frame_env_) + ".bin";
-    common::util::SetProtoToBinaryFile(list_frame_env_, file_name);
+    cyber::common::SetProtoToBinaryFile(list_frame_env_, file_name);
     list_frame_env_.Clear();
     ++idx_frame_env_;
   }

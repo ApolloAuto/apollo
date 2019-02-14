@@ -109,10 +109,6 @@ message Feature {
   repeated PredictionTrajectoryPoint future_trajectory_points = 31;
 }
 
-message Features {
-  repeated Feature feature = 1;
-}
-
 message ObstacleHistory {
   repeated Feature feature = 1;
   optional bool is_trainable = 2 [default = false];

@@ -66,7 +66,6 @@ class EvaluatorManager {
   void EvaluateObstacle(Obstacle* obstacle);
 
  private:
-
   void BuildCurrentFrameEnv();
 
   /**
