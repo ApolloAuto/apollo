@@ -77,7 +77,8 @@ class PlaneMotion {
   }
 
   void add_new_motion(double pre_image_timestamp, double image_timestamp,
-       int motion_operation_flag, base::VehicleStatus *vehicledata);
+                      int motion_operation_flag,
+                      base::VehicleStatus *vehicledata);
 
   base::MotionBuffer get_buffer();
   bool find_motion_with_timestamp(double timestamp, base::VehicleStatus *vs);

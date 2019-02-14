@@ -39,8 +39,8 @@ bool LidarObstacleSegmentation::Init(
   CHECK(model_config->get_value("root_path", &root_path));
   config_file = cyber::common::GetAbsolutePath(work_root, root_path);
   config_file = cyber::common::GetAbsolutePath(config_file, sensor_name);
-  config_file = cyber::common::GetAbsolutePath(config_file,
-      "lidar_obstacle_segmentation.conf");
+  config_file = cyber::common::GetAbsolutePath(
+      config_file, "lidar_obstacle_segmentation.conf");
 
   LidarObstacleSegmentationConfig config;
   CHECK(cyber::common::GetProtoFromFile(config_file, &config));
@@ -65,8 +65,8 @@ bool LidarObstacleSegmentation::Init(
     }
   }
 
-  segmentor_.reset(BaseSegmentationRegisterer::GetInstanceByName(
-        segmentor_name_));
+  segmentor_.reset(
+      BaseSegmentationRegisterer::GetInstanceByName(segmentor_name_));
   CHECK_NOTNULL(segmentor_.get());
   SegmentationInitOptions segmentation_init_options;
   segmentation_init_options.sensor_name = sensor_name;
@@ -88,7 +88,7 @@ LidarProcessResult LidarObstacleSegmentation::Process(
     const LidarObstacleSegmentationOptions& options, LidarFrame* frame) {
   PointCloudPreprocessorOptions preprocessor_options;
   preprocessor_options.sensor2novatel_extrinsics =
-    options.sensor2novatel_extrinsics;
+      options.sensor2novatel_extrinsics;
   if (cloud_preprocessor_.Preprocess(preprocessor_options, frame)) {
     return ProcessCommon(options, frame);
   } else {
@@ -108,7 +108,7 @@ LidarProcessResult LidarObstacleSegmentation::Process(
   PERCEPTION_PERF_BLOCK_START();
   PointCloudPreprocessorOptions preprocessor_options;
   preprocessor_options.sensor2novatel_extrinsics =
-    options.sensor2novatel_extrinsics;
+      options.sensor2novatel_extrinsics;
   if (cloud_preprocessor_.Preprocess(preprocessor_options, message, frame)) {
     PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "preprocess");
     return ProcessCommon(options, frame);

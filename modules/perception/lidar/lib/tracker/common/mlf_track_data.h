@@ -54,8 +54,8 @@ class MlfTrackData : public TrackData {
 
   void PushTrackedObjectToCache(TrackedObjectPtr obj);
 
-  bool ToObject(const Eigen::Vector3d& local_to_global_offset,
-      double timestamp, base::ObjectPtr object) const;
+  bool ToObject(const Eigen::Vector3d& local_to_global_offset, double timestamp,
+                base::ObjectPtr object) const;
 
   void RemoveStaleHistory(double timestamp);
 
@@ -68,26 +68,24 @@ class MlfTrackData : public TrackData {
       const std::string& sensor_name) {
     auto iter = sensor_history_objects_.find(sensor_name);
     if (iter != sensor_history_objects_.end()) {
-      auto& history_objects  = iter->second;
+      auto& history_objects = iter->second;
       if (history_objects.size() != 0) {
         return *history_objects.rbegin();
       }
     }
-    return std::pair<double, TrackedObjectPtr>(
-        0.0, TrackedObjectPtr(nullptr));
+    return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
 
   std::pair<double, TrackedObjectConstPtr> GetLatestSensorObject(
       const std::string& sensor_name) const {
     auto iter = sensor_history_objects_.find(sensor_name);
     if (iter != sensor_history_objects_.end()) {
-      auto& history_objects  = iter->second;
+      auto& history_objects = iter->second;
       if (history_objects.size() != 0) {
         return *history_objects.rbegin();
       }
     }
-    return std::pair<double, TrackedObjectPtr>(
-        0.0, TrackedObjectPtr(nullptr));
+    return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
 
  public:
@@ -115,4 +113,3 @@ typedef std::shared_ptr<const MlfTrackData> MlfTrackDataConstPtr;
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-

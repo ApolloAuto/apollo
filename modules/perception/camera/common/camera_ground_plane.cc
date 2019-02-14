@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/common/camera_ground_plane.h"
 
 #include <utility>
@@ -20,7 +20,6 @@
 #include "cyber/common/log.h"
 #include "modules/perception/common/i_lib/da/i_ransac.h"
 #include "modules/perception/common/i_lib/geometry/i_util.h"
-
 
 namespace apollo {
 namespace perception {
@@ -78,8 +77,7 @@ bool ConvertGround4ToGround3(const float &baseline,
 
 void GetGroundPlanePitchHeight(const float &baseline,
                                const std::vector<float> &k_mat,
-                               const std::vector<float> &ground3,
-                               float *pitch,
+                               const std::vector<float> &ground3, float *pitch,
                                float *cam_height) {
   CHECK_GT(baseline, 0.0f);
   CHECK_EQ(k_mat.size(), 9);
@@ -98,8 +96,7 @@ void GetGroundPlanePitchHeight(const float &baseline,
 }
 
 void GetGround3FromPitchHeight(const std::vector<float> &k_mat,
-                               const float &baseline,
-                               const float &pitch,
+                               const float &baseline, const float &pitch,
                                const float &cam_height,
                                std::vector<float> *ground3) {
   CHECK_EQ(k_mat.size(), 9);
@@ -126,9 +123,8 @@ GroundPlaneTracker::GroundPlaneTracker(int track_length) {
 
   // normalize
   float accm_sum = common::ISum(const_weight_temporal_.data(), track_length);
-  common::IScale(const_weight_temporal_.data(),
-               track_length,
-               common::IRec(accm_sum));
+  common::IScale(const_weight_temporal_.data(), track_length,
+                 common::IRec(accm_sum));
 
   head_ = track_length;
 }
@@ -139,7 +135,7 @@ void GroundPlaneTracker::Push(const std::vector<float> &ph,
   int i = 0;
   int length = static_cast<int>(pitch_height_inlier_tracks_.size());
   if (head_ == 0) {
-    if (length > 3) {  // move backwards
+    if (length > 3) {                      // move backwards
       for (i = length - 1; i >= 3; i--) {  // 3: pitch, height, inlier-number
         pitch_height_inlier_tracks_[i] = pitch_height_inlier_tracks_[i - 3];
       }
@@ -194,7 +190,7 @@ void GroundPlaneTracker::GetGround(float *pitch, float *cam_height) {
 
 void GroundPlaneTracker::Restart() {
   unsigned int track_length =
-    static_cast<unsigned int>(pitch_height_inlier_tracks_.size() / 3);
+      static_cast<unsigned int>(pitch_height_inlier_tracks_.size() / 3);
   auto &data = pitch_height_inlier_tracks_;
   unsigned int i = 0;
   for (; i < track_length; ++i) {
@@ -206,7 +202,7 @@ void GroundPlaneTracker::Restart() {
 }
 
 void CameraGroundPlaneParams::SetDefault() {
-  min_nr_samples = 6;  // 40
+  min_nr_samples = 6;   // 40
   nr_frames_track = 3;  // 2
   max_tilt_angle = common::IDegreeToRadians(10.0f);
   max_camera_ground_height = 2.5f;
@@ -217,10 +213,8 @@ void CameraGroundPlaneParams::SetDefault() {
   thres_inlier_plane_fitting = 0.0035f;  // in reversed depth, 3m@30m
 }
 
-bool CameraGroundPlaneDetector::DetetGround(float pitch,
-                                            float camera_height,
-                                            float *vd,
-                                            int count_vd,
+bool CameraGroundPlaneDetector::DetetGround(float pitch, float camera_height,
+                                            float *vd, int count_vd,
                                             const std::vector<float> &plane) {
   ground_is_valid_ = false;
 
@@ -228,29 +222,26 @@ bool CameraGroundPlaneDetector::DetetGround(float pitch,
   std::vector<float> k_mat(k_mat_, k_mat_ + 9);
 
   if (!plane.empty()) {  // assigned from outside
-//    GetGeneralGroundPlaneModelReversed(k_mat_, baseline_, plane.data(), l_);
+    //    GetGeneralGroundPlaneModelReversed(k_mat_, baseline_, plane.data(),
+    //    l_);
     ConvertGround4ToGround3(baseline_, k_mat, plane, &ground3);
     FillGroundModel(ground3);
-    AINFO << "set ground plane from outside: "
-             << plane[0] << ", "
-             << plane[1] << ", "
-             << plane[2] << ", "
-             << plane[3];
+    AINFO << "set ground plane from outside: " << plane[0] << ", " << plane[1]
+          << ", " << plane[2] << ", " << plane[3];
     ground_is_valid_ = true;
     return true;
   } else {
     bool success = false;
     float inlier_ratio = 0.0f;
     std::vector<float> ph(2, 0);
-    if (CameraGroundPlaneDetector::DetectGroundFromSamples(vd,
-                                                           count_vd,
+    if (CameraGroundPlaneDetector::DetectGroundFromSamples(vd, count_vd,
                                                            &inlier_ratio)) {
       ADEBUG << "l: " << l_[0] << ", " << l_[1] << ", " << l_[2];
       ground3.assign(l_, l_ + 3);
       GetGroundPlanePitchHeight(baseline_, k_mat, ground3, &ph[0], &ph[1]);
       ADEBUG << "ph: " << ph[0] << ", " << ph[1];
-      success = fabs(ph[0]) < params_.max_tilt_angle
-          && ph[1] < params_.max_camera_ground_height;
+      success = fabs(ph[0]) < params_.max_tilt_angle &&
+                ph[1] < params_.max_camera_ground_height;
       if (success) {
         ground_plane_tracker_->Push(ph, inlier_ratio);
         ground_plane_tracker_->GetGround(&ph[0], &ph[1]);
@@ -276,10 +267,7 @@ bool CameraGroundPlaneDetector::DetetGround(float pitch,
       CHECK(fabs(pitch) < params_.max_tilt_angle);
       CHECK(camera_height < params_.max_camera_ground_height);
       CHECK_GT(camera_height, 0.f);
-      GetGround3FromPitchHeight(k_mat,
-                                baseline_,
-                                pitch,
-                                camera_height,
+      GetGround3FromPitchHeight(k_mat, baseline_, pitch, camera_height,
                                 &ground3);
       FillGroundModel(ground3);
     }
@@ -288,8 +276,7 @@ bool CameraGroundPlaneDetector::DetetGround(float pitch,
   }
 }
 
-bool CameraGroundPlaneDetector::DetectGroundFromSamples(float *vd,
-                                                        int count_vd,
+bool CameraGroundPlaneDetector::DetectGroundFromSamples(float *vd, int count_vd,
                                                         float *inlier_ratio) {
   CHECK(vd != nullptr);
   CHECK(inlier_ratio != nullptr);
@@ -314,24 +301,11 @@ bool CameraGroundPlaneDetector::DetectGroundFromSamples(float *vd,
   memset(inliers, 0, sizeof(int) * count_vd * 2);
   float p[2] = {0};
 
-  if (!common::RobustBinaryFitRansac<float,
-                                  1,
-                                  1,
-                                  2,
-                                  2,
-                                  GroundHypoGenFunc<float>,
-                                  GroundFittingCostFunc<float>,
-                                  nullptr>(vs,
-                                           ds,
-                                           count_vd,
-                                           p,
-                                           &nr_inliers,
-                                           inliers,
-                                           kThresInlier,
-                                           false,
-                                           true,
-                                           0.99f,
-                                           kMinInlierRatio)) {
+  if (!common::RobustBinaryFitRansac<float, 1, 1, 2, 2,
+                                     GroundHypoGenFunc<float>,
+                                     GroundFittingCostFunc<float>, nullptr>(
+          vs, ds, count_vd, p, &nr_inliers, inliers, kThresInlier, false, true,
+          0.99f, kMinInlierRatio)) {
     memset(l_, 0, sizeof(float) * 3);
     return false;
   } else {

@@ -16,7 +16,6 @@
 
 #include "modules/perception/common/perception_gflags.h"
 
-
 namespace apollo {
 namespace perception {
 
@@ -31,8 +30,7 @@ DEFINE_bool(enable_base_object_pool, false, "Enable base object pool.");
 
 // config_manager
 DEFINE_string(config_manager_path, "./conf", "The ModelConfig config paths.");
-DEFINE_string(work_root, "",
-              "Project work root direcotry.");
+DEFINE_string(work_root, "", "Project work root direcotry.");
 
 }  // namespace perception
 }  // namespace apollo

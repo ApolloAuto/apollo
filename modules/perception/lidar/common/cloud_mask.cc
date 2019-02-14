@@ -19,8 +19,8 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using base::PointF;
 using base::AttributePointCloud;
+using base::PointF;
 
 size_t CloudMask::ValidIndicesCount() const {
   size_t count = 0;

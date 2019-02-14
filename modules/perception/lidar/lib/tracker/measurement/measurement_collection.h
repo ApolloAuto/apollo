@@ -25,30 +25,26 @@ namespace lidar {
 // @params [in/out]: new object for current updating
 // @params [in]: old object for last updating
 // @params [in]: time interval from last updating
-void MeasureAnchorPointVelocity(
-    TrackedObjectPtr new_object,
-    const TrackedObjectConstPtr& old_object,
-    const double& time_diff);
+void MeasureAnchorPointVelocity(TrackedObjectPtr new_object,
+                                const TrackedObjectConstPtr& old_object,
+                                const double& time_diff);
 
 // @brief: measure bbox center velocity
 // @params [in/out]: new object for current updating
 // @params [in]: old object for last updating
 // @params [in]: time interval from last updating
-void MeasureBboxCenterVelocity(
-    TrackedObjectPtr new_object,
-    const TrackedObjectConstPtr& old_object,
-    const double& time_diff);
+void MeasureBboxCenterVelocity(TrackedObjectPtr new_object,
+                               const TrackedObjectConstPtr& old_object,
+                               const double& time_diff);
 
 // @brief: measure bbox corner velocity
 // @params [in/out]: new object for current updating
 // @params [in]: old object for last updating
 // @params [in]: time interval from last updating
-void MeasureBboxCornerVelocity(
-    TrackedObjectPtr new_object,
-    const TrackedObjectConstPtr& old_object,
-    const double& time_diff);
+void MeasureBboxCornerVelocity(TrackedObjectPtr new_object,
+                               const TrackedObjectConstPtr& old_object,
+                               const double& time_diff);
 
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-

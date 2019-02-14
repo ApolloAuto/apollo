@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/omt/obstacle_reference.h"
 
 #include "cyber/common/file.h"
@@ -31,17 +31,17 @@ TEST(RefTest, update_test) {
   // Init object template
   ObjectTemplateManagerInitOptions object_template_init_options;
   object_template_init_options.root_dir =
-    "/apollo/modules/perception/testdata/"
-    "camera/app/data/perception/camera/common/object_template/";
+      "/apollo/modules/perception/testdata/"
+      "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
   CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   ObstacleReference ref;
   omt::OmtParam omt_param;
   std::string omt_config = apollo::cyber::common::GetAbsolutePath(
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/tracker/omt/data/models/omt_obstacle_tracker",
-    "config.pt");
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/obstacle/tracker/omt/data/models/omt_obstacle_tracker",
+      "config.pt");
   CHECK(apollo::cyber::common::GetProtoFromFile(omt_config, &omt_param));
   ref.Init(omt_param.reference(), 1920.0f, 1080.0f);
   std::string sensor_name = "onsemi_obstacle";

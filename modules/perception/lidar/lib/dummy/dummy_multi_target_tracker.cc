@@ -58,8 +58,8 @@ bool DummyMultiTargetTracker::Track(const MultiTargetTrackerOptions& options,
     common::TransformPointCloud(pose, &obj->lidar_supplement.cloud_world);
     common::TransformPointCloud(
         pose, (base::AttributePointCloud<base::PointD>*)&obj->polygon);
-    obj->theta = static_cast<float>(atan2(obj->direction[1],
-                                    obj->direction[0]));
+    obj->theta =
+        static_cast<float>(atan2(obj->direction[1], obj->direction[0]));
   }
   return true;
 }

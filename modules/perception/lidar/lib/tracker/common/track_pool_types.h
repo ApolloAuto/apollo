@@ -33,11 +33,8 @@ struct TrackDataInitializer {
 };
 
 struct MlfTrackDataInitializer {
-  void operator()(MlfTrackData* data) const {
-    data->Reset();
-  }
+  void operator()(MlfTrackData* data) const { data->Reset(); }
 };
-
 
 static const size_t kTrackedObjectPoolSize = 20000;
 static const size_t kTrackDataPoolSize = 1000;
@@ -49,8 +46,9 @@ typedef base::ConcurrentObjectPool<TrackedObject, kTrackedObjectPoolSize,
 typedef base::ConcurrentObjectPool<TrackData, kTrackDataPoolSize,
                                    TrackDataInitializer>
     TrackDataPool;
-typedef base::ConcurrentObjectPool<MlfTrackData,
-        kTrackDataPoolSize, MlfTrackDataInitializer> MlfTrackDataPool;
+typedef base::ConcurrentObjectPool<MlfTrackData, kTrackDataPoolSize,
+                                   MlfTrackDataInitializer>
+    MlfTrackDataPool;
 
 }  // namespace lidar
 }  // namespace perception

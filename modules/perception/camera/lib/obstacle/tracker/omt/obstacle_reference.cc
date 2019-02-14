@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/omt/obstacle_reference.h"
 
 #include <algorithm>
@@ -30,12 +30,12 @@ void ObstacleReference::Init(const omt::ReferenceParam &ref_param, float width,
   ref_param_ = ref_param;
   img_width_ = width;
   img_height_ = height;
-  ref_width_ = static_cast<int>
-               (width / static_cast<float>(ref_param.down_sampling()) + 1);
-  ref_height_ = static_cast<int>
-               (height / static_cast<float>(ref_param.down_sampling()) + 1);
-  static const float k = static_cast<float>(ref_height_) /
-                         static_cast<float>(ref_width_);
+  ref_width_ = static_cast<int>(
+      width / static_cast<float>(ref_param.down_sampling()) + 1);
+  ref_height_ = static_cast<int>(
+      height / static_cast<float>(ref_param.down_sampling()) + 1);
+  static const float k =
+      static_cast<float>(ref_height_) / static_cast<float>(ref_width_);
   static const float b = static_cast<float>(ref_height_);
   init_ref_map_.resize(ref_height_);
   for (int y = 0; y < ref_height_; ++y) {
@@ -92,8 +92,8 @@ void ObstacleReference::UpdateReference(const CameraFrame *frame,
     float x = box.Center().x;
     float y = box.ymax;
 
-    AINFO << "Target: " << target.id << " can be Ref. Type: "
-             << base::kSubType2NameMap.at(obj->sub_type);
+    AINFO << "Target: " << target.id
+          << " can be Ref. Type: " << base::kSubType2NameMap.at(obj->sub_type);
     int y_discrete =
         static_cast<int>(y / static_cast<float>(ref_param_.down_sampling()));
     int x_discrete =
@@ -143,9 +143,9 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
   for (auto &obj : frame->detected_objects) {
     float volume_object = obj->size[0] * obj->size[1] * obj->size[2];
     ADEBUG << "Det " << frame->frame_id << " (" << obj->id << ") "
-              << "ori size:" << obj->size.transpose() << " "
-              << "type: " << static_cast<int>(obj->sub_type) << " "
-              << volume_object << " " << frame->data_provider->sensor_name();
+           << "ori size:" << obj->size.transpose() << " "
+           << "type: " << static_cast<int>(obj->sub_type) << " "
+           << volume_object << " " << frame->data_provider->sensor_name();
     base::CameraObjectSupplement &supplement = obj->camera_supplement;
 
     if (Contain(object_template_manager_->TypeRefinedByTemplate(),
@@ -203,8 +203,7 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
             static_cast<int>(supplement.box.ymax), &z_calib);
         if (success) {
           z_calib = std::max(z_calib, z_obj);
-          float k2 = static_cast<float>(
-                         z_calib / frame->camera_k_matrix(1, 1));
+          float k2 = static_cast<float>(z_calib / frame->camera_k_matrix(1, 1));
           float h = k2 * (supplement.box.ymax - supplement.box.ymin);
           h = std::max(std::min(h, kMaxTemplateHWL.at(obj->sub_type).at(0)),
                        kMinTemplateHWL.at(obj->sub_type).at(0));
@@ -224,10 +223,9 @@ void ObstacleReference::CorrectSize(CameraFrame *frame) {
           // pick out the refs close enough in y directions
           float dy = std::abs(reference.ymax - supplement.box.ymax);
           float scale_y = (supplement.box.ymax - cy) / (img_height_ - cy);
-          float thres_dy = std::max(
-                             static_cast<float>(ref_param_.down_sampling()) *
-                             scale_y,
-                             static_cast<float>(ref_param_.margin()) * 2.0f);
+          float thres_dy =
+              std::max(static_cast<float>(ref_param_.down_sampling()) * scale_y,
+                       static_cast<float>(ref_param_.margin()) * 2.0f);
           if (dy < thres_dy) {
             float k2 = reference.k;
             k2 *= (reference.ymax - cy) / (supplement.box.ymax - cy);

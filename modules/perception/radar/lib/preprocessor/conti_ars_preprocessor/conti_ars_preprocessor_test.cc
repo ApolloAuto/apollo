@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include <gtest/gtest.h>
 
 #include "modules/perception/common/perception_gflags.h"
@@ -27,9 +27,8 @@ using drivers::ContiRadarObs;
 
 class ContiArsPreprocessorTest : public testing::Test {
  public:
-  void SetMaxRadarIdx() {
-    preprocessor.current_idx_ = MAX_RADAR_IDX - 1;
-  }
+  void SetMaxRadarIdx() { preprocessor.current_idx_ = MAX_RADAR_IDX - 1; }
+
  protected:
   ContiArsPreprocessor preprocessor;
 };
@@ -37,7 +36,8 @@ class ContiArsPreprocessorTest : public testing::Test {
 TEST_F(ContiArsPreprocessorTest, init) {
   float delay_time = static_cast<float>(preprocessor.GetDelayTime());
   EXPECT_FLOAT_EQ(delay_time, 0.0);
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/"
       "radar/preprocessor";
   bool init_result = preprocessor.Init();
   EXPECT_TRUE(init_result);

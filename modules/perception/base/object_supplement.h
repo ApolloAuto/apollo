@@ -216,7 +216,6 @@ typedef boost::circular_buffer<Vehicle3DStatus> Motion3DBuffer;
 typedef std::shared_ptr<Motion3DBuffer> Motion3DBufferPtr;
 typedef std::shared_ptr<const Motion3DBuffer> Motion3DBufferConstPtr;
 
-
 struct SensorObjectMeasurement {
   void Reset() {
     sensor_id = "unknonw_sensor";

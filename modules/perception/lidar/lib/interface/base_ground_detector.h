@@ -25,11 +25,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct GroundDetectorInitOptions {
-};
+struct GroundDetectorInitOptions {};
 
-struct GroundDetectorOptions {
-};
+struct GroundDetectorOptions {};
 
 class BaseGroundDetector {
  public:
@@ -37,8 +35,8 @@ class BaseGroundDetector {
 
   virtual ~BaseGroundDetector() = default;
 
-  virtual bool Init(const GroundDetectorInitOptions&
-                        options = GroundDetectorInitOptions()) = 0;
+  virtual bool Init(const GroundDetectorInitOptions& options =
+                        GroundDetectorInitOptions()) = 0;
 
   // @brief: detect ground points from point cloud.
   // @param [in]: options

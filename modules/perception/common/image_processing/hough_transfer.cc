@@ -42,10 +42,8 @@ bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
   img_h_ = img_h;
   d_r_ = d_r;
   d_theta_ = static_cast<float>(M_PI) * d_theta / 180.0f;
-  r_size_ = static_cast<int>(2 *
-                             sqrtf(static_cast<float>(img_w_ * img_w_ +
-                                                      img_h_ * img_h_))
-                            / d_r_);
+  r_size_ = static_cast<int>(
+      2 * sqrtf(static_cast<float>(img_w_ * img_w_ + img_h_ * img_h_)) / d_r_);
   theta_size_ = static_cast<int>(M_PI / d_theta_);
 
   ClearWithShrink();
@@ -62,8 +60,9 @@ bool HoughTransfer::Init(int img_w, int img_h, float d_r, float d_theta) {
     for (int img_pos = 0; img_pos < img_w_ * img_h_; ++img_pos) {
       int w = img_pos % img_w_;
       int h = img_pos / img_w_;
-      int r = static_cast<int>((cos(cur_theta) * w + sin(cur_theta) * h)
-                               / d_r_) + r_size_ / 2;
+      int r =
+          static_cast<int>((cos(cur_theta) * w + sin(cur_theta) * h) / d_r_) +
+          r_size_ / 2;
       if (0 <= r && r < r_size_) {
         query_map_[img_pos][theta_idx] = r * theta_size_ + theta_idx;
       }
@@ -159,8 +158,8 @@ bool HoughTransfer::GetLines(int min_pt_num, int r_neibor, int theta_neibor,
 unsigned int HoughTransfer::MemoryConsume() const {
   unsigned int size = 0;
   if (is_prepared()) {
-    size += static_cast<unsigned int>(vote_map_.capacity() *
-                                      sizeof(vote_map_[0]));
+    size +=
+        static_cast<unsigned int>(vote_map_.capacity() * sizeof(vote_map_[0]));
     size += static_cast<unsigned int>(query_map_.capacity() *
                                       sizeof(query_map_[0]));
     size += static_cast<unsigned int>(theta_size_ * query_map_.size() *
@@ -263,10 +262,9 @@ bool HoughTransfer::VotePosToHoughLine(int vote_pos, bool with_distribute,
     const int start_y = start_pos / img_w_;
     const int end_x = end_pos % img_w_;
     const int end_y = end_pos / img_w_;
-    out_line->length = sqrtf(static_cast<float>((start_x - end_x) *
-                                                (start_x - end_x) +
-                                                (start_y - end_y) *
-                                                (start_y - end_y)));
+    out_line->length =
+        sqrtf(static_cast<float>((start_x - end_x) * (start_x - end_x) +
+                                 (start_y - end_y) * (start_y - end_y)));
   }
   return true;
 }

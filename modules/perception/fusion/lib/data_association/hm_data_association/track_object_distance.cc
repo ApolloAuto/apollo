@@ -39,10 +39,11 @@ double TrackObjectDistance::s_lidar2radar_association_center_dist_threshold_ =
     10.0;
 double TrackObjectDistance::s_radar2radar_association_center_dist_threshold_ =
     10.0;
-size_t TrackObjectDistance::s_lidar2camera_projection_downsample_target_pts_num_
-    = 100;
-size_t TrackObjectDistance::s_lidar2camera_projection_vertices_check_pts_num_
-    = 20;
+size_t
+    TrackObjectDistance::s_lidar2camera_projection_downsample_target_pts_num_ =
+        100;
+size_t TrackObjectDistance::s_lidar2camera_projection_vertices_check_pts_num_ =
+    20;
 
 void TrackObjectDistance::GetModified2DRadarBoxVertices(
     const std::vector<Eigen::Vector3d>& radar_box_vertices,
@@ -96,13 +97,10 @@ bool TrackObjectDistance::QueryLidar2WorldPose(
 }
 
 ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
-    const SensorObjectConstPtr& lidar,
-    const SensorObjectConstPtr& camera,
+    const SensorObjectConstPtr& lidar, const SensorObjectConstPtr& camera,
     const base::BaseCameraModelPtr& camera_model,
-    const std::string& measurement_sensor_id,
-    double measurement_timestamp,
-    const std::string& projection_sensor_id,
-    double projection_timestamp) {
+    const std::string& measurement_sensor_id, double measurement_timestamp,
+    const std::string& projection_sensor_id, double projection_timestamp) {
   // 1. get lidar2camera_pose
   Eigen::Matrix4d world2camera_pose;
   if (!QueryWorld2CameraPose(camera, &world2camera_pose)) {
@@ -113,8 +111,8 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
     return nullptr;
   }
   Eigen::Matrix4d lidar2camera_pose =
-    static_cast<Eigen::Matrix<double, 4, 4, 0, 4, 4>>
-    (world2camera_pose * lidar2world_pose);
+      static_cast<Eigen::Matrix<double, 4, 4, 0, 4, 4>>(world2camera_pose *
+                                                        lidar2world_pose);
   // 2. compute offset
   double time_diff = camera->GetTimestamp() - lidar->GetTimestamp();
   Eigen::Vector3d offset =
@@ -126,8 +124,8 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
   double height = static_cast<double>(camera_model->get_height());
   const int& lidar_object_id = lidar->GetBaseObject()->id;
   ProjectionCacheObject* cache_object = projection_cache_.BuildObject(
-      measurement_sensor_id, measurement_timestamp,
-      projection_sensor_id, projection_timestamp, lidar_object_id);
+      measurement_sensor_id, measurement_timestamp, projection_sensor_id,
+      projection_timestamp, lidar_object_id);
   if (cache_object == nullptr) {
     AERROR << "Failed to build projection cache object";
     return nullptr;
@@ -149,15 +147,14 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
     for (size_t i = 0; i < lidar_box_vertices.size(); ++i) {
       Eigen::Vector3d& vt = lidar_box_vertices[i];
       Eigen::Vector4d project_vt =
-          static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
-          (world2camera_pose * Eigen::Vector4d(vt(0) + offset(0),
-                                               vt(1) + offset(1),
-                                               vt(2) + offset(2), 1.0));
+          static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
+              world2camera_pose * Eigen::Vector4d(vt(0) + offset(0),
+                                                  vt(1) + offset(1),
+                                                  vt(2) + offset(2), 1.0));
       if (project_vt(2) <= 0) continue;
-      Eigen::Vector2f project_vt2f = camera_model->Project(
-          Eigen::Vector3f(static_cast<float>(project_vt(0)),
-                          static_cast<float>(project_vt(1)),
-                          static_cast<float>(project_vt(2))));
+      Eigen::Vector2f project_vt2f = camera_model->Project(Eigen::Vector3f(
+          static_cast<float>(project_vt(0)), static_cast<float>(project_vt(1)),
+          static_cast<float>(project_vt(2))));
       if (!IsPtInFrustum(project_vt2f, width, height)) continue;
       is_all_lidar_3d_vertices_outside_frustum = false;
       break;
@@ -169,22 +166,21 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
     // 5.1 check whehter downsampling needed
     size_t every_n = 1;
     if (cloud.size() > s_lidar2camera_projection_downsample_target_pts_num_) {
-      every_n = cloud.size() /
-                s_lidar2camera_projection_downsample_target_pts_num_;
+      every_n =
+          cloud.size() / s_lidar2camera_projection_downsample_target_pts_num_;
     }
     for (size_t i = 0; i < cloud.size(); ++i) {
       if ((every_n > 1) && (i % every_n != 0)) continue;
       const base::PointF& pt = cloud.at(i);
       Eigen::Vector4d project_pt =
-          static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
-          (lidar2camera_pose * Eigen::Vector4d(pt.x + offset(0),
-                                               pt.y + offset(1),
-                                               pt.z + offset(2), 1.0));
+          static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
+              lidar2camera_pose * Eigen::Vector4d(pt.x + offset(0),
+                                                  pt.y + offset(1),
+                                                  pt.z + offset(2), 1.0));
       if (project_pt(2) <= 0) continue;
-      Eigen::Vector2f project_pt2f = camera_model->Project(
-          Eigen::Vector3f(static_cast<float>(project_pt(0)),
-                          static_cast<float>(project_pt(1)),
-                          static_cast<float>(project_pt(2))));
+      Eigen::Vector2f project_pt2f = camera_model->Project(Eigen::Vector3f(
+          static_cast<float>(project_pt(0)), static_cast<float>(project_pt(1)),
+          static_cast<float>(project_pt(2))));
       if (!IsPtInFrustum(project_pt2f, width, height)) continue;
       if (project_pt2f.x() < xmin) xmin = project_pt2f.x();
       if (project_pt2f.y() < ymin) ymin = project_pt2f.y();
@@ -202,8 +198,7 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
 }
 
 ProjectionCacheObject* TrackObjectDistance::QueryProjectionCacheObject(
-    const SensorObjectConstPtr& lidar,
-    const SensorObjectConstPtr& camera,
+    const SensorObjectConstPtr& lidar, const SensorObjectConstPtr& camera,
     const base::BaseCameraModelPtr& camera_model,
     const bool measurement_is_lidar) {
   // 1. try to query existed projection cache object
@@ -217,12 +212,12 @@ ProjectionCacheObject* TrackObjectDistance::QueryProjectionCacheObject(
       measurement_is_lidar ? camera->GetTimestamp() : lidar->GetTimestamp();
   const int& lidar_object_id = lidar->GetBaseObject()->id;
   ProjectionCacheObject* cache_object = projection_cache_.QueryObject(
-      measurement_sensor_id, measurement_timestamp,
-      projection_sensor_id, projection_timestamp, lidar_object_id);
+      measurement_sensor_id, measurement_timestamp, projection_sensor_id,
+      projection_timestamp, lidar_object_id);
   if (cache_object != nullptr) return cache_object;
   // 2. if query failed, build projection and cache it
-  return BuildProjectionCacheObject(lidar, camera, camera_model,
-      measurement_sensor_id, measurement_timestamp,
+  return BuildProjectionCacheObject(
+      lidar, camera, camera_model, measurement_sensor_id, measurement_timestamp,
       projection_sensor_id, projection_timestamp);
 }
 
@@ -234,10 +229,10 @@ void TrackObjectDistance::QueryProjectedVeloCtOnCamera(
       velodyne64->GetBaseObject()->velocity.cast<double>() * time_diff;
   const Eigen::Vector3d& velo_ct = velodyne64->GetBaseObject()->center;
   Eigen::Vector4d projected_ct_4d =
-      static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
-      (lidar2camera_pose * Eigen::Vector4d(velo_ct[0] + offset[0],
-                                           velo_ct[1] + offset[1],
-                                           velo_ct[2] + offset[2], 1.0));
+      static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
+          lidar2camera_pose * Eigen::Vector4d(velo_ct[0] + offset[0],
+                                              velo_ct[1] + offset[1],
+                                              velo_ct[2] + offset[2], 1.0));
   *projected_ct = projected_ct_4d.head(3);
 }
 
@@ -450,8 +445,8 @@ float TrackObjectDistance::ComputeLidarCamera(
     return distance;
   }
   Eigen::Matrix4d lidar2camera_pose =
-    static_cast<Eigen::Matrix<double, 4, 4, 0, 4, 4>>
-    (world2camera_pose * lidar2world_pose);
+      static_cast<Eigen::Matrix<double, 4, 4, 0, 4, 4>>(world2camera_pose *
+                                                        lidar2world_pose);
   // 2. compute distance of camera vs. lidar observation
   const base::PointFCloud& cloud =
       lidar->GetBaseObject()->lidar_supplement.cloud;
@@ -470,26 +465,25 @@ float TrackObjectDistance::ComputeLidarCamera(
       AERROR << "Failed to query projection cached object";
       return distance;
     }
-    double similarity = ComputePtsBoxSimilarity(&projection_cache_,
-        cache_object, camera_bbox);
+    double similarity =
+        ComputePtsBoxSimilarity(&projection_cache_, cache_object, camera_bbox);
     distance =
-        distance_thresh_ *
-        ((1.0f - static_cast<float>(similarity)) /
-         (1.0f - vc_similarity2distance_penalize_thresh_));
+        distance_thresh_ * ((1.0f - static_cast<float>(similarity)) /
+                            (1.0f - vc_similarity2distance_penalize_thresh_));
   } else {
     // 2.2 if cloud is empty, calculate distance according to ct diff
     Eigen::Vector3d projected_velo_ct;
     QueryProjectedVeloCtOnCamera(lidar, camera, lidar2camera_pose,
                                  &projected_velo_ct);
     if (projected_velo_ct[2] > 0) {
-      Eigen::Vector2f project_pt2f = camera_model->Project(Eigen::Vector3f(
-          static_cast<float>(projected_velo_ct[0]),
-          static_cast<float>(projected_velo_ct[1]),
-          static_cast<float>(projected_velo_ct[2])));
+      Eigen::Vector2f project_pt2f = camera_model->Project(
+          Eigen::Vector3f(static_cast<float>(projected_velo_ct[0]),
+                          static_cast<float>(projected_velo_ct[1]),
+                          static_cast<float>(projected_velo_ct[2])));
       Eigen::Vector2d project_pt2d = project_pt2f.cast<double>();
       Eigen::Vector2d ct_diff = project_pt2d - box2d_ct;
-      distance = static_cast<float>(ct_diff.norm()) *
-        vc_diff2distance_scale_factor_;
+      distance =
+          static_cast<float>(ct_diff.norm()) * vc_diff2distance_scale_factor_;
     } else {
       distance = std::numeric_limits<float>::max();
     }
@@ -531,10 +525,9 @@ float TrackObjectDistance::ComputeRadarCamera(
       radar->GetBaseObject()->velocity.cast<double>() * time_diff;
   offset.setZero();
   Eigen::Vector3d radar_ct = radar->GetBaseObject()->center + offset;
-  Eigen::Vector4d local_pt =
-      static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
-      (world2camera_pose *
-       Eigen::Vector4d(radar_ct[0], radar_ct[1], radar_ct[2], 1.0));
+  Eigen::Vector4d local_pt = static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
+      world2camera_pose *
+      Eigen::Vector4d(radar_ct[0], radar_ct[1], radar_ct[2], 1.0));
   std::vector<Eigen::Vector3d> radar_box_vertices;
   GetObjectEightVertices(radar->GetBaseObject(), &radar_box_vertices);
   std::vector<Eigen::Vector2d> radar_box2d_vertices;
@@ -544,10 +537,9 @@ float TrackObjectDistance::ComputeRadarCamera(
   double fused_similarity = 0.0;
   if (local_pt[2] > 0) {
     Eigen::Vector3f pt3f;
-    pt3f << camera_model->Project(
-        Eigen::Vector3f(static_cast<float>(local_pt[0]),
-                        static_cast<float>(local_pt[1]),
-                        static_cast<float>(local_pt[2]))),
+    pt3f << camera_model->Project(Eigen::Vector3f(
+        static_cast<float>(local_pt[0]), static_cast<float>(local_pt[1]),
+        static_cast<float>(local_pt[2]))),
         static_cast<float>(local_pt[2]);
     Eigen::Vector3d pt3d = pt3f.cast<double>();
     if (IsPtInFrustum(pt3d, width, height)) {
@@ -634,8 +626,8 @@ double TrackObjectDistance::ComputeLidarCameraSimilarity(
     if (cache_object == nullptr) {
       return similarity;
     }
-    similarity = ComputePtsBoxSimilarity(&projection_cache_,
-                                         cache_object, camera_bbox);
+    similarity =
+        ComputePtsBoxSimilarity(&projection_cache_, cache_object, camera_bbox);
   }
   return similarity;
 }
@@ -673,10 +665,9 @@ double TrackObjectDistance::ComputeRadarCameraSimilarity(
   double height = static_cast<double>(camera_model->get_height());
   // 3. get information of radar
   Eigen::Vector3d radar_ct = radar->GetBaseObject()->center;
-  Eigen::Vector4d local_pt =
-      static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
-      (world2camera_pose *
-       Eigen::Vector4d(radar_ct[0], radar_ct[1], radar_ct[2], 1.0));
+  Eigen::Vector4d local_pt = static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
+      world2camera_pose *
+      Eigen::Vector4d(radar_ct[0], radar_ct[1], radar_ct[2], 1.0));
   // 4. similarity computation
   Eigen::Vector3d camera_ct = camera->GetBaseObject()->center;
   Eigen::Vector3d camera_ct_c =
@@ -686,9 +677,9 @@ double TrackObjectDistance::ComputeRadarCameraSimilarity(
   depth_diff /= camera_ct_c.z();
   if (local_pt[2] > 0 && depth_diff > -depth_diff_th) {
     Eigen::Vector3f pt3f;
-    pt3f << camera_model->Project(
-        Eigen::Vector3f(static_cast<float>(local_pt[0]),
-          static_cast<float>(local_pt[1]), static_cast<float>(local_pt[2]))),
+    pt3f << camera_model->Project(Eigen::Vector3f(
+        static_cast<float>(local_pt[0]), static_cast<float>(local_pt[1]),
+        static_cast<float>(local_pt[2]))),
         static_cast<float>(local_pt[2]);
     Eigen::Vector3d pt3d = pt3f.cast<double>();
     if (IsPtInFrustum(pt3d, width, height)) {
@@ -739,7 +730,7 @@ float TrackObjectDistance::ComputeEuclideanDistance(
     const Eigen::Vector3d& des, const Eigen::Vector3d& src) {
   Eigen::Vector3d diff_pos = des - src;
   float distance = static_cast<float>(
-    std::sqrt(diff_pos.head(2).cwiseProduct(diff_pos.head(2)).sum()));
+      std::sqrt(diff_pos.head(2).cwiseProduct(diff_pos.head(2)).sum()));
   return distance;
 }
 

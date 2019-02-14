@@ -25,9 +25,9 @@ namespace perception {
 namespace lidar {
 
 using base::Object;
-using base::PointF;
-using base::PointD;
 using base::PointCloud;
+using base::PointD;
+using base::PointF;
 
 void GetBoundingBox2d(const std::shared_ptr<Object>& object,
                       PointCloud<PointD>* box, double expand) {

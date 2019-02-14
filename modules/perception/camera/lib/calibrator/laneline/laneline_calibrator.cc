@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/calibrator/laneline/laneline_calibrator.h"
 
 namespace apollo {
@@ -53,11 +53,9 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
   };
 
   ADEBUG << "c2w transform this frame:\n"
-            << p2w[0] << ", " << p2w[1] << ", " << p2w[2] << ", " << p2w[3]
-            << "\n"
-            << p2w[4] << ", " << p2w[5] << ", " << p2w[6] << ", " << p2w[7]
-            << "\n"
-            << p2w[8] << ", " << p2w[9] << ", " << p2w[10] << ", " << p2w[11];
+         << p2w[0] << ", " << p2w[1] << ", " << p2w[2] << ", " << p2w[3] << "\n"
+         << p2w[4] << ", " << p2w[5] << ", " << p2w[6] << ", " << p2w[7] << "\n"
+         << p2w[8] << ", " << p2w[9] << ", " << p2w[10] << ", " << p2w[11];
 
   common::IMultAx3x4(p2w, cam_ori, cam_coord_cur_);
   time_diff_ = kTimeDiffDefault;
@@ -68,13 +66,12 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
   if (!is_first_frame_) {
     time_diff_ = fabsf(static_cast<float>(timestamp_cur_ - timestamp_pre_));
     ADEBUG << timestamp_cur_ << " " << timestamp_pre_ << std::endl;
-    camera::GetYawVelocityInfo(
-        time_diff_, cam_coord_cur_, cam_coord_pre_, cam_coord_pre_pre_,
-        &yaw_rate_, &velocity_);
+    camera::GetYawVelocityInfo(time_diff_, cam_coord_cur_, cam_coord_pre_,
+                               cam_coord_pre_pre_, &yaw_rate_, &velocity_);
     std::string timediff_yawrate_velocity_text =
         "time_diff_: " + std::to_string(time_diff_).substr(0, 4) + " | " +
-            "yaw_rate_: " + std::to_string(yaw_rate_).substr(0, 4) + " | " +
-            "velocity_: " + std::to_string(velocity_).substr(0, 4);
+        "yaw_rate_: " + std::to_string(yaw_rate_).substr(0, 4) + " | " +
+        "velocity_: " + std::to_string(velocity_).substr(0, 4);
     ADEBUG << timediff_yawrate_velocity_text << std::endl;
   }
 
@@ -97,15 +94,13 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
 }
 
 bool LaneLineCalibrator::LoadEgoLaneline(
-                            const std::vector<base::LaneLine>  &lane_objects,
-                                         EgoLane *ego_lane) {
+    const std::vector<base::LaneLine> &lane_objects, EgoLane *ego_lane) {
   CHECK(ego_lane != nullptr);
   bool found_ego_left = false;
   bool found_ego_right = false;
   // using points from model fitting
   for (size_t i = 0; i < lane_objects.size(); ++i) {
-    if (lane_objects[i].pos_type ==
-        base::LaneLinePositionType::EGO_LEFT) {
+    if (lane_objects[i].pos_type == base::LaneLinePositionType::EGO_LEFT) {
       int num_points =
           static_cast<int>(lane_objects[i].curve_image_point_set.size());
       ego_lane->left_line.lane_point.resize(num_points);
@@ -116,15 +111,14 @@ bool LaneLineCalibrator::LoadEgoLaneline(
       for (int j = 0; j < num_points; ++j) {
         y_curve = lane_objects[i].curve_image_point_set[j].y;
         x_curve = curve.a * common::ICub(y_curve) +
-            curve.b * common::ISqr(y_curve) + curve.c * y_curve + curve.d;
+                  curve.b * common::ISqr(y_curve) + curve.c * y_curve + curve.d;
         x_raw = lane_objects[i].curve_image_point_set[j].x;
         ego_lane->left_line.lane_point[j](1) = y_curve;
         ego_lane->left_line.lane_point[j](0) = (x_curve + x_raw) / 2;
       }
       found_ego_left = true;
     }
-    if (lane_objects[i].pos_type ==
-        base::LaneLinePositionType::EGO_RIGHT) {
+    if (lane_objects[i].pos_type == base::LaneLinePositionType::EGO_RIGHT) {
       int num_points =
           static_cast<int>(lane_objects[i].curve_image_point_set.size());
       ego_lane->right_line.lane_point.resize(num_points);
@@ -135,7 +129,7 @@ bool LaneLineCalibrator::LoadEgoLaneline(
       for (int j = 0; j < num_points; ++j) {
         y_curve = lane_objects[i].curve_image_point_set[j].y;
         x_curve = curve.a * common::ICub(y_curve) +
-            curve.b * common::ISqr(y_curve) + curve.c * y_curve + curve.d;
+                  curve.b * common::ISqr(y_curve) + curve.c * y_curve + curve.d;
         x_raw = lane_objects[i].curve_image_point_set[j].x;
         ego_lane->right_line.lane_point[j](1) = y_curve;
         ego_lane->right_line.lane_point[j](0) = (x_curve + x_raw) / 2;

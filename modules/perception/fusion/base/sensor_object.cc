@@ -25,22 +25,19 @@ namespace fusion {
 
 // SensorObject implementations
 SensorObject::SensorObject(
-    const std::shared_ptr<const base::Object>& object_ptr):
-    object_(object_ptr), frame_header_(nullptr) {
-}
+    const std::shared_ptr<const base::Object>& object_ptr)
+    : object_(object_ptr), frame_header_(nullptr) {}
 
 SensorObject::SensorObject(
     const std::shared_ptr<const base::Object>& object_ptr,
-    const std::shared_ptr<const SensorFrameHeader>& frame_header):
-    object_(object_ptr), frame_header_(frame_header) {
-}
-
+    const std::shared_ptr<const SensorFrameHeader>& frame_header)
+    : object_(object_ptr), frame_header_(frame_header) {}
 
 SensorObject::SensorObject(
     const std::shared_ptr<const base::Object>& object_ptr,
-    const std::shared_ptr<SensorFrame>& frame_ptr):
-    object_(object_ptr),
-    frame_header_((frame_ptr == nullptr) ? nullptr : frame_ptr->GetHeader()) {
+    const std::shared_ptr<SensorFrame>& frame_ptr)
+    : object_(object_ptr),
+      frame_header_((frame_ptr == nullptr) ? nullptr : frame_ptr->GetHeader()) {
 }
 
 double SensorObject::GetTimestamp() const {

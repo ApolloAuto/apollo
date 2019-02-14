@@ -87,7 +87,7 @@ bool HMTrackersObjectsAssociation::Associate(
   track_ind_g2l.resize(num_track, -1);
   for (size_t i = 0; i < association_result->unassigned_tracks.size(); i++) {
     track_ind_g2l[association_result->unassigned_tracks[i]] =
-      static_cast<int>(i);
+        static_cast<int>(i);
   }
   std::vector<int> measurement_ind_g2l;
   measurement_ind_g2l.resize(num_measurement, -1);
@@ -96,7 +96,7 @@ bool HMTrackersObjectsAssociation::Associate(
   for (size_t i = 0; i < association_result->unassigned_measurements.size();
        i++) {
     measurement_ind_g2l[association_result->unassigned_measurements[i]] =
-      static_cast<int>(i);
+        static_cast<int>(i);
   }
   std::vector<size_t> track_ind_l2g = association_result->unassigned_tracks;
 
@@ -225,7 +225,7 @@ void HMTrackersObjectsAssociation::ComputeDistance(
   for (size_t i = 0; i < association_result->assignments.size(); i++) {
     int track_ind = static_cast<int>(association_result->assignments[i].first);
     int measurement_ind =
-      static_cast<int>(association_result->assignments[i].second);
+        static_cast<int>(association_result->assignments[i].second);
     int track_ind_loc = track_ind_g2l[track_ind];
     int measurement_ind_loc = measurement_ind_g2l[measurement_ind];
     if (track_ind_loc >= 0 && measurement_ind_loc >= 0) {
@@ -277,8 +277,8 @@ void HMTrackersObjectsAssociation::ComputeDistance(
   }
   for (size_t i = 0; i < association_result->unassigned_measurements.size();
        i++) {
-    int m_ind = static_cast<int>(
-      association_result->unassigned_measurements[i]);
+    int m_ind =
+        static_cast<int>(association_result->unassigned_measurements[i]);
     int m_ind_loc = measurement_ind_g2l[m_ind];
     association_result->measurement2track_dist[m_ind] =
         association_mat[0][m_ind_loc];
@@ -367,8 +367,7 @@ void HMTrackersObjectsAssociation::IdAssign(
     if (obj == nullptr) {
       continue;
     }
-    sensor_id_2_track_ind[obj->GetBaseObject()->track_id] =
-      static_cast<int>(i);
+    sensor_id_2_track_ind[obj->GetBaseObject()->track_id] = static_cast<int>(i);
   }
   std::vector<bool> fusion_used(num_track, false);
   std::vector<bool> sensor_used(num_obj, false);

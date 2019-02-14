@@ -70,7 +70,8 @@ TEST(LidarLibObjectFilterBankTest, lidar_lib_object_filter_bank_test) {
   putenv(cyber_path);
   char module_path[100] = "MODULE_PATH=";
   putenv(module_path);
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/"
       "lidar/lib/object_filter_bank/filter_bank";
 
   ObjectFilterBank filter_bank;

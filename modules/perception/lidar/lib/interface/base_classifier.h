@@ -25,11 +25,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct ClassifierInitOptions {
-};
+struct ClassifierInitOptions {};
 
-struct ClassifierOptions {
-};
+struct ClassifierOptions {};
 
 class BaseClassifier {
  public:

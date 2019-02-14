@@ -30,7 +30,7 @@ class CCRFOneShotTypeFusion : public BaseOneShotTypeFusion {
  public:
   bool Init(const TypeFusionInitOption& option) override;
   bool TypeFusion(const TypeFusionOption& option,
-      std::shared_ptr<perception::base::Object> object) override;
+                  std::shared_ptr<perception::base::Object> object) override;
   std::string Name() const override { return "CCRFOneShotTypeFusion"; }
   bool FuseOneShotTypeProbs(
       const std::shared_ptr<perception::base::Object>& object,

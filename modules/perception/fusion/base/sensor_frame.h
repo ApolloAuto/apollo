@@ -35,10 +35,9 @@ struct SensorFrameHeader {
   Eigen::Affine3d sensor2world_pose;
 
   SensorFrameHeader() = default;
-  SensorFrameHeader(const base::SensorInfo& info,
-  double ts, const Eigen::Affine3d& pose): sensor_info(info),
-  timestamp(ts), sensor2world_pose(pose) {
-  }
+  SensorFrameHeader(const base::SensorInfo& info, double ts,
+                    const Eigen::Affine3d& pose)
+      : sensor_info(info), timestamp(ts), sensor2world_pose(pose) {}
 };
 
 class SensorFrame {
@@ -53,9 +52,7 @@ class SensorFrame {
                   const SensorPtr& sensor);
 
   // Getter
-  inline double GetTimestamp() const {
-    return header_->timestamp;
-  }
+  inline double GetTimestamp() const { return header_->timestamp; }
 
   inline bool GetPose(Eigen::Affine3d* pose) const {
     CHECK_NOTNULL(pose);
@@ -83,9 +80,7 @@ class SensorFrame {
 
   base::SensorType GetSensorType() const;
 
-  SensorFrameHeaderConstPtr GetHeader() const {
-    return header_;
-  }
+  SensorFrameHeaderConstPtr GetHeader() const { return header_; }
 
  private:
   std::vector<SensorObjectPtr> foreground_objects_;

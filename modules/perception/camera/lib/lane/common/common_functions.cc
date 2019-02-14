@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/lane/common/common_functions.h"
 
 #include <algorithm>
@@ -24,15 +24,15 @@ namespace camera {
 /** DisjointSet **/
 // add a new element, which is a subset by itself;
 int DisjointSet::Add() {
-    int cur_size = static_cast<int>(disjoint_array_.size());
-    disjoint_array_.push_back(cur_size);
-    ++subset_num_;
-    return cur_size;
+  int cur_size = static_cast<int>(disjoint_array_.size());
+  disjoint_array_.push_back(cur_size);
+  ++subset_num_;
+  return cur_size;
 }
 
 int DisjointSet::Find(int x) {
   if (disjoint_array_[x] == x) {
-      return x;
+    return x;
   }
 
   int y = x;
@@ -42,7 +42,7 @@ int DisjointSet::Find(int x) {
   while (true) {
     const int z = disjoint_array_[x];
     if (z == x) {
-        break;
+      break;
     }
     disjoint_array_[x] = y;
     x = z;
@@ -52,19 +52,19 @@ int DisjointSet::Find(int x) {
 
 // point the x and y to smaller root of the two
 void DisjointSet::Unite(int x, int y) {
-    if (x == y) {
-        return;
-    }
-    int x_root = Find(x);
-    int y_root = Find(y);
-    if (x_root == y_root) {
-        return;
-    } else if (x_root < y_root) {
-        disjoint_array_[y_root] = x_root;
-    } else {
-        disjoint_array_[x_root] = y_root;
-    }
-    --subset_num_;
+  if (x == y) {
+    return;
+  }
+  int x_root = Find(x);
+  int y_root = Find(y);
+  if (x_root == y_root) {
+    return;
+  } else if (x_root < y_root) {
+    disjoint_array_[y_root] = x_root;
+  } else {
+    disjoint_array_[x_root] = y_root;
+  }
+  --subset_num_;
 }
 
 /** ConnectedComponent **/
@@ -81,13 +81,11 @@ void ConnectedComponent::AddPixel(int x, int y) {
   return;
 }
 
-bool FindCC(const std::vector<unsigned char>& src,
-  int width, int height,
-  const base::RectI& roi,
-  std::vector<ConnectedComponent>* cc) {
+bool FindCC(const std::vector<unsigned char>& src, int width, int height,
+            const base::RectI& roi, std::vector<ConnectedComponent>* cc) {
   if (src.empty()) {
-      AERROR << "input image is empty";
-      return false;
+    AERROR << "input image is empty";
+    return false;
   }
 
   cc->clear();
@@ -104,13 +102,11 @@ bool FindCC(const std::vector<unsigned char>& src,
     return false;
   }
   if (x_max >= width) {
-    AERROR << "x_max is larger than image width: "
-      << x_max << "|" << width;
+    AERROR << "x_max is larger than image width: " << x_max << "|" << width;
     return false;
   }
   if (y_max >= height) {
-    AERROR << "y_max is larger than image height: "
-      << y_max << "|" << height;
+    AERROR << "y_max is larger than image height: " << y_max << "|" << height;
     return false;
   }
   if (roi.width <= 1 && roi.height <= 1) {
@@ -166,15 +162,15 @@ bool FindCC(const std::vector<unsigned char>& src,
           // current pixel is foreground
           // and is connected to left and up neighbors
           frame_label[cur_idx] = (frame_label[left_idx] > frame_label[up_idx])
-                                 ? frame_label[up_idx]
-                                 : frame_label[left_idx];
+                                     ? frame_label[up_idx]
+                                     : frame_label[left_idx];
           labels.Unite(frame_label[left_idx], frame_label[up_idx]);
         }
       } else {
         frame_label[cur_idx] = -1;
       }
     }  //  end for x
-  }  //  end for y
+  }    //  end for y
   AINFO << "subset number = " << labels.Size();
 
   // second loop logic
@@ -184,12 +180,11 @@ bool FindCC(const std::vector<unsigned char>& src,
   for (y = y_min; y <= y_max; y++) {
     for (x = x_min; x <= x_max; x++, cur_idx++) {
       curt_label = frame_label[cur_idx];
-      if (curt_label >= 0 &&
-        curt_label < static_cast<int>(labels.Num())) {
+      if (curt_label >= 0 && curt_label < static_cast<int>(labels.Num())) {
         curt_label = labels.Find(curt_label);
         if (curt_label >= static_cast<int>(root_map.size())) {
           AERROR << "curt_label should be smaller than root_map.size() "
-                      << curt_label << " vs. " << root_map.size();
+                 << curt_label << " vs. " << root_map.size();
           return false;
         }
         if (root_map.at(curt_label) != -1) {
@@ -200,18 +195,16 @@ bool FindCC(const std::vector<unsigned char>& src,
         }
       }
     }  // end for x
-  }   // end for y
+  }    // end for y
   AINFO << "cc number = " << cc_count;
 
   return true;
 }
 
-bool ImagePoint2Camera(
-  const base::Point2DF &img_point,
-  float pitch_angle,
-  float camera_ground_height,
-  const Eigen::Matrix3f& intrinsic_params_inverse,
-  Eigen::Vector3d* camera_point) {
+bool ImagePoint2Camera(const base::Point2DF& img_point, float pitch_angle,
+                       float camera_ground_height,
+                       const Eigen::Matrix3f& intrinsic_params_inverse,
+                       Eigen::Vector3d* camera_point) {
   Eigen::MatrixXf pt_m(3, 1);
   pt_m << img_point.x, img_point.y, 1;
   const Eigen::MatrixXf& org_camera_point = intrinsic_params_inverse * pt_m;
@@ -219,9 +212,7 @@ bool ImagePoint2Camera(
   float cos_pitch = static_cast<float>(cos(pitch_angle));
   float sin_pitch = static_cast<float>(sin(pitch_angle));
   Eigen::Matrix3f pitch_matrix;
-  pitch_matrix << 1, 0, 0,
-                  0, cos_pitch, sin_pitch,
-                  0, -sin_pitch, cos_pitch;
+  pitch_matrix << 1, 0, 0, 0, cos_pitch, sin_pitch, 0, -sin_pitch, cos_pitch;
   const Eigen::MatrixXf& rotate_point = pitch_matrix * org_camera_point;
   if (fabs(rotate_point(1, 0)) < lane_eps_value) {
     return false;
@@ -233,10 +224,9 @@ bool ImagePoint2Camera(
   return true;
 }
 
-bool CameraPoint2Image(
-  const Eigen::Vector3d& camera_point,
-  const Eigen::Matrix3f& intrinsic_params,
-  base::Point2DF* img_point) {
+bool CameraPoint2Image(const Eigen::Vector3d& camera_point,
+                       const Eigen::Matrix3f& intrinsic_params,
+                       base::Point2DF* img_point) {
   Eigen::Vector3f camera_point3f;
   camera_point3f(0, 0) = static_cast<float>(camera_point(0, 0));
   camera_point3f(1, 0) = static_cast<float>(camera_point(1, 0));
@@ -249,13 +239,12 @@ bool CameraPoint2Image(
   img_point->y = img_point3f(1, 0) / img_point3f(2, 0);
   return true;
 }
-bool ComparePoint2DY(const base::Point2DF &point1,
-  const base::Point2DF &point2) {
+bool ComparePoint2DY(const base::Point2DF& point1,
+                     const base::Point2DF& point2) {
   return point1.y < point2.y;
 }
 
-bool FindKSmallValue(const float *distance,
-  int dim, int k, int* index) {
+bool FindKSmallValue(const float* distance, int dim, int k, int* index) {
   if (dim < k) {
     AWARN << "dim is smaller than k";
     return false;
@@ -282,16 +271,16 @@ bool FindKSmallValue(const float *distance,
     } else {
       for (int j = 0; j < k - 1; j++) {
         if (distance[i] >= small_value[j] &&
-          distance[i] <= small_value[j + 1]) {
+            distance[i] <= small_value[j + 1]) {
           locate_index = j + 1;
           break;
         }  //  if
-      }  //  for
-    }  //  else
+      }    //  for
+    }      //  else
     if (locate_index == -1) {
       return false;
     }
-    for (int j = k - 2; j >= locate_index ; j--) {
+    for (int j = k - 2; j >= locate_index; j--) {
       small_value[j + 1] = small_value[j];
       index[j + 1] = index[j];
     }
@@ -301,8 +290,7 @@ bool FindKSmallValue(const float *distance,
   return true;
 }
 
-bool FindKLargeValue(const float *distance,
-  int dim, int k, int* index) {
+bool FindKLargeValue(const float* distance, int dim, int k, int* index) {
   if (dim < k) {
     AWARN << "dim is smaller than k";
     return false;
@@ -331,16 +319,16 @@ bool FindKLargeValue(const float *distance,
     } else {
       for (int j = 0; j < k - 1; j++) {
         if (distance[i] <= large_value[j] &&
-          distance[i] >= large_value[j + 1]) {
+            distance[i] >= large_value[j + 1]) {
           locate_index = j + 1;
           break;
         }  //  if
-      }  //  for
-    }  //  else
+      }    //  for
+    }      //  else
     if (locate_index == -1) {
       return false;
     }
-    for (int j = k - 2; j >= locate_index ; j--) {
+    for (int j = k - 2; j >= locate_index; j--) {
       large_value[j + 1] = large_value[j];
       index[j + 1] = index[j];
     }

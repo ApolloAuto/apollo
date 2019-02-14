@@ -39,12 +39,12 @@ class FeatureDescriptor {
     int zstep = bin_size;
     int stat_len = xstep + ystep + zstep;
     std::vector<int> stat_feat(stat_len, 0);
-    float xsize = (max_pt_.x - min_pt_.x) /
-                  static_cast<float>(xstep) + 0.000001f;
-    float ysize = (max_pt_.y - min_pt_.y) /
-                  static_cast<float>(ystep) + 0.000001f;
-    float zsize = (max_pt_.z - min_pt_.z) /
-                  static_cast<float>(zstep) + 0.000001f;
+    float xsize =
+        (max_pt_.x - min_pt_.x) / static_cast<float>(xstep) + 0.000001f;
+    float ysize =
+        (max_pt_.y - min_pt_.y) / static_cast<float>(ystep) + 0.000001f;
+    float zsize =
+        (max_pt_.z - min_pt_.z) / static_cast<float>(zstep) + 0.000001f;
 
     int pt_num = static_cast<int>(cloud_->size());
     for (int i = 0; i < pt_num; ++i) {

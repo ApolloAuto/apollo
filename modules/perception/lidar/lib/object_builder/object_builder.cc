@@ -29,8 +29,8 @@ namespace lidar {
 static const float kEpsilon = 1e-6f;
 static const float kEpsilonForSize = 1e-2f;
 static const float kEpsilonForLine = 1e-3f;
-using apollo::perception::base::PointF;
 using apollo::perception::base::PointD;
+using apollo::perception::base::PointF;
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
 using PointFCloud = apollo::perception::base::PointCloud<PointF>;
 using PolygonDType = apollo::perception::base::PointCloud<PointD>;
@@ -108,8 +108,8 @@ void ObjectBuilder::ComputePolygonSizeCenter(ObjectPtr object) {
       object->size[i] = kEpsilonForSize;
     }
   }
-  object->theta = static_cast<float>(atan2(object->direction[1],
-                                           object->direction[0]));
+  object->theta =
+      static_cast<float>(atan2(object->direction[1], object->direction[0]));
 }
 
 void ObjectBuilder::SetDefaultValue(const Eigen::Vector3f& min_pt_in,

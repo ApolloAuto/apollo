@@ -72,15 +72,13 @@ bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
       (!params_.use_camera_3d || invisible_in_camera)) {
     return false;
   }
-  time_t rawtime = static_cast<time_t>(
-                       track->GetFusedObject()->GetTimestamp());
+  time_t rawtime = static_cast<time_t>(track->GetFusedObject()->GetTimestamp());
 
   // use thread-safe localtime_r instead of localtime
   struct tm timeinfo;
   localtime_r(&rawtime, &timeinfo);
   bool is_night = (timeinfo.tm_hour >= 23);
-  if (!LidarAbleToPublish(track) &&
-      !RadarAbleToPublish(track, is_night) &&
+  if (!LidarAbleToPublish(track) && !RadarAbleToPublish(track, is_night) &&
       !CameraAbleToPublish(track, is_night)) {
     return false;
   }

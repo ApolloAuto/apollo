@@ -39,8 +39,7 @@ class HDMapInput {
                          std::shared_ptr<base::HdmapStruct> hdmap_struct_prt);
   bool GetNearestLaneDirection(const base::PointD& pointd,
                                Eigen::Vector3d* lane_direction);
-  bool GetSignals(const Eigen::Vector3d& pointd,
-                  double forward_distance,
+  bool GetSignals(const Eigen::Vector3d& pointd, double forward_distance,
                   std::vector<apollo::hdmap::Signal>* signals);
 
  private:
@@ -59,10 +58,9 @@ class HDMapInput {
       const std::vector<base::PointCloud<base::PointD>>& junctions,
       std::vector<base::RoadBoundary>* flt_road_boundaries_ptr);
 
-  void DownsamplePoints(
-      const base::PointDCloudPtr& raw_cloud_ptr,
-      base::PointCloud<base::PointD>* polygon_ptr,
-      size_t min_points_num_for_sample = 15) const;
+  void DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
+                        base::PointCloud<base::PointD>* polygon_ptr,
+                        size_t min_points_num_for_sample = 15) const;
 
   void SplitBoundary(
       const base::PointCloud<base::PointD>& boundary_line,

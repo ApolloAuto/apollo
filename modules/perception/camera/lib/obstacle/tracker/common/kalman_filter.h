@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <Eigen/Core>
@@ -33,8 +33,8 @@ class KalmanFilterConstVelocity {
   void Correct(const Eigen::VectorXd &z);
 
   Eigen::Vector4d get_state() const;
-  void MagicPosition(const Eigen::VectorXd& pos);
-  void MagicVelocity(const Eigen::VectorXd& vel);
+  void MagicPosition(const Eigen::VectorXd &pos);
+  void MagicVelocity(const Eigen::VectorXd &vel);
   Eigen::Matrix4d variance_;
   Eigen::Matrix2d measure_noise_;
   Eigen::Matrix4d process_noise_;
@@ -65,15 +65,13 @@ class KalmanFilterConstState {
   KalmanFilterConstState() = default;
   ~KalmanFilterConstState() = default;
 
-  bool Init(const VectorNd& param);
+  bool Init(const VectorNd &param);
 
   bool Predict(float delta_t);
 
-  void Correct(const VectorNd& measurement);
+  void Correct(const VectorNd &measurement);
 
-  VectorNd get_state() const {
-    return state_;
-  }
+  VectorNd get_state() const { return state_; }
 
   MatrixNd covariance_;     // P
   MatrixNd measure_noise_;  // R
@@ -163,9 +161,8 @@ class MeanFilter {
 
   const Eigen::VectorXd &get_state() const;
   const Eigen::MatrixXd &get_variance() const;
-  int size() const {
-    return static_cast<int>(measures_.size());
-  }
+  int size() const { return static_cast<int>(measures_.size()); }
+
  private:
   std::vector<Eigen::VectorXd> measures_;
   Eigen::VectorXd state_;
@@ -176,7 +173,7 @@ class MeanFilter {
 
 // [BEGIN] KalmanFilterConstState
 template <std::size_t N>
-bool KalmanFilterConstState<N>::Init(const VectorNd& param) {
+bool KalmanFilterConstState<N>::Init(const VectorNd &param) {
   state_ = param;
   inited_ = true;
 
@@ -196,7 +193,7 @@ bool KalmanFilterConstState<N>::Predict(float delta_t) {
 }
 
 template <std::size_t N>
-void KalmanFilterConstState<N>::Correct(const VectorNd& measurement) {
+void KalmanFilterConstState<N>::Correct(const VectorNd &measurement) {
   if (!inited_) {
     Init(measurement);
   } else {
@@ -207,9 +204,9 @@ void KalmanFilterConstState<N>::Correct(const VectorNd& measurement) {
 
     // compute likelihood
     residual_ = measurement - predict_state_;
-    likelihood_ =
-        std::exp(-0.5 * residual_.transpose() * measurements_cov.inverse() *
-            residual_) / std::sqrt(2 * M_PI * measurements_cov.determinant());
+    likelihood_ = std::exp(-0.5 * residual_.transpose() *
+                           measurements_cov.inverse() * residual_) /
+                  std::sqrt(2 * M_PI * measurements_cov.determinant());
   }
 }
 // [END] KalmanFilterConstState

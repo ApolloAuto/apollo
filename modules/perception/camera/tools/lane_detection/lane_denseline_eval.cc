@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -38,7 +38,7 @@ void lane_postprocessor_eval() {
   init_options.root_dir = "data/";
   base::BrownCameraDistortionModel model;
   bool flag = common::LoadBrownCameraIntrinsic(
-    "params/front_6mm_intrinsics.yaml", &model);
+      "params/front_6mm_intrinsics.yaml", &model);
   if (!flag) {
     AERROR << "LoadBrownCameraIntrinsic Error!";
     return;
@@ -111,7 +111,7 @@ void lane_postprocessor_eval() {
     std::shared_ptr<base::SyncedMemory> img_gpu_data;
     int size = img.cols * img.rows * img.channels();
     img_gpu_data.reset(new base::SyncedMemory(size, true));
-    memcpy(img_gpu_data->mutable_cpu_data(), img.data, size*sizeof(uint8_t));
+    memcpy(img_gpu_data->mutable_cpu_data(), img.data, size * sizeof(uint8_t));
 
     DataProvider data_provider;
     frame.data_provider = &data_provider;
@@ -120,11 +120,9 @@ void lane_postprocessor_eval() {
     dp_init_options.image_width = img.cols;
     dp_init_options.device_id = 0;
     frame.data_provider->Init(dp_init_options);
-    frame.data_provider->
-        FillImageData(img.rows,
-                      img.cols,
-                      (const uint8_t *)(img_gpu_data->mutable_gpu_data()),
-                      "bgr8");
+    frame.data_provider->FillImageData(
+        img.rows, img.cols, (const uint8_t*)(img_gpu_data->mutable_gpu_data()),
+        "bgr8");
 
     //  set pitch angle
     float pitch_angle = 0.0f;
@@ -134,20 +132,20 @@ void lane_postprocessor_eval() {
     // frame.camera_ground_height = camera_ground_height;
     frame.camera_k_matrix = model.get_intrinsic_params();
     CalibrationServiceInitOptions calibration_service_init_options;
-    calibration_service_init_options.calibrator_working_sensor_name
-              = "onsmi_obstacle";
+    calibration_service_init_options.calibrator_working_sensor_name =
+        "onsmi_obstacle";
     std::map<std::string, Eigen::Matrix3f> name_intrinsic_map;
     name_intrinsic_map["onsmi_obstacle"] = frame.camera_k_matrix;
     calibration_service_init_options.name_intrinsic_map = name_intrinsic_map;
     calibration_service_init_options.calibrator_method = "LaneLineCalibrator";
     calibration_service_init_options.image_height =
-      static_cast<int>(model.get_height());
+        static_cast<int>(model.get_height());
     calibration_service_init_options.image_width =
-      static_cast<int>(model.get_width());
+        static_cast<int>(model.get_width());
     std::shared_ptr<BaseCalibrationService> calibration_service;
     calibration_service.reset(
         BaseCalibrationServiceRegisterer::GetInstanceByName(
-                                                   "OnlineCalibration"));
+            "OnlineCalibration"));
     CHECK(calibration_service->Init(calibration_service_init_options));
 
     std::map<std::string, float> name_camera_ground_height_map;
@@ -155,9 +153,8 @@ void lane_postprocessor_eval() {
     name_camera_ground_height_map["onsmi_obstacle"] = camera_ground_height;
     name_camera_pitch_angle_diff_map["onsmi_obstacle"] = 0;
     calibration_service->SetCameraHeightAndPitch(
-                                            name_camera_ground_height_map,
-                                            name_camera_pitch_angle_diff_map,
-                                            pitch_angle);
+        name_camera_ground_height_map, name_camera_pitch_angle_diff_map,
+        pitch_angle);
     frame.calibration_service = calibration_service.get();
     //  detect the lane image
     lib::Timer timer;
@@ -180,40 +177,39 @@ void lane_postprocessor_eval() {
     std::vector<ConnectedComponent> lane_ccs;
     std::vector<ConnectedComponent> select_lane_ccs;
 
-    lane_postprocessor->GetLaneCCs(&lane_map,
-      &lane_map_width, &lane_map_height, &lane_ccs, &select_lane_ccs);
+    lane_postprocessor->GetLaneCCs(&lane_map, &lane_map_width, &lane_map_height,
+                                   &lane_ccs, &select_lane_ccs);
 
     const std::vector<std::vector<LanePointInfo> >& detect_laneline_point_set =
-      lane_postprocessor->GetLanelinePointSet();
+        lane_postprocessor->GetLanelinePointSet();
     if (FLAGS_lane_line_debug) {
-      save_img_path = FLAGS_save_dir + "/"
-        + FLAGS_file_title + "_0_" + FLAGS_file_ext_name  + ".jpg";
-      const std::vector<LanePointInfo>& infer_point_set
-        = lane_postprocessor->GetAllInferLinePointSet();
+      save_img_path = FLAGS_save_dir + "/" + FLAGS_file_title + "_0_" +
+                      FLAGS_file_ext_name + ".jpg";
+      const std::vector<LanePointInfo>& infer_point_set =
+          lane_postprocessor->GetAllInferLinePointSet();
       show_all_infer_point_set(img, infer_point_set, save_img_path);
 
-      save_img_path = FLAGS_save_dir + "/"
-        + FLAGS_file_title + "_1_" + FLAGS_file_ext_name  + ".jpg";
+      save_img_path = FLAGS_save_dir + "/" + FLAGS_file_title + "_1_" +
+                      FLAGS_file_ext_name + ".jpg";
       show_detect_point_set(img, detect_laneline_point_set, save_img_path);
       AINFO << "detect_laneline_point_set num: "
-        << detect_laneline_point_set.size();
+            << detect_laneline_point_set.size();
     }
     // draw the lane map
     // draw the connected_components
     if (FLAGS_lane_cc_debug) {
-      save_img_path = FLAGS_save_dir + "/"
-        + FLAGS_file_title + "_2_" + FLAGS_file_ext_name  + ".jpg";
-      show_lane_ccs(lane_map, lane_map_width, lane_map_height,
-        lane_ccs, select_lane_ccs, save_img_path);
+      save_img_path = FLAGS_save_dir + "/" + FLAGS_file_title + "_2_" +
+                      FLAGS_file_ext_name + ".jpg";
+      show_lane_ccs(lane_map, lane_map_width, lane_map_height, lane_ccs,
+                    select_lane_ccs, save_img_path);
     }
     if (FLAGS_lane_line_debug) {
-      save_img_path = FLAGS_save_dir + "/"
-        + FLAGS_file_title + "_5_" + FLAGS_file_ext_name  + ".jpg";
+      save_img_path = FLAGS_save_dir + "/" + FLAGS_file_title + "_5_" +
+                      FLAGS_file_ext_name + ".jpg";
       show_lane_lines(img, frame.lane_objects, save_img_path);
     }
     if (FLAGS_lane_result_output) {
-      std::string save_path = FLAGS_save_dir + "/"
-        + FLAGS_file_title + ".txt";
+      std::string save_path = FLAGS_save_dir + "/" + FLAGS_file_title + ".txt";
       output_laneline_to_json(frame.lane_objects, save_path);
     }
   }
@@ -223,7 +219,7 @@ void lane_postprocessor_eval() {
 }  // namespace perception
 }  // namespace apollo
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_alsologtostderr = true;
   google::InitGoogleLogging(argv[0]);

@@ -33,7 +33,7 @@ bool FusionComponent::Init() {
   if (!GetProtoConfig(&comp_config)) {
     return false;
   }
-  AINFO <<"Radarr Component Configs: " << comp_config.DebugString();
+  AINFO << "Radarr Component Configs: " << comp_config.DebugString();
 
   // to load component configs
   fusion_method_ = comp_config.fusion_method();
@@ -57,9 +57,9 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
     return true;
   }
   std::shared_ptr<PerceptionObstacles> out_message(new (std::nothrow)
-                                                   PerceptionObstacles);
+                                                       PerceptionObstacles);
   std::shared_ptr<SensorFrameMessage> viz_message(new (std::nothrow)
-                                                  SensorFrameMessage);
+                                                      SensorFrameMessage);
   bool status = InternalProc(message, out_message, viz_message);
   if (status == true) {
     // TODO(conver sensor id)
@@ -91,8 +91,7 @@ bool FusionComponent::InitAlgorithmPlugin() {
     hdmap_input_ = map::HDMapInput::Instance();
     CHECK(hdmap_input_->Init()) << "Failed to init hdmap input.";
   }
-  AINFO << "Init algorithm successfully, onboard fusion: "
-        << fusion_method_;
+  AINFO << "Init algorithm successfully, onboard fusion: " << fusion_method_;
   return true;
 }
 
@@ -147,8 +146,8 @@ bool FusionComponent::InternalProc(
       position.x = sensor2world_pose(0, 3);
       position.y = sensor2world_pose(1, 3);
       position.z = sensor2world_pose(2, 3);
-      hdmap_input_->GetRoiHDMapStruct(
-          position, radius_for_roi_object_check_, hdmap);
+      hdmap_input_->GetRoiHDMapStruct(position, radius_for_roi_object_check_,
+                                      hdmap);
       // TODO(use check)
       // ObjectInRoiSlackCheck(hdmap, fused_objects, &valid_objects);
       valid_objects.assign(fused_objects.begin(), fused_objects.end());

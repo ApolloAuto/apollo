@@ -26,8 +26,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct MlfTrackObjectDistanceInitOptions {
-};
+struct MlfTrackObjectDistanceInitOptions {};
 
 class MlfTrackObjectDistance {
  public:
@@ -35,19 +34,16 @@ class MlfTrackObjectDistance {
   ~MlfTrackObjectDistance() = default;
 
   bool Init(const MlfTrackObjectDistanceInitOptions& options =
-      MlfTrackObjectDistanceInitOptions());
+                MlfTrackObjectDistanceInitOptions());
 
   // @brief: compute object track distance
   // @params [in]: object
   // @params [in]: track data
   // @return: distance
-  float ComputeDistance(
-      const TrackedObjectConstPtr& object,
-      const MlfTrackDataConstPtr& track) const;
+  float ComputeDistance(const TrackedObjectConstPtr& object,
+                        const MlfTrackDataConstPtr& track) const;
 
-  std::string Name() const {
-    return "MlfTrackObjectDistance";
-  }
+  std::string Name() const { return "MlfTrackObjectDistance"; }
 
  protected:
   std::map<std::string, std::vector<float> > foreground_weight_table_;
@@ -62,5 +58,3 @@ class MlfTrackObjectDistance {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

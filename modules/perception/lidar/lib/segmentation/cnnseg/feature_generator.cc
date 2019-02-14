@@ -47,8 +47,8 @@ bool FeatureGenerator::Init(const FeatureParam& feature_param,
   // set output feature blob data
   float* out_blob_data = nullptr;
 #ifndef PERCEPTION_CPU_ONLY
-  log_blob_.reset(new base::Blob<float>(1, 1, 1,
-                                        static_cast<int>(log_table_.size())));
+  log_blob_.reset(
+      new base::Blob<float>(1, 1, 1, static_cast<int>(log_table_.size())));
   float* log_table = log_blob_->mutable_gpu_data();
   cudaMemcpy(log_table, log_table_.data(), log_table_.size() * sizeof(float),
              cudaMemcpyHostToDevice);
@@ -85,12 +85,8 @@ bool FeatureGenerator::Init(const FeatureParam& feature_param,
       for (int col = 0; col < width_; ++col) {
         int idx = row * width_ + col;
         // * row <-> x, column <-> y
-        float center_x = Pixel2Pc(row,
-                                  static_cast<float>(height_),
-                                  range_);
-        float center_y = Pixel2Pc(col,
-                                  static_cast<float>(width_),
-                                  range_);
+        float center_x = Pixel2Pc(row, static_cast<float>(height_), range_);
+        float center_y = Pixel2Pc(col, static_cast<float>(width_), range_);
         direction_data[idx] =
             static_cast<float>(std::atan2(center_y, center_x) / (2.0 * kPI));
         distance_data[idx] =

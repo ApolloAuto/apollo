@@ -57,9 +57,8 @@ bool PbfTracker::InitParams() {
   }
 
   AINFO << "Load PbfTrackerConfig: " << params.type_fusion_method() << ","
-           << params.motion_fusion_method() << ","
-           << params.shape_fusion_method() << ","
-           << params.existance_fusion_method();
+        << params.motion_fusion_method() << "," << params.shape_fusion_method()
+        << "," << params.existance_fusion_method();
   s_type_fusion_method_ = params.type_fusion_method();
   s_motion_fusion_method_ = params.motion_fusion_method();
   s_existance_fusion_method_ = params.existance_fusion_method();
@@ -114,8 +113,8 @@ void PbfTracker::UpdateWithMeasurement(const TrackerOptions& options,
                                        double target_timestamp) {
   std::string sensor_id = measurement->GetSensorId();
   ADEBUG << "fusion_updating..." << track_->GetTrackId() << " with "
-            << sensor_id << "..." << measurement->GetBaseObject()->track_id
-            << "@" << GLOG_TIMESTAMP(measurement->GetTimestamp());
+         << sensor_id << "..." << measurement->GetBaseObject()->track_id << "@"
+         << GLOG_TIMESTAMP(measurement->GetTimestamp());
   existance_fusion_->UpdateWithMeasurement(measurement, target_timestamp,
                                            options.match_distance);
   motion_fusion_->UpdateWithMeasurement(measurement, target_timestamp);

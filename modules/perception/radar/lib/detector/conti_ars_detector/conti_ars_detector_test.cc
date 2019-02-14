@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include <gtest/gtest.h>
 
 #include "modules/perception/radar/lib/detector/conti_ars_detector/conti_ars_detector.h"
@@ -47,15 +47,9 @@ TEST(ContiArsDetector, detect) {
 
   DetectorOptions options;
   Eigen::Matrix4d pose;
-  pose << 0, -1, 0, 4,
-          1, 0, 0, 1,
-          0, 0, 1, 0,
-          0, 0, 0, 1;
+  pose << 0, -1, 0, 4, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1;
   Eigen::Matrix4d radar2novatel_trans;
-  radar2novatel_trans << 1, 0, 0, 0,
-                         0, 1, 0, 0,
-                         0, 0, 1, 0,
-                         0, 0, 0, 1;
+  radar2novatel_trans << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   options.radar2world_pose = &pose;
   options.radar2novatel_trans = &radar2novatel_trans;
   options.car_linear_speed = Eigen::Vector3f(3, 1, 0);
@@ -82,12 +76,8 @@ TEST(ContiArsDetector, detect) {
 
   Eigen::Matrix3f dist_uncertain;
   Eigen::Matrix3f vel_uncertain;
-  dist_uncertain << 0.01f, 0.0f,  0.0f,
-                    0.0f,  0.04f, 0.0f,
-                    0.0f,  0.0f,  0.0f;
-  vel_uncertain << 0.01f, 0.0f,  0.0f,
-                   0.0f,  0.04f, 0.0f,
-                   0.0f,  0.0f,  0.0f;
+  dist_uncertain << 0.01f, 0.0f, 0.0f, 0.0f, 0.04f, 0.0f, 0.0f, 0.0f, 0.0f;
+  vel_uncertain << 0.01f, 0.0f, 0.0f, 0.0f, 0.04f, 0.0f, 0.0f, 0.0f, 0.0f;
   float dist_diff = (dist_uncertain - radar_object->center_uncertainty).norm();
   float vel_diff = (vel_uncertain - radar_object->velocity_uncertainty).norm();
   EXPECT_LT(dist_diff, 1.0e-6);
@@ -131,7 +121,7 @@ TEST(ContiArsDetector, detect) {
 
   base::FramePtr radar_frame7(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(
-          CONTI_TYPE_UNKNOWN);
+      CONTI_TYPE_UNKNOWN);
   detector.Detect(corrected_obstacles, options, radar_frame7);
   radar_object = radar_frame7->objects.front();
   EXPECT_EQ(radar_object->type, base::ObjectType::UNKNOWN);
@@ -144,8 +134,7 @@ TEST(ContiArsDetector, detect) {
   EXPECT_EQ(radar_object->type, base::ObjectType::VEHICLE);
 
   base::FramePtr radar_frame9(new base::Frame);
-  corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(
-                                           CONTI_PEDESTRIAN);
+  corrected_obstacles.mutable_contiobs(0)->set_obstacle_class(CONTI_PEDESTRIAN);
   detector.Detect(corrected_obstacles, options, radar_frame9);
   radar_object = radar_frame9->objects.front();
   EXPECT_EQ(radar_object->type, base::ObjectType::PEDESTRIAN);
@@ -170,7 +159,7 @@ TEST(ContiArsDetector, detect) {
 
   base::FramePtr radar_frame13(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_dynprop(
-                                           CONTI_STATIONARY_CANDIDATE);
+      CONTI_STATIONARY_CANDIDATE);
   detector.Detect(corrected_obstacles, options, radar_frame13);
   radar_object = radar_frame13->objects.front();
   EXPECT_EQ(radar_object->motion_state, base::MotionState::STATIONARY);
@@ -183,7 +172,7 @@ TEST(ContiArsDetector, detect) {
 
   base::FramePtr radar_frame15(new base::Frame);
   corrected_obstacles.mutable_contiobs(0)->set_dynprop(
-                                           CONTI_CROSSING_STATIONARY);
+      CONTI_CROSSING_STATIONARY);
   detector.Detect(corrected_obstacles, options, radar_frame15);
   radar_object = radar_frame15->objects.front();
   EXPECT_EQ(radar_object->motion_state, base::MotionState::STATIONARY);

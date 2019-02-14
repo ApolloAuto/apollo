@@ -26,7 +26,7 @@ bool RadarDetectionComponent::Init() {
   if (!GetProtoConfig(&comp_config)) {
     return false;
   }
-  AINFO <<"Radar Component Configs: " << comp_config.DebugString();
+  AINFO << "Radar Component Configs: " << comp_config.DebugString();
 
   // to load component configs
   tf_child_frame_id_ = comp_config.tf_child_frame_id();
@@ -45,24 +45,24 @@ bool RadarDetectionComponent::Init() {
   }
 
   writer_ = node_->CreateWriter<SensorFrameMessage>(
-    comp_config.output_channel_name());
+      comp_config.output_channel_name());
 
   // init algorithm plugin
   CHECK(InitAlgorithmPlugin() == true) << "Failed to init algorithm plugin.";
   radar2world_trans_.Init(tf_child_frame_id_);
   radar2novatel_trans_.Init(tf_child_frame_id_);
-  localization_subscriber_.Init(odometry_channel_name_,
+  localization_subscriber_.Init(
+      odometry_channel_name_,
       odometry_channel_name_ + '_' + comp_config.radar_name());
   return true;
 }
 
-bool RadarDetectionComponent::Proc(
-    const std::shared_ptr<ContiRadar>& message) {
+bool RadarDetectionComponent::Proc(const std::shared_ptr<ContiRadar>& message) {
   AINFO << "Enter radar preprocess, message timestamp: "
-           << std::to_string(message->header().timestamp_sec())
-           << " current timestamp " << lib::TimeUtil::GetCurrentTime();
+        << std::to_string(message->header().timestamp_sec())
+        << " current timestamp " << lib::TimeUtil::GetCurrentTime();
   std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow)
-                                                  SensorFrameMessage);
+                                                      SensorFrameMessage);
   int status = InternalProc(message, out_message);
   if (status) {
     writer_->Write(out_message);
@@ -86,8 +86,8 @@ int RadarDetectionComponent::InitAlgorithmPlugin() {
   radar::BaseRadarObstaclePerception* radar_perception =
       radar::BaseRadarObstaclePerceptionRegisterer::GetInstanceByName(
           perception_method_);
-  CHECK(radar_perception != nullptr) << "No radar obstacle perception named "
-                                     << perception_method_;
+  CHECK(radar_perception != nullptr)
+      << "No radar obstacle perception named " << perception_method_;
   radar_perception_.reset(radar_perception);
   CHECK(radar_perception_->Init(pipeline_name_))
       << "Failed to init radar perception.";
@@ -107,10 +107,9 @@ bool RadarDetectionComponent::InternalProc(
   double timestamp = in_message->header().timestamp_sec();
   const double cur_time = lib::TimeUtil::GetCurrentTime();
   const double start_latency = (cur_time - timestamp) * 1e3;
-  AINFO << "FRAME_STATISTICS:Radar:Start:msg_time["
-           << std::to_string(timestamp) << "]:cur_time["
-           << std::to_string(cur_time) << "]:cur_latency[" << start_latency
-           << "]";
+  AINFO << "FRAME_STATISTICS:Radar:Start:msg_time[" << std::to_string(timestamp)
+        << "]:cur_time[" << std::to_string(cur_time) << "]:cur_latency["
+        << start_latency << "]";
   PERCEPTION_PERF_BLOCK_START();
   // init preprocessor_options
   radar::PreprocessorOptions preprocessor_options;
@@ -154,7 +153,7 @@ bool RadarDetectionComponent::InternalProc(
           timestamp, &(options.detector_options.car_linear_speed),
           &(options.detector_options.car_angular_speed)) != true) {
     AERROR << "Failed to call get_car_speed. [timestamp: "
-              << std::to_string(timestamp);
+           << std::to_string(timestamp);
     // return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name, "GetCarSpeed");
@@ -195,10 +194,9 @@ bool RadarDetectionComponent::InternalProc(
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(radar_info_.name,
                                            "radar_perception");
   AINFO << "FRAME_STATISTICS:Radar:End:msg_time["
-           << std::to_string(in_message->header().timestamp_sec())
-           << "]:cur_time[" << std::to_string(end_timestamp)
-           << "]:cur_latency[" << end_latency
-           << "]";
+        << std::to_string(in_message->header().timestamp_sec()) << "]:cur_time["
+        << std::to_string(end_timestamp) << "]:cur_latency[" << end_latency
+        << "]";
 
   return true;
 }
@@ -216,17 +214,17 @@ int RadarDetectionComponent::GetCarLocalizationSpeed(
     return false;
   }
   (*car_linear_speed)[0] =
-    static_cast<float>(loct_ptr->pose().linear_velocity().x());
+      static_cast<float>(loct_ptr->pose().linear_velocity().x());
   (*car_linear_speed)[1] =
-    static_cast<float>(loct_ptr->pose().linear_velocity().y());
+      static_cast<float>(loct_ptr->pose().linear_velocity().y());
   (*car_linear_speed)[2] =
-    static_cast<float>(loct_ptr->pose().linear_velocity().z());
+      static_cast<float>(loct_ptr->pose().linear_velocity().z());
   (*car_angular_speed)[0] =
-    static_cast<float>(loct_ptr->pose().angular_velocity().x());
+      static_cast<float>(loct_ptr->pose().angular_velocity().x());
   (*car_angular_speed)[1] =
-    static_cast<float>(loct_ptr->pose().angular_velocity().y());
+      static_cast<float>(loct_ptr->pose().angular_velocity().y());
   (*car_angular_speed)[2] =
-    static_cast<float>(loct_ptr->pose().angular_velocity().z());
+      static_cast<float>(loct_ptr->pose().angular_velocity().z());
 
   return true;
 }

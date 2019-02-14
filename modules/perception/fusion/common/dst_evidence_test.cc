@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 #include "boost/format.hpp"
-#include "gtest/gtest.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 
 #include "modules/perception/fusion/common/dst_evidence.h"
 

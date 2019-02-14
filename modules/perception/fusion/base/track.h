@@ -120,7 +120,7 @@ class Track {
   SensorObjectConstPtr GetLatestSensorObject(
       const SensorId2ObjectMap& objects) const;
   void UpdateSensorObject(SensorId2ObjectMap* objects,
-      const SensorObjectPtr& obj);
+                          const SensorObjectPtr& obj);
   void UpdateSensorObjectWithoutMeasurement(SensorId2ObjectMap* objects,
                                             const std::string& sensor_id,
                                             double measurement_timestamp,

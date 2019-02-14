@@ -27,9 +27,10 @@ class CudaUtil {
   static bool set_device_id(int device_id);
   static cublasHandle_t& get_handler();
   ~CudaUtil();
+
  private:
   CudaUtil();
-  static CudaUtil &get();
+  static CudaUtil& get();
   cublasHandle_t cublas_handle_;
 };
 

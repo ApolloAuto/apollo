@@ -191,7 +191,7 @@ void MlfEngine::CollectTrackedResult(LidarFrame* frame) {
   base::ObjectPool::Instance().BatchGet(num_objects, &tracked_objects);
   size_t pos = 0;
   size_t num_predict = 0;
-  auto collect = [&](std::vector<MlfTrackDataPtr> * tracks) {
+  auto collect = [&](std::vector<MlfTrackDataPtr>* tracks) {
     for (auto& track_data : *tracks) {
       if (!output_predict_objects_ && track_data->is_current_state_predicted_) {
         ++num_predict;

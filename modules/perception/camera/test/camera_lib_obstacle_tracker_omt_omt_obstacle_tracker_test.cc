@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 
@@ -35,14 +35,17 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-DEFINE_string(data_root, "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/tracker/omt/test_fusion_data", "root dir of images");
+DEFINE_string(data_root,
+              "/apollo/modules/perception/testdata/"
+              "camera/lib/obstacle/tracker/omt/test_fusion_data",
+              "root dir of images");
 DEFINE_int32(max_img_num, 10, "max length of test images");
 DEFINE_string(narrow_name, "narrow", "type of camera for projecting");
 DEFINE_string(obstacle_name, "obstacle", "type of camera to be peojected");
-DEFINE_string(image_root, "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/tracker/omt/images",
-    "root dir of images");
+DEFINE_string(image_root,
+              "/apollo/modules/perception/testdata/"
+              "camera/lib/obstacle/tracker/omt/images",
+              "root dir of images");
 DEFINE_int32(feature_length, 576, "size of feature");
 DEFINE_string(base_camera_name, "onsemi_obstacle", "camera to be peojected");
 DEFINE_string(sensor_name, "onsemi_obstacle,onsemi_narrow", "camera to use");
@@ -87,8 +90,8 @@ int read_detections(const std::string &path, const int &feature_dim,
     object->size(0) = kMinTemplateHWL.at(base::ObjectSubType::CAR).at(2);
     object->size(1) = kMinTemplateHWL.at(base::ObjectSubType::CAR).at(1);
     object->size(2) = kMinTemplateHWL.at(base::ObjectSubType::CAR).at(0);
-    float *data = frame->track_feature_blob->mutable_cpu_data() +
-        i * feature_size;
+    float *data =
+        frame->track_feature_blob->mutable_cpu_data() + i * feature_size;
     for (int j = 0; j < feature_size; j++) {
       fin >> feature;
       *data = feature;
@@ -112,11 +115,11 @@ int write_track_imgs(const std::string &out_path, const cv::Mat &frame,
     cv::rectangle(image_mat_src, rect, cv::Scalar(0, 255, 0), 2);
     cv::Point txt_pos;
     txt_pos.x = 0.5 * (visual_object->camera_supplement.box.xmin +
-        visual_object->camera_supplement.box.xmax);
+                       visual_object->camera_supplement.box.xmax);
     txt_pos.y = 0.5 * (visual_object->camera_supplement.box.ymin +
-        visual_object->camera_supplement.box.ymax);
-    cv::putText(image_mat_src, std::to_string(visual_object->track_id),
-                txt_pos, cv::FONT_HERSHEY_PLAIN, 2.0, cv::Scalar(0, 0, 255), 2);
+                       visual_object->camera_supplement.box.ymax);
+    cv::putText(image_mat_src, std::to_string(visual_object->track_id), txt_pos,
+                cv::FONT_HERSHEY_PLAIN, 2.0, cv::Scalar(0, 0, 255), 2);
   }
   cv::imwrite(out_path, image_mat_src);
   return 0;
@@ -151,15 +154,15 @@ bool LoadExtrinsics(const std::string &yaml_file,
     tz = node["transform"]["translation"]["z"].as<double>();
   } catch (YAML::InvalidNode &in) {
     AERROR << "load camera extrisic file " << yaml_file
-              << " with error, YAML::InvalidNode exception";
+           << " with error, YAML::InvalidNode exception";
     return false;
   } catch (YAML::TypedBadConversion<double> &bc) {
     AERROR << "load camera extrisic file " << yaml_file
-              << " with error, YAML::TypedBadConversion exception";
+           << " with error, YAML::TypedBadConversion exception";
     return false;
   } catch (YAML::Exception &e) {
     AERROR << "load camera extrisic file " << yaml_file
-              << " with error, YAML exception:" << e.what();
+           << " with error, YAML exception:" << e.what();
     return false;
   }
   camera_extrinsic->setConstant(0);
@@ -177,31 +180,28 @@ bool LoadExtrinsics(const std::string &yaml_file,
 }
 
 // @description: get project matrix
-bool GetProjectMatrix(const std::string &camera_name,
-                      const std::map<std::string,
-                        Eigen::Matrix4d> &extrinsic_map,
-                      const std::map<std::string,
-                        Eigen::Matrix3f> &intrinsic_map,
-                      Eigen::Matrix3d *project_matrix,
-                      double *pitch_diff = nullptr) {
+bool GetProjectMatrix(
+    const std::string &camera_name,
+    const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
+    const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
+    Eigen::Matrix3d *project_matrix, double *pitch_diff = nullptr) {
   std::string base_camera_name = FLAGS_base_camera_name;
   if (camera_name == base_camera_name) {
     *project_matrix = Eigen::Matrix3d::Identity();
     return true;
   }
 
-  *project_matrix = intrinsic_map.at(base_camera_name).cast<double>() *
-                    extrinsic_map.at(base_camera_name).block<3, 3>(
-                      0, 0).inverse() *
-                    extrinsic_map.at(camera_name).block<3, 3>(0, 0) *
-                    intrinsic_map.at(camera_name).cast<double>().inverse();
+  *project_matrix =
+      intrinsic_map.at(base_camera_name).cast<double>() *
+      extrinsic_map.at(base_camera_name).block<3, 3>(0, 0).inverse() *
+      extrinsic_map.at(camera_name).block<3, 3>(0, 0) *
+      intrinsic_map.at(camera_name).cast<double>().inverse();
   // extract the pitch_diff = pitch_narrow - pitch_obstacle
   if (pitch_diff != nullptr) {
     Eigen::Vector3d euler =
-      (extrinsic_map.at(base_camera_name).block<3, 3>(0, 0).inverse() *
-       extrinsic_map.at(camera_name).block<3, 3>(0, 0)).eulerAngles(0,
-                                                                    1,
-                                                                    2);
+        (extrinsic_map.at(base_camera_name).block<3, 3>(0, 0).inverse() *
+         extrinsic_map.at(camera_name).block<3, 3>(0, 0))
+            .eulerAngles(0, 1, 2);
     *pitch_diff = euler(0);
     AINFO << "pitch diff: " << *pitch_diff;
   }
@@ -228,7 +228,7 @@ bool LoadCameraIntrinsics(const std::string &yaml_file,
     }
   } catch (YAML::Exception &e) {
     AERROR << "load camera extrisic file " << yaml_file
-              << " with error, YAML exception: " << e.what();
+           << " with error, YAML exception: " << e.what();
     return false;
   }
   return true;
@@ -238,8 +238,8 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   // Init object template
   ObjectTemplateManagerInitOptions object_template_init_options;
   object_template_init_options.root_dir =
-    "/apollo/modules/perception/testdata/"
-    "camera/app/data/perception/camera/common/object_template/";
+      "/apollo/modules/perception/testdata/"
+      "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
   CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
@@ -260,7 +260,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
     data_options.sensor_name = camera_names[i];
     CHECK(data_providers[i].Init(data_options));
     name_provider_map.insert(std::pair<std::string, DataProvider *>(
-      camera_names[i], &data_providers[i]));
+        camera_names[i], &data_providers[i]));
     AINFO << "Init data_provider for " << camera_names[i];
   }
 
@@ -269,12 +269,14 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   std::map<std::string, Eigen::Matrix3f> intrinsic_map;
   for (int i = 0; i < camera_names.size(); i++) {
     Eigen::Matrix3f intrinsic;
-    ASSERT_TRUE(LoadCameraIntrinsics(FLAGS_data_root + "/params/"
-                + camera_names[i] + "_intrinsics.yaml", &intrinsic));
+    ASSERT_TRUE(LoadCameraIntrinsics(
+        FLAGS_data_root + "/params/" + camera_names[i] + "_intrinsics.yaml",
+        &intrinsic));
     intrinsic_map[camera_names[i]] = intrinsic;
     Eigen::Matrix4d extrinsic;
-    ASSERT_TRUE(LoadExtrinsics(FLAGS_data_root + "/params/"
-                   + camera_names[i] + "_extrinsics.yaml", &extrinsic));
+    ASSERT_TRUE(LoadExtrinsics(
+        FLAGS_data_root + "/params/" + camera_names[i] + "_extrinsics.yaml",
+        &extrinsic));
     extrinsic_map[camera_names[i]] = extrinsic;
   }
 
@@ -282,9 +284,9 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   // init tracker
   ObstacleTrackerInitOptions init_options;
   init_options.root_dir =
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/tracker/omt/data/models/"
-    "omt_obstacle_tracker";
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/obstacle/tracker/omt/data/models/"
+      "omt_obstacle_tracker";
   init_options.conf_file = "config.pt";
   init_options.image_height = 1080;
   init_options.image_width = 1920;
@@ -297,7 +299,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
   std::string filename = FLAGS_data_root + "/det_gt.txt";
   std::ifstream fin_gt(filename);
   ASSERT_TRUE(fin_gt.is_open());
-  std::vector<std::vector<base::CameraObjectSupplement> > det_gts;
+  std::vector<std::vector<base::CameraObjectSupplement>> det_gts;
   std::string image_name;
   int det_count = 0;
   while (fin_gt >> image_name >> det_count) {
@@ -318,7 +320,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
     det_gts.push_back(bboxs);
   }
 
-  std::vector<std::vector<int> > tracked_index(det_gts.size());
+  std::vector<std::vector<int>> tracked_index(det_gts.size());
   std::vector<std::vector<base::CameraObjectSupplement>> tracked_results(
       det_gts.size());
   std::vector<CameraFrame> frames(det_gts.size());
@@ -341,18 +343,16 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
     image_name = temp_strs[1];
 
     AINFO << "image: " << image_name << " camera_name:" << camera_name;
-    std::string image_path = FLAGS_image_root + "/" + camera_name + "/"
-                             + image_name + FLAGS_image_ext;
+    std::string image_path = FLAGS_image_root + "/" + camera_name + "/" +
+                             image_name + FLAGS_image_ext;
     CameraFrame &frame = frames[frame_num];
 
     // read detections from txt
     std::string filename = FLAGS_data_root + "/detection_feature/" +
-                             std::to_string(frame_num) + ".txt";
-    read_detections(filename, FLAGS_feature_length,
-                    camera_name, &frame);
-    AINFO << "Frame " << frame_num << " has "
-             << frame.detected_objects.size()
-             << " detection objects";
+                           std::to_string(frame_num) + ".txt";
+    read_detections(filename, FLAGS_feature_length, camera_name, &frame);
+    AINFO << "Frame " << frame_num << " has " << frame.detected_objects.size()
+          << " detection objects";
     frame.frame_id = frame_num;
     std::stringstream ss(image_name);
     frame.timestamp = 0.0;
@@ -362,24 +362,17 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
     Eigen::Matrix3d project_matrix;
     double pitch_diff = 0.0;
 
-    ASSERT_TRUE(GetProjectMatrix(camera_name,
-                                 extrinsic_map,
-                                 intrinsic_map,
-                                 &project_matrix,
-                                 &pitch_diff));
+    ASSERT_TRUE(GetProjectMatrix(camera_name, extrinsic_map, intrinsic_map,
+                                 &project_matrix, &pitch_diff));
     frame.project_matrix = project_matrix;
     frame.data_provider = name_provider_map.at(camera_name);
     AINFO << "Project Matrix: \n" << frame.project_matrix;
-    ASSERT_TRUE(camera_tracker->Predict(ObstacleTrackerOptions(),
-                                        &frame));
-    ASSERT_TRUE(camera_tracker->Associate2D(ObstacleTrackerOptions(),
-                                            &frame));
-    ASSERT_TRUE(camera_tracker->Associate3D(ObstacleTrackerOptions(),
-                                            &frame));
-    ASSERT_TRUE(camera_tracker->Track(ObstacleTrackerOptions(),
-                                      &frame));
-    AINFO << "Frame " << frame_num << " tracked object size: "
-             << frame.tracked_objects.size();
+    ASSERT_TRUE(camera_tracker->Predict(ObstacleTrackerOptions(), &frame));
+    ASSERT_TRUE(camera_tracker->Associate2D(ObstacleTrackerOptions(), &frame));
+    ASSERT_TRUE(camera_tracker->Associate3D(ObstacleTrackerOptions(), &frame));
+    ASSERT_TRUE(camera_tracker->Track(ObstacleTrackerOptions(), &frame));
+    AINFO << "Frame " << frame_num
+          << " tracked object size: " << frame.tracked_objects.size();
     for (auto &bbox_gt : det_gts[frame_num]) {
       int id = -1;
       float max_iou = 0.0f;
@@ -392,8 +385,7 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
       for (int i = 0; i < frames[frame_num].tracked_objects.size(); i++) {
         Eigen::Matrix<double, 3, 1> center1, size1;
         base::BBox2DF temp_box;
-        temp_box = frames[frame_num].tracked_objects[i]->
-            camera_supplement.box;
+        temp_box = frames[frame_num].tracked_objects[i]->camera_supplement.box;
         center1[0] = temp_box.Center().x;
         size1[0] = temp_box.xmax - temp_box.xmin;
         center1[1] = temp_box.Center().y;
@@ -403,13 +395,12 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
         if (iou > max_iou) {
           max_iou = iou;
           id = i;
-          bbox.local_track_id = frames[frame_num].tracked_objects[i]->
-                                track_id;
+          bbox.local_track_id = frames[frame_num].tracked_objects[i]->track_id;
         }
       }
-      if (frame_num >=
-          dynamic_cast<OMTObstacleTracker*>(camera_tracker.get())->omt_param_.
-            target_param().tracked_life()) {
+      if (frame_num >= dynamic_cast<OMTObstacleTracker *>(camera_tracker.get())
+                           ->omt_param_.target_param()
+                           .tracked_life()) {
         ASSERT_GE(max_iou, 0.5);
       }
       tracked_index[frame_num].push_back(id);
@@ -418,18 +409,18 @@ TEST(FusionObstacleTrackerTest, FusionObstacleTracker_test) {
     ++frame_num;
   }
   std::vector<int> ids(2, -100);
-  for (frame_num =
-       dynamic_cast<OMTObstacleTracker*>(camera_tracker.get())->omt_param_.
-         target_param().tracked_life();
-            frame_num < det_gts.size(); ++frame_num) {
+  for (frame_num = dynamic_cast<OMTObstacleTracker *>(camera_tracker.get())
+                       ->omt_param_.target_param()
+                       .tracked_life();
+       frame_num < det_gts.size(); ++frame_num) {
     ASSERT_GE(tracked_results[frame_num].size(), 1);
     for (int i = 0; i < det_gts[frame_num].size(); ++i) {
       if (ids[i] < -50) {
         ids[i] = det_gts[frame_num][i].local_track_id -
-            tracked_results[frame_num][i].local_track_id;
+                 tracked_results[frame_num][i].local_track_id;
       } else {
         ASSERT_EQ(ids[i], det_gts[frame_num][i].local_track_id -
-            tracked_results[frame_num][i].local_track_id);
+                              tracked_results[frame_num][i].local_track_id);
       }
     }
   }

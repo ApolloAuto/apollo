@@ -43,7 +43,8 @@ class LidarLibROIServiceFilterTest : public testing::Test {
     putenv(cyber_path);
     char module_path[100] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+    FLAGS_work_root =
+        "/apollo/modules/perception/testdata/"
         "lidar/lib/roi_filter/roi_service_filter";
     FLAGS_config_manager_path = "./conf";
     lib::ConfigManager::Instance()->Reset();
@@ -79,8 +80,8 @@ void MockData(LidarFrame* frame) {
   point.y = frame->lidar2world_pose.translation()(1);
   point.z = frame->lidar2world_pose.translation()(2);
   frame->hdmap_struct.reset(new base::HdmapStruct);
-  CHECK(map::HDMapInput::Instance()->GetRoiHDMapStruct(
-      point, 120.0, frame->hdmap_struct));
+  CHECK(map::HDMapInput::Instance()->GetRoiHDMapStruct(point, 120.0,
+                                                       frame->hdmap_struct));
 
   // d. trans points
   frame->world_cloud = base::PointDCloudPool::Instance().Get();

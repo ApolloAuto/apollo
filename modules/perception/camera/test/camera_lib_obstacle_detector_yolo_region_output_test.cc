@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include <gtest/gtest.h>
 
 #include "modules/perception/base/distortion_model.h"
@@ -75,9 +75,7 @@ TEST(YoloCameraDetectorTest, jaccard_overlap_gpu_test) {
 }
 
 TEST(YoloCameraDetectorTest, apply_nms_test) {
-  bool overlapped[] = {true,  true, false,
-                       true,  true, true,
-                       false, true, true};
+  bool overlapped[] = {true, true, false, true, true, true, false, true, true};
 
   {
     std::vector<int> indices;
@@ -316,24 +314,12 @@ TEST(YoloCameraDetectorTest, nms_test) {
     scores.push_back(obj_ped3.score);
 
     std::vector<int> indices;
-    apply_softnms_fast(test_objects,
-                       &scores,
-                       0.1f,
-                       0.5f,
-                       20,
-                       &indices,
-                       true,
+    apply_softnms_fast(test_objects, &scores, 0.1f, 0.5f, 20, &indices, true,
                        0.4f);
     CHECK_LT(scores[1], 0.8f);
     scores[1] = 0.8f;
     scores[2] = 0.01f;
-    apply_softnms_fast(test_objects,
-                       &scores,
-                       0.1f,
-                       0.5f,
-                       20,
-                       &indices,
-                       false,
+    apply_softnms_fast(test_objects, &scores, 0.1f, 0.5f, 20, &indices, false,
                        0.4f);
     CHECK_LT(scores[1], 0.8f);
 
@@ -362,12 +348,8 @@ TEST(YoloCameraDetectorTest, nms_test) {
     std::vector<NormalizedBBox> test_empty_objects;
     std::vector<float> test_empty_scores;
 
-    apply_boxvoting_fast(&test_empty_objects,
-                         &test_empty_scores,
-                         0.1f,
-                         0.5f,
-                         0.4f,
-                         &indices);
+    apply_boxvoting_fast(&test_empty_objects, &test_empty_scores, 0.1f, 0.5f,
+                         0.4f, &indices);
   }
   {
     std::vector<NormalizedBBox> test_objects;
@@ -432,17 +414,17 @@ TEST(YoloCameraDetectorTest, nms_test) {
     obj_ped.ymax = .60f;
     obj_ped.score = 0.95f;
     obj_ped.label = static_cast<int>(base::ObjectType::PEDESTRIAN);
-/*
-    test_objects.push_back(obj_cyc);
-    test_objects.push_back(obj_ped);
+    /*
+        test_objects.push_back(obj_cyc);
+        test_objects.push_back(obj_ped);
 
-    std::vector<int> cyc_indices;
-    std::vector<int> ped_indices;
-    cyc_indices.push_back(0);
-    ped_indices.push_back(1);
-    cross_class_merge(&cyc_indices, &ped_indices, test_objects, 0.8);
-    CHECK_EQ(cyc_indices.size(), 1);
-    CHECK_EQ(ped_indices.size(), 0);*/
+        std::vector<int> cyc_indices;
+        std::vector<int> ped_indices;
+        cyc_indices.push_back(0);
+        ped_indices.push_back(1);
+        cross_class_merge(&cyc_indices, &ped_indices, test_objects, 0.8);
+        CHECK_EQ(cyc_indices.size(), 1);
+        CHECK_EQ(ped_indices.size(), 0);*/
   }
 
   std::vector<base::ObjectPtr> visual_objects;
@@ -474,20 +456,10 @@ TEST(YoloCameraDetectorTest, nms_test) {
     std::vector<float> empty_scores;
     std::vector<int> empty_indices;
 
-    apply_softnms_fast(test_empty_objects,
-                       &empty_scores,
-                       0.1f,
-                       0.5f,
-                       20,
-                       &empty_indices,
-                       true,
-                       0.8f);
+    apply_softnms_fast(test_empty_objects, &empty_scores, 0.1f, 0.5f, 20,
+                       &empty_indices, true, 0.8f);
     CHECK_EQ(empty_indices.size(), 0);
-    apply_boxvoting_fast(&test_empty_objects,
-                         &empty_scores,
-                         0.1f,
-                         0.5f,
-                         20,
+    apply_boxvoting_fast(&test_empty_objects, &empty_scores, 0.1f, 0.5f, 20,
                          &empty_indices);
     CHECK_EQ(empty_indices.size(), 0);
   }

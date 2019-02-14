@@ -25,11 +25,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct ROIFilterInitOptions {
-};
+struct ROIFilterInitOptions {};
 
-struct ROIFilterOptions {
-};
+struct ROIFilterOptions {};
 
 class BaseROIFilter {
  public:

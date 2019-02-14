@@ -95,7 +95,6 @@ bool MlfMotionRefiner::Refine(const MlfTrackDataConstPtr& track_data,
 bool MlfMotionRefiner::CheckStaticHypothesisByState(
     const TrackedObjectConstPtr& latest_object,
     const TrackedObjectConstPtr& new_object) const {
-
   // Check whether track is static or not
   // evaluate speed noise level, the less the level is the
   // greater the probability of noise is
@@ -148,7 +147,6 @@ bool MlfMotionRefiner::CheckStaticHypothesisByVelocityAngleChange(
     const TrackedObjectConstPtr& latest_object,
     const TrackedObjectConstPtr& new_object,
     double reasonable_angle_change_maximum) const {
-
   // note reasonable_angle_change_maximum should be within [0, M_PI]
   // believe angle change is obvious if one of estimation pair is
   // extrodinary small

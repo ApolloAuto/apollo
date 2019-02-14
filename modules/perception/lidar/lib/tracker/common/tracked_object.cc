@@ -33,9 +33,9 @@ TrackedObject::TrackedObject(base::ObjectPtr obj_ptr,
 }
 
 void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
-    const Eigen::Affine3d& pose,
-    const Eigen::Vector3d& global_to_local_offset,
-    const base::SensorInfo& sensor) {
+                                 const Eigen::Affine3d& pose,
+                                 const Eigen::Vector3d& global_to_local_offset,
+                                 const base::SensorInfo& sensor) {
   if (obj_ptr) {
     // all state of input obj_ptr will not change except cloud world
     object_ptr = obj_ptr;
@@ -45,8 +45,7 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
     // object info to tracked object
     center = pose * object_ptr->center;
     const PointFCloud& cloud = (object_ptr->lidar_supplement).cloud;
-    barycenter = (common::CalculateCentroid(cloud))
-        .cast<double>();
+    barycenter = (common::CalculateCentroid(cloud)).cast<double>();
     barycenter = pose * barycenter;
     anchor_point = barycenter;
 
@@ -70,7 +69,7 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
     }
     // memcpy(&(cloud_world.points_height(0)), &(cloud.points_height(0)),
     //        sizeof(float) * cloud.size());
-    for (size_t i = 0; i <  cloud.size(); ++i) {
+    for (size_t i = 0; i < cloud.size(); ++i) {
       cloud_world.SetPointHeight(i, cloud.points_height(i));
     }
     // other belief infomation keep as Reset()
@@ -104,7 +103,7 @@ void TrackedObject::TransformObjectCloudToWorld() {
     cloud_world[i].intensity = cloud[i].intensity;
   }
   memcpy(&cloud_world.points_height(0), &cloud.points_height(0),
-      sizeof(float) * cloud.size());
+         sizeof(float) * cloud.size());
 }
 
 void TrackedObject::Reset() {
@@ -167,10 +166,9 @@ void TrackedObject::Reset() {
   sensor_info.Reset();
 }
 
-void TrackedObject::Reset(base::ObjectPtr obj_ptr,
-    const Eigen::Affine3d& pose,
-    const Eigen::Vector3d& global_to_local_offset,
-    const base::SensorInfo& sensor) {
+void TrackedObject::Reset(base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
+                          const Eigen::Vector3d& global_to_local_offset,
+                          const base::SensorInfo& sensor) {
   Reset();
   AttachObject(obj_ptr, pose, global_to_local_offset, sensor);
 }

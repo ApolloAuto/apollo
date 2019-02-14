@@ -160,9 +160,8 @@ double ComputePtsBoxSimilarity(const ProjectionCachePtr& cache,
       ComputePtsBoxShapeSimilarity(cache, object, camera_bbox);
   double fused_similarity =
       FuseTwoProbabilities(location_similarity, shape_similarity);
-  ADEBUG << "fused_similarity@" << fused_similarity
-         << ", location_similarity@" << location_similarity
-         << ", shape_similarity@" << shape_similarity;
+  ADEBUG << "fused_similarity@" << fused_similarity << ", location_similarity@"
+         << location_similarity << ", shape_similarity@" << shape_similarity;
   return fused_similarity;
 }
 // @brief: calculate the x/y/h similarity between radar and camera
@@ -281,15 +280,11 @@ double ComputeRadarCameraVelocitySimilarity(
     const float velocity_std = 0.15f;
     const float max_velocity_p = 0.9f;
     const float th_velocity_p = 0.5f;
-    float velocity_score =
-        static_cast<float>(1 - ChiSquaredCdf1TableFun(diff_velocity_ratio *
-                                                      diff_velocity_ratio /
-                                                      velocity_std /
-                                                      velocity_std));
-    velocity_score = static_cast<float>(
-                         ScalePositiveProbability(velocity_score,
-                                                  max_velocity_p,
-                                                  th_velocity_p));
+    float velocity_score = static_cast<float>(
+        1 - ChiSquaredCdf1TableFun(diff_velocity_ratio * diff_velocity_ratio /
+                                   velocity_std / velocity_std));
+    velocity_score = static_cast<float>(ScalePositiveProbability(
+        velocity_score, max_velocity_p, th_velocity_p));
     return velocity_score;
   } else {
     return 0.5;

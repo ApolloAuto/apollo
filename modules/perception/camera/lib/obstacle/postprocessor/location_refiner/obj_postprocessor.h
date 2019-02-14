@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <vector>
@@ -47,9 +47,7 @@ struct ObjPostProcessorOptions {
 
 // hyper parameters
 struct ObjPostProcessorParams {
-  ObjPostProcessorParams() {
-    set_default();
-  }
+  ObjPostProcessorParams() { set_default(); }
   void set_default();
   int max_nr_iter;
   float sampling_ratio_low;
@@ -79,50 +77,30 @@ class ObjPostProcessor {
                                  float center[3], float hwl[3], float *ry);
 
  private:
-  float GetProjectionScore(float ry,
-                           const float *bbox,
-                           const float *hwl,
+  float GetProjectionScore(float ry, const float *bbox, const float *hwl,
                            const float *center,
                            const bool &check_truncation = true) const {
     float rot[9] = {0};
     GenRotMatrix(ry, rot);
     float *bbox_null_1 = nullptr;
     float *bbox_null_2 = nullptr;
-    return GetScoreViaRotDimensionCenter(&k_mat_[0],
-                                         width_,
-                                         height_,
-                                         bbox,
-                                         rot,
-                                         hwl,
-                                         center,
-                                         check_truncation,
-                                         bbox_null_1,
-                                         bbox_null_2);
+    return GetScoreViaRotDimensionCenter(&k_mat_[0], width_, height_, bbox, rot,
+                                         hwl, center, check_truncation,
+                                         bbox_null_1, bbox_null_2);
   }
 
   // refinement using ground-3d bbox consistency
-  bool AdjustCenterWithGround(const float *bbox,
-                              const float *hwl,
-                              float ry,
-                              const float *plane,
-                              float *center) const;
+  bool AdjustCenterWithGround(const float *bbox, const float *hwl, float ry,
+                              const float *plane, float *center) const;
 
   // adjustment using on-ground line segments
   bool PostRefineCenterWithGroundBoundary(
-      const float *bbox,
-      const float *hwl,
-      float ry,
-      const float *plane,
-      const std::vector<LineSegment2D<float>> &line_seg_limits,
-      float *center,
+      const float *bbox, const float *hwl, float ry, const float *plane,
+      const std::vector<LineSegment2D<float>> &line_seg_limits, float *center,
       bool check_lowerbound) const;
 
-  int GetDepthXPair(const float *bbox,
-                    const float *hwl,
-                    const float *center,
-                    float ry,
-                    float *depth_pts,
-                    int *x_pts,
+  int GetDepthXPair(const float *bbox, const float *hwl, const float *center,
+                    float ry, float *depth_pts, int *x_pts,
                     float *pts_c = nullptr) const;
 
  private:

@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include <gtest/gtest.h>
 
 #include "modules/perception/camera/common/twod_threed_util.h"
@@ -228,9 +228,15 @@ TEST(TwodThreedUtilTest, GetScoreViaRotDimensionCenterTest) {
   float hwl8[3] = {1.5f, 1.6f, 4.0f};
   float object_center1[3] = {-3.32887f, 1.86078f, 17.2908f};
 
-  float k_mat[9] = {2022.5639693330495f, 0.0f, 989.3893672805314f,
-                    0.0f, 2014.0535251884398f, 570.6145712367711f,
-                    0.0f, 0.0f, 1.0f};
+  float k_mat[9] = {2022.5639693330495f,
+                    0.0f,
+                    989.3893672805314f,
+                    0.0f,
+                    2014.0535251884398f,
+                    570.6145712367711f,
+                    0.0f,
+                    0.0f,
+                    1.0f};
 
   float rotation_y = 1.5f;
   float rot[9];
@@ -248,37 +254,20 @@ TEST(TwodThreedUtilTest, GetScoreViaRotDimensionCenterTest) {
   float bbox_near[4];
 
   bool check_truncation = false;
-  float score = GetScoreViaRotDimensionCenter(k_mat,
-                                              image_width,
-                                              image_height,
-                                              bbox_ref,
-                                              rot,
-                                              hwl8,
-                                              object_center1,
-                                              check_truncation);
+  float score = GetScoreViaRotDimensionCenter(k_mat, image_width, image_height,
+                                              bbox_ref, rot, hwl8,
+                                              object_center1, check_truncation);
   EXPECT_NEAR(score, 0.f, 1e-5);
 
   check_truncation = true;
-  score = GetScoreViaRotDimensionCenter(k_mat,
-                                        image_width,
-                                        image_height,
-                                        bbox_ref,
-                                        rot,
-                                        hwl8,
-                                        object_center1,
+  score = GetScoreViaRotDimensionCenter(k_mat, image_width, image_height,
+                                        bbox_ref, rot, hwl8, object_center1,
                                         check_truncation);
   EXPECT_NEAR(score, 0.f, 1e-5);
 
-  score = GetScoreViaRotDimensionCenter(k_mat,
-                                        image_width,
-                                        image_height,
-                                        bbox_ref,
-                                        rot,
-                                        hwl8,
-                                        object_center1,
-                                        check_truncation,
-                                        bbox_res,
-                                        bbox_near);
+  score = GetScoreViaRotDimensionCenter(k_mat, image_width, image_height,
+                                        bbox_ref, rot, hwl8, object_center1,
+                                        check_truncation, bbox_res, bbox_near);
   EXPECT_NEAR(score, 0.f, 1e-5);
 }
 
@@ -286,196 +275,83 @@ TEST(TwodThreedUtilTest, GetDxDzForCenterFromGroundLineSegTest) {
   {
     int width = 1920;
     int height = 1080;
-    float k_mat[9] = {
-        1975.43f, 0.0f, 958.069f,
-        0.0f, 1979.28f, 460.072f,
-        0.0f, 0.0f, 1.0f};
+    float k_mat[9] = {1975.43f, 0.0f, 958.069f, 0.0f, 1979.28f,
+                      460.072f, 0.0f, 0.0f,     1.0f};
     LineSegment2D<float> ls(0.0f, 0.0f, 0.1f, 0.0f);
     float plane[4] = {0};
     float pts_c[12] = {0};
     float ratio_x_over_z = 1.0f;
     float dx_dz[2] = {0};
-    GetDxDzForCenterFromGroundLineSeg(ls,
-                                      plane,
-                                      pts_c,
-                                      k_mat,
-                                      width,
-                                      height,
-                                      ratio_x_over_z,
-                                      dx_dz,
-                                      true);
+    GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
+                                      ratio_x_over_z, dx_dz, true);
     EXPECT_TRUE(dx_dz[1] < 1e-5);
   }
   {
     int width = 1920;
     int height = 1080;
-    float k_mat[9] = {
-        1975.43f, 0.0f, 958.069f,
-        0.0f, 1979.28f, 460.072f,
-        0.0f, 0.0f, 1.0f};
+    float k_mat[9] = {1975.43f, 0.0f, 958.069f, 0.0f, 1979.28f,
+                      460.072f, 0.0f, 0.0f,     1.0f};
     LineSegment2D<float> ls(200, 400, 500, 400);
     float plane[4] = {0.0f, 0.0f, 1.0f, 10.0f};
     float pts_c[12] = {0};
     float ratio_x_over_z = 1.0f;
     float dx_dz[2] = {0};
-    GetDxDzForCenterFromGroundLineSeg(ls,
-                                      plane,
-                                      pts_c,
-                                      k_mat,
-                                      width,
-                                      height,
-                                      ratio_x_over_z,
-                                      dx_dz,
-                                      true);
+    GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
+                                      ratio_x_over_z, dx_dz, true);
     EXPECT_TRUE(dx_dz[1] < 1e-5);
   }
   {
     int width = 1193;
     int height = 712;
-    float k_mat[9] = {
-        1447.44f,
-        0.0f,
-        495.503f,
-        0.0f,
-        1446.67f,
-        381.524f,
-        0.0f,
-        0.0f,
-        1.0f};
-    LineSegment2D<float> ls(165.481f, 482.044f,
-                            580.937f, 482.044f);
+    float k_mat[9] = {1447.44f, 0.0f, 495.503f, 0.0f, 1446.67f,
+                      381.524f, 0.0f, 0.0f,     1.0f};
+    LineSegment2D<float> ls(165.481f, 482.044f, 580.937f, 482.044f);
     float plane[4] = {0.0f, 1.0f, 0.0f, -1.5f};
-    float pts_c[12] = {
-        7.03179f,
-        0.281616f,
-        13.5518f,
-        5.49636f,
-        0.281616f,
-        13.5518f,
-        5.49636f,
-        0.281616f,
-        17.5286f,
-        7.03179f,
-        0.281616f,
-        17.5286f
-    };
+    float pts_c[12] = {7.03179f,  0.281616f, 13.5518f,  5.49636f,
+                       0.281616f, 13.5518f,  5.49636f,  0.281616f,
+                       17.5286f,  7.03179f,  0.281616f, 17.5286f};
     float ratio_x_over_z = 0.403088f;
     float dx_dz[2] = {0};
-    GetDxDzForCenterFromGroundLineSeg(ls,
-                                      plane,
-                                      pts_c,
-                                      k_mat,
-                                      width,
-                                      height,
-                                      ratio_x_over_z,
-                                      dx_dz,
-                                      true);
+    GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
+                                      ratio_x_over_z, dx_dz, true);
     EXPECT_FALSE(dx_dz[1] < 1e-5);
-    GetDxDzForCenterFromGroundLineSeg(ls,
-                                      plane,
-                                      pts_c,
-                                      k_mat,
-                                      width,
-                                      height,
-                                      ratio_x_over_z,
-                                      dx_dz,
-                                      false);
+    GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
+                                      ratio_x_over_z, dx_dz, false);
     EXPECT_FALSE(dx_dz[1] < 1e-5);
   }
   {
     int width = 1193;
     int height = 712;
-    float k_mat[9] = {
-        1447.44f,
-        0.0f,
-        495.503f,
-        0.0f,
-        1446.67f,
-        381.524f,
-        0.0f,
-        0.0f,
-        1.0f};
-    LineSegment2D<float> ls(271.519f, 393.128f,
-                            990.795f, 393.128f);
+    float k_mat[9] = {1447.44f, 0.0f, 495.503f, 0.0f, 1446.67f,
+                      381.524f, 0.0f, 0.0f,     1.0f};
+    LineSegment2D<float> ls(271.519f, 393.128f, 990.795f, 393.128f);
     float plane[4] = {0.0f, 1.0f, 0.0f, -1.5f};
-    float pts_c[12] = {
-        5.74431f,
-        0.84582f,
-        11.623f,
-        6.78823f,
-        0.84582f,
-        10.1878f,
-        2.88452f,
-        0.84582f,
-        7.34827f,
-        1.8406f,
-        0.84582f,
-        8.78343f
-    };
+    float pts_c[12] = {5.74431f, 0.84582f, 11.623f,  6.78823f,
+                       0.84582f, 10.1878f, 2.88452f, 0.84582f,
+                       7.34827f, 1.8406f,  0.84582f, 8.78343f};
     float ratio_x_over_z = 0.454838f;
     float dx_dz[2] = {0};
-    GetDxDzForCenterFromGroundLineSeg(ls,
-                                      plane,
-                                      pts_c,
-                                      k_mat,
-                                      width,
-                                      height,
-                                      ratio_x_over_z,
-                                      dx_dz,
-                                      true);
+    GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
+                                      ratio_x_over_z, dx_dz, true);
     EXPECT_FALSE(dx_dz[1] < 1e-5);
-    GetDxDzForCenterFromGroundLineSeg(ls,
-                                      plane,
-                                      pts_c,
-                                      k_mat,
-                                      width,
-                                      height,
-                                      ratio_x_over_z,
-                                      dx_dz,
-                                      false);
+    GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
+                                      ratio_x_over_z, dx_dz, false);
     EXPECT_FALSE(dx_dz[1] < 1e-5);
   }
   {
     int width = 1193;
     int height = 712;
-    float k_mat[9] = {
-        1447.44f,
-        0.0f,
-        495.503f,
-        0.0f,
-        1446.67f,
-        381.524f,
-        0.0f,
-        0.0f,
-        1.0f};
-    LineSegment2D<float> ls(424.105f, 383.528f,
-                            1106.85f, 383.528f);
+    float k_mat[9] = {1447.44f, 0.0f, 495.503f, 0.0f, 1446.67f,
+                      381.524f, 0.0f, 0.0f,     1.0f};
+    LineSegment2D<float> ls(424.105f, 383.528f, 1106.85f, 383.528f);
     float plane[4] = {0.0f, 1.0f, 0.0f, -0.0159766f};
-    float pts_c[12] = {
-        2.49833f,
-        0.0501389f,
-        21.9282f,
-        3.86523f,
-        0.0501389f,
-        21.4518f,
-        2.33395f,
-        0.0501389f,
-        17.058f,
-        0.967046f,
-        0.0501389f,
-        17.5344f
-    };
+    float pts_c[12] = {2.49833f,   0.0501389f, 21.9282f,   3.86523f,
+                       0.0501389f, 21.4518f,   2.33395f,   0.0501389f,
+                       17.058f,    0.967046f,  0.0501389f, 17.5344f};
     float ratio_x_over_z = 0.123948f;
     float dx_dz[2] = {0};
-    GetDxDzForCenterFromGroundLineSeg(ls,
-                                      plane,
-                                      pts_c,
-                                      k_mat,
-                                      width,
-                                      height,
-                                      ratio_x_over_z,
-                                      dx_dz,
-                                      false);
+    GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
+                                      ratio_x_over_z, dx_dz, false);
     EXPECT_TRUE(dx_dz[1] < -1e-5);
   }
 }

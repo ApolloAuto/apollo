@@ -123,15 +123,16 @@ class ProjectionCache {
     point2ds_.emplace_back(pt.x(), pt.y());
   }
   // add object
-  ProjectionCacheObject* BuildObject(
-      const std::string& measurement_sensor_id, double measurement_timestamp,
-      const std::string& projection_sensor_id, double projection_timestamp,
-      int lidar_object_id) {
+  ProjectionCacheObject* BuildObject(const std::string& measurement_sensor_id,
+                                     double measurement_timestamp,
+                                     const std::string& projection_sensor_id,
+                                     double projection_timestamp,
+                                     int lidar_object_id) {
     if (!VerifyKey(measurement_sensor_id, measurement_timestamp)) {
       return nullptr;
     }
-    ProjectionCacheFrame* frame = QueryFrame(projection_sensor_id,
-        projection_timestamp);
+    ProjectionCacheFrame* frame =
+        QueryFrame(projection_sensor_id, projection_timestamp);
     if (frame == nullptr) {
       frame = BuildFrame(projection_sensor_id, projection_timestamp);
     }
@@ -141,10 +142,11 @@ class ProjectionCache {
     return frame->BuildObject(lidar_object_id);
   }
   // query projection cache object
-  ProjectionCacheObject* QueryObject(
-      const std::string& measurement_sensor_id, double measurement_timestamp,
-      const std::string& projection_sensor_id, double projection_timestamp,
-      int lidar_object_id) {
+  ProjectionCacheObject* QueryObject(const std::string& measurement_sensor_id,
+                                     double measurement_timestamp,
+                                     const std::string& projection_sensor_id,
+                                     double projection_timestamp,
+                                     int lidar_object_id) {
     if (!VerifyKey(measurement_sensor_id, measurement_timestamp)) {
       return nullptr;
     }

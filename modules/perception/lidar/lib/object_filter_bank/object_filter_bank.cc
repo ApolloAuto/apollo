@@ -66,8 +66,8 @@ bool ObjectFilterBank::Filter(const ObjectFilterOptions& options,
       AINFO << "Failed to filter objects in: " << filter->Name();
     }
   }
-  AINFO << "Object filter bank, filtered objects size: from "
-           << object_number << " to " << frame->segmented_objects.size();
+  AINFO << "Object filter bank, filtered objects size: from " << object_number
+        << " to " << frame->segmented_objects.size();
   return true;
 }
 

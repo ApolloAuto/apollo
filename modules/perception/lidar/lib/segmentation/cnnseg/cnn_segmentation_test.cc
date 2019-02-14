@@ -55,8 +55,8 @@ void PrintObjects(const std::vector<base::ObjectPtr>& objects) {
   AINFO << "Total objects num: " << objects.size();
   int obj_id = 0;
   for (auto object : objects) {
-    unsigned cloud_size = static_cast<unsigned>(
-                              object->lidar_supplement.cloud.size());
+    unsigned cloud_size =
+        static_cast<unsigned>(object->lidar_supplement.cloud.size());
     AINFO << "Point num of Segment: " << cloud_size;
     std::cout << "-- Object " << obj_id++ << " : ";
     std::cout << object->ToString() << ", type_probs: " << object->type_probs[0]

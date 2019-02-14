@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/sensor.h"
 
-
 #include "cyber/common/log.h"
 
 namespace apollo {

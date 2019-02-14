@@ -276,12 +276,12 @@ void KalmanMotionFusion::MotionFusionWithMeasurement(
                                    .cast<double>();
 
   ADEBUG << "fusion_original_measurement@(" << std::setprecision(10)
-            << observation(0) << "," << observation(1) << "," << observation(2)
-            << "," << observation(3) << ")";
-  ADEBUG << "fusion_original_measurement_covariance@(" << r_matrix(0, 0)
-            << "," << r_matrix(0, 1) << "," << r_matrix(1, 0) << ","
-            << r_matrix(1, 1) << "," << r_matrix(2, 2) << "," << r_matrix(2, 3)
-            << "," << r_matrix(3, 2) << "," << r_matrix(3, 3) << ")";
+         << observation(0) << "," << observation(1) << "," << observation(2)
+         << "," << observation(3) << ")";
+  ADEBUG << "fusion_original_measurement_covariance@(" << r_matrix(0, 0) << ","
+         << r_matrix(0, 1) << "," << r_matrix(1, 0) << "," << r_matrix(1, 1)
+         << "," << r_matrix(2, 2) << "," << r_matrix(2, 3) << ","
+         << r_matrix(3, 2) << "," << r_matrix(3, 3) << ")";
 
   /* compute pseudo measurement */
   Eigen::Vector4d temp_observation = observation.head(4);
@@ -300,31 +300,31 @@ void KalmanMotionFusion::MotionFusionWithMeasurement(
                 measurement->GetBaseObject()->velocity_converged, &r_matrix);
 
   ADEBUG << "fusion_pseudo_measurement@(" << std::setprecision(10)
-            << observation(0) << "," << observation(1) << "," << observation(2)
-            << "," << observation(3) << ")";
+         << observation(0) << "," << observation(1) << "," << observation(2)
+         << "," << observation(3) << ")";
   ADEBUG << "fusion_pseudo_measurement_covariance@(" << r_matrix(0, 0) << ","
-            << r_matrix(0, 1) << "," << r_matrix(1, 0) << "," << r_matrix(1, 1)
-            << "," << r_matrix(2, 2) << "," << r_matrix(2, 3) << ","
-            << r_matrix(3, 2) << "," << r_matrix(3, 3) << ")";
+         << r_matrix(0, 1) << "," << r_matrix(1, 0) << "," << r_matrix(1, 1)
+         << "," << r_matrix(2, 2) << "," << r_matrix(2, 3) << ","
+         << r_matrix(3, 2) << "," << r_matrix(3, 3) << ")";
 
   kalman_filter_.DeCorrelation(2, 0, 2, 2);
   kalman_filter_.Correct(observation, r_matrix);
   kalman_filter_.CorrectionBreakdown();
 
   ADEBUG << "fusion_filter_belief@(" << std::setprecision(10)
-            << kalman_filter_.GetStates()(0) << ","
-            << kalman_filter_.GetStates()(1) << ","
-            << kalman_filter_.GetStates()(2) << ","
-            << kalman_filter_.GetStates()(3) << ")";
+         << kalman_filter_.GetStates()(0) << ","
+         << kalman_filter_.GetStates()(1) << ","
+         << kalman_filter_.GetStates()(2) << ","
+         << kalman_filter_.GetStates()(3) << ")";
   ADEBUG << "fusion_filter_belief_covariance@("
-            << kalman_filter_.GetUncertainty()(0, 0) << ","
-            << kalman_filter_.GetUncertainty()(0, 1) << ","
-            << kalman_filter_.GetUncertainty()(1, 0) << ","
-            << kalman_filter_.GetUncertainty()(1, 1) << ","
-            << kalman_filter_.GetUncertainty()(2, 2) << ","
-            << kalman_filter_.GetUncertainty()(2, 3) << ","
-            << kalman_filter_.GetUncertainty()(3, 2) << ","
-            << kalman_filter_.GetUncertainty()(3, 3) << ")";
+         << kalman_filter_.GetUncertainty()(0, 0) << ","
+         << kalman_filter_.GetUncertainty()(0, 1) << ","
+         << kalman_filter_.GetUncertainty()(1, 0) << ","
+         << kalman_filter_.GetUncertainty()(1, 1) << ","
+         << kalman_filter_.GetUncertainty()(2, 2) << ","
+         << kalman_filter_.GetUncertainty()(2, 3) << ","
+         << kalman_filter_.GetUncertainty()(3, 2) << ","
+         << kalman_filter_.GetUncertainty()(3, 3) << ")";
 }
 
 void KalmanMotionFusion::UpdateMotionState() {
@@ -422,8 +422,8 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
   /* initialize status variables */
   int trace_count = 0;
   const float velocity_angle_change_thresh_ = static_cast<float>(M_PI / 20.0);
-  const float acceleration_angle_change_thresh_
-                = static_cast<float>(M_PI / 3.0);
+  const float acceleration_angle_change_thresh_ =
+      static_cast<float>(M_PI / 3.0);
   Eigen::Vector4d pseudo_measurement = measurement;
   Eigen::Vector3d lidar_velocity =
       Eigen::Vector3d(measurement(2), measurement(3), 0);
@@ -497,8 +497,8 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
   /* initialize status variables */
   int trace_count = 0;
   const float velocity_angle_change_thresh_ = static_cast<float>(M_PI / 10.0);
-  const float acceleration_angle_change_thresh_
-                = static_cast<float>(M_PI / 3.0);
+  const float acceleration_angle_change_thresh_ =
+      static_cast<float>(M_PI / 3.0);
   Eigen::Vector4d pseudo_measurement = measurement;
   Eigen::Vector3d camera_velocity =
       Eigen::Vector3d(measurement(2), measurement(3), 0);

@@ -447,7 +447,7 @@ bool PolygonScanCvter<T>::ConvertSegment(const size_t seg_id,
   const Point& low_vertex = segment.first;
   const Point& high_vertex = segment.second;
   if (low_vertex[dir_major_] > high_vertex[dir_major_]) {
-     std::swap(segment.first, segment.second);
+    std::swap(segment.first, segment.second);
   }
   // return pair of int id and edge
   Edge& edge = out_edge->second;

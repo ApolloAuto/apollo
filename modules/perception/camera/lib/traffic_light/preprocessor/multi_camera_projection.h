@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <map>
@@ -40,13 +40,11 @@ struct MultiCamerasInitOption {
 // @brief Camera Projection project the Light into the image.
 class MultiCamerasProjection {
  public:
-  MultiCamerasProjection() {
-  }
+  MultiCamerasProjection() {}
 
   ~MultiCamerasProjection() = default;
   bool Init(const MultiCamerasInitOption& options);
-  bool Project(const CarPose& pose,
-               const ProjectOption& option,
+  bool Project(const CarPose& pose, const ProjectOption& option,
                base::TrafficLight* light) const;
   bool HasCamera(const std::string& camera_name) const;
 
@@ -60,9 +58,9 @@ class MultiCamerasProjection {
  private:
   bool BoundaryBasedProject(
       const base::BrownCameraDistortionModelPtr camera_model,
-      const Eigen::Matrix4d &c2w_pose,
-      const std::vector<base::PointXYZID> &point,
-      base::TrafficLight *light) const;
+      const Eigen::Matrix4d& c2w_pose,
+      const std::vector<base::PointXYZID>& point,
+      base::TrafficLight* light) const;
 
  private:
   // sorted by focal length in descending order

@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include <gtest/gtest.h>
 
 #include "cyber/common/log.h"
@@ -31,8 +31,9 @@ namespace radar {
 TEST(HMMatcherTest, hm_matcher_init_test) {
   BaseMatcher* matcher = new HMMatcher();
   EXPECT_TRUE(matcher != nullptr);
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
-        "radar/matcher";
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/"
+      "radar/matcher";
   EXPECT_EQ(matcher->Init(), true);
   delete matcher;
 }
@@ -51,8 +52,8 @@ TEST(HMMatcherTest, hm_matcher_propterty_match_test) {
   std::vector<size_t> unassigned_tracks;
   std::vector<size_t> unassigned_objects;
   unassigned_tracks.push_back(0);
-  matcher->TrackObjectPropertyMatch(radar_tracks, radar_frame,
-    &assignments, &unassigned_tracks, &unassigned_objects);
+  matcher->TrackObjectPropertyMatch(radar_tracks, radar_frame, &assignments,
+                                    &unassigned_tracks, &unassigned_objects);
   EXPECT_EQ(unassigned_tracks.size(), 1);
   EXPECT_EQ(unassigned_objects.size(), 0);
   delete matcher;
@@ -61,8 +62,9 @@ TEST(HMMatcherTest, hm_matcher_propterty_match_test) {
 TEST(HMMatcherTest, hm_matcher_test) {
   BaseMatcher* matcher = new HMMatcher();
   EXPECT_TRUE(matcher != nullptr);
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
-        "radar/matcher";
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/"
+      "radar/matcher";
   EXPECT_EQ(matcher->Init(), true);
   EXPECT_EQ(matcher->Name(), "HMMatcher");
   double match_distance = 2.5;

@@ -118,9 +118,9 @@ void PlaneFitGroundDetector::InitOrderTable(const VoxelGridXY<float> *vg,
     map_dist.push_back(std::pair<float, int>(dist2, i));
   }
   sort(map_dist.begin(), map_dist.end(),
-       [](const std::pair<float, int> & a, const std::pair<float, int> & b) {
-    return a.first < b.first;
-  });
+       [](const std::pair<float, int> &a, const std::pair<float, int> &b) {
+         return a.first < b.first;
+       });
   for (i = 0; i < map_dist.size(); ++i) {
     id = map_dist[i].second;
     const auto &voxel = vg->GetConstVoxels()[id];
@@ -635,9 +635,8 @@ int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
   int indices_trial[] = {0, 0, 0};
   int nr_samples = candi->Prune(param_.nr_samples_min_threshold,
                                 param_.nr_samples_max_threshold);
-  int nr_inliers_termi =
-      IRound(static_cast<float>(nr_samples) *
-             param_.termi_inlier_percen_threshold);
+  int nr_inliers_termi = IRound(static_cast<float>(nr_samples) *
+                                param_.termi_inlier_percen_threshold);
   // 3x3 matrix stores: x, y, z; x, y, z; x, y, z;
   float samples[9];
   // copy 3D points
@@ -676,8 +675,8 @@ int PlaneFitGroundDetector::FitGrid(const float *point_cloud,
     // Assign number of supports
     plane.SetNrSupport(nr_inliers);
 
-    fit_cost = nr_inliers > 0 ?
-               (fit_cost / static_cast<float>(nr_inliers)) : dist_thre;
+    fit_cost = nr_inliers > 0 ? (fit_cost / static_cast<float>(nr_inliers))
+                              : dist_thre;
     // record the best plane
     if (nr_inliers >= nr_inliers_best) {
       if (nr_inliers == nr_inliers_best) {
@@ -827,8 +826,8 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   }
 
   GroundPlaneLiDAR plane;
-  int kNr_iter = param_.nr_ransac_iter_threshold +
-                 static_cast<int>(neighbors.size());
+  int kNr_iter =
+      param_.nr_ransac_iter_threshold + static_cast<int>(neighbors.size());
   GroundPlaneLiDAR hypothesis[kNr_iter];
   float ptp_dist = 0.0f;
   int best = -1;
@@ -840,9 +839,8 @@ int PlaneFitGroundDetector::FitGridWithNeighbors(
   int indices_trial[] = {0, 0, 0};
   int nr_samples = candi.Prune(param_.nr_samples_min_threshold,
                                param_.nr_samples_max_threshold);
-  int nr_inliers_termi =
-      IRound(static_cast<float>(nr_samples) *
-             param_.termi_inlier_percen_threshold);
+  int nr_inliers_termi = IRound(static_cast<float>(nr_samples) *
+                                param_.termi_inlier_percen_threshold);
   // 3x3 matrix stores: x, y, z; x, y, z; x, y, z;
   float samples[9];
   // copy 3D points
@@ -1129,14 +1127,14 @@ int PlaneFitGroundDetector::CompleteGrid(const GroundPlaneSpherical &lt,
   if (!support_sum) {
     return 0;
   }
-  weights[0] = static_cast<float>(supports[0]) /
-               static_cast<float>(support_sum);
-  weights[1] = static_cast<float>(supports[1]) /
-               static_cast<float>(support_sum);
-  weights[2] = static_cast<float>(supports[2]) /
-               static_cast<float>(support_sum);
-  weights[3] = static_cast<float>(supports[3]) /
-               static_cast<float>(support_sum);
+  weights[0] =
+      static_cast<float>(supports[0]) / static_cast<float>(support_sum);
+  weights[1] =
+      static_cast<float>(supports[1]) / static_cast<float>(support_sum);
+  weights[2] =
+      static_cast<float>(supports[2]) / static_cast<float>(support_sum);
+  weights[3] =
+      static_cast<float>(supports[3]) / static_cast<float>(support_sum);
   // weighted average:
   gp->theta = weights[0] * lt.theta + weights[1] * rt.theta +
               weights[2] * up.theta + weights[3] * dn.theta;
@@ -1186,16 +1184,16 @@ int PlaneFitGroundDetector::SmoothGrid(const GroundPlaneSpherical &g,
     return 0;
   }
   support_sum += supports[4];
-  weights[0] = static_cast<float>(supports[0]) /
-               static_cast<float>(support_sum);
-  weights[1] = static_cast<float>(supports[1]) /
-               static_cast<float>(support_sum);
-  weights[2] = static_cast<float>(supports[2]) /
-               static_cast<float>(support_sum);
-  weights[3] = static_cast<float>(supports[3]) /
-               static_cast<float>(support_sum);
-  weights[4] = static_cast<float>(supports[4]) /
-               static_cast<float>(support_sum);
+  weights[0] =
+      static_cast<float>(supports[0]) / static_cast<float>(support_sum);
+  weights[1] =
+      static_cast<float>(supports[1]) / static_cast<float>(support_sum);
+  weights[2] =
+      static_cast<float>(supports[2]) / static_cast<float>(support_sum);
+  weights[3] =
+      static_cast<float>(supports[3]) / static_cast<float>(support_sum);
+  weights[4] =
+      static_cast<float>(supports[4]) / static_cast<float>(support_sum);
   // weighted average:
   gp->theta = weights[0] * lt.theta + weights[1] * rt.theta +
               weights[2] * up.theta + weights[3] * dn.theta +

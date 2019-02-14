@@ -28,7 +28,7 @@ namespace {
 float GetThreshold(const size_t sz, const float c) {
   return c / static_cast<float>(sz);
 }
-}
+}  // namespace
 
 void GraphSegmentor::Init(const float initial_threshold) {
   initial_threshold_ = initial_threshold;

@@ -28,7 +28,8 @@ namespace common {
 // General plane equation pi: ax+by+cz+d = 0
 
 // Another 3D Plane Data structure:
-template <typename T> struct PlanePara {
+template <typename T>
+struct PlanePara {
   PlanePara(const PlanePara<T> &pi) {
     ICopy4(pi.p, p);
     ICopy3(pi.t, t);
@@ -75,7 +76,8 @@ inline void IPointOnPlaneProjection(const T *pi, const T *p, T *q) {
 
 // Measure point to plane distance in 3D space, point p is in inhomogeneous
 // coordinates
-template <typename T> inline T IPlaneToPointDistance(const T *pi, const T *p) {
+template <typename T>
+inline T IPlaneToPointDistance(const T *pi, const T *p) {
   return IDiv(IAbs(IDot3(pi, p) + pi[3]), IL2Norm3(pi));
 }
 
@@ -177,7 +179,8 @@ inline void IPlaneFitTotalLeastSquare(T *X, T *pi, int n) {
 // are stored as[x0, y0, z0, x1, y1, z1, ...].
 // pi is stored as 4 - vector[a, b, c, d]. x will be destroyed after calling
 // this routine.
-template <typename T> inline void IPlaneFitTotalLeastSquare3(T *X, T *pi) {
+template <typename T>
+inline void IPlaneFitTotalLeastSquare3(T *X, T *pi) {
   T mat_a[9];
   T eigv[3];
   T mat_q[9];
@@ -425,14 +428,14 @@ inline void IPlaneFitTotalLeastSquareAdv(T *X, int *indices, T *para, int m,
 // space - minimal solution
 template <typename T>
 inline void IPlaneFit(const T *X1, const T *X2, const T *X3, T *pi) {
-  T mat_a[9] = { X1[0], X1[1], X1[2], X2[0], X2[1], X2[2], X3[0], X3[1],
-                 X3[2] };
+  T mat_a[9] = {X1[0], X1[1], X1[2], X2[0], X2[1], X2[2], X3[0], X3[1], X3[2]};
   IPlaneFitTotalLeastSquare(mat_a, pi, 3);
 }
 
 // Fit a plane pi (ax+by+cz+d = 0) with three 3D points in inhomogeneous
 // space - minimal solution
-template <typename T> inline void IPlaneFit(const T *Xs, T *pi) {
+template <typename T>
+inline void IPlaneFit(const T *Xs, T *pi) {
   T mat_a[9];
   ICopy9(Xs, mat_a);
   IPlaneFitTotalLeastSquare(mat_a, pi, 3);
@@ -441,13 +444,15 @@ template <typename T> inline void IPlaneFit(const T *Xs, T *pi) {
 // Fit a plane pi (ax+by+cz+d = 0) with three 3D points in inhomogeneous
 // space - minimal solution,
 // note that the input Xs will be destroyed
-template <typename T> inline void IPlaneFitDestroyed(T *Xs, T *pi) {
+template <typename T>
+inline void IPlaneFitDestroyed(T *Xs, T *pi) {
   IPlaneFitTotalLeastSquare3(Xs, pi);
 }
 
 // Fit a plane pi: {[a,b,c,d], [x,y,z]} with three 3D points in inhomogeneous
 // space - minimal solution
-template <typename T> inline void IPlaneFitAdv(const T *Xs, T *para) {
+template <typename T>
+inline void IPlaneFitAdv(const T *Xs, T *para) {
   T mat_a[9], mat_ap[9];
   PlanePara<T> pi;
   ICopy9(Xs, mat_a);

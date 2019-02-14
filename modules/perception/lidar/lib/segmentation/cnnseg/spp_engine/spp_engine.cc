@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_engine.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lidar/common/lidar_log.h"
 #include "modules/perception/lidar/common/lidar_timer.h"
-#include "modules/perception/lidar/lib/segmentation/cnnseg/spp_engine/spp_engine.h"
 
 namespace apollo {
 namespace perception {
@@ -26,8 +26,7 @@ namespace lidar {
 void SppEngine::Init(size_t width, size_t height, float range,
                      const SppParams& param, const std::string& sensor_name) {
   // initialize connect component detector
-  detector_2d_cc_.Init(static_cast<int>(height),
-                       static_cast<int>(width));
+  detector_2d_cc_.Init(static_cast<int>(height), static_cast<int>(width));
   detector_2d_cc_.SetData(data_.obs_prob_data_ref, data_.offset_data,
                           static_cast<float>(height) / (2.f * range),
                           data_.objectness_threshold);
@@ -41,7 +40,7 @@ void SppEngine::Init(size_t width, size_t height, float range,
   width_ = width;
   height_ = height;
   range_ = range;
-    // bind worker
+  // bind worker
   worker_.Bind([&]() {
     data_.confidence_pt_blob->cpu_data();
     data_.classify_pt_blob->cpu_data();

@@ -28,7 +28,8 @@ namespace fusion {
 using apollo::perception::base::SensorInfo;
 
 TEST(ProbabliticFusionTest, test_init) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/"
       "fusion/probabilistic_fusion";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
@@ -95,12 +96,14 @@ TEST(ProbabliticFusionTest, test_init) {
 }
 
 TEST(ProbabliticFusionTest, test_update) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/"
       "fusion/probabilistic_fusion";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
       "/apollo/modules/perception/testdata/fusion/probabilistic_fusion/params";
-  SensorDataManager* sensor_manager = SensorDataManager::Instance();;
+  SensorDataManager* sensor_manager = SensorDataManager::Instance();
+
   sensor_manager->Reset();
   sensor_manager->Init();
   FusionInitOptions init_options;
@@ -245,7 +248,8 @@ TEST(ProbabliticFusionTest, test_update) {
 }
 
 TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
-  FLAGS_work_root = "/apollo/modules/perception/testdata/"
+  FLAGS_work_root =
+      "/apollo/modules/perception/testdata/"
       "fusion/probabilistic_fusion";
   FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
   FLAGS_obs_sensor_intrinsic_path =
@@ -278,8 +282,8 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   base_track_lidar->polygon.resize(4);
   for (size_t i = 0; i < 4; i++) {
     base_track_lidar->polygon[i].x = static_cast<double>(8 + 4 * (i % 2));
-    base_track_lidar->polygon[i].y = static_cast<double>(
-                                         -1 + 2 * ((i + 1) % 2));
+    base_track_lidar->polygon[i].y =
+        static_cast<double>(-1 + 2 * ((i + 1) % 2));
     base_track_lidar->polygon[i].z = 0.0;
   }
   base_track_lidar->anchor_point = Eigen::Vector3d(10, 0, 0);
@@ -310,8 +314,8 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   base_track_radar->polygon.resize(4);
   for (size_t i = 0; i < 4; i++) {
     base_track_radar->polygon[i].x = static_cast<double>(8 + 4 * (i % 2));
-    base_track_radar->polygon[i].y = static_cast<double>(
-                                         -1 + 2 * ((i + 1) % 2));
+    base_track_radar->polygon[i].y =
+        static_cast<double>(-1 + 2 * ((i + 1) % 2));
     base_track_radar->polygon[i].z = 0.0;
   }
   base_track_radar->anchor_point = Eigen::Vector3d(10, 0, 0);
@@ -333,8 +337,8 @@ TEST(ProbabilisticFusionTest, test_collect_sensor_measurement) {
   base_track_camera->polygon.resize(4);
   for (size_t i = 0; i < 4; i++) {
     base_track_radar->polygon[i].x = static_cast<double>(58 + 4 * (i % 2));
-    base_track_radar->polygon[i].y = static_cast<double>(
-                                         -1 + 2 * ((i + 1) % 2));
+    base_track_radar->polygon[i].y =
+        static_cast<double>(-1 + 2 * ((i + 1) % 2));
     base_track_radar->polygon[i].z = 0.0;
   }
   base_track_camera->anchor_point = Eigen::Vector3d(10, 0, 0);

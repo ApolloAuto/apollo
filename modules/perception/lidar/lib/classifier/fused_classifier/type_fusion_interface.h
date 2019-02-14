@@ -34,7 +34,7 @@ class BaseOneShotTypeFusion {
  public:
   virtual bool Init(const TypeFusionInitOption& option) = 0;
   virtual bool TypeFusion(const TypeFusionOption& option,
-      std::shared_ptr<perception::base::Object> object) = 0;
+                          std::shared_ptr<perception::base::Object> object) = 0;
   virtual std::string Name() const = 0;
 };
 

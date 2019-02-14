@@ -26,7 +26,6 @@
 #include "modules/perception/onboard/proto/lidar_component_config.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 
-
 namespace apollo {
 namespace perception {
 namespace onboard {

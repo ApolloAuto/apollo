@@ -151,19 +151,29 @@ inline double IPow(double a, double b) { return pow(a, b); }
 inline double IPow(double a, int b) { return pow(a, static_cast<double>(b)); }
 
 // Compute min(a,b)
-template <typename T> inline T IMin(T a, T b) { return ((a <= b) ? a : b); }
+template <typename T>
+inline T IMin(T a, T b) {
+  return ((a <= b) ? a : b);
+}
 
 // Compute max(a,b)
-template <typename T> inline T IMax(T a, T b) { return ((a >= b) ? a : b); }
+template <typename T>
+inline T IMax(T a, T b) {
+  return ((a >= b) ? a : b);
+}
 
 // Compute the average of a and b
-template <typename T> inline T IAverage(T a, T b) { return (a + b) / 2; }
+template <typename T>
+inline T IAverage(T a, T b) {
+  return (a + b) / 2;
+}
 
 // Compute the sign of a, return:
 // 1 if a>0
 // -1 if a<0
 // 0 if a==0
-template <typename T> inline T ISign(T a) {
+template <typename T>
+inline T ISign(T a) {
   if (a > T(0.0))
     return (T(1.0));
   else if (a < T(0.0))
@@ -175,7 +185,8 @@ template <typename T> inline T ISign(T a) {
 // Compute the sign of a, return:
 // 1 if a>=0
 // -1 if a<0
-template <typename T> inline T ISignNeverZero(T a) {
+template <typename T>
+inline T ISignNeverZero(T a) {
   if (a >= T(0.0))
     return (T(1.0));
   else
@@ -268,26 +279,30 @@ inline unsigned int IHammingLut(unsigned int a, unsigned int b) {
 }
 
 // Swap of numbers
-template <typename T> inline void ISwap(T &a, T &b) {
+template <typename T>
+inline void ISwap(T &a, T &b) {
   T temp;
   temp = a;
   a = b;
   b = temp;
 }
-template <typename T> inline void ISwap(T *a, T *b, int n) {
-  for (int i = 0; i < n; i++)
-    ISwap(a[i], b[i]);
+template <typename T>
+inline void ISwap(T *a, T *b, int n) {
+  for (int i = 0; i < n; i++) ISwap(a[i], b[i]);
 }
-template <typename T> inline void ISwap2(T *a, T *b) {
+template <typename T>
+inline void ISwap2(T *a, T *b) {
   ISwap(a[0], b[0]);
   ISwap(a[1], b[1]);
 }
-template <typename T> inline void ISwap3(T *a, T *b) {
+template <typename T>
+inline void ISwap3(T *a, T *b) {
   ISwap(a[0], b[0]);
   ISwap(a[1], b[1]);
   ISwap(a[2], b[2]);
 }
-template <typename T> inline void ISwap4(T *a, T *b) {
+template <typename T>
+inline void ISwap4(T *a, T *b) {
   ISwap(a[0], b[0]);
   ISwap(a[1], b[1]);
   ISwap(a[2], b[2]);
@@ -297,53 +312,62 @@ template <typename T> inline void ISwap4(T *a, T *b) {
 // Return:
 // min_val if a <= min_val
 // max_val if a >= max_val
-template <typename T> inline T IInterval(T a, T min_val, T max_val) {
+template <typename T>
+inline T IInterval(T a, T min_val, T max_val) {
   if (a <= min_val) return (min_val);
   if (a >= max_val) return (max_val);
   return (a);
 }
 
-template <typename T> inline T IIntervalHalfopen(T a, T min_val, T max_val) {
+template <typename T>
+inline T IIntervalHalfopen(T a, T min_val, T max_val) {
   if (a <= min_val) return (min_val);
   if (a >= max_val) return (max_val - 1);
   return (a);
 }
 
 // Make p[i] to be the reference of a's ith row, where a is a mxn matrix
-template <typename T> inline void IMakeReference(T *a, T **p, int m, int n) {
+template <typename T>
+inline void IMakeReference(T *a, T **p, int m, int n) {
   for (int i = 0; i < m; i++) {
     p[i] = &a[i * n];
   }
 }
-template <typename T> inline void IMakeReference2x2(T a[4], T *p[2]) {
+template <typename T>
+inline void IMakeReference2x2(T a[4], T *p[2]) {
   p[0] = &a[0];
   p[1] = &a[2];
 }
-template <typename T> inline void IMakeReference3x3(T a[9], T *p[3]) {
+template <typename T>
+inline void IMakeReference3x3(T a[9], T *p[3]) {
   p[0] = &a[0];
   p[1] = &a[3];
   p[2] = &a[6];
 }
-template <typename T> inline void IMakeReference4x4(T a[16], T *p[4]) {
+template <typename T>
+inline void IMakeReference4x4(T a[16], T *p[4]) {
   p[0] = &a[0];
   p[1] = &a[4];
   p[2] = &a[8];
   p[3] = &a[12];
 }
-template <typename T> inline void IMakeReference4x9(T a[36], T *p[4]) {
+template <typename T>
+inline void IMakeReference4x9(T a[36], T *p[4]) {
   p[0] = &a[0];
   p[1] = &a[9];
   p[2] = &a[18];
   p[3] = &a[27];
 }
-template <typename T> inline void IMakeReference5x9(T a[45], T *p[5]) {
+template <typename T>
+inline void IMakeReference5x9(T a[45], T *p[5]) {
   p[0] = &a[0];
   p[1] = &a[9];
   p[2] = &a[18];
   p[3] = &a[27];
   p[4] = &a[36];
 }
-template <typename T> inline void IMakeReference9x9(T a[81], T *p[9]) {
+template <typename T>
+inline void IMakeReference9x9(T a[81], T *p[9]) {
   p[0] = &a[0];
   p[1] = &a[9];
   p[2] = &a[18];
@@ -354,7 +378,8 @@ template <typename T> inline void IMakeReference9x9(T a[81], T *p[9]) {
   p[7] = &a[63];
   p[8] = &a[72];
 }
-template <typename T> inline void IMakeReference12x12(T a[144], T *p[12]) {
+template <typename T>
+inline void IMakeReference12x12(T a[144], T *p[12]) {
   p[0] = &a[0];
   p[1] = &a[12];
   p[2] = &a[24];
@@ -449,7 +474,8 @@ inline void IMakeReference(T *a, T ***p, int l, int m, int n) {
 }
 
 // Assign a[i] = i to a n-dimensional vector a
-template <typename T> inline void IRamp(T *a, int n) {
+template <typename T>
+inline void IRamp(T *a, int n) {
   for (int i = 0; i < n; i++) {
     a[i] = static_cast<T>(i);
   }
@@ -510,7 +536,10 @@ inline void IGaussian2D(double *kernel, int n, const double sigma) {
 
 // Move a into b, without necessarily preserving the value of a. This function
 // is * specialized for types that are expensive to copy
-template <typename T> inline void IMove(const T &a, T *b) { *b = a; }
+template <typename T>
+inline void IMove(const T &a, T *b) {
+  *b = a;
+}
 
 // Check if a point x is within the 1D rectangle bounding box defined by range
 //  * [start, start + length)

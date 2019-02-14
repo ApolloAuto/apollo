@@ -31,36 +31,30 @@ class MlfMotionFilter : public MlfBaseFilter {
   MlfMotionFilter() = default;
   virtual ~MlfMotionFilter() = default;
 
-  bool Init(const MlfFilterInitOptions& options =
-      MlfFilterInitOptions()) override;
+  bool Init(
+      const MlfFilterInitOptions& options = MlfFilterInitOptions()) override;
 
   // @brief: updating motion filter with object
   // @params [in]: options for updating
   // @params [in]: track data, not include new object
   // @params [in/out]: new object for updating
-  void UpdateWithObject(
-      const MlfFilterOptions& options,
-      const MlfTrackDataConstPtr& track_data,
-      TrackedObjectPtr new_object) override;
+  void UpdateWithObject(const MlfFilterOptions& options,
+                        const MlfTrackDataConstPtr& track_data,
+                        TrackedObjectPtr new_object) override;
 
   // @brief: updating motion filter without object
   // @params [in]: options for updating
   // @params [in]: current timestamp
   // @params [in/out]: track data to be updated
-  void UpdateWithoutObject(
-      const MlfFilterOptions& options,
-      double timestamp,
-      MlfTrackDataPtr track_data) override;
+  void UpdateWithoutObject(const MlfFilterOptions& options, double timestamp,
+                           MlfTrackDataPtr track_data) override;
 
-  std::string Name() const override {
-    return "MlfMotionFilter";
-  }
+  std::string Name() const override { return "MlfMotionFilter"; }
 
  protected:
   // @brief: initialize track state and store in the new object
   // @params [out]: new object to be updated
-  void InitializeTrackState(
-      TrackedObjectPtr new_object);
+  void InitializeTrackState(TrackedObjectPtr new_object);
 
   // @brief: update state with kalman filter,
   //         constant acceleration motion model,
@@ -70,19 +64,17 @@ class MlfMotionFilter : public MlfBaseFilter {
   // @params [in/out]: new object to be updated
   void KalmanFilterUpdateWithPartialObservation(
       const MlfTrackDataConstPtr& track_data,
-      const TrackedObjectConstPtr& latest_object,
-      TrackedObjectPtr new_object);
+      const TrackedObjectConstPtr& latest_object, TrackedObjectPtr new_object);
 
   // @brief: adjust kalman state gain with several strategies
   // @params [in]: history track data
   // @params [in]: latest object in the track data
   // @params [in]: new object to be updated
   // @params [in/out]: state gain
-  void StateGainAdjustment(
-      const MlfTrackDataConstPtr& track_data,
-      const TrackedObjectConstPtr& latest_object,
-      const TrackedObjectConstPtr& new_object,
-      Eigen::Vector4d* gain);
+  void StateGainAdjustment(const MlfTrackDataConstPtr& track_data,
+                           const TrackedObjectConstPtr& latest_object,
+                           const TrackedObjectConstPtr& new_object,
+                           Eigen::Vector4d* gain);
 
   // @brief: estimate convergence confidence and boost up state
   // @params [in]: history track data
@@ -90,24 +82,21 @@ class MlfMotionFilter : public MlfBaseFilter {
   // @params [in/out]: new object to be updated
   void ConvergenceEstimationAndBoostUp(
       const MlfTrackDataConstPtr& track_data,
-      const TrackedObjectConstPtr& latest_object,
-      TrackedObjectPtr new_object);
+      const TrackedObjectConstPtr& latest_object, TrackedObjectPtr new_object);
 
   // @brief: compute convergence confidence
   // @params [in]: history track data
   // @params [in/out]: new object to be updated
   // @params [in]: whether using belief velocity or output velocity
-  void ComputeConvergenceConfidence(
-      const MlfTrackDataConstPtr& track_data,
-      TrackedObjectPtr new_object,
-      bool velocity_source_is_belief = true);
+  void ComputeConvergenceConfidence(const MlfTrackDataConstPtr& track_data,
+                                    TrackedObjectPtr new_object,
+                                    bool velocity_source_is_belief = true);
 
   // @brief: boost up state considering track history
   // @params [in]: history track data
   // @params [in/out]: new object to be updated
-  void BoostupState(
-      const MlfTrackDataConstPtr& track_data,
-      TrackedObjectPtr new_object);
+  void BoostupState(const MlfTrackDataConstPtr& track_data,
+                    TrackedObjectPtr new_object);
 
   // @brief: cliping state if is within noise level
   // @params [in/out]: new object to be updated
@@ -116,16 +105,14 @@ class MlfMotionFilter : public MlfBaseFilter {
   // @brief: estimate covariance considering history measurment
   // @params [in]: history track data
   // @params [in/out]: new object to be updated
-  void OnlineCovarianceEstimation(
-      const MlfTrackDataConstPtr& track_data,
-      TrackedObjectPtr object);
+  void OnlineCovarianceEstimation(const MlfTrackDataConstPtr& track_data,
+                                  TrackedObjectPtr object);
 
   // @brief: update convergence confidence
   // @params [in]: history track data
   // @params [in/out]: new object to be updated
-  void UpdateConverged(
-      const MlfTrackDataConstPtr& track_data,
-      TrackedObjectPtr object);
+  void UpdateConverged(const MlfTrackDataConstPtr& track_data,
+                       TrackedObjectPtr object);
 
   // @brief: synchronize state to belief to keep consistency
   // @params [in/out]: new object to be updated
@@ -162,5 +149,3 @@ class MlfMotionFilter : public MlfBaseFilter {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

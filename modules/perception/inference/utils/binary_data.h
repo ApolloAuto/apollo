@@ -32,15 +32,15 @@ static const int kMaxDim = INT_MAX;
 size_t BinaryReadString(FILE *fp, char *name);
 size_t BinaryWriteString(FILE *fp, const std::string &str);
 
-template<typename Dtype>
+template <typename Dtype>
 boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp);
-template<typename Dtype>
+template <typename Dtype>
 void BinaryWriteBlob(FILE *fp, const base::Blob<Dtype> &blob);
 
-template<typename Dtype>
-std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>>
-BinaryReadFile(const char *file_path);
-template<typename Btype>
+template <typename Dtype>
+std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
+    const char *file_path);
+template <typename Btype>
 bool BinaryWriteFile(const char *file_path,
                      const std::map<std::string, Btype> &data_dict);
 

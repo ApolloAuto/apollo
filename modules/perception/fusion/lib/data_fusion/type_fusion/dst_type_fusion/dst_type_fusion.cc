@@ -278,8 +278,10 @@ double DstTypeFusion::GetReliabilityForUnKnown(
   struct tm timeinfo;
   localtime_r(&rawtime, &timeinfo);
   bool is_night = (timeinfo.tm_hour >= 17);
-  double prob = (common::SensorManager::Instance()->IsCamera(sensor_id) &&
-                 is_night) ? 0.1 : 1.0;
+  double prob =
+      (common::SensorManager::Instance()->IsCamera(sensor_id) && is_night)
+          ? 0.1
+          : 1.0;
   return find_res->second * prob;
 }
 

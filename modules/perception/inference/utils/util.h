@@ -28,7 +28,7 @@ namespace apollo {
 namespace perception {
 namespace inference {
 
-template<typename T>
+template <typename T>
 void load_data(const std::string &filename, std::vector<T> *outputs) {
   std::ifstream ifs(filename, std::ifstream::in);
 

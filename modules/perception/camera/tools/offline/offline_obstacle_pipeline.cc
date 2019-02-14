@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include <iomanip>
 
@@ -26,20 +26,21 @@
 
 DEFINE_string(test_list, "full_test_list.txt", "exe image list");
 DEFINE_string(image_root,
-   "/apollo/modules/perception/testdata/camera/lib/obstacle/detector/yolo/img/",
-   "root dir of images");
+              "/apollo/modules/perception/testdata/camera/lib/obstacle/"
+              "detector/yolo/img/",
+              "root dir of images");
 DEFINE_string(image_ext, ".jpg", "extension of image name");
 DEFINE_string(image_color, "bgr", "color space of image");
 DEFINE_string(config_root,
-             "/apollo/modules/perception/production/conf/perception/camera/",
-             "config_root");
+              "/apollo/modules/perception/production/conf/perception/camera/",
+              "config_root");
 DEFINE_string(tf_file, "", "tf file");
 DEFINE_string(config_file, "obstacle.pt", "config_file");
 DEFINE_string(narrow_name, "front_12mm", " camera for projecting");
 DEFINE_string(base_camera_name, "front_6mm", "camera to be peojected");
 DEFINE_string(sensor_name, "front_6mm,front_12mm", "camera to use");
 DEFINE_string(params_dir, "/apollo/modules/perception/data/params",
-             "params dir");
+              "params dir");
 DEFINE_string(visualize_dir, "/tmp/0000", "visualize dir");
 DEFINE_double(camera_fps, 15, "camera_fps");
 DEFINE_bool(do_undistortion, false, "do_undistortion");
@@ -52,11 +53,10 @@ namespace camera {
 static const float kDefaultPitchAngle = 0.0f;
 static const float kDefaultCameraHeight = 1.5f;
 
-void save_image(const std::string &path, base::Image8U &image) { // NOLINT
+void save_image(const std::string &path, base::Image8U &image) {  // NOLINT
   AINFO << path;
   int cv_type = image.type() == base::Color::GRAY ? CV_8UC1 : CV_8UC3;
-  cv::Mat cv_img(image.rows(), image.cols(), cv_type,
-                 image.mutable_cpu_data(),
+  cv::Mat cv_img(image.rows(), image.cols(), cv_type, image.mutable_cpu_data(),
                  image.width_step());
   cv::imwrite(path, cv_img);
 }
@@ -118,11 +118,11 @@ int work() {
   for (const auto &camera_name : camera_names) {
     base::BaseCameraModelPtr model;
     model = manager->GetUndistortCameraModel(camera_name);
-    auto pinhole = dynamic_cast<base::PinholeCameraModel *> (model.get());
+    auto pinhole = dynamic_cast<base::PinholeCameraModel *>(model.get());
     Eigen::Matrix3f intrinsic = pinhole->get_intrinsic_params();
     intrinsic_map[camera_name] = intrinsic;
     AINFO << "#intrinsics of " << camera_name << ": "
-             << intrinsic_map[camera_name];
+          << intrinsic_map[camera_name];
   }
 
   // Init extrinsic
@@ -143,7 +143,7 @@ int work() {
     Eigen::Affine3d c2g;
     if (!transform_server.QueryTransform(camera_names[i], "ground", &c2g)) {
       AINFO << "Failed to query transform from " << camera_names[i]
-               << " to ground";
+            << " to ground";
       return -1;
     }
     float camera_ground_height = static_cast<float>(c2g.translation()[2]);
@@ -157,8 +157,7 @@ int work() {
     } else {
       Eigen::Affine3d trans;
       if (!transform_server.QueryTransform(camera_names[i],
-                                           FLAGS_base_camera_name,
-                                           &trans)) {
+                                           FLAGS_base_camera_name, &trans)) {
         AINFO << "Failed to query transform";
         return -1;
       }
@@ -169,8 +168,8 @@ int work() {
       }
       project_matrix =
           intrinsic_map.at(FLAGS_base_camera_name).cast<double>() *
-              trans.linear() *
-              intrinsic_map.at(camera_names[i]).cast<double>().inverse();
+          trans.linear() *
+          intrinsic_map.at(camera_names[i]).cast<double>().inverse();
     }
     name_camera_pitch_angle_diff_map[camera_names[i]] = pitch_diff;
   }
@@ -194,8 +193,8 @@ int work() {
     image_name = temp_strs[1];
 
     AINFO << "image: " << image_name << " camera_name:" << camera_name;
-    std::string image_path = FLAGS_image_root + "/" + camera_name + "/"
-        + image_name + FLAGS_image_ext;
+    std::string image_path = FLAGS_image_root + "/" + camera_name + "/" +
+                             image_name + FLAGS_image_ext;
     cv::Mat image;
     if (FLAGS_image_color == "gray") {
       image = cv::imread(image_path, CV_LOAD_IMAGE_GRAYSCALE);
@@ -224,23 +223,22 @@ int work() {
       frame.timestamp = 1.0 / FLAGS_camera_fps * frame_id;
     }
     AINFO << "Timestamp: " << std::fixed << std::setprecision(10)
-             << frame.timestamp;
+          << frame.timestamp;
 
     if (FLAGS_base_camera_name == camera_name) {
       frame.project_matrix = Eigen::Matrix3d::Identity();
     } else {
       Eigen::Affine3d trans;
-      if (!transform_server.QueryTransform(camera_name,
-                                           FLAGS_base_camera_name,
+      if (!transform_server.QueryTransform(camera_name, FLAGS_base_camera_name,
                                            &trans)) {
-        AINFO << "Failed to query transform from "
-                 << camera_name << " to " << FLAGS_base_camera_name;
+        AINFO << "Failed to query transform from " << camera_name << " to "
+              << FLAGS_base_camera_name;
         return -1;
       }
       frame.project_matrix =
           intrinsic_map.at(FLAGS_base_camera_name).cast<double>() *
-              trans.linear() *
-              intrinsic_map.at(camera_name).cast<double>().inverse();
+          trans.linear() *
+          intrinsic_map.at(camera_name).cast<double>().inverse();
     }
     frame.data_provider = name_provider_map.at(camera_name);
     AINFO << "Project Matrix: \n" << frame.project_matrix;
@@ -251,16 +249,13 @@ int work() {
 
     Eigen::Affine3d c2n;
     if (!transform_server.QueryTransform(camera_name, "novatel", &c2n)) {
-      AINFO << "Failed to query transform from "
-               << camera_name << " to novatel";
+      AINFO << "Failed to query transform from " << camera_name
+            << " to novatel";
       return -1;
     }
     frame.camera2world_pose = pose * c2n;
-    frame.data_provider->FillImageData(image.rows,
-                                       image.cols,
-                                       (const uint8_t *) (
-                                           image.data),
-                                       "bgr8");
+    frame.data_provider->FillImageData(image.rows, image.cols,
+                                       (const uint8_t *)(image.data), "bgr8");
     perception.GetCalibrationService(&frame.calibration_service);
 
     // save distortion images
@@ -285,8 +280,9 @@ int work() {
 
 int main(int argc, char *argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  google::SetUsageMessage("command line brew\n"
-                          "Usage: camera_benchmark <args>\n");
+  google::SetUsageMessage(
+      "command line brew\n"
+      "Usage: camera_benchmark <args>\n");
 
   return apollo::perception::camera::work();
 }

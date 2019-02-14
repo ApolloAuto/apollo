@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/calibrator/common/histogram_estimator.h"
 
 #include "modules/perception/common/i_lib/core/i_basic.h"
@@ -43,8 +43,7 @@ void HistogramEstimatorParams::Init() {  // set default value
   decay_factor = 0.9f;
 }
 
-void HistogramEstimator::Init(
-    const HistogramEstimatorParams *params) {
+void HistogramEstimator::Init(const HistogramEstimatorParams *params) {
   if (params != nullptr) {
     params_ = *params;
   }
@@ -114,8 +113,7 @@ void HistogramEstimator::Smooth(const uint32_t *hist_input, int nr_bins,
     ep = i + filter_radius;
     float kernel_sum = 0.0f;
     for (int j = sp; j <= ep; ++j) {
-      sum += hist_input[j]
-          * params_.smooth_kernel[j - i + filter_radius];
+      sum += hist_input[j] * params_.smooth_kernel[j - i + filter_radius];
       kernel_sum += static_cast<float>(params_.smooth_kernel[j - sp]);
     }
     float scale = common::IRec(kernel_sum);
@@ -130,8 +128,8 @@ void HistogramEstimator::Smooth(const uint32_t *hist_input, int nr_bins,
     for (int j = sp; j <= ep; ++j) {
       sum += hist_input[j] * params_.smooth_kernel[j - sp];
     }
-    hist_output[i] = static_cast<uint32_t>(static_cast<float>(sum) *
-                                           norm_reversed);
+    hist_output[i] =
+        static_cast<uint32_t>(static_cast<float>(sum) * norm_reversed);
   }
 
   // right boundary part
@@ -145,8 +143,7 @@ void HistogramEstimator::Smooth(const uint32_t *hist_input, int nr_bins,
       kernel_sum += static_cast<float>(params_.smooth_kernel[j - sp]);
     }
     float scale = common::IRec(kernel_sum);
-    hist_output[i] = static_cast<uint32_t>(static_cast<float>(sum) *
-                                           scale);
+    hist_output[i] = static_cast<uint32_t>(static_cast<float>(sum) * scale);
   }
 }
 
@@ -165,8 +162,8 @@ void HistogramEstimator::GenerateHat(float *hist_hat, int nr_bins) {
   }
 }
 
-bool HistogramEstimator::IsGoodShape(const uint32_t *hist,
-                                     int nr_bins, int max_index) {
+bool HistogramEstimator::IsGoodShape(const uint32_t *hist, int nr_bins,
+                                     int max_index) {
   assert(nr_bins == params_.nr_bins_in_histogram);
   assert(max_index < params_.nr_bins_in_histogram);
   assert(max_index >= 0);
@@ -180,19 +177,15 @@ bool HistogramEstimator::IsGoodShape(const uint32_t *hist,
 
   for (int i = sp; i < ep; ++i) {
     float hat_val = hist_hat_[i - offset];
-    if (static_cast<float>(hist[i]) >
-        static_cast<float>(max_value) * hat_val) {
+    if (static_cast<float>(hist[i]) > static_cast<float>(max_value) * hat_val) {
       return false;
     }
   }
   return true;
 }
 
-void HistogramEstimator::GetPeakIndexAndMass(
-    const uint32_t *hist,
-    int nr_bins,
-    int *index,
-    uint32_t *mass) {
+void HistogramEstimator::GetPeakIndexAndMass(const uint32_t *hist, int nr_bins,
+                                             int *index, uint32_t *mass) {
   assert(nr_bins == params_.nr_bins_in_histogram);
   assert(hist != nullptr);
   assert(index != nullptr);

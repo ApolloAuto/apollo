@@ -1,23 +1,23 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <assert.h>
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 #include "cyber/common/log.h"
 
@@ -27,9 +27,7 @@ namespace camera {
 
 // histogram related params
 struct HistogramEstimatorParams {
-  HistogramEstimatorParams() {
-    Init();
-  }
+  HistogramEstimatorParams() { Init(); }
   void Init();
 
   int nr_bins_in_histogram = 0;
@@ -61,8 +59,7 @@ struct HistogramEstimatorParams {
     assert(w >= 1);
     smooth_kernel_width = w;
     smooth_kernel.resize(smooth_kernel_width);
-    memcpy(smooth_kernel.data(),
-           params.smooth_kernel.data(),
+    memcpy(smooth_kernel.data(), params.smooth_kernel.data(),
            sizeof(uint32_t) * smooth_kernel_width);
     smooth_kernel_radius = smooth_kernel_width >> 1;
 
@@ -95,7 +92,7 @@ class HistogramEstimator {
     Init();
   }
 
-  ~HistogramEstimator() { }
+  ~HistogramEstimator() {}
 
   void Init(const HistogramEstimatorParams *params = nullptr);
 
@@ -119,17 +116,11 @@ class HistogramEstimator {
     val_cur_ = val_estimation_ = 0.0f;
   }
 
-  const std::vector<uint32_t> &get_hist() const {
-    return hist_;
-  }
+  const std::vector<uint32_t> &get_hist() const { return hist_; }
 
-  float get_val_cur() const {
-    return val_cur_;
-  }
+  float get_val_cur() const { return val_cur_; }
 
-  float get_val_estimation() const {
-    return val_estimation_;
-  }
+  float get_val_estimation() const { return val_estimation_; }
 
   uint32_t get_bin_value(int i) const {
     assert(i >= 0 && i < params_.nr_bins_in_histogram);
@@ -142,8 +133,7 @@ class HistogramEstimator {
 
  private:
   int GetIndex(float val) const {
-    return static_cast<int>((val - params_.data_sp)
-        * step_bin_reversed_);
+    return static_cast<int>((val - params_.data_sp) * step_bin_reversed_);
   }
 
   float GetValFromIndex(int index) const {
@@ -151,13 +141,12 @@ class HistogramEstimator {
             (static_cast<float>(index) + 0.5f) * params_.step_bin);
   }
 
-  void Smooth(const uint32_t *hist_input, int nr_bins,
-              uint32_t *hist_output);
+  void Smooth(const uint32_t *hist_input, int nr_bins, uint32_t *hist_output);
 
   bool IsGoodShape(const uint32_t *hist, int nr_bins, int max_index);
 
-  void GetPeakIndexAndMass(const uint32_t *hist, int nr_bins,
-                           int *index, uint32_t *mass);
+  void GetPeakIndexAndMass(const uint32_t *hist, int nr_bins, int *index,
+                           uint32_t *mass);
 
   void Decay(uint32_t *hist, int nr_bins) {
     float df = params_.decay_factor;

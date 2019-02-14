@@ -61,18 +61,15 @@ bool MotionService::Init() {
   // initialize image listener
   const std::string &channel_name_img = input_camera_channel_names_[0];
   const std::string &camera_name = camera_names_[0];
-  std::function<void(const ImageMsgType &)> camera_callback =
-      std::bind(&MotionService::OnReceiveImage, this,
-      std::placeholders::_1, camera_name);
-  auto camera_reader =
-      node_->CreateReader(channel_name_img, camera_callback);
+  std::function<void(const ImageMsgType &)> camera_callback = std::bind(
+      &MotionService::OnReceiveImage, this, std::placeholders::_1, camera_name);
+  auto camera_reader = node_->CreateReader(channel_name_img, camera_callback);
 
   // initialize localization listener
   const std::string &channel_name_local =
       motion_service_param.input_localization_channel_name();
-  std::function<void(const LocalizationMsgType &)>
-      localization_callback = std::bind(&MotionService::OnLocalization,
-      this, std::placeholders::_1);
+  std::function<void(const LocalizationMsgType &)> localization_callback =
+      std::bind(&MotionService::OnLocalization, this, std::placeholders::_1);
   auto localization_reader =
       node_->CreateReader(channel_name_local, localization_callback);
 
@@ -84,8 +81,8 @@ bool MotionService::Init() {
 }
 
 // On receiving image input, just need to record its timestamp
-void MotionService::OnReceiveImage(
-    const ImageMsgType &message, const std::string &camera_name) {
+void MotionService::OnReceiveImage(const ImageMsgType &message,
+                                   const std::string &camera_name) {
   std::lock_guard<std::mutex> lock(mutex_);
   const double curr_timestamp = message->measurement_time() + timestamp_offset_;
   ADEBUG << "image received: "
@@ -100,14 +97,14 @@ void MotionService::OnLocalization(const LocalizationMsgType &message) {
   std::lock_guard<std::mutex> lock(mutex_);
   ADEBUG << "localization received: "
          << " localization ts: " + std::to_string(message->measurement_time());
-  const auto& velocity = message->pose().linear_velocity();
+  const auto &velocity = message->pose().linear_velocity();
   // Get base::VehicleStatus
   base::VehicleStatus vehicle_status;
-  float velx = static_cast<float> (velocity.x());
-  float vely = static_cast<float> (velocity.y());
-  float velz = static_cast<float> (velocity.z());
-  vehicle_status.velocity = static_cast<float> (sqrt(velx * velx +
-                                       vely * vely + velz * velz));
+  float velx = static_cast<float>(velocity.x());
+  float vely = static_cast<float>(velocity.y());
+  float velz = static_cast<float>(velocity.z());
+  vehicle_status.velocity =
+      static_cast<float>(sqrt(velx * velx + vely * vely + velz * velz));
   vehicle_status.velocity_x = velx;
   vehicle_status.velocity_y = vely;
   vehicle_status.velocity_z = velz;
@@ -120,12 +117,12 @@ void MotionService::OnLocalization(const LocalizationMsgType &message) {
     vehicle_status.time_ts = 0;
 
   } else {
-    vehicle_status.roll_rate = static_cast<float>
-                                (message->pose().angular_velocity_vrf().y());
-    vehicle_status.pitch_rate = static_cast<float>
-                                (-message->pose().angular_velocity_vrf().x());
-    vehicle_status.yaw_rate = static_cast<float>
-                                (message->pose().angular_velocity_vrf().z());
+    vehicle_status.roll_rate =
+        static_cast<float>(message->pose().angular_velocity_vrf().y());
+    vehicle_status.pitch_rate =
+        static_cast<float>(-message->pose().angular_velocity_vrf().x());
+    vehicle_status.yaw_rate =
+        static_cast<float>(message->pose().angular_velocity_vrf().z());
     timestamp_diff = message->measurement_time() - pre_timestamp_;
     vehicle_status.time_d = timestamp_diff;
     vehicle_status.time_ts = message->measurement_time();
@@ -168,8 +165,8 @@ void MotionService::OnLocalization(const LocalizationMsgType &message) {
 // which is at camera timestamp
 void MotionService::PublishEvent(const double timestamp) {
   // protobuf msg
-  std::shared_ptr<apollo::perception::Motion_Service>
-    motion_service_msg(new (std::nothrow) apollo::perception::Motion_Service);
+  std::shared_ptr<apollo::perception::Motion_Service> motion_service_msg(
+      new (std::nothrow) apollo::perception::Motion_Service);
   apollo::common::Header *header = motion_service_msg->mutable_header();
 
   // output camera_time when motion service last proceesed
@@ -178,7 +175,7 @@ void MotionService::PublishEvent(const double timestamp) {
 
   // convert vehicle status buffer to output message
   auto motion_buffer = MotionService::GetMotionBuffer();
-  for (int k = static_cast<int>(motion_buffer.size())-1; k >= 0; k--) {
+  for (int k = static_cast<int>(motion_buffer.size()) - 1; k >= 0; k--) {
     apollo::perception::VehicleStatus *v_status_msg =
         motion_service_msg->add_vehicle_status();
     ConvertVehicleMotionToMsgOut(motion_buffer.at(k), v_status_msg);
@@ -188,35 +185,33 @@ void MotionService::PublishEvent(const double timestamp) {
 
 // convert vehicle status buffer to output message
 void MotionService::ConvertVehicleMotionToMsgOut(
-    base::VehicleStatus vs,
-    apollo::perception::VehicleStatus *v_status_msg) {
-  v_status_msg -> set_roll_rate(vs.roll_rate);
-  v_status_msg -> set_pitch_rate(vs.pitch_rate);
-  v_status_msg -> set_yaw_rate(vs.yaw_rate);
-  v_status_msg -> set_velocity(vs.velocity);
-  v_status_msg -> set_velocity_x(vs.velocity_x);
-  v_status_msg -> set_velocity_y(vs.velocity_y);
-  v_status_msg -> set_velocity_z(vs.velocity_z);
-  v_status_msg -> set_time_ts(vs.time_ts);
-  v_status_msg -> set_time_d(vs.time_d);
-  apollo::perception::MotionType *motion_msg =
-      v_status_msg->mutable_motion();
-  motion_msg -> set_m00(vs.motion(0, 0));
-  motion_msg -> set_m01(vs.motion(0, 1));
-  motion_msg -> set_m02(vs.motion(0, 2));
-  motion_msg -> set_m03(vs.motion(0, 3));
-  motion_msg -> set_m10(vs.motion(1, 0));
-  motion_msg -> set_m11(vs.motion(1, 1));
-  motion_msg -> set_m12(vs.motion(1, 2));
-  motion_msg -> set_m13(vs.motion(1, 3));
-  motion_msg -> set_m20(vs.motion(2, 0));
-  motion_msg -> set_m21(vs.motion(2, 1));
-  motion_msg -> set_m22(vs.motion(2, 2));
-  motion_msg -> set_m23(vs.motion(2, 3));
-  motion_msg -> set_m30(vs.motion(3, 0));
-  motion_msg -> set_m31(vs.motion(3, 1));
-  motion_msg -> set_m32(vs.motion(3, 2));
-  motion_msg -> set_m33(vs.motion(3, 3));
+    base::VehicleStatus vs, apollo::perception::VehicleStatus *v_status_msg) {
+  v_status_msg->set_roll_rate(vs.roll_rate);
+  v_status_msg->set_pitch_rate(vs.pitch_rate);
+  v_status_msg->set_yaw_rate(vs.yaw_rate);
+  v_status_msg->set_velocity(vs.velocity);
+  v_status_msg->set_velocity_x(vs.velocity_x);
+  v_status_msg->set_velocity_y(vs.velocity_y);
+  v_status_msg->set_velocity_z(vs.velocity_z);
+  v_status_msg->set_time_ts(vs.time_ts);
+  v_status_msg->set_time_d(vs.time_d);
+  apollo::perception::MotionType *motion_msg = v_status_msg->mutable_motion();
+  motion_msg->set_m00(vs.motion(0, 0));
+  motion_msg->set_m01(vs.motion(0, 1));
+  motion_msg->set_m02(vs.motion(0, 2));
+  motion_msg->set_m03(vs.motion(0, 3));
+  motion_msg->set_m10(vs.motion(1, 0));
+  motion_msg->set_m11(vs.motion(1, 1));
+  motion_msg->set_m12(vs.motion(1, 2));
+  motion_msg->set_m13(vs.motion(1, 3));
+  motion_msg->set_m20(vs.motion(2, 0));
+  motion_msg->set_m21(vs.motion(2, 1));
+  motion_msg->set_m22(vs.motion(2, 2));
+  motion_msg->set_m23(vs.motion(2, 3));
+  motion_msg->set_m30(vs.motion(3, 0));
+  motion_msg->set_m31(vs.motion(3, 1));
+  motion_msg->set_m32(vs.motion(3, 2));
+  motion_msg->set_m33(vs.motion(3, 3));
 }
 
 // load vehicle status buffer from vehicle_planemotion_
@@ -231,8 +226,8 @@ double MotionService::GetLatestTimestamp() {
 }
 
 // retrieve vehiclestattus at the closeset cameratimestamp
-bool MotionService::GetMotionInformation(
-    double timestamp, base::VehicleStatus* vs) {
+bool MotionService::GetMotionInformation(double timestamp,
+                                         base::VehicleStatus *vs) {
   return vehicle_planemotion_->find_motion_with_timestamp(timestamp, vs);
 }
 

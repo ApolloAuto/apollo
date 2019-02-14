@@ -38,12 +38,12 @@ inline int IRansacTrials(int sample_size, double confidence,
 
 // Using Ransac to fit a model to data set which contains outliers
 // The function needs 2n entries of scratch space in inliers
-template <
-    typename T, int l, int lp, int k, int s,
-    void (*HypogenFunc)(const T* x, const T* xp, T* model),
-    void (*CostFunc)(const T* model, const T* x, const T* xp, int n,
-                     int* nr_liner, int* inliers, T* cost, T error_tol),
-    void (*RefitFunc)(T* x, T* xp, int* inliers, T* model, int n, int nr_liner)>
+template <typename T, int l, int lp, int k, int s,
+          void (*HypogenFunc)(const T* x, const T* xp, T* model),
+          void (*CostFunc)(const T* model, const T* x, const T* xp, int n,
+                           int* nr_liner, int* inliers, T* cost, T error_tol),
+          void (*RefitFunc)(T* x, T* xp, int* inliers, T* model, int n,
+                            int nr_liner)>
 bool RobustBinaryFitRansac(T* x, T* xp, int n, T* model, int* consensus_size,
                            int* inliers, T error_tol,
                            bool re_est_model_w_inliers = false,

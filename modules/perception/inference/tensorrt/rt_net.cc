@@ -493,14 +493,14 @@ void RTNet::mergeBN(int index, LayerParameter *layer_param) {
     const BlobProto *var = (layer_param->mutable_blobs(index + 1));
     for (int k = 0; k < size; k++) {
       auto data = blob->data(k);
-      blob->set_data(k, static_cast<float>(-data * scale_factor /
-                            sqrt(var->data(k) * scale_factor + epsilon)));
+      blob->set_data(
+          k, static_cast<float>(-data * scale_factor /
+                                sqrt(var->data(k) * scale_factor + epsilon)));
     }
   } else if (index == 1) {
     for (int k = 0; k < size; k++) {
-      blob->set_data(k,
-                     1.0f / static_cast<float>(
-                                sqrt(blob->data(k) * scale_factor + epsilon)));
+      blob->set_data(k, 1.0f / static_cast<float>(sqrt(
+                                   blob->data(k) * scale_factor + epsilon)));
     }
   }
 }

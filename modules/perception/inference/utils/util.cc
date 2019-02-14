@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/common/log.h"
 #include "modules/perception/inference/utils/util.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -32,7 +32,7 @@ std::shared_ptr<float> load_binary_data(const std::string &filename) {
   ifs.seekg(0, ifs.beg);
   std::shared_ptr<float> outputs;
   outputs.reset(new float[length]);
-  ifs.read( reinterpret_cast<char *>(outputs.get()), sizeof(float) * length);
+  ifs.read(reinterpret_cast<char *>(outputs.get()), sizeof(float) * length);
   ifs.close();
   return outputs;
 }

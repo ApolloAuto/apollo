@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <vector>
@@ -38,13 +38,11 @@ bool ConvertGround4ToGround3(const float &baseline,
 
 void GetGroundPlanePitchHeight(const float &baseline,
                                const std::vector<float> &k_mat,
-                               const std::vector<float> &ground3,
-                               float *pitch,
+                               const std::vector<float> &ground3, float *pitch,
                                float *cam_height);
 
 void GetGround3FromPitchHeight(const std::vector<float> &k_mat,
-                               const float &baseline,
-                               const float &pitch,
+                               const float &baseline, const float &pitch,
                                const float &cam_height,
                                std::vector<float> *ground3);
 
@@ -56,8 +54,7 @@ class GroundPlaneTracker {
   explicit GroundPlaneTracker(int track_length);
   ~GroundPlaneTracker() {}
 
-  void Push(const std::vector<float> &ph,
-            const float &inlier_ratio);
+  void Push(const std::vector<float> &ph, const float &inlier_ratio);
 
   void GetGround(float *pitch, float *cam_height);
 
@@ -78,9 +75,7 @@ class GroundPlaneTracker {
 
 // params for ground detector
 struct CameraGroundPlaneParams {
-  CameraGroundPlaneParams() {
-    SetDefault();
-  }
+  CameraGroundPlaneParams() { SetDefault(); }
   void SetDefault();
 
   int min_nr_samples;
@@ -112,11 +107,8 @@ class CameraGroundPlaneDetector {
     ground_plane_tracker_ = nullptr;
   }
 
-  void Init(const std::vector<float> &k_mat,
-            int width,
-            int height,
-            float baseline,
-            int max_nr_samples = 1080) {
+  void Init(const std::vector<float> &k_mat, int width, int height,
+            float baseline, int max_nr_samples = 1080) {
     CHECK_EQ(k_mat.size(), 9);
     memcpy(k_mat_, k_mat.data(), sizeof(float) * 9);
     width_ = width;
@@ -126,18 +118,14 @@ class CameraGroundPlaneDetector {
     ss_int_.resize(max_nr_samples * 2);
   }
 
-  int get_min_nr_samples() {
-    return params_.min_nr_samples;
-  }
+  int get_min_nr_samples() { return params_.min_nr_samples; }
 
   // main interface: fit the plane from v-d samples
   // input a backup (default) pitch + camera_height
   // can be assigned by {a, b, c, d}: a * X + b * Y + c * Z + d = 0 (cam coor)
-  bool DetetGround(float pitch,
-                   float camera_height,
+  bool DetetGround(float pitch, float camera_height,
                    float *vd, /*samples: v0, d0 ... vj, dj*/
-                   int count_vd,
-                   const std::vector<float> &plane = {});
+                   int count_vd, const std::vector<float> &plane = {});
 
   bool GetGroundModel(float *l) const {
     l[0] = l_[0];
@@ -176,7 +164,7 @@ class CameraGroundPlaneDetector {
 /*
  fitting utils
 */
-template<typename T>
+template <typename T>
 void GroundHypoGenFunc(const T *v, const T *d, T *p) {
   // disp = p0 * y + p1 -> l = {p0, -1, p1}
   T x[2] = {v[0], d[0]};
@@ -187,14 +175,11 @@ void GroundHypoGenFunc(const T *v, const T *d, T *p) {
   p[1] = -l[2] * common::IRec(l[1]);
 }
 
-template<typename T>
-void GroundFittingCostFunc(const T *p,
-                           const T *v,
-                           const T *d,
-                           int n,
+template <typename T>
+void GroundFittingCostFunc(const T *p, const T *v, const T *d, int n,
                            int *nr_inlier,  // NOLINT compatible for i-lib
                            int *inliers,
-                           T *cost,         // NOLINT
+                           T *cost,  // NOLINT
                            T error_tol) {
   *cost = static_cast<T>(0.0f);
   *nr_inlier = 0;

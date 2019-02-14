@@ -1,22 +1,22 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/detector/detection/select.h"
 
-#include "gtest/gtest.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace perception {
@@ -100,7 +100,7 @@ TEST(MatchTest, nvn2) {
   EXPECT_EQ(hdmap_bboxes[0]->region.detection_roi,
             detect_bboxes[0]->region.detection_roi);
   EXPECT_EQ(hdmap_bboxes[1]->region.detection_roi,
-      detect_bboxes[1]->region.detection_roi);
+            detect_bboxes[1]->region.detection_roi);
 }
 
 TEST(MatchTest, nvm12) {
@@ -137,7 +137,7 @@ TEST(MatchTest, nvm12) {
   EXPECT_TRUE(hdmap_bboxes[0]->region.is_selected);
   EXPECT_TRUE(hdmap_bboxes[0]->region.is_detected);
   EXPECT_EQ(hdmap_bboxes[0]->region.detection_roi,
-              detect_bboxes[1]->region.detection_roi);
+            detect_bboxes[1]->region.detection_roi);
 }
 
 TEST(MatchTest, nvm21) {
@@ -177,7 +177,7 @@ TEST(MatchTest, nvm21) {
   EXPECT_EQ(hdmap_bboxes[0]->region.detection_roi,
             detect_bboxes[0]->region.detection_roi);
   EXPECT_EQ(hdmap_bboxes[1]->region.detection_roi,
-              hdmap_bboxes[1]->region.detection_roi);
+            hdmap_bboxes[1]->region.detection_roi);
 }
 
 TEST(MatchTest, nvm24) {
@@ -239,7 +239,7 @@ TEST(MatchTest, nvm24) {
   EXPECT_EQ(hdmap_bboxes[0]->region.detection_roi,
             detect_bboxes[0]->region.detection_roi);
   EXPECT_EQ(hdmap_bboxes[1]->region.detection_roi,
-              detect_bboxes[1]->region.detection_roi);
+            detect_bboxes[1]->region.detection_roi);
 }
 
 TEST(MatchTest, test_outside_crop_roi) {

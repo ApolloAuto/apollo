@@ -270,7 +270,8 @@ TEST(ComputeRadarCameraVelocitySimilarity, test_compute_radar_camera_vel_sim) {
   SensorObjectConstPtr radar_const_sensor_ptr(
       new SensorObject(radar_const_object_ptr, radar_frame_ptr));
 
-  EXPECT_LT(ComputeRadarCameraVelocitySimilarity(radar_const_sensor_ptr, camera_const_sensor_ptr), 0.8);
+  EXPECT_LT(ComputeRadarCameraVelocitySimilarity(radar_const_sensor_ptr,
+camera_const_sensor_ptr), 0.8);
 }
 
 TEST(TrackObjectDistance, test) {

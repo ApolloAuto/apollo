@@ -29,8 +29,7 @@ struct ObjectFilterInitOptions {
   std::string sensor_name = "velodyne64";
 };
 
-struct ObjectFilterOptions {
-};
+struct ObjectFilterOptions {};
 
 class BaseObjectFilter {
  public:

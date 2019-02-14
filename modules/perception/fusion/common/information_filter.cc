@@ -150,7 +150,7 @@ bool InformationFilter::Correct(
     last_observation_ = last_to_cur_transform_matrix_ * last_observation_;
     last_observation_uncertainty_ =
         last_to_cur_transform_matrix_ * last_observation_uncertainty_ *
-        last_to_cur_transform_matrix_.transpose() +
+            last_to_cur_transform_matrix_.transpose() +
         last_to_cur_env_uncertainty_;
     last_observation_uncertainty_ =  // transform to measurement space
         c_matrix_ * last_observation_uncertainty_ * c_matrix_.transpose();

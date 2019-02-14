@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <nppi.h>
@@ -32,8 +32,11 @@ namespace camera {
 class DataProvider {
  public:
   struct InitOptions {
-    InitOptions() : image_height(0), image_width(0),
-                    device_id(-1), do_undistortion(false) {}
+    InitOptions()
+        : image_height(0),
+          image_width(0),
+          device_id(-1),
+          do_undistortion(false) {}
 
     int image_height;
     int image_width;
@@ -48,9 +51,7 @@ class DataProvider {
       this->do_crop = false;
     }
 
-    ImageOptions(base::Color target_color,
-                 bool do_crop,
-                 base::RectI crop_roi) {
+    ImageOptions(base::Color target_color, bool do_crop, base::RectI crop_roi) {
       this->target_color = target_color;
       this->do_crop = do_crop;
       this->crop_roi = crop_roi;
@@ -61,16 +62,14 @@ class DataProvider {
       ss << " " << static_cast<int>(target_color);
       ss << " " << do_crop;
       if (do_crop) {
-        ss << " " << crop_roi.x
-           << " " << crop_roi.y
-           << " " << crop_roi.width
+        ss << " " << crop_roi.x << " " << crop_roi.y << " " << crop_roi.width
            << " " << crop_roi.height;
       }
       return ss.str();
     }
 
     base::Color target_color = base::Color::BGR;
-    bool do_crop = false;           // default: DONOT crop
+    bool do_crop = false;  // default: DONOT crop
     base::RectI crop_roi;
   };
 

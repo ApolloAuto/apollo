@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <Eigen/Core>
@@ -34,13 +34,13 @@
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/interface/base_camera_perception.h"
 #include "modules/perception/camera/lib/motion_service/motion_service.h"
+#include "modules/perception/camera/tools/offline/visualizer.h"
 #include "modules/perception/onboard/component/camera_perception_viz_message.h"
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/onboard/proto/lane_perception_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
-#include "modules/perception/proto/perception_lane.pb.h"
 #include "modules/perception/proto/motion_service.pb.h"
-#include "modules/perception/camera/tools/offline/visualizer.h"
+#include "modules/perception/proto/perception_lane.pb.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
@@ -51,25 +51,20 @@ namespace onboard {
 
 typedef Eigen::Matrix4d MotionType;
 
-class LaneDetectionComponent :
-    public apollo::cyber::Component<> {
+class LaneDetectionComponent : public apollo::cyber::Component<> {
  public:
   LaneDetectionComponent() : seq_num_(0) {}
   ~LaneDetectionComponent();
 
-  LaneDetectionComponent(
-      const LaneDetectionComponent&) = delete;
-  LaneDetectionComponent& operator=(
-      const LaneDetectionComponent&) = delete;
+  LaneDetectionComponent(const LaneDetectionComponent&) = delete;
+  LaneDetectionComponent& operator=(const LaneDetectionComponent&) = delete;
 
   bool Init() override;
 
  private:
-  void OnReceiveImage(
-      const std::shared_ptr<apollo::drivers::Image>& in_message,
-      const std::string &camera_name);
-  void OnMotionService(
-      const MotionServiceMsgType& in_message);
+  void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image>& in_message,
+                      const std::string& camera_name);
+  void OnMotionService(const MotionServiceMsgType& in_message);
   int InitConfig();
   int InitSensorInfo();
   int InitAlgorithmPlugin();
@@ -81,23 +76,23 @@ class LaneDetectionComponent :
 
   int InternalProc(
       const std::shared_ptr<apollo::drivers::Image const>& in_message,
-      const std::string &camera_name,
-      apollo::common::ErrorCode *error_code,
+      const std::string& camera_name, apollo::common::ErrorCode* error_code,
       SensorFrameMessage* prefused_message,
       apollo::perception::PerceptionLanes* out_message);
 
-  int ConvertLaneToCameraLaneline(const base::LaneLine& lane_line,
+  int ConvertLaneToCameraLaneline(
+      const base::LaneLine& lane_line,
       apollo::perception::camera::CameraLaneLine* camera_laneline);
 
   int MakeProtobufMsg(double msg_timestamp, const std::string& camera_name,
-      const camera::CameraFrame& camera_frame,
-      apollo::perception::PerceptionLanes* lanes_msg);
+                      const camera::CameraFrame& camera_frame,
+                      apollo::perception::PerceptionLanes* lanes_msg);
 
  private:
   std::mutex mutex_;
   uint32_t seq_num_;
 
-  std::vector<std::shared_ptr<cyber::Node> > camera_listener_nodes_;
+  std::vector<std::shared_ptr<cyber::Node>> camera_listener_nodes_;
 
   std::vector<std::string> camera_names_;  // camera sensor names
   std::vector<std::string> input_camera_channel_names_;
@@ -113,12 +108,12 @@ class LaneDetectionComponent :
 
   // TF stuff
   std::map<std::string, std::string> tf_camera_frame_id_map_;
-  std::map<std::string, std::shared_ptr<TransformWrapper> >
+  std::map<std::string, std::shared_ptr<TransformWrapper>>
       camera2world_trans_wrapper_map_;
 
   // pre-allocaated-mem data_provider;
-  std::map<std::string,
-      std::shared_ptr<camera::DataProvider> > data_providers_map_;
+  std::map<std::string, std::shared_ptr<camera::DataProvider>>
+      data_providers_map_;
 
   // map for store params
   std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
@@ -161,8 +156,8 @@ class LaneDetectionComponent :
   double last_timestamp_ = 0.0;
   double ts_diff_ = 1.0;
 
-  std::shared_ptr<apollo::cyber::Writer<
-      apollo::perception::PerceptionLanes>> writer_;
+  std::shared_ptr<apollo::cyber::Writer<apollo::perception::PerceptionLanes>>
+      writer_;
 
   base::MotionBufferPtr mot_buffer_;
   const int motion_buffer_size_ = 100;

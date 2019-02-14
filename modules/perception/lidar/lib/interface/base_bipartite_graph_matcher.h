@@ -54,7 +54,6 @@ class BaseBipartiteGraphMatcher {
 
   virtual common::SecureMat<float> *cost_matrix() { return cost_matrix_; }
 
-
  protected:
   common::SecureMat<float> *cost_matrix_ = nullptr;
   float max_match_distance_ = 0.0f;
