@@ -239,8 +239,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
 
 bool ScenarioManager::ReuseCurrentScenario(
     const common::TrajectoryPoint& ego_point, const Frame& frame) {
-  return current_scenario_->IsTransferable(*current_scenario_, ego_point,
-                                           frame);
+  return current_scenario_->IsTransferable(*current_scenario_, frame);
 }
 
 bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
@@ -254,7 +253,7 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
     return true;
   } else {
     auto scenario = CreateScenario(type);
-    if (scenario->IsTransferable(*current_scenario_, ego_point, frame)) {
+    if (scenario->IsTransferable(*current_scenario_, frame)) {
       AINFO << "switch to scenario: " << scenario->Name();
       current_scenario_ = std::move(scenario);
       return true;
