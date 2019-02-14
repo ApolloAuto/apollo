@@ -34,8 +34,8 @@ namespace lidar {
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::cyber::common::GetProtoFromFile;
 using base::AttributePointCloud;
-using base::PointF;
 using base::Object;
+using base::PointF;
 
 bool CNNSegmentation::Init(const SegmentationInitOptions& options) {
   // get configs
@@ -314,7 +314,7 @@ void CNNSegmentation::GetObjectsFromSppEngine(
   Timer timer;
   spp_engine_.GetSppData().grid_indices = point2grid_.data();
   size_t num_foreground =
-       spp_engine_.ProcessForegroundSegmentation(original_cloud_);
+      spp_engine_.ProcessForegroundSegmentation(original_cloud_);
   fg_seg_time_ = timer.toc(true);
   // should sync with worker before do background segmentation
   worker_.Join();
@@ -339,8 +339,8 @@ void CNNSegmentation::GetObjectsFromSppEngine(
          sizeof(float) * original_cloud_->size());
   if (cnnseg_param_.remove_ground_points()) {
     num_foreground = spp_engine_.RemoveGroundPointsInForegroundCluster(
-          original_cloud_, lidar_frame_ref_->roi_indices,
-          lidar_frame_ref_->non_ground_indices);
+        original_cloud_, lidar_frame_ref_->roi_indices,
+        lidar_frame_ref_->non_ground_indices);
     if (num_foreground == 0) {
       ADEBUG << "No foreground segmentation output";
     }

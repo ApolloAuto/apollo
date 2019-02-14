@@ -17,19 +17,19 @@
 
 #include <Eigen/Core>
 #include <list>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
-#include <mutex>
-#include <memory>
 
 #include "cyber/component/component.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/localization/proto/localization.pb.h"
-#include "modules/perception/proto/motion_service.pb.h"
-#include "modules/perception/camera/lib/motion/plane_motion.h"
 #include "modules/perception/camera/common/camera_frame.h"
+#include "modules/perception/camera/lib/motion/plane_motion.h"
 #include "modules/perception/lib/registerer/registerer.h"
 #include "modules/perception/onboard/proto/motion_service.pb.h"
+#include "modules/perception/proto/motion_service.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -38,8 +38,7 @@ namespace camera {
 typedef std::shared_ptr<apollo::drivers::Image> ImageMsgType;
 typedef std::shared_ptr<localization::LocalizationEstimate> LocalizationMsgType;
 
-class MotionService :
-    public apollo::cyber::Component<> {
+class MotionService : public apollo::cyber::Component<> {
  public:
   MotionService() = default;
   virtual ~MotionService() { delete vehicle_planemotion_; }
@@ -49,16 +48,13 @@ class MotionService :
   base::MotionBuffer GetMotionBuffer();
   double GetLatestTimestamp();
 
- protected:
  private:
   void OnLocalization(const LocalizationMsgType &localization);
-  void OnReceiveImage(
-      const ImageMsgType &message,
-      const std::string &camera_name);
+  void OnReceiveImage(const ImageMsgType &message,
+                      const std::string &camera_name);
   void PublishEvent(const double timestamp);
   void ConvertVehicleMotionToMsgOut(
-      base::VehicleStatus vs,
-      apollo::perception::VehicleStatus *v_status_msg);
+      base::VehicleStatus vs, apollo::perception::VehicleStatus *v_status_msg);
 
   PlaneMotion *vehicle_planemotion_ = nullptr;
   std::string device_id_;
@@ -73,10 +69,10 @@ class MotionService :
   std::vector<std::string> camera_names_;  // camera sensor names
   std::vector<std::string> input_camera_channel_names_;
   std::mutex mutex_;
-//   std::mutex image_mutex_;
+  //   std::mutex image_mutex_;
   std::mutex motion_mutex_;
-  std::shared_ptr<apollo::cyber::Writer<
-      apollo::perception::Motion_Service>> writer_;
+  std::shared_ptr<apollo::cyber::Writer<apollo::perception::Motion_Service>>
+      writer_;
   DISALLOW_COPY_AND_ASSIGN(MotionService);
 };
 

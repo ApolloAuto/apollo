@@ -42,8 +42,8 @@ bool CCRFOneShotTypeFusion::Init(const TypeFusionInitOption& option) {
   config_file = GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
   CHECK(cyber::common::GetProtoFromFile(config_file, &config));
-  std::string classifiers_property_file_path = GetAbsolutePath(
-      work_root, config.classifiers_property_file_path());
+  std::string classifiers_property_file_path =
+      GetAbsolutePath(work_root, config.classifiers_property_file_path());
   CHECK(util::LoadMultipleMatricesFile(classifiers_property_file_path,
                                        &smooth_matrices_));
 
@@ -136,8 +136,8 @@ bool CCRFSequenceTypeFusion::Init(const TypeFusionInitOption& option) {
   config_file = GetAbsolutePath(config_file, "ccrf_type_fusion.conf");
   CcrfTypeFusionConfig config;
   CHECK(cyber::common::GetProtoFromFile(config_file, &config));
-  std::string transition_property_file_path = GetAbsolutePath(
-      work_root, config.transition_property_file_path());
+  std::string transition_property_file_path =
+      GetAbsolutePath(work_root, config.transition_property_file_path());
   s_alpha_ = config.transition_matrix_alpha();
   CHECK(util::LoadSingleMatrixFile(transition_property_file_path,
                                    &transition_matrix_));

@@ -2,7 +2,9 @@
 
 ## Introduction
 
-As the Planning module introduced a major change with the launch of Scenario-based planning, we realized the need to have scenario specific algorithms that can be fine-tuned to enhance the trajectory of the ego-car for that particular scenario. The Open Space Planner is one such algorithm in development targeted towards reverse parking and sharp U-turns
+As the Planning module introduced a major change with the launch of Scenario-based planning, we realized the need to have scenario specific algorithms that can be fine-tuned to enhance the trajectory of the ego-car for that particular scenario. The Open Space Planner is one such algorithm in development targeted towards reverse parking and sharp U-turns.
+This algorithm was initially inspired by several papers<cite>[1]</cite><cite>[2]</cite><cite>[3]</cite>.
+
 
 ## Algorithm Flow
 
@@ -16,7 +18,7 @@ Once the data is in place, Open Space planner is triggered as seen in the image 
 
 ### Searching - Based Planning
 
-In step 1, a raw trajectory is generated for the ego-car. This stage applies vehicle kinemetic model in algorithm to create the raw trajectory with a series of distance equidistant points as seen in the image below. 
+In step 1, a raw trajectory is generated for the ego-car. This stage applies vehicle kinemetic model in algorithm to create the raw trajectory with a series of distance equidistant points as seen in the image below.
 The red line represents the raw trajectory output which is sent to the next step, Optimization to calculate the green smoothened line.
 
 ![](images/step1.png)
@@ -25,7 +27,7 @@ The red line represents the raw trajectory output which is sent to the next step
 ### Optimization
 
 
-This step involves two major tasks, 
+This step involves two major tasks,
 - Smooth the trajectory to get better riding comfort experience and to make it easier for the control module to track
 - Ensure collision avoidance
 
@@ -41,3 +43,11 @@ Once this stage is complete, the output is directly sent to the Control module t
 ## Future Applications
 
 As the algorithm is currently in development, it is currently used for reverse parking, but can also be implemented in scenarios that involve tight U-turns. The main aim of scenario-based planning is to ensure efficient planning of the car's trajectory using targeted algorithms for individual scenarios just like with Open Space Planning for reverse parking.
+
+
+
+[1]:  Dolgov, Dmitri, et al. "Path Planning for Autonomous Vehicles in Unknown Semi-Structured Environments." The International Journal of Robotics Research, vol. 29, no. 5, 2010, pp. 485-501., doi:10.1177/0278364909359210.
+
+[2]: Prodan, Ionela, et al. "Mixed-integer representations in control design: Mathematical foundations and applications."" Springer, 2015.
+
+[3]:  Xiaojing Zhang, et al. "Optimization-Based Collision Avoidance" (arXiv:1711.03449).

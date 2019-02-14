@@ -68,15 +68,14 @@ bool ConfigManager::InitInternal() {
     return false;
   }
 
-  for (const auto& model_config_file : model_config_files) {
+  for (const auto &model_config_file : model_config_files) {
     ModelConfigFileListProto file_list_proto;
     if (!GetProtoFromASCIIFile(model_config_file, &file_list_proto)) {
-      AERROR << "invalid ModelConfigFileListProto file: "
-             << model_config_file;
+      AERROR << "invalid ModelConfigFileListProto file: " << model_config_file;
       return false;
     }
 
-    for (const std::string& model_config_path :
+    for (const std::string &model_config_path :
          file_list_proto.model_config_path()) {
       const std::string abs_path =
           GetAbsolutePath(work_root_, model_config_path);

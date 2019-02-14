@@ -214,8 +214,8 @@ void MockData(LidarFrame* frame) {
   point.y = frame->lidar2world_pose.translation()(1);
   point.z = frame->lidar2world_pose.translation()(2);
   frame->hdmap_struct.reset(new base::HdmapStruct);
-  CHECK(map::HDMapInput::Instance()->GetRoiHDMapStruct(
-      point, 120.0, frame->hdmap_struct));
+  CHECK(map::HDMapInput::Instance()->GetRoiHDMapStruct(point, 120.0,
+                                                       frame->hdmap_struct));
 
   // d. trans points
   frame->world_cloud = base::PointDCloudPool::Instance().Get();

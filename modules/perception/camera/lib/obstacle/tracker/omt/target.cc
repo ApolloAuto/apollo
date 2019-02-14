@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
 
 #include <algorithm>
@@ -28,23 +28,17 @@ namespace perception {
 namespace camera {
 
 int Target::global_track_id = 0;
-int Target::Size() const {
-  return static_cast<int>(tracked_objects.size());
-}
+int Target::Size() const { return static_cast<int>(tracked_objects.size()); }
 
-void Target::Clear() {
-  tracked_objects.clear();
-}
+void Target::Clear() { tracked_objects.clear(); }
 
-TrackObjectPtr Target::operator[](int index) const {
-  return get_object(index);
-}
+TrackObjectPtr Target::operator[](int index) const { return get_object(index); }
 TrackObjectPtr Target::get_object(int index) const {
   CHECK_GT(tracked_objects.size(), 0);
   CHECK_LT(index, static_cast<int>(tracked_objects.size()));
   CHECK_GE(index, -static_cast<int>(tracked_objects.size()));
-  return tracked_objects[(index + tracked_objects.size())
-      % tracked_objects.size()];
+  return tracked_objects[(index + tracked_objects.size()) %
+                         tracked_objects.size()];
 }
 void Target::Add(TrackObjectPtr object) {
   if (tracked_objects.empty()) {
@@ -62,7 +56,7 @@ void Target::Add(TrackObjectPtr object) {
 void Target::RemoveOld(int frame_id) {
   size_t index = 0;
   while (index < tracked_objects.size() &&
-      tracked_objects[index]->indicator.frame_id < frame_id) {
+         tracked_objects[index]->indicator.frame_id < frame_id) {
     ++index;
   }
   tracked_objects.erase(tracked_objects.begin(),
@@ -106,9 +100,7 @@ void Target::Init(const omt::TargetParam &param) {
   // Init object template
   object_template_manager_ = ObjectTemplateManager::Instance();
 }
-Target::Target(const omt::TargetParam &param) {
-  Init(param);
-}
+Target::Target(const omt::TargetParam &param) { Init(param); }
 
 void Target::Predict(CameraFrame *frame) {
   auto delta_t =
@@ -189,13 +181,13 @@ void Target::Update3D(CameraFrame *frame) {
       float obj_2_car_z = object->camera_supplement.local_center[2];
       float obj_distance_to_main_car =
           obj_2_car_x * obj_2_car_x + obj_2_car_z * obj_2_car_z;
-      float dis_err = target_param_.world_center().measure_variance()
-          * obj_distance_to_main_car;
+      float dis_err = target_param_.world_center().measure_variance() *
+                      obj_distance_to_main_car;
       world_center.measure_noise_.setIdentity();
       world_center.measure_noise_ *= dis_err;
       world_center.Correct(z);
       ADEBUG << "Velocity: " << id << " " << z.transpose() << " "
-                << world_center.get_state().transpose();
+             << world_center.get_state().transpose();
 
       // const position kalman correct
       world_center_const.measure_noise_.setIdentity();
@@ -229,7 +221,7 @@ void Target::Update3D(CameraFrame *frame) {
       double speed2 = std::sqrt(x(2) * x(2) + x(3) * x(3));
       double ratio = (Equal(speed1, 0)) ? 0 : speed2 / speed1;
       ADEBUG << "Target: " << id << " " << vel.transpose() << " , "
-                << x.block<2, 1>(2, 0).transpose();
+             << x.block<2, 1>(2, 0).transpose();
       if (ratio > target_param_.too_large_velocity_ratio()) {
         world_center.MagicVelocity(vel);
         ADEBUG << "Velocity too large";
@@ -258,9 +250,9 @@ void Target::Update3D(CameraFrame *frame) {
     object->center(1) = x(1);
     object->center_uncertainty.setConstant(0);
     object->center_uncertainty(0, 0) =
-      static_cast<float>(world_center.variance_(0, 0));
+        static_cast<float>(world_center.variance_(0, 0));
     object->center_uncertainty(1, 1) =
-      static_cast<float>(world_center.variance_(1, 1));
+        static_cast<float>(world_center.variance_(1, 1));
     object->velocity(0) = static_cast<float>(x(2));
     object->velocity(1) = static_cast<float>(x(3));
     object->velocity(2) = 0;
@@ -289,8 +281,8 @@ void Target::Update3D(CameraFrame *frame) {
       displacement_theta.AddMeasure(measured_theta);
       // if an object is moving, its displacement oritentation should be
       // consistent
-      stable_moving = displacement_theta.get_variance()(0, 0)
-          < target_param_.displacement_theta_var();
+      stable_moving = displacement_theta.get_variance()(0, 0) <
+                      target_param_.displacement_theta_var();
     }
 
     // check const position kalman residuals
@@ -310,8 +302,8 @@ void Target::Update3D(CameraFrame *frame) {
   }
 
   // debug velocity
-  ADEBUG << "obj_speed--id: " << id
-            << " " << std::to_string(object->velocity.head(2).norm());
+  ADEBUG << "obj_speed--id: " << id << " "
+         << std::to_string(object->velocity.head(2).norm());
 }
 
 void Target::UpdateType(CameraFrame *frame) {
@@ -332,15 +324,15 @@ void Target::UpdateType(CameraFrame *frame) {
     type_probs[static_cast<int>(object->sub_type)] += alpha;
     auto max_prob = std::max_element(type_probs.begin(), type_probs.end());
     auto index = static_cast<int>(std::distance(type_probs.begin(), max_prob));
-    type = static_cast<base::ObjectSubType >(index);
-    ADEBUG << "Target " << id
-              << " change type from " << static_cast<int>(object->sub_type)
-              << " to " << static_cast<int>(type);
+    type = static_cast<base::ObjectSubType>(index);
+    ADEBUG << "Target " << id << " change type from "
+           << static_cast<int>(object->sub_type) << " to "
+           << static_cast<int>(type);
     object->sub_type = type;
 
     Eigen::Vector4d size_measurement;
-    size_measurement
-        << alpha, object->size(0), object->size(1), object->size(2);
+    size_measurement << alpha, object->size(0), object->size(1),
+        object->size(2);
     world_lwh.AddMeasure(size_measurement);
     world_lwh_for_unmovable.AddMeasure(size_measurement);
     // update 3d object size
@@ -361,21 +353,21 @@ void Target::ClappingTrackVelocity(const base::ObjectPtr &obj) {
     Eigen::Vector3f obj_vel = obj->velocity;
     double vel_heading_angle_change_1 =
         common::CalculateTheta2DXY(obj_dir, obj_vel);
-    obj_dir *= -1;    // obj's heading may flip
+    obj_dir *= -1;  // obj's heading may flip
     double vel_heading_angle_change_2 =
         common::CalculateTheta2DXY(obj_dir, obj_vel);
     double vel_heading_angle_change =
         std::min(std::fabs(vel_heading_angle_change_1),
                  std::fabs(vel_heading_angle_change_2));
     ADEBUG << "obj_id: " << obj->track_id
-              << " vel_heading_angle, 1: " << vel_heading_angle_change_1
-              << " 2: " << vel_heading_angle_change_2
-              << " final: " << vel_heading_angle_change;
+           << " vel_heading_angle, 1: " << vel_heading_angle_change_1
+           << " 2: " << vel_heading_angle_change_2
+           << " final: " << vel_heading_angle_change;
     if (vel_heading_angle_change >
         target_param_.abnormal_velocity_heading_angle_threshold()) {
       ADEBUG << "omt set zero velocity because vel_heading_angle_change >"
-                   " abnormal_velocity_heading_angle_threshold : "
-                << target_param_.abnormal_velocity_heading_angle_threshold();
+                " abnormal_velocity_heading_angle_threshold : "
+             << target_param_.abnormal_velocity_heading_angle_threshold();
       obj->velocity = Eigen::Vector3f::Zero();
       return;
     }
@@ -402,24 +394,21 @@ bool Target::CheckStatic() {
 
   // 1. Check small speed
   bool small_speed = false;
-  const int min_vel_size = std::min(
-      static_cast<int>(history_world_states_.size()),
-      target_param_.min_cached_velocity_size());
+  const int min_vel_size =
+      std::min(static_cast<int>(history_world_states_.size()),
+               target_param_.min_cached_velocity_size());
   // calculate average velocity
   base::Object tmp_obj_vel_avg;
   tmp_obj_vel_avg.velocity = Eigen::Vector3f(0, 0, 0);
-  tmp_obj_vel_avg = std::accumulate(history_world_states_.begin() +
-                                        history_world_states_.size() -
-                                        min_vel_size,
-                                    history_world_states_.end(),
-                                    tmp_obj_vel_avg,
-                                    [](const base::Object &obj1,
-                                       const base::Object &obj2) {
-                                      base::Object ret_obj;
-                                      ret_obj.velocity =
-                                          obj1.velocity + obj2.velocity;
-                                      return ret_obj;
-                                    });
+  tmp_obj_vel_avg =
+      std::accumulate(history_world_states_.begin() +
+                          history_world_states_.size() - min_vel_size,
+                      history_world_states_.end(), tmp_obj_vel_avg,
+                      [](const base::Object &obj1, const base::Object &obj2) {
+                        base::Object ret_obj;
+                        ret_obj.velocity = obj1.velocity + obj2.velocity;
+                        return ret_obj;
+                      });
   tmp_obj_vel_avg.velocity /= static_cast<float>(min_vel_size);
   double speed_avg = tmp_obj_vel_avg.velocity.head(2).norm();
   const auto &obj_type = history_world_states_.back().type;
@@ -441,13 +430,13 @@ bool Target::CheckStatic() {
     double move_distance = 0.0;
     Eigen::Vector3d start_position(0.0, 0.0, 0.0);
     Eigen::Vector3d end_position(0.0, 0.0, 0.0);
-    const int start_idx = static_cast<int>(history_world_states_.size()) -
+    const int start_idx =
+        static_cast<int>(history_world_states_.size()) -
         static_cast<int>(target_param_.min_cached_position_size());
     const int end_idx = static_cast<int>(history_world_states_.size()) - 1;
     // calculate window-averaged start and end positions
     // and calculate moved distance
-    if (end_idx - start_idx >=
-        target_param_.calc_avg_position_window_size() &&
+    if (end_idx - start_idx >= target_param_.calc_avg_position_window_size() &&
         start_idx + target_param_.calc_avg_position_window_size() - 1 <
             static_cast<int>(history_world_states_.size()) &&
         end_idx - target_param_.calc_avg_position_window_size() + 1 >= 0) {
@@ -456,7 +445,7 @@ bool Target::CheckStatic() {
         end_position += history_world_states_[end_idx - i].center;
       }
       double time_diff = history_world_states_[end_idx].latest_tracked_time -
-          history_world_states_[start_idx].latest_tracked_time;
+                         history_world_states_[start_idx].latest_tracked_time;
       // do not consider moved distance when time_diff is small
       if (std::fabs(time_diff) > 1e-3) {
         start_position /= target_param_.calc_avg_position_window_size();
@@ -478,12 +467,12 @@ bool Target::CheckStatic() {
 
   // 3. Check velocity theta's variance
   std::vector<double> theta_vec(min_vel_size);
-  std::transform(history_world_states_.begin() +
-                     history_world_states_.size() - min_vel_size,
-                 history_world_states_.end(),
-                 theta_vec.begin(), [](const base::Object &obj) -> double {
-        return std::atan2(obj.velocity[1], obj.velocity[0]);
-      });
+  std::transform(history_world_states_.begin() + history_world_states_.size() -
+                     min_vel_size,
+                 history_world_states_.end(), theta_vec.begin(),
+                 [](const base::Object &obj) -> double {
+                   return std::atan2(obj.velocity[1], obj.velocity[0]);
+                 });
   double mean = 0.0;
   double var = 0.0;
   CalculateMeanAndVariance(theta_vec, &mean, &var);
@@ -497,9 +486,7 @@ bool Target::CheckStatic() {
 bool Target::isTracked() const {
   return Size() >= target_param_.tracked_life();
 }
-bool Target::isLost() const {
-  return lost_age > 0;
-}
+bool Target::isLost() const { return lost_age > 0; }
 
 }  // namespace camera
 }  // namespace perception

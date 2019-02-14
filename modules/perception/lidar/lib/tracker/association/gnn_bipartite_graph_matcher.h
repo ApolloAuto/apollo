@@ -15,11 +15,11 @@
  *****************************************************************************/
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "modules/perception/lidar/lib/interface/base_bipartite_graph_matcher.h"
 #include "modules/perception/common/graph/secure_matrix.h"
+#include "modules/perception/lidar/lib/interface/base_bipartite_graph_matcher.h"
 
 namespace apollo {
 namespace perception {
@@ -37,8 +37,8 @@ class MatchCost {
   // @brief access Cost
   double Cost() const;
 
-  friend bool operator< (const MatchCost& m1, const MatchCost& m2);
-  friend std::ostream& operator<< (std::ostream& os, const MatchCost& m);
+  friend bool operator<(const MatchCost& m1, const MatchCost& m2);
+  friend std::ostream& operator<<(std::ostream& os, const MatchCost& m);
 
  private:
   size_t row_idx_ = 0;
@@ -46,7 +46,7 @@ class MatchCost {
   double cost_ = 0.0;
 };
 
-class GnnBipartiteGraphMatcher: public BaseBipartiteGraphMatcher{
+class GnnBipartiteGraphMatcher : public BaseBipartiteGraphMatcher {
  public:
   explicit GnnBipartiteGraphMatcher(size_t max_size = 1000);
   ~GnnBipartiteGraphMatcher();
@@ -56,14 +56,13 @@ class GnnBipartiteGraphMatcher: public BaseBipartiteGraphMatcher{
   // @params [out]: matched pair of objects & tracks
   // @params [out]: unmatched rows
   // @params [out]: unmatched cols
-  void Match(const BipartiteGraphMatcherOptions & options,
-             std::vector<NodeNodePair> *assignments,
-             std::vector<size_t> *unassigned_rows,
-             std::vector<size_t> *unassigned_cols);
+  void Match(const BipartiteGraphMatcherOptions& options,
+             std::vector<NodeNodePair>* assignments,
+             std::vector<size_t>* unassigned_rows,
+             std::vector<size_t>* unassigned_cols);
 
-  std::string Name() const {
-      return "GnnBipartiteGraphMatcher";
-  }
+  std::string Name() const { return "GnnBipartiteGraphMatcher"; }
+
  protected:
   std::vector<int> row_tag_;
   std::vector<int> col_tag_;

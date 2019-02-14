@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
 
 #include <algorithm>
@@ -39,12 +39,12 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   }
 
   AINFO << "load omt parameters from " << omt_config
-           << " \nimg_capability: " << omt_param_.img_capability()
-           << " \nlost_age: " << omt_param_.lost_age()
-           << " \nreserve_age: " << omt_param_.reserve_age()
-           << " \nborder: " << omt_param_.border()
-           << " \ntarget_thresh: " << omt_param_.target_thresh()
-           << " \ncorrect_type: " << omt_param_.correct_type();
+        << " \nimg_capability: " << omt_param_.img_capability()
+        << " \nlost_age: " << omt_param_.lost_age()
+        << " \nreserve_age: " << omt_param_.reserve_age()
+        << " \nborder: " << omt_param_.border()
+        << " \ntarget_thresh: " << omt_param_.target_thresh()
+        << " \ncorrect_type: " << omt_param_.correct_type();
 
   track_id_ = 0;
   frame_num_ = 0;
@@ -73,9 +73,7 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
   return true;
 }
 
-std::string OMTObstacleTracker::Name() const {
-  return "OMTObstacleTracker";
-}
+std::string OMTObstacleTracker::Name() const { return "OMTObstacleTracker"; }
 
 // @description combine targets using iou after association
 bool OMTObstacleTracker::CombineDuplicateTargets() {
@@ -96,17 +94,17 @@ bool OMTObstacleTracker::CombineDuplicateTargets() {
       while (index1 < targets_[i].Size() && index2 < targets_[j].Size()) {
         auto p1 = targets_[i][index1];
         auto p2 = targets_[j][index2];
-        if (std::abs(p1->timestamp - p2->timestamp)
-            < omt_param_.same_ts_eps()) {
+        if (std::abs(p1->timestamp - p2->timestamp) <
+            omt_param_.same_ts_eps()) {
           if (p1->indicator.sensor_name != p2->indicator.sensor_name) {
             auto box1 = p1->projected_box;
             auto box2 = p2->projected_box;
             score += common::CalculateIOUBBox(box1, box2);
             base::RectF rect1(box1);
             base::RectF rect2(box2);
-            score -= std::abs(
-                (rect1.width - rect2.width) * (rect1.height - rect2.height)
-                    / (rect1.width * rect1.height));
+            score -= std::abs((rect1.width - rect2.width) *
+                              (rect1.height - rect2.height) /
+                              (rect1.width * rect1.height));
             count += 1;
           }
           ++index1;
@@ -119,10 +117,8 @@ bool OMTObstacleTracker::CombineDuplicateTargets() {
           }
         }
       }
-      ADEBUG << "Overlap: (" << targets_[i].id
-                << "," << targets_[j].id
-                << ") score " << score
-                << " count " << count;
+      ADEBUG << "Overlap: (" << targets_[i].id << "," << targets_[j].id
+             << ") score " << score << " count " << count;
       hypo.target = static_cast<int>(i);
       hypo.object = static_cast<int>(j);
       hypo.score = (count > 0) ? score / static_cast<float>(count) : 0;
@@ -150,19 +146,16 @@ bool OMTObstacleTracker::CombineDuplicateTargets() {
       // no need to change track_id of all objects in target_del
       target_save.Add(target_del[i]);
     }
-    std::sort(target_save.tracked_objects.begin(),
-              target_save.tracked_objects.end(),
-              [](const TrackObjectPtr object1,
-                 const TrackObjectPtr object2) -> bool {
-                return object1->indicator.frame_id <
-                    object2->indicator.frame_id;
-              });
+    std::sort(
+        target_save.tracked_objects.begin(), target_save.tracked_objects.end(),
+        [](const TrackObjectPtr object1, const TrackObjectPtr object2) -> bool {
+          return object1->indicator.frame_id < object2->indicator.frame_id;
+        });
     target_save.latest_object = target_save.get_object(-1);
     base::ObjectPtr object = target_del.latest_object->object;
     target_del.Clear();
-    AINFO << "Target " << target_del.id
-             << " is merged into Target "
-             << target_save.id << " with iou " << pair.score;
+    AINFO << "Target " << target_del.id << " is merged into Target "
+          << target_save.id << " with iou " << pair.score;
     used_target[pair.object] = true;
     used_target[pair.target] = true;
   }
@@ -182,25 +175,21 @@ void OMTObstacleTracker::GenerateHypothesis(const TrackObjectPtrs &objects) {
       float ss = ScoreShape(targets_[i], objects[j]);
       float so = ScoreOverlap(targets_[i], objects[j]);
       if (sa == 0) {
-        hypo.score =
-            omt_param_.weight_diff_camera().motion() * sm
-                + omt_param_.weight_diff_camera().shape() * ss
-                + omt_param_.weight_diff_camera().overlap() * so;
+        hypo.score = omt_param_.weight_diff_camera().motion() * sm +
+                     omt_param_.weight_diff_camera().shape() * ss +
+                     omt_param_.weight_diff_camera().overlap() * so;
       } else {
         hypo.score = (omt_param_.weight_same_camera().appearance() * sa +
-            omt_param_.weight_same_camera().motion() * sm +
-            omt_param_.weight_same_camera().shape() * ss +
-            omt_param_.weight_same_camera().overlap() * so);
+                      omt_param_.weight_same_camera().motion() * sm +
+                      omt_param_.weight_same_camera().shape() * ss +
+                      omt_param_.weight_same_camera().overlap() * so);
       }
       int change_from_type = static_cast<int>(targets_[i].type);
       int change_to_type = static_cast<int>(objects[j]->object->sub_type);
       hypo.score += -kTypeAssociatedCost_[change_from_type][change_to_type];
       ADEBUG << "Detection " << objects[j]->indicator.frame_id << "(" << j
-                << ") sa:" << sa
-                << " sm: " << sm
-                << " ss: " << ss
-                << " so: " << so
-                << " score: " << hypo.score;
+             << ") sa:" << sa << " sm: " << sm << " ss: " << ss << " so: " << so
+             << " score: " << hypo.score;
 
       // 95.44% area is range [mu - sigma*2, mu + sigma*2]
       // don't match if motion is beyond the range
@@ -211,9 +200,7 @@ void OMTObstacleTracker::GenerateHypothesis(const TrackObjectPtrs &objects) {
     }
   }
 
-  sort(score_list.begin(),
-       score_list.end(),
-       std::greater<Hypothesis>());
+  sort(score_list.begin(), score_list.end(), std::greater<Hypothesis>());
   std::vector<bool> used_target(targets_.size(), false);
   for (auto &pair : score_list) {
     if (used_target[pair.target] || used_[pair.object]) {
@@ -224,11 +211,9 @@ void OMTObstacleTracker::GenerateHypothesis(const TrackObjectPtrs &objects) {
     target.Add(det_obj);
     used_[pair.object] = true;
     used_target[pair.target] = true;
-    AINFO << "Target " << target.id << " match "
-             << det_obj->indicator.frame_id << " ("
-             << pair.object << ")"
-             << "at " << pair.score
-             << " size: " << target.Size();
+    AINFO << "Target " << target.id << " match " << det_obj->indicator.frame_id
+          << " (" << pair.object << ")"
+          << "at " << pair.score << " size: " << target.Size();
   }
 }
 
@@ -240,7 +225,7 @@ float OMTObstacleTracker::ScoreMotion(const Target &target,
   base::Point2DF center = track_obj->projected_box.Center();
   base::RectF rect(track_obj->projected_box);
   float s = gaussian(center.x, target_centerx, rect.width) *
-      gaussian(center.y, target_centery, rect.height);
+            gaussian(center.y, target_centery, rect.height);
   return s;
 }
 
@@ -248,8 +233,8 @@ float OMTObstacleTracker::ScoreShape(const Target &target,
                                      TrackObjectPtr track_obj) {
   Eigen::Vector2d shape = target.image_wh.get_state();
   base::RectF rect(track_obj->projected_box);
-  float s = static_cast<float>((shape[1] - rect.height)
-      * (shape[0] - rect.width) / (shape[1] * shape[0]));
+  float s = static_cast<float>((shape[1] - rect.height) *
+                               (shape[0] - rect.width) / (shape[1] * shape[0]));
   return -std::abs(s);
 }
 
@@ -352,8 +337,8 @@ int OMTObstacleTracker::CreateNewTarget(const TrackObjectPtrs &objects) {
         target.Add(objects[i]);
         targets_.push_back(target);
         AINFO << "Target " << target.id << " is created by "
-                 << objects[i]->indicator.frame_id << " ("
-                 << objects[i]->indicator.patch_id << ")";
+              << objects[i]->indicator.frame_id << " ("
+              << objects[i]->indicator.patch_id << ")";
         created_count += 1;
       }
     }
@@ -388,8 +373,7 @@ bool OMTObstacleTracker::Associate2D(const ObstacleTrackerOptions &options,
     track_ptr->object->camera_supplement.sensor_name =
         frame->data_provider->sensor_name();
     ProjectBox(frame->detected_objects[i]->camera_supplement.box,
-               frame->project_matrix,
-               &(track_ptr->projected_box));
+               frame->project_matrix, &(track_ptr->projected_box));
     track_objects.push_back(track_ptr);
   }
   reference_.CorrectSize(frame);
@@ -416,8 +400,7 @@ bool OMTObstacleTracker::Associate2D(const ObstacleTrackerOptions &options,
   Eigen::Matrix3d inverse_project = frame->project_matrix.inverse();
   for (auto &target : targets_) {
     if (!target.isLost()) {
-      ProjectBox(target[-1]->projected_box,
-                 inverse_project,
+      ProjectBox(target[-1]->projected_box, inverse_project,
                  &(target[-1]->object->camera_supplement.box));
       RefineBox(target[-1]->object->camera_supplement.box, width_, height_,
                 &(target[-1]->object->camera_supplement.box));
@@ -464,8 +447,7 @@ bool OMTObstacleTracker::Associate3D(const ObstacleTrackerOptions &options,
       float obj_2_car_y = obj->camera_supplement.local_center[2];
       float dis = obj_2_car_x * obj_2_car_x + obj_2_car_y * obj_2_car_y;
       if (move > sqr(omt_param_.abnormal_movement()) * dis) {
-        AINFO << "Target " << target.id
-                 << " is removed for abnormal movement";
+        AINFO << "Target " << target.id << " is removed for abnormal movement";
         track_objects.push_back(target.latest_object);
         target.Clear();
       }
@@ -484,10 +466,10 @@ bool OMTObstacleTracker::Associate3D(const ObstacleTrackerOptions &options,
     target.Update3D(frame);
     if (!target.isLost()) {
       frame->tracked_objects.push_back(target[-1]->object);
-      ADEBUG << "Target " << target.id << " velocity: "
-                << target.world_center.get_state().transpose() << " % "
-                << target.world_center.variance_.diagonal().transpose() << " % "
-                << target[-1]->object->velocity.transpose();
+      ADEBUG << "Target " << target.id
+             << " velocity: " << target.world_center.get_state().transpose()
+             << " % " << target.world_center.variance_.diagonal().transpose()
+             << " % " << target[-1]->object->velocity.transpose();
     }
   }
   return true;

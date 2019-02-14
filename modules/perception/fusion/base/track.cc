@@ -30,10 +30,8 @@ bool Track::Initialize(SensorObjectPtr obj, bool is_background) {
   Reset();
   int track_id = static_cast<int>(GenerateNewTrackId());
   is_background_ = is_background;
-  std::shared_ptr<base::Object> fused_base_obj
-      = fused_object_->GetBaseObject();
-  std::shared_ptr<const base::Object> sensor_base_obj
-      = obj->GetBaseObject();
+  std::shared_ptr<base::Object> fused_base_obj = fused_object_->GetBaseObject();
+  std::shared_ptr<const base::Object> sensor_base_obj = obj->GetBaseObject();
   *fused_base_obj = *sensor_base_obj;
   fused_base_obj->track_id = track_id;
   UpdateWithSensorObject(obj);
@@ -279,10 +277,10 @@ bool Track::IsCameraVisible() const {
 }
 
 void Track::UpdateWithSensorObjectForBackground(const SensorObjectPtr& obj) {
-  std::shared_ptr<base::Object> fused_base_object
-      = fused_object_->GetBaseObject();
-  std::shared_ptr<const base::Object> measurement_base_object
-      = obj->GetBaseObject();
+  std::shared_ptr<base::Object> fused_base_object =
+      fused_object_->GetBaseObject();
+  std::shared_ptr<const base::Object> measurement_base_object =
+      obj->GetBaseObject();
   int track_id = fused_base_object->track_id;
   *fused_base_object = *measurement_base_object;
   fused_base_object->track_id = track_id;
