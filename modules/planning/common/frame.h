@@ -58,16 +58,15 @@ namespace planning {
 class Frame {
  public:
   explicit Frame(uint32_t sequence_num);
+
   explicit Frame(uint32_t sequence_num, const LocalView &local_view,
                  const common::TrajectoryPoint &planning_start_point,
-                 const double start_time,
                  const common::VehicleState &vehicle_state,
                  ReferenceLineProvider *reference_line_provider,
                  ADCTrajectory *output_trajectory);
 
   explicit Frame(uint32_t sequence_num, const LocalView &local_view,
                  const common::TrajectoryPoint &planning_start_point,
-                 const double start_time,
                  const common::VehicleState &vehicle_state,
                  ADCTrajectory *output_trajectory);
 
@@ -186,7 +185,6 @@ class Frame {
   LocalView local_view_;
   const hdmap::HDMap *hdmap_ = nullptr;
   common::TrajectoryPoint planning_start_point_;
-  double start_time_ = 0.0;
   common::VehicleState vehicle_state_;
   std::list<ReferenceLineInfo> reference_line_info_;
   std::list<TrajectoryInfo> trajectory_info_;

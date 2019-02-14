@@ -18,8 +18,10 @@
  * @file
  **/
 
-#include "gflags/gflags.h"
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "gflags/gflags.h"
+
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/reference_line/spiral_reference_line_smoother.h"
@@ -28,7 +30,7 @@ DEFINE_string(input_file, "", "input file with format x,y per line");
 DEFINE_string(output_file, "", "output file with format x,y per line");
 DEFINE_double(smooth_length, 200.0, "Smooth this amount of length ");
 DEFINE_double(minimum_point_spacing, 5.0,
-    "The minimum distance for input points.");
+              "The minimum distance for input points.");
 
 namespace apollo {
 namespace planning {
@@ -98,7 +100,7 @@ class SpiralSmootherUtil {
           p = p - start_point;});
 
     ReferenceLineSmootherConfig config;
-    CHECK(common::util::GetProtoFromFile(
+    CHECK(cyber::common::GetProtoFromFile(
         "modules/planning/conf/spiral_smoother_config.pb.txt", &config));
 
     std::vector<double> opt_theta;

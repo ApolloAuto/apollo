@@ -63,8 +63,6 @@ class SidePassScenario : public Scenario {
 
   bool HasBlockingObstacle(const Frame& frame);
 
-  bool IsParked(const ReferenceLine& reference_line, const Obstacle* obstacle);
-
  private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,

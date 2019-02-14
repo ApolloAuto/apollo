@@ -16,15 +16,15 @@
 
 #include "gflags/gflags.h"
 
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "cyber/time/rate.h"
 #include "cyber/time/time.h"
 
-#include "cyber/common/log.h"
-#include "cyber/init.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/control/common/control_gflags.h"
 #include "modules/control/proto/pad_msg.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -53,6 +53,7 @@ int main(int argc, char** argv) {
   using apollo::canbus::Chassis;
   using apollo::control::PadMessage;
   using apollo::cyber::Time;
+  using apollo::cyber::common::GetProtoFromFile;
   using apollo::localization::LocalizationEstimate;
   using apollo::planning::ADCTrajectory;
   using std::this_thread::sleep_for;
@@ -62,29 +63,25 @@ int main(int argc, char** argv) {
   FLAGS_alsologtostderr = true;
 
   Chassis chassis;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_chassis_test_file,
-                                              &chassis)) {
+  if (!GetProtoFromFile(FLAGS_chassis_test_file, &chassis)) {
     AERROR << "failed to load file: " << FLAGS_chassis_test_file;
     return -1;
   }
 
   LocalizationEstimate localization;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_localization_test_file,
-                                              &localization)) {
+  if (!GetProtoFromFile(FLAGS_localization_test_file, &localization)) {
     AERROR << "failed to load file: " << FLAGS_localization_test_file;
     return -1;
   }
 
   PadMessage pad_msg;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_pad_msg_test_file,
-                                              &pad_msg)) {
+  if (!GetProtoFromFile(FLAGS_pad_msg_test_file, &pad_msg)) {
     AERROR << "failed to load file: " << FLAGS_pad_msg_test_file;
     return -1;
   }
 
   ADCTrajectory trajectory;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_planning_test_file,
-                                              &trajectory)) {
+  if (!GetProtoFromFile(FLAGS_planning_test_file, &trajectory)) {
     AERROR << "failed to load file: " << FLAGS_planning_test_file;
     return -1;
   }

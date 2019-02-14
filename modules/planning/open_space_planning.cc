@@ -91,11 +91,10 @@ Status OpenSpacePlanning::Init(const PlanningConfig& config) {
 
 Status OpenSpacePlanning::InitFrame(const uint32_t sequence_num,
                                     const TrajectoryPoint& planning_start_point,
-                                    const double start_time,
                                     const VehicleState& vehicle_state,
                                     ADCTrajectory* output_trajectory) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
-                         start_time, vehicle_state, output_trajectory));
+                         vehicle_state, output_trajectory));
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
@@ -167,7 +166,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
   const size_t frame_num = seq_num_++;
   status =
       InitFrame(static_cast<uint32_t>(frame_num), stitching_trajectory.back(),
-                start_timestamp, vehicle_state, ptr_trajectory_pb);
+                vehicle_state, ptr_trajectory_pb);
 
   ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);

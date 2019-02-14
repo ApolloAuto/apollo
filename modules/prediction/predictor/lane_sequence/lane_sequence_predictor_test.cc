@@ -16,6 +16,7 @@
 
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
 
+#include "cyber/common/file.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
@@ -28,7 +29,7 @@ class LaneSequencePredictorTest : public KMLMapBasedTest {
   virtual void SetUp() {
     std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    apollo::common::util::GetProtoFromFile(file, &perception_obstacles_);
+    cyber::common::GetProtoFromFile(file, &perception_obstacles_);
   }
 
  protected:

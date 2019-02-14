@@ -19,9 +19,9 @@
 #include <string>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gmock/gmock.h"
-#include "modules/common/util/file.h"
 #include "modules/control/proto/control_conf.pb.h"
 
 using ::testing::ElementsAre;
@@ -34,7 +34,7 @@ class Interpolation1DTest : public ::testing::Test {
   virtual void SetUp() {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
-    CHECK(common::util::GetProtoFromFile(control_conf_file, &control_conf_));
+    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf_));
   }
 
  protected:

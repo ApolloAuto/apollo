@@ -38,8 +38,8 @@ namespace prediction {
 
 void Initialize() {
   PredictionConf prediction_conf;
-  if (!apollo::common::util::GetProtoFromFile(
-           FLAGS_prediction_conf_file, &prediction_conf)) {
+  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
+                                       &prediction_conf)) {
     AERROR << "Unable to load prediction conf file: "
            << FLAGS_prediction_conf_file;
     return;
@@ -48,7 +48,7 @@ void Initialize() {
             << prediction_conf.ShortDebugString();
 
   apollo::common::adapter::AdapterManagerConfig adapter_conf;
-  if (!apollo::common::util::GetProtoFromFile(
+  if (!cyber::common::GetProtoFromFile(
     FLAGS_prediction_adapter_config_filename, &adapter_conf)) {
     AERROR << "Unable to load adapter conf file: "
            << FLAGS_prediction_adapter_config_filename;
