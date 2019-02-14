@@ -46,7 +46,6 @@ class SidePassScenario : public Scenario {
                             const ScenarioContext* scenario_context);
 
   bool IsTransferable(const Scenario& current_scenario,
-                      const common::TrajectoryPoint& ego_point,
                       const Frame& frame) override;
 
   std::unique_ptr<Stage> CreateStage(
