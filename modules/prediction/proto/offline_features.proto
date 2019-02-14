@@ -43,3 +43,7 @@ message ListPredictionResult {
 message ListFrameEnv {
   repeated FrameEnv frame_env = 1;
 }
+
+message Features {
+  repeated Feature feature = 1;
+}

@@ -17,9 +17,11 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
 #include <vector>
+#include <algorithm>
 
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -131,7 +133,9 @@ void EvaluatorManager::Run() {
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
 
-  BuildCurrentFrameEnv();
+  if (FLAGS_enable_build_current_frame_env) {
+    BuildCurrentFrameEnv();
+  }
 
   std::vector<Obstacle*> dynamic_env;
   for (int id : obstacles_container->curr_frame_predictable_obstacle_ids()) {
