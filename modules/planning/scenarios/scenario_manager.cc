@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -51,8 +52,8 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
   switch (scenario_type) {
     case ScenarioConfig::LANE_FOLLOW:
-      ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
-                                                    &scenario_context_));
+      ptr.reset(new lane_follow::LaneFollowScenario(
+          config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::SIDE_PASS:
       ptr.reset(new scenario::side_pass::SidePassScenario(
@@ -172,8 +173,63 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     const Frame& frame) {
-  // TODO(all):
-  return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double traffic_light_overlap_start_s =
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
+  const double adc_distance_to_stop_line =
+      traffic_light_overlap_start_s - adc_front_edge_s;
+  const double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+
+  auto scenario_config =
+      config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
+                  .traffic_light_unprotected_right_turn_config();
+
+  bool is_stopped_for_traffic_light = true;
+  if (adc_speed > scenario_config.max_adc_stop_speed() ||
+      adc_distance_to_stop_line > scenario_config.max_valid_stop_distance()) {
+    is_stopped_for_traffic_light = false;
+    ADEBUG << "ADC not stopped: speed[" << adc_speed
+        << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line << "]";
+  }
+
+  bool right_turn = (reference_line_info.GetPathTurnType() ==
+      hdmap::Lane::RIGHT_TURN);
+  bool left_turn = (reference_line_info.GetPathTurnType() ==
+      hdmap::Lane::LEFT_TURN);
+
+  switch (current_scenario_->scenario_type()) {
+    case ScenarioConfig::LANE_FOLLOW:
+    case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::APPROACH:
+      if (is_stopped_for_traffic_light) {
+        if (right_turn) {
+          return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
+        } else if (left_turn) {
+          return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN;
+        } else {
+          return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
+        }
+      }
+      break;
+    case ScenarioConfig::STOP_SIGN_PROTECTED:
+    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      break;
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+      if (current_scenario_->GetStatus() ==
+              Scenario::ScenarioStatus::STATUS_DONE) {
+        return ScenarioConfig::LANE_FOLLOW;
+      }
+      break;
+    default:
+      break;
+  }
+
+  return current_scenario_->scenario_type();
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
