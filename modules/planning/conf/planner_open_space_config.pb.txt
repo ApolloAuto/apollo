@@ -31,7 +31,7 @@ dual_variable_warm_start_config {
     ipopt_alpha_for_y: "min"
     ipopt_recalc_y: "yes"
   }
-  qp_format: true
+  qp_format: OSQP
 }
 distance_approach_config {
   weight_steer: 0.3
