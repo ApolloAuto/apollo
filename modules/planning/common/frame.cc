@@ -52,9 +52,7 @@ FrameHistory::FrameHistory()
 
 Frame::Frame(uint32_t sequence_num)
     : sequence_num_(sequence_num),
-      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {
-  init_data_ = false;
-}
+      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {}
 
 Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
              const common::TrajectoryPoint &planning_start_point,
@@ -67,8 +65,7 @@ Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
       vehicle_state_(vehicle_state),
       output_trajectory_(output_trajectory),
       reference_line_provider_(reference_line_provider),
-      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING),
-      init_data_(true) {}
+      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {}
 
 Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
              const common::TrajectoryPoint &planning_start_point,
