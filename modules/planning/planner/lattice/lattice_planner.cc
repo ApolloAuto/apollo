@@ -93,7 +93,8 @@ void ComputeInitFrenetState(const PathPoint& matched_point,
 }  // namespace
 
 Status LatticePlanner::Plan(const TrajectoryPoint& planning_start_point,
-                            Frame* frame) {
+                            Frame* frame,
+                            ADCTrajectory* ptr_computed_trajectory) {
   size_t success_line_count = 0;
   size_t index = 0;
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {

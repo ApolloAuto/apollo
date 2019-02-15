@@ -37,7 +37,8 @@ RTKReplayPlanner::RTKReplayPlanner() {
 Status RTKReplayPlanner::Init(const PlanningConfig&) { return Status::OK(); }
 
 Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_start_point,
-                              Frame* frame) {
+                              Frame* frame,
+                              ADCTrajectory* ptr_computed_trajectory) {
   auto status = Status::OK();
   bool has_plan = false;
   auto it = std::find_if(

@@ -61,13 +61,11 @@ class Frame {
   explicit Frame(uint32_t sequence_num, const LocalView &local_view,
                  const common::TrajectoryPoint &planning_start_point,
                  const common::VehicleState &vehicle_state,
-                 ReferenceLineProvider *reference_line_provider,
-                 ADCTrajectory *output_trajectory);
+                 ReferenceLineProvider *reference_line_provider);
 
   explicit Frame(uint32_t sequence_num, const LocalView &local_view,
                  const common::TrajectoryPoint &planning_start_point,
-                 const common::VehicleState &vehicle_state,
-                 ADCTrajectory *output_trajectory);
+                 const common::VehicleState &vehicle_state);
 
   const common::TrajectoryPoint &PlanningStartPoint() const;
 
@@ -123,8 +121,6 @@ class Frame {
   ADCTrajectory *mutable_trajectory() { return &trajectory_; }
 
   const ADCTrajectory &trajectory() const { return trajectory_; }
-
-  ADCTrajectory *output_trajectory() { return output_trajectory_; }
 
   planning_internal::OpenSpaceDebug *mutable_open_space_debug() {
     return &open_space_debug_;
@@ -200,10 +196,6 @@ class Frame {
   planning_internal::OpenSpaceDebug open_space_debug_;
   // stitching trajectory for open space planner
   std::vector<common::TrajectoryPoint> stitching_trajectory_;
-
-  // TODO(all): change to use shared_ptr.
-  // output trajectory pb
-  ADCTrajectory *output_trajectory_ = nullptr;  // not owned
 
   const ReferenceLineProvider *reference_line_provider_ = nullptr;
 
