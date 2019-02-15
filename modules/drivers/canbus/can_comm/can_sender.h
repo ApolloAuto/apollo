@@ -300,6 +300,7 @@ void CanSender<SensorType>::PowerSendThreadFunc() {
         continue;
       }
       std::vector<CanFrame> can_frames;
+      message.Update();
       CanFrame can_frame = message.CanFrame();
       can_frames.push_back(can_frame);
       if (can_client_->SendSingleFrame(can_frames) != common::ErrorCode::OK) {

@@ -212,7 +212,7 @@ void CanbusComponent::OnControlCommand(const ControlCommand &control_command) {
               "vehicle_controller_->Update error.";
     return;
   }
-  can_sender_.Update();
+  // can_sender_.Update();
 }
 
 void CanbusComponent::OnGuardianCommand(
