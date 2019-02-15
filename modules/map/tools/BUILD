@@ -69,7 +69,19 @@ cc_binary(
         "//modules/map/proto:map_proto",
     ],
 )
-
+cc_binary(
+    name = "bin_map_generator",
+    srcs = ["bin_map_generator.cc"],
+    data = ["//modules/map:map_data"],
+    deps = [
+        "//external:gflags",
+        "//modules/common",
+        "//modules/common/util",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/map/hdmap/adapter:opendrive_adapter",
+        "//modules/map/proto:map_proto",
+    ],
+)
 cc_binary(
     name = "quaternion_euler",
     srcs = ["quaternion_euler.cc"],
