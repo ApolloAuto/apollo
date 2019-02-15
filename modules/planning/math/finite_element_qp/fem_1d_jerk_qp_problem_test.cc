@@ -52,7 +52,8 @@ TEST(Fem1dJerkQpProblemTest, basic_test) {
   double max_x_third_order_derivative = 1.25;
   EXPECT_TRUE(
       fem_qp->Init(n, x_init, delta_s, w, max_x_third_order_derivative));
-
+  EXPECT_FALSE(fem_qp->Optimize());
+  
   fem_qp->SetVariableBounds(x_bounds);
 
   auto start_time = std::chrono::system_clock::now();
