@@ -54,7 +54,7 @@ class PathDecision {
 
   Obstacle *Find(const std::string &object_id);
 
-  void SetStBoundary(const std::string &id, const STBoundary &boundary);
+  void SetSTBoundary(const std::string &id, const STBoundary &boundary);
   void EraseStBoundaries();
   MainStop main_stop() const { return main_stop_; }
   double stop_reference_line_s() const { return stop_reference_line_s_; }

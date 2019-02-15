@@ -36,7 +36,7 @@ PathDecider::PathDecider(const TaskConfig &config) : Task(config) {
   SetName("PathDecider");
 }
 
-apollo::common::Status PathDecider::Execute(
+Status PathDecider::Execute(
     Frame *frame, ReferenceLineInfo *reference_line_info) {
   Task::Execute(frame, reference_line_info);
   return Process(reference_line_info->path_data(),
