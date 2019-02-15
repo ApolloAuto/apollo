@@ -94,6 +94,11 @@ new_http_archive(
     strip_prefix = "opencv-2.4.13.2",
     url = "file:///home/tmp/opencv-2.4.13.2.zip",
 )
+#new_local_repository(
+#    name = "opencv2",
+#    build_file = "third_party/opencv2.BUILD",
+#    path = "/usr/include",
+#)
 
 # PCL 1.7
 # =======
@@ -142,6 +147,11 @@ new_http_archive(
     strip_prefix = "yaml-cpp-yaml-cpp-0.5.3",
     url = "file:///home/tmp/yaml-cpp-0.5.3.zip",
 )
+#new_local_repository(
+#    name = "yaml_cpp",
+#    build_file = "third_party/yaml_cpp.BUILD",
+#    path = "/usr/include",
+#)
 
 new_http_archive(
     name = "qpOASES",

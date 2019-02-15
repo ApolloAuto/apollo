@@ -16,6 +16,21 @@
 
 #include "modules/perception/obstacle/camera/detector/yolo_camera_detector/yolo_camera_detector.h"
 
+#include <opencv2/core/version.hpp>
+#if (CV_MAJOR_VERSION == 2)
+#include <opencv2/opencv.hpp>
+#ifdef HAVE_OPENCV_GPU
+#include <opencv2/gpu/gpu.hpp>
+#include <opencv2/core/gpumat.hpp>
+#endif
+#else
+#include <opencv2/core.hpp>
+#include <opencv2/cudaimgproc.hpp>
+#include <opencv2/cudawarping.hpp>
+#include <opencv2/cudaarithm.hpp>
+#include <opencv2/cudafilters.hpp>
+#endif
+
 #include <cmath>
 #include <ctime>
 #include <unordered_map>
@@ -361,8 +376,27 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
   int roi_h = frame.rows - offset_y_;
   cv::Rect roi(0, offset_y_, roi_w, roi_h);
   cv::Mat img(frame, roi);
-  cv::resize(img, img, cv::Size(lane_output_height_lane_,
+
+  if ( FLAGS_enable_opencv_gpu < 1 ) {
+    cv::resize(img, img, cv::Size(lane_output_height_lane_,
                         lane_output_width_lane_), 0, 0);
+  } else {
+#if (CV_MAJOR_VERSION == 2)
+#ifdef HAVE_OPENCV_GPU
+    cv::gpu::GpuMat matsrc, matdst;
+    matsrc.upload(img);
+    cv::gpu::resize(matsrc, matdst, cv::Size(lane_output_height_lane_,
+                                   lane_output_width_lane_));
+    matdst.download(img);
+#endif
+#else
+    cv::cuda::GpuMat matsrc, matdst;
+    matsrc.upload(img);
+    cv::cuda::resize(matsrc, matdst, cv::Size(lane_output_height_lane_,
+                                   lane_output_width_lane_));
+    matdst.download(img);
+#endif
+  }
   const auto input_blob = cnnadapter_lane_->get_blob_by_name(
       lane_param_.net_param().input_blob());
 
@@ -387,13 +421,32 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
     return false;
   }
 
+  cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
   for (int i = 0; i < num_lanes_; ++i) {
-    cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
+    // cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
     memcpy(tmp.data, seg_blob->cpu_data() +
                          lane_output_width_lane_ * lane_output_height_lane_ * i,
            lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
-    cv::resize(tmp, tmp, cv::Size(lane_output_width_, lane_output_height_), 0,
+    if ( FLAGS_enable_opencv_gpu < 1 ) {
+      cv::resize(tmp, tmp, cv::Size(lane_output_width_, lane_output_height_), 0,
                0);
+    } else {
+#if (CV_MAJOR_VERSION == 2)
+#ifdef HAVE_OPENCV_GPU
+      cv::gpu::GpuMat matsrc, matdst;
+      matsrc.upload(tmp);
+      cv::gpu::resize(matsrc, matdst, cv::Size(lane_output_width_,
+                                      lane_output_height_));
+      matdst.download(tmp);
+#endif
+#else
+      cv::cuda::GpuMat matsrc, matdst;
+      matsrc.upload(tmp);
+      cv::cuda::resize(matsrc, matdst, cv::Size(lane_output_width_,
+                                      lane_output_height_));
+      matdst.download(tmp);
+#endif
+    }
     predictions->push_back(tmp);
   }
 
