@@ -88,8 +88,7 @@ class OpenSpacePlanning : public PlanningBase {
   apollo::common::Status InitFrame(
       const uint32_t sequence_num,
       const common::TrajectoryPoint& planning_start_point,
-      const common::VehicleState& vehicle_state,
-      ADCTrajectory* output_trajectory);
+      const common::VehicleState& vehicle_state);
 
   bool CheckPlanningConfig(const PlanningConfig& config);
 
