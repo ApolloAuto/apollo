@@ -19,7 +19,7 @@
  */
 
 #pragma once
-
+#include <algorithm>
 #include "Eigen/Dense"
 
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_interface.h"

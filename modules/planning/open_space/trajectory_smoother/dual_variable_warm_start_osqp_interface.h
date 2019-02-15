@@ -79,6 +79,8 @@ class DualVariableWarmStartOSQPInterface {
   int obstacles_num_;
   int obstacles_edges_sum_;
 
+  double min_safety_distance_;
+
   // lagrangian l start index
   int l_start_index_ = 0;
 
