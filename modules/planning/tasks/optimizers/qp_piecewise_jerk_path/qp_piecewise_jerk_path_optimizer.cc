@@ -236,7 +236,7 @@ Status QpPiecewiseJerkPathOptimizer::Process(
       qp_config.guiding_line_weight(),
   };
 
-  fem_1d_qp_.reset(new Fem1dExpandedJerkQpProblem());
+  fem_1d_qp_.reset(new Fem1dJerkQpProblem());
   constexpr double kMaxLThirdOrderDerivative = 2.0;
 
   if (!fem_1d_qp_->Init(n, init_lateral_state, qp_delta_s, w,
