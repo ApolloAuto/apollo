@@ -141,6 +141,7 @@ class Fem1dQpProblem {
 
  protected:
   bool is_init_ = false;
+  bool bound_is_init_ = false;
 
   size_t num_var_ = 0;
 

@@ -18,35 +18,6 @@ cc_library(
 )
 
 cc_library(
-    name = "fem_1d_expanded_qp_problem",
-    srcs = [
-        "fem_1d_expanded_qp_problem.cc",
-    ],
-    hdrs = [
-        "fem_1d_expanded_qp_problem.h",
-    ],
-    deps = [
-        ":fem_1d_qp_problem",
-        "//cyber/common:log",
-        "//modules/common/math:matrix_operations",
-        "@eigen",
-    ],
-)
-
-cc_test(
-    name = "fem_1d_expanded_qp_problem_test",
-    size = "small",
-    srcs = [
-        "fem_1d_expanded_qp_problem_test.cc",
-    ],
-    deps = [
-        ":fem_1d_expanded_qp_problem",
-        "//cyber/common:log",
-        "@gtest//:main",
-    ],
-)
-
-cc_library(
     name = "fem_1d_linear_qp_problem",
     srcs = [
         "fem_1d_linear_qp_problem.cc",
@@ -76,31 +47,28 @@ cc_test(
 )
 
 cc_library(
-    name = "fem_1d_expanded_jerk_qp_problem",
+    name = "fem_1d_jerk_qp_problem",
     srcs = [
-        "fem_1d_expanded_jerk_qp_problem.cc",
+        "fem_1d_jerk_qp_problem.cc",
     ],
     hdrs = [
-        "fem_1d_expanded_jerk_qp_problem.h",
+        "fem_1d_jerk_qp_problem.h",
     ],
     deps = [
         ":fem_1d_qp_problem",
         "//cyber/common:log",
-        "//modules/common/math:matrix_operations",
-        "@eigen",
     ],
 )
 
 cc_test(
-    name = "fem_1d_expanded_jerk_qp_problem_test",
+    name = "fem_1d_jerk_qp_problem_test",
     size = "small",
     srcs = [
-        "fem_1d_expanded_jerk_qp_problem_test.cc",
+        "fem_1d_jerk_qp_problem_test.cc",
     ],
     deps = [
-        ":fem_1d_expanded_jerk_qp_problem",
+        ":fem_1d_jerk_qp_problem",
         "//cyber/common:log",
-        "//modules/planning/common:planning_gflags",
         "@gtest//:main",
     ],
 )

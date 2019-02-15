@@ -56,12 +56,14 @@ bool Fem1dQpProblem::Init(const size_t num_var,
   delta_s_penta_ = delta_s_sq_ * delta_s_tri_;
   delta_s_hex_ = delta_s_tri_ * delta_s_tri_;
 
+
+  const double LARGE_VALUE = 2.0;
   x_bounds_.resize(num_var_,
                    std::make_pair(-kMaxVariableRange, kMaxVariableRange));
   dx_bounds_.resize(num_var_,
-                    std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+                    std::make_pair(-LARGE_VALUE, LARGE_VALUE));
   ddx_bounds_.resize(num_var_,
-                     std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+                     std::make_pair(-LARGE_VALUE, LARGE_VALUE));
 
   is_init_ = true;
   return true;
@@ -131,6 +133,7 @@ void Fem1dQpProblem::SetVariableBounds(
     return;
   }
   ProcessBound(x_bounds, &x_bounds_);
+  bound_is_init_ = true;
 }
 
 // dx_bounds: tuple(s, lower_bounds, upper_bounds)
