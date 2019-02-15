@@ -45,7 +45,6 @@ cc_library(
         ":debug_info",
         "//cyber",
         "//external:gflags",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
@@ -78,7 +77,6 @@ cc_library(
     deps = [
         ":camera_app_lib_proto",
         "//cyber",
-        "//modules/common/util:file_util",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/traffic_light/detector/detection",
@@ -97,11 +95,10 @@ cc_library(
         "lane_camera_perception.h",
     ],
     deps = [
-	    ":camera_app_lib_proto",
+        ":camera_app_lib_proto",
         ":debug_info",
         "//cyber",
         "//external:gflags",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
