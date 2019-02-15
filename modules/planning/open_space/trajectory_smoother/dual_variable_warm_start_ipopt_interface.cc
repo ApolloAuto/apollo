@@ -115,7 +115,7 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
   // 1. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      x[l_index] = 0.5;
+      x[l_index] = 0.0;
       ++l_index;
     }
   }
@@ -123,7 +123,7 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
   // 2. lagrange constraint n, 4*obstacles_num * (horizon_+1)
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      x[n_index] = 1.0;
+      x[n_index] = 0.0;
       ++n_index;
     }
   }

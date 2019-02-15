@@ -6,6 +6,7 @@ enum DualWarmUpMode {
     IPOPT = 0;
     IPOPTQP = 1;
     OSQP = 2;
+    DEBUG = 3;
 }
 
 message PlannerOpenSpaceConfig {
@@ -56,6 +57,7 @@ message DualVariableWarmStartConfig {
   optional double weight_d = 1 [default = 1.0];
   optional IpoptConfig ipopt_config = 2;
   optional DualWarmUpMode qp_format = 3;
+  optional double min_safety_distance = 4 [default = 0.0];
 }
 
 message DistanceApproachConfig {
