@@ -179,6 +179,7 @@ DECLARE_double(weight_lateral_second_order_derivative);
 DECLARE_double(weight_lateral_third_order_derivative);
 DECLARE_double(weight_lateral_obstacle_distance);
 DECLARE_double(lateral_third_order_derivative_max);
+DECLARE_double(lateral_derivative_bound_default);
 
 // Lattice Evaluate Parameters
 DECLARE_double(weight_lon_objective);

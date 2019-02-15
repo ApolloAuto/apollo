@@ -384,6 +384,8 @@ DEFINE_double(
     "weight for lateral obstacle distance in lateral trajectory optimization");
 DEFINE_double(lateral_third_order_derivative_max, 0.1,
               "the maximal allowance for lateral third order derivative");
+DEFINE_double(lateral_derivative_bound_default, 2.0,
+              "the default value for lateral derivative bound.");
 DEFINE_double(max_s_lateral_optimization, 60.0,
               "The maximal s for lateral optimization.");
 DEFINE_double(default_delta_s_lateral_optimization, 1.0,
