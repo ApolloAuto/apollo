@@ -43,7 +43,6 @@
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/common/trajectory_info.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 
 namespace apollo {
@@ -91,8 +90,6 @@ class Frame {
 
   const std::list<ReferenceLineInfo> &reference_line_info() const;
   std::list<ReferenceLineInfo> *mutable_reference_line_info();
-  const std::list<TrajectoryInfo> &trajectory_info() const;
-  std::list<TrajectoryInfo> *mutable_trajectory_info();
 
   Obstacle *Find(const std::string &id);
 
@@ -187,7 +184,6 @@ class Frame {
   common::TrajectoryPoint planning_start_point_;
   common::VehicleState vehicle_state_;
   std::list<ReferenceLineInfo> reference_line_info_;
-  std::list<TrajectoryInfo> trajectory_info_;
 
   bool is_near_destination_ = false;
 

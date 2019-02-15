@@ -39,7 +39,7 @@ const Obstacle *PathDecision::Find(const std::string &object_id) const {
   return obstacles_.Find(object_id);
 }
 
-void PathDecision::SetStBoundary(const std::string &id,
+void PathDecision::SetSTBoundary(const std::string &id,
                                  const STBoundary &boundary) {
   auto *obstacle = obstacles_.Find(id);
 
@@ -91,7 +91,7 @@ bool PathDecision::MergeWithMainStop(const ObjectStop &obj_stop,
   reference_line.XYToSL({stop_point.x(), stop_point.y()}, &stop_line_sl);
 
   double stop_line_s = stop_line_sl.s();
-  if (stop_line_s < 0 || stop_line_s > reference_line.Length()) {
+  if (stop_line_s < 0.0 || stop_line_s > reference_line.Length()) {
     AERROR << "Ignore object:" << obj_id << " fence route_s[" << stop_line_s
            << "] not in range[0, " << reference_line.Length() << "]";
     return false;
@@ -102,7 +102,7 @@ bool PathDecision::MergeWithMainStop(const ObjectStop &obj_stop,
   stop_line_s = std::fmax(stop_line_s, adc_sl_boundary.end_s() - kStopBuff);
 
   if (stop_line_s >= stop_reference_line_s_) {
-    ADEBUG << "stop point is further than current main stop point.";
+    ADEBUG << "stop point is farther than current main stop point.";
     return false;
   }
 
