@@ -203,4 +203,18 @@ And finally restart Dreamview using
     bash scripts/bootstrap.sh start
 ```
 
+---
+
+## I want to plot my own graphs for my algorithms, where should I go?
+
+**Dreamview/proto/chart.proto** -  
+1. Find a protobuf which you could use to define your chart.  
+2. There are three types of data sets that you could plot: Line, Polygon and Car. Each one of those is defined in the protobuf.
+3. In the Chart, there are options that need to be set which include minimum, maximum x, y. 
+4. You would need to change the Label for each data set type as it is unique to each chart
+5. Dreamview uses **Chartjs.org** for graphs graphs. To select properties, you could refer to “https://www.chartjs.org/docs/latest/charts/line.html”.
+6. You could look into planning_base.cc for a code sample.
+Remember to fill in the information of your chart in https://github.com/ApolloAuto/apollo2/blob/master/modules/planning/proto/planning_internal.proto#L169. But note, this is specifically for planning module.
+
+---
 **More DreamView FAQs to follow.**
