@@ -197,17 +197,15 @@ bool TransformWrapper::GetTrans(double timestamp, Eigen::Affine3d* trans,
                                 const std::string& frame_id,
                                 const std::string& child_frame_id) {
   StampedTransform transform;
-  if (QueryTrans(timestamp, &transform, frame_id, child_frame_id) != true) {
-    if (FLAGS_obs_enable_local_pose_extrapolation) {
-      if (!transform_cache_.QueryTransform(
-              timestamp, &transform,
+  if (!QueryTrans(timestamp, &transform, frame_id, child_frame_id)) {
+    if (!FLAGS_obs_enable_local_pose_extrapolation ||
+        !transform_cache_.QueryTransform(timestamp, &transform,
               FLAGS_obs_max_local_pose_extrapolation_latency)) {
         return false;
-      }
-    } else {
-      return false;
     }
-  } else if (FLAGS_obs_enable_local_pose_extrapolation) {
+  }
+
+  if (FLAGS_obs_enable_local_pose_extrapolation) {
     transform_cache_.AddTransform(transform);
   }
 
