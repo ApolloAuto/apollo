@@ -23,6 +23,7 @@
 #include <list>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
@@ -118,10 +119,16 @@ class Frame {
       const double planning_start_time,
       prediction::PredictionObstacles *prediction_obstacles);
 
-  ADCTrajectory *mutable_trajectory() { return &trajectory_; }
+  void set_last_planned_trajectory(ADCTrajectory last_planned_trajectory) {
+    last_planned_trajectory_ = std::move(last_planned_trajectory);
+  }
 
-  const ADCTrajectory &trajectory() const { return trajectory_; }
+  ADCTrajectory last_planned_trajectory() const {
+    return last_planned_trajectory_;
+  }
 
+  // TODO(Qi, Jinyun): check the usage in open space planner
+  //                   and remove it from frame
   planning_internal::OpenSpaceDebug *mutable_open_space_debug() {
     return &open_space_debug_;
   }
@@ -130,6 +137,8 @@ class Frame {
     return open_space_debug_;
   }
 
+  // TODO(Qi, Jinyun): check the usage in open space planner
+  //                   and remove it from frame
   std::vector<common::TrajectoryPoint> *mutable_last_stitching_trajectory() {
     return &stitching_trajectory_;
   }
@@ -190,7 +199,7 @@ class Frame {
 
   ThreadSafeIndexedObstacles obstacles_;
   ChangeLaneDecider change_lane_decider_;
-  ADCTrajectory trajectory_;  // last published trajectory
+  ADCTrajectory last_planned_trajectory_;  // last published trajectory
 
   // debug info for open space planner
   planning_internal::OpenSpaceDebug open_space_debug_;

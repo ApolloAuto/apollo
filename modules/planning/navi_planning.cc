@@ -233,7 +233,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       FillPlanningPb(start_timestamp, trajectory_pb);
     }
 
-    frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+    frame_->set_last_planned_trajectory(*trajectory_pb);
     auto seq_num = frame_->SequenceNum();
     FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 
