@@ -210,7 +210,6 @@ class Frame {
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
-  bool init_data_ = false;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
