@@ -27,7 +27,7 @@
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/math/finite_element_qp/fem_1d_expanded_jerk_qp_problem.h"
+#include "modules/planning/math/finite_element_qp/fem_1d_jerk_qp_problem.h"
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/qp_piecewise_jerk_path_config.pb.h"
