@@ -66,11 +66,16 @@ DualVariableWarmStartOSQPInterface::DualVariableWarmStartOSQPInterface(
   num_of_variables_ = lambda_horizon_ + miu_horizon_;
   // number of constraints
   num_of_constraints_ = 3 * obstacles_num_ * (horizon_ + 1) + num_of_variables_;
+
+  min_safety_distance_ = planner_open_space_config.
+      dual_variable_warm_start_config().min_safety_distance();
 }
 
 bool DualVariableWarmStartOSQPInterface::optimize() {
   int kNumParam = num_of_variables_;
   int kNumConst = num_of_constraints_;
+
+  bool succ = true;
   // assemble P, quadratic term in objective
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
@@ -96,7 +101,7 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
     lb[i] = 0.0;
     if (i >= 2 * obstacles_num_ * (horizon_ + 1) &&
         i < 3 * obstacles_num_ * (horizon_ + 1)) {
-      lb[i] = 0.0;
+      lb[i] = min_safety_distance_;
     }
     if (i < 2 * obstacles_num_ * (horizon_ + 1)) {
       ub[i] = 0.0;
@@ -141,7 +146,7 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
       AERROR << "OSQP dual warm up unsuccess, "
           << "return status: "
           << work->info->status;
-      return false;
+      succ = false;
   }
 
   // extract primal results
@@ -164,6 +169,8 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
     }
   }
 
+  succ = succ & (work->info->obj_val <= 1.0);
+
   // Cleanup
   osqp_cleanup(work);
   c_free(data->A);
@@ -171,7 +178,7 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   c_free(data);
   c_free(settings);
 
-  return true;
+  return succ;
 }
 
 void DualVariableWarmStartOSQPInterface::assemble_P(
