@@ -119,12 +119,9 @@ bool ConfigManager::Reset() {
 }
 
 std::string ConfigManager::get_env(const std::string &var_name) {
-  char *var = nullptr;
-  var = getenv(var_name.c_str());
-  if (var == nullptr) {
-    return std::string("");
-  }
-  return std::string(var);
+  const char *var = getenv(var_name.c_str());
+
+  return !var ? std::string("") : std::string(var);
 }
 
 bool ConfigManager::GetModelConfig(const std::string &model_name,
