@@ -275,7 +275,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     }
 
     FillPlanningPb(start_timestamp, trajectory_pb);
-    frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+    frame_->set_last_planned_trajectory(*trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
     FrameHistory::Instance()->Add(n, std::move(frame_));
     return;
@@ -334,7 +334,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   FillPlanningPb(start_timestamp, trajectory_pb);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
-  frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+  frame_->set_last_planned_trajectory(*trajectory_pb);
   if (FLAGS_enable_planning_smoother) {
     planning_smoother_.Smooth(FrameHistory::Instance(), frame_.get(),
                               trajectory_pb);
