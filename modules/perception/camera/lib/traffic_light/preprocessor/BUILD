@@ -27,7 +27,6 @@ cc_library(
     deps = [
         ":pose",
         "//cyber",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/common/io:io_util",
@@ -65,7 +64,6 @@ cc_library(
         ":multi_camera_projection",
         "//cyber",
         "//external:gflags",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
