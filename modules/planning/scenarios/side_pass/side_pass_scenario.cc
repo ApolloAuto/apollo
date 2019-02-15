@@ -237,9 +237,11 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
             distance_between_adc_and_obstacle;
         front_blocking_obstacle_id_ = obstacle->Id() + "_0";
         side_pass_context_.front_blocking_obstacle_id_ = obstacle->Id();
-        // TODO(all): to be removed when SidePass obstacle decision impl is ready
-        PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id =
-            side_pass_context_.front_blocking_obstacle_id_;
+        // TODO(all): to be removed
+        //            when SidePass obstacle decision impl is ready
+        PlanningContext::GetScenarioInfo()
+            ->side_pass_front_blocking_obstacle_id =
+                side_pass_context_.front_blocking_obstacle_id_;
       }
     }
   }
