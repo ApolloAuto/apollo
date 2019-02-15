@@ -105,7 +105,7 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
     if (!obstacle->st_boundary().IsEmpty()) {
       mutable_obstacle->SetBlockingObstacle(true);
     } else {
-      path_decision->SetStBoundary(
+      path_decision->SetSTBoundary(
           id, path_decision->Find(id)->reference_line_st_boundary());
     }
   }

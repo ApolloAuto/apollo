@@ -308,7 +308,6 @@ cc_library(
         ":local_view",
         ":obstacle",
         ":reference_line_info",
-        ":trajectory_info",
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/monitor_log",
@@ -439,21 +438,6 @@ cc_library(
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
         "@eigen",
-    ],
-)
-
-cc_library(
-    name = "trajectory_info",
-    hdrs = [
-        "trajectory_info.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        "//modules/planning/common/path:path_data",
-        "//modules/planning/common/speed:speed_data",
-        "//modules/planning/common/trajectory:discretized_trajectory",
     ],
 )
 
