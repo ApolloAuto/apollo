@@ -46,14 +46,13 @@ void TransformCache::AddTransform(const StampedTransform& transform) {
     return;
   }
 
-  while (!transforms_.empty()) {
+  do {
     delt = transform.timestamp - transforms_.front().timestamp;
-    if (delt > cache_duration_) {
-      transforms_.pop_front();
-    } else {
+    if (delt < cache_duration_) {
       break;
     }
-  }
+    transforms_.pop_front();
+  } while (!transforms_.empty());
 
   transforms_.push_back(transform);
 }
