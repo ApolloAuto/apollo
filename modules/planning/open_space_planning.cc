@@ -194,7 +194,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
     }
 
     FillPlanningPb(start_timestamp, ptr_trajectory_pb);
-    frame_->mutable_trajectory()->CopyFrom(*ptr_trajectory_pb);
+    frame_->set_last_planned_trajectory(*ptr_trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
     FrameHistory::Instance()->Add(n, std::move(frame_));
     return;
@@ -230,7 +230,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
   FillPlanningPb(start_timestamp, ptr_trajectory_pb);
   ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
 
-  frame_->mutable_trajectory()->CopyFrom(*ptr_trajectory_pb);
+  frame_->set_last_planned_trajectory(*ptr_trajectory_pb);
 
   const uint32_t n = frame_->SequenceNum();
   FrameHistory::Instance()->Add(n, std::move(frame_));
@@ -248,35 +248,36 @@ Status OpenSpacePlanning::Plan(
   Status trajectory_partition_status;
 
   if (status == Status::OK()) {
-    ADCTrajectory* trajectory_after_stitching_point =
-        frame_->mutable_trajectory();
+    auto trajectory_after_stitching_point =
+        frame_->last_planned_trajectory();
     last_stitching_trajectory_ = frame_->last_stitching_trajectory();
-    trajectory_after_stitching_point->mutable_header()->set_timestamp_sec(
+    trajectory_after_stitching_point.mutable_header()->set_timestamp_sec(
         current_time_stamp);
 
     // adjust the relative time and relative s
     int size_of_trajectory_after_stitching_point =
-        trajectory_after_stitching_point->trajectory_point_size();
+        trajectory_after_stitching_point.trajectory_point_size();
     double last_stitching_trajectory_relative_time =
         last_stitching_trajectory_.back().relative_time();
     double last_stitching_trajectory_relative_s =
         last_stitching_trajectory_.back().path_point().s();
     for (int i = 0; i < size_of_trajectory_after_stitching_point; i++) {
-      trajectory_after_stitching_point->mutable_trajectory_point(i)
+      trajectory_after_stitching_point.mutable_trajectory_point(i)
           ->set_relative_time(
-              trajectory_after_stitching_point->mutable_trajectory_point(i)
+              trajectory_after_stitching_point.mutable_trajectory_point(i)
                   ->relative_time() +
               last_stitching_trajectory_relative_time);
-      trajectory_after_stitching_point->mutable_trajectory_point(i)
+      trajectory_after_stitching_point.mutable_trajectory_point(i)
           ->mutable_path_point()
-          ->set_s(trajectory_after_stitching_point->mutable_trajectory_point(i)
+          ->set_s(trajectory_after_stitching_point.mutable_trajectory_point(i)
                       ->path_point()
                       .s() +
                   last_stitching_trajectory_relative_s);
     }
 
     last_publishable_trajectory_.reset(
-        new PublishableTrajectory(*trajectory_after_stitching_point));
+        new PublishableTrajectory(trajectory_after_stitching_point));
+    frame_->set_last_planned_trajectory(trajectory_after_stitching_point);
 
     ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
