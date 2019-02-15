@@ -87,7 +87,7 @@ bool SetCameraHeight(const std::string &sensor_name,
 bool LoadExtrinsics(const std::string &yaml_file,
                     Eigen::Matrix4d *camera_extrinsic) {
   if (!apollo::cyber::common::PathExists(yaml_file)) {
-    AINFO << yaml_file << " not exist!";
+    AINFO << yaml_file << " does not exist!";
     return false;
   }
   YAML::Node node = YAML::LoadFile(yaml_file);
