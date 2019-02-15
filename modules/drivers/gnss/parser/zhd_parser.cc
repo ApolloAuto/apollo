@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include <cmath>
-#include <iostream>
-#include <limits>
-#include <memory>
-
+#include <math.h>
 #include <stdint.h>
 #include <string.h>
-#include <math.h>
 #include <stdlib.h>
-#include <vector>
+#include <memory>
 #include <iomanip>
+
+#include <limits>
+#include <iostream>
+#include <cmath>
+#include <vector>
 
 #include "ros/include/ros/ros.h"
 
@@ -41,7 +41,6 @@
 
 #include "modules/drivers/gnss/proto/zhd_gps.pb.h"
 
-//using namespace std;
 
 namespace apollo {
 namespace drivers {
@@ -50,13 +49,13 @@ namespace gnss {
 namespace {
     constexpr size_t BUFFER_SIZE = 256;
     constexpr double DEG_TO_RAD = M_PI / 180.0;
-    
+
     constexpr float FLOAT_NAN = std::numeric_limits<float>::quiet_NaN();
     constexpr double azimuth_deg_to_yaw_rad(double azimuth, double angle) {
       return (angle - azimuth) * DEG_TO_RAD;
     }
 
-} // namespace
+}  // namespace
 
 class ZhdParser : public Parser {
  public:
@@ -104,11 +103,9 @@ ZhdParser::ZhdParser(const config::Config& config) {
 
   if (config.has_zhd_config()) {
     zhd_config_ = config.zhd_config();
-  }
-  else {
-    /* code */
+  } else {
     zhd_config_.set_angle_heading(90);
-    AERROR<<"angle_heading="<<hex<<zhd_config_.angle_heading();
+    AERROR << "angle_heading=" << hex << zhd_config_.angle_heading();
   }
 }
 
@@ -125,8 +122,7 @@ Parser::MessageType ZhdParser::GetMessage(MessagePtr* message_ptr) {
       }
       ++data_;
       total_length_ = 0;
-    }
-    else if (buffer_.size() == 1) {
+    } else if (buffer_.size() == 1) {
       // Looking for SYNC1
       if (*data_ == zhd::SYNC_1) {
         buffer_.push_back(*data_++);
@@ -152,7 +148,7 @@ Parser::MessageType ZhdParser::GetMessage(MessagePtr* message_ptr) {
         total_length_ = 0;
       }
     } else if (total_length_ > 0) {
-        if(buffer_.size() >256) {
+        if (buffer_.size() >256) {
           AERROR << "buffer_.size() >256 ";
           buffer_.clear();
           total_length_ = 0;
@@ -160,7 +156,7 @@ Parser::MessageType ZhdParser::GetMessage(MessagePtr* message_ptr) {
         if (buffer_.size() < total_length_) {
             buffer_.push_back(*data_++);
             if (buffer_.size() == 6) {
-              total_length_= 
+              total_length_ =
                 (*reinterpret_cast<uint16_t*>(buffer_.data() + 4)) +2;
               if (total_length_ > 138) {
                 AERROR << "buffer_.size()1 >138 ";
@@ -218,12 +214,11 @@ Parser::MessageType ZhdParser::PrepareMessage(MessagePtr* message_ptr) {
 
     zhdgps_.set_angle_heading(stZhdData->angle_heading);
     zhdgps_.set_angle_pitch(stZhdData->angle_pitch);
- 
     zhdgps_.set_vel_e_m_s(stZhdData->vel_e_m_s);
     zhdgps_.set_vel_n_m_s(stZhdData->vel_n_m_s);
 
     zhdgps_.set_vel_u_m_s(azimuth_deg_to_yaw_rad(
-      stZhdData->angle_heading ,zhd_config_.angle_heading()));
+    stZhdData->angle_heading, zhd_config_.angle_heading()));
 
     zhdgps_.set_satellites_used(stZhdData->satellites_used);
     zhdgps_.set_satellites_track(stZhdData->satellites_track);
@@ -244,7 +239,6 @@ Parser::MessageType ZhdParser::PrepareMessage(MessagePtr* message_ptr) {
         }
         case apollo::drivers::gnss::ZhdGps::FIX_TYPE_VBS_PPP:
         {
-          // Pseudorange differential ,Unconverged OmniSTAR,HP/XP/G2/VBS converging PPP
           zhdgps_.set_instype(apollo::drivers::gnss::ZhdGps::INVALID);
           zhdgps_.set_fix_type(apollo::drivers::gnss::ZhdGps::FIX_TYPE_VBS_PPP);
           break;
@@ -257,71 +251,67 @@ Parser::MessageType ZhdParser::PrepareMessage(MessagePtr* message_ptr) {
         }
         case apollo::drivers::gnss::ZhdGps::FIX_TYPE_PPP:
         {
-          //Converged PPP
           zhdgps_.set_instype(apollo::drivers::gnss::ZhdGps::INVALID);
           zhdgps_.set_fix_type(apollo::drivers::gnss::ZhdGps::FIX_TYPE_PPP);
           break;
         }
         case apollo::drivers::gnss::ZhdGps::FIX_TYPE_DEAD_MOD:
         {
-          //Dead reckoning mode
           zhdgps_.set_instype(apollo::drivers::gnss::ZhdGps::INVALID);
-          zhdgps_.set_fix_type(apollo::drivers::gnss::ZhdGps::FIX_TYPE_DEAD_MOD);
+          zhdgps_.set_fix_type(
+            apollo::drivers::gnss::ZhdGps::FIX_TYPE_DEAD_MOD);
           break;
         }
         case apollo::drivers::gnss::ZhdGps::FIX_TYPE_INPUT_MOD:
         {
-          //Manual input mode (fixed position)
           zhdgps_.set_instype(apollo::drivers::gnss::ZhdGps::INVALID);
-          zhdgps_.set_fix_type(apollo::drivers::gnss::ZhdGps::FIX_TYPE_INPUT_MOD);
+          zhdgps_.set_fix_type(
+            apollo::drivers::gnss::ZhdGps::FIX_TYPE_INPUT_MOD);
           break;
         }
-        case apollo::drivers::gnss::ZhdGps::SIMULATOR_MODE://Single point
+        case apollo::drivers::gnss::ZhdGps::SIMULATOR_MODE:
         {
-          //Simulator mode
           zhdgps_.set_instype(apollo::drivers::gnss::ZhdGps::INVALID);
           zhdgps_.set_fix_type(apollo::drivers::gnss::ZhdGps::SIMULATOR_MODE);
           break;
-        }     
+        }
         case apollo::drivers::gnss::ZhdGps::WAAS:
         {
-          //WAAS (SBAS)
           zhdgps_.set_instype(apollo::drivers::gnss::ZhdGps::INVALID);
           zhdgps_.set_fix_type(apollo::drivers::gnss::ZhdGps::WAAS);
           break;
-        }      
+        }
         case apollo::drivers::gnss::ZhdGps::INS_FIXED:
         {
-          //INS fixed ambiguity solution(惯导定位解状态) PfGps
           zhdgps_.set_instype(apollo::drivers::gnss::ZhdGps::INVALID);
           zhdgps_.set_fix_type(apollo::drivers::gnss::ZhdGps::INS_FIXED);
           break;
-        }                  
+        }
         default:
         {
           zhdgps_.set_instype(apollo::drivers::gnss::ZhdGps::INVALID);
           zhdgps_.set_fix_type(apollo::drivers::gnss::ZhdGps::FIX_TYPE_INVALID);
-          AERROR<<"zhd gps invalid"<<stZhdData->fix_type;
+          AERROR << "zhd gps invalid" << stZhdData->fix_type;
           break;
         }
       }
 
-    switch ((uint32_t)stZhdData->angle_postype) 
-    {
-        case apollo::drivers::gnss::ZhdGps::POS_TYPE_NARROW_INT://Fix not available or invalid
+    switch ((uint32_t)stZhdData->angle_postype) {
+        case apollo::drivers::gnss::ZhdGps::POS_TYPE_NARROW_INT:
         {
-          zhdgps_.set_angle_postype(apollo::drivers::gnss::ZhdGps::POS_TYPE_NARROW_INT);
+          zhdgps_.set_angle_postype(
+            apollo::drivers::gnss::ZhdGps::POS_TYPE_NARROW_INT);
           break;
-        }                 
+        }
         default:
         {
-          zhdgps_.set_angle_postype(apollo::drivers::gnss::ZhdGps::POS_TYPE_NONE);
-          AERROR<<"zhd set_angle_postype invalid="<<stZhdData->angle_postype;
+          zhdgps_.set_angle_postype(
+            apollo::drivers::gnss::ZhdGps::POS_TYPE_NONE);
+          AERROR << "zhd set_angle_postype invalid="
+            << stZhdData->angle_postype;
           break;
         }
-
       }
-      // zhdgps_.set_angle_postype(static_cast<uint32_t>(stZhdData->angle_postype));
       zhdgps_.set_head_deviation(stZhdData->head_deviation);
       zhdgps_.set_ins_state(stZhdData->ins_state);
       zhdgps_.set_gnss_alt_delta(stZhdData->gnss_alt_delta);
@@ -333,19 +323,20 @@ Parser::MessageType ZhdParser::PrepareMessage(MessagePtr* message_ptr) {
 }
 
 bool ZhdParser::check_checksum(void) {
-  uint16_t xor_check=0;
+  uint16_t xor_check = 0;
   uint16_t Checksum = 0;
 
-  Checksum = (uint16_t)*reinterpret_cast<uint16_t*>(buffer_.data() + buffer_.size()-2);//136
+  Checksum =
+    (uint16_t)*reinterpret_cast<uint16_t*>(buffer_.data() +
+    buffer_.size()-2);
 
-  for (vector<uint8_t>::iterator riter = buffer_.begin(); riter != (buffer_.end()-2); riter++) {
+  for (vector<uint8_t>::iterator riter = buffer_.begin();
+    riter != (buffer_.end()-2); riter++) {
     xor_check = xor_check^(reinterpret_cast<uint8_t>(*riter));
   }
- 
   if (xor_check != Checksum) {
-    AERROR<<" 0 = xor_check="<<xor_check<<"stZhd_checksum="<<Checksum;
-    fprintf(stderr,"0 = xor_check==> 0x%04x \n",xor_check);
-    fprintf(stderr,"0 = Checksum==> 0x%04x \n",Checksum);
+    AERROR << " 0 = xor_check="
+      << xor_check << "stZhd_checksum=" << Checksum;
     return false;
   }
   return true;

@@ -33,13 +33,13 @@ enum SyncByte : uint8_t {
 };
 
 enum class _fixtype : uint32_t {
-  FIX_TYPE_NONE = 0, //Fix not available or invalid
-  FIX_TYPE_SPOINT =1, //Single point
-  FIX_TYPE_VBS_PPP =2,// Pseudorange differential
-  FIX_TYPE_RT2 =4,  //RTK fixed ambiguity solution (RT2)
-  FIX_TYPE_PPP =5,  //Converged PPP
-  FIX_TYPE_DEAD_MOD =6,  //Dead reckoning mode
-  FIX_TYPE_INPUT_MOD =7,  //Manual input mode (fixed position)
+  FIX_TYPE_NONE = 0,
+  FIX_TYPE_SPOINT = 1,
+  FIX_TYPE_VBS_PPP = 2,
+  FIX_TYPE_RT2 = 4,
+  FIX_TYPE_PPP = 5,
+  FIX_TYPE_DEAD_MOD = 6,
+  FIX_TYPE_INPUT_MOD = 7,
 };
 
 enum class _PosType : uint8_t {
@@ -65,44 +65,44 @@ enum class _PosType : uint8_t {
 };
 
 typedef struct {
-  unsigned char head[2];          //2 bytes deviation 0
-  unsigned short int version;     //2 bytes deviation 2
-  unsigned short int length;      //2 bytes deviation 4
-  unsigned short int freq;        //2 bytes deviation 6
-  float time_utc;                 //4 bytes deviation 8
-  unsigned short int year_utc;    //2 bytes deviation 12
-  unsigned short int month_utc;   //2 bytes deviation 14
-  unsigned short int day_utc;     //2 bytes deviation 16
-  unsigned short int hour_utc;    //2 bytes deviation 18
-  unsigned short int min_utc;     //2 bytes deviation 20
-  unsigned short int sec_utc;     //2 bytes deviation 22
-  double latitude;                //8 bytes deviation 24
-  double longitude;               //8 bytes deviation 32
-  double altitude;                //8 bytes deviation 40
-  float eph;                      //4 bytes deviation 48
-  float epv;                      //4 bytes deviation 52
-  float vel_ground_m_s;           //4 bytes deviation 56
-  float angle_tracktrue;          //4 bytes deviation 60
-  float angle_heading;            //4 bytes deviation 64
-  float angle_pitch;              //4 bytes deviation 68
-  double vel_n_m_s;                   //8 bytes deviation 72
-  double vel_e_m_s;                   //8 bytes deviation 80
-  double vel_u_m_s;                   //8 bytes deviation 88
-  
-  unsigned short int satellites_used;   //2 bytes deviation 96
-  unsigned short int satellites_track;  //2 bytes deviation 98
-  float vel_ned_valid;                  //4 bytes deviation 100
-  unsigned short int fix_type;          //2 bytes deviation 104
-  float angle_postype;                  //4 bytes deviation 106
-  float head_deviation;                 //4 bytes deviation 110
+  unsigned char head[2];
+  uint16_t version;
+  uint16_t length;
+  uint16_t freq;
+  float time_utc;
+  uint16_t year_utc;
+  uint16_t month_utc;
+  uint16_t day_utc;
+  uint16_t hour_utc;
+  uint16_t min_utc;
+  uint16_t sec_utc;
+  double latitude;
+  double longitude;
+  double altitude;
+  float eph;
+  float epv;
+  float vel_ground_m_s;
+  float angle_tracktrue;
+  float angle_heading;
+  float angle_pitch;
+  double vel_n_m_s;
+  double vel_e_m_s;
+  double vel_u_m_s;
 
-  unsigned short int ins_state;         //2 bytes deviation 114
-  double gnss_alt_delta ;               //8 bytes deviation 116
-  double ellipsoidal_h;                 //8 bytes deviation 124
-  unsigned short int diff_age;          //2 bytes deviation 132
-  unsigned char reserve[2];             //2 bytes deviation 134
-  unsigned short int checksum;          //2 bytes deviation 136
-}gps_rtk_zhd_packet_t; //total 138 bytes
+  uint16_t satellites_used;
+  uint16_t satellites_track;
+  float vel_ned_valid;
+  uint16_t fix_type;
+  float angle_postype;
+  float head_deviation;
+
+  uint16_t ins_state;
+  double gnss_alt_delta;
+  double ellipsoidal_h;
+  uint16_t diff_age;
+  unsigned char reserve[2];
+  uint16_t checksum;
+}gps_rtk_zhd_packet_t;
 
 #pragma pack()
 
