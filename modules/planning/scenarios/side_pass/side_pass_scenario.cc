@@ -127,11 +127,23 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
     // If not, then switch to LANE_FOLLOW.
     const auto front_blocking_obstacle =
         const_cast<Frame&>(frame).Find(front_blocking_obstacle_id);
-    if (front_blocking_obstacle != nullptr &&
-        !front_blocking_obstacle->IsStatic()) {
-      AWARN << "Obstacle " << front_blocking_obstacle_id
-          << " starts to move. Change scenario from SIDE_PASS"
-          << " back to default scenario.";
+    if (!front_blocking_obstacle) {
+      ADEBUG << "Obstacle " << front_blocking_obstacle_id
+            << " not exist any more. Change scenario to default scenario.";
+      return false;
+    }
+    const auto& reference_line_info = frame.reference_line_info().front();
+    const double adc_front_edge_s =
+        reference_line_info.AdcSlBoundary().end_s();
+    const double distance =
+        front_blocking_obstacle->PerceptionSLBoundary().start_s() -
+        adc_front_edge_s;
+
+    constexpr double kSidePassMaxDistance = 10.0;
+    if (!front_blocking_obstacle->IsStatic() ||
+        distance > kSidePassMaxDistance) {
+      ADEBUG << "Obstacle " << front_blocking_obstacle_id
+            << " starts to move. Change scenario to default scenario.";
       return false;
     }
     msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
