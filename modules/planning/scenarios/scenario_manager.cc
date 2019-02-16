@@ -273,7 +273,6 @@ void ScenarioManager::Observe(const Frame& frame) {
   PlanningContext::GetScenarioInfo()->next_stop_sign_overlap = PathOverlap();
   PlanningContext::GetScenarioInfo()->next_traffic_light_overlap =
       PathOverlap();
-  PlanningContext::GetScenarioInfo()->next_crosswalk_overlap = PathOverlap();
 
   const auto& reference_line_info = frame.reference_line_info().front();
 
@@ -321,24 +320,8 @@ void ScenarioManager::Observe(const Frame& frame) {
     }
   }
   ADEBUG << "Traffic Light: "
-         << PlanningContext::GetScenarioInfo()
-                ->next_traffic_light_overlap.object_id;
-
-  // find next crosswalk_overlap
-  const std::vector<hdmap::PathOverlap>& crosswalk_overlaps =
-      reference_line_info.reference_line().map_path().crosswalk_overlaps();
-  min_start_s = std::numeric_limits<double>::max();
-  for (const PathOverlap& crosswalk_overlap : crosswalk_overlaps) {
-    if (adc_front_edge_s - crosswalk_overlap.end_s <=
-            conf_min_pass_s_distance_ &&
-        crosswalk_overlap.start_s < min_start_s) {
-      min_start_s = crosswalk_overlap.start_s;
-      PlanningContext::GetScenarioInfo()->next_crosswalk_overlap =
-          crosswalk_overlap;
-    }
-  }
-  ADEBUG << "Crosswalk: "
-      << PlanningContext::GetScenarioInfo()->next_crosswalk_overlap.object_id;
+      << PlanningContext::GetScenarioInfo()
+          ->next_traffic_light_overlap.object_id;
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
