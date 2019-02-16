@@ -419,7 +419,7 @@ void ScenarioManager::ScenarioDispatch(
     scenario_type = SelectSidePassScenario(frame);
   }
 
-  ADEBUG << "select cenario: "
+  ADEBUG << "select scenario: "
       << ScenarioConfig::ScenarioType_Name(scenario_type);
 
   if (current_scenario_->scenario_type() != scenario_type) {
