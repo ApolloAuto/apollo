@@ -5,12 +5,10 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "util",
     srcs = [
-        "string_tokenizer.cc",
         "util.cc",
     ],
     hdrs = [
         "blocking_queue.h",
-        "string_tokenizer.h",
         "util.h",
     ],
     deps = [
@@ -23,10 +21,21 @@ cc_library(
         ":message_util",
         ":points_downsampler",
         ":string_util",
+        ":string_tokenizer",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
     ],
+)
+
+cc_library(
+    name = "string_tokenizer",
+    srcs = [
+        "string_tokenizer.cc",
+    ],
+    hdrs = [
+        "string_tokenizer.h",
+    ]
 )
 
 cc_test(
@@ -55,7 +64,7 @@ cc_test(
     ],
     deps = [
         ":disjoint_set",
-        "//cyber",
+        "//cyber/common",
         "@gtest//:main",
     ],
 )
@@ -150,7 +159,7 @@ cc_library(
         "factory.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common",
     ],
 )
 
@@ -162,7 +171,6 @@ cc_test(
     ],
     deps = [
         ":factory",
-        "//cyber",
         "//modules/common",
         "@gtest//:main",
     ],
@@ -200,7 +208,7 @@ cc_library(
         "points_downsampler.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common",
         "//modules/common/math:geometry",
     ],
 )
@@ -226,7 +234,7 @@ cc_library(
         "json_util.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/common",
         "//third_party/json",
         "@com_google_protobuf//:protobuf",
     ],
@@ -250,7 +258,7 @@ cc_library(
     srcs = ["http_client.cc"],
     hdrs = ["http_client.h"],
     deps = [
-        "//cyber",
+        "//cyber/common",
         "//modules/common/status",
         "//modules/common/util:string_util",
         "//third_party/json",
