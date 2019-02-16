@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/st_boundary_config.pb.h"
+#include "modules/planning/proto/speed_bounds_decider_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/path/path_data.h"
@@ -39,7 +39,7 @@ namespace planning {
 class StBoundaryMapper {
  public:
   StBoundaryMapper(const SLBoundary& adc_sl_boundary,
-                   const StBoundaryConfig& config,
+                   const SpeedBoundsDeciderConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data, const double planning_distance,
                    const double planning_time, const bool is_change_lane);
@@ -47,13 +47,6 @@ class StBoundaryMapper {
   virtual ~StBoundaryMapper() = default;
 
   apollo::common::Status CreateStBoundary(PathDecision* path_decision) const;
-
-  apollo::common::Status CreateStBoundaryWithHistory(
-      const ObjectDecisions& history_decisions,
-      PathDecision* path_decision) const;
-
-  apollo::common::Status CreateStBoundary(
-      Obstacle* obstacle, const ObjectDecisionType& external_decision) const;
 
  private:
   FRIEND_TEST(StBoundaryMapperTest, check_overlap_test);
@@ -81,7 +74,7 @@ class StBoundaryMapper {
 
  private:
   const SLBoundary& adc_sl_boundary_;
-  const StBoundaryConfig& st_boundary_config_;
+  const SpeedBoundsDeciderConfig& speed_bounds_config_;
   const ReferenceLine& reference_line_;
   const PathData& path_data_;
   const apollo::common::VehicleParam& vehicle_param_;

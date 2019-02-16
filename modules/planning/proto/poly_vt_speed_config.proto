@@ -2,8 +2,6 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/planning/proto/st_boundary_config.proto";
-
 message PolyVTSpeedConfig {
   optional double total_time = 1 [default = 0.0]; //Total evaluate time
   optional double total_s = 2 [default = 0.0]; // Max station distance

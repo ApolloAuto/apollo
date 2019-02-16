@@ -34,9 +34,12 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 
 QpPiecewiseStGraph::QpPiecewiseStGraph(
-    const QpStSpeedConfig& qp_st_speed_config)
+    const QpStSpeedConfig& qp_st_speed_config, const double total_path_length,
+    const double total_time)
     : qp_st_speed_config_(qp_st_speed_config),
-      t_evaluated_resolution_(qp_st_speed_config_.total_time() /
+      total_path_length_(total_path_length),
+      total_time_(total_time),
+      t_evaluated_resolution_(total_time /
                               qp_st_speed_config_.qp_piecewise_config()
                                   .number_of_evaluated_graph_t()) {
   Init();
@@ -147,7 +150,7 @@ Status QpPiecewiseStGraph::AddConstraint(
     double lower_s = 0.0;
     double upper_s = 0.0;
     GetSConstraintByTime(boundaries, curr_t,
-                         qp_st_speed_config_.total_path_length(), &upper_s,
+                         total_path_length_, &upper_s,
                          &lower_s);
     s_upper_bound[i] = upper_s;
     s_lower_bound[i] = lower_s;
@@ -260,7 +263,7 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
 
   for (uint32_t i = 0; i < t_evaluated_.size(); ++i) {
     index_list[i] = i;
-    cruise_[i] = qp_st_speed_config_.total_path_length();
+    cruise_[i] = total_path_length_;
   }
   if (st_graph_debug_) {
     auto kernel_cruise_ref = st_graph_debug_->mutable_kernel_cruise_ref();
@@ -278,7 +281,7 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
     ref_kernel->AddReferenceLineKernelMatrix(
         index_list, cruise_,
         weight * static_cast<double>(t_evaluated_.size()) /
-            qp_st_speed_config_.total_time());
+            total_time_);
   }
 
   return Status::OK();
@@ -327,7 +330,7 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
     follow_kernel->AddReferenceLineKernelMatrix(
         index_list, ref_s,
         weight * static_cast<double>(t_evaluated_.size()) /
-            qp_st_speed_config_.total_time());
+            total_time_);
   }
 
   for (size_t i = 0; i < filtered_evaluate_t.size(); ++i) {

@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
-#include "modules/planning/proto/st_boundary_config.pb.h"
+#include "modules/planning/proto/speed_bounds_decider_config.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/obstacle.h"
@@ -38,7 +38,7 @@ namespace planning {
 class SpeedLimitDecider {
  public:
   SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
-                    const StBoundaryConfig& config,
+                    const SpeedBoundsDeciderConfig& config,
                     const ReferenceLine& reference_line,
                     const PathData& path_data);
 
@@ -57,7 +57,7 @@ class SpeedLimitDecider {
 
  private:
   const SLBoundary& adc_sl_boundary_;
-  const StBoundaryConfig& st_boundary_config_;
+  const SpeedBoundsDeciderConfig& speed_bounds_config_;
   const ReferenceLine& reference_line_;
   const PathData& path_data_;
   const apollo::common::VehicleParam& vehicle_param_;

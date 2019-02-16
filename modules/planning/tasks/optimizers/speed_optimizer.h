@@ -44,10 +44,9 @@ class SpeedOptimizer : public Task {
       const SpeedData& reference_speed_data, PathDecision* const path_decision,
       SpeedData* const speed_data) = 0;
 
-  void RecordSTGraphDebug(const StGraphData& st_graph_data,
-                          planning_internal::STGraphDebug* stGraphDebug) const;
-
   void RecordDebugInfo(const SpeedData& speed_data);
+  void RecordDebugInfo(const SpeedData& speed_data,
+                       planning_internal::STGraphDebug* st_graph_debug);
 };
 
 }  // namespace planning

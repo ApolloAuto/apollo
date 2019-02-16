@@ -127,8 +127,11 @@ TEST_F(DpStGraphTest, simple) {
 
   const double path_data_length = 120.0;
 
-  st_graph_data_ =
-      StGraphData(boundaries, init_point_, speed_limit_, path_data_length);
+  planning_internal::STGraphDebug st_graph_debug;
+
+  st_graph_data_ = StGraphData();
+  st_graph_data_.LoadData(boundaries, init_point_, speed_limit_,
+                          path_data_length, 120, 7.0, &st_graph_debug);
 
   // adc_sl_boundary_
   adc_sl_boundary_.set_start_s(15.0);
