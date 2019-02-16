@@ -22,7 +22,9 @@
 
 #include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/proto/speed_bounds_decider_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
+#include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
 
 namespace apollo {
 namespace planning {
@@ -33,8 +35,15 @@ class SpeedBoundsDecider : public Decider {
 
  private:
   apollo::common::Status Process(
-      Frame *const frame,
-      ReferenceLineInfo *const reference_line_info) override;
+      Frame* const frame,
+      ReferenceLineInfo* const reference_line_info) override;
+
+  void RecordSTGraphDebug(
+      const StGraphData& st_graph_data,
+      planning_internal::STGraphDebug* st_graph_debug) const;
+
+ private:
+  SpeedBoundsDeciderConfig speed_bounds_config_;
 };
 
 }  // namespace planning

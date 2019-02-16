@@ -26,13 +26,10 @@
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/qp_st_speed_config.pb.h"
-#include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/planning/math/smoothing_spline/active_set_spline_1d_solver.h"
 #include "modules/planning/math/smoothing_spline/osqp_spline_1d_solver.h"
 #include "modules/planning/tasks/optimizers/speed_optimizer.h"
-#include "modules/planning/tasks/optimizers/st_graph/speed_limit_decider.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_boundary_mapper.h"
 
 namespace apollo {
 namespace planning {
@@ -51,7 +48,6 @@ class QpSplineStSpeedOptimizer : public SpeedOptimizer {
                          SpeedData* const speed_data) override;
 
   QpStSpeedConfig qp_st_speed_config_;
-  StBoundaryConfig st_boundary_config_;
   std::unique_ptr<Spline1dSolver> spline_solver_;
 };
 

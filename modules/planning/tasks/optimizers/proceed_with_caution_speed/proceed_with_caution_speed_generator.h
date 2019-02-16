@@ -21,7 +21,6 @@
 #pragma once
 
 #include "modules/common/status/status.h"
-#include "modules/planning/proto/st_boundary_config.pb.h"
 #include "modules/planning/tasks/optimizers/speed_optimizer.h"
 
 namespace apollo {
