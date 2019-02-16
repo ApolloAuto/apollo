@@ -32,7 +32,7 @@ namespace {
 constexpr double kInf = std::numeric_limits<double>::infinity();
 }
 
-DpStCost::DpStCost(const DpStSpeedConfig& config,
+DpStCost::DpStCost(const DpStSpeedConfig& config, const double total_time,
                    const std::vector<const Obstacle*>& obstacles,
                    const common::TrajectoryPoint& init_point)
     : config_(config), obstacles_(obstacles), init_point_(init_point) {
@@ -40,7 +40,7 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
   for (auto& obstacle : obstacles) {
     boundary_map_[obstacle->st_boundary().id()] = index++;
   }
-  unit_t_ = config_.total_time() / config_.matrix_dimension_t();
+  unit_t_ = total_time / config_.matrix_dimension_t();
 
   AddToKeepClearRange(obstacles);
 
