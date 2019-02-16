@@ -42,9 +42,6 @@ class DeciderRuleBasedStop : public Decider {
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-  void CheckCrosswalk(Frame* const frame,
-                      ReferenceLineInfo* const reference_line_info);
-
   void CheckStopSign(Frame* const frame,
                 ReferenceLineInfo* const reference_line_info);
 
