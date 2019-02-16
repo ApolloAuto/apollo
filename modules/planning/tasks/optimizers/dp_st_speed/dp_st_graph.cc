@@ -68,14 +68,12 @@ DpStGraph::DpStGraph(const StGraphData& st_graph_data,
       dp_st_speed_config_(dp_config),
       obstacles_(obstacles),
       init_point_(init_point),
-      dp_st_cost_(dp_config, obstacles, init_point_),
+      dp_st_cost_(dp_config, st_graph_data_.total_time_by_conf(), obstacles,
+                  init_point_),
       adc_sl_boundary_(adc_sl_boundary) {
-  dp_st_speed_config_.set_total_path_length(
-      std::fmin(dp_st_speed_config_.total_path_length(),
-                st_graph_data_.path_data_length()));
-  unit_s_ = dp_st_speed_config_.total_path_length() /
+  unit_s_ = st_graph_data_.path_length() /
             (dp_st_speed_config_.matrix_dimension_s() - 1);
-  unit_t_ = dp_st_speed_config_.total_time() /
+  unit_t_ = st_graph_data_.total_time_by_conf() /
             (dp_st_speed_config_.matrix_dimension_t() - 1);
 }
 

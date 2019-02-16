@@ -41,7 +41,8 @@ namespace planning {
 
 class QpSplineStGraph {
  public:
-  QpSplineStGraph(Spline1dSolver* spline_solver,
+  QpSplineStGraph(Spline1dSolver* spline_solver, const double total_path_length,
+                  const double total_time,
                   const QpStSpeedConfig& qp_st_speed_config,
                   const apollo::common::VehicleParam& veh_param,
                   const bool is_change_lane);
@@ -111,6 +112,10 @@ class QpSplineStGraph {
 
   // knots
   std::vector<double> t_knots_;
+
+  double total_path_length_ = 0.0;
+
+  double total_time_ = 0.0;
 
   // evaluated t resolution
   double t_evaluated_resolution_ = 0.0;
