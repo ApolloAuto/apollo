@@ -77,7 +77,7 @@ class StBoundaryMapperTest : public ::testing::Test {
 };
 
 TEST_F(StBoundaryMapperTest, check_overlap_test) {
-  StBoundaryConfig config;
+  SpeedBoundsDeciderConfig config;
   double planning_distance = 70.0;
   double planning_time = 10.0;
   SLBoundary adc_sl_boundary;

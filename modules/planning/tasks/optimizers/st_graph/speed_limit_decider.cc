@@ -36,11 +36,11 @@ namespace planning {
 using apollo::common::Status;
 
 SpeedLimitDecider::SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
-                                     const StBoundaryConfig& config,
+                                     const SpeedBoundsDeciderConfig& config,
                                      const ReferenceLine& reference_line,
                                      const PathData& path_data)
     : adc_sl_boundary_(adc_sl_boundary),
-      st_boundary_config_(config),
+      speed_bounds_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {
@@ -50,7 +50,7 @@ void SpeedLimitDecider::GetAvgKappa(
     const std::vector<common::PathPoint>& path_points,
     std::vector<double>* kappa) const {
   CHECK_NOTNULL(kappa);
-  const int kHalfNumPoints = st_boundary_config_.num_points_to_avg_kappa() / 2;
+  const int kHalfNumPoints = speed_bounds_config_.num_points_to_avg_kappa() / 2;
   CHECK_GT(kHalfNumPoints, 0);
   kappa->clear();
   kappa->resize(path_points.size());
@@ -106,7 +106,7 @@ Status SpeedLimitDecider::GetSpeedLimits(
     const double centri_acc_speed_limit =
         std::sqrt(GetCentricAccLimit(std::fabs(avg_kappa[i])) /
                   std::fmax(std::fabs(avg_kappa[i]),
-                            st_boundary_config_.minimal_kappa()));
+                            speed_bounds_config_.minimal_kappa()));
 
     // -- 2.2: limit by centripetal jerk
     double centri_jerk_speed_limit = std::numeric_limits<double>::max();
@@ -118,7 +118,7 @@ Status SpeedLimitDecider::GetSpeedLimits(
       const double centri_jerk =
           std::fabs(avg_kappa[i + 1] - avg_kappa[i]) / (ds + kEpsilon);
       centri_jerk_speed_limit = std::fmax(
-          10.0, st_boundary_config_.centri_jerk_speed_coeff() / centri_jerk);
+          10.0, speed_bounds_config_.centri_jerk_speed_coeff() / centri_jerk);
     }
 
     // (3) speed limit from nudge obstacles
@@ -165,10 +165,10 @@ Status SpeedLimitDecider::GetSpeedLimits(
         double nudge_speed_ratio = 1.0;
         if (const_obstacle->IsStatic()) {
           nudge_speed_ratio =
-              st_boundary_config_.static_obs_nudge_speed_ratio();
+              speed_bounds_config_.static_obs_nudge_speed_ratio();
         } else {
           nudge_speed_ratio =
-              st_boundary_config_.dynamic_obs_nudge_speed_ratio();
+              speed_bounds_config_.dynamic_obs_nudge_speed_ratio();
         }
         nudge_obstacle_speed_limit =
             nudge_speed_ratio * speed_limit_on_reference_line;
@@ -179,13 +179,13 @@ Status SpeedLimitDecider::GetSpeedLimits(
     double curr_speed_limit = 0.0;
     if (FLAGS_enable_nudge_slowdown) {
       curr_speed_limit =
-          std::fmax(st_boundary_config_.lowest_speed(),
+          std::fmax(speed_bounds_config_.lowest_speed(),
                     common::util::MinElement(std::vector<double>{
                         speed_limit_on_reference_line, centri_acc_speed_limit,
                         centri_jerk_speed_limit, nudge_obstacle_speed_limit}));
     } else {
       curr_speed_limit =
-          std::fmax(st_boundary_config_.lowest_speed(),
+          std::fmax(speed_bounds_config_.lowest_speed(),
                     common::util::MinElement(std::vector<double>{
                         speed_limit_on_reference_line, centri_acc_speed_limit,
                         centri_jerk_speed_limit}));
@@ -206,13 +206,13 @@ double SpeedLimitDecider::GetCentricAccLimit(const double kappa) const {
   // consider acc = v ^ 2 * kappa
   // we determine acc by the two functions above, with uppper and lower speed
   // bounds
-  const double v_high = st_boundary_config_.high_speed_threshold();
-  const double v_low = st_boundary_config_.low_speed_threshold();
+  const double v_high = speed_bounds_config_.high_speed_threshold();
+  const double v_low = speed_bounds_config_.low_speed_threshold();
 
   const double h_v_acc =
-      st_boundary_config_.high_speed_centric_acceleration_limit();
+      speed_bounds_config_.high_speed_centric_acceleration_limit();
   const double l_v_acc =
-      st_boundary_config_.low_speed_centric_acceleration_limit();
+      speed_bounds_config_.low_speed_centric_acceleration_limit();
 
   if (std::fabs(v_high - v_low) < 1.0) {
     AERROR << "High speed and low speed threshold are too close to each other. "

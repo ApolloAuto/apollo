@@ -32,6 +32,8 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/math/finite_element_qp:fem_1d_jerk_qp_problem",
         "//modules/planning/tasks:task",
+        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
+        "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",
     ],
 )
 
