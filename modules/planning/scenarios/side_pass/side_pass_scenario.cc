@@ -120,7 +120,6 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 
   std::string front_blocking_obstacle_id =
       PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id;
-  front_blocking_obstacle_id += "_0";  // obstacle id for static obstacle
 
   if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     // Check if the blocking obstacle is still static.
