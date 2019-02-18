@@ -171,7 +171,7 @@ Chassis LincolnController::chassis() {
   }
   // 5
   if (chassis_detail.has_vehicle_spd() &&
-      static_cast<float>(chassis_detail.vehicle_spd().has_vehicle_spd())) {
+      chassis_detail.vehicle_spd().has_vehicle_spd()) {
     chassis_.set_speed_mps(
         static_cast<float>(chassis_detail.vehicle_spd().vehicle_spd()));
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
