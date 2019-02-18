@@ -117,6 +117,8 @@ class ObstaclesContainer : public Container {
    */
   std::vector<int> curr_frame_obstacle_ids();
 
+  double timestamp() const;
+
  private:
   Obstacle* GetObstacleWithLRUUpdate(const int obstacle_id);
   /**

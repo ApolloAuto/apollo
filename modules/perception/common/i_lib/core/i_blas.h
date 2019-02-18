@@ -23,35 +23,42 @@ namespace perception {
 namespace common {
 
 // Copy of 1D arrays
-template <typename T> inline void ICopy(const T *src, T *dst, int n) {
+template <typename T>
+inline void ICopy(const T *src, T *dst, int n) {
   memcpy(dst, src, n * sizeof(T));
 }
-template <typename T> inline void ICopy1(const T src[1], T dst[1]) {
+template <typename T>
+inline void ICopy1(const T src[1], T dst[1]) {
   dst[0] = src[0];
 }
-template <typename T> inline void ICopy2(const T src[2], T dst[2]) {
+template <typename T>
+inline void ICopy2(const T src[2], T dst[2]) {
   dst[0] = src[0];
   dst[1] = src[1];
 }
-template <typename T> inline void ICopy3(const T src[3], T dst[3]) {
+template <typename T>
+inline void ICopy3(const T src[3], T dst[3]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
 }
-template <typename T> inline void ICopy4(const T src[4], T dst[4]) {
+template <typename T>
+inline void ICopy4(const T src[4], T dst[4]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
   dst[3] = src[3];
 }
-template <typename T> inline void ICopy5(const T src[5], T dst[5]) {
+template <typename T>
+inline void ICopy5(const T src[5], T dst[5]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
   dst[3] = src[3];
   dst[4] = src[4];
 }
-template <typename T> inline void ICopy6(const T src[6], T dst[6]) {
+template <typename T>
+inline void ICopy6(const T src[6], T dst[6]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -59,7 +66,8 @@ template <typename T> inline void ICopy6(const T src[6], T dst[6]) {
   dst[4] = src[4];
   dst[5] = src[5];
 }
-template <typename T> inline void ICopy7(const T src[7], T dst[7]) {
+template <typename T>
+inline void ICopy7(const T src[7], T dst[7]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -68,7 +76,8 @@ template <typename T> inline void ICopy7(const T src[7], T dst[7]) {
   dst[5] = src[5];
   dst[6] = src[6];
 }
-template <typename T> inline void ICopy8(const T src[8], T dst[8]) {
+template <typename T>
+inline void ICopy8(const T src[8], T dst[8]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -78,7 +87,8 @@ template <typename T> inline void ICopy8(const T src[8], T dst[8]) {
   dst[6] = src[6];
   dst[7] = src[7];
 }
-template <typename T> inline void ICopy9(const T src[9], T dst[9]) {
+template <typename T>
+inline void ICopy9(const T src[9], T dst[9]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -89,7 +99,8 @@ template <typename T> inline void ICopy9(const T src[9], T dst[9]) {
   dst[7] = src[7];
   dst[8] = src[8];
 }
-template <typename T> inline void ICopy10(const T src[10], T dst[10]) {
+template <typename T>
+inline void ICopy10(const T src[10], T dst[10]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -101,7 +112,8 @@ template <typename T> inline void ICopy10(const T src[10], T dst[10]) {
   dst[8] = src[8];
   dst[9] = src[9];
 }
-template <typename T> inline void ICopy11(const T src[11], T dst[11]) {
+template <typename T>
+inline void ICopy11(const T src[11], T dst[11]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -114,7 +126,8 @@ template <typename T> inline void ICopy11(const T src[11], T dst[11]) {
   dst[9] = src[9];
   dst[10] = src[10];
 }
-template <typename T> inline void ICopy12(const T src[12], T dst[12]) {
+template <typename T>
+inline void ICopy12(const T src[12], T dst[12]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -128,7 +141,8 @@ template <typename T> inline void ICopy12(const T src[12], T dst[12]) {
   dst[10] = src[10];
   dst[11] = src[11];
 }
-template <typename T> inline void ICopy13(const T src[13], T dst[13]) {
+template <typename T>
+inline void ICopy13(const T src[13], T dst[13]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -143,7 +157,8 @@ template <typename T> inline void ICopy13(const T src[13], T dst[13]) {
   dst[11] = src[11];
   dst[12] = src[12];
 }
-template <typename T> inline void ICopy14(const T src[14], T dst[14]) {
+template <typename T>
+inline void ICopy14(const T src[14], T dst[14]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -159,7 +174,8 @@ template <typename T> inline void ICopy14(const T src[14], T dst[14]) {
   dst[12] = src[12];
   dst[13] = src[13];
 }
-template <typename T> inline void ICopy15(const T src[15], T dst[15]) {
+template <typename T>
+inline void ICopy15(const T src[15], T dst[15]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -176,7 +192,8 @@ template <typename T> inline void ICopy15(const T src[15], T dst[15]) {
   dst[13] = src[13];
   dst[14] = src[14];
 }
-template <typename T> inline void ICopy16(const T src[16], T dst[16]) {
+template <typename T>
+inline void ICopy16(const T src[16], T dst[16]) {
   dst[0] = src[0];
   dst[1] = src[1];
   dst[2] = src[2];
@@ -198,8 +215,7 @@ template <typename T> inline void ICopy16(const T src[16], T dst[16]) {
 template <typename T>
 inline void ICopy(const T *const *src, T **dst, int m, int n) {
   int i;
-  for (i = 0; i < m; i++)
-    ICopy<T>(src[i], dst[i], n);
+  for (i = 0; i < m; i++) ICopy<T>(src[i], dst[i], n);
 }
 
 // Copy of 1D arrays with different types
@@ -214,156 +230,202 @@ inline void ICopy(const T *src, S *dst, int n) {
 template <typename T, typename S>
 inline void ICopy(const T *const *src, S **dst, int m, int n) {
   int i;
-  for (i = 0; i < m; i++)
-    ICopy<T, S>(src[i], dst[i], n);
+  for (i = 0; i < m; i++) ICopy<T, S>(src[i], dst[i], n);
 }
 
 // Fill array elements with constant value
-template <typename T> inline void IFill(T *a, int n, T val) {
-  for (int i = 0; i < n; i++)
-    a[i] = val;
+template <typename T>
+inline void IFill(T *a, int n, T val) {
+  for (int i = 0; i < n; i++) a[i] = val;
 }
-template <typename T> inline void IFill1(T a[1], T val) { a[0] = val; }
-template <typename T> inline void IFill2(T a[2], T val) { a[0] = a[1] = val; }
-template <typename T> inline void IFill3(T a[3], T val) {
+template <typename T>
+inline void IFill1(T a[1], T val) {
+  a[0] = val;
+}
+template <typename T>
+inline void IFill2(T a[2], T val) {
+  a[0] = a[1] = val;
+}
+template <typename T>
+inline void IFill3(T a[3], T val) {
   a[0] = a[1] = a[2] = val;
 }
-template <typename T> inline void IFill4(T a[4], T val) {
+template <typename T>
+inline void IFill4(T a[4], T val) {
   a[0] = a[1] = a[2] = a[3] = val;
 }
-template <typename T> inline void IFill5(T a[5], T val) {
+template <typename T>
+inline void IFill5(T a[5], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = val;
 }
-template <typename T> inline void IFill6(T a[6], T val) {
+template <typename T>
+inline void IFill6(T a[6], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = val;
 }
-template <typename T> inline void IFill7(T a[7], T val) {
+template <typename T>
+inline void IFill7(T a[7], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = val;
 }
-template <typename T> inline void IFill8(T a[8], T val) {
+template <typename T>
+inline void IFill8(T a[8], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = val;
 }
-template <typename T> inline void IFill9(T a[9], T val) {
+template <typename T>
+inline void IFill9(T a[9], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = val;
 }
-template <typename T> inline void IFill10(T a[10], T val) {
+template <typename T>
+inline void IFill10(T a[10], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = val;
 }
-template <typename T> inline void IFill11(T a[11], T val) {
+template <typename T>
+inline void IFill11(T a[11], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       val;
 }
-template <typename T> inline void IFill12(T a[12], T val) {
+template <typename T>
+inline void IFill12(T a[12], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = val;
 }
-template <typename T> inline void IFill13(T a[13], T val) {
+template <typename T>
+inline void IFill13(T a[13], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = a[12] = val;
 }
-template <typename T> inline void IFill14(T a[14], T val) {
+template <typename T>
+inline void IFill14(T a[14], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = a[12] = a[13] = val;
 }
-template <typename T> inline void IFill15(T a[15], T val) {
+template <typename T>
+inline void IFill15(T a[15], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = a[12] = a[13] = a[14] = val;
 }
-template <typename T> inline void IFill16(T a[16], T val) {
+template <typename T>
+inline void IFill16(T a[16], T val) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = a[12] = a[13] = a[14] = a[15] = val;
 }
 
 // Fill array elements with zeroes
-template <typename T> inline void IZero(T *a, int n) {
-  for (int i = 0; i < n; i++)
-    a[i] = static_cast<T>(0.0);
+template <typename T>
+inline void IZero(T *a, int n) {
+  for (int i = 0; i < n; i++) a[i] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero1(T a[1]) { a[0] = static_cast<T>(0.0); }
-template <typename T> inline void IZero2(T a[2]) {
+template <typename T>
+inline void IZero1(T a[1]) {
+  a[0] = static_cast<T>(0.0);
+}
+template <typename T>
+inline void IZero2(T a[2]) {
   a[0] = a[1] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero3(T a[3]) {
+template <typename T>
+inline void IZero3(T a[3]) {
   a[0] = a[1] = a[2] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero4(T a[4]) {
+template <typename T>
+inline void IZero4(T a[4]) {
   a[0] = a[1] = a[2] = a[3] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero5(T a[5]) {
+template <typename T>
+inline void IZero5(T a[5]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero6(T a[6]) {
+template <typename T>
+inline void IZero6(T a[6]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero7(T a[7]) {
+template <typename T>
+inline void IZero7(T a[7]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero8(T a[8]) {
+template <typename T>
+inline void IZero8(T a[8]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero9(T a[9]) {
+template <typename T>
+inline void IZero9(T a[9]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] =
       static_cast<T>(0.0);
 }
-template <typename T> inline void IZero10(T a[10]) {
+template <typename T>
+inline void IZero10(T a[10]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] =
       static_cast<T>(0.0);
 }
-template <typename T> inline void IZero11(T a[11]) {
+template <typename T>
+inline void IZero11(T a[11]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       static_cast<T>(0.0);
 }
-template <typename T> inline void IZero12(T a[12]) {
+template <typename T>
+inline void IZero12(T a[12]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero13(T a[13]) {
+template <typename T>
+inline void IZero13(T a[13]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = a[12] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero14(T a[14]) {
+template <typename T>
+inline void IZero14(T a[14]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = a[12] = a[13] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero15(T a[15]) {
+template <typename T>
+inline void IZero15(T a[15]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = a[12] = a[13] = a[14] = static_cast<T>(0.0);
 }
-template <typename T> inline void IZero16(T a[16]) {
+template <typename T>
+inline void IZero16(T a[16]) {
   a[0] = a[1] = a[2] = a[3] = a[4] = a[5] = a[6] = a[7] = a[8] = a[9] = a[10] =
       a[11] = a[12] = a[13] = a[14] = a[15] = static_cast<T>(0.0);
 }
 
 // Negate a vector x of length n inplace
-template <typename T> inline void INeg(T *x, int n) {
+template <typename T>
+inline void INeg(T *x, int n) {
   for (int i = 0; i < n; i++) {
     x[i] = -x[i];
   }
 }
-template <typename T> inline void INeg1(T x[1]) { x[0] = -x[0]; }
-template <typename T> inline void INeg2(T x[2]) {
+template <typename T>
+inline void INeg1(T x[1]) {
+  x[0] = -x[0];
+}
+template <typename T>
+inline void INeg2(T x[2]) {
   x[0] = -x[0];
   x[1] = -x[1];
 }
-template <typename T> inline void INeg3(T x[3]) {
+template <typename T>
+inline void INeg3(T x[3]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
 }
-template <typename T> inline void INeg4(T x[4]) {
+template <typename T>
+inline void INeg4(T x[4]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
   x[3] = -x[3];
 }
-template <typename T> inline void INeg5(T x[5]) {
+template <typename T>
+inline void INeg5(T x[5]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
   x[3] = -x[3];
   x[4] = -x[4];
 }
-template <typename T> inline void INeg6(T x[6]) {
+template <typename T>
+inline void INeg6(T x[6]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -371,7 +433,8 @@ template <typename T> inline void INeg6(T x[6]) {
   x[4] = -x[4];
   x[5] = -x[5];
 }
-template <typename T> inline void INeg7(T x[7]) {
+template <typename T>
+inline void INeg7(T x[7]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -380,7 +443,8 @@ template <typename T> inline void INeg7(T x[7]) {
   x[5] = -x[5];
   x[6] = -x[6];
 }
-template <typename T> inline void INeg8(T x[8]) {
+template <typename T>
+inline void INeg8(T x[8]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -390,7 +454,8 @@ template <typename T> inline void INeg8(T x[8]) {
   x[6] = -x[6];
   x[7] = -x[7];
 }
-template <typename T> inline void INeg9(T x[9]) {
+template <typename T>
+inline void INeg9(T x[9]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -401,7 +466,8 @@ template <typename T> inline void INeg9(T x[9]) {
   x[7] = -x[7];
   x[8] = -x[8];
 }
-template <typename T> inline void INeg10(T x[10]) {
+template <typename T>
+inline void INeg10(T x[10]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -413,7 +479,8 @@ template <typename T> inline void INeg10(T x[10]) {
   x[8] = -x[8];
   x[9] = -x[9];
 }
-template <typename T> inline void INeg11(T x[11]) {
+template <typename T>
+inline void INeg11(T x[11]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -426,7 +493,8 @@ template <typename T> inline void INeg11(T x[11]) {
   x[9] = -x[9];
   x[10] = -x[10];
 }
-template <typename T> inline void INeg12(T x[12]) {
+template <typename T>
+inline void INeg12(T x[12]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -440,7 +508,8 @@ template <typename T> inline void INeg12(T x[12]) {
   x[10] = -x[10];
   x[11] = -x[11];
 }
-template <typename T> inline void INeg13(T x[13]) {
+template <typename T>
+inline void INeg13(T x[13]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -455,7 +524,8 @@ template <typename T> inline void INeg13(T x[13]) {
   x[11] = -x[11];
   x[12] = -x[12];
 }
-template <typename T> inline void INeg14(T x[14]) {
+template <typename T>
+inline void INeg14(T x[14]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -471,7 +541,8 @@ template <typename T> inline void INeg14(T x[14]) {
   x[12] = -x[12];
   x[13] = -x[13];
 }
-template <typename T> inline void INeg15(T x[15]) {
+template <typename T>
+inline void INeg15(T x[15]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -488,7 +559,8 @@ template <typename T> inline void INeg15(T x[15]) {
   x[13] = -x[13];
   x[14] = -x[14];
 }
-template <typename T> inline void INeg16(T x[16]) {
+template <typename T>
+inline void INeg16(T x[16]) {
   x[0] = -x[0];
   x[1] = -x[1];
   x[2] = -x[2];
@@ -507,30 +579,38 @@ template <typename T> inline void INeg16(T x[16]) {
   x[15] = -x[15];
 }
 // Negate a vector x of length n, save results in a vector y
-template <typename T> inline void INeg1(const T x[1], T y[1]) { y[0] = -x[0]; }
-template <typename T> inline void INeg2(const T x[2], T y[2]) {
+template <typename T>
+inline void INeg1(const T x[1], T y[1]) {
+  y[0] = -x[0];
+}
+template <typename T>
+inline void INeg2(const T x[2], T y[2]) {
   y[0] = -x[0];
   y[1] = -x[1];
 }
-template <typename T> inline void INeg3(const T x[3], T y[3]) {
+template <typename T>
+inline void INeg3(const T x[3], T y[3]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
 }
-template <typename T> inline void INeg4(const T x[4], T y[4]) {
+template <typename T>
+inline void INeg4(const T x[4], T y[4]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
   y[3] = -x[3];
 }
-template <typename T> inline void INeg5(const T x[5], T y[5]) {
+template <typename T>
+inline void INeg5(const T x[5], T y[5]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
   y[3] = -x[3];
   y[4] = -x[4];
 }
-template <typename T> inline void INeg6(const T x[6], T y[6]) {
+template <typename T>
+inline void INeg6(const T x[6], T y[6]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -538,7 +618,8 @@ template <typename T> inline void INeg6(const T x[6], T y[6]) {
   y[4] = -x[4];
   y[5] = -x[5];
 }
-template <typename T> inline void INeg7(const T x[7], T y[7]) {
+template <typename T>
+inline void INeg7(const T x[7], T y[7]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -547,7 +628,8 @@ template <typename T> inline void INeg7(const T x[7], T y[7]) {
   y[5] = -x[5];
   y[6] = -x[6];
 }
-template <typename T> inline void INeg8(const T x[8], T y[8]) {
+template <typename T>
+inline void INeg8(const T x[8], T y[8]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -557,7 +639,8 @@ template <typename T> inline void INeg8(const T x[8], T y[8]) {
   y[6] = -x[6];
   y[7] = -x[7];
 }
-template <typename T> inline void INeg9(const T x[9], T y[9]) {
+template <typename T>
+inline void INeg9(const T x[9], T y[9]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -568,7 +651,8 @@ template <typename T> inline void INeg9(const T x[9], T y[9]) {
   y[7] = -x[7];
   y[8] = -x[8];
 }
-template <typename T> inline void INeg10(const T x[10], T y[10]) {
+template <typename T>
+inline void INeg10(const T x[10], T y[10]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -580,7 +664,8 @@ template <typename T> inline void INeg10(const T x[10], T y[10]) {
   y[8] = -x[8];
   y[9] = -x[9];
 }
-template <typename T> inline void INeg11(const T x[11], T y[11]) {
+template <typename T>
+inline void INeg11(const T x[11], T y[11]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -593,7 +678,8 @@ template <typename T> inline void INeg11(const T x[11], T y[11]) {
   y[9] = -x[9];
   y[10] = -x[10];
 }
-template <typename T> inline void INeg12(const T x[12], T y[12]) {
+template <typename T>
+inline void INeg12(const T x[12], T y[12]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -607,7 +693,8 @@ template <typename T> inline void INeg12(const T x[12], T y[12]) {
   y[10] = -x[10];
   y[11] = -x[11];
 }
-template <typename T> inline void INeg13(const T x[13], T y[13]) {
+template <typename T>
+inline void INeg13(const T x[13], T y[13]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -622,7 +709,8 @@ template <typename T> inline void INeg13(const T x[13], T y[13]) {
   y[11] = -x[11];
   y[12] = -x[12];
 }
-template <typename T> inline void INeg14(const T x[14], T y[14]) {
+template <typename T>
+inline void INeg14(const T x[14], T y[14]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -638,7 +726,8 @@ template <typename T> inline void INeg14(const T x[14], T y[14]) {
   y[12] = -x[12];
   y[13] = -x[13];
 }
-template <typename T> inline void INeg15(const T x[15], T y[15]) {
+template <typename T>
+inline void INeg15(const T x[15], T y[15]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -655,7 +744,8 @@ template <typename T> inline void INeg15(const T x[15], T y[15]) {
   y[13] = -x[13];
   y[14] = -x[14];
 }
-template <typename T> inline void INeg16(const T x[16], T y[16]) {
+template <typename T>
+inline void INeg16(const T x[16], T y[16]) {
   y[0] = -x[0];
   y[1] = -x[1];
   y[2] = -x[2];
@@ -675,7 +765,8 @@ template <typename T> inline void INeg16(const T x[16], T y[16]) {
 }
 
 // Negate the cth column of mxn matrix A
-template <typename T> inline void INegCol(T *A, int c, int m, int n) {
+template <typename T>
+inline void INegCol(T *A, int c, int m, int n) {
   T *ref = A;
   for (int r = 0; r < m; ++r, ref += n) {
     ref[c] = -ref[c];
@@ -683,43 +774,51 @@ template <typename T> inline void INegCol(T *A, int c, int m, int n) {
 }
 
 // Compute x=x+c where x is n-dimensional vectors and c is a constant
-template <typename T> inline void IAdd(T *x, int n, T k) {
+template <typename T>
+inline void IAdd(T *x, int n, T k) {
   for (int i = 0; i < n; i++) {
     x[i] += k;
   }
 }
 // Compute z=x+y where x, y, and z are n-dimensional vectors
-template <typename T> inline void IAdd(const T *x, const T *y, int n, T *z) {
+template <typename T>
+inline void IAdd(const T *x, const T *y, int n, T *z) {
   for (int i = 0; i < n; i++) {
     z[i] = x[i] + y[i];
   }
 }
-template <typename T> inline void IAdd1(const T x[1], const T y[1], T z[1]) {
+template <typename T>
+inline void IAdd1(const T x[1], const T y[1], T z[1]) {
   z[0] = x[0] + y[0];
 }
-template <typename T> inline void IAdd2(const T x[2], const T y[2], T z[2]) {
+template <typename T>
+inline void IAdd2(const T x[2], const T y[2], T z[2]) {
   z[0] = x[0] + y[0];
   z[1] = x[1] + y[1];
 }
-template <typename T> inline void IAdd3(const T x[3], const T y[3], T z[3]) {
+template <typename T>
+inline void IAdd3(const T x[3], const T y[3], T z[3]) {
   z[0] = x[0] + y[0];
   z[1] = x[1] + y[1];
   z[2] = x[2] + y[2];
 }
-template <typename T> inline void IAdd4(const T x[4], const T y[4], T z[4]) {
+template <typename T>
+inline void IAdd4(const T x[4], const T y[4], T z[4]) {
   z[0] = x[0] + y[0];
   z[1] = x[1] + y[1];
   z[2] = x[2] + y[2];
   z[3] = x[3] + y[3];
 }
-template <typename T> inline void IAdd5(const T x[5], const T y[5], T z[5]) {
+template <typename T>
+inline void IAdd5(const T x[5], const T y[5], T z[5]) {
   z[0] = x[0] + y[0];
   z[1] = x[1] + y[1];
   z[2] = x[2] + y[2];
   z[3] = x[3] + y[3];
   z[4] = x[4] + y[4];
 }
-template <typename T> inline void IAdd6(const T x[6], const T y[6], T z[6]) {
+template <typename T>
+inline void IAdd6(const T x[6], const T y[6], T z[6]) {
   z[0] = x[0] + y[0];
   z[1] = x[1] + y[1];
   z[2] = x[2] + y[2];
@@ -727,7 +826,8 @@ template <typename T> inline void IAdd6(const T x[6], const T y[6], T z[6]) {
   z[4] = x[4] + y[4];
   z[5] = x[5] + y[5];
 }
-template <typename T> inline void IAdd7(const T x[7], const T y[7], T z[7]) {
+template <typename T>
+inline void IAdd7(const T x[7], const T y[7], T z[7]) {
   z[0] = x[0] + y[0];
   z[1] = x[1] + y[1];
   z[2] = x[2] + y[2];
@@ -736,7 +836,8 @@ template <typename T> inline void IAdd7(const T x[7], const T y[7], T z[7]) {
   z[5] = x[5] + y[5];
   z[6] = x[6] + y[6];
 }
-template <typename T> inline void IAdd8(const T x[8], const T y[8], T z[8]) {
+template <typename T>
+inline void IAdd8(const T x[8], const T y[8], T z[8]) {
   z[0] = x[0] + y[0];
   z[1] = x[1] + y[1];
   z[2] = x[2] + y[2];
@@ -746,7 +847,8 @@ template <typename T> inline void IAdd8(const T x[8], const T y[8], T z[8]) {
   z[6] = x[6] + y[6];
   z[7] = x[7] + y[7];
 }
-template <typename T> inline void IAdd9(const T x[9], const T y[9], T z[9]) {
+template <typename T>
+inline void IAdd9(const T x[9], const T y[9], T z[9]) {
   z[0] = x[0] + y[0];
   z[1] = x[1] + y[1];
   z[2] = x[2] + y[2];
@@ -894,35 +996,44 @@ inline void IAdd20(const T x[20], const T y[20], T z[20]) {
 }
 
 // Compute y=y+x where x and y are n-dimensional vectors
-template <typename T> inline void IAdd(const T *x, T *y, int n) {
+template <typename T>
+inline void IAdd(const T *x, T *y, int n) {
   for (int i = 0; i < n; i++) {
     y[i] += x[i];
   }
 }
-template <typename T> inline void IAdd1(const T x[1], T y[1]) { y[0] += x[0]; }
-template <typename T> inline void IAdd2(const T x[2], T y[2]) {
+template <typename T>
+inline void IAdd1(const T x[1], T y[1]) {
+  y[0] += x[0];
+}
+template <typename T>
+inline void IAdd2(const T x[2], T y[2]) {
   y[0] += x[0];
   y[1] += x[1];
 }
-template <typename T> inline void IAdd3(const T x[3], T y[3]) {
+template <typename T>
+inline void IAdd3(const T x[3], T y[3]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
 }
-template <typename T> inline void IAdd4(const T x[4], T y[4]) {
+template <typename T>
+inline void IAdd4(const T x[4], T y[4]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
   y[3] += x[3];
 }
-template <typename T> inline void IAdd5(const T x[5], T y[5]) {
+template <typename T>
+inline void IAdd5(const T x[5], T y[5]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
   y[3] += x[3];
   y[4] += x[4];
 }
-template <typename T> inline void IAdd6(const T x[6], T y[6]) {
+template <typename T>
+inline void IAdd6(const T x[6], T y[6]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -930,7 +1041,8 @@ template <typename T> inline void IAdd6(const T x[6], T y[6]) {
   y[4] += x[4];
   y[5] += x[5];
 }
-template <typename T> inline void IAdd7(const T x[7], T y[7]) {
+template <typename T>
+inline void IAdd7(const T x[7], T y[7]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -939,7 +1051,8 @@ template <typename T> inline void IAdd7(const T x[7], T y[7]) {
   y[5] += x[5];
   y[6] += x[6];
 }
-template <typename T> inline void IAdd8(const T x[8], T y[8]) {
+template <typename T>
+inline void IAdd8(const T x[8], T y[8]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -949,7 +1062,8 @@ template <typename T> inline void IAdd8(const T x[8], T y[8]) {
   y[6] += x[6];
   y[7] += x[7];
 }
-template <typename T> inline void IAdd9(const T x[9], T y[9]) {
+template <typename T>
+inline void IAdd9(const T x[9], T y[9]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -960,7 +1074,8 @@ template <typename T> inline void IAdd9(const T x[9], T y[9]) {
   y[7] += x[7];
   y[8] += x[8];
 }
-template <typename T> inline void IAdd10(const T x[10], T y[10]) {
+template <typename T>
+inline void IAdd10(const T x[10], T y[10]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -972,7 +1087,8 @@ template <typename T> inline void IAdd10(const T x[10], T y[10]) {
   y[8] += x[8];
   y[9] += x[9];
 }
-template <typename T> inline void IAdd11(const T x[11], T y[11]) {
+template <typename T>
+inline void IAdd11(const T x[11], T y[11]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -985,7 +1101,8 @@ template <typename T> inline void IAdd11(const T x[11], T y[11]) {
   y[9] += x[9];
   y[10] += x[10];
 }
-template <typename T> inline void IAdd12(const T x[12], T y[12]) {
+template <typename T>
+inline void IAdd12(const T x[12], T y[12]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -999,7 +1116,8 @@ template <typename T> inline void IAdd12(const T x[12], T y[12]) {
   y[10] += x[10];
   y[11] += x[11];
 }
-template <typename T> inline void IAdd13(const T x[13], T y[13]) {
+template <typename T>
+inline void IAdd13(const T x[13], T y[13]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -1014,7 +1132,8 @@ template <typename T> inline void IAdd13(const T x[13], T y[13]) {
   y[11] += x[11];
   y[12] += x[12];
 }
-template <typename T> inline void IAdd14(const T x[14], T y[14]) {
+template <typename T>
+inline void IAdd14(const T x[14], T y[14]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -1030,7 +1149,8 @@ template <typename T> inline void IAdd14(const T x[14], T y[14]) {
   y[12] += x[12];
   y[13] += x[13];
 }
-template <typename T> inline void IAdd15(const T x[15], T y[15]) {
+template <typename T>
+inline void IAdd15(const T x[15], T y[15]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -1047,7 +1167,8 @@ template <typename T> inline void IAdd15(const T x[15], T y[15]) {
   y[13] += x[13];
   y[14] += x[14];
 }
-template <typename T> inline void IAdd16(const T x[16], T y[16]) {
+template <typename T>
+inline void IAdd16(const T x[16], T y[16]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -1065,7 +1186,8 @@ template <typename T> inline void IAdd16(const T x[16], T y[16]) {
   y[14] += x[14];
   y[15] += x[15];
 }
-template <typename T> inline void IAdd20(const T x[20], T y[20]) {
+template <typename T>
+inline void IAdd20(const T x[20], T y[20]) {
   y[0] += x[0];
   y[1] += x[1];
   y[2] += x[2];
@@ -1089,37 +1211,44 @@ template <typename T> inline void IAdd20(const T x[20], T y[20]) {
 }
 
 // Compute y=y+x*k where x and y are n-dimensional vectors, k is constant
-template <typename T> inline void IAddScaled(const T *x, T *y, int n, T k) {
+template <typename T>
+inline void IAddScaled(const T *x, T *y, int n, T k) {
   for (int i = 0; i < n; i++) {
     y[i] += (x[i] * k);
   }
 }
-template <typename T> inline void IAddScaled1(const T x[1], T y[1], T k) {
+template <typename T>
+inline void IAddScaled1(const T x[1], T y[1], T k) {
   y[0] += x[0] * k;
 }
-template <typename T> inline void IAddScaled2(const T x[2], T y[2], T k) {
+template <typename T>
+inline void IAddScaled2(const T x[2], T y[2], T k) {
   y[0] += x[0] * k;
   y[1] += x[1] * k;
 }
-template <typename T> inline void IAddScaled3(const T x[3], T y[3], T k) {
+template <typename T>
+inline void IAddScaled3(const T x[3], T y[3], T k) {
   y[0] += x[0] * k;
   y[1] += x[1] * k;
   y[2] += x[2] * k;
 }
-template <typename T> inline void IAddScaled4(const T x[4], T y[4], T k) {
+template <typename T>
+inline void IAddScaled4(const T x[4], T y[4], T k) {
   y[0] += x[0] * k;
   y[1] += x[1] * k;
   y[2] += x[2] * k;
   y[3] += x[3] * k;
 }
-template <typename T> inline void IAddScaled5(const T x[5], T y[5], T k) {
+template <typename T>
+inline void IAddScaled5(const T x[5], T y[5], T k) {
   y[0] += x[0] * k;
   y[1] += x[1] * k;
   y[2] += x[2] * k;
   y[3] += x[3] * k;
   y[4] += x[4] * k;
 }
-template <typename T> inline void IAddScaled6(const T x[6], T y[6], T k) {
+template <typename T>
+inline void IAddScaled6(const T x[6], T y[6], T k) {
   y[0] += x[0] * k;
   y[1] += x[1] * k;
   y[2] += x[2] * k;
@@ -1127,7 +1256,8 @@ template <typename T> inline void IAddScaled6(const T x[6], T y[6], T k) {
   y[4] += x[4] * k;
   y[5] += x[5] * k;
 }
-template <typename T> inline void IAddScaled7(const T x[7], T y[7], T k) {
+template <typename T>
+inline void IAddScaled7(const T x[7], T y[7], T k) {
   y[0] += x[0] * k;
   y[1] += x[1] * k;
   y[2] += x[2] * k;
@@ -1136,7 +1266,8 @@ template <typename T> inline void IAddScaled7(const T x[7], T y[7], T k) {
   y[5] += x[5] * k;
   y[6] += x[6] * k;
 }
-template <typename T> inline void IAddScaled8(const T x[8], T y[8], T k) {
+template <typename T>
+inline void IAddScaled8(const T x[8], T y[8], T k) {
   y[0] += x[0] * k;
   y[1] += x[1] * k;
   y[2] += x[2] * k;
@@ -1146,7 +1277,8 @@ template <typename T> inline void IAddScaled8(const T x[8], T y[8], T k) {
   y[6] += x[6] * k;
   y[7] += x[7] * k;
 }
-template <typename T> inline void IAddScaled9(const T x[9], T y[9], T k) {
+template <typename T>
+inline void IAddScaled9(const T x[9], T y[9], T k) {
   y[0] += x[0] * k;
   y[1] += x[1] * k;
   y[2] += x[2] * k;
@@ -1239,43 +1371,51 @@ inline void IAddScaled9(const T x[9], const T y[9], T z[9], T k) {
 }
 
 // Compute x=x-c where x is n-dimensional vectors and c is a constant
-template <typename T> inline void ISub(T *x, int n, T k) {
+template <typename T>
+inline void ISub(T *x, int n, T k) {
   for (int i = 0; i < n; i++) {
     x[i] -= k;
   }
 }
 // Compute z=x-y where x, y, and z are n-dimensional vectors
-template <typename T> inline void ISub(const T *x, const T *y, int n, T *z) {
+template <typename T>
+inline void ISub(const T *x, const T *y, int n, T *z) {
   for (int i = 0; i < n; i++) {
     z[i] = x[i] - y[i];
   }
 }
-template <typename T> inline void ISub1(const T x[1], const T y[1], T z[1]) {
+template <typename T>
+inline void ISub1(const T x[1], const T y[1], T z[1]) {
   z[0] = x[0] - y[0];
 }
-template <typename T> inline void ISub2(const T x[2], const T y[2], T z[2]) {
+template <typename T>
+inline void ISub2(const T x[2], const T y[2], T z[2]) {
   z[0] = x[0] - y[0];
   z[1] = x[1] - y[1];
 }
-template <typename T> inline void ISub3(const T x[3], const T y[3], T z[3]) {
+template <typename T>
+inline void ISub3(const T x[3], const T y[3], T z[3]) {
   z[0] = x[0] - y[0];
   z[1] = x[1] - y[1];
   z[2] = x[2] - y[2];
 }
-template <typename T> inline void ISub4(const T x[4], const T y[4], T z[4]) {
+template <typename T>
+inline void ISub4(const T x[4], const T y[4], T z[4]) {
   z[0] = x[0] - y[0];
   z[1] = x[1] - y[1];
   z[2] = x[2] - y[2];
   z[3] = x[3] - y[3];
 }
-template <typename T> inline void ISub5(const T x[5], const T y[5], T z[5]) {
+template <typename T>
+inline void ISub5(const T x[5], const T y[5], T z[5]) {
   z[0] = x[0] - y[0];
   z[1] = x[1] - y[1];
   z[2] = x[2] - y[2];
   z[3] = x[3] - y[3];
   z[4] = x[4] - y[4];
 }
-template <typename T> inline void ISub6(const T x[6], const T y[6], T z[6]) {
+template <typename T>
+inline void ISub6(const T x[6], const T y[6], T z[6]) {
   z[0] = x[0] - y[0];
   z[1] = x[1] - y[1];
   z[2] = x[2] - y[2];
@@ -1283,7 +1423,8 @@ template <typename T> inline void ISub6(const T x[6], const T y[6], T z[6]) {
   z[4] = x[4] - y[4];
   z[5] = x[5] - y[5];
 }
-template <typename T> inline void ISub7(const T x[7], const T y[7], T z[7]) {
+template <typename T>
+inline void ISub7(const T x[7], const T y[7], T z[7]) {
   z[0] = x[0] - y[0];
   z[1] = x[1] - y[1];
   z[2] = x[2] - y[2];
@@ -1292,7 +1433,8 @@ template <typename T> inline void ISub7(const T x[7], const T y[7], T z[7]) {
   z[5] = x[5] - y[5];
   z[6] = x[6] - y[6];
 }
-template <typename T> inline void ISub8(const T x[8], const T y[8], T z[8]) {
+template <typename T>
+inline void ISub8(const T x[8], const T y[8], T z[8]) {
   z[0] = x[0] - y[0];
   z[1] = x[1] - y[1];
   z[2] = x[2] - y[2];
@@ -1302,7 +1444,8 @@ template <typename T> inline void ISub8(const T x[8], const T y[8], T z[8]) {
   z[6] = x[6] - y[6];
   z[7] = x[7] - y[7];
 }
-template <typename T> inline void ISub9(const T x[9], const T y[9], T z[9]) {
+template <typename T>
+inline void ISub9(const T x[9], const T y[9], T z[9]) {
   z[0] = x[0] - y[0];
   z[1] = x[1] - y[1];
   z[2] = x[2] - y[2];
@@ -1427,35 +1570,44 @@ inline void ISub16(const T x[16], const T y[16], T z[16]) {
 }
 
 // Compute y=y-x where x and y are n-dimensional vectors
-template <typename T> inline void ISub(const T *x, T *y, int n) {
+template <typename T>
+inline void ISub(const T *x, T *y, int n) {
   for (int i = 0; i < n; i++) {
     y[i] -= x[i];
   }
 }
-template <typename T> inline void ISub1(const T x[1], T y[1]) { y[0] -= x[0]; }
-template <typename T> inline void ISub2(const T x[2], T y[2]) {
+template <typename T>
+inline void ISub1(const T x[1], T y[1]) {
+  y[0] -= x[0];
+}
+template <typename T>
+inline void ISub2(const T x[2], T y[2]) {
   y[0] -= x[0];
   y[1] -= x[1];
 }
-template <typename T> inline void ISub3(const T x[3], T y[3]) {
+template <typename T>
+inline void ISub3(const T x[3], T y[3]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
 }
-template <typename T> inline void ISub4(const T x[4], T y[4]) {
+template <typename T>
+inline void ISub4(const T x[4], T y[4]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
   y[3] -= x[3];
 }
-template <typename T> inline void ISub5(const T x[5], T y[5]) {
+template <typename T>
+inline void ISub5(const T x[5], T y[5]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
   y[3] -= x[3];
   y[4] -= x[4];
 }
-template <typename T> inline void ISub6(const T x[6], T y[6]) {
+template <typename T>
+inline void ISub6(const T x[6], T y[6]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1463,7 +1615,8 @@ template <typename T> inline void ISub6(const T x[6], T y[6]) {
   y[4] -= x[4];
   y[5] -= x[5];
 }
-template <typename T> inline void ISub7(const T x[7], T y[7]) {
+template <typename T>
+inline void ISub7(const T x[7], T y[7]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1472,7 +1625,8 @@ template <typename T> inline void ISub7(const T x[7], T y[7]) {
   y[5] -= x[5];
   y[6] -= x[6];
 }
-template <typename T> inline void ISub8(const T x[8], T y[8]) {
+template <typename T>
+inline void ISub8(const T x[8], T y[8]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1482,7 +1636,8 @@ template <typename T> inline void ISub8(const T x[8], T y[8]) {
   y[6] -= x[6];
   y[7] -= x[7];
 }
-template <typename T> inline void ISub9(const T x[9], T y[9]) {
+template <typename T>
+inline void ISub9(const T x[9], T y[9]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1493,7 +1648,8 @@ template <typename T> inline void ISub9(const T x[9], T y[9]) {
   y[7] -= x[7];
   y[8] -= x[8];
 }
-template <typename T> inline void ISub10(const T x[10], T y[10]) {
+template <typename T>
+inline void ISub10(const T x[10], T y[10]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1505,7 +1661,8 @@ template <typename T> inline void ISub10(const T x[10], T y[10]) {
   y[8] -= x[8];
   y[9] -= x[9];
 }
-template <typename T> inline void ISub11(const T x[11], T y[11]) {
+template <typename T>
+inline void ISub11(const T x[11], T y[11]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1518,7 +1675,8 @@ template <typename T> inline void ISub11(const T x[11], T y[11]) {
   y[9] -= x[9];
   y[10] -= x[10];
 }
-template <typename T> inline void ISub12(const T x[12], T y[12]) {
+template <typename T>
+inline void ISub12(const T x[12], T y[12]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1532,7 +1690,8 @@ template <typename T> inline void ISub12(const T x[12], T y[12]) {
   y[10] -= x[10];
   y[11] -= x[11];
 }
-template <typename T> inline void ISub13(const T x[13], T y[13]) {
+template <typename T>
+inline void ISub13(const T x[13], T y[13]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1547,7 +1706,8 @@ template <typename T> inline void ISub13(const T x[13], T y[13]) {
   y[11] -= x[11];
   y[12] -= x[12];
 }
-template <typename T> inline void ISub14(const T x[14], T y[14]) {
+template <typename T>
+inline void ISub14(const T x[14], T y[14]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1563,7 +1723,8 @@ template <typename T> inline void ISub14(const T x[14], T y[14]) {
   y[12] -= x[12];
   y[13] -= x[13];
 }
-template <typename T> inline void ISub15(const T x[15], T y[15]) {
+template <typename T>
+inline void ISub15(const T x[15], T y[15]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1580,7 +1741,8 @@ template <typename T> inline void ISub15(const T x[15], T y[15]) {
   y[13] -= x[13];
   y[14] -= x[14];
 }
-template <typename T> inline void ISub16(const T x[16], T y[16]) {
+template <typename T>
+inline void ISub16(const T x[16], T y[16]) {
   y[0] -= x[0];
   y[1] -= x[1];
   y[2] -= x[2];
@@ -1599,37 +1761,44 @@ template <typename T> inline void ISub16(const T x[16], T y[16]) {
   y[15] -= x[15];
 }
 // Compute y=y-x*k where x and y are n-dimensional vectors, k is constant
-template <typename T> inline void ISubScaled(const T *x, T *y, int n, T k) {
+template <typename T>
+inline void ISubScaled(const T *x, T *y, int n, T k) {
   for (int i = 0; i < n; i++) {
     y[i] -= (x[i] * k);
   }
 }
-template <typename T> inline void ISubScaled1(const T x[1], T y[1], T k) {
+template <typename T>
+inline void ISubScaled1(const T x[1], T y[1], T k) {
   y[0] -= x[0] * k;
 }
-template <typename T> inline void ISubScaled2(const T x[2], T y[2], T k) {
+template <typename T>
+inline void ISubScaled2(const T x[2], T y[2], T k) {
   y[0] -= x[0] * k;
   y[1] -= x[1] * k;
 }
-template <typename T> inline void ISubScaled3(const T x[3], T y[3], T k) {
+template <typename T>
+inline void ISubScaled3(const T x[3], T y[3], T k) {
   y[0] -= x[0] * k;
   y[1] -= x[1] * k;
   y[2] -= x[2] * k;
 }
-template <typename T> inline void ISubScaled4(const T x[4], T y[4], T k) {
+template <typename T>
+inline void ISubScaled4(const T x[4], T y[4], T k) {
   y[0] -= x[0] * k;
   y[1] -= x[1] * k;
   y[2] -= x[2] * k;
   y[3] -= x[3] * k;
 }
-template <typename T> inline void ISubScaled5(const T x[5], T y[5], T k) {
+template <typename T>
+inline void ISubScaled5(const T x[5], T y[5], T k) {
   y[0] -= x[0] * k;
   y[1] -= x[1] * k;
   y[2] -= x[2] * k;
   y[3] -= x[3] * k;
   y[4] -= x[4] * k;
 }
-template <typename T> inline void ISubScaled6(const T x[6], T y[6], T k) {
+template <typename T>
+inline void ISubScaled6(const T x[6], T y[6], T k) {
   y[0] -= x[0] * k;
   y[1] -= x[1] * k;
   y[2] -= x[2] * k;
@@ -1637,7 +1806,8 @@ template <typename T> inline void ISubScaled6(const T x[6], T y[6], T k) {
   y[4] -= x[4] * k;
   y[5] -= x[5] * k;
 }
-template <typename T> inline void ISubScaled7(const T x[7], T y[7], T k) {
+template <typename T>
+inline void ISubScaled7(const T x[7], T y[7], T k) {
   y[0] -= x[0] * k;
   y[1] -= x[1] * k;
   y[2] -= x[2] * k;
@@ -1646,7 +1816,8 @@ template <typename T> inline void ISubScaled7(const T x[7], T y[7], T k) {
   y[5] -= x[5] * k;
   y[6] -= x[6] * k;
 }
-template <typename T> inline void ISubScaled8(const T x[8], T y[8], T k) {
+template <typename T>
+inline void ISubScaled8(const T x[8], T y[8], T k) {
   y[0] -= x[0] * k;
   y[1] -= x[1] * k;
   y[2] -= x[2] * k;
@@ -1656,7 +1827,8 @@ template <typename T> inline void ISubScaled8(const T x[8], T y[8], T k) {
   y[6] -= x[6] * k;
   y[7] -= x[7] * k;
 }
-template <typename T> inline void ISubScaled9(const T x[9], T y[9], T k) {
+template <typename T>
+inline void ISubScaled9(const T x[9], T y[9], T k) {
   y[0] -= x[0] * k;
   y[1] -= x[1] * k;
   y[2] -= x[2] * k;
@@ -1669,34 +1841,42 @@ template <typename T> inline void ISubScaled9(const T x[9], T y[9], T k) {
 }
 
 // Rescale n-dimensional vector x with a scale factor sf (inplace)
-template <typename T> inline void IScale(T *x, int n, T sf) {
-  for (int i = 0; i < n; i++)
-    x[i] *= sf;
+template <typename T>
+inline void IScale(T *x, int n, T sf) {
+  for (int i = 0; i < n; i++) x[i] *= sf;
 }
-template <typename T> inline void IScale1(T x[1], T sf) { x[0] *= sf; }
-template <typename T> inline void IScale2(T x[2], T sf) {
+template <typename T>
+inline void IScale1(T x[1], T sf) {
+  x[0] *= sf;
+}
+template <typename T>
+inline void IScale2(T x[2], T sf) {
   x[0] *= sf;
   x[1] *= sf;
 }
-template <typename T> inline void IScale3(T x[3], T sf) {
+template <typename T>
+inline void IScale3(T x[3], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
 }
-template <typename T> inline void IScale4(T x[4], T sf) {
+template <typename T>
+inline void IScale4(T x[4], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
   x[3] *= sf;
 }
-template <typename T> inline void IScale5(T x[5], T sf) {
+template <typename T>
+inline void IScale5(T x[5], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
   x[3] *= sf;
   x[4] *= sf;
 }
-template <typename T> inline void IScale6(T x[6], T sf) {
+template <typename T>
+inline void IScale6(T x[6], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1704,7 +1884,8 @@ template <typename T> inline void IScale6(T x[6], T sf) {
   x[4] *= sf;
   x[5] *= sf;
 }
-template <typename T> inline void IScale7(T x[7], T sf) {
+template <typename T>
+inline void IScale7(T x[7], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1713,7 +1894,8 @@ template <typename T> inline void IScale7(T x[7], T sf) {
   x[5] *= sf;
   x[6] *= sf;
 }
-template <typename T> inline void IScale8(T x[8], T sf) {
+template <typename T>
+inline void IScale8(T x[8], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1723,7 +1905,8 @@ template <typename T> inline void IScale8(T x[8], T sf) {
   x[6] *= sf;
   x[7] *= sf;
 }
-template <typename T> inline void IScale9(T x[9], T sf) {
+template <typename T>
+inline void IScale9(T x[9], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1734,7 +1917,8 @@ template <typename T> inline void IScale9(T x[9], T sf) {
   x[7] *= sf;
   x[8] *= sf;
 }
-template <typename T> inline void IScale10(T x[10], T sf) {
+template <typename T>
+inline void IScale10(T x[10], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1746,7 +1930,8 @@ template <typename T> inline void IScale10(T x[10], T sf) {
   x[8] *= sf;
   x[9] *= sf;
 }
-template <typename T> inline void IScale11(T x[11], T sf) {
+template <typename T>
+inline void IScale11(T x[11], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1759,7 +1944,8 @@ template <typename T> inline void IScale11(T x[11], T sf) {
   x[9] *= sf;
   x[10] *= sf;
 }
-template <typename T> inline void IScale12(T x[12], T sf) {
+template <typename T>
+inline void IScale12(T x[12], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1773,7 +1959,8 @@ template <typename T> inline void IScale12(T x[12], T sf) {
   x[10] *= sf;
   x[11] *= sf;
 }
-template <typename T> inline void IScale13(T x[13], T sf) {
+template <typename T>
+inline void IScale13(T x[13], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1788,7 +1975,8 @@ template <typename T> inline void IScale13(T x[13], T sf) {
   x[11] *= sf;
   x[12] *= sf;
 }
-template <typename T> inline void IScale14(T x[14], T sf) {
+template <typename T>
+inline void IScale14(T x[14], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1804,7 +1992,8 @@ template <typename T> inline void IScale14(T x[14], T sf) {
   x[12] *= sf;
   x[13] *= sf;
 }
-template <typename T> inline void IScale15(T x[15], T sf) {
+template <typename T>
+inline void IScale15(T x[15], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1821,7 +2010,8 @@ template <typename T> inline void IScale15(T x[15], T sf) {
   x[13] *= sf;
   x[14] *= sf;
 }
-template <typename T> inline void IScale16(T x[16], T sf) {
+template <typename T>
+inline void IScale16(T x[16], T sf) {
   x[0] *= sf;
   x[1] *= sf;
   x[2] *= sf;
@@ -1841,37 +2031,44 @@ template <typename T> inline void IScale16(T x[16], T sf) {
 }
 // Rescale n-dimensional vector x with a scale factor sf, save the result to
 //  * n-dimensional vector y
-template <typename T> inline void IScale(const T *x, T *y, int n, T sf) {
+template <typename T>
+inline void IScale(const T *x, T *y, int n, T sf) {
   for (int i = 0; i < n; i++) {
     y[i] = x[i] * sf;
   }
 }
-template <typename T> inline void IScale1(const T x[1], T y[1], T sf) {
+template <typename T>
+inline void IScale1(const T x[1], T y[1], T sf) {
   y[0] = x[0] * sf;
 }
-template <typename T> inline void IScale2(const T x[2], T y[2], T sf) {
+template <typename T>
+inline void IScale2(const T x[2], T y[2], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
 }
-template <typename T> inline void IScale3(const T x[3], T y[3], T sf) {
+template <typename T>
+inline void IScale3(const T x[3], T y[3], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
 }
-template <typename T> inline void IScale4(const T x[4], T y[4], T sf) {
+template <typename T>
+inline void IScale4(const T x[4], T y[4], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
   y[3] = x[3] * sf;
 }
-template <typename T> inline void IScale5(const T x[5], T y[5], T sf) {
+template <typename T>
+inline void IScale5(const T x[5], T y[5], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
   y[3] = x[3] * sf;
   y[4] = x[4] * sf;
 }
-template <typename T> inline void IScale6(const T x[6], T y[6], T sf) {
+template <typename T>
+inline void IScale6(const T x[6], T y[6], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1879,7 +2076,8 @@ template <typename T> inline void IScale6(const T x[6], T y[6], T sf) {
   y[4] = x[4] * sf;
   y[5] = x[5] * sf;
 }
-template <typename T> inline void IScale7(const T x[7], T y[7], T sf) {
+template <typename T>
+inline void IScale7(const T x[7], T y[7], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1888,7 +2086,8 @@ template <typename T> inline void IScale7(const T x[7], T y[7], T sf) {
   y[5] = x[5] * sf;
   y[6] = x[6] * sf;
 }
-template <typename T> inline void IScale8(const T x[8], T y[8], T sf) {
+template <typename T>
+inline void IScale8(const T x[8], T y[8], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1898,7 +2097,8 @@ template <typename T> inline void IScale8(const T x[8], T y[8], T sf) {
   y[6] = x[6] * sf;
   y[7] = x[7] * sf;
 }
-template <typename T> inline void IScale9(const T x[9], T y[9], T sf) {
+template <typename T>
+inline void IScale9(const T x[9], T y[9], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1909,7 +2109,8 @@ template <typename T> inline void IScale9(const T x[9], T y[9], T sf) {
   y[7] = x[7] * sf;
   y[8] = x[8] * sf;
 }
-template <typename T> inline void IScale10(const T x[10], T y[10], T sf) {
+template <typename T>
+inline void IScale10(const T x[10], T y[10], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1921,7 +2122,8 @@ template <typename T> inline void IScale10(const T x[10], T y[10], T sf) {
   y[8] = x[8] * sf;
   y[9] = x[9] * sf;
 }
-template <typename T> inline void IScale11(const T x[11], T y[11], T sf) {
+template <typename T>
+inline void IScale11(const T x[11], T y[11], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1934,7 +2136,8 @@ template <typename T> inline void IScale11(const T x[11], T y[11], T sf) {
   y[9] = x[9] * sf;
   y[10] = x[10] * sf;
 }
-template <typename T> inline void IScale12(const T x[12], T y[12], T sf) {
+template <typename T>
+inline void IScale12(const T x[12], T y[12], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1948,7 +2151,8 @@ template <typename T> inline void IScale12(const T x[12], T y[12], T sf) {
   y[10] = x[10] * sf;
   y[11] = x[11] * sf;
 }
-template <typename T> inline void IScale13(const T x[13], T y[13], T sf) {
+template <typename T>
+inline void IScale13(const T x[13], T y[13], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1963,7 +2167,8 @@ template <typename T> inline void IScale13(const T x[13], T y[13], T sf) {
   y[11] = x[11] * sf;
   y[12] = x[12] * sf;
 }
-template <typename T> inline void IScale14(const T x[14], T y[14], T sf) {
+template <typename T>
+inline void IScale14(const T x[14], T y[14], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1979,7 +2184,8 @@ template <typename T> inline void IScale14(const T x[14], T y[14], T sf) {
   y[12] = x[12] * sf;
   y[13] = x[13] * sf;
 }
-template <typename T> inline void IScale15(const T x[15], T y[15], T sf) {
+template <typename T>
+inline void IScale15(const T x[15], T y[15], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -1996,7 +2202,8 @@ template <typename T> inline void IScale15(const T x[15], T y[15], T sf) {
   y[13] = x[13] * sf;
   y[14] = x[14] * sf;
 }
-template <typename T> inline void IScale16(const T x[16], T y[16], T sf) {
+template <typename T>
+inline void IScale16(const T x[16], T y[16], T sf) {
   y[0] = x[0] * sf;
   y[1] = x[1] * sf;
   y[2] = x[2] * sf;
@@ -2023,75 +2230,92 @@ template <typename T> inline void IScale16(const T x[16], T y[16], T sf) {
 //   }
 //   return acc;
 // }
-template <typename T> inline T IDot(const T *x, const T *y, int n) {
+template <typename T>
+inline T IDot(const T *x, const T *y, int n) {
   T acc = static_cast<T>(0.0);
   for (int i = 0; i < n; ++i) {
     acc += x[i] * y[i];
   }
   return acc;
 }
-template <typename T> inline T IDot1(const T x[1], const T y[1]) {
+template <typename T>
+inline T IDot1(const T x[1], const T y[1]) {
   return (x[0] * y[0]);
 }
-template <typename T> inline T IDot2(const T x[2], const T y[2]) {
+template <typename T>
+inline T IDot2(const T x[2], const T y[2]) {
   return (x[0] * y[0] + x[1] * y[1]);
 }
-template <typename T> inline T IDot3(const T x[3], const T y[3]) {
+template <typename T>
+inline T IDot3(const T x[3], const T y[3]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2]);
 }
-template <typename T> inline T IDot4(const T x[4], const T y[4]) {
+template <typename T>
+inline T IDot4(const T x[4], const T y[4]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3]);
 }
-template <typename T> inline T IDot5(const T x[5], const T y[5]) {
+template <typename T>
+inline T IDot5(const T x[5], const T y[5]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4]);
 }
-template <typename T> inline T IDot6(const T x[6], const T y[6]) {
+template <typename T>
+inline T IDot6(const T x[6], const T y[6]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5]);
 }
-template <typename T> inline T IDot7(const T x[7], const T y[7]) {
+template <typename T>
+inline T IDot7(const T x[7], const T y[7]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6]);
 }
-template <typename T> inline T IDot8(const T x[8], const T y[8]) {
+template <typename T>
+inline T IDot8(const T x[8], const T y[8]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6] + x[7] * y[7]);
 }
-template <typename T> inline T IDot9(const T x[9], const T y[9]) {
+template <typename T>
+inline T IDot9(const T x[9], const T y[9]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6] + x[7] * y[7] + x[8] * y[8]);
 }
-template <typename T> inline T IDot10(const T x[10], const T y[10]) {
+template <typename T>
+inline T IDot10(const T x[10], const T y[10]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6] + x[7] * y[7] + x[8] * y[8] + x[9] * y[9]);
 }
-template <typename T> inline T IDot11(const T x[11], const T y[11]) {
+template <typename T>
+inline T IDot11(const T x[11], const T y[11]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6] + x[7] * y[7] + x[8] * y[8] + x[9] * y[9] +
           x[10] * y[10]);
 }
-template <typename T> inline T IDot12(const T x[12], const T y[12]) {
+template <typename T>
+inline T IDot12(const T x[12], const T y[12]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6] + x[7] * y[7] + x[8] * y[8] + x[9] * y[9] +
           x[10] * y[10] + x[11] * y[11]);
 }
-template <typename T> inline T IDot13(const T x[13], const T y[13]) {
+template <typename T>
+inline T IDot13(const T x[13], const T y[13]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6] + x[7] * y[7] + x[8] * y[8] + x[9] * y[9] +
           x[10] * y[10] + x[11] * y[11] + x[12] * y[12]);
 }
-template <typename T> inline T IDot14(const T x[14], const T y[14]) {
+template <typename T>
+inline T IDot14(const T x[14], const T y[14]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6] + x[7] * y[7] + x[8] * y[8] + x[9] * y[9] +
           x[10] * y[10] + x[11] * y[11] + x[12] * y[12] + x[13] * y[13]);
 }
-template <typename T> inline T IDot15(const T x[15], const T y[15]) {
+template <typename T>
+inline T IDot15(const T x[15], const T y[15]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6] + x[7] * y[7] + x[8] * y[8] + x[9] * y[9] +
           x[10] * y[10] + x[11] * y[11] + x[12] * y[12] + x[13] * y[13] +
           x[14] * y[14]);
 }
-template <typename T> inline T IDot16(const T x[16], const T y[16]) {
+template <typename T>
+inline T IDot16(const T x[16], const T y[16]) {
   return (x[0] * y[0] + x[1] * y[1] + x[2] * y[2] + x[3] * y[3] + x[4] * y[4] +
           x[5] * y[5] + x[6] * y[6] + x[7] * y[7] + x[8] * y[8] + x[9] * y[9] +
           x[10] * y[10] + x[11] * y[11] + x[12] * y[12] + x[13] * y[13] +
@@ -2106,65 +2330,87 @@ inline int ISumU(const unsigned char *x, int n) {
   }
   return acc;
 }
-template <typename T> inline T ISum(const T *x, int n) {
+template <typename T>
+inline T ISum(const T *x, int n) {
   T acc = static_cast<T>(0.0);
   for (int i = 0; i < n; ++i) {
     acc += x[i];
   }
   return acc;
 }
-template <typename T> inline T ISum1(const T x[1]) { return (x[0]); }
-template <typename T> inline T ISum2(const T x[2]) { return (x[0] + x[1]); }
-template <typename T> inline T ISum3(const T x[3]) {
+template <typename T>
+inline T ISum1(const T x[1]) {
+  return (x[0]);
+}
+template <typename T>
+inline T ISum2(const T x[2]) {
+  return (x[0] + x[1]);
+}
+template <typename T>
+inline T ISum3(const T x[3]) {
   return (x[0] + x[1] + x[2]);
 }
-template <typename T> inline T ISum4(const T x[4]) {
+template <typename T>
+inline T ISum4(const T x[4]) {
   return (x[0] + x[1] + x[2] + x[3]);
 }
-template <typename T> inline T ISum5(const T x[5]) {
+template <typename T>
+inline T ISum5(const T x[5]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4]);
 }
-template <typename T> inline T ISum6(const T x[6]) {
+template <typename T>
+inline T ISum6(const T x[6]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5]);
 }
-template <typename T> inline T ISum7(const T x[7]) {
+template <typename T>
+inline T ISum7(const T x[7]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6]);
 }
-template <typename T> inline T ISum8(const T x[8]) {
+template <typename T>
+inline T ISum8(const T x[8]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7]);
 }
-template <typename T> inline T ISum9(const T x[9]) {
+template <typename T>
+inline T ISum9(const T x[9]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8]);
 }
-template <typename T> inline T ISum10(const T x[10]) {
+template <typename T>
+inline T ISum10(const T x[10]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9]);
 }
-template <typename T> inline T ISum11(const T x[11]) {
+template <typename T>
+inline T ISum11(const T x[11]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9] +
           x[10]);
 }
-template <typename T> inline T ISum12(const T x[12]) {
+template <typename T>
+inline T ISum12(const T x[12]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9] +
           x[10] + x[11]);
 }
-template <typename T> inline T ISum13(const T x[13]) {
+template <typename T>
+inline T ISum13(const T x[13]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9] +
           x[10] + x[11] + x[12]);
 }
-template <typename T> inline T ISum14(const T x[14]) {
+template <typename T>
+inline T ISum14(const T x[14]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9] +
           x[10] + x[11] + x[12] + x[13]);
 }
-template <typename T> inline T ISum15(const T x[15]) {
+template <typename T>
+inline T ISum15(const T x[15]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9] +
           x[10] + x[11] + x[12] + x[13] + x[14]);
 }
-template <typename T> inline T ISum16(const T x[16]) {
+template <typename T>
+inline T ISum16(const T x[16]) {
   return (x[0] + x[1] + x[2] + x[3] + x[4] + x[5] + x[6] + x[7] + x[8] + x[9] +
           x[10] + x[11] + x[12] + x[13] + x[14] + x[15]);
 }
 
-template <typename T> inline T IAbsSum(const T *x, int n) {
+template <typename T>
+inline T IAbsSum(const T *x, int n) {
   T acc = static_cast<T>(0.0);
   for (int i = 0; i < n; ++i) {
     acc += IAbs(x[i]);
@@ -2174,27 +2420,74 @@ template <typename T> inline T IAbsSum(const T *x, int n) {
 
 // Compute mean of n-dimensional vector x
 inline int IMeanU(const unsigned char *x, int n) { return ISumU(x, n) / n; }
-template <typename T> inline T IMean(const T *x, int n) {
+template <typename T>
+inline T IMean(const T *x, int n) {
   return ISum(x, n) / n;
 }
-template <typename T> inline T IMean2(const T x[2]) { return ISum2(x) / 2; }
-template <typename T> inline T IMean3(const T x[3]) { return ISum3(x) / 3; }
-template <typename T> inline T IMean4(const T x[4]) { return ISum4(x) / 4; }
-template <typename T> inline T IMean5(const T x[5]) { return ISum5(x) / 5; }
-template <typename T> inline T IMean6(const T x[6]) { return ISum6(x) / 6; }
-template <typename T> inline T IMean7(const T x[7]) { return ISum7(x) / 7; }
-template <typename T> inline T IMean8(const T x[8]) { return ISum8(x) / 8; }
-template <typename T> inline T IMean9(const T x[9]) { return ISum9(x) / 9; }
-template <typename T> inline T IMean10(const T x[10]) { return ISum10(x) / 10; }
-template <typename T> inline T IMean11(const T x[11]) { return ISum11(x) / 11; }
-template <typename T> inline T IMean12(const T x[12]) { return ISum12(x) / 12; }
-template <typename T> inline T IMean13(const T x[13]) { return ISum13(x) / 13; }
-template <typename T> inline T IMean14(const T x[14]) { return ISum14(x) / 14; }
-template <typename T> inline T IMean15(const T x[15]) { return ISum15(x) / 15; }
-template <typename T> inline T IMean16(const T x[16]) { return ISum16(x) / 16; }
+template <typename T>
+inline T IMean2(const T x[2]) {
+  return ISum2(x) / 2;
+}
+template <typename T>
+inline T IMean3(const T x[3]) {
+  return ISum3(x) / 3;
+}
+template <typename T>
+inline T IMean4(const T x[4]) {
+  return ISum4(x) / 4;
+}
+template <typename T>
+inline T IMean5(const T x[5]) {
+  return ISum5(x) / 5;
+}
+template <typename T>
+inline T IMean6(const T x[6]) {
+  return ISum6(x) / 6;
+}
+template <typename T>
+inline T IMean7(const T x[7]) {
+  return ISum7(x) / 7;
+}
+template <typename T>
+inline T IMean8(const T x[8]) {
+  return ISum8(x) / 8;
+}
+template <typename T>
+inline T IMean9(const T x[9]) {
+  return ISum9(x) / 9;
+}
+template <typename T>
+inline T IMean10(const T x[10]) {
+  return ISum10(x) / 10;
+}
+template <typename T>
+inline T IMean11(const T x[11]) {
+  return ISum11(x) / 11;
+}
+template <typename T>
+inline T IMean12(const T x[12]) {
+  return ISum12(x) / 12;
+}
+template <typename T>
+inline T IMean13(const T x[13]) {
+  return ISum13(x) / 13;
+}
+template <typename T>
+inline T IMean14(const T x[14]) {
+  return ISum14(x) / 14;
+}
+template <typename T>
+inline T IMean15(const T x[15]) {
+  return ISum15(x) / 15;
+}
+template <typename T>
+inline T IMean16(const T x[16]) {
+  return ISum16(x) / 16;
+}
 
 // Compute the sample standard deviation of sample data x
-template <typename T> inline T ISdv(const T *x, T mean, int n) {
+template <typename T>
+inline T ISdv(const T *x, T mean, int n) {
   if (n < 2) return static_cast<T>(0.0);
   T sdv = static_cast<T>(0.0);
   for (int i = 0; i < n; ++i) {
@@ -2211,74 +2504,91 @@ inline int ISquaresumU(const unsigned char *x, int n) {
   }
   return (acc);
 }
-template <typename T> inline T ISquaresum(const T *x, int n) {
+template <typename T>
+inline T ISquaresum(const T *x, int n) {
   T acc = static_cast<T>(0.0);
   for (int i = 0; i < n; ++i) {
     acc += ISqr(x[i]);
   }
   return acc;
 }
-template <typename T> inline T ISquaresum1(const T x[1]) {
+template <typename T>
+inline T ISquaresum1(const T x[1]) {
   return (ISqr(x[0]));
 }
-template <typename T> inline T ISquaresum2(const T x[2]) {
+template <typename T>
+inline T ISquaresum2(const T x[2]) {
   return (ISqr(x[0]) + ISqr(x[1]));
 }
-template <typename T> inline T ISquaresum3(const T x[3]) {
+template <typename T>
+inline T ISquaresum3(const T x[3]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]));
 }
-template <typename T> inline T ISquaresum4(const T x[4]) {
+template <typename T>
+inline T ISquaresum4(const T x[4]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]));
 }
-template <typename T> inline T ISquaresum5(const T x[5]) {
+template <typename T>
+inline T ISquaresum5(const T x[5]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]));
 }
-template <typename T> inline T ISquaresum6(const T x[6]) {
+template <typename T>
+inline T ISquaresum6(const T x[6]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]));
 }
-template <typename T> inline T ISquaresum7(const T x[7]) {
+template <typename T>
+inline T ISquaresum7(const T x[7]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]));
 }
-template <typename T> inline T ISquaresum8(const T x[8]) {
+template <typename T>
+inline T ISquaresum8(const T x[8]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]) + ISqr(x[7]));
 }
-template <typename T> inline T ISquaresum9(const T x[9]) {
+template <typename T>
+inline T ISquaresum9(const T x[9]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]) + ISqr(x[7]) + ISqr(x[8]));
 }
-template <typename T> inline T ISquaresum10(const T x[10]) {
+template <typename T>
+inline T ISquaresum10(const T x[10]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]) + ISqr(x[7]) + ISqr(x[8]) + ISqr(x[9]));
 }
-template <typename T> inline T ISquaresum11(const T x[11]) {
+template <typename T>
+inline T ISquaresum11(const T x[11]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]) + ISqr(x[7]) + ISqr(x[8]) + ISqr(x[9]) +
           ISqr(x[10]));
 }
-template <typename T> inline T ISquaresum12(const T x[12]) {
+template <typename T>
+inline T ISquaresum12(const T x[12]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]) + ISqr(x[7]) + ISqr(x[8]) + ISqr(x[9]) +
           ISqr(x[10]) + ISqr(x[11]));
 }
-template <typename T> inline T ISquaresum13(const T x[13]) {
+template <typename T>
+inline T ISquaresum13(const T x[13]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]) + ISqr(x[7]) + ISqr(x[8]) + ISqr(x[9]) +
           ISqr(x[10]) + ISqr(x[11]) + ISqr(x[12]));
 }
-template <typename T> inline T ISquaresum14(const T x[14]) {
+template <typename T>
+inline T ISquaresum14(const T x[14]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]) + ISqr(x[7]) + ISqr(x[8]) + ISqr(x[9]) +
           ISqr(x[10]) + ISqr(x[11]) + ISqr(x[12]) + ISqr(x[13]));
 }
-template <typename T> inline T ISquaresum15(const T x[15]) {
+template <typename T>
+inline T ISquaresum15(const T x[15]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]) + ISqr(x[7]) + ISqr(x[8]) + ISqr(x[9]) +
           ISqr(x[10]) + ISqr(x[11]) + ISqr(x[12]) + ISqr(x[13]) + ISqr(x[14]));
 }
-template <typename T> inline T ISquaresum16(const T x[16]) {
+template <typename T>
+inline T ISquaresum16(const T x[16]) {
   return (ISqr(x[0]) + ISqr(x[1]) + ISqr(x[2]) + ISqr(x[3]) + ISqr(x[4]) +
           ISqr(x[5]) + ISqr(x[6]) + ISqr(x[7]) + ISqr(x[8]) + ISqr(x[9]) +
           ISqr(x[10]) + ISqr(x[11]) + ISqr(x[12]) + ISqr(x[13]) + ISqr(x[14]) +
@@ -2295,89 +2605,106 @@ inline int ISquaresumDiffU(const unsigned char *x, const unsigned char *y,
   }
   return acc;
 }
-template <typename T> inline T ISquaresumDiffU(const T *x, const T *y, int n) {
+template <typename T>
+inline T ISquaresumDiffU(const T *x, const T *y, int n) {
   T acc = static_cast<T>(0.0);
   for (int i = 0; i < n; i++) {
     acc += ISqr(x[i] - y[i]);
   }
   return acc;
 }
-template <typename T> inline T ISquaresumDiffU1(const T x[1], const T y[1]) {
+template <typename T>
+inline T ISquaresumDiffU1(const T x[1], const T y[1]) {
   return (ISqr(x[0] - y[0]));
 }
-template <typename T> inline T ISquaresumDiffU2(const T x[2], const T y[2]) {
+template <typename T>
+inline T ISquaresumDiffU2(const T x[2], const T y[2]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]));
 }
-template <typename T> inline T ISquaresumDiffU3(const T x[3], const T y[3]) {
+template <typename T>
+inline T ISquaresumDiffU3(const T x[3], const T y[3]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]));
 }
-template <typename T> inline T ISquaresumDiffU4(const T x[4], const T y[4]) {
+template <typename T>
+inline T ISquaresumDiffU4(const T x[4], const T y[4]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]));
 }
-template <typename T> inline T ISquaresumDiffU5(const T x[5], const T y[5]) {
+template <typename T>
+inline T ISquaresumDiffU5(const T x[5], const T y[5]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]));
 }
-template <typename T> inline T ISquaresumDiffU6(const T x[6], const T y[6]) {
+template <typename T>
+inline T ISquaresumDiffU6(const T x[6], const T y[6]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]));
 }
-template <typename T> inline T ISquaresumDiffU7(const T x[7], const T y[7]) {
+template <typename T>
+inline T ISquaresumDiffU7(const T x[7], const T y[7]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]));
 }
-template <typename T> inline T ISquaresumDiffU8(const T x[8], const T y[8]) {
+template <typename T>
+inline T ISquaresumDiffU8(const T x[8], const T y[8]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]) + ISqr(x[7] - y[7]));
 }
-template <typename T> inline T ISquaresumDiffU9(const T x[9], const T y[9]) {
+template <typename T>
+inline T ISquaresumDiffU9(const T x[9], const T y[9]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]) + ISqr(x[7] - y[7]) + ISqr(x[8] - y[8]));
 }
-template <typename T> inline T ISquaresumDiffU10(const T x[10], const T y[10]) {
+template <typename T>
+inline T ISquaresumDiffU10(const T x[10], const T y[10]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]) + ISqr(x[7] - y[7]) + ISqr(x[8] - y[8]) +
           ISqr(x[9] - y[9]));
 }
-template <typename T> inline T ISquaresumDiffU11(const T x[11], const T y[11]) {
+template <typename T>
+inline T ISquaresumDiffU11(const T x[11], const T y[11]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]) + ISqr(x[7] - y[7]) + ISqr(x[8] - y[8]) +
           ISqr(x[9] - y[9]) + ISqr(x[10] - y[10]));
 }
-template <typename T> inline T ISquaresumDiffU12(const T x[12], const T y[12]) {
+template <typename T>
+inline T ISquaresumDiffU12(const T x[12], const T y[12]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]) + ISqr(x[7] - y[7]) + ISqr(x[8] - y[8]) +
           ISqr(x[9] - y[9]) + ISqr(x[10] - y[10]) + ISqr(x[11] - y[11]));
 }
-template <typename T> inline T ISquaresumDiffU13(const T x[13], const T y[13]) {
+template <typename T>
+inline T ISquaresumDiffU13(const T x[13], const T y[13]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]) + ISqr(x[7] - y[7]) + ISqr(x[8] - y[8]) +
           ISqr(x[9] - y[9]) + ISqr(x[10] - y[10]) + ISqr(x[11] - y[11]) +
           ISqr(x[12] - y[12]));
 }
-template <typename T> inline T ISquaresumDiffU14(const T x[14], const T y[14]) {
+template <typename T>
+inline T ISquaresumDiffU14(const T x[14], const T y[14]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]) + ISqr(x[7] - y[7]) + ISqr(x[8] - y[8]) +
           ISqr(x[9] - y[9]) + ISqr(x[10] - y[10]) + ISqr(x[11] - y[11]) +
           ISqr(x[12] - y[12]) + ISqr(x[13] - y[13]));
 }
-template <typename T> inline T ISquaresumDiffU15(const T x[15], const T y[15]) {
+template <typename T>
+inline T ISquaresumDiffU15(const T x[15], const T y[15]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]) + ISqr(x[7] - y[7]) + ISqr(x[8] - y[8]) +
           ISqr(x[9] - y[9]) + ISqr(x[10] - y[10]) + ISqr(x[11] - y[11]) +
           ISqr(x[12] - y[12]) + ISqr(x[13] - y[13]) + ISqr(x[14] - y[14]));
 }
-template <typename T> inline T ISquaresumDiffU16(const T x[16], const T y[16]) {
+template <typename T>
+inline T ISquaresumDiffU16(const T x[16], const T y[16]) {
   return (ISqr(x[0] - y[0]) + ISqr(x[1] - y[1]) + ISqr(x[2] - y[2]) +
           ISqr(x[3] - y[3]) + ISqr(x[4] - y[4]) + ISqr(x[5] - y[5]) +
           ISqr(x[6] - y[6]) + ISqr(x[7] - y[7]) + ISqr(x[8] - y[8]) +
@@ -2461,56 +2788,75 @@ inline double IL2Norm(const double *x, int n) {
 }
 
 // For type float and double only
-template <typename T> inline T IL2Norm1(const T x[1]) { return (x[0]); }
-template <typename T> inline T IL2Norm2(const T x[2]) {
+template <typename T>
+inline T IL2Norm1(const T x[1]) {
+  return (x[0]);
+}
+template <typename T>
+inline T IL2Norm2(const T x[2]) {
   return (ISqrt(ISquaresum2(x)));
 }
-template <typename T> inline T IL2Norm3(const T x[3]) {
+template <typename T>
+inline T IL2Norm3(const T x[3]) {
   return (ISqrt(ISquaresum3(x)));
 }
-template <typename T> inline T IL2Norm4(const T x[4]) {
+template <typename T>
+inline T IL2Norm4(const T x[4]) {
   return (ISqrt(ISquaresum4(x)));
 }
-template <typename T> inline T IL2Norm5(const T x[5]) {
+template <typename T>
+inline T IL2Norm5(const T x[5]) {
   return (ISqrt(ISquaresum5(x)));
 }
-template <typename T> inline T IL2Norm6(const T x[6]) {
+template <typename T>
+inline T IL2Norm6(const T x[6]) {
   return (ISqrt(ISquaresum6(x)));
 }
-template <typename T> inline T IL2Norm7(const T x[7]) {
+template <typename T>
+inline T IL2Norm7(const T x[7]) {
   return (ISqrt(ISquaresum7(x)));
 }
-template <typename T> inline T IL2Norm8(const T x[8]) {
+template <typename T>
+inline T IL2Norm8(const T x[8]) {
   return (ISqrt(ISquaresum8(x)));
 }
-template <typename T> inline T IL2Norm9(const T x[9]) {
+template <typename T>
+inline T IL2Norm9(const T x[9]) {
   return (ISqrt(ISquaresum9(x)));
 }
-template <typename T> inline T IL2Norm10(const T x[10]) {
+template <typename T>
+inline T IL2Norm10(const T x[10]) {
   return (ISqrt(ISquaresum10(x)));
 }
-template <typename T> inline T IL2Norm11(const T x[11]) {
+template <typename T>
+inline T IL2Norm11(const T x[11]) {
   return (ISqrt(ISquaresum11(x)));
 }
-template <typename T> inline T IL2Norm12(const T x[12]) {
+template <typename T>
+inline T IL2Norm12(const T x[12]) {
   return (ISqrt(ISquaresum12(x)));
 }
-template <typename T> inline T IL2Norm13(const T x[13]) {
+template <typename T>
+inline T IL2Norm13(const T x[13]) {
   return (ISqrt(ISquaresum13(x)));
 }
-template <typename T> inline T IL2Norm14(const T x[14]) {
+template <typename T>
+inline T IL2Norm14(const T x[14]) {
   return (ISqrt(ISquaresum14(x)));
 }
-template <typename T> inline T IL2Norm15(const T x[15]) {
+template <typename T>
+inline T IL2Norm15(const T x[15]) {
   return (ISqrt(ISquaresum15(x)));
 }
-template <typename T> inline T IL2Norm16(const T x[16]) {
+template <typename T>
+inline T IL2Norm16(const T x[16]) {
   return (ISqrt(ISquaresum16(x)));
 }
 
 // Compute sqrt( a^2 + b^2 ) with decent precision, for type float and double
 // only
-template <typename T> inline T IL2NormAdv(T a, T b) {
+template <typename T>
+inline T IL2NormAdv(T a, T b) {
   T absa = IAbs(a);
   T absb = IAbs(b);
   if (absa > absb) {
@@ -2524,12 +2870,14 @@ template <typename T> inline T IL2NormAdv(T a, T b) {
 
 // Compute sqrt( x[0]^2 + x[1]^2 ) with decent precision, for type float and
 // double only
-template <typename T> inline T IL2NormAdv(const T x[2]) {
+template <typename T>
+inline T IL2NormAdv(const T x[2]) {
   return IL2NormAdv<T>(x[0], x[1]);
 }
 
 // Compute the infinity-norm of a m x n matrix A
-template <typename T> inline T IInfinityNorm(const T *A, int m, int n) {
+template <typename T>
+inline T IInfinityNorm(const T *A, int m, int n) {
   T infinity_norm = IAbsSum(A, n);
   T tmp;
   int i, ni = n;
@@ -2587,136 +2935,179 @@ inline void ISafeUnitize(float *x, float *y, int n) {
   }
 }
 // For type float and double only!
-template <typename T> inline void IUnitize2(T x[2]) {
+template <typename T>
+inline void IUnitize2(T x[2]) {
   IScale2(x, IRec(IL2Norm2(x)));
 }
-template <typename T> inline void IUnitize3(T x[3]) {
+template <typename T>
+inline void IUnitize3(T x[3]) {
   IScale3(x, IRec(IL2Norm3(x)));
 }
-template <typename T> inline void IUnitize4(T x[4]) {
+template <typename T>
+inline void IUnitize4(T x[4]) {
   IScale4(x, IRec(IL2Norm4(x)));
 }
-template <typename T> inline void IUnitize5(T x[5]) {
+template <typename T>
+inline void IUnitize5(T x[5]) {
   IScale5(x, IRec(IL2Norm5(x)));
 }
-template <typename T> inline void IUnitize6(T x[6]) {
+template <typename T>
+inline void IUnitize6(T x[6]) {
   IScale6(x, IRec(IL2Norm6(x)));
 }
-template <typename T> inline void IUnitize7(T x[7]) {
+template <typename T>
+inline void IUnitize7(T x[7]) {
   IScale7(x, IRec(IL2Norm7(x)));
 }
-template <typename T> inline void IUnitize8(T x[8]) {
+template <typename T>
+inline void IUnitize8(T x[8]) {
   IScale8(x, IRec(IL2Norm8(x)));
 }
-template <typename T> inline void IUnitize9(T x[9]) {
+template <typename T>
+inline void IUnitize9(T x[9]) {
   IScale9(x, IRec(IL2Norm9(x)));
 }
-template <typename T> inline void IUnitize10(T x[10]) {
+template <typename T>
+inline void IUnitize10(T x[10]) {
   IScale10(x, IRec(IL2Norm10(x)));
 }
-template <typename T> inline void IUnitize11(T x[11]) {
+template <typename T>
+inline void IUnitize11(T x[11]) {
   IScale11(x, IRec(IL2Norm11(x)));
 }
-template <typename T> inline void IUnitize12(T x[12]) {
+template <typename T>
+inline void IUnitize12(T x[12]) {
   IScale12(x, IRec(IL2Norm12(x)));
 }
-template <typename T> inline void IUnitize13(T x[13]) {
+template <typename T>
+inline void IUnitize13(T x[13]) {
   IScale13(x, IRec(IL2Norm13(x)));
 }
-template <typename T> inline void IUnitize14(T x[14]) {
+template <typename T>
+inline void IUnitize14(T x[14]) {
   IScale14(x, IRec(IL2Norm14(x)));
 }
-template <typename T> inline void IUnitize15(T x[15]) {
+template <typename T>
+inline void IUnitize15(T x[15]) {
   IScale15(x, IRec(IL2Norm15(x)));
 }
-template <typename T> inline void IUnitize16(T x[16]) {
+template <typename T>
+inline void IUnitize16(T x[16]) {
   IScale16(x, IRec(IL2Norm16(x)));
 }
-template <typename T> inline void IUnitize2(const T x[2], T y[2]) {
+template <typename T>
+inline void IUnitize2(const T x[2], T y[2]) {
   IScale2(x, y, IRec(IL2Norm2(x)));
 }
-template <typename T> inline void IUnitize3(const T x[3], T y[3]) {
+template <typename T>
+inline void IUnitize3(const T x[3], T y[3]) {
   IScale3(x, y, IRec(IL2Norm3(x)));
 }
-template <typename T> inline void IUnitize4(const T x[4], T y[4]) {
+template <typename T>
+inline void IUnitize4(const T x[4], T y[4]) {
   IScale4(x, y, IRec(IL2Norm4(x)));
 }
-template <typename T> inline void IUnitize5(const T x[5], T y[5]) {
+template <typename T>
+inline void IUnitize5(const T x[5], T y[5]) {
   IScale5(x, y, IRec(IL2Norm5(x)));
 }
-template <typename T> inline void IUnitize6(const T x[6], T y[6]) {
+template <typename T>
+inline void IUnitize6(const T x[6], T y[6]) {
   IScale6(x, y, IRec(IL2Norm6(x)));
 }
-template <typename T> inline void IUnitize7(const T x[7], T y[7]) {
+template <typename T>
+inline void IUnitize7(const T x[7], T y[7]) {
   IScale7(x, y, IRec(IL2Norm7(x)));
 }
-template <typename T> inline void IUnitize8(const T x[8], T y[8]) {
+template <typename T>
+inline void IUnitize8(const T x[8], T y[8]) {
   IScale8(x, y, IRec(IL2Norm8(x)));
 }
-template <typename T> inline void IUnitize9(const T x[9], T y[9]) {
+template <typename T>
+inline void IUnitize9(const T x[9], T y[9]) {
   IScale9(x, y, IRec(IL2Norm9(x)));
 }
-template <typename T> inline void IUnitize10(const T x[10], T y[10]) {
+template <typename T>
+inline void IUnitize10(const T x[10], T y[10]) {
   IScale10(x, y, IRec(IL2Norm10(x)));
 }
-template <typename T> inline void IUnitize11(const T x[11], T y[11]) {
+template <typename T>
+inline void IUnitize11(const T x[11], T y[11]) {
   IScale11(x, y, IRec(IL2Norm11(x)));
 }
-template <typename T> inline void IUnitize12(const T x[12], T y[12]) {
+template <typename T>
+inline void IUnitize12(const T x[12], T y[12]) {
   IScale12(x, y, IRec(IL2Norm12(x)));
 }
-template <typename T> inline void IUnitize13(const T x[13], T y[13]) {
+template <typename T>
+inline void IUnitize13(const T x[13], T y[13]) {
   IScale13(x, y, IRec(IL2Norm13(x)));
 }
-template <typename T> inline void IUnitize14(const T x[14], T y[14]) {
+template <typename T>
+inline void IUnitize14(const T x[14], T y[14]) {
   IScale14(x, y, IRec(IL2Norm14(x)));
 }
-template <typename T> inline void IUnitize15(const T x[15], T y[15]) {
+template <typename T>
+inline void IUnitize15(const T x[15], T y[15]) {
   IScale15(x, y, IRec(IL2Norm15(x)));
 }
-template <typename T> inline void IUnitize16(const T x[16], T y[16]) {
+template <typename T>
+inline void IUnitize16(const T x[16], T y[16]) {
   IScale16(x, y, IRec(IL2Norm16(x)));
 }
 
-template <typename T> inline void ISignedUnitize2(T x[2]) {
+template <typename T>
+inline void ISignedUnitize2(T x[2]) {
   IScale2(x, ISignNeverZero(x[1]) * IRec(IL2Norm2(x)));
 }
-template <typename T> inline void ISignedUnitize3(T x[3]) {
+template <typename T>
+inline void ISignedUnitize3(T x[3]) {
   IScale3(x, ISignNeverZero(x[2]) * IRec(IL2Norm3(x)));
 }
-template <typename T> inline void ISignedUnitize4(T x[4]) {
+template <typename T>
+inline void ISignedUnitize4(T x[4]) {
   IScale4(x, ISignNeverZero(x[3]) * IRec(IL2Norm4(x)));
 }
 
-template <typename T> inline void IHomogeneousUnitize(T *x, int n) {
+template <typename T>
+inline void IHomogeneousUnitize(T *x, int n) {
   IScale(x, n, IRec(x[n - 1]));
 }
-template <typename T> inline void IHomogeneousUnitize2(T x[2]) {
+template <typename T>
+inline void IHomogeneousUnitize2(T x[2]) {
   IScale2(x, IRec(x[1]));
 }
-template <typename T> inline void IHomogeneousUnitize3(T x[3]) {
+template <typename T>
+inline void IHomogeneousUnitize3(T x[3]) {
   IScale3(x, IRec(x[2]));
 }
-template <typename T> inline void IHomogeneousUnitize4(T x[4]) {
+template <typename T>
+inline void IHomogeneousUnitize4(T x[4]) {
   IScale4(x, IRec(x[3]));
 }
-template <typename T> inline void IHomogeneousUnitize9(T x[9]) {
+template <typename T>
+inline void IHomogeneousUnitize9(T x[9]) {
   IScale9(x, IRec(x[8]));
 }
 
-template <typename T> inline void IHomogeneousUnitize(const T *x, T *y, int n) {
+template <typename T>
+inline void IHomogeneousUnitize(const T *x, T *y, int n) {
   IScale(x, y, n, IRec(x[n - 1]));
 }
-template <typename T> inline void IHomogeneousUnitize2(const T x[2], T y[2]) {
+template <typename T>
+inline void IHomogeneousUnitize2(const T x[2], T y[2]) {
   IScale2(x, y, IRec(x[1]));
 }
-template <typename T> inline void IHomogeneousUnitize3(const T x[3], T y[3]) {
+template <typename T>
+inline void IHomogeneousUnitize3(const T x[3], T y[3]) {
   IScale3(x, y, IRec(x[2]));
 }
-template <typename T> inline void IHomogeneousUnitize4(const T x[4], T y[4]) {
+template <typename T>
+inline void IHomogeneousUnitize4(const T x[4], T y[4]) {
   IScale4(x, y, IRec(x[3]));
 }
-template <typename T> inline void IHomogeneousUnitize9(const T x[9], T y[9]) {
+template <typename T>
+inline void IHomogeneousUnitize9(const T x[9], T y[9]) {
   IScale9(x, y, IRec(x[8]));
 }
 
@@ -2813,7 +3204,8 @@ inline void ICentroid2(const float *a, int n, float centroid[2],
 }
 
 // Compute the minimum element in array
-template <typename T> inline T IMinElement(const T *a, int n) {
+template <typename T>
+inline T IMinElement(const T *a, int n) {
   T val, temp;
   if (n <= 0) return (static_cast<T>(0.0));
   val = a[0];
@@ -2826,7 +3218,8 @@ template <typename T> inline T IMinElement(const T *a, int n) {
   return (val);
 }
 // Compute the maximum element in array
-template <typename T> inline T IMaxElement(const T *a, int n) {
+template <typename T>
+inline T IMaxElement(const T *a, int n) {
   T val, temp;
   if (n <= 0) return (static_cast<T>(0.0));
   val = a[0];
@@ -2876,7 +3269,8 @@ template <typename T> inline T IMaxElement(const T *a, int n) {
 // }
 
 // Compute the maximum diagonal element of a n x n square matrix
-template <typename T> inline T IMaxDiagonalElement(const T *a, int n) {
+template <typename T>
+inline T IMaxDiagonalElement(const T *a, int n) {
   T val, temp;
   if (n <= 0) return (static_cast<T>(0.0));
   val = a[0];
@@ -3258,22 +3652,26 @@ inline void IMinMaxElements(const T *a, int n, T *min_val, T *max_val) {
 
 // Given a n-dimensional vector x, construct its homogeneous representation
 //  * (n+1-dimensional vector) y by adding 1 to the last entry
-template <typename T> inline void IHomogenize(const T *x, T *y, int n) {
+template <typename T>
+inline void IHomogenize(const T *x, T *y, int n) {
   for (int i = 0; i < n; ++i) {
     y[i] = x[i];
   }
   y[n] = static_cast<T>(1.0);
 }
-template <typename T> inline void IHomogenize1(const T x[1], T y[2]) {
+template <typename T>
+inline void IHomogenize1(const T x[1], T y[2]) {
   y[0] = x[0];
   y[1] = static_cast<T>(1.0);
 }
-template <typename T> inline void IHomogenize2(const T x[2], T y[3]) {
+template <typename T>
+inline void IHomogenize2(const T x[2], T y[3]) {
   y[0] = x[0];
   y[1] = x[1];
   y[2] = static_cast<T>(1.0);
 }
-template <typename T> inline void IHomogenize3(const T x[3], T y[4]) {
+template <typename T>
+inline void IHomogenize3(const T x[3], T y[4]) {
   y[0] = x[0];
   y[1] = x[1];
   y[2] = x[2];
@@ -3281,7 +3679,8 @@ template <typename T> inline void IHomogenize3(const T x[3], T y[4]) {
 }
 
 // Compute the cross product between two 3-dimensional vectors x and y
-template <typename T> inline void ICross(const T x[3], const T y[3], T xxy[3]) {
+template <typename T>
+inline void ICross(const T x[3], const T y[3], T xxy[3]) {
   xxy[0] = x[1] * y[2] - x[2] * y[1];
   xxy[1] = x[2] * y[0] - x[0] * y[2];
   xxy[2] = x[0] * y[1] - x[1] * y[0];
@@ -3289,7 +3688,8 @@ template <typename T> inline void ICross(const T x[3], const T y[3], T xxy[3]) {
 
 // Compute the 3x3 skew-symmetric matrix [e]_x such that [e]_x * y is the cross
 //  * product of 3-dimensional vectors x and y for all y
-template <typename T> inline void IAxiator(const T x[3], T e_x[9]) {
+template <typename T>
+inline void IAxiator(const T x[3], T e_x[9]) {
   e_x[0] = static_cast<T>(0.0);
   e_x[1] = -x[2];
   e_x[2] = x[1];
@@ -3317,22 +3717,26 @@ inline void ISqrSkewSymmetric3x3(const T x[3], T e_x2[9]) {
 }
 
 // Set the nxn matrix A to be an identity matrix
-template <typename T> inline void IEye(T *A, int n) {
+template <typename T>
+inline void IEye(T *A, int n) {
   int in = 0;
   IZero(A, n * n);
   for (int i = 0; i < n; ++i, in += n) {
     A[in + i] = static_cast<T>(1.0);
   }
 }
-template <typename T> inline void IEye2x2(T A[4]) {
+template <typename T>
+inline void IEye2x2(T A[4]) {
   A[0] = A[3] = static_cast<T>(1.0);
   A[1] = A[2] = static_cast<T>(0.0);
 }
-template <typename T> inline void IEye3x3(T A[9]) {
+template <typename T>
+inline void IEye3x3(T A[9]) {
   A[0] = A[4] = A[8] = static_cast<T>(1.0);
   A[1] = A[2] = A[3] = A[5] = A[6] = A[7] = static_cast<T>(0.0);
 }
-template <typename T> inline void IEye4x4(T A[16]) {
+template <typename T>
+inline void IEye4x4(T A[16]) {
   A[0] = A[5] = A[10] = A[15] = static_cast<T>(1.0);
   A[1] = A[2] = A[3] = A[4] = A[6] = A[7] = A[8] = A[9] = A[11] = A[12] =
       A[13] = A[14] = static_cast<T>(0.0);
@@ -3779,7 +4183,8 @@ inline void ISolve3x3(const float A[9], const float b[3], float x[3]) {
 }
 
 // Compute the transpose of a suqare nxn matrix inplace
-template <typename T> inline void ITranspose(T *A, int n) {
+template <typename T>
+inline void ITranspose(T *A, int n) {
   for (int r = 0; r < n; ++r) {
     for (int c = r; c < n; ++c) {
       ISwap(A[r * n + c], A[c * n + r]);
@@ -3787,26 +4192,33 @@ template <typename T> inline void ITranspose(T *A, int n) {
   }
 }
 // Compute the transpose of a mxn matrix A, At is nxm
-template <typename T> inline void ITranspose(const T *A, T *At, int m, int n) {
+template <typename T>
+inline void ITranspose(const T *A, T *At, int m, int n) {
   for (int r = 0; r < m; ++r) {
     for (int c = 0; c < n; ++c) {
       At[c * m + r] = A[r * n + c];
     }
   }
 }
-template <typename T> inline void ITranspose2x2(T A[4]) { ISwap(A[1], A[2]); }
-template <typename T> inline void ITranspose2x2(const T A[4], T At[4]) {
+template <typename T>
+inline void ITranspose2x2(T A[4]) {
+  ISwap(A[1], A[2]);
+}
+template <typename T>
+inline void ITranspose2x2(const T A[4], T At[4]) {
   At[0] = A[0];
   At[1] = A[2];
   At[2] = A[1];
   At[3] = A[3];
 }
-template <typename T> inline void ITranspose3x3(T A[9]) {
+template <typename T>
+inline void ITranspose3x3(T A[9]) {
   ISwap(A[1], A[3]);
   ISwap(A[2], A[6]);
   ISwap(A[5], A[7]);
 }
-template <typename T> inline void ITranspose3x3(const T A[9], T At[9]) {
+template <typename T>
+inline void ITranspose3x3(const T A[9], T At[9]) {
   At[0] = A[0];
   At[1] = A[3];
   At[2] = A[6];
@@ -3817,7 +4229,8 @@ template <typename T> inline void ITranspose3x3(const T A[9], T At[9]) {
   At[7] = A[5];
   At[8] = A[8];
 }
-template <typename T> inline void ITranspose4x4(T A[16]) {
+template <typename T>
+inline void ITranspose4x4(T A[16]) {
   ISwap(A[1], A[4]);
   ISwap(A[2], A[8]);
   ISwap(A[6], A[9]);
@@ -3825,7 +4238,8 @@ template <typename T> inline void ITranspose4x4(T A[16]) {
   ISwap(A[7], A[13]);
   ISwap(A[11], A[14]);
 }
-template <typename T> inline void ITranspose4x4(const T A[16], T At[16]) {
+template <typename T>
+inline void ITranspose4x4(const T A[16], T At[16]) {
   At[0] = A[0];
   At[1] = A[4];
   At[2] = A[8];
@@ -4312,7 +4726,8 @@ inline void IMultABt4x4And3x4(const T A[16], const T B[12], T ABt[12]) {
 }
 
 // Multiply m x n matrix A's transpose At (n x m) with A and get AtA (n x n)
-template <typename T> inline void IMultAtA(const T *A, T *AtA, int m, int n) {
+template <typename T>
+inline void IMultAtA(const T *A, T *AtA, int m, int n) {
   int i, j, k, ni;
   T acc;
   const T *Ai, *Aj;
@@ -4333,18 +4748,20 @@ template <typename T> inline void IMultAtA(const T *A, T *AtA, int m, int n) {
   }
 }
 
-template <typename T> inline void IMultAtA2x2(const T A[4], T AtA[4]) {
+template <typename T>
+inline void IMultAtA2x2(const T A[4], T AtA[4]) {
   AtA[0] = A[0] * A[0] + A[2] * A[2];
   AtA[1] = AtA[2] = A[0] * A[1] + A[2] * A[3];
   AtA[3] = A[1] * A[1] + A[3] * A[3];
 }
 
-template <typename T> inline void IMultAtA2x2(const T *A, T AtA[4], int n) {
+template <typename T>
+inline void IMultAtA2x2(const T *A, T AtA[4], int n) {
   T xx = static_cast<T>(0.0);
   T xy = static_cast<T>(0.0);
   T yy = static_cast<T>(0.0);
   T x, y;
-  for (int i = 0; i < 2 *n; i += 2) {
+  for (int i = 0; i < 2 * n; i += 2) {
     x = A[i];
     y = A[i + 1];
     xx += x * x;
@@ -4356,12 +4773,13 @@ template <typename T> inline void IMultAtA2x2(const T *A, T AtA[4], int n) {
   AtA[3] = yy;
 }
 
-template <typename T> inline void IMultAtAnx2(const T *A, T *AtA, int n) {
+template <typename T>
+inline void IMultAtAnx2(const T *A, T *AtA, int n) {
   T xx = static_cast<T>(0.0);
   T xy = static_cast<T>(0.0);
   T yy = static_cast<T>(0.0);
   T x, y;
-  for (int i = 0; i < 2 *n; i += 2) {
+  for (int i = 0; i < 2 * n; i += 2) {
     x = A[i];
     y = A[i + 1];
     xx += x * x;
@@ -4373,7 +4791,8 @@ template <typename T> inline void IMultAtAnx2(const T *A, T *AtA, int n) {
   AtA[3] = yy;
 }
 
-template <typename T> inline void IMultAtA3x3(const T A[9], T AtA[9]) {
+template <typename T>
+inline void IMultAtA3x3(const T A[9], T AtA[9]) {
   AtA[0] = A[0] * A[0] + A[3] * A[3] + A[6] * A[6];
   AtA[1] = AtA[3] = A[0] * A[1] + A[3] * A[4] + A[6] * A[7];
   AtA[2] = AtA[6] = A[0] * A[2] + A[3] * A[5] + A[6] * A[8];
@@ -4382,7 +4801,8 @@ template <typename T> inline void IMultAtA3x3(const T A[9], T AtA[9]) {
   AtA[8] = A[2] * A[2] + A[5] * A[5] + A[8] * A[8];
 }
 
-template <typename T> inline void IMultAtAnx3(const T *A, T AtA[9], int n) {
+template <typename T>
+inline void IMultAtAnx3(const T *A, T AtA[9], int n) {
   T xx = static_cast<T>(0.0);
   T xy = static_cast<T>(0.0);
   T xz = static_cast<T>(0.0);
@@ -4410,7 +4830,8 @@ template <typename T> inline void IMultAtAnx3(const T *A, T AtA[9], int n) {
   AtA[8] = zz;
 }
 
-template <typename T> inline void IMultAtA4x4(const T A[16], T AtA[16]) {
+template <typename T>
+inline void IMultAtA4x4(const T A[16], T AtA[16]) {
   AtA[0] = A[0] * A[0] + A[4] * A[4] + A[8] * A[8] + A[12] * A[12];
   AtA[1] = AtA[4] = A[0] * A[1] + A[4] * A[5] + A[8] * A[9] + A[12] * A[13];
   AtA[2] = AtA[8] = A[0] * A[2] + A[4] * A[6] + A[8] * A[10] + A[12] * A[14];
@@ -4444,13 +4865,15 @@ inline void IMultAtB3x3And3x3(const T A[9], const T B[9], T AtB[9]) {
   AtB[8] = A[2] * B[2] + A[5] * B[5] + A[8] * B[8];
 }
 
-template <typename T> inline void IMultAAt2x3(const T A[6], T AAt[4]) {
+template <typename T>
+inline void IMultAAt2x3(const T A[6], T AAt[4]) {
   AAt[0] = A[0] * A[0] + A[1] * A[1] + A[2] * A[2];
   AAt[1] = AAt[2] = A[0] * A[3] + A[1] * A[4] + A[2] * A[5];
   AAt[3] = A[3] * A[3] + A[4] * A[4] + A[5] * A[5];
 }
 
-template <typename T> inline void IMultAAt3x3(const T A[9], T AAt[9]) {
+template <typename T>
+inline void IMultAAt3x3(const T A[9], T AAt[9]) {
   AAt[0] = (A[0] * A[0] + A[1] * A[1] + A[2] * A[2]);
   AAt[1] = AAt[3] = (A[0] * A[3] + A[1] * A[4] + A[2] * A[5]);
   AAt[2] = AAt[6] = (A[0] * A[6] + A[1] * A[7] + A[2] * A[8]);
@@ -4459,7 +4882,8 @@ template <typename T> inline void IMultAAt3x3(const T A[9], T AAt[9]) {
   AAt[8] = (A[6] * A[6] + A[7] * A[7] + A[8] * A[8]);
 }
 
-template <typename T> inline void IMultAAt4x1(const T A[4], T AAt[16]) {
+template <typename T>
+inline void IMultAAt4x1(const T A[4], T AAt[16]) {
   AAt[0] = A[0] * A[0];
   AAt[1] = AAt[4] = (A[0] * A[1]);
   AAt[2] = AAt[8] = (A[0] * A[2]);
@@ -4563,7 +4987,8 @@ inline void ISwapColsInterval(T *A, int i1, int i2, int c1, int c2, int m,
 // yn, ?} becomes {x1, y1, x2, y2, x3, y3, ..., xn, yn, ?, ?, ?, ...?} after
 // shifting
 // The size of input array A is n*3
-template <typename T> inline void IShiftHomogeneous3(T *A, int n) {
+template <typename T>
+inline void IShiftHomogeneous3(T *A, int n) {
   if (n <= 1) {
     return;
   }
@@ -4583,7 +5008,8 @@ template <typename T> inline void IShiftHomogeneous3(T *A, int n) {
 // yn,
 // zn, ?, ?, ?, ...?} after shifting
 // The size of input array A is n*4
-template <typename T> inline void IShiftHomogeneous4(T *A, int n) {
+template <typename T>
+inline void IShiftHomogeneous4(T *A, int n) {
   if (n <= 1) {
     return;
   }

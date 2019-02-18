@@ -89,8 +89,7 @@ class OfflineLidarObstaclePerception {
     bool ret = common::SensorManager::Instance()->GetSensorInfo(
         FLAGS_sensor_name, &sensor_info_);
     if (!ret) {
-      AERROR << "Failed to get sensor info, sensor name: "
-        << FLAGS_sensor_name;
+      AERROR << "Failed to get sensor info, sensor name: " << FLAGS_sensor_name;
       return false;
     }
     ADEBUG << "Sensor_name: " << sensor_info_.name;
@@ -124,7 +123,7 @@ class OfflineLidarObstaclePerception {
       }
       LoadPCLPCD(pcd_folder + "/" + file_name + ".pcd", frame_->cloud.get());
       AINFO << "Read point cloud from " << pcd_file_names[i]
-               << " with cloud size: " << frame_->cloud->size();
+            << " with cloud size: " << frame_->cloud->size();
       if (pose_folder != "") {
         std::string pose_file_name = pose_folder + "/" + file_name + ".pose";
         AINFO << "Pose file: " << pose_file_name;

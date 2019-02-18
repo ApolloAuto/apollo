@@ -28,9 +28,10 @@ message LonControllerConf {
   optional PidConf reverse_station_pid_conf = 12;
   optional PidConf reverse_speed_pid_conf = 13;
   optional FilterConf pitch_angle_filter_conf = 14;
-
   optional LeadlagConf reverse_station_leadlag_conf = 15;
   optional LeadlagConf reverse_speed_leadlag_conf = 16;
 
   optional calibrationtable.ControlCalibrationTable calibration_table = 17;
+
+  optional bool enable_reverse_leadlag_compensation = 18 [default = false];
 }

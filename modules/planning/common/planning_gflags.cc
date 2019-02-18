@@ -53,7 +53,7 @@ DEFINE_string(scenario_traffic_light_unprotected_right_turn_config_file,
               "scenario/traffic_light_unprotected_right_turn_config.pb.txt",
               "scenario_traffic_light_unprotected_right_turn config file");
 
-DEFINE_bool(enable_scenario_dispatcher, false,
+DEFINE_bool(enable_scenario_dispatcher, true,
             "enable dispatcher inside scenario manager to select scenario");
 
 DEFINE_bool(enable_scenario_side_pass, true,
@@ -384,6 +384,8 @@ DEFINE_double(
     "weight for lateral obstacle distance in lateral trajectory optimization");
 DEFINE_double(lateral_third_order_derivative_max, 0.1,
               "the maximal allowance for lateral third order derivative");
+DEFINE_double(lateral_derivative_bound_default, 2.0,
+              "the default value for lateral derivative bound.");
 DEFINE_double(max_s_lateral_optimization, 60.0,
               "The maximal s for lateral optimization.");
 DEFINE_double(default_delta_s_lateral_optimization, 1.0,

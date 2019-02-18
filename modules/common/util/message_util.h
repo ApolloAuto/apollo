@@ -24,9 +24,9 @@
 #include <memory>
 #include <string>
 
+#include "cyber/common/file.h"
 #include "google/protobuf/message.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 
 /**
@@ -75,8 +75,8 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
 
   auto type_name = T::descriptor()->full_name();
   std::string dump_path = dump_dir + "/" + type_name;
-  if (!DirectoryExists(dump_path)) {
-    if (!EnsureDirectory(dump_path)) {
+  if (!cyber::common::DirectoryExists(dump_path)) {
+    if (!cyber::common::EnsureDirectory(dump_path)) {
       AERROR << "Cannot enable dumping for '" << type_name
              << "' because the path " << dump_path
              << " cannot be created or is not a directory.";
@@ -85,7 +85,7 @@ bool DumpMessage(const std::shared_ptr<T>& msg,
   }
 
   auto sequence_num = msg->header().sequence_num();
-  return util::SetProtoToASCIIFile(
+  return cyber::common::SetProtoToASCIIFile(
       *msg, util::StrCat(dump_path, "/", sequence_num, ".pb.txt"));
 }
 

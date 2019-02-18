@@ -1,21 +1,21 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
-#include "cyber/common/log.h"
 #include "modules/perception/camera/lib/obstacle/detector/yolo/region_output.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace perception {
@@ -74,8 +74,7 @@ float get_jaccard_overlap(const NormalizedBBox &bbox1,
 }
 
 void get_max_score_index(const std::vector<float> &scores,
-                         const float threshold,
-                         const int top_k,
+                         const float threshold, const int top_k,
                          std::vector<std::pair<float, int> > *score_index_vec) {
   // Generate index score pairs.
   for (int i = 0; i < static_cast<int>(scores.size()); ++i) {
@@ -95,16 +94,13 @@ void get_max_score_index(const std::vector<float> &scores,
 }
 
 void apply_softnms_fast(const std::vector<NormalizedBBox> &bboxes,
-                        std::vector<float> *scores,
-                        const float score_threshold,
-                        const float nms_threshold,
-                        const int top_k,
-                        std::vector<int> *indices,
-                        bool is_linear,
+                        std::vector<float> *scores, const float score_threshold,
+                        const float nms_threshold, const int top_k,
+                        std::vector<int> *indices, bool is_linear,
                         const float sigma) {
   // Sanity check.
   CHECK_EQ(bboxes.size(), scores->size())
-    << "bboxes and scores have different size.";
+      << "bboxes and scores have different size.";
 
   // Get top_k scores (with corresponding indices).
   std::vector<std::pair<float, int> > score_index_vec;
@@ -119,8 +115,8 @@ void apply_softnms_fast(const std::vector<NormalizedBBox> &bboxes,
     score_index_vec.erase(best_it);
     const NormalizedBBox &best_bbox = bboxes[best_idx];
     indices->push_back(best_idx);
-    for (std::vector<std::pair<float, int> >::iterator
-             it = score_index_vec.begin();
+    for (std::vector<std::pair<float, int> >::iterator it =
+             score_index_vec.begin();
          it != score_index_vec.end();) {
       int cur_idx = it->second;
       const NormalizedBBox &cur_bbox = bboxes[cur_idx];
@@ -131,7 +127,7 @@ void apply_softnms_fast(const std::vector<NormalizedBBox> &bboxes,
         (*scores)[cur_idx] *= static_cast<float>((1.0 - cur_overlap));
       } else {
         (*scores)[cur_idx] *=
-          static_cast<float>(exp(-1.0 * pow(cur_overlap, 2) / sigma));
+            static_cast<float>(exp(-1.0 * pow(cur_overlap, 2) / sigma));
       }
       ++it;
     }
@@ -140,10 +136,8 @@ void apply_softnms_fast(const std::vector<NormalizedBBox> &bboxes,
 
 void apply_boxvoting_fast(std::vector<NormalizedBBox> *bboxes,
                           std::vector<float> *scores,
-                          const float conf_threshold,
-                          const float nms_threshold,
-                          const float sigma,
-                          std::vector<int> *indices) {
+                          const float conf_threshold, const float nms_threshold,
+                          const float sigma, std::vector<int> *indices) {
   if (bboxes->size() == 0) {
     return;
   }
@@ -186,7 +180,7 @@ void apply_boxvoting_fast(std::vector<NormalizedBBox> *bboxes,
         (*bboxes)[sub_it].mask = true;
       } else {
         (*scores)[sub_it] *=
-          static_cast<float>(exp(-1.0 * pow(cur_overlap, 2) / sigma));
+            static_cast<float>(exp(-1.0 * pow(cur_overlap, 2) / sigma));
       }
       (*bboxes)[sub_it].score = (*scores)[sub_it];
 
@@ -211,14 +205,12 @@ void apply_boxvoting_fast(std::vector<NormalizedBBox> *bboxes,
 
 void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
                     const std::vector<float> &scores,
-                    const float score_threshold,
-                    const float nms_threshold,
-                    const float eta,
-                    const int top_k,
+                    const float score_threshold, const float nms_threshold,
+                    const float eta, const int top_k,
                     std::vector<int> *indices) {
   // Sanity check.
   CHECK_EQ(bboxes.size(), scores.size())
-    << "bboxes and scores have different size.";
+      << "bboxes and scores have different size.";
 
   // Get top_k scores (with corresponding indices).
   std::vector<std::pair<float, int> > score_index_vec;
@@ -255,24 +247,21 @@ void filter_bbox(const MinDims &min_dims,
   int total_obj_idx = 0;
   while (total_obj_idx < static_cast<int>(objects->size())) {
     const auto &obj = (*objects)[total_obj_idx];
-    if ((obj->camera_supplement.box.ymax
-        - obj->camera_supplement.box.ymin) >= min_dims.min_2d_height &&
-        (min_dims.min_3d_height <= 0 || obj->size[2] >= min_dims.min_3d_height)
-        &&
-            (min_dims.min_3d_width <= 0
-                || obj->size[1] >= min_dims.min_3d_width) &&
-        (min_dims.min_3d_length <= 0
-            || obj->size[0] >= min_dims.min_3d_length)) {
-      (*objects)[valid_obj_idx] =
-          (*objects)[total_obj_idx];
+    if ((obj->camera_supplement.box.ymax - obj->camera_supplement.box.ymin) >=
+            min_dims.min_2d_height &&
+        (min_dims.min_3d_height <= 0 ||
+         obj->size[2] >= min_dims.min_3d_height) &&
+        (min_dims.min_3d_width <= 0 || obj->size[1] >= min_dims.min_3d_width) &&
+        (min_dims.min_3d_length <= 0 ||
+         obj->size[0] >= min_dims.min_3d_length)) {
+      (*objects)[valid_obj_idx] = (*objects)[total_obj_idx];
       ++valid_obj_idx;
     }
     ++total_obj_idx;
   }
   AINFO << valid_obj_idx << " of " << total_obj_idx << " obstacles kept";
   objects->resize(valid_obj_idx);
-  AINFO << "Number of detected obstacles: "
-           << objects->size();
+  AINFO << "Number of detected obstacles: " << objects->size();
 }
 void recover_bbox(int roi_w, int roi_h, int offset_y,
                   std::vector<base::ObjectPtr> *objects) {
@@ -286,9 +275,9 @@ void recover_bbox(int roi_w, int roi_h, int offset_y,
     int y = static_cast<int>(ymin * static_cast<float>(roi_h)) + offset_y;
     int h = static_cast<int>((ymax - ymin) * static_cast<float>(roi_h));
     base::RectF rect_det(static_cast<float>(x), static_cast<float>(y),
-      static_cast<float>(w), static_cast<float>(h));
+                         static_cast<float>(w), static_cast<float>(h));
     base::RectF rect_img(0, 0, static_cast<float>(roi_w),
-      static_cast<float>(roi_h + offset_y));
+                         static_cast<float>(roi_h + offset_y));
     base::RectF rect = rect_det & rect_img;
     obj->camera_supplement.box = rect;
 
@@ -382,10 +371,10 @@ void fill_ratios(bool with_ratios, base::ObjectPtr obj, const float *bbox) {
 }
 
 void fill_area_id(bool with_flag, base::ObjectPtr obj, const float *data) {
-    if (with_flag) {
-        obj->camera_supplement.area_id = static_cast<int>(data[0]);
-        // obj->camera_supplement.area_id_prob = data[1];
-    }
+  if (with_flag) {
+    obj->camera_supplement.area_id = static_cast<int>(data[0]);
+    // obj->camera_supplement.area_id_prob = data[1];
+  }
 }
 
 int get_area_id(float visible_ratios[4]) {

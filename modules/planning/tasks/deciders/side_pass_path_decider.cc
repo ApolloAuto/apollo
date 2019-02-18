@@ -56,7 +56,7 @@ void SidePassPathDecider::InitSolver() {
       config.side_pass_path_decider_config().dddl_weight(),
       config.side_pass_path_decider_config().guiding_line_weight(),
   };
-  fem_qp_.reset(new Fem1dExpandedJerkQpProblem());
+  fem_qp_.reset(new Fem1dJerkQpProblem());
   CHECK(fem_qp_->Init(n, l_init, delta_s_, w,
                       config.side_pass_path_decider_config().max_dddl()));
 }

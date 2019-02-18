@@ -192,6 +192,8 @@ Status SpeedLimitDecider::GetSpeedLimits(
     }
 
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
+    // TODO(all) implement
+    speed_limit_data->AppendSoftSpeedLimit(path_s, curr_speed_limit);
   }
   return Status::OK();
 }

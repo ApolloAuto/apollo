@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <map>
@@ -44,8 +44,8 @@ class DummyInferenceEngine : public BaseInferenceEngine {
 
   virtual ~DummyInferenceEngine() {}
 
-  bool Init(const InferenceEngineInitOptions &options
-  = InferenceEngineInitOptions()) override {
+  bool Init(const InferenceEngineInitOptions &options =
+                InferenceEngineInitOptions()) override {
     return true;
   }
 
@@ -54,9 +54,7 @@ class DummyInferenceEngine : public BaseInferenceEngine {
     return true;
   }
 
-  std::string Name() const override {
-    return "DummyInferenceEngine";
-  }
+  std::string Name() const override { return "DummyInferenceEngine"; }
 };
 
 class DummyLaneDetector : public BaseLaneDetector {
@@ -73,9 +71,7 @@ class DummyLaneDetector : public BaseLaneDetector {
     return true;
   }
 
-  std::string Name() const override {
-    return "DummyLaneDetector";
-  }
+  std::string Name() const override { return "DummyLaneDetector"; }
 };
 
 class DummyLanePostprocessor : public BaseLanePostprocessor {
@@ -84,24 +80,22 @@ class DummyLanePostprocessor : public BaseLanePostprocessor {
 
   virtual ~DummyLanePostprocessor() {}
 
-  bool Init(const LanePostprocessorInitOptions &options
-    = LanePostprocessorInitOptions()) override {
+  bool Init(const LanePostprocessorInitOptions &options =
+                LanePostprocessorInitOptions()) override {
     return true;
   }
 
   bool Process2D(const LanePostprocessorOptions &options,
-               CameraFrame *frame) override {
+                 CameraFrame *frame) override {
     return true;
   }
 
   bool Process3D(const LanePostprocessorOptions &options,
-               CameraFrame *frame) override {
+                 CameraFrame *frame) override {
     return true;
   }
 
-  std::string Name() const override {
-    return "DummyLanePostprocessor";
-  }
+  std::string Name() const override { return "DummyLanePostprocessor"; }
 };
 
 class DummyLaneTracker : public BaseLaneTracker {
@@ -110,19 +104,16 @@ class DummyLaneTracker : public BaseLaneTracker {
 
   virtual ~DummyLaneTracker() {}
 
-  bool Init(const LaneTrackerInitOptions &options
-  = LaneTrackerInitOptions()) override {
+  bool Init(const LaneTrackerInitOptions &options =
+                LaneTrackerInitOptions()) override {
     return true;
   }
 
-  bool Track(const LaneTrackerOptions &options,
-             CameraFrame *frame) override {
+  bool Track(const LaneTrackerOptions &options, CameraFrame *frame) override {
     return true;
   }
 
-  std::string Name() const override {
-    return "DummyLaneTracker";
-  }
+  std::string Name() const override { return "DummyLaneTracker"; }
 };
 
 class DummyObstacleDetector : public BaseObstacleDetector {
@@ -131,8 +122,8 @@ class DummyObstacleDetector : public BaseObstacleDetector {
 
   virtual ~DummyObstacleDetector() {}
 
-  bool Init(const ObstacleDetectorInitOptions &options
-  = ObstacleDetectorInitOptions()) override {
+  bool Init(const ObstacleDetectorInitOptions &options =
+                ObstacleDetectorInitOptions()) override {
     return true;
   }
 
@@ -141,9 +132,7 @@ class DummyObstacleDetector : public BaseObstacleDetector {
     return true;
   }
 
-  std::string Name() const override {
-    return "DummyObstacleDetector";
-  }
+  std::string Name() const override { return "DummyObstacleDetector"; }
 };
 
 class DummyObstaclePostprocessor : public BaseObstaclePostprocessor {
@@ -152,27 +141,22 @@ class DummyObstaclePostprocessor : public BaseObstaclePostprocessor {
 
   virtual ~DummyObstaclePostprocessor() {}
 
-  bool Init(const ObstaclePostprocessorInitOptions &options
-  = ObstaclePostprocessorInitOptions()) override {
+  bool Init(const ObstaclePostprocessorInitOptions &options =
+                ObstaclePostprocessorInitOptions()) override {
     return true;
   }
 
-  bool Process(
-      const ObstaclePostprocessorOptions &options,
-      CameraFrame *frame) override {
+  bool Process(const ObstaclePostprocessorOptions &options,
+               CameraFrame *frame) override {
     return true;
   }
 
-  std::string Name() const override {
-    return "DummyObstaclePostprocessor";
-  }
+  std::string Name() const override { return "DummyObstaclePostprocessor"; }
 };
 
 class DummyObstacleTracker : public BaseObstacleTracker {
  public:
-  bool Init(const ObstacleTrackerInitOptions &options) override {
-    return true;
-  }
+  bool Init(const ObstacleTrackerInitOptions &options) override { return true; }
 
   bool Predict(const ObstacleTrackerOptions &options,
                CameraFrame *frame) override {
@@ -198,9 +182,7 @@ class DummyObstacleTracker : public BaseObstacleTracker {
     return true;
   }
 
-  std::string Name() const override {
-    return "DummyObstacleTracker";
-  }
+  std::string Name() const override { return "DummyObstacleTracker"; }
 };
 
 class DummyObstacleTransformer : public BaseObstacleTransformer {
@@ -212,9 +194,7 @@ class DummyObstacleTransformer : public BaseObstacleTransformer {
                  CameraFrame *frame) override {
     return true;
   }
-  std::string Name() const override {
-    return "DummyObstacleTransformer";
-  }
+  std::string Name() const override { return "DummyObstacleTransformer"; }
 };
 
 class DummyFeatureExtractor : public BaseFeatureExtractor {
@@ -229,17 +209,15 @@ class DummyFeatureExtractor : public BaseFeatureExtractor {
                CameraFrame *frame) override {
     return true;
   }
-  std::string Name() const override {
-    return "DummyFeatureExtractor";
-  }
+  std::string Name() const override { return "DummyFeatureExtractor"; }
 };
 
 class DummyLandmarkDetector : public BaseLandmarkDetector {
  public:
   DummyLandmarkDetector() : BaseLandmarkDetector() {}
   virtual ~DummyLandmarkDetector() {}
-  bool Init(const LandmarkDetectorInitOptions &options
-  = LandmarkDetectorInitOptions()) override {
+  bool Init(const LandmarkDetectorInitOptions &options =
+                LandmarkDetectorInitOptions()) override {
     return true;
   }
 
@@ -247,74 +225,62 @@ class DummyLandmarkDetector : public BaseLandmarkDetector {
               CameraFrame *frame) override {
     return true;
   }
-  std::string Name() const override {
-    return "DummyLandmarkDetector";
-  }
+  std::string Name() const override { return "DummyLandmarkDetector"; }
 };
 
 class DummyCalibrator : public BaseCalibrator {
  public:
   DummyCalibrator() : BaseCalibrator() {}
   virtual ~DummyCalibrator() {}
-  bool Init(const CalibratorInitOptions &options
-            = CalibratorInitOptions()) override {
+  bool Init(
+      const CalibratorInitOptions &options = CalibratorInitOptions()) override {
     return true;
   }
   bool Calibrate(const CalibratorOptions &options,
-                   float* pitch_angle) override {
+                 float *pitch_angle) override {
     return true;
   }
-  std::string Name() const override {
-    return "DummyCalibrator";
-  }
+  std::string Name() const override { return "DummyCalibrator"; }
 };
 
 class DummyCalibrationService : public BaseCalibrationService {
  public:
   DummyCalibrationService() : BaseCalibrationService() {}
   virtual ~DummyCalibrationService() {}
-  bool Init(const CalibrationServiceInitOptions &options
-            = CalibrationServiceInitOptions()) override {
+  bool Init(const CalibrationServiceInitOptions &options =
+                CalibrationServiceInitOptions()) override {
     return true;
   }
-  bool BuildIndex() override {
-    return true;
-  }
+  bool BuildIndex() override { return true; }
   bool QueryDepthOnGroundPlane(int x, int y, double *depth) const override {
     return false;
   }
-  bool QueryPoint3dOnGroundPlane(
-                      int x, int y, Eigen::Vector3d *point3d) const override {
+  bool QueryPoint3dOnGroundPlane(int x, int y,
+                                 Eigen::Vector3d *point3d) const override {
     return false;
   }
   bool QueryGroundPlaneInCameraFrame(
-                                Eigen::Vector4d *plane_param) const override {
+      Eigen::Vector4d *plane_param) const override {
     return false;
   }
-  bool QueryCameraToGroundHeightAndPitchAngle(
-                              float *height, float *pitch) const override {
+  bool QueryCameraToGroundHeightAndPitchAngle(float *height,
+                                              float *pitch) const override {
     return false;
   }
-  float QueryCameraToGroundHeight() {
-    return 0.f;
-  }
-  float QueryPitchAngle() {
-    return 0.f;
-  }
-  void Update(CameraFrame* frame) override {
+  float QueryCameraToGroundHeight() { return 0.f; }
+  float QueryPitchAngle() { return 0.f; }
+  void Update(CameraFrame *frame) override {
     // do nothing
   }
 
   void SetCameraHeightAndPitch(
-          const std::map<std::string, float> &name_camera_ground_height_map,
-          const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
-          const float &pitch_angle_master_sensor) override {
+      const std::map<std::string, float> &name_camera_ground_height_map,
+      const std::map<std::string, float> &name_camera_pitch_angle_diff_map,
+      const float &pitch_angle_master_sensor) override {
     // do nothing
   }
 
-  std::string Name() const override {
-    return "DummyCalibrationService";
-  }
+  std::string Name() const override { return "DummyCalibrationService"; }
 };
 
 }  // namespace camera

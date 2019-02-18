@@ -66,6 +66,8 @@ class EvaluatorManager {
   void EvaluateObstacle(Obstacle* obstacle);
 
  private:
+  void BuildCurrentFrameEnv();
+
   /**
    * @brief Register an evaluator by type
    * @param Evaluator type

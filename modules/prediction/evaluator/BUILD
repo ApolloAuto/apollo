@@ -7,6 +7,9 @@ cc_library(
     srcs = ["evaluator_manager.cc"],
     hdrs = ["evaluator_manager.h"],
     deps = [
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/prediction/common:feature_output",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",
         "//modules/prediction/evaluator/vehicle:cruise_mlp_evaluator",
         "//modules/prediction/evaluator/vehicle:junction_mlp_evaluator",

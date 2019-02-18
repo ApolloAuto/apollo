@@ -31,7 +31,6 @@ cc_binary(
         ":lane_common",
         "//cyber",
         "//external:gflags",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",

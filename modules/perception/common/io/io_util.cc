@@ -85,11 +85,10 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
     }
 
     model->set_params(static_cast<size_t>(camera_width),
-                      static_cast<size_t>(camera_height),
-                      params);
+                      static_cast<size_t>(camera_height), params);
   } catch (YAML::Exception &e) {
     AERROR << "load camera intrisic file " << yaml_file
-              << " with error, YAML exception: " << e.what();
+           << " with error, YAML exception: " << e.what();
     return false;
   }
 
@@ -161,7 +160,7 @@ bool LoadOmnidirectionalCameraIntrinsics(
     model->set_params(camera_width, camera_height, eigen_params);
   } catch (YAML::Exception &e) {
     AERROR << "load camera intrisic file " << yaml_file
-              << " with error, YAML exception: " << e.what();
+           << " with error, YAML exception: " << e.what();
     return false;
   }
 

@@ -85,7 +85,7 @@ std::string TitleCase(const std::string& origin) {
 // List subdirs and return a dict of {subdir_title: subdir_path}.
 Map<std::string, std::string> ListDirAsDict(const std::string& dir) {
   Map<std::string, std::string> result;
-  const auto subdirs = apollo::common::util::ListSubPaths(dir);
+  const auto subdirs = cyber::common::ListSubPaths(dir);
   for (const auto& subdir : subdirs) {
     const auto subdir_title = TitleCase(subdir);
     const auto subdir_path = StrCat(dir, "/", subdir);
@@ -99,9 +99,9 @@ Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
                                               const std::string& extension) {
   Map<std::string, std::string> result;
   const std::string pattern = StrCat(dir, "/*", extension);
-  for (const std::string& file_path : apollo::common::util::Glob(pattern)) {
+  for (const std::string& file_path : cyber::common::Glob(pattern)) {
     // Remove the extention and convert to title case as the file title.
-    const std::string filename = apollo::common::util::GetFileName(file_path);
+    const std::string filename = cyber::common::GetFileName(file_path);
     const std::string file_title =
         TitleCase(filename.substr(0, filename.length() - extension.length()));
     result.insert({file_title, file_path});

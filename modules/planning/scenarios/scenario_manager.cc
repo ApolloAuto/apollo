@@ -233,14 +233,23 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
     const Frame& frame) {
-  // TODO(all):
+  // TODO(all): to be updated when SIDE_PASS obstacle decisions
+  //            from ReferenceLine is ready
+  if (current_scenario_->scenario_type() == ScenarioConfig::SIDE_PASS &&
+      current_scenario_->IsTransferable(*current_scenario_, frame)) {
+    return ScenarioConfig::SIDE_PASS;
+  }
+
+  auto scenario = CreateScenario(ScenarioConfig::SIDE_PASS);
+  if (scenario->IsTransferable(*current_scenario_, frame)) {
+    return ScenarioConfig::SIDE_PASS;
+  }
   return ScenarioConfig::LANE_FOLLOW;
 }
 
 bool ScenarioManager::ReuseCurrentScenario(
     const common::TrajectoryPoint& ego_point, const Frame& frame) {
-  return current_scenario_->IsTransferable(*current_scenario_, ego_point,
-                                           frame);
+  return current_scenario_->IsTransferable(*current_scenario_, frame);
 }
 
 bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
@@ -250,17 +259,13 @@ bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
     return true;
   }
 
-  if (FLAGS_enable_scenario_dispatcher) {
+  auto scenario = CreateScenario(type);
+  if (scenario->IsTransferable(*current_scenario_, frame)) {
+    AINFO << "switch to scenario: " << scenario->Name();
+    current_scenario_ = std::move(scenario);
     return true;
-  } else {
-    auto scenario = CreateScenario(type);
-    if (scenario->IsTransferable(*current_scenario_, ego_point, frame)) {
-      AINFO << "switch to scenario: " << scenario->Name();
-      current_scenario_ = std::move(scenario);
-      return true;
-    }
-    return false;
   }
+  return false;
 }
 
 void ScenarioManager::Observe(const Frame& frame) {
@@ -268,7 +273,6 @@ void ScenarioManager::Observe(const Frame& frame) {
   PlanningContext::GetScenarioInfo()->next_stop_sign_overlap = PathOverlap();
   PlanningContext::GetScenarioInfo()->next_traffic_light_overlap =
       PathOverlap();
-  PlanningContext::GetScenarioInfo()->next_crosswalk_overlap = PathOverlap();
 
   const auto& reference_line_info = frame.reference_line_info().front();
 
@@ -316,24 +320,8 @@ void ScenarioManager::Observe(const Frame& frame) {
     }
   }
   ADEBUG << "Traffic Light: "
-         << PlanningContext::GetScenarioInfo()
-                ->next_traffic_light_overlap.object_id;
-
-  // find next crosswalk_overlap
-  const std::vector<hdmap::PathOverlap>& crosswalk_overlaps =
-      reference_line_info.reference_line().map_path().crosswalk_overlaps();
-  min_start_s = std::numeric_limits<double>::max();
-  for (const PathOverlap& crosswalk_overlap : crosswalk_overlaps) {
-    if (adc_front_edge_s - crosswalk_overlap.end_s <=
-            conf_min_pass_s_distance_ &&
-        crosswalk_overlap.start_s < min_start_s) {
-      min_start_s = crosswalk_overlap.start_s;
-      PlanningContext::GetScenarioInfo()->next_crosswalk_overlap =
-          crosswalk_overlap;
-    }
-  }
-  ADEBUG << "Crosswalk: "
-      << PlanningContext::GetScenarioInfo()->next_crosswalk_overlap.object_id;
+      << PlanningContext::GetScenarioInfo()
+          ->next_traffic_light_overlap.object_id;
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
@@ -385,12 +373,12 @@ void ScenarioManager::ScenarioDispatch(
   if (junction_with_sign_overlap) {
     switch (junction_with_sign_overlap->first) {
       case ReferenceLineInfo::STOP_SIGN:
-        if (!FLAGS_enable_scenario_stop_sign) {
+        if (FLAGS_enable_scenario_stop_sign) {
           scenario_type = SelectStopSignScenario(frame);
         }
         break;
       case ReferenceLineInfo::SIGNAL:
-        if (!FLAGS_enable_scenario_traffic_light) {
+        if (FLAGS_enable_scenario_traffic_light) {
           scenario_type = SelectTrafficLightScenario(frame);
         }
         break;
@@ -404,19 +392,22 @@ void ScenarioManager::ScenarioDispatch(
 
   ////////////////////////////////////////
   // CHANGE_LANE scenario
-  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
-    SelectChangeLaneScenario(frame);
+  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
+    scenario_type = SelectChangeLaneScenario(frame);
   }
 
   ////////////////////////////////////////
   // SIDE_PASS scenario
-  if (scenario_type != ScenarioConfig::LANE_FOLLOW) {
-    SelectSidePassScenario(frame);
+  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
+    scenario_type = SelectSidePassScenario(frame);
   }
 
   ADEBUG << "select scenario: "
       << ScenarioConfig::ScenarioType_Name(scenario_type);
-  current_scenario_ = CreateScenario(scenario_type);
+
+  if (current_scenario_->scenario_type() != scenario_type) {
+    current_scenario_ = CreateScenario(scenario_type);
+  }
 }
 
 void ScenarioManager::ScenarioSelfVote(

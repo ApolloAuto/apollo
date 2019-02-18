@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/calibrator/laneline/lane_based_calibrator.h"
 #include "modules/perception/common/i_lib/core/i_blas.h"
 
@@ -20,17 +20,15 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-void GetYawVelocityInfo(const float &time_diff,
-                        const double cam_coord_cur[3],
+void GetYawVelocityInfo(const float &time_diff, const double cam_coord_cur[3],
                         const double cam_coord_pre[3],
-                        const double cam_coord_pre_pre[3],
-                        float *yaw_rate,
+                        const double cam_coord_pre_pre[3], float *yaw_rate,
                         float *velocity) {
   assert(yaw_rate != nullptr);
   assert(velocity != nullptr);
   double time_diff_r = common::IRec(static_cast<double>(time_diff));
-  double dist
-      = common::ISqrt(common::ISquaresumDiffU2(cam_coord_cur, cam_coord_pre));
+  double dist =
+      common::ISqrt(common::ISquaresumDiffU2(cam_coord_cur, cam_coord_pre));
   *velocity = static_cast<float>(dist * time_diff_r);
 
   double offset_cur[2] = {
@@ -51,8 +49,7 @@ void CalibratorParams::Init() {
   // general
   min_nr_pts_laneline = 20;
   sampling_lane_point_rate = 0.05f;  // 0.05f
-  max_allowed_yaw_angle_in_radian
-      = common::IDegreeToRadians(3.0f);
+  max_allowed_yaw_angle_in_radian = common::IDegreeToRadians(3.0f);
 
   // slow set-up
   // min_distance_to_update_calibration_in_meter = 1600.0f;
@@ -64,13 +61,12 @@ void CalibratorParams::Init() {
 
   // histogram params
   hist_estimator_params.nr_bins_in_histogram = 400;
-  hist_estimator_params.data_sp
-      = -common::IDegreeToRadians(10.0f);
-  hist_estimator_params.data_ep
-      = -hist_estimator_params.data_sp;  // -10 ~ 10 degree
+  hist_estimator_params.data_sp = -common::IDegreeToRadians(10.0f);
+  hist_estimator_params.data_ep =
+      -hist_estimator_params.data_sp;  // -10 ~ 10 degree
 
-  hist_estimator_params.step_bin = (hist_estimator_params.data_ep
-      - hist_estimator_params.data_sp);
+  hist_estimator_params.step_bin =
+      (hist_estimator_params.data_ep - hist_estimator_params.data_sp);
   hist_estimator_params.step_bin /=
       static_cast<float>(hist_estimator_params.nr_bins_in_histogram);
 
@@ -80,22 +76,21 @@ void CalibratorParams::Init() {
   hist_estimator_params.smooth_kernel.push_back(5);
   hist_estimator_params.smooth_kernel.push_back(3);
   hist_estimator_params.smooth_kernel.push_back(1);
-  hist_estimator_params.smooth_kernel_width
-      = static_cast<int>(hist_estimator_params.smooth_kernel.size());
-  hist_estimator_params.smooth_kernel_radius
-      = hist_estimator_params.smooth_kernel_width >> 1;
+  hist_estimator_params.smooth_kernel_width =
+      static_cast<int>(hist_estimator_params.smooth_kernel.size());
+  hist_estimator_params.smooth_kernel_radius =
+      hist_estimator_params.smooth_kernel_width >> 1;
 
   hist_estimator_params.hat_min_allowed = 0.40f;
   hist_estimator_params.hat_std_allowed = 6.25f;
   // hist_estimator_params.histogram_mass_limit = 500;
   hist_estimator_params.histogram_mass_limit = 50;
-  hist_estimator_params.decay_factor
-      = 0.8908987f;  // decay 6-times to half value
+  hist_estimator_params.decay_factor =
+      0.8908987f;  // decay 6-times to half value
 }
 
-void LaneBasedCalibrator::Init(
-    const LocalCalibratorInitOptions &options,
-    const CalibratorParams *params) {
+void LaneBasedCalibrator::Init(const LocalCalibratorInitOptions &options,
+                               const CalibratorParams *params) {
   ClearUp();
   image_width_ = options.image_width;
   image_height_ = options.image_height;
@@ -126,8 +121,7 @@ void LaneBasedCalibrator::ClearUp() {
   accumulated_straight_driving_in_meter_ = 0.0f;
 }
 
-bool LaneBasedCalibrator::Process(const EgoLane &lane,
-                                  const float &velocity,
+bool LaneBasedCalibrator::Process(const EgoLane &lane, const float &velocity,
                                   const float &yaw_rate,
                                   const float &time_diff) {
   float distance_traveled_in_meter = velocity * time_diff;
@@ -140,7 +134,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane,
   // check for driving straight
   if (!IsTravelingStraight(vehicle_yaw_changed)) {
     AINFO << "Do not calibate if not moving straight: "
-              << "yaw angle changed " << vehicle_yaw_changed;
+          << "yaw angle changed " << vehicle_yaw_changed;
     vp_buffer_.clear();
     return false;
   }
@@ -154,7 +148,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane,
     return false;
   }
   vp_cur.distance_traveled = distance_traveled_in_meter;
-//  std::cout << "#current v-row: " << vp_cur.pixel_pos[1] << std::endl;
+  //  std::cout << "#current v-row: " << vp_cur.pixel_pos[1] << std::endl;
 
   // push vanishing point into buffer
   PushVanishingPoint(vp_cur);
@@ -169,7 +163,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane,
     AINFO << "Fail to estimate pitch from vanishing point.";
     return false;
   }
-//  std::cout << "#current pitch: " << pitch_cur_ << std::endl;
+  //  std::cout << "#current pitch: " << pitch_cur_ << std::endl;
   vanishing_row_ = vp_work.pixel_pos[1];
 
   // get the filtered output using histogram
@@ -178,12 +172,11 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane,
     return false;
   }
 
-  accumulated_straight_driving_in_meter_
-      += distance_traveled_in_meter;
-//  std::cout << "acc_d: " << accumulated_straight_driving_in_meter_ << "\n";
-  if (accumulated_straight_driving_in_meter_
-      > params_.min_distance_to_update_calibration_in_meter
-      && pitch_histogram_.Process()) {
+  accumulated_straight_driving_in_meter_ += distance_traveled_in_meter;
+  //  std::cout << "acc_d: " << accumulated_straight_driving_in_meter_ << "\n";
+  if (accumulated_straight_driving_in_meter_ >
+          params_.min_distance_to_update_calibration_in_meter &&
+      pitch_histogram_.Process()) {
     pitch_estimation_ = pitch_histogram_.get_val_estimation();
     const float cy = k_mat_[5];
     const float fy = k_mat_[4];
@@ -209,8 +202,8 @@ bool LaneBasedCalibrator::PopVanishingPoint(VanishingPoint *v_point) {
   for (auto &vp : vp_buffer_) {
     accumulated_distance += vp.distance_traveled;
   }
-  if (accumulated_distance
-      < params_.min_required_straight_driving_distance_in_meter) {
+  if (accumulated_distance <
+      params_.min_required_straight_driving_distance_in_meter) {
     return false;
   }
   *v_point = vp_buffer_.back();
@@ -222,8 +215,8 @@ bool LaneBasedCalibrator::AddPitchToHistogram(float pitch) {
   return pitch_histogram_.Push(pitch);
 }
 
-bool LaneBasedCalibrator::GetPitchFromVanishingPoint(
-    const VanishingPoint &vp, float *pitch) const {
+bool LaneBasedCalibrator::GetPitchFromVanishingPoint(const VanishingPoint &vp,
+                                                     float *pitch) const {
   assert(pitch != nullptr);
   const float cx = k_mat_[2];
   const float cy = k_mat_[5];
@@ -244,28 +237,28 @@ bool LaneBasedCalibrator::GetVanishingPoint(const EgoLane &lane,
   float line_seg_r[4] = {0};
 
   // get line seg
-  bool get_line_seg_left
-      = SelectTwoPointsFromLineForVanishingPoint(lane.left_line, line_seg_l);
+  bool get_line_seg_left =
+      SelectTwoPointsFromLineForVanishingPoint(lane.left_line, line_seg_l);
   if (!get_line_seg_left) {
     AINFO << "left lane is too short.";
     return false;
   }
 
-  bool get_line_seg_right
-      = SelectTwoPointsFromLineForVanishingPoint(lane.right_line, line_seg_r);
+  bool get_line_seg_right =
+      SelectTwoPointsFromLineForVanishingPoint(lane.right_line, line_seg_r);
   if (!get_line_seg_right) {
     AINFO << "right lane is too short.";
     return false;
   }
 
   // get vanishing point by line segments intersection
-  bool get_vp_success
-      = GetIntersectionFromTwoLineSegments(line_seg_l, line_seg_r, v_point);
+  bool get_vp_success =
+      GetIntersectionFromTwoLineSegments(line_seg_l, line_seg_r, v_point);
   return get_vp_success;
 }
 
-int LaneBasedCalibrator::GetCenterIndex(
-    const Eigen::Vector2f *points, int nr_pts) const {
+int LaneBasedCalibrator::GetCenterIndex(const Eigen::Vector2f *points,
+                                        int nr_pts) const {
   assert(points != nullptr);
   if (nr_pts <= 0) {
     return -1;
@@ -279,9 +272,8 @@ int LaneBasedCalibrator::GetCenterIndex(
   center_x /= static_cast<float>(nr_pts);
   center_y /= static_cast<float>(nr_pts);
   float dist = 0.0f;
-  float dist_min
-      = static_cast<float>(fabs(points[0](0) - center_x) +
-                           fabs(points[0](1) - center_y));
+  float dist_min = static_cast<float>(fabs(points[0](0) - center_x) +
+                                      fabs(points[0](1) - center_y));
   int center_index = 0;
   for (int i = 1; i < nr_pts; ++i) {
     dist = static_cast<float>(fabs(points[i](0) - center_x) +
@@ -303,20 +295,20 @@ bool LaneBasedCalibrator::SelectTwoPointsFromLineForVanishingPoint(
 
   int nr_samples = nr_pts * static_cast<int>(params_.sampling_lane_point_rate);
   int offset_end = nr_pts - nr_samples - 1;
-  int sampled_start
-      = GetCenterIndex(line.lane_point.data(), nr_samples);
-  int sampled_end = offset_end +
+  int sampled_start = GetCenterIndex(line.lane_point.data(), nr_samples);
+  int sampled_end =
+      offset_end +
       GetCenterIndex(line.lane_point.data() + offset_end, nr_samples);
 
   if (sampled_start >= 0 && sampled_end >= 0) {
     line_seg[0] = line.lane_point[sampled_start](0);  // start
     line_seg[1] = line.lane_point[sampled_start](1);
-    line_seg[2] = line.lane_point[sampled_end](0);    // end
+    line_seg[2] = line.lane_point[sampled_end](0);  // end
     line_seg[3] = line.lane_point[sampled_end](1);
   } else {
     line_seg[0] = line.lane_point.front()(0);  // start
     line_seg[1] = line.lane_point.front()(1);
-    line_seg[2] = line.lane_point.back()(0);   // end
+    line_seg[2] = line.lane_point.back()(0);  // end
     line_seg[3] = line.lane_point.back()(1);
   }
 
@@ -329,8 +321,7 @@ bool LaneBasedCalibrator::SelectTwoPointsFromLineForVanishingPoint(
 }
 
 bool LaneBasedCalibrator::GetIntersectionFromTwoLineSegments(
-    const float line_seg_l[4],
-    const float line_seg_r[4],
+    const float line_seg_l[4], const float line_seg_r[4],
     VanishingPoint *v_point) {
   assert(v_point != nullptr);
   // ref: https://stackoverflow.com/questions/563198/...
@@ -363,12 +354,8 @@ bool LaneBasedCalibrator::GetIntersectionFromTwoLineSegments(
   float right_end_x = line_seg_r[2];
   float right_end_y = line_seg_r[3];
 
-  float v10[2] = {
-      left_end_x - left_start_x,
-      left_end_y - left_start_y};
-  float v32[2] = {
-      right_end_x - right_start_x,
-      right_end_y - right_start_y};
+  float v10[2] = {left_end_x - left_start_x, left_end_y - left_start_y};
+  float v32[2] = {right_end_x - right_start_x, right_end_y - right_start_y};
   float dn = v10[0] * v32[1] - v10[1] * v32[0];
 
   // colinear
@@ -376,9 +363,7 @@ bool LaneBasedCalibrator::GetIntersectionFromTwoLineSegments(
     return false;
   }
 
-  float v13[2] = {
-      left_start_x - right_start_x,
-      left_start_y - right_start_y};
+  float v13[2] = {left_start_x - right_start_x, left_start_y - right_start_y};
   float t = v32[0] * v13[1] - v32[1] * v13[0];
   t *= common::IRec(dn);
 

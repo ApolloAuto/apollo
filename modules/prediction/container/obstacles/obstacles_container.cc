@@ -74,12 +74,14 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
           FeatureOutput::Size() > FLAGS_max_num_dump_feature) {
         FeatureOutput::WriteFeatureProto();
       }
+      break;
     }
     case 2: {
       if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
           FeatureOutput::SizeOfDataForLearning() > FLAGS_max_num_dump_feature) {
         FeatureOutput::WriteDataForLearning();
       }
+      break;
     }
     case 3: {
       if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
@@ -87,6 +89,18 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
               FLAGS_max_num_dump_feature) {
         FeatureOutput::WritePredictionResult();
       }
+      break;
+    }
+    case 4: {
+      if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+          FeatureOutput::SizeOfFrameEnv() > FLAGS_max_num_dump_feature) {
+        FeatureOutput::WriteFrameEnv();
+      }
+      break;
+    }
+    default: {
+      // No data dump
+      break;
     }
   }
 
@@ -383,6 +397,10 @@ bool ObstaclesContainer::IsPredictable(
     return false;
   }
   return true;
+}
+
+double ObstaclesContainer::timestamp() const {
+  return timestamp_;
 }
 
 }  // namespace prediction

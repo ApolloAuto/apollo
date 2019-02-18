@@ -45,26 +45,11 @@ Status DeciderRuleBasedStop::Process(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  CheckCrosswalk(frame, reference_line_info);
-
   CheckStopSign(frame, reference_line_info);
 
   CheckTrafficLight(frame, reference_line_info);
 
   return Status::OK();
-}
-
-void DeciderRuleBasedStop::CheckCrosswalk(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-
-  if (!config_.decider_rule_based_stop_config().crosswalk().enabled()) {
-      return;
-  }
-
-  // TODO(all) check pedestrians
 }
 
 void DeciderRuleBasedStop::CheckStopSign(

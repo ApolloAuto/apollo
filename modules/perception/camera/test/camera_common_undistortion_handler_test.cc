@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/perception/camera/common/undistortion_handler.h"
 #include "modules/perception/camera/test/camera_common_io_util.h"
@@ -23,9 +23,9 @@ namespace apollo {
 namespace perception {
 
 namespace common {
-  DECLARE_string(obs_sensor_meta_path);
-  DECLARE_string(obs_sensor_intrinsic_path);
-}
+DECLARE_string(obs_sensor_meta_path);
+DECLARE_string(obs_sensor_intrinsic_path);
+}  // namespace common
 
 namespace camera {
 
@@ -33,12 +33,15 @@ TEST(UndistortionHandlerTest, test_init) {
   unsetenv("MODULE_PATH");
   unsetenv("CYBER_PATH");
   {
-    FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
-      "camera/common/conf/sensor_meta.config";
-    FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
-      "camera/common/params";
-    cv::Mat cv_img = cv::imread("/apollo/modules/perception/testdata/"
-      "camera/common/img/origin.jpeg");
+    FLAGS_obs_sensor_meta_path =
+        "/apollo/modules/perception/testdata/"
+        "camera/common/conf/sensor_meta.config";
+    FLAGS_obs_sensor_intrinsic_path =
+        "/apollo/modules/perception/testdata/"
+        "camera/common/params";
+    cv::Mat cv_img = cv::imread(
+        "/apollo/modules/perception/testdata/"
+        "camera/common/img/origin.jpeg");
 
     base::Image8U image(cv_img.rows, cv_img.cols, base::Color::BGR);
     base::Image8U undistorted(cv_img.rows, cv_img.cols, base::Color::BGR);
@@ -66,15 +69,19 @@ TEST(UndistortionHandlerTest, test_undistortion) {
   unsetenv("MODULE_PATH");
   unsetenv("CYBER_PATH");
   {
-    FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
-      "camera/common/conf/sensor_meta.config";
-    FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
-      "camera/common/params";
-    cv::Mat cv_bgr = cv::imread("/apollo/modules/perception/testdata/"
-      "camera/common/img/origin.jpeg");
-    cv::Mat cv_gray = cv::imread("/apollo/modules/perception/testdata/"
-      "camera/common/img/origin.jpeg",
-      CV_LOAD_IMAGE_GRAYSCALE);
+    FLAGS_obs_sensor_meta_path =
+        "/apollo/modules/perception/testdata/"
+        "camera/common/conf/sensor_meta.config";
+    FLAGS_obs_sensor_intrinsic_path =
+        "/apollo/modules/perception/testdata/"
+        "camera/common/params";
+    cv::Mat cv_bgr = cv::imread(
+        "/apollo/modules/perception/testdata/"
+        "camera/common/img/origin.jpeg");
+    cv::Mat cv_gray = cv::imread(
+        "/apollo/modules/perception/testdata/"
+        "camera/common/img/origin.jpeg",
+        CV_LOAD_IMAGE_GRAYSCALE);
 
     base::Image8U bgr(cv_bgr.rows, cv_bgr.cols, base::Color::BGR);
     base::Image8U bgr_undistorted(cv_bgr.rows, cv_bgr.cols, base::Color::BGR);
@@ -83,8 +90,7 @@ TEST(UndistortionHandlerTest, test_undistortion) {
     base::Image8U gray_undistorted(cv_bgr.rows, cv_bgr.cols, base::Color::GRAY);
 
     for (int y = 0; y < cv_bgr.rows; ++y) {
-      memcpy(bgr.mutable_cpu_ptr(y), cv_bgr.ptr<uint8_t>(y),
-             bgr.width_step());
+      memcpy(bgr.mutable_cpu_ptr(y), cv_bgr.ptr<uint8_t>(y), bgr.width_step());
     }
 
     for (int y = 0; y < cv_gray.rows; ++y) {
@@ -107,8 +113,9 @@ TEST(UndistortionHandlerTest, test_verify) {
   unsetenv("CYBER_PATH");
   {
     // test RGB undistortion
-    cv::Mat rgb_image = cv::imread("/apollo/modules/perception/testdata/"
-      "camera/common/img/origin.jpeg");
+    cv::Mat rgb_image = cv::imread(
+        "/apollo/modules/perception/testdata/"
+        "camera/common/img/origin.jpeg");
     int img_width = rgb_image.cols;
     int img_height = rgb_image.rows;
 
@@ -126,7 +133,7 @@ TEST(UndistortionHandlerTest, test_verify) {
       for (int c = 0; c < img_width; ++c) {
         for (int ch = 0; ch < 3; ++ch) {
           rgb_orig[r * img_width * 3 + c * 3 + ch] =
-            rgb_image.at<cv::Vec3b>(r, c)[ch];
+              rgb_image.at<cv::Vec3b>(r, c)[ch];
         }
       }
     }
@@ -134,10 +141,11 @@ TEST(UndistortionHandlerTest, test_verify) {
     ImageGpuPreprocessHandler handler;
     lib::Timer timer;
     timer.Start();
-    err = handler.init("/apollo/modules/perception/testdata/"
-      "camera/common/params/onsemi_obstacle_intrinsics.yaml", 0);
-    AINFO << "Time cost rgb with undistort init : "
-      << timer.End("") << " us";
+    err = handler.init(
+        "/apollo/modules/perception/testdata/"
+        "camera/common/params/onsemi_obstacle_intrinsics.yaml",
+        0);
+    AINFO << "Time cost rgb with undistort init : " << timer.End("") << " us";
 
     EXPECT_EQ(err, 0);
 
@@ -150,7 +158,7 @@ TEST(UndistortionHandlerTest, test_verify) {
       err += handler.handle(rgb_orig.data(), rgb);
     }
     AINFO << "Time cost rgb with undistort handle : "
-      << (timer.End("") / num_repeats) << " us";
+          << (timer.End("") / num_repeats) << " us";
 
     EXPECT_EQ(err, 0);
 
@@ -159,16 +167,19 @@ TEST(UndistortionHandlerTest, test_verify) {
       cv::imwrite("undistorted_old.jpg", in_image);
     }
 
-    delete [] rgb;
+    delete[] rgb;
   }
 
   {
-    FLAGS_obs_sensor_meta_path = "/apollo/modules/perception/testdata/"
-      "camera/common/conf/sensor_meta.config";
-    FLAGS_obs_sensor_intrinsic_path = "/apollo/modules/perception/testdata/"
-      "camera/common/params";
-    cv::Mat cv_img = cv::imread("/apollo/modules/perception/testdata/"
-      "camera/common/img/origin.jpeg");
+    FLAGS_obs_sensor_meta_path =
+        "/apollo/modules/perception/testdata/"
+        "camera/common/conf/sensor_meta.config";
+    FLAGS_obs_sensor_intrinsic_path =
+        "/apollo/modules/perception/testdata/"
+        "camera/common/params";
+    cv::Mat cv_img = cv::imread(
+        "/apollo/modules/perception/testdata/"
+        "camera/common/img/origin.jpeg");
 
     base::Image8U image(cv_img.rows, cv_img.cols, base::Color::BGR);
     base::Image8U undistorted(cv_img.rows, cv_img.cols, base::Color::BGR);

@@ -283,8 +283,7 @@ template <typename PointT>
 void CalculateDistAndDirToBoundary(
     const Eigen::Matrix<typename PointT::Type, 3, 1> &pt,
     const base::PointCloud<PointT> &left_boundary,
-    const base::PointCloud<PointT> &right_boundary,
-    typename PointT::Type *dist,
+    const base::PointCloud<PointT> &right_boundary, typename PointT::Type *dist,
     Eigen::Matrix<typename PointT::Type, 3, 1> *dir) {
   using Type = typename PointT::Type;
   Type dist_to_left = std::numeric_limits<Type>::max();

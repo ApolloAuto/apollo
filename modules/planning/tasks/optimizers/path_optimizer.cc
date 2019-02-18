@@ -29,7 +29,7 @@ using apollo::common::Status;
 
 PathOptimizer::PathOptimizer(const TaskConfig& config) : Task(config) {}
 
-apollo::common::Status PathOptimizer::Execute(
+Status PathOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {
   Task::Execute(frame, reference_line_info);
   auto ret = Process(

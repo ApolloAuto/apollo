@@ -100,9 +100,19 @@ Status LonController::Init(const ControlConf *control_conf) {
   }
   const LonControllerConf &lon_controller_conf =
       control_conf_->lon_controller_conf();
+  double ts = lon_controller_conf.ts();
+  bool enable_leadlag =
+    lon_controller_conf.enable_reverse_leadlag_compensation();
 
   station_pid_controller_.Init(lon_controller_conf.station_pid_conf());
   speed_pid_controller_.Init(lon_controller_conf.low_speed_pid_conf());
+
+  if (enable_leadlag) {
+    station_leadlag_controller_.Init(lon_controller_conf.
+      reverse_station_leadlag_conf(), ts);
+    speed_leadlag_controller_.Init(lon_controller_conf.
+      reverse_speed_leadlag_conf(), ts);
+  }
 
   vehicle_param_.CopyFrom(
       common::VehicleConfigHelper::Instance()->GetConfig().vehicle_param());
@@ -170,6 +180,8 @@ Status LonController::ComputeControlCommand(
   double throttle_cmd = 0.0;
   double ts = lon_controller_conf.ts();
   double preview_time = lon_controller_conf.preview_window() * ts;
+  bool enable_leadlag =
+    lon_controller_conf.enable_reverse_leadlag_compensation();
 
   if (preview_time < 0.0) {
     const auto error_msg = common::util::StrCat(
@@ -194,6 +206,12 @@ Status LonController::ComputeControlCommand(
     station_pid_controller_.SetPID(
         lon_controller_conf.reverse_station_pid_conf());
     speed_pid_controller_.SetPID(lon_controller_conf.reverse_speed_pid_conf());
+    if (enable_leadlag) {
+      station_leadlag_controller_.SetLeadlag(
+          lon_controller_conf.reverse_station_leadlag_conf());
+      speed_leadlag_controller_.SetLeadlag(lon_controller_conf.
+        reverse_speed_leadlag_conf());
+    }
   } else if (VehicleStateProvider::Instance()->linear_velocity() <=
              lon_controller_conf.switch_speed()) {
     speed_pid_controller_.SetPID(lon_controller_conf.low_speed_pid_conf());
@@ -203,6 +221,10 @@ Status LonController::ComputeControlCommand(
 
   double speed_offset =
       station_pid_controller_.Control(station_error_limited, ts);
+  if (enable_leadlag) {
+    speed_offset =
+        station_leadlag_controller_.Control(speed_offset, ts);
+  }
 
   double speed_controller_input = 0.0;
   double speed_controller_input_limit =
@@ -221,6 +243,14 @@ Status LonController::ComputeControlCommand(
 
   acceleration_cmd_closeloop =
       speed_pid_controller_.Control(speed_controller_input_limited, ts);
+  debug->set_pid_saturation_status(speed_pid_controller_.
+        IntegratorSaturationStatus());
+  if (enable_leadlag) {
+    acceleration_cmd_closeloop =
+        speed_leadlag_controller_.Control(acceleration_cmd_closeloop, ts);
+    debug->set_leadlag_saturation_status(speed_leadlag_controller_.
+      InnerstateSaturationStatus());
+  }
 
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(VehicleStateProvider::Instance()->pitch()));

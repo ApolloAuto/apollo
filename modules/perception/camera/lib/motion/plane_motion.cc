@@ -46,15 +46,15 @@ PlaneMotion::~PlaneMotion(void) {
 
 // Generate the inverse motion for past trajectory
 void PlaneMotion::generate_motion_matrix(base::VehicleStatus *vehicledata) {
-  float time_d = static_cast<float> (vehicledata->time_d);
+  float time_d = static_cast<float>(vehicledata->time_d);
   if (!is_3d_motion_) {
     base::MotionType motion_2d = base::MotionType::Identity();
     float theta = time_d * vehicledata->yaw_rate;
     Eigen::Rotation2Df rot2d(theta);
     Eigen::Vector2f trans;
-    float velocity = static_cast<float> (sqrt(
-            vehicledata->velocity_x * vehicledata->velocity_x
-            + vehicledata->velocity_y * vehicledata->velocity_y));
+    float velocity = static_cast<float>(
+        sqrt(vehicledata->velocity_x * vehicledata->velocity_x +
+             vehicledata->velocity_y * vehicledata->velocity_y));
     float displacement = time_d * velocity;
     trans(0) = static_cast<float>(displacement * cos(theta));
     trans(1) = static_cast<float>(displacement * sin(theta));
@@ -81,9 +81,10 @@ void PlaneMotion::generate_motion_matrix(base::VehicleStatus *vehicledata) {
 
     float displacement = time_d * vehicledata->velocity;
     Eigen::Vector3f trans;
-    trans(0) = static_cast<float>(sqrt(
-        displacement * displacement / (tan(yaw_delta) * tan(yaw_delta) +
-        tan(pitch_delta) * tan(pitch_delta) + 1)));
+    trans(0) =
+        static_cast<float>(sqrt(displacement * displacement /
+                                (tan(yaw_delta) * tan(yaw_delta) +
+                                 tan(pitch_delta) * tan(pitch_delta) + 1)));
     trans(1) = static_cast<float>(tan(yaw_delta) * trans(0));
     trans(2) = static_cast<float>(tan(pitch_delta) * trans(0));
 
@@ -133,7 +134,7 @@ void PlaneMotion::update_motion_buffer(const base::VehicleStatus &vehicledata,
   // reset motion buffer
   mat_motion_sensor_ =
       base::MotionType::Identity();  // reset image accumulated motion
-  time_difference_ = 0.0f;     // reset the accumulated time difference
+  time_difference_ = 0.0f;           // reset the accumulated time difference
 }
 
 bool PlaneMotion::find_motion_with_timestamp(double timestamp,
@@ -201,4 +202,3 @@ void PlaneMotion::add_new_motion(double pre_image_timestamp,
 }  // namespace camera
 }  // namespace perception
 }  // namespace apollo
-

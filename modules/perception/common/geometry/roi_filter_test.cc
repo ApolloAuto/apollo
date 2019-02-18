@@ -29,8 +29,8 @@ using apollo::perception::base::HdmapStruct;
 using HdmapStructConstPtr =
     std::shared_ptr<const apollo::perception::base::HdmapStruct>;
 using HdmapStructPtr = std::shared_ptr<apollo::perception::base::HdmapStruct>;
-using apollo::perception::base::PointD;
 using apollo::perception::base::Object;
+using apollo::perception::base::PointD;
 using ObjectConstPtr = std::shared_ptr<const apollo::perception::base::Object>;
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
 

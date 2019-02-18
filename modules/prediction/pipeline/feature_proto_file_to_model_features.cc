@@ -138,8 +138,8 @@ void OfflineProcessFeatureProtoFile(
   if (list_data_for_learning.data_for_learning_size() <= 0) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
-    apollo::common::util::SetProtoToBinaryFile(list_data_for_learning,
-                                               output_filename);
+    apollo::cyber::common::SetProtoToBinaryFile(
+        list_data_for_learning, output_filename);
   }
 }
 

@@ -122,8 +122,8 @@ int main(int argc, char **argv) {
       std::vector<float> tmp_vec(blob->cpu_data(),
                                  blob->cpu_data() + blob->count());
       // if(output_name=="conv2" || output_name == "conv1") {
-      AINFO << output_name << " " << blob->channels() << " "
-            << blob->height() << " " << blob->width();
+      AINFO << output_name << " " << blob->channels() << " " << blob->height()
+            << " " << blob->width();
       double sum = 0;
       for (int i = 0; i < blob->count(); ++i) {
         sum += blob->cpu_data()[i];

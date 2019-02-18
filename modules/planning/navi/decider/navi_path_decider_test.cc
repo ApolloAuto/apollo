@@ -162,7 +162,7 @@ TEST_F(NaviPathDeciderTest, KeepLane) {
       vehicle_state, plan_start_point, ref_line, route_segments);
   LocalView local_view;
   navi_path_decider.frame_ = new Frame(1, local_view, plan_start_point,
-                                       vehicle_state, nullptr, nullptr);
+                                       vehicle_state, nullptr);
   DCHECK_NOTNULL(navi_path_decider.reference_line_info_);
   DCHECK_NOTNULL(navi_path_decider.frame_);
   GeneratePathData(kMaxS, 0.19, 0.03, &path_points);
