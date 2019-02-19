@@ -56,7 +56,7 @@ Status SpeedBoundsDecider::Process(
   if (boundary_mapper.CreateStBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
     const std::string msg =
-        "Mapping obstacle for dp st speed optimizer failed.";
+        "Mapping obstacle failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -83,7 +83,7 @@ Status SpeedBoundsDecider::Process(
   if (!speed_limit_decider
            .GetSpeedLimits(path_decision->obstacles(), &speed_limit)
            .ok()) {
-    std::string msg("Getting speed limits for dp st speed optimizer failed!");
+    std::string msg("Getting speed limits failed!");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -96,7 +96,7 @@ Status SpeedBoundsDecider::Process(
   const double total_time_by_conf = speed_bounds_config_.total_time();
 
   // Load generated st graph data back to frame
-  StGraphData *const st_graph_data =
+  StGraphData* st_graph_data =
       reference_line_info_->mutable_st_graph_data();
 
   // Add a st_graph debug info and save the pointer to st_graph_data for
