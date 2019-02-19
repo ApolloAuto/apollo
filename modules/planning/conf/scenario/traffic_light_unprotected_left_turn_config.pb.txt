@@ -16,8 +16,10 @@ stage_config: {
   task_type: DECIDER_CREEP
   task_type: DP_POLY_PATH_OPTIMIZER
   task_type: PATH_DECIDER
+  task_type: SPEED_BOUNDS_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_DECIDER
   task_type: PROCEED_WITH_CAUTION_SPEED
   task_config: {
     task_type: DECIDER_RULE_BASED_STOP
@@ -51,6 +53,9 @@ stage_config: {
       max_distance: 5.0
     }
   }
+  task_config: {
+    task_type: SPEED_BOUNDS_DECIDER
+  }
 }
 
 stage_config: {
@@ -59,8 +64,10 @@ stage_config: {
   task_type: DECIDER_RULE_BASED_STOP
   task_type: DP_POLY_PATH_OPTIMIZER
   task_type: PATH_DECIDER
+  task_type: SPEED_BOUNDS_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_DECIDER
   task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
   task_config: {
     task_type: DECIDER_RULE_BASED_STOP
@@ -79,5 +86,8 @@ stage_config: {
   }
   task_config: {
     task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_DECIDER
   }
 }
