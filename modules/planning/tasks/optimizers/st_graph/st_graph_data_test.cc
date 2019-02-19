@@ -40,9 +40,9 @@ TEST(StGraphDataTest, basic_test) {
   traj_point.set_relative_time(1010.022);
 
   SpeedLimit speed_limit;
-  double path_data_length = 0.0;
-  double path_length_by_conf = 0.0;
-  double total_time_by_conf = 0.0;
+  double path_data_length = 100.0;
+  double path_length_by_conf = 100.0;
+  double total_time_by_conf = 7.0;
   planning_internal::STGraphDebug* st_graph_debug = nullptr;
   StGraphData st_graph_data;
   st_graph_data.LoadData(boundary_vec, traj_point, speed_limit,
