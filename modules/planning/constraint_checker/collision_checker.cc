@@ -55,19 +55,19 @@ bool CollisionChecker::InCollision(
     const DiscretizedTrajectory& ego_trajectory, const double ego_length,
     const double ego_width, const double ego_back_edge_to_center) {
   for (size_t i = 0; i < ego_trajectory.NumOfPoints(); ++i) {
-    const auto& ego_point = ego_trajectory.TrajectoryPointAt(
-        static_cast<std::uint32_t>(i));
+    const auto& ego_point =
+        ego_trajectory.TrajectoryPointAt(static_cast<std::uint32_t>(i));
     const auto relative_time = ego_point.relative_time();
     const auto ego_theta = ego_point.path_point().theta();
 
     Box2d ego_box({ego_point.path_point().x(), ego_point.path_point().y()},
-        ego_theta, ego_length, ego_width);
+                  ego_theta, ego_length, ego_width);
 
     // correct the inconsistency of reference point and center point
     // TODO(all): move the logic before constructing the ego_box
     double shift_distance = ego_length / 2.0 - ego_back_edge_to_center;
-    Vec2d shift_vec(shift_distance * std::cos(ego_theta), shift_distance
-        * std::sin(ego_theta));
+    Vec2d shift_vec(shift_distance * std::cos(ego_theta),
+                    shift_distance * std::sin(ego_theta));
     ego_box.Shift(shift_vec);
 
     std::vector<Box2d> obstacle_boxes;
@@ -92,8 +92,8 @@ bool CollisionChecker::InCollision(
   double ego_width = vehicle_config.vehicle_param().width();
 
   for (size_t i = 0; i < discretized_trajectory.NumOfPoints(); ++i) {
-    const auto& trajectory_point = discretized_trajectory.TrajectoryPointAt(
-        static_cast<std::uint32_t>(i));
+    const auto& trajectory_point =
+        discretized_trajectory.TrajectoryPointAt(static_cast<std::uint32_t>(i));
     double ego_theta = trajectory_point.path_point().theta();
     Box2d ego_box(
         {trajectory_point.path_point().x(), trajectory_point.path_point().y()},

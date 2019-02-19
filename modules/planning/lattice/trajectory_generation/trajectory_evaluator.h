@@ -95,8 +95,8 @@ class TrajectoryEvaluator {
       const PlanningTarget& planning_target) const;
 
   bool InterpolateDenseStPoints(
-      const std::vector<apollo::common::SpeedPoint>& st_points,
-      double t, double *traj_s) const;
+      const std::vector<apollo::common::SpeedPoint>& st_points, double t,
+      double* traj_s) const;
 
   struct CostComparator
       : public std::binary_function<const PairCost&, const PairCost&, bool> {

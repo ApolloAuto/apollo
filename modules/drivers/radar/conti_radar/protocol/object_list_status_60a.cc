@@ -25,8 +25,8 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-using apollo::drivers::canbus::Byte;
 using apollo::drivers::ContiRadarObs;
+using apollo::drivers::canbus::Byte;
 
 ObjectListStatus60A::ObjectListStatus60A() {}
 const uint32_t ObjectListStatus60A::ID = 0x60A;

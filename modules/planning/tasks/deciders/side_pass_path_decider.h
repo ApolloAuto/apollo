@@ -56,9 +56,9 @@ class SidePassPathDecider : public Decider {
   bool DecideSidePassDirection(const std::vector<bool>& can_side_pass,
                                size_t left_length, size_t right_length);
 
-  bool GetLaneInfoFromPoint(
-    double point_x, double point_y, double point_z, double point_theta,
-    hdmap::LaneInfoConstPtr* const lane);
+  bool GetLaneInfoFromPoint(double point_x, double point_y, double point_z,
+                            double point_theta,
+                            hdmap::LaneInfoConstPtr* const lane);
 
   bool GeneratePath(Frame* const frame,
                     ReferenceLineInfo* const reference_line_info);

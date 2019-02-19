@@ -77,20 +77,20 @@ class OnlineVisualizerComponent final
   std::string map_folder_;
   std::string map_visual_folder_;
 
-  std::shared_ptr<cyber::Reader<LocalizationEstimate>>
-      lidar_local_listener_ = nullptr;
+  std::shared_ptr<cyber::Reader<LocalizationEstimate>> lidar_local_listener_ =
+      nullptr;
   std::string lidar_local_topic_ = "";
 
-  std::shared_ptr<cyber::Reader<LocalizationEstimate>>
-      gnss_local_listener_ = nullptr;
+  std::shared_ptr<cyber::Reader<LocalizationEstimate>> gnss_local_listener_ =
+      nullptr;
   std::string gnss_local_topic_ = "";
 
-  std::shared_ptr<cyber::Reader<LocalizationEstimate>>
-      fusion_local_listener_ = nullptr;
+  std::shared_ptr<cyber::Reader<LocalizationEstimate>> fusion_local_listener_ =
+      nullptr;
   std::string fusion_local_topic_ = "";
 
-  std::shared_ptr<cyber::Reader<LocalizationEstimate>>
-      ndt_local_listener_ = nullptr;
+  std::shared_ptr<cyber::Reader<LocalizationEstimate>> ndt_local_listener_ =
+      nullptr;
   std::string ndt_local_topic_ = "";
 };
 

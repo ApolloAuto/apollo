@@ -38,7 +38,7 @@ namespace common {
  * @brief A general class to denote the return status of an API call. It
  * can either be an OK status for success, or a failure status with error
  * message and error code enum.
-*/
+ */
 class Status {
  public:
   /**

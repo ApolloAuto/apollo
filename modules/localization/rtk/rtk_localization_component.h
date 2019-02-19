@@ -51,17 +51,16 @@ class RTKLocalizationComponent final
 
   void PublishPoseBroadcastTF(const LocalizationEstimate &localization);
   void PublishPoseBroadcastTopic(const LocalizationEstimate &localization);
-  void PublishLocalizationStatus(
-      const LocalizationStatus& localization_status);
+  void PublishLocalizationStatus(const LocalizationStatus &localization_status);
 
  private:
   std::shared_ptr<cyber::Reader<localization::CorrectedImu>>
       corrected_imu_listener_ = nullptr;
-  std::shared_ptr<cyber::Reader<drivers::gnss::InsStat>>
-      gps_status_listener_ = nullptr;
+  std::shared_ptr<cyber::Reader<drivers::gnss::InsStat>> gps_status_listener_ =
+      nullptr;
 
-  std::shared_ptr<cyber::Writer<LocalizationEstimate>>
-      localization_talker_ = nullptr;
+  std::shared_ptr<cyber::Writer<LocalizationEstimate>> localization_talker_ =
+      nullptr;
   std::shared_ptr<cyber::Writer<LocalizationStatus>>
       localization_status_talker_ = nullptr;
 

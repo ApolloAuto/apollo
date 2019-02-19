@@ -81,10 +81,9 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
     // Insert features to DataForLearning
-    if (FLAGS_prediction_offline_mode == 2 &&
-        !obstacle_ptr->IsNearJunction()) {
-      FeatureOutput::InsertDataForLearning(
-          *latest_feature_ptr, feature_values, "mlp");
+    if (FLAGS_prediction_offline_mode == 2 && !obstacle_ptr->IsNearJunction()) {
+      FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
+                                           "mlp");
       ADEBUG << "Save extracted features for learning locally.";
       return;  // Skip Compute probability for offline mode
     }
@@ -154,8 +153,8 @@ void MLPEvaluator::SetObstacleFeatureValues(
   std::vector<double> speeds;
   std::vector<double> timestamps;
 
-  double duration = obstacle_ptr->timestamp() -
-      FLAGS_prediction_trajectory_time_length;
+  double duration =
+      obstacle_ptr->timestamp() - FLAGS_prediction_trajectory_time_length;
   int count = 0;
   for (std::size_t i = 0; i < obstacle_ptr->history_size(); ++i) {
     const Feature& feature = obstacle_ptr->feature(i);

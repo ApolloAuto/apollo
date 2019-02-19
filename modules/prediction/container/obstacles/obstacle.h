@@ -47,12 +47,11 @@ class Obstacle {
   /**
    * @brief Constructor
    */
-  static std::unique_ptr<Obstacle>
-  Create(const perception::PerceptionObstacle& perception_obstacle,
+  static std::unique_ptr<Obstacle> Create(
+      const perception::PerceptionObstacle& perception_obstacle,
       const double timestamp, const int prediction_id);
 
-  static std::unique_ptr<Obstacle>
-  Create(const Feature& feature);
+  static std::unique_ptr<Obstacle> Create(const Feature& feature);
 
   /**
    * @brief Destructor
@@ -300,8 +299,8 @@ class Obstacle {
 
   void InsertFeatureToHistory(const Feature& feature);
 
-  void SetJunctionFeatureWithEnterLane(
-      const std::string& enter_lane_id, Feature* const feature_ptr);
+  void SetJunctionFeatureWithEnterLane(const std::string& enter_lane_id,
+                                       Feature* const feature_ptr);
 
   void SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr);
 

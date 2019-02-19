@@ -54,9 +54,9 @@ class CruiseMLPEvaluator : public Evaluator {
                             std::vector<double>* feature_values);
 
   /**
-    * @brief Get the name of evaluator.
-    */
-  std::string GetName() override {return "CRUISE_MLP_EVALUATOR";}
+   * @brief Get the name of evaluator.
+   */
+  std::string GetName() override { return "CRUISE_MLP_EVALUATOR"; }
 
   void Clear();
 

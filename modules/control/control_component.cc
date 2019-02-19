@@ -41,8 +41,8 @@ bool ControlComponent::Init() {
 
   AINFO << "Control init, starting ...";
 
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_control_conf_file,
-                                        &control_conf_))
+  CHECK(
+      cyber::common::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";

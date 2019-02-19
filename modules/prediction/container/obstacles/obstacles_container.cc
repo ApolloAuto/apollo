@@ -16,8 +16,8 @@
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
-#include <utility>
 #include <unordered_set>
+#include <utility>
 
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
@@ -180,8 +180,8 @@ ObstaclesContainer::curr_frame_non_predictable_obstacle_ids() {
 std::vector<int> ObstaclesContainer::curr_frame_obstacle_ids() {
   std::vector<int> curr_frame_obs_ids = curr_frame_predictable_obstacle_ids_;
   curr_frame_obs_ids.insert(curr_frame_obs_ids.end(),
-      curr_frame_non_predictable_obstacle_ids_.begin(),
-      curr_frame_non_predictable_obstacle_ids_.end());
+                            curr_frame_non_predictable_obstacle_ids_.begin(),
+                            curr_frame_non_predictable_obstacle_ids_.end());
   return curr_frame_obs_ids;
 }
 
@@ -211,8 +211,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     obstacle_ptr->Insert(perception_obstacle, timestamp, id);
     ADEBUG << "Refresh obstacle [" << id << "]";
   } else {
-    auto ptr_obstacle = Obstacle::Create(
-        perception_obstacle, timestamp, id);
+    auto ptr_obstacle = Obstacle::Create(perception_obstacle, timestamp, id);
     if (ptr_obstacle == nullptr) {
       AERROR << "Failed to insert obstacle into container";
       return;
@@ -278,8 +277,8 @@ void ObstaclesContainer::BuildCurrentFrameIdMapping(
         seen_prediction_ids.insert(prediction_id);
       }
     } else {  // process adaption
-      common::util::Node<int, std::unique_ptr<Obstacle>>*
-      curr = ptr_obstacles_.First();
+      common::util::Node<int, std::unique_ptr<Obstacle>>* curr =
+          ptr_obstacles_.First();
       while (curr != nullptr) {
         int obs_id = curr->key;
         curr = curr->next;
@@ -352,7 +351,7 @@ void ObstaclesContainer::BuildJunctionFeature() {
     const std::string& junction_id = JunctionAnalyzer::GetJunctionId();
     if (obstacle_ptr->IsInJunction(junction_id)) {
       ADEBUG << "Build junction feature for obstacle [" << obstacle_ptr->id()
-            << "] in junction [" << junction_id << "]";
+             << "] in junction [" << junction_id << "]";
       obstacle_ptr->BuildJunctionFeature();
     }
   }
@@ -369,12 +368,12 @@ bool ObstaclesContainer::AdaptTracking(
   if (perception_obstacle.has_position() &&
       perception_obstacle.position().has_x() &&
       perception_obstacle.position().has_y()) {
-    double obs_x = obstacle_ptr->latest_feature().position().x() + (timestamp_ -
-                   obstacle_ptr->latest_feature().timestamp()) *
-                   obstacle_ptr->latest_feature().raw_velocity().x();
-    double obs_y = obstacle_ptr->latest_feature().position().y() + (timestamp_ -
-                   obstacle_ptr->latest_feature().timestamp()) *
-                   obstacle_ptr->latest_feature().raw_velocity().y();
+    double obs_x = obstacle_ptr->latest_feature().position().x() +
+                   (timestamp_ - obstacle_ptr->latest_feature().timestamp()) *
+                       obstacle_ptr->latest_feature().raw_velocity().x();
+    double obs_y = obstacle_ptr->latest_feature().position().y() +
+                   (timestamp_ - obstacle_ptr->latest_feature().timestamp()) *
+                       obstacle_ptr->latest_feature().raw_velocity().y();
     double vel_x = obstacle_ptr->latest_feature().raw_velocity().x();
     double vel_y = obstacle_ptr->latest_feature().raw_velocity().y();
     double vel = std::hypot(vel_x, vel_y);
@@ -399,9 +398,7 @@ bool ObstaclesContainer::IsPredictable(
   return true;
 }
 
-double ObstaclesContainer::timestamp() const {
-  return timestamp_;
-}
+double ObstaclesContainer::timestamp() const { return timestamp_; }
 
 }  // namespace prediction
 }  // namespace apollo

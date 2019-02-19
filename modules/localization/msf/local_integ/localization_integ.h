@@ -71,9 +71,9 @@ class LocalizationInteg {
   // gnss heading process
   void GnssHeadingProcess(const drivers::gnss::Heading &gnss_heading_msg);
 
-  const LocalizationResult& GetLastestLidarLocalization() const;
-  const LocalizationResult& GetLastestIntegLocalization() const;
-  const LocalizationResult& GetLastestGnssLocalization() const;
+  const LocalizationResult &GetLastestLidarLocalization() const;
+  const LocalizationResult &GetLastestIntegLocalization() const;
+  const LocalizationResult &GetLastestGnssLocalization() const;
 
  protected:
   void TransferImuFlu(const drivers::gnss::Imu &imu_msg, ImuData *imu_data);

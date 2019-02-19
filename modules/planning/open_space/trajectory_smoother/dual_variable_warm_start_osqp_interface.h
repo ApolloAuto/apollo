@@ -21,8 +21,8 @@
 #pragma once
 
 #include <limits>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "Eigen/Dense"
 #include "osqp/include/osqp.h"
@@ -38,9 +38,9 @@ class DualVariableWarmStartOSQPInterface {
  public:
   DualVariableWarmStartOSQPInterface(
       size_t horizon, double ts, const Eigen::MatrixXd& ego,
-      const Eigen::MatrixXi& obstacles_edges_num,
-      const size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
-      const Eigen::MatrixXd& obstacles_b, const Eigen::MatrixXd& xWS,
+      const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
+      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+      const Eigen::MatrixXd& xWS,
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DualVariableWarmStartOSQPInterface() = default;
@@ -50,13 +50,12 @@ class DualVariableWarmStartOSQPInterface {
 
   bool optimize();
 
-  void assemble_P(std::vector<c_float>* P_data,
-      std::vector<c_int>* P_indices,
-      std::vector<c_int>* P_indptr);
+  void assemble_P(std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
+                  std::vector<c_int>* P_indptr);
 
   void assemble_constraint(std::vector<c_float>* A_data,
-      std::vector<c_int>* A_indices,
-      std::vector<c_int>* A_indptr);
+                           std::vector<c_int>* A_indices,
+                           std::vector<c_int>* A_indptr);
 
  private:
   int num_of_variables_;

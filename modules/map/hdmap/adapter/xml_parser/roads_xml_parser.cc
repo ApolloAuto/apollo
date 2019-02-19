@@ -82,7 +82,7 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
 }
 
 void RoadsXmlParser::Parse_road_objects(const tinyxml2::XMLElement& xml_node,
-                                    RoadInternal* road_info) {
+                                        RoadInternal* road_info) {
   CHECK_NOTNULL(road_info);
 
   // objects
@@ -104,15 +104,14 @@ void RoadsXmlParser::Parse_road_objects(const tinyxml2::XMLElement& xml_node,
 }
 
 void RoadsXmlParser::Parse_road_signals(const tinyxml2::XMLElement& xml_node,
-                                    RoadInternal* road_info) {
+                                        RoadInternal* road_info) {
   CHECK_NOTNULL(road_info);
 
   // signals
   auto sub_node = xml_node.FirstChildElement("signals");
   if (sub_node != nullptr) {
     // traffic lights
-    SignalsXmlParser::ParseTrafficLights(*sub_node,
-                                      &road_info->traffic_lights);
+    SignalsXmlParser::ParseTrafficLights(*sub_node, &road_info->traffic_lights);
     // stop signs
     SignalsXmlParser::ParseStopSigns(*sub_node, &road_info->stop_signs);
     // yield signs
@@ -121,7 +120,7 @@ void RoadsXmlParser::Parse_road_signals(const tinyxml2::XMLElement& xml_node,
 }
 
 Status RoadsXmlParser::to_pb_road_type(const std::string& type,
-                                    PbRoadType* pb_road_type) {
+                                       PbRoadType* pb_road_type) {
   CHECK_NOTNULL(pb_road_type);
 
   std::string upper_type = UtilXmlParser::ToUpper(type);
@@ -135,8 +134,8 @@ Status RoadsXmlParser::to_pb_road_type(const std::string& type,
   } else if (upper_type == "PARK") {
     *pb_road_type = apollo::hdmap::Road::PARK;
   } else {
-      std::string err_msg = "Error or unsupport road type";
-      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    std::string err_msg = "Error or unsupport road type";
+    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
 
   return Status::OK();

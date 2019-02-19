@@ -40,8 +40,7 @@ TEST_F(Fbs3237Test, reset) {
   EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().eps_streeingmode(), 1);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().epsdrvinputtrqvalue(),
                    -19.5508);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().epsconsumedcurrvalue(),
-                   127);
+  EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().epsconsumedcurrvalue(), 127);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().fbs3_237().epscurrmod(), 2);
 }
 

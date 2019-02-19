@@ -94,8 +94,7 @@ void FeatureOutput::InsertDataForLearning(
 }
 
 void FeatureOutput::InsertPredictionResult(
-    const int obstacle_id,
-    const PredictionObstacle& prediction_obstacle) {
+    const int obstacle_id, const PredictionObstacle& prediction_obstacle) {
   PredictionResult* prediction_result =
       list_prediction_result_.add_prediction_result();
   prediction_result->set_id(obstacle_id);
@@ -114,8 +113,8 @@ void FeatureOutput::WriteFeatureProto() {
   if (features_.feature_size() <= 0) {
     ADEBUG << "Skip writing empty feature.";
   } else {
-    const std::string file_name = StrCat(FLAGS_prediction_data_dir,
-        "/feature.", std::to_string(idx_feature_), ".bin");
+    const std::string file_name = StrCat(FLAGS_prediction_data_dir, "/feature.",
+                                         std::to_string(idx_feature_), ".bin");
     cyber::common::SetProtoToBinaryFile(features_, file_name);
     features_.Clear();
     ++idx_feature_;
@@ -126,8 +125,9 @@ void FeatureOutput::WriteDataForLearning() {
   if (list_data_for_learning_.data_for_learning().empty()) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
-    const std::string file_name = StrCat(FLAGS_prediction_data_dir,
-        "/datalearn.", std::to_string(idx_learning_), ".bin");
+    const std::string file_name =
+        StrCat(FLAGS_prediction_data_dir, "/datalearn.",
+               std::to_string(idx_learning_), ".bin");
     cyber::common::SetProtoToBinaryFile(list_data_for_learning_, file_name);
     list_data_for_learning_.Clear();
     ++idx_learning_;
@@ -138,8 +138,9 @@ void FeatureOutput::WritePredictionResult() {
   if (list_prediction_result_.prediction_result().empty()) {
     ADEBUG << "Skip writing empty prediction_result.";
   } else {
-    const std::string file_name = StrCat(FLAGS_prediction_data_dir,
-        "/prediction_result.", std::to_string(idx_prediction_result_), ".bin");
+    const std::string file_name =
+        StrCat(FLAGS_prediction_data_dir, "/prediction_result.",
+               std::to_string(idx_prediction_result_), ".bin");
     cyber::common::SetProtoToBinaryFile(list_prediction_result_, file_name);
     list_prediction_result_.Clear();
     ++idx_prediction_result_;
@@ -150,8 +151,9 @@ void FeatureOutput::WriteFrameEnv() {
   if (list_frame_env_.frame_env().empty()) {
     ADEBUG << "Skip writing empty prediction_result.";
   } else {
-    const std::string file_name = StrCat(FLAGS_prediction_data_dir,
-        "/frame_env.", std::to_string(idx_frame_env_), ".bin");
+    const std::string file_name =
+        StrCat(FLAGS_prediction_data_dir, "/frame_env.",
+               std::to_string(idx_frame_env_), ".bin");
     cyber::common::SetProtoToBinaryFile(list_frame_env_, file_name);
     list_frame_env_.Clear();
     ++idx_frame_env_;
@@ -168,9 +170,7 @@ int FeatureOutput::SizeOfPredictionResult() {
   return list_prediction_result_.prediction_result_size();
 }
 
-int FeatureOutput::SizeOfFrameEnv() {
-  return list_frame_env_.frame_env_size();
-}
+int FeatureOutput::SizeOfFrameEnv() { return list_frame_env_.frame_env_size(); }
 
 }  // namespace prediction
 }  // namespace apollo

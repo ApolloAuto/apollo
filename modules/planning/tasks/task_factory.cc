@@ -99,10 +99,9 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new SidePassSafety(config);
                          });
-  task_factory_.Register(TaskConfig::DECIDER_RSS,
-                         [](const TaskConfig& config) -> Task* {
-                           return new RssDecider(config);
-                         });
+  task_factory_.Register(
+      TaskConfig::DECIDER_RSS,
+      [](const TaskConfig& config) -> Task* { return new RssDecider(config); });
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =
         default_task_config;

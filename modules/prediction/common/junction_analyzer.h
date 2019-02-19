@@ -79,8 +79,8 @@ class JunctionAnalyzer {
    * @param start lane ID
    * @return Filtered junction exits
    */
-  static std::vector<JunctionExit>
-  GetJunctionExits(const std::string& start_lane_id);
+  static std::vector<JunctionExit> GetJunctionExits(
+      const std::string& start_lane_id);
 
   /**
    * @brief Determine if a lane with lane_id is an exit lane of this junction

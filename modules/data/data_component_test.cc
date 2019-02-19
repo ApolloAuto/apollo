@@ -36,9 +36,7 @@ using apollo::cyber::Writer;
 
 class DataComponentTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    SetupCyber();
-  }
+  virtual void SetUp() { SetupCyber(); }
 
  protected:
   void SetupCyber();

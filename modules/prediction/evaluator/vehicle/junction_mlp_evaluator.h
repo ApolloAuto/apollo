@@ -58,9 +58,9 @@ class JunctionMLPEvaluator : public Evaluator {
                             std::vector<double>* feature_values);
 
   /**
-    * @brief Get the name of evaluator.
-    */
-  std::string GetName() override {return "JUNCTION_MLP_EVALUATOR";}
+   * @brief Get the name of evaluator.
+   */
+  std::string GetName() override { return "JUNCTION_MLP_EVALUATOR"; }
 
  private:
   /**

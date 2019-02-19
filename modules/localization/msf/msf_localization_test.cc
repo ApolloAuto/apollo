@@ -24,9 +24,7 @@ namespace msf {
 
 class MSFLocalizationTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    msf_localizatoin_.reset(new MSFLocalization());
-  }
+  virtual void SetUp() { msf_localizatoin_.reset(new MSFLocalization()); }
 
  protected:
   std::unique_ptr<MSFLocalization> msf_localizatoin_;

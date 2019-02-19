@@ -91,8 +91,7 @@ Status NaviPlanning::InitFrame(const uint32_t sequence_num,
                                const TrajectoryPoint& planning_start_point,
                                const VehicleState& vehicle_state) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
-                         vehicle_state,
-                         reference_line_provider_.get()));
+                         vehicle_state, reference_line_provider_.get()));
 
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
@@ -472,8 +471,8 @@ Status NaviPlanning::Plan(
         stitching_trajectory.back());
   }
 
-  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
-      trajectory_pb);
+  auto status =
+      planner_->Plan(stitching_trajectory.back(), frame_.get(), trajectory_pb);
 
   ExportReferenceLineDebug(ptr_debug);
 

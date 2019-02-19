@@ -30,7 +30,7 @@ WeyVehicleFactory::CreateVehicleController() {
 std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>
 WeyVehicleFactory::CreateMessageManager() {
   return std::unique_ptr<MessageManager<::apollo::canbus::ChassisDetail>>(
-       new wey::WeyMessageManager());
+      new wey::WeyMessageManager());
 }
 
 }  // namespace canbus

@@ -38,8 +38,8 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using common::time::Clock;
 using common::TrajectoryPoint;
+using common::time::Clock;
 using hdmap::PathOverlap;
 using perception::TrafficLight;
 
@@ -71,11 +71,12 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::Process(
   const double wait_time =
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout = scenario_config_.creep_timeout();
-  auto *task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
-  if (task && task->CheckCreepDone(
-      *frame, reference_line_info,
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s,
-      wait_time, timeout)) {
+  auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
+  if (task &&
+      task->CheckCreepDone(
+          *frame, reference_line_info,
+          PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s,
+          wait_time, timeout)) {
     return FinishStage();
   }
 

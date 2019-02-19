@@ -34,7 +34,7 @@ namespace math {
 // i.e., f(x) = coef[0] + coef[1] * x + coef[2] * x^2 ...
 template <std::size_t N>
 double EvaluatePolynomial(const std::array<double, N + 1>& coef,
-    const double p) {
+                          const double p) {
   double r = 0.0;
   for (int i = N; i >= 0; --i) {
     r = r * p + coef[i];
@@ -62,8 +62,8 @@ std::array<double, N + 1> FitPolynomial(
   }
 
   Eigen::Matrix<double, N + 1, 1> t =
-      PseudoInverse<double, N + 1, N + 1>(X.transpose() * X) *
-      X.transpose() * Y;
+      PseudoInverse<double, N + 1, N + 1>(X.transpose() * X) * X.transpose() *
+      Y;
 
   std::array<double, N + 1> coefs;
   for (std::size_t i = 0; i < N + 1; ++i) {

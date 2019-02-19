@@ -52,8 +52,8 @@ void LocalizationMonitor::RunOnce(const double current_time) {
     return;
   }
 
-  static auto reader = manager->CreateReader<LocalizationStatus>(
-      FLAGS_localization_msf_status);
+  static auto reader =
+      manager->CreateReader<LocalizationStatus>(FLAGS_localization_msf_status);
   reader->Observe();
   const auto status = reader->GetLatestObserved();
 
@@ -74,15 +74,13 @@ void LocalizationMonitor::RunOnce(const double current_time) {
       break;
     case MeasureState::WARNNING:
       SummaryMonitor::EscalateStatus(
-          ComponentStatus::WARN,
-          StrCat("WARNNING: ", status->state_message()),
+          ComponentStatus::WARN, StrCat("WARNNING: ", status->state_message()),
           component_status);
       break;
     case MeasureState::ERROR:
-      SummaryMonitor::EscalateStatus(
-          ComponentStatus::WARN,
-          StrCat("ERROR: ", status->state_message()),
-          component_status);
+      SummaryMonitor::EscalateStatus(ComponentStatus::WARN,
+                                     StrCat("ERROR: ", status->state_message()),
+                                     component_status);
       break;
     case MeasureState::CRITICAL_ERROR:
       SummaryMonitor::EscalateStatus(
@@ -93,8 +91,7 @@ void LocalizationMonitor::RunOnce(const double current_time) {
     case MeasureState::FATAL_ERROR:
       SummaryMonitor::EscalateStatus(
           ComponentStatus::FATAL,
-          StrCat("FATAL_ERROR: ", status->state_message()),
-          component_status);
+          StrCat("FATAL_ERROR: ", status->state_message()), component_status);
       break;
     default:
       AFATAL << "Unknown fusion_status: " << status->fusion_status();

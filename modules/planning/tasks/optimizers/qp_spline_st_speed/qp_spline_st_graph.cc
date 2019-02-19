@@ -32,11 +32,11 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
 using apollo::common::ErrorCode;
 using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::common::VehicleParam;
+using apollo::common::time::Clock;
 
 QpSplineStGraph::QpSplineStGraph(Spline1dSolver* spline_solver,
                                  const QpStSpeedConfig& qp_st_speed_config,
@@ -361,8 +361,9 @@ Status QpSplineStGraph::AddCruiseReferenceLineKernel(const double weight) {
 
   if (t_evaluated_.size() > 0) {
     spline_kernel->AddReferenceLineKernelMatrix(
-        t_evaluated_, cruise_, weight * qp_st_speed_config_.total_time() /
-                                   static_cast<double>(t_evaluated_.size()));
+        t_evaluated_, cruise_,
+        weight * qp_st_speed_config_.total_time() /
+            static_cast<double>(t_evaluated_.size()));
   }
 
   return Status::OK();
@@ -477,8 +478,9 @@ bool QpSplineStGraph::AddDpStReferenceKernel(const double weight) const {
   auto* spline_kernel = spline_solver_->mutable_spline_kernel();
   if (!t_pos.empty()) {
     spline_kernel->AddReferenceLineKernelMatrix(
-        t_pos, s_pos, weight * qp_st_speed_config_.total_time() /
-                          static_cast<double>(t_pos.size()));
+        t_pos, s_pos,
+        weight * qp_st_speed_config_.total_time() /
+            static_cast<double>(t_pos.size()));
   }
   return true;
 }

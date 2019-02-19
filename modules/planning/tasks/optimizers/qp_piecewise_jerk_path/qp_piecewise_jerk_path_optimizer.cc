@@ -34,19 +34,21 @@ namespace {
 std::vector<std::pair<double, double>>::iterator min_pair_first(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::min_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.first < rhs.first;
-  });
+  return std::min_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.first < rhs.first;
+                          });
 }
 
 std::vector<std::pair<double, double>>::iterator max_pair_second(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::max_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.second < rhs.second;
-  });
+  return std::max_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.second < rhs.second;
+                          });
 }
 
 void assign_pair_first(std::vector<std::pair<double, double>>::iterator begin,

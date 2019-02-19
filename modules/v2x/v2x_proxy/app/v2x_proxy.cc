@@ -71,11 +71,11 @@ V2xProxy::V2xProxy()
     AFATAL << "Failed to init os interface or obu interface";
     return;
   }
-  first_flag_reader_ =
-      node_->CreateReader<StatusResponse>("/apollo/v2x/inner/sync_flag",
-              [this](const std::shared_ptr<const StatusResponse>& msg) {
-                  x2v_trafficlight_timer_->Start();
-              });
+  first_flag_reader_ = node_->CreateReader<StatusResponse>(
+      "/apollo/v2x/inner/sync_flag",
+      [this](const std::shared_ptr<const StatusResponse>& msg) {
+        x2v_trafficlight_timer_->Start();
+      });
   if (first_flag_reader_ == nullptr) {
     AERROR << "Create sync flag reader failed";
     exit(1);
@@ -86,11 +86,9 @@ V2xProxy::V2xProxy()
   init_flag_ = true;
 }
 
-bool V2xProxy::InitFlag() {
-  return init_flag_;
-}
+bool V2xProxy::InitFlag() { return init_flag_; }
 
-bool V2xProxy::TrafficLightProc(CurrentLaneTrafficLight *msg) {
+bool V2xProxy::TrafficLightProc(CurrentLaneTrafficLight* msg) {
   if (!msg->has_gps_x_m() || !msg->has_gps_y_m()) {
     AERROR << "Error::v2x trafficlight ignore, gps point is null";
     return false;

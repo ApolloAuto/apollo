@@ -44,8 +44,8 @@ namespace apollo {
 namespace canbus {
 namespace lincoln {
 
-using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::canbus::ChassisDetail;
+using ::apollo::drivers::canbus::ProtocolData;
 
 class LincolnMessageManagerTest : public ::testing::Test {
  public:

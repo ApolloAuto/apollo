@@ -77,8 +77,8 @@ TEST_F(MoveSequencePredictorTest, Polynomial) {
         *obstacle_ptr, lane_sequence, lon_end_state, &lon_coefficients);
     EXPECT_TRUE(ret_lon);
     std::array<double, 6> lat_coefficients;
-    bool ret_lat = predictor.GetLateralPolynomial(
-        *obstacle_ptr, lane_sequence, 3.0, &lat_coefficients);
+    bool ret_lat = predictor.GetLateralPolynomial(*obstacle_ptr, lane_sequence,
+                                                  3.0, &lat_coefficients);
     EXPECT_TRUE(ret_lat);
   }
 }

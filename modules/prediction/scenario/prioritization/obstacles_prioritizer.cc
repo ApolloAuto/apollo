@@ -26,10 +26,10 @@
 namespace apollo {
 namespace prediction {
 
-using common::adapter::AdapterConfig;
-using common::math::Vec2d;
-using common::math::Box2d;
 using apollo::perception::PerceptionObstacle;
+using common::adapter::AdapterConfig;
+using common::math::Box2d;
+using common::math::Vec2d;
 
 void ObstaclesPrioritizer::PrioritizeObstacles(
     const EnvironmentFeatures& environment_features,
@@ -40,16 +40,18 @@ void ObstaclesPrioritizer::PrioritizeObstacles(
 void ObstaclesPrioritizer::AssignIgnoreLevel(
     const EnvironmentFeatures& environment_features,
     const std::shared_ptr<ScenarioFeatures> ptr_scenario_features) {
-  auto obstacles_container = ContainerManager::Instance()->GetContainer<
-      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+  auto obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
 
   if (obstacles_container == nullptr) {
     AERROR << "Obstacles container pointer is a null pointer.";
     return;
   }
 
-  auto pose_container = ContainerManager::Instance()->GetContainer<
-      PoseContainer>(AdapterConfig::LOCALIZATION);
+  auto pose_container =
+      ContainerManager::Instance()->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
   if (pose_container == nullptr) {
     AERROR << "Pose container pointer is a null pointer.";
     return;
@@ -66,13 +68,13 @@ void ObstaclesPrioritizer::AssignIgnoreLevel(
   double pose_x = pose_obstacle_ptr->position().x();
   double pose_y = pose_obstacle_ptr->position().y();
 
-  ADEBUG << "Get pose (" << pose_x << ", " << pose_y
-         << ", " << pose_theta << ")";
+  ADEBUG << "Get pose (" << pose_x << ", " << pose_y << ", " << pose_theta
+         << ")";
 
   // Build rectangular scan_area
   Box2d scan_box({pose_x + FLAGS_scan_length / 2.0 * std::cos(pose_theta),
                   pose_y + FLAGS_scan_length / 2.0 * std::sin(pose_theta)},
-                  pose_theta, FLAGS_scan_length, FLAGS_scan_width);
+                 pose_theta, FLAGS_scan_length, FLAGS_scan_width);
 
   const auto& obstacle_ids =
       obstacles_container->curr_frame_predictable_obstacle_ids();
@@ -92,8 +94,8 @@ void ObstaclesPrioritizer::AssignIgnoreLevel(
 
     double pedestrian_like_nearby_lane_radius =
         FLAGS_pedestrian_nearby_lane_search_radius;
-    bool is_near_lane = PredictionMap::HasNearbyLane(obstacle_x, obstacle_y,
-        pedestrian_like_nearby_lane_radius);
+    bool is_near_lane = PredictionMap::HasNearbyLane(
+        obstacle_x, obstacle_y, pedestrian_like_nearby_lane_radius);
 
     // Decide if we need consider this obstacle
     bool is_in_scan_area = scan_box.IsPointIn({obstacle_x, obstacle_y});
@@ -112,10 +114,10 @@ void ObstaclesPrioritizer::AssignIgnoreLevel(
 
     if (!need_consider) {
       latest_feature_ptr->mutable_priority()->set_priority(
-            ObstaclePriority::IGNORE);
+          ObstaclePriority::IGNORE);
     } else {
       latest_feature_ptr->mutable_priority()->set_priority(
-            ObstaclePriority::NORMAL);
+          ObstaclePriority::NORMAL);
     }
   }
 }

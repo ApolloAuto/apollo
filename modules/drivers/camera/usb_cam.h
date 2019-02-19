@@ -73,8 +73,8 @@ using apollo::drivers::camera::config::IO_METHOD_MMAP;
 using apollo::drivers::camera::config::IO_METHOD_READ;
 using apollo::drivers::camera::config::IO_METHOD_UNKNOWN;
 using apollo::drivers::camera::config::IO_METHOD_USERPTR;
-using apollo::drivers::camera::config::YUYV;
 using apollo::drivers::camera::config::RGB;
+using apollo::drivers::camera::config::YUYV;
 
 // camera raw image struct
 struct CameraImage {

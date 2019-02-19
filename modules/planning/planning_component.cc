@@ -24,8 +24,8 @@
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/navi_planning.h"
-#include "modules/planning/open_space_planning.h"
 #include "modules/planning/on_lane_planning.h"
+#include "modules/planning/open_space_planning.h"
 
 namespace apollo {
 namespace planning {

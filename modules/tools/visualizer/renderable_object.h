@@ -48,7 +48,8 @@ class RenderableObject : protected QOpenGLFunctions {
   }
 
   int VertexBufferSize(void) const {
-    return vertex_count() * vertex_element_count() * static_cast<int>(sizeof(GLfloat));
+    return vertex_count() * vertex_element_count() *
+           static_cast<int>(sizeof(GLfloat));
   }
 
   void set_shader_program(
@@ -73,8 +74,9 @@ class RenderableObject : protected QOpenGLFunctions {
 
   virtual void SetupAllAttrPointer(void) {
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, vertex_element_count(), GL_FLOAT, GL_FALSE,
-                          static_cast<int>(sizeof(GLfloat)) * vertex_element_count(), 0);
+    glVertexAttribPointer(
+        0, vertex_element_count(), GL_FLOAT, GL_FALSE,
+        static_cast<int>(sizeof(GLfloat)) * vertex_element_count(), 0);
   }
 
   bool is_init_;

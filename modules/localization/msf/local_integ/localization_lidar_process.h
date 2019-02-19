@@ -137,9 +137,9 @@ class LocalizationLidarProcess {
   LidarState lidar_status_;
 
   LocalLidarStatus local_lidar_status_ =
-    LocalLidarStatus::MSF_LOCAL_LIDAR_UNDEFINED_STATUS;
+      LocalLidarStatus::MSF_LOCAL_LIDAR_UNDEFINED_STATUS;
   LocalLidarQuality local_lidar_quality_ =
-    LocalLidarQuality::MSF_LOCAL_LIDAR_BAD;
+      LocalLidarQuality::MSF_LOCAL_LIDAR_BAD;
 
   bool reinit_flag_ = false;
 

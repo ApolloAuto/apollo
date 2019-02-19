@@ -65,7 +65,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
 
   constexpr double kPassStopLineBuffer = 1.0;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double distance_adc_pass_traffic_light = adc_front_edge_s -
+  const double distance_adc_pass_traffic_light =
+      adc_front_edge_s -
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
   // passed stop line too far
   if (distance_adc_pass_traffic_light > kPassStopLineBuffer) {
@@ -92,8 +93,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
   return Stage::RUNNING;
 }
 
-Stage::StageStatus
-    TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
 
   next_stage_ = ScenarioConfig::NO_STAGE;
