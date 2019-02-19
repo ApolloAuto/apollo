@@ -35,6 +35,7 @@
 #include "modules/common/transform_listener/transform_listener.h"
 
 #include "ros/include/ros/ros.h"
+#include "std_msgs/Int32MultiArray.h"
 
 /**
  * @namespace apollo::common::adapter
@@ -321,6 +322,8 @@ class AdapterManager {
   REGISTER_ADAPTER(StreamStatus);
   REGISTER_ADAPTER(GnssHeading);
   REGISTER_ADAPTER(RtcmData);
+  REGISTER_ADAPTER(Ultrasound);
+  REGISTER_ADAPTER(Ultanalyse);
 
   DECLARE_SINGLETON(AdapterManager);
 };

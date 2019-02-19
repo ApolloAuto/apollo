@@ -146,3 +146,8 @@ DEFINE_string(heading_topic, "/apollo/sensor/gnss/heading",
               "gnss heading topic name");
 DEFINE_string(rtcm_data_topic, "/apollo/sensor/gnss/rtcm_data",
               "gnss rtcm data topic name");
+DEFINE_string(ultrasound_topic, "/ultrasound",
+              "the ultrasound (from rosserial) topic name");
+DEFINE_string(ultanalyse_topic, "/apollo/ultanalyse",
+              "Ultanalyse topic");
+

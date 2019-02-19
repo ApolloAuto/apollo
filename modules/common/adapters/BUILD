@@ -103,6 +103,7 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
         "//modules/routing/proto:routing_proto",
+        "//modules/drivers/ultanalyse/proto:ultanalyse_proto",
         "@glog",
     ],
 )

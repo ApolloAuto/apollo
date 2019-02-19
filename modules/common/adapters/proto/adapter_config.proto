@@ -84,6 +84,8 @@ message AdapterConfig {
     CAMERA_IMAGE_SHORT = 73;
 
     PLANNING_PAD = 74;
+    ULTRASOUND = 75;
+    ULTANALYSE = 76;
   }
   enum Mode {
     RECEIVE_ONLY = 0;

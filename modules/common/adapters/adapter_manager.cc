@@ -280,6 +280,12 @@ void AdapterManager::Init(const AdapterManagerConfig &configs) {
       case AdapterConfig::VELODYNE_SCAN_SPARSE_3:
         EnableVelodyneScanSparse3(config.topic(), config);
         break;
+      case AdapterConfig::ULTRASOUND:
+        EnableUltrasound(FLAGS_ultrasound_topic, config);
+        break;
+      case AdapterConfig::ULTANALYSE:
+        EnableUltrasound(FLAGS_ultanalyse_topic, config);
+        break;
 
       default:
         AERROR << "Unknown adapter config type!";

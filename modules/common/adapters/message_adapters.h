@@ -43,6 +43,7 @@
 #include "modules/drivers/proto/mobileye.pb.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/proto/ultrasonic_radar.pb.h"
+#include "modules/drivers/ultanalyse/proto/ultanalyse.pb.h"
 #include "modules/guardian/proto/guardian.pb.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
@@ -151,6 +152,9 @@ using VelodyneScanSparse2Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
 using PointCloudSparse3Adapter = Adapter<::sensor_msgs::PointCloud2>;
 using PointCloudSparseRaw3Adapter = Adapter<::sensor_msgs::PointCloud2>;
 using VelodyneScanSparse3Adapter = Adapter<velodyne_msgs::VelodyneScanUnified>;
+
+using UltrasoundAdapter = Adapter<::std_msgs::Int32MultiArray>;
+using UltanalyseAdapter = Adapter<apollo::ultanalyse::ObstAnalyse>;
 
 }  // namespace adapter
 }  // namespace common

@@ -1,0 +1,20 @@
+syntax = "proto2";
+package apollo.ultanalyse;
+
+import "modules/common/proto/header.proto";
+
+message ObstAnalyse {
+  optional apollo.common.Header header = 1;
+  optional bool obst_flag = 2;
+  optional int32 obst_number = 3;
+  repeated ObstInfo obstinfo = 4;
+}
+message ObstInfo{
+  optional double location_x = 1;
+  optional double location_y = 2;
+  optional int32 detec_sonar = 3;
+  optional double obst_distance = 4;
+}
+message ChassisUlt{
+  repeated double sonar_range = 1;
+}
