@@ -20,14 +20,15 @@
 
 #include "modules/planning/traffic_rules/signal_light.h"
 
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/planning_internal.pb.h"
+#include <algorithm>
 
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/traffic_rules/util.h"
 
 namespace apollo {
