@@ -27,9 +27,9 @@
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/scenarios/side_pass/stage_approach_obstacle.h"
 #include "modules/planning/scenarios/side_pass/stage_backup.h"
 #include "modules/planning/scenarios/side_pass/stage_detect_safety.h"
@@ -128,12 +128,11 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
         const_cast<Frame&>(frame).Find(front_blocking_obstacle_id);
     if (!front_blocking_obstacle) {
       ADEBUG << "Obstacle " << front_blocking_obstacle_id
-            << " not exist any more. Change scenario to default scenario.";
+             << " not exist any more. Change scenario to default scenario.";
       return false;
     }
     const auto& reference_line_info = frame.reference_line_info().front();
-    const double adc_front_edge_s =
-        reference_line_info.AdcSlBoundary().end_s();
+    const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
     const double distance =
         front_blocking_obstacle->PerceptionSLBoundary().start_s() -
         adc_front_edge_s;
@@ -142,7 +141,7 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
     if (!front_blocking_obstacle->IsStatic() ||
         distance > kSidePassMaxDistance) {
       ADEBUG << "Obstacle " << front_blocking_obstacle_id
-            << " starts to move. Change scenario to default scenario.";
+             << " starts to move. Change scenario to default scenario.";
       return false;
     }
     msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
@@ -164,8 +163,7 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 }
 
 bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
-  return (IsFarFromDestination(frame) &&
-          IsFarFromIntersection(frame) &&
+  return (IsFarFromDestination(frame) && IsFarFromIntersection(frame) &&
           HasBlockingObstacle(frame));
 }
 
@@ -205,14 +203,14 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
     auto distance = overlap.second.start_s - adc_sl_boundary.end_s();
     if (overlap.first == ReferenceLineInfo::SIGNAL) {
       if (distance < FLAGS_side_pass_min_signal_intersection_distance) {
-        ADEBUG << "Too close to signal intersection ("
-               << distance << "m); don't SIDE_PASS.";
+        ADEBUG << "Too close to signal intersection (" << distance
+               << "m); don't SIDE_PASS.";
         return false;
       }
     } else {
       if (distance < kClearDistance) {
-        ADEBUG << "Too close to overlap_type[" << overlap.first
-               << "] (" << distance << "m); don't SIDE_PASS";
+        ADEBUG << "Too close to overlap_type[" << overlap.first << "] ("
+               << distance << "m); don't SIDE_PASS";
         return false;
       }
     }
@@ -237,8 +235,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     const auto& side_pass_config = side_pass_context_.scenario_config_;
     if (IsBlockingObstacleToSidePass(
-            frame, obstacle,
-            side_pass_config.block_obstacle_min_speed(),
+            frame, obstacle, side_pass_config.block_obstacle_min_speed(),
             side_pass_config.min_front_obstacle_distance(),
             side_pass_config.enable_obstacle_blocked_check())) {
       exists_a_blocking_obstacle = true;
@@ -255,7 +252,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
         //            when SidePass obstacle decision impl is ready
         PlanningContext::GetScenarioInfo()
             ->side_pass_front_blocking_obstacle_id =
-                side_pass_context_.front_blocking_obstacle_id_;
+            side_pass_context_.front_blocking_obstacle_id_;
       }
     }
   }

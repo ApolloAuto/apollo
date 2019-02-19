@@ -41,12 +41,10 @@ bool ThresholdItem::InRange(const uint32_t seq_num, const double value) {
   return true;
 }
 
-void Threshold::AddItem(const std::string& id,
-               const uint32_t seq_num,
-               const double min_val,
-               const double max_val,
-               const uint32_t max_repeat_time,
-               const uint32_t max_time_interval) {
+void Threshold::AddItem(const std::string& id, const uint32_t seq_num,
+                        const double min_val, const double max_val,
+                        const uint32_t max_repeat_time,
+                        const uint32_t max_time_interval) {
   ThresholdItem& item = map_[id];
   item.repeat_time = max_repeat_time;
   item.last_seq_num = seq_num;
@@ -57,12 +55,10 @@ void Threshold::AddItem(const std::string& id,
   item.max_time_interval = max_time_interval;
 }
 
-bool Threshold::IsInRange(const std::string& id,
-                 const uint32_t seq_num,
-                 const double value) {
+bool Threshold::IsInRange(const std::string& id, const uint32_t seq_num,
+                          const double value) {
   if (map_.find(id) == map_.end()) {
     return false;
   }
   return map_[id].InRange(seq_num, value);
 }
-

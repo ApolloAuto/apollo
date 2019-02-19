@@ -183,8 +183,8 @@ void ReferenceLineInfo::InitFirstOverlaps() {
   if (!first_encounter_overlaps_.empty()) {
     std::sort(first_encounter_overlaps_.begin(),
               first_encounter_overlaps_.end(),
-              [](const std::pair<OverlapType, hdmap::PathOverlap> &a,
-                 const std::pair<OverlapType, hdmap::PathOverlap> &b) {
+              [](const std::pair<OverlapType, hdmap::PathOverlap>& a,
+                 const std::pair<OverlapType, hdmap::PathOverlap>& b) {
                 return a.second.start_s < b.second.start_s;
               });
   }

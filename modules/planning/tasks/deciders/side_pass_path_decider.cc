@@ -127,18 +127,19 @@ bool SidePassPathDecider::DecideSidePassDirection(
 
 bool SidePassPathDecider::GetLaneInfoFromPoint(
     double point_x, double point_y, double point_z, double point_theta,
-    hdmap::LaneInfoConstPtr* const lane) {
+    hdmap::LaneInfoConstPtr *const lane) {
   constexpr double kLaneSearchRadius = 1.0;
   constexpr double kLaneSearchMaxThetaDiff = M_PI / 3.0;
   double s = 0.0;
   double l = 0.0;
   if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
           common::util::MakePointENU(point_x, point_y, point_z),
-          kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff,
-          lane, &s, &l) != 0) {
+          kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff, lane, &s,
+          &l) != 0) {
     AERROR << "Failed to find nearest lane from map at position: "
-           << "(x, y, z) = (" << point_x << ", " << point_y << ", "
-           << point_z << ")" << ", heading = " << point_theta;
+           << "(x, y, z) = (" << point_x << ", " << point_y << ", " << point_z
+           << ")"
+           << ", heading = " << point_theta;
     return false;
   }
   return true;
@@ -152,12 +153,11 @@ bool SidePassPathDecider::GeneratePath(
 
   // Get the current LaneInfo of the ADC.
   hdmap::LaneInfoConstPtr lane;
-  if (!GetLaneInfoFromPoint(
-          adc_planning_start_point_.path_point().x(),
-          adc_planning_start_point_.path_point().y(),
-          adc_planning_start_point_.path_point().z(),
-          adc_planning_start_point_.path_point().theta(),
-          &lane)) {
+  if (!GetLaneInfoFromPoint(adc_planning_start_point_.path_point().x(),
+                            adc_planning_start_point_.path_point().y(),
+                            adc_planning_start_point_.path_point().z(),
+                            adc_planning_start_point_.path_point().theta(),
+                            &lane)) {
     return false;
   }
   curr_lane_ = lane->lane();
@@ -295,8 +295,7 @@ SidePassPathDecider::GetPathBoundaries(
     if (!FLAGS_side_pass_use_actual_laneinfo_for_path_generation ||
         !GetLaneInfoFromPoint(
             reference_line.GetReferencePoint(curr_s).x(),
-            reference_line.GetReferencePoint(curr_s).y(),
-            0.0,
+            reference_line.GetReferencePoint(curr_s).y(), 0.0,
             reference_line.GetReferencePoint(curr_s).heading(),
             &lane_info_ptr)) {
       ADEBUG << "Cannot find the true current lane; therefore, use the "

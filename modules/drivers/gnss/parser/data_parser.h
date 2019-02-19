@@ -79,18 +79,17 @@ class DataParser {
   std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
   std::shared_ptr<apollo::cyber::Writer<GnssStatus>> gnssstatus_writer_ =
       nullptr;
-  std::shared_ptr<apollo::cyber::Writer<InsStatus>> insstatus_writer_ =
+  std::shared_ptr<apollo::cyber::Writer<InsStatus>> insstatus_writer_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<GnssBestPose>> gnssbestpose_writer_ =
       nullptr;
-  std::shared_ptr<apollo::cyber::Writer<GnssBestPose>>
-      gnssbestpose_writer_ = nullptr;
   std::shared_ptr<apollo::cyber::Writer<apollo::localization::CorrectedImu>>
       corrimu_writer_ = nullptr;
   std::shared_ptr<apollo::cyber::Writer<Imu>> rawimu_writer_ = nullptr;
   std::shared_ptr<apollo::cyber::Writer<apollo::localization::Gps>>
       gps_writer_ = nullptr;
   std::shared_ptr<apollo::cyber::Writer<InsStat>> insstat_writer_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<GnssEphemeris>>
-      gnssephemeris_writer_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<GnssEphemeris>> gnssephemeris_writer_ =
+      nullptr;
   std::shared_ptr<apollo::cyber::Writer<EpochObservation>>
       epochobservation_writer_ = nullptr;
   std::shared_ptr<apollo::cyber::Writer<Heading>> heading_writer_ = nullptr;

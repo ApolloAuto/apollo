@@ -29,19 +29,19 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
 using apollo::common::Status;
+using apollo::common::time::Clock;
 using apollo::common::util::WithinBound;
 using apollo::perception::TrafficLight;
 
-DeciderRuleBasedStop::DeciderRuleBasedStop(
-    const TaskConfig& config) : Decider(config) {
+DeciderRuleBasedStop::DeciderRuleBasedStop(const TaskConfig& config)
+    : Decider(config) {
   CHECK(config.has_decider_rule_based_stop_config());
   SetName("DeciderRuleBasedStop");
 }
 
 Status DeciderRuleBasedStop::Process(Frame* frame,
-                                ReferenceLineInfo* reference_line_info) {
+                                     ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -53,13 +53,12 @@ Status DeciderRuleBasedStop::Process(Frame* frame,
 }
 
 void DeciderRuleBasedStop::CheckStopSign(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
   if (!config_.decider_rule_based_stop_config().stop_sign().enabled()) {
-      return;
+    return;
   }
 
   const std::string stop_sign_id =
@@ -79,25 +78,21 @@ void DeciderRuleBasedStop::CheckStopSign(
   const double stop_distance =
       config_.decider_rule_based_stop_config().stop_sign().stop_distance();
   ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
-      << "] stop_line_s[" << stop_line_s << "]";
+         << "] stop_line_s[" << stop_line_s << "]";
 
   BuildStopDecision(
-      frame, reference_line_info,
-      stop_wall_id,
-      stop_line_s,
-      stop_distance,
+      frame, reference_line_info, stop_wall_id, stop_line_s, stop_distance,
       StopReasonCode::STOP_REASON_STOP_SIGN,
       PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles);
 }
 
 void DeciderRuleBasedStop::CheckTrafficLight(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
   if (!config_.decider_rule_based_stop_config().traffic_light().enabled()) {
-      return;
+    return;
   }
 
   const std::string traffic_light_id =
@@ -111,8 +106,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     return;
   }
 
-  const TrafficLight traffic_light = ReadTrafficLight(
-      *frame, traffic_light_id);
+  const TrafficLight traffic_light = ReadTrafficLight(*frame, traffic_light_id);
 
   // TODO(all): add stop_deceleration check based on signal colors
 
@@ -131,27 +125,24 @@ void DeciderRuleBasedStop::CheckTrafficLight(
       config_.decider_rule_based_stop_config().traffic_light().stop_distance();
 
   ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
-      << "] stop_line_s[" << stop_line_s << "]";
+         << "] stop_line_s[" << stop_line_s << "]";
   std::vector<std::string> wait_for_obstacles;
-  BuildStopDecision(frame, reference_line_info,
-                    stop_wall_id,
-                    stop_line_s,
-                    stop_distance,
-                    StopReasonCode::STOP_REASON_SIGNAL,
+  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
+                    stop_distance, StopReasonCode::STOP_REASON_SIGNAL,
                     wait_for_obstacles);
 }
 
 TrafficLight DeciderRuleBasedStop::ReadTrafficLight(
-    const Frame& frame,
-    const std::string& traffic_light_id) {
+    const Frame& frame, const std::string& traffic_light_id) {
   const auto traffic_light_detection = frame.local_view().traffic_light;
   if (traffic_light_detection == nullptr) {
     ADEBUG << "traffic_light_detection is null";
   } else {
     const double delay = traffic_light_detection->header().timestamp_sec() -
-        Clock::NowInSeconds();
-    if (delay > config_.decider_rule_based_stop_config().traffic_light().
-        signal_expire_time_sec()) {
+                         Clock::NowInSeconds();
+    if (delay > config_.decider_rule_based_stop_config()
+                    .traffic_light()
+                    .signal_expire_time_sec()) {
       ADEBUG << "traffic signal is expired, delay[" << delay << "] seconds.";
     } else {
       for (int i = 0; i < traffic_light_detection->traffic_light_size(); i++) {
@@ -172,12 +163,9 @@ TrafficLight DeciderRuleBasedStop::ReadTrafficLight(
 }
 
 bool DeciderRuleBasedStop::BuildStopDecision(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info,
-    const std::string& stop_wall_id,
-    const double stop_line_s,
-    const double stop_distance,
-    const StopReasonCode& stop_reason_code,
+    Frame* const frame, ReferenceLineInfo* const reference_line_info,
+    const std::string& stop_wall_id, const double stop_line_s,
+    const double stop_distance, const StopReasonCode& stop_reason_code,
     const std::vector<std::string>& wait_for_obstacles) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -221,8 +209,8 @@ bool DeciderRuleBasedStop::BuildStopDecision(
   }
 
   auto* path_decision = reference_line_info->path_decision();
-  path_decision->AddLongitudinalDecision(
-      "DeciderRuleBasedStop", stop_wall->Id(), stop);
+  path_decision->AddLongitudinalDecision("DeciderRuleBasedStop",
+                                         stop_wall->Id(), stop);
 
   return 0;
 }

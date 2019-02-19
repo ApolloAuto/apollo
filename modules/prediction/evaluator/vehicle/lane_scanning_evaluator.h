@@ -44,12 +44,12 @@ class LaneScanningEvaluator : public Evaluator {
   void Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
-    * @brief Override Evaluate
-    * @param Obstacle pointer
-    * @param vector of all Obstacles
-    */
-  void Evaluate(
-      Obstacle* obstacle_ptr, std::vector<Obstacle*> dynamic_env) override;
+   * @brief Override Evaluate
+   * @param Obstacle pointer
+   * @param vector of all Obstacles
+   */
+  void Evaluate(Obstacle* obstacle_ptr,
+                std::vector<Obstacle*> dynamic_env) override;
 
   /**
    * @brief Extract features for learning model's input
@@ -60,9 +60,9 @@ class LaneScanningEvaluator : public Evaluator {
                        std::vector<double>* feature_values);
 
   /**
-    * @brief Get the name of evaluator.
-    */
-  std::string GetName() override {return "LANE_SCANNING_EVALUATOR";}
+   * @brief Get the name of evaluator.
+   */
+  std::string GetName() override { return "LANE_SCANNING_EVALUATOR"; }
 
  private:
   /**
@@ -81,7 +81,6 @@ class LaneScanningEvaluator : public Evaluator {
   bool ExtractStaticEnvFeatures(const Obstacle* obstacle_ptr,
                                 const LaneGraph* lane_graph_ptr,
                                 std::vector<double>* feature_values);
-
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 5 * 9;

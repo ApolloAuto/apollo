@@ -63,7 +63,8 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
   // TODO(all): update when pnc-junction is ready
   constexpr double kIntersectionLength = 10.0;  // unit: m
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  const double distance_adc_pass_stop_sign = adc_back_edge_s -
+  const double distance_adc_pass_stop_sign =
+      adc_back_edge_s -
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
   if (distance_adc_pass_stop_sign > kIntersectionLength) {
     return FinishStage();

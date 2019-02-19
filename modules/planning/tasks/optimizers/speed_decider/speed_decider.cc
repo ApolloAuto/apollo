@@ -36,8 +36,8 @@ namespace planning {
 
 using common::ErrorCode;
 using common::Status;
-using common::math::Vec2d;
 using common::VehicleConfigHelper;
+using common::math::Vec2d;
 using perception::PerceptionObstacle;
 
 SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {
@@ -153,8 +153,8 @@ bool SpeedDecider::CheckKeepClearBlocked(
     const double distance =
         obstacle_start_s - keep_clear_obstacle.PerceptionSLBoundary().end_s();
 
-    if (obstacle->IsBlockingObstacle()
-        && distance > 0 && distance < (adc_length / 2)) {
+    if (obstacle->IsBlockingObstacle() && distance > 0 &&
+        distance < (adc_length / 2)) {
       keep_clear_blocked = true;
       break;
     }

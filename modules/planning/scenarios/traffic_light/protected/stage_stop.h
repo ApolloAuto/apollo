@@ -37,12 +37,12 @@ struct TrafficLightProtectedContext;
 class TrafficLightProtectedStageStop : public Stage {
  public:
   explicit TrafficLightProtectedStageStop(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
  private:
-  Stage::StageStatus Process(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
   TrafficLightProtectedContext* GetContext() {
     return GetContextAs<TrafficLightProtectedContext>();
   }

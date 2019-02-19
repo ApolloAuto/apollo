@@ -67,8 +67,9 @@ DualVariableWarmStartOSQPInterface::DualVariableWarmStartOSQPInterface(
   // number of constraints
   num_of_constraints_ = 3 * obstacles_num_ * (horizon_ + 1) + num_of_variables_;
 
-  min_safety_distance_ = planner_open_space_config.
-      dual_variable_warm_start_config().min_safety_distance();
+  min_safety_distance_ =
+      planner_open_space_config.dual_variable_warm_start_config()
+          .min_safety_distance();
 }
 
 bool DualVariableWarmStartOSQPInterface::optimize() {
@@ -141,12 +142,10 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   osqp_solve(work);
 
   // check state
-  if (work->info->status_val != 1 &&
-      work->info->status_val != 2) {
-      AERROR << "OSQP dual warm up unsuccess, "
-          << "return status: "
-          << work->info->status;
-      succ = false;
+  if (work->info->status_val != 1 && work->info->status_val != 2) {
+    AERROR << "OSQP dual warm up unsuccess, "
+           << "return status: " << work->info->status;
+    succ = false;
   }
 
   // extract primal results
@@ -182,8 +181,7 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
 }
 
 void DualVariableWarmStartOSQPInterface::assemble_P(
-    std::vector<c_float>* P_data,
-    std::vector<c_int>* P_indices,
+    std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
     std::vector<c_int>* P_indptr) {
   // the objective function is norm(A' * lambda)
   std::vector<c_float> P_tmp;
@@ -246,115 +244,112 @@ void DualVariableWarmStartOSQPInterface::assemble_P(
 }
 
 void DualVariableWarmStartOSQPInterface::assemble_constraint(
-    std::vector<c_float>* A_data,
-    std::vector<c_int>* A_indices,
+    std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr) {
-    /*
-    * The constraint matrix is as the form,
-    *  |R' * A',   G'|, #: 2 * obstacles_num_ * (horizon_ + 1)
-    *  |A * t - b, -g|, #: obstacles_num_ * (horizon_ + 1)
-    *  |I,          0|, #: num_of_lambda
-    *  |0,          I|, #: num_of_miu
-    */
-    int r1_index = 0;
-    int r2_index = 2 * obstacles_num_ * (horizon_ + 1);
-    int r3_index = 3 * obstacles_num_ * (horizon_ + 1);
-    int r4_index = 3 * obstacles_num_ * (horizon_ + 1) +
-        lambda_horizon_;
-    int first_row_location = 0;
+  /*
+   * The constraint matrix is as the form,
+   *  |R' * A',   G'|, #: 2 * obstacles_num_ * (horizon_ + 1)
+   *  |A * t - b, -g|, #: obstacles_num_ * (horizon_ + 1)
+   *  |I,          0|, #: num_of_lambda
+   *  |0,          I|, #: num_of_miu
+   */
+  int r1_index = 0;
+  int r2_index = 2 * obstacles_num_ * (horizon_ + 1);
+  int r3_index = 3 * obstacles_num_ * (horizon_ + 1);
+  int r4_index = 3 * obstacles_num_ * (horizon_ + 1) + lambda_horizon_;
+  int first_row_location = 0;
 
-    // lambda variables
-    for (int i = 0; i < horizon_ + 1; ++i) {
-      int edges_counter = 0;
+  // lambda variables
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    int edges_counter = 0;
 
-      Eigen::MatrixXd R(2, 2);
-      R << cos(xWS_(2, i)), sin(xWS_(2, i)),
-          sin(xWS_(2, i)), cos(xWS_(2, i));
+    Eigen::MatrixXd R(2, 2);
+    R << cos(xWS_(2, i)), sin(xWS_(2, i)), sin(xWS_(2, i)), cos(xWS_(2, i));
 
-      Eigen::MatrixXd t_trans(1, 2);
-      t_trans << (xWS_(0, i) + cos(xWS_(2, i)) * offset_),
-          (xWS_(1, i) + sin(xWS_(2, i)) * offset_);
+    Eigen::MatrixXd t_trans(1, 2);
+    t_trans << (xWS_(0, i) + cos(xWS_(2, i)) * offset_),
+        (xWS_(1, i) + sin(xWS_(2, i)) * offset_);
 
-      // assume: stationary obstacles
-      for (int j = 0; j < obstacles_num_; ++j) {
-        int current_edges_num = obstacles_edges_num_(j, 0);
-        Eigen::MatrixXd Aj =
-            obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
-        Eigen::MatrixXd bj =
-            obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
+    // assume: stationary obstacles
+    for (int j = 0; j < obstacles_num_; ++j) {
+      int current_edges_num = obstacles_edges_num_(j, 0);
+      Eigen::MatrixXd Aj =
+          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+      Eigen::MatrixXd bj =
+          obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
-        Eigen::MatrixXd r1_block(2, current_edges_num);
-        r1_block = R * Aj.transpose();
+      Eigen::MatrixXd r1_block(2, current_edges_num);
+      r1_block = R * Aj.transpose();
 
-        Eigen::MatrixXd r2_block(1, current_edges_num);
-        r2_block = t_trans * Aj.transpose() - bj.transpose();
+      Eigen::MatrixXd r2_block(1, current_edges_num);
+      r2_block = t_trans * Aj.transpose() - bj.transpose();
 
-        // insert into A matrix, col by col
-        for (int k = 0; k < current_edges_num; ++k) {
-          A_data->emplace_back(r1_block(0, k));
-          A_indices->emplace_back(r1_index);
+      // insert into A matrix, col by col
+      for (int k = 0; k < current_edges_num; ++k) {
+        A_data->emplace_back(r1_block(0, k));
+        A_indices->emplace_back(r1_index);
 
-          A_data->emplace_back(r1_block(1, k));
-          A_indices->emplace_back(r1_index + 1);
+        A_data->emplace_back(r1_block(1, k));
+        A_indices->emplace_back(r1_index + 1);
 
-          A_data->emplace_back(r2_block(0, k));
-          A_indices->emplace_back(r2_index);
+        A_data->emplace_back(r2_block(0, k));
+        A_indices->emplace_back(r2_index);
 
-          A_data->emplace_back(1.0);
-          A_indices->emplace_back(r3_index);
-          r3_index++;
+        A_data->emplace_back(1.0);
+        A_indices->emplace_back(r3_index);
+        r3_index++;
 
-          A_indptr->emplace_back(first_row_location);
-          first_row_location += 4;
-        }
-
-        // Update index
-        edges_counter += current_edges_num;
-        r1_index += 2;
-        r2_index += 1;
+        A_indptr->emplace_back(first_row_location);
+        first_row_location += 4;
       }
+
+      // Update index
+      edges_counter += current_edges_num;
+      r1_index += 2;
+      r2_index += 1;
     }
+  }
 
-    // miu variables
-    // G: ((1, 0, -1, 0), (0, 1, 0, -1))
-    // g: g_
-    r1_index = 0;
-    r2_index = 2 * obstacles_num_ * (horizon_ + 1);
-    for (int i = 0; i < horizon_ + 1; ++i) {
-      for (int j = 0; j < obstacles_num_; ++j) {
-        for (int k = 0; k < 4; ++k) {
-          // update G
-          if (k < 2) {
-            A_data->emplace_back(1.0);
-          } else {
-            A_data->emplace_back(-1.0);
-          }
-          A_indices->emplace_back(r1_index + k%2);
-
-          // update g'
-          A_data->emplace_back(g_[k]);
-          A_indices->emplace_back(r2_index);
-
-          // update I
+  // miu variables
+  // G: ((1, 0, -1, 0), (0, 1, 0, -1))
+  // g: g_
+  r1_index = 0;
+  r2_index = 2 * obstacles_num_ * (horizon_ + 1);
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_num_; ++j) {
+      for (int k = 0; k < 4; ++k) {
+        // update G
+        if (k < 2) {
           A_data->emplace_back(1.0);
-          A_indices->emplace_back(r4_index);
-          r4_index++;
-
-          // update col index
-          A_indptr->emplace_back(first_row_location);
-          first_row_location += 3;
+        } else {
+          A_data->emplace_back(-1.0);
         }
+        A_indices->emplace_back(r1_index + k % 2);
 
-        // update index
-        r1_index += 2;
-        r2_index += 1;
+        // update g'
+        A_data->emplace_back(g_[k]);
+        A_indices->emplace_back(r2_index);
+
+        // update I
+        A_data->emplace_back(1.0);
+        A_indices->emplace_back(r4_index);
+        r4_index++;
+
+        // update col index
+        A_indptr->emplace_back(first_row_location);
+        first_row_location += 3;
       }
+
+      // update index
+      r1_index += 2;
+      r2_index += 1;
     }
+  }
 
-    A_indptr->emplace_back(first_row_location);
+  A_indptr->emplace_back(first_row_location);
 
-    CHECK_EQ(A_data->size(), A_indices->size());
-    CHECK_EQ(A_indptr->size(), num_of_variables_ + 1);
+  CHECK_EQ(A_data->size(), A_indices->size());
+  CHECK_EQ(A_indptr->size(), num_of_variables_ + 1);
 }
 
 void DualVariableWarmStartOSQPInterface::get_optimization_results(

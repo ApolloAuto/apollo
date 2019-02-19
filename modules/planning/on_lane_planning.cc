@@ -102,8 +102,8 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 }
 
 Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
-                              const TrajectoryPoint& planning_start_point,
-                              const VehicleState& vehicle_state) {
+                                 const TrajectoryPoint& planning_start_point,
+                                 const VehicleState& vehicle_state) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
                          vehicle_state, reference_line_provider_.get()));
 
@@ -147,7 +147,6 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-
 // TODO(all): fix this! this will cause unexpected behavior from controller
 void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
   trajectory_pb->clear_trajectory_point();
@@ -172,7 +171,7 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
 }
 
 void OnLanePlanning::RunOnce(const LocalView& local_view,
-                          ADCTrajectory* const trajectory_pb) {
+                             ADCTrajectory* const trajectory_pb) {
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
 
@@ -228,8 +227,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
-  const double planning_cycle_time = 1.0 /
-      static_cast<double>(FLAGS_planning_loop_rate);
+  const double planning_cycle_time =
+      1.0 / static_cast<double>(FLAGS_planning_loop_rate);
 
   std::vector<TrajectoryPoint> stitching_trajectory;
   std::string replan_reason;
@@ -370,8 +369,8 @@ Status OnLanePlanning::Plan(
         stitching_trajectory.back());
   }
 
-  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
-      trajectory_pb);
+  auto status =
+      planner_->Plan(stitching_trajectory.back(), frame_.get(), trajectory_pb);
 
   ptr_debug->mutable_planning_data()->set_front_clear_distance(
       EgoInfo::Instance()->front_clear_distance());
@@ -445,7 +444,7 @@ Status OnLanePlanning::Plan(
 
   last_publishable_trajectory_->PrependTrajectoryPoints(
       std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
-          stitching_trajectory.end() - 1));
+                                   stitching_trajectory.end() - 1));
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
 

@@ -53,9 +53,9 @@ TEST_F(SequencePredictorTest, General) {
   predictor.Predict(obstacle_ptr);
   EXPECT_EQ(predictor.NumOfTrajectories(), 0);
   LaneSequence* lane_seq = obstacle_ptr->mutable_latest_feature()
-                                       ->mutable_lane()
-                                       ->mutable_lane_graph()
-                                       ->mutable_lane_sequence(0);
+                               ->mutable_lane()
+                               ->mutable_lane_graph()
+                               ->mutable_lane_sequence(0);
   std::string sequence_str = predictor.ToString(*lane_seq);
   EXPECT_GT(sequence_str.size(), 0);
   SequencePredictor::LaneChangeType lane_change_type =

@@ -35,8 +35,8 @@ namespace planning {
 namespace scenario {
 namespace side_pass {
 
-using apollo::common::TrajectoryPoint;
 using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::Vec2d;
 
 constexpr double kSExtraMarginforStopOnWaitPointStage = 3.0;
@@ -197,8 +197,8 @@ bool StageStopOnWaitPoint::IsFarAwayFromObstacles(
     double obs_start_s = obstacle->PerceptionSLBoundary().start_s();
     double obs_end_s = obstacle->PerceptionSLBoundary().end_s();
     if (obs_end_s < first_sl_point.s() ||
-        obs_start_s > last_sl_point.s() +
-            kSExtraMarginforStopOnWaitPointStage) {
+        obs_start_s >
+            last_sl_point.s() + kSExtraMarginforStopOnWaitPointStage) {
       continue;
     }
     // Check the l-direction.
@@ -227,7 +227,6 @@ bool StageStopOnWaitPoint::GetTheNearestObstacle(
     const Frame& frame,
     const IndexedList<std::string, Obstacle>& indexed_obstacle_list,
     const Obstacle** nearest_obstacle) {
-
   // Sanity checks.
   if (frame.reference_line_info().size() > 1) {
     return false;
@@ -294,9 +293,9 @@ bool StageStopOnWaitPoint::GetMoveForwardLastPathPoint(
                                   &curr_point_right_width);
       // Check if this corner point is within the lane:
       if (curr_point_sl.l() > std::abs(curr_point_left_width) -
-          kLExtraMarginforStopOnWaitPointStage ||
+                                  kLExtraMarginforStopOnWaitPointStage ||
           curr_point_sl.l() < -std::abs(curr_point_right_width) +
-          kLExtraMarginforStopOnWaitPointStage) {
+                                  kLExtraMarginforStopOnWaitPointStage) {
         is_out_of_curr_lane = true;
         break;
       }

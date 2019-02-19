@@ -38,7 +38,7 @@ TEST_F(JunctionAnalyzerTest, MultiLane) {
   JunctionAnalyzer::Init("j2");
   const JunctionFeature& merged_junction_feature =
       JunctionAnalyzer::GetJunctionFeature(
-      std::vector<std::string> {"l35", "l61", "l114", "l162"});
+          std::vector<std::string>{"l35", "l61", "l114", "l162"});
   EXPECT_EQ(merged_junction_feature.junction_id(), "j2");
   EXPECT_EQ(merged_junction_feature.junction_exit_size(), 3);
   JunctionAnalyzer::Clear();

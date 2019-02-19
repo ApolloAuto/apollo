@@ -32,8 +32,8 @@ using apollo::planning_internal::STGraphDebug;
 
 SpeedOptimizer::SpeedOptimizer(const TaskConfig& config) : Task(config) {}
 
-Status SpeedOptimizer::Execute(
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
+Status SpeedOptimizer::Execute(Frame* frame,
+                               ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
 
   auto ret = Process(

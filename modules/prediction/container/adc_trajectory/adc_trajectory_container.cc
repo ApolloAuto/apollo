@@ -31,10 +31,9 @@ using ::apollo::hdmap::PNCJunctionInfo;
 using ::apollo::planning::ADCTrajectory;
 
 ADCTrajectoryContainer::ADCTrajectoryContainer()
-    :adc_junction_info_ptr_(nullptr),
-     adc_pnc_junction_info_ptr_(nullptr),
-     s_dist_to_junction_(0.0) {
-}
+    : adc_junction_info_ptr_(nullptr),
+      adc_pnc_junction_info_ptr_(nullptr),
+      s_dist_to_junction_(0.0) {}
 
 void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
@@ -61,8 +60,7 @@ void ADCTrajectoryContainer::Insert(
          << "].";
 }
 
-bool ADCTrajectoryContainer::IsPointInJunction(
-    const PathPoint& point) const {
+bool ADCTrajectoryContainer::IsPointInJunction(const PathPoint& point) const {
   if (adc_pnc_junction_info_ptr_ != nullptr) {
     return IsPointInPNCJunction(point);
   }

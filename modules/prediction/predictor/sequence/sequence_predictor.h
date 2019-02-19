@@ -96,10 +96,9 @@ class SequencePredictor : public Predictor {
    * @param A vector of generated trajectory points
    */
   void DrawConstantAccelerationTrajectory(
-    const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double total_time, const double period,
-    const double acceleration,
-    std::vector<apollo::common::TrajectoryPoint>* points);
+      const Obstacle& obstacle, const LaneSequence& lane_sequence,
+      const double total_time, const double period, const double acceleration,
+      std::vector<apollo::common::TrajectoryPoint>* points);
 
   /**
    * @brief Clear private members

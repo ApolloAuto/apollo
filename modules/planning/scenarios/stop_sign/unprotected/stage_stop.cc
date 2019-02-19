@@ -71,7 +71,8 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   constexpr double kPassStopLineBuffer = 1.0;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double distance_adc_pass_stop_sign = adc_front_edge_s -
+  const double distance_adc_pass_stop_sign =
+      adc_front_edge_s -
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
   // passed stop line too far
   if (distance_adc_pass_stop_sign > kPassStopLineBuffer) {
@@ -136,8 +137,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
  * @brief: remove a watch vehicle which not stopping at stop sign any more
  */
 int StopSignUnprotectedStageStop::RemoveWatchVehicle(
-    const PathDecision& path_decision,
-    StopSignLaneVehicles* watch_vehicles) {
+    const PathDecision& path_decision, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
   for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {
@@ -174,7 +174,7 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     std::vector<std::string> remove_vehicles;
     for (auto obstacle_id : it->second) {
       // watched-vehicle info
-      auto *obstacle = path_decision.Find(obstacle_id);
+      auto* obstacle = path_decision.Find(obstacle_id);
       if (!obstacle) {
         AERROR << "mark ERASE obstacle_id[" << obstacle_id << "] not exist";
         remove_vehicles.push_back(obstacle_id);
@@ -185,15 +185,15 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
       PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
       std::string obstacle_type_name =
           PerceptionObstacle_Type_Name(obstacle_type);
-      auto obstacle_point = common::util::MakePointENU(
-          perception_obstacle.position().x(),
-          perception_obstacle.position().y(),
-          perception_obstacle.position().z());
+      auto obstacle_point =
+          common::util::MakePointENU(perception_obstacle.position().x(),
+                                     perception_obstacle.position().y(),
+                                     perception_obstacle.position().z());
 
-      double distance = common::util::DistanceXY(
-          stop_sign_point, obstacle_point);
-      ADEBUG << "obstacle_id[" << obstacle_id
-          << "] distance[" << distance << "]";
+      double distance =
+          common::util::DistanceXY(stop_sign_point, obstacle_point);
+      ADEBUG << "obstacle_id[" << obstacle_id << "] distance[" << distance
+             << "]";
 
       // TODO(all): move 10.0 to conf
       if (distance > 10.0) {

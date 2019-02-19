@@ -98,8 +98,7 @@ Status NaviPlanner::Init(const PlanningConfig& config) {
 }
 
 Status NaviPlanner::Plan(const TrajectoryPoint& planning_init_point,
-                         Frame* frame,
-                         ADCTrajectory* ptr_computed_trajectory) {
+                         Frame* frame, ADCTrajectory* ptr_computed_trajectory) {
   // NaviPlanner is only used in navigation mode based on the real-time relative
   // map.
   if (!FLAGS_use_navigation_mode) {

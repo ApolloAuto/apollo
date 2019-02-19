@@ -17,8 +17,8 @@
 #include <memory>
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/scenario/scenario_features/scenario_features.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
+#include "modules/prediction/scenario/scenario_features/scenario_features.h"
 
 namespace apollo {
 namespace prediction {

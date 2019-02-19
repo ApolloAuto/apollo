@@ -24,8 +24,8 @@
 
 #define protected public
 // TODO(all) #include "modules/planning/navi_planning.h"
-#include "modules/planning/planning_base.h"
 #include "modules/planning/on_lane_planning.h"
+#include "modules/planning/planning_base.h"
 
 namespace apollo {
 namespace planning {
@@ -52,7 +52,7 @@ namespace planning {
 
 #define TMAIN                                            \
   int main(int argc, char** argv) {                      \
-    ::apollo::cyber::Init("planning_test");          \
+    ::apollo::cyber::Init("planning_test");              \
     ::testing::InitGoogleTest(&argc, argv);              \
     ::google::ParseCommandLineFlags(&argc, &argv, true); \
     using apollo::common::time::Clock;                   \

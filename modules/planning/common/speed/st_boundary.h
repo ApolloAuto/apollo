@@ -49,9 +49,8 @@ class STBoundary : public common::math::Polygon2d {
 
   explicit STBoundary(std::vector<common::math::Vec2d> points) = delete;
 
-  static STBoundary CreateInstance(
-      const std::vector<STPoint>& lower_points,
-      const std::vector<STPoint>& upper_points);
+  static STBoundary CreateInstance(const std::vector<STPoint>& lower_points,
+                                   const std::vector<STPoint>& upper_points);
 
   static std::unique_ptr<STBoundary> CreateInstance(
       const std::vector<std::pair<STPoint, STPoint>>& point_pairs);

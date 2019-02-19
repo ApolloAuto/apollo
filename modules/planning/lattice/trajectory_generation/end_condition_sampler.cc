@@ -63,8 +63,8 @@ std::vector<Condition> EndConditionSampler::SampleLonEndConditionsForCruising(
   constexpr size_t num_of_time_samples = 9;
   std::array<double, num_of_time_samples> time_samples;
   for (size_t i = 1; i < num_of_time_samples; ++i) {
-    auto ratio = static_cast<double>(i) /
-        static_cast<double>(num_of_time_samples - 1);
+    auto ratio =
+        static_cast<double>(i) / static_cast<double>(num_of_time_samples - 1);
     time_samples[i] = FLAGS_trajectory_time_length * ratio;
   }
   time_samples[0] = FLAGS_polynomial_minimal_param;
@@ -105,8 +105,8 @@ std::vector<Condition> EndConditionSampler::SampleLonEndConditionsForStopping(
   constexpr size_t num_of_time_samples = 9;
   std::array<double, num_of_time_samples> time_samples;
   for (size_t i = 1; i < num_of_time_samples; ++i) {
-    auto ratio = static_cast<double>(i) /
-        static_cast<double>(num_of_time_samples - 1);
+    auto ratio =
+        static_cast<double>(i) / static_cast<double>(num_of_time_samples - 1);
     time_samples[i] = FLAGS_trajectory_time_length * ratio;
   }
   time_samples[0] = FLAGS_polynomial_minimal_param;
@@ -196,7 +196,7 @@ void EndConditionSampler::QueryOvertakePathTimePoints(
     SamplePoint sample_point;
     sample_point.path_time_point = path_time_point;
     sample_point.path_time_point.set_s(path_time_point.s() +
-        FLAGS_default_lon_buffer);
+                                       FLAGS_default_lon_buffer);
     sample_point.ref_v = v;
     sample_points->push_back(std::move(sample_point));
   }

@@ -530,9 +530,8 @@ void CosThetaProbleminterface::hessian_strcuture() {
   size_t index = 0;
   for (size_t i = 0; i < 6; ++i) {
     for (size_t j = 0; j <= i; ++j) {
-      idx_map_.insert(
-          std::pair<std::pair<size_t, size_t>, size_t>(
-              std::pair<size_t, size_t>(i, j), index));
+      idx_map_.insert(std::pair<std::pair<size_t, size_t>, size_t>(
+          std::pair<size_t, size_t>(i, j), index));
       index++;
     }
   }
@@ -541,17 +540,15 @@ void CosThetaProbleminterface::hessian_strcuture() {
   for (size_t i = 6; i < num_of_variables_; ++i) {
     if (i % 2 == 0) {
       for (size_t j = 2 + shift; j <= 6 + shift; ++j) {
-        idx_map_.insert(
-            std::pair<std::pair<size_t, size_t>, size_t>(
-                std::pair<size_t, size_t>(i, j), index));
+        idx_map_.insert(std::pair<std::pair<size_t, size_t>, size_t>(
+            std::pair<size_t, size_t>(i, j), index));
         index++;
       }
 
     } else {
       for (size_t j = 2 + shift; j <= 7 + shift; ++j) {
-        idx_map_.insert(
-            std::pair<std::pair<size_t, size_t>, size_t>(
-                std::pair<size_t, size_t>(i, j), index));
+        idx_map_.insert(std::pair<std::pair<size_t, size_t>, size_t>(
+            std::pair<size_t, size_t>(i, j), index));
         index++;
       }
       shift += 2;

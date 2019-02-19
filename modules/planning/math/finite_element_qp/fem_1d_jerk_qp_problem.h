@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 

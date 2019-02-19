@@ -34,15 +34,13 @@ class Threshold {
  public:
   Threshold() = default;
   ~Threshold() = default;
-  void AddItem(const std::string& id,
-               const uint32_t seq_num,
-               const double min_val,
-               const double max_val,
+  void AddItem(const std::string& id, const uint32_t seq_num,
+               const double min_val, const double max_val,
                const uint32_t max_repeat_time,
                const uint32_t max_time_interval);
-  bool IsInRange(const std::string& id,
-                 const uint32_t seq_num,
+  bool IsInRange(const std::string& id, const uint32_t seq_num,
                  const double value);
+
  private:
   std::unordered_map<std::string, ThresholdItem> map_;
 };

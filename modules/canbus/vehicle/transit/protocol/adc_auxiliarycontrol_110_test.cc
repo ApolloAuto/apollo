@@ -66,7 +66,7 @@ TEST_F(Auxiliarycontrol_110_test, General) {
   control_.set_p_adc_auxcontrol_counter(data, adc_auxcontrol_counter);
   control_.set_p_adc_auxcontrol_checksum(data, adc_auxcontrol_checksum);
   control_.set_p_adc_cmd_inverter_controlenable(data,
-              adc_cmd_inverter_controlenable);
+                                                adc_cmd_inverter_controlenable);
   control_.set_p_adc_cmd_inverter(data, adc_cmd_inverter);
   control_.set_p_adc_cmd_wiper(data, adc_cmd_wiper);
   control_.set_p_adc_cmd_pdu_controlenable(data, adc_cmd_pdu_controlenable);

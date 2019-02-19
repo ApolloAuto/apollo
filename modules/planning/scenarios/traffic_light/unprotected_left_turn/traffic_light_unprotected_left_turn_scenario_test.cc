@@ -48,8 +48,7 @@ TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, VerifyConf) {
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_unprotected_left_turn_config_file,
-      &config));
+      FLAGS_scenario_traffic_light_unprotected_left_turn_config_file, &config));
 }
 
 TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, Init) {
@@ -59,12 +58,11 @@ TEST_F(TrafficLightUnprotectedLeftTurnScenarioTest, Init) {
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_unprotected_left_turn_config_file,
-      &config));
+      FLAGS_scenario_traffic_light_unprotected_left_turn_config_file, &config));
 
   ScenarioContext context;
-  scenario_.reset(new TrafficLightUnprotectedLeftTurnScenario(config,
-                                                              &context));
+  scenario_.reset(
+      new TrafficLightUnprotectedLeftTurnScenario(config, &context));
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN);
 }

@@ -25,8 +25,8 @@ namespace conti_radar {
 
 using apollo::drivers::ContiRadar;
 using apollo::drivers::conti_radar::OutputType;
-using apollo::drivers::conti_radar::RcsThreshold;
 using apollo::drivers::conti_radar::RadarConf;
+using apollo::drivers::conti_radar::RcsThreshold;
 
 class RadarConfig200
     : public apollo::drivers::canbus::ProtocolData<ContiRadar> {

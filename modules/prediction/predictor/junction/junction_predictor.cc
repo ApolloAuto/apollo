@@ -30,8 +30,8 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::hdmap::LaneInfo;
-using apollo::prediction::math_util::EvaluateCubicPolynomial;
 using apollo::prediction::math_util::ComputePolynomial;
+using apollo::prediction::math_util::EvaluateCubicPolynomial;
 
 void JunctionPredictor::Predict(Obstacle* obstacle) {
   Clear();
@@ -43,8 +43,8 @@ void JunctionPredictor::Predict(Obstacle* obstacle) {
       MostLikelyJunctions(latest_feature);
   for (const auto& junction_exit : junction_exits) {
     std::vector<TrajectoryPoint> trajectory_points;
-    DrawJunctionTrajectoryPoints(latest_feature, junction_exit,
-        FLAGS_prediction_trajectory_time_length,
+    DrawJunctionTrajectoryPoints(
+        latest_feature, junction_exit, FLAGS_prediction_trajectory_time_length,
         FLAGS_prediction_trajectory_time_resolution, &trajectory_points);
     Trajectory trajectory = GenerateTrajectory(trajectory_points);
     trajectories_.push_back(std::move(trajectory));
@@ -58,17 +58,19 @@ void JunctionPredictor::DrawJunctionTrajectoryPoints(
   double speed = feature.speed();
   const std::array<double, 2> start_x = {feature.position().x(),
                                          feature.raw_velocity().x()};
-  const std::array<double, 2> end_x = {junction_exit.exit_position().x(),
-                              std::cos(junction_exit.exit_heading()) * speed};
+  const std::array<double, 2> end_x = {
+      junction_exit.exit_position().x(),
+      std::cos(junction_exit.exit_heading()) * speed};
   const std::array<double, 2> start_y = {feature.position().y(),
                                          feature.raw_velocity().y()};
-  const std::array<double, 2> end_y = {junction_exit.exit_position().y(),
-                              std::sin(junction_exit.exit_heading()) * speed};
+  const std::array<double, 2> end_y = {
+      junction_exit.exit_position().y(),
+      std::sin(junction_exit.exit_heading()) * speed};
   double exit_time = GetBestTime(start_x, end_x, start_y, end_y);
   std::array<double, 4> x_coeffs =
-        ComputePolynomial<3>(start_x, end_x, exit_time);
+      ComputePolynomial<3>(start_x, end_x, exit_time);
   std::array<double, 4> y_coeffs =
-        ComputePolynomial<3>(start_y, end_y, exit_time);
+      ComputePolynomial<3>(start_y, end_y, exit_time);
   double t = 0.0;
   // Trajectory in junction
   while (t <= exit_time) {
@@ -81,7 +83,7 @@ void JunctionPredictor::DrawJunctionTrajectoryPoints(
     TrajectoryPoint trajectory_point;
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
     trajectory_point.set_v(std::hypot(EvaluateCubicPolynomial(x_coeffs, t, 1),
-                                    EvaluateCubicPolynomial(y_coeffs, t, 1)));
+                                      EvaluateCubicPolynomial(y_coeffs, t, 1)));
     trajectory_point.set_relative_time(t);
     trajectory_points->emplace_back(std::move(trajectory_point));
     t += period;
@@ -198,8 +200,9 @@ double JunctionPredictor::CostFunction(const std::array<double, 4>& x_coeffs,
     double y_1 = EvaluateCubicPolynomial(y_coeffs, t, 1);
     double y_2 = EvaluateCubicPolynomial(y_coeffs, t, 2);
     // cost = curvature * v^2 + time_to_exit
-    cost = std::max(cost, std::abs(x_1 * y_2 - y_1 * x_2) /
-                          std::hypot(x_1, y_1) + time_to_exit);
+    cost =
+        std::max(cost, std::abs(x_1 * y_2 - y_1 * x_2) / std::hypot(x_1, y_1) +
+                           time_to_exit);
     t += FLAGS_prediction_trajectory_time_resolution;
   }
   return cost;

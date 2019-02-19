@@ -16,23 +16,23 @@
 
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/prediction/common/feature_output.h"
-#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
+#include "modules/prediction/evaluator/cyclist/cyclist_keep_lane_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
-#include "modules/prediction/evaluator/cyclist/cyclist_keep_lane_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -47,8 +47,7 @@ bool IsTrainable(const Feature& feature) {
     return false;
   }
   if (feature.priority().priority() == ObstaclePriority::IGNORE ||
-      feature.is_still() ||
-      feature.type() != PerceptionObstacle::VEHICLE) {
+      feature.is_still() || feature.type() != PerceptionObstacle::VEHICLE) {
     return false;
   }
   return true;
@@ -158,8 +157,8 @@ void EvaluatorManager::Run() {
   }
 }
 
-void EvaluatorManager::EvaluateObstacle(
-    Obstacle* obstacle, std::vector<Obstacle*> dynamic_env) {
+void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
+                                        std::vector<Obstacle*> dynamic_env) {
   Evaluator* evaluator = nullptr;
   // Select different evaluators depending on the obstacle's type.
   switch (obstacle->type()) {
@@ -172,8 +171,9 @@ void EvaluatorManager::EvaluateObstacle(
         evaluator = GetEvaluator(vehicle_on_lane_evaluator_);
         CHECK_NOTNULL(evaluator);
       } else {
-        ADEBUG << "Obstacle: " << obstacle->id() << " is neither "
-               "on lane, nor in junction. Skip evaluating.";
+        ADEBUG << "Obstacle: " << obstacle->id()
+               << " is neither "
+                  "on lane, nor in junction. Skip evaluating.";
       }
       break;
     }
@@ -232,8 +232,8 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
     if (obstacle == nullptr || obstacle->history_size() == 0) {
       continue;
     }
-    size_t num_frames = std::min(static_cast<size_t>(10),
-                                 obstacle->history_size());
+    size_t num_frames =
+        std::min(static_cast<size_t>(10), obstacle->history_size());
     ObstacleHistory obstacle_history;
     for (size_t i = 0; i < num_frames; ++i) {
       const Feature& obstacle_feature = obstacle->feature(i);
@@ -257,11 +257,9 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
     }
     obstacle_history.set_is_trainable(IsTrainable(obstacle->latest_feature()));
     if (obstacle->id() != -1) {
-      curr_frame_env.add_obstacles_history()
-                    ->CopyFrom(obstacle_history);
+      curr_frame_env.add_obstacles_history()->CopyFrom(obstacle_history);
     } else {
-      curr_frame_env.mutable_ego_history()
-                    ->CopyFrom(obstacle_history);
+      curr_frame_env.mutable_ego_history()->CopyFrom(obstacle_history);
     }
   }
   if (FLAGS_prediction_offline_mode == 4) {

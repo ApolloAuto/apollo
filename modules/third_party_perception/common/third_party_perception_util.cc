@@ -18,9 +18,9 @@
  * @file
  */
 
+#include "modules/third_party_perception/common/third_party_perception_util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
-#include "modules/third_party_perception/common/third_party_perception_util.h"
 
 /**
  * @namespace apollo::third_party_perception
@@ -38,10 +38,9 @@ using Point = apollo::common::Point3D;
 
 double GetAngleFromQuaternion(const Quaternion quaternion) {
   double theta = std::atan2(2.0 * (quaternion.qw() * quaternion.qz() +
-                                quaternion.qx() * quaternion.qy()),
-                            1.0 -
-                                2.0 * (quaternion.qy() * quaternion.qy() +
-                                       quaternion.qz() * quaternion.qz())) +
+                                   quaternion.qx() * quaternion.qy()),
+                            1.0 - 2.0 * (quaternion.qy() * quaternion.qy() +
+                                         quaternion.qz() * quaternion.qz())) +
                  std::acos(-1.0) / 2.0;
   return theta;
 }

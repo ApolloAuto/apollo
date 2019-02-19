@@ -34,8 +34,7 @@ namespace monitor {
 
 ProcessMonitor::ProcessMonitor()
     : RecurrentRunner(FLAGS_process_monitor_name,
-                      FLAGS_process_monitor_interval) {
-}
+                      FLAGS_process_monitor_interval) {}
 
 void ProcessMonitor::RunOnce(const double current_time) {
   // Get running processes.

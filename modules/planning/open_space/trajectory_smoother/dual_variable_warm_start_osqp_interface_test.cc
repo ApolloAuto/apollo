@@ -69,9 +69,9 @@ void DualVariableWarmStartOSQPInterfaceTest::ProblemSetup() {
   obstacles_edges_num_ = Eigen::MatrixXi(obstacles_num_, 1);
   obstacles_edges_num_ << 2, 1, 2, 1;
   Eigen::MatrixXd xWS = Eigen::MatrixXd::Ones(4, horizon_ + 1);
-  ptop_.reset(new DualVariableWarmStartOSQPInterface(horizon_, ts_, ego_,
-      obstacles_edges_num_, obstacles_num_, obstacles_A_, obstacles_b_, xWS,
-      planner_open_space_config_));
+  ptop_.reset(new DualVariableWarmStartOSQPInterface(
+      horizon_, ts_, ego_, obstacles_edges_num_, obstacles_num_, obstacles_A_,
+      obstacles_b_, xWS, planner_open_space_config_));
 }
 
 TEST_F(DualVariableWarmStartOSQPInterfaceTest, initilization) {

@@ -103,8 +103,7 @@ std::unique_ptr<Stage> TrafficLightProtectedScenario::CreateStage(
 }
 
 bool TrafficLightProtectedScenario::IsTransferable(
-    const Scenario& current_scenario,
-    const Frame& frame) {
+    const Scenario& current_scenario, const Frame& frame) {
   const std::string traffic_light_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
   if (traffic_light_overlap_id.empty()) {
@@ -127,7 +126,8 @@ bool TrafficLightProtectedScenario::IsTransferable(
       adc_distance_to_stop_line > scenario_config.max_valid_stop_distance()) {
     is_stopped_for_traffic_light = false;
     ADEBUG << "ADC not stopped: speed[" << adc_speed
-        << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line << "]";
+           << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line
+           << "]";
   }
 
   switch (current_scenario.scenario_type()) {
@@ -160,8 +160,7 @@ bool TrafficLightProtectedScenario::GetScenarioConfig() {
     AERROR << "miss scenario specific config";
     return false;
   }
-  context_.scenario_config.CopyFrom(
-      config_.traffic_light_protected_config());
+  context_.scenario_config.CopyFrom(config_.traffic_light_protected_config());
   return true;
 }
 
@@ -178,7 +177,7 @@ bool TrafficLightProtectedScenario::IsProtected(
   // right turn
   if (turn == hdmap::Lane::RIGHT_TURN) {
     return (PlanningContext::GetScenarioInfo()->traffic_light_color ==
-        TrafficLight::GREEN);
+            TrafficLight::GREEN);
   }
 
   // u-turn

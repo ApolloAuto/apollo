@@ -29,8 +29,8 @@ namespace apollo {
 namespace drivers {
 namespace velodyne {
 
-using apollo::transform::Buffer;
 using apollo::drivers::PointCloud;
+using apollo::transform::Buffer;
 
 class Compensator {
  public:

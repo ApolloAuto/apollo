@@ -35,7 +35,8 @@ struct TrafficLightUnprotectedLeftTurnContext;
 class TrafficLightUnprotectedLeftTurnStageIntersectionCruise : public Stage {
  public:
   explicit TrafficLightUnprotectedLeftTurnStageIntersectionCruise(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

@@ -57,8 +57,7 @@ class PredictionComponent
    * @brief Data callback upon receiving a perception obstacle message.
    * @param Perception obstacle message.
    */
-  bool Proc(
-      const std::shared_ptr<perception::PerceptionObstacles> &) override;
+  bool Proc(const std::shared_ptr<perception::PerceptionObstacles>&) override;
 
   /**
    * @brief Load and process feature proto file.
@@ -71,14 +70,12 @@ class PredictionComponent
 
   double frame_start_time_ = 0.0;
 
-  std::shared_ptr<cyber::Reader<planning::ADCTrajectory>>
-      planning_reader_;
+  std::shared_ptr<cyber::Reader<planning::ADCTrajectory>> planning_reader_;
 
   std::shared_ptr<cyber::Reader<localization::LocalizationEstimate>>
       localization_reader_;
 
-  std::shared_ptr<cyber::Writer<PredictionObstacles>>
-      prediction_writer_;
+  std::shared_ptr<cyber::Writer<PredictionObstacles>> prediction_writer_;
 };
 
 CYBER_REGISTER_COMPONENT(PredictionComponent)

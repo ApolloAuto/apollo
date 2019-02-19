@@ -18,7 +18,6 @@
  * @file
  **/
 
-
 #include "rss/core/RssCheck.hpp"
 #include "rss/test_support/TestSupport.hpp"
 
@@ -94,21 +93,21 @@ TEST_F(RssCheckSameDirectionTests, OtherLeading_FixDistance) {
   ::rss::world::AccelerationRestriction accelerationRestriction;
   ::rss::core::RssCheck rssCheck;
 
-  double dMin = calculateLongitudinalMinSafeDistance(worldModel.egoVehicle,
-      worldModel.scenes[0].object);
+  double dMin = calculateLongitudinalMinSafeDistance(
+      worldModel.egoVehicle, worldModel.scenes[0].object);
 
-  ASSERT_TRUE(rssCheck.calculateAccelerationRestriction(worldModel,
-      accelerationRestriction));
+  ASSERT_TRUE(rssCheck.calculateAccelerationRestriction(
+      worldModel, accelerationRestriction));
   ASSERT_EQ(accelerationRestriction.longitudinalRange.minimum,
-      -1. * worldModel.egoVehicle.dynamics.alphaLon.brakeMax);
+            -1. * worldModel.egoVehicle.dynamics.alphaLon.brakeMax);
   ASSERT_EQ(accelerationRestriction.longitudinalRange.maximum,
-      -1. * worldModel.egoVehicle.dynamics.alphaLon.brakeMin);
+            -1. * worldModel.egoVehicle.dynamics.alphaLon.brakeMin);
 
   printf("dMin = %f\n", dMin);
   printf("accelerationRestriction.longitudinalRange.minimum=%f\n",
-      accelerationRestriction.longitudinalRange.minimum);
+         accelerationRestriction.longitudinalRange.minimum);
   printf("accelerationRestriction.longitudinalRange.maximum=%f\n",
-      accelerationRestriction.longitudinalRange.maximum);
+         accelerationRestriction.longitudinalRange.maximum);
 }
 
 }  // namespace core

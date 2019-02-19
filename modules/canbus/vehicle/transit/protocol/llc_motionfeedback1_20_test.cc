@@ -62,43 +62,43 @@ TEST_F(Motionfeedback1_20_test, General) {
   const int32_t equivalent_Longitudinalcontrolmode = 0;
   const int32_t equivalent_State = 15;
 
-  EXPECT_EQ(feedback_.llc_fbk_gear(bytes, length_Gear),
-            static_cast<Llc_motionfeedback1_20
-            ::Llc_fbk_gearType>(equivalent_Gear));
+  EXPECT_EQ(
+      feedback_.llc_fbk_gear(bytes, length_Gear),
+      static_cast<Llc_motionfeedback1_20 ::Llc_fbk_gearType>(equivalent_Gear));
   EXPECT_TRUE(feedback_.llc_fbk_parkingbrake(bytes, length_Parkingbrake));
-  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_throttleposition(bytes,
-                   length_Throttleposition),
-                   equivalent_Throttleposition);
-  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_brakepercentrear(bytes,
-                   length_Brakepercentrear),
-                   equivalent_Brakepercentrear);
-  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_brakepercentfront(bytes,
-                   length_Brakepercentfront),
-                   equivalent_Brakepercentfront);
-  EXPECT_EQ(feedback_.llc_fbk_steeringcontrolmode(bytes,
-            length_Steeringcontrolmode),
-            static_cast<Llc_motionfeedback1_20
-            ::Llc_fbk_steeringcontrolmodeType>(equivalent_Steeringcontrolmode));
-  EXPECT_EQ(feedback_.llc_motionfeedback1_counter(bytes,
-            length_Motionfeedback1_counter),
+  EXPECT_DOUBLE_EQ(
+      feedback_.llc_fbk_throttleposition(bytes, length_Throttleposition),
+      equivalent_Throttleposition);
+  EXPECT_DOUBLE_EQ(
+      feedback_.llc_fbk_brakepercentrear(bytes, length_Brakepercentrear),
+      equivalent_Brakepercentrear);
+  EXPECT_DOUBLE_EQ(
+      feedback_.llc_fbk_brakepercentfront(bytes, length_Brakepercentfront),
+      equivalent_Brakepercentfront);
+  EXPECT_EQ(
+      feedback_.llc_fbk_steeringcontrolmode(bytes, length_Steeringcontrolmode),
+      static_cast<Llc_motionfeedback1_20 ::Llc_fbk_steeringcontrolmodeType>(
+          equivalent_Steeringcontrolmode));
+  EXPECT_EQ(feedback_.llc_motionfeedback1_counter(
+                bytes, length_Motionfeedback1_counter),
             equivalent_Motionfeedback1_counter);
-  EXPECT_EQ(feedback_.llc_motionfeedback1_checksum(bytes,
-            length_Motionfeedback1_checksum),
+  EXPECT_EQ(feedback_.llc_motionfeedback1_checksum(
+                bytes, length_Motionfeedback1_checksum),
             equivalent_Motionfeedback1_checksum);
-  EXPECT_TRUE(feedback_.llc_motionfeedback1_checksum(bytes,
-              length_Commandaligned));
+  EXPECT_TRUE(
+      feedback_.llc_motionfeedback1_checksum(bytes, length_Commandaligned));
   EXPECT_TRUE(feedback_.llc_fbk_estoppressed(bytes, length_Estoppressed));
-  EXPECT_TRUE(feedback_.llc_fbk_adcrequestautonomy(bytes,
-              length_Adcrequestautonomy));
+  EXPECT_TRUE(
+      feedback_.llc_fbk_adcrequestautonomy(bytes, length_Adcrequestautonomy));
   EXPECT_FALSE(feedback_.llc_fbk_allowautonomy(bytes, length_Allowautonomy));
-  EXPECT_EQ(feedback_.llc_fbk_longitudinalcontrolmode(bytes,
-            length_Longitudinalcontrolmode),
-            static_cast<Llc_motionfeedback1_20
-            ::Llc_fbk_longitudinalcontrolmodeType>
-            (equivalent_Longitudinalcontrolmode));
+  EXPECT_EQ(
+      feedback_.llc_fbk_longitudinalcontrolmode(bytes,
+                                                length_Longitudinalcontrolmode),
+      static_cast<Llc_motionfeedback1_20 ::Llc_fbk_longitudinalcontrolmodeType>(
+          equivalent_Longitudinalcontrolmode));
   EXPECT_EQ(feedback_.llc_fbk_state(bytes, length_State),
-            static_cast<Llc_motionfeedback1_20
-            ::Llc_fbk_stateType>(equivalent_State));
+            static_cast<Llc_motionfeedback1_20 ::Llc_fbk_stateType>(
+                equivalent_State));
 }
 
 }  // namespace transit
