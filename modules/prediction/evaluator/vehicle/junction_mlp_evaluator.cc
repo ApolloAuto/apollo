@@ -20,8 +20,8 @@
 #include <unordered_map>
 
 #include "cyber/common/file.h"
-#include "modules/common/math/vec2d.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -34,8 +34,8 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
-using apollo::prediction::math_util::EvaluateCubicPolynomial;
 using apollo::prediction::math_util::ComputePolynomial;
+using apollo::prediction::math_util::EvaluateCubicPolynomial;
 
 namespace {
 
@@ -55,8 +55,7 @@ JunctionMLPEvaluator::JunctionMLPEvaluator() {
   LoadModel(FLAGS_evaluator_vehicle_junction_mlp_file);
 }
 
-void JunctionMLPEvaluator::Clear() {
-}
+void JunctionMLPEvaluator::Clear() {}
 
 void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
@@ -82,8 +81,8 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
   // Insert features to DataForLearning
   if (FLAGS_prediction_offline_mode == 2) {
-    FeatureOutput::InsertDataForLearning(
-        *latest_feature_ptr, feature_values, "junction");
+    FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
+                                         "junction");
     ADEBUG << "Save extracted features for learning locally.";
     return;  // Skip Compute probability for offline mode
   }
@@ -97,7 +96,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
   for (double prob : probability) {
     latest_feature_ptr->mutable_junction_feature()
-                      ->add_junction_mlp_probability(prob);
+        ->add_junction_mlp_probability(prob);
   }
 
   // assign all lane_sequence probability
@@ -112,31 +111,30 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   std::unordered_map<std::string, double> junction_exit_prob;
   for (const JunctionExit& junction_exit :
        latest_feature_ptr->junction_feature().junction_exit()) {
-    double x = junction_exit.exit_position().x()
-             - latest_feature_ptr->position().x();
-    double y = junction_exit.exit_position().y()
-             - latest_feature_ptr->position().y();
-    double angle = std::atan2(y, x)
-                 - std::atan2(latest_feature_ptr->raw_velocity().y(),
-                              latest_feature_ptr->raw_velocity().x());
+    double x =
+        junction_exit.exit_position().x() - latest_feature_ptr->position().x();
+    double y =
+        junction_exit.exit_position().y() - latest_feature_ptr->position().y();
+    double angle =
+        std::atan2(y, x) - std::atan2(latest_feature_ptr->raw_velocity().y(),
+                                      latest_feature_ptr->raw_velocity().x());
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
     int prev_idx = idx == 0 ? 11 : idx - 1;
     int post_idx = idx == 11 ? 0 : idx + 1;
-    junction_exit_prob[junction_exit.exit_lane_id()] = probability[idx] * 0.5
-        + probability[prev_idx] * 0.25 + probability[post_idx] * 0.25;
+    junction_exit_prob[junction_exit.exit_lane_id()] =
+        probability[idx] * 0.5 + probability[prev_idx] * 0.25 +
+        probability[post_idx] * 0.25;
   }
 
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
-    LaneSequence* lane_sequence_ptr =
-        lane_graph_ptr->mutable_lane_sequence(i);
+    LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     CHECK_NOTNULL(lane_sequence_ptr);
-    for (const LaneSegment& lane_segment :
-         lane_sequence_ptr->lane_segment()) {
+    for (const LaneSegment& lane_segment : lane_sequence_ptr->lane_segment()) {
       if (junction_exit_prob.find(lane_segment.lane_id()) !=
           junction_exit_prob.end()) {
         lane_sequence_ptr->set_probability(
-          junction_exit_prob[lane_segment.lane_id()]);
+            junction_exit_prob[lane_segment.lane_id()]);
       }
     }
   }
@@ -175,14 +173,12 @@ void JunctionMLPEvaluator::ExtractFeatureValues(
     return;
   }
 
-  feature_values->insert(feature_values->end(),
-                         obstacle_feature_values.begin(),
+  feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
   feature_values->insert(feature_values->end(),
                          ego_vehicle_feature_values.begin(),
                          ego_vehicle_feature_values.end());
-  feature_values->insert(feature_values->end(),
-                         junction_feature_values.begin(),
+  feature_values->insert(feature_values->end(), junction_feature_values.begin(),
                          junction_feature_values.end());
 }
 
@@ -204,8 +200,9 @@ void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
     Obstacle* obstacle_ptr, std::vector<double>* const feature_values) {
   feature_values->clear();
   *feature_values = std::vector<double>(4, 0.0);
-  auto ego_pose_container_ptr = ContainerManager::Instance()->GetContainer<
-      PoseContainer>(AdapterConfig::LOCALIZATION);
+  auto ego_pose_container_ptr =
+      ContainerManager::Instance()->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
   if (ego_pose_container_ptr == nullptr) {
     (*feature_values)[0] = 100.0;
     (*feature_values)[1] = 100.0;
@@ -220,18 +217,16 @@ void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
   apollo::common::math::Vec2d ego_relative_position(
       ego_position.x() - obstacle_feature.position().x(),
       ego_position.y() - obstacle_feature.position().y());
-  apollo::common::math::Vec2d ego_relative_velocity(
-      ego_velocity.x(), ego_velocity.y());
+  apollo::common::math::Vec2d ego_relative_velocity(ego_velocity.x(),
+                                                    ego_velocity.y());
   ego_relative_velocity.rotate(-obstacle_feature.velocity_heading());
   (*feature_values)[0] = ego_relative_position.x();
   (*feature_values)[1] = ego_relative_position.y();
   (*feature_values)[2] = ego_relative_velocity.x();
   (*feature_values)[3] = ego_relative_velocity.y();
-  ADEBUG << "ego relative pos = {"
-         << ego_relative_position.x() << ", "
+  ADEBUG << "ego relative pos = {" << ego_relative_position.x() << ", "
          << ego_relative_position.y() << "} "
-         << "ego_relative_velocity = {"
-         << ego_relative_velocity.x() << ", "
+         << "ego_relative_velocity = {" << ego_relative_velocity.x() << ", "
          << ego_relative_velocity.y() << "}";
 }
 
@@ -269,8 +264,8 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     double y = junction_exit.exit_position().y() - feature_ptr->position().y();
     double diff_x = std::cos(-heading) * x - std::sin(-heading) * y;
     double diff_y = std::sin(-heading) * x + std::cos(-heading) * y;
-    double diff_heading = apollo::common::math::AngleDiff(heading,
-                              junction_exit.exit_heading());
+    double diff_heading =
+        apollo::common::math::AngleDiff(heading, junction_exit.exit_heading());
     double angle = std::atan2(diff_y, diff_x);
     double d_idx = (angle / (2.0 * M_PI)) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
@@ -292,8 +287,8 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
       double y_1 = EvaluateCubicPolynomial(y_coeffs, t, 1);
       double y_2 = EvaluateCubicPolynomial(y_coeffs, t, 2);
       // cost = curvature * v^2
-      cost = std::max(cost, std::abs(x_1 * y_2 - y_1 * x_2) /
-                            std::hypot(x_1, y_1));
+      cost = std::max(cost,
+                      std::abs(x_1 * y_2 - y_1 * x_2) / std::hypot(x_1, y_1));
       t += FLAGS_prediction_trajectory_time_resolution;
     }
     feature_values->operator[](idx * 6) = 1.0;
@@ -350,8 +345,8 @@ std::vector<double> JunctionMLPEvaluator::ComputeProbability(
       layer_output.push_back(neuron_output);
     }
     if (layer.layer_activation_func() == Layer::SOFTMAX) {
-      layer_output = apollo::prediction::math_util::Softmax(
-          layer_output, false);
+      layer_output =
+          apollo::prediction::math_util::Softmax(layer_output, false);
     }
   }
   return layer_output;

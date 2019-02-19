@@ -113,9 +113,8 @@ Stage::StageStatus Stage::FinishScenario() {
   return Stage::FINISHED;
 }
 
-bool Stage::CheckStopSignDone(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& stop_sign_overlap_id) {
+bool Stage::CheckStopSignDone(const ReferenceLineInfo& reference_line_info,
+                              const std::string& stop_sign_overlap_id) {
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
   auto stop_sign_overlap_it =
@@ -126,9 +125,8 @@ bool Stage::CheckStopSignDone(
   return (stop_sign_overlap_it == stop_sign_overlaps.end());
 }
 
-bool Stage::CheckTrafficLightDone(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& traffic_light_overlap_id) {
+bool Stage::CheckTrafficLightDone(const ReferenceLineInfo& reference_line_info,
+                                  const std::string& traffic_light_overlap_id) {
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
   auto traffic_light_overlap_it =

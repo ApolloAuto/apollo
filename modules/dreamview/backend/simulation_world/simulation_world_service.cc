@@ -976,7 +976,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
     // Add prediction priority
     if (obstacle.has_priority()) {
-        world_obj.mutable_obstacle_priority()->CopyFrom(obstacle.priority());
+      world_obj.mutable_obstacle_priority()->CopyFrom(obstacle.priority());
     }
 
     world_obj.set_timestamp_sec(

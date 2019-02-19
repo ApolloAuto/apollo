@@ -48,8 +48,7 @@ TEST_F(TrafficLightProtectedScenarioTest, VerifyConf) {
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_protected_config_file,
-      &config));
+      FLAGS_scenario_traffic_light_protected_config_file, &config));
 }
 
 TEST_F(TrafficLightProtectedScenarioTest, Init) {
@@ -59,8 +58,7 @@ TEST_F(TrafficLightProtectedScenarioTest, Init) {
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_protected_config_file,
-      &config));
+      FLAGS_scenario_traffic_light_protected_config_file, &config));
 
   ScenarioContext context;
   scenario_.reset(new TrafficLightProtectedScenario(config, &context));

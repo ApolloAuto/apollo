@@ -101,7 +101,7 @@ class MonitorLogBuffer {
   void Publish();
 
  private:
-  MonitorLogger* logger_ = MonitorLogger::Instance();
+  MonitorLogger *logger_ = MonitorLogger::Instance();
   MonitorMessageItem::LogLevel level_ = MonitorMessageItem::INFO;
   std::vector<MessageItem> monitor_msg_items_;
   MonitorMessageItem::MessageSource source_;

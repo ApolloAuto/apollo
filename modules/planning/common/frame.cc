@@ -68,8 +68,8 @@ Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
 Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
              const common::TrajectoryPoint &planning_start_point,
              const common::VehicleState &vehicle_state)
-    : Frame(sequence_num, local_view, planning_start_point,
-            vehicle_state, nullptr) {}
+    : Frame(sequence_num, local_view, planning_start_point, vehicle_state,
+            nullptr) {}
 
 const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
   return planning_start_point_;

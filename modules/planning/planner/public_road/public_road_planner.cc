@@ -51,9 +51,9 @@ Status PublicRoadPlanner::Plan(const TrajectoryPoint& planning_start_point,
   auto result = scenario_->Process(planning_start_point, frame);
 
   if (FLAGS_enable_record_debug) {
-    auto scenario_debug =
-        ptr_computed_trajectory->mutable_debug()
-        ->mutable_planning_data()->mutable_scenario();
+    auto scenario_debug = ptr_computed_trajectory->mutable_debug()
+                              ->mutable_planning_data()
+                              ->mutable_scenario();
     scenario_debug->set_scenario_type(scenario_->scenario_type());
     scenario_debug->set_stage_type(scenario_->GetStage());
     scenario_debug->set_msg(scenario_->GetMsg());

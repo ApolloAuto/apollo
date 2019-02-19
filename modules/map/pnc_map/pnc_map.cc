@@ -311,9 +311,8 @@ int PncMap::SearchForwardWaypointIndex(int start,
 int PncMap::SearchBackwardWaypointIndex(int start,
                                         const LaneWaypoint &waypoint) const {
   int i = std::min(static_cast<int>(route_indices_.size() - 1), start);
-  while (
-      i >= 0 &&
-      !RouteSegments::WithinLaneSegment(route_indices_[i].segment, waypoint)) {
+  while (i >= 0 && !RouteSegments::WithinLaneSegment(route_indices_[i].segment,
+                                                     waypoint)) {
     --i;
   }
   return i;
@@ -734,10 +733,9 @@ void PncMap::AppendLaneToPoints(LaneInfoConstPtr lane, const double start_s,
       const auto &segment = lane->segments()[i];
       const double next_accumulate_s = accumulate_s + segment.length();
       if (start_s > accumulate_s && start_s < next_accumulate_s) {
-        points->emplace_back(
-            segment.start() +
-                segment.unit_direction() * (start_s - accumulate_s),
-            lane->headings()[i], LaneWaypoint(lane, start_s));
+        points->emplace_back(segment.start() + segment.unit_direction() *
+                                                   (start_s - accumulate_s),
+                             lane->headings()[i], LaneWaypoint(lane, start_s));
       }
       if (end_s > accumulate_s && end_s < next_accumulate_s) {
         points->emplace_back(

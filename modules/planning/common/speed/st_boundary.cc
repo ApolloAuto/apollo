@@ -419,4 +419,3 @@ void STBoundary::set_bottom_right_point(STPoint st_point) {
 
 }  // namespace planning
 }  // namespace apollo
-

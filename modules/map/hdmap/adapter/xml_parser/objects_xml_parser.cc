@@ -170,8 +170,8 @@ Status ObjectsXmlParser::ParseStopLines(
 }
 
 Status ObjectsXmlParser::ParseParkingSpaces(
-        const tinyxml2::XMLElement& xml_node,
-        std::vector<PbParkingSpace>* parking_spaces) {
+    const tinyxml2::XMLElement& xml_node,
+    std::vector<PbParkingSpace>* parking_spaces) {
   CHECK_NOTNULL(parking_spaces);
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
   while (sub_node) {
@@ -212,8 +212,8 @@ Status ObjectsXmlParser::ParseParkingSpaces(
 }
 
 Status ObjectsXmlParser::ParsePNCJunctions(
-        const tinyxml2::XMLElement& xml_node,
-        std::vector<PbPNCJunction>* pnc_junctions) {
+    const tinyxml2::XMLElement& xml_node,
+    std::vector<PbPNCJunction>* pnc_junctions) {
   CHECK_NOTNULL(pnc_junctions);
   const tinyxml2::XMLElement* sub_node = xml_node.FirstChildElement("object");
   while (sub_node) {

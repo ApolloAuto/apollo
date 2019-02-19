@@ -63,8 +63,8 @@ TEST_F(TrafficLightUnprotectedRightTurnScenarioTest, Init) {
       &config));
 
   ScenarioContext context;
-  scenario_.reset(new TrafficLightUnprotectedRightTurnScenario(config,
-                                                               &context));
+  scenario_.reset(
+      new TrafficLightUnprotectedRightTurnScenario(config, &context));
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
 }

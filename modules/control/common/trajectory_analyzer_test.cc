@@ -16,8 +16,8 @@
 
 #include "modules/control/common/trajectory_analyzer.h"
 
-#include "gtest/gtest.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 #include "modules/common/time/time.h"
 
 using apollo::common::PathPoint;

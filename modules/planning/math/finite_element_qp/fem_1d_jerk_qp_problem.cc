@@ -63,10 +63,9 @@ bool Fem1dJerkQpProblem::Optimize() {
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
   OSQPWorkspace* work = nullptr;
 
-  OptimizeWithOsqp(3 * num_var_, lower_bounds.size(),
-                   P_data, P_indices, P_indptr,
-                   A_data, A_indices, A_indptr,
-                   lower_bounds, upper_bounds, q, data, &work, settings);
+  OptimizeWithOsqp(3 * num_var_, lower_bounds.size(), P_data, P_indices,
+                   P_indptr, A_data, A_indices, A_indptr, lower_bounds,
+                   upper_bounds, q, data, &work, settings);
   if (work == nullptr || work->solution == nullptr) {
     AERROR << "Failed to find QP solution.";
     return false;

@@ -93,7 +93,6 @@ Status LocalizationIntegImpl::Init(const LocalizationIntegParam& params) {
   return Status::OK();
 }
 
-
 void LocalizationIntegImpl::PcdProcess(const LidarFrame& lidar_frame) {
   PcdProcessImpl(lidar_frame);
 
@@ -121,8 +120,8 @@ void LocalizationIntegImpl::PcdProcessImpl(const LidarFrame& pcd_data) {
     imu_altitude_from_lidar_localization_available_ = true;
   }
 
-  lastest_lidar_localization_ = LocalizationResult(
-      LocalizationMeasureState(state), lidar_localization);
+  lastest_lidar_localization_ =
+      LocalizationResult(LocalizationMeasureState(state), lidar_localization);
 }
 
 void LocalizationIntegImpl::RawImuProcessRfu(const ImuData& imu_data) {
@@ -199,9 +198,9 @@ void LocalizationIntegImpl::ImuProcessImpl(const ImuData& imu_data) {
   angular_velocity_vrf->set_y(imu_data.wibb[1]);
   angular_velocity_vrf->set_z(imu_data.wibb[2]);
 
-  lastest_integ_localization_ = LocalizationResult(
-      LocalizationMeasureState(static_cast<int>(state)),
-      integ_localization, integ_status);
+  lastest_integ_localization_ =
+      LocalizationResult(LocalizationMeasureState(static_cast<int>(state)),
+                         integ_localization, integ_status);
 
   InsPva integ_sins_pva;
   double covariance[9][9];
@@ -297,8 +296,8 @@ void LocalizationIntegImpl::GnssBestPoseProcessImpl(
     TransferGnssMeasureToLocalization(measure, &gnss_localization);
     expert_.GetGnssStatus(gnss_localization.mutable_msf_status());
 
-    lastest_gnss_localization_ = LocalizationResult(
-        LocalizationMeasureState::OK, gnss_localization);
+    lastest_gnss_localization_ =
+        LocalizationResult(LocalizationMeasureState::OK, gnss_localization);
   }
   return;
 }
@@ -369,18 +368,18 @@ void LocalizationIntegImpl::TransferGnssMeasureToLocalization(
   return;
 }
 
-const LocalizationResult& LocalizationIntegImpl::
-    GetLastestLidarLocalization() const {
+const LocalizationResult& LocalizationIntegImpl::GetLastestLidarLocalization()
+    const {
   return lastest_lidar_localization_;
 }
 
-const LocalizationResult& LocalizationIntegImpl::
-    GetLastestIntegLocalization() const {
+const LocalizationResult& LocalizationIntegImpl::GetLastestIntegLocalization()
+    const {
   return lastest_integ_localization_;
 }
 
-const LocalizationResult& LocalizationIntegImpl::
-    GetLastestGnssLocalization() const {
+const LocalizationResult& LocalizationIntegImpl::GetLastestGnssLocalization()
+    const {
   return lastest_gnss_localization_;
 }
 

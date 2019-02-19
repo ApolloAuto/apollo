@@ -104,8 +104,7 @@ std::unique_ptr<Stage> TrafficLightUnprotectedLeftTurnScenario::CreateStage(
 }
 
 bool TrafficLightUnprotectedLeftTurnScenario::IsTransferable(
-    const Scenario& current_scenario,
-    const Frame& frame) {
+    const Scenario& current_scenario, const Frame& frame) {
   const std::string traffic_light_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
   if (traffic_light_overlap_id.empty()) {
@@ -128,11 +127,12 @@ bool TrafficLightUnprotectedLeftTurnScenario::IsTransferable(
       adc_distance_to_stop_line > scenario_config.max_valid_stop_distance()) {
     is_stopped_for_traffic_light = false;
     ADEBUG << "ADC not stopped: speed[" << adc_speed
-        << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line << "]";
+           << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line
+           << "]";
   }
 
-  bool left_turn = (reference_line_info.GetPathTurnType() ==
-      hdmap::Lane::LEFT_TURN);
+  bool left_turn =
+      (reference_line_info.GetPathTurnType() == hdmap::Lane::LEFT_TURN);
 
   switch (current_scenario.scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
@@ -140,8 +140,8 @@ bool TrafficLightUnprotectedLeftTurnScenario::IsTransferable(
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
       return (is_stopped_for_traffic_light && left_turn &&
-          PlanningContext::GetScenarioInfo()->traffic_light_color ==
-              TrafficLight::GREEN);
+              PlanningContext::GetScenarioInfo()->traffic_light_color ==
+                  TrafficLight::GREEN);
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:

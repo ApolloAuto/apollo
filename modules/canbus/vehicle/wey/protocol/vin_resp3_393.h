@@ -16,20 +16,20 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace wey {
 
 class Vinresp3393 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                        ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
   Vinresp3393();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'name': 'VIN16', 'offset': 0.0, 'precision': 1.0,

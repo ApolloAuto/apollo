@@ -98,9 +98,8 @@ bool PiecewisePolyVTSpeedSampler::Sample(
       // resampling
       if (sampling_v > init_point.v() - unit_v && i != config_.num_t_layers()) {
         double dec_lower_v =
-            std::fmax(0.0, sampling_v +
-                               0.5 * config_.online_max_dec() *
-                                   (config_.num_t_layers() - i));
+            std::fmax(0.0, sampling_v + 0.5 * config_.online_max_dec() *
+                                            (config_.num_t_layers() - i));
         for (double end_v = dec_lower_v; end_v < sampling_v; end_v += unit_v) {
           end_point.set_v(end_v);
           PiecewisePolySpeedCurve curve(init_speed_point, connect_point,

@@ -63,7 +63,7 @@ std::unique_ptr<Stage> LaneFollowScenario::CreateStage(
 }
 
 bool LaneFollowScenario::IsTransferable(const Scenario& current_scenario,
-    const Frame& frame) {
+                                        const Frame& frame) {
   // implement here
   if (current_scenario.scenario_type() == ScenarioConfig::LANE_FOLLOW) {
     return true;

@@ -37,9 +37,7 @@ class GrpcServerImpl final : public ObuToCar::Service {
 
   ~GrpcServerImpl() {}
 
-  bool InitFlag() {
-    return init_flag_;
-  }
+  bool InitFlag() { return init_flag_; }
 
   /* function that send perception obstacles through grpc
   @param input perception obstacles grpc request

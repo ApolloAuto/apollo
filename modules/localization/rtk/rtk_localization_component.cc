@@ -14,8 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/time/time.h"
 #include "modules/localization/rtk/rtk_localization_component.h"
+#include "modules/common/time/time.h"
 
 namespace apollo {
 namespace localization {
@@ -44,7 +44,7 @@ bool RTKLocalizationComponent::Init() {
 bool RTKLocalizationComponent::InitConfig() {
   rtk_config::Config rtk_config;
   if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                                   &rtk_config)) {
+                                               &rtk_config)) {
     return false;
   }
   AINFO << "Rtk localization config: " << rtk_config.DebugString();
@@ -64,19 +64,13 @@ bool RTKLocalizationComponent::InitConfig() {
 
 bool RTKLocalizationComponent::InitIO() {
   corrected_imu_listener_ = node_->CreateReader<localization::CorrectedImu>(
-      imu_topic_,
-      std::bind(
-          &RTKLocalization::ImuCallback,
-          localization_.get(),
-          std::placeholders::_1));
+      imu_topic_, std::bind(&RTKLocalization::ImuCallback, localization_.get(),
+                            std::placeholders::_1));
   DCHECK_NOTNULL(corrected_imu_listener_);
 
   gps_status_listener_ = node_->CreateReader<drivers::gnss::InsStat>(
-      gps_status_topic_,
-      std::bind(
-          &RTKLocalization::GpsStatusCallback,
-          localization_.get(),
-          std::placeholders::_1));
+      gps_status_topic_, std::bind(&RTKLocalization::GpsStatusCallback,
+                                   localization_.get(), std::placeholders::_1));
   DCHECK_NOTNULL(gps_status_listener_);
 
   localization_talker_ =

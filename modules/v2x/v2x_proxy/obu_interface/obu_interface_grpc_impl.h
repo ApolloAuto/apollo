@@ -36,11 +36,11 @@ class ObuInterFaceGrpcImpl : public ObuInterFaceBase {
   ~ObuInterFaceGrpcImpl();
 
   /* function that init grpc server
-  */
+   */
   bool InitialServer() override;
 
   /* function that init grpc client
-  */
+   */
   bool InitialClient() override;
 
   /* function that get perception obstacles through grpc
@@ -69,12 +69,12 @@ class ObuInterFaceGrpcImpl : public ObuInterFaceBase {
       override;
 
   /* function that return init flag
-  */
+   */
   bool InitFlag() { return init_succ_; }
 
  private:
   /* thread function that run server
-  */
+   */
   void ThreadRunServer();
   std::shared_ptr<GrpcClientImpl> grpc_client_;
   std::shared_ptr<GrpcServerImpl> grpc_server_;

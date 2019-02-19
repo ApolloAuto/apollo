@@ -22,8 +22,8 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-using apollo::drivers::canbus::Byte;
 using apollo::drivers::ContiRadar;
+using apollo::drivers::canbus::Byte;
 
 const uint32_t RadarConfig200::ID = 0x200;
 

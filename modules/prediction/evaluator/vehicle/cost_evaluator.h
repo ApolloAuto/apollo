@@ -42,9 +42,9 @@ class CostEvaluator : public Evaluator {
   void Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
-    * @brief Get the name of evaluator.
-    */
-  std::string GetName() override {return "COST_EVALUATOR";}
+   * @brief Get the name of evaluator.
+   */
+  std::string GetName() override { return "COST_EVALUATOR"; }
 
  private:
   double ComputeProbability(const double obstacle_length,

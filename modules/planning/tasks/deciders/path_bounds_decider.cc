@@ -42,11 +42,11 @@ constexpr double kRoadEdgeBuffer = 0.2;
 constexpr double kObstacleSBuffer = 0.5;
 constexpr double kObstacleLBuffer = 0.5;
 
-PathBoundsDecider::PathBoundsDecider(const TaskConfig &config)
+PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
     : Decider(config) {}
 
 Status PathBoundsDecider::Process(
-    Frame *const frame, ReferenceLineInfo *const reference_line_info) {
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -55,19 +55,19 @@ Status PathBoundsDecider::Process(
   std::vector<std::tuple<double, double, double>> path_boundaries;
 
   // 0. Initialize the path boundaries to be an indefinitely large area.
-  if (!InitPathBoundaries(
-          reference_line_info->reference_line(),
-          frame->PlanningStartPoint(), &path_boundaries)) {
+  if (!InitPathBoundaries(reference_line_info->reference_line(),
+                          frame->PlanningStartPoint(), &path_boundaries)) {
     const std::string msg = "Failed to initialize path boundaries.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   // 1. Decide a rough boundary based on road info and ADC's position
-  if (!GetBoundariesFromRoadsAndADC(
-          reference_line_info->reference_line(),
-          reference_line_info->AdcSlBoundary(), &path_boundaries)) {
-    const std::string msg = "Failed to decide a rough boundary based on "
-                            "road information.";
+  if (!GetBoundariesFromRoadsAndADC(reference_line_info->reference_line(),
+                                    reference_line_info->AdcSlBoundary(),
+                                    &path_boundaries)) {
+    const std::string msg =
+        "Failed to decide a rough boundary based on "
+        "road information.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -76,8 +76,9 @@ Status PathBoundsDecider::Process(
   if (!GetBoundariesFromStaticObstacles(
           reference_line_info->path_decision()->obstacles(),
           &path_boundaries)) {
-    const std::string msg = "Failed to decide fine tune the boundaries after "
-                            "taking into consideration all static obstacles.";
+    const std::string msg =
+        "Failed to decide fine tune the boundaries after "
+        "taking into consideration all static obstacles.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -105,18 +106,15 @@ bool PathBoundsDecider::InitPathBoundaries(
        curr_s < std::min(adc_frenet_s_ + kPathBoundsDeciderHorizon,
                          reference_line.Length());
        curr_s += kPathBoundsDeciderResolution) {
-    path_boundaries->emplace_back(
-        curr_s,
-        std::numeric_limits<double>::lowest(),
-        std::numeric_limits<double>::max());
+    path_boundaries->emplace_back(curr_s, std::numeric_limits<double>::lowest(),
+                                  std::numeric_limits<double>::max());
   }
 
   return true;
 }
 
 bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
-    const ReferenceLine& reference_line,
-    const SLBoundary& adc_sl_boundary,
+    const ReferenceLine& reference_line, const SLBoundary& adc_sl_boundary,
     std::vector<std::tuple<double, double, double>>* const path_boundaries) {
   // Sanity checks.
   CHECK_NOTNULL(path_boundaries);
@@ -133,8 +131,8 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
     // Get the lane width at current point.
     double curr_lane_left_width = 0.0;
     double curr_lane_right_width = 0.0;
-    if (!reference_line.GetLaneWidth(
-            curr_s, &curr_lane_left_width, &curr_lane_right_width)) {
+    if (!reference_line.GetLaneWidth(curr_s, &curr_lane_left_width,
+                                     &curr_lane_right_width)) {
       AWARN << "Failed to get lane width at s = " << curr_s;
       curr_lane_left_width = past_lane_left_width;
       curr_lane_right_width = past_lane_right_width;
@@ -145,8 +143,8 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
     // Get the road width at current point.
     double curr_road_left_width = 0.0;
     double curr_road_right_width = 0.0;
-    if (!reference_line.GetRoadWidth(
-            curr_s, &curr_road_left_width, &curr_road_right_width)) {
+    if (!reference_line.GetRoadWidth(curr_s, &curr_road_left_width,
+                                     &curr_road_right_width)) {
       AWARN << "Failed to get road width at s = " << curr_s;
       curr_road_left_width = past_road_left_width;
       curr_road_right_width = past_road_right_width;
@@ -247,19 +245,20 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
           break;
         } else {
           center_line = (std::get<1>((*path_boundaries)[i]) +
-              std::get<2>((*path_boundaries)[i])) / 2.0;
+                         std::get<2>((*path_boundaries)[i])) /
+                        2.0;
         }
 
         ++obs_idx;
       }
     } else {
       // If no obstacle change, update the bounds and center_line.
-      std::get<1>((*path_boundaries)[i]) = std::fmax(
-          std::get<1>((*path_boundaries)[i]),
-          *left_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
-      std::get<2>((*path_boundaries)[i]) = std::fmin(
-          std::get<2>((*path_boundaries)[i]),
-          *right_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
+      std::get<1>((*path_boundaries)[i]) =
+          std::fmax(std::get<1>((*path_boundaries)[i]),
+                    *left_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
+      std::get<2>((*path_boundaries)[i]) =
+          std::fmin(std::get<2>((*path_boundaries)[i]),
+                    *right_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
       if (std::get<1>((*path_boundaries)[i]) >
           std::get<2>((*path_boundaries)[i])) {
         ADEBUG << "Path is blocked at s = " << curr_s;
@@ -270,7 +269,8 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
         break;
       } else {
         center_line = (std::get<1>((*path_boundaries)[i]) +
-            std::get<2>((*path_boundaries)[i])) / 2.0;
+                       std::get<2>((*path_boundaries)[i])) /
+                      2.0;
       }
     }
 
@@ -285,8 +285,9 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
     if (path_blocked_idx == 0) {
       ADEBUG << "Completely blocked. Cannot move at all.";
     }
-    for (int i = 0; i < static_cast<int>(path_boundaries->size()) -
-         path_blocked_idx; ++i) {
+    for (int i = 0;
+         i < static_cast<int>(path_boundaries->size()) - path_blocked_idx;
+         ++i) {
       path_boundaries->pop_back();
     }
   }
@@ -309,7 +310,7 @@ std::vector<std::tuple<int, double, double, double, std::string>>
 PathBoundsDecider::SortObstaclesForSweepLine(
     const IndexedList<std::string, Obstacle>& indexed_obstacles) {
   std::vector<std::tuple<int, double, double, double, std::string>>
-    sorted_obstacles;
+      sorted_obstacles;
 
   // Go through every obstacle and preprocess it.
   for (const auto* obstacle : indexed_obstacles.Items()) {
@@ -328,20 +329,20 @@ PathBoundsDecider::SortObstaclesForSweepLine(
     // Decompose each obstacle's rectangle into two edges: one at
     // start_s; the other at end_s.
     const auto obstacle_sl = obstacle->PerceptionSLBoundary();
-    sorted_obstacles.emplace_back(
-        1, obstacle_sl.start_s() - kObstacleSBuffer,
-        obstacle_sl.start_l() - kObstacleLBuffer,
-        obstacle_sl.end_l() + kObstacleLBuffer, obstacle->Id());
-    sorted_obstacles.emplace_back(
-        0, obstacle_sl.end_s() + kObstacleSBuffer,
-        obstacle_sl.start_l() - kObstacleLBuffer,
-        obstacle_sl.end_l() + kObstacleLBuffer, obstacle->Id());
+    sorted_obstacles.emplace_back(1, obstacle_sl.start_s() - kObstacleSBuffer,
+                                  obstacle_sl.start_l() - kObstacleLBuffer,
+                                  obstacle_sl.end_l() + kObstacleLBuffer,
+                                  obstacle->Id());
+    sorted_obstacles.emplace_back(0, obstacle_sl.end_s() + kObstacleSBuffer,
+                                  obstacle_sl.start_l() - kObstacleLBuffer,
+                                  obstacle_sl.end_l() + kObstacleLBuffer,
+                                  obstacle->Id());
   }
 
   // Sort.
   sort(sorted_obstacles.begin(), sorted_obstacles.end(),
-       [ ](const std::tuple<int, double, double, double, std::string>& lhs,
-           const std::tuple<int, double, double, double, std::string>& rhs) {
+       [](const std::tuple<int, double, double, double, std::string>& lhs,
+          const std::tuple<int, double, double, double, std::string>& rhs) {
          if (std::get<1>(lhs) != std::get<1>(rhs)) {
            return std::get<1>(lhs) < std::get<1>(rhs);
          } else {

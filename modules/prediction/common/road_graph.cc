@@ -26,22 +26,18 @@ namespace prediction {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::math::NormalizeAngle;
 using apollo::hdmap::Lane;
 using apollo::hdmap::LaneInfo;
-using apollo::common::math::NormalizeAngle;
-
 
 // Custom helper functions for sorting purpose.
-bool HeadingIsAtLeft(std::vector<double> heading1,
-                     std::vector<double> heading2,
+bool HeadingIsAtLeft(std::vector<double> heading1, std::vector<double> heading2,
                      size_t idx);
 bool IsAtLeft(std::shared_ptr<const LaneInfo> lane1,
               std::shared_ptr<const LaneInfo> lane2);
 int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane);
 
-
-bool HeadingIsAtLeft(std::vector<double> heading1,
-                     std::vector<double> heading2,
+bool HeadingIsAtLeft(std::vector<double> heading1, std::vector<double> heading2,
                      size_t idx) {
   if (heading1.empty() || heading2.empty()) {
     return true;
@@ -110,8 +106,8 @@ Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   std::vector<LaneSegment> lane_segments;
   double accumulated_s = 0.0;
   ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_,
-                      FLAGS_road_graph_max_search_horizon,
-                      &lane_segments, lane_graph_ptr);
+                      FLAGS_road_graph_max_search_horizon, &lane_segments,
+                      lane_graph_ptr);
 
   return Status::OK();
 }
@@ -165,7 +161,6 @@ void RoadGraph::ComputeLaneSequence(
   lane_segment.set_total_length(lane_info_ptr->total_length());
   lane_segments->push_back(std::move(lane_segment));
 
-
   if (accumulated_s + lane_info_ptr->total_length() - start_s >= length_ ||
       lane_info_ptr->lane().successor_id_size() == 0) {
     // End condition: if search reached the max. search distance,
@@ -181,16 +176,16 @@ void RoadGraph::ComputeLaneSequence(
     // Sort the successor lane_segments from left to right.
     std::vector<std::shared_ptr<const hdmap::LaneInfo>> successor_lanes;
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
-      successor_lanes.push_back
-          (PredictionMap::LaneById(successor_lane_id.id()));
+      successor_lanes.push_back(
+          PredictionMap::LaneById(successor_lane_id.id()));
     }
     std::sort(successor_lanes.begin(), successor_lanes.end(), IsAtLeft);
 
     // Run recursion function to perform DFS.
     for (size_t i = 0; i < successor_lanes.size(); i++) {
       ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lanes[i],
-                          graph_search_horizon - 1,
-                          lane_segments, lane_graph_ptr);
+                          graph_search_horizon - 1, lane_segments,
+                          lane_graph_ptr);
     }
   }
   lane_segments->pop_back();

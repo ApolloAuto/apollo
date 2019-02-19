@@ -51,9 +51,8 @@ apollo::common::Status SidePassSafety::BuildSidePathDecision(
   std::string virtual_obstacle_id = SIDEPASS_VIRTUAL_OBSTACLE_ID;
 
   double stop_fence_s = reference_line_info->AdcSlBoundary().end_s() + 0.2;
-  auto *obstacle =
-      frame->CreateStopObstacle(reference_line_info, virtual_obstacle_id,
-                                stop_fence_s);
+  auto *obstacle = frame->CreateStopObstacle(reference_line_info,
+                                             virtual_obstacle_id, stop_fence_s);
   if (!obstacle) {
     AERROR << "Failed to create side pass safety obstacle["
            << virtual_obstacle_id << "]";
@@ -73,7 +72,7 @@ apollo::common::Status SidePassSafety::BuildSidePathDecision(
   // build stop decision
   const double stop_distance = 2.0;
   const double stop_s = stop_fence_s - stop_distance;
-  const auto& reference_line = reference_line_info->reference_line();
+  const auto &reference_line = reference_line_info->reference_line();
   auto stop_point = reference_line.GetReferencePoint(stop_s);
   double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
 

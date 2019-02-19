@@ -96,13 +96,9 @@ int PIDController::IntegratorSaturationStatus() const {
   return integrator_saturation_status_;
 }
 
-bool PIDController::IntegratorHold() const {
-  return integrator_hold_;
-}
+bool PIDController::IntegratorHold() const { return integrator_hold_; }
 
-void PIDController::SetIntegratorHold(bool hold) {
-  integrator_hold_ = hold;
-}
+void PIDController::SetIntegratorHold(bool hold) { integrator_hold_ = hold; }
 
 }  // namespace control
 }  // namespace apollo

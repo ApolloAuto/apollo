@@ -47,21 +47,19 @@ class QuinticSpiralPathWithDerivation : public QuinticPolynomialCurve1d {
 
   virtual ~QuinticSpiralPathWithDerivation() = default;
 
-  double evaluate(const size_t order,
-      const size_t i, const size_t n);
+  double evaluate(const size_t order, const size_t i, const size_t n);
 
   double ComputeCartesianDeviationX() const { return dx_; }
 
   double ComputeCartesianDeviationY() const { return dy_; }
 
-  std::pair<double, double> DeriveCartesianDeviation(
-      const size_t param_index);
+  std::pair<double, double> DeriveCartesianDeviation(const size_t param_index);
 
-  double DeriveKappaDerivative(const size_t param_index,
-      const int i, const int n);
+  double DeriveKappaDerivative(const size_t param_index, const int i,
+                               const int n);
 
-  double DeriveDKappaDerivative(const size_t param_index,
-      const int i, const int n);
+  double DeriveDKappaDerivative(const size_t param_index, const int i,
+                                const int n);
 
   static const size_t THETA0 = 0;
   static const size_t KAPPA0 = 1;
@@ -90,24 +88,17 @@ class QuinticSpiralPathWithDerivation : public QuinticPolynomialCurve1d {
   }
 
  private:
-  double DeriveCosTheta(
-      const size_t param_index,
-      const double r) const;
+  double DeriveCosTheta(const size_t param_index, const double r) const;
 
-  double DeriveSinTheta(
-      const size_t param_index,
-      const double r) const;
+  double DeriveSinTheta(const size_t param_index, const double r) const;
 
-  double DeriveThetaDerivative(
-      const size_t param_index,
-      const double r) const;
+  double DeriveThetaDerivative(const size_t param_index, const double r) const;
 
   std::array<std::array<double, 7>, 6> coef_deriv_;
 
   std::unordered_map<size_t, double> cache_evaluate_;
 
-  std::unordered_map<size_t, std::pair<double, double>>
-  cache_cartesian_deriv_;
+  std::unordered_map<size_t, std::pair<double, double>> cache_cartesian_deriv_;
 
   std::unordered_map<size_t, double> cache_kappa_deriv_;
 
@@ -122,11 +113,11 @@ class QuinticSpiralPathWithDerivation : public QuinticPolynomialCurve1d {
   std::array<double, N> gauss_point_weights_;
 };
 
-template<size_t N>
+template <size_t N>
 QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
     const double x0, const double dx0, const double ddx0, const double x1,
-    const double dx1, const double ddx1, const double s) :
-    QuinticPolynomialCurve1d(x0, dx0, ddx0, x1, dx1, ddx1, s) {
+    const double dx1, const double ddx1, const double s)
+    : QuinticPolynomialCurve1d(x0, dx0, ddx0, x1, dx1, ddx1, s) {
   CHECK(s > 0.0);
 
   auto gauss_points = common::math::GetGaussLegendrePoints<N>();
@@ -157,8 +148,8 @@ QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
   coef_deriv_[5][3] = 6.0 / s5;
   coef_deriv_[5][4] = -3.0 / s4;
   coef_deriv_[5][5] = 0.5 / s3;
-  coef_deriv_[5][6] = 30.0 * x0 / s6 + 12.0 * dx0 / s5 + 1.5 * ddx0 / s4
-      - 30.0 * x1 / s6 + 12.0 * dx1 / s5 - 1.5 * ddx1 / s4;
+  coef_deriv_[5][6] = 30.0 * x0 / s6 + 12.0 * dx0 / s5 + 1.5 * ddx0 / s4 -
+                      30.0 * x1 / s6 + 12.0 * dx1 / s5 - 1.5 * ddx1 / s4;
 
   // derive b
   // double b = 15.0 * x0 / p4 + 8.0 * dx0 / p3 + 1.5 * ddx0 / p2 - 15.0 * x1 /
@@ -169,8 +160,8 @@ QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
   coef_deriv_[4][3] = -15.0 / s4;
   coef_deriv_[4][4] = 7.0 / s3;
   coef_deriv_[4][5] = -1.0 / s2;
-  coef_deriv_[4][6] = -60.0 * x0 / s5 - 24.0 * dx0 / s4 - 3.0 * ddx0 / s3
-      + 60.0 * x1 / s5 - 21.0 * dx1 / s4 + 2.0 * ddx1 / s3;
+  coef_deriv_[4][6] = -60.0 * x0 / s5 - 24.0 * dx0 / s4 - 3.0 * ddx0 / s3 +
+                      60.0 * x1 / s5 - 21.0 * dx1 / s4 + 2.0 * ddx1 / s3;
 
   // derive c
   // double c = -10.0 * x0 / p3 - 6.0 * dx0 / p2 - 1.5 * ddx0 / p + 10.0 * x1 /
@@ -181,8 +172,8 @@ QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
   coef_deriv_[3][3] = 10.0 / s3;
   coef_deriv_[3][4] = -4.0 / s2;
   coef_deriv_[3][5] = 0.5 / s;
-  coef_deriv_[3][6] = 30.0 * x0 / s4 + 12.0 * dx0 / s3 + 1.5 * ddx0 / s2
-      - 30.0 * x1 / s4 + 8.0 * dx1 / s3 - 0.5 * ddx1 / s2;
+  coef_deriv_[3][6] = 30.0 * x0 / s4 + 12.0 * dx0 / s3 + 1.5 * ddx0 / s2 -
+                      30.0 * x1 / s4 + 8.0 * dx1 / s3 - 0.5 * ddx1 / s2;
 
   // derive d
   // double d = 0.5 * ddx0;
@@ -197,34 +188,33 @@ QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
   coef_deriv_[0][0] = 1.0;
 }
 
-template<size_t N>
+template <size_t N>
 QuinticSpiralPathWithDerivation<N>::QuinticSpiralPathWithDerivation(
     const std::array<double, 3>& start, const std::array<double, 3>& end,
-    const double delta_s) :
-    QuinticSpiralPathWithDerivation<N>(start[0], start[1], start[2], end[0],
-        end[1], end[2], delta_s) {
-}
+    const double delta_s)
+    : QuinticSpiralPathWithDerivation<N>(start[0], start[1], start[2], end[0],
+                                         end[1], end[2], delta_s) {}
 
-template<size_t N>
-double QuinticSpiralPathWithDerivation<N>::evaluate(
-    const size_t order, const size_t i, const size_t n) {
+template <size_t N>
+double QuinticSpiralPathWithDerivation<N>::evaluate(const size_t order,
+                                                    const size_t i,
+                                                    const size_t n) {
   auto key = order * 100 + n * 10 + i;
   if (cache_evaluate_.find(key) != cache_evaluate_.end()) {
     return cache_evaluate_[key];
   }
-  auto res = Evaluate(order,
-      static_cast<double>(i) / static_cast<double>(n) * param_);
+  auto res =
+      Evaluate(order, static_cast<double>(i) / static_cast<double>(n) * param_);
   cache_evaluate_[key] = res;
   return res;
 }
 
-template<size_t N>
+template <size_t N>
 std::pair<double, double>
 QuinticSpiralPathWithDerivation<N>::DeriveCartesianDeviation(
     const size_t param_index) {
-
-  if (cache_cartesian_deriv_.find(param_index)
-      != cache_cartesian_deriv_.end()) {
+  if (cache_cartesian_deriv_.find(param_index) !=
+      cache_cartesian_deriv_.end()) {
     return cache_cartesian_deriv_[param_index];
   }
 
@@ -277,19 +267,15 @@ double QuinticSpiralPathWithDerivation<N>::DeriveKappaDerivative(
   double s3 = s2 * s;
   double s4 = s2 * s2;
 
-  double derivative =
-      5.0 * coef_deriv_[5][param_index] * s4 +
-      4.0 * coef_deriv_[4][param_index] * s3 +
-      3.0 * coef_deriv_[3][param_index] * s2 +
-      2.0 * coef_deriv_[2][param_index] * s +
-      coef_deriv_[1][param_index];
+  double derivative = 5.0 * coef_deriv_[5][param_index] * s4 +
+                      4.0 * coef_deriv_[4][param_index] * s3 +
+                      3.0 * coef_deriv_[3][param_index] * s2 +
+                      2.0 * coef_deriv_[2][param_index] * s +
+                      coef_deriv_[1][param_index];
 
   if (param_index == DELTA_S) {
-    derivative +=
-        20.0 * coef_[5] * s3 * r +
-        12.0 * coef_[4] * s2 * r +
-        6.0 * coef_[3] * s * r +
-        2.0 * coef_[2] * r;
+    derivative += 20.0 * coef_[5] * s3 * r + 12.0 * coef_[4] * s2 * r +
+                  6.0 * coef_[3] * s * r + 2.0 * coef_[2] * r;
   }
 
   cache_kappa_deriv_[key] = derivative;
@@ -299,7 +285,6 @@ double QuinticSpiralPathWithDerivation<N>::DeriveKappaDerivative(
 template <size_t N>
 double QuinticSpiralPathWithDerivation<N>::DeriveDKappaDerivative(
     const size_t param_index, const int i, const int n) {
-
   auto key = param_index * INDEX_MAX + i;
   if (cache_dkappa_deriv_.find(key) != cache_dkappa_deriv_.end()) {
     return cache_dkappa_deriv_[key];
@@ -310,17 +295,14 @@ double QuinticSpiralPathWithDerivation<N>::DeriveDKappaDerivative(
   double s2 = s * s;
   double s3 = s2 * s;
 
-  double derivative =
-      20.0 * coef_deriv_[5][param_index] * s3 +
-      12.0 * coef_deriv_[4][param_index] * s2 +
-      6.0 * coef_deriv_[3][param_index] * s +
-      2.0 * coef_deriv_[2][param_index];
+  double derivative = 20.0 * coef_deriv_[5][param_index] * s3 +
+                      12.0 * coef_deriv_[4][param_index] * s2 +
+                      6.0 * coef_deriv_[3][param_index] * s +
+                      2.0 * coef_deriv_[2][param_index];
 
   if (param_index == DELTA_S) {
     derivative +=
-        60.0 * coef_[5] * s2 * r +
-        24.0 * coef_[4] * s * r +
-        6.0 * coef_[3] * r;
+        60.0 * coef_[5] * s2 * r + 24.0 * coef_[4] * s * r + 6.0 * coef_[3] * r;
   }
 
   cache_dkappa_deriv_[key] = derivative;
@@ -337,20 +319,14 @@ double QuinticSpiralPathWithDerivation<N>::DeriveThetaDerivative(
   double s5 = s3 * s2;
 
   double derivative =
-      coef_deriv_[5][param_index] * s5 +
-      coef_deriv_[4][param_index] * s4 +
-      coef_deriv_[3][param_index] * s3 +
-      coef_deriv_[2][param_index] * s2 +
-      coef_deriv_[1][param_index] * s +
-      coef_deriv_[0][param_index];
+      coef_deriv_[5][param_index] * s5 + coef_deriv_[4][param_index] * s4 +
+      coef_deriv_[3][param_index] * s3 + coef_deriv_[2][param_index] * s2 +
+      coef_deriv_[1][param_index] * s + coef_deriv_[0][param_index];
 
   if (param_index == DELTA_S) {
-    derivative +=
-        coef_[5] * 5.0 * s4 * r +
-        coef_[4] * 4.0 * s3 * r +
-        coef_[3] * 3.0 * s2 * r +
-        coef_[2] * 2.0 * s * r +
-        coef_[1] * r;
+    derivative += coef_[5] * 5.0 * s4 * r + coef_[4] * 4.0 * s3 * r +
+                  coef_[3] * 3.0 * s2 * r + coef_[2] * 2.0 * s * r +
+                  coef_[1] * r;
   }
   return derivative;
 }

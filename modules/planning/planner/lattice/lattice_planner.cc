@@ -35,8 +35,8 @@
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/lattice/behavior/path_time_graph.h"
 #include "modules/planning/lattice/behavior/prediction_querier.h"
-#include "modules/planning/lattice/trajectory_generation/lattice_trajectory1d.h"
 #include "modules/planning/lattice/trajectory_generation/backup_trajectory_generator.h"
+#include "modules/planning/lattice/trajectory_generation/lattice_trajectory1d.h"
 #include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
 #include "modules/planning/lattice/trajectory_generation/trajectory_combiner.h"
 #include "modules/planning/lattice/trajectory_generation/trajectory_evaluator.h"
@@ -48,8 +48,8 @@ using apollo::common::ErrorCode;
 using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::math::PathMatcher;
 using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::math::PathMatcher;
 using apollo::common::time::Clock;
 
 namespace {

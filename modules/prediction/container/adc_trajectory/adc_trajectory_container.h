@@ -109,7 +109,8 @@ class ADCTrajectoryContainer : public Container {
   /**
    * @brief Check if a point is in the first PNC junction of the adc trajectory
    * @param Point
-   * @return True if the point is in the first PNC junction of the adc trajectory
+   * @return True if the point is in the first PNC junction of the adc
+   * trajectory
    */
   bool IsPointInPNCJunction(const common::PathPoint& point) const;
 

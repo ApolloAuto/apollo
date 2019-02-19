@@ -36,8 +36,7 @@ class LidarMsgTransfer {
  public:
   LidarMsgTransfer() = default;
 
-  void Transfer(
-      const drivers::PointCloud &message, LidarFrame *lidar_frame);
+  void Transfer(const drivers::PointCloud &message, LidarFrame *lidar_frame);
 
  protected:
   double max_height_ = 100.0;

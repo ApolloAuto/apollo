@@ -60,8 +60,8 @@ void NdtMapConfig::LoadXml(boost::property_tree::ptree* config) {
   BaseMapConfig::LoadXml(*config);
   map_is_compression_ = config->get<bool>("map.map_config.compression");
   map_resolutions_z_.clear();
-  BOOST_FOREACH(boost::property_tree::ptree::value_type& v,
-                config->get_child("map.map_config.resolutions_z")) {
+  BOOST_FOREACH (boost::property_tree::ptree::value_type& v,
+                 config->get_child("map.map_config.resolutions_z")) {
     map_resolutions_z_.push_back(
         static_cast<float>(atof(v.second.data().c_str())));
   }

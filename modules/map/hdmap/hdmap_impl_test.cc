@@ -13,9 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 
+#include "modules/map/hdmap/hdmap_impl.h"
 #include "cyber/common/file.h"
 #include "gtest/gtest.h"
-#include "modules/map/hdmap/hdmap_impl.h"
 
 DEFINE_string(output_dir, "/tmp", "output map directory");
 

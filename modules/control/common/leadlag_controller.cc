@@ -29,7 +29,7 @@ double LeadlagController::Control(const double error, const double dt) {
     TransformC2d(dt);
     if (!transfromc2d_enabled_) {
       AWARN << "C2d transform failed; will work as a unity compensator, dt: "
-       << dt;
+            << dt;
       return error;  // treat the Lead/Lag as a unity proportional controller
     }
   }
@@ -44,7 +44,7 @@ double LeadlagController::Control(const double error, const double dt) {
   // the inner (intermedia) state under the Direct form II for the Lead / Lag
   // compensator factorization
   if (innerstate_ > innerstate_saturation_high_) {
-    innerstate_  = innerstate_saturation_high_;
+    innerstate_ = innerstate_saturation_high_;
     innerstate_saturation_status_ = 1;
   } else if (innerstate_ < innerstate_saturation_low_) {
     innerstate_ = innerstate_saturation_low_;
@@ -101,7 +101,7 @@ void LeadlagController::TransformC2d(const double dt) {
     kd0_ = Ts_ * a0 - 2 * a1;
     if (kd1_ <= 0.0) {
       AWARN << "kd1 <= 0, continuous-discrete transformation failed, kd1: "
-       << kd1_;
+            << kd1_;
       transfromc2d_enabled_ = false;
     } else {
       transfromc2d_enabled_ = true;

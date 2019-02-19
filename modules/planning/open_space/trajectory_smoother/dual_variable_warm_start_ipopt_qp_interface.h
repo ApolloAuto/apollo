@@ -45,9 +45,9 @@ class DualVariableWarmStartIPOPTQPInterface : public Ipopt::TNLP {
  public:
   explicit DualVariableWarmStartIPOPTQPInterface(
       size_t horizon, double ts, const Eigen::MatrixXd& ego,
-      const Eigen::MatrixXi& obstacles_edges_num,
-      const size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
-      const Eigen::MatrixXd& obstacles_b, const Eigen::MatrixXd& xWS,
+      const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
+      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+      const Eigen::MatrixXd& xWS,
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DualVariableWarmStartIPOPTQPInterface() = default;

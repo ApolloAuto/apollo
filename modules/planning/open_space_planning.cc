@@ -163,9 +163,8 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
       last_publishable_trajectory_.get(), &replan_reason);
 
   const size_t frame_num = seq_num_++;
-  status =
-      InitFrame(static_cast<uint32_t>(frame_num), stitching_trajectory.back(),
-                vehicle_state);
+  status = InitFrame(static_cast<uint32_t>(frame_num),
+                     stitching_trajectory.back(), vehicle_state);
 
   ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
@@ -248,8 +247,7 @@ Status OpenSpacePlanning::Plan(
   Status trajectory_partition_status;
 
   if (status == Status::OK()) {
-    auto trajectory_after_stitching_point =
-        frame_->last_planned_trajectory();
+    auto trajectory_after_stitching_point = frame_->last_planned_trajectory();
     last_stitching_trajectory_ = frame_->last_stitching_trajectory();
     trajectory_after_stitching_point.mutable_header()->set_timestamp_sec(
         current_time_stamp);

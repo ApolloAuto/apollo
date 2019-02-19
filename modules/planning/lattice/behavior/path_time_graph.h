@@ -33,8 +33,8 @@
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/reference_line/reference_line.h"
 
-#include "modules/planning/common/speed/st_point.h"
 #include "modules/planning/common/speed/st_boundary.h"
+#include "modules/planning/common/speed/st_point.h"
 
 namespace apollo {
 namespace planning {
@@ -50,7 +50,7 @@ class PathTimeGraph {
   const std::vector<STBoundary>& GetPathTimeObstacles() const;
 
   bool GetPathTimeObstacle(const std::string& obstacle_id,
-      STBoundary* path_time_obstacle);
+                           STBoundary* path_time_obstacle);
 
   std::vector<std::pair<double, double>> GetPathBlockingIntervals(
       const double t) const;
@@ -81,7 +81,7 @@ class PathTimeGraph {
       const std::vector<common::PathPoint>& discretized_ref_points) const;
 
   STPoint SetPathTimePoint(const std::string& obstacle_id, const double s,
-                                 const double t) const;
+                           const double t) const;
 
   void SetStaticObstacle(
       const Obstacle* obstacle,

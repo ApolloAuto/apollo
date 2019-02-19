@@ -39,9 +39,8 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  auto cast_writer =
-      cast_node->CreateWriter<apollo::routing::RoutingResponse>(
-          FLAGS_routing_response_topic);
+  auto cast_writer = cast_node->CreateWriter<apollo::routing::RoutingResponse>(
+      FLAGS_routing_response_topic);
   Rate rate(1.0);
   while (apollo::cyber::OK()) {
     apollo::common::util::FillHeader("routing", &routing_response);
