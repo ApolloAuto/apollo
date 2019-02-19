@@ -15,8 +15,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <map>
 #include <opencv2/opencv.hpp>
+
+#include <map>
 #include <string>
 #include <vector>
 
