@@ -243,11 +243,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
   status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
-  if (update_ego_info && status.ok()) {
-    EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
-        frame_->obstacles());
-  }
-
   if (FLAGS_enable_record_debug) {
     frame_->RecordInputDebug(trajectory_pb->mutable_debug());
   }
@@ -382,8 +377,10 @@ Status OnLanePlanning::Plan(
   auto status =
       planner_->Plan(stitching_trajectory.back(), frame_.get(), trajectory_pb);
 
+  const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
+
   ptr_debug->mutable_planning_data()->set_front_clear_distance(
-      EgoInfo::Instance()->front_clear_distance());
+      best_ref_info->ReachableS());
 
   if (frame_->open_space_info().is_on_open_space_trajectory()) {
     const auto& publishable_trajectory =
@@ -392,6 +389,17 @@ Status OnLanePlanning::Plan(
         frame_->open_space_info().publishable_trajectory_data().second;
     publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
     trajectory_pb->set_gear(publishable_trajectory_gear);
+
+  if (!best_ref_info) {
+    std::string msg("planner failed to make a driving plan");
+    AERROR << msg;
+    if (last_publishable_trajectory_) {
+      last_publishable_trajectory_->Clear();
+    }
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  if (FLAGS_export_chart) {
+    ExportChart(best_ref_info->debug(), ptr_debug);
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
     if (!best_ref_info) {

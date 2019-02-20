@@ -46,12 +46,7 @@ class EgoInfo {
 
   common::VehicleState vehicle_state() const { return vehicle_state_; }
 
-  double front_clear_distance() const { return front_clear_distance_; }
-
   common::math::Box2d ego_box() const { return ego_box_; }
-
-  void CalculateFrontObstacleClearDistance(
-      const std::vector<const Obstacle*>& obstacles);
 
  private:
   FRIEND_TEST(EgoInfoTest, EgoInfoSimpleTest);
@@ -72,8 +67,6 @@ class EgoInfo {
 
   // ego vehicle state
   common::VehicleState vehicle_state_;
-
-  double front_clear_distance_ = FLAGS_default_front_clear_distance;
 
   common::VehicleConfig ego_vehicle_config_;
 

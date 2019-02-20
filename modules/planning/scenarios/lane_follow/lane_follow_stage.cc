@@ -205,7 +205,8 @@ Status LaneFollowStage::PlanOnReferenceLine(
     AERROR << "Speed fallback.";
 
     *reference_line_info->mutable_speed_data() =
-        SpeedProfileGenerator::GenerateFallbackSpeedProfile();
+        SpeedProfileGenerator::GenerateFallbackSpeedProfile(
+            reference_line_info->ReachableS());
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
   }
