@@ -225,6 +225,11 @@ class Obstacle {
    */
   bool RNNEnabled() const;
 
+  /**
+   * @brief Set the obstacle as caution level
+   */
+  void SetCaution();
+
  private:
   Obstacle() = default;
 

@@ -40,6 +40,8 @@ class ObstaclesPrioritizer {
       const EnvironmentFeatures& environment_features,
       const std::shared_ptr<CruiseScenarioFeatures> scenario_features,
       ObstaclesContainer* ptr_obstacle_contrainer);
+
+  static void AssignCautionLevelCruiseKeepLane();
 };
 
 }  // namespace prediction
