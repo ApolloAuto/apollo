@@ -98,8 +98,7 @@ bool PathDecision::MergeWithMainStop(const ObjectStop &obj_stop,
   }
 
   // check stop_line_s vs adc_s, ignore if it is further way than main stop
-  const double kStopBuff = 1.0;
-  stop_line_s = std::fmax(stop_line_s, adc_sl_boundary.end_s() - kStopBuff);
+  stop_line_s = std::fmax(stop_line_s, adc_sl_boundary.end_s());
 
   if (stop_line_s >= stop_reference_line_s_) {
     ADEBUG << "stop point is farther than current main stop point.";
