@@ -33,6 +33,7 @@
 #include "modules/common/filters/digital_filter_coefficients.h"
 #include "modules/common/filters/mean_filter.h"
 #include "modules/control/common/interpolation_1d.h"
+#include "modules/control/common/leadlag_controller.h"
 #include "modules/control/common/trajectory_analyzer.h"
 #include "modules/control/controller/controller.h"
 
@@ -203,6 +204,9 @@ class LatController : public Controller {
   // MeanFilter heading_rate_filter_;
   common::MeanFilter lateral_error_filter_;
   common::MeanFilter heading_error_filter_;
+
+  // Lead/Lag controller
+  LeadlagController leadlag_controller_;
 
   // for logging purpose
   std::ofstream steer_log_file_;
