@@ -35,6 +35,7 @@ cc_library(
         "//modules/common/time",
         "//modules/control/common:control_gflags",
         "//modules/control/common:interpolation_1d",
+        "//modules/control/common:leadlag_controller",
         "//modules/control/common:trajectory_analyzer",
         "//modules/control/proto:control_proto",
         "@eigen",
