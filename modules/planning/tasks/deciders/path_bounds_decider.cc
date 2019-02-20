@@ -106,12 +106,14 @@ Status PathBoundsDecider::Process(
   reference_line_info->SetPathBoundaries(path_boundaries_pair,
                                          std::get<0>(path_boundaries[0]),
                                          kPathBoundsDeciderResolution);
+
   reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
   if (!path_boundaries.empty()) {
     CHECK_LE(adc_frenet_l_, std::get<2>(path_boundaries[0]));
     CHECK_GE(adc_frenet_l_, std::get<1>(path_boundaries[0]));
   }
   ADEBUG << "Completed path boundaries generation.";
+  reference_line_info->SetReachableS(std::get<0>(path_boundaries.back()));
   return Status::OK();
 }
 

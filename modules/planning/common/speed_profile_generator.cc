@@ -121,11 +121,13 @@ std::vector<SpeedPoint> SpeedProfileGenerator::GenerateSpeedHotStart(
   return hot_start_speed_profile;
 }
 
-SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile() {
+SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile(
+    const double reachable_s) {
   const double init_v = EgoInfo::Instance()->start_point().v();
   const double init_a = EgoInfo::Instance()->start_point().a();
   if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
-    auto speed_data = GenerateStopProfileFromPolynomial(init_v, init_a);
+    auto speed_data = GenerateStopProfileFromPolynomial(init_v, init_a,
+                                                        reachable_s);
     if (!speed_data.empty()) {
       return speed_data;
     }
@@ -159,13 +161,11 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
 }
 
 SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
-    const double init_speed, const double init_acc) {
+    const double init_speed, const double init_acc, const double reachable_s) {
   AERROR << "Slowing down the car with polynomial.";
   constexpr double kMaxT = 4.0;
   for (double t = 2.0; t <= kMaxT; t += 0.5) {
-    for (double s = 0.0;
-         s < std::min(50.0, EgoInfo::Instance()->front_clear_distance() - 0.3);
-         s += 1.0) {
+    for (double s = 0.0; s < std::min(50.0, reachable_s - 0.3); s += 1.0) {
       QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
       if (!IsValidProfile(curve)) {
         continue;
