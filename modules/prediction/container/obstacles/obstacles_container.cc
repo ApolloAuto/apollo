@@ -334,6 +334,13 @@ void ObstaclesContainer::BuildLaneGraph() {
     ADEBUG << "Building ordered Lane Graph.";
     obstacle_ptr->BuildLaneGraphFromLeftToRight();
   }
+
+  Obstacle* ego_vehicle = GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_vehicle == nullptr) {
+    AERROR << "Ego vehicle not inserted";
+    return;
+  }
+  ego_vehicle->BuildLaneGraph();
 }
 
 void ObstaclesContainer::BuildJunctionFeature() {

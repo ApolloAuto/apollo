@@ -17,10 +17,12 @@
 #include "modules/prediction/scenario/prioritization/obstacles_prioritizer.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
@@ -177,6 +179,44 @@ void ObstaclesPrioritizer::AssignIgnoreLevelForCruiseScenario(
             ObstaclePriority::IGNORE);
       }
     }
+  }
+}
+
+void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
+  ObstaclesContainer* obstacles_container =
+      ContainerManager::Instance()->GetContainer<
+          ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+  Obstacle* ego_vehicle =
+      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_vehicle == nullptr) {
+    AERROR << "Ego vehicle not found";
+    return;
+  }
+  if (ego_vehicle->history_size() == 0) {
+    AERROR << "Ego vehicle has no history";
+    return;
+  }
+  const Feature& ego_latest_feature = ego_vehicle->latest_feature();
+  for (const LaneSequence& lane_sequence :
+       ego_latest_feature.lane().lane_graph().lane_sequence()) {
+    int nearest_front_obstacle_id = -10;
+    double smallest_relative_s = std::numeric_limits<double>::infinity();
+    for (const auto& nearby_obs : lane_sequence.nearby_obstacle()) {
+      if (nearby_obs.s() < 0.0) {
+        continue;
+      }
+      if (nearby_obs.s() < smallest_relative_s) {
+        smallest_relative_s = nearby_obs.s();
+        nearest_front_obstacle_id = nearby_obs.id();
+      }
+    }
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(
+        nearest_front_obstacle_id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Obstacle [" << nearest_front_obstacle_id << "] Not found";
+      continue;
+    }
+    obstacle_ptr->SetCaution();
   }
 }
 
