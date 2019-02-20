@@ -79,6 +79,8 @@ class ReferenceLineInfo {
   void SetCost(double cost) { cost_ = cost; }
   double PriorityCost() const { return priority_cost_; }
   void SetPriorityCost(double cost) { priority_cost_ = cost; }
+  double ReachableS() const { return reachable_s_; }
+  void SetReachableS(double reachable_s) { reachable_s_ = reachable_s; }
   // For lattice planner'speed planning target
   void SetStopPoint(const StopPoint& stop_point);
   void SetCruiseSpeed(double speed);
@@ -243,6 +245,8 @@ class ReferenceLineInfo {
    * line. The lower the better.
    */
   double cost_ = 0.0;
+
+  double reachable_s_ = 0.0;
 
   bool is_inited_ = false;
 

@@ -40,16 +40,6 @@ TEST(EgoInfoTest, EgoInfoSimpleTest) {
   EXPECT_DOUBLE_EQ(ego_info->start_point().path_point().x(), p.x());
   EXPECT_DOUBLE_EQ(ego_info->start_point().path_point().y(), p.y());
   EXPECT_DOUBLE_EQ(ego_info->start_point().path_point().z(), p.z());
-
-  uint32_t sequence_num = 0;
-  common::TrajectoryPoint planning_start_point;
-  common::VehicleState vehicle_state;
-  ReferenceLineProvider reference_line_provider;
-
-  LocalView dummy_local_view;
-  Frame frame(sequence_num, dummy_local_view, planning_start_point,
-              vehicle_state, &reference_line_provider);
-  ego_info->CalculateFrontObstacleClearDistance(frame.obstacles());
 }
 
 }  // namespace planning
