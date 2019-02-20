@@ -1,0 +1,130 @@
+Skip to content
+Your account has been flagged.
+Because of that, your profile is hidden from the public. If you believe this is a mistake, contact support to have your account status reviewed.
+
+sensio jetbrains satellite
+Repositories0
+Code10
+Commits0
+Issues0
+Marketplace0
+Topics0
+Wikis0
+Users0
+Languages
+5 CSV
+4 Text
+1 HTML
+Advanced search 
+10 code results
+@cncf
+cncf/velocity – projects_2015Q3.csv
+Showing the top match Last indexed on Jul 8, 2018
+CSV
+casacore,casacore,503,297,86,94,26,16,casacore,""
+EMCECS,ECS-CommunityEdition,215,63,23,112,17,16,EMCECS,""
+SatelliteQE,robottelo,1937,1381,209,196,151,16,SatelliteQE,""
+vhbb,cmssw,435,266,68,63,38,16,vhbb,""
+bitcoinj,bitcoinj,573,381,63,103,26,16,bitcoinj,""
+@alixaxel
+alixaxel/dump.HN – 14-15.csv
+Showing the top two matches Last indexed on Jul 1, 2018
+CSV
+10830779,comment,10822020,10822020,0,0,ifdattic,,,"SEEKING WORK - Remote (GMT+2)<p>Building software applications is as much about coding as it is about understanding and solving the actual business problems!<p>I&#x27;m a Zend & SensioLabs certified web developer / consultant with a focus on solving business problems and adding value through product optimisation. This can be done in many ways: creating a new application, suggesting an action plan or architecture, optimizing current set-up / architecture / applications, etc.<p>At the moment my technology focus is on PHP, Symfony, AWS, MongoDB, MySQL, APIs, NodeJS and Docker. I also care a lot about security (InfoSec), performance, quality, best practices & continuous learning. You can contact me for projects at <a href=""http://ifdattic.com"" rel=""nofollow"">http://ifdattic.com</a><p>Few of the problems I solved for my clients:<p><pre><code>    * optimize infrastructure to reduce costs by $10000+ per year\n    * implement backup & work flow to avoid using data due to \n      incompetent developers\n    * custom applications for improving work flows (document \n      submission, sports coaching, inventory system, etc.)\n</code></pre>\nWebsite: <a href=""http://ifdattic.com"" rel=""nofollow"">http://ifdattic.com</a><p>LinkedIn: <a href=""http://www.linkedin.com/in/ifdattic"" rel=""nofollow"">http://www.linkedin.com/in/ifdattic</a><p>AngelList: <a href=""https://angel.co/ifdattic"" rel=""nofollow"">https://angel.co/ifdattic</a><p>Twitter: <a href=""https://twitter.com/ifdattic"" rel=""nofollow"">https://twitter.com/ifdattic</a><p>GitHub: <a href=""https://github.com/ifdattic"" rel=""nofollow"">https://github.com/ifdattic</a>",1451833129
+10830773,comment,10829184,10830742,0,0,dordoka,,,"I understand and agree that in corporate enterprise you usually do not control which software is installed in your workstation.<p>I should note that this JDK 8 migration is for EAP releases (ie early alpha/beta versions of the next major release) and that all installers (windows, osx and linux) offered by Jetbrains come with its own JDK bundled in the installer. So if you happen to work in one of those corporate environments, if you manage to get permission to run this IDEA version, you also get the required JRE to execute the ide included.",1451833020
+@lint0011
+lint0011/FYP_rerunKM – svo_exception.txt
+Showing the top two matches Last indexed on Jul 13, 2018
+Text
+getmethod	An HTTP protocol request method.
+satellite	A natural or artificial object orbiting near a bigger object
+jstack	Java Virtual Machine Stack Trace dumper tool.
+imei	International Mobile Equipment Identity a number, usually unique, to identify 3GPP and iDEN mobile phones, as well as some satellite phones.
+movement	DO NOT USE - ambiguous
+sha-3	SHA-3 is a cryptographic hash functions, a successor to SHA-2.
+@jeremander
+jeremander/Gplus – employer_freelance_n50_adj_k50_normalize_top_attrs.txt
+Showing the top two matches Last indexed on Jul 1, 2018
+Text
+mindtree                                                  0.000400
+extrême sensio                                            0.000400
+revista apertura                                          0.000400
+cpm braxis capgemini                                      0.000200
+sensio labs                                               0.000200
+@jeremander
+jeremander/Gplus – employer_freelance_n100_adj_k50_normalize_top_attrs.txt
+Showing the top two matches Last indexed on Jul 1, 2018
+Text
+proximity panels                                          0.000400
+крок дв                                                   0.000400
+jetbrains gmbh                                            0.000400
+uşak üniversitesi                                         0.000400
+extrême sensio                                            0.000400
+@alixaxel
+alixaxel/dump.HN – 13-14.csv
+Showing the top two matches Last indexed on Jul 1, 2018
+CSV
+7767329,comment,7766104,7766276,1,0,DanBC,,,"Slower than ICBM if the target is Earth, but if the target is massive satellite damage by spewing orbital debris then it&#x27;s probably in the right place.",1400506639
+7767253,story,,,1,0,sadtaf,"Follow Links Vs. No Follow Links: Should You Care?",http://www.wordstream.com/blog/ws/2013/07/24/follow-nofollow-links,,1400505806
+7767252,story,,,1,0,rdemmer,"SensioLabs Partners with PhpStorm on Symfony Community Tooling",http://blog.jetbrains.com/phpstorm/2014/05/sensiolabs-partners-with-phpstorm-for-the-bright-future-of-symfony-community-tooling/,,1400505800
+@lightbend
+lightbend/scaladays.org – amsterdam2015.html
+Showing the top two matches Last indexed on Jun 27, 2018
+HTML
+                                                        Dustin Whittle is a Developer Evangelist at AppDynamics where he focuses on helping organizations manage application performance. Before joining AppDynamics, Dustin was CTO at Kwarter, a consultant at SensioLabs, and developer evangelist at Yahoo!. He has experience building and leading engineering teams and working with developers and partners to platforms. When Dustin isn't working he enjoys flying, sailing, diving, golfing, and traveling around the world. Find out more at dustinwhittle.com or follow him @dustinwhittle.
+                                                        Tal Weiss is the CEO of Takipi - God Mode in Production Code. Tal has been designing scalable, real-time Java, Scala and C++ applications for the past 15 years. Previously, Tal was co-founder and CEO at VisualTao, acquired by Autodesk in 2009. Following the acquisition Tal was the Director of the AutoCAD web &amp; mobile product line, used by 17 million professional users worldwide. Prior to VisualTao, Tal worked as a software architect at IAI Space Industries focusing on real-time satellite tracking systems. He still enjoys analyzing a good bug and instrumenting JVM code. In his free time Tal plays Jazz drums.
+@jeremander
+jeremander/Gplus – employer_freelance_n200_adj_k100_normalize_top_attrs.txt
+Showing the top two matches Last indexed on Jul 1, 2018
+Text
+nurun                                                     0.000480
+british sky broadcasting                                  0.000480
+jetbrains                                                 0.000480
+wayne state university school of medicine                 0.000200
+itu center for satellite communications and rem...        0.000200
+@keelezibel
+keelezibel/CS512proj – repo_name.csv
+Showing the top two matches Last indexed on Jul 3, 2018
+CSV
+cookbook-keystone
+jboss-as-maven-plugin
+InfiniteWPM
+SensioGeneratorBundle
+cob_robots
+remotipart
+restforce
+barclamp-tempest
+nodemon
+node-ewmh
+SensioLabsDoctrineQueryStatisticsBundle
+rubykassa
+reprepro
+puppet-apt
+mcom-tests
+pull-split
+Payum
+unoconv
+@wangshans
+wangshans/GithubUserInfluenceDataset – top4950_result.csv
+Showing the top two matches Last indexed on Jul 13, 2018
+CSV
+26434,"JuliaLang",175,106,311,306,348,21,48
+26704,"CreateJS",2608,4442,1667,1936,352,30,73
+26731,"JetBrains",423,142,847,640,293,21,30
+26759,"bundestag",4865,7910,2213,3175,352,34,69
+44374,"openstreetmap",850,1138,946,815,350,27,58
+44511,"rubinius",24,27,26,10,336,32,66
+44529,"sensio",413,880,306,286,351,35,73
+© 2019 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Press h to open a hovercard with more details.
