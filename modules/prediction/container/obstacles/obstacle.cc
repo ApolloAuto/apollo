@@ -1528,5 +1528,11 @@ void Obstacle::InitRNNStates() {
 
 bool Obstacle::RNNEnabled() const { return rnn_enabled_; }
 
+void Obstacle::SetCaution() {
+  CHECK_GT(feature_history_.size(), 0);
+  Feature* feature = mutable_latest_feature();
+  feature->mutable_priority()->set_priority(ObstaclePriority::CAUTION);
+}
+
 }  // namespace prediction
 }  // namespace apollo

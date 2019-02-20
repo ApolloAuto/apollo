@@ -48,6 +48,7 @@ DECLARE_bool(enable_junction_feature);
 DECLARE_bool(enable_all_junction);
 
 // Obstacle features
+DECLARE_int32(ego_vehicle_id);
 DECLARE_double(scan_length);
 DECLARE_double(scan_width);
 DECLARE_double(back_dist_ignore_ped);

@@ -64,6 +64,7 @@ DEFINE_bool(enable_all_junction, false,
            "If consider all junction with junction_mlp_model.");
 
 // Obstacle features
+DEFINE_int32(ego_vehicle_id, -1, "The obstacle ID of the ego vehicle.");
 DEFINE_double(scan_length, 80.0, "The length of the obstacles scan area");
 DEFINE_double(scan_width, 12.0, "The width of the obstacles scan area");
 DEFINE_double(back_dist_ignore_ped, -2.0,
