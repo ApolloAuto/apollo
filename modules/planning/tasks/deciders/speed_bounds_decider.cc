@@ -15,10 +15,14 @@
  *****************************************************************************/
 
 #include "modules/planning/tasks/deciders/speed_bounds_decider.h"
+
+#include <string>
+#include <vector>
+
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/optimizers/st_graph/speed_limit_decider.h"
 #include "modules/planning/tasks/optimizers/st_graph/st_boundary_mapper.h"
 #include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
-#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -26,8 +30,8 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::planning_internal::STGraphDebug;
 using apollo::planning_internal::StGraphBoundaryDebug;
+using apollo::planning_internal::STGraphDebug;
 
 SpeedBoundsDecider::SpeedBoundsDecider(const TaskConfig &config)
     : Decider(config) {
@@ -55,8 +59,7 @@ Status SpeedBoundsDecider::Process(
   path_decision->EraseStBoundaries();
   if (boundary_mapper.CreateStBoundary(path_decision).code() ==
       ErrorCode::PLANNING_ERROR) {
-    const std::string msg =
-        "Mapping obstacle failed.";
+    const std::string msg = "Mapping obstacle failed.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -89,23 +92,23 @@ Status SpeedBoundsDecider::Process(
   }
 
   // 3. Get path_length as s axis search bound in st graph
-  const double path_length = path_data.discretized_path().Length();
+  const double path_data_length = path_data.discretized_path().Length();
   const double path_length_by_conf = speed_bounds_config_.total_path_length();
 
   // 4. Get time duration as t axis search bound in st graph
   const double total_time_by_conf = speed_bounds_config_.total_time();
 
   // Load generated st graph data back to frame
-  StGraphData* st_graph_data =
-      reference_line_info_->mutable_st_graph_data();
+  StGraphData *st_graph_data = reference_line_info_->mutable_st_graph_data();
 
   // Add a st_graph debug info and save the pointer to st_graph_data for
   // optimizer logging
   auto *debug = reference_line_info_->mutable_debug();
   STGraphDebug *st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
-  st_graph_data->LoadData(boundaries, init_point, speed_limit, path_length,
-                          path_length_by_conf, total_time_by_conf, st_graph_debug);
+  st_graph_data->LoadData(boundaries, init_point, speed_limit, path_data_length,
+                          path_length_by_conf, total_time_by_conf,
+                          st_graph_debug);
 
   // Create and record st_graph debug info
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);

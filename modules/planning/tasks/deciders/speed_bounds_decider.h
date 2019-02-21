@@ -31,7 +31,7 @@ namespace planning {
 
 class SpeedBoundsDecider : public Decider {
  public:
-  explicit SpeedBoundsDecider(const TaskConfig &config);
+  explicit SpeedBoundsDecider(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(
