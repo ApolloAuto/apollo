@@ -18,5 +18,5 @@ message PolyVTSpeedConfig {
   optional int32 num_evaluated_points = 13;
   optional double sampling_unit_v = 14;
   optional double max_sampling_unit_v = 15;
-  optional apollo.planning.StBoundaryConfig st_boundary_config = 16;
+  // optional apollo.planning.StBoundaryConfig st_boundary_config = 16;
 }
