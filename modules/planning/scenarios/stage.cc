@@ -51,9 +51,16 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
     CHECK(config_map.find(task_type) != config_map.end())
         << "Task: " << TaskConfig::TaskType_Name(task_type)
         << " used but not configured";
-    auto ptr = TaskFactory::CreateTask(*config_map[task_type]);
-    task_list_.push_back(ptr.get());
-    tasks_[task_type] = std::move(ptr);
+    auto iter = tasks_.find(task_type);
+    if (iter == tasks_.end()) {
+      auto ptr = TaskFactory::CreateTask(*config_map[task_type]);
+      task_list_.push_back(ptr.get());
+      tasks_[task_type] = std::move(ptr);
+    }
+    else {
+      task_list_.push_back(iter->second.get());
+    }
+
   }
 }
 
