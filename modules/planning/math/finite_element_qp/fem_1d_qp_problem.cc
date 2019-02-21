@@ -30,12 +30,11 @@ namespace {
 constexpr double kMaxVariableRange = 1e10;
 }  // namespace
 
-
-Fem1dQpProblem::Fem1dQpProblem(const size_t num_var,
+Fem1dQpProblem::Fem1dQpProblem(const size_t num_of_knots,
     const std::array<double, 3>& x_init, const double delta_s,
     const std::array<double, 5>& w, const double max_x_third_order_derivative) {
-  CHECK_GE(num_var, 4);
-  num_var_ = num_var;
+  CHECK_GE(num_of_knots, 4);
+  num_of_knots_ = num_of_knots;
 
   x_init_ = x_init;
 
@@ -49,19 +48,15 @@ Fem1dQpProblem::Fem1dQpProblem(const size_t num_var,
 
   delta_s_ = delta_s;
   delta_s_sq_ = delta_s * delta_s;
-  delta_s_tri_ = delta_s_sq_ * delta_s;
-  delta_s_tetra_ = delta_s_sq_ * delta_s_sq_;
-  delta_s_penta_ = delta_s_sq_ * delta_s_tri_;
-  delta_s_hex_ = delta_s_tri_ * delta_s_tri_;
 
-  x_bounds_.resize(num_var_,
+  x_bounds_.resize(num_of_knots_,
                    std::make_pair(-kMaxVariableRange, kMaxVariableRange));
-  dx_bounds_.resize(num_var_,
-                    std::make_pair(-FLAGS_lateral_derivative_bound_default,
-                                   FLAGS_lateral_derivative_bound_default));
-  ddx_bounds_.resize(num_var_,
-                     std::make_pair(-FLAGS_lateral_derivative_bound_default,
-                                    FLAGS_lateral_derivative_bound_default));
+
+  dx_bounds_.resize(num_of_knots_,
+                   std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+
+  ddx_bounds_.resize(num_of_knots_,
+                   std::make_pair(-kMaxVariableRange, kMaxVariableRange));
 }
 
 bool Fem1dQpProblem::OptimizeWithOsqp(
@@ -101,13 +96,55 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
   return true;
 }
 
+void Fem1dQpProblem::SetZeroOrderBounds(
+    std::vector<std::pair<double, double>> x_bounds) {
+  CHECK_EQ(x_bounds.size(), num_of_knots_);
+  x_bounds_ = std::move(x_bounds);
+}
+
+void Fem1dQpProblem::SetFirstOrderBounds(
+    std::vector<std::pair<double, double>> dx_bounds) {
+  CHECK_EQ(dx_bounds.size(), num_of_knots_);
+  dx_bounds_ = std::move(dx_bounds);
+}
+
+void Fem1dQpProblem::SetSecondOrderBounds(
+    std::vector<std::pair<double, double>> d2x_bounds) {
+  CHECK_EQ(d2x_bounds.size(), num_of_knots_);
+  ddx_bounds_ = std::move(d2x_bounds);
+}
+
+void Fem1dQpProblem::SetZeroOrderBounds(const double x_bound) {
+  CHECK_GT(x_bound, 0.0);
+  for (auto& x : x_bounds_) {
+    x.first = -x_bound;
+    x.second = x_bound;
+  }
+}
+
+void Fem1dQpProblem::SetFirstOrderBounds(const double dx_bound) {
+  CHECK_GT(dx_bound, 0.0);
+  for (auto& x : dx_bounds_) {
+    x.first = -dx_bound;
+    x.second = dx_bound;
+  }
+}
+
+void Fem1dQpProblem::SetSecondOrderBounds(const double ddx_bound) {
+  CHECK_GT(ddx_bound, 0.0);
+  for (auto& x : ddx_bounds_) {
+    x.first = -ddx_bound;
+    x.second = ddx_bound;
+  }
+}
+
 void Fem1dQpProblem::ProcessBound(
     const std::vector<std::tuple<double, double, double>>& src,
     std::vector<std::pair<double, double>>* dst) {
   DCHECK_NOTNULL(dst);
 
   *dst = std::vector<std::pair<double, double>>(
-      num_var_, std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+      num_of_knots_, std::make_pair(-kMaxVariableRange, kMaxVariableRange));
 
   for (size_t i = 0; i < src.size(); ++i) {
     size_t index = static_cast<size_t>(std::get<0>(src[i]) / delta_s_ + 0.5);
@@ -124,7 +161,6 @@ void Fem1dQpProblem::ProcessBound(
 void Fem1dQpProblem::SetVariableBounds(
     const std::vector<std::tuple<double, double, double>>& x_bounds) {
   ProcessBound(x_bounds, &x_bounds_);
-  bound_is_init_ = true;
 }
 
 // dx_bounds: tuple(s, lower_bounds, upper_bounds)
@@ -162,18 +198,18 @@ void Fem1dQpProblem::SetOutputResolution(const double resolution) {
     double d3x = 0.0;
 
     if (idx == 0) {
-      d3x = x_third_order_derivative_.front();
+      d3x = dddx_.front();
       d2x = x_init_[2] + d3x * ds;
       dx = x_init_[1] + x_init_[2] * ds + 0.5 * d3x * ds * ds;
       x = x_init_[0] + x_init_[1] * ds + 0.5 * x_init_[2] * ds * ds +
           d3x * ds * ds * ds / 6.0;
     } else {
-      d3x = x_third_order_derivative_[idx - 1];
-      d2x = x_second_order_derivative_[idx - 1] + d3x * ds;
-      dx = x_derivative_[idx - 1] + x_second_order_derivative_[idx - 1] * ds +
+      d3x = dddx_[idx - 1];
+      d2x = ddx_[idx - 1] + d3x * ds;
+      dx = dx_[idx - 1] + ddx_[idx - 1] * ds +
            0.5 * d3x * ds * ds;
-      x = x_[idx - 1] + x_derivative_[idx - 1] * ds +
-          0.5 * x_second_order_derivative_[idx - 1] * ds * ds +
+      x = x_[idx - 1] + dx_[idx - 1] * ds +
+          0.5 * ddx_[idx - 1] * ds * ds +
           d3x * ds * ds * ds / 6.0;
     }
 
@@ -183,17 +219,13 @@ void Fem1dQpProblem::SetOutputResolution(const double resolution) {
     new_ddx.push_back(d3x);
   }
   x_ = new_x;
-  x_derivative_ = new_dx;
-  x_second_order_derivative_ = new_ddx;
-  x_third_order_derivative_ = new_dddx;
+  dx_ = new_dx;
+  ddx_ = new_ddx;
+  dddx_ = new_dddx;
 }
 
 bool Fem1dQpProblem::Optimize() {
-  if (!bound_is_init_) {
-    AERROR << "Please SetVariableBounds() before running.";
-    return false;
-  }
-  // calculate kernal
+  // calculate kernel
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
   std::vector<c_int> P_indptr;
@@ -228,7 +260,7 @@ bool Fem1dQpProblem::Optimize() {
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
   OSQPWorkspace* work = nullptr;
 
-  OptimizeWithOsqp(3 * num_var_, lower_bounds.size(), P_data, P_indices,
+  OptimizeWithOsqp(3 * num_of_knots_, lower_bounds.size(), P_data, P_indices,
                    P_indptr, A_data, A_indices, A_indptr, lower_bounds,
                    upper_bounds, q, data, &work, settings);
   if (work == nullptr || work->solution == nullptr) {
@@ -237,16 +269,16 @@ bool Fem1dQpProblem::Optimize() {
   }
 
   // extract primal results
-  x_.resize(num_var_);
-  x_derivative_.resize(num_var_);
-  x_second_order_derivative_.resize(num_var_);
-  for (size_t i = 0; i < num_var_; ++i) {
+  x_.resize(num_of_knots_);
+  dx_.resize(num_of_knots_);
+  ddx_.resize(num_of_knots_);
+  for (size_t i = 0; i < num_of_knots_; ++i) {
     x_.at(i) = work->solution->x[i];
-    x_derivative_.at(i) = work->solution->x[i + num_var_];
-    x_second_order_derivative_.at(i) = work->solution->x[i + 2 * num_var_];
+    dx_.at(i) = work->solution->x[i + num_of_knots_];
+    ddx_.at(i) = work->solution->x[i + 2 * num_of_knots_];
   }
-  x_derivative_.back() = 0.0;
-  x_second_order_derivative_.back() = 0.0;
+  dx_.back() = 0.0;
+  ddx_.back() = 0.0;
 
   // Cleanup
   osqp_cleanup(work);
@@ -264,7 +296,7 @@ bool Fem1dQpProblem::Optimize() {
 void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                          std::vector<c_int>* P_indices,
                                          std::vector<c_int>* P_indptr) {
-  const int N = static_cast<int>(num_var_);
+  const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   P_data->resize(kNumParam);
   P_indices->resize(kNumParam);
@@ -292,7 +324,7 @@ void Fem1dQpProblem::CalculateAffineConstraint(
   // 3N params bounds on x, x', x''
   // 3(N-1) constraints on x, x', x''
   // 3 constraints on x_init_
-  const int N = static_cast<int>(num_var_);
+  const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   const int kNumConstraint = kNumParam + 3 * (N - 1) + 3;
   lower_bounds->resize(kNumConstraint);
@@ -386,7 +418,7 @@ void Fem1dQpProblem::CalculateAffineConstraint(
 
 void Fem1dQpProblem::CalculateOffset(std::vector<c_float>* q) {
   CHECK_NOTNULL(q);
-  const int N = static_cast<int>(num_var_);
+  const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   q->resize(kNumParam);
   for (int i = 0; i < kNumParam; ++i) {
