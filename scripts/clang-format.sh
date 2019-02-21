@@ -16,14 +16,18 @@
 # limitations under the License.
 ###############################################################################
 
-# You should have clang-format installed:
-#   sudo apt-get install -y clang-format
-#
 # Usage:
 #   clang-format.sh </some/path>
 
 TARGET=$1
 
+# Check tool.
+if ! [ -x "$(command -v clang-format)" ]; then
+  echo "Installing clang-format..."
+  sudo apt-get install -y clang-format
+fi
+
+# Format.
 if [ -f "${TARGET}" ]; then
   clang-format -i -style=Google "${TARGET}"
 else
