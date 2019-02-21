@@ -79,10 +79,10 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
-  QpSplineStGraph st_graph(spline_solver_.get(), st_graph_data.path_length(),
-                           st_graph_data.total_time_by_conf(),
-                           qp_st_speed_config_, veh_param,
-                           reference_line_info_->IsChangeLanePath());
+  QpSplineStGraph st_graph(
+      spline_solver_.get(), st_graph_data.path_length_by_conf(),
+      st_graph_data.total_time_by_conf(), qp_st_speed_config_, veh_param,
+      reference_line_info_->IsChangeLanePath());
 
   std::pair<double, double> accel_bound = {
       qp_st_speed_config_.preferred_min_deceleration(),
@@ -106,7 +106,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       AERROR << "Spline QP speed solver Failed. "
              << "Using finite difference method.";
       QpPiecewiseStGraph piecewise_st_graph(qp_st_speed_config_,
-                                            st_graph_data.path_length(),
+                                            st_graph_data.path_length_by_conf(),
                                             st_graph_data.total_time_by_conf());
 
       ret = piecewise_st_graph.Search(st_graph_data, speed_data, accel_bound);

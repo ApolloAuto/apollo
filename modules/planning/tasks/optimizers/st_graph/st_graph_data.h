@@ -50,6 +50,10 @@ class StGraphData {
 
   double path_length() const;
 
+  double path_data_length() const;
+
+  double path_length_by_conf() const;
+
   double total_time_by_conf() const;
 
   planning_internal::STGraphDebug* mutable_st_graph_debug();
@@ -58,7 +62,8 @@ class StGraphData {
   std::vector<const STBoundary*> st_boundaries_;
   apollo::common::TrajectoryPoint init_point_;
   SpeedLimit speed_limit_;
-  double path_length_ = 0.0;
+  double path_data_length_ = 0.0;
+  double path_length_by_conf_ = 0.0;
   double total_time_by_conf_ = 0.0;
   planning_internal::STGraphDebug* st_graph_debug_ = nullptr;
 };

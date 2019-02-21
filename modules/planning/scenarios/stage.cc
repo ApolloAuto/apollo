@@ -56,11 +56,9 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
       auto ptr = TaskFactory::CreateTask(*config_map[task_type]);
       task_list_.push_back(ptr.get());
       tasks_[task_type] = std::move(ptr);
-    }
-    else {
+    } else {
       task_list_.push_back(iter->second.get());
     }
-
   }
 }
 
