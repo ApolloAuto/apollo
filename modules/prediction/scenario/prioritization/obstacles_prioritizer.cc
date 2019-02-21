@@ -22,8 +22,8 @@
 
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
-#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
+#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
 #include "modules/prediction/container/pose/pose_container.h"
 
@@ -37,7 +37,8 @@ using common::math::Vec2d;
 
 namespace {
 
-bool IsLaneSequenceInReferenceLine(const LaneSequence& lane_sequence,
+bool IsLaneSequenceInReferenceLine(
+    const LaneSequence& lane_sequence,
     const ADCTrajectoryContainer* ego_trajectory_container) {
   for (const auto& lane_segment : lane_sequence.lane_segment()) {
     std::string lane_id = lane_segment.lane_id();
@@ -173,8 +174,8 @@ void ObstaclesPrioritizer::AssignIgnoreLevel(
 
 void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
   ObstaclesContainer* obstacles_container =
-      ContainerManager::Instance()->GetContainer<
-          ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
   Obstacle* ego_vehicle =
       obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
   if (ego_vehicle == nullptr) {
@@ -193,8 +194,8 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
     if (nearest_front_obstacle_id < 0) {
       continue;
     }
-    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(
-        nearest_front_obstacle_id);
+    Obstacle* obstacle_ptr =
+        obstacles_container->GetObstacle(nearest_front_obstacle_id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Obstacle [" << nearest_front_obstacle_id << "] Not found";
       continue;
@@ -205,8 +206,8 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
 
 void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane() {
   ObstaclesContainer* obstacles_container =
-      ContainerManager::Instance()->GetContainer<
-          ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
   ADCTrajectoryContainer* ego_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
@@ -229,8 +230,8 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane() {
       if (nearest_front_obstacle_id < 0) {
         continue;
       }
-      Obstacle* obstacle_ptr = obstacles_container->GetObstacle(
-          nearest_front_obstacle_id);
+      Obstacle* obstacle_ptr =
+          obstacles_container->GetObstacle(nearest_front_obstacle_id);
       if (obstacle_ptr == nullptr) {
         AERROR << "Obstacle [" << nearest_front_obstacle_id << "] Not found";
         continue;
@@ -268,8 +269,8 @@ void ObstaclesPrioritizer::AssignCautionLevelInJunction(
   }
   std::string junction_id = scenario_features->scenario().junction_id();
   ObstaclesContainer* obstacles_container =
-      ContainerManager::Instance()->GetContainer<
-          ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
   Obstacle* ego_vehicle =
       obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
   if (ego_vehicle == nullptr) {
