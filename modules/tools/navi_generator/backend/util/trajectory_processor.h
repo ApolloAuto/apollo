@@ -34,8 +34,8 @@
 #include <vector>
 
 #include "modules/tools/navi_generator/backend/database/db_operator.h"
-#include "modules/tools/navi_generator/backend/util/navi_gen_json_converter.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_converter.h"
+#include "modules/tools/navi_generator/proto/navigation_response.pb.h"
 
 /**
  * @namespace apollo::planning
@@ -75,10 +75,13 @@ struct FileInfo {
 };
 
 typedef void (*UPDATE_FRONTEND_FUNC)(const std::string&, void*);
+typedef void (*NOTIFY_BAG_FIFES_PROCESSED_FUNC)(void*);
 
 class TrajectoryProcessor {
  public:
-  TrajectoryProcessor(UPDATE_FRONTEND_FUNC update_task, void* gui_service);
+  TrajectoryProcessor(UPDATE_FRONTEND_FUNC update_task,
+                      NOTIFY_BAG_FIFES_PROCESSED_FUNC notify_task,
+                      void* gui_service);
   ~TrajectoryProcessor();
 
  public:
@@ -110,7 +113,7 @@ class TrajectoryProcessor {
   void UpdateFrontendThread();
 
   bool ExportSegmentsToFile(const std::string& file_name);
-  void ProcessFiles();
+  bool ProcessFiles();
   bool ProcessFile(const BagFileInfo& bag_file_info);
   bool ProcessBagFile(
       const std::string& first_bag_filename,
@@ -126,7 +129,7 @@ class TrajectoryProcessor {
   bool GetRightmostNaviFile(const FileInfo& file_info,
                             NaviFile* const navi_file);
 
-  bool ResponseToFrontend(const NaviGenResponse& navi_gen_response);
+  bool ResponseToFrontend(const NaviResponse& navi_response);
 
  private:
   CommonBagFileInfo common_file_info_;
@@ -154,6 +157,9 @@ class TrajectoryProcessor {
   // A binded updating frontend function.
   std::function<void(const std::string&)> update_frontend_func_;
   std::atomic<bool> update_frontend_finished_;
+
+  // A binded notifying bag files has been processed.
+  std::function<void()> notify_bag_file_processed_func_;
 };
 
 }  // namespace util

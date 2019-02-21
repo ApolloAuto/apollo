@@ -29,7 +29,6 @@
 #include "modules/common/log.h"
 #include "modules/tools/navi_generator/backend/common/navi_generator_gflags.h"
 #include "modules/tools/navi_generator/backend/database/db_operator.h"
-#include "modules/tools/navi_generator/backend/util/navi_gen_json_converter.h"
 #include "modules/tools/navi_generator/backend/util/quad_tiles_maker.h"
 
 namespace apollo {
@@ -47,6 +46,7 @@ constexpr double kMinDist = 0.5;
 constexpr double kEpsilon = 0.001;
 // kSinsRadToDeg = 180 / pi
 constexpr double kSinsRadToDeg = 57.295779513;
+constexpr int kUtmZoneId = 49;
 }  // namespace
 
 bool NavigationMatcher::MatchWayWithPos(
@@ -188,8 +188,11 @@ bool NavigationMatcher::FindMinDist(
     int index = std::distance(std::begin(min_dist_vector), min_distance);
     *line_num = min_linenum_vector[index];
     *way_id = min_way_id_vector[index];
-    found_pos->log = min_x_vector[index];
-    found_pos->lat = min_y_vector[index];
+    apollo::localization::msf::WGS84Corr wgs84;
+    UtmXYToLatlon(min_x_vector[index], min_y_vector[index], kUtmZoneId, false,
+                  &wgs84);
+    found_pos->lat = wgs84.lat * kSinsRadToDeg;
+    found_pos->log = wgs84.log * kSinsRadToDeg;
   } else {
     AERROR << "There is no min_dist_vector";
     return false;
@@ -248,27 +251,17 @@ bool NavigationMatcher::MatchStep(
   return true;
 }
 
-bool NavigationMatcher::MatchRoute(const Json& expected_route,
+bool NavigationMatcher::MatchRoute(const MapData& map_data,
                                    const std::vector<Way>& route) {
-  MapData map_data;
-  NaviGenJsonConverter converter;
-  if (!converter.JsonToMapData(expected_route, &map_data)) {
-    return false;
-  }
-  int baidu_num_plans = map_data.route_plans.size();
-
   std::vector<std::uint64_t> way_id_vector;
-  for (std::size_t i = 0; i < route.size(); ++i) {
-    way_id_vector.emplace_back(route[i].way_id);
+  for (const auto& way : route) {
+    way_id_vector.emplace_back(way.way_id);
   }
 
-  for (int i = 0; i < baidu_num_plans; ++i) {
-    std::vector<MapRoutes> baidu_routes =
-        map_data.route_plans[i].route_plan.routes;
-    for (std::size_t j = 0; j < baidu_routes.size(); ++j) {
-      MapStep first_step = baidu_routes[j].route.step[0];
-      double step_log = first_step.step.log;
-      double step_lat = first_step.step.lat;
+  for (const auto& route_plans : map_data.route_plans()) {
+    for (const auto& routes : route_plans.route_plan().routes()) {
+      double step_log = routes.route().step(0).lng();
+      double step_lat = routes.route().step(0).lat();
       if (!MatchStep(step_log, step_lat, way_id_vector)) {
         return false;
       }

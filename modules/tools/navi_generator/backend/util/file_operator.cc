@@ -85,11 +85,11 @@ bool FileOperator::Import(const std::string& filename,
     AERROR << "Can't open the smoothed file: " << filename;
     return false;
   }
-  // TODO(zhanghua): Maybe these read char operation shuold be optimized.
   unsigned char c;
+  c = ifs.get();
   while (!ifs.eof()) {
-    c = ifs.get();
     data->emplace_back(c);
+    c = ifs.get();
   }
   ifs.close();
   return true;

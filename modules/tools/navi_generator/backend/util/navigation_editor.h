@@ -23,14 +23,22 @@
 #ifndef MODULES_TOOLS_NAVI_GENERATOR_BACKEND_UTIL_NAVIGATION_EDITOR_H_
 #define MODULES_TOOLS_NAVI_GENERATOR_BACKEND_UTIL_NAVIGATION_EDITOR_H_
 
+#include <condition_variable>
+#include <deque>
+#include <future>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "modules/localization/msf/common/util/frame_transform.h"
 #include "modules/tools/navi_generator/backend/database/db_operator.h"
 #include "modules/tools/navi_generator/backend/util/navigation_matcher.h"
 #include "modules/tools/navi_generator/backend/util/trajectory_processor.h"
+#include "modules/tools/navi_generator/proto/navigation_response.pb.h"
+
 /**
  * @namespace apollo::navi_generator::util
  * @brief apollo::navi_generator::util
@@ -42,8 +50,8 @@ namespace util {
 class NavigationEditor {
  public:
   // NavigationEditor() = default;
-  NavigationEditor(UPDATE_FRONTEND_FUNC task, void* gui_service);
-  ~NavigationEditor() = default;
+  NavigationEditor(UPDATE_FRONTEND_FUNC update_task, void* gui_service);
+  ~NavigationEditor();
 
  public:
   /**
@@ -65,8 +73,6 @@ class NavigationEditor {
   bool SaveRoadCorrection(TrajectoryProcessor* const trajectory_processor);
 
   bool SaveSpeedLimit();
-
-  bool ResponseToFrontEnd();
 
   const std::vector<Way>& GetNewRoute() const { return new_route_; }
 
@@ -104,6 +110,14 @@ class NavigationEditor {
                         std::uint64_t* const end_line_number,
                         std::vector<Way>* const route);
   /**
+   * @brief Find way min and max line number.
+   */
+  bool FindMinMaxLineNumber(DBOperator* const db_operator,
+                            const std::uint64_t way_id,
+                            std::uint64_t* const min_line_number,
+                            std::uint64_t* const max_line_number);
+
+  /**
    * @brief Update start and end way.
    */
   bool SplitStartEndWay(DBOperator* const db_operator,
@@ -120,6 +134,20 @@ class NavigationEditor {
    * @brief Update new way.
    */
   bool UpdateNewRoute(DBOperator* const db_operator);
+  /**
+   * @brief Response to frontend.
+   */
+  bool ResponseToFrontEnd(const std::string& type, const std::string& msg,
+                          int success);
+  /**
+   * @brief Get response data.
+   */
+  bool GetResponseDataByFile(NaviRoutePlans* const response_data);
+  bool GetResponseDataByDatabase(NaviRoutePlans* const response_data);
+  /**
+   * @brief A worker thread function that updates the frontend's display.
+   */
+  void UpdateFrontendThread();
 
  private:
   // first: file_index, second: FileInfo
@@ -130,11 +158,21 @@ class NavigationEditor {
   NaviInfo end_way_navi_info_;
   WayNodes start_way_nodes_;
   WayNodes end_way_nodes_;
+  apollo::localization::msf::WGS84Corr start_point_;
+  apollo::localization::msf::WGS84Corr end_point_;
+  Way replaced_way_;
   std::uint8_t new_speed_min_;
   std::uint8_t new_speed_max_;
-
-  // A task for asynchronously updating GUI information.
-  std::packaged_task<void(const std::string&)> update_gui_task_;
+  bool need_split_ = true;
+  // A thread in charge of updating the frontend.
+  std::unique_ptr<std::thread> update_frontend_thread_;
+  std::condition_variable update_frontend_cv_;
+  mutable std::mutex update_frontend_mut_;
+  // A task deque for asynchronously updating GUI information.
+  std::deque<std::packaged_task<void()>> update_frontend_tasks_;
+  // A binded updating frontend function.
+  std::function<void(const std::string&)> update_frontend_func_;
+  std::atomic<bool> update_frontend_finished_;
 };
 
 }  // namespace util

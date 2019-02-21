@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package apollo.navi_generator;
+
+message NaviWGS84Corr {
+  required double lng = 1;
+  required double lat = 2;
+}

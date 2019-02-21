@@ -1,0 +1,74 @@
+syntax = "proto2";
+
+package apollo.drivers.gnss;
+
+//add ycy for gps gnss
+message ZhdGps {
+    optional double measurement_time = 1;
+    optional double latitude = 2;
+    optional double longitude = 3;
+    optional double altitude = 4;
+    optional double eph = 5;
+    optional double epv = 6;
+    optional float vel_ground_m_s = 7;
+    optional float angle_tracktrue = 8;
+    optional float angle_heading = 9;
+    optional float angle_pitch = 10;
+    optional double vel_n_m_s = 11;
+    optional double vel_e_m_s = 12;
+    optional double vel_u_m_s = 13;
+    optional uint32  satellites_used = 14;
+    optional uint32  satellites_track = 15;
+    optional float   vel_ned_valid = 16;
+
+    enum FixType {
+      FIX_TYPE_INVALID = 0;
+      FIX_TYPE_SPOINT = 1;
+      FIX_TYPE_VBS_PPP = 2;
+      FIX_TYPE_RT2 = 4;
+      FIX_TYPE_PPP = 5;
+      FIX_TYPE_DEAD_MOD = 6;
+      FIX_TYPE_INPUT_MOD = 7;
+      SIMULATOR_MODE = 8;
+      WAAS = 9;
+      INS_FIXED = 99;
+  }
+  optional FixType fix_type = 17;
+
+  enum ZhdPosType {
+    POS_TYPE_NONE = 0;
+    POS_TYPE_FIXEDPOS = 1;
+    FIX_TYPE_FIXEDHEIGHT = 2;
+    POS_TYPE_DOPPLER_VELOCITY = 8;
+    POS_TYPE_SINGLE = 16;
+    POS_TYPE_PSRDIFF = 17;
+    POS_TYPE_WAAS = 18;
+    FIX_TYPE_PROPAGATED = 19;
+    POS_TYPE_OMNISTAR = 20;
+    POS_TYPE_L1_FLOAT = 32;
+    POS_TYPE_IONOFREE_FLOAT = 33;
+    POS_TYPE_NARROW_FLOAT = 34;
+    FIX_TYPE_L1_INT = 48;
+    POS_TYPE_NARROW_INT = 50;
+    POS_TYPE_OMNISTAR_HP = 64;
+    POS_TYPE_OMNISTAR_XP = 65;
+    POS_TYPE_PPP_CONVERGING = 68;
+    POS_TYPE_PPP = 69;
+    POS_TYPE_INS_Angle_state = 99;
+  }
+
+  optional ZhdPosType angle_postype = 18;
+  optional float head_deviation = 19;
+
+  optional uint32 ins_state = 20;
+  optional double gnss_alt_delta = 21;
+  optional double ellipsoidal_h = 22;
+  optional uint32 diff_age = 23;
+
+  enum InsType {
+      INVALID = 0;
+      CONVERGING = 1;
+      GOOD = 2;
+    }
+    optional InsType instype = 24;
+}

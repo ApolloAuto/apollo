@@ -41,7 +41,7 @@ using apollo::common::time::Clock;
 namespace {
 // Time interval, in milliseconds, between pushing SimulationWorld to
 // frontend.
-constexpr double kSimWorldTimeIntervalMs = 100;
+constexpr double kSimWorldTimeIntervalMs = 1000;
 }  // namespace
 
 TopicsUpdater::TopicsUpdater(NaviGeneratorWebSocket *websocket)
@@ -59,6 +59,7 @@ void TopicsUpdater::RegisterMessageHandlers() {
         std::string collection_type;
         std::size_t min_speed_limit;
         std::size_t max_speed_limit;
+        int ret = 0;
         if (!JsonUtil::GetStringFromJson(json, "collectionType",
                                          &collection_type)) {
           return;
@@ -71,8 +72,17 @@ void TopicsUpdater::RegisterMessageHandlers() {
                                          &max_speed_limit)) {
           return;
         }
-        topicsService_.StartCollector(collection_type, min_speed_limit,
-                                      max_speed_limit);
+        if (!topicsService_.StartCollector(collection_type, min_speed_limit,
+                                           max_speed_limit)) {
+          ret = -1;
+        }
+        std::string module = "collector";
+        std::string command = "start";
+        std::string type = "requestStartCollection";
+
+        Json response =
+            topicsService_.GetCommandResponseAsJson(type, module, command, ret);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
@@ -81,6 +91,7 @@ void TopicsUpdater::RegisterMessageHandlers() {
         std::string collection_type;
         std::size_t min_speed_limit;
         std::size_t max_speed_limit;
+        int ret = 0;
         if (!JsonUtil::GetStringFromJson(json, "collectionType",
                                          &collection_type)) {
           return;
@@ -93,65 +104,38 @@ void TopicsUpdater::RegisterMessageHandlers() {
                                          &max_speed_limit)) {
           return;
         }
-        topicsService_.UpdateCollector(collection_type, min_speed_limit,
-                                       max_speed_limit);
+        if (!topicsService_.UpdateCollector(collection_type, min_speed_limit,
+                                            max_speed_limit)) {
+          ret = -1;
+        }
+        std::string module = "collector";
+        std::string command = "update";
+        std::string type = "requestUpdateCollectionCondition";
+
+        Json response =
+            topicsService_.GetCommandResponseAsJson(type, module, command, ret);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
       "requestFinishCollection",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        topicsService_.StopCollector();
+        int ret = 0;
+        std::string module = "collector";
+        std::string command = "stop";
+        std::string type = "requestFinishCollection";
+        if (!topicsService_.StopCollector()) {
+          ret = -1;
+        }
+        Json response =
+            topicsService_.GetCommandResponseAsJson(type, module, command, ret);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
       "requestProcessBagFiles",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        if (ContainsKey(json, "totalFileNum")) {
-          std::size_t num;
-          apollo::navi_generator::util::CommonBagFileInfo common_file_info;
-          if (!JsonUtil::GetNumberFromJson(json, "totalFileNum", &num)) {
-            return;
-          }
-          common_file_info.total_file_num = num;
-          if (!JsonUtil::GetNumberFromJson(json, "leftLaneNum", &num)) {
-            return;
-          }
-          common_file_info.left_lane_num = num;
-          if (!JsonUtil::GetNumberFromJson(json, "rightLaneNum", &num)) {
-            return;
-          }
-          common_file_info.right_lane_num = num;
-          topicsService_.SetCommonBagFileInfo(common_file_info);
-        } else if (ContainsKey(json, "curIndex")) {
-          std::string str;
-          std::size_t num;
-          apollo::navi_generator::util::FileSegment file_segment;
-          if (!JsonUtil::GetNumberFromJson(json, "curIndex", &num)) {
-            return;
-          }
-          file_segment.cur_file_index = num;
-          if (!JsonUtil::GetNumberFromJson(json, "curSegCount", &num)) {
-            return;
-          }
-          file_segment.cur_file_seg_count = num;
-          if (!JsonUtil::GetNumberFromJson(json, "curSegIdx", &num)) {
-            return;
-          }
-          file_segment.cur_file_seg_index = num;
-          if (!JsonUtil::GetStringFromJson(json, "curName", &str)) {
-            return;
-          }
-          file_segment.cur_file_name = str;
-          if (!JsonUtil::GetStringFromJson(json, "nextName", &str)) {
-            return;
-          }
-          file_segment.next_file_name = str;
-          if (!JsonUtil::GetStringFromJson(json, "data", &str)) {
-            return;
-          }
-          file_segment.cur_file_seg_data = str;
-          topicsService_.ProcessBagFileSegment(file_segment);
-        }
+        ParseProcessRequest(json);
       });
   websocket_->RegisterMessageHandler(
       "requestSaveBagFiles",
@@ -169,7 +153,8 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestNavigation",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        // TODO(*): return the navigation result
+        Json response = topicsService_.GetNavigationPathAsJson(json);
+        websocket_->SendData(conn, response.dump());
       });
 
   websocket_->RegisterMessageHandler(
@@ -213,13 +198,38 @@ void TopicsUpdater::RegisterMessageHandlers() {
   websocket_->RegisterMessageHandler(
       "requestCorrectRoadDeviation",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
-        topicsService_.CorrectRoadDeviation();
+        ParseProcessRequest(json);
       });
 
   websocket_->RegisterMessageHandler(
       "requestSaveRoadCorrection",
       [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
         topicsService_.SaveRoadCorrection();
+      });
+
+  // HMI client asks for executing module command.
+  websocket_->RegisterMessageHandler(
+      "requestExecuteModuleCommand",
+      [this](const Json &json, NaviGeneratorWebSocket::Connection *conn) {
+        // json should contain {module: "module_name", command: "command_name"}.
+        // If module_name is "all", then run the command on all modules.
+        std::string module;
+        std::string command;
+        std::string type = "requestExecuteModuleCommand";
+        int ret = 0;
+        if (JsonUtil::GetStringFromJson(json, "module", &module) &&
+            JsonUtil::GetStringFromJson(json, "command", &command)) {
+          if (module == "all") {
+            ret = HMIWorker::instance()->RunModeCommand(command);
+          } else {
+            ret = HMIWorker::instance()->RunModuleCommand(module, command);
+          }
+          Json response = topicsService_.GetCommandResponseAsJson(type, module,
+                                                                  command, ret);
+          websocket_->SendData(conn, response.dump());
+        } else {
+          AERROR << "Truncated module command.";
+        }
       });
 
   // Received new system status, broadcast to clients.
@@ -246,6 +256,7 @@ bool TopicsUpdater::ValidateCoordinate(const nlohmann::json &json) {
 }
 
 void TopicsUpdater::Start() {
+  topicsService_.InitCollector();
   // start ROS timer, one-shot = false, auto-start = true
   timer_ =
       AdapterManager::CreateTimer(ros::Duration(kSimWorldTimeIntervalMs / 1000),
@@ -254,6 +265,16 @@ void TopicsUpdater::Start() {
 
 void TopicsUpdater::OnTimer(const ros::TimerEvent &event) {
   topicsService_.Update();
+  if (!topicsService_.ReadyToPush()) {
+    return;
+  }
+  if (!topicsService_.ReadyToSend()) {
+    return;
+  }
+  Json json = topicsService_.GetUpdateAsJson();
+  simulation_world_ = json.dump();
+  websocket_->BroadcastData(simulation_world_);
+  topicsService_.SetReadyToPush(false);
 }
 
 void TopicsUpdater::StartBroadcastHMIStatusThread() {
@@ -266,6 +287,9 @@ void TopicsUpdater::StartBroadcastHMIStatusThread() {
       {
         std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
         if (!need_broadcast_) {
+          continue;
+        }
+        if (!topicsService_.ReadyToSend()) {
           continue;
         }
         // Reset to false.
@@ -283,6 +307,65 @@ void TopicsUpdater::StartBroadcastHMIStatusThread() {
 void TopicsUpdater::DeferredBroadcastHMIStatus() {
   std::lock_guard<std::mutex> lock(need_broadcast_mutex_);
   need_broadcast_ = true;
+}
+
+bool TopicsUpdater::ParseProcessRequest(const Json &json) {
+  if (ContainsKey(json, "totalFileNum")) {
+    std::size_t num;
+    apollo::navi_generator::util::CommonBagFileInfo common_file_info;
+    if (!JsonUtil::GetNumberFromJson(json, "totalFileNum", &num)) {
+      return false;
+    }
+    common_file_info.total_file_num = num;
+    if (!JsonUtil::GetNumberFromJson(json, "leftLaneNum", &num)) {
+      return false;
+    }
+    common_file_info.left_lane_num = num;
+    if (!JsonUtil::GetNumberFromJson(json, "rightLaneNum", &num)) {
+      return false;
+    }
+    common_file_info.right_lane_num = num;
+    std::string type;
+    if (!JsonUtil::GetStringFromJson(json, "type", &type)) {
+      return false;
+    }
+    if (type == "requestCorrectRoadDeviation") {
+      topicsService_.EnableRoadDeviationCorrection(true);
+    } else {
+      topicsService_.EnableRoadDeviationCorrection(false);
+    }
+    return topicsService_.SetCommonBagFileInfo(common_file_info);
+  } else if (ContainsKey(json, "curIndex")) {
+    std::string str;
+    std::size_t num;
+    apollo::navi_generator::util::FileSegment file_segment;
+    if (!JsonUtil::GetNumberFromJson(json, "curIndex", &num)) {
+      return false;
+    }
+    file_segment.cur_file_index = num;
+    if (!JsonUtil::GetNumberFromJson(json, "curSegCount", &num)) {
+      return false;
+    }
+    file_segment.cur_file_seg_count = num;
+    if (!JsonUtil::GetNumberFromJson(json, "curSegIdx", &num)) {
+      return false;
+    }
+    file_segment.cur_file_seg_index = num;
+    if (!JsonUtil::GetStringFromJson(json, "curName", &str)) {
+      return false;
+    }
+    file_segment.cur_file_name = str;
+    if (!JsonUtil::GetStringFromJson(json, "nextName", &str)) {
+      return false;
+    }
+    file_segment.next_file_name = str;
+    if (!JsonUtil::GetStringFromJson(json, "data", &str)) {
+      return false;
+    }
+    file_segment.cur_file_seg_data = str;
+    return topicsService_.ProcessBagFileSegment(file_segment);
+  }
+  return true;
 }
 
 }  // namespace navi_generator

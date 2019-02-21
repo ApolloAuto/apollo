@@ -27,6 +27,7 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
+#include "modules/localization/msf/common/util/frame_transform.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/tools/navi_generator/backend/common/navi_generator_gflags.h"
 #include "modules/tools/navi_generator/backend/util/navigation_provider.h"
@@ -43,6 +44,13 @@ using apollo::common::adapter::AdapterManager;
 using apollo::localization::LocalizationEstimate;
 using google::protobuf::util::MessageToJsonString;
 
+namespace {
+static constexpr double kAngleThreshold = 0.1;
+// kSinsRadToDeg = 180 / pi
+constexpr double kSinsRadToDeg = 57.295779513;
+constexpr std::size_t kLocalUTMZoneID = 49;
+}  // namespace
+
 // A callback function which updates the GUI.
 void TopicsService::UpdateGUI(const std::string &msg, void *service) {
   CHECK_NOTNULL(service);
@@ -54,28 +62,72 @@ void TopicsService::UpdateGUI(const std::string &msg, void *service) {
   }
 }
 
-TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
-    : websocket_(websocket) {
-  trajectory_processor_.reset(
-      new util::TrajectoryProcessor(TopicsService::UpdateGUI, this));
-}
-
-void TopicsService::Update() {
-  if (to_clear_) {
-    // Clears received data.
-    AdapterManager::GetLocalization()->ClearData();
-    to_clear_ = false;
+// A callback function which informs the bag files has been processed.
+void TopicsService::NotifyBagFilesProcessed(void *service) {
+  CHECK_NOTNULL(service);
+  TopicsService *topics_service = reinterpret_cast<TopicsService *>(service);
+  if (topics_service) {
+    topics_service->CorrectRoadDeviation();
   }
 }
 
-template <>
-void TopicsService::UpdateObserved(const LocalizationEstimate &localization) {
-  // TODO(***): Update status
+TopicsService::TopicsService(NaviGeneratorWebSocket *websocket)
+    : websocket_(websocket), ready_to_push_(false) {
+  trajectory_processor_.reset(new util::TrajectoryProcessor(
+      TopicsService::UpdateGUI, TopicsService::NotifyBagFilesProcessed, this));
+  navigation_editor_.reset(
+      new util::NavigationEditor(TopicsService::UpdateGUI, this));
+  trajectory_collector_.reset(new util::TrajectoryCollector());
+  navigation_provider_.reset(new util::NavigationProvider());
+}
+
+void TopicsService::Update() {
+  const apollo::localization::LocalizationEstimate localization =
+      trajectory_collector_->GetLocalization();
+  if (!localization.has_pose()) {
+    return;
+  }
+  if (!ReadyToSend()) {
+    return;
+  }
+  UpdateObserved(localization);
+  world_.set_sequence_num(world_.sequence_num() + 1);
+  world_.set_timestamp(apollo::common::time::AsInt64<millis>(Clock::Now()));
+  trajectory_collector_->PublishCollector();
+}
+
+void TopicsService::UpdateObserved(
+    const apollo::localization::LocalizationEstimate &localization) {
+  // Update status
+  Object *auto_driving_car = world_.mutable_auto_driving_car();
+  const auto &pose = localization.pose();
+
+  apollo::localization::msf::WGS84Corr wgs84;
+  apollo::localization::msf::UtmXYToLatlon(
+      pose.position().x(), pose.position().y(), kLocalUTMZoneID, false, &wgs84);
+  wgs84.lat *= kSinsRadToDeg;
+  wgs84.log *= kSinsRadToDeg;
+
+  // Updates position with the input localization message.
+  auto_driving_car->set_position_x(pose.position().x());
+  auto_driving_car->set_position_y(pose.position().y());
+  auto_driving_car->set_heading(pose.heading());
+
+  auto_driving_car->set_latitude(wgs84.lat);
+  auto_driving_car->set_longitude(wgs84.log);
+
+  // Updates the timestamp with the timestamp inside the localization
+  // message header. It is done on both the SimulationWorld object
+  // itself and its auto_driving_car() field.
+  auto_driving_car->set_timestamp_sec(localization.header().timestamp_sec());
+
+  ready_to_push_.store(true);
 }
 
 bool TopicsService::SetCommonBagFileInfo(
     const apollo::navi_generator::util::CommonBagFileInfo &common_file_info) {
   trajectory_processor_->Reset();
+  SetReadyToSend(false);
   return trajectory_processor_->SetCommonBagFileInfo(common_file_info);
 }
 
@@ -85,7 +137,16 @@ bool TopicsService::ProcessBagFileSegment(
 }
 
 bool TopicsService::SaveFilesToDatabase() {
+  SetReadyToSend(true);
   return trajectory_processor_->SaveFilesToDatabase();
+}
+
+bool TopicsService::InitCollector() {
+  if (!trajectory_collector_->Init()) {
+    return false;
+  }
+  SetReadyToSend(true);
+  return true;
 }
 
 bool TopicsService::StartCollector(const std::string &collection_type,
@@ -150,6 +211,7 @@ bool TopicsService::GetCollectorOptions(const std::string &collection_type,
     is_duration = true;
   } else if (unit == std::string("km")) {
     is_duration = false;
+    multiplier = 1000.0;
   } else {
     AWARN << "Collection type error.";
     return false;
@@ -159,9 +221,11 @@ bool TopicsService::GetCollectorOptions(const std::string &collection_type,
                                      "/apollo/navi_generator/collector"};
   options->topics = topics;
   if (is_duration) {
+    options->collector_type = util::CollectorType::TIME;
     options->max_duration = ros::Duration(multiplier * duration);
   } else {
-    options->max_mileage = duration;
+    options->collector_type = util::CollectorType::MILEAGE;
+    options->max_mileage = multiplier * duration;
   }
   options->max_speed_limit = static_cast<double>(max_speed_limit);
   options->min_speed_limit = static_cast<double>(min_speed_limit);
@@ -171,24 +235,64 @@ bool TopicsService::GetCollectorOptions(const std::string &collection_type,
 
 Json TopicsService::GetRoutePathAsJson(const Json &map_data) {
   Json response;
-  std::unique_ptr<util::NavigationProvider> provider;
-  provider->GetRoutePathAsJson(map_data, &response);
+  navigation_provider_->GetRoutePathAsJson(map_data, false, &response);
+  return response;
+}
+
+Json TopicsService::GetNavigationPathAsJson(const Json &map_data) {
+  Json response;
+  navigation_provider_->GetRoutePathAsJson(map_data, true, &response);
+  return response;
+}
+
+Json TopicsService::GetUpdateAsJson() const {
+  std::string sim_world_json_string;
+  MessageToJsonString(world_, &sim_world_json_string);
+
+  Json update;
+  update["type"] = "SimWorldUpdate";
+  update["data"] = sim_world_json_string;
+  return update;
+}
+
+Json TopicsService::GetCommandResponseAsJson(const std::string &type,
+                                             const std::string &module,
+                                             const std::string &command,
+                                             const int success) const {
+  Json response;
+  response["type"] = type;
+  response["result"]["name"] = module;
+  response["result"]["success"] = std::to_string(success);
+  std::string msg;
+  if (success == 0) {
+    msg = module + " has been " + command + "successfully.";
+  } else {
+    msg = module + " has been " + command + "failed.";
+  }
+  response["result"]["msg"] = msg;
   return response;
 }
 
 bool TopicsService::CorrectRoadDeviation() {
+  if (!road_deviation_correction_enabled_) {
+    return true;
+  }
+  SetReadyToSend(false);
+  road_deviation_correction_enabled_ = false;
   const std::map<std::uint16_t, apollo::navi_generator::util::FileInfo>
       *processed_file_info = nullptr;
   trajectory_processor_->GetProcessedFilesInfo(&processed_file_info);
   if (processed_file_info == nullptr) {
     return false;
   }
-  if (navigation_editor_->CorrectDeviation(*processed_file_info)) {
+  if (!navigation_editor_->CorrectDeviation(*processed_file_info)) {
     return false;
   }
   return true;
 }
+
 bool TopicsService::SaveRoadCorrection() {
+  SetReadyToSend(true);
   if (!navigation_editor_->SaveRoadCorrection(trajectory_processor_.get())) {
     return false;
   }

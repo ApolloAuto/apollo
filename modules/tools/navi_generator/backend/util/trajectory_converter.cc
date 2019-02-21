@@ -34,6 +34,7 @@
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/planning/proto/reference_line_smoother_config.pb.h"
+#include "modules/tools/navi_generator/proto/trajectory_collector.pb.h"
 
 namespace apollo {
 namespace navi_generator {
@@ -184,6 +185,7 @@ bool TrajectoryConverter::SmoothTrajectoryPoints() {
 
 bool TrajectoryConverter::GetSmoothedTrajectoryWGS84Points(
     std::vector<apollo::localization::msf::WGS84Corr>* const waypoints) {
+  CHECK_NOTNULL(waypoints);
   for (auto smoothed_point : smoothed_points_) {
     apollo::localization::msf::WGS84Corr wgs84;
     apollo::localization::msf::UtmXYToLatlon(smoothed_point.x(),
@@ -199,6 +201,7 @@ bool TrajectoryConverter::GetSmoothedTrajectoryWGS84Points(
 bool TrajectoryConverter::ConvertSmoothedTrajectoryPointsToWGS84(
     const std::vector<planning::ReferencePoint>* const smoothed_points,
     std::vector<apollo::localization::msf::WGS84Corr>* const waypoints) {
+  CHECK_NOTNULL(waypoints);
   for (auto smoothed_point : *smoothed_points) {
     apollo::localization::msf::WGS84Corr wgs84;
     apollo::localization::msf::UtmXYToLatlon(smoothed_point.x(),
@@ -208,6 +211,33 @@ bool TrajectoryConverter::ConvertSmoothedTrajectoryPointsToWGS84(
     wgs84.log *= kSinsRadToDeg;
     waypoints->emplace_back(wgs84);
   }
+  return true;
+}
+
+bool TrajectoryConverter::ExtractSpeedLimit(const std::string& bag_filename,
+                                            double* const min_speed_limit,
+                                            double* const max_speed_limit) {
+  CHECK_NOTNULL(min_speed_limit);
+  CHECK_NOTNULL(max_speed_limit);
+  rosbag::Bag bag;
+  try {
+    bag.open(bag_filename);  // BagMode is Read by default
+  } catch (const rosbag::BagException& e) {
+    AERROR << "Can't open the input bag file: " << bag_filename;
+    AERROR << "The reason is: " << e.what();
+    return false;
+  }
+
+  std::vector<std::string> topics = {"/apollo/navi_generator/collector"};
+  rosbag::View view(bag, rosbag::TopicQuery(topics));
+  for (auto const m : view) {
+    auto msg = m.instantiate<TrajectoryCollectorMsg>();
+    if (msg != nullptr) {
+      *min_speed_limit = msg->min_speed_limit();
+      *max_speed_limit = msg->max_speed_limit();
+    }
+  }
+  bag.close();
   return true;
 }
 

@@ -1,0 +1,26 @@
+syntax = "proto2";
+
+package apollo.navi_generator;
+
+message Object {
+  // Position Info
+  optional double heading = 1;
+  optional double latitude = 2;
+  optional double longitude = 3;
+  optional double position_x = 4;
+  optional double position_y = 5;
+ 
+  // Time Info
+  optional double timestamp_sec = 6;
+}
+
+message SimulationWorld {
+  // Timestamp in milliseconds
+  optional double timestamp = 1;
+
+  // Sequence number
+  optional uint32 sequence_num = 2;
+
+  // Autonomous driving cars
+  optional Object auto_driving_car = 3;
+}

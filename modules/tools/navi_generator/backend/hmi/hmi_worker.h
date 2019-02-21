@@ -39,7 +39,7 @@ namespace navi_generator {
 class HMIWorker {
  public:
   // Run a command on current system mode.
-  void RunModeCommand(const std::string& command_name);
+  int RunModeCommand(const std::string& command_name);
   // Run a command on given module.
   int RunModuleCommand(const std::string& module, const std::string& command);
   // Run a command on given hardware.
