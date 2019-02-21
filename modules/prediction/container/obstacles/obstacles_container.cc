@@ -339,7 +339,7 @@ void ObstaclesContainer::BuildLaneGraph() {
     AERROR << "Ego vehicle not inserted";
     return;
   }
-  ego_vehicle->BuildLaneGraph();
+  // ego_vehicle->BuildLaneGraph();
 }
 
 void ObstaclesContainer::BuildJunctionFeature() {
