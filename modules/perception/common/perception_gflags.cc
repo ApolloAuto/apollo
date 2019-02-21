@@ -210,7 +210,3 @@ DEFINE_string(traffic_light_recognizer, "",
               "the recognizer enabled for traffic_light");
 DEFINE_string(traffic_light_reviser, "",
               "the reviser enabled for traffic_light");
-
-/// cuda configration
-DEFINE_int32(cuda_block_width, 32, "cuda block width");
-DEFINE_int32(cuda_block_height, 32, "cuda block height");
