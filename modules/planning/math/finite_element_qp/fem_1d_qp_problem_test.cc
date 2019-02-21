@@ -33,7 +33,7 @@
 namespace apollo {
 namespace planning {
 
-TEST(Fem1dJerkQpProblemTest, basic_test) {
+TEST(Fem1dQPProblemTest, basic_test) {
   FLAGS_enable_osqp_debug = true;
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
   double delta_s = 0.5;
@@ -54,9 +54,9 @@ TEST(Fem1dJerkQpProblemTest, basic_test) {
   Fem1dQpProblem* fem_qp = new Fem1dQpProblem(
       n, x_init, delta_s, w, max_x_third_order_derivative);
 
-  EXPECT_FALSE(fem_qp->Optimize());
-
   fem_qp->SetVariableBounds(x_bounds);
+  fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
 
   auto start_time = std::chrono::system_clock::now();
   EXPECT_TRUE(fem_qp->Optimize());
@@ -73,7 +73,7 @@ TEST(Fem1dJerkQpProblemTest, basic_test) {
   delete fem_qp;
 }
 
-TEST(Fem1dJerkQpProblemTest, add_bounds_test) {
+TEST(Fem1dQPProblemTest, add_bounds_test) {
   FLAGS_enable_osqp_debug = false;
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
   double delta_s = 0.5;
@@ -118,6 +118,8 @@ TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
       n, x_init, delta_s, w, max_x_third_order_derivative);
 
   fem_qp->SetVariableBounds(x_bounds);
+  fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
 
   const double dx_max = std::sqrt(0.5) / 15.0;
   std::vector<std::tuple<double, double, double>> dx_bounds;

@@ -75,6 +75,21 @@ class Fem1dQpProblem {
     x_init_ = x_init;
   }
 
+  void SetZeroOrderBounds(
+      std::vector<std::pair<double, double>> x_bounds);
+
+  void SetFirstOrderBounds(
+      std::vector<std::pair<double, double>> dx_bounds);
+
+  void SetSecondOrderBounds(
+      std::vector<std::pair<double, double>> d2x_bounds);
+
+  void SetZeroOrderBounds(const double x_bound);
+
+  void SetFirstOrderBounds(const double dx_bound);
+
+  void SetSecondOrderBounds(const double ddx_bound);
+
   // x_bounds: tuple(s, lower_bounds, upper_bounds)
   // s doesn't need to be sorted
   virtual void SetVariableBounds(
@@ -96,14 +111,14 @@ class Fem1dQpProblem {
 
   virtual std::vector<double> x() const { return x_; }
 
-  virtual std::vector<double> x_derivative() const { return x_derivative_; }
+  virtual std::vector<double> x_derivative() const { return dx_; }
 
   virtual std::vector<double> x_second_order_derivative() const {
-    return x_second_order_derivative_;
+    return ddx_;
   }
 
   virtual std::vector<double> x_third_order_derivative() const {
-    return x_third_order_derivative_;
+    return dddx_;
   }
 
   // modify output resolution. If not set, the output resolution is by default
@@ -138,15 +153,13 @@ class Fem1dQpProblem {
       std::vector<std::pair<double, double>>* dst);
 
  protected:
-  bool bound_is_init_ = false;
-
-  size_t num_var_ = 0;
+  size_t num_of_knots_ = 0;
 
   // output
   std::vector<double> x_;
-  std::vector<double> x_derivative_;
-  std::vector<double> x_second_order_derivative_;
-  std::vector<double> x_third_order_derivative_;
+  std::vector<double> dx_;
+  std::vector<double> ddx_;
+  std::vector<double> dddx_;
 
   std::array<double, 3> x_init_;
   std::vector<std::pair<double, double>> x_bounds_;
@@ -165,10 +178,6 @@ class Fem1dQpProblem {
 
   double delta_s_ = 1.0;
   double delta_s_sq_ = 1.0;
-  double delta_s_tri_ = 1.0;    // delta_s^3
-  double delta_s_tetra_ = 1.0;  // delta_s^4
-  double delta_s_penta_ = 1.0;  // delta_s^5
-  double delta_s_hex_ = 1.0;    // delta_s^6
 };
 
 }  // namespace planning
