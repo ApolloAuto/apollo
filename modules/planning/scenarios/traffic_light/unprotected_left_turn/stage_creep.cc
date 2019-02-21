@@ -59,6 +59,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::Process(
     AERROR << "TrafficLightUnprotectedLeftTurnStageCreep planning error";
   }
 
+  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
   // check if the traffic_light is still along reference_line
@@ -85,6 +86,7 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::Process(
       ->SetProceedWithCautionSpeedParam(
           *frame, reference_line_info,
           PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s);
+  */
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {

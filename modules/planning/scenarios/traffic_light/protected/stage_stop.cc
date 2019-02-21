@@ -54,6 +54,7 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
     AERROR << "TrafficLightProtectedStop planning error";
   }
 
+  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
   // check if the traffic_light is still along reference_line
@@ -78,20 +79,23 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
       TrafficLight::GREEN) {
     return FinishStage();
   }
+  */
 
   return Stage::RUNNING;
 }
 
 Stage::StageStatus TrafficLightProtectedStageStop::FinishScenario() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
 Stage::StageStatus TrafficLightProtectedStageStop::FinishStage() {
+  /* TODO(all): to be fixed
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
+  */
   next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
