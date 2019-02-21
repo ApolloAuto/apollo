@@ -44,7 +44,6 @@
 
 #include "block_uf.h"
 #include "texture.h"
-#include "modules/perception/common/cuda_conf.h"
 
 namespace apollo {
 namespace perception {
@@ -175,7 +174,7 @@ bool BlockUnionFind(const unsigned char* img, int width, int height,
       (void**)&label_array,
       static_cast<size_t>(width) * static_cast<size_t>(height) * sizeof(int));
 
-  dim3 block(CudaConfig::instance().width(), CudaConfig::instance().height());
+  dim3 block(UF_BLOCK_WIDTH, UF_BLOCK_HEIGHT);
   dim3 grid(
       static_cast<unsigned int>((width + block.x - 1) / block.x),
       static_cast<unsigned int>((height + block.y - 1) / block.y));

@@ -8,13 +8,11 @@ cc_library(
         "geometry_util.cc",
         "graph_util.cc",
         "perception_gflags.cc",
-        "cuda_conf.cc",
     ],
     hdrs = [
         "geometry_util.h",
         "graph_util.h",
         "perception_gflags.h",
-        "cuda_conf.h",
     ],
     deps = [
         ":pcl_util",
