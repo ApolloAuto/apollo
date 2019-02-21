@@ -153,6 +153,22 @@ class ReferenceLineInfo {
     offset_to_other_reference_line_ = offset;
   }
 
+  void GetPathBoundaries(
+      std::vector<std::pair<double, double>>* const ptr_path_boundaries,
+      double* const ptr_start_s, double* const ptr_resolution_s) {
+    (*ptr_path_boundaries) = path_boundaries_;
+    *ptr_start_s = path_boundaries_s_start_;
+    *ptr_resolution_s = path_boundaries_s_resolution_;
+  }
+
+  void SetPathBoundaries(
+      const std::vector<std::pair<double, double>>& path_boundaries,
+      const double start_s, const double resolution_s) {
+    path_boundaries_ = path_boundaries;
+    path_boundaries_s_start_ = start_s;
+    path_boundaries_s_resolution_ = resolution_s;
+  }
+
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
 
   void InitFirstOverlaps();
@@ -225,6 +241,10 @@ class ReferenceLineInfo {
   bool is_drivable_ = true;
 
   PathDecision path_decision_;
+
+  std::vector<std::pair<double, double>> path_boundaries_;
+  double path_boundaries_s_start_ = 0.0;
+  double path_boundaries_s_resolution_ = 0.1;
 
   PathData path_data_;
   SpeedData speed_data_;

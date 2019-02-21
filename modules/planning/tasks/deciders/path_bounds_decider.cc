@@ -23,6 +23,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -84,7 +85,20 @@ Status PathBoundsDecider::Process(
   }
 
   // Update the path boundary info to the frame.
-  // TODO(all): update frame with path bound info.
+  if (path_boundaries.empty()) {
+    const std::string msg =
+        "Failed to get a valid path boundary";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  std::vector<std::pair<double, double>> path_boundaries_pair;
+  for (size_t i = 0; i < path_boundaries.size(); ++i) {
+    path_boundaries_pair.emplace_back(std::get<1>(path_boundaries[i]),
+                                      std::get<2>(path_boundaries[i]));
+  }
+  reference_line_info->SetPathBoundaries(
+      path_boundaries_pair, std::get<0>(path_boundaries[0]),
+      kPathBoundsDeciderResolution);
   return Status::OK();
 }
 
