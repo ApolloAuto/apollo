@@ -105,7 +105,7 @@ ZhdParser::ZhdParser(const config::Config& config) {
     zhd_config_ = config.zhd_config();
   } else {
     zhd_config_.set_angle_heading(90);
-    AERROR << "angle_heading=" << hex << zhd_config_.angle_heading();
+    AERROR << "angle_heading=" << std::hex << zhd_config_.angle_heading();
   }
 }
 
@@ -200,7 +200,7 @@ Parser::MessageType ZhdParser::PrepareMessage(MessagePtr* message_ptr) {
     double milliseconds_a = (stZhdData->sec_utc  % 100) * 10;
     double seconds = milliseconds_a / 1000;
     time_t epoch = mktime(&timeinfo);
-    double time_stamp = static_cast<double>epoch + seconds;
+    double time_stamp = static_cast<double>(epoch) + seconds;
 
     zhdgps_.set_measurement_time(time_stamp);
     zhdgps_.set_longitude(stZhdData->longitude);
@@ -330,7 +330,7 @@ bool ZhdParser::check_checksum(void) {
     (uint16_t)*reinterpret_cast<uint16_t*>(buffer_.data() +
     buffer_.size()-2);
 
-  for (vector<uint8_t>::iterator riter = buffer_.begin();
+  for (std::vector<uint8_t>::iterator riter = buffer_.begin();
     riter != (buffer_.end()-2); riter++) {
     xor_check = xor_check^(reinterpret_cast<uint8_t>(*riter));
   }
