@@ -58,7 +58,6 @@ class TrafficLightProtectedScenario : public Scenario {
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
-  bool IsProtected(const ReferenceLineInfo& reference_line_info) const;
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>

@@ -67,8 +67,11 @@ void DeciderRuleBasedStop::CheckStopSign(
     return;
   }
 
-  if (stop_sign_id ==
-      PlanningContext::GetScenarioInfo()->stop_done_overlap_id) {
+  if (PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end() !=
+      std::find(
+          PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.begin(),
+          PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end(),
+          stop_sign_id)) {
     return;
   }
 
@@ -95,41 +98,45 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     return;
   }
 
-  const std::string traffic_light_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (traffic_light_id.empty()) {
-    return;
+  for (auto traffic_light_overlap :
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
+    const std::string traffic_light_id = traffic_light_overlap.object_id;
+
+    if (PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end() !=
+        std::find(
+            PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.begin(),
+            PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end(),
+            traffic_light_id)) {
+      continue;
+    }
+
+
+    const TrafficLight traffic_light = ReadTrafficLight(
+        *frame, traffic_light_id);
+
+    // TODO(all): add stop_deceleration check based on signal colors
+    // TODO(all): to be fixed
+    // PlanningContext::GetScenarioInfo()->traffic_light_color =
+    //   traffic_light.color();
+
+    if (traffic_light.color() == TrafficLight::GREEN) {
+      continue;
+    }
+
+    const std::string stop_wall_id =
+        TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_id;
+    const double stop_line_s = traffic_light_overlap.start_s;
+    const double stop_distance =
+        config_.decider_rule_based_stop_config().traffic_light()
+            .stop_distance();
+
+    ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
+        << "] stop_line_s[" << stop_line_s << "]";
+    std::vector<std::string> wait_for_obstacles;
+    BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
+                      stop_distance, StopReasonCode::STOP_REASON_SIGNAL,
+                      wait_for_obstacles);
   }
-
-  if (traffic_light_id ==
-      PlanningContext::GetScenarioInfo()->stop_done_overlap_id) {
-    return;
-  }
-
-  const TrafficLight traffic_light = ReadTrafficLight(*frame, traffic_light_id);
-
-  // TODO(all): add stop_deceleration check based on signal colors
-
-  PlanningContext::GetScenarioInfo()->traffic_light_color =
-      traffic_light.color();
-
-  if (traffic_light.color() == TrafficLight::GREEN) {
-    return;
-  }
-
-  const std::string stop_wall_id =
-      TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_id;
-  const double stop_line_s =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
-  const double stop_distance =
-      config_.decider_rule_based_stop_config().traffic_light().stop_distance();
-
-  ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
-         << "] stop_line_s[" << stop_line_s << "]";
-  std::vector<std::string> wait_for_obstacles;
-  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
-                    stop_distance, StopReasonCode::STOP_REASON_SIGNAL,
-                    wait_for_obstacles);
 }
 
 TrafficLight DeciderRuleBasedStop::ReadTrafficLight(

@@ -53,6 +53,7 @@ TrafficLightUnprotectedLeftTurnStageIntersectionCruise::Process(
            << "plan error";
   }
 
+  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
   // check if the traffic_light is still along reference_line
@@ -72,6 +73,7 @@ TrafficLightUnprotectedLeftTurnStageIntersectionCruise::Process(
   if (distance_adc_pass_traffic_light > kIntersectionLength) {
     return FinishStage();
   }
+  */
 
   return Stage::RUNNING;
 }
