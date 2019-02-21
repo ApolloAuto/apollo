@@ -195,6 +195,11 @@ const ADCTrajectory& ADCTrajectoryContainer::adc_trajectory() const {
   return adc_trajectory_;
 }
 
+bool ADCTrajectoryContainer::IsLaneIdInReferenceLine(
+    const std::string& lane_id) const {
+  return adc_lane_ids_.find(lane_id) != adc_lane_ids_.end();
+}
+
 void ADCTrajectoryContainer::SetLaneSequence() {
   for (const auto& lane : adc_trajectory_.lane_id()) {
     if (!lane.id().empty()) {
