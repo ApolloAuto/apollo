@@ -94,6 +94,12 @@ class ADCTrajectoryContainer : public Container {
    */
   const planning::ADCTrajectory& adc_trajectory() const;
 
+  /**
+   * @brief Determine if a lane ID is in the reference line
+   * @return The lane ID to be investigated
+   */
+  bool IsLaneIdInReferenceLine(const std::string& lane_id) const;
+
  private:
   void SetJunctionPolygon();
 
