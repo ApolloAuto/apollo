@@ -260,5 +260,31 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane() {
   }
 }
 
+void ObstaclesPrioritizer::AssignCautionLevelInJunction(
+    const std::shared_ptr<ScenarioFeatures> scenario_features) {
+  if (scenario_features->scenario().type() != Scenario::JUNCTION) {
+    ADEBUG << "Not in Junction Scenario";
+    return;
+  }
+  std::string junction_id = scenario_features->scenario().junction_id();
+  ObstaclesContainer* obstacles_container =
+      ContainerManager::Instance()->GetContainer<
+          ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+  Obstacle* ego_vehicle =
+      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_vehicle == nullptr) {
+    AERROR << "Ego vehicle not found";
+    return;
+  }
+  for (const int id :
+       obstacles_container->curr_frame_predictable_obstacle_ids()) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(id);
+    if (obstacle_ptr != nullptr && obstacle_ptr->IsInJunction(junction_id)) {
+      obstacle_ptr->SetCaution();
+      ADEBUG << "SetCaution for obstacle [" << obstacle_ptr->id() << "]";
+    }
+  }
+}
+
 }  // namespace prediction
 }  // namespace apollo

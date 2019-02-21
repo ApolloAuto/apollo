@@ -39,6 +39,9 @@ class ObstaclesPrioritizer {
   static void AssignCautionLevelCruiseKeepLane();
 
   static void AssignCautionLevelCruiseChangeLane();
+
+  static void AssignCautionLevelInJunction(
+      const std::shared_ptr<ScenarioFeatures> scenario_features);
 };
 
 }  // namespace prediction
