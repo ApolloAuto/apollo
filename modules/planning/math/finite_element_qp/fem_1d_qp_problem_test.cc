@@ -18,6 +18,7 @@
  * @file
  **/
 
+#include <math.h>
 #include <chrono>
 
 #include "cyber/common/log.h"
@@ -27,14 +28,13 @@
 
 #define private public
 #define protected public
-#include "modules/planning/math/finite_element_qp/fem_1d_jerk_qp_problem.h"
+#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
 namespace apollo {
 namespace planning {
 
 TEST(Fem1dJerkQpProblemTest, basic_test) {
   FLAGS_enable_osqp_debug = true;
-  Fem1dQpProblem* fem_qp = new Fem1dJerkQpProblem();
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
   double delta_s = 0.5;
   size_t n = 400;
@@ -50,8 +50,10 @@ TEST(Fem1dJerkQpProblemTest, basic_test) {
   }
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 1.25;
-  EXPECT_TRUE(
-      fem_qp->Init(n, x_init, delta_s, w, max_x_third_order_derivative));
+
+  Fem1dQpProblem* fem_qp = new Fem1dQpProblem(
+      n, x_init, delta_s, w, max_x_third_order_derivative);
+
   EXPECT_FALSE(fem_qp->Optimize());
 
   fem_qp->SetVariableBounds(x_bounds);
@@ -68,18 +70,19 @@ TEST(Fem1dJerkQpProblemTest, basic_test) {
     EXPECT_LE(x[i], fem_qp->x_bounds_[i].second);
     EXPECT_GE(x[i], fem_qp->x_bounds_[i].first);
   }
+  delete fem_qp;
 }
 
 TEST(Fem1dJerkQpProblemTest, add_bounds_test) {
   FLAGS_enable_osqp_debug = false;
-  Fem1dQpProblem* fem_qp = new Fem1dJerkQpProblem();
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
   double delta_s = 0.5;
   size_t n = 400;
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 0.25;
-  EXPECT_TRUE(
-      fem_qp->Init(n, x_init, delta_s, w, max_x_third_order_derivative));
+
+  Fem1dQpProblem* fem_qp = new Fem1dQpProblem(
+      n, x_init, delta_s, w, max_x_third_order_derivative);
 
   std::vector<std::tuple<double, double, double>> x_bounds;
   for (size_t i = 10; i < 20; ++i) {
@@ -95,11 +98,12 @@ TEST(Fem1dJerkQpProblemTest, add_bounds_test) {
     EXPECT_DOUBLE_EQ(std::get<0>(x[i]), -1.81);
     EXPECT_DOUBLE_EQ(std::get<1>(x[i]), 1.95);
   }
+
+  delete fem_qp;
 }
 
 TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
   FLAGS_enable_osqp_debug = true;
-  Fem1dQpProblem* fem_qp = new Fem1dJerkQpProblem();
   std::array<double, 3> x_init = {4.5, 0.00, 0.0};
   double delta_s = 0.5;
   size_t n = 200;
@@ -109,8 +113,9 @@ TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
   }
   std::array<double, 5> w = {1.0, 100.0, 1000.0, 1000.0, 0.0};
   double max_x_third_order_derivative = 2.0;
-  EXPECT_TRUE(
-      fem_qp->Init(n, x_init, delta_s, w, max_x_third_order_derivative));
+
+  Fem1dQpProblem* fem_qp = new Fem1dQpProblem(
+      n, x_init, delta_s, w, max_x_third_order_derivative);
 
   fem_qp->SetVariableBounds(x_bounds);
 
@@ -141,6 +146,8 @@ TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
     EXPECT_LT(dx[i] - 1e-12, fem_qp->dx_bounds_[i].second);
     EXPECT_GT(dx[i] + 1e-12, fem_qp->dx_bounds_[i].first);
   }
+
+  delete fem_qp;
 }
 
 }  // namespace planning
