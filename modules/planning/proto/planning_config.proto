@@ -45,7 +45,8 @@ message TaskConfig {
     SIDE_PASS_SAFETY = 14;
     PROCEED_WITH_CAUTION_SPEED = 15;
     DECIDER_RSS = 16;
-    SPEED_BOUNDS_DECIDER = 17;
+    SPEED_BOUNDS_PRIORI_DECIDER = 17;
+    SPEED_BOUNDS_FINAL_DECIDER = 18;
   };
   optional TaskType task_type = 1;
   oneof task_config {
