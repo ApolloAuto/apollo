@@ -1,0 +1,1 @@
+scenario_type: VALET_PARKING
