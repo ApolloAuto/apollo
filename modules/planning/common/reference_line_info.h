@@ -157,7 +157,7 @@ class ReferenceLineInfo {
   void GetPathBoundaries(
       std::vector<std::pair<double, double>>* const ptr_path_boundaries,
       double* const ptr_start_s, double* const ptr_resolution_s) {
-    (*ptr_path_boundaries) = path_boundaries_;
+    *ptr_path_boundaries = path_boundaries_;
     *ptr_start_s = path_boundaries_s_start_;
     *ptr_resolution_s = path_boundaries_s_resolution_;
   }

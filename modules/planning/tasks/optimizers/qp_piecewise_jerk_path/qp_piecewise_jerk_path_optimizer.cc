@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "modules/common/time/time.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
 namespace apollo {
@@ -248,6 +249,10 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   auto start_time = std::chrono::system_clock::now();
 
   fem_1d_qp_->SetVariableBounds(lateral_bounds);
+
+  fem_1d_qp_->SetFirstOrderBounds(
+      FLAGS_lateral_derivative_bound_default);
+
   fem_1d_qp_->SetVariableSecondOrderDerivativeBounds(
       lateral_second_order_derivative_bounds);
 
@@ -262,8 +267,6 @@ Status QpPiecewiseJerkPathOptimizer::Process(
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
   fem_1d_qp_->SetOutputResolution(qp_config.path_output_resolution());
-
-  std::vector<common::FrenetFramePoint> frenet_path;
 
   std::vector<common::FrenetFramePoint> frenet_frame_path;
   double accumulated_s = frenet_point.s();
