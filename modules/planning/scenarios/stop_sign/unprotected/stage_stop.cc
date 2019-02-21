@@ -213,7 +213,7 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
 }
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
@@ -221,8 +221,9 @@ Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
 }
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.push_back(
+      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id);
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
   GetContext()->creep_start_time = Clock::NowInSeconds();
 

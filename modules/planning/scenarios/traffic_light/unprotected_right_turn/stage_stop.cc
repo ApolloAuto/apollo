@@ -54,6 +54,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
     AERROR << "TrafficLightRightTurnUnprotectedStop planning error";
   }
 
+  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
   // check if the traffic_light is still along reference_line
@@ -89,20 +90,23 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
         TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
     return Stage::FINISHED;
   }
+  */
 
   return Stage::RUNNING;
 }
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage() {
+  /* TODO(all): to be fixed
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
+  */
   GetContext()->creep_start_time = Clock::NowInSeconds();
 
   next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP;

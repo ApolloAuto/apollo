@@ -50,6 +50,7 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
     AERROR << "TrafficLightProtectedStageIntersectionCruise plan error";
   }
 
+  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
   // check if the traffic_light is still along reference_line
@@ -69,6 +70,7 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
   if (distance_adc_pass_traffic_light > kIntersectionLength) {
     return FinishStage();
   }
+  */
 
   return Stage::RUNNING;
 }

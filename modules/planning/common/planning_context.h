@@ -49,11 +49,13 @@ class PlanningContext {
   // scenario context
   struct ScenarioInfo {
     apollo::hdmap::PathOverlap next_stop_sign_overlap;
-    apollo::hdmap::PathOverlap next_traffic_light_overlap;
+    std::vector<apollo::hdmap::PathOverlap> next_traffic_light_overlaps;
     apollo::perception::TrafficLight_Color traffic_light_color;
+
     // still in the scenario for this overlap, but stop already done
     // => no stop fence from decider_rule_based_stop task
-    std::string stop_done_overlap_id;
+    std::vector<std::string> stop_done_overlap_ids;
+
     ProceedWithCautionSpeedParam proceed_with_caution_speed;
     std::vector<std::string> stop_sign_wait_for_obstacles;
     std::vector<std::string> crosswalk_wait_for_obstacles;

@@ -52,6 +52,7 @@ void TrafficLightProtectedScenario::Init() {
     return;
   }
 
+  /* TODO(all): to be fixed
   const std::string traffic_light_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
   if (traffic_light_overlap_id.empty()) {
@@ -64,6 +65,7 @@ void TrafficLightProtectedScenario::Init() {
     AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
     return;
   }
+  */
 
   init_ = true;
 }
@@ -104,51 +106,6 @@ std::unique_ptr<Stage> TrafficLightProtectedScenario::CreateStage(
 
 bool TrafficLightProtectedScenario::IsTransferable(
     const Scenario& current_scenario, const Frame& frame) {
-  const std::string traffic_light_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (traffic_light_overlap_id.empty()) {
-    return false;
-  }
-
-  const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double traffic_light_overlap_start_s =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
-  const double adc_distance_to_stop_line =
-      traffic_light_overlap_start_s - adc_front_edge_s;
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
-
-  auto scenario_config = config_.traffic_light_protected_config();
-
-  bool is_stopped_for_traffic_light = true;
-  if (adc_speed > scenario_config.max_adc_stop_speed() ||
-      adc_distance_to_stop_line > scenario_config.max_valid_stop_distance()) {
-    is_stopped_for_traffic_light = false;
-    ADEBUG << "ADC not stopped: speed[" << adc_speed
-           << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line
-           << "]";
-  }
-
-  switch (current_scenario.scenario_type()) {
-    case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
-    case ScenarioConfig::APPROACH:
-      return (is_stopped_for_traffic_light && IsProtected(reference_line_info));
-    case ScenarioConfig::STOP_SIGN_PROTECTED:
-    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      return false;
-    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
-      return (current_scenario.GetStatus() !=
-              Scenario::ScenarioStatus::STATUS_DONE);
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-      return false;
-    default:
-      break;
-  }
-
   return false;
 }
 
@@ -161,31 +118,6 @@ bool TrafficLightProtectedScenario::GetScenarioConfig() {
     return false;
   }
   context_.scenario_config.CopyFrom(config_.traffic_light_protected_config());
-  return true;
-}
-
-bool TrafficLightProtectedScenario::IsProtected(
-    const ReferenceLineInfo& reference_line_info) const {
-  const auto& turn = reference_line_info.GetPathTurnType();
-
-  // left turn
-  if (turn == hdmap::Lane::LEFT_TURN) {
-    // TODO(all): add arrow-left check
-    return false;
-  }
-
-  // right turn
-  if (turn == hdmap::Lane::RIGHT_TURN) {
-    return (PlanningContext::GetScenarioInfo()->traffic_light_color ==
-            TrafficLight::GREEN);
-  }
-
-  // u-turn
-  if (turn == hdmap::Lane::U_TURN) {
-    // TODO(all): add arrow-u-turn check
-    return false;
-  }
-
   return true;
 }
 
