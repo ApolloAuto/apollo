@@ -17,28 +17,14 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "fem_1d_jerk_qp_problem",
+cc_test(
+    name = "fem_1d_qp_problem_test",
+    size = "small",
     srcs = [
-        "fem_1d_jerk_qp_problem.cc",
-    ],
-    hdrs = [
-        "fem_1d_jerk_qp_problem.h",
+        "fem_1d_qp_problem_test.cc",
     ],
     deps = [
         ":fem_1d_qp_problem",
-        "//cyber/common:log",
-    ],
-)
-
-cc_test(
-    name = "fem_1d_jerk_qp_problem_test",
-    size = "small",
-    srcs = [
-        "fem_1d_jerk_qp_problem_test.cc",
-    ],
-    deps = [
-        ":fem_1d_jerk_qp_problem",
         "//cyber/common:log",
         "@gtest//:main",
     ],

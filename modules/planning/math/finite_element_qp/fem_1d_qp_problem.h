@@ -49,10 +49,6 @@ namespace planning {
 
 class Fem1dQpProblem {
  public:
-  Fem1dQpProblem() = default;
-
-  virtual ~Fem1dQpProblem() = default;
-
   /*
    * @param
    * x_init: the init status of x, x', x''
@@ -66,9 +62,11 @@ class Fem1dQpProblem {
    * -- w[4]: default reference line weight, (x_bounds[k].first +
    * x_bounds[k].second)/2
    */
-  virtual bool Init(const size_t num_var, const std::array<double, 3>& x_init,
-                    const double delta_s, const std::array<double, 5>& w,
-                    const double max_x_third_order_derivative);
+  Fem1dQpProblem(const size_t num_var, const std::array<double, 3>& x_init,
+      const double delta_s, const std::array<double, 5>& w,
+      const double max_x_third_order_derivative);
+
+  virtual ~Fem1dQpProblem() = default;
 
   virtual void AddReferenceLineKernel(const std::vector<double>& ref_line,
                                       const double wweight) {}
@@ -94,7 +92,7 @@ class Fem1dQpProblem {
 
   virtual void PreSetKernel() {}
 
-  virtual bool Optimize() = 0;
+  virtual bool Optimize();
 
   virtual std::vector<double> x() const { return x_; }
 
@@ -116,14 +114,14 @@ class Fem1dQpProblem {
   // naming convention follows osqp solver.
   virtual void CalculateKernel(std::vector<c_float>* P_data,
                                std::vector<c_int>* P_indices,
-                               std::vector<c_int>* P_indptr) = 0;
+                               std::vector<c_int>* P_indptr);
 
-  virtual void CalculateOffset(std::vector<c_float>* q) = 0;
+  virtual void CalculateOffset(std::vector<c_float>* q);
 
   virtual void CalculateAffineConstraint(
       std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
       std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
-      std::vector<c_float>* upper_bounds) = 0;
+      std::vector<c_float>* upper_bounds);
 
   bool OptimizeWithOsqp(
       const size_t kernel_dim, const size_t num_affine_constraint,
@@ -140,7 +138,6 @@ class Fem1dQpProblem {
       std::vector<std::pair<double, double>>* dst);
 
  protected:
-  bool is_init_ = false;
   bool bound_is_init_ = false;
 
   size_t num_var_ = 0;

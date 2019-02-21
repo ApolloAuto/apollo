@@ -21,8 +21,10 @@
 #include "modules/planning/tasks/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "modules/common/time/time.h"
+#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -238,14 +240,10 @@ Status QpPiecewiseJerkPathOptimizer::Process(
       qp_config.guiding_line_weight(),
   };
 
-  fem_1d_qp_.reset(new Fem1dJerkQpProblem());
   constexpr double kMaxLThirdOrderDerivative = 2.0;
-
-  if (!fem_1d_qp_->Init(n, init_lateral_state, qp_delta_s, w,
-                        kMaxLThirdOrderDerivative)) {
-    std::string msg = "lateral qp optimizer failed";
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+  auto fem_1d_qp_ = std::make_unique<Fem1dQpProblem>(
+      n, init_lateral_state, qp_delta_s, w,
+      kMaxLThirdOrderDerivative);
 
   auto start_time = std::chrono::system_clock::now();
 
