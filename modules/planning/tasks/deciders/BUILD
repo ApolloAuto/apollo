@@ -31,6 +31,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/math/finite_element_qp:fem_1d_qp_problem",
+        "//modules/planning/scenarios/util:util_lib",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
         "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",

@@ -20,11 +20,10 @@
 
 #include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -111,12 +110,10 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     }
 
 
-    // TODO(all): to be removed, to use PlanningContext instead
-    const TrafficLight traffic_light = ReadTrafficLight(
-        *frame, traffic_light_id);
+    auto signal_color = scenario::GetSignal(traffic_light_id).color();
     ADEBUG << "traffic_light_id[" << traffic_light_id
-        << "] color[" << traffic_light.color() << "]";
-    if (traffic_light.color() == TrafficLight::GREEN) {
+        << "] color[" << signal_color << "]";
+    if (signal_color == TrafficLight::GREEN) {
       continue;
     }
 
@@ -136,36 +133,6 @@ void DeciderRuleBasedStop::CheckTrafficLight(
                       stop_distance, StopReasonCode::STOP_REASON_SIGNAL,
                       wait_for_obstacles);
   }
-}
-
-TrafficLight DeciderRuleBasedStop::ReadTrafficLight(
-    const Frame& frame, const std::string& traffic_light_id) {
-  const auto traffic_light_detection = frame.local_view().traffic_light;
-  if (traffic_light_detection == nullptr) {
-    ADEBUG << "traffic_light_detection is null";
-  } else {
-    const double delay = traffic_light_detection->header().timestamp_sec() -
-                         Clock::NowInSeconds();
-    if (delay > config_.decider_rule_based_stop_config()
-                    .traffic_light()
-                    .signal_expire_time_sec()) {
-      ADEBUG << "traffic signal is expired, delay[" << delay << "] seconds.";
-    } else {
-      for (int i = 0; i < traffic_light_detection->traffic_light_size(); i++) {
-        if (traffic_light_detection->traffic_light(i).id() ==
-            traffic_light_id) {
-          return traffic_light_detection->traffic_light(i);
-        }
-      }
-    }
-  }
-
-  TrafficLight traffic_light;
-  traffic_light.set_id(traffic_light_id);
-  traffic_light.set_color(TrafficLight::UNKNOWN);
-  traffic_light.set_confidence(0.0);
-  traffic_light.set_tracking_time(0.0);
-  return traffic_light;
 }
 
 bool DeciderRuleBasedStop::BuildStopDecision(
