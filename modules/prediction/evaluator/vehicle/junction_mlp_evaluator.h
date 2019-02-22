@@ -100,9 +100,9 @@ class JunctionMLPEvaluator : public Evaluator {
       const std::vector<double>& feature_values);
 
  private:
-  static const size_t OBSTACLE_FEATURE_SIZE = 3;
+  static const size_t OBSTACLE_FEATURE_SIZE = 4 + 2 * 5;
   static const size_t EGO_VEHICLE_FEATURE_SIZE = 4;
-  static const size_t JUNCTION_FEATURE_SIZE = 72;
+  static const size_t JUNCTION_FEATURE_SIZE = 12 * 8;
 
   std::unique_ptr<FnnVehicleModel> model_ptr_;
 };
