@@ -57,8 +57,8 @@ cc_library(
     deps = [
         "//modules/common/status",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/tasks:task",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/tasks:task",
     ],
 )
 

@@ -22,8 +22,6 @@
 #include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
-#define private public
-
 namespace apollo {
 namespace planning {
 namespace scenario {

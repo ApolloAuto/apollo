@@ -5,21 +5,22 @@ package apollo.planning;
 import "modules/planning/proto/decider_config.proto";
 import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
+import "modules/planning/proto/open_space_fallback_decider_config.proto";
+import "modules/planning/proto/open_space_roi_decider_config.proto";
 import "modules/planning/proto/path_bound_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
+import "modules/planning/proto/proceed_with_caution_speed_config.proto";
+import "modules/planning/proto/planner_open_space_config.proto";
+// import "modules/planning/proto/poly_vt_speed_config.proto";
 import "modules/planning/proto/qp_piecewise_jerk_path_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
+import "modules/planning/proto/speed_bounds_decider_config.proto";
 import "modules/planning/proto/side_pass_path_decider_config.proto";
-import "modules/planning/proto/proceed_with_caution_speed_config.proto";
-// import "modules/planning/proto/poly_vt_speed_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
-import "modules/planning/proto/planner_open_space_config.proto";
-import "modules/planning/proto/speed_bounds_decider_config.proto";
-import "modules/planning/proto/open_space_fallback_decider_config.proto";
-import "modules/planning/proto/open_space_roi_decider_config.proto";
+
 
 message PathDeciderConfig {
   // place holder
