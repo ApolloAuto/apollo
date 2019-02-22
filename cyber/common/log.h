@@ -53,19 +53,19 @@
 
 #define ALOG_MODULE_STREAM_INFO(module)                         \
   google::LogMessage(__FILE__, __LINE__, google::INFO).stream() \
-      << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+      << LEFT_BRACKET << module << RIGHT_BRACKET
 
 #define ALOG_MODULE_STREAM_WARN(module)                            \
   google::LogMessage(__FILE__, __LINE__, google::WARNING).stream() \
-      << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+      << LEFT_BRACKET << module << RIGHT_BRACKET
 
 #define ALOG_MODULE_STREAM_ERROR(module)                         \
   google::LogMessage(__FILE__, __LINE__, google::ERROR).stream() \
-      << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+      << LEFT_BRACKET << module << RIGHT_BRACKET
 
 #define ALOG_MODULE_STREAM_FATAL(module)                         \
   google::LogMessage(__FILE__, __LINE__, google::FATAL).stream() \
-      << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET
+      << LEFT_BRACKET << module << RIGHT_BRACKET
 
 #define AINFO_IF(cond) ALOG_IF(INFO, cond, MODULE_NAME)
 #define AWARN_IF(cond) ALOG_IF(WARN, cond, MODULE_NAME)
