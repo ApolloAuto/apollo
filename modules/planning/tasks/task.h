@@ -46,6 +46,8 @@ class Task {
   virtual apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info);
 
+  virtual apollo::common::Status Execute(Frame* frame);
+
  protected:
   Frame* frame_ = nullptr;
   ReferenceLineInfo* reference_line_info_ = nullptr;

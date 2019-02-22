@@ -45,4 +45,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "trajectory_optimizer",
+    srcs = [
+        "trajectory_optimizer.cc",
+    ],
+    hdrs = [
+        "trajectory_optimizer.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//modules/common/status",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/tasks:task",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+    ],
+)
+
 cpplint()
