@@ -61,6 +61,7 @@ class Visualizer {
     roi_width_ = crop_width;
   }
   bool write_out_img_ = false;
+  bool cv_imshow_img_ = true;
 
  private:
   std::map<std::string, cv::Mat> camera_image_;
