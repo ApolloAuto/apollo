@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
+* Copyright 2019 The Apollo Authors. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the License);
 * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   AINFO << "input_width: " << input_width_;
 
   // compute image provider parameters
-    input_offset_y_ = static_cast<uint16_t>(model_param.input_offset_y());
+  input_offset_y_ = static_cast<uint16_t>(model_param.input_offset_y());
   input_offset_x_ = static_cast<uint16_t>(model_param.input_offset_x());
   resize_height_ = static_cast<uint16_t>(model_param.resize_height());
   resize_width_ = static_cast<uint16_t>(model_param.resize_width());
@@ -75,9 +75,9 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   confidence_threshold_lane_ = model_param.confidence_threshold();
 
   CHECK_LE(crop_height_, input_height_)
-    << "crop height larger than input height";
+      << "crop height larger than input height";
   CHECK_LE(crop_width_, input_width_)
-    << "crop width larger than input width";
+      << "crop width larger than input width";
 
   if (model_param.is_bgr()) {
     data_provider_image_option_.target_color = base::Color::BGR;
@@ -171,11 +171,11 @@ bool DarkSCNNLaneDetector::Detect(
   auto start = std::chrono::high_resolution_clock::now();
   auto data_provider = frame->data_provider;
   CHECK_EQ(input_width_, data_provider->src_width())
-    << "Input size is not correct: "
-    << input_width_ << " vs " << data_provider->src_width();
+      << "Input size is not correct: "
+      << input_width_ << " vs " << data_provider->src_width();
   CHECK_EQ(input_height_, data_provider->src_height())
-    << "Input size is not correct: "
-    << input_height_ << " vs " << data_provider->src_height();
+      << "Input size is not correct: "
+      << input_height_ << " vs " << data_provider->src_height();
 
   // use data provider to crop input image
   CHECK(data_provider->GetImage(data_provider_image_option_, &image_src_));

@@ -108,9 +108,9 @@ bool PolyEval(const Dtype& x, int order,
 // @brief: ransac fitting to estimate the coefficients of linear system
 template <typename Dtype>
 bool RansacFitting(std::vector<Eigen::Matrix<Dtype, 2, 1>> *pos_vec,
-             Eigen::Matrix<Dtype, 4, 1> *coeff,
-             const int max_iters = 100,
-             const int N = 5, Dtype inlier_thres = 0.1) {
+                   Eigen::Matrix<Dtype, 4, 1> *coeff,
+                   const int max_iters = 100,
+                   const int N = 5, Dtype inlier_thres = 0.1) {
   if (coeff == NULL) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
@@ -171,16 +171,16 @@ bool RansacFitting(std::vector<Eigen::Matrix<Dtype, 2, 1>> *pos_vec,
 
     if (max_inliers > early_stop_ratio*n) break;
   }
-  if (static_cast<Dtype>(max_inliers)/n < good_lane_ratio) {
+
+  if (static_cast<Dtype>(max_inliers)/n < good_lane_ratio)
     return false;
-  } else {
-    std::vector<Eigen::Matrix<Dtype, 2, 1>> tmp = *pos_vec;
-    pos_vec->clear();
-    for (int i = 0; i < n; ++i) {
-      Dtype y = tmp[i](0)*tmp[i](0)*(*coeff)(2) +
-                  tmp[i](0)*(*coeff)(1) + (*coeff)(0);
-      if (std::abs(y - tmp[i](1)) <= inlier_thres) pos_vec->push_back(tmp[i]);
-    }
+
+  std::vector<Eigen::Matrix<Dtype, 2, 1>> tmp = *pos_vec;
+  pos_vec->clear();
+  for (int i = 0; i < n; ++i) {
+    Dtype y = tmp[i](0)*tmp[i](0)*(*coeff)(2) +
+                tmp[i](0)*(*coeff)(1) + (*coeff)(0);
+    if (std::abs(y - tmp[i](1)) <= inlier_thres) pos_vec->push_back(tmp[i]);
   }
   return true;
 }
