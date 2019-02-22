@@ -22,8 +22,10 @@
 #pragma once
 
 #include <deque>
+#include <list>
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "modules/common/filters/digital_filter.h"
@@ -37,6 +39,8 @@
  */
 namespace apollo {
 namespace prediction {
+
+using hdmap::LaneInfo;
 
 /**
  * @class Obstacle
@@ -311,6 +315,13 @@ class Obstacle {
   void SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr);
 
   void DiscardOutdatedHistory();
+
+  void GetNeighborLaneSegments(
+      std::shared_ptr<const LaneInfo> center_lane_info,
+      bool is_left,
+      int recursion_depth,
+      std::list<std::string>* const lane_ids_ordered,
+      std::unordered_set<std::string>* const existing_lane_ids);
 
  private:
   int id_ = -1;

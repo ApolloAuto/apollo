@@ -19,7 +19,8 @@
 #include <algorithm>
 #include <iomanip>
 #include <limits>
-#include <set>
+#include <list>
+#include <unordered_set>
 
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -1120,6 +1121,65 @@ void Obstacle::SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr) {
   }
 }
 
+void Obstacle::GetNeighborLaneSegments(
+    std::shared_ptr<const LaneInfo> center_lane_info,
+    bool is_left,
+    int recursion_depth,
+    std::list<std::string>* const lane_ids_ordered,
+    std::unordered_set<std::string>* const existing_lane_ids) {
+  // Exit recursion if reached max num of allowed search depth.
+  if (recursion_depth <= 0) {
+    return;
+  }
+  if (is_left) {
+    std::vector<std::string> curr_left_lane_ids;
+    for (int i = 0;
+         i < center_lane_info->lane().left_neighbor_forward_lane_id().size();
+         ++i) {
+      if (center_lane_info->lane().left_neighbor_forward_lane_id(i).has_id()) {
+        std::string lane_id =
+             center_lane_info->lane().left_neighbor_forward_lane_id(i).id();
+        // If haven't seen this lane id before.
+        if (existing_lane_ids->count(lane_id) == 0) {
+          existing_lane_ids->insert(lane_id);
+          lane_ids_ordered->push_front(lane_id);
+          curr_left_lane_ids.push_back(lane_id);
+        }
+      }
+    }
+
+    for (size_t i = 0; i < curr_left_lane_ids.size(); ++i) {
+      GetNeighborLaneSegments(
+          PredictionMap::LaneById(curr_left_lane_ids[i]),
+          true, recursion_depth - 1,
+          lane_ids_ordered, existing_lane_ids);
+    }
+  } else {
+    std::vector<std::string> curr_right_lane_ids;
+    for (int i = 0;
+         i < center_lane_info->lane().right_neighbor_forward_lane_id().size();
+         ++i) {
+      if (center_lane_info->lane().right_neighbor_forward_lane_id(i).has_id()) {
+        std::string lane_id =
+             center_lane_info->lane().right_neighbor_forward_lane_id(i).id();
+        // If haven't seen this lane id before.
+        if (existing_lane_ids->count(lane_id) == 0) {
+          existing_lane_ids->insert(lane_id);
+          lane_ids_ordered->push_back(lane_id);
+          curr_right_lane_ids.push_back(lane_id);
+        }
+      }
+    }
+
+    for (size_t i = 0; i < curr_right_lane_ids.size(); ++i) {
+      GetNeighborLaneSegments(
+          PredictionMap::LaneById(curr_right_lane_ids[i]),
+          false, recursion_depth - 1,
+          lane_ids_ordered, existing_lane_ids);
+    }
+  }
+}
+
 void Obstacle::BuildLaneGraphFromLeftToRight() {
   // Sanity checks.
   if (history_size() == 0) {
@@ -1152,37 +1212,17 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   }
   std::shared_ptr<const LaneInfo> center_lane_info =
       PredictionMap::LaneById(feature->lane().lane_feature().lane_id());
-  std::vector<std::string> lane_ids_ordered;
-  for (int i =
-           center_lane_info->lane().left_neighbor_forward_lane_id().size() - 1;
-       i >= 0; --i) {
-    if (center_lane_info->lane().left_neighbor_forward_lane_id(i).has_id()) {
-      lane_ids_ordered.push_back(
-          center_lane_info->lane().left_neighbor_forward_lane_id(i).id());
-    }
-  }
-  lane_ids_ordered.push_back(center_lane_info->lane().id().id());
-  for (int i = 0;
-       i < center_lane_info->lane().right_neighbor_forward_lane_id().size();
-       i++) {
-    if (center_lane_info->lane().right_neighbor_forward_lane_id(i).has_id()) {
-      lane_ids_ordered.push_back(
-          center_lane_info->lane().right_neighbor_forward_lane_id(i).id());
-    }
-  }
+  std::list<std::string> lane_ids_ordered_list;
+  std::unordered_set<std::string> existing_lane_ids;
+  GetNeighborLaneSegments(
+      center_lane_info, true, 5, &lane_ids_ordered_list, &existing_lane_ids);
+  GetNeighborLaneSegments(
+      center_lane_info, false, 5, &lane_ids_ordered_list, &existing_lane_ids);
 
-  // Remove repeated lane_segments
-  std::set<std::string> existing_lane_ids;
-  std::vector<std::string> lane_ids_ordered_temp = lane_ids_ordered;
-  lane_ids_ordered.clear();
-  for (size_t i = 0; i < lane_ids_ordered_temp.size(); ++i) {
-    // Skip repeated lane_segment ids.
-    if (existing_lane_ids.count(lane_ids_ordered_temp[i]) != 0) {
-      continue;
-    }
-    // Otherwise, record the existence, and push_back to vector.
-    existing_lane_ids.insert(lane_ids_ordered_temp[i]);
-    lane_ids_ordered.push_back(lane_ids_ordered_temp[i]);
+  std::vector<std::string> lane_ids_ordered;
+  for (auto it = lane_ids_ordered_list.begin();
+       it != lane_ids_ordered_list.end(); ++it) {
+    lane_ids_ordered.push_back(*it);
   }
 
   // Build lane_graph for every lane_segment and update it into proto.
@@ -1214,7 +1254,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_points.
   if (feature->has_lane() && feature->lane().has_lane_graph()) {
-    SetLanePoints(feature, FLAGS_dense_lane_gap, 200,
+    SetLanePoints(feature, FLAGS_dense_lane_gap, 100,
                   feature->mutable_lane()->mutable_lane_graph_ordered());
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
   }
