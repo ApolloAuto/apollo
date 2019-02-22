@@ -1133,6 +1133,10 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     ADEBUG << "Don't build lane graph for non-moving obstacle.";
     return;
   }
+  if (feature->lane().lane_graph_ordered().lane_sequence_size() > 0) {
+    ADEBUG << "Don't build lane graph for an old obstacle.";
+    return;
+  }
   double speed = feature->speed();
   double road_graph_search_distance =
       std::fmax(speed * FLAGS_prediction_trajectory_time_length +
