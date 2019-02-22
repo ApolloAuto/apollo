@@ -5,6 +5,7 @@ package apollo.planning;
 import "modules/planning/proto/decider_config.proto";
 import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
+import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/qp_piecewise_jerk_path_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
@@ -47,6 +48,7 @@ message TaskConfig {
     DECIDER_RSS = 16;
     SPEED_BOUNDS_PRIORI_DECIDER = 17;
     SPEED_BOUNDS_FINAL_DECIDER = 18;
+    PIECEWISE_JERK_PATH_OPTIMIZER = 19;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -63,6 +65,7 @@ message TaskConfig {
     SidePassPathDeciderConfig side_pass_path_decider_config = 13;
     // PolyVTSpeedConfig poly_vt_speed_config = 14;
     SpeedBoundsDeciderConfig speed_bounds_decider_config = 15;
+    PiecewiseJerkPathConfig piecewise_jerk_path_config = 16;
   }
 }
 
