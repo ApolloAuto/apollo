@@ -17,18 +17,4 @@ Dreamview or Apollo's HMI module provides a web application that helps developer
 ## Output
   A web-based dynamic 3D rendering of the monitored messages in a simulated world.
 
-## Features introduced in Apollo 3.5
 
-### Latency graph
-
-The Simulation team is proud to introduce the Latency graph tab in Dreamview which is included to display the difference in time when the module receives sensor input data to when it will publish this data.
-To view this tab:
-1. Build Apollo and run Dreamview on your web browser
-2. On the right-hand side, you should be able to view the Planning, Control, Latency graphs as seen below
-![](images/dreamview_landing.png)
-
-3. Click on the "Latency" tab to view the latency graph
-![](images/dreamview_landing2.png)
-
-4. The Latency Graph can be used to track the latency each individual faces. The graphs are coloured differently to help distinguish the modules and a key is included for better understanding. The graph is plotted as Latency measured in ms vs Timestamp measure in seconds as seen in the image below.
-![](images/Latency.png)
