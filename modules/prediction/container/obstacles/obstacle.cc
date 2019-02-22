@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <limits>
+#include <set>
 
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -1162,6 +1163,20 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     }
   }
 
+  // Remove repeated lane_segments
+  std::set<std::string> existing_lane_ids;
+  std::vector<std::string> lane_ids_ordered_temp = lane_ids_ordered;
+  lane_ids_ordered.clear();
+  for (size_t i = 0; i < lane_ids_ordered_temp.size(); ++i) {
+    // Skip repeated lane_segment ids.
+    if (existing_lane_ids.count(lane_ids_ordered_temp[i]) != 0) {
+      continue;
+    }
+    // Otherwise, record the existence, and push_back to vector.
+    existing_lane_ids.insert(lane_ids_ordered_temp[i]);
+    lane_ids_ordered.push_back(lane_ids_ordered_temp[i]);
+  }
+
   // Build lane_graph for every lane_segment and update it into proto.
   int seq_id = 0;
   for (size_t i = 0; i < lane_ids_ordered.size(); ++i) {
@@ -1191,7 +1206,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_points.
   if (feature->has_lane() && feature->lane().has_lane_graph()) {
-    SetLanePoints(feature, FLAGS_dense_lane_gap,
+    SetLanePoints(feature, FLAGS_dense_lane_gap, 200,
                   feature->mutable_lane()->mutable_lane_graph_ordered());
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
   }
@@ -1202,12 +1217,14 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 // FLAGS_target_lane_gap.
 void Obstacle::SetLanePoints(Feature* feature) {
   LaneGraph* lane_graph = feature->mutable_lane()->mutable_lane_graph();
-  SetLanePoints(feature, FLAGS_target_lane_gap, lane_graph);
+  SetLanePoints(feature, FLAGS_target_lane_gap, FLAGS_max_num_lane_point,
+      lane_graph);
 }
 
 // The generic SetLanePoints
-void Obstacle::SetLanePoints(const Feature* feature, double lane_point_spacing,
-                             LaneGraph* const lane_graph) {
+void Obstacle::SetLanePoints(
+    const Feature* feature, const double lane_point_spacing,
+    const uint64_t max_num_lane_point, LaneGraph* const lane_graph) {
   // Sanity checks.
   if (feature == nullptr || !feature->has_velocity_heading()) {
     AERROR << "Null feature or no velocity heading.";
@@ -1232,7 +1249,7 @@ void Obstacle::SetLanePoints(const Feature* feature, double lane_point_spacing,
     std::size_t count_point = 0;
     // Go through lane_segment one by one sequentially.
     while (lane_index < lane_sequence->lane_segment_size() &&
-           count_point < FLAGS_max_num_lane_point) {
+           count_point < max_num_lane_point) {
       if (lane_seg_s > lane_segment->end_s()) {
         // If already exceeds the current lane_segment, then go to the
         // next following one.
