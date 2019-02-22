@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
 namespace apollo {

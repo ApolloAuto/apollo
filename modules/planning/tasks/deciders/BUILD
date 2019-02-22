@@ -42,8 +42,37 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "open_space_decider",
+    srcs = [
+        "open_space_fallback_decider.cc",
+        "open_space_roi_decider.cc",
+    ],
+    hdrs = [
+        "open_space_fallback_decider.h",
+        "open_space_roi_decider.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "decider",
+    ],
+)
+
+# cc_test(
+#     name = "open_space_decider_test",
+#     size = "small",
+#     srcs = [
+#         "side_pass_path_decider_test.cc",
+#         "side_pass_safety_test.cc",
+#     ],
+#     deps = [
+#         ":open_space_decider",
+#         "@gtest//:main",
+#     ],
+# )
+
 cc_test(
-    name = "decider_test",
+    name = "side_pass_decider_test",
     size = "small",
     srcs = [
         "side_pass_path_decider_test.cc",
