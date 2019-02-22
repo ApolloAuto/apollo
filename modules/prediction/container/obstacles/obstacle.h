@@ -289,8 +289,9 @@ class Obstacle {
 
   void SetLanePoints(Feature* feature);
 
-  void SetLanePoints(const Feature* feature, double lane_point_spacing,
-                     LaneGraph* const lane_graph);
+  void SetLanePoints(
+      const Feature* feature, const double lane_point_spacing,
+      const uint64_t max_num_lane_point, LaneGraph* const lane_graph);
 
   void SetLaneSequencePath(LaneGraph* const lane_graph);
 
