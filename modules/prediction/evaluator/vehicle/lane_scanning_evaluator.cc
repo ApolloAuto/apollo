@@ -75,9 +75,9 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "cruise");
     ADEBUG << "Save extracted features for learning locally.";
-  } else {
-    // TODO(jiacheng): once the model is trained, implement this online part.
+    return;
   }
+  // TODO(jiacheng): once the model is trained, implement this online part.
 }
 
 bool LaneScanningEvaluator::ExtractFeatures(
@@ -269,15 +269,16 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
         count += 4;
       }
     }
+
     // If lane-points are not enough, then extrapolate linearly.
     while (count >= SINGLE_LANE_FEATURE_SIZE * 2 &&
            count < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
       std::size_t s = feature_values->size();
-      double relative_l_new = 2 * feature_values->operator[](s - 5) -
-                              feature_values->operator[](s - 10);
-      double relative_s_new = 2 * feature_values->operator[](s - 4) -
-                              feature_values->operator[](s - 9);
-      double relative_ang_new = feature_values->operator[](s - 3);
+      double relative_l_new = 2 * feature_values->operator[](s - 4) -
+                              feature_values->operator[](s - 8);
+      double relative_s_new = 2 * feature_values->operator[](s - 3) -
+                              feature_values->operator[](s - 7);
+      double relative_ang_new = feature_values->operator[](s - 2);
 
       feature_values->push_back(relative_l_new);
       feature_values->push_back(relative_s_new);
