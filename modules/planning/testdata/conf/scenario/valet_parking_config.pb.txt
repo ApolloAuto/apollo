@@ -1,1 +1,11 @@
 scenario_type: VALET_PARKING
+stage_type: VALET_PARKING_APPROACHING_PARKING_SPOT
+stage_type: VALET_PARKING_PARKING
+stage_config: {
+    stage_type: VALET_PARKING_APPROACHING_PARKING_SPOT
+    enabled: true
+}
+stage_config: {
+    stage_type: VALET_PARKING_PARKING
+    enabled: true
+}

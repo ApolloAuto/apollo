@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,32 +17,34 @@
 /**
  * @file
  **/
+#include "modules/planning/scenarios/valet_parking/stage_approaching_parking_spot.h"
 
-#include "modules/planning/tasks/task.h"
-
+#include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
+namespace scenario {
+namespace valet_parking {
+class StageApproachingParkingSpotTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {
+    config_.set_stage_type(
+        ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT);
+  }
 
-using apollo::common::Status;
+ protected:
+  ScenarioConfig::StageConfig config_;
+  struct ValetParkingContext;
+};
 
-Task::Task(const TaskConfig& config) : config_(config) {
-  name_ = TaskConfig::TaskType_Name(config_.task_type());
+TEST_F(StageApproachingParkingSpotTest, Init) {
+  StageApproachingParkingSpot stage_approaching_parking_spot(config_);
+  EXPECT_EQ(stage_approaching_parking_spot.Name(),
+            ScenarioConfig::StageType_Name(config_.stage_type()));
 }
 
-const std::string& Task::Name() const { return name_; }
-
-Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
-  reference_line_info_ = reference_line_info;
-  return Status::OK();
-}
-
-Status Task::Execute(Frame* frame) {
-  frame_ = frame;
-  return Status::OK();
-}
-
+}  // namespace valet_parking
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

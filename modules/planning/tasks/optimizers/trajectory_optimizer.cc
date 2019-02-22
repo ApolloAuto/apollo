@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,29 +18,19 @@
  * @file
  **/
 
-#include "modules/planning/tasks/task.h"
-
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
 
-Task::Task(const TaskConfig& config) : config_(config) {
-  name_ = TaskConfig::TaskType_Name(config_.task_type());
-}
+TrajectoryOptimizer::TrajectoryOptimizer(const TaskConfig& config)
+    : Task(config) {}
 
-const std::string& Task::Name() const { return name_; }
-
-Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
-  reference_line_info_ = reference_line_info;
-  return Status::OK();
-}
-
-Status Task::Execute(Frame* frame) {
-  frame_ = frame;
+Status TrajectoryOptimizer::Execute(Frame* frame) {
+  Task::Execute(frame);
+  // run process() here without taking reference line info
   return Status::OK();
 }
 

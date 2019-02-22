@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,31 +17,28 @@
 /**
  * @file
  **/
+#include "modules/planning/tasks/deciders/open_space_fallback_decider.h"
 
-#include "modules/planning/tasks/task.h"
-
+#include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
+class OpenSpaceFallbackDeciderTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {
+    config_.set_task_type(TaskConfig::OPEN_SPACE_FALLBACK_DECIDER);
+  }
 
-Task::Task(const TaskConfig& config) : config_(config) {
-  name_ = TaskConfig::TaskType_Name(config_.task_type());
-}
+ protected:
+  TaskConfig config_;
+};
 
-const std::string& Task::Name() const { return name_; }
-
-Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
-  reference_line_info_ = reference_line_info;
-  return Status::OK();
-}
-
-Status Task::Execute(Frame* frame) {
-  frame_ = frame;
-  return Status::OK();
+TEST_F(OpenSpaceFallbackDeciderTest, Init) {
+  OpenSpaceFallbackDecider open_space_fallback_decider(config_);
+  EXPECT_EQ(open_space_fallback_decider.Name(),
+            TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 }  // namespace planning

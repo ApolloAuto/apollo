@@ -5,19 +5,22 @@ package apollo.planning;
 import "modules/planning/proto/decider_config.proto";
 import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
+import "modules/planning/proto/open_space_fallback_decider_config.proto";
+import "modules/planning/proto/open_space_roi_decider_config.proto";
 import "modules/planning/proto/path_bound_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
+import "modules/planning/proto/proceed_with_caution_speed_config.proto";
+import "modules/planning/proto/planner_open_space_config.proto";
+// import "modules/planning/proto/poly_vt_speed_config.proto";
 import "modules/planning/proto/qp_piecewise_jerk_path_config.proto";
 import "modules/planning/proto/qp_spline_path_config.proto";
 import "modules/planning/proto/qp_st_speed_config.proto";
+import "modules/planning/proto/speed_bounds_decider_config.proto";
 import "modules/planning/proto/side_pass_path_decider_config.proto";
-import "modules/planning/proto/proceed_with_caution_speed_config.proto";
-// import "modules/planning/proto/poly_vt_speed_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
-import "modules/planning/proto/planner_open_space_config.proto";
-import "modules/planning/proto/speed_bounds_decider_config.proto";
+
 
 message PathDeciderConfig {
   // place holder
@@ -51,6 +54,8 @@ message TaskConfig {
     SPEED_BOUNDS_FINAL_DECIDER = 18;
     PIECEWISE_JERK_PATH_OPTIMIZER = 19;
     PATH_BOUND_DECIDER = 20;
+    OPEN_SPACE_FALLBACK_DECIDER = 21;
+    OPEN_SPACE_ROI_DECIDER = 22;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -69,6 +74,8 @@ message TaskConfig {
     SpeedBoundsDeciderConfig speed_bounds_decider_config = 15;
     PiecewiseJerkPathConfig piecewise_jerk_path_config = 16;
     PathBoundDeciderConfig path_bound_decider_config = 17;
+    OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config = 18;
+    OpenSpaceRoiDeciderConfig open_space_roi_decider_config = 19;
   }
 }
 
@@ -169,6 +176,9 @@ message ScenarioConfig {
     TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP = 320;
     TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP = 321 ;
     TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE = 322;
+
+    VALET_PARKING_APPROACHING_PARKING_SPOT = 401;
+    VALET_PARKING_PARKING = 402;
   };
 
   message StageConfig {
