@@ -27,6 +27,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
+        "//modules/planning/scenarios/util:util_lib",
         "//modules/planning/tasks/deciders:decider",
         "@eigen",
     ],

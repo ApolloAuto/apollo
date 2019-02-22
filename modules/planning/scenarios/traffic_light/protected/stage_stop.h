@@ -22,8 +22,7 @@
 
 #include <string>
 
-#include "modules/planning/proto/planning_config.pb.h"
-
+// #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
@@ -50,8 +49,6 @@ class TrafficLightProtectedStageStop : public Stage {
  private:
   Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage();
-  // TODO(all): move to util
-  perception::TrafficLight GetSignal(const std::string& signal_id);
 
  private:
   ScenarioTrafficLightProtectedConfig scenario_config_;

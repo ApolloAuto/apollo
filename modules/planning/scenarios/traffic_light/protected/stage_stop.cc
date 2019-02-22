@@ -25,6 +25,7 @@
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -56,7 +57,8 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
         traffic_light_overlap.object_id;
 
     // check if the traffic_light is still along reference_line
-    if (CheckTrafficLightDone(reference_line_info, traffic_light_overlap_id)) {
+    if (scenario::CheckTrafficLightDone(reference_line_info,
+                                        traffic_light_overlap_id)) {
       continue;
     }
 
@@ -86,7 +88,7 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
     }
 
     // check on traffic light color
-    auto signal_color = GetSignal(traffic_light_overlap_id).color();
+    auto signal_color = scenario::GetSignal(traffic_light_overlap_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
         << "] color[" << signal_color << "]";
     if (signal_color != TrafficLight::GREEN) {
@@ -115,23 +117,6 @@ Stage::StageStatus TrafficLightProtectedStageStop::FinishStage() {
   */
   next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE;
   return Stage::FINISHED;
-}
-
-TrafficLight TrafficLightProtectedStageStop::GetSignal(
-    const std::string& traffic_light_id) {
-  const auto* result = apollo::common::util::FindPtrOrNull(
-      PlanningContext::GetScenarioInfo()->traffic_lights,
-      traffic_light_id);
-
-  if (result == nullptr) {
-    TrafficLight traffic_light;
-    traffic_light.set_id(traffic_light_id);
-    traffic_light.set_color(TrafficLight::UNKNOWN);
-    traffic_light.set_confidence(0.0);
-    traffic_light.set_tracking_time(0.0);
-    return traffic_light;
-  }
-  return *result;
 }
 
 }  // namespace traffic_light
