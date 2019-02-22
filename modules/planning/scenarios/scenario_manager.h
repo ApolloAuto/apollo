@@ -73,6 +73,8 @@ class ScenarioManager final {
   // ScenarioConfig::ScenarioType DecideCurrentScenario(
   //      const common::TrajectoryPoint& ego_point, const Frame& frame);
 
+  void ReadTrafficLight(const Frame& frame);
+
  private:
   std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
                      std::hash<int>>

@@ -50,6 +50,8 @@ class TrafficLightProtectedStageStop : public Stage {
  private:
   Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage();
+  // TODO(all): move to util
+  perception::TrafficLight GetSignal(const std::string& signal_id);
 
  private:
   ScenarioTrafficLightProtectedConfig scenario_config_;
