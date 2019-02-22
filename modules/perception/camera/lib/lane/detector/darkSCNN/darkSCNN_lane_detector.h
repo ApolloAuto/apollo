@@ -1,5 +1,5 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
+* Copyright 2019 The Apollo Authors. All Rights Reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the License);
 * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #include "modules/perception/camera/lib/lane/common/darkSCNN.pb.h"
 #include "modules/perception/inference/tensorrt/rt_net.h"
 #include "modules/perception/lib/registerer/registerer.h"
-
 
 namespace apollo {
 namespace perception {
