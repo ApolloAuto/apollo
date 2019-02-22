@@ -111,17 +111,16 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     }
 
 
+    // TODO(all): to be removed, to use PlanningContext instead
     const TrafficLight traffic_light = ReadTrafficLight(
         *frame, traffic_light_id);
-
-    // TODO(all): add stop_deceleration check based on signal colors
-    // TODO(all): to be fixed
-    // PlanningContext::GetScenarioInfo()->traffic_light_color =
-    //   traffic_light.color();
-
+    ADEBUG << "traffic_light_id[" << traffic_light_id
+        << "] color[" << traffic_light.color() << "]";
     if (traffic_light.color() == TrafficLight::GREEN) {
       continue;
     }
+
+    // TODO(all): add stop_deceleration check based on signal colors
 
     const std::string stop_wall_id =
         TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_id;
