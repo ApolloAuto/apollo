@@ -134,7 +134,7 @@ apollo::common::Status NaviPathDecider::Process(
 
   KeepLane(dest_ref_line_y, &path_points);
 
-  DiscretizedPath discretized_path(path_points);
+  DiscretizedPath discretized_path(std::move(path_points));
   path_data->SetReferenceLine(&(reference_line_info_->reference_line()));
   if (!path_data->SetDiscretizedPath(discretized_path)) {
     AERROR << "Set path data failed.";
