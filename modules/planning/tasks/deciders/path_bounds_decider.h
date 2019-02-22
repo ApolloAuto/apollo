@@ -36,7 +36,7 @@ class PathBoundsDecider : public Decider {
   explicit PathBoundsDecider(const TaskConfig& config);
 
  private:
-  apollo::common::Status Process(
+  common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
   bool InitPathBoundaries(
