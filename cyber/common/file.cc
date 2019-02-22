@@ -318,7 +318,7 @@ std::string GetFileName(const std::string &path, const bool remove_extension) {
 
 std::string GetCurrentPath() {
   char tmp[PATH_MAX];
-  if (getcwd(tmp, sizeof(tmp)) != NULL) {
+  if (getcwd(tmp, sizeof(tmp)) != nullptr) {
     return std::string(tmp);
   } else {
     return std::string("");
