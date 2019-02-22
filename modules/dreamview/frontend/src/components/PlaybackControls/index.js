@@ -119,6 +119,7 @@ export default class PlaybackControls extends React.Component {
                     <span className="arrow"></span>
                 </div>
                 <TimeControls numFrames={playback.numFrames}
+                              loadingMarker={playback.loadingMarker}
                               currentFrame={playback.currentFrame}
                               fps={playback.FPS}
                               isSeeking={playback.isSeeking}
