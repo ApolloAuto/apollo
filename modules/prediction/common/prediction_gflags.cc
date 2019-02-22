@@ -69,7 +69,7 @@ DEFINE_double(scan_length, 80.0, "The length of the obstacles scan area");
 DEFINE_double(scan_width, 12.0, "The width of the obstacles scan area");
 DEFINE_double(back_dist_ignore_ped, -2.0,
               "Backward distance to ignore pedestrians.");
-DEFINE_uint64(cruise_historical_frame_length, 5,
+DEFINE_uint64(cruise_historical_frame_length, 15,
               "The number of historical frames of the obstacle"
               "that the cruise model will look at.");
 DEFINE_bool(enable_kf_tracking, false, "Use measurements with KF tracking");

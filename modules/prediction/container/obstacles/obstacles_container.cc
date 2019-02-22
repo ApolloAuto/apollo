@@ -331,7 +331,7 @@ void ObstaclesContainer::BuildLaneGraph() {
     ADEBUG << "Building Lane Graph.";
     obstacle_ptr->BuildLaneGraph();
     ADEBUG << "Building ordered Lane Graph.";
-    // obstacle_ptr->BuildLaneGraphFromLeftToRight();
+    obstacle_ptr->BuildLaneGraphFromLeftToRight();
   }
 
   Obstacle* ego_vehicle = GetObstacle(FLAGS_ego_vehicle_id);

@@ -1197,13 +1197,15 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     ADEBUG << "Don't build lane graph for an old obstacle.";
     return;
   }
-  double speed = feature->speed();
-  double road_graph_search_distance =
+  //double speed = feature->speed();
+  double road_graph_search_distance = 20.0;
+  /*
       std::fmax(speed * FLAGS_prediction_trajectory_time_length +
                     0.5 * FLAGS_vehicle_max_linear_acc *
                         FLAGS_prediction_trajectory_time_length *
                         FLAGS_prediction_trajectory_time_length,
                 FLAGS_min_prediction_trajectory_spatial_length);
+  */
 
   // Treat the most probable lane_segment as the center, put its left
   // and right neighbors into a vector following the left-to-right order.
