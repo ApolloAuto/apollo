@@ -78,7 +78,8 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
   if (!GetTheNearestObstacle(*frame, path_decision.obstacles(),
                              &nearest_obstacle)) {
     AERROR << "Failed while running the function to get nearest obstacle.";
-    return Stage::ERROR;
+    next_stage_ = ScenarioConfig::SIDE_PASS_BACKUP;
+    return Stage::FINISHED;
   }
   if (nearest_obstacle) {
     if (nearest_obstacle->speed() >
