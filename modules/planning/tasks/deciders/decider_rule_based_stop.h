@@ -47,8 +47,6 @@ class DeciderRuleBasedStop : public Decider {
 
   void CheckTrafficLight(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info);
-  perception::TrafficLight ReadTrafficLight(
-      const Frame& frame, const std::string& traffic_light_id);
 
   bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info,
