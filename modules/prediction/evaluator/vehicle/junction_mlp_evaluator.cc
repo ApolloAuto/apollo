@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <unordered_map>
+#include <utility>
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
@@ -91,14 +92,14 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     probability = ComputeProbability(feature_values);
   } else {
     for (int i = 0; i < 12; ++i) {
-      probability.push_back(feature_values[3 + 6 * i]);
+      probability.push_back(feature_values[OBSTACLE_FEATURE_SIZE +
+                                           EGO_VEHICLE_FEATURE_SIZE + 8 * i]);
     }
   }
   for (double prob : probability) {
     latest_feature_ptr->mutable_junction_feature()
         ->add_junction_mlp_probability(prob);
   }
-
   // assign all lane_sequence probability
   LaneGraph* lane_graph_ptr =
       latest_feature_ptr->mutable_lane()->mutable_lane_graph();
@@ -191,9 +192,41 @@ void JunctionMLPEvaluator::SetObstacleFeatureValues(
     ADEBUG << "Obstacle [" << obstacle_ptr->id() << "] has no position.";
     return;
   }
+  std::pair<double, double> obs_curr_pos = std::make_pair(
+      feature.position().x(), feature.position().y());
+  double obs_curr_heading = feature.velocity_heading();
+  bool has_history = false;
+  std::vector<std::pair<double, double>> pos_history(
+      FLAGS_junction_historical_frame_length, std::make_pair(0.0, 0.0));
+
+  if (obstacle_ptr->history_size() > FLAGS_junction_historical_frame_length) {
+    has_history = true;
+    for (std::size_t i = 0; i < FLAGS_junction_historical_frame_length; ++i) {
+      const Feature& feature = obstacle_ptr->feature(i+1);
+      if (!feature.IsInitialized()) {
+        has_history = false;
+        break;
+      }
+      if (feature.has_position()) {
+        pos_history[i] = WorldCoordToObjCoord(
+            std::make_pair(feature.position().x(), feature.position().y()),
+            obs_curr_pos, obs_curr_heading);
+      }
+    }
+  }
+
   feature_values->push_back(feature.speed());
   feature_values->push_back(feature.acc());
   feature_values->push_back(feature.junction_feature().junction_range());
+  if (has_history) {
+    feature_values->push_back(1.0);
+  } else {
+    feature_values->push_back(0.0);
+  }
+  for (std::size_t i = 0; i < FLAGS_junction_historical_frame_length; i++) {
+    feature_values->push_back(pos_history[i].first);
+    feature_values->push_back(pos_history[i].second);
+  }
 }
 
 void JunctionMLPEvaluator::SetEgoVehicleFeatureValues(
@@ -250,6 +283,8 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
   double junction_range = feature_ptr->junction_feature().junction_range();
   for (int i = 0; i < 12; ++i) {
     feature_values->push_back(0.0);
+    feature_values->push_back(0.0);
+    feature_values->push_back(0.0);
     feature_values->push_back(1.0);
     feature_values->push_back(1.0);
     feature_values->push_back(1.0);
@@ -291,13 +326,15 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
                       std::abs(x_1 * y_2 - y_1 * x_2) / std::hypot(x_1, y_1));
       t += FLAGS_prediction_trajectory_time_resolution;
     }
-    feature_values->operator[](idx * 6) = 1.0;
-    feature_values->operator[](idx * 6 + 1) = diff_x / junction_range;
-    feature_values->operator[](idx * 6 + 2) = diff_y / junction_range;
-    feature_values->operator[](idx * 6 + 3) =
+    feature_values->operator[](idx * 8) = 1.0;
+    feature_values->operator[](idx * 8 + 1) = diff_x / junction_range;
+    feature_values->operator[](idx * 8 + 2) = diff_y / junction_range;
+    feature_values->operator[](idx * 8 + 3) =
         std::sqrt(diff_x * diff_x + diff_y * diff_y) / junction_range;
-    feature_values->operator[](idx * 6 + 4) = diff_heading;
-    feature_values->operator[](idx * 6 + 5) = cost;
+    feature_values->operator[](idx * 8 + 4) = diff_x;
+    feature_values->operator[](idx * 8 + 5) = diff_y;
+    feature_values->operator[](idx * 8 + 6) = diff_heading;
+    feature_values->operator[](idx * 8 + 7) = cost;
   }
 }
 
