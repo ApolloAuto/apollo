@@ -8,6 +8,7 @@ cc_library(
         ":data_parser",
         ":novatel_parser",
         ":rtcm_parsers",
+        ":zhd_parser",
     ],
 )
 
@@ -20,6 +21,7 @@ cc_library(
     ],
     deps = [
         ":novatel_parser",
+        ":zhd_parser",
         "//external:gflags",
         "//modules/common:log",
         "//modules/common/adapters:adapter_manager",
@@ -71,6 +73,27 @@ cc_library(
         "//modules/common/adapters:adapter_manager",
         "//modules/common/monitor_log",
         "//modules/drivers/gnss:gnss_gflags",
+        "//modules/drivers/gnss/proto:gnss_proto",
+        "//modules/drivers/gnss/third_party:rtcm",
+        "//modules/drivers/gnss/util:gnss_util",
+        "@ros//:ros_common",
+    ],
+)
+
+cc_library(
+    name = "zhd_parser",
+    srcs = [
+        "zhd_parser.cc",
+    ],
+    hdrs = [
+        "parser.h",
+        "zhd_messages.h",
+        "rtcm_decode.h",
+    ],
+    deps = [
+        "//external:gflags",
+        "//modules/common:log",
+        "//modules/common/monitor_log",
         "//modules/drivers/gnss/proto:gnss_proto",
         "//modules/drivers/gnss/third_party:rtcm",
         "//modules/drivers/gnss/util:gnss_util",
