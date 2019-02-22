@@ -71,7 +71,13 @@ Eigen::Matrix3d Camera2CarHomograph(
   Eigen::Matrix4d extrinsic_camera2lidar,
   Eigen::Matrix4d extrinsic_lidar2imu,
   double pitch_adj) {
-// rotate 90 degree around z axis to make x point forward
+  AINFO << "intrinsic parameter of camera: "
+        << intrinsic;
+  AINFO << "extrinsic parameter of camera to lidar: "
+        << extrinsic_camera2lidar;
+  AINFO << "extrinsic parameter of lidar to imu: "
+        << extrinsic_lidar2imu;
+  // rotate 90 degree around z axis to make x point forward
   Eigen::Matrix4d Rz;
   Rz << 0, 1, 0, 0,
        -1, 0, 0, 0,
@@ -139,6 +145,7 @@ bool Visualizer::Init_all_info_single_camera(
   camera_image_[camera_name + "_3D"] =
       cv::Mat(small_h_, small_w_, CV_8UC3, cv::Scalar(0, 0, 0));
   world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
+  draw_range_circle();
 
   ex_lidar2imu.block(0, 3, 3, 1) =  - ex_lidar2imu.block(0, 3, 3, 1);
   extrinsic_map_.at(camera_name).block(0, 3, 3, 1) =
@@ -321,8 +328,10 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
       cv::imwrite(path, bigimg);
     }
 
-    cv::imshow("", bigimg);
-    cvWaitKey(30);
+    if (cv_imshow_img_) {
+      cv::imshow("", bigimg);
+      cvWaitKey(30);
+    }
     world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
     draw_range_circle();
   }
@@ -557,29 +566,11 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
 
 void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
                                                    const CameraFrame &frame) {
+  if (frame.timestamp - last_timestamp_ < 0.02) return;
+
+  // draw results on visulization panel
   cv::Mat image = img.clone();
   std::string camera_name = frame.data_provider->sensor_name();
-
-  if (frame.timestamp - last_timestamp_ > 0.02) {
-    cv::Mat bigimg(world_h_, small_w_ + wide_pixel_, CV_8UC3);
-    camera_image_[camera_name + "_2D"].copyTo(
-        bigimg(cv::Rect(0, 0, small_w_, small_h_)));
-    camera_image_[camera_name + "_3D"].copyTo(
-        bigimg(cv::Rect(0, small_h_, small_w_, small_h_)));
-    world_image_.copyTo(bigimg(cv::Rect(small_w_, 0, wide_pixel_, world_h_)));
-    if (write_out_img_) {
-      char path[1000];
-      snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(),
-               frame.frame_id);
-      AINFO << path;
-      cv::imwrite(path, bigimg);
-    }
-    cv::imshow("", bigimg);
-    cvWaitKey(30);
-    world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
-    draw_range_circle();
-  }
-
   cv::putText(image, "timestamp:" + std::to_string(frame.timestamp),
               cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
@@ -596,6 +587,32 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   } else {
     AERROR << "fail to find necessuary intrinsic or extrinsic params.";
   }
+
+  // copy visual results into visualization panel
+  cv::Mat bigimg(world_h_, small_w_ + wide_pixel_, CV_8UC3);
+  camera_image_[camera_name + "_2D"].copyTo(
+      bigimg(cv::Rect(0, 0, small_w_, small_h_)));
+  camera_image_[camera_name + "_3D"].copyTo(
+      bigimg(cv::Rect(0, small_h_, small_w_, small_h_)));
+  world_image_.copyTo(bigimg(cv::Rect(small_w_, 0, wide_pixel_, world_h_)));
+
+  // output visualization panel
+  if (write_out_img_) {
+    char path[1000];
+    snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(),
+              frame.frame_id);
+    AINFO << path;
+    cv::imwrite(path, bigimg);
+  }
+
+  if (cv_imshow_img_) {
+    cv::imshow("", bigimg);
+    cvWaitKey(30);
+  }
+
+  // re-initialize empty world_image_
+  world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
+  draw_range_circle();
 }
 
 void Visualizer::draw_range_circle() {

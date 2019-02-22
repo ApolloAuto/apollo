@@ -1,7 +1,7 @@
 model_param {
   model_name: "darkSCNN"
-  proto_file: "lane_deploy.prototxt"
-  weight_file: "lane_deploy.caffemodel"
+  proto_file: "deploy.prototxt"
+  weight_file: "deploy.caffemodel"
   input_offset_y: 312
   input_offset_x: 0
   crop_height: 768

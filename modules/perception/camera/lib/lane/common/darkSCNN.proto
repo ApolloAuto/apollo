@@ -9,8 +9,8 @@ message DarkSCNNParam {
 
 message ModelParam {
     optional string model_name = 1 [default = "darkSCNN"];
-    optional string proto_file = 2 [default = "lane_deploy.prototxt"];
-    optional string weight_file = 3 [default = "lane_deploy.caffemodel"];
+    optional string proto_file = 2 [default = "deploy.prototxt"];
+    optional string weight_file = 3 [default = "deploy.caffemodel"];
     optional uint32 input_offset_y = 4 [default = 0];
     optional uint32 input_offset_x = 5 [default = 0];
     optional uint32 crop_height = 6 [default = 1080];

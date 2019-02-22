@@ -428,6 +428,51 @@ cc_test(
 )
 
 cc_test(
+    name = "camera_lib_lane_detector_darkscnn_lane_detector_test",
+    size = "medium",
+    srcs = [
+        "camera_lib_lane_detector_darkscnn_lane_detector_test.cc",
+    ],
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_imgproc",
+        "-lopencv_highgui",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/base",
+        "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
+        "//modules/perception/common/io:io_util",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "camera_lib_lane_postprocessor_darkscnn_lane_postprocessor_test",
+    size = "medium",
+    srcs = [
+        "camera_lib_lane_postprocessor_darkscnn_lane_postprocessor_test.cc",
+    ],
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_imgproc",
+        "-lopencv_highgui",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/base",
+        "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/calibration_service/online_calibration_service",
+        "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
+        "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
+        "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
+        "//modules/perception/camera/tools/offline:visualizer",
+        "//modules/perception/common/io:io_util",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
     name = "camera_lib_obstacle_detector_yolo_region_output_test",
     size = "small",
     srcs = [
