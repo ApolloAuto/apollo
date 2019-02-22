@@ -13,6 +13,7 @@ export default class Playback {
     @observable numFrames = 0;
     @observable requestedFrame = 0;
     @observable retrievedFrame = 0;
+    @observable loadingMarker = 0;
 
     @observable isPlaying = false;
     @observable isSeeking = true;
@@ -87,5 +88,9 @@ export default class Playback {
         }
 
         return false;
+    }
+
+    @action setLoadingMarker(frameId) {
+        this.loadingMarker = frameId;
     }
 }
