@@ -355,10 +355,7 @@ void ScenarioManager::ReadTrafficLight(const Frame& frame) {
   const double delay = traffic_light_detection->header().timestamp_sec() -
       Clock::NowInSeconds();
 
-  // TODO(all): to be fixed
-  // if (delay > config_.decider_rule_based_stop_config().traffic_light()
-  //     .signal_expire_time_sec()) {
-  if (delay > 5.0) {
+  if (delay > signal_expire_time_sec_) {
     ADEBUG << "traffic signal is expired, delay[" << delay << "] seconds.";
     return;
   }

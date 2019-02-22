@@ -77,8 +77,7 @@ class ScenarioManager final {
 
  private:
   std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
-                     std::hash<int>>
-      config_map_;
+                     std::hash<int>> config_map_;
 
   std::unique_ptr<Scenario> current_scenario_;
   ScenarioConfig::ScenarioType default_scenario_type_;
@@ -87,6 +86,7 @@ class ScenarioManager final {
 
   // TODO(all): move to scenario conf later
   const uint32_t conf_min_pass_s_distance_ = 3.0;  // meter
+  const double signal_expire_time_sec_ = 5.0;  // sec
 };
 
 }  // namespace scenario
