@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,31 +18,21 @@
  * @file
  **/
 
-#include "modules/planning/tasks/task.h"
+#pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
 namespace planning {
+class OpenSpaceRoiDecider : public Decider {
+ public:
+  explicit OpenSpaceRoiDecider(const TaskConfig& config);
 
-using apollo::common::Status;
+ private:
+  apollo::common::Status Process(
+      Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-Task::Task(const TaskConfig& config) : config_(config) {
-  name_ = TaskConfig::TaskType_Name(config_.task_type());
-}
-
-const std::string& Task::Name() const { return name_; }
-
-Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
-  reference_line_info_ = reference_line_info;
-  return Status::OK();
-}
-
-Status Task::Execute(Frame* frame) {
-  frame_ = frame;
-  return Status::OK();
-}
-
+  apollo::common::Status Process(Frame* const frame);
+};
 }  // namespace planning
 }  // namespace apollo

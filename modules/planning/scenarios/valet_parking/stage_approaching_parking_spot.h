@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,31 +18,20 @@
  * @file
  **/
 
-#include "modules/planning/tasks/task.h"
+#pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
+namespace scenario {
+namespace valet_parking {
 
-using apollo::common::Status;
+struct ValetParkingContext;
 
-Task::Task(const TaskConfig& config) : config_(config) {
-  name_ = TaskConfig::TaskType_Name(config_.task_type());
-}
+DECLARE_STAGE(StageApproachingParkingSpot, ValetParkingContext);
 
-const std::string& Task::Name() const { return name_; }
-
-Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
-  reference_line_info_ = reference_line_info;
-  return Status::OK();
-}
-
-Status Task::Execute(Frame* frame) {
-  frame_ = frame;
-  return Status::OK();
-}
-
+}  // namespace valet_parking
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

@@ -34,5 +34,10 @@ apollo::common::Status Decider::Execute(
   return ret;
 }
 
+apollo::common::Status Decider::Execute(Frame* frame) {
+  Task::Execute(frame);
+  return apollo::common::Status::OK();
+}
+
 }  // namespace planning
 }  // namespace apollo

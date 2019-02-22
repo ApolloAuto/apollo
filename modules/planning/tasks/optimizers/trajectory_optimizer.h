@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,31 @@
  *****************************************************************************/
 
 /**
- * @file
+ * @file trajectory_optimizer.h
  **/
 
-#include "modules/planning/tasks/task.h"
+#pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
+#include "modules/common/proto/pnc_point.pb.h"
+#include "modules/common/status/status.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
+class TrajectoryOptimizer : public Task {
+ public:
+  explicit TrajectoryOptimizer(const TaskConfig &config);
+  virtual ~TrajectoryOptimizer() = default;
 
-Task::Task(const TaskConfig& config) : config_(config) {
-  name_ = TaskConfig::TaskType_Name(config_.task_type());
-}
+  apollo::common::Status Execute(Frame *frame) override;
 
-const std::string& Task::Name() const { return name_; }
-
-Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
-  frame_ = frame;
-  reference_line_info_ = reference_line_info;
-  return Status::OK();
-}
-
-Status Task::Execute(Frame* frame) {
-  frame_ = frame;
-  return Status::OK();
-}
+ protected:
+  virtual apollo::common::Status Process(
+      const common::TrajectoryPoint &init_point,
+      DiscretizedTrajectory *const trajectory_data) = 0;
+};
 
 }  // namespace planning
 }  // namespace apollo
