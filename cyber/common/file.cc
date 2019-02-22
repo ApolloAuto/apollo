@@ -316,7 +316,14 @@ std::string GetFileName(const std::string &path, const bool remove_extension) {
   return path.substr(start, len);
 }
 
-std::string GetCurrentPath() { return std::string(get_current_dir_name()); }
+std::string GetCurrentPath() {
+  char tmp[PATH_MAX];
+  if (getcwd(tmp, sizeof(tmp)) != NULL) {
+    return std::string(tmp);
+  } else {
+    return std::string("");
+  }
+}
 
 }  // namespace common
 }  // namespace cyber
