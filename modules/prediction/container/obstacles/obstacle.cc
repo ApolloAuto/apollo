@@ -1020,6 +1020,10 @@ void Obstacle::BuildLaneGraph() {
     ADEBUG << "Not build lane graph for still obstacle";
     return;
   }
+  if (feature->lane().lane_graph().lane_sequence_size() > 0) {
+    ADEBUG << "Not build lane graph for an old obstacle";
+    return;
+  }
   double speed = feature->speed();
   double t_max = FLAGS_prediction_trajectory_time_length;
   double a_max = FLAGS_vehicle_max_linear_acc;
