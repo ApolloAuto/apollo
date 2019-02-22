@@ -17,25 +17,30 @@
 /**
  * @file
  **/
-
 #include "modules/planning/tasks/deciders/open_space_roi_decider.h"
+
+#include "gtest/gtest.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
+#define private public
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
+class OpenSpaceRoiDeciderTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {
+    config_.set_task_type(TaskConfig::OPEN_SPACE_ROI_DECIDER);
+  }
 
-OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig& config)
-    : Decider(config) {
-}
+ protected:
+  TaskConfig config_;
+};
 
-Status OpenSpaceRoiDecider::Process(
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
-  return Status::OK();
-}
-
-Status OpenSpaceRoiDecider::Process(Frame* const frame) {
-  return Status::OK();
+TEST_F(OpenSpaceRoiDeciderTest, Init) {
+  OpenSpaceRoiDecider open_space_roi_decider(config_);
+  EXPECT_EQ(open_space_roi_decider.Name(),
+            TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 }  // namespace planning

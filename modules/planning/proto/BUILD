@@ -200,6 +200,8 @@ proto_library(
         ":reference_line_smoother_config_proto_lib",
         ":side_pass_path_decider_config_proto_lib",
         ":speed_bounds_decider_config_proto_lib",
+        ":open_space_fallback_decider_config_proto_lib",
+        ":open_space_roi_decider_config_proto_lib",
     ],
 )
 
@@ -507,6 +509,34 @@ cc_proto_library(
     name = "speed_bounds_decider_config_proto",
     deps = [
         ":speed_bounds_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "open_space_fallback_decider_config_proto_lib",
+    srcs = [
+        "open_space_fallback_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "open_space_fallback_decider_config_proto",
+    deps = [
+        ":open_space_fallback_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "open_space_roi_decider_config_proto_lib",
+    srcs = [
+        "open_space_roi_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "open_space_roi_decider_config_proto",
+    deps = [
+        ":open_space_roi_decider_config_proto_lib",
     ],
 )
 

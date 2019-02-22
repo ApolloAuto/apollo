@@ -58,18 +58,18 @@ cc_library(
     ],
 )
 
-# cc_test(
-#     name = "open_space_decider_test",
-#     size = "small",
-#     srcs = [
-#         "side_pass_path_decider_test.cc",
-#         "side_pass_safety_test.cc",
-#     ],
-#     deps = [
-#         ":open_space_decider",
-#         "@gtest//:main",
-#     ],
-# )
+cc_test(
+    name = "open_space_decider_test",
+    size = "small",
+    srcs = [
+        "open_space_fallback_decider_test.cc",
+        "open_space_roi_decider_test.cc",
+    ],
+    deps = [
+        ":open_space_decider",
+        "@gtest//:main",
+    ],
+)
 
 cc_test(
     name = "side_pass_decider_test",

@@ -71,4 +71,32 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "stage_approaching_parking_spot_test",
+    size = "small",
+    srcs = [
+        "stage_approaching_parking_spot_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":stage_approaching_parking_spot",
+        "@gtest//:main",
+    ],
+)
+cc_test(
+    name = "stage_parking_test",
+    size = "small",
+    srcs = [
+        "stage_parking_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":stage_parking",
+        "@gtest//:main",
+    ],
+)
 cpplint()

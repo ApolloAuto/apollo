@@ -27,7 +27,6 @@ using apollo::common::Status;
 
 OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
     : Decider(config) {
-  SetName("OpenSpaceFallbackDecider");
 }
 
 Status OpenSpaceFallbackDecider::Process(

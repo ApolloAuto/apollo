@@ -17,26 +17,35 @@
 /**
  * @file
  **/
+#include "modules/planning/scenarios/valet_parking/stage_parking.h"
 
-#include "modules/planning/tasks/deciders/open_space_roi_decider.h"
+#include "gtest/gtest.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
+#define private public
 
 namespace apollo {
 namespace planning {
+namespace scenario {
+namespace valet_parking {
 
-using apollo::common::Status;
+class StageParkingTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {
+    config_.set_stage_type(ScenarioConfig::VALET_PARKING_PARKING);
+  }
 
-OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig& config)
-    : Decider(config) {
+ protected:
+  ScenarioConfig::StageConfig config_;
+};
+
+TEST_F(StageParkingTest, Init) {
+  StageParking stage_parking(config_);
+  EXPECT_EQ(stage_parking.Name(),
+            ScenarioConfig::StageType_Name(config_.stage_type()));
 }
 
-Status OpenSpaceRoiDecider::Process(
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
-  return Status::OK();
-}
-
-Status OpenSpaceRoiDecider::Process(Frame* const frame) {
-  return Status::OK();
-}
-
+}  // namespace valet_parking
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
