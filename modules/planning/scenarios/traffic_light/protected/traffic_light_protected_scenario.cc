@@ -20,13 +20,9 @@
 
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/traffic_light/protected/stage_intersection_cruise.h"
@@ -52,20 +48,17 @@ void TrafficLightProtectedScenario::Init() {
     return;
   }
 
-  /* TODO(all): to be fixed
-  const std::string traffic_light_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (traffic_light_overlap_id.empty()) {
-    return;
+  for (const auto& traffic_light_overlap :
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
+    const std::string traffic_light_overlap_id =
+        traffic_light_overlap.object_id;
+    hdmap::SignalInfoConstPtr traffic_light =
+        HDMapUtil::BaseMap().GetSignalById(
+            hdmap::MakeMapId(traffic_light_overlap_id));
+    if (!traffic_light) {
+      ADEBUG << "Could not find traffic light: " << traffic_light_overlap_id;
+    }
   }
-
-  hdmap::SignalInfoConstPtr traffic_light = HDMapUtil::BaseMap().GetSignalById(
-      hdmap::MakeMapId(traffic_light_overlap_id));
-  if (!traffic_light) {
-    AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
-    return;
-  }
-  */
 
   init_ = true;
 }
