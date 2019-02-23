@@ -459,4 +459,26 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "open_space_info",
+    srcs = [
+        "open_space_info.cc",
+    ],
+    hdrs = [
+        "open_space_info.h",
+    ],
+)
+
+cc_test(
+    name = "open_space_info_test",
+    size = "small",
+    srcs = [
+        "open_space_info_test.cc",
+    ],
+    deps = [
+        "open_space_info",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
