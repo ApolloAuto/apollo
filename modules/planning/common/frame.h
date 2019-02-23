@@ -25,6 +25,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
@@ -42,6 +43,7 @@
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
+#include "modules/planning/common/open_space_info.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -182,6 +184,10 @@ class Frame {
 
   void AddObstacle(const Obstacle &obstacle);
 
+  const OpenSpaceInfo &open_space_info() { return *open_space_info_; }
+
+  OpenSpaceInfo *mutable_open_space_info() { return open_space_info_.get(); }
+
  private:
   uint32_t sequence_num_ = 0;
   LocalView local_view_;
@@ -207,6 +213,8 @@ class Frame {
   std::vector<common::TrajectoryPoint> stitching_trajectory_;
 
   const ReferenceLineProvider *reference_line_provider_ = nullptr;
+
+  std::unique_ptr<OpenSpaceInfo> open_space_info_;
 
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
