@@ -32,9 +32,7 @@ class OpenSpaceInfoTest : public ::testing::Test {
   OpenSpaceInfo open_space_info_;
 };
 
-TEST_F(OpenSpaceInfoTest, Init) {
-    EXPECT_NE(&open_space_info_, nullptr);
-}
+TEST_F(OpenSpaceInfoTest, Init) { EXPECT_NE(&open_space_info_, nullptr); }
 
 }  // namespace planning
 }  // namespace apollo

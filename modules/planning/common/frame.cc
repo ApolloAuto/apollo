@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 
 #include "modules/routing/proto/routing.pb.h"
 
@@ -341,6 +342,8 @@ Status Frame::Init(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   future_route_waypoints_ = future_route_waypoints;
+
+  open_space_info_ = std::make_unique<OpenSpaceInfo>();
 
   return Status::OK();
 }

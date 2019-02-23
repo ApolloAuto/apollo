@@ -308,6 +308,7 @@ cc_library(
         ":indexed_queue",
         ":local_view",
         ":obstacle",
+        ":open_space_info",
         ":reference_line_info",
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
