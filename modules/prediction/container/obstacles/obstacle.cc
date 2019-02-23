@@ -1224,7 +1224,8 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
        it != lane_ids_ordered_list.end(); ++it) {
     lane_ids_ordered.push_back(*it);
   }
-
+  // TODO(all): sort the lane_segments from left to right (again)
+  //            to double-check and make sure it's well sorted.
   // Build lane_graph for every lane_segment and update it into proto.
   int seq_id = 0;
   for (size_t i = 0; i < lane_ids_ordered.size(); ++i) {
