@@ -1,9 +1,9 @@
-'use strict'
+'use strict';
 
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const FaviconsWebpackPlugin = require("favicons-webpack-plugin");
+const WebappWebpackPlugin = require("webapp-webpack-plugin");
 const ProgressBarPlugin = require("progress-bar-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -190,7 +190,11 @@ module.exports = {
             // Include only the app. Do not include the service worker.
             chunks: ["offline"]
         }),
-        new FaviconsWebpackPlugin("./favicon.png"),
+        new WebappWebpackPlugin({
+            logo: "./favicon.png",
+            cache: true,
+            prefix: "icons/"
+        }),
         new CopyWebpackPlugin([
             {
                 from: '../node_modules/three/examples/fonts',
