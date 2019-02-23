@@ -210,6 +210,11 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
     }
   }
 
+  for (std::size_t i = obstacle_ptr->history_size();
+       i < FLAGS_cruise_historical_frame_length; ++i) {
+    has_history[i] = 0.0;
+  }
+
   // Update the extracted features into the feature_values vector.
   for (std::size_t i = 0; i < FLAGS_cruise_historical_frame_length; i++) {
     feature_values->push_back(has_history[i]);

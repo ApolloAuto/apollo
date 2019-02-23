@@ -54,6 +54,8 @@ class LaneScanningEvaluator : public Evaluator {
   /**
    * @brief Extract features for learning model's input
    * @param Obstacle pointer
+   * @param Lane Graph pointer
+   * @param To be filled up with extracted features
    */
   bool ExtractFeatures(const Obstacle* obstacle_ptr,
                        const LaneGraph* lane_graph_ptr,
