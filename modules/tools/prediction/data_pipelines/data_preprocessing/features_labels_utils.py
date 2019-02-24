@@ -21,7 +21,6 @@ import os
 from modules.prediction.proto import offline_features_pb2
 
 
-junction_label_feature_dim = 79
 junction_label_label_dim = 12
 future_status_label_dim = 30
 
@@ -94,8 +93,7 @@ def CombineFeaturesAndLabels(feature_path, label_path, dict_name='future_status'
         labels = None
         list_curr = None
         if dict_name == 'junction_label':
-            if len(features_for_learning) != junction_label_feature_dim or \
-               len(dict_labels[key]) != junction_label_label_dim:
+            if len(dict_labels[key]) != junction_label_label_dim:
                 continue
             labels = dict_labels[key]
             list_curr = features_for_learning + labels
