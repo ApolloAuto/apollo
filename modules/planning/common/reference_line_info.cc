@@ -800,5 +800,21 @@ void ReferenceLineInfo::SetPathTurnType() {
   return;
 }
 
+int ReferenceLineInfo::GetPnCJunction(
+    const double s, hdmap::PathOverlap* pnc_junction_overlap) const {
+  CHECK_NOTNULL(pnc_junction_overlap);
+  const std::vector<hdmap::PathOverlap>& pnc_junction_overlaps =
+      reference_line_.map_path().pnc_junction_overlaps();
+  for (const auto& overlap : pnc_junction_overlaps) {
+    const double distance = fabs(s - overlap.start_s);
+    constexpr double kMaxDist = 3.0;  // meter
+    if (distance <= kMaxDist) {
+      *pnc_junction_overlap = overlap;
+      return 1;
+    }
+  }
+  return 0;
+}
+
 }  // namespace planning
 }  // namespace apollo
