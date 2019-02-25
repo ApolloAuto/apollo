@@ -34,7 +34,7 @@ oprofile提供了多种命令，通常情况下我们使用比较多的是`operf
 以测试perception模块为例。
 * 1.修改`script/apollo_bash.sh`脚本，文件第239行的`nohup`后面增加`operf`指令，如图：
 
-![operf_command](howto/images/TX2/operf_command.png)
+![operf_command](images/TX2/operf_command.png)
 
 * 2.使用脚本如`./script/perception.sh`启动perception模块
 
@@ -48,7 +48,7 @@ $ opreport
 ```
 结果示例为：
 
-![opreport_](howto/images/TX2/opreport_.png)
+![opreport_](images/TX2/opreport_.png)
 
 使用`opreport`查看函数占比：
 ```bash
@@ -60,7 +60,7 @@ $ opreport -l bazel-bin/modules/perception/perception > perception_op_funcs.md
 ```
 结果示例为：
 
-![opreport_file](howto/images/TX2/opreport_file.png)
+![opreport_file](images/TX2/opreport_file.png)
 
 使用`opannotate`查看详细的源码数据统计：
 ```bash
