@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 #include <string>
 
 #include "modules/prediction/common/prediction_gflags.h"
@@ -285,6 +286,49 @@ void ObstaclesPrioritizer::AssignCautionLevelInJunction(
       ADEBUG << "SetCaution for obstacle [" << obstacle_ptr->id() << "]";
     }
   }
+}
+
+void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
+  ADCTrajectoryContainer* adc_trajectory_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  const std::vector<std::string>& lane_ids =
+      adc_trajectory_container->GetADCLaneIDSequence();
+  if (lane_ids.empty()) {
+    return;
+  }
+
+  double accumulated_s = 0.0;
+  for (const std::string& lane_id : lane_ids) {
+    std::shared_ptr<const LaneInfo> lane_info_ptr =
+        PredictionMap::LaneById(lane_id);
+    if (lane_info_ptr == nullptr) {
+      AERROR << "Null lane info pointer found.";
+      continue;
+    }
+    accumulated_s += lane_info_ptr->total_length();
+    AssignCautionByMerge(lane_info_ptr);
+    AssignCautionByOverlap(lane_info_ptr);
+    if (accumulated_s > 40.0) {
+      break;
+    }
+  }
+}
+
+void ObstaclesPrioritizer::AssignCautionByMerge(
+    std::shared_ptr<const LaneInfo> lane_info_ptr) {
+  // TODO(all) implement
+}
+
+void ObstaclesPrioritizer::AssignCautionByOverlap(
+    std::shared_ptr<const LaneInfo> lane_info_ptr) {
+  // TODO(all) implement
+}
+
+void ObstaclesPrioritizer::SetCautionBackward(
+    std::shared_ptr<const LaneInfo> start_lane_info_ptr,
+    const double distance) {
+  // TODO(all) implement
 }
 
 }  // namespace prediction
