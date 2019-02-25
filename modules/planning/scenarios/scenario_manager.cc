@@ -186,12 +186,13 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       (reference_line_info.GetPathTurnType() == hdmap::Lane::LEFT_TURN);
 
   for (auto traffic_light_overlap :
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
+       PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
     const double traffic_light_overlap_start_s = traffic_light_overlap.start_s;
     const double adc_distance_to_stop_line =
         traffic_light_overlap_start_s - adc_front_edge_s;
     ADEBUG << "adc_distance_to_stop_line[" << adc_distance_to_stop_line
-        << "] right_turn[" << right_turn << "] left_turn[" << left_turn << "]";
+           << "] right_turn[" << right_turn << "] left_turn[" << left_turn
+           << "]";
 
     switch (current_scenario_->scenario_type()) {
       case ScenarioConfig::LANE_FOLLOW:
@@ -284,7 +285,7 @@ void ScenarioManager::Observe(const Frame& frame) {
   double min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
     if (adc_front_edge_s - stop_sign_overlap.end_s <=
-        conf_min_pass_s_distance_ &&
+            conf_min_pass_s_distance_ &&
         stop_sign_overlap.start_s < min_start_s) {
       min_start_s = stop_sign_overlap.start_s;
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap =
@@ -299,7 +300,8 @@ void ScenarioManager::Observe(const Frame& frame) {
           PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end());
     }
   }
-  ADEBUG << "Stop Sign: "
+  ADEBUG
+      << "Stop Sign: "
       << PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
 
   // find next pnc_junction_overlap
@@ -308,7 +310,7 @@ void ScenarioManager::Observe(const Frame& frame) {
   min_start_s = std::numeric_limits<double>::max();
   for (const PathOverlap& pnc_junction_overlap : pnc_junction_overlaps) {
     if (adc_front_edge_s - pnc_junction_overlap.end_s <=
-        conf_min_pass_s_distance_ &&
+            conf_min_pass_s_distance_ &&
         pnc_junction_overlap.start_s < min_start_s) {
       min_start_s = pnc_junction_overlap.start_s;
       PlanningContext::GetScenarioInfo()->next_pnc_junction_overlap =
@@ -316,8 +318,8 @@ void ScenarioManager::Observe(const Frame& frame) {
     }
   }
   ADEBUG << "PNC_junction: "
-      << PlanningContext::GetScenarioInfo()
-          ->next_pnc_junction_overlap.object_id;
+         << PlanningContext::GetScenarioInfo()
+                ->next_pnc_junction_overlap.object_id;
 
   // find next traffic_light_overlap
   PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps.clear();
@@ -326,11 +328,11 @@ void ScenarioManager::Observe(const Frame& frame) {
       reference_line_info.reference_line().map_path().signal_overlaps();
   for (const PathOverlap& traffic_light_overlap : traffic_light_overlaps) {
     if (adc_front_edge_s - traffic_light_overlap.end_s <=
-            conf_min_pass_s_distance_ ) {
+        conf_min_pass_s_distance_) {
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps.push_back(
           traffic_light_overlap);
       ADEBUG << "Traffic Light[" << traffic_light_overlap.object_id
-          << "] start_s[" << traffic_light_overlap.start_s << "]";
+             << "] start_s[" << traffic_light_overlap.start_s << "]";
     } else {
       // clear stop_done_overlap_id if already passed
       /* TODO(all): to be fixed
@@ -352,8 +354,8 @@ void ScenarioManager::ReadTrafficLight(const Frame& frame) {
     return;
   }
 
-  const double delay = traffic_light_detection->header().timestamp_sec() -
-      Clock::NowInSeconds();
+  const double delay =
+      traffic_light_detection->header().timestamp_sec() - Clock::NowInSeconds();
 
   if (delay > signal_expire_time_sec_) {
     ADEBUG << "traffic signal is expired, delay[" << delay << "] seconds.";

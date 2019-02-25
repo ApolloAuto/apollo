@@ -1138,7 +1138,7 @@ void Obstacle::GetNeighborLaneSegments(
          ++i) {
       if (center_lane_info->lane().left_neighbor_forward_lane_id(i).has_id()) {
         std::string lane_id =
-             center_lane_info->lane().left_neighbor_forward_lane_id(i).id();
+            center_lane_info->lane().left_neighbor_forward_lane_id(i).id();
         // If haven't seen this lane id before.
         if (existing_lane_ids->count(lane_id) == 0) {
           existing_lane_ids->insert(lane_id);
@@ -1161,7 +1161,7 @@ void Obstacle::GetNeighborLaneSegments(
          ++i) {
       if (center_lane_info->lane().right_neighbor_forward_lane_id(i).has_id()) {
         std::string lane_id =
-             center_lane_info->lane().right_neighbor_forward_lane_id(i).id();
+            center_lane_info->lane().right_neighbor_forward_lane_id(i).id();
         // If haven't seen this lane id before.
         if (existing_lane_ids->count(lane_id) == 0) {
           existing_lane_ids->insert(lane_id);
@@ -1267,13 +1267,14 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 void Obstacle::SetLanePoints(Feature* feature) {
   LaneGraph* lane_graph = feature->mutable_lane()->mutable_lane_graph();
   SetLanePoints(feature, FLAGS_target_lane_gap, FLAGS_max_num_lane_point,
-      lane_graph);
+                lane_graph);
 }
 
 // The generic SetLanePoints
-void Obstacle::SetLanePoints(
-    const Feature* feature, const double lane_point_spacing,
-    const uint64_t max_num_lane_point, LaneGraph* const lane_graph) {
+void Obstacle::SetLanePoints(const Feature* feature,
+                             const double lane_point_spacing,
+                             const uint64_t max_num_lane_point,
+                             LaneGraph* const lane_graph) {
   // Sanity checks.
   if (feature == nullptr || !feature->has_velocity_heading()) {
     AERROR << "Null feature or no velocity heading.";

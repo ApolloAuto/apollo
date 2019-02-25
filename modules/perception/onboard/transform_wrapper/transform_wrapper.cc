@@ -198,9 +198,10 @@ bool TransformWrapper::GetTrans(double timestamp, Eigen::Affine3d* trans,
   StampedTransform transform;
   if (!QueryTrans(timestamp, &transform, frame_id, child_frame_id)) {
     if (!FLAGS_obs_enable_local_pose_extrapolation ||
-        !transform_cache_.QueryTransform(timestamp, &transform,
-              FLAGS_obs_max_local_pose_extrapolation_latency)) {
-        return false;
+        !transform_cache_.QueryTransform(
+            timestamp, &transform,
+            FLAGS_obs_max_local_pose_extrapolation_latency)) {
+      return false;
     }
   }
 

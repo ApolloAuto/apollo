@@ -56,8 +56,8 @@ class PedestrianInteractionEvaluator : public Evaluator {
    * @param Obstacle pointer
    * @param To be filled up with extracted features
    */
-  bool ExtractFeatures(
-      const Obstacle* obstacle_ptr, std::vector<double>* feature_values);
+  bool ExtractFeatures(const Obstacle* obstacle_ptr,
+                       std::vector<double>* feature_values);
 
   /**
    * @brief Get the name of evaluator.

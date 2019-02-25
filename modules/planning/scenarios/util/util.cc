@@ -54,8 +54,7 @@ bool CheckTrafficLightDone(const ReferenceLineInfo& reference_line_info,
 
 TrafficLight GetSignal(const std::string& traffic_light_id) {
   const auto* result = apollo::common::util::FindPtrOrNull(
-      PlanningContext::GetScenarioInfo()->traffic_lights,
-      traffic_light_id);
+      PlanningContext::GetScenarioInfo()->traffic_lights, traffic_light_id);
 
   if (result == nullptr) {
     TrafficLight traffic_light;

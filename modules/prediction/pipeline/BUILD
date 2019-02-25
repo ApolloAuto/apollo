@@ -18,19 +18,19 @@ cc_binary(
         "//cyber/common:file",
         "//modules/common/adapters/proto:adapter_config_proto",
         "//modules/prediction/common:prediction_gflags",
-        "//modules/prediction/proto:feature_proto",
-        "//modules/prediction/proto:offline_features_proto",
-        "//modules/prediction/proto:prediction_conf_proto",
-        "//modules/prediction/proto:prediction_proto",
-        "//modules/prediction/proto:prediction_output_evaluation_proto",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator:evaluator_manager",
         "//modules/prediction/predictor:predictor_manager",
+        "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:offline_features_proto",
+        "//modules/prediction/proto:prediction_conf_proto",
+        "//modules/prediction/proto:prediction_output_evaluation_proto",
+        "//modules/prediction/proto:prediction_proto",
     ],
 )
 
 cc_binary(
-   name = "records_to_offline_data",
+    name = "records_to_offline_data",
     srcs = ["records_to_offline_data.cc"],
     deps = [
         "//modules/prediction/common:message_process",

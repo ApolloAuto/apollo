@@ -187,13 +187,9 @@ class ReferenceLineInfo {
     return trajectory_type_;
   }
 
-  StGraphData* mutable_st_graph_data() {
-    return &st_graph_data_;
-  }
+  StGraphData* mutable_st_graph_data() { return &st_graph_data_; }
 
-  const StGraphData& st_graph_data() {
-    return st_graph_data_;
-  }
+  const StGraphData& st_graph_data() { return st_graph_data_; }
 
   // different types of overlaps that can be handled by different scenarios.
   enum OverlapType {

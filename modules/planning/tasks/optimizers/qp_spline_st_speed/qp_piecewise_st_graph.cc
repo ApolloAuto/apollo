@@ -149,8 +149,7 @@ Status QpPiecewiseStGraph::AddConstraint(
     const double curr_t = t_evaluated_[i];
     double lower_s = 0.0;
     double upper_s = 0.0;
-    GetSConstraintByTime(boundaries, curr_t,
-                         total_path_length_, &upper_s,
+    GetSConstraintByTime(boundaries, curr_t, total_path_length_, &upper_s,
                          &lower_s);
     s_upper_bound[i] = upper_s;
     s_lower_bound[i] = lower_s;
@@ -280,8 +279,7 @@ Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
   if (t_evaluated_.size() > 0) {
     ref_kernel->AddReferenceLineKernelMatrix(
         index_list, cruise_,
-        weight * static_cast<double>(t_evaluated_.size()) /
-            total_time_);
+        weight * static_cast<double>(t_evaluated_.size()) / total_time_);
   }
 
   return Status::OK();
@@ -329,8 +327,7 @@ Status QpPiecewiseStGraph::AddFollowReferenceLineKernel(
   if (!ref_s.empty()) {
     follow_kernel->AddReferenceLineKernelMatrix(
         index_list, ref_s,
-        weight * static_cast<double>(t_evaluated_.size()) /
-            total_time_);
+        weight * static_cast<double>(t_evaluated_.size()) / total_time_);
   }
 
   for (size_t i = 0; i < filtered_evaluate_t.size(); ++i) {

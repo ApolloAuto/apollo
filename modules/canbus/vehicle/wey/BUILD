@@ -36,10 +36,10 @@ cc_library(
         "wey_message_manager.h",
     ],
     deps = [
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -65,25 +65,25 @@ cc_library(
     ],
     deps = [
         ":wey_message_manager",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/wey/protocol:canbus_wey_protocol",
+        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
 cc_test(
     name = "wey_controller_test",
     size = "small",
-    data = ["//modules/canbus:canbus_testdata"],
     srcs = [
         "wey_controller_test.cc",
     ],
+    data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":wey_controller",
-        "//modules/common/util:util",
+        "//modules/common/util",
         "@gtest//:main",
     ],
 )

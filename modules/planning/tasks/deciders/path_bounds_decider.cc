@@ -86,8 +86,7 @@ Status PathBoundsDecider::Process(
 
   // Update the path boundary info to the frame.
   if (path_boundaries.empty()) {
-    const std::string msg =
-        "Failed to get a valid path boundary";
+    const std::string msg = "Failed to get a valid path boundary";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -96,9 +95,9 @@ Status PathBoundsDecider::Process(
     path_boundaries_pair.emplace_back(std::get<1>(path_boundaries[i]),
                                       std::get<2>(path_boundaries[i]));
   }
-  reference_line_info->SetPathBoundaries(
-      path_boundaries_pair, std::get<0>(path_boundaries[0]),
-      kPathBoundsDeciderResolution);
+  reference_line_info->SetPathBoundaries(path_boundaries_pair,
+                                         std::get<0>(path_boundaries[0]),
+                                         kPathBoundsDeciderResolution);
   return Status::OK();
 }
 
