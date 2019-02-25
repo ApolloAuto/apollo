@@ -33,16 +33,15 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(
-    const TaskConfig& config) : PathOptimizer(config) {
+PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
+    : PathOptimizer(config) {
   SetName("PiecewiseJerkPathOptimizer");
   CHECK(config_.has_piecewise_jerk_path_config());
 }
 
-common::Status PiecewiseJerkPathOptimizer::Process(const SpeedData& speed_data,
-    const ReferenceLine& reference_line,
+common::Status PiecewiseJerkPathOptimizer::Process(
+    const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point, PathData* const path_data) {
-
   const auto frenet_point =
       reference_line.GetFrenetPoint(init_point.path_point());
   const auto& qp_config = config_.qp_piecewise_jerk_path_config();
@@ -51,7 +50,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(const SpeedData& speed_data,
   double start_s = 0.0;
   double delta_s = 0.0;
   reference_line_info_->GetPathBoundaries(&lateral_boundaries, &start_s,
-      &delta_s);
+                                          &delta_s);
 
   auto num_of_points = lateral_boundaries.size();
 
@@ -67,8 +66,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(const SpeedData& speed_data,
                                            frenet_point.ddl()};
 
   auto fem_1d_qp_ = std::make_unique<Fem1dQpProblem>(
-      num_of_points, init_lateral_state, delta_s, w,
-      FLAGS_lateral_jerk_bound);
+      num_of_points, init_lateral_state, delta_s, w, FLAGS_lateral_jerk_bound);
 
   auto start_time = std::chrono::system_clock::now();
 

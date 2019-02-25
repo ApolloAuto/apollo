@@ -52,8 +52,8 @@ void EgoInfo::CalculateEgoBox(const common::VehicleState& vehicle_state) {
   Vec2d position(vehicle_state.x(), vehicle_state.y());
   Vec2d center(position + vec_to_center.rotate(vehicle_state.heading()));
 
-  ego_box_ = Box2d(center, vehicle_state.heading(), param.length(),
-      param.width());
+  ego_box_ =
+      Box2d(center, vehicle_state.heading(), param.length(), param.width());
 }
 
 void EgoInfo::Clear() {

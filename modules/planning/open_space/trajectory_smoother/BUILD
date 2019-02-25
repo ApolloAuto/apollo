@@ -78,8 +78,8 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planner_open_space_config_proto",
         "//modules/planning/proto:planning_proto",
-        "@osqp",
         "@eigen",
+        "@osqp",
     ],
 )
 
@@ -91,7 +91,10 @@ cc_library(
     hdrs = [
         "distance_approach_problem.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
     deps = [
         "distance_approach_ipopt_interface",
         "//cyber/common:log",
@@ -109,7 +112,10 @@ cc_library(
     hdrs = [
         "distance_approach_ipopt_interface.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
     deps = [
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -130,7 +136,10 @@ cc_test(
     srcs = [
         "distance_approach_ipopt_interface_test.cc",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
     deps = [
         ":distance_approach_ipopt_interface",
         "//cyber/common:log",
@@ -144,7 +153,10 @@ cc_test(
     srcs = [
         "distance_approach_problem_test.cc",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
     deps = [
         ":distance_approach_problem",
         "//cyber/common:log",

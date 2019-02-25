@@ -11,8 +11,8 @@ cc_library(
         "util.h",
     ],
     deps = [
-    	"//modules/routing:routing_lib",        
-    	"//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/routing:routing_lib",
     ],
 )
 

@@ -24,7 +24,7 @@ cc_library(
         "//modules/common",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
-        ],
+    ],
 )
 
 cc_test(

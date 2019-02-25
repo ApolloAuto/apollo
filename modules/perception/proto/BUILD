@@ -12,11 +12,11 @@ cc_proto_library(
 proto_library(
     name = "perception_proto_lib",
     srcs = [
+        "motion_service.proto",
+        "perception_camera.proto",
+        "perception_lane.proto",
         "perception_obstacle.proto",
         "traffic_light_detection.proto",
-        "perception_lane.proto",
-	"motion_service.proto",
-	"perception_camera.proto",
     ],
     deps = [
         "//modules/common/proto:error_code_proto_lib",

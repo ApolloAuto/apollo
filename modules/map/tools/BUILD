@@ -69,6 +69,7 @@ cc_binary(
         "//modules/map/proto:map_proto",
     ],
 )
+
 cc_binary(
     name = "bin_map_generator",
     srcs = ["bin_map_generator.cc"],
@@ -82,6 +83,7 @@ cc_binary(
         "//modules/map/proto:map_proto",
     ],
 )
+
 cc_binary(
     name = "quaternion_euler",
     srcs = ["quaternion_euler.cc"],

@@ -26,17 +26,14 @@ namespace planning {
 using apollo::common::Status;
 
 OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig& config)
-    : Decider(config) {
-}
+    : Decider(config) {}
 
-Status OpenSpaceRoiDecider::Process(
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
+Status OpenSpaceRoiDecider::Process(Frame* frame,
+                                    ReferenceLineInfo* reference_line_info) {
   return Status::OK();
 }
 
-Status OpenSpaceRoiDecider::Process(Frame* const frame) {
-  return Status::OK();
-}
+Status OpenSpaceRoiDecider::Process(Frame* const frame) { return Status::OK(); }
 
 }  // namespace planning
 }  // namespace apollo

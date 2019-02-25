@@ -55,7 +55,6 @@ cc_library(
     ],
 )
 
-
 cc_test(
     name = "valet_parking_scenario_test",
     size = "small",
@@ -85,6 +84,7 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
 cc_test(
     name = "stage_parking_test",
     size = "small",
@@ -99,4 +99,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
 cpplint()

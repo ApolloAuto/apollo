@@ -87,7 +87,7 @@ cc_library(
 )
 
 cc_library(
-   name = "lane_camera_perception",
+    name = "lane_camera_perception",
     srcs = [
         "lane_camera_perception.cc",
     ],

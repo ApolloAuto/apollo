@@ -63,8 +63,8 @@ class Fem1dQpProblem {
    * x_bounds[k].second)/2
    */
   Fem1dQpProblem(const size_t num_var, const std::array<double, 3>& x_init,
-      const double delta_s, const std::array<double, 5>& w,
-      const double max_x_third_order_derivative);
+                 const double delta_s, const std::array<double, 5>& w,
+                 const double max_x_third_order_derivative);
 
   virtual ~Fem1dQpProblem() = default;
 
@@ -75,14 +75,11 @@ class Fem1dQpProblem {
     x_init_ = x_init;
   }
 
-  void SetZeroOrderBounds(
-      std::vector<std::pair<double, double>> x_bounds);
+  void SetZeroOrderBounds(std::vector<std::pair<double, double>> x_bounds);
 
-  void SetFirstOrderBounds(
-      std::vector<std::pair<double, double>> dx_bounds);
+  void SetFirstOrderBounds(std::vector<std::pair<double, double>> dx_bounds);
 
-  void SetSecondOrderBounds(
-      std::vector<std::pair<double, double>> d2x_bounds);
+  void SetSecondOrderBounds(std::vector<std::pair<double, double>> d2x_bounds);
 
   void SetZeroOrderBounds(const double x_bound);
 
@@ -113,13 +110,9 @@ class Fem1dQpProblem {
 
   virtual std::vector<double> x_derivative() const { return dx_; }
 
-  virtual std::vector<double> x_second_order_derivative() const {
-    return ddx_;
-  }
+  virtual std::vector<double> x_second_order_derivative() const { return ddx_; }
 
-  virtual std::vector<double> x_third_order_derivative() const {
-    return dddx_;
-  }
+  virtual std::vector<double> x_third_order_derivative() const { return dddx_; }
 
   // modify output resolution. If not set, the output resolution is by default
   // identical to the original resolution.
@@ -133,10 +126,11 @@ class Fem1dQpProblem {
 
   virtual void CalculateOffset(std::vector<c_float>* q);
 
-  virtual void CalculateAffineConstraint(
-      std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
-      std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
-      std::vector<c_float>* upper_bounds);
+  virtual void CalculateAffineConstraint(std::vector<c_float>* A_data,
+                                         std::vector<c_int>* A_indices,
+                                         std::vector<c_int>* A_indptr,
+                                         std::vector<c_float>* lower_bounds,
+                                         std::vector<c_float>* upper_bounds);
 
   bool OptimizeWithOsqp(
       const size_t kernel_dim, const size_t num_affine_constraint,

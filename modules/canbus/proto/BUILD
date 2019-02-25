@@ -16,8 +16,8 @@ proto_library(
         "ge3.proto",
         "lexus.proto",
         "transit.proto",
-        "wey.proto",
         "vehicle_parameter.proto",
+        "wey.proto",
     ],
     deps = [
         "//modules/common/proto:drive_state_proto_lib",

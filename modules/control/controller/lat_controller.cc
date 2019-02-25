@@ -235,8 +235,8 @@ Status LatController::Init(const ControlConf *control_conf) {
   LoadLatGainScheduler(lat_controller_conf);
   LogInitParameters();
 
-  bool enable_leadlag = control_conf_->
-        lat_controller_conf().enable_reverse_leadlag_compensation();
+  bool enable_leadlag = control_conf_->lat_controller_conf()
+                            .enable_reverse_leadlag_compensation();
   if (enable_leadlag) {
     leadlag_controller_.Init(lat_controller_conf.reverse_leadlag_conf(), ts_);
   }
@@ -413,12 +413,13 @@ Status LatController::ComputeControlCommand(
 
   // Clamp the steer angle to -100.0 to 100.0
   double steer_angle = 0.0;
-  bool enable_leadlag = control_conf_->
-        lat_controller_conf().enable_reverse_leadlag_compensation();
+  bool enable_leadlag = control_conf_->lat_controller_conf()
+                            .enable_reverse_leadlag_compensation();
   if (enable_leadlag) {
     steer_angle = common::math::Clamp(
         leadlag_controller_.Control(steer_angle_feedback, ts_) +
-        steer_angle_feedforward, -100.0, 100.0);
+            steer_angle_feedforward,
+        -100.0, 100.0);
   } else {
     steer_angle = common::math::Clamp(
         steer_angle_feedback + steer_angle_feedforward, -100.0, 100.0);

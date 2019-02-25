@@ -51,8 +51,8 @@ TEST(Fem1dQPProblemTest, basic_test) {
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 1.25;
 
-  Fem1dQpProblem* fem_qp = new Fem1dQpProblem(
-      n, x_init, delta_s, w, max_x_third_order_derivative);
+  Fem1dQpProblem* fem_qp =
+      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative);
 
   fem_qp->SetVariableBounds(x_bounds);
   fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
@@ -81,8 +81,8 @@ TEST(Fem1dQPProblemTest, add_bounds_test) {
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 0.25;
 
-  Fem1dQpProblem* fem_qp = new Fem1dQpProblem(
-      n, x_init, delta_s, w, max_x_third_order_derivative);
+  Fem1dQpProblem* fem_qp =
+      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative);
 
   std::vector<std::tuple<double, double, double>> x_bounds;
   for (size_t i = 10; i < 20; ++i) {
@@ -114,8 +114,8 @@ TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
   std::array<double, 5> w = {1.0, 100.0, 1000.0, 1000.0, 0.0};
   double max_x_third_order_derivative = 2.0;
 
-  Fem1dQpProblem* fem_qp = new Fem1dQpProblem(
-      n, x_init, delta_s, w, max_x_third_order_derivative);
+  Fem1dQpProblem* fem_qp =
+      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative);
 
   fem_qp->SetVariableBounds(x_bounds);
   fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);

@@ -98,7 +98,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
   }
 
   for (auto traffic_light_overlap :
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
+       PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
     const std::string traffic_light_id = traffic_light_overlap.object_id;
 
     if (PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end() !=
@@ -109,10 +109,9 @@ void DeciderRuleBasedStop::CheckTrafficLight(
       continue;
     }
 
-
     auto signal_color = scenario::GetSignal(traffic_light_id).color();
-    ADEBUG << "traffic_light_id[" << traffic_light_id
-        << "] color[" << signal_color << "]";
+    ADEBUG << "traffic_light_id[" << traffic_light_id << "] color["
+           << signal_color << "]";
     if (signal_color == TrafficLight::GREEN) {
       continue;
     }
@@ -127,7 +126,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
             .stop_distance();
 
     ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
-        << "] stop_line_s[" << stop_line_s << "]";
+           << "] stop_line_s[" << stop_line_s << "]";
     std::vector<std::string> wait_for_obstacles;
     BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
                       stop_distance, StopReasonCode::STOP_REASON_SIGNAL,

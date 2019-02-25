@@ -52,7 +52,7 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
 
   bool traffic_light_all_done = true;
   for (const auto& traffic_light_overlap :
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
+       PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
     const std::string traffic_light_overlap_id =
         traffic_light_overlap.object_id;
 
@@ -64,33 +64,33 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
 
     // check if traffic_light is too far
     const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-    const double adc_distance_to_stop_line = traffic_light_overlap.start_s -
-        adc_front_edge_s;
+    const double adc_distance_to_stop_line =
+        traffic_light_overlap.start_s - adc_front_edge_s;
     // TODO(all): move to conf
     constexpr double kTrafficLightMinDistance = 5.0;  // unit: m
     if (adc_distance_to_stop_line > kTrafficLightMinDistance) {
       ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
-          << "] start_s[" << traffic_light_overlap.start_s
-          << "] too far. ignore";
+             << "] start_s[" << traffic_light_overlap.start_s
+             << "] too far. ignore";
       continue;
     }
 
     // check if passing stop line ready
     constexpr double kPassStopLineBuffer = 2.0;  // unit: m
-    const double distance_adc_pass_traffic_light = adc_front_edge_s -
-        traffic_light_overlap.start_s;
+    const double distance_adc_pass_traffic_light =
+        adc_front_edge_s - traffic_light_overlap.start_s;
     // passed stop line too far
     if (distance_adc_pass_traffic_light > kPassStopLineBuffer) {
       ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
-          << "] start_s[" << traffic_light_overlap.start_s
-          << "] already passed. ignore";
+             << "] start_s[" << traffic_light_overlap.start_s
+             << "] already passed. ignore";
       continue;
     }
 
     // check on traffic light color
     auto signal_color = scenario::GetSignal(traffic_light_overlap_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
-        << "] color[" << signal_color << "]";
+           << "] color[" << signal_color << "]";
     if (signal_color != TrafficLight::GREEN) {
       traffic_light_all_done = false;
     }
