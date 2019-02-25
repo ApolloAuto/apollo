@@ -30,8 +30,8 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
 #include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
 namespace planning {

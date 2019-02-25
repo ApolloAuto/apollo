@@ -452,10 +452,10 @@ cc_library(
         "trajectory_stitcher.h",
     ],
     deps = [
-        "//modules/planning/common/trajectory:publishable_trajectory",
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
     ],
 )

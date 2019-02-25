@@ -31,8 +31,10 @@ constexpr double kMaxVariableRange = 1e10;
 }  // namespace
 
 Fem1dQpProblem::Fem1dQpProblem(const size_t num_of_knots,
-    const std::array<double, 3>& x_init, const double delta_s,
-    const std::array<double, 5>& w, const double max_x_third_order_derivative) {
+                               const std::array<double, 3>& x_init,
+                               const double delta_s,
+                               const std::array<double, 5>& w,
+                               const double max_x_third_order_derivative) {
   CHECK_GE(num_of_knots, 4);
   num_of_knots_ = num_of_knots;
 
@@ -53,10 +55,10 @@ Fem1dQpProblem::Fem1dQpProblem(const size_t num_of_knots,
                    std::make_pair(-kMaxVariableRange, kMaxVariableRange));
 
   dx_bounds_.resize(num_of_knots_,
-                   std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+                    std::make_pair(-kMaxVariableRange, kMaxVariableRange));
 
   ddx_bounds_.resize(num_of_knots_,
-                   std::make_pair(-kMaxVariableRange, kMaxVariableRange));
+                     std::make_pair(-kMaxVariableRange, kMaxVariableRange));
 }
 
 bool Fem1dQpProblem::OptimizeWithOsqp(
@@ -206,10 +208,8 @@ void Fem1dQpProblem::SetOutputResolution(const double resolution) {
     } else {
       d3x = dddx_[idx - 1];
       d2x = ddx_[idx - 1] + d3x * ds;
-      dx = dx_[idx - 1] + ddx_[idx - 1] * ds +
-           0.5 * d3x * ds * ds;
-      x = x_[idx - 1] + dx_[idx - 1] * ds +
-          0.5 * ddx_[idx - 1] * ds * ds +
+      dx = dx_[idx - 1] + ddx_[idx - 1] * ds + 0.5 * d3x * ds * ds;
+      x = x_[idx - 1] + dx_[idx - 1] * ds + 0.5 * ddx_[idx - 1] * ds * ds +
           d3x * ds * ds * ds / 6.0;
     }
 
@@ -294,8 +294,8 @@ bool Fem1dQpProblem::Optimize() {
 }
 
 void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
-                                         std::vector<c_int>* P_indices,
-                                         std::vector<c_int>* P_indptr) {
+                                     std::vector<c_int>* P_indices,
+                                     std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   P_data->resize(kNumParam);

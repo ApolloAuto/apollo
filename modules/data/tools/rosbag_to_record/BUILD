@@ -20,7 +20,7 @@ cc_library(
         "channel_info.h",
     ],
     deps = [
-        "//cyber", 
+        "//cyber",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/monitor_log/proto:monitor_log_proto",
         "//modules/common/proto:drive_event_proto",

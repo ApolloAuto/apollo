@@ -7,17 +7,17 @@ cc_library(
     srcs = [
         "decider_creep.cc",
         "decider_rule_based_stop.cc",
+        "path_bounds_decider.cc",
         "side_pass_path_decider.cc",
         "side_pass_safety.cc",
-        "path_bounds_decider.cc",
         "speed_bounds_decider.cc",
     ],
     hdrs = [
         "decider_creep.h",
         "decider_rule_based_stop.h",
+        "path_bounds_decider.h",
         "side_pass_path_decider.h",
         "side_pass_safety.h",
-        "path_bounds_decider.h",
         "speed_bounds_decider.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
@@ -31,8 +31,8 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/math/finite_element_qp:fem_1d_qp_problem",
         "//modules/planning/scenarios/util:util_lib",
-        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
         "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",
+        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
     ],
 )
 

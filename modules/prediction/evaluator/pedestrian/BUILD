@@ -11,8 +11,8 @@ cc_library(
         "pedestrian_interaction_evaluator.h",
     ],
     deps = [
-        "//modules/prediction/evaluator",
         "//modules/prediction/container:container_manager",
+        "//modules/prediction/evaluator",
     ],
 )
 
@@ -27,9 +27,9 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        ":pedestrian_interaction_evaluator",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
-        ":pedestrian_interaction_evaluator",
         "@gtest//:main",
     ],
 )

@@ -27,9 +27,9 @@ cc_library(
     deps = [
         ":st_point",
         "//cyber/common:log",
+        "//modules/planning/common:planning_gflags",
         "//modules/planning/proto:planning_proto",
         "@gtest",
-        "//modules/planning/common:planning_gflags",
     ],
 )
 

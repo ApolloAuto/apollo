@@ -25,9 +25,7 @@ namespace prediction {
 
 class PedestrianInteractionEvaluatorTest : public KMLMapBasedTest {
  public:
-  void SetUp() override {
-    return;
-  }
+  void SetUp() override { return; }
 
  protected:
   apollo::perception::PerceptionObstacles perception_obstacles_;

@@ -20,8 +20,8 @@ cc_library(
         ":lru_cache",
         ":message_util",
         ":points_downsampler",
-        ":string_util",
         ":string_tokenizer",
+        ":string_util",
         "//modules/common/math",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/time",
@@ -35,7 +35,7 @@ cc_library(
     ],
     hdrs = [
         "string_tokenizer.h",
-    ]
+    ],
 )
 
 cc_test(

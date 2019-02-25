@@ -26,9 +26,9 @@ cc_test(
         "//modules/prediction:prediction_testdata",
     ],
     deps = [
+        ":cyclist_keep_lane_evaluator",
         "//modules/prediction/common:kml_map_based_test",
         "//modules/prediction/container/obstacles:obstacles_container",
-        ":cyclist_keep_lane_evaluator",
         "@gtest//:main",
     ],
 )

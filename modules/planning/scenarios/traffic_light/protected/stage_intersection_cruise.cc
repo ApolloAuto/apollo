@@ -49,10 +49,11 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
   constexpr double kIntersectionLength = 2.0;  // unit: m
   const auto& reference_line_info = frame->reference_line_info().front();
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  const double distance_adc_pass_traffic_light = adc_back_edge_s -
+  const double distance_adc_pass_traffic_light =
+      adc_back_edge_s -
       PlanningContext::GetScenarioInfo()->next_pnc_junction_overlap.end_s;
   ADEBUG << "distance_adc_pass_traffic_light["
-      << distance_adc_pass_traffic_light << "]";
+         << distance_adc_pass_traffic_light << "]";
   if (distance_adc_pass_traffic_light >= kIntersectionLength) {
     return FinishStage();
   }

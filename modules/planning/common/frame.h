@@ -22,10 +22,10 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <memory>
 
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
