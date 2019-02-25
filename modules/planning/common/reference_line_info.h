@@ -206,6 +206,9 @@ class ReferenceLineInfo {
     return first_encounter_overlaps_;
   }
 
+  int GetPnCJunction(const double s,
+                     hdmap::PathOverlap* pnc_junction_overlap) const;
+
  private:
   bool CheckChangeLane() const;
 
