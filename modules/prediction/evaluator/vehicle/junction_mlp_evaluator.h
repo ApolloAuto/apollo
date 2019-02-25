@@ -100,8 +100,11 @@ class JunctionMLPEvaluator : public Evaluator {
       const std::vector<double>& feature_values);
 
  private:
+  // obstacle feature with 4 basic features and 5 frames of history posotion
   static const size_t OBSTACLE_FEATURE_SIZE = 4 + 2 * 5;
+  // ego vehicle feature of position and velocity
   static const size_t EGO_VEHICLE_FEATURE_SIZE = 4;
+  // junction feature on 12 fan area 8 dim each
   static const size_t JUNCTION_FEATURE_SIZE = 12 * 8;
 
   std::unique_ptr<FnnVehicleModel> model_ptr_;
