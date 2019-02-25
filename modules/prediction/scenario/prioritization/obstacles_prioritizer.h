@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <memory>
+#include <vector>
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
@@ -42,6 +43,18 @@ class ObstaclesPrioritizer {
 
   static void AssignCautionLevelInJunction(
       const std::shared_ptr<ScenarioFeatures> scenario_features);
+
+  static void AssignCautionLevelByEgoReferenceLine();
+
+  static void AssignCautionByMerge(
+      std::shared_ptr<const LaneInfo> lane_info_ptr);
+
+  static void AssignCautionByOverlap(
+      std::shared_ptr<const LaneInfo> lane_info_ptr);
+
+  static void SetCautionBackward(
+    std::shared_ptr<const LaneInfo> start_lane_info_ptr,
+    const double distance);
 };
 
 }  // namespace prediction
