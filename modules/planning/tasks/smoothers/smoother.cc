@@ -95,7 +95,8 @@ apollo::common::Status Smoother::Smooth(
     AWARN << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  const auto& previous_planning = previous_frame->last_planned_trajectory();
+  const auto& previous_planning =
+      previous_frame->current_frame_planned_trajectory();
   auto header = current_trajectory_pb->header();
   *current_trajectory_pb = previous_planning;
   current_trajectory_pb->mutable_header()->CopyFrom(header);
