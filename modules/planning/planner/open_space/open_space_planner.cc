@@ -189,7 +189,7 @@ void OpenSpacePlanner::LoadTrajectoryToFrame(Frame* frame) {
   trajectory_to_end_pb_.Clear();
   trajectory_to_end_pb_.mutable_trajectory_point()->CopyFrom(
       *(trajectory_to_end_.mutable_trajectory_point()));
-  frame->set_last_planned_trajectory(trajectory_to_end_pb_);
+  frame->set_current_frame_planned_trajectory(trajectory_to_end_pb_);
   frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
   *(frame->mutable_last_stitching_trajectory()) = stitching_trajectory_;
 }

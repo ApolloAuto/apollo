@@ -193,7 +193,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
     }
 
     FillPlanningPb(start_timestamp, ptr_trajectory_pb);
-    frame_->set_last_planned_trajectory(*ptr_trajectory_pb);
+    frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
     FrameHistory::Instance()->Add(n, std::move(frame_));
     return;
@@ -229,7 +229,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
   FillPlanningPb(start_timestamp, ptr_trajectory_pb);
   ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
 
-  frame_->set_last_planned_trajectory(*ptr_trajectory_pb);
+  frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
 
   const uint32_t n = frame_->SequenceNum();
   FrameHistory::Instance()->Add(n, std::move(frame_));
@@ -247,7 +247,8 @@ Status OpenSpacePlanning::Plan(
   Status trajectory_partition_status;
 
   if (status == Status::OK()) {
-    auto trajectory_after_stitching_point = frame_->last_planned_trajectory();
+    auto trajectory_after_stitching_point =
+        frame_->current_frame_planned_trajectory();
     last_stitching_trajectory_ = frame_->last_stitching_trajectory();
     trajectory_after_stitching_point.mutable_header()->set_timestamp_sec(
         current_time_stamp);
@@ -275,7 +276,8 @@ Status OpenSpacePlanning::Plan(
 
     last_publishable_trajectory_.reset(
         new PublishableTrajectory(trajectory_after_stitching_point));
-    frame_->set_last_planned_trajectory(trajectory_after_stitching_point);
+    frame_->set_current_frame_planned_trajectory(
+        trajectory_after_stitching_point);
 
     ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 

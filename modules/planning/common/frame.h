@@ -121,12 +121,14 @@ class Frame {
       const double planning_start_time,
       prediction::PredictionObstacles *prediction_obstacles);
 
-  void set_last_planned_trajectory(ADCTrajectory last_planned_trajectory) {
-    last_planned_trajectory_ = std::move(last_planned_trajectory);
+  void set_current_frame_planned_trajectory(
+      ADCTrajectory current_frame_planned_trajectory) {
+    current_frame_planned_trajectory_ =
+        std::move(current_frame_planned_trajectory);
   }
 
-  ADCTrajectory last_planned_trajectory() const {
-    return last_planned_trajectory_;
+  const ADCTrajectory &current_frame_planned_trajectory() const {
+    return current_frame_planned_trajectory_;
   }
 
   // TODO(Qi, Jinyun): check the usage in open space planner
@@ -205,7 +207,7 @@ class Frame {
 
   ThreadSafeIndexedObstacles obstacles_;
   ChangeLaneDecider change_lane_decider_;
-  ADCTrajectory last_planned_trajectory_;  // last published trajectory
+  ADCTrajectory current_frame_planned_trajectory_;  // last published trajectory
 
   // debug info for open space planner
   planning_internal::OpenSpaceDebug open_space_debug_;
