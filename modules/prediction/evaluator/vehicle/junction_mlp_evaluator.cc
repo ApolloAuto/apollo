@@ -202,7 +202,7 @@ void JunctionMLPEvaluator::SetObstacleFeatureValues(
   if (obstacle_ptr->history_size() > FLAGS_junction_historical_frame_length) {
     has_history = true;
     for (std::size_t i = 0; i < FLAGS_junction_historical_frame_length; ++i) {
-      const Feature& feature = obstacle_ptr->feature(i+1);
+      const Feature& feature = obstacle_ptr->feature(i + 1);
       if (!feature.IsInitialized()) {
         has_history = false;
         break;
