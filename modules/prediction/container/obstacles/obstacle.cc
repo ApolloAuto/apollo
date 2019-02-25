@@ -1218,6 +1218,8 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   std::unordered_set<std::string> existing_lane_ids;
   GetNeighborLaneSegments(
       center_lane_info, true, 5, &lane_ids_ordered_list, &existing_lane_ids);
+  lane_ids_ordered_list.push_back(feature->lane().lane_feature().lane_id());
+  existing_lane_ids.insert(feature->lane().lane_feature().lane_id());
   GetNeighborLaneSegments(
       center_lane_info, false, 5, &lane_ids_ordered_list, &existing_lane_ids);
 
