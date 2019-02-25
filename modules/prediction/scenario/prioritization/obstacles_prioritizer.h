@@ -47,13 +47,13 @@ class ObstaclesPrioritizer {
   static void AssignCautionLevelByEgoReferenceLine();
 
   static void AssignCautionByMerge(
-      std::shared_ptr<const LaneInfo> lane_info_ptr);
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
 
   static void AssignCautionByOverlap(
-      std::shared_ptr<const LaneInfo> lane_info_ptr);
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
 
   static void SetCautionBackward(
-    std::shared_ptr<const LaneInfo> start_lane_info_ptr,
+    std::shared_ptr<const hdmap::LaneInfo> start_lane_info_ptr,
     const double distance);
 };
 
