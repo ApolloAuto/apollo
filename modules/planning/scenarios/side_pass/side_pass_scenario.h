@@ -71,7 +71,6 @@ class SidePassScenario : public Scenario {
   std::vector<std::unique_ptr<Task>> tasks_;
   ScenarioConfig config_;
   bool stage_init_ = false;
-  std::string front_blocking_obstacle_id_;
 };
 
 }  // namespace side_pass

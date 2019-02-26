@@ -85,9 +85,7 @@ class Scenario {
   virtual void Init();
 
   const std::string& Name() const;
-  const std::string& GetMsg() const {
-    return msg_;
-  }
+  const std::string& GetMsg() const { return msg_; }
 
  protected:
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;

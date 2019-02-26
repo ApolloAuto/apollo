@@ -41,18 +41,19 @@ using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
 Stage::StageStatus
-    TrafficLightUnprotectedLeftTurnStageIntersectionCruise::Process(
+TrafficLightUnprotectedLeftTurnStageIntersectionCruise::Process(
 
-        const TrajectoryPoint& planning_init_point, Frame* frame) {
+    const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "TrafficLightUnprotectedLeftTurnStageIntersectionCruise "
-        << "plan error";
+           << "plan error";
   }
 
+  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
   // check if the traffic_light is still along reference_line
@@ -66,17 +67,19 @@ Stage::StageStatus
   // TODO(all): update when pnc-junction is ready
   constexpr double kIntersectionLength = 10.0;  // unit: m
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  const double distance_adc_pass_traffic_light = adc_back_edge_s -
+  const double distance_adc_pass_traffic_light =
+      adc_back_edge_s -
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s;
   if (distance_adc_pass_traffic_light > kIntersectionLength) {
     return FinishStage();
   }
+  */
 
   return Stage::RUNNING;
 }
 
 Stage::StageStatus
-    TrafficLightUnprotectedLeftTurnStageIntersectionCruise::FinishStage() {
+TrafficLightUnprotectedLeftTurnStageIntersectionCruise::FinishStage() {
   return FinishScenario();
 }
 

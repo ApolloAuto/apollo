@@ -30,12 +30,11 @@ bool RoutingComponent::Init() {
   apollo::cyber::proto::RoleAttributes attr;
   attr.set_channel_name(FLAGS_routing_response_topic);
   auto qos = attr.mutable_qos_profile();
-  qos->set_history(
-      apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
+  qos->set_history(apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos->set_reliability(
       apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
-  qos->set_durability(apollo::cyber::proto::QosDurabilityPolicy::
-                          DURABILITY_TRANSIENT_LOCAL);
+  qos->set_durability(
+      apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
   response_writer_ = node_->CreateWriter<RoutingResponse>(attr);
 
   apollo::cyber::proto::RoleAttributes attr_history;
@@ -45,12 +44,12 @@ bool RoutingComponent::Init() {
       apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos_history->set_reliability(
       apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
-  qos_history->set_durability(apollo::cyber::proto::QosDurabilityPolicy::
-                          DURABILITY_TRANSIENT_LOCAL);
+  qos_history->set_durability(
+      apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
 
   response_history_writer_ = node_->CreateWriter<RoutingResponse>(attr_history);
   std::weak_ptr<RoutingComponent> self =
-     std::dynamic_pointer_cast<RoutingComponent>(shared_from_this());
+      std::dynamic_pointer_cast<RoutingComponent>(shared_from_this());
   timer_.reset(new ::apollo::cyber::Timer(
       FLAGS_routing_response_history_interval_ms,
       [self, this]() {

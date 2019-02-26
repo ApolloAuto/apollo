@@ -52,12 +52,13 @@ Eigen::Matrix<T, N, N> PseudoInverse(const Eigen::Matrix<T, N, N> &m,
                                      const double epsilon = 1.0e-6) {
   Eigen::JacobiSVD<Eigen::Matrix<T, N, N>> svd(
       m, Eigen::ComputeFullU | Eigen::ComputeFullV);
-  return static_cast<Eigen::Matrix<T, N, N>>(svd.matrixV() *
-         (svd.singularValues().array().abs() > epsilon)
-             .select(svd.singularValues().array().inverse(), 0)
-             .matrix()
-             .asDiagonal() *
-         svd.matrixU().adjoint());
+  return static_cast<Eigen::Matrix<T, N, N>>(
+      svd.matrixV() *
+      (svd.singularValues().array().abs() > epsilon)
+          .select(svd.singularValues().array().inverse(), 0)
+          .matrix()
+          .asDiagonal() *
+      svd.matrixU().adjoint());
 }
 
 /**

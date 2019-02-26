@@ -20,6 +20,7 @@
 
 #include "modules/planning/common/path_decision.h"
 
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {
@@ -98,8 +99,9 @@ bool PathDecision::MergeWithMainStop(const ObjectStop &obj_stop,
   }
 
   // check stop_line_s vs adc_s, ignore if it is further way than main stop
-  const double kStopBuff = 1.0;
-  stop_line_s = std::fmax(stop_line_s, adc_sl_boundary.end_s() - kStopBuff);
+  const auto& vehicle_config = common::VehicleConfigHelper::GetConfig();
+  stop_line_s = std::fmax(stop_line_s, adc_sl_boundary.end_s() -
+      vehicle_config.vehicle_param().front_edge_to_center());
 
   if (stop_line_s >= stop_reference_line_s_) {
     ADEBUG << "stop point is farther than current main stop point.";

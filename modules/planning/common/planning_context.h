@@ -21,6 +21,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "cyber/common/macros.h"
@@ -49,15 +50,23 @@ class PlanningContext {
   // scenario context
   struct ScenarioInfo {
     apollo::hdmap::PathOverlap next_stop_sign_overlap;
-    apollo::hdmap::PathOverlap next_traffic_light_overlap;
-    apollo::perception::TrafficLight_Color traffic_light_color;
-    apollo::hdmap::PathOverlap next_crosswalk_overlap;
+    std::vector<apollo::hdmap::PathOverlap> next_traffic_light_overlaps;
+    std::unordered_map<std::string, const apollo::perception::TrafficLight*>
+        traffic_lights;
+
+    apollo::hdmap::PathOverlap next_pnc_junction_overlap;
+    std::unordered_map<std::string, const apollo::hdmap::PathOverlap*>
+        next_pnc_junction_overlaps;
+
     // still in the scenario for this overlap, but stop already done
     // => no stop fence from decider_rule_based_stop task
-    std::string stop_done_overlap_id;
+    std::vector<std::string> stop_done_overlap_ids;
+
     ProceedWithCautionSpeedParam proceed_with_caution_speed;
     std::vector<std::string> stop_sign_wait_for_obstacles;
     std::vector<std::string> crosswalk_wait_for_obstacles;
+    // TODO(all): to be removed when SidePass obstacle decision impl is done
+    std::string side_pass_front_blocking_obstacle_id;
   };
 
   static void Clear();

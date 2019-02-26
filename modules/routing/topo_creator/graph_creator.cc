@@ -30,15 +30,15 @@
 namespace apollo {
 namespace routing {
 
-using ::google::protobuf::RepeatedPtrField;
 using apollo::common::PointENU;
 using apollo::common::VehicleConfigHelper;
-using apollo::common::math::Vec2d;
 using apollo::common::math::kMathEpsilon;
+using apollo::common::math::Vec2d;
 using apollo::common::util::EndWith;
 using apollo::hdmap::Id;
 using apollo::hdmap::LaneBoundary;
 using apollo::hdmap::LaneBoundaryType;
+using ::google::protobuf::RepeatedPtrField;
 
 namespace {
 

@@ -57,16 +57,14 @@ Adseps113* Adseps113::set_ads_epsmode(
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 7,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
 void Adseps113::set_p_ads_epsmode(uint8_t* data,
-    Ads_eps_113::Ads_epsmodeType ads_epsmode) {
+                                  Ads_eps_113::Ads_epsmodeType ads_epsmode) {
   int x = ads_epsmode;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 6, 2);
 }
 
-
-Adseps113* Adseps113::set_ads_reqepstargetangle(
-    double ads_reqepstargetangle) {
+Adseps113* Adseps113::set_ads_reqepstargetangle(double ads_reqepstargetangle) {
   ads_reqepstargetangle_ = ads_reqepstargetangle;
   return this;
 }
@@ -76,9 +74,9 @@ Adseps113* Adseps113::set_ads_reqepstargetangle(
 // 'is_signed_var': False, 'physical_range': '[-800|838.3]', 'bit': 15,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': 'deg'}
 void Adseps113::set_p_ads_reqepstargetangle(uint8_t* data,
-    double ads_reqepstargetangle) {
-  ads_reqepstargetangle = ProtocolData::BoundedValue(-800.0, 838.3,
-                                                     ads_reqepstargetangle);
+                                            double ads_reqepstargetangle) {
+  ads_reqepstargetangle =
+      ProtocolData::BoundedValue(-800.0, 838.3, ads_reqepstargetangle);
   int x = static_cast<int>((ads_reqepstargetangle - -800.000000) / 0.100000);
   uint8_t t = 0;
 

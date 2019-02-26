@@ -49,7 +49,7 @@ void Scenario::Init() {
         << " has no config";
   }
   ADEBUG << "init stage "
-        << ScenarioConfig::StageType_Name(config_.stage_type(0));
+         << ScenarioConfig::StageType_Name(config_.stage_type(0));
   current_stage_ = CreateStage(*stage_config_map_[config_.stage_type(0)]);
 }
 

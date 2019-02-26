@@ -41,9 +41,9 @@ struct TrafficLightProtectedContext {
 
 class TrafficLightProtectedScenario : public Scenario {
  public:
-  explicit TrafficLightProtectedScenario(
-      const ScenarioConfig& config,
-      const ScenarioContext* context) : Scenario(config, context) {}
+  explicit TrafficLightProtectedScenario(const ScenarioConfig& config,
+                                         const ScenarioContext* context)
+      : Scenario(config, context) {}
 
   void Init() override;
 
@@ -58,7 +58,6 @@ class TrafficLightProtectedScenario : public Scenario {
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
-  bool IsProtected(const ReferenceLineInfo& reference_line_info) const;
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>

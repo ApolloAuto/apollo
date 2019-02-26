@@ -160,8 +160,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   // Step 8 : Formulate distance approach problem
   // solution from distance approach
   ADEBUG << "Start forming state warm start problem with configs setting : "
-    << planner_open_space_config_.\
-      dual_variable_warm_start_config().ShortDebugString();
+         << planner_open_space_config_.dual_variable_warm_start_config()
+                .ShortDebugString();
 
   // result for distance approach problem
   Eigen::MatrixXd l_warm_up;

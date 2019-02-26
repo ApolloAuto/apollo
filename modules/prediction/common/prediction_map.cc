@@ -29,11 +29,11 @@ namespace prediction {
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::LaneInfo;
 using apollo::hdmap::JunctionInfo;
-using apollo::hdmap::PNCJunctionInfo;
-using apollo::hdmap::OverlapInfo;
+using apollo::hdmap::LaneInfo;
 using apollo::hdmap::MapPathPoint;
+using apollo::hdmap::OverlapInfo;
+using apollo::hdmap::PNCJunctionInfo;
 
 bool PredictionMap::Ready() { return HDMapUtil::BaseMapPtr() != nullptr; }
 
@@ -78,8 +78,7 @@ std::shared_ptr<const OverlapInfo> PredictionMap::OverlapById(
 }
 
 bool PredictionMap::GetProjection(
-    const Eigen::Vector2d& pos,
-    const std::shared_ptr<const LaneInfo> lane_info,
+    const Eigen::Vector2d& pos, const std::shared_ptr<const LaneInfo> lane_info,
     double* s, double* l) {
   if (lane_info == nullptr) {
     return false;
@@ -204,8 +203,8 @@ void PredictionMap::OnLane(
 }
 
 std::shared_ptr<const LaneInfo> PredictionMap::GetMostLikelyCurrentLane(
-    const common::PointENU& position, const double radius,
-    const double heading, const double angle_diff_threshold) {
+    const common::PointENU& position, const double radius, const double heading,
+    const double angle_diff_threshold) {
   std::vector<std::shared_ptr<const LaneInfo>> candidate_lanes;
   if (HDMapUtil::BaseMap().GetLanesWithHeading(position, radius, heading,
                                                angle_diff_threshold,
@@ -219,9 +218,8 @@ std::shared_ptr<const LaneInfo> PredictionMap::GetMostLikelyCurrentLane(
       continue;
     }
     double distance = 0.0;
-    common::PointENU nearest_point =
-        candidate_lane->GetNearestPoint(
-            {position.x(), position.y()}, &distance);
+    common::PointENU nearest_point = candidate_lane->GetNearestPoint(
+        {position.x(), position.y()}, &distance);
     double nearest_point_heading = PathHeading(candidate_lane, nearest_point);
     double angle_diff =
         std::fabs(common::math::AngleDiff(heading, nearest_point_heading));
@@ -234,9 +232,7 @@ std::shared_ptr<const LaneInfo> PredictionMap::GetMostLikelyCurrentLane(
 }
 
 bool PredictionMap::IsProjectionApproximateWithinLane(
-    const Eigen::Vector2d& ego_position,
-    const std::string& lane_id) {
-
+    const Eigen::Vector2d& ego_position, const std::string& lane_id) {
   auto ptr_lane = LaneById(lane_id);
   const auto& lane_points = ptr_lane->points();
   if (lane_points.size() < 2) {
@@ -253,11 +249,10 @@ bool PredictionMap::IsProjectionApproximateWithinLane(
     return false;
   }
 
-  auto dist_vec = common::math::Vec2d(ego_position.x(), ego_position.y()) -
-      start_point;
+  auto dist_vec =
+      common::math::Vec2d(ego_position.x(), ego_position.y()) - start_point;
 
-  auto projection_length = dist_vec.InnerProd(lane_vec) /
-      approx_lane_length;
+  auto projection_length = dist_vec.InnerProd(lane_vec) / approx_lane_length;
 
   if (projection_length < 0.0 || projection_length > approx_lane_length) {
     return false;
@@ -293,8 +288,8 @@ std::vector<std::shared_ptr<const JunctionInfo>> PredictionMap::GetJunctions(
 }
 
 std::vector<std::shared_ptr<const PNCJunctionInfo>>
-PredictionMap::GetPNCJunctions(
-    const Eigen::Vector2d& point, const double radius) {
+PredictionMap::GetPNCJunctions(const Eigen::Vector2d& point,
+                               const double radius) {
   common::PointENU hdmap_point;
   hdmap_point.set_x(point.x());
   hdmap_point.set_y(point.y());

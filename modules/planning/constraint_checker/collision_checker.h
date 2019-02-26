@@ -44,8 +44,9 @@ class CollisionChecker {
   bool InCollision(const DiscretizedTrajectory& discretized_trajectory);
 
   static bool InCollision(const std::vector<const Obstacle*>& obstacles,
-      const DiscretizedTrajectory& ego_trajectory, const double ego_length,
-      const double ego_width, const double ego_edge_to_center);
+                          const DiscretizedTrajectory& ego_trajectory,
+                          const double ego_length, const double ego_width,
+                          const double ego_edge_to_center);
 
  private:
   void BuildPredictedEnvironment(

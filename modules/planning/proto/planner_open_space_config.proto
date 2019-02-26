@@ -2,6 +2,13 @@ syntax = "proto2";
 
 package apollo.planning;
 
+enum DualWarmUpMode {
+    IPOPT = 0;
+    IPOPTQP = 1;
+    OSQP = 2;
+    DEBUG = 3;
+}
+
 message PlannerOpenSpaceConfig {
   // Open Space ROIConfig
   optional ROIConfig roi_config = 1;
@@ -49,7 +56,8 @@ message DualVariableWarmStartConfig {
   // Dual variable Warm Start
   optional double weight_d = 1 [default = 1.0];
   optional IpoptConfig ipopt_config = 2;
-  optional bool qp_format = 3;
+  optional DualWarmUpMode qp_format = 3;
+  optional double min_safety_distance = 4 [default = 0.0];
 }
 
 message DistanceApproachConfig {

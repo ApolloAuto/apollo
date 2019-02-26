@@ -46,8 +46,7 @@ bool ValidationChecker::ValidCentripetalAcceleration(
   for (size_t i = 0; i + 1 < trajectory_points.size(); ++i) {
     const auto& p0 = trajectory_points[i];
     const auto& p1 = trajectory_points[i + 1];
-    double time_diff =
-        std::abs(p1.relative_time() - p0.relative_time());
+    double time_diff = std::abs(p1.relative_time() - p0.relative_time());
     if (time_diff < FLAGS_double_precision) {
       continue;
     }

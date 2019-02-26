@@ -16,15 +16,15 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace wey {
 
 class Adsreqvin390 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                         ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -41,8 +41,8 @@ class Adsreqvin390 : public ::apollo::drivers::canbus::ProtocolData<
   // 1.0, 'len': 8, 'is_signed_var': False, 'offset': 0.0, 'physical_range':
   // '[0|255]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  Adsreqvin390* set_req_vin_signal(Ads_req_vin_390::
-                                   Req_vin_signalType req_vin_signal);
+  Adsreqvin390* set_req_vin_signal(
+      Ads_req_vin_390::Req_vin_signalType req_vin_signal);
 
  private:
   // config detail: {'name': 'Req_VIN_Signal', 'enum': {0:
@@ -51,7 +51,7 @@ class Adsreqvin390 : public ::apollo::drivers::canbus::ProtocolData<
   // '[0|255]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
   void set_p_req_vin_signal(uint8_t* data,
-                        Ads_req_vin_390::Req_vin_signalType req_vin_signal);
+                            Ads_req_vin_390::Req_vin_signalType req_vin_signal);
 
  private:
   Ads_req_vin_390::Req_vin_signalType req_vin_signal_;

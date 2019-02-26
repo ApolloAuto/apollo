@@ -17,8 +17,8 @@
 #include <memory>
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/scenario/scenario_features/scenario_features.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
+#include "modules/prediction/scenario/scenario_features/scenario_features.h"
 
 namespace apollo {
 namespace prediction {
@@ -36,10 +36,12 @@ class ObstaclesPrioritizer {
       const EnvironmentFeatures& environment_features,
       const std::shared_ptr<ScenarioFeatures> scenario_features);
 
-  static void AssignIgnoreLevelForCruiseScenario(
-      const EnvironmentFeatures& environment_features,
-      const std::shared_ptr<CruiseScenarioFeatures> scenario_features,
-      ObstaclesContainer* ptr_obstacle_contrainer);
+  static void AssignCautionLevelCruiseKeepLane();
+
+  static void AssignCautionLevelCruiseChangeLane();
+
+  static void AssignCautionLevelInJunction(
+      const std::shared_ptr<ScenarioFeatures> scenario_features);
 };
 
 }  // namespace prediction

@@ -37,8 +37,6 @@
 #include "modules/perception/onboard/common_flags/common_flags.h"
 #include "modules/perception/onboard/component/camera_perception_viz_message.h"
 
-FILE *motion_history;
-
 namespace apollo {
 namespace perception {
 namespace onboard {
@@ -70,7 +68,7 @@ static bool SetCameraHeight(const std::string &sensor_name,
   float camera_offset = 0.0f;
   try {
     YAML::Node lidar_height =
-        YAML::LoadFile(params_dir + "/" + "velodyne64_height.yaml");
+        YAML::LoadFile(params_dir + "/" + "velodyne128_height.yaml");
     base_h = lidar_height["vehicle"]["parameters"]["height"].as<float>();
     AINFO << base_h;
     YAML::Node camera_ex =
@@ -210,24 +208,25 @@ bool LaneDetectionComponent::Init() {
   }
   SetCameraHeightAndPitch();
 
-  if (enable_visualization_) {
-    // Init visualizer
-    // TODO(techoe, yg13): homography from image to ground should be
-    // computed from camera height and pitch.
-    // Apply online calibration to adjust pitch/height automatically
-    // Temporary code is used here for test
-    double pitch_adj = -0.1;
-    // load in lidar to imu extrinsic
-    Eigen::Matrix4d ex_lidar2imu;
-    LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
-                       "velodyne128_novatel_extrinsics.yaml",
-                   &ex_lidar2imu);
-    ex_lidar2imu.block(0, 3, 3, 1) = -ex_lidar2imu.block(0, 3, 3, 1);
-    AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
+  // Init visualizer
+  // TODO(techoe, yg13): homography from image to ground should be
+  // computed from camera height and pitch.
+  // Apply online calibration to adjust pitch/height automatically
+  // Temporary code is used here for testing
+  double pitch_adj = -0.1;
+  // load in lidar to imu extrinsic
+  Eigen::Matrix4d ex_lidar2imu;
+  LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
+                  "velodyne128_novatel_extrinsics.yaml", &ex_lidar2imu);
+  AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
-    CHECK(visualize_.Init_all_info_single_camera(
-        visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj,
-        image_height_, image_width_));
+  CHECK(visualize_.Init_all_info_single_camera(
+      visual_camera_, intrinsic_map_, extrinsic_map_,
+      ex_lidar2imu, pitch_adj, image_height_, image_width_));
+  homography_im2car_ = visualize_.homography_im2car();
+  camera_lane_pipeline_->SetIm2CarHomography(homography_im2car_);
+
+  if (enable_visualization_) {
     if (write_visual_img_) {
       visualize_.write_out_img_ = true;
       visualize_.SetDirectory(visual_debug_folder_);

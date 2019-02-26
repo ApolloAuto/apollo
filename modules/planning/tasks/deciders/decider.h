@@ -34,6 +34,8 @@ class Decider : public Task {
   apollo::common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
+  apollo::common::Status Execute(Frame* frame) override;
+
  protected:
   virtual apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) = 0;

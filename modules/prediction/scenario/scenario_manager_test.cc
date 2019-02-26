@@ -23,9 +23,7 @@ using apollo::common::adapter::AdapterConfig;
 
 class ScenarioManagerTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    manager_ = ScenarioManager::Instance();
-  }
+  virtual void SetUp() { manager_ = ScenarioManager::Instance(); }
 
  protected:
   ScenarioManager* manager_ = nullptr;

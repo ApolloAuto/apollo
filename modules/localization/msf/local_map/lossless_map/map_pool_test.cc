@@ -28,9 +28,7 @@ class BaseMapPoolTestSuite : public ::testing::Test {
  protected:
   BaseMapPoolTestSuite() {}
   virtual ~BaseMapPoolTestSuite() {}
-  virtual void SetUp() {
-    apollo::cyber::Init("map_pool_test");
-  }
+  virtual void SetUp() { apollo::cyber::Init("map_pool_test"); }
   virtual void TearDown() {}
 };
 

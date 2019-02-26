@@ -61,7 +61,8 @@ class Planner {
    * @return OK if planning succeeds; error otherwise.
    */
   virtual apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point, Frame* frame) = 0;
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      ADCTrajectory* ptr_computed_trajectory) = 0;
 
   virtual void Stop() = 0;
 

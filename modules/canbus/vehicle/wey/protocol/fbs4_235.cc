@@ -31,19 +31,19 @@ Fbs4235::Fbs4235() {}
 const int32_t Fbs4235::ID = 0x235;
 
 void Fbs4235::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
+                    ChassisDetail* chassis) const {
   chassis->mutable_wey()->mutable_fbs4_235()->set_steerwheelangle(
-                                              steerwheelangle(bytes, length));
+      steerwheelangle(bytes, length));
   chassis->mutable_wey()->mutable_fbs4_235()->set_steerwheelspd(
-                                              steerwheelspd(bytes, length));
+      steerwheelspd(bytes, length));
 }
 
 // config detail: {'description': 'angle of steering wheel ',
 // 'offset': 0.0, 'precision': 0.1, 'len': 15, 'name': 'steerwheelangle',
 // 'is_signed_var': False, 'physical_range': '[0|780]', 'bit': 15,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': '\xa1\xe3'}
-double Fbs4235::steerwheelangle(
-                        const std::uint8_t* bytes, int32_t length) const {
+double Fbs4235::steerwheelangle(const std::uint8_t* bytes,
+                                int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 8);
 
@@ -60,8 +60,7 @@ double Fbs4235::steerwheelangle(
 // 'offset': 0.0, 'precision': 0.1, 'len': 15, 'name': 'steerwheelspd',
 // 'is_signed_var': False, 'physical_range': '[0|1016]', 'bit': 39,
 // 'type': 'double', 'order': 'motorola', 'physical_unit': '\xa1\xe3/s'}
-double Fbs4235::steerwheelspd(
-                       const std::uint8_t* bytes, int32_t length) const {
+double Fbs4235::steerwheelspd(const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 4);
   int32_t x = t0.get_byte(0, 8);
 

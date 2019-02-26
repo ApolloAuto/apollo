@@ -16,15 +16,15 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/time",
         "//modules/common/math",
         "//modules/common/monitor_log",
+        "//modules/common/time",
         "//modules/localization/common:localization_common",
-        "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
         "//modules/localization/msf/common/util:localization_msf_common_util",
-        "@glog//:glog",
-        "@eigen//:eigen",
-        "@pcl//:pcl",
+        "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
+        "@eigen",
+        "@glog",
+        "@pcl",
         "@yaml_cpp//:yaml",
     ],
 )
@@ -33,7 +33,7 @@ filegroup(
     name = "ndt_lidar_locator_test_data",
     srcs = glob([
         "ndt/test_data/**",
-    ])
+    ]),
 )
 
 cc_test(
@@ -44,8 +44,8 @@ cc_test(
     data = [":ndt_lidar_locator_test_data"],
     deps = [
         "//cyber",
-        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "//modules/localization/msf/common/io:localization_msf_common_io",
+        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@gtest//:main",
     ],
 )
@@ -58,8 +58,8 @@ cc_test(
     data = [":ndt_lidar_locator_test_data"],
     deps = [
         "//cyber",
-        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "//modules/localization/msf/common/io:localization_msf_common_io",
+        "//modules/localization/ndt/ndt_locator:ndt_lidar_locator",
         "@gtest//:main",
     ],
 )

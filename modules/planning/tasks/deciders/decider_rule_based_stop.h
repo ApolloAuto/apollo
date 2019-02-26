@@ -42,23 +42,16 @@ class DeciderRuleBasedStop : public Decider {
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-  void CheckCrosswalk(Frame* const frame,
-                      ReferenceLineInfo* const reference_line_info);
-
   void CheckStopSign(Frame* const frame,
-                ReferenceLineInfo* const reference_line_info);
+                     ReferenceLineInfo* const reference_line_info);
 
   void CheckTrafficLight(Frame* const frame,
-                    ReferenceLineInfo* const reference_line_info);
-  perception::TrafficLight ReadTrafficLight(
-      const Frame& frame,
-      const std::string& traffic_light_id);
+                         ReferenceLineInfo* const reference_line_info);
 
   bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info,
                          const std::string& stop_wall_id,
-                         const double stop_line_s,
-                         const double stop_distance,
+                         const double stop_line_s, const double stop_distance,
                          const StopReasonCode& stop_reason_code,
                          const std::vector<std::string>& wait_for_obstacles);
 

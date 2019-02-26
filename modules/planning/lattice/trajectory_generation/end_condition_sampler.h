@@ -44,15 +44,14 @@ struct SamplePoint {
 class EndConditionSampler {
  public:
   EndConditionSampler(
-      const std::array<double, 3>& init_s,
-      const std::array<double, 3>& init_d,
+      const std::array<double, 3>& init_s, const std::array<double, 3>& init_d,
       std::shared_ptr<PathTimeGraph> ptr_path_time_graph,
       std::shared_ptr<PredictionQuerier> ptr_prediction_querier);
 
   virtual ~EndConditionSampler() = default;
 
-  std::vector<std::pair<std::array<double, 3>, double>>
-  SampleLatEndConditions() const;
+  std::vector<std::pair<std::array<double, 3>, double>> SampleLatEndConditions()
+      const;
 
   std::vector<std::pair<std::array<double, 3>, double>>
   SampleLonEndConditionsForCruising(const double ref_cruise_speed) const;

@@ -52,8 +52,16 @@ DEFINE_string(scenario_traffic_light_unprotected_right_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_unprotected_right_turn_config.pb.txt",
               "scenario_traffic_light_unprotected_right_turn config file");
+DEFINE_string(scenario_valet_parking_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/valet_parking_config.pb.txt",
+              "scenario_valet_parking config file");
+DEFINE_string(scenario_narrow_street_u_turn_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/narrow_street_u_turn_config.pb.txt",
+              "scenario_narrow_street_u_turn config file");
 
-DEFINE_bool(enable_scenario_dispatcher, false,
+DEFINE_bool(enable_scenario_dispatcher, true,
             "enable dispatcher inside scenario manager to select scenario");
 
 DEFINE_bool(enable_scenario_side_pass, true,
@@ -492,4 +500,3 @@ DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 DEFINE_bool(enable_parallel_open_space_smoother, false,
             "True to enable open space smoother parallel implementation.");
-

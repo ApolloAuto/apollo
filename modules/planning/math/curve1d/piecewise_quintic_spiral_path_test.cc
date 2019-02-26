@@ -38,7 +38,7 @@ TEST(PiecewiseQuinticSpiralPath, Evaluate) {
   double dkappa1 = 0.0;
 
   QuinticSpiralPath path0(theta0, kappa0, dkappa0, theta1, kappa1, dkappa1,
-      delta_s0);
+                          delta_s0);
 
   double theta2 = 0.2;
   double kappa2 = 1.0;
@@ -46,7 +46,7 @@ TEST(PiecewiseQuinticSpiralPath, Evaluate) {
 
   double delta_s1 = 2.0;
   QuinticSpiralPath path1(theta1, kappa1, dkappa1, theta2, kappa2, dkappa2,
-      delta_s1);
+                          delta_s1);
 
   PiecewiseQuinticSpiralPath piecewise_path(theta0, kappa0, dkappa0);
   piecewise_path.Append(theta1, kappa1, dkappa1, delta_s0);
@@ -55,9 +55,9 @@ TEST(PiecewiseQuinticSpiralPath, Evaluate) {
   EXPECT_NEAR(delta_s0 + delta_s1, piecewise_path.ParamLength(), 1.0e-8);
   EXPECT_NEAR(path0.Evaluate(0, 0.0), piecewise_path.Evaluate(0, 0.0), 1.0e-8);
   EXPECT_NEAR(path1.Evaluate(0, 0.0), piecewise_path.Evaluate(0, delta_s0),
-      1.0e-8);
+              1.0e-8);
   EXPECT_NEAR(path1.Evaluate(0, path1.ParamLength()),
-      piecewise_path.Evaluate(0, piecewise_path.ParamLength()), 1.0e-8);
+              piecewise_path.Evaluate(0, piecewise_path.ParamLength()), 1.0e-8);
 }
 
 }  // namespace planning

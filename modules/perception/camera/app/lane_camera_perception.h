@@ -55,13 +55,15 @@ class LaneCameraPerception : public BaseCameraPerception {
       const std::map<std::string, float> name_camera_ground_height_map,
       const std::map<std::string, float> name_camera_pitch_angle_diff_map,
       const float &pitch_angle_calibrator_working_sensor);
-  bool GetCalibrationService(BaseCalibrationService **calibration_service);
+  void SetIm2CarHomography(Eigen::Matrix3d homography_im2car);
+  bool GetCalibrationService(BaseCalibrationService** calibration_service);
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
   std::string Name() const override { return "LaneCameraPerception"; }
 
  private:
   std::map<std::string, Eigen::Matrix3f> name_intrinsic_map_;
+  std::map<std::string, Eigen::Matrix4d> name_extrinsic_map_;
   std::shared_ptr<BaseLaneDetector> lane_detector_;
   std::shared_ptr<BaseLanePostprocessor> lane_postprocessor_;
   std::shared_ptr<BaseCalibrationService> calibration_service_;

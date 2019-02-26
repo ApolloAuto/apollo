@@ -85,8 +85,8 @@ class OpenSpacePlanner : public Planner {
    * @brief override function Plan in parent class Planner.
    */
   apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override {
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      ADCTrajectory* ptr_computed_trajectory) override {
     return Status::OK();
   }
 

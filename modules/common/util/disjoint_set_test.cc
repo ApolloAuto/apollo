@@ -16,8 +16,8 @@
 
 #include "modules/common/util/disjoint_set.h"
 
-#include "gtest/gtest.h"
 #include "cyber/common/log.h"
+#include "gtest/gtest.h"
 
 namespace apollo {
 namespace common {

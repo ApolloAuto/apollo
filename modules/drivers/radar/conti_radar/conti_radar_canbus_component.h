@@ -60,14 +60,14 @@ namespace conti_radar {
 using apollo::common::ErrorCode;
 // using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
+using apollo::cyber::Reader;
+using apollo::cyber::Writer;
 using apollo::drivers::canbus::CanClient;
 using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
 using apollo::localization::LocalizationEstimate;
-using apollo::cyber::Writer;
-using apollo::cyber::Reader;
 
 class ContiRadarCanbusComponent : public apollo::cyber::Component<> {
  public:
@@ -76,7 +76,7 @@ class ContiRadarCanbusComponent : public apollo::cyber::Component<> {
   bool Init() override;
 
  private:
-  bool OnError(const std::string &error_msg);
+  bool OnError(const std::string& error_msg);
   void RegisterCanClients();
   apollo::common::ErrorCode ConfigureRadar();
   bool Start();

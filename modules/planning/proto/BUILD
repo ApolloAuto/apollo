@@ -112,9 +112,6 @@ proto_library(
     srcs = [
         "dp_st_speed_config.proto",
     ],
-    deps = [
-        ":st_boundary_config_proto_lib",
-    ],
 )
 
 cc_proto_library(
@@ -192,15 +189,20 @@ proto_library(
         ":navi_obstacle_decider_config_proto_lib",
         ":navi_path_decider_config_proto_lib",
         ":navi_speed_decider_config_proto_lib",
+        ":open_space_fallback_decider_config_proto_lib",
+        ":open_space_roi_decider_config_proto_lib",
+        ":open_space_trajectory_provider_config_proto_lib",
         ":planner_open_space_config_proto_lib",
-        ":poly_st_speed_config_proto_lib",
-        ":poly_vt_speed_config_proto_lib",
+        # ":poly_vt_speed_config_proto_lib",
         ":proceed_with_caution_speed_config_proto_lib",
+        ":path_bound_decider_config_proto_lib",
+        ":piecewise_jerk_path_config_proto_lib",
         ":qp_piecewise_jerk_path_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
         ":qp_st_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
         ":side_pass_path_decider_config_proto_lib",
+        ":speed_bounds_decider_config_proto_lib",
     ],
 )
 
@@ -272,44 +274,24 @@ proto_library(
     srcs = [
         "qp_st_speed_config.proto",
     ],
-    deps = [
-        ":st_boundary_config_proto_lib",
-    ],
 )
 
-cc_proto_library(
-    name = "poly_st_speed_config_proto",
-    deps = [
-        ":poly_st_speed_config_proto_lib",
-    ],
-)
+# cc_proto_library(
+#     name = "poly_vt_speed_config_proto",
+#     deps = [
+#         ":poly_vt_speed_config_proto_lib",
+#     ],
+# )
 
-proto_library(
-    name = "poly_st_speed_config_proto_lib",
-    srcs = [
-        "poly_st_speed_config.proto",
-    ],
-    deps = [
-        ":st_boundary_config_proto_lib",
-    ],
-)
-
-cc_proto_library(
-    name = "poly_vt_speed_config_proto",
-    deps = [
-        ":poly_vt_speed_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "poly_vt_speed_config_proto_lib",
-    srcs = [
-        "poly_vt_speed_config.proto",
-    ],
-    deps = [
-        ":st_boundary_config_proto_lib",
-    ],
-)
+# proto_library(
+#     name = "poly_vt_speed_config_proto_lib",
+#     srcs = [
+#         "poly_vt_speed_config.proto",
+#     ],
+#     deps = [
+#         ":st_boundary_config_proto_lib",
+#     ],
+# )
 
 proto_library(
     name = "sl_boundary_proto_lib",
@@ -347,6 +329,34 @@ proto_library(
 )
 
 cc_proto_library(
+    name = "piecewise_jerk_path_config_proto",
+    deps = [
+        ":piecewise_jerk_path_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "piecewise_jerk_path_config_proto_lib",
+    srcs = [
+        "piecewise_jerk_path_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "path_bound_decider_config_proto",
+    deps = [
+        ":path_bound_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "path_bound_decider_config_proto_lib",
+    srcs = [
+        "path_bound_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
     name = "spiral_curve_config_proto",
     deps = [
         ":spiral_curve_config_proto_lib",
@@ -357,20 +367,6 @@ proto_library(
     name = "spiral_curve_config_proto_lib",
     srcs = [
         "spiral_curve_config.proto",
-    ],
-)
-
-cc_proto_library(
-    name = "st_boundary_config_proto",
-    deps = [
-        ":st_boundary_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "st_boundary_config_proto_lib",
-    srcs = [
-        "st_boundary_config.proto",
     ],
 )
 
@@ -500,6 +496,62 @@ cc_proto_library(
     name = "side_pass_path_decider_config_proto",
     deps = [
         ":side_pass_path_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "speed_bounds_decider_config_proto_lib",
+    srcs = [
+        "speed_bounds_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "speed_bounds_decider_config_proto",
+    deps = [
+        ":speed_bounds_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "open_space_fallback_decider_config_proto_lib",
+    srcs = [
+        "open_space_fallback_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "open_space_fallback_decider_config_proto",
+    deps = [
+        ":open_space_fallback_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "open_space_roi_decider_config_proto_lib",
+    srcs = [
+        "open_space_roi_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "open_space_roi_decider_config_proto",
+    deps = [
+        ":open_space_roi_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "open_space_trajectory_provider_config_proto_lib",
+    srcs = [
+        "open_space_trajectory_provider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "open_space_trajectory_provider_config_proto",
+    deps = [
+        ":open_space_trajectory_provider_config_proto_lib",
     ],
 )
 

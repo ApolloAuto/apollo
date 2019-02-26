@@ -48,8 +48,8 @@ static void FillHeader(const std::string& module_name, T* msg) {
   double timestamp = apollo::common::time::Clock::NowInSeconds();
   header->set_module_name(module_name);
   header->set_timestamp_sec(timestamp);
-  header->set_sequence_num(static_cast<unsigned int>(
-      sequence_num.fetch_add(1)));
+  header->set_sequence_num(
+      static_cast<unsigned int>(sequence_num.fetch_add(1)));
 }
 
 template <typename T, typename std::enable_if<

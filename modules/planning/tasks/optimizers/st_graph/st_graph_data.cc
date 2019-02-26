@@ -25,14 +25,21 @@ namespace planning {
 
 using apollo::common::TrajectoryPoint;
 
-StGraphData::StGraphData(const std::vector<const STBoundary*>& st_boundaries,
-                         const TrajectoryPoint& init_point,
-                         const SpeedLimit& speed_limit,
-                         const double path_data_length)
-    : st_boundaries_(st_boundaries),
-      init_point_(init_point),
-      speed_limit_(speed_limit),
-      path_data_length_(path_data_length) {}
+void StGraphData::LoadData(const std::vector<const STBoundary*>& st_boundaries,
+                           const TrajectoryPoint& init_point,
+                           const SpeedLimit& speed_limit,
+                           const double path_data_length,
+                           const double path_length_by_conf,
+                           const double total_time_by_conf,
+                           planning_internal::STGraphDebug* st_graph_debug) {
+  st_boundaries_ = st_boundaries;
+  init_point_ = init_point;
+  speed_limit_ = speed_limit;
+  path_data_length_ = path_data_length;
+  path_length_by_conf_ = path_length_by_conf;
+  total_time_by_conf_ = total_time_by_conf;
+  st_graph_debug_ = st_graph_debug;
+}
 
 const std::vector<const STBoundary*>& StGraphData::st_boundaries() const {
   return st_boundaries_;
@@ -42,7 +49,19 @@ const TrajectoryPoint& StGraphData::init_point() const { return init_point_; }
 
 const SpeedLimit& StGraphData::speed_limit() const { return speed_limit_; }
 
+double StGraphData::path_length() const {
+  return std::fmin(path_data_length_, path_length_by_conf_);
+}
+
 double StGraphData::path_data_length() const { return path_data_length_; }
+
+double StGraphData::path_length_by_conf() const { return path_length_by_conf_; }
+
+double StGraphData::total_time_by_conf() const { return total_time_by_conf_; }
+
+planning_internal::STGraphDebug* StGraphData::mutable_st_graph_debug() {
+  return st_graph_debug_;
+}
 
 }  // namespace planning
 }  // namespace apollo

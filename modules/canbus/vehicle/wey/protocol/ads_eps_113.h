@@ -16,15 +16,15 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
 namespace wey {
 
 class Adseps113 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                      ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 
@@ -55,8 +55,8 @@ class Adseps113 : public ::apollo::drivers::canbus::ProtocolData<
   // 'len': 2, 'name': 'ADS_EPSMode', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|3]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_ads_epsmode(uint8_t* data, Ads_eps_113::
-                                                Ads_epsmodeType ads_epsmode);
+  void set_p_ads_epsmode(uint8_t* data,
+                         Ads_eps_113::Ads_epsmodeType ads_epsmode);
 
   // config detail: {'description': 'Steering Wheel Target Angle',
   // 'offset': -800.0, 'precision': 0.1, 'len': 14, 'name':
@@ -73,4 +73,3 @@ class Adseps113 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace wey
 }  // namespace canbus
 }  // namespace apollo
-

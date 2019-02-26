@@ -24,16 +24,16 @@ namespace apollo {
 namespace planning {
 
 std::unique_ptr<Frame> FrameManager::CreateFrame(
-  const uint32_t sequence_num) const {
+    const uint32_t sequence_num) const {
   std::unique_ptr<Frame> frame(new Frame(sequence_num));
   return frame;
 }
 
 Frame* FrameManager::GetFrame(const uint32_t sequence_num) {
-  std::unordered_map<uint32_t, std::unique_ptr<Frame>>::const_iterator it
-        = frames_.find(sequence_num);
+  std::unordered_map<uint32_t, std::unique_ptr<Frame>>::const_iterator it =
+      frames_.find(sequence_num);
   if (it != frames_.end()) {
-      return it->second.get();
+    return it->second.get();
   }
   return nullptr;
 }
@@ -50,8 +50,8 @@ void FrameManager::SaveFrame(std::unique_ptr<Frame>* const frame) {
   CHECK_NOTNULL(frame->get());
   sequence_queue_.emplace_back((*frame)->SequenceNum());
   frames_[(*frame)->SequenceNum()] = std::move(*frame);
-  if (sequence_queue_.size()
-    > static_cast<size_t>(FLAGS_max_history_frame_num)) {
+  if (sequence_queue_.size() >
+      static_cast<size_t>(FLAGS_max_history_frame_num)) {
     frames_.erase(sequence_queue_.front());
     sequence_queue_.pop_front();
   }
@@ -66,4 +66,3 @@ void FrameManager::Clear() {
 
 }  // namespace planning
 }  // namespace apollo
-

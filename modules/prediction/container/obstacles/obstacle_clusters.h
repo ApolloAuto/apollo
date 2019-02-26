@@ -66,9 +66,9 @@ class ObstacleClusters {
    * @param the forward obstacle on lane
    * @return If the forward obstacle is found
    */
-  static bool ForwardNearbyObstacle(
-      const LaneSequence& lane_sequence, const double s,
-      LaneObstacle* const lane_obstacle);
+  static bool ForwardNearbyObstacle(const LaneSequence& lane_sequence,
+                                    const double s,
+                                    LaneObstacle* const lane_obstacle);
 
   /**
    * @brief Add an obstacle into clusters
@@ -77,11 +77,8 @@ class ObstacleClusters {
    * @param lane s
    * @param lane l
    */
-  static void AddObstacle(
-      const int obstacle_id,
-      const std::string& lane_id,
-      const double lane_s,
-      const double lane_l);
+  static void AddObstacle(const int obstacle_id, const std::string& lane_id,
+                          const double lane_s, const double lane_l);
 
   /**
    * @brief Sort lane obstacles by lane s
@@ -95,12 +92,11 @@ class ObstacleClusters {
    * @param the forward obstacle on lane
    * @return If the forward obstacle is found
    */
-  static bool ForwardNearbyObstacle(
-      const LaneSequence& lane_sequence,
-      const int obstacle_id,
-      const double obstacle_s,
-      const double obstacle_l,
-      NearbyObstacle* const nearby_obstacle_ptr);
+  static bool ForwardNearbyObstacle(const LaneSequence& lane_sequence,
+                                    const int obstacle_id,
+                                    const double obstacle_s,
+                                    const double obstacle_l,
+                                    NearbyObstacle* const nearby_obstacle_ptr);
 
   /**
    * @brief Get the backward nearest obstacle on lane sequence at s
@@ -109,12 +105,11 @@ class ObstacleClusters {
    * @param the forward obstacle on lane
    * @return If the backward obstacle is found
    */
-  static bool BackwardNearbyObstacle(
-    const LaneSequence& lane_sequence,
-    const int obstacle_id,
-    const double obstacle_s,
-    const double obstacle_l,
-    NearbyObstacle* const nearby_obstacle_ptr);
+  static bool BackwardNearbyObstacle(const LaneSequence& lane_sequence,
+                                     const int obstacle_id,
+                                     const double obstacle_s,
+                                     const double obstacle_l,
+                                     NearbyObstacle* const nearby_obstacle_ptr);
 
   /**
    * @brief Query stop sign by lane ID
@@ -130,8 +125,8 @@ class ObstacleClusters {
 
  private:
   static std::unordered_map<std::string, LaneGraph> lane_graphs_;
-  static std::unordered_map<std::string,
-                            std::vector<LaneObstacle>> lane_obstacles_;
+  static std::unordered_map<std::string, std::vector<LaneObstacle>>
+      lane_obstacles_;
   static std::unordered_map<std::string, StopSign> lane_id_stop_sign_map_;
 };
 

@@ -25,16 +25,14 @@ class ScenarioAnalyzerTest : public KMLMapBasedTest {};
 
 TEST_F(ScenarioAnalyzerTest, unknown) {
   EnvironmentFeatures environment_features;
-  auto ptr_scenario_features =
-      ScenarioAnalyzer::Analyze(environment_features);
+  auto ptr_scenario_features = ScenarioAnalyzer::Analyze(environment_features);
   EXPECT_EQ(ptr_scenario_features->scenario().type(), Scenario::UNKNOWN);
 }
 
 TEST_F(ScenarioAnalyzerTest, junction) {
   EnvironmentFeatures environment_features;
   environment_features.SetFrontJunction("1", 3.0);
-  auto ptr_scenario_features =
-      ScenarioAnalyzer::Analyze(environment_features);
+  auto ptr_scenario_features = ScenarioAnalyzer::Analyze(environment_features);
   EXPECT_EQ(ptr_scenario_features->scenario().type(), Scenario::JUNCTION);
 }
 

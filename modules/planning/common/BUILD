@@ -201,6 +201,7 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
+        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
         "@eigen",
     ],
 )
@@ -307,6 +308,7 @@ cc_library(
         ":indexed_queue",
         ":local_view",
         ":obstacle",
+        ":open_space_info",
         ":reference_line_info",
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
@@ -450,11 +452,33 @@ cc_library(
         "trajectory_stitcher.h",
     ],
     deps = [
-        "//modules/planning/common/trajectory:publishable_trajectory",
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
+    ],
+)
+
+cc_library(
+    name = "open_space_info",
+    srcs = [
+        "open_space_info.cc",
+    ],
+    hdrs = [
+        "open_space_info.h",
+    ],
+)
+
+cc_test(
+    name = "open_space_info_test",
+    size = "small",
+    srcs = [
+        "open_space_info_test.cc",
+    ],
+    deps = [
+        "open_space_info",
+        "@gtest//:main",
     ],
 )
 

@@ -263,8 +263,8 @@ void VisualizationEngine::Draw() {
 
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      subMat_[i]
-             [j].copyTo(big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
+      subMat_[i][j].copyTo(
+          big_window_(cv::Rect(j * 1024, i * 1024, 1024, 1024)));
     }
   }
 
@@ -498,9 +498,10 @@ void VisualizationEngine::DrawLegend() {
     unsigned char b = color_table[i % 3][0];
     unsigned char g = color_table[i % 3][1];
     unsigned char r = color_table[i % 3][2];
-    cv::circle(image_window_, cv::Point(755, (15 + textSize.height) * (i + 1) -
-                                                 textSize.height / 2),
-               8, cv::Scalar(b, g, r), 3);
+    cv::circle(
+        image_window_,
+        cv::Point(755, (15 + textSize.height) * (i + 1) - textSize.height / 2),
+        8, cv::Scalar(b, g, r), 3);
   }
 }
 
@@ -735,12 +736,10 @@ void VisualizationEngine::CloudToMat(const Eigen::Affine3d &cur_pose,
   unsigned int img_width = map_param_.map_node_size_x;
   unsigned int img_height = map_param_.map_node_size_y;
   Eigen::Vector3d cen = car_pose_.translation();
-  cloud_img_lt_coord_[0] = cen[0] -
-                           map_param_.map_resolutions[resolution_id_] *
-                               (static_cast<float>(img_width) / 2.0f);
-  cloud_img_lt_coord_[1] = cen[1] -
-                           map_param_.map_resolutions[resolution_id_] *
-                               (static_cast<float>(img_height) / 2.0f);
+  cloud_img_lt_coord_[0] = cen[0] - map_param_.map_resolutions[resolution_id_] *
+                                        (static_cast<float>(img_width) / 2.0f);
+  cloud_img_lt_coord_[1] = cen[1] - map_param_.map_resolutions[resolution_id_] *
+                                        (static_cast<float>(img_height) / 2.0f);
 
   cloud_img_.setTo(cv::Scalar(0, 0, 0));
   cloud_img_mask_.setTo(cv::Scalar(0));

@@ -51,9 +51,9 @@ class CyclistKeepLaneEvaluator : public Evaluator {
   void Evaluate(Obstacle* obstacle_ptr) override;
 
   /**
-    * @brief Get the name of evaluator.
-    */
-  std::string GetName() override {return "CYCLIST_KEEP_LANE_EVALUATOR";}
+   * @brief Get the name of evaluator.
+   */
+  std::string GetName() override { return "CYCLIST_KEEP_LANE_EVALUATOR"; }
 
  private:
   double ComputeProbability(const std::string& curr_lane_id,

@@ -96,8 +96,8 @@ class ObstaclesContainer : public Container {
 
   size_t NumOfObstacles() { return ptr_obstacles_.size(); }
 
-  const apollo::perception::PerceptionObstacle&
-  GetPerceptionObstacle(const int id);
+  const apollo::perception::PerceptionObstacle& GetPerceptionObstacle(
+      const int id);
 
   /**
    * @brief Get predictable obstacle IDs in the current frame
@@ -128,7 +128,7 @@ class ObstaclesContainer : public Container {
    * @return True if the perception_obstacle is this obstacle; otherwise false;
    */
   bool AdaptTracking(const perception::PerceptionObstacle& perception_obstacle,
-                      Obstacle* obstacle_ptr);
+                     Obstacle* obstacle_ptr);
 
   /**
    * @brief Check if an obstacle is predictable

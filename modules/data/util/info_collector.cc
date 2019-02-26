@@ -58,7 +58,7 @@ InfoCollector::InfoCollector() {
   CHECK(GetProtoFromASCIIFile(FLAGS_static_info_conf_file, &config_));
 }
 
-void InfoCollector::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
+void InfoCollector::Init(const std::shared_ptr<apollo::cyber::Node> &node) {
   Instance()->routing_request_reader_ =
       node->CreateReader<apollo::routing::RoutingRequest>(
           FLAGS_routing_request_topic);

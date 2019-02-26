@@ -33,7 +33,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/math/finite_element_qp/fem_1d_jerk_qp_problem.h"
+#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
@@ -56,9 +56,9 @@ class SidePassPathDecider : public Decider {
   bool DecideSidePassDirection(const std::vector<bool>& can_side_pass,
                                size_t left_length, size_t right_length);
 
-  bool GetLaneInfoFromPoint(
-    double point_x, double point_y, double point_z, double point_theta,
-    hdmap::LaneInfoConstPtr* const lane);
+  bool GetLaneInfoFromPoint(double point_x, double point_y, double point_z,
+                            double point_theta,
+                            hdmap::LaneInfoConstPtr* const lane);
 
   bool GeneratePath(Frame* const frame,
                     ReferenceLineInfo* const reference_line_info);
@@ -81,7 +81,7 @@ class SidePassPathDecider : public Decider {
  private:
   common::TrajectoryPoint adc_planning_start_point_;
   common::FrenetFramePoint adc_frenet_frame_point_;
-  std::unique_ptr<Fem1dQpProblem> fem_qp_;
+  std::unique_ptr<Fem1dQpProblem> fem_qp_ = nullptr;
   SidePassDirection decided_direction_ = SidePassDirection::LEFT;
   double delta_s_ = 0.0;
   double total_path_length_ = 0.0;

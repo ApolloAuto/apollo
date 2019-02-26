@@ -29,12 +29,11 @@
 #include "modules/control/proto/control_cmd.pb.h"
 
 #include "cyber/common/log.h"
+#include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/message_util.h"
-#include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/canbus/vehicle/vehicle_controller.h"
-
 
 // gflags
 DEFINE_double(throttle_inc_delta, 2.0,
@@ -43,9 +42,9 @@ DEFINE_double(brake_inc_delta, 2.0, "brake pedal delta percentage");
 DEFINE_double(steer_inc_delta, 2.0, "steer delta percentage");
 // TODO(ALL) : switch the acceleration cmd or pedal cmd
 // default : use pedal cmd
-DEFINE_bool(use_acceleration, false,
-       "switch to use acceleration instead of throttle pedal and brake pedal");
-
+DEFINE_bool(
+    use_acceleration, false,
+    "switch to use acceleration instead of throttle pedal and brake pedal");
 
 namespace {
 
@@ -145,9 +144,9 @@ class Teleop {
     PadMessage pad_msg;
     ControlCommand &control_command_ = control_command();
     apollo::common::VehicleParam vehicle_params_;
-    vehicle_params_.CopyFrom(
-        apollo::common::VehicleConfigHelper::Instance()->
-              GetConfig().vehicle_param());
+    vehicle_params_.CopyFrom(apollo::common::VehicleConfigHelper::Instance()
+                                 ->GetConfig()
+                                 .vehicle_param());
 
     // get the console in raw mode
     tcgetattr(kfd_, &cooked_);
@@ -172,9 +171,9 @@ class Teleop {
         case KEYCODE_UP1:  // accelerate
         case KEYCODE_UP2:
           if (!FLAGS_use_acceleration) {
-              brake = control_command_.brake();
-              throttle = control_command_.throttle();
-            }
+            brake = control_command_.brake();
+            throttle = control_command_.throttle();
+          }
           if (brake > 1e-6) {
             brake = GetCommand(brake, -FLAGS_brake_inc_delta);
             if (!FLAGS_use_acceleration) {
@@ -202,9 +201,9 @@ class Teleop {
         case KEYCODE_DN1:  // decelerate
         case KEYCODE_DN2:
           if (!FLAGS_use_acceleration) {
-              brake = control_command_.brake();
-              throttle = control_command_.throttle();
-            }
+            brake = control_command_.brake();
+            throttle = control_command_.throttle();
+          }
           if (throttle > 1e-6) {
             throttle = GetCommand(throttle, -FLAGS_throttle_inc_delta);
             if (!FLAGS_use_acceleration) {
