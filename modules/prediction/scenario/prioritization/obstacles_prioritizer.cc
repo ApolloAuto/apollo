@@ -19,7 +19,11 @@
 #include <algorithm>
 #include <limits>
 #include <memory>
+#include <queue>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
 
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_map.h"
@@ -37,6 +41,7 @@ using common::math::Box2d;
 using common::math::Vec2d;
 using hdmap::LaneInfo;
 using hdmap::OverlapInfo;
+using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
 namespace {
 
@@ -344,7 +349,49 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
 void ObstaclesPrioritizer::SetCautionBackward(
     std::shared_ptr<const LaneInfo> start_lane_info_ptr,
     const double distance) {
-  // TODO(all) implement
+  ObstaclesContainer* obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  std::unordered_map<std::string, std::vector<LaneObstacle>> lane_obstacles =
+      ObstacleClusters::GetLaneObstacles();
+  int max_search_level = 4;
+  std::queue<std::pair<ConstLaneInfoPtr, int>> lane_info_queue;
+  lane_info_queue.emplace(start_lane_info_ptr, 0);
+  while (!lane_info_queue.empty()) {
+    ConstLaneInfoPtr curr_lane = lane_info_queue.front().first;
+    int level = lane_info_queue.front().second;
+    lane_info_queue.pop();
+    const std::string& lane_id = curr_lane->id().id();
+    std::unordered_set<std::string> visited_lanes;
+    if (visited_lanes.find(lane_id) == visited_lanes.end() &&
+        lane_obstacles.find(lane_id) != lane_obstacles.end() &&
+        !lane_obstacles[lane_id].empty()) {
+      visited_lanes.insert(lane_id);
+      // find the obstacle with largest lane_s on the lane
+      int obstacle_id = lane_obstacles[lane_id].front().obstacle_id();
+      double obstacle_s = lane_obstacles[lane_id].front().lane_s();
+      for (const LaneObstacle& lane_obstacle : lane_obstacles[lane_id]) {
+        if (lane_obstacle.lane_s() > obstacle_s) {
+          obstacle_id = lane_obstacle.obstacle_id();
+          obstacle_s = lane_obstacle.lane_s();
+        }
+      }
+      Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+      if (obstacle_ptr == nullptr) {
+        AERROR << "Obstacle [" << obstacle_id << "] Not found";
+        continue;
+      }
+      obstacle_ptr->SetCaution();
+      continue;
+    }
+    if (level >= max_search_level) {
+      continue;
+    }
+    for (const auto& pre_lane_id : curr_lane->lane().predecessor_id()) {
+      ConstLaneInfoPtr pre_lane_ptr = PredictionMap::LaneById(pre_lane_id.id());
+      lane_info_queue.emplace(pre_lane_ptr, level + 1);
+    }
+  }
 }
 
 }  // namespace prediction
