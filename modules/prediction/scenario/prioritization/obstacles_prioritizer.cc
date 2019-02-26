@@ -36,6 +36,7 @@ using common::adapter::AdapterConfig;
 using common::math::Box2d;
 using common::math::Vec2d;
 using hdmap::LaneInfo;
+using hdmap::OverlapInfo;
 
 namespace {
 
@@ -318,12 +319,26 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
 
 void ObstaclesPrioritizer::AssignCautionByMerge(
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
-  // TODO(all) implement
+  SetCautionBackward(lane_info_ptr, 40.0);
 }
 
 void ObstaclesPrioritizer::AssignCautionByOverlap(
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
-  // TODO(all) implement
+  std::string lane_id = lane_info_ptr->id().id();
+  const std::vector<std::shared_ptr<const OverlapInfo>> cross_lanes_ =
+      lane_info_ptr->cross_lanes();
+  for (const auto overlap_ptr : cross_lanes_) {
+    for (const auto &object : overlap_ptr->overlap().object()) {
+      const auto &object_id = object.id().id();
+      if (object_id == lane_info_ptr->id().id()) {
+        continue;
+      } else {
+        std::shared_ptr<const LaneInfo> overlap_lane_ptr =
+            PredictionMap::LaneById(object_id);
+        SetCautionBackward(overlap_lane_ptr, 20.0);
+      }
+    }
+  }
 }
 
 void ObstaclesPrioritizer::SetCautionBackward(
