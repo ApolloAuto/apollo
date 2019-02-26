@@ -44,7 +44,7 @@ def verify():
     sec_package = os.environ['HOME'] + '/.cache/sec_apollo_release.tar.gz'
     orig_package = os.environ['HOME'] + '/.cache/apollo_release.tar.gz'
     ret = sec_api.sec_upgrade_verify_package(auth_token, sec_package,
-                                            orig_package)
+                                             orig_package)
     if ret is True:
         print('Verify package successfully!')
         sys.exit(0)
