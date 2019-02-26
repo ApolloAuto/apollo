@@ -1,4 +1,5 @@
 load("//tools:cpplint.bzl", "cpplint")
+load("//tools:cuda_library.bzl", "cuda_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -107,9 +108,11 @@ cc_library(
 cc_library(
     name = "distance_approach_ipopt_interface",
     srcs = [
+        ":planning_block",
         "distance_approach_ipopt_interface.cc",
     ],
     hdrs = [
+        "planning_block.h",
         "distance_approach_ipopt_interface.h",
     ],
     copts = [
@@ -127,6 +130,19 @@ cc_library(
         "@adolc",
         "@eigen",
         "@ipopt",
+    ],
+)
+
+cuda_library(
+    name = "planning_block",
+    srcs = [
+        "planning_block.cu",
+    ],
+    hdrs = [
+        "planning_block.h",
+    ],
+    deps = [
+        "@cuda",
     ],
 )
 
