@@ -58,6 +58,9 @@ class PathBoundsDecider : public Decider {
   SortObstaclesForSweepLine(
       const IndexedList<std::string, Obstacle>& indexed_obstacles);
 
+  void PathBoundsDebugString(
+      const std::vector<std::tuple<double, double, double>>& path_boundaries);
+
  private:
   double adc_frenet_s_ = 0.0;
   double adc_frenet_l_ = 0.0;
