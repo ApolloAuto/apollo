@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/common/configs/config_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/common/vehicle_model/vehicle_model.h"
+
+#include "cyber/common/file.h"
+#include "modules/common/configs/config_gflags.h"
 
 namespace apollo {
 namespace common {
+
 void VehicleModel::RearCenteredKinematicBicycleModel(
     const VehicleModelConfig& vehicle_model_config,
     const VehicleParam& vehicle_param, const double predicted_time_horizon,
@@ -27,11 +29,13 @@ void VehicleModel::RearCenteredKinematicBicycleModel(
     VehicleState* predicted_vehicle_state) {
   // Kinematic bicycle model centered at rear axis center by Euler forward
   // discretization
+  // Assume constant control command and constant z axis position
   CHECK_GT(predicted_time_horizon, 0.0);
   double dt = vehicle_model_config.rc_kinematic_bicycle_model().dt();
   double wheel_base = vehicle_param.wheel_base();
   double cur_x = cur_vehicle_state.x();
   double cur_y = cur_vehicle_state.y();
+  double cur_z = cur_vehicle_state.z();
   double cur_phi = cur_vehicle_state.heading();
   double cur_v = cur_vehicle_state.linear_velocity();
   double cur_steer = std::atan(cur_vehicle_state.kappa() * wheel_base);
@@ -46,9 +50,10 @@ void VehicleModel::RearCenteredKinematicBicycleModel(
 
   double countdown_time = predicted_time_horizon;
   bool finish_flag = false;
-  while (countdown_time > 0.0 && !finish_flag) {
+  constexpr double kepsilon = 1e-8;
+  while (countdown_time > kepsilon && !finish_flag) {
     countdown_time -= dt;
-    if (countdown_time < 0.0) {
+    if (countdown_time < kepsilon) {
       dt = countdown_time + dt;
       finish_flag = true;
     }
@@ -71,7 +76,7 @@ void VehicleModel::RearCenteredKinematicBicycleModel(
 
   predicted_vehicle_state->set_x(next_x);
   predicted_vehicle_state->set_y(next_y);
-  predicted_vehicle_state->set_z(0.0);
+  predicted_vehicle_state->set_z(cur_z);
   predicted_vehicle_state->set_heading(next_phi);
   predicted_vehicle_state->set_kappa(cur_vehicle_state.kappa());
   predicted_vehicle_state->set_linear_velocity(next_v);
@@ -86,7 +91,7 @@ VehicleState VehicleModel::Predict(const double predicted_time_horizon,
   const VehicleParam& vehicle_param =
       VehicleConfigHelper::GetConfig().vehicle_param();
 
-  CHECK(apollo::common::util::GetProtoFromFile(
+  CHECK(cyber::common::GetProtoFromFile(
       FLAGS_vehicle_model_config_filename, &vehicle_model_config))
       << "Failed to load vehicle model config file "
       << FLAGS_vehicle_model_config_filename;
