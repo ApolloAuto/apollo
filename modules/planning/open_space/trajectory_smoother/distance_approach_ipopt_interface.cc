@@ -18,6 +18,7 @@
  * @file
  */
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
+#include "modules/planning/open_space/trajectory_smoother/planning_block.h"
 
 namespace apollo {
 namespace planning {
@@ -2288,23 +2289,30 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
 
-    for (int idx = 0; idx < nnz_L; idx++) {
-      iRow[idx] = rind_L[idx];
-      jCol[idx] = cind_L[idx];
+    if (!fill_lower_left(iRow, jCol, rind_L, cind_L, nnz_L)) {
+        // use CPU if Cuda initialize failed
+        for (int idx = 0; idx < nnz_L; idx++) {
+          iRow[idx] = rind_L[idx];
+          jCol[idx] = cind_L[idx];
+        }
     }
   } else {
     // return the values. This is a symmetric matrix, fill the lower left
     // triangle only
 
     obj_lam[0] = obj_factor;
-    for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
+    if (!data_transfer(&obj_lam[1], lambda, m)) {
+        for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
+    }
 
     set_param_vec(tag_L, m + 1, obj_lam);
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
                 &hessval, options_L);
 
-    for (int idx = 0; idx < nnz_L; idx++) {
-      values[idx] = hessval[idx];
+    if (!data_transfer(values, hessval, nnz_L)) {
+      for (int idx = 0; idx < nnz_L; idx++) {
+        values[idx] = hessval[idx];
+      }
     }
   }
 
