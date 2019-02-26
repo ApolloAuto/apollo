@@ -123,7 +123,7 @@ class RtkPlayer(object):
         """
         New message received
         """
-        if self.terminating == True:
+        if self.terminating is True:
             self.logger.info("terminating when receive padmsg")
             return
 
