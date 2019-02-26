@@ -1,5 +1,5 @@
 model_type: REAR_CENTERED_KINEMATIC_BICYCLE_MODEL
 
 rc_kinematic_bicycle_model: {
-    dt: 0.05
+    dt: 0.06
 }
