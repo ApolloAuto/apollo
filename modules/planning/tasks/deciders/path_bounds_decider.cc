@@ -62,6 +62,8 @@ Status PathBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  // PathBoundsDebugString(path_boundaries);
+
   // 1. Decide a rough boundary based on road info and ADC's position
   if (!GetBoundariesFromRoadsAndADC(reference_line_info->reference_line(),
                                     reference_line_info->AdcSlBoundary(),
@@ -72,6 +74,8 @@ Status PathBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  // PathBoundsDebugString(path_boundaries);
+
   // 2. Fine-tune the boundary based on static obstacles
   // TODO(all): in the future, add side-pass functionality.
   if (!GetBoundariesFromStaticObstacles(
@@ -83,6 +87,7 @@ Status PathBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
+  PathBoundsDebugString(path_boundaries);
 
   // Update the path boundary info to the frame.
   if (path_boundaries.empty()) {
@@ -167,19 +172,28 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
     }
     // Calculate the proper boundary based on lane-width, road-width, and
     // ADC's position.
+    /*
+    ADEBUG << "At s = " << std::get<0>((*path_boundaries)[i])
+           << ", lane_left_W = " << curr_lane_left_width
+           << ", lane_right_W = " << curr_lane_right_width
+           << ", road_left_W = " << curr_road_left_width
+           << ", road_right_W = " << curr_road_right_width
+           << ", ADC W = " << GetBufferBetweenADCCenterAndEdge();
+    */
+
     double curr_left_bound =
-        std::fmax(-curr_road_left_width,
-                  std::fmin(-curr_lane_left_width, adc_sl_boundary.start_l()));
+        std::fmin(curr_road_left_width,
+                  std::fmax(curr_lane_left_width, adc_sl_boundary.end_l()));
     double curr_right_bound =
-        std::fmin(curr_road_right_width,
-                  std::fmax(curr_lane_right_width, adc_sl_boundary.end_l()));
+        std::fmax(-curr_road_right_width,
+                  std::fmin(-curr_lane_right_width, adc_sl_boundary.start_l()));
     // Update the boundary.
     std::get<1>((*path_boundaries)[i]) =
         std::fmax(std::get<1>((*path_boundaries)[i]),
-                  curr_left_bound + GetBufferBetweenADCCenterAndEdge());
+                  curr_right_bound + GetBufferBetweenADCCenterAndEdge());
     std::get<2>((*path_boundaries)[i]) =
         std::fmin(std::get<2>((*path_boundaries)[i]),
-                  curr_right_bound - GetBufferBetweenADCCenterAndEdge());
+                  curr_left_bound - GetBufferBetweenADCCenterAndEdge());
   }
 
   return true;
@@ -244,10 +258,10 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
         // Update the bounds and center_line.
         std::get<1>((*path_boundaries)[i]) = std::fmax(
             std::get<1>((*path_boundaries)[i]),
-            *left_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
+            *right_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
         std::get<2>((*path_boundaries)[i]) = std::fmin(
             std::get<2>((*path_boundaries)[i]),
-            *right_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
+            *left_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
         if (std::get<1>((*path_boundaries)[i]) >
             std::get<2>((*path_boundaries)[i])) {
           ADEBUG << "Path is blocked at s = " << curr_s;
@@ -268,10 +282,10 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
       // If no obstacle change, update the bounds and center_line.
       std::get<1>((*path_boundaries)[i]) =
           std::fmax(std::get<1>((*path_boundaries)[i]),
-                    *left_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
+                    *right_bounds.begin() + GetBufferBetweenADCCenterAndEdge());
       std::get<2>((*path_boundaries)[i]) =
           std::fmin(std::get<2>((*path_boundaries)[i]),
-                    *right_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
+                    *left_bounds.begin() - GetBufferBetweenADCCenterAndEdge());
       if (std::get<1>((*path_boundaries)[i]) >
           std::get<2>((*path_boundaries)[i])) {
         ADEBUG << "Path is blocked at s = " << curr_s;
@@ -313,7 +327,7 @@ double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   // TODO(all): currently it's a fixed number. But it can take into account many
   // factors such as: ADC length, possible turning angle, speed, etc.
-  constexpr double kAdcEdgeBuffer = 0.5;
+  constexpr double kAdcEdgeBuffer = 0.2;
 
   return (adc_half_width + kAdcEdgeBuffer);
 }
@@ -364,6 +378,15 @@ PathBoundsDecider::SortObstaclesForSweepLine(
        });
 
   return sorted_obstacles;
+}
+
+void PathBoundsDecider::PathBoundsDebugString(
+      const std::vector<std::tuple<double, double, double>>& path_boundaries) {
+  for (size_t i = 0; i < path_boundaries.size(); ++i) {
+    ADEBUG << "s = " << std::get<0>(path_boundaries[i])
+           << "; l_min = " << std::get<1>(path_boundaries[i])
+           << "; l_max = " << std::get<2>(path_boundaries[i]);
+  }
 }
 
 }  // namespace planning
