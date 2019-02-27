@@ -11,5 +11,6 @@ This is the Python API reference of the tf2 package.
 Indices and tables
 ==================
 
+
 * :ref:`genindex`
 * :ref:`search`

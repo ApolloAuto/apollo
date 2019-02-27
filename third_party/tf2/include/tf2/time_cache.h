@@ -39,11 +39,15 @@
 
 #include <sstream>
 
+// #include <ros/message_forward.h>
+// #include <ros/time.h>
 
 #include <boost/shared_ptr.hpp>
 
-
-
+// namespace geometry_msgs {
+// ROS_DECLARE_MESSAGE(TransformStamped);
+// }
+//
 namespace tf2
 {
 

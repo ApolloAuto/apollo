@@ -35,7 +35,7 @@
 
 #include <tf2/transform_datatypes.h>
 #include <tf2/exceptions.h>
-#include <tf2/transform_stamped.h>
+#include <geometry_msgs/transform_stamped.h>
 #include <tf2/impl/convert.h>
 #include <tf2/time.h>
 
