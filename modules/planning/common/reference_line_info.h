@@ -170,6 +170,14 @@ class ReferenceLineInfo {
     path_boundaries_s_resolution_ = resolution_s;
   }
 
+  std::string GetBlockingObstacleId() const {
+    return blocking_obstacle_id_;
+  }
+
+  void SetBlockingObstacleId(const std::string& blocking_obstacle_id) {
+    blocking_obstacle_id_ = blocking_obstacle_id;
+  }
+
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
 
   void InitFirstOverlaps();
@@ -253,6 +261,7 @@ class ReferenceLineInfo {
   std::vector<std::pair<double, double>> path_boundaries_;
   double path_boundaries_s_start_ = 0.0;
   double path_boundaries_s_resolution_ = 0.1;
+  std::string blocking_obstacle_id_ = "";
 
   PathData path_data_;
   SpeedData speed_data_;
