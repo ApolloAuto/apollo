@@ -140,7 +140,7 @@ void SignalLight::MakeDecisions(Frame* const frame,
 
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
         signal_light_debug->add_signal();
-    signal_debug->set_adc_stop_deacceleration(stop_deceleration);
+    signal_debug->set_adc_stop_deceleration(stop_deceleration);
     signal_debug->set_color(signal.color());
     signal_debug->set_light_id(signal_light.object_id);
     signal_debug->set_light_stop_s(signal_light.start_s);
@@ -154,7 +154,7 @@ void SignalLight::MakeDecisions(Frame* const frame,
          stop_deceleration < config_.signal_light().max_stop_deceleration()) ||
         (signal.color() == TrafficLight::YELLOW &&
          stop_deceleration <
-             config_.signal_light().max_stop_deacceleration_yellow_light())) {
+             config_.signal_light().max_stop_deceleration_yellow_light())) {
       if (config_.signal_light().righ_turn_creep().enabled() &&
           reference_line_info->GetPathTurnType() == hdmap::Lane::RIGHT_TURN) {
         SetCreepForwardSignalDecision(reference_line_info, &signal_light);
