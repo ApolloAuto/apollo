@@ -37,6 +37,12 @@ class ObstaclesPrioritizer {
       const EnvironmentFeatures& environment_features,
       const std::shared_ptr<ScenarioFeatures> scenario_features);
 
+  static void AssignCautionLevel(
+      const std::shared_ptr<ScenarioFeatures> scenario_features);
+
+  static void AssignCautionLevelInCruise(
+      const std::shared_ptr<ScenarioFeatures> scenario_features);
+
   static void AssignCautionLevelCruiseKeepLane();
 
   static void AssignCautionLevelCruiseChangeLane();
