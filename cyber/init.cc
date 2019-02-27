@@ -44,7 +44,7 @@ namespace {
 bool g_atexit_registered = false;
 std::mutex g_mutex;
 logger::AsyncLogger* async_logger = nullptr;
-}
+}  // namespace
 
 namespace {
 

@@ -14,7 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/utsname.h>
@@ -26,15 +25,15 @@
 #include <vector>
 
 #include "cyber/common/global_data.h"
-#include "glog/logging.h"
 #include "cyber/logger/logger_util.h"
+#include "glog/logging.h"
 
 namespace apollo {
 namespace cyber {
 namespace logger {
 
 namespace {
-  static int32_t g_main_thread_pid = getpid();
+static int32_t g_main_thread_pid = getpid();
 }
 
 int32_t GetMainThreadPid() { return g_main_thread_pid; }
@@ -63,4 +62,3 @@ const std::vector<std::string>& GetLoggingDirectories() {
 }  // namespace logger
 }  // namespace cyber
 }  // namespace apollo
-
