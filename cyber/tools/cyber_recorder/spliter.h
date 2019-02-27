@@ -28,10 +28,10 @@
 #include "cyber/record/file/record_file_writer.h"
 #include "cyber/record/header_builder.h"
 
-using ::apollo::cyber::proto::Header;
-using ::apollo::cyber::proto::ChunkHeader;
-using ::apollo::cyber::proto::ChunkBody;
 using ::apollo::cyber::proto::ChannelCache;
+using ::apollo::cyber::proto::ChunkBody;
+using ::apollo::cyber::proto::ChunkHeader;
+using ::apollo::cyber::proto::Header;
 
 namespace apollo {
 namespace cyber {

@@ -37,8 +37,8 @@
 #include "cyber/record/record_writer.h"
 
 using ::apollo::cyber::proto::Header;
-using ::apollo::cyber::record::RecordReader;
 using ::apollo::cyber::record::RecordFileWriter;
+using ::apollo::cyber::record::RecordReader;
 
 namespace apollo {
 namespace cyber {
