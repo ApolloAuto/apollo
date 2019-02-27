@@ -43,7 +43,7 @@ void CRoutineEntry(void *arg) {
   r->Run();
   CRoutine::Yield(RoutineState::FINISHED);
 }
-}
+}  // namespace
 
 CRoutine::CRoutine(const std::function<void()> &func) : func_(func) {
   std::call_once(pool_init_flag, [&]() {

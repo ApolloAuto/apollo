@@ -43,7 +43,7 @@ using apollo::cyber::common::WorkRoot;
 namespace {
 std::atomic<Scheduler*> instance = {nullptr};
 std::mutex mutex;
-}
+}  // namespace
 
 Scheduler* Instance() {
   Scheduler* obj = instance.load(std::memory_order_acquire);
