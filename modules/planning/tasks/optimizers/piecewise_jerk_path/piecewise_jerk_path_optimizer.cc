@@ -52,11 +52,12 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   double delta_s = 0.0;
   reference_line_info_->GetPathBoundaries(&lateral_boundaries, &start_s,
                                           &delta_s);
+
   /**
   AERROR<< "Number of boundaries:\t" << lateral_boundaries.size();
   AERROR<< "List of boundaries:";
   for (const auto& b : lateral_boundaries) {
-    AERROR<< b.first << "\t" << b.second;
+    CHECK(b.first < b.second);
   }
   **/
 
