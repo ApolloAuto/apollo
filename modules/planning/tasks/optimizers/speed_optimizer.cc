@@ -61,6 +61,7 @@ void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data,
     ADEBUG << "Skip record debug info";
     return;
   }
+  st_graph_debug->set_name(Name());
   st_graph_debug->mutable_speed_profile()->CopyFrom(
       {speed_data.begin(), speed_data.end()});
 }
