@@ -96,7 +96,7 @@ class NaviPlanning : public PlanningBase {
   /**
    * @brief get the left neighbors lane info of the lane which the vehicle is
    *located
-   * @lane_info_group output left neighors info which sorted from near to
+   * @lane_info_group output left neighbors info which sorted from near to
    *far
    */
   void GetLeftNeighborLanesInfo(
@@ -105,7 +105,7 @@ class NaviPlanning : public PlanningBase {
   /**
    * @brief get the right neighbors lane of the lane which the vehicle is
    * located
-   * @lane_info_group output right neighors info which sorted from near to
+   * @lane_info_group output right neighbors info which sorted from near to
    *far
    */
   void GetRightNeighborLanesInfo(
