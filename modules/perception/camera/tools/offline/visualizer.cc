@@ -22,33 +22,21 @@ namespace perception {
 namespace camera {
 
 std::vector<cv::Scalar> colorlistobj = {
-    cv::Scalar(0, 0, 255),
-    cv::Scalar(0, 100, 255),
-    cv::Scalar(0, 200, 255),
-    cv::Scalar(100, 255, 255),
-    cv::Scalar(200, 255, 255),
-    cv::Scalar(255, 100, 255),
-    cv::Scalar(255, 0, 255),
-    cv::Scalar(255, 255, 100),
-    cv::Scalar(255, 255, 0),
-    cv::Scalar(255, 0, 100),
-    cv::Scalar(255, 0, 0),
-    cv::Scalar(0, 255, 0),
+    cv::Scalar(0, 0, 255),     cv::Scalar(0, 100, 255),
+    cv::Scalar(0, 200, 255),   cv::Scalar(100, 255, 255),
+    cv::Scalar(200, 255, 255), cv::Scalar(255, 100, 255),
+    cv::Scalar(255, 0, 255),   cv::Scalar(255, 255, 100),
+    cv::Scalar(255, 255, 0),   cv::Scalar(255, 0, 100),
+    cv::Scalar(255, 0, 0),     cv::Scalar(0, 255, 0),
     cv::Scalar(100, 255, 100)};
 
 std::vector<cv::Vec3b> colorlistlane = {
-    cv::Vec3b(0, 0, 255),
-    cv::Vec3b(0, 100, 255),
-    cv::Vec3b(0, 200, 255),
-    cv::Vec3b(100, 255, 255),
-    cv::Vec3b(200, 255, 255),
-    cv::Vec3b(255, 100, 255),
-    cv::Vec3b(255, 0, 255),
-    cv::Vec3b(255, 255, 100),
-    cv::Vec3b(255, 255, 0),
-    cv::Vec3b(255, 0, 100),
-    cv::Vec3b(255, 0, 0),
-    cv::Vec3b(0, 255, 0),
+    cv::Vec3b(0, 0, 255),     cv::Vec3b(0, 100, 255),
+    cv::Vec3b(0, 200, 255),   cv::Vec3b(100, 255, 255),
+    cv::Vec3b(200, 255, 255), cv::Vec3b(255, 100, 255),
+    cv::Vec3b(255, 0, 255),   cv::Vec3b(255, 255, 100),
+    cv::Vec3b(255, 255, 0),   cv::Vec3b(255, 0, 100),
+    cv::Vec3b(255, 0, 0),     cv::Vec3b(0, 255, 0),
     cv::Vec3b(100, 255, 100)};
 
 std::map<base::LaneLinePositionType, cv::Scalar> colormapline = {
@@ -66,35 +54,24 @@ std::map<base::LaneLinePositionType, cv::Scalar> colormapline = {
     {base::LaneLinePositionType::CURB_LEFT, cv::Scalar(0, 255, 0)},
     {base::LaneLinePositionType::CURB_RIGHT, cv::Scalar(100, 255, 100)}};
 
-Eigen::Matrix3d Camera2CarHomograph(
-  Eigen::Matrix3d intrinsic,
-  Eigen::Matrix4d extrinsic_camera2lidar,
-  Eigen::Matrix4d extrinsic_lidar2imu,
-  double pitch_adj) {
-  AINFO << "intrinsic parameter of camera: "
-        << intrinsic;
-  AINFO << "extrinsic parameter of camera to lidar: "
-        << extrinsic_camera2lidar;
-  AINFO << "extrinsic parameter of lidar to imu: "
-        << extrinsic_lidar2imu;
+Eigen::Matrix3d Camera2CarHomograph(Eigen::Matrix3d intrinsic,
+                                    Eigen::Matrix4d extrinsic_camera2lidar,
+                                    Eigen::Matrix4d extrinsic_lidar2imu,
+                                    double pitch_adj) {
+  AINFO << "intrinsic parameter of camera: " << intrinsic;
+  AINFO << "extrinsic parameter of camera to lidar: " << extrinsic_camera2lidar;
+  AINFO << "extrinsic parameter of lidar to imu: " << extrinsic_lidar2imu;
   // rotate 90 degree around z axis to make x point forward
   Eigen::Matrix4d Rz;
-  Rz << 0, 1, 0, 0,
-       -1, 0, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1;
+  Rz << 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   Eigen::Matrix4d extrinsic_camera2car;
-  extrinsic_camera2car =
-     extrinsic_camera2lidar * extrinsic_lidar2imu * Rz;
+  extrinsic_camera2car = extrinsic_camera2lidar * extrinsic_lidar2imu * Rz;
   // adjust pitch in camera coords
   Eigen::Matrix4d Rx;
-  Rx << 1, 0, 0, 0,
-        0, cos(pitch_adj), -sin(pitch_adj), 0,
-        0, sin(pitch_adj), cos(pitch_adj), 0,
-        0, 0, 0, 1;
+  Rx << 1, 0, 0, 0, 0, cos(pitch_adj), -sin(pitch_adj), 0, 0, sin(pitch_adj),
+      cos(pitch_adj), 0, 0, 0, 0, 1;
   extrinsic_camera2car = extrinsic_camera2car * Rx;
-  AINFO << "extrinsic parameter from camera to car: "
-        << extrinsic_camera2car;
+  AINFO << "extrinsic parameter from camera to car: " << extrinsic_camera2car;
 
   // compute the homography matrix, such that H [u, v, 1]' ~ [X_l, Y_l, 1]
   Eigen::Matrix3d K = intrinsic;
@@ -107,9 +84,8 @@ Eigen::Matrix3d Camera2CarHomograph(
   return H.inverse();
 }
 
-bool Visualizer::Init(
-    const std::vector<std::string> &camera_names,
-    TransformServer *tf_server) {
+bool Visualizer::Init(const std::vector<std::string> &camera_names,
+                      TransformServer *tf_server) {
   tf_server_ = tf_server;
   CHECK(tf_server_ != nullptr);
   last_timestamp_ = 0;
@@ -147,27 +123,26 @@ bool Visualizer::Init_all_info_single_camera(
   world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
   draw_range_circle();
 
-  ex_lidar2imu.block(0, 3, 3, 1) =  - ex_lidar2imu.block(0, 3, 3, 1);
+  ex_lidar2imu.block(0, 3, 3, 1) = -ex_lidar2imu.block(0, 3, 3, 1);
   extrinsic_map_.at(camera_name).block(0, 3, 3, 1) =
-      - extrinsic_map_.at(camera_name).block(0, 3, 3, 1);
+      -extrinsic_map_.at(camera_name).block(0, 3, 3, 1);
   homography_im2car_ = Camera2CarHomograph(
-      intrinsic_map_.at(camera_name).cast<double> (),
-      extrinsic_map_.at(camera_name),
-      ex_lidar2imu, pitch_adj);
+      intrinsic_map_.at(camera_name).cast<double>(),
+      extrinsic_map_.at(camera_name), ex_lidar2imu, pitch_adj);
   AINFO << "homography_im2car_: " << homography_im2car_;
 
   // compute FOV points
   p_fov_1_.x = 0;
   p_fov_1_.y = static_cast<int>(image_height_ * fov_cut_ratio_);
 
-  p_fov_2_.x = image_width_-1;
-  p_fov_2_.y = static_cast<int>(image_height_*fov_cut_ratio_);
+  p_fov_2_.x = image_width_ - 1;
+  p_fov_2_.y = static_cast<int>(image_height_ * fov_cut_ratio_);
 
   p_fov_3_.x = 0;
   p_fov_3_.y = image_height_ - 1;
 
-  p_fov_4_.x = image_width_-1;
-  p_fov_4_.y = image_height_-1;
+  p_fov_4_.x = image_width_ - 1;
+  p_fov_4_.y = image_height_ - 1;
 
   return true;
 }
@@ -247,14 +222,11 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
   Eigen::Affine3d world2lidar = lidar2world.inverse();
   for (const auto &object : frame.tracked_objects) {
     base::RectF rect(object->camera_supplement.box);
-    cv::Rect r(static_cast<int>(rect.x),
-               static_cast<int>(rect.y),
-               static_cast<int>(rect.width),
-               static_cast<int>(rect.height));
+    cv::Rect r(static_cast<int>(rect.x), static_cast<int>(rect.y),
+               static_cast<int>(rect.width), static_cast<int>(rect.height));
     cv::rectangle(image, r,
-        colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::putText(image,
-                std::to_string(object->track_id),
+                  colorlistobj[object->track_id % colorlistobj.size()], 2);
+    cv::putText(image, std::to_string(object->track_id),
                 cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y)),
                 cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 255), 2);
     Eigen::Vector3d theta;
@@ -287,17 +259,13 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     p4 << object->size[0] * 0.5, -object->size[1] * 0.5;
     p4 = rotate * p4 + pos_2d;
 
-    cv::line(world_image_, world_point_to_bigimg(p1),
-             world_point_to_bigimg(p2),
+    cv::line(world_image_, world_point_to_bigimg(p1), world_point_to_bigimg(p2),
              colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(world_image_, world_point_to_bigimg(p2),
-             world_point_to_bigimg(p3),
+    cv::line(world_image_, world_point_to_bigimg(p2), world_point_to_bigimg(p3),
              colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(world_image_, world_point_to_bigimg(p3),
-             world_point_to_bigimg(p4),
+    cv::line(world_image_, world_point_to_bigimg(p3), world_point_to_bigimg(p4),
              colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(world_image_, world_point_to_bigimg(p4),
-             world_point_to_bigimg(p1),
+    cv::line(world_image_, world_point_to_bigimg(p4), world_point_to_bigimg(p1),
              colorlistobj[object->track_id % colorlistobj.size()], 2);
     cv::line(world_image_, world_point_to_bigimg(pos_2d),
              world_point_to_bigimg(v_2d),
@@ -347,20 +315,18 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
   Draw2Dand3D(image, frame);
 }
 
-void Visualizer::Draw2Dand3D_all_info_single_camera(
-    const cv::Mat &img, const CameraFrame &frame,
-    Eigen::Matrix3d intrinsic, Eigen::Matrix4d extrinsic) {
-  cv::Mat image_2D = img.clone();;
+void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
+                                                    const CameraFrame &frame,
+                                                    Eigen::Matrix3d intrinsic,
+                                                    Eigen::Matrix4d extrinsic) {
+  cv::Mat image_2D = img.clone();
+  ;
   // plot FOV
-  cv::line(image_2D, p_fov_1_, p_fov_2_,
-           cv::Scalar(255, 255, 255), 2);
-  cv::line(image_2D, p_fov_1_, p_fov_3_,
-           cv::Scalar(255, 255, 255), 2);
-  cv::line(image_2D, p_fov_2_, p_fov_4_,
-           cv::Scalar(255, 255, 255), 2);
+  cv::line(image_2D, p_fov_1_, p_fov_2_, cv::Scalar(255, 255, 255), 2);
+  cv::line(image_2D, p_fov_1_, p_fov_3_, cv::Scalar(255, 255, 255), 2);
+  cv::line(image_2D, p_fov_2_, p_fov_4_, cv::Scalar(255, 255, 255), 2);
 
-  cv::line(world_image_,
-           world_point_to_bigimg(image2ground(p_fov_1_)),
+  cv::line(world_image_, world_point_to_bigimg(image2ground(p_fov_1_)),
            world_point_to_bigimg(image2ground(p_fov_2_)),
            cv::Scalar(255, 255, 255), 2);
   cv::line(world_image_, world_point_to_bigimg(image2ground(p_fov_1_)),
@@ -382,15 +348,14 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
   cv::Mat lane_map(lane_map_height, lane_map_width, CV_32FC1);
   lane_map.setTo(cv::Scalar(0));
   memcpy(lane_map.data, frame.lane_detected_blob->cpu_data(),
-      lane_map_width * lane_map_height * sizeof(float));
-  for (int yi = lane_map.rows-1; yi >= 0; yi--) {
+         lane_map_width * lane_map_height * sizeof(float));
+  for (int yi = lane_map.rows - 1; yi >= 0; yi--) {
     for (int xi = 0; xi < lane_map.cols; xi++) {
-      int line_idx = static_cast<int> (std::round(lane_map.at<float>(yi, xi)));
+      int line_idx = static_cast<int>(std::round(lane_map.at<float>(yi, xi)));
       if (line_idx >= 1) {
-        image_2D.at<cv::Vec3b>(static_cast<int> (
-            yi * roi_height_ / lane_map.rows +
-            roi_start_), static_cast<int>(xi *
-            roi_width_ / lane_map.cols)) =
+        image_2D.at<cv::Vec3b>(
+            static_cast<int>(yi * roi_height_ / lane_map.rows + roi_start_),
+            static_cast<int>(xi * roi_width_ / lane_map.cols)) =
             colorlistlane[static_cast<int>(line_idx)];
       }
     }
@@ -410,12 +375,9 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
       p_cur.y = static_cast<int>(object.curve_image_point_set[i].y);
       Eigen::Vector2d p_cur_ground = image2ground(p_cur);
 
-      cv::line(image_3D, p_prev, p_cur,
-          lane_color, 2);
-      cv::line(world_image_,
-          world_point_to_bigimg(p_prev_ground),
-          world_point_to_bigimg(p_cur_ground),
-          lane_color, 2);
+      cv::line(image_3D, p_prev, p_cur, lane_color, 2);
+      cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
+               world_point_to_bigimg(p_cur_ground), lane_color, 2);
       p_prev = p_cur;
       p_prev_ground = p_cur_ground;
     }
@@ -424,14 +386,11 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
   for (const auto &object : frame.tracked_objects) {
     // plot 2D box on image_2D
     base::RectF rect(object->camera_supplement.box);
-    cv::Rect r(static_cast<int>(rect.x),
-               static_cast<int>(rect.y),
-               static_cast<int>(rect.width),
-               static_cast<int>(rect.height));
+    cv::Rect r(static_cast<int>(rect.x), static_cast<int>(rect.y),
+               static_cast<int>(rect.width), static_cast<int>(rect.height));
     cv::rectangle(image_2D, r,
                   colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::putText(image_2D,
-                std::to_string(object->track_id),
+    cv::putText(image_2D, std::to_string(object->track_id),
                 cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y)),
                 cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 255), 2);
 
@@ -544,8 +503,7 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
              colorlistobj[object->track_id % colorlistobj.size()], 2);
     cv::line(image_3D, p_proj[7], p_proj[4],
              colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[0], p_proj[4],
-             cv::Scalar(255, 255, 255), 2);
+    cv::line(image_3D, p_proj[0], p_proj[4], cv::Scalar(255, 255, 255), 2);
     cv::line(image_3D, p_proj[1], p_proj[5],
              colorlistobj[object->track_id % colorlistobj.size()], 2);
     cv::line(image_3D, p_proj[2], p_proj[6],
@@ -599,8 +557,7 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   // output visualization panel
   if (write_out_img_) {
     char path[1000];
-    snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(),
-              frame.frame_id);
+    snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(), frame.frame_id);
     AINFO << path;
     cv::imwrite(path, bigimg);
   }
