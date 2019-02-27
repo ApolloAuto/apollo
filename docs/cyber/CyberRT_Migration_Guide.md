@@ -23,21 +23,21 @@ Bazel
 
 ```
 cc_binary(
-	name = "talker",
-	srcs = ["talker.cc"],
-	deps = [
-		"//cyber",
-		"//cyber/examples/proto:examples_cc_proto",
-		],
-	)
+    name = "talker",
+    srcs = ["talker.cc"],
+    deps = [
+        "//cyber",
+        "//cyber/examples/proto:examples_cc_proto",
+    ],
+)
 cc_binary(
-	name = "listener",
-	srcs = ["listener.cc"],
-	deps = [
-		"//cyber",
-		"//cyber/examples/proto:examples_cc_proto",
-		],
-	)
+    name = "listener",
+    srcs = ["listener.cc"],
+    deps = [
+        "//cyber",
+        "//cyber/examples/proto:examples_cc_proto",
+    ],
+)
 ```
 We can find the mapping easily from the 2 file snippets. For example, `pb_talker` and `src/talker.cpp` in cmake `add_executable` setting map to `name = "talker"` and `srcs = ["talker.cc"]` in BUILD file `cc_binary`.
 ###Proto
@@ -45,17 +45,17 @@ Apollo ROS has customized to support proto message formate that a separate secti
 
 ```C
 cc_proto_library(
-	name = "examples_cc_proto",
-	deps = [
-		":examples_proto",
-		],
-	)
+    name = "examples_cc_proto",
+    deps = [
+        ":examples_proto",
+    ],
+)
 proto_library(
-	name = "examples_proto",
-	srcs = [
-		"examples.proto",
-		],
-	)
+    name = "examples_proto",
+    srcs = [
+        "examples.proto",
+    ],
+)
 ``` 
 
 The package definition has also changed in Cyber-RT. In Apollo ROS a fixed package `package pb_msgs;` is used for proto files, but in Cyber-RT, the proto file path `package apollo.cyber.examples.proto;` is used instead. 
@@ -67,25 +67,25 @@ As shown below, Cyber-RT remove the src folder and pull all source code in the s
 - CMakeLists.txt
 - package.xml
 - proto
-	- chatter.proto	
+    - chatter.proto	
 - src
-	- listener.cpp
-	- talker.cpp
+    - listener.cpp
+    - talker.cpp
 
 ### Cyber-RT
 - BUILD
-- listener.ccc
+- listener.cc
 - talker.cc
 - proto
-	- BUILD
-	- examples.proto (with chatter message) 	
-     
+    - BUILD
+    - examples.proto (with chatter message)
+
 ## Update source code
 
 ### Listener
 Cyber-RT
 
-```c
+```C++
 #include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
 
@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
 ```
 ROS
 
-```c
+```C++
 #include "ros/ros.h"
 #include "chatter.pb.h"
 
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
 }
 ```
 
-You can see easily from the two listener code above that Cyber-RT provides very similar API to for developers to migrate from ROS.  
+You can see easily from the two listener code above that Cyber-RT provides very similar API to for developers to migrate from ROS.
 
 - `ros::init(argc, argv, "listener");` --> `apollo::cyber::Init(argv[0]);`
 - `ros::NodeHandle n;` --> `auto listener_node = apollo::cyber::CreateNode("listener");`
@@ -142,7 +142,7 @@ Note: for Cyber-RT, a listener node has to use node->CreateReader<messageType>(c
 
 Cyber-RT
 
-```C
+```C++
 #include "cyber/cyber.h"
 #include "cyber/examples/proto/examples.pb.h"
 
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
 
 ROS
 
-```c
+```C++
 #include "ros/ros.h"
 #include "chatter.pb.h"
 
