@@ -293,6 +293,7 @@ void ObstaclesPrioritizer::AssignCautionLevelInJunction(
       ADEBUG << "SetCaution for obstacle [" << obstacle_ptr->id() << "]";
     }
   }
+  AssignCautionLevelByEgoReferenceLine();
 }
 
 void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
@@ -316,7 +317,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     accumulated_s += lane_info_ptr->total_length();
     AssignCautionByMerge(lane_info_ptr);
     AssignCautionByOverlap(lane_info_ptr);
-    if (accumulated_s > 40.0) {
+    if (accumulated_s > FLAGS_caution_search_distance_ahead) {
       break;
     }
   }
@@ -324,7 +325,8 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
 
 void ObstaclesPrioritizer::AssignCautionByMerge(
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
-  SetCautionBackward(lane_info_ptr, 40.0);
+  SetCautionBackward(lane_info_ptr,
+      FLAGS_caution_search_distance_backward_for_merge);
 }
 
 void ObstaclesPrioritizer::AssignCautionByOverlap(
@@ -340,7 +342,8 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
       } else {
         std::shared_ptr<const LaneInfo> overlap_lane_ptr =
             PredictionMap::LaneById(object_id);
-        SetCautionBackward(overlap_lane_ptr, 20.0);
+        SetCautionBackward(overlap_lane_ptr,
+            FLAGS_caution_search_distance_backward_for_overlap);
       }
     }
   }
