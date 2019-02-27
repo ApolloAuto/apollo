@@ -44,9 +44,9 @@
 #include "sensor_msgs/CompressedImage.h"
 #include "sensor_msgs/Image.h"
 #include "sensor_msgs/PointCloud2.h"
+#include "std_msgs/Int32MultiArray.h"
 #include "std_msgs/String.h"
 #include "velodyne_msgs/VelodyneScanUnified.h"
-#include "std_msgs/Int32MultiArray.h"
 
 /**
  * @namespace apollo::common::adapter
