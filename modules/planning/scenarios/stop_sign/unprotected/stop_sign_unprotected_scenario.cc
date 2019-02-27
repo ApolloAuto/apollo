@@ -66,11 +66,11 @@ void StopSignUnprotectedScenario::Init() {
   }
 
   const std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
   if (stop_sign_overlap_id.empty()) {
+    AERROR << "Could not find stop sign";
     return;
   }
-
   hdmap::StopSignInfoConstPtr stop_sign = HDMapUtil::BaseMap().GetStopSignById(
       hdmap::MakeMapId(stop_sign_overlap_id));
   if (!stop_sign) {
@@ -126,14 +126,14 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
 bool StopSignUnprotectedScenario::IsTransferable(
     const Scenario& current_scenario, const Frame& frame) {
   if (PlanningContext::GetScenarioInfo()
-          ->next_stop_sign_overlap.object_id.empty()) {
+      ->current_stop_sign_overlap.object_id.empty()) {
     return false;
   }
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double stop_sign_overlap_start_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
   const double adc_distance_to_stop_sign =
       stop_sign_overlap_start_s - adc_front_edge_s;
   ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign

@@ -62,7 +62,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
 
   // check if the stop_sign is still along reference_line
   std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
   if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
     return FinishScenario();
   }
@@ -74,7 +74,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   if (task &&
       task->CheckCreepDone(
           *frame, reference_line_info,
-          PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s,
+          PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s,
           wait_time, timeout)) {
     return FinishStage();
   }
@@ -83,7 +83,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
       ->SetProceedWithCautionSpeedParam(
           *frame, reference_line_info,
-          PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s);
+          PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {

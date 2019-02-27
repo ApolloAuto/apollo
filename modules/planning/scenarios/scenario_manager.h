@@ -53,8 +53,12 @@ class ScenarioManager final {
   void RegisterScenarios();
 
   ScenarioConfig::ScenarioType SelectChangeLaneScenario(const Frame& frame);
-  ScenarioConfig::ScenarioType SelectStopSignScenario(const Frame& frame);
-  ScenarioConfig::ScenarioType SelectTrafficLightScenario(const Frame& frame);
+  ScenarioConfig::ScenarioType SelectStopSignScenario(
+      const Frame& frame,
+      const hdmap::PathOverlap& first_encountered_stop_sign_overlap);
+  ScenarioConfig::ScenarioType SelectTrafficLightScenario(
+      const Frame& frame,
+      const hdmap::PathOverlap& first_encountered_traffic_Light_overlap);
   ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
 
   // functions for scenario voter implementation
@@ -75,6 +79,14 @@ class ScenarioManager final {
 
   void ReadTrafficLight(const Frame& frame);
 
+  bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsTrafficLightScenario(
+      const ScenarioConfig::ScenarioType& scenario_type);
+
+  void UpdatePlanningContext(
+      const Frame& frame,
+      const ScenarioConfig::ScenarioType& scenario_type);
+
  private:
   std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
                      std::hash<int>> config_map_;
@@ -85,7 +97,6 @@ class ScenarioManager final {
   ScenarioContext scenario_context_;
 
   // TODO(all): move to scenario conf later
-  const uint32_t conf_min_pass_s_distance_ = 3.0;  // meter
   const double signal_expire_time_sec_ = 5.0;      // sec
 };
 

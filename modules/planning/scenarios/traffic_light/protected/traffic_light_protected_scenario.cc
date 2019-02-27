@@ -49,7 +49,7 @@ void TrafficLightProtectedScenario::Init() {
   }
 
   for (const auto& traffic_light_overlap :
-       PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
+       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
     const std::string traffic_light_overlap_id =
         traffic_light_overlap.object_id;
     hdmap::SignalInfoConstPtr traffic_light =
