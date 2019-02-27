@@ -136,7 +136,7 @@ bool RadarDetectionComponent::InternalProc(
   }
   Eigen::Affine3d radar2novatel_trans;
   if (!radar2novatel_trans_.GetTrans(timestamp, &radar2novatel_trans, "novatel",
-                                    tf_child_frame_id_)) {
+                                     tf_child_frame_id_)) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     AERROR << "Failed to get radar2novatel trans at time: " << timestamp;
     return true;
