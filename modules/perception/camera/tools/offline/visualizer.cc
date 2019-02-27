@@ -320,7 +320,7 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
                                                     Eigen::Matrix3d intrinsic,
                                                     Eigen::Matrix4d extrinsic) {
   cv::Mat image_2D = img.clone();
-  ;
+
   // plot FOV
   cv::line(image_2D, p_fov_1_, p_fov_2_, cv::Scalar(255, 255, 255), 2);
   cv::line(image_2D, p_fov_1_, p_fov_3_, cv::Scalar(255, 255, 255), 2);
