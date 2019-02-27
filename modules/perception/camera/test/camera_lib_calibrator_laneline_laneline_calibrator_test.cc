@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/perception/camera/lib/calibrator/laneline/laneline_calibrator.h"
 
@@ -28,8 +28,9 @@ namespace camera {
 DEFINE_bool(vis, false, "plot results on image sequences");
 
 TEST(LanelineCalibratorTest, laneline_calibrator_test) {
-  std::string root_path = "/apollo/modules/perception/testdata/"
-    "camera/lib/calibrator/laneline/data/";
+  std::string root_path =
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/calibrator/laneline/data/";
   std::string img_path = root_path + "/img/";
   std::string lane_path = root_path + "/lane/";
   std::string intrinsics_file = root_path + "/intrinsics.txt";
@@ -59,9 +60,9 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
   EXPECT_TRUE(adu::perception::obstacle::load_ref_camera_k_mat(
       intrinsics_file, k_mat, &image_width, &image_height));
   AINFO << "----intrinsics:\n"
-           << k_mat[0] << ", " << k_mat[1] << ", " << k_mat[2] << "\n"
-           << k_mat[3] << ", " << k_mat[4] << ", " << k_mat[5] << "\n"
-           << k_mat[6] << ", " << k_mat[7] << ", " << k_mat[8];
+        << k_mat[0] << ", " << k_mat[1] << ", " << k_mat[2] << "\n"
+        << k_mat[3] << ", " << k_mat[4] << ", " << k_mat[5] << "\n"
+        << k_mat[6] << ", " << k_mat[7] << ", " << k_mat[8];
   AINFO << "----width, height: \n" << image_width << ", " << image_height;
 
   std::vector<std::string> lane_list;
@@ -83,10 +84,10 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
   std::vector<std::string> frame_list;  // these three are aligned
   std::vector<double> time_stamps;
   std::vector<Eigen::Matrix4d> camera2world;
-  EXPECT_FALSE(camera::LoadCamera2WorldTfs(
-      "abc", &frame_list, &time_stamps, &camera2world));
-  EXPECT_TRUE(camera::LoadCamera2WorldTfs(
-      tf_file, &frame_list, &time_stamps, &camera2world));
+  EXPECT_FALSE(camera::LoadCamera2WorldTfs("abc", &frame_list, &time_stamps,
+                                           &camera2world));
+  EXPECT_TRUE(camera::LoadCamera2WorldTfs(tf_file, &frame_list, &time_stamps,
+                                          &camera2world));
   EXPECT_EQ(nr_frames, (int)frame_list.size());
   EXPECT_EQ(nr_frames, (int)time_stamps.size());
   AINFO << "number of frames: " << nr_frames;
@@ -176,8 +177,7 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
     }
 
     AINFO << "nr-of-left-lane-pts: " << ego_lane.left_line.lane_point.size();
-    AINFO << "nr-of-right-lane-pts: "
-             << ego_lane.right_line.lane_point.size();
+    AINFO << "nr-of-right-lane-pts: " << ego_lane.right_line.lane_point.size();
 
     cv::Mat test_image;
     if (FLAGS_vis) {
@@ -187,18 +187,18 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
       EXPECT_EQ(test_image.rows, image_height);
 
       // draw lane pts
-      camera::draw_lane_pts(ego_lane.left_line.lane_point,
-                                             kColorLaneLine_left, &test_image);
+      camera::draw_lane_pts(ego_lane.left_line.lane_point, kColorLaneLine_left,
+                            &test_image);
       camera::draw_lane_pts(ego_lane.right_line.lane_point,
-                                             kColorLaneLine_right, &test_image);
+                            kColorLaneLine_right, &test_image);
     }
 
     CameraFrame frame;
     CalibratorOptions calibrator_options;
     calibrator_options.lane_objects =
-            std::make_shared<std::vector<base::LaneLine>>(frame.lane_objects);
+        std::make_shared<std::vector<base::LaneLine>>(frame.lane_objects);
     calibrator_options.camera2world_pose =
-                   std::make_shared<Eigen::Affine3d>(frame.camera2world_pose);
+        std::make_shared<Eigen::Affine3d>(frame.camera2world_pose);
     calibrator_options.timestamp = &(frame.timestamp);
     float pitch_angle;
     // blank ego lane
@@ -215,9 +215,9 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
           ego_lane.left_line.lane_point[j](1);
     }
     calibrator_options.lane_objects =
-            std::make_shared<std::vector<base::LaneLine>>(frame.lane_objects);
+        std::make_shared<std::vector<base::LaneLine>>(frame.lane_objects);
     calibrator_options.camera2world_pose =
-                   std::make_shared<Eigen::Affine3d>(frame.camera2world_pose);
+        std::make_shared<Eigen::Affine3d>(frame.camera2world_pose);
     calibrator_options.timestamp = &(frame.timestamp);
     // lack ego right
     EXPECT_FALSE(calibrator.Calibrate(calibrator_options, &pitch_angle));
@@ -238,9 +238,9 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
 
     // process
     calibrator_options.lane_objects =
-            std::make_shared<std::vector<base::LaneLine>>(frame.lane_objects);
+        std::make_shared<std::vector<base::LaneLine>>(frame.lane_objects);
     calibrator_options.camera2world_pose =
-                   std::make_shared<Eigen::Affine3d>(frame.camera2world_pose);
+        std::make_shared<Eigen::Affine3d>(frame.camera2world_pose);
     calibrator_options.timestamp = &(frame.timestamp);
     update = calibrator.Calibrate(calibrator_options, &pitch_angle);
     if (update) {
@@ -257,8 +257,9 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
 
     std::string timediff_yawrate_velocity_text =
         "time_diff_: " + std::to_string(calibrator.GetTimeDiff()).substr(0, 4) +
-        " | " + "yaw_rate_: " +
-        std::to_string(calibrator.GetYawRate()).substr(0, 4) + " | " +
+        " | " +
+        "yaw_rate_: " + std::to_string(calibrator.GetYawRate()).substr(0, 4) +
+        " | " +
         "velocity_: " + std::to_string(calibrator.GetVelocity()).substr(0, 4);
     AINFO << timediff_yawrate_velocity_text;
 
@@ -272,8 +273,8 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
     if (update) {
       int vanishing_row_res = calibrator.GetVanishingRow();
       AINFO << "result from online calib:\n"
-               << "pitch_res: " << pitch_calib << "\n"
-               << "v-row res: " << vanishing_row_res << "\n";
+            << "pitch_res: " << pitch_calib << "\n"
+            << "v-row res: " << vanishing_row_res << "\n";
       if (FLAGS_vis) {
         std::string pitch_calib_text =
             "pitch: " + std::to_string(pitch_calib).substr(0, 8);
@@ -292,8 +293,8 @@ TEST(LanelineCalibratorTest, laneline_calibrator_test) {
         cv::Mat image_fake(10, 10, CV_8UC3, cv::Scalar::all(100));
         EXPECT_TRUE(camera::draw_vanishing_row_on_image(
             kColorVaniLine_res, image_fake.cols / 2, &image_fake));
-        EXPECT_FALSE(camera::draw_vanishing_row_on_image(
-            kColorVaniLine_res, -1, &image_fake));
+        EXPECT_FALSE(camera::draw_vanishing_row_on_image(kColorVaniLine_res, -1,
+                                                         &image_fake));
         EXPECT_FALSE(camera::draw_vanishing_row_on_image(
             kColorVaniLine_res, image_fake.cols, &image_fake));
       }

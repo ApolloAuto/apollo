@@ -13,9 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================*/
 
-#include "gtest/gtest.h"
-#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_impl.h"
+#include "cyber/common/file.h"
+#include "gtest/gtest.h"
 
 DEFINE_string(output_dir, "/tmp", "output map directory");
 
@@ -415,11 +415,11 @@ TEST_F(HDMapImplTestSuite, GetLocalMap) {
   ASSERT_EQ(0, hdmap_impl_.GetLocalMap(point, range, &local_map));
 
   const std::string output_bin_file = FLAGS_output_dir + "/base_map.bin";
-  CHECK(apollo::common::util::SetProtoToBinaryFile(local_map, output_bin_file))
+  CHECK(cyber::common::SetProtoToBinaryFile(local_map, output_bin_file))
       << "failed to output binary format base map";
 
   local_map.Clear();
-  CHECK(apollo::common::util::GetProtoFromFile(output_bin_file, &local_map))
+  CHECK(cyber::common::GetProtoFromFile(output_bin_file, &local_map))
       << "failed to load map";
 }
 

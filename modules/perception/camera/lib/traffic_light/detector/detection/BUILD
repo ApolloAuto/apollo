@@ -29,7 +29,6 @@ cc_library(
         ":select",
         ":trafficlight_detector_detection_proto",
         "//cyber",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",

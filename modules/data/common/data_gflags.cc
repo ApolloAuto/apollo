@@ -16,10 +16,8 @@
 
 #include "modules/data/common/data_gflags.h"
 
-DEFINE_string(data_conf_file,
-              "/apollo/modules/data/conf/data_config.pb.txt",
+DEFINE_string(data_conf_file, "/apollo/modules/data/conf/data_config.pb.txt",
               "default data config file");
 
-DEFINE_string(data_record_service_name,
-              "Data_Record_Service",
+DEFINE_string(data_record_service_name, "Data_Record_Service",
               "default recorder service name");

@@ -19,7 +19,7 @@
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {

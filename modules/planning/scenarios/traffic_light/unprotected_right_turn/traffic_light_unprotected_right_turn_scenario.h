@@ -44,8 +44,8 @@ struct TrafficLightUnprotectedRightTurnContext {
 class TrafficLightUnprotectedRightTurnScenario : public Scenario {
  public:
   explicit TrafficLightUnprotectedRightTurnScenario(
-      const ScenarioConfig& config,
-      const ScenarioContext* context) : Scenario(config, context) {}
+      const ScenarioConfig& config, const ScenarioContext* context)
+      : Scenario(config, context) {}
 
   void Init() override;
 
@@ -53,7 +53,6 @@ class TrafficLightUnprotectedRightTurnScenario : public Scenario {
       const ScenarioConfig::StageConfig& stage_config);
 
   bool IsTransferable(const Scenario& current_scenario,
-                      const common::TrajectoryPoint& ego_point,
                       const Frame& frame) override;
 
   TrafficLightUnprotectedRightTurnContext* GetContext() { return &context_; }

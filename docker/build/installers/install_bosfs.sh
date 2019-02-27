@@ -21,9 +21,9 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-# Prepair.
+# Prepare
 apt-get update -y
-apt-get install -y libfuse-dev
+apt-get install -y libfuse-dev autotools-dev automake uuid-dev
 wget http://sdk.bce.baidu.com/console-sdk/bosfs-1.0.0.8.tar.gz
 tar zxf bosfs-1.0.0.8.tar.gz
 

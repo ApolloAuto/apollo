@@ -282,8 +282,8 @@ bool SpiralProblemInterface::eval_f(int n, const double* x, bool new_x,
     obj_value += delta_s * weight_curve_length_;
 
     for (int j = 0; j < num_of_internal_points_; ++j) {
-      double ratio = static_cast<double>(j) /
-          static_cast<double>(num_of_internal_points_);
+      double ratio =
+          static_cast<double>(j) / static_cast<double>(num_of_internal_points_);
       double s = ratio * delta_s;
 
       double kappa = spiral_curve.Evaluate(1, s);
@@ -297,7 +297,7 @@ bool SpiralProblemInterface::eval_f(int n, const double* x, bool new_x,
 }
 
 bool SpiralProblemInterface::eval_grad_f(int n, const double* x, bool new_x,
-    double* grad_f) {
+                                         double* grad_f) {
   CHECK_EQ(n, num_of_variables_);
   std::fill(grad_f, grad_f + n, 0.0);
 
@@ -316,59 +316,59 @@ bool SpiralProblemInterface::eval_grad_f(int n, const double* x, bool new_x,
     grad_f[variable_offset + i] += weight_curve_length_ * 1.0;
 
     for (int j = 0; j < num_of_internal_points_; ++j) {
-      double ratio = static_cast<double>(j)
-          / static_cast<double>(num_of_internal_points_);
+      double ratio =
+          static_cast<double>(j) / static_cast<double>(num_of_internal_points_);
       double s = ratio * delta_s;
 
       double kappa = spiral_curve.Evaluate(1, s);
-      grad_f[index0] += weight_kappa_ * 2.0 * kappa
-          * spiral_curve.DeriveKappaDerivative(THETA0, j,
-              num_of_internal_points_);
-      grad_f[index0 + 1] += weight_kappa_ * 2.0 * kappa
-          * spiral_curve.DeriveKappaDerivative(KAPPA0, j,
-              num_of_internal_points_);
-      grad_f[index0 + 2] += weight_kappa_ * 2.0 * kappa
-          * spiral_curve.DeriveKappaDerivative(DKAPPA0, j,
-              num_of_internal_points_);
+      grad_f[index0] += weight_kappa_ * 2.0 * kappa *
+                        spiral_curve.DeriveKappaDerivative(
+                            THETA0, j, num_of_internal_points_);
+      grad_f[index0 + 1] += weight_kappa_ * 2.0 * kappa *
+                            spiral_curve.DeriveKappaDerivative(
+                                KAPPA0, j, num_of_internal_points_);
+      grad_f[index0 + 2] += weight_kappa_ * 2.0 * kappa *
+                            spiral_curve.DeriveKappaDerivative(
+                                DKAPPA0, j, num_of_internal_points_);
 
-      grad_f[index1] += weight_kappa_ * 2.0 * kappa
-          * spiral_curve.DeriveKappaDerivative(THETA1, j,
-              num_of_internal_points_);
-      grad_f[index1 + 1] += weight_kappa_ * 2.0 * kappa
-          * spiral_curve.DeriveKappaDerivative(KAPPA1, j,
-              num_of_internal_points_);
-      grad_f[index1 + 2] += weight_kappa_ * 2.0 * kappa
-          * spiral_curve.DeriveKappaDerivative(DKAPPA1, j,
-              num_of_internal_points_);
+      grad_f[index1] += weight_kappa_ * 2.0 * kappa *
+                        spiral_curve.DeriveKappaDerivative(
+                            THETA1, j, num_of_internal_points_);
+      grad_f[index1 + 1] += weight_kappa_ * 2.0 * kappa *
+                            spiral_curve.DeriveKappaDerivative(
+                                KAPPA1, j, num_of_internal_points_);
+      grad_f[index1 + 2] += weight_kappa_ * 2.0 * kappa *
+                            spiral_curve.DeriveKappaDerivative(
+                                DKAPPA1, j, num_of_internal_points_);
 
-      grad_f[variable_offset + i] += weight_kappa_ * 2.0 * kappa
-          * spiral_curve.DeriveKappaDerivative(DELTA_S, j,
-              num_of_internal_points_);
+      grad_f[variable_offset + i] += weight_kappa_ * 2.0 * kappa *
+                                     spiral_curve.DeriveKappaDerivative(
+                                         DELTA_S, j, num_of_internal_points_);
 
       double dkappa = spiral_curve.Evaluate(2, s);
-      grad_f[index0] += weight_dkappa_ * 2.0 * dkappa
-          * spiral_curve.DeriveDKappaDerivative(THETA0, j,
-              num_of_internal_points_);
-      grad_f[index0 + 1] += weight_dkappa_ * 2.0 * dkappa
-          * spiral_curve.DeriveDKappaDerivative(KAPPA0, j,
-              num_of_internal_points_);
-      grad_f[index0 + 2] += weight_dkappa_ * 2.0 * dkappa
-          * spiral_curve.DeriveDKappaDerivative(DKAPPA0, j,
-              num_of_internal_points_);
+      grad_f[index0] += weight_dkappa_ * 2.0 * dkappa *
+                        spiral_curve.DeriveDKappaDerivative(
+                            THETA0, j, num_of_internal_points_);
+      grad_f[index0 + 1] += weight_dkappa_ * 2.0 * dkappa *
+                            spiral_curve.DeriveDKappaDerivative(
+                                KAPPA0, j, num_of_internal_points_);
+      grad_f[index0 + 2] += weight_dkappa_ * 2.0 * dkappa *
+                            spiral_curve.DeriveDKappaDerivative(
+                                DKAPPA0, j, num_of_internal_points_);
 
-      grad_f[index1] += weight_dkappa_ * 2.0 * dkappa
-          * spiral_curve.DeriveDKappaDerivative(THETA1, j,
-              num_of_internal_points_);
-      grad_f[index1 + 1] += weight_dkappa_ * 2.0 * dkappa
-          * spiral_curve.DeriveDKappaDerivative(KAPPA1, j,
-              num_of_internal_points_);
-      grad_f[index1 + 2] += weight_dkappa_ * 2.0 * dkappa
-          * spiral_curve.DeriveDKappaDerivative(DKAPPA1, j,
-              num_of_internal_points_);
+      grad_f[index1] += weight_dkappa_ * 2.0 * dkappa *
+                        spiral_curve.DeriveDKappaDerivative(
+                            THETA1, j, num_of_internal_points_);
+      grad_f[index1 + 1] += weight_dkappa_ * 2.0 * dkappa *
+                            spiral_curve.DeriveDKappaDerivative(
+                                KAPPA1, j, num_of_internal_points_);
+      grad_f[index1 + 2] += weight_dkappa_ * 2.0 * dkappa *
+                            spiral_curve.DeriveDKappaDerivative(
+                                DKAPPA1, j, num_of_internal_points_);
 
-      grad_f[variable_offset + i] += weight_dkappa_ * 2.0 * dkappa
-          * spiral_curve.DeriveDKappaDerivative(DELTA_S, j,
-              num_of_internal_points_);
+      grad_f[variable_offset + i] += weight_dkappa_ * 2.0 * dkappa *
+                                     spiral_curve.DeriveDKappaDerivative(
+                                         DELTA_S, j, num_of_internal_points_);
     }
   }
   return true;
@@ -552,22 +552,15 @@ bool SpiralProblemInterface::eval_jac_g(int n, const double* x, bool new_x,
       double y_diff = x[index1 + 4] - x[index0 + 4] -
                       spiral_curve.ComputeCartesianDeviationY(delta_s);
 
-      auto pos_theta0 =
-          spiral_curve.DeriveCartesianDeviation(THETA0);
-      auto pos_kappa0 =
-          spiral_curve.DeriveCartesianDeviation(KAPPA0);
-      auto pos_dkappa0 =
-          spiral_curve.DeriveCartesianDeviation(DKAPPA0);
+      auto pos_theta0 = spiral_curve.DeriveCartesianDeviation(THETA0);
+      auto pos_kappa0 = spiral_curve.DeriveCartesianDeviation(KAPPA0);
+      auto pos_dkappa0 = spiral_curve.DeriveCartesianDeviation(DKAPPA0);
 
-      auto pos_theta1 =
-          spiral_curve.DeriveCartesianDeviation(THETA1);
-      auto pos_kappa1 =
-          spiral_curve.DeriveCartesianDeviation(KAPPA1);
-      auto pos_dkappa1 =
-          spiral_curve.DeriveCartesianDeviation(DKAPPA1);
+      auto pos_theta1 = spiral_curve.DeriveCartesianDeviation(THETA1);
+      auto pos_kappa1 = spiral_curve.DeriveCartesianDeviation(KAPPA1);
+      auto pos_dkappa1 = spiral_curve.DeriveCartesianDeviation(DKAPPA1);
 
-      auto pos_delta_s =
-          spiral_curve.DeriveCartesianDeviation(DELTA_S);
+      auto pos_delta_s = spiral_curve.DeriveCartesianDeviation(DELTA_S);
 
       // for x coordinate
       // theta0

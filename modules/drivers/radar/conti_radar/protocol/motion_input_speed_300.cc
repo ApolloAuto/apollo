@@ -22,8 +22,8 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-using apollo::drivers::canbus::Byte;
 using apollo::drivers::ContiRadar;
+using apollo::drivers::canbus::Byte;
 
 const uint32_t MotionInputSpeed300::ID = 0x300;
 
@@ -55,25 +55,19 @@ void MotionInputSpeed300::UpdateData(uint8_t* data) {
   uint32_t speed_value = static_cast<uint32_t>(fabs(speed_) / 0.02);
   Byte frame_speed_direction(data);
   frame_speed_direction.set_value(
-      static_cast<unsigned char>((speed_direction << 6) & 0x00C0)
-          | static_cast<unsigned char>((speed_value & 0x1F00) >> 8),
+      static_cast<unsigned char>((speed_direction << 6) & 0x00C0) |
+          static_cast<unsigned char>((speed_value & 0x1F00) >> 8),
       0, 8);
   Byte frame_speed(data + 1);
-  frame_speed.set_value(
-      static_cast<unsigned char>(speed_value & 0x00FF),
-      0, 8);
+  frame_speed.set_value(static_cast<unsigned char>(speed_value & 0x00FF), 0, 8);
 }
 
 /**
  * @brief reset the private variables
  */
-void MotionInputSpeed300::Reset() {
-  speed_ = NAN;
-}
+void MotionInputSpeed300::Reset() { speed_ = NAN; }
 
-void MotionInputSpeed300::SetSpeed(const float& speed) {
-  speed_ = speed;
-}
+void MotionInputSpeed300::SetSpeed(const float& speed) { speed_ = speed; }
 
 }  // namespace conti_radar
 }  // namespace drivers

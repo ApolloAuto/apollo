@@ -1,26 +1,28 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
+#include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
+
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
-#include "modules/common/util/file.h"
+
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/object_template_manager.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/frame_list.h"
 #include "modules/perception/camera/lib/obstacle/tracker/omt/omt.pb.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/target.h"
 
 namespace apollo {
 namespace perception {
@@ -30,19 +32,19 @@ TEST(TargetTest, target_test) {
   // Init object template
   ObjectTemplateManagerInitOptions object_template_init_options;
   object_template_init_options.root_dir =
-    "/apollo/modules/perception/testdata/"
-    "camera/app/data/perception/camera/common/object_template/";
+      "/apollo/modules/perception/testdata/"
+      "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
   CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
-  std::string omt_config = apollo::common::util::GetAbsolutePath(
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/tracker/omt/data/models/"
-    "omt_obstacle_tracker",
-    "config.pt");
+  std::string omt_config = cyber::common::GetAbsolutePath(
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/obstacle/tracker/omt/data/models/"
+      "omt_obstacle_tracker",
+      "config.pt");
 
-  ASSERT_TRUE(apollo::common::util::GetProtoFromFile(omt_config, &omt_param));
+  ASSERT_TRUE(cyber::common::GetProtoFromFile(omt_config, &omt_param));
 
   // first frame with one car object
   std::string sensor_name = "onsemi_obstacle";
@@ -83,8 +85,7 @@ TEST(TargetTest, target_test) {
   target.Update2D(&frame);
   target.Update3D(&frame);
   target.UpdateType(&frame);
-  ASSERT_EQ(target.get_object(-1)->object->sub_type,
-            base::ObjectSubType::CAR);
+  ASSERT_EQ(target.get_object(-1)->object->sub_type, base::ObjectSubType::CAR);
   // auto state = target.image_center.get_state();
   // second frame
 
@@ -110,8 +111,7 @@ TEST(TargetTest, target_test) {
 
   target.lost_age = 0;
   target.UpdateType(&frame1);
-  ASSERT_EQ(target.get_object(-1)->object->sub_type,
-            base::ObjectSubType::CAR);
+  ASSERT_EQ(target.get_object(-1)->object->sub_type, base::ObjectSubType::CAR);
   target.Update2D(&frame1);
   target.Update3D(&frame1);
 
@@ -137,8 +137,7 @@ TEST(TargetTest, target_test) {
   object3->camera_supplement.box = bbox3;
   object3->camera_supplement.projected_box = bbox3;
   object3->type = base::ObjectType::UNKNOWN_UNMOVABLE;
-  object3->sub_type =
-      base::ObjectSubType::TRAFFICCONE;
+  object3->sub_type = base::ObjectSubType::TRAFFICCONE;
   frame3.detected_objects.push_back(object3);
   frame3.frame_id = 3;
   frame3.timestamp = 3;
@@ -152,15 +151,13 @@ TEST(TargetTest, target_test) {
   target.UpdateType(&frame3);
   target.lost_age = 0;
   target.UpdateType(&frame3);
-  ASSERT_EQ(target.get_object(-1)->object->sub_type,
-            base::ObjectSubType::CAR);
+  ASSERT_EQ(target.get_object(-1)->object->sub_type, base::ObjectSubType::CAR);
   target.Update2D(&frame3);
   target.Update3D(&frame3);
 
   ASSERT_EQ(target.Size(), 3);
   target.Clear();
   ASSERT_EQ(target.Size(), 0);
-
 
   // first frame with one unknown object
   CameraFrame frame5;
@@ -169,8 +166,7 @@ TEST(TargetTest, target_test) {
   object5->camera_supplement.box = bbox5;
   object5->camera_supplement.projected_box = bbox5;
   object5->type = base::ObjectType::UNKNOWN_UNMOVABLE;
-  object5->sub_type =
-      base::ObjectSubType::TRAFFICCONE;
+  object5->sub_type = base::ObjectSubType::TRAFFICCONE;
   object5->size << 1.6f, 1.7f, 3.8f;
   object5->camera_supplement.local_center << 18, 30, 24;
   frame5.detected_objects.push_back(object5);
@@ -203,22 +199,21 @@ TEST(TargetTest, clapping_velocity_test) {
   // Init object template
   ObjectTemplateManagerInitOptions object_template_init_options;
   object_template_init_options.root_dir =
-    "/apollo/modules/perception/testdata/"
-    "camera/app/data/perception/camera/common/object_template/";
+      "/apollo/modules/perception/testdata/"
+      "camera/app/data/perception/camera/common/object_template/";
   object_template_init_options.conf_file = "object_template.pt";
   CHECK(ObjectTemplateManager::Instance()->Init(object_template_init_options));
 
   omt::OmtParam omt_param;
-  std::string omt_config = apollo::common::util::GetAbsolutePath(
-    "/apollo/modules/perception/testdata/"
-    "camera/lib/obstacle/tracker/omt/data/models/"
-    "omt_obstacle_tracker",
-    "config.pt");
+  std::string omt_config = cyber::common::GetAbsolutePath(
+      "/apollo/modules/perception/testdata/"
+      "camera/lib/obstacle/tracker/omt/data/models/omt_obstacle_tracker",
+      "config.pt");
 
-  ASSERT_TRUE(apollo::common::util::GetProtoFromFile(omt_config, &omt_param));
+  ASSERT_TRUE(cyber::common::GetProtoFromFile(omt_config, &omt_param));
 
-  auto read_pos_and_theta_vec = [](const std::string& fname)
-      -> std::vector<std::vector<double> > {
+  auto read_pos_and_theta_vec =
+      [](const std::string& fname) -> std::vector<std::vector<double> > {
     std::vector<std::vector<double> > pos_and_theta_vec;
     std::ifstream fin(fname);
     if (!fin.is_open()) {
@@ -251,8 +246,9 @@ TEST(TargetTest, clapping_velocity_test) {
     // new target
     Target target(omt_param.target_param());
     target.id = 1;
-    std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
-      "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta1.txt";
+    std::string pos_theta_filename =
+        "/apollo/modules/perception/testdata/"
+        "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta1.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
     for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       double ts = static_cast<double>(i) * 0.066;
@@ -262,13 +258,12 @@ TEST(TargetTest, clapping_velocity_test) {
       object->camera_supplement.box = bbox;
       object->camera_supplement.projected_box = bbox;
       object->type = base::ObjectType::VEHICLE;
-      object->sub_type =
-          base::ObjectSubType::CAR;
+      object->sub_type = base::ObjectSubType::CAR;
       object->size << 3.8f, 1.8f, 1.6f;
       object->camera_supplement.local_center << 20, 30, 30;
       object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
-      object->center << pos_and_theta_vec[i][0],
-          pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
+      object->center << pos_and_theta_vec[i][0], pos_and_theta_vec[i][1],
+          pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
       frame.frame_id = static_cast<int>(i);
@@ -280,7 +275,7 @@ TEST(TargetTest, clapping_velocity_test) {
 
       TrackObjectPtr track_obj(new TrackObject);
       track_obj->indicator =
-        PatchIndicator(static_cast<int>(i), 0, sensor_name);
+          PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
       track_obj->timestamp = ts;
       target.Add(track_obj);
@@ -311,8 +306,9 @@ TEST(TargetTest, clapping_velocity_test) {
     // new target
     Target target(omt_param.target_param());
     target.id = 1;
-    std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
-      "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta1.txt";
+    std::string pos_theta_filename =
+        "/apollo/modules/perception/testdata/"
+        "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta1.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
     for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       CameraFrame frame;
@@ -321,13 +317,12 @@ TEST(TargetTest, clapping_velocity_test) {
       object->camera_supplement.box = bbox;
       object->camera_supplement.projected_box = bbox;
       object->type = base::ObjectType::VEHICLE;
-      object->sub_type =
-          base::ObjectSubType::CAR;
+      object->sub_type = base::ObjectSubType::CAR;
       object->size << 1.6f, 1.7f, 3.8f;
       object->camera_supplement.local_center << 18, 30, 24;
       object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
-      object->center << pos_and_theta_vec[i][0],
-          pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
+      object->center << pos_and_theta_vec[i][0], pos_and_theta_vec[i][1],
+          pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
       frame.frame_id = static_cast<int>(i);
@@ -336,7 +331,7 @@ TEST(TargetTest, clapping_velocity_test) {
 
       TrackObjectPtr track_obj(new TrackObject);
       track_obj->indicator =
-        PatchIndicator(static_cast<int>(i), 0, sensor_name);
+          PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
       track_obj->timestamp = static_cast<double>(i) * 0.066;
       target.Add(track_obj);
@@ -367,8 +362,9 @@ TEST(TargetTest, clapping_velocity_test) {
     // new target
     Target target(omt_param.target_param());
     target.id = 1;
-    std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
-      "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta2.txt";
+    std::string pos_theta_filename =
+        "/apollo/modules/perception/testdata/"
+        "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta2.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
     for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       double ts = static_cast<double>(i) * 0.066;
@@ -378,13 +374,12 @@ TEST(TargetTest, clapping_velocity_test) {
       object->camera_supplement.box = bbox;
       object->camera_supplement.projected_box = bbox;
       object->type = base::ObjectType::VEHICLE;
-      object->sub_type =
-          base::ObjectSubType::CAR;
+      object->sub_type = base::ObjectSubType::CAR;
       object->size << 3.8f, 1.8f, 1.6f;
       object->camera_supplement.local_center << 20, 30, 30;
       object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
-      object->center << pos_and_theta_vec[i][0],
-          pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
+      object->center << pos_and_theta_vec[i][0], pos_and_theta_vec[i][1],
+          pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
       frame.frame_id = static_cast<int>(i);
@@ -396,7 +391,7 @@ TEST(TargetTest, clapping_velocity_test) {
 
       TrackObjectPtr track_obj(new TrackObject);
       track_obj->indicator =
-        PatchIndicator(static_cast<int>(i), 0, sensor_name);
+          PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
       track_obj->timestamp = ts;
       target.Add(track_obj);
@@ -426,8 +421,9 @@ TEST(TargetTest, clapping_velocity_test) {
     // new target
     Target target(omt_param.target_param());
     target.id = 1;
-    std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
-      "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta3.txt";
+    std::string pos_theta_filename =
+        "/apollo/modules/perception/testdata/"
+        "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta3.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
     for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       double ts = static_cast<double>(i) * 0.033;
@@ -437,13 +433,12 @@ TEST(TargetTest, clapping_velocity_test) {
       object->camera_supplement.box = bbox;
       object->camera_supplement.projected_box = bbox;
       object->type = base::ObjectType::VEHICLE;
-      object->sub_type =
-          base::ObjectSubType::CAR;
+      object->sub_type = base::ObjectSubType::CAR;
       object->size << 3.8f, 1.8f, 1.6f;
       object->camera_supplement.local_center << 20, 30, 30;
       object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
-      object->center << pos_and_theta_vec[i][0],
-          pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
+      object->center << pos_and_theta_vec[i][0], pos_and_theta_vec[i][1],
+          pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
       frame.frame_id = static_cast<int>(i);
@@ -455,7 +450,7 @@ TEST(TargetTest, clapping_velocity_test) {
 
       TrackObjectPtr track_obj(new TrackObject);
       track_obj->indicator =
-        PatchIndicator(static_cast<int>(i), 0, sensor_name);
+          PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
       track_obj->timestamp = ts;
       target.Add(track_obj);
@@ -486,8 +481,9 @@ TEST(TargetTest, clapping_velocity_test) {
     // new target
     Target target(omt_param.target_param());
     target.id = 1;
-    std::string pos_theta_filename = "/apollo/modules/perception/testdata/"
-      "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta4.txt";
+    std::string pos_theta_filename =
+        "/apollo/modules/perception/testdata/"
+        "camera/lib/obstacle/tracker/omt/test_data/target_pos_theta4.txt";
     auto pos_and_theta_vec = read_pos_and_theta_vec(pos_theta_filename);
     for (size_t i = 0; i < pos_and_theta_vec.size(); ++i) {
       double ts = static_cast<double>(i) * 0.033;
@@ -497,13 +493,12 @@ TEST(TargetTest, clapping_velocity_test) {
       object->camera_supplement.box = bbox;
       object->camera_supplement.projected_box = bbox;
       object->type = base::ObjectType::PEDESTRIAN;
-      object->sub_type =
-          base::ObjectSubType::PEDESTRIAN;
+      object->sub_type = base::ObjectSubType::PEDESTRIAN;
       object->size << 0.5f, 0.7f, 1.7f;
       object->camera_supplement.local_center << 20, 30, 30;
       object->theta = static_cast<float>(pos_and_theta_vec[i][3]);
-      object->center << pos_and_theta_vec[i][0],
-          pos_and_theta_vec[i][1], pos_and_theta_vec[i][2];
+      object->center << pos_and_theta_vec[i][0], pos_and_theta_vec[i][1],
+          pos_and_theta_vec[i][2];
 
       frame.detected_objects.push_back(object);
       frame.frame_id = static_cast<int>(i);
@@ -515,7 +510,7 @@ TEST(TargetTest, clapping_velocity_test) {
 
       TrackObjectPtr track_obj(new TrackObject);
       track_obj->indicator =
-        PatchIndicator(static_cast<int>(i), 0, sensor_name);
+          PatchIndicator(static_cast<int>(i), 0, sensor_name);
       track_obj->object = object;
       track_obj->timestamp = ts;
       target.Add(track_obj);

@@ -30,7 +30,7 @@ import proto.fnn_model_pb2
 from proto.fnn_model_pb2 import FnnModel, Layer
 from sklearn.model_selection import train_test_split
 
-dim_input = 3 + 72
+dim_input = 7 + 72
 dim_output = 12
 
 

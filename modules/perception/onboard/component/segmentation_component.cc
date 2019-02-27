@@ -40,12 +40,12 @@ bool SegmentationComponent::Init() {
   sensor_name_ = comp_config.sensor_name();
   lidar2novatel_tf2_child_frame_id_ =
       comp_config.lidar2novatel_tf2_child_frame_id();
-  lidar_query_tf_offset_ = static_cast<float>(
-                             comp_config.lidar_query_tf_offset());
+  lidar_query_tf_offset_ =
+      static_cast<float>(comp_config.lidar_query_tf_offset());
   enable_hdmap_ = comp_config.enable_hdmap();
   writer_ = node_->CreateWriter<LidarFrameMessage>(output_channel_name_);
 
-  if (InitAlgorithmPlugin() != true) {
+  if (!InitAlgorithmPlugin()) {
     AERROR << "Failed to init segmentation component algorithm plugin.";
     return false;
   }
@@ -55,14 +55,14 @@ bool SegmentationComponent::Init() {
 bool SegmentationComponent::Proc(
     const std::shared_ptr<drivers::PointCloud>& message) {
   AINFO << "Enter segmentation component, message timestamp: "
-        << std::to_string(message->measurement_time()) << " current timestamp "
+        << std::to_string(message->measurement_time()) << " current timestamp: "
         << std::to_string(lib::TimeUtil::GetCurrentTime());
 
   std::shared_ptr<LidarFrameMessage> out_message(new (std::nothrow)
-                                                 LidarFrameMessage);
+                                                     LidarFrameMessage);
 
   bool status = InternalProc(message, out_message);
-  if (status == true) {
+  if (status) {
     writer_->Write(out_message);
     AINFO << "Send lidar segment output message.";
   }
@@ -124,11 +124,11 @@ bool SegmentationComponent::InternalProc(
   Eigen::Affine3d pose = Eigen::Affine3d::Identity();
   const double lidar_query_tf_timestamp =
       timestamp - lidar_query_tf_offset_ * 0.001;
-  if (lidar2world_trans_.GetSensor2worldTrans(lidar_query_tf_timestamp,
-                                              &pose) != true) {
+  if (!lidar2world_trans_.GetSensor2worldTrans(lidar_query_tf_timestamp,
+                                               &pose)) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
-    AERROR << "Fail to get pose at time: " << std::to_string(
-                                                  lidar_query_tf_timestamp);
+    AERROR << "Failed to get pose at time: "
+           << std::to_string(lidar_query_tf_timestamp);
     return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(

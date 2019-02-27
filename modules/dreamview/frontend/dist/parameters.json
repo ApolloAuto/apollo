@@ -252,6 +252,10 @@
 		"showMapParkingSpace": {
 			"default": true,
 			"menuId": "mapParkingSpace"
+		},
+		"showMapLaneId": {
+			"default": false,
+			"menuId": "mapLaneId"
 		}
 	},
 	"routingEditor": {

@@ -35,6 +35,7 @@ message LanePerceptionParam {
     optional DetectorParam lane_detector_param = 1;
     optional PluginParam lane_postprocessor_param = 2;
     optional PluginParam lane_tracker_param = 3;
+    optional int32 gpu_id = 4;
 }
 message CalibrationServiceParam {
     optional string calibrator_method = 2;

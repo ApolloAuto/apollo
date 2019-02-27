@@ -35,7 +35,8 @@ struct TrafficLightUnprotectedRightTurnContext;
 class TrafficLightUnprotectedRightTurnStageCreep : public Stage {
  public:
   explicit TrafficLightUnprotectedRightTurnStageCreep(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

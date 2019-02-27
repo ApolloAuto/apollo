@@ -8,6 +8,7 @@ import {
     drawDashedLineFromPoints,
     drawShapeFromPoints
 } from "utils/draw";
+import Text3D, { TEXT_ALIGN } from "renderer/text3d";
 
 import stopSignMaterial from "assets/models/stop_sign.mtl";
 import stopSignObject from "assets/models/stop_sign.obj";
@@ -46,6 +47,7 @@ const EPSILON = 1e-9;
 
 export default class Map {
     constructor() {
+        this.textRender = new Text3D();
         this.hash = -1;
         this.data = {};
         this.initialized = false;
@@ -58,7 +60,7 @@ export default class Map {
         let empty = true;
 
         for (const kind in elementIds) {
-            if (!this.shouldDrawThisElementKind(kind)) {
+            if (!this.shouldDrawObjectOfThisElementKind(kind)) {
                 continue;
             }
 
@@ -145,6 +147,34 @@ export default class Map {
         });
 
         return drewObjects;
+    }
+
+    addLaneId(lane, coordinates, scene) {
+        const centralLine = lane.centralCurve.segment;
+        let position = _.get(centralLine, '[0].startPosition');
+        if (position) {
+            position.z = 0.04;
+            position = coordinates.applyOffset(position);
+        }
+
+        const rotation = { x: 0.0, y: 0.0, z: 0.0 };
+        const points = _.get(centralLine, '[0].lineSegment.point', []);
+        if (points.length >= 2) {
+            const p1 = points[0];
+            const p2 = points[1];
+            rotation.z = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+        }
+
+        const text = this.textRender.drawText(
+            lane.id.id, scene, colorMapping.WHITE, TEXT_ALIGN.LEFT);
+        if (text) {
+            text.position.set(position.x, position.y, position.z);
+            text.rotation.set(rotation.x, rotation.y, rotation.z);
+            text.visible = false;
+            scene.add(text);
+        }
+
+        return text;
     }
 
     addRoad(road, coordinates, scene) {
@@ -245,7 +275,7 @@ export default class Map {
         const orthogonalX = (boundary2.x - boundary1.x) * (boundary3.z - boundary1.z)
             - (boundary3.x - boundary1.x) * (boundary2.z - boundary1.z);
         const orthogonalY = (boundary2.y - boundary1.y) * (boundary3.z - boundary1.z)
-             - (boundary3.y - boundary1.y) * (boundary2.z - boundary1.z);
+            - (boundary3.y - boundary1.y) * (boundary2.z - boundary1.z);
         const orthogonalConstant = -orthogonalX * boundary1.x - orthogonalY * boundary1.y;
         // get the stop line
         const stopLine = _.get(signal, 'stopLine[0].segment[0].lineSegment.point', '');
@@ -367,6 +397,13 @@ export default class Map {
         return drewObjects;
     }
 
+    removeDrewText(textMesh, scene) {
+        if (textMesh) {
+            textMesh.children.forEach(c => c.visible = false);
+            scene.remove(textMesh);
+        }
+    }
+
     removeDrewObjects(drewObjects, scene) {
         if (drewObjects) {
             drewObjects.forEach(object => {
@@ -389,7 +426,7 @@ export default class Map {
         const newData = {};
 
         for (const kind in this.data) {
-            const drawThisKind = this.shouldDrawThisElementKind(kind);
+            const drawThisKind = this.shouldDrawObjectOfThisElementKind(kind);
             newData[kind] = [];
             const oldDataOfThisKind = this.data[kind];
             const currentIds = elementIds[kind];
@@ -398,6 +435,7 @@ export default class Map {
                     newData[kind].push(oldData);
                 } else {
                     this.removeDrewObjects(oldData.drewObjects, scene);
+                    this.removeDrewText(oldData.text, scene);
                 }
             });
         }
@@ -423,7 +461,8 @@ export default class Map {
                     case "lane":
                         const lane = newData[kind][i];
                         this.data[kind].push(Object.assign(newData[kind][i], {
-                            drewObjects: this.addLane(lane, coordinates, scene)
+                            drewObjects: this.addLane(lane, coordinates, scene),
+                            text: this.addLaneId(lane, coordinates, scene)
                         }));
                         break;
                     case "clearArea":
@@ -488,7 +527,7 @@ export default class Map {
         }
     }
 
-    shouldDrawThisElementKind(kind) {
+    shouldDrawObjectOfThisElementKind(kind) {
         // Ex: mapping 'lane' to 'showMapLane' option
         const optionName = `showMap${kind[0].toUpperCase()}${kind.slice(1)}`;
 
@@ -496,13 +535,34 @@ export default class Map {
         return STORE.options[optionName] !== false;
     }
 
+    shouldDrawTextOfThisElementKind(kind) {
+        // Ex: mapping 'lane' to 'showMapLaneId' option
+        const optionName = `showMap${kind[0].toUpperCase()}${kind.slice(1)}Id`;
+
+        // NOTE: return false if the option is not found
+        return STORE.options[optionName] === true;
+    }
+
+    updateText() {
+        for (const kind in this.data) {
+            const isVisible = this.shouldDrawTextOfThisElementKind(kind);
+            this.data[kind].forEach(element => {
+                if (element.text) {
+                    element.text.visible = isVisible;
+                }
+            });
+        }
+    }
+
     updateIndex(hash, elementIds, scene) {
         if (STORE.hmi.inNavigationMode) {
             MAP_WS.requestRelativeMapData();
         } else {
+            this.updateText();
+
             let newElementKindsDrawn = '';
             for (const kind of Object.keys(elementIds).sort()) {
-                if (this.shouldDrawThisElementKind(kind)) {
+                if (this.shouldDrawObjectOfThisElementKind(kind)) {
                     newElementKindsDrawn += kind;
                 }
             }

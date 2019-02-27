@@ -18,17 +18,17 @@ make sure your changes follow the guidelines mentioned below, namely: license, t
 
 For each new file, please include a license at the top of the file.
 
-* C++ code License example [adapter.h](https://github.com/ApolloAuto/apollo/blob/master/modules/common/adapters/adapter.h);
+* C++ code License example [util.h](modules/common/util/util.h);
 
-* Python code License example [diagnostics.py](https://github.com/ApolloAuto/apollo/blob/master/modules/tools/diagnostics/diagnostics.py);
+* Python code License example [process.py](modules/tools/calibration/process.py);
 
-* Bash code License example [apollo_base.sh](https://github.com/ApolloAuto/apollo/blob/master/scripts/apollo_base.sh);
+* Bash code License example [apollo_base.sh](scripts/apollo_base.sh);
 
 #### Testing
 
 Please include unit tests for the contributed code to prove that your code works correctly,
 and make sure that your code does not break existing tests. Test files are always named to end with `_test.cc`, and the test target names in the BUILD file always end with `test`.
-Here is an example test file [adapter_test.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/common/adapters/adapter_test.cc).
+Here is an example test file [file_test.cc](cyber/common/file_test.cc).
 
 You can use command `bash apollo.sh test` to run all unit tests.
 

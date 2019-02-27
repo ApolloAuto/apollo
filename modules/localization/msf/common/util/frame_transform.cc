@@ -69,8 +69,7 @@ bool FrameTransform::UtmXYToLatlon(double x, double y, int zone, bool southhemi,
   return true;
 }
 
-bool FrameTransform::XYZToBlh(const Vector3d &xyz,
-                              Vector3d *blh) {
+bool FrameTransform::XYZToBlh(const Vector3d &xyz, Vector3d *blh) {
   projPJ pj_xyz;
   projPJ pj_blh;
   std::string xyz_src = "+proj=geocent +datum=WGS84";
@@ -92,8 +91,7 @@ bool FrameTransform::XYZToBlh(const Vector3d &xyz,
   pj_free(pj_blh);
   return true;
 }
-bool FrameTransform::BlhToXYZ(const Vector3d &blh,
-                              Vector3d *xyz) {
+bool FrameTransform::BlhToXYZ(const Vector3d &blh, Vector3d *xyz) {
   projPJ pj_xyz;
   projPJ pj_blh;
   std::string blh_src = "+proj=latlong +datum=WGS84";

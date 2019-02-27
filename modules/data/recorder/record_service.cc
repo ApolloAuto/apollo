@@ -14,24 +14,22 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/data/common/data_gflags.h"
 #include "modules/data/recorder/record_service.h"
+#include "modules/data/common/data_gflags.h"
 
-#include "gflags/gflags.h"
 #include "cyber/common/log.h"
+#include "gflags/gflags.h"
 
 namespace apollo {
 namespace data {
 
 RecordService::RecordService() = default;
 
-bool RecordService::Init(
-    const std::shared_ptr<apollo::cyber::Node>& node) {
+bool RecordService::Init(const std::shared_ptr<apollo::cyber::Node> &node) {
   AINFO << "RecordService::Init(), starting...";
 
   Instance()->server_ = node->CreateService<RecordRequest, RecordResponse>(
-      FLAGS_data_record_service_name,
-      RecordService::OnRecordRequest);
+      FLAGS_data_record_service_name, RecordService::OnRecordRequest);
 
   CHECK(Instance()->server_ != nullptr);
 

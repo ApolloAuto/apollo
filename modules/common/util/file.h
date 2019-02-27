@@ -33,23 +33,12 @@ namespace util {
 
 // TODO(all): The file utils have been moved into cyber. After migrating the
 // usages we'll retire the aliases here.
-using apollo::cyber::common::SetProtoToASCIIFile;
-using apollo::cyber::common::GetProtoFromASCIIFile;
-using apollo::cyber::common::SetProtoToBinaryFile;
-using apollo::cyber::common::GetProtoFromBinaryFile;
-using apollo::cyber::common::GetProtoFromFile;
-using apollo::cyber::common::GetContent;
-using apollo::cyber::common::GetAbsolutePath;
-using apollo::cyber::common::PathExists;
 using apollo::cyber::common::DirectoryExists;
-using apollo::cyber::common::Glob;
-using apollo::cyber::common::CopyFile;
-using apollo::cyber::common::CopyDir;
-using apollo::cyber::common::Copy;
 using apollo::cyber::common::EnsureDirectory;
-using apollo::cyber::common::RemoveAllFiles;
-using apollo::cyber::common::ListSubPaths;
-using apollo::cyber::common::GetFileName;
+using apollo::cyber::common::GetProtoFromASCIIFile;
+using apollo::cyber::common::GetProtoFromFile;
+using apollo::cyber::common::PathExists;
+using apollo::cyber::common::SetProtoToASCIIFile;
 
 }  // namespace util
 }  // namespace common

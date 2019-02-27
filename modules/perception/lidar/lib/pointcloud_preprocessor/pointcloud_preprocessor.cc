@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/pointcloud_preprocessor/pointcloud_preprocessor.h"
 
+#include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_log.h"
@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using apollo::cyber::common::GetAbsolutePath;
 
 const float PointCloudPreprocessor::kPointInfThreshold = 1e3;
 
@@ -43,7 +43,7 @@ bool PointCloudPreprocessor::Init(
   config_file = GetAbsolutePath(config_file, options.sensor_name);
   config_file = GetAbsolutePath(config_file, "pointcloud_preprocessor.conf");
   PointCloudPreprocessorConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   filter_naninf_points_ = config.filter_naninf_points();
   filter_nearby_box_points_ = config.filter_nearby_box_points();
   box_forward_x_ = config.box_forward_x();
@@ -92,7 +92,7 @@ bool PointCloudPreprocessor::Preprocess(
       }
       Eigen::Vector3d vec3d_lidar(pt.x(), pt.y(), pt.z());
       Eigen::Vector3d vec3d_novatel =
-        options.sensor2novatel_extrinsics * vec3d_lidar;
+          options.sensor2novatel_extrinsics * vec3d_lidar;
       if (filter_nearby_box_points_ && vec3d_novatel[0] < box_forward_x_ &&
           vec3d_novatel[0] > box_backward_x_ &&
           vec3d_novatel[1] < box_forward_y_ &&
@@ -141,7 +141,7 @@ bool PointCloudPreprocessor::Preprocess(
       }
       Eigen::Vector3d vec3d_lidar(pt.x, pt.y, pt.z);
       Eigen::Vector3d vec3d_novatel =
-        options.sensor2novatel_extrinsics * vec3d_lidar;
+          options.sensor2novatel_extrinsics * vec3d_lidar;
       if (filter_nearby_box_points_ && vec3d_novatel[0] < box_forward_x_ &&
           vec3d_novatel[0] > box_backward_x_ &&
           vec3d_novatel[1] < box_forward_y_ &&

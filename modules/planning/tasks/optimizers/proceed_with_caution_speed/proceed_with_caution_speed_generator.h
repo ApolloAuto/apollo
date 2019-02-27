@@ -21,7 +21,6 @@
 #pragma once
 
 #include "modules/common/status/status.h"
-#include "modules/planning/proto/st_boundary_config.pb.h"
 #include "modules/planning/tasks/optimizers/speed_optimizer.h"
 
 namespace apollo {
@@ -50,6 +49,7 @@ class ProceedWithCautionSpeedGenerator : public SpeedOptimizer {
                          const SpeedData& reference_speed_data,
                          PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
+
  private:
   // TODO(all): might move to conf later
   const double proceeding_speed_ = 2.23;    // (5mph proceeding speed)

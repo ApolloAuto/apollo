@@ -29,8 +29,8 @@ using apollo::perception::base::HdmapStruct;
 using HdmapStructConstPtr =
     std::shared_ptr<const apollo::perception::base::HdmapStruct>;
 using HdmapStructPtr = std::shared_ptr<apollo::perception::base::HdmapStruct>;
-using apollo::perception::base::PointD;
 using apollo::perception::base::Object;
+using apollo::perception::base::PointD;
 using ObjectConstPtr = std::shared_ptr<const apollo::perception::base::Object>;
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
 
@@ -132,12 +132,12 @@ TEST(ObjectInRoiTest, test_roi) {
   ObjectPtr obj(new Object);
   obj->center = Eigen::Vector3d(0, 0, 0);
   objects.push_back(obj);
-  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), true);
+  EXPECT_TRUE(ObjectInRoiCheck(hdmap, objects, &valid_objects));
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap.reset(new HdmapStruct());
   valid_objects.clear();
-  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), false);
+  EXPECT_TRUE(ObjectInRoiCheck(hdmap, objects, &valid_objects));
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons.resize(1);
@@ -155,12 +155,12 @@ TEST(ObjectInRoiTest, test_roi) {
   pt.z = 0;
   hdmap->road_polygons[0].push_back(pt);
   valid_objects.clear();
-  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), false);
+  EXPECT_TRUE(ObjectInRoiCheck(hdmap, objects, &valid_objects));
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons[0][2].y = -0.1;
   valid_objects.clear();
-  EXPECT_EQ(ObjectInRoiCheck(hdmap, objects, &valid_objects), false);
+  EXPECT_FALSE(ObjectInRoiCheck(hdmap, objects, &valid_objects));
   EXPECT_EQ(valid_objects.size(), 0);
 }
 

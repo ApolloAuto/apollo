@@ -52,6 +52,17 @@ DEFINE_string(scenario_traffic_light_unprotected_right_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_unprotected_right_turn_config.pb.txt",
               "scenario_traffic_light_unprotected_right_turn config file");
+DEFINE_string(scenario_valet_parking_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/valet_parking_config.pb.txt",
+              "scenario_valet_parking config file");
+DEFINE_string(scenario_narrow_street_u_turn_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/narrow_street_u_turn_config.pb.txt",
+              "scenario_narrow_street_u_turn config file");
+
+DEFINE_bool(enable_scenario_dispatcher, true,
+            "enable dispatcher inside scenario manager to select scenario");
 
 DEFINE_bool(enable_scenario_side_pass, true,
             "enable side pass scenario in planning");
@@ -133,7 +144,7 @@ DEFINE_double(max_collision_distance, 0.1,
               "equal to this (meters)");
 
 DEFINE_bool(ignore_overlapped_obstacle, false,
-            "ingore obstacle that overlapps with ADC. Only enable this flag "
+            "ignore obstacle that overlapps with ADC. Only enable this flag "
             "when you found fake obstacle result from poorly lidar");
 
 DEFINE_double(replan_lateral_distance_threshold, 0.5,
@@ -381,6 +392,8 @@ DEFINE_double(
     "weight for lateral obstacle distance in lateral trajectory optimization");
 DEFINE_double(lateral_third_order_derivative_max, 0.1,
               "the maximal allowance for lateral third order derivative");
+DEFINE_double(lateral_derivative_bound_default, 2.0,
+              "the default value for lateral derivative bound.");
 DEFINE_double(max_s_lateral_optimization, 60.0,
               "The maximal s for lateral optimization.");
 DEFINE_double(default_delta_s_lateral_optimization, 1.0,
@@ -404,9 +417,6 @@ DEFINE_double(speed_bump_speed_limit, 4.4704,
 DEFINE_double(navigation_fallback_cruise_time, 8.0,
               "The time range of fallback cruise under navigation mode.");
 
-DEFINE_bool(enable_stitch_last_trajectory, true,
-            "To control whether to stitch last trajectory or not.");
-
 DEFINE_bool(enable_planning_pad_msg, false,
             "To control whether to enable planning pad message.");
 
@@ -423,7 +433,7 @@ DEFINE_double(open_space_prediction_time_horizon, 2.0,
               "given by prediction");
 
 DEFINE_bool(enable_perception_obstacles, true,
-            "enable the open space planner to take percetion obstacles into "
+            "enable the open space planner to take perception obstacles into "
             "consideration");
 
 DEFINE_bool(enable_open_space_planner_thread, true,
@@ -464,7 +474,7 @@ DEFINE_bool(
     "True to enable planning smoother among different planning cycles.");
 DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
-              "within this threshold, current planning will be smoothered.");
+              "within this threshold, current planning will be smoothed.");
 
 DEFINE_double(side_pass_road_buffer, 0.05,
               "(unit: meter) for side pass scenario ");
@@ -490,5 +500,3 @@ DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 DEFINE_bool(enable_parallel_open_space_smoother, false,
             "True to enable open space smoother parallel implementation.");
-DEFINE_bool(enable_derivative_check, false,
-            "True to enable derivative check inside open space planner.");

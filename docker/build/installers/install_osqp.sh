@@ -28,7 +28,7 @@ unzip master.zip
 
 pushd osqp-contrib-master
 
-cp -r ./osqp /usr/include/
+cp -r ./osqp /usr/local/include/
 popd
 
 rm -fr master.zip osqp-contrib-master

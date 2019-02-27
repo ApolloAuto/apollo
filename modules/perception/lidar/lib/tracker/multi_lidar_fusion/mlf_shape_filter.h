@@ -29,30 +29,25 @@ class MlfShapeFilter : public MlfBaseFilter {
   MlfShapeFilter() = default;
   virtual ~MlfShapeFilter() = default;
 
-  bool Init(const MlfFilterInitOptions& options =
-      MlfFilterInitOptions()) override;
+  bool Init(
+      const MlfFilterInitOptions& options = MlfFilterInitOptions()) override;
 
   // @brief: updating shape filter with object
   // @params [in]: options for updating
   // @params [in]: track data, not include new object
   // @params [in/out]: new object for updating
-  void UpdateWithObject(
-      const MlfFilterOptions& options,
-      const MlfTrackDataConstPtr& track_data,
-      TrackedObjectPtr new_object) override;
+  void UpdateWithObject(const MlfFilterOptions& options,
+                        const MlfTrackDataConstPtr& track_data,
+                        TrackedObjectPtr new_object) override;
 
   // @brief: updating shape filter without object
   // @params [in]: options for updating
   // @params [in]: current timestamp
   // @params [in/out]: track data to be updated
-  void UpdateWithoutObject(
-      const MlfFilterOptions& options,
-      double timestamp,
-      MlfTrackDataPtr track_data) override;
+  void UpdateWithoutObject(const MlfFilterOptions& options, double timestamp,
+                           MlfTrackDataPtr track_data) override;
 
-  std::string Name() const override {
-    return "MlfShapeFilter";
-  }
+  std::string Name() const override { return "MlfShapeFilter"; }
 
  protected:
   common::ConvexHull2D<base::PointDCloud, base::PolygonDType> hull_;
@@ -63,5 +58,3 @@ class MlfShapeFilter : public MlfBaseFilter {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

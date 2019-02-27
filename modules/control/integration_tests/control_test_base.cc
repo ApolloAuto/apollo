@@ -16,8 +16,8 @@
 
 #include <memory>
 
+#include "cyber/common/file.h"
 #include "google/protobuf/text_format.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/control/integration_tests/control_test_base.h"
 #include "modules/control/proto/control_cmd.pb.h"
@@ -41,8 +41,8 @@ using apollo::planning::ADCTrajectory;
 uint32_t ControlTestBase::s_seq_num_ = 0;
 
 bool ControlTestBase::test_control() {
-  if (!common::util::GetProtoFromFile(FLAGS_control_conf_file,
-                                      &control_.control_conf_)) {
+  if (!cyber::common::GetProtoFromFile(FLAGS_control_conf_file,
+                                       &control_.control_conf_)) {
     AERROR << "Unable to load control conf file: " << FLAGS_control_conf_file;
     exit(EXIT_FAILURE);
   }
@@ -59,7 +59,7 @@ bool ControlTestBase::test_control() {
   // Pad message
   if (!FLAGS_test_pad_file.empty()) {
     PadMessage pad_message;
-    if (!common::util::GetProtoFromFile(
+    if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_pad_file, &pad_message)) {
       AERROR << "Failed to load PadMesssage from file " << FLAGS_test_data_dir
              << FLAGS_test_pad_file;
@@ -71,7 +71,7 @@ bool ControlTestBase::test_control() {
   // Localization
   if (!FLAGS_test_localization_file.empty()) {
     LocalizationEstimate localization;
-    if (!common::util::GetProtoFromFile(
+    if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_localization_file,
             &localization)) {
       AERROR << "Failed to load localization file " << FLAGS_test_data_dir
@@ -86,7 +86,7 @@ bool ControlTestBase::test_control() {
   // Planning
   if (!FLAGS_test_planning_file.empty()) {
     ADCTrajectory trajectory;
-    if (!common::util::GetProtoFromFile(
+    if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_planning_file, &trajectory)) {
       AERROR << "Failed to load planning file " << FLAGS_test_data_dir
              << FLAGS_test_planning_file;
@@ -99,7 +99,7 @@ bool ControlTestBase::test_control() {
   // Chassis
   if (!FLAGS_test_chassis_file.empty()) {
     Chassis chassis;
-    if (!common::util::GetProtoFromFile(
+    if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_chassis_file, &chassis)) {
       AERROR << "Failed to load chassis file " << FLAGS_test_data_dir
              << FLAGS_test_chassis_file;
@@ -111,7 +111,7 @@ bool ControlTestBase::test_control() {
   // Monitor
   if (!FLAGS_test_monitor_file.empty()) {
     MonitorMessage monitor_message;
-    if (!apollo::common::util::GetProtoFromFile(
+    if (!cyber::common::GetProtoFromFile(
             FLAGS_test_data_dir + FLAGS_test_monitor_file, &monitor_message)) {
       AERROR << "Failed to load monitor file " << FLAGS_test_data_dir
              << FLAGS_test_monitor_file;
@@ -153,14 +153,14 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
     AINFO << "The golden file is " << tmp_golden_path << " Remember to:\n"
           << "mv " << tmp_golden_path << " " << FLAGS_test_data_dir << "\n"
           << "git add " << FLAGS_test_data_dir << "/" << golden_result_file;
-    common::util::SetProtoToASCIIFile(control_command_, golden_result_file);
+    cyber::common::SetProtoToASCIIFile(control_command_, golden_result_file);
   } else {
     ControlCommand golden_result;
     bool load_success =
-        common::util::GetProtoFromASCIIFile(full_golden_path, &golden_result);
+        cyber::common::GetProtoFromASCIIFile(full_golden_path, &golden_result);
     if (!load_success) {
       AERROR << "Failed to load golden file: " << full_golden_path;
-      common::util::SetProtoToASCIIFile(control_command_, tmp_golden_path);
+      cyber::common::SetProtoToASCIIFile(control_command_, tmp_golden_path);
       AINFO << "Current result is written to " << tmp_golden_path;
       return false;
     }
@@ -168,7 +168,8 @@ bool ControlTestBase::test_control(const std::string &test_case_name,
         common::util::IsProtoEqual(golden_result, control_command_);
     if (!same_result) {
       std::string tmp_test_result_file = tmp_golden_path + ".tmp";
-      common::util::SetProtoToASCIIFile(control_command_, tmp_test_result_file);
+      cyber::common::SetProtoToASCIIFile(control_command_,
+                                         tmp_test_result_file);
       AERROR << "found diff " << tmp_test_result_file << " "
              << full_golden_path;
     }

@@ -96,8 +96,8 @@ TEST(CommonIoTest, GetFileList) {
   std::vector<std::string> files;
   EXPECT_TRUE(GetFileList(path, "", &files));
   EXPECT_FALSE(GetFileList("/not_exist_path", "", &files));
-  EXPECT_TRUE(GetFileList(
-      "/apollo/modules/perception/testdata/lib/data", "txt", &files));
+  EXPECT_TRUE(GetFileList("/apollo/modules/perception/testdata/lib/data", "txt",
+                          &files));
 }
 
 }  // namespace common

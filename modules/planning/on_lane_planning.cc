@@ -17,6 +17,7 @@
 #include <list>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "gtest/gtest_prod.h"
 
 #include "modules/routing/proto/routing.pb.h"
@@ -28,7 +29,7 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
 #include "modules/planning/on_lane_planning.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -53,9 +54,6 @@ OnLanePlanning::~OnLanePlanning() {
     reference_line_provider_->Stop();
   }
   planner_->Stop();
-  last_publishable_trajectory_.reset(nullptr);
-  frame_.reset(nullptr);
-  planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
   PlanningContext::MutablePlanningStatus()->Clear();
   last_routing_.Clear();
@@ -75,7 +73,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
   planner_dispatcher_->Init();
 
-  CHECK(apollo::common::util::GetProtoFromFile(
+  CHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
@@ -104,13 +102,11 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 }
 
 Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
-                              const TrajectoryPoint& planning_start_point,
-                              const double start_time,
-                              const VehicleState& vehicle_state,
-                              ADCTrajectory* output_trajectory) {
+                                 const TrajectoryPoint& planning_start_point,
+                                 const VehicleState& vehicle_state) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
-                         start_time, vehicle_state,
-                         reference_line_provider_.get(), output_trajectory));
+                         vehicle_state, reference_line_provider_.get()));
+
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
@@ -151,6 +147,7 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
+// TODO(all): fix this! this will cause unexpected behavior from controller
 void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
   trajectory_pb->clear_trajectory_point();
 
@@ -174,7 +171,7 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
 }
 
 void OnLanePlanning::RunOnce(const LocalView& local_view,
-                          ADCTrajectory* const trajectory_pb) {
+                             ADCTrajectory* const trajectory_pb) {
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
 
@@ -230,7 +227,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
-  const double planning_cycle_time = 1.0 / FLAGS_planning_loop_rate;
+  const double planning_cycle_time =
+      1.0 / static_cast<double>(FLAGS_planning_loop_rate);
 
   std::vector<TrajectoryPoint> stitching_trajectory;
   std::string replan_reason;
@@ -241,8 +239,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   bool update_ego_info =
       EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
-  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
-                     vehicle_state, trajectory_pb);
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
   if (update_ego_info && status.ok()) {
     EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
@@ -277,7 +274,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     }
 
     FillPlanningPb(start_timestamp, trajectory_pb);
-    frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+    frame_->set_current_frame_planned_trajectory(*trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
     FrameHistory::Instance()->Add(n, std::move(frame_));
     return;
@@ -336,7 +333,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   FillPlanningPb(start_timestamp, trajectory_pb);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
-  frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+  frame_->set_current_frame_planned_trajectory(*trajectory_pb);
   if (FLAGS_enable_planning_smoother) {
     planning_smoother_.Smooth(FrameHistory::Instance(), frame_.get(),
                               trajectory_pb);
@@ -372,7 +369,8 @@ Status OnLanePlanning::Plan(
         stitching_trajectory.back());
   }
 
-  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
+  auto status =
+      planner_->Plan(stitching_trajectory.back(), frame_.get(), trajectory_pb);
 
   ptr_debug->mutable_planning_data()->set_front_clear_distance(
       EgoInfo::Instance()->front_clear_distance());
@@ -444,11 +442,9 @@ Status OnLanePlanning::Plan(
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  if (FLAGS_enable_stitch_last_trajectory) {
-    last_publishable_trajectory_->PrependTrajectoryPoints(
-        std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
-                                     stitching_trajectory.end() - 1));
-  }
+  last_publishable_trajectory_->PrependTrajectoryPoints(
+      std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
+                                   stitching_trajectory.end() - 1));
 
   last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
 

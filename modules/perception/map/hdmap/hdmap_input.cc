@@ -18,8 +18,8 @@
 
 #include <algorithm>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/common/geometry/common.h"
@@ -32,14 +32,14 @@ namespace map {
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::JunctionInfoConstPtr;
-using apollo::hdmap::RoadRoiPtr;
 using apollo::hdmap::LineBoundary;
+using apollo::hdmap::RoadRoiPtr;
 using apollo::hdmap::SignalInfoConstPtr;
 
 using base::PointD;
-using base::RoadBoundary;
 using base::PointDCloud;
 using base::PointDCloudPtr;
+using base::RoadBoundary;
 // HDMapInput
 
 HDMapInput::HDMapInput() {}
@@ -88,9 +88,9 @@ bool HDMapInput::InitHDMap() {
   // Option2: Load own map with different hdmap_sample_step_
   // Load hdmap path from global_flagfile.txt
   hdmap_file_ =
-    apollo::common::util::StrCat(FLAGS_map_dir, "/base_map.bin", filename);
+      apollo::common::util::StrCat(FLAGS_map_dir, "/base_map.bin", filename);
   AINFO << "hdmap_file_: " << hdmap_file_;
-  if (!apollo::common::util::PathExists(hdmap_file_)) {
+  if (!apollo::cyber::common::PathExists(hdmap_file_)) {
     AERROR << "Failed to find hadmap file: " << hdmap_file_;
     return false;
   }
@@ -114,12 +114,10 @@ bool HDMapInput::GetRoiHDMapStruct(
   point.set_x(pointd.x);
   point.set_y(pointd.y);
   point.set_z(pointd.z);
-  int status = hdmap_->GetRoadBoundaries(point, distance,
-      &road_boundary_vec,
-      &junctions_vec);
+  int status = hdmap_->GetRoadBoundaries(point, distance, &road_boundary_vec,
+                                         &junctions_vec);
   if (status != 0) {
-    AERROR << "Failed to get road boundary, point: "
-      << point.DebugString();
+    AERROR << "Failed to get road boundary, point: " << point.DebugString();
     return false;
   }
   if (hdmap_struct_prt != nullptr) {
@@ -132,17 +130,13 @@ bool HDMapInput::GetRoiHDMapStruct(
   }
   // merge boundary and junction
   std::vector<RoadBoundary> road_boundaries;
-  MergeBoundaryJunction(
-      road_boundary_vec,
-      junctions_vec,
-      &road_boundaries,
-      &(hdmap_struct_prt->road_polygons),
-      &(hdmap_struct_prt->junction_polygons));
+  MergeBoundaryJunction(road_boundary_vec, junctions_vec, &road_boundaries,
+                        &(hdmap_struct_prt->road_polygons),
+                        &(hdmap_struct_prt->junction_polygons));
   // filter road boundary by junction
-  GetRoadBoundaryFilteredByJunctions(
-      road_boundaries,
-      hdmap_struct_prt->junction_polygons,
-      &(hdmap_struct_prt->road_boundary));
+  GetRoadBoundaryFilteredByJunctions(road_boundaries,
+                                     hdmap_struct_prt->junction_polygons,
+                                     &(hdmap_struct_prt->road_boundary));
   return true;
 }
 
@@ -169,9 +163,8 @@ void HDMapInput::MergeBoundaryJunction(
     temp_cloud->clear();
     const LineBoundary& left_boundary = boundary[i]->left_boundary;
     const std::vector<apollo::common::PointENU>& left_line_points =
-      left_boundary.line_points;
-    ADEBUG << "input left road_boundary size = " <<
-    left_line_points.size();
+        left_boundary.line_points;
+    ADEBUG << "input left road_boundary size = " << left_line_points.size();
     step = (left_line_points.size() > 2) ? hdmap_sample_step_ : 1;
     for (unsigned int idx = 0; idx < left_line_points.size(); idx += step) {
       PointD pointd;
@@ -181,21 +174,21 @@ void HDMapInput::MergeBoundaryJunction(
       temp_cloud->push_back(pointd);
     }
     DownsamplePoints(temp_cloud,
-        &(road_boundaries_ptr->at(polygons_index).left_boundary));
+                     &(road_boundaries_ptr->at(polygons_index).left_boundary));
     for (unsigned int index = 0;
-        index < road_boundaries_ptr->at(polygons_index).left_boundary.size();
-        ++index) {
-      road_polygons_ptr->at(polygons_index).push_back(
-          road_boundaries_ptr->at(polygons_index).left_boundary[index]);
+         index < road_boundaries_ptr->at(polygons_index).left_boundary.size();
+         ++index) {
+      road_polygons_ptr->at(polygons_index)
+          .push_back(
+              road_boundaries_ptr->at(polygons_index).left_boundary[index]);
     }
     ADEBUG << "left road_boundary downsample size = "
-      << road_polygons_ptr->at(polygons_index).size();
+           << road_polygons_ptr->at(polygons_index).size();
     temp_cloud->clear();
     const LineBoundary& right_boundary = boundary[i]->right_boundary;
-    const std::vector<apollo::common::PointENU>& right_line_points
-      = right_boundary.line_points;
-    ADEBUG << "input right road_boundary size = "
-      << right_line_points.size();
+    const std::vector<apollo::common::PointENU>& right_line_points =
+        right_boundary.line_points;
+    ADEBUG << "input right road_boundary size = " << right_line_points.size();
     step = (right_line_points.size() > 2) ? hdmap_sample_step_ : 1;
     for (unsigned int idx = 0; idx < right_line_points.size(); idx += step) {
       PointD pointd;
@@ -205,18 +198,18 @@ void HDMapInput::MergeBoundaryJunction(
       temp_cloud->push_back(pointd);
     }
     DownsamplePoints(temp_cloud,
-        &(road_boundaries_ptr->at(polygons_index).right_boundary));
+                     &(road_boundaries_ptr->at(polygons_index).right_boundary));
     for (unsigned int index = 0;
-        index <
-        road_boundaries_ptr->at(polygons_index).right_boundary.size();
-        ++index) {
-      road_polygons_ptr->at(polygons_index).push_back(
-          road_boundaries_ptr->at(polygons_index).right_boundary[
-          road_boundaries_ptr->at(
-            polygons_index).right_boundary.size() - 1 - index]);
+         index < road_boundaries_ptr->at(polygons_index).right_boundary.size();
+         ++index) {
+      road_polygons_ptr->at(polygons_index)
+          .push_back(road_boundaries_ptr->at(polygons_index)
+                         .right_boundary[road_boundaries_ptr->at(polygons_index)
+                                             .right_boundary.size() -
+                                         1 - index]);
     }
     ADEBUG << "right road_boundary downsample size = "
-      << road_polygons_ptr->at(polygons_index).size();
+           << road_polygons_ptr->at(polygons_index).size();
     polygons_index++;
   }
   // merge junctions
@@ -242,13 +235,13 @@ bool HDMapInput::GetRoadBoundaryFilteredByJunctions(
     std::vector<base::PolygonDType> temp_left_boundary_vec;
     std::vector<base::PolygonDType> temp_right_boundary_vec;
     // filter left boundary points
-    this->SplitBoundary(temp_road_boundary.left_boundary,
-        junctions,  &temp_left_boundary_vec);
+    this->SplitBoundary(temp_road_boundary.left_boundary, junctions,
+                        &temp_left_boundary_vec);
     // filter right boundary points
-    this->SplitBoundary(temp_road_boundary.right_boundary,
-        junctions, &temp_right_boundary_vec);
-    auto n_temp_road_boundary = std::max(temp_left_boundary_vec.size(),
-        temp_right_boundary_vec.size());
+    this->SplitBoundary(temp_road_boundary.right_boundary, junctions,
+                        &temp_right_boundary_vec);
+    auto n_temp_road_boundary =
+        std::max(temp_left_boundary_vec.size(), temp_right_boundary_vec.size());
     for (size_t i = 0; i < n_temp_road_boundary; ++i) {
       base::RoadBoundary temp_road_boundary;
       if (i < temp_left_boundary_vec.size()) {
@@ -263,10 +256,9 @@ bool HDMapInput::GetRoadBoundaryFilteredByJunctions(
   return true;
 }
 
-void HDMapInput::DownsamplePoints(
-    const base::PointDCloudPtr& raw_cloud_ptr,
-    base::PointCloud<base::PointD>* polygon_ptr,
-    size_t min_points_num_for_sample) const {
+void HDMapInput::DownsamplePoints(const base::PointDCloudPtr& raw_cloud_ptr,
+                                  base::PointCloud<base::PointD>* polygon_ptr,
+                                  size_t min_points_num_for_sample) const {
   const PointDCloud& raw_cloud = *raw_cloud_ptr;
   unsigned int spt = 0;
   double acos_theta = 0.0;
@@ -286,8 +278,8 @@ void HDMapInput::DownsamplePoints(
     const PointD& point_2 = raw_cloud[idx];
     Eigen::Vector2d v1(point_1.x - point_0.x, point_1.y - point_0.y);
     Eigen::Vector2d v2(point_2.x - point_1.x, point_2.y - point_1.y);
-    double vector_dist = sqrt(v1.cwiseProduct(v1).sum())
-      * sqrt(v2.cwiseProduct(v2).sum());
+    double vector_dist =
+        sqrt(v1.cwiseProduct(v1).sum()) * sqrt(v2.cwiseProduct(v2).sum());
     // judge duplicate points
     if (vector_dist < DBL_EPSILON) {
       continue;
@@ -308,8 +300,8 @@ void HDMapInput::DownsamplePoints(
   }
   // the last point
   polygon_ptr->push_back(raw_cloud[raw_cloud_size - 1]);
-  AINFO << "Downsample road boundary points from "
-    << raw_cloud_size << " to " << polygon_ptr->size();
+  AINFO << "Downsample road boundary points from " << raw_cloud_size << " to "
+        << polygon_ptr->size();
 }
 
 void HDMapInput::SplitBoundary(
@@ -388,46 +380,44 @@ bool HDMapInput::GetNearestLaneDirection(const base::PointD& pointd,
   return true;
 }
 
-bool HDMapInput::GetSignalsFromHDMap(const Eigen::Vector3d& pointd,
-    double forward_distance,
+bool HDMapInput::GetSignalsFromHDMap(
+    const Eigen::Vector3d& pointd, double forward_distance,
     std::vector<apollo::hdmap::Signal>* signals) {
-    apollo::common::PointENU point;
-    point.set_x(pointd(0));
-    point.set_y(pointd(1));
-    point.set_z(pointd(2));
-    std::vector<SignalInfoConstPtr> forward_signals;
-    // int result = _hdmap->get_forward_signal(
-    //         point,
-    //         forward_distance,
-    //         &forward_signals);
-    // int result = _hdmap->get_forward_nearest_signals_on_road(
-    //         point,
-    //         forward_distance,
-    //         &forward_signals);
-    int result = hdmap_->GetForwardNearestSignalsOnLane(
-        point,
-        forward_distance,
-        &forward_signals);
-    if (result != 0) {
-      AERROR << "Failed to call HDMap::get_signal. point: "
-        << point.ShortDebugString();
-      return false;
-    }
-    signals->reserve(forward_signals.size());
-    for (auto& signal_info : forward_signals) {
-      signals->push_back(signal_info->signal());
-      ADEBUG << "Signal: " << signals->back().DebugString();
-    }
-    ADEBUG << "get_signal success. num_signals: " << signals->size()
-      << " point: " << point.ShortDebugString();
-    return true;
+  apollo::common::PointENU point;
+  point.set_x(pointd(0));
+  point.set_y(pointd(1));
+  point.set_z(pointd(2));
+  std::vector<SignalInfoConstPtr> forward_signals;
+  // int result = _hdmap->get_forward_signal(
+  //         point,
+  //         forward_distance,
+  //         &forward_signals);
+  // int result = _hdmap->get_forward_nearest_signals_on_road(
+  //         point,
+  //         forward_distance,
+  //         &forward_signals);
+  int result = hdmap_->GetForwardNearestSignalsOnLane(point, forward_distance,
+                                                      &forward_signals);
+  if (result != 0) {
+    AERROR << "Failed to call HDMap::get_signal. point: "
+           << point.ShortDebugString();
+    return false;
+  }
+  signals->reserve(forward_signals.size());
+  for (auto& signal_info : forward_signals) {
+    signals->push_back(signal_info->signal());
+    ADEBUG << "Signal: " << signals->back().DebugString();
+  }
+  ADEBUG << "get_signal success. num_signals: " << signals->size()
+         << " point: " << point.ShortDebugString();
+  return true;
 }
 bool HDMapInput::GetSignals(const Eigen::Vector3d& pointd,
-    double forward_distance,
-    std::vector<apollo::hdmap::Signal>* signals) {
-    lib::MutexLock lock(&mutex_);
-    CHECK_NOTNULL(hdmap_.get());
-    return GetSignalsFromHDMap(pointd, forward_distance, signals);
+                            double forward_distance,
+                            std::vector<apollo::hdmap::Signal>* signals) {
+  lib::MutexLock lock(&mutex_);
+  CHECK_NOTNULL(hdmap_.get());
+  return GetSignalsFromHDMap(pointd, forward_distance, signals);
 }
 // add end
 

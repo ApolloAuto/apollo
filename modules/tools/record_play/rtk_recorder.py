@@ -40,7 +40,7 @@ class RtkRecord(object):
     """
 
     def write(self, data):
-        """wrap file write function to flush data to disk"""
+        """Wrap file write function to flush data to disk"""
         self.file_handler.write(data)
         self.file_handler.flush()
 
@@ -52,10 +52,10 @@ class RtkRecord(object):
 
         try:
             self.file_handler = open(record_file, 'w')
-        except:
-            self.logger.error("open file %s failed" % (record_file))
+        except IOError:
+            self.logger.error("Open file %s failed" % (record_file))
             self.file_handler.close()
-            sys.exit()
+            sys.exit(1)
 
         self.write("x,y,z,speed,acceleration,curvature,"
                    "curvature_change_rate,time,theta,gear,s,throttle,brake,steering\n")
@@ -76,7 +76,7 @@ class RtkRecord(object):
         """
         New message received
         """
-        if self.terminating == True:
+        if self.terminating is True:
             self.logger.info("terminating when receive chassis msg")
             return
 
@@ -93,7 +93,7 @@ class RtkRecord(object):
         """
         New message received
         """
-        if self.terminating == True:
+        if self.terminating is True:
             self.logger.info("terminating when receive localization msg")
             return
 
@@ -162,7 +162,7 @@ class RtkRecord(object):
         """
         self.terminating = True
         self.logger.info("Shutting Down...")
-        self.logger.info("file is written into %s" % self.record_file)
+        self.logger.info("File is written into %s" % self.record_file)
         self.file_handler.close()
 
 

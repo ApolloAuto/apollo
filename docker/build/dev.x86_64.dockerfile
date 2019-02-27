@@ -25,6 +25,7 @@ RUN apt-get update -y && \
     liblapack-dev \
     libpcap-dev \
     libsqlite3-dev \
+    libgtest-dev \
     locate \
     lsof \
     nfs-common \
@@ -58,9 +59,11 @@ RUN bash /tmp/installers/install_nlopt.sh
 RUN bash /tmp/installers/install_node.sh
 RUN bash /tmp/installers/install_ota.sh
 RUN bash /tmp/installers/install_pcl.sh
+RUN bash /tmp/installers/install_poco.sh
 RUN bash /tmp/installers/install_protobuf.sh
 RUN bash /tmp/installers/install_python_modules.sh
 RUN bash /tmp/installers/install_qp_oases.sh
+RUN bash /tmp/installers/install_qt.sh
 RUN bash /tmp/installers/install_supervisor.sh
 RUN bash /tmp/installers/install_undistort.sh
 RUN bash /tmp/installers/install_user.sh

@@ -36,8 +36,7 @@ DEFINE_double(vehicle_max_linear_acc, 4.0,
               "Upper bound of vehicle linear acceleration");
 DEFINE_double(vehicle_min_linear_acc, -4.0,
               "Lower bound of vehicle linear deceleration");
-DEFINE_double(vehicle_max_speed, 35.0,
-              "Max speed of vehicle");
+DEFINE_double(vehicle_max_speed, 35.0, "Max speed of vehicle");
 
 // Tracking Adaptation
 DEFINE_double(max_tracking_time, 0.5,
@@ -54,16 +53,18 @@ DEFINE_double(pedestrian_nearby_lane_search_radius, 3.0,
               "Radius to determine if pedestrian-like obstacle is near lane.");
 
 // Scenario
-DEFINE_double(junction_distance_threshold, 10.0, "Distance threshold "
+DEFINE_double(junction_distance_threshold, 10.0,
+              "Distance threshold "
               "to junction to consider as junction scenario");
 DEFINE_bool(enable_prioritize_obstacles, true,
             "If to enable the functionality to prioritize obstacles");
 DEFINE_bool(enable_junction_feature, true,
             "If to enable building junction feature for obstacles");
 DEFINE_bool(enable_all_junction, false,
-           "If consider all junction with junction_mlp_model.");
+            "If consider all junction with junction_mlp_model.");
 
 // Obstacle features
+DEFINE_int32(ego_vehicle_id, -1, "The obstacle ID of the ego vehicle.");
 DEFINE_double(scan_length, 80.0, "The length of the obstacles scan area");
 DEFINE_double(scan_width, 12.0, "The width of the obstacles scan area");
 DEFINE_double(back_dist_ignore_ped, -2.0,
@@ -97,7 +98,8 @@ DEFINE_double(still_pedestrian_position_std, 0.5,
               "Position standard deviation for still obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "Gap between two lane points.");
-DEFINE_double(dense_lane_gap, 0.2, "Gap between two adjacent lane points"
+DEFINE_double(dense_lane_gap, 0.2,
+              "Gap between two adjacent lane points"
               " for constructing dense lane graph.");
 DEFINE_int32(max_num_current_lane, 2, "Max number to search current lanes");
 DEFINE_int32(max_num_nearby_lane, 2, "Max number to search nearby lanes");
@@ -156,6 +158,9 @@ DEFINE_double(centripetal_acc_coeff, 0.5,
               "Coefficient of centripetal acceleration probability");
 
 // Junction Scenario
+DEFINE_uint32(junction_historical_frame_length, 5,
+              "The number of historical frames of the obstacle"
+              "that the junction model will look at.");
 DEFINE_double(junction_exit_lane_threshold, 0.1,
               "If a lane extends out of the junction by this value,"
               "consider it as a exit_lane.");
@@ -174,6 +179,8 @@ DEFINE_double(default_s_if_no_obstacle_in_lane_sequence, 1000.0,
               "The default s value if no obstacle in the lane sequence.");
 DEFINE_double(default_l_if_no_obstacle_in_lane_sequence, 10.0,
               "The default l value if no obstacle in the lane sequence.");
+DEFINE_bool(enable_build_current_frame_env, false,
+            "If build current frame environment");
 
 // Obstacle trajectory
 DEFINE_bool(enable_cruise_regression, false,

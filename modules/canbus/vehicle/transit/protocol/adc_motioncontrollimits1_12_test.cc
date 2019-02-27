@@ -44,12 +44,11 @@ TEST_F(Motioncontrollimits1_12_test, General) {
   const uint8_t equivalent_steeringrate1 = 0xef;
   const uint8_t equivalent_steeringrate2 = 0xef;
   const uint8_t equivalent_steerwheelanglelimit = 0x80;
-  controllimits_.set_p_adc_cmd_throttlecommandlimit(data,
-        adc_cmd_throttlecommandlimit);
-  controllimits_.set_p_adc_cmd_steeringrate(data,
-        adc_cmd_steeringrate);
-  controllimits_.set_p_adc_cmd_steerwheelanglelimit(data,
-        adc_cmd_steerwheelanglelimit);
+  controllimits_.set_p_adc_cmd_throttlecommandlimit(
+      data, adc_cmd_throttlecommandlimit);
+  controllimits_.set_p_adc_cmd_steeringrate(data, adc_cmd_steeringrate);
+  controllimits_.set_p_adc_cmd_steerwheelanglelimit(
+      data, adc_cmd_steerwheelanglelimit);
   EXPECT_EQ(data[3], equivalent_throttlecommandlimit);
   EXPECT_EQ(data[0], equivalent_steeringrate1);
   EXPECT_EQ(data[1], equivalent_steeringrate2);

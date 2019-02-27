@@ -4,12 +4,13 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "localization_msf_ndt_map",
-    srcs = ["ndt_map.cc",
-            "ndt_map_config.cc",
-            "ndt_map_matrix.cc",
-            "ndt_map_node.cc",
-            "ndt_map_pool.cc",
-           ],
+    srcs = [
+        "ndt_map.cc",
+        "ndt_map_config.cc",
+        "ndt_map_matrix.cc",
+        "ndt_map_node.cc",
+        "ndt_map_pool.cc",
+    ],
     hdrs = glob(["*.h"]),
     deps = [
         "//modules/localization/msf/common/util:localization_msf_common_util",
@@ -33,10 +34,10 @@ cc_test(
     srcs = ["ndt_map_test.cpp"],
     data = [":localization_msf_ndt_map_test_data"],
     deps = [
-        "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
-        "//modules/localization/msf/common/io:localization_msf_common_io",
-        "@eigen",
         "//cyber",
+        "//modules/localization/msf/common/io:localization_msf_common_io",
+        "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
+        "@eigen",
         "@gtest//:main",
     ],
 )
@@ -47,9 +48,9 @@ cc_test(
     timeout = "short",
     srcs = ["ndt_map_config_test.cpp"],
     deps = [
+        "//cyber",
         "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
         "@eigen",
-        "//cyber",
         "@gtest//:main",
     ],
 )

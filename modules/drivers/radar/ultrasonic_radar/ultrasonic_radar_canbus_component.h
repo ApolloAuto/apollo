@@ -33,6 +33,7 @@ class UltrasonicRadarCanbusComponent : public apollo::cyber::Component<> {
   UltrasonicRadarCanbusComponent();
   ~UltrasonicRadarCanbusComponent() = default;
   bool Init() override;
+
  private:
   UltrasonicRadarCanbus utralsonic_radar_canbus_;
   std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>> writer_;

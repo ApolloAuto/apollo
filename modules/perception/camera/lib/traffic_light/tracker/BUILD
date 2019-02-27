@@ -26,7 +26,7 @@ cc_library(
     ],
     deps = [
         ":trafficlight_tracker_semantic_proto",
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/camera/lib/interface",
     ],
 )

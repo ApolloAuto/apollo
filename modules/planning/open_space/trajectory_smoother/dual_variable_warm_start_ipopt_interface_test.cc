@@ -19,9 +19,9 @@
  **/
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_interface.h"
 
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -34,7 +34,7 @@ class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
         "/apollo/modules/planning/testdata/conf/"
         "open_space_standard_parking_lot.pb.txt";
 
-    CHECK(apollo::common::util::GetProtoFromFile(
+    CHECK(apollo::cyber::common::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;
@@ -68,9 +68,9 @@ class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
 void DualVariableWarmStartIPOPTInterfaceTest::ProblemSetup() {
   obstacles_edges_num_ = 4 * Eigen::MatrixXi::Ones(obstacles_num_, 1);
   Eigen::MatrixXd xWS = Eigen::MatrixXd::Ones(4, horizon_ + 1);
-  ptop_.reset(new DualVariableWarmStartIPOPTInterface(horizon_, ts_, ego_,
-      obstacles_edges_num_, obstacles_num_, obstacles_A_, obstacles_b_, xWS,
-      planner_open_space_config_));
+  ptop_.reset(new DualVariableWarmStartIPOPTInterface(
+      horizon_, ts_, ego_, obstacles_edges_num_, obstacles_num_, obstacles_A_,
+      obstacles_b_, xWS, planner_open_space_config_));
 }
 
 TEST_F(DualVariableWarmStartIPOPTInterfaceTest, initilization) {

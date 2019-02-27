@@ -65,8 +65,8 @@ class PredictorManager {
    * @param A pointer to adc_trajectory_container
    */
   void PredictObstacle(Obstacle* obstacle,
-      PredictionObstacle* const prediction_obstacle,
-      ADCTrajectoryContainer* adc_trajectory_container);
+                       PredictionObstacle* const prediction_obstacle,
+                       ADCTrajectoryContainer* adc_trajectory_container);
 
   /**
    * @brief Get prediction obstacles

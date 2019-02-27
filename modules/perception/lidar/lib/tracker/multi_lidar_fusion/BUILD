@@ -23,7 +23,7 @@ cc_library(
         "mlf_engine.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/interface:base_multi_target_tracker",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
@@ -42,7 +42,7 @@ cc_library(
         "mlf_motion_filter.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/multi_lidar_fusion:mlf_base_filter",
@@ -76,7 +76,7 @@ cc_library(
         "mlf_motion_refiner.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/common/geometry:basic",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
@@ -93,7 +93,7 @@ cc_library(
         "mlf_shape_filter.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/common/geometry:convex_hull_2d",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/common:lidar_object_util",
@@ -111,7 +111,7 @@ cc_library(
         "mlf_track_object_distance.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/association:distance_collection",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
@@ -129,7 +129,7 @@ cc_library(
         "mlf_track_object_matcher.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/common/graph:secure_matrix",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/interface:base_bipartite_graph_matcher",
@@ -150,7 +150,7 @@ cc_library(
         "mlf_tracker.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lidar/lib/tracker/common:mlf_track_data_with_track_pool_types",
         "//modules/perception/lidar/lib/tracker/common:tracked_object",

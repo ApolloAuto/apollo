@@ -16,16 +16,16 @@
 
 #include "modules/localization/msf/local_map/base_map/base_map_node.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/localization/msf/local_map/base_map/base_map_matrix.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-using apollo::common::util::DirectoryExists;
-using apollo::common::util::EnsureDirectory;
+using cyber::common::DirectoryExists;
+using cyber::common::EnsureDirectory;
 
 BaseMapNode::BaseMapNode(BaseMapMatrix* matrix, CompressionStrategy* strategy)
     : map_matrix_(matrix), compression_strategy_(strategy) {}

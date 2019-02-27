@@ -21,7 +21,6 @@
 #pragma once
 
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
-#include "modules/planning/proto/st_boundary_config.pb.h"
 
 #include "modules/planning/tasks/task.h"
 
@@ -44,16 +43,14 @@ class SpeedDecider : public Task {
 
   StPosition GetStPosition(const PathDecision* const path_decision,
                            const SpeedData& speed_profile,
-                           const StBoundary& st_boundary) const;
+                           const STBoundary& st_boundary) const;
 
-  bool CheckKeepClearCrossable(
-      const PathDecision* const path_decision,
-      const SpeedData& speed_profile,
-      const StBoundary& keep_clear_st_boundary) const;
+  bool CheckKeepClearCrossable(const PathDecision* const path_decision,
+                               const SpeedData& speed_profile,
+                               const STBoundary& keep_clear_st_boundary) const;
 
-  bool CheckKeepClearBlocked(
-      const PathDecision* const path_decision,
-      const Obstacle& keep_clear_obstacle) const;
+  bool CheckKeepClearBlocked(const PathDecision* const path_decision,
+                             const Obstacle& keep_clear_obstacle) const;
 
   /**
    * @brief check if the ADC should follow an obstacle by examing the
@@ -62,7 +59,7 @@ class SpeedDecider : public Task {
    * @return true if the ADC believe it should follow the obstacle, and
    *         false otherwise.
    **/
-  bool CheckIsFollowByT(const StBoundary& boundary) const;
+  bool CheckIsFollowByT(const STBoundary& boundary) const;
 
   bool CreateStopDecision(const Obstacle& obstacle,
                           ObjectDecisionType* const stop_decision,

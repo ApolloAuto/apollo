@@ -43,37 +43,80 @@ class Topology_Manager(object):
     """
     def __init__(self):
         """
-        init Node_manager.
+        Init Topology Manager.
         """
-        print("init successful")
+        print("init topology manager successful")
         self.node_manager = "null"
+        self.channel_manager = "null"
 
     def has_node(self, node_name):
         """
-        check Node_manager has node.
+        check Has Specific Node.
         """
-        print("node name:", node_name)
         self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
         flag = _CYBER_TOPOLOGY_MANAGER.Py_HasNode(self.node_manager, node_name)
         return flag
 
-    def get_nodes_name(self):
+    def get_node_list(self):
         """
-        Get Node_manager nodes.
+        Get Node List.
         """
         self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
-        nodes = _CYBER_TOPOLOGY_MANAGER.Py_GetNodesName(self.node_manager)
-        if(len(nodes) > 0):
-            print("get all nodes completed")
-        else:
-            print("get all nodes failed")
-        return nodes
+        node_list = _CYBER_TOPOLOGY_MANAGER.Py_GetNodeList(self.node_manager)
+        return node_list
 
     def show_node_info(self, node_name):
         """
-        Show node Info.
+        Show Node Info.
         """
         self.node_manager = _CYBER_TOPOLOGY_MANAGER.new_Node_Manager()
         ret = _CYBER_TOPOLOGY_MANAGER.Py_ShowNodeInfo(self.node_manager, node_name)
         return ret
 
+    def get_channel_list(self):
+        """
+        Get Channel List.
+        """
+        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        channel_list = _CYBER_TOPOLOGY_MANAGER.Py_GetChannelList(self.channel_manager)
+        return channel_list
+
+    def get_reader_list(self):
+        """
+        Get Reader List.
+        """
+        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        reader_list = _CYBER_TOPOLOGY_MANAGER.Py_GetReaderList(self.channel_manager)
+        return reader_list
+
+    def get_writer_list(self):
+        """
+        Get Writer List.
+        """
+        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        writer_list = _CYBER_TOPOLOGY_MANAGER.Py_GetWriterList(self.channel_manager)
+        return writer_list
+
+    def get_node_writes(self, node_name):
+        """
+        Get Node Writes.
+        """
+        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        node_writers = _CYBER_TOPOLOGY_MANAGER.Py_GetWritersOfNode(self.channel_manager, node_name)
+        return node_writers
+
+    def get_node_readers(self, node_name):
+        """
+        Get Node Readers.
+        """
+        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        node_readers = _CYBER_TOPOLOGY_MANAGER.Py_GetReadersOfNode(self.channel_manager, node_name)
+        return node_readers
+
+    def show_channel_info(self, channel_name):
+        """
+        Show Channel Info.
+        """
+        self.channel_manager = _CYBER_TOPOLOGY_MANAGER.new_Channel_Manager()
+        ret = _CYBER_TOPOLOGY_MANAGER.Py_ShowChannelInfo(self.channel_manager, channel_name)
+        return ret

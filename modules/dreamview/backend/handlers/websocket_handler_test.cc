@@ -15,9 +15,9 @@ limitations under the License.
 
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 
+#include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "cyber/common/log.h"
 
 using ::testing::ElementsAre;
 

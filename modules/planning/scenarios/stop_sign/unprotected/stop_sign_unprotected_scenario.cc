@@ -71,9 +71,8 @@ void StopSignUnprotectedScenario::Init() {
     return;
   }
 
-  hdmap::StopSignInfoConstPtr stop_sign =
-      HDMapUtil::BaseMap().GetStopSignById(
-          hdmap::MakeMapId(stop_sign_overlap_id));
+  hdmap::StopSignInfoConstPtr stop_sign = HDMapUtil::BaseMap().GetStopSignById(
+      hdmap::MakeMapId(stop_sign_overlap_id));
   if (!stop_sign) {
     AERROR << "Could not find stop sign: " << stop_sign_overlap_id;
     return;
@@ -125,8 +124,7 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
 }
 
 bool StopSignUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario, const TrajectoryPoint& ego_point,
-    const Frame& frame) {
+    const Scenario& current_scenario, const Frame& frame) {
   if (PlanningContext::GetScenarioInfo()
           ->next_stop_sign_overlap.object_id.empty()) {
     return false;

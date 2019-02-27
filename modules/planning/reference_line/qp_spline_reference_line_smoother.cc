@@ -27,7 +27,6 @@
 #include "cyber/common/log.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/math/curve_math.h"

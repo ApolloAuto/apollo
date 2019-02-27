@@ -36,8 +36,8 @@ PathDecider::PathDecider(const TaskConfig &config) : Task(config) {
   SetName("PathDecider");
 }
 
-apollo::common::Status PathDecider::Execute(
-    Frame *frame, ReferenceLineInfo *reference_line_info) {
+Status PathDecider::Execute(Frame *frame,
+                            ReferenceLineInfo *reference_line_info) {
   Task::Execute(frame, reference_line_info);
   return Process(reference_line_info->path_data(),
                  reference_line_info->path_decision());
@@ -100,7 +100,7 @@ bool PathDecider::MakeStaticObstacleDecision(
       continue;
     }
     if (obstacle->reference_line_st_boundary().boundary_type() ==
-        StBoundary::BoundaryType::KEEP_CLEAR) {
+        STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
 
@@ -121,12 +121,17 @@ bool PathDecider::MakeStaticObstacleDecision(
 
     const auto frenet_point = frenet_path.GetNearestPoint(sl_boundary);
     const double curr_l = frenet_point.l();
+    double min_nudge_l =
+        half_width + FLAGS_static_decision_nudge_l_buffer / 2.0;
+
     if (curr_l - lateral_radius > sl_boundary.end_l() ||
         curr_l + lateral_radius < sl_boundary.start_l()) {
       // ignore
       path_decision->AddLateralDecision("PathDecider/not-in-l", obstacle->Id(),
                                         object_decision);
-    } else if (obstacle->IsLaneBlocking()) {
+    } else if (obstacle->IsLaneBlocking() ||
+               (curr_l - sl_boundary.end_l() < min_nudge_l &&
+                curr_l - sl_boundary.start_l() > min_nudge_l)) {
       // stop
       *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
 

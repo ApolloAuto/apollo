@@ -89,9 +89,8 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
 
   for (size_t i = 1; i < horizon; ++i) {
     matrix_aa.block(i * matrix_a.rows(), 0, matrix_a.rows(), matrix_a.cols()) =
-        matrix_a *
-        matrix_aa.block((i - 1) * matrix_a.rows(), 0, matrix_a.rows(),
-                        matrix_a.cols());
+        matrix_a * matrix_aa.block((i - 1) * matrix_a.rows(), 0,
+                                   matrix_a.rows(), matrix_a.cols());
   }
 
   // Compute matrix_m

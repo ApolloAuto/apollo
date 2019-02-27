@@ -18,10 +18,10 @@
 
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/proto/point_cloud.pb.h"
 #include "pcl/filters/voxel_grid.h"
@@ -47,8 +47,8 @@ PointCloudUpdater::PointCloudUpdater(WebSocketHandler *websocket)
 
 PointCloudUpdater::~PointCloudUpdater() { Stop(); }
 
-void PointCloudUpdater::LoadLidarHeight(const std::string& file_path) {
-  if (!common::util::PathExists(file_path)) {
+void PointCloudUpdater::LoadLidarHeight(const std::string &file_path) {
+  if (!cyber::common::PathExists(file_path)) {
     AWARN << "No such file: " << FLAGS_lidar_height_yaml
           << ". Using default lidar height:" << kDefaultLidarHeight;
     boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
@@ -65,8 +65,8 @@ void PointCloudUpdater::LoadLidarHeight(const std::string& file_path) {
   }
 
   AWARN << "Fail to load the lidar height yaml file: "
-        << FLAGS_lidar_height_yaml << ". Using default lidar height:"
-        << kDefaultLidarHeight;
+        << FLAGS_lidar_height_yaml
+        << ". Using default lidar height:" << kDefaultLidarHeight;
   boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
   lidar_height_ = kDefaultLidarHeight;
 }
@@ -163,14 +163,13 @@ void PointCloudUpdater::UpdatePointCloud(
     }
 
     for (size_t i = 0; i < pcl_ptr->points.size(); ++i) {
-      const auto& point = point_cloud->point(static_cast<int>(i));
+      const auto &point = point_cloud->point(static_cast<int>(i));
       pcl_ptr->points[i].x = point.x();
       pcl_ptr->points[i].y = point.y();
       pcl_ptr->points[i].z = point.z();
     }
     std::future<void> f =
-        cyber::Async(&PointCloudUpdater::FilterPointCloud,
-                         this, pcl_ptr);
+        cyber::Async(&PointCloudUpdater::FilterPointCloud, this, pcl_ptr);
     async_future_ = std::move(f);
   }
 }
@@ -179,12 +178,11 @@ void PointCloudUpdater::FilterPointCloud(
     pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_ptr) {
   pcl::VoxelGrid<pcl::PointXYZ> voxel_grid;
   voxel_grid.setInputCloud(pcl_ptr);
-  voxel_grid.setLeafSize(
-      static_cast<float>(FLAGS_voxel_filter_size),
-      static_cast<float>(FLAGS_voxel_filter_size),
-      static_cast<float>(FLAGS_voxel_filter_height));
+  voxel_grid.setLeafSize(static_cast<float>(FLAGS_voxel_filter_size),
+                         static_cast<float>(FLAGS_voxel_filter_size),
+                         static_cast<float>(FLAGS_voxel_filter_height));
   pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_filtered_ptr(
-    new pcl::PointCloud<pcl::PointXYZ>);
+      new pcl::PointCloud<pcl::PointXYZ>);
   voxel_grid.filter(*pcl_filtered_ptr);
   AINFO << "filtered point cloud data size: " << pcl_filtered_ptr->size();
 

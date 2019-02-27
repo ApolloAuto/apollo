@@ -26,11 +26,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct MlfTrackerInitOptions {
-};
+struct MlfTrackerInitOptions {};
 
-struct MlfTrackOptions {
-};
+struct MlfTrackOptions {};
 
 class MlfTracker {
  public:
@@ -41,33 +39,27 @@ class MlfTracker {
     }
   }
 
-  bool Init(const MlfTrackerInitOptions options
-      = MlfTrackerInitOptions());
+  bool Init(const MlfTrackerInitOptions options = MlfTrackerInitOptions());
 
   // @brief: initialize new track data and push new object to cache
   // @params [in/out]: new track data
   // @params [in/out]: new object
-  void InitializeTrack(
-      MlfTrackDataPtr new_track_data,
-      TrackedObjectPtr new_object);
+  void InitializeTrack(MlfTrackDataPtr new_track_data,
+                       TrackedObjectPtr new_object);
 
   // @brief: update track data with object
   // @params [in/out]: history track data
   // @params [in/out]: new object
-  void UpdateTrackDataWithObject(
-      MlfTrackDataPtr track_data,
-      TrackedObjectPtr new_object);
+  void UpdateTrackDataWithObject(MlfTrackDataPtr track_data,
+                                 TrackedObjectPtr new_object);
 
   // @brief: update track data without object
   // @params [in]: timestamp
   // @params [in/out]: history track data
-  void UpdateTrackDataWithoutObject(
-      double timestamp,
-      MlfTrackDataPtr track_data);
+  void UpdateTrackDataWithoutObject(double timestamp,
+                                    MlfTrackDataPtr track_data);
 
-  std::string Name() const {
-    return "MlfTracker";
-  }
+  std::string Name() const { return "MlfTracker"; }
 
  protected:
   // @brief: get next track id
@@ -91,4 +83,3 @@ class MlfTracker {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-

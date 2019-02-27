@@ -44,13 +44,11 @@ void PiecewisePolySpeedProfile::set_collision(const bool collision) {
   collision_ = collision;
 }
 
-void PiecewisePolySpeedProfile::GeneratePoints(
-    const size_t num_eval_points) {
+void PiecewisePolySpeedProfile::GeneratePoints(const size_t num_eval_points) {
   curve_.SampleSpeedPoints(num_eval_points, &eval_points_);
 }
 
-void PiecewisePolySpeedProfile::GeneratePointsByTime(
-    const double t_res) {
+void PiecewisePolySpeedProfile::GeneratePointsByTime(const double t_res) {
   curve_.SampleSpeedPointsWithTime(t_res, &eval_points_);
 }
 

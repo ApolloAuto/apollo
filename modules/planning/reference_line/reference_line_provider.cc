@@ -25,11 +25,11 @@
 #include <limits>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/task/task.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
@@ -68,8 +68,8 @@ ReferenceLineProvider::ReferenceLineProvider(
     relative_map_ = relative_map;
   }
 
-  CHECK(common::util::GetProtoFromFile(FLAGS_smoother_config_filename,
-                                       &smoother_config_))
+  CHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
+                                        &smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_smoother_config_filename;
   if (smoother_config_.has_qp_spline()) {

@@ -39,8 +39,10 @@
 
 #include <string>
 
+// #include "ros/duration.h"
+// #include "ros/time.h"
 //#include "geometry_msgs/TwistStamped.h"
-#include "tf2/transform_stamped.h"
+#include "geometry_msgs/transform_stamped.h"
 
 //////////////////////////backwards startup for porting
 //#include "tf/tf.h"
@@ -329,7 +331,6 @@ private:
   std::vector<std::string> frameIDs_reverse;
   /** \brief A map to lookup the most recent authority for a given frame */
   std::map<CompactFrameID, std::string> frame_authority_;
-
 
   /// How long to cache transform history
   Duration cache_time_;

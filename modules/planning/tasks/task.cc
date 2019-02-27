@@ -39,5 +39,10 @@ Status Task::Execute(Frame* frame, ReferenceLineInfo* reference_line_info) {
   return Status::OK();
 }
 
+Status Task::Execute(Frame* frame) {
+  frame_ = frame;
+  return Status::OK();
+}
+
 }  // namespace planning
 }  // namespace apollo

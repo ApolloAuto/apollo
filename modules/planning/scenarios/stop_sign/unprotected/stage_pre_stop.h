@@ -39,7 +39,8 @@ struct StopSignUnprotectedContext;
 class StopSignUnprotectedStagePreStop : public Stage {
  public:
   explicit StopSignUnprotectedStagePreStop(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

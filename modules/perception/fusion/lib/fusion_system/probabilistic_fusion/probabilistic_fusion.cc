@@ -18,8 +18,8 @@
 #include <map>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "modules/common/time/time_util.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/object_pool_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/track_pool_types.h"
@@ -36,7 +36,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 ProbabilisticFusion::ProbabilisticFusion() {}
 
@@ -56,7 +56,7 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   ProbabilisticFusionConfig params;
 
-  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
+  if (!cyber::common::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }
@@ -74,15 +74,13 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   Track::SetMaxLidarInvisiblePeriod(params.max_lidar_invisible_period());
   Track::SetMaxRadarInvisiblePeriod(params.max_radar_invisible_period());
   Track::SetMaxCameraInvisiblePeriod(params.max_camera_invisible_period());
-  Sensor::SetMaxCachedFrameNum(
-    static_cast<int>(params.max_cached_frame_num()));
+  Sensor::SetMaxCachedFrameNum(static_cast<int>(params.max_cached_frame_num()));
 
   scenes_.reset(new Scene());
   if (params_.data_association_method == "HMAssociation") {
     matcher_.reset(new HMTrackersObjectsAssociation());
   } else {
-    AERROR << "Unknown association method: "
-              << params_.data_association_method;
+    AERROR << "Unknown association method: " << params_.data_association_method;
     return false;
   }
   if (!matcher_->Init()) {
@@ -135,8 +133,8 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
 
   if (started_) {
     AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
-             << ", obj_cnt : " << sensor_frame->objects.size() << ", "
-             << GLOG_TIMESTAMP(sensor_frame->timestamp);
+          << ", obj_cnt : " << sensor_frame->objects.size() << ", "
+          << GLOG_TIMESTAMP(sensor_frame->timestamp);
     sensor_data_manager->AddSensorMeasurements(sensor_frame);
   }
 
@@ -183,11 +181,11 @@ bool ProbabilisticFusion::IsPublishSensor(
 
 void ProbabilisticFusion::FuseFrame(const SensorFramePtr& frame) {
   AINFO << "Fusing frame: " << frame->GetSensorId()
-           << ", foreground_object_number: "
-           << frame->GetForegroundObjects().size()
-           << ", background_object_number: "
-           << frame->GetBackgroundObjects().size()
-           << ", timestamp: " << GLOG_TIMESTAMP(frame->GetTimestamp());
+        << ", foreground_object_number: "
+        << frame->GetForegroundObjects().size()
+        << ", background_object_number: "
+        << frame->GetBackgroundObjects().size()
+        << ", timestamp: " << GLOG_TIMESTAMP(frame->GetTimestamp());
   this->FuseForegroundTrack(frame);
   this->FusebackgroundTrack(frame);
   this->RemoveLostTrack();
@@ -273,10 +271,9 @@ void ProbabilisticFusion::CreateNewTracks(
     track->Initialize(frame->GetForegroundObjects()[obj_ind]);
     scenes_->AddForegroundTrack(track);
 
-    ADEBUG
-        << "object id: "
-        << frame->GetForegroundObjects()[obj_ind]->GetBaseObject()->track_id
-        << ", create new track: " << track->GetTrackId();
+    ADEBUG << "object id: "
+           << frame->GetForegroundObjects()[obj_ind]->GetBaseObject()->track_id
+           << ", create new track: " << track->GetTrackId();
 
     if (params_.tracker_method == "PbfTracker") {
       std::shared_ptr<BaseTracker> tracker;
@@ -356,7 +353,7 @@ void ProbabilisticFusion::RemoveLostTrack() {
     }
   }
   AINFO << "Remove " << foreground_tracks.size() - foreground_track_count
-           << " foreground tracks";
+        << " foreground tracks";
   foreground_tracks.resize(foreground_track_count);
   trackers_.resize(foreground_track_count);
 
@@ -372,7 +369,7 @@ void ProbabilisticFusion::RemoveLostTrack() {
     }
   }
   AINFO << "Remove " << background_tracks.size() - background_track_count
-           << " background tracks";
+        << " background tracks";
   background_tracks.resize(background_track_count);
 }
 
@@ -403,8 +400,8 @@ void ProbabilisticFusion::CollectFusedObjects(
   }
 
   AINFO << "collect objects : fg_obj_cnt = " << fg_obj_num
-           << ", bg_obj_cnt = " << bg_obj_num
-           << ", timestamp = " << GLOG_TIMESTAMP(timestamp);
+        << ", bg_obj_cnt = " << bg_obj_num
+        << ", timestamp = " << GLOG_TIMESTAMP(timestamp);
 }
 
 void ProbabilisticFusion::CollectObjectsByTrack(
@@ -416,8 +413,9 @@ void ProbabilisticFusion::CollectObjectsByTrack(
   const SensorId2ObjectMap& lidar_measurements = track->GetLidarObjects();
   const SensorId2ObjectMap& radar_measurements = track->GetRadarObjects();
   const SensorId2ObjectMap& camera_measurements = track->GetCameraObjects();
-  int num_measurements = static_cast<int>(lidar_measurements.size() +
-                      camera_measurements.size() + radar_measurements.size());
+  int num_measurements =
+      static_cast<int>(lidar_measurements.size() + camera_measurements.size() +
+                       radar_measurements.size());
   obj->fusion_supplement.on_use = true;
   std::vector<base::SensorObjectMeasurement>& measurements =
       obj->fusion_supplement.measurements;
@@ -444,16 +442,16 @@ void ProbabilisticFusion::CollectObjectsByTrack(
   obj->tracking_time = track->GetTrackingPeriod();
   fused_objects->emplace_back(obj);
   ADEBUG << "fusion_reporting..." << obj->track_id << "@"
-            << GLOG_TIMESTAMP(timestamp) << "@(" << std::setprecision(10)
-            << obj->center(0) << "," << obj->center(1) << ","
-            << obj->center_uncertainty(0, 0) << ","
-            << obj->center_uncertainty(0, 1) << ","
-            << obj->center_uncertainty(1, 0) << ","
-            << obj->center_uncertainty(1, 1) << "," << obj->velocity(0) << ","
-            << obj->velocity(1) << "," << obj->velocity_uncertainty(0, 0) << ","
-            << obj->velocity_uncertainty(0, 1) << ","
-            << obj->velocity_uncertainty(1, 0) << ","
-            << obj->velocity_uncertainty(1, 1) << ")";
+         << GLOG_TIMESTAMP(timestamp) << "@(" << std::setprecision(10)
+         << obj->center(0) << "," << obj->center(1) << ","
+         << obj->center_uncertainty(0, 0) << ","
+         << obj->center_uncertainty(0, 1) << ","
+         << obj->center_uncertainty(1, 0) << ","
+         << obj->center_uncertainty(1, 1) << "," << obj->velocity(0) << ","
+         << obj->velocity(1) << "," << obj->velocity_uncertainty(0, 0) << ","
+         << obj->velocity_uncertainty(0, 1) << ","
+         << obj->velocity_uncertainty(1, 0) << ","
+         << obj->velocity_uncertainty(1, 1) << ")";
 }
 
 void ProbabilisticFusion::CollectSensorMeasurementFromObject(

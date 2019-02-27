@@ -1,23 +1,23 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/test/camera_common_undistortion.h"
 
 #include <npp.h>
-#include <boost/filesystem.hpp>
 #include <yaml-cpp/yaml.h>
+#include <boost/filesystem.hpp>
 #include <opencv2/opencv.hpp>
 
 namespace apollo {
@@ -32,15 +32,14 @@ namespace camera {
  * Note: returns OK if already been inited.
  */
 int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
-    int dev) {
+                                    int dev) {
   if (_inited) {
     return 0;
   }
 
   std::vector<double> D;
   std::vector<double> K;
-  if (load_camera_intrinsics(intrinsics_path, &_width, &_height,
-        &D, &K) != 0) {
+  if (load_camera_intrinsics(intrinsics_path, &_width, &_height, &D, &K) != 0) {
     std::cerr << "Failed to load camera intrinsics!" << std::endl;
     return -1;
   }
@@ -68,7 +67,7 @@ int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
   cv::Mat ncm = cm.clone();
 
   cv::initUndistortRectifyMap(cm, dc, I, ncm, cv::Size(_width, _height),
-      CV_32FC1, map1, map2);
+                              CV_32FC1, map1, map2);
 
   std::vector<float> mapx;
   std::vector<float> mapy;
@@ -86,9 +85,9 @@ int ImageGpuPreprocessHandler::init(const std::string &intrinsics_path,
   BASE_CUDA_CHECK(cudaMalloc(&_d_mapy, img_size * sizeof(float)));
 
   BASE_CUDA_CHECK(cudaMemcpy(_d_mapx, mapx.data(), img_size * sizeof(float),
-        cudaMemcpyHostToDevice));
+                             cudaMemcpyHostToDevice));
   BASE_CUDA_CHECK(cudaMemcpy(_d_mapy, mapy.data(), img_size * sizeof(float),
-        cudaMemcpyHostToDevice));
+                             cudaMemcpyHostToDevice));
   _inited = true;
   return 0;
 }
@@ -109,16 +108,15 @@ int ImageGpuPreprocessHandler::handle(uint8_t *src, uint8_t *dst) {
 
   NppiSize Remapsize;
   NppiInterpolationMode RemapMode = NPPI_INTER_LINEAR;
-  Remapsize.width  = _width;
+  Remapsize.width = _width;
   Remapsize.height = _height;
   NppiRect RemapRect = {0, 0, _width, _height};
 
-  NppStatus eStatusNPP = nppiRemap_8u_C3R(_d_rgb, Remapsize,
-      (_width * CHANNEL), RemapRect,
-      _d_mapx, (_width * static_cast<int>(sizeof(float))),
-      _d_mapy, (_width * static_cast<int>(sizeof(float))),
-      _d_dst, (_width * CHANNEL),
-      Remapsize, RemapMode);
+  NppStatus eStatusNPP =
+      nppiRemap_8u_C3R(_d_rgb, Remapsize, (_width * CHANNEL), RemapRect,
+                       _d_mapx, (_width * static_cast<int>(sizeof(float))),
+                       _d_mapy, (_width * static_cast<int>(sizeof(float))),
+                       _d_dst, (_width * CHANNEL), Remapsize, RemapMode);
 
   if (eStatusNPP != NPP_SUCCESS) {
     std::cerr << "NPP_CHECK_NPP - eStatusNPP = " << eStatusNPP << std::endl;
@@ -178,6 +176,6 @@ int ImageGpuPreprocessHandler::load_camera_intrinsics(
   return 0;
 }
 
-}   // namespace camera
-}   // namespace perception
-}   // namespace apollo
+}  // namespace camera
+}  // namespace perception
+}  // namespace apollo

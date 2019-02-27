@@ -15,10 +15,10 @@
  *****************************************************************************/
 #include "modules/control/control_component.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
 
@@ -41,8 +41,8 @@ bool ControlComponent::Init() {
 
   AINFO << "Control init, starting ...";
 
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_control_conf_file,
-                                               &control_conf_))
+  CHECK(
+      cyber::common::GetProtoFromFile(FLAGS_control_conf_file, &control_conf_))
       << "Unable to load control conf file: " + FLAGS_control_conf_file;
 
   AINFO << "Conf file: " << FLAGS_control_conf_file << " is loaded.";

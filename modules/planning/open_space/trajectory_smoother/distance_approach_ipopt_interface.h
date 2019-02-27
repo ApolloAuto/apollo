@@ -20,6 +20,7 @@
 
 #pragma once
 #include <omp.h>
+#include <algorithm>
 #include <limits>
 #include <vector>
 #include "Eigen/Dense"
@@ -36,7 +37,6 @@
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
@@ -57,9 +57,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
       const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
       const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
-      const Eigen::MatrixXi& obstacles_edges_num,
-      const size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
-      const Eigen::MatrixXd& obstacles_b,
+      const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
+      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachIPOPTInterface() = default;
@@ -82,9 +81,14 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   /** Method to return the gradient of the objective */
   bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f) override;
+  // eval_grad_f by hand.
+  bool eval_grad_f_hand(int n, const double* x, bool new_x, double* grad_f);
 
   /** Method to return the constraint residuals */
   bool eval_g(int n, const double* x, bool new_x, int m, double* g) override;
+
+  /** Check unfeasible constraints for futher study**/
+  bool check_g(int n, const double* x, int m, double* g);
 
   /** Method to return:
    *   1) The structure of the jacobian (if "values" is nullptr)
@@ -152,6 +156,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd xf_;
   Eigen::MatrixXd last_time_u_;
   std::vector<double> XYbounds_;
+
+  // debug flag
+  bool enable_constraint_check_;
 
   // penalty
   double weight_state_x_ = 0.0;

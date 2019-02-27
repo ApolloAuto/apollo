@@ -17,7 +17,7 @@
 #include <limits>
 #include <utility>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -29,7 +29,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
-using apollo::common::util::GetProtoFromFile;
+using apollo::cyber::common::GetProtoFromFile;
 
 // Helper function for computing the mean value of a vector.
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
@@ -47,8 +47,7 @@ CruiseMLPEvaluator::CruiseMLPEvaluator() {
              FLAGS_evaluator_cruise_vehicle_cutin_model_file);
 }
 
-void CruiseMLPEvaluator::Clear() {
-}
+void CruiseMLPEvaluator::Clear() {}
 
 void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
@@ -84,9 +83,9 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     CHECK_NOTNULL(lane_sequence_ptr);
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
-    if (feature_values.size() != OBSTACLE_FEATURE_SIZE +
-                                 INTERACTION_FEATURE_SIZE +
-                                 SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
+    if (feature_values.size() !=
+        OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE +
+            SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
       lane_sequence_ptr->set_probability(0.0);
       ADEBUG << "Skip lane sequence due to incorrect feature size";
       continue;
@@ -94,24 +93,23 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
     // Insert features to DataForLearning
     if (FLAGS_prediction_offline_mode == 2) {
-      FeatureOutput::InsertDataForLearning(
-          *latest_feature_ptr, feature_values, "junction");
+      FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
+                                           "junction");
       ADEBUG << "Save extracted features for learning locally.";
       return;  // Skip Compute probability for offline mode
     }
 
-    Eigen::MatrixXf obs_feature_mat = VectorToMatrixXf(feature_values, 0,
-        OBSTACLE_FEATURE_SIZE);
-    Eigen::MatrixXf lane_feature_mat = VectorToMatrixXf(feature_values,
-        OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE,
+    Eigen::MatrixXf obs_feature_mat =
+        VectorToMatrixXf(feature_values, 0, OBSTACLE_FEATURE_SIZE);
+    Eigen::MatrixXf lane_feature_mat = VectorToMatrixXf(
+        feature_values, OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE,
         static_cast<int>(feature_values.size()), SINGLE_LANE_FEATURE_SIZE,
-                         LANE_POINTS_SIZE);
+        LANE_POINTS_SIZE);
     Eigen::MatrixXf model_output;
     if (lane_sequence_ptr->vehicle_on_lane()) {
       go_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
     } else {
-      cutin_model_ptr_->Run(
-          {lane_feature_mat, obs_feature_mat}, &model_output);
+      cutin_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
     }
     double probability = model_output(0, 0);
     double finish_time = model_output(0, 1);
@@ -120,10 +118,9 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   }
 }
 
-void CruiseMLPEvaluator::ExtractFeatureValues
-    (Obstacle* obstacle_ptr,
-     LaneSequence* lane_sequence_ptr,
-     std::vector<double>* feature_values) {
+void CruiseMLPEvaluator::ExtractFeatureValues(
+    Obstacle* obstacle_ptr, LaneSequence* lane_sequence_ptr,
+    std::vector<double>* feature_values) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
   CHECK_NOTNULL(lane_sequence_ptr);
@@ -139,8 +136,7 @@ void CruiseMLPEvaluator::ExtractFeatureValues
     return;
   }
   ADEBUG << "Obstacle feature size = " << obstacle_feature_values.size();
-  feature_values->insert(feature_values->end(),
-                         obstacle_feature_values.begin(),
+  feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
 
   // Extract interaction features.
@@ -169,8 +165,7 @@ void CruiseMLPEvaluator::ExtractFeatureValues
     return;
   }
   ADEBUG << "Lane feature size = " << lane_feature_values.size();
-  feature_values->insert(feature_values->end(),
-                         lane_feature_values.begin(),
+  feature_values->insert(feature_values->end(), lane_feature_values.begin(),
                          lane_feature_values.end());
 }
 
@@ -188,25 +183,23 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   std::vector<double> speeds;
   std::vector<double> timestamps;
 
-  std::vector<double> has_history
-      (FLAGS_cruise_historical_frame_length, 1.0);
-  std::vector<std::pair<double, double>> pos_history
-      (FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
-  std::vector<std::pair<double, double>> vel_history
-      (FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
-  std::vector<std::pair<double, double>> acc_history
-      (FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
-  std::vector<double> vel_heading_history
-      (FLAGS_cruise_historical_frame_length, 0.0);
-  std::vector<double> vel_heading_changing_rate_history
-      (FLAGS_cruise_historical_frame_length, 0.0);
+  std::vector<double> has_history(FLAGS_cruise_historical_frame_length, 1.0);
+  std::vector<std::pair<double, double>> pos_history(
+      FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
+  std::vector<std::pair<double, double>> vel_history(
+      FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
+  std::vector<std::pair<double, double>> acc_history(
+      FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));
+  std::vector<double> vel_heading_history(FLAGS_cruise_historical_frame_length,
+                                          0.0);
+  std::vector<double> vel_heading_changing_rate_history(
+      FLAGS_cruise_historical_frame_length, 0.0);
 
   // Get obstacle's current position to set up the relative coord. system.
   const Feature& obs_curr_feature = obstacle_ptr->latest_feature();
   double obs_curr_heading = obs_curr_feature.velocity_heading();
-  std::pair<double, double> obs_curr_pos =
-      std::make_pair(obs_curr_feature.position().x(),
-                     obs_curr_feature.position().y());
+  std::pair<double, double> obs_curr_pos = std::make_pair(
+      obs_curr_feature.position().x(), obs_curr_feature.position().y());
   double obs_feature_history_start_time =
       obstacle_ptr->timestamp() - FLAGS_prediction_trajectory_time_length;
   int count = 0;
@@ -247,46 +240,46 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
     if (i >= FLAGS_cruise_historical_frame_length) {
       continue;
     }
-    if (i != 0 && has_history[i-1] == 0.0) {
+    if (i != 0 && has_history[i - 1] == 0.0) {
       has_history[i] = 0.0;
       continue;
     }
     if (feature.has_position()) {
-      pos_history[i] = WorldCoordToObjCoord
-          (std::make_pair(feature.position().x(), feature.position().y()),
-           obs_curr_pos, obs_curr_heading);
+      pos_history[i] = WorldCoordToObjCoord(
+          std::make_pair(feature.position().x(), feature.position().y()),
+          obs_curr_pos, obs_curr_heading);
     } else {
       has_history[i] = 0.0;
     }
     if (feature.has_velocity()) {
-      auto vel_end = WorldCoordToObjCoord
-          (std::make_pair(feature.velocity().x(), feature.velocity().y()),
-           obs_curr_pos, obs_curr_heading);
-      auto vel_begin = WorldCoordToObjCoord
-          (std::make_pair(0.0, 0.0), obs_curr_pos, obs_curr_heading);
+      auto vel_end = WorldCoordToObjCoord(
+          std::make_pair(feature.velocity().x(), feature.velocity().y()),
+          obs_curr_pos, obs_curr_heading);
+      auto vel_begin = WorldCoordToObjCoord(std::make_pair(0.0, 0.0),
+                                            obs_curr_pos, obs_curr_heading);
       vel_history[i] = std::make_pair(vel_end.first - vel_begin.first,
                                       vel_end.second - vel_begin.second);
     } else {
       has_history[i] = 0.0;
     }
     if (feature.has_acceleration()) {
-      auto acc_end = WorldCoordToObjCoord
-          (std::make_pair(feature.acceleration().x(),
-                          feature.acceleration().y()),
-           obs_curr_pos, obs_curr_heading);
-      auto acc_begin = WorldCoordToObjCoord
-          (std::make_pair(0.0, 0.0), obs_curr_pos, obs_curr_heading);
+      auto acc_end =
+          WorldCoordToObjCoord(std::make_pair(feature.acceleration().x(),
+                                              feature.acceleration().y()),
+                               obs_curr_pos, obs_curr_heading);
+      auto acc_begin = WorldCoordToObjCoord(std::make_pair(0.0, 0.0),
+                                            obs_curr_pos, obs_curr_heading);
       acc_history[i] = std::make_pair(acc_end.first - acc_begin.first,
                                       acc_end.second - acc_begin.second);
     } else {
       has_history[i] = 0.0;
     }
     if (feature.has_velocity_heading()) {
-      vel_heading_history[i] = WorldAngleToObjAngle
-          (feature.velocity_heading(), obs_curr_heading);
+      vel_heading_history[i] =
+          WorldAngleToObjAngle(feature.velocity_heading(), obs_curr_heading);
       if (i != 0) {
         vel_heading_changing_rate_history[i] =
-            (vel_heading_history[i-1] - vel_heading_history[i]) /
+            (vel_heading_history[i - 1] - vel_heading_history[i]) /
             (FLAGS_double_precision + feature.timestamp() - prev_timestamp);
         prev_timestamp = feature.timestamp();
       }
@@ -319,9 +312,8 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
 
   double delta_t = 0.0;
   if (timestamps.size() > 1) {
-    delta_t =
-        (timestamps.front() - timestamps.back()) /
-        static_cast<double>(timestamps.size() - 1);
+    delta_t = (timestamps.front() - timestamps.back()) /
+              static_cast<double>(timestamps.size() - 1);
   }
   double angle_curr = ComputeMean(thetas, 0, curr_size - 1);
   double angle_prev = ComputeMean(thetas, curr_size, 2 * curr_size - 1);
@@ -344,15 +336,13 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   double jerk = 0.0;
   if (static_cast<int>(speeds.size()) >= 3 * curr_size &&
       delta_t > std::numeric_limits<double>::epsilon()) {
-    double speed_1st_recent =
-        ComputeMean(speeds, 0, curr_size - 1);
-    double speed_2nd_recent =
-        ComputeMean(speeds, curr_size, 2 * curr_size - 1);
+    double speed_1st_recent = ComputeMean(speeds, 0, curr_size - 1);
+    double speed_2nd_recent = ComputeMean(speeds, curr_size, 2 * curr_size - 1);
     double speed_3rd_recent =
         ComputeMean(speeds, 2 * curr_size, 3 * curr_size - 1);
     acc = (speed_1st_recent - speed_2nd_recent) / (curr_size * delta_t);
     jerk = (speed_1st_recent - 2 * speed_2nd_recent + speed_3rd_recent) /
-          (curr_size * curr_size * delta_t * delta_t);
+           (curr_size * curr_size * delta_t * delta_t);
   }
 
   double dist_lb_rate_curr = 0.0;
@@ -413,8 +403,9 @@ void CruiseMLPEvaluator::SetObstacleFeatureValues(
   }
 }
 
-void CruiseMLPEvaluator::SetInteractionFeatureValues(Obstacle* obstacle_ptr,
-    LaneSequence* lane_sequence_ptr, std::vector<double>* feature_values) {
+void CruiseMLPEvaluator::SetInteractionFeatureValues(
+    Obstacle* obstacle_ptr, LaneSequence* lane_sequence_ptr,
+    std::vector<double>* feature_values) {
   // forward / backward: relative_s, relative_l, speed, length
   feature_values->clear();
   // Initialize forward and backward obstacles
@@ -441,8 +432,9 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(Obstacle* obstacle_ptr,
     }
   }
 
-  auto obstacles_container = ContainerManager::Instance()->GetContainer<
-      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+  auto obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
   // Set feature values for forward obstacle
   feature_values->push_back(forward_obstacle.s());
   feature_values->push_back(forward_obstacle.l());
@@ -472,9 +464,9 @@ void CruiseMLPEvaluator::SetInteractionFeatureValues(Obstacle* obstacle_ptr,
   }
 }
 
-void CruiseMLPEvaluator::SetLaneFeatureValues
-    (const Obstacle* obstacle_ptr, const LaneSequence* lane_sequence_ptr,
-     std::vector<double>* feature_values) {
+void CruiseMLPEvaluator::SetLaneFeatureValues(
+    const Obstacle* obstacle_ptr, const LaneSequence* lane_sequence_ptr,
+    std::vector<double>* feature_values) {
   // Sanity checks.
   feature_values->clear();
   feature_values->reserve(SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE);
@@ -504,12 +496,11 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
         continue;
       }
 
-      std::pair<double, double> relative_s_l = WorldCoordToObjCoord
-      (std::make_pair(lane_point.position().x(), lane_point.position().y()),
-       std::make_pair(feature.position().x(), feature.position().y()),
-       heading);
-      double relative_ang = WorldAngleToObjAngle(lane_point.heading(),
-                                                 heading);
+      std::pair<double, double> relative_s_l = WorldCoordToObjCoord(
+          std::make_pair(lane_point.position().x(), lane_point.position().y()),
+          std::make_pair(feature.position().x(), feature.position().y()),
+          heading);
+      double relative_ang = WorldAngleToObjAngle(lane_point.heading(), heading);
 
       feature_values->push_back(relative_s_l.second);
       feature_values->push_back(relative_s_l.first);
@@ -522,9 +513,9 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
   std::size_t size = feature_values->size();
   while (size >= 10 && size < SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
     double relative_l_new = 2 * feature_values->operator[](size - 5) -
-                                feature_values->operator[](size - 10);
+                            feature_values->operator[](size - 10);
     double relative_s_new = 2 * feature_values->operator[](size - 4) -
-                                feature_values->operator[](size - 9);
+                            feature_values->operator[](size - 9);
     double relative_ang_new = feature_values->operator[](size - 3);
 
     feature_values->push_back(relative_l_new);
@@ -537,7 +528,7 @@ void CruiseMLPEvaluator::SetLaneFeatureValues
 }
 
 void CruiseMLPEvaluator::LoadModels(const std::string& go_model_file,
-    const std::string& cutin_model_file) {
+                                    const std::string& cutin_model_file) {
   go_model_ptr_.reset(new network::CruiseModel());
   cutin_model_ptr_.reset(new network::CruiseModel());
   CHECK_NOTNULL(go_model_ptr_);

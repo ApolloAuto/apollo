@@ -19,7 +19,6 @@
 #include "cyber/common/log.h"
 #include "modules/perception/common/graph/gated_hungarian_bigraph_matcher.h"
 
-
 namespace apollo {
 namespace perception {
 namespace lidar {
@@ -38,13 +37,9 @@ void MultiHmBipartiteGraphMatcher::Match(
     std::vector<size_t> *unassigned_rows,
     std::vector<size_t> *unassigned_cols) {
   common::GatedHungarianMatcher<float>::OptimizeFlag opt_flag =
-                   common:: GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
-  optimizer_.Match(options.cost_thresh,
-                   options.bound_value,
-                   opt_flag,
-                   assignments,
-                   unassigned_rows,
-                   unassigned_cols);
+      common::GatedHungarianMatcher<float>::OptimizeFlag::OPTMIN;
+  optimizer_.Match(options.cost_thresh, options.bound_value, opt_flag,
+                   assignments, unassigned_rows, unassigned_cols);
 }
 
 PERCEPTION_REGISTER_BIPARTITEGRAPHMATCHER(MultiHmBipartiteGraphMatcher);

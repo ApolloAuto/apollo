@@ -60,12 +60,13 @@ class EvaluatorManager {
    */
   void Run();
 
-  void EvaluateObstacle(
-      Obstacle* obstacle, std::vector<Obstacle*> dynamic_env);
+  void EvaluateObstacle(Obstacle* obstacle, std::vector<Obstacle*> dynamic_env);
 
   void EvaluateObstacle(Obstacle* obstacle);
 
  private:
+  void BuildCurrentFrameEnv();
+
   /**
    * @brief Register an evaluator by type
    * @param Evaluator type

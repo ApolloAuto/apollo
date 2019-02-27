@@ -32,23 +32,20 @@ namespace planning {
 class PiecewiseQuinticSpiralPath : public Curve1d {
  public:
   PiecewiseQuinticSpiralPath(const double theta, const double kappa,
-      const double dkappa);
+                             const double dkappa);
 
   virtual ~PiecewiseQuinticSpiralPath() = default;
 
   void Append(const double theta, const double kappa, const double dkappa,
-      const double delta_s);
+              const double delta_s);
 
-  double Evaluate(const std::uint32_t order,
-      const double param) const override;
+  double Evaluate(const std::uint32_t order, const double param) const override;
 
   double DeriveKappaS(const double s) const;
 
   double ParamLength() const override;
 
-  std::string ToString() const override {
-    return "PiecewiseQuinticSpiralPath";
-  }
+  std::string ToString() const override { return "PiecewiseQuinticSpiralPath"; }
 
  private:
   size_t LocatePiece(const double param) const;

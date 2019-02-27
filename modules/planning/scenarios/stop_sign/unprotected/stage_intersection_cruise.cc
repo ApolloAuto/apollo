@@ -30,6 +30,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
@@ -55,7 +56,7 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
   // check if the stop_sign is still along reference_line
   std::string stop_sign_overlap_id =
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  if (CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
+  if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
     return FinishScenario();
   }
 
@@ -63,7 +64,8 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
   // TODO(all): update when pnc-junction is ready
   constexpr double kIntersectionLength = 10.0;  // unit: m
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  const double distance_adc_pass_stop_sign = adc_back_edge_s -
+  const double distance_adc_pass_stop_sign =
+      adc_back_edge_s -
       PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
   if (distance_adc_pass_stop_sign > kIntersectionLength) {
     return FinishStage();
