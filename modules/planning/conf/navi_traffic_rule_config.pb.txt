@@ -96,7 +96,7 @@ config: {
     stop_distance: 1.0
     max_stop_deceleration: 6.0
     min_pass_s_distance: 4.0
-    max_stop_deacceleration_yellow_light: 3.0
+    max_stop_deceleration_yellow_light: 3.0
     signal_expire_time_sec: 5.0
     righ_turn_creep {
       enabled: false
