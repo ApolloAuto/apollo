@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Willow Garage, Inc.
+ * Copyright (c) 2013, Open Source Robotics Foundation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,60 +27,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** \author Tully Foote */
+#ifndef GEOMETRY_MSGS_TRANSFORM_STAMPED_H 
+#define GEOMETRY_MSGS_TRANSFORM_STAMPED_H
 
-#ifndef TF2_TRANSFORM_STORAGE_H
-#define TF2_TRANSFORM_STORAGE_H
+#include <iostream>
+#include <stdint.h>
 
-#include <tf2/LinearMath/Vector3.h>
-#include <tf2/LinearMath/Quaternion.h>
+namespace geometry_msgs {
 
-#include <ros/message_forward.h>
-#include <ros/time.h>
-#include <ros/types.h>
-
-namespace geometry_msgs
-{
-ROS_DECLARE_MESSAGE(TransformStamped);
-}
-
-namespace tf2
-{
-
-typedef uint32_t CompactFrameID;
-
-/** \brief Storage for transforms and their parent */
-class TransformStorage
-{
-public:
-  TransformStorage();
-  TransformStorage(const geometry_msgs::TransformStamped& data, CompactFrameID frame_id, CompactFrameID child_frame_id);
-
-  TransformStorage(const TransformStorage& rhs)
-  {
-    *this = rhs;
-  }
-
-  TransformStorage& operator=(const TransformStorage& rhs)
-  {
-#if 01
-    rotation_ = rhs.rotation_;
-    translation_ = rhs.translation_;
-    stamp_ = rhs.stamp_;
-    frame_id_ = rhs.frame_id_;
-    child_frame_id_ = rhs.child_frame_id_;
-#endif
-    return *this;
-  }
-
-  tf2::Quaternion rotation_;
-  tf2::Vector3 translation_;
-  ros::Time stamp_;
-  CompactFrameID frame_id_;
-  CompactFrameID child_frame_id_;
+struct Header {
+  uint32_t seq;
+  uint64_t stamp;
+  std::string frame_id;
+  Header() : seq(0), stamp(0), frame_id("") {}
 };
 
+struct Vector3 {
+  double x;
+  double y;
+  double z;
+  Vector3() : x(0.0), y(0.0), z(0.0) {}
+};
+
+struct Quaternion {
+  double x;
+  double y;
+  double z;
+  double w;
+  Quaternion(): x(0.0), y(0.0), z(0.0), w(0.0) {}
+};
+
+struct Transform {
+  Vector3 translation;
+  Quaternion rotation;
+};
+
+struct TransformStamped { 
+  Header header;
+  std::string child_frame_id;
+  Transform transform;
+}; 
+
 }
 
-#endif // TF2_TRANSFORM_STORAGE_H
-
+#endif
