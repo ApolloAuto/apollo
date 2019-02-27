@@ -382,14 +382,17 @@ class Adapter : public AdapterBase {
     FeedData(data);
     return true;
   }
+ 
   bool FeedFile(const std::string& message_file,
                 IdentifierType<::sensor_msgs::PointCloud2>) {
     return false;
   }
+ 
   bool FeedFile(const std::string& message_file,
                 IdentifierType<::sensor_msgs::CompressedImage>) {
     return false;
   }
+ 
   bool FeedFile(const std::string& message_file,
                 IdentifierType<::sensor_msgs::Image>) {
     return false;
@@ -398,15 +401,17 @@ class Adapter : public AdapterBase {
                 IdentifierType<::std_msgs::String>) {
     return false;
   }
+ 
   bool FeedFile(const std::string& message_file,
                 IdentifierType<velodyne_msgs::VelodyneScanUnified>) {
     return false;
   }
+ 
   bool FeedFile(const std::string& message_file,
                 IdentifierType<::std_msgs::Int32MultiArray>) {
     return false;
   }
-  // HasSequenceNumber returns false for non-proto-message data types.
+
   // HasSequenceNumber returns false for non-proto-message data types.
   template <typename InputMessageType>
   static bool HasSequenceNumber(
