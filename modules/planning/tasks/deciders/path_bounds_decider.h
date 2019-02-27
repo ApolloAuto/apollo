@@ -58,6 +58,16 @@ class PathBoundsDecider : public Decider {
   SortObstaclesForSweepLine(
       const IndexedList<std::string, Obstacle>& indexed_obstacles);
 
+  /**
+    * @brief Update the path_boundary at "idx", as well as the new center-line.
+    *        It also checks if ADC is blocked (lmax < lmin).
+    * @return If path is good, true; if path is blocked, false.
+    */
+  bool UpdatePathBoundaryAndCenterLine(
+      size_t idx, double left_bound, double right_bound,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries,
+      double* center_line);
+
   void PathBoundsDebugString(
       const std::vector<std::tuple<double, double, double>>& path_boundaries);
 
