@@ -173,21 +173,19 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
   LoadExtrinsics(
       "/apollo/modules/perception/testdata/"
       "camera/lib/lane/postprocessor/darkSCNN/params/"
-      "onsemi_obstacle_extrinsics.yaml", &ex_camera2lidar);
+      "onsemi_obstacle_extrinsics.yaml",
+      &ex_camera2lidar);
   LoadExtrinsics(
       "/apollo/modules/perception/testdata/"
       "camera/lib/lane/postprocessor/darkSCNN/params/"
-      "velodyne128_novatel_extrinsics.yaml", &ex_lidar2imu);
+      "velodyne128_novatel_extrinsics.yaml",
+      &ex_lidar2imu);
 
   intrinsic_map["onsemi_obstacle"] = frame.camera_k_matrix;
   extrinsic_map["onsemi_obstacle"] = ex_camera2lidar;
 
   EXPECT_TRUE(visualize_.Init_all_info_single_camera(
-      visual_camera,
-      intrinsic_map,
-      extrinsic_map,
-      ex_lidar2imu,
-      pitch_adj,
+      visual_camera, intrinsic_map, extrinsic_map, ex_lidar2imu, pitch_adj,
       calibration_service_init_options.image_height,
       calibration_service_init_options.image_width));
   homography_im2car_ = visualize_.homography_im2car();
@@ -230,9 +228,9 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
     AINFO << "3D postprocess finished!";
 
     if (enable_visualization_) {
-        frame.frame_id = i;
-        frame.timestamp = static_cast<double> (i);
-        visualize_.ShowResult_all_info_single_camera(img, frame);
+      frame.frame_id = i;
+      frame.timestamp = static_cast<double>(i);
+      visualize_.ShowResult_all_info_single_camera(img, frame);
     }
 
     // delete detector;

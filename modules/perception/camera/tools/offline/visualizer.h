@@ -21,8 +21,8 @@
 #include <string>
 #include <vector>
 
-#include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/common/camera_frame.h"
+#include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
 
 namespace apollo {
@@ -53,8 +53,7 @@ class Visualizer {
   std::string type_to_string(const apollo::perception::base::ObjectType type);
   std::string sub_type_to_string(
       const apollo::perception::base::ObjectSubType type);
-  Eigen::Matrix3d homography_im2car() {
-      return homography_im2car_;}
+  Eigen::Matrix3d homography_im2car() { return homography_im2car_; }
   void Set_ROI(int input_offset_y, int crop_height, int crop_width) {
     roi_start_ = input_offset_y;
     roi_height_ = crop_height;
