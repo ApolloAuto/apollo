@@ -1,0 +1,8 @@
+prefix=/home/fengliu/works/package/geometry2/tf2/build/devel
+
+Name: tf2
+Description: Description of tf2
+Version: 0.6.5
+Cflags: -I/home/fengliu/works/package/geometry2/tf2/include -I/usr/include
+Libs: -L/home/fengliu/works/package/geometry2/tf2/build/devel/lib -ltf2 /usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4
+Requires: geometry_msgs tf2_msgs rostime

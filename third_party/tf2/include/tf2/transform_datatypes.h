@@ -33,7 +33,7 @@
 #define TF2_TRANSFORM_DATATYPES_H
 
 #include <string>
-#include "tf2/time.h"
+#include "ros/time.h"
 
 namespace tf2
 {
@@ -43,14 +43,14 @@ namespace tf2
 template <typename T>
 class Stamped : public T{
  public:
-  Time stamp_; ///< The timestamp associated with this data
+  ros::Time stamp_; ///< The timestamp associated with this data
   std::string frame_id_; ///< The frame_id associated this data
 
   /** Default constructor */
   Stamped() :frame_id_ ("NO_ID_STAMPED_DEFAULT_CONSTRUCTION"){}; //Default constructor used only for preallocation
 
   /** Full constructor */
-  Stamped(const T& input, const Time& timestamp, const std::string & frame_id) :
+  Stamped(const T& input, const ros::Time& timestamp, const std::string & frame_id) :
     T (input), stamp_ ( timestamp ), frame_id_ (frame_id){ } ;
   
   /** Copy Constructor */
@@ -67,7 +67,7 @@ class Stamped : public T{
 template <typename T> 
 bool operator==(const Stamped<T> &a, const Stamped<T> &b) {
   return a.frame_id_ == b.frame_id_ && a.stamp_ == b.stamp_ && static_cast<const T&>(a) == static_cast<const T&>(b);
-};
+}
 
 
 }

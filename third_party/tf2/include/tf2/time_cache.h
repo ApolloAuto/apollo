@@ -33,27 +33,31 @@
 #define TF2_TIME_CACHE_H
 
 #include "transform_storage.h"
-#include "tf2/time.h"
 
-#include <list>
+#include <deque>
 
 #include <sstream>
 
+#include <ros/message_forward.h>
+#include <ros/time.h>
 
 #include <boost/shared_ptr.hpp>
 
-
+namespace geometry_msgs
+{
+ROS_DECLARE_MESSAGE(TransformStamped);
+}
 
 namespace tf2
 {
 
-typedef std::pair<Time, CompactFrameID> P_TimeAndFrameID;
+typedef std::pair<ros::Time, CompactFrameID> P_TimeAndFrameID;
 
 class TimeCacheInterface
 {
 public:
   /** \brief Access data from the cache */
-  virtual bool getData(Time time, TransformStorage & data_out, std::string* error_str = 0)=0; //returns false if data unavailable (should be thrown as lookup exception
+  virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0)=0; //returns false if data unavailable (should be thrown as lookup exception
 
   /** \brief Insert data into the cache */
   virtual bool insertData(const TransformStorage& new_data)=0;
@@ -62,7 +66,7 @@ public:
   virtual void clearList()=0;
 
   /** \brief Retrieve the parent at a specific time */
-  virtual CompactFrameID getParent(Time time, std::string* error_str) = 0;
+  virtual CompactFrameID getParent(ros::Time time, std::string* error_str) = 0;
 
   /**
    * \brief Get the latest time stored in this cache, and the parent associated with it.  Returns parent = 0 if no data.
@@ -75,10 +79,10 @@ public:
   virtual unsigned int getListLength()=0;
 
   /** @brief Get the latest timestamp cached */
-  virtual Time getLatestTimestamp()=0;
+  virtual ros::Time getLatestTimestamp()=0;
 
   /** @brief Get the oldest timestamp cached */
-  virtual Time getOldestTimestamp()=0;
+  virtual ros::Time getOldestTimestamp()=0;
 };
 
 typedef boost::shared_ptr<TimeCacheInterface> TimeCacheInterfacePtr;
@@ -92,37 +96,37 @@ class TimeCache : public TimeCacheInterface
  public:
   static const int MIN_INTERPOLATION_DISTANCE = 5; //!< Number of nano-seconds to not interpolate below.
   static const unsigned int MAX_LENGTH_LINKED_LIST = 1000000; //!< Maximum length of linked list, to make sure not to be able to use unlimited memory.
-  static const int64_t DEFAULT_MAX_STORAGE_TIME = 1ULL * 1000000000LL; //!< default value of 10 seconds storage
+  static const int64_t DEFAULT_MAX_STORAGE_TIME = 10ULL * 1000000000LL; //!< default value of 10 seconds storage
 
-  TimeCache(Duration  max_storage_time = DEFAULT_MAX_STORAGE_TIME);
+  TimeCache(ros::Duration  max_storage_time = ros::Duration().fromNSec(DEFAULT_MAX_STORAGE_TIME));
 
 
   /// Virtual methods
 
-  virtual bool getData(Time time, TransformStorage & data_out, std::string* error_str = 0);
+  virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0);
   virtual bool insertData(const TransformStorage& new_data);
   virtual void clearList();
-  virtual CompactFrameID getParent(Time time, std::string* error_str);
+  virtual CompactFrameID getParent(ros::Time time, std::string* error_str);
   virtual P_TimeAndFrameID getLatestTimeAndParent();
 
   /// Debugging information methods
   virtual unsigned int getListLength();
-  virtual Time getLatestTimestamp();
-  virtual Time getOldestTimestamp();
+  virtual ros::Time getLatestTimestamp();
+  virtual ros::Time getOldestTimestamp();
   
 
 private:
-  typedef std::list<TransformStorage> L_TransformStorage;
+  typedef std::deque<TransformStorage> L_TransformStorage;
   L_TransformStorage storage_;
 
-  Duration max_storage_time_;
+  ros::Duration max_storage_time_;
 
 
   /// A helper function for getData
   //Assumes storage is already locked for it
-  inline uint8_t findClosest(TransformStorage*& one, TransformStorage*& two, Time target_time, std::string* error_str);
+  inline uint8_t findClosest(TransformStorage*& one, TransformStorage*& two, ros::Time target_time, std::string* error_str);
 
-  inline void interpolate(const TransformStorage& one, const TransformStorage& two, Time time, TransformStorage& output);
+  inline void interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output);
 
 
   void pruneList();
@@ -136,17 +140,17 @@ class StaticCache : public TimeCacheInterface
  public:
   /// Virtual methods
 
-  virtual bool getData(Time time, TransformStorage & data_out, std::string* error_str = 0); //returns false if data unavailable (should be thrown as lookup exception
+  virtual bool getData(ros::Time time, TransformStorage & data_out, std::string* error_str = 0); //returns false if data unavailable (should be thrown as lookup exception
   virtual bool insertData(const TransformStorage& new_data);
   virtual void clearList();
-  virtual CompactFrameID getParent(Time time, std::string* error_str);
+  virtual CompactFrameID getParent(ros::Time time, std::string* error_str);
   virtual P_TimeAndFrameID getLatestTimeAndParent();
 
 
   /// Debugging information methods
   virtual unsigned int getListLength();
-  virtual Time getLatestTimestamp();
-  virtual Time getOldestTimestamp();
+  virtual ros::Time getLatestTimestamp();
+  virtual ros::Time getOldestTimestamp();
   
 
 private:

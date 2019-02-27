@@ -37,7 +37,7 @@
 namespace tf2{
 
 /** \brief A base class for all tf2 exceptions 
- * This inherits from exception 
+ * This inherits from ros::exception 
  * which inherits from std::runtime_exception
  */
 class TransformException: public std::runtime_error

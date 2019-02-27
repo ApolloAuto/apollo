@@ -35,9 +35,8 @@
 
 #include <tf2/transform_datatypes.h>
 #include <tf2/exceptions.h>
-#include <tf2/transform_stamped.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <tf2/impl/convert.h>
-#include <tf2/time.h>
 
 namespace tf2 {
 
@@ -59,7 +58,7 @@ template <class T>
  * reference is bound to the lifetime of the argument.
  */
 template <class T>
-  const Time& getTimestamp(const T& t);
+  const ros::Time& getTimestamp(const T& t);
 
 /**\brief Get the frame_id from data 
  * \param t The data input.
@@ -73,7 +72,7 @@ template <class T>
 
 /* An implementation for Stamped<P> datatypes */
 template <class P>
-  const Time& getTimestamp(const tf2::Stamped<P>& t)
+  const ros::Time& getTimestamp(const tf2::Stamped<P>& t)
   {
     return t.stamp_;
   }
@@ -114,7 +113,7 @@ template <class A, class B>
   void convert(const A& a, B& b)
   {
     //printf("In double type convert\n");
-    // impl::Converter<ros::message_traits::IsMessage<A>::value, ros::message_traits::IsMessage<B>::value>::convert(a, b);
+    impl::Converter<ros::message_traits::IsMessage<A>::value, ros::message_traits::IsMessage<B>::value>::convert(a, b);
   }
 
 template <class A>
