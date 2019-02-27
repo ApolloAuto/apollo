@@ -177,53 +177,6 @@ void Fem1dQpProblem::SetVariableSecondOrderDerivativeBounds(
   ProcessBound(ddx_bounds, &ddx_bounds_);
 }
 
-void Fem1dQpProblem::SetOutputResolution(const double resolution) {
-  // It is assumed that the third order derivative of x is const between each s
-  // positions
-  const double kEps = 1e-12;
-  if (resolution < kEps || x_.empty()) {
-    return;
-  }
-  std::vector<double> new_x;
-  std::vector<double> new_dx;
-  std::vector<double> new_ddx;
-  std::vector<double> new_dddx;
-
-  const double total_s = delta_s_ * (static_cast<double>(x_.size()) - 1.0);
-  for (double s = resolution; s < total_s; s += resolution) {
-    const size_t idx = static_cast<size_t>(std::floor(s / delta_s_));
-    const double ds = s - delta_s_ * static_cast<double>(idx);
-
-    double x = 0.0;
-    double dx = 0.0;
-    double d2x = 0.0;
-    double d3x = 0.0;
-
-    if (idx == 0) {
-      d3x = dddx_.front();
-      d2x = x_init_[2] + d3x * ds;
-      dx = x_init_[1] + x_init_[2] * ds + 0.5 * d3x * ds * ds;
-      x = x_init_[0] + x_init_[1] * ds + 0.5 * x_init_[2] * ds * ds +
-          d3x * ds * ds * ds / 6.0;
-    } else {
-      d3x = dddx_[idx - 1];
-      d2x = ddx_[idx - 1] + d3x * ds;
-      dx = dx_[idx - 1] + ddx_[idx - 1] * ds + 0.5 * d3x * ds * ds;
-      x = x_[idx - 1] + dx_[idx - 1] * ds + 0.5 * ddx_[idx - 1] * ds * ds +
-          d3x * ds * ds * ds / 6.0;
-    }
-
-    new_x.push_back(x);
-    new_dx.push_back(dx);
-    new_ddx.push_back(d2x);
-    new_ddx.push_back(d3x);
-  }
-  x_ = new_x;
-  dx_ = new_dx;
-  ddx_ = new_ddx;
-  dddx_ = new_dddx;
-}
-
 bool Fem1dQpProblem::Optimize() {
   // calculate kernel
   std::vector<c_float> P_data;

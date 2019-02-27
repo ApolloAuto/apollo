@@ -54,10 +54,13 @@ common::Status PiecewiseJerkPathOptimizer::Process(
                                           &delta_s);
 
   /**
-  AERROR<< "Number of boundaries:\t" << lateral_boundaries.size();
-  AERROR<< "List of boundaries:";
-  for (const auto& b : lateral_boundaries) {
-    CHECK(b.first < b.second);
+  for (auto& b : lateral_boundaries) {
+    if (b.first > frenet_point.l()) {
+      b.first = frenet_point.l() - 0.1;
+    }
+    if (b.second < frenet_point.l()) {
+      b.second = frenet_point.l() + 0.1;
+    }
   }
   **/
 
@@ -74,8 +77,9 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   std::array<double, 3> init_lateral_state{frenet_point.l(), frenet_point.dl(),
                                            frenet_point.ddl()};
 
-  auto fem_1d_qp = std::make_unique<Fem1dQpProblem>(
-      num_of_points, init_lateral_state, delta_s, w, FLAGS_lateral_jerk_bound);
+  std::unique_ptr<Fem1dQpProblem> fem_1d_qp(
+      new Fem1dQpProblem(num_of_points, init_lateral_state, delta_s, w,
+          FLAGS_lateral_jerk_bound));
 
   auto start_time = std::chrono::system_clock::now();
 
@@ -94,9 +98,9 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
 
-  const auto x = fem_1d_qp->x();
-  const auto dx = fem_1d_qp->x_derivative();
-  const auto ddx = fem_1d_qp->x_second_order_derivative();
+  const auto& x = fem_1d_qp->x();
+  const auto& dx = fem_1d_qp->x_derivative();
+  const auto& ddx = fem_1d_qp->x_second_order_derivative();
 
   CHECK(!x.empty());
   CHECK(!dx.empty());
