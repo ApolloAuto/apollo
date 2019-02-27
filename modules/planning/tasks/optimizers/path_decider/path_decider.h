@@ -33,13 +33,16 @@ class PathDecider : public Task {
       Frame *frame, ReferenceLineInfo *reference_line_info) override;
 
  private:
-  apollo::common::Status Process(const PathData &path_data,
+  apollo::common::Status Process(const ReferenceLineInfo* reference_line_info,
+                                 const PathData &path_data,
                                  PathDecision *const path_decision);
 
-  bool MakeObjectDecision(const PathData &path_data,
+  bool MakeObjectDecision(const PathData& path_data,
+                          const std::string& blocking_obstacle_id,
                           PathDecision *const path_decision);
 
-  bool MakeStaticObstacleDecision(const PathData &path_data,
+  bool MakeStaticObstacleDecision(const PathData& path_data,
+                                  const std::string& blocking_obstacle_id,
                                   PathDecision *const path_decision);
 
   ObjectStop GenerateObjectStopDecision(const Obstacle &obstacle) const;

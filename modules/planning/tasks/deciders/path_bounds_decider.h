@@ -49,7 +49,7 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundariesFromStaticObstacles(
-      const IndexedList<std::string, Obstacle>& indexed_obstacles,
+      PathDecision* const path_decision,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   double GetBufferBetweenADCCenterAndEdge();
@@ -76,6 +76,7 @@ class PathBoundsDecider : public Decider {
       const std::vector<std::tuple<double, double, double>>& path_boundaries);
 
  private:
+  std::string blocking_obstacle_id_ = "";
   double adc_frenet_s_ = 0.0;
   double adc_frenet_l_ = 0.0;
 };

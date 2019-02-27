@@ -39,24 +39,31 @@ PathDecider::PathDecider(const TaskConfig &config) : Task(config) {
 Status PathDecider::Execute(Frame *frame,
                             ReferenceLineInfo *reference_line_info) {
   Task::Execute(frame, reference_line_info);
-  return Process(reference_line_info->path_data(),
+  return Process(reference_line_info,
+                 reference_line_info->path_data(),
                  reference_line_info->path_decision());
 }
 
-Status PathDecider::Process(const PathData &path_data,
+Status PathDecider::Process(const ReferenceLineInfo* reference_line_info,
+                            const PathData &path_data,
                             PathDecision *const path_decision) {
   CHECK_NOTNULL(path_decision);
-  if (!MakeObjectDecision(path_data, path_decision)) {
+  std::string blocking_obstacle_id =
+      reference_line_info->GetBlockingObstacleId();
+  if (!MakeObjectDecision(
+          path_data, blocking_obstacle_id, path_decision)) {
     AERROR << "Failed to make decision based on tunnel";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
   }
   return Status::OK();
 }
 
-bool PathDecider::MakeObjectDecision(const PathData &path_data,
-                                     PathDecision *const path_decision) {
+bool PathDecider::MakeObjectDecision(
+    const PathData &path_data, const std::string& blocking_obstacle_id,
+    PathDecision *const path_decision) {
   DCHECK_NOTNULL(path_decision);
-  if (!MakeStaticObstacleDecision(path_data, path_decision)) {
+  if (!MakeStaticObstacleDecision(
+          path_data, blocking_obstacle_id, path_decision)) {
     AERROR << "Failed to make decisions for static obstacles";
     return false;
   }
@@ -64,7 +71,8 @@ bool PathDecider::MakeObjectDecision(const PathData &path_data,
 }
 
 bool PathDecider::MakeStaticObstacleDecision(
-    const PathData &path_data, PathDecision *const path_decision) {
+    const PathData &path_data, const std::string& blocking_obstacle_id,
+    PathDecision *const path_decision) {
   DCHECK_NOTNULL(path_decision);
   const auto &frenet_path = path_data.frenet_frame_path();
   if (frenet_path.empty()) {
@@ -85,6 +93,15 @@ bool PathDecider::MakeStaticObstacleDecision(
              perception::PerceptionObstacle::PEDESTRIAN);
 
     if (!is_bycycle_or_pedestrain && !obstacle->IsStatic()) {
+      continue;
+    }
+
+    if (obstacle->Id() == blocking_obstacle_id) {
+      // Add stop decision
+      ObjectDecisionType object_decision;
+      *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
+      path_decision->AddLongitudinalDecision("PathDecider/blocking_obstacle",
+                                               obstacle->Id(), object_decision);
       continue;
     }
 

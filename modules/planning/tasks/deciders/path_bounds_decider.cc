@@ -41,7 +41,7 @@ constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
 constexpr double kRoadEdgeBuffer = 0.2;
 constexpr double kObstacleSBuffer = 1.0;
-constexpr double kObstacleLBuffer = 0.5;
+constexpr double kObstacleLBuffer = 0.2;
 
 PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -79,7 +79,7 @@ Status PathBoundsDecider::Process(
   // 2. Fine-tune the boundary based on static obstacles
   // TODO(all): in the future, add side-pass functionality.
   if (!GetBoundariesFromStaticObstacles(
-          reference_line_info->path_decision()->obstacles(),
+          reference_line_info->path_decision(),
           &path_boundaries)) {
     const std::string msg =
         "Failed to decide fine tune the boundaries after "
@@ -87,7 +87,7 @@ Status PathBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(path_boundaries);
 
   // 3. Adjust the boundary considering dynamic obstacles
   // TODO(all): may need to implement this in the future.
@@ -106,6 +106,7 @@ Status PathBoundsDecider::Process(
   reference_line_info->SetPathBoundaries(path_boundaries_pair,
                                          std::get<0>(path_boundaries[0]),
                                          kPathBoundsDeciderResolution);
+  reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
   return Status::OK();
 }
 
@@ -116,6 +117,9 @@ bool PathBoundsDecider::InitPathBoundaries(
   // Sanity checks.
   CHECK_NOTNULL(path_boundaries);
   path_boundaries->clear();
+
+  // Reset
+  blocking_obstacle_id_ = "";
 
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
@@ -187,10 +191,12 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
 
     double curr_left_bound =
         std::fmin(curr_road_left_width,
-                  std::fmax(curr_lane_left_width, adc_sl_boundary.end_l()));
+                  std::fmax(curr_lane_left_width, adc_frenet_l_ +
+                            GetBufferBetweenADCCenterAndEdge()));
     double curr_right_bound =
         std::fmax(-curr_road_right_width,
-                  std::fmin(-curr_lane_right_width, adc_sl_boundary.start_l()));
+                  std::fmin(-curr_lane_right_width, adc_frenet_l_ -
+                            GetBufferBetweenADCCenterAndEdge()));
     // Update the boundary.
     double dummy = 0.0;
     if (!UpdatePathBoundaryAndCenterLine(
@@ -213,9 +219,10 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
 // obstacles whose headings differ from road-headings a lot.
 // TODO(all): (future work) this can be improved in the future.
 bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
-    const IndexedList<std::string, Obstacle>& indexed_obstacles,
+    PathDecision* const path_decision,
     std::vector<std::tuple<double, double, double>>* const path_boundaries) {
   // Preprocessing.
+  auto indexed_obstacles = path_decision->obstacles();
   auto sorted_obstacles = SortObstaclesForSweepLine(indexed_obstacles);
   double center_line = adc_frenet_l_;
   size_t obs_idx = 0;
@@ -259,6 +266,7 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
                     i, *left_bounds.begin(), *right_bounds.begin(),
                     path_boundaries, &center_line)) {
               path_blocked_idx = static_cast<int>(i);
+              blocking_obstacle_id_ = curr_obstacle_id;
               break;
               // ADC has no path, start side-pass decision.
               // 1. Don't side-pass if obstacle is blocked by other obstacles
@@ -274,6 +282,7 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
                     i, *left_bounds.begin(), *right_bounds.begin(),
                     path_boundaries, &center_line)) {
               path_blocked_idx = static_cast<int>(i);
+              blocking_obstacle_id_ = curr_obstacle_id;
               break;
             }
           }
