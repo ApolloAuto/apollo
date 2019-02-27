@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_ULTANALYSE_ULTANALYSE_GFLAGS_H_
-#define MODULES_ULTANALYSE_ULTANALYSE_GFLAGS_H_
+#pragma once
 
 #include "gflags/gflags.h"
 
@@ -25,5 +24,3 @@ DECLARE_string(adapter_config_filename);
 DECLARE_bool(ultanalyse_enabled);
 DECLARE_double(min_sonar_range_detectable);
 DECLARE_double(max_sonar_range_detectable);
-
-#endif
