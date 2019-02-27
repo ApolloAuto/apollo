@@ -2,7 +2,10 @@ syntax = "proto2";
 
 package apollo.planning;
 
+import "modules/planning/proto/planner_open_space_config.proto";
+
 message OpenSpaceTrajectoryProviderConfig {
+  //TODO(Jinyun) Move PlannerOpenSpaceConfig to OpenSpaceTrajectoryOptimizerConfig
   optional OpenSpaceTrajectoryOptimizerConfig open_space_trajectory_optimizer_config = 1;
 }
 
@@ -15,6 +18,8 @@ message OpenSpaceTrajectoryOptimizerConfig {
   optional DistanceApproachTrajectorySmootherConfig distance_approach_trajectory_smoother_config = 3;
   optional float delta_t = 4 [default = 0.5];
   optional double is_near_destination_threshold = 5 [default = 0.001];
+  // tmp message during refactoring
+  optional PlannerOpenSpaceConfig planner_open_space_config = 6;
 }
 
 // Hybrid a star as warm start for later smoothing
