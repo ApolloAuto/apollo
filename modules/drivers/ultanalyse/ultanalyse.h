@@ -24,7 +24,6 @@
 #include <queue>
 #include <string>
 
-// #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/apollo_app.h"
 #include "modules/common/macro.h"
 #include "modules/drivers/ultanalyse/proto/ultanalyse.pb.h"
@@ -47,19 +46,15 @@ class Ultanalyse : public apollo::common::ApolloApp {
   void Stop() override;
 
  private:
-  // void OnChassis(const apollo::canbus::Chassis& message);
   void OnSystemStatus(const apollo::monitor::SystemStatus & message);
   void ObstAnalyse();
-  // void canbus_ObstAnalyse();
   void OnUltrasound(const std_msgs::Int32MultiArray & message);
 
-  // apollo::canbus::Chassis chassis_;
   apollo::monitor::SystemStatus system_status_;
   apollo::ultanalyse::ObstAnalyse obst_analyse_;
   apollo::ultanalyse::ChassisUlt ChassisUlt_;
 
   std::mutex mutex_;
-  // ros::Timer timer_;
 };
 
 }  // namespace ultanalyse
