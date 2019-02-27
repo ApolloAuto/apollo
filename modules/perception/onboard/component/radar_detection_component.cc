@@ -172,7 +172,7 @@ bool RadarDetectionComponent::InternalProc(
   // Init object_builder_options
   std::vector<base::ObjectPtr> radar_objects;
   if (!radar_perception_->Perceive(corrected_obstacles, options,
-                                  &radar_objects)) {
+                                   &radar_objects)) {
     out_message->error_code_ =
         apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     AERROR << "RadarDetector Proc failed.";
