@@ -36,11 +36,11 @@ using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 
 constexpr double kPathBoundsDeciderHorizon = 100.0;
-constexpr double kPathBoundsDeciderResolution = 0.1;
+constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
 constexpr double kRoadEdgeBuffer = 0.2;
-constexpr double kObstacleSBuffer = 0.5;
+constexpr double kObstacleSBuffer = 1.0;
 constexpr double kObstacleLBuffer = 0.5;
 
 PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
