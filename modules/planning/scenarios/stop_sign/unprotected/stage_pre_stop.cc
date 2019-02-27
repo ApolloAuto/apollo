@@ -66,7 +66,7 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
 
   // check if the stop_sign is still along reference_line
   std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
   if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
     return FinishScenario();
   }
@@ -75,7 +75,7 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_pass_stop_sign =
       adc_front_edge_s -
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
   if (distance_adc_pass_stop_sign <= kPassStopLineBuffer) {
     // not passed stop line, check valid stop
     if (CheckADCStop(reference_line_info)) {
@@ -225,13 +225,15 @@ bool StopSignUnprotectedStagePreStop::CheckADCStop(
   // check stop close enough to stop line of the stop_sign
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double stop_line_start_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
   const double distance_stop_line_to_adc_front_edge =
       stop_line_start_s - adc_front_edge_s;
   ADEBUG << "distance_stop_line_to_adc_front_edge["
-         << distance_stop_line_to_adc_front_edge << "]; stop_line_start_s["
-         << stop_line_start_s << "]; adc_front_edge_s[" << adc_front_edge_s
-         << "]";
+      << distance_stop_line_to_adc_front_edge
+      << "] stop_sign["
+      << PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id
+      << "] stop_line_start_s[" << stop_line_start_s
+      << "] adc_front_edge_s[" << adc_front_edge_s << "]";
 
   if (distance_stop_line_to_adc_front_edge >
       scenario_config_.max_valid_stop_distance()) {
