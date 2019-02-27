@@ -164,6 +164,10 @@ class Frame {
 
   ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
 
+  const OpenSpaceInfo &open_space_info() { return *open_space_info_; }
+
+  OpenSpaceInfo *mutable_open_space_info() { return open_space_info_.get(); }
+
  private:
   common::Status InitFrameData();
 
@@ -185,10 +189,6 @@ class Frame {
                                               const common::math::Box2d &box);
 
   void AddObstacle(const Obstacle &obstacle);
-
-  const OpenSpaceInfo &open_space_info() { return *open_space_info_; }
-
-  OpenSpaceInfo *mutable_open_space_info() { return open_space_info_.get(); }
 
  private:
   uint32_t sequence_num_ = 0;
