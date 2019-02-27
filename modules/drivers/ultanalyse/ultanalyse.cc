@@ -95,7 +95,6 @@ void Ultanalyse::ObstAnalyse() {
   std::lock_guard<std::mutex> lock(mutex_);
 
   obst_analyse_.clear_obstinfo();
-  // for (int i = 0; i < ChassisUlt_.sonar_range_size(); i++){
   for (int i = 0; i < 12; i++) {
     if ((ChassisUlt_.sonar_range(i) >= FLAGS_min_sonar_range_detectable) &&
         (ChassisUlt_.sonar_range(i) <= FLAGS_max_sonar_range_detectable)) {
@@ -121,8 +120,6 @@ void Ultanalyse::ObstAnalyse() {
       obst_analyse_.mutable_obstinfo(count)->set_obst_distance(obst_distance);
       count++;  // count the number of the detected obstacles
 
-
-
     } else if ((ChassisUlt_.sonar_range(i) < FLAGS_min_sonar_range_detectable)
                || (ChassisUlt_.sonar_range(i) == 65535)) {
       AERROR << "distance is invalid, sensor is FAULT";
@@ -134,9 +131,7 @@ void Ultanalyse::ObstAnalyse() {
   }
   obst_analyse_.set_obst_flag(obst_flag);
   obst_analyse_.set_obst_number(count);
-  // AINFO << "obst_number = "<< count;
 }
-
-
+  
 }  // namespace ultanalyse
 }  // namespace apollo
