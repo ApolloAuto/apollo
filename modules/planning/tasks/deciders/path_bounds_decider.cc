@@ -87,7 +87,10 @@ Status PathBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(path_boundaries);
+
+  // 3. Adjust the boundary considering dynamic obstacles
+  // TODO(all): may need to implement this in the future.
 
   // Update the path boundary info to the frame.
   if (path_boundaries.empty()) {
@@ -199,6 +202,7 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
   return true;
 }
 
+
 // Currently, it processes each obstacle based on its frenet-frame
 // projection. Therefore, it might be overly conservative when processing
 // obstacles whose headings differ from road-headings a lot.
@@ -218,6 +222,9 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
   // Maps obstacle ID's to the decided ADC pass direction, if ADC should
   // pass from left, then true; otherwise, false.
   std::unordered_map<std::string, bool> obs_id_to_direction;
+  // Maps obstacle ID's to the decision of whether side-pass on this obstacle
+  // is allowed. If allowed, then true; otherwise, false.
+  std::unordered_map<std::string, bool> obs_id_to_sidepass_decision;
 
   // Step through every path point.
   for (size_t i = 0; i < path_boundaries->size(); ++i) {
@@ -233,18 +240,31 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
         std::string curr_obstacle_id = std::get<4>(curr_obstacle);
         if (std::get<0>(curr_obstacle) == 1) {
           // A new obstacle enters into our scope:
-          //   Decide which direction for the ADC to pass, and update the
-          //   left/right bound accordingly.
+          //   - Decide which direction for the ADC to pass.
+          //   - Update the left/right bound accordingly.
+          //   - If boundaries blocked, then decide whether can side-pass.
+          //   - If yes, then borrow neighbor lane to side-pass.
           // TODO(all): (future work) can make this DFS all possible
           // directions. (with proper early stopping mechanisms to save time)
           if (curr_obstacle_l_min + curr_obstacle_l_max < center_line * 2) {
             // Obstacle is to the right of center-line, should pass from left.
             obs_id_to_direction[curr_obstacle_id] = true;
             right_bounds.insert(curr_obstacle_l_max);
+            if (!UpdatePathBoundaryAndCenterLine(
+                    i, *left_bounds.begin(), *right_bounds.begin(),
+                    path_boundaries, &center_line)) {
+              // ADC has no path, start side-pass decision.
+              // 1. Don't side-pass if obstacle is blocked by other obstacles
+              //    and is not a parked vehicle.
+              //    Don't side-pass virtual/ped/cyclist obstacles.
+            }
           } else {
             // Obstacle is to the left of center-line, should pass from right.
             obs_id_to_direction[curr_obstacle_id] = false;
             left_bounds.insert(curr_obstacle_l_min);
+            UpdatePathBoundaryAndCenterLine(
+                i, *left_bounds.begin(), *right_bounds.begin(),
+                path_boundaries, &center_line);
           }
         } else {
           // An existing obstacle exits our scope.
@@ -378,6 +398,29 @@ PathBoundsDecider::SortObstaclesForSweepLine(
        });
 
   return sorted_obstacles;
+}
+
+bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
+    size_t idx, double left_bound, double right_bound,
+    std::vector<std::tuple<double, double, double>>* const path_boundaries,
+    double* center_line) {
+  // Update the right bound (l_min):
+  std::get<1>((*path_boundaries)[idx]) = std::fmax(
+      std::get<1>((*path_boundaries)[idx]),
+      right_bound + GetBufferBetweenADCCenterAndEdge());
+  // Update the left bound (l_max):
+  std::get<2>((*path_boundaries)[idx]) = std::fmin(
+      std::get<2>((*path_boundaries)[idx]),
+      left_bound - GetBufferBetweenADCCenterAndEdge());
+
+  // Check if ADC is blocked. If blocked, return false.
+  if (std::get<1>((*path_boundaries)[idx]) >
+      std::get<2>((*path_boundaries)[idx])) {
+    ADEBUG << "Path is blocked.";
+    return false;
+  }
+  // Otherwise, return true.
+  return true;
 }
 
 void PathBoundsDecider::PathBoundsDebugString(
