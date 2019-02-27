@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2019 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.h"
 
 #include <algorithm>
@@ -76,8 +76,7 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
 
   CHECK_LE(crop_height_, input_height_)
       << "crop height larger than input height";
-  CHECK_LE(crop_width_, input_width_)
-      << "crop width larger than input width";
+  CHECK_LE(crop_width_, input_width_) << "crop width larger than input width";
 
   if (model_param.is_bgr()) {
     data_provider_image_option_.target_color = base::Color::BGR;
@@ -115,25 +114,20 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   const auto &model_type = model_param.model_type();
   AINFO << "model_type: " << model_type;
   cnnadapter_lane_.reset(
-      inference::CreateInferenceByName(model_type,
-                                       proto_file,
-                                       weight_file,
-                                       net_outputs_,
-                                       net_inputs_,
-                                       model_root));
+      inference::CreateInferenceByName(model_type, proto_file, weight_file,
+                                       net_outputs_, net_inputs_, model_root));
   CHECK(cnnadapter_lane_ != nullptr);
 
   cnnadapter_lane_->set_gpu_id(options.gpu_id);
   CHECK(resize_width_ > 0) << "resize width should be more than 0";
   CHECK(resize_height_ > 0) << "resize height should be more than 0";
   std::vector<int> shape = {1, 3, resize_height_, resize_width_};
-  std::map<std::string, std::vector<int>>
-      input_reshape{{net_inputs_[0], shape}};
-  AINFO << "input_reshape: "
-           << input_reshape[net_inputs_[0]][0] << ", "
-           << input_reshape[net_inputs_[0]][1] << ", "
-           << input_reshape[net_inputs_[0]][2] << ", "
-           << input_reshape[net_inputs_[0]][3];
+  std::map<std::string, std::vector<int>> input_reshape{
+      {net_inputs_[0], shape}};
+  AINFO << "input_reshape: " << input_reshape[net_inputs_[0]][0] << ", "
+        << input_reshape[net_inputs_[0]][1] << ", "
+        << input_reshape[net_inputs_[0]][2] << ", "
+        << input_reshape[net_inputs_[0]][3];
   if (!cnnadapter_lane_->Init(input_reshape)) {
     AINFO << "net init fail.";
     return false;
@@ -142,13 +136,13 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   for (auto &input_blob_name : net_inputs_) {
     auto input_blob = cnnadapter_lane_->get_blob(input_blob_name);
     AINFO << input_blob_name << ": " << input_blob->channels() << " "
-             << input_blob->height() << " " << input_blob->width();
+          << input_blob->height() << " " << input_blob->width();
   }
   // assume there is only one network output for now
   for (auto &output_blob_name : net_outputs_) {
     auto output_blob = cnnadapter_lane_->get_blob(output_blob_name);
     AINFO << output_blob_name << " : " << output_blob->channels() << " "
-             << output_blob->height() << " " << output_blob->width();
+          << output_blob->height() << " " << output_blob->width();
     lane_output_height_ = output_blob->height();
     lane_output_width_ = output_blob->width();
     num_lanes_ = output_blob->channels();
@@ -160,9 +154,8 @@ bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   return true;
 }
 
-bool DarkSCNNLaneDetector::Detect(
-    const LaneDetectorOptions &options,
-    CameraFrame *frame) {
+bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
+                                  CameraFrame *frame) {
   if (frame == nullptr) {
     AINFO << "camera frame is empty.";
     return false;
@@ -171,11 +164,11 @@ bool DarkSCNNLaneDetector::Detect(
   auto start = std::chrono::high_resolution_clock::now();
   auto data_provider = frame->data_provider;
   CHECK_EQ(input_width_, data_provider->src_width())
-      << "Input size is not correct: "
-      << input_width_ << " vs " << data_provider->src_width();
+      << "Input size is not correct: " << input_width_ << " vs "
+      << data_provider->src_width();
   CHECK_EQ(input_height_, data_provider->src_height())
-      << "Input size is not correct: "
-      << input_height_ << " vs " << data_provider->src_height();
+      << "Input size is not correct: " << input_height_ << " vs "
+      << data_provider->src_height();
 
   // use data provider to crop input image
   CHECK(data_provider->GetImage(data_provider_image_option_, &image_src_));
@@ -185,26 +178,21 @@ bool DarkSCNNLaneDetector::Detect(
   auto blob_channel = input_blob->channels();
   auto blob_height = input_blob->height();
   auto blob_width = input_blob->width();
-  ADEBUG << "input_blob: " << blob_channel << " "
-           << blob_height << " " << blob_width << std::endl;
+  ADEBUG << "input_blob: " << blob_channel << " " << blob_height << " "
+         << blob_width << std::endl;
 
-  CHECK_EQ(blob_height, resize_height_) << "height is not equal" << blob_height
-                                        << " vs " << resize_height_;
-  CHECK_EQ(blob_width, resize_width_) << "width is not equal" << blob_width
-                                      << " vs " << resize_width_;
+  CHECK_EQ(blob_height, resize_height_)
+      << "height is not equal" << blob_height << " vs " << resize_height_;
+  CHECK_EQ(blob_width, resize_width_)
+      << "width is not equal" << blob_width << " vs " << resize_width_;
 
   ADEBUG << "image_blob: " << image_src_.blob()->shape_string();
   ADEBUG << "input_blob: " << input_blob->shape_string();
   // resize the cropped image into network input blob
-  inference::ResizeGPU(image_src_,
-            input_blob,
-            static_cast<int>(crop_width_),
-            0,
-            static_cast<float>(image_mean_[0]),
-            static_cast<float>(image_mean_[1]),
-            static_cast<float>(image_mean_[2]),
-            false,
-            static_cast<float>(1.0));
+  inference::ResizeGPU(
+      image_src_, input_blob, static_cast<int>(crop_width_), 0,
+      static_cast<float>(image_mean_[0]), static_cast<float>(image_mean_[1]),
+      static_cast<float>(image_mean_[2]), false, static_cast<float>(1.0));
   ADEBUG << "resize gpu finish.";
   cudaDeviceSynchronize();
   cnnadapter_lane_->Infer();
@@ -221,8 +209,8 @@ bool DarkSCNNLaneDetector::Detect(
   std::vector<cv::Mat> masks;
   for (int i = 0; i < num_lanes_; ++i) {
     cv::Mat tmp(lane_output_height_, lane_output_width_, CV_32FC1);
-    memcpy(tmp.data, seg_blob->cpu_data() +
-           lane_output_width_ * lane_output_height_ * i,
+    memcpy(tmp.data,
+           seg_blob->cpu_data() + lane_output_width_ * lane_output_height_ * i,
            lane_output_width_ * lane_output_height_ * sizeof(float));
     // cv::resize(tmp
     // , tmp, cv::Size(lane_output_width_, lane_output_height_), 0,
@@ -243,8 +231,8 @@ bool DarkSCNNLaneDetector::Detect(
     }
   }
   memcpy(lane_blob_->mutable_cpu_data(),
-     reinterpret_cast<float*> (mask_color.data),
-     lane_output_width_ * lane_output_height_ * sizeof(float));
+         reinterpret_cast<float *>(mask_color.data),
+         lane_output_width_ * lane_output_height_ * sizeof(float));
   // Don't use this way to copy data, it will modify data
   // lane_blob_->set_cpu_data((float*)mask_color.data);
   frame->lane_detected_blob = lane_blob_;
@@ -256,7 +244,7 @@ bool DarkSCNNLaneDetector::Detect(
 
   time_num += 1;
   ADEBUG << "Avg detection infer time: " << time_1 / time_num
-        << " Avg detection merge output time: " << time_2 / time_num;
+         << " Avg detection merge output time: " << time_2 / time_num;
   ADEBUG << "Lane detection done!";
   return true;
 }

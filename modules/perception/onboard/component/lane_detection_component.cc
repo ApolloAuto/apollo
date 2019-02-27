@@ -217,12 +217,13 @@ bool LaneDetectionComponent::Init() {
   // load in lidar to imu extrinsic
   Eigen::Matrix4d ex_lidar2imu;
   LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
-                  "velodyne128_novatel_extrinsics.yaml", &ex_lidar2imu);
+                     "velodyne128_novatel_extrinsics.yaml",
+                 &ex_lidar2imu);
   AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
   CHECK(visualize_.Init_all_info_single_camera(
-      visual_camera_, intrinsic_map_, extrinsic_map_,
-      ex_lidar2imu, pitch_adj, image_height_, image_width_));
+      visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj,
+      image_height_, image_width_));
   homography_im2car_ = visualize_.homography_im2car();
   camera_lane_pipeline_->SetIm2CarHomography(homography_im2car_);
 
