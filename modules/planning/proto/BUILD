@@ -546,6 +546,9 @@ proto_library(
     srcs = [
         "open_space_trajectory_provider_config.proto",
     ],
+    deps = [
+        ":planner_open_space_config_proto_lib",
+    ],
 )
 
 cc_proto_library(
