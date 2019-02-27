@@ -49,14 +49,21 @@ class PlanningContext {
 
   // scenario context
   struct ScenarioInfo {
-    apollo::hdmap::PathOverlap next_stop_sign_overlap;
-    std::vector<apollo::hdmap::PathOverlap> next_traffic_light_overlaps;
+    /////////////////////////
+    // general info, set up by ScenarioManager::Observe()
+    // all traffic lights ahead, with signal info
     std::unordered_map<std::string, const apollo::perception::TrafficLight*>
         traffic_lights;
-
-    apollo::hdmap::PathOverlap next_pnc_junction_overlap;
+    // intersection_map
     std::unordered_map<std::string, const apollo::hdmap::PathOverlap*>
-        next_pnc_junction_overlaps;
+        traffic_sign_pnc_junction_overlap_map;
+
+    /////////////////////////
+    // scenario specific info, set up by ScenarioManager::ScenarioDispatch()
+    // current stop sign
+    apollo::hdmap::PathOverlap current_stop_sign_overlap;
+    // current traffic light (vector)
+    std::vector<apollo::hdmap::PathOverlap> current_traffic_light_overlaps;
 
     // still in the scenario for this overlap, but stop already done
     // => no stop fence from decider_rule_based_stop task

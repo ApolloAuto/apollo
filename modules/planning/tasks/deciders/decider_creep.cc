@@ -44,7 +44,7 @@ Status DeciderCreep::Process(Frame* frame,
   CHECK_NOTNULL(reference_line_info);
 
   const double stop_sign_overlap_end_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
   BuildStopDecision(stop_sign_overlap_end_s, frame, reference_line_info);
 
   return Status::OK();
