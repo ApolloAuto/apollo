@@ -68,6 +68,10 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_boundaries,
       double* center_line);
 
+  void TrimPathBounds(
+      int path_blocked_idx,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+
   void PathBoundsDebugString(
       const std::vector<std::tuple<double, double, double>>& path_boundaries);
 
