@@ -11,7 +11,7 @@ project(pb_msgs_example)
 add_proto_files(
     DIRECTORY proto
     FILES chatter.proto
-	)
+)
 ## Declare a C++ executable
 add_executable(pb_talker src/talker.cpp)
 target_link_libraries(pb_talker ${catkin_LIBRARIES}pb_msgs_example_proto)
@@ -22,22 +22,22 @@ target_link_libraries(pb_listener ${catkin_LIBRARIES}  pb_msgs_example_proto)
 Bazel
 
 ```
- cc_binary(
-       name = "talker",
-       srcs = ["talker.cc"],
-       deps = [
-           "//cyber",
-          "//cyber/examples/proto:examples_cc_proto",
-      ],
-  )
-  cc_binary(
-      name = "listener",
-      srcs = ["listener.cc"],
-      deps = [
-          "//cyber",
-          "//cyber/examples/proto:examples_cc_proto",
-      ],
-  )
+cc_binary(
+	name = "talker",
+	srcs = ["talker.cc"],
+	deps = [
+		"//cyber",
+		"//cyber/examples/proto:examples_cc_proto",
+		],
+	)
+cc_binary(
+	name = "listener",
+	srcs = ["listener.cc"],
+	deps = [
+		"//cyber",
+		"//cyber/examples/proto:examples_cc_proto",
+		],
+	)
 ```
 We can find the mapping easily from the 2 file snippets. For example, `pb_talker` and `src/talker.cpp` in cmake `add_executable` setting map to `name = "talker"` and `srcs = ["talker.cc"]` in BUILD file `cc_binary`.
 ###Proto
@@ -45,18 +45,17 @@ Apollo ROS has customized to support proto message formate that a separate secti
 
 ```C
 cc_proto_library(
-    name = "examples_cc_proto",
-    deps = [
-        ":examples_proto",
-    ],
-)
-
+	name = "examples_cc_proto",
+	deps = [
+		":examples_proto",
+		],
+	)
 proto_library(
-    name = "examples_proto",
-    srcs = [
-        "examples.proto",
-    ],
-)
+	name = "examples_proto",
+	srcs = [
+		"examples.proto",
+		],
+	)
 ``` 
 
 The package definition has also changed in Cyber-RT. In Apollo ROS a fixed package `package pb_msgs;` is used for proto files, but in Cyber-RT, the proto file path `package apollo.cyber.examples.proto;` is used instead. 
@@ -115,19 +114,16 @@ ROS
 #include "ros/ros.h"
 #include "chatter.pb.h"
 
-void MessageCallback(const boost::shared_ptr<pb_msgs::Chatter>& msg)
-{
+void MessageCallback(const boost::shared_ptr<pb_msgs::Chatter>& msg) {
   ROS_INFO_STREAM("Time: " << msg->stamp().sec() << "." << msg->stamp().nsec());
   ROS_INFO("I heard pb Chatter message: [%s]", msg->content().c_str());
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   ros::init(argc, argv, "listener");
   ros::NodeHandle n;
   ros::Subscriber pb_sub = n.subscribe("chatter", 1000, MessageCallback);
   ros::spin();
-
   return 0;
 }
 ```
@@ -183,16 +179,13 @@ ROS
 
 #include <sstream>
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
   ros::init(argc, argv, "talker");
   ros::NodeHandle n;
   ros::Publisher chatter_pub = n.advertise<pb_msgs::Chatter>("chatter", 1000);
   ros::Rate loop_rate(10);
-
   int count = 0;
-  while (ros::ok())
-  {
+  while (ros::ok()) {
     pb_msgs::Chatter msg;
     ros::Time now = ros::Time::now();
     msg.mutable_stamp()->set_sec(now.sec);
@@ -200,8 +193,7 @@ int main(int argc, char** argv)
     std::stringstream ss; 
     ss << "Hello world " << count;
     msg.set_content(ss.str());
-    chatter_pub.publish(msg);
-    
+    chatter_pub.publish(msg);   
     ros::spinOnce();
     loop_rate.sleep();
   }
