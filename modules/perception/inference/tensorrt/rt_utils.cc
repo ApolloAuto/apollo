@@ -34,13 +34,13 @@ bool ReadProtoFromTextFile(const std::string &filename,
   google::protobuf::io::FileInputStream raw_input(fd);
   raw_input.setCloseOnDelete(true);
 
-  if (!google::protobuf::TextFormat::Parse(&raw_input, proto)) {
+  bool ret = google::protobuf::TextFormat::Parse(&raw_input, proto);
+  if (!ret) {
     AERROR << "Failed to parse proto file: " << filename;
-    return false;
   }
 
   close(fd);
-  return true;
+  return ret;
 }
 
 bool ReadProtoFromBinaryFile(const std::string &filename,
@@ -55,13 +55,13 @@ bool ReadProtoFromBinaryFile(const std::string &filename,
   google::protobuf::io::CodedInputStream coded_input(&raw_input);
   coded_input.SetTotalBytesLimit(INT_MAX, 536870912);
 
-  if (!proto->ParseFromCodedStream(&coded_input)) {
+  bool ret = proto->ParseFromCodedStream(&coded_input));
+  if (!ret) {
     AERROR << "Failed to parse proto file: " << filename;
-    return false;
   }
 
   close(fd);
-  return true;
+  return ret;
 }
 
 bool loadNetParams(const std::string &param_file, NetParameter *param) {
