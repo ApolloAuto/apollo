@@ -92,6 +92,7 @@ cc_library(
         "//modules/drivers/gnss/proto:imu_proto",
         "//modules/drivers/gnss/proto:ins_proto",
         "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/ultanalyse/proto:ultanalyse_proto",        
         "//modules/guardian/proto:guardian_proto",
         "//modules/localization/proto:gps_proto",
         "//modules/localization/proto:imu_proto",
@@ -103,7 +104,6 @@ cc_library(
         "//modules/planning/proto:planning_proto",
         "//modules/prediction/proto:prediction_proto",
         "//modules/routing/proto:routing_proto",
-        "//modules/drivers/ultanalyse/proto:ultanalyse_proto",
         "@glog",
     ],
 )
