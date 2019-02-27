@@ -93,6 +93,25 @@ void ObstaclesPrioritizer::PrioritizeObstacles(
     const EnvironmentFeatures& environment_features,
     const std::shared_ptr<ScenarioFeatures> scenario_features) {
   AssignIgnoreLevel(environment_features, scenario_features);
+  AssignCautionLevel(scenario_features);
+}
+
+void ObstaclesPrioritizer::AssignCautionLevel(
+    const std::shared_ptr<ScenarioFeatures> scenario_features) {
+  switch (scenario_features->scenario().type()) {
+    case Scenario::JUNCTION: {
+      AssignCautionLevelInJunction(scenario_features);
+      break;
+    }
+    case Scenario::CRUISE: {
+      AssignCautionLevelInCruise(scenario_features);
+      break;
+    }
+    default: {
+      AssignCautionLevelInCruise(scenario_features);
+      break;
+    }
+  }
 }
 
 void ObstaclesPrioritizer::AssignIgnoreLevel(
@@ -178,6 +197,12 @@ void ObstaclesPrioritizer::AssignIgnoreLevel(
           ObstaclePriority::NORMAL);
     }
   }
+}
+
+void ObstaclesPrioritizer::AssignCautionLevelInCruise(
+    const std::shared_ptr<ScenarioFeatures> scenario_features) {
+  // TODO(kechxu) integrate change lane when ready to check change lane
+  AssignCautionLevelCruiseKeepLane();
 }
 
 void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
