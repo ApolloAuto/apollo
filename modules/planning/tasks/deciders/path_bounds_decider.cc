@@ -87,7 +87,7 @@ Status PathBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  // PathBoundsDebugString(path_boundaries);
+  PathBoundsDebugString(path_boundaries);
 
   // 3. Adjust the boundary considering dynamic obstacles
   // TODO(all): may need to implement this in the future.
@@ -147,6 +147,7 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
   double past_lane_right_width = kDefaultLaneWidth / 2.0;
   double past_road_left_width = kDefaultRoadWidth / 2.0;
   double past_road_right_width = kDefaultRoadWidth / 2.0;
+  int path_blocked_idx = -1;
   for (size_t i = 0; i < path_boundaries->size(); ++i) {
     double curr_s = std::get<0>((*path_boundaries)[i]);
     // Get the lane width at current point.
@@ -191,13 +192,17 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
         std::fmax(-curr_road_right_width,
                   std::fmin(-curr_lane_right_width, adc_sl_boundary.start_l()));
     // Update the boundary.
-    std::get<1>((*path_boundaries)[i]) =
-        std::fmax(std::get<1>((*path_boundaries)[i]),
-                  curr_right_bound + GetBufferBetweenADCCenterAndEdge());
-    std::get<2>((*path_boundaries)[i]) =
-        std::fmin(std::get<2>((*path_boundaries)[i]),
-                  curr_left_bound - GetBufferBetweenADCCenterAndEdge());
+    double dummy = 0.0;
+    if (!UpdatePathBoundaryAndCenterLine(
+            i, curr_left_bound, curr_right_bound, path_boundaries, &dummy)) {
+      path_blocked_idx = static_cast<int>(i);
+    }
+    if (path_blocked_idx != -1) {
+      break;
+    }
   }
+
+  TrimPathBounds(path_blocked_idx, path_boundaries);
 
   return true;
 }
@@ -253,18 +258,24 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
             if (!UpdatePathBoundaryAndCenterLine(
                     i, *left_bounds.begin(), *right_bounds.begin(),
                     path_boundaries, &center_line)) {
+              path_blocked_idx = static_cast<int>(i);
+              break;
               // ADC has no path, start side-pass decision.
               // 1. Don't side-pass if obstacle is blocked by other obstacles
               //    and is not a parked vehicle.
               //    Don't side-pass virtual/ped/cyclist obstacles.
+              // TODO(all): finish this.
             }
           } else {
             // Obstacle is to the left of center-line, should pass from right.
             obs_id_to_direction[curr_obstacle_id] = false;
             left_bounds.insert(curr_obstacle_l_min);
-            UpdatePathBoundaryAndCenterLine(
-                i, *left_bounds.begin(), *right_bounds.begin(),
-                path_boundaries, &center_line);
+            if (!UpdatePathBoundaryAndCenterLine(
+                    i, *left_bounds.begin(), *right_bounds.begin(),
+                    path_boundaries, &center_line)) {
+              path_blocked_idx = static_cast<int>(i);
+              break;
+            }
           }
         } else {
           // An existing obstacle exits our scope.
@@ -313,7 +324,6 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
         // Currently, no side-pass when blocked.
         // TODO(all): implement the side-pass feature by considering
         // borrowing the adjacent lane.
-        break;
       } else {
         center_line = (std::get<1>((*path_boundaries)[i]) +
                        std::get<2>((*path_boundaries)[i])) /
@@ -327,17 +337,7 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
     }
   }
 
-  // Remove the blocked part. Don't generate path for it.
-  if (path_blocked_idx != -1) {
-    if (path_blocked_idx == 0) {
-      ADEBUG << "Completely blocked. Cannot move at all.";
-    }
-    for (int i = 0;
-         i < static_cast<int>(path_boundaries->size()) - path_blocked_idx;
-         ++i) {
-      path_boundaries->pop_back();
-    }
-  }
+  TrimPathBounds(path_blocked_idx, path_boundaries);
 
   return true;
 }
@@ -347,7 +347,7 @@ double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   // TODO(all): currently it's a fixed number. But it can take into account many
   // factors such as: ADC length, possible turning angle, speed, etc.
-  constexpr double kAdcEdgeBuffer = 0.2;
+  constexpr double kAdcEdgeBuffer = 0.0;
 
   return (adc_half_width + kAdcEdgeBuffer);
 }
@@ -423,10 +423,25 @@ bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
   return true;
 }
 
+void PathBoundsDecider::TrimPathBounds(
+    int path_blocked_idx,
+    std::vector<std::tuple<double, double, double>>* const path_boundaries) {
+  if (path_blocked_idx != -1) {
+    if (path_blocked_idx == 0) {
+      ADEBUG << "Completely blocked. Cannot move at all.";
+    }
+    int range = static_cast<int>(path_boundaries->size()) - path_blocked_idx;
+    for (int i = 0; i < range; ++i) {
+      path_boundaries->pop_back();
+    }
+  }
+}
+
 void PathBoundsDecider::PathBoundsDebugString(
       const std::vector<std::tuple<double, double, double>>& path_boundaries) {
   for (size_t i = 0; i < path_boundaries.size(); ++i) {
-    ADEBUG << "s = " << std::get<0>(path_boundaries[i])
+    ADEBUG << "idx " << i
+           << "; s = " << std::get<0>(path_boundaries[i])
            << "; l_min = " << std::get<1>(path_boundaries[i])
            << "; l_max = " << std::get<2>(path_boundaries[i]);
   }
