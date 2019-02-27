@@ -135,7 +135,7 @@ bool DirectoryExists(const std::string &directory_path);
  * @param pattern Path pattern, which may contain wildcards [?*].
  * @return Matched path list.
  */
-std::vector<std::string> Glob(const std::string& pattern);
+std::vector<std::string> Glob(const std::string &pattern);
 
 /**
  * @brief Copy a file.

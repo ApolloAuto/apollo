@@ -27,9 +27,9 @@ namespace cyber {
 namespace proto {
 class ChangeMsg;
 class RoleAttributes;
-}  // proto
-}  // cyber
-}  // apollo
+}  // namespace proto
+}  // namespace cyber
+}  // namespace apollo
 
 class GeneralChannelMessage;
 // class GeneralMessage;
@@ -43,7 +43,8 @@ class CyberTopologyMessage : public RenderableMessage {
   RenderableMessage* Child(int index) const override;
 
   void TopologyChanged(const apollo::cyber::proto::ChangeMsg& change_msg);
-  void AddReaderWriter(const apollo::cyber::proto::RoleAttributes& role, bool isWriter);
+  void AddReaderWriter(const apollo::cyber::proto::RoleAttributes& role,
+                       bool isWriter);
 
  private:
   CyberTopologyMessage(const CyberTopologyMessage&) = delete;
@@ -52,13 +53,14 @@ class CyberTopologyMessage : public RenderableMessage {
   void ChangeState(const Screen* s, int key);
   bool isFromHere(const std::string& nodeName);
 
-  std::map<std::string, GeneralChannelMessage*>::const_iterator findChild(int index) const;
+  std::map<std::string, GeneralChannelMessage*>::const_iterator findChild(
+      int index) const;
 
   enum class SecondColumnType { MessageType, MessageFrameRatio };
   SecondColumnType second_column_;
-  
+
   int pid_;
-  int col1_width_; 
+  int col1_width_;
   const std::string& specified_channel_;
   std::map<std::string, GeneralChannelMessage*> all_channels_map_;
 };

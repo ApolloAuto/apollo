@@ -42,7 +42,10 @@ class WriterBase {
     return role_attr_.channel_name();
   }
 
-  bool IsInit() const { std::lock_guard<std::mutex> g(lock_); return init_; }
+  bool IsInit() const {
+    std::lock_guard<std::mutex> g(lock_);
+    return init_;
+  }
 
  protected:
   proto::RoleAttributes role_attr_;
