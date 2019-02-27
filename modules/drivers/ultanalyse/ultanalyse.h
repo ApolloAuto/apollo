@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,7 @@
 /**
  * @file
  */
-
-#ifndef MODEULES_ULTANALYSE_ULTANALYSE_H_
-#define MODEULES_ULTANALYSE_ULTANALYSE_H_
+#pragma once
 
 #include <map>
 #include <mutex>
@@ -66,5 +64,3 @@ class Ultanalyse : public apollo::common::ApolloApp {
 
 }  // namespace ultanalyse
 }  // namespace apollo
-
-#endif  // MODULES_ULTANALYSE_ULTANALYSE_H_
