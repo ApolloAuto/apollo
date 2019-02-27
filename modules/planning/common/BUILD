@@ -468,6 +468,17 @@ cc_library(
     hdrs = [
         "open_space_info.h",
     ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/map/pnc_map",
+        "//modules/planning/common:indexed_queue",
+        "//modules/planning/common:obstacle",
+        "//modules/planning/common:planning_gflags",
+        "@eigen",
+     ],
 )
 
 cc_test(
