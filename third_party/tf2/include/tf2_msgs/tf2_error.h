@@ -27,52 +27,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef TF2_IMPL_CONVERT_H
-#define TF2_IMPL_CONVERT_H
+#ifndef TF2_MSGS_TF2_ERROR_H
+#define TF2_MSGS_TF2_ERROR_H
 
-namespace tf2 {
-namespace impl {
-
-template <bool IS_MESSAGE_A, bool IS_MESSAGE_B>
-class Converter {
-public:
-  template<typename A, typename B>
-  static void convert(const A& a, B& b);
-};
-
-// The case where both A and B are messages should not happen: if you have two
-// messages that are interchangeable, well, that's against the ROS purpose:
-// only use one type. Worst comes to worst, specialize the original convert
-// function for your types.
-// if B == A, the templated version of convert with only one argument will be
-// used.
-//
-//template <>
-//template <typename A, typename B>
-//inline void Converter<true, true>::convert(const A& a, B& b);
-
-template <>
-template <typename A, typename B>
-inline void Converter<true, false>::convert(const A& a, B& b)
-{
-  fromMsg(a, b);
-}
-
-template <>
-template <typename A, typename B>
-inline void Converter<false, true>::convert(const A& a, B& b)
-{
-  b = toMsg(a);
-}
-
-template <>
-template <typename A, typename B>
-inline void Converter<false, false>::convert(const A& a, B& b)
-{
-  fromMsg(toMsg(a), b);
-}
-
+namespace tf2_msgs {
+namespace TF2Error {
+  const uint8_t NO_ERROR = 0;
+  const uint8_t LOOKUP_ERROR = 1;
+  const uint8_t CONNECTIVITY_ERROR = 2;
+  const uint8_t EXTRAPOLATION_ERROR = 3;
+  const uint8_t INVALID_ARGUMENT_ERROR = 4;
+  const uint8_t TIMEOUT_ERROR = 5;
+  const uint8_t TRANSFORM_ERROR = 6;
 }
 }
-
-#endif //TF2_IMPL_CONVERT_H
+#endif

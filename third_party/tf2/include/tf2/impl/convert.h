@@ -47,6 +47,7 @@ public:
 // if B == A, the templated version of convert with only one argument will be
 // used.
 //
+//
 //template <>
 //template <typename A, typename B>
 //inline void Converter<true, true>::convert(const A& a, B& b);

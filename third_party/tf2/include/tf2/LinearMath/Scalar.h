@@ -13,7 +13,6 @@ subject to the following restrictions:
 */
 
 
-
 #ifndef TF2_SCALAR_H
 #define TF2_SCALAR_H
 
