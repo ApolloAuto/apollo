@@ -7,14 +7,14 @@ cc_library(
     srcs = ["ultanalyse.cc"],
     hdrs = ["ultanalyse.h"],
     deps = [
+        "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_manager",        
         "//modules/common:apollo_app",
         "//modules/common:log",
-        "//modules/common/adapters:adapter_manager",
+        "//modules/control/proto:control_proto",        
         "//modules/drivers/ultanalyse/common:ultanalyse_gflags",
-        "//modules/canbus/proto:canbus_proto",
-        "//modules/control/proto:control_proto",
-        "//modules/monitor/proto:system_status_proto",
         "//modules/drivers/ultanalyse/proto:ultanalyse_proto",
+        "//modules/monitor/proto:system_status_proto",
     ],
 )
 
