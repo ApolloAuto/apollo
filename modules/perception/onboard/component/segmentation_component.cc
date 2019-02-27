@@ -125,7 +125,7 @@ bool SegmentationComponent::InternalProc(
   const double lidar_query_tf_timestamp =
       timestamp - lidar_query_tf_offset_ * 0.001;
   if (!lidar2world_trans_.GetSensor2worldTrans(lidar_query_tf_timestamp,
-                                              &pose)) {
+                                               &pose)) {
     out_message->error_code_ = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     AERROR << "Failed to get pose at time: "
            << std::to_string(lidar_query_tf_timestamp);
