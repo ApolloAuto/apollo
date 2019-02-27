@@ -13,7 +13,6 @@ subject to the following restrictions:
 */
 
 
-
 #ifndef TF2_VECTOR3_H
 #define TF2_VECTOR3_H
 
@@ -26,7 +25,6 @@ namespace tf2
 
 #define Vector3Data Vector3DoubleData
 #define Vector3DataName "Vector3DoubleData"
-
 
 
 

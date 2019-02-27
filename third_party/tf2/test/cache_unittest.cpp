@@ -33,7 +33,8 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include <stdexcept>
 
-#include <geometry_msgs/TransformStamped.h>
+// #include <geometry_msgs/TransformStamped.h>
+#include "geometry_msgs/transform_stamped.h"
 
 #include <cmath>
 
@@ -83,7 +84,7 @@ TEST(TimeCache, Repeatability)
   for ( uint64_t i = 1; i < runs ; i++ )
   {
     stor.frame_id_ = i;
-    stor.stamp_ = ros::Time().fromNSec(i);
+    stor.stamp_ = tf2::Time(i);
     
     cache.insertData(stor);
   }
@@ -91,9 +92,9 @@ TEST(TimeCache, Repeatability)
   for ( uint64_t i = 1; i < runs ; i++ )
 
   {
-    cache.getData(ros::Time().fromNSec(i), stor);
+    cache.getData(tf2::Time(i), stor);
     EXPECT_EQ(stor.frame_id_, i);
-    EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(i));
+    EXPECT_EQ(stor.stamp_, tf2::Time(i));
   }
   
 }
@@ -110,16 +111,16 @@ TEST(TimeCache, RepeatabilityReverseInsertOrder)
   for ( int i = runs -1; i >= 0 ; i-- )
   {
     stor.frame_id_ = i;
-    stor.stamp_ = ros::Time().fromNSec(i);
+    stor.stamp_ = tf2::Time(i);
     
     cache.insertData(stor);
   }
   for ( uint64_t i = 1; i < runs ; i++ )
 
   {
-    cache.getData(ros::Time().fromNSec(i), stor);
+    cache.getData(tf2::Time(i), stor);
     EXPECT_EQ(stor.frame_id_, i);
-    EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(i));
+    EXPECT_EQ(stor.stamp_, tf2::Time(i));
   }
   
 }
@@ -174,36 +175,36 @@ TEST(TimeCache, ZeroAtFront)
   for ( uint64_t i = 1; i < runs ; i++ )
   {
     stor.frame_id_ = i;
-    stor.stamp_ = ros::Time().fromNSec(i);
+    stor.stamp_ = tf2::Time(i);
     
     cache.insertData(stor);
   }
 
   stor.frame_id_ = runs;
-  stor.stamp_ = ros::Time().fromNSec(runs);
+  stor.stamp_ = tf2::Time(runs);
   cache.insertData(stor);
 
   for ( uint64_t i = 1; i < runs ; i++ )
 
   {
-    cache.getData(ros::Time().fromNSec(i), stor);
+    cache.getData(tf2::Time(i), stor);
     EXPECT_EQ(stor.frame_id_, i);
-    EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(i));
+    EXPECT_EQ(stor.stamp_, tf2::Time(i));
   }
 
-  cache.getData(ros::Time(), stor);
+  cache.getData(0, stor);
   EXPECT_EQ(stor.frame_id_, runs);
-  EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(runs));
+  EXPECT_EQ(stor.stamp_, tf2::Time(runs));
 
   stor.frame_id_ = runs;
-  stor.stamp_ = ros::Time().fromNSec(runs+1);
+  stor.stamp_ = tf2::Time(runs + 1);
   cache.insertData(stor);
 
 
   //Make sure we get a different value now that a new values is added at the front
-  cache.getData(ros::Time(), stor);
+  cache.getData(0, stor);
   EXPECT_EQ(stor.frame_id_, runs);
-  EXPECT_EQ(stor.stamp_, ros::Time().fromNSec(runs+1));
+  EXPECT_EQ(stor.stamp_, tf2::Time(runs + 1));
   
 }
 
@@ -234,13 +235,13 @@ TEST(TimeCache, CartesianInterpolation)
     
       stor.translation_.setValue(xvalues[step], yvalues[step], zvalues[step]);
       stor.frame_id_ = 2;
-      stor.stamp_ = ros::Time().fromNSec(step * 100 + offset);
+      stor.stamp_ = tf2::Time(step * 100 + offset);
       cache.insertData(stor);
     }
     
     for (int pos = 0; pos < 100 ; pos ++)
     {
-      cache.getData(ros::Time().fromNSec(offset + pos), stor);
+      cache.getData(tf2::Time(offset + pos), stor);
       double x_out = stor.translation_.x();
       double y_out = stor.translation_.y();
       double z_out = stor.translation_.z();
@@ -284,13 +285,13 @@ TEST(TimeCache, ReparentingInterpolationProtection)
 
     stor.translation_.setValue(xvalues[step], yvalues[step], zvalues[step]);
     stor.frame_id_ = step + 4;
-    stor.stamp_ = ros::Time().fromNSec(step * 100 + offset);
+    stor.stamp_ = tf2::Time(step * 100 + offset);
     cache.insertData(stor);
   }
   
   for (int pos = 0; pos < 100 ; pos ++)
   {
-    EXPECT_TRUE(cache.getData(ros::Time().fromNSec(offset + pos), stor));
+    EXPECT_TRUE(cache.getData(tf2::Time(offset + pos), stor));
     double x_out = stor.translation_.x();
     double y_out = stor.translation_.y();
     double z_out = stor.translation_.z();
@@ -352,13 +353,13 @@ TEST(TimeCache, AngularInterpolation)
       quats[step].setRPY(yawvalues[step], pitchvalues[step], rollvalues[step]);
       stor.rotation_ = quats[step];
       stor.frame_id_ = 3;
-      stor.stamp_ = ros::Time().fromNSec(offset + (step * 100)); //step = 0 or 1
+      stor.stamp_ = tf2::Time(offset + (step * 100)); //step = 0 or 1
       cache.insertData(stor);
     }
     
     for (int pos = 0; pos < 100 ; pos ++)
     {
-      EXPECT_TRUE(cache.getData(ros::Time().fromNSec(offset + pos), stor)); //get the transform for the position
+      EXPECT_TRUE(cache.getData(tf2::Time(offset + pos), stor)); //get the transform for the position
       tf2::Quaternion quat (stor.rotation_);
 
       //Generate a ground truth quaternion directly calling slerp
@@ -383,14 +384,14 @@ TEST(TimeCache, DuplicateEntries)
   TransformStorage stor;
   setIdentity(stor);
   stor.frame_id_ = 3;
-  stor.stamp_ = ros::Time().fromNSec(1);
+  stor.stamp_ = tf2::Time(1);
 
   cache.insertData(stor);
 
   cache.insertData(stor);
 
 
-  cache.getData(ros::Time().fromNSec(1), stor);
+  cache.getData(tf2::Time(1), stor);
   
   //printf(" stor is %f\n", stor.translation_.x());
   EXPECT_TRUE(!std::isnan(stor.translation_.x()));

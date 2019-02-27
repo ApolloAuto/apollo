@@ -27,30 +27,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
+
 #include <tf2/buffer_core.h>
-
-#include <ros/time.h>
-#include <console_bridge/console.h>
-
+#include "tf2/time.h"
 #include <boost/lexical_cast.hpp>
+#include <chrono>
+
+using std::chrono::system_clock;
+using std::chrono::steady_clock;
+using std::chrono::high_resolution_clock;
 
 int main(int argc, char** argv)
 {
   uint32_t num_levels = 10;
-  if (argc > 1)
-  {
-    num_levels = boost::lexical_cast<uint32_t>(argv[1]);
-  }
+  // if (argc > 1)
+  // {
+  //   num_levels = boost::lexical_cast<uint32_t>(argv[1]);
+  // }
 
   tf2::BufferCore bc;
   geometry_msgs::TransformStamped t;
-  t.header.stamp = ros::Time(1);
+  t.header.stamp = 1;
   t.header.frame_id = "root";
   t.child_frame_id = "0";
   t.transform.translation.x = 1;
   t.transform.rotation.w = 1.0;
   bc.setTransform(t, "me");
-  t.header.stamp = ros::Time(2);
+  t.header.stamp = 2;
   bc.setTransform(t, "me");
 
   for (uint32_t i = 1; i < num_levels/2; ++i)
@@ -62,7 +66,7 @@ int main(int argc, char** argv)
       std::stringstream child_ss;
       child_ss << i;
 
-      t.header.stamp = ros::Time(j);
+      t.header.stamp = tf2::Time(j);
       t.header.frame_id = parent_ss.str();
       t.child_frame_id = child_ss.str();
       bc.setTransform(t, "me");
@@ -72,10 +76,10 @@ int main(int argc, char** argv)
   t.header.frame_id = "root";
   std::stringstream ss;
   ss << num_levels/2;
-  t.header.stamp = ros::Time(1);
+  t.header.stamp = 1; 
   t.child_frame_id = ss.str();
   bc.setTransform(t, "me");
-  t.header.stamp = ros::Time(2);
+  t.header.stamp = 2;
   bc.setTransform(t, "me");
 
   for (uint32_t i = num_levels/2 + 1; i < num_levels; ++i)
@@ -87,7 +91,7 @@ int main(int argc, char** argv)
       std::stringstream child_ss;
       child_ss << i;
 
-      t.header.stamp = ros::Time(j);
+      t.header.stamp = tf2::Time(j);
       t.header.frame_id = parent_ss.str();
       t.child_frame_id = child_ss.str();
       bc.setTransform(t, "me");
@@ -98,121 +102,113 @@ int main(int argc, char** argv)
 
   std::string v_frame0 = boost::lexical_cast<std::string>(num_levels - 1);
   std::string v_frame1 = boost::lexical_cast<std::string>(num_levels/2 - 1);
-  logInform("%s to %s", v_frame0.c_str(), v_frame1.c_str());
+  printf("%s to %s\n", v_frame0.c_str(), v_frame1.c_str());
   geometry_msgs::TransformStamped out_t;
 
   const uint32_t count = 1000000;
-  logInform("Doing %d %d-level tests", count, num_levels);
+  printf("Doing %d %d-level tests\n", count, num_levels);
 
 #if 01
   {
-    ros::WallTime start = ros::WallTime::now();
+    steady_clock::time_point start = steady_clock::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(0));
+      out_t = bc.lookupTransform(v_frame1, v_frame0, 0);
     }
-    ros::WallTime end = ros::WallTime::now();
-    ros::WallDuration dur = end - start;
-    //ROS_INFO_STREAM(out_t);
-    logInform("lookupTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    steady_clock::time_point end = steady_clock::now();
+    double dur = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    printf("lookupTransform at Time(0) took: %f (secs) for an average of: %.9f (secs)\n", dur, dur / (double)count);
   }
 #endif
 
 #if 01
   {
-    ros::WallTime start = ros::WallTime::now();
+    steady_clock::time_point start = steady_clock::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(1));
+      out_t = bc.lookupTransform(v_frame1, v_frame0, tf2::Time(1));
     }
-    ros::WallTime end = ros::WallTime::now();
-    ros::WallDuration dur = end - start;
-    //ROS_INFO_STREAM(out_t);
-    logInform("lookupTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    steady_clock::time_point end = steady_clock::now();
+    double dur = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    printf("lookupTransform at Time(1) took: %f for an average of: %.9f\n", dur, dur / (double)count);
   }
 #endif
 
 #if 01
   {
-    ros::WallTime start = ros::WallTime::now();
+    steady_clock::time_point start = steady_clock::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(1.5));
+      out_t = bc.lookupTransform(v_frame1, v_frame0, tf2::Time(1.5));
     }
-    ros::WallTime end = ros::WallTime::now();
-    ros::WallDuration dur = end - start;
-    //ROS_INFO_STREAM(out_t);
-    logInform("lookupTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    steady_clock::time_point end = steady_clock::now();
+    double dur = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    printf("lookupTransform at Time(1.5) took %f for an average of %.9f\n", dur, dur / (double)count);
   }
 #endif
 
 #if 01
   {
-    ros::WallTime start = ros::WallTime::now();
+    steady_clock::time_point start = steady_clock::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      out_t = bc.lookupTransform(v_frame1, v_frame0, ros::Time(2));
+      out_t = bc.lookupTransform(v_frame1, v_frame0, tf2::Time(2));
     }
-    ros::WallTime end = ros::WallTime::now();
-    ros::WallDuration dur = end - start;
-    //ROS_INFO_STREAM(out_t);
-    logInform("lookupTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    steady_clock::time_point end = steady_clock::now();
+    double dur = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    printf("lookupTransform at Time(2) took %f for an average of %.9f\n", dur, dur / (double)count);
   }
 #endif
 
 #if 01
   {
-    ros::WallTime start = ros::WallTime::now();
+    steady_clock::time_point start = steady_clock::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      bc.canTransform(v_frame1, v_frame0, ros::Time(0));
+      bc.canTransform(v_frame1, v_frame0, tf2::Time(0));
     }
-    ros::WallTime end = ros::WallTime::now();
-    ros::WallDuration dur = end - start;
-    //ROS_INFO_STREAM(out_t);
-    logInform("canTransform at Time(0) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    steady_clock::time_point end = steady_clock::now();
+    double dur = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    printf("canTransform at Time(0) took %f for an average of %.9f\n", dur, dur / (double)count);
   }
 #endif
 
 #if 01
   {
-    ros::WallTime start = ros::WallTime::now();
+    steady_clock::time_point start = steady_clock::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      bc.canTransform(v_frame1, v_frame0, ros::Time(1));
+      bc.canTransform(v_frame1, v_frame0, tf2::Time(1));
     }
-    ros::WallTime end = ros::WallTime::now();
-    ros::WallDuration dur = end - start;
-    //ROS_INFO_STREAM(out_t);
-    logInform("canTransform at Time(1) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    steady_clock::time_point end = steady_clock::now();
+    double dur = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    printf("canTransform at Time(1) took %f for an average of %.9f\n", dur, dur / (double)count);
   }
 #endif
 
 #if 01
   {
-    ros::WallTime start = ros::WallTime::now();
+    steady_clock::time_point start = steady_clock::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      bc.canTransform(v_frame1, v_frame0, ros::Time(1.5));
+      bc.canTransform(v_frame1, v_frame0, tf2::Time(1.5 * 1e9));
     }
-    ros::WallTime end = ros::WallTime::now();
-    ros::WallDuration dur = end - start;
-    //ROS_INFO_STREAM(out_t);
-    logInform("canTransform at Time(1.5) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    steady_clock::time_point end = steady_clock::now();
+    double dur = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    printf("canTransform at Time(1.5) took %f for an average of %.9f\n", dur, dur / (double)count);
   }
 #endif
 
 #if 01
   {
-    ros::WallTime start = ros::WallTime::now();
+    steady_clock::time_point start = steady_clock::now();
     for (uint32_t i = 0; i < count; ++i)
     {
-      bc.canTransform(v_frame1, v_frame0, ros::Time(2));
+      bc.canTransform(v_frame1, v_frame0, tf2::Time(2));
     }
-    ros::WallTime end = ros::WallTime::now();
-    ros::WallDuration dur = end - start;
-    //ROS_INFO_STREAM(out_t);
-    logInform("canTransform at Time(2) took %f for an average of %.9f", dur.toSec(), dur.toSec() / (double)count);
+    steady_clock::time_point end = steady_clock::now();
+    double dur = std::chrono::duration_cast<std::chrono::duration<double>>(end - start).count();
+    printf("canTransform at Time(2) took %f for an average of %.9f\n", dur, dur / (double)count);
   }
 #endif
 }
