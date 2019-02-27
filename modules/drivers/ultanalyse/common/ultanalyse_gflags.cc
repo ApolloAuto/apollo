@@ -28,5 +28,3 @@ DEFINE_double(min_sonar_range_detectable, 20.0,
             "set the min detectable range of ultrasonic sensors");
 DEFINE_double(max_sonar_range_detectable, 250.0,
             "set the max detectable range of ultrasonic sensors");
-
-
