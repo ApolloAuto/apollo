@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 wh. All Rights Reserved.
+ * Copyright 2019 wh. All Rights Reserved.
  * ultrasound analyse module
  * 
  * wh  27 Nov. 2018
