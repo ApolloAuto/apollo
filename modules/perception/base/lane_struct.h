@@ -43,8 +43,8 @@ enum class LaneLinePositionType {
   THIRD_RIGHT = 3,
   FOURTH_RIGHT = 4,
   CURB_RIGHT = 5,
-  OTHER = 6,           //!< other types of lane
-  UNKNOWN = 7          //!< background
+  OTHER = 6,   //!< other types of lane
+  UNKNOWN = 7  //!< background
 };
 
 // Definition of the use type of a lane mark in lane adjustment
