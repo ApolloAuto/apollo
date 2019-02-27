@@ -35,7 +35,7 @@ Fem1dQpProblem::Fem1dQpProblem(const size_t num_of_knots,
                                const double delta_s,
                                const std::array<double, 5>& w,
                                const double max_x_third_order_derivative) {
-  CHECK_GE(num_of_knots, 4);
+  CHECK_GE(num_of_knots, 2);
   num_of_knots_ = num_of_knots;
 
   x_init_ = x_init;
