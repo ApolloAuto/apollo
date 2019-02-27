@@ -21,7 +21,6 @@
 
 namespace tf2 {
 namespace impl {
-
 /** Function needed for the generalization of toQuaternion
  * \param q a tf2::Quaternion
  * \return a copy of the same quaternion

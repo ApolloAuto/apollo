@@ -35,8 +35,9 @@
 #include <tf2/LinearMath/Vector3.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
-#include <geometry_msgs/TransformStamped.h>
 #include <assert.h>
+
+#include "geometry_msgs/transform_stamped.h"
 
 namespace tf2 {
 
@@ -56,13 +57,13 @@ TransformStorage::TransformStorage(const geometry_msgs::TransformStamped& data, 
   translation_ = tf2::Vector3(v.x, v.y, v.z);
 }
 
-TimeCache::TimeCache(ros::Duration max_storage_time)
+TimeCache::TimeCache(Duration max_storage_time)
 : max_storage_time_(max_storage_time)
 {}
 
 namespace cache { // Avoid ODR collisions https://github.com/ros/geometry2/issues/175 
 // hoisting these into separate functions causes an ~8% speedup.  Removing calling them altogether adds another ~10%
-void createExtrapolationException1(ros::Time t0, ros::Time t1, std::string* error_str)
+void createExtrapolationException1(Time t0, Time t1, std::string* error_str)
 {
   if (error_str)
   {
@@ -72,7 +73,7 @@ void createExtrapolationException1(ros::Time t0, ros::Time t1, std::string* erro
   }
 }
 
-void createExtrapolationException2(ros::Time t0, ros::Time t1, std::string* error_str)
+void createExtrapolationException2(Time t0, Time t1, std::string* error_str)
 {
   if (error_str)
   {
@@ -82,7 +83,7 @@ void createExtrapolationException2(ros::Time t0, ros::Time t1, std::string* erro
   }
 }
 
-void createExtrapolationException3(ros::Time t0, ros::Time t1, std::string* error_str)
+void createExtrapolationException3(Time t0, Time t1, std::string* error_str)
 {
   if (error_str)
   {
@@ -93,7 +94,7 @@ void createExtrapolationException3(ros::Time t0, ros::Time t1, std::string* erro
 }
 } // namespace cache
 
-uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, ros::Time target_time, std::string* error_str)
+uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, Time target_time, std::string* error_str)
 {
   //No values stored
   if (storage_.empty())
@@ -102,7 +103,7 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
   }
 
   //If time == 0 return the latest
-  if (target_time.isZero())
+  if (target_time == 0)
   {
     one = &storage_.front();
     return 1;
@@ -124,8 +125,8 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
     }
   }
 
-  ros::Time latest_time = (*storage_.begin()).stamp_;
-  ros::Time earliest_time = (*(storage_.rbegin())).stamp_;
+  Time latest_time = (*storage_.begin()).stamp_;
+  Time earliest_time = (*(storage_.rbegin())).stamp_;
 
   if (target_time == latest_time)
   {
@@ -159,6 +160,15 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
     storage_it++;
   }
 
+  if (storage_it == storage_.end()) {
+    return 0;
+  }
+
+  if (storage_it == storage_.begin()) {
+    one = &*(storage_it); //Older
+    return 1;
+  }
+
   //Finally the case were somewhere in the middle  Guarenteed no extrapolation :-)
   one = &*(storage_it); //Older
   two = &*(--storage_it); //Newer
@@ -167,7 +177,7 @@ uint8_t TimeCache::findClosest(TransformStorage*& one, TransformStorage*& two, r
 
 }
 
-void TimeCache::interpolate(const TransformStorage& one, const TransformStorage& two, ros::Time time, TransformStorage& output)
+void TimeCache::interpolate(const TransformStorage& one, const TransformStorage& two, Time time, TransformStorage& output)
 {
   // Check for zero distance case
   if( two.stamp_ == one.stamp_ )
@@ -176,7 +186,8 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
     return;
   }
   //Calculate the ratio
-  tf2Scalar ratio = (time.toSec() - one.stamp_.toSec()) / (two.stamp_.toSec() - one.stamp_.toSec());
+  // tf2Scalar ratio = (time.toSec() - one.stamp_.toSec()) / (two.stamp_.toSec() - one.stamp_.toSec());
+  tf2Scalar ratio = time_to_sec(time - one.stamp_) / time_to_sec(two.stamp_ - one.stamp_);
 
   //Interpolate translation
   output.translation_.setInterpolate3(one.translation_, two.translation_, ratio);
@@ -189,7 +200,7 @@ void TimeCache::interpolate(const TransformStorage& one, const TransformStorage&
   output.child_frame_id_ = one.child_frame_id_;
 }
 
-bool TimeCache::getData(ros::Time time, TransformStorage & data_out, std::string* error_str) //returns false if data not available
+bool TimeCache::getData(Time time, TransformStorage & data_out, std::string* error_str) //returns false if data not available
 {
   TransformStorage* p_temp_1;
   TransformStorage* p_temp_2;
@@ -222,7 +233,7 @@ bool TimeCache::getData(ros::Time time, TransformStorage & data_out, std::string
   return true;
 }
 
-CompactFrameID TimeCache::getParent(ros::Time time, std::string* error_str)
+CompactFrameID TimeCache::getParent(Time time, std::string* error_str)
 {
   TransformStorage* p_temp_1;
   TransformStorage* p_temp_2;
@@ -275,33 +286,35 @@ P_TimeAndFrameID TimeCache::getLatestTimeAndParent()
 {
   if (storage_.empty())
   {
-    return std::make_pair(ros::Time(), 0);
+    return std::make_pair(Time(), 0);
   }
 
   const TransformStorage& ts = storage_.front();
   return std::make_pair(ts.stamp_, ts.frame_id_);
 }
 
-ros::Time TimeCache::getLatestTimestamp() 
+Time TimeCache::getLatestTimestamp() 
 {   
-  if (storage_.empty()) return ros::Time(); //empty list case
+  if (storage_.empty()) return Time(); //empty list case
   return storage_.front().stamp_;
 }
 
-ros::Time TimeCache::getOldestTimestamp() 
+Time TimeCache::getOldestTimestamp() 
 {   
-  if (storage_.empty()) return ros::Time(); //empty list case
+  if (storage_.empty()) return Time(); //empty list case
   return storage_.back().stamp_;
 }
 
 void TimeCache::pruneList()
 {
-  ros::Time latest_time = storage_.begin()->stamp_;
+  Time latest_time = storage_.begin()->stamp_;
   
   while(!storage_.empty() && storage_.back().stamp_ + max_storage_time_ < latest_time)
   {
     storage_.pop_back();
   }
+
+  // std::cout << "max_storage_time:" << max_storage_time_ <<", time cache list size:" << storage_.size() << std::endl;
   
 } // namespace tf2
 }
