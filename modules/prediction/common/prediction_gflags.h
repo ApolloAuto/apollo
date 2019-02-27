@@ -46,6 +46,9 @@ DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_prioritize_obstacles);
 DECLARE_bool(enable_junction_feature);
 DECLARE_bool(enable_all_junction);
+DECLARE_double(caution_search_distance_ahead);
+DECLARE_double(caution_search_distance_backward_for_merge);
+DECLARE_double(caution_search_distance_backward_for_overlap);
 
 // Obstacle features
 DECLARE_int32(ego_vehicle_id);
