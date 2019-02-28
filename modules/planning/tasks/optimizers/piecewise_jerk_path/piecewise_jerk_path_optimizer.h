@@ -40,6 +40,7 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
                          const common::TrajectoryPoint& init_point,
                          PathData* const path_data) override;
 
+<<<<<<< 098b3a116be2519d1f51fbf76c086bc9c148adcd
   bool OptimizePath(const std::pair<const std::array<double, 3>,
       const std::array<double, 3>>& init_state,
       const double delta_s,
@@ -57,6 +58,10 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
   double AdjustLateralDerivativeBounds(const double s_dot,
       const double dl, const double ddl,
       const double l_dot_bounds) const;
+=======
+  double AdjustLateralDerivativeBounds(const double s_dot,
+      const double l_dot_bounds);
+>>>>>>> planning: added adjustable lateral vel.
 };
 
 }  // namespace planning

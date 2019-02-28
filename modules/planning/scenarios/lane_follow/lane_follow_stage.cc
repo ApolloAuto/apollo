@@ -113,11 +113,12 @@ void LaneFollowStage::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 Stage::StageStatus LaneFollowStage::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   bool has_drivable_reference_line = false;
-  //  bool disable_low_priority_path = false;
-
   ADEBUG << "Number of reference lines:\t"
       << frame->mutable_reference_line_info()->size();
 
+  bool disable_low_priority_path = false;
+
+  AERROR << "Number of reference lines:\t" << frame->mutable_reference_line_info()->size();
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (has_drivable_reference_line) {
       reference_line_info.SetDrivable(false);

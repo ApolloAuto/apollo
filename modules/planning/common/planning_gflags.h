@@ -259,3 +259,5 @@ DECLARE_bool(enable_parallel_open_space_smoother);
 
 DECLARE_double(vehicle_low_speed_threshold);
 DECLARE_bool(enable_cuda);
+
+DECLARE_double(vehicle_low_speed_threshold);

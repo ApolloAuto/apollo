@@ -43,6 +43,7 @@ PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
 common::Status PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point, PathData* const path_data) {
+
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
@@ -200,6 +201,12 @@ double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
     l_prime_adjusted = std::fabs(dl) + 0.1;
   }
   return l_prime_adjusted;
+}
+
+double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
+    const double s_dot, const double l_dot_bounds) {
+  double s = std::fmax(FLAGS_vehicle_low_speed_threshold, s_dot);
+  return l_dot_bounds / s;
 }
 
 }  // namespace planning
