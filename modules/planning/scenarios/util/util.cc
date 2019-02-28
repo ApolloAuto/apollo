@@ -28,6 +28,9 @@ namespace scenario {
 using hdmap::PathOverlap;
 using perception::TrafficLight;
 
+/*
+ * @brief: check if a stop_sign_overlap is still along reference_line
+ */
 bool CheckStopSignDone(const ReferenceLineInfo& reference_line_info,
                        const std::string& stop_sign_overlap_id) {
   const std::vector<PathOverlap>& stop_sign_overlaps =
@@ -40,6 +43,9 @@ bool CheckStopSignDone(const ReferenceLineInfo& reference_line_info,
   return (stop_sign_overlap_it == stop_sign_overlaps.end());
 }
 
+/*
+ * @brief: check if a traffic_light_overlap is still along reference_line
+ */
 bool CheckTrafficLightDone(const ReferenceLineInfo& reference_line_info,
                            const std::string& traffic_light_overlap_id) {
   const std::vector<PathOverlap>& traffic_light_overlaps =
@@ -52,6 +58,9 @@ bool CheckTrafficLightDone(const ReferenceLineInfo& reference_line_info,
   return (traffic_light_overlap_it == traffic_light_overlaps.end());
 }
 
+/*
+ * @brief: read signal info
+ */
 TrafficLight GetSignal(const std::string& traffic_light_id) {
   const auto* result = apollo::common::util::FindPtrOrNull(
       PlanningContext::GetScenarioInfo()->traffic_lights, traffic_light_id);
@@ -65,6 +74,34 @@ TrafficLight GetSignal(const std::string& traffic_light_id) {
     return traffic_light;
   }
   return *result;
+}
+
+/*
+ * @brief: check if ADC is till inside a pnc-junction
+ */
+bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
+
+  hdmap::PathOverlap pnc_junction_overlap;
+  reference_line_info.GetPnCJunction(adc_front_edge_s, &pnc_junction_overlap);
+  if (pnc_junction_overlap.object_id.empty()) {
+    return false;
+  }
+
+  constexpr double kIntersectionPassDist = 2.0;  // unit: m
+  const double distance_adc_pass_intersection = adc_back_edge_s -
+      pnc_junction_overlap.end_s;
+  ADEBUG << "distance_adc_pass_intersection["
+      << distance_adc_pass_intersection
+      << "] pnc_junction_overlap[" << pnc_junction_overlap.object_id
+      << "] start_s[" << pnc_junction_overlap.start_s << "]";
+
+  if (distance_adc_pass_intersection >= kIntersectionPassDist) {
+    return false;
+  }
+
+  return true;
 }
 
 }  // namespace scenario
