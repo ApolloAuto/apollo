@@ -9,8 +9,8 @@ Cmake
 ```
 project(pb_msgs_example)
 add_proto_files(
-    DIRECTORY proto
-    FILES chatter.proto
+  DIRECTORY proto
+  FILES chatter.proto
 )
 ## Declare a C++ executable
 add_executable(pb_talker src/talker.cpp)
@@ -23,21 +23,21 @@ Bazel
 
 ```
 cc_binary(
-	name = "talker",
-	srcs = ["talker.cc"],
-	deps = [
-		"//cyber",
-		"//cyber/examples/proto:examples_cc_proto",
-		],
-	)
+  name = "talker",
+  srcs = ["talker.cc"],
+  deps = [
+    "//cyber",
+    "//cyber/examples/proto:examples_cc_proto",
+    ],
+  )
 cc_binary(
-	name = "listener",
-	srcs = ["listener.cc"],
-	deps = [
-		"//cyber",
-		"//cyber/examples/proto:examples_cc_proto",
-		],
-	)
+  name = "listener",
+  srcs = ["listener.cc"],
+  deps = [
+    "//cyber",
+    "//cyber/examples/proto:examples_cc_proto",
+    ],
+  )
 ```
 We can find the mapping easily from the 2 file snippets. For example, `pb_talker` and `src/talker.cpp` in cmake `add_executable` setting map to `name = "talker"` and `srcs = ["talker.cc"]` in BUILD file `cc_binary`.
 ###Proto
@@ -45,17 +45,17 @@ Apollo ROS has customized to support proto message formate that a separate secti
 
 ```C
 cc_proto_library(
-	name = "examples_cc_proto",
-	deps = [
-		":examples_proto",
-		],
-	)
+  name = "examples_cc_proto",
+  deps = [
+    ":examples_proto",
+    ],
+  )
 proto_library(
-	name = "examples_proto",
-	srcs = [
-		"examples.proto",
-		],
-	)
+  name = "examples_proto",
+  srcs = [
+    "examples.proto",
+    ],
+  )
 ``` 
 
 The package definition has also changed in Cyber-RT. In Apollo ROS a fixed package `package pb_msgs;` is used for proto files, but in Cyber-RT, the proto file path `package apollo.cyber.examples.proto;` is used instead. 
@@ -67,18 +67,18 @@ As shown below, Cyber-RT remove the src folder and pull all source code in the s
 - CMakeLists.txt
 - package.xml
 - proto
-	- chatter.proto	
+  - chatter.proto  
 - src
-	- listener.cpp
-	- talker.cpp
+  - listener.cpp
+  - talker.cpp
 
 ### Cyber-RT
 - BUILD
 - listener.ccc
 - talker.cc
 - proto
-	- BUILD
-	- examples.proto (with chatter message) 	
+  - BUILD
+  - examples.proto (with chatter message)   
      
 ## Update source code
 
