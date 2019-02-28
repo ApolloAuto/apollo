@@ -37,6 +37,7 @@
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {
@@ -58,8 +59,8 @@ class OpenSpaceInfo {
     return &obstacles_edges_num_;
   }
 
-  const std::vector<std::vector<common::math::Vec2d>>
-      &obstacles_vertices_vec() const {
+  const std::vector<std::vector<common::math::Vec2d>> &obstacles_vertices_vec()
+      const {
     return obstacles_vertices_vec_;
   }
   std::vector<std::vector<common::math::Vec2d>>
@@ -91,13 +92,18 @@ class OpenSpaceInfo {
     return &open_space_end_pose_;
   }
 
+  const DiscretizedTrajectory &optimizer_trajectory_data() const {
+    return optimizer_trajectory_data_;
+  }
+
+  DiscretizedTrajectory *mutable_optimizer_trajectory_data() {
+    return &optimizer_trajectory_data_;
+  }
+
  private:
-  // copy from open_space_ROI.h
   // @brief obstacles total num including perception obstacles and parking space
   // boundary
   size_t obstacles_num_ = 0;
-
-  // common::VehicleState vehicle_state_;
 
   // @brief the dimension needed for A and b matrix dimension in H
   // representation
@@ -105,8 +111,6 @@ class OpenSpaceInfo {
 
   // @brief in the order of [x_min, x_max, y_min, y_max];
   std::vector<double> ROI_xy_boundary_;
-
-
 
   // @brief open_space end configuration in order of x, y, heading and speed.
   // Speed is set to be always zero now for parking
@@ -126,16 +130,7 @@ class OpenSpaceInfo {
   // problem in order of x , y
   common::math::Vec2d origin_point_;
 
-  // @brief parking_spot_heading_ is heading the direction pointing away from
-  // the lane
-  // double parking_spot_heading_ = 0.0;
-
-  // @brief parking_spot_id from routing
-  // std::string target_parking_spot_id_ = "";
-
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-
-  // apollo::common::VehicleParam vehicle_params_;
+  DiscretizedTrajectory optimizer_trajectory_data_;
 };
 }  // namespace planning
 }  // namespace apollo

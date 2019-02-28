@@ -31,7 +31,6 @@ OpenSpaceTrajectoryProvider::OpenSpaceTrajectoryProvider(
     : TrajectoryOptimizer(config) {}
 
 Status OpenSpaceTrajectoryProvider::Process(
-    const TrajectoryPoint &init_point,
     DiscretizedTrajectory *const trajectory_data) {
   return Status::OK();
 }
