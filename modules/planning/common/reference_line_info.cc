@@ -241,8 +241,8 @@ bool ReferenceLineInfo::CheckChangeLane() const {
     const auto& sl_boundary = obstacle->PerceptionSLBoundary();
 
     constexpr float kLateralShift = 2.5f;
-    if (sl_boundary.start_l() < -kLateralShift ||
-        sl_boundary.end_l() > kLateralShift) {
+    if (sl_boundary.end_l() < -kLateralShift ||
+        sl_boundary.start_l() > kLateralShift) {
       continue;
     }
     constexpr double kChangeLaneIgnoreDistance = 50.0;
