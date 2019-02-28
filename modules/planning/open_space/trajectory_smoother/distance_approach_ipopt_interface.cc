@@ -2289,20 +2289,23 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
 
-    if (!fill_lower_left(iRow, jCol, rind_L, cind_L, nnz_L)) {
-        // use CPU if Cuda initialize failed
-        for (int idx = 0; idx < nnz_L; idx++) {
-          iRow[idx] = rind_L[idx];
-          jCol[idx] = cind_L[idx];
-        }
+    if (FLAGS_enable_cuda) {
+      fill_lower_left(iRow, jCol, rind_L, cind_L, nnz_L);
+    } else {
+      for (int idx = 0; idx < nnz_L; idx++) {
+        iRow[idx] = rind_L[idx];
+        jCol[idx] = cind_L[idx];
+      }
     }
   } else {
     // return the values. This is a symmetric matrix, fill the lower left
     // triangle only
 
     obj_lam[0] = obj_factor;
-    if (!data_transfer(&obj_lam[1], lambda, m)) {
-        for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
+    if (FLAGS_enable_cuda) {
+      data_transfer(&obj_lam[1], lambda, m);
+    } else {
+      for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
     }
 
     set_param_vec(tag_L, m + 1, obj_lam);

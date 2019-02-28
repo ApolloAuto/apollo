@@ -501,3 +501,5 @@ DEFINE_bool(enable_parallel_open_space_smoother, false,
 DEFINE_double(vehicle_low_speed_threshold, 1.0,
               "Vehicle low speed threshold.");
 
+DEFINE_bool(enable_cuda, true,
+            "True to enable cuda parallel implementation.");
