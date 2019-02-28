@@ -43,14 +43,16 @@ OpenSpaceTrajectoryProvider::OpenSpaceTrajectoryProvider(
   open_space_trajectory_optimizer_.reset(new OpenSpaceTrajectoryOptimizer(
       config.open_space_trajectory_provider_config()
           .open_space_trajectory_optimizer_config()));
-  if (FLAGS_enable_open_space_planner_thread) {
-    task_future_ = cyber::Async(
-        &OpenSpaceTrajectoryProvider::GenerateTrajectoryThread, this);
-  }
 }
 
 Status OpenSpaceTrajectoryProvider::Process(
     DiscretizedTrajectory* const trajectory_data) {
+  // Start thread when getting in Process() for the first time
+  if (FLAGS_enable_open_space_planner_thread && !thread_init_flag_) {
+    task_future_ = cyber::Async(
+        &OpenSpaceTrajectoryProvider::GenerateTrajectoryThread, this);
+    thread_init_flag_ = true;
+  }
   // Get stitching trajectory from last frame
   const double start_timestamp = Clock::NowInSeconds();
   const common::VehicleState vehicle_state = frame_->vehicle_state();
@@ -102,9 +104,18 @@ Status OpenSpaceTrajectoryProvider::Process(
       return Status::OK();
     }
 
-    return Status(
-        ErrorCode::OK,
-        "Waiting for planning thread in open_space_trajectory_provider");
+    if (trajectory_error_) {
+      ++optimizer_thread_counter;
+      trajectory_error_.store(false);
+      if (optimizer_thread_counter > 5) {
+        return Status(ErrorCode::PLANNING_ERROR,
+                      "open_space_optimizer failed too many times");
+      }
+    }
+
+    return Status(ErrorCode::OK,
+                  "Waiting for open_space_trajectory_optimizer in "
+                  "open_space_trajectory_provider");
 
   } else {
     const auto& end_pose = open_space_info.open_space_end_pose();
@@ -160,9 +171,14 @@ void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
       if (status == Status::OK()) {
         trajectory_updated_.store(true);
       } else {
-        AERROR_EVERY(200)
-            << "Multi-thread trajectory generator not OK with return satus : "
-            << status.ToString();
+        ADEBUG_EVERY(200) << "open_space_trajectory_optimizer not returning "
+                             "OK() with status: "
+                          << status.ToString();
+        if (status.ok()) {
+          trajectory_skipped_.store(true);
+        } else {
+          trajectory_error_.store(true);
+        }
       }
     }
   }
