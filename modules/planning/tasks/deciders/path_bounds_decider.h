@@ -20,8 +20,11 @@
 
 #pragma once
 
+#include <functional>
+#include <set>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/planning/proto/decider_config.pb.h"
@@ -58,15 +61,31 @@ class PathBoundsDecider : public Decider {
   SortObstaclesForSweepLine(
       const IndexedList<std::string, Obstacle>& indexed_obstacles);
 
+  size_t ConstructSubsequentPathBounds(
+      const std::vector<std::tuple<int, double, double, double, std::string>>&
+      sorted_obstacles, size_t path_idx, size_t obs_idx,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries,
+      std::multiset<double>* const left_bounds,
+      std::multiset<double, std::greater<double>>* const right_bounds,
+      double* const center_line,
+      std::unordered_map<std::string, bool>* const obs_id_to_direction,
+      std::unordered_map<std::string, bool>* const obs_id_to_sidepass_decision,
+      std::vector<std::tuple<double, double, double>>* const final_path_bounds);
+
   /**
     * @brief Update the path_boundary at "idx", as well as the new center-line.
     *        It also checks if ADC is blocked (lmax < lmin).
+    * @param The current index of the path_bounds
+    * @param The minimum left boundary (l_max)
+    * @param The maximum right boundary (l_min)
+    * @param The path_boundaries (its content at idx will be updated)
+    * @param The center_line (to be updated)
     * @return If path is good, true; if path is blocked, false.
     */
   bool UpdatePathBoundaryAndCenterLine(
       size_t idx, double left_bound, double right_bound,
       std::vector<std::tuple<double, double, double>>* const path_boundaries,
-      double* center_line);
+      double* const center_line);
 
   void TrimPathBounds(
       int path_blocked_idx,
