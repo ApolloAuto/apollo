@@ -46,7 +46,7 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
 
   // check pass pnc_junction
   const auto& reference_line_info = frame->reference_line_info().front();
-  if (scenario::CheckInsidePnCJunction(reference_line_info)) {
+  if (!scenario::CheckInsidePnCJunction(reference_line_info)) {
     return FinishStage();
   }
 
