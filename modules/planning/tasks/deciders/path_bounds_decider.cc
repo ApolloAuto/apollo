@@ -560,7 +560,7 @@ PathBoundsDecider::SortObstaclesForSweepLine(
         obstacle->speed() > 0.5) {
       continue;
     }
-    // Only focus on obstaclse that are ahead of ADC.
+    // Only focus on obstacles that are ahead of ADC.
     if (obstacle->PerceptionSLBoundary().end_s() < adc_frenet_s_) {
       continue;
     }
