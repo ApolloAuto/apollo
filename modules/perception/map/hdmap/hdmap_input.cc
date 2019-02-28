@@ -94,7 +94,7 @@ bool HDMapInput::InitHDMap() {
     AERROR << "Failed to find hadmap file: " << hdmap_file_;
     return false;
   }
-  if (!hdmap_->LoadMapFromFile(hdmap_file_)) {
+  if (hdmap_->LoadMapFromFile(hdmap_file_) != 0) {
     AERROR << "Failed to load hadmap file: " << hdmap_file_;
     return false;
   }
@@ -115,8 +115,8 @@ bool HDMapInput::GetRoiHDMapStruct(
   point.set_x(pointd.x);
   point.set_y(pointd.y);
   point.set_z(pointd.z);
-  if (!hdmap_->GetRoadBoundaries(point, distance, &road_boundary_vec,
-                                 &junctions_vec)) {
+  if (hdmap_->GetRoadBoundaries(point, distance, &road_boundary_vec,
+                                &junctions_vec) != 0) {
     AERROR << "Failed to get road boundary, point: " << point.DebugString();
     return false;
   }
@@ -156,7 +156,7 @@ void HDMapInput::MergeBoundaryJunction(
   junction_polygons_ptr->resize(junctions_size);
   road_boundaries_ptr->resize(polygon_size);
   int polygons_index = 0;
-  // Merege boundary
+  // Merge boundary
   int step = hdmap_sample_step_;
   PointDCloudPtr temp_cloud = base::PointDCloudPool::Instance().Get();
   for (int i = 0; i < polygon_size; ++i) {
@@ -388,8 +388,8 @@ bool HDMapInput::GetSignalsFromHDMap(
   point.set_y(pointd(1));
   point.set_z(pointd(2));
   std::vector<SignalInfoConstPtr> forward_signals;
-  if (!hdmap_->GetForwardNearestSignalsOnLane(point, forward_distance,
-                                              &forward_signals)) {
+  if (hdmap_->GetForwardNearestSignalsOnLane(point, forward_distance,
+                                             &forward_signals) != 0) {
     AERROR << "Failed to call HDMap::get_signal. point: "
            << point.ShortDebugString();
     return false;
