@@ -20,6 +20,7 @@
 #include <list>
 #include <map>
 
+#include "cyber/common/file.h"
 #include "google/protobuf/repeated_field.h"
 
 #include "modules/common/math/quaternion.h"
@@ -29,7 +30,7 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -68,7 +69,7 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
 
   planner_dispatcher_->Init();
 
-  CHECK(apollo::common::util::GetProtoFromFile(
+  CHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
       << "Failed to load traffic rule config file "
       << FLAGS_traffic_rule_config_filename;
@@ -88,12 +89,9 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
 
 Status NaviPlanning::InitFrame(const uint32_t sequence_num,
                                const TrajectoryPoint& planning_start_point,
-                               const double start_time,
-                               const VehicleState& vehicle_state,
-                               ADCTrajectory* output_trajectory) {
+                               const VehicleState& vehicle_state) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
-                         start_time, vehicle_state,
-                         reference_line_provider_.get(), output_trajectory));
+                         vehicle_state, reference_line_provider_.get()));
 
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
@@ -194,8 +192,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       last_publishable_trajectory_.get(), &replan_reason);
 
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
-  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
-                     vehicle_state, trajectory_pb);
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
+
   if (!frame_) {
     std::string msg("Failed to init frame");
     AERROR << msg;
@@ -234,7 +232,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       FillPlanningPb(start_timestamp, trajectory_pb);
     }
 
-    frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+    frame_->set_current_frame_planned_trajectory(*trajectory_pb);
     auto seq_num = frame_->SequenceNum();
     FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 
@@ -473,7 +471,8 @@ Status NaviPlanning::Plan(
         stitching_trajectory.back());
   }
 
-  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
+  auto status =
+      planner_->Plan(stitching_trajectory.back(), frame_.get(), trajectory_pb);
 
   ExportReferenceLineDebug(ptr_debug);
 
@@ -533,14 +532,17 @@ Status NaviPlanning::Plan(
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  // Navi Panner doesn't need to stitch the last path planning
+  // Navi Planner doesn't need to stitch the last path planning
   // trajectory.Otherwise, it will cause the Dreamview planning track to display
   // flashing or bouncing
+  // TODO(Yifei): remove this if navi-planner doesn't need stitching
+  /**
   if (FLAGS_enable_stitch_last_trajectory) {
     last_publishable_trajectory_->PrependTrajectoryPoints(
         std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
                                      stitching_trajectory.end() - 1));
   }
+  **/
 
   for (size_t i = 0; i < last_publishable_trajectory_->NumOfPoints(); ++i) {
     if (last_publishable_trajectory_->TrajectoryPointAt(i).relative_time() >

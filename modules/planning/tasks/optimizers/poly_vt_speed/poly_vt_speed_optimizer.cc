@@ -24,7 +24,6 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_internal.pb.h"
@@ -106,7 +105,7 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
     if (!obstacle->st_boundary().IsEmpty()) {
       mutable_obstacle->SetBlockingObstacle(true);
     } else {
-      path_decision->SetStBoundary(
+      path_decision->SetSTBoundary(
           id, path_decision->Find(id)->reference_line_st_boundary());
     }
   }
@@ -187,24 +186,24 @@ void PolyVTSpeedOptimizer::RecordSTGraphDebug(
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary->id());
     switch (boundary->boundary_type()) {
-      case StBoundary::BoundaryType::FOLLOW:
+      case STBoundary::BoundaryType::FOLLOW:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_FOLLOW);
         break;
-      case StBoundary::BoundaryType::OVERTAKE:
+      case STBoundary::BoundaryType::OVERTAKE:
         boundary_debug->set_type(
             StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
         break;
-      case StBoundary::BoundaryType::STOP:
+      case STBoundary::BoundaryType::STOP:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_STOP);
         break;
-      case StBoundary::BoundaryType::UNKNOWN:
+      case STBoundary::BoundaryType::UNKNOWN:
         boundary_debug->set_type(
             StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
         break;
-      case StBoundary::BoundaryType::YIELD:
+      case STBoundary::BoundaryType::YIELD:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
         break;
-      case StBoundary::BoundaryType::KEEP_CLEAR:
+      case STBoundary::BoundaryType::KEEP_CLEAR:
         boundary_debug->set_type(
             StGraphBoundaryDebug::ST_BOUNDARY_TYPE_KEEP_CLEAR);
         break;

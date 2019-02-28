@@ -28,8 +28,8 @@
 
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/constraint_checker/collision_checker.h"
-#include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
 #include "modules/planning/lattice/trajectory_generation/trajectory1d_generator.h"
 #include "modules/planning/math/curve1d/curve1d.h"
 

@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/planning/planning_component.h"
 
+#include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/message_util.h"
@@ -23,8 +24,8 @@
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/navi_planning.h"
-#include "modules/planning/open_space_planning.h"
 #include "modules/planning/on_lane_planning.h"
+#include "modules/planning/open_space_planning.h"
 
 namespace apollo {
 namespace planning {
@@ -46,8 +47,8 @@ bool PlanningComponent::Init() {
       planning_base_ = std::make_unique<OnLanePlanning>();
     }
   }
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                               &config_))
+  CHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
+                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
   planning_base_->Init(config_);
 

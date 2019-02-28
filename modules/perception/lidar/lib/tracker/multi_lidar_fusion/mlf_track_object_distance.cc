@@ -16,7 +16,7 @@
 
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/mlf_track_object_distance.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/association/distance_collection.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
@@ -29,14 +29,12 @@ namespace lidar {
 // point num dist weight, histogram dist weight, centroid shift dist weight
 // bbox iou dist weight
 const std::vector<float> MlfTrackObjectDistance::kForegroundDefaultWeight = {
-  0.6f, 0.2f, 0.1f, 0.1f, 0.5f, 0.f, 0.f
-};
+    0.6f, 0.2f, 0.1f, 0.1f, 0.5f, 0.f, 0.f};
 // location dist weight, irection dist weight, bbox size dist weight,
 // point num dist weight, histogram dist weight, centroid shift dist weight
 // bbox iou dist weight
 const std::vector<float> MlfTrackObjectDistance::kBackgroundDefaultWeight = {
-  0.f, 0.f, 0.f, 0.f, 0.f, 0.2f, 0.8f
-};
+    0.f, 0.f, 0.f, 0.f, 0.f, 0.2f, 0.8f};
 
 bool MlfTrackObjectDistance::Init(
     const MlfTrackObjectDistanceInitOptions& options) {
@@ -47,11 +45,11 @@ bool MlfTrackObjectDistance::Init(
   std::string config_file;
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path));
-  config_file = apollo::common::util::GetAbsolutePath(work_root, root_path);
-  config_file = apollo::common::util::GetAbsolutePath(
+  config_file = cyber::common::GetAbsolutePath(work_root, root_path);
+  config_file = cyber::common::GetAbsolutePath(
       config_file, "mlf_track_object_distance.conf");
   MlfDistanceConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
 
   foreground_weight_table_.clear();
   background_weight_table_.clear();
@@ -142,9 +140,9 @@ float MlfTrackObjectDistance::ComputeDistance(
                                            object, time_diff);
   }
   if (weights->at(5) > delta) {
-    distance += weights->at(5) *
-                CentroidShiftDistance(latest_object, track->predict_.state,
-                                      object, time_diff);
+    distance += weights->at(5) * CentroidShiftDistance(latest_object,
+                                                       track->predict_.state,
+                                                       object, time_diff);
   }
   if (weights->at(6) > delta) {
     distance += weights->at(6) *

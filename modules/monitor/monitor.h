@@ -34,6 +34,7 @@ class Monitor : public apollo::cyber::TimerComponent {
  public:
   bool Init() override;
   bool Proc() override;
+
  private:
   std::vector<std::unique_ptr<RecurrentRunner>> runners_;
 };

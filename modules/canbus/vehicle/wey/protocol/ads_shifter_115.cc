@@ -57,14 +57,13 @@ Adsshifter115* Adsshifter115::set_ads_shiftmode(
 // 'len': 4, 'name': 'ADS_ShiftMode', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Adsshifter115::set_p_ads_shiftmode(uint8_t* data,
-    Ads_shifter_115::Ads_shiftmodeType ads_shiftmode) {
+void Adsshifter115::set_p_ads_shiftmode(
+    uint8_t* data, Ads_shifter_115::Ads_shiftmodeType ads_shiftmode) {
   int x = ads_shiftmode;
 
   Byte to_set(data + 3);
   to_set.set_value(static_cast<uint8_t>(x), 4, 4);
 }
-
 
 Adsshifter115* Adsshifter115::set_ads_targetgear(
     Ads_shifter_115::Ads_targetgearType ads_targetgear) {
@@ -77,8 +76,8 @@ Adsshifter115* Adsshifter115::set_ads_targetgear(
 // 3: 'ADS_TARGETGEAR_D'}, 'precision': 1.0, 'len': 2, 'name': 'ADS_TargetGear',
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|0]', 'bit': 38,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Adsshifter115::set_p_ads_targetgear(uint8_t* data,
-    Ads_shifter_115::Ads_targetgearType ads_targetgear) {
+void Adsshifter115::set_p_ads_targetgear(
+    uint8_t* data, Ads_shifter_115::Ads_targetgearType ads_targetgear) {
   int x = ads_targetgear;
 
   Byte to_set(data + 4);

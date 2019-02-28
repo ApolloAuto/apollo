@@ -32,6 +32,7 @@ namespace planning {
  * @brief DpPolyPathOptimizer does path planning with dynamic programming
  * algorithm.
  */
+
 class DpPolyPathOptimizer : public PathOptimizer {
  public:
   explicit DpPolyPathOptimizer(const TaskConfig &config);

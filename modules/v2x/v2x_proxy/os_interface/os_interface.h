@@ -40,7 +40,9 @@ class OsInterFace {
   ~OsInterFace();
 
   inline void PrintModuleDetails() {
-    AINFO << "[module name: ]" << "v2x_os_interface" << " "
+    AINFO << "[module name: ]"
+          << "v2x_os_interface"
+          << " "
           << "[localization topic name: ]"
           << localization_reader_->GetChannelName() << " "
           << "[perception topic name: ]"
@@ -101,8 +103,8 @@ class OsInterFace {
   void SendMsgToOs(cyber::Writer<MessageT> *writer,
                    const std::shared_ptr<MessageT> &msg) {
     if (writer == nullptr) {
-        AERROR << "Writer in not valid";
-        return;
+      AERROR << "Writer in not valid";
+      return;
     }
     if (writer->Write(msg) == true) {
       ADEBUG << "Write msg success to: " << writer->GetChannelName();

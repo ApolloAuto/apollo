@@ -1,18 +1,18 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/routing/routing.h"
 
@@ -27,14 +27,14 @@ using apollo::common::ErrorCode;
 std::string Routing::Name() const { return FLAGS_routing_node_name; }
 
 Routing::Routing()
-    : monitor_logger_buffer_(
-          common::monitor::MonitorMessageItem::ROUTING) {}
+    : monitor_logger_buffer_(common::monitor::MonitorMessageItem::ROUTING) {}
 
 apollo::common::Status Routing::Init() {
   const auto routing_map_file = apollo::hdmap::RoutingMapFile();
   AINFO << "Use routing topology graph path: " << routing_map_file;
   navigator_ptr_.reset(new Navigator(routing_map_file));
-  CHECK(common::util::GetProtoFromFile(FLAGS_routing_conf_file, &routing_conf_))
+  CHECK(
+      cyber::common::GetProtoFromFile(FLAGS_routing_conf_file, &routing_conf_))
       << "Unable to load routing conf file: " + FLAGS_routing_conf_file;
 
   AINFO << "Conf file: " << FLAGS_routing_conf_file << " is loaded.";
@@ -86,9 +86,8 @@ RoutingRequest Routing::FillLaneInfoIfMissing(
   return fixed_request;
 }
 
-bool Routing::Process(
-    const std::shared_ptr<RoutingRequest>& routing_request,
-    RoutingResponse* const routing_response) {
+bool Routing::Process(const std::shared_ptr<RoutingRequest>& routing_request,
+                      RoutingResponse* const routing_response) {
   CHECK_NOTNULL(routing_response);
   AINFO << "Get new routing request:" << routing_request->DebugString();
   const auto& fixed_request = FillLaneInfoIfMissing(*routing_request);

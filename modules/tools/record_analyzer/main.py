@@ -18,6 +18,7 @@
 
 import sys
 import argparse
+import matplotlib.pyplot as plt
 from cyber_py.record import RecordReader
 from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
@@ -31,7 +32,7 @@ from lidar_endtoend_analyzer import LidarEndToEndAnalyzer
 
 
 def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
-            is_simulation, all_data):
+            is_simulation, plot_planning_path, plot_planning_refpath, all_data):
     is_auto_drive = False
 
     for msg in reader.read_messages():
@@ -45,7 +46,8 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
                 is_auto_drive = False
 
         if msg.topic == "/apollo/control":
-            if (not is_auto_drive and not all_data) or is_simulation:
+            if (not is_auto_drive and not all_data) or \
+                is_simulation or plot_planning_path or plot_planning_refpath:
                 continue
             control_cmd = control_cmd_pb2.ControlCommand()
             control_cmd.ParseFromString(msg.message)
@@ -59,20 +61,32 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
             adc_trajectory.ParseFromString(msg.message)
             planning_analyzer.put(adc_trajectory)
             lidar_endtoend_analyzer.put_planning(adc_trajectory)
+            
+            if plot_planning_path:
+                planning_analyzer.plot_path(plt, adc_trajectory)
+            if plot_planning_refpath:
+                planning_analyzer.plot_refpath(plt, adc_trajectory)
 
         if msg.topic == "/apollo/sensor/velodyne64/compensator/PointCloud2" or \
             msg.topic == "/apollo/sensor/lidar128/compensator/PointCloud2":
-            if ((not is_auto_drive) and (not all_data)) or is_simulation:
+            if ((not is_auto_drive) and (not all_data)) or is_simulation or \
+                plot_planning_path or plot_planning_refpath:
                 continue
             point_cloud = pointcloud_pb2.PointCloud()
             point_cloud.ParseFromString(msg.message)
             lidar_endtoend_analyzer.put_lidar(point_cloud)
 
         if msg.topic == "/apollo/perception/obstacles":
+            if ((not is_auto_drive) and (not all_data)) or is_simulation or \
+                plot_planning_path or plot_planning_refpath:
+                continue
             perception = perception_obstacle_pb2.PerceptionObstacles()
             perception.ParseFromString(msg.message)
 
         if msg.topic == "/apollo/prediction":
+            if ((not is_auto_drive) and (not all_data)) or is_simulation or \
+                plot_planning_path or plot_planning_refpath:
+                continue
             prediction = prediction_obstacle_pb2.PredictionObstacles()
             prediction.ParseFromString(msg.message)
 
@@ -86,9 +100,18 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f", "--file", action="store", type=str, required=True,
         help="Specify the record file for analysis.")
+ 
     parser.add_argument(
         "-s", "--simulation", action="store_const", const=True,
         help="For simulation API call")
+    parser.add_argument(
+        "-path", "--planningpath", action="store_const", const=True,
+        help="plot planing paths in cartesian coordinate.")
+
+    parser.add_argument(
+        "-refpath", "--planningrefpath", action="store_const", const=True,
+        help="plot planing reference paths in cartesian coordinate.")
+ 
     parser.add_argument(
         "-a", "--alldata", action="store_const", const=True,
         help="Analyze all data (both auto and manual), otherwise auto data only without this option.")
@@ -102,10 +125,14 @@ if __name__ == "__main__":
     lidar_endtoend_analyzer = LidarEndToEndAnalyzer()
 
     process(control_analyzer, planning_analyzer,
-            lidar_endtoend_analyzer, args.simulation, args.alldata)
+            lidar_endtoend_analyzer, args.simulation, args.planningpath,
+            args.planningrefpath, args.alldata)
 
     if args.simulation:
         planning_analyzer.print_simulation_results()
+    elif args.planningpath or args.planningrefpath:
+        plt.axis('equal')
+        plt.show()
     else:
         control_analyzer.print_latency_statistics()
         planning_analyzer.print_latency_statistics()

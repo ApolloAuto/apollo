@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
@@ -52,7 +52,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
   Ads338e* set_ads_bcmworkstsvalid(
-                Ads3_38e::Ads_bcmworkstsvalidType ads_bcmworkstsvalid);
+      Ads3_38e::Ads_bcmworkstsvalidType ads_bcmworkstsvalid);
 
   // config detail: {'description': 'Vehicle Task request.If ADS request
   // control BCM', 'enum': {0: 'ADS_REQCONTROLBCM_NO_REQUEST',
@@ -61,7 +61,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|1]', 'bit': 8, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
   Ads338e* set_ads_reqcontrolbcm(
-                Ads3_38e::Ads_reqcontrolbcmType ads_reqcontrolbcm);
+      Ads3_38e::Ads_reqcontrolbcmType ads_reqcontrolbcm);
 
   // config detail: {'description': 'Open theHigh Beam light', 'enum':
   // {0: 'HIGHBEAMTON_TURN_OFF', 1: 'HIGHBEAMTON_TURN_ON'}, 'precision': 1.0,
@@ -91,7 +91,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 45, 'type':'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Ads338e* set_emergencylighton(
-                        Ads3_38e::EmergencylightonType emergencylighton);
+      Ads3_38e::EmergencylightonType emergencylighton);
 
   // config detail: {'description': 'Open the front fog light', 'enum':
   // {0: 'FFOGLAMPON_TURN_OFF', 1: 'FFOGLAMPON_TURN_ON'}, 'precision': 1.0,
@@ -127,7 +127,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 50, 'type':'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Ads338e* set_fwindshieldwiper(
-                      Ads3_38e::FwindshieldwiperType fwindshieldwiper);
+      Ads3_38e::FwindshieldwiperType fwindshieldwiper);
 
   // config detail: {'description': 'Open rear window shield wiper', 'enum':
   // {0: 'RWINDSHIELDWIPER_TURN_OFF', 1: 'RWINDSHIELDWIPER_TURN_ON'},
@@ -135,7 +135,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 60, 'type':'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Ads338e* set_rwindshieldwiper(
-                      Ads3_38e::RwindshieldwiperType rwindshieldwiper);
+      Ads3_38e::RwindshieldwiperType rwindshieldwiper);
 
  private:
   // config detail: {'description': 'The work status of ADS control unit.
@@ -146,7 +146,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 6, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   void set_p_ads_bcm_worksts(uint8_t* data,
-                        Ads3_38e::Ads_bcm_workstsType ads_bcm_worksts);
+                             Ads3_38e::Ads_bcm_workstsType ads_bcm_worksts);
 
   // config detail: {'description': 'This Signal reflect the ADS_WorkSts Signal
   // is Valid OR not', 'enum': {0: 'ADS_BCMWORKSTSVALID_INVALID',
@@ -154,8 +154,8 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // 'ADS_BCMWorkStsValid', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_ads_bcmworkstsvalid(uint8_t* data,
-                        Ads3_38e::Ads_bcmworkstsvalidType ads_bcmworkstsvalid);
+  void set_p_ads_bcmworkstsvalid(
+      uint8_t* data, Ads3_38e::Ads_bcmworkstsvalidType ads_bcmworkstsvalid);
 
   // config detail: {'description': 'Vehicle Task request.If ADS request
   // control BCM', 'enum': {0: 'ADS_REQCONTROLBCM_NO_REQUEST',
@@ -163,8 +163,8 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // 'name': 'ADS_ReqControlBCM', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 8, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_ads_reqcontrolbcm(uint8_t* data,
-                        Ads3_38e::Ads_reqcontrolbcmType ads_reqcontrolbcm);
+  void set_p_ads_reqcontrolbcm(
+      uint8_t* data, Ads3_38e::Ads_reqcontrolbcmType ads_reqcontrolbcm);
 
   // config detail: {'description': 'Open theHigh Beam light', 'enum':
   // {0: 'HIGHBEAMTON_TURN_OFF', 1: 'HIGHBEAMTON_TURN_ON'}, 'precision': 1.0,
@@ -179,7 +179,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|1]', 'bit': 12, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
   void set_p_dippedbeamon(uint8_t* data,
-                        Ads3_38e::DippedbeamonType dippedbeamon);
+                          Ads3_38e::DippedbeamonType dippedbeamon);
 
   // config detail: {'description': 'Open the Turn light', 'enum':
   // {0: 'TURNLLIGHTON_TURN_OFF', 1: 'TURNLLIGHTON_TURN_LEFT_ON',
@@ -188,7 +188,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // 'offset': 0.0, 'physical_range': '[0|3]', 'bit': 17, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   void set_p_turnllighton(uint8_t* data,
-                        Ads3_38e::TurnllightonType turnllighton);
+                          Ads3_38e::TurnllightonType turnllighton);
 
   // config detail: {'description': 'Open the emergency light', 'enum':
   // {0: 'EMERGENCYLIGHTON_TURN_OFF', 1: 'EMERGENCYLIGHTON_TURN_ON'},
@@ -196,23 +196,21 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]',
   // 'bit': 45, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   void set_p_emergencylighton(uint8_t* data,
-                        Ads3_38e::EmergencylightonType emergencylighton);
+                              Ads3_38e::EmergencylightonType emergencylighton);
 
   // config detail: {'description': 'Open the front fog light', 'enum':
   // {0: 'FFOGLAMPON_TURN_OFF', 1: 'FFOGLAMPON_TURN_ON'}, 'precision': 1.0,
   // 'len': 1, 'name': 'FFogLampON', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 46, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_ffoglampon(uint8_t* data,
-                        Ads3_38e::FfoglamponType ffoglampon);
+  void set_p_ffoglampon(uint8_t* data, Ads3_38e::FfoglamponType ffoglampon);
 
   // config detail: {'description': 'Open the rear fog ligh', 'enum':
   // {0: 'RFOGLAMPON_TURN_OFF', 1: 'RFOGLAMPON_TURN_ON'}, 'precision': 1.0,
   // 'len': 1, 'name': 'RFogLampON', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 47, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_rfoglampon(uint8_t* data,
-                        Ads3_38e::RfoglamponType rfoglampon);
+  void set_p_rfoglampon(uint8_t* data, Ads3_38e::RfoglamponType rfoglampon);
 
   // config detail: {'description': 'Open the brake light', 'enum':
   // {0: 'BRAKELIGHT_TURN_OFF', 1: 'BRAKELIGHT_TURN_ON'}, 'precision': 1.0,
@@ -234,7 +232,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 50,'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   void set_p_fwindshieldwiper(uint8_t* data,
-                        Ads3_38e::FwindshieldwiperType fwindshieldwiper);
+                              Ads3_38e::FwindshieldwiperType fwindshieldwiper);
 
   // config detail: {'description': 'Open rear window shield wiper', 'enum':
   // {0: 'RWINDSHIELDWIPER_TURN_OFF', 1: 'RWINDSHIELDWIPER_TURN_ON'},
@@ -242,7 +240,7 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
   // False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 60,'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   void set_p_rwindshieldwiper(uint8_t* data,
-                        Ads3_38e::RwindshieldwiperType rwindshieldwiper);
+                              Ads3_38e::RwindshieldwiperType rwindshieldwiper);
 
  private:
   Ads3_38e::Ads_bcm_workstsType ads_bcm_worksts_;
@@ -263,4 +261,3 @@ class Ads338e : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace wey
 }  // namespace canbus
 }  // namespace apollo
-

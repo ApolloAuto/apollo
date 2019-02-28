@@ -19,13 +19,13 @@ committed.
 LICENSE
 
 Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met: 
+modification, are permitted provided that the following conditions are met:
 
 1. Redistributions of source code must retain the above copyright notice, this
-   list of conditions and the following disclaimer. 
+   list of conditions and the following disclaimer.
 2. Redistributions in binary form must reproduce the above copyright notice,
    this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution. 
+   and/or other materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -98,12 +98,7 @@ inline void PerceptionFreeHost(void* ptr, bool use_cuda) {
  */
 class SyncedMemory {
  public:
-  enum SyncedHead {
-    UNINITIALIZED,
-    HEAD_AT_CPU,
-    HEAD_AT_GPU,
-    SYNCED
-  };
+  enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
 
   explicit SyncedMemory(bool use_cuda);
   explicit SyncedMemory(size_t size, bool use_cuda);

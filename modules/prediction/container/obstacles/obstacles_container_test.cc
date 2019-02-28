@@ -16,7 +16,7 @@
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 
 namespace apollo {
@@ -28,7 +28,7 @@ class ObstaclesContainerTest : public KMLMapBasedTest {
     std::string file =
         "modules/prediction/testdata/perception_vehicles_pedestrians.pb.txt";
     perception::PerceptionObstacles perception_obstacles;
-    common::util::GetProtoFromFile(file, &perception_obstacles);
+    cyber::common::GetProtoFromFile(file, &perception_obstacles);
     container_.Insert(perception_obstacles);
   }
 

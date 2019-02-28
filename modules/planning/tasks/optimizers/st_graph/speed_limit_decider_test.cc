@@ -76,7 +76,7 @@ class SpeedLimitDeciderTest : public ::testing::Test {
 };
 
 TEST_F(SpeedLimitDeciderTest, get_centric_acc_limit) {
-  StBoundaryConfig config;
+  SpeedBoundsDeciderConfig config;
   SLBoundary sl;
   SpeedLimitDecider speed_limit_decider(sl, config, *reference_line_,
                                         path_data_);

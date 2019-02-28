@@ -32,7 +32,6 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/line_segment2d.h"
 #include "modules/common/math/vec2d.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -55,14 +54,14 @@ constexpr double boundary_s_buffer = 1.0;
 }  // namespace
 
 StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
-                                   const StBoundaryConfig& config,
+                                   const SpeedBoundsDeciderConfig& config,
                                    const ReferenceLine& reference_line,
                                    const PathData& path_data,
                                    const double planning_distance,
                                    const double planning_time,
                                    bool is_change_lane)
     : adc_sl_boundary_(adc_sl_boundary),
-      st_boundary_config_(config),
+      speed_bounds_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()),
@@ -158,105 +157,7 @@ Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
-  return Status::OK();
-}
 
-Status StBoundaryMapper::CreateStBoundaryWithHistory(
-    const ObjectDecisions& history_decisions,
-    PathDecision* path_decision) const {
-  const auto& obstacles = path_decision->obstacles();
-  if (planning_time_ < 0.0) {
-    const std::string msg = "Fail to get params since planning_time_ < 0.";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
-  if (path_data_.discretized_path().size() < 2) {
-    AERROR << "Fail to get params because of too few path points. path points "
-              "size: "
-           << path_data_.discretized_path().size() << ".";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Fail to get params because of too few path points");
-  }
-
-  std::unordered_map<std::string, ObjectDecisionType> prev_decision_map;
-  for (const auto& history_decision : history_decisions.decision()) {
-    for (const auto& decision : history_decision.object_decision()) {
-      if (Obstacle::IsLongitudinalDecision(decision) &&
-          !decision.has_ignore()) {
-        prev_decision_map[history_decision.id()] = decision;
-        break;
-      }
-    }
-  }
-
-  Obstacle* stop_obstacle = nullptr;
-  ObjectDecisionType stop_decision;
-  double min_stop_s = std::numeric_limits<double>::max();
-
-  for (const auto* const_obstacle : obstacles.Items()) {
-    auto* obstacle = path_decision->Find(const_obstacle->Id());
-    auto iter = prev_decision_map.find(obstacle->Id());
-    ObjectDecisionType decision;
-    if (iter == prev_decision_map.end()) {
-      decision.mutable_ignore();
-    } else {
-      decision = iter->second;
-    }
-
-    if (!obstacle->HasLongitudinalDecision()) {
-      if (!MapWithoutDecision(obstacle).ok()) {
-        std::string msg = StrCat("Fail to map obstacle ", obstacle->Id(),
-                                 " without decision.");
-        AERROR << msg;
-        return Status(ErrorCode::PLANNING_ERROR, msg);
-      }
-      if (obstacle->st_boundary().IsEmpty() || decision.has_ignore()) {
-        continue;
-      }
-    }
-    if (obstacle->HasLongitudinalDecision()) {
-      decision = obstacle->LongitudinalDecision();
-    }
-    if (decision.has_stop()) {
-      const double stop_s = obstacle->PerceptionSLBoundary().start_s() +
-                            decision.stop().distance_s();
-      // this is a rough estimation based on reference line s, so that a large
-      // buffer is used.
-      constexpr double stop_buff = 15.0;
-      if (stop_s + stop_buff < adc_sl_boundary_.end_s()) {
-        AERROR << "Invalid stop decision. not stop at behind of current "
-                  "position. stop_s : "
-               << stop_s << ", and current adc_s is; "
-               << adc_sl_boundary_.end_s();
-        return Status(ErrorCode::PLANNING_ERROR, "invalid decision");
-      }
-      if (stop_s < min_stop_s) {
-        stop_obstacle = obstacle;
-        min_stop_s = stop_s;
-        stop_decision = decision;
-      }
-    } else if (decision.has_follow() || decision.has_overtake() ||
-               decision.has_yield()) {
-      if (!MapWithDecision(obstacle, decision).ok()) {
-        AERROR << "Fail to map obstacle " << obstacle->Id()
-               << " with decision: " << decision.DebugString();
-        return Status(ErrorCode::PLANNING_ERROR,
-                      "Fail to map overtake/yield decision");
-      }
-    } else {
-      AWARN << "No mapping for decision: " << decision.DebugString();
-    }
-  }
-
-  if (stop_obstacle) {
-    bool success = MapStopDecision(stop_obstacle, stop_decision);
-    if (!success) {
-      std::string msg = "Fail to MapStopDecision.";
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
-    }
-  }
   return Status::OK();
 }
 
@@ -299,11 +200,11 @@ bool StBoundaryMapper::MapStopDecision(
   point_pairs.emplace_back(STPoint(s_min, 0.0), STPoint(s_max, 0.0));
   point_pairs.emplace_back(
       STPoint(s_min, planning_time_),
-      STPoint(s_max + st_boundary_config_.boundary_buffer(), planning_time_));
-  auto boundary = StBoundary(point_pairs);
-  boundary.SetBoundaryType(StBoundary::BoundaryType::STOP);
-  boundary.SetCharacteristicLength(st_boundary_config_.boundary_buffer());
-  boundary.SetId(stop_obstacle->Id());
+      STPoint(s_max + speed_bounds_config_.boundary_buffer(), planning_time_));
+  auto boundary = STBoundary(point_pairs);
+  boundary.SetBoundaryType(STBoundary::BoundaryType::STOP);
+  boundary.SetCharacteristicLength(speed_bounds_config_.boundary_buffer());
+  boundary.set_id(stop_obstacle->Id());
   stop_obstacle->SetStBoundary(boundary);
   return true;
 }
@@ -317,10 +218,10 @@ Status StBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
     return Status::OK();
   }
 
-  auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+  auto boundary = STBoundary::CreateInstance(lower_points, upper_points)
                       .ExpandByS(boundary_s_buffer)
                       .ExpandByT(boundary_t_buffer);
-  boundary.SetId(obstacle->Id());
+  boundary.set_id(obstacle->Id());
   const auto& prev_st_boundary = obstacle->st_boundary();
   const auto& ref_line_st_boundary = obstacle->reference_line_st_boundary();
   if (!prev_st_boundary.IsEmpty()) {
@@ -362,7 +263,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       const Box2d obs_box = obstacle.PerceptionBoundingBox();
 
       if (CheckOverlap(curr_point_on_path, obs_box,
-                       st_boundary_config_.boundary_buffer())) {
+                       speed_bounds_config_.boundary_buffer())) {
         const double backward_distance = -vehicle_param_.front_edge_to_center();
         const double forward_distance = vehicle_param_.length() +
                                         vehicle_param_.width() +
@@ -410,7 +311,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
         const auto curr_adc_path_point =
             discretized_path.Evaluate(path_s + discretized_path.front().s());
         if (CheckOverlap(curr_adc_path_point, obs_box,
-                         st_boundary_config_.boundary_buffer())) {
+                         speed_bounds_config_.boundary_buffer())) {
           // found overlap, start searching with higher resolution
           const double backward_distance = -step_length;
           const double forward_distance = vehicle_param_.length() +
@@ -434,7 +335,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
               const auto& point_low = discretized_path.Evaluate(
                   low_s + discretized_path.front().s());
               if (!CheckOverlap(point_low, obs_box,
-                                st_boundary_config_.boundary_buffer())) {
+                                speed_bounds_config_.boundary_buffer())) {
                 low_s += fine_tuning_step_length;
               } else {
                 find_low = true;
@@ -444,7 +345,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
               const auto& point_high = discretized_path.Evaluate(
                   high_s + discretized_path.front().s());
               if (!CheckOverlap(point_high, obs_box,
-                                st_boundary_config_.boundary_buffer())) {
+                                speed_bounds_config_.boundary_buffer())) {
                 high_s -= fine_tuning_step_length;
               } else {
                 find_high = true;
@@ -453,10 +354,10 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
           }
           if (find_high && find_low) {
             lower_points->emplace_back(
-                low_s - st_boundary_config_.point_extension(),
+                low_s - speed_bounds_config_.point_extension(),
                 trajectory_point_time);
             upper_points->emplace_back(
-                high_s + st_boundary_config_.point_extension(),
+                high_s + speed_bounds_config_.point_extension(),
                 trajectory_point_time);
           }
           break;
@@ -496,30 +397,30 @@ Status StBoundaryMapper::MapWithDecision(
     lower_points.emplace_back(extend_lower_s, planning_time_);
   }
 
-  auto boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+  auto boundary = STBoundary::CreateInstance(lower_points, upper_points)
                       .ExpandByS(boundary_s_buffer)
                       .ExpandByT(boundary_t_buffer);
 
   // get characteristic_length and boundary_type.
-  StBoundary::BoundaryType b_type = StBoundary::BoundaryType::UNKNOWN;
+  STBoundary::BoundaryType b_type = STBoundary::BoundaryType::UNKNOWN;
   double characteristic_length = 0.0;
   if (decision.has_follow()) {
     characteristic_length = std::fabs(decision.follow().distance_s());
-    b_type = StBoundary::BoundaryType::FOLLOW;
+    b_type = STBoundary::BoundaryType::FOLLOW;
   } else if (decision.has_yield()) {
     characteristic_length = std::fabs(decision.yield().distance_s());
-    boundary = StBoundary::GenerateStBoundary(lower_points, upper_points)
+    boundary = STBoundary::CreateInstance(lower_points, upper_points)
                    .ExpandByS(characteristic_length);
-    b_type = StBoundary::BoundaryType::YIELD;
+    b_type = STBoundary::BoundaryType::YIELD;
   } else if (decision.has_overtake()) {
     characteristic_length = std::fabs(decision.overtake().distance_s());
-    b_type = StBoundary::BoundaryType::OVERTAKE;
+    b_type = STBoundary::BoundaryType::OVERTAKE;
   } else {
     DCHECK(false) << "Obj decision should be either yield or overtake: "
                   << decision.DebugString();
   }
   boundary.SetBoundaryType(b_type);
-  boundary.SetId(obstacle->Id());
+  boundary.set_id(obstacle->Id());
   boundary.SetCharacteristicLength(characteristic_length);
   obstacle->SetStBoundary(boundary);
 

@@ -13,7 +13,6 @@ subject to the following restrictions:
 */
 
 
-
 #ifndef GEN_MINMAX_H
 #define GEN_MINMAX_H
 

@@ -58,8 +58,9 @@ bool ThirdPartyPerceptionComponent::Init() {
   localization_reader_ =
       node_->CreateReader<apollo::localization::LocalizationEstimate>(
           FLAGS_localization_topic,
-          [this](const std::shared_ptr<
-                 apollo::localization::LocalizationEstimate> &localization) {
+          [this](
+              const std::shared_ptr<apollo::localization::LocalizationEstimate>
+                  &localization) {
             perception_.OnLocalization(*localization.get());
           });
 

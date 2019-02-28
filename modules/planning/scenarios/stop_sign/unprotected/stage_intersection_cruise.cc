@@ -30,6 +30,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
@@ -50,22 +51,25 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     AERROR << "StopSignUnprotectedStageIntersectionCruise plan error";
   }
 
+  // check pass pnc_junction
   const auto& reference_line_info = frame->reference_line_info().front();
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
 
-  // check if the stop_sign is still along reference_line
-  std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  if (CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
-    return FinishScenario();
+  hdmap::PathOverlap pnc_junction_overlap;
+  reference_line_info.GetPnCJunction(adc_front_edge_s, &pnc_junction_overlap);
+  if (pnc_junction_overlap.object_id.empty()) {
+    return FinishStage();
   }
 
-  // check pass intersection
-  // TODO(all): update when pnc-junction is ready
-  constexpr double kIntersectionLength = 10.0;  // unit: m
-  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  const double distance_adc_pass_stop_sign = adc_back_edge_s -
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
-  if (distance_adc_pass_stop_sign > kIntersectionLength) {
+  constexpr double kIntersectionPassDist = 2.0;  // unit: m
+  const double distance_adc_pass_intersection = adc_back_edge_s -
+      pnc_junction_overlap.end_s;
+  ADEBUG << "distance_adc_pass_intersection["
+      << distance_adc_pass_intersection
+      << "] pnc_junction_overlap[" << pnc_junction_overlap.object_id
+      << "] start_s[" << pnc_junction_overlap.start_s << "]";
+  if (distance_adc_pass_intersection >= kIntersectionPassDist) {
     return FinishStage();
   }
 

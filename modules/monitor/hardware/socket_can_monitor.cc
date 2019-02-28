@@ -25,8 +25,8 @@
 #include <unistd.h>
 #include <string>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
 #include "modules/monitor/common/monitor_manager.h"
 #include "modules/monitor/software/summary_monitor.h"
@@ -82,7 +82,7 @@ bool SocketCanTest(std::string* message) {
   struct sockaddr_can addr;
   addr.can_family = AF_CAN;
   addr.can_ifindex = ifr.ifr_ifindex;
-  ret = bind(dev_handler, reinterpret_cast<struct sockaddr *>(&addr),
+  ret = bind(dev_handler, reinterpret_cast<struct sockaddr*>(&addr),
              sizeof(addr));
 
   if (ret < 0) {
@@ -95,10 +95,9 @@ bool SocketCanTest(std::string* message) {
 
 }  // namespace
 
-SocketCanMonitor::SocketCanMonitor() :
-    RecurrentRunner(FLAGS_socket_can_monitor_name,
-                    FLAGS_socket_can_monitor_interval) {
-}
+SocketCanMonitor::SocketCanMonitor()
+    : RecurrentRunner(FLAGS_socket_can_monitor_name,
+                      FLAGS_socket_can_monitor_interval) {}
 
 void SocketCanMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();

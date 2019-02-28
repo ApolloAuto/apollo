@@ -16,7 +16,7 @@
 
 #include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
@@ -28,7 +28,7 @@ class CostEvaluatorTest : public KMLMapBasedTest {
   void SetUp() override {
     std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    CHECK(apollo::common::util::GetProtoFromFile(file, &perception_obstacles_));
+    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:

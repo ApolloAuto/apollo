@@ -23,8 +23,8 @@
 #include "cyber/py_wrapper/py_node.h"
 #include "gtest/gtest.h"
 
-using apollo::cyber::message::PyMessageWrap;
 using apollo::cyber::Time;
+using apollo::cyber::message::PyMessageWrap;
 
 apollo::cyber::PyReader *pr = NULL;
 

@@ -170,8 +170,7 @@ double Gaussian(const double u, const double std, const double x);
 double Sigmoid(const double x);
 
 // Rotate a 2d vector counter-clockwise by theta
-Eigen::Vector2d RotateVector2d(
-    const Eigen::Vector2d& v_in, const double theta);
+Eigen::Vector2d RotateVector2d(const Eigen::Vector2d &v_in, const double theta);
 
 inline std::pair<double, double> RFUToFLU(const double x, const double y) {
   return std::make_pair(y, -x);

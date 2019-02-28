@@ -16,9 +16,10 @@
 
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "gflags/gflags.h"
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 
 DEFINE_string(vehicle_data_config_filename,
@@ -28,8 +29,8 @@ DEFINE_string(vehicle_data_config_filename,
 namespace apollo {
 namespace dreamview {
 
-using apollo::common::util::GetProtoFromFile;
 using apollo::common::util::StrCat;
+using cyber::common::GetProtoFromFile;
 
 VehicleManager::VehicleManager() {
   CHECK(GetProtoFromFile(FLAGS_vehicle_data_config_filename, &vehicle_data_))
@@ -38,7 +39,7 @@ VehicleManager::VehicleManager() {
 }
 
 bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
-  if (!apollo::common::util::DirectoryExists(vehicle_data_path)) {
+  if (!cyber::common::DirectoryExists(vehicle_data_path)) {
     AERROR << "Cannot find vehicle data: " << vehicle_data_path;
     return false;
   }
@@ -48,7 +49,7 @@ bool VehicleManager::UseVehicle(const std::string &vehicle_data_path) {
         StrCat(vehicle_data_path, "/", data_file.source_path());
     const auto &dest_path = data_file.dest_path();
 
-    const bool ret = apollo::common::util::Copy(source_path, dest_path);
+    const bool ret = cyber::common::Copy(source_path, dest_path);
     AINFO_IF(ret) << "Copied " << source_path << " to " << dest_path;
   }
 

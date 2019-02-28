@@ -17,6 +17,7 @@
 #ifndef CYBER_CLASS_LOADER_CLASS_LOADER_MANAGER_H_
 #define CYBER_CLASS_LOADER_CLASS_LOADER_MANAGER_H_
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>

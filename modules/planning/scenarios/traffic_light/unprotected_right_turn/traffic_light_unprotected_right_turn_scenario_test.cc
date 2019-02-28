@@ -24,8 +24,8 @@
 
 #include "gtest/gtest.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -47,7 +47,7 @@ TEST_F(TrafficLightUnprotectedRightTurnScenarioTest, VerifyConf) {
       "scenario/traffic_light_unprotected_right_turn_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config));
 }
@@ -58,13 +58,13 @@ TEST_F(TrafficLightUnprotectedRightTurnScenarioTest, Init) {
       "scenario/traffic_light_unprotected_right_turn_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config));
 
   ScenarioContext context;
-  scenario_.reset(new TrafficLightUnprotectedRightTurnScenario(config,
-                                                               &context));
+  scenario_.reset(
+      new TrafficLightUnprotectedRightTurnScenario(config, &context));
   EXPECT_EQ(scenario_->scenario_type(),
             ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
 }

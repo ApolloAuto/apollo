@@ -31,8 +31,8 @@ namespace cyber {
 namespace scheduler {
 
 using apollo::cyber::croutine::CRoutine;
-using apollo::cyber::proto::ClassicTask;
 using apollo::cyber::proto::ClassicConf;
+using apollo::cyber::proto::ClassicTask;
 
 class SchedulerClassic : public Scheduler {
  public:

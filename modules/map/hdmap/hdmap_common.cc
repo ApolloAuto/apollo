@@ -80,8 +80,8 @@ void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
   for (const auto &curve : input_curve.segment()) {
     if (curve.has_line_segment()) {
       for (const auto &point : curve.line_segment().point()) {
-        CHECK(IsPointValid(point)) << "invalid map point: "
-                                   << point.DebugString();
+        CHECK(IsPointValid(point))
+            << "invalid map point: " << point.DebugString();
         points->emplace_back(point.x(), point.y());
       }
     } else {
@@ -99,9 +99,8 @@ apollo::common::math::Polygon2d ConvertToPolygon2d(const Polygon &polygon) {
     points.emplace_back(point.x(), point.y());
   }
   RemoveDuplicates(&points);
-  while (points.size() >= 2 &&
-         points[0].DistanceTo(points.back()) <=
-             apollo::common::math::kMathEpsilon) {
+  while (points.size() >= 2 && points[0].DistanceTo(points.back()) <=
+                                   apollo::common::math::kMathEpsilon) {
     points.pop_back();
   }
   return apollo::common::math::Polygon2d(points);

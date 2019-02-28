@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <memory>
 
 #include "modules/routing/proto/routing.pb.h"
 
@@ -52,31 +53,24 @@ FrameHistory::FrameHistory()
 
 Frame::Frame(uint32_t sequence_num)
     : sequence_num_(sequence_num),
-      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {
-  init_data_ = false;
-}
+      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {}
 
 Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
              const common::TrajectoryPoint &planning_start_point,
-             const double start_time, const common::VehicleState &vehicle_state,
-             ReferenceLineProvider *reference_line_provider,
-             ADCTrajectory *output_trajectory)
+             const common::VehicleState &vehicle_state,
+             ReferenceLineProvider *reference_line_provider)
     : sequence_num_(sequence_num),
       local_view_(local_view),
       planning_start_point_(planning_start_point),
-      start_time_(start_time),
       vehicle_state_(vehicle_state),
-      output_trajectory_(output_trajectory),
       reference_line_provider_(reference_line_provider),
-      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING),
-      init_data_(true) {}
+      monitor_logger_buffer_(common::monitor::MonitorMessageItem::PLANNING) {}
 
 Frame::Frame(uint32_t sequence_num, const LocalView &local_view,
              const common::TrajectoryPoint &planning_start_point,
-             const double start_time, const common::VehicleState &vehicle_state,
-             ADCTrajectory *output_trajectory)
-    : Frame(sequence_num, local_view, planning_start_point, start_time,
-            vehicle_state, nullptr, output_trajectory) {}
+             const common::VehicleState &vehicle_state)
+    : Frame(sequence_num, local_view, planning_start_point, vehicle_state,
+            nullptr) {}
 
 const common::TrajectoryPoint &Frame::PlanningStartPoint() const {
   return planning_start_point_;
@@ -349,6 +343,8 @@ Status Frame::Init(
   }
   future_route_waypoints_ = future_route_waypoints;
 
+  open_space_info_ = std::make_unique<OpenSpaceInfo>();
+
   return Status::OK();
 }
 
@@ -366,11 +362,6 @@ Status Frame::InitFrameData() {
   }
   ADEBUG << "Enabled align prediction time ? : " << std::boolalpha
          << FLAGS_align_prediction_time;
-
-  // if (FLAGS_enable_lag_prediction && lag_predictor_) {
-  // lag_predictor_->GetLaggedPrediction(
-  //    local_view_.prediction_obstacles.get());
-  //}
 
   if (FLAGS_align_prediction_time) {
     auto prediction = *(local_view_.prediction_obstacles);
@@ -501,5 +492,6 @@ const ReferenceLineInfo *Frame::DriveReferenceLineInfo() const {
 const std::vector<const Obstacle *> Frame::obstacles() const {
   return obstacles_.Items();
 }
+
 }  // namespace planning
 }  // namespace apollo

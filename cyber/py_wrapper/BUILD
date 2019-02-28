@@ -71,7 +71,7 @@ cc_binary(
 
 cc_library(
     name = "py_topology_manager",
-    srcs = ["py_topology_manager_wrap.cc"],
+    srcs = ["cyber_topology_manager_wrap.cc"],
     hdrs = ["py_topology_manager.h"],
     deps = [
         "//cyber/service_discovery:topology_manager",

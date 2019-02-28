@@ -18,6 +18,7 @@
 
 #include <unordered_set>
 
+#include "cyber/common/file.h"
 #include "google/protobuf/util/json_util.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
@@ -26,7 +27,6 @@
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/common/util/util.h"
@@ -51,8 +51,8 @@ using apollo::common::time::Clock;
 using apollo::common::time::millis;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::FillHeader;
-using apollo::common::util::GetProtoFromFile;
 using apollo::control::ControlCommand;
+using apollo::cyber::common::GetProtoFromFile;
 using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
 using apollo::hdmap::Path;
@@ -143,6 +143,8 @@ void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
     default:
       world_object->set_type(Object_Type_VIRTUAL);
   }
+
+    world_object->set_sub_type(obstacle.sub_type());
 }
 
 void SetStopReason(const StopReasonCode &reason_code, Decision *decision) {
@@ -976,7 +978,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
     // Add prediction priority
     if (obstacle.has_priority()) {
-        world_obj.mutable_obstacle_priority()->CopyFrom(obstacle.priority());
+      world_obj.mutable_obstacle_priority()->CopyFrom(obstacle.priority());
     }
 
     world_obj.set_timestamp_sec(

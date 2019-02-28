@@ -55,33 +55,28 @@ TEST_F(Diag_fault_620_test, General) {
   const int equivalent_fbk_version_month = 0x03;
   const int equivalent_fbk_version_day = 0x1d;
   const int equivalent_fbk_version_hour = 0x18;
-  EXPECT_EQ(diagfault_.llc_disengagecounter_brake(bytes,
-                    length_disengagecounter_brake),
-                    equivalent_disengagecounter_brake);
-  EXPECT_EQ(diagfault_.llc_disengagecounter_steer(bytes,
-                    length_disengagecounter_steer),
-                    equivalent_disengagecounter_steer);
-  EXPECT_EQ(diagfault_.llc_disengagecounter_throttle(bytes,
-                    length_disengagecounter_throttle),
-                    equivalent_disengagecounter_throttle);
-  EXPECT_EQ(diagfault_.llc_fbk_faultcounter(bytes,
-                    length_fbk_faultcounter),
-                    equivalent_fbk_faultcounter);
-  EXPECT_EQ(diagfault_.llc_disengagecounter_button(bytes,
-                    length_disengagecounter_button),
-                    equivalent_disengagecounter_button);
-  EXPECT_EQ(diagfault_.llc_fbk_version_year(bytes,
-                    length_fbk_version_year),
-                    equivalent_fbk_version_year);
-  EXPECT_EQ(diagfault_.llc_fbk_version_month(bytes,
-                    length_fbk_version_month),
-                    equivalent_fbk_version_month);
-  EXPECT_EQ(diagfault_.llc_fbk_version_day(bytes,
-                    length_fbk_version_day),
-                    equivalent_fbk_version_day);
-  EXPECT_EQ(diagfault_.llc_fbk_version_hour(bytes,
-                    length_fbk_version_hour),
-                    equivalent_fbk_version_hour);
+  EXPECT_EQ(diagfault_.llc_disengagecounter_brake(
+                bytes, length_disengagecounter_brake),
+            equivalent_disengagecounter_brake);
+  EXPECT_EQ(diagfault_.llc_disengagecounter_steer(
+                bytes, length_disengagecounter_steer),
+            equivalent_disengagecounter_steer);
+  EXPECT_EQ(diagfault_.llc_disengagecounter_throttle(
+                bytes, length_disengagecounter_throttle),
+            equivalent_disengagecounter_throttle);
+  EXPECT_EQ(diagfault_.llc_fbk_faultcounter(bytes, length_fbk_faultcounter),
+            equivalent_fbk_faultcounter);
+  EXPECT_EQ(diagfault_.llc_disengagecounter_button(
+                bytes, length_disengagecounter_button),
+            equivalent_disengagecounter_button);
+  EXPECT_EQ(diagfault_.llc_fbk_version_year(bytes, length_fbk_version_year),
+            equivalent_fbk_version_year);
+  EXPECT_EQ(diagfault_.llc_fbk_version_month(bytes, length_fbk_version_month),
+            equivalent_fbk_version_month);
+  EXPECT_EQ(diagfault_.llc_fbk_version_day(bytes, length_fbk_version_day),
+            equivalent_fbk_version_day);
+  EXPECT_EQ(diagfault_.llc_fbk_version_hour(bytes, length_fbk_version_hour),
+            equivalent_fbk_version_hour);
 }
 
 }  // namespace transit

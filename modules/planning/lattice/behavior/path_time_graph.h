@@ -26,13 +26,15 @@
 #include <vector>
 
 #include "modules/common/proto/geometry.pb.h"
-#include "modules/planning/proto/lattice_structure.pb.h"
 
 #include "modules/common/math/polygon2d.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/reference_line/reference_line.h"
+
+#include "modules/planning/common/speed/st_boundary.h"
+#include "modules/planning/common/speed/st_point.h"
 
 namespace apollo {
 namespace planning {
@@ -45,10 +47,10 @@ class PathTimeGraph {
                 const double s_start, const double s_end, const double t_start,
                 const double t_end, const std::array<double, 3>& init_d);
 
-  const std::vector<PathTimeObstacle>& GetPathTimeObstacles() const;
+  const std::vector<STBoundary>& GetPathTimeObstacles() const;
 
   bool GetPathTimeObstacle(const std::string& obstacle_id,
-                           PathTimeObstacle* path_time_obstacle);
+                           STBoundary* path_time_obstacle);
 
   std::vector<std::pair<double, double>> GetPathBlockingIntervals(
       const double t) const;
@@ -60,7 +62,7 @@ class PathTimeGraph {
 
   std::pair<double, double> get_time_range() const;
 
-  std::vector<PathTimePoint> GetObstacleSurroundingPoints(
+  std::vector<STPoint> GetObstacleSurroundingPoints(
       const std::string& obstacle_id, const double s_dist,
       const double t_density) const;
 
@@ -78,8 +80,8 @@ class PathTimeGraph {
       const std::vector<common::math::Vec2d>& vertices,
       const std::vector<common::PathPoint>& discretized_ref_points) const;
 
-  PathTimePoint SetPathTimePoint(const std::string& obstacle_id, const double s,
-                                 const double t) const;
+  STPoint SetPathTimePoint(const std::string& obstacle_id, const double s,
+                           const double t) const;
 
   void SetStaticObstacle(
       const Obstacle* obstacle,
@@ -100,8 +102,8 @@ class PathTimeGraph {
   const ReferenceLineInfo* ptr_reference_line_info_;
   std::array<double, 3> init_d_;
 
-  std::unordered_map<std::string, PathTimeObstacle> path_time_obstacle_map_;
-  std::vector<PathTimeObstacle> path_time_obstacles_;
+  std::unordered_map<std::string, STBoundary> path_time_obstacle_map_;
+  std::vector<STBoundary> path_time_obstacles_;
   std::vector<SLBoundary> static_obs_sl_boundaries_;
 };
 

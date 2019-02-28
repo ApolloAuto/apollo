@@ -147,9 +147,7 @@ function build() {
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
 
-  unbuffer bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS | \
-      tee >(tools/stat_compile_warnings.py)
-
+  bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
   if [ ${PIPESTATUS[0]} -ne 0 ]; then
     fail 'Build failed!'
   fi

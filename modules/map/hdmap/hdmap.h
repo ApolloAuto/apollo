@@ -177,8 +177,9 @@ class HDMap {
    * @param junctions store all junctions in target range
    * @return 0:success, otherwise failed
    */
-  int GetPNCJunctions(const apollo::common::PointENU& point, double distance,
-                   std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const;
+  int GetPNCJunctions(
+      const apollo::common::PointENU& point, double distance,
+      std::vector<PNCJunctionInfoConstPtr>* pnc_junctions) const;
   /**
    * @brief get nearest lane from target point,
    * @param point the target point
@@ -286,16 +287,15 @@ class HDMap {
                                  std::vector<LaneInfoConstPtr>* lanes) const;
 
   /**
-   * @brief get a local map which is identical to the origin map except that all map elements 
-   *   without overlap with the given region are deleted.
+   * @brief get a local map which is identical to the origin map except that all
+   * map elements without overlap with the given region are deleted.
    * @param point the target position
    * @param range the size of local map region, [width, height]
    * @param local_map local map in proto format
    * @return 0:success, otherwise failed
    */
   int GetLocalMap(const apollo::common::PointENU& point,
-                const std::pair<double, double>& range,
-                Map* local_map) const;
+                  const std::pair<double, double>& range, Map* local_map) const;
 
  private:
   HDMapImpl impl_;

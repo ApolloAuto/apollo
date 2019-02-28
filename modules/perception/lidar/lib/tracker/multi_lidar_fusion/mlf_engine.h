@@ -33,18 +33,16 @@ class MlfEngine : public BaseMultiTargetTracker {
   MlfEngine() = default;
   ~MlfEngine() = default;
 
-  bool Init(const MultiTargetTrackerInitOptions& options
-      = MultiTargetTrackerInitOptions()) override;
+  bool Init(const MultiTargetTrackerInitOptions& options =
+                MultiTargetTrackerInitOptions()) override;
 
   // @brief: track segmented objects from multiple lidar sensors
   // @params [in]: tracker options
   // @params [in/out]: lidar frame
   bool Track(const MultiTargetTrackerOptions& options,
-      LidarFrame* frame) override;
+             LidarFrame* frame) override;
 
-  std::string Name() const override {
-    return "MlfEngine";
-  };
+  std::string Name() const override { return "MlfEngine"; };
 
  protected:
   // @brief: split foreground/background objects and attach to tracked objects
@@ -61,16 +59,14 @@ class MlfEngine : public BaseMultiTargetTracker {
   // @params [in/out]: tracks for match and assignment
   void TrackObjectMatchAndAssign(
       const MlfTrackObjectMatcherOptions& match_options,
-      const std::vector<TrackedObjectPtr>& objects,
-      const std::string& name,
+      const std::vector<TrackedObjectPtr>& objects, const std::string& name,
       std::vector<MlfTrackDataPtr>* tracks);
 
   // @brief: filter tracks
   // @params [in]: tracks for filter
   // @params [in]: frame timestamp
-  void TrackStateFilter(
-      const std::vector<MlfTrackDataPtr>& tracks,
-      double frame_timestamp);
+  void TrackStateFilter(const std::vector<MlfTrackDataPtr>& tracks,
+                        double frame_timestamp);
 
   // @brief: collect track results and store in frame tracked objects
   // @params [in/out]: lidar frame
@@ -80,10 +76,8 @@ class MlfEngine : public BaseMultiTargetTracker {
   // @params: name
   // @params: timestamp
   // @params [in/out]: tracks to be cleaned
-  void RemoveStaleTrackData(
-      const std::string& name,
-      double timestamp,
-      std::vector<MlfTrackDataPtr>* tracks);
+  void RemoveStaleTrackData(const std::string& name, double timestamp,
+                            std::vector<MlfTrackDataPtr>* tracks);
 
  protected:
   // foreground and background track data

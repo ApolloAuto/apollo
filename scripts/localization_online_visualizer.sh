@@ -4,6 +4,4 @@ cd "${DIR}/.."
 
 source "${DIR}/apollo_base.sh"
 
-$APOLLO_BIN_PREFIX/modules/localization/msf/local_tool/local_visualization/online_visual/online_local_visualizer \
-    --flagfile=/apollo/modules/localization/conf/localization.conf \
-    --log_dir=/apollo/data/log
+cyber_launch start /apollo/modules/localization/launch/msf_visualizer.launch

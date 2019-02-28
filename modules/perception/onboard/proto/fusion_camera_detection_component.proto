@@ -21,8 +21,11 @@ message FusionCameraDetection {
     optional string calibrator_method = 16 [default = "LaneLineCalibrator"];
     optional string calib_service_name = 17 [default = "OnlineCalibrationService"];
     optional bool run_calib_service = 18 [default = true];
-    optional bool output_camera_debug_msg = 19 [default = true];
-    optional string camera_debug_channel_name = 20 [default = "/perception/obstacles_camera_debug"];
+    optional bool output_camera_debug_msg = 19 [default = false];
+    optional string camera_debug_channel_name = 20 [default = "/perception/camera_debug"];
     optional double ts_diff = 21 [default = 0.1];
     optional bool output_final_obstacles = 22 [default = false];
+    optional string visual_debug_folder = 23 [default = "/apollo/debug_output"];
+    optional string visual_camera = 24 [default = "front_6mm"];
+    optional bool write_visual_img = 25 [default = false];
 }

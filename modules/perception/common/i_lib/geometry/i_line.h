@@ -23,7 +23,8 @@ namespace perception {
 namespace common {
 // Measure point to line distance in 2D space, point p is in inhomogeneous
 // coordinates
-template <typename T> inline T ILineToPointDistance2d(const T *l, const T *p) {
+template <typename T>
+inline T ILineToPointDistance2d(const T *l, const T *p) {
   return IDiv(IAbs(IDot2(l, p) + l[2]), IL2Norm2(l));
 }
 
@@ -38,8 +39,8 @@ inline void ILineFit2dTotalLeastSquare(T *x, T *l, int n) {
     return;
   }
   T ma[4], eigv[2];
-  T mq[4]={static_cast<T>(0.0), static_cast<T>(0.0),
-           static_cast<T>(0.0), static_cast<T>(0.0)};
+  T mq[4] = {static_cast<T>(0.0), static_cast<T>(0.0), static_cast<T>(0.0),
+             static_cast<T>(0.0)};
   //   //  compute the centroid of input data points
   int i, length = 2 * n;
   T xm = static_cast<T>(0.0);
@@ -63,8 +64,9 @@ inline void ILineFit2dTotalLeastSquare(T *x, T *l, int n) {
 
 // Fit a line l: ax+by+c = 0 in 2D space with two 2D points in inhomogeneous
 // space.
-template <typename T> inline void ILineFit2d(const T *x, const T *xp, T *l) {
-  T ma[4] = { x[0], x[1], xp[0], xp[1] };
+template <typename T>
+inline void ILineFit2d(const T *x, const T *xp, T *l) {
+  T ma[4] = {x[0], x[1], xp[0], xp[1]};
   ILineFit2dTotalLeastSquare(ma, l, 2);
 }
 

@@ -36,8 +36,8 @@ namespace planning {
 
 using common::ErrorCode;
 using common::Status;
-using common::math::Vec2d;
 using common::VehicleConfigHelper;
+using common::math::Vec2d;
 using perception::PerceptionObstacle;
 
 SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {
@@ -62,7 +62,7 @@ common::Status SpeedDecider::Execute(Frame* frame,
 
 SpeedDecider::StPosition SpeedDecider::GetStPosition(
     const PathDecision* const path_decision, const SpeedData& speed_profile,
-    const StBoundary& st_boundary) const {
+    const STBoundary& st_boundary) const {
   StPosition st_position = BELOW;
   if (st_boundary.IsEmpty()) {
     return st_position;
@@ -86,7 +86,7 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
       ADEBUG << "speed profile cross st_boundaries.";
       st_position = CROSS;
 
-      if (st_boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+      if (st_boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
         if (!CheckKeepClearCrossable(path_decision, speed_profile,
                                      st_boundary)) {
           st_position = BELOW;
@@ -111,7 +111,7 @@ SpeedDecider::StPosition SpeedDecider::GetStPosition(
 
 bool SpeedDecider::CheckKeepClearCrossable(
     const PathDecision* const path_decision, const SpeedData& speed_profile,
-    const StBoundary& keep_clear_st_boundary) const {
+    const STBoundary& keep_clear_st_boundary) const {
   bool keep_clear_crossable = true;
 
   const auto& last_speed_point = speed_profile.back();
@@ -153,8 +153,8 @@ bool SpeedDecider::CheckKeepClearBlocked(
     const double distance =
         obstacle_start_s - keep_clear_obstacle.PerceptionSLBoundary().end_s();
 
-    if (obstacle->IsBlockingObstacle()
-        && distance > 0 && distance < (adc_length / 2)) {
+    if (obstacle->IsBlockingObstacle() && distance > 0 &&
+        distance < (adc_length / 2)) {
       keep_clear_blocked = true;
       break;
     }
@@ -205,7 +205,7 @@ Status SpeedDecider::MakeObjectDecision(
     }
 
     auto position = GetStPosition(path_decision, speed_profile, boundary);
-    if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+    if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       if (CheckKeepClearBlocked(path_decision, *obstacle)) {
         position = BELOW;
       }
@@ -218,7 +218,7 @@ Status SpeedDecider::MakeObjectDecision(
 
     switch (position) {
       case BELOW:
-        if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+        if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType stop_decision;
           if (CreateStopDecision(*mutable_obstacle, &stop_decision, 0.0)) {
             mutable_obstacle->AddLongitudinalDecision("dp_st_graph/keep_clear",
@@ -254,7 +254,7 @@ Status SpeedDecider::MakeObjectDecision(
         }
         break;
       case ABOVE:
-        if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+        if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
           ObjectDecisionType ignore;
           ignore.mutable_ignore();
           mutable_obstacle->AddLongitudinalDecision("dp_st_graph", ignore);
@@ -308,7 +308,7 @@ bool SpeedDecider::CreateStopDecision(const Obstacle& obstacle,
 
   const auto& boundary = obstacle.st_boundary();
   double fence_s = adc_sl_boundary_.end_s() + boundary.min_s() + stop_distance;
-  if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+  if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
     fence_s = obstacle.PerceptionSLBoundary().start_s();
   }
   const double main_stop_s =
@@ -329,7 +329,7 @@ bool SpeedDecider::CreateStopDecision(const Obstacle& obstacle,
   stop_point->set_z(0.0);
   stop->set_stop_heading(fence_point.heading());
 
-  if (boundary.boundary_type() == StBoundary::BoundaryType::KEEP_CLEAR) {
+  if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
     stop->set_reason_code(StopReasonCode::STOP_REASON_CLEAR_ZONE);
   }
 
@@ -465,8 +465,8 @@ bool SpeedDecider::CreateOvertakeDecision(
   return true;
 }
 
-bool SpeedDecider::CheckIsFollowByT(const StBoundary& boundary) const {
-  if (boundary.BottomLeftPoint().s() > boundary.BottomRightPoint().s()) {
+bool SpeedDecider::CheckIsFollowByT(const STBoundary& boundary) const {
+  if (boundary.bottom_left_point().s() > boundary.bottom_right_point().s()) {
     return false;
   }
   constexpr double kFollowTimeEpsilon = 1e-3;

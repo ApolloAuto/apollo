@@ -30,27 +30,26 @@ bool RoutingComponent::Init() {
   apollo::cyber::proto::RoleAttributes attr;
   attr.set_channel_name(FLAGS_routing_response_topic);
   auto qos = attr.mutable_qos_profile();
-  qos->set_history(
-      apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
+  qos->set_history(apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos->set_reliability(
       apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
-  qos->set_durability(apollo::cyber::proto::QosDurabilityPolicy::
-                          DURABILITY_TRANSIENT_LOCAL);
+  qos->set_durability(
+      apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
   response_writer_ = node_->CreateWriter<RoutingResponse>(attr);
 
   apollo::cyber::proto::RoleAttributes attr_history;
-  attr_history.set_channel_name(FLAGS_routing_response_topic + "_history");
+  attr_history.set_channel_name(FLAGS_routing_response_history_topic);
   auto qos_history = attr_history.mutable_qos_profile();
   qos_history->set_history(
       apollo::cyber::proto::QosHistoryPolicy::HISTORY_KEEP_LAST);
   qos_history->set_reliability(
       apollo::cyber::proto::QosReliabilityPolicy::RELIABILITY_RELIABLE);
-  qos_history->set_durability(apollo::cyber::proto::QosDurabilityPolicy::
-                          DURABILITY_TRANSIENT_LOCAL);
+  qos_history->set_durability(
+      apollo::cyber::proto::QosDurabilityPolicy::DURABILITY_TRANSIENT_LOCAL);
 
   response_history_writer_ = node_->CreateWriter<RoutingResponse>(attr_history);
   std::weak_ptr<RoutingComponent> self =
-     std::dynamic_pointer_cast<RoutingComponent>(shared_from_this());
+      std::dynamic_pointer_cast<RoutingComponent>(shared_from_this());
   timer_.reset(new ::apollo::cyber::Timer(
       FLAGS_routing_response_history_interval_ms,
       [self, this]() {
@@ -58,7 +57,10 @@ bool RoutingComponent::Init() {
         if (ptr) {
           std::lock_guard<std::mutex> guard(this->mutex_);
           if (this->response_.get() != nullptr) {
-            this->response_history_writer_->Write(response_);
+            auto response = *response_;
+            auto timestamp = apollo::common::time::Clock::NowInSeconds();
+            response.mutable_header()->set_timestamp_sec(timestamp);
+            this->response_history_writer_->Write(response);
           }
         }
       },

@@ -75,14 +75,11 @@ class PlanningBase {
   virtual void FillPlanningPb(const double timestamp,
                               ADCTrajectory* const trajectory_pb);
 
-  void SetFallbackTrajectory(ADCTrajectory* const trajectory_pb);
-
   virtual void ExportChart(const planning_internal::Debug& debug_info,
                            planning_internal::Debug* debug_chart);
 
   LocalView local_view_;
   const hdmap::HDMap* hdmap_ = nullptr;
-  const std::shared_ptr<ADCTrajectory> last_planning_;
 
   double start_time_ = 0.0;
   size_t seq_num_ = 0;

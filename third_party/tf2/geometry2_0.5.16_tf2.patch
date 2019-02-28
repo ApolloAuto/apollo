@@ -302,7 +302,7 @@ diff -uprN 0.5.16/include/tf2/convert.h tf2/include/tf2/convert.h
  #include <tf2/transform_datatypes.h>
  #include <tf2/exceptions.h>
 -#include <geometry_msgs/TransformStamped.h>
-+#include <geometry_msgs/transform_stamped.h>
++#include <tf2/transform_stamped.h>
  #include <tf2/impl/convert.h>
 +#include <tf2/time.h>
  

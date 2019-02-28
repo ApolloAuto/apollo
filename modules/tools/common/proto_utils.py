@@ -21,16 +21,13 @@ import google.protobuf.text_format as text_format
 
 def write_pb_to_text_file(topic_pb, file_path):
     """write pb message to file"""
-    f = file(file_path, 'w')
-    f.write(str(topic_pb))
-    f.close()
-
+    with open(file_path, 'w') as f:
+        f.write(str(topic_pb))
 
 def get_pb_from_text_file(filename, pb_value):
     """Get a proto from given text file."""
     with open(filename, 'r') as file_in:
         return text_format.Merge(file_in.read(), pb_value)
-
 
 def get_pb_from_bin_file(filename, pb_value):
     """Get a proto from given binary file."""

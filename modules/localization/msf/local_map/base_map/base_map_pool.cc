@@ -89,7 +89,7 @@ BaseMapNode* BaseMapNodePool::AllocMapNode() {
 
 void BaseMapNodePool::FreeMapNode(BaseMapNode* map_node) {
   node_reset_workers_ =
-    cyber::Async(&BaseMapNodePool::FreeMapNodeTask, this, map_node);
+      cyber::Async(&BaseMapNodePool::FreeMapNodeTask, this, map_node);
 }
 
 void BaseMapNodePool::FreeMapNodeTask(BaseMapNode* map_node) {

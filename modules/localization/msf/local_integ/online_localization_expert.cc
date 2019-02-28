@@ -179,8 +179,7 @@ void OnlineLocalizationExpert::CheckGnssLidarMsfStatus(
           << latest_lidar_timestamp_;
     msf_status_.set_local_lidar_status(
         LocalLidarStatus::MSF_LOCAL_LIDAR_NO_OUTPUT);
-    msf_status_.set_local_lidar_quality(
-        LocalLidarQuality::MSF_LOCAL_LIDAR_BAD);
+    msf_status_.set_local_lidar_quality(LocalLidarQuality::MSF_LOCAL_LIDAR_BAD);
   }
   latest_lidar_timestamp_mutex_.unlock();
   msf_status_mutex_.unlock();

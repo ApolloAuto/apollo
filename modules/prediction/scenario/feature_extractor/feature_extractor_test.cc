@@ -18,7 +18,6 @@
 
 #include "modules/prediction/common/kml_map_based_test.h"
 
-
 namespace apollo {
 namespace prediction {
 

@@ -39,8 +39,8 @@ class LidarObstacleTracking {
   LidarObstacleTracking() = default;
   ~LidarObstacleTracking() = default;
 
-  bool Init(const LidarObstacleTrackingInitOptions& options
-      = LidarObstacleTrackingInitOptions());
+  bool Init(const LidarObstacleTrackingInitOptions& options =
+                LidarObstacleTrackingInitOptions());
 
   LidarProcessResult Process(const LidarObstacleTrackingOptions& options,
                              LidarFrame* frame);

@@ -18,7 +18,7 @@
 
 #include <algorithm>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/lib/roi_filter/hdmap_roi_filter/polygon_mask.h"
@@ -30,7 +30,7 @@ namespace perception {
 namespace lidar {
 
 using DirectionMajor = Bitmap2D::DirectionMajor;
-using apollo::common::util::GetAbsolutePath;
+using apollo::cyber::common::GetAbsolutePath;
 using base::PolygonDType;
 
 template <typename T>
@@ -48,7 +48,7 @@ bool HdmapROIFilter::Init(const ROIFilterInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "hdmap_roi_filter.conf");
   HDMapRoiFilterConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(apollo::cyber::common::GetProtoFromFile(config_file, &config));
   range_ = config.range();
   cell_size_ = config.cell_size();
   extend_dist_ = config.extend_dist();

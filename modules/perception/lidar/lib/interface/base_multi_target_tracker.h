@@ -24,11 +24,9 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct MultiTargetTrackerInitOptions {
-};
+struct MultiTargetTrackerInitOptions {};
 
-struct MultiTargetTrackerOptions {
-};
+struct MultiTargetTrackerOptions {};
 
 class BaseMultiTargetTracker {
  public:
@@ -36,8 +34,8 @@ class BaseMultiTargetTracker {
 
   virtual ~BaseMultiTargetTracker() = default;
 
-  virtual bool Init(const MultiTargetTrackerInitOptions&
-                        options = MultiTargetTrackerInitOptions()) = 0;
+  virtual bool Init(const MultiTargetTrackerInitOptions& options =
+                        MultiTargetTrackerInitOptions()) = 0;
 
   // @brief: track segmented objects, and estimate motion
   // @param [in]: options

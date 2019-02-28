@@ -30,6 +30,8 @@ using proto::SingleMessage;
 
 RecordWriter::RecordWriter() { header_ = HeaderBuilder::GetHeader(); }
 
+RecordWriter::RecordWriter(const proto::Header& header) { header_ = header; }
+
 RecordWriter::~RecordWriter() { Close(); }
 
 bool RecordWriter::Open(const std::string& file) {

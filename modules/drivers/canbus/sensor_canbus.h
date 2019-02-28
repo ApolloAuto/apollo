@@ -28,6 +28,7 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/common/file.h"
 #include "cyber/component/component.h"
 
 #include "modules/common/adapters/adapter_manager.h"
@@ -109,7 +110,7 @@ class SensorCanbus : public apollo::cyber::Component {
 template <typename SensorType>
 bool SensorCanbus<SensorType>::Init() {
   // load conf
-  if (!common::util::GetProtoFromFile(FLAGS_sensor_conf_file, &canbus_conf_)) {
+  if (!cyber::common::GetProtoFromFile(FLAGS_sensor_conf_file, &canbus_conf_)) {
     return OnError("Unable to load canbus conf file: " +
                    FLAGS_sensor_conf_file);
   }
@@ -160,8 +161,8 @@ bool SensorCanbus<SensorType>::Start() {
   // no need for timer.
   if (FLAGS_sensor_freq > 0) {
     const double duration_ms = 1000.0 / FLAGS_sensor_freq;
-    timer_ = cyber::Timer(duration_ms, &SensorCanbus<SensorType>::OnTimer,
-                              this, false);
+    timer_ = cyber::Timer(duration_ms, &SensorCanbus<SensorType>::OnTimer, this,
+                          false);
     timer_.Start();
   } else {
     data_trigger_running_ = true;

@@ -79,8 +79,7 @@ class MoveSequencePredictor : public SequencePredictor {
 
   std::vector<double> GenerateCandidateTimes();
 
-  double CostFunction(const double max_lat_acc,
-                      const double time_to_end_state,
+  double CostFunction(const double max_lat_acc, const double time_to_end_state,
                       const double time_to_lane_edge,
                       const double bell_curve_mu);
 };

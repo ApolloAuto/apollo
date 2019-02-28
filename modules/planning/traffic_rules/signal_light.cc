@@ -20,14 +20,15 @@
 
 #include "modules/planning/traffic_rules/signal_light.h"
 
-#include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/proto/planning_internal.pb.h"
+#include <algorithm>
 
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/map_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/traffic_rules/util.h"
 
 namespace apollo {
@@ -95,8 +96,7 @@ void SignalLight::MakeDecisions(Frame* const frame,
       reference_line_info->mutable_debug()
           ->mutable_planning_data()
           ->mutable_signal_light();
-  const double adc_front_edge_s =
-      reference_line_info->AdcSlBoundary().end_s();
+  const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   signal_light_debug->set_adc_front_s(adc_front_edge_s);
   signal_light_debug->set_adc_speed(
       common::VehicleStateProvider::Instance()->linear_velocity());
@@ -112,9 +112,9 @@ void SignalLight::MakeDecisions(Frame* const frame,
     // work around incorrect s-projection along round routing
     const double kTrafficLightLookForwardDistanceConfGuard = 135.0;
     const double kTrafficLightDistance = 50.0;
-    const double monitor_forward_distance = std::max(
-        kTrafficLightLookForwardDistanceConfGuard,
-        config_.signal_light().max_monitor_forward_distance());
+    const double monitor_forward_distance =
+        std::max(kTrafficLightLookForwardDistanceConfGuard,
+                 config_.signal_light().max_monitor_forward_distance());
     if (signal_light.start_s - adc_front_edge_s > monitor_forward_distance) {
       const auto& reference_line = reference_line_info->reference_line();
       common::SLPoint signal_light_sl;
@@ -127,39 +127,36 @@ void SignalLight::MakeDecisions(Frame* const frame,
           common::VehicleStateProvider::Instance()->x(),
           common::VehicleStateProvider::Instance()->y()};
 
-      const double distance = common::util::DistanceXY(
-          signal_light_point, adc_position);
-      ADEBUG << "traffic_light[" << signal_light.object_id
-          << "] start_s[" << signal_light.start_s
-          << "] actual_distance[" << distance << "]";
+      const double distance =
+          common::util::DistanceXY(signal_light_point, adc_position);
+      ADEBUG << "traffic_light[" << signal_light.object_id << "] start_s["
+             << signal_light.start_s << "] actual_distance[" << distance << "]";
       if (distance < kTrafficLightDistance) {
         ADEBUG << "SKIP traffic_light[" << signal_light.object_id
-            << "]. too far away along reference line";
+               << "]. too far away along reference line";
         continue;
       }
     }
 
     planning_internal::SignalLightDebug::SignalDebug* signal_debug =
         signal_light_debug->add_signal();
-    signal_debug->set_adc_stop_deacceleration(stop_deceleration);
+    signal_debug->set_adc_stop_deceleration(stop_deceleration);
     signal_debug->set_color(signal.color());
     signal_debug->set_light_id(signal_light.object_id);
     signal_debug->set_light_stop_s(signal_light.start_s);
 
-    ADEBUG << "traffic_light[" << signal_light.object_id
-        << "] start_s[" << signal_light.start_s
-        << "] color[" << signal.color()
-        << "] stop_deceleration[" << stop_deceleration << "]";
+    ADEBUG << "traffic_light[" << signal_light.object_id << "] start_s["
+           << signal_light.start_s << "] color[" << signal.color()
+           << "] stop_deceleration[" << stop_deceleration << "]";
     if ((signal.color() == TrafficLight::RED &&
          stop_deceleration < config_.signal_light().max_stop_deceleration()) ||
         (signal.color() == TrafficLight::UNKNOWN &&
          stop_deceleration < config_.signal_light().max_stop_deceleration()) ||
         (signal.color() == TrafficLight::YELLOW &&
          stop_deceleration <
-             config_.signal_light().max_stop_deacceleration_yellow_light())) {
+             config_.signal_light().max_stop_deceleration_yellow_light())) {
       if (config_.signal_light().righ_turn_creep().enabled() &&
-          reference_line_info->GetPathTurnType() ==
-              hdmap::Lane::RIGHT_TURN) {
+          reference_line_info->GetPathTurnType() == hdmap::Lane::RIGHT_TURN) {
         SetCreepForwardSignalDecision(reference_line_info, &signal_light);
       }
       if (BuildStopDecision(frame, reference_line_info, &signal_light)) {

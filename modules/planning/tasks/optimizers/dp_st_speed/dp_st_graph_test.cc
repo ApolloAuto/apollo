@@ -25,14 +25,14 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::util::GetProtoFromFile;
+using apollo::cyber::common::GetProtoFromFile;
 
 class DpStGraphTest : public ::testing::Test {
  public:
@@ -73,6 +73,10 @@ class DpStGraphTest : public ::testing::Test {
     for (double s = 0; s < 200.0; s += 1.0) {
       speed_limit_.AppendSpeedLimit(s, 25.0);
     }
+    // soft_speed_limit:
+    for (double s = 0; s < 200.0; s += 1.0) {
+      speed_limit_.AppendSoftSpeedLimit(s, 25.0);
+    }
   }
 
   virtual void TearDown() {}
@@ -109,9 +113,9 @@ TEST_F(DpStGraphTest, simple) {
   point_pairs.emplace_back(lower_points[0], upper_points[0]);
   point_pairs.emplace_back(lower_points[1], upper_points[1]);
 
-  obstacle_list_.back().SetStBoundary(StBoundary(point_pairs));
+  obstacle_list_.back().SetStBoundary(STBoundary(point_pairs));
 
-  std::vector<const StBoundary*> boundaries;
+  std::vector<const STBoundary*> boundaries;
   boundaries.push_back(&(obstacles_.back()->st_boundary()));
 
   init_point_.mutable_path_point()->set_x(0.0);
@@ -123,8 +127,11 @@ TEST_F(DpStGraphTest, simple) {
 
   const double path_data_length = 120.0;
 
-  st_graph_data_ =
-      StGraphData(boundaries, init_point_, speed_limit_, path_data_length);
+  planning_internal::STGraphDebug st_graph_debug;
+
+  st_graph_data_ = StGraphData();
+  st_graph_data_.LoadData(boundaries, init_point_, speed_limit_,
+                          path_data_length, 120, 7.0, &st_graph_debug);
 
   // adc_sl_boundary_
   adc_sl_boundary_.set_start_s(15.0);

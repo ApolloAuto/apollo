@@ -13,7 +13,7 @@ cc_library(
         "timer.h",
     ],
     deps = [
-        "//cyber",
+        "//cyber/time",
         "//modules/common/configs:config_gflags",
     ],
 )

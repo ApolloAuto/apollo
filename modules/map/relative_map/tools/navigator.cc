@@ -53,8 +53,8 @@ int main(int argc, char** argv) {
   NavigatorConfig navigator_config;
   AINFO << "The navigator configuration filename is: "
         << FLAGS_navigator_config_filename;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_navigator_config_filename,
-                                              &navigator_config)) {
+  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_navigator_config_filename,
+                                               &navigator_config)) {
     AERROR << "Failed to parse " << FLAGS_navigator_config_filename;
     return -1;
   }

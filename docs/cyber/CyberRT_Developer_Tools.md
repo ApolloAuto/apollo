@@ -171,6 +171,8 @@ usage: cyber_recorder record [options]
     -o, --output <file>                output record file
     -a, --all                          all channels
     -c, --channel <name>               channel name
+    -i, --segment-interval <seconds>   record segmented every n second(s)
+    -m, --segment-size <MB>            record segmented every n megabyte(s)
     -h, --help                         show help message
 
 ```

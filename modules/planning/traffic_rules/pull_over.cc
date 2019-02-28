@@ -262,8 +262,8 @@ bool PullOver::OnOverlap(const double start_s, const double end_s) {
         end_s >= pnc_junction_overlap.start_s) {
       ADEBUG << "s[" << start_s << ", " << end_s << "] on pnc_junction_overlap["
              << pnc_junction_overlap.object_id << "] s["
-             << pnc_junction_overlap.start_s
-             << ", " << pnc_junction_overlap.end_s << "]";
+             << pnc_junction_overlap.start_s << ", "
+             << pnc_junction_overlap.end_s << "]";
       return true;
     }
   }

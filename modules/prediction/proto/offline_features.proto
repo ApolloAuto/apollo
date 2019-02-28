@@ -5,10 +5,6 @@ package apollo.prediction;
 import "modules/prediction/proto/feature.proto";
 import "modules/prediction/proto/prediction_obstacle.proto";
 
-message Features {
-  repeated Feature feature = 1;
-}
-
 message CNNFeatures {
   optional uint32 dim0 = 1;
   optional uint32 dim1 = 2;
@@ -42,4 +38,12 @@ message PredictionResult {
 
 message ListPredictionResult {
   repeated PredictionResult prediction_result = 1;
+}
+
+message ListFrameEnv {
+  repeated FrameEnv frame_env = 1;
+}
+
+message Features {
+  repeated Feature feature = 1;
 }

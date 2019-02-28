@@ -29,7 +29,7 @@ namespace planning {
 class AutotuningRawFeatureGeneratorTest : public ::testing::Test {
  protected:
   void SetUp() override {
-    // Referennce line info
+    // Reference line info
     common::VehicleState ego_state;
     common::TrajectoryPoint ego_pos;
     ReferenceLine reference_line;
@@ -38,8 +38,7 @@ class AutotuningRawFeatureGeneratorTest : public ::testing::Test {
         new ReferenceLineInfo(ego_state, ego_pos, reference_line, segments));
     // pseudo empty frame info
     LocalView dummy_local_view;
-    frame_.reset(new Frame(0, dummy_local_view, ego_pos, 0, ego_state, nullptr,
-                           nullptr));
+    frame_.reset(new Frame(0, dummy_local_view, ego_pos, ego_state, nullptr));
     speed_limit_.reset(new SpeedLimit());
     generator_.reset(new AutotuningRawFeatureGenerator(8, 17, *ref_line_info_,
                                                        *frame_, *speed_limit_));
@@ -63,14 +62,14 @@ TEST_F(AutotuningRawFeatureGeneratorTest, generate_input_trajectory) {
   std::vector<common::TrajectoryPoint> trajectory;
   ASSERT_TRUE(generator_ != nullptr);
   auto result = generator_->EvaluateTrajectory(trajectory, nullptr);
-  EXPECT_TRUE(result == common::Status::OK());
+  EXPECT_TRUE(result.ok());
 }
 
 TEST_F(AutotuningRawFeatureGeneratorTest, generate_input_trajectory_pointwise) {
   common::TrajectoryPoint trajectory_point;
   ASSERT_TRUE(generator_ != nullptr);
   auto result = generator_->EvaluateTrajectoryPoint(trajectory_point, nullptr);
-  EXPECT_TRUE(result == common::Status::OK());
+  EXPECT_TRUE(result.ok());
 }
 
 }  // namespace planning

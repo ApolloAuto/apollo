@@ -19,20 +19,16 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-SensorFrame::SensorFrame() {
-  header_.reset(new SensorFrameHeader());
-}
+SensorFrame::SensorFrame() { header_.reset(new SensorFrameHeader()); }
 
-SensorFrame::SensorFrame(
-  const base::FrameConstPtr& base_frame_ptr) {
+SensorFrame::SensorFrame(const base::FrameConstPtr& base_frame_ptr) {
   Initialize(base_frame_ptr);
 }
 
 void SensorFrame::Initialize(const base::FrameConstPtr& base_frame_ptr) {
-  header_.reset(new SensorFrameHeader(
-    base_frame_ptr->sensor_info,
-    base_frame_ptr->timestamp,
-    base_frame_ptr->sensor2world_pose));
+  header_.reset(new SensorFrameHeader(base_frame_ptr->sensor_info,
+                                      base_frame_ptr->timestamp,
+                                      base_frame_ptr->sensor2world_pose));
 
   lidar_frame_supplement_ = base_frame_ptr->lidar_frame_supplement;
   radar_frame_supplement_ = base_frame_ptr->radar_frame_supplement;
@@ -63,7 +59,6 @@ std::string SensorFrame::GetSensorId() const {
 
   return header_->sensor_info.name;
 }
-
 
 base::SensorType SensorFrame::GetSensorType() const {
   if (header_ == nullptr) {

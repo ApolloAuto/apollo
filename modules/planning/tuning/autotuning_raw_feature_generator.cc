@@ -158,13 +158,13 @@ void AutotuningRawFeatureGenerator::GenerateSTBoundaries(
 }
 
 void AutotuningRawFeatureGenerator::ConvertToDiscretizedBoundaries(
-    const StBoundary& boundary, const double speed) {
+    const STBoundary& boundary, const double speed) {
   for (size_t i = 0; i < eval_time_.size(); ++i) {
     double upper = 0.0;
     double lower = 0.0;
     bool suc = boundary.GetBoundarySRange(eval_time_[i], &upper, &lower);
     if (suc) {
-      if (boundary.boundary_type() == StBoundary::BoundaryType::STOP) {
+      if (boundary.boundary_type() == STBoundary::BoundaryType::STOP) {
         stop_boundaries_[i].push_back({{lower, upper, speed}});
       } else {
         obs_boundaries_[i].push_back({{lower, upper, speed}});

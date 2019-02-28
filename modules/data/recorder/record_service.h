@@ -33,11 +33,12 @@ namespace data {
 
 class RecordService {
  public:
-  static bool Init(const std::shared_ptr<apollo::cyber::Node>& node);
+  static bool Init(const std::shared_ptr<apollo::cyber::Node> &node);
+
  private:
-  static void OnRecordRequest(
-      const std::shared_ptr<RecordRequest> &request,
-      const std::shared_ptr<RecordResponse> &response);
+  static void OnRecordRequest(const std::shared_ptr<RecordRequest> &request,
+                              const std::shared_ptr<RecordResponse> &response);
+
  private:
   std::shared_ptr<apollo::cyber::Service<RecordRequest, RecordResponse>>
       server_;

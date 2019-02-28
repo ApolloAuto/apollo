@@ -62,8 +62,7 @@ class Writer : public WriterBase {
 
 template <typename MessageT>
 Writer<MessageT>::Writer(const proto::RoleAttributes& role_attr)
-    : WriterBase(role_attr), transmitter_(nullptr),
-      channel_manager_(nullptr) {}
+    : WriterBase(role_attr), transmitter_(nullptr), channel_manager_(nullptr) {}
 
 template <typename MessageT>
 Writer<MessageT>::~Writer() {
@@ -74,15 +73,20 @@ template <typename MessageT>
 bool Writer<MessageT>::Init() {
   {
     std::lock_guard<std::mutex> g(lock_);
-    if (init_) { return true; }
-    transmitter_ = transport::Transport::Instance()->
-      CreateTransmitter<MessageT>(role_attr_);
-    if (transmitter_ == nullptr) { return false; }
+    if (init_) {
+      return true;
+    }
+    transmitter_ =
+        transport::Transport::Instance()->CreateTransmitter<MessageT>(
+            role_attr_);
+    if (transmitter_ == nullptr) {
+      return false;
+    }
     init_ = true;
   }
   this->role_attr_.set_id(transmitter_->id().HashValue());
-  channel_manager_ = service_discovery::TopologyManager::Instance()->
-    channel_manager();
+  channel_manager_ =
+      service_discovery::TopologyManager::Instance()->channel_manager();
   JoinTheTopology();
   return true;
 }
@@ -91,7 +95,9 @@ template <typename MessageT>
 void Writer<MessageT>::Shutdown() {
   {
     std::lock_guard<std::mutex> g(lock_);
-    if (!init_) { return; }
+    if (!init_) {
+      return;
+    }
     init_ = false;
   }
   LeaveTheTopology();

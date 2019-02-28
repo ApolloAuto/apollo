@@ -20,15 +20,12 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 #include <tuple>
 #include <utility>
 #include <vector>
 
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/planning/math/finite_element_qp/fem_1d_expanded_jerk_qp_problem.h"
-#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/qp_piecewise_jerk_path_config.pb.h"
 #include "modules/planning/tasks/optimizers/path_optimizer.h"
@@ -36,6 +33,7 @@
 namespace apollo {
 namespace planning {
 
+// TODO(all): change name to PiecewiseJerkPathOptimizer
 class QpPiecewiseJerkPathOptimizer : public PathOptimizer {
  public:
   explicit QpPiecewiseJerkPathOptimizer(const TaskConfig& config);
@@ -55,9 +53,6 @@ class QpPiecewiseJerkPathOptimizer : public PathOptimizer {
   std::vector<std::tuple<double, double, double>>
   GetLateralSecondOrderDerivativeBounds(
       const common::TrajectoryPoint& init_point, const double qp_delta_s);
-
- private:
-  std::unique_ptr<Fem1dQpProblem> fem_1d_qp_;
 };
 
 }  // namespace planning

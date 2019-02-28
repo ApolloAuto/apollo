@@ -94,6 +94,14 @@ class ADCTrajectoryContainer : public Container {
    */
   const planning::ADCTrajectory& adc_trajectory() const;
 
+  /**
+   * @brief Determine if a lane ID is in the reference line
+   * @return The lane ID to be investigated
+   */
+  bool IsLaneIdInReferenceLine(const std::string& lane_id) const;
+
+  const std::vector<std::string>& GetADCLaneIDSequence() const;
+
  private:
   void SetJunctionPolygon();
 
@@ -109,7 +117,8 @@ class ADCTrajectoryContainer : public Container {
   /**
    * @brief Check if a point is in the first PNC junction of the adc trajectory
    * @param Point
-   * @return True if the point is in the first PNC junction of the adc trajectory
+   * @return True if the point is in the first PNC junction of the adc
+   * trajectory
    */
   bool IsPointInPNCJunction(const common::PathPoint& point) const;
 

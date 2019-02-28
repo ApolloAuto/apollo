@@ -46,7 +46,7 @@ s.t. \qquad & LB \leq x \leq UB \\
 \end{aligned}
 $$
 </p>
-Below is the example for converting the cost function into the QP formulaiton. 
+Below is the example for converting the cost function into the QP formulation. 
 <p>
 $$
 f_i(s) ＝

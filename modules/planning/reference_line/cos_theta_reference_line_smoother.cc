@@ -21,6 +21,7 @@
 #include "IpIpoptApplication.hpp"
 #include "IpSolveStatistics.hpp"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
@@ -37,8 +38,8 @@ using apollo::common::time::Clock;
 CosThetaReferenceLineSmoother::CosThetaReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
-  CHECK(common::util::GetProtoFromFile(FLAGS_reopt_smoother_config_filename,
-                                       &reopt_smoother_config_))
+  CHECK(cyber::common::GetProtoFromFile(FLAGS_reopt_smoother_config_filename,
+                                        &reopt_smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_reopt_smoother_config_filename;
 

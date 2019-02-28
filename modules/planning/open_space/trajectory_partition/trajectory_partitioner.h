@@ -34,7 +34,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
 #include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {

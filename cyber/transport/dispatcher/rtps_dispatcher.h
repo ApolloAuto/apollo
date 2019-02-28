@@ -82,8 +82,8 @@ template <typename MessageT>
 void RtpsDispatcher::AddListener(const RoleAttributes& self_attr,
                                  const MessageListener<MessageT>& listener) {
   auto listener_adapter = [listener](
-      const std::shared_ptr<std::string>& msg_str,
-      const MessageInfo& msg_info) {
+                              const std::shared_ptr<std::string>& msg_str,
+                              const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
     listener(msg, msg_info);
@@ -98,8 +98,8 @@ void RtpsDispatcher::AddListener(const RoleAttributes& self_attr,
                                  const RoleAttributes& opposite_attr,
                                  const MessageListener<MessageT>& listener) {
   auto listener_adapter = [listener](
-      const std::shared_ptr<std::string>& msg_str,
-      const MessageInfo& msg_info) {
+                              const std::shared_ptr<std::string>& msg_str,
+                              const MessageInfo& msg_info) {
     auto msg = std::make_shared<MessageT>();
     RETURN_IF(!message::ParseFromString(*msg_str, msg.get()));
     listener(msg, msg_info);

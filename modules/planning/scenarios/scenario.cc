@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/scenario.h"
 
+#include "cyber/common/file.h"
+
 namespace apollo {
 namespace planning {
 namespace scenario {
@@ -31,7 +33,7 @@ Scenario::Scenario(const ScenarioConfig& config, const ScenarioContext* context)
 
 bool Scenario::LoadConfig(const std::string& config_file,
                           ScenarioConfig* config) {
-  return apollo::common::util::GetProtoFromFile(config_file, config);
+  return apollo::cyber::common::GetProtoFromFile(config_file, config);
 }
 
 void Scenario::Init() {
@@ -47,7 +49,7 @@ void Scenario::Init() {
         << " has no config";
   }
   ADEBUG << "init stage "
-        << ScenarioConfig::StageType_Name(config_.stage_type(0));
+         << ScenarioConfig::StageType_Name(config_.stage_type(0));
   current_stage_ = CreateStage(*stage_config_map_[config_.stage_type(0)]);
 }
 

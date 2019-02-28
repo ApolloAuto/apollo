@@ -18,30 +18,46 @@
 
 #include <vector>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
+#include "modules/common/util/string_util.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 
 namespace apollo {
 namespace prediction {
 
+using apollo::common::util::StrCat;
+
 Features FeatureOutput::features_;
 ListDataForLearning FeatureOutput::list_data_for_learning_;
 ListPredictionResult FeatureOutput::list_prediction_result_;
+ListFrameEnv FeatureOutput::list_frame_env_;
 std::size_t FeatureOutput::idx_feature_ = 0;
 std::size_t FeatureOutput::idx_learning_ = 0;
 std::size_t FeatureOutput::idx_prediction_result_ = 0;
+std::size_t FeatureOutput::idx_frame_env_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
   switch (FLAGS_prediction_offline_mode) {
     case 1: {
       WriteFeatureProto();
+      break;
     }
     case 2: {
       WriteDataForLearning();
+      break;
     }
     case 3: {
       WritePredictionResult();
+      break;
+    }
+    case 4: {
+      WriteFrameEnv();
+      break;
+    }
+    default: {
+      // No data dump
+      break;
     }
   }
   Clear();
@@ -74,12 +90,12 @@ void FeatureOutput::InsertDataForLearning(
     data_for_learning->add_features_for_learning(feature_values[i]);
   }
   data_for_learning->set_category(category);
-  ADEBUG << "Insert [" << category << "] data for learning";
+  ADEBUG << "Insert [" << category << "] data for learning with size = "
+         << feature_values.size();
 }
 
 void FeatureOutput::InsertPredictionResult(
-    const int obstacle_id,
-    const PredictionObstacle& prediction_obstacle) {
+    const int obstacle_id, const PredictionObstacle& prediction_obstacle) {
   PredictionResult* prediction_result =
       list_prediction_result_.add_prediction_result();
   prediction_result->set_id(obstacle_id);
@@ -90,42 +106,58 @@ void FeatureOutput::InsertPredictionResult(
   }
 }
 
+void FeatureOutput::InsertFrameEnv(const FrameEnv& frame_env) {
+  list_frame_env_.add_frame_env()->CopyFrom(frame_env);
+}
+
 void FeatureOutput::WriteFeatureProto() {
   if (features_.feature_size() <= 0) {
     ADEBUG << "Skip writing empty feature.";
   } else {
-    const std::string file_name =
-        FLAGS_prediction_data_dir + "/feature." +
-        std::to_string(idx_feature_) + ".bin";
-    common::util::SetProtoToBinaryFile(features_, file_name);
+    const std::string file_name = StrCat(FLAGS_prediction_data_dir, "/feature.",
+                                         std::to_string(idx_feature_), ".bin");
+    cyber::common::SetProtoToBinaryFile(features_, file_name);
     features_.Clear();
     ++idx_feature_;
   }
 }
 
 void FeatureOutput::WriteDataForLearning() {
-  if (list_data_for_learning_.data_for_learning_size() <= 0) {
+  if (list_data_for_learning_.data_for_learning().empty()) {
     ADEBUG << "Skip writing empty data_for_learning.";
   } else {
     const std::string file_name =
-        FLAGS_prediction_data_dir + "/datalearn." +
-        std::to_string(idx_learning_) + ".bin";
-    common::util::SetProtoToBinaryFile(list_data_for_learning_, file_name);
+        StrCat(FLAGS_prediction_data_dir, "/datalearn.",
+               std::to_string(idx_learning_), ".bin");
+    cyber::common::SetProtoToBinaryFile(list_data_for_learning_, file_name);
     list_data_for_learning_.Clear();
     ++idx_learning_;
   }
 }
 
 void FeatureOutput::WritePredictionResult() {
-  if (list_prediction_result_.prediction_result_size() <= 0) {
+  if (list_prediction_result_.prediction_result().empty()) {
     ADEBUG << "Skip writing empty prediction_result.";
   } else {
     const std::string file_name =
-        FLAGS_prediction_data_dir + "/prediction_result." +
-        std::to_string(idx_prediction_result_) + ".bin";
-    common::util::SetProtoToBinaryFile(list_prediction_result_, file_name);
+        StrCat(FLAGS_prediction_data_dir, "/prediction_result.",
+               std::to_string(idx_prediction_result_), ".bin");
+    cyber::common::SetProtoToBinaryFile(list_prediction_result_, file_name);
     list_prediction_result_.Clear();
     ++idx_prediction_result_;
+  }
+}
+
+void FeatureOutput::WriteFrameEnv() {
+  if (list_frame_env_.frame_env().empty()) {
+    ADEBUG << "Skip writing empty prediction_result.";
+  } else {
+    const std::string file_name =
+        StrCat(FLAGS_prediction_data_dir, "/frame_env.",
+               std::to_string(idx_frame_env_), ".bin");
+    cyber::common::SetProtoToBinaryFile(list_frame_env_, file_name);
+    list_frame_env_.Clear();
+    ++idx_frame_env_;
   }
 }
 
@@ -138,6 +170,8 @@ int FeatureOutput::SizeOfDataForLearning() {
 int FeatureOutput::SizeOfPredictionResult() {
   return list_prediction_result_.prediction_result_size();
 }
+
+int FeatureOutput::SizeOfFrameEnv() { return list_frame_env_.frame_env_size(); }
 
 }  // namespace prediction
 }  // namespace apollo

@@ -22,9 +22,9 @@
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/trajectory1d/constant_deceleration_trajectory1d.h"
-#include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
-#include "modules/planning/lattice/trajectory1d/standing_still_trajectory1d.h"
+#include "modules/planning/common/trajectory1d/constant_deceleration_trajectory1d.h"
+#include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
+#include "modules/planning/common/trajectory1d/standing_still_trajectory1d.h"
 #include "modules/planning/lattice/trajectory_generation/lateral_osqp_optimizer.h"
 #include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
 

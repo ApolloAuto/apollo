@@ -18,7 +18,6 @@ requests >= 2.18
 simplejson
 
 # Python tools
-plyvel == 0.9
 pymongo
 pyproj
 shapely

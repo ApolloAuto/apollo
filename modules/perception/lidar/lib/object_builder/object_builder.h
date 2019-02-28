@@ -73,8 +73,7 @@ class ObjectBuilder {
   // @param [in]: min and max point.
   // @param [in/out]: ObjectPtr.
   void SetDefaultValue(
-      const Eigen::Vector3f& min_pt,
-      const Eigen::Vector3f& max_pt,
+      const Eigen::Vector3f& min_pt, const Eigen::Vector3f& max_pt,
       std::shared_ptr<apollo::perception::base::Object> object);
 
   // @brief: decide whether input cloud is on the same line.
@@ -82,17 +81,15 @@ class ObjectBuilder {
   // @param [in/out]: pointcloud.
   // @param [out]: is line: true, not line: false.
   bool LinePerturbation(
-      apollo::perception::base::PointCloud<
-          apollo::perception::base::PointF>* cloud);
+      apollo::perception::base::PointCloud<apollo::perception::base::PointF>*
+          cloud);
 
   // @brief: calculate 3D min max point
   // @param [in]: point cloud.
   // @param [in/out]: min and max points.
-  void GetMinMax3D(
-      const apollo::perception::base::PointCloud<
-          apollo::perception::base::PointF>& cloud,
-      Eigen::Vector3f* min_pt,
-      Eigen::Vector3f* max_pt);
+  void GetMinMax3D(const apollo::perception::base::PointCloud<
+                       apollo::perception::base::PointF>& cloud,
+                   Eigen::Vector3f* min_pt, Eigen::Vector3f* max_pt);
 };  // class ObjectBuilder
 
 }  // namespace lidar
