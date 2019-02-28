@@ -113,24 +113,27 @@ message ScenarioStopSignUnprotectedConfig {
 }
 
 message ScenarioTrafficLightProtectedConfig {
-  optional double max_valid_stop_distance = 1 [default = 3.5];  // meter
-  optional double max_adc_stop_speed = 2 [default = 0.3];  // m/s
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
+  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
+  optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
+  optional double max_adc_stop_speed = 3 [default = 0.3];  // m/s
+  optional double min_pass_s_distance = 4 [default = 3.0];  // meter
 }
 
 message ScenarioTrafficLightUnprotectedLeftTurnConfig {
-  optional double max_valid_stop_distance = 1 [default = 3.5];  // meter
-  optional double max_adc_stop_speed = 2 [default = 0.3];  // m/s
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
-  optional float creep_timeout = 4 [default = 10.0];  // sec
+  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
+  optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
+  optional double max_adc_stop_speed = 3 [default = 0.3];  // m/s
+  optional double min_pass_s_distance = 4 [default = 3.0];  // meter
+  optional float creep_timeout = 5 [default = 10.0];  // sec
 }
 
 message ScenarioTrafficLightUnprotectedRightTurnConfig {
-  optional double max_valid_stop_distance = 1 [default = 3.5];  // meter
-  optional double max_adc_stop_speed = 2 [default = 0.3];  // m/s
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
-  optional float red_light_right_turn_stop_duration = 4 [default = 3.0];  // sec
-  optional float creep_timeout = 5 [default = 10.0];  // sec
+  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
+  optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
+  optional double max_adc_stop_speed = 3 [default = 0.3];  // m/s
+  optional double min_pass_s_distance = 4 [default = 3.0];  // meter
+  optional float red_light_right_turn_stop_duration = 5 [default = 3.0];  // sec
+  optional float creep_timeout = 6 [default = 10.0];  // sec
 }
 
 message ScenarioValetParkingConfig {}

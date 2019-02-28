@@ -127,6 +127,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     auto signal_color = scenario::GetSignal(
         traffic_light_overlap.object_id).color();
     ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
+        << "] start_s[" << traffic_light_overlap.start_s
         << "] color[" << signal_color << "]";
     if (signal_color == TrafficLight::GREEN) {
       continue;
