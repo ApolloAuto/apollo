@@ -565,62 +565,81 @@ bool ScenarioManager::IsTrafficLightScenario(
 void ScenarioManager::UpdatePlanningContext(
     const Frame& frame,
     const ScenarioConfig::ScenarioType& scenario_type) {
-  const auto& reference_line_info = frame.reference_line_info().front();
-
   if (!IsStopSignScenario(scenario_type) &&
       !IsTrafficLightScenario(scenario_type)) {
+    PlanningContext::GetScenarioInfo()->current_stop_sign_overlap
+        = PathOverlap();
+    PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps.clear();
     PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
+    PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
     return;
   }
 
   // StopSign scenario
   if (IsStopSignScenario(scenario_type)) {
-    if (scenario_type != current_scenario_->scenario_type()) {
-      // set to first_encountered stop sign
-      const auto& first_encountered_overlaps =
-          reference_line_info.FirstEncounteredOverlaps();
-      hdmap::PathOverlap* stop_sign_overlap = nullptr;
-      for (const auto& overlap : first_encountered_overlaps) {
-        if (!stop_sign_overlap && overlap.first ==
-            ReferenceLineInfo::STOP_SIGN) {
-          stop_sign_overlap =
-              const_cast<hdmap::PathOverlap*>(&(overlap.second));
-          break;
-        }
-      }
-
-      if (stop_sign_overlap) {
-        PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
-            *stop_sign_overlap;
-        ADEBUG << "Update PlanningContext with first_encountered stop sign["
-            << stop_sign_overlap->object_id << "]";
-      }
-    } else {
-      // refresh current_stop_sign_overlap
-      const std::string current_stop_sign_overlap_id =
-          PlanningContext::GetScenarioInfo()
-              ->current_stop_sign_overlap.object_id;
-
-      const std::vector<PathOverlap>& stop_sign_overlaps =
-          reference_line_info.reference_line().map_path().stop_sign_overlaps();
-      auto stop_sign_overlap_itr =
-          std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
-              [&current_stop_sign_overlap_id](
-                  const hdmap::PathOverlap& overlap) {
-                return overlap.object_id == current_stop_sign_overlap_id;
-              });
-      if (stop_sign_overlap_itr != stop_sign_overlaps.end()) {
-        PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
-            *stop_sign_overlap_itr;
-        ADEBUG << "refresh PlanningContext with current stop sign["
-            << stop_sign_overlap_itr->object_id << "]";
-      }
-    }
+    UpdatePlanningContextStopSignScenario(frame, scenario_type);
     return;
   }
 
   // TrafficLight scenario
-  // TODO(all): to be added
+  if (IsStopSignScenario(scenario_type)) {
+    UpdatePlanningContextTrafficLightScenario(frame, scenario_type);
+    return;
+  }
+}
+
+void ScenarioManager::UpdatePlanningContextStopSignScenario(
+    const Frame& frame,
+    const ScenarioConfig::ScenarioType& scenario_type) {
+  const auto& reference_line_info = frame.reference_line_info().front();
+
+  if (scenario_type != current_scenario_->scenario_type()) {
+    // set to first_encountered stop sign
+    const auto& first_encountered_overlaps =
+        reference_line_info.FirstEncounteredOverlaps();
+    hdmap::PathOverlap* stop_sign_overlap = nullptr;
+    for (const auto& overlap : first_encountered_overlaps) {
+      if (!stop_sign_overlap && overlap.first ==
+          ReferenceLineInfo::STOP_SIGN) {
+        stop_sign_overlap =
+            const_cast<hdmap::PathOverlap*>(&(overlap.second));
+        break;
+      }
+    }
+
+    if (stop_sign_overlap) {
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+          *stop_sign_overlap;
+      ADEBUG << "Update PlanningContext with first_encountered stop sign["
+          << stop_sign_overlap->object_id << "]";
+    }
+  } else {
+    // refresh current_stop_sign_overlap
+    const std::string current_stop_sign_overlap_id =
+        PlanningContext::GetScenarioInfo()
+            ->current_stop_sign_overlap.object_id;
+
+    const std::vector<PathOverlap>& stop_sign_overlaps =
+        reference_line_info.reference_line().map_path().stop_sign_overlaps();
+    auto stop_sign_overlap_itr =
+        std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
+            [&current_stop_sign_overlap_id](
+                  const hdmap::PathOverlap& overlap) {
+                return overlap.object_id == current_stop_sign_overlap_id;
+              });
+    if (stop_sign_overlap_itr != stop_sign_overlaps.end()) {
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+          *stop_sign_overlap_itr;
+      ADEBUG << "refresh PlanningContext with current stop sign["
+          << stop_sign_overlap_itr->object_id << "]";
+    }
+  }
+}
+
+void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
+    const Frame& frame,
+    const ScenarioConfig::ScenarioType& scenario_type) {
+  // TODO(all)
 }
 
 }  // namespace scenario
