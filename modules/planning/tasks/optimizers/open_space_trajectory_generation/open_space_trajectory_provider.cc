@@ -18,6 +18,9 @@
  * @file
  **/
 
+#include <string>
+#include <vector>
+
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 
 #include "cyber/task/task.h"
@@ -91,7 +94,10 @@ Status OpenSpaceTrajectoryProvider::Process(
     // Check if trajectory updated
     if (trajectory_updated_) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
-      // TODO(Jinyun) update results
+      open_space_trajectory_optimizer_->GetOptimizedTrajectory(trajectory_data);
+      open_space_trajectory_optimizer_->GetStitchingTrajectory(
+          frame_->mutable_open_space_info()
+              ->mutable_stitching_trajectory_data());
       trajectory_updated_.store(false);
       return Status::OK();
     }
@@ -125,7 +131,10 @@ Status OpenSpaceTrajectoryProvider::Process(
 
     // If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
-      // TODO(Jinyun) update results
+      open_space_trajectory_optimizer_->GetOptimizedTrajectory(trajectory_data);
+      open_space_trajectory_optimizer_->GetStitchingTrajectory(
+          frame_->mutable_open_space_info()
+              ->mutable_stitching_trajectory_data());
       return status;
     } else {
       return status;
