@@ -600,24 +600,21 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
   const auto& reference_line_info = frame.reference_line_info().front();
 
   if (scenario_type != current_scenario_->scenario_type()) {
+    PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+        PathOverlap();
+
     // set to first_encountered stop sign
     const auto& first_encountered_overlaps =
         reference_line_info.FirstEncounteredOverlaps();
-    hdmap::PathOverlap* stop_sign_overlap = nullptr;
     for (const auto& overlap : first_encountered_overlaps) {
-      if (!stop_sign_overlap && overlap.first ==
-          ReferenceLineInfo::STOP_SIGN) {
-        stop_sign_overlap =
-            const_cast<hdmap::PathOverlap*>(&(overlap.second));
+      if (overlap.first == ReferenceLineInfo::STOP_SIGN) {
+        PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+            overlap.second;
+        ADEBUG << "Update PlanningContext with first_encountered stop sign["
+            << overlap.second.object_id << "] start_s["
+            << overlap.second.start_s << "]";
         break;
       }
-    }
-
-    if (stop_sign_overlap) {
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
-          *stop_sign_overlap;
-      ADEBUG << "Update PlanningContext with first_encountered stop sign["
-          << stop_sign_overlap->object_id << "]";
     }
   } else {
     // refresh with current_stop_sign_overlap
@@ -625,6 +622,8 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
         PlanningContext::GetScenarioInfo()
             ->current_stop_sign_overlap.object_id;
 
+    PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+        PathOverlap();
     const std::vector<PathOverlap>& stop_sign_overlaps =
         reference_line_info.reference_line().map_path().stop_sign_overlaps();
     auto stop_sign_overlap_itr =
@@ -637,7 +636,8 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
       PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
           *stop_sign_overlap_itr;
       ADEBUG << "refresh PlanningContext with current stop sign["
-          << stop_sign_overlap_itr->object_id << "]";
+          << stop_sign_overlap_itr->object_id
+          << "] start_s[" << stop_sign_overlap_itr->start_s << "]";
     }
   }
 }
