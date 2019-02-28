@@ -21,7 +21,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-const size_t Sensor::kMaxCachedFrameNum = 10;
+size_t Sensor::kMaxCachedFrameNum = 10;
 
 void Sensor::QueryLatestFrames(double timestamp,
                                std::vector<SensorFramePtr>* frames) {
