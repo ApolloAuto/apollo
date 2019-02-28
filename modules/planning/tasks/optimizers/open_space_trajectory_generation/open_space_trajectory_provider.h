@@ -33,7 +33,6 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
 
  private:
   apollo::common::Status Process(
-      const common::TrajectoryPoint &init_point,
       DiscretizedTrajectory *const trajectory_data) override;
 };
 
