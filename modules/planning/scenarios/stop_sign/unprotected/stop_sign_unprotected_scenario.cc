@@ -25,8 +25,6 @@
 
 #include "cyber/common/log.h"
 
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -40,7 +38,6 @@ namespace planning {
 namespace scenario {
 namespace stop_sign {
 
-using common::TrajectoryPoint;
 using hdmap::HDMapUtil;
 using hdmap::StopSignInfo;
 using hdmap::StopSignInfoConstPtr;
