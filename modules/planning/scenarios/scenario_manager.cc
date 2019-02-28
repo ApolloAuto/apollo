@@ -251,11 +251,24 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
   return ScenarioConfig::LANE_FOLLOW;
 }
 
+/*
+ * @brief: function called by ScenarioSelfVote(),
+ *         which selects scenario based on vote from each individual scenario.
+ *         not in use now. but please do NOT delete the code yet
+ */
+ /*
 bool ScenarioManager::ReuseCurrentScenario(
     const common::TrajectoryPoint& ego_point, const Frame& frame) {
   return current_scenario_->IsTransferable(*current_scenario_, frame);
 }
+*/
 
+/*
+ * @brief: function called by ScenarioSelfVote(),
+ *         which selects scenario based on vote from each individual scenario.
+ *         not in use now. but please do NOT delete the code yet
+ */
+/*
 bool ScenarioManager::SelectScenario(
     const ScenarioConfig::ScenarioType type,
     const common::TrajectoryPoint& ego_point,
@@ -272,6 +285,7 @@ bool ScenarioManager::SelectScenario(
   }
   return false;
 }
+*/
 
 void ScenarioManager::Observe(const Frame& frame) {
   // read traffic light signal info
@@ -309,11 +323,7 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
 
   Observe(frame);
 
-  if (FLAGS_enable_scenario_dispatcher) {
-    ScenarioDispatch(ego_point, frame);
-  } else {
-    ScenarioSelfVote(ego_point, frame);
-  }
+  ScenarioDispatch(ego_point, frame);
 }
 
 void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
@@ -322,7 +332,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
 
   ////////////////////////////////////////
   // default: LANE_FOLLOW
-  ScenarioConfig::ScenarioType scenario_type = ScenarioConfig::LANE_FOLLOW;
+  ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
 
   // check current_scenario (not switchable)
   switch (current_scenario_->scenario_type()) {
@@ -359,7 +369,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
 
   ////////////////////////////////////////
   // intersection scenarios
-  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
+  if (scenario_type == default_scenario_type_) {
     const auto& reference_line_info = frame.reference_line_info().front();
     const auto& first_encountered_overlaps =
         reference_line_info.FirstEncounteredOverlaps();
@@ -410,13 +420,13 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
 
   ////////////////////////////////////////
   // CHANGE_LANE scenario
-  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
+  if (scenario_type == default_scenario_type_) {
     scenario_type = SelectChangeLaneScenario(frame);
   }
 
   ////////////////////////////////////////
   // SIDE_PASS scenario
-  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
+  if (scenario_type == default_scenario_type_) {
     scenario_type = SelectSidePassScenario(frame);
   }
 
@@ -431,6 +441,11 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   }
 }
 
+/*
+ * @brief: select scenario based on vote from each individual scenario
+ *         not in use now. but please do NOT delete the code yet
+ */
+/*
 void ScenarioManager::ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
                                        const Frame& frame) {
   CHECK(!frame.reference_line_info().empty());
@@ -533,6 +548,7 @@ void ScenarioManager::ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
     current_scenario_ = CreateScenario(default_scenario_type_);
   }
 }
+*/
 
 bool ScenarioManager::IsStopSignScenario(
     const ScenarioConfig::ScenarioType& scenario_type) {
