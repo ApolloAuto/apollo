@@ -209,6 +209,10 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
   ObstaclesContainer* obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
+  if (obstacles_container == nullptr) {
+    AERROR << "Null obstacles container found";
+    return;
+  }
   Obstacle* ego_vehicle =
       obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
   if (ego_vehicle == nullptr) {
@@ -241,6 +245,10 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane() {
   ObstaclesContainer* obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
+  if (obstacles_container == nullptr) {
+    AERROR << "Null obstacles container found";
+    return;
+  }
   ADCTrajectoryContainer* ego_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
@@ -304,6 +312,10 @@ void ObstaclesPrioritizer::AssignCautionLevelInJunction(
   ObstaclesContainer* obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
+  if (obstacles_container == nullptr) {
+    AERROR << "Null obstacles container found";
+    return;
+  }
   Obstacle* ego_vehicle =
       obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
   if (ego_vehicle == nullptr) {
