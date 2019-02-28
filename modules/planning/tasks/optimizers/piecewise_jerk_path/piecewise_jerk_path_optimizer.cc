@@ -45,6 +45,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     const common::TrajectoryPoint& init_point, PathData* const path_data) {
   const auto frenet_point =
       reference_line.GetFrenetPoint(init_point.path_point());
+
   const auto& qp_config = config_.qp_piecewise_jerk_path_config();
 
   std::vector<std::pair<double, double>> lateral_boundaries;
@@ -84,7 +85,11 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   auto start_time = std::chrono::system_clock::now();
 
   fem_1d_qp->SetZeroOrderBounds(lateral_boundaries);
-  fem_1d_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
+
+  double first_order_bounds = AdjustLateralDerivativeBounds(init_point.v(),
+      FLAGS_lateral_derivative_bound_default);
+  AERROR << "adjusted lateral bound from \t" << FLAGS_lateral_derivative_bound_default << "\t" << first_order_bounds;
+  fem_1d_qp->SetFirstOrderBounds(first_order_bounds);
   fem_1d_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
 
   bool success = fem_1d_qp->Optimize();
@@ -134,6 +139,12 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
 
   return Status::OK();
+}
+
+double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
+    const double s_dot, const double l_dot_bounds) {
+  double s = std::fmax(FLAGS_vehicle_low_speed_threshold, s_dot);
+  return l_dot_bounds / s;
 }
 
 }  // namespace planning
