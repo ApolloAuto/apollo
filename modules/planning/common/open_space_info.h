@@ -100,6 +100,15 @@ class OpenSpaceInfo {
     return &optimizer_trajectory_data_;
   }
 
+  const std::vector<common::TrajectoryPoint> &stitching_trajectory_data()
+      const {
+    return stitching_trajectory_data_;
+  }
+
+  std::vector<common::TrajectoryPoint> *mutable_stitching_trajectory_data() {
+    return &stitching_trajectory_data_;
+  }
+
  private:
   // @brief obstacles total num including perception obstacles and parking space
   // boundary
@@ -131,6 +140,8 @@ class OpenSpaceInfo {
   common::math::Vec2d origin_point_;
 
   DiscretizedTrajectory optimizer_trajectory_data_;
+
+  std::vector<common::TrajectoryPoint> stitching_trajectory_data_;
 };
 }  // namespace planning
 }  // namespace apollo
