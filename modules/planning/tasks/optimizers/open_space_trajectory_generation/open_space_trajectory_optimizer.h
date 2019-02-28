@@ -26,6 +26,7 @@
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
@@ -55,11 +56,9 @@ class OpenSpaceTrajectoryOptimizer {
     *stitching_trajectory = stitching_trajectory_;
   }
 
-  void GetOptimizedTrajectory(
-      common::Trajectory* optimized_trajectory) {
-    optimized_trajectory->Clear();
-    optimized_trajectory->mutable_trajectory_point()->CopyFrom(
-        *(optimized_trajectory_.mutable_trajectory_point()));
+  void GetOptimizedTrajectory(DiscretizedTrajectory* optimized_trajectory) {
+    optimized_trajectory->clear();
+    *optimized_trajectory = optimized_trajectory_;
   }
 
  private:
@@ -88,7 +87,7 @@ class OpenSpaceTrajectoryOptimizer {
   std::unique_ptr<DualVariableWarmStartProblem> dual_variable_warm_start_;
 
   std::vector<common::TrajectoryPoint> stitching_trajectory_;
-  common::Trajectory optimized_trajectory_;
+  DiscretizedTrajectory optimized_trajectory_;
 };
 }  // namespace planning
 }  // namespace apollo

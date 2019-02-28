@@ -245,7 +245,7 @@ void OpenSpaceTrajectoryOptimizer::PathPointDeNormalizing(
 void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
     const Eigen::MatrixXd& state_result, const Eigen::MatrixXd& control_result,
     const Eigen::MatrixXd& time_result) {
-  optimized_trajectory_.Clear();
+  optimized_trajectory_.clear();
   size_t states_size = state_result.cols();
   size_t times_size = time_result.cols();
   size_t controls_size = control_result.cols();
@@ -253,21 +253,22 @@ void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
   CHECK_EQ(states_size - 1, controls_size);
   double relative_time = 0.0;
   for (size_t i = 0; i < states_size; ++i) {
-    auto* point = optimized_trajectory_.add_trajectory_point();
-    point->mutable_path_point()->set_x(state_result(0, i));
-    point->mutable_path_point()->set_y(state_result(1, i));
-    point->mutable_path_point()->set_theta(state_result(2, i));
-    point->set_relative_time(relative_time);
+    common::TrajectoryPoint point;
+    point.mutable_path_point()->set_x(state_result(0, i));
+    point.mutable_path_point()->set_y(state_result(1, i));
+    point.mutable_path_point()->set_theta(state_result(2, i));
+    point.set_relative_time(relative_time);
     relative_time += time_result(0, i);
-    point->set_v(state_result(3, i));
+    point.set_v(state_result(3, i));
     // TODO(Jinyun) Evaluate how to set end states control input
     if (i == controls_size) {
-      point->set_steer(0.0);
-      point->set_a(0.0);
+      point.set_steer(0.0);
+      point.set_a(0.0);
     } else {
-      point->set_steer(control_result(0, i));
-      point->set_a(control_result(1, i));
+      point.set_steer(control_result(0, i));
+      point.set_a(control_result(1, i));
     }
+    optimized_trajectory_.emplace_back(point);
   }
 }
 
