@@ -24,7 +24,6 @@
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
 #include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
