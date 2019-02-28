@@ -125,40 +125,6 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
 
 bool StopSignUnprotectedScenario::IsTransferable(
     const Scenario& current_scenario, const Frame& frame) {
-  if (PlanningContext::GetScenarioInfo()
-      ->current_stop_sign_overlap.object_id.empty()) {
-    return false;
-  }
-
-  const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double stop_sign_overlap_start_s =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
-  const double adc_distance_to_stop_sign =
-      stop_sign_overlap_start_s - adc_front_edge_s;
-  ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign
-         << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s << "]";
-
-  switch (current_scenario.scenario_type()) {
-    case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
-    case ScenarioConfig::APPROACH:
-      return (adc_distance_to_stop_sign > 0 &&
-              adc_distance_to_stop_sign <=
-                  config_.stop_sign_unprotected_config()
-                      .start_stop_sign_scenario_distance());
-    case ScenarioConfig::STOP_SIGN_PROTECTED:
-      return false;
-    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      return (current_scenario.GetStatus() !=
-              Scenario::ScenarioStatus::STATUS_DONE);
-    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-    default:
-      break;
-  }
   return false;
 }
 
