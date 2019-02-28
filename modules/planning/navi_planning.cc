@@ -532,7 +532,7 @@ Status NaviPlanning::Plan(
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  // Navi Panner doesn't need to stitch the last path planning
+  // Navi Planner doesn't need to stitch the last path planning
   // trajectory.Otherwise, it will cause the Dreamview planning track to display
   // flashing or bouncing
   // TODO(Yifei): remove this if navi-planner doesn't need stitching
