@@ -14,11 +14,10 @@ This section includes:
 
 Before getting started, please make sure you have installed Ubuntu Linux 14.04.3 and the Apollo Kernel following the steps in the [Apollo core Software Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_1_0_hardware_system_installation_guide.md#installing-the-software-for-the-ipc).
 
-## *New*
+## *New - Git LFS*
 
 Now we leverage [git-lfs](https://git-lfs.github.com) to manage large files in
-Apollo. Please make sure you installed the plugin by following the guiding steps
-on its web page.
+Apollo. Please make sure you installed the plugin by following the steps on its webpage or refer to [the Migration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md) for additional information
 
 ```bash
 # Required for Ubuntu 14.04 / 16.04.
