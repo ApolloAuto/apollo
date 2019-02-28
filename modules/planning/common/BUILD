@@ -395,23 +395,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "threshold",
-    srcs = [
-        "threshold.cc",
-    ],
-    hdrs = [
-        "threshold.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        ":frame",
-        ":speed_limit",
-    ],
-)
-
 cc_test(
     name = "ego_info_test",
     size = "small",
@@ -431,7 +414,6 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "threshold",
         ":ego_info",
         ":frame",
         ":planning_gflags",
