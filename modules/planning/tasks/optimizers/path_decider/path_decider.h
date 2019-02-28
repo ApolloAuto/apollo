@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
