@@ -3,7 +3,7 @@ header:
   stamp: 
     secs: 0
     nsecs:         0
-  frame_id: ''
+  frame_id: long_camera
 height: 1080
 width: 1920
 distortion_model: plumb_bob
