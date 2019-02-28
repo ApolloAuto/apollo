@@ -41,7 +41,7 @@ constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
 constexpr double kRoadEdgeBuffer = 0.2;
 constexpr double kObstacleSBuffer = 1.0;
-constexpr double kObstacleLBuffer = 0.2;
+constexpr double kObstacleLBuffer = 0.3;
 
 PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -107,6 +107,10 @@ Status PathBoundsDecider::Process(
                                          std::get<0>(path_boundaries[0]),
                                          kPathBoundsDeciderResolution);
   reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
+  if (!path_boundaries.empty()) {
+    CHECK_LE(adc_frenet_l_, std::get<2>(path_boundaries[0]));
+    CHECK_GE(adc_frenet_l_, std::get<1>(path_boundaries[0]));
+  }
   return Status::OK();
 }
 
@@ -190,13 +194,11 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
     */
 
     double curr_left_bound =
-        std::fmin(curr_road_left_width,
-                  std::fmax(curr_lane_left_width, adc_frenet_l_ +
-                            GetBufferBetweenADCCenterAndEdge()));
+        std::fmax(curr_lane_left_width,
+                  adc_frenet_l_ + GetBufferBetweenADCCenterAndEdge() + 0.1);
     double curr_right_bound =
-        std::fmax(-curr_road_right_width,
-                  std::fmin(-curr_lane_right_width, adc_frenet_l_ -
-                            GetBufferBetweenADCCenterAndEdge()));
+        std::fmin(-curr_lane_right_width,
+                  adc_frenet_l_ - GetBufferBetweenADCCenterAndEdge() - 0.1);
     // Update the boundary.
     double dummy = 0.0;
     if (!UpdatePathBoundaryAndCenterLine(
@@ -239,7 +241,7 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
   std::unordered_map<std::string, bool> obs_id_to_sidepass_decision;
 
   // Step through every path point.
-  for (size_t i = 0; i < path_boundaries->size(); ++i) {
+  for (size_t i = 1; i < path_boundaries->size(); ++i) {
     double curr_s = std::get<0>((*path_boundaries)[i]);
     // Check and see if there is any obstacle change:
     if (obs_idx < sorted_obstacles.size() &&
