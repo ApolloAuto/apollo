@@ -54,9 +54,6 @@ class PlanningContext {
     // all traffic lights ahead, with signal info
     std::unordered_map<std::string, const apollo::perception::TrafficLight*>
         traffic_lights;
-    // intersection_map
-    std::unordered_map<std::string, const apollo::hdmap::PathOverlap*>
-        traffic_sign_pnc_junction_overlap_map;
 
     /////////////////////////
     // scenario specific info, set up by ScenarioManager::ScenarioDispatch()
@@ -71,7 +68,7 @@ class PlanningContext {
 
     ProceedWithCautionSpeedParam proceed_with_caution_speed;
     std::vector<std::string> stop_sign_wait_for_obstacles;
-    std::vector<std::string> crosswalk_wait_for_obstacles;
+
     // TODO(all): to be removed when SidePass obstacle decision impl is done
     std::string side_pass_front_blocking_obstacle_id;
   };
