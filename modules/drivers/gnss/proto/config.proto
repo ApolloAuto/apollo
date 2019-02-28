@@ -17,6 +17,9 @@ message Stream {
 
     NEWTONM2_TEXT = 30;
     NEWTONM2_BINARY = 31;
+
+    ZHD_TEXT = 40;
+    ZHD_BINARY = 41;
   }
   optional Format format = 1;
 
@@ -68,6 +71,16 @@ message NewtonM2Config {
 message UbloxConfig {
 }
 
+message ZhdConfig {
+  enum AngHead {
+    eANG_0 = 0;
+    eANG_90 = 90;
+    eANG_180 = 180;
+    eANG_270 = 270;
+    eANG_360 = 360;
+  }
+  optional float angle_heading = 1;
+}
 
 enum ImuType {
   // We currently use the following IMUs. We'll extend this list when a new IMU
@@ -124,5 +137,10 @@ message Config {
   optional string proj4_text = 12;
   optional TF tf = 13;
   // If given, the driver will send velocity info to novatel with command stream
+<<<<<<< HEAD
   optional string wheel_parameters = 14;
+=======
+  optional string wheel_parameters = 13;
+  optional ZhdConfig zhd_config = 14;
+>>>>>>> upstream/v3.1_dev
 }
