@@ -202,7 +202,7 @@ class OfflineLidarObstaclePerception {
         }
       }
       if (!WriteObjectsForNewBenchmark(i, filtered_objects,
-                                  output_path + "/" + file_name + ".pcd")) {
+          apollo::common::util::StrCat(output_path, "/", file_name, ".pcd"))) {
         return false;
       }
     }
