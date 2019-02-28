@@ -595,7 +595,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   EXPECT_EQ("11652", crosswalk_status->stop_time(0).obstacle_id());
 
   // step 2:
-  // timeout on static pesestrian
+  // timeout on static pedestrian
 
   // set PlanningStatus
   auto* crosswalk_config =
