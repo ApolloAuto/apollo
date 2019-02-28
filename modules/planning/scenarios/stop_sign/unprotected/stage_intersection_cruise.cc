@@ -23,15 +23,9 @@
 
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
 namespace planning {
@@ -39,7 +33,6 @@ namespace scenario {
 namespace stop_sign {
 
 using common::TrajectoryPoint;
-using hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
