@@ -48,14 +48,14 @@ cc_proto_library(
   name = "examples_cc_proto",
   deps = [
     ":examples_proto",
-    ],
-  )
+  ],
+)
 proto_library(
   name = "examples_proto",
   srcs = [
     "examples.proto",
-    ],
-  )
+  ],
+)
 ``` 
 
 The package definition has also changed in Cyber-RT. In Apollo ROS a fixed package `package pb_msgs;` is used for proto files, but in Cyber-RT, the proto file path `package apollo.cyber.examples.proto;` is used instead. 
