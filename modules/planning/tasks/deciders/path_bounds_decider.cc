@@ -98,8 +98,6 @@ Status PathBoundsDecider::Process(
   reference_line_info->SetPathBoundaries(path_boundaries_pair,
                                          std::get<0>(path_boundaries[0]),
                                          kPathBoundsDeciderResolution);
-
-  reference_line_info->SetReachableS(std::get<0>(path_boundaries.back()));
   return Status::OK();
 }
 
