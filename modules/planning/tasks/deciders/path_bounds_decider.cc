@@ -65,7 +65,6 @@ Status PathBoundsDecider::Process(
 
   // 1. Decide a rough boundary based on road info and ADC's position
   if (!GetBoundariesFromRoadsAndADC(reference_line_info->reference_line(),
-                                    reference_line_info->AdcSlBoundary(),
                                     &path_boundaries)) {
     const std::string msg =
         "Failed to decide a rough boundary based on "
@@ -145,7 +144,7 @@ bool PathBoundsDecider::InitPathBoundaries(
 }
 
 bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
-    const ReferenceLine& reference_line, const SLBoundary& adc_sl_boundary,
+    const ReferenceLine& reference_line, int lane_borrowing,
     std::vector<std::tuple<double, double, double>>* const path_boundaries) {
   // Sanity checks.
   CHECK_NOTNULL(path_boundaries);
@@ -155,8 +154,6 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
   // ADC's position.
   double past_lane_left_width = kDefaultLaneWidth / 2.0;
   double past_lane_right_width = kDefaultLaneWidth / 2.0;
-  double past_road_left_width = kDefaultRoadWidth / 2.0;
-  double past_road_right_width = kDefaultRoadWidth / 2.0;
   int path_blocked_idx = -1;
   for (size_t i = 0; i < path_boundaries->size(); ++i) {
     double curr_s = std::get<0>((*path_boundaries)[i]);
@@ -172,29 +169,8 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
       past_lane_left_width = curr_lane_left_width;
       past_lane_right_width = curr_lane_right_width;
     }
-    // Get the road width at current point.
-    double curr_road_left_width = 0.0;
-    double curr_road_right_width = 0.0;
-    if (!reference_line.GetRoadWidth(curr_s, &curr_road_left_width,
-                                     &curr_road_right_width)) {
-      AWARN << "Failed to get road width at s = " << curr_s;
-      curr_road_left_width = past_road_left_width;
-      curr_road_right_width = past_road_right_width;
-    } else {
-      past_road_left_width = curr_road_left_width;
-      past_road_right_width = curr_road_right_width;
-    }
     // Calculate the proper boundary based on lane-width, road-width, and
     // ADC's position.
-    /*
-    ADEBUG << "At s = " << std::get<0>((*path_boundaries)[i])
-           << ", lane_left_W = " << curr_lane_left_width
-           << ", lane_right_W = " << curr_lane_right_width
-           << ", road_left_W = " << curr_road_left_width
-           << ", road_right_W = " << curr_road_right_width
-           << ", ADC W = " << GetBufferBetweenADCCenterAndEdge();
-    */
-
     double curr_left_bound =
         std::fmax(curr_lane_left_width,
                   adc_frenet_l_ + GetBufferBetweenADCCenterAndEdge() + 0.1);
@@ -413,6 +389,30 @@ PathBoundsDecider::SortObstaclesForSweepLine(
   return sorted_obstacles;
 }
 
+// return value: LEFT -> true; RIGHT -> false.
+bool PathBoundsDecider::GetOptimalSidepassDirection(
+    double ADC_center_line, double obstacle_center_line) {
+  return (obstacle_center_line < ADC_center_line);
+}
+
+std::pair<double, double> PathBoundsDecider::GetPathBoundAtS(
+    const std::vector<std::tuple<double, double, double>>* path_boundaries,
+    const double& s) {
+  // Sanity check.
+  if (path_boundaries->empty()) {
+    return std::make_pair(0.0, 0.0);
+  }
+
+  int idx = (int)((s - std::get<0>((*path_boundaries)[0])) /
+            kPathBoundsDeciderResolution);
+  idx = std::min(idx, path_boundaries->size() - 1);
+  return std::make_pair(
+      std::get<1>((*path_boundaries)[idx]),
+      std::get<2>((*path_boundaries)[idx]));
+}
+
+
+
 size_t PathBoundsDecider::ConstructSubsequentPathBounds(
     const std::vector<std::tuple<int, double, double, double, std::string>>&
     sorted_obstacles, size_t path_idx, size_t obs_idx,
@@ -464,7 +464,6 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
 
   //==============================================================
   // If there is obstacle entering
-
 
 
   //==============================================================
@@ -603,6 +602,74 @@ void PathBoundsDecider::PathBoundsDebugString(
            << "; l_max = " << std::get<2>(path_boundaries[i]);
   }
 }
+
+
+/*
+void PathBoundsDecider::SearchFeasibleSidepassDirections(
+    const std::vector<std::tuple<int, double, double, double, std::string>>&
+    sorted_obstacles, double s_max,
+    const std::vector<std::tuple<double, double, double>>* path_boundaries, 
+    size_t idx,
+    std::unordered_map<std::string, double>
+    std::vector<bool>* const curr_sidepass_directions,
+    std::vector<std::vector<bool>>* const final_sidepass_directions) {
+  // If already exhausted all available obstacles, exit.
+  if (idx >= sorted_obstacles.size()) {
+    final_sidepass_directions->push_back(*curr_sidepass_directions);
+    return;
+  }
+
+  // If the next obstacle is out of scope, exit.
+  if (std::get<1>(sorted_obstacles[idx]) > s_max) {
+    final_sidepass_directions->push_back(*curr_sidepass_directions);
+    return;
+  }
+
+  // If the next obstacle is a leaving obstacle.
+  if (std::get<0>(sorted_obstacles[idx]) == 0) {
+    // TODO(jiacheng): implement this part.
+    return;
+  }
+
+  // For the next entering obstacle:
+  // 0. Some preprocessing.
+  double obs_s = std::get<1>(sorted_obstacles[idx]);
+  double obs_l_min = std::get<2>(sorted_obstacles[idx]);
+  double obs_l_max = std::get<3>(sorted_obstacles[idx]);
+  std::string obs_id = std::get<4>(sorted_obstacles[idx]);
+  // 1. Determine an optimal direction to sidepass.
+  bool sidepass_direction = GetOptimalSidepassDirection(
+      0.0, 0.0);
+  // 2. Try optimal direction first. If fail, try the other one.
+  for (int i = 0; i < 2; ++i) {
+    // a. Get the current boundary due to road:
+    double left_road_bound = GetPathBoundAtS(path_boundaries, obs_s).second;
+    left_road_bound = std::max(
+        left_road_bound, left_road_bound + *borrowed_lane_width);
+    double right_road_bound = GetPathBoundAtS(path_boundaries, obs_s).first;
+    right_road_bound = std::min(
+        right_road_bound, right_road_bound + *borrowed_lane_width);
+    // b. Get the current boundary due to this obstacle:
+    double left_obs_bound = sidepass_direction ?
+        std::numeric_limits<double>::max() : obs_l_min;
+    left_obs_bound -= GetBufferBetweenADCCenterAndEdge();
+    double right_obs_bound = sidepass_direction ?
+        obs_l_max : std::numeric_limits<double>::lowest();
+    right_obs_bound += GetBufferBetweenADCCenterAndEdge();
+    // c. Get the total left/right bounds; check if lane-borrowing is needed.
+    bool is_blocked = (
+        std::min(left_road_bound, left_obs_bound) <
+        std::max(right_road_bound, right_obs_bound));
+    if (is_blocked && *borrowed_lane_width == 0) {
+      // Do side-pass lane-borrowing.
+    } else {
+      // Stop here.
+    }
+
+    sidepass_direction = !sidepass_direction;
+  }
+}
+*/
 
 }  // namespace planning
 }  // namespace apollo
