@@ -94,7 +94,16 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
   *work = osqp_setup(data, settings);
 
   // Solve Problem
-  osqp_solve(*work);
+  auto exit_flag = osqp_solve(*work);
+
+  // TODO(all): this is a bug in osqp solver.
+  // It will return 0 no matter what the optimization result is.
+  if (exit_flag != 0) {
+    /**
+    AERROR << "failed optimization exit flag:\t" << exit_flag;
+    return false;
+    **/
+  }
   return true;
 }
 
@@ -213,11 +222,18 @@ bool Fem1dQpProblem::Optimize() {
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
   OSQPWorkspace* work = nullptr;
 
-  OptimizeWithOsqp(3 * num_of_knots_, lower_bounds.size(), P_data, P_indices,
+  bool res = OptimizeWithOsqp(3 * num_of_knots_, lower_bounds.size(), P_data, P_indices,
                    P_indptr, A_data, A_indices, A_indptr, lower_bounds,
                    upper_bounds, q, data, &work, settings);
-  if (work == nullptr || work->solution == nullptr) {
-    AERROR << "Failed to find QP solution.";
+  if (res == false || work == nullptr || work->solution == nullptr) {
+    AERROR << "Failed to find solution.";
+    // Cleanup
+    osqp_cleanup(work);
+    c_free(data->A);
+    c_free(data->P);
+    c_free(data);
+    c_free(settings);
+
     return false;
   }
 

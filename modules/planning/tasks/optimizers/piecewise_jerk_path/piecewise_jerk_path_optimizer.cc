@@ -55,15 +55,19 @@ common::Status PiecewiseJerkPathOptimizer::Process(
                                           &delta_s);
 
   if (lateral_boundaries.size() < 2) {
+    AERROR << "lateral boundary size < 2";
     return Status(ErrorCode::PLANNING_ERROR, "invalid lateral bounds provided");
   }
 
+  // TODO(all): clean this debug messages after the branch is stable
   /**
   AERROR << "Init point:";
   AERROR << "\tl:\t" << frenet_point.l();
   AERROR << "\tdl:\t" << frenet_point.dl();
   AERROR << "\tddl:\t" << frenet_point.ddl();
+  **/
 
+  /**
   AERROR << "Weights:";
   AERROR << "\tl:\t" << piecewise_jerk_path_config.l_weight();
   AERROR << "\tdl:\t" << piecewise_jerk_path_config.dl_weight();
@@ -117,9 +121,21 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   const auto& dx = fem_1d_qp->x_derivative();
   const auto& ddx = fem_1d_qp->x_second_order_derivative();
 
-  CHECK(!x.empty());
-  CHECK(!dx.empty());
-  CHECK(!ddx.empty());
+  CHECK(!x.empty() && x.size() == num_of_points);
+  CHECK(!dx.empty() && dx.size() == num_of_points);
+  CHECK(!ddx.empty() && ddx.size() == num_of_points);
+
+  // TODO(all): an ad-hoc check for path feasibility since osqp
+  //            cannot return the correct status
+  for (std::size_t i = 0; i < num_of_points; ++i) {
+    if (x[i] < lateral_boundaries[i].first ||
+        x[i] > lateral_boundaries[i].second) {
+      AERROR << "piecewise jerk path optimizer finds a infeasible solution";
+      return Status(ErrorCode::PLANNING_ERROR,
+          "piecewise jerk path optimizer failed");
+    }
+  }
+
   PiecewiseJerkTrajectory1d piecewise_jerk_traj(x.front(),
       dx.front(), ddx.front());
 
