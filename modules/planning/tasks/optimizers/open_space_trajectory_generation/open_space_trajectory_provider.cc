@@ -58,8 +58,9 @@ void OpenSpaceTrajectoryProvider::Stop() {
   }
 }
 
-Status OpenSpaceTrajectoryProvider::Process(
-    DiscretizedTrajectory* const trajectory_data) {
+Status OpenSpaceTrajectoryProvider::Process() {
+  auto trajectory_data =
+      frame_->mutable_open_space_info()->mutable_stitched_trajectory_result();
   // Start thread when getting in Process() for the first time
   if (FLAGS_enable_open_space_planner_thread && !thread_init_flag_) {
     task_future_ = cyber::Async(

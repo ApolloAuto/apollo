@@ -54,8 +54,7 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
   void Stop();
 
  private:
-  apollo::common::Status Process(
-      DiscretizedTrajectory* const trajectory_data) override;
+  apollo::common::Status Process() override;
 
   void GenerateTrajectoryThread();
 
