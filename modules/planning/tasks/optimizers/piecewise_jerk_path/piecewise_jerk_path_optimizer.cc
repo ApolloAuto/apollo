@@ -125,17 +125,6 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   CHECK(!dx.empty() && dx.size() == num_of_points);
   CHECK(!ddx.empty() && ddx.size() == num_of_points);
 
-  // TODO(all): an ad-hoc check for path feasibility since osqp
-  //            cannot return the correct status
-  for (std::size_t i = 0; i < num_of_points; ++i) {
-    if (x[i] < lateral_boundaries[i].first ||
-        x[i] > lateral_boundaries[i].second) {
-      AERROR << "piecewise jerk path optimizer finds a infeasible solution";
-      return Status(ErrorCode::PLANNING_ERROR,
-          "piecewise jerk path optimizer failed");
-    }
-  }
-
   PiecewiseJerkTrajectory1d piecewise_jerk_traj(x.front(),
       dx.front(), ddx.front());
 
