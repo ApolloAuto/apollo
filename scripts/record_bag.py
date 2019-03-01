@@ -99,8 +99,8 @@ LARGE_TOPICS = [
     '/apollo/sensor/camera/traffic/image_short/compressed',
     '/apollo/sensor/radar/front',
     '/apollo/sensor/radar/rear',
-    '/apollo/sensor/lidar16/front/up/PointCloud2'
     '/apollo/sensor/lidar16/front/center/PointCloud2',
+    '/apollo/sensor/lidar16/front/up/PointCloud2',
     '/apollo/sensor/lidar16/rear/left/PointCloud2',
     '/apollo/sensor/lidar16/rear/right/PointCloud2',
     '/apollo/sensor/lidar16/fusion/PointCloud2',
