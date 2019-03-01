@@ -164,7 +164,7 @@ class Frame {
 
   ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
 
-  const OpenSpaceInfo &open_space_info() { return *open_space_info_; }
+  const OpenSpaceInfo &open_space_info() const { return *open_space_info_; }
 
   OpenSpaceInfo *mutable_open_space_info() { return open_space_info_.get(); }
 

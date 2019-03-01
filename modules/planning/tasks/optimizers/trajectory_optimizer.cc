@@ -31,7 +31,7 @@ TrajectoryOptimizer::TrajectoryOptimizer(const TaskConfig& config)
 Status TrajectoryOptimizer::Execute(Frame* frame) {
   Task::Execute(frame);
   auto ret = Process(
-      frame->mutable_open_space_info()->mutable_optimizer_trajectory_data());
+      frame->mutable_open_space_info()->mutable_stitched_trajectory_result());
   return ret;
 }
 
