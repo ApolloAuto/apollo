@@ -65,7 +65,7 @@ class PathBoundsDecider : public Decider {
   SortObstaclesForSweepLine(
       const IndexedList<std::string, Obstacle>& indexed_obstacles);
 
-  size_t ConstructSubsequentPathBounds(
+  int ConstructSubsequentPathBounds(
       const std::vector<std::tuple<int, double, double, double, std::string>>&
       sorted_obstacles,
       size_t path_idx, size_t obs_idx,
@@ -75,7 +75,7 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const final_path_bounds);
 
   std::vector<std::vector<bool>> DecidePassDirections(
-      const std::vector<std::tuple<int, double, double, double, std::string>>&
+      std::vector<std::tuple<int, double, double, double, std::string>>* const
       new_entering_obstacles);
 
   /**
