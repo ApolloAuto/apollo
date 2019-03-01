@@ -64,7 +64,7 @@ class LaneFollowStage : public Stage {
   void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
                        const std::string& name, const double time_diff_ms);
 
-  bool IsClearToChangeLane (
+  bool IsClearToChangeLane(
       const ReferenceLineInfo& reference_line_info,
       Frame* frame,
       const double ego_v);

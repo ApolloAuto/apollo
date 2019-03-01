@@ -29,6 +29,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
+#define ADEBUG AERROR
+
 namespace apollo {
 namespace planning {
 
@@ -135,17 +137,6 @@ bool PathBoundsDecider::InitPathBoundaries(
       reference_line.GetFrenetPoint(planning_start_point.path_point());
   adc_frenet_s_ = adc_frenet_position.s();
   adc_frenet_l_ = adc_frenet_position.l();
-  // ADC's lane info.
-  hdmap::LaneInfoConstPtr lane;
-  if (!GetLaneInfoFromPoint(planning_start_point.path_point().x(),
-                            planning_start_point.path_point().y(),
-                            planning_start_point.path_point().z(),
-                            planning_start_point.path_point().theta(),
-                            &lane)) {
-    ADEBUG << "Failed to get the lane info for the planning start point.";
-    return false;
-  }
-  adc_lane_info_ = lane;
   // ADC's lane width.
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
@@ -513,9 +504,9 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
       std::get<1>(sorted_obstacles[obs_idx]) > curr_s) {
     for (auto it = obs_id_to_details->begin();
          it != obs_id_to_details->end(); ++it) {
-      if(std::get<0>(it->second)) {
+      if (std::get<0>(it->second)) {
         // Pass from left.
-        right_bounds_from_obstacles = 
+        right_bounds_from_obstacles =
             std::max(right_bounds_from_obstacles, std::get<1>(it->second));
       } else {
         // Pass from right.
@@ -545,7 +536,7 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
   // 0. Backup the old memory.
   std::unordered_map<std::string, std::tuple<bool, double>>
   old_obs_id_to_details = *obs_id_to_details;
-  // 1. Go through all obstacle changes. 
+  // 1. Go through all obstacle changes.
   //    - For exiting obstacle, remove from our memory.
   //    - For entering obstalce, save it to a vector.
   std::vector<std::tuple<int, double, double, double, std::string>>
@@ -570,10 +561,10 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
   int best_ret_val = static_cast<int>(path_idx);
   std::vector<std::tuple<double, double, double>> best_final_path_bounds =
       *curr_path_bounds;
-  for(size_t i = 0; i < pass_direction_decisions.size(); ++i) {
+  for (size_t i = 0; i < pass_direction_decisions.size(); ++i) {
     // For each possible direction:
     // a. Update the obs_id_to_details
-    for(size_t j = 0; j < pass_direction_decisions[i].size(); ++j) {
+    for (size_t j = 0; j < pass_direction_decisions[i].size(); ++j) {
       if (pass_direction_decisions[i][j]) {
         // Pass from left.
         (*obs_id_to_details)[std::get<4>(new_entering_obstacles[j])] =
@@ -587,9 +578,9 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
     // b. Figure out left/right bounds after the updates.
     for (auto it = obs_id_to_details->begin();
          it != obs_id_to_details->end(); ++it) {
-      if(std::get<0>(it->second)) {
+      if (std::get<0>(it->second)) {
         // Pass from left.
-        right_bounds_from_obstacles = 
+        right_bounds_from_obstacles =
             std::max(right_bounds_from_obstacles, std::get<1>(it->second));
       } else {
         // Pass from right.

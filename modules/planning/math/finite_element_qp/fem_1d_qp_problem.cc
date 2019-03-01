@@ -222,9 +222,9 @@ bool Fem1dQpProblem::Optimize() {
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
   OSQPWorkspace* work = nullptr;
 
-  bool res = OptimizeWithOsqp(3 * num_of_knots_, lower_bounds.size(), P_data, P_indices,
-                   P_indptr, A_data, A_indices, A_indptr, lower_bounds,
-                   upper_bounds, q, data, &work, settings);
+  bool res = OptimizeWithOsqp(3 * num_of_knots_, lower_bounds.size(),
+                   P_data, P_indices, P_indptr, A_data, A_indices, A_indptr,
+                   lower_bounds, upper_bounds, q, data, &work, settings);
   if (res == false || work == nullptr || work->solution == nullptr) {
     AERROR << "Failed to find solution.";
     // Cleanup
