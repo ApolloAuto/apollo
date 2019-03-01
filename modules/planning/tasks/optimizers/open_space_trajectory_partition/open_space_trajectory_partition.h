@@ -18,12 +18,23 @@
  * @file
  **/
 
-#pragma
+#pragma once
 
 #include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
 
+#include "modules/common/status/status.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
+
 namespace apollo {
 namespace planning {
-class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {}
+class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
+ public:
+  explicit OpenSpaceTrajectoryPartition(const TaskConfig& config);
+  ~OpenSpaceTrajectoryPartition() = default;
+
+ private:
+  apollo::common::Status Process(
+      DiscretizedTrajectory* const trajectory_data) override;
+};
 }  // namespace planning
 }  // namespace apollo
