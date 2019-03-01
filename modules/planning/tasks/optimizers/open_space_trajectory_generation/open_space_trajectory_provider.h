@@ -60,8 +60,15 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
                                 double rotate_angle,
                                 const Vec2d& translate_origin);
 
+  void GenerateStopTrajectory(DiscretizedTrajectory* const trajectory_data);
+
+  void LoadResult(DiscretizedTrajectory* const trajectory_data);
+
+  void ReuseLastFrameResult(const Frame* last_frame,
+                            DiscretizedTrajectory* const trajectory_data);
+
  private:
-  thread_init_flag_ = false;
+  bool thread_init_flag_ = false;
 
   std::unique_ptr<OpenSpaceTrajectoryOptimizer>
       open_space_trajectory_optimizer_;
