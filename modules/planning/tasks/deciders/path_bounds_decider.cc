@@ -74,7 +74,7 @@ Status PathBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  // PathBoundsDebugString(path_boundaries);
+  PathBoundsDebugString(path_boundaries);
 
   // 2. Fine-tune the boundary based on static obstacles
   // TODO(all): in the future, add side-pass functionality.
@@ -87,7 +87,7 @@ Status PathBoundsDecider::Process(
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  // PathBoundsDebugString(path_boundaries);
+  PathBoundsDebugString(path_boundaries);
 
   // 3. Adjust the boundary considering dynamic obstacles
   // TODO(all): may need to implement this in the future.
@@ -492,11 +492,12 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
     sorted_obstacles,
     size_t path_idx, size_t obs_idx,
     std::unordered_map<std::string, std::tuple<bool, double>>*
-    const obs_id_to_details;
+    const obs_id_to_details,
     std::vector<std::tuple<double, double, double>>* const curr_path_bounds,
     std::vector<std::tuple<double, double, double>>* const final_path_bounds) {
   double left_bounds_from_obstacles = std::numeric_limits<double>::max();
   double right_bounds_from_obstacles = std::numeric_limits<double>::lowest();
+  double curr_s = std::get<0>((*curr_path_bounds)[path_idx]);
   //==============================================================
   // If searched through all available s and found a path, return.
   if (path_idx >= curr_path_bounds->size()) {
@@ -509,8 +510,8 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
   // If there is no obstacle updates at this path_idx.
   if (obs_idx >= sorted_obstacles.size() ||
       std::get<1>(sorted_obstacles[obs_idx]) > curr_s) {
-    for (auto it = obs_id_to_details.begin();
-         it != obs_id_to_details.end(); ++it) {
+    for (auto it = obs_id_to_details->begin();
+         it != obs_id_to_details->end(); ++it) {
       if(std::get<0>(it->second)) {
         // Pass from left.
         right_bounds_from_obstacles = 
@@ -545,11 +546,11 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
   old_obs_id_to_details = *obs_id_to_details;
   std::vector<std::tuple<int, double, double, double, std::string>>
   new_entering_obstacles;
-  double new_obs_idx = obs_idx;
+  size_t new_obs_idx = obs_idx;
   while (new_obs_idx < sorted_obstacles.size() &&
-         std::get<1>(sorted_obstacles[new_obs_idx] <= curr_s)) {
+         std::get<1>(sorted_obstacles[new_obs_idx]) <= curr_s) {
     if (!std::get<0>(sorted_obstacles[new_obs_idx])) {
-      obs_id_to_details.erase(std::get<4>(sorted_obstacles[new_obs_idx]));
+      obs_id_to_details->erase(std::get<4>(sorted_obstacles[new_obs_idx]));
     } else {
       new_entering_obstacles.push_back(sorted_obstacles[new_obs_idx]);
     }
@@ -558,7 +559,7 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
   auto pass_direction_decisions =
       DecidePassDirections(new_entering_obstacles);
 
-
+  // The following part needs to be re-written.
   size_t ret_val = 0;
   for(size_t i = 0; i < 1; ++i) {
     // For now, only try one optimal direction.
@@ -577,14 +578,17 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
     ret_val = ConstructSubsequentPathBounds(
         sorted_obstacles, path_idx + 1, new_obs_idx,
         obs_id_to_details, curr_path_bounds, final_path_bounds);
+    return ret_val;
   }
   ////////////////////////////////////////////////////
+  return 0;
 }
 
 std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
     const std::vector<std::tuple<int, double, double, double, std::string>>&
     new_entering_obstacles) {
-
+  std::vector<std::vector<bool>> decision;
+  return decision;
 }
 
 bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
@@ -642,7 +646,7 @@ void PathBoundsDecider::PathBoundsDebugString(
 
 
 
-
+/*
 size_t PathBoundsDecider::ConstructSubsequentPathBounds(
     const std::vector<std::tuple<int, double, double, double, std::string>>&
     sorted_obstacles, size_t path_idx, size_t obs_idx,
@@ -782,7 +786,7 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
 }
 
 
-/*
+
 // return value: LEFT -> true; RIGHT -> false.
 bool PathBoundsDecider::GetOptimalSidepassDirection(
     double ADC_center_line, double obstacle_center_line) {
