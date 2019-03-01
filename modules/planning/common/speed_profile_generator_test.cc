@@ -29,7 +29,7 @@ namespace apollo {
 namespace planning {
 
 TEST(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
-  auto speed_data = SpeedProfileGenerator::GenerateFallbackSpeedProfile(100.0);
+  auto speed_data = SpeedProfileGenerator::GenerateFallbackSpeedProfile();
   EXPECT_FALSE(speed_data.empty());
 
   common::TrajectoryPoint adc_planning_point;
@@ -38,7 +38,7 @@ TEST(SpeedProfileGeneratorTest, GenerateFallbackSpeedProfile) {
   common::VehicleState vs;
 
   EgoInfo::Instance()->Update(adc_planning_point, vs);
-  auto speed_data2 = SpeedProfileGenerator::GenerateFallbackSpeedProfile(100.0);
+  auto speed_data2 = SpeedProfileGenerator::GenerateFallbackSpeedProfile();
   EXPECT_FALSE(speed_data2.empty());
 }
 
