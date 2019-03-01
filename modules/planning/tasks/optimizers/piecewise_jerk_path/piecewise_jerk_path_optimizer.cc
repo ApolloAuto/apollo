@@ -54,19 +54,11 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   reference_line_info_->GetPathBoundaries(&lateral_boundaries, &start_s,
                                           &delta_s);
 
-//  for (auto& b : lateral_boundaries) {
-//    b.first -= 2.5;
-//    b.second += 2.5;
-////    if (b.first > frenet_point.l()) {
-////      b.first = frenet_point.l() - 0.1;
-////    }
-////    if (b.second < frenet_point.l()) {
-////      b.second = frenet_point.l() + 0.1;
-////    }
-////    b.first = std::min(b.first, frenet_point.l() + frenet_point.dl() * delta_s);
-////    b.second = std::max(b.second, frenet_point.l() + frenet_point.dl() * delta_s);
-//  }
+  if (lateral_boundaries.size() < 2) {
+    return Status(ErrorCode::PLANNING_ERROR, "invalid lateral bounds provided");
+  }
 
+  /**
   AERROR << "Init point:";
   AERROR << "\tl:\t" << frenet_point.l();
   AERROR << "\tdl:\t" << frenet_point.dl();
@@ -77,6 +69,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   AERROR << "\tdl:\t" << piecewise_jerk_path_config.dl_weight();
   AERROR << "\tddl:\t" << piecewise_jerk_path_config.ddl_weight();
   AERROR << "\tdddl:\t" << piecewise_jerk_path_config.dddl_weight();
+  **/
 
   auto num_of_points = lateral_boundaries.size();
 
