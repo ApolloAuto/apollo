@@ -674,10 +674,10 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
   int best_ret_val = static_cast<int>(path_idx);
   std::vector<std::tuple<double, double, double>> best_final_path_bounds =
       *curr_path_bounds;
-  for (size_t i = 0; i < pass_direction_decisions.size(); ++i) {
+  for(size_t i = 0; i < pass_direction_decisions.size(); ++i) {
     // For each possible direction:
     // a. Update the obs_id_to_details
-    for (size_t j = 0; j < pass_direction_decisions[i].size(); ++j) {
+    for(size_t j = 0; j < pass_direction_decisions[i].size(); ++j) {
       if (pass_direction_decisions[i][j]) {
         // Pass from left.
         (*obs_id_to_details)[std::get<4>(new_entering_obstacles[j])] =
@@ -691,9 +691,9 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
     // b. Figure out left/right bounds after the updates.
     for (auto it = obs_id_to_details->begin();
          it != obs_id_to_details->end(); ++it) {
-      if (std::get<0>(it->second)) {
+      if(std::get<0>(it->second)) {
         // Pass from left.
-        right_bounds_from_obstacles =
+        right_bounds_from_obstacles = 
             std::max(right_bounds_from_obstacles, std::get<1>(it->second));
       } else {
         // Pass from right.
