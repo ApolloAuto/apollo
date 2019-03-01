@@ -47,13 +47,17 @@ class PathBoundsDecider : public Decider {
       const common::TrajectoryPoint& planning_start_point,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
-  bool GetBoundariesFromRoadsAndADC(
+  bool GetBoundariesFromLanesAndADC(
       const ReferenceLine& reference_line,  int lane_borrowing,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundariesFromStaticObstacles(
       PathDecision* const path_decision,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
+
+  bool GetLaneInfoFromPoint(
+      double point_x, double point_y, double point_z, double point_theta,
+      hdmap::LaneInfoConstPtr *const lane);
 
   double GetBufferBetweenADCCenterAndEdge();
 
@@ -98,6 +102,8 @@ class PathBoundsDecider : public Decider {
   std::string blocking_obstacle_id_ = "";
   double adc_frenet_s_ = 0.0;
   double adc_frenet_l_ = 0.0;
+  double adc_lane_width_ = 0.0;
+  hdmap::LaneInfoConstPtr adc_lane_info_;
 };
 
 }  // namespace planning
