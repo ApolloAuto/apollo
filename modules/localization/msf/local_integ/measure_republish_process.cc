@@ -15,14 +15,11 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_integ/measure_republish_process.h"
-
 #include <ros/ros.h>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-
 #include "yaml-cpp/yaml.h"
-
 #include "modules/common/log.h"
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/time/time_util.h"
@@ -59,17 +56,17 @@ Status MeasureRepublishProcess::Init(const LocalizationIntegParam& params) {
   novatel_heading_time_ = 0.0;
 
   std::ifstream imu_ant_fin(params.ant_imu_leverarm_file.c_str());
-  std::cout << "the ant_imu_leverarm file: "
+  AINFO << "the ant_imu_leverarm file: "
             << params.ant_imu_leverarm_file.c_str() << std::endl;
   if (imu_ant_fin) {
     bool success = LoadImuGnssAntennaExtrinsic(params.ant_imu_leverarm_file,
                                                &imu_gnssant_extrinsic_);
     if (!success) {
-      LOG(ERROR) << "IntegratedLocalization: Fail to access the lever arm "
+      AERROR << "IntegratedLocalization: Fail to access the lever arm "
                     "between imu and gnss extrinsic file: "
                  << params.ant_imu_leverarm_file;
     }
-    LOG(INFO) << "gnss and imu lever arm in vehicle frame: "
+    AINFO << "gnss and imu lever arm in vehicle frame: "
               << " " << imu_gnssant_extrinsic_.ant_num << " "
               << imu_gnssant_extrinsic_.transform_1.translation()[0] << " "
               << imu_gnssant_extrinsic_.transform_1.translation()[1] << " "
@@ -78,7 +75,7 @@ Status MeasureRepublishProcess::Init(const LocalizationIntegParam& params) {
               << imu_gnssant_extrinsic_.transform_2.translation()[1] << " "
               << imu_gnssant_extrinsic_.transform_2.translation()[2];
   } else {
-    LOG(INFO) << "the ant_imu_leverarm_file does not existence!";
+    AINFO << "the ant_imu_leverarm_file does not existence!";
   }
 
   double vehicle_to_imu_quatern[4] = {
@@ -115,7 +112,7 @@ Status MeasureRepublishProcess::Init(const LocalizationIntegParam& params) {
       dcm[2][0] * lever_arm_x + dcm[2][1] * lever_arm_y +
       dcm[2][2] * lever_arm_z;
 
-  LOG(INFO) << "gnss and imu lever arm in imu frame: "
+  AINFO << "gnss and imu lever arm in imu frame: "
             << " " << imu_gnssant_extrinsic_.ant_num << " "
             << imu_gnssant_extrinsic_.transform_1.translation()[0] << " "
             << imu_gnssant_extrinsic_.transform_1.translation()[1] << " "
@@ -179,10 +176,10 @@ bool MeasureRepublishProcess::NovatelBestgnssposProcess(
         novatel_heading_mutex_.lock();
         novatel_heading_time = novatel_heading_time_;
         novatel_heading_mutex_.unlock();
-        LOG(INFO) << "wait new heading data!";
+        AINFO << "wait new heading data!";
 
         if (ros::Time::now().toSec() - 0.3 > time_before_wait) {
-          LOG(INFO) << "the time of wait wheelspeed_data is too long!";
+          AINFO << "the time of wait wheelspeed_data is too long!";
           break;
         }
       }
@@ -607,18 +604,18 @@ bool MeasureRepublishProcess::GnssHeadingProcess(
   }
   int solution_status = heading_msg.solution_status();
   int position_type = heading_msg.position_type();
-  LOG(INFO) << "the heading solution_status and position_type: "
+  AINFO << "the heading solution_status and position_type: "
             << solution_status << " " << position_type;
 
   if (solution_status != 0) {
     *status = 93;
-    LOG(INFO) << "the heading's solution_status is not computed: "
+    AINFO << "the heading's solution_status is not computed: "
               << solution_status;
     return false;
   }
   *status = position_type;
   if ((position_type == 0) || (position_type == 1)) {
-    LOG(INFO) << "the heading's solution_type is invalid or fixed: "
+    AINFO << "the heading's solution_type is invalid or fixed: "
               << position_type;
     return false;
   }
@@ -639,7 +636,7 @@ bool MeasureRepublishProcess::GnssHeadingProcess(
   height_mutex_.unlock();
 
   if (delta_time_between_height < 1.0) {
-    LOG(INFO) << "the heading time and delta time: " << std::setprecision(15)
+    AINFO << "the heading time and delta time: " << std::setprecision(15)
               << measure_data->time << " " << delta_time_between_height;
     return false;
   }
@@ -668,15 +665,15 @@ bool MeasureRepublishProcess::GnssHeadingProcess(
                imu_gnssant_extrinsic_.transform_2.translation()[1] -
                    imu_gnssant_extrinsic_.transform_1.translation()[1]) *
         57.295779513082323;
-    LOG(INFO) << "imu_gnssant_extrinsic_: "
+    AINFO << "imu_gnssant_extrinsic_: "
               << imu_gnssant_extrinsic_.transform_2.translation()[0] << ", "
               << imu_gnssant_extrinsic_.transform_1.translation()[0] << ", "
               << imu_gnssant_extrinsic_.transform_2.translation()[1] << ", "
               << imu_gnssant_extrinsic_.transform_2.translation()[1];
-    LOG(INFO) << "the yaw between double ant yaw and vehicle: "
+    AINFO << "the yaw between double ant yaw and vehicle: "
               << imu_ant_yaw_angle;
   }
-  LOG(INFO) << "novatel heading is: " << std::setprecision(15)
+  AINFO << "novatel heading is: " << std::setprecision(15)
             << measure_data->time << " " << std::setprecision(6) << gnss_yaw;
   if (gnss_yaw > 180) {
     // the novatel yaw angle is 0-360deg
@@ -690,13 +687,13 @@ bool MeasureRepublishProcess::GnssHeadingProcess(
   measure_data->measure_type = MeasureType::GNSS_DOUBLE_ANT_YAW;
   measure_data->is_have_variance = true;
   // 3.046174197867086e-04 = (pi / 180)^2
-  LOG(INFO) << "the novatel heading std: " << std::setprecision(15)
+  AINFO << "the novatel heading std: " << std::setprecision(15)
             << measure_data->time << " " << heading_std;
   measure_data->variance[8][8] =
       heading_std * heading_std * 3.046174197867086e-04;
   measure_data->gnss_att.yaw = -gnss_yaw * 0.017453292519943;
 
-  LOG(INFO) << "measure data heading is: " << std::setprecision(15)
+  AINFO << "measure data heading is: " << std::setprecision(15)
             << measure_data->time << " " << std::setprecision(6)
             << measure_data->gnss_att.yaw;
 

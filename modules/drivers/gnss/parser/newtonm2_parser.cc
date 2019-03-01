@@ -25,7 +25,6 @@
 #include <vector>
 #include "ros/include/ros/ros.h"
 #include "modules/common/log.h"
-//#include "modules/drivers/gnss/parser/novatel_messages.h"
 #include "modules/drivers/gnss/parser/newtonm2_messages.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm_decode.h"
