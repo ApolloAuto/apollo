@@ -46,7 +46,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   const auto frenet_point =
       reference_line.GetFrenetPoint(init_point.path_point());
 
-  const auto& qp_config = config_.qp_piecewise_jerk_path_config();
+  const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
 
   std::vector<std::pair<double, double>> lateral_boundaries;
   double start_s = 0.0;
@@ -54,24 +54,37 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   reference_line_info_->GetPathBoundaries(&lateral_boundaries, &start_s,
                                           &delta_s);
 
-  /**
-  for (auto& b : lateral_boundaries) {
-    if (b.first > frenet_point.l()) {
-      b.first = frenet_point.l() - 0.1;
-    }
-    if (b.second < frenet_point.l()) {
-      b.second = frenet_point.l() + 0.1;
-    }
-  }
-  **/
+//  for (auto& b : lateral_boundaries) {
+//    b.first -= 2.5;
+//    b.second += 2.5;
+////    if (b.first > frenet_point.l()) {
+////      b.first = frenet_point.l() - 0.1;
+////    }
+////    if (b.second < frenet_point.l()) {
+////      b.second = frenet_point.l() + 0.1;
+////    }
+////    b.first = std::min(b.first, frenet_point.l() + frenet_point.dl() * delta_s);
+////    b.second = std::max(b.second, frenet_point.l() + frenet_point.dl() * delta_s);
+//  }
+
+  AERROR << "Init point:";
+  AERROR << "\tl:\t" << frenet_point.l();
+  AERROR << "\tdl:\t" << frenet_point.dl();
+  AERROR << "\tddl:\t" << frenet_point.ddl();
+
+  AERROR << "Weights:";
+  AERROR << "\tl:\t" << piecewise_jerk_path_config.l_weight();
+  AERROR << "\tdl:\t" << piecewise_jerk_path_config.dl_weight();
+  AERROR << "\tddl:\t" << piecewise_jerk_path_config.ddl_weight();
+  AERROR << "\tdddl:\t" << piecewise_jerk_path_config.dddl_weight();
 
   auto num_of_points = lateral_boundaries.size();
 
   std::array<double, 5> w = {
-      qp_config.l_weight(),
-      qp_config.dl_weight(),
-      qp_config.ddl_weight(),
-      qp_config.dddl_weight(),
+      piecewise_jerk_path_config.l_weight(),
+      piecewise_jerk_path_config.dl_weight(),
+      piecewise_jerk_path_config.ddl_weight(),
+      piecewise_jerk_path_config.dddl_weight(),
       0.0
   };
 
@@ -86,9 +99,12 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   fem_1d_qp->SetZeroOrderBounds(lateral_boundaries);
 
+  FLAGS_lateral_derivative_bound_default = 1.0;
   double first_order_bounds = AdjustLateralDerivativeBounds(init_point.v(),
+      frenet_point.dl(), frenet_point.ddl(),
       FLAGS_lateral_derivative_bound_default);
-  AERROR << "adjusted lateral bound from \t" << FLAGS_lateral_derivative_bound_default << "\t" << first_order_bounds;
+  AERROR << "adjusted lateral bound from \t"
+      << FLAGS_lateral_derivative_bound_default << "\t" << first_order_bounds;
   fem_1d_qp->SetFirstOrderBounds(first_order_bounds);
   fem_1d_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
 
@@ -99,8 +115,9 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   ADEBUG << "Path Optimizer used time: " << diff.count() * 1000 << " ms.";
 
   if (!success) {
-    AERROR << "lateral qp optimizer failed";
-    return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
+    AERROR << "piecewise jerk path optimizer failed";
+    return Status(ErrorCode::PLANNING_ERROR,
+        "piecewise jerk path optimizer failed");
   }
 
   const auto& x = fem_1d_qp->x();
@@ -142,9 +159,13 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 }
 
 double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
-    const double s_dot, const double l_dot_bounds) {
+    const double s_dot, const double dl, const double ddl, const double l_dot_bounds) const {
   double s = std::fmax(FLAGS_vehicle_low_speed_threshold, s_dot);
-  return l_dot_bounds / s;
+  double l_prime_adjusted = l_dot_bounds / s;
+  if (l_prime_adjusted < std::fabs(dl)) {
+    l_prime_adjusted = std::fabs(dl) + 0.1;
+  }
+  return l_prime_adjusted;
 }
 
 }  // namespace planning
