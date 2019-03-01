@@ -40,7 +40,7 @@ using std::chrono::high_resolution_clock;
 
 int main(int argc, char** argv)
 {
-  uint32_t num_levels = 10;
+  int num_levels = 10;
   // if (argc > 1)
   // {
   //   num_levels = boost::lexical_cast<uint32_t>(argv[1]);
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
   printf("%s to %s\n", v_frame0.c_str(), v_frame1.c_str());
   geometry_msgs::TransformStamped out_t;
 
-  const uint32_t count = 1000000;
+  const int count = 1000000;
   printf("Doing %d %d-level tests\n", count, num_levels);
 
 #if 01
