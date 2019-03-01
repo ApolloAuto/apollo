@@ -48,6 +48,12 @@ void TrafficLightProtectedScenario::Init() {
     return;
   }
 
+  if (PlanningContext::GetScenarioInfo()
+      ->current_traffic_light_overlaps.empty()) {
+    AERROR << "Could not find traffic-ligh(s)";
+    return;
+  }
+
   for (const auto& traffic_light_overlap :
        PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
     const std::string traffic_light_overlap_id =
@@ -56,8 +62,9 @@ void TrafficLightProtectedScenario::Init() {
         HDMapUtil::BaseMap().GetSignalById(
             hdmap::MakeMapId(traffic_light_overlap_id));
     if (!traffic_light) {
-      ADEBUG << "Could not find traffic light: " << traffic_light_overlap_id;
+      AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
     }
+    return;
   }
 
   init_ = true;
