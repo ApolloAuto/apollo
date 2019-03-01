@@ -47,7 +47,9 @@ class OpenSpaceInfo {
   ~OpenSpaceInfo() = default;
 
   const size_t obstacles_num() const { return obstacles_num_; }
+
   size_t *mutable_obstacles_num() { return &obstacles_num_; }
+
   void set_obstacles_num(size_t obstacles_num) {
     obstacles_num_ = obstacles_num;
   }
@@ -55,6 +57,7 @@ class OpenSpaceInfo {
   const Eigen::MatrixXi &obstacles_edges_num() const {
     return obstacles_edges_num_;
   }
+
   Eigen::MatrixXi *mutable_obstacles_edges_num() {
     return &obstacles_edges_num_;
   }
@@ -63,31 +66,38 @@ class OpenSpaceInfo {
       const {
     return obstacles_vertices_vec_;
   }
+
   std::vector<std::vector<common::math::Vec2d>>
       *mutable_obstacles_vertices_vec() {
     return &obstacles_vertices_vec_;
   }
 
   const Eigen::MatrixXd &obstacles_A() const { return obstacles_A_; }
+
   Eigen::MatrixXd *mutable_obstacles_A() { return &obstacles_A_; }
 
   const Eigen::MatrixXd &obstacles_b() const { return obstacles_b_; }
+
   Eigen::MatrixXd *mutable_obstacles_b() { return &obstacles_b_; }
 
   const double origin_heading() const { return origin_heading_; }
+
   double *mutable_origin_heading() { return &origin_heading_; }
 
   const common::math::Vec2d &origin_point() const { return origin_point_; }
+
   common::math::Vec2d *mutable_origin_point() { return &origin_point_; }
 
   const std::vector<double> &ROI_xy_boundary() const {
     return ROI_xy_boundary_;
   }
+
   std::vector<double> *mutable_ROI_xy_boundary() { return &ROI_xy_boundary_; }
 
   const std::vector<double> &open_space_end_pose() const {
     return open_space_end_pose_;
   }
+
   std::vector<double> *mutable_open_space_end_pose() {
     return &open_space_end_pose_;
   }
@@ -108,6 +118,26 @@ class OpenSpaceInfo {
   std::vector<common::TrajectoryPoint> *mutable_stitching_trajectory_data() {
     return &stitching_trajectory_data_;
   }
+
+  const DiscretizedTrajectory &stitched_trajectory_result() const {
+    return stitched_trajectory_result_;
+  }
+
+  DiscretizedTrajectory *mutable_stitched_trajectory_result() {
+    return &stitched_trajectory_result_;
+  }
+
+  const bool &open_space_provider_success() const {
+    return open_space_provider_success_;
+  }
+
+  bool *mutable_open_space_provider_success() { return &open_space_provider_success_; }
+
+  const bool &destination_reached() const {
+    return destination_reached_;
+  }
+
+  bool *mutable_destination_reached() { return &destination_reached_; }
 
  private:
   // @brief obstacles total num including perception obstacles and parking space
@@ -142,6 +172,12 @@ class OpenSpaceInfo {
   DiscretizedTrajectory optimizer_trajectory_data_;
 
   std::vector<common::TrajectoryPoint> stitching_trajectory_data_;
+
+  DiscretizedTrajectory stitched_trajectory_result_;
+
+  bool open_space_provider_success_ = false;
+
+  bool destination_reached_ = false;
 };
 }  // namespace planning
 }  // namespace apollo
