@@ -26,8 +26,6 @@
 #include <string>
 #include <thread>
 
-#include "cyber/cyber.h"
-#include "cyber/init.h"
 #include "cyber/message/protobuf_factory.h"
 #include "cyber/message/py_message.h"
 #include "cyber/message/raw_message.h"
