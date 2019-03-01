@@ -168,7 +168,8 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 }
 
 double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
-    const double s_dot, const double dl, const double ddl, const double l_dot_bounds) const {
+    const double s_dot, const double dl, const double ddl,
+    const double l_dot_bounds) const {
   double s = std::fmax(FLAGS_vehicle_low_speed_threshold, s_dot);
   double l_prime_adjusted = l_dot_bounds / s;
   if (l_prime_adjusted < std::fabs(dl)) {

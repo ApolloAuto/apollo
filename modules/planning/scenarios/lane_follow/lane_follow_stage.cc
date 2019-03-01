@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
+#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -162,13 +163,11 @@ Stage::StageStatus LaneFollowStage::Process(
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
           AERROR << "\tclear for lane change";
-        }
-        else {
+        } else {
           reference_line_info.SetDrivable(false);
           AERROR << "\tlane change failed";
         }
       } else {
-
         AERROR << "reference line is NOT lane change ref.";
         has_drivable_reference_line = true;
       }
@@ -347,7 +346,7 @@ SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
   return sl_point;
 }
 
-bool LaneFollowStage::IsClearToChangeLane (
+bool LaneFollowStage::IsClearToChangeLane(
     const ReferenceLineInfo& reference_line_info,
     Frame* frame,
     const double ego_v) {
@@ -411,7 +410,6 @@ bool LaneFollowStage::IsClearToChangeLane (
     }
   }
   return true;
-
 }
 
 }  // namespace lane_follow
