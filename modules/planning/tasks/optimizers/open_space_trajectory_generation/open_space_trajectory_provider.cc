@@ -270,7 +270,8 @@ void OpenSpaceTrajectoryProvider::LoadResult(
 
 void OpenSpaceTrajectoryProvider::ReuseLastFrameResult(
     const Frame* last_frame, DiscretizedTrajectory* const trajectory_data) {
-  *(trajectory_data) = last_frame->open_space_info().stitched_trajectory_result();
+  *(trajectory_data) =
+      last_frame->open_space_info().stitched_trajectory_result();
 }
 
 }  // namespace planning
