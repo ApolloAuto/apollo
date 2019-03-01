@@ -8,6 +8,7 @@ import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/open_space_fallback_decider_config.proto";
 import "modules/planning/proto/open_space_roi_decider_config.proto";
 import "modules/planning/proto/open_space_trajectory_provider_config.proto";
+import "modules/planning/proto/open_space_trajectory_partition_config.proto";
 import "modules/planning/proto/path_bound_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
@@ -57,6 +58,7 @@ message TaskConfig {
     OPEN_SPACE_FALLBACK_DECIDER = 21;
     OPEN_SPACE_ROI_DECIDER = 22;
     OPEN_SPACE_TRAJECTORY_PROVIDER = 23;
+    OPEN_SPACE_TRAJECTORY_PARTITION = 24;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -78,6 +80,7 @@ message TaskConfig {
     OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config = 18;
     OpenSpaceRoiDeciderConfig open_space_roi_decider_config = 19;
     OpenSpaceTrajectoryProviderConfig open_space_trajectory_provider_config = 20;
+    OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config = 21;
   }
 }
 

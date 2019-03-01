@@ -131,11 +131,11 @@ class OpenSpaceInfo {
     return open_space_provider_success_;
   }
 
-  bool *mutable_open_space_provider_success() { return &open_space_provider_success_; }
-
-  const bool &destination_reached() const {
-    return destination_reached_;
+  bool *mutable_open_space_provider_success() {
+    return &open_space_provider_success_;
   }
+
+  const bool &destination_reached() const { return destination_reached_; }
 
   bool *mutable_destination_reached() { return &destination_reached_; }
 
