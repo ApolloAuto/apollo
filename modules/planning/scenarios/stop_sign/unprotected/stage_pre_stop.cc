@@ -44,7 +44,6 @@ using common::time::Clock;
 using hdmap::HDMapUtil;
 using hdmap::LaneInfoConstPtr;
 using hdmap::OverlapInfoConstPtr;
-using hdmap::PathOverlap;
 using perception::PerceptionObstacle;
 
 using StopSignLaneVehicles =
