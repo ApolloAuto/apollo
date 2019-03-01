@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/map/hdmap/hdmap_util.h"
 
 namespace apollo {
 namespace planning {
@@ -34,6 +35,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
+using apollo::hdmap::HDMapUtil;
 
 constexpr double kPathBoundsDeciderHorizon = 100.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
@@ -64,8 +66,8 @@ Status PathBoundsDecider::Process(
   // PathBoundsDebugString(path_boundaries);
 
   // 1. Decide a rough boundary based on road info and ADC's position
-  if (!GetBoundariesFromRoadsAndADC(reference_line_info->reference_line(),
-                                    &path_boundaries)) {
+  if (!GetBoundariesFromLanesAndADC(reference_line_info->reference_line(),
+                                    0, &path_boundaries)) {
     const std::string msg =
         "Failed to decide a rough boundary based on "
         "road information.";
@@ -121,17 +123,41 @@ bool PathBoundsDecider::InitPathBoundaries(
   CHECK_NOTNULL(path_boundaries);
   path_boundaries->clear();
 
-  // Reset variables
+  // Reset variables.
   blocking_obstacle_id_ = "";
   adc_frenet_s_ = 0.0;
   adc_frenet_l_ = 0.0;
+  adc_lane_width_ = 0.0;
 
-  // Starting from ADC's current position, increment until the horizon, and
-  // set lateral bounds to be infinite at every spot.
+  // Initialize some private variables.
+  // ADC s/l info.
   auto adc_frenet_position =
       reference_line.GetFrenetPoint(planning_start_point.path_point());
   adc_frenet_s_ = adc_frenet_position.s();
   adc_frenet_l_ = adc_frenet_position.l();
+  // ADC's lane info.
+  hdmap::LaneInfoConstPtr lane;
+  if (!GetLaneInfoFromPoint(planning_start_point.path_point().x(),
+                            planning_start_point.path_point().y(),
+                            planning_start_point.path_point().z(),
+                            planning_start_point.path_point().theta(),
+                            &lane)) {
+    ADEBUG << "Failed to get the lane info for the planning start point.";
+    return false;
+  }
+  adc_lane_info_ = lane;
+  // ADC's lane width.
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  if (!reference_line.GetLaneWidth(adc_frenet_s_, &lane_left_width,
+                                   &lane_right_width)) {
+    AERROR << "Failed to get lane width at planning start point.";
+    return false;
+  }
+  adc_lane_width_ = lane_left_width + lane_right_width;
+
+  // Starting from ADC's current position, increment until the horizon, and
+  // set lateral bounds to be infinite at every spot.
   for (double curr_s = adc_frenet_s_;
        curr_s < std::min(adc_frenet_s_ + kPathBoundsDeciderHorizon,
                          reference_line.Length());
@@ -143,21 +169,23 @@ bool PathBoundsDecider::InitPathBoundaries(
   return true;
 }
 
-bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
+bool PathBoundsDecider::GetBoundariesFromLanesAndADC(
     const ReferenceLine& reference_line, int lane_borrowing,
     std::vector<std::tuple<double, double, double>>* const path_boundaries) {
   // Sanity checks.
   CHECK_NOTNULL(path_boundaries);
   CHECK(!path_boundaries->empty());
 
-  // Go through every point, update the boundary based on road info and
+  // Go through every point, update the boundary based on lane info and
   // ADC's position.
-  double past_lane_left_width = kDefaultLaneWidth / 2.0;
-  double past_lane_right_width = kDefaultLaneWidth / 2.0;
+  double past_lane_left_width = adc_lane_width_ / 2.0;
+  double past_lane_right_width = adc_lane_width_ / 2.0;
+  double past_neighbor_lane_width = 0.0;
+
   int path_blocked_idx = -1;
   for (size_t i = 0; i < path_boundaries->size(); ++i) {
     double curr_s = std::get<0>((*path_boundaries)[i]);
-    // Get the lane width at current point.
+    // 1. Get the current lane width at current point.
     double curr_lane_left_width = 0.0;
     double curr_lane_right_width = 0.0;
     if (!reference_line.GetLaneWidth(curr_s, &curr_lane_left_width,
@@ -169,15 +197,74 @@ bool PathBoundsDecider::GetBoundariesFromRoadsAndADC(
       past_lane_left_width = curr_lane_left_width;
       past_lane_right_width = curr_lane_right_width;
     }
-    // Calculate the proper boundary based on lane-width, road-width, and
-    // ADC's position.
+
+    // 2. Get the neighbor lane widths at the current point.
+    double curr_neighbor_lane_width = 0.0;
+    hdmap::Lane curr_lane;
+    hdmap::LaneInfoConstPtr lane_info_ptr;
+    if (!GetLaneInfoFromPoint(
+            reference_line.GetReferencePoint(curr_s).x(),
+            reference_line.GetReferencePoint(curr_s).y(), 0.0,
+            reference_line.GetReferencePoint(curr_s).heading(),
+            &lane_info_ptr)) {
+      ADEBUG << "Cannot find the true current lane; therefore, use the "
+                "planning starting point's lane as a substitute.";
+      curr_neighbor_lane_width = past_neighbor_lane_width;
+    } else {
+      curr_lane = lane_info_ptr->lane();
+      hdmap::LaneInfoConstPtr adjacent_lane = nullptr;
+      if (lane_borrowing == 1) {
+        // Borrowing left neighbor lane.
+        if (curr_lane.left_neighbor_forward_lane_id_size() > 0) {
+          adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+              curr_lane.left_neighbor_forward_lane_id(0));
+
+        } else if (curr_lane.left_neighbor_reverse_lane_id_size() > 0) {
+          adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+              curr_lane.left_neighbor_reverse_lane_id(0));
+        }
+      } else if (lane_borrowing == -1) {
+        // Borrowing right neighbor lane.
+        if (curr_lane.right_neighbor_forward_lane_id_size() > 0) {
+          adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+              curr_lane.right_neighbor_forward_lane_id(0));
+        } else if (curr_lane.right_neighbor_reverse_lane_id_size() > 0) {
+          adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+              curr_lane.right_neighbor_reverse_lane_id(0));
+        }
+      }
+      common::math::Vec2d xy_curr_s;
+      common::SLPoint sl_curr_s;
+      sl_curr_s.set_s(curr_s);
+      sl_curr_s.set_l(0.0);
+      reference_line.SLToXY(sl_curr_s, &xy_curr_s);
+      double adjacent_lane_s = 0.0;
+      double adjacent_lane_l = 0.0;
+      if (adjacent_lane == nullptr ||
+          !adjacent_lane->GetProjection(xy_curr_s, &adjacent_lane_s,
+                                        &adjacent_lane_l)) {
+        ADEBUG << "Unable to get the neighbor lane's width.";
+        curr_neighbor_lane_width = past_neighbor_lane_width;
+      } else {
+        curr_neighbor_lane_width = adjacent_lane->GetWidth(adjacent_lane_s);
+        past_neighbor_lane_width = curr_neighbor_lane_width;
+      }
+    }
+
+    // 3. Calculate the proper boundary based on lane-width, road-width, and
+    //    ADC's position.
     double curr_left_bound =
-        std::fmax(curr_lane_left_width,
-                  adc_frenet_l_ + GetBufferBetweenADCCenterAndEdge() + 0.1);
+        std::fmax(
+            curr_lane_left_width +
+                (lane_borrowing == 1 ? curr_neighbor_lane_width: 0.0),
+            adc_frenet_l_ + GetBufferBetweenADCCenterAndEdge() + 0.1);
     double curr_right_bound =
-        std::fmin(-curr_lane_right_width,
-                  adc_frenet_l_ - GetBufferBetweenADCCenterAndEdge() - 0.1);
-    // Update the boundary.
+        std::fmin(
+            -curr_lane_right_width -
+                (lane_borrowing == -1 ? curr_neighbor_lane_width: 0.0),
+            adc_frenet_l_ - GetBufferBetweenADCCenterAndEdge() - 0.1);
+
+    // 4. Update the boundary.
     double dummy = 0.0;
     if (!UpdatePathBoundaryAndCenterLine(
             i, curr_left_bound, curr_right_bound, path_boundaries, &dummy)) {
@@ -331,6 +418,26 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
   return true;
 }
 
+bool PathBoundsDecider::GetLaneInfoFromPoint(
+    double point_x, double point_y, double point_z, double point_theta,
+    hdmap::LaneInfoConstPtr *const lane) {
+  constexpr double kLaneSearchRadius = 1.0;
+  constexpr double kLaneSearchMaxThetaDiff = M_PI / 3.0;
+  double s = 0.0;
+  double l = 0.0;
+  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
+          common::util::MakePointENU(point_x, point_y, point_z),
+          kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff, lane, &s,
+          &l) != 0) {
+    AERROR << "Failed to find nearest lane from map at position: "
+           << "(x, y, z) = (" << point_x << ", " << point_y << ", " << point_z
+           << ")"
+           << ", heading = " << point_theta;
+    return false;
+  }
+  return true;
+}
+
 double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
   double adc_half_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
@@ -387,28 +494,6 @@ PathBoundsDecider::SortObstaclesForSweepLine(
        });
 
   return sorted_obstacles;
-}
-
-// return value: LEFT -> true; RIGHT -> false.
-bool PathBoundsDecider::GetOptimalSidepassDirection(
-    double ADC_center_line, double obstacle_center_line) {
-  return (obstacle_center_line < ADC_center_line);
-}
-
-std::pair<double, double> PathBoundsDecider::GetPathBoundAtS(
-    const std::vector<std::tuple<double, double, double>>* path_boundaries,
-    const double& s) {
-  // Sanity check.
-  if (path_boundaries->empty()) {
-    return std::make_pair(0.0, 0.0);
-  }
-
-  int idx = (int)((s - std::get<0>((*path_boundaries)[0])) /
-            kPathBoundsDeciderResolution);
-  idx = std::min(idx, path_boundaries->size() - 1);
-  return std::make_pair(
-      std::get<1>((*path_boundaries)[idx]),
-      std::get<2>((*path_boundaries)[idx]));
 }
 
 
@@ -468,7 +553,7 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
 
   //==============================================================
   // Do what needs to be done for the current path_idx and/or obs_idx.
-  
+
   if (obs_idx < sorted_obstacles.size() &&
       std::get<1>(sorted_obstacles[obs_idx]) < curr_s) {
     // If there is some obstacle entering/exiting at this path_idx
@@ -605,6 +690,28 @@ void PathBoundsDecider::PathBoundsDebugString(
 
 
 /*
+// return value: LEFT -> true; RIGHT -> false.
+bool PathBoundsDecider::GetOptimalSidepassDirection(
+    double ADC_center_line, double obstacle_center_line) {
+  return (obstacle_center_line < ADC_center_line);
+}
+
+std::pair<double, double> PathBoundsDecider::GetPathBoundAtS(
+    const std::vector<std::tuple<double, double, double>>* path_boundaries,
+    const double& s) {
+  // Sanity check.
+  if (path_boundaries->empty()) {
+    return std::make_pair(0.0, 0.0);
+  }
+
+  int idx = (int)((s - std::get<0>((*path_boundaries)[0])) /
+            kPathBoundsDeciderResolution);
+  idx = std::min(idx, path_boundaries->size() - 1);
+  return std::make_pair(
+      std::get<1>((*path_boundaries)[idx]),
+      std::get<2>((*path_boundaries)[idx]));
+}
+
 void PathBoundsDecider::SearchFeasibleSidepassDirections(
     const std::vector<std::tuple<int, double, double, double, std::string>>&
     sorted_obstacles, double s_max,
