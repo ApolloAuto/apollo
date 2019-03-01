@@ -335,11 +335,6 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
               path_blocked_idx = static_cast<int>(i);
               blocking_obstacle_id_ = curr_obstacle_id;
               break;
-              // ADC has no path, start side-pass decision.
-              // 1. Don't side-pass if obstacle is blocked by other obstacles
-              //    and is not a parked vehicle.
-              //    Don't side-pass virtual/ped/cyclist obstacles.
-              // TODO(all): finish this.
             }
           } else {
             // Obstacle is to the left of center-line, should pass from right.
@@ -374,8 +369,6 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
           ADEBUG << "Path is blocked at s = " << curr_s;
           path_blocked_idx = static_cast<int>(i);
           // Currently, no side-pass when blocked.
-          // TODO(all): implement the side-pass feature by considering
-          // borrowing the adjacent lane.
           break;
         } else {
           center_line = (std::get<1>((*path_boundaries)[i]) +
@@ -398,8 +391,6 @@ bool PathBoundsDecider::GetBoundariesFromStaticObstacles(
         ADEBUG << "Path is blocked at s = " << curr_s;
         path_blocked_idx = static_cast<int>(i);
         // Currently, no side-pass when blocked.
-        // TODO(all): implement the side-pass feature by considering
-        // borrowing the adjacent lane.
       } else {
         center_line = (std::get<1>((*path_boundaries)[i]) +
                        std::get<2>((*path_boundaries)[i])) /
@@ -495,6 +486,160 @@ PathBoundsDecider::SortObstaclesForSweepLine(
 
   return sorted_obstacles;
 }
+
+size_t PathBoundsDecider::ConstructSubsequentPathBounds(
+    const std::vector<std::tuple<int, double, double, double, std::string>>&
+    sorted_obstacles,
+    size_t path_idx, size_t obs_idx,
+    std::unordered_map<std::string, std::tuple<bool, double>>*
+    const obs_id_to_details;
+    std::vector<std::tuple<double, double, double>>* const curr_path_bounds,
+    std::vector<std::tuple<double, double, double>>* const final_path_bounds) {
+  double left_bounds_from_obstacles = std::numeric_limits<double>::max();
+  double right_bounds_from_obstacles = std::numeric_limits<double>::lowest();
+  //==============================================================
+  // If searched through all available s and found a path, return.
+  if (path_idx >= curr_path_bounds->size()) {
+    ADEBUG << "Completed path bounds search ending at path_idx = " << path_idx;
+    *final_path_bounds = *curr_path_bounds;
+    return path_idx;
+  }
+
+  //==============================================================
+  // If there is no obstacle updates at this path_idx.
+  if (obs_idx >= sorted_obstacles.size() ||
+      std::get<1>(sorted_obstacles[obs_idx]) > curr_s) {
+    for (auto it = obs_id_to_details.begin();
+         it != obs_id_to_details.end(); ++it) {
+      if(std::get<0>(it->second)) {
+        // Pass from left.
+        right_bounds_from_obstacles = 
+            std::max(right_bounds_from_obstacles, std::get<1>(it->second));
+      } else {
+        // Pass from right.
+        left_bounds_from_obstacles =
+            std::min(left_bounds_from_obstacles, std::get<1>(it->second));
+      }
+    }
+    double dummy = 0.0;
+    auto old_path_bound = (*curr_path_bounds)[path_idx];
+    bool is_able_to_update = UpdatePathBoundaryAndCenterLine(
+        path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
+        curr_path_bounds, &dummy);
+    size_t ret_val = 0;
+    if (is_able_to_update) {
+      ret_val = ConstructSubsequentPathBounds(
+          sorted_obstacles, path_idx + 1, obs_idx,
+          obs_id_to_details, curr_path_bounds, final_path_bounds);
+      
+    } else {
+      ret_val = path_idx;
+    }
+    (*curr_path_bounds)[path_idx] = old_path_bound;
+    return ret_val;
+  }
+
+  //==============================================================
+  // If there are obstacle changes
+  std::unordered_map<std::string, std::tuple<bool, double>>
+  old_obs_id_to_details = *obs_id_to_details;
+  std::vector<std::tuple<int, double, double, double, std::string>>
+  new_entering_obstacles;
+  double new_obs_idx = obs_idx;
+  while (new_obs_idx < sorted_obstacles.size() &&
+         std::get<1>(sorted_obstacles[new_obs_idx] <= curr_s)) {
+    if (!std::get<0>(sorted_obstacles[new_obs_idx])) {
+      obs_id_to_details.erase(std::get<4>(sorted_obstacles[new_obs_idx]));
+    } else {
+      new_entering_obstacles.push_back(sorted_obstacles[new_obs_idx]);
+    }
+    ++new_obs_idx;
+  }
+  auto pass_direction_decisions =
+      DecidePassDirections(new_entering_obstacles);
+
+
+  size_t ret_val = 0;
+  for(size_t i = 0; i < 1; ++i) {
+    // For now, only try one optimal direction.
+    // TODO(jiacheng): try all the possible directions.
+    for(size_t j = 0; j < pass_direction_decisions[i].size(); ++j) {
+      if (pass_direction_decisions[i][j]) {
+        // Pass from left.
+        (*obs_id_to_details)[std::get<4>(new_entering_obstacles[j])] =
+            std::make_tuple(true, std::get<3>(new_entering_obstacles[j]));
+      } else {
+        // Pass from right.
+        (*obs_id_to_details)[std::get<4>(new_entering_obstacles[j])] =
+            std::make_tuple(false, std::get<2>(new_entering_obstacles[j]));
+      }
+    }
+    ret_val = ConstructSubsequentPathBounds(
+        sorted_obstacles, path_idx + 1, new_obs_idx,
+        obs_id_to_details, curr_path_bounds, final_path_bounds);
+  }
+  ////////////////////////////////////////////////////
+}
+
+std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
+    const std::vector<std::tuple<int, double, double, double, std::string>>&
+    new_entering_obstacles) {
+
+}
+
+bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
+    size_t idx, double left_bound, double right_bound,
+    std::vector<std::tuple<double, double, double>>* const path_boundaries,
+    double* const center_line) {
+  // Update the right bound (l_min):
+  double new_l_min = std::fmax(
+      std::get<1>((*path_boundaries)[idx]),
+      right_bound + GetBufferBetweenADCCenterAndEdge());
+  // Update the left bound (l_max):
+  double new_l_max = std::fmin(
+      std::get<2>((*path_boundaries)[idx]),
+      left_bound - GetBufferBetweenADCCenterAndEdge());
+
+  // Check if ADC is blocked.
+  // If blocked, don't update anything, return false.
+  if (std::get<1>((*path_boundaries)[idx]) >
+      std::get<2>((*path_boundaries)[idx])) {
+    ADEBUG << "Path is blocked at idx = " << idx;
+    return false;
+  }
+  // Otherwise, update path_boundaries and center_line; then return true.
+  std::get<1>((*path_boundaries)[idx]) = new_l_min;
+  std::get<2>((*path_boundaries)[idx]) = new_l_max;
+  *center_line = (std::get<1>((*path_boundaries)[idx]) +
+                  std::get<2>((*path_boundaries)[idx])) / 2.0;
+  return true;
+}
+
+void PathBoundsDecider::TrimPathBounds(
+    int path_blocked_idx,
+    std::vector<std::tuple<double, double, double>>* const path_boundaries) {
+  if (path_blocked_idx != -1) {
+    if (path_blocked_idx == 0) {
+      ADEBUG << "Completely blocked. Cannot move at all.";
+    }
+    int range = static_cast<int>(path_boundaries->size()) - path_blocked_idx;
+    for (int i = 0; i < range; ++i) {
+      path_boundaries->pop_back();
+    }
+  }
+}
+
+void PathBoundsDecider::PathBoundsDebugString(
+      const std::vector<std::tuple<double, double, double>>& path_boundaries) {
+  for (size_t i = 0; i < path_boundaries.size(); ++i) {
+    ADEBUG << "idx " << i
+           << "; s = " << std::get<0>(path_boundaries[i])
+           << "; l_min = " << std::get<1>(path_boundaries[i])
+           << "; l_max = " << std::get<2>(path_boundaries[i]);
+  }
+}
+
+
 
 
 
@@ -634,58 +779,6 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
 
   //==============================================================
   return true;
-}
-
-bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
-    size_t idx, double left_bound, double right_bound,
-    std::vector<std::tuple<double, double, double>>* const path_boundaries,
-    double* const center_line) {
-  // Update the right bound (l_min):
-  double new_l_min = std::fmax(
-      std::get<1>((*path_boundaries)[idx]),
-      right_bound + GetBufferBetweenADCCenterAndEdge());
-  // Update the left bound (l_max):
-  double new_l_max = std::fmin(
-      std::get<2>((*path_boundaries)[idx]),
-      left_bound - GetBufferBetweenADCCenterAndEdge());
-
-  // Check if ADC is blocked.
-  // If blocked, don't update anything, return false.
-  if (std::get<1>((*path_boundaries)[idx]) >
-      std::get<2>((*path_boundaries)[idx])) {
-    ADEBUG << "Path is blocked at idx = " << idx;
-    return false;
-  }
-  // Otherwise, update path_boundaries and center_line; then return true.
-  std::get<1>((*path_boundaries)[idx]) = new_l_min;
-  std::get<2>((*path_boundaries)[idx]) = new_l_max;
-  *center_line = (std::get<1>((*path_boundaries)[idx]) +
-                  std::get<2>((*path_boundaries)[idx])) / 2.0;
-  return true;
-}
-
-void PathBoundsDecider::TrimPathBounds(
-    int path_blocked_idx,
-    std::vector<std::tuple<double, double, double>>* const path_boundaries) {
-  if (path_blocked_idx != -1) {
-    if (path_blocked_idx == 0) {
-      ADEBUG << "Completely blocked. Cannot move at all.";
-    }
-    int range = static_cast<int>(path_boundaries->size()) - path_blocked_idx;
-    for (int i = 0; i < range; ++i) {
-      path_boundaries->pop_back();
-    }
-  }
-}
-
-void PathBoundsDecider::PathBoundsDebugString(
-      const std::vector<std::tuple<double, double, double>>& path_boundaries) {
-  for (size_t i = 0; i < path_boundaries.size(); ++i) {
-    ADEBUG << "idx " << i
-           << "; s = " << std::get<0>(path_boundaries[i])
-           << "; l_min = " << std::get<1>(path_boundaries[i])
-           << "; l_max = " << std::get<2>(path_boundaries[i]);
-  }
 }
 
 
