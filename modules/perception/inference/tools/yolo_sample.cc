@@ -69,16 +69,17 @@ int main(int argc, char **argv) {
   std::vector<std::string> image_lists;
   apollo::perception::inference::load_data<std::string>(FLAGS_test_list,
                                                         &image_lists);
+
+  const int count = 3 * width * height;
   std::vector<float> output_data_vec;
-  for (auto image_file : image_lists) {
+  for (auto &image_file : image_lists) {
     cv::Mat img = cv::imread(FLAGS_image_root + image_file + FLAGS_image_ext);
     cv::Rect roi(0, offset_y, img.cols, img.rows - offset_y);
     cv::Mat img_roi = img(roi);
     img_roi.copyTo(img);
     cv::resize(img, img, cv::Size(width, height));
     auto input = rt_net->get_blob("data")->mutable_cpu_data();
-    const int count = 3 * width * height;
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
       input[i] = img.data[i];
     }
     cudaDeviceSynchronize();

@@ -51,7 +51,7 @@ size_t BinaryWriteString(FILE *fp, const std::string &str) {
   return len;
 }
 
-template<typename Dtype>
+template <typename Dtype>
 boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
   int ndim;
   boost::shared_ptr<base::Blob<Dtype>> blob(new base::Blob<Dtype>());
@@ -85,7 +85,7 @@ boost::shared_ptr<base::Blob<Dtype>> BinaryReadBlob(FILE *fp) {
   return blob;
 }
 
-template<typename Dtype>
+template <typename Dtype>
 void BinaryWriteBlob(FILE *fp, const base::Blob<Dtype> &blob) {
   int ndim, dim;
   // write dtype
@@ -110,9 +110,9 @@ template boost::shared_ptr<base::Blob<double>> BinaryReadBlob(FILE *fp);
 template void BinaryWriteBlob(FILE *fp, const base::Blob<float> &blob);
 template void BinaryWriteBlob(FILE *fp, const base::Blob<double> &blob);
 
-template<typename Dtype>
-std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>>
-BinaryReadFile(const char *file_path) {
+template <typename Dtype>
+std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> BinaryReadFile(
+    const char *file_path) {
   char name[kMaxStrLen];
   std::map<std::string, boost::shared_ptr<base::Blob<Dtype>>> data_dict;
 
@@ -132,7 +132,7 @@ BinaryReadFile(const char *file_path) {
   return data_dict;
 }
 
-template<typename Btype>
+template <typename Btype>
 bool BinaryWriteFile(const char *file_path,
                      const std::map<std::string, Btype> &data_dict) {
   FILE *fp = fopen(file_path, "wb");
@@ -164,12 +164,12 @@ BinaryReadFile(const char *file_path);
 
 template bool BinaryWriteFile(
     const char *file_path,
-    const std::map<std::string,
-                   boost::shared_ptr<base::Blob<float>>> &data_dict);
+    const std::map<std::string, boost::shared_ptr<base::Blob<float>>>
+        &data_dict);
 template bool BinaryWriteFile(
     const char *file_path,
-    const std::map<std::string,
-                   boost::shared_ptr<base::Blob<double>>> &data_dict);
+    const std::map<std::string, boost::shared_ptr<base::Blob<double>>>
+        &data_dict);
 
 template bool BinaryWriteFile(
     const char *file_path,

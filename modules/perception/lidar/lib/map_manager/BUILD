@@ -13,7 +13,6 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/math",
-        "//modules/common/util:file_util",
         "//modules/map/hdmap",
         "//modules/map/proto:map_proto",
         "//modules/perception/base:base_type",

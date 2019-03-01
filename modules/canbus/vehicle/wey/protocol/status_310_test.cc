@@ -41,8 +41,7 @@ TEST_F(Status310Test, reset) {
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().rlwheelspdvalid(), 1);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().rrwheelspdvalid(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().vehiclespdvalid(), 0);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().longitudedrivingmode(),
-                   2);
+  EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().longitudedrivingmode(), 2);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().engspdvalid(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().accepedaloverride(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().brakepedalstatus(), 0);
@@ -56,8 +55,7 @@ TEST_F(Status310Test, reset) {
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().epshandsdetnsts(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().eps_handsdetnstsvalid(),
                    0);
-  EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().steerwheelanglesign(),
-                   1);
+  EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().steerwheelanglesign(), 1);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().steerwheelspdsign(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().driverdoorsts(), 0);
   EXPECT_DOUBLE_EQ(chassis_detail.wey().status_310().rldoorsts(), 0);

@@ -16,9 +16,9 @@
 
 #include "gflags/gflags.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/hdmap/hdmap_impl.h"
@@ -70,8 +70,8 @@ std::ostream &operator<<(
 #define GET_ELEMENT_BY_ID(TYPE)                                     \
   const TYPE##InfoConstPtr Get##TYPE(const std::string &id) {       \
     auto ret = HDMapUtil::BaseMap().Get##TYPE##ById(MakeMapId(id)); \
-    AERROR_IF(ret == nullptr) << "failed to find " << #TYPE         \
-                              << " with id: " << id;                \
+    AERROR_IF(ret == nullptr)                                       \
+        << "failed to find " << #TYPE << " with id: " << id;        \
     return ret;                                                     \
   }
 
@@ -359,14 +359,14 @@ int main(int argc, char *argv[]) {
   }
   if (!FLAGS_dump_txt_map.empty()) {
     apollo::hdmap::Map map;
-    CHECK(apollo::common::util::GetProtoFromFile(map_file, &map));
-    CHECK(apollo::common::util::SetProtoToASCIIFile(map, FLAGS_dump_txt_map));
+    CHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map));
+    CHECK(apollo::cyber::common::SetProtoToASCIIFile(map, FLAGS_dump_txt_map));
     valid_arg = true;
   }
   if (!FLAGS_dump_bin_map.empty()) {
     apollo::hdmap::Map map;
-    CHECK(apollo::common::util::GetProtoFromFile(map_file, &map));
-    CHECK(apollo::common::util::SetProtoToBinaryFile(map, FLAGS_dump_bin_map));
+    CHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map));
+    CHECK(apollo::cyber::common::SetProtoToBinaryFile(map, FLAGS_dump_bin_map));
     valid_arg = true;
   }
   if (!valid_arg) {

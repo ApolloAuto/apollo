@@ -14,18 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 #include "modules/perception/lidar/lib/object_filter_bank/roi_boundary_filter/roi_boundary_filter.h"
+
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
+
 #include "modules/perception/common/geometry/common.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
-
 #include "modules/perception/proto/roi_boundary_filter_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -38,7 +39,7 @@ bool ROIBoundaryFilter::Init(const ObjectFilterInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "roi_boundary_filter.conf");
   ROIBoundaryFilterConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   distance_to_boundary_threshold_ = config.distance_to_boundary_threshold();
   confidence_threshold_ = config.confidence_threshold();
   cross_roi_threshold_ = config.cross_roi_threshold();
@@ -91,7 +92,7 @@ bool ROIBoundaryFilter::Filter(const ObjectFilterOptions& options,
   }
   objects.resize(count);
   AINFO << "Roi boundary filter, " << objects_valid_flag_.size() << " to "
-           << count;
+        << count;
   return true;
 }
 
@@ -176,9 +177,9 @@ void ROIBoundaryFilter::FilterObjectsOutsideBoundary(
       }
       if (!(*objects_valid_flag)[i]) {
         ADEBUG << "Roi boundary filter: min_dist_to_boundary exceed "
-                  << distance_to_boundary_threshold_ << ", id " << obj->id
-                  << ", center " << obj->center.head<2>().transpose()
-                  << ", distance " << min_dist_to_boundary;
+               << distance_to_boundary_threshold_ << ", id " << obj->id
+               << ", center " << obj->center.head<2>().transpose()
+               << ", distance " << min_dist_to_boundary;
       }
     }
   }
@@ -219,9 +220,9 @@ void ROIBoundaryFilter::FilterObjectsInsideBoundary(
       }
       if (!(*objects_valid_flag)[i]) {
         ADEBUG << "Roi boundary filter: inside_distance within "
-                  << inside_threshold_ << ", id " << obj->id << ", center "
-                  << obj->center.head<2>().transpose() << ", distance "
-                  << min_dist_to_boundary;
+               << inside_threshold_ << ", id " << obj->id << ", center "
+               << obj->center.head<2>().transpose() << ", distance "
+               << min_dist_to_boundary;
       }
     }
   }
@@ -234,15 +235,14 @@ void ROIBoundaryFilter::FilterObjectsByConfidence(
   for (size_t i = 0; i < objects.size(); ++i) {
     if (objects_cross_roi_[i] || !objects[i]->lidar_supplement.is_in_roi) {
       if (objects[i]->confidence < confidence_threshold_) {
-        ADEBUG << "Roi boundary filter: confidence "
-                  << objects[i]->confidence << " below "
-                  << confidence_threshold_ << ", id " << objects[i]->id
-                  << ", center " << objects[i]->center.head<2>().transpose()
-                  << " cross roi " << objects_cross_roi_[i] << " in roi "
-                  << objects[i]->lidar_supplement.is_in_roi
-                  << " #points_in_roi "
-                  << objects[i]->lidar_supplement.num_points_in_roi << "/"
-                  << objects[i]->lidar_supplement.cloud.size();
+        ADEBUG << "Roi boundary filter: confidence " << objects[i]->confidence
+               << " below " << confidence_threshold_ << ", id "
+               << objects[i]->id << ", center "
+               << objects[i]->center.head<2>().transpose() << " cross roi "
+               << objects_cross_roi_[i] << " in roi "
+               << objects[i]->lidar_supplement.is_in_roi << " #points_in_roi "
+               << objects[i]->lidar_supplement.num_points_in_roi << "/"
+               << objects[i]->lidar_supplement.cloud.size();
         (*objects_valid_flag)[i] = false;
       }
     }

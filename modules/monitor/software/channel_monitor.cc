@@ -65,11 +65,12 @@ std::shared_ptr<cyber::ReaderBase> GetReader(const std::string& channel) {
   } else if (channel == FLAGS_relative_map_topic) {
     return manager->CreateReader<relative_map::MapMsg>(channel);
   } else if (channel == FLAGS_pointcloud_topic ||
-             channel == FLAGS_pointcloud_128_topic) {
+             channel == FLAGS_pointcloud_128_topic ||
+             channel == FLAGS_pointcloud_16_front_up_topic) {
     return manager->CreateReader<drivers::PointCloud>(channel);
   }
   // Add more channels here if you want to monitor.
-  AFATAL << "Channel is not handled by ChannelMonitor: " << channel;
+  AERROR << "Channel is not handled by ChannelMonitor: " << channel;
   return nullptr;
 }
 
@@ -77,8 +78,7 @@ std::shared_ptr<cyber::ReaderBase> GetReader(const std::string& channel) {
 
 ChannelMonitor::ChannelMonitor()
     : RecurrentRunner(FLAGS_channel_monitor_name,
-                      FLAGS_channel_monitor_interval) {
-}
+                      FLAGS_channel_monitor_interval) {}
 
 void ChannelMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
@@ -98,12 +98,19 @@ void ChannelMonitor::UpdateStatus(
     const apollo::dreamview::ChannelMonitorConfig& config,
     ComponentStatus* status) {
   status->clear_status();
-  const double delay = GetReader(config.name())->GetDelaySec();
+  auto reader = GetReader(config.name());
+  if (reader == nullptr) {
+    SummaryMonitor::EscalateStatus(
+        ComponentStatus::UNKNOWN,
+        StrCat(config.name(), " is not registered in ChannelMonitor."), status);
+    return;
+  }
+
+  const double delay = reader->GetDelaySec();
   if (delay < 0 || delay > config.delay_fatal()) {
     SummaryMonitor::EscalateStatus(
         ComponentStatus::FATAL,
-        StrCat(config.name(), " delayed for ", delay, " seconds."),
-        status);
+        StrCat(config.name(), " delayed for ", delay, " seconds."), status);
   } else {
     SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", status);
   }

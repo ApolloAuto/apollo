@@ -35,8 +35,7 @@ class PiecewiseJerkTrajectory1d : public Curve1d {
 
   virtual ~PiecewiseJerkTrajectory1d() = default;
 
-  double Evaluate(const std::uint32_t order,
-                  const double param) const;
+  double Evaluate(const std::uint32_t order, const double param) const;
 
   double ParamLength() const;
 

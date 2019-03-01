@@ -22,8 +22,10 @@
 #pragma once
 
 #include <deque>
+#include <list>
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "modules/common/filters/digital_filter.h"
@@ -47,12 +49,11 @@ class Obstacle {
   /**
    * @brief Constructor
    */
-  static std::unique_ptr<Obstacle>
-  Create(const perception::PerceptionObstacle& perception_obstacle,
+  static std::unique_ptr<Obstacle> Create(
+      const perception::PerceptionObstacle& perception_obstacle,
       const double timestamp, const int prediction_id);
 
-  static std::unique_ptr<Obstacle>
-  Create(const Feature& feature);
+  static std::unique_ptr<Obstacle> Create(const Feature& feature);
 
   /**
    * @brief Destructor
@@ -225,6 +226,11 @@ class Obstacle {
    */
   bool RNNEnabled() const;
 
+  /**
+   * @brief Set the obstacle as caution level
+   */
+  void SetCaution();
+
  private:
   Obstacle() = default;
 
@@ -285,8 +291,9 @@ class Obstacle {
 
   void SetLanePoints(Feature* feature);
 
-  void SetLanePoints(const Feature* feature, double lane_point_spacing,
-                     LaneGraph* const lane_graph);
+  void SetLanePoints(
+      const Feature* feature, const double lane_point_spacing,
+      const uint64_t max_num_lane_point, LaneGraph* const lane_graph);
 
   void SetLaneSequencePath(LaneGraph* const lane_graph);
 
@@ -300,12 +307,19 @@ class Obstacle {
 
   void InsertFeatureToHistory(const Feature& feature);
 
-  void SetJunctionFeatureWithEnterLane(
-      const std::string& enter_lane_id, Feature* const feature_ptr);
+  void SetJunctionFeatureWithEnterLane(const std::string& enter_lane_id,
+                                       Feature* const feature_ptr);
 
   void SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr);
 
   void DiscardOutdatedHistory();
+
+  void GetNeighborLaneSegments(
+      std::shared_ptr<const apollo::hdmap::LaneInfo> center_lane_info,
+      bool is_left,
+      int recursion_depth,
+      std::list<std::string>* const lane_ids_ordered,
+      std::unordered_set<std::string>* const existing_lane_ids);
 
  private:
   int id_ = -1;

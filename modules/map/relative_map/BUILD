@@ -91,12 +91,12 @@ cc_test(
     data = [
         ":relative_map_conf",
         ":testdata",
-    ], 
+    ],
     deps = [
-        "@gtest//:main",
         ":relative_map_component_lib",
         "//modules/common",
         "//third_party/json",
+        "@gtest//:main",
     ],
 )
 

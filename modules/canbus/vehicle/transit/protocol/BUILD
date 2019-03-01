@@ -17,7 +17,6 @@ cc_library(
         ":llc_motionfeedback2_21",
         ":llc_vehiclelimits_24",
         ":llc_vehiclestatus_25",
-
     ],
 )
 
@@ -43,11 +42,10 @@ cc_test(
     srcs = ["adc_auxiliarycontrol_110_test.cc"],
     deps = [
         ":adc_auxiliarycontrol_110",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
-
 
 cc_library(
     name = "adc_motioncontrol1_10",
@@ -71,8 +69,8 @@ cc_test(
     srcs = ["adc_motioncontrol1_10_test.cc"],
     deps = [
         ":adc_motioncontrol1_10",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -98,8 +96,8 @@ cc_test(
     srcs = ["adc_motioncontrollimits1_12_test.cc"],
     deps = [
         ":adc_motioncontrollimits1_12",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -125,8 +123,8 @@ cc_test(
     srcs = ["llc_auxiliaryfeedback_120_test.cc"],
     deps = [
         ":llc_auxiliaryfeedback_120",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -152,8 +150,8 @@ cc_test(
     srcs = ["llc_diag_brakecontrol_721_test.cc"],
     deps = [
         ":llc_diag_brakecontrol_721",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -179,8 +177,8 @@ cc_test(
     srcs = ["llc_diag_fault_620_test.cc"],
     deps = [
         ":llc_diag_fault_620",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -206,8 +204,8 @@ cc_test(
     srcs = ["llc_diag_steeringcontrol_722_test.cc"],
     deps = [
         ":llc_diag_steeringcontrol_722",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -233,8 +231,8 @@ cc_test(
     srcs = ["llc_motioncommandfeedback1_22_test.cc"],
     deps = [
         ":llc_motioncommandfeedback1_22",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -260,8 +258,8 @@ cc_test(
     srcs = ["llc_motionfeedback1_20_test.cc"],
     deps = [
         ":llc_motionfeedback1_20",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -287,8 +285,8 @@ cc_test(
     srcs = ["llc_motionfeedback2_21_test.cc"],
     deps = [
         ":llc_motionfeedback2_21",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -314,8 +312,8 @@ cc_test(
     srcs = ["llc_vehiclelimits_24_test.cc"],
     deps = [
         ":llc_vehiclelimits_24",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 
@@ -341,8 +339,8 @@ cc_test(
     srcs = ["llc_vehiclestatus_25_test.cc"],
     deps = [
         ":llc_vehiclestatus_25",
-        "@gtest//:main",
         "//modules/canbus/vehicle/transit/protocol:canbus_transit_protocol",
+        "@gtest//:main",
     ],
 )
 

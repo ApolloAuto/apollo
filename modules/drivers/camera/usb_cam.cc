@@ -504,8 +504,9 @@ bool UsbCam::init_userp(unsigned int buffer_size) {
 
   if (-1 == xioctl(fd_, VIDIOC_REQBUFS, &req)) {
     if (EINVAL == errno) {
-      AERROR << config_->camera_dev() << " does not support "
-                                         "user pointer i/o";
+      AERROR << config_->camera_dev()
+             << " does not support "
+                "user pointer i/o";
       return false;
     }
     AERROR << "VIDIOC_REQBUFS";
@@ -747,9 +748,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 
           case EIO:
 
-          /* Could ignore EIO, see spec. */
+            /* Could ignore EIO, see spec. */
 
-          /* fall through */
+            /* fall through */
 
           default:
             AERROR << "read";
@@ -774,9 +775,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 
           case EIO:
 
-          /* Could ignore EIO, see spec. */
+            /* Could ignore EIO, see spec. */
 
-          /* fall through */
+            /* fall through */
 
           default:
             AERROR << "VIDIOC_DQBUF";
@@ -852,9 +853,9 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
 
           case EIO:
 
-          /* Could ignore EIO, see spec. */
+            /* Could ignore EIO, see spec. */
 
-          /* fall through */
+            /* fall through */
 
           default:
             AERROR << "VIDIOC_DQBUF";

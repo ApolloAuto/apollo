@@ -17,8 +17,8 @@
 
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/proto/sensor_meta_schema.pb.h"
@@ -27,7 +27,7 @@ namespace apollo {
 namespace perception {
 namespace common {
 
-using apollo::common::util::GetProtoFromASCIIFile;
+using apollo::cyber::common::GetProtoFromASCIIFile;
 using apollo::perception::base::BrownCameraDistortionModel;
 using apollo::perception::base::SensorInfo;
 using apollo::perception::base::SensorOrientation;
@@ -45,13 +45,12 @@ bool SensorManager::Init() {
   distort_model_map_.clear();
   undistort_model_map_.clear();
 
-  const std::string file_path = apollo::common::util::GetAbsolutePath(
+  const std::string file_path = cyber::common::GetAbsolutePath(
       lib::ConfigManager::Instance()->work_root(), FLAGS_obs_sensor_meta_path);
 
   MultiSensorMeta sensor_list_proto;
   if (!GetProtoFromASCIIFile(file_path, &sensor_list_proto)) {
-    AERROR << "Invalid MultiSensorMeta file: "
-           << FLAGS_obs_sensor_meta_path;
+    AERROR << "Invalid MultiSensorMeta file: " << FLAGS_obs_sensor_meta_path;
     return false;
   }
 
@@ -146,10 +145,8 @@ bool SensorManager::IsHdLidar(const std::string& name) const {
 }
 
 bool SensorManager::IsHdLidar(const SensorType& type) const {
-  return type == SensorType::VELODYNE_128 ||
-         type == SensorType::VELODYNE_64 ||
-         type == SensorType::VELODYNE_32 ||
-         type == SensorType::VELODYNE_16;
+  return type == SensorType::VELODYNE_128 || type == SensorType::VELODYNE_64 ||
+         type == SensorType::VELODYNE_32 || type == SensorType::VELODYNE_16;
 }
 
 bool SensorManager::IsLdLidar(const std::string& name) const {
@@ -226,8 +223,7 @@ bool SensorManager::IsUltrasonic(const SensorType& type) const {
 
 std::string SensorManager::GetFrameId(const std::string& name) const {
   const auto& itr = sensor_info_map_.find(name);
-  return itr == sensor_info_map_.end()
-      ? std::string("") : itr->second.frame_id;
+  return itr == sensor_info_map_.end() ? std::string("") : itr->second.frame_id;
 }
 
 }  // namespace common

@@ -30,15 +30,15 @@
 #include "cyber/proto/topology_change.pb.h"
 #include "cyber/record/record_writer.h"
 
-using apollo::cyber::service_discovery::TopologyManager;
-using apollo::cyber::service_discovery::ChannelManager;
-using apollo::cyber::proto::ChangeMsg;
-using apollo::cyber::proto::RoleType;
-using apollo::cyber::proto::RoleAttributes;
-using apollo::cyber::message::RawMessage;
-using apollo::cyber::base::Connection;
-using apollo::cyber::ReaderBase;
 using apollo::cyber::Node;
+using apollo::cyber::ReaderBase;
+using apollo::cyber::base::Connection;
+using apollo::cyber::message::RawMessage;
+using apollo::cyber::proto::ChangeMsg;
+using apollo::cyber::proto::RoleAttributes;
+using apollo::cyber::proto::RoleType;
+using apollo::cyber::service_discovery::ChannelManager;
+using apollo::cyber::service_discovery::TopologyManager;
 
 namespace apollo {
 namespace cyber {

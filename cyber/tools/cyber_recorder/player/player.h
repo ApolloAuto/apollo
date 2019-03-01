@@ -42,8 +42,10 @@ class Player {
   bool Init();
   bool Start();
   bool Stop();
+
  private:
   void ThreadFunc_Term();
+
  private:
   std::atomic<bool> is_initialized_ = {false};
   std::atomic<bool> is_stopped_ = {false};

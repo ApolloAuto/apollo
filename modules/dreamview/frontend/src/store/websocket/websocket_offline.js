@@ -79,6 +79,7 @@ export default class OfflinePlaybackWebSocketEndpoint {
 
                     if (world.sequenceNum && !(world.sequenceNum in this.frameData)) {
                         this.frameData[world.sequenceNum] = world;
+                        STORE.playback.setLoadingMarker(world.sequenceNum);
                     }
 
                     break;
@@ -180,8 +181,15 @@ export default class OfflinePlaybackWebSocketEndpoint {
                 recordId: recordId,
                 frameId: frameId,
             }));
-        } else if (STORE.playback.isSeeking) {
-            this.processSimWorld(this.frameData[frameId]);
+        } else {
+            if (STORE.playback.isSeeking) {
+                this.processSimWorld(this.frameData[frameId]);
+            }
+            let loadingMarker = frameId;
+            while (loadingMarker in this.frameData) {
+                loadingMarker ++;
+            }
+            STORE.playback.setLoadingMarker(loadingMarker - 1);
         }
     }
 

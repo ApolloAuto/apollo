@@ -1,5 +1,6 @@
 scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
 traffic_light_unprotected_right_turn_config: {
+  start_traffic_light_scenario_distance: 5.0
   max_valid_stop_distance: 3.5
   max_adc_stop_speed: 0.3
   min_pass_s_distance: 3.0
@@ -16,8 +17,10 @@ stage_config: {
   task_type: DECIDER_RULE_BASED_STOP
   task_type: DP_POLY_PATH_OPTIMIZER
   task_type: PATH_DECIDER
+  task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_FINAL_DECIDER
   task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
   task_config: {
     task_type: DECIDER_RULE_BASED_STOP
@@ -32,10 +35,16 @@ stage_config: {
     task_type: DP_ST_SPEED_OPTIMIZER
   }
   task_config: {
-    task_type: SPEED_DECIDER
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
   }
   task_config: {
     task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
   }
 }
 
@@ -46,8 +55,10 @@ stage_config: {
   task_type: DECIDER_CREEP
   task_type: DP_POLY_PATH_OPTIMIZER
   task_type: PATH_DECIDER
+  task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_FINAL_DECIDER
   task_type: PROCEED_WITH_CAUTION_SPEED
   task_config: {
     task_type: DECIDER_RULE_BASED_STOP
@@ -73,13 +84,19 @@ stage_config: {
     task_type: DP_ST_SPEED_OPTIMIZER
   }
   task_config: {
-    task_type: SPEED_DECIDER
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
   }
   task_config: {
     task_type: PROCEED_WITH_CAUTION_SPEED
     proceed_with_caution_speed_config: {
       max_distance: 5.0
     }
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
   }
 }
 
@@ -89,8 +106,10 @@ stage_config: {
   task_type: DECIDER_RULE_BASED_STOP
   task_type: DP_POLY_PATH_OPTIMIZER
   task_type: PATH_DECIDER
+  task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
+  task_type: SPEED_BOUNDS_FINAL_DECIDER
   task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
   task_config: {
     task_type: DECIDER_RULE_BASED_STOP
@@ -105,9 +124,15 @@ stage_config: {
     task_type: DP_ST_SPEED_OPTIMIZER
   }
   task_config: {
-    task_type: SPEED_DECIDER
+    task_type: SPEED_BOUNDS_PRIORI_DECIDER
+  }
+  task_config: {
+    task_type: SPEED_BOUNDS_FINAL_DECIDER
   }
   task_config: {
     task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  }
+  task_config: {
+    task_type: SPEED_DECIDER
   }
 }

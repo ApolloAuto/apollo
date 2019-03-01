@@ -31,9 +31,8 @@ using apollo::canbus::Chassis;
 using apollo::dreamview::HMIWorker;
 
 MonitorManager::MonitorManager()
-    : hmi_config_(HMIWorker::LoadConfig())
-    , log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {
-}
+    : hmi_config_(HMIWorker::LoadConfig()),
+      log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {}
 
 void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
   node_ = node;
@@ -44,8 +43,8 @@ void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
 
 bool MonitorManager::StartFrame(const double current_time) {
   // Get latest HMIStatus.
-  static auto hmi_status_reader = CreateReader<apollo::dreamview::HMIStatus>(
-      FLAGS_hmi_status_topic);
+  static auto hmi_status_reader =
+      CreateReader<apollo::dreamview::HMIStatus>(FLAGS_hmi_status_topic);
   hmi_status_reader->Observe();
   const auto hmi_status = hmi_status_reader->GetLatestObserved();
   if (hmi_status == nullptr) {

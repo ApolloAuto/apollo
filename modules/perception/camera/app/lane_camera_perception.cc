@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2019 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/app/lane_camera_perception.h"
 
 #include <gflags/gflags.h>
@@ -23,8 +23,8 @@
 #include <utility>
 #include <vector>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/camera/app/debug_info.h"
 #include "modules/perception/camera/common/global_config.h"
@@ -37,10 +37,9 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using apollo::cyber::common::GetAbsolutePath;
 
-bool LaneCameraPerception::Init(
-    const CameraPerceptionInitOptions &options) {
+bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   std::string work_root = "";
   if (options.use_cyber_work_root) {
     GetCyberWorkRoot(&work_root);
@@ -48,8 +47,8 @@ bool LaneCameraPerception::Init(
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
-  CHECK(apollo::common::util::GetProtoFromFile(
-      config_file, &perception_param_)) << "Read config failed: ";
+  CHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
+      << "Read config failed: " << config_file;
   CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
   lane_calibration_working_sensor_name_ =
@@ -66,8 +65,7 @@ bool LaneCameraPerception::Init(
 }
 
 void LaneCameraPerception::InitLane(
-    const std::string &work_root,
-    base::BaseCameraModelPtr &model,
+    const std::string &work_root, base::BaseCameraModelPtr &model,
     const app::PerceptionParam &perception_param) {
   // Init lane
   CHECK(perception_param.has_lane_param()) << "Failed to include lane_param";
@@ -86,7 +84,7 @@ void LaneCameraPerception::InitLane(
     lane_detector_init_options.gpu_id = perception_param_.gpu_id();
     model = common::SensorManager::Instance()->GetUndistortCameraModel(
         lane_detector_param.camera_name());
-    auto pinhole = static_cast<base::PinholeCameraModel *> (model.get());
+    auto pinhole = static_cast<base::PinholeCameraModel *>(model.get());
     name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
         lane_detector_param.camera_name(), pinhole->get_intrinsic_params()));
     lane_detector_init_options.base_camera_model = model;
@@ -112,7 +110,7 @@ void LaneCameraPerception::InitLane(
         lane_postprocessor_param.config_file();
     lane_postprocessor_.reset(
         BaseLanePostprocessorRegisterer::GetInstanceByName(
-        lane_postprocessor_param.name()));
+            lane_postprocessor_param.name()));
     CHECK(lane_postprocessor_ != nullptr);
     CHECK(lane_postprocessor_->Init(postprocessor_init_options))
         << "Failed to init " << lane_postprocessor_param.name();
@@ -121,7 +119,7 @@ void LaneCameraPerception::InitLane(
     // Init output file folder
     if (perception_param_.has_debug_param() &&
         perception_param_.debug_param().has_lane_out_dir()) {
-      write_out_lane_file_ =  true;
+      write_out_lane_file_ = true;
       out_lane_dir_ = perception_param_.debug_param().lane_out_dir();
       std::string command;
       command = "mkdir -p " + out_lane_dir_;
@@ -130,7 +128,7 @@ void LaneCameraPerception::InitLane(
 
     if (perception_param_.has_debug_param() &&
         perception_param_.debug_param().has_calibration_out_dir()) {
-      write_out_calib_file_ =  true;
+      write_out_calib_file_ = true;
       out_calib_dir_ = perception_param_.debug_param().calibration_out_dir();
       std::string command;
       command = "mkdir -p " + out_calib_dir_;
@@ -140,8 +138,7 @@ void LaneCameraPerception::InitLane(
 }
 
 void LaneCameraPerception::InitCalibrationService(
-    const std::string &work_root,
-    const base::BaseCameraModelPtr model,
+    const std::string &work_root, const base::BaseCameraModelPtr model,
     const app::PerceptionParam &perception_param) {
   // Init calibration service
   CHECK(perception_param.has_calibration_service_param())
@@ -160,8 +157,8 @@ void LaneCameraPerception::InitCalibrationService(
     calibration_service_init_options.image_width =
         static_cast<int>(model->get_width());
     calibration_service_.reset(
-    BaseCalibrationServiceRegisterer::GetInstanceByName(
-        calibration_service_param.plugin_param().name()));
+        BaseCalibrationServiceRegisterer::GetInstanceByName(
+            calibration_service_param.plugin_param().name()));
     CHECK(calibration_service_ != nullptr);
     CHECK(calibration_service_->Init(calibration_service_init_options))
         << "Failed to init " << calibration_service_param.plugin_param().name();
@@ -175,19 +172,24 @@ void LaneCameraPerception::SetCameraHeightAndPitch(
     const float &pitch_angle_calibrator_working_sensor) {
   CHECK(calibration_service_ != nullptr);
   calibration_service_->SetCameraHeightAndPitch(
-      name_camera_ground_height_map,
-      name_camera_pitch_angle_diff_map,
+      name_camera_ground_height_map, name_camera_pitch_angle_diff_map,
       pitch_angle_calibrator_working_sensor);
 }
 
+void LaneCameraPerception::SetIm2CarHomography(
+    Eigen::Matrix3d homography_im2car) {
+  CHECK(calibration_service_ != nullptr);
+  lane_postprocessor_->SetIm2CarHomography(homography_im2car);
+}
+
 bool LaneCameraPerception::GetCalibrationService(
-    BaseCalibrationService** calibration_service) {
+    BaseCalibrationService **calibration_service) {
   *calibration_service = calibration_service_.get();
   return true;
 }
 
-bool LaneCameraPerception::Perception(
-    const CameraPerceptionOptions &options, CameraFrame *frame) {
+bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
+                                      CameraFrame *frame) {
   PERCEPTION_PERF_FUNCTION();
   inference::CudaUtil::set_device_id(perception_param_.gpu_id());
   PERCEPTION_PERF_BLOCK_START();
@@ -195,10 +197,10 @@ bool LaneCameraPerception::Perception(
   CHECK(frame->calibration_service != nullptr);
 
   //  lane detector and postprocessor: work on front_6mm only
-  if (lane_calibration_working_sensor_name_
-      == frame->data_provider->sensor_name()) {
-    frame->camera_k_matrix = name_intrinsic_map_.at(
-    frame->data_provider->sensor_name());
+  if (lane_calibration_working_sensor_name_ ==
+      frame->data_provider->sensor_name()) {
+    frame->camera_k_matrix =
+        name_intrinsic_map_.at(frame->data_provider->sensor_name());
     LaneDetectorOptions lane_detetor_options;
     LanePostprocessorOptions lane_postprocessor_options;
     if (!lane_detector_->Detect(lane_detetor_options, frame)) {
@@ -229,10 +231,8 @@ bool LaneCameraPerception::Perception(
 
     if (write_out_lane_file_) {
       std::string lane_file_path =
-      out_lane_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
-      WriteLanelines(write_out_lane_file_,
-                     lane_file_path,
-                     frame->lane_objects);
+          out_lane_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
+      WriteLanelines(write_out_lane_file_, lane_file_path, frame->lane_objects);
     }
   } else {
     AINFO << "Skip lane detection & calibration due to sensor mismatch.";
@@ -246,9 +246,7 @@ bool LaneCameraPerception::Perception(
   if (write_out_calib_file_) {
     std::string calib_file_path =
         out_calib_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
-    WriteCalibrationOutput(write_out_calib_file_,
-                           calib_file_path,
-                           frame);
+    WriteCalibrationOutput(write_out_calib_file_, calib_file_path, frame);
   }
   return true;
 }

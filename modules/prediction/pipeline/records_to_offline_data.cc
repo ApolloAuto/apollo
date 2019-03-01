@@ -58,7 +58,7 @@ void GenerateDataForLearning() {
 }  // namespace prediction
 }  // namespace apollo
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   apollo::prediction::GenerateDataForLearning();
   return 0;

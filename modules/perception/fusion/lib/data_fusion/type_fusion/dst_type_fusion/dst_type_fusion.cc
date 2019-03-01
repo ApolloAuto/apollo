@@ -17,7 +17,7 @@
 
 #include "boost/format.hpp"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
@@ -28,7 +28,7 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 template <typename Type>
 std::string vector2string(const std::vector<Type> &values) {
@@ -78,7 +78,7 @@ bool DstTypeFusion::Init() {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   DstTypeFusionConfig params;
 
-  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
+  if (!cyber::common::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }
@@ -278,8 +278,10 @@ double DstTypeFusion::GetReliabilityForUnKnown(
   struct tm timeinfo;
   localtime_r(&rawtime, &timeinfo);
   bool is_night = (timeinfo.tm_hour >= 17);
-  double prob = (common::SensorManager::Instance()->IsCamera(sensor_id) &&
-                 is_night) ? 0.1 : 1.0;
+  double prob =
+      (common::SensorManager::Instance()->IsCamera(sensor_id) && is_night)
+          ? 0.1
+          : 1.0;
   return find_res->second * prob;
 }
 

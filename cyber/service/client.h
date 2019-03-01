@@ -154,7 +154,9 @@ template <typename Request, typename Response>
 typename Client<Request, Response>::SharedResponse
 Client<Request, Response>::SendRequest(SharedRequest request,
                                        const std::chrono::seconds& timeout_s) {
-  if (!IsInit()) { return nullptr; }
+  if (!IsInit()) {
+    return nullptr;
+  }
   auto future = AsyncSendRequest(request);
   if (!future.valid()) {
     return nullptr;
@@ -171,7 +173,9 @@ template <typename Request, typename Response>
 typename Client<Request, Response>::SharedResponse
 Client<Request, Response>::SendRequest(const Request& request,
                                        const std::chrono::seconds& timeout_s) {
-  if (!IsInit()) { return nullptr; }
+  if (!IsInit()) {
+    return nullptr;
+  }
   auto request_ptr = std::make_shared<const Request>(request);
   return SendRequest(request_ptr, timeout_s);
 }

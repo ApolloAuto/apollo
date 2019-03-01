@@ -41,76 +41,401 @@ bool DualVariableWarmStartProblem::Solve(
     const Eigen::MatrixXd& xWS, Eigen::MatrixXd* l_warm_up,
     Eigen::MatrixXd* n_warm_up) {
   auto t_start = cyber::Time::Now().ToSecond();
-  DualVariableWarmStartIPOPTInterface* ptop =
-      new DualVariableWarmStartIPOPTInterface(
-          horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
-          obstacles_b, xWS, planner_open_space_config_);
 
-  Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
+  if (planner_open_space_config_.dual_variable_warm_start_config()
+          .qp_format() == OSQP) {
+    DualVariableWarmStartOSQPInterface* ptop =
+        new DualVariableWarmStartOSQPInterface(
+            horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
+            obstacles_b, xWS, planner_open_space_config_);
+    bool succ = ptop->optimize();
 
-  // Create an instance of the IpoptApplication
-  Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+    if (succ) {
+      AINFO << "dual warm up done.";
+      ptop->get_optimization_results(l_warm_up, n_warm_up);
 
-  app->Options()->SetIntegerValue("print_level", planner_open_space_config_.
-      dual_variable_warm_start_config().ipopt_config().ipopt_print_level());
-  app->Options()->SetIntegerValue("mumps_mem_percent",
-      planner_open_space_config_.dual_variable_warm_start_config().
-      ipopt_config().mumps_mem_percent());
-  app->Options()->SetNumericValue("mumps_pivtol", planner_open_space_config_.
-      dual_variable_warm_start_config().ipopt_config().mumps_pivtol());
-  app->Options()->SetIntegerValue("max_iter", planner_open_space_config_.
-      dual_variable_warm_start_config().ipopt_config().ipopt_max_iter());
-  app->Options()->SetNumericValue("tol", planner_open_space_config_.
-      dual_variable_warm_start_config().ipopt_config().ipopt_tol());
-  app->Options()->SetNumericValue("acceptable_constr_viol_tol",
-      planner_open_space_config_.dual_variable_warm_start_config().
-      ipopt_config().ipopt_acceptable_constr_viol_tol());
-  app->Options()->SetNumericValue("min_hessian_perturbation",
-      planner_open_space_config_.dual_variable_warm_start_config().
-      ipopt_config().ipopt_min_hessian_perturbation());
-  app->Options()->SetNumericValue("jacobian_regularization_value",
-      planner_open_space_config_.dual_variable_warm_start_config().
-      ipopt_config().ipopt_jacobian_regularization_value());
-  app->Options()->SetStringValue("print_timing_statistics",
-      planner_open_space_config_.dual_variable_warm_start_config().
-      ipopt_config().ipopt_print_timing_statistics());
-  app->Options()->SetStringValue("alpha_for_y",
-      planner_open_space_config_.dual_variable_warm_start_config().
-      ipopt_config().ipopt_alpha_for_y());
-  app->Options()->SetStringValue("recalc_y", planner_open_space_config_.
-      dual_variable_warm_start_config().ipopt_config().ipopt_recalc_y());
+      auto t_end = cyber::Time::Now().ToSecond();
+      AINFO << "Dual vairable warm start solving time in second : "
+            << t_end - t_start;
+      return true;
+    }
 
-  Ipopt::ApplicationReturnStatus status = app->Initialize();
-  if (status != Ipopt::Solve_Succeeded) {
-    AERROR
-        << "*** Dual variable wart start problem error during initialization!";
+    AERROR << "dual warm up fail.";
+    ptop->get_optimization_results(l_warm_up, n_warm_up);
     return false;
-  }
+  } else if (planner_open_space_config_.dual_variable_warm_start_config()
+                 .qp_format() == IPOPTQP) {
+    DualVariableWarmStartIPOPTQPInterface* ptop =
+        new DualVariableWarmStartIPOPTQPInterface(
+            horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
+            obstacles_b, xWS, planner_open_space_config_);
 
-  status = app->OptimizeTNLP(problem);
+    Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
+    // Create an instance of the IpoptApplication
+    Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  if (status == Ipopt::Solve_Succeeded ||
-      status == Ipopt::Solved_To_Acceptable_Level) {
-    // Retrieve some statistics about the solve
-    Ipopt::Index iter_count = app->Statistics()->IterationCount();
-    AINFO << "*** The problem solved in " << iter_count << " iterations!";
+    app->Options()->SetIntegerValue(
+        "print_level",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_print_level());
+    app->Options()->SetIntegerValue(
+        "mumps_mem_percent",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .mumps_mem_percent());
+    app->Options()->SetNumericValue(
+        "mumps_pivtol",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .mumps_pivtol());
+    app->Options()->SetIntegerValue(
+        "max_iter", planner_open_space_config_.dual_variable_warm_start_config()
+                        .ipopt_config()
+                        .ipopt_max_iter());
+    app->Options()->SetNumericValue(
+        "tol", planner_open_space_config_.dual_variable_warm_start_config()
+                   .ipopt_config()
+                   .ipopt_tol());
+    app->Options()->SetNumericValue(
+        "acceptable_constr_viol_tol",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_acceptable_constr_viol_tol());
+    app->Options()->SetNumericValue(
+        "min_hessian_perturbation",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_min_hessian_perturbation());
+    app->Options()->SetNumericValue(
+        "jacobian_regularization_value",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_jacobian_regularization_value());
+    app->Options()->SetStringValue(
+        "print_timing_statistics",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_print_timing_statistics());
+    app->Options()->SetStringValue(
+        "alpha_for_y",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_alpha_for_y());
+    app->Options()->SetStringValue(
+        "recalc_y", planner_open_space_config_.dual_variable_warm_start_config()
+                        .ipopt_config()
+                        .ipopt_recalc_y());
+    // for qp problem speed up
+    app->Options()->SetStringValue("mehrotra_algorithm", "yes");
 
-    Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-    AINFO << "*** The final value of the objective function is " << final_obj
-          << '.';
+    Ipopt::ApplicationReturnStatus status = app->Initialize();
+    if (status != Ipopt::Solve_Succeeded) {
+      AERROR << "*** Dual variable wart start problem error during "
+                "initialization!";
+      return false;
+    }
+
+    status = app->OptimizeTNLP(problem);
+
+    if (status == Ipopt::Solve_Succeeded ||
+        status == Ipopt::Solved_To_Acceptable_Level) {
+      // Retrieve some statistics about the solve
+      Ipopt::Index iter_count = app->Statistics()->IterationCount();
+      AINFO << "*** The problem solved in " << iter_count << " iterations!";
+
+      Ipopt::Number final_obj = app->Statistics()->FinalObjective();
+      AINFO << "*** The final value of the objective function is " << final_obj
+            << '.';
+      auto t_end = cyber::Time::Now().ToSecond();
+
+      AINFO << "Dual vairable warm start solving time in second : "
+            << t_end - t_start;
+    } else {
+      AINFO << "Solve not succeeding, return status: " << int(status);
+    }
+
+    ptop->get_optimization_results(l_warm_up, n_warm_up);
+
+    return status == Ipopt::Solve_Succeeded ||
+           status == Ipopt::Solved_To_Acceptable_Level;
+  } else if (planner_open_space_config_.dual_variable_warm_start_config()
+                 .qp_format() == IPOPT) {
+    DualVariableWarmStartIPOPTInterface* ptop =
+        new DualVariableWarmStartIPOPTInterface(
+            horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
+            obstacles_b, xWS, planner_open_space_config_);
+
+    Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
+    // Create an instance of the IpoptApplication
+    Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+
+    app->Options()->SetIntegerValue(
+        "print_level",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_print_level());
+    app->Options()->SetIntegerValue(
+        "mumps_mem_percent",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .mumps_mem_percent());
+    app->Options()->SetNumericValue(
+        "mumps_pivtol",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .mumps_pivtol());
+    app->Options()->SetIntegerValue(
+        "max_iter", planner_open_space_config_.dual_variable_warm_start_config()
+                        .ipopt_config()
+                        .ipopt_max_iter());
+    app->Options()->SetNumericValue(
+        "tol", planner_open_space_config_.dual_variable_warm_start_config()
+                   .ipopt_config()
+                   .ipopt_tol());
+    app->Options()->SetNumericValue(
+        "acceptable_constr_viol_tol",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_acceptable_constr_viol_tol());
+    app->Options()->SetNumericValue(
+        "min_hessian_perturbation",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_min_hessian_perturbation());
+    app->Options()->SetNumericValue(
+        "jacobian_regularization_value",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_jacobian_regularization_value());
+    app->Options()->SetStringValue(
+        "print_timing_statistics",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_print_timing_statistics());
+    app->Options()->SetStringValue(
+        "alpha_for_y",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_alpha_for_y());
+    app->Options()->SetStringValue(
+        "recalc_y", planner_open_space_config_.dual_variable_warm_start_config()
+                        .ipopt_config()
+                        .ipopt_recalc_y());
+
+    Ipopt::ApplicationReturnStatus status = app->Initialize();
+    if (status != Ipopt::Solve_Succeeded) {
+      AERROR << "*** Dual variable wart start problem error during "
+                "initialization!";
+      return false;
+    }
+
+    status = app->OptimizeTNLP(problem);
+    if (status == Ipopt::Solve_Succeeded ||
+        status == Ipopt::Solved_To_Acceptable_Level) {
+      // Retrieve some statistics about the solve
+      Ipopt::Index iter_count = app->Statistics()->IterationCount();
+      AINFO << "*** The problem solved in " << iter_count << " iterations!";
+
+      Ipopt::Number final_obj = app->Statistics()->FinalObjective();
+      AINFO << "*** The final value of the objective function is " << final_obj
+            << '.';
+      auto t_end = cyber::Time::Now().ToSecond();
+
+      AINFO << "Dual vairable warm start solving time in second : "
+            << t_end - t_start;
+    } else {
+      AINFO << "Solve not succeeding, return status: " << int(status);
+    }
+
+    ptop->get_optimization_results(l_warm_up, n_warm_up);
+
+    return status == Ipopt::Solve_Succeeded ||
+           status == Ipopt::Solved_To_Acceptable_Level;
+  } else {  // debug mode
+    DualVariableWarmStartOSQPInterface* ptop_osqp =
+        new DualVariableWarmStartOSQPInterface(
+            horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
+            obstacles_b, xWS, planner_open_space_config_);
+    bool succ = ptop_osqp->optimize();
+
+    if (!succ) {
+      AERROR << "dual warm up fail.";
+      ptop_osqp->get_optimization_results(l_warm_up, n_warm_up);
+    }
+
+    AINFO << "dual warm up done.";
+    ptop_osqp->get_optimization_results(l_warm_up, n_warm_up);
+
     auto t_end = cyber::Time::Now().ToSecond();
-
     AINFO << "Dual vairable warm start solving time in second : "
           << t_end - t_start;
-  } else {
-    AINFO << "Solve not succeeding, return status: " << int(status);
+
+    // ipoptqp result
+    Eigen::MatrixXd l_warm_up_ipoptqp(l_warm_up->rows(), l_warm_up->cols());
+    Eigen::MatrixXd n_warm_up_ipoptqp(n_warm_up->rows(), n_warm_up->cols());
+
+    DualVariableWarmStartIPOPTQPInterface* ptop_ipoptqp =
+        new DualVariableWarmStartIPOPTQPInterface(
+            horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
+            obstacles_b, xWS, planner_open_space_config_);
+
+    Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop_ipoptqp;
+    // Create an instance of the IpoptApplication
+    Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+
+    app->Options()->SetIntegerValue(
+        "print_level",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_print_level());
+    app->Options()->SetIntegerValue(
+        "mumps_mem_percent",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .mumps_mem_percent());
+    app->Options()->SetNumericValue(
+        "mumps_pivtol",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .mumps_pivtol());
+    app->Options()->SetIntegerValue(
+        "max_iter", planner_open_space_config_.dual_variable_warm_start_config()
+                        .ipopt_config()
+                        .ipopt_max_iter());
+    app->Options()->SetNumericValue(
+        "tol", planner_open_space_config_.dual_variable_warm_start_config()
+                   .ipopt_config()
+                   .ipopt_tol());
+    app->Options()->SetNumericValue(
+        "acceptable_constr_viol_tol",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_acceptable_constr_viol_tol());
+    app->Options()->SetNumericValue(
+        "min_hessian_perturbation",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_min_hessian_perturbation());
+    app->Options()->SetNumericValue(
+        "jacobian_regularization_value",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_jacobian_regularization_value());
+    app->Options()->SetStringValue(
+        "print_timing_statistics",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_print_timing_statistics());
+    app->Options()->SetStringValue(
+        "alpha_for_y",
+        planner_open_space_config_.dual_variable_warm_start_config()
+            .ipopt_config()
+            .ipopt_alpha_for_y());
+    app->Options()->SetStringValue(
+        "recalc_y", planner_open_space_config_.dual_variable_warm_start_config()
+                        .ipopt_config()
+                        .ipopt_recalc_y());
+    // for qp problem speed up
+    app->Options()->SetStringValue("mehrotra_algorithm", "yes");
+
+    Ipopt::ApplicationReturnStatus status = app->Initialize();
+    if (status != Ipopt::Solve_Succeeded) {
+      AERROR << "*** Dual variable wart start problem error during "
+                "initialization!";
+      return false;
+    }
+
+    status = app->OptimizeTNLP(problem);
+
+    if (status == Ipopt::Solve_Succeeded ||
+        status == Ipopt::Solved_To_Acceptable_Level) {
+      // Retrieve some statistics about the solve
+      Ipopt::Index iter_count = app->Statistics()->IterationCount();
+      AINFO << "*** IPOPTQP: The problem solved in " << iter_count
+            << " iterations!";
+      Ipopt::Number final_obj = app->Statistics()->FinalObjective();
+      AINFO << "*** IPOPTQP: The final value of the objective function is "
+            << final_obj << '.';
+    } else {
+      AINFO << "Solve not succeeding, return status: " << int(status);
+    }
+
+    ptop_ipoptqp->get_optimization_results(&l_warm_up_ipoptqp,
+                                           &n_warm_up_ipoptqp);
+
+    // ipopt result
+    Eigen::MatrixXd l_warm_up_ipopt(l_warm_up->rows(), l_warm_up->cols());
+    Eigen::MatrixXd n_warm_up_ipopt(n_warm_up->rows(), n_warm_up->cols());
+
+    DualVariableWarmStartIPOPTInterface* ptop_ipopt =
+        new DualVariableWarmStartIPOPTInterface(
+            horizon, ts, ego, obstacles_edges_num, obstacles_num, obstacles_A,
+            obstacles_b, xWS, planner_open_space_config_);
+
+    problem = ptop_ipopt;
+    // Create an instance of the IpoptApplication
+
+    status = app->Initialize();
+    if (status != Ipopt::Solve_Succeeded) {
+      AERROR << "*** Dual variable wart start problem error during "
+                "initialization!";
+      return false;
+    }
+
+    status = app->OptimizeTNLP(problem);
+    if (status == Ipopt::Solve_Succeeded ||
+        status == Ipopt::Solved_To_Acceptable_Level) {
+      // Retrieve some statistics about the solve
+      Ipopt::Index iter_count = app->Statistics()->IterationCount();
+      AINFO << "*** IPOPT: The problem solved in " << iter_count
+            << " iterations!";
+      Ipopt::Number final_obj = app->Statistics()->FinalObjective();
+      AINFO << "*** IPOPT: The final value of the objective function is "
+            << final_obj << '.';
+    } else {
+      AINFO << "Solve not succeeding, return status: " << int(status);
+    }
+
+    ptop_ipopt->get_optimization_results(&l_warm_up_ipopt, &n_warm_up_ipopt);
+
+    // compare three results
+    double l_max_diff1 = 0.0;
+    double l_max_diff2 = 0.0;
+    double l_max_diff3 = 0.0;
+    for (int c = 0; c < l_warm_up->cols(); ++c) {
+      for (int r = 0; r < l_warm_up->rows(); ++r) {
+        l_max_diff1 = std::max(l_max_diff1, std::abs(l_warm_up->coeff(r, c) -
+                                                     l_warm_up_ipopt(r, c)));
+        l_max_diff2 = std::max(l_max_diff2, std::abs(l_warm_up->coeff(r, c) -
+                                                     l_warm_up_ipoptqp(r, c)));
+        l_max_diff3 = std::max(l_max_diff3, std::abs(l_warm_up_ipoptqp(r, c) -
+                                                     l_warm_up_ipopt(r, c)));
+      }
+    }
+    AINFO << "max l warm up diff between osqp & ipopt: " << l_max_diff1;
+    AINFO << "max l warm up diff between osqp & ipoptqp: " << l_max_diff2;
+    AINFO << "max l warm up diff between ipopt & ipoptqp: " << l_max_diff3;
+
+    double n_max_diff1 = 0.0;
+    double n_max_diff2 = 0.0;
+    double n_max_diff3 = 0.0;
+    for (int c = 0; c < n_warm_up->cols(); ++c) {
+      for (int r = 0; r < n_warm_up->rows(); ++r) {
+        n_max_diff1 = std::max(n_max_diff1, std::abs(n_warm_up->coeff(r, c) -
+                                                     n_warm_up_ipopt(r, c)));
+        n_max_diff2 = std::max(n_max_diff2, std::abs(n_warm_up->coeff(r, c) -
+                                                     n_warm_up_ipoptqp(r, c)));
+        n_max_diff3 = std::max(n_max_diff3, std::abs(n_warm_up_ipoptqp(r, c) -
+                                                     n_warm_up_ipopt(r, c)));
+      }
+    }
+    AINFO << "max n warm up diff between osqp & ipopt: " << n_max_diff1;
+    AINFO << "max n warm up diff between osqp & ipoptqp: " << n_max_diff2;
+    AINFO << "max n warm up diff between ipopt & ipoptqp: " << n_max_diff3;
+
+    return true;
   }
-
-  ptop->get_optimization_results(l_warm_up, n_warm_up);
-
-  return status == Ipopt::Solve_Succeeded ||
-         status == Ipopt::Solved_To_Acceptable_Level;
 }
-
 }  // namespace planning
 }  // namespace apollo

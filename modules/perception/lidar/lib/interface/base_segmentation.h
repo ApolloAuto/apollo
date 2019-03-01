@@ -29,8 +29,7 @@ struct SegmentationInitOptions {
   std::string sensor_name = "velodyne64";
 };
 
-struct SegmentationOptions {
-};
+struct SegmentationOptions {};
 
 class BaseSegmentation {
  public:

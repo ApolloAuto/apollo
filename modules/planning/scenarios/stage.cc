@@ -51,9 +51,14 @@ Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
     CHECK(config_map.find(task_type) != config_map.end())
         << "Task: " << TaskConfig::TaskType_Name(task_type)
         << " used but not configured";
-    auto ptr = TaskFactory::CreateTask(*config_map[task_type]);
-    task_list_.push_back(ptr.get());
-    tasks_[task_type] = std::move(ptr);
+    auto iter = tasks_.find(task_type);
+    if (iter == tasks_.end()) {
+      auto ptr = TaskFactory::CreateTask(*config_map[task_type]);
+      task_list_.push_back(ptr.get());
+      tasks_[task_type] = std::move(ptr);
+    } else {
+      task_list_.push_back(iter->second.get());
+    }
   }
 }
 
@@ -111,32 +116,6 @@ bool Stage::ExecuteTaskOnReferenceLine(
 Stage::StageStatus Stage::FinishScenario() {
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
-}
-
-bool Stage::CheckStopSignDone(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& stop_sign_overlap_id) {
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it =
-      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
-                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == stop_sign_overlap_id;
-                   });
-  return (stop_sign_overlap_it == stop_sign_overlaps.end());
-}
-
-bool Stage::CheckTrafficLightDone(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& traffic_light_overlap_id) {
-  const std::vector<PathOverlap>& traffic_light_overlaps =
-      reference_line_info.reference_line().map_path().signal_overlaps();
-  auto traffic_light_overlap_it =
-      std::find_if(traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
-                   [&traffic_light_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == traffic_light_overlap_id;
-                   });
-  return (traffic_light_overlap_it == traffic_light_overlaps.end());
 }
 
 }  // namespace scenario

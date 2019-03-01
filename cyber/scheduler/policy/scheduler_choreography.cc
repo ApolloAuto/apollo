@@ -34,10 +34,10 @@ namespace scheduler {
 using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;
-using apollo::cyber::common::GlobalData;
 using apollo::cyber::common::GetAbsolutePath;
-using apollo::cyber::common::PathExists;
 using apollo::cyber::common::GetProtoFromFile;
+using apollo::cyber::common::GlobalData;
+using apollo::cyber::common::PathExists;
 using apollo::cyber::common::WorkRoot;
 using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
@@ -126,7 +126,7 @@ void SchedulerChoreography::CreateProcessor() {
 bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  MutexWrapper *wrapper = nullptr;
+  MutexWrapper* wrapper = nullptr;
   if (!id_map_mutex_.Get(cr->id(), &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
@@ -177,7 +177,8 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
     {
       WriteLockGuard<AtomicRWLock> lk(
           ClassicContext::rq_locks_[DEFAULT_GROUP_NAME].at(cr->priority()));
-      ClassicContext::cr_group_[DEFAULT_GROUP_NAME].at(cr->priority())
+      ClassicContext::cr_group_[DEFAULT_GROUP_NAME]
+          .at(cr->priority())
           .emplace_back(cr);
     }
   }
@@ -195,7 +196,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
 bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  MutexWrapper *wrapper = nullptr;
+  MutexWrapper* wrapper = nullptr;
   if (!id_map_mutex_.Get(crid, &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
@@ -242,8 +243,7 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
       }
     }
   } else {
-    static_cast<ChoreographyContext *>(pctxs_[pid].get())
-        ->RemoveCRoutine(crid);
+    static_cast<ChoreographyContext*>(pctxs_[pid].get())->RemoveCRoutine(crid);
     return true;
   }
 

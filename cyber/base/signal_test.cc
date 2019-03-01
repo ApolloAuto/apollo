@@ -19,7 +19,6 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-
 namespace apollo {
 namespace cyber {
 namespace base {

@@ -41,8 +41,7 @@ using apollo::common::util::StrCat;
 
 ResourceMonitor::ResourceMonitor()
     : RecurrentRunner(FLAGS_resource_monitor_name,
-                      FLAGS_resource_monitor_interval) {
-}
+                      FLAGS_resource_monitor_interval) {}
 
 void ResourceMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
@@ -64,18 +63,18 @@ void ResourceMonitor::UpdateStatus(
   status->clear_status();
   // Monitor available disk space.
   for (const auto& disk_space : config.disk_spaces()) {
-    for (const auto& path : apollo::common::util::Glob(disk_space.path())) {
+    for (const auto& path : cyber::common::Glob(disk_space.path())) {
       const auto space = boost::filesystem::space(path);
       const int available_gb = static_cast<int>(space.available >> 30);
       if (available_gb < disk_space.insufficient_space_error()) {
-        const std::string err = StrCat(
-            path, " has insufficient space: ",
-            available_gb, "GB < ", disk_space.insufficient_space_error());
+        const std::string err =
+            StrCat(path, " has insufficient space: ", available_gb, "GB < ",
+                   disk_space.insufficient_space_error());
         SummaryMonitor::EscalateStatus(ComponentStatus::ERROR, err, status);
       } else if (available_gb < disk_space.insufficient_space_warning()) {
-        const std::string err = StrCat(
-            path, " has insufficient space: ",
-            available_gb, "GB < ", disk_space.insufficient_space_warning());
+        const std::string err =
+            StrCat(path, " has insufficient space: ", available_gb, "GB < ",
+                   disk_space.insufficient_space_warning());
         SummaryMonitor::EscalateStatus(ComponentStatus::WARN, err, status);
       }
     }

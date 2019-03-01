@@ -73,8 +73,8 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
     bool is_about_to_stop = false;
     double acceleration = 0.0;
     if (sequence.has_stop_sign()) {
-      double stop_distance = sequence.stop_sign().lane_sequence_s() -
-                             sequence.lane_s();
+      double stop_distance =
+          sequence.stop_sign().lane_sequence_s() - sequence.lane_s();
       is_about_to_stop = SupposedToStop(feature, stop_distance, &acceleration);
     }
 
@@ -83,8 +83,8 @@ void LaneSequencePredictor::Predict(Obstacle* obstacle) {
           *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
           FLAGS_prediction_trajectory_time_resolution, acceleration, &points);
     } else {
-      DrawLaneSequenceTrajectoryPoints(*obstacle, sequence,
-          FLAGS_prediction_trajectory_time_length,
+      DrawLaneSequenceTrajectoryPoints(
+          *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
           FLAGS_prediction_trajectory_time_resolution, &points);
     }
 

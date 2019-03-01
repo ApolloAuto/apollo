@@ -80,11 +80,9 @@ LaneGraph ObstacleClusters::GetLaneGraphWithoutMemorizing(
   return lane_graph;
 }
 
-void ObstacleClusters::AddObstacle(
-    const int obstacle_id,
-    const std::string& lane_id,
-    const double lane_s,
-    const double lane_l) {
+void ObstacleClusters::AddObstacle(const int obstacle_id,
+                                   const std::string& lane_id,
+                                   const double lane_s, const double lane_l) {
   LaneObstacle lane_obstacle;
   lane_obstacle.set_obstacle_id(obstacle_id);
   lane_obstacle.set_lane_id(lane_id);
@@ -94,20 +92,18 @@ void ObstacleClusters::AddObstacle(
 }
 
 void ObstacleClusters::SortObstacles() {
-  for (auto iter = lane_obstacles_.begin();
-       iter != lane_obstacles_.end(); ++iter) {
+  for (auto iter = lane_obstacles_.begin(); iter != lane_obstacles_.end();
+       ++iter) {
     std::sort(iter->second.begin(), iter->second.end(),
-      [](const LaneObstacle& obs0, const LaneObstacle& obs1) -> bool {
-        return obs0.lane_s() < obs1.lane_s();
-      });
+              [](const LaneObstacle& obs0, const LaneObstacle& obs1) -> bool {
+                return obs0.lane_s() < obs1.lane_s();
+              });
   }
 }
 
 bool ObstacleClusters::ForwardNearbyObstacle(
-    const LaneSequence& lane_sequence,
-    const int obstacle_id,
-    const double obstacle_s,
-    const double obstacle_l,
+    const LaneSequence& lane_sequence, const int obstacle_id,
+    const double obstacle_s, const double obstacle_l,
     NearbyObstacle* const nearby_obstacle_ptr) {
   double accumulated_s = 0.0;
   for (const LaneSegment& lane_segment : lane_sequence.lane_segment()) {
@@ -136,10 +132,8 @@ bool ObstacleClusters::ForwardNearbyObstacle(
 }
 
 bool ObstacleClusters::BackwardNearbyObstacle(
-    const LaneSequence& lane_sequence,
-    const int obstacle_id,
-    const double obstacle_s,
-    const double obstacle_l,
+    const LaneSequence& lane_sequence, const int obstacle_id,
+    const double obstacle_s, const double obstacle_l,
     NearbyObstacle* const nearby_obstacle_ptr) {
   if (lane_sequence.lane_segment_size() == 0) {
     AERROR << "Empty lane sequence found.";
@@ -151,8 +145,8 @@ bool ObstacleClusters::BackwardNearbyObstacle(
   // Search current lane
   if (lane_obstacles_.find(lane_id) != lane_obstacles_.end() &&
       !lane_obstacles_[lane_id].empty()) {
-    for (int i = static_cast<int>(lane_obstacles_[lane_id].size()) - 1;
-        i >= 0; --i) {
+    for (int i = static_cast<int>(lane_obstacles_[lane_id].size()) - 1; i >= 0;
+         --i) {
       const LaneObstacle& lane_obstacle = lane_obstacles_[lane_id][i];
       if (lane_obstacle.obstacle_id() == obstacle_id) {
         continue;
@@ -182,7 +176,7 @@ bool ObstacleClusters::BackwardNearbyObstacle(
       continue;
     }
     std::shared_ptr<const LaneInfo> pred_lane_info_ptr =
-      PredictionMap::LaneById(predecessor_lane_id.id());
+        PredictionMap::LaneById(predecessor_lane_id.id());
     const LaneObstacle& backward_obs = lane_obstacles_[lane_id].back();
     double delta_s = backward_obs.lane_s() -
                      (obstacle_s + pred_lane_info_ptr->total_length());
@@ -208,15 +202,15 @@ StopSign ObstacleClusters::QueryStopSignByLaneId(const std::string& lane_id) {
   std::shared_ptr<const LaneInfo> lane_info_ptr =
       PredictionMap::LaneById(lane_id);
   CHECK_NOTNULL(lane_info_ptr);
-  for (const auto &overlap_id : lane_info_ptr->lane().overlap_id()) {
+  for (const auto& overlap_id : lane_info_ptr->lane().overlap_id()) {
     auto overlap_info_ptr = PredictionMap::OverlapById(overlap_id.id());
     if (overlap_info_ptr == nullptr) {
       continue;
     }
-    for (const auto &object : overlap_info_ptr->overlap().object()) {
+    for (const auto& object : overlap_info_ptr->overlap().object()) {
       // find the overlap with stop_sign
       if (object.has_stop_sign_overlap_info()) {
-        for (const auto &obj : overlap_info_ptr->overlap().object()) {
+        for (const auto& obj : overlap_info_ptr->overlap().object()) {
           // find the obj of in the overlap
           if (obj.has_lane_overlap_info()) {
             if (!stop_sign.has_lane_s() ||

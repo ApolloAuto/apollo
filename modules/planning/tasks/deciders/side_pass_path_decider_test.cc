@@ -32,15 +32,15 @@ class SidePassPathDeciderTest : public ::testing::Test {
   virtual void SetUp() {
     config_.set_task_type(TaskConfig::SIDE_PASS_PATH_DECIDER);
     config_.mutable_side_pass_path_decider_config();
-    config_.mutable_side_pass_path_decider_config()->
-        set_total_path_length(200.0);
+    config_.mutable_side_pass_path_decider_config()->set_total_path_length(
+        200.0);
     config_.mutable_side_pass_path_decider_config()->set_path_resolution(0.5);
     config_.mutable_side_pass_path_decider_config()->set_l_weight(1.0);
     config_.mutable_side_pass_path_decider_config()->set_dl_weight(1.0);
     config_.mutable_side_pass_path_decider_config()->set_ddl_weight(1.0);
     config_.mutable_side_pass_path_decider_config()->set_dddl_weight(1.0);
-    config_.mutable_side_pass_path_decider_config()->
-        set_guiding_line_weight(1.0);
+    config_.mutable_side_pass_path_decider_config()->set_guiding_line_weight(
+        1.0);
 
     AINFO << config_.DebugString();
   }

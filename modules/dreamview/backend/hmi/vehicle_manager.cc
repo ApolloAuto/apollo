@@ -29,8 +29,8 @@ DEFINE_string(vehicle_data_config_filename,
 namespace apollo {
 namespace dreamview {
 
-using cyber::common::GetProtoFromFile;
 using apollo::common::util::StrCat;
+using cyber::common::GetProtoFromFile;
 
 VehicleManager::VehicleManager() {
   CHECK(GetProtoFromFile(FLAGS_vehicle_data_config_filename, &vehicle_data_))

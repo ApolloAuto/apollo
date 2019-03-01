@@ -27,23 +27,22 @@ DEFINE_string(process_monitor_name, "ProcessMonitor",
               "Name of the process monitor.");
 
 DEFINE_double(process_monitor_interval, 1.5,
-              "Process status checking interval (s).");
+              "Process status checking interval in seconds.");
 
 namespace apollo {
 namespace monitor {
 
 ProcessMonitor::ProcessMonitor()
     : RecurrentRunner(FLAGS_process_monitor_name,
-                      FLAGS_process_monitor_interval) {
-}
+                      FLAGS_process_monitor_interval) {}
 
 void ProcessMonitor::RunOnce(const double current_time) {
   // Get running processes.
   std::vector<std::string> running_processes;
-  for (const auto& cmd_file : apollo::common::util::Glob("/proc/*/cmdline")) {
+  for (const auto& cmd_file : cyber::common::Glob("/proc/*/cmdline")) {
     // Get process command string.
     std::string cmd_string;
-    if (apollo::common::util::GetContent(cmd_file, &cmd_string) &&
+    if (cyber::common::GetContent(cmd_file, &cmd_string) &&
         !cmd_string.empty()) {
       // In /proc/<PID>/cmdline, the parts are seperated with \0, which will be
       // converted back to whitespaces here.

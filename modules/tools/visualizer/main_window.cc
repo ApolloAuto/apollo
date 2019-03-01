@@ -250,7 +250,6 @@ MainWindow::~MainWindow() {
 
   pointcloud_reader_mutex_.unlock();
 
-
   if (pointcloud_channel_Reader_) {
     delete pointcloud_channel_Reader_;
     pointcloud_channel_Reader_ = nullptr;

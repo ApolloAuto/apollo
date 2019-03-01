@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/common/data_provider.h"
 #include "cyber/common/log.h"
 
@@ -27,8 +27,8 @@ bool DataProvider::Init(const DataProvider::InitOptions &options) {
   device_id_ = options.device_id;
 
   if (cudaSetDevice(device_id_) != cudaSuccess) {
-      AERROR << "Failed to set device to " << device_id_;
-      return false;
+    AERROR << "Failed to set device to " << device_id_;
+    return false;
   }
 
   // init uint8 blobs
@@ -52,12 +52,12 @@ bool DataProvider::Init(const DataProvider::InitOptions &options) {
       return false;
     }
     // init uint8 blobs
-    ori_gray_.reset(new base::Image8U(src_height_, src_width_,
-                                      base::Color::GRAY));
-    ori_rgb_.reset(new base::Image8U(src_height_, src_width_,
-                                     base::Color::RGB));
-    ori_bgr_.reset(new base::Image8U(src_height_, src_width_,
-                                     base::Color::BGR));
+    ori_gray_.reset(
+        new base::Image8U(src_height_, src_width_, base::Color::GRAY));
+    ori_rgb_.reset(
+        new base::Image8U(src_height_, src_width_, base::Color::RGB));
+    ori_bgr_.reset(
+        new base::Image8U(src_height_, src_width_, base::Color::BGR));
 
     // allocate CPU memory for uint8 blobs
     ori_gray_->cpu_data();
@@ -111,8 +111,8 @@ bool DataProvider::Init(const DataProvider::InitOptions &options) {
 bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
                                  const std::string &encoding) {
   if (cudaSetDevice(device_id_) != cudaSuccess) {
-      AERROR << "Failed to set device to " << device_id_;
-      return false;
+    AERROR << "Failed to set device to " << device_id_;
+    return false;
   }
 
   gray_ready_ = false;
@@ -128,31 +128,27 @@ bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
     return false;
   }
   if (encoding == "rgb8") {
-    memcpy(rgb_->mutable_cpu_data(), data,
-           rgb_->count() * sizeof(data[0]));
+    memcpy(rgb_->mutable_cpu_data(), data, rgb_->count() * sizeof(data[0]));
     rgb_ready_ = true;
     success = true;
   } else if (encoding == "bgr8") {
-    memcpy(bgr_->mutable_cpu_data(), data,
-           bgr_->count() * sizeof(data[0]));
+    memcpy(bgr_->mutable_cpu_data(), data, bgr_->count() * sizeof(data[0]));
     bgr_ready_ = true;
     success = true;
   } else if (encoding == "gray" || encoding == "y") {
-    memcpy(gray_->mutable_cpu_data(), data,
-           gray_->count() * sizeof(data[0]));
+    memcpy(gray_->mutable_cpu_data(), data, gray_->count() * sizeof(data[0]));
     gray_ready_ = true;
     success = true;
   } else {
     success = false;
     AERROR << "Unrecognized image encoding: " << encoding;
   }
-#else   // copy to device memory directly
+#else  // copy to device memory directly
   AINFO << "Fill in GPU mode ...";
   if (encoding == "rgb8") {
     if (handler_ != nullptr) {
       cudaMemcpy(ori_rgb_->mutable_gpu_data(), data,
-                 ori_rgb_->rows() * ori_rgb_->width_step(),
-                 cudaMemcpyDefault);
+                 ori_rgb_->rows() * ori_rgb_->width_step(), cudaMemcpyDefault);
       success = handler_->Handle(*ori_rgb_, rgb_.get());
     } else {
       cudaMemcpy(rgb_->mutable_gpu_data(), data,
@@ -163,12 +159,11 @@ bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
   } else if (encoding == "bgr8") {
     if (handler_ != nullptr) {
       cudaMemcpy(ori_bgr_->mutable_gpu_data(), data,
-                 ori_bgr_->rows() * ori_bgr_->width_step(),
-                 cudaMemcpyDefault);
+                 ori_bgr_->rows() * ori_bgr_->width_step(), cudaMemcpyDefault);
       success = handler_->Handle(*ori_bgr_, bgr_.get());
     } else {
       cudaMemcpy(bgr_->mutable_gpu_data(), data,
-          bgr_->rows() * bgr_->width_step(), cudaMemcpyDefault);
+                 bgr_->rows() * bgr_->width_step(), cudaMemcpyDefault);
       success = true;
     }
     bgr_ready_ = true;
@@ -180,7 +175,7 @@ bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
       success = handler_->Handle(*ori_gray_, gray_.get());
     } else {
       cudaMemcpy(gray_->mutable_gpu_data(), data,
-          gray_->rows() * gray_->width_step(), cudaMemcpyDefault);
+                 gray_->rows() * gray_->width_step(), cudaMemcpyDefault);
       success = true;
     }
     gray_ready_ = true;
@@ -233,13 +228,11 @@ bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
   if (image.channels() == 1) {
     nppiCopy_8u_C1R(image.gpu_data(), image.width_step(),
                     blob->mutable_gpu_data(),
-                    blob->count(2) * static_cast<int>(sizeof(uint8_t)),
-                    roi);
+                    blob->count(2) * static_cast<int>(sizeof(uint8_t)), roi);
   } else {
     nppiCopy_8u_C3R(image.gpu_data(), image.width_step(),
                     blob->mutable_gpu_data(),
-                    blob->count(2) * static_cast<int>(sizeof(uint8_t)),
-                    roi);
+                    blob->count(2) * static_cast<int>(sizeof(uint8_t)), roi);
   }
 
   return true;
@@ -268,7 +261,7 @@ bool DataProvider::GetImage(const DataProvider::ImageOptions &options,
     default:
       success = false;
       AERROR << "Unsupported Color: "
-                << static_cast<uint8_t>(options.target_color);
+             << static_cast<uint8_t>(options.target_color);
   }
   if (!success) {
     return false;
@@ -289,18 +282,14 @@ bool DataProvider::to_gray_image() {
     roi.width = src_width_;
     if (bgr_ready_) {
       Npp32f coeffs[] = {0.114f, 0.587f, 0.299f};
-      nppiColorToGray_8u_C3C1R(bgr_->gpu_data(),
-                               bgr_->width_step(),
-                               gray_->mutable_gpu_data(),
-                               gray_->width_step(),
+      nppiColorToGray_8u_C3C1R(bgr_->gpu_data(), bgr_->width_step(),
+                               gray_->mutable_gpu_data(), gray_->width_step(),
                                roi, coeffs);
       gray_ready_ = true;
     } else if (rgb_ready_) {
       Npp32f coeffs[] = {0.299f, 0.587f, 0.114f};
-      nppiColorToGray_8u_C3C1R(rgb_->gpu_data(),
-                               rgb_->width_step(),
-                               gray_->mutable_gpu_data(),
-                               gray_->width_step(),
+      nppiColorToGray_8u_C3C1R(rgb_->gpu_data(), rgb_->width_step(),
+                               gray_->mutable_gpu_data(), gray_->width_step(),
                                roi, coeffs);
       gray_ready_ = true;
     } else {
@@ -319,18 +308,13 @@ bool DataProvider::to_rgb_image() {
     if (bgr_ready_) {
       // BGR2RGB takes less than 0.010ms on K2200
       const int order[] = {2, 1, 0};
-      nppiSwapChannels_8u_C3R(bgr_->gpu_data(),
-                              bgr_->width_step(),
-                              rgb_->mutable_gpu_data(),
-                              rgb_->width_step(),
-                              roi, order);
+      nppiSwapChannels_8u_C3R(bgr_->gpu_data(), bgr_->width_step(),
+                              rgb_->mutable_gpu_data(), rgb_->width_step(), roi,
+                              order);
       rgb_ready_ = true;
     } else if (gray_ready_) {
-      nppiDup_8u_C1C3R(gray_->gpu_data(),
-                       gray_->width_step(),
-                       rgb_->mutable_gpu_data(),
-                       rgb_->width_step(),
-                       roi);
+      nppiDup_8u_C1C3R(gray_->gpu_data(), gray_->width_step(),
+                       rgb_->mutable_gpu_data(), rgb_->width_step(), roi);
       rgb_ready_ = true;
     } else {
       AWARN << "No image data filled yet, return uninitialized blob!";
@@ -347,18 +331,13 @@ bool DataProvider::to_bgr_image() {
     roi.width = src_width_;
     if (rgb_ready_) {
       const int order[] = {2, 1, 0};
-      nppiSwapChannels_8u_C3R(rgb_->gpu_data(),
-                              rgb_->width_step(),
-                              bgr_->mutable_gpu_data(),
-                              bgr_->width_step(),
-                              roi, order);
+      nppiSwapChannels_8u_C3R(rgb_->gpu_data(), rgb_->width_step(),
+                              bgr_->mutable_gpu_data(), bgr_->width_step(), roi,
+                              order);
       bgr_ready_ = true;
     } else if (gray_ready_) {
-      nppiDup_8u_C1C3R(gray_->gpu_data(),
-                       gray_->width_step(),
-                       bgr_->mutable_gpu_data(),
-                       bgr_->width_step(),
-                       roi);
+      nppiDup_8u_C1C3R(gray_->gpu_data(), gray_->width_step(),
+                       bgr_->mutable_gpu_data(), bgr_->width_step(), roi);
       bgr_ready_ = true;
     } else {
       AWARN << "No image data filled yet, return uninitialized blob!";

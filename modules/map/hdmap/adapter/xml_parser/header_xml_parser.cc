@@ -53,16 +53,15 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   double west = 0.0;
   double east = 0.0;
   std::string vendor;
-  int checker = UtilXmlParser::QueryStringAttribute(
-                            *header_node, "revMajor", &rev_major);
-  checker += UtilXmlParser::QueryStringAttribute(
-                            *header_node, "revMinor", &rev_minor);
-  checker += UtilXmlParser::QueryStringAttribute(
-                            *header_node, "name", &database_name);
-  checker += UtilXmlParser::QueryStringAttribute(
-                            *header_node, "version", &version);
-  checker += UtilXmlParser::QueryStringAttribute(
-                            *header_node, "date", &date);
+  int checker =
+      UtilXmlParser::QueryStringAttribute(*header_node, "revMajor", &rev_major);
+  checker +=
+      UtilXmlParser::QueryStringAttribute(*header_node, "revMinor", &rev_minor);
+  checker +=
+      UtilXmlParser::QueryStringAttribute(*header_node, "name", &database_name);
+  checker +=
+      UtilXmlParser::QueryStringAttribute(*header_node, "version", &version);
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "date", &date);
   checker += header_node->QueryDoubleAttribute("north", &north);
   checker += header_node->QueryDoubleAttribute("south", &south);
   checker += header_node->QueryDoubleAttribute("east", &east);
@@ -96,8 +95,8 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
       std::string err_msg = "Error parsing header utm node";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
-    checker = UtilXmlParser::QueryStringAttribute(*utm_node, "zoneID",
-                                              &zone_id);
+    checker =
+        UtilXmlParser::QueryStringAttribute(*utm_node, "zoneID", &zone_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parsing utm zone id attributes";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);

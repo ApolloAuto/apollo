@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/common/geometry/basic.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/tracker/multi_lidar_fusion/proto/multi_lidar_fusion_config.pb.h"
@@ -28,7 +28,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool MlfMotionFilter::Init(const MlfFilterInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -41,7 +41,7 @@ bool MlfMotionFilter::Init(const MlfFilterInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "mlf_motion_filter.conf");
   MlfMotionFilterConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   use_adaptive_ = config.use_adaptive();
   use_breakdown_ = config.use_breakdown();
   use_convergence_boostup_ = config.use_convergence_boostup();
@@ -140,7 +140,6 @@ void MlfMotionFilter::InitializeTrackState(TrackedObjectPtr new_object) {
 void MlfMotionFilter::KalmanFilterUpdateWithPartialObservation(
     const MlfTrackDataConstPtr& track_data,
     const TrackedObjectConstPtr& latest_object, TrackedObjectPtr new_object) {
-
   double range = new_object->object_ptr->center.norm();
 
   const Eigen::Vector4d& last_state = latest_object->state;
@@ -177,12 +176,13 @@ void MlfMotionFilter::KalmanFilterUpdateWithPartialObservation(
   auto measurement_covariance =
       new_object->measurement_covariance.block<2, 2>(0, 0);
   // 1. prediction stage
-  Eigen::Matrix4d predict_covariance =
-      Eigen::Matrix4d::Identity() * predict_variance_per_sqrsec_ * time_diff *
-      time_diff;
+  Eigen::Matrix4d predict_covariance = Eigen::Matrix4d::Identity() *
+                                       predict_variance_per_sqrsec_ *
+                                       time_diff * time_diff;
   state = transition * last_state;
-  state_covariance = transition * last_state_covariance *
-                         transition.transpose() + predict_covariance;
+  state_covariance =
+      transition * last_state_covariance * transition.transpose() +
+      predict_covariance;
 
   // 2. measurement update stage
   Eigen::Vector2d measurement;
@@ -200,30 +200,31 @@ void MlfMotionFilter::KalmanFilterUpdateWithPartialObservation(
     measurement_covariance =
         measured_velocity_variance_ * direction * direction.transpose() +
         (measured_velocity_variance_ +
-         fabs(measurement.dot(odirection)) * kVarianceAmplifier) * odirection *
-            odirection.transpose();
+         fabs(measurement.dot(odirection)) * kVarianceAmplifier) *
+            odirection * odirection.transpose();
   }
 
   Eigen::Matrix<double, 2, 4> observation_transform;
   observation_transform.block<2, 2>(0, 0).setIdentity();
   observation_transform.block<2, 2>(0, 2).setZero();
   Eigen::Matrix<double, 4, 2> kalman_gain_matrix =
-      static_cast<Eigen::Matrix<double, 4, 2, 0, 4, 2>>
-      (state_covariance * observation_transform.transpose() *
-       (observation_transform * state_covariance *
-            observation_transform.transpose() + measurement_covariance)
-           .inverse());
+      static_cast<Eigen::Matrix<double, 4, 2, 0, 4, 2>>(
+          state_covariance * observation_transform.transpose() *
+          (observation_transform * state_covariance *
+               observation_transform.transpose() +
+           measurement_covariance)
+              .inverse());
   Eigen::Vector4d state_gain =
-      static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>
-      (kalman_gain_matrix * (measurement - observation_transform * state));
+      static_cast<Eigen::Matrix<double, 4, 1, 0, 4, 1>>(
+          kalman_gain_matrix * (measurement - observation_transform * state));
 
   // 3. gain adjustment and esitmate posterior
   StateGainAdjustment(track_data, latest_object, new_object, &state_gain);
 
   state = state + state_gain;
-  state_covariance =
-      (Eigen::Matrix4d::Identity() -
-       kalman_gain_matrix * observation_transform) * state_covariance;
+  state_covariance = (Eigen::Matrix4d::Identity() -
+                      kalman_gain_matrix * observation_transform) *
+                     state_covariance;
 
   // 4. finally, state to belief and output to keep consistency
   new_object->belief_velocity_gain << state_gain.head<2>(), 0;
@@ -283,9 +284,9 @@ void MlfMotionFilter::OnlineCovarianceEstimation(
                static_cast<size_t>(object->boostup_need_history_size));
   if (evaluate_window <= 0) {
     // a default large covariance
-    object->belief_velocity_online_covariance =
-        Eigen::Matrix3d::Identity() * predict_variance_per_sqrsec_ *
-        predict_variance_per_sqrsec_;
+    object->belief_velocity_online_covariance = Eigen::Matrix3d::Identity() *
+                                                predict_variance_per_sqrsec_ *
+                                                predict_variance_per_sqrsec_;
     return;
   }
   // compute online covariance
@@ -302,10 +303,10 @@ void MlfMotionFilter::OnlineCovarianceEstimation(
     object->belief_velocity_online_covariance.block<2, 2>(0, 0) =
         velocity_resisual.head<2>() * velocity_resisual.head<2>().transpose();
   }
-  object->belief_velocity_online_covariance /= static_cast<double>(
-                                                   evaluate_window);
-  object->belief_velocity_online_covariance += Eigen::Matrix3d::Identity() *
-      noise_maximum_ * noise_maximum_;
+  object->belief_velocity_online_covariance /=
+      static_cast<double>(evaluate_window);
+  object->belief_velocity_online_covariance +=
+      Eigen::Matrix3d::Identity() * noise_maximum_ * noise_maximum_;
   object->output_velocity_uncertainty =
       object->belief_velocity_online_covariance;
 }

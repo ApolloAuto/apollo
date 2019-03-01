@@ -31,22 +31,22 @@ Fbs2240::Fbs2240() {}
 const int32_t Fbs2240::ID = 0x240;
 
 void Fbs2240::Parse(const std::uint8_t* bytes, int32_t length,
-                         ChassisDetail* chassis) const {
+                    ChassisDetail* chassis) const {
   chassis->mutable_wey()->mutable_fbs2_240()->set_flwheeldirection(
-                                         flwheeldirection(bytes, length));
+      flwheeldirection(bytes, length));
   chassis->mutable_wey()->mutable_fbs2_240()->set_frwheelspd(
-                                         frwheelspd(bytes, length));
+      frwheelspd(bytes, length));
   chassis->mutable_wey()->mutable_fbs2_240()->set_rlwheeldrivedirection(
-                                         rlwheeldrivedirection(bytes, length));
+      rlwheeldrivedirection(bytes, length));
   chassis->mutable_wey()->mutable_fbs2_240()->set_rlwheelspd(
-                                         rlwheelspd(bytes, length));
+      rlwheelspd(bytes, length));
   chassis->mutable_wey()->mutable_fbs2_240()->set_rrwheeldirection(
-                                         rrwheeldirection(bytes, length));
+      rrwheeldirection(bytes, length));
   chassis->mutable_wey()->mutable_fbs2_240()->set_rrwheelspd(
-                                         rrwheelspd(bytes, length));
+      rrwheelspd(bytes, length));
   // change km/h to m/s
   chassis->mutable_wey()->mutable_fbs2_240()->set_vehiclespd(
-                                         vehiclespd(bytes, length) / 3.6);
+      vehiclespd(bytes, length) / 3.6);
 }
 
 // config detail: {'description': 'Front left wheel Moving direction',
@@ -56,12 +56,12 @@ void Fbs2240::Parse(const std::uint8_t* bytes, int32_t length,
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
 // 'bit': 57, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
 Fbs2_240::FlwheeldirectionType Fbs2240::flwheeldirection(
-                          const std::uint8_t* bytes, int32_t length) const {
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 7);
   int32_t x = t0.get_byte(0, 2);
 
-  Fbs2_240::FlwheeldirectionType ret = static_cast<
-                                        Fbs2_240::FlwheeldirectionType>(x);
+  Fbs2_240::FlwheeldirectionType ret =
+      static_cast<Fbs2_240::FlwheeldirectionType>(x);
   return ret;
 }
 
@@ -89,12 +89,12 @@ double Fbs2240::frwheelspd(const std::uint8_t* bytes, int32_t length) const {
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
 // 'bit': 9, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
 Fbs2_240::RlwheeldrivedirectionType Fbs2240::rlwheeldrivedirection(
-                            const std::uint8_t* bytes, int32_t length) const {
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 1);
   int32_t x = t0.get_byte(0, 2);
 
-  Fbs2_240::RlwheeldrivedirectionType ret = static_cast<
-                                      Fbs2_240::RlwheeldrivedirectionType>(x);
+  Fbs2_240::RlwheeldrivedirectionType ret =
+      static_cast<Fbs2_240::RlwheeldrivedirectionType>(x);
   return ret;
 }
 
@@ -122,12 +122,12 @@ double Fbs2240::rlwheelspd(const std::uint8_t* bytes, int32_t length) const {
 // 'physical_range': '[0|3]', 'bit': 25, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
 Fbs2_240::RrwheeldirectionType Fbs2240::rrwheeldirection(
-                             const std::uint8_t* bytes, int32_t length) const {
+    const std::uint8_t* bytes, int32_t length) const {
   Byte t0(bytes + 3);
   int32_t x = t0.get_byte(0, 2);
 
   Fbs2_240::RrwheeldirectionType ret =
-                                static_cast<Fbs2_240::RrwheeldirectionType>(x);
+      static_cast<Fbs2_240::RrwheeldirectionType>(x);
   return ret;
 }
 

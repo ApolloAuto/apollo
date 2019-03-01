@@ -18,8 +18,8 @@
  * @file
  **/
 
-#include "cyber/common/file.h"
 #include "modules/planning/open_space/trajectory_partition/trajectory_partitioner.h"
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace planning {

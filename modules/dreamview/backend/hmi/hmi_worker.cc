@@ -85,7 +85,7 @@ std::string TitleCase(const std::string& origin) {
 // List subdirs and return a dict of {subdir_title: subdir_path}.
 Map<std::string, std::string> ListDirAsDict(const std::string& dir) {
   Map<std::string, std::string> result;
-  const auto subdirs = apollo::common::util::ListSubPaths(dir);
+  const auto subdirs = cyber::common::ListSubPaths(dir);
   for (const auto& subdir : subdirs) {
     const auto subdir_title = TitleCase(subdir);
     const auto subdir_path = StrCat(dir, "/", subdir);
@@ -99,9 +99,9 @@ Map<std::string, std::string> ListFilesAsDict(const std::string& dir,
                                               const std::string& extension) {
   Map<std::string, std::string> result;
   const std::string pattern = StrCat(dir, "/*", extension);
-  for (const std::string& file_path : apollo::common::util::Glob(pattern)) {
+  for (const std::string& file_path : cyber::common::Glob(pattern)) {
     // Remove the extention and convert to title case as the file title.
-    const std::string filename = apollo::common::util::GetFileName(file_path);
+    const std::string filename = cyber::common::GetFileName(file_path);
     const std::string file_title =
         TitleCase(filename.substr(0, filename.length() - extension.length()));
     result.insert({file_title, file_path});
@@ -134,8 +134,7 @@ void System(const std::string& cmd) {
 
 std::string GetDockerImage() {
   const char* docker_image = std::getenv("DOCKER_IMG");
-  return docker_image != nullptr
-      ? std::string(docker_image) : std::string("");
+  return docker_image != nullptr ? std::string(docker_image) : std::string("");
 }
 
 }  // namespace
@@ -168,8 +167,8 @@ HMIConfig HMIWorker::LoadConfig() {
   // Get available modes, maps and vehicles by listing data directory.
   *config.mutable_modes() =
       ListFilesAsDict(FLAGS_hmi_modes_config_path, ".pb.txt");
-  CHECK(!config.modes().empty()) << "No modes config loaded from "
-                                 << FLAGS_hmi_modes_config_path;
+  CHECK(!config.modes().empty())
+      << "No modes config loaded from " << FLAGS_hmi_modes_config_path;
 
   *config.mutable_maps() = ListDirAsDict(FLAGS_maps_data_path);
   *config.mutable_vehicles() = ListDirAsDict(FLAGS_vehicles_config_path);
@@ -186,9 +185,9 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
     const std::string& module_name = iter.first;
     const CyberModule& cyber_module = iter.second;
     // Each cyber module should have at least one dag file.
-    CHECK(!cyber_module.dag_files().empty()) << "None dag file is provided for "
-                                             << module_name << " module in "
-                                             << mode_config_path;
+    CHECK(!cyber_module.dag_files().empty())
+        << "None dag file is provided for " << module_name << " module in "
+        << mode_config_path;
 
     Module& module = LookupOrInsert(mode.mutable_modules(), module_name, {});
     module.set_required_for_safety(cyber_module.required_for_safety());
@@ -374,7 +373,8 @@ bool HMIWorker::Trigger(const HMIAction action, const std::string& value) {
 
 void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
                                  const std::string& event_msg,
-                                 const std::vector<std::string>& event_types) {
+                                 const std::vector<std::string>& event_types,
+                                 const bool is_reportable) {
   std::shared_ptr<DriveEvent> drive_event = std::make_shared<DriveEvent>();
   apollo::common::util::FillHeader("HMI", drive_event.get());
   // TODO(xiaoxq): Here we reuse the header time field as the event occuring
@@ -383,6 +383,7 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
   drive_event->mutable_header()->set_timestamp_sec(
       static_cast<double>(event_time_ms) / 1000.0);
   drive_event->set_event(event_msg);
+  drive_event->set_is_reportable(is_reportable);
   for (const auto& type_name : event_types) {
     DriveEvent::Type type;
     if (DriveEvent::Type_Parse(type_name, &type)) {

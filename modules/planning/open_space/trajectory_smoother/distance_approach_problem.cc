@@ -30,12 +30,11 @@ DistanceApproachProblem::DistanceApproachProblem(
 
 bool DistanceApproachProblem::Solve(
     const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xF,
-    const Eigen::MatrixXd& last_time_u, const size_t& horizon,
-    const double& ts, const Eigen::MatrixXd& ego, const Eigen::MatrixXd& xWS,
+    const Eigen::MatrixXd& last_time_u, const size_t& horizon, const double& ts,
+    const Eigen::MatrixXd& ego, const Eigen::MatrixXd& xWS,
     const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
     const Eigen::MatrixXd& n_warm_up, const std::vector<double>& XYbounds,
-    const size_t& obstacles_num,
-    const Eigen::MatrixXi& obstacles_edges_num,
+    const size_t& obstacles_num, const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     Eigen::MatrixXd* state_result, Eigen::MatrixXd* control_result,
     Eigen::MatrixXd* time_result, Eigen::MatrixXd* dual_l_result,
@@ -52,42 +51,58 @@ bool DistanceApproachProblem::Solve(
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
 
-  app->Options()->SetIntegerValue("print_level",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_print_level());
-  app->Options()->SetIntegerValue("mumps_mem_percent",
-      planner_open_space_config_.distance_approach_config().
-        ipopt_config().mumps_mem_percent());
-  app->Options()->SetNumericValue("mumps_pivtol",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().mumps_pivtol());
-  app->Options()->SetIntegerValue("max_iter",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_max_iter());
-  app->Options()->SetNumericValue("tol",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_tol());
-  app->Options()->SetNumericValue("acceptable_constr_viol_tol",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_acceptable_constr_viol_tol());
-  app->Options()->SetNumericValue("min_hessian_perturbation",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_min_hessian_perturbation());
-  app->Options()->SetNumericValue("jacobian_regularization_value",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_jacobian_regularization_value());
-  app->Options()->SetStringValue("print_timing_statistics",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_print_timing_statistics());
-  app->Options()->SetStringValue("alpha_for_y",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_alpha_for_y());
-  app->Options()->SetStringValue("recalc_y",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_recalc_y());
-  app->Options()->SetNumericValue("mu_init",
-      planner_open_space_config_.distance_approach_config().\
-        ipopt_config().ipopt_mu_init());
+  app->Options()->SetIntegerValue(
+      "print_level", planner_open_space_config_.distance_approach_config()
+                         .ipopt_config()
+                         .ipopt_print_level());
+  app->Options()->SetIntegerValue(
+      "mumps_mem_percent", planner_open_space_config_.distance_approach_config()
+                               .ipopt_config()
+                               .mumps_mem_percent());
+  app->Options()->SetNumericValue(
+      "mumps_pivtol", planner_open_space_config_.distance_approach_config()
+                          .ipopt_config()
+                          .mumps_pivtol());
+  app->Options()->SetIntegerValue(
+      "max_iter", planner_open_space_config_.distance_approach_config()
+                      .ipopt_config()
+                      .ipopt_max_iter());
+  app->Options()->SetNumericValue(
+      "tol", planner_open_space_config_.distance_approach_config()
+                 .ipopt_config()
+                 .ipopt_tol());
+  app->Options()->SetNumericValue(
+      "acceptable_constr_viol_tol",
+      planner_open_space_config_.distance_approach_config()
+          .ipopt_config()
+          .ipopt_acceptable_constr_viol_tol());
+  app->Options()->SetNumericValue(
+      "min_hessian_perturbation",
+      planner_open_space_config_.distance_approach_config()
+          .ipopt_config()
+          .ipopt_min_hessian_perturbation());
+  app->Options()->SetNumericValue(
+      "jacobian_regularization_value",
+      planner_open_space_config_.distance_approach_config()
+          .ipopt_config()
+          .ipopt_jacobian_regularization_value());
+  app->Options()->SetStringValue(
+      "print_timing_statistics",
+      planner_open_space_config_.distance_approach_config()
+          .ipopt_config()
+          .ipopt_print_timing_statistics());
+  app->Options()->SetStringValue(
+      "alpha_for_y", planner_open_space_config_.distance_approach_config()
+                         .ipopt_config()
+                         .ipopt_alpha_for_y());
+  app->Options()->SetStringValue(
+      "recalc_y", planner_open_space_config_.distance_approach_config()
+                      .ipopt_config()
+                      .ipopt_recalc_y());
+  app->Options()->SetNumericValue(
+      "mu_init", planner_open_space_config_.distance_approach_config()
+                     .ipopt_config()
+                     .ipopt_mu_init());
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {

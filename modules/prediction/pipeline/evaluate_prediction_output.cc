@@ -21,35 +21,35 @@
 #include "cyber/common/file.h"
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/evaluator_manager.h"
+#include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/feature.pb.h"
 #include "modules/prediction/proto/offline_features.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/proto/prediction_output_evaluation.pb.h"
-#include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/evaluator/evaluator_manager.h"
-#include "modules/prediction/predictor/predictor_manager.h"
 
 namespace apollo {
 namespace prediction {
 
 void Initialize() {
   PredictionConf prediction_conf;
-  if (!apollo::common::util::GetProtoFromFile(
-           FLAGS_prediction_conf_file, &prediction_conf)) {
+  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_conf_file,
+                                       &prediction_conf)) {
     AERROR << "Unable to load prediction conf file: "
            << FLAGS_prediction_conf_file;
     return;
   }
   ADEBUG << "Prediction config file is loaded into: "
-            << prediction_conf.ShortDebugString();
+         << prediction_conf.ShortDebugString();
 
   apollo::common::adapter::AdapterManagerConfig adapter_conf;
-  if (!apollo::common::util::GetProtoFromFile(
-    FLAGS_prediction_adapter_config_filename, &adapter_conf)) {
+  if (!cyber::common::GetProtoFromFile(FLAGS_prediction_adapter_config_filename,
+                                       &adapter_conf)) {
     AERROR << "Unable to load adapter conf file: "
            << FLAGS_prediction_adapter_config_filename;
     return;
@@ -60,18 +60,17 @@ void Initialize() {
   PredictorManager::Instance()->Init(prediction_conf);
 }
 
-bool IsCorrectlyPredictedOnLane(
-    const PredictionTrajectoryPoint& future_point,
-    const PredictionObstacle& prediction_obstacle) {
-  double future_relative_time = future_point.timestamp() -
-                                prediction_obstacle.timestamp();
+bool IsCorrectlyPredictedOnLane(const PredictionTrajectoryPoint& future_point,
+                                const PredictionObstacle& prediction_obstacle) {
+  double future_relative_time =
+      future_point.timestamp() - prediction_obstacle.timestamp();
   const auto& predicted_trajectories = prediction_obstacle.trajectory();
   for (const auto& predicted_traj : predicted_trajectories) {
     // find an index, TODO(kechxu) use binary search to speed up
     int i = 0;
     while (i + 1 < predicted_traj.trajectory_point_size() &&
            predicted_traj.trajectory_point(i + 1).relative_time() <
-           future_relative_time) {
+               future_relative_time) {
       ++i;
     }
     // TODO(kechxu) consider interpolation
@@ -94,13 +93,13 @@ bool IsCorrectlyPredictedJunction(
   return false;
 }
 
-double CorrectlyPredictedPortionOnLane(
-    Obstacle* obstacle_ptr, const double time_range,
-    int* num_predicted_trajectory) {
+double CorrectlyPredictedPortionOnLane(Obstacle* obstacle_ptr,
+                                       const double time_range,
+                                       int* num_predicted_trajectory) {
   PredictionObstacle prediction_obstacle;
   EvaluatorManager::Instance()->EvaluateObstacle(obstacle_ptr);
-  PredictorManager::Instance()->PredictObstacle(
-      obstacle_ptr, &prediction_obstacle, nullptr);
+  PredictorManager::Instance()->PredictObstacle(obstacle_ptr,
+                                                &prediction_obstacle, nullptr);
   const Feature& feature = obstacle_ptr->latest_feature();
   int total_count = 0;
   int correct_count = 0;
@@ -116,13 +115,13 @@ double CorrectlyPredictedPortionOnLane(
   return static_cast<double>(correct_count) / static_cast<double>(total_count);
 }
 
-double CorrectlyPredictedPortionJunction(
-    Obstacle* obstacle_ptr, const double time_range,
-    int* num_predicted_trajectory) {
+double CorrectlyPredictedPortionJunction(Obstacle* obstacle_ptr,
+                                         const double time_range,
+                                         int* num_predicted_trajectory) {
   PredictionObstacle prediction_obstacle;
   EvaluatorManager::Instance()->EvaluateObstacle(obstacle_ptr);
-  PredictorManager::Instance()->PredictObstacle(
-      obstacle_ptr, &prediction_obstacle, nullptr);
+  PredictorManager::Instance()->PredictObstacle(obstacle_ptr,
+                                                &prediction_obstacle, nullptr);
   const Feature& feature = obstacle_ptr->latest_feature();
   int total_count = 0;
   int correct_count = 0;
@@ -139,10 +138,10 @@ double CorrectlyPredictedPortionJunction(
 }
 
 void UpdateMetrics(const int num_trajectory, const double correct_portion,
-    TrajectoryEvaluationMetrics* const metrics) {
+                   TrajectoryEvaluationMetrics* const metrics) {
   metrics->set_num_frame_obstacle(metrics->num_frame_obstacle() + 1);
-  metrics->set_num_predicted_trajectory(
-      metrics->num_predicted_trajectory() + num_trajectory);
+  metrics->set_num_predicted_trajectory(metrics->num_predicted_trajectory() +
+                                        num_trajectory);
   metrics->set_num_correctly_predicted_frame_obstacle(
       metrics->num_correctly_predicted_frame_obstacle() + correct_portion);
 }
@@ -153,9 +152,9 @@ void ComputeResults(TrajectoryEvaluationMetrics* const metrics) {
     return;
   }
   metrics->set_recall(metrics->num_correctly_predicted_frame_obstacle() /
-                     metrics->num_frame_obstacle());
+                      metrics->num_frame_obstacle());
   metrics->set_recall(metrics->num_correctly_predicted_frame_obstacle() /
-                     metrics->num_predicted_trajectory());
+                      metrics->num_predicted_trajectory());
   // TODO(kechxu) compute sum_squared_error
 }
 
@@ -166,19 +165,19 @@ TrajectoryEvaluationMetricsGroup Evaluate(
   TrajectoryEvaluationMetricsGroup metrics_group;
   auto obstacles_container_ptr =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-        apollo::common::adapter::AdapterConfig::PERCEPTION_OBSTACLES);
+          apollo::common::adapter::AdapterConfig::PERCEPTION_OBSTACLES);
   for (const Feature& feature : features_with_future_status.feature()) {
     obstacles_container_ptr->InsertFeatureProto(feature);
     Obstacle* obstacle_ptr = obstacles_container_ptr->GetObstacle(feature.id());
     if (obstacle_ptr->HasJunctionFeatureWithExits()) {
       int num_trajectory = 0;
-      double correct_portion = CorrectlyPredictedPortionJunction(
-          obstacle_ptr, 3.0, &num_trajectory);
+      double correct_portion =
+          CorrectlyPredictedPortionJunction(obstacle_ptr, 3.0, &num_trajectory);
       UpdateMetrics(num_trajectory, correct_portion, &junction_metrics);
     } else if (obstacle_ptr->IsOnLane()) {
       int num_trajectory = 0;
-      double correct_portion = CorrectlyPredictedPortionOnLane(
-          obstacle_ptr, 3.0, &num_trajectory);
+      double correct_portion =
+          CorrectlyPredictedPortionOnLane(obstacle_ptr, 3.0, &num_trajectory);
       UpdateMetrics(num_trajectory, correct_portion, &on_lane_metrics);
     }
   }
@@ -192,7 +191,7 @@ TrajectoryEvaluationMetricsGroup Evaluate(
 }  // namespace prediction
 }  // namespace apollo
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_enable_trim_prediction_trajectory = false;
   apollo::prediction::Initialize();

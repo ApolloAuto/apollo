@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/fusion/lib/data_fusion/tracker/pbf_tracker/pbf_tracker.h"
 
+#include "cyber/common/file.h"
 #include "modules/common/time/time_util.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/fusion/lib/data_fusion/existance_fusion/dst_existance_fusion/dst_existance_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/motion_fusion/kalman_motion_fusion/kalman_motion_fusion.h"
 #include "modules/perception/fusion/lib/data_fusion/shape_fusion/pbf_shape_fusion/pbf_shape_fusion.h"
@@ -27,12 +27,14 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 // TODO(all) fix the static string lint issue
 std::string PbfTracker::s_type_fusion_method_ = "DstTypeFusion";  // NOLINT
-std::string PbfTracker::s_existance_fusion_method_ = "DstExistanceFusion";  // NOLINT
-std::string PbfTracker::s_motion_fusion_method_ = "KalmanMotionFusion";  // NOLINT
+std::string PbfTracker::s_existance_fusion_method_ =              // NOLINT
+    "DstExistanceFusion";
+std::string PbfTracker::s_motion_fusion_method_ =  // NOLINT
+    "KalmanMotionFusion";
 std::string PbfTracker::s_shape_fusion_method_ = "PbfShapeFusion";  // NOLINT
 
 PbfTracker::PbfTracker() {}
@@ -51,15 +53,14 @@ bool PbfTracker::InitParams() {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   AINFO << "Config file : " << config;
   PbfTrackerConfig params;
-  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
+  if (!cyber::common::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }
 
   AINFO << "Load PbfTrackerConfig: " << params.type_fusion_method() << ","
-           << params.motion_fusion_method() << ","
-           << params.shape_fusion_method() << ","
-           << params.existance_fusion_method();
+        << params.motion_fusion_method() << "," << params.shape_fusion_method()
+        << "," << params.existance_fusion_method();
   s_type_fusion_method_ = params.type_fusion_method();
   s_motion_fusion_method_ = params.motion_fusion_method();
   s_existance_fusion_method_ = params.existance_fusion_method();
@@ -114,8 +115,8 @@ void PbfTracker::UpdateWithMeasurement(const TrackerOptions& options,
                                        double target_timestamp) {
   std::string sensor_id = measurement->GetSensorId();
   ADEBUG << "fusion_updating..." << track_->GetTrackId() << " with "
-            << sensor_id << "..." << measurement->GetBaseObject()->track_id
-            << "@" << GLOG_TIMESTAMP(measurement->GetTimestamp());
+         << sensor_id << "..." << measurement->GetBaseObject()->track_id << "@"
+         << GLOG_TIMESTAMP(measurement->GetTimestamp());
   existance_fusion_->UpdateWithMeasurement(measurement, target_timestamp,
                                            options.match_distance);
   motion_fusion_->UpdateWithMeasurement(measurement, target_timestamp);

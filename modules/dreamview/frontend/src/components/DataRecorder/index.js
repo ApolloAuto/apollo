@@ -6,6 +6,7 @@ import _ from "lodash";
 import STORE from "store";
 import WS from "store/websocket";
 import PortalModal from "components/common/PortalModal";
+import CheckboxItem from "components/common/CheckboxItem";
 
 const simWorldRoot = protobuf.Root.fromJSON(require("proto_bundle/sim_world_proto_bundle.json"));
 const DriveEventType = simWorldRoot.lookup("apollo.common.DriveEvent.Type").values;
@@ -19,12 +20,14 @@ export default class DriveEventEditor extends React.Component {
             eventMessage: "",
             eventTypes: new Set(),
             popupReminder: this.props.newDisengagementReminder,
+            isReportable: false,
         };
 
         this.handleMessageChange = this.handleMessageChange.bind(this);
         this.handleTimestampUpdate = this.handleTimestampUpdate.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.toggleTicket = this.toggleTicket.bind(this);
         this.setTextareaRef = (element) => {
             this.textareaElement = element;
         };
@@ -57,7 +60,8 @@ export default class DriveEventEditor extends React.Component {
         WS.submitDriveEvent(
             this.state.eventTime.getTime(),
             this.state.eventMessage,
-            this.state.eventTypes
+            this.state.eventTypes,
+            this.state.isReportable,
         );
         STORE.handleOptionToggle('showDataRecorder');
     }
@@ -76,7 +80,13 @@ export default class DriveEventEditor extends React.Component {
         this.setState({ eventTypes: new Set(eventTypes) });
     }
 
-    render() {
+    toggleTicket() {
+        this.setState((prevState) => {
+            return { isReportable: !prevState.isReportable };
+        });
+    }
+
+    renderTypeCheckBox() {
         const typeCheckbox = Object.keys(DriveEventType).map(type => {
             return (
                 <button
@@ -91,6 +101,10 @@ export default class DriveEventEditor extends React.Component {
                 </button>
             );
         });
+        return typeCheckbox;
+    }
+
+    render() {
 
         return (
             <div className="card data-recorder">
@@ -100,7 +114,7 @@ export default class DriveEventEditor extends React.Component {
                 <div className="card-content-column">
                     <table>
                         <tbody>
-                            <tr className="drive-event-time-row">
+                            <tr className="drive-event-row">
                                 <td>Event Time</td>
                                 <td>
                                     <span>
@@ -113,9 +127,20 @@ export default class DriveEventEditor extends React.Component {
                                     </span>
                                 </td>
                             </tr>
-                            <tr className="drive-event-time-row">
+                            <tr className="drive-event-row">
                                 <td>Types</td>
-                                <td>{typeCheckbox}</td>
+                                <td>{this.renderTypeCheckBox()}</td>
+                            </tr>
+                            <tr className="drive-event-row">
+                                <td>File a ticket</td>
+                                <td>
+                                    <CheckboxItem
+                                        id={"showPNCMonitor"}
+                                        isChecked={this.state.isReportable}
+                                        disabled={false}
+                                        onClick={this.toggleTicket}
+                                    />
+                                </td>
                             </tr>
                             <tr className="drive-event-msg-row">
                                 <td>Message</td>

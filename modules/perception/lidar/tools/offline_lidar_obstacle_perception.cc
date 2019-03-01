@@ -21,7 +21,7 @@
 #include "pcl/kdtree/kdtree.h"
 #include "pcl/kdtree/kdtree_flann.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
@@ -50,7 +50,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetFileName;
+using cyber::common::GetFileName;
 
 class OfflineLidarObstaclePerception {
  public:
@@ -89,8 +89,7 @@ class OfflineLidarObstaclePerception {
     bool ret = common::SensorManager::Instance()->GetSensorInfo(
         FLAGS_sensor_name, &sensor_info_);
     if (!ret) {
-      AERROR << "Failed to get sensor info, sensor name: "
-        << FLAGS_sensor_name;
+      AERROR << "Failed to get sensor info, sensor name: " << FLAGS_sensor_name;
       return false;
     }
     ADEBUG << "Sensor_name: " << sensor_info_.name;
@@ -124,11 +123,11 @@ class OfflineLidarObstaclePerception {
       }
       LoadPCLPCD(pcd_folder + "/" + file_name + ".pcd", frame_->cloud.get());
       AINFO << "Read point cloud from " << pcd_file_names[i]
-               << " with cloud size: " << frame_->cloud->size();
+            << " with cloud size: " << frame_->cloud->size();
       if (pose_folder != "") {
         std::string pose_file_name = pose_folder + "/" + file_name + ".pose";
         AINFO << "Pose file: " << pose_file_name;
-        if (!apollo::common::util::PathExists(pose_file_name)) {
+        if (!apollo::cyber::common::PathExists(pose_file_name)) {
           pose_file_name = pose_folder + "/" + file_name + ".pcd.pose";
         }
         int idt = 0;

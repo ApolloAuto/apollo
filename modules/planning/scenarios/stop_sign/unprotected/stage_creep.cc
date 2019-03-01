@@ -30,6 +30,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
@@ -37,8 +38,8 @@ namespace planning {
 namespace scenario {
 namespace stop_sign {
 
-using common::time::Clock;
 using common::TrajectoryPoint;
+using common::time::Clock;
 using hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedStageCreep::Process(
@@ -61,19 +62,20 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
 
   // check if the stop_sign is still along reference_line
   std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  if (CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
+  if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
     return FinishScenario();
   }
 
   const double wait_time =
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout = scenario_config_.creep_timeout();
-  auto *task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
-  if (task && task->CheckCreepDone(
-      *frame, reference_line_info,
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s,
-      wait_time, timeout)) {
+  auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
+  if (task &&
+      task->CheckCreepDone(
+          *frame, reference_line_info,
+          PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s,
+          wait_time, timeout)) {
     return FinishStage();
   }
 
@@ -81,7 +83,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
       ->SetProceedWithCautionSpeedParam(
           *frame, reference_line_info,
-          PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s);
+          PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {

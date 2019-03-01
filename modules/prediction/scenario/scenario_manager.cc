@@ -24,10 +24,10 @@
 namespace apollo {
 namespace prediction {
 
-using common::adapter::AdapterConfig;
-using common::math::Vec2d;
-using common::math::Box2d;
 using apollo::perception::PerceptionObstacle;
+using common::adapter::AdapterConfig;
+using common::math::Box2d;
+using common::math::Vec2d;
 
 ScenarioManager::ScenarioManager() {}
 
@@ -39,8 +39,8 @@ void ScenarioManager::Run() {
   current_scenario_ = ptr_scenario_features->scenario();
 
   if (FLAGS_enable_prioritize_obstacles) {
-    ObstaclesPrioritizer::PrioritizeObstacles(
-        environment_features, ptr_scenario_features);
+    ObstaclesPrioritizer::PrioritizeObstacles(environment_features,
+                                              ptr_scenario_features);
   }
   // TODO(all) other functionalities including lane, junction filters
 }

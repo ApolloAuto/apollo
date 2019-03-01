@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "gflags/gflags.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map.pb.h"
@@ -40,15 +40,15 @@ int main(int argc, char **argv) {
       << "fail to load data from : " << map_filename;
 
   const std::string output_ascii_file = FLAGS_output_dir + "/base_map.txt";
-  CHECK(apollo::common::util::SetProtoToASCIIFile(pb_map, output_ascii_file))
+  CHECK(apollo::cyber::common::SetProtoToASCIIFile(pb_map, output_ascii_file))
       << "failed to output ASCII format base map";
 
   const std::string output_bin_file = FLAGS_output_dir + "/base_map.bin";
-  CHECK(apollo::common::util::SetProtoToBinaryFile(pb_map, output_bin_file))
+  CHECK(apollo::cyber::common::SetProtoToBinaryFile(pb_map, output_bin_file))
       << "failed to output binary format base map";
 
   pb_map.Clear();
-  CHECK(apollo::common::util::GetProtoFromFile(output_bin_file, &pb_map))
+  CHECK(apollo::cyber::common::GetProtoFromFile(output_bin_file, &pb_map))
       << "failed to load map";
 
   AINFO << "load map success";

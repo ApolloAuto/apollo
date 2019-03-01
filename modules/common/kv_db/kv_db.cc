@@ -20,7 +20,6 @@
 #include "gflags/gflags.h"
 
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 
@@ -37,7 +36,7 @@ class SqliteWraper {
  public:
   static int Callback(void *data, int argc, char **argv, char **col_name) {
     if (data != nullptr) {
-      std::string *data_str = static_cast<std::string*>(data);
+      std::string *data_str = static_cast<std::string *>(data);
       *data_str = argc > 0 ? argv[0] : "";
     }
     return 0;
@@ -93,8 +92,10 @@ class SqliteWraper {
 
 bool KVDB::Put(const std::string &key, const std::string &value) {
   SqliteWraper sqlite;
-  return sqlite.SQL(StrCat("INSERT OR REPLACE INTO key_value (key, value) "
-                           "VALUES ('", key, "', '", value, "');"));
+  return sqlite.SQL(
+      StrCat("INSERT OR REPLACE INTO key_value (key, value) "
+             "VALUES ('",
+             key, "', '", value, "');"));
 }
 
 bool KVDB::Delete(const std::string &key) {

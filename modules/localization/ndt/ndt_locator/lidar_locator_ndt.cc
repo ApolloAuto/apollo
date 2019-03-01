@@ -225,7 +225,7 @@ int LidarLocatorNdt::Update(unsigned int frame_idx, const Eigen::Affine3d& pose,
   AINFO << "Has_converged: " << has_converged;
   AINFO << "Iteration: %d: " << iteration;
   AINFO << "Relative Ndt pose: " << ndt_pose(0, 3) << ", " << ndt_pose(1, 3)
-         << ", " << ndt_pose(2, 3);
+        << ", " << ndt_pose(2, 3);
 
   // Twv
   Eigen::Affine3d lidar_location = Eigen::Affine3d::Identity();

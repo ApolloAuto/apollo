@@ -63,12 +63,10 @@ class CruiseModel : public NetModel {
       std::unique_ptr<AvgPool1d>(new AvgPool1d());
 
   // ObsFeatureFCParameter
-  std::unique_ptr<Dense> obs_linear_0_ =
-      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Dense> obs_linear_0_ = std::unique_ptr<Dense>(new Dense());
   std::unique_ptr<Activation> obs_activation_1_ =
       std::unique_ptr<Activation>(new Activation());
-  std::unique_ptr<Dense> obs_linear_3_ =
-      std::unique_ptr<Dense>(new Dense());
+  std::unique_ptr<Dense> obs_linear_3_ = std::unique_ptr<Dense>(new Dense());
   std::unique_ptr<Activation> obs_activation_4_ =
       std::unique_ptr<Activation>(new Activation());
 

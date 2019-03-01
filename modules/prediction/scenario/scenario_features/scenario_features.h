@@ -32,6 +32,7 @@ class ScenarioFeatures {
   virtual ~ScenarioFeatures() = default;
 
   const Scenario& scenario() const;
+
  protected:
   Scenario scenario_;
 };

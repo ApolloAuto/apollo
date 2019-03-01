@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
@@ -64,7 +64,7 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
   // 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Ads1111* set_ads_driveoff_req(
-                              Ads1_111::Ads_driveoff_reqType ads_driveoff_req);
+      Ads1_111::Ads_driveoff_reqType ads_driveoff_req);
 
   // config detail: {'description': 'target deceleration value from AEB',
   // 'offset': -16.0, 'precision': 0.000488, 'len': 16, 'name':
@@ -79,7 +79,7 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
   Ads1111* set_ads_aeb_tgtdecel_req(
-                      Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req);
+      Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req);
 
  private:
   // config detail: {'description': 'ADS request ESP/VLC to decelerate untill
@@ -125,8 +125,8 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
   // 'ADS_AEB_TgtDecel_Req', 'is_signed_var': False, 'offset': 0.0,
   // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
-  void set_p_ads_aeb_tgtdecel_req(uint8_t* data,
-                      Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req);
+  void set_p_ads_aeb_tgtdecel_req(
+      uint8_t* data, Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req);
 
  private:
   Ads1_111::Ads_dectostopType ads_dectostop_;
@@ -140,4 +140,3 @@ class Ads1111 : public ::apollo::drivers::canbus::ProtocolData<
 }  // namespace wey
 }  // namespace canbus
 }  // namespace apollo
-

@@ -20,32 +20,31 @@
 
 #include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::time::Clock;
 using apollo::common::Status;
+using apollo::common::time::Clock;
 using apollo::common::util::WithinBound;
+using apollo::hdmap::PathOverlap;
 using apollo::perception::TrafficLight;
 
-DeciderRuleBasedStop::DeciderRuleBasedStop(
-    const TaskConfig& config) : Decider(config) {
+DeciderRuleBasedStop::DeciderRuleBasedStop(const TaskConfig& config)
+    : Decider(config) {
   CHECK(config.has_decider_rule_based_stop_config());
   SetName("DeciderRuleBasedStop");
 }
 
 Status DeciderRuleBasedStop::Process(Frame* frame,
-                                ReferenceLineInfo* reference_line_info) {
+                                     ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
-
-  CheckCrosswalk(frame, reference_line_info);
 
   CheckStopSign(frame, reference_line_info);
 
@@ -54,145 +53,108 @@ Status DeciderRuleBasedStop::Process(Frame* frame,
   return Status::OK();
 }
 
-void DeciderRuleBasedStop::CheckCrosswalk(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-
-  if (!config_.decider_rule_based_stop_config().crosswalk().enabled()) {
-      return;
-  }
-
-  // TODO(all) check pedestrians
-}
-
 void DeciderRuleBasedStop::CheckStopSign(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
   if (!config_.decider_rule_based_stop_config().stop_sign().enabled()) {
-      return;
-  }
-
-  const std::string stop_sign_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  if (stop_sign_id.empty()) {
     return;
   }
 
-  if (stop_sign_id ==
-      PlanningContext::GetScenarioInfo()->stop_done_overlap_id) {
-    return;
+  const double adc_back_edge_s =
+      reference_line_info->AdcSlBoundary().start_s();
+
+  const std::vector<PathOverlap>& stop_sign_overlaps =
+      reference_line_info->reference_line().map_path().stop_sign_overlaps();
+  for (const auto& stop_sign_overlap : stop_sign_overlaps) {
+    if (stop_sign_overlap.end_s <= adc_back_edge_s) {
+      continue;
+    }
+
+    const auto& stop_done_overlap_ids =
+        PlanningContext::GetScenarioInfo()->stop_done_overlap_ids;
+    if (stop_done_overlap_ids.end() != std::find(
+        stop_done_overlap_ids.begin(),
+        stop_done_overlap_ids.end(),
+        stop_sign_overlap.object_id)) {
+      continue;
+    }
+
+    const std::string stop_wall_id = STOP_SIGN_VO_ID_PREFIX +
+        stop_sign_overlap.object_id;
+    const double stop_line_s = stop_sign_overlap.start_s;
+    const double stop_distance =
+        config_.decider_rule_based_stop_config().stop_sign().stop_distance();
+    ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
+        << "] stop_line_s[" << stop_line_s << "]";
+
+    BuildStopDecision(
+        frame, reference_line_info, stop_wall_id, stop_line_s, stop_distance,
+        StopReasonCode::STOP_REASON_STOP_SIGN,
+        PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles);
   }
-
-  const std::string stop_wall_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_id;
-  const double stop_line_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
-  const double stop_distance =
-      config_.decider_rule_based_stop_config().stop_sign().stop_distance();
-  ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
-      << "] stop_line_s[" << stop_line_s << "]";
-
-  BuildStopDecision(
-      frame, reference_line_info,
-      stop_wall_id,
-      stop_line_s,
-      stop_distance,
-      StopReasonCode::STOP_REASON_STOP_SIGN,
-      PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles);
 }
 
 void DeciderRuleBasedStop::CheckTrafficLight(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
   if (!config_.decider_rule_based_stop_config().traffic_light().enabled()) {
-      return;
-  }
-
-  const std::string traffic_light_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (traffic_light_id.empty()) {
     return;
   }
 
-  if (traffic_light_id ==
-      PlanningContext::GetScenarioInfo()->stop_done_overlap_id) {
-    return;
-  }
+  const double adc_back_edge_s =
+      reference_line_info->AdcSlBoundary().start_s();
 
-  const TrafficLight traffic_light = ReadTrafficLight(
-      *frame, traffic_light_id);
-
-  // TODO(all): add stop_deceleration check based on signal colors
-
-  PlanningContext::GetScenarioInfo()->traffic_light_color =
-      traffic_light.color();
-
-  if (traffic_light.color() == TrafficLight::GREEN) {
-    return;
-  }
-
-  const std::string stop_wall_id =
-      TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_id;
-  const double stop_line_s =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
-  const double stop_distance =
-      config_.decider_rule_based_stop_config().traffic_light().stop_distance();
-
-  ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
-      << "] stop_line_s[" << stop_line_s << "]";
-  std::vector<std::string> wait_for_obstacles;
-  BuildStopDecision(frame, reference_line_info,
-                    stop_wall_id,
-                    stop_line_s,
-                    stop_distance,
-                    StopReasonCode::STOP_REASON_SIGNAL,
-                    wait_for_obstacles);
-}
-
-TrafficLight DeciderRuleBasedStop::ReadTrafficLight(
-    const Frame& frame,
-    const std::string& traffic_light_id) {
-  const auto traffic_light_detection = frame.local_view().traffic_light;
-  if (traffic_light_detection == nullptr) {
-    ADEBUG << "traffic_light_detection is null";
-  } else {
-    const double delay = traffic_light_detection->header().timestamp_sec() -
-        Clock::NowInSeconds();
-    if (delay > config_.decider_rule_based_stop_config().traffic_light().
-        signal_expire_time_sec()) {
-      ADEBUG << "traffic signal is expired, delay[" << delay << "] seconds.";
-    } else {
-      for (int i = 0; i < traffic_light_detection->traffic_light_size(); i++) {
-        if (traffic_light_detection->traffic_light(i).id() ==
-            traffic_light_id) {
-          return traffic_light_detection->traffic_light(i);
-        }
-      }
+  const std::vector<PathOverlap>& traffic_light_overlaps =
+      reference_line_info->reference_line().map_path().signal_overlaps();
+  for (const auto& traffic_light_overlap : traffic_light_overlaps) {
+    if (traffic_light_overlap.end_s <= adc_back_edge_s) {
+      continue;
     }
-  }
 
-  TrafficLight traffic_light;
-  traffic_light.set_id(traffic_light_id);
-  traffic_light.set_color(TrafficLight::UNKNOWN);
-  traffic_light.set_confidence(0.0);
-  traffic_light.set_tracking_time(0.0);
-  return traffic_light;
+    const auto& stop_done_overlap_ids =
+        PlanningContext::GetScenarioInfo()->stop_done_overlap_ids;
+    if (stop_done_overlap_ids.end() != std::find(
+        stop_done_overlap_ids.begin(),
+        stop_done_overlap_ids.end(),
+        traffic_light_overlap.object_id)) {
+      continue;
+    }
+
+    auto signal_color = scenario::GetSignal(
+        traffic_light_overlap.object_id).color();
+    ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
+        << "] start_s[" << traffic_light_overlap.start_s
+        << "] color[" << signal_color << "]";
+    if (signal_color == TrafficLight::GREEN) {
+      continue;
+    }
+
+    // TODO(all): add stop_deceleration check based on signal colors
+
+    const std::string stop_wall_id =
+        TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_overlap.object_id;
+    const double stop_line_s = traffic_light_overlap.start_s;
+    const double stop_distance =
+        config_.decider_rule_based_stop_config().traffic_light()
+            .stop_distance();
+
+    ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
+           << "] stop_line_s[" << stop_line_s << "]";
+    std::vector<std::string> wait_for_obstacles;
+    BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
+                      stop_distance, StopReasonCode::STOP_REASON_SIGNAL,
+                      wait_for_obstacles);
+  }
 }
 
 bool DeciderRuleBasedStop::BuildStopDecision(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info,
-    const std::string& stop_wall_id,
-    const double stop_line_s,
-    const double stop_distance,
-    const StopReasonCode& stop_reason_code,
+    Frame* const frame, ReferenceLineInfo* const reference_line_info,
+    const std::string& stop_wall_id, const double stop_line_s,
+    const double stop_distance, const StopReasonCode& stop_reason_code,
     const std::vector<std::string>& wait_for_obstacles) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -236,8 +198,8 @@ bool DeciderRuleBasedStop::BuildStopDecision(
   }
 
   auto* path_decision = reference_line_info->path_decision();
-  path_decision->AddLongitudinalDecision(
-      "DeciderRuleBasedStop", stop_wall->Id(), stop);
+  path_decision->AddLongitudinalDecision("DeciderRuleBasedStop",
+                                         stop_wall->Id(), stop);
 
   return 0;
 }

@@ -72,10 +72,9 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
  * @param parameter of the quintic polynomial.
  * @return order of derivative to evaluate.
  */
-double EvaluateQuinticPolynomial(
-    const std::array<double, 6>& coeffs,
-    const double t, const uint32_t order,
-    const double end_t, const double end_v);
+double EvaluateQuinticPolynomial(const std::array<double, 6>& coeffs,
+                                 const double t, const uint32_t order,
+                                 const double end_t, const double end_v);
 
 /**
  * @brief Evaluate quartic polynomial.
@@ -83,10 +82,9 @@ double EvaluateQuinticPolynomial(
  * @param parameter of the quartic polynomial.
  * @return order of derivative to evaluate.
  */
-double EvaluateQuarticPolynomial(
-    const std::array<double, 5>& coeffs,
-    const double t, const uint32_t order,
-    const double end_t, const double end_v);
+double EvaluateQuarticPolynomial(const std::array<double, 5>& coeffs,
+                                 const double t, const uint32_t order,
+                                 const double end_t, const double end_v);
 
 /**
  * @brief Evaluate cubic polynomial.
@@ -97,22 +95,19 @@ double EvaluateQuarticPolynomial(
  * @return order of derivative to evaluate.
  */
 double EvaluateCubicPolynomial(
-    const std::array<double, 4>& coefs,
-    const double t, const uint32_t order,
+    const std::array<double, 4>& coefs, const double t, const uint32_t order,
     const double end_t = std::numeric_limits<double>::infinity(),
     const double end_v = 0.0);
 
 template <std::size_t N>
 std::array<double, 2 * N - 2> ComputePolynomial(
     const std::array<double, N - 1>& start_state,
-    const std::array<double, N - 1>& end_state,
-    const double param);
+    const std::array<double, N - 1>& end_state, const double param);
 
 template <>
 inline std::array<double, 4> ComputePolynomial<3>(
     const std::array<double, 2>& start_state,
-    const std::array<double, 2>& end_state,
-    const double param) {
+    const std::array<double, 2>& end_state, const double param) {
   std::array<double, 4> coefs;
   coefs[0] = start_state[0];
   coefs[1] = start_state[1];

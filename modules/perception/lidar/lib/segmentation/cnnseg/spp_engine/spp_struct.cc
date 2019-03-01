@@ -34,7 +34,7 @@ void SppData::MakeReference(size_t width, size_t height, float range) {
   }
 
   if (obs_prob_data_ref == nullptr) {
-    obs_prob_data_ref = new float* [height];
+    obs_prob_data_ref = new float*[height];
   }
   for (size_t i = 0; i < height; ++i) {
     obs_prob_data_ref[i] = obs_prob_data + i * width;

@@ -32,7 +32,7 @@ namespace {
 constexpr double kInf = std::numeric_limits<double>::infinity();
 }
 
-DpStCost::DpStCost(const DpStSpeedConfig& config,
+DpStCost::DpStCost(const DpStSpeedConfig& config, const double total_time,
                    const std::vector<const Obstacle*>& obstacles,
                    const common::TrajectoryPoint& init_point)
     : config_(config), obstacles_(obstacles), init_point_(init_point) {
@@ -40,7 +40,7 @@ DpStCost::DpStCost(const DpStSpeedConfig& config,
   for (auto& obstacle : obstacles) {
     boundary_map_[obstacle->st_boundary().id()] = index++;
   }
-  unit_t_ = config_.total_time() / config_.matrix_dimension_t();
+  unit_t_ = total_time / config_.matrix_dimension_t();
 
   AddToKeepClearRange(obstacles);
 
@@ -160,13 +160,14 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
 }
 
 double DpStCost::GetReferenceCost(const STPoint& point,
-                                 const STPoint& reference_point) const {
+                                  const STPoint& reference_point) const {
   return config_.reference_weight() * (point.s() - reference_point.s()) *
          (point.s() - reference_point.s()) * unit_t_;
 }
 
 double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
-                             const double speed_limit) const {
+                              const double speed_limit,
+                              const double soft_speed_limit) const {
   double cost = 0.0;
   const double speed = (second.s() - first.s()) / unit_t_;
   if (speed < 0) {
@@ -186,6 +187,15 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
   } else if (det_speed < 0) {
     cost += config_.low_speed_penalty() * config_.default_speed_cost() *
             -det_speed * unit_t_;
+  }
+
+  double soft_det_speed = (speed - soft_speed_limit) / soft_speed_limit;
+  if (soft_det_speed > 0) {
+    cost += config_.exceed_soft_speed_penalty() * config_.default_speed_cost() *
+            fabs(speed * speed) * unit_t_;
+  } else if (soft_det_speed < 0) {
+    cost += config_.low_soft_speed_penalty() * config_.default_speed_cost() *
+            -soft_det_speed * unit_t_;
   }
   return cost;
 }
@@ -224,15 +234,15 @@ double DpStCost::GetAccelCost(const double accel) {
 }
 
 double DpStCost::GetAccelCostByThreePoints(const STPoint& first,
-                                          const STPoint& second,
-                                          const STPoint& third) {
+                                           const STPoint& second,
+                                           const STPoint& third) {
   double accel = (first.s() + third.s() - 2 * second.s()) / (unit_t_ * unit_t_);
   return GetAccelCost(accel);
 }
 
 double DpStCost::GetAccelCostByTwoPoints(const double pre_speed,
-                                        const STPoint& pre_point,
-                                        const STPoint& curr_point) {
+                                         const STPoint& pre_point,
+                                         const STPoint& curr_point) {
   double current_speed = (curr_point.s() - pre_point.s()) / unit_t_;
   double accel = (current_speed - pre_speed) / unit_t_;
   return GetAccelCost(accel);
@@ -264,18 +274,18 @@ double DpStCost::JerkCost(const double jerk) {
 }
 
 double DpStCost::GetJerkCostByFourPoints(const STPoint& first,
-                                        const STPoint& second,
-                                        const STPoint& third,
-                                        const STPoint& fourth) {
+                                         const STPoint& second,
+                                         const STPoint& third,
+                                         const STPoint& fourth) {
   double jerk = (fourth.s() - 3 * third.s() + 3 * second.s() - first.s()) /
-               (unit_t_ * unit_t_ * unit_t_);
+                (unit_t_ * unit_t_ * unit_t_);
   return JerkCost(jerk);
 }
 
 double DpStCost::GetJerkCostByTwoPoints(const double pre_speed,
-                                       const double pre_acc,
-                                       const STPoint& pre_point,
-                                       const STPoint& curr_point) {
+                                        const double pre_acc,
+                                        const STPoint& pre_point,
+                                        const STPoint& curr_point) {
   const double curr_speed = (curr_point.s() - pre_point.s()) / unit_t_;
   const double curr_accel = (curr_speed - pre_speed) / unit_t_;
   const double jerk = (curr_accel - pre_acc) / unit_t_;
@@ -283,9 +293,9 @@ double DpStCost::GetJerkCostByTwoPoints(const double pre_speed,
 }
 
 double DpStCost::GetJerkCostByThreePoints(const double first_speed,
-                                         const STPoint& first,
-                                         const STPoint& second,
-                                         const STPoint& third) {
+                                          const STPoint& first,
+                                          const STPoint& second,
+                                          const STPoint& third) {
   const double pre_speed = (second.s() - first.s()) / unit_t_;
   const double pre_acc = (pre_speed - first_speed) / unit_t_;
   const double curr_speed = (third.s() - second.s()) / unit_t_;

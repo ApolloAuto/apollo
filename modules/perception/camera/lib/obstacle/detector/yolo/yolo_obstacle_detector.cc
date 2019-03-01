@@ -1,20 +1,23 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
+
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
+
 #include "modules/perception/base/common.h"
 #include "modules/perception/camera/common/timer.h"
 #include "modules/perception/inference/inference_factory.h"
@@ -25,7 +28,7 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 void YoloObstacleDetector::LoadInputShape(const yolo::ModelParam &model_param) {
   float offset_ratio = model_param.offset_ratio();
@@ -36,21 +39,21 @@ void YoloObstacleDetector::LoadInputShape(const yolo::ModelParam &model_param) {
   int image_height = static_cast<int>(base_camera_model_->get_height());
   int image_width = static_cast<int>(base_camera_model_->get_width());
 
-  offset_y_ = static_cast<int>(offset_ratio *
-                               static_cast<float>(image_height) + .5f);
+  offset_y_ =
+      static_cast<int>(offset_ratio * static_cast<float>(image_height) + .5f);
   float roi_ratio = cropped_ratio * static_cast<float>(image_height) /
                     static_cast<float>(image_width);
   width_ = static_cast<int>(resized_width + aligned_pixel / 2) / aligned_pixel *
            aligned_pixel;  // TO DO : Suspicous code
   height_ = static_cast<int>(static_cast<float>(width_) * roi_ratio +
-            static_cast<float>(aligned_pixel) / 2.0f) /
+                             static_cast<float>(aligned_pixel) / 2.0f) /
             aligned_pixel * aligned_pixel;  // TO DO : Suspicous code
 
   AINFO << "image_height=" << image_height << ", "
-           << "image_width=" << image_width << ", "
-           << "roi_ratio=" << roi_ratio;
+        << "image_width=" << image_width << ", "
+        << "roi_ratio=" << roi_ratio;
   AINFO << "offset_y=" << offset_y_ << ", height=" << height_
-           << ", width=" << width_;
+        << ", width=" << width_;
 }
 
 void YoloObstacleDetector::LoadParam(const yolo::YoloParam &yolo_param) {
@@ -132,13 +135,12 @@ void YoloObstacleDetector::InitYoloBlob(const yolo::NetworkParam &net_param) {
   auto obj_blob = inference_->get_blob(net_param.obj_blob());
   int output_height = obj_blob->shape(1);
   int output_width = obj_blob->shape(2);
-  int obj_size = output_height * output_width *
-                 static_cast<int>(anchors_.size()) / 2;
+  int obj_size =
+      output_height * output_width * static_cast<int>(anchors_.size()) / 2;
   yolo_blobs_.res_box_blob.reset(
       new base::Blob<float>(1, 1, obj_size, kBoxBlockSize));
-  yolo_blobs_.res_cls_blob.reset(
-      new base::Blob<float>(1, 1,
-        static_cast<int>(types_.size() + 1), obj_size));
+  yolo_blobs_.res_cls_blob.reset(new base::Blob<float>(
+      1, 1, static_cast<int>(types_.size() + 1), obj_size));
   yolo_blobs_.res_cls_blob->cpu_data();
   overlapped_.reset(
       new base::Blob<bool>(std::vector<int>{obj_k_, obj_k_}, true));
@@ -202,13 +204,13 @@ bool YoloObstacleDetector::Init(const ObstacleDetectorInitOptions &options) {
   CHECK(base_camera_model_ != nullptr) << "base_camera_model is nullptr!";
   std::string config_path =
       GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!apollo::common::util::GetProtoFromFile(config_path, &yolo_param_)) {
+  if (!cyber::common::GetProtoFromFile(config_path, &yolo_param_)) {
     AERROR << "read proto_config fail";
     return false;
   }
   const auto &model_param = yolo_param_.model_param();
-  std::string model_root = GetAbsolutePath(
-      options.root_dir, model_param.model_name());
+  std::string model_root =
+      GetAbsolutePath(options.root_dir, model_param.model_name());
   std::string anchors_file =
       GetAbsolutePath(model_root, model_param.anchors_file());
   std::string types_file =
@@ -272,15 +274,14 @@ bool YoloObstacleDetector::Detect(const ObstacleDetectorOptions &options,
   AINFO << "Start: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
   DataProvider::ImageOptions image_options;
   image_options.target_color = base::Color::BGR;
-  image_options.crop_roi =
-      base::RectI(0, offset_y_,
-        static_cast<int>(base_camera_model_->get_width()),
-        static_cast<int>(base_camera_model_->get_height()) - offset_y_);
+  image_options.crop_roi = base::RectI(
+      0, offset_y_, static_cast<int>(base_camera_model_->get_width()),
+      static_cast<int>(base_camera_model_->get_height()) - offset_y_);
   image_options.do_crop = true;
   frame->data_provider->GetImage(image_options, image_.get());
   AINFO << "GetImageBlob: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
-  inference::ResizeGPU(*image_,
-                       input_blob, frame->data_provider->src_width(), 0);
+  inference::ResizeGPU(*image_, input_blob, frame->data_provider->src_width(),
+                       0);
   AINFO << "Resize: " << static_cast<double>(timer.Toc()) * 0.001 << "ms";
 
   /////////////////////////// detection part ///////////////////////////
@@ -302,17 +303,17 @@ bool YoloObstacleDetector::Detect(const ObstacleDetectorOptions &options,
                &frame->detected_objects);
 
   // post processing
-  int left_boundary = static_cast<int>(border_ratio_ *
-                                       static_cast<float>(image_->cols()));
-  int right_boundary = static_cast<int>(
-              (1.0f - border_ratio_) * static_cast<float>(image_->cols()));
+  int left_boundary =
+      static_cast<int>(border_ratio_ * static_cast<float>(image_->cols()));
+  int right_boundary = static_cast<int>((1.0f - border_ratio_) *
+                                        static_cast<float>(image_->cols()));
   for (auto &obj : frame->detected_objects) {
     // recover alpha
     obj->camera_supplement.alpha /= ori_cycle_;
     // get area_id from visible_ratios
     if (yolo_param_.model_param().num_areas() == 0) {
-        obj->camera_supplement.area_id =
-            get_area_id(obj->camera_supplement.visible_ratios);
+      obj->camera_supplement.area_id =
+          get_area_id(obj->camera_supplement.visible_ratios);
     }
     // clear cut off ratios
     auto &box = obj->camera_supplement.box;

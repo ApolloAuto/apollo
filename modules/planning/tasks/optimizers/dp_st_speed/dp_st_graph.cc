@@ -68,14 +68,12 @@ DpStGraph::DpStGraph(const StGraphData& st_graph_data,
       dp_st_speed_config_(dp_config),
       obstacles_(obstacles),
       init_point_(init_point),
-      dp_st_cost_(dp_config, obstacles, init_point_),
+      dp_st_cost_(dp_config, st_graph_data_.total_time_by_conf(), obstacles,
+                  init_point_),
       adc_sl_boundary_(adc_sl_boundary) {
-  dp_st_speed_config_.set_total_path_length(
-      std::fmin(dp_st_speed_config_.total_path_length(),
-                st_graph_data_.path_data_length()));
-  unit_s_ = dp_st_speed_config_.total_path_length() /
+  unit_s_ = st_graph_data_.path_length() /
             (dp_st_speed_config_.matrix_dimension_s() - 1);
-  unit_t_ = dp_st_speed_config_.total_time() /
+  unit_t_ = st_graph_data_.total_time_by_conf() /
             (dp_st_speed_config_.matrix_dimension_t() - 1);
 }
 
@@ -261,6 +259,9 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
 
   double speed_limit =
       st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
+  double soft_speed_limit =
+      st_graph_data_.speed_limit().GetSoftSpeedLimitByS(unit_s_ * r);
+
   if (c == 1) {
     const double acc = (r * unit_s_ / unit_t_ - init_point_.v()) / unit_t_;
     if (acc < dp_st_speed_config_.max_deceleration() ||
@@ -272,8 +273,9 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
                                 cost_init)) {
       return;
     }
-    cost_cr.SetTotalCost(cost_cr.obstacle_cost() + cost_init.total_cost() +
-                         CalculateEdgeCostForSecondCol(r, speed_limit));
+    cost_cr.SetTotalCost(
+        cost_cr.obstacle_cost() + cost_init.total_cost() +
+        CalculateEdgeCostForSecondCol(r, speed_limit, soft_speed_limit));
     cost_cr.SetPrePoint(cost_init);
     return;
   }
@@ -300,9 +302,9 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
         continue;
       }
 
-      const double cost = cost_cr.obstacle_cost() +
-                          pre_col[r_pre].total_cost() +
-                          CalculateEdgeCostForThirdCol(r, r_pre, speed_limit);
+      const double cost =
+          cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
+          CalculateEdgeCostForThirdCol(r, r_pre, speed_limit, soft_speed_limit);
 
       if (cost < cost_cr.total_cost()) {
         cost_cr.SetTotalCost(cost);
@@ -345,7 +347,7 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
     const STPoint& curr_point = cost_cr.point();
     double cost = cost_cr.obstacle_cost() + pre_col[r_pre].total_cost() +
                   CalculateEdgeCost(triple_pre_point, prepre_point, pre_point,
-                                    curr_point, speed_limit);
+                                    curr_point, speed_limit, soft_speed_limit);
 
     if (cost < cost_cr.total_cost()) {
       cost_cr.SetTotalCost(cost);
@@ -411,19 +413,22 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
 
 double DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
                                     const STPoint& third, const STPoint& forth,
-                                    const double speed_limit) {
-  return dp_st_cost_.GetSpeedCost(third, forth, speed_limit) +
+                                    const double speed_limit,
+                                    const double soft_speed_limit) {
+  return dp_st_cost_.GetSpeedCost(third, forth, speed_limit, soft_speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
 double DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
-                                                const double speed_limit) {
+                                                const double speed_limit,
+                                                const double soft_speed_limit) {
   double init_speed = init_point_.v();
   double init_acc = init_point_.a();
   const STPoint& pre_point = cost_table_[0][0].point();
   const STPoint& curr_point = cost_table_[1][row].point();
-  return dp_st_cost_.GetSpeedCost(pre_point, curr_point, speed_limit) +
+  return dp_st_cost_.GetSpeedCost(pre_point, curr_point, speed_limit,
+                                  soft_speed_limit) +
          dp_st_cost_.GetAccelCostByTwoPoints(init_speed, pre_point,
                                              curr_point) +
          dp_st_cost_.GetJerkCostByTwoPoints(init_speed, init_acc, pre_point,
@@ -432,12 +437,14 @@ double DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
 
 double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
                                                const uint32_t pre_row,
-                                               const double speed_limit) {
+                                               const double speed_limit,
+                                               const double soft_speed_limit) {
   double init_speed = init_point_.v();
   const STPoint& first = cost_table_[0][0].point();
   const STPoint& second = cost_table_[1][pre_row].point();
   const STPoint& third = cost_table_[2][curr_row].point();
-  return dp_st_cost_.GetSpeedCost(second, third, speed_limit) +
+  return dp_st_cost_.GetSpeedCost(second, third, speed_limit,
+                                  soft_speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(first, second, third) +
          dp_st_cost_.GetJerkCostByThreePoints(init_speed, first, second, third);
 }

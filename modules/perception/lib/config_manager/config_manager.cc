@@ -15,8 +15,8 @@
  *****************************************************************************/
 #include "modules/perception/lib/config_manager/config_manager.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/perception_gflags.h"
 
@@ -24,8 +24,8 @@ namespace apollo {
 namespace perception {
 namespace lib {
 
-using apollo::common::util::GetAbsolutePath;
-using apollo::common::util::GetProtoFromASCIIFile;
+using cyber::common::GetAbsolutePath;
+using cyber::common::GetProtoFromASCIIFile;
 
 ConfigManager::ConfigManager() {
   work_root_ = FLAGS_work_root;
@@ -68,15 +68,14 @@ bool ConfigManager::InitInternal() {
     return false;
   }
 
-  for (const auto& model_config_file : model_config_files) {
+  for (const auto &model_config_file : model_config_files) {
     ModelConfigFileListProto file_list_proto;
     if (!GetProtoFromASCIIFile(model_config_file, &file_list_proto)) {
-      AERROR << "invalid ModelConfigFileListProto file: "
-             << model_config_file;
+      AERROR << "invalid ModelConfigFileListProto file: " << model_config_file;
       return false;
     }
 
-    for (const std::string& model_config_path :
+    for (const std::string &model_config_path :
          file_list_proto.model_config_path()) {
       const std::string abs_path =
           GetAbsolutePath(work_root_, model_config_path);
@@ -120,12 +119,9 @@ bool ConfigManager::Reset() {
 }
 
 std::string ConfigManager::get_env(const std::string &var_name) {
-  char *var = nullptr;
-  var = getenv(var_name.c_str());
-  if (var == nullptr) {
-    return std::string("");
-  }
-  return std::string(var);
+  const char *var = getenv(var_name.c_str());
+
+  return !var ? std::string("") : std::string(var);
 }
 
 bool ConfigManager::GetModelConfig(const std::string &model_name,

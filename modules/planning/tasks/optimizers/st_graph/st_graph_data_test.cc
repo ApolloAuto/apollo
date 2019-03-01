@@ -40,7 +40,14 @@ TEST(StGraphDataTest, basic_test) {
   traj_point.set_relative_time(1010.022);
 
   SpeedLimit speed_limit;
-  StGraphData st_graph_data(boundary_vec, traj_point, speed_limit, 100.0);
+  double path_data_length = 100.0;
+  double path_length_by_conf = 100.0;
+  double total_time_by_conf = 7.0;
+  planning_internal::STGraphDebug* st_graph_debug = nullptr;
+  StGraphData st_graph_data;
+  st_graph_data.LoadData(boundary_vec, traj_point, speed_limit,
+                         path_data_length, path_length_by_conf,
+                         total_time_by_conf, st_graph_debug);
   EXPECT_EQ(st_graph_data.st_boundaries().size(), 1);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().x(), 1.1);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().path_point().y(), 2.1);
@@ -52,7 +59,7 @@ TEST(StGraphDataTest, basic_test) {
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().v(), 10.001);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().a(), 1.022);
   EXPECT_DOUBLE_EQ(st_graph_data.init_point().relative_time(), 1010.022);
-  EXPECT_DOUBLE_EQ(st_graph_data.path_data_length(), 100.0);
+  EXPECT_DOUBLE_EQ(st_graph_data.path_length(), 100.0);
 }
 
 }  // namespace planning

@@ -57,7 +57,7 @@ class PointCloudUpdater {
   explicit PointCloudUpdater(WebSocketHandler *websocket);
   ~PointCloudUpdater();
 
-  static void LoadLidarHeight(const std::string& file_path);
+  static void LoadLidarHeight(const std::string &file_path);
 
   /**
    * @brief Starts to push PointCloud to frontend.
@@ -101,8 +101,7 @@ class PointCloudUpdater {
   // Cyber messsage readers.
   std::shared_ptr<cyber::Reader<apollo::localization::LocalizationEstimate>>
       localization_reader_;
-  std::shared_ptr<cyber::Reader<drivers::PointCloud>>
-      point_cloud_reader_;
+  std::shared_ptr<cyber::Reader<drivers::PointCloud>> point_cloud_reader_;
 
   double last_point_cloud_time_ = 0.0;
   double last_localization_time_ = 0.0;

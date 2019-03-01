@@ -26,7 +26,6 @@
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/util/factory.h"
-#include "modules/map/hdmap/hdmap.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -41,9 +40,9 @@ struct TrafficLightProtectedContext {
 
 class TrafficLightProtectedScenario : public Scenario {
  public:
-  explicit TrafficLightProtectedScenario(
-      const ScenarioConfig& config,
-      const ScenarioContext* context) : Scenario(config, context) {}
+  explicit TrafficLightProtectedScenario(const ScenarioConfig& config,
+                                         const ScenarioContext* context)
+      : Scenario(config, context) {}
 
   void Init() override;
 
@@ -51,7 +50,6 @@ class TrafficLightProtectedScenario : public Scenario {
       const ScenarioConfig::StageConfig& stage_config);
 
   bool IsTransferable(const Scenario& current_scenario,
-                      const common::TrajectoryPoint& ego_point,
                       const Frame& frame) override;
 
   TrafficLightProtectedContext* GetContext() { return &context_; }
@@ -59,7 +57,6 @@ class TrafficLightProtectedScenario : public Scenario {
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
-  bool IsProtected(const ReferenceLineInfo& reference_line_info) const;
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>

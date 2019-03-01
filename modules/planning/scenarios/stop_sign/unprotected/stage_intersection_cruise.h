@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 
@@ -35,7 +33,8 @@ struct StopSignUnprotectedContext;
 class StopSignUnprotectedStageIntersectionCruise : public Stage {
  public:
   explicit StopSignUnprotectedStageIntersectionCruise(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,

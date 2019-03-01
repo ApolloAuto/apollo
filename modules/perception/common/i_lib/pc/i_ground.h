@@ -23,8 +23,6 @@
 #include "modules/perception/common/i_lib/geometry/i_plane.h"
 #include "modules/perception/common/i_lib/pc/i_struct_s.h"
 
-
-
 namespace apollo {
 namespace perception {
 namespace common {

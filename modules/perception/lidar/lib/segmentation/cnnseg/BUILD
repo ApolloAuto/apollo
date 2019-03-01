@@ -16,7 +16,6 @@ cc_library(
         ":feature_generator",
         ":util",
         "//cyber",
-        "//modules/common/util:file_util",
         "//modules/common/util:string_util",
         "//modules/perception/base",
         "//modules/perception/inference:inference_factory_lib",

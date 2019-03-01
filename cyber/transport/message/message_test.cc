@@ -126,14 +126,14 @@ TEST(ListenerHandlerTest, listener_handler_test) {
   MessageInfo message_info(sender_id, 0, spare_id);
   auto message = std::shared_ptr<RawMessage>(new RawMessage);
   int call_count = 0;
-  ListenerHandler<RawMessage>::Listener listener = [&call_count](
-      const std::shared_ptr<RawMessage>& message,
-      const MessageInfo& message_info) {
-    ++call_count;
-    AINFO << "Got Message from " << message_info.sender_id().data()
-          << ", sequence_num: " << message_info.seq_num()
-          << ", to spare: " << message_info.spare_id().data();
-  };
+  ListenerHandler<RawMessage>::Listener listener =
+      [&call_count](const std::shared_ptr<RawMessage>& message,
+                    const MessageInfo& message_info) {
+        ++call_count;
+        AINFO << "Got Message from " << message_info.sender_id().data()
+              << ", sequence_num: " << message_info.seq_num()
+              << ", to spare: " << message_info.spare_id().data();
+      };
 
   uint64_t self_id = 123;
   uint64_t opposite_id = 456;

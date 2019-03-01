@@ -33,10 +33,9 @@ class Smoother {
   Smoother() = default;
   virtual ~Smoother() = default;
 
-  apollo::common::Status Smooth(
-      const FrameHistory* frame_history,
-      const Frame* current_frame,
-      ADCTrajectory* const current_trajectory_pb);
+  apollo::common::Status Smooth(const FrameHistory* frame_history,
+                                const Frame* current_frame,
+                                ADCTrajectory* const current_trajectory_pb);
 
  private:
   bool IsCloseStop(const common::VehicleState& vehicle_state,

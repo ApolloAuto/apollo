@@ -45,7 +45,6 @@ cc_library(
         ":debug_info",
         "//cyber",
         "//external:gflags",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
@@ -78,7 +77,6 @@ cc_library(
     deps = [
         ":camera_app_lib_proto",
         "//cyber",
-        "//modules/common/util:file_util",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/traffic_light/detector/detection",
@@ -89,7 +87,7 @@ cc_library(
 )
 
 cc_library(
-   name = "lane_camera_perception",
+    name = "lane_camera_perception",
     srcs = [
         "lane_camera_perception.cc",
     ],
@@ -97,18 +95,19 @@ cc_library(
         "lane_camera_perception.h",
     ],
     deps = [
-	    ":camera_app_lib_proto",
+        ":camera_app_lib_proto",
         ":debug_info",
         "//cyber",
         "//external:gflags",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
         "//modules/perception/camera/lib/interface",
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
+        "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/utils",

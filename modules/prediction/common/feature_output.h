@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "modules/prediction/proto/offline_features.pb.h"
 
@@ -54,21 +54,22 @@ class FeatureOutput {
   static void InsertFeatureProto(const Feature& feature);
 
   /**
-    * @brief Insert a data_for_learning
-    * @param A feature in proto
-    */
-  static void InsertDataForLearning(
-      const Feature& feature, const std::vector<double>& feature_values,
-      const std::string& category);
+   * @brief Insert a data_for_learning
+   * @param A feature in proto
+   */
+  static void InsertDataForLearning(const Feature& feature,
+                                    const std::vector<double>& feature_values,
+                                    const std::string& category);
 
   /**
-    * @brief Insert a prediction result with predicted trajectories
-    * @param Obstacle id
-    * @param prediction_obstacle
-    */
+   * @brief Insert a prediction result with predicted trajectories
+   * @param Obstacle id
+   * @param prediction_obstacle
+   */
   static void InsertPredictionResult(
-    const int obstacle_id,
-    const PredictionObstacle& prediction_obstacle);
+      const int obstacle_id, const PredictionObstacle& prediction_obstacle);
+
+  static void InsertFrameEnv(const FrameEnv& frame_env);
 
   /**
    * @brief Write features to a file
@@ -76,14 +77,16 @@ class FeatureOutput {
   static void WriteFeatureProto();
 
   /**
-    * @brief Write DataForLearning features to a file
-    */
+   * @brief Write DataForLearning features to a file
+   */
   static void WriteDataForLearning();
 
   /**
-    * @brief Write PredictionResult to a file
-    */
+   * @brief Write PredictionResult to a file
+   */
   static void WritePredictionResult();
+
+  static void WriteFrameEnv();
 
   /**
    * @brief Get feature size
@@ -92,16 +95,18 @@ class FeatureOutput {
   static int Size();
 
   /**
-    * @brief Get the size of data_for_learning features.
-    * @return The size of data_for_learning features.
-    */
+   * @brief Get the size of data_for_learning features.
+   * @return The size of data_for_learning features.
+   */
   static int SizeOfDataForLearning();
 
   /**
-    * @brief Get the size of prediction results.
-    * @return The size of prediction results.
-    */
+   * @brief Get the size of prediction results.
+   * @return The size of prediction results.
+   */
   static int SizeOfPredictionResult();
+
+  static int SizeOfFrameEnv();
 
  private:
   static Features features_;
@@ -110,6 +115,8 @@ class FeatureOutput {
   static std::size_t idx_learning_;
   static ListPredictionResult list_prediction_result_;
   static std::size_t idx_prediction_result_;
+  static ListFrameEnv list_frame_env_;
+  static std::size_t idx_frame_env_;
 };
 
 }  // namespace prediction

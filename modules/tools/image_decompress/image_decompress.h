@@ -25,8 +25,8 @@
 namespace apollo {
 namespace image_decompress {
 
-class ImageDecompressComponent final :
-    public cyber::Component<apollo::drivers::CompressedImage> {
+class ImageDecompressComponent final
+    : public cyber::Component<apollo::drivers::CompressedImage> {
  public:
   bool Init() override;
   bool Proc(

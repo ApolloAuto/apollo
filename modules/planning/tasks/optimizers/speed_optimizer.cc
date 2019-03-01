@@ -26,13 +26,14 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::Status;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 
 SpeedOptimizer::SpeedOptimizer(const TaskConfig& config) : Task(config) {}
 
-apollo::common::Status SpeedOptimizer::Execute(
-    Frame* frame, ReferenceLineInfo* reference_line_info) {
+Status SpeedOptimizer::Execute(Frame* frame,
+                               ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
 
   auto ret = Process(
@@ -54,56 +55,13 @@ void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data) {
       {speed_data.begin(), speed_data.end()});
 }
 
-void SpeedOptimizer::RecordSTGraphDebug(const StGraphData& st_graph_data,
-                                        STGraphDebug* st_graph_debug) const {
+void SpeedOptimizer::RecordDebugInfo(const SpeedData& speed_data,
+                                     STGraphDebug* st_graph_debug) {
   if (!FLAGS_enable_record_debug || !st_graph_debug) {
     ADEBUG << "Skip record debug info";
     return;
   }
-
   st_graph_debug->set_name(Name());
-  for (const auto& boundary : st_graph_data.st_boundaries()) {
-    auto boundary_debug = st_graph_debug->add_boundary();
-    boundary_debug->set_name(boundary->id());
-    switch (boundary->boundary_type()) {
-      case STBoundary::BoundaryType::FOLLOW:
-        boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_FOLLOW);
-        break;
-      case STBoundary::BoundaryType::OVERTAKE:
-        boundary_debug->set_type(
-            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
-        break;
-      case STBoundary::BoundaryType::STOP:
-        boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_STOP);
-        break;
-      case STBoundary::BoundaryType::UNKNOWN:
-        boundary_debug->set_type(
-            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
-        break;
-      case STBoundary::BoundaryType::YIELD:
-        boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
-        break;
-      case STBoundary::BoundaryType::KEEP_CLEAR:
-        boundary_debug->set_type(
-            StGraphBoundaryDebug::ST_BOUNDARY_TYPE_KEEP_CLEAR);
-        break;
-    }
-
-    for (const auto& point : boundary->points()) {
-      auto point_debug = boundary_debug->add_point();
-      point_debug->set_t(point.x());
-      point_debug->set_s(point.y());
-    }
-  }
-
-  for (const auto& point : st_graph_data.speed_limit().speed_limit_points()) {
-    common::SpeedPoint speed_point;
-    speed_point.set_s(point.first);
-    speed_point.set_v(point.second);
-    st_graph_debug->add_speed_limit()->CopyFrom(speed_point);
-  }
-
-  const auto& speed_data = reference_line_info_->speed_data();
   st_graph_debug->mutable_speed_profile()->CopyFrom(
       {speed_data.begin(), speed_data.end()});
 }

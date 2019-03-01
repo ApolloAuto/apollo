@@ -37,7 +37,7 @@ class ReferenceLineEnd : public TrafficRule {
   virtual ~ReferenceLineEnd() = default;
 
   common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+                           ReferenceLineInfo* const reference_line_info);
 
  private:
   static constexpr char const* const REF_LINE_END_VO_ID_PREFIX = "REF_END_";

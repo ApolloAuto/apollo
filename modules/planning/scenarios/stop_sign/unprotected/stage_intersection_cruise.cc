@@ -18,19 +18,11 @@
  * @file
  **/
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -38,7 +30,6 @@ namespace scenario {
 namespace stop_sign {
 
 using common::TrajectoryPoint;
-using hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -50,22 +41,9 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     AERROR << "StopSignUnprotectedStageIntersectionCruise plan error";
   }
 
+  // check pass pnc_junction
   const auto& reference_line_info = frame->reference_line_info().front();
-
-  // check if the stop_sign is still along reference_line
-  std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  if (CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
-    return FinishScenario();
-  }
-
-  // check pass intersection
-  // TODO(all): update when pnc-junction is ready
-  constexpr double kIntersectionLength = 10.0;  // unit: m
-  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  const double distance_adc_pass_stop_sign = adc_back_edge_s -
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
-  if (distance_adc_pass_stop_sign > kIntersectionLength) {
+  if (!scenario::CheckInsidePnCJunction(reference_line_info)) {
     return FinishStage();
   }
 

@@ -166,7 +166,7 @@ Status SignalsXmlParser::ToPbSubSignalType(const std::string& xml_type,
 }
 
 Status SignalsXmlParser::ToPbStopSignType(const std::string& xml_type,
-                                           PbStopSignType* stop_type) {
+                                          PbStopSignType* stop_type) {
   CHECK_NOTNULL(stop_type);
 
   std::string upper_str = UtilXmlParser::ToUpper(xml_type);
@@ -220,8 +220,7 @@ Status SignalsXmlParser::ParseStopSigns(
         sub_node = sub_node->FirstChildElement("objectReference");
         while (sub_node) {
           std::string stop_line_id;
-          int checker = UtilXmlParser::QueryStringAttribute(*sub_node,
-                                                            "id",
+          int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
                                                             &stop_line_id);
           CHECK(checker == tinyxml2::XML_SUCCESS);
           stop_sign_internal.stop_line_ids.insert(stop_line_id);
@@ -233,9 +232,8 @@ Status SignalsXmlParser::ParseStopSigns(
       sub_node = signal_node->FirstChildElement("attribute");
       if (sub_node) {
         std::string stop_type;
-        int checker = UtilXmlParser::QueryStringAttribute(*sub_node,
-                                                        "stopType",
-                                                        &stop_type);
+        int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "stopType",
+                                                          &stop_type);
         if (checker != tinyxml2::XML_SUCCESS) {
           std::string err_msg = "Error parse stop type.";
           return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);

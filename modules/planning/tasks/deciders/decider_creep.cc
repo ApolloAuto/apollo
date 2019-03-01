@@ -44,7 +44,7 @@ Status DeciderCreep::Process(Frame* frame,
   CHECK_NOTNULL(reference_line_info);
 
   const double stop_sign_overlap_end_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
   BuildStopDecision(stop_sign_overlap_end_s, frame, reference_line_info);
 
   return Status::OK();
@@ -128,12 +128,11 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
         double obstacle_traveled_s =
             obstacle->reference_line_st_boundary().bottom_left_point().s() -
             obstacle->reference_line_st_boundary().bottom_right_point().s();
-        ADEBUG << "obstacle[" << obstacle->Id()
-            << "] obstacle_st_min_t["
-            << obstacle->reference_line_st_boundary().min_t()
-            << "] obstacle_st_min_s["
-            << obstacle->reference_line_st_boundary().min_s()
-            << "] obstacle_traveled_s[" << obstacle_traveled_s << "]";
+        ADEBUG << "obstacle[" << obstacle->Id() << "] obstacle_st_min_t["
+               << obstacle->reference_line_st_boundary().min_t()
+               << "] obstacle_st_min_s["
+               << obstacle->reference_line_st_boundary().min_s()
+               << "] obstacle_traveled_s[" << obstacle_traveled_s << "]";
 
         // ignore the obstacle which is already on reference line and moving
         // along the direction of ADC

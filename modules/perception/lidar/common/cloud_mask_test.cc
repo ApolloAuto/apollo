@@ -21,8 +21,8 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using base::PointF;
 using base::AttributePointCloud;
+using base::PointF;
 
 TEST(LidarCloudMaskTest, lidar_cloud_mask_test) {
   CloudMask mask;

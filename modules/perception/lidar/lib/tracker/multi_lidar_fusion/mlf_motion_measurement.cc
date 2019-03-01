@@ -27,7 +27,6 @@ namespace lidar {
 
 void MlfMotionMeasurement::ComputeMotionMeasurment(
     const MlfTrackDataConstPtr& track_data, TrackedObjectPtr new_object) {
-
   // prefer to choose objects from the same sensor
   std::string sensor_name = new_object->sensor_info.name;
   TrackedObjectConstPtr latest_object =
@@ -59,9 +58,10 @@ void MlfMotionMeasurement::MeasurementSelection(
   float corner_velocity_gain = 0.0f;
   std::vector<float> corner_velocity_gain_norms(4);
   for (int i = 0; i < 4; ++i) {
-    corner_velocity_gain_norms[i] = static_cast<float>(
-                                    (new_object->measured_corners_velocity[i] -
-                                     latest_object->belief_velocity).norm());
+    corner_velocity_gain_norms[i] =
+        static_cast<float>((new_object->measured_corners_velocity[i] -
+                            latest_object->belief_velocity)
+                               .norm());
   }
   std::vector<float>::iterator corener_min_gain =
       std::min_element(std::begin(corner_velocity_gain_norms),
@@ -71,12 +71,13 @@ void MlfMotionMeasurement::MeasurementSelection(
 
   std::vector<float> velocity_gain_norms(3);
   velocity_gain_norms[0] = corner_velocity_gain;
-  velocity_gain_norms[1] = static_cast<float>(
-                            (new_object->measured_barycenter_velocity -
-                             latest_object->belief_velocity).norm());
+  velocity_gain_norms[1] =
+      static_cast<float>((new_object->measured_barycenter_velocity -
+                          latest_object->belief_velocity)
+                             .norm());
   velocity_gain_norms[2] = static_cast<float>(
-                            (new_object->measured_center_velocity -
-                            latest_object->belief_velocity).norm());
+      (new_object->measured_center_velocity - latest_object->belief_velocity)
+          .norm());
   std::vector<float>::iterator min_gain = std::min_element(
       std::begin(velocity_gain_norms), std::end(velocity_gain_norms));
   int64_t min_gain_pos = min_gain - velocity_gain_norms.begin();

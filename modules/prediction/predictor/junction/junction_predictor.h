@@ -48,8 +48,8 @@ class JunctionPredictor : public Predictor {
   void Predict(Obstacle* obstacle) override;
 
  private:
-  void DrawJunctionTrajectoryPoints(const Feature& feature,
-      const JunctionExit& junction_exit,
+  void DrawJunctionTrajectoryPoints(
+      const Feature& feature, const JunctionExit& junction_exit,
       const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
 

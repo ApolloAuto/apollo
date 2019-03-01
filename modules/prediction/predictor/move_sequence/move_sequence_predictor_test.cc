@@ -16,6 +16,7 @@
 
 #include "modules/prediction/predictor/move_sequence/move_sequence_predictor.h"
 
+#include "cyber/common/file.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
@@ -76,8 +77,8 @@ TEST_F(MoveSequencePredictorTest, Polynomial) {
         *obstacle_ptr, lane_sequence, lon_end_state, &lon_coefficients);
     EXPECT_TRUE(ret_lon);
     std::array<double, 6> lat_coefficients;
-    bool ret_lat = predictor.GetLateralPolynomial(
-        *obstacle_ptr, lane_sequence, 3.0, &lat_coefficients);
+    bool ret_lat = predictor.GetLateralPolynomial(*obstacle_ptr, lane_sequence,
+                                                  3.0, &lat_coefficients);
     EXPECT_TRUE(ret_lat);
   }
 }
