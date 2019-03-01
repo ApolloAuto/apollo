@@ -18,9 +18,6 @@
  * @file
  **/
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
 
 #include "cyber/common/log.h"
