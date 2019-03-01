@@ -58,7 +58,12 @@ function check_host_environment() {
   fi
 
   # Fetch lfs managed files for current HEAD.
-  git lfs fetch
+  git lfs install && git lfs fetch
+  if [ $? -ne 0 ]; then
+    echo 'Failed to fetch LFS objects. Please retry command'
+    echo '    git lfs install && git lfs fetch && echo Succeeded'
+    exit 1
+  fi
 
   if ! [ -d ${APOLLO_ROOT_DIR}/.git/lfs/objects ]; then
     echo 'You need to install and run git-lfs when working with apollo.'
