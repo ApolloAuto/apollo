@@ -45,6 +45,19 @@ OpenSpaceTrajectoryProvider::OpenSpaceTrajectoryProvider(
           .open_space_trajectory_optimizer_config()));
 }
 
+OpenSpaceTrajectoryProvider::~OpenSpaceTrajectoryProvider() {
+  if (FLAGS_enable_open_space_planner_thread) {
+    Stop();
+  }
+}
+
+void OpenSpaceTrajectoryProvider::Stop() {
+  is_stop_ = true;
+  if (FLAGS_enable_open_space_planner_thread) {
+    task_future_.get();
+  }
+}
+
 Status OpenSpaceTrajectoryProvider::Process(
     DiscretizedTrajectory* const trajectory_data) {
   // Start thread when getting in Process() for the first time
