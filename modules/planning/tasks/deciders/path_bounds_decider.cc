@@ -453,7 +453,8 @@ PathBoundsDecider::SortObstaclesForSweepLine(
       continue;
     }
     // Only focus on static obstacles.
-    if (!obstacle->IsStatic()) {
+    if (!obstacle->IsStatic() ||
+        obstacle->speed() > 0.5) {
       continue;
     }
     // Only focus on obstaclse that are ahead of ADC.
@@ -487,7 +488,7 @@ PathBoundsDecider::SortObstaclesForSweepLine(
   return sorted_obstacles;
 }
 
-size_t PathBoundsDecider::ConstructSubsequentPathBounds(
+int PathBoundsDecider::ConstructSubsequentPathBounds(
     const std::vector<std::tuple<int, double, double, double, std::string>>&
     sorted_obstacles,
     size_t path_idx, size_t obs_idx,
@@ -503,7 +504,7 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
   if (path_idx >= curr_path_bounds->size()) {
     ADEBUG << "Completed path bounds search ending at path_idx = " << path_idx;
     *final_path_bounds = *curr_path_bounds;
-    return path_idx;
+    return static_cast<int>(path_idx);
   }
 
   //==============================================================
@@ -527,14 +528,13 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
     bool is_able_to_update = UpdatePathBoundaryAndCenterLine(
         path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
         curr_path_bounds, &dummy);
-    size_t ret_val = 0;
+    int ret_val = 0;
     if (is_able_to_update) {
       ret_val = ConstructSubsequentPathBounds(
           sorted_obstacles, path_idx + 1, obs_idx,
           obs_id_to_details, curr_path_bounds, final_path_bounds);
-      
     } else {
-      ret_val = path_idx;
+      ret_val = static_cast<int>(path_idx);
     }
     (*curr_path_bounds)[path_idx] = old_path_bound;
     return ret_val;
@@ -542,28 +542,37 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
 
   //==============================================================
   // If there are obstacle changes
+  // 0. Backup the old memory.
   std::unordered_map<std::string, std::tuple<bool, double>>
   old_obs_id_to_details = *obs_id_to_details;
+  // 1. Go through all obstacle changes. 
+  //    - For exiting obstacle, remove from our memory.
+  //    - For entering obstalce, save it to a vector.
   std::vector<std::tuple<int, double, double, double, std::string>>
   new_entering_obstacles;
   size_t new_obs_idx = obs_idx;
   while (new_obs_idx < sorted_obstacles.size() &&
          std::get<1>(sorted_obstacles[new_obs_idx]) <= curr_s) {
     if (!std::get<0>(sorted_obstacles[new_obs_idx])) {
+      // For exiting obstacle.
       obs_id_to_details->erase(std::get<4>(sorted_obstacles[new_obs_idx]));
     } else {
+      // For entering obstacle.
       new_entering_obstacles.push_back(sorted_obstacles[new_obs_idx]);
     }
     ++new_obs_idx;
   }
+  // 2. For new entering obstacles, decide possible pass directions.
+  //    (ranked in terms of optimality)
   auto pass_direction_decisions =
-      DecidePassDirections(new_entering_obstacles);
-
-  // The following part needs to be re-written.
-  size_t ret_val = 0;
-  for(size_t i = 0; i < 1; ++i) {
-    // For now, only try one optimal direction.
-    // TODO(jiacheng): try all the possible directions.
+      DecidePassDirections(&new_entering_obstacles);
+  // 3. Try constructing subsequent path-bounds for all possible directions.
+  int best_ret_val = static_cast<int>(path_idx);
+  std::vector<std::tuple<double, double, double>> best_final_path_bounds =
+      *curr_path_bounds;
+  for(size_t i = 0; i < pass_direction_decisions.size(); ++i) {
+    // For each possible direction:
+    // a. Update the obs_id_to_details
     for(size_t j = 0; j < pass_direction_decisions[i].size(); ++j) {
       if (pass_direction_decisions[i][j]) {
         // Pass from left.
@@ -575,17 +584,49 @@ size_t PathBoundsDecider::ConstructSubsequentPathBounds(
             std::make_tuple(false, std::get<2>(new_entering_obstacles[j]));
       }
     }
-    ret_val = ConstructSubsequentPathBounds(
-        sorted_obstacles, path_idx + 1, new_obs_idx,
-        obs_id_to_details, curr_path_bounds, final_path_bounds);
-    return ret_val;
+    // b. Figure out left/right bounds after the updates.
+    for (auto it = obs_id_to_details->begin();
+         it != obs_id_to_details->end(); ++it) {
+      if(std::get<0>(it->second)) {
+        // Pass from left.
+        right_bounds_from_obstacles = 
+            std::max(right_bounds_from_obstacles, std::get<1>(it->second));
+      } else {
+        // Pass from right.
+        left_bounds_from_obstacles =
+            std::min(left_bounds_from_obstacles, std::get<1>(it->second));
+      }
+    }
+    // c. Update for this path_idx, and construct the subsequent path bounds.
+    double dummy = 0.0;
+    auto old_path_bound = (*curr_path_bounds)[path_idx];
+    std::vector<std::tuple<double, double, double>> curr_final_path_bounds;
+    bool is_able_to_update = UpdatePathBoundaryAndCenterLine(
+        path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
+        curr_path_bounds, &dummy);
+    int ret_val = 0;
+    if (is_able_to_update) {
+      ret_val = ConstructSubsequentPathBounds(
+          sorted_obstacles, path_idx + 1, obs_idx,
+          obs_id_to_details, curr_path_bounds, &curr_final_path_bounds);
+    } else {
+      ret_val = static_cast<int>(path_idx);
+      curr_final_path_bounds = *curr_path_bounds;
+    }
+    // d. If it's a longer path, update the best_path_bounds info.
+    if (ret_val > best_ret_val) {
+      best_ret_val = ret_val;
+      best_final_path_bounds = curr_final_path_bounds;
+    }
+    (*curr_path_bounds)[path_idx] = old_path_bound;
   }
-  ////////////////////////////////////////////////////
-  return 0;
+  *obs_id_to_details = old_obs_id_to_details;
+  *final_path_bounds = best_final_path_bounds;
+  return best_ret_val;
 }
 
 std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
-    const std::vector<std::tuple<int, double, double, double, std::string>>&
+    std::vector<std::tuple<int, double, double, double, std::string>>* const
     new_entering_obstacles) {
   std::vector<std::vector<bool>> decision;
   return decision;
