@@ -38,7 +38,8 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
                          PathData* const path_data) override;
 
   double AdjustLateralDerivativeBounds(const double s_dot,
-      const double l_dot_bounds);
+      const double dl, const double ddl,
+      const double l_dot_bounds) const;
 };
 
 }  // namespace planning
