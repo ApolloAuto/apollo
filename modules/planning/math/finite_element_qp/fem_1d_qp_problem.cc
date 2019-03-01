@@ -94,15 +94,12 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
   *work = osqp_setup(data, settings);
 
   // Solve Problem
-  auto exit_flag = osqp_solve(*work);
+  osqp_solve(*work);
 
-  // TODO(all): this is a bug in osqp solver.
-  // It will return 0 no matter what the optimization result is.
-  if (exit_flag != 0) {
-    /**
-    AERROR << "failed optimization exit flag:\t" << exit_flag;
+  auto status = (*work)->info->status_val;
+  if (status != 1 && status != 2) {
+    AERROR << "failed optimization status:\t" << (*work)->info->status;
     return false;
-    **/
   }
   return true;
 }
