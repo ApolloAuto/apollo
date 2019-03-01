@@ -1,3 +1,4 @@
+
 /******************************************************************************
  * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
@@ -18,21 +19,28 @@
  * @file
  **/
 
-#include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
+#include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
+
+#include "gtest/gtest.h"
+#include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
+class OpenSpaceTrajectoryPartitionTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {
+    config_.set_task_type(TaskConfig::OPEN_SPACE_TRAJECTORY_PARTITION);
+  }
 
-TrajectoryOptimizer::TrajectoryOptimizer(const TaskConfig& config)
-    : Task(config) {}
+ protected:
+  TaskConfig config_;
+};
 
-Status TrajectoryOptimizer::Execute(Frame* frame) {
-  Task::Execute(frame);
-  auto ret = Process(
-      frame->mutable_open_space_info()->mutable_stitched_trajectory_result());
-  return ret;
+TEST_F(OpenSpaceTrajectoryPartitionTest, Init) {
+  OpenSpaceTrajectoryPartition open_space_trajectory_partition(config_);
+  EXPECT_EQ(open_space_trajectory_partition.Name(),
+            TaskConfig::TaskType_Name(config_.task_type()));
 }
 
 }  // namespace planning

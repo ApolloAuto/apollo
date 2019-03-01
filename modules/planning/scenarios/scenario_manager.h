@@ -40,11 +40,6 @@ class ScenarioManager final {
   void Update(const common::TrajectoryPoint& ego_point, const Frame& frame);
 
  private:
-  /**
-   * This function will wake up each scenario's observe function to cache
-   * necessary information in planning context, even when the scenario is not
-   * scheduled.
-   */
   void Observe(const Frame& frame);
 
   std::unique_ptr<Scenario> CreateScenario(
@@ -62,28 +57,34 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
 
   // functions for scenario voter implementation
-  void ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
-                        const Frame& frame);
-  bool ReuseCurrentScenario(const common::TrajectoryPoint& ego_point,
-                            const Frame& frame);
-  bool SelectScenario(const ScenarioConfig::ScenarioType type,
-                      const common::TrajectoryPoint& ego_point,
-                      const Frame& frame);
+  // do NOT delete the code yet
+  // void ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
+  //                       const Frame& frame);
+  // bool ReuseCurrentScenario(const common::TrajectoryPoint& ego_point,
+  //                           const Frame& frame);
+  // bool SelectScenario(const ScenarioConfig::ScenarioType type,
+  //                     const common::TrajectoryPoint& ego_point,
+  //                     const Frame& frame);
 
-  // functions for scenario dispatch implementation
   void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
                         const Frame& frame);
 
-  // ScenarioConfig::ScenarioType DecideCurrentScenario(
-  //      const common::TrajectoryPoint& ego_point, const Frame& frame);
-
   void ReadTrafficLight(const Frame& frame);
 
-  bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsStopSignScenario(
+      const ScenarioConfig::ScenarioType& scenario_type);
   bool IsTrafficLightScenario(
       const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContext(
+      const Frame& frame,
+      const ScenarioConfig::ScenarioType& scenario_type);
+
+  void UpdatePlanningContextStopSignScenario(
+      const Frame& frame,
+      const ScenarioConfig::ScenarioType& scenario_type);
+
+  void UpdatePlanningContextTrafficLightScenario(
       const Frame& frame,
       const ScenarioConfig::ScenarioType& scenario_type);
 

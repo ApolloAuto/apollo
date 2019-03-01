@@ -43,14 +43,29 @@ OpenSpaceTrajectoryProvider::OpenSpaceTrajectoryProvider(
   open_space_trajectory_optimizer_.reset(new OpenSpaceTrajectoryOptimizer(
       config.open_space_trajectory_provider_config()
           .open_space_trajectory_optimizer_config()));
+}
+
+OpenSpaceTrajectoryProvider::~OpenSpaceTrajectoryProvider() {
   if (FLAGS_enable_open_space_planner_thread) {
-    task_future_ = cyber::Async(
-        &OpenSpaceTrajectoryProvider::GenerateTrajectoryThread, this);
+    Stop();
+  }
+}
+
+void OpenSpaceTrajectoryProvider::Stop() {
+  is_stop_ = true;
+  if (FLAGS_enable_open_space_planner_thread) {
+    task_future_.get();
   }
 }
 
 Status OpenSpaceTrajectoryProvider::Process(
     DiscretizedTrajectory* const trajectory_data) {
+  // Start thread when getting in Process() for the first time
+  if (FLAGS_enable_open_space_planner_thread && !thread_init_flag_) {
+    task_future_ = cyber::Async(
+        &OpenSpaceTrajectoryProvider::GenerateTrajectoryThread, this);
+    thread_init_flag_ = true;
+  }
   // Get stitching trajectory from last frame
   const double start_timestamp = Clock::NowInSeconds();
   const common::VehicleState vehicle_state = frame_->vehicle_state();
@@ -84,28 +99,40 @@ Status OpenSpaceTrajectoryProvider::Process(
       thread_data_.XYbounds = open_space_info.ROI_xy_boundary();
     }
 
-    // check vehicle state
+    // Check vehicle state
     if (IsVehicleNearDestination(
             vehicle_state, open_space_info.open_space_end_pose(),
             open_space_info.origin_heading(), open_space_info.origin_point())) {
+      GenerateStopTrajectory(trajectory_data);
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
 
     // Check if trajectory updated
     if (trajectory_updated_) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
-      open_space_trajectory_optimizer_->GetOptimizedTrajectory(trajectory_data);
-      open_space_trajectory_optimizer_->GetStitchingTrajectory(
-          frame_->mutable_open_space_info()
-              ->mutable_stitching_trajectory_data());
+      LoadResult(trajectory_data);
       trajectory_updated_.store(false);
       return Status::OK();
     }
 
-    return Status(
-        ErrorCode::OK,
-        "Waiting for planning thread in open_space_trajectory_provider");
+    if (trajectory_error_) {
+      ++optimizer_thread_counter;
+      trajectory_error_.store(false);
+      if (optimizer_thread_counter > 5) {
+        return Status(ErrorCode::PLANNING_ERROR,
+                      "open_space_optimizer failed too many times");
+      }
+    }
 
+    if (previous_frame->open_space_info().open_space_provider_success()) {
+      ReuseLastFrameResult(previous_frame, trajectory_data);
+      return Status(ErrorCode::OK,
+                    "Waiting for open_space_trajectory_optimizer in "
+                    "open_space_trajectory_provider");
+    } else {
+      GenerateStopTrajectory(trajectory_data);
+      return Status(ErrorCode::OK, "Stop due to computation not finished");
+    }
   } else {
     const auto& end_pose = open_space_info.open_space_end_pose();
     const auto& rotate_angle = open_space_info.origin_heading();
@@ -117,9 +144,10 @@ Status OpenSpaceTrajectoryProvider::Process(
         open_space_info.obstacles_vertices_vec();
     const auto& XYbounds = open_space_info.ROI_xy_boundary();
 
-    // check vehicle state
+    // Check vehicle state
     if (IsVehicleNearDestination(vehicle_state, end_pose, rotate_angle,
                                  translate_origin)) {
+      GenerateStopTrajectory(trajectory_data);
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
 
@@ -131,16 +159,13 @@ Status OpenSpaceTrajectoryProvider::Process(
 
     // If status is OK, update vehicle trajectory;
     if (status == Status::OK()) {
-      open_space_trajectory_optimizer_->GetOptimizedTrajectory(trajectory_data);
-      open_space_trajectory_optimizer_->GetStitchingTrajectory(
-          frame_->mutable_open_space_info()
-              ->mutable_stitching_trajectory_data());
+      LoadResult(trajectory_data);
       return status;
     } else {
       return status;
     }
   }
-  return Status::OK();
+  return Status(ErrorCode::PLANNING_ERROR);
 }
 
 void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
@@ -160,9 +185,14 @@ void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
       if (status == Status::OK()) {
         trajectory_updated_.store(true);
       } else {
-        AERROR_EVERY(200)
-            << "Multi-thread trajectory generator not OK with return satus : "
-            << status.ToString();
+        AERROR_EVERY(200) << "open_space_trajectory_optimizer not returning "
+                             "OK() with status: "
+                          << status.ToString();
+        if (status.ok()) {
+          trajectory_skipped_.store(true);
+        } else {
+          trajectory_error_.store(true);
+        }
       }
     }
   }
@@ -188,9 +218,73 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
                                 .open_space_trajectory_optimizer_config()
                                 .is_near_destination_threshold()) {
     ADEBUG << "vehicle reach end_pose";
+    *(frame_->mutable_open_space_info()->mutable_destination_reached()) = true;
     return true;
   }
   return false;
+}
+
+void OpenSpaceTrajectoryProvider::GenerateStopTrajectory(
+    DiscretizedTrajectory* const trajectory_data) {
+  double relative_time = 0.0;
+  // TODO(Jinyun) Move to conf
+  constexpr int stop_trajectory_length = 10;
+  constexpr double relative_stop_time = 0.1;
+  trajectory_data->clear();
+  for (size_t i = 0; i < stop_trajectory_length; i++) {
+    TrajectoryPoint point;
+    point.mutable_path_point()->set_x(frame_->vehicle_state().x());
+    point.mutable_path_point()->set_y(frame_->vehicle_state().x());
+    point.mutable_path_point()->set_theta(frame_->vehicle_state().heading());
+    point.mutable_path_point()->set_s(0.0);
+    point.mutable_path_point()->set_kappa(0.0);
+    point.set_relative_time(relative_time);
+    point.set_v(0.0);
+    point.set_a(0.0);
+    trajectory_data->emplace_back(point);
+    relative_time += relative_stop_time;
+  }
+}
+
+void OpenSpaceTrajectoryProvider::LoadResult(
+    DiscretizedTrajectory* const trajectory_data) {
+  // Load unstitched two trajectories into frame for debug
+  auto optimizer_trajectory_ptr =
+      frame_->mutable_open_space_info()->mutable_optimizer_trajectory_data();
+  auto stitching_trajectory_ptr =
+      frame_->mutable_open_space_info()->mutable_stitching_trajectory_data();
+  open_space_trajectory_optimizer_->GetOptimizedTrajectory(
+      optimizer_trajectory_ptr);
+  open_space_trajectory_optimizer_->GetStitchingTrajectory(
+      stitching_trajectory_ptr);
+  // Stitch two trajectories and load back to trajectory_data from frame
+  size_t optimizer_trajectory_size = optimizer_trajectory_ptr->size();
+  double stitching_point_relative_time =
+      stitching_trajectory_ptr->back().relative_time();
+  double stitching_point_relative_s =
+      stitching_trajectory_ptr->back().path_point().s();
+  for (size_t i = 0; i < optimizer_trajectory_size; ++i) {
+    optimizer_trajectory_ptr->at(i).set_relative_time(
+        optimizer_trajectory_ptr->at(i).relative_time() +
+        stitching_point_relative_time);
+    optimizer_trajectory_ptr->at(i).mutable_path_point()->set_s(
+        optimizer_trajectory_ptr->at(i).path_point().s() +
+        stitching_point_relative_s);
+  }
+
+  *(trajectory_data) = *(optimizer_trajectory_ptr);
+
+  trajectory_data->PrependTrajectoryPoints(
+      frame_->open_space_info().stitching_trajectory_data());
+
+  *(frame_->mutable_open_space_info()->mutable_open_space_provider_success()) =
+      true;
+}
+
+void OpenSpaceTrajectoryProvider::ReuseLastFrameResult(
+    const Frame* last_frame, DiscretizedTrajectory* const trajectory_data) {
+  *(trajectory_data) =
+      last_frame->open_space_info().stitched_trajectory_result();
 }
 
 }  // namespace planning

@@ -49,6 +49,10 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
  public:
   explicit OpenSpaceTrajectoryProvider(const TaskConfig& config);
 
+  ~OpenSpaceTrajectoryProvider();
+
+  void Stop();
+
  private:
   apollo::common::Status Process(
       DiscretizedTrajectory* const trajectory_data) override;
@@ -60,14 +64,27 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
                                 double rotate_angle,
                                 const Vec2d& translate_origin);
 
+  void GenerateStopTrajectory(DiscretizedTrajectory* const trajectory_data);
+
+  void LoadResult(DiscretizedTrajectory* const trajectory_data);
+
+  void ReuseLastFrameResult(const Frame* last_frame,
+                            DiscretizedTrajectory* const trajectory_data);
+
  private:
+  bool thread_init_flag_ = false;
+
   std::unique_ptr<OpenSpaceTrajectoryOptimizer>
       open_space_trajectory_optimizer_;
+
+  size_t optimizer_thread_counter = 0;
 
   OpenSpaceTrajectoryThreadData thread_data_;
   std::future<void> task_future_;
   std::atomic<bool> is_stop_{false};
   std::atomic<bool> trajectory_updated_{false};
+  std::atomic<bool> trajectory_error_{false};
+  std::atomic<bool> trajectory_skipped_{false};
   std::mutex open_space_mutex_;
 };
 

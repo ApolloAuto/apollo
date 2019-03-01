@@ -55,6 +55,7 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
   if (XYbounds.size() == 0 || end_pose.size() == 0 ||
       obstacles_edges_num.cols() == 0 || obstacles_A.cols() == 0 ||
       obstacles_b.cols() == 0) {
+    ADEBUG << "OpenSpaceTrajectoryOptimizer input data not ready";
     return Status(ErrorCode::PLANNING_ERROR,
                   "OpenSpaceTrajectoryOptimizer input data not ready");
   }
@@ -62,18 +63,16 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
   // Generate Stop trajectory if init point close to destination
   if (IsInitPointNearDestination(stitching_trajectory.back(), end_pose,
                                  rotate_angle, translate_origin)) {
-    AINFO << "Planning init point is close to destination, skip new "
-             "trajectory generation.";
-
+    ADEBUG << "Planning init point is close to destination, skip new "
+              "trajectory generation";
     return Status(ErrorCode::OK,
                   "Planning init point is close to destination, skip new "
-                  "trajectory generation.");
+                  "trajectory generation");
   }
 
   // Initiate initial states
   stitching_trajectory_ = stitching_trajectory;
-  common::TrajectoryPoint init_trajectory_point =
-      stitching_trajectory.back();
+  common::TrajectoryPoint init_trajectory_point = stitching_trajectory.back();
   common::PathPoint init_path_point = init_trajectory_point.path_point();
   double init_x = init_path_point.x();
   double init_y = init_path_point.y();
@@ -104,6 +103,7 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
                         xF(2, 0), XYbounds, obstacles_vertices_vec, &result)) {
     ADEBUG << "State warm start problem solved successfully!";
   } else {
+    ADEBUG << "State warm start problem failed to solve";
     return Status(ErrorCode::PLANNING_ERROR,
                   "State warm start problem failed to solve");
   }
@@ -156,6 +156,7 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
             obstacles_b, xWS, &l_warm_up, &n_warm_up)) {
       ADEBUG << "Dual variable problem solved successfully!";
     } else {
+      ADEBUG << "Dual variable problem failed to solve";
       return Status(ErrorCode::PLANNING_ERROR,
                     "Dual variable problem failed to solve");
     }
@@ -179,6 +180,7 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
           &dual_l_result_ds, &dual_n_result_ds)) {
     ADEBUG << "Distance approach problem solved successfully!";
   } else {
+    ADEBUG << "Distance approach problem failed to solve";
     return Status(ErrorCode::PLANNING_ERROR,
                   "Distance approach problem failed to solve");
   }
@@ -214,7 +216,6 @@ bool OpenSpaceTrajectoryOptimizer::IsInitPointNearDestination(
 
   if (distance_to_init_point <
       config_.planner_open_space_config().is_near_destination_threshold()) {
-    AINFO << "init_point reach end_pose";
     return true;
   }
   return false;

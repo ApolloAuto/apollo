@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
-
-#include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
+#include "modules/prediction/predictor/interaction/interaction_predictor.h"
 
 namespace apollo {
-namespace planning {
+namespace prediction {
 
-using apollo::common::Status;
-
-TrajectoryOptimizer::TrajectoryOptimizer(const TaskConfig& config)
-    : Task(config) {}
-
-Status TrajectoryOptimizer::Execute(Frame* frame) {
-  Task::Execute(frame);
-  auto ret = Process(
-      frame->mutable_open_space_info()->mutable_stitched_trajectory_result());
-  return ret;
+void InteractionPredictor::Predict(Obstacle* obstacle) {
+  // TODO(kechxu) implement
 }
 
-}  // namespace planning
+}  // namespace prediction
 }  // namespace apollo

@@ -18,20 +18,11 @@
  * @file
  **/
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
 namespace planning {
@@ -39,7 +30,6 @@ namespace scenario {
 namespace stop_sign {
 
 using common::TrajectoryPoint;
-using hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -53,23 +43,7 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
 
   // check pass pnc_junction
   const auto& reference_line_info = frame->reference_line_info().front();
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-
-  hdmap::PathOverlap pnc_junction_overlap;
-  reference_line_info.GetPnCJunction(adc_front_edge_s, &pnc_junction_overlap);
-  if (pnc_junction_overlap.object_id.empty()) {
-    return FinishStage();
-  }
-
-  constexpr double kIntersectionPassDist = 2.0;  // unit: m
-  const double distance_adc_pass_intersection = adc_back_edge_s -
-      pnc_junction_overlap.end_s;
-  ADEBUG << "distance_adc_pass_intersection["
-      << distance_adc_pass_intersection
-      << "] pnc_junction_overlap[" << pnc_junction_overlap.object_id
-      << "] start_s[" << pnc_junction_overlap.start_s << "]";
-  if (distance_adc_pass_intersection >= kIntersectionPassDist) {
+  if (!scenario::CheckInsidePnCJunction(reference_line_info)) {
     return FinishStage();
   }
 

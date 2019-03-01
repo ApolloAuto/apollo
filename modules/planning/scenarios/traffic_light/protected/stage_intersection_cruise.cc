@@ -18,14 +18,11 @@
  * @file
  **/
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/traffic_light/protected/stage_intersection_cruise.h"
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -45,8 +42,11 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
     AERROR << "TrafficLightProtectedStageIntersectionCruise plan error";
   }
 
-  // check pass intersection
-  // TODO(all): to be added
+  // check pass pnc_junction
+  const auto& reference_line_info = frame->reference_line_info().front();
+  if (!scenario::CheckInsidePnCJunction(reference_line_info)) {
+    return FinishStage();
+  }
 
   return Stage::RUNNING;
 }
