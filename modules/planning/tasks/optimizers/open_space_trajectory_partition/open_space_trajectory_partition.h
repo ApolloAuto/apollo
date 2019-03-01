@@ -36,8 +36,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
   void Restart();
 
  private:
-  apollo::common::Status Process(
-      DiscretizedTrajectory* const trajectory_data) override;
+  apollo::common::Status Process() override;
 
  private:
   void InterpolateTrajectory(DiscretizedTrajectory* const trajectory,
