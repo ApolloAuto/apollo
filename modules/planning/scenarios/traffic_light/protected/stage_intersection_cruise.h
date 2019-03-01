@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
