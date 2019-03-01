@@ -235,9 +235,7 @@ PyObject *cyber_PyRecordReader_GetChannelList(PyObject *self, PyObject *args) {
   PyObject *pyobj_list = PyList_New(channel_list.size());
   size_t pos = 0;
   for (const std::string &channel : channel_list) {
-    PyObject *bld_name = Py_BuildValue("s", channel.c_str());
-    PyList_SetItem(pyobj_list, pos, bld_name);
-    Py_DECREF(bld_name);
+    PyList_SetItem(pyobj_list, pos, Py_BuildValue("s", channel.c_str()));
     pos++;
   }
 
@@ -381,9 +379,8 @@ PyObject *cyber_PyRecordWriter_SetSizeOfFileSegmentation(PyObject *self,
   uint64_t size_kilobytes = 0;
 
   if (!PyArg_ParseTuple(
-          args,
-          const_cast<char *>(
-              "OK:cyber_PyRecordWriter_SetSizeOfFileSegmentation"),
+          args, const_cast<char *>(
+                    "OK:cyber_PyRecordWriter_SetSizeOfFileSegmentation"),
           &pyobj_rec_writer, &size_kilobytes)) {
     AERROR
         << "cyber_PyRecordWriter_SetSizeOfFileSegmentation parsetuple failed!";
@@ -412,9 +409,8 @@ PyObject *cyber_PyRecordWriter_SetIntervalOfFileSegmentation(PyObject *self,
   uint64_t time_sec = 0;
 
   if (!PyArg_ParseTuple(
-          args,
-          const_cast<char *>(
-              "OK:cyber_PyRecordWriter_SetIntervalOfFileSegmentation"),
+          args, const_cast<char *>(
+                    "OK:cyber_PyRecordWriter_SetIntervalOfFileSegmentation"),
           &pyobj_rec_writer, &time_sec)) {
     AERROR << "cyber_PyRecordWriter_SetIntervalOfFileSegmentation parsetuple "
               "failed!";
