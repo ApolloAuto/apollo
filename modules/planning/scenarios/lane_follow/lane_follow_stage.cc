@@ -112,29 +112,71 @@ void LaneFollowStage::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 Stage::StageStatus LaneFollowStage::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   bool has_drivable_reference_line = false;
-  bool disable_low_priority_path = false;
+  //  bool disable_low_priority_path = false;
 
-  AERROR << "Number of reference lines:\t" << frame->mutable_reference_line_info()->size();
+  AERROR << "Number of reference lines:\t"
+      << frame->mutable_reference_line_info()->size();
+
+  /**
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (disable_low_priority_path) {
       reference_line_info.SetDrivable(false);
     }
     if (!reference_line_info.IsDrivable()) {
+      AERROR << "\t one line is not drivable";
       continue;
     }
+
+    AERROR << "\t one line is drivable";
     auto cur_status =
         PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
     if (cur_status.ok() && reference_line_info.IsDrivable()) {
       has_drivable_reference_line = true;
       if (FLAGS_prioritize_change_lane &&
           reference_line_info.IsChangeLanePath() &&
-          reference_line_info.Cost() < kStraightForwardLineCost) {
+          reference_line_info.Cost() < kStraightForwardLineCost &&
+          IsClearToChangeLane(reference_line_info, frame, planning_start_point.v())) {
         disable_low_priority_path = true;
       }
     } else {
       reference_line_info.SetDrivable(false);
     }
   }
+  **/
+
+  for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
+    if (has_drivable_reference_line) {
+      reference_line_info.SetDrivable(false);
+      break;
+    }
+
+    auto cur_status =
+        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
+
+    if (cur_status.ok()) {
+      if (reference_line_info.IsChangeLanePath()) {
+        AERROR << "reference line is lane change ref.";
+        if (reference_line_info.Cost() < kStraightForwardLineCost &&
+            IsClearToChangeLane(reference_line_info, frame,
+                planning_start_point.v())) {
+          has_drivable_reference_line = true;
+          reference_line_info.SetDrivable(true);
+          AERROR << "\tclear for lane change";
+        }
+        else {
+          reference_line_info.SetDrivable(false);
+          AERROR << "\tlane change failed";
+        }
+      } else {
+
+        AERROR << "reference line is NOT lane change ref.";
+        has_drivable_reference_line = true;
+      }
+    } else {
+      reference_line_info.SetDrivable(false);
+    }
+  }
+
   return has_drivable_reference_line ? StageStatus::RUNNING
                                      : StageStatus::ERROR;
 }
@@ -179,20 +221,24 @@ Status LaneFollowStage::PlanOnReferenceLine(
   RecordObstacleDebugInfo(reference_line_info);
 
   if (reference_line_info->path_data().Empty()) {
-    ADEBUG << "Path fallback.";
+    AERROR << "Path fallback.";
     GenerateFallbackPathProfile(reference_line_info,
                                 reference_line_info->mutable_path_data());
     reference_line_info->AddCost(kPathOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
+  } else {
+    AERROR << "Path succeeded";
   }
 
   if (!ret.ok() || reference_line_info->speed_data().empty()) {
-    ADEBUG << "Speed fallback.";
+    AERROR << "Speed fallback.";
 
     *reference_line_info->mutable_speed_data() =
         SpeedProfileGenerator::GenerateFallbackSpeedProfile();
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
+  } else {
+    AERROR << "Speed succeeded";
   }
 
   if (!(reference_line_info->trajectory_type() ==
@@ -299,6 +345,73 @@ SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
       {stop_decision.stop_point().x(), stop_decision.stop_point().y()},
       &sl_point);
   return sl_point;
+}
+
+bool LaneFollowStage::IsClearToChangeLane (
+    const ReferenceLineInfo& reference_line_info,
+    Frame* frame,
+    const double ego_v) {
+  CHECK(reference_line_info.IsChangeLanePath());
+
+  double ego_start_s = reference_line_info.AdcSlBoundary().start_s();
+  double ego_end_s = reference_line_info.AdcSlBoundary().end_s();
+
+  auto obstacles = frame->obstacles();
+
+  AERROR << "\tNumber of obstacles:\t" << obstacles.size();
+
+  for (const auto* obstacle : obstacles) {
+    if (obstacle->IsVirtual() || obstacle->IsStatic()) {
+      AERROR << "skip one virtual or static obstacle";
+      continue;
+    }
+
+    double start_s = std::numeric_limits<double>::max();
+    double end_s = -std::numeric_limits<double>::max();
+    double start_l = std::numeric_limits<double>::max();
+    double end_l = -std::numeric_limits<double>::max();
+
+    for (const auto& p : obstacle->PerceptionPolygon().points()) {
+      SLPoint sl_point;
+      reference_line_info.reference_line().XYToSL({p.x(), p.y()}, &sl_point);
+      start_s = std::fmin(start_s, sl_point.s());
+      end_s = std::fmax(end_s, sl_point.s());
+
+      start_l = std::fmin(start_l, sl_point.l());
+      end_l = std::fmax(end_l, sl_point.l());
+    }
+
+    /**
+    AERROR << "has dynamic obstacle";
+    AERROR << "obs start_s:\t" << start_s;
+    AERROR << "obs end_s:\t" << end_s;
+    AERROR << "obs start_l:\t" << start_l;
+    AERROR << "obs end_l:\t" << end_l;
+    AERROR << "obs v:\t" << obstacle->speed();
+    **/
+
+    constexpr double kLateralShift = 2.5;
+    if (end_l < -kLateralShift ||
+        start_l > kLateralShift) {
+      continue;
+    }
+    constexpr double kSafeTime = 3.0;
+    constexpr double kForwardMinSafeDistance = 6.0;
+    constexpr double kBackwardMinSafeDistance = 8.0;
+
+    const auto kForwardSafeDistance = std::fmax(
+        kForwardMinSafeDistance,
+        ego_v * kSafeTime);
+    const auto kBackwardSafeDistance = std::fmax(
+        kBackwardMinSafeDistance,
+        obstacle->speed() * kSafeTime);
+    if (end_s > ego_start_s - kBackwardSafeDistance &&
+        start_s < ego_end_s + kForwardSafeDistance) {
+      return false;
+    }
+  }
+  return true;
+
 }
 
 }  // namespace lane_follow
