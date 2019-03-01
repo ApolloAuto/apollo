@@ -49,6 +49,8 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
  public:
   explicit OpenSpaceTrajectoryProvider(const TaskConfig& config);
 
+  ~OpenSpaceTrajectoryProvider() = default;
+
  private:
   apollo::common::Status Process(
       DiscretizedTrajectory* const trajectory_data) override;
