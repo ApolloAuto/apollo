@@ -30,11 +30,31 @@ namespace planning {
 class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
  public:
   explicit OpenSpaceTrajectoryPartition(const TaskConfig& config);
+
   ~OpenSpaceTrajectoryPartition() = default;
+
+  void Restart();
 
  private:
   apollo::common::Status Process(
       DiscretizedTrajectory* const trajectory_data) override;
+
+ private:
+  void InterpolateTrajectory(DiscretizedTrajectory* const trajectory,
+                             DiscretizedTrajectory* interpolated_trajectory);
+
+  bool InsertGearShiftTrajectory(
+      const bool& flag_change_to_next, const size_t& current_trajectory_index,
+      const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions);
+
+  void GenerateGearShiftTrajectory(
+      const apollo::canbus::Chassis::GearPosition& gear_position);
+
+  void SetTrajectoryPb(
+      const apollo::planning_internal::Trajectories& trajectory_partitioned,
+      const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions,
+      const size_t& current_trajectory_index,
+      const int& closest_trajectory_point_index);
 };
 }  // namespace planning
 }  // namespace apollo
