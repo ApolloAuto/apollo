@@ -67,14 +67,16 @@ class PathBoundsDecider : public Decider {
 
   size_t ConstructSubsequentPathBounds(
       const std::vector<std::tuple<int, double, double, double, std::string>>&
-      sorted_obstacles, size_t path_idx, size_t obs_idx,
-      std::vector<std::tuple<double, double, double>>* const path_boundaries,
-      std::multiset<double>* const left_bounds,
-      std::multiset<double, std::greater<double>>* const right_bounds,
-      double* const center_line,
-      std::unordered_map<std::string, bool>* const obs_id_to_direction,
-      std::unordered_map<std::string, bool>* const obs_id_to_sidepass_decision,
+      sorted_obstacles,
+      size_t path_idx, size_t obs_idx,
+      std::unordered_map<std::string, std::tuple<bool, double>>*
+      const obs_id_to_details,
+      std::vector<std::tuple<double, double, double>>* const curr_path_bounds,
       std::vector<std::tuple<double, double, double>>* const final_path_bounds);
+
+  std::vector<std::vector<bool>> DecidePassDirections(
+      const std::vector<std::tuple<int, double, double, double, std::string>>&
+      new_entering_obstacles);
 
   /**
     * @brief Update the path_boundary at "idx", as well as the new center-line.
