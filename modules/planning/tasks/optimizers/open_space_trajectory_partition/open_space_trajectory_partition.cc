@@ -29,8 +29,7 @@ OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
     const TaskConfig& config)
     : TrajectoryOptimizer(config) {}
 
-Status OpenSpaceTrajectoryPartition::Process(
-    DiscretizedTrajectory* const trajectory_data) {
+Status OpenSpaceTrajectoryPartition::Process() {
   return Status::OK();
 }
 }  // namespace planning
