@@ -16,8 +16,7 @@
 
 // This defines enums and structures for parsing Newton_M2 binary messages. 
 
-#ifndef MODULES_DRIVERS_GNSS_NEWTONM2_MESSAGES_H_
-#define MODULES_DRIVERS_GNSS_NEWTONM2_MESSAGES_H_
+#pragma once
 
 #include <stdint.h>
 #include "modules/drivers/gnss/proto/config.pb.h"
@@ -541,5 +540,3 @@ inline ImuParameter GetImuParameter(ImuType type) {
 }  // namespace gnss
 }  // namespace drivers
 }  // namespace apollo
-
-#endif  // MODULES_DRIVERS_GNSS_NEWTONM2_MESSAGES_H_

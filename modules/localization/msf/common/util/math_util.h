@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#ifndef MODULES_LOCALIZATION_MSF_COMMON_MATH_UTIL_H_
-#define MODULES_LOCALIZATION_MSF_COMMON_MATH_UTIL_H_
-
+#pragma once
 /**
  * @namespace apollo::localization
  * @brief apollo::localization
@@ -67,4 +65,3 @@ struct math {
 }  // namespace msf
 }  // namespace localization
 }  // namespace apollo
-#endif  // MODULES_LOCALIZATION_MSF_COMMON_MATH_UTIL_H_
