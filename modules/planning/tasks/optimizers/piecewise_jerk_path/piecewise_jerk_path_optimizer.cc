@@ -125,6 +125,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   CHECK(!dx.empty() && dx.size() == num_of_points);
   CHECK(!ddx.empty() && ddx.size() == num_of_points);
 
+  /*
   // TODO(all): an ad-hoc check for path feasibility since osqp
   //            cannot return the correct status
   const double numerical_buffer = 0.05;
@@ -139,6 +140,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
           "piecewise jerk path optimizer failed");
     }
   }
+  */
 
   PiecewiseJerkTrajectory1d piecewise_jerk_traj(x.front(),
       dx.front(), ddx.front());
