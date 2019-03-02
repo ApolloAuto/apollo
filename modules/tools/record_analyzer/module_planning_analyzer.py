@@ -16,15 +16,16 @@
 # limitations under the License.
 ###############################################################################
 
+import json
+import numpy as np
+from shapely.geometry import LineString, Point
+from modules.planning.proto import planning_pb2
 from common.statistical_analyzer import StatisticalAnalyzer
 from common.statistical_analyzer import PrintColors
 from common.distribution_analyzer import DistributionAnalyzer
 from common.error_code_analyzer import ErrorCodeAnalyzer
 from common.error_msg_analyzer import ErrorMsgAnalyzer
 from common.frechet_distance import frechet_distance
-from modules.planning.proto import planning_pb2
-from shapely.geometry import LineString, Point
-import numpy as np
 
 
 class PlannigAnalyzer:
@@ -196,7 +197,7 @@ class PlannigAnalyzer:
         #    results['overall_score'] += (1 - results['frechet_dist'] / 10.0)
         #results['overall_score'] /= 2.0
 
-        print str(results)
+        print json.dumps(results)
 
     def plot_path(self, plt, adc_trajectory):
         path_coords = self.trim_path_by_distance(adc_trajectory, 5.0)
