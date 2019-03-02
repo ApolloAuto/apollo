@@ -500,5 +500,5 @@ DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 DEFINE_bool(enable_parallel_open_space_smoother, false,
             "True to enable open space smoother parallel implementation.");
-DEFINE_bool(enable_cuda, true,
+DEFINE_bool(enable_cuda, false,
             "True to enable cuda parallel implementation.");
