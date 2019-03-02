@@ -118,6 +118,9 @@ class ObstacleClusters {
    */
   static StopSign QueryStopSignByLaneId(const std::string& lane_id);
 
+  static std::unordered_map<std::string, std::vector<LaneObstacle>>&
+      GetLaneObstacles() { return lane_obstacles_; }
+
  private:
   ObstacleClusters() = delete;
 

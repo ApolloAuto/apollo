@@ -113,12 +113,11 @@ int main(int argc, char *argv[]) {
 
   signal(SIGWINCH, SigResizeHandle);
   signal(SIGINT, SigCtrlCHandle);
-  
+
   s->SetCurrentRenderMessage(&topologyMsg);
 
   s->Init();
   s->Run();
-
 
   return 0;
 }

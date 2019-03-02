@@ -29,9 +29,9 @@
 namespace apollo {
 namespace cyber {
 
-using std::chrono::system_clock;
-using std::chrono::steady_clock;
 using std::chrono::high_resolution_clock;
+using std::chrono::steady_clock;
+using std::chrono::system_clock;
 
 const Time Time::MAX = Time(std::numeric_limits<uint64_t>::max());
 const Time Time::MIN = Time(1);

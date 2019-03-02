@@ -31,6 +31,7 @@ export default class PerceptionObstacles {
         this.extrusionDashedFaces = []; // for obstacles with polygon points
         this.laneMarkers = []; // for lane markers
         this.icons = [];
+        this.trafficCones = []; // for traffic cone meshes
     }
 
     update(world, coordinates, scene, isBirdView) {
@@ -59,6 +60,7 @@ export default class PerceptionObstacles {
             hideArrayObjects(this.extrusionSolidFaces);
             hideArrayObjects(this.extrusionDashedFaces);
             hideArrayObjects(this.icons);
+            hideArrayObjects(this.trafficCones);
             return;
         }
 
@@ -72,6 +74,7 @@ export default class PerceptionObstacles {
         let cubeIdx = 0;
         let extrusionFaceIdx = 0;
         let iconIdx = 0;
+        let trafficConeIdx = 0;
         for (let i = 0; i < objects.length; i++) {
             const obstacle = objects[i];
             if (!STORE.options['showObstacles' + _.upperFirst(_.camelCase(obstacle.type))]
@@ -106,7 +109,10 @@ export default class PerceptionObstacles {
             confidence = Math.max(0.0, confidence);
             confidence = Math.min(1.0, confidence);
             const polygon = obstacle.polygonPoint;
-            if (polygon !== undefined && polygon.length > 0) {
+            if (obstacle.subType === "ST_TRAFFICCONE") {
+                this.updateTrafficCone(position, trafficConeIdx, scene);
+                trafficConeIdx++;
+            } else if (polygon !== undefined && polygon.length > 0) {
                 this.updatePolygon(polygon, obstacle.height, color, coordinates, confidence,
                         extrusionFaceIdx, scene);
                 extrusionFaceIdx += polygon.length;
@@ -132,6 +138,7 @@ export default class PerceptionObstacles {
         hideArrayObjects(this.extrusionSolidFaces, extrusionFaceIdx);
         hideArrayObjects(this.extrusionDashedFaces, extrusionFaceIdx);
         hideArrayObjects(this.icons, iconIdx);
+        hideArrayObjects(this.trafficCones, trafficConeIdx);
     }
 
     updateArrow(position, heading, color, arrowIdx, scene) {
@@ -247,6 +254,13 @@ export default class PerceptionObstacles {
         icon.visible = true;
     }
 
+    updateTrafficCone(position, coneIdx, scene) {
+        const cone = this.getTrafficCone(coneIdx, scene);
+        cone.position.setX(position.x);
+        cone.position.setY(position.y);
+        cone.visible = true;
+    }
+
     getArrow(index, scene) {
         if (index < this.arrows.length) {
             return this.arrows[index];
@@ -340,5 +354,26 @@ export default class PerceptionObstacles {
                 }
             }
         }
+    }
+
+    getTrafficCone(index, scene) {
+        if (index < this.trafficCones.length) {
+            return this.trafficCones[index];
+        }
+
+        const height = 0.914;
+        const geometry = new THREE.CylinderGeometry(0.1, 0.25, height, 32);
+        const material = new THREE.MeshBasicMaterial({
+            color: 0xE1601C,
+            transparent: true,
+            opacity: 0.65,
+        });
+        const cone = new THREE.Mesh(geometry, material);
+        cone.rotation.set(Math.PI / 2, 0, 0);
+        cone.position.set(0, 0, height/2);
+        this.trafficCones.push(cone);
+        scene.add(cone);
+
+        return cone;
     }
 }

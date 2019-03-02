@@ -395,23 +395,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "threshold",
-    srcs = [
-        "threshold.cc",
-    ],
-    hdrs = [
-        "threshold.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        ":frame",
-        ":speed_limit",
-    ],
-)
-
 cc_test(
     name = "ego_info_test",
     size = "small",
@@ -431,7 +414,6 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "threshold",
         ":ego_info",
         ":frame",
         ":planning_gflags",
@@ -468,6 +450,18 @@ cc_library(
     hdrs = [
         "open_space_info.h",
     ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/map/pnc_map",
+        "//modules/planning/common:indexed_queue",
+        "//modules/planning/common:obstacle",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "@eigen",
+     ],
 )
 
 cc_test(

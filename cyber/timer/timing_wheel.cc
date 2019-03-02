@@ -130,9 +130,7 @@ void TimingWheel::RemoveCancelledTasks(uint64_t slot_index) {
   {
     std::lock_guard<std::mutex> lg(cancelled_mutex_);
     for (auto id : cancelled_list_) {
-      FOR_EACH(i, 0, TIMING_WHEEL_SIZE) {
-        time_slots_[i].RemoveTask(id);
-      }
+      FOR_EACH(i, 0, TIMING_WHEEL_SIZE) { time_slots_[i].RemoveTask(id); }
     }
     cancelled_list_.clear();
   }

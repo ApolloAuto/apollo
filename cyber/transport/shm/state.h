@@ -31,7 +31,6 @@ class State {
   explicit State(const uint64_t& ceiling_msg_size);
   virtual ~State();
 
-
   void IncreaseWroteNum() { wrote_num_.fetch_add(1); }
   void ResetWroteNum() { wrote_num_.store(0); }
 

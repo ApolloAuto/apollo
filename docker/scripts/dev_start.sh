@@ -20,7 +20,7 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20190128_1800"
+VERSION_X86_64="dev-x86_64-20190228_1414"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
@@ -58,7 +58,12 @@ function check_host_environment() {
   fi
 
   # Fetch lfs managed files for current HEAD.
-  git lfs fetch
+  git lfs install && git lfs fetch
+  if [ $? -ne 0 ]; then
+    echo 'Failed to fetch LFS objects. Please retry command'
+    echo '    git lfs install && git lfs fetch && echo Succeeded'
+    exit 1
+  fi
 
   if ! [ -d ${APOLLO_ROOT_DIR}/.git/lfs/objects ]; then
     echo 'You need to install and run git-lfs when working with apollo.'

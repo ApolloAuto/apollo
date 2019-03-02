@@ -27,12 +27,10 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
 namespace planning {
@@ -65,7 +63,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   // check if the stop_sign is still along reference_line
   std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
   if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
     return FinishScenario();
   }
@@ -74,7 +72,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_pass_stop_sign =
       adc_front_edge_s -
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
   // passed stop line too far
   if (distance_adc_pass_stop_sign > kPassStopLineBuffer) {
     return FinishStage();
@@ -177,7 +175,7 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
       // watched-vehicle info
       auto* obstacle = path_decision.Find(obstacle_id);
       if (!obstacle) {
-        AERROR << "mark ERASE obstacle_id[" << obstacle_id << "] not exist";
+        ADEBUG << "mark ERASE obstacle_id[" << obstacle_id << "] not exist";
         remove_vehicles.push_back(obstacle_id);
         continue;
       }
@@ -222,9 +220,11 @@ Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
 }
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
+  // update PlanningContext
   PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
   PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.push_back(
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id);
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id);
+
   PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
   GetContext()->creep_start_time = Clock::NowInSeconds();
 
