@@ -47,13 +47,13 @@ class ShmConf {
   uint32_t block_num_;
   uint64_t managed_shm_size_;
 
-  // Extra size, Bit
+  // Extra size, Byte
   static const uint64_t EXTRA_SIZE;
-  // State size, Bit
+  // State size, Byte
   static const uint64_t STATE_SIZE;
-  // Block size, Bit
+  // Block size, Byte
   static const uint64_t BLOCK_SIZE;
-  // Message info size, Bit
+  // Message info size, Byte
   static const uint64_t MESSAGE_INFO_SIZE;
   // For message 0-10K
   static const uint32_t BLOCK_NUM_16K;

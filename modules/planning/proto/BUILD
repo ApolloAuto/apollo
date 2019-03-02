@@ -192,6 +192,7 @@ proto_library(
         ":open_space_fallback_decider_config_proto_lib",
         ":open_space_roi_decider_config_proto_lib",
         ":open_space_trajectory_provider_config_proto_lib",
+        ":open_space_trajectory_partition_config_proto_lib",
         ":planner_open_space_config_proto_lib",
         # ":poly_vt_speed_config_proto_lib",
         ":proceed_with_caution_speed_config_proto_lib",
@@ -546,6 +547,9 @@ proto_library(
     srcs = [
         "open_space_trajectory_provider_config.proto",
     ],
+    deps = [
+        ":planner_open_space_config_proto_lib",
+    ],
 )
 
 cc_proto_library(
@@ -554,5 +558,20 @@ cc_proto_library(
         ":open_space_trajectory_provider_config_proto_lib",
     ],
 )
+
+proto_library(
+    name = "open_space_trajectory_partition_config_proto_lib",
+    srcs = [
+        "open_space_trajectory_partition_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "open_space_trajectory_partition_config_proto",
+    deps = [
+        ":open_space_trajectory_partition_config_proto_lib",
+    ],
+)
+
 
 cpplint()

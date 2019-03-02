@@ -61,9 +61,6 @@ DEFINE_string(scenario_narrow_street_u_turn_config_file,
               "scenario/narrow_street_u_turn_config.pb.txt",
               "scenario_narrow_street_u_turn config file");
 
-DEFINE_bool(enable_scenario_dispatcher, true,
-            "enable dispatcher inside scenario manager to select scenario");
-
 DEFINE_bool(enable_scenario_side_pass, true,
             "enable side pass scenario in planning");
 DEFINE_double(side_pass_min_signal_intersection_distance, 50.0,
@@ -500,3 +497,5 @@ DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 DEFINE_bool(enable_parallel_open_space_smoother, false,
             "True to enable open space smoother parallel implementation.");
+DEFINE_bool(enable_cuda, true,
+            "True to enable cuda parallel implementation.");

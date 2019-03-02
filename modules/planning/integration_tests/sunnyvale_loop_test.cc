@@ -168,7 +168,7 @@ TEST_F(SunnyvaleLoopTest, rightturn_01) {
 }
 
 /*
- * test right turn, but stop before trafic light
+ * test right turn, but stop before traffic light
  * A right turn test case
  * A traffic light test case
  */
@@ -250,8 +250,8 @@ TEST_F(SunnyvaleLoopTest, qp_path_failure) {
  * Expect to keep going on the current lane.
  */
 TEST_F(SunnyvaleLoopTest, change_lane_failback) {
-  //// temporarly disable this test case, because a lane in routing cannot be
-  //// found on test map.
+  // temporarily disable this test case, because a lane in routing cannot be
+  // found on test map.
   auto target_lane = hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(
       hdmap::MakeMapId("2020_1_-2"));
   if (target_lane == nullptr) {

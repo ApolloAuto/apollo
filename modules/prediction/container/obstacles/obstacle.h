@@ -40,8 +40,6 @@
 namespace apollo {
 namespace prediction {
 
-using hdmap::LaneInfo;
-
 /**
  * @class Obstacle
  * @brief Prediction obstacle.
@@ -317,7 +315,7 @@ class Obstacle {
   void DiscardOutdatedHistory();
 
   void GetNeighborLaneSegments(
-      std::shared_ptr<const LaneInfo> center_lane_info,
+      std::shared_ptr<const apollo::hdmap::LaneInfo> center_lane_info,
       bool is_left,
       int recursion_depth,
       std::list<std::string>* const lane_ids_ordered,

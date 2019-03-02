@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include <memory>
+#include <vector>
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
@@ -36,12 +37,30 @@ class ObstaclesPrioritizer {
       const EnvironmentFeatures& environment_features,
       const std::shared_ptr<ScenarioFeatures> scenario_features);
 
+  static void AssignCautionLevel(
+      const std::shared_ptr<ScenarioFeatures> scenario_features);
+
+  static void AssignCautionLevelInCruise(
+      const std::shared_ptr<ScenarioFeatures> scenario_features);
+
   static void AssignCautionLevelCruiseKeepLane();
 
   static void AssignCautionLevelCruiseChangeLane();
 
   static void AssignCautionLevelInJunction(
       const std::shared_ptr<ScenarioFeatures> scenario_features);
+
+  static void AssignCautionLevelByEgoReferenceLine();
+
+  static void AssignCautionByMerge(
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
+
+  static void AssignCautionByOverlap(
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
+
+  static void SetCautionBackward(
+    std::shared_ptr<const hdmap::LaneInfo> start_lane_info_ptr,
+    const double distance);
 };
 
 }  // namespace prediction
