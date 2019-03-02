@@ -22,10 +22,12 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "Eigen/Dense"
 #include "cyber/common/log.h"
+#include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
@@ -41,6 +43,17 @@
 
 namespace apollo {
 namespace planning {
+
+struct GearSwitchStates {
+  bool gear_switching_flag = false;
+  bool gear_shift_period_finished = true;
+  bool gear_shift_period_started = true;
+  double gear_shift_period_time = 0.0;
+  double gear_shift_start_time = 0.0;
+  apollo::canbus::Chassis::GearPosition gear_shift_position =
+      canbus::Chassis::GEAR_DRIVE;
+};
+
 class OpenSpaceInfo {
  public:
   OpenSpaceInfo();
@@ -139,6 +152,43 @@ class OpenSpaceInfo {
 
   bool *mutable_destination_reached() { return &destination_reached_; }
 
+  const DiscretizedTrajectory &interpolated_trajectory_result() const {
+    return interpolated_trajectory_result_;
+  }
+
+  DiscretizedTrajectory *mutable_interpolated_trajectory_result() {
+    return &interpolated_trajectory_result_;
+  }
+
+  const std::vector<
+      std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>>
+      &paritioned_trajectories() const {
+    return paritioned_trajectories_;
+  }
+
+  std::vector<std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>>
+      *mutable_paritioned_trajectories() {
+    return &paritioned_trajectories_;
+  }
+
+  const GearSwitchStates &gear_switch_states() const {
+    return gear_switch_states_;
+  }
+
+  GearSwitchStates *mutable_gear_switch_states() {
+    return &gear_switch_states_;
+  }
+
+  const std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
+      &chosen_paritioned_trajectory() const {
+    return chosen_paritioned_trajectory_;
+  }
+
+  std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
+      *mutable_chosen_paritioned_trajectory() {
+    return &chosen_paritioned_trajectory_;
+  }
+
  private:
   // @brief obstacles total num including perception obstacles and parking space
   // boundary
@@ -178,6 +228,16 @@ class OpenSpaceInfo {
   bool open_space_provider_success_ = false;
 
   bool destination_reached_ = false;
+
+  DiscretizedTrajectory interpolated_trajectory_result_;
+
+  std::vector<std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>>
+      paritioned_trajectories_;
+
+  GearSwitchStates gear_switch_states_;
+
+  std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
+      chosen_paritioned_trajectory_;
 };
 }  // namespace planning
 }  // namespace apollo
