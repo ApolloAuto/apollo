@@ -33,6 +33,7 @@
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -188,8 +189,12 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   const bool left_turn =
       (reference_line_info.GetPathTurnType() == hdmap::Lane::LEFT_TURN);
 
+  bool traffic_light_scenario = false;
+  bool red_light = false;
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
+
+  // note: need iterate all lights to check no RED
   for (const auto& traffic_light_overlap : traffic_light_overlaps) {
     const double adc_distance_to_traffic_light =
         traffic_light_overlap.start_s - adc_front_edge_s;
@@ -197,43 +202,56 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
            << "] right_turn[" << right_turn << "] left_turn[" << left_turn
            << "]";
 
-    const bool traffic_light_scenario = (adc_distance_to_traffic_light > 0 &&
+    // check distance
+    if (adc_distance_to_traffic_light > 0 &&
         adc_distance_to_traffic_light <=
             config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
                         .traffic_light_protected_config()
-                        .start_traffic_light_scenario_distance());
-
-    switch (current_scenario_->scenario_type()) {
-      case ScenarioConfig::LANE_FOLLOW:
-      case ScenarioConfig::CHANGE_LANE:
-      case ScenarioConfig::SIDE_PASS:
-      case ScenarioConfig::APPROACH:
-        if (traffic_light_scenario) {
-          if (right_turn) {
-            return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
-          } else if (left_turn) {
-            // TODO(all): switch when ready
-            // return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN;
-            return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
-          } else {
-            return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
-          }
-        }
+                        .start_traffic_light_scenario_distance()) {
+      traffic_light_scenario = true;
+      auto signal_color = scenario::GetSignal(
+          traffic_light_overlap.object_id).color();
+      ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
+          << "] start_s[" << traffic_light_overlap.start_s
+          << "] color[" << signal_color << "]";
+      if (signal_color != TrafficLight::GREEN) {
+        red_light = true;
         break;
-      case ScenarioConfig::STOP_SIGN_PROTECTED:
-      case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-        break;
-      case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
-      case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
-      case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-        if (current_scenario_->GetStatus() ==
-            Scenario::ScenarioStatus::STATUS_DONE) {
-          return ScenarioConfig::LANE_FOLLOW;
-        }
-        break;
-      default:
-        break;
+      }
     }
+  }
+
+  switch (current_scenario_->scenario_type()) {
+    case ScenarioConfig::LANE_FOLLOW:
+    case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::APPROACH:
+      if (traffic_light_scenario) {
+        if (right_turn && red_light) {
+          return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
+        }
+        if (left_turn) {
+          // TODO(all): switch when ready
+          // return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN;
+          return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
+        }
+
+        return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
+      }
+      break;
+    case ScenarioConfig::STOP_SIGN_PROTECTED:
+    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      break;
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+      if (current_scenario_->GetStatus() ==
+          Scenario::ScenarioStatus::STATUS_DONE) {
+        return ScenarioConfig::LANE_FOLLOW;
+      }
+      break;
+    default:
+      break;
   }
 
   return current_scenario_->scenario_type();
@@ -301,21 +319,10 @@ void ScenarioManager::Observe(const Frame& frame) {
   const auto& first_encountered_overlaps =
       reference_line_info.FirstEncounteredOverlaps();
   for (const auto& overlap : first_encountered_overlaps) {
-    switch (overlap.first) {
-      case ReferenceLineInfo::STOP_SIGN:
-        first_encountered_overlap_map_[ReferenceLineInfo::STOP_SIGN] =
-            overlap.second;
-        break;
-      case ReferenceLineInfo::SIGNAL:
-        first_encountered_overlap_map_[ReferenceLineInfo::SIGNAL] =
-            overlap.second;
-        break;
-      case ReferenceLineInfo::PNC_JUNCTION:
-        first_encountered_overlap_map_[ReferenceLineInfo::PNC_JUNCTION] =
-            overlap.second;
-        break;
-      default:
-        break;
+    if (overlap.first == ReferenceLineInfo::STOP_SIGN ||
+        overlap.first == ReferenceLineInfo::SIGNAL ||
+        overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
+      first_encountered_overlap_map_[overlap.first] = overlap.second;
     }
   }
 }
