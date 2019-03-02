@@ -19,6 +19,7 @@
 import json
 import numpy as np
 from shapely.geometry import LineString, Point
+
 from modules.planning.proto import planning_pb2
 from common.statistical_analyzer import StatisticalAnalyzer
 from common.statistical_analyzer import PrintColors
