@@ -143,9 +143,10 @@ bool PathBoundsDecider::InitPathBoundaries(
   if (!reference_line.GetLaneWidth(adc_frenet_s_, &lane_left_width,
                                    &lane_right_width)) {
     AERROR << "Failed to get lane width at planning start point.";
-    return false;
+    adc_lane_width_ = kDefaultLaneWidth;
+  } else {
+    adc_lane_width_ = lane_left_width + lane_right_width;
   }
-  adc_lane_width_ = lane_left_width + lane_right_width;
 
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
@@ -638,8 +639,7 @@ bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
 
   // Check if ADC is blocked.
   // If blocked, don't update anything, return false.
-  if (std::get<1>((*path_boundaries)[idx]) >
-      std::get<2>((*path_boundaries)[idx])) {
+  if (new_l_min > new_l_max) {
     ADEBUG << "Path is blocked at idx = " << idx;
     return false;
   }
