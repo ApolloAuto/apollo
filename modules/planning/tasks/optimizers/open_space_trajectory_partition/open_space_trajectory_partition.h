@@ -20,13 +20,23 @@
 
 #pragma once
 
+#include <utility>
+#include <vector>
+
 #include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
 
+#include "modules/canbus/proto/chassis.pb.h"
+#include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/math/linear_interpolation.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {
+
+typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
+    TrajGearPair;
+
 class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
  public:
   explicit OpenSpaceTrajectoryPartition(const TaskConfig& config);
@@ -36,24 +46,25 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
   void Restart();
 
  private:
-  apollo::common::Status Process() override;
+  common::Status Process() override;
 
- private:
-  void InterpolateTrajectory(DiscretizedTrajectory* const trajectory,
+  void InterpolateTrajectory(const DiscretizedTrajectory& trajectory,
                              DiscretizedTrajectory* interpolated_trajectory);
 
   bool InsertGearShiftTrajectory(
       const bool& flag_change_to_next, const size_t& current_trajectory_index,
-      const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions);
+      const std::vector<TrajGearPair>& paritioned_trajectories,
+      TrajGearPair* gear_switch_idle_time_trajectory);
 
   void GenerateGearShiftTrajectory(
-      const apollo::canbus::Chassis::GearPosition& gear_position);
+      const canbus::Chassis::GearPosition& gear_position,
+      TrajGearPair* gear_switch_idle_time_trajectory);
 
-  void SetTrajectoryPb(
-      const apollo::planning_internal::Trajectories& trajectory_partitioned,
-      const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions,
+  void AdjustRelativeTimeAndS(
+      const std::vector<TrajGearPair>& paritioned_trajectories,
       const size_t& current_trajectory_index,
-      const int& closest_trajectory_point_index);
+      const size_t& closest_trajectory_point_index,
+      TrajGearPair* current_paritioned_trajectory);
 };
 }  // namespace planning
 }  // namespace apollo
