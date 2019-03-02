@@ -127,10 +127,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   // TODO(all): an ad-hoc check for path feasibility since osqp
   //            cannot return the correct status
+  const double numerical_buffer = 0.05;
   for (std::size_t i = 0; i < num_of_points; ++i) {
-    if (x[i] < lateral_boundaries[i].first
-        || x[i] > lateral_boundaries[i].second) {
-      AERROR<< "piecewise jerk path optimizer finds a infeasible solution";
+    if (x[i] < lateral_boundaries[i].first - numerical_buffer
+        || x[i] > lateral_boundaries[i].second + numerical_buffer) {
+      AERROR << "piecewise jerk path optimizer finds a infeasible solution";
+      AERROR << "index\t" << i << ":\t" << x[i] <<
+          "\t" << lateral_boundaries[i].first <<
+          "\t" << lateral_boundaries[i].second;
       return Status(ErrorCode::PLANNING_ERROR,
           "piecewise jerk path optimizer failed");
     }
