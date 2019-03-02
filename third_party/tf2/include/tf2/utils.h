@@ -20,6 +20,7 @@
 #include <tf2/impl/utils.h>
 
 namespace tf2 {
+
 /** Return the yaw, pitch, roll of anything that can be converted to a tf2::Quaternion
  * The conventions are the usual ROS ones defined in tf2/LineMath/Matrix3x3.h
  * \param a the object to get data from (it represents a rotation/quaternion)

@@ -85,7 +85,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
 
   // check PlanningContext content
   auto* scenario_info = PlanningContext::GetScenarioInfo();
-  EXPECT_EQ(scenario_info->next_stop_sign_overlap.object_id, "1017");
+  EXPECT_EQ(scenario_info->current_stop_sign_overlap.object_id, "");
   EXPECT_EQ(scenario_info->stop_done_overlap_ids.size(), 0);
   EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
 }
@@ -109,7 +109,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
 
   // check PlanningContext content
   auto* scenario_info = PlanningContext::GetScenarioInfo();
-  EXPECT_EQ(scenario_info->next_stop_sign_overlap.object_id, "1017");
+  EXPECT_EQ(scenario_info->current_stop_sign_overlap.object_id, "1017");
   EXPECT_EQ(scenario_info->stop_done_overlap_ids.size(), 0);
   EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
 }
@@ -134,7 +134,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 
   // check PlanningContext content
   auto* scenario_info = PlanningContext::GetScenarioInfo();
-  EXPECT_EQ(scenario_info->next_stop_sign_overlap.object_id, "1017");
+  EXPECT_EQ(scenario_info->current_stop_sign_overlap.object_id, "1017");
   EXPECT_EQ(scenario_info->stop_done_overlap_ids.size(), 0);
   EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
 
@@ -145,7 +145,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 
   // check PlanningContext content
   scenario_info = PlanningContext::GetScenarioInfo();
-  EXPECT_EQ(scenario_info->next_stop_sign_overlap.object_id, "1017");
+  EXPECT_EQ(scenario_info->current_stop_sign_overlap.object_id, "1017");
   EXPECT_EQ(scenario_info->stop_done_overlap_ids.size(), 0);
   EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
 }
@@ -595,7 +595,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   EXPECT_EQ("11652", crosswalk_status->stop_time(0).obstacle_id());
 
   // step 2:
-  // timeout on static pesestrian
+  // timeout on static pedestrian
 
   // set PlanningStatus
   auto* crosswalk_config =

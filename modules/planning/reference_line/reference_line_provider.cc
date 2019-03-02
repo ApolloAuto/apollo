@@ -375,22 +375,22 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
                 return left.second < right.second;
               });
     ADEBUG << "need to change lane";
-    // the higheast priority lane as the target naviagion lane
+    // the highest priority lane as the target navigation lane
     target_lane_pair = high_priority_lane_pairs.front();
     is_lane_change_needed = true;
   }
-  // 3.get current lane's the neareast neighbor lane to the target lane
+  // 3.get current lane's the nearest neighbor lane to the target lane
   // and make sure it position is left or right on the current lane
   routing::ChangeLaneType lane_change_type = routing::FORWARD;
-  std::string neareast_neighbor_lane_id;
+  std::string nearest_neighbor_lane_id;
   if (is_lane_change_needed) {
     // target on the left of adc
     if (left_neighbor_lane_ids.end() !=
         std::find(left_neighbor_lane_ids.begin(), left_neighbor_lane_ids.end(),
                   target_lane_pair.first)) {
       // take the id of the first adjacent lane on the left of adc as
-      // the neareast_neighbor_lane_id
-      neareast_neighbor_lane_id =
+      // the nearest_neighbor_lane_id
+      nearest_neighbor_lane_id =
           adc_lane_way_point.lane->lane().left_neighbor_forward_lane_id(0).id();
     } else if (right_neighbor_lane_ids.end() !=
                std::find(right_neighbor_lane_ids.begin(),
@@ -398,10 +398,10 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
                          target_lane_pair.first)) {
       // target lane on the right of adc
       // take the id  of the first adjacent lane on the right of adc as
-      // the neareast_neighbor_lane_id
-      neareast_neighbor_lane_id = adc_lane_way_point.lane->lane()
-                                      .right_neighbor_forward_lane_id(0)
-                                      .id();
+      // the nearest_neighbor_lane_id
+      nearest_neighbor_lane_id = adc_lane_way_point.lane->lane()
+                                     .right_neighbor_forward_lane_id(0)
+                                     .id();
     }
   }
 
@@ -418,9 +418,9 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     segment.SetPreviousAction(routing::FORWARD);
 
     if (is_lane_change_needed) {
-      if (lane_id == neareast_neighbor_lane_id) {
+      if (lane_id == nearest_neighbor_lane_id) {
         ADEBUG << "adc lane_id = " << adc_lane_id
-               << " neareast_neighbor_lane_id = " << lane_id;
+               << " nearest_neighbor_lane_id = " << lane_id;
         segment.SetIsNeighborSegment(true);
         segment.SetPreviousAction(lane_change_type);
       } else if (lane_id == adc_lane_id) {
@@ -471,7 +471,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
     return false;
   }
 
-  // get lanes that exist in both map and navigation paths as vallid lanes
+  // get lanes that exist in both map and navigation paths as valid lanes
   std::vector<hdmap::LaneInfoConstPtr> valid_lanes;
   std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(valid_lanes),
                [&](hdmap::LaneInfoConstPtr ptr) {
@@ -483,7 +483,7 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
     return false;
   }
 
-  // get nearest lane wayponints for current adc position
+  // get nearest lane waypoints for current adc position
   double min_distance = std::numeric_limits<double>::infinity();
   for (const auto &lane : valid_lanes) {
     // project adc point to lane to check if it is out of lane range
@@ -497,11 +497,11 @@ bool ReferenceLineProvider::GetNearestWayPointFromNavigationPath(
       continue;
     }
 
-    // get the neareast distance between adc point and lane
+    // get the nearest distance between adc point and lane
     double distance = 0.0;
     common::PointENU map_point =
         lane->GetNearestPoint({point.x(), point.y()}, &distance);
-    // reord the near distance lane
+    // record the near distance lane
     if (distance < min_distance) {
       double s = 0.0;
       double l = 0.0;
@@ -697,7 +697,7 @@ bool ReferenceLineProvider::Shrink(const common::SLPoint &sl,
   bool need_shrink = false;
   if (sl.s() > FLAGS_look_backward_distance * 1.5) {
     ADEBUG << "reference line back side is " << sl.s()
-           << ", shrink reference line: origin lenght: "
+           << ", shrink reference line: origin length: "
            << reference_line->Length();
     new_backward_distance = FLAGS_look_backward_distance;
     need_shrink = true;

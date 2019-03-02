@@ -65,10 +65,12 @@ RenderableMessage* CyberTopologyMessage::Child(int lineNo) const {
   return ret;
 }
 
-std::map<std::string, GeneralChannelMessage*>::const_iterator CyberTopologyMessage::findChild(int lineNo) const{
+std::map<std::string, GeneralChannelMessage*>::const_iterator
+CyberTopologyMessage::findChild(int lineNo) const {
   --lineNo;
 
-  std::map<std::string, GeneralChannelMessage*>::const_iterator ret = all_channels_map_.cend();
+  std::map<std::string, GeneralChannelMessage*>::const_iterator ret =
+      all_channels_map_.cend();
 
   if (lineNo > -1 && lineNo < page_item_count_) {
     int i = 0;
@@ -95,8 +97,7 @@ void CyberTopologyMessage::TopologyChanged(
   if (::apollo::cyber::proto::OperateType::OPT_JOIN ==
       changeMsg.operate_type()) {
     bool isWriter = true;
-    if (::apollo::cyber::proto::RoleType::ROLE_READER ==
-        changeMsg.role_type())
+    if (::apollo::cyber::proto::RoleType::ROLE_READER == changeMsg.role_type())
       isWriter = false;
     AddReaderWriter(changeMsg.role_attr(), isWriter);
   } else {
@@ -143,13 +144,15 @@ void CyberTopologyMessage::AddReaderWriter(
 
     channelMsg = new GeneralChannelMessage(outStr.str(), this);
 
-    if(channelMsg != nullptr){
-      if (!GeneralChannelMessage::isErrorCode(channelMsg->OpenChannel(channelName))) {
+    if (channelMsg != nullptr) {
+      if (!GeneralChannelMessage::isErrorCode(
+              channelMsg->OpenChannel(channelName))) {
         channelMsg->set_message_type(msgTypeName);
         channelMsg->add_reader(channelMsg->NodeName());
       }
     } else {
-      channelMsg = GeneralChannelMessage::castErrorCode2Ptr(GeneralChannelMessage::ErrorCode::NewSubClassFailed);
+      channelMsg = GeneralChannelMessage::castErrorCode2Ptr(
+          GeneralChannelMessage::ErrorCode::NewSubClassFailed);
     }
     all_channels_map_[channelName] = channelMsg;
   } else {
@@ -186,11 +189,11 @@ void CyberTopologyMessage::ChangeState(const Screen* s, int key) {
       auto iter = findChild(*line_no());
       if (!GeneralChannelMessage::isErrorCode(iter->second)) {
         GeneralChannelMessage* child = iter->second;
-        if(child->is_enabled()){
+        if (child->is_enabled()) {
           child->CloseChannel();
         } else {
           GeneralChannelMessage* ret = child->OpenChannel(iter->first);
-          if(GeneralChannelMessage::isErrorCode(ret)){
+          if (GeneralChannelMessage::isErrorCode(ret)) {
             delete child;
             all_channels_map_[iter->first] = ret;
           } else {

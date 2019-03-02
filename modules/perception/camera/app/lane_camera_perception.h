@@ -56,7 +56,7 @@ class LaneCameraPerception : public BaseCameraPerception {
       const std::map<std::string, float> name_camera_pitch_angle_diff_map,
       const float &pitch_angle_calibrator_working_sensor);
   void SetIm2CarHomography(Eigen::Matrix3d homography_im2car);
-  bool GetCalibrationService(BaseCalibrationService** calibration_service);
+  bool GetCalibrationService(BaseCalibrationService **calibration_service);
   bool Perception(const CameraPerceptionOptions &options,
                   CameraFrame *frame) override;
   std::string Name() const override { return "LaneCameraPerception"; }

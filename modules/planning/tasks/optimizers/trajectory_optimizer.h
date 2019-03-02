@@ -37,7 +37,6 @@ class TrajectoryOptimizer : public Task {
 
  protected:
   virtual apollo::common::Status Process(
-      const common::TrajectoryPoint &init_point,
       DiscretizedTrajectory *const trajectory_data) = 0;
 };
 

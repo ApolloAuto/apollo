@@ -27,8 +27,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "cyber/base/atomic_rw_lock.h"
 #include "cyber/base/atomic_hash_map.h"
+#include "cyber/base/atomic_rw_lock.h"
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "cyber/common/types.h"
@@ -40,9 +40,9 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
+using apollo::cyber::base::AtomicHashMap;
 using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::base::ReadLockGuard;
-using apollo::cyber::base::AtomicHashMap;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
@@ -64,8 +64,7 @@ class Scheduler {
   uint32_t TaskPoolSize() { return task_pool_size_; }
 
   virtual bool RemoveTask(const std::string& name) = 0;
-  virtual void SetInnerThreadAttr(const std::string& name,
-                                  std::thread* thr) {}
+  virtual void SetInnerThreadAttr(const std::string& name, std::thread* thr) {}
 
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>&) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;

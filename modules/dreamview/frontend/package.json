@@ -5,6 +5,10 @@
     "main": "app.js",
     "author": "adu-sim",
     "license": "Apache-2.0",
+    "engines" : {
+        "npm": ">=5.6.0",
+        "node": ">=8.11.1"
+    },
     "scripts": {
         "build": "./setup.sh; node_modules/.bin/webpack  --progress --mode=production",
         "start": "./setup.sh; node_modules/.bin/webpack-dev-server --progress --mode=development --watch-poll",

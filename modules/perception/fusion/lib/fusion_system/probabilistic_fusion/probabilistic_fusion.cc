@@ -74,7 +74,7 @@ bool ProbabilisticFusion::Init(const FusionInitOptions& init_options) {
   Track::SetMaxLidarInvisiblePeriod(params.max_lidar_invisible_period());
   Track::SetMaxRadarInvisiblePeriod(params.max_radar_invisible_period());
   Track::SetMaxCameraInvisiblePeriod(params.max_camera_invisible_period());
-  Sensor::SetMaxCachedFrameNum(static_cast<int>(params.max_cached_frame_num()));
+  Sensor::SetMaxCachedFrameNumber(params.max_cached_frame_num());
 
   scenes_.reset(new Scene());
   if (params_.data_association_method == "HMAssociation") {

@@ -30,8 +30,9 @@ TrajectoryOptimizer::TrajectoryOptimizer(const TaskConfig& config)
 
 Status TrajectoryOptimizer::Execute(Frame* frame) {
   Task::Execute(frame);
-  // run process() here without taking reference line info
-  return Status::OK();
+  auto ret = Process(
+      frame->mutable_open_space_info()->mutable_stitched_trajectory_result());
+  return ret;
 }
 
 }  // namespace planning
