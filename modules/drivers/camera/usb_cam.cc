@@ -49,11 +49,6 @@ namespace apollo {
 namespace drivers {
 namespace camera {
 
-void rgb242rgb(char *YUV, char *RGB, int NumPixels)
-{
-  memcpy(RGB, YUV, NumPixels * 3);
-}
-
 UsbCam::UsbCam()
     : fd_(-1),
       buffers_(NULL),
@@ -838,11 +833,10 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
           AWARN << warning_str;
         }
       }
-      /*if (len < raw_image->width * raw_image->height) {
+      if (len < raw_image->width * raw_image->height && pixel_format_ == V4L2_PIX_FMT_YUYV) {
         AERROR << "Wrong Buffer Len: " << len
                << ", dev: " << config_->camera_dev();
-      } else */
-      {
+      } else {
         process_image(buffers_[buf.index].start, len, raw_image);
       }
 
@@ -922,11 +916,7 @@ bool UsbCam::process_image(const void* src, int len, CameraImagePtr dest) {
   }
   else if (pixel_format_ == V4L2_PIX_FMT_MJPEG)
     mjpeg2rgb((char*)src, len, dest->image, dest->width * dest->height);
-  else if (pixel_format_ == V4L2_PIX_FMT_RGB24)
-    rgb242rgb((char*)src, dest->image, dest->width * dest->height);
-  else if (pixel_format_ == V4L2_PIX_FMT_GREY)
-    memcpy(dest->image, (char*)src, dest->width * dest->height);
-   else {
+  else {
     AERROR << "unsupported pixel format:" << pixel_format_;
     return false;
   }
@@ -1028,7 +1018,10 @@ bool UsbCam::wait_for_device() {
     return false;
   }
   // will continue when trigger failed for self-trigger camera
-  //set_adv_trigger();
+  if (pixel_format_ == V4L2_PIX_FMT_YUYV ||
+      pixel_format_ == V4L2_PIX_FMT_UYVY){
+      set_adv_trigger();
+  }
   return true;
 }
 
