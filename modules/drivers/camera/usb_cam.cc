@@ -833,7 +833,7 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
           AWARN << warning_str;
         }
       }
-      if (len < raw_image->width * raw_image->height && pixel_format_ == V4L2_PIX_FMT_YUYV) {
+      if (len < raw_image->width * raw_image->height && config_->pixel_format() == "yuyv") {
         AERROR << "Wrong Buffer Len: " << len
                << ", dev: " << config_->camera_dev();
       } else {
@@ -1018,8 +1018,7 @@ bool UsbCam::wait_for_device() {
     return false;
   }
   // will continue when trigger failed for self-trigger camera
-  if (pixel_format_ == V4L2_PIX_FMT_YUYV ||
-      pixel_format_ == V4L2_PIX_FMT_UYVY){
+  if (config_->pixel_format() == "yuyv"){
       set_adv_trigger();
   }
   return true;
