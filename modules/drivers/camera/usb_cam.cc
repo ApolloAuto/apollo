@@ -49,12 +49,19 @@ namespace apollo {
 namespace drivers {
 namespace camera {
 
+void rgb242rgb(char *YUV, char *RGB, int NumPixels)
+{
+  memcpy(RGB, YUV, NumPixels * 3);
+}
+
 UsbCam::UsbCam()
     : fd_(-1),
       buffers_(NULL),
       n_buffers_(0),
       is_capturing_(false),
       image_seq_(0),
+      avoptions_(NULL),
+      video_sws_(NULL),
       device_wait_sec_(2),
       last_nsec_(0),
       frame_drop_interval_(0.0) {}
@@ -107,8 +114,13 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
   }
 
   avcodec_context_ = avcodec_alloc_context3(avcodec_);
+#if LIBAVCODEC_VERSION_MAJOR < 55
   avframe_camera_ = avcodec_alloc_frame();
   avframe_rgb_ = avcodec_alloc_frame();
+#else
+  avframe_camera_ = av_frame_alloc();
+  avframe_rgb_ = av_frame_alloc();
+#endif
 
   avpicture_alloc(reinterpret_cast<AVPicture*>(avframe_rgb_), PIX_FMT_RGB24,
                   image_width, image_height);
@@ -118,14 +130,14 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
   avcodec_context_->height = image_height;
 
 #if LIBAVCODEC_VERSION_MAJOR > 52
-  avcodec_context_->pix_fmt = PIX_FMT_YUV422P;
+  avcodec_context_->pix_fmt = AV_PIX_FMT_YUV422P;
   avcodec_context_->codec_type = AVMEDIA_TYPE_VIDEO;
 #endif
 
   avframe_camera_size_ =
-      avpicture_get_size(PIX_FMT_YUV422P, image_width, image_height);
+      avpicture_get_size(AV_PIX_FMT_YUV422P, image_width, image_height);
   avframe_rgb_size_ =
-      avpicture_get_size(PIX_FMT_RGB24, image_width, image_height);
+      avpicture_get_size(AV_PIX_FMT_RGB24, image_width, image_height);
 
   /* open it */
   if (avcodec_open2(avcodec_context_, avcodec_, &avoptions_) < 0) {
@@ -826,10 +838,11 @@ bool UsbCam::read_frame(CameraImagePtr raw_image) {
           AWARN << warning_str;
         }
       }
-      if (len < raw_image->width * raw_image->height) {
+      /*if (len < raw_image->width * raw_image->height) {
         AERROR << "Wrong Buffer Len: " << len
                << ", dev: " << config_->camera_dev();
-      } else {
+      } else */
+      {
         process_image(buffers_[buf.index].start, len, raw_image);
       }
 
@@ -906,7 +919,14 @@ bool UsbCam::process_image(const void* src, int len, CameraImagePtr dest) {
       AERROR << "unsupported output format:" << config_->output_type();
       return false;
     }
-  } else {
+  }
+  else if (pixel_format_ == V4L2_PIX_FMT_MJPEG)
+    mjpeg2rgb((char*)src, len, dest->image, dest->width * dest->height);
+  else if (pixel_format_ == V4L2_PIX_FMT_RGB24)
+    rgb242rgb((char*)src, dest->image, dest->width * dest->height);
+  else if (pixel_format_ == V4L2_PIX_FMT_GREY)
+    memcpy(dest->image, (char*)src, dest->width * dest->height);
+   else {
     AERROR << "unsupported pixel format:" << pixel_format_;
     return false;
   }
@@ -1008,7 +1028,7 @@ bool UsbCam::wait_for_device() {
     return false;
   }
   // will continue when trigger failed for self-trigger camera
-  set_adv_trigger();
+  //set_adv_trigger();
   return true;
 }
 
