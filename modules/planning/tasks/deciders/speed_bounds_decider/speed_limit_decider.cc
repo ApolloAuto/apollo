@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/optimizers/st_graph/speed_limit_decider.h"
+#include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
 
 #include <limits>
 

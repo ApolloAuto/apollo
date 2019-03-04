@@ -23,7 +23,7 @@ cc_library(
         "//modules/planning/math/smoothing_spline:active_set_spline_1d_solver",
         "//modules/planning/math/smoothing_spline:osqp_spline_1d_solver",
         "//modules/planning/proto:qp_st_speed_config_proto",
-        "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",
+        "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
     ],
 )
 
@@ -47,7 +47,7 @@ cc_library(
         "//modules/planning/common:st_graph_data",
         "//modules/planning/math/smoothing_spline:piecewise_linear_generator",
         "//modules/planning/proto:qp_st_speed_config_proto",
-        "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",
+        "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
     ],
 )
 
@@ -70,7 +70,7 @@ cc_library(
         "//modules/map/hdmap",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks/optimizers:speed_optimizer",
-        "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",
+        "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
     ],
 )
 
