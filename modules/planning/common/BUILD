@@ -188,6 +188,7 @@ cc_library(
     ],
     deps = [
         ":ego_info",
+        ":st_graph_data",
         ":path_decision",
         ":planning_gflags",
         "//cyber/common:log",
@@ -201,7 +202,6 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
-        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
         "@eigen",
     ],
 )
@@ -418,6 +418,7 @@ cc_library(
         ":frame",
         ":planning_gflags",
         ":speed_limit",
+        ":st_graph_data",
         "//cyber/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
@@ -472,6 +473,37 @@ cc_test(
     ],
     deps = [
         "open_space_info",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "st_graph_data",
+    srcs = [
+        "st_graph_data.cc",
+    ],
+    hdrs = [
+        "st_graph_data.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        ":speed_limit",
+        ":planning_gflags",
+        "//modules/planning/common/speed:st_boundary",
+    ],
+)
+
+cc_test(
+    name = "st_graph_data_test",
+    size = "small",
+    srcs = [
+        "st_graph_data_test.cc",
+    ],
+    deps = [
+        ":st_graph_data",
+        "//cyber/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
         "@gtest//:main",
     ],
 )

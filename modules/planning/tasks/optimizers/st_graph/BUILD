@@ -3,22 +3,6 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "st_graph_data",
-    srcs = [
-        "st_graph_data.cc",
-    ],
-    hdrs = [
-        "st_graph_data.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/common:speed_limit",
-        "//modules/planning/common/speed:st_boundary",
-    ],
-)
-
-cc_library(
     name = "st_boundary_mapper",
     srcs = [
         "speed_limit_decider.cc",
@@ -84,21 +68,6 @@ cc_test(
     ],
     deps = [
         ":st_boundary_mapper",
-        "//cyber/common:log",
-        "//modules/common/time",
-        "//modules/common/util",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "st_graph_data_test",
-    size = "small",
-    srcs = [
-        "st_graph_data_test.cc",
-    ],
-    deps = [
-        ":st_graph_data",
         "//cyber/common:log",
         "//modules/common/time",
         "//modules/common/util",

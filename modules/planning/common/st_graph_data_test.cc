@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
+#include "modules/planning/common/st_graph_data.h"
 
 #include "gmock/gmock.h"
 

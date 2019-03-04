@@ -30,7 +30,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/optimizers/qp_spline_st_speed/qp_piecewise_st_graph.h"
 #include "modules/planning/tasks/optimizers/qp_spline_st_speed/qp_spline_st_graph.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
+#include "modules/planning/common/st_graph_data.h"
 
 namespace apollo {
 namespace planning {
