@@ -19,7 +19,9 @@
  */
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 
+#ifdef USE_GPU
 #include "modules/planning/open_space/trajectory_smoother/planning_block.h"
+#endif
 
 namespace apollo {
 namespace planning {
@@ -175,8 +177,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
                                                      double* x_u, int m,
                                                      double* g_l, double* g_u) {
   ADEBUG << "get_bounds_info";
-  CHECK(XYbounds_.size() == 4)
-      << "XYbounds_ size is not 4, but" << XYbounds_.size();
+  CHECK(XYbounds_.size() == 4) << "XYbounds_ size is not 4, but"
+                               << XYbounds_.size();
 
   // Variables: includes state, u, sample time and lagrange multipliers
   // 1. state variables, 4 * [0, horizon]
@@ -586,8 +588,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
                                                     int nele_jac, int* iRow,
                                                     int* jCol, double* values) {
   ADEBUG << "eval_jac_g";
-  CHECK_EQ(n, num_of_variables_)
-      << "No. of variables wrong in eval_jac_g. n : " << n;
+  CHECK_EQ(n, num_of_variables_) << "No. of variables wrong in eval_jac_g. n : "
+                                 << n;
   CHECK_EQ(m, num_of_constraints_)
       << "No. of constraints wrong in eval_jac_g. n : " << m;
 
@@ -1044,9 +1046,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::cos(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -1116,9 +1117,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -1160,9 +1160,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
       ++nz_index;
 
       values[nz_index] =
-          -1.0 * (ts_ *
-                      (x[state_index + 3] +
-                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          -1.0 * (ts_ * (x[state_index + 3] +
+                         x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                       std::tan(x[control_index]) / wheelbase_ +
                   x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
                       std::tan(x[control_index]) / wheelbase_);  // n.
@@ -1457,8 +1456,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
                                                     int nele_jac, int* iRow,
                                                     int* jCol, double* values) {
   ADEBUG << "eval_jac_g";
-  CHECK_EQ(n, num_of_variables_)
-      << "No. of variables wrong in eval_jac_g. n : " << n;
+  CHECK_EQ(n, num_of_variables_) << "No. of variables wrong in eval_jac_g. n : "
+                                 << n;
   CHECK_EQ(m, num_of_constraints_)
       << "No. of constraints wrong in eval_jac_g. n : " << m;
 
@@ -1895,9 +1894,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::cos(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -1967,9 +1965,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -2011,9 +2008,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
       ++nz_index;
 
       values[nz_index] =
-          -1.0 * (ts_ *
-                      (x[state_index + 3] +
-                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          -1.0 * (ts_ * (x[state_index + 3] +
+                         x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                       std::tan(x[control_index]) / wheelbase_ +
                   x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
                       std::tan(x[control_index]) / wheelbase_);  // n.
@@ -2291,7 +2287,11 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
     // triangle only.
 
     if (FLAGS_enable_cuda) {
+#ifdef USE_GPU
       fill_lower_left(iRow, jCol, rind_L, cind_L, nnz_L);
+#else
+      AFATAL << "CUDA enabled without GPU!";
+#endif
     } else {
       for (int idx = 0; idx < nnz_L; idx++) {
         iRow[idx] = rind_L[idx];
@@ -2304,7 +2304,11 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
 
     obj_lam[0] = obj_factor;
     if (FLAGS_enable_cuda) {
+#ifdef USE_GPU
       data_transfer(&obj_lam[1], lambda, m);
+#else
+      AFATAL << "CUDA enabled without GPU!";
+#endif
     } else {
       for (int idx = 0; idx < m; idx++) {
         obj_lam[1 + idx] = lambda[idx];
@@ -2315,11 +2319,13 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
                 &hessval, options_L);
 
+#ifdef USE_GPU
     if (!data_transfer(values, hessval, nnz_L)) {
       for (int idx = 0; idx < nnz_L; idx++) {
         values[idx] = hessval[idx];
       }
     }
+#endif
   }
 
   return true;
@@ -2551,9 +2557,9 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
          ts_ * x[time_index] *
              (x[state_index + 3] +
               ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             cos(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
-                                          x[state_index + 3] *
-                                          tan(x[control_index]) / wheelbase_));
+             cos(x[state_index + 2] +
+                 ts_ * x[time_index] * 0.5 * x[state_index + 3] *
+                     tan(x[control_index]) / wheelbase_));
     // x2
     g[constraint_index + 1] =
         x[state_index + 5] -
@@ -2561,18 +2567,17 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
          ts_ * x[time_index] *
              (x[state_index + 3] +
               ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             sin(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
-                                          x[state_index + 3] *
-                                          tan(x[control_index]) / wheelbase_));
+             sin(x[state_index + 2] +
+                 ts_ * x[time_index] * 0.5 * x[state_index + 3] *
+                     tan(x[control_index]) / wheelbase_));
 
     // x3
     g[constraint_index + 2] =
-        x[state_index + 6] -
-        (x[state_index + 2] +
-         ts_ * x[time_index] *
-             (x[state_index + 3] +
-              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             tan(x[control_index]) / wheelbase_);
+        x[state_index + 6] - (x[state_index + 2] +
+                              ts_ * x[time_index] * (x[state_index + 3] +
+                                                     ts_ * x[time_index] * 0.5 *
+                                                         x[control_index + 1]) *
+                                  tan(x[control_index]) / wheelbase_);
 
     // x4
     g[constraint_index + 3] =

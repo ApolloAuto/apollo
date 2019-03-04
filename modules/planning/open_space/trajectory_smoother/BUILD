@@ -108,11 +108,15 @@ cc_library(
 cc_library(
     name = "distance_approach_ipopt_interface",
     srcs = [
-        ":planning_block",
         "distance_approach_ipopt_interface.cc",
-    ],
+    ] + select({
+        "//tools/platforms:use_gpu": [
+            "planning_block.h",
+            ":planning_block",
+        ],
+        "//conditions:default": [],
+    }),
     hdrs = [
-        "planning_block.h",
         "distance_approach_ipopt_interface.h",
     ],
     copts = [
@@ -130,7 +134,7 @@ cc_library(
         "@adolc",
         "@eigen",
         "@ipopt",
-    ],
+    ]
 )
 
 cuda_library(
