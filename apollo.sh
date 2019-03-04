@@ -788,7 +788,7 @@ function main() {
       run_lint
       ;;
     test)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
+      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
       USE_GPU="1"
       run_test $@
       ;;
