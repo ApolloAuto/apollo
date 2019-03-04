@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-// This defines enums and structures for parsing Newton_M2 binary messages. 
+// This defines enums and structures for parsing Newton_M2 binary messages.
 
 #pragma once
 
