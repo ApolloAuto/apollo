@@ -44,6 +44,9 @@
 namespace apollo {
 namespace planning {
 
+typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
+    TrajGearPair;
+
 struct GearSwitchStates {
   bool gear_switching_flag = false;
   bool gear_shift_period_finished = true;
@@ -160,14 +163,11 @@ class OpenSpaceInfo {
     return &interpolated_trajectory_result_;
   }
 
-  const std::vector<
-      std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>>
-      &paritioned_trajectories() const {
+  const std::vector<TrajGearPair> &paritioned_trajectories() const {
     return paritioned_trajectories_;
   }
 
-  std::vector<std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>>
-      *mutable_paritioned_trajectories() {
+  std::vector<TrajGearPair> *mutable_paritioned_trajectories() {
     return &paritioned_trajectories_;
   }
 
@@ -179,15 +179,22 @@ class OpenSpaceInfo {
     return &gear_switch_states_;
   }
 
-  const std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
-      &chosen_paritioned_trajectory() const {
+  const TrajGearPair &chosen_paritioned_trajectory() const {
     return chosen_paritioned_trajectory_;
   }
 
-  std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
-      *mutable_chosen_paritioned_trajectory() {
+  TrajGearPair *mutable_chosen_paritioned_trajectory() {
     return &chosen_paritioned_trajectory_;
   }
+
+  bool *mutable_fallback_flag() {return &fallback_flag_;}
+
+  const bool &fallback_flag() {return fallback_flag_;}
+
+  TrajGearPair *mutable_fallback_trajectory() {return &fallback_trajectory_;}
+
+  const TrajGearPair &fallback_trajectory() {return fallback_trajectory_;}
+
 
  private:
   // @brief obstacles total num including perception obstacles and parking space
@@ -231,13 +238,15 @@ class OpenSpaceInfo {
 
   DiscretizedTrajectory interpolated_trajectory_result_;
 
-  std::vector<std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>>
-      paritioned_trajectories_;
+  std::vector<TrajGearPair> paritioned_trajectories_;
 
   GearSwitchStates gear_switch_states_;
 
-  std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
-      chosen_paritioned_trajectory_;
+  TrajGearPair chosen_paritioned_trajectory_;
+
+  bool fallback_flag_ = true;
+
+  TrajGearPair fallback_trajectory_;
 };
 }  // namespace planning
 }  // namespace apollo
