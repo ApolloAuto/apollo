@@ -113,7 +113,7 @@
 #         "//modules/planning/proto:planning_proto",
 #         "//modules/planning/proto:poly_vt_speed_config_proto",
 #         "//modules/planning/tasks:task",
-#         "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",
+#         "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
 #         "//modules/planning/common:st_graph_data",
 #         "//modules/planning/tuning:autotuning_raw_feature_generator",
 #         "//modules/planning/tuning/speed_model:autotuning_speed_feature_builder",

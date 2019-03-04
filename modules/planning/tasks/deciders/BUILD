@@ -30,7 +30,7 @@ cc_library(
         "//modules/perception/proto:perception_proto",
         "//modules/planning/math/finite_element_qp:fem_1d_qp_problem",
         "//modules/planning/scenarios/util:util_lib",
-        "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",
+        "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
         "//modules/planning/tasks/deciders/speed_bounds_decider:speed_bounds_decider",
     ],
 )
