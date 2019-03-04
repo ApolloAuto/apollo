@@ -27,7 +27,7 @@
 #include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 #include "modules/planning/tasks/deciders/side_pass_path_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_safety.h"
-#include "modules/planning/tasks/deciders/speed_bounds_decider.h"
+#include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"

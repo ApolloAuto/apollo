@@ -37,10 +37,10 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common:speed_limit",
+        "//modules/planning/common:st_graph_data",
         "//modules/planning/common/path:path_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/tasks:task",
-        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
         "@eigen",
     ],
 )
