@@ -147,6 +147,36 @@ class Map:
             arrowprops=dict(arrowstyle='-|>', connectionstyle='arc3,rad=-0.2',
                             fc=color_val, ec=color_val, alpha=0.5))
 
+    def draw_pnc_junctions(self, ax):
+        cnt = 1
+        for pnc_junction in self.map_pb.pnc_junction:
+            color_val = self.colors[cnt % len(self.colors)]
+            self._draw_pnc_boundary(pnc_junction, ax, color_val)
+            self._draw_pnc_junction_id(pnc_junction, ax, color_val)
+            cnt += 1
+
+    def _draw_pnc_junction_id(self, pnc_junction, ax, color_val):
+        """draw pnc_junction id"""
+        labelxys = []
+        labelxys.append((40, -40))
+        labelxys.append((-40, -40))
+        labelxys.append((40, 40))
+        labelxys.append((-40, 40))
+        has = ['right', 'left', 'right', 'left']
+        vas = ['bottom', 'bottom', 'top', 'top']
+
+        idx = random.randint(0, 3)
+        lxy = labelxys[idx]
+        x = pnc_junction.polygon.point[0].x
+        y = pnc_junction.polygon.point[1].y
+        plt.annotate(
+            pnc_junction.id.id,
+            xy=(x, y), xytext=lxy,
+            textcoords='offset points', ha=has[idx], va=vas[idx],
+            bbox=dict(boxstyle='round,pad=0.5', fc=color_val, alpha=0.5),
+            arrowprops=dict(arrowstyle='-|>', connectionstyle='arc3,rad=-0.2',
+                            fc=color_val, ec=color_val, alpha=0.5))
+
     @staticmethod
     def _find_lane_central_point(lane):
         segment_idx = len(lane.left_boundary.curve.segment) / 2
@@ -206,6 +236,16 @@ class Map:
                     px.append(float(p.x))
                     py.append(float(p.y))
                 ax.plot(px, py, ls=':', c=color_val, alpha=0.5)
+
+    @staticmethod
+    def _draw_pnc_boundary(pnc_junction, ax, color_val):
+        """draw boundary"""
+        px = []
+        py = []
+        for point in pnc_junction.polygon.point:
+            px.append(point.x)
+            py.append(point.y)
+        ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
 
     def draw_signal_lights(self, ax):
         """draw_signal_lights"""

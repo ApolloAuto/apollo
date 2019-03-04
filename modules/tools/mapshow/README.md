@@ -28,11 +28,14 @@ source scripts/apollo_base.sh
 >
 >  -l, --laneid    Show specific lane id(s) in map
 >
+>  -l LANEID \[LANEID ...], --laneid LANEID \[LANEID ...]  Show specific lane id(s) in map
+>
 >  -signal, --showsignals    Show all signal light stop lines with ids in map
 >
 >  -stopsign, --showstopsigns    Show all stop sign stop lines with ids in map
 >
->  -l LANEID \[LANEID ...], --laneid LANEID \[LANEID ...]  Show specific lane id(s) in map
+>  -junction, --showjunctions    Show all pnc-junctions with ids in map
+>
 
 ## Examples
 
