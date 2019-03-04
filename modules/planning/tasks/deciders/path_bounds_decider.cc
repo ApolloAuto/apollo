@@ -29,8 +29,6 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/map/hdmap/hdmap_util.h"
 
-#define ADEBUG AERROR
-
 namespace apollo {
 namespace planning {
 
