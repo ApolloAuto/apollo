@@ -62,7 +62,7 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
           ->current_traffic_light_overlaps[0].end_s;
       const double distance_adc_pass_traffic_light = adc_back_edge_s -
           traffic_light_end_s;
-      AERROR << "distance_adc_pass_traffic_light["
+      ADEBUG << "distance_adc_pass_traffic_light["
           << distance_adc_pass_traffic_light
           << "] traffic_light_end_s[" << traffic_light_end_s << "]";
 
