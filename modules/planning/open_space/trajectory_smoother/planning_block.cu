@@ -55,8 +55,8 @@ bool fill_lower_left(int *iRow, int *jCol,
   int *d_iRow, *d_jCol;
   unsigned int *d_rind_L, *d_cind_L;
 
-  unsigned int nBytes = nnz_L * sizeof(int); 
-  unsigned int nUBytes = nnz_L * sizeof(unsigned int); 
+  unsigned int nBytes = nnz_L * sizeof(int);
+  unsigned int nUBytes = nnz_L * sizeof(unsigned int);
   cudaMalloc((void**)&d_iRow, nBytes);
   cudaMalloc((void**)&d_jCol, nBytes);
   cudaMalloc((void**)&d_rind_L, nUBytes);
