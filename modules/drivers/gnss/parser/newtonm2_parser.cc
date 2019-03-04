@@ -14,10 +14,11 @@
  * limitations under the License.
  *****************************************************************************/
 
-// An parser for decoding binary messages from a Starneto Newton-M2 receiver. The following
-// messages must be
-// logged in order for this parser to work properly.
+// An parser for decoding binary messages from a Starneto Newton-M2 receiver.
+// The following messages must be logged in order for this parser to work
+// properly.
 //
+
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -46,10 +47,10 @@ Parser* Parser::CreateNewtonM2(const config::Config& config) {
 }
 
 NewtonM2Parser::NewtonM2Parser() {
-  buffer_.reserve(BUFFER_SIZE);
-  ins_.mutable_position_covariance()->Resize(9, FLOAT_NAN);
-  ins_.mutable_euler_angles_covariance()->Resize(9, FLOAT_NAN);
-  ins_.mutable_linear_velocity_covariance()->Resize(9, FLOAT_NAN);
+  buffer_.reserve(newtonm2::BUFFER_SIZE);
+  ins_.mutable_position_covariance()->Resize(9, newtonm2::FLOAT_NAN);
+  ins_.mutable_euler_angles_covariance()->Resize(9, newtonm2::FLOAT_NAN);
+  ins_.mutable_linear_velocity_covariance()->Resize(9, newtonm2::FLOAT_NAN);
 
   if (1 != init_raw(&raw_)) {
     AFATAL << "memory allocation error for observation data structure.";
@@ -57,10 +58,10 @@ NewtonM2Parser::NewtonM2Parser() {
 }
 
 NewtonM2Parser::NewtonM2Parser(const config::Config& config) {
-  buffer_.reserve(BUFFER_SIZE);
-  ins_.mutable_position_covariance()->Resize(9, FLOAT_NAN);
-  ins_.mutable_euler_angles_covariance()->Resize(9, FLOAT_NAN);
-  ins_.mutable_linear_velocity_covariance()->Resize(9, FLOAT_NAN);
+  buffer_.reserve(newtonm2::BUFFER_SIZE);
+  ins_.mutable_position_covariance()->Resize(9, newtonm2::FLOAT_NAN);
+  ins_.mutable_euler_angles_covariance()->Resize(9, newtonm2::FLOAT_NAN);
+  ins_.mutable_linear_velocity_covariance()->Resize(9, newtonm2::FLOAT_NAN);
 
   if (config.has_imu_type()) {
     imu_type_ = config.imu_type();
@@ -106,9 +107,10 @@ Parser::MessageType NewtonM2Parser::GetMessage(MessagePtr* message_ptr) {
         buffer_.push_back(*data_++);
       } else {
         if (header_length_ == sizeof(newtonm2::LongHeader)) {
-          total_length_ = header_length_ + newtonm2::CRC_LENGTH +
-                          reinterpret_cast<newtonm2::LongHeader*>(buffer_.data())
-                              ->message_length;
+          total_length_ =
+              header_length_ + newtonm2::CRC_LENGTH +
+              reinterpret_cast<newtonm2::LongHeader*>(buffer_.data())
+                  ->message_length;
         } else if (header_length_ == sizeof(newtonm2::ShortHeader)) {
           total_length_ =
               header_length_ + newtonm2::CRC_LENGTH +
@@ -138,7 +140,7 @@ Parser::MessageType NewtonM2Parser::GetMessage(MessagePtr* message_ptr) {
 
 bool NewtonM2Parser::check_crc() {
   size_t l = buffer_.size() - newtonm2::CRC_LENGTH;
-  return crc32_block(buffer_.data(), l) ==
+  return newtonm2::crc32_block(buffer_.data(), l) ==
          *reinterpret_cast<uint32_t*>(buffer_.data() + l);
 }
 
@@ -161,7 +163,8 @@ Parser::MessageType NewtonM2Parser::PrepareMessage(MessagePtr* message_ptr) {
     message_id = header->message_id;
     message_length = header->message_length;
   } else {
-    auto header = reinterpret_cast<const newtonm2::ShortHeader*>(buffer_.data());
+    auto header =
+        reinterpret_cast<const newtonm2::ShortHeader*>(buffer_.data());
     message = buffer_.data() + sizeof(newtonm2::ShortHeader);
     gps_week = header->gps_week;
     gps_millisecs = header->gps_millisecs;
@@ -215,7 +218,8 @@ Parser::MessageType NewtonM2Parser::PrepareMessage(MessagePtr* message_ptr) {
         break;
       }
 
-      if (HandleCorrImuData(reinterpret_cast<newtonm2::CorrImuData*>(message))) {
+      if (HandleCorrImuData(
+              reinterpret_cast<newtonm2::CorrImuData*>(message))) {
         *message_ptr = &ins_;
         return MessageType::INS;
       }
@@ -346,8 +350,8 @@ Parser::MessageType NewtonM2Parser::PrepareMessage(MessagePtr* message_ptr) {
 }
 
 bool NewtonM2Parser::HandleGnssBestpos(const newtonm2::BestPos* pos,
-                                      uint16_t gps_week,
-                                      uint32_t gps_millisecs) {
+                                       uint16_t gps_week,
+                                       uint32_t gps_millisecs) {
   bestpos_.set_sol_status(
       static_cast<apollo::drivers::gnss::SolutionStatus>(pos->solution_status));
   bestpos_.set_sol_type(
@@ -372,14 +376,14 @@ bool NewtonM2Parser::HandleGnssBestpos(const newtonm2::BestPos* pos,
   bestpos_.set_galileo_beidou_used_mask(pos->galileo_beidou_used_mask);
   bestpos_.set_gps_glonass_used_mask(pos->gps_glonass_used_mask);
 
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   bestpos_.set_measurement_time(seconds);
   // AINFO << "Best gnss pose:\r\n" << bestpos_.DebugString();
   return true;
 }
 
 bool NewtonM2Parser::HandleBestPos(const newtonm2::BestPos* pos,
-                                  uint16_t gps_week, uint32_t gps_millisecs) {
+                                   uint16_t gps_week, uint32_t gps_millisecs) {
   gnss_.mutable_position()->set_lon(pos->longitude);
   gnss_.mutable_position()->set_lat(pos->latitude);
   gnss_.mutable_position()->set_height(pos->height_msl + pos->undulation);
@@ -451,7 +455,7 @@ bool NewtonM2Parser::HandleBestPos(const newtonm2::BestPos* pos,
                     << static_cast<int>(pos->datum_id);
   }
 
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   if (gnss_.measurement_time() != seconds) {
     gnss_.set_measurement_time(seconds);
     return false;
@@ -460,7 +464,7 @@ bool NewtonM2Parser::HandleBestPos(const newtonm2::BestPos* pos,
 }
 
 bool NewtonM2Parser::HandleBestVel(const newtonm2::BestVel* vel,
-                                  uint16_t gps_week, uint32_t gps_millisecs) {
+                                   uint16_t gps_week, uint32_t gps_millisecs) {
   if (velocity_type_ != vel->velocity_type) {
     velocity_type_ = vel->velocity_type;
     AINFO << "Velocity type: " << static_cast<int>(velocity_type_);
@@ -470,12 +474,12 @@ bool NewtonM2Parser::HandleBestVel(const newtonm2::BestVel* vel,
     AINFO << "Velocity latency: " << static_cast<int>(vel->latency);
     gnss_.set_velocity_latency(vel->latency);
   }
-  double yaw = azimuth_deg_to_yaw_rad(vel->track_over_ground);
+  double yaw = newtonm2::azimuth_deg_to_yaw_rad(vel->track_over_ground);
   gnss_.mutable_linear_velocity()->set_x(vel->horizontal_speed * cos(yaw));
   gnss_.mutable_linear_velocity()->set_y(vel->horizontal_speed * sin(yaw));
   gnss_.mutable_linear_velocity()->set_z(vel->vertical_speed);
 
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   if (gnss_.measurement_time() != seconds) {
     gnss_.set_measurement_time(seconds);
     return false;
@@ -484,16 +488,17 @@ bool NewtonM2Parser::HandleBestVel(const newtonm2::BestVel* vel,
 }
 
 bool NewtonM2Parser::HandleCorrImuData(const newtonm2::CorrImuData* imu) {
-  rfu_to_flu(imu->x_velocity_change * imu_measurement_hz_,
-             imu->y_velocity_change * imu_measurement_hz_,
-             imu->z_velocity_change * imu_measurement_hz_,
-             ins_.mutable_linear_acceleration());
-  rfu_to_flu(imu->x_angle_change * imu_measurement_hz_,
-             imu->y_angle_change * imu_measurement_hz_,
-             imu->z_angle_change * imu_measurement_hz_,
-             ins_.mutable_angular_velocity());
+  newtonm2::rfu_to_flu(imu->x_velocity_change * imu_measurement_hz_,
+                       imu->y_velocity_change * imu_measurement_hz_,
+                       imu->z_velocity_change * imu_measurement_hz_,
+                       ins_.mutable_linear_acceleration());
+  newtonm2::rfu_to_flu(imu->x_angle_change * imu_measurement_hz_,
+                       imu->y_angle_change * imu_measurement_hz_,
+                       imu->z_angle_change * imu_measurement_hz_,
+                       ins_.mutable_angular_velocity());
 
-  double seconds = imu->gps_week * SECONDS_PER_WEEK + imu->gps_seconds;
+  double seconds =
+      imu->gps_week * newtonm2::SECONDS_PER_WEEK + imu->gps_seconds;
   if (ins_.measurement_time() != seconds) {
     ins_.set_measurement_time(seconds);
     return false;
@@ -507,7 +512,8 @@ bool NewtonM2Parser::HandleInsCov(const newtonm2::InsCov* cov) {
   for (int i = 0; i < 9; ++i) {
     ins_.set_position_covariance(i, cov->position_covariance[i]);
     ins_.set_euler_angles_covariance(
-        INDEX[i], (DEG_TO_RAD * DEG_TO_RAD) * cov->attitude_covariance[i]);
+        newtonm2::INDEX[i], (newtonm2::DEG_TO_RAD * newtonm2::DEG_TO_RAD) *
+                                cov->attitude_covariance[i]);
     ins_.set_linear_velocity_covariance(i, cov->velocity_covariance[i]);
   }
   return false;
@@ -521,9 +527,10 @@ bool NewtonM2Parser::HandleInsPva(const newtonm2::InsPva* pva) {
   ins_.mutable_position()->set_lon(pva->longitude);
   ins_.mutable_position()->set_lat(pva->latitude);
   ins_.mutable_position()->set_height(pva->height);
-  ins_.mutable_euler_angles()->set_x(pva->roll * DEG_TO_RAD);
-  ins_.mutable_euler_angles()->set_y(-pva->pitch * DEG_TO_RAD);
-  ins_.mutable_euler_angles()->set_z(azimuth_deg_to_yaw_rad(pva->azimuth));
+  ins_.mutable_euler_angles()->set_x(pva->roll * newtonm2::DEG_TO_RAD);
+  ins_.mutable_euler_angles()->set_y(-pva->pitch * newtonm2::DEG_TO_RAD);
+  ins_.mutable_euler_angles()->set_z(
+      newtonm2::azimuth_deg_to_yaw_rad(pva->azimuth));
   ins_.mutable_linear_velocity()->set_x(pva->east_velocity);
   ins_.mutable_linear_velocity()->set_y(pva->north_velocity);
   ins_.mutable_linear_velocity()->set_z(pva->up_velocity);
@@ -542,7 +549,8 @@ bool NewtonM2Parser::HandleInsPva(const newtonm2::InsPva* pva) {
       ins_.set_type(apollo::drivers::gnss::Ins::INVALID);
   }
 
-  double seconds = pva->gps_week * SECONDS_PER_WEEK + pva->gps_seconds;
+  double seconds =
+      pva->gps_week * newtonm2::SECONDS_PER_WEEK + pva->gps_seconds;
   if (ins_.measurement_time() != seconds) {
     ins_.set_measurement_time(seconds);
     return false;
@@ -553,8 +561,8 @@ bool NewtonM2Parser::HandleInsPva(const newtonm2::InsPva* pva) {
 }
 
 bool NewtonM2Parser::HandleInsPvax(const newtonm2::InsPvaX* pvax,
-                                  uint16_t gps_week, uint32_t gps_millisecs) {
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+                                   uint16_t gps_week, uint32_t gps_millisecs) {
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   double unix_sec = apollo::drivers::util::gps2unix(seconds);
   ins_stat_.mutable_header()->set_timestamp_sec(unix_sec);
   ins_stat_.set_ins_status(pvax->ins_status);
@@ -567,7 +575,7 @@ bool NewtonM2Parser::HandleRawImuX(const newtonm2::RawImuX* imu) {
     AWARN << "IMU error. Status: " << std::hex << std::showbase
           << imu->imuStatus;
   }
-  if (is_zero(gyro_scale_)) {
+  if (newtonm2::is_zero(gyro_scale_)) {
     config::ImuType imu_type = imu_type_;
     newtonm2::ImuParameter param = newtonm2::GetImuParameter(imu_type);
     AINFO << "IMU type: " << config::ImuType_Name(imu_type) << "; "
@@ -575,7 +583,7 @@ bool NewtonM2Parser::HandleRawImuX(const newtonm2::RawImuX* imu) {
           << "Accel scale: " << param.accel_scale << "; "
           << "Sampling rate: " << param.sampling_rate_hz << ".";
 
-    if (is_zero(param.sampling_rate_hz)) {
+    if (newtonm2::is_zero(param.sampling_rate_hz)) {
       AERROR_EVERY(5) << "Unsupported IMU type: "
                       << config::ImuType_Name(imu_type);
       return false;
@@ -587,7 +595,7 @@ bool NewtonM2Parser::HandleRawImuX(const newtonm2::RawImuX* imu) {
     imu_.set_measurement_span(imu_measurement_span_);
   }
 
-  double time = imu->gps_week * SECONDS_PER_WEEK + imu->gps_seconds;
+  double time = imu->gps_week * newtonm2::SECONDS_PER_WEEK + imu->gps_seconds;
   if (imu_measurement_time_previous_ > 0.0 &&
       fabs(time - imu_measurement_time_previous_ - imu_measurement_span_) >
           1e-4) {
@@ -597,24 +605,24 @@ bool NewtonM2Parser::HandleRawImuX(const newtonm2::RawImuX* imu) {
   imu_.set_measurement_time(time);
   switch (imu_frame_mapping_) {
     case 5:  // Default mapping.
-      rfu_to_flu(imu->x_velocity_change * accel_scale_,
-                 -imu->y_velocity_change_neg * accel_scale_,
-                 imu->z_velocity_change * accel_scale_,
-                 imu_.mutable_linear_acceleration());
-      rfu_to_flu(imu->x_angle_change * gyro_scale_,
-                 -imu->y_angle_change_neg * gyro_scale_,
-                 imu->z_angle_change * gyro_scale_,
-                 imu_.mutable_angular_velocity());
+      newtonm2::rfu_to_flu(imu->x_velocity_change * accel_scale_,
+                           -imu->y_velocity_change_neg * accel_scale_,
+                           imu->z_velocity_change * accel_scale_,
+                           imu_.mutable_linear_acceleration());
+      newtonm2::rfu_to_flu(imu->x_angle_change * gyro_scale_,
+                           -imu->y_angle_change_neg * gyro_scale_,
+                           imu->z_angle_change * gyro_scale_,
+                           imu_.mutable_angular_velocity());
       break;
     case 6:
-      rfu_to_flu(-imu->y_velocity_change_neg * accel_scale_,
-                 imu->x_velocity_change * accel_scale_,
-                 -imu->z_velocity_change * accel_scale_,
-                 imu_.mutable_linear_acceleration());
-      rfu_to_flu(-imu->y_angle_change_neg * gyro_scale_,
-                 imu->x_angle_change * gyro_scale_,
-                 -imu->z_angle_change * gyro_scale_,
-                 imu_.mutable_angular_velocity());
+      newtonm2::rfu_to_flu(-imu->y_velocity_change_neg * accel_scale_,
+                           imu->x_velocity_change * accel_scale_,
+                           -imu->z_velocity_change * accel_scale_,
+                           imu_.mutable_linear_acceleration());
+      newtonm2::rfu_to_flu(-imu->y_angle_change_neg * gyro_scale_,
+                           imu->x_angle_change * gyro_scale_,
+                           -imu->z_angle_change * gyro_scale_,
+                           imu_.mutable_angular_velocity());
       break;
     default:
       AERROR_EVERY(5) << "Unsupported IMU frame mapping: "
@@ -629,10 +637,10 @@ bool NewtonM2Parser::HandleRawImu(const newtonm2::RawImu* imu) {
   double accel_scale = 0.0;
   float imu_measurement_span = 1.0 / 200.0;
 
-  if (is_zero(gyro_scale_)) {
+  if (newtonm2::is_zero(gyro_scale_)) {
     newtonm2::ImuParameter param = newtonm2::GetImuParameter(imu_type_);
 
-    if (is_zero(param.sampling_rate_hz)) {
+    if (newtonm2::is_zero(param.sampling_rate_hz)) {
       AERROR_EVERY(5) << "Unsupported IMU type ADUS16488.";
       return false;
     }
@@ -647,7 +655,7 @@ bool NewtonM2Parser::HandleRawImu(const newtonm2::RawImu* imu) {
     imu_.set_measurement_span(imu_measurement_span);
   }
 
-  double time = imu->gps_week * SECONDS_PER_WEEK + imu->gps_seconds;
+  double time = imu->gps_week * newtonm2::SECONDS_PER_WEEK + imu->gps_seconds;
   if (imu_measurement_time_previous_ > 0.0 &&
       fabs(time - imu_measurement_time_previous_ - imu_measurement_span) >
           1e-4) {
@@ -658,24 +666,24 @@ bool NewtonM2Parser::HandleRawImu(const newtonm2::RawImu* imu) {
   imu_.set_measurement_time(time);
   switch (imu_frame_mapping_) {
     case 5:  // Default mapping.
-      rfu_to_flu(imu->x_velocity_change * accel_scale,
-                 -imu->y_velocity_change_neg * accel_scale,
-                 imu->z_velocity_change * accel_scale,
-                 imu_.mutable_linear_acceleration());
-      rfu_to_flu(imu->x_angle_change * gyro_scale,
-                 -imu->y_angle_change_neg * gyro_scale,
-                 imu->z_angle_change * gyro_scale,
-                 imu_.mutable_angular_velocity());
+      newtonm2::rfu_to_flu(imu->x_velocity_change * accel_scale,
+                           -imu->y_velocity_change_neg * accel_scale,
+                           imu->z_velocity_change * accel_scale,
+                           imu_.mutable_linear_acceleration());
+      newtonm2::rfu_to_flu(imu->x_angle_change * gyro_scale,
+                           -imu->y_angle_change_neg * gyro_scale,
+                           imu->z_angle_change * gyro_scale,
+                           imu_.mutable_angular_velocity());
       break;
     case 6:
-      rfu_to_flu(-imu->y_velocity_change_neg * accel_scale,
-                 imu->x_velocity_change * accel_scale,
-                 -imu->z_velocity_change * accel_scale,
-                 imu_.mutable_linear_acceleration());
-      rfu_to_flu(-imu->y_angle_change_neg * gyro_scale,
-                 imu->x_angle_change * gyro_scale,
-                 -imu->z_angle_change * gyro_scale,
-                 imu_.mutable_angular_velocity());
+      newtonm2::rfu_to_flu(-imu->y_velocity_change_neg * accel_scale,
+                           imu->x_velocity_change * accel_scale,
+                           -imu->z_velocity_change * accel_scale,
+                           imu_.mutable_linear_acceleration());
+      newtonm2::rfu_to_flu(-imu->y_angle_change_neg * gyro_scale,
+                           imu->x_angle_change * gyro_scale,
+                           -imu->z_angle_change * gyro_scale,
+                           imu_.mutable_angular_velocity());
       break;
     default:
       AERROR_EVERY(5) << "Unsupported IMU frame mapping: "
@@ -803,7 +811,7 @@ bool NewtonM2Parser::HandleGloEph(const newtonm2::GLO_Ephemeris* glo_emph) {
 }
 
 bool NewtonM2Parser::HandleHeading(const newtonm2::Heading* heading,
-                                  uint16_t gps_week, uint32_t gps_millisecs) {
+                                   uint16_t gps_week, uint32_t gps_millisecs) {
   heading_.set_solution_status(static_cast<uint32_t>(heading->solution_status));
   heading_.set_position_type(static_cast<uint32_t>(heading->position_type));
   heading_.set_baseline_length(heading->length);
@@ -821,7 +829,7 @@ bool NewtonM2Parser::HandleHeading(const newtonm2::Heading* heading,
   heading_.set_extended_solution_status(heading->extended_solution_status);
   heading_.set_galileo_beidou_sig_mask(heading->galileo_beidou_sig_mask);
   heading_.set_gps_glonass_sig_mask(heading->gps_glonass_sig_mask);
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   heading_.set_measurement_time(seconds);
   return true;
 }
@@ -835,7 +843,7 @@ void NewtonM2Parser::SetObservationTime() {
 }
 
 bool NewtonM2Parser::DecodeGnssObservation(const uint8_t* obs_data,
-                                          const uint8_t* obs_data_end) {
+                                           const uint8_t* obs_data_end) {
   while (obs_data < obs_data_end) {
     const int status = input_oem4(&raw_, *obs_data++);
     switch (status) {
@@ -865,7 +873,7 @@ bool NewtonM2Parser::DecodeGnssObservation(const uint8_t* obs_data,
 
           int j = 0;
           for (j = 0; j < NFREQ + NEXOBS; ++j) {
-            if (is_zero(raw_.obs.data[i].L[j])) {
+            if (newtonm2::is_zero(raw_.obs.data[i].L[j])) {
               break;
             }
 

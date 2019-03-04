@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-// An parser for decoding binary messages from a Starneto Newton-M2 receiver. The following
-// messages must be
-// logged in order for this parser to work properly.
+// An parser for decoding binary messages from a Starneto Newton-M2 receiver.
+// The following messages must be logged in order for this parser to work
+// properly.
 //
 #include <cmath>
 #include <iostream>
@@ -41,7 +41,7 @@ namespace drivers {
 namespace gnss {
 
 // Anonymous namespace that contains helper constants and functions.
-namespace {
+namespace newtonm2 {
 
 constexpr size_t BUFFER_SIZE = 256;
 
@@ -85,8 +85,8 @@ inline uint32_t crc32_block(const uint8_t* buffer, size_t length) {
   return word;
 }
 
-// Converts NewtonM2's azimuth (north = 0, east = 90) to FLU yaw (east = 0, north
-// = pi/2).
+// Converts NewtonM2's azimuth (north = 0, east = 90) to FLU yaw (east = 0,
+// north = pi/2).
 constexpr double azimuth_deg_to_yaw_rad(double azimuth) {
   return (90.0 - azimuth) * DEG_TO_RAD;
 }
@@ -100,7 +100,7 @@ inline void rfu_to_flu(double r, double f, double u,
   flu->set_z(u);
 }
 
-}  // namespace
+}  // namespace newtonm2
 
 class NewtonM2Parser : public Parser {
  public:
@@ -172,8 +172,10 @@ class NewtonM2Parser : public Parser {
   // -1 is an unused value.
   newtonm2::SolutionStatus solution_status_ =
       static_cast<newtonm2::SolutionStatus>(-1);
-  newtonm2::SolutionType position_type_ = static_cast<newtonm2::SolutionType>(-1);
-  newtonm2::SolutionType velocity_type_ = static_cast<newtonm2::SolutionType>(-1);
+  newtonm2::SolutionType position_type_ =
+      static_cast<newtonm2::SolutionType>(-1);
+  newtonm2::SolutionType velocity_type_ =
+      static_cast<newtonm2::SolutionType>(-1);
   newtonm2::InsStatus ins_status_ = static_cast<newtonm2::InsStatus>(-1);
 
   raw_t raw_;  // used for observation data
