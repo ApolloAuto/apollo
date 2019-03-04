@@ -96,8 +96,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     current_trajectory->second = canbus::Chassis::GEAR_REVERSE;
   } else {
     if (init_direction > 0) {
-      ADEBUG << "initial speed oscillate too "
-                "frequent around zero";
+      ADEBUG << "initial speed oscillate too frequent around zero";
       current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
     } else if (init_direction < 0) {
       ADEBUG << "initial speed oscillate too "
@@ -105,8 +104,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
       current_trajectory->second = canbus::Chassis::GEAR_REVERSE;
     } else {
       ADEBUG << "Invalid trajectory start! Speed values of initial points are "
-                "too small to decide "
-                "gear";
+                "too small to decide gear";
       current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
     }
   }
