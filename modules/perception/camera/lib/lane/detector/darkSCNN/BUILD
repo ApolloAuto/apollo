@@ -11,7 +11,7 @@ cc_library(
         "darkSCNN_lane_detector.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",

@@ -19,8 +19,7 @@
 #include <map>
 #include <utility>
 
-// #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/lib/utils/timer.h"
@@ -79,7 +78,7 @@ bool DarkSCNNLanePostprocessor::Init(
   darkSCNN::DarkSCNNParam darkscnn_param;
   const std::string& proto_path =
       GetAbsolutePath(options.detect_config_root, options.detect_config_name);
-  if (!apollo::common::util::GetProtoFromFile(proto_path, &darkscnn_param)) {
+  if (!apollo::cyber::common::GetProtoFromFile(proto_path, &darkscnn_param)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }
@@ -97,8 +96,8 @@ bool DarkSCNNLanePostprocessor::Init(
   const std::string& postprocessor_config =
       GetAbsolutePath(root_dir, conf_file);
   AINFO << "postprocessor_config:" << postprocessor_config;
-  if (!apollo::common::util::GetProtoFromFile(postprocessor_config,
-                                              &lane_postprocessor_param_)) {
+  if (!apollo::cyber::common::GetProtoFromFile(postprocessor_config,
+                                               &lane_postprocessor_param_)) {
     AERROR << "Read config detect_param failed: " << postprocessor_config;
     return false;
   }
