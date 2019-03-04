@@ -35,7 +35,10 @@ using common::time::Clock;
 
 OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
     const TaskConfig& config)
-    : TrajectoryOptimizer(config) {}
+    : TrajectoryOptimizer(config) {
+  open_space_trajectory_partition_config_ =
+      config_.open_space_trajectory_partition_config();
+}
 
 void OpenSpaceTrajectoryPartition::Restart() {
   auto* current_gear_status =
@@ -69,32 +72,24 @@ Status OpenSpaceTrajectoryPartition::Process() {
   constexpr double kepsilon = 1e-8;
   size_t horizon = interpolated_trajectory_result_ptr->size();
   size_t initial_horizon = std::min(
-      horizon,
-      static_cast<size_t>(config_.open_space_trajectory_partition_config()
-                              .initial_gear_check_horizon()));
+      horizon, static_cast<size_t>(open_space_trajectory_partition_config_
+                                       .initial_gear_check_horizon()));
   int direction_flag = 0;
-  size_t i = 0;
-  int j = 0;
   int init_direction = 0;
-  while (i != initial_horizon) {
-    if (interpolated_trajectory_result_ptr->at(j).v() > kepsilon) {
-      ++i;
-      ++j;
+  for (size_t i = 0; i < initial_horizon; ++i) {
+    if (interpolated_trajectory_result_ptr->at(i).v() > kepsilon) {
       direction_flag++;
       if (init_direction == 0) {
         init_direction++;
       }
-    } else if (interpolated_trajectory_result_ptr->at(j).v() < -kepsilon) {
-      ++i;
-      ++j;
+    } else if (interpolated_trajectory_result_ptr->at(i).v() < -kepsilon) {
       direction_flag--;
       if (init_direction == 0) {
         init_direction--;
       }
-    } else {
-      ++j;
     }
   }
+
   if (direction_flag > 1) {
     current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
   } else if (direction_flag < -1) {
@@ -172,7 +167,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
   // Choose the one to follow based on the closest partitioned trajectory
   size_t trajectories_size = paritioned_trajectories_ptr->size();
   size_t current_trajectory_index = 0;
-  size_t closest_trajectory_point_index = 0;
+  size_t current_trajectory_point_index = 0;
   bool flag_change_to_next = false;
   // Could have a big error in vehicle state in single thread mode As the
   // vehicle state is only updated at the every beginning at RunOnce()
@@ -217,18 +212,16 @@ Status OpenSpaceTrajectoryPartition::Process() {
           NormalizeAngle(vehicle_moving_direction + M_PI);
     }
     // If close to the end point, start on the next trajectory
-    if (distance_to_trajs_end <=
-            config_.open_space_trajectory_partition_config()
-                .kepsilon_to_midway_point() &&
+    if (distance_to_trajs_end <= open_space_trajectory_partition_config_
+                                     .kepsilon_to_midway_point() &&
         std::abs(traj_point_moving_direction - vehicle_moving_direction) <
-            config_.open_space_trajectory_partition_config()
-                .heading_searching_range()) {
+            open_space_trajectory_partition_config_.heading_searching_range()) {
       if (i + 1 >= trajectories_size) {
         current_trajectory_index = trajectories_size - 1;
-        closest_trajectory_point_index = trajectory_size - 1;
+        current_trajectory_point_index = trajectory_size - 1;
       } else {
         current_trajectory_index = i + 1;
-        closest_trajectory_point_index = 0;
+        current_trajectory_point_index = 0;
       }
       flag_change_to_next = true;
       break;
@@ -244,24 +237,26 @@ Status OpenSpaceTrajectoryPartition::Process() {
                                       (path_point.y() - vehicle_state.y()));
       if (distance < min_distance) {
         min_distance = distance;
-        closest_trajectory_point_index = j;
+        current_trajectory_point_index = j;
       }
     }
 
     closest_points.push(std::make_pair(
-        std::make_pair(i, closest_trajectory_point_index), min_distance));
+        std::make_pair(i, current_trajectory_point_index), min_distance));
   }
 
   if (!flag_change_to_next) {
     while (!closest_points.empty()) {
       auto closest_point = closest_points.top();
+      const auto& closest_trajectory_index = closest_point.first.first;
+      const auto& closest_trajectory_point_index = closest_point.first.second;
       closest_points.pop();
       double traj_point_moving_direction =
-          paritioned_trajectories_ptr->at(closest_point.first.first)
-              .first.at(closest_point.first.second)
+          paritioned_trajectories_ptr->at(closest_trajectory_index)
+              .first.at(closest_trajectory_point_index)
               .path_point()
               .theta();
-      if (paritioned_trajectories_ptr->at(closest_point.first.first).second ==
+      if (paritioned_trajectories_ptr->at(closest_trajectory_index).second ==
           canbus::Chassis::GEAR_REVERSE) {
         traj_point_moving_direction =
             NormalizeAngle(traj_point_moving_direction + M_PI);
@@ -272,10 +267,9 @@ Status OpenSpaceTrajectoryPartition::Process() {
             NormalizeAngle(vehicle_moving_direction + M_PI);
       }
       if (std::abs(traj_point_moving_direction - vehicle_moving_direction) <
-          config_.open_space_trajectory_partition_config()
-              .heading_searching_range()) {
-        current_trajectory_index = closest_point.first.first;
-        closest_trajectory_point_index = closest_point.first.second;
+          open_space_trajectory_partition_config_.heading_searching_range()) {
+        current_trajectory_index = closest_trajectory_index;
+        current_trajectory_point_index = closest_trajectory_point_index;
         break;
       }
     }
@@ -296,7 +290,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
   }
 
   AdjustRelativeTimeAndS(paritioned_trajectories, current_trajectory_index,
-                         closest_trajectory_point_index,
+                         current_trajectory_point_index,
                          chosen_paritioned_trajectory);
   return Status::OK();
 }
@@ -306,8 +300,7 @@ void OpenSpaceTrajectoryPartition::InterpolateTrajectory(
     DiscretizedTrajectory* interpolated_trajectory) {
   interpolated_trajectory->clear();
   size_t interpolated_pieces_num =
-      config_.open_space_trajectory_partition_config()
-          .interpolated_pieces_num();
+      open_space_trajectory_partition_config_.interpolated_pieces_num();
   CHECK_GT(trajectory.size(), 0);
   CHECK_GT(interpolated_pieces_num, 0);
   size_t trajectory_to_be_partitioned_intervals_num = trajectory.size() - 1;
@@ -331,7 +324,7 @@ void OpenSpaceTrajectoryPartition::InterpolateTrajectory(
 }
 
 bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
-    const bool& flag_change_to_next, const size_t& current_trajectory_index,
+    const bool flag_change_to_next, const size_t current_trajectory_index,
     const std::vector<TrajGearPair>& paritioned_trajectories,
     TrajGearPair* gear_switch_idle_time_trajectory) {
   const auto* last_frame = FrameHistory::Instance()->Latest();
@@ -350,8 +343,7 @@ bool OpenSpaceTrajectoryPartition::InsertGearShiftTrajectory(
       current_gear_status->gear_shift_period_started = false;
     }
     if (current_gear_status->gear_shift_period_time >
-        config_.open_space_trajectory_partition_config()
-            .gear_shift_period_duration()) {
+        open_space_trajectory_partition_config_.gear_shift_period_duration()) {
       current_gear_status->gear_shift_period_finished = true;
       current_gear_status->gear_shift_period_started = true;
     } else {
@@ -370,14 +362,14 @@ void OpenSpaceTrajectoryPartition::GenerateGearShiftTrajectory(
     const canbus::Chassis::GearPosition& gear_position,
     TrajGearPair* gear_switch_idle_time_trajectory) {
   gear_switch_idle_time_trajectory->first.clear();
-  double gear_shift_max_t =
-      config_.open_space_trajectory_partition_config().gear_shift_max_t();
-  double gear_shift_unit_t =
-      config_.open_space_trajectory_partition_config().gear_shift_unit_t();
-  double vehicle_x = frame_->vehicle_state().x();
-  double vehicle_y = frame_->vehicle_state().y();
-  double vehicle_heading = frame_->vehicle_state().heading();
-  double vehicle_kappa = frame_->vehicle_state().kappa();
+  const double gear_shift_max_t =
+      open_space_trajectory_partition_config_.gear_shift_max_t();
+  const double gear_shift_unit_t =
+      open_space_trajectory_partition_config_.gear_shift_unit_t();
+  const double vehicle_x = frame_->vehicle_state().x();
+  const double vehicle_y = frame_->vehicle_state().y();
+  const double vehicle_heading = frame_->vehicle_state().heading();
+  const double vehicle_kappa = frame_->vehicle_state().kappa();
   for (double t = 0.0; t < gear_shift_max_t; t += gear_shift_unit_t) {
     gear_switch_idle_time_trajectory->first.emplace_back();
     auto* trajectory_point = &(gear_switch_idle_time_trajectory->first.back());
@@ -396,8 +388,8 @@ void OpenSpaceTrajectoryPartition::GenerateGearShiftTrajectory(
 
 void OpenSpaceTrajectoryPartition::AdjustRelativeTimeAndS(
     const std::vector<TrajGearPair>& paritioned_trajectories,
-    const size_t& current_trajectory_index,
-    const size_t& closest_trajectory_point_index,
+    const size_t current_trajectory_index,
+    const size_t closest_trajectory_point_index,
     TrajGearPair* current_paritioned_trajectory) {
   // Reassign relative time and relative s to have the closest point as origin
   // point

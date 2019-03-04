@@ -33,10 +33,6 @@
 
 namespace apollo {
 namespace planning {
-
-typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
-    TrajGearPair;
-
 class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
  public:
   explicit OpenSpaceTrajectoryPartition(const TaskConfig& config);
@@ -52,7 +48,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
                              DiscretizedTrajectory* interpolated_trajectory);
 
   bool InsertGearShiftTrajectory(
-      const bool& flag_change_to_next, const size_t& current_trajectory_index,
+      const bool flag_change_to_next, const size_t current_trajectory_index,
       const std::vector<TrajGearPair>& paritioned_trajectories,
       TrajGearPair* gear_switch_idle_time_trajectory);
 
@@ -62,9 +58,12 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
 
   void AdjustRelativeTimeAndS(
       const std::vector<TrajGearPair>& paritioned_trajectories,
-      const size_t& current_trajectory_index,
-      const size_t& closest_trajectory_point_index,
+      const size_t current_trajectory_index,
+      const size_t closest_trajectory_point_index,
       TrajGearPair* current_paritioned_trajectory);
+
+ private:
+  OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config_;
 };
 }  // namespace planning
 }  // namespace apollo
