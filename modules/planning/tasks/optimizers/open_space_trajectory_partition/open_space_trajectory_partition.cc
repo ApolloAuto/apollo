@@ -99,8 +99,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
       ADEBUG << "initial speed oscillate too frequent around zero";
       current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
     } else if (init_direction < 0) {
-      ADEBUG << "initial speed oscillate too "
-                "frequent around zero";
+      ADEBUG << "initial speed oscillate too frequent around zero";
       current_trajectory->second = canbus::Chassis::GEAR_REVERSE;
     } else {
       ADEBUG << "Invalid trajectory start! Speed values of initial points are "
