@@ -24,7 +24,7 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/speed_bounds_decider_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
+#include "modules/planning/common/st_graph_data.h"
 
 namespace apollo {
 namespace planning {

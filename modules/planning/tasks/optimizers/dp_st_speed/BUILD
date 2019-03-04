@@ -56,10 +56,10 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/common:obstacle",
         "//modules/planning/common:path_decision",
+        "//modules/planning/common:st_graph_data",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
     ],
 )
 
@@ -78,11 +78,11 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/localization/proto:localization_proto",
+        "//modules/planning/common:st_graph_data",
         "//modules/planning/proto:dp_st_speed_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks/optimizers:speed_optimizer",
         "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",
-        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
     ],
 )
 
