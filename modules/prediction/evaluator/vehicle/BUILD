@@ -115,6 +115,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
         "//modules/prediction/proto:fnn_vehicle_model_proto",
+        "@pytorch",
     ],
 )
 
