@@ -112,7 +112,9 @@ class PathBoundsDecider : public Decider {
  private:
   std::string blocking_obstacle_id_ = "";
   double adc_frenet_s_ = 0.0;
+  double adc_frenet_sd_ = 0.0;
   double adc_frenet_l_ = 0.0;
+  double adc_frenet_ld_ = 0.0;
   double adc_lane_width_ = 0.0;
   hdmap::LaneInfoConstPtr adc_lane_info_;
 };
