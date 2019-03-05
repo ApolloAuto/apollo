@@ -5,19 +5,7 @@ licenses(["notice"])
 cc_library(
     name = "pytorch",
     hdrs = glob(["*"]),
-    srcs = [
-        "lib/libtorch.so",
-        "lib/libc10.so",
-        "lib/libc10_cuda.so",
-        "lib/libcaffe2.so",
-        "lib/libcaffe2_detectron_ops_gpu.so",
-        "lib/libcaffe2_gpu.so",
-        "lib/libcaffe2_observers.so",
-        "lib/libiomp5.so",
-        "lib/libmklml_intel.so",
-        "lib/libshm.so",
-        "lib/libonnxifi.so",
-    ],
+    srcs = glob(["lib/*.so"]),
     includes = [
         "include",
         "include/torch/csrc/api/include",
@@ -32,8 +20,6 @@ cc_library(
         "-Llib",
     ],
     deps = [
-        "@gtest",
         "@python27",
-        "@cuda",
     ]
 )
