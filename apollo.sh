@@ -295,14 +295,14 @@ function release() {
     cp -a --parent ${LIB} ${APOLLO_RELEASE_DIR}
   done
   mkdir ${APOLLO_RELEASE_DIR}/bazel-bin
-  mv ${APOLLO_RELEASE_DIR}/bazel-out/local-dbg/bin/* ${APOLLO_RELEASE_DIR}/bazel-bin/
+  mv ${APOLLO_RELEASE_DIR}/bazel-out/local-opt/bin/* ${APOLLO_RELEASE_DIR}/bazel-bin/
   rm -rf ${APOLLO_RELEASE_DIR}/bazel-out
 
   # reset softlinks
   cd ${APOLLO_RELEASE_DIR}/bazel-bin
   LIST=("_solib_k8")
   for DIR in "${LIST[@]}"; do
-    LINKS=$(find ${DIR}/* -name "*.so" -type l | sed '/.*@.*/d' | sed '/.*third_Uparty.*/d')
+    LINKS=$(find ${DIR}/* -name "*.so" -type l | sed '/.*@.*/d')
     for LINK in $LINKS; do
       LIB=$(echo $LINK | sed 's/_S/\//g' | sed 's/_U/_/g')
       if [[ $LIB == *"_solib_k8/lib"* ]]; then
