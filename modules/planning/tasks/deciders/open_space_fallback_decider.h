@@ -31,8 +31,7 @@ class OpenSpaceFallbackDecider : public Decider {
 
  private:
   apollo::common::Status Process(
-      Frame* const frame,
-      ReferenceLineInfo* const reference_line_info) override;
+      Frame* frame) override;
 };
 
 }  // namespace planning
