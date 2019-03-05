@@ -96,13 +96,15 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   fem_1d_qp->SetZeroOrderBounds(lateral_boundaries);
 
-  FLAGS_lateral_derivative_bound_default = 1.0;
+  // FLAGS_lateral_derivative_bound_default = 1.0;
   double first_order_bounds = AdjustLateralDerivativeBounds(init_point.v(),
       frenet_point.dl(), frenet_point.ddl(),
       FLAGS_lateral_derivative_bound_default);
-  AERROR << "adjusted lateral bound from \t"
+  AERROR << "adjusted lateral derivative bound from \t"
       << FLAGS_lateral_derivative_bound_default << "\t" << first_order_bounds;
-  fem_1d_qp->SetFirstOrderBounds(first_order_bounds);
+  // TODO(all): temprary disable AdjustLateralDerivativeBounds, enable later
+  // fem_1d_qp->SetFirstOrderBounds(first_order_bounds);
+  fem_1d_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
   fem_1d_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
 
   bool success = fem_1d_qp->Optimize();
