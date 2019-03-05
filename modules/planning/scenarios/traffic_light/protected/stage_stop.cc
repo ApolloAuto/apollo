@@ -87,7 +87,7 @@ Stage::StageStatus TrafficLightProtectedStageStop::FinishScenario() {
 Stage::StageStatus TrafficLightProtectedStageStop::FinishStage() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
   for (const auto& traffic_light_overlap :
-      PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
+       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
     PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.push_back(
         traffic_light_overlap.object_id);
   }

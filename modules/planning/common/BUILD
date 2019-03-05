@@ -188,9 +188,9 @@ cc_library(
     ],
     deps = [
         ":ego_info",
-        ":st_graph_data",
         ":path_decision",
         ":planning_gflags",
+        ":st_graph_data",
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -462,7 +462,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "@eigen",
-     ],
+    ],
 )
 
 cc_test(
@@ -487,8 +487,8 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        ":speed_limit",
         ":planning_gflags",
+        ":speed_limit",
         "//modules/planning/common/speed:st_boundary",
     ],
 )

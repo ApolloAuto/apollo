@@ -111,7 +111,7 @@ TEST(MapNdtTestSuite, matrix) {
                 resolution * static_cast<float>(y),
             static_cast<float>(pt3d_global[2]) -
                 static_cast<float>(altitude_index) *
-                map_config.map_resolutions_z_[res]);
+                    map_config.map_resolutions_z_[res]);
 
         // Add sample 3d points
         ndt_map_cells.AddSample(intensity, static_cast<float>(pt3d_global[2]),
