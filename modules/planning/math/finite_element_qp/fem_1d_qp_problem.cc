@@ -72,10 +72,6 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
     OSQPSettings* settings) {
   // Define Solver settings as default
   osqp_set_default_settings(settings);
-  settings->alpha = 1.0;  // Change alpha parameter
-  settings->eps_abs = 1.0e-05;
-  settings->eps_rel = 1.0e-05;
-  settings->max_iter = 5000;
   settings->polish = true;
   settings->verbose = FLAGS_enable_osqp_debug;
 
