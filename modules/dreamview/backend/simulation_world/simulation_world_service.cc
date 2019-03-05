@@ -144,7 +144,7 @@ void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
       world_object->set_type(Object_Type_VIRTUAL);
   }
 
-    world_object->set_sub_type(obstacle.sub_type());
+  world_object->set_sub_type(obstacle.sub_type());
 }
 
 void SetStopReason(const StopReasonCode &reason_code, Decision *decision) {

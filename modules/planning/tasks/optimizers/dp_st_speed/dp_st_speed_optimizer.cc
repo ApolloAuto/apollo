@@ -27,8 +27,8 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_graph.h"
 #include "modules/planning/common/st_graph_data.h"
+#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_graph.h"
 
 namespace apollo {
 namespace planning {

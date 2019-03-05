@@ -87,8 +87,8 @@ class OfflineLidarObstaclePerception {
       return false;
     }
 
-    if (!common::SensorManager::Instance()->GetSensorInfo(
-        FLAGS_sensor_name, &sensor_info_)) {
+    if (!common::SensorManager::Instance()->GetSensorInfo(FLAGS_sensor_name,
+                                                          &sensor_info_)) {
       AERROR << "Failed to get sensor info, sensor name: " << FLAGS_sensor_name;
       return false;
     }
@@ -328,7 +328,7 @@ class OfflineLidarObstaclePerception {
 }  // namespace perception
 }  // namespace apollo
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   FLAGS_alsologtostderr = 1;
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);

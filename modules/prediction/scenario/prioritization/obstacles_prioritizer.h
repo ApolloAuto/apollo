@@ -59,8 +59,8 @@ class ObstaclesPrioritizer {
       std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
 
   static void SetCautionBackward(
-    std::shared_ptr<const hdmap::LaneInfo> start_lane_info_ptr,
-    const double distance);
+      std::shared_ptr<const hdmap::LaneInfo> start_lane_info_ptr,
+      const double distance);
 };
 
 }  // namespace prediction

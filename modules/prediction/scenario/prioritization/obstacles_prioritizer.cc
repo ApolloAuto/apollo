@@ -363,7 +363,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
 void ObstaclesPrioritizer::AssignCautionByMerge(
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
   SetCautionBackward(lane_info_ptr,
-      FLAGS_caution_search_distance_backward_for_merge);
+                     FLAGS_caution_search_distance_backward_for_merge);
 }
 
 void ObstaclesPrioritizer::AssignCautionByOverlap(
@@ -372,15 +372,15 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
   const std::vector<std::shared_ptr<const OverlapInfo>> cross_lanes_ =
       lane_info_ptr->cross_lanes();
   for (const auto overlap_ptr : cross_lanes_) {
-    for (const auto &object : overlap_ptr->overlap().object()) {
-      const auto &object_id = object.id().id();
+    for (const auto& object : overlap_ptr->overlap().object()) {
+      const auto& object_id = object.id().id();
       if (object_id == lane_info_ptr->id().id()) {
         continue;
       } else {
         std::shared_ptr<const LaneInfo> overlap_lane_ptr =
             PredictionMap::LaneById(object_id);
         SetCautionBackward(overlap_lane_ptr,
-            FLAGS_caution_search_distance_backward_for_overlap);
+                           FLAGS_caution_search_distance_backward_for_overlap);
       }
     }
   }

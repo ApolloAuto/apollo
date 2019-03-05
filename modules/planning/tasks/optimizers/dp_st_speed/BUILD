@@ -81,8 +81,8 @@ cc_library(
         "//modules/planning/common:st_graph_data",
         "//modules/planning/proto:dp_st_speed_config_proto",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/tasks/optimizers:speed_optimizer",
         "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
+        "//modules/planning/tasks/optimizers:speed_optimizer",
     ],
 )
 

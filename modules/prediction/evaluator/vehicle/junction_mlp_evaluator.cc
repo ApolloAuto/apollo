@@ -192,8 +192,8 @@ void JunctionMLPEvaluator::SetObstacleFeatureValues(
     ADEBUG << "Obstacle [" << obstacle_ptr->id() << "] has no position.";
     return;
   }
-  std::pair<double, double> obs_curr_pos = std::make_pair(
-      feature.position().x(), feature.position().y());
+  std::pair<double, double> obs_curr_pos =
+      std::make_pair(feature.position().x(), feature.position().y());
   double obs_curr_heading = feature.velocity_heading();
   bool has_history = false;
   std::vector<std::pair<double, double>> pos_history(
