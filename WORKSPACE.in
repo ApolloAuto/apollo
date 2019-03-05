@@ -251,3 +251,10 @@ new_local_repository(
     build_file = "third_party/python27.BUILD",
     path = "/usr",
 )
+
+# PyTorch
+new_local_repository(
+    name = "pytorch",
+    build_file = "third_party/pytorch.BUILD",
+    path = "/usr/local/apollo/libtorch",
+)
