@@ -134,7 +134,7 @@ cc_library(
         "@adolc",
         "@eigen",
         "@ipopt",
-    ]
+    ],
 )
 
 cuda_library(

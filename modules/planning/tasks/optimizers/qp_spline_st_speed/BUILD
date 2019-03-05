@@ -69,8 +69,8 @@ cc_library(
         "//modules/localization/proto:pose_proto",
         "//modules/map/hdmap",
         "//modules/planning/proto:planning_proto",
-        "//modules/planning/tasks/optimizers:speed_optimizer",
         "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
+        "//modules/planning/tasks/optimizers:speed_optimizer",
     ],
 )
 

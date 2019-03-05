@@ -37,8 +37,8 @@
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/common/st_graph_data.h"
+#include "modules/planning/common/trajectory/discretized_trajectory.h"
 
 namespace apollo {
 namespace planning {
