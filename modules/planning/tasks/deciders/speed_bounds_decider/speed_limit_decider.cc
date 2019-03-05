@@ -21,6 +21,7 @@
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
 
 #include <limits>
+#include <tuple>
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/planning/proto/decision.pb.h"
@@ -80,6 +81,8 @@ void SpeedLimitDecider::GetAvgKappa(
 
 Status SpeedLimitDecider::GetSpeedLimits(
     const IndexedList<std::string, Obstacle>& obstacles,
+    const std::vector<std::tuple<double, double, double>>&
+        path_point_decision_guide,
     SpeedLimit* const speed_limit_data) const {
   CHECK_NOTNULL(speed_limit_data);
 
@@ -192,7 +195,9 @@ Status SpeedLimitDecider::GetSpeedLimits(
     }
 
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
-    // TODO(all) implement
+    // TODO(Jinyun) implement
+    // if (speed_bounds_config_.path_point_decision_guide_flag()) {}
+
     speed_limit_data->AppendSoftSpeedLimit(path_s, curr_speed_limit);
   }
   return Status::OK();
