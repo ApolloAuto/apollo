@@ -132,7 +132,7 @@ std::string PathBoundsDecider::GeneratePathBoundaries(
     AERROR << msg;
     return msg;
   }
-  PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(path_boundaries);
 
   // 2. Decide a rough boundary based on road info and ADC's position
   if (!GetBoundariesFromLanesAndADC(reference_line_info->reference_line(),
@@ -155,7 +155,7 @@ std::string PathBoundsDecider::GeneratePathBoundaries(
     AERROR << msg;
     return msg;
   }
-  PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(path_boundaries);
 
   // 4. Adjust the boundary considering dynamic obstacles
   // TODO(all): may need to implement this in the future.
@@ -179,8 +179,7 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundaries(
     AERROR << msg;
     return msg;
   }
-<<<<<<< HEAD
-  PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(path_boundaries);
 
   // 2. Decide a rough boundary based on road info and ADC's position
   if (!GetBoundariesFromLanesAndADC(reference_line_info->reference_line(),
@@ -191,22 +190,10 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundaries(
     AERROR << msg;
     return msg;
   }
-  PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(path_boundaries);
 
   ADEBUG << "Completed generating fallback path boundaries.";
   return "";
-=======
-  reference_line_info->SetPathBoundaries(path_boundaries_pair,
-                                         std::get<0>(path_boundaries[0]),
-                                         kPathBoundsDeciderResolution);
-  reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
-  if (!path_boundaries.empty()) {
-    CHECK_LE(adc_frenet_l_, std::get<2>(path_boundaries[0]));
-    CHECK_GE(adc_frenet_l_, std::get<1>(path_boundaries[0]));
-  }
-  ADEBUG << "Completed path boundaries generation.";
-  return Status::OK();
->>>>>>> parent of d284446... Planning: remove code related to front obs distance
 }
 
 bool PathBoundsDecider::InitPathBoundaries(
@@ -229,6 +216,10 @@ bool PathBoundsDecider::InitPathBoundaries(
       reference_line.GetFrenetPoint(planning_start_point.path_point());
   adc_frenet_s_ = adc_frenet_position.s();
   adc_frenet_l_ = adc_frenet_position.l();
+  auto adc_sl_info =
+      reference_line.ToFrenetFrame(planning_start_point);
+  adc_frenet_sd_ = adc_sl_info.first[1];
+  adc_frenet_ld_ = adc_sl_info.second[1] * adc_frenet_sd_;
   // ADC's lane width.
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
@@ -336,18 +327,28 @@ bool PathBoundsDecider::GetBoundariesFromLanesAndADC(
       }
     }
 
-    // 3. Calculate the proper boundary based on lane-width, road-width, and
-    //    ADC's position.
+    // 3. Calculate the proper boundary based on lane-width, ADC's position,
+    //    and ADC's velocity.
+    constexpr double kMaxLateralAccelerations = 1.0;
+    double ADC_speed_buffer =
+        (adc_frenet_ld_ > 0 ? 1.0 : -1.0) *
+        adc_frenet_ld_ * adc_frenet_ld_ / kMaxLateralAccelerations / 2.0;
+
+    double curr_left_bound_lane = curr_lane_left_width +
+        (lane_borrowing == 1 ? curr_neighbor_lane_width: 0.0);
+    double curr_left_bound_adc =
+        std::fmax(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) +
+        GetBufferBetweenADCCenterAndEdge() + ADC_buffer;
     double curr_left_bound =
-        std::fmax(
-            curr_lane_left_width +
-                (lane_borrowing == 1 ? curr_neighbor_lane_width: 0.0),
-            adc_frenet_l_ + GetBufferBetweenADCCenterAndEdge() + ADC_buffer);
+        std::fmax(curr_left_bound_lane, curr_left_bound_adc);
+
+    double curr_right_bound_lane = -curr_lane_right_width -
+        (lane_borrowing == -1 ? curr_neighbor_lane_width: 0.0);
+    double curr_right_bound_adc =
+        std::fmin(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) -
+        GetBufferBetweenADCCenterAndEdge() - ADC_buffer;
     double curr_right_bound =
-        std::fmin(
-            -curr_lane_right_width -
-                (lane_borrowing == -1 ? curr_neighbor_lane_width: 0.0),
-            adc_frenet_l_ - GetBufferBetweenADCCenterAndEdge() - ADC_buffer);
+        std::fmin(curr_right_bound_lane, curr_right_bound_adc);
 
     // 4. Update the boundary.
     double dummy = 0.0;
