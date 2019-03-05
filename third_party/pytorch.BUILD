@@ -13,10 +13,8 @@ cc_library(
         "lib/libcaffe2_detectron_ops_gpu.so",
         "lib/libcaffe2_gpu.so",
         "lib/libcaffe2_observers.so",
-        "lib/libfoxi.so",
         "lib/libiomp5.so",
         "lib/libmklml_intel.so",
-        "lib/libthnvrtc.so",
         "lib/libshm.so",
         "lib/libonnxifi.so",
     ],
@@ -36,5 +34,6 @@ cc_library(
     deps = [
         "@gtest",
         "@python27",
+        "@cuda",
     ]
 )
