@@ -200,12 +200,12 @@ class LabelGenerator(object):
             #####################################################################
             # Update the obstacle trajectory:
             # Only update for consecutive (sampling rate = 0.1sec) points.
-            obs_traj.append((feature_sequence[j].position.x,\
-                             feature_sequence[j].position.y,\
-                             feature_sequence[j].velocity_heading,\
-                             feature_sequence[j].speed,\
-                             feature_sequence[j].length,\
-                             feature_sequence[j].width,\
+            obs_traj.append((feature_sequence[j].position.x,
+                             feature_sequence[j].position.y,
+                             feature_sequence[j].velocity_heading,
+                             feature_sequence[j].speed,
+                             feature_sequence[j].length,
+                             feature_sequence[j].width,
                              feature_sequence[j].timestamp))
 
             #####################################################################
