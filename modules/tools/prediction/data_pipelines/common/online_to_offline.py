@@ -436,6 +436,7 @@ class LabelGenerator(object):
                 # Construct dictionary of all exit with dict[exit_lane_id] = np.array(exit_position)
                 exit_dict = dict()
                 exit_pos_dict = dict()
+                mask = [0] * 12
                 for junction_exit in fea.junction_feature.junction_exit:
                     if junction_exit.HasField('exit_lane_id'):
                         exit_dict[junction_exit.exit_lane_id] = \
@@ -444,8 +445,13 @@ class LabelGenerator(object):
                                           junction_exit.exit_heading,
                                           0.01,
                                           junction_exit.exit_width)
-                        exit_pos_dict[junction_exit.exit_lane_id] = np.array(
-                            [junction_exit.exit_position.x, junction_exit.exit_position.y])
+                        exit_pos = np.array([junction_exit.exit_position.x, junction_exit.exit_position.y])
+                        exit_pos_dict[junction_exit.exit_lane_id] = exit_pos
+                        delta_pos = exit_pos - curr_pos
+                        angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
+                        d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
+                        mask[d_idx] = 1
+
                 # Searching for up to 100 frames (10 seconds)
                 for j in range(i, min(i + 100, feature_seq_len)):
                     car_bounding = BoundingRectangle(feature_sequence[j].position.x,
@@ -461,10 +467,10 @@ class LabelGenerator(object):
                             angle = math.atan2(
                                 delta_pos[1], delta_pos[0]) - heading
                             d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
-                            label = [0 for idx in range(12)]
+                            label = [0] * 12
                             label[d_idx] = 1
                             fea.junction_feature.junction_mlp_label.extend(label)
-                            self.junction_label_dict["{}@{:.3f}".format(fea.id, fea.timestamp)] = label
+                            self.junction_label_dict["{}@{:.3f}".format(fea.id, fea.timestamp)] = label + mask
                             break  # actually break two level
                     else:
                         continue
