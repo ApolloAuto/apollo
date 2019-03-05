@@ -42,12 +42,6 @@ OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig &config)
       apollo::common::VehicleConfigHelper::GetConfig().vehicle_param();
 }
 
-Status OpenSpaceRoiDecider::Process(Frame *frame,
-                                    ReferenceLineInfo *reference_line_info) {
-  // no need to pass reference line for open space
-  return Status::OK();
-}
-
 Status OpenSpaceRoiDecider::Process(Frame *frame) {
   // TODO(Jinyun) only run GetOpenSpaceROI() at the first frame of
   // open space planner to save computation effort
