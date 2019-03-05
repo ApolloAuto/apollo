@@ -135,6 +135,9 @@ DEFINE_string(evaluator_cruise_vehicle_go_model_file,
 DEFINE_string(evaluator_cruise_vehicle_cutin_model_file,
               "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.bin",
               "Vehicle cruise cut-in model file");
+DEFINE_string(torch_vehicle_junction_mlp_file,
+              "/apollo/modules/prediction/data/junction_mlp_vehicle_model.pt",
+              "Vehicle junction MLP model file");
 DEFINE_string(evaluator_vehicle_junction_mlp_file,
               "/apollo/modules/prediction/data/junction_mlp_vehicle_model.bin",
               "Vehicle junction MLP model file");
