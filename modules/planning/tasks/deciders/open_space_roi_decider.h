@@ -49,10 +49,7 @@ class OpenSpaceRoiDecider : public Decider {
   explicit OpenSpaceRoiDecider(const TaskConfig &config);
 
  private:
-  apollo::common::Status Process(
-      Frame *frame, ReferenceLineInfo *reference_line_info) override;
-
-  apollo::common::Status Process(Frame *frame);
+  apollo::common::Status Process(Frame *frame) override;
 
  private:
   // private functions copied from open_space_ROI.h

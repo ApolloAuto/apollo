@@ -28,10 +28,7 @@ using apollo::common::Status;
 OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
     : Decider(config) {}
 
-Status OpenSpaceFallbackDecider::Process(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  return Status::OK();
-}
+Status OpenSpaceFallbackDecider::Process(Frame* frame) { return Status::OK(); }
 
 }  // namespace planning
 }  // namespace apollo
