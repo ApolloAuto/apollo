@@ -20,6 +20,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include "torch/script.h"
+
 #include "cyber/common/file.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/math/vec2d.h"
@@ -87,9 +89,30 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     ADEBUG << "Save extracted features for learning locally.";
     return;  // Skip Compute probability for offline mode
   }
+  torch::Device device(torch::kCPU);
+  // if (torch::cuda::is_available()) {
+  //   AERROR << "CUDA is available";
+  //   device = torch::Device(torch::kCUDA);
+  // }
+  std::vector<torch::jit::IValue> torch_inputs;
+  int input_dim = static_cast<int>(OBSTACLE_FEATURE_SIZE +
+      EGO_VEHICLE_FEATURE_SIZE + JUNCTION_FEATURE_SIZE);
+  torch::Tensor torch_input = torch::zeros({1, input_dim});
+  for (size_t i = 0; i < feature_values.size(); ++i) {
+    torch_input[0][i] = static_cast<float>(feature_values[i]);
+  }
+  torch_inputs.push_back(torch_input.to(device));
+  std::shared_ptr<torch::jit::script::Module> torch_module =
+      torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device);
+
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
-    probability = ComputeProbability(feature_values);
+    at::Tensor torch_output_tensor =
+        torch_module->forward(torch_inputs).toTensor();
+    auto torch_output = torch_output_tensor.accessor<float, 2>();
+    for (int i = 0; i < torch_output.size(1); ++i) {
+      probability.push_back(static_cast<double>(torch_output[0][i]));
+    }
   } else {
     for (int i = 0; i < 12; ++i) {
       probability.push_back(feature_values[OBSTACLE_FEATURE_SIZE +
