@@ -42,7 +42,7 @@ constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
 constexpr double kObstacleSBuffer = 1.0;
-constexpr double kObstacleLBuffer = 0.3;
+constexpr double kObstacleLBuffer = 0.5;
 
 PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -140,7 +140,7 @@ bool PathBoundsDecider::InitPathBoundaries(
   double lane_right_width = 0.0;
   if (!reference_line.GetLaneWidth(adc_frenet_s_, &lane_left_width,
                                    &lane_right_width)) {
-    AERROR << "Failed to get lane width at planning start point.";
+    AWARN << "Failed to get lane width at planning start point.";
     adc_lane_width_ = kDefaultLaneWidth;
   } else {
     adc_lane_width_ = lane_left_width + lane_right_width;
@@ -410,7 +410,7 @@ bool PathBoundsDecider::GetLaneInfoFromPoint(
           common::util::MakePointENU(point_x, point_y, point_z),
           kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff, lane, &s,
           &l) != 0) {
-    AERROR << "Failed to find nearest lane from map at position: "
+    AWARN << "Failed to find nearest lane from map at position: "
            << "(x, y, z) = (" << point_x << ", " << point_y << ", " << point_z
            << ")"
            << ", heading = " << point_theta;
@@ -440,6 +440,17 @@ PathBoundsDecider::SortObstaclesForSweepLine(
   for (const auto* obstacle : indexed_obstacles.Items()) {
     // Only focus on non-virtual obstacles.
     if (obstacle->IsVirtual()) {
+      continue;
+    }
+    // Only focus on non-ignoring obstacles.
+    bool has_ignore_decision = false;
+    for (auto decision : obstacle->decisions()) {
+      if (decision.has_ignore()) {
+        has_ignore_decision = true;
+        break;
+      }
+    }
+    if (has_ignore_decision) {
       continue;
     }
     // Only focus on static obstacles.
