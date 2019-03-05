@@ -76,6 +76,26 @@ Status PathBoundsDecider::Process(
   }
   PathBoundsDebugString(path_boundaries);
 
+  // This rough boundary can be the fallback path boundaries.
+  if (path_boundaries.empty()) {
+    const std::string msg =
+        "Failed to get a valid fallback path boundary";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+  std::vector<std::pair<double, double>> fallback_path_boundaries_pair;
+  for (size_t i = 0; i < path_boundaries.size(); ++i) {
+    fallback_path_boundaries_pair.emplace_back(
+        std::get<1>(path_boundaries[i]), std::get<2>(path_boundaries[i]));
+  }
+  reference_line_info->SetFallbackPathBoundaries(
+      fallback_path_boundaries_pair, std::get<0>(path_boundaries[0]),
+      kPathBoundsDeciderResolution);
+  if (!path_boundaries.empty()) {
+    CHECK_LE(adc_frenet_l_, std::get<2>(path_boundaries[0]));
+    CHECK_GE(adc_frenet_l_, std::get<1>(path_boundaries[0]));
+  }
+
   // 2. Fine-tune the boundary based on static obstacles
   // TODO(all): in the future, add side-pass functionality.
   if (!GetBoundariesFromStaticObstacles(
@@ -94,7 +114,8 @@ Status PathBoundsDecider::Process(
 
   // Update the path boundary info to the frame.
   if (path_boundaries.empty()) {
-    const std::string msg = "Failed to get a valid path boundary";
+    const std::string msg =
+        "Failed to get a valid path boundary";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -413,9 +434,9 @@ bool PathBoundsDecider::GetLaneInfoFromPoint(
           kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff, lane, &s,
           &l) != 0) {
     AWARN << "Failed to find nearest lane from map at position: "
-           << "(x, y, z) = (" << point_x << ", " << point_y << ", " << point_z
-           << ")"
-           << ", heading = " << point_theta;
+          << "(x, y, z) = (" << point_x << ", " << point_y << ", " << point_z
+          << ")"
+          << ", heading = " << point_theta;
     return false;
   }
   return true;
