@@ -650,6 +650,11 @@ function config() {
   ${APOLLO_ROOT_DIR}/scripts/configurator.sh
 }
 
+function set_use_gpu() {
+  DEFINES="${DEFINES} --define USE_GPU=true"
+  USE_GPU="1"
+}
+
 function print_usage() {
   RED='\033[0;31m'
   BLUE='\033[0;34m'
@@ -708,8 +713,7 @@ function main() {
       check $@
       ;;
     build)
-      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
-      USE_GPU="1"
+      set_use_gpu
       apollo_build_dbg $@
       ;;
     build_cpu)
@@ -760,13 +764,12 @@ function main() {
       apollo_build_opt $@
       ;;
     build_gpu)
-      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
-      USE_GPU="1"
+      set_use_gpu
       apollo_build_dbg $@
       ;;
     build_opt_gpu)
-      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU --copt=-fpic"
-      USE_GPU="1"
+      set_use_gpu
+      DEFINES="${DEFINES} --copt=-fpic"
       apollo_build_opt $@
       ;;
     build_fe)
@@ -788,8 +791,7 @@ function main() {
       run_lint
       ;;
     test)
-      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
-      USE_GPU="1"
+      set_use_gpu
       run_test $@
       ;;
     test_cpu)
@@ -809,8 +811,7 @@ function main() {
       citest_extended $@
       ;;
     test_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
-      USE_GPU="1"
+      set_use_gpu
       run_test $@
       ;;
     release)
