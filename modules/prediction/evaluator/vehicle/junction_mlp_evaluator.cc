@@ -21,6 +21,7 @@
 #include <utility>
 
 #include "torch/script.h"
+#include "torch/torch.h"
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
@@ -90,8 +91,9 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;  // Skip Compute probability for offline mode
   }
   torch::Device device(torch::kCPU);
+  // TODO(all) uncomment the following when cuda issue is resolved
   // if (torch::cuda::is_available()) {
-  //   AERROR << "CUDA is available";
+  //   ADEBUG << "CUDA is available";
   //   device = torch::Device(torch::kCUDA);
   // }
   std::vector<torch::jit::IValue> torch_inputs;
