@@ -34,16 +34,15 @@ template ret routine
 TEMPLATE_ROUTINE_INSTANCE(bool, data_transfer(type *dst,    \
     const type *src, const int size))
 
-#define CUDA_CHECK(call)                              \
-{                                                     \
-    const cudaError_t error = call;                   \
-    if (error != cudaSuccess) {                       \
-        printf("Error: %s:%d, ", __FILE__, __LINE__); \
-        printf("code: %d, reasone: %s\n", error,      \
-            cudaGetErrorString(error));               \
-        return false;                                 \
-    }                                                 \
-}
+#define CUDA_CHECK(call)                                                   \
+  {                                                                        \
+    const cudaError_t error = call;                                        \
+    if (error != cudaSuccess) {                                            \
+      printf("Error: %s:%d, ", __FILE__, __LINE__);                        \
+      printf("code: %d, reasone: %s\n", error, cudaGetErrorString(error)); \
+      return false;                                                        \
+    }                                                                      \
+  }
 
 bool InitialCuda();
 

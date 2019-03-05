@@ -187,14 +187,13 @@ class OpenSpaceInfo {
     return &chosen_paritioned_trajectory_;
   }
 
-  bool *mutable_fallback_flag() {return &fallback_flag_;}
+  bool *mutable_fallback_flag() { return &fallback_flag_; }
 
-  const bool &fallback_flag() {return fallback_flag_;}
+  const bool &fallback_flag() { return fallback_flag_; }
 
-  TrajGearPair *mutable_fallback_trajectory() {return &fallback_trajectory_;}
+  TrajGearPair *mutable_fallback_trajectory() { return &fallback_trajectory_; }
 
-  const TrajGearPair &fallback_trajectory() {return fallback_trajectory_;}
-
+  const TrajGearPair &fallback_trajectory() { return fallback_trajectory_; }
 
  private:
   // @brief obstacles total num including perception obstacles and parking space

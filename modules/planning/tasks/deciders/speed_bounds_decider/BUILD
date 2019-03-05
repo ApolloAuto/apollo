@@ -17,8 +17,8 @@ cc_library(
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:st_graph_data",
-        "//modules/planning/tasks/deciders:decider_base",
         "//modules/planning/tasks:task",
+        "//modules/planning/tasks/deciders:decider_base",
     ],
 )
 

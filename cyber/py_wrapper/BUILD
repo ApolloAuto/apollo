@@ -73,9 +73,10 @@ cc_library(
     srcs = ["cyber_topology_manager_wrap.cc"],
     hdrs = ["py_topology_manager.h"],
     deps = [
-        "//cyber/service_discovery:topology_manager",
         "//cyber:cyber_core",
+        "//cyber/service_discovery:topology_manager",
         "@python27",
     ],
 )
+
 cpplint()

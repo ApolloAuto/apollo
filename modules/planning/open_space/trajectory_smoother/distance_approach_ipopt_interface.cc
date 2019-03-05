@@ -177,8 +177,8 @@ bool DistanceApproachIPOPTInterface::get_bounds_info(int n, double* x_l,
                                                      double* x_u, int m,
                                                      double* g_l, double* g_u) {
   ADEBUG << "get_bounds_info";
-  CHECK(XYbounds_.size() == 4) << "XYbounds_ size is not 4, but"
-                               << XYbounds_.size();
+  CHECK(XYbounds_.size() == 4)
+      << "XYbounds_ size is not 4, but" << XYbounds_.size();
 
   // Variables: includes state, u, sample time and lagrange multipliers
   // 1. state variables, 4 * [0, horizon]
@@ -588,8 +588,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
                                                     int nele_jac, int* iRow,
                                                     int* jCol, double* values) {
   ADEBUG << "eval_jac_g";
-  CHECK_EQ(n, num_of_variables_) << "No. of variables wrong in eval_jac_g. n : "
-                                 << n;
+  CHECK_EQ(n, num_of_variables_)
+      << "No. of variables wrong in eval_jac_g. n : " << n;
   CHECK_EQ(m, num_of_constraints_)
       << "No. of constraints wrong in eval_jac_g. n : " << m;
 
@@ -1456,8 +1456,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
                                                     int nele_jac, int* iRow,
                                                     int* jCol, double* values) {
   ADEBUG << "eval_jac_g";
-  CHECK_EQ(n, num_of_variables_) << "No. of variables wrong in eval_jac_g. n : "
-                                 << n;
+  CHECK_EQ(n, num_of_variables_)
+      << "No. of variables wrong in eval_jac_g. n : " << n;
   CHECK_EQ(m, num_of_constraints_)
       << "No. of constraints wrong in eval_jac_g. n : " << m;
 

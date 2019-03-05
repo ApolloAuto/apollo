@@ -34,7 +34,7 @@ using apollo::hdmap::Path;
 
 constexpr double kMathEpsilon = 1e-8;
 
-OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig& config)
+OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig &config)
     : Decider(config) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
@@ -42,25 +42,24 @@ OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig& config)
       apollo::common::VehicleConfigHelper::GetConfig().vehicle_param();
 }
 
-Status OpenSpaceRoiDecider::Process(Frame* frame,
-                                    ReferenceLineInfo* reference_line_info) {
+Status OpenSpaceRoiDecider::Process(Frame *frame,
+                                    ReferenceLineInfo *reference_line_info) {
   // no need to pass reference line for open space
   return Status::OK();
 }
 
-Status OpenSpaceRoiDecider::Process(Frame* frame) {
+Status OpenSpaceRoiDecider::Process(Frame *frame) {
   // TODO(Jinyun) only run GetOpenSpaceROI() at the first frame of
   // open space planner to save computation effort
   vehicle_state_ = frame->vehicle_state();
   obstacles_by_frame_ = frame->GetObstacleList();
   if (frame->local_view().routing->routing_request().has_parking_space() &&
       frame->local_view().routing->routing_request().parking_space().has_id()) {
-    target_parking_spot_id_ =
-        frame->local_view()
-        .routing->routing_request()
-        .parking_space()
-        .id()
-        .id();
+    target_parking_spot_id_ = frame->local_view()
+                                  .routing->routing_request()
+                                  .parking_space()
+                                  .id()
+                                  .id();
   } else {
     const std::string msg = "Failed to get parking space id from routing";
     AERROR << msg;
@@ -87,7 +86,7 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
     size_t perception_obstacles_num = obstacles_by_frame_->Items().size();
 
     frame_->mutable_open_space_info()->set_obstacles_num(
-      perception_obstacles_num + parking_boundaries_num);
+        perception_obstacles_num + parking_boundaries_num);
     if (perception_obstacles_num == 0) {
       AERROR << "no obstacle given by percption";
     }
@@ -102,7 +101,7 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
             parking_boundaries_obstacles_edges_num.rows(),
         1);
     *(frame_->mutable_open_space_info()->mutable_obstacles_edges_num())
-      << perception_obstacles_edges_num_,
+        << perception_obstacles_edges_num_,
         parking_boundaries_obstacles_edges_num;
     // load vertices for perception obstacles(repeat the first vertice at the
     // last to form closed convex hull)
@@ -122,8 +121,9 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
       // repeated at the end of the vector to help transform all four edges to
       // inequality constraint
       vertices_cw.push_back(vertices_cw.front());
-      frame_->mutable_open_space_info()->mutable_obstacles_vertices_vec()
-            ->emplace_back(vertices_cw);
+      frame_->mutable_open_space_info()
+          ->mutable_obstacles_vertices_vec()
+          ->emplace_back(vertices_cw);
     }
   } else {
     frame_->mutable_open_space_info()->set_obstacles_num(
@@ -143,21 +143,20 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
   for (size_t i = 0; i < parking_boundaries_num; ++i) {
     // directly load the ROI_distance_approach_parking_boundary_ into
     // obstacles_vertices_vec_
-          frame_->mutable_open_space_info()->mutable_obstacles_vertices_vec()
-                ->emplace_back(ROI_parking_boundary_[i]);
+    frame_->mutable_open_space_info()
+        ->mutable_obstacles_vertices_vec()
+        ->emplace_back(ROI_parking_boundary_[i]);
   }
   return true;
 }
 
 bool OpenSpaceRoiDecider::HPresentationObstacle() {
-  *(frame_->mutable_open_space_info()->mutable_obstacles_A())
-      = Eigen::MatrixXd::Zero(
-      frame_->open_space_info().obstacles_edges_num().sum(),
-        2);
-  *(frame_->mutable_open_space_info()->mutable_obstacles_b())
-      = Eigen::MatrixXd::Zero(
-      frame_->open_space_info().obstacles_edges_num().sum(),
-        1);
+  *(frame_->mutable_open_space_info()->mutable_obstacles_A()) =
+      Eigen::MatrixXd::Zero(
+          frame_->open_space_info().obstacles_edges_num().sum(), 2);
+  *(frame_->mutable_open_space_info()->mutable_obstacles_b()) =
+      Eigen::MatrixXd::Zero(
+          frame_->open_space_info().obstacles_edges_num().sum(), 1);
   // vertices using H-represetntation
   if (!ObsHRep(frame_->open_space_info().obstacles_num(),
                frame_->open_space_info().obstacles_edges_num(),
@@ -274,10 +273,10 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
   double center_line_s = (left_top_s + right_top_s) / 2;
   double start_s =
       center_line_s -
-        config_.open_space_roi_decider_config().roi_longitudinal_range();
+      config_.open_space_roi_decider_config().roi_longitudinal_range();
   double end_s =
       center_line_s +
-        config_.open_space_roi_decider_config().roi_longitudinal_range();
+      config_.open_space_roi_decider_config().roi_longitudinal_range();
   hdmap::MapPathPoint end_point = nearby_path->GetSmoothPoint(end_s);
   hdmap::MapPathPoint start_point = nearby_path->GetSmoothPoint(start_s);
   double start_left_width = nearby_path->GetRoadLeftWidth(start_s);
@@ -308,8 +307,8 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
 
   // rotate the points to have the lane to be horizontal to x axis and scale
   // them base on the origin point
-  *(frame_->mutable_open_space_info()->mutable_origin_heading())
-      = nearby_path->GetSmoothPoint(center_line_s).heading();
+  *(frame_->mutable_open_space_info()->mutable_origin_heading()) =
+      nearby_path->GetSmoothPoint(center_line_s).heading();
   frame_->mutable_open_space_info()->mutable_origin_point()->set_x(
       left_top.x());
   frame_->mutable_open_space_info()->mutable_origin_point()->set_y(
@@ -338,34 +337,39 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
   if (parking_spot_heading_ > kMathEpsilon) {
     if (config_.open_space_roi_decider_config().parking_inwards()) {
       end_y = left_down.y() - std::max(3 * (left_down.y() - left_top.y()) / 4,
-          vehicle_params_.front_edge_to_center());
+                                       vehicle_params_.front_edge_to_center());
     } else {
       end_y = left_down.y() - std::max((left_down.y() - left_top.y()) / 4,
-          vehicle_params_.back_edge_to_center());
+                                       vehicle_params_.back_edge_to_center());
     }
   } else {
     if (config_.open_space_roi_decider_config().parking_inwards()) {
       end_y = left_down.y() + std::max(3 * (left_top.y() - left_down.y()) / 4,
-          vehicle_params_.front_edge_to_center());
+                                       vehicle_params_.front_edge_to_center());
     } else {
       end_y = left_down.y() + std::max((left_top.y() - left_down.y()) / 4,
-          vehicle_params_.back_edge_to_center());
+                                       vehicle_params_.back_edge_to_center());
     }
   }
 
-  frame_->mutable_open_space_info()->mutable_open_space_end_pose()
+  frame_->mutable_open_space_info()
+      ->mutable_open_space_end_pose()
       ->emplace_back(end_x);
-  frame_->mutable_open_space_info()->mutable_open_space_end_pose()
+  frame_->mutable_open_space_info()
+      ->mutable_open_space_end_pose()
       ->emplace_back(end_y);
   if (config_.open_space_roi_decider_config().parking_inwards()) {
-    frame_->mutable_open_space_info()->mutable_open_space_end_pose()
+    frame_->mutable_open_space_info()
+        ->mutable_open_space_end_pose()
         ->emplace_back(parking_spot_heading_);
   } else {
-    frame_->mutable_open_space_info()->mutable_open_space_end_pose()
-        ->emplace_back(common::math::NormalizeAngle(
-            parking_spot_heading_ + M_PI));
+    frame_->mutable_open_space_info()
+        ->mutable_open_space_end_pose()
+        ->emplace_back(
+            common::math::NormalizeAngle(parking_spot_heading_ + M_PI));
   }
-  frame_->mutable_open_space_info()->mutable_open_space_end_pose()
+  frame_->mutable_open_space_info()
+      ->mutable_open_space_end_pose()
       ->emplace_back(0.0);
 
   // get xy boundary of the ROI
@@ -454,8 +458,7 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
 void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
     std::shared_ptr<Path> *nearby_path,
     ParkingSpaceInfoConstPtr *target_parking_spot) {
-  const auto &parking_space_overlaps = (
-        *nearby_path)->parking_space_overlaps();
+  const auto &parking_space_overlaps = (*nearby_path)->parking_space_overlaps();
   if (parking_space_overlaps.size() != 0) {
     for (const auto &parking_overlap : parking_space_overlaps) {
       if (parking_overlap.object_id == target_parking_spot_id_) {
@@ -468,12 +471,10 @@ void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
 }
 
 bool OpenSpaceRoiDecider::GetMapInfo(
-      ParkingSpaceInfoConstPtr *target_parking_spot,
-      std::shared_ptr<Path> *nearby_path) {
+    ParkingSpaceInfoConstPtr *target_parking_spot,
+    std::shared_ptr<Path> *nearby_path) {
   auto point = common::util::MakePointENU(
-      vehicle_state_.x(),
-      vehicle_state_.y(),
-      vehicle_state_.z());
+      vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
   hdmap::LaneInfoConstPtr nearest_lane;
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
@@ -548,8 +549,7 @@ bool OpenSpaceRoiDecider::CheckDistanceToParkingSpot(
   (*nearby_path)
       ->GetNearestPoint(right_bottom_point, &right_bottom_point_s,
                         &right_bottom_point_l);
-  Vec2d vehicle_vec(vehicle_state_.x(),
-                    vehicle_state_.y());
+  Vec2d vehicle_vec(vehicle_state_.x(), vehicle_state_.y());
   (*nearby_path)
       ->GetNearestPoint(vehicle_vec, &vehicle_point_s, &vehicle_point_l);
   if (std::abs((left_bottom_point_s + right_bottom_point_s) / 2 -

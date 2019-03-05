@@ -262,8 +262,8 @@ void ADCTrajectoryContainer::SetPosition(const Vec2d& position) {
   ADEBUG << "Generate an ADC lane ids [" << ToString(adc_lane_ids_) << "].";
 }
 
-const std::vector<std::string>&
-ADCTrajectoryContainer::GetADCLaneIDSequence() const {
+const std::vector<std::string>& ADCTrajectoryContainer::GetADCLaneIDSequence()
+    const {
   return adc_lane_seq_;
 }
 

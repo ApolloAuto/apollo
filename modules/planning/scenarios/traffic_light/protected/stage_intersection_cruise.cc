@@ -52,7 +52,7 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
   if (pnc_junction_overlaps.size() == 0) {
     // pnc_junction not exist on map, use current traffic_light's end_s
     if (PlanningContext::GetScenarioInfo()
-        ->current_traffic_light_overlaps.size() == 0) {
+            ->current_traffic_light_overlaps.size() == 0) {
       return FinishStage();
     } else {
       constexpr double kIntersectionPassDist = 20.0;  // unit: m
