@@ -81,15 +81,19 @@ class RecordViewer {
  private:
   friend class Iterator;
 
-  void Sort();
+  void Init();
   void Reset();
   void UpdateTime();
   bool FillBuffer();
 
   uint64_t begin_time_ = 0;
   uint64_t end_time_ = UINT64_MAX;
+  // User defined channels
   std::set<std::string> channels_;
+  // All channel in user defined readers
+  std::set<std::string> channel_list_;
   std::vector<RecordReaderPtr> readers_;
+  std::vector<bool> readers_finished_;
 
   uint64_t curr_begin_time_ = 0;
   std::multimap<uint64_t, std::shared_ptr<RecordMessage>> msg_buffer_;
