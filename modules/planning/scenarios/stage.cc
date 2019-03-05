@@ -113,6 +113,27 @@ bool Stage::ExecuteTaskOnReferenceLine(
   return true;
 }
 
+bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
+  auto ret = common::Status::OK();
+  for (auto* task : task_list_) {
+    ret = task->Execute(frame);
+    if (!ret.ok()) {
+      AERROR << "Failed to run tasks[" << task->Name()
+             << "], Error message: " << ret.error_message();
+      return false;
+    }
+  }
+
+  if (frame->open_space_info().fallback_flag()) {
+    *(frame->mutable_open_space_info()->mutable_trajectory_data()) =
+        frame->open_space_info().fallback_trajectory();
+  } else {
+    *(frame->mutable_open_space_info()->mutable_trajectory_data()) =
+        frame->open_space_info().chosen_paritioned_trajectory();
+  }
+  return true;
+}
+
 Stage::StageStatus Stage::FinishScenario() {
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;

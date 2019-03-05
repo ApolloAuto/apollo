@@ -189,11 +189,17 @@ class OpenSpaceInfo {
 
   bool *mutable_fallback_flag() { return &fallback_flag_; }
 
-  const bool &fallback_flag() { return fallback_flag_; }
+  const bool &fallback_flag() const { return fallback_flag_; }
 
   TrajGearPair *mutable_fallback_trajectory() { return &fallback_trajectory_; }
 
-  const TrajGearPair &fallback_trajectory() { return fallback_trajectory_; }
+  const TrajGearPair &fallback_trajectory() const {
+    return fallback_trajectory_;
+  }
+
+  TrajGearPair *mutable_trajectory_data() { return &trajectory_data_; }
+
+  const TrajGearPair &trajectory_data() const { return trajectory_data_; }
 
  private:
   // @brief obstacles total num including perception obstacles and parking space
@@ -246,6 +252,8 @@ class OpenSpaceInfo {
   bool fallback_flag_ = true;
 
   TrajGearPair fallback_trajectory_;
+
+  TrajGearPair trajectory_data_;
 };
 }  // namespace planning
 }  // namespace apollo
