@@ -42,13 +42,22 @@ class PathBoundsDecider : public Decider {
   common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
+  std::string GeneratePathBoundaries(
+      Frame* frame, ReferenceLineInfo* reference_line_info,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+
+  std::string GenerateFallbackPathBoundaries(
+      Frame* frame, ReferenceLineInfo* reference_line_info,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+
   bool InitPathBoundaries(
       const ReferenceLine& reference_line,
       const common::TrajectoryPoint& planning_start_point,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundariesFromLanesAndADC(
-      const ReferenceLine& reference_line,  int lane_borrowing,
+      const ReferenceLine& reference_line,
+      int lane_borrowing, double ADC_buffer,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundariesFromStaticObstacles(
@@ -98,7 +107,7 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   void PathBoundsDebugString(
-      const std::vector<std::tuple<double, double, double>>& path_boundaries);
+      const std::vector<std::tuple<double, double, double>>* path_boundaries);
 
  private:
   std::string blocking_obstacle_id_ = "";
