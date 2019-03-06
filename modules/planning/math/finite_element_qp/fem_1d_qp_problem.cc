@@ -92,14 +92,12 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
   // Solve Problem
   osqp_solve(*work);
 
-  /**
   auto status = (*work)->info->status_val;
 
-  if (status < 1) {
+  if (status < 0) {
     AERROR << "failed optimization status:\t" << (*work)->info->status;
     return false;
   }
-  **/
 
   /**
   if (status != 1 && status != 2) {
