@@ -17,11 +17,11 @@
 // Converts GPS timestamp from/to UNIX system timestamp.
 // This helper is considering leap second.
 
-#ifndef MODULES_DRIVERS_GNSS_TIME_CONVERSION_H_
-#define MODULES_DRIVERS_GNSS_TIME_CONVERSION_H_
+#pragma once
 
 #include <stdint.h>
 
+#include "modules/common/time/time_util.h"
 #include "modules/drivers/gnss/util/macros.h"
 
 namespace apollo {
@@ -114,30 +114,29 @@ static const int32_t LEAP_SECONDS[][2] = {
 // 315964800 = 315993600 - 28800
 
 const int32_t GPS_AND_SYSTEM_DIFF_SECONDS = 315964800;
+const int64_t ONE_MILLION = 1000000L;
+const int64_t ONE_BILLION = 1000000000L;
 
-template <typename T>
-T unix2gps(const T unix_seconds) {
-  for (size_t i = 0; i < array_size(LEAP_SECONDS); ++i) {
-    if (unix_seconds >= LEAP_SECONDS[i][0]) {
-      return unix_seconds - (GPS_AND_SYSTEM_DIFF_SECONDS - LEAP_SECONDS[i][1]);
-    }
-  }
-  return static_cast<T>(0);
+inline int64_t UnixToGpsMicroSeconds(int64_t unix_microseconds) {
+  return common::time::TimeUtil::Unix2gps(unix_microseconds / ONE_MILLION) *
+             ONE_MILLION + unix_microseconds % ONE_MILLION;
 }
 
-template <typename T>
-T gps2unix(const T gps_seconds) {
-  for (size_t i = 0; i < array_size(LEAP_SECONDS); ++i) {
-    T result = gps_seconds + (GPS_AND_SYSTEM_DIFF_SECONDS - LEAP_SECONDS[i][1]);
-    if (result >= LEAP_SECONDS[i][0]) {
-      return result;
-    }
-  }
-  return static_cast<T>(0);
+inline int64_t UnixToGpsNanoSeconds(int64_t unix_nanoseconds) {
+  return common::time::TimeUtil::Unix2gps(unix_nanoseconds / ONE_BILLION) *
+             ONE_BILLION + unix_nanoseconds % ONE_BILLION;
+}
+
+inline int64_t GpsToUnixMicroSeconds(int64_t gps_microseconds) {
+  return common::time::TimeUtil::Gps2unix(gps_microseconds / ONE_MILLION) *
+             ONE_MILLION + gps_microseconds % ONE_MILLION;
+}
+
+inline int64_t GpsToUnixNanoSeconds(int64_t gps_nanoseconds) {
+  return common::time::TimeUtil::Gps2unix(gps_nanoseconds / ONE_BILLION) *
+             ONE_BILLION + gps_nanoseconds % ONE_BILLION;
 }
 
 }  // namespace util
 }  // namespace drivers
 }  // namespace apollo
-
-#endif  // MODULES_DRIVERS_GNSS_TIME_CONVERSION_H_

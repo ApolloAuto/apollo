@@ -24,7 +24,7 @@
 #include "modules/common/math/euler_angles_zxy.h"
 #include "modules/common/time/time_util.h"
 #include "modules/localization/msf/common/util/math_util.h"
-#include "modules/localization/msf/common/util/time_conversion.h"
+#include "modules/drivers/gnss/util/time_conversion.h"
 
 namespace apollo {
 namespace localization {
@@ -623,7 +623,7 @@ bool MeasureRepublishProcess::GnssHeadingProcess(
   measure_data->time = heading_msg.measurement_time();
 
   if (is_trans_gpstime_to_utctime_) {
-    measure_data->time = GpsToUnixSeconds(measure_data->time);
+    measure_data->time = common::time::TimeUtil::Gps2unix(measure_data->time);
   }
 
   novatel_heading_mutex_.lock();

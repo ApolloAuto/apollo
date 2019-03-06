@@ -563,7 +563,7 @@ bool NewtonM2Parser::HandleInsPva(const newtonm2::InsPva* pva) {
 bool NewtonM2Parser::HandleInsPvax(const newtonm2::InsPvaX* pvax,
                                    uint16_t gps_week, uint32_t gps_millisecs) {
   double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
-  double unix_sec = apollo::drivers::util::gps2unix(seconds);
+  double unix_sec = common::time::TimeUtil::Gps2unix(seconds);
   ins_stat_.mutable_header()->set_timestamp_sec(unix_sec);
   ins_stat_.set_ins_status(pvax->ins_status);
   ins_stat_.set_pos_type(pvax->pos_type);
