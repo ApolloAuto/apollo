@@ -17,6 +17,9 @@
 #include <limits>
 #include <utility>
 
+#include "torch/script.h"
+#include "torch/torch.h"
+
 #include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -99,20 +102,27 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       return;  // Skip Compute probability for offline mode
     }
 
-    Eigen::MatrixXf obs_feature_mat =
-        VectorToMatrixXf(feature_values, 0, OBSTACLE_FEATURE_SIZE);
-    Eigen::MatrixXf lane_feature_mat = VectorToMatrixXf(
-        feature_values, OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE,
-        static_cast<int>(feature_values.size()), SINGLE_LANE_FEATURE_SIZE,
-        LANE_POINTS_SIZE);
-    Eigen::MatrixXf model_output;
-    if (lane_sequence_ptr->vehicle_on_lane()) {
-      go_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
-    } else {
-      cutin_model_ptr_->Run({lane_feature_mat, obs_feature_mat}, &model_output);
+    torch::Device device(torch::kCPU);
+    // TODO(all) uncomment the following when cuda issue is resolved
+    // if (torch::cuda::is_available()) {
+    //   ADEBUG << "CUDA is available";
+    //   device = torch::Device(torch::kCUDA);
+    // }
+    std::vector<torch::jit::IValue> torch_inputs;
+    int input_dim = static_cast<int>(OBSTACLE_FEATURE_SIZE +
+      INTERACTION_FEATURE_SIZE + SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE);
+    torch::Tensor torch_input = torch::zeros({1, input_dim});
+    for (size_t i = 0; i < feature_values.size(); ++i) {
+      torch_input[0][i] = static_cast<float>(feature_values[i]);
     }
-    double probability = model_output(0, 0);
-    double finish_time = model_output(0, 1);
+    torch_inputs.push_back(torch_input.to(device));
+    std::shared_ptr<torch::jit::script::Module> torch_module =
+        torch::jit::load(FLAGS_torch_vehicle_cruise_cutin_file, device);
+    at::Tensor torch_output_tensor =
+        torch_module->forward(torch_inputs).toTensor();
+    auto torch_output = torch_output_tensor.accessor<float, 2>();
+    double probability = static_cast<double>(torch_output[0][0]);
+    double finish_time = static_cast<double>(torch_output[0][1]);
     lane_sequence_ptr->set_probability(probability);
     lane_sequence_ptr->set_time_to_lane_center(finish_time);
   }
