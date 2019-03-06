@@ -101,9 +101,10 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
     // last to form closed convex hull)
     for (const auto &obstacle : obstacles_by_frame_->Items()) {
       Box2d original_box = obstacle->PerceptionBoundingBox();
-      original_box.Shift(-1.0 *
-          *(frame_->mutable_open_space_info()->mutable_origin_point()));
-      original_box.RotateFromCenter(-1.0 *
+      original_box.Shift(
+          -1.0 * *(frame_->mutable_open_space_info()->mutable_origin_point()));
+      original_box.RotateFromCenter(
+          -1.0 *
           *(frame_->mutable_open_space_info()->mutable_origin_heading()));
       std::vector<Vec2d> vertices_ccw = original_box.GetAllCorners();
       std::vector<Vec2d> vertices_cw;
@@ -164,8 +165,7 @@ bool OpenSpaceRoiDecider::HPresentationObstacle() {
 }
 
 bool OpenSpaceRoiDecider::ObsHRep(
-    const size_t &obstacles_num,
-    const Eigen::MatrixXi &obstacles_edges_num,
+    const size_t &obstacles_num, const Eigen::MatrixXi &obstacles_edges_num,
     const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
     Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all) {
   if (obstacles_num != obstacles_vertices_vec.size()) {
@@ -464,6 +464,7 @@ void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
   }
 }
 
+// TODO(Jinyun) Deprecate because of duplicate code in valet parking scenario
 bool OpenSpaceRoiDecider::GetMapInfo(
     ParkingSpaceInfoConstPtr *target_parking_spot,
     std::shared_ptr<Path> *nearby_path) {
@@ -473,16 +474,14 @@ bool OpenSpaceRoiDecider::GetMapInfo(
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
   int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-      point, 10.0, vehicle_state_.heading(),
-      M_PI / 2.0, &nearest_lane,
+      point, 10.0, vehicle_state_.heading(), M_PI / 2.0, &nearest_lane,
       &vehicle_lane_s, &vehicle_lane_l);
   if (status != 0) {
     AERROR << "Getlane failed at OpenSpaceRoiDecider::GetOpenSpaceROI()";
     return false;
   }
   LaneSegment nearest_lanesegment =
-      LaneSegment(nearest_lane,
-                  nearest_lane->accumulate_s().front(),
+      LaneSegment(nearest_lane, nearest_lane->accumulate_s().front(),
                   nearest_lane->accumulate_s().back());
   std::vector<LaneSegment> segments_vector;
   int next_lanes_num = nearest_lane->lane().successor_id_size();
@@ -492,8 +491,7 @@ bool OpenSpaceRoiDecider::GetMapInfo(
       segments_vector.push_back(nearest_lanesegment);
       auto next_lane = hdmap_->GetLaneById(next_lane_id);
       LaneSegment next_lanesegment =
-          LaneSegment(next_lane,
-                      next_lane->accumulate_s().front(),
+          LaneSegment(next_lane, next_lane->accumulate_s().front(),
                       next_lane->accumulate_s().back());
       segments_vector.emplace_back(next_lanesegment);
       (*nearby_path).reset(new Path(segments_vector));

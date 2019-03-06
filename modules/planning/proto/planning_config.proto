@@ -136,7 +136,9 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
   optional float creep_timeout = 6 [default = 10.0];  // sec
 }
 
-message ScenarioValetParkingConfig {}
+message ScenarioValetParkingConfig {
+  optional double parking_spot_range_to_start = 1 [default = 20.0];
+}
 
 message ScenarioNarrowStreetUTurnConfig {}
 
