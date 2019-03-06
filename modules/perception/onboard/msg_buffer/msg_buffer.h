@@ -179,15 +179,14 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
 
   const double lower_timestamp = timestamp - period;
   const double upper_timestamp = timestamp + period;
-  for (size_t idx = 0; idx < buffer_queue_.size(); ++idx) {
-    if (buffer_queue_[idx].first < lower_timestamp) {
+  for (const auto& obj_pair : buffer_queue_) {
+    if (obj_pair.first < lower_timestamp) {
       continue;
     }
-    if (buffer_queue_[idx].first > upper_timestamp) {
+    if (obj_pair.first > upper_timestamp) {
       break;
     }
-    msgs->emplace_back(std::make_pair(buffer_queue_[idx].first,
-                                      buffer_queue_[idx].second));
+    msgs->push_back(obj_pair);
   }
 
   return true;
