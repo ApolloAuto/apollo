@@ -704,7 +704,7 @@ bool NovatelParser::HandleInsPva(const novatel::InsPva* pva) {
 bool NovatelParser::HandleInsPvax(const novatel::InsPvaX* pvax,
                                   uint16_t gps_week, uint32_t gps_millisecs) {
   double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
-  double unix_sec = apollo::drivers::util::gps2unix(seconds);
+  double unix_sec = common::time::TimeUtil::Gps2unix(seconds);
   ins_stat_.mutable_header()->set_timestamp_sec(unix_sec);
   ins_stat_.set_ins_status(pvax->ins_status);
   ins_stat_.set_pos_type(pvax->pos_type);

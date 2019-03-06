@@ -15,7 +15,6 @@ cc_library(
         "rect2d.h",
         "math_util.h",
         "system_utility.h",
-        "time_conversion.h",
         "threadpool.h",
         "voxel_grid_covariance_hdmap.h",
         "frame_transform.h",

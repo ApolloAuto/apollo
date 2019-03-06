@@ -14,8 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef MODULES_COMMON_TIME_TIME_UTIL_H_
-#define MODULES_COMMON_TIME_TIME_UTIL_H_
+#pragma once
 
 #include <sys/time.h>
 #include <iomanip>
@@ -32,21 +31,23 @@ namespace time {
 class TimeUtil {
  public:
   // @brief: UNIX timestamp to GPS timestamp, in seconds.
-  static double Unix2gps(double unix_time) {
-    double gps_time = unix_time - UNIX_GPS_DIFF;
+  template <typename T>
+  static T Unix2gps(T unix_time) {
+    T gps_time = unix_time - UNIX_GPS_DIFF;
     if (unix_time < LEAP_SECOND_TIMESTAMP) {
       gps_time -= 1.0;
     }
-    return gps_time;
+    return static_cast<T>(gps_time);
   }
 
   // @brief: GPS timestamp to UNIX timestamp, in seconds.
-  static double Gps2unix(double gps_time) {
-    double unix_time = gps_time + UNIX_GPS_DIFF;
+  template <typename T>
+  static T Gps2unix(T gps_time) {
+    T unix_time = gps_time + UNIX_GPS_DIFF;
     if (unix_time + 1 < LEAP_SECOND_TIMESTAMP) {
       unix_time += 1.0;
     }
-    return unix_time;
+    return static_cast<T>(unix_time);
   }
 
   static double GetCurrentTime() {
@@ -68,5 +69,3 @@ class TimeUtil {
 }  // namespace time
 }  // namespace common
 }  // namespace apollo
-
-#endif  // MODULES_COMMON_TIME_TIME_UTIL_H__
