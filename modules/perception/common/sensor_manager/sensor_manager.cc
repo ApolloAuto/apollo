@@ -72,9 +72,10 @@ bool SensorManager::Init() {
     if (this->IsCamera(sensor_info.type)) {
       std::shared_ptr<BrownCameraDistortionModel> distort_model(
           new BrownCameraDistortionModel());
-      if (!LoadBrownCameraIntrinsic(IntrinsicPath(sensor_info.frame_id),
+      auto intrinsic_file = IntrinsicPath(sensor_info.frame_id);
+      if (!LoadBrownCameraIntrinsic(intrinsic_file,
                                     distort_model.get())) {
-        AERROR << "Failed to load camera intrinsic.";
+        AERROR << "Failed to load camera intrinsic:" << intrinsic_file;
         return false;
       }
       distort_model_map_.insert(make_pair(
