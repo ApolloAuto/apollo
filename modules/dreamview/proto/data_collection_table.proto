@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package apollo.dreamview;
+
+message Criterion {
+  optional string field = 1;
+  optional string comparison_operator = 2;
+  optional float value = 3;
+}
+
+message Category {
+  optional uint32 total_frames = 1;
+  optional string description = 2;
+  repeated Criterion criterion = 3;
+}
+
+message DataCollectionTable {
+  optional uint32 total_frames = 1;
+  map<string, Category> category = 2;
+}

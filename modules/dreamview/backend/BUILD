@@ -15,6 +15,7 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/status",
         "//modules/dreamview/backend/common:dreamview_gflags",
+        "//modules/dreamview/backend/data_collection_monitor",
         "//modules/dreamview/backend/handlers:image_handler",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/hmi",

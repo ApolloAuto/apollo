@@ -30,6 +30,7 @@
 #include "cyber/cyber.h"
 
 #include "modules/common/util/string_util.h"
+#include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/map/map_service.h"
 #include "modules/dreamview/backend/sim_control/sim_control.h"
@@ -62,6 +63,7 @@ class SimulationWorldUpdater {
    */
   SimulationWorldUpdater(WebSocketHandler *websocket, WebSocketHandler *map_ws,
                          SimControl *sim_control, const MapService *map_service,
+                         DataCollectionMonitor *data_collection_monitor,
                          bool routing_from_file = false);
 
   /**
@@ -136,6 +138,7 @@ class SimulationWorldUpdater {
   WebSocketHandler *websocket_ = nullptr;
   WebSocketHandler *map_ws_ = nullptr;
   SimControl *sim_control_ = nullptr;
+  DataCollectionMonitor *data_collection_monitor_ = nullptr;
 
   // End point for requesting default route
   apollo::routing::POI poi_;

@@ -25,6 +25,7 @@ cc_library(
         "//modules/common/util:points_downsampler",
         "//modules/control/proto:control_proto",
         "//modules/dreamview/backend/common:dreamview_gflags",
+        "//modules/dreamview/backend/data_collection_monitor",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/util:trajectory_point_collector",
         "//modules/dreamview/proto:simulation_world_proto",
