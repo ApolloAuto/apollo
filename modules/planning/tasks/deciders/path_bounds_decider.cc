@@ -112,7 +112,6 @@ Status PathBoundsDecider::Process(
   }
 
   // Success
-  reference_line_info->SetReachableS(std::get<0>(path_boundaries.back()));
   ADEBUG << "Completed regular and fallback path boundaries generation.";
   return Status::OK();
 }
@@ -179,7 +178,6 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundaries(
     AERROR << msg;
     return msg;
   }
-<<<<<<< HEAD
   PathBoundsDebugString(path_boundaries);
 
   // 2. Decide a rough boundary based on road info and ADC's position
@@ -195,18 +193,6 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundaries(
 
   ADEBUG << "Completed generating fallback path boundaries.";
   return "";
-=======
-  reference_line_info->SetPathBoundaries(path_boundaries_pair,
-                                         std::get<0>(path_boundaries[0]),
-                                         kPathBoundsDeciderResolution);
-  reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
-  if (!path_boundaries.empty()) {
-    CHECK_LE(adc_frenet_l_, std::get<2>(path_boundaries[0]));
-    CHECK_GE(adc_frenet_l_, std::get<1>(path_boundaries[0]));
-  }
-  ADEBUG << "Completed path boundaries generation.";
-  return Status::OK();
->>>>>>> parent of d284446... Planning: remove code related to front obs distance
 }
 
 bool PathBoundsDecider::InitPathBoundaries(
