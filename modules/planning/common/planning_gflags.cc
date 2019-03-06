@@ -461,7 +461,7 @@ DEFINE_bool(enable_record_debug, true,
             "True to enable record debug info in chart format");
 
 DEFINE_double(
-    default_front_clear_distance, 100.0,
+    default_front_clear_distance, 300.0,
     "default front clear distance value in case there is no obstacle around.");
 
 DEFINE_double(max_trajectory_len, 1000.0,
