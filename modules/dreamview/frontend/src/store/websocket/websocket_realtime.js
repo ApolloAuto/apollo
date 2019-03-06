@@ -99,6 +99,11 @@ export default class RealtimeWebSocketEndpoint {
                         RENDERER.removeInvalidRoutingPoint(message.pointId, message.error);
                     }
                     break;
+                case "DataCollectionProgress":
+                    if (message) {
+                        console.log("collection progress:", message);
+                    }
+                    break;
             }
         };
         this.websocket.onclose = event => {
@@ -130,11 +135,9 @@ export default class RealtimeWebSocketEndpoint {
                     this.updatePOI = false;
                 }
 
-                const requestPlanningData = STORE.options.showPNCMonitor;
-                this.websocket.send(JSON.stringify({
-                    type : "RequestSimulationWorld",
-                    planning : requestPlanningData,
-                }));
+                this.requestSimulationWorld(STORE.options.showPNCMonitor);
+                // TODO: request in calibration mode only
+                // this.requestDataCollectionProgress();
             }
         }, this.simWorldUpdatePeriodMs);
     }
@@ -162,6 +165,13 @@ export default class RealtimeWebSocketEndpoint {
         this.secondLastSeqNum = this.lastSeqNum;
         this.lastSeqNum = world.sequenceNum;
         this.simWorldLastUpdateTimestamp = now;
+    }
+
+    requestSimulationWorld(requestPlanningData) {
+        this.websocket.send(JSON.stringify({
+            type : "RequestSimulationWorld",
+            planning : requestPlanningData,
+        }));
     }
 
     checkRoutingPoint(point) {
@@ -298,5 +308,11 @@ export default class RealtimeWebSocketEndpoint {
 
     publishNavigationInfo(data) {
         this.websocket.send(data);
+    }
+
+    requestDataCollectionProgress() {
+        this.websocket.send(JSON.stringify({
+            type: "RequestDataCollectionProgress",
+        }));
     }
 }

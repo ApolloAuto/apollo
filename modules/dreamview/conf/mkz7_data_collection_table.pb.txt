@@ -1,0 +1,372 @@
+total_frames: 100000
+
+category {
+  key: "10mps, throttle >= 30%"
+  value {
+    total_frames: 20000
+    description: "10mps, Hash Throttle"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: "<"
+      value: 10
+    }
+    criterion {
+      field: "throttle_percentage"
+      comparison_operator: ">="
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "10mps, throttle < 30%"
+  value {
+    total_frames: 20000
+    description: "10mps, Under Throttle"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: "<"
+      value: 10
+    }
+    criterion {
+      field: "throttle_percentage"
+      comparison_operator: "<"
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "10mps, brake >= 30%"
+  value {
+    total_frames: 20000
+    description: "10mps, Brake Tap"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: "<"
+      value: 10
+    }
+    criterion {
+      field: "brake_percentage"
+      comparison_operator: ">="
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "10mps, brake < 30%"
+  value {
+    total_frames: 20000
+    description: "10mps, Brake Pulsing"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: "<"
+      value: 10
+    }
+    criterion {
+      field: "brake_percentage"
+      comparison_operator: "<"
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "15mps, throttle >= 30%"
+  value {
+    total_frames: 20000
+    description: "15mps, Hash Throttle"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: ">="
+      value: 10
+    }
+    criterion {
+      field: "speed_mps"
+      comparison_operator: "<"
+      value: 20
+    }
+    criterion {
+      field: "throttle_percentage"
+      comparison_operator: ">="
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "15mps, throttle < 30%"
+  value {
+    total_frames: 20000
+    description: "15mps, Under Throttle"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: ">="
+      value: 10
+    }
+    criterion {
+      field: "speed_mps"
+      comparison_operator: "<"
+      value: 20
+    }
+    criterion {
+      field: "throttle_percentage"
+      comparison_operator: "<"
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "15mps, brake >= 30%"
+  value {
+    total_frames: 20000
+    description: "15mps, Brake Tap"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: ">="
+      value: 10
+    }
+    criterion {
+      field: "speed_mps"
+      comparison_operator: "<"
+      value: 20
+    }
+    criterion {
+      field: "brake_percentage"
+      comparison_operator: ">="
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "15mps, brake < 30%"
+  value {
+    total_frames: 20000
+    description: "15mps, Brake Pulsing"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: ">="
+      value: 10
+    }
+    criterion {
+      field: "speed_mps"
+      comparison_operator: "<"
+      value: 20
+    }
+    criterion {
+      field: "brake_percentage"
+      comparison_operator: "<"
+      value: 30
+    }
+  }
+}
+
+
+category {
+  key: "20mps, throttle >= 30%"
+  value {
+    total_frames: 20000
+    description: "20mps, Hash Throttle"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: ">="
+      value: 20
+    }
+    criterion {
+      field: "throttle_percentage"
+      comparison_operator: ">="
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "20mps, throttle < 30%"
+  value {
+    total_frames: 20000
+    description: "20mps, Under Throttle"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: ">="
+      value: 20
+    }
+    criterion {
+      field: "throttle_percentage"
+      comparison_operator: "<"
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "20mps, brake >= 30%"
+  value {
+    total_frames: 20000
+    description: "20mps, Brake Tap"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: ">="
+      value: 20
+    }
+    criterion {
+      field: "brake_percentage"
+      comparison_operator: ">="
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "20mps, brake < 30%"
+  value {
+    total_frames: 20000
+    description: "20mps, Brake Pulsing"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: ">="
+      value: 20
+    }
+    criterion {
+      field: "brake_percentage"
+      comparison_operator: "<"
+      value: 30
+    }
+  }
+}
+
+category {
+  key: "Left steering < 20%"
+  value {
+    total_frames: 20000
+    description: "Left steering < 20%"
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: ">="
+      value: 0
+    }
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<"
+      value: 20
+    }
+  }
+}
+
+category {
+  key: "Left steering 20% ~ 40%"
+  value {
+    total_frames: 20000
+    description: "Left steering 20% ~ 40%"
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: ">="
+      value: 20
+    }
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<"
+      value: 40
+    }
+  }
+}
+
+category {
+  key: "Left steering 40% ~ 60%"
+  value {
+    total_frames: 20000
+    description: "Left steering 40% ~ 60%"
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: ">="
+      value: 40
+    }
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<"
+      value: 60
+    }
+  }
+}
+
+category {
+  key: "Left steering >= 60%"
+  value {
+    total_frames: 20000
+    description: "Left steering >= 60%"
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: ">="
+      value: 60
+    }
+  }
+}
+
+category {
+  key: "Right steering < 20%"
+  value {
+    total_frames: 20000
+    description: "Right steering < 20%"
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<="
+      value: 0
+    }
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<"
+      value: -20
+    }
+  }
+}
+
+category {
+  key: "Right steering 20% ~ 40%"
+  value {
+    total_frames: 20000
+    description: "Right steering 20% ~ 40%"
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<="
+      value: -20
+    }
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<"
+      value: -40
+    }
+  }
+}
+
+category {
+  key: "Right steering 40% ~ 60%"
+  value {
+    total_frames: 20000
+    description: "Right steering 40% ~ 60%"
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<="
+      value: -40
+    }
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<"
+      value: -60
+    }
+  }
+}
+
+category {
+  key: "Right steering >= 60%"
+  value {
+    total_frames: 20000
+    description: "Right steering >= 60%"
+    criterion {
+      field: "steering_percentage"
+      comparison_operator: "<="
+      value: -60
+    }
+  }
+}
