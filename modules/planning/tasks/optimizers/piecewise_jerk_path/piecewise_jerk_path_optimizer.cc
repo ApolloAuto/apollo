@@ -43,40 +43,9 @@ PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
 common::Status PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point, PathData* const path_data) {
-  const auto frenet_point =
-      reference_line.GetFrenetPoint(init_point.path_point());
+  const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
-
-  std::vector<std::pair<double, double>> lateral_boundaries;
-  double start_s = 0.0;
-  double delta_s = 0.0;
-  reference_line_info_->GetPathBoundaries(&lateral_boundaries, &start_s,
-                                          &delta_s);
-
-  if (lateral_boundaries.size() < 2) {
-    AERROR << "lateral boundary size < 2";
-    return Status(ErrorCode::PLANNING_ERROR, "invalid lateral bounds provided");
-  }
-
-  // TODO(all): clean this debug messages after the branch is stable
-  /**
-  AERROR << "Init point:";
-  AERROR << "\tl:\t" << frenet_point.l();
-  AERROR << "\tdl:\t" << frenet_point.dl();
-  AERROR << "\tddl:\t" << frenet_point.ddl();
-  **/
-
-  /**
-  AERROR << "Weights:";
-  AERROR << "\tl:\t" << piecewise_jerk_path_config.l_weight();
-  AERROR << "\tdl:\t" << piecewise_jerk_path_config.dl_weight();
-  AERROR << "\tddl:\t" << piecewise_jerk_path_config.ddl_weight();
-  AERROR << "\tdddl:\t" << piecewise_jerk_path_config.dddl_weight();
-  **/
-
-  auto num_of_points = lateral_boundaries.size();
-
   std::array<double, 5> w = {
       piecewise_jerk_path_config.l_weight(),
       piecewise_jerk_path_config.dl_weight(),
@@ -85,24 +54,84 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       0.0
   };
 
-  std::array<double, 3> init_lateral_state{frenet_point.l(), frenet_point.dl(),
-                                           frenet_point.ddl()};
+  {
+    std::vector<std::pair<double, double>> lat_boundaries;
+    double start_s = 0.0;
+    double delta_s = 0.0;
+    reference_line_info_->GetPathBoundaries(
+        &lat_boundaries, &start_s, &delta_s);
+    if (lat_boundaries.size() >= 2) {
+      std::vector<double> opt_l;
+      std::vector<double> opt_dl;
+      std::vector<double> opt_ddl;
+
+      bool res_opt = OptimizePath(init_frenet_state, delta_s, lat_boundaries, w,
+          &opt_l, &opt_dl, &opt_ddl);
+
+      if (res_opt) {
+        auto frenet_frame_path = ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
+            delta_s, start_s);
+
+        path_data->SetReferenceLine(&reference_line);
+        path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
+        return Status::OK();
+      }
+    }
+  }
+
+  {
+    std::vector<std::pair<double, double>> lat_boundaries;
+    double start_s = 0.0;
+    double delta_s = 0.0;
+    reference_line_info_->GetFallbackPathBoundaries(
+        &lat_boundaries, &start_s, &delta_s);
+    CHECK_GT(lat_boundaries.size(), 1);
+
+    std::vector<double> opt_l;
+    std::vector<double> opt_dl;
+    std::vector<double> opt_ddl;
+
+    bool res_opt = OptimizePath(init_frenet_state, delta_s, lat_boundaries, w,
+        &opt_l, &opt_dl, &opt_ddl);
+
+    if (res_opt) {
+      auto frenet_frame_path = ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
+          delta_s, start_s);
+
+      path_data->SetReferenceLine(&reference_line);
+      path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
+      return Status::OK();
+    }
+  }
+  return Status(ErrorCode::PLANNING_ERROR,
+      "Path Optimizer failed to generate path");
+}
+
+bool PiecewiseJerkPathOptimizer::OptimizePath(
+    const std::pair<const std::array<double, 3>,
+    const std::array<double, 3>>& init_state,
+    const double delta_s,
+    const std::vector<std::pair<double, double>>& lat_boundaries,
+    const std::array<double, 5>& w,
+    std::vector<double>* x,
+    std::vector<double>* dx,
+    std::vector<double>* ddx) {
 
   std::unique_ptr<Fem1dQpProblem> fem_1d_qp(
-      new Fem1dQpProblem(num_of_points, init_lateral_state, delta_s, w,
+      new Fem1dQpProblem(lat_boundaries.size(), init_state.second, delta_s, w,
           FLAGS_lateral_jerk_bound));
 
   auto start_time = std::chrono::system_clock::now();
 
-  fem_1d_qp->SetZeroOrderBounds(lateral_boundaries);
+  fem_1d_qp->SetZeroOrderBounds(lat_boundaries);
 
-  // FLAGS_lateral_derivative_bound_default = 1.0;
-  double first_order_bounds = AdjustLateralDerivativeBounds(init_point.v(),
-      frenet_point.dl(), frenet_point.ddl(),
+  double first_order_bounds = AdjustLateralDerivativeBounds(
+      init_state.first[1],
+      init_state.second[1], init_state.second[2],
       FLAGS_lateral_derivative_bound_default);
   AERROR << "adjusted lateral derivative bound from \t"
       << FLAGS_lateral_derivative_bound_default << "\t" << first_order_bounds;
-  // TODO(all): temprary disable AdjustLateralDerivativeBounds, enable later
+  // TODO(all): temp. disable AdjustLateralDerivativeBounds, enable later
   // fem_1d_qp->SetFirstOrderBounds(first_order_bounds);
   fem_1d_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
   fem_1d_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
@@ -115,34 +144,24 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   if (!success) {
     AERROR << "piecewise jerk path optimizer failed";
-    return Status(ErrorCode::PLANNING_ERROR,
-        "piecewise jerk path optimizer failed");
+    return false;
   }
 
-  const auto& x = fem_1d_qp->x();
-  const auto& dx = fem_1d_qp->x_derivative();
-  const auto& ddx = fem_1d_qp->x_second_order_derivative();
+  *x = fem_1d_qp->x();
+  *dx = fem_1d_qp->x_derivative();
+  *ddx = fem_1d_qp->x_second_order_derivative();
 
-  CHECK(!x.empty() && x.size() == num_of_points);
-  CHECK(!dx.empty() && dx.size() == num_of_points);
-  CHECK(!ddx.empty() && ddx.size() == num_of_points);
+  return true;
+}
 
-  /*
-  // TODO(all): an ad-hoc check for path feasibility since osqp
-  //            cannot return the correct status
-  const double numerical_buffer = 0.05;
-  for (std::size_t i = 0; i < num_of_points; ++i) {
-    if (x[i] < lateral_boundaries[i].first - numerical_buffer
-        || x[i] > lateral_boundaries[i].second + numerical_buffer) {
-      AERROR << "piecewise jerk path optimizer finds a infeasible solution";
-      AERROR << "index\t" << i << ":\t" << x[i] <<
-          "\t" << lateral_boundaries[i].first <<
-          "\t" << lateral_boundaries[i].second;
-      return Status(ErrorCode::PLANNING_ERROR,
-          "piecewise jerk path optimizer failed");
-    }
-  }
-  */
+FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
+    const std::vector<double>& x, const std::vector<double>& dx,
+    const std::vector<double>& ddx, const double delta_s,
+    const double start_s) const {
+
+  CHECK(!x.empty());
+  CHECK(!dx.empty());
+  CHECK(!ddx.empty());
 
   PiecewiseJerkTrajectory1d piecewise_jerk_traj(x.front(),
       dx.front(), ddx.front());
@@ -169,10 +188,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     accumulated_s += FLAGS_trajectory_space_resolution;
   }
 
-  path_data->SetReferenceLine(&reference_line);
-  path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
-
-  return Status::OK();
+  return FrenetFramePath(frenet_frame_path);
 }
 
 double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
