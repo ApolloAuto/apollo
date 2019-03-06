@@ -154,6 +154,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
         "//modules/prediction/network/cruise_model",
+        "@pytorch",
     ],
 )
 
