@@ -60,24 +60,25 @@ bool GetProtobufFloatByFieldName(const google::protobuf::Message& message,
 }
 
 bool IsCompliedWithCriterion(float actual_value,
-                             const std::string& comparison_operator,
+                             const ComparisonOperator& comparison_operator,
                              float target_value) {
-  if (comparison_operator == "==") {
-    return (actual_value == target_value);
-  } else if (comparison_operator == ">") {
-    return (actual_value > target_value);
-  } else if (comparison_operator == ">=") {
-    return (actual_value >= target_value);
-  } else if (comparison_operator == "<") {
-    return (actual_value < target_value);
-  } else if (comparison_operator == "<=") {
-    return (actual_value <= target_value);
-  } else if (comparison_operator == "!=") {
-    return (actual_value != target_value);
-  } else {
-    AERROR << " Unsupported comparision operator defined in "
-           << comparison_operator;
-    return false;
+  switch (comparison_operator) {
+    case ComparisonOperator::EQUAL:
+      return (actual_value == target_value);
+    case ComparisonOperator::GREATER_THAN:
+      return (actual_value > target_value);
+    case ComparisonOperator::GREATER_THAN_OR_EQUAL:
+      return (actual_value >= target_value);
+    case ComparisonOperator::LESS_THAN:
+      return (actual_value < target_value);
+    case ComparisonOperator::LESS_THAN_OR_EQUAL:
+      return (actual_value <= target_value);
+    case ComparisonOperator::NOT_EQUAL:
+      return (actual_value != target_value);
+    default:
+      AERROR << "Unsupported comparision operator found:"
+             << comparison_operator;
+      return false;
   }
 }
 
