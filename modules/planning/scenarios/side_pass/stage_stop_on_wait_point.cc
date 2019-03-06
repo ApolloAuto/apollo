@@ -118,8 +118,7 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
     auto& rfl_info = frame->mutable_reference_line_info()->front();
     *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
     *(rfl_info.mutable_speed_data()) =
-        SpeedProfileGenerator::GenerateFallbackSpeedProfile(
-            rfl_info.ReachableS());
+        SpeedProfileGenerator::GenerateFallbackSpeedProfile();
 
     rfl_info.set_trajectory_type(ADCTrajectory::NORMAL);
     DiscretizedTrajectory trajectory;

@@ -59,6 +59,49 @@ void EgoInfo::CalculateEgoBox(const common::VehicleState& vehicle_state) {
 void EgoInfo::Clear() {
   start_point_.Clear();
   vehicle_state_.Clear();
+  front_clear_distance_ = FLAGS_default_front_clear_distance;
+}
+
+// TODO(all): remove this function and "front_clear_distance" related.
+// It doesn't make sense when:
+// 1. the heading is not necessaries align with the road
+// 2. the road is not necessaries straight
+void EgoInfo::CalculateFrontObstacleClearDistance(
+    const std::vector<const Obstacle*>& obstacles) {
+  Vec2d position(vehicle_state_.x(), vehicle_state_.y());
+
+  const auto& param = ego_vehicle_config_.vehicle_param();
+  Vec2d vec_to_center(
+      (param.front_edge_to_center() - param.back_edge_to_center()) / 2.0,
+      (param.left_edge_to_center() - param.right_edge_to_center()) / 2.0);
+
+  Vec2d center(position + vec_to_center.rotate(vehicle_state_.heading()));
+
+  Vec2d unit_vec_heading = Vec2d::CreateUnitVec2d(vehicle_state_.heading());
+
+  // Due to the error of ego heading, only short range distance is meaningful
+  constexpr double kDistanceThreshold = 50.0;
+  constexpr double buffer = 0.1;  // in meters
+  const double impact_region_length =
+      param.length() + buffer + kDistanceThreshold;
+  Box2d ego_front_region(center + unit_vec_heading * kDistanceThreshold / 2.0,
+                         vehicle_state_.heading(), impact_region_length,
+                         param.width() + buffer);
+
+  for (const auto& obstacle : obstacles) {
+    if (obstacle->IsVirtual() ||
+        !ego_front_region.HasOverlap(obstacle->PerceptionBoundingBox())) {
+      continue;
+    }
+
+    double dist = ego_box_.center().DistanceTo(
+                      obstacle->PerceptionBoundingBox().center()) -
+                  ego_box_.diagonal() / 2.0;
+
+    if (front_clear_distance_ < 0.0 || dist < front_clear_distance_) {
+      front_clear_distance_ = dist;
+    }
+  }
 }
 
 }  // namespace planning

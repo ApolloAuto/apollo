@@ -96,8 +96,7 @@ bool Stage::ExecuteTaskOnReferenceLine(
 
     if (reference_line_info.speed_data().empty()) {
       *reference_line_info.mutable_speed_data() =
-          SpeedProfileGenerator::GenerateFallbackSpeedProfile(
-              reference_line_info.ReachableS());
+          SpeedProfileGenerator::GenerateFallbackSpeedProfile();
       reference_line_info.AddCost(kSpeedOptimizationFallbackCost);
       reference_line_info.set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
     } else {
