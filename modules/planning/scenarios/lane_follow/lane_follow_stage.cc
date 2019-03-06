@@ -400,10 +400,10 @@ bool LaneFollowStage::IsClearToChangeLane(
 
     const auto kForwardSafeDistance = std::fmax(
         kForwardMinSafeDistance,
-        ego_v * kSafeTime);
+        (ego_v - obstacle->speed())* kSafeTime);
     const auto kBackwardSafeDistance = std::fmax(
         kBackwardMinSafeDistance,
-        obstacle->speed() * kSafeTime);
+        (obstacle->speed() - ego_v) * kSafeTime);
     if (end_s > ego_start_s - kBackwardSafeDistance &&
         start_s < ego_end_s + kForwardSafeDistance) {
       return false;
