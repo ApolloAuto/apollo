@@ -18,6 +18,9 @@
 // The following messages must be logged in order for this parser to work
 // properly.
 //
+
+#pragma once
+
 #include <cmath>
 #include <iostream>
 #include <limits>
