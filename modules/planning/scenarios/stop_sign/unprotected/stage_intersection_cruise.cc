@@ -50,6 +50,7 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
       reference_line_info.reference_line().map_path().pnc_junction_overlaps();
   if (pnc_junction_overlaps.size() == 0) {
     // pnc_junction not exist on map, use current stop_sign's end_s
+
     constexpr double kIntersectionPassDist = 20.0;  // unit: m
     const double adc_back_edge_s =
         reference_line_info.AdcSlBoundary().start_s();
@@ -63,6 +64,8 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
 
     if (distance_adc_pass_stop_sign >= kIntersectionPassDist) {
       return FinishStage();
+    } else {
+      return Stage::RUNNING;
     }
   }
 
