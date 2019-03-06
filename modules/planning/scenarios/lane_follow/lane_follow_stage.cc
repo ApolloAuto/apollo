@@ -115,35 +115,8 @@ Stage::StageStatus LaneFollowStage::Process(
   bool has_drivable_reference_line = false;
   //  bool disable_low_priority_path = false;
 
-  AERROR << "Number of reference lines:\t"
+  ADEBUG << "Number of reference lines:\t"
       << frame->mutable_reference_line_info()->size();
-
-  /**
-  for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
-    if (disable_low_priority_path) {
-      reference_line_info.SetDrivable(false);
-    }
-    if (!reference_line_info.IsDrivable()) {
-      AERROR << "\t one line is not drivable";
-      continue;
-    }
-
-    AERROR << "\t one line is drivable";
-    auto cur_status =
-        PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
-    if (cur_status.ok() && reference_line_info.IsDrivable()) {
-      has_drivable_reference_line = true;
-      if (FLAGS_prioritize_change_lane &&
-          reference_line_info.IsChangeLanePath() &&
-          reference_line_info.Cost() < kStraightForwardLineCost &&
-          IsClearToChangeLane(reference_line_info, frame, planning_start_point.v())) {
-        disable_low_priority_path = true;
-      }
-    } else {
-      reference_line_info.SetDrivable(false);
-    }
-  }
-  **/
 
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (has_drivable_reference_line) {
@@ -225,8 +198,6 @@ Status LaneFollowStage::PlanOnReferenceLine(
                                 reference_line_info->mutable_path_data());
     reference_line_info->AddCost(kPathOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
-  } else {
-    AERROR << "Path succeeded";
   }
 
   if (!ret.ok() || reference_line_info->speed_data().empty()) {
@@ -236,8 +207,6 @@ Status LaneFollowStage::PlanOnReferenceLine(
         SpeedProfileGenerator::GenerateFallbackSpeedProfile();
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
     reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
-  } else {
-    AERROR << "Speed succeeded";
   }
 
   if (!(reference_line_info->trajectory_type() ==
