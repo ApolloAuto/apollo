@@ -31,11 +31,13 @@ namespace dreamview {
 using apollo::common::util::JsonUtil;
 using Json = WebSocketHandler::Json;
 
-HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
+HMI::HMI(WebSocketHandler* websocket, MapService* map_service,
+         DataCollectionMonitor* data_collection_monitor)
     : hmi_worker_(new HMIWorker()),
       monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
       websocket_(websocket),
-      map_service_(map_service) {
+      map_service_(map_service),
+      data_collection_monitor_(data_collection_monitor) {
   if (websocket_) {
     RegisterMessageHandlers();
   }
@@ -105,10 +107,9 @@ void HMI::RegisterMessageHandlers() {
         } else if (hmi_action == HMIAction::CHANGE_MODE) {
           static constexpr char kCalibrationMode[] = "Mkz Calibration";
           if (value == kCalibrationMode) {
-            // TODO(vivian): Finish.
-            // calibration_mon->start();
+            data_collection_monitor_->Start();
           } else {
-            // calibration_mon->stop();
+            data_collection_monitor_->Stop();
           }
         }
       });
