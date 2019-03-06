@@ -192,14 +192,18 @@ class OpenSpaceInfo {
     return &chosen_paritioned_trajectory_;
   }
 
-  bool *mutable_fallback_flag() { return &fallback_flag_; }
-
   const bool &fallback_flag() const { return fallback_flag_; }
+
+  void set_fallback_flag(bool flag) { fallback_flag_ = flag; }
 
   TrajGearPair *mutable_fallback_trajectory() { return &fallback_trajectory_; }
 
   const TrajGearPair &fallback_trajectory() const {
     return fallback_trajectory_;
+  }
+
+  void set_fallback_trajectory(const TrajGearPair& traj_gear_pair) {
+    fallback_trajectory_ = traj_gear_pair;
   }
 
   std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
