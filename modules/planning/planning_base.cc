@@ -51,9 +51,6 @@ void PlanningBase::FillPlanningPb(const double timestamp,
     trajectory_pb->mutable_header()->set_radar_timestamp(
         local_view_.prediction_obstacles->header().radar_timestamp());
   }
-
-  // TODO(all): integrate reverse gear
-  trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
   trajectory_pb->mutable_routing_header()->CopyFrom(
       local_view_.routing->header());
 }

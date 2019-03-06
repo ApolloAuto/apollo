@@ -23,13 +23,16 @@
 #include <unordered_map>
 #include <utility>
 
+#include "modules/common/time/time.h"
 #include "modules/planning/common/speed_profile_generator.h"
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
+using common::time::Clock;
 using hdmap::PathOverlap;
 
 namespace {
@@ -125,12 +128,28 @@ bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
   }
 
   if (frame->open_space_info().fallback_flag()) {
-    *(frame->mutable_open_space_info()->mutable_trajectory_data()) =
-        frame->open_space_info().fallback_trajectory();
+    auto& trajectory = frame->open_space_info().fallback_trajectory().first;
+    auto& gear = frame->open_space_info().fallback_trajectory().second;
+    PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(),
+                                                 trajectory);
+    auto publishable_traj_and_gear =
+        std::make_pair(std::move(publishable_trajectory), gear);
+
+    *(frame->mutable_open_space_info()->mutable_publishable_trajectory_data()) =
+        std::move(publishable_traj_and_gear);
   } else {
-    *(frame->mutable_open_space_info()->mutable_trajectory_data()) =
-        frame->open_space_info().chosen_paritioned_trajectory();
+    auto& trajectory =
+        frame->open_space_info().chosen_paritioned_trajectory().first;
+    auto& gear = frame->open_space_info().chosen_paritioned_trajectory().second;
+    PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(),
+                                                 trajectory);
+    auto publishable_traj_and_gear =
+        std::make_pair(std::move(publishable_trajectory), gear);
+
+    *(frame->mutable_open_space_info()->mutable_publishable_trajectory_data()) =
+        std::move(publishable_traj_and_gear);
   }
+
   return true;
 }
 
