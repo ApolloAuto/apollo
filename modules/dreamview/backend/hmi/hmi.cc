@@ -102,6 +102,14 @@ void HMI::RegisterMessageHandlers() {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
+        } else if (hmi_action == HMIAction::CHANGE_MODE) {
+          static constexpr char kCalibrationMode[] = "Mkz Calibration";
+          if (value == kCalibrationMode) {
+            // TODO(vivian): Finish.
+            // calibration_mon->start();
+          } else {
+            // calibration_mon->stop();
+          }
         }
       });
 
