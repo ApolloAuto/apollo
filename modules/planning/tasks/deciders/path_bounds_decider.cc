@@ -112,7 +112,6 @@ Status PathBoundsDecider::Process(
   }
 
   // Success
-  reference_line_info->SetReachableS(std::get<0>(path_boundaries.back()));
   ADEBUG << "Completed regular and fallback path boundaries generation.";
   return Status::OK();
 }
