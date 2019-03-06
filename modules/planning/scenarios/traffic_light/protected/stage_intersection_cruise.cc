@@ -54,21 +54,23 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
     if (PlanningContext::GetScenarioInfo()
             ->current_traffic_light_overlaps.size() == 0) {
       return FinishStage();
-    } else {
-      constexpr double kIntersectionPassDist = 20.0;  // unit: m
-      const double adc_back_edge_s =
-          reference_line_info.AdcSlBoundary().start_s();
-      const double traffic_light_end_s = PlanningContext::GetScenarioInfo()
-          ->current_traffic_light_overlaps[0].end_s;
-      const double distance_adc_pass_traffic_light = adc_back_edge_s -
-          traffic_light_end_s;
-      ADEBUG << "distance_adc_pass_traffic_light["
-          << distance_adc_pass_traffic_light
-          << "] traffic_light_end_s[" << traffic_light_end_s << "]";
+    }
 
-      if (distance_adc_pass_traffic_light >= kIntersectionPassDist) {
-        return FinishStage();
-      }
+    constexpr double kIntersectionPassDist = 20.0;  // unit: m
+    const double adc_back_edge_s =
+        reference_line_info.AdcSlBoundary().start_s();
+    const double traffic_light_end_s = PlanningContext::GetScenarioInfo()
+        ->current_traffic_light_overlaps[0].end_s;
+    const double distance_adc_pass_traffic_light = adc_back_edge_s -
+        traffic_light_end_s;
+    ADEBUG << "distance_adc_pass_traffic_light["
+        << distance_adc_pass_traffic_light
+        << "] traffic_light_end_s[" << traffic_light_end_s << "]";
+
+    if (distance_adc_pass_traffic_light >= kIntersectionPassDist) {
+      return FinishStage();
+    } else {
+      return Stage::RUNNING;
     }
   }
 
