@@ -21,13 +21,12 @@
 #pragma once
 
 #include "modules/planning/scenarios/stage.h"
+#include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace valet_parking {
-
-struct ValetParkingContext;
 
 DECLARE_STAGE(StageParking, ValetParkingContext);
 
