@@ -21,6 +21,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "modules/planning/scenarios/scenario.h"
 
@@ -29,17 +30,38 @@ namespace planning {
 namespace scenario {
 namespace valet_parking {
 
+struct ValetParkingContext {
+  ScenarioValetParkingConfig scenario_config;
+  std::string target_parking_spot_id;
+};
+
 class ValetParkingScenario : public Scenario {
  public:
   explicit ValetParkingScenario(const ScenarioConfig& config,
                                 const ScenarioContext* context)
       : Scenario(config, context) {}
 
+  void Init() override;
+
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
 
   bool IsTransferable(const Scenario& current_scenario,
                       const Frame& frame) override;
+
+  ValetParkingContext* GetContext() { return &context_; }
+
+ private:
+  static void RegisterStages();
+  bool GetScenarioConfig();
+
+ private:
+  bool init_ = false;
+  static apollo::common::util::Factory<
+      ScenarioConfig::StageType, Stage,
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      s_stage_factory_;
+  ValetParkingContext context_;
 };
 
 }  // namespace valet_parking
