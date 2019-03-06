@@ -40,6 +40,7 @@
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
 
 namespace apollo {
 namespace planning {
@@ -61,6 +62,10 @@ class OpenSpaceInfo {
  public:
   OpenSpaceInfo();
   ~OpenSpaceInfo() = default;
+
+  const bool is_in_open_space() const { return is_in_open_space_; }
+
+  bool *is_in_open_space() { return &is_in_open_space_; }
 
   const size_t obstacles_num() const { return obstacles_num_; }
 
@@ -197,11 +202,18 @@ class OpenSpaceInfo {
     return fallback_trajectory_;
   }
 
-  TrajGearPair *mutable_trajectory_data() { return &trajectory_data_; }
+  std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
+      *mutable_publishable_trajectory_data() {
+    return &publishable_trajectory_data_;
+  }
 
-  const TrajGearPair &trajectory_data() const { return trajectory_data_; }
+  const std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
+      &publishable_trajectory_data() const {
+    return publishable_trajectory_data_;
+  }
 
  private:
+  bool is_in_open_space_ = false;
   // @brief obstacles total num including perception obstacles and parking space
   // boundary
   size_t obstacles_num_ = 0;
@@ -253,7 +265,8 @@ class OpenSpaceInfo {
 
   TrajGearPair fallback_trajectory_;
 
-  TrajGearPair trajectory_data_;
+  std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
+      publishable_trajectory_data_;
 };
 }  // namespace planning
 }  // namespace apollo
