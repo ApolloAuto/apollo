@@ -64,9 +64,7 @@ static const cv::Scalar kFaceColorMap[] = {
 };
 
 base::ObjectSubType GetObjectSubType(const std::string &type_name) {
-  if (type_name == "") {
-    return base::ObjectSubType::UNKNOWN;
-  } else if (type_name == "car") {
+  if (type_name == "car") {
     return base::ObjectSubType::CAR;
   } else if (type_name == "van") {
     return base::ObjectSubType::VAN;
@@ -85,6 +83,7 @@ base::ObjectSubType GetObjectSubType(const std::string &type_name) {
   } else if (type_name == "trafficcone") {
     return base::ObjectSubType::TRAFFICCONE;
   } else {
+    // type_name is "" or unknown
     return base::ObjectSubType::UNKNOWN;
   }
 }
