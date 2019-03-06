@@ -84,7 +84,7 @@ class ReferenceLine {
       const common::PathPoint& path_point) const;
 
   std::pair<std::array<double, 3>, std::array<double, 3>> ToFrenetFrame(
-      const common::TrajectoryPoint& path_point) const;
+      const common::TrajectoryPoint& traj_point) const;
 
   std::vector<ReferencePoint> GetReferencePoints(double start_s,
                                                  double end_s) const;
