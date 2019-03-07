@@ -210,17 +210,16 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
   return;
 }
 
-void output_laneline_to_json(const std::vector<base::LaneLine>& lane_objects,
-                             const std::string& save_path) {
+int output_laneline_to_json(const std::vector<base::LaneLine>& lane_objects,
+                            const std::string& save_path) {
   FILE* file_save = fopen(save_path.c_str(), "wt");
   if (!file_save) {
     AERROR << "Failed to open file: " << save_path;
-    return;
+    return -1;
   }
 
   int lane_line_size = static_cast<int>(lane_objects.size());
   AINFO << "lane line num: " << lane_line_size;
-  std::string msg = "lane line info: ";
   fprintf(file_save, "[\n");
   for (int j = 0; j < lane_line_size; ++j) {
     const base::LaneLineCubicCurve& curve_camera =
@@ -284,7 +283,7 @@ void output_laneline_to_json(const std::vector<base::LaneLine>& lane_objects,
   }
   fprintf(file_save, "]\n");
   fclose(file_save);
-  return;
+  return 0;
 }
 
 void output_laneline_to_txt(const std::vector<base::LaneLine>& lane_objects,
