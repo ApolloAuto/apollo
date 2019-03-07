@@ -48,6 +48,9 @@ class DeciderRuleBasedStop : public Decider {
   void CheckTrafficLight(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info);
 
+  void CheckOpenSpacePreStop(Frame* const frame,
+                             ReferenceLineInfo* const reference_line_info);
+
   bool BuildStopDecision(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info,
                          const std::string& stop_wall_id,
@@ -58,6 +61,7 @@ class DeciderRuleBasedStop : public Decider {
  private:
   static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";
   static constexpr const char* TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_";
+  static constexpr const char* OPEN_SPACE_VO_ID_PREFIX = "OP_";
 };
 
 }  // namespace planning

@@ -50,6 +50,8 @@ Status DeciderRuleBasedStop::Process(Frame* frame,
 
   CheckTrafficLight(frame, reference_line_info);
 
+  CheckOpenSpacePreStop(frame, reference_line_info);
+
   return Status::OK();
 }
 
@@ -145,6 +147,56 @@ void DeciderRuleBasedStop::CheckTrafficLight(
                       stop_distance, StopReasonCode::STOP_REASON_SIGNAL,
                       wait_for_obstacles);
   }
+}
+
+void DeciderRuleBasedStop::CheckOpenSpacePreStop(
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
+  if (frame->open_space_info().open_space_pre_stop_finished()) {
+    return;
+  }
+
+  const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+  const auto& target_parking_spot_id =
+      frame->open_space_info().target_parking_spot_id();
+  const auto& nearby_path = reference_line_info->reference_line().map_path();
+  if (target_parking_spot_id.empty()) {
+    AERROR << "no target parking spot found when setting pre stop fence";
+  }
+
+  double target_area_center_s = 0.0;
+  const auto& parking_space_overlaps = nearby_path.parking_space_overlaps();
+  if (parking_space_overlaps.size() != 0) {
+    for (const auto& parking_overlap : parking_space_overlaps) {
+      if (parking_overlap.object_id == target_parking_spot_id) {
+        target_area_center_s =
+            (parking_overlap.start_s + parking_overlap.end_s) / 2.0;
+      }
+    }
+  }
+
+  double stop_line_s = 0.0;
+  double stop_distance_to_target = config_.decider_rule_based_stop_config()
+                                       .open_space()
+                                       .stop_distance_to_target();
+  CHECK_GE(stop_distance_to_target, 1.0e-8);
+  double target_vehicle_offset = target_area_center_s - adc_front_edge_s;
+  if (target_vehicle_offset > stop_distance_to_target) {
+    stop_line_s = target_area_center_s - stop_distance_to_target;
+  } else if (std::abs(target_vehicle_offset) < stop_distance_to_target) {
+    stop_line_s = target_area_center_s + stop_distance_to_target;
+  } else if (target_vehicle_offset < -stop_distance_to_target) {
+    stop_line_s = adc_front_edge_s + config_.decider_rule_based_stop_config()
+                                         .open_space()
+                                         .rightaway_stop_distance();
+  }
+  const std::string stop_wall_id =
+      OPEN_SPACE_VO_ID_PREFIX + target_parking_spot_id;
+  std::vector<std::string> wait_for_obstacles;
+  *(frame->mutable_open_space_info()->mutable_open_space_pre_stop_fence_s()) =
+      stop_line_s;
+  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s, 0.0,
+                    StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP,
+                    wait_for_obstacles);
 }
 
 bool DeciderRuleBasedStop::BuildStopDecision(

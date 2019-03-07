@@ -36,10 +36,16 @@ message RuleTrafficLightConfig {
   optional double signal_expire_time_sec = 3 [default = 5.0];  // second
 }
 
+message RuleOpenSpaceStopConfig {
+  optional double rightaway_stop_distance = 1 [default = 2.0];  // meter
+  optional double stop_distance_to_target = 2 [default = 5.0];  // second
+}
+
 message DeciderRuleBasedStopConfig {
   optional RuleCrosswalkConfig crosswalk = 1;
   optional RuleStopSignConfig stop_sign = 2;
   optional RuleTrafficLightConfig traffic_light = 3;
+  optional RuleOpenSpaceStopConfig open_space = 4;
 }
 
 message SidePassSafetyConfig {
