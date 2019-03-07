@@ -63,9 +63,43 @@ class OpenSpaceInfo {
   OpenSpaceInfo();
   ~OpenSpaceInfo() = default;
 
-  const bool is_in_open_space() const { return is_in_open_space_; }
+  const bool open_space_pre_stop_finished() const {
+    return open_space_pre_stop_finished_;
+  }
 
-  bool *is_in_open_space() { return &is_in_open_space_; }
+  bool *mutable_open_space_pre_stop_finished() {
+    return &open_space_pre_stop_finished_;
+  }
+
+  const std::string target_parking_spot_id() const {
+    return target_parking_spot_id_;
+  }
+
+  std::string *mutable_target_parking_spot_id() {
+    return &target_parking_spot_id_;
+  }
+
+  const hdmap::ParkingSpaceInfoConstPtr target_parking_spot() const {
+    return target_parking_spot_;
+  }
+
+  hdmap::ParkingSpaceInfoConstPtr *mutable_target_parking_spot() {
+    return &target_parking_spot_;
+  }
+
+  const double open_space_pre_stop_fence_s() const {
+    return open_space_pre_stop_fence_s_;
+  }
+
+  double *mutable_open_space_pre_stop_fence_s() {
+    return &open_space_pre_stop_fence_s_;
+  }
+
+  const bool is_on_open_space_trajectory() const {
+    return is_on_open_space_trajectory_;
+  }
+
+  bool *is_on_open_space_trajectory() { return &is_on_open_space_trajectory_; }
 
   const size_t obstacles_num() const { return obstacles_num_; }
 
@@ -217,7 +251,16 @@ class OpenSpaceInfo {
   }
 
  private:
-  bool is_in_open_space_ = false;
+  // @brief vehicle needs to stop first in open space related scenarios
+  bool open_space_pre_stop_finished_ = true;
+
+  std::string target_parking_spot_id_;
+
+  hdmap::ParkingSpaceInfoConstPtr target_parking_spot_ = nullptr;
+
+  double open_space_pre_stop_fence_s_ = 0.0;
+
+  bool is_on_open_space_trajectory_ = false;
   // @brief obstacles total num including perception obstacles and parking space
   // boundary
   size_t obstacles_num_ = 0;
