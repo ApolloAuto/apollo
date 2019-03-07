@@ -50,8 +50,8 @@ class RecordFileBase {
   std::string GetPath() { return path_; }
   Header GetHeader() { return header_; }
   Index GetIndex() { return index_; }
-  uint64_t CurrentPosition();
-  bool SetPosition(uint64_t position);
+  int64_t CurrentPosition();
+  bool SetPosition(int64_t position);
 
  protected:
   std::mutex mutex_;
