@@ -926,12 +926,13 @@ bool TrafficLightsPerceptionComponent::TransformDebugMessage(
 
   if (lights.size() > 0) {
     camera::CarPose pose;
-    if (!GetCarPose(frame->timestamp, &pose)) {
-      AERROR << "Error occured in calculate distance to stop line.";
+    if (GetCarPose(frame->timestamp, &pose)) {
+      Eigen::Matrix4d cam_pose;
+      pose.GetCameraPose("front_6mm", &cam_pose);
+      light_debug->set_distance_to_stop_line(stopline_distance(cam_pose));
+    } else {
+      AERROR << "Error occured in calculate distance to stop line."
     }
-    Eigen::Matrix4d cam_pose;
-    pose.GetCameraPose("front_6mm", &cam_pose);
-    light_debug->set_distance_to_stop_line(stopline_distance(cam_pose));
   }
 
   if (FLAGS_start_visualizer) {
