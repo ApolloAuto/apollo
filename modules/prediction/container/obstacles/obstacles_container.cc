@@ -334,12 +334,13 @@ void ObstaclesContainer::BuildLaneGraph() {
     // obstacle_ptr->BuildLaneGraphFromLeftToRight();
   }
 
-  Obstacle* ego_vehicle = GetObstacle(FLAGS_ego_vehicle_id);
-  if (ego_vehicle == nullptr) {
+  Obstacle* ego_vehicle_ptr = GetObstacle(FLAGS_ego_vehicle_id);
+  if (ego_vehicle_ptr == nullptr) {
     AERROR << "Ego vehicle not inserted";
     return;
   }
-  ego_vehicle->BuildLaneGraph();
+  ego_vehicle_ptr->BuildLaneGraph();
+  ego_vehicle_ptr->SetNearbyObstacles();
 }
 
 void ObstaclesContainer::BuildJunctionFeature() {
