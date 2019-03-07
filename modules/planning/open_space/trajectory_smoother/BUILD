@@ -109,6 +109,33 @@ cc_library(
     name = "distance_approach_ipopt_interface",
     srcs = [
         "distance_approach_ipopt_interface.cc",
+    ],
+    hdrs = [
+        "distance_approach_ipopt_interface.h",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/math",
+        "//modules/common/util",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/proto:planner_open_space_config_proto",
+        "//modules/planning/proto:planning_proto",
+        "@adolc",
+        "@eigen",
+        "@ipopt",
+    ],
+)
+
+
+cc_library(
+    name = "distance_approach_ipopt_cuda_interface",
+    srcs = [
+        "distance_approach_ipopt_cuda_interface.cc",
     ] + select({
         "//tools/platforms:use_gpu": [
             "planning_block.h",
@@ -117,7 +144,7 @@ cc_library(
         "//conditions:default": [],
     }),
     hdrs = [
-        "distance_approach_ipopt_interface.h",
+        "distance_approach_ipopt_cuda_interface.h",
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
@@ -162,6 +189,24 @@ cc_test(
     ],
     deps = [
         ":distance_approach_ipopt_interface",
+        "//cyber/common:log",
+        "@gtest//:main",
+    ],
+)
+
+
+cc_test(
+    name = "distance_approach_ipopt_cuda_interface_test",
+    size = "small",
+    srcs = [
+        "distance_approach_ipopt_cuda_interface_test.cc",
+    ],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
+    deps = [
+        ":distance_approach_ipopt_cuda_interface",
         "//cyber/common:log",
         "@gtest//:main",
     ],
