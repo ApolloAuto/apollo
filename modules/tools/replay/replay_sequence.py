@@ -28,12 +28,6 @@ from google.protobuf import text_format
 import common.message_manager as message_manager
 
 
-def generate_message(filename, pb_type):
-    with open(filename, 'r') as fp:
-        message = pb_type()
-        text_format.Merge(fp.read(), message)
-    return message
-
 def seq_publisher(seq_num, period):
     """publisher"""
 
