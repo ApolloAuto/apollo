@@ -26,7 +26,13 @@ namespace valet_parking {
 
 Stage::StageStatus StageApproachingParkingSpot::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
-  return Stage::FINISHED;
+  ADEBUG << "stage: StageApproachingParkingSpot";
+  CHECK_NOTNULL(frame);
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
+  if (!plan_ok) {
+    AERROR << "StopSignUnprotectedStagePreStop planning error";
+  }
+  return Stage::RUNNING;
 }
 
 }  // namespace valet_parking
