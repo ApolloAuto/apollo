@@ -81,7 +81,7 @@ message SignalLightDebug {
     optional string light_id = 1;
     optional apollo.perception.TrafficLight.Color color = 2;
     optional double light_stop_s = 3;
-    optional double adc_stop_deacceleration = 4;
+    optional double adc_stop_deceleration = 4;
     optional bool is_stop_wall_created = 5;
   }
   optional double adc_speed = 1;

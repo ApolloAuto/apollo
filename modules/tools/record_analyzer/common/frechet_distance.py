@@ -46,8 +46,12 @@ def _c(ca, i, j, P, Q):
 def frechet_distance(P, Q):
     ca = np.ones((len(P), len(Q)))
     ca = np.multiply(ca, -1)
-    return _c(ca, len(P)-1, len(Q)-1, P, Q)
-
+    dist = None
+    try:
+        dist = _c(ca, len(P)-1, len(Q)-1, P, Q)
+    except:
+        print("calcualte frechet_distance exception.")
+    return dist
 
 if __name__ == "__main__":
     """test"""

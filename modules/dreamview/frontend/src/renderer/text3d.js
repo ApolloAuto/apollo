@@ -17,6 +17,11 @@ loader.load(fontPath, font => {
         console.log( 'An error happened when loading ' + fontPath );
 });
 
+export const TEXT_ALIGN = {
+    CENTER: 'center',
+    LEFT: 'left',
+};
+
 export default class Text3D {
     constructor() {
         // The meshes for each ASCII char, created and reused when needed.
@@ -33,7 +38,23 @@ export default class Text3D {
         this.charPointers = {};
     }
 
-    composeText(text) {
+    drawText(text, scene, color = 0xFFEA00, textAlign = TEXT_ALIGN.CENTER) {
+        const textMesh = this.composeText(text, color, textAlign);
+        if (textMesh === null) {
+            return;
+        }
+
+        const camera = scene.getObjectByName("camera");
+        if (camera !== undefined) {
+            textMesh.quaternion.copy(camera.quaternion);
+        }
+        textMesh.children.forEach(c => c.visible = true);
+        textMesh.visible = true;
+
+        return textMesh;
+    }
+
+    composeText(text, color, textAlign) {
         if (!fontsLoaded) {
             return null;
         }
@@ -56,7 +77,7 @@ export default class Text3D {
                 if (this.charMeshes[idx].length > 0) {
                     mesh = this.charMeshes[idx][0].clone();
                 } else {
-                    mesh = this.drawChar3D(text[j]);
+                    mesh = this.drawChar3D(text[j], color);
                 }
                 this.charMeshes[idx].push(mesh);
             }
@@ -74,15 +95,25 @@ export default class Text3D {
                     additionalOffset = 0.15;
                     break;
             }
-            mesh.position.set((j - charIndices.length / 2) * letterOffset + additionalOffset, 0, 0);
+
+            switch (textAlign) {
+                case 'left':
+                    mesh.position.set(
+                        j * letterOffset + additionalOffset, 0, 0);
+                    break;
+                case 'center':
+                default:
+                    mesh.position.set(
+                        (j - charIndices.length / 2) * letterOffset + additionalOffset, 0, 0);
+                    break;
+            }
             this.charPointers[idx]++;
             textMesh.add(mesh);
         }
         return textMesh;
     }
 
-    drawChar3D(char, font = fonts['gentilis_bold'], size = 0.6, height = 0,
-            color = 0xFFEA00) {
+    drawChar3D(char, color, font = fonts['gentilis_bold'], size = 0.6, height = 0) {
         const charGeo = new THREE.TextGeometry(char, {
             font: font,
             size: size,

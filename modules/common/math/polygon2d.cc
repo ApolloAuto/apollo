@@ -584,9 +584,8 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
     } else {
       const int count = static_cast<int>(diff / kMinAngle) + 1;
       for (int k = 0; k <= count; ++k) {
-        const double angle =
-            start_angle +
-            diff * static_cast<double>(k) / static_cast<double>(count);
+        const double angle = start_angle + diff * static_cast<double>(k) /
+                                               static_cast<double>(count);
         points.push_back(points_[i] + Vec2d::CreateUnitVec2d(angle) * distance);
       }
     }

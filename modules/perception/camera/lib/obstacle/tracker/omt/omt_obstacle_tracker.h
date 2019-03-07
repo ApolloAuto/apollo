@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <memory>
@@ -47,13 +47,9 @@ struct Hypothesis {
     this->score = score;
   }
 
-  bool operator<(const Hypothesis &b) const {
-    return score < b.score;
-  }
+  bool operator<(const Hypothesis &b) const { return score < b.score; }
 
-  bool operator>(const Hypothesis &b) const {
-    return score > b.score;
-  }
+  bool operator>(const Hypothesis &b) const { return score > b.score; }
 };
 
 class OMTObstacleTracker : public BaseObstacleTracker {
@@ -63,8 +59,7 @@ class OMTObstacleTracker : public BaseObstacleTracker {
   //                         width_(0.0f), height_(0.0f),
   //                         BaseObstacleTracker() {
   //  }
-  OMTObstacleTracker() : BaseObstacleTracker() {
-  }
+  OMTObstacleTracker() : BaseObstacleTracker() {}
 
   ~OMTObstacleTracker() override = default;
 
@@ -73,49 +68,41 @@ class OMTObstacleTracker : public BaseObstacleTracker {
   // @param [in]: options
   // @param [in/out]: frame
   // candidate obstacle 2D boxes should be filled, required.
-  bool Predict(
-      const ObstacleTrackerOptions &options,
-      CameraFrame *frame) override;
+  bool Predict(const ObstacleTrackerOptions &options,
+               CameraFrame *frame) override;
 
   // @brief: associate obstales by 2D information.
   // @param [in]: options
   // @param [in/out]: frame
   // associated obstacles with tracking id should be filled, required,
   // smoothed 2D&3D information can be filled, optional.
-  bool Associate2D(
-      const ObstacleTrackerOptions &options,
-      CameraFrame *frame) override;
+  bool Associate2D(const ObstacleTrackerOptions &options,
+                   CameraFrame *frame) override;
 
   // @brief: associate obstales by 3D information.
   // @param [in]: options
   // @param [in/out]: frame
   // associated obstacles with tracking id should be filled, required,
   // smoothed 3D information can be filled, optional.
-  bool Associate3D(
-      const ObstacleTrackerOptions &options,
-      CameraFrame *frame) override;
+  bool Associate3D(const ObstacleTrackerOptions &options,
+                   CameraFrame *frame) override;
 
   // @brief: track detected obstacles.
   // @param [in]: options
   // @param [in/out]: frame
   // associated obstacles with tracking id should be filled, required,
   // motion information of obstacles should be filled, required.
-  bool Track(
-      const ObstacleTrackerOptions &options,
-      CameraFrame *frame) override;
+  bool Track(const ObstacleTrackerOptions &options,
+             CameraFrame *frame) override;
 
   std::string Name() const override;
 
  private:
-  float ScoreAppearance(const Target &target,
-                        TrackObjectPtr object);
+  float ScoreAppearance(const Target &target, TrackObjectPtr object);
 
-  float ScoreMotion(const Target &target,
-                    TrackObjectPtr object);
-  float ScoreShape(const Target &target,
-                   TrackObjectPtr object);
-  float ScoreOverlap(const Target &target,
-                                         TrackObjectPtr track_obj);
+  float ScoreMotion(const Target &target, TrackObjectPtr object);
+  float ScoreShape(const Target &target, TrackObjectPtr object);
+  float ScoreOverlap(const Target &target, TrackObjectPtr track_obj);
   void ClearTargets();
   bool CombineDuplicateTargets();
   void GenerateHypothesis(const TrackObjectPtrs &objects);

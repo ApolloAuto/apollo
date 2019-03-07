@@ -43,7 +43,6 @@ cc_library(
 cc_binary(
     name = "_cyber_record.so",
     linkshared = True,
-    linkstatic = False,
     deps = [
         ":py_record",
     ],
@@ -54,8 +53,28 @@ cc_library(
     srcs = ["cyber_record_wrap.cc"],
     hdrs = ["py_record.h"],
     deps = [
-        "//cyber:cyber_core",
+        "//cyber/message:py_message",
         "//cyber/record",
+        "@python27",
+    ],
+)
+
+cc_binary(
+    name = "_cyber_topology_manager.so",
+    linkshared = True,
+    linkstatic = False,
+    deps = [
+        ":py_topology_manager",
+    ],
+)
+
+cc_library(
+    name = "py_topology_manager",
+    srcs = ["cyber_topology_manager_wrap.cc"],
+    hdrs = ["py_topology_manager.h"],
+    deps = [
+        "//cyber:cyber_core",
+        "//cyber/service_discovery:topology_manager",
         "@python27",
     ],
 )

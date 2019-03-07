@@ -48,7 +48,7 @@ class LightObjectPool : public BaseObjectPool<ObjectType> {
     auto itr = object_pool.find(sensor_name);
     if (itr == object_pool.end()) {
       auto ret = object_pool.insert(std::pair<std::string, LightObjectPoolPtr>(
-        sensor_name, LightObjectPoolPtr(new LightObjectPool(N))));
+          sensor_name, LightObjectPoolPtr(new LightObjectPool(N))));
       return *(ret.first->second);
     }
     return *(itr->second);

@@ -21,32 +21,24 @@
 
 #include "cyber/common/log.h"
 
-
 namespace apollo {
 namespace perception {
 namespace lidar {
 
-MatchCost::MatchCost(size_t ridx, size_t cidx, double cost):
-  row_idx_(ridx), col_idx_(cidx), cost_(cost) {
-}
+MatchCost::MatchCost(size_t ridx, size_t cidx, double cost)
+    : row_idx_(ridx), col_idx_(cidx), cost_(cost) {}
 
-size_t MatchCost::RowIdx() const {
-  return row_idx_;
-}
+size_t MatchCost::RowIdx() const { return row_idx_; }
 
-size_t MatchCost::ColIdx() const {
-  return col_idx_;
-}
+size_t MatchCost::ColIdx() const { return col_idx_; }
 
-double MatchCost::Cost() const {
-  return cost_;
-}
+double MatchCost::Cost() const { return cost_; }
 
-bool operator < (const MatchCost& m1, const MatchCost& m2) {
+bool operator<(const MatchCost& m1, const MatchCost& m2) {
   return m1.cost_ < m2.cost_;
 }
 
-std::ostream& operator<< (std::ostream& os, const MatchCost& m) {
+std::ostream& operator<<(std::ostream& os, const MatchCost& m) {
   os << "MatchCost ridx:" << m.RowIdx() << " cidx:" << m.ColIdx()
      << " Cost:" << m.Cost();
   return os;
@@ -59,21 +51,20 @@ GnnBipartiteGraphMatcher::GnnBipartiteGraphMatcher(size_t max_size) {
 }
 
 GnnBipartiteGraphMatcher::~GnnBipartiteGraphMatcher() {
-  if (cost_matrix_ != nullptr)
-    delete cost_matrix_;
+  if (cost_matrix_ != nullptr) delete cost_matrix_;
 }
 
 void GnnBipartiteGraphMatcher::Match(
-    const BipartiteGraphMatcherOptions &options,
-    std::vector<NodeNodePair> *assignments,
-    std::vector<size_t> *unassigned_rows,
-    std::vector<size_t> *unassigned_cols) {
+    const BipartiteGraphMatcherOptions& options,
+    std::vector<NodeNodePair>* assignments,
+    std::vector<size_t>* unassigned_rows,
+    std::vector<size_t>* unassigned_cols) {
   assignments->clear();
   unassigned_rows->clear();
   unassigned_cols->clear();
   row_tag_.clear();
   col_tag_.clear();
-  common::SecureMat<float> *cost_matrix = cost_matrix_;
+  common::SecureMat<float>* cost_matrix = cost_matrix_;
   float max_dist = options.cost_thresh;
   int num_rows = static_cast<int>(cost_matrix->height());
   int num_cols = static_cast<int>(cost_matrix->width());
@@ -82,12 +73,12 @@ void GnnBipartiteGraphMatcher::Match(
 
   std::vector<MatchCost> match_costs;
   for (int r = 0; r < num_rows; r++) {
-      for (int c = 0; c < num_cols; c++) {
-          if ((*cost_matrix)(r, c) < max_dist) {
-              MatchCost item(r, c, (*cost_matrix)(r, c));
-              match_costs.push_back(item);
-          }
+    for (int c = 0; c < num_cols; c++) {
+      if ((*cost_matrix)(r, c) < max_dist) {
+        MatchCost item(r, c, (*cost_matrix)(r, c));
+        match_costs.push_back(item);
       }
+    }
   }
 
   // sort costs in ascending order
@@ -95,25 +86,25 @@ void GnnBipartiteGraphMatcher::Match(
 
   // gnn
   for (size_t i = 0; i < match_costs.size(); ++i) {
-      size_t rid = match_costs[i].RowIdx();
-      size_t cid = match_costs[i].ColIdx();
-      if (row_tag_[rid] == 0 && col_tag_[cid] == 0) {
-          row_tag_[rid] = 1;
-          col_tag_[cid] = 1;
-          assignments->push_back(std::make_pair(rid, cid));
-      }
+    size_t rid = match_costs[i].RowIdx();
+    size_t cid = match_costs[i].ColIdx();
+    if (row_tag_[rid] == 0 && col_tag_[cid] == 0) {
+      row_tag_[rid] = 1;
+      col_tag_[cid] = 1;
+      assignments->push_back(std::make_pair(rid, cid));
+    }
   }
 
   for (int i = 0; i < num_rows; i++) {
-      if (row_tag_[i] == 0) {
-          unassigned_rows->push_back(i);
-      }
+    if (row_tag_[i] == 0) {
+      unassigned_rows->push_back(i);
+    }
   }
 
   for (int i = 0; i < num_cols; i++) {
-      if (col_tag_[i] == 0) {
-          unassigned_cols->push_back(i);
-      }
+    if (col_tag_[i] == 0) {
+      unassigned_cols->push_back(i);
+    }
   }
 }
 

@@ -45,8 +45,8 @@ class RtcmParser {
 
   config::Config config_;
   std::shared_ptr<apollo::cyber::Node> node_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<GnssEphemeris>>
-      gnssephemeris_writer_ = nullptr;
+  std::shared_ptr<apollo::cyber::Writer<GnssEphemeris>> gnssephemeris_writer_ =
+      nullptr;
   std::shared_ptr<apollo::cyber::Writer<EpochObservation>>
       epochobservation_writer_ = nullptr;
   bool init_flag_ = false;

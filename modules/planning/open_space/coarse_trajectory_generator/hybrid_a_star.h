@@ -18,17 +18,6 @@
  * @file
  */
 
-/*
- * Inspired by
- *
- * Dolgov, Dmitri, et al. "Path Planning for Autonomous Vehicles in Unknown
- * Semi-Structured Environments." The International Journal of Robotics
- * Research, vol. 29, no. 5, 2010, pp. 485-501., doi:10.1177/0278364909359210.
- *
- * Xiaojing, et al. "Optimization-Based Collision Avoidance" (arXiv:1711.03449)
- * and its implementation (https://github.com/XiaojingGeorgeZhang/H-OBCA).
- */
-
 #pragma once
 
 #include <memory>
@@ -55,6 +44,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
+using apollo::common::math::Box2d;
 
 struct HybridAStartResult {
   std::vector<double> x;
@@ -87,12 +77,11 @@ class HybridAStar {
       std::shared_ptr<Node3d> current_node);
   std::shared_ptr<Node3d> Next_node_generator(
       std::shared_ptr<Node3d> current_node, size_t next_node_index);
-  bool CalculateNodeCost(std::shared_ptr<Node3d> current_node,
+  void CalculateNodeCost(std::shared_ptr<Node3d> current_node,
                          std::shared_ptr<Node3d> next_node);
   double TrajCost(std::shared_ptr<Node3d> current_node,
                   std::shared_ptr<Node3d> next_node);
-  bool HoloObstacleHeuristic(std::shared_ptr<Node3d> next_node,
-                               double* optimal_path_cost);
+  double HoloObstacleHeuristic(std::shared_ptr<Node3d> next_node);
   bool GetResult(HybridAStartResult* result);
   bool GenerateSpeedAcceleration(HybridAStartResult* result);
 

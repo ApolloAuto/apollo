@@ -34,15 +34,15 @@ namespace traffic_light {
 
 struct TrafficLightUnprotectedRightTurnContext;
 
-class StageStop : public Stage {
+class TrafficLightUnprotectedRightTurnStageStop : public Stage {
  public:
-  explicit StageStop(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+  explicit TrafficLightUnprotectedRightTurnStageStop(
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
  private:
-  Stage::StageStatus Process(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
   TrafficLightUnprotectedRightTurnContext* GetContext() {
     return GetContextAs<TrafficLightUnprotectedRightTurnContext>();
   }

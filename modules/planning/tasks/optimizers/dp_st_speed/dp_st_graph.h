@@ -34,9 +34,9 @@
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/speed/st_point.h"
+#include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_cost.h"
 #include "modules/planning/tasks/optimizers/dp_st_speed/st_graph_point.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
 
 namespace apollo {
 namespace planning {
@@ -66,13 +66,16 @@ class DpStGraph {
   void CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg);
 
   double CalculateEdgeCost(const STPoint& first, const STPoint& second,
-                          const STPoint& third, const STPoint& forth,
-                          const double speed_limit);
+                           const STPoint& third, const STPoint& forth,
+                           const double speed_limit,
+                           const double soft_speed_limit);
   double CalculateEdgeCostForSecondCol(const uint32_t row,
-                                      const double speed_limit);
+                                       const double speed_limit,
+                                       const double soft_speed_limit);
   double CalculateEdgeCostForThirdCol(const uint32_t curr_r,
-                                     const uint32_t pre_r,
-                                     const double speed_limit);
+                                      const uint32_t pre_r,
+                                      const double speed_limit,
+                                      const double soft_speed_limit);
 
   void GetRowRange(const StGraphPoint& point, size_t* highest_row,
                    size_t* lowest_row);

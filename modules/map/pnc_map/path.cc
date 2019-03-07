@@ -218,10 +218,9 @@ std::vector<MapPathPoint> MapPathPoint::GetPointsFromLane(LaneInfoConstPtr lane,
       const auto& segment = lane->segments()[i];
       const double next_accumulate_s = accumulate_s + segment.length();
       if (start_s > accumulate_s && start_s < next_accumulate_s) {
-        points.emplace_back(
-            segment.start() +
-                segment.unit_direction() * (start_s - accumulate_s),
-            lane->headings()[i], LaneWaypoint(lane, start_s));
+        points.emplace_back(segment.start() + segment.unit_direction() *
+                                                  (start_s - accumulate_s),
+                            lane->headings()[i], LaneWaypoint(lane, start_s));
       }
       if (end_s > accumulate_s && end_s < next_accumulate_s) {
         points.emplace_back(
@@ -376,9 +375,8 @@ void Path::InitPoints() {
     } else {
       segments_.emplace_back(path_points_[i], path_points_[i + 1]);
       heading = path_points_[i + 1] - path_points_[i];
-      // TODO(lianglia_apollo):
-      // use heading.length when all adjacent lanes are guarantee to be
-      // connected.
+      // TODO(All): use heading.length when all adjacent lanes are guarantee to
+      // be connected.
       s += heading.Length();
     }
     heading.Normalize();

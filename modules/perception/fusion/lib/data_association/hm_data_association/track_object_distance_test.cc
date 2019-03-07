@@ -38,7 +38,8 @@ class TrackObjectDistanceTest : public testing::Test {
   void SetUp() {
     lib::FLAGS_work_root = "./fusion_test_data/hm_data_association";
     common::FLAGS_obs_sensor_meta_path = "./data/sensor_meta.pt";
-    common::FLAGS_obs_sensor_intrinsic_path = "./fusion_test_data/hm_data_association/params";
+    common::FLAGS_obs_sensor_intrinsic_path =
+"./fusion_test_data/hm_data_association/params";
   }
 };
 
@@ -182,7 +183,7 @@ TEST_F(TrackObjectDistanceTest, test_query_world2camera_pose) {
         camera_sensor_object_ptr, &pose));
 
     delete sensor_info_ptr;
-    sensor_info_ptr = nullptr;  
+    sensor_info_ptr = nullptr;
   }
 
   {
@@ -414,7 +415,7 @@ TEST_F(TrackObjectDistanceTest, test_query_projection_cache_object_2) {
   pt.z = -1;
   pt.intensity = 1;
   cloud.push_back(pt);
-  
+
   base::ObjectConstPtr lidar_object_const_ptr(lidar_object_ptr);
   base::SensorInfo* lidar_info_ptr = new base::SensorInfo;
   lidar_info_ptr->name = "lidar1";
@@ -461,7 +462,7 @@ TEST_F(TrackObjectDistanceTest, test_query_projection_cache_object_2) {
   projection_cache.AddPoint(test_pt);
   projection_cache.Reset("lidar", 0.0);
   cache_object_ptr = projection_cache.BuildObject("lidar", 0.0,
-      "front_camera", 0.0, 1);  
+      "front_camera", 0.0, 1);
 
   projection_cache.Reset("lidar1", 0.0);
   lidar_sensor_frame_ptr = (nullptr);
@@ -472,7 +473,7 @@ TEST_F(TrackObjectDistanceTest, test_query_projection_cache_object_2) {
       pinhole_camera_model_ptr, true) != nullptr);
 
   delete camera_info_ptr;
-  camera_info_ptr = nullptr;  
+  camera_info_ptr = nullptr;
   delete lidar_info_ptr;
   lidar_info_ptr = nullptr;
 }
@@ -743,7 +744,7 @@ TEST_F(TrackObjectDistanceTest, test_compute_radar_camera_similiarity_2) {
 
   EXPECT_EQ(track_object_distance.ComputeRadarCameraSimilarity(
       radar_sensor_object_ptr, camera_sensor_object_ptr), 0.0);
-  
+
   delete camera_info_ptr;
   camera_info_ptr = nullptr;
   delete radar_info_ptr;
@@ -1153,8 +1154,8 @@ TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_similiarity_4) {
   SensorObjectPtr camera_sensor_object_ptr(
       new SensorObject(camera_object_const_ptr, camera_sensor_frame_ptr));
 
-  track_object_distance.projection_cache_.Reset("lidar", 0.0); //= new ProjectionCache("lidar", 0.0);
-  ProjectionCache& projection_cache =
+  track_object_distance.projection_cache_.Reset("lidar", 0.0); //= new
+ProjectionCache("lidar", 0.0); ProjectionCache& projection_cache =
   track_object_distance.projection_cache_;
   // projection_cache.Reset("lidar", 0.0);
   Eigen::Vector2f test_pt(2, 3);
@@ -1692,7 +1693,7 @@ TEST_F(TrackObjectDistanceTest, test_compute_lidar_camera_3) {
       new SensorObject(camera_object_const_ptr, camera_sensor_frame_ptr));
   EXPECT_GT(track_object_distance.ComputeLidarCamera(
       lidar_sensor_object_ptr, camera_sensor_object_ptr, true, false), 4);
-    
+
   delete camera_info_ptr;
   camera_info_ptr = nullptr;
   delete lidar_info_ptr;
@@ -2505,7 +2506,7 @@ TEST_F(TrackObjectDistanceTest, test_compute_9) {
   float val = track_object_distance.Compute(fused_track,
       camera_sensor_object_ptr, options);
   EXPECT_GT(val, 4);
-  
+
   delete camera_info_ptr;
   camera_info_ptr = nullptr;
   delete lidar_info_ptr;
@@ -2569,7 +2570,7 @@ TEST_F(TrackObjectDistanceTest, test_compute_10) {
   float val = track_object_distance.Compute(fused_track,
       camera_sensor_object_ptr, options);
   EXPECT_EQ(val, (std::numeric_limits<float>::max)());
-  
+
   delete camera_info_ptr;
   camera_info_ptr = nullptr;
   delete radar_info_ptr;
@@ -2609,7 +2610,7 @@ TEST_F(TrackObjectDistanceTest, test_compute_11) {
   float val = track_object_distance.Compute(fused_track,
       camera_sensor_object_ptr, options);
   EXPECT_EQ(val, std::numeric_limits<float>::max());
-  
+
   delete camera_info_ptr;
   camera_info_ptr = nullptr;
 }

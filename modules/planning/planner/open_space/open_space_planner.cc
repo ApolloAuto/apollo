@@ -20,6 +20,7 @@
 
 #include "modules/planning/planner/open_space/open_space_planner.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "cyber/task/task.h"
 #include "modules/common/util/string_tokenizer.h"
@@ -34,8 +35,8 @@ Status OpenSpacePlanner::Init(const PlanningConfig& planning_confgs) {
   AINFO << "In OpenSpacePlanner::Init()";
 
   // TODO(QiL): integrate open_space planner into task config when refactor done
-  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
-                                       &planner_open_space_config_))
+  CHECK(cyber::common::GetProtoFromFile(
+      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
 
@@ -170,7 +171,7 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
         trajectory_updated_.store(true);
       } else {
         AERROR_EVERY(200)
-            << "Multi-thread trajectory generator not OK with return satus : "
+            << "Multi-thread trajectory generator not OK with return status : "
             << status.ToString();
       }
     }
@@ -188,7 +189,7 @@ void OpenSpacePlanner::LoadTrajectoryToFrame(Frame* frame) {
   trajectory_to_end_pb_.Clear();
   trajectory_to_end_pb_.mutable_trajectory_point()->CopyFrom(
       *(trajectory_to_end_.mutable_trajectory_point()));
-  frame->mutable_trajectory()->CopyFrom(trajectory_to_end_pb_);
+  frame->set_current_frame_planned_trajectory(trajectory_to_end_pb_);
   frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
   *(frame->mutable_last_stitching_trajectory()) = stitching_trajectory_;
 }

@@ -18,7 +18,7 @@ Inside docker, run the following command from your Apollo root dir:
 python modules/tools/mapviewer/gmap_viwer.py -m map_path_and_file
 ```
 
-An output file 
+An output file
 
 ```
 gmap.html
@@ -33,7 +33,7 @@ python modules/tools/mapviewer/gmap_viwer.py map_path_and_file utm_zone_id
 ```
 
 ### hdmapviewer.py
-Activate enviroments: 
+Activate enviroments:
 
 ```
 conda create --name py27bokeh python=2.7.15 numpy scipy bokeh protobuf

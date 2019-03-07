@@ -34,12 +34,12 @@ TEST_F(Steeringrpt16eTest, reset) {
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
 
   steeringrpt16.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_rpt_1_6e()\
-.manual_input(), 0.258);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_rpt_1_6e()\
-.commanded_value(), 0.772);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_rpt_1_6e()\
-.output_value(), 4.37);
+  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_rpt_1_6e().manual_input(),
+                   0.258);
+  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_rpt_1_6e().commanded_value(),
+                   0.772);
+  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_rpt_1_6e().output_value(),
+                   4.37);
 }
 
 }  // namespace gem

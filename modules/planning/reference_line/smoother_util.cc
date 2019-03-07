@@ -18,8 +18,10 @@
  * @file
  **/
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "gflags/gflags.h"
+
 #include "modules/common/math/vec2d.h"
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/path.h"
@@ -54,8 +56,8 @@ class SmootherUtil {
       auto y_str = point_str.substr(idx + 1);
       raw_points_.emplace_back(std::stod(x_str), std::stod(y_str));
     }
-    CHECK(common::util::GetProtoFromFile(FLAGS_smoother_config_filename,
-                                         &config_))
+    CHECK(cyber::common::GetProtoFromFile(FLAGS_smoother_config_filename,
+                                          &config_))
         << "Failed to read smoother config file: "
         << FLAGS_smoother_config_filename;
   }

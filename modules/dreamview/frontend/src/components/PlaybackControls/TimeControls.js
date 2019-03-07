@@ -1,5 +1,6 @@
 import React from "react";
 import Slider from 'react-rangeslider';
+import styled from 'styled-components';
 
 export default class TimeControls extends React.Component {
     constructor(props) {
@@ -7,6 +8,7 @@ export default class TimeControls extends React.Component {
 
         this.state = {
             frame: -1,
+            loadingProcess: '#2D3B50'
         };
 
         this.updatingSeekingTime = false;
@@ -34,21 +36,36 @@ export default class TimeControls extends React.Component {
         if (!this.updatingSeekingTime && !nextProps.isSeeking) {
             this.setState({frame: nextProps.currentFrame});
         }
+        if (nextProps.loadingMarker <= nextProps.numFrames) {
+            const loadingPercent = (nextProps.loadingMarker / nextProps.numFrames) * 100;
+            const unloadingPercent = 100 - loadingPercent;
+            const backgroundColor = `linear-gradient(90deg, #212c3d ${loadingPercent.toFixed()}%,` +
+                ` #2d3b50 ${loadingPercent.toFixed()}%, #2d3b50 ${unloadingPercent.toFixed()}%)`;
+            this.setState({
+                loadingProcess: backgroundColor
+            });
+        }
     }
 
     render() {
-        const { numFrames, currentFrame, fps,
-                isSeeking, handleFrameSeek} = this.props;
+        const { numFrames, currentFrame, fps } = this.props;
 
         const totalTime = this.getTimeFromFrame(fps, numFrames);
         const currentTime = this.getTimeFromFrame(fps, currentFrame);
 
+        const StyledSlider = styled(Slider)`
+            background: ${this.state.loadingProcess}
+        `;
         return (
             <div className="time-controls">
-                <Slider tooltip={false} min={1} max={numFrames}
-                        value={this.state.frame}
-                        onChange={this.handleSliderChange}
-                        onChangeComplete={this.handleSliderChangeComplete}/>
+                <StyledSlider
+                    tooltip={false}
+                    min={1}
+                    max={numFrames}
+                    value={this.state.frame}
+                    onChange={this.handleSliderChange}
+                    onChangeComplete={this.handleSliderChangeComplete}
+                />
                 <div className="time-display">
                     {`${currentTime} / ${totalTime} s`}
                 </div>

@@ -56,18 +56,18 @@ class Evaluator {
   virtual void Evaluate(Obstacle* obstacle) = 0;
 
   /**
-    * @brief Evaluate an obstacle
-    * @param Obstacle pointer
-    * @param vector of all Obstacles
-    */
-  virtual void Evaluate(
-      Obstacle* obstacle, std::vector<Obstacle*> dynamic_env) {
+   * @brief Evaluate an obstacle
+   * @param Obstacle pointer
+   * @param vector of all Obstacles
+   */
+  virtual void Evaluate(Obstacle* obstacle,
+                        std::vector<Obstacle*> dynamic_env) {
     Evaluate(obstacle);
   }
 
   /**
-    * @brief Get the name of evaluator
-    */
+   * @brief Get the name of evaluator
+   */
   virtual std::string GetName() = 0;
 
  protected:
@@ -81,7 +81,7 @@ class Evaluator {
     double rho = std::sqrt(x_diff * x_diff + y_diff * y_diff);
     double theta = std::atan2(y_diff, x_diff) - obj_world_angle;
 
-    return std::make_pair(std::cos(theta)*rho, std::sin(theta)*rho);
+    return std::make_pair(std::cos(theta) * rho, std::sin(theta) * rho);
   }
 
   double WorldAngleToObjAngle(double input_world_angle,
@@ -90,7 +90,7 @@ class Evaluator {
   }
 
   Eigen::MatrixXf VectorToMatrixXf(const std::vector<double>& nums,
-      const int start_index, const int end_index) {
+                                   const int start_index, const int end_index) {
     CHECK_LT(start_index, end_index);
     CHECK_GE(start_index, 0);
     CHECK_LE(end_index, static_cast<int>(nums.size()));
@@ -103,8 +103,9 @@ class Evaluator {
   }
 
   Eigen::MatrixXf VectorToMatrixXf(const std::vector<double>& nums,
-      const int start_index, const int end_index,
-      const int output_num_row, const int output_num_col) {
+                                   const int start_index, const int end_index,
+                                   const int output_num_row,
+                                   const int output_num_col) {
     CHECK_LT(start_index, end_index);
     CHECK_GE(start_index, 0);
     CHECK_LE(end_index, static_cast<int>(nums.size()));

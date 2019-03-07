@@ -22,14 +22,13 @@
 #pragma once
 
 #include <memory>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "modules/common/configs/config_gflags.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/v2x/v2x_proxy/obu_interface/obu_interface_grpc_impl.h"
 #include "modules/v2x/v2x_proxy/os_interface/os_interface.h"
-
 
 namespace apollo {
 namespace v2x {

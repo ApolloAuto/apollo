@@ -23,8 +23,8 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-using ::apollo::cyber::proto::Header;
 using ::apollo::cyber::proto::CompressType;
+using ::apollo::cyber::proto::Header;
 
 class HeaderBuilder {
  public:
@@ -41,7 +41,7 @@ class HeaderBuilder {
   static const uint64_t CHUNK_INTERVAL_ = 20 * 1000 * 1000 * 1000ULL;    // 20s
   static const uint64_t SEGMENT_INTERVAL_ = 60 * 1000 * 1000 * 1000ULL;  // 60s
   static const uint64_t CHUNK_RAW_SIZE_ = 200 * 1024 * 1024ULL;     // 200MB
-  static const uint64_t SEGMENT_RAW_SIZE_ = 2048 * 1024 * 1024ULL;  // 200GB
+  static const uint64_t SEGMENT_RAW_SIZE_ = 2048 * 1024 * 1024ULL;  // 2GB
 };
 
 }  // namespace record

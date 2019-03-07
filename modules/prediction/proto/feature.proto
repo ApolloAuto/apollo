@@ -3,7 +3,6 @@ syntax = "proto2";
 package apollo.prediction;
 
 import "modules/common/proto/geometry.proto";
-import "modules/common/proto/pnc_point.proto";
 import "modules/perception/proto/perception_obstacle.proto";
 import "modules/prediction/proto/lane_graph.proto";
 import "modules/prediction/proto/prediction_point.proto";
@@ -108,4 +107,15 @@ message Feature {
 
   // Obstacle ground-truth labels:
   repeated PredictionTrajectoryPoint future_trajectory_points = 31;
+}
+
+message ObstacleHistory {
+  repeated Feature feature = 1;
+  optional bool is_trainable = 2 [default = false];
+}
+
+message FrameEnv {
+  optional double timestamp = 1;
+  optional ObstacleHistory ego_history = 2;
+  repeated ObstacleHistory obstacles_history = 3;
 }

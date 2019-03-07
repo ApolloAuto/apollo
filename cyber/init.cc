@@ -25,11 +25,8 @@
 #include <string>
 
 #include "cyber/binary.h"
-#include "cyber/common/environment.h"
-#include "cyber/common/file.h"
 #include "cyber/common/global_data.h"
 #include "cyber/data/data_dispatcher.h"
-#include "cyber/event/perf_event_cache.h"
 #include "cyber/logger/async_logger.h"
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
@@ -40,12 +37,6 @@
 namespace apollo {
 namespace cyber {
 
-using apollo::cyber::common::EnsureDirectory;
-using apollo::cyber::common::GetAbsolutePath;
-using apollo::cyber::common::GetProtoFromFile;
-using apollo::cyber::common::WorkRoot;
-using apollo::cyber::croutine::CRoutine;
-using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::scheduler::Scheduler;
 using apollo::cyber::service_discovery::TopologyManager;
 
@@ -53,7 +44,7 @@ namespace {
 bool g_atexit_registered = false;
 std::mutex g_mutex;
 logger::AsyncLogger* async_logger = nullptr;
-}
+}  // namespace
 
 namespace {
 
@@ -102,6 +93,8 @@ bool Init(const char* binary_name) {
   }
 
   InitLogger(binary_name);
+  auto thread = const_cast<std::thread*>(async_logger->LogThread());
+  scheduler::Instance()->SetInnerThreadAttr("async_log", thread);
   std::signal(SIGINT, OnShutdown);
   // Register exit handlers
   if (!g_atexit_registered) {

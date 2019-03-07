@@ -32,9 +32,10 @@ namespace stop_sign {
 
 struct StopSignUnprotectedContext;
 
-class StageCreep : public Stage {
+class StopSignUnprotectedStageCreep : public Stage {
  public:
-  explicit StageCreep(const ScenarioConfig::StageConfig& config)
+  explicit StopSignUnprotectedStageCreep(
+      const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:

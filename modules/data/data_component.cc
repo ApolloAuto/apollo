@@ -16,7 +16,6 @@
 #include "modules/data/data_component.h"
 
 #include "cyber/common/log.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
 #include "modules/data/common/data_gflags.h"
@@ -26,8 +25,7 @@ namespace apollo {
 namespace data {
 
 bool DataComponent::Init() {
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_data_conf_file,
-                                               &data_conf_))
+  CHECK(cyber::common::GetProtoFromFile(FLAGS_data_conf_file, &data_conf_))
       << "Unable to load data conf file: " << FLAGS_data_conf_file;
 
   if (!data_conf_.data_enabled()) {
@@ -43,10 +41,8 @@ bool DataComponent::Init() {
   return true;
 }
 
-bool DataComponent::Proc(
-    const std::shared_ptr<DataInputCommand> &request) {
-  ADEBUG << "Received data input command: "
-         << request->DebugString();
+bool DataComponent::Proc(const std::shared_ptr<DataInputCommand> &request) {
+  ADEBUG << "Received data input command: " << request->DebugString();
 
   OnDataInputCommand(request);
 
@@ -57,11 +53,8 @@ bool DataComponent::Proc(
 // but just leave it for testing for now
 void DataComponent::CreateReader() {
   data_input_cmd_reader_ = node_->CreateReader<DataInputCommand>(
-      FLAGS_data_topic,
-      std::bind(
-          &DataComponent::OnDataInputCommand,
-          this,
-          std::placeholders::_1));
+      FLAGS_data_topic, std::bind(&DataComponent::OnDataInputCommand, this,
+                                  std::placeholders::_1));
   CHECK(data_input_cmd_reader_ != nullptr);
 }
 

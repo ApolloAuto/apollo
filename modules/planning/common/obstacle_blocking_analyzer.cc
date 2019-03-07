@@ -33,11 +33,10 @@ using apollo::hdmap::HDMapUtil;
 
 // This is the side-pass condition for every obstacle.
 // TODO(all): if possible, transform as many function parameters into GFLAGS.
-bool IsBlockingObstacleToSidePass(
-    const Frame& frame, const Obstacle* obstacle,
-    double block_obstacle_min_speed,
-    double min_front_sidepass_distance,
-    bool enable_obstacle_blocked_check) {
+bool IsBlockingObstacleToSidePass(const Frame& frame, const Obstacle* obstacle,
+                                  double block_obstacle_min_speed,
+                                  double min_front_sidepass_distance,
+                                  bool enable_obstacle_blocked_check) {
   // Get the necessary info.
   const auto& reference_line_info = frame.reference_line_info().front();
   const auto& reference_line = reference_line_info.reference_line();
@@ -52,15 +51,13 @@ bool IsBlockingObstacleToSidePass(
   }
 
   // Obstacle is moving.
-  if (!obstacle->IsStatic() ||
-      obstacle->speed() > block_obstacle_min_speed) {
+  if (!obstacle->IsStatic() || obstacle->speed() > block_obstacle_min_speed) {
     ADEBUG << " - It is non-static.";
     return false;
   }
 
   // Obstacle is behind ADC.
-  if (obstacle->PerceptionSLBoundary().start_s() <=
-      adc_sl_boundary.end_s()) {
+  if (obstacle->PerceptionSLBoundary().start_s() <= adc_sl_boundary.end_s()) {
     ADEBUG << " - It is behind ADC.";
     return false;
   }
@@ -120,8 +117,8 @@ bool IsBlockingObstacleToSidePass(
   return true;
 }
 
-double GetDistanceBetweenADCAndObstacle(
-    const Frame& frame, const Obstacle* obstacle) {
+double GetDistanceBetweenADCAndObstacle(const Frame& frame,
+                                        const Obstacle* obstacle) {
   const auto& reference_line_info = frame.reference_line_info().front();
   const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
   double distance_between_adc_and_obstacle =
@@ -129,17 +126,16 @@ double GetDistanceBetweenADCAndObstacle(
   return distance_between_adc_and_obstacle;
 }
 
-bool IsBlockingDrivingPathObstacle(
-    const ReferenceLine& reference_line, const Obstacle* obstacle) {
+bool IsBlockingDrivingPathObstacle(const ReferenceLine& reference_line,
+                                   const Obstacle* obstacle) {
   const double driving_width =
       reference_line.GetDrivingWidth(obstacle->PerceptionSLBoundary());
   const double adc_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width();
   ADEBUG << " (driving width = " << driving_width
          << ", adc_width = " << adc_width << ")";
-  if (driving_width >
-      adc_width + FLAGS_static_decision_nudge_l_buffer +
-      FLAGS_side_pass_driving_width_l_buffer) {
+  if (driving_width > adc_width + FLAGS_static_decision_nudge_l_buffer +
+                          FLAGS_side_pass_driving_width_l_buffer) {
     // TODO(jiacheng): make this a GFLAG:
     // side_pass_context_.scenario_config_.min_l_nudge_buffer()
     ADEBUG << "It is NOT blocking our path.";

@@ -35,7 +35,6 @@ DEFINE_string(res_dir, "./result.dat", "path of result");
 
 int main(int argc, char **argv) {
   google::ParseCommandLineFlags(&argc, &argv, true);
-  std::vector<float> output_data_vec1;
   std::vector<cv::Scalar> color_table;
   color_table.push_back(cv::Scalar(0, 97, 255));    // for other >0 mask values
   color_table.push_back(cv::Scalar(0, 0, 255));     // for mask value = 1
@@ -61,7 +60,7 @@ int main(int argc, char **argv) {
 
   apollo::perception::inference::load_data<std::string>(FLAGS_names_file,
                                                         &outputs);
-  for (auto name : outputs) {
+  for (auto &name : outputs) {
     ADEBUG << name;
   }
 
@@ -90,7 +89,8 @@ int main(int argc, char **argv) {
                                                         &image_lists);
   std::vector<float> output_data_vec;
 
-  for (auto image_file : image_lists) {
+  const int count = width * height;
+  for (auto &image_file : image_lists) {
     cv::Mat img =
         cv::imread(FLAGS_image_root + image_file + FLAGS_image_ext, CV_8UC1);
     ADEBUG << img.channels();
@@ -99,9 +99,8 @@ int main(int argc, char **argv) {
     img_roi.copyTo(img);
     cv::resize(img, img, cv::Size(width, height));
 
-    const int count = 1 * width * height;
     std::vector<float> input(count);
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
       input[i] = static_cast<float>(img.data[i] - 128) * 0.0078125f;
     }
     cudaMemcpy(input_blob->mutable_gpu_data(), &input[0], count * sizeof(float),
@@ -110,7 +109,7 @@ int main(int argc, char **argv) {
     rt_net->Infer();
     cudaDeviceSynchronize();
 
-    for (auto output_name : outputs) {
+    for (auto &output_name : outputs) {
       auto blob = rt_net->get_blob(output_name);
       std::vector<float> tmp_vec(blob->cpu_data(),
                                  blob->cpu_data() + blob->count());

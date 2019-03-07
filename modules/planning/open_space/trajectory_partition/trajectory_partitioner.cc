@@ -19,6 +19,7 @@
  **/
 
 #include "modules/planning/open_space/trajectory_partition/trajectory_partitioner.h"
+#include "cyber/common/file.h"
 
 namespace apollo {
 namespace planning {
@@ -29,8 +30,8 @@ using apollo::common::VehicleState;
 using apollo::common::time::Clock;
 
 TrajectoryPartitioner::TrajectoryPartitioner() {
-  CHECK(common::util::GetProtoFromFile(FLAGS_planner_open_space_config_filename,
-                                       &planner_open_space_config_))
+  CHECK(cyber::common::GetProtoFromFile(
+      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
   gear_shift_max_t_ = planner_open_space_config_.trajectory_partition_config()

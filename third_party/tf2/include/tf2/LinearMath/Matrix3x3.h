@@ -22,7 +22,6 @@ subject to the following restrictions:
 namespace tf2
 {
 
-
 #define Matrix3x3Data	Matrix3x3DoubleData 
 
 

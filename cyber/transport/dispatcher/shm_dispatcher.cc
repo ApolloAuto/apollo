@@ -149,7 +149,7 @@ bool ShmDispatcher::Init() {
   host_id_ = common::Hash(GlobalData::Instance()->HostIp());
   notifier_ = NotifierFactory::CreateNotifier();
   thread_ = std::thread(&ShmDispatcher::ThreadFunc, this);
-  scheduler::Instance()->SetInnerThreadAttr(&thread_, "shm_disp");
+  scheduler::Instance()->SetInnerThreadAttr("shm_disp", &thread_);
   return true;
 }
 

@@ -182,7 +182,7 @@ bool DecisionData::CreateVirtualObstacle(
   std::lock_guard<std::mutex> lock(mutex_);
 
   perception::PerceptionObstacle perception_obstacle;
-  // TODO(lianglia-apollo) please chagne is_virtual in obstacle
+  // TODO(All) please chagne is_virtual in obstacle
   perception_obstacle.set_id(virtual_obstacle_.size() + 1);
   perception_obstacle.mutable_position()->set_x(obstacle_box.center().x());
   perception_obstacle.mutable_position()->set_y(obstacle_box.center().y());

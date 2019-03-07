@@ -26,8 +26,8 @@ UltrasonicRadarCanbusComponent::UltrasonicRadarCanbusComponent() {
 }
 
 bool UltrasonicRadarCanbusComponent::Init() {
-  return utralsonic_radar_canbus_.Init(ConfigFilePath(), writer_).ok()
-      && utralsonic_radar_canbus_.Start().ok();
+  return utralsonic_radar_canbus_.Init(ConfigFilePath(), writer_).ok() &&
+         utralsonic_radar_canbus_.Start().ok();
 }
 
 }  // namespace ultrasonic_radar

@@ -21,7 +21,8 @@
 #include "pcl/kdtree/kdtree.h"
 #include "pcl/kdtree/kdtree_flann.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
+#include "modules/common/util/string_util.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point_cloud.h"
@@ -50,7 +51,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetFileName;
+using cyber::common::GetFileName;
 
 class OfflineLidarObstaclePerception {
  public:
@@ -86,25 +87,26 @@ class OfflineLidarObstaclePerception {
       return false;
     }
 
-    bool ret = common::SensorManager::Instance()->GetSensorInfo(
-        FLAGS_sensor_name, &sensor_info_);
-    if (!ret) {
-      AERROR << "Failed to get sensor info, sensor name: "
-        << FLAGS_sensor_name;
+    if (!common::SensorManager::Instance()->GetSensorInfo(FLAGS_sensor_name,
+                                                          &sensor_info_)) {
+      AERROR << "Failed to get sensor info, sensor name: " << FLAGS_sensor_name;
       return false;
     }
-    ADEBUG << "Sensor_name: " << sensor_info_.name;
 
+    ADEBUG << "Sensor_name: " << sensor_info_.name;
     return true;
   }
 
-  void run() {
+  bool run() {
     double timestamp = 0.f;
     std::string pcd_folder = FLAGS_pcd_path;
     std::string pose_folder = FLAGS_pose_path;
     std::string output_path = FLAGS_output_path;
     std::vector<std::string> pcd_file_names;
-    common::GetFileList(pcd_folder, ".pcd", &pcd_file_names);
+    if (!common::GetFileList(pcd_folder, ".pcd", &pcd_file_names)) {
+      AERROR << "pcd_folder: " << pcd_folder << " get file list error.";
+      return false;
+    }
     std::sort(pcd_file_names.begin(), pcd_file_names.end(),
               [](const std::string& lhs, const std::string& rhs) {
                 if (lhs.length() != rhs.length()) {
@@ -112,7 +114,7 @@ class OfflineLidarObstaclePerception {
                 }
                 return lhs <= rhs;
               });
-    for (size_t i = 0; i < pcd_file_names.size(); i++) {
+    for (size_t i = 0; i < pcd_file_names.size(); ++i) {
       AINFO << "***************** Frame " << i << " ******************";
       AINFO << pcd_file_names[i];
       const std::string file_name = GetFileName(pcd_file_names[i]);
@@ -124,11 +126,11 @@ class OfflineLidarObstaclePerception {
       }
       LoadPCLPCD(pcd_folder + "/" + file_name + ".pcd", frame_->cloud.get());
       AINFO << "Read point cloud from " << pcd_file_names[i]
-               << " with cloud size: " << frame_->cloud->size();
+            << " with cloud size: " << frame_->cloud->size();
       if (pose_folder != "") {
         std::string pose_file_name = pose_folder + "/" + file_name + ".pose";
         AINFO << "Pose file: " << pose_file_name;
-        if (!apollo::common::util::PathExists(pose_file_name)) {
+        if (!apollo::cyber::common::PathExists(pose_file_name)) {
           pose_file_name = pose_folder + "/" + file_name + ".pcd.pose";
         }
         int idt = 0;
@@ -146,7 +148,7 @@ class OfflineLidarObstaclePerception {
           lidar_segmentation_->Process(segment_options_, frame_.get());
       if (segment_result.error_code != LidarErrorCode::Succeed) {
         AINFO << segment_result.log;
-        return;
+        return false;
       }
       if (FLAGS_enable_tracking) {
         AINFO << "Enable tracking.";
@@ -154,7 +156,7 @@ class OfflineLidarObstaclePerception {
             lidar_tracking_->Process(tracking_options_, frame_.get());
         if (tracking_result.error_code != LidarErrorCode::Succeed) {
           AINFO << tracking_result.log;
-          return;
+          return false;
         }
         if (FLAGS_use_tracking_info) {
           auto& objects = frame_->segmented_objects;
@@ -200,9 +202,13 @@ class OfflineLidarObstaclePerception {
           filtered_objects.push_back(object);
         }
       }
-      WriteObjectsForNewBenchmark(i, filtered_objects,
-                                  output_path + "/" + file_name + ".pcd");
+      if (!WriteObjectsForNewBenchmark(i, filtered_objects,
+          apollo::common::util::StrCat(output_path, "/", file_name, ".pcd"))) {
+        return false;
+      }
     }
+
+    return true;
   }
 
   bool WriteObjectsForNewBenchmark(size_t frame_id,
@@ -210,7 +216,7 @@ class OfflineLidarObstaclePerception {
                                    const std::string& path) {
     std::ofstream fout(path);
     if (!fout.is_open()) {
-      AERROR << "Fail to open " << path << std::endl;
+      AERROR << "Failed to open: " << path;
       return false;
     }
     fout << frame_id << " " << objects.size() << std::endl;
@@ -224,7 +230,7 @@ class OfflineLidarObstaclePerception {
       if (object->type == base::ObjectType::UNKNOWN ||
           object->type == base::ObjectType::UNKNOWN_MOVABLE ||
           object->type == base::ObjectType::UNKNOWN_UNMOVABLE) {
-        type = "unknow";
+        // type is unknow in this case
       } else if (object->type == base::ObjectType::PEDESTRIAN) {
         type = "pedestrian";
       } else if (object->type == base::ObjectType::VEHICLE) {
@@ -260,9 +266,9 @@ class OfflineLidarObstaclePerception {
       }
       fout << std::endl;
     }
-    // we save road boundary and road/junction polygon here for debug
+    // We save road boundary and road/junction polygon here for debug
     if (frame_->hdmap_struct != nullptr) {
-      // transform to local frame, note since missing valid z value, the local
+      // Transform to local frame, note since missing valid z value, the local
       // coordinates may not be accurate, only for visualization purpose
       double z = frame_->lidar2world_pose(2, 3) - 1.7;
       Eigen::Affine3d world2lidar_pose = frame_->lidar2world_pose.inverse();
@@ -278,13 +284,13 @@ class OfflineLidarObstaclePerception {
         }
         fout << std::endl;
       };
-      // 1. write road boundary
+      // 1. Write road boundary
       fout << frame_->hdmap_struct->road_boundary.size() << std::endl;
       for (auto& pair : frame_->hdmap_struct->road_boundary) {
         write_transformed_polygon(pair.left_boundary);
         write_transformed_polygon(pair.right_boundary);
       }
-      // 2. write road/junction polygon
+      // 2. Write road/junction polygon
       fout << frame_->hdmap_struct->road_polygons.size() +
                   frame_->hdmap_struct->junction_polygons.size()
            << std::endl;
@@ -294,13 +300,14 @@ class OfflineLidarObstaclePerception {
       for (auto& poly : frame_->hdmap_struct->junction_polygons) {
         write_transformed_polygon(poly);
       }
-      // 3. save points label
+      // 3. Save points label
       fout << frame_->cloud->size() << " ";
       for (size_t i = 0; i < frame_->cloud->size(); ++i) {
         fout << static_cast<int>(frame_->cloud->points_label(i)) << " ";
       }
       fout << std::endl;
     }
+
     fout.close();
     return true;
   }
@@ -321,7 +328,7 @@ class OfflineLidarObstaclePerception {
 }  // namespace perception
 }  // namespace apollo
 
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv) {
   FLAGS_alsologtostderr = 1;
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);
@@ -329,8 +336,7 @@ int main(int argc, char* argv[]) {
   apollo::perception::lidar::OfflineLidarObstaclePerception test;
   if (!test.setup()) {
     AINFO << "Failed to setup OfflineLidarObstaclePerception";
-    return 0;
+    return -1;
   }
-  test.run();
-  return 0;
+  return test.run() ? 0 : -1;
 }

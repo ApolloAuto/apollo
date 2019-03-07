@@ -16,7 +16,7 @@
 
 #include "modules/perception/lidar/lib/ground_detector/ground_service_detector/ground_service_detector.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/common/lidar_point_label.h"
 #include "modules/perception/lidar/lib/ground_detector/ground_service_detector/proto/ground_service_detector_config.pb.h"
@@ -25,7 +25,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   auto config_manager = lib::ConfigManager::Instance();
@@ -42,7 +42,7 @@ bool GroundServiceDetector::Init(const GroundDetectorInitOptions& options) {
   config_file = GetAbsolutePath(config_file, "ground_service_detector.conf");
 
   GroundServiceDetectorConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   ground_threshold_ = config.ground_threshold();
 
   ground_service_ = std::dynamic_pointer_cast<GroundService>(

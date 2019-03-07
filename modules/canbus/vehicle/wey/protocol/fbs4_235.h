@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
@@ -29,15 +29,14 @@ class Fbs4235 : public ::apollo::drivers::canbus::ProtocolData<
   static const int32_t ID;
   Fbs4235();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'angle of steering wheel ', 'offset': 0.0,
   // 'precision': 0.1, 'len': 15, 'name': 'SteerWheelAngle',
   // 'is_signed_var': False, 'physical_range': '[0|780]', 'bit': 15,
   // 'type': 'double', 'order': 'motorola', 'physical_unit': '\xa1\xe3'}
-  double steerwheelangle(const std::uint8_t* bytes,
-                                                const int32_t length) const;
+  double steerwheelangle(const std::uint8_t* bytes, const int32_t length) const;
 
   // config detail: {'description': 'steering wheel rotation speed',
   // 'offset': 0.0, 'precision': 0.1, 'len': 15, 'name': 'SteerWheelSpd',

@@ -30,14 +30,14 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;
-using apollo::cyber::common::GlobalData;
 using apollo::cyber::common::GetAbsolutePath;
-using apollo::cyber::common::PathExists;
 using apollo::cyber::common::GetProtoFromFile;
+using apollo::cyber::common::GlobalData;
+using apollo::cyber::common::PathExists;
 using apollo::cyber::common::WorkRoot;
+using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
@@ -106,7 +106,7 @@ void SchedulerClassic::CreateProcessor() {
 bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  MutexWrapper *wrapper = nullptr;
+  MutexWrapper* wrapper = nullptr;
   if (!id_map_mutex_.Get(cr->id(), &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
@@ -146,7 +146,8 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   {
     WriteLockGuard<AtomicRWLock> lk(
         ClassicContext::rq_locks_[cr->group_name()].at(cr->priority()));
-    ClassicContext::cr_group_[cr->group_name()].at(cr->priority())
+    ClassicContext::cr_group_[cr->group_name()]
+        .at(cr->priority())
         .emplace_back(cr);
   }
 
@@ -188,7 +189,7 @@ bool SchedulerClassic::RemoveTask(const std::string& name) {
 bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  MutexWrapper *wrapper = nullptr;
+  MutexWrapper* wrapper = nullptr;
   if (!id_map_mutex_.Get(crid, &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);

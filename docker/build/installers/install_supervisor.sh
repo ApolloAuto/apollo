@@ -19,7 +19,9 @@
 # Fail on first error.
 set -e
 
-apt-get install -y supervisor
+apt-get -y update && \
+    apt-get install -y supervisor
+
 # Add supervisord config file
 echo_supervisord_conf > /etc/supervisord.conf
 

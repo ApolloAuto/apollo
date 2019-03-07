@@ -234,6 +234,13 @@ Status LatController::Init(const ControlConf *control_conf) {
   auto &lat_controller_conf = control_conf_->lat_controller_conf();
   LoadLatGainScheduler(lat_controller_conf);
   LogInitParameters();
+
+  bool enable_leadlag = control_conf_->lat_controller_conf()
+                            .enable_reverse_leadlag_compensation();
+  if (enable_leadlag) {
+    leadlag_controller_.Init(lat_controller_conf.reverse_leadlag_conf(), ts_);
+  }
+
   return Status::OK();
 }
 
@@ -405,8 +412,18 @@ Status LatController::ComputeControlCommand(
   const double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
 
   // Clamp the steer angle to -100.0 to 100.0
-  double steer_angle = common::math::Clamp(
-      steer_angle_feedback + steer_angle_feedforward, -100.0, 100.0);
+  double steer_angle = 0.0;
+  bool enable_leadlag = control_conf_->lat_controller_conf()
+                            .enable_reverse_leadlag_compensation();
+  if (enable_leadlag) {
+    steer_angle = common::math::Clamp(
+        leadlag_controller_.Control(steer_angle_feedback, ts_) +
+            steer_angle_feedforward,
+        -100.0, 100.0);
+  } else {
+    steer_angle = common::math::Clamp(
+        steer_angle_feedback + steer_angle_feedforward, -100.0, 100.0);
+  }
 
   if (FLAGS_set_steer_limit) {
     const double steer_limit = std::atan(max_lat_acc_ * min_turn_radius_ /
@@ -425,7 +442,7 @@ Status LatController::ComputeControlCommand(
     steer_angle = digital_filter_.Filter(steer_angle);
   }
 
-  if (vehicle_state->linear_velocity() < FLAGS_lock_steer_speed &&
+  if (std::abs(vehicle_state->linear_velocity()) < FLAGS_lock_steer_speed &&
       (vehicle_state->gear() == canbus::Chassis::GEAR_DRIVE ||
        vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE) &&
       chassis->driving_mode() == canbus::Chassis::COMPLETE_AUTO_DRIVE) {

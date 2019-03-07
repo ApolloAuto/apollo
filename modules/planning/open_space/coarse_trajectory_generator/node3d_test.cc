@@ -41,7 +41,7 @@ class Node3dTest : public ::testing::Test {
 };
 
 TEST_F(Node3dTest, GetBoundingBox) {
-  Box2d test_box = node_->GetBoundingBox(vehicle_param_);
+  Box2d test_box = Node3d::GetBoundingBox(vehicle_param_, 0.0, 0.0, 0.0);
   double ego_length = vehicle_param_.length();
   double ego_width = vehicle_param_.width();
   Box2d gold_box({0.0, 0.0}, 0.0, ego_length, ego_width);

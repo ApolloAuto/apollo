@@ -39,8 +39,8 @@ class LidarEndToEndAnalyzer:
                 control_cmd.header.lidar_timestamp)
             del (self.control_unprocessed_lidar_timestamps[ind])
             self.control_endtoend_latency.append(
-                control_cmd.header.lidar_timestamp / 1.0e-9 -
-                control_cmd.header.timestamp_sec)
+                (control_cmd.header.timestamp_sec -
+                control_cmd.header.lidar_timestamp * 1.0e-9) * 1000.0)
 
     def put_planning(self, planning_cmd):
         """put control data"""
@@ -50,8 +50,8 @@ class LidarEndToEndAnalyzer:
                 planning_cmd.header.lidar_timestamp)
             del (self.planning_unprocessed_lidar_timestamps[ind])
             self.planning_endtoend_latency.append(
-                planning_cmd.header.lidar_timestamp * 1.0e-9 -
-                planning_cmd.header.timestamp_sec)
+                (planning_cmd.header.timestamp_sec -
+                planning_cmd.header.lidar_timestamp * 1.0e-9) * 1000.0)
 
     def put_lidar(self, point_cloud):
         """put lidar data"""

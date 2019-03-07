@@ -43,6 +43,7 @@ class RecordWriter : public RecordBase {
   using FileWriterPtr = std::unique_ptr<RecordFileWriter>;
 
   RecordWriter();
+  explicit RecordWriter(const proto::Header& header);
 
   virtual ~RecordWriter();
 

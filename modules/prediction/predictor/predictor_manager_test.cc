@@ -16,6 +16,7 @@
 
 #include "modules/prediction/predictor/predictor_manager.h"
 
+#include "cyber/common/file.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
@@ -32,7 +33,7 @@ class PredictorManagerTest : public KMLMapBasedTest {
   void SetUp() override {
     std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
-    CHECK(apollo::common::util::GetProtoFromFile(file, &perception_obstacles_));
+    CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
 
  protected:
@@ -44,8 +45,8 @@ class PredictorManagerTest : public KMLMapBasedTest {
 TEST_F(PredictorManagerTest, General) {
   FLAGS_enable_trim_prediction_trajectory = false;
   std::string conf_file = "modules/prediction/testdata/adapter_conf.pb.txt";
-  bool ret_load_conf = common::util::GetProtoFromFile(
-      conf_file, &adapter_conf_);
+  bool ret_load_conf =
+      cyber::common::GetProtoFromFile(conf_file, &adapter_conf_);
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(adapter_conf_.IsInitialized());
 
@@ -53,8 +54,9 @@ TEST_F(PredictorManagerTest, General) {
   EvaluatorManager::Instance()->Init(prediction_conf_);
   PredictorManager::Instance()->Init(prediction_conf_);
 
-  auto obstacles_container = ContainerManager::Instance()->GetContainer<
-      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+  auto obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
   obstacles_container->Insert(perception_obstacles_);
 

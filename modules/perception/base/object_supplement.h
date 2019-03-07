@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <boost/circular_buffer.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -180,6 +181,40 @@ struct alignas(16) CameraObjectSupplement {
 typedef std::shared_ptr<CameraObjectSupplement> CameraObjectSupplementPtr;
 typedef std::shared_ptr<const CameraObjectSupplement>
     CameraObjectSupplementConstPtr;
+
+typedef Eigen::Matrix4f MotionType;
+struct alignas(16) VehicleStatus {
+  float roll_rate = 0;
+  float pitch_rate = 0;
+  float yaw_rate = 0;
+  float velocity = 0;
+  float velocity_x = 0;
+  float velocity_y = 0;
+  float velocity_z = 0;
+  double time_ts = 0;                          // time stamp
+  double time_d = 0;                           // time stamp difference in image
+  MotionType motion = MotionType::Identity();  // Motion Matrix
+};
+
+typedef boost::circular_buffer<VehicleStatus> MotionBuffer;
+typedef std::shared_ptr<MotionBuffer> MotionBufferPtr;
+typedef std::shared_ptr<const MotionBuffer> MotionBufferConstPtr;
+
+struct alignas(16) Vehicle3DStatus {
+  float yaw_delta;  // azimuth angle change
+  float pitch_delta;
+  float roll_delta;
+  float velocity_x;          // east
+  float velocity_y;          // north
+  float velocity_z;          // up
+  double time_ts;            // time stamp
+  double time_d;             // time stamp difference in image
+  Eigen::Matrix4f motion3d;  // 3-d Motion Matrix
+};
+
+typedef boost::circular_buffer<Vehicle3DStatus> Motion3DBuffer;
+typedef std::shared_ptr<Motion3DBuffer> Motion3DBufferPtr;
+typedef std::shared_ptr<const Motion3DBuffer> Motion3DBufferConstPtr;
 
 struct SensorObjectMeasurement {
   void Reset() {

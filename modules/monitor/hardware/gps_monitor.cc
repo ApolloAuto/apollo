@@ -34,9 +34,8 @@ namespace monitor {
 using apollo::drivers::gnss::GnssStatus;
 using apollo::drivers::gnss::InsStatus;
 
-GpsMonitor::GpsMonitor() : RecurrentRunner(FLAGS_gps_monitor_name,
-                                           FLAGS_gps_monitor_interval) {
-}
+GpsMonitor::GpsMonitor()
+    : RecurrentRunner(FLAGS_gps_monitor_name, FLAGS_gps_monitor_interval) {}
 
 void GpsMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
@@ -55,8 +54,8 @@ void GpsMonitor::RunOnce(const double current_time) {
   gnss_status_reader->Observe();
   const auto gnss_status = gnss_status_reader->GetLatestObserved();
   if (gnss_status == nullptr) {
-    SummaryMonitor::EscalateStatus(
-        ComponentStatus::ERROR, "No GNSS status message", component_status);
+    SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
+                                   "No GNSS status message", component_status);
     return;
   }
   if (!gnss_status->solution_completed()) {
@@ -71,8 +70,8 @@ void GpsMonitor::RunOnce(const double current_time) {
   ins_status_reader->Observe();
   const auto ins_status = ins_status_reader->GetLatestObserved();
   if (ins_status == nullptr) {
-    SummaryMonitor::EscalateStatus(
-        ComponentStatus::ERROR, "No INS status message", component_status);
+    SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
+                                   "No INS status message", component_status);
     return;
   }
   switch (ins_status->type()) {
@@ -84,12 +83,12 @@ void GpsMonitor::RunOnce(const double current_time) {
       SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", component_status);
       break;
     case InsStatus::INVALID:
-      SummaryMonitor::EscalateStatus(
-          ComponentStatus::ERROR, "INS status invalid", component_status);
+      SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
+                                     "INS status invalid", component_status);
       break;
     default:
-      SummaryMonitor::EscalateStatus(
-          ComponentStatus::ERROR, "INS status unknown", component_status);
+      SummaryMonitor::EscalateStatus(ComponentStatus::ERROR,
+                                     "INS status unknown", component_status);
       break;
   }
 }

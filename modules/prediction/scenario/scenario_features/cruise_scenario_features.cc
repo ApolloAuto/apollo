@@ -40,8 +40,7 @@ bool CruiseScenarioFeatures::IsLaneOfInterest(
   return lane_ids_of_interest_.find(lane_id) != lane_ids_of_interest_.end();
 }
 
-void CruiseScenarioFeatures::InsertLaneOfInterest(
-    const std::string& lane_id) {
+void CruiseScenarioFeatures::InsertLaneOfInterest(const std::string& lane_id) {
   lane_ids_of_interest_.insert(lane_id);
 }
 

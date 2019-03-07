@@ -24,8 +24,8 @@
 
 #include "gtest/gtest.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -47,9 +47,8 @@ TEST_F(TrafficLightProtectedScenarioTest, VerifyConf) {
       "scenario/traffic_light_protected_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_protected_config_file,
-      &config));
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
+      FLAGS_scenario_traffic_light_protected_config_file, &config));
 }
 
 TEST_F(TrafficLightProtectedScenarioTest, Init) {
@@ -58,9 +57,8 @@ TEST_F(TrafficLightProtectedScenarioTest, Init) {
       "scenario/traffic_light_protected_config.pb.txt";
 
   ScenarioConfig config;
-  EXPECT_TRUE(apollo::common::util::GetProtoFromFile(
-      FLAGS_scenario_traffic_light_protected_config_file,
-      &config));
+  EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
+      FLAGS_scenario_traffic_light_protected_config_file, &config));
 
   ScenarioContext context;
   scenario_.reset(new TrafficLightProtectedScenario(config, &context));

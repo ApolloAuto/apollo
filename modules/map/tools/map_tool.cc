@@ -1,24 +1,24 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "gflags/gflags.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/proto/map.pb.h"
 
@@ -37,14 +37,14 @@ static void ShiftMap(Map* map_pb) {
       }
     }
     for (auto& segment :
-        *(lane.mutable_left_boundary()->mutable_curve()->mutable_segment())) {
+         *(lane.mutable_left_boundary()->mutable_curve()->mutable_segment())) {
       for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
         point.set_x(point.x() + FLAGS_x_offset);
         point.set_y(point.y() + FLAGS_y_offset);
       }
     }
     for (auto& segment :
-        *(lane.mutable_right_boundary()->mutable_curve()->mutable_segment())) {
+         *(lane.mutable_right_boundary()->mutable_curve()->mutable_segment())) {
       for (auto& point : *(segment.mutable_line_segment()->mutable_point())) {
         point.set_x(point.x() + FLAGS_x_offset);
         point.set_y(point.y() + FLAGS_y_offset);
@@ -66,8 +66,8 @@ static void ShiftMap(Map* map_pb) {
 static void OutputMap(const Map& map_pb) {
   const std::string txt_file = FLAGS_output_dir + "/base_map.txt";
   const std::string bin_file = FLAGS_output_dir + "/base_map.bin";
-  CHECK(apollo::common::util::SetProtoToASCIIFile(map_pb, txt_file));
-  CHECK(apollo::common::util::SetProtoToBinaryFile(map_pb, bin_file));
+  CHECK(apollo::cyber::common::SetProtoToASCIIFile(map_pb, txt_file));
+  CHECK(apollo::cyber::common::SetProtoToBinaryFile(map_pb, bin_file));
 }
 
 int main(int32_t argc, char** argv) {
@@ -79,7 +79,7 @@ int main(int32_t argc, char** argv) {
 
   Map map_pb;
   const auto map_file = apollo::hdmap::BaseMapFile();
-  CHECK(apollo::common::util::GetProtoFromFile(map_file, &map_pb))
+  CHECK(apollo::cyber::common::GetProtoFromFile(map_file, &map_pb))
       << "Fail to open:" << map_file;
   ShiftMap(&map_pb);
   OutputMap(map_pb);

@@ -58,6 +58,21 @@ cc_library(
 )
 
 cc_library(
+    name = "leadlag_controller",
+    srcs = [
+        "leadlag_controller.cc",
+    ],
+    hdrs = [
+        "leadlag_controller.h",
+    ],
+    copts = ['-DMODULE_NAME=\\"control\\"'],
+    deps = [
+        "//cyber",
+        "//modules/control/proto:control_proto",
+    ],
+)
+
+cc_library(
     name = "pid_controller",
     srcs = [
         "pid_controller.cc",
@@ -133,6 +148,7 @@ cc_library(
         ":hysteresis_filter",
         ":interpolation_1d",
         ":interpolation_2d",
+        ":leadlag_controller",
         ":pid_controller",
         ":trajectory_analyzer",
     ],
@@ -176,6 +192,21 @@ cc_test(
     deps = [
         ":interpolation_2d",
         "//cyber",
+        "//modules/common/util",
+        "//modules/control/proto:control_proto",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "leadlag_controller_test",
+    size = "small",
+    srcs = [
+        "leadlag_controller_test.cc",
+    ],
+    data = ["//modules/control/testdata:control_testdata"],
+    deps = [
+        ":leadlag_controller",
         "//modules/common/util",
         "//modules/control/proto:control_proto",
         "@gtest//:main",

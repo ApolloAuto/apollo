@@ -34,10 +34,10 @@ namespace scheduler {
 using apollo::cyber::base::AtomicRWLock;
 using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::WriteLockGuard;
-using apollo::cyber::common::GlobalData;
 using apollo::cyber::common::GetAbsolutePath;
-using apollo::cyber::common::PathExists;
 using apollo::cyber::common::GetProtoFromFile;
+using apollo::cyber::common::GlobalData;
+using apollo::cyber::common::PathExists;
 using apollo::cyber::common::WorkRoot;
 using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
@@ -126,7 +126,7 @@ void SchedulerChoreography::CreateProcessor() {
 bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  MutexWrapper *wrapper = nullptr;
+  MutexWrapper* wrapper = nullptr;
   if (!id_map_mutex_.Get(cr->id(), &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
@@ -177,7 +177,8 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
     {
       WriteLockGuard<AtomicRWLock> lk(
           ClassicContext::rq_locks_[DEFAULT_GROUP_NAME].at(cr->priority()));
-      ClassicContext::cr_group_[DEFAULT_GROUP_NAME].at(cr->priority())
+      ClassicContext::cr_group_[DEFAULT_GROUP_NAME]
+          .at(cr->priority())
           .emplace_back(cr);
     }
   }
@@ -195,7 +196,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
 bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
-  MutexWrapper *wrapper = nullptr;
+  MutexWrapper* wrapper = nullptr;
   if (!id_map_mutex_.Get(crid, &wrapper)) {
     {
       std::lock_guard<std::mutex> wl_lg(cr_wl_mtx_);
@@ -242,8 +243,7 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
       }
     }
   } else {
-    static_cast<ChoreographyContext *>(pctxs_[pid].get())
-        ->RemoveCRoutine(crid);
+    static_cast<ChoreographyContext*>(pctxs_[pid].get())->RemoveCRoutine(crid);
     return true;
   }
 
@@ -286,10 +286,9 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
   return true;
 }
 
-void SchedulerChoreography::SetInnerThreadAttr(const std::thread* thr,
-                                               const std::string& name) {
-  if (inner_thr_confs_.find(name) != inner_thr_confs_.end()) {
-    auto th = const_cast<std::thread*>(thr);
+void SchedulerChoreography::SetInnerThreadAttr(const std::string& name,
+                                               std::thread* thr) {
+  if (thr != nullptr && inner_thr_confs_.find(name) != inner_thr_confs_.end()) {
     auto th_conf = inner_thr_confs_[name];
     auto cpuset = th_conf.cpuset();
 
@@ -300,7 +299,7 @@ void SchedulerChoreography::SetInnerThreadAttr(const std::thread* thr,
     for (const auto cpu : cpus) {
       CPU_SET(cpu, &set);
     }
-    pthread_setaffinity_np(th->native_handle(), sizeof(set), &set);
+    pthread_setaffinity_np(thr->native_handle(), sizeof(set), &set);
 
     auto policy = th_conf.policy();
     auto prio = th_conf.prio();
@@ -316,7 +315,7 @@ void SchedulerChoreography::SetInnerThreadAttr(const std::thread* thr,
     struct sched_param sp;
     memset(static_cast<void*>(&sp), 0, sizeof(sp));
     sp.sched_priority = prio;
-    pthread_setschedparam(th->native_handle(), p, &sp);
+    pthread_setschedparam(thr->native_handle(), p, &sp);
   }
   return;
 }

@@ -26,7 +26,6 @@
 #include "modules/planning/proto/planning.pb.h"
 
 #include "modules/common/util/factory.h"
-#include "modules/map/hdmap/hdmap.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -37,14 +36,13 @@ namespace traffic_light {
 // stage context
 struct TrafficLightProtectedContext {
   ScenarioTrafficLightProtectedConfig scenario_config;
-  std::string traffic_light_id;
 };
 
 class TrafficLightProtectedScenario : public Scenario {
  public:
-  explicit TrafficLightProtectedScenario(
-      const ScenarioConfig& config,
-      const ScenarioContext* context) : Scenario(config, context) {}
+  explicit TrafficLightProtectedScenario(const ScenarioConfig& config,
+                                         const ScenarioContext* context)
+      : Scenario(config, context) {}
 
   void Init() override;
 
@@ -52,7 +50,6 @@ class TrafficLightProtectedScenario : public Scenario {
       const ScenarioConfig::StageConfig& stage_config);
 
   bool IsTransferable(const Scenario& current_scenario,
-                      const common::TrajectoryPoint& ego_point,
                       const Frame& frame) override;
 
   TrafficLightProtectedContext* GetContext() { return &context_; }
@@ -60,18 +57,14 @@ class TrafficLightProtectedScenario : public Scenario {
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
-  bool IsProtected(const ReferenceLineInfo& reference_line_info) const;
-
- private:
-  bool init_ = false;
-  TrafficLightProtectedContext context_;
-
-  hdmap::SignalInfoConstPtr traffic_light_ = nullptr;
-
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
+
+ private:
+  bool init_ = false;
+  TrafficLightProtectedContext context_;
 };
 
 }  // namespace traffic_light

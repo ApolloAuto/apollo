@@ -53,16 +53,15 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   double west = 0.0;
   double east = 0.0;
   std::string vendor;
-  int checker = UtilXmlParser::QueryStringAttribute(
-                            *header_node, "revMajor", &rev_major);
-  checker += UtilXmlParser::QueryStringAttribute(
-                            *header_node, "revMinor", &rev_minor);
-  checker += UtilXmlParser::QueryStringAttribute(
-                            *header_node, "name", &database_name);
-  checker += UtilXmlParser::QueryStringAttribute(
-                            *header_node, "version", &version);
-  checker += UtilXmlParser::QueryStringAttribute(
-                            *header_node, "date", &date);
+  int checker =
+      UtilXmlParser::QueryStringAttribute(*header_node, "revMajor", &rev_major);
+  checker +=
+      UtilXmlParser::QueryStringAttribute(*header_node, "revMinor", &rev_minor);
+  checker +=
+      UtilXmlParser::QueryStringAttribute(*header_node, "name", &database_name);
+  checker +=
+      UtilXmlParser::QueryStringAttribute(*header_node, "version", &version);
+  checker += UtilXmlParser::QueryStringAttribute(*header_node, "date", &date);
   checker += header_node->QueryDoubleAttribute("north", &north);
   checker += header_node->QueryDoubleAttribute("south", &south);
   checker += header_node->QueryDoubleAttribute("east", &east);
@@ -87,15 +86,32 @@ Status HeaderXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
   }
 
   // coordinate frame
+  std::string zone_id;
   std::string from_coordinate = geo_text->Value();
-  int eastZone = GetLongZone(east);
-  int westZone = GetLongZone(west);
-  if (eastZone != westZone) {
-    std::string err_msg = "unsupport data in more than one zones";
-    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+  auto projection_node = header_node->FirstChildElement("projection");
+  if (projection_node != nullptr) {
+    auto utm_node = projection_node->FirstChildElement("utm");
+    if (!utm_node) {
+      std::string err_msg = "Error parsing header utm node";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+    checker =
+        UtilXmlParser::QueryStringAttribute(*utm_node, "zoneID", &zone_id);
+    if (checker != tinyxml2::XML_SUCCESS) {
+      std::string err_msg = "Error parsing utm zone id attributes";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+  } else {
+    int eastZone = GetLongZone(east);
+    int westZone = GetLongZone(west);
+    if (eastZone != westZone) {
+      std::string err_msg = "unsupport data in more than one zones";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+    zone_id = std::to_string(westZone);
   }
-  int zone = westZone;
-  std::string to_coordinate = "+proj=utm +zone=" + std::to_string(zone) +
+
+  std::string to_coordinate = "+proj=utm +zone=" + zone_id +
                               " +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
   CoordinateConvertTool::GetInstance()->SetConvertParam(from_coordinate,
                                                         to_coordinate);

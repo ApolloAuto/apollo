@@ -41,7 +41,7 @@ class LaneRecord(object):
     """
 
     def write(self, data):
-        """wrap file write function to flush data to disk"""
+        """Wrap file write function to flush data to disk"""
         self.file_handler.write(data)
         self.file_handler.flush()
 
@@ -53,10 +53,10 @@ class LaneRecord(object):
 
         try:
             self.file_handler = open(record_file, 'w')
-        except:
-            self.logger.error("open file %s failed" % (record_file))
+        except IOError:
+            self.logger.error("Failed to open file %s " % (record_file))
             self.file_handler.close()
-            sys.exit()
+            sys.exit(-1)
 
         self.write("x,y,z,theta,dist_l,conf_l,dist_r,conf_r\n")
 
@@ -69,7 +69,7 @@ class LaneRecord(object):
         """
         New message received
         """
-        if self.terminating == True:
+        if self.terminating is True:
             self.logger.info("terminating when receive mobileye msg")
             return
 
@@ -80,7 +80,7 @@ class LaneRecord(object):
         """
         New message received
         """
-        if self.terminating == True:
+        if self.terminating is True:
             self.logger.info("terminating when receive localization msg")
             return
 

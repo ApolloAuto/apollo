@@ -3,6 +3,20 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
+    name = "lattice_trajectory1d",
+    srcs = [
+        "lattice_trajectory1d.cc",
+    ],
+    hdrs = [
+        "lattice_trajectory1d.h",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/planning/math/curve1d",
+    ],
+)
+
+cc_library(
     name = "end_condition_sampler",
     srcs = [
         "end_condition_sampler.cc",
@@ -35,13 +49,13 @@ cc_library(
         ":lateral_qp_optimizer",
         "//modules/common",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory1d:constant_deceleration_trajectory1d",
+        "//modules/planning/common/trajectory1d:piecewise_acceleration_trajectory1d",
+        "//modules/planning/common/trajectory1d:piecewise_trajectory1d",
+        "//modules/planning/common/trajectory1d:standing_still_trajectory1d",
         "//modules/planning/lattice/behavior:path_time_graph",
         "//modules/planning/lattice/behavior:prediction_querier",
-        "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
-        "//modules/planning/lattice/trajectory1d:lattice_trajectory1d",
-        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
-        "//modules/planning/lattice/trajectory1d:piecewise_trajectory1d",
-        "//modules/planning/lattice/trajectory1d:standing_still_trajectory1d",
+        "//modules/planning/lattice/trajectory_generation:lattice_trajectory1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
@@ -61,9 +75,9 @@ cc_library(
         "//modules/common",
         "//modules/common/math:path_matcher",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/constraint_checker:constraint_checker1d",
         "//modules/planning/lattice/behavior:path_time_graph",
-        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/lattice/trajectory_generation:piecewise_braking_trajectory_generator",
         "//modules/planning/math/curve1d",
         "//modules/planning/proto:lattice_sampling_config_proto",
@@ -82,8 +96,8 @@ cc_library(
         "//modules/common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory1d:constant_deceleration_trajectory1d",
         "//modules/planning/constraint_checker:collision_checker",
-        "//modules/planning/lattice/trajectory1d:constant_deceleration_trajectory1d",
         "//modules/planning/lattice/trajectory_generation:trajectory1d_generator",
         "//modules/planning/lattice/trajectory_generation:trajectory_combiner",
         "//modules/planning/math/curve1d",
@@ -118,7 +132,7 @@ cc_library(
     ],
     deps = [
         "//modules/common",
-        "//modules/planning/lattice/trajectory1d:piecewise_acceleration_trajectory1d",
+        "//modules/planning/common/trajectory1d:piecewise_acceleration_trajectory1d",
         "//modules/planning/math/curve1d",
     ],
 )
@@ -133,7 +147,7 @@ cc_library(
     ],
     deps = [
         "//cyber/common:log",
-        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
+        "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
     ],
 )
 
@@ -148,7 +162,7 @@ cc_library(
     deps = [
         ":lateral_qp_optimizer",
         "//cyber/common:log",
-        "//modules/planning/lattice/trajectory1d:piecewise_jerk_trajectory1d",
+        "//modules/planning/common/trajectory1d:piecewise_jerk_trajectory1d",
         "@eigen",
         "@osqp",
     ],

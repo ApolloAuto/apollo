@@ -125,8 +125,8 @@ bool SceneViewer::AddTempRenderableObj(const std::string &tmpObjGroupName,
 }
 
 void SceneViewer::AddNewShaderProg(
-    const std::string& shaderProgName,
-    const std::shared_ptr<QOpenGLShaderProgram>& newShaderProg) {
+    const std::string &shaderProgName,
+    const std::shared_ptr<QOpenGLShaderProgram> &newShaderProg) {
   if (newShaderProg == nullptr) {
     return;
   }
@@ -137,7 +137,7 @@ void SceneViewer::AddNewShaderProg(
   }
 
   QMatrix4x4 mvp = current_cameraPtr_->projection_matrix() *
-                  current_cameraPtr_->model_view_matrix();
+                   current_cameraPtr_->model_view_matrix();
 
   newShaderProg->bind();
   newShaderProg->setUniformValue("mvp", mvp);

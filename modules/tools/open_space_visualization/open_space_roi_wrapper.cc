@@ -22,6 +22,8 @@
 #include <vector>
 
 #include "Eigen/Dense"
+#include "cyber/common/file.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -358,7 +360,7 @@ class OpenSpaceROITest {
       return false;
     }
 
-    CHECK(common::util::GetProtoFromFile(
+    CHECK(cyber::common::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;

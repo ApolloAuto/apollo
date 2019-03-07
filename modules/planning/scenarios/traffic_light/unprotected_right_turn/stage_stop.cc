@@ -42,7 +42,7 @@ using common::time::Clock;
 using hdmap::PathOverlap;
 using perception::TrafficLight;
 
-Stage::StageStatus StageStop::Process(
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Stop";
   CHECK_NOTNULL(frame);
@@ -54,26 +54,21 @@ Stage::StageStatus StageStop::Process(
     AERROR << "TrafficLightRightTurnUnprotectedStop planning error";
   }
 
+  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
   // check if the traffic_light is still along reference_line
-  std::string traffic_light_id = GetContext()->traffic_light_id;
-  const std::vector<PathOverlap>& traffic_light_overlaps =
-      reference_line_info.reference_line().map_path().signal_overlaps();
-  auto traffic_light_overlap_it =
-      std::find_if(traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
-                   [&traffic_light_id](const PathOverlap& overlap) {
-                     return overlap.object_id == traffic_light_id;
-                   });
-  if (traffic_light_overlap_it == traffic_light_overlaps.end()) {
+  std::string traffic_light_overlap_id =
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
+  if (CheckTrafficLightDone(reference_line_info, traffic_light_overlap_id)) {
     return FinishScenario();
   }
 
+  constexpr double kPassStopLineBuffer = 1.0;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_pass_traffic_light =
-      adc_front_edge_s - traffic_light_overlap_it->start_s;
-  constexpr double kPassStopLineBuffer = 1.0;  // unit: m
-
+      adc_front_edge_s -
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
   // passed stop line too far
   if (distance_adc_pass_traffic_light > kPassStopLineBuffer) {
     return FinishStage();
@@ -95,20 +90,23 @@ Stage::StageStatus StageStop::Process(
         TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
     return Stage::FINISHED;
   }
+  */
 
   return Stage::RUNNING;
 }
 
-Stage::StageStatus StageStop::FinishScenario() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
-Stage::StageStatus StageStop::FinishStage() {
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage() {
+  /* TODO(all): to be fixed
   PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
-      GetContext()->traffic_light_id;
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
+  */
   GetContext()->creep_start_time = Clock::NowInSeconds();
 
   next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP;

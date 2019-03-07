@@ -555,6 +555,10 @@ inline ImuParameter GetImuParameter(ImuType type) {
     case ImuType::UM442:
       return {6.6581059144655048e-6, 2.99127170628e-5, 20.0};
 
+    case ImuType::IAM20680:
+      // (1.0/65.5)/125.0 deg/LSB (1.0/8192.0)*9.80665/125.0 m/s/LSB
+      return {0.0001221374045, 9.57680664e-06, 125};
+
     default:
       return {0.0, 0.0, 0.0};
   }

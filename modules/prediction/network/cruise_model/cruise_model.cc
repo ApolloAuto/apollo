@@ -111,7 +111,7 @@ void CruiseModel::Run(const std::vector<Eigen::MatrixXf>& inputs,
                              &regress_activation_1_output);
   Eigen::MatrixXf regress_linear_3_output;
   regress_linear_3_->Run({regress_activation_1_output},
-                          &regress_linear_3_output);
+                         &regress_linear_3_output);
   Eigen::MatrixXf regress_activation_4_output;
   regress_activation_4_->Run({regress_linear_3_output},
                              &regress_activation_4_output);

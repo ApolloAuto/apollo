@@ -40,7 +40,6 @@ namespace stop_sign {
 // stage context
 struct StopSignUnprotectedContext {
   ScenarioStopSignUnprotectedConfig scenario_config;
-  std::string stop_sign_id;
   double stop_start_time = 0.0;
   double creep_start_time = 0.0;
   std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;
@@ -60,7 +59,6 @@ class StopSignUnprotectedScenario : public Scenario {
       const ScenarioConfig::StageConfig& stage_config);
 
   bool IsTransferable(const Scenario& current_scenario,
-                      const common::TrajectoryPoint& ego_point,
                       const Frame& frame) override;
 
   StopSignUnprotectedContext* GetContext() { return &context_; }
@@ -69,17 +67,14 @@ class StopSignUnprotectedScenario : public Scenario {
   static void RegisterStages();
   bool GetScenarioConfig();
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
-
- private:
-  bool init_ = false;
-  StopSignUnprotectedContext context_;
-
-  hdmap::StopSignInfoConstPtr stop_sign_ = nullptr;
-
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
+
+ private:
+  bool init_ = false;
+  StopSignUnprotectedContext context_;
 };
 
 }  // namespace stop_sign

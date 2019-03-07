@@ -16,7 +16,9 @@
 
 #include "modules/prediction/predictor/predictor_manager.h"
 
+#include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
@@ -127,11 +129,13 @@ Predictor* PredictorManager::GetPredictor(
 
 void PredictorManager::Run() {
   prediction_obstacles_.Clear();
-  auto obstacles_container = ContainerManager::Instance()->GetContainer<
-      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+  auto obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
 
-  auto adc_trajectory_container = ContainerManager::Instance()->GetContainer<
-      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
+  auto adc_trajectory_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
 
   CHECK_NOTNULL(obstacles_container);
   for (const int id : obstacles_container->curr_frame_obstacle_ids()) {
@@ -173,8 +177,8 @@ void PredictorManager::PredictObstacle(
   if (obstacle->ToIgnore()) {
     ADEBUG << "Ignore obstacle [" << obstacle->id() << "]";
     predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
-    prediction_obstacle->mutable_priority()
-        ->set_priority(ObstaclePriority::IGNORE);
+    prediction_obstacle->mutable_priority()->set_priority(
+        ObstaclePriority::IGNORE);
   } else if (obstacle->IsStill()) {
     ADEBUG << "Still obstacle [" << obstacle->id() << "]";
     predictor = GetPredictor(ObstacleConf::EMPTY_PREDICTOR);
@@ -199,8 +203,9 @@ void PredictorManager::PredictObstacle(
         break;
       }
       case PerceptionObstacle::BICYCLE: {
-        if (obstacle->IsOnLane() && !obstacle->IsNearJunction()) {
+        if (obstacle->IsOnLane()) {
           predictor = GetPredictor(cyclist_on_lane_predictor_);
+          // TODO(kechxu) add a specific predictor in junction
         } else {
           predictor = GetPredictor(cyclist_off_lane_predictor_);
         }
@@ -229,7 +234,12 @@ void PredictorManager::PredictObstacle(
     }
   }
   prediction_obstacle->set_timestamp(obstacle->timestamp());
+  prediction_obstacle->mutable_priority()->CopyFrom(
+      obstacle->latest_feature().priority());
   prediction_obstacle->set_is_static(obstacle->IsStill());
+  if (FLAGS_prediction_offline_mode == 3) {
+    FeatureOutput::InsertPredictionResult(obstacle->id(), *prediction_obstacle);
+  }
 }
 
 std::unique_ptr<Predictor> PredictorManager::CreatePredictor(

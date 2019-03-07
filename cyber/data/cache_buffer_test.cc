@@ -21,7 +21,6 @@
 #include <thread>
 #include <utility>
 
-
 namespace apollo {
 namespace cyber {
 namespace data {

@@ -28,8 +28,8 @@
 #include <string>
 #include <thread>
 
-namespace{
-  constexpr double MinHalfFrameRatio = 12.5;
+namespace {
+constexpr double MinHalfFrameRatio = 12.5;
 }
 
 Screen* Screen::Instance(void) {
@@ -222,7 +222,7 @@ void Screen::Run() {
     (this->*showFuncs[static_cast<int>(current_state_)])(ch);
 
     double fr = current_render_obj_->frame_ratio();
-    if(fr < MinHalfFrameRatio) fr = MinHalfFrameRatio;
+    if (fr < MinHalfFrameRatio) fr = MinHalfFrameRatio;
     int period = static_cast<int>(1000.0 / fr);
     period >>= 1;
     std::this_thread::sleep_for(std::chrono::milliseconds(period));

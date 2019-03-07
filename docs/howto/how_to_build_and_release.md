@@ -13,7 +13,28 @@ To install docker, you may refer to
 Don't forget to test it using 
 [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
 
-## <span id="build_release">Build and Release</span>
+## *New - Git LFS*
+
+Now we leverage [git-lfs](https://git-lfs.github.com) to manage large files in
+Apollo. Please make sure you installed the plugin by following the steps on its webpage or refer to [the Migration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md) for additional information
+
+```bash
+# Required for Ubuntu 14.04 / 16.04.
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+
+# Ubuntu 14.04 / 16.04 / 18.04.
+sudo apt-get install -y git-lfs
+```
+
+For latest Git versions, the lfs plugin works automatically and transparently
+along with the commands you are familiar with, such as `git clone` and `git pull`.
+
+But for old versions like Git 1.x, you may need to call it explicitly with
+`git lfs clone` and `git lfs pull`.
+
+
+## Build and Release
+
 ### Start container
 We provide a build image named *dev-latest*. The Container will mount your local apollo repo to */apollo*.
 ```bash

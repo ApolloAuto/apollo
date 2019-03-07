@@ -128,18 +128,17 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     // after releasing the mutex
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
-      is_front
-          ? data->emplace_front(std::shared_ptr<ObjectType>(
-                buffer[i],
-                [&](ObjectType* obj_ptr) {
-                  std::lock_guard<std::mutex> lock(mutex_);
-                  queue_.push(obj_ptr);
-                }))
-          : data->emplace_back(std::shared_ptr<ObjectType>(
-                buffer[i], [&](ObjectType* obj_ptr) {
-                  std::lock_guard<std::mutex> lock(mutex_);
-                  queue_.push(obj_ptr);
-                }));
+      is_front ? data->emplace_front(std::shared_ptr<ObjectType>(
+                     buffer[i],
+                     [&](ObjectType* obj_ptr) {
+                       std::lock_guard<std::mutex> lock(mutex_);
+                       queue_.push(obj_ptr);
+                     }))
+               : data->emplace_back(std::shared_ptr<ObjectType>(
+                     buffer[i], [&](ObjectType* obj_ptr) {
+                       std::lock_guard<std::mutex> lock(mutex_);
+                       queue_.push(obj_ptr);
+                     }));
     }
 #else
     for (size_t i = 0; i < num; ++i) {
@@ -169,18 +168,17 @@ class ConcurrentObjectPool : public BaseObjectPool<ObjectType> {
     }
     for (size_t i = 0; i < num; ++i) {
       kInitializer(buffer[i]);
-      is_front
-          ? data->emplace_front(std::shared_ptr<ObjectType>(
-                buffer[i],
-                [&](ObjectType* obj_ptr) {
-                  std::lock_guard<std::mutex> lock(mutex_);
-                  queue_.push(obj_ptr);
-                }))
-          : data->emplace_back(std::shared_ptr<ObjectType>(
-                buffer[i], [&](ObjectType* obj_ptr) {
-                  std::lock_guard<std::mutex> lock(mutex_);
-                  queue_.push(obj_ptr);
-                }));
+      is_front ? data->emplace_front(std::shared_ptr<ObjectType>(
+                     buffer[i],
+                     [&](ObjectType* obj_ptr) {
+                       std::lock_guard<std::mutex> lock(mutex_);
+                       queue_.push(obj_ptr);
+                     }))
+               : data->emplace_back(std::shared_ptr<ObjectType>(
+                     buffer[i], [&](ObjectType* obj_ptr) {
+                       std::lock_guard<std::mutex> lock(mutex_);
+                       queue_.push(obj_ptr);
+                     }));
     }
 #else
     for (size_t i = 0; i < num; ++i) {

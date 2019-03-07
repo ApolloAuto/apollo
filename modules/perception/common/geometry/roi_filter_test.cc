@@ -29,8 +29,8 @@ using apollo::perception::base::HdmapStruct;
 using HdmapStructConstPtr =
     std::shared_ptr<const apollo::perception::base::HdmapStruct>;
 using HdmapStructPtr = std::shared_ptr<apollo::perception::base::HdmapStruct>;
-using apollo::perception::base::PointD;
 using apollo::perception::base::Object;
+using apollo::perception::base::PointD;
 using ObjectConstPtr = std::shared_ptr<const apollo::perception::base::Object>;
 using ObjectPtr = std::shared_ptr<apollo::perception::base::Object>;
 
@@ -132,12 +132,12 @@ TEST(ObjectInRoiTest, test_roi) {
   ObjectPtr obj(new Object);
   obj->center = Eigen::Vector3d(0, 0, 0);
   objects.push_back(obj);
-  ObjectInRoiCheck(hdmap, objects, &valid_objects);
+  EXPECT_TRUE(ObjectInRoiCheck(hdmap, objects, &valid_objects));
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap.reset(new HdmapStruct());
   valid_objects.clear();
-  ObjectInRoiCheck(hdmap, objects, &valid_objects);
+  EXPECT_TRUE(ObjectInRoiCheck(hdmap, objects, &valid_objects));
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons.resize(1);
@@ -155,53 +155,12 @@ TEST(ObjectInRoiTest, test_roi) {
   pt.z = 0;
   hdmap->road_polygons[0].push_back(pt);
   valid_objects.clear();
-  ObjectInRoiCheck(hdmap, objects, &valid_objects);
+  EXPECT_TRUE(ObjectInRoiCheck(hdmap, objects, &valid_objects));
   EXPECT_EQ(valid_objects.size(), 1);
 
   hdmap->road_polygons[0][2].y = -0.1;
   valid_objects.clear();
-  ObjectInRoiCheck(hdmap, objects, &valid_objects);
-  EXPECT_EQ(valid_objects.size(), 0);
-}
-
-TEST(ObjectInRoiSlackTest, test_roi) {
-  HdmapStructPtr hdmap = nullptr;
-  std::vector<ObjectPtr> objects;
-  std::vector<ObjectPtr> valid_objects;
-  ObjectPtr obj(new Object);
-  obj->center = Eigen::Vector3d(0, 0, 0);
-  obj->direction = Eigen::Vector3f(1, 0, 0);
-  objects.push_back(obj);
-
-  ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
-  EXPECT_EQ(valid_objects.size(), 1);
-
-  hdmap.reset(new HdmapStruct());
-  valid_objects.clear();
-  ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
-  EXPECT_EQ(valid_objects.size(), 1);
-
-  hdmap->road_polygons.resize(1);
-  PointD pt;
-  pt.x = -1.0;
-  pt.y = -1.0;
-  pt.z = 0;
-  hdmap->road_polygons[0].push_back(pt);
-  pt.x = 1.0;
-  pt.y = -1.0;
-  pt.z = 0;
-  hdmap->road_polygons[0].push_back(pt);
-  pt.x = 0;
-  pt.y = 1;
-  pt.z = 0;
-  hdmap->road_polygons[0].push_back(pt);
-  valid_objects.clear();
-  ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
-  EXPECT_EQ(valid_objects.size(), 1);
-
-  hdmap->road_polygons[0][2].y = -2;
-  valid_objects.clear();
-  ObjectInRoiSlackCheck(hdmap, objects, &valid_objects);
+  EXPECT_FALSE(ObjectInRoiCheck(hdmap, objects, &valid_objects));
   EXPECT_EQ(valid_objects.size(), 0);
 }
 

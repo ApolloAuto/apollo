@@ -102,6 +102,14 @@ void HMI::RegisterMessageHandlers() {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
+        } else if (hmi_action == HMIAction::CHANGE_MODE) {
+          static constexpr char kCalibrationMode[] = "Mkz Calibration";
+          if (value == kCalibrationMode) {
+            // TODO(vivian): Finish.
+            // calibration_mon->start();
+          } else {
+            // calibration_mon->stop();
+          }
         }
       });
 
@@ -113,12 +121,16 @@ void HMI::RegisterMessageHandlers() {
         uint64_t event_time_ms;
         std::string event_msg;
         std::vector<std::string> event_types;
+        bool is_reportable;
         if (JsonUtil::GetNumberFromJson(json, "event_time_ms",
                                         &event_time_ms) &&
             JsonUtil::GetStringFromJson(json, "event_msg", &event_msg) &&
             JsonUtil::GetStringVectorFromJson(json, "event_type",
-                                              &event_types)) {
-          hmi_worker_->SubmitDriveEvent(event_time_ms, event_msg, event_types);
+                                              &event_types) &&
+            JsonUtil::GetBooleanFromJson(json, "is_reportable",
+                                         &is_reportable)) {
+          hmi_worker_->SubmitDriveEvent(event_time_ms, event_msg, event_types,
+                                        is_reportable);
           monitor_log_buffer_.INFO("Drive event added.");
         } else {
           AERROR << "Truncated SubmitDriveEvent request.";

@@ -23,30 +23,26 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-struct MlfMotionRefinerInitOptions {
-};
+struct MlfMotionRefinerInitOptions {};
 
-struct MlfMotionRefinerOptions {
-};
+struct MlfMotionRefinerOptions {};
 
 class MlfMotionRefiner {
  public:
   MlfMotionRefiner() = default;
   ~MlfMotionRefiner() = default;
 
-  bool Init(const MlfMotionRefinerInitOptions& options
-      = MlfMotionRefinerInitOptions());
+  bool Init(const MlfMotionRefinerInitOptions& options =
+                MlfMotionRefinerInitOptions());
 
   // @brief: refine velocity of new object
   // @params [in]: history track data
   // @params [in]: new object to be updated
   // @return: true if velocity is changed
   bool Refine(const MlfTrackDataConstPtr& track_data,
-      TrackedObjectPtr new_object);
+              TrackedObjectPtr new_object);
 
-  std::string Name() const {
-    return "MlfMotionRefiner";
-  }
+  std::string Name() const { return "MlfMotionRefiner"; }
 
  protected:
   // @brief: check whether new observed object is static or not
@@ -77,5 +73,3 @@ class MlfMotionRefiner {
 }  // namespace lidar
 }  // namespace perception
 }  // namespace apollo
-
-

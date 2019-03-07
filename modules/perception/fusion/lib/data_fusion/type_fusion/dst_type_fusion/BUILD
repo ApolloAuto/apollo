@@ -11,7 +11,7 @@ cc_library(
         "dst_type_fusion.h",
     ],
     deps = [
-        "//modules/common/util:file_util",
+        "//cyber/common:file",
         "//modules/perception/fusion/base:base_init_options",
         "//modules/perception/fusion/base:scene",
         "//modules/perception/fusion/base:sensor_data_manager",

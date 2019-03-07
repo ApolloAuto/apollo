@@ -21,9 +21,9 @@
 #include <vector>
 
 #include "modules/planning/common/frame.h"
-#include "modules/planning/planner/std_planner_dispatcher.h"
-#include "modules/planning/planning_base.h"
 #include "modules/planning/open_space/trajectory_partition/trajectory_partitioner.h"
+#include "modules/planning/planner/on_lane_planner_dispatcher.h"
+#include "modules/planning/planning_base.h"
 
 /**
  * @namespace apollo::planning
@@ -41,7 +41,7 @@ namespace planning {
 class OpenSpacePlanning : public PlanningBase {
  public:
   OpenSpacePlanning() {
-    planner_dispatcher_ = std::make_unique<StdPlannerDispatcher>();
+    planner_dispatcher_ = std::make_unique<OnLanePlannerDispatcher>();
   }
   virtual ~OpenSpacePlanning();
 
@@ -88,8 +88,8 @@ class OpenSpacePlanning : public PlanningBase {
   apollo::common::Status InitFrame(
       const uint32_t sequence_num,
       const common::TrajectoryPoint& planning_start_point,
-      const double start_time, const common::VehicleState& vehicle_state,
-      ADCTrajectory* output_trajectory);
+      const common::VehicleState& vehicle_state);
+
   bool CheckPlanningConfig(const PlanningConfig& config);
 
   bool IsCollisionFreeTrajectory(const ADCTrajectory& trajectory_pb);

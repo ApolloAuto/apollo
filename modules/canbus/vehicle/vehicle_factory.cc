@@ -16,11 +16,11 @@
 
 #include "modules/canbus/vehicle/vehicle_factory.h"
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
+#include "modules/canbus/vehicle/ge3/ge3_vehicle_factory.h"
 #include "modules/canbus/vehicle/gem/gem_vehicle_factory.h"
 #include "modules/canbus/vehicle/lexus/lexus_vehicle_factory.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
 #include "modules/canbus/vehicle/transit/transit_vehicle_factory.h"
-#include "modules/canbus/vehicle/ge3/ge3_vehicle_factory.h"
 #include "modules/canbus/vehicle/wey/wey_vehicle_factory.h"
 
 namespace apollo {

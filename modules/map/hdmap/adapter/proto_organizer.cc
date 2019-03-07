@@ -143,18 +143,18 @@ void ProtoOrganizer::GetLaneObjectOverlapElements(
         overlap_object.is_merge);
     if (!overlap_object.region_overlap_id.empty()) {
       object_overlap->mutable_lane_overlap_info()
-          ->mutable_region_overlap_id()->set_id(
-            overlap_object.region_overlap_id);
+          ->mutable_region_overlap_id()
+          ->set_id(overlap_object.region_overlap_id);
     }
     object_overlap = overlap.add_object();
     object_overlap->mutable_id()->set_id(object_id);
     if (proto_data_.pb_crosswalks.count(object_id) > 0) {
       proto_data_.pb_crosswalks[object_id].add_overlap_id()->set_id(overlap_id);
-    if (!overlap_object.region_overlap_id.empty()) {
-      object_overlap->mutable_crosswalk_overlap_info()
-          ->mutable_region_overlap_id()
-          ->set_id(overlap_object.region_overlap_id);
-    }
+      if (!overlap_object.region_overlap_id.empty()) {
+        object_overlap->mutable_crosswalk_overlap_info()
+            ->mutable_region_overlap_id()
+            ->set_id(overlap_object.region_overlap_id);
+      }
       object_overlap->mutable_crosswalk_overlap_info();
     } else if (proto_data_.pb_clear_areas.count(object_id) > 0) {
       object_overlap->mutable_clear_area_overlap_info();
@@ -336,14 +336,13 @@ void ProtoOrganizer::GetJunctionObjectOverlapElements(
             overlap_id);
       } else if (proto_data_.pb_signals.count(object_id) > 0) {
         object_overlap->mutable_signal_overlap_info();
-        proto_data_.pb_signals[object_id].add_overlap_id()->set_id(
-            overlap_id);
+        proto_data_.pb_signals[object_id].add_overlap_id()->set_id(overlap_id);
       } else {
         continue;
       }
 
       proto_data_.pb_junctions[junction_id].add_overlap_id()->set_id(
-        overlap_id);
+          overlap_id);
       proto_data_.pb_overlaps[overlap_id] = overlap;
     }
   }

@@ -40,28 +40,26 @@ namespace traffic_light {
 using common::TrajectoryPoint;
 using hdmap::PathOverlap;
 
-Stage::StageStatus StageIntersectionCruise::Process(
+Stage::StageStatus
+TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
+
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageIntersectionCruise plan error";
+    AERROR << "TrafficLightUnprotectedRightTurnStageIntersectionCruise "
+           << "plan error";
   }
 
+  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the traffic_light is still along referenceline
-  std::string traffic_light_overlap_id = GetContext()->traffic_light_id;
-  const std::vector<PathOverlap>& traffic_light_overlaps =
-      reference_line_info.reference_line().map_path().signal_overlaps();
-  auto traffic_light_overlap_it =
-      std::find_if(traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
-                   [&traffic_light_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == traffic_light_overlap_id;
-                   });
-  if (traffic_light_overlap_it == traffic_light_overlaps.end()) {
+  // check if the traffic_light is still along reference_line
+  std::string traffic_light_overlap_id =
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
+  if (CheckTrafficLightDone(reference_line_info, traffic_light_overlap_id)) {
     return FinishScenario();
   }
 
@@ -69,14 +67,19 @@ Stage::StageStatus StageIntersectionCruise::Process(
   // TODO(all): update when pnc-junction is ready
   constexpr double kIntersectionLength = 10.0;  // unit: m
   const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  if (adc_back_edge_s - traffic_light_overlap_it->end_s > kIntersectionLength) {
+  const double distance_adc_pass_traffic_light =
+      adc_back_edge_s -
+      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s;
+  if (distance_adc_pass_traffic_light > kIntersectionLength) {
     return FinishStage();
   }
+  */
 
   return Stage::RUNNING;
 }
 
-Stage::StageStatus StageIntersectionCruise::FinishStage() {
+Stage::StageStatus
+TrafficLightUnprotectedRightTurnStageIntersectionCruise::FinishStage() {
   return FinishScenario();
 }
 

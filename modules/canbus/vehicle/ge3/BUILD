@@ -36,10 +36,10 @@ cc_library(
         "ge3_message_manager.h",
     ],
     deps = [
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
@@ -65,25 +65,25 @@ cc_library(
     ],
     deps = [
         ":ge3_message_manager",
-        "//modules/drivers/canbus/can_comm:can_sender",
-        "//modules/drivers/canbus/common:canbus_common",
         "//modules/canbus/proto:canbus_proto",
-        "//modules/drivers/canbus/can_comm:message_manager_base",
         "//modules/canbus/vehicle:vehicle_controller_base",
         "//modules/canbus/vehicle/ge3/protocol:canbus_ge3_protocol_pc_bcm_201",
+        "//modules/drivers/canbus/can_comm:can_sender",
+        "//modules/drivers/canbus/can_comm:message_manager_base",
+        "//modules/drivers/canbus/common:canbus_common",
     ],
 )
 
 cc_test(
     name = "ge3_controller_test",
     size = "small",
-    data = ["//modules/canbus:canbus_testdata"],
     srcs = [
         "ge3_controller_test.cc",
     ],
+    data = ["//modules/canbus:canbus_testdata"],
     deps = [
         ":ge3_controller",
-        "//modules/common/util:util",
+        "//modules/common/util",
         "@gtest//:main",
     ],
 )

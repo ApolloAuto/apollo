@@ -15,7 +15,6 @@
  *****************************************************************************/
 #include "modules/perception/fusion/base/sensor.h"
 
-
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -29,7 +28,7 @@ void Sensor::QueryLatestFrames(double timestamp,
   CHECK_NOTNULL(frames);
 
   frames->clear();
-  for (size_t i = 0; i < frames_.size(); i++) {
+  for (size_t i = 0; i < frames_.size(); ++i) {
     if (frames_[i]->GetTimestamp() > latest_query_timestamp_ &&
         frames_[i]->GetTimestamp() <= timestamp) {
       frames->push_back(frames_[i]);
@@ -40,7 +39,7 @@ void Sensor::QueryLatestFrames(double timestamp,
 
 SensorFramePtr Sensor::QueryLatestFrame(double timestamp) {
   SensorFramePtr latest_frame = nullptr;
-  for (size_t i = 0; i < frames_.size(); i++) {
+  for (size_t i = 0; i < frames_.size(); ++i) {
     if (frames_[i]->GetTimestamp() > latest_query_timestamp_ &&
         frames_[i]->GetTimestamp() <= timestamp) {
       latest_frame = frames_[i];

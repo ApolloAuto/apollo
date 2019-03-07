@@ -29,8 +29,8 @@
 namespace apollo {
 namespace planning {
 
-using Eigen::MatrixXd;
 using apollo::common::math::DenseToCSCMatrix;
+using Eigen::MatrixXd;
 
 OsqpSpline1dSolver::OsqpSpline1dSolver(const std::vector<double>& x_knots,
                                        const uint32_t order)

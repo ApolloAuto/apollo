@@ -55,7 +55,6 @@ void ImageHandler::OnImage(
   std::vector<uint8_t> compressed_raw_data(compressed_image->data().begin(),
                                            compressed_image->data().end());
   cv::Mat mat_image = cv::imdecode(compressed_raw_data, CV_LOAD_IMAGE_COLOR);
-  cv::cvtColor(mat_image, mat_image, cv::COLOR_RGB2BGR);
 
   std::unique_lock<std::mutex> lock(mutex_);
   cv::imencode(".jpg", mat_image, send_buffer_,
@@ -65,12 +64,14 @@ void ImageHandler::OnImage(
 
 void ImageHandler::OnImageFront(const std::shared_ptr<Image> &image) {
   if (FLAGS_use_navigation_mode) {
+    // Navigation mode
     OnImage(image);
   }
 }
 
 void ImageHandler::OnImageShort(const std::shared_ptr<CompressedImage> &image) {
   if (!FLAGS_use_navigation_mode) {
+    // Regular mode
     OnImage(image);
   }
 }
@@ -79,9 +80,7 @@ ImageHandler::ImageHandler()
     : requests_(0), node_(cyber::CreateNode("image_handler")) {
   node_->CreateReader<Image>(
       FLAGS_image_front_topic,
-      [this](const std::shared_ptr<Image> &image) {
-        OnImageFront(image);
-      });
+      [this](const std::shared_ptr<Image> &image) { OnImageFront(image); });
 
   node_->CreateReader<CompressedImage>(
       FLAGS_image_short_topic,

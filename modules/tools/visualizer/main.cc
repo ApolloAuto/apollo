@@ -33,14 +33,15 @@ int main(int argc, char* argv[]) {
 
     std::stringstream strStreamObj;
     strStreamObj << (const char*)ctx.functions()->glGetString(
-                     GL_SHADING_LANGUAGE_VERSION);
+        GL_SHADING_LANGUAGE_VERSION);
     double version;
     strStreamObj >> version;
     major = static_cast<int>(version);
     minor = static_cast<int>(version * 10.0 - major * 10);
-    if(major < 3 && minor < 3){
-        std::cout << "Shading Language Version ( " << version << ") is much lower than 3.3" << std::endl;
-        return -1;
+    if (major < 3 && minor < 3) {
+      std::cout << "Shading Language Version ( " << version
+                << ") is much lower than 3.3" << std::endl;
+      return -1;
     }
   }
   QSurfaceFormat format;
@@ -65,8 +66,9 @@ int main(int argc, char* argv[]) {
         w.TopologyChanged(change_msg);
       };
 
-  auto channelManager = apollo::cyber::service_discovery::TopologyManager::Instance()
-      ->channel_manager();
+  auto channelManager =
+      apollo::cyber::service_discovery::TopologyManager::Instance()
+          ->channel_manager();
   channelManager->AddChangeListener(topologyCallback);
 
   std::vector<apollo::cyber::proto::RoleAttributes> role_attr_vec;

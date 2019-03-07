@@ -37,14 +37,14 @@ namespace canbus {
 /**
  * @class WeyVehicleFactory
  *
- * @brief this class is inherited from AbstractVehicleFactory. It can be used 
+ * @brief this class is inherited from AbstractVehicleFactory. It can be used
  * to create controller and message manager for wey vehicle.
  */
 class WeyVehicleFactory : public AbstractVehicleFactory {
  public:
   /**
-  * @brief destructor
-  */
+   * @brief destructor
+   */
   virtual ~WeyVehicleFactory() = default;
 
   /**

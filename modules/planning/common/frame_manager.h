@@ -34,6 +34,7 @@ class FrameManager final {
   Frame* GetLastFrame();
   void SaveFrame(std::unique_ptr<Frame>* const frame);
   void Clear();
+
  private:
   std::unordered_map<uint32_t, std::unique_ptr<Frame>> frames_;
   std::list<uint32_t> sequence_queue_;
@@ -43,4 +44,3 @@ class FrameManager final {
 }  // namespace apollo
 
 #endif  // MODULES_PLANNING_COMMON_FRAME_MANAGER_H_
-

@@ -31,6 +31,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
@@ -43,13 +44,12 @@ using common::time::Clock;
 using hdmap::HDMapUtil;
 using hdmap::LaneInfoConstPtr;
 using hdmap::OverlapInfoConstPtr;
-using hdmap::PathOverlap;
 using perception::PerceptionObstacle;
 
 using StopSignLaneVehicles =
     std::unordered_map<std::string, std::vector<std::string>>;
 
-Stage::StageStatus StagePreStop::Process(
+Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: PreStop";
   CHECK_NOTNULL(frame);
@@ -58,29 +58,23 @@ Stage::StageStatus StagePreStop::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StagePreStop planning error";
+    AERROR << "StopSignUnprotectedStagePreStop planning error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the stop_sign is still along referenceline
-  std::string stop_sign_overlap_id = GetContext()->stop_sign_id;
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  auto stop_sign_overlap_it =
-      std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
-                   [&stop_sign_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == stop_sign_overlap_id;
-                   });
-  if (stop_sign_overlap_it == stop_sign_overlaps.end()) {
+  // check if the stop_sign is still along reference_line
+  std::string stop_sign_overlap_id =
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
+  if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
     return FinishScenario();
   }
 
+  constexpr double kPassStopLineBuffer = 0.3;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_pass_stop_sign =
-      adc_front_edge_s - stop_sign_overlap_it->start_s;
-  constexpr double kPassStopLineBuffer = 0.3;  // unit: m
-
+      adc_front_edge_s -
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
   if (distance_adc_pass_stop_sign <= kPassStopLineBuffer) {
     // not passed stop line, check valid stop
     if (CheckADCStop(reference_line_info)) {
@@ -130,8 +124,8 @@ Stage::StageStatus StagePreStop::Process(
 /**
  * @brief: add a watch vehicle which arrives at stop sign ahead of adc
  */
-int StagePreStop::AddWatchVehicle(const Obstacle& obstacle,
-                                  StopSignLaneVehicles* watch_vehicles) {
+int StopSignUnprotectedStagePreStop::AddWatchVehicle(
+    const Obstacle& obstacle, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
   const PerceptionObstacle& perception_obstacle = obstacle.Perception();
@@ -218,7 +212,7 @@ int StagePreStop::AddWatchVehicle(const Obstacle& obstacle,
 /**
  * @brief: check valid stop_sign stop
  */
-bool StagePreStop::CheckADCStop(
+bool StopSignUnprotectedStagePreStop::CheckADCStop(
     const ReferenceLineInfo& reference_line_info) {
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
@@ -230,16 +224,18 @@ bool StagePreStop::CheckADCStop(
   // check stop close enough to stop line of the stop_sign
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double stop_line_start_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
   const double distance_stop_line_to_adc_front_edge =
       stop_line_start_s - adc_front_edge_s;
   ADEBUG << "distance_stop_line_to_adc_front_edge["
       << distance_stop_line_to_adc_front_edge
-      << "]; stop_line_start_s[" << stop_line_start_s
-      << "]; adc_front_edge_s[" << adc_front_edge_s << "]";
+      << "] stop_sign["
+      << PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id
+      << "] stop_line_start_s[" << stop_line_start_s
+      << "] adc_front_edge_s[" << adc_front_edge_s << "]";
 
   if (distance_stop_line_to_adc_front_edge >
-    scenario_config_.max_valid_stop_distance()) {
+      scenario_config_.max_valid_stop_distance()) {
     ADEBUG << "not a valid stop. too far from stop line.";
     return false;
   }
@@ -249,7 +245,7 @@ bool StagePreStop::CheckADCStop(
   return true;
 }
 
-Stage::StageStatus StagePreStop::FinishStage() {
+Stage::StageStatus StopSignUnprotectedStagePreStop::FinishStage() {
   GetContext()->stop_start_time = Clock::NowInSeconds();
   next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_STOP;
 

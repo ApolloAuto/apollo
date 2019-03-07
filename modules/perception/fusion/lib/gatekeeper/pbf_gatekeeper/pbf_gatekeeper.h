@@ -60,7 +60,6 @@ class PbfGatekeeper : public BaseGatekeeper {
   bool RadarAbleToPublish(const TrackPtr& track, bool is_night);
   bool CameraAbleToPublish(const TrackPtr& track, bool is_night);
 
- private:
   PbfGatekeeperParams params_;
 };
 

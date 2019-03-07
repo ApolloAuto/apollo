@@ -1,22 +1,22 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/global_config.h"
 
 namespace apollo {
@@ -25,17 +25,16 @@ namespace camera {
 
 bool MultiCueObstacleTransformer::Init(
     const ObstacleTransformerInitOptions &options) {
-  std::string transformer_config = apollo::common::util::GetAbsolutePath(
-      options.root_dir, options.conf_file);
+  std::string transformer_config =
+      cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
 
-  if (!apollo::common::util::GetProtoFromFile(transformer_config,
-                                              &multicue_param_)) {
+  if (!cyber::common::GetProtoFromFile(transformer_config, &multicue_param_)) {
     AERROR << "Read config failed: " << transformer_config;
     return false;
   }
   AINFO << "Load transformer parameters from " << transformer_config
-           << " \nmin dimension: " << multicue_param_.min_dimension_val()
-           << " \ndo template search: " << multicue_param_.check_dimension();
+        << " \nmin dimension: " << multicue_param_.min_dimension_val()
+        << " \ndo template search: " << multicue_param_.check_dimension();
 
   // Init object template
   object_template_manager_ = ObjectTemplateManager::Instance();
@@ -44,7 +43,7 @@ bool MultiCueObstacleTransformer::Init(
 }
 
 void MultiCueObstacleTransformer::SetObjMapperOptions(
-     base::ObjectPtr obj, Eigen::Matrix3f camera_k_matrix, int width_image,
+    base::ObjectPtr obj, Eigen::Matrix3f camera_k_matrix, int width_image,
     int height_image, ObjMapperOptions *obj_mapper_options, float *theta_ray) {
   // prepare bbox2d
   float bbox2d[4] = {
@@ -65,12 +64,12 @@ void MultiCueObstacleTransformer::SetObjMapperOptions(
   float box_cent_x = (bbox2d[0] + bbox2d[2]) / 2;
   Eigen::Vector3f image_point_low_center(box_cent_x, bbox2d[3], 1);
   Eigen::Vector3f point_in_camera =
-      static_cast<Eigen::Matrix<float, 3, 1, 0, 3, 1>>
-      (camera_k_matrix.inverse() * image_point_low_center);
-  *theta_ray = static_cast<float>(atan2(point_in_camera.x(),
-                                  point_in_camera.z()));
-  float rotation_y = *theta_ray +
-                     static_cast<float>(obj->camera_supplement.alpha);
+      static_cast<Eigen::Matrix<float, 3, 1, 0, 3, 1>>(
+          camera_k_matrix.inverse() * image_point_low_center);
+  *theta_ray =
+      static_cast<float>(atan2(point_in_camera.x(), point_in_camera.z()));
+  float rotation_y =
+      *theta_ray + static_cast<float>(obj->camera_supplement.alpha);
   base::ObjectSubType sub_type = obj->sub_type;
 
   // enforce rotation_y to be in the range [-pi, pi)
@@ -93,7 +92,7 @@ void MultiCueObstacleTransformer::SetObjMapperOptions(
   ADEBUG << "Obj pred ry:" << rotation_y;
   ADEBUG << "Obj pred type: " << static_cast<int>(sub_type);
   ADEBUG << "Bbox: " << bbox2d[0] << ", " << bbox2d[1] << ", " << bbox2d[2]
-            << ", " << bbox2d[3];
+         << ", " << bbox2d[3];
 }
 
 int MultiCueObstacleTransformer::MatchTemplates(base::ObjectSubType sub_type,
@@ -160,7 +159,7 @@ int MultiCueObstacleTransformer::MatchTemplates(base::ObjectSubType sub_type,
     default:
       if (min_dimension_val < multicue_param_.min_dimension_val()) {
         common::IScale3(dimension_hwl, multicue_param_.min_dimension_val() *
-                                         common::IRec(min_dimension_val));
+                                           common::IRec(min_dimension_val));
       }
       break;
   }
@@ -170,7 +169,6 @@ int MultiCueObstacleTransformer::MatchTemplates(base::ObjectSubType sub_type,
 void MultiCueObstacleTransformer::FillResults(
     float object_center[3], float dimension_hwl[3], float rotation_y,
     Eigen::Affine3d camera2world_pose, float theta_ray, base::ObjectPtr obj) {
-
   object_center[1] -= dimension_hwl[0] / 2;
   obj->camera_supplement.local_center(0) = object_center[0];
   obj->camera_supplement.local_center(1) = object_center[1];
@@ -178,9 +176,9 @@ void MultiCueObstacleTransformer::FillResults(
   ADEBUG << "Obj id: " << obj->track_id;
   ADEBUG << "Obj type: " << static_cast<int>(obj->sub_type);
   ADEBUG << "Obj ori dimension: " << obj->size[2] << ", " << obj->size[1]
-            << ", " << obj->size[0];
-  AINFO << "Obj local center[0] from transformer: " << object_center[0]
-           << " " << object_center[1] << " " << object_center[2];
+         << ", " << obj->size[0];
+  AINFO << "Obj local center[0] from transformer: " << object_center[0] << " "
+        << object_center[1] << " " << object_center[2];
 
   obj->center(0) = static_cast<double>(object_center[0]);
   obj->center(1) = static_cast<double>(object_center[1]);
@@ -208,7 +206,7 @@ void MultiCueObstacleTransformer::FillResults(
   obj->camera_supplement.alpha = rotation_y - theta_ray;
 
   ADEBUG << "Dimension hwl: " << dimension_hwl[0] << ", " << dimension_hwl[1]
-            << ", " << dimension_hwl[2];
+         << ", " << dimension_hwl[2];
   ADEBUG << "Obj ry:" << rotation_y;
   ADEBUG << "Obj theta: " << obj->theta;
   AINFO << "Obj center from transformer: " << obj->center.transpose();
@@ -230,9 +228,9 @@ bool MultiCueObstacleTransformer::Transform(
     }
   }
   ADEBUG << "Camera k matrix input to transformer: \n"
-            << k_mat[0] << ", " << k_mat[1] << ", " << k_mat[2] << "\n"
-            << k_mat[3] << ", " << k_mat[4] << ", " << k_mat[5] << "\n"
-            << k_mat[6] << ", " << k_mat[7] << ", " << k_mat[8] << "\n";
+         << k_mat[0] << ", " << k_mat[1] << ", " << k_mat[2] << "\n"
+         << k_mat[3] << ", " << k_mat[4] << ", " << k_mat[5] << "\n"
+         << k_mat[6] << ", " << k_mat[7] << ", " << k_mat[8] << "\n";
 
   const int width_image = frame->data_provider->src_width();
   const int height_image = frame->data_provider->src_height();

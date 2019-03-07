@@ -147,9 +147,7 @@ function build() {
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
 
-  unbuffer bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS | \
-      tee >(tools/stat_compile_warnings.py)
-
+  bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
   if [ ${PIPESTATUS[0]} -ne 0 ]; then
     fail 'Build failed!'
   fi
@@ -297,14 +295,14 @@ function release() {
     cp -a --parent ${LIB} ${APOLLO_RELEASE_DIR}
   done
   mkdir ${APOLLO_RELEASE_DIR}/bazel-bin
-  mv ${APOLLO_RELEASE_DIR}/bazel-out/local-dbg/bin/* ${APOLLO_RELEASE_DIR}/bazel-bin/
+  mv ${APOLLO_RELEASE_DIR}/bazel-out/local-opt/bin/* ${APOLLO_RELEASE_DIR}/bazel-bin/
   rm -rf ${APOLLO_RELEASE_DIR}/bazel-out
 
   # reset softlinks
   cd ${APOLLO_RELEASE_DIR}/bazel-bin
   LIST=("_solib_k8")
   for DIR in "${LIST[@]}"; do
-    LINKS=$(find ${DIR}/* -name "*.so" -type l | sed '/.*@.*/d' | sed '/.*third_Uparty.*/d')
+    LINKS=$(find ${DIR}/* -name "*.so" -type l | sed '/.*@.*/d')
     for LINK in $LINKS; do
       LIB=$(echo $LINK | sed 's/_S/\//g' | sed 's/_U/_/g')
       if [[ $LIB == *"_solib_k8/lib"* ]]; then
@@ -652,6 +650,11 @@ function config() {
   ${APOLLO_ROOT_DIR}/scripts/configurator.sh
 }
 
+function set_use_gpu() {
+  DEFINES="${DEFINES} --define USE_GPU=true"
+  USE_GPU="1"
+}
+
 function print_usage() {
   RED='\033[0;31m'
   BLUE='\033[0;34m'
@@ -710,8 +713,7 @@ function main() {
       check $@
       ;;
     build)
-      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
-      USE_GPU="1"
+      set_use_gpu
       apollo_build_dbg $@
       ;;
     build_cpu)
@@ -762,13 +764,12 @@ function main() {
       apollo_build_opt $@
       ;;
     build_gpu)
-      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU"
-      USE_GPU="1"
+      set_use_gpu
       apollo_build_dbg $@
       ;;
     build_opt_gpu)
-      DEFINES="${DEFINES} --define USE_GPU=true --cxxopt=-DUSE_GPU --copt=-fpic"
-      USE_GPU="1"
+      set_use_gpu
+      DEFINES="${DEFINES} --copt=-fpic"
       apollo_build_opt $@
       ;;
     build_fe)
@@ -790,8 +791,7 @@ function main() {
       run_lint
       ;;
     test)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
-      USE_GPU="1"
+      set_use_gpu
       run_test $@
       ;;
     test_cpu)
@@ -811,8 +811,7 @@ function main() {
       citest_extended $@
       ;;
     test_gpu)
-      DEFINES="${DEFINES} --cxxopt=-DUSE_GPU"
-      USE_GPU="1"
+      set_use_gpu
       run_test $@
       ;;
     release)

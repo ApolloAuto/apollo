@@ -80,8 +80,9 @@ bool IntraReader<MessageT>::Init() {
   }
   return BlockerManager::Instance()->Subscribe<MessageT>(
       this->role_attr_.channel_name(), this->role_attr_.qos_profile().depth(),
-      this->role_attr_.node_name(), std::bind(&IntraReader<MessageT>::OnMessage,
-                                              this, std::placeholders::_1));
+      this->role_attr_.node_name(),
+      std::bind(&IntraReader<MessageT>::OnMessage, this,
+                std::placeholders::_1));
 }
 
 template <typename MessageT>

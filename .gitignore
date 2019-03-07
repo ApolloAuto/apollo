@@ -53,15 +53,7 @@ third_party/ros_x86_64/
 modules/ros/third_party/fast-rtps
 
 # Data
-data/prediction
-data/log
-data/core
-data/bag
-data/cov
-data/kv_db.sqlite
-data/pcd
-data/nfs
-data/map_visual
+/data
 modules/data/conf/task_info_template.pb.txt
 modules/tools/ota/update.ini
 modules/tools/ota/vehicle_info.pb.txt

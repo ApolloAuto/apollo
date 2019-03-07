@@ -31,10 +31,9 @@ using ::apollo::hdmap::PNCJunctionInfo;
 using ::apollo::planning::ADCTrajectory;
 
 ADCTrajectoryContainer::ADCTrajectoryContainer()
-    :adc_junction_info_ptr_(nullptr),
-     adc_pnc_junction_info_ptr_(nullptr),
-     s_dist_to_junction_(0.0) {
-}
+    : adc_junction_info_ptr_(nullptr),
+      adc_pnc_junction_info_ptr_(nullptr),
+      s_dist_to_junction_(0.0) {}
 
 void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {
@@ -61,8 +60,7 @@ void ADCTrajectoryContainer::Insert(
          << "].";
 }
 
-bool ADCTrajectoryContainer::IsPointInJunction(
-    const PathPoint& point) const {
+bool ADCTrajectoryContainer::IsPointInJunction(const PathPoint& point) const {
   if (adc_pnc_junction_info_ptr_ != nullptr) {
     return IsPointInPNCJunction(point);
   }
@@ -197,6 +195,11 @@ const ADCTrajectory& ADCTrajectoryContainer::adc_trajectory() const {
   return adc_trajectory_;
 }
 
+bool ADCTrajectoryContainer::IsLaneIdInReferenceLine(
+    const std::string& lane_id) const {
+  return adc_lane_ids_.find(lane_id) != adc_lane_ids_.end();
+}
+
 void ADCTrajectoryContainer::SetLaneSequence() {
   for (const auto& lane : adc_trajectory_.lane_id()) {
     if (!lane.id().empty()) {
@@ -257,6 +260,11 @@ void ADCTrajectoryContainer::SetPosition(const Vec2d& position) {
     }
   }
   ADEBUG << "Generate an ADC lane ids [" << ToString(adc_lane_ids_) << "].";
+}
+
+const std::vector<std::string>& ADCTrajectoryContainer::GetADCLaneIDSequence()
+    const {
+  return adc_lane_seq_;
 }
 
 }  // namespace prediction

@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
@@ -29,7 +29,7 @@ class Fail241 : public ::apollo::drivers::canbus::ProtocolData<
   static const int32_t ID;
   Fail241();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'Engine Fail status', 'enum': {0:
@@ -38,7 +38,7 @@ class Fail241 : public ::apollo::drivers::canbus::ProtocolData<
   // '[0|1]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
   Fail_241::EngfailType engfail(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+                                const int32_t length) const;
 
   // config detail: {'description': 'ESP fault', 'enum': {0:
   // 'ESPFAIL_NO_FAILURE', 1: 'ESPFAIL_FAILURE'}, 'precision': 1.0, 'len': 1,
@@ -46,7 +46,7 @@ class Fail241 : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|1]', 'bit': 14, 'type': 'enum',
   // 'order': 'motorola', 'physical_unit': ''}
   Fail_241::EspfailType espfail(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+                                const int32_t length) const;
 
   // config detail: {'description': 'error indication of EPB system', 'enum':
   // {0: 'EPBFAIL_UNDEFINED', 1: 'EPBFAIL_NO_ERROR', 2: 'EPBFAIL_ERROR', 3:
@@ -54,7 +54,7 @@ class Fail241 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
   // 'bit': 35, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   Fail_241::EpbfailType epbfail(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+                                const int32_t length) const;
 
   // config detail: {'description': 'Driver display failure messages', 'enum':
   // {0: 'SHIFTFAIL_NO_FAIL', 1: 'SHIFTFAIL_TRANSMISSION_MALFUNCTION',
@@ -65,7 +65,7 @@ class Fail241 : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|15]', 'bit': 31, 'type': 'enum', 'order':'motorola',
   // 'physical_unit': ''}
   Fail_241::ShiftfailType shiftfail(const std::uint8_t* bytes,
-                                     const int32_t length) const;
+                                    const int32_t length) const;
 
   // config detail: {'description': 'Electrical steering fail status', 'enum':
   // {0: 'EPSFAIL_NO_FAULT', 1: 'EPSFAIL_FAULT'}, 'precision': 1.0, 'len': 1,
@@ -73,7 +73,7 @@ class Fail241 : public ::apollo::drivers::canbus::ProtocolData<
   // 'physical_range': '[0|1]', 'bit': 21, 'type': 'enum', 'order': 'motorola',
   // 'physical_unit': ''}
   Fail_241::EpsfailType epsfail(const std::uint8_t* bytes,
-                                 const int32_t length) const;
+                                const int32_t length) const;
 };
 
 }  // namespace wey

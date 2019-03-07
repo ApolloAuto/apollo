@@ -12,6 +12,9 @@ cc_proto_library(
 proto_library(
     name = "perception_proto_lib",
     srcs = [
+        "motion_service.proto",
+        "perception_camera.proto",
+        "perception_lane.proto",
         "perception_obstacle.proto",
         "traffic_light_detection.proto",
     ],

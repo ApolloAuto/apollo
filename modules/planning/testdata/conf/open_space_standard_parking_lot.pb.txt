@@ -41,18 +41,18 @@ dual_variable_warm_start_config : {
 }
 
 distance_approach_config : {
-  weight_u : 0.0
-  weight_u : 0.0
-  weight_u_rate : 0.02
-  weight_u_rate : 0.02
-  weight_state : 1.0
-  weight_state : 1.0
-  weight_state : 2.0
-  weight_state : 0.0
-  weight_stitching : 0.02
-  weight_stitching : 0.02
-  weight_time : 8.0
-  weight_time : 16.0
+  weight_steer : 0.0
+  weight_a : 0.0
+  weight_steer_rate : 0.02
+  weight_a_rate : 0.02
+  weight_x : 1.0
+  weight_y : 1.0
+  weight_phi : 2.0
+  weight_v : 0.0
+  weight_steer_stitching : 0.02
+  weight_a_stitching : 0.02
+  weight_first_order_time : 8.0
+  weight_second_order_time : 16.0
   min_safety_distance : 0.0
   max_speed_forward : 2.0
   max_speed_reverse : 1.0

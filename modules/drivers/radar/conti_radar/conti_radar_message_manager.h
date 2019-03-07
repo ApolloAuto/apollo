@@ -29,7 +29,6 @@
 #include "modules/drivers/proto/conti_radar.pb.h"
 #include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
 
-
 namespace apollo {
 namespace drivers {
 namespace conti_radar {
@@ -42,7 +41,7 @@ using ::apollo::common::ErrorCode;
 using apollo::drivers::canbus::CanClient;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::conti_radar::RadarConfig200;
-template<typename T>
+template <typename T>
 using Writer = apollo::cyber::Writer<T>;
 
 class ContiRadarMessageManager : public MessageManager<ContiRadar> {

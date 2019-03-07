@@ -70,8 +70,7 @@ LocationExporter::~LocationExporter() {
   }
 }
 
-void LocationExporter::GnssLocCallback(
-    const std::string &msg_string) {
+void LocationExporter::GnssLocCallback(const std::string &msg_string) {
   AINFO << "GNSS location callback.";
   LocalizationEstimate msg;
   msg.ParseFromString(msg_string);
@@ -99,8 +98,7 @@ void LocationExporter::GnssLocCallback(
   ++index;
 }
 
-void LocationExporter::LidarLocCallback(
-    const std::string &msg_string) {
+void LocationExporter::LidarLocCallback(const std::string &msg_string) {
   AINFO << "Lidar location callback.";
   LocalizationEstimate msg;
   msg.ParseFromString(msg_string);
@@ -133,8 +131,7 @@ void LocationExporter::LidarLocCallback(
   ++index;
 }
 
-void LocationExporter::FusionLocCallback(
-    const std::string &msg_string) {
+void LocationExporter::FusionLocCallback(const std::string &msg_string) {
   AINFO << "Fusion location callback.";
   LocalizationEstimate msg;
   msg.ParseFromString(msg_string);
@@ -167,8 +164,7 @@ void LocationExporter::FusionLocCallback(
   ++index;
 }
 
-void LocationExporter::OdometryLocCallback(
-    const std::string &msg_string) {
+void LocationExporter::OdometryLocCallback(const std::string &msg_string) {
   AINFO << "Odometry location callback.";
   Gps msg;
   msg.ParseFromString(msg_string);

@@ -290,7 +290,7 @@ std::string Dst::PrintBba() const {
   for (const auto &fod_subset_name : fod_subset_names) {
     header += (boost::format("%20s") % fod_subset_name).str();
   }
-  res = res + header + "\n";
+  res += header + "\n";
   res += print_row("belief_mass", bba_vec_);
   // res += print_row("support", support_vec_);
   // res += print_row("uncertainty", uncertainty_vec_);
@@ -340,15 +340,14 @@ void Dst::ComputeProbability() const {
       dst_data_ptr_->fod_subset_cardinalities_;
   for (size_t i = 0; i < combination_relations.size(); ++i) {
     const auto &combination_pairs = combination_relations[i];
-    double intersection_card = static_cast<double>(
-                                   fod_subset_cardinalities[i]);
+    double intersection_card = static_cast<double>(fod_subset_cardinalities[i]);
     for (auto combination_pair : combination_pairs) {
       size_t a_ind = combination_pair.first;
       size_t b_ind = combination_pair.second;
       probability_vec_[a_ind] +=
-          intersection_card / static_cast<double>(
-                                  fod_subset_cardinalities[b_ind]) *
-                                  bba_vec_[b_ind];
+          intersection_card /
+          static_cast<double>(fod_subset_cardinalities[b_ind]) *
+          bba_vec_[b_ind];
     }
   }
 }

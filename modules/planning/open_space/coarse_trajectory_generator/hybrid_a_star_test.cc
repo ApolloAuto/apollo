@@ -18,12 +18,14 @@
  * @file
  */
 
+#include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
+
+#include "cyber/common/file.h"
 #include "gtest/gtest.h"
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
 namespace apollo {
 namespace planning {
@@ -35,7 +37,7 @@ class HybridATest : public ::testing::Test {
         "/apollo/modules/planning/testdata/conf/"
         "open_space_standard_parking_lot.pb.txt";
 
-    CHECK(apollo::common::util::GetProtoFromFile(
+    CHECK(apollo::cyber::common::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;

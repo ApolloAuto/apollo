@@ -24,7 +24,6 @@
 #include "cyber/base/macros.h"
 #include "cyber/logger/log_file_object.h"
 #include "cyber/logger/logger_util.h"
-#include "cyber/scheduler/scheduler_factory.h"
 
 namespace apollo {
 namespace cyber {
@@ -54,7 +53,6 @@ void AsyncLogger::Start() {
   CHECK_EQ(state_, INITTED);
   state_ = RUNNING;
   thread_ = std::thread(&AsyncLogger::RunThread, this);
-  scheduler::Instance()->SetInnerThreadAttr(&thread_, "async_log");
   // std::cout << "Async Logger Start!" << std::endl;
 }
 

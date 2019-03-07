@@ -1,22 +1,22 @@
 /******************************************************************************
-  * Copyright 2017 The Apollo Authors. All Rights Reserved.
-  *
-  * Licensed under the Apache License, Version 2.0 (the "License");
-  * you may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at
-  *
-  * http://www.apache.org/licenses/LICENSE-2.0
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *****************************************************************************/
+ * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/routing/core/navigator.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/routing/common/routing_gflags.h"
 #include "modules/routing/graph/sub_topo_graph.h"
 #include "modules/routing/strategy/a_star_strategy.h"
@@ -94,7 +94,7 @@ void PrintDebugData(const std::vector<NodeWithRange>& nodes) {
 
 Navigator::Navigator(const std::string& topo_file_path) {
   Graph graph;
-  if (!common::util::GetProtoFromFile(topo_file_path, &graph)) {
+  if (!cyber::common::GetProtoFromFile(topo_file_path, &graph)) {
     AERROR << "Failed to read topology graph from " << topo_file_path;
     return;
   }

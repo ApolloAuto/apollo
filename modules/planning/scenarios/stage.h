@@ -82,8 +82,11 @@ class Stage {
   bool ExecuteTaskOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
+  bool ExecuteTaskOnOpenSpace(Frame* frame);
+
   virtual Stage::StageStatus FinishScenario();
 
+ protected:
   std::map<TaskConfig::TaskType, std::unique_ptr<Task>> tasks_;
   std::vector<Task*> task_list_;
   ScenarioConfig::StageConfig config_;

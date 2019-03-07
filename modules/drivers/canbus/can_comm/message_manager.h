@@ -68,8 +68,8 @@ template <typename SensorType>
 class MessageManager {
  public:
   /*
-  * @brief constructor function
-  */
+   * @brief constructor function
+   */
   MessageManager() {}
   /*
    * @brief destructor function
@@ -87,7 +87,7 @@ class MessageManager {
 
   void ClearSensorData();
 
-  std::condition_variable* GetMutableCVar();
+  std::condition_variable *GetMutableCVar();
 
   /**
    * @brief get mutable protocol data by message id
@@ -212,7 +212,7 @@ void MessageManager<SensorType>::ClearSensorData() {
 }
 
 template <typename SensorType>
-std::condition_variable* MessageManager<SensorType>::GetMutableCVar() {
+std::condition_variable *MessageManager<SensorType>::GetMutableCVar() {
   return &cvar_;
 }
 

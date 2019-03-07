@@ -53,19 +53,20 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
     return;
   }
 
+  /* TODO(all): to be fixed
   const std::string traffic_light_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
   if (traffic_light_overlap_id.empty()) {
     return;
   }
 
-  context_.traffic_light_id = traffic_light_overlap_id;
-  traffic_light_ = HDMapUtil::BaseMap().GetSignalById(
+  hdmap::SignalInfoConstPtr traffic_light = HDMapUtil::BaseMap().GetSignalById(
       hdmap::MakeMapId(traffic_light_overlap_id));
-  if (!traffic_light_) {
+  if (!traffic_light) {
     AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
     return;
   }
+  */
 
   init_ = true;
 }
@@ -82,17 +83,18 @@ void TrafficLightUnprotectedRightTurnScenario::RegisterStages() {
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageStop(config);
+        return new TrafficLightUnprotectedRightTurnStageStop(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageCreep(config);
+        return new TrafficLightUnprotectedRightTurnStageCreep(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageIntersectionCruise(config);
+        return new TrafficLightUnprotectedRightTurnStageIntersectionCruise(
+            config);
       });
 }
 
@@ -110,57 +112,7 @@ std::unique_ptr<Stage> TrafficLightUnprotectedRightTurnScenario::CreateStage(
 }
 
 bool TrafficLightUnprotectedRightTurnScenario::IsTransferable(
-    const Scenario& current_scenario,
-    const common::TrajectoryPoint& ego_point,
-    const Frame& frame) {
-  const std::string traffic_light_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (traffic_light_overlap_id.empty()) {
-    return false;
-  }
-
-  const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double traffic_light_overlap_start_s =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
-  const double adc_distance_to_stop_line =
-      traffic_light_overlap_start_s - adc_front_edge_s;
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
-
-  auto scenario_config = config_.traffic_light_unprotected_right_turn_config();
-
-  bool is_stopped_for_traffic_light = true;
-  if (adc_speed > scenario_config.max_adc_stop_speed() ||
-      adc_distance_to_stop_line > scenario_config.max_valid_stop_distance()) {
-    is_stopped_for_traffic_light = false;
-    ADEBUG << "ADC not stopped: speed[" << adc_speed
-        << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line << "]";
-  }
-
-  bool right_turn = (reference_line_info.GetPathTurnType() ==
-      hdmap::Lane::RIGHT_TURN);
-
-  switch (current_scenario.scenario_type()) {
-    case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
-    case ScenarioConfig::APPROACH:
-      return (is_stopped_for_traffic_light && right_turn &&
-          PlanningContext::GetScenarioInfo()->traffic_light_color ==
-              TrafficLight::RED);
-    case ScenarioConfig::STOP_SIGN_PROTECTED:
-    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
-      return false;
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-      return (current_scenario.GetStatus() !=
-              Scenario::ScenarioStatus::STATUS_DONE);
-    default:
-      break;
-  }
-
+    const Scenario& current_scenario, const Frame& frame) {
   return false;
 }
 

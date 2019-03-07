@@ -35,7 +35,7 @@ TEST_F(FeatureOutputTest, insertion) {
   Feature feature;
   for (int i = 0; i < 3; ++i) {
     Feature feature;
-    FeatureOutput::Insert(feature);
+    FeatureOutput::InsertFeatureProto(feature);
   }
   EXPECT_EQ(3, FeatureOutput::Size());
 }
@@ -44,7 +44,7 @@ TEST_F(FeatureOutputTest, clear) {
   Feature feature;
   for (int i = 0; i < 3; ++i) {
     Feature feature;
-    FeatureOutput::Insert(feature);
+    FeatureOutput::InsertFeatureProto(feature);
   }
   FeatureOutput::Clear();
   EXPECT_EQ(0, FeatureOutput::Size());

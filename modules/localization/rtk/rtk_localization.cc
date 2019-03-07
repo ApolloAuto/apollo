@@ -188,7 +188,7 @@ void RTKLocalization::FillLocalizationMsgHeader(
     LocalizationEstimate *localization) {
   DCHECK_NOTNULL(localization);
 
-  auto* header = localization->mutable_header();
+  auto *header = localization->mutable_header();
   double timestamp = apollo::common::time::Clock::NowInSeconds();
   header->set_module_name(module_name_);
   header->set_timestamp_sec(timestamp);
@@ -232,8 +232,7 @@ void RTKLocalization::FillLocalizationStatusMsg(
 }
 
 void RTKLocalization::ComposeLocalizationMsg(
-    const localization::Gps &gps_msg,
-    const localization::CorrectedImu &imu_msg,
+    const localization::Gps &gps_msg, const localization::CorrectedImu &imu_msg,
     LocalizationEstimate *localization) {
   localization->Clear();
 
@@ -244,7 +243,7 @@ void RTKLocalization::ComposeLocalizationMsg(
   // combine gps and imu
   auto mutable_pose = localization->mutable_pose();
   if (gps_msg.has_localization()) {
-    const auto& pose = gps_msg.localization();
+    const auto &pose = gps_msg.localization();
 
     if (pose.has_position()) {
       // position
@@ -272,7 +271,7 @@ void RTKLocalization::ComposeLocalizationMsg(
   }
 
   if (imu_msg.has_imu()) {
-    const auto& imu = imu_msg.imu();
+    const auto &imu = imu_msg.imu();
     // linear acceleration
     if (imu.has_linear_acceleration()) {
       if (localization->pose().has_orientation()) {
@@ -459,7 +458,7 @@ bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
 }
 
 template <class T>
-T RTKLocalization::InterpolateXYZ(const T& p1, const T& p2,
+T RTKLocalization::InterpolateXYZ(const T &p1, const T &p2,
                                   const double frac1) {
   T p;
   double frac2 = 1.0 - frac1;
@@ -475,8 +474,8 @@ T RTKLocalization::InterpolateXYZ(const T& p1, const T& p2,
   return p;
 }
 
-bool RTKLocalization::FindNearestGpsStatus(
-    const double gps_timestamp_sec, drivers::gnss::InsStat *status) {
+bool RTKLocalization::FindNearestGpsStatus(const double gps_timestamp_sec,
+                                           drivers::gnss::InsStat *status) {
   CHECK_NOTNULL(status);
 
   std::unique_lock<std::mutex> lock(gps_status_list_mutex_);
@@ -485,8 +484,8 @@ bool RTKLocalization::FindNearestGpsStatus(
 
   double timestamp_diff_sec = 1e8;
   auto nearest_itr = gps_status_list.end();
-  for (auto itr = gps_status_list.begin();
-       itr != gps_status_list.end(); ++itr) {
+  for (auto itr = gps_status_list.begin(); itr != gps_status_list.end();
+       ++itr) {
     double diff = std::abs(itr->header().timestamp_sec() - gps_timestamp_sec);
     if (diff < timestamp_diff_sec) {
       timestamp_diff_sec = diff;

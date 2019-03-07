@@ -31,8 +31,8 @@ bool PointCamera1ToCamera2(const Eigen::Vector2d& point,
                            Eigen::Vector2d* point_out) {
   Eigen::Vector3d pt = point.homogeneous();
   Eigen::Vector3d camera2_3d =
-      static_cast<Eigen::Matrix<double, 3, 1, 0, 3, 1>>
-      (trans_camera1_to_camera2 * camera1_intrinsic_inverse * pt);
+      static_cast<Eigen::Matrix<double, 3, 1, 0, 3, 1>>(
+          trans_camera1_to_camera2 * camera1_intrinsic_inverse * pt);
 
   double z = camera2_3d(2);
   if (fabs(z) > 1e-6) {
@@ -55,8 +55,8 @@ bool IsCamerasFieldOverlap(const base::PinholeCameraModel& from_camera,
   Eigen::Matrix3d f2t_rotation = extrinsic.topLeftCorner(3, 3);
   Eigen::Matrix<double, 4, 2> points;
   points << 0.0, 0.0, static_cast<double>(f_width), 0.0,
-            static_cast<double>(f_width), static_cast<double>(f_height),
-            0.0, static_cast<double>(f_height);
+      static_cast<double>(f_width), static_cast<double>(f_height), 0.0,
+      static_cast<double>(f_height);
   Eigen::Vector2d pt_min(std::numeric_limits<double>::max(),
                          std::numeric_limits<double>::max());
   Eigen::Vector2d pt_max(-std::numeric_limits<double>::max(),

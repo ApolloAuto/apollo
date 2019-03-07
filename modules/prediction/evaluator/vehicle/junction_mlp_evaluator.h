@@ -58,9 +58,9 @@ class JunctionMLPEvaluator : public Evaluator {
                             std::vector<double>* feature_values);
 
   /**
-    * @brief Get the name of evaluator.
-    */
-  std::string GetName() override {return "JUNCTION_MLP_EVALUATOR";}
+   * @brief Get the name of evaluator.
+   */
+  std::string GetName() override { return "JUNCTION_MLP_EVALUATOR"; }
 
  private:
   /**
@@ -69,7 +69,15 @@ class JunctionMLPEvaluator : public Evaluator {
    *        Feature container in a vector for receiving the feature values
    */
   void SetObstacleFeatureValues(Obstacle* obstacle_ptr,
-                                std::vector<double>* feature_values);
+                                std::vector<double>* const feature_values);
+
+  /**
+   * @brief Set ego vehicle feature vector
+   * @param Obstacle pointer
+   *        Feature container in a vector for receiving the feature values
+   */
+  void SetEgoVehicleFeatureValues(Obstacle* obstacle_ptr,
+                                  std::vector<double>* const feature_values);
 
   /**
    * @brief Set junction feature vector
@@ -77,15 +85,7 @@ class JunctionMLPEvaluator : public Evaluator {
    *        Feature container in a vector for receiving the feature values
    */
   void SetJunctionFeatureValues(Obstacle* obstacle_ptr,
-                                std::vector<double>* feature_values);
-
-  /**
-   * @brief Save offline feature values in proto
-   * @param Obstacle feature
-   * @param Vector of feature values
-   */
-  void SaveOfflineFeatures(Feature* feature_ptr,
-                           const std::vector<double>& feature_values);
+                                std::vector<double>* const feature_values);
 
   /**
    * @brief Load mode file
@@ -100,8 +100,12 @@ class JunctionMLPEvaluator : public Evaluator {
       const std::vector<double>& feature_values);
 
  private:
-  static const size_t OBSTACLE_FEATURE_SIZE = 3;
-  static const size_t JUNCTION_FEATURE_SIZE = 60;
+  // obstacle feature with 4 basic features and 5 frames of history posotion
+  static const size_t OBSTACLE_FEATURE_SIZE = 4 + 2 * 5;
+  // ego vehicle feature of position and velocity
+  static const size_t EGO_VEHICLE_FEATURE_SIZE = 4;
+  // junction feature on 12 fan area 8 dim each
+  static const size_t JUNCTION_FEATURE_SIZE = 12 * 8;
 
   std::unique_ptr<FnnVehicleModel> model_ptr_;
 };

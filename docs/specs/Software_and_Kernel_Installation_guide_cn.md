@@ -98,7 +98,7 @@ wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_
 2. 执行驱动安装
 
 ```
-sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s
+sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s --no-kernel-module
 ```
 
 ### 参考资料

@@ -9,7 +9,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         "//modules/planning/common:frame",
-        "//modules/planning/common/trajectory:trajectory_stitcher",
+        "//modules/planning/common:trajectory_stitcher",
     ],
 )
 

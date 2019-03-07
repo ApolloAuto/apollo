@@ -70,7 +70,6 @@ class Scenario {
   // Each scenario should define its own transfer condition, i.e., when it
   // should allow to transfer from other scenario to itself.
   virtual bool IsTransferable(const Scenario& other_scenario,
-                              const common::TrajectoryPoint& ego_point,
                               const Frame& frame) = 0;
 
   ScenarioStatus Process(const common::TrajectoryPoint& planning_init_point,
@@ -86,9 +85,7 @@ class Scenario {
   virtual void Init();
 
   const std::string& Name() const;
-  const std::string& GetMsg() const {
-    return msg_;
-  }
+  const std::string& GetMsg() const { return msg_; }
 
  protected:
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;

@@ -37,12 +37,6 @@
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 
-/*
-Initially inspired by "Optimization-Based Collision Avoidance"
-(arXiv:1711.03449) from Xiaojing Zhang , Alexander Liniger and Francesco
-Borrelli
-*/
-
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
@@ -91,8 +85,8 @@ class OpenSpacePlanner : public Planner {
    * @brief override function Plan in parent class Planner.
    */
   apollo::common::Status Plan(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override {
+      const common::TrajectoryPoint& planning_init_point, Frame* frame,
+      ADCTrajectory* ptr_computed_trajectory) override {
     return Status::OK();
   }
 

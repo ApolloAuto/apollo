@@ -50,6 +50,7 @@ cyber_recorder split -f "${INPUT_RECORD}" -o "${OUTPUT_RECORD}" \
     -c "/apollo/relative_map" \
     -c "/apollo/routing_request" \
     -c "/apollo/routing_response" \
+    -c "/apollo/routing_response_history" \
     -c "/apollo/sensor/conti_radar" \
     -c "/apollo/sensor/delphi_esr" \
     -c "/apollo/sensor/gnss/best_pose" \

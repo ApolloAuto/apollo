@@ -22,8 +22,6 @@
 
 #include <string>
 
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
@@ -34,15 +32,15 @@ namespace traffic_light {
 
 struct TrafficLightProtectedContext;
 
-class StageStop : public Stage {
+class TrafficLightProtectedStageStop : public Stage {
  public:
-  explicit StageStop(
-      const ScenarioConfig::StageConfig& config) : Stage(config) {}
+  explicit TrafficLightProtectedStageStop(
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
  private:
-  Stage::StageStatus Process(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
   TrafficLightProtectedContext* GetContext() {
     return GetContextAs<TrafficLightProtectedContext>();
   }

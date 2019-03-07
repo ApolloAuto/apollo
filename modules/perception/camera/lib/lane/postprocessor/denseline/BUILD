@@ -27,7 +27,6 @@ cc_library(
     deps = [
         ":denseline_postprocessor_proto",
         "//cyber",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",

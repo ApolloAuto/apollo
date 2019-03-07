@@ -16,19 +16,18 @@
 
 #include "modules/control/controller/lon_controller.h"
 
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
 #include "gtest/gtest.h"
 
-#include "modules/control/proto/control_conf.pb.h"
-#include "modules/planning/proto/planning.pb.h"
-
-#include "cyber/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/control/common/control_gflags.h"
+#include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
 namespace control {
@@ -51,8 +50,7 @@ class LonControllerTest : public ::testing::Test, LonController {
     std::string control_conf_file =
         "/apollo/modules/control/testdata/conf/control_conf.pb.txt";
 
-    CHECK(apollo::common::util::GetProtoFromFile(control_conf_file,
-                                                 &control_conf));
+    CHECK(cyber::common::GetProtoFromFile(control_conf_file, &control_conf));
     longitudinal_conf_ = control_conf.lon_controller_conf();
 
     timestamp_ = Clock::NowInSeconds();
@@ -73,7 +71,7 @@ class LonControllerTest : public ::testing::Test, LonController {
  protected:
   LocalizationPb LoadLocalizationPb(const std::string &filename) {
     LocalizationPb localization;
-    CHECK(apollo::common::util::GetProtoFromFile(filename, &localization))
+    CHECK(cyber::common::GetProtoFromFile(filename, &localization))
         << "Failed to open file " << filename;
     localization.mutable_header()->set_timestamp_sec(timestamp_);
     return localization;
@@ -81,7 +79,7 @@ class LonControllerTest : public ::testing::Test, LonController {
 
   ChassisPb LoadChassisPb(const std::string &filename) {
     ChassisPb chassis_pb;
-    CHECK(apollo::common::util::GetProtoFromFile(filename, &chassis_pb))
+    CHECK(cyber::common::GetProtoFromFile(filename, &chassis_pb))
         << "Failed to open file " << filename;
     chassis_pb.mutable_header()->set_timestamp_sec(timestamp_);
     return chassis_pb;
@@ -89,7 +87,7 @@ class LonControllerTest : public ::testing::Test, LonController {
 
   TrajectoryPb LoadPlanningTrajectoryPb(const std::string &filename) {
     TrajectoryPb trajectory_pb;
-    CHECK(apollo::common::util::GetProtoFromFile(filename, &trajectory_pb))
+    CHECK(cyber::common::GetProtoFromFile(filename, &trajectory_pb))
         << "Failed to open file " << filename;
 
     trajectory_pb.mutable_header()->set_timestamp_sec(timestamp_);
@@ -149,7 +147,7 @@ TEST_F(LonControllerTest, ComputeLongitudinalErrors) {
 
 TEST_F(LonControllerTest, Init) {
   common::Status status = Init(nullptr);
-  EXPECT_EQ(status.code() == common::ErrorCode::CONTROL_INIT_ERROR, true);
+  EXPECT_EQ(status.code(), common::ErrorCode::CONTROL_INIT_ERROR);
 }
 
 }  // namespace control

@@ -20,7 +20,6 @@
 #include <string.h>
 #include <string>
 
-
 namespace apollo {
 namespace cyber {
 namespace message {

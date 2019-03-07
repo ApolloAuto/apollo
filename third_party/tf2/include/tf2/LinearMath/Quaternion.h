@@ -13,7 +13,6 @@ subject to the following restrictions:
 */
 
 
-
 #ifndef TF2_QUATERNION_H_
 #define TF2_QUATERNION_H_
 

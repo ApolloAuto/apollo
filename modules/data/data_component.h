@@ -36,11 +36,11 @@
 namespace apollo {
 namespace data {
 
-class DataComponent final
-    : public apollo::cyber::Component<DataInputCommand> {
+class DataComponent final : public apollo::cyber::Component<DataInputCommand> {
  public:
   DataComponent() = default;
   ~DataComponent() = default;
+
  public:
   bool Init() override;
   bool Proc(const std::shared_ptr<DataInputCommand> &request) override;
@@ -50,11 +50,12 @@ class DataComponent final
 
  private:
   void OnDataInputCommand(
-    const std::shared_ptr<DataInputCommand> &data_input_cmd);
+      const std::shared_ptr<DataInputCommand> &data_input_cmd);
+
  private:
   DataConf data_conf_;
   std::shared_ptr<apollo::cyber::Reader<DataInputCommand>>
-    data_input_cmd_reader_;
+      data_input_cmd_reader_;
 };
 
 CYBER_REGISTER_COMPONENT(DataComponent)

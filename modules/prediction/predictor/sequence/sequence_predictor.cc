@@ -65,11 +65,11 @@ void SequencePredictor::FilterLaneSequences(
   std::pair<int, double> change(-1, -1.0);
   std::pair<int, double> all(-1, -1.0);
 
-  /** 
-    * Filter out those obstacles that are close to the ADC 
-    * so that we will ignore them and drive normally unless
-    * they really kick into our lane.
-    */
+  /**
+   * Filter out those obstacles that are close to the ADC
+   * so that we will ignore them and drive normally unless
+   * they really kick into our lane.
+   */
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
     lane_change_type[i] = GetLaneChangeType(lane_id, sequence);
@@ -87,9 +87,9 @@ void SequencePredictor::FilterLaneSequences(
            << distance;
     if (distance > 0.0 && distance < FLAGS_lane_change_dist) {
       bool obs_within_its_own_lane = true;
-      for (int j = 0; j < feature.polygon_point_size(); j ++) {
-        Eigen::Vector2d position
-            (feature.polygon_point(j).x(), feature.polygon_point(j).y());
+      for (int j = 0; j < feature.polygon_point_size(); j++) {
+        Eigen::Vector2d position(feature.polygon_point(j).x(),
+                                 feature.polygon_point(j).y());
         std::shared_ptr<const LaneInfo> lane_info =
             PredictionMap::LaneById(lane_id);
         if (lane_info == nullptr) {
@@ -120,8 +120,8 @@ void SequencePredictor::FilterLaneSequences(
   }
 
   /**
-    * Pick the most probable lane-sequence and lane-change
-    */
+   * Pick the most probable lane-sequence and lane-change
+   */
   for (int i = 0; i < num_lane_sequence; ++i) {
     const LaneSequence& sequence = lane_graph.lane_sequence(i);
 
@@ -182,7 +182,7 @@ SequencePredictor::LaneChangeType SequencePredictor::GetLaneChangeType(
     if (PredictionMap::IsLeftNeighborLane(ptr_change_lane, ptr_current_lane)) {
       return LaneChangeType::LEFT;
     } else if (PredictionMap::IsRightNeighborLane(ptr_change_lane,
-        ptr_current_lane)) {
+                                                  ptr_current_lane)) {
       return LaneChangeType::RIGHT;
     }
   }
@@ -194,8 +194,9 @@ double SequencePredictor::GetLaneChangeDistanceWithADC(
   auto pose_container =
       ContainerManager::Instance()->GetContainer<PoseContainer>(
           AdapterConfig::LOCALIZATION);
-  auto adc_container = ContainerManager::Instance()->GetContainer<
-      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
+  auto adc_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
 
   CHECK_NOTNULL(pose_container);
   CHECK_NOTNULL(adc_container);
@@ -255,8 +256,7 @@ bool SequencePredictor::LaneChangeWithMaxProb(const LaneChangeType& type,
 
 void SequencePredictor::DrawConstantAccelerationTrajectory(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double total_time, const double period,
-    const double acceleration,
+    const double total_time, const double period, const double acceleration,
     std::vector<TrajectoryPoint>* points) {
   const Feature& feature = obstacle.latest_feature();
   if (!feature.has_position() || !feature.has_velocity() ||

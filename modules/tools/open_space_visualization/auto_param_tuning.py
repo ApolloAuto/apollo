@@ -21,15 +21,17 @@ import argparse
 from google.protobuf.internal import decoder
 from google.protobuf.internal import encoder
 import hybrid_a_star_visualizer
+import distance_approach_visualizer
 import common.proto_utils as proto_utils
 from modules.planning.proto import planner_open_space_config_pb2
 
 
-random.seed(333)
-rand_num = 1000
+random.seed(99999)
+rand_num = 100
 original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
 optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config.pb.txt"
-tunning_object = "coarse_trajectory"
+# tunning_object = "coarse_trajectory"
+tunning_object = "smooth_trajectory"
 
 
 def load_open_space_protobuf(filename):
@@ -48,9 +50,34 @@ def GetParamsForTunning(tunning_object):
         param_names_and_range.append(
             ("warm_start_config.traj_gear_switch_penalty", 2.0))
         param_names_and_range.append(
-            ("warm_start_config.traj_steer_penalty", 2.0))
+            ("warm_start_config.traj_steer_penalty", 3.0))
         param_names_and_range.append(
             ("warm_start_config.traj_steer_change_penalty", 2.0))
+    elif tunning_object == "smooth_trajectory":
+        param_names_and_range.append(
+            ("distance_approach_config.weight_steer", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_a", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_steer_rate", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_a_rate", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_x", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_y", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_phi", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_v", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_steer_stitching", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_a_stitching", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_first_order_time", 2.0))
+        param_names_and_range.append(
+            ("distance_approach_config.weight_second_order_time", 2.0))
     return param_names_and_range
 
 
@@ -87,6 +114,14 @@ def ParamEvaluation(params, tunning_object):
             return float('inf')
         else:
             return planning_time
+    elif tunning_object == "smooth_trajectory":
+        visualize_flag = False
+        success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out, planning_time = distance_approach_visualizer.SmoothTrajectory(
+            visualize_flag)
+        if not success:
+            return float('inf')
+        else:
+            return planning_time
 
 
 def GetOptimalParams(params_lists, key_to_evaluations):
@@ -113,9 +148,6 @@ if __name__ == '__main__':
     original_file_path = args.InputConfig
     optimal_file_path = args.OutputConfig
     tunning_object = args.TunningObject
-    if tunning_object != "coarse_trajectory":
-        print("Algorithm other than coarse_trajectory is not supported")
-        exit()
     param_names_and_range = GetParamsForTunning(tunning_object)
     origin_open_space_params = load_open_space_protobuf(original_file_path)
     params_lists = RandSampling(

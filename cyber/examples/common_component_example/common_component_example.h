@@ -19,9 +19,9 @@
 #include "cyber/component/component.h"
 #include "cyber/examples/proto/examples.pb.h"
 
-using apollo::cyber::examples::proto::Driver;
 using apollo::cyber::Component;
 using apollo::cyber::ComponentBase;
+using apollo::cyber::examples::proto::Driver;
 
 class CommonComponentSample : public Component<Driver, Driver> {
  public:
