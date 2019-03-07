@@ -58,8 +58,8 @@ bool IsLaneSequenceInReferenceLine(
 }
 
 int NearestFrontObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
-  int nearest_front_obstacle_id = -std::numeric_limits<int>::infinity();
-  double smallest_relative_s = std::numeric_limits<double>::infinity();
+  int nearest_front_obstacle_id = std::numeric_limits<int>::min();
+  double smallest_relative_s = std::numeric_limits<double>::max();
   for (const auto& nearby_obs : lane_sequence.nearby_obstacle()) {
     if (nearby_obs.s() < 0.0) {
       continue;
@@ -73,8 +73,8 @@ int NearestFrontObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
 }
 
 int NearestBackwardObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
-  int nearest_backward_obstacle_id = -std::numeric_limits<int>::infinity();
-  double smallest_relative_s = std::numeric_limits<double>::infinity();
+  int nearest_backward_obstacle_id = std::numeric_limits<int>::min();
+  double smallest_relative_s = std::numeric_limits<double>::max();
   for (const auto& nearby_obs : lane_sequence.nearby_obstacle()) {
     if (nearby_obs.s() > 0.0) {
       continue;
@@ -219,11 +219,11 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
     AERROR << "Ego vehicle not found";
     return;
   }
-  if (ego_vehicle->history_size() == 0) {
+  if (ego_vehicle->history_size() < 2) {
     AERROR << "Ego vehicle has no history";
     return;
   }
-  const Feature& ego_latest_feature = ego_vehicle->latest_feature();
+  const Feature& ego_latest_feature = ego_vehicle->feature(1);
   for (const LaneSequence& lane_sequence :
        ego_latest_feature.lane().lane_graph().lane_sequence()) {
     int nearest_front_obstacle_id =
