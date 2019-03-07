@@ -87,7 +87,7 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
     if (feature_values.size() !=
-        OBSTACLE_FEATURE_SIZE + INTERACTION_FEATURE_SIZE +
+        OBSTACLE_FEATURE_SIZE +
             SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE) {
       lane_sequence_ptr->set_probability(0.0);
       ADEBUG << "Skip lane sequence due to incorrect feature size";
@@ -110,7 +110,7 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     // }
     std::vector<torch::jit::IValue> torch_inputs;
     int input_dim = static_cast<int>(OBSTACLE_FEATURE_SIZE +
-      INTERACTION_FEATURE_SIZE + SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE);
+        SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE);
     torch::Tensor torch_input = torch::zeros({1, input_dim});
     for (size_t i = 0; i < feature_values.size(); ++i) {
       torch_input[0][i] = static_cast<float>(feature_values[i]);
@@ -150,19 +150,19 @@ void CruiseMLPEvaluator::ExtractFeatureValues(
                          obstacle_feature_values.end());
 
   // Extract interaction features.
-  std::vector<double> interaction_feature_values;
-  SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
-                              &interaction_feature_values);
-  if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
-    ADEBUG << "Obstacle [" << id << "] has fewer than "
-           << "expected lane feature_values"
-           << interaction_feature_values.size() << ".";
-    return;
-  }
-  ADEBUG << "Interaction feature size = " << interaction_feature_values.size();
-  feature_values->insert(feature_values->end(),
-                         interaction_feature_values.begin(),
-                         interaction_feature_values.end());
+  // std::vector<double> interaction_feature_values;
+  // SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
+  //                             &interaction_feature_values);
+  // if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
+  //   ADEBUG << "Obstacle [" << id << "] has fewer than "
+  //          << "expected lane feature_values"
+  //          << interaction_feature_values.size() << ".";
+  //   return;
+  // }
+  // ADEBUG << "Interaction feature size = " << interaction_feature_values.size();
+  // feature_values->insert(feature_values->end(),
+  //                        interaction_feature_values.begin(),
+  //                        interaction_feature_values.end());
 
   // Extract lane related features.
   std::vector<double> lane_feature_values;
