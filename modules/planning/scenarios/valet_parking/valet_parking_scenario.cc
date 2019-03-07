@@ -20,9 +20,9 @@
 
 #include <vector>
 
-#include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/valet_parking/stage_approaching_parking_spot.h"
 #include "modules/planning/scenarios/valet_parking/stage_parking.h"
+#include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -116,47 +116,53 @@ bool ValetParkingScenario::IsTransferable(const Scenario& current_scenario,
   }
 
   ParkingSpaceInfoConstPtr target_parking_spot = nullptr;
-  Path nearby_path;
+  const auto& nearby_path =
+      frame.reference_line_info().front().reference_line().map_path();
+  SearchTargetParkingSpotOnPath(nearby_path, &target_parking_spot);
   const auto& vehicle_state = frame.vehicle_state();
-  auto point = common::util::MakePointENU(vehicle_state.x(), vehicle_state.y(),
-                                          vehicle_state.z());
-  hdmap::LaneInfoConstPtr nearest_lane;
-  double vehicle_lane_s = 0.0;
-  double vehicle_lane_l = 0.0;
-  int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-      point, 5.0, vehicle_state.heading(), M_PI / 3.0, &nearest_lane,
-      &vehicle_lane_s, &vehicle_lane_l);
-  if (status != 0) {
-    AERROR << "GetNearestLaneWithHeading failed at IsTransferable() of valet "
-              "parking scenario";
-    return false;
-  }
-  // TODO(Jinyun) Take path from reference line
-  LaneSegment nearest_lanesegment =
-      LaneSegment(nearest_lane, nearest_lane->accumulate_s().front(),
-                  nearest_lane->accumulate_s().back());
-  std::vector<LaneSegment> segments_vector;
-  int next_lanes_num = nearest_lane->lane().successor_id_size();
-  if (next_lanes_num != 0) {
-    for (int i = 0; i < next_lanes_num; ++i) {
-      auto next_lane_id = nearest_lane->lane().successor_id(i);
-      segments_vector.push_back(nearest_lanesegment);
-      auto next_lane = hdmap_->GetLaneById(next_lane_id);
-      LaneSegment next_lanesegment =
-          LaneSegment(next_lane, next_lane->accumulate_s().front(),
-                      next_lane->accumulate_s().back());
-      segments_vector.emplace_back(next_lanesegment);
-      nearby_path = Path(segments_vector);
-      SearchTargetParkingSpotOnPath(nearby_path, &target_parking_spot);
-      if (target_parking_spot != nullptr) {
-        break;
-      }
-    }
-  } else {
-    segments_vector.push_back(nearest_lanesegment);
-    nearby_path = Path(segments_vector);
-    SearchTargetParkingSpotOnPath(nearby_path, &target_parking_spot);
-  }
+
+  // TODO(Jinyun) Will check taking path from reference line, keep the method of
+  // constructing path for tmp;
+  // const auto& vehicle_state = frame.vehicle_state();
+  // auto point = common::util::MakePointENU(vehicle_state.x(),
+  // vehicle_state.y(), vehicle_state.z());
+  // hdmap::LaneInfoConstPtr nearest_lane;
+  // double vehicle_lane_s = 0.0;
+  // double vehicle_lane_l = 0.0;
+  // int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+  //     point, 5.0, vehicle_state.heading(), M_PI / 3.0, &nearest_lane,
+  //     &vehicle_lane_s, &vehicle_lane_l);
+  // if (status != 0) {
+  //   AERROR << "GetNearestLaneWithHeading failed at IsTransferable() of
+  //   valet "
+  //             "parking scenario";
+  //   return false;
+  // }
+  // LaneSegment nearest_lanesegment =
+  //     LaneSegment(nearest_lane, nearest_lane->accumulate_s().front(),
+  //                 nearest_lane->accumulate_s().back());
+  // std::vector<LaneSegment> segments_vector;
+  // int next_lanes_num = nearest_lane->lane().successor_id_size();
+  // if (next_lanes_num != 0) {
+  //   for (int i = 0; i < next_lanes_num; ++i) {
+  //     auto next_lane_id = nearest_lane->lane().successor_id(i);
+  //     segments_vector.push_back(nearest_lanesegment);
+  //     auto next_lane = hdmap_->GetLaneById(next_lane_id);
+  //     LaneSegment next_lanesegment =
+  //         LaneSegment(next_lane, next_lane->accumulate_s().front(),
+  //                     next_lane->accumulate_s().back());
+  //     segments_vector.emplace_back(next_lanesegment);
+  //     nearby_path = Path(segments_vector);
+  //     SearchTargetParkingSpotOnPath(nearby_path, &target_parking_spot);
+  //     if (target_parking_spot != nullptr) {
+  //       break;
+  //     }
+  //   }
+  // } else {
+  //   segments_vector.push_back(nearest_lanesegment);
+  //   nearby_path = Path(segments_vector);
+  //   SearchTargetParkingSpotOnPath(nearby_path, &target_parking_spot);
+  // }
 
   if (target_parking_spot == nullptr) {
     std::string msg(
@@ -174,6 +180,7 @@ bool ValetParkingScenario::IsTransferable(const Scenario& current_scenario,
     return false;
   }
 
+  context_.target_parking_spot = target_parking_spot;
   return true;
 }
 

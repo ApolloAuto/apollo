@@ -37,6 +37,9 @@ namespace valet_parking {
 struct ValetParkingContext {
   ScenarioValetParkingConfig scenario_config;
   std::string target_parking_spot_id;
+  hdmap::ParkingSpaceInfoConstPtr target_parking_spot = nullptr;
+  bool valet_parking_pre_stop_finished = false;
+  double valet_parking_pre_stop_fence_s = 0.0;
 };
 
 class ValetParkingScenario : public Scenario {
