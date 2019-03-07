@@ -42,11 +42,11 @@
 DEFINE_string(test_list,
               "/apollo/modules/perception/testdata/camera/lib/obstacle/"
               "detector/yolo/img/full_test_list.txt",
-              "exe image list");
+              "test image list");
 DEFINE_string(image_root,
               "/apollo/modules/perception/testdata/camera/lib/obstacle/"
               "detector/yolo/img/",
-              "root dir of images");
+              "root directory of images");
 DEFINE_string(image_ext, ".jpg", "extension of image name");
 DEFINE_string(image_color, "bgr", "color space of image");
 DEFINE_string(config_root,
@@ -55,16 +55,17 @@ DEFINE_string(config_root,
 DEFINE_string(tf_file, "", "tf file");
 DEFINE_string(config_file, "obstacle.pt", "config_file");
 DEFINE_string(narrow_name, "front_12mm", " camera for projecting");
-DEFINE_string(base_camera_name, "front_6mm", "camera to be peojected");
+DEFINE_string(base_camera_name, "front_6mm", "camera to be projected");
 DEFINE_string(sensor_name, "front_6mm,front_12mm", "camera to use");
 DEFINE_string(params_dir, "/apollo/modules/perception/data/params",
-              "params dir");
-DEFINE_string(visualize_dir, "/tmp/0000", "visualize dir");
+              "params directory");
+DEFINE_string(visualize_dir, "/tmp/0000", "visualize directory");
 DEFINE_double(camera_fps, 15, "camera_fps");
 DEFINE_bool(do_undistortion, false, "do_undistortion");
 DEFINE_string(undistortion_save_dir, "./undistortion_result",
-              "save imgs dir after undistortion");
-DEFINE_string(save_dir, "./result", "save imgs dir");
+              "Directory to save undistored images.");
+DEFINE_string(save_dir, "./result",
+              "Directory to save result images with detections.");
 
 namespace apollo {
 namespace perception {
@@ -120,7 +121,7 @@ int work() {
   std::ifstream fin;
   fin.open(FLAGS_test_list, std::ifstream::in);
   if (!fin.is_open()) {
-    AERROR << "Cannot open exe list: " << FLAGS_test_list;
+    AERROR << "Cannot open image list: " << FLAGS_test_list;
     return -1;
   }
 
@@ -316,13 +317,13 @@ int work() {
       myfile.open(save_dir + "/" + image_name + ".txt");
       for (auto obj : frame.detected_objects) {
         auto &box = obj->camera_supplement.box;
-        myfile << base::kSubType2NameMap.at(obj->sub_type) + " " +
-                  std::to_string(static_cast<int>(box.xmin)) + " " +
-                  std::to_string(static_cast<int>(box.ymin)) + " " +
-                  std::to_string(static_cast<int>(box.xmax)) + " " +
-                  std::to_string(static_cast<int>(box.ymax)) + " " +
-                  std::to_string(
-                   obj->sub_type_probs[static_cast<int>(obj->sub_type)]) + "\n";
+        myfile << base::kSubType2NameMap.at(obj->sub_type) << " "
+               << static_cast<int>(box.xmin) << " "
+               << static_cast<int>(box.ymin) << " "
+               << static_cast<int>(box.xmax) << " "
+               << static_cast<int>(box.ymax) << " "
+               << obj->sub_type_probs[static_cast<int>(obj->sub_type)]
+               << "\n";
         cv::rectangle(image,
                       cv::Point(static_cast<int>(box.xmin),
                       static_cast<int>(box.ymin)),
