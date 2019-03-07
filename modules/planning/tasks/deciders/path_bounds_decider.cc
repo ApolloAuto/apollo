@@ -539,11 +539,18 @@ PathBoundsDecider::SortObstaclesForSweepLine(
     }
     // Only focus on non-ignoring obstacles.
     bool has_ignore_decision = false;
+    /*
     for (auto decision : obstacle->decisions()) {
       if (decision.has_ignore()) {
         has_ignore_decision = true;
         break;
       }
+    }
+    */
+    if (obstacle->HasLongitudinalDecision() &&
+        obstacle->HasLateralDecision() &&
+        obstacle->IsIgnore()) {
+      has_ignore_decision = true;
     }
     if (has_ignore_decision) {
       continue;
