@@ -98,15 +98,6 @@ bool PathDecider::MakeStaticObstacleDecision(
       continue;
     }
 
-    if (obstacle->Id() == blocking_obstacle_id) {
-      // Add stop decision
-      ObjectDecisionType object_decision;
-      *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
-      path_decision->AddLongitudinalDecision("PathDecider/blocking_obstacle",
-                                               obstacle->Id(), object_decision);
-      continue;
-    }
-
     if (obstacle->HasLongitudinalDecision() &&
         obstacle->LongitudinalDecision().has_ignore() &&
         obstacle->HasLateralDecision() &&
@@ -118,6 +109,16 @@ bool PathDecider::MakeStaticObstacleDecision(
       // STOP decision
       continue;
     }
+
+    if (obstacle->Id() == blocking_obstacle_id) {
+      // Add stop decision
+      ObjectDecisionType object_decision;
+      *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
+      path_decision->AddLongitudinalDecision("PathDecider/blocking_obstacle",
+                                               obstacle->Id(), object_decision);
+      continue;
+    }
+    
     if (obstacle->reference_line_st_boundary().boundary_type() ==
         STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
