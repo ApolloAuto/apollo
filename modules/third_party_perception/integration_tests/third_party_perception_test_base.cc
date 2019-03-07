@@ -32,9 +32,7 @@ void ThirdPartyPerceptionTestBase::SetUpTestCase() {
       "/apollo/modules/third_party_perception/testdata/conf/adapter.conf";
 }
 
-void ThirdPartyPerceptionTestBase::SetUp() {
-  ++s_seq_num_;
-}
+void ThirdPartyPerceptionTestBase::SetUp() { ++s_seq_num_; }
 
 }  // namespace third_party_perception
 }  // namespace apollo

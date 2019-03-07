@@ -28,8 +28,8 @@ class ScenarioAnalyzer {
  public:
   ScenarioAnalyzer() = delete;
 
-  static std::shared_ptr<ScenarioFeatures>
-  Analyze(const EnvironmentFeatures& environment_features);
+  static std::shared_ptr<ScenarioFeatures> Analyze(
+      const EnvironmentFeatures& environment_features);
 };
 
 }  // namespace prediction

@@ -31,7 +31,7 @@ namespace data {
 
 class InfoCollector {
  public:
-  static void Init(const std::shared_ptr<apollo::cyber::Node>& node);
+  static void Init(const std::shared_ptr<apollo::cyber::Node> &node);
   // Get task information.
   static const StaticInfo &GetStaticInfo();
 

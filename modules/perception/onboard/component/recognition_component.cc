@@ -35,7 +35,7 @@ bool RecognitionComponent::Init() {
   output_channel_name_ = comp_config.output_channel_name();
   main_sensor_name_ = comp_config.main_sensor_name();
   writer_ = node_->CreateWriter<SensorFrameMessage>(output_channel_name_);
-  if (InitAlgorithmPlugin() != true) {
+  if (!InitAlgorithmPlugin()) {
     AERROR << "Failed to init recongnition component algorithm plugin.";
     return false;
   }
@@ -45,14 +45,13 @@ bool RecognitionComponent::Init() {
 bool RecognitionComponent::Proc(
     const std::shared_ptr<LidarFrameMessage>& message) {
   AINFO << "Enter Tracking component, message timestamp: "
-        << std::to_string(message->timestamp_) << " current timestamp "
+        << std::to_string(message->timestamp_) << " current timestamp: "
         << std::to_string(lib::TimeUtil::GetCurrentTime());
 
   std::shared_ptr<SensorFrameMessage> out_message =
       std::make_shared<SensorFrameMessage>();
 
   if (InternalProc(message, out_message)) {
-    // Send(output_channel_name_, out_message);
     writer_->Write(out_message);
     AINFO << "Send lidar recognition output message.";
     return true;
@@ -63,13 +62,13 @@ bool RecognitionComponent::Proc(
 bool RecognitionComponent::InitAlgorithmPlugin() {
   tracker_.reset(new lidar::LidarObstacleTracking);
   if (tracker_ == nullptr) {
-    AERROR << "Failed to get tracking instance";
+    AERROR << "Failed to get tracking instance.";
     return false;
   }
   lidar::LidarObstacleTrackingInitOptions init_options;
   init_options.sensor_name = main_sensor_name_;
   if (!tracker_->Init(init_options)) {
-    AERROR << "Failed to init tracking";
+    AERROR << "Failed to init tracking.";
     return false;
   }
 
@@ -88,7 +87,7 @@ bool RecognitionComponent::InternalProc(
 
   if (in_message->error_code_ != apollo::common::ErrorCode::OK) {
     out_message->error_code_ = in_message->error_code_;
-    AERROR << "Lidar recognition receive message with error code, skip it";
+    AERROR << "Lidar recognition receive message with error code, skip it.";
     return true;
   }
 

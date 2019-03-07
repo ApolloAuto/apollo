@@ -35,8 +35,8 @@ namespace apollo {
 namespace drivers {
 namespace ultrasonic_radar {
 
-using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::drivers::canbus::MessageManager;
+using ::apollo::drivers::canbus::ProtocolData;
 using Clock = ::apollo::common::time::Clock;
 using micros = std::chrono::microseconds;
 using ::apollo::common::ErrorCode;
@@ -45,7 +45,8 @@ using apollo::drivers::canbus::SenderMessage;
 
 class UltrasonicRadarMessageManager : public MessageManager<Ultrasonic> {
  public:
-  explicit UltrasonicRadarMessageManager(const int entrance_num,
+  explicit UltrasonicRadarMessageManager(
+      const int entrance_num,
       const std::shared_ptr<::apollo::cyber::Writer<Ultrasonic>> &writer);
   virtual ~UltrasonicRadarMessageManager() = default;
   void Parse(const uint32_t message_id, const uint8_t *data, int32_t length);

@@ -33,12 +33,12 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::lerp;
-using apollo::common::math::Box2d;
-using apollo::common::math::Polygon2d;
-using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
+using apollo::common::math::Box2d;
+using apollo::common::math::lerp;
+using apollo::common::math::PathMatcher;
+using apollo::common::math::Polygon2d;
 
 PathTimeGraph::PathTimeGraph(
     const std::vector<const Obstacle*>& obstacles,
@@ -132,14 +132,12 @@ void PathTimeGraph::SetStaticObstacle(
   path_time_obstacle_map_[obstacle_id].set_id(obstacle_id);
   path_time_obstacle_map_[obstacle_id].set_bottom_left_point(
       SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
-  path_time_obstacle_map_[obstacle_id].set_bottom_right_point(
-      SetPathTimePoint(obstacle_id, sl_boundary.start_s(),
-                       FLAGS_trajectory_time_length));
+  path_time_obstacle_map_[obstacle_id].set_bottom_right_point(SetPathTimePoint(
+      obstacle_id, sl_boundary.start_s(), FLAGS_trajectory_time_length));
   path_time_obstacle_map_[obstacle_id].set_upper_left_point(
       SetPathTimePoint(obstacle_id, sl_boundary.end_s(), 0.0));
-  path_time_obstacle_map_[obstacle_id].set_upper_right_point(
-      SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
-                       FLAGS_trajectory_time_length));
+  path_time_obstacle_map_[obstacle_id].set_upper_right_point(SetPathTimePoint(
+      obstacle_id, sl_boundary.end_s(), FLAGS_trajectory_time_length));
   static_obs_sl_boundaries_.push_back(std::move(sl_boundary));
   ADEBUG << "ST-Graph mapping static obstacle: " << obstacle_id
          << ", start_s : " << sl_boundary.start_s()
@@ -197,19 +195,17 @@ void PathTimeGraph::SetDynamicObstacle(
 }
 
 STPoint PathTimeGraph::SetPathTimePoint(const std::string& obstacle_id,
-                                              const double s,
-                                              const double t) const {
+                                        const double s, const double t) const {
   STPoint path_time_point(s, t);
   return path_time_point;
 }
 
-const std::vector<STBoundary>& PathTimeGraph::GetPathTimeObstacles()
-    const {
+const std::vector<STBoundary>& PathTimeGraph::GetPathTimeObstacles() const {
   return path_time_obstacles_;
 }
 
 bool PathTimeGraph::GetPathTimeObstacle(const std::string& obstacle_id,
-    STBoundary* path_time_obstacle) {
+                                        STBoundary* path_time_obstacle) {
   if (path_time_obstacle_map_.find(obstacle_id) ==
       path_time_obstacle_map_.end()) {
     return false;
@@ -227,13 +223,14 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetPathBlockingIntervals(
       continue;
     }
     double s_upper = lerp(pt_obstacle.upper_left_point().s(),
-        pt_obstacle.upper_left_point().t(), pt_obstacle.upper_right_point().s(),
-        pt_obstacle.upper_right_point().t(), t);
+                          pt_obstacle.upper_left_point().t(),
+                          pt_obstacle.upper_right_point().s(),
+                          pt_obstacle.upper_right_point().t(), t);
 
     double s_lower = lerp(pt_obstacle.bottom_left_point().s(),
-        pt_obstacle.bottom_left_point().t(),
-        pt_obstacle.bottom_right_point().s(),
-        pt_obstacle.bottom_right_point().t(), t);
+                          pt_obstacle.bottom_left_point().t(),
+                          pt_obstacle.bottom_right_point().s(),
+                          pt_obstacle.bottom_right_point().t(), t);
 
     intervals.emplace_back(s_lower, s_upper);
   }

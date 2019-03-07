@@ -79,14 +79,14 @@ TEST(PredictionUtilTest, solve_cubic_polynomial_and_evaluate) {
 
   auto coefs = ComputePolynomial<3>(start, end, param);
   EXPECT_DOUBLE_EQ(EvaluateCubicPolynomial(coefs, 0.0, 0, param, 1.0),
-                                           start[0]);
+                   start[0]);
   EXPECT_DOUBLE_EQ(EvaluateCubicPolynomial(coefs, 0.0, 1, param, 1.0),
-                                           start[1]);
+                   start[1]);
 
   EXPECT_DOUBLE_EQ(EvaluateCubicPolynomial(coefs, param, 0, param, 1.0),
-                                           end[0]);
+                   end[0]);
   EXPECT_DOUBLE_EQ(EvaluateCubicPolynomial(coefs, param, 1, param, 1.0),
-                                           end[1]);
+                   end[1]);
 }
 
 }  // namespace math_util

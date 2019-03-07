@@ -56,8 +56,7 @@ void CyclistKeepLaneEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 }
 
 double CyclistKeepLaneEvaluator::ComputeProbability(
-    const std::string& curr_lane_id,
-    const LaneSequence& lane_sequence) {
+    const std::string& curr_lane_id, const LaneSequence& lane_sequence) {
   if (lane_sequence.lane_segment_size() == 0) {
     AWARN << "Empty lane sequence.";
     return 0.0;

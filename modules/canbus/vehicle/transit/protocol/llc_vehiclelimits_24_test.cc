@@ -41,12 +41,12 @@ TEST_F(Vehiclelimits_24_test, General) {
   const int32_t length_maxbrakepercent = 12;
   const int equivalent_maxsteeringangle = 0xad9;
   const int equivalent_maxbrakepercent = 0xe8f;
-  EXPECT_EQ(vehiclelimits_.llc_fbk_maxsteeringangle(bytes,
-                    length_maxsteeringangle),
-                    equivalent_maxsteeringangle);
-  EXPECT_EQ(vehiclelimits_.llc_fbk_maxbrakepercent(bytes,
-                    length_maxbrakepercent),
-                    equivalent_maxbrakepercent);
+  EXPECT_EQ(
+      vehiclelimits_.llc_fbk_maxsteeringangle(bytes, length_maxsteeringangle),
+      equivalent_maxsteeringangle);
+  EXPECT_EQ(
+      vehiclelimits_.llc_fbk_maxbrakepercent(bytes, length_maxbrakepercent),
+      equivalent_maxbrakepercent);
 }
 
 }  // namespace transit

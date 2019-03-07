@@ -37,7 +37,7 @@ class NdtMapNode : public BaseMapNode {
         ->map_resolutions_z_[index_.resolution_id_];
   }
 
-  /**@brief Given the local x, y, altitude index, 
+  /**@brief Given the local x, y, altitude index,
    * return the global coordinate.
    */
   Eigen::Vector3d GetCoordinate3D(unsigned int x, unsigned int y,

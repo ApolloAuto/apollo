@@ -30,8 +30,8 @@ DECLARE_string(scenario_stop_sign_unprotected_config_file);
 DECLARE_string(scenario_traffic_light_protected_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_left_turn_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
-
-DECLARE_bool(enable_scenario_dispatcher);
+DECLARE_string(scenario_valet_parking_config_file);
+DECLARE_string(scenario_narrow_street_u_turn_config_file);
 
 DECLARE_bool(enable_scenario_side_pass);
 DECLARE_double(side_pass_min_signal_intersection_distance);
@@ -179,6 +179,7 @@ DECLARE_double(weight_lateral_second_order_derivative);
 DECLARE_double(weight_lateral_third_order_derivative);
 DECLARE_double(weight_lateral_obstacle_distance);
 DECLARE_double(lateral_third_order_derivative_max);
+DECLARE_double(lateral_derivative_bound_default);
 
 // Lattice Evaluate Parameters
 DECLARE_double(weight_lon_objective);
@@ -255,3 +256,4 @@ DECLARE_double(side_pass_driving_width_l_buffer);
 
 DECLARE_bool(enable_parallel_hybrid_a);
 DECLARE_bool(enable_parallel_open_space_smoother);
+DECLARE_bool(enable_cuda);

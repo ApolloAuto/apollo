@@ -28,9 +28,9 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/tasks/optimizers/qp_spline_st_speed/qp_piecewise_st_graph.h"
 #include "modules/planning/tasks/optimizers/qp_spline_st_speed/qp_spline_st_graph.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
 
 namespace apollo {
 namespace planning {
@@ -45,7 +45,6 @@ QpSplineStSpeedOptimizer::QpSplineStSpeedOptimizer(const TaskConfig& config)
   SetName("QpSplineStSpeedOptimizer");
   CHECK(config.has_qp_st_speed_config());
   qp_st_speed_config_ = config.qp_st_speed_config();
-  st_boundary_config_ = qp_st_speed_config_.st_boundary_config();
   std::vector<double> init_knots;
 
   if (FLAGS_use_osqp_optimizer_for_qp_st) {
@@ -72,57 +71,25 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  StBoundaryMapper boundary_mapper(
-      adc_sl_boundary, st_boundary_config_, reference_line, path_data,
-      qp_st_speed_config_.total_path_length(), qp_st_speed_config_.total_time(),
-      reference_line_info_->IsChangeLanePath());
-
   for (const auto* obstacle : path_decision->obstacles().Items()) {
     DCHECK(obstacle->HasLongitudinalDecision());
   }
-  // step 1 get boundaries
-  path_decision->EraseStBoundaries();
-  if (boundary_mapper.CreateStBoundary(path_decision).code() ==
-      ErrorCode::PLANNING_ERROR) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Mapping obstacle for qp st speed optimizer failed!");
-  }
+  StGraphData& st_graph_data = *reference_line_info_->mutable_st_graph_data();
 
-  std::vector<const STBoundary*> boundaries;
-  for (auto* obstacle : path_decision->obstacles().Items()) {
-    auto id = obstacle->Id();
-    if (!obstacle->st_boundary().IsEmpty()) {
-      path_decision->Find(id)->SetBlockingObstacle(true);
-      boundaries.push_back(&obstacle->st_boundary());
-    }
-  }
-
-  SpeedLimitDecider speed_limit_decider(adc_sl_boundary, st_boundary_config_,
-                                        reference_line, path_data);
-  SpeedLimit speed_limits;
-  if (speed_limit_decider.GetSpeedLimits(path_decision->obstacles(),
-                                         &speed_limits) != Status::OK()) {
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "GetSpeedLimits for qp st speed optimizer failed!");
-  }
-
-  // step 2 perform graph search
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
-  QpSplineStGraph st_graph(spline_solver_.get(), qp_st_speed_config_, veh_param,
-                           reference_line_info_->IsChangeLanePath());
 
-  StGraphData st_graph_data(boundaries, init_point, speed_limits,
-                            path_data.discretized_path().Length());
-
-  STGraphDebug* st_graph_debug = reference_line_info_->mutable_debug()
-                                     ->mutable_planning_data()
-                                     ->add_st_graph();
+  QpSplineStGraph st_graph(
+      spline_solver_.get(), st_graph_data.path_length_by_conf(),
+      st_graph_data.total_time_by_conf(), qp_st_speed_config_, veh_param,
+      reference_line_info_->IsChangeLanePath());
 
   std::pair<double, double> accel_bound = {
       qp_st_speed_config_.preferred_min_deceleration(),
       qp_st_speed_config_.preferred_max_acceleration()};
-  st_graph.SetDebugLogger(st_graph_debug);
+
+  st_graph.SetDebugLogger(st_graph_data.mutable_st_graph_debug());
+
   auto ret = st_graph.Search(st_graph_data, accel_bound, reference_speed_data,
                              speed_data);
   if (ret != Status::OK()) {
@@ -138,21 +105,22 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
     if (ret != Status::OK()) {
       AERROR << "Spline QP speed solver Failed. "
              << "Using finite difference method.";
-      QpPiecewiseStGraph piecewise_st_graph(qp_st_speed_config_);
+      QpPiecewiseStGraph piecewise_st_graph(qp_st_speed_config_,
+                                            st_graph_data.path_length_by_conf(),
+                                            st_graph_data.total_time_by_conf());
+
       ret = piecewise_st_graph.Search(st_graph_data, speed_data, accel_bound);
 
       if (ret != Status::OK()) {
         std::string msg = common::util::StrCat(
             Name(), ": Failed to search graph with quadratic programming!");
         AERROR << msg;
-        RecordSTGraphDebug(st_graph_data, st_graph_debug);
+        RecordDebugInfo(*speed_data, st_graph_data.mutable_st_graph_debug());
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
     }
   }
-
-  // record debug info
-  RecordSTGraphDebug(st_graph_data, st_graph_debug);
+  RecordDebugInfo(*speed_data, st_graph_data.mutable_st_graph_debug());
   return Status::OK();
 }
 

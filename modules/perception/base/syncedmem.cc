@@ -116,6 +116,10 @@ inline void SyncedMemory::to_cpu() {
   switch (head_) {
     case UNINITIALIZED:
       PerceptionMallocHost(&cpu_ptr_, size_, cpu_malloc_use_cuda_);
+      if (cpu_ptr_ == nullptr) {
+        AERROR << "cpu_ptr_ is null";
+        return;
+      }
       memset(cpu_ptr_, 0, size_);
       head_ = HEAD_AT_CPU;
       own_cpu_data_ = true;

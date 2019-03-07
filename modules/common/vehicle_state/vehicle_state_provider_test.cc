@@ -30,8 +30,8 @@ namespace apollo {
 namespace common {
 namespace vehicle_state_provider {
 
-using apollo::localization::LocalizationEstimate;
 using apollo::canbus::Chassis;
+using apollo::localization::LocalizationEstimate;
 
 class VehicleStateProviderTest : public ::testing::Test {
  public:

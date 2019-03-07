@@ -25,13 +25,13 @@
 namespace apollo {
 namespace relative_map {
 
+using apollo::canbus::Chassis;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::perception::PerceptionObstacles;
-using apollo::canbus::Chassis;
 using apollo::localization::LocalizationEstimate;
+using apollo::perception::PerceptionObstacles;
 
 RelativeMap::RelativeMap()
     : monitor_logger_buffer_(MonitorMessageItem::RELATIVE_MAP) {}
@@ -44,9 +44,8 @@ Status RelativeMap::Init() {
                   "FLAGS_use_navigation_mode is not true.");
   }
   config_.Clear();
-  if (!cyber::common::GetProtoFromFile(
-      FLAGS_relative_map_config_filename,
-      &config_)) {
+  if (!cyber::common::GetProtoFromFile(FLAGS_relative_map_config_filename,
+                                       &config_)) {
     return Status(ErrorCode::RELATIVE_MAP_ERROR,
                   "Unable to load relative map conf file: " +
                       FLAGS_relative_map_config_filename);
@@ -79,8 +78,7 @@ bool RelativeMap::Process(MapMsg* const map_msg) {
   return true;
 }
 
-void RelativeMap::OnNavigationInfo(
-    const NavigationInfo& navigation_info) {
+void RelativeMap::OnNavigationInfo(const NavigationInfo& navigation_info) {
   {
     std::lock_guard<std::mutex> lock(navigation_lane_mutex_);
     navigation_lane_.UpdateNavigationInfo(navigation_info);
@@ -120,8 +118,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   map_msg->mutable_localization()->CopyFrom(localization_);
 
   // update navigation_lane from perception_obstacles (lane marker)
-  PerceptionObstacles const& perception =
-      perception_obstacles_;
+  PerceptionObstacles const& perception = perception_obstacles_;
   navigation_lane_.UpdatePerception(perception);
   map_msg->mutable_lane_marker()->CopyFrom(perception_obstacles_.lane_marker());
 
@@ -149,9 +146,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   return true;
 }
 
-void RelativeMap::Stop() {
-  monitor_logger_buffer_.INFO("RelativeMap stopped");
-}
+void RelativeMap::Stop() { monitor_logger_buffer_.INFO("RelativeMap stopped"); }
 
 }  // namespace relative_map
 }  // namespace apollo

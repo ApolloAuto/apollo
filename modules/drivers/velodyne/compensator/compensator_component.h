@@ -32,8 +32,8 @@ namespace velodyne {
 using apollo::cyber::Component;
 using apollo::cyber::Reader;
 using apollo::cyber::Writer;
-using apollo::drivers::PointCloud;
 using apollo::cyber::base::CCObjectPool;
+using apollo::drivers::PointCloud;
 
 class CompensatorComponent : public Component<PointCloud> {
  public:

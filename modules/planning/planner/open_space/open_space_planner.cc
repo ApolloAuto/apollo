@@ -171,7 +171,7 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
         trajectory_updated_.store(true);
       } else {
         AERROR_EVERY(200)
-            << "Multi-thread trajectory generator not OK with return satus : "
+            << "Multi-thread trajectory generator not OK with return status : "
             << status.ToString();
       }
     }
@@ -189,7 +189,7 @@ void OpenSpacePlanner::LoadTrajectoryToFrame(Frame* frame) {
   trajectory_to_end_pb_.Clear();
   trajectory_to_end_pb_.mutable_trajectory_point()->CopyFrom(
       *(trajectory_to_end_.mutable_trajectory_point()));
-  frame->mutable_trajectory()->CopyFrom(trajectory_to_end_pb_);
+  frame->set_current_frame_planned_trajectory(trajectory_to_end_pb_);
   frame->mutable_open_space_debug()->CopyFrom(open_space_debug_);
   *(frame->mutable_last_stitching_trajectory()) = stitching_trajectory_;
 }

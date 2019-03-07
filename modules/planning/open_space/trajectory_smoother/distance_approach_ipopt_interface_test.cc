@@ -19,8 +19,8 @@
  **/
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 #include "cyber/common/file.h"
 #include "gtest/gtest.h"
@@ -120,8 +120,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_f) {
   double x[1274];
   std::fill_n(x, n, 1.2);
   bool res = ptop_->eval_f(n, x, true, obj_value);
-  EXPECT_DOUBLE_EQ(obj_value, 1443.3600000000008)
-      << "eval_f: " << obj_value;
+  EXPECT_DOUBLE_EQ(obj_value, 1443.3600000000008) << "eval_f: " << obj_value;
   EXPECT_TRUE(res);
 }
 
@@ -132,8 +131,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_jac_g_par) {
   int kNnzhss = 0;
   Ipopt::TNLP::IndexStyleEnum index_style;
   // to-do: check get_nlp_info
-  bool res = ptop_->get_nlp_info(n, m, kNnzJac,
-      kNnzhss, index_style);
+  bool res = ptop_->get_nlp_info(n, m, kNnzJac, kNnzhss, index_style);
   EXPECT_TRUE(res);
 
   double x[1274];
@@ -144,33 +142,30 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_jac_g_par) {
   int j_col_ser[kNnzJac];
   double values_ser[kNnzJac];
   std::fill_n(values_ser, n, 0.0);
-  bool res2 = ptop_->eval_jac_g_ser(n, x, new_x,
-      m, kNnzJac, i_row_ser, j_col_ser, NULL);
+  bool res2 = ptop_->eval_jac_g_ser(n, x, new_x, m, kNnzJac, i_row_ser,
+                                    j_col_ser, NULL);
   EXPECT_TRUE(res2);
-  bool res3 = ptop_->eval_jac_g_ser(n, x, new_x,
-      m, kNnzJac, i_row_ser, j_col_ser, values_ser);
+  bool res3 = ptop_->eval_jac_g_ser(n, x, new_x, m, kNnzJac, i_row_ser,
+                                    j_col_ser, values_ser);
   EXPECT_TRUE(res3);
 
   int i_row_par[kNnzJac];
   int j_col_par[kNnzJac];
   double values_par[kNnzJac];
   std::fill_n(values_par, n, 0.0);
-  bool res4 = ptop_->eval_jac_g_par(n, x, new_x,
-      m, kNnzJac, i_row_par, j_col_par, NULL);
+  bool res4 = ptop_->eval_jac_g_par(n, x, new_x, m, kNnzJac, i_row_par,
+                                    j_col_par, NULL);
   EXPECT_TRUE(res4);
   for (int i = 0; i < kNnzJac; ++i) {
-    EXPECT_EQ(i_row_ser[i], i_row_par[i]) <<
-        "iRow differ at index " << i;
-    EXPECT_EQ(j_col_ser[i], j_col_par[i]) <<
-        "iCol differ at index " << i;
+    EXPECT_EQ(i_row_ser[i], i_row_par[i]) << "iRow differ at index " << i;
+    EXPECT_EQ(j_col_ser[i], j_col_par[i]) << "iCol differ at index " << i;
   }
 
-  bool res5 = ptop_->eval_jac_g_par(n, x, new_x,
-      m, kNnzJac, i_row_par, j_col_par, values_par);
+  bool res5 = ptop_->eval_jac_g_par(n, x, new_x, m, kNnzJac, i_row_par,
+                                    j_col_par, values_par);
   EXPECT_TRUE(res5);
   for (int i = 0; i < kNnzJac; ++i) {
-    EXPECT_EQ(values_ser[i], values_par[i]) <<
-        "values differ at index " << i;
+    EXPECT_EQ(values_ser[i], values_par[i]) << "values differ at index " << i;
   }
 }
 
@@ -191,8 +186,8 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_grad_f_hand) {
   EXPECT_TRUE(res2);
 
   for (int i = 0; i < n; ++i) {
-    EXPECT_EQ(grad_f_adolc[i], grad_f_hand[i]) <<
-        "grad_f differ at index " << i;
+    EXPECT_EQ(grad_f_adolc[i], grad_f_hand[i])
+        << "grad_f differ at index " << i;
   }
 }
 }  // namespace planning

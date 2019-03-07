@@ -25,8 +25,8 @@ namespace camera {
 
 bool TransformServer::Init(const std::vector<std::string> &camera_names,
                            const std::string &params_path) {
-  std::string params_dir = params_path;
-  // 1. init lidar height
+  const std::string params_dir = params_path;
+  // 1. Init lidar height
   try {
     YAML::Node lidar_height =
         YAML::LoadFile(params_dir + "/" + "velodyne128_height.yaml");
@@ -50,7 +50,7 @@ bool TransformServer::Init(const std::vector<std::string> &camera_names,
            << " error, YAML exception:" << e.what();
     return false;
   }
-  // 2. init lidar and camera extrinsic
+  // 2. Init lidar and camera extrinsic
   std::vector<std::string> extrinsic_filelist;
   extrinsic_filelist.push_back(params_dir +
                                "/velodyne128_novatel_extrinsics.yaml");
@@ -79,8 +79,7 @@ bool TransformServer::Init(const std::vector<std::string> &camera_names,
       Eigen::Affine3d trans;
       trans.linear() = qq.matrix();
       trans.translation() << t[0], t[1], t[2];
-      bool added = AddTransform(child_frame_id, frame_id, trans);
-      if (!added) {
+      if (!AddTransform(child_frame_id, frame_id, trans)) {
         AINFO << "failed to add transform from " << child_frame_id << " to "
               << frame_id << std::endl;
       }
@@ -184,7 +183,7 @@ bool TransformServer::QueryTransform(const std::string &child_frame_id,
   auto cf_iter = vertices_.find(child_frame_id);
   auto f_iter = vertices_.find(frame_id);
 
-  // vertices do not exist
+  // Vertices do not exist
   if (cf_iter == vertices_.end() || f_iter == vertices_.end()) {
     return false;
   }
@@ -224,8 +223,7 @@ bool TransformServer::FindTransform(const std::string &child_frame_id,
     }
 
     Eigen::Affine3d tr = Eigen::Affine3d::Identity();
-    bool bfound = FindTransform(edge.frame_id, frame_id, &tr, visited);
-    if (bfound) {
+    if (FindTransform(edge.frame_id, frame_id, &tr, visited)) {
       loc_transform = tr * loc_transform;
       *transform = loc_transform;
       return true;

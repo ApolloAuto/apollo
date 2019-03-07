@@ -4,7 +4,6 @@ module_config {
         class_name : "Monitor"
         config {
             name: "monitor"
-            config_file_path:  "/apollo/modules/monitor/conf/monitor_conf.pb.txt"
             interval: 500
         }
     }

@@ -23,10 +23,10 @@
 #include "cyber/record/record_reader.h"
 #include "cyber/record/record_writer.h"
 
+using apollo::cyber::message::RawMessage;
+using ::apollo::cyber::record::RecordMessage;
 using ::apollo::cyber::record::RecordReader;
 using ::apollo::cyber::record::RecordWriter;
-using ::apollo::cyber::record::RecordMessage;
-using apollo::cyber::message::RawMessage;
 
 const char CHANNEL_NAME_1[] = "/test/channel1";
 const char CHANNEL_NAME_2[] = "/test/channel2";

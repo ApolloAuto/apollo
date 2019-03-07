@@ -5,7 +5,6 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "base",
     deps = [
-        "//cyber/base:atomic_fifo",
         "//cyber/base:atomic_hash_map",
         "//cyber/base:atomic_rw_lock",
         "//cyber/base:bounded_queue",
@@ -20,13 +19,6 @@ cc_library(
         "//cyber/base:thread_safe_queue",
         "//cyber/base:unbounded_queue",
         "//cyber/base:wait_strategy",
-    ],
-)
-
-cc_library(
-    name = "atomic_fifo",
-    hdrs = [
-        "atomic_fifo.h",
     ],
 )
 

@@ -250,8 +250,7 @@ class Clock {
 };
 
 inline Clock::Clock()
-    : Clock(FLAGS_use_cyber_time ? ClockMode::CYBER
-                                     : ClockMode::SYSTEM) {}
+    : Clock(FLAGS_use_cyber_time ? ClockMode::CYBER : ClockMode::SYSTEM) {}
 
 // Measure run time of a code block, mostly for debugging purpose.
 // Example usage:

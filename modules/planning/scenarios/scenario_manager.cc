@@ -17,10 +17,13 @@
 #include "modules/planning/scenarios/scenario_manager.h"
 
 #include <limits>
+#include <string>
 #include <utility>
 #include <vector>
 
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/perception/proto/traffic_light_detection.pb.h"
+
+#include "modules/common/time/time.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -30,12 +33,16 @@
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
+using apollo::common::time::Clock;
 using apollo::hdmap::PathOverlap;
+using apollo::perception::TrafficLight;
+using apollo::perception::TrafficLightDetection;
 
 bool ScenarioManager::Init(
     const std::set<ScenarioConfig::ScenarioType>& supported_scenarios) {
@@ -52,8 +59,8 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
   switch (scenario_type) {
     case ScenarioConfig::LANE_FOLLOW:
-      ptr.reset(new lane_follow::LaneFollowScenario(
-          config_map_[scenario_type], &scenario_context_));
+      ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
+                                                    &scenario_context_));
       break;
     case ScenarioConfig::SIDE_PASS:
       ptr.reset(new scenario::side_pass::SidePassScenario(
@@ -64,9 +71,8 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
           config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
-      ptr.reset(
-          new scenario::traffic_light::TrafficLightProtectedScenario(
-              config_map_[scenario_type], &scenario_context_));
+      ptr.reset(new scenario::traffic_light::TrafficLightProtectedScenario(
+          config_map_[scenario_type], &scenario_context_));
       break;
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
       ptr.reset(
@@ -90,14 +96,12 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
 void ScenarioManager::RegisterScenarios() {
   // lane_follow
-  CHECK(Scenario::LoadConfig(
-      FLAGS_scenario_lane_follow_config_file,
-      &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
+                             &config_map_[ScenarioConfig::LANE_FOLLOW]));
 
   // side_pass
-  CHECK(Scenario::LoadConfig(
-      FLAGS_scenario_side_pass_config_file,
-      &config_map_[ScenarioConfig::SIDE_PASS]));
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_side_pass_config_file,
+                             &config_map_[ScenarioConfig::SIDE_PASS]));
 
   // stop_sign
   CHECK(Scenario::LoadConfig(
@@ -120,43 +124,45 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
     const Frame& frame) {
   if (frame.reference_line_info().size() > 1) {
     // TODO(all): to be implemented
-    return  ScenarioConfig::LANE_FOLLOW;
+    return ScenarioConfig::LANE_FOLLOW;
   }
   return ScenarioConfig::LANE_FOLLOW;
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
-    const Frame& frame) {
+    const Frame& frame,
+    const hdmap::PathOverlap& first_encountered_stop_sign_overlap) {
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double stop_sign_overlap_start_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
+      first_encountered_stop_sign_overlap.start_s;
   const double adc_distance_to_stop_sign =
       stop_sign_overlap_start_s - adc_front_edge_s;
   ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign
-         << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s << "]";
+      << "] stop_sign[" << first_encountered_stop_sign_overlap.object_id
+      << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s << "]";
 
-  bool stop_sign = (adc_distance_to_stop_sign > 0 &&
+  const bool stop_sign_scenario = (adc_distance_to_stop_sign > 0 &&
       adc_distance_to_stop_sign <=
-      config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]
-                  .stop_sign_unprotected_config()
-                  .start_stop_sign_scenario_distance());
-  bool stop_sign_all_way = false;  // TODO(all)
+          config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]
+                      .stop_sign_unprotected_config()
+                      .start_stop_sign_scenario_distance());
+  const bool stop_sign_all_way = false;  // TODO(all)
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      if (stop_sign) {
-        return stop_sign_all_way ? ScenarioConfig::STOP_SIGN_PROTECTED:
-            ScenarioConfig::STOP_SIGN_UNPROTECTED;
+      if (stop_sign_scenario) {
+        return stop_sign_all_way ? ScenarioConfig::STOP_SIGN_PROTECTED
+                                 : ScenarioConfig::STOP_SIGN_UNPROTECTED;
       }
       break;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       if (current_scenario_->GetStatus() ==
-              Scenario::ScenarioStatus::STATUS_DONE) {
+          Scenario::ScenarioStatus::STATUS_DONE) {
         return ScenarioConfig::LANE_FOLLOW;
       }
       break;
@@ -171,46 +177,66 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
-    const Frame& frame) {
+    const Frame& frame,
+    const hdmap::PathOverlap& first_encountered_traffic_Light_overlap) {
+  auto scenario_config = config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
+                             .traffic_light_unprotected_right_turn_config();
+
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double traffic_light_overlap_start_s =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
-  const double adc_distance_to_stop_line =
-      traffic_light_overlap_start_s - adc_front_edge_s;
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
+  const bool right_turn =
+      (reference_line_info.GetPathTurnType() == hdmap::Lane::RIGHT_TURN);
+  const bool left_turn =
+      (reference_line_info.GetPathTurnType() == hdmap::Lane::LEFT_TURN);
 
-  auto scenario_config =
-      config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
-                  .traffic_light_unprotected_right_turn_config();
+  bool traffic_light_scenario = false;
+  bool red_light = false;
+  const std::vector<PathOverlap>& traffic_light_overlaps =
+      reference_line_info.reference_line().map_path().signal_overlaps();
 
-  bool is_stopped_for_traffic_light = true;
-  if (adc_speed > scenario_config.max_adc_stop_speed() ||
-      adc_distance_to_stop_line > scenario_config.max_valid_stop_distance()) {
-    is_stopped_for_traffic_light = false;
-    ADEBUG << "ADC not stopped: speed[" << adc_speed
-        << "] adc_distance_to_stop_line[" << adc_distance_to_stop_line << "]";
+  // note: need iterate all lights to check no RED
+  for (const auto& traffic_light_overlap : traffic_light_overlaps) {
+    const double adc_distance_to_traffic_light =
+        traffic_light_overlap.start_s - adc_front_edge_s;
+    ADEBUG << "adc_distance_to_traffic_light[" << adc_distance_to_traffic_light
+           << "] right_turn[" << right_turn << "] left_turn[" << left_turn
+           << "]";
+
+    // check distance
+    if (adc_distance_to_traffic_light > 0 &&
+        adc_distance_to_traffic_light <=
+            config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
+                .traffic_light_protected_config()
+                .start_traffic_light_scenario_distance()) {
+      traffic_light_scenario = true;
+      auto signal_color =
+          scenario::GetSignal(traffic_light_overlap.object_id).color();
+      ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
+          << "] start_s[" << traffic_light_overlap.start_s
+          << "] color[" << signal_color << "]";
+      if (signal_color != TrafficLight::GREEN) {
+        red_light = true;
+        break;
+      }
+    }
   }
-
-  bool right_turn = (reference_line_info.GetPathTurnType() ==
-      hdmap::Lane::RIGHT_TURN);
-  bool left_turn = (reference_line_info.GetPathTurnType() ==
-      hdmap::Lane::LEFT_TURN);
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::APPROACH:
-      if (is_stopped_for_traffic_light) {
-        if (right_turn) {
+      if (traffic_light_scenario) {
+        if (right_turn && red_light) {
           return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
-        } else if (left_turn) {
-          return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN;
-        } else {
+        }
+        if (left_turn) {
+          // TODO(all): switch when ready
+          // return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN;
           return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
         }
+
+        return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
       }
       break;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
@@ -220,7 +246,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
       if (current_scenario_->GetStatus() ==
-              Scenario::ScenarioStatus::STATUS_DONE) {
+          Scenario::ScenarioStatus::STATUS_DONE) {
         return ScenarioConfig::LANE_FOLLOW;
       }
       break;
@@ -235,6 +261,11 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
     const Frame& frame) {
   // TODO(all): to be updated when SIDE_PASS obstacle decisions
   //            from ReferenceLine is ready
+  if (current_scenario_->scenario_type() == ScenarioConfig::SIDE_PASS &&
+      current_scenario_->IsTransferable(*current_scenario_, frame)) {
+    return ScenarioConfig::SIDE_PASS;
+  }
+
   auto scenario = CreateScenario(ScenarioConfig::SIDE_PASS);
   if (scenario->IsTransferable(*current_scenario_, frame)) {
     return ScenarioConfig::SIDE_PASS;
@@ -242,102 +273,83 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
   return ScenarioConfig::LANE_FOLLOW;
 }
 
+/*
+ * @brief: function called by ScenarioSelfVote(),
+ *         which selects scenario based on vote from each individual scenario.
+ *         not in use now. but please do NOT delete the code yet
+ */
+ /*
 bool ScenarioManager::ReuseCurrentScenario(
     const common::TrajectoryPoint& ego_point, const Frame& frame) {
   return current_scenario_->IsTransferable(*current_scenario_, frame);
 }
+*/
 
-bool ScenarioManager::SelectScenario(const ScenarioConfig::ScenarioType type,
-                                     const common::TrajectoryPoint& ego_point,
-                                     const Frame& frame) {
+/*
+ * @brief: function called by ScenarioSelfVote(),
+ *         which selects scenario based on vote from each individual scenario.
+ *         not in use now. but please do NOT delete the code yet
+ */
+/*
+bool ScenarioManager::SelectScenario(
+    const ScenarioConfig::ScenarioType type,
+    const common::TrajectoryPoint& ego_point,
+    const Frame& frame) {
   if (current_scenario_->scenario_type() == type) {
     return true;
   }
 
-  if (FLAGS_enable_scenario_dispatcher) {
+  auto scenario = CreateScenario(type);
+  if (scenario->IsTransferable(*current_scenario_, frame)) {
+    AINFO << "switch to scenario: " << scenario->Name();
+    current_scenario_ = std::move(scenario);
     return true;
-  } else {
-    auto scenario = CreateScenario(type);
-    if (scenario->IsTransferable(*current_scenario_, frame)) {
-      AINFO << "switch to scenario: " << scenario->Name();
-      current_scenario_ = std::move(scenario);
-      return true;
+  }
+  return false;
+}
+*/
+
+void ScenarioManager::Observe(const Frame& frame) {
+  // read traffic light signal info
+  ReadTrafficLight(frame);
+
+  // init first_encountered_overlap_map_
+  first_encountered_overlap_map_.clear();
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const auto& first_encountered_overlaps =
+      reference_line_info.FirstEncounteredOverlaps();
+  for (const auto& overlap : first_encountered_overlaps) {
+    if (overlap.first == ReferenceLineInfo::STOP_SIGN ||
+        overlap.first == ReferenceLineInfo::SIGNAL ||
+        overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
+      first_encountered_overlap_map_[overlap.first] = overlap.second;
     }
-    return false;
   }
 }
 
-void ScenarioManager::Observe(const Frame& frame) {
-  // init
-  PlanningContext::GetScenarioInfo()->next_stop_sign_overlap = PathOverlap();
-  PlanningContext::GetScenarioInfo()->next_traffic_light_overlap =
-      PathOverlap();
-  PlanningContext::GetScenarioInfo()->next_crosswalk_overlap = PathOverlap();
-
-  const auto& reference_line_info = frame.reference_line_info().front();
-
-  double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-
-  // find next stop_sign_overlap
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info.reference_line().map_path().stop_sign_overlaps();
-  double min_start_s = std::numeric_limits<double>::max();
-  for (const PathOverlap& stop_sign_overlap : stop_sign_overlaps) {
-    if (adc_front_edge_s - stop_sign_overlap.end_s <=
-            conf_min_pass_s_distance_ &&
-        stop_sign_overlap.start_s < min_start_s) {
-      min_start_s = stop_sign_overlap.start_s;
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap =
-          stop_sign_overlap;
-    } else {
-      // clear stop_done_overlap_id if already passed
-      if (PlanningContext::GetScenarioInfo()->stop_done_overlap_id ==
-          stop_sign_overlap.object_id) {
-        PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
-      }
-    }
+void ScenarioManager::ReadTrafficLight(const Frame& frame) {
+  PlanningContext::GetScenarioInfo()->traffic_lights.clear();
+  const auto traffic_light_detection = frame.local_view().traffic_light;
+  if (traffic_light_detection == nullptr) {
+    ADEBUG << "traffic_light_detection is null";
+    return;
   }
-  ADEBUG << "Stop Sign: "
-      << PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
 
-  // find next traffic_light_overlap
-  const std::vector<hdmap::PathOverlap>& traffic_light_overlaps =
-      reference_line_info.reference_line().map_path().signal_overlaps();
-  min_start_s = std::numeric_limits<double>::max();
-  for (const PathOverlap& traffic_light_overlap : traffic_light_overlaps) {
-    if (adc_front_edge_s - traffic_light_overlap.end_s <=
-            conf_min_pass_s_distance_ &&
-        traffic_light_overlap.start_s < min_start_s) {
-      min_start_s = traffic_light_overlap.start_s;
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap =
-          traffic_light_overlap;
-    } else {
-      // clear stop_done_overlap_id if already passed
-      if (PlanningContext::GetScenarioInfo()->stop_done_overlap_id ==
-          traffic_light_overlap.object_id) {
-        PlanningContext::GetScenarioInfo()->stop_done_overlap_id = "";
-      }
-    }
-  }
-  ADEBUG << "Traffic Light: "
-         << PlanningContext::GetScenarioInfo()
-                ->next_traffic_light_overlap.object_id;
+  const double delay =
+      traffic_light_detection->header().timestamp_sec() -
+          Clock::NowInSeconds();
 
-  // find next crosswalk_overlap
-  const std::vector<hdmap::PathOverlap>& crosswalk_overlaps =
-      reference_line_info.reference_line().map_path().crosswalk_overlaps();
-  min_start_s = std::numeric_limits<double>::max();
-  for (const PathOverlap& crosswalk_overlap : crosswalk_overlaps) {
-    if (adc_front_edge_s - crosswalk_overlap.end_s <=
-            conf_min_pass_s_distance_ &&
-        crosswalk_overlap.start_s < min_start_s) {
-      min_start_s = crosswalk_overlap.start_s;
-      PlanningContext::GetScenarioInfo()->next_crosswalk_overlap =
-          crosswalk_overlap;
-    }
+  if (delay > signal_expire_time_sec_) {
+    ADEBUG << "traffic signal is expired, delay[" << delay << "] seconds.";
+    return;
   }
-  ADEBUG << "Crosswalk: "
-      << PlanningContext::GetScenarioInfo()->next_crosswalk_overlap.object_id;
+
+  for (int i = 0; i < traffic_light_detection->traffic_light_size(); i++) {
+    const TrafficLight& traffic_light =
+        traffic_light_detection->traffic_light(i);
+    PlanningContext::GetScenarioInfo()->traffic_lights[traffic_light.id()] =
+        &traffic_light;
+  }
 }
 
 void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
@@ -346,86 +358,123 @@ void ScenarioManager::Update(const common::TrajectoryPoint& ego_point,
 
   Observe(frame);
 
-  if (FLAGS_enable_scenario_dispatcher) {
-    ScenarioDispatch(ego_point, frame);
-  } else {
-    ScenarioSelfVote(ego_point, frame);
-  }
+  ScenarioDispatch(ego_point, frame);
 }
 
-void ScenarioManager::ScenarioDispatch(
-    const common::TrajectoryPoint& ego_point,
-    const Frame& frame) {
+void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
+                                       const Frame& frame) {
   CHECK(!frame.reference_line_info().empty());
-
-  const auto& reference_line_info = frame.reference_line_info().front();
-  const auto& first_encountered_overlaps =
-      reference_line_info.FirstEncounteredOverlaps();
-  std::pair<ReferenceLineInfo::OverlapType, hdmap::PathOverlap>
-      *junction_with_sign_overlap = nullptr;
-  std::pair<ReferenceLineInfo::OverlapType, hdmap::PathOverlap>
-      *junction_overlap = nullptr;
-  for (const auto& overlap : first_encountered_overlaps) {
-    if (!junction_with_sign_overlap &&
-        (overlap.first == ReferenceLineInfo::STOP_SIGN ||
-            overlap.first == ReferenceLineInfo::SIGNAL)) {
-          junction_with_sign_overlap = const_cast<
-              std::pair<ReferenceLineInfo::OverlapType, hdmap::PathOverlap>*>
-              (&overlap);
-    } else if (!junction_overlap &&
-        overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
-      junction_overlap = const_cast<
-          std::pair<ReferenceLineInfo::OverlapType, hdmap::PathOverlap>*>
-          (&overlap);
-    }
-  }
 
   ////////////////////////////////////////
   // default: LANE_FOLLOW
-  ScenarioConfig::ScenarioType scenario_type = ScenarioConfig::LANE_FOLLOW;
+  ScenarioConfig::ScenarioType scenario_type = default_scenario_type_;
+
+  // check current_scenario (not switchable)
+  switch (current_scenario_->scenario_type()) {
+    case ScenarioConfig::LANE_FOLLOW:
+      break;
+    case ScenarioConfig::CHANGE_LANE:
+      break;
+    case ScenarioConfig::SIDE_PASS:
+      if (current_scenario_->GetStatus() !=
+          Scenario::ScenarioStatus::STATUS_DONE) {
+        scenario_type = current_scenario_->scenario_type();
+      }
+      break;
+    case ScenarioConfig::APPROACH:
+      break;
+    case ScenarioConfig::STOP_SIGN_PROTECTED:
+    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+      if (current_scenario_->GetStatus() !=
+          Scenario::ScenarioStatus::STATUS_DONE) {
+        scenario_type = current_scenario_->scenario_type();
+      }
+      break;
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+      if (current_scenario_->GetStatus() !=
+          Scenario::ScenarioStatus::STATUS_DONE) {
+        scenario_type = current_scenario_->scenario_type();
+      }
+      break;
+    default:
+      break;
+  }
 
   ////////////////////////////////////////
   // intersection scenarios
-  if (junction_with_sign_overlap) {
-    switch (junction_with_sign_overlap->first) {
-      case ReferenceLineInfo::STOP_SIGN:
-        if (!FLAGS_enable_scenario_stop_sign) {
-          scenario_type = SelectStopSignScenario(frame);
-        }
-        break;
-      case ReferenceLineInfo::SIGNAL:
-        if (!FLAGS_enable_scenario_traffic_light) {
-          scenario_type = SelectTrafficLightScenario(frame);
-        }
-        break;
-      default:
-        break;
+  if (scenario_type == default_scenario_type_) {
+    hdmap::PathOverlap* stop_sign_overlap = nullptr;
+    auto map_itr =
+        first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
+    if (map_itr != first_encountered_overlap_map_.end()) {
+      stop_sign_overlap = &(map_itr->second);
     }
-  } else if (junction_overlap) {
-    // junction with no signs(stop_sign/traffic_light/etc)
-    // TODO(all): to be added
+
+    hdmap::PathOverlap* traffic_light_overlap = nullptr;
+    map_itr = first_encountered_overlap_map_.find(ReferenceLineInfo::SIGNAL);
+    if (map_itr != first_encountered_overlap_map_.end()) {
+      traffic_light_overlap = &(map_itr->second);
+    }
+
+    bool stop_sign_found = (stop_sign_overlap != nullptr);
+    bool traffic_light_found = (traffic_light_overlap != nullptr);
+    if (stop_sign_overlap && traffic_light_overlap) {
+      stop_sign_found =
+          stop_sign_overlap->start_s < traffic_light_overlap->start_s ?
+              true : false;
+      traffic_light_found =
+          stop_sign_overlap->start_s < traffic_light_overlap->start_s ?
+              false : true;
+    }
+
+    if (stop_sign_found) {
+      if (FLAGS_enable_scenario_stop_sign) {
+        scenario_type = SelectStopSignScenario(
+            frame, *stop_sign_overlap);
+      }
+    } else if (traffic_light_found) {
+      if (FLAGS_enable_scenario_traffic_light) {
+        scenario_type = SelectTrafficLightScenario(
+            frame, *traffic_light_overlap);
+      }
+    } else {
+      // junction with no signs(stop_sign/traffic_light/etc)
+      // TODO(all): to be added
+    }
   }
 
   ////////////////////////////////////////
   // CHANGE_LANE scenario
-  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
+  if (scenario_type == default_scenario_type_) {
     scenario_type = SelectChangeLaneScenario(frame);
   }
 
   ////////////////////////////////////////
   // SIDE_PASS scenario
-  if (scenario_type == ScenarioConfig::LANE_FOLLOW) {
+  if (scenario_type == default_scenario_type_) {
     scenario_type = SelectSidePassScenario(frame);
   }
 
   ADEBUG << "select scenario: "
-      << ScenarioConfig::ScenarioType_Name(scenario_type);
-  current_scenario_ = CreateScenario(scenario_type);
+         << ScenarioConfig::ScenarioType_Name(scenario_type);
+
+  // update PlanningContext
+  UpdatePlanningContext(frame, scenario_type);
+
+  if (current_scenario_->scenario_type() != scenario_type) {
+    current_scenario_ = CreateScenario(scenario_type);
+  }
 }
 
-void ScenarioManager::ScenarioSelfVote(
-    const common::TrajectoryPoint& ego_point,
-    const Frame& frame) {
+/*
+ * @brief: select scenario based on vote from each individual scenario
+ *         not in use now. but please do NOT delete the code yet
+ */
+/*
+void ScenarioManager::ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
+                                       const Frame& frame) {
   CHECK(!frame.reference_line_info().empty());
 
   const auto& reference_line_info = frame.reference_line_info().front();
@@ -442,7 +491,6 @@ void ScenarioManager::ScenarioSelfVote(
     return;
   }
   rejected_scenarios.insert(current_scenario_->scenario_type());
-
 
   std::vector<ScenarioConfig::ScenarioType> preferred_scenarios;
   preferred_scenarios.push_back(ScenarioConfig::LANE_FOLLOW);
@@ -461,8 +509,7 @@ void ScenarioManager::ScenarioSelfVote(
 
     // traffic_light scenarios
     if (overlap.first == ReferenceLineInfo::SIGNAL) {
-      preferred_scenarios.push_back(
-          ScenarioConfig::TRAFFIC_LIGHT_PROTECTED);
+      preferred_scenarios.push_back(ScenarioConfig::TRAFFIC_LIGHT_PROTECTED);
       preferred_scenarios.push_back(
           ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN);
       preferred_scenarios.push_back(
@@ -526,6 +573,146 @@ void ScenarioManager::ScenarioSelfVote(
     AINFO << "select default scenario: "
           << ScenarioConfig::ScenarioType_Name(default_scenario_type_);
     current_scenario_ = CreateScenario(default_scenario_type_);
+  }
+}
+*/
+
+bool ScenarioManager::IsStopSignScenario(
+    const ScenarioConfig::ScenarioType& scenario_type) {
+  return (scenario_type == ScenarioConfig::STOP_SIGN_PROTECTED ||
+          scenario_type == ScenarioConfig::STOP_SIGN_UNPROTECTED);
+}
+
+bool ScenarioManager::IsTrafficLightScenario(
+    const ScenarioConfig::ScenarioType& scenario_type) {
+  return (
+      scenario_type == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED ||
+      scenario_type == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN ||
+      scenario_type == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN);
+}
+
+void ScenarioManager::UpdatePlanningContext(
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  if (!IsStopSignScenario(scenario_type) &&
+      !IsTrafficLightScenario(scenario_type)) {
+    PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+        PathOverlap();
+    PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps.clear();
+    PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
+    PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+    return;
+  }
+
+  // StopSign scenario
+  if (IsStopSignScenario(scenario_type)) {
+    UpdatePlanningContextStopSignScenario(frame, scenario_type);
+    return;
+  }
+
+  // TrafficLight scenario
+  if (IsTrafficLightScenario(scenario_type)) {
+    UpdatePlanningContextTrafficLightScenario(frame, scenario_type);
+    return;
+  }
+}
+
+// update: PlanningContext::GetScenarioInfo()->current_stop_sign_overlap
+void ScenarioManager::UpdatePlanningContextStopSignScenario(
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  const auto& reference_line_info = frame.reference_line_info().front();
+
+  if (scenario_type != current_scenario_->scenario_type()) {
+    PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+        PathOverlap();
+
+    // set to first_encountered stop sign
+    const auto map_itr =
+        first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
+    if (map_itr != first_encountered_overlap_map_.end()) {
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+          map_itr->second;
+      ADEBUG << "Update PlanningContext with first_encountered stop sign["
+             << map_itr->second.object_id << "] start_s["
+             << map_itr->second.start_s << "]";
+    }
+  } else {
+    // refresh with current_stop_sign_overlap
+    const std::string current_stop_sign_overlap_id =
+        PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
+
+    PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+        PathOverlap();
+    const std::vector<PathOverlap>& stop_sign_overlaps =
+        reference_line_info.reference_line().map_path().stop_sign_overlaps();
+    auto stop_sign_overlap_itr =
+        std::find_if(stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
+            [&current_stop_sign_overlap_id](
+                  const hdmap::PathOverlap& overlap) {
+                return overlap.object_id == current_stop_sign_overlap_id;
+              });
+    if (stop_sign_overlap_itr != stop_sign_overlaps.end()) {
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
+          *stop_sign_overlap_itr;
+      ADEBUG << "refresh PlanningContext with current stop sign["
+          << stop_sign_overlap_itr->object_id
+          << "] start_s[" << stop_sign_overlap_itr->start_s << "]";
+    }
+  }
+}
+
+// update: PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps
+void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  const auto& reference_line_info = frame.reference_line_info().front();
+
+  std::string current_traffic_light_overlap_id;
+  if (scenario_type != current_scenario_->scenario_type()) {
+    const auto map_itr =
+        first_encountered_overlap_map_.find(ReferenceLineInfo::SIGNAL);
+    if (map_itr != first_encountered_overlap_map_.end()) {
+      current_traffic_light_overlap_id = map_itr->second.object_id;
+    }
+  } else {
+    // refresh with current_traffic_light_overlaps
+    if (!PlanningContext::GetScenarioInfo()
+             ->current_traffic_light_overlaps.empty()) {
+      current_traffic_light_overlap_id = PlanningContext::GetScenarioInfo()
+                                             ->current_traffic_light_overlaps[0]
+                                             .object_id;
+    }
+  }
+
+  if (current_traffic_light_overlap_id.empty()) {
+    PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps.clear();
+    return;
+  }
+
+  // find all the traffic light at/within the same location/group
+  // and refresh the overlap info
+  PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps.clear();
+
+  const std::vector<PathOverlap>& traffic_light_overlaps =
+      reference_line_info.reference_line().map_path().signal_overlaps();
+  auto traffic_light_overlap_itr = std::find_if(
+      traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
+      [&current_traffic_light_overlap_id](const hdmap::PathOverlap& overlap) {
+        return overlap.object_id == current_traffic_light_overlap_id;
+      });
+  double current_traffic_light_overlap_start_s;
+  if (traffic_light_overlap_itr != traffic_light_overlaps.end()) {
+    current_traffic_light_overlap_start_s = traffic_light_overlap_itr->start_s;
+  }
+
+  constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
+  for (const auto& traffic_light_overlap : traffic_light_overlaps) {
+    const double dist =
+        traffic_light_overlap.start_s - current_traffic_light_overlap_start_s;
+    if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
+      PlanningContext::GetScenarioInfo()
+          ->current_traffic_light_overlaps.push_back(traffic_light_overlap);
+      ADEBUG << "traffic_light[" << traffic_light_overlap.object_id
+             << "] start_s[" << traffic_light_overlap.start_s << "]";
+    }
   }
 }
 

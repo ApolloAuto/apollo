@@ -78,8 +78,7 @@ std::shared_ptr<cyber::ReaderBase> GetReader(const std::string& channel) {
 
 ChannelMonitor::ChannelMonitor()
     : RecurrentRunner(FLAGS_channel_monitor_name,
-                      FLAGS_channel_monitor_interval) {
-}
+                      FLAGS_channel_monitor_interval) {}
 
 void ChannelMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
@@ -103,8 +102,7 @@ void ChannelMonitor::UpdateStatus(
   if (reader == nullptr) {
     SummaryMonitor::EscalateStatus(
         ComponentStatus::UNKNOWN,
-        StrCat(config.name(), " is not registered in ChannelMonitor."),
-        status);
+        StrCat(config.name(), " is not registered in ChannelMonitor."), status);
     return;
   }
 
@@ -112,8 +110,7 @@ void ChannelMonitor::UpdateStatus(
   if (delay < 0 || delay > config.delay_fatal()) {
     SummaryMonitor::EscalateStatus(
         ComponentStatus::FATAL,
-        StrCat(config.name(), " delayed for ", delay, " seconds."),
-        status);
+        StrCat(config.name(), " delayed for ", delay, " seconds."), status);
   } else {
     SummaryMonitor::EscalateStatus(ComponentStatus::OK, "", status);
   }

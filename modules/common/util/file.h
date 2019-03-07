@@ -33,12 +33,12 @@ namespace util {
 
 // TODO(all): The file utils have been moved into cyber. After migrating the
 // usages we'll retire the aliases here.
-using apollo::cyber::common::SetProtoToASCIIFile;
+using apollo::cyber::common::DirectoryExists;
+using apollo::cyber::common::EnsureDirectory;
 using apollo::cyber::common::GetProtoFromASCIIFile;
 using apollo::cyber::common::GetProtoFromFile;
 using apollo::cyber::common::PathExists;
-using apollo::cyber::common::DirectoryExists;
-using apollo::cyber::common::EnsureDirectory;
+using apollo::cyber::common::SetProtoToASCIIFile;
 
 }  // namespace util
 }  // namespace common

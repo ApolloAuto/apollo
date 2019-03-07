@@ -41,8 +41,7 @@ bool DataComponent::Init() {
   return true;
 }
 
-bool DataComponent::Proc(
-    const std::shared_ptr<DataInputCommand> &request) {
+bool DataComponent::Proc(const std::shared_ptr<DataInputCommand> &request) {
   ADEBUG << "Received data input command: " << request->DebugString();
 
   OnDataInputCommand(request);
@@ -54,9 +53,8 @@ bool DataComponent::Proc(
 // but just leave it for testing for now
 void DataComponent::CreateReader() {
   data_input_cmd_reader_ = node_->CreateReader<DataInputCommand>(
-      FLAGS_data_topic,
-      std::bind(&DataComponent::OnDataInputCommand, this,
-                std::placeholders::_1));
+      FLAGS_data_topic, std::bind(&DataComponent::OnDataInputCommand, this,
+                                  std::placeholders::_1));
   CHECK(data_input_cmd_reader_ != nullptr);
 }
 

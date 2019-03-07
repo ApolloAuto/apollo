@@ -30,7 +30,6 @@ cc_library(
         "//modules/planning/math:polynomial_xd",
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
-        "//modules/planning/math/finite_element_qp:fem_1d_expanded_jerk_qp_problem",
         "//modules/planning/math/finite_element_qp:fem_1d_qp_problem",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",

@@ -76,8 +76,8 @@ TEST_F(SpiralReferenceLineSmootherTest, smooth_stand_alone) {
   std::vector<double> y;
 
   SpiralReferenceLineSmoother spiral_smoother(config_);
-  int res = spiral_smoother.SmoothStandAlone(raw_points_,
-      &theta, &kappa, &dkappa, &s, &x, &y);
+  int res = spiral_smoother.SmoothStandAlone(raw_points_, &theta, &kappa,
+                                             &dkappa, &s, &x, &y);
   // TODO(Yajia): fix this test.
   EXPECT_LT(res, 100000);
 }

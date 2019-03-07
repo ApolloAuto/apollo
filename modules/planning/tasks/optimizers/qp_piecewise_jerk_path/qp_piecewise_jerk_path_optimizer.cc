@@ -21,8 +21,11 @@
 #include "modules/planning/tasks/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "modules/common/time/time.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -34,19 +37,21 @@ namespace {
 std::vector<std::pair<double, double>>::iterator min_pair_first(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::min_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.first < rhs.first;
-  });
+  return std::min_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.first < rhs.first;
+                          });
 }
 
 std::vector<std::pair<double, double>>::iterator max_pair_second(
     std::vector<std::pair<double, double>>::iterator begin,
     std::vector<std::pair<double, double>>::iterator end) {
-  return std::max_element(begin, end, [](const std::pair<double, double>& lhs,
-                                         const std::pair<double, double>& rhs) {
-    return lhs.second < rhs.second;
-  });
+  return std::max_element(begin, end,
+                          [](const std::pair<double, double>& lhs,
+                             const std::pair<double, double>& rhs) {
+                            return lhs.second < rhs.second;
+                          });
 }
 
 void assign_pair_first(std::vector<std::pair<double, double>>::iterator begin,
@@ -236,18 +241,16 @@ Status QpPiecewiseJerkPathOptimizer::Process(
       qp_config.guiding_line_weight(),
   };
 
-  fem_1d_qp_.reset(new Fem1dExpandedJerkQpProblem());
   constexpr double kMaxLThirdOrderDerivative = 2.0;
-
-  if (!fem_1d_qp_->Init(n, init_lateral_state, qp_delta_s, w,
-                        kMaxLThirdOrderDerivative)) {
-    std::string msg = "lateral qp optimizer failed";
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+  auto fem_1d_qp_ = std::make_unique<Fem1dQpProblem>(
+      n, init_lateral_state, qp_delta_s, w, kMaxLThirdOrderDerivative);
 
   auto start_time = std::chrono::system_clock::now();
 
   fem_1d_qp_->SetVariableBounds(lateral_bounds);
+
+  fem_1d_qp_->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
+
   fem_1d_qp_->SetVariableSecondOrderDerivativeBounds(
       lateral_second_order_derivative_bounds);
 
@@ -262,8 +265,6 @@ Status QpPiecewiseJerkPathOptimizer::Process(
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
   fem_1d_qp_->SetOutputResolution(qp_config.path_output_resolution());
-
-  std::vector<common::FrenetFramePoint> frenet_path;
 
   std::vector<common::FrenetFramePoint> frenet_frame_path;
   double accumulated_s = frenet_point.s();

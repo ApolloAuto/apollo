@@ -46,8 +46,12 @@ DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_prioritize_obstacles);
 DECLARE_bool(enable_junction_feature);
 DECLARE_bool(enable_all_junction);
+DECLARE_double(caution_search_distance_ahead);
+DECLARE_double(caution_search_distance_backward_for_merge);
+DECLARE_double(caution_search_distance_backward_for_overlap);
 
 // Obstacle features
+DECLARE_int32(ego_vehicle_id);
 DECLARE_double(scan_length);
 DECLARE_double(scan_width);
 DECLARE_double(back_dist_ignore_ped);
@@ -102,6 +106,7 @@ DECLARE_double(angle_threshold_to_junction_exit);
 DECLARE_double(centripetal_acc_coeff);
 
 // Junction Scenario
+DECLARE_uint32(junction_historical_frame_length);
 DECLARE_double(junction_exit_lane_threshold);
 DECLARE_double(distance_beyond_junction);
 DECLARE_double(defualt_junction_range);

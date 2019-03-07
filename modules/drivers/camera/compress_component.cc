@@ -72,7 +72,7 @@ bool CompressComponent::Proc(const std::shared_ptr<Image>& image) {
     }
     compressed_image->set_data(compress_buffer.data(), compress_buffer.size());
     writer_->Write(compressed_image);
-  } catch(std::exception &e) {
+  } catch (std::exception& e) {
     AERROR << "cv::imencode (jpeg) exception :" << e.what();
     return false;
   }

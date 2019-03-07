@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/planning/planner/on_lane_planner_dispatcher.h"
 #include "cyber/common/file.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/planner/on_lane_planner_dispatcher.h"
 #include "modules/planning/proto/planning_config.pb.h"
 
 namespace apollo {

@@ -38,8 +38,7 @@ class AutotuningRawFeatureGeneratorTest : public ::testing::Test {
         new ReferenceLineInfo(ego_state, ego_pos, reference_line, segments));
     // pseudo empty frame info
     LocalView dummy_local_view;
-    frame_.reset(new Frame(0, dummy_local_view, ego_pos, ego_state, nullptr,
-                           nullptr));
+    frame_.reset(new Frame(0, dummy_local_view, ego_pos, ego_state, nullptr));
     speed_limit_.reset(new SpeedLimit());
     generator_.reset(new AutotuningRawFeatureGenerator(8, 17, *ref_line_info_,
                                                        *frame_, *speed_limit_));

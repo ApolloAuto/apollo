@@ -27,9 +27,9 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
+#include "modules/planning/tasks/deciders/speed_bounds_decider/st_boundary_mapper.h"
 #include "modules/planning/tasks/optimizers/poly_vt_speed/piecewise_poly_vt_speed_sampler.h"
-#include "modules/planning/tasks/optimizers/st_graph/speed_limit_decider.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_boundary_mapper.h"
 #include "modules/planning/tuning/autotuning_raw_feature_generator.h"
 #include "modules/planning/tuning/speed_model/autotuning_speed_feature_builder.h"
 #include "modules/planning/tuning/speed_model/autotuning_speed_mlp_model.h"
@@ -105,7 +105,7 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
     if (!obstacle->st_boundary().IsEmpty()) {
       mutable_obstacle->SetBlockingObstacle(true);
     } else {
-      path_decision->SetStBoundary(
+      path_decision->SetSTBoundary(
           id, path_decision->Find(id)->reference_line_st_boundary());
     }
   }

@@ -38,14 +38,14 @@ namespace traffic_light {
 struct TrafficLightUnprotectedRightTurnContext {
   ScenarioTrafficLightUnprotectedRightTurnConfig scenario_config;
   double stop_start_time = 0.0;
-  double creep_start_time;
+  double creep_start_time = 0.0;
 };
 
 class TrafficLightUnprotectedRightTurnScenario : public Scenario {
  public:
   explicit TrafficLightUnprotectedRightTurnScenario(
-      const ScenarioConfig& config,
-      const ScenarioContext* context) : Scenario(config, context) {}
+      const ScenarioConfig& config, const ScenarioContext* context)
+      : Scenario(config, context) {}
 
   void Init() override;
 

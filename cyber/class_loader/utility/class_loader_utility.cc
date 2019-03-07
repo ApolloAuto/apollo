@@ -241,8 +241,7 @@ bool LoadLibrary(const std::string& library_path, ClassLoader* loader) {
     return false;
   }
 
-  auto num_lib_objs =
-      GetAllClassFactoryObjectsOfLibrary(library_path).size();
+  auto num_lib_objs = GetAllClassFactoryObjectsOfLibrary(library_path).size();
   if (num_lib_objs == 0) {
     AWARN << "class factory objs counts is 0, maybe registerclass failed";
   }

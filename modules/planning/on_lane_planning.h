@@ -71,8 +71,7 @@ class OnLanePlanning : public PlanningBase {
  private:
   common::Status InitFrame(const uint32_t sequence_num,
                            const common::TrajectoryPoint& planning_start_point,
-                           const common::VehicleState& vehicle_state,
-                           ADCTrajectory* output_trajectory);
+                           const common::VehicleState& vehicle_state);
 
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
   bool CheckPlanningConfig(const PlanningConfig& config);

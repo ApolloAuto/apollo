@@ -38,8 +38,8 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-using google::protobuf::io::ZeroCopyOutputStream;
 using google::protobuf::io::FileOutputStream;
+using google::protobuf::io::ZeroCopyOutputStream;
 
 struct Chunk {
   Chunk() { clear(); }
@@ -86,6 +86,7 @@ class RecordFileWriter : public RecordFileBase {
   bool WriteChannel(const Channel& channel);
   bool WriteMessage(const SingleMessage& message);
   uint64_t GetMessageNumber(const std::string& channel_name) const;
+
  private:
   bool WriteChunk(const ChunkHeader& chunk_header, const ChunkBody& chunk_body);
   template <typename T>

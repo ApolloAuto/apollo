@@ -40,6 +40,7 @@
  * @namespace apollo::planning
  * @brief apollo::planning
  */
+
 namespace apollo {
 namespace planning {
 

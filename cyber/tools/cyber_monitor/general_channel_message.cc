@@ -112,10 +112,11 @@ GeneralChannelMessage* GeneralChannelMessage::OpenChannel(
     return castErrorCode2Ptr(ErrorCode::CreateNodeFailed);
   }
 
-  auto callBack = [this](
-      const std::shared_ptr<apollo::cyber::message::RawMessage>& rawMsg) {
-    updateRawMessage(rawMsg);
-  };
+  auto callBack =
+      [this](
+          const std::shared_ptr<apollo::cyber::message::RawMessage>& rawMsg) {
+        updateRawMessage(rawMsg);
+      };
 
   channel_reader_ =
       channel_node_->CreateReader<apollo::cyber::message::RawMessage>(

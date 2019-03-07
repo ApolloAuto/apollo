@@ -127,8 +127,9 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
           transform,
       bool is_static);
 
-  void TF2MsgToCyber(const geometry_msgs::TransformStamped& tf2_trans_stamped,
-                     apollo::transform::TransformStamped& trans_stamped) const; // NOLINT
+  void TF2MsgToCyber(
+      const geometry_msgs::TransformStamped& tf2_trans_stamped,
+      apollo::transform::TransformStamped& trans_stamped) const;  // NOLINT
 
   std::unique_ptr<cyber::Node> node_;
   std::shared_ptr<cyber::Reader<apollo::transform::TransformStampeds>>

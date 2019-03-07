@@ -37,17 +37,20 @@ cc_library(
     name = "planning_lib",
     srcs = [
         "navi_planning.cc",
+        "on_lane_planning.cc",
         "open_space_planning.cc",
         "planning_base.cc",
-        "on_lane_planning.cc",
     ],
     hdrs = [
         "navi_planning.h",
+        "on_lane_planning.h",
         "open_space_planning.h",
         "planning_base.h",
-        "on_lane_planning.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
     deps = [
         "//modules/common",
         "//modules/common/configs:config_gflags",
@@ -69,8 +72,8 @@ cc_library(
         "//modules/planning/tasks:task_factory",
         "//modules/planning/tasks/smoothers:smoother",
         "//modules/planning/traffic_rules:traffic_decider",
-        "//modules/prediction/proto:prediction_proto",
         "//modules/planning/util:util_lib",
+        "//modules/prediction/proto:prediction_proto",
     ],
 )
 

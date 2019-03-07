@@ -27,6 +27,7 @@
 #include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 #include "modules/planning/tasks/deciders/side_pass_path_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_safety.h"
+#include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
@@ -83,6 +84,7 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new QpPiecewiseJerkPathOptimizer(config);
                          });
+
   task_factory_.Register(TaskConfig::PROCEED_WITH_CAUTION_SPEED,
                          [](const TaskConfig& config) -> Task* {
                            return new ProceedWithCautionSpeedGenerator(config);
@@ -99,9 +101,16 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new SidePassSafety(config);
                          });
-  task_factory_.Register(TaskConfig::DECIDER_RSS,
+  task_factory_.Register(
+      TaskConfig::DECIDER_RSS,
+      [](const TaskConfig& config) -> Task* { return new RssDecider(config); });
+  task_factory_.Register(TaskConfig::SPEED_BOUNDS_PRIORI_DECIDER,
                          [](const TaskConfig& config) -> Task* {
-                           return new RssDecider(config);
+                           return new SpeedBoundsDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::SPEED_BOUNDS_FINAL_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new SpeedBoundsDecider(config);
                          });
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =

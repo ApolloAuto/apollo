@@ -20,9 +20,9 @@
 
 #pragma once
 #include <omp.h>
+#include <algorithm>
 #include <limits>
 #include <vector>
-#include <algorithm>
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
@@ -57,9 +57,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
       const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
       const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
       const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
-      const Eigen::MatrixXi& obstacles_edges_num,
-      const size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
-      const Eigen::MatrixXd& obstacles_b,
+      const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
+      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachIPOPTInterface() = default;

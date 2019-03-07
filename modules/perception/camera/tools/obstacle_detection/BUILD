@@ -8,6 +8,7 @@ cc_binary(
         "obstacle_detection.cc",
     ],
     linkopts = [
+        "-lboost_system",
         "-lopencv_core",
         "-lopencv_imgproc",
         "-lopencv_highgui",

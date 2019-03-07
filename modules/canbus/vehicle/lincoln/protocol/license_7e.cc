@@ -24,11 +24,11 @@ namespace {
 using ::apollo::drivers::canbus::Byte;
 
 template <class T>
-inline T ByteTo(const Byte &byte) {
+inline T ByteTo(const Byte& byte) {
   return static_cast<T>(byte.get_byte(0, 8));
 }
 
-inline std::string ByteToString(const Byte &byte) {
+inline std::string ByteToString(const Byte& byte) {
   return std::string(1, ByteTo<char>(byte));
 }
 

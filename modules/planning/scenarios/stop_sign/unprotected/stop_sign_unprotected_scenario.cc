@@ -25,8 +25,6 @@
 
 #include "cyber/common/log.h"
 
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -40,7 +38,6 @@ namespace planning {
 namespace scenario {
 namespace stop_sign {
 
-using common::TrajectoryPoint;
 using hdmap::HDMapUtil;
 using hdmap::StopSignInfo;
 using hdmap::StopSignInfoConstPtr;
@@ -66,14 +63,13 @@ void StopSignUnprotectedScenario::Init() {
   }
 
   const std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
   if (stop_sign_overlap_id.empty()) {
+    AERROR << "Could not find stop sign";
     return;
   }
-
-  hdmap::StopSignInfoConstPtr stop_sign =
-      HDMapUtil::BaseMap().GetStopSignById(
-          hdmap::MakeMapId(stop_sign_overlap_id));
+  hdmap::StopSignInfoConstPtr stop_sign = HDMapUtil::BaseMap().GetStopSignById(
+      hdmap::MakeMapId(stop_sign_overlap_id));
   if (!stop_sign) {
     AERROR << "Could not find stop sign: " << stop_sign_overlap_id;
     return;
@@ -125,42 +121,7 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
 }
 
 bool StopSignUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario,
-    const Frame& frame) {
-  if (PlanningContext::GetScenarioInfo()
-          ->next_stop_sign_overlap.object_id.empty()) {
-    return false;
-  }
-
-  const auto& reference_line_info = frame.reference_line_info().front();
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double stop_sign_overlap_start_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
-  const double adc_distance_to_stop_sign =
-      stop_sign_overlap_start_s - adc_front_edge_s;
-  ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign
-         << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s << "]";
-
-  switch (current_scenario.scenario_type()) {
-    case ScenarioConfig::LANE_FOLLOW:
-    case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
-    case ScenarioConfig::APPROACH:
-      return (adc_distance_to_stop_sign > 0 &&
-              adc_distance_to_stop_sign <=
-                  config_.stop_sign_unprotected_config()
-                      .start_stop_sign_scenario_distance());
-    case ScenarioConfig::STOP_SIGN_PROTECTED:
-      return false;
-    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      return (current_scenario.GetStatus() !=
-              Scenario::ScenarioStatus::STATUS_DONE);
-    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-    default:
-      break;
-  }
+    const Scenario& current_scenario, const Frame& frame) {
   return false;
 }
 

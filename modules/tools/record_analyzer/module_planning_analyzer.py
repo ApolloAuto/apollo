@@ -16,14 +16,17 @@
 # limitations under the License.
 ###############################################################################
 
+import json
+import numpy as np
+from shapely.geometry import LineString, Point
+
+from modules.planning.proto import planning_pb2
 from common.statistical_analyzer import StatisticalAnalyzer
 from common.statistical_analyzer import PrintColors
 from common.distribution_analyzer import DistributionAnalyzer
 from common.error_code_analyzer import ErrorCodeAnalyzer
 from common.error_msg_analyzer import ErrorMsgAnalyzer
 from common.frechet_distance import frechet_distance
-from modules.planning.proto import planning_pb2
-from shapely.geometry import LineString, Point
 
 
 class PlannigAnalyzer:
@@ -41,6 +44,8 @@ class PlannigAnalyzer:
         self.is_simulation = is_simulation
         self.hard_break_list = []
         self.total_cycle_num = 0
+        self.init_point_curvature = []
+        self.init_point_dcurvature = []
 
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
@@ -68,15 +73,22 @@ class PlannigAnalyzer:
                 if point.a <= -2.0:
                     self.hard_break_list.append(point.a)
 
-        if self.last_adc_trajectory is not None and self.is_simulation:
-            current_path, last_path = self.find_common_path(adc_trajectory,
-                                                            self.last_adc_trajectory)
-            if len(current_path) == 0 or len(last_path) == 0:
-                dist = 0
-            else:
-                dist = frechet_distance(current_path, last_path)
-                if dist is not None:
-                    self.frechet_distance_list.append(dist)
+            if adc_trajectory.debug.planning_data.HasField('init_point'):
+                self.init_point_curvature.append(
+                    abs(adc_trajectory.debug.planning_data.init_point.path_point.kappa))
+                self.init_point_dcurvature.append(
+                    abs(adc_trajectory.debug.planning_data.init_point.path_point.dkappa))
+
+        # TODO(yifei) temporarily disable frechet distance
+        #if self.last_adc_trajectory is not None and self.is_simulation:
+        #    current_path, last_path = self.find_common_path(adc_trajectory,
+        #                                                    self.last_adc_trajectory)
+        #    if len(current_path) == 0 or len(last_path) == 0:
+        #        dist = 0
+        #    else:
+        #        dist = frechet_distance(current_path, last_path)
+        #        if dist is not None:
+        #            self.frechet_distance_list.append(dist)
 
         self.last_adc_trajectory = adc_trajectory
 
@@ -161,18 +173,32 @@ class PlannigAnalyzer:
 
     def print_simulation_results(self):
         results = {}
-        results['frechet_dist'] = sum(self.frechet_distance_list) /\
-            len(self.frechet_distance_list)
+        # TODO(yifei) temporarily disable frechet distance
+        # results['frechet_dist'] = sum(self.frechet_distance_list) /\
+        #    len(self.frechet_distance_list)
+
         results['hard_brake_cycle_num'] = len(self.hard_break_list)
+
+        curvature_99pctl = np.percentile(self.init_point_curvature, 99)
+        results['curvature_99pctl'] = curvature_99pctl
+        curvature_avg = np.average(self.init_point_curvature)
+        results['curvature_avg'] = curvature_avg
+
+        dcurvature_99pctl = np.percentile(self.init_point_dcurvature, 99)
+        results['dcurvature_99pctl'] = dcurvature_99pctl
+        dcurvature_avg = np.average(self.init_point_dcurvature)
+        results['dcurvature_avg'] = dcurvature_avg
+
         results['overall_score'] = 1 - results['hard_brake_cycle_num'] /\
             float(self.total_cycle_num)
-        if results['frechet_dist'] > 10:
-            results['overall_score'] += 0.0
-        else:
-            results['overall_score'] += (1 - results['frechet_dist'] / 10.0)
-        results['overall_score'] /= 2.0
+        # TODO(yifei) temporarily disable frechet distance
+        #if results['frechet_dist'] > 10:
+        #    results['overall_score'] += 0.0
+        #else:
+        #    results['overall_score'] += (1 - results['frechet_dist'] / 10.0)
+        #results['overall_score'] /= 2.0
 
-        print str(results)
+        print json.dumps(results)
 
     def plot_path(self, plt, adc_trajectory):
         path_coords = self.trim_path_by_distance(adc_trajectory, 5.0)

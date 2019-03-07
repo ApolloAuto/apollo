@@ -9,4 +9,7 @@
 
 * [Apollo Cyber RT FAQs](https://github.com/ApolloAuto/apollo/tree/master/docs/FAQs/CyberRT_FAQs.md): Answers to the most frequently asked questions about Apollo Cyber RT.
 
+* [Apollo Cyber RT Terms](CyberRT_Terms.md): Commonly used terminologies in Cyber RT documentation and code.
+
+
 More documents to come soon!

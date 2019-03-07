@@ -26,8 +26,8 @@ static constexpr float kSecondToNanoFactor = 1e9f;
 Buffer::Buffer() : BufferCore() { Init(); }
 
 int Buffer::Init() {
-  std::string node_name = "transform_listener_" +
-                          std::to_string(cyber::Time::Now().ToNanosecond());
+  std::string node_name =
+      "transform_listener_" + std::to_string(cyber::Time::Now().ToNanosecond());
   node_ = cyber::CreateNode(node_name);
   apollo::cyber::proto::RoleAttributes attr;
   attr.set_channel_name("/tf");
@@ -84,8 +84,8 @@ void Buffer::SubscriptionCallbackImpl(
 
       // header
       const auto& header = msg_evt->transforms(i).header();
-      trans_stamped.header.stamp = static_cast<uint64_t>(
-          header.timestamp_sec() * kSecondToNanoFactor);
+      trans_stamped.header.stamp =
+          static_cast<uint64_t>(header.timestamp_sec() * kSecondToNanoFactor);
       trans_stamped.header.frame_id = header.frame_id();
       trans_stamped.header.seq = header.sequence_num();
 
@@ -171,11 +171,10 @@ apollo::transform::TransformStamped Buffer::lookupTransform(
 
 bool Buffer::canTransform(const std::string& target_frame,
                           const std::string& source_frame,
-                          const cyber::Time& time,
-                          const float timeout_second,
+                          const cyber::Time& time, const float timeout_second,
                           std::string* errstr) const {
-  uint64_t timeout_ns = static_cast<uint64_t>(
-      timeout_second * kSecondToNanoFactor);
+  uint64_t timeout_ns =
+      static_cast<uint64_t>(timeout_second * kSecondToNanoFactor);
   uint64_t start_time = cyber::Time::Now().ToNanosecond();
   while (
       cyber::Time::Now().ToNanosecond() < start_time + timeout_ns &&
@@ -197,8 +196,8 @@ bool Buffer::canTransform(const std::string& target_frame,
                           const float timeout_second,
                           std::string* errstr) const {
   // poll for transform if timeout is set
-  uint64_t timeout_ns = static_cast<uint64_t>(
-      timeout_second * kSecondToNanoFactor);
+  uint64_t timeout_ns =
+      static_cast<uint64_t>(timeout_second * kSecondToNanoFactor);
   uint64_t start_time = cyber::Time::Now().ToNanosecond();
   while (cyber::Time::Now().ToNanosecond() < start_time + timeout_ns &&
          !canTransform(target_frame, target_time.ToNanosecond(), source_frame,

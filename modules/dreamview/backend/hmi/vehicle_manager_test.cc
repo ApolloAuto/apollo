@@ -48,8 +48,8 @@ TEST_F(VehicleManagerTest, Success) {
   ASSERT_TRUE(cyber::common::EnsureDirectory(kTargetDir));
 
   EXPECT_TRUE(VehicleManager::Instance()->UseVehicle(kTestVehicle));
-  EXPECT_TRUE(cyber::common::PathExists(
-      StrCat(kTargetDir, "/vehicle_data.pb.txt")));
+  EXPECT_TRUE(
+      cyber::common::PathExists(StrCat(kTargetDir, "/vehicle_data.pb.txt")));
 
   ASSERT_TRUE(cyber::common::RemoveAllFiles(kTargetDir));
 }

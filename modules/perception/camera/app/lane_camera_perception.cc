@@ -48,7 +48,7 @@ bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
   CHECK(cyber::common::GetProtoFromFile(config_file, &perception_param_))
-      << "Read config failed: ";
+      << "Read config failed: " << config_file;
   CHECK(inference::CudaUtil::set_device_id(perception_param_.gpu_id()));
 
   lane_calibration_working_sensor_name_ =
@@ -174,6 +174,12 @@ void LaneCameraPerception::SetCameraHeightAndPitch(
   calibration_service_->SetCameraHeightAndPitch(
       name_camera_ground_height_map, name_camera_pitch_angle_diff_map,
       pitch_angle_calibrator_working_sensor);
+}
+
+void LaneCameraPerception::SetIm2CarHomography(
+    Eigen::Matrix3d homography_im2car) {
+  CHECK(calibration_service_ != nullptr);
+  lane_postprocessor_->SetIm2CarHomography(homography_im2car);
 }
 
 bool LaneCameraPerception::GetCalibrationService(

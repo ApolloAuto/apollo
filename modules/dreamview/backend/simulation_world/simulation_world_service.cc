@@ -143,6 +143,8 @@ void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
     default:
       world_object->set_type(Object_Type_VIRTUAL);
   }
+
+  world_object->set_sub_type(obstacle.sub_type());
 }
 
 void SetStopReason(const StopReasonCode &reason_code, Decision *decision) {
@@ -976,7 +978,7 @@ void SimulationWorldService::UpdateSimulationWorld(
 
     // Add prediction priority
     if (obstacle.has_priority()) {
-        world_obj.mutable_obstacle_priority()->CopyFrom(obstacle.priority());
+      world_obj.mutable_obstacle_priority()->CopyFrom(obstacle.priority());
     }
 
     world_obj.set_timestamp_sec(

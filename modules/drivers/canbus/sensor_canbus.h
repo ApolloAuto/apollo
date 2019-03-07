@@ -161,8 +161,8 @@ bool SensorCanbus<SensorType>::Start() {
   // no need for timer.
   if (FLAGS_sensor_freq > 0) {
     const double duration_ms = 1000.0 / FLAGS_sensor_freq;
-    timer_ = cyber::Timer(duration_ms, &SensorCanbus<SensorType>::OnTimer,
-                              this, false);
+    timer_ = cyber::Timer(duration_ms, &SensorCanbus<SensorType>::OnTimer, this,
+                          false);
     timer_.Start();
   } else {
     data_trigger_running_ = true;

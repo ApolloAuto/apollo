@@ -102,12 +102,11 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 }
 
 Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
-                              const TrajectoryPoint& planning_start_point,
-                              const VehicleState& vehicle_state,
-                              ADCTrajectory* output_trajectory) {
+                                 const TrajectoryPoint& planning_start_point,
+                                 const VehicleState& vehicle_state) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
-                         vehicle_state, reference_line_provider_.get(),
-                         output_trajectory));
+                         vehicle_state, reference_line_provider_.get()));
+
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
@@ -148,7 +147,6 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   return Status::OK();
 }
 
-
 // TODO(all): fix this! this will cause unexpected behavior from controller
 void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
   trajectory_pb->clear_trajectory_point();
@@ -173,7 +171,7 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
 }
 
 void OnLanePlanning::RunOnce(const LocalView& local_view,
-                          ADCTrajectory* const trajectory_pb) {
+                             ADCTrajectory* const trajectory_pb) {
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
 
@@ -213,6 +211,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
+    // TODO(all): integrate reverse gear
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
     FillPlanningPb(start_timestamp, trajectory_pb);
     GenerateStopTrajectory(trajectory_pb);
     return;
@@ -229,8 +229,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
-  const double planning_cycle_time = 1.0 /
-      static_cast<double>(FLAGS_planning_loop_rate);
+  const double planning_cycle_time =
+      1.0 / static_cast<double>(FLAGS_planning_loop_rate);
 
   std::vector<TrajectoryPoint> stitching_trajectory;
   std::string replan_reason;
@@ -241,8 +241,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
   bool update_ego_info =
       EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
-  status = InitFrame(frame_num, stitching_trajectory.back(),
-                     vehicle_state, trajectory_pb);
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
   if (update_ego_info && status.ok()) {
     EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
@@ -275,9 +274,10 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       status.Save(trajectory_pb->mutable_header()->mutable_status());
       GenerateStopTrajectory(trajectory_pb);
     }
-
+    // TODO(all): integrate reverse gear
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
     FillPlanningPb(start_timestamp, trajectory_pb);
-    frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+    frame_->set_current_frame_planned_trajectory(*trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
     FrameHistory::Instance()->Add(n, std::move(frame_));
     return;
@@ -307,12 +307,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   ADEBUG << "Planning latency: "
          << trajectory_pb->latency_stats().DebugString();
 
-  auto* ref_line_task =
-      trajectory_pb->mutable_latency_stats()->add_task_stats();
-  ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
-                             1000.0);
-  ref_line_task->set_name("ReferenceLineProvider");
-
   if (!status.ok()) {
     status.Save(trajectory_pb->mutable_header()->mutable_status());
     AERROR << "Planning failed:" << status.ToString();
@@ -333,13 +327,26 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     trajectory_pb->set_replan_reason(replan_reason);
   }
 
-  FillPlanningPb(start_timestamp, trajectory_pb);
-  ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
+  if (frame_->open_space_info().is_in_open_space()) {
+    FillPlanningPb(start_timestamp, trajectory_pb);
+    ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
+    frame_->set_current_frame_planned_trajectory(*trajectory_pb);
+  } else {
+    auto* ref_line_task =
+        trajectory_pb->mutable_latency_stats()->add_task_stats();
+    ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
+                               1000.0);
+    ref_line_task->set_name("ReferenceLineProvider");
+    // TODO(all): integrate reverse gear
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+    FillPlanningPb(start_timestamp, trajectory_pb);
+    ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
-  frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
-  if (FLAGS_enable_planning_smoother) {
-    planning_smoother_.Smooth(FrameHistory::Instance(), frame_.get(),
-                              trajectory_pb);
+    frame_->set_current_frame_planned_trajectory(*trajectory_pb);
+    if (FLAGS_enable_planning_smoother) {
+      planning_smoother_.Smooth(FrameHistory::Instance(), frame_.get(),
+                                trajectory_pb);
+    }
   }
 
   const uint32_t n = frame_->SequenceNum();
@@ -372,85 +379,96 @@ Status OnLanePlanning::Plan(
         stitching_trajectory.back());
   }
 
-  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
+  auto status =
+      planner_->Plan(stitching_trajectory.back(), frame_.get(), trajectory_pb);
 
   ptr_debug->mutable_planning_data()->set_front_clear_distance(
       EgoInfo::Instance()->front_clear_distance());
 
-  const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
-  if (!best_ref_info) {
-    std::string msg("planner failed to make a driving plan");
-    AERROR << msg;
-    if (last_publishable_trajectory_) {
-      last_publishable_trajectory_->Clear();
-    }
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-  if (FLAGS_export_chart) {
-    ExportChart(best_ref_info->debug(), ptr_debug);
+  if (frame_->open_space_info().is_in_open_space()) {
+    const auto& publishable_trajectory =
+        frame_->open_space_info().publishable_trajectory_data().first;
+    const auto& publishable_trajectory_gear =
+        frame_->open_space_info().publishable_trajectory_data().second;
+    publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
+    trajectory_pb->set_gear(publishable_trajectory_gear);
   } else {
-    ptr_debug->MergeFrom(best_ref_info->debug());
-    ExportReferenceLineDebug(ptr_debug);
-  }
-  trajectory_pb->mutable_latency_stats()->MergeFrom(
-      best_ref_info->latency_stats());
-  // set right of way status
-  trajectory_pb->set_right_of_way_status(best_ref_info->GetRightOfWayStatus());
-  for (const auto& id : best_ref_info->TargetLaneId()) {
-    trajectory_pb->add_lane_id()->CopyFrom(id);
-  }
-
-  trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());
-
-  if (FLAGS_enable_rss_info) {
-    trajectory_pb->mutable_rss_info()->CopyFrom(best_ref_info->rss_info());
-  }
-
-  best_ref_info->ExportDecision(trajectory_pb->mutable_decision());
-
-  // Add debug information.
-  if (FLAGS_enable_record_debug) {
-    auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
-    reference_line->set_name("planning_reference_line");
-    const auto& reference_points =
-        best_ref_info->reference_line().reference_points();
-    double s = 0.0;
-    double prev_x = 0.0;
-    double prev_y = 0.0;
-    bool empty_path = true;
-    for (const auto& reference_point : reference_points) {
-      auto* path_point = reference_line->add_path_point();
-      path_point->set_x(reference_point.x());
-      path_point->set_y(reference_point.y());
-      path_point->set_theta(reference_point.heading());
-      path_point->set_kappa(reference_point.kappa());
-      path_point->set_dkappa(reference_point.dkappa());
-      if (empty_path) {
-        path_point->set_s(0.0);
-        empty_path = false;
-      } else {
-        double dx = reference_point.x() - prev_x;
-        double dy = reference_point.y() - prev_y;
-        s += std::hypot(dx, dy);
-        path_point->set_s(s);
+    const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
+    if (!best_ref_info) {
+      std::string msg("planner failed to make a driving plan");
+      AERROR << msg;
+      if (last_publishable_trajectory_) {
+        last_publishable_trajectory_->Clear();
       }
-      prev_x = reference_point.x();
-      prev_y = reference_point.y();
+      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    if (FLAGS_export_chart) {
+      ExportChart(best_ref_info->debug(), ptr_debug);
+    } else {
+      ptr_debug->MergeFrom(best_ref_info->debug());
+      ExportReferenceLineDebug(ptr_debug);
+    }
+    trajectory_pb->mutable_latency_stats()->MergeFrom(
+        best_ref_info->latency_stats());
+    // set right of way status
+    trajectory_pb->set_right_of_way_status(
+        best_ref_info->GetRightOfWayStatus());
+    for (const auto& id : best_ref_info->TargetLaneId()) {
+      trajectory_pb->add_lane_id()->CopyFrom(id);
+    }
+
+    trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());
+
+    if (FLAGS_enable_rss_info) {
+      trajectory_pb->mutable_rss_info()->CopyFrom(best_ref_info->rss_info());
+    }
+
+    best_ref_info->ExportDecision(trajectory_pb->mutable_decision());
+
+    // Add debug information.
+    if (FLAGS_enable_record_debug) {
+      auto* reference_line = ptr_debug->mutable_planning_data()->add_path();
+      reference_line->set_name("planning_reference_line");
+      const auto& reference_points =
+          best_ref_info->reference_line().reference_points();
+      double s = 0.0;
+      double prev_x = 0.0;
+      double prev_y = 0.0;
+      bool empty_path = true;
+      for (const auto& reference_point : reference_points) {
+        auto* path_point = reference_line->add_path_point();
+        path_point->set_x(reference_point.x());
+        path_point->set_y(reference_point.y());
+        path_point->set_theta(reference_point.heading());
+        path_point->set_kappa(reference_point.kappa());
+        path_point->set_dkappa(reference_point.dkappa());
+        if (empty_path) {
+          path_point->set_s(0.0);
+          empty_path = false;
+        } else {
+          double dx = reference_point.x() - prev_x;
+          double dy = reference_point.y() - prev_y;
+          s += std::hypot(dx, dy);
+          path_point->set_s(s);
+        }
+        prev_x = reference_point.x();
+        prev_y = reference_point.y();
+      }
+    }
+
+    last_publishable_trajectory_.reset(new PublishableTrajectory(
+        current_time_stamp, best_ref_info->trajectory()));
+
+    ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
+
+    last_publishable_trajectory_->PrependTrajectoryPoints(
+        std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
+                                     stitching_trajectory.end() - 1));
+
+    last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
+
+    best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
   }
-
-  last_publishable_trajectory_.reset(new PublishableTrajectory(
-      current_time_stamp, best_ref_info->trajectory()));
-
-  ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
-
-  last_publishable_trajectory_->PrependTrajectoryPoints(
-      std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
-          stitching_trajectory.end() - 1));
-
-  last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
-
-  best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
 
   return status;
 }

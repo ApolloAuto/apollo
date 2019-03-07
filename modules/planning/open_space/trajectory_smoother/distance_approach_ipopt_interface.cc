@@ -19,6 +19,10 @@
  */
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 
+#ifdef USE_GPU
+#include "modules/planning/open_space/trajectory_smoother/planning_block.h"
+#endif
+
 namespace apollo {
 namespace planning {
 
@@ -413,8 +417,8 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
 
   // 2. time scale variable initialization, horizon_ + 1
   for (int i = 0; i < horizon_ + 1; ++i) {
-    x[time_start_index_ + i] = 0.5 * (
-      min_time_sample_scaling_ + max_time_sample_scaling_);
+    x[time_start_index_ + i] =
+        0.5 * (min_time_sample_scaling_ + max_time_sample_scaling_);
   }
 
   // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
@@ -454,11 +458,10 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
       gradient(tag_f, n, x, grad_f_check);
       double delta_v = 1e-6;
       for (int i = 0; i < n; ++i) {
-        if (std::abs(grad_f_check[i] - grad_f[i])
-            > delta_v) {
+        if (std::abs(grad_f_check[i] - grad_f[i]) > delta_v) {
           AERROR << "cost gradient not match at: " << i
-              << ", grad by hand: " << grad_f[i]
-              << ", grad by adolc: " << grad_f_check[i];
+                 << ", grad by hand: " << grad_f[i]
+                 << ", grad by adolc: " << grad_f_check[i];
         }
       }
     }
@@ -469,7 +472,8 @@ bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
 }
 
 bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
-    bool new_x, double* grad_f) {
+                                                      bool new_x,
+                                                      double* grad_f) {
   ADEBUG << "eval_grad_f by hand";
   // Objective is from eval_f:
   // min control inputs
@@ -488,14 +492,13 @@ bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
     std::fill(grad_f, grad_f + n, 0.0);
     // 1. objective to minimize state diff to warm up
     for (int i = 0; i < horizon_ + 1; ++i) {
-      grad_f[state_index] += 2 * weight_state_x_ *
-          (x[state_index] - xWS_(0, i));
-      grad_f[state_index + 1] += 2 * weight_state_y_ *
-          (x[state_index + 1] - xWS_(1, i));
-      grad_f[state_index + 2] += 2 * weight_state_phi_ *
-          (x[state_index + 2] - xWS_(2, i));
-      grad_f[state_index + 3] = 2 * weight_state_v_ *
-          x[state_index + 3];
+      grad_f[state_index] +=
+          2 * weight_state_x_ * (x[state_index] - xWS_(0, i));
+      grad_f[state_index + 1] +=
+          2 * weight_state_y_ * (x[state_index + 1] - xWS_(1, i));
+      grad_f[state_index + 2] +=
+          2 * weight_state_phi_ * (x[state_index + 2] - xWS_(2, i));
+      grad_f[state_index + 3] = 2 * weight_state_v_ * x[state_index + 3];
       state_index += 4;
     }
 
@@ -512,15 +515,16 @@ bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
     double last_time_steer_rate =
         (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
     double last_time_a_rate =
-       (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
+        (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
 
     grad_f[control_index] += 2.0 * last_time_steer_rate *
-        (weight_stitching_steer_ / x[time_index] / ts_);
-    grad_f[control_index + 1] += 2.0 * last_time_a_rate *
-        (weight_stitching_a_ / x[time_index] / ts_);
-    grad_f[time_index] += -2.0 * (
-        weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
-        weight_stitching_a_ * last_time_a_rate * last_time_a_rate) /
+                             (weight_stitching_steer_ / x[time_index] / ts_);
+    grad_f[control_index + 1] +=
+        2.0 * last_time_a_rate * (weight_stitching_a_ / x[time_index] / ts_);
+    grad_f[time_index] +=
+        -2.0 *
+        (weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
+         weight_stitching_a_ * last_time_a_rate * last_time_a_rate) /
         x[time_index];
 
     // 4. objective to minimize input change rates, [0- horizon_ -2]
@@ -529,21 +533,21 @@ bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
     for (int i = 0; i < horizon_ - 1; ++i) {
       double steering_rate =
           (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
-      grad_f[control_index + 2] += 2.0 * steering_rate *
-          (weight_rate_steer_ / x[time_index] / ts_);
-      grad_f[control_index] += -2.0 * steering_rate *
-          (weight_rate_steer_ / x[time_index] / ts_);
-      grad_f[time_index] += -2.0 * weight_rate_steer_ *
-          steering_rate * steering_rate / x[time_index];
+      grad_f[control_index + 2] +=
+          2.0 * steering_rate * (weight_rate_steer_ / x[time_index] / ts_);
+      grad_f[control_index] +=
+          -2.0 * steering_rate * (weight_rate_steer_ / x[time_index] / ts_);
+      grad_f[time_index] += -2.0 * weight_rate_steer_ * steering_rate *
+                            steering_rate / x[time_index];
 
       double a_rate =
           (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
-      grad_f[control_index + 3] += 2.0 * a_rate *
-          (weight_rate_a_ / x[time_index] / ts_);
-      grad_f[control_index + 1] += -2.0 * a_rate *
-          (weight_rate_a_ / x[time_index] / ts_);
-      grad_f[time_index] += -2.0 * weight_rate_a_*
-          a_rate * a_rate / x[time_index];
+      grad_f[control_index + 3] +=
+          2.0 * a_rate * (weight_rate_a_ / x[time_index] / ts_);
+      grad_f[control_index + 1] +=
+          -2.0 * a_rate * (weight_rate_a_ / x[time_index] / ts_);
+      grad_f[time_index] +=
+          -2.0 * weight_rate_a_ * a_rate * a_rate / x[time_index];
 
       control_index += 2;
       time_index++;
@@ -552,9 +556,9 @@ bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
     // 5. objective to minimize total time [0, horizon_]
     time_index = time_start_index_;
     for (int i = 0; i < horizon_ + 1; ++i) {
-        grad_f[time_index] += weight_first_order_time_ +
-            2.0 * weight_second_order_time_ * x[time_index];
-        time_index++;
+      grad_f[time_index] += weight_first_order_time_ +
+                            2.0 * weight_second_order_time_ * x[time_index];
+      time_index++;
     }
   }
 
@@ -581,9 +585,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
 
 bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
                                                     bool new_x, int m,
-                                                    int nele_jac,
-                                                    int* iRow, int* jCol,
-                                                    double* values) {
+                                                    int nele_jac, int* iRow,
+                                                    int* jCol, double* values) {
   ADEBUG << "eval_jac_g";
   CHECK_EQ(n, num_of_variables_)
       << "No. of variables wrong in eval_jac_g. n : " << n;
@@ -798,8 +801,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
         }
       }
       int n_index_tmp = n_index + (i * obstacles_num_ + j) * 4;
-      int constraint_index_tmp = constraint_index +
-          (i * obstacles_num_ + j) * 4;
+      int constraint_index_tmp =
+          constraint_index + (i * obstacles_num_ + j) * 4;
       int state_index_tmp = state_index + i * 4;
 
       // 1. norm(A* lambda == 1)
@@ -1043,9 +1046,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::cos(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -1115,9 +1117,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -1159,9 +1160,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
       ++nz_index;
 
       values[nz_index] =
-          -1.0 * (ts_ *
-                      (x[state_index + 3] +
-                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          -1.0 * (ts_ * (x[state_index + 3] +
+                         x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                       std::tan(x[control_index]) / wheelbase_ +
                   x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
                       std::tan(x[control_index]) / wheelbase_);  // n.
@@ -1293,48 +1293,50 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
         // with respect to l
         values[nz_index_tmp] =
             2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
-        ++nz_index_tmp;  // current_edges_num
+        ++nz_index_tmp;                                 // current_edges_num
       }
 
       // 2. G' * mu + R' * lambda == 0, part 1
       // With respect to x
       values[nz_index_tmp] = -std::sin(x[state_index_tmp + 2]) * tmp1 +
-                         std::cos(x[state_index_tmp + 2]) * tmp2;  // u
-      ++nz_index_tmp;  // 1
+                             std::cos(x[state_index_tmp + 2]) * tmp2;  // u
+      ++nz_index_tmp;                                                  // 1
 
       // with respect to l
       for (int k = 0; k < current_edges_num; ++k) {
-        values[nz_index_tmp] = std::cos(x[state_index_tmp + 2]) * Aj(k, 0) +
+        values[nz_index_tmp] =
+            std::cos(x[state_index_tmp + 2]) * Aj(k, 0) +
             std::sin(x[state_index_tmp + 2]) * Aj(k, 1);  // v0~vn
-        ++nz_index_tmp;  // current_edges_num
+        ++nz_index_tmp;                                   // current_edges_num
       }
 
       // With respect to n
       values[nz_index_tmp] = 1.0;  // w0
-      ++nz_index_tmp;  // 1
+      ++nz_index_tmp;              // 1
 
       values[nz_index_tmp] = -1.0;  // w2
-      ++nz_index_tmp;  // 1
+      ++nz_index_tmp;               // 1
 
       // 3. G' * mu + R' * lambda == 0, part 2
       // With respect to x
       values[nz_index_tmp] = -std::cos(x[state_index_tmp + 2]) * tmp1 -
-                         std::sin(x[state_index_tmp + 2]) * tmp2;  // x
-      ++nz_index_tmp;  // 1
+                             std::sin(x[state_index_tmp + 2]) * tmp2;  // x
+      ++nz_index_tmp;                                                  // 1
 
       // with respect to l
       for (int k = 0; k < current_edges_num; ++k) {
-        values[nz_index_tmp] = -std::sin(x[state_index_tmp + 2]) * Aj(k, 0) +
+        values[nz_index_tmp] =
+            -std::sin(x[state_index_tmp + 2]) * Aj(k, 0) +
             std::cos(x[state_index_tmp + 2]) * Aj(k, 1);  // y0~yn
-        ++nz_index_tmp;  // current_edges_num
+        ++nz_index_tmp;                                   // current_edges_num
       }
 
       // With respect to n
       values[nz_index_tmp] = 1.0;  // z1
-      ++nz_index_tmp;  // 1
+      ++nz_index_tmp;              // 1
 
       values[nz_index_tmp] = -1.0;  // z3
-      ++nz_index_tmp;  // 1
+      ++nz_index_tmp;               // 1
 
       //  3. -g'*mu + (A*t - b)*lambda > 0
       double tmp3 = 0.0;
@@ -1349,32 +1351,32 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
 
       // With respect to x
       values[nz_index_tmp] = tmp1;  // aa1
-      ++nz_index_tmp;  // 1
+      ++nz_index_tmp;               // 1
 
       values[nz_index_tmp] = tmp2;  // bb1
-      ++nz_index_tmp;  // 1
+      ++nz_index_tmp;               // 1
 
       values[nz_index_tmp] =
           -std::sin(x[state_index_tmp + 2]) * offset_ * tmp1 +
           std::cos(x[state_index_tmp + 2]) * offset_ * tmp2;  // cc1
-      ++nz_index_tmp;  // 1
+      ++nz_index_tmp;                                         // 1
 
       // with respect to l
       for (int k = 0; k < current_edges_num; ++k) {
         values[nz_index_tmp] =
             (x[state_index_tmp] + std::cos(x[state_index_tmp + 2]) * offset_) *
                 Aj(k, 0) +
-            (x[state_index_tmp + 1]
-                + std::sin(x[state_index_tmp + 2]) * offset_) *
+            (x[state_index_tmp + 1] +
+             std::sin(x[state_index_tmp + 2]) * offset_) *
                 Aj(k, 1) -
-                bj(k, 0);  // ddk
+            bj(k, 0);    // ddk
         ++nz_index_tmp;  // current_edges_num
       }
 
       // with respect to n
       for (int k = 0; k < 4; ++k) {
         values[nz_index_tmp] = -g_[k];  // eek
-        ++nz_index_tmp;  // 4
+        ++nz_index_tmp;                 // 4
       }
     }
     // update index
@@ -1451,9 +1453,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
 
 bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
                                                     bool new_x, int m,
-                                                    int nele_jac,
-                                                    int* iRow, int* jCol,
-                                                    double* values) {
+                                                    int nele_jac, int* iRow,
+                                                    int* jCol, double* values) {
   ADEBUG << "eval_jac_g";
   CHECK_EQ(n, num_of_variables_)
       << "No. of variables wrong in eval_jac_g. n : " << n;
@@ -1893,9 +1894,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::cos(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -1965,9 +1965,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -2009,9 +2008,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
       ++nz_index;
 
       values[nz_index] =
-          -1.0 * (ts_ *
-                      (x[state_index + 3] +
-                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          -1.0 * (ts_ * (x[state_index + 3] +
+                         x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                       std::tan(x[control_index]) / wheelbase_ +
                   x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
                       std::tan(x[control_index]) / wheelbase_);  // n.
@@ -2288,24 +2286,46 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
 
-    for (int idx = 0; idx < nnz_L; idx++) {
-      iRow[idx] = rind_L[idx];
-      jCol[idx] = cind_L[idx];
+    if (FLAGS_enable_cuda) {
+#ifdef USE_GPU
+      fill_lower_left(iRow, jCol, rind_L, cind_L, nnz_L);
+#else
+      AFATAL << "CUDA enabled without GPU!";
+#endif
+    } else {
+      for (int idx = 0; idx < nnz_L; idx++) {
+        iRow[idx] = rind_L[idx];
+        jCol[idx] = cind_L[idx];
+      }
     }
   } else {
     // return the values. This is a symmetric matrix, fill the lower left
     // triangle only
 
     obj_lam[0] = obj_factor;
-    for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
+    if (FLAGS_enable_cuda) {
+#ifdef USE_GPU
+      data_transfer(&obj_lam[1], lambda, m);
+#else
+      AFATAL << "CUDA enabled without GPU!";
+#endif
+    } else {
+      for (int idx = 0; idx < m; idx++) {
+        obj_lam[1 + idx] = lambda[idx];
+      }
+    }
 
     set_param_vec(tag_L, m + 1, obj_lam);
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
                 &hessval, options_L);
 
-    for (int idx = 0; idx < nnz_L; idx++) {
-      values[idx] = hessval[idx];
+#ifdef USE_GPU
+    if (!data_transfer(values, hessval, nnz_L)) {
+      for (int idx = 0; idx < nnz_L; idx++) {
+        values[idx] = hessval[idx];
+      }
     }
+#endif
   }
 
   return true;
@@ -2390,9 +2410,8 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   double state_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4; ++j) {
-      state_diff_max = std::max(std::abs(
-        xWS_(j, i) - state_result_(j, i)),
-        state_diff_max);
+      state_diff_max =
+          std::max(std::abs(xWS_(j, i) - state_result_(j, i)), state_diff_max);
     }
   }
 
@@ -2401,12 +2420,10 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   CHECK_EQ(control_result_.rows(), uWS_.rows());
   double control_diff_max = 0.0;
   for (int i = 0; i < horizon_; ++i) {
-    control_diff_max = std::max(std::abs(
-      uWS_(0, i) - control_result_(0, i)),
-      control_diff_max);
-    control_diff_max = std::max(std::abs(
-      uWS_(1, i) - control_result_(1, i)),
-      control_diff_max);
+    control_diff_max = std::max(std::abs(uWS_(0, i) - control_result_(0, i)),
+                                control_diff_max);
+    control_diff_max = std::max(std::abs(uWS_(1, i) - control_result_(1, i)),
+                                control_diff_max);
   }
 
   // 2. time scale variable initialization, horizon_ + 1, no
@@ -2417,9 +2434,8 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   double l_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      l_diff_max = std::max(std::abs(
-        l_warm_up_(j, i) - dual_l_result_(j, i)),
-        l_diff_max);
+      l_diff_max = std::max(std::abs(l_warm_up_(j, i) - dual_l_result_(j, i)),
+                            l_diff_max);
     }
   }
 
@@ -2429,9 +2445,8 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   double n_diff_max = 0.0;
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-       n_diff_max = std::max(std::abs(
-         n_warm_up_(j, i) - dual_n_result_(j, i)),
-         n_diff_max);
+      n_diff_max = std::max(std::abs(n_warm_up_(j, i) - dual_n_result_(j, i)),
+                            n_diff_max);
     }
   }
 
@@ -2542,9 +2557,9 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
          ts_ * x[time_index] *
              (x[state_index + 3] +
               ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             cos(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
-                                          x[state_index + 3] *
-                                          tan(x[control_index]) / wheelbase_));
+             cos(x[state_index + 2] +
+                 ts_ * x[time_index] * 0.5 * x[state_index + 3] *
+                     tan(x[control_index]) / wheelbase_));
     // x2
     g[constraint_index + 1] =
         x[state_index + 5] -
@@ -2552,18 +2567,17 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
          ts_ * x[time_index] *
              (x[state_index + 3] +
               ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             sin(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
-                                          x[state_index + 3] *
-                                          tan(x[control_index]) / wheelbase_));
+             sin(x[state_index + 2] +
+                 ts_ * x[time_index] * 0.5 * x[state_index + 3] *
+                     tan(x[control_index]) / wheelbase_));
 
     // x3
     g[constraint_index + 2] =
-        x[state_index + 6] -
-        (x[state_index + 2] +
-         ts_ * x[time_index] *
-             (x[state_index + 3] +
-              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             tan(x[control_index]) / wheelbase_);
+        x[state_index + 6] - (x[state_index + 2] +
+                              ts_ * x[time_index] * (x[state_index + 3] +
+                                                     ts_ * x[time_index] * 0.5 *
+                                                         x[control_index + 1]) *
+                                  tan(x[control_index]) / wheelbase_);
 
     // x4
     g[constraint_index + 3] =
@@ -2734,8 +2748,8 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   return true;
 }
 
-bool DistanceApproachIPOPTInterface::check_g(
-    int n, const double* x, int m, double* g) {
+bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
+                                             double* g) {
   int kN = n;
   int kM = m;
   double x_u_tmp[kN];
@@ -2743,20 +2757,16 @@ bool DistanceApproachIPOPTInterface::check_g(
   double g_u_tmp[kM];
   double g_l_tmp[kM];
 
-  get_bounds_info(n, x_l_tmp, x_u_tmp,
-      m, g_l_tmp, g_u_tmp);
+  get_bounds_info(n, x_l_tmp, x_u_tmp, m, g_l_tmp, g_u_tmp);
 
   double delta_v = 1e-4;
   for (int idx = 0; idx < n; ++idx) {
     x_u_tmp[idx] = x_u_tmp[idx] + delta_v;
     x_l_tmp[idx] = x_l_tmp[idx] - delta_v;
-    if (x[idx] > x_u_tmp[idx] ||
-          x[idx] < x_l_tmp[idx]) {
-        AINFO << "x idx unfeasible: " << idx
-          << ", x: " << x[idx]
-          << ", lower: " << x_l_tmp[idx]
-          << ", upper: " << x_u_tmp[idx];
-      }
+    if (x[idx] > x_u_tmp[idx] || x[idx] < x_l_tmp[idx]) {
+      AINFO << "x idx unfeasible: " << idx << ", x: " << x[idx]
+            << ", lower: " << x_l_tmp[idx] << ", upper: " << x_u_tmp[idx];
+    }
   }
 
   // m1 : dynamics constatins
@@ -2807,12 +2817,9 @@ bool DistanceApproachIPOPTInterface::check_g(
   AINFO << "total variables: " << num_of_variables_;
 
   for (int idx = 0; idx < m; ++idx) {
-    if (g[idx] > g_u_tmp[idx] + delta_v
-        || g[idx] < g_l_tmp[idx] - delta_v) {
-      AINFO << "constratins idx unfeasible: " << idx
-          << ", g: " << g[idx]
-          << ", lower: " << g_l_tmp[idx]
-          << ", upper: " << g_u_tmp[idx];
+    if (g[idx] > g_u_tmp[idx] + delta_v || g[idx] < g_l_tmp[idx] - delta_v) {
+      AINFO << "constratins idx unfeasible: " << idx << ", g: " << g[idx]
+            << ", lower: " << g_l_tmp[idx] << ", upper: " << g_u_tmp[idx];
     }
   }
   return true;
@@ -2839,7 +2846,9 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_on(tag_f);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
 
   eval_obj(n, xa, &obj_value);
 
@@ -2849,18 +2858,26 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_on(tag_g);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
 
   eval_constraints(n, xa, m, g);
 
-  for (int idx = 0; idx < m; idx++) g[idx] >>= dummy;
+  for (int idx = 0; idx < m; idx++) {
+    g[idx] >>= dummy;
+  }
 
   trace_off();
 
   trace_on(tag_L);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
-  for (int idx = 0; idx < m; idx++) lam[idx] = 1.0;
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  for (int idx = 0; idx < m; idx++) {
+    lam[idx] = 1.0;
+  }
   sig = 1.0;
 
   eval_obj(n, xa, &obj_value);
@@ -2868,7 +2885,9 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
   obj_value *= mkparam(sig);
   eval_constraints(n, xa, m, g);
 
-  for (int idx = 0; idx < m; idx++) obj_value += g[idx] * mkparam(lam[idx]);
+  for (int idx = 0; idx < m; idx++) {
+    obj_value += g[idx] * mkparam(lam[idx]);
+  }
 
   obj_value >>= dummy;
 

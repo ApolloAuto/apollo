@@ -130,9 +130,9 @@ bool DualVariableWarmStartIPOPTQPInterface::get_starting_point(
 }
 
 bool DualVariableWarmStartIPOPTQPInterface::get_bounds_info(int n, double* x_l,
-                                                          double* x_u, int m,
-                                                          double* g_l,
-                                                          double* g_u) {
+                                                            double* x_u, int m,
+                                                            double* g_l,
+                                                            double* g_u) {
   int variable_index = 0;
   // 1. lagrange constraint l, [0, obstacles_edges_sum_ - 1] * [0,
   // horizon_]
@@ -201,8 +201,8 @@ bool DualVariableWarmStartIPOPTQPInterface::eval_f(int n, const double* x,
 }
 
 bool DualVariableWarmStartIPOPTQPInterface::eval_grad_f(int n, const double* x,
-                                                      bool new_x,
-                                                      double* grad_f) {
+                                                        bool new_x,
+                                                        double* grad_f) {
   std::fill(grad_f, grad_f + n, 0.0);
   int l_index = l_start_index_;
   for (int i = 0; i < horizon_ + 1; ++i) {
@@ -223,8 +223,7 @@ bool DualVariableWarmStartIPOPTQPInterface::eval_grad_f(int n, const double* x,
         tmp2 += Aj(k, 1) * x[l_index + k];
       }
       for (int k = 0; k < current_edges_num; ++k) {
-        grad_f[l_index + k] += 2.0 * tmp1 * Aj(k, 0) +
-            2.0 * tmp2 * Aj(k, 1);
+        grad_f[l_index + k] += 2.0 * tmp1 * Aj(k, 0) + 2.0 * tmp2 * Aj(k, 1);
       }
 
       // Update index
@@ -237,16 +236,17 @@ bool DualVariableWarmStartIPOPTQPInterface::eval_grad_f(int n, const double* x,
 }
 
 bool DualVariableWarmStartIPOPTQPInterface::eval_g(int n, const double* x,
-                                                 bool new_x, int m, double* g) {
+                                                   bool new_x, int m,
+                                                   double* g) {
   eval_constraints(n, x, m, g);
   return true;
 }
 
 bool DualVariableWarmStartIPOPTQPInterface::eval_jac_g(int n, const double* x,
-                                                     bool new_x, int m,
-                                                     int nele_jac, int* iRow,
-                                                     int* jCol,
-                                                     double* values) {
+                                                       bool new_x, int m,
+                                                       int nele_jac, int* iRow,
+                                                       int* jCol,
+                                                       double* values) {
   ADEBUG << "eval_jac_g";
 
   if (values == nullptr) {
@@ -448,12 +448,10 @@ bool DualVariableWarmStartIPOPTQPInterface::eval_jac_g(int n, const double* x,
   return true;
 }
 
-bool DualVariableWarmStartIPOPTQPInterface::eval_h(int n, const double* x,
-                                                 bool new_x, double obj_factor,
-                                                 int m, const double* lambda,
-                                                 bool new_lambda, int nele_hess,
-                                                 int* iRow, int* jCol,
-                                                 double* values) {
+bool DualVariableWarmStartIPOPTQPInterface::eval_h(
+    int n, const double* x, bool new_x, double obj_factor, int m,
+    const double* lambda, bool new_lambda, int nele_hess, int* iRow, int* jCol,
+    double* values) {
   if (values == NULL) {
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
@@ -521,7 +519,7 @@ void DualVariableWarmStartIPOPTQPInterface::get_optimization_results(
 /** Template to return the objective value */
 template <class T>
 bool DualVariableWarmStartIPOPTQPInterface::eval_obj(int n, const T* x,
-                                                   T* obj_value) {
+                                                     T* obj_value) {
   ADEBUG << "eval_obj";
   *obj_value = 0.0;
   int l_index = l_start_index_;
@@ -556,7 +554,7 @@ bool DualVariableWarmStartIPOPTQPInterface::eval_obj(int n, const T* x,
 /** Template to compute contraints */
 template <class T>
 bool DualVariableWarmStartIPOPTQPInterface::eval_constraints(int n, const T* x,
-                                                           int m, T* g) {
+                                                             int m, T* g) {
   ADEBUG << "eval_constraints";
   // state start index
 
@@ -634,7 +632,7 @@ bool DualVariableWarmStartIPOPTQPInterface::eval_constraints(int n, const T* x,
 
 /** Method to generate the required tapes */
 void DualVariableWarmStartIPOPTQPInterface::generate_tapes(int n, int m,
-                                                         int* nnz_h_lag) {
+                                                           int* nnz_h_lag) {
   double* xp = new double[n];
   double* lamp = new double[m];
   double* zl = new double[m];

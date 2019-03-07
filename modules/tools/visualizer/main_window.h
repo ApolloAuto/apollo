@@ -142,6 +142,5 @@ class MainWindow : public QMainWindow {
   QList<RadarData*> radarData_list_;
   QList<RadarData*> closed_radarData_list_;
 
-  std::map<std::string , std::string>
-      _channelName2TypeMap;
+  std::map<std::string, std::string> _channelName2TypeMap;
 };

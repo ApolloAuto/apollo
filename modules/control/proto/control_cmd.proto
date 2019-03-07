@@ -92,6 +92,8 @@ message SimpleLongitudinalDebug {
   optional double slope_offset_compensation = 19;
   optional double current_station = 20;
   optional double path_remain = 21;
+  optional int32 pid_saturation_status = 22;
+  optional int32 leadlag_saturation_status = 23;
 }
 
 message SimpleLateralDebug {

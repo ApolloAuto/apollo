@@ -10,11 +10,11 @@ cc_library(
     hdrs = [
         "open_space_trajectory_generator.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\"", "-fopenmp"],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
     deps = [
-        "//modules/planning/open_space/trajectory_smoother:distance_approach_problem",
-        "//modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_problem",
-        "//modules/planning/open_space/coarse_trajectory_generator:hybrid_a_star",
         "//cyber/common:log",
         "//external:gflags",
         "//modules/common/proto:pnc_point_proto",
@@ -25,6 +25,9 @@ cc_library(
         "//modules/map/hdmap",
         "//modules/planning/common:frame",
         "//modules/planning/common:planning_common",
+        "//modules/planning/open_space/coarse_trajectory_generator:hybrid_a_star",
+        "//modules/planning/open_space/trajectory_smoother:distance_approach_problem",
+        "//modules/planning/open_space/trajectory_smoother:dual_variable_warm_start_problem",
         "//modules/planning/proto:planning_proto",
         "@eigen",
     ],

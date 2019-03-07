@@ -183,8 +183,8 @@ void ReferenceLineInfo::InitFirstOverlaps() {
   if (!first_encounter_overlaps_.empty()) {
     std::sort(first_encounter_overlaps_.begin(),
               first_encounter_overlaps_.end(),
-              [](const std::pair<OverlapType, hdmap::PathOverlap> &a,
-                 const std::pair<OverlapType, hdmap::PathOverlap> &b) {
+              [](const std::pair<OverlapType, hdmap::PathOverlap>& a,
+                 const std::pair<OverlapType, hdmap::PathOverlap>& b) {
                 return a.second.start_s < b.second.start_s;
               });
   }
@@ -798,6 +798,22 @@ void ReferenceLineInfo::SetPathTurnType() {
 
   path_turn_type_ = hdmap::Lane::NO_TURN;
   return;
+}
+
+int ReferenceLineInfo::GetPnCJunction(
+    const double s, hdmap::PathOverlap* pnc_junction_overlap) const {
+  CHECK_NOTNULL(pnc_junction_overlap);
+  const std::vector<hdmap::PathOverlap>& pnc_junction_overlaps =
+      reference_line_.map_path().pnc_junction_overlaps();
+
+  constexpr double kError = 1.0;  // meter
+  for (const auto& overlap : pnc_junction_overlaps) {
+    if (s >= overlap.start_s - kError && s <= overlap.end_s + kError) {
+      *pnc_junction_overlap = overlap;
+      return 1;
+    }
+  }
+  return 0;
 }
 
 }  // namespace planning

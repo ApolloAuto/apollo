@@ -80,16 +80,16 @@ class PredictionMap {
    * @param id The ID of the target junction ID in the form of string.
    * @return A shared pointer to the junction with the input junction ID.
    */
-  static std::shared_ptr<const hdmap::JunctionInfo>
-  JunctionById(const std::string& id);
+  static std::shared_ptr<const hdmap::JunctionInfo> JunctionById(
+      const std::string& id);
 
   /**
    * @brief Get a shared pointer to a overlap by overlap ID.
    * @param id The ID of the target overlap ID in the form of string.
    * @return A shared pointer to the overlap with the input overlap ID.
    */
-  static std::shared_ptr<const hdmap::OverlapInfo>
-  OverlapById(const std::string& id);
+  static std::shared_ptr<const hdmap::OverlapInfo> OverlapById(
+      const std::string& id);
 
   /**
    * @brief Get the frenet coordinates (s, l) on a lane by a position.
@@ -100,8 +100,8 @@ class PredictionMap {
    */
   static bool GetProjection(
       const Eigen::Vector2d& position,
-      const std::shared_ptr<const hdmap::LaneInfo> lane_info,
-      double* s, double* l);
+      const std::shared_ptr<const hdmap::LaneInfo> lane_info, double* s,
+      double* l);
 
   /**
    * @brief If there is a lane in the range with radius
@@ -163,9 +163,9 @@ class PredictionMap {
    * @return A pointer to a lane info
    */
   static std::shared_ptr<const apollo::hdmap::LaneInfo>
-  GetMostLikelyCurrentLane(
-      const common::PointENU& position, const double radius,
-      const double heading, const double angle_diff_threshold);
+  GetMostLikelyCurrentLane(const common::PointENU& position,
+                           const double radius, const double heading,
+                           const double angle_diff_threshold);
 
   /**
    * @brief Check whether the projection of ego vehicle is on the target lane.
@@ -177,8 +177,7 @@ class PredictionMap {
    *         false otherwise.
    */
   static bool IsProjectionApproximateWithinLane(
-      const Eigen::Vector2d& ego_position,
-      const std::string& lane_id);
+      const Eigen::Vector2d& ego_position, const std::string& lane_id);
 
   /**
    * @brief Check if there are any junctions within the range centered at

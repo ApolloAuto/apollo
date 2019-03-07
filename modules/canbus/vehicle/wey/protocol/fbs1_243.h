@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 namespace apollo {
 namespace canbus {
@@ -29,7 +29,7 @@ class Fbs1243 : public ::apollo::drivers::canbus::ProtocolData<
   static const int32_t ID;
   Fbs1243();
   void Parse(const std::uint8_t* bytes, int32_t length,
-                     ChassisDetail* chassis) const override;
+             ChassisDetail* chassis) const override;
 
  private:
   // config detail: {'description': 'Longitude acceleration', 'offset': -21.592,
@@ -63,7 +63,7 @@ class Fbs1243 : public ::apollo::drivers::canbus::ProtocolData<
   // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|3]',
   // 'bit': 57, 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
   Fbs1_243::FrwheeldirectionType frwheeldirection(const std::uint8_t* bytes,
-                                                   const int32_t length) const;
+                                                  const int32_t length) const;
 };
 
 }  // namespace wey

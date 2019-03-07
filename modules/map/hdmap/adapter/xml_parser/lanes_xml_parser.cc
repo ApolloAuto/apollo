@@ -19,7 +19,7 @@ limitations under the License.
 namespace {
 double ToMPS(double speed) { return speed * 1000.0 / 3600.0; }
 bool IsReferenceLane(int lane_id) { return lane_id == 0; }
-};
+};  // namespace
 
 namespace apollo {
 namespace hdmap {
@@ -41,8 +41,7 @@ Status LanesXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     std::string section_id = std::to_string(++section_cnt);
     section_internal.id = section_id;
     section_internal.section.mutable_id()->set_id(section_id);
-    RETURN_IF_ERROR(ParseLaneSection(*sub_node,
-                                     &section_internal.lanes));
+    RETURN_IF_ERROR(ParseLaneSection(*sub_node, &section_internal.lanes));
     RETURN_IF_ERROR(ParseSectionBoundary(
         *sub_node,
         section_internal.section.mutable_boundary()->mutable_outer_polygon()));
@@ -214,7 +213,7 @@ Status LanesXmlParser::ParseLane(const tinyxml2::XMLElement& xml_node,
     bool is_virtual = false;
     std::string virtual_border = "FALSE";
     checker = UtilXmlParser::QueryStringAttribute(*sub_node, "virtual",
-            &virtual_border);
+                                                  &virtual_border);
     if (checker == tinyxml2::XML_SUCCESS) {
       if (virtual_border == "TRUE") {
         is_virtual = true;
@@ -469,12 +468,12 @@ Status LanesXmlParser::ParseObjectOverlapGroup(
       overlap_with_lane.end_s = end_s;
       overlap_with_lane.is_merge = is_merge;
 
-      RETURN_IF_ERROR(ParseRegionOverlap(*sub_node,
-                                      &overlap_with_lane.region_overlaps));
+      RETURN_IF_ERROR(
+          ParseRegionOverlap(*sub_node, &overlap_with_lane.region_overlaps));
 
       if (overlap_with_lane.region_overlaps.size() > 0) {
-        UtilXmlParser::QueryStringAttribute(*sub_node, "regionOverlapId",
-                                      &overlap_with_lane.region_overlap_id);
+        UtilXmlParser::QueryStringAttribute(
+            *sub_node, "regionOverlapId", &overlap_with_lane.region_overlap_id);
       }
 
       object_overlaps->push_back(overlap_with_lane);
@@ -579,8 +578,8 @@ Status LanesXmlParser::ParseLaneOverlapGroup(
       std::string lane_id;
       double start_s = 0.0;
       double end_s = 0.0;
-      int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                   &lane_id);
+      int checker =
+          UtilXmlParser::QueryStringAttribute(*sub_node, "id", &lane_id);
       checker += sub_node->QueryDoubleAttribute("startOffset", &start_s);
       checker += sub_node->QueryDoubleAttribute("endOffset", &end_s);
       if (checker != tinyxml2::XML_SUCCESS) {
@@ -685,8 +684,8 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
       xml_node.FirstChildElement("predecessor");
   while (sub_node) {
     std::string lane_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                    &lane_id);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &lane_id);
     if (checker == tinyxml2::XML_SUCCESS) {
       PbID* pb_lane_id = lane->add_predecessor_id();
       pb_lane_id->set_id(lane_id);
@@ -697,8 +696,8 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
   sub_node = xml_node.FirstChildElement("successor");
   while (sub_node) {
     std::string lane_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                    &lane_id);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &lane_id);
     if (checker == tinyxml2::XML_SUCCESS) {
       PbID* pb_lane_id = lane->add_successor_id();
       pb_lane_id->set_id(lane_id);
@@ -711,8 +710,8 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
     std::string side;
     std::string direction;
     std::string lane_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                   &lane_id);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &lane_id);
     checker += UtilXmlParser::QueryStringAttribute(*sub_node, "side", &side);
     checker +=
         UtilXmlParser::QueryStringAttribute(*sub_node, "direction", &direction);
@@ -737,8 +736,8 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
   sub_node = xml_node.FirstChildElement("selfReverse");
   while (sub_node) {
     std::string lane_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                    &lane_id);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &lane_id);
     if (checker == tinyxml2::XML_SUCCESS) {
       lane->add_self_reverse_lane_id()->set_id(lane_id);
     }
@@ -814,8 +813,9 @@ Status LanesXmlParser::ToPbLaneMarkType(const std::string& type,
   return Status::OK();
 }
 
-Status LanesXmlParser::ParseRegionOverlap(const tinyxml2::XMLElement& xml_node,
-                              std::vector<PbRegionOverlap>* region_overlaps) {
+Status LanesXmlParser::ParseRegionOverlap(
+    const tinyxml2::XMLElement& xml_node,
+    std::vector<PbRegionOverlap>* region_overlaps) {
   CHECK_NOTNULL(region_overlaps);
 
   auto region_overlap_node = xml_node.FirstChildElement("regionOverlap");
@@ -824,8 +824,7 @@ Status LanesXmlParser::ParseRegionOverlap(const tinyxml2::XMLElement& xml_node,
 
     std::string region_overlap_id;
     int checker = UtilXmlParser::QueryStringAttribute(*region_overlap_node,
-                                                    "id",
-                                                    &region_overlap_id);
+                                                      "id", &region_overlap_id);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error to parse region overlap id";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -835,13 +834,13 @@ Status LanesXmlParser::ParseRegionOverlap(const tinyxml2::XMLElement& xml_node,
 
     auto outline_node = region_overlap_node->FirstChildElement("outline");
     while (outline_node != nullptr) {
-      RETURN_IF_ERROR(UtilXmlParser::ParseOutline(*outline_node,
-                                            region_overlap.add_polygon()));
+      RETURN_IF_ERROR(UtilXmlParser::ParseOutline(
+          *outline_node, region_overlap.add_polygon()));
       outline_node = outline_node->NextSiblingElement("outline");
     }
 
-    region_overlap_node = region_overlap_node->NextSiblingElement(
-                                                        "regionOverlap");
+    region_overlap_node =
+        region_overlap_node->NextSiblingElement("regionOverlap");
 
     region_overlaps->emplace_back(region_overlap);
   }

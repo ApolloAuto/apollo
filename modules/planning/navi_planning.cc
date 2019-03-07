@@ -89,12 +89,9 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
 
 Status NaviPlanning::InitFrame(const uint32_t sequence_num,
                                const TrajectoryPoint& planning_start_point,
-                               const double start_time,
-                               const VehicleState& vehicle_state,
-                               ADCTrajectory* output_trajectory) {
+                               const VehicleState& vehicle_state) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
-                         vehicle_state,
-                         reference_line_provider_.get(), output_trajectory));
+                         vehicle_state, reference_line_provider_.get()));
 
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
@@ -182,6 +179,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
+    // TODO(all): integrate reverse gear
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
     FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
@@ -195,13 +194,15 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       last_publishable_trajectory_.get(), &replan_reason);
 
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
-  status = InitFrame(frame_num, stitching_trajectory.back(), start_timestamp,
-                     vehicle_state, trajectory_pb);
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
+
   if (!frame_) {
     std::string msg("Failed to init frame");
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
+    // TODO(all): integrate reverse gear
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
     FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
@@ -225,6 +226,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
+      // TODO(all): integrate reverse gear
+      trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
       FillPlanningPb(start_timestamp, &estop_trajectory);
     } else {
       trajectory_pb->mutable_decision()
@@ -232,10 +235,12 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
           ->mutable_not_ready()
           ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
+      // TODO(all): integrate reverse gear
+      trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
       FillPlanningPb(start_timestamp, trajectory_pb);
     }
 
-    frame_->mutable_trajectory()->CopyFrom(*trajectory_pb);
+    frame_->set_current_frame_planned_trajectory(*trajectory_pb);
     auto seq_num = frame_->SequenceNum();
     FrameHistory::Instance()->Add(seq_num, std::move(frame_));
 
@@ -290,6 +295,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   }
 
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
+  // TODO(all): integrate reverse gear
+  trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
   FillPlanningPb(start_timestamp, trajectory_pb);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
@@ -474,7 +481,8 @@ Status NaviPlanning::Plan(
         stitching_trajectory.back());
   }
 
-  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get());
+  auto status =
+      planner_->Plan(stitching_trajectory.back(), frame_.get(), trajectory_pb);
 
   ExportReferenceLineDebug(ptr_debug);
 
@@ -534,7 +542,7 @@ Status NaviPlanning::Plan(
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  // Navi Panner doesn't need to stitch the last path planning
+  // Navi Planner doesn't need to stitch the last path planning
   // trajectory.Otherwise, it will cause the Dreamview planning track to display
   // flashing or bouncing
   // TODO(Yifei): remove this if navi-planner doesn't need stitching

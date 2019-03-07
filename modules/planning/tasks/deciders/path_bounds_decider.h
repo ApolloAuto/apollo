@@ -45,8 +45,7 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundariesFromRoadsAndADC(
-      const ReferenceLine& reference_line,
-      const SLBoundary& adc_sl_boundary,
+      const ReferenceLine& reference_line, const SLBoundary& adc_sl_boundary,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundariesFromStaticObstacles(
@@ -54,6 +53,14 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   double GetBufferBetweenADCCenterAndEdge();
+
+  std::vector<std::tuple<int, double, double, double, std::string>>
+  SortObstaclesForSweepLine(
+      const IndexedList<std::string, Obstacle>& indexed_obstacles);
+
+ private:
+  double adc_frenet_s_ = 0.0;
+  double adc_frenet_l_ = 0.0;
 };
 
 }  // namespace planning

@@ -41,15 +41,12 @@ TEST_F(ContainerManagerTest, GetContainer) {
   EXPECT_TRUE(conf_.IsInitialized());
 
   manager_->Init(conf_);
-  EXPECT_TRUE(
-      manager_->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES) != nullptr);
-  EXPECT_TRUE(
-      manager_->GetContainer<PoseContainer>(AdapterConfig::LOCALIZATION)
-          != nullptr);
-  EXPECT_TRUE(
-      manager_->GetContainer<PoseContainer>(AdapterConfig::CONTROL_COMMAND)
-          == nullptr);
+  EXPECT_TRUE(manager_->GetContainer<ObstaclesContainer>(
+                  AdapterConfig::PERCEPTION_OBSTACLES) != nullptr);
+  EXPECT_TRUE(manager_->GetContainer<PoseContainer>(
+                  AdapterConfig::LOCALIZATION) != nullptr);
+  EXPECT_TRUE(manager_->GetContainer<PoseContainer>(
+                  AdapterConfig::CONTROL_COMMAND) == nullptr);
 }
 
 }  // namespace prediction

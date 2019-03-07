@@ -29,7 +29,7 @@
 namespace apollo {
 namespace relative_map {
 
-class RelativeMap{
+class RelativeMap {
  public:
   RelativeMap();
 
