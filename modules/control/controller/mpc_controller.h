@@ -250,6 +250,14 @@ class MPCController : public Controller {
   common::MeanFilter heading_error_filter_;
 
   double minimum_speed_protection_ = 0.1;
+
+  // Enable the feedback-gain-related compensation components in the feedfoward
+  // term for steering control
+  bool enable_mpc_feedforward_compensation_ = false;
+
+  // Limitation for judging if the unconstraint analytical control is close
+  // enough to the the solver's output with constraint
+  double unconstraint_control_diff_limit_ = 5.0;
 };
 
 }  // namespace control
