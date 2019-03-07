@@ -113,6 +113,12 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   standstill_acceleration_ =
       control_conf->mpc_controller_conf().standstill_acceleration();
 
+  enable_mpc_feedforward_compensation_ =
+      control_conf->mpc_controller_conf().enable_mpc_feedforward_compensation();
+
+  unconstraint_control_diff_limit_ =
+      control_conf->mpc_controller_conf().unconstraint_control_diff_limit();
+
   LoadControlCalibrationTable(control_conf->mpc_controller_conf());
   AINFO << "MPC conf loaded";
   return true;
@@ -325,34 +331,65 @@ Status MPCController::ComputeControlCommand(
   debug->add_matrix_r_updated(matrix_r_updated_(0, 0));
   debug->add_matrix_r_updated(matrix_r_updated_(1, 1));
 
-  Eigen::MatrixXd control_matrix(controls_, 1);
-  control_matrix << 0, 0;
+  Matrix control_matrix = Matrix::Zero(controls_, 1);
+  std::vector<Matrix> control(horizon_, control_matrix);
 
-  Eigen::MatrixXd reference_state(basic_state_size_, 1);
-  reference_state << 0, 0, 0, 0, 0, 0;
+  Matrix control_gain_matrix = Matrix::Zero(controls_, basic_state_size_);
+  std::vector<Matrix> control_gain(horizon_, control_gain_matrix);
 
-  std::vector<Eigen::MatrixXd> reference(horizon_, reference_state);
+  Matrix addition_gain_matrix = Matrix::Zero(controls_, 1);
+  std::vector<Matrix> addition_gain(horizon_, addition_gain_matrix);
 
-  Eigen::MatrixXd lower_bound(controls_, 1);
+  Matrix reference_state = Matrix::Zero(basic_state_size_, 1);
+  std::vector<Matrix> reference(horizon_, reference_state);
+
+  Matrix lower_bound(controls_, 1);
   lower_bound << -wheel_single_direction_max_degree_, max_deceleration_;
 
-  Eigen::MatrixXd upper_bound(controls_, 1);
+  Matrix upper_bound(controls_, 1);
   upper_bound << wheel_single_direction_max_degree_, max_acceleration_;
-
-  std::vector<Eigen::MatrixXd> control(horizon_, control_matrix);
 
   double mpc_start_timestamp = Clock::NowInSeconds();
   double steer_angle_feedback = 0.0;
   double acc_feedback = 0.0;
+  double steer_angle_ff_compensation = 0.0;
+  double unconstraint_control_diff = 0.0;
+  double control_gain_truncation_ratio = 0.0;
+  double unconstraint_control = 0.0;
+  const double v = VehicleStateProvider::Instance()->linear_velocity();
   if (common::math::SolveLinearMPC(
           matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
           matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
-          mpc_eps_, mpc_max_iteration_, &control) != true) {
+          mpc_eps_, mpc_max_iteration_, &control, &control_gain, &addition_gain)
+           != true) {
     AERROR << "MPC solver failed";
   } else {
     ADEBUG << "MPC problem solved! ";
     steer_angle_feedback = Wheel2SteerPct(control[0](0, 0));
     acc_feedback = control[0](1, 0);
+    for (int i = 0; i < basic_state_size_; ++i) {
+      unconstraint_control += control_gain[0](0, i) * matrix_state_(i, 0);
+    }
+    unconstraint_control += addition_gain[0](0, 0) * v * debug->curvature();
+    if (enable_mpc_feedforward_compensation_) {
+      unconstraint_control_diff =
+          Wheel2SteerPct(control[0](0, 0) - unconstraint_control);
+      if (fabs(unconstraint_control_diff) <= unconstraint_control_diff_limit_) {
+        steer_angle_ff_compensation =
+            Wheel2SteerPct(debug->curvature() * (control_gain[0](0, 2) *
+                           (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
+                           addition_gain[0](0, 0) * v));
+      } else {
+        control_gain_truncation_ratio = control[0](0, 0) / unconstraint_control;
+        steer_angle_ff_compensation =
+            Wheel2SteerPct(debug->curvature() * (control_gain[0](0, 2) *
+                           (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
+                           addition_gain[0](0, 0) * v) *
+                           control_gain_truncation_ratio);
+        }
+    } else {
+      steer_angle_ff_compensation = 0.0;
+    }
   }
 
   double mpc_end_timestamp = Clock::NowInSeconds();
@@ -361,9 +398,9 @@ Status MPCController::ComputeControlCommand(
          << (mpc_end_timestamp - mpc_start_timestamp) * 1000 << " ms.";
 
   // TODO(QiL): evaluate whether need to add spline smoothing after the result
-
   double steer_angle =
-      steer_angle_feedback + steer_angle_feedforwardterm_updated_;
+      steer_angle_feedback + steer_angle_feedforwardterm_updated_ +
+      steer_angle_ff_compensation;
 
   // Clamp the steer angle to -100.0 to 100.0
   steer_angle = common::math::Clamp(steer_angle, -100.0, 100.0);
@@ -436,6 +473,8 @@ Status MPCController::ComputeControlCommand(
   debug->set_steering_position(chassis->steering_percentage());
   debug->set_steer_angle(steer_angle);
   debug->set_steer_angle_feedforward(steer_angle_feedforwardterm_updated_);
+  debug->set_steer_angle_feedforward_compensation(steer_angle_ff_compensation);
+  debug->set_steer_unconstraint_control_diff(unconstraint_control_diff);
   debug->set_steer_angle_feedback(steer_angle_feedback);
   debug->set_steering_position(chassis->steering_percentage());
 
@@ -510,8 +549,11 @@ void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
 }
 
 void MPCController::FeedforwardUpdate(SimpleMPCDebug *debug) {
-  steer_angle_feedforwardterm_ =
-      Wheel2SteerPct(wheelbase_ * debug->curvature());
+  const double v = VehicleStateProvider::Instance()->linear_velocity();
+  const double kv =
+      lr_ * mass_ / 2 / cf_ / wheelbase_ - lf_ * mass_ / 2 / cr_ / wheelbase_;
+  steer_angle_feedforwardterm_ = Wheel2SteerPct(
+      wheelbase_ * debug->curvature() + kv * v * v * debug->curvature());
 }
 
 void MPCController::ComputeLateralErrors(
