@@ -91,7 +91,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;  // Skip Compute probability for offline mode
   }
   torch::Device device(torch::kCPU);
-  // TODO(all) uncomment the following when cuda issue is resolved
+  // TODO(all) uncomment the following code when cuda issue is resolved
   // if (torch::cuda::is_available()) {
   //   ADEBUG << "CUDA is available";
   //   device = torch::Device(torch::kCUDA);
