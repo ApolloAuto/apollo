@@ -225,7 +225,7 @@ GPS-IMU组件的GPS接收器、天线可使用选项有：
 
 
 ## 激光雷达 (LiDAR)
-由Velodyne LiDAR公司提供的16线激光雷达系统 **HDL-64E S3** 。
+由Velodyne LiDAR公司提供的64线激光雷达系统 **HDL-64E S3** 。
 
 ![lidar_image](images/lidar_pic.png)
 
@@ -249,7 +249,7 @@ GPS-IMU组件的GPS接收器、天线可使用选项有：
 
 由Velodyne LiDAR公司提供的16线激光雷达系统 **VLP-16**。
 
-![lidar_image](/Users/hanyang07/apollo/docs/quickstart/images/lidar_pic_16.png)
+![lidar_image](images/lidar_pic_16.png)
 
 **主要特点:**
 
@@ -261,7 +261,7 @@ GPS-IMU组件的GPS接收器、天线可使用选项有：
 - 低功耗
 - 保护性设计
 
-![online](/Users/hanyang07/apollo/docs/quickstart/images/online_icon.png)Velodyne VLP-16官网:
+![online](images/online_icon.png)Velodyne VLP-16官网:
 [http://velodynelidar.com/vlp-16.html](http://velodynelidar.com/vlp-16.html)
 
 ## 摄像头
