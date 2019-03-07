@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "modules/common/monitor_log/monitor_log_buffer.h"
+#include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
 #include "modules/dreamview/backend/map/map_service.h"
@@ -32,7 +33,8 @@ namespace dreamview {
 
 class HMI {
  public:
-  HMI(WebSocketHandler *websocket, MapService *map_service);
+  HMI(WebSocketHandler *websocket, MapService *map_service,
+      DataCollectionMonitor *data_collection_monitor_);
   void Start();
   void Stop();
 
@@ -48,6 +50,7 @@ class HMI {
   // No ownership.
   WebSocketHandler *websocket_;
   MapService *map_service_;
+  DataCollectionMonitor *data_collection_monitor_;
 };
 
 }  // namespace dreamview
