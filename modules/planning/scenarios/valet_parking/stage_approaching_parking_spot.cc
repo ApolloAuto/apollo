@@ -37,6 +37,7 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "StopSignUnprotectedStagePreStop planning error";
+    return StageStatus::ERROR;
   }
   GetContext()->valet_parking_pre_stop_fence_s =
       frame->open_space_info().open_space_pre_stop_fence_s();

@@ -28,7 +28,26 @@ namespace planning {
 namespace scenario {
 namespace valet_parking {
 
-DECLARE_STAGE(StageParking, ValetParkingContext);
+class StageParking : public Stage {
+ public:
+  explicit StageParking(
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
+
+ private:
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
+
+  ValetParkingContext* GetContext() {
+    return GetContextAs<ValetParkingContext>();
+  }
+
+ private:
+  Stage::StageStatus FinishStage();
+
+ private:
+  ScenarioValetParkingConfig scenario_config_;
+};
 
 }  // namespace valet_parking
 }  // namespace scenario
