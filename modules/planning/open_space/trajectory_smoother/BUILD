@@ -13,9 +13,9 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        "dual_variable_warm_start_ipopt_interface",
-        "dual_variable_warm_start_ipopt_qp_interface",
-        "dual_variable_warm_start_osqp_interface",
+        ":dual_variable_warm_start_ipopt_interface",
+        ":dual_variable_warm_start_ipopt_qp_interface",
+        ":dual_variable_warm_start_osqp_interface",
     ],
 )
 
@@ -97,8 +97,8 @@ cc_library(
         "-fopenmp",
     ],
     deps = [
-        "distance_approach_ipopt_interface",
-        "distance_approach_ipopt_cuda_interface",
+        ":distance_approach_ipopt_interface",
+        ":distance_approach_ipopt_cuda_interface",
         "//cyber/common:log",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
@@ -113,6 +113,7 @@ cc_library(
     ],
     hdrs = [
         "distance_approach_ipopt_interface.h",
+        "distance_approach_interface.h"
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
@@ -146,6 +147,7 @@ cc_library(
     }),
     hdrs = [
         "distance_approach_ipopt_cuda_interface.h",
+        "distance_approach_interface.h"
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
