@@ -118,13 +118,13 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     torch_inputs.push_back(torch_input.to(device));
     std::shared_ptr<torch::jit::script::Module> torch_module =
         torch::jit::load(FLAGS_torch_vehicle_cruise_cutin_file, device);
-    at::Tensor torch_output_tensor =
-        torch_module->forward(torch_inputs).toTensor();
-    auto torch_output = torch_output_tensor.accessor<float, 2>();
-    double probability = static_cast<double>(torch_output[0][0]);
-    double finish_time = static_cast<double>(torch_output[0][1]);
-    lane_sequence_ptr->set_probability(probability);
-    lane_sequence_ptr->set_time_to_lane_center(finish_time);
+    auto torch_output_tuple = torch_module->forward(torch_inputs).toTuple();
+    auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
+    auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
+    lane_sequence_ptr->set_probability(
+        static_cast<double>(probability_tensor.accessor<float, 2>()[0][0]));
+    lane_sequence_ptr->set_time_to_lane_center(
+        static_cast<double>(finish_time_tensor.accessor<float, 2>()[0][0]));
   }
 }
 
