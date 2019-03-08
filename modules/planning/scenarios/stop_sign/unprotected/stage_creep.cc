@@ -67,6 +67,13 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
     return FinishScenario();
   }
 
+  // set right_of_way_status
+  const double stop_sign_start_s =
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
+  reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
+
+  const double stop_sign_end_s =
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
   const double wait_time =
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout = scenario_config_.creep_timeout();
@@ -74,7 +81,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   if (task &&
       task->CheckCreepDone(
           *frame, reference_line_info,
-          PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s,
+          stop_sign_end_s,
           wait_time, timeout)) {
     return FinishStage();
   }
@@ -82,8 +89,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   // set param for PROCEED_WITH_CAUTION_SPEED
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
       ->SetProceedWithCautionSpeedParam(
-          *frame, reference_line_info,
-          PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s);
+          *frame, reference_line_info, stop_sign_end_s);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {

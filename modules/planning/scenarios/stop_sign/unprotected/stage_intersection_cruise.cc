@@ -44,6 +44,11 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
+  // set right_of_way_status
+  const double stop_sign_start_s =
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
+  reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
+
   // check pass pnc_junction
   // TODO(all): remove when pnc_junction completely available on map
   const auto& pnc_junction_overlaps =
