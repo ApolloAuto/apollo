@@ -14,10 +14,10 @@
 | **粗体**                            | 重点强调                                 |
 | `等宽字体`                   | 代码，类型数据                         |
 | _斜体_                            | 文件，部分和标题的标题使用的术语 |
-| ![info](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果。 |
-| ![tip](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于完成任务的快捷方式。 |
-| ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息。 |
-| ![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) | **Warning**. 包含**不能忽略**的信息，否则执行某个任务或步骤时，您将面临风险。 |
+| ![info](images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果。 |
+| ![tip](images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于完成任务的快捷方式。 |
+| ![online](images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息。 |
+| ![warning](images/warning_icon.png) | **Warning**. 包含**不能忽略**的信息，否则执行某个任务或步骤时，您将面临风险。 |
 
 ## 引言
 阿波罗计划是为汽车和自主驾驶行业的合作伙伴提供开放，完整和可靠的软件平台。该项目的目的是使合作伙伴能够基于Apollo软件堆栈开发自己的自动驾驶系统。
@@ -72,20 +72,20 @@ IPC配置如下：
 #### IPC前后视图
 
 Nuvo-6108GC前视图：
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-front-side.jpg" width="90%">
+<img src="images/IPC-6108GC-front-side.jpg" width="90%">
 
 Nuvo-6108GC后视图：
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-left-side.jpg" width="90%">
+<img src="images/IPC-6108GC-left-side.jpg" width="90%">
 
- ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)中文介绍：http://www.neousys-tech.com/cn/product/application/rugged-embedded/nuvo-6108gc-gpu-computing
+ ![online](images/online_icon.png)中文介绍：http://www.neousys-tech.com/cn/product/application/rugged-embedded/nuvo-6108gc-gpu-computing
 
 Neousys Nuvo-6108GC 手册：还不可用。
 
 #### CAN 卡
 IPC中使用的CAN卡型号为ESD CAN-PCIe/402。
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/can_card.png" width="50%">
+<img src="images/can_card.png" width="50%">
 
- ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)产品主页：https://esd.eu/en/products/can-pcie402
+ ![online](images/online_icon.png)产品主页：https://esd.eu/en/products/can-pcie402
 
 #### GPS与IMU
 
@@ -95,9 +95,9 @@ IPC中使用的CAN卡型号为ESD CAN-PCIe/402。
 
 ##### NovAtel SPAN-IGM-A1
 NovAtel SPAN-IGM-A1是一个集成的，单盒的解决方案，提供紧密耦合的全球导航卫星系统（GNSS）定位和具有NovAtel OEM615接收机的惯性导航功能。
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Novatel_imu.png" width="60%">
+<img src="images/Novatel_imu.png" width="60%">
 
- ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) 产品主页：
+ ![online](images/online_icon.png) 产品主页：
 https://www.novatel.com/products/span-gnss-inertial-systems/span-combined-systems/span-igm-a1/
 
 ##### NovAtel SPAN ProPak6 and NovAtel IMU-IGM-A1
@@ -106,13 +106,13 @@ NovAtel ProPak6是独立的GNSS接收机，它与NovAtel提供的独立IMU（本
 ProPak6提供由NovAtel生产的最新最先进的外壳产品。
 
 IMU-IGM-A1是与支持SPAN的GNSS接收器（如SPAN ProPak6）配对的IMU。
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Novatel_pp6.png" width="60%">
+<img src="images/Novatel_pp6.png" width="60%">
 
-![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) NovAtel ProPak6 安装与操作手册:
+![online](images/online_icon.png) NovAtel ProPak6 安装与操作手册:
 
 https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf
 
-![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)onlineNovAtel IMU-IGM-A1 产品主页:
+![online](images/online_icon.png)onlineNovAtel IMU-IGM-A1 产品主页:
 
 https://www.novatel.com/products/span-gnss-inertial-systems/span-imus/span-mems-imus/imu-igm-a1/#overview
 
@@ -121,15 +121,15 @@ https://www.novatel.com/products/span-gnss-inertial-systems/span-imus/span-mems-
 GPS-IMU组件的GPS接收器、天线使用的是NovAtel GPS-703-GGG-HV。
 
 **注意**：GPS NovAtelGPS-703-GGG-HV与上文中提到的两个GPS-IMU选项的任一型号配合使用。
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/gps_receiver.png" width="60%">
+<img src="images/gps_receiver.png" width="60%">
 
-![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) NovAtel GPS-703-GGG-HV 产品主页:
+![online](images/online_icon.png) NovAtel GPS-703-GGG-HV 产品主页:
 
 https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gps-703-ggg-hv/
 
 #### 激光雷达
 使用来自Velodyne激光雷达公司的64线激光雷达系统HDL-64E S3。
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/lidar_pic.png" width="90%">
+<img src="images/lidar_pic.png" width="90%">
 
 主要特点:
 - 64 Channels
@@ -143,7 +143,7 @@ https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gp
 - User selectable frame rate
 - Rugged Design
 
-![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) Velodyne HDL-64E S3介绍: http://velodynelidar.com/hdl-64e.html
+![online](images/online_icon.png) Velodyne HDL-64E S3介绍: http://velodynelidar.com/hdl-64e.html
 
 ## 安装任务概览
 
@@ -196,41 +196,41 @@ https://www.novatel.com/products/gnss-antennas/high-performance-gnss-antennas/gp
 
 a. 找到并拧下计算机侧面的八个螺丝（棕色方块所示或棕色箭头指示）:
 
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-Screw-Positions_labeled.png" width="99%">
+<img src="images/IPC-6108GC-Screw-Positions_labeled.png" width="99%">
 
 b. 从IPC上拆下盖子。基座有3个PCI插槽（由显卡占据一个）：
 
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Removing_the_cover.jpg" width="99%">
+<img src="images/Removing_the_cover.jpg" width="99%">
 
-![Before installing the CAN card](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Before_installing_the_can_card.png)
+![Before installing the CAN card](images/Before_installing_the_can_card.png)
 
 c. 通过从其默认位置移除红色跳线帽（以黄色圆圈显示）并将其放置在其终止位置，设置CAN卡端接跳线：
 
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/prepare_can_card.png" width="99%">
+<img src="images/prepare_can_card.png" width="99%">
 
-**![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)WARNING**: 如果端接跳线设置不正确，CAN卡将无法正常工作。
+**![warning](images/warning_icon.png)WARNING**: 如果端接跳线设置不正确，CAN卡将无法正常工作。
 
 d. 将CAN卡插入IPC的插槽:
 
-![installed CAN](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/After_installing_the_CAN_Card.png)
+![installed CAN](images/After_installing_the_CAN_Card.png)
 
 e. 安装IPC盖子：
 
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-Screw-Positions.png" width="99%">
+<img src="images/IPC-6108GC-Screw-Positions.png" width="99%">
 
 2. 准备给IPC加电:
 
    a. 将电源线连接到IPC:
 
-   ![warning_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)**注意**: 确保电源电缆的正极（红色标记为**R**）和负极（黑色标记为** B **）导线插入电源端子块上的正确孔中。
+   ![warning_icon](images/warning_icon.png)**注意**: 确保电源电缆的正极（红色标记为**R**）和负极（黑色标记为** B **）导线插入电源端子块上的正确孔中。
 
-3. ![ipc_power_RB](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/ipc_power_RB.png)
+3. ![ipc_power_RB](images/ipc_power_RB.png)
 
    b. 将显示器，网线，键盘和鼠标连接到IPC:
 
-4. ![IPC-6108GC-CableConnected-overexposed.png](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-CableConnected-overexposed.png)
+4. ![IPC-6108GC-CableConnected-overexposed.png](images/IPC-6108GC-CableConnected-overexposed.png)
 
-![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)
+![warning](images/tip_icon.png)
 如果将一个或多个插件卡添加到系统中，建议通过BIOS设置来配置风扇速度
 
 ```
@@ -240,14 +240,14 @@ e. 安装IPC盖子：
     - 设置 [Fan Start Trip Temp] 为 20
 ```
 
-![tip_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)建议在显卡的图形卡上使用DVI连接器。 要将显示设置为主板上的DVI端口，请执行以下设置步骤：
+![tip_icon](images/tip_icon.png)建议在显卡的图形卡上使用DVI连接器。 要将显示设置为主板上的DVI端口，请执行以下设置步骤：
 
 ```
     - 开机按 F2 进入 BIOS 设置菜单
     - 依次选择 [Advanced]=>[System Agent (SA) Configuration]=>[Graphics Configuration]=>[Primary Display]=> 设置为 "PEG"
 ```
 
-![tip_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)建议将IPC配置为始终以最高性能模式运行:
+![tip_icon](images/tip_icon.png)建议将IPC配置为始终以最高性能模式运行:
 ```
      - 开机按 F2 进入 BIOS 设置菜单
      - 选择 [Power] => [SKU POWER CONFIG] => 设置为 "MAX. TDP"
@@ -255,7 +255,7 @@ e. 安装IPC盖子：
 
 c. 连接电源: 
 
-![IPC-6108GC-PowerCable.jpg](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-6108GC-PowerCable.jpg)
+![IPC-6108GC-PowerCable.jpg](images/IPC-6108GC-PowerCable.jpg)
 
 #### 为IPC安装软件
 这部分主要描述以下的安装步骤：
@@ -263,7 +263,7 @@ c. 连接电源:
 - Apollo 内核
 - Nvidia GPU 驱动
 
-![tip_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)假设您有使用Linux的经验来成功执行软件安装。
+![tip_icon](images/tip_icon.png)假设您有使用Linux的经验来成功执行软件安装。
 
 ##### 安装Ubuntu Linux
 步骤如下：
@@ -271,10 +271,10 @@ c. 连接电源:
 
 >推荐使用Ubuntu 14.04.3
 
-![tip_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)开机按 F2 进入 BIOS 设置菜单，建议禁用BIOS中的快速启动和静默启动，以便捕捉引导启动过程中的问题。
+![tip_icon](images/tip_icon.png)开机按 F2 进入 BIOS 设置菜单，建议禁用BIOS中的快速启动和静默启动，以便捕捉引导启动过程中的问题。
 
 获取更多Ubuntu信息，可访问:
-![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png) Ubuntu 桌面站点:
+![online_icon](images/online_icon.png) Ubuntu 桌面站点:
 
 [https://www.ubuntu.com/desktop](https://www.ubuntu.com/desktop)
 
@@ -295,7 +295,7 @@ c. 连接电源:
 ```shell
 sudo apt-get install linux-generic-lts-xenial
 ```
-![tip_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)IPC必须接入网络以便更新与安装软件，所以请确认网线插入并连接，如果连接网络没有使用动态分配（DHCP），需要更改网络配置。
+![tip_icon](images/tip_icon.png)IPC必须接入网络以便更新与安装软件，所以请确认网线插入并连接，如果连接网络没有使用动态分配（DHCP），需要更改网络配置。
 
 #### 安装Apollo内核
 车上运行Apollo需要[Apollo 内核](https://github.com/ApolloAuto/apollo-kernel)。强烈建议安装预编译内核。
@@ -381,10 +381,10 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 以下两图显示车辆上应安装三个主要组件（GPS天线，IPC，GPS接收机和LiDAR）的位置：
 示例图：
 
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Car_Sideview.png" width="99%">
+<img src="images/Car_Sideview.png" width="99%">
 车辆与后备箱侧视图
 
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Car_Rearview.png" width="99%">
+<img src="images/Car_Rearview.png" width="99%">
 车辆与后备箱后视图
 
 #### 安装GPS接收器与天线
@@ -411,13 +411,13 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
      - 将其串行端口连接到IPC。如果电源来自车载电池，请添加辅助电池（推荐）。
 
 
-![imu_main_cable_connection](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/imu_main_cable_connection.png)
+![imu_main_cable_connection](images/imu_main_cable_connection.png)
 
 主电缆连接
 
 更多信息参见 *SPAN-IGM™ 快速入门指南*, 第三页, 详细图:
 
-![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)SPAN-IGM™ 快速入门指南
+![online_icon](images/online_icon.png)SPAN-IGM™ 快速入门指南
 
 [http://www.novatel.com/assets/Documents/Manuals/GM-14915114.pdf](http://www.novatel.com/assets/Documents/Manuals/GM-14915114.pdf)
 
@@ -430,7 +430,7 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 
 更多有关SPAN-IGM-A1的信息参见:
 
-![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)SPAN-IGM™ 用户手册:
+![online_icon](images/online_icon.png)SPAN-IGM™ 用户手册:
 
 [http://www.novatel.com/assets/Documents/Manuals/OM-20000141.pdf](http://www.novatel.com/assets/Documents/Manuals/OM-20000141.pdf)
 
@@ -457,7 +457,7 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 - 将ProPak6和IMU并排固定在行李箱内，Y轴指向前方。
 - 将NovAtel GPS-703-GGG-HV天线安装在车辆顶部或行李箱盖顶部，如图所示：
 
-![gps_receiver_on_car](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/gps_receiver_on_car.png)
+![gps_receiver_on_car](images/gps_receiver_on_car.png)
 
 - 使用磁性适配器将天线紧固到行李箱盖上。
 - 通过打开主干并将电缆放置在行李箱盖和车身之间的空间中，将天线电缆安装在主干箱中。
@@ -472,11 +472,11 @@ b. 使用从ESD Electronics获取到得的ESD CAN软件包的一部分的测试�
 4.将GNSS天线连接到Propak6。
 5.连接Propak6电源线。
 
-![wiring](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/wiring.png)
+![wiring](images/wiring.png)
 
 更多有关 NovAtel SPAN ProPak6的信息, 参见:
 
-![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel ProPak6 安装操作手册:
+![online_icon](images/online_icon.png)NovAtel ProPak6 安装操作手册:
 
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
@@ -497,19 +497,19 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 
 每个HDL-64E S3 LiDAR包括一个将LiDAR连接到电源的电缆组件，计算机（用于数据传输的以太网和用于LiDAR配置的串行端口）和GPS时间同步源。
 
-![LiDAR_Cable](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_Cable_whitened_labeled.png)
+![LiDAR_Cable](images/HDL64_Cable_whitened_labeled.png)
 
 1. 连接到LiDAR
 
   将电源和信号电缆连接到LiDAR上的匹配端口
 
-   ![HDL64_Cabling](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_Cabling.jpg)
+   ![HDL64_Cabling](images/HDL64_Cabling.jpg)
 
 2. 连接到电源
 
    两根AWG 16线为HDL-64E S3提供所需电力。 所需电压/电流：12V/3A。 要连接电源，请与电线完全接触并拧紧螺丝。
 
-   ![HDL64_Power_Cable](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/HDL64_PowerCable.jpg)
+   ![HDL64_Power_Cable](images/HDL64_PowerCable.jpg)
 
 3. 连接到IPC
 
@@ -525,7 +525,7 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 
     如果您配置了[配置GPS和IMU]（＃configuration-the-gps-and-imu）中指定的SPAN-IGM-A1，GPRMC信号将通过用户端口电缆从主端口从GPS接收器发送。 PPS信号通过Aux端口上标有“PPS”和“PPS dgnd”的电缆发送。 下图中的虚线框是HDL64E S3 LiDAR和SPAN-IGM-A1 GPS接收机附带的可用连接。 剩余的连接需要由用户进行。
 
-   ![Wiring_Schematics_IGM_A1](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/LiDAR_A1_wiring.png)
+   ![Wiring_Schematics_IGM_A1](images/LiDAR_A1_wiring.png)
 
    b. Propak 6 和 IMU-IGM-A1
 
@@ -533,13 +533,13 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
      
     下图中的虚线框是HDL-64E S3 LiDAR和Propak 6 GPS接收机附带的可用连接。 剩余的连接需要由用户进行。
 
-   ![Wiring_Schematics_PP6](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/LiDAR_PP6_wiring.png)
+   ![Wiring_Schematics_PP6](images/LiDAR_PP6_wiring.png)
 
 5. 通过串口连接进行LiDAR配置
 一些低级的参数可以通过串口进行配置。
 在Velodyne提供的电缆束内，有两对红色/黑色电缆，如下表所示。 较厚的一对（AWG 16）用于为LiDAR系统供电。 较薄的一对用于串行连接。 将黑线（串行输入）连接到RX，将红线连接到串行电缆的地线。 将串行电缆与USB串行适配器连接至所选择的计算机。
 
-![pinout_table](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/pinout_table.png)
+![pinout_table](images/pinout_table.png)
 
 #### 配置
 默认情况下，HDL-64E S3的网络IP地址设置为192.168.0.1。 但是，当我们配置Apollo时，我们应该将网络IP地址改为192.168.20.13。 可以使用终端应用程序Terminalite 3.2，进入网络设置命令。可以按照以下步骤配置HDL-64E S3的IP地址：
@@ -555,7 +555,7 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
       [http://www.compuphase.com/software_termite.htm](http://www.compuphase.com/software_termite.htm)
 
    5. HDL-64E S3和笔记本电脑之间的COM端口连接
-      ![Serial cable connected to laptop.png](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Serial_cable_connected_to_laptop.png)
+      ![Serial cable connected to laptop.png](images/Serial_cable_connected_to_laptop.png)
 
    6. 在笔记本运行 **Termite 3.2**
 
@@ -563,9 +563,9 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 
    8. 本机必须重新上电才能采用新的IP地址
 
-      ![Issuing the serial command](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Issuing_the_serial_command.png)
+      ![Issuing the serial command](images/Issuing_the_serial_command.png)
 
-      ![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)HDL-64E S3 手册可见:
+      ![online_icon](images/online_icon.png)HDL-64E S3 手册可见:
 
       [http://velodynelidar.com/hdl-64e.html](http://velodynelidar.com/hdl-64e.html)
 
@@ -575,26 +575,26 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 
 1. 使用电压转换器/调节器，将车辆的12 VDC输出转换为所需的电压。根据Neousys的建议，使用12 VDC至19 VDC转换器，最大输出电流为20 A.
 
-     ![voltage_regulater_converter](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/voltage_converter2.jpg)
+     ![voltage_regulater_converter](images/voltage_converter2.jpg)
 
      首先，将两条19 VDC输出线连接到IPC的电源连接器（绿色如下图所示）。
 
-     ![ipc_power_RB](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/ipc_power_RB.png)
+     ![ipc_power_RB](images/ipc_power_RB.png)
 
      其次，将12 VDC输入的两条电缆连接到车辆的电源面板。 如果导线的尺寸太厚，则电线应分开成几根线，并分别连接到相应的端口。
 
-     ![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png)这一步非常有必要。 如果输入电压低于所需极限。 很可能导致系统故障。
+     ![warning](images/warning_icon.png)这一步非常有必要。 如果输入电压低于所需极限。 很可能导致系统故障。
 
 
 2.   将板载计算机系统6108GC放在主干箱内（推荐）。
 
-      例如，阿波罗1.5使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/Mount_ipc_on_carpet.jpg)
+      例如，阿波罗1.5使用4x4螺钉将6108GC螺栓固定在后备箱的箱板上。 ![IPC-bolt_down-936x720](images/Mount_ipc_on_carpet.jpg)
 
 3. 安装IPC，使其前后两侧（所有端口位于）面对右侧（乘客）或左侧（驱动器）的主干。
 这种定位使得连接所有电缆更容易。
 有关更多信息，请参见：
 
-![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)Neousys Nuvo-6108GC – 手册:
+![online_icon](images/online_icon.png)Neousys Nuvo-6108GC – 手册:
 
 **[链接暂不可用]**
 
@@ -606,11 +606,11 @@ LiDAR所需的实际高度取决于车辆的设计和LiDAR相对于车辆的安�
 a. 将电源线连接到工控机（如图所示）：
 b. 将电源线的另一端连接到车辆电池（如图所示）：
 
-![IPC-power-cable](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/IPC-power-cable.jpg)
+![IPC-power-cable](images/IPC-power-cable.jpg)
 
 c. 连接DB9电缆工控机和可（如图所示）：
 
-![DB9_cable](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/DB9_cable.png)
+![DB9_cable](images/DB9_cable.png)
 
 d. 连接:
 
@@ -618,7 +618,7 @@ d. 连接:
 - 全球定位系统接收机
 -（可选）监视器：
 
-![IPC-power-842x636](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/cable_connected_incar.jpg)
+![IPC-power-842x636](images/cable_connected_incar.jpg)
 
 
 #### 杠杆臂测量
@@ -629,7 +629,7 @@ d. 连接:
 2. 当IMU和GPS天线就位时，必须测量从IMU到GPS天线的距离。距离测量应为：X偏移，yoffset，和Z偏移。偏移误差必须在一厘米以内，以达到定位和定位的高精度。
 更多信息，参见：
 
-![online_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)NovAtel ProPak6 安装与操作手册:
+![online_icon](images/online_icon.png)NovAtel ProPak6 安装与操作手册:
 
 [https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf](https://www.novatel.com/assets/Documents/Manuals/OM-20000148.pdf)
 
@@ -689,7 +689,7 @@ psrdiffsource auto any
 SAVECONFIG
 ```
 
-**![warning_icon](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) WARNING:基于真实的测量值（GPS天线、IMU的偏移量）** 修改 **<u>SETIMUTOANTOFFSE</u>T** 行。
+**![warning_icon](images/warning_icon.png) WARNING:基于真实的测量值（GPS天线、IMU的偏移量）** 修改 **<u>SETIMUTOANTOFFSE</u>T** 行。
 
 示例:
 
@@ -704,7 +704,7 @@ SETIMUTOANTOFFSET -0.05 0.5 0.8 0.05 0.05 0.08
 
 #### 推荐配置
 建议您根据下图设置网络：
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/4G-LTE-setup-6108GC.png" width="99%">
+<img src="images/4G-LTE-setup-6108GC.png" width="99%">
 
 步骤如下：
 - 安装并配置4G网络，
