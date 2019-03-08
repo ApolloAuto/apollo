@@ -31,8 +31,13 @@
         padding-left: 5px;
 
         line-height: 150%;
-        font-size: 12px;
+        font-size: 14px;
         word-wrap: break-word;
+        white-space: pre-wrap;
+
+        @include small-screen {
+            font-size: 12px;
+        }
     }
 
     .time {
@@ -287,14 +292,16 @@ body {
             }
         }
 
-        .pnc-monitor {
+        .monitor {
             height: 100%;
             border: 1px solid #000000;
             box-sizing: border-box;
         
             background-color: #1D2226;
             overflow: auto;
-        
+        }
+
+        .pnc-monitor {
             .scatter-graph {
                 margin: 0px;
                 border: 1px #000000;
@@ -337,6 +344,40 @@ body {
                             text-align: center;
                         }
                     }
+                }
+            }
+        }
+
+        .data-collection-monitor {
+            .no-data {
+                padding: 20px;
+                color: #B43131;
+            }
+
+            .category {
+                position: relative;
+                height: 30px;
+                margin: 10px;
+                border: 1px solid #999999;
+
+                background-color: rgba(0, 0, 0, 0.5);
+                text-align: left;
+                line-height: 30px;
+
+                .category-progress {
+                    position: absolute;
+                    height: 100%;
+                    background: linear-gradient(to right, #2D3B50 0%, #006AFF 100%);;
+                }
+
+                .category-description {
+                    position: absolute;
+                    left: 10px;
+                }
+
+                .category-percentage {
+                    position: absolute;
+                    right: 10px;
                 }
             }
         }
@@ -492,6 +533,7 @@ body {
 
         li {
             line-height: 40px;
+            white-space: nowrap;
 
             span {
                 margin-left: 15px;
@@ -642,7 +684,7 @@ body {
         overflow: hidden;
 
         .monitor-item {
-            @include monitor-item-common-properties(calc(100% - 80px));
+            @include monitor-item-common-properties(calc(100% - 82px));
         }
     }
 
@@ -1076,12 +1118,10 @@ body {
     }
 
     .others {
-        min-width: 200px;
-        max-width: 280px;
+        min-width: 245px;
 
         @include small-screen {
-            min-width: 180px;
-            max-width: 260px;
+            min-width: 225px;
         }
 
         .others-checkbox {
@@ -1090,8 +1130,12 @@ body {
     }
 
     .delay {
-        min-width: 265px;
+        min-width: 240px;
         line-height: 26px;
+
+        @include small-screen {
+            min-width: 230px;
+        }
 
         .delay-item {
             position: relative;
