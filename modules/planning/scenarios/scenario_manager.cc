@@ -445,11 +445,9 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     bool traffic_light_found = (traffic_light_overlap != nullptr);
     if (stop_sign_overlap && traffic_light_overlap) {
       stop_sign_found =
-          stop_sign_overlap->start_s < traffic_light_overlap->start_s ? true
-                                                                      : false;
+          stop_sign_overlap->start_s < traffic_light_overlap->start_s;
       traffic_light_found =
-          stop_sign_overlap->start_s < traffic_light_overlap->start_s ? false
-                                                                      : true;
+          stop_sign_overlap->start_s > traffic_light_overlap->start_s;
     }
 
     if (stop_sign_found) {
@@ -477,6 +475,17 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // SIDE_PASS scenario
   if (scenario_type == default_scenario_type_) {
     scenario_type = SelectSidePassScenario(frame);
+  }
+
+  ////////////////////////////////////////
+  // VALET_PARKING scenario
+  if (scenario_type == default_scenario_type_) {
+    scenario_type = SelectValetParkingScenario(frame);
+  }
+
+  // Check if it is supported by confs
+  if (supported_scenarios_.find(scenario_type) == supported_scenarios_.end()) {
+    scenario_type == default_scenario_type_;
   }
 
   ADEBUG << "select scenario: "
