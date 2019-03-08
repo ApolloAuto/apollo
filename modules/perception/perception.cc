@@ -58,8 +58,11 @@ Status Perception::Init() {
            << FLAGS_dag_config_path;
     return Status(ErrorCode::PERCEPTION_ERROR, "failed to Init DAGStreaming.");
   }
+#ifdef __x86_64__
   callback_thread_num_ = 5;
-
+#else
+  callback_thread_num_ = 1;
+#endif
   return Status::OK();
 }
 

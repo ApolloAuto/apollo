@@ -33,6 +33,7 @@
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/imu.pb.h"
+#include "modules/drivers/gnss/proto/heading.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/msf/local_integ/localization_lidar.h"
@@ -74,6 +75,8 @@ class LocalizationInteg {
   void RawEphemerisProcess(const drivers::gnss::GnssEphemeris& gnss_orbit_msg);
   // gnss best pose process
   void GnssBestPoseProcess(const drivers::gnss::GnssBestPose& bestgnsspos_msg);
+
+  void GnssHeadingProcess(const drivers::gnss::Heading &gnssheading_msg);
 
   void GetLastestLidarLocalization(LocalizationMeasureState *state,
                                    LocalizationEstimate *lidar_localization);

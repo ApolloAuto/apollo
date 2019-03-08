@@ -15,6 +15,20 @@
  *****************************************************************************/
 
 #include "modules/perception/obstacle/onboard/camera_process_subnode.h"
+#include <opencv2/core/version.hpp>
+#if (CV_MAJOR_VERSION == 2)
+#include <opencv2/opencv.hpp>
+#ifdef HAVE_OPENCV_GPU
+#include <opencv2/gpu/gpu.hpp>
+#include <opencv2/core/gpumat.hpp>
+#endif
+#else
+#include <opencv2/core.hpp>
+#include <opencv2/cudaimgproc.hpp>
+#include <opencv2/cudawarping.hpp>
+#include <opencv2/cudaarithm.hpp>
+#include <opencv2/cudafilters.hpp>
+#endif
 #include "eigen_conversions/eigen_msg.h"
 #include "modules/perception/common/perception_gflags.h"
 #include "modules/perception/onboard/transform_input.h"
@@ -30,6 +44,24 @@ bool CameraProcessSubnode::InitInternal() {
   // Subnode config in DAG streaming
   std::unordered_map<std::string, std::string> fields;
   SubnodeHelper::ParseReserveField(reserve_, &fields);
+
+#if (CV_MAJOR_VERSION == 2)
+#ifdef HAVE_OPENCV_GPU
+  FLAGS_enable_opencv_gpu = cv::gpu::getCudaEnabledDeviceCount;
+  if (FLAGS_enable_opencv_gpu) {
+    cv::Mat cmat = cv::Mat::zeros(cv::Size(1920, 1080), CV_16UC1);
+    cv::gpu::GpuMat gmat(cmat);
+  }
+#else
+  FLAGS_enable_opencv_gpu = 0;
+#endif
+#else
+  FLAGS_enable_opencv_gpu = cv::cuda::getCudaEnabledDeviceCount
+  if (FLAGS_enable_opencv_gpu) {
+    cv::Mat cmat = cv::Mat::zeros(cv::Size(1920, 1080), CV_16UC1);
+    cv::cuda::GpuMat gmat(cmat);
+  }
+#endif
 
   if (fields.count("device_id")) {
     device_id_ = fields["device_id"];
@@ -129,7 +161,23 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
     img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
   }
 
-  cv::resize(img, img, cv::Size(1920, 1080), 0, 0);
+  if ( FLAGS_enable_opencv_gpu < 1 ) {
+    cv::resize(img, img, cv::Size(1920, 1080), 0, 0);
+  } else {
+#if (CV_MAJOR_VERSION == 2)
+#ifdef HAVE_OPENCV_GPU
+    cv::gpu::GpuMat matsrc, matdst;
+    matsrc.upload(img);
+    cv::gpu::resize(matsrc, matdst, cv::Size(1920, 1080));
+    matdst.download(img);
+#endif
+#else
+    cv::cuda::GpuMat matsrc, matdst;
+    matsrc.upload(img);
+    cv::cuda::resize(matsrc, matdst, cv::Size(1920, 1080));
+    matdst.download(img);
+#endif
+  }
   std::vector<std::shared_ptr<VisualObject>> objects;
   cv::Mat mask;
 
