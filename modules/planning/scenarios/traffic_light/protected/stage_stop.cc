@@ -58,6 +58,10 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
       continue;
     }
 
+    // set right_of_way_status
+    reference_line_info.SetJunctionRightOfWay(
+        traffic_light_overlap.start_s, false);
+
     const double adc_front_edge_s =
         reference_line_info.AdcSlBoundary().end_s();
     const double distance_adc_to_stop_line = traffic_light_overlap.start_s -
