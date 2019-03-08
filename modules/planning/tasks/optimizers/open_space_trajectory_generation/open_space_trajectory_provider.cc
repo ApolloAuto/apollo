@@ -219,7 +219,7 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
                                 .open_space_trajectory_optimizer_config()
                                 .is_near_destination_threshold()) {
     ADEBUG << "vehicle reach end_pose";
-    *(frame_->mutable_open_space_info()->mutable_destination_reached()) = true;
+    frame_->mutable_open_space_info()->set_destination_reached(true);
     return true;
   }
   return false;
@@ -278,8 +278,7 @@ void OpenSpaceTrajectoryProvider::LoadResult(
   trajectory_data->PrependTrajectoryPoints(
       frame_->open_space_info().stitching_trajectory_data());
 
-  *(frame_->mutable_open_space_info()->mutable_open_space_provider_success()) =
-      true;
+  frame_->mutable_open_space_info()->set_open_space_provider_success(true);
 }
 
 void OpenSpaceTrajectoryProvider::ReuseLastFrameResult(

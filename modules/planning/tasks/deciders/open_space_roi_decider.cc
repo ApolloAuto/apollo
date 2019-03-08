@@ -99,13 +99,12 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
         parking_boundaries_obstacles_edges_num;
     // load vertices for perception obstacles(repeat the first vertice at the
     // last to form closed convex hull)
+    const auto &origin_point = frame_->open_space_info().origin_point();
+    const auto &origin_heading = frame_->open_space_info().origin_heading();
     for (const auto &obstacle : obstacles_by_frame_->Items()) {
       Box2d original_box = obstacle->PerceptionBoundingBox();
-      original_box.Shift(
-          -1.0 * *(frame_->mutable_open_space_info()->mutable_origin_point()));
-      original_box.RotateFromCenter(
-          -1.0 *
-          *(frame_->mutable_open_space_info()->mutable_origin_heading()));
+      original_box.Shift(-1.0 * origin_point);
+      original_box.RotateFromCenter(-1.0 * origin_heading);
       std::vector<Vec2d> vertices_ccw = original_box.GetAllCorners();
       std::vector<Vec2d> vertices_cw;
       while (!vertices_ccw.empty()) {
@@ -301,8 +300,8 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
 
   // rotate the points to have the lane to be horizontal to x axis and scale
   // them base on the origin point
-  *(frame_->mutable_open_space_info()->mutable_origin_heading()) =
-      nearby_path->GetSmoothPoint(center_line_s).heading();
+  frame_->mutable_open_space_info()->set_origin_heading(
+      nearby_path->GetSmoothPoint(center_line_s).heading());
   frame_->mutable_open_space_info()->mutable_origin_point()->set_x(
       left_top.x());
   frame_->mutable_open_space_info()->mutable_origin_point()->set_y(

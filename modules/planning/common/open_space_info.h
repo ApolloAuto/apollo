@@ -63,12 +63,12 @@ class OpenSpaceInfo {
   OpenSpaceInfo();
   ~OpenSpaceInfo() = default;
 
-  const bool open_space_pre_stop_finished() const {
+  bool open_space_pre_stop_finished() const {
     return open_space_pre_stop_finished_;
   }
 
-  bool *mutable_open_space_pre_stop_finished() {
-    return &open_space_pre_stop_finished_;
+  void set_open_space_pre_stop_finished(const bool flag) {
+    open_space_pre_stop_finished_ = flag;
   }
 
   const std::string target_parking_spot_id() const {
@@ -87,25 +87,25 @@ class OpenSpaceInfo {
     return &target_parking_spot_;
   }
 
-  const double open_space_pre_stop_fence_s() const {
+  double open_space_pre_stop_fence_s() const {
     return open_space_pre_stop_fence_s_;
   }
 
-  double *mutable_open_space_pre_stop_fence_s() {
-    return &open_space_pre_stop_fence_s_;
+  void set_open_space_pre_stop_fence_s(const double s) {
+    open_space_pre_stop_fence_s_ = s;
   }
 
-  const bool is_on_open_space_trajectory() const {
+  bool is_on_open_space_trajectory() const {
     return is_on_open_space_trajectory_;
   }
 
-  bool *is_on_open_space_trajectory() { return &is_on_open_space_trajectory_; }
+  void set_is_on_open_space_trajectory(const bool flag) {
+    is_on_open_space_trajectory_ = flag;
+  }
 
   const size_t obstacles_num() const { return obstacles_num_; }
 
-  size_t *mutable_obstacles_num() { return &obstacles_num_; }
-
-  void set_obstacles_num(size_t obstacles_num) {
+  void set_obstacles_num(const size_t obstacles_num) {
     obstacles_num_ = obstacles_num;
   }
 
@@ -135,9 +135,11 @@ class OpenSpaceInfo {
 
   Eigen::MatrixXd *mutable_obstacles_b() { return &obstacles_b_; }
 
-  const double origin_heading() const { return origin_heading_; }
+  double origin_heading() const { return origin_heading_; }
 
-  double *mutable_origin_heading() { return &origin_heading_; }
+  void set_origin_heading(const double original_heading) {
+    origin_heading_ = original_heading;
+  }
 
   const common::math::Vec2d &origin_point() const { return origin_point_; }
 
@@ -182,17 +184,17 @@ class OpenSpaceInfo {
     return &stitched_trajectory_result_;
   }
 
-  const bool &open_space_provider_success() const {
+  bool open_space_provider_success() const {
     return open_space_provider_success_;
   }
 
-  bool *mutable_open_space_provider_success() {
-    return &open_space_provider_success_;
+  void set_open_space_provider_success(const bool flag) {
+    open_space_provider_success_ = flag;
   }
 
-  const bool &destination_reached() const { return destination_reached_; }
+  bool destination_reached() const { return destination_reached_; }
 
-  bool *mutable_destination_reached() { return &destination_reached_; }
+  void set_destination_reached(const bool flag) { destination_reached_ = flag; }
 
   const DiscretizedTrajectory &interpolated_trajectory_result() const {
     return interpolated_trajectory_result_;
@@ -226,9 +228,9 @@ class OpenSpaceInfo {
     return &chosen_paritioned_trajectory_;
   }
 
-  const bool &fallback_flag() const { return fallback_flag_; }
+  bool fallback_flag() const { return fallback_flag_; }
 
-  void set_fallback_flag(bool flag) { fallback_flag_ = flag; }
+  void set_fallback_flag(const bool flag) { fallback_flag_ = flag; }
 
   TrajGearPair *mutable_fallback_trajectory() { return &fallback_trajectory_; }
 
@@ -236,7 +238,7 @@ class OpenSpaceInfo {
     return fallback_trajectory_;
   }
 
-  void set_fallback_trajectory(const TrajGearPair& traj_gear_pair) {
+  void set_fallback_trajectory(const TrajGearPair &traj_gear_pair) {
     fallback_trajectory_ = traj_gear_pair;
   }
 
