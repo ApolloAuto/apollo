@@ -651,8 +651,13 @@ function config() {
 }
 
 function set_use_gpu() {
-  DEFINES="${DEFINES} --define USE_GPU=true"
-  USE_GPU="1"
+  which nvcc &> /dev/null
+  if [ $? = 0 ]; then
+    DEFINES="${DEFINES} --define USE_GPU=true"
+    USE_GPU="1"
+  else
+    DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+  fi
 }
 
 function print_usage() {
