@@ -2,6 +2,7 @@
 branches:
   only:
   - master
+  - prediction-torch
 
 language: cpp
 sudo: required
