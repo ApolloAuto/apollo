@@ -176,7 +176,7 @@ double DstExistanceFusion::ComputeDistDecay(base::ObjectConstPtr obj,
   Eigen::Affine3d sensor2world_pose;
   bool status = SensorDataManager::Instance()->GetPose(sensor_id, timestamp,
                                                        &sensor2world_pose);
-  if (status == false) {
+  if (!status) {
     AERROR << "Failed to get pose";
     return dist_decay;
   }
@@ -286,7 +286,7 @@ void DstExistanceFusion::UpdateToicWithoutCameraMeasurement(
                         {ToicDstMaps::TOICUNKOWN, dist_score}});
   // TODO(yuantingrong): hard code for fused toic bba
   const double toic_fused_w = 1.0;
-  fused_toic_ = fused_toic_ + toic_evidence * in_view_ratio * toic_fused_w;
+  fused_toic_ += toic_evidence * in_view_ratio * toic_fused_w;
 }
 
 void DstExistanceFusion::UpdateToicWithCameraMeasurement(
@@ -337,7 +337,7 @@ void DstExistanceFusion::UpdateToicWithCameraMeasurement(
                         {ToicDstMaps::TOICUNKOWN, 1 - association_prob}});
   // TODO(yuantingrong): hard code for fused toic bba
   const double toic_fused_w = 0.7;
-  fused_toic_ = fused_toic_ + toic_evidence * toic_fused_w * in_view_ratio;
+  fused_toic_ += toic_evidence * toic_fused_w * in_view_ratio;
 }
 
 std::string DstExistanceFusion::Name() const { return name_; }
@@ -382,7 +382,7 @@ void DstExistanceFusion::UpdateExistanceState() {
   // to affect the association, but when this fused object have just
   // radar object, we want using the historical information to filter
   // large amount of false positive
-  if (!(track_ref_->GetLidarObjects()).empty()) {
+  if (!track_ref_->GetLidarObjects().empty()) {
     toic_score_ = 0.5;
   } else if (!track_ref_->GetRadarObjects().empty()) {
     toic_score_ = toic_score;
