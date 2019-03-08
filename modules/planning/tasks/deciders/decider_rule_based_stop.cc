@@ -159,20 +159,21 @@ void DeciderRuleBasedStop::CheckOpenSpacePreStop(
   const auto& target_parking_spot_id =
       frame->open_space_info().target_parking_spot_id();
   const auto& nearby_path = reference_line_info->reference_line().map_path();
-  if (target_parking_spot_id.empty()) {
-    AERROR << "no target parking spot found when setting pre stop fence";
-  }
+  AERROR_IF(target_parking_spot_id.empty())
+      << "no target parking spot id found when setting pre stop fence";
 
   double target_area_center_s = 0.0;
+  bool target_area_found = false;
   const auto& parking_space_overlaps = nearby_path.parking_space_overlaps();
-  if (parking_space_overlaps.size() != 0) {
-    for (const auto& parking_overlap : parking_space_overlaps) {
-      if (parking_overlap.object_id == target_parking_spot_id) {
-        target_area_center_s =
-            (parking_overlap.start_s + parking_overlap.end_s) / 2.0;
-      }
+  for (const auto& parking_overlap : parking_space_overlaps) {
+    if (parking_overlap.object_id == target_parking_spot_id) {
+      target_area_center_s =
+          (parking_overlap.start_s + parking_overlap.end_s) / 2.0;
+      target_area_found = true;
     }
   }
+  AERROR_IF(!target_area_found)
+      << "no target parking spot found on reference line";
 
   double stop_line_s = 0.0;
   double stop_distance_to_target = config_.decider_rule_based_stop_config()
@@ -192,8 +193,8 @@ void DeciderRuleBasedStop::CheckOpenSpacePreStop(
   const std::string stop_wall_id =
       OPEN_SPACE_VO_ID_PREFIX + target_parking_spot_id;
   std::vector<std::string> wait_for_obstacles;
-  *(frame->mutable_open_space_info()->mutable_open_space_pre_stop_fence_s()) =
-      stop_line_s;
+  frame->mutable_open_space_info()->set_open_space_pre_stop_fence_s(
+      stop_line_s);
   BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s, 0.0,
                     StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP,
                     wait_for_obstacles);

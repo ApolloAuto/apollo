@@ -30,8 +30,8 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: StageApproachingParkingSpot";
   CHECK_NOTNULL(frame);
-  *(frame->mutable_open_space_info()->mutable_open_space_pre_stop_finished()) =
-      GetContext()->valet_parking_pre_stop_finished;
+  frame->mutable_open_space_info()->set_open_space_pre_stop_finished(
+      GetContext()->valet_parking_pre_stop_finished);
   *(frame->mutable_open_space_info()->mutable_target_parking_spot_id()) =
       GetContext()->target_parking_spot_id;
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
