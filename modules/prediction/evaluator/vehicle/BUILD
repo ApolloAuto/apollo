@@ -117,7 +117,7 @@ cc_library(
         "//modules/prediction/proto:fnn_vehicle_model_proto",
     ] + select({
         "//tools/platforms:use_gpu": [
-            "@pytorch_gpu",
+            "@pytorch",
         ],
         "//conditions:default": [
             "@pytorch",
