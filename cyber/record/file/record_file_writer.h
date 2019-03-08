@@ -120,10 +120,10 @@ bool RecordFileWriter::WriteSection(const T& message) {
   } else if (std::is_same<T, Index>::value) {
     type = SectionType::SECTION_INDEX;
   } else {
-    AERROR << "Do not support is template typename.";
+    AERROR << "Do not support this template typename.";
     return false;
   }
-  Section section = {type, (uint64_t)message.ByteSize()};
+  Section section = {type, message.ByteSize()};
   ssize_t count = write(fd_, &section, sizeof(section));
   if (count < 0) {
     AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;
