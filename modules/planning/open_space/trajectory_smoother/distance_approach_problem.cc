@@ -41,12 +41,25 @@ bool DistanceApproachProblem::Solve(
     Eigen::MatrixXd* dual_n_result) {
   // TODO(QiL) : evaluate whether need to new it everytime
   auto t_start = cyber::Time::Now().ToSecond();
-  DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
-      horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
-      XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
-      planner_open_space_config_);
 
-  Ipopt::SmartPtr<Ipopt::TNLP> problem = ptop;
+  Ipopt::SmartPtr<Ipopt::TNLP> problem;
+
+  if (planner_open_space_config_.distance_approach_config()
+          .distance_approach_mode() == DISTANCE_APPROACH_IPOPT) {
+    DistanceApproachIPOPTInterface* ptop = new DistanceApproachIPOPTInterface(
+        horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
+        XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
+        planner_open_space_config_);
+    problem = ptop;
+  } else if (planner_open_space_config_.distance_approach_config()
+                 .distance_approach_mode() == DISTANCE_APPROACH_IPOPT_CUDA) {
+    DistanceApproachIPOPTCUDAInterface* ptop =
+        new DistanceApproachIPOPTCUDAInterface(
+            horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF,
+            last_time_u, XYbounds, obstacles_edges_num, obstacles_num,
+            obstacles_A, obstacles_b, planner_open_space_config_);
+    problem = ptop;
+  }
 
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();

@@ -9,6 +9,11 @@ enum DualWarmUpMode {
     DEBUG = 3;
 }
 
+enum DistanceApproachMode {
+  DISTANCE_APPROACH_IPOPT = 0;
+  DISTANCE_APPROACH_IPOPT_CUDA = 1;
+}
+
 message PlannerOpenSpaceConfig {
   // Open Space ROIConfig
   optional ROIConfig roi_config = 1;
@@ -88,6 +93,7 @@ message DistanceApproachConfig {
   optional bool enable_derivative_check = 24;
   // True to enable derivative check inside open space planner
   optional bool enable_initial_final_check = 25 [default = false];
+  optional DistanceApproachMode distance_approach_mode = 26;
 }
 
 message IpoptConfig {
@@ -108,7 +114,7 @@ message IpoptConfig {
 }
 
 message TrajectoryPartitionConfig {
- optional uint64 interpolated_pieces_num = 1 [default = 50]; 
+ optional uint64 interpolated_pieces_num = 1 [default = 50];
  optional uint64 initial_gear_check_horizon = 2 [default = 3];
  optional double heading_searching_range = 3 [default = 0.3];
  optional double gear_shift_period_duration = 4 [default = 2.0];
