@@ -1,4 +1,4 @@
-import { observable, action, computed } from "mobx";
+import { observable, action, computed, extendObservable } from "mobx";
 
 import WS from "store/websocket";
 import UTTERANCE from "store/utterance";
@@ -32,15 +32,15 @@ export default class HMI {
     @observable moduleStatus = observable.map();
     @observable componentStatus = observable.map();
     @observable enableStartAuto = false;
+    @observable dockerImage = 'unknown';
+    @observable isCoDriver = false;
+    @observable isMute = false;
 
     displayName = {};
     utmZoneId = 10;
 
-    @observable dockerImage = 'unknown';
-
-    @observable isCoDriver = false;
-
-    @observable isMute = false;
+    @observable isCalibrationMode = false;
+    @observable dataCollectionProgress = observable.map();
 
     @action toggleCoDriverFlag() {
         this.isCoDriver = !this.isCoDriver;
@@ -63,6 +63,10 @@ export default class HMI {
             this.modes = newStatus.modes.sort();
         }
         if (newStatus.currentMode) {
+            this.isCalibrationMode = (newStatus.currentMode.toLowerCase().includes('calibration'));
+            if (this.currentMode !== newStatus.currentMode) {
+                this.dataCollectionProgress.clear();
+            }
             this.currentMode = newStatus.currentMode;
         }
 
@@ -126,5 +130,20 @@ export default class HMI {
 
     @computed get inNavigationMode() {
         return this.currentMode === "Navigation";
+    }
+
+    @action updateDataCollectionProgress(data) {
+        const overallKeyName = 'Overall';
+        Object.keys(data).sort((category1, category2) => {
+            if (category1 === overallKeyName) {
+                return -1;
+            }
+            if (category2 === overallKeyName) {
+                return 1;
+            }
+            return category1.localeCompare(category2);
+        }).forEach((category) => {
+            this.dataCollectionProgress.set(category, data[category]);
+        });
     }
 }

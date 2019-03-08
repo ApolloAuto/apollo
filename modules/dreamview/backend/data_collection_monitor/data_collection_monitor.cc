@@ -106,9 +106,12 @@ void DataCollectionMonitor::LoadConfiguration(
       << "Unable to parse calibration configuration from file "
       << data_collection_config_path;
 
+  current_progress_json_["Overall"] = 0.0;
   for (const auto& iter : data_collection_table_.category()) {
     const std::string& category_name = iter.first;
-    category_frame_count_.insert({category_name, 0});
+    const Category& category = iter.second;
+    category_frame_count_.insert({category_name, 0.0});
+    current_progress_json_[category.description()] = 0.0;
   }
 
   ADEBUG << "Configuration loaded.";
@@ -173,6 +176,14 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
 }
 
 void DataCollectionMonitor::UpdateProgressInJson() {
+  const double overall_percentage =
+      100.0 * static_cast<double>(current_frame_count_) /
+      static_cast<double>(data_collection_table_.total_frames());
+  {
+    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+    current_progress_json_["Overall"] = overall_percentage;
+  }
+
   for (const auto& iter : data_collection_table_.category()) {
     const std::string& category_name = iter.first;
     const Category& category = iter.second;
@@ -183,14 +194,6 @@ void DataCollectionMonitor::UpdateProgressInJson() {
       boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
       current_progress_json_[category.description()] = progress_percentage;
     }
-  }
-
-  const double overall_percentage =
-      100.0 * static_cast<double>(current_frame_count_) /
-      static_cast<double>(data_collection_table_.total_frames());
-  {
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    current_progress_json_["overall"] = overall_percentage;
   }
 }
 

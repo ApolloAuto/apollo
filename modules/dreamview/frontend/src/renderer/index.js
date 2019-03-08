@@ -254,9 +254,12 @@ class Renderer {
     disableRouteEditing() {
         this.routingEditor.disableEditingMode(this.scene);
 
-        document.getElementById(this.canvasId).removeEventListener('mousedown',
-                                                                   this.onMouseDownHandler,
-                                                                   false);
+        const element = document.getElementById(this.canvasId);
+        if (element) {
+            element.removeEventListener('mousedown',
+                                        this.onMouseDownHandler,
+                                        false);
+        }
     }
 
     addDefaultEndPoint(points) {
