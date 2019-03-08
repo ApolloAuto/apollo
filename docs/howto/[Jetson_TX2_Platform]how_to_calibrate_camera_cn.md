@@ -55,7 +55,7 @@ $ sudo apt-get upgrade
 （在很多教程中，直接告诉开发者执行命令`rosdep install camera_calibration`，但是可能会出现错误：
 ERROR: Rosdep cannot find all required resources to answer your query。按照下面的步骤就可以了。）
 ```bash
-$ echo ‘source /opt/ros/kinetic/setup.bash’ >> ~/.bashrc
+$ echo 'source /opt/ros/kinetic/setup.bash' >> ~/.bashrc
 $ source ~/.bashrc
 $ sudo rosdep init
 $ rosdep update
