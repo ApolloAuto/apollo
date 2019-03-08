@@ -347,7 +347,7 @@ void NaviPlanning::RunOnce() {
 
   VehicleState vehicle_state =
       VehicleStateProvider::instance()->vehicle_state();
-
+  AINFO<<"test!!";
   // estimate (x, y) at current timestamp
   // This estimate is only valid if the current time and vehicle state timestamp
   // differs only a small amount (20ms). When the different is too large, the
