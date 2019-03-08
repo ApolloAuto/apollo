@@ -42,7 +42,8 @@ std::vector<base::LaneLinePositionType> spatialLUT(
      base::LaneLinePositionType::ADJACENT_RIGHT,
      base::LaneLinePositionType::THIRD_RIGHT,
      base::LaneLinePositionType::FOURTH_RIGHT,
-     base::LaneLinePositionType::OTHER, base::LaneLinePositionType::CURB_LEFT,
+     base::LaneLinePositionType::OTHER,
+     base::LaneLinePositionType::CURB_LEFT,
      base::LaneLinePositionType::CURB_RIGHT});
 
 std::map<base::LaneLinePositionType, int> spatialLUTind = {
@@ -110,6 +111,9 @@ bool DarkSCNNLanePostprocessor::Init(
   roi_height_ = lane_postprocessor_param_.roi_height();
   roi_start_ = lane_postprocessor_param_.roi_start();
   roi_width_ = lane_postprocessor_param_.roi_width();
+
+  lane_type_num_ = static_cast<int>(spatialLUTind.size());
+  AINFO << "lane_type_num_: " << lane_type_num_;
   return true;
 }
 
@@ -129,18 +133,22 @@ bool DarkSCNNLanePostprocessor::Process2D(
   // }
 
   // 1. Sample points on lane_map and project them onto world coordinate
+
+  // TODO(techoe): Should be fixed
   int y = static_cast<int>(lane_map.rows * 0.9 - 1);
+  // TODO(techoe): Should be fixed
   int step_y = (y - 40) * (y - 40) / 6400 + 1;
 
   xy_points.clear();
-  xy_points.resize(13);
+  xy_points.resize(lane_type_num_);
   uv_points.clear();
-  uv_points.resize(13);
+  uv_points.resize(lane_type_num_);
 
   while (y > 0) {
     for (int x = 1; x < lane_map.cols - 1; x++) {
       int value = static_cast<int>(round(lane_map.at<float>(y, x)));
       // lane on left
+
       if ((value > 0 && value < 5) || value == 11) {
         // right edge (inner) of the lane
         if (value != static_cast<int>(round(lane_map.at<float>(y, x + 1)))) {
@@ -152,23 +160,27 @@ bool DarkSCNNLanePostprocessor::Process2D(
           xy_p = trans_mat_ * img_point;
           Eigen::Matrix<float, 2, 1> xy_point;
           Eigen::Matrix<float, 2, 1> uv_point;
-          if (std::abs(xy_p(2)) < 1e-6) continue;
+          if (std::fabs(xy_p(2)) < 1e-6) continue;
           xy_point << xy_p(0) / xy_p(2), xy_p(1) / xy_p(2);
-          if (xy_point(0) < 0.0 || xy_point(0) > 300.0 ||
+
+          // Filter out lane line points
+          if (xy_point(0) < 0.0 ||  // This condition is only for front camera
+              xy_point(0) > max_longitudinal_distance_ ||
               std::abs(xy_point(1)) > 30.0) {
             continue;
           }
           uv_point << static_cast<float>(x * roi_width_ / lane_map.cols),
               static_cast<float>(y * roi_height_ / lane_map.rows + roi_start_);
-          if (xy_points[value].size() < 5 || xy_point(0) < 50 ||
-              std::abs(xy_point(1) - xy_points[value].back()(1)) < 1) {
+          if (xy_points[value].size() < minNumPoints_ ||
+              xy_point(0) < 50.0f ||
+              std::fabs(xy_point(1) - xy_points[value].back()(1)) < 1.0f) {
             xy_points[value].push_back(xy_point);
             uv_points[value].push_back(uv_point);
           }
         }
-      } else if (value >= 5) {
+      } else if (value >= 5 && value < lane_type_num_) {
         // left edge (inner) of the lane
-        if (value != round(lane_map.at<float>(y, x - 1))) {
+        if (value != static_cast<int>(round(lane_map.at<float>(y, x - 1)))) {
           Eigen::Matrix<float, 3, 1> img_point(
               static_cast<float>(x * roi_width_ / lane_map.cols),
               static_cast<float>(y * roi_height_ / lane_map.rows + roi_start_),
@@ -177,18 +189,24 @@ bool DarkSCNNLanePostprocessor::Process2D(
           xy_p = trans_mat_ * img_point;
           Eigen::Matrix<float, 2, 1> xy_point;
           Eigen::Matrix<float, 2, 1> uv_point;
+          if (std::fabs(xy_p(2)) < 1e-6) continue;
           xy_point << xy_p(0) / xy_p(2), xy_p(1) / xy_p(2);
+          // Filter out lane line points
           if (xy_point(0) < 0.0 || xy_point(0) > 300.0 ||
               std::abs(xy_point(1)) > 25.0) {
             continue;
           }
           uv_point << static_cast<float>(x * roi_width_ / lane_map.cols),
               static_cast<float>(y * roi_height_ / lane_map.rows + roi_start_);
-          if (xy_points[value].size() < 5 || xy_point(0) < 50 ||
-              std::abs(xy_point(1) - xy_points[value].back()(1)) < 1) {
+          if (xy_points[value].size() < minNumPoints_ ||
+              xy_point(0) < 50.0f ||
+              std::fabs(xy_point(1) - xy_points[value].back()(1)) < 1.0f) {
             xy_points[value].push_back(xy_point);
             uv_points[value].push_back(uv_point);
           }
+        } else if (value >= lane_type_num_) {
+          AWARN << "Lane line value shouldn't be equal or more than "
+                << lane_type_num_;
         }
       }
     }
@@ -204,18 +222,18 @@ bool DarkSCNNLanePostprocessor::Process2D(
   // 2. Remove outliers and Do a ransac fitting
   std::vector<Eigen::Matrix<float, 4, 1>> coeffs;
   std::vector<Eigen::Matrix<float, 4, 1>> img_coeffs;
-  coeffs.resize(13);
-  img_coeffs.resize(13);
-  for (int i = 1; i < 13; ++i) {
+  coeffs.resize(lane_type_num_);
+  img_coeffs.resize(lane_type_num_);
+  for (int i = 1; i < lane_type_num_; ++i) {
     if (xy_points[i].size() < minNumPoints_) continue;
     Eigen::Matrix<float, 4, 1> coeff;
     // solve linear system to estimate polynomial coefficients
-    // if (RansacFitting(&xy_points[i], &coeff,
-    //     200, static_cast<int> (minNumPoints_), 0.1f)) {
-    if (PolyFit(xy_points[i], max_poly_order, &coeff, true)) {
-      coeffs[i] = coeff;
+    if (RansacFitting(&xy_points[i], &coeff,
+         200, static_cast<int> (minNumPoints_), 0.1f)) {
+//    if (PolyFit(xy_points[i], max_poly_order, &coeff, true)) {
+       coeffs[i] = coeff;
     } else {
-      xy_points[i].clear();
+       xy_points[i].clear();
     }
   }
 
@@ -225,8 +243,8 @@ bool DarkSCNNLanePostprocessor::Process2D(
   time_2 += microseconds_2 - microseconds_1;
 
   // 3. Write values into lane_objects
-  std::vector<float> c0s(13, 0);
-  for (int i = 1; i < 13; ++i) {
+  std::vector<float> c0s(lane_type_num_, 0);
+  for (int i = 1; i < lane_type_num_; ++i) {
     if (xy_points[i].size() < minNumPoints_) continue;
     c0s[i] = GetPolyValue(
         static_cast<float>(coeffs[i](3)), static_cast<float>(coeffs[i](2)),
@@ -237,11 +255,13 @@ bool DarkSCNNLanePostprocessor::Process2D(
   if (xy_points[4].size() < minNumPoints_ &&
       xy_points[5].size() >= minNumPoints_) {
     std::swap(xy_points[4], xy_points[5]);
+    std::swap(uv_points[4], uv_points[5]);
     std::swap(coeffs[4], coeffs[5]);
     std::swap(c0s[4], c0s[5]);
   } else if (xy_points[6].size() < minNumPoints_ &&
              xy_points[5].size() >= minNumPoints_) {
     std::swap(xy_points[6], xy_points[5]);
+    std::swap(uv_points[6], uv_points[5]);
     std::swap(coeffs[6], coeffs[5]);
     std::swap(c0s[6], c0s[5]);
   }
@@ -258,10 +278,12 @@ bool DarkSCNNLanePostprocessor::Process2D(
     }
     if (use_boundary) {
       std::swap(xy_points[4], xy_points[11]);
+      std::swap(uv_points[4], uv_points[11]);
       std::swap(coeffs[4], coeffs[11]);
       std::swap(c0s[4], c0s[11]);
     }
   }
+
 
   if (xy_points[6].size() < minNumPoints_ &&
       xy_points[12].size() >= minNumPoints_) {
@@ -275,12 +297,13 @@ bool DarkSCNNLanePostprocessor::Process2D(
     }
     if (use_boundary) {
       std::swap(xy_points[6], xy_points[12]);
+      std::swap(uv_points[6], uv_points[12]);
       std::swap(coeffs[6], coeffs[12]);
       std::swap(c0s[6], c0s[12]);
     }
   }
 
-  for (int i = 1; i < 13; ++i) {
+  for (int i = 1; i < lane_type_num_; ++i) {
     base::LaneLine cur_object;
     if (xy_points[i].size() < minNumPoints_) continue;
 
@@ -299,7 +322,6 @@ bool DarkSCNNLanePostprocessor::Process2D(
       else if (c0s[i] < c0s[9] && i == 11)
         continue;
     }
-
     // [4] write values
     cur_object.curve_car_coord.x_start =
         static_cast<float>(xy_points[i].front()(0));
@@ -312,7 +334,6 @@ bool DarkSCNNLanePostprocessor::Process2D(
     // if (cur_object.curve_car_coord.x_end -
     //     cur_object.curve_car_coord.x_start < 5) continue;
     // cur_object.order = 2;
-
     for (size_t j = 0; j < xy_points[i].size(); ++j) {
       base::Point2DF p_j;
       p_j.x = static_cast<float>(xy_points[i][j](0));
