@@ -105,7 +105,7 @@ void HMI::RegisterMessageHandlers() {
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
         } else if (hmi_action == HMIAction::CHANGE_MODE) {
-          static constexpr char kCalibrationMode[] = "Mkz Calibration";
+          static constexpr char kCalibrationMode[] = "Vehicle Calibration";
           if (value == kCalibrationMode) {
             data_collection_monitor_->Start();
           } else {
