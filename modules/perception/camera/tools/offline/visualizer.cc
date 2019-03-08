@@ -292,18 +292,17 @@ bool Visualizer::adjust_angles(
 
 
 bool Visualizer::SetDirectory(const std::string &path) {
-  int is_success = 1;
-  std::string command;
-  command = "mkdir -p " + path;
-  is_success = system(command.c_str());
+  std::string command = "mkdir -p " + path;
+  int is_success = system(command.c_str());
+  if (!is_success) {
+    return false;
+  }
+
   command = "rm " + path + "/*.jpg";
   is_success = system(command.c_str());
   path_ = path;
-  if (is_success > 0) {
-    return true;
-  } else {
-    return false;
-  }
+
+  return !is_success ? true : false;
 }
 
 std::string Visualizer::type_to_string(
@@ -322,8 +321,9 @@ std::string Visualizer::type_to_string(
     case apollo::perception::base::ObjectType::VEHICLE:
       return "VEH";
     default:
-      return "WRNG";
+      break;
   }
+
   return "WRNG";
 }
 
@@ -355,10 +355,12 @@ std::string Visualizer::sub_type_to_string(
     case apollo::perception::base::ObjectSubType::TRAFFICCONE:
       return "CONE";
     default:
-      return "WRNG";
+      break;
   }
+
   return "WRNG";
 }
+
 bool Visualizer::reset_key() {
   use_class_color_ = true;
   capture_screen_ = false;
