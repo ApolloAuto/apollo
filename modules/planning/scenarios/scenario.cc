@@ -55,6 +55,10 @@ void Scenario::Init() {
 
 Scenario::ScenarioStatus Scenario::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
+  if (current_stage_ == nullptr) {
+    AWARN << "Current stage is a null pointer.";
+    return STATUS_UNKNOWN;
+  }
   if (current_stage_->stage_type() == ScenarioConfig::NO_STAGE) {
     scenario_status_ = STATUS_DONE;
     return scenario_status_;
@@ -85,6 +89,10 @@ Scenario::ScenarioStatus Scenario::Process(
           return scenario_status_;
         }
         current_stage_ = CreateStage(*stage_config_map_[next_stage]);
+        if (current_stage_ == nullptr) {
+          AWARN << "Current stage is a null pointer.";
+          return STATUS_UNKNOWN;
+        }
       }
       if (current_stage_ != nullptr &&
           current_stage_->stage_type() != ScenarioConfig::NO_STAGE) {
