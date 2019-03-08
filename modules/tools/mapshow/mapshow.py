@@ -22,6 +22,18 @@ from libs.map import Map
 from libs.localization import Localization
 from libs.path import Path
 
+def draw(map):
+    lane_ids = args.laneid
+    if lane_ids is None:
+        lane_ids = []
+    map.draw_lanes(plt, args.showlaneids, lane_ids, args.showlanedetails)
+    if args.showsignals:
+        map.draw_signal_lights(plt)
+    if args.showstopsigns:
+        map.draw_stop_signs(plt)
+    if args.showjunctions:
+        map.draw_pnc_junctions(plt)
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
@@ -30,6 +42,9 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "-m", "--map", action="store", type=str, required=True,
+        help="Specify the map file in txt or binary format")
+    parser.add_argument(
+        "-m2", "--map2", action="store", type=str, required=False,
         help="Specify the map file in txt or binary format")
     parser.add_argument(
         "-sl", "--showlaneids", action="store_const", const=True,
@@ -62,16 +77,12 @@ if __name__ == "__main__":
 
     map = Map()
     map.load(args.map)
-    lane_ids = args.laneid
-    if lane_ids is None:
-        lane_ids = []
-    map.draw_lanes(plt, args.showlaneids, lane_ids, args.showlanedetails)
-    if args.showsignals:
-        map.draw_signal_lights(plt)
-    if args.showstopsigns:
-        map.draw_stop_signs(plt)
-    if args.showjunctions:
-        map.draw_pnc_junctions(plt)
+    draw(map)
+
+    if args.map2 is not None:
+        map2 = Map()
+        map2.load(args.map2)
+        draw(map2)    
 
     if args.drivingpath is not None:
         path = Path(args.drivingpath)
