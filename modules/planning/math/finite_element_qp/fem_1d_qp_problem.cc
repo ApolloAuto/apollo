@@ -268,23 +268,59 @@ void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                      std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
-  P_data->resize(kNumParam);
-  P_indices->resize(kNumParam);
-  P_indptr->resize(kNumParam + 1);
+  const int kNumValue = kNumParam + (N - 1);
+  std::vector<std::vector<std::pair<c_int, c_float>>> columns;
+  columns.resize(kNumParam);
+  int value_index = 0;
 
-  for (int i = 0; i < kNumParam; ++i) {
-    if (i < N) {
-      P_data->at(i) = 2.0 * (weight_.x_w + weight_.x_mid_line_w);
-    } else if (i < 2 * N) {
-      P_data->at(i) = 2.0 * weight_.x_derivative_w;
-    } else {
-      P_data->at(i) = 2.0 * weight_.x_second_order_derivative_w;
-    }
-    P_indices->at(i) = i;
-    P_indptr->at(i) = i;
+  // x(i)^2 * (w_x + w_mid_line)
+  for (int i = 0; i < N; ++i) {
+    columns[i].emplace_back(i, (weight_.x_w + weight_.x_mid_line_w));
+    ++value_index;
   }
-  P_indptr->at(kNumParam) = kNumParam;
-  CHECK_EQ(P_data->size(), P_indices->size());
+
+  // x(i)'^2 * w_dx
+  for (int i = 0; i < N; ++i) {
+    columns[N + i].emplace_back(N + i, weight_.x_derivative_w);
+    ++value_index;
+  }
+
+  // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
+  columns[2 * N].emplace_back(2 * N, weight_.x_second_order_derivative_w +
+                              weight_.x_third_order_derivative_w / delta_s_sq_);
+  ++value_index;
+  for (int i = 1; i < N - 1; ++i) {
+    columns[2 * N + i].emplace_back(2 * N + i,
+                       weight_.x_second_order_derivative_w +
+                       2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
+    ++value_index;
+  }
+  columns[3 * N - 1].emplace_back(3 * N - 1, weight_.x_second_order_derivative_w
+                     + weight_.x_third_order_derivative_w / delta_s_sq_);
+  ++value_index;
+
+  // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
+  for (int i = 0; i < N - 1; ++i) {
+    columns[2 * N + i].emplace_back(2 * N + i + 1,
+                       -2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
+    ++value_index;
+  }
+
+  CHECK_EQ(value_index, kNumValue);
+
+  int ind_p = 0;
+  for (int i = 0; i < kNumParam; ++i) {
+    P_indptr->push_back(ind_p);
+    for (const auto& row_data_pair : columns[i]) {
+      P_data->push_back(row_data_pair.second * 2.0);
+      P_indices->push_back(row_data_pair.first);
+      ++ind_p;
+    }
+  }
+  P_indptr->push_back(ind_p);
+  ADEBUG << "P_data.size()=" << P_data->size();
+  ADEBUG << "P_indices.size()=" << P_indices->size();
+  ADEBUG << "P_indptr.size()=" << P_indptr->size();
 }
 
 void Fem1dQpProblem::CalculateAffineConstraint(
