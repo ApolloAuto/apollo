@@ -21,6 +21,7 @@
 #pragma once
 
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"
@@ -46,6 +47,8 @@ class SpeedLimitDecider {
 
   virtual apollo::common::Status GetSpeedLimits(
       const IndexedList<std::string, Obstacle>& obstacles,
+      const std::vector<std::tuple<double, double, double>>&
+          path_point_decision_guide,
       SpeedLimit* const speed_limit_data) const;
 
  private:

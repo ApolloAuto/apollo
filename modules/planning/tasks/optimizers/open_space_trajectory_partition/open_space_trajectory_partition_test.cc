@@ -1,3 +1,4 @@
+
 /******************************************************************************
  * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
@@ -18,33 +19,29 @@
  * @file
  **/
 
-#pragma once
+#include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 
-#include "modules/planning/proto/decider_config.pb.h"
+#include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
-#include "modules/planning/proto/speed_bounds_decider_config.pb.h"
-#include "modules/planning/tasks/deciders/decider.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
 
 namespace apollo {
 namespace planning {
 
-class SpeedBoundsDecider : public Decider {
+class OpenSpaceTrajectoryPartitionTest : public ::testing::Test {
  public:
-  explicit SpeedBoundsDecider(const TaskConfig& config);
+  virtual void SetUp() {
+    config_.set_task_type(TaskConfig::OPEN_SPACE_TRAJECTORY_PARTITION);
+  }
 
- private:
-  apollo::common::Status Process(
-      Frame* const frame,
-      ReferenceLineInfo* const reference_line_info) override;
-
-  void RecordSTGraphDebug(
-      const StGraphData& st_graph_data,
-      planning_internal::STGraphDebug* st_graph_debug) const;
-
- private:
-  SpeedBoundsDeciderConfig speed_bounds_config_;
+ protected:
+  TaskConfig config_;
 };
+
+TEST_F(OpenSpaceTrajectoryPartitionTest, Init) {
+  OpenSpaceTrajectoryPartition open_space_trajectory_partition(config_);
+  EXPECT_EQ(open_space_trajectory_partition.Name(),
+            TaskConfig::TaskType_Name(config_.task_type()));
+}
 
 }  // namespace planning
 }  // namespace apollo

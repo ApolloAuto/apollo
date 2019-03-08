@@ -16,6 +16,7 @@
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/pbf_gatekeeper.h"
 
 #include "cyber/common/file.h"
+#include "modules/perception/base/object_types.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/lib/gatekeeper/pbf_gatekeeper/proto/pbf_gatekeeper_config.pb.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
@@ -70,7 +71,12 @@ bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
   bool invisible_in_camera = !(track->IsCameraVisible());
   if (invisible_in_lidar && invisible_in_radar &&
       (!params_.use_camera_3d || invisible_in_camera)) {
-    return false;
+    auto sensor_obj = track->GetFusedObject();
+    if (sensor_obj != nullptr &&
+        sensor_obj->GetBaseObject()->sub_type !=
+            base::ObjectSubType::TRAFFICCONE) {
+      return false;
+    }
   }
   time_t rawtime = static_cast<time_t>(track->GetFusedObject()->GetTimestamp());
 

@@ -10,13 +10,19 @@ cc_library(
     hdrs = [
         "open_space_trajectory_provider.h",
     ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    copts = [
+        "-DMODULE_NAME=\\\"planning\\\"",
+        "-fopenmp",
+    ],
     deps = [
-        "//modules/planning/tasks/optimizers:trajectory_optimizer",
+        ":open_space_trajectory_optimizer",
         "//modules/common/status",
+        "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:trajectory_stitcher",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/tasks:task",
+        "//modules/planning/tasks/optimizers:trajectory_optimizer",
     ],
 )
 
@@ -29,7 +35,7 @@ cc_library(
         "open_space_trajectory_optimizer.h",
     ],
     copts = [
-        "-DMODULE_NAME=\\\"planning\\\"", 
+        "-DMODULE_NAME=\\\"planning\\\"",
         "-fopenmp",
     ],
     deps = [
@@ -53,6 +59,9 @@ cc_test(
     size = "small",
     srcs = [
         "open_space_trajectory_provider_test.cc",
+    ],
+    copts = [
+        "-fopenmp",
     ],
     deps = [
         ":open_space_trajectory_provider",

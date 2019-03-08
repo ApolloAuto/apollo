@@ -18,23 +18,73 @@
  * @file
  **/
 
+#pragma once
+
+#include <memory>
+#include <vector>
+
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/status/status.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
+#include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_optimizer.h"
 #include "modules/planning/tasks/optimizers/trajectory_optimizer.h"
 #include "modules/planning/tasks/task.h"
 
 namespace apollo {
 namespace planning {
 
+struct OpenSpaceTrajectoryThreadData {
+  std::vector<common::TrajectoryPoint> stitching_trajectory;
+  std::vector<double> end_pose;
+  std::vector<double> XYbounds;
+  double rotate_angle;
+  apollo::common::math::Vec2d translate_origin;
+  Eigen::MatrixXi obstacles_edges_num;
+  Eigen::MatrixXd obstacles_A;
+  Eigen::MatrixXd obstacles_b;
+  std::vector<std::vector<common::math::Vec2d>> obstacles_vertices_vec;
+};
+
 class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
  public:
-  explicit OpenSpaceTrajectoryProvider(const TaskConfig &config);
+  explicit OpenSpaceTrajectoryProvider(const TaskConfig& config);
+
+  ~OpenSpaceTrajectoryProvider();
+
+  void Stop();
 
  private:
-  apollo::common::Status Process(
-      const common::TrajectoryPoint &init_point,
-      DiscretizedTrajectory *const trajectory_data) override;
+  apollo::common::Status Process() override;
+
+  void GenerateTrajectoryThread();
+
+  bool IsVehicleNearDestination(const common::VehicleState& vehicle_state,
+                                const std::vector<double>& end_pose,
+                                double rotate_angle,
+                                const Vec2d& translate_origin);
+
+  void GenerateStopTrajectory(DiscretizedTrajectory* const trajectory_data);
+
+  void LoadResult(DiscretizedTrajectory* const trajectory_data);
+
+  void ReuseLastFrameResult(const Frame* last_frame,
+                            DiscretizedTrajectory* const trajectory_data);
+
+ private:
+  bool thread_init_flag_ = false;
+
+  std::unique_ptr<OpenSpaceTrajectoryOptimizer>
+      open_space_trajectory_optimizer_;
+
+  size_t optimizer_thread_counter = 0;
+
+  OpenSpaceTrajectoryThreadData thread_data_;
+  std::future<void> task_future_;
+  std::atomic<bool> is_stop_{false};
+  std::atomic<bool> trajectory_updated_{false};
+  std::atomic<bool> trajectory_error_{false};
+  std::atomic<bool> trajectory_skipped_{false};
+  std::mutex open_space_mutex_;
 };
 
 }  // namespace planning

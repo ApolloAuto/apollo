@@ -23,7 +23,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/common/speed/speed_data.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
+#include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/tasks/task.h"
 
 #include "modules/common/configs/proto/vehicle_config.pb.h"

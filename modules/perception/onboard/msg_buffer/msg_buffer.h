@@ -141,11 +141,11 @@ template <class T>
 int MsgBuffer<T>::LookupLatest(ConstPtr* msg) {
   std::lock_guard<std::mutex> lock(buffer_mutex_);
   if (!init_) {
-    AERROR << "msg buffer is uninitialized.";
+    AERROR << "Message buffer is uninitialized.";
     return false;
   }
   if (buffer_queue_.empty()) {
-    AERROR << "msg buffer is empty.";
+    AERROR << "Message buffer is empty.";
     return false;
   }
   *msg = buffer_queue_.back().second;
@@ -157,11 +157,11 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
                                std::vector<ObjectPair>* msgs) {
   std::lock_guard<std::mutex> lock(buffer_mutex_);
   if (!init_) {
-    AERROR << "msg buffer is uninitialized.";
+    AERROR << "Message buffer is uninitialized.";
     return false;
   }
   if (buffer_queue_.empty()) {
-    AERROR << "msg buffer is empty.";
+    AERROR << "Message buffer is empty.";
     return false;
   }
   if (buffer_queue_.front().first - FLAGS_obs_buffer_match_precision >
@@ -179,17 +179,14 @@ int MsgBuffer<T>::LookupPeriod(const double timestamp, const double period,
 
   const double lower_timestamp = timestamp - period;
   const double upper_timestamp = timestamp + period;
-  for (size_t idx = 0; idx < buffer_queue_.size(); ++idx) {
-    if (buffer_queue_[idx].first < lower_timestamp) {
+  for (const auto& obj_pair : buffer_queue_) {
+    if (obj_pair.first < lower_timestamp) {
       continue;
-    } else {
-      if (buffer_queue_[idx].first > upper_timestamp) {
-        break;
-      } else {
-        msgs->emplace_back(std::make_pair(buffer_queue_[idx].first,
-                                          buffer_queue_[idx].second));
-      }
     }
+    if (obj_pair.first > upper_timestamp) {
+      break;
+    }
+    msgs->push_back(obj_pair);
   }
 
   return true;

@@ -8,6 +8,7 @@ import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/open_space_fallback_decider_config.proto";
 import "modules/planning/proto/open_space_roi_decider_config.proto";
 import "modules/planning/proto/open_space_trajectory_provider_config.proto";
+import "modules/planning/proto/open_space_trajectory_partition_config.proto";
 import "modules/planning/proto/path_bound_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
@@ -57,6 +58,7 @@ message TaskConfig {
     OPEN_SPACE_FALLBACK_DECIDER = 21;
     OPEN_SPACE_ROI_DECIDER = 22;
     OPEN_SPACE_TRAJECTORY_PROVIDER = 23;
+    OPEN_SPACE_TRAJECTORY_PARTITION = 24;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -78,6 +80,7 @@ message TaskConfig {
     OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config = 18;
     OpenSpaceRoiDeciderConfig open_space_roi_decider_config = 19;
     OpenSpaceTrajectoryProviderConfig open_space_trajectory_provider_config = 20;
+    OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config = 21;
   }
 }
 
@@ -110,27 +113,32 @@ message ScenarioStopSignUnprotectedConfig {
 }
 
 message ScenarioTrafficLightProtectedConfig {
-  optional double max_valid_stop_distance = 1 [default = 3.5];  // meter
-  optional double max_adc_stop_speed = 2 [default = 0.3];  // m/s
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
+  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
+  optional double max_valid_stop_distance = 2 [default = 2.0];  // meter
+  optional double max_adc_stop_speed = 3 [default = 0.3];  // m/s
+  optional double min_pass_s_distance = 4 [default = 3.0];  // meter
 }
 
 message ScenarioTrafficLightUnprotectedLeftTurnConfig {
-  optional double max_valid_stop_distance = 1 [default = 3.5];  // meter
-  optional double max_adc_stop_speed = 2 [default = 0.3];  // m/s
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
-  optional float creep_timeout = 4 [default = 10.0];  // sec
-}
-
-message ScenarioTrafficLightUnprotectedRightTurnConfig {
-  optional double max_valid_stop_distance = 1 [default = 3.5];  // meter
-  optional double max_adc_stop_speed = 2 [default = 0.3];  // m/s
-  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
-  optional float red_light_right_turn_stop_duration = 4 [default = 3.0];  // sec
+  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
+  optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
+  optional double max_adc_stop_speed = 3 [default = 0.3];  // m/s
+  optional double min_pass_s_distance = 4 [default = 3.0];  // meter
   optional float creep_timeout = 5 [default = 10.0];  // sec
 }
 
-message ScenarioValetParkingConfig {}
+message ScenarioTrafficLightUnprotectedRightTurnConfig {
+  optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
+  optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
+  optional double max_adc_stop_speed = 3 [default = 0.3];  // m/s
+  optional double min_pass_s_distance = 4 [default = 3.0];  // meter
+  optional float red_light_right_turn_stop_duration = 5 [default = 3.0];  // sec
+  optional float creep_timeout = 6 [default = 10.0];  // sec
+}
+
+message ScenarioValetParkingConfig {
+  optional double parking_spot_range_to_start = 1 [default = 20.0];
+}
 
 message ScenarioNarrowStreetUTurnConfig {}
 

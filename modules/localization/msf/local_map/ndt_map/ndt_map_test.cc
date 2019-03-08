@@ -15,29 +15,23 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/ndt_map/ndt_map.h"
+
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
+
+#include "modules/common/util/string_util.h"
+#include "modules/localization/msf/common/io/pcl_point_types.h"
+#include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_matrix.h"
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_pool.h"
-
-#include "modules/localization/msf/common/io/pcl_point_types.h"
-#include "modules/localization/msf/common/io/velodyne_utility.h"
 
 namespace apollo {
 namespace localization {
 namespace msf {
 
-class MapNdtTestSuite : public ::testing::Test {
- protected:
-  MapNdtTestSuite() {}
-  virtual ~MapNdtTestSuite() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-};
-
-TEST_F(MapNdtTestSuite, matrix) {
+TEST(MapNdtTestSuite, matrix) {
   const std::string pcd_folder =
       "/apollo/modules/localization/msf/local_map/test_data/ndt_map/pcds";
   const std::string pose_files = pcd_folder + "/poses.txt";
@@ -76,9 +70,8 @@ TEST_F(MapNdtTestSuite, matrix) {
   ndt_map.SetMapFolderPath(map_base_folder);
 
   for (unsigned int frame_idx = 0; frame_idx < pcd_poses.size(); ++frame_idx) {
-    std::ostringstream ss;
-    ss << pcd_indices[frame_idx];
-    std::string pcd_file_path = pcd_folder + "/" + ss.str() + ".pcd";
+    const std::string pcd_file_path = apollo::common::util::StrCat(
+        pcd_folder, "/", pcd_indices[frame_idx], ".pcd");
     velodyne::VelodyneFrame velodyne_frame;
     velodyne::LoadPcds(pcd_file_path, pcd_indices[frame_idx],
                        pcd_poses[frame_idx], &velodyne_frame, false);
@@ -91,35 +84,37 @@ TEST_F(MapNdtTestSuite, matrix) {
 
       for (size_t res = 0; res < map_config.map_resolutions_.size(); ++res) {
         MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(
-            map_config, pt3d_global, res, zone_id);
+            map_config, pt3d_global, static_cast<unsigned int>(res), zone_id);
         NdtMapNode* ndt_map_node =
             static_cast<NdtMapNode*>(ndt_map.GetMapNodeSafe(index));
         NdtMapMatrix& ndt_map_matrix =
             static_cast<NdtMapMatrix&>(ndt_map_node->GetMapCellMatrix());
 
-        Eigen::Vector2d coord2d;
-        coord2d[0] = pt3d_global[0];
-        coord2d[1] = pt3d_global[1];
+        const Eigen::Vector2d coord2d(pt3d_global[0], pt3d_global[1]);
         unsigned int x = 0;
         unsigned int y = 0;
         ndt_map_node->GetCoordinate(coord2d, &x, &y);
 
         // get the centroid
         Eigen::Vector2d left_top_corner = ndt_map_node->GetLeftTopCorner();
-        float resolution = ndt_map_node->GetMapResolution();
-        Eigen::Vector3f centroid;
-        centroid[0] = coord2d[0] - static_cast<float>(left_top_corner[0]) -
-                      resolution * x;
-        centroid[1] = coord2d[1] - static_cast<float>(left_top_corner[1]) -
-                      resolution * y;
+        const float resolution = ndt_map_node->GetMapResolution();
         NdtMapCells& ndt_map_cells = ndt_map_matrix.GetMapCell(y, x);
         int altitude_index = ndt_map_cells.CalAltitudeIndex(
-            map_config.map_resolutions_z_[res], pt3d_global[2]);
-        centroid[2] = pt3d_global[2] -
-                      altitude_index * map_config.map_resolutions_z_[res];
+            map_config.map_resolutions_z_[res],
+            static_cast<float>(pt3d_global[2]));
+        const Eigen::Vector3f centroid(
+            static_cast<float>(coord2d[0]) -
+                static_cast<float>(left_top_corner[0]) -
+                resolution * static_cast<float>(x),
+            static_cast<float>(coord2d[1]) -
+                static_cast<float>(left_top_corner[1]) -
+                resolution * static_cast<float>(y),
+            static_cast<float>(pt3d_global[2]) -
+                static_cast<float>(altitude_index) *
+                    map_config.map_resolutions_z_[res]);
 
         // Add sample 3d points
-        ndt_map_cells.AddSample(intensity, pt3d_global[2],
+        ndt_map_cells.AddSample(intensity, static_cast<float>(pt3d_global[2]),
                                 map_config.map_resolutions_z_[res], centroid,
                                 false);
         ndt_map_node->SetIsChanged(true);

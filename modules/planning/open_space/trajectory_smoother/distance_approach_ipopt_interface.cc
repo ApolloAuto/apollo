@@ -19,6 +19,10 @@
  */
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 
+#ifdef USE_GPU
+#include "modules/planning/open_space/trajectory_smoother/planning_block.h"
+#endif
+
 namespace apollo {
 namespace planning {
 
@@ -1042,9 +1046,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::cos(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -1114,9 +1117,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -1158,9 +1160,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
       ++nz_index;
 
       values[nz_index] =
-          -1.0 * (ts_ *
-                      (x[state_index + 3] +
-                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          -1.0 * (ts_ * (x[state_index + 3] +
+                         x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                       std::tan(x[control_index]) / wheelbase_ +
                   x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
                       std::tan(x[control_index]) / wheelbase_);  // n.
@@ -1893,9 +1894,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::cos(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -1965,9 +1965,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
 
       values[nz_index] =
           -1.0 *
-          (ts_ *
-               (x[state_index + 3] +
-                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          (ts_ * (x[state_index + 3] +
+                  x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                std::sin(x[state_index + 2] +
                         x[time_index] * ts_ * 0.5 * x[state_index + 3] *
                             std::tan(x[control_index]) / wheelbase_) +
@@ -2009,9 +2008,8 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
       ++nz_index;
 
       values[nz_index] =
-          -1.0 * (ts_ *
-                      (x[state_index + 3] +
-                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          -1.0 * (ts_ * (x[state_index + 3] +
+                         x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
                       std::tan(x[control_index]) / wheelbase_ +
                   x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
                       std::tan(x[control_index]) / wheelbase_);  // n.
@@ -2288,24 +2286,46 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
 
-    for (int idx = 0; idx < nnz_L; idx++) {
-      iRow[idx] = rind_L[idx];
-      jCol[idx] = cind_L[idx];
+    if (FLAGS_enable_cuda) {
+#ifdef USE_GPU
+      fill_lower_left(iRow, jCol, rind_L, cind_L, nnz_L);
+#else
+      AFATAL << "CUDA enabled without GPU!";
+#endif
+    } else {
+      for (int idx = 0; idx < nnz_L; idx++) {
+        iRow[idx] = rind_L[idx];
+        jCol[idx] = cind_L[idx];
+      }
     }
   } else {
     // return the values. This is a symmetric matrix, fill the lower left
     // triangle only
 
     obj_lam[0] = obj_factor;
-    for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
+    if (FLAGS_enable_cuda) {
+#ifdef USE_GPU
+      data_transfer(&obj_lam[1], lambda, m);
+#else
+      AFATAL << "CUDA enabled without GPU!";
+#endif
+    } else {
+      for (int idx = 0; idx < m; idx++) {
+        obj_lam[1 + idx] = lambda[idx];
+      }
+    }
 
     set_param_vec(tag_L, m + 1, obj_lam);
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
                 &hessval, options_L);
 
-    for (int idx = 0; idx < nnz_L; idx++) {
-      values[idx] = hessval[idx];
+#ifdef USE_GPU
+    if (!data_transfer(values, hessval, nnz_L)) {
+      for (int idx = 0; idx < nnz_L; idx++) {
+        values[idx] = hessval[idx];
+      }
     }
+#endif
   }
 
   return true;
@@ -2537,9 +2557,9 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
          ts_ * x[time_index] *
              (x[state_index + 3] +
               ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             cos(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
-                                          x[state_index + 3] *
-                                          tan(x[control_index]) / wheelbase_));
+             cos(x[state_index + 2] +
+                 ts_ * x[time_index] * 0.5 * x[state_index + 3] *
+                     tan(x[control_index]) / wheelbase_));
     // x2
     g[constraint_index + 1] =
         x[state_index + 5] -
@@ -2547,18 +2567,17 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
          ts_ * x[time_index] *
              (x[state_index + 3] +
               ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             sin(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
-                                          x[state_index + 3] *
-                                          tan(x[control_index]) / wheelbase_));
+             sin(x[state_index + 2] +
+                 ts_ * x[time_index] * 0.5 * x[state_index + 3] *
+                     tan(x[control_index]) / wheelbase_));
 
     // x3
     g[constraint_index + 2] =
-        x[state_index + 6] -
-        (x[state_index + 2] +
-         ts_ * x[time_index] *
-             (x[state_index + 3] +
-              ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
-             tan(x[control_index]) / wheelbase_);
+        x[state_index + 6] - (x[state_index + 2] +
+                              ts_ * x[time_index] * (x[state_index + 3] +
+                                                     ts_ * x[time_index] * 0.5 *
+                                                         x[control_index + 1]) *
+                                  tan(x[control_index]) / wheelbase_);
 
     // x4
     g[constraint_index + 3] =
@@ -2827,7 +2846,9 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_on(tag_f);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
 
   eval_obj(n, xa, &obj_value);
 
@@ -2837,18 +2858,26 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_on(tag_g);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
 
   eval_constraints(n, xa, m, g);
 
-  for (int idx = 0; idx < m; idx++) g[idx] >>= dummy;
+  for (int idx = 0; idx < m; idx++) {
+    g[idx] >>= dummy;
+  }
 
   trace_off();
 
   trace_on(tag_L);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
-  for (int idx = 0; idx < m; idx++) lam[idx] = 1.0;
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  for (int idx = 0; idx < m; idx++) {
+    lam[idx] = 1.0;
+  }
   sig = 1.0;
 
   eval_obj(n, xa, &obj_value);
@@ -2856,7 +2885,9 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
   obj_value *= mkparam(sig);
   eval_constraints(n, xa, m, g);
 
-  for (int idx = 0; idx < m; idx++) obj_value += g[idx] * mkparam(lam[idx]);
+  for (int idx = 0; idx < m; idx++) {
+    obj_value += g[idx] * mkparam(lam[idx]);
+  }
 
   obj_value >>= dummy;
 

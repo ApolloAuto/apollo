@@ -32,6 +32,8 @@ bool CheckTrafficLightDone(const ReferenceLineInfo& reference_line_info,
 
 perception::TrafficLight GetSignal(const std::string& signal_id);
 
+bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info);
+
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

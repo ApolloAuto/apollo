@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_config.h"
+
 #include <gtest/gtest.h>
 #include <string>
 
@@ -22,15 +23,7 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-class MapNdtConfigTestSuite : public ::testing::Test {
- protected:
-  MapNdtConfigTestSuite() {}
-  virtual ~MapNdtConfigTestSuite() {}
-  virtual void SetUp() {}
-  virtual void TearDown() {}
-};
-
-TEST_F(MapNdtConfigTestSuite, config) {
+TEST(MapNdtConfigTestSuite, config) {
   // init config
   NdtMapConfig config("map_ndt_v01");
   EXPECT_EQ(config.map_version_, "map_ndt_v01");

@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/optimizers/st_graph/st_boundary_mapper.h"
+#include "modules/planning/tasks/deciders/speed_bounds_decider/st_boundary_mapper.h"
 
 #include <algorithm>
 #include <limits>

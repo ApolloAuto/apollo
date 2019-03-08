@@ -38,12 +38,13 @@ unsigned int NdtMapSingleCell::LoadBinary(unsigned char* buf) {
   ++f_buf;
   intensity_var_ = *f_buf;
   ++f_buf;
-  unsigned int* ui_buf = reinterpret_cast<unsigned int*>(f_buf);
+  unsigned int* ui_buf =
+      reinterpret_cast<unsigned int*>(reinterpret_cast<void*>(f_buf));
   road_pt_count_ = *ui_buf;
   ++ui_buf;
   count_ = *ui_buf;
   ++ui_buf;
-  f_buf = reinterpret_cast<float*>(ui_buf);
+  f_buf = reinterpret_cast<float*>(reinterpret_cast<void*>(ui_buf));
   centroid_[0] = *f_buf;
   ++f_buf;
   centroid_[1] = *f_buf;
@@ -82,12 +83,13 @@ unsigned int NdtMapSingleCell::CreateBinary(unsigned char* buf,
     ++p;
     *p = intensity_var_;
     ++p;
-    unsigned int* pp = reinterpret_cast<unsigned int*>(p);
+    unsigned int* pp =
+        reinterpret_cast<unsigned int*>(reinterpret_cast<void*>(p));
     *pp = road_pt_count_;
     ++pp;
     *pp = count_;
     ++pp;
-    float* ppp = reinterpret_cast<float*>(pp);
+    float* ppp = reinterpret_cast<float*>(reinterpret_cast<void*>(pp));
     *ppp = centroid_[0];
     ++ppp;
     *ppp = centroid_[1];

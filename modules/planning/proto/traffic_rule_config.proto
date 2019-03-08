@@ -86,7 +86,7 @@ message PullOverConfig {
   optional double buffer_to_boundary = 6 [default = 0.5];
   // distance to stop point to start planning pull over
   optional double plan_distance = 7 [default = 35.0];
-  // s_distance to beteeen start and stop points
+  // s_distance to between start and stop points
   optional double operation_length = 8 [default = 30.0];  // meter
   // max s_distance to check ahead while planning pull over
   optional double max_check_distance = 9 [default = 60.0];  // meter
@@ -95,7 +95,7 @@ message PullOverConfig {
 }
 
 message ReferenceLineEndConfig {
-  // stop distance from refrence line end
+  // stop distance from reference line end
   optional double stop_distance = 1 [default = 0.5];  // meter
   optional double min_reference_line_remain_length = 2 [default = 50.0];
 }

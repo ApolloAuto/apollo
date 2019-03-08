@@ -30,8 +30,7 @@ TrajectoryOptimizer::TrajectoryOptimizer(const TaskConfig& config)
 
 Status TrajectoryOptimizer::Execute(Frame* frame) {
   Task::Execute(frame);
-  // run process() here without taking reference line info
-  return Status::OK();
+  return Process();
 }
 
 }  // namespace planning

@@ -10,7 +10,6 @@ cc_library(
         "path_bounds_decider.cc",
         "side_pass_path_decider.cc",
         "side_pass_safety.cc",
-        "speed_bounds_decider.cc",
     ],
     hdrs = [
         "decider_creep.h",
@@ -18,7 +17,6 @@ cc_library(
         "path_bounds_decider.h",
         "side_pass_path_decider.h",
         "side_pass_safety.h",
-        "speed_bounds_decider.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
@@ -29,10 +27,11 @@ cc_library(
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/common:st_graph_data",
         "//modules/planning/math/finite_element_qp:fem_1d_qp_problem",
         "//modules/planning/scenarios/util:util_lib",
-        "//modules/planning/tasks/optimizers/st_graph:st_boundary_mapper",
-        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
+        "//modules/planning/tasks/deciders/speed_bounds_decider",
+        "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
     ],
 )
 

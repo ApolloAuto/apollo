@@ -234,6 +234,8 @@ void PredictorManager::PredictObstacle(
     }
   }
   prediction_obstacle->set_timestamp(obstacle->timestamp());
+  prediction_obstacle->mutable_priority()->CopyFrom(
+      obstacle->latest_feature().priority());
   prediction_obstacle->set_is_static(obstacle->IsStill());
   if (FLAGS_prediction_offline_mode == 3) {
     FeatureOutput::InsertPredictionResult(obstacle->id(), *prediction_obstacle);

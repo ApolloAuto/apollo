@@ -21,7 +21,12 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
+#include "modules/map/hdmap/hdmap_util.h"
+#include "modules/map/pnc_map/path.h"
+#include "modules/map/pnc_map/pnc_map.h"
+#include "modules/map/proto/map_id.pb.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -29,17 +34,45 @@ namespace planning {
 namespace scenario {
 namespace valet_parking {
 
+struct ValetParkingContext {
+  ScenarioValetParkingConfig scenario_config;
+  std::string target_parking_spot_id;
+};
+
 class ValetParkingScenario : public Scenario {
  public:
   explicit ValetParkingScenario(const ScenarioConfig& config,
                                 const ScenarioContext* context)
       : Scenario(config, context) {}
 
+  void Init() override;
+
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
 
   bool IsTransferable(const Scenario& current_scenario,
                       const Frame& frame) override;
+
+  ValetParkingContext* GetContext() { return &context_; }
+
+ private:
+  static void RegisterStages();
+  bool GetScenarioConfig();
+  void SearchTargetParkingSpotOnPath(
+      const hdmap::Path& nearby_path,
+      hdmap::ParkingSpaceInfoConstPtr* target_parking_spot);
+  bool CheckDistanceToParkingSpot(
+      const common::VehicleState& vehicle_state, const hdmap::Path& nearby_path,
+      const hdmap::ParkingSpaceInfoConstPtr& target_parking_spot);
+
+ private:
+  bool init_ = false;
+  static apollo::common::util::Factory<
+      ScenarioConfig::StageType, Stage,
+      Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
+      s_stage_factory_;
+  ValetParkingContext context_;
+  const hdmap::HDMap* hdmap_ = nullptr;
 };
 
 }  // namespace valet_parking

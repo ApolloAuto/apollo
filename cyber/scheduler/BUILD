@@ -40,8 +40,8 @@ cc_library(
     ],
     deps = [
         "//cyber/croutine",
-        "//cyber/scheduler:processor",
         "//cyber/scheduler:mutex_wrapper",
+        "//cyber/scheduler:processor",
     ],
 )
 
@@ -129,9 +129,9 @@ cc_library(
     deps = [
         "//cyber/croutine",
         "//cyber/proto:classic_conf_cc_proto",
-        "//cyber/scheduler:processor",
-        "//cyber/scheduler:mutex_wrapper",
         "//cyber/scheduler:cv_wrapper",
+        "//cyber/scheduler:mutex_wrapper",
+        "//cyber/scheduler:processor",
     ],
 )
 
