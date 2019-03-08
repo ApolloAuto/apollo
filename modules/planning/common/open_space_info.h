@@ -103,7 +103,7 @@ class OpenSpaceInfo {
     is_on_open_space_trajectory_ = flag;
   }
 
-  const size_t obstacles_num() const { return obstacles_num_; }
+  size_t obstacles_num() const { return obstacles_num_; }
 
   void set_obstacles_num(const size_t obstacles_num) {
     obstacles_num_ = obstacles_num;
@@ -317,5 +317,6 @@ class OpenSpaceInfo {
   std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
       publishable_trajectory_data_;
 };
+
 }  // namespace planning
 }  // namespace apollo
