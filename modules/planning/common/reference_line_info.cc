@@ -434,9 +434,17 @@ bool ReferenceLineInfo::IsStartFrom(
 
 const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
 
+const PathData& ReferenceLineInfo::fallback_path_data() const {
+  return fallback_path_data_;
+}
+
 const SpeedData& ReferenceLineInfo::speed_data() const { return speed_data_; }
 
 PathData* ReferenceLineInfo::mutable_path_data() { return &path_data_; }
+
+PathData* ReferenceLineInfo::mutable_fallback_path_data() {
+  return &fallback_path_data_;
+}
 
 SpeedData* ReferenceLineInfo::mutable_speed_data() { return &speed_data_; }
 

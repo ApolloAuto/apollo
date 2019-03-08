@@ -7,6 +7,7 @@ cc_library(
     srcs = [
         "decider_creep.cc",
         "decider_rule_based_stop.cc",
+        "path_assessment_decider.cc",
         "path_bounds_decider.cc",
         "side_pass_path_decider.cc",
         "side_pass_safety.cc",
@@ -14,6 +15,7 @@ cc_library(
     hdrs = [
         "decider_creep.h",
         "decider_rule_based_stop.h",
+        "path_assessment_decider.h",
         "path_bounds_decider.h",
         "side_pass_path_decider.h",
         "side_pass_safety.h",

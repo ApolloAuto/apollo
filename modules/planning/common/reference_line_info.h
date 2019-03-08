@@ -100,8 +100,10 @@ class ReferenceLineInfo {
   const LatencyStats& latency_stats() const { return latency_stats_; }
 
   const PathData& path_data() const;
+  const PathData& fallback_path_data() const;
   const SpeedData& speed_data() const;
   PathData* mutable_path_data();
+  PathData* mutable_fallback_path_data();
   SpeedData* mutable_speed_data();
 
   const RSSInfo& rss_info() const;
@@ -287,6 +289,7 @@ class ReferenceLineInfo {
   double fallback_path_boundaries_s_resolution_ = 0.1;
 
   PathData path_data_;
+  PathData fallback_path_data_;
   SpeedData speed_data_;
 
   DiscretizedTrajectory discretized_trajectory_;
