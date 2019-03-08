@@ -16,11 +16,10 @@
 # limitations under the License.
 ###############################################################################
 
-import sys
-import gflags
 import os
+import sys
 
-from google.protobuf import text_format
+import gflags
 import matplotlib.pyplot as plt
 
 import common.proto_utils as proto_utils
