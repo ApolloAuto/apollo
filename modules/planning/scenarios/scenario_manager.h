@@ -55,6 +55,7 @@ class ScenarioManager final {
       const Frame& frame,
       const hdmap::PathOverlap& first_encountered_traffic_Light_overlap);
   ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
+  ScenarioConfig::ScenarioType SelectValetParkingScenario(const Frame& frame);
 
   // functions for scenario voter implementation
   // do NOT delete the code yet
