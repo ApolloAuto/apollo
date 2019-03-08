@@ -122,6 +122,7 @@ check_host_environment
 VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
   sunnyvale_big_loop
+  sunnyvale_hdl128
   sunnyvale_loop
   sunnyvale_with_two_offices
   san_mateo
