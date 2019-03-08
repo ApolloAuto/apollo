@@ -651,8 +651,11 @@ function config() {
 }
 
 function set_use_gpu() {
-  DEFINES="${DEFINES} --define USE_GPU=true"
-  USE_GPU="1"
+  if [ "${USE_GPU}" = "1" ] ; then
+    DEFINES="${DEFINES} --define USE_GPU=true"
+  else
+    DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+  fi
 }
 
 function print_usage() {
