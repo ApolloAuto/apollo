@@ -20,11 +20,13 @@ import sys
 import gflags
 import os
 
+from google.protobuf import text_format
+import matplotlib.pyplot as plt
+
+import common.proto_utils as proto_utils
 import modules.map.proto.map_pb2 as map_pb2
 import modules.routing.proto.topo_graph_pb2 as topo_graph_pb2
 import modules.routing.proto.routing_pb2 as routing_pb2
-from google.protobuf import text_format
-import matplotlib.pyplot as plt
 
 FLAGS = gflags.FLAGS
 gflags.DEFINE_string('map_dir', 'modules/map/data/demo', 'map directory')
@@ -48,24 +50,14 @@ def get_mapdata(map_dir):
     print('Please wait for loading map data...')
     map_data_path = os.path.join(map_dir, 'base_map.bin')
     print('File: %s' % map_data_path)
-
-    with open(map_data_path) as fp:
-        base_map = map_pb2.Map()
-        base_map.ParseFromString(f_handle.read())
-    print('Done')
-    return base_map
+    return proto_utils.get_pb_from_bin_file(map_data_path, map_pb2.Map())
 
 
 def get_topodata(map_dir):
     print('Please wait for loading routing topo data...')
     topo_data_path = os.path.join(map_dir, 'routing_map.bin')
-    print("File: %s" % topo_data_path)
-
-    with open(topo_data_path) as fp:
-        graph = topo_graph_pb2.Graph()
-        graph.ParseFromString(fp.read())
-    print('Done')
-    return graph
+    print("File: %s" % )
+    return proto_utils.get_pb_from_bin_file(topo_data_path, topo_graph_pb2.Graph())
 
 
 def get_routingdata():
@@ -74,11 +66,7 @@ def get_routingdata():
         os.path.join(os.path.dirname(__file__), '../../../data/log'))
     route_data_path = os.path.join(log_dir, 'passage_region_debug.bin')
     print("File: %s" % route_data_path)
-    with open(route_data_path) as fp:
-        route = routing_pb2.RoutingResponse()
-        text_format.Parse(f_handle.read(), route)
-    print("Done")
-    return route
+    return proto_utils.get_pb_from_text_file(route_data_path, routing_pb2.RoutingResponse())
 
 
 def onclick(event):
