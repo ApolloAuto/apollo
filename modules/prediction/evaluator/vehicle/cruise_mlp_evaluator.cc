@@ -17,9 +17,6 @@
 #include <limits>
 #include <utility>
 
-#include "torch/script.h"
-#include "torch/torch.h"
-
 #include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -47,9 +44,8 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
   return (count == 0) ? 0.0 : sum / count;
 }
 
-CruiseMLPEvaluator::CruiseMLPEvaluator() {
-  LoadModels(FLAGS_evaluator_cruise_vehicle_go_model_file,
-             FLAGS_evaluator_cruise_vehicle_cutin_model_file);
+CruiseMLPEvaluator::CruiseMLPEvaluator() : device_(torch::kCPU) {
+  LoadModels();
 }
 
 void CruiseMLPEvaluator::Clear() {}
@@ -104,12 +100,6 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       return;  // Skip Compute probability for offline mode
     }
 
-    torch::Device device(torch::kCPU);
-    // TODO(all) uncomment the following when cuda issue is resolved
-    // if (torch::cuda::is_available()) {
-    //   ADEBUG << "CUDA is available";
-    //   device = torch::Device(torch::kCUDA);
-    // }
     std::vector<torch::jit::IValue> torch_inputs;
     int input_dim = static_cast<int>(OBSTACLE_FEATURE_SIZE +
         SINGLE_LANE_FEATURE_SIZE * LANE_POINTS_SIZE);
@@ -117,10 +107,9 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     for (size_t i = 0; i < feature_values.size(); ++i) {
       torch_input[0][i] = static_cast<float>(feature_values[i]);
     }
-    torch_inputs.push_back(torch_input.to(device));
-    std::shared_ptr<torch::jit::script::Module> torch_module =
-        torch::jit::load(FLAGS_torch_vehicle_cruise_cutin_file, device);
-    auto torch_output_tuple = torch_module->forward(torch_inputs).toTuple();
+    torch_inputs.push_back(torch_input.to(device_));
+    auto torch_output_tuple =
+        torch_cutin_model_ptr_->forward(torch_inputs).toTuple();
     auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
     auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
     lane_sequence_ptr->set_probability(Sigmoid(static_cast<double>(
@@ -539,27 +528,14 @@ void CruiseMLPEvaluator::SetLaneFeatureValues(
   }
 }
 
-void CruiseMLPEvaluator::LoadModels(const std::string& go_model_file,
-                                    const std::string& cutin_model_file) {
-  go_model_ptr_.reset(new network::CruiseModel());
-  cutin_model_ptr_.reset(new network::CruiseModel());
-  CHECK_NOTNULL(go_model_ptr_);
-  CHECK_NOTNULL(cutin_model_ptr_);
-
-  AINFO << "start loading models";
-
-  CruiseModelParameter go_model_param;
-  CruiseModelParameter cutin_model_param;
-  CHECK(GetProtoFromFile(go_model_file, &go_model_param))
-      << "Unable to load go model file: " << go_model_file << ".";
-  CHECK(GetProtoFromFile(cutin_model_file, &cutin_model_param))
-      << "Unable to load cut-in model file: " << cutin_model_file << ".";
-
-  go_model_ptr_->LoadModel(go_model_param);
-  cutin_model_ptr_->LoadModel(cutin_model_param);
-
-  AINFO << "Succeeded in loading go model: " << go_model_file << ".";
-  AINFO << "Succeeded in loading cut-in model: " << cutin_model_file << ".";
+void CruiseMLPEvaluator::LoadModels() {
+  // TODO(all) uncomment the following when cuda issue is resolved
+  // if (torch::cuda::is_available()) {
+  //   ADEBUG << "CUDA is available";
+  //   device_ = torch::Device(torch::kCUDA);
+  // }
+  torch_cutin_model_ptr_ = torch::jit::load(
+      FLAGS_torch_vehicle_cruise_cutin_file, device_);
 }
 
 // TODO(all): implement this once the model is trained and ready.
