@@ -24,6 +24,7 @@
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
@@ -33,6 +34,7 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::cyber::common::GetProtoFromFile;
+using apollo::prediction::math_util::Sigmoid;
 
 // Helper function for computing the mean value of a vector.
 double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
@@ -121,8 +123,8 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     auto torch_output_tuple = torch_module->forward(torch_inputs).toTuple();
     auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
     auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
-    lane_sequence_ptr->set_probability(
-        static_cast<double>(probability_tensor.accessor<float, 2>()[0][0]));
+    lane_sequence_ptr->set_probability(Sigmoid(static_cast<double>(
+        probability_tensor.accessor<float, 2>()[0][0])));
     lane_sequence_ptr->set_time_to_lane_center(
         static_cast<double>(finish_time_tensor.accessor<float, 2>()[0][0]));
   }
