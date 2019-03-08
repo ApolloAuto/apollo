@@ -64,7 +64,6 @@ void TrafficLightProtectedScenario::Init() {
     if (!traffic_light) {
       AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
     }
-    return;
   }
 
   init_ = true;

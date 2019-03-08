@@ -153,7 +153,8 @@ class ReferenceLineInfo {
 
   void ExportDecision(DecisionResult* decision_result) const;
 
-  void SetJunctionRightOfWay(double junction_s, bool is_protected);
+  void SetJunctionRightOfWay(const double junction_s,
+                             const bool is_protected) const;
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
