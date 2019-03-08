@@ -154,8 +154,13 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
         "//modules/prediction/network/cruise_model",
-        "@pytorch",
-    ],
+    ] + select({
+        "//tools/platforms:use_gpu": [
+            "@pytorch_gpu",
+        ],
+        "//conditions:default": [
+            "@pytorch",
+        ]}),
 )
 
 cc_test(
