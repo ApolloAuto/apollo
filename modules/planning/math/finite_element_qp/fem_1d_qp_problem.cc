@@ -267,7 +267,7 @@ void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                      std::vector<c_int>* P_indices,
                                      std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
-  const int kNumParam = 3 * N;
+  const int kNumParam = 4 * N;
   P_data->resize(kNumParam);
   P_indices->resize(kNumParam);
   P_indptr->resize(kNumParam + 1);
@@ -277,8 +277,10 @@ void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
       P_data->at(i) = 2.0 * (weight_.x_w + weight_.x_mid_line_w);
     } else if (i < 2 * N) {
       P_data->at(i) = 2.0 * weight_.x_derivative_w;
-    } else {
+    } else if (i < 3 * N) {
       P_data->at(i) = 2.0 * weight_.x_second_order_derivative_w;
+    } else {
+      P_data->at(i) = 2.0 * weight_.x_third_order_derivative_w;
     }
     P_indices->at(i) = i;
     P_indptr->at(i) = i;
@@ -291,11 +293,11 @@ void Fem1dQpProblem::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
     std::vector<c_float>* upper_bounds) {
-  // 3N params bounds on x, x', x''
+  // 4N params bounds on x, x', x'', x'''
   // 3(N-1) constraints on x, x', x''
   // 3 constraints on x_init_
   const int N = static_cast<int>(num_of_knots_);
-  const int kNumParam = 3 * N;
+  const int kNumParam = 4 * N;
   const int kNumConstraint = kNumParam + 3 * (N - 1) + 3;
   lower_bounds->resize(kNumConstraint);
   upper_bounds->resize(kNumConstraint);
@@ -313,9 +315,12 @@ void Fem1dQpProblem::CalculateAffineConstraint(
     } else if (i < 2 * N) {
       lower_bounds->at(constraint_index) = std::get<0>(dx_bounds_[i - N]);
       upper_bounds->at(constraint_index) = std::get<1>(dx_bounds_[i - N]);
-    } else {
+    } else if (i < 3 * N) {
       lower_bounds->at(constraint_index) = std::get<0>(ddx_bounds_[i - 2 * N]);
       upper_bounds->at(constraint_index) = std::get<1>(ddx_bounds_[i - 2 * N]);
+    } else {
+      lower_bounds->at(constraint_index) = -max_x_third_order_derivative_;
+      upper_bounds->at(constraint_index) = max_x_third_order_derivative_;
     }
     ++constraint_index;
   }
@@ -325,10 +330,9 @@ void Fem1dQpProblem::CalculateAffineConstraint(
   for (int i = 0; i + 1 < N; ++i) {
     columns[2 * N + i].emplace_back(constraint_index, -1.0);
     columns[2 * N + i + 1].emplace_back(constraint_index, 1.0);
-    lower_bounds->at(constraint_index) =
-        -max_x_third_order_derivative_ * delta_s_;
-    upper_bounds->at(constraint_index) =
-        max_x_third_order_derivative_ * delta_s_;
+    columns[3 * N + i].emplace_back(constraint_index, -delta_s_);
+    lower_bounds->at(constraint_index) = 0.0;
+    upper_bounds->at(constraint_index) = 0.0;
     ++constraint_index;
   }
 
@@ -389,7 +393,7 @@ void Fem1dQpProblem::CalculateAffineConstraint(
 void Fem1dQpProblem::CalculateOffset(std::vector<c_float>* q) {
   CHECK_NOTNULL(q);
   const int N = static_cast<int>(num_of_knots_);
-  const int kNumParam = 3 * N;
+  const int kNumParam = 4 * N;
   q->resize(kNumParam);
   for (int i = 0; i < kNumParam; ++i) {
     if (i < N) {
