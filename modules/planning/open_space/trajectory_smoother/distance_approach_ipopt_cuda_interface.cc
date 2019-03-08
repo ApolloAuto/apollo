@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ namespace apollo {
 namespace planning {
 
 DistanceApproachIPOPTCUDAInterface::DistanceApproachIPOPTCUDAInterface(
-    size_t horizon, double ts, Eigen::MatrixXd ego, const Eigen::MatrixXd& xWS,
-    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
-    const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& x0,
-    const Eigen::MatrixXd& xf, const Eigen::MatrixXd& last_time_u,
-    const std::vector<double>& XYbounds,
+    const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
+    const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
     const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const PlannerOpenSpaceConfig& planner_open_space_config)
