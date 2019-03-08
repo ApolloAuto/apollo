@@ -31,9 +31,6 @@ gflags.DEFINE_string('map_dir', 'modules/map/data/demo', 'map directory')
 
 
 def get_map_dir(argv):
-    """
-
-    """
     sys.argv.insert(1, '--undefok')
     flagfile = os.path.normpath(
         os.path.join(
@@ -43,56 +40,57 @@ def get_map_dir(argv):
     argv = FLAGS(sys.argv)
     mapdir = os.path.normpath(
         os.path.join(os.path.dirname(__file__), '../../../', FLAGS.map_dir))
-    print "Map dir: ", FLAGS.map_dir
+    print("Map dir: %s " % FLAGS.map_dir)
     return mapdir
 
 
 def get_mapdata(map_dir):
-    print 'Please wait for loading map data...'
+    print('Please wait for loading map data...')
     map_data_path = os.path.join(map_dir, 'base_map.bin')
-    print "file: ", map_data_path
-    f_handle = open(map_data_path)
-    base_map = map_pb2.Map()
-    base_map.ParseFromString(f_handle.read())
-    f_handle.close()
-    print 'Done'
+    print('File: %s' % map_data_path)
+
+    with open(map_data_path) as fp:
+        base_map = map_pb2.Map()
+        base_map.ParseFromString(f_handle.read())
+    print('Done')
     return base_map
 
 
 def get_topodata(map_dir):
-    print 'Please wait for loading routing topo data...'
+    print('Please wait for loading routing topo data...')
     topo_data_path = os.path.join(map_dir, 'routing_map.bin')
-    print "file: ", topo_data_path
-    f_handle = open(topo_data_path)
-    graph = topo_graph_pb2.Graph()
-    graph.ParseFromString(f_handle.read())
-    f_handle.close()
-    print 'Done'
+    print("File: %s" % topo_data_path)
+
+    with open(topo_data_path) as fp:
+        graph = topo_graph_pb2.Graph()
+        graph.ParseFromString(fp.read())
+    print('Done')
     return graph
 
 
 def get_routingdata():
-    print 'Please wait for loading route response data...'
+    print('Please wait for loading route response data...')
     log_dir = os.path.normpath(
         os.path.join(os.path.dirname(__file__), '../../../data/log'))
     route_data_path = os.path.join(log_dir, 'passage_region_debug.bin')
-    print "file: ", route_data_path
-    f_handle = open(route_data_path)
-    route = routing_pb2.RoutingResponse()
-    text_format.Parse(f_handle.read(), route)
-    f_handle.close()
-    print "Done"
+    print("File: %s" % route_data_path)
+    with open(route_data_path) as fp:
+        route = routing_pb2.RoutingResponse()
+        text_format.Parse(f_handle.read(), route)
+    print("Done")
     return route
 
 
 def onclick(event):
     """Event function when mouse left button is clicked"""
-    print '\nClick captured! x=%f\ty=%f' % (event.xdata, event.ydata)
-    print 'cmd>',
+
+    print('\nClick captured! x=%f\ty=%f' % (event.xdata, event.ydata))
+    print('cmd>')
 
 
 def downsample_array(array, step=5):
-    """down sample given array"""
+    """Down sample given array"""
+
     result = array[::step]
     result.append(array[-1])
     return result
@@ -103,6 +101,7 @@ def draw_boundary(ax, line_segment):
     :param line_segment:
     :return:
     """
+
     px = [float(p.x) for p in line_segment.point]
     py = [float(p.y) for p in line_segment.point]
 
@@ -112,7 +111,7 @@ def draw_boundary(ax, line_segment):
 
 
 def draw_map(ax, mapfile):
-    """ draw map from mapfile"""
+    """Draw map from mapfile"""
 
     for lane in mapfile.lane:
         for curve in lane.left_boundary.curve.segment:
