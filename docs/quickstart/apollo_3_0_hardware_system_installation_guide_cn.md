@@ -27,10 +27,10 @@
 | **粗体**                            | 重点强调                                 |
 | `等宽字体`                   | 代码，类型数据                         |
 | _斜体_                            | 标题、章节和标题使用的术语 |
-| ![info](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果。 |
-| ![tip](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于完成任务的快捷方式。 |
-| ![online](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息。 |
-| ![warning](https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/quickstart/images/warning_icon.png) | **Warning**. 包含**不能忽略**的信息，否则在执行某个任务或步骤时，您将面临失败的风险。 |
+| ![info](images/info_icon.png)       | **Info**  包含可能有用的信息。忽略信息图标没有消极的后果。 |
+| ![tip](images/tip_icon.png)         | **Tip**. 包括有用的提示或可能有助于完成任务的快捷方式。 |
+| ![online](images/online_icon.png)   | **Online**. 提供指向特定网站的链接，您可以在其中获取更多信息。 |
+| ![warning](images/warning_icon.png) | **Warning**. 包含**不能忽略**的信息，否则在执行某个任务或步骤时，您将面临失败的风险。 |
 
 ## 引言
 
