@@ -118,6 +118,7 @@ bool PathDecider::MakeStaticObstacleDecision(
                                                obstacle->Id(), object_decision);
       continue;
     }
+
     if (obstacle->reference_line_st_boundary().boundary_type() ==
         STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
