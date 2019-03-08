@@ -151,6 +151,7 @@ cc_library(
         "cruise_mlp_evaluator.h",
     ],
     deps = [
+        "//modules/prediction/common:prediction_util",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
         "//modules/prediction/network/cruise_model",
