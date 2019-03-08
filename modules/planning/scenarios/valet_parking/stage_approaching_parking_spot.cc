@@ -42,8 +42,7 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
                                                .id()
                                                .id();
   } else {
-    const std::string msg = "No parking space id from routing";
-    AERROR << msg;
+    AERROR << "No parking space id from routing";
     return StageStatus::ERROR;
   }
 

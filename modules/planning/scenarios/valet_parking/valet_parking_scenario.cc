@@ -18,8 +18,8 @@
  * @file
  **/
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "modules/planning/scenarios/valet_parking/stage_approaching_parking_spot.h"
 #include "modules/planning/scenarios/valet_parking/stage_parking.h"
@@ -108,8 +108,7 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
     target_parking_spot_id =
         frame.local_view().routing->routing_request().parking_space().id().id();
   } else {
-    const std::string msg = "No parking space id from routing";
-    AERROR << msg;
+    AERROR << "No parking space id from routing";
     return false;
   }
 
@@ -122,21 +121,19 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
   PathOverlap parking_space_overlap;
   const auto& vehicle_state = frame.vehicle_state();
 
-  if (!SearchTargetParkingSpotOnPath(nearby_path,
-                                     target_parking_spot_id,
+  if (!SearchTargetParkingSpotOnPath(nearby_path, target_parking_spot_id,
                                      &parking_space_overlap)) {
-    std::string msg(
-        "No such parking spot found after searching all path forward possible");
-    AERROR << msg << target_parking_spot_id;
+    AERROR << "No such parking spot found after searching all path forward "
+              "possible"
+           << target_parking_spot_id;
     return false;
   }
 
   if (!CheckDistanceToParkingSpot(vehicle_state, nearby_path,
                                   parking_start_range, parking_space_overlap)) {
-    std::string msg(
-        "target parking spot found, but too far, distance larger than "
-        "pre-defined distance");
-    AERROR << msg << target_parking_spot_id;
+    AERROR << "target parking spot found, but too far, distance larger than "
+              "pre-defined distance"
+           << target_parking_spot_id;
     return false;
   }
 
