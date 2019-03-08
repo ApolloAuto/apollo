@@ -130,10 +130,17 @@ bool RecordFileReader::ReadSection(Section* section) {
   return true;
 }
 
-bool RecordFileReader::SkipSection(uint64_t size) {
-  uint64_t c = CurrentPosition();
-  if (!SetPosition(c + size)) {
-    AERROR << "Skip failed, file: " << path_ << ", skip count: " << size;
+bool RecordFileReader::SkipSection(int64_t size) {
+  int64_t pos = CurrentPosition();
+  if (size > INT64_MAX - pos) {
+    AERROR << "Current position plus skip count is larger than INT64_MAX, "
+           << pos << " + " << size << " > " << INT64_MAX;
+    return false;
+  }
+  if (!SetPosition(pos + size)) {
+    AERROR << "Skip failed, file: " << path_
+           << ", current position: " << pos
+           << "skip count: " << size;
     return false;
   }
   return true;
