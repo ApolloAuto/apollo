@@ -20,6 +20,9 @@
 #include <string>
 #include <vector>
 
+#include "torch/script.h"
+#include "torch/torch.h"
+
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/network/cruise_model/cruise_model.h"
 
@@ -91,11 +94,8 @@ class CruiseMLPEvaluator : public Evaluator {
 
   /**
    * @brief Load mode files
-   * @param Go model file name
-   * @param Cutin model file name
    */
-  void LoadModels(const std::string& go_model_file,
-                  const std::string& cutin_model_file);
+  void LoadModels();
 
   /**
    * @brief Compute probability of a junction exit
@@ -116,8 +116,9 @@ class CruiseMLPEvaluator : public Evaluator {
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 20;
 
-  std::shared_ptr<network::CruiseModel> go_model_ptr_;
-  std::shared_ptr<network::CruiseModel> cutin_model_ptr_;
+  std::shared_ptr<torch::jit::script::Module> torch_go_model_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module> torch_cutin_model_ptr_ = nullptr;
+  torch::Device device_;
 };
 
 }  // namespace prediction
