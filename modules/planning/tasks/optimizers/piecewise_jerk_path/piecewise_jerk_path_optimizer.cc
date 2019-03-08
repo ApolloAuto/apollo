@@ -50,7 +50,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       piecewise_jerk_path_config.l_weight(),
       piecewise_jerk_path_config.dl_weight(),
       piecewise_jerk_path_config.ddl_weight(),
-      0.0,
+      piecewise_jerk_path_config.dddl_weight(),
       0.0
   };
 
