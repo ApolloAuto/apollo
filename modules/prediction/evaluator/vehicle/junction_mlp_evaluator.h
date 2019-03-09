@@ -92,9 +92,8 @@ class JunctionMLPEvaluator : public Evaluator {
 
   /**
    * @brief Load mode file
-   * @param Model file name
    */
-  void LoadModel(const std::string& model_file);
+  void LoadModel();
 
  private:
   // obstacle feature with 4 basic features and 5 frames of history posotion
