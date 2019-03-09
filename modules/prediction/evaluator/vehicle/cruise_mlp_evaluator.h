@@ -97,18 +97,10 @@ class CruiseMLPEvaluator : public Evaluator {
    */
   void LoadModels();
 
-  /**
-   * @brief Compute probability of a junction exit
-   */
-  double ComputeFinishTime(const std::vector<double>& feature_values);
-
-  /**
-   * @brief Save offline feature values in proto
-   * @param Lane sequence
-   * @param Vector of feature values
-   */
-  void SaveOfflineFeatures(LaneSequence* sequence,
-                           const std::vector<double>& feature_values);
+  void ModelInference(
+      const std::vector<torch::jit::IValue>& torch_inputs,
+      std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+      LaneSequence* lane_sequence_ptr);
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 23 + 5 * 9;
