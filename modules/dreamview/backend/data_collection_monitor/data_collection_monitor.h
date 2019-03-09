@@ -26,6 +26,7 @@
 
 #include "boost/thread/shared_mutex.hpp"
 #include "third_party/json/json.hpp"
+#include "gtest/gtest_prod.h"
 
 #include "cyber/cyber.h"
 #include "modules/canbus/proto/chassis.pb.h"
@@ -66,7 +67,7 @@ class DataCollectionMonitor {
   /**
    * @brief return collection progress of categories and overall as json
    */
-  nlohmann::json GetProgressString();
+  nlohmann::json GetProgressAsJson();
 
  private:
   void InitReaders();
@@ -94,6 +95,9 @@ class DataCollectionMonitor {
   // Mutex to protect concurrent access to current_progress_json_.
   // NOTE: Use boost until we have std version of rwlock support.
   boost::shared_mutex mutex_;
+
+
+  FRIEND_TEST(DataCollectionMonitorTest, UpdateCollectionProgress);
 };
 
 }  // namespace dreamview
