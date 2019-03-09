@@ -108,14 +108,25 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
       torch_input[0][i] = static_cast<float>(feature_values[i]);
     }
     torch_inputs.push_back(torch_input.to(device_));
-    auto torch_output_tuple =
-        torch_cutin_model_ptr_->forward(torch_inputs).toTuple();
-    auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
-    auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
-    lane_sequence_ptr->set_probability(Sigmoid(static_cast<double>(
-        probability_tensor.accessor<float, 2>()[0][0])));
-    lane_sequence_ptr->set_time_to_lane_center(
-        static_cast<double>(finish_time_tensor.accessor<float, 2>()[0][0]));
+    if (lane_sequence_ptr->vehicle_on_lane()) {
+      auto torch_output_tuple =
+          torch_go_model_ptr_->forward(torch_inputs).toTuple();
+      auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
+      auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
+      lane_sequence_ptr->set_probability(Sigmoid(static_cast<double>(
+          probability_tensor.accessor<float, 2>()[0][0])));
+      lane_sequence_ptr->set_time_to_lane_center(
+          static_cast<double>(finish_time_tensor.accessor<float, 2>()[0][0]));
+    } else {
+      auto torch_output_tuple =
+          torch_cutin_model_ptr_->forward(torch_inputs).toTuple();
+      auto probability_tensor = torch_output_tuple->elements()[0].toTensor();
+      auto finish_time_tensor = torch_output_tuple->elements()[1].toTensor();
+      lane_sequence_ptr->set_probability(Sigmoid(static_cast<double>(
+          probability_tensor.accessor<float, 2>()[0][0])));
+      lane_sequence_ptr->set_time_to_lane_center(
+          static_cast<double>(finish_time_tensor.accessor<float, 2>()[0][0]));
+    }
   }
 }
 
@@ -140,20 +151,22 @@ void CruiseMLPEvaluator::ExtractFeatureValues(
   feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
 
-  // Extract interaction features.
-  // std::vector<double> interaction_feature_values;
-  // SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
-  //                             &interaction_feature_values);
-  // if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
-  //   ADEBUG << "Obstacle [" << id << "] has fewer than "
-  //          << "expected lane feature_values"
-  //          << interaction_feature_values.size() << ".";
-  //   return;
-  // }
-  // ADEBUG << "Interaction feature size = " << interaction_feature_values.size();
-  // feature_values->insert(feature_values->end(),
-  //                        interaction_feature_values.begin(),
-  //                        interaction_feature_values.end());
+  /*
+  Extract interaction features.
+  std::vector<double> interaction_feature_values;
+  SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
+                              &interaction_feature_values);
+  if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
+           << "expected lane feature_values"
+           << interaction_feature_values.size() << ".";
+    return;
+  }
+  ADEBUG << "Interaction feature size = " << interaction_feature_values.size();
+  feature_values->insert(feature_values->end(),
+                         interaction_feature_values.begin(),
+                         interaction_feature_values.end());
+  */
 
   // Extract lane related features.
   std::vector<double> lane_feature_values;
@@ -534,6 +547,8 @@ void CruiseMLPEvaluator::LoadModels() {
   //   ADEBUG << "CUDA is available";
   //   device_ = torch::Device(torch::kCUDA);
   // }
+  torch_go_model_ptr_ = torch::jit::load(
+      FLAGS_torch_vehicle_cruise_go_file, device_);
   torch_cutin_model_ptr_ = torch::jit::load(
       FLAGS_torch_vehicle_cruise_cutin_file, device_);
 }
