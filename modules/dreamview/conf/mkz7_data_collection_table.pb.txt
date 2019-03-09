@@ -316,7 +316,7 @@ category {
     }
     criterion {
       field: "steering_percentage"
-      comparison_operator: LESS_THAN
+      comparison_operator: GREATER_THAN
       value: -20
     }
   }
@@ -334,7 +334,7 @@ category {
     }
     criterion {
       field: "steering_percentage"
-      comparison_operator: LESS_THAN
+      comparison_operator: GREATER_THAN
       value: -40
     }
   }
@@ -352,7 +352,7 @@ category {
     }
     criterion {
       field: "steering_percentage"
-      comparison_operator: LESS_THAN
+      comparison_operator: GREATER_THAN
       value: -60
     }
   }

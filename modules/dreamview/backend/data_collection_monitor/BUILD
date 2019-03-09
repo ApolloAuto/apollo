@@ -21,4 +21,21 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "data_collection_monitor_test",
+    size = "small",
+    srcs = [
+        "data_collection_monitor_test.cc",
+    ],
+    data = [
+        "//modules/dreamview/backend/testdata",
+    ],
+    deps = [
+        ":data_collection_monitor",
+        "//modules/common/util:json_util",
+        "@gtest//:main",
+    ],
+)
+
+
 cpplint()
