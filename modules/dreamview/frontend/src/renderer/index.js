@@ -151,8 +151,8 @@ class Renderer {
         this.controls.enabled = true;
         this.controls.enableRotate = false;
         this.controls.reset();
-        this.controls.minDistance = 20;
-        this.controls.maxDistance = 1000;
+        this.controls.minDistance = 4;
+        this.controls.maxDistance = 4000;
         this.controls.target.set(carPosition.x, carPosition.y, 0);
 
         this.camera.position.set(carPosition.x, carPosition.y, 50);
