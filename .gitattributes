@@ -11,7 +11,5 @@
 # and tracked.
 *caffe.md filter=lfs diff=lfs merge=lfs -text
 *deploy.md filter=lfs diff=lfs merge=lfs -text
-cruise_cutin_vehicle_model.pt filter=lfs diff=lfs merge=lfs -text
-cruise_go_vehicle_model.pt filter=lfs diff=lfs merge=lfs -text
-junction_mlp_vehicle_model.pt filter=lfs diff=lfs merge=lfs -text
+*_vehicle_model.pt filter=lfs diff=lfs merge=lfs -text
 * text !filter !merge !diff
