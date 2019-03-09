@@ -49,7 +49,7 @@ $ start_gdb dreamview
 
 Once gdb is launched, press `r` and `enter` key to run,  if dreamview crashes, then get the backtrace with `bt`.
 
-## CPU does not support FMA/FMA3 instructions
+### CPU does not support FMA/FMA3 instructions
 
 If you see an error `Illegal instruction` and something related with **libpcl_sample_consensus.so.1.7** in gdb backtrace, then you probably need to rebuild pcl lib from source by yourself and replace the one in the docker.
 
@@ -181,7 +181,7 @@ And finally restart Dreamview using
     bash scripts/bootstrap.sh start
 ```
 
-## CPU does not support AVX instructions
+### CPU does not support AVX instructions
 
 If CPU does not support AVX instructions, and you gdb the coredump file under /apollo/data/core/ with name core_dreamview.$PID, you may see logs like:
 
