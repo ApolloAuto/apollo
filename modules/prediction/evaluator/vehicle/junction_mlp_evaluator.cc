@@ -53,7 +53,7 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 }  // namespace
 
 JunctionMLPEvaluator::JunctionMLPEvaluator() : device_(torch::kCPU) {
-  LoadModel(FLAGS_torch_vehicle_junction_mlp_file);
+  LoadModel();
 }
 
 void JunctionMLPEvaluator::Clear() {}
@@ -355,7 +355,7 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
   }
 }
 
-void JunctionMLPEvaluator::LoadModel(const std::string& model_file) {
+void JunctionMLPEvaluator::LoadModel() {
   // TODO(all) uncomment the following when cuda issue is resolved
   // if (torch::cuda::is_available()) {
   //   ADEBUG << "CUDA is available";
