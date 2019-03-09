@@ -197,7 +197,7 @@ void DataCollectionMonitor::UpdateProgressInJson() {
   }
 }
 
-nlohmann::json DataCollectionMonitor::GetProgressString() {
+nlohmann::json DataCollectionMonitor::GetProgressAsJson() {
   boost::unique_lock<boost::shared_mutex> reader_lock(mutex_);
   return current_progress_json_;
 }
