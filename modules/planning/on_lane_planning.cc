@@ -392,6 +392,7 @@ Status OnLanePlanning::Plan(
         frame_->open_space_info().publishable_trajectory_data().second;
     publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
     trajectory_pb->set_gear(publishable_trajectory_gear);
+  }
 
   const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
   if (!best_ref_info) {
