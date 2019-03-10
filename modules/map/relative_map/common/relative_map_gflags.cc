@@ -55,3 +55,5 @@ DEFINE_bool(relative_map_generate_left_boundray, true,
 DEFINE_bool(navigator_down_sample, true,
             "When a navigation line is sent, the original data is downsampled "
             "to reduce unnecessary memory consumption.");
+
+DEFINE_int32(relative_map_path_frame_ahead, 1500, "path frame count ahead waiting to be updated");

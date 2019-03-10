@@ -425,8 +425,16 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
       if (length > FLAGS_max_len_from_navigation_line) {
         return true;
       }
+      int path_size = navigation_path.path_point_size();
+      int path_size_ahead = path_size;
+#ifdef __aarch64__
+      path_size_ahead = current_project_index + FLAGS_relative_map_path_frame_ahead;
+      if (path_size_ahead > path_size) {
+        path_size_ahead = path_size;
+      }
+#endif
       gen_navi_path_loop_func(stitch_end_index,
-                              navigation_path.path_point_size(), length,
+                              path_size_ahead, length,
                               FLAGS_max_len_from_navigation_line, path);
       return true;
     }
@@ -435,8 +443,18 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
   if (dist < 20) {
     return false;
   }
+
+  int path_size = navigation_path.path_point_size();
+  int path_size_ahead = path_size;
+#ifdef __aarch64__
+  path_size_ahead = current_project_index + FLAGS_relative_map_path_frame_ahead;
+  if (path_size_ahead > path_size) {
+    path_size_ahead = path_size;
+  }
+#endif
+
   gen_navi_path_loop_func(std::max(0, current_project_index - 3),
-                          navigation_path.path_point_size(), 0.0,
+                          path_size_ahead, 0.0,
                           FLAGS_max_len_from_navigation_line, path);
   return true;
 }

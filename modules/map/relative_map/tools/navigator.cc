@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  while (ros::ok()) {
+  if (ros::ok()) {
     AdapterManager::FillNavigationHeader("relative_map", &navigation_info);
     AdapterManager::PublishNavigation(navigation_info);
     ADEBUG << "Sending navigation info:" << navigation_info.DebugString();
@@ -104,6 +104,9 @@ int main(int argc, char** argv) {
     // prematurely.
     ros::Rate r(1);  // 1 hz
     r.sleep();
+  } else {
+    AERROR << "ROS status is wrong.";
+    return -1;
   }
 
   return 0;
