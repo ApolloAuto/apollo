@@ -374,11 +374,13 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
       AERROR << "Null lane info pointer found.";
       continue;
     }
-    double s, l;
-    PredictionMap::GetProjection({pose_x, pose_y}, lane_info_ptr, &s, &l);
-    if (l < ego_vehicle_l) {
-      ego_vehicle_s = accumulated_s + s;
-      ego_vehicle_l = l;
+    double s = 0.0;
+    double l = 0.0;
+    if (PredictionMap::GetProjection({pose_x, pose_y}, lane_info_ptr, &s, &l)) {
+      if (l < ego_vehicle_l) {
+        ego_vehicle_s = accumulated_s + s;
+        ego_vehicle_l = l;
+      }
     }
     accumulated_s += lane_info_ptr->total_length();
   }
