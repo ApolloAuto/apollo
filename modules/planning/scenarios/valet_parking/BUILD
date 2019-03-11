@@ -5,14 +5,14 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "valet_parking",
     srcs = [
-        "valet_parking_scenario.cc",
         "stage_approaching_parking_spot.cc",
         "stage_parking.cc",
+        "valet_parking_scenario.cc",
     ],
     hdrs = [
-        "valet_parking_scenario.h",
         "stage_approaching_parking_spot.h",
         "stage_parking.h",
+        "valet_parking_scenario.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

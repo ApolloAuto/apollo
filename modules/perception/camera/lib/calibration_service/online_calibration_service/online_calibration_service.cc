@@ -173,10 +173,10 @@ void OnlineCalibrationService::Update(CameraFrame *frame) {
     }
   }
   auto iter = name_camera_status_map_.find(sensor_name_);
-  AINFO << "camera_ground_height: "
-        << iter->second.camera_ground_height << " meter";
-  AINFO << "pitch_angle: "
-        << iter->second.pitch_angle * 180.0 / M_PI << " degree";
+  AINFO << "camera_ground_height: " << iter->second.camera_ground_height
+        << " meter";
+  AINFO << "pitch_angle: " << iter->second.pitch_angle * 180.0 / M_PI
+        << " degree";
   // CHECK(BuildIndex());
 }
 

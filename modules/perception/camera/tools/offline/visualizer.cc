@@ -163,8 +163,7 @@ bool Visualizer::Init_all_info_single_camera(
   AINFO << "ex_camera2car_ =" << ex_camera2car_;
 
   // Adjust angle
-  adjust_angles(camera_name,
-    pitch_adj_degree, yaw_adj_degree, roll_adj_degree);
+  adjust_angles(camera_name, pitch_adj_degree, yaw_adj_degree, roll_adj_degree);
 
   AINFO << "homography_image2ground_ =" << homography_image2ground_;
 
@@ -212,12 +211,10 @@ bool Visualizer::Init_all_info_single_camera(
   return true;
 }
 
-bool Visualizer::adjust_angles(
-    const std::string &camera_name,
-    const double &pitch_adj_degree,
-    const double &yaw_adj_degree,
-    const double &roll_adj_degree) {
-
+bool Visualizer::adjust_angles(const std::string &camera_name,
+                               const double &pitch_adj_degree,
+                               const double &yaw_adj_degree,
+                               const double &roll_adj_degree) {
   // Convert degree angles to radian angles
   double pitch_adj_radian = pitch_adj_degree * degree_to_radian_factor;
   double yaw_adj_radian = yaw_adj_degree * degree_to_radian_factor;
@@ -247,8 +244,7 @@ bool Visualizer::adjust_angles(
         0, 0, 0, 1;
 
   adjusted_camera2car_ = ex_camera2car_ * Rz * Ry * Rx;
-  AWARN << "adjusted_camera2car_: "
-        << adjusted_camera2car_;
+  AWARN << "adjusted_camera2car_: " << adjusted_camera2car_;
 
   // Get homography from projection matrix
   // ====
@@ -289,7 +285,6 @@ bool Visualizer::adjust_angles(
 
   return true;
 }
-
 
 bool Visualizer::SetDirectory(const std::string &path) {
   int is_success = 1;
@@ -523,19 +518,19 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     if (show_verbose_) help_str_ += " (ON)";
   }
   switch (key) {
-    case 65362:  // Up_Arrow
-    case 65361:  // Left_Arrow
-    case 65363:  // Right_Arrow
-    case 65364:  // Down_Arrow
+    case 65362:   // Up_Arrow
+    case 65361:   // Left_Arrow
+    case 65363:   // Right_Arrow
+    case 65364:   // Down_Arrow
     case 130897:  // ALT + Left_Arrow
     case 130899:  // ALT + Right_Arrow
-    adjust_angles(camera_name,
-      pitch_adj_degree_, yaw_adj_degree_, roll_adj_degree_);
-    if (show_help_text_) {
-      help_str_ += "\nAdjusted Pitch: " + std::to_string(pitch_adj_degree_);
-      help_str_ += "\nAdjusted Yaw: " + std::to_string(yaw_adj_degree_);
-      help_str_ += "\nAdjusted Roll: " + std::to_string(roll_adj_degree_);
-    }
+      adjust_angles(camera_name, pitch_adj_degree_, yaw_adj_degree_,
+                    roll_adj_degree_);
+      if (show_help_text_) {
+        help_str_ += "\nAdjusted Pitch: " + std::to_string(pitch_adj_degree_);
+        help_str_ += "\nAdjusted Yaw: " + std::to_string(yaw_adj_degree_);
+        help_str_ += "\nAdjusted Roll: " + std::to_string(roll_adj_degree_);
+      }
   }
   return true;
 }

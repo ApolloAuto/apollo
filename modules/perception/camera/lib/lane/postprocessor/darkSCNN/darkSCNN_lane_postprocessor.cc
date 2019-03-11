@@ -228,12 +228,12 @@ bool DarkSCNNLanePostprocessor::Process2D(
     if (xy_points[i].size() < minNumPoints_) continue;
     Eigen::Matrix<float, 4, 1> coeff;
     // solve linear system to estimate polynomial coefficients
-    if (RansacFitting(&xy_points[i], &coeff,
-         200, static_cast<int> (minNumPoints_), 0.1f)) {
-//    if (PolyFit(xy_points[i], max_poly_order, &coeff, true)) {
-       coeffs[i] = coeff;
+    if (RansacFitting(&xy_points[i], &coeff, 200,
+                      static_cast<int>(minNumPoints_), 0.1f)) {
+      //    if (PolyFit(xy_points[i], max_poly_order, &coeff, true)) {
+      coeffs[i] = coeff;
     } else {
-       xy_points[i].clear();
+      xy_points[i].clear();
     }
   }
 
@@ -283,7 +283,6 @@ bool DarkSCNNLanePostprocessor::Process2D(
       std::swap(c0s[4], c0s[11]);
     }
   }
-
 
   if (xy_points[6].size() < minNumPoints_ &&
       xy_points[12].size() >= minNumPoints_) {
