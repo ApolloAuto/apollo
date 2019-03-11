@@ -34,6 +34,7 @@
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 #include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
 namespace planning {
@@ -84,6 +85,10 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
           new scenario::traffic_light::TrafficLightUnprotectedRightTurnScenario(
               config_map_[scenario_type], &scenario_context_));
       break;
+    case ScenarioConfig::VALET_PARKING:
+      ptr.reset(new scenario::valet_parking::ValetParkingScenario(
+          config_map_[scenario_type], &scenario_context_));
+      break;
     default:
       return nullptr;
   }
@@ -118,6 +123,10 @@ void ScenarioManager::RegisterScenarios() {
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
+
+  // valet parking
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
+                             &config_map_[ScenarioConfig::VALET_PARKING]));
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
@@ -274,6 +283,20 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
   return ScenarioConfig::LANE_FOLLOW;
 }
 
+ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
+    const Frame& frame) {
+  // TODO(All) triger valet parking by route message definition as of now
+  double parking_spot_range_to_start =
+      config_map_[ScenarioConfig::VALET_PARKING]
+          .valet_parking_config()
+          .parking_spot_range_to_start();
+  if (scenario::valet_parking::ValetParkingScenario::IsTransferable(
+          frame, parking_spot_range_to_start)) {
+    return ScenarioConfig::VALET_PARKING;
+  }
+  return ScenarioConfig::LANE_FOLLOW;
+}
+
 /*
  * @brief: function called by ScenarioSelfVote(),
  *         which selects scenario based on vote from each individual scenario.
@@ -422,11 +445,9 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     bool traffic_light_found = (traffic_light_overlap != nullptr);
     if (stop_sign_overlap && traffic_light_overlap) {
       stop_sign_found =
-          stop_sign_overlap->start_s < traffic_light_overlap->start_s ? true
-                                                                      : false;
+          stop_sign_overlap->start_s < traffic_light_overlap->start_s;
       traffic_light_found =
-          stop_sign_overlap->start_s < traffic_light_overlap->start_s ? false
-                                                                      : true;
+          stop_sign_overlap->start_s >= traffic_light_overlap->start_s;
     }
 
     if (stop_sign_found) {
@@ -454,6 +475,17 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // SIDE_PASS scenario
   if (scenario_type == default_scenario_type_) {
     scenario_type = SelectSidePassScenario(frame);
+  }
+
+  ////////////////////////////////////////
+  // VALET_PARKING scenario
+  if (scenario_type == default_scenario_type_) {
+    scenario_type = SelectValetParkingScenario(frame);
+  }
+
+  // Check if it is supported by confs
+  if (supported_scenarios_.find(scenario_type) == supported_scenarios_.end()) {
+    scenario_type == default_scenario_type_;
   }
 
   ADEBUG << "select scenario: "

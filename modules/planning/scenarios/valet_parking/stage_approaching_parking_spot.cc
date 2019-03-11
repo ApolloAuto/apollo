@@ -17,6 +17,9 @@
 /**
  * @file
  **/
+
+#include <string>
+
 #include "modules/planning/scenarios/valet_parking/stage_approaching_parking_spot.h"
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
@@ -30,6 +33,23 @@ Stage::StageStatus StageApproachingParkingSpot::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: StageApproachingParkingSpot";
   CHECK_NOTNULL(frame);
+  GetContext()->target_parking_spot_id.clear();
+  if (frame->local_view().routing->routing_request().has_parking_space() &&
+      frame->local_view().routing->routing_request().parking_space().has_id()) {
+    GetContext()->target_parking_spot_id = frame->local_view()
+                                               .routing->routing_request()
+                                               .parking_space()
+                                               .id()
+                                               .id();
+  } else {
+    AERROR << "No parking space id from routing";
+    return StageStatus::ERROR;
+  }
+
+  if (GetContext()->target_parking_spot_id.empty()) {
+    return StageStatus::ERROR;
+  }
+
   frame->mutable_open_space_info()->set_open_space_pre_stop_finished(
       GetContext()->valet_parking_pre_stop_finished);
   *(frame->mutable_open_space_info()->mutable_target_parking_spot_id()) =
