@@ -203,11 +203,5 @@ double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
   return l_prime_adjusted;
 }
 
-double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
-    const double s_dot, const double l_dot_bounds) {
-  double s = std::fmax(FLAGS_vehicle_low_speed_threshold, s_dot);
-  return l_dot_bounds / s;
-}
-
 }  // namespace planning
 }  // namespace apollo
