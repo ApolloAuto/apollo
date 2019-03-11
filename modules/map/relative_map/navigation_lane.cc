@@ -425,14 +425,13 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
       if (length > FLAGS_max_len_from_navigation_line) {
         return true;
       }
-      int path_size = navigation_path.path_point_size();
-      int path_size_ahead = path_size;
+      const int path_size = navigation_path.path_point_size();
 #ifdef __aarch64__
-      path_size_ahead = current_project_index +
-                        FLAGS_relative_map_path_frame_ahead;
-      if (path_size_ahead > path_size) {
-        path_size_ahead = path_size;
-      }
+      const int path_size_ahead =
+          std::min(current_project_index + FLAGS_relative_map_path_frame_ahead,
+          path_size);
+#else
+      const int path_size_ahead = path_size;
 #endif
       gen_navi_path_loop_func(stitch_end_index,
                               path_size_ahead, length,
@@ -445,13 +444,12 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
     return false;
   }
   int path_size = navigation_path.path_point_size();
-  int path_size_ahead = path_size;
 #ifdef __aarch64__
-  path_size_ahead = current_project_index +
-                    FLAGS_relative_map_path_frame_ahead;
-  if (path_size_ahead > path_size) {
-    path_size_ahead = path_size;
-  }
+  int path_size_ahead =
+      std::min(current_project_index + FLAGS_relative_map_path_frame_ahead,
+      path_size);
+#else
+  int path_size_ahead = path_size;
 #endif
   gen_navi_path_loop_func(std::max(0, current_project_index - 3),
                           path_size_ahead, 0.0,
