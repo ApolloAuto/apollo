@@ -98,12 +98,12 @@ Status SidePassPathDecider::Process(
 bool SidePassPathDecider::DecideSidePassDirection(
     const std::vector<bool> &can_side_pass, size_t left_length,
     size_t right_length) {
-  if (can_side_pass[0] == false && can_side_pass[1] == false) {
+  if (!can_side_pass[0] && !can_side_pass[1]) {
     return false;
-  } else if (can_side_pass[0] == true && can_side_pass[1] == false) {
+  } else if (can_side_pass[0] && !can_side_pass[1]) {
     decided_direction_ = SidePassDirection::LEFT;
     return true;
-  } else if (can_side_pass[0] == false && can_side_pass[1] == true) {
+  } else if (!can_side_pass[0] && can_side_pass[1]) {
     decided_direction_ = SidePassDirection::RIGHT;
     return true;
   } else {
