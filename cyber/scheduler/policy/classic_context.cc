@@ -22,10 +22,10 @@ namespace apollo {
 namespace cyber {
 namespace scheduler {
 
-using apollo::cyber::croutine::RoutineState;
-using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::base::AtomicRWLock;
+using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::croutine::CRoutine;
+using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
@@ -38,9 +38,7 @@ GRP_WQ_CV ClassicContext::cv_wq_;
 RQ_LOCK_GROUP ClassicContext::rq_locks_;
 CR_GROUP ClassicContext::cr_group_;
 
-ClassicContext::ClassicContext() {
-  InitGroup(DEFAULT_GROUP_NAME);
-}
+ClassicContext::ClassicContext() { InitGroup(DEFAULT_GROUP_NAME); }
 
 ClassicContext::ClassicContext(const std::string& group_name) {
   InitGroup(group_name);

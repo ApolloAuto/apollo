@@ -213,18 +213,22 @@ bool LaneDetectionComponent::Init() {
   // computed from camera height and pitch.
   // Apply online calibration to adjust pitch/height automatically
   // Temporary code is used here for testing
-  double pitch_adj = -0.1;
+  double pitch_adj_degree = 0.0;
+  double yaw_adj_degree = 0.0;
+  double roll_adj_degree = 0.0;
   // load in lidar to imu extrinsic
   Eigen::Matrix4d ex_lidar2imu;
   LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
-                  "velodyne128_novatel_extrinsics.yaml", &ex_lidar2imu);
+                     "velodyne128_novatel_extrinsics.yaml",
+                 &ex_lidar2imu);
   AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
   CHECK(visualize_.Init_all_info_single_camera(
-      visual_camera_, intrinsic_map_, extrinsic_map_,
-      ex_lidar2imu, pitch_adj, image_height_, image_width_));
-  homography_im2car_ = visualize_.homography_im2car();
-  camera_lane_pipeline_->SetIm2CarHomography(homography_im2car_);
+       visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu,
+       pitch_adj_degree, yaw_adj_degree, roll_adj_degree,
+       image_height_, image_width_));
+  homography_image2ground_ = visualize_.homography_im2car();
+  camera_lane_pipeline_->SetIm2CarHomography(homography_image2ground_);
 
   if (enable_visualization_) {
     if (write_visual_img_) {
@@ -232,7 +236,6 @@ bool LaneDetectionComponent::Init() {
       visualize_.SetDirectory(visual_debug_folder_);
     }
   }
-
   AINFO << "Init processes all succeed";
   return true;
 }

@@ -17,20 +17,13 @@
 /**
  * @file
  **/
-
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_intersection_cruise.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
+#include "modules/planning/scenarios/util/util.h"
+
 
 namespace apollo {
 namespace planning {
@@ -38,11 +31,9 @@ namespace scenario {
 namespace traffic_light {
 
 using common::TrajectoryPoint;
-using hdmap::PathOverlap;
 
 Stage::StageStatus
 TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
-
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
@@ -50,30 +41,51 @@ TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "TrafficLightUnprotectedRightTurnStageIntersectionCruise "
-           << "plan error";
+        << "plan error";
   }
 
-  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the traffic_light is still along reference_line
-  std::string traffic_light_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (CheckTrafficLightDone(reference_line_info, traffic_light_overlap_id)) {
-    return FinishScenario();
+  // set right_of_way_status
+  if (PlanningContext::GetScenarioInfo()
+      ->current_traffic_light_overlaps.size() > 0) {
+    const double traffic_light_start_s = PlanningContext::GetScenarioInfo()
+        ->current_traffic_light_overlaps[0].start_s;
+    reference_line_info.SetJunctionRightOfWay(traffic_light_start_s, true);
   }
 
-  // check pass intersection
-  // TODO(all): update when pnc-junction is ready
-  constexpr double kIntersectionLength = 10.0;  // unit: m
-  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  const double distance_adc_pass_traffic_light =
-      adc_back_edge_s -
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s;
-  if (distance_adc_pass_traffic_light > kIntersectionLength) {
+  // check pass pnc_junction
+  // TODO(all): remove when pnc_junction completely available on map
+  const auto& pnc_junction_overlaps =
+      reference_line_info.reference_line().map_path().pnc_junction_overlaps();
+  if (pnc_junction_overlaps.size() == 0) {
+    // pnc_junction not exist on map, use current traffic_light's end_s
+    if (PlanningContext::GetScenarioInfo()
+        ->current_traffic_light_overlaps.size() == 0) {
+      return FinishStage();
+    }
+
+    constexpr double kIntersectionPassDist = 20.0;  // unit: m
+    const double adc_back_edge_s =
+        reference_line_info.AdcSlBoundary().start_s();
+    const double traffic_light_end_s = PlanningContext::GetScenarioInfo()
+        ->current_traffic_light_overlaps[0].end_s;
+    const double distance_adc_pass_traffic_light = adc_back_edge_s -
+        traffic_light_end_s;
+    ADEBUG << "distance_adc_pass_traffic_light["
+        << distance_adc_pass_traffic_light
+        << "] traffic_light_end_s[" << traffic_light_end_s << "]";
+
+    if (distance_adc_pass_traffic_light >= kIntersectionPassDist) {
+      return FinishStage();
+    } else {
+      return Stage::RUNNING;
+    }
+  }
+
+  if (!scenario::CheckInsidePnCJunction(reference_line_info)) {
     return FinishStage();
   }
-  */
 
   return Stage::RUNNING;
 }

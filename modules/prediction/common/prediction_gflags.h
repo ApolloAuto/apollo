@@ -46,6 +46,9 @@ DECLARE_double(junction_distance_threshold);
 DECLARE_bool(enable_prioritize_obstacles);
 DECLARE_bool(enable_junction_feature);
 DECLARE_bool(enable_all_junction);
+DECLARE_double(caution_search_distance_ahead);
+DECLARE_double(caution_search_distance_backward_for_merge);
+DECLARE_double(caution_search_distance_backward_for_overlap);
 
 // Obstacle features
 DECLARE_int32(ego_vehicle_id);
@@ -81,11 +84,11 @@ DECLARE_double(pedestrian_max_speed);
 DECLARE_double(pedestrian_max_acc);
 DECLARE_double(still_speed);
 DECLARE_string(evaluator_vehicle_mlp_file);
-DECLARE_string(evaluator_cruise_vehicle_go_model_file);
-DECLARE_string(evaluator_cruise_vehicle_cutin_model_file);
+DECLARE_string(torch_vehicle_junction_mlp_file);
+DECLARE_string(torch_vehicle_cruise_go_file);
+DECLARE_string(torch_vehicle_cruise_cutin_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_string(evaluator_vehicle_cruise_mlp_file);
-DECLARE_string(evaluator_vehicle_junction_mlp_file);
 DECLARE_int32(max_num_obstacles);
 DECLARE_double(valid_position_diff_threshold);
 DECLARE_double(valid_position_diff_rate_threshold);

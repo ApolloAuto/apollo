@@ -20,7 +20,7 @@ INCHINA="no"
 LOCAL_IMAGE="no"
 VERSION=""
 ARCH=$(uname -m)
-VERSION_X86_64="dev-x86_64-20190128_1800"
+VERSION_X86_64="dev-x86_64-20190307_1502"
 VERSION_AARCH64="dev-aarch64-20170927_1111"
 VERSION_OPT=""
 
@@ -58,7 +58,12 @@ function check_host_environment() {
   fi
 
   # Fetch lfs managed files for current HEAD.
-  git lfs fetch
+  git lfs install && git lfs fetch
+  if [ $? -ne 0 ]; then
+    echo 'Failed to fetch LFS objects. Please retry command'
+    echo '    git lfs install && git lfs fetch && echo Succeeded'
+    exit 1
+  fi
 
   if ! [ -d ${APOLLO_ROOT_DIR}/.git/lfs/objects ]; then
     echo 'You need to install and run git-lfs when working with apollo.'
@@ -117,6 +122,7 @@ check_host_environment
 VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
   sunnyvale_big_loop
+  sunnyvale_hdl128
   sunnyvale_loop
   sunnyvale_with_two_offices
   san_mateo
@@ -282,8 +288,10 @@ function main(){
     info "Starting docker container \"${APOLLO_DEV}\" ..."
 
     DOCKER_CMD="nvidia-docker"
+    USE_GPU=1
     if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
         DOCKER_CMD="docker"
+        USE_GPU=0
     fi
 
     ${DOCKER_CMD} run -it \
@@ -300,6 +308,7 @@ function main(){
         -e DOCKER_GRP="$GRP" \
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
+        -e USE_GPU=$USE_GPU \
         $(local_volumes) \
         --net host \
         -w /apollo \

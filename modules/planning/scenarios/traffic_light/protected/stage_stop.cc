@@ -33,7 +33,6 @@ namespace scenario {
 namespace traffic_light {
 
 using common::TrajectoryPoint;
-using hdmap::PathOverlap;
 using perception::TrafficLight;
 
 Stage::StageStatus TrafficLightProtectedStageStop::Process(
@@ -52,47 +51,39 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
 
   bool traffic_light_all_done = true;
   for (const auto& traffic_light_overlap :
-       PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
-    const std::string traffic_light_overlap_id =
-        traffic_light_overlap.object_id;
-
+       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
     // check if the traffic_light is still along reference_line
     if (scenario::CheckTrafficLightDone(reference_line_info,
-                                        traffic_light_overlap_id)) {
+                                        traffic_light_overlap.object_id)) {
       continue;
     }
 
-    // check if traffic_light is too far
-    const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-    const double adc_distance_to_stop_line =
-        traffic_light_overlap.start_s - adc_front_edge_s;
-    // TODO(all): move to conf
-    constexpr double kTrafficLightMinDistance = 5.0;  // unit: m
-    if (adc_distance_to_stop_line > kTrafficLightMinDistance) {
-      ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
-             << "] start_s[" << traffic_light_overlap.start_s
-             << "] too far. ignore";
-      continue;
-    }
+    // set right_of_way_status
+    reference_line_info.SetJunctionRightOfWay(
+        traffic_light_overlap.start_s, false);
 
-    // check if passing stop line ready
-    constexpr double kPassStopLineBuffer = 2.0;  // unit: m
-    const double distance_adc_pass_traffic_light =
-        adc_front_edge_s - traffic_light_overlap.start_s;
-    // passed stop line too far
-    if (distance_adc_pass_traffic_light > kPassStopLineBuffer) {
-      ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
-             << "] start_s[" << traffic_light_overlap.start_s
-             << "] already passed. ignore";
-      continue;
+    const double adc_front_edge_s =
+        reference_line_info.AdcSlBoundary().end_s();
+    const double distance_adc_to_stop_line = traffic_light_overlap.start_s -
+        adc_front_edge_s;
+    auto signal_color =
+        scenario::GetSignal(traffic_light_overlap.object_id).color();
+    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id
+           << "] start_s[" << traffic_light_overlap.start_s
+           << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
+           << "] color[" << signal_color << "]";
+
+    // check distance to stop line
+    if (distance_adc_to_stop_line >
+        scenario_config_.max_valid_stop_distance()) {
+      traffic_light_all_done = false;
+      break;
     }
 
     // check on traffic light color
-    auto signal_color = scenario::GetSignal(traffic_light_overlap_id).color();
-    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
-           << "] color[" << signal_color << "]";
     if (signal_color != TrafficLight::GREEN) {
       traffic_light_all_done = false;
+      break;
     }
   }
 
@@ -111,10 +102,13 @@ Stage::StageStatus TrafficLightProtectedStageStop::FinishScenario() {
 }
 
 Stage::StageStatus TrafficLightProtectedStageStop::FinishStage() {
-  /* TODO(all): to be fixed
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  */
+  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
+  for (const auto& traffic_light_overlap :
+       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
+    PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.push_back(
+        traffic_light_overlap.object_id);
+  }
+
   next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }

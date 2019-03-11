@@ -33,18 +33,15 @@ using common::GetEnv;
 
 PerfEventCache::PerfEventCache() {
   auto trans_perf = GetEnv("cyber_trans_perf");
-  if (trans_perf != "" &&
-      std::stoi(trans_perf)) {
+  if (trans_perf != "" && std::stoi(trans_perf)) {
     enable_trans_perf_ = true;
   }
   auto sched_perf = GetEnv("cyber_sched_perf");
-  if (sched_perf != "" &&
-      std::stoi(sched_perf)) {
+  if (sched_perf != "" && std::stoi(sched_perf)) {
     enable_sched_perf_ = true;
   }
 
-  if (enable_sched_perf_ ||
-      enable_trans_perf_) {
+  if (enable_sched_perf_ || enable_trans_perf_) {
     if (!event_queue_.Init(kEventQueueSize)) {
       AERROR << "Event queue init failed.";
       throw std::runtime_error("Event queue init failed.");
@@ -54,8 +51,7 @@ PerfEventCache::PerfEventCache() {
 }
 
 PerfEventCache::~PerfEventCache() {
-  if (!enable_sched_perf_ &&
-      !enable_trans_perf_) {
+  if (!enable_sched_perf_ && !enable_trans_perf_) {
     return;
   }
 

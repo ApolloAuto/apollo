@@ -6673,6 +6673,8 @@ mpc_controller_conf {
   standstill_acceleration: -3.0
   brake_deadzone: 15.5
   throttle_deadzone: 18.0
+  enable_mpc_feedforward_compensation: false
+  unconstraint_control_diff_limit: 5.0
   lat_err_gain_scheduler {
     scheduler {
       speed: 4.0

@@ -36,11 +36,11 @@ class OpenSpaceTrajectoryProviderTest : public ::testing::Test {
   TaskConfig config_;
 };
 
-TEST_F(OpenSpaceTrajectoryProviderTest, Init) {
-  OpenSpaceTrajectoryProvider open_space_trajectory_provider(config_);
-  EXPECT_EQ(open_space_trajectory_provider.Name(),
-            TaskConfig::TaskType_Name(config_.task_type()));
-}
+// TEST_F(OpenSpaceTrajectoryProviderTest, Init) {
+//   OpenSpaceTrajectoryProvider open_space_trajectory_provider(config_);
+//   EXPECT_EQ(open_space_trajectory_provider.Name(),
+//             TaskConfig::TaskType_Name(config_.task_type()));
+// }
 
 }  // namespace planning
 }  // namespace apollo

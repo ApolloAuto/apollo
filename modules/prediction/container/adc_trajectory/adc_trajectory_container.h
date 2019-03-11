@@ -100,6 +100,8 @@ class ADCTrajectoryContainer : public Container {
    */
   bool IsLaneIdInReferenceLine(const std::string& lane_id) const;
 
+  const std::vector<std::string>& GetADCLaneIDSequence() const;
+
  private:
   void SetJunctionPolygon();
 

@@ -19,8 +19,8 @@
 #include "cyber/parameter/parameter_server.h"
 
 using apollo::cyber::Parameter;
-using apollo::cyber::ParameterServer;
 using apollo::cyber::ParameterClient;
+using apollo::cyber::ParameterServer;
 
 int main(int argc, char** argv) {
   apollo::cyber::Init(*argv);

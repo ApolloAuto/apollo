@@ -6,11 +6,16 @@ stage_type: SIDE_PASS_DETECT_SAFETY
 stage_type: SIDE_PASS_PASS_OBSTACLE
 stage_type: SIDE_PASS_BACKUP
 side_pass_config: {
-  side_pass_exit_distance: 10.0
-  approach_obstacle_max_stop_speed: 1.0e-5
-  approach_obstacle_min_stop_distance: 4.0
+  side_pass_exit_distance: 5.0
+  approach_obstacle_max_stop_speed: 1.0e-2
+  approach_obstacle_min_stop_distance: 2.5
   block_obstacle_min_speed: 0.1
   enable_obstacle_blocked_check: true
+  max_backup_stage_cycle_num: 30
+  min_l_nudge_buffer: 0.3
+  min_front_obstacle_distance: 1.0
+  max_front_obstacle_distance: 15.0
+  stop_fence_distance_to_blocking_obstacle: 6.0
 }
 stage_config: {
   stage_type: SIDE_PASS_APPROACH_OBSTACLE

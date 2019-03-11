@@ -179,6 +179,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
+    // TODO(all): integrate reverse gear
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
     FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
@@ -199,6 +201,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
+    // TODO(all): integrate reverse gear
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
     FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
@@ -222,6 +226,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
+      // TODO(all): integrate reverse gear
+      trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
       FillPlanningPb(start_timestamp, &estop_trajectory);
     } else {
       trajectory_pb->mutable_decision()
@@ -229,6 +235,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
           ->mutable_not_ready()
           ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
+      // TODO(all): integrate reverse gear
+      trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
       FillPlanningPb(start_timestamp, trajectory_pb);
     }
 
@@ -287,6 +295,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   }
 
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
+  // TODO(all): integrate reverse gear
+  trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
   FillPlanningPb(start_timestamp, trajectory_pb);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
@@ -532,7 +542,7 @@ Status NaviPlanning::Plan(
 
   ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-  // Navi Panner doesn't need to stitch the last path planning
+  // Navi Planner doesn't need to stitch the last path planning
   // trajectory.Otherwise, it will cause the Dreamview planning track to display
   // flashing or bouncing
   // TODO(Yifei): remove this if navi-planner doesn't need stitching

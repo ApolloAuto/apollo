@@ -23,11 +23,11 @@ namespace apollo {
 namespace planning {
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
-    size_t horizon, double ts, Eigen::MatrixXd ego, const Eigen::MatrixXd& xWS,
-    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
-    const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& x0,
-    const Eigen::MatrixXd& xf, const Eigen::MatrixXd& last_time_u,
-    const std::vector<double>& XYbounds,
+    const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
+    const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
     const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const PlannerOpenSpaceConfig& planner_open_space_config)
@@ -2297,7 +2297,10 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
     // triangle only
 
     obj_lam[0] = obj_factor;
-    for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
+
+    for (int idx = 0; idx < m; idx++) {
+      obj_lam[1 + idx] = lambda[idx];
+    }
 
     set_param_vec(tag_L, m + 1, obj_lam);
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
@@ -2827,7 +2830,9 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_on(tag_f);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
 
   eval_obj(n, xa, &obj_value);
 
@@ -2837,18 +2842,26 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_on(tag_g);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
 
   eval_constraints(n, xa, m, g);
 
-  for (int idx = 0; idx < m; idx++) g[idx] >>= dummy;
+  for (int idx = 0; idx < m; idx++) {
+    g[idx] >>= dummy;
+  }
 
   trace_off();
 
   trace_on(tag_L);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
-  for (int idx = 0; idx < m; idx++) lam[idx] = 1.0;
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  for (int idx = 0; idx < m; idx++) {
+    lam[idx] = 1.0;
+  }
   sig = 1.0;
 
   eval_obj(n, xa, &obj_value);
@@ -2856,7 +2869,9 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
   obj_value *= mkparam(sig);
   eval_constraints(n, xa, m, g);
 
-  for (int idx = 0; idx < m; idx++) obj_value += g[idx] * mkparam(lam[idx]);
+  for (int idx = 0; idx < m; idx++) {
+    obj_value += g[idx] * mkparam(lam[idx]);
+  }
 
   obj_value >>= dummy;
 

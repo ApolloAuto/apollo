@@ -22,24 +22,19 @@
 
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/stage_stop.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using common::TrajectoryPoint;
 using common::time::Clock;
-using hdmap::PathOverlap;
+using common::TrajectoryPoint;
 using perception::TrafficLight;
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
@@ -54,62 +49,96 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
     AERROR << "TrafficLightRightTurnUnprotectedStop planning error";
   }
 
-  /* TODO(all): to be fixed
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the traffic_light is still along reference_line
-  std::string traffic_light_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (CheckTrafficLightDone(reference_line_info, traffic_light_overlap_id)) {
-    return FinishScenario();
+  bool traffic_light_all_stop = true;
+  bool traffic_light_all_green = true;
+  for (const auto& traffic_light_overlap :
+       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
+    // check if the traffic_light is still along reference_line
+    if (scenario::CheckTrafficLightDone(reference_line_info,
+                                        traffic_light_overlap.object_id)) {
+      continue;
+    }
+
+    // set right_of_way_status
+    reference_line_info.SetJunctionRightOfWay(
+        traffic_light_overlap.start_s, false);
+
+    const double adc_front_edge_s =
+        reference_line_info.AdcSlBoundary().end_s();
+    const double distance_adc_to_stop_line = traffic_light_overlap.start_s -
+        adc_front_edge_s;
+    auto signal_color =
+        scenario::GetSignal(traffic_light_overlap.object_id).color();
+    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id
+           << "] start_s[" << traffic_light_overlap.start_s
+           << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
+           << "] color[" << signal_color << "]";
+
+    // check distance to stop line
+    if (distance_adc_to_stop_line >
+        scenario_config_.max_valid_stop_distance()) {
+      traffic_light_all_stop = false;
+      break;
+    }
+
+    // check on traffic light color
+    if (signal_color != TrafficLight::GREEN) {
+      traffic_light_all_green = false;
+      break;
+    }
   }
 
-  constexpr double kPassStopLineBuffer = 1.0;  // unit: m
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double distance_adc_pass_traffic_light =
-      adc_front_edge_s -
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.start_s;
-  // passed stop line too far
-  if (distance_adc_pass_traffic_light > kPassStopLineBuffer) {
-    return FinishStage();
+  if (traffic_light_all_stop && traffic_light_all_green) {
+    return FinishStage(true);
   }
 
   // check on wait-time
-  auto start_time = GetContext()->stop_start_time;
-  const double wait_time = Clock::NowInSeconds() - start_time;
-  ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
-         << "]";
-  if (wait_time > scenario_config_.red_light_right_turn_stop_duration()) {
-    return FinishStage();
+  if (traffic_light_all_stop && !traffic_light_all_green) {
+    if (GetContext()->stop_start_time == 0.0)  {
+      GetContext()->stop_start_time = Clock::NowInSeconds();
+    } else {
+      auto start_time = GetContext()->stop_start_time;
+      const double wait_time = Clock::NowInSeconds() - start_time;
+      ADEBUG << "stop_start_time[" << start_time
+          << "] wait_time[" << wait_time << "]";
+      if (wait_time > scenario_config_.red_light_right_turn_stop_duration()) {
+        return FinishStage(false);
+      }
+    }
   }
-
-  // check on traffic light color
-  if (PlanningContext::GetScenarioInfo()->traffic_light_color ==
-      TrafficLight::GREEN) {
-    next_stage_ = ScenarioConfig::
-        TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
-    return Stage::FINISHED;
-  }
-  */
 
   return Stage::RUNNING;
 }
 
-Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
+Stage::StageStatus
+TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
-Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage() {
-  /* TODO(all): to be fixed
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  */
-  GetContext()->creep_start_time = Clock::NowInSeconds();
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
+    const bool protected_mode) {
+  if (protected_mode) {
+    // intersection_cruise
+    next_stage_ = ScenarioConfig
+        ::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
+  } else {
+    // creep
+    // update PlanningContext
+    PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
+    for (const auto& traffic_light_overlap :
+         PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
+      PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.push_back(
+          traffic_light_overlap.object_id);
+    }
 
-  next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP;
+    GetContext()->creep_start_time = Clock::NowInSeconds();
+    next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP;
+  }
   return Stage::FINISHED;
 }
 

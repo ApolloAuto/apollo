@@ -23,13 +23,16 @@
 #include <unordered_map>
 #include <utility>
 
+#include "modules/common/time/time.h"
 #include "modules/planning/common/speed_profile_generator.h"
+#include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/tasks/task_factory.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
+using common::time::Clock;
 using hdmap::PathOverlap;
 
 namespace {
@@ -110,6 +113,43 @@ bool Stage::ExecuteTaskOnReferenceLine(
     reference_line_info.SetDrivable(true);
     return true;
   }
+  return true;
+}
+
+bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
+  auto ret = common::Status::OK();
+  for (auto* task : task_list_) {
+    ret = task->Execute(frame);
+    if (!ret.ok()) {
+      AERROR << "Failed to run tasks[" << task->Name()
+             << "], Error message: " << ret.error_message();
+      return false;
+    }
+  }
+
+  if (frame->open_space_info().fallback_flag()) {
+    auto& trajectory = frame->open_space_info().fallback_trajectory().first;
+    auto& gear = frame->open_space_info().fallback_trajectory().second;
+    PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(),
+                                                 trajectory);
+    auto publishable_traj_and_gear =
+        std::make_pair(std::move(publishable_trajectory), gear);
+
+    *(frame->mutable_open_space_info()->mutable_publishable_trajectory_data()) =
+        std::move(publishable_traj_and_gear);
+  } else {
+    auto& trajectory =
+        frame->open_space_info().chosen_paritioned_trajectory().first;
+    auto& gear = frame->open_space_info().chosen_paritioned_trajectory().second;
+    PublishableTrajectory publishable_trajectory(Clock::NowInSeconds(),
+                                                 trajectory);
+    auto publishable_traj_and_gear =
+        std::make_pair(std::move(publishable_trajectory), gear);
+
+    *(frame->mutable_open_space_info()->mutable_publishable_trajectory_data()) =
+        std::move(publishable_traj_and_gear);
+  }
+
   return true;
 }
 

@@ -190,6 +190,7 @@ cc_library(
         ":ego_info",
         ":path_decision",
         ":planning_gflags",
+        ":st_graph_data",
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -201,7 +202,6 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
-        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
         "@eigen",
     ],
 )
@@ -395,23 +395,6 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "threshold",
-    srcs = [
-        "threshold.cc",
-    ],
-    hdrs = [
-        "threshold.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        ":frame",
-        ":speed_limit",
-    ],
-)
-
 cc_test(
     name = "ego_info_test",
     size = "small",
@@ -431,11 +414,11 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        "threshold",
         ":ego_info",
         ":frame",
         ":planning_gflags",
         ":speed_limit",
+        ":st_graph_data",
         "//cyber/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
@@ -468,6 +451,19 @@ cc_library(
     hdrs = [
         "open_space_info.h",
     ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/vehicle_state/proto:vehicle_state_proto",
+        "//modules/map/hdmap:hdmap_util",
+        "//modules/map/pnc_map",
+        "//modules/planning/common:indexed_queue",
+        "//modules/planning/common:obstacle",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory:publishable_trajectory",
+        "@eigen",
+    ],
 )
 
 cc_test(
@@ -478,6 +474,37 @@ cc_test(
     ],
     deps = [
         "open_space_info",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "st_graph_data",
+    srcs = [
+        "st_graph_data.cc",
+    ],
+    hdrs = [
+        "st_graph_data.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        ":planning_gflags",
+        ":speed_limit",
+        "//modules/planning/common/speed:st_boundary",
+    ],
+)
+
+cc_test(
+    name = "st_graph_data_test",
+    size = "small",
+    srcs = [
+        "st_graph_data_test.cc",
+    ],
+    deps = [
+        ":st_graph_data",
+        "//cyber/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
         "@gtest//:main",
     ],
 )
