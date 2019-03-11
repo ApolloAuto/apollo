@@ -47,7 +47,7 @@ bool RadarDetectionComponent::Init() {
       comp_config.output_channel_name());
 
   // Init algorithm plugin
-  CHECK(InitAlgorithmPlugin() == true) << "Failed to init algorithm plugin.";
+  CHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
   radar2world_trans_.Init(tf_child_frame_id_);
   radar2novatel_trans_.Init(tf_child_frame_id_);
   localization_subscriber_.Init(

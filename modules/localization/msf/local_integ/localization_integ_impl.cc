@@ -46,7 +46,7 @@ LocalizationIntegImpl::~LocalizationIntegImpl() {
 
 Status LocalizationIntegImpl::Init(const LocalizationIntegParam& params) {
   enable_lidar_localization_ = params.enable_lidar_localization;
-  if (params.enable_lidar_localization == true) {
+  if (params.enable_lidar_localization) {
     auto state = lidar_process_->Init(params);
     if (!state.ok()) {
       return state;
