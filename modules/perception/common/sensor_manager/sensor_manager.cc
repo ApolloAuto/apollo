@@ -99,9 +99,7 @@ bool SensorManager::Init() {
 }
 
 bool SensorManager::IsSensorExist(const std::string& name) const {
-  const auto& itr = sensor_info_map_.find(name);
-
-  return itr == sensor_info_map_.end() ? false : true;
+  return sensor_info_map_.find(name) != sensor_info_map_.end();
 }
 
 bool SensorManager::GetSensorInfo(const std::string& name,
