@@ -203,6 +203,7 @@ void ObstaclesPrioritizer::AssignCautionLevelInCruise(
     const std::shared_ptr<ScenarioFeatures> scenario_features) {
   // TODO(kechxu) integrate change lane when ready to check change lane
   AssignCautionLevelCruiseKeepLane();
+  AssignCautionLevelByEgoReferenceLine();
 }
 
 void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
