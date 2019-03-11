@@ -346,7 +346,7 @@ unsigned int LossyMapMatrix2D::CreateBinary(unsigned char* buf,
     for (unsigned int y = 0; y < rows_; ++y) {
       for (unsigned int x = 0; x < cols_; ++x) {
         const LossyMapCell2D& cell = map_cells_[y * cols_ + x];
-        if (cell.is_ground_useful == false) {
+        if (!cell.is_ground_useful) {
           continue;
         }
         if (cell.altitude_ground > alt_ground_max_) {

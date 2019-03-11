@@ -63,7 +63,7 @@ bool InformationFilter::SetLastObservation(
     const Eigen::MatrixXd &last_observation_uncertainty,
     const Eigen::MatrixXd &last_to_cur_transform_matrix,
     const Eigen::MatrixXd &last_to_cur_env_uncertainty) {
-  if (init_ == false) {
+  if (!init_) {
     return false;
   }
   if (last_observation.rows() != states_num_) {
@@ -98,7 +98,7 @@ bool InformationFilter::SetLastObservation(
 
 bool InformationFilter::Predict(const Eigen::MatrixXd &transform_matrix,
                                 const Eigen::MatrixXd &env_uncertainty) {
-  if (init_ == false) {
+  if (!init_) {
     return false;
   }
   if (transform_matrix.rows() != states_num_) {
@@ -125,7 +125,7 @@ bool InformationFilter::Predict(const Eigen::MatrixXd &transform_matrix,
 bool InformationFilter::Correct(
     const Eigen::VectorXd &cur_observation,
     const Eigen::MatrixXd &cur_observation_uncertainty) {
-  if (init_ == false) {
+  if (!init_) {
     return false;
   }
   if (cur_observation.rows() != states_num_) {
@@ -177,7 +177,7 @@ bool InformationFilter::Correct(
 }
 bool InformationFilter::SetControlMatrix(
     const Eigen::MatrixXd &control_matrix) {
-  if (init_ == false) {
+  if (!init_) {
     return false;
   }
   if (control_matrix.rows() != states_num_ ||
