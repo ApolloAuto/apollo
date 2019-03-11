@@ -157,8 +157,26 @@ bool ValetParkingScenario::CheckDistanceToParkingSpot(
     const VehicleState& vehicle_state, const Path& nearby_path,
     const double parking_start_range,
     const PathOverlap& parking_space_overlap) {
+  // TODO(Jinyun) parking overlap s are wrong on map, not usable
+  // double parking_space_center_s =
+  //     (parking_space_overlap.start_s + parking_space_overlap.end_s) / 2.0;
+  const hdmap::HDMap* hdmap = hdmap::HDMapUtil::BaseMapPtr();
+  hdmap::Id id;
+  id.set_id(parking_space_overlap.object_id);
+  ParkingSpaceInfoConstPtr target_parking_spot_ptr =
+      hdmap->GetParkingSpaceById(id);
+  Vec2d left_bottom_point = target_parking_spot_ptr->polygon().points().at(0);
+  Vec2d right_bottom_point = target_parking_spot_ptr->polygon().points().at(1);
+  double left_bottom_point_s = 0.0;
+  double left_bottom_point_l = 0.0;
+  double right_bottom_point_s = 0.0;
+  double right_bottom_point_l = 0.0;
+  nearby_path.GetNearestPoint(left_bottom_point, &left_bottom_point_s,
+                              &left_bottom_point_l);
+  nearby_path.GetNearestPoint(right_bottom_point, &right_bottom_point_s,
+                              &right_bottom_point_l);
   double parking_space_center_s =
-      (parking_space_overlap.start_s + parking_space_overlap.end_s) / 2.0;
+      (left_bottom_point_s + right_bottom_point_s) / 2.0;
   double vehicle_point_s = 0.0;
   double vehicle_point_l = 0.0;
   Vec2d vehicle_vec(vehicle_state.x(), vehicle_state.y());

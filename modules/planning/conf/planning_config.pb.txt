@@ -8,6 +8,7 @@ standard_planning_config {
      scenario_type: TRAFFIC_LIGHT_PROTECTED
      scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
      scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
+     scenario_type: VALET_PARKING
   }
 }
 default_task_config: {

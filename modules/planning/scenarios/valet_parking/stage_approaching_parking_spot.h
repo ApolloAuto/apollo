@@ -42,7 +42,7 @@ class StageApproachingParkingSpot : public Stage {
     return GetContextAs<ValetParkingContext>();
   }
 
-  bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
+  bool CheckADCStop(const Frame& frame);
 
  private:
   ScenarioValetParkingConfig scenario_config_;
