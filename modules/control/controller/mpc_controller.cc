@@ -357,11 +357,10 @@ Status MPCController::ComputeControlCommand(
   double control_gain_truncation_ratio = 0.0;
   double unconstraint_control = 0.0;
   const double v = VehicleStateProvider::Instance()->linear_velocity();
-  if (common::math::SolveLinearMPC(
+  if (!common::math::SolveLinearMPC(
           matrix_ad_, matrix_bd_, matrix_cd_, matrix_q_updated_,
           matrix_r_updated_, lower_bound, upper_bound, matrix_state_, reference,
-          mpc_eps_, mpc_max_iteration_, &control, &control_gain, &addition_gain)
-           != true) {
+          mpc_eps_, mpc_max_iteration_, &control, &control_gain, &addition_gain)) {
     AERROR << "MPC solver failed";
   } else {
     ADEBUG << "MPC problem solved! ";
