@@ -49,7 +49,7 @@ void TrafficLightProtectedScenario::Init() {
   }
 
   if (PlanningContext::GetScenarioInfo()
-      ->current_traffic_light_overlaps.empty()) {
+          ->current_traffic_light_overlaps.empty()) {
     AERROR << "Could not find traffic-light(s)";
     return;
   }

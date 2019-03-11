@@ -88,8 +88,8 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;  // Skip Compute probability for offline mode
   }
   std::vector<torch::jit::IValue> torch_inputs;
-  int input_dim = static_cast<int>(OBSTACLE_FEATURE_SIZE +
-      EGO_VEHICLE_FEATURE_SIZE + JUNCTION_FEATURE_SIZE);
+  int input_dim = static_cast<int>(
+      OBSTACLE_FEATURE_SIZE + EGO_VEHICLE_FEATURE_SIZE + JUNCTION_FEATURE_SIZE);
   torch::Tensor torch_input = torch::zeros({1, input_dim});
   for (size_t i = 0; i < feature_values.size(); ++i) {
     torch_input[0][i] = static_cast<float>(feature_values[i]);
@@ -361,8 +361,8 @@ void JunctionMLPEvaluator::LoadModel() {
   //   ADEBUG << "CUDA is available";
   //   device_ = torch::Device(torch::kCUDA);
   // }
-  torch_model_ptr_ = torch::jit::load(
-      FLAGS_torch_vehicle_junction_mlp_file, device_);
+  torch_model_ptr_ =
+      torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
 }
 
 }  // namespace prediction

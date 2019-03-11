@@ -447,7 +447,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       stop_sign_found =
           stop_sign_overlap->start_s < traffic_light_overlap->start_s;
       traffic_light_found =
-          stop_sign_overlap->start_s > traffic_light_overlap->start_s;
+          stop_sign_overlap->start_s >= traffic_light_overlap->start_s;
     }
 
     if (stop_sign_found) {

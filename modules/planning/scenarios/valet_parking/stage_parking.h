@@ -30,8 +30,7 @@ namespace valet_parking {
 
 class StageParking : public Stage {
  public:
-  explicit StageParking(
-      const ScenarioConfig::StageConfig& config)
+  explicit StageParking(const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:

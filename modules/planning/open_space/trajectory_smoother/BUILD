@@ -97,8 +97,8 @@ cc_library(
         "-fopenmp",
     ],
     deps = [
-        ":distance_approach_ipopt_interface",
         ":distance_approach_ipopt_cuda_interface",
+        ":distance_approach_ipopt_interface",
         "//cyber/common:log",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",
@@ -112,8 +112,8 @@ cc_library(
         "distance_approach_ipopt_interface.cc",
     ],
     hdrs = [
+        "distance_approach_interface.h",
         "distance_approach_ipopt_interface.h",
-        "distance_approach_interface.h"
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
@@ -133,7 +133,6 @@ cc_library(
     ],
 )
 
-
 cc_library(
     name = "distance_approach_ipopt_cuda_interface",
     srcs = [
@@ -146,8 +145,8 @@ cc_library(
         "//conditions:default": [],
     }),
     hdrs = [
+        "distance_approach_interface.h",
         "distance_approach_ipopt_cuda_interface.h",
-        "distance_approach_interface.h"
     ],
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
@@ -196,7 +195,6 @@ cc_test(
         "@gtest//:main",
     ],
 )
-
 
 cc_test(
     name = "distance_approach_ipopt_cuda_interface_test",
