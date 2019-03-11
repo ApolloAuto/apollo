@@ -337,8 +337,7 @@ bool DenselineLanePostprocessor::MaxScorePoint(const float* score_pointer,
   }
   int max_x = large_index[0];
   float max_score = score_pointer[large_index[0]];
-  flag = (max_score > laneline_point_score_thresh_) ? true : false;
-  if (!flag) {
+  if (max_score <= laneline_point_score_thresh_) {
     return false;
   }
   (*point_info).x =
