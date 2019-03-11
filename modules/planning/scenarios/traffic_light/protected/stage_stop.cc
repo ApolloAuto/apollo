@@ -59,13 +59,12 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
     }
 
     // set right_of_way_status
-    reference_line_info.SetJunctionRightOfWay(
-        traffic_light_overlap.start_s, false);
+    reference_line_info.SetJunctionRightOfWay(traffic_light_overlap.start_s,
+                                              false);
 
-    const double adc_front_edge_s =
-        reference_line_info.AdcSlBoundary().end_s();
-    const double distance_adc_to_stop_line = traffic_light_overlap.start_s -
-        adc_front_edge_s;
+    const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+    const double distance_adc_to_stop_line =
+        traffic_light_overlap.start_s - adc_front_edge_s;
     auto signal_color =
         scenario::GetSignal(traffic_light_overlap.object_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id

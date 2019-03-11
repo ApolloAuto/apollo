@@ -44,8 +44,7 @@ class OpenSpaceFallbackDecider : public Decider {
   explicit OpenSpaceFallbackDecider(const TaskConfig& config);
 
  private:
-  apollo::common::Status Process(
-      Frame* frame) override;
+  apollo::common::Status Process(Frame* frame) override;
 
   // bool IsCollisionFreeTrajectory(const ADCTrajectory& trajectory_pb);
 
@@ -54,10 +53,11 @@ class OpenSpaceFallbackDecider : public Decider {
     std::vector<std::vector<common::math::Box2d>>
         &predicted_bounding_rectangles);
 
-  bool IsCollisionFreeTrajectory(const TrajGearPair& trajectory_pb,
-    const std::vector<std::vector<common::math::Box2d>>
-        &predicted_bounding_rectangles,
-    double *collision_distance);
+  bool IsCollisionFreeTrajectory(
+      const TrajGearPair& trajectory_pb,
+      const std::vector<std::vector<common::math::Box2d>>&
+          predicted_bounding_rectangles,
+      double* collision_distance);
 };
 
 }  // namespace planning

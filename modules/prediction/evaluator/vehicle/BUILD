@@ -121,7 +121,8 @@ cc_library(
         ],
         "//conditions:default": [
             "@pytorch",
-        ]}),
+        ],
+    }),
 )
 
 cc_test(
@@ -161,7 +162,8 @@ cc_library(
         ],
         "//conditions:default": [
             "@pytorch",
-        ]}),
+        ],
+    }),
 )
 
 cc_test(

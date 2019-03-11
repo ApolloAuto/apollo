@@ -75,8 +75,8 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   constexpr double kPassStopLineBuffer = 1.0;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double distance_adc_pass_stop_sign = adc_front_edge_s -
-      stop_sign_start_s;
+  const double distance_adc_pass_stop_sign =
+      adc_front_edge_s - stop_sign_start_s;
   // passed stop line too far
   if (distance_adc_pass_stop_sign > kPassStopLineBuffer) {
     return FinishStage();

@@ -36,9 +36,7 @@ Stage::StageStatus StageParking::Process(
   return StageStatus::RUNNING;
 }
 
-Stage::StageStatus StageParking::FinishStage() {
-  return Stage::FINISHED;
-}
+Stage::StageStatus StageParking::FinishStage() { return Stage::FINISHED; }
 
 }  // namespace valet_parking
 }  // namespace scenario

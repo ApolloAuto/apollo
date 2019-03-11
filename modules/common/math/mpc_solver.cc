@@ -132,10 +132,8 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
   // control gain matrix, corresponding to the unconstraint QP problem
   const Matrix matrix_m0 = static_cast<Matrix>(
       -1 * matrix_m1.inverse() * matrix_k.transpose() * matrix_qq);
-  const Matrix matrix_ctrl_gain = static_cast<Matrix>(
-      matrix_m0 * matrix_aa);
-  const Matrix matrix_add_gain = static_cast<Matrix>(
-      matrix_m0 * matrix_cc);
+  const Matrix matrix_ctrl_gain = static_cast<Matrix>(matrix_m0 * matrix_aa);
+  const Matrix matrix_add_gain = static_cast<Matrix>(matrix_m0 * matrix_cc);
 
   // Format in qp_solver
   /**
