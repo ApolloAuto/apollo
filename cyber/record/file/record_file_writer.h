@@ -38,8 +38,8 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-using google::protobuf::io::ZeroCopyOutputStream;
 using google::protobuf::io::FileOutputStream;
+using google::protobuf::io::ZeroCopyOutputStream;
 
 struct Chunk {
   Chunk() { clear(); }
@@ -86,6 +86,7 @@ class RecordFileWriter : public RecordFileBase {
   bool WriteChannel(const Channel& channel);
   bool WriteMessage(const SingleMessage& message);
   uint64_t GetMessageNumber(const std::string& channel_name) const;
+
  private:
   bool WriteChunk(const ChunkHeader& chunk_header, const ChunkBody& chunk_body);
   template <typename T>
@@ -119,10 +120,10 @@ bool RecordFileWriter::WriteSection(const T& message) {
   } else if (std::is_same<T, Index>::value) {
     type = SectionType::SECTION_INDEX;
   } else {
-    AERROR << "Do not support is template typename.";
+    AERROR << "Do not support this template typename.";
     return false;
   }
-  Section section = {type, (uint64_t)message.ByteSize()};
+  Section section = {type, message.ByteSize()};
   ssize_t count = write(fd_, &section, sizeof(section));
   if (count < 0) {
     AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;

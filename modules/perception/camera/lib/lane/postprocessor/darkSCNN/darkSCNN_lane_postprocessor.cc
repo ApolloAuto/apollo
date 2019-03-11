@@ -1,23 +1,23 @@
 /******************************************************************************
-* Copyright 2019 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/darkSCNN_lane_postprocessor.h"
 
 #include <algorithm>
-#include <utility>
 #include <map>
+#include <utility>
 
 // #include "cyber/common/log.h"
 #include "modules/common/util/file.h"
@@ -31,20 +31,20 @@ namespace camera {
 
 using apollo::cyber::common::GetAbsolutePath;
 
-std::vector<base::LaneLinePositionType> spatialLUT({
-    base::LaneLinePositionType::UNKNOWN,
-    base::LaneLinePositionType::FOURTH_LEFT,
-    base::LaneLinePositionType::THIRD_LEFT,
-    base::LaneLinePositionType::ADJACENT_LEFT,
-    base::LaneLinePositionType::EGO_LEFT,
-    base::LaneLinePositionType::EGO_CENTER,
-    base::LaneLinePositionType::EGO_RIGHT,
-    base::LaneLinePositionType::ADJACENT_RIGHT,
-    base::LaneLinePositionType::THIRD_RIGHT,
-    base::LaneLinePositionType::FOURTH_RIGHT,
-    base::LaneLinePositionType::OTHER,
-    base::LaneLinePositionType::CURB_LEFT,
-    base::LaneLinePositionType::CURB_RIGHT});
+std::vector<base::LaneLinePositionType> spatialLUT(
+    {base::LaneLinePositionType::UNKNOWN,
+     base::LaneLinePositionType::FOURTH_LEFT,
+     base::LaneLinePositionType::THIRD_LEFT,
+     base::LaneLinePositionType::ADJACENT_LEFT,
+     base::LaneLinePositionType::EGO_LEFT,
+     base::LaneLinePositionType::EGO_CENTER,
+     base::LaneLinePositionType::EGO_RIGHT,
+     base::LaneLinePositionType::ADJACENT_RIGHT,
+     base::LaneLinePositionType::THIRD_RIGHT,
+     base::LaneLinePositionType::FOURTH_RIGHT,
+     base::LaneLinePositionType::OTHER,
+     base::LaneLinePositionType::CURB_LEFT,
+     base::LaneLinePositionType::CURB_RIGHT});
 
 std::map<base::LaneLinePositionType, int> spatialLUTind = {
     {base::LaneLinePositionType::UNKNOWN, 0},
@@ -75,7 +75,7 @@ T GetPolyValue(T a, T b, T c, T d, T x) {
 }
 
 bool DarkSCNNLanePostprocessor::Init(
-  const LanePostprocessorInitOptions& options) {
+    const LanePostprocessorInitOptions& options) {
   // read detector config parameter
   darkSCNN::DarkSCNNParam darkscnn_param;
   const std::string& proto_path =
@@ -89,42 +89,43 @@ bool DarkSCNNLanePostprocessor::Init(
   input_offset_y_ = model_param.input_offset_y();
   lane_map_width_ = model_param.resize_width();
   lane_map_height_ = model_param.resize_height();
-  AINFO << " offset_x=" << input_offset_x_
-    << " offset_y=" << input_offset_y_
-    << " lane_map_width=" << lane_map_width_
-    << " lane_map_height_=" << lane_map_height_;
+  AINFO << " offset_x=" << input_offset_x_ << " offset_y=" << input_offset_y_
+        << " lane_map_width=" << lane_map_width_
+        << " lane_map_height_=" << lane_map_height_;
   //  read postprocessor parameter
   const std::string& root_dir = options.root_dir;
   const std::string& conf_file = options.conf_file;
   const std::string& postprocessor_config =
       GetAbsolutePath(root_dir, conf_file);
   AINFO << "postprocessor_config:" << postprocessor_config;
-  if (!apollo::common::util::GetProtoFromFile(
-    postprocessor_config, &lane_postprocessor_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(postprocessor_config,
+                                              &lane_postprocessor_param_)) {
     AERROR << "Read config detect_param failed: " << postprocessor_config;
     return false;
   }
   std::string param_str;
   google::protobuf::TextFormat::PrintToString(lane_postprocessor_param_,
-     &param_str);
+                                              &param_str);
   AINFO << "lane_postprocessor param: " << param_str;
 
   roi_height_ = lane_postprocessor_param_.roi_height();
   roi_start_ = lane_postprocessor_param_.roi_start();
   roi_width_ = lane_postprocessor_param_.roi_width();
+
+  lane_type_num_ = static_cast<int>(spatialLUTind.size());
+  AINFO << "lane_type_num_: " << lane_type_num_;
   return true;
 }
 
 bool DarkSCNNLanePostprocessor::Process2D(
-  const LanePostprocessorOptions& options,
-  CameraFrame* frame) {
+    const LanePostprocessorOptions& options, CameraFrame* frame) {
   ADEBUG << "Process2D start";
   frame->lane_objects.clear();
   auto start = std::chrono::high_resolution_clock::now();
 
   cv::Mat lane_map(lane_map_height_, lane_map_width_, CV_32FC1);
   memcpy(lane_map.data, frame->lane_detected_blob->cpu_data(),
-      lane_map_width_ * lane_map_height_ * sizeof(float));
+         lane_map_width_ * lane_map_height_ * sizeof(float));
 
   // if (options.use_lane_history &&
   //     (!use_history_ || time_stamp_ > options.timestamp)) {
@@ -132,66 +133,80 @@ bool DarkSCNNLanePostprocessor::Process2D(
   // }
 
   // 1. Sample points on lane_map and project them onto world coordinate
-  int y = static_cast<int> (lane_map.rows * 0.9 - 1);
+
+  // TODO(techoe): Should be fixed
+  int y = static_cast<int>(lane_map.rows * 0.9 - 1);
+  // TODO(techoe): Should be fixed
   int step_y = (y - 40) * (y - 40) / 6400 + 1;
 
   xy_points.clear();
-  xy_points.resize(13);
+  xy_points.resize(lane_type_num_);
   uv_points.clear();
-  uv_points.resize(13);
+  uv_points.resize(lane_type_num_);
 
   while (y > 0) {
-    for (int x = 1; x < lane_map.cols-1; x++) {
-      int value = static_cast<int> (round(lane_map.at<float>(y, x)));
+    for (int x = 1; x < lane_map.cols - 1; x++) {
+      int value = static_cast<int>(round(lane_map.at<float>(y, x)));
       // lane on left
+
       if ((value > 0 && value < 5) || value == 11) {
         // right edge (inner) of the lane
-        if (value != static_cast<int> (round(lane_map.at<float>(y, x + 1)))) {
+        if (value != static_cast<int>(round(lane_map.at<float>(y, x + 1)))) {
           Eigen::Matrix<float, 3, 1> img_point(
               static_cast<float>(x * roi_width_ / lane_map.cols),
-              static_cast<float>(
-                  y * roi_height_ / lane_map.rows + roi_start_), 1.0);
+              static_cast<float>(y * roi_height_ / lane_map.rows + roi_start_),
+              1.0);
           Eigen::Matrix<float, 3, 1> xy_p;
           xy_p = trans_mat_ * img_point;
           Eigen::Matrix<float, 2, 1> xy_point;
           Eigen::Matrix<float, 2, 1> uv_point;
-          if (std::abs(xy_p(2)) < 1e-6) continue;
+          if (std::fabs(xy_p(2)) < 1e-6) continue;
           xy_point << xy_p(0) / xy_p(2), xy_p(1) / xy_p(2);
-          if (xy_point(0) < 0.0 || xy_point(0) > 300.0 ||
+
+          // Filter out lane line points
+          if (xy_point(0) < 0.0 ||  // This condition is only for front camera
+              xy_point(0) > max_longitudinal_distance_ ||
               std::abs(xy_point(1)) > 30.0) {
             continue;
           }
           uv_point << static_cast<float>(x * roi_width_ / lane_map.cols),
               static_cast<float>(y * roi_height_ / lane_map.rows + roi_start_);
-          if (xy_points[value].size() < 5 || xy_point(0) < 50 ||
-              std::abs(xy_point(1) - xy_points[value].back()(1)) < 1) {
+          if (xy_points[value].size() < minNumPoints_ ||
+              xy_point(0) < 50.0f ||
+              std::fabs(xy_point(1) - xy_points[value].back()(1)) < 1.0f) {
             xy_points[value].push_back(xy_point);
             uv_points[value].push_back(uv_point);
           }
         }
-      } else if (value >= 5) {
+      } else if (value >= 5 && value < lane_type_num_) {
         // left edge (inner) of the lane
-        if (value != round(lane_map.at<float>(y, x - 1))) {
+        if (value != static_cast<int>(round(lane_map.at<float>(y, x - 1)))) {
           Eigen::Matrix<float, 3, 1> img_point(
               static_cast<float>(x * roi_width_ / lane_map.cols),
-              static_cast<float>(
-                  y * roi_height_ / lane_map.rows + roi_start_), 1.0);
+              static_cast<float>(y * roi_height_ / lane_map.rows + roi_start_),
+              1.0);
           Eigen::Matrix<float, 3, 1> xy_p;
           xy_p = trans_mat_ * img_point;
           Eigen::Matrix<float, 2, 1> xy_point;
           Eigen::Matrix<float, 2, 1> uv_point;
+          if (std::fabs(xy_p(2)) < 1e-6) continue;
           xy_point << xy_p(0) / xy_p(2), xy_p(1) / xy_p(2);
+          // Filter out lane line points
           if (xy_point(0) < 0.0 || xy_point(0) > 300.0 ||
               std::abs(xy_point(1)) > 25.0) {
             continue;
           }
           uv_point << static_cast<float>(x * roi_width_ / lane_map.cols),
               static_cast<float>(y * roi_height_ / lane_map.rows + roi_start_);
-          if (xy_points[value].size() < 5 || xy_point(0) < 50 ||
-              std::abs(xy_point(1) - xy_points[value].back()(1)) < 1) {
+          if (xy_points[value].size() < minNumPoints_ ||
+              xy_point(0) < 50.0f ||
+              std::fabs(xy_point(1) - xy_points[value].back()(1)) < 1.0f) {
             xy_points[value].push_back(xy_point);
             uv_points[value].push_back(uv_point);
           }
+        } else if (value >= lane_type_num_) {
+          AWARN << "Lane line value shouldn't be equal or more than "
+                << lane_type_num_;
         }
       }
     }
@@ -207,18 +222,18 @@ bool DarkSCNNLanePostprocessor::Process2D(
   // 2. Remove outliers and Do a ransac fitting
   std::vector<Eigen::Matrix<float, 4, 1>> coeffs;
   std::vector<Eigen::Matrix<float, 4, 1>> img_coeffs;
-  coeffs.resize(13);
-  img_coeffs.resize(13);
-  for (int i = 1; i < 13; ++i) {
+  coeffs.resize(lane_type_num_);
+  img_coeffs.resize(lane_type_num_);
+  for (int i = 1; i < lane_type_num_; ++i) {
     if (xy_points[i].size() < minNumPoints_) continue;
     Eigen::Matrix<float, 4, 1> coeff;
     // solve linear system to estimate polynomial coefficients
-    // if (RansacFitting(&xy_points[i], &coeff,
-    //     200, static_cast<int> (minNumPoints_), 0.1f)) {
-    if (PolyFit(xy_points[i], max_poly_order, &coeff, true)) {
-      coeffs[i] = coeff;
+    if (RansacFitting(&xy_points[i], &coeff,
+         200, static_cast<int> (minNumPoints_), 0.1f)) {
+//    if (PolyFit(xy_points[i], max_poly_order, &coeff, true)) {
+       coeffs[i] = coeff;
     } else {
-      xy_points[i].clear();
+       xy_points[i].clear();
     }
   }
 
@@ -228,8 +243,8 @@ bool DarkSCNNLanePostprocessor::Process2D(
   time_2 += microseconds_2 - microseconds_1;
 
   // 3. Write values into lane_objects
-  std::vector<float> c0s(13, 0);
-  for (int i = 1; i < 13; ++i) {
+  std::vector<float> c0s(lane_type_num_, 0);
+  for (int i = 1; i < lane_type_num_; ++i) {
     if (xy_points[i].size() < minNumPoints_) continue;
     c0s[i] = GetPolyValue(
         static_cast<float>(coeffs[i](3)), static_cast<float>(coeffs[i](2)),
@@ -240,11 +255,13 @@ bool DarkSCNNLanePostprocessor::Process2D(
   if (xy_points[4].size() < minNumPoints_ &&
       xy_points[5].size() >= minNumPoints_) {
     std::swap(xy_points[4], xy_points[5]);
+    std::swap(uv_points[4], uv_points[5]);
     std::swap(coeffs[4], coeffs[5]);
     std::swap(c0s[4], c0s[5]);
   } else if (xy_points[6].size() < minNumPoints_ &&
              xy_points[5].size() >= minNumPoints_) {
     std::swap(xy_points[6], xy_points[5]);
+    std::swap(uv_points[6], uv_points[5]);
     std::swap(coeffs[6], coeffs[5]);
     std::swap(c0s[6], c0s[5]);
   }
@@ -261,10 +278,12 @@ bool DarkSCNNLanePostprocessor::Process2D(
     }
     if (use_boundary) {
       std::swap(xy_points[4], xy_points[11]);
+      std::swap(uv_points[4], uv_points[11]);
       std::swap(coeffs[4], coeffs[11]);
       std::swap(c0s[4], c0s[11]);
     }
   }
+
 
   if (xy_points[6].size() < minNumPoints_ &&
       xy_points[12].size() >= minNumPoints_) {
@@ -278,12 +297,13 @@ bool DarkSCNNLanePostprocessor::Process2D(
     }
     if (use_boundary) {
       std::swap(xy_points[6], xy_points[12]);
+      std::swap(uv_points[6], uv_points[12]);
       std::swap(coeffs[6], coeffs[12]);
       std::swap(c0s[6], c0s[12]);
     }
   }
 
-  for (int i = 1; i < 13; ++i) {
+  for (int i = 1; i < lane_type_num_; ++i) {
     base::LaneLine cur_object;
     if (xy_points[i].size() < minNumPoints_) continue;
 
@@ -302,7 +322,6 @@ bool DarkSCNNLanePostprocessor::Process2D(
       else if (c0s[i] < c0s[9] && i == 11)
         continue;
     }
-
     // [4] write values
     cur_object.curve_car_coord.x_start =
         static_cast<float>(xy_points[i].front()(0));
@@ -315,7 +334,6 @@ bool DarkSCNNLanePostprocessor::Process2D(
     // if (cur_object.curve_car_coord.x_end -
     //     cur_object.curve_car_coord.x_start < 5) continue;
     // cur_object.order = 2;
-
     for (size_t j = 0; j < xy_points[i].size(); ++j) {
       base::Point2DF p_j;
       p_j.x = static_cast<float>(xy_points[i][j](0));
@@ -349,17 +367,17 @@ bool DarkSCNNLanePostprocessor::Process2D(
   }
   // change labels for all lanes from one side
   if (has_center_ == 1) {
-    for (auto &lane_ : frame->lane_objects) {
+    for (auto& lane_ : frame->lane_objects) {
       int spatial_id = spatialLUTind[lane_.pos_type];
       if (spatial_id >= 1 && spatial_id <= 5) {
-        lane_.pos_type = spatialLUT[spatial_id-1];
+        lane_.pos_type = spatialLUT[spatial_id - 1];
       }
     }
   } else if (has_center_ == 2) {
-    for (auto &lane_ : frame->lane_objects) {
+    for (auto& lane_ : frame->lane_objects) {
       int spatial_id = spatialLUTind[lane_.pos_type];
       if (spatial_id >= 5 && spatial_id <= 9) {
-        lane_.pos_type = spatialLUT[spatial_id+1];
+        lane_.pos_type = spatialLUT[spatial_id + 1];
       }
     }
   }
@@ -372,43 +390,39 @@ bool DarkSCNNLanePostprocessor::Process2D(
   time_num += 1;
 
   ADEBUG << "Avg sampling time: " << time_1 / time_num
-        << " Avg fitting time: " << time_2 / time_num
-        << " Avg writing time: " << time_3 / time_num;
+         << " Avg fitting time: " << time_2 / time_num
+         << " Avg writing time: " << time_3 / time_num;
   ADEBUG << "darkSCNN lane_postprocess done!";
   return true;
 }
 
 // produce laneline output in camera coordinates (optional)
 bool DarkSCNNLanePostprocessor::Process3D(
-  const LanePostprocessorOptions& options,
-  CameraFrame* frame) {
+    const LanePostprocessorOptions& options, CameraFrame* frame) {
   ConvertImagePoint2Camera(frame);
   PolyFitCameraLaneline(frame);
   return true;
 }
 
-void DarkSCNNLanePostprocessor::ConvertImagePoint2Camera(
-  CameraFrame* frame) {
+void DarkSCNNLanePostprocessor::ConvertImagePoint2Camera(CameraFrame* frame) {
   float pitch_angle = frame->calibration_service->QueryPitchAngle();
   float camera_ground_height =
-                frame->calibration_service->QueryCameraToGroundHeight();
-  const Eigen::Matrix3f& intrinsic_params =
-    frame->camera_k_matrix;
+      frame->calibration_service->QueryCameraToGroundHeight();
+  const Eigen::Matrix3f& intrinsic_params = frame->camera_k_matrix;
   const Eigen::Matrix3f& intrinsic_params_inverse = intrinsic_params.inverse();
   std::vector<base::LaneLine>& lane_objects = frame->lane_objects;
   int laneline_num = static_cast<int>(lane_objects.size());
   for (int line_index = 0; line_index < laneline_num; line_index++) {
     std::vector<base::Point2DF>& image_point_set =
-      lane_objects[line_index].curve_image_point_set;
+        lane_objects[line_index].curve_image_point_set;
     std::vector<base::Point3DF>& camera_point_set =
-      lane_objects[line_index].curve_camera_point_set;
-    for (int i = 0;
-      i < static_cast<int>(image_point_set.size()); i++) {
+        lane_objects[line_index].curve_camera_point_set;
+    for (int i = 0; i < static_cast<int>(image_point_set.size()); i++) {
       base::Point3DF camera_point;
       Eigen::Vector3d camera_point3d;
       const base::Point2DF& image_point = image_point_set[i];
       ImagePoint2Camera(image_point, pitch_angle, camera_ground_height,
-        intrinsic_params_inverse, &camera_point3d);
+                        intrinsic_params_inverse, &camera_point3d);
       camera_point.x = static_cast<float>(camera_point3d(0));
       camera_point.y = static_cast<float>(camera_point3d(1));
       camera_point.z = static_cast<float>(camera_point3d(2));
@@ -419,19 +433,18 @@ void DarkSCNNLanePostprocessor::ConvertImagePoint2Camera(
 }
 
 // @brief: fit camera lane line using polynomial
-void DarkSCNNLanePostprocessor::PolyFitCameraLaneline(
-  CameraFrame* frame) {
+void DarkSCNNLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
   std::vector<base::LaneLine>& lane_objects = frame->lane_objects;
   int laneline_num = static_cast<int>(lane_objects.size());
   for (int line_index = 0; line_index < laneline_num; line_index++) {
     const std::vector<base::Point3DF>& camera_point_set =
-      lane_objects[line_index].curve_camera_point_set;
+        lane_objects[line_index].curve_camera_point_set;
     // z: longitudinal direction
     // x: latitudinal direction
     float x_start = camera_point_set[0].z;
     float x_end = 0.0f;
     Eigen::Matrix<float, max_poly_order + 1, 1> camera_coeff;
-    std::vector<Eigen::Matrix<float, 2, 1> > camera_pos_vec;
+    std::vector<Eigen::Matrix<float, 2, 1>> camera_pos_vec;
     for (int i = 0; i < static_cast<int>(camera_point_set.size()); i++) {
       x_end = std::max(camera_point_set[i].z, x_end);
       x_start = std::min(camera_point_set[i].z, x_start);
@@ -442,7 +455,7 @@ void DarkSCNNLanePostprocessor::PolyFitCameraLaneline(
 
     bool is_x_axis = true;
     bool fit_flag =
-      PolyFit(camera_pos_vec, max_poly_order, &camera_coeff, is_x_axis);
+        PolyFit(camera_pos_vec, max_poly_order, &camera_coeff, is_x_axis);
     if (!fit_flag) {
       continue;
     }

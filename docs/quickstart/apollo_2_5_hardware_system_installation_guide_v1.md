@@ -254,7 +254,7 @@ The 64 line LiDAR system **HDL-64E S3** is available from Velodyne LiDAR, Inc.
 
 The 16 line LiDAR system VLP-16 is available from Velodyne LiDAR, Inc.
 
-![lidar_image](/Users/hanyang07/apollo/docs/quickstart/images/lidar_pic_16.png)
+![lidar_image](images/lidar_pic_16.png)
 
 **Key Features:**
 
@@ -266,7 +266,7 @@ The 16 line LiDAR system VLP-16 is available from Velodyne LiDAR, Inc.
 - Low Power Consumption
 - Protective Design
 
-![online](/Users/hanyang07/apollo/docs/quickstart/images/online_icon.png)Webpage for Velodyne VLP-16:
+![online](images/online_icon.png)Webpage for Velodyne VLP-16:
 [http://velodynelidar.com/vlp-16.html](http://velodynelidar.com/vlp-16.html)
 
 ## Cameras

@@ -1,1 +1,1 @@
-guardian_enable: false
+guardian_enable: true

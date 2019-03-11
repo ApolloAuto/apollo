@@ -197,8 +197,8 @@ bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   return overlap.start_s - kEpsilon <= s && s <= overlap.end_s + kEpsilon;
 }
 
-void ReferenceLineInfo::SetJunctionRightOfWay(double junction_s,
-                                              bool is_protected) {
+void ReferenceLineInfo::SetJunctionRightOfWay(
+    const double junction_s, const bool is_protected) const {
   auto* right_of_way =
       PlanningContext::MutablePlanningStatus()->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
@@ -805,10 +805,10 @@ int ReferenceLineInfo::GetPnCJunction(
   CHECK_NOTNULL(pnc_junction_overlap);
   const std::vector<hdmap::PathOverlap>& pnc_junction_overlaps =
       reference_line_.map_path().pnc_junction_overlaps();
+
+  constexpr double kError = 1.0;  // meter
   for (const auto& overlap : pnc_junction_overlaps) {
-    const double distance = fabs(s - overlap.start_s);
-    constexpr double kMaxDist = 3.0;  // meter
-    if (distance <= kMaxDist) {
+    if (s >= overlap.start_s - kError && s <= overlap.end_s + kError) {
       *pnc_junction_overlap = overlap;
       return 1;
     }

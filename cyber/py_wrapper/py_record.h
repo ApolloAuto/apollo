@@ -26,8 +26,6 @@
 #include <string>
 #include <thread>
 
-#include "cyber/cyber.h"
-#include "cyber/init.h"
 #include "cyber/message/protobuf_factory.h"
 #include "cyber/message/py_message.h"
 #include "cyber/message/raw_message.h"
@@ -37,8 +35,8 @@
 #include "cyber/record/record_writer.h"
 
 using ::apollo::cyber::proto::Header;
-using ::apollo::cyber::record::RecordReader;
 using ::apollo::cyber::record::RecordFileWriter;
+using ::apollo::cyber::record::RecordReader;
 
 namespace apollo {
 namespace cyber {

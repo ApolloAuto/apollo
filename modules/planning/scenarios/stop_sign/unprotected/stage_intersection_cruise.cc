@@ -18,20 +18,12 @@
  * @file
  **/
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
 namespace planning {
@@ -39,7 +31,6 @@ namespace scenario {
 namespace stop_sign {
 
 using common::TrajectoryPoint;
-using hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -53,21 +44,37 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the stop_sign is still along reference_line
-  std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
-    return FinishScenario();
+  // set right_of_way_status
+  const double stop_sign_start_s =
+      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
+  reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
+
+  // check pass pnc_junction
+  // TODO(all): remove when pnc_junction completely available on map
+  const auto& pnc_junction_overlaps =
+      reference_line_info.reference_line().map_path().pnc_junction_overlaps();
+  if (pnc_junction_overlaps.size() == 0) {
+    // pnc_junction not exist on map, use current stop_sign's end_s
+
+    constexpr double kIntersectionPassDist = 20.0;  // unit: m
+    const double adc_back_edge_s =
+        reference_line_info.AdcSlBoundary().start_s();
+    const double stop_sign_end_s =
+        PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
+    const double distance_adc_pass_stop_sign = adc_back_edge_s -
+        stop_sign_end_s;
+    ADEBUG << "distance_adc_pass_stop_sign["
+        << distance_adc_pass_stop_sign
+        << "] stop_sign_end_s[" << stop_sign_end_s << "]";
+
+    if (distance_adc_pass_stop_sign >= kIntersectionPassDist) {
+      return FinishStage();
+    } else {
+      return Stage::RUNNING;
+    }
   }
 
-  // check pass intersection
-  // TODO(all): update when pnc-junction is ready
-  constexpr double kIntersectionLength = 10.0;  // unit: m
-  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  const double distance_adc_pass_stop_sign =
-      adc_back_edge_s -
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.end_s;
-  if (distance_adc_pass_stop_sign > kIntersectionLength) {
+  if (!scenario::CheckInsidePnCJunction(reference_line_info)) {
     return FinishStage();
   }
 

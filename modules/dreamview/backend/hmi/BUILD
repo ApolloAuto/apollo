@@ -46,6 +46,7 @@ cc_library(
         "//modules/common/monitor_log",
         "//modules/common/util:json_util",
         "//modules/common/util:map_util",
+        "//modules/dreamview/backend/data_collection_monitor",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/point_cloud:point_cloud_updater",

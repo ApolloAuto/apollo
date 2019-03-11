@@ -37,7 +37,7 @@ bool RadarDetectionComponent::Init() {
   odometry_channel_name_ = comp_config.odometry_channel_name();
 
   if (!common::SensorManager::Instance()->GetSensorInfo(
-      comp_config.radar_name(), &radar_info_)) {
+          comp_config.radar_name(), &radar_info_)) {
     AERROR << "Failed to get sensor info, sensor name: "
            << comp_config.radar_name();
     return false;
@@ -147,9 +147,9 @@ bool RadarDetectionComponent::InternalProc(
   options.detector_options.radar2world_pose = &radar2world_pose;
   Eigen::Matrix4d radar2novatel_trans_m = radar2novatel_trans.matrix();
   options.detector_options.radar2novatel_trans = &radar2novatel_trans_m;
-  if (!GetCarLocalizationSpeed(
-          timestamp, &(options.detector_options.car_linear_speed),
-          &(options.detector_options.car_angular_speed))) {
+  if (!GetCarLocalizationSpeed(timestamp,
+                               &(options.detector_options.car_linear_speed),
+                               &(options.detector_options.car_angular_speed))) {
     AERROR << "Failed to call get_car_speed. [timestamp: "
            << std::to_string(timestamp);
     // return false;

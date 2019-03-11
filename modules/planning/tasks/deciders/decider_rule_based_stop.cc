@@ -22,6 +22,7 @@
 
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/util/util.h"
 
@@ -31,6 +32,7 @@ namespace planning {
 using apollo::common::Status;
 using apollo::common::time::Clock;
 using apollo::common::util::WithinBound;
+using apollo::hdmap::PathOverlap;
 using apollo::perception::TrafficLight;
 
 DeciderRuleBasedStop::DeciderRuleBasedStop(const TaskConfig& config)
@@ -48,6 +50,8 @@ Status DeciderRuleBasedStop::Process(Frame* frame,
 
   CheckTrafficLight(frame, reference_line_info);
 
+  CheckOpenSpacePreStop(frame, reference_line_info);
+
   return Status::OK();
 }
 
@@ -60,32 +64,36 @@ void DeciderRuleBasedStop::CheckStopSign(
     return;
   }
 
-  const std::string stop_sign_id =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.object_id;
-  if (stop_sign_id.empty()) {
-    return;
+  const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
+
+  const std::vector<PathOverlap>& stop_sign_overlaps =
+      reference_line_info->reference_line().map_path().stop_sign_overlaps();
+  for (const auto& stop_sign_overlap : stop_sign_overlaps) {
+    if (stop_sign_overlap.end_s <= adc_back_edge_s) {
+      continue;
+    }
+
+    const auto& stop_done_overlap_ids =
+        PlanningContext::GetScenarioInfo()->stop_done_overlap_ids;
+    if (stop_done_overlap_ids.end() != std::find(stop_done_overlap_ids.begin(),
+                                                 stop_done_overlap_ids.end(),
+                                                 stop_sign_overlap.object_id)) {
+      continue;
+    }
+
+    const std::string stop_wall_id =
+        STOP_SIGN_VO_ID_PREFIX + stop_sign_overlap.object_id;
+    const double stop_line_s = stop_sign_overlap.start_s;
+    const double stop_distance =
+        config_.decider_rule_based_stop_config().stop_sign().stop_distance();
+    ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
+           << "] stop_line_s[" << stop_line_s << "]";
+
+    BuildStopDecision(
+        frame, reference_line_info, stop_wall_id, stop_line_s, stop_distance,
+        StopReasonCode::STOP_REASON_STOP_SIGN,
+        PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles);
   }
-
-  if (PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end() !=
-      std::find(
-          PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.begin(),
-          PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end(),
-          stop_sign_id)) {
-    return;
-  }
-
-  const std::string stop_wall_id = STOP_SIGN_VO_ID_PREFIX + stop_sign_id;
-  const double stop_line_s =
-      PlanningContext::GetScenarioInfo()->next_stop_sign_overlap.start_s;
-  const double stop_distance =
-      config_.decider_rule_based_stop_config().stop_sign().stop_distance();
-  ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
-         << "] stop_line_s[" << stop_line_s << "]";
-
-  BuildStopDecision(
-      frame, reference_line_info, stop_wall_id, stop_line_s, stop_distance,
-      StopReasonCode::STOP_REASON_STOP_SIGN,
-      PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles);
 }
 
 void DeciderRuleBasedStop::CheckTrafficLight(
@@ -97,20 +105,27 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     return;
   }
 
-  for (auto traffic_light_overlap :
-       PlanningContext::GetScenarioInfo()->next_traffic_light_overlaps) {
-    const std::string traffic_light_id = traffic_light_overlap.object_id;
+  const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
 
-    if (PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end() !=
-        std::find(
-            PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.begin(),
-            PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.end(),
-            traffic_light_id)) {
+  const std::vector<PathOverlap>& traffic_light_overlaps =
+      reference_line_info->reference_line().map_path().signal_overlaps();
+  for (const auto& traffic_light_overlap : traffic_light_overlaps) {
+    if (traffic_light_overlap.end_s <= adc_back_edge_s) {
       continue;
     }
 
-    auto signal_color = scenario::GetSignal(traffic_light_id).color();
-    ADEBUG << "traffic_light_id[" << traffic_light_id << "] color["
+    const auto& stop_done_overlap_ids =
+        PlanningContext::GetScenarioInfo()->stop_done_overlap_ids;
+    if (stop_done_overlap_ids.end() !=
+        std::find(stop_done_overlap_ids.begin(), stop_done_overlap_ids.end(),
+                  traffic_light_overlap.object_id)) {
+      continue;
+    }
+
+    auto signal_color =
+        scenario::GetSignal(traffic_light_overlap.object_id).color();
+    ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
+           << "] start_s[" << traffic_light_overlap.start_s << "] color["
            << signal_color << "]";
     if (signal_color == TrafficLight::GREEN) {
       continue;
@@ -119,11 +134,11 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     // TODO(all): add stop_deceleration check based on signal colors
 
     const std::string stop_wall_id =
-        TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_id;
+        TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_overlap.object_id;
     const double stop_line_s = traffic_light_overlap.start_s;
-    const double stop_distance =
-        config_.decider_rule_based_stop_config().traffic_light()
-            .stop_distance();
+    const double stop_distance = config_.decider_rule_based_stop_config()
+                                     .traffic_light()
+                                     .stop_distance();
 
     ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
            << "] stop_line_s[" << stop_line_s << "]";
@@ -132,6 +147,57 @@ void DeciderRuleBasedStop::CheckTrafficLight(
                       stop_distance, StopReasonCode::STOP_REASON_SIGNAL,
                       wait_for_obstacles);
   }
+}
+
+void DeciderRuleBasedStop::CheckOpenSpacePreStop(
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
+  if (frame->open_space_info().open_space_pre_stop_finished()) {
+    return;
+  }
+
+  const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+  const auto& target_parking_spot_id =
+      frame->open_space_info().target_parking_spot_id();
+  const auto& nearby_path = reference_line_info->reference_line().map_path();
+  AERROR_IF(target_parking_spot_id.empty())
+      << "no target parking spot id found when setting pre stop fence";
+
+  double target_area_center_s = 0.0;
+  bool target_area_found = false;
+  const auto& parking_space_overlaps = nearby_path.parking_space_overlaps();
+  for (const auto& parking_overlap : parking_space_overlaps) {
+    if (parking_overlap.object_id == target_parking_spot_id) {
+      target_area_center_s =
+          (parking_overlap.start_s + parking_overlap.end_s) / 2.0;
+      target_area_found = true;
+    }
+  }
+  AERROR_IF(!target_area_found)
+      << "no target parking spot found on reference line";
+
+  double stop_line_s = 0.0;
+  double stop_distance_to_target = config_.decider_rule_based_stop_config()
+                                       .open_space()
+                                       .stop_distance_to_target();
+  CHECK_GE(stop_distance_to_target, 1.0e-8);
+  double target_vehicle_offset = target_area_center_s - adc_front_edge_s;
+  if (target_vehicle_offset > stop_distance_to_target) {
+    stop_line_s = target_area_center_s - stop_distance_to_target;
+  } else if (std::abs(target_vehicle_offset) < stop_distance_to_target) {
+    stop_line_s = target_area_center_s + stop_distance_to_target;
+  } else if (target_vehicle_offset < -stop_distance_to_target) {
+    stop_line_s = adc_front_edge_s + config_.decider_rule_based_stop_config()
+                                         .open_space()
+                                         .rightaway_stop_distance();
+  }
+  const std::string stop_wall_id =
+      OPEN_SPACE_VO_ID_PREFIX + target_parking_spot_id;
+  std::vector<std::string> wait_for_obstacles;
+  frame->mutable_open_space_info()->set_open_space_pre_stop_fence_s(
+      stop_line_s);
+  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s, 0.0,
+                    StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP,
+                    wait_for_obstacles);
 }
 
 bool DeciderRuleBasedStop::BuildStopDecision(

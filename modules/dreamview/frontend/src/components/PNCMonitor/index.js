@@ -11,7 +11,7 @@ export default class PNCMonitor extends React.Component {
     render() {
         const { options } = this.props;
         return (
-            <div className="pnc-monitor">
+            <div className="monitor pnc-monitor">
                 <Tabs>
                     <TabList>
                         <Tab>Planning</Tab>

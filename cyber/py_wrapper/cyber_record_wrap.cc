@@ -235,9 +235,7 @@ PyObject *cyber_PyRecordReader_GetChannelList(PyObject *self, PyObject *args) {
   PyObject *pyobj_list = PyList_New(channel_list.size());
   size_t pos = 0;
   for (const std::string &channel : channel_list) {
-    PyObject *bld_name = Py_BuildValue("s", channel.c_str());
-    PyList_SetItem(pyobj_list, pos, bld_name);
-    Py_DECREF(bld_name);
+    PyList_SetItem(pyobj_list, pos, Py_BuildValue("s", channel.c_str()));
     pos++;
   }
 

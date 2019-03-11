@@ -52,7 +52,8 @@ void GeneralMessage::Render(const Screen* s, int key) {
     s->AddStr(channelMsgPtr->message_type().c_str());
 
     std::ostringstream outStr;
-    outStr << std::fixed << std::setprecision(FrameRatio_Precision) << channelMsgPtr->frame_ratio();
+    outStr << std::fixed << std::setprecision(FrameRatio_Precision)
+           << channelMsgPtr->frame_ratio();
     s->AddStr(0, lineNo++, "FrameRatio: ");
     s->AddStr(outStr.str().c_str());
 
@@ -102,20 +103,21 @@ void GeneralMessage::Render(const Screen* s, int key) {
         }
       }
 
-      int lcount = lineCountOfField(*message_ptr_, s->Width(), 
-              field_, reflection_ptr_, is_folded_);
+      int lcount = lineCountOfField(*message_ptr_, s->Width(), field_,
+                                    reflection_ptr_, is_folded_);
       page_item_count_ = s->Height() - lineNo - 8;
       if (page_item_count_ < 1) page_item_count_ = 1;
       pages_ = lcount / page_item_count_ + 1;
       SplitPages(key);
       int jumpLines = page_index_ * page_item_count_;
       if (is_folded_) {
-        GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, 
-                          s, lineNo, 0, reflection_ptr_, field_, itemIndex_);
+        GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s,
+                                       lineNo, 0, reflection_ptr_, field_,
+                                       itemIndex_);
       } else {
         for (int i = 0; i < size; ++i) {
-          GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, 
-                            s, lineNo, 0, reflection_ptr_, field_, i);
+          GeneralMessageBase::PrintField(this, *message_ptr_, jumpLines, s,
+                                         lineNo, 0, reflection_ptr_, field_, i);
         }
       }
     }

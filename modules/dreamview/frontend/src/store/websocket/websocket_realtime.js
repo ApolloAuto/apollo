@@ -51,7 +51,7 @@ export default class RealtimeWebSocketEndpoint {
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
-                    const updateCoordination = (this.currentMode !== STORE.hmi.currentMode);
+                    const isNewMode = (this.currentMode !== STORE.hmi.currentMode);
                     this.currentMode = STORE.hmi.currentMode;
                     if (STORE.hmi.inNavigationMode) {
                         // In navigation mode, the coordinate system is FLU and
@@ -71,11 +71,11 @@ export default class RealtimeWebSocketEndpoint {
                         this.mapUpdatePeriodMs = 1000;
                     }
 
-                    STORE.update(message);
+                    STORE.update(message, isNewMode);
                     RENDERER.maybeInitializeOffest(
                         message.autoDrivingCar.positionX,
                         message.autoDrivingCar.positionY,
-                        updateCoordination);
+                        isNewMode);
                     RENDERER.updateWorld(message);
                     this.updateMapIndex(message);
                     if (this.routingTime !== message.routingTime) {
@@ -97,6 +97,11 @@ export default class RealtimeWebSocketEndpoint {
                 case "RoutingPointCheckResult":
                     if (message.error) {
                         RENDERER.removeInvalidRoutingPoint(message.pointId, message.error);
+                    }
+                    break;
+                case "DataCollectionProgress":
+                    if (message) {
+                        STORE.hmi.updateDataCollectionProgress(message.data);
                     }
                     break;
             }
@@ -130,11 +135,10 @@ export default class RealtimeWebSocketEndpoint {
                     this.updatePOI = false;
                 }
 
-                const requestPlanningData = STORE.options.showPNCMonitor;
-                this.websocket.send(JSON.stringify({
-                    type : "RequestSimulationWorld",
-                    planning : requestPlanningData,
-                }));
+                this.requestSimulationWorld(STORE.options.showPNCMonitor);
+                if (STORE.hmi.isCalibrationMode) {
+                    this.requestDataCollectionProgress();
+                }
             }
         }, this.simWorldUpdatePeriodMs);
     }
@@ -162,6 +166,13 @@ export default class RealtimeWebSocketEndpoint {
         this.secondLastSeqNum = this.lastSeqNum;
         this.lastSeqNum = world.sequenceNum;
         this.simWorldLastUpdateTimestamp = now;
+    }
+
+    requestSimulationWorld(requestPlanningData) {
+        this.websocket.send(JSON.stringify({
+            type : "RequestSimulationWorld",
+            planning : requestPlanningData,
+        }));
     }
 
     checkRoutingPoint(point) {
@@ -298,5 +309,11 @@ export default class RealtimeWebSocketEndpoint {
 
     publishNavigationInfo(data) {
         this.websocket.send(data);
+    }
+
+    requestDataCollectionProgress() {
+        this.websocket.send(JSON.stringify({
+            type: "RequestDataCollectionProgress",
+        }));
     }
 }

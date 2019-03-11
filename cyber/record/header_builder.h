@@ -23,8 +23,8 @@ namespace apollo {
 namespace cyber {
 namespace record {
 
-using ::apollo::cyber::proto::Header;
 using ::apollo::cyber::proto::CompressType;
+using ::apollo::cyber::proto::Header;
 
 class HeaderBuilder {
  public:

@@ -42,18 +42,17 @@ void SensorDataManager::Reset() {
 
 void SensorDataManager::AddSensorMeasurements(
     const base::FrameConstPtr& frame_ptr) {
-  const base::SensorInfo sensor_info = frame_ptr->sensor_info;
+  const base::SensorInfo& sensor_info = frame_ptr->sensor_info;
   std::string sensor_id = sensor_info.name;
-  const auto& it = sensors_.find(sensor_id);
+  const auto it = sensors_.find(sensor_id);
   SensorPtr sensor_ptr = nullptr;
   if (it == sensors_.end()) {
     if (!sensor_manager_->IsSensorExist(sensor_id)) {
       AERROR << "Failed to find sensor " << sensor_id << " in sensor manager.";
       return;
-    } else {
-      sensor_ptr = std::make_shared<Sensor>(Sensor(sensor_info));
-      sensors_.insert(make_pair(sensor_id, sensor_ptr));
     }
+    sensor_ptr = std::make_shared<Sensor>(Sensor(sensor_info));
+    sensors_.emplace(sensor_id, sensor_ptr);
   } else {
     sensor_ptr = it->second;
   }
@@ -83,7 +82,7 @@ void SensorDataManager::GetLatestSensorFrames(
     AERROR << "Nullptr error.";
     return;
   }
-  const auto& it = sensors_.find(sensor_id);
+  const auto it = sensors_.find(sensor_id);
   if (it == sensors_.end()) {
     return;
   }
@@ -125,7 +124,7 @@ bool SensorDataManager::GetPose(const std::string& sensor_id, double timestamp,
     return false;
   }
 
-  const auto& it = sensors_.find(sensor_id);
+  const auto it = sensors_.find(sensor_id);
   if (it == sensors_.end()) {
     AERROR << "Failed to find sensor " << sensor_id << " for get pose.";
     return false;
