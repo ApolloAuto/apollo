@@ -748,7 +748,7 @@ void Obstacle::CheckLaneBlocking(const ReferenceLine& reference_line) {
   is_lane_blocking_ = false;
 }
 
-void Obstacle::SetLaneChangeBlocking(const bool is_distance_clear){
+void Obstacle::SetLaneChangeBlocking(const bool is_distance_clear) {
   is_lane_change_blocking_ = is_distance_clear;
 }
 

@@ -113,7 +113,6 @@ void LaneFollowStage::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 Stage::StageStatus LaneFollowStage::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   bool has_drivable_reference_line = false;
-  //  bool disable_low_priority_path = false;
 
   ADEBUG << "Number of reference lines:\t"
       << frame->mutable_reference_line_info()->size();
@@ -322,8 +321,9 @@ bool LaneFollowStage::HysteresisFilter(const double obstacle_distance,
                                        const bool is_obstacle_blocking) {
   if (is_obstacle_blocking) {
     return obstacle_distance < safe_distance + distance_buffer;
-  } else
+  } else {
     return obstacle_distance < safe_distance - distance_buffer;
+  }
 }
 
 bool LaneFollowStage::IsClearToChangeLane(
@@ -386,10 +386,11 @@ bool LaneFollowStage::IsClearToChangeLane(
           ->SetLaneChangeBlocking(true);
       AERROR << "Lane Change is blocked by obstacle" << obstacle->Id();
       return false;
-    } else
+    } else {
       reference_line_info->path_decision()
           ->Find(obstacle->Id())
           ->SetLaneChangeBlocking(false);
+    }
   }
   return true;
 }
