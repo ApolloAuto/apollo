@@ -28,12 +28,12 @@ RTKLocalizationComponent::RTKLocalizationComponent()
 bool RTKLocalizationComponent::Init() {
   Clock::SetMode(Clock::CYBER);
   tf2_broadcaster_.reset(new apollo::transform::TransformBroadcaster(node_));
-  if (InitConfig() != true) {
+  if (!InitConfig()) {
     AERROR << "Init Config falseed.";
     return false;
   }
 
-  if (InitIO() != true) {
+  if (!InitIO()) {
     AERROR << "Init Interval falseed.";
     return false;
   }
