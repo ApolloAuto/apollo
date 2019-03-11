@@ -14,7 +14,12 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(avcodec libavcodec REQUIRED)
 pkg_check_modules(swscale libswscale REQUIRED)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O2 -fopenmp -mavx2 -fPIC")
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O2 -fopenmp -fPIC")
+else()
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -O2 -fopenmp -mavx2 -fPIC")
+endif()
 
 ###################################################
 ## Declare things to be passed to other projects ##
@@ -33,14 +38,23 @@ catkin_package(
 ## Build ##
 ###########
 
+if(NOT (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64"))
+  set(JSONCPP_LIB_DIR /usr/local/apollo/jsoncpp/lib)
+  set(ADV_PLAT_LIB_DIR /usr/local/apollo/adv_plat/lib)
+  set(ADV_PLAT_DIR /usr/local/apollo/adv_plat)
+  set(LIBADV_TRIGGER_CTL libadv_trigger_ctl.a)
+  set(LIBJSONCPP libjsoncpp.so)
+  set(LIBADV_PLAT_COMMON libadv_plat_common.a)
+endif()
+
 link_directories(
-  /usr/local/apollo/jsoncpp/lib
-  /usr/local/apollo/adv_plat/lib
+  ${JSONCPP_LIB_DIR}
+  ${ADV_PLAT_LIB_DIR}
   ${catkin_LIB_DIRS}
 )
 
 include_directories(include
-  /usr/local/apollo/adv_plat
+  ${ADV_PLAT_DIR}
   ${catkin_INCLUDE_DIRS}
   ${avcodec_INCLUDE_DIRS}
   ${swscale_INCLUDE_DIRS}
@@ -50,9 +64,9 @@ include_directories(include
 add_library(${PROJECT_NAME} src/usb_cam.cpp)
 target_link_libraries(${PROJECT_NAME}
     yaml-cpp
-    libadv_trigger_ctl.a
-    libjsoncpp.so
-    libadv_plat_common.a
+    ${LIBADV_TRIGGER_CTL}
+    ${LIBJSONCPP}
+    ${LIBADV_PLAT_COMMON}
     ${avcodec_LIBRARIES}
     ${swscale_LIBRARIES}
     ${catkin_LIBRARIES}
@@ -61,10 +75,10 @@ target_link_libraries(${PROJECT_NAME}
 ## Build the USB camera nodelet
 add_library(${PROJECT_NAME}_nodelet nodes/usb_cam_nodelet.cpp nodes/usb_cam_wrapper.cpp)
 target_link_libraries(${PROJECT_NAME}_nodelet
-    ${PROJECT_NAME}
-    libadv_trigger_ctl.a
-    libjsoncpp.so
-    libadv_plat_common.a
+  ${PROJECT_NAME}
+  ${LIBADV_TRIGGER_CTL}
+  ${LIBJSONCPP}
+  ${LIBADV_PLAT_COMMON}
   ${avcodec_LIBRARIES}
   ${swscale_LIBRARIES}
   ${catkin_LIBRARIES}
@@ -74,9 +88,9 @@ target_link_libraries(${PROJECT_NAME}_nodelet
 add_executable(${PROJECT_NAME}_node nodes/usb_cam_node.cpp nodes/usb_cam_wrapper.cpp)
 target_link_libraries(${PROJECT_NAME}_node
   ${PROJECT_NAME}
-  libadv_trigger_ctl.a
-  libjsoncpp.so
-  libadv_plat_common.a
+  ${LIBADV_TRIGGER_CTL}
+  ${LIBJSONCPP}
+  ${LIBADV_PLAT_COMMON}
   ${avcodec_LIBRARIES}
   ${swscale_LIBRARIES}
   ${catkin_LIBRARIES}

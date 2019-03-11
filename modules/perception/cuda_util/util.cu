@@ -134,7 +134,11 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <caffe::Sync
     int origin_width = frame.cols;
     int origin_height = frame.rows;
 
+#ifdef __x86_64__
     const dim3 block(32, 8);
+#else
+    const dim3 block(16, 16);
+#endif    
     int width = dst->height();
     int height = dst->channels();
     int channel = dst->width();
@@ -156,8 +160,11 @@ void resize(cv::Mat frame, caffe::Blob<float> *dst, std::shared_ptr <caffe::Sync
             const float scale) {
     int origin_width = frame.cols;
     int origin_height = frame.rows;
-
+#ifdef __x86_64__
     const dim3 block(32, 8);
+#else
+    const dim3 block(16, 16);
+#endif
     int width = dst->height();
     int height = dst->channels();
     int channel = dst->width();

@@ -2,9 +2,9 @@
 
 Apollo Sensor Unit (ASU) is designed to work with Industrial PC (IPC) to implement sensor fusion, vehicle control and network access in Apollo's autonomous driving platform.
 
-The ASU system provides sensor interfaces to collect data from various sensors, including cameras, Lidars, Radars, and Ultrasonic Sensors. The system also utilizes pulse per second (PPS) and GPRMC signals from GNSS receiver to implement data collection synchronization for the camera and LiDAR sensors. 
+The ASU system provides sensor interfaces to collect data from various sensors, including cameras, Lidars, Radars, and Ultrasonic Sensors. The system also utilizes pulse per second (PPS) and GPRMC signals from GNSS receiver to implement data collection synchronization for the camera and LiDAR sensors.
 
-The communication between the ASU and the IPC is through PCI Express Interface. ASU collects sensor data and passes to IPC via PCI Express Interface, and the IPC uses the ASU to send out Vehicle Control commands in the Controller Area Network (CAN) protocol. 
+The communication between the ASU and the IPC is through PCI Express Interface. ASU collects sensor data and passes to IPC via PCI Express Interface, and the IPC uses the ASU to send out Vehicle Control commands in the Controller Area Network (CAN) protocol.
 
 In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, and WiFi access point via WiFi module will be enabled in the future releases.
 
@@ -14,24 +14,20 @@ In addition, Lidar connectivity via Ethernet, WWAN gateway via 4G LTE module, an
 
 #### Front Panel Connectors
 
-1. External GPS PPS / GPRMC Input Port 
+1. External GPS PPS / GPRMC Input Port
 2. FAKRA Camera Data Input Port (5 ports)
-3. 10/100/1000M Base-T Ethernet Port (2 Ports) 
-4. KL-15 (AKA Car Ignite) Signal Input Port 
+3. 10/100/1000M Base-T Ethernet Port (2 Ports)
+4. KL-15 (AKA Car Ignite) Signal Input Port
 
-#### Rear Panel Connectors 
+#### Rear Panel Connectors
 
-1. Micro USB to UART port (reserved for debug) 
-2. Micro USB to UART port (ASU configuration port) 
-3. Micro SIM card holder for built-in LTE module 
-4. General purpose UART port(reserved) 
-5. USB 3.0 type A port (2 Ports)
-6. External PCI Express Port (Support X4 or X8)
-7. GPS PPS / GPRMC Output Port ( 3 Ports)
-8. Micro USB 2.0 OTG
-9. Power and PPS/GPRMC Output Port for Stereo Camera
-10. CAN Bus (4 Ports)
-11. Main Power Input Connector 
+
+1. General purpose UART port(reserved)
+2. External PCI Express Port (Support X4 or X8). For connections to IPC, please use EXTN port.
+3. GPS PPS / GPRMC Output Port ( 3 Ports)
+4. Power and PPS/GPRMC Output Port for Stereo Camera
+5. CAN Bus (4 Ports)
+6. Main Power Input Connector
 
 ### Purchase Channels
 
@@ -41,7 +37,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
 1. Power Cable
 
-   The main power is from vehicle battery, 9V ~ 36V, 120W. 
+   The main power is from vehicle battery, 9V ~ 36V, 120W.
 
    ![conn-DTF13-2P](images/conn-DTF13-2P.jpeg)
 
@@ -54,7 +50,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | 1     | 12V  | PWR  | 12V (9V~36V, 120W) |
    | 2     | GND  | PWR  | GROUND             |
 
-2. FPD-Link III cameras. 
+2. FPD-Link III cameras.
 
    There are 5 FAKRA connectors for FPD Link III cameras in ASU Front Panel labeled with 1~5, respectively, from right to left. The ASU can support up to 5 cameras by enabling Camera 1 ~ 4 and 5 whose deserializers (TI, DS90UB914ATRHSTQ1) convert FPD Link III signals into parallel data signals.
 
@@ -85,7 +81,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
 
 4. GPS synchronization output channels
 
-   The forwards the duplicated GPS PPS/GPRMC from external GPS to the customized 8 Pin connector. This connector provides 3 sets of PPS/GPRMC output for sensors need synchronized, such as Lidars, Stereo Cameras, etc. 
+   The forwards the duplicated GPS PPS/GPRMC from external GPS to the customized 8 Pin connector. This connector provides 3 sets of PPS/GPRMC output for sensors need synchronized, such as Lidars, Stereo Cameras, etc.
 
    ![1376350-2](images/1376350-2.jpeg)
 
@@ -129,7 +125,7 @@ The Apollo Sensor Unit is currently only provided to our Partners and certain de
    | 11   | CANL-2 | INOUT | Channel 3, CANL |
    | 12   | GND    | PWR   | Ground          |
 
-   
+
 ## Disclaimer
 
 This device is `Apollo Platform Supported`

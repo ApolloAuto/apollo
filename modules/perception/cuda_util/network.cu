@@ -138,7 +138,11 @@ void GetObjectsGPU(int n,
                                   float *res_box_data,
                                   float *res_cls_data, 
                                   int s_box_block_size) {
-	const int thread_size = 512;
+#ifdef __x86_64__
+    const int thread_size = 512;
+#else
+    const int thread_size = 256;
+#endif
 	int block_size = (n + thread_size -1) / thread_size;
         {
 		get_object_kernel << < block_size, thread_size >> >

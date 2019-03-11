@@ -31,7 +31,7 @@ Perception depends on the raw sensor data such as LiDAR point cloud data and cam
 Changes to Apollo 3.0:
  - CIPV detection/ Tailgating – moving within a single lane
  -	Whole lane line support - bold line support for long range accuracy. There are 2 different types on installations for Camera, low and high installation.
- -	Asynchronous sensor fusion – get all the information and get data points by asynchronously fusing LiDAR, Radar and Camera data. This is specifically important because of the frame rate differences in the different sensors – Radar is 10ms, Camera is 33s and LiDAR is 100ms
+ -	Asynchronous sensor fusion – get all the information and get data points by asynchronously fusing LiDAR, Radar and Camera data. This is specifically important because of the frame rate differences in the different sensors – Radar is 10ms, Camera is 33ms and LiDAR is 100ms
  -	Online pose estimation – determines angle change and estimates it when there are bumps or slopes to ensure that the sensors move with the car and the angle/pose changes accordingly
  -	Visual localization – we now use camera for localization. This functionality is currently being tested.
  -	Ultrasonic Sensor – Currently being tested as the final gatekeeper to be used in conjunction with Guardian for Automated Emergency brake and vertical/perpendicular parking.

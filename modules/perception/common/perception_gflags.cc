@@ -210,3 +210,5 @@ DEFINE_string(traffic_light_recognizer, "",
               "the recognizer enabled for traffic_light");
 DEFINE_string(traffic_light_reviser, "",
               "the reviser enabled for traffic_light");
+
+DEFINE_int32(enable_opencv_gpu, 0, "OpenCV Compiled with CUDA");

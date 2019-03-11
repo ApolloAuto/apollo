@@ -55,9 +55,17 @@
 #include <boost/lexical_cast.hpp>
 
 #include <usb_cam/usb_cam.h>
+
+#ifdef __x86_64__
 #include "include/adv_trigger_ctl.h"
+#endif
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
+
+#ifndef __x86_64__
+#define ADV_TRIGGER_ENABLE    1
+#define ADV_TRIGGER_DISABLE   0
+#endif
 
 namespace usb_cam {
 
@@ -879,10 +887,18 @@ UsbCam::pixel_format UsbCam::pixel_format_from_string(const std::string &str) {
 int UsbCam::trigger_enable(unsigned char fps, unsigned char internal) {
   ROS_INFO("Trigger enable, dev:%s, fps:%d, internal:%d", camera_dev_.c_str(),
            fps, internal);
+#ifdef __x86_64__
   return adv_trigger_enable(camera_dev_.c_str(), fps, internal);
+#else 
+  return ADV_TRIGGER_ENABLE;
+#endif
 }
 
 int UsbCam::trigger_disable() {
+#ifdef __x86_64__
   return adv_trigger_disable(camera_dev_.c_str());
+#else
+  return ADV_TRIGGER_DISABLE;
+#endif
 }
 }  // namespace usb_cam

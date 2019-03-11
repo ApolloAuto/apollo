@@ -1,0 +1,23 @@
+syntax = "proto2";
+
+package apollo.navi_generator;
+
+import "modules/common/proto/header.proto";
+import "modules/monitor/proto/system_status.proto";
+
+message HardwareStatusSummary {
+  // Overall status summary.
+  optional apollo.monitor.Summary summary = 1 [default = UNKNOWN];
+}
+
+message ModuleStatusSummary {
+  // Overall status summary.
+  optional apollo.monitor.Summary summary = 1 [default = UNKNOWN];
+}
+
+message HMIStatus {
+  optional apollo.common.Header header = 1;
+  map<string, ModuleStatusSummary> modules = 2;
+  map<string, HardwareStatusSummary> hardware = 3;
+  optional string current_mode = 4 [default = "Standard"];
+}

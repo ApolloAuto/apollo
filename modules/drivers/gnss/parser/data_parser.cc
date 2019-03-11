@@ -76,6 +76,9 @@ Parser *CreateParser(config::Config config, bool is_base_station = false) {
     case config::Stream::NOVATEL_BINARY:
       return Parser::CreateNovatel(config);
 
+    case config::Stream::NEWTONM2_BINARY:
+      return Parser::CreateNewtonM2(config);
+
     default:
       return nullptr;
   }
@@ -247,7 +250,7 @@ void DataParser::PublishOdometry(const MessagePtr message) {
   Ins *ins = As<Ins>(message);
   Gps gps;
 
-  double unix_sec = apollo::drivers::util::gps2unix(ins->measurement_time());
+  double unix_sec = common::time::TimeUtil::Gps2unix(ins->measurement_time());
   gps.mutable_header()->set_timestamp_sec(unix_sec);
   auto *gps_msg = gps.mutable_localization();
 
@@ -288,7 +291,7 @@ void DataParser::PublishOdometry(const MessagePtr message) {
 void DataParser::PublishCorrimu(const MessagePtr message) {
   Ins *ins = As<Ins>(message);
   CorrectedImu imu;
-  double unix_sec = apollo::drivers::util::gps2unix(ins->measurement_time());
+  double unix_sec = common::time::TimeUtil::Gps2unix(ins->measurement_time());
   imu.mutable_header()->set_timestamp_sec(unix_sec);
 
   auto *imu_msg = imu.mutable_imu();

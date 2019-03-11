@@ -24,12 +24,12 @@ else
 	rm -rf modules/map/data/${MAP}
 	mkdir modules/map/data/${MAP}
 	if [ "$2" == "" ]; then
-	    echo "Gererating map with a single lane"
+	    echo "Generating map with a single lane"
 		python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -e modules/map/data/${MAP}/default_end_way_point.txt
 	else
 		LEFT_LANES=$2
 		RIGHT_LANES=$3
-	    echo "Gererating map with one center lane, ${LEFT_LANES} left lane(s), ${RIGHT_LANES} right lane(s)"
+	    echo "Generating map with one center lane, ${LEFT_LANES} left lane(s), ${RIGHT_LANES} right lane(s)"
 		python ./modules/tools/create_map/create_map.py -i /tmp/lane.csv -o modules/map/data/${MAP}/base_map.txt -e modules/map/data/${MAP}/default_end_way_point.txt --left_lanes ${LEFT_LANES} --right_lanes ${RIGHT_LANES}
 	fi
 	echo "--map_dir=modules/map/data/${MAP}" >> modules/common/data/global_flagfile.txt

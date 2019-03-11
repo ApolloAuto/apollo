@@ -2,7 +2,7 @@
 
 Apollo documents contain the following folders:
 
-- **[Quick Start Guide](quickstart/README.md)** - A hardware and software guide to setting up Apollo, seggregated by versions.
+- **[Quick Start Guide](quickstart/README.md)** - A hardware and software guide to setting up Apollo, segregated by versions.
 ---
 - **[Technical Tutorial](technical_tutorial/README.md)** - Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
 ---

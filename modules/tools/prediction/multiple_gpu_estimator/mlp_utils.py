@@ -149,7 +149,7 @@ def local_device_setter(num_devices=1,
                         worker_device='/cpu:0',
                         ps_ops=None,
                         ps_strategy=None):
-    if ps_ops == None:
+    if ps_ops is None:
         ps_ops = ['Variable', 'VariableV2', 'VarHandleOp']
 
     if ps_strategy is None:

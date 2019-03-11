@@ -8,7 +8,7 @@ Quadratic programming + Spline interpolation
 
 ### 1.1  Get path length
 
-Path is defined in station-lateral coordination system. The **s** range from vehicle's current position to  default planing path length.
+Path is defined in station-lateral coordination system. The **s** range from vehicle's current position to  default planning path length.
 
 ### 1.2   Get spline segments
 

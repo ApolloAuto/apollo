@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+package apollo.navi_generator;
+
+message TrajectorySmootherConfig {
+  // Configuration file name for the smoothing algorithm.
+  optional string smoother_config_filename = 1
+      [default = "modules/planning/conf/qp_spline_smoother_config.pb.txt"];
+  // Smoothing distance in meters
+  optional double smooth_length = 2 [default = 200.0];
+}
+
+message TrajectoryUtilConfig {
+  optional TrajectorySmootherConfig smoother_config = 1;
+}
