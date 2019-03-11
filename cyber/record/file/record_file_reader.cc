@@ -138,8 +138,7 @@ bool RecordFileReader::SkipSection(int64_t size) {
     return false;
   }
   if (!SetPosition(pos + size)) {
-    AERROR << "Skip failed, file: " << path_
-           << ", current position: " << pos
+    AERROR << "Skip failed, file: " << path_ << ", current position: " << pos
            << "skip count: " << size;
     return false;
   }

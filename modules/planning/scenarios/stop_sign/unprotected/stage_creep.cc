@@ -78,18 +78,15 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout = scenario_config_.creep_timeout();
   auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
-  if (task &&
-      task->CheckCreepDone(
-          *frame, reference_line_info,
-          stop_sign_end_s,
-          wait_time, timeout)) {
+  if (task && task->CheckCreepDone(*frame, reference_line_info, stop_sign_end_s,
+                                   wait_time, timeout)) {
     return FinishStage();
   }
 
   // set param for PROCEED_WITH_CAUTION_SPEED
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-      ->SetProceedWithCautionSpeedParam(
-          *frame, reference_line_info, stop_sign_end_s);
+      ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
+                                        stop_sign_end_s);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {

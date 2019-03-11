@@ -23,9 +23,9 @@
 namespace apollo {
 namespace planning {
 using apollo::common::Status;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::common::TrajectoryPoint;
 using apollo::planning::TrajGearPair;
 
 OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
@@ -35,12 +35,11 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles;
   double collision_distance;
 
-  BuildPredictedEnvironment(frame->obstacles(),
-      predicted_bounding_rectangles);
+  BuildPredictedEnvironment(frame->obstacles(), predicted_bounding_rectangles);
 
   if (!IsCollisionFreeTrajectory(
-        frame->open_space_info().chosen_paritioned_trajectory(),
-        predicted_bounding_rectangles, &collision_distance)) {
+          frame->open_space_info().chosen_paritioned_trajectory(),
+          predicted_bounding_rectangles, &collision_distance)) {
     // change gflag
     frame_->mutable_open_space_info()->set_fallback_flag(true);
 
@@ -49,8 +48,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     *(frame_->mutable_open_space_info()->mutable_fallback_trajectory()) =
         frame->open_space_info().chosen_paritioned_trajectory();
     auto fallback_trajectory_vec =
-        frame_->mutable_open_space_info()->
-        mutable_fallback_trajectory()->first;
+        frame_->mutable_open_space_info()->mutable_fallback_trajectory()->first;
 
     double stop_distance = std::max(0.0,
         collision_distance - config_.open_space_fallback_decider_config().
@@ -62,8 +60,8 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
            frame_->vehicle_state().linear_velocity()) /
            2.0 / stop_distance;
       double current_v = frame_->vehicle_state().linear_velocity();
-      size_t temp_horizon = frame_->open_space_info().
-          fallback_trajectory().first.NumOfPoints();
+      size_t temp_horizon =
+          frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
       for (size_t i = 0; i < temp_horizon; ++i) {
         double next_v = std::max(0.0, current_v -
             accelerate * frame_->open_space_info().
@@ -75,8 +73,8 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
       }
     } else {
       // if the stop distance is not enough, stop at current location
-      size_t temp_horizon = frame_->open_space_info().
-          fallback_trajectory().first.NumOfPoints();
+      size_t temp_horizon =
+          frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
       for (size_t i = 0; i < temp_horizon; ++i) {
         fallback_trajectory_vec[i].set_v(0.0);
       }
@@ -89,19 +87,18 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
 }
 
 void OpenSpaceFallbackDecider::BuildPredictedEnvironment(
-  const std::vector<const Obstacle*>& obstacles,
-  std::vector<std::vector<common::math::Box2d>>
-      &predicted_bounding_rectangles) {
+    const std::vector<const Obstacle*>& obstacles,
+    std::vector<std::vector<common::math::Box2d>>&
+        predicted_bounding_rectangles) {
   predicted_bounding_rectangles.clear();
   double relative_time = 0.0;
-  while (relative_time <
-      config_.open_space_fallback_decider_config().
-        open_space_prediction_time_period()) {
+  while (relative_time < config_.open_space_fallback_decider_config()
+                             .open_space_prediction_time_period()) {
     std::vector<Box2d> predicted_env;
     for (const Obstacle* obstacle : obstacles) {
-          TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
-          Box2d box = obstacle->GetBoundingBox(point);
-          predicted_env.push_back(std::move(box));
+      TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
+      Box2d box = obstacle->GetBoundingBox(point);
+      predicted_env.push_back(std::move(box));
     }
     predicted_bounding_rectangles.emplace_back(std::move(predicted_env));
     relative_time += FLAGS_trajectory_time_resolution;
@@ -109,10 +106,10 @@ void OpenSpaceFallbackDecider::BuildPredictedEnvironment(
 }
 
 bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
-  const TrajGearPair& trajectory_gear_pair,
-  const std::vector<std::vector<common::math::Box2d>>
-      &predicted_bounding_rectangles,
-  double *collision_distance) {
+    const TrajGearPair& trajectory_gear_pair,
+    const std::vector<std::vector<common::math::Box2d>>&
+        predicted_bounding_rectangles,
+    double* collision_distance) {
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
@@ -137,12 +134,10 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
       for (const auto& obstacle_box : predicted_bounding_rectangles[j]) {
         if (ego_box.HasOverlap(obstacle_box)) {
           const auto& vehicle_state = frame_->vehicle_state();
-          Vec2d vehicle_vec(
-            {vehicle_state.x(),
-             vehicle_state.y()});
+          Vec2d vehicle_vec({vehicle_state.x(), vehicle_state.y()});
           if (obstacle_box.DistanceTo(vehicle_vec) <
-              config_.open_space_fallback_decider_config().
-                  open_space_fall_back_collision_distance()) {
+              config_.open_space_fallback_decider_config()
+                  .open_space_fall_back_collision_distance()) {
             *collision_distance = obstacle_box.DistanceTo(vehicle_vec);
             return false;
           }

@@ -33,8 +33,8 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using common::time::Clock;
 using common::TrajectoryPoint;
+using common::time::Clock;
 using perception::TrafficLight;
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
@@ -96,13 +96,13 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
 
   // check on wait-time
   if (traffic_light_all_stop && !traffic_light_all_green) {
-    if (GetContext()->stop_start_time == 0.0)  {
+    if (GetContext()->stop_start_time == 0.0) {
       GetContext()->stop_start_time = Clock::NowInSeconds();
     } else {
       auto start_time = GetContext()->stop_start_time;
       const double wait_time = Clock::NowInSeconds() - start_time;
-      ADEBUG << "stop_start_time[" << start_time
-          << "] wait_time[" << wait_time << "]";
+      ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
+             << "]";
       if (wait_time > scenario_config_.red_light_right_turn_stop_duration()) {
         return FinishStage(false);
       }
@@ -112,8 +112,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
   return Stage::RUNNING;
 }
 
-Stage::StageStatus
-TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
@@ -124,8 +123,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
     const bool protected_mode) {
   if (protected_mode) {
     // intersection_cruise
-    next_stage_ = ScenarioConfig
-        ::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
+    next_stage_ = ScenarioConfig ::
+        TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
   } else {
     // creep
     // update PlanningContext

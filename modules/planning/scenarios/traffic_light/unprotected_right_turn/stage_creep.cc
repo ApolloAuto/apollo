@@ -64,7 +64,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
   const auto& reference_line_info = frame->reference_line_info().front();
 
   if (PlanningContext::GetScenarioInfo()
-      ->current_traffic_light_overlaps.size() == 0) {
+          ->current_traffic_light_overlaps.size() == 0) {
     return FinishStage();
   }
 
@@ -85,8 +85,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     auto signal_color =
         scenario::GetSignal(traffic_light_overlap.object_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id
-        << "] start_s[" << traffic_light_overlap.start_s
-        << "] color[" << signal_color << "]";
+           << "] start_s[" << traffic_light_overlap.start_s << "] color["
+           << signal_color << "]";
 
     // check on traffic light color
     if (signal_color != TrafficLight::GREEN) {
@@ -106,19 +106,15 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout = scenario_config_.creep_timeout();
   auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
-  if (task &&
-      task->CheckCreepDone(
-          *frame, reference_line_info,
-          traffic_light.end_s,
-          wait_time, timeout)) {
+  if (task && task->CheckCreepDone(*frame, reference_line_info,
+                                   traffic_light.end_s, wait_time, timeout)) {
     return FinishStage();
   }
 
   // set param for PROCEED_WITH_CAUTION_SPEED
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-      ->SetProceedWithCautionSpeedParam(
-          *frame, reference_line_info,
-          traffic_light.end_s);
+      ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
+                                        traffic_light.end_s);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
