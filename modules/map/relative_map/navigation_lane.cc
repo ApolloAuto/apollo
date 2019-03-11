@@ -428,7 +428,7 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
       int path_size = navigation_path.path_point_size();
       int path_size_ahead = path_size;
 #ifdef __aarch64__
-      path_size_ahead = current_project_index + 
+      path_size_ahead = current_project_index +
                         FLAGS_relative_map_path_frame_ahead;
       if (path_size_ahead > path_size) {
         path_size_ahead = path_size;
@@ -448,7 +448,7 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
   int path_size = navigation_path.path_point_size();
   int path_size_ahead = path_size;
 #ifdef __aarch64__
-  path_size_ahead = current_project_index + 
+  path_size_ahead = current_project_index +
                     FLAGS_relative_map_path_frame_ahead;
   if (path_size_ahead > path_size) {
     path_size_ahead = path_size;
