@@ -131,8 +131,8 @@ Stage::StageStatus LaneFollowStage::Process(
       if (reference_line_info.IsChangeLanePath()) {
         AERROR << "reference line is lane change ref.";
         if (reference_line_info.Cost() < kStraightForwardLineCost &&
-            IsClearToChangeLane(reference_line_info, frame,
-                planning_start_point.v())) {
+            IsClearToChangeLane(&reference_line_info, frame,
+                                planning_start_point.v())) {
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
           AERROR << "\tclear for lane change";
@@ -315,20 +315,26 @@ SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
   return sl_point;
 }
 
+// a hysteresis filter used to improve decision consistency in lane change
+bool LaneFollowStage::HysteresisFilter(const double obstacle_distance,
+                                       const double safe_distance,
+                                       const double distance_buffer,
+                                       const bool is_obstacle_blocking) {
+  if (is_obstacle_blocking) {
+    return obstacle_distance < safe_distance + distance_buffer;
+  } else
+    return obstacle_distance < safe_distance - distance_buffer;
+}
+
 bool LaneFollowStage::IsClearToChangeLane(
-    const ReferenceLineInfo& reference_line_info,
-    Frame* frame,
-    const double ego_v) {
-  CHECK(reference_line_info.IsChangeLanePath());
+    ReferenceLineInfo* reference_line_info, Frame* frame, const double ego_v) {
+  CHECK(reference_line_info->IsChangeLanePath());
 
-  double ego_start_s = reference_line_info.AdcSlBoundary().start_s();
-  double ego_end_s = reference_line_info.AdcSlBoundary().end_s();
+  double ego_start_s = reference_line_info->AdcSlBoundary().start_s();
+  double ego_end_s = reference_line_info->AdcSlBoundary().end_s();
 
-  auto obstacles = frame->obstacles();
-
-  AERROR << "\tNumber of obstacles:\t" << obstacles.size();
-
-  for (const auto* obstacle : obstacles) {
+  for (auto* obstacle :
+       reference_line_info->path_decision()->obstacles().Items()) {
     if (obstacle->IsVirtual() || obstacle->IsStatic()) {
       AERROR << "skip one virtual or static obstacle";
       continue;
@@ -341,7 +347,7 @@ bool LaneFollowStage::IsClearToChangeLane(
 
     for (const auto& p : obstacle->PerceptionPolygon().points()) {
       SLPoint sl_point;
-      reference_line_info.reference_line().XYToSL({p.x(), p.y()}, &sl_point);
+      reference_line_info->reference_line().XYToSL({p.x(), p.y()}, &sl_point);
       start_s = std::fmin(start_s, sl_point.s());
       end_s = std::fmax(end_s, sl_point.s());
 
@@ -359,24 +365,31 @@ bool LaneFollowStage::IsClearToChangeLane(
     **/
 
     constexpr double kLateralShift = 2.5;
-    if (end_l < -kLateralShift ||
-        start_l > kLateralShift) {
+    if (end_l < -kLateralShift || start_l > kLateralShift) {
       continue;
     }
     constexpr double kSafeTime = 3.0;
     constexpr double kForwardMinSafeDistance = 6.0;
     constexpr double kBackwardMinSafeDistance = 8.0;
+    constexpr double kDistanceBuffer = 0.5;
 
     const auto kForwardSafeDistance = std::fmax(
-        kForwardMinSafeDistance,
-        (ego_v - obstacle->speed())* kSafeTime);
+        kForwardMinSafeDistance, (ego_v - obstacle->speed()) * kSafeTime);
     const auto kBackwardSafeDistance = std::fmax(
-        kBackwardMinSafeDistance,
-        (obstacle->speed() - ego_v) * kSafeTime);
-    if (end_s > ego_start_s - kBackwardSafeDistance &&
-        start_s < ego_end_s + kForwardSafeDistance) {
+        kBackwardMinSafeDistance, (obstacle->speed() - ego_v) * kSafeTime);
+    if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance,
+                         kDistanceBuffer, obstacle->IsLaneChangeBlocking()) &&
+        HysteresisFilter(start_s - ego_end_s, kForwardSafeDistance,
+                         kDistanceBuffer, obstacle->IsLaneChangeBlocking())) {
+      reference_line_info->path_decision()
+          ->Find(obstacle->Id())
+          ->SetLaneChangeBlocking(true);
+      AERROR << "Lane Change is blocked by obstacle" << obstacle->Id();
       return false;
-    }
+    } else
+      reference_line_info->path_decision()
+          ->Find(obstacle->Id())
+          ->SetLaneChangeBlocking(false);
   }
   return true;
 }
