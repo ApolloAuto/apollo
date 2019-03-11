@@ -378,8 +378,7 @@ void HMTrackersObjectsAssociation::IdAssign(
     // In id_assign, we don't assign the narrow camera object
     // with the track which only have narrow camera object
     // In post id_assign, we do this.
-    if (post == false &&
-        (sensor_id == "front_6mm" || sensor_id == "front_12mm"))
+    if (!post && (sensor_id == "front_6mm" || sensor_id == "front_12mm"))
       continue;
 
     if (it != sensor_id_2_track_ind.end()) {

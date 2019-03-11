@@ -156,7 +156,7 @@ bool CanbusComponent::Init() {
   }
 
   // 4. start controller
-  if (vehicle_controller_->Start() == false) {
+  if (!vehicle_controller_->Start()) {
     AERROR << "Failed to start vehicle controller.";
     return false;
   }
