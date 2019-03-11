@@ -12,9 +12,9 @@ cc_library(
     ],
     deps = [
         "//cyber",
+        "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/dreamview/backend/common:dreamview_gflags",
-        "//modules/canbus/proto:canbus_proto",
         "//modules/dreamview/proto:data_collection_table_proto",
         "//third_party/json",
         "@gtest",
@@ -36,6 +36,5 @@ cc_test(
         "@gtest//:main",
     ],
 )
-
 
 cpplint()

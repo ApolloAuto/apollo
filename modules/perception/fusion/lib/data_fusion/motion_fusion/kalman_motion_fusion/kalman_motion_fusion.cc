@@ -85,10 +85,10 @@ bool KalmanMotionFusion::InitFilter(const SensorObjectConstPtr& sensor_object) {
   if (!kalman_filter_.Init(global_states, global_uncertainty)) {
     return false;
   }
-  if (!kalman_filter_.SetGainBreakdownThresh(
-          gain_break_down, gain_break_down_threshold) ||
-      !kalman_filter_.SetValueBreakdownThresh(
-          value_break_down, value_break_down_threshold)) {
+  if (!kalman_filter_.SetGainBreakdownThresh(gain_break_down,
+                                             gain_break_down_threshold) ||
+      !kalman_filter_.SetValueBreakdownThresh(value_break_down,
+                                              value_break_down_threshold)) {
     return false;
   }
 

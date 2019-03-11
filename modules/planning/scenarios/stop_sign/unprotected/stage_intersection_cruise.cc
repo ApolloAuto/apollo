@@ -61,11 +61,10 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
         reference_line_info.AdcSlBoundary().start_s();
     const double stop_sign_end_s =
         PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
-    const double distance_adc_pass_stop_sign = adc_back_edge_s -
-        stop_sign_end_s;
-    ADEBUG << "distance_adc_pass_stop_sign["
-        << distance_adc_pass_stop_sign
-        << "] stop_sign_end_s[" << stop_sign_end_s << "]";
+    const double distance_adc_pass_stop_sign =
+        adc_back_edge_s - stop_sign_end_s;
+    ADEBUG << "distance_adc_pass_stop_sign[" << distance_adc_pass_stop_sign
+           << "] stop_sign_end_s[" << stop_sign_end_s << "]";
 
     if (distance_adc_pass_stop_sign >= kIntersectionPassDist) {
       return FinishStage();
