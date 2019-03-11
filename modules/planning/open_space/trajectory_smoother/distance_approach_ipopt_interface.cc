@@ -391,7 +391,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
   ADEBUG << "get_starting_point";
-  CHECK(init_x == true) << "Warm start init_x setting failed";
+  CHECK(init_x) << "Warm start init_x setting failed";
 
   CHECK_EQ(horizon_, uWS_.cols());
   CHECK_EQ(horizon_ + 1, xWS_.cols());

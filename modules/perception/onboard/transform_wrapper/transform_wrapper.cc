@@ -262,7 +262,7 @@ bool TransformWrapper::GetExtrinsicsBySensorId(
 
   StampedTransform transform;
   bool status = QueryTrans(0.0, &transform, frame_id, child_frame_id);
-  if (status == true) {
+  if (status) {
     *trans = transform.translation * transform.rotation;
   }
   return status;
