@@ -33,12 +33,12 @@ bool MSFLocalizationComponent::Init() {
   Clock::SetMode(Clock::CYBER);
   publisher_.reset(new LocalizationMsgPublisher(this->node_));
 
-  if (InitConfig() != true) {
+  if (!InitConfig()) {
     AERROR << "Init Config failed.";
     return false;
   }
 
-  if (InitIO() != true) {
+  if (!InitIO()) {
     AERROR << "Init IO failed.";
     return false;
   }
@@ -51,12 +51,12 @@ bool MSFLocalizationComponent::InitConfig() {
   bestgnsspos_topic_ = FLAGS_gnss_best_pose_topic;
   gnss_heading_topic_ = FLAGS_heading_topic;
 
-  if (publisher_->InitConfig() != true) {
+  if (!publisher_->InitConfig()) {
     AERROR << "Init publisher config failed.";
     return false;
   }
 
-  if (localization_.Init().ok() != true) {
+  if (!localization_.Init().ok()) {
     AERROR << "Init class MSFLocalization failed.";
     return false;
   }
@@ -91,7 +91,7 @@ bool MSFLocalizationComponent::InitIO() {
       gnss_heading_topic_, gnss_heading_call);
 
   // init writer
-  if (publisher_->InitIO() != true) {
+  if (!publisher_->InitIO()) {
     AERROR << "Init publisher io failed.";
     return false;
   }
