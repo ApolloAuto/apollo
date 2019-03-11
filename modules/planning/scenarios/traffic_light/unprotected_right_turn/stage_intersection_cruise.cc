@@ -45,6 +45,14 @@ TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
+  // set right_of_way_status
+  if (PlanningContext::GetScenarioInfo()
+      ->current_traffic_light_overlaps.size() > 0) {
+    const double traffic_light_start_s = PlanningContext::GetScenarioInfo()
+        ->current_traffic_light_overlaps[0].start_s;
+    reference_line_info.SetJunctionRightOfWay(traffic_light_start_s, true);
+  }
+
   // check pass pnc_junction
   // TODO(all): remove when pnc_junction completely available on map
   const auto& pnc_junction_overlaps =
