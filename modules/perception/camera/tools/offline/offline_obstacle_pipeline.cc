@@ -14,9 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <opencv2/opencv.hpp>
+
 #include <fstream>
 #include <iomanip>
-#include <opencv2/opencv.hpp>
 
 #include "cyber/common/file.h"
 #include "modules/common/util/string_util.h"
