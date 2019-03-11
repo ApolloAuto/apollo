@@ -62,12 +62,12 @@ DEFINE_bool(enable_junction_feature, true,
             "If to enable building junction feature for obstacles");
 DEFINE_bool(enable_all_junction, false,
             "If consider all junction with junction_mlp_model.");
-DEFINE_double(caution_search_distance_ahead, 40.0,
+DEFINE_double(caution_search_distance_ahead, 50.0,
               "The distance ahead to search caution-level obstacles");
-DEFINE_double(caution_search_distance_backward_for_merge, 30.0,
+DEFINE_double(caution_search_distance_backward_for_merge, 60.0,
               "The distance backward to search caution-lebel obstacles "
               "in the case of merging");
-DEFINE_double(caution_search_distance_backward_for_overlap, 20.0,
+DEFINE_double(caution_search_distance_backward_for_overlap, 30.0,
               "The distance backward to search caution-lebel obstacles "
               "in the case of overlap");
 
