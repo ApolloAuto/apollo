@@ -485,7 +485,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
 
   // Check if it is supported by confs
   if (supported_scenarios_.find(scenario_type) == supported_scenarios_.end()) {
-    scenario_type == default_scenario_type_;
+    scenario_type = default_scenario_type_;
   }
 
   ADEBUG << "select scenario: "
