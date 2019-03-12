@@ -38,6 +38,10 @@ class PathAssessmentDecider : public Decider {
   common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
+  bool IsValidPath(const PathData* path_data);
+
+  void SetPathInfo();
+
  private:
 };
 
