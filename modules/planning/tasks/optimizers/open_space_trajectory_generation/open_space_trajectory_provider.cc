@@ -51,10 +51,30 @@ OpenSpaceTrajectoryProvider::~OpenSpaceTrajectoryProvider() {
   }
 }
 
+// TODO(Jinyun) Fix "no associate state" error.
 void OpenSpaceTrajectoryProvider::Stop() {
-  is_stop_ = true;
   if (FLAGS_enable_open_space_planner_thread) {
+    is_stop_.store(true);
     task_future_.get();
+    trajectory_updated_.store(false);
+    trajectory_error_.store(false);
+    trajectory_skipped_.store(false);
+    optimizer_thread_counter = 0;
+  }
+}
+
+// TODO(Jinyun) Fix "no associate state error". Driving out of parking spot not
+// supported right now
+void OpenSpaceTrajectoryProvider::Restart() {
+  if (FLAGS_enable_open_space_planner_thread) {
+    is_stop_.store(true);
+    task_future_.get();
+    is_stop_.store(false);
+    thread_init_flag_ = false;
+    trajectory_updated_.store(false);
+    trajectory_error_.store(false);
+    trajectory_skipped_.store(false);
+    optimizer_thread_counter = 0;
   }
 }
 
@@ -92,6 +112,11 @@ Status OpenSpaceTrajectoryProvider::Process() {
   if (FLAGS_enable_open_space_planner_thread) {
     ADEBUG << "Open space plan in multi-threads mode";
 
+    if (is_stop_) {
+      GenerateStopTrajectory(trajectory_data);
+      return Status(ErrorCode::OK, "Parking finished");
+    }
+
     {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       thread_data_.stitching_trajectory = stitching_trajectory;
@@ -111,6 +136,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
             vehicle_state, open_space_info.open_space_end_pose(),
             open_space_info.origin_heading(), open_space_info.origin_point())) {
       GenerateStopTrajectory(trajectory_data);
+      is_stop_.store(true);
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
 

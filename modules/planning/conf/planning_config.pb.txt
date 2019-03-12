@@ -213,7 +213,7 @@ default_task_config: {
     heading_searching_range: 0.2
     heading_tracking_range: 1.57
     gear_shift_period_duration: 2.0
-    kepsilon_to_midway_point: 1.0e-4
+    kepsilon_to_midway_point: 1.0e-2
   }
 }
 default_task_config: {
