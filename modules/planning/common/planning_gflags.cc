@@ -497,4 +497,8 @@ DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 DEFINE_bool(enable_parallel_open_space_smoother, false,
             "True to enable open space smoother parallel implementation.");
+
+DEFINE_double(vehicle_low_speed_threshold, 1.0,
+              "Vehicle low speed threshold.");
+
 DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");

@@ -256,4 +256,7 @@ DECLARE_double(side_pass_driving_width_l_buffer);
 
 DECLARE_bool(enable_parallel_hybrid_a);
 DECLARE_bool(enable_parallel_open_space_smoother);
+
+DECLARE_double(vehicle_low_speed_threshold);
+
 DECLARE_bool(enable_cuda);
