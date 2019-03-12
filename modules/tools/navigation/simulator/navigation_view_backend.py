@@ -282,7 +282,7 @@ if __name__ == "__main__":
     try:
         with open(key_file_name, 'r') as f:
             for line in f:
-                API_KEY = line.replace('\n', "")
+                API_KEY = line.strip()
                 break
     except IOError:
         print('Could not read file: %s' % key_file_name)
