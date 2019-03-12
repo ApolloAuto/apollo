@@ -211,6 +211,7 @@ default_task_config: {
     interpolated_pieces_num: 50
     initial_gear_check_horizon: 3
     heading_searching_range: 0.3
+    heading_tracking_range: 0.2
     gear_shift_period_duration: 2.0
     kepsilon_to_midway_point: 1.0e-6
   }

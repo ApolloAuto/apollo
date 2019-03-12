@@ -31,6 +31,7 @@ using common::PathPoint;
 using common::Status;
 using common::TrajectoryPoint;
 using common::math::NormalizeAngle;
+using common::math::Vec2d;
 using common::time::Clock;
 
 OpenSpaceTrajectoryPartition::OpenSpaceTrajectoryPartition(
@@ -197,11 +198,11 @@ Status OpenSpaceTrajectoryPartition::Process() {
                   (path_end_point.y() - vehicle_state.y()) *
                       (path_end_point.y() - vehicle_state.y()));
 
-    double traj_point_moving_direction = path_end_point.theta();
+    double traj_end_point_moving_direction = path_end_point.theta();
     if (paritioned_trajectories_ptr->at(i).second ==
         canbus::Chassis::GEAR_REVERSE) {
-      traj_point_moving_direction =
-          NormalizeAngle(traj_point_moving_direction + M_PI);
+      traj_end_point_moving_direction =
+          NormalizeAngle(traj_end_point_moving_direction + M_PI);
     }
     double vehicle_moving_direction = vehicle_state.heading();
     if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
@@ -211,7 +212,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     // If close to the end point, start on the next trajectory
     if (distance_to_trajs_end <= open_space_trajectory_partition_config_
                                      .kepsilon_to_midway_point() &&
-        std::abs(traj_point_moving_direction - vehicle_moving_direction) <
+        std::abs(traj_end_point_moving_direction - vehicle_moving_direction) <
             open_space_trajectory_partition_config_.heading_searching_range()) {
       if (i + 1 >= trajectories_size) {
         current_trajectory_index = trajectories_size - 1;
@@ -232,7 +233,14 @@ Status OpenSpaceTrajectoryPartition::Process() {
                                       (path_point.x() - vehicle_state.x()) +
                                   (path_point.y() - vehicle_state.y()) *
                                       (path_point.y() - vehicle_state.y()));
-      if (distance < min_distance) {
+      Vec2d tracking_vector(path_point.x() - vehicle_state.x(),
+                            path_point.y() - vehicle_state.y());
+      double tracking_direction = tracking_vector.Angle();
+      if (distance < min_distance &&
+          std::abs(
+              NormalizeAngle(tracking_direction - vehicle_moving_direction)) <
+              open_space_trajectory_partition_config_
+                  .heading_tracking_range()) {
         min_distance = distance;
         current_trajectory_point_index = j;
       }
