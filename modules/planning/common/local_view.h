@@ -39,7 +39,6 @@ struct LocalView {
   std::shared_ptr<localization::LocalizationEstimate> localization_estimate;
   std::shared_ptr<perception::TrafficLightDetection> traffic_light;
   std::shared_ptr<routing::RoutingResponse> routing;
-  bool is_new_routing = false;
   std::shared_ptr<relative_map::MapMsg> relative_map;
 };
 
