@@ -49,6 +49,7 @@ DECLARE_bool(enable_all_junction);
 DECLARE_double(caution_search_distance_ahead);
 DECLARE_double(caution_search_distance_backward_for_merge);
 DECLARE_double(caution_search_distance_backward_for_overlap);
+DECLARE_double(caution_pedestrian_approach_time);
 
 // Obstacle features
 DECLARE_int32(ego_vehicle_id);
