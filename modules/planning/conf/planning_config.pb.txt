@@ -8,6 +8,7 @@ standard_planning_config {
      scenario_type: TRAFFIC_LIGHT_PROTECTED
      scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
      scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
+     scenario_type: VALET_PARKING
   }
 }
 default_task_config: {
@@ -301,8 +302,8 @@ default_task_config: {
 default_task_config: {
   task_type: OPEN_SPACE_ROI_DECIDER
   open_space_roi_decider_config {
-    roi_longitudinal_range: 10.0
-    parking_start_range: 7.0
+    roi_longitudinal_range: 15.0
+    parking_start_range: 20.0
     parking_inwards: false
     enable_perception_obstacles: false
   }

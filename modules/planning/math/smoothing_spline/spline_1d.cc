@@ -32,7 +32,7 @@ Spline1d::Spline1d(const std::vector<double>& x_knots, const uint32_t order)
 }
 
 double Spline1d::operator()(const double x) const {
-  if (splines_.size() == 0) {
+  if (splines_.empty()) {
     return 0.0;
   }
   uint32_t index = FindIndex(x);
@@ -41,7 +41,7 @@ double Spline1d::operator()(const double x) const {
 
 double Spline1d::Derivative(const double x) const {
   // zero order spline
-  if (splines_.size() == 0) {
+  if (splines_.empty()) {
     return 0.0;
   }
   uint32_t index = FindIndex(x);
@@ -49,7 +49,7 @@ double Spline1d::Derivative(const double x) const {
 }
 
 double Spline1d::SecondOrderDerivative(const double x) const {
-  if (splines_.size() == 0) {
+  if (splines_.empty()) {
     return 0.0;
   }
   uint32_t index = FindIndex(x);
@@ -57,7 +57,7 @@ double Spline1d::SecondOrderDerivative(const double x) const {
 }
 
 double Spline1d::ThirdOrderDerivative(const double x) const {
-  if (splines_.size() == 0) {
+  if (splines_.empty()) {
     return 0.0;
   }
   uint32_t index = FindIndex(x);

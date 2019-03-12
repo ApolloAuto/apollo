@@ -252,7 +252,7 @@ Status QpPiecewiseStGraph::AddKernel(
 Status QpPiecewiseStGraph::AddCruiseReferenceLineKernel(
     const SpeedLimit& speed_limit, const double weight) {
   auto* ref_kernel = generator_->mutable_kernel();
-  if (speed_limit.speed_limit_points().size() == 0) {
+  if (speed_limit.speed_limit_points().empty()) {
     std::string msg = "Fail to apply_kernel due to empty speed limits.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);

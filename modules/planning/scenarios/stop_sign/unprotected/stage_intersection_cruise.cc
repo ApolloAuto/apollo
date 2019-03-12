@@ -53,7 +53,7 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
   // TODO(all): remove when pnc_junction completely available on map
   const auto& pnc_junction_overlaps =
       reference_line_info.reference_line().map_path().pnc_junction_overlaps();
-  if (pnc_junction_overlaps.size() == 0) {
+  if (pnc_junction_overlaps.empty()) {
     // pnc_junction not exist on map, use current stop_sign's end_s
 
     constexpr double kIntersectionPassDist = 20.0;  // unit: m

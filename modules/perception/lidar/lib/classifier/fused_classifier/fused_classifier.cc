@@ -82,7 +82,7 @@ bool FusedClassifier::Classify(const ClassifierOptions& options,
       const int& track_id = object->track_id;
       sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
                                          temporal_window_);
-      if (tracked_objects.size() == 0) {
+      if (tracked_objects.empty()) {
         AERROR << "Find zero-length track, so skip.";
         continue;
       }

@@ -1066,7 +1066,7 @@ int PlaneFitGroundDetector::SmoothLine(unsigned int up, unsigned int r,
   assert(r < param_.nr_grids_coarse);
   assert(dn < param_.nr_grids_coarse);
   if (/*!(*_vg_coarse)(r, 0).empty()*/ true) {
-    if (ground_planes_sphe_[r][0].IsValid() == false) {
+    if (!ground_planes_sphe_[r][0].IsValid()) {
       nr_grids += CompleteGrid(
           ground_planes_sphe_[r][0], ground_planes_sphe_[r][1],
           ground_planes_sphe_[up][0], ground_planes_sphe_[dn][0], &plane);
@@ -1080,7 +1080,7 @@ int PlaneFitGroundDetector::SmoothLine(unsigned int up, unsigned int r,
   }
   for (c = 1; c < nm1; ++c) {
     if (/*!(*_vg_coarse)(r, c).empty()*/ true) {
-      if (ground_planes_sphe_[r][c].IsValid() == false) {
+      if (!ground_planes_sphe_[r][c].IsValid()) {
         nr_grids += CompleteGrid(
             ground_planes_sphe_[r][c - 1], ground_planes_sphe_[r][c + 1],
             ground_planes_sphe_[up][c], ground_planes_sphe_[dn][c], &plane);
@@ -1094,7 +1094,7 @@ int PlaneFitGroundDetector::SmoothLine(unsigned int up, unsigned int r,
     }
   }
   if (/*!(*_vg_coarse)(r, nm1).empty()*/ true) {
-    if (ground_planes_sphe_[r][nm1].IsValid() == false) {
+    if (!ground_planes_sphe_[r][nm1].IsValid()) {
       nr_grids += CompleteGrid(
           ground_planes_sphe_[r][nm1 - 1], ground_planes_sphe_[r][nm1],
           ground_planes_sphe_[up][nm1], ground_planes_sphe_[dn][nm1], &plane);
@@ -1305,7 +1305,7 @@ PlaneFitPointCandIndices **PlaneFitGroundDetector::GetCandis() const {
 
 void IPlaneEucliToSpher(const GroundPlaneLiDAR &src,
                         GroundPlaneSpherical *dst) {
-  if (src.IsValid() == false) {
+  if (!src.IsValid()) {
     dst->ForceInvalid();
   } else {
     GroundPlaneLiDAR p = src;
@@ -1322,7 +1322,7 @@ void IPlaneEucliToSpher(const GroundPlaneLiDAR &src,
 
 void IPlaneSpherToEucli(const GroundPlaneSpherical &src,
                         GroundPlaneLiDAR *dst) {
-  if (src.IsValid() == false) {
+  if (!src.IsValid()) {
     dst->ForceInvalid();
   } else {
     // assume positive nz;

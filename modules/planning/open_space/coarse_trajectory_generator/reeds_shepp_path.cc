@@ -1262,7 +1262,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
     }
   }
 
-  if (succ != true) {
+  if (!succ) {
     AERROR << "RSP parallel fails";
     return false;
   }

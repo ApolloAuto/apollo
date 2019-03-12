@@ -48,7 +48,7 @@ void LoadPlanes(std::string path, GroundNode* node_ptr) {
   while (file.good()) {
     std::string buf;
     getline(file, buf);
-    if (buf.size() == 0) {
+    if (buf.empty()) {
       continue;
     }
     std::stringstream ss;
@@ -70,7 +70,7 @@ void LoadPoints(const std::string path, std::vector<std::vector<double>>* pts,
     pt.clear();
     std::string buf;
     getline(file, buf);
-    if (buf.size() == 0) {
+    if (buf.empty()) {
       continue;
     }
     std::stringstream ss;

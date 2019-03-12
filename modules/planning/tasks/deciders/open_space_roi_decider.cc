@@ -46,6 +46,7 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
   // TODO(Jinyun) only run GetOpenSpaceROI() at the first frame of
   // open space planner to save computation effort
   vehicle_state_ = frame->vehicle_state();
+  ROI_parking_boundary_.clear();
   obstacles_by_frame_ = frame->GetObstacleList();
   if (frame->local_view().routing->routing_request().has_parking_space() &&
       frame->local_view().routing->routing_request().parking_space().has_id()) {
@@ -257,9 +258,7 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
   double right_top_l = 0.0;
   if (!(nearby_path->GetProjection(left_top, &left_top_s, &left_top_l) &&
         nearby_path->GetProjection(right_top, &right_top_s, &right_top_l))) {
-    std::string msg(
-        "fail to get parking spot points' projections on reference line");
-    AERROR << msg;
+    AERROR << "fail to get parking spot points' projections on reference line";
     return false;
   }
   // start or end, left or right is decided by the vehicle's heading
@@ -385,8 +384,7 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
   vehicle_xy.SelfRotate(-1.0 * frame_->open_space_info().origin_heading());
   if (vehicle_xy.x() > x_max || vehicle_xy.x() < x_min ||
       vehicle_xy.y() > y_max || vehicle_xy.y() < y_min) {
-    std::string msg("vehicle pose outside of xy boundary of parking ROI");
-    AERROR << msg;
+    AERROR << "vehicle pose outside of xy boundary of parking ROI";
     return false;
   }
   // If smaller than zero, the parking spot is on the right of the lane
@@ -452,13 +450,11 @@ void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
     std::shared_ptr<Path> *nearby_path,
     ParkingSpaceInfoConstPtr *target_parking_spot) {
   const auto &parking_space_overlaps = (*nearby_path)->parking_space_overlaps();
-  if (parking_space_overlaps.size() != 0) {
-    for (const auto &parking_overlap : parking_space_overlaps) {
-      if (parking_overlap.object_id == target_parking_spot_id_) {
-        hdmap::Id id;
-        id.set_id(parking_overlap.object_id);
-        *target_parking_spot = hdmap_->GetParkingSpaceById(id);
-      }
+  for (const auto &parking_overlap : parking_space_overlaps) {
+    if (parking_overlap.object_id == target_parking_spot_id_) {
+      hdmap::Id id;
+      id.set_id(parking_overlap.object_id);
+      *target_parking_spot = hdmap_->GetParkingSpaceById(id);
     }
   }
 }
@@ -506,17 +502,14 @@ bool OpenSpaceRoiDecider::GetMapInfo(
   }
 
   if (*target_parking_spot == nullptr) {
-    std::string msg(
-        "No such parking spot found after searching all path forward possible");
-    AERROR << msg << target_parking_spot_id_;
+    AERROR << "No such parking spot found after searching all path forward "
+              "possible";
     return false;
   }
 
   if (!CheckDistanceToParkingSpot(nearby_path, target_parking_spot)) {
-    std::string msg(
-        "target parking spot found, but too far, distance larger than "
-        "pre-defined distance");
-    AERROR << msg << target_parking_spot_id_;
+    AERROR << "target parking spot found, but too far, distance larger than "
+              "pre-defined distance";
     return false;
   }
 

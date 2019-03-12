@@ -16,8 +16,6 @@
 # limitations under the License.
 ###############################################################################
 
-#! /bin/bash
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}"  )" && pwd  )"
 rm $DIR/result.csv
 for f in `ls ${1}/*_recorded.csv`
