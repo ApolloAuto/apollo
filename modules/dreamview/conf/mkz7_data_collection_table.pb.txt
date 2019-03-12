@@ -4,7 +4,12 @@ category {
   key: "10mps, throttle >= 30%"
   value {
     total_frames: 20000
-    description: "10mps, Hash Throttle"
+    description: "Speed < 10mps, Hash Throttle"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
     criterion {
       field: "speed_mps"
       comparison_operator: LESS_THAN
@@ -22,7 +27,12 @@ category {
   key: "10mps, throttle < 30%"
   value {
     total_frames: 20000
-    description: "10mps, Under Throttle"
+    description: "Speed < 10mps, Under Throttle"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
     criterion {
       field: "speed_mps"
       comparison_operator: LESS_THAN
@@ -40,7 +50,12 @@ category {
   key: "10mps, brake >= 30%"
   value {
     total_frames: 20000
-    description: "10mps, Brake Tap"
+    description: "Speed < 10mps, Brake Tap"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
     criterion {
       field: "speed_mps"
       comparison_operator: LESS_THAN
@@ -58,7 +73,12 @@ category {
   key: "10mps, brake < 30%"
   value {
     total_frames: 20000
-    description: "10mps, Brake Pulsing"
+    description: "Speed < 10mps, Brake Pulsing"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
     criterion {
       field: "speed_mps"
       comparison_operator: LESS_THAN
@@ -76,7 +96,7 @@ category {
   key: "15mps, throttle >= 30%"
   value {
     total_frames: 20000
-    description: "15mps, Hash Throttle"
+    description: "Speed 10 ~ 20mps, Hash Throttle"
     criterion {
       field: "speed_mps"
       comparison_operator: GREATER_THAN_OR_EQUAL
@@ -99,7 +119,7 @@ category {
   key: "15mps, throttle < 30%"
   value {
     total_frames: 20000
-    description: "15mps, Under Throttle"
+    description: "Speed 10 ~ 20mps, Under Throttle"
     criterion {
       field: "speed_mps"
       comparison_operator: GREATER_THAN_OR_EQUAL
@@ -122,7 +142,7 @@ category {
   key: "15mps, brake >= 30%"
   value {
     total_frames: 20000
-    description: "15mps, Brake Tap"
+    description: "Speed 10 ~ 20mps, Brake Tap"
     criterion {
       field: "speed_mps"
       comparison_operator: GREATER_THAN_OR_EQUAL
@@ -145,7 +165,7 @@ category {
   key: "15mps, brake < 30%"
   value {
     total_frames: 20000
-    description: "15mps, Brake Pulsing"
+    description: "Speed 10 ~ 20mps, Brake Pulsing"
     criterion {
       field: "speed_mps"
       comparison_operator: GREATER_THAN_OR_EQUAL
@@ -169,7 +189,7 @@ category {
   key: "20mps, throttle >= 30%"
   value {
     total_frames: 20000
-    description: "20mps, Hash Throttle"
+    description: "Speed >= 20mps, Hash Throttle"
     criterion {
       field: "speed_mps"
       comparison_operator: GREATER_THAN_OR_EQUAL
@@ -187,7 +207,7 @@ category {
   key: "20mps, throttle < 30%"
   value {
     total_frames: 20000
-    description: "20mps, Under Throttle"
+    description: "Speed >= 20mps, Under Throttle"
     criterion {
       field: "speed_mps"
       comparison_operator: GREATER_THAN_OR_EQUAL
@@ -205,7 +225,7 @@ category {
   key: "20mps, brake >= 30%"
   value {
     total_frames: 20000
-    description: "20mps, Brake Tap"
+    description: "Speed >= 20mps, Brake Tap"
     criterion {
       field: "speed_mps"
       comparison_operator: GREATER_THAN_OR_EQUAL
@@ -223,7 +243,7 @@ category {
   key: "20mps, brake < 30%"
   value {
     total_frames: 20000
-    description: "20mps, Brake Pulsing"
+    description: "Speed >= 20mps, Brake Pulsing"
     criterion {
       field: "speed_mps"
       comparison_operator: GREATER_THAN_OR_EQUAL
@@ -243,6 +263,11 @@ category {
     total_frames: 20000
     description: "Left steering < 20%"
     criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
+    criterion {
       field: "steering_percentage"
       comparison_operator: GREATER_THAN_OR_EQUAL
       value: 0
@@ -260,6 +285,11 @@ category {
   value {
     total_frames: 20000
     description: "Left steering 20% ~ 40%"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
     criterion {
       field: "steering_percentage"
       comparison_operator: GREATER_THAN_OR_EQUAL
@@ -279,6 +309,11 @@ category {
     total_frames: 20000
     description: "Left steering 40% ~ 60%"
     criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
+    criterion {
       field: "steering_percentage"
       comparison_operator: GREATER_THAN_OR_EQUAL
       value: 40
@@ -297,6 +332,11 @@ category {
     total_frames: 20000
     description: "Left steering >= 60%"
     criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
+    criterion {
       field: "steering_percentage"
       comparison_operator: GREATER_THAN_OR_EQUAL
       value: 60
@@ -309,6 +349,11 @@ category {
   value {
     total_frames: 20000
     description: "Right steering < 20%"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
     criterion {
       field: "steering_percentage"
       comparison_operator: LESS_THAN_OR_EQUAL
@@ -328,6 +373,11 @@ category {
     total_frames: 20000
     description: "Right steering 20% ~ 40%"
     criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
+    criterion {
       field: "steering_percentage"
       comparison_operator: LESS_THAN_OR_EQUAL
       value: -20
@@ -346,6 +396,11 @@ category {
     total_frames: 20000
     description: "Right steering 40% ~ 60%"
     criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
+    criterion {
       field: "steering_percentage"
       comparison_operator: LESS_THAN_OR_EQUAL
       value: -40
@@ -363,6 +418,11 @@ category {
   value {
     total_frames: 20000
     description: "Right steering >= 60%"
+    criterion {
+      field: "speed_mps"
+      comparison_operator: GREATER_THAN_OR_EQUAL
+      value: 0.2
+    }
     criterion {
       field: "steering_percentage"
       comparison_operator: LESS_THAN_OR_EQUAL
