@@ -210,7 +210,7 @@ default_task_config: {
     gear_shift_unit_t: 0.02
     interpolated_pieces_num: 20
     initial_gear_check_horizon: 3
-    heading_searching_range: 0.5
+    heading_searching_range: 0.2
     heading_tracking_range: 1.57
     gear_shift_period_duration: 2.0
     kepsilon_to_midway_point: 1.0e-4
@@ -307,6 +307,7 @@ default_task_config: {
     parking_start_range: 20.0
     parking_inwards: false
     enable_perception_obstacles: false
+    parking_depth_buffer: 0.2
   }
 }
 default_task_config: {
