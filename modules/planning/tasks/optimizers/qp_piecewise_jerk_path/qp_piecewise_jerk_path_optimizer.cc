@@ -25,6 +25,7 @@
 
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
 namespace apollo {
@@ -215,7 +216,7 @@ QpPiecewiseJerkPathOptimizer::GetLateralBounds(
 Status QpPiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
     const common::TrajectoryPoint& init_point, PathData* const path_data) {
-  const auto frenet_point =
+  const auto init_frenet_point =
       reference_line.GetFrenetPoint(init_point.path_point());
   const auto& qp_config = config_.qp_piecewise_jerk_path_config();
   const auto& adc_sl = reference_line_info_->AdcSlBoundary();
@@ -224,13 +225,13 @@ Status QpPiecewiseJerkPathOptimizer::Process(
       std::fmax(qp_config.min_look_ahead_time() * init_point.v(),
                 qp_config.min_look_ahead_distance());
   auto lateral_bounds = GetLateralBounds(
-      adc_sl, frenet_point, qp_delta_s, path_length, reference_line,
+      adc_sl, init_frenet_point, qp_delta_s, path_length, reference_line,
       reference_line_info_->path_decision()->obstacles().Items());
   auto lateral_second_order_derivative_bounds =
       GetLateralSecondOrderDerivativeBounds(init_point, qp_delta_s);
 
-  std::array<double, 3> init_lateral_state{frenet_point.l(), frenet_point.dl(),
-                                           frenet_point.ddl()};
+  std::array<double, 3> init_lateral_state { init_frenet_point.l(),
+      init_frenet_point.dl(), init_frenet_point.ddl() };
   const int n = static_cast<int>(path_length / qp_delta_s);
 
   std::array<double, 5> w = {
@@ -242,19 +243,20 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   };
 
   constexpr double kMaxLThirdOrderDerivative = 2.0;
-  auto fem_1d_qp_ = std::make_unique<Fem1dQpProblem>(
-      n, init_lateral_state, qp_delta_s, w, kMaxLThirdOrderDerivative);
+  std::unique_ptr<Fem1dQpProblem> fem_1d_qp(
+      new Fem1dQpProblem(n, init_lateral_state, qp_delta_s, w,
+          kMaxLThirdOrderDerivative));
 
   auto start_time = std::chrono::system_clock::now();
 
-  fem_1d_qp_->SetVariableBounds(lateral_bounds);
+  fem_1d_qp->SetVariableBounds(lateral_bounds);
 
-  fem_1d_qp_->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
+  fem_1d_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
 
-  fem_1d_qp_->SetVariableSecondOrderDerivativeBounds(
+  fem_1d_qp->SetVariableSecondOrderDerivativeBounds(
       lateral_second_order_derivative_bounds);
 
-  bool success = fem_1d_qp_->Optimize();
+  bool success = fem_1d_qp->Optimize();
 
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
@@ -264,16 +266,34 @@ Status QpPiecewiseJerkPathOptimizer::Process(
     AERROR << "lateral qp optimizer failed";
     return Status(ErrorCode::PLANNING_ERROR, "lateral qp optimizer failed");
   }
-  fem_1d_qp_->SetOutputResolution(qp_config.path_output_resolution());
+
+  const auto& x = fem_1d_qp->x();
+  const auto& dx = fem_1d_qp->x_derivative();
+  const auto& ddx = fem_1d_qp->x_second_order_derivative();
+  CHECK(!x.empty());
+  CHECK(!dx.empty());
+  CHECK(!ddx.empty());
+
+  PiecewiseJerkTrajectory1d piecewise_jerk_traj1d(x.front(), dx.front(),
+      ddx.front());
+  for (std::size_t i = 1; i < x.size(); ++i) {
+    auto dddx = (ddx[i] - ddx[i - 1]) / qp_delta_s;
+    piecewise_jerk_traj1d.AppendSegment(dddx, qp_delta_s);
+  }
 
   std::vector<common::FrenetFramePoint> frenet_frame_path;
-  double accumulated_s = frenet_point.s();
-  for (size_t i = 0; i < fem_1d_qp_->x().size(); ++i) {
+  double accumulated_s = 0.0;
+  while (accumulated_s <= piecewise_jerk_traj1d.ParamLength()) {
+    auto l = piecewise_jerk_traj1d.Evaluate(0, accumulated_s);
+    auto dl = piecewise_jerk_traj1d.Evaluate(1, accumulated_s);
+    auto ddl = piecewise_jerk_traj1d.Evaluate(2, accumulated_s);
+
     common::FrenetFramePoint frenet_frame_point;
-    frenet_frame_point.set_s(accumulated_s);
-    frenet_frame_point.set_l(fem_1d_qp_->x()[i]);
-    frenet_frame_point.set_dl(fem_1d_qp_->x_derivative()[i]);
-    frenet_frame_point.set_ddl(fem_1d_qp_->x_second_order_derivative()[i]);
+    frenet_frame_point.set_s(accumulated_s + init_frenet_point.s());
+    frenet_frame_point.set_l(l);
+    frenet_frame_point.set_dl(dl);
+    frenet_frame_point.set_ddl(ddl);
+
     frenet_frame_path.push_back(std::move(frenet_frame_point));
     accumulated_s += qp_config.path_output_resolution();
   }

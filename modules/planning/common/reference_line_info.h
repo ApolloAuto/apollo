@@ -183,6 +183,30 @@ class ReferenceLineInfo {
     path_boundaries_s_resolution_ = resolution_s;
   }
 
+  std::string GetBlockingObstacleId() const {
+    return blocking_obstacle_id_;
+  }
+
+  void GetFallbackPathBoundaries(
+      std::vector<std::pair<double, double>>* const ptr_path_boundaries,
+      double* const ptr_start_s, double* const ptr_resolution_s) {
+    *ptr_path_boundaries = fallback_path_boundaries_;
+    *ptr_start_s = fallback_path_boundaries_s_start_;
+    *ptr_resolution_s = fallback_path_boundaries_s_resolution_;
+  }
+
+  void SetFallbackPathBoundaries(
+      const std::vector<std::pair<double, double>>& path_boundaries,
+      const double start_s, const double resolution_s) {
+    fallback_path_boundaries_ = path_boundaries;
+    fallback_path_boundaries_s_start_ = start_s;
+    fallback_path_boundaries_s_resolution_ = resolution_s;
+  }
+
+  void SetBlockingObstacleId(const std::string& blocking_obstacle_id) {
+    blocking_obstacle_id_ = blocking_obstacle_id;
+  }
+
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
 
   void InitFirstOverlaps();
@@ -266,6 +290,11 @@ class ReferenceLineInfo {
   std::vector<std::pair<double, double>> path_boundaries_;
   double path_boundaries_s_start_ = 0.0;
   double path_boundaries_s_resolution_ = 0.1;
+  std::string blocking_obstacle_id_ = "";
+
+  std::vector<std::pair<double, double>> fallback_path_boundaries_;
+  double fallback_path_boundaries_s_start_ = 0.0;
+  double fallback_path_boundaries_s_resolution_ = 0.1;
 
   PathData path_data_;
   SpeedData speed_data_;

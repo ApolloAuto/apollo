@@ -437,6 +437,7 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/vehicle_model",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
