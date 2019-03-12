@@ -35,14 +35,12 @@ class PathAssessmentDecider : public Decider {
   explicit PathAssessmentDecider(const TaskConfig& config);
 
  private:
-  common::Status Process(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+  common::Status Process(Frame* const frame,
+      ReferenceLineInfo* const reference_line_info) override;
 
-  bool IsValidPath(const PathData* path_data);
+  bool IsValidPath(const PathData& path_data);
 
   void SetPathInfo();
-
- private:
 };
 
 }  // namespace planning

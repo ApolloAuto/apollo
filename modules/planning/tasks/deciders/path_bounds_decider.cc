@@ -600,10 +600,7 @@ std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
   // If searched through all available s and found a path, return.
   if (path_idx >= curr_path_bounds->size()) {
     ADEBUG << "Completed path bounds search ending at path_idx = " << path_idx;
-
-    std::vector<PathBoundary> ret;
-    ret.push_back(*curr_path_bounds);
-    return ret;
+    return {*curr_path_bounds};
   }
 
   //==============================================================
@@ -670,7 +667,7 @@ std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
   // 2. For new entering obstacles, decide possible pass directions.
   //    (ranked in terms of optimality)
   auto pass_direction_decisions =
-      DecidePassDirections(0.0, 0.0, &new_entering_obstacles);
+      DecidePassDirections(0.0, 0.0, new_entering_obstacles);
   // 3. Try constructing subsequent path-bounds for all possible directions.
   std::vector<PathBoundary> ret;
   for (size_t i = 0; i < pass_direction_decisions.size(); ++i) {
@@ -734,7 +731,7 @@ std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
 
 std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
     const double& l_min, const double& l_max,
-    std::vector<ObstacleEdge>* const new_entering_obstacles) {
+    const std::vector<ObstacleEdge>& new_entering_obstacles) {
   std::vector<std::vector<bool>> decisions;
 
   // Convert into lateral edges.
@@ -747,17 +744,17 @@ std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
       1, l_max, 0.0, 0.0, "l_max");
   lateral_edges.emplace_back(
       0, std::numeric_limits<double>::max(), 0.0, 0.0, "l_max");
-  for (size_t i = 0; i < new_entering_obstacles->size(); ++i) {
-    if (std::get<3>((*new_entering_obstacles)[i]) < l_min ||
-        std::get<2>((*new_entering_obstacles)[i]) > l_max) {
+  for (size_t i = 0; i < new_entering_obstacles.size(); ++i) {
+    if (std::get<3>(new_entering_obstacles[i]) < l_min ||
+        std::get<2>(new_entering_obstacles[i]) > l_max) {
       continue;
     }
     lateral_edges.emplace_back(
-        1, std::get<2>((*new_entering_obstacles)[i]),
-        0.0, 0.0, std::get<4>((*new_entering_obstacles)[i]));
+        1, std::get<2>(new_entering_obstacles[i]),
+        0.0, 0.0, std::get<4>(new_entering_obstacles[i]));
     lateral_edges.emplace_back(
-        0, std::get<3>((*new_entering_obstacles)[i]),
-        0.0, 0.0, std::get<4>((*new_entering_obstacles)[i]));
+        0, std::get<3>(new_entering_obstacles[i]),
+        0.0, 0.0, std::get<4>(new_entering_obstacles[i]));
   }
   // Sort the lateral edges for lateral sweep-line algorithm.
   std::sort(lateral_edges.begin(), lateral_edges.end(),
@@ -790,8 +787,8 @@ std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
   for (size_t i = 0; i < empty_slot.size(); ++i) {
     double pass_position = empty_slot[i];
     std::vector<bool> pass_direction;
-    for (size_t j = 0; j < new_entering_obstacles->size(); ++j) {
-      if (std::get<2>((*new_entering_obstacles)[j]) > pass_position) {
+    for (size_t j = 0; j < new_entering_obstacles.size(); ++j) {
+      if (std::get<2>(new_entering_obstacles[j]) > pass_position) {
         pass_direction.push_back(false);
       } else {
         pass_direction.push_back(true);
@@ -799,6 +796,7 @@ std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
     }
     decisions.push_back(pass_direction);
   }
+  // TODO(jiacheng): sort the decisions based on the feasibility.
 
   return decisions;
 }
@@ -830,7 +828,7 @@ bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
 }
 
 void PathBoundsDecider::TrimPathBounds(
-    int path_blocked_idx, PathBoundary* const path_boundaries) {
+    const int path_blocked_idx, PathBoundary* const path_boundaries) {
   if (path_blocked_idx != -1) {
     if (path_blocked_idx == 0) {
       ADEBUG << "Completely blocked. Cannot move at all.";
@@ -851,237 +849,6 @@ void PathBoundsDecider::PathBoundsDebugString(
            << "; l_max = " << std::get<2>((*path_boundaries)[i]);
   }
 }
-
-
-
-/*
-size_t PathBoundsDecider::ConstructSubsequentPathBounds(
-    const std::vector<std::tuple<int, double, double, double, std::string>>&
-    sorted_obstacles, size_t path_idx, size_t obs_idx,
-    std::vector<std::tuple<double, double, double>>* const path_boundaries,
-    std::multiset<double>* const left_bounds,
-    std::multiset<double, std::greater<double>>* const right_bounds,
-    double* const center_line,
-    std::unordered_map<std::string, bool>* const obs_id_to_direction,
-    std::unordered_map<std::string, bool>* const obs_id_to_sidepass_decision,
-    std::vector<std::tuple<double, double, double>>* const final_path_bounds) {
-  double curr_s = std::get<0>((*path_boundaries)[path_idx]);
-  //==============================================================
-  // If searched through all available s and found a path, return.
-  if (path_idx >= path_boundaries->size()) {
-    ADEBUG << "Completed path bounds search with path_idx = " << path_idx;
-    *final_path_bounds = *path_boundaries;
-    return path_idx;
-  }
-
-  //==============================================================
-  // If there is no obstacle updates at this path_idx.
-  if (obs_idx >= sorted_obstacles.size() ||
-      std::get<1>(sorted_obstacles[obs_idx]) > curr_s) {
-    ADEBUG << "There is no obstacle change at path_idx = " << path_idx;
-    auto old_path_bound = (*path_boundaries)[path_idx];
-    double old_center_line = *center_line;
-    bool is_not_blocked = UpdatePathBoundaryAndCenterLine(
-        path_idx, *left_bounds->begin(), *right_bounds->begin(),
-        path_boundaries, center_line);
-    size_t ret_val = 0;
-    if (is_not_blocked) {
-      ret_val = ConstructSubsequentPathBounds(
-          sorted_obstacles, path_idx + 1, obs_idx,
-          path_boundaries, left_bounds, right_bounds, center_line,
-          obs_id_to_direction, obs_id_to_sidepass_decision,
-          final_path_bounds);
-    } else {
-      ret_val = path_idx;
-      *final_path_bounds = *path_boundaries;
-    }
-    (*path_boundaries)[path_idx] = old_path_bound;
-    *center_line = old_center_line;
-    return ret_val;
-  }
-
-  //==============================================================
-  // If there is obstacle leaving
-
-
-  //==============================================================
-  // If there is obstacle entering
-
-
-  //==============================================================
-  // Do what needs to be done for the current path_idx and/or obs_idx.
-
-  if (obs_idx < sorted_obstacles.size() &&
-      std::get<1>(sorted_obstacles[obs_idx]) < curr_s) {
-    // If there is some obstacle entering/exiting at this path_idx
-    // Some preprocessing.
-    const auto& curr_obstacle = sorted_obstacles[obs_idx];
-    double curr_obstacle_l_min = std::get<2>(curr_obstacle);
-    double curr_obstacle_l_max = std::get<3>(curr_obstacle);
-    std::string curr_obstacle_id = std::get<4>(curr_obstacle);
-    // Check if it's entering or exiting.
-    if (std::get<0>(curr_obstacle) == 1) {
-      // *** A new obstacle is entering ***
-      // 1. Determine a better INITIAL direction for ADC to try passing.
-      bool is_passing_from_left = true;
-      if (curr_obstacle_l_min + curr_obstacle_l_max < *center_line * 2) {
-        is_passing_from_left = true;
-      } else {
-        is_passing_from_left = false;
-      }
-      // 2. Try the determined direciton first, if failed, try the other one.
-      for (int i = 0; i < 2; ++i) {
-        // a. Update the bounds.
-        if (is_passing_from_left) {
-          (*obs_id_to_direction)[curr_obstacle_id] = true;
-          right_bounds->insert(curr_obstacle_l_max);
-        } else {
-          (*obs_id_to_direction)[curr_obstacle_id] = false;
-          left_bounds->insert(curr_obstacle_l_min);
-        }
-        // b. Check if able to proceed? If not, this direction doesn't work.
-        // TODO(all): later, try borrowing neighbor lane before claiming this
-        //            direction doesn't work.
-        bool is_able_to_find_feasible_bound =
-            UpdatePathBoundaryAndCenterLine(
-                path_idx, *left_bounds->begin(), *right_bounds->begin(),
-                path_boundaries, center_line);
-        // c. If it's able to proceed, try constructing subsequent path_bounds.
-        if (is_able_to_find_feasible_bound) {
-          bool is_able_to_construct_subsequent_path =
-              ConstructSubsequentPathBounds(
-                  sorted_obstacles, path_idx, obs_idx + 1,
-                  path_boundaries, left_bounds, right_bounds, center_line,
-                  obs_id_to_direction, obs_id_to_sidepass_decision,
-                  final_path_bounds);
-          if (is_able_to_construct_subsequent_path) {
-            return true;
-          }
-        }
-        // d. If it turns out this direction doesn't work, revert any change
-        // made before.
-        obs_id_to_direction->erase(curr_obstacle_id);
-        if (is_passing_from_left) {
-          right_bounds->erase(curr_obstacle_l_max);
-        } else {
-          left_bounds->erase(curr_obstacle_l_min);
-        }
-        if (is_able_to_find_feasible_bound) {
-          UpdatePathBoundaryAndCenterLine(
-              path_idx, *left_bounds->begin(), *right_bounds->begin(),
-              path_boundaries, center_line);
-        }
-        // e. Change side-pass direction and try again.
-        is_passing_from_left = !is_passing_from_left;
-        continue;
-      }
-      // 3. Failed for both directions. Unable to find a feasible path_boundary
-      //    under the given conditions starting from path_idx.
-      return false;
-    } else {
-      // *** An existing obstacle is exiting ***
-      // UpdatePathBoundsForExitingObstacle();
-    }
-  } else {
-    // *** If there is no obstacle change at this path_idx ***
-    UpdatePathBoundaryAndCenterLine(
-        path_idx, *left_bounds->begin(), *right_bounds->begin(),
-        path_boundaries, center_line);
-  }
-
-  //==============================================================
-  return true;
-}
-
-
-
-// return value: LEFT -> true; RIGHT -> false.
-bool PathBoundsDecider::GetOptimalSidepassDirection(
-    double ADC_center_line, double obstacle_center_line) {
-  return (obstacle_center_line < ADC_center_line);
-}
-
-std::pair<double, double> PathBoundsDecider::GetPathBoundAtS(
-    const std::vector<std::tuple<double, double, double>>* path_boundaries,
-    const double& s) {
-  // Sanity check.
-  if (path_boundaries->empty()) {
-    return std::make_pair(0.0, 0.0);
-  }
-
-  int idx = (int)((s - std::get<0>((*path_boundaries)[0])) /
-            kPathBoundsDeciderResolution);
-  idx = std::min(idx, path_boundaries->size() - 1);
-  return std::make_pair(
-      std::get<1>((*path_boundaries)[idx]),
-      std::get<2>((*path_boundaries)[idx]));
-}
-
-void PathBoundsDecider::SearchFeasibleSidepassDirections(
-    const std::vector<std::tuple<int, double, double, double, std::string>>&
-    sorted_obstacles, double s_max,
-    const std::vector<std::tuple<double, double, double>>* path_boundaries, 
-    size_t idx,
-    std::unordered_map<std::string, double>
-    std::vector<bool>* const curr_sidepass_directions,
-    std::vector<std::vector<bool>>* const final_sidepass_directions) {
-  // If already exhausted all available obstacles, exit.
-  if (idx >= sorted_obstacles.size()) {
-    final_sidepass_directions->push_back(*curr_sidepass_directions);
-    return;
-  }
-
-  // If the next obstacle is out of scope, exit.
-  if (std::get<1>(sorted_obstacles[idx]) > s_max) {
-    final_sidepass_directions->push_back(*curr_sidepass_directions);
-    return;
-  }
-
-  // If the next obstacle is a leaving obstacle.
-  if (std::get<0>(sorted_obstacles[idx]) == 0) {
-    // TODO(jiacheng): implement this part.
-    return;
-  }
-
-  // For the next entering obstacle:
-  // 0. Some preprocessing.
-  double obs_s = std::get<1>(sorted_obstacles[idx]);
-  double obs_l_min = std::get<2>(sorted_obstacles[idx]);
-  double obs_l_max = std::get<3>(sorted_obstacles[idx]);
-  std::string obs_id = std::get<4>(sorted_obstacles[idx]);
-  // 1. Determine an optimal direction to sidepass.
-  bool sidepass_direction = GetOptimalSidepassDirection(
-      0.0, 0.0);
-  // 2. Try optimal direction first. If fail, try the other one.
-  for (int i = 0; i < 2; ++i) {
-    // a. Get the current boundary due to road:
-    double left_road_bound = GetPathBoundAtS(path_boundaries, obs_s).second;
-    left_road_bound = std::max(
-        left_road_bound, left_road_bound + *borrowed_lane_width);
-    double right_road_bound = GetPathBoundAtS(path_boundaries, obs_s).first;
-    right_road_bound = std::min(
-        right_road_bound, right_road_bound + *borrowed_lane_width);
-    // b. Get the current boundary due to this obstacle:
-    double left_obs_bound = sidepass_direction ?
-        std::numeric_limits<double>::max() : obs_l_min;
-    left_obs_bound -= GetBufferBetweenADCCenterAndEdge();
-    double right_obs_bound = sidepass_direction ?
-        obs_l_max : std::numeric_limits<double>::lowest();
-    right_obs_bound += GetBufferBetweenADCCenterAndEdge();
-    // c. Get the total left/right bounds; check if lane-borrowing is needed.
-    bool is_blocked = (
-        std::min(left_road_bound, left_obs_bound) <
-        std::max(right_road_bound, right_obs_bound));
-    if (is_blocked && *borrowed_lane_width == 0) {
-      // Do side-pass lane-borrowing.
-    } else {
-      // Stop here.
-    }
-
-    sidepass_direction = !sidepass_direction;
-  }
-}
-*/
 
 }  // namespace planning
 }  // namespace apollo
