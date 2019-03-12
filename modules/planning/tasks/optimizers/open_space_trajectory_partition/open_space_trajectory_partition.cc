@@ -251,6 +251,9 @@ Status OpenSpaceTrajectoryPartition::Process() {
   }
 
   if (!flag_change_to_next) {
+    bool distance_and_angle_matched_point_found = false;
+    size_t closest_point_trajectory_index = closest_points.top().first.first;
+    size_t closest_point_index = closest_points.top().first.second;
     while (!closest_points.empty()) {
       auto closest_point = closest_points.top();
       const auto& closest_trajectory_index = closest_point.first.first;
@@ -273,10 +276,15 @@ Status OpenSpaceTrajectoryPartition::Process() {
       }
       if (std::abs(traj_point_moving_direction - vehicle_moving_direction) <
           open_space_trajectory_partition_config_.heading_searching_range()) {
+        distance_and_angle_matched_point_found = true;
         current_trajectory_index = closest_trajectory_index;
         current_trajectory_point_index = closest_trajectory_point_index;
         break;
       }
+    }
+    if (!distance_and_angle_matched_point_found) {
+      current_trajectory_index = closest_point_trajectory_index;
+      current_trajectory_point_index = closest_point_index;
     }
   }
 
