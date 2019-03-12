@@ -109,7 +109,7 @@ bool ObjectInRoiCheck(const HdmapStructConstPtr roi,
     }
   }
 
-  return valid_objects->size() > 0 ? true : false;
+  return valid_objects->size() > 0;
 }
 
 }  // namespace common

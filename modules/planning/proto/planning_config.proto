@@ -55,10 +55,10 @@ message TaskConfig {
     SPEED_BOUNDS_FINAL_DECIDER = 18;
     PIECEWISE_JERK_PATH_OPTIMIZER = 19;
     PATH_BOUND_DECIDER = 20;
-    OPEN_SPACE_FALLBACK_DECIDER = 21;
-    OPEN_SPACE_ROI_DECIDER = 22;
-    OPEN_SPACE_TRAJECTORY_PROVIDER = 23;
-    OPEN_SPACE_TRAJECTORY_PARTITION = 24;
+    OPEN_SPACE_ROI_DECIDER = 21;
+    OPEN_SPACE_TRAJECTORY_PROVIDER = 22;
+    OPEN_SPACE_TRAJECTORY_PARTITION = 23;
+    OPEN_SPACE_FALLBACK_DECIDER = 24;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -114,7 +114,7 @@ message ScenarioStopSignUnprotectedConfig {
 
 message ScenarioTrafficLightProtectedConfig {
   optional double start_traffic_light_scenario_distance = 1 [default = 5.0];  // meter
-  optional double max_valid_stop_distance = 2 [default = 3.5];  // meter
+  optional double max_valid_stop_distance = 2 [default = 2.0];  // meter
   optional double max_adc_stop_speed = 3 [default = 0.3];  // m/s
   optional double min_pass_s_distance = 4 [default = 3.0];  // meter
 }
@@ -136,7 +136,11 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
   optional float creep_timeout = 6 [default = 10.0];  // sec
 }
 
-message ScenarioValetParkingConfig {}
+message ScenarioValetParkingConfig {
+  optional double parking_spot_range_to_start = 1 [default = 20.0];
+  optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
+  optional double max_adc_stop_speed = 3 [default = 0.1];  // m/s
+}
 
 message ScenarioNarrowStreetUTurnConfig {}
 

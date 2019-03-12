@@ -21,15 +21,32 @@
 #pragma once
 
 #include "modules/planning/scenarios/stage.h"
+#include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace valet_parking {
 
-struct ValetParkingContext;
+class StageParking : public Stage {
+ public:
+  explicit StageParking(const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
-DECLARE_STAGE(StageParking, ValetParkingContext);
+ private:
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
+
+  ValetParkingContext* GetContext() {
+    return GetContextAs<ValetParkingContext>();
+  }
+
+ private:
+  Stage::StageStatus FinishStage();
+
+ private:
+  ScenarioValetParkingConfig scenario_config_;
+};
 
 }  // namespace valet_parking
 }  // namespace scenario

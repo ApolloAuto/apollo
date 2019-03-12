@@ -79,7 +79,7 @@ bool TrackObjectDistance::QueryWorld2CameraPose(
   Eigen::Affine3d camera2world_pose;
   bool status = SensorDataManager::Instance()->GetPose(
       camera->GetSensorId(), camera->GetTimestamp(), &camera2world_pose);
-  if (status == false) {
+  if (!status) {
     return false;
   }
   (*pose) = camera2world_pose.matrix().inverse();

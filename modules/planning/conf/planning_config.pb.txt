@@ -8,9 +8,9 @@ standard_planning_config {
      scenario_type: TRAFFIC_LIGHT_PROTECTED
      scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
      scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
+     scenario_type: VALET_PARKING
   }
 }
-
 default_task_config: {
   task_type: DECIDER_RULE_BASED_STOP
   decider_rule_based_stop_config: {
@@ -192,5 +192,118 @@ default_task_config: {
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
     centri_jerk_speed_coeff: 1.0
+  }
+}
+default_task_config: {
+  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  open_space_trajectory_partition_config {
+    gear_shift_max_t: 3.0
+    gear_shift_unit_t: 0.02
+    interpolated_pieces_num: 50
+    initial_gear_check_horizon: 3
+    heading_searching_range: 0.3
+    gear_shift_period_duration: 2.0
+    kepsilon_to_midway_point: 1.0e-6
+  }
+}
+default_task_config: {
+  task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+  open_space_trajectory_provider_config {
+    open_space_trajectory_optimizer_config {
+      planner_open_space_config {
+        warm_start_config {
+          xy_grid_resolution: 0.3
+          phi_grid_resolution: 0.1
+          next_node_num: 10
+          step_size: 0.5
+          traj_forward_penalty: 1.0
+          traj_back_penalty: 1.0
+          traj_gear_switch_penalty: 10.0
+          traj_steer_penalty: 0.0
+          traj_steer_change_penalty: 0.0
+          grid_a_star_xy_resolution: 1.0
+          node_radius: 0.5
+        }
+        dual_variable_warm_start_config {
+          weight_d: 1.0
+          ipopt_config {
+            ipopt_print_level: 0
+            mumps_mem_percent: 6000
+            mumps_pivtol: 1e-06
+            ipopt_max_iter: 100
+            ipopt_tol: 1e-05
+            ipopt_acceptable_constr_viol_tol: 0.1
+            ipopt_min_hessian_perturbation: 1e-12
+            ipopt_jacobian_regularization_value: 1e-07
+            ipopt_print_timing_statistics: "yes"
+            ipopt_alpha_for_y: "min"
+            ipopt_recalc_y: "yes"
+          }
+          qp_format: OSQP
+          min_safety_distance: 0.0
+        }
+        distance_approach_config {
+          weight_steer: 0.3
+          weight_a: 1.1
+          weight_steer_rate: 3.0
+          weight_a_rate: 2.5
+          weight_x: 2.3
+          weight_y: 0.7
+          weight_phi: 1.5
+          weight_v: 3.75
+          weight_steer_stitching: 1.75
+          weight_a_stitching: 3.25
+          weight_first_order_time: 4.25
+          weight_second_order_time: 13.5
+          min_safety_distance: 0.0
+          max_speed_forward: 2.0
+          max_speed_reverse: 1.0
+          max_acceleration_forward: 2.0
+          max_acceleration_reverse: 1.0
+          min_time_sample_scaling: 0.8
+          max_time_sample_scaling: 1.2
+          use_fix_time: false
+          ipopt_config {
+            ipopt_print_level: 0
+            mumps_mem_percent: 6000
+            mumps_pivtol: 1e-06
+            ipopt_max_iter: 1000
+            ipopt_tol: 0.0001
+            ipopt_acceptable_constr_viol_tol: 0.1
+            ipopt_min_hessian_perturbation: 1e-12
+            ipopt_jacobian_regularization_value: 1e-07
+            ipopt_print_timing_statistics: "yes"
+            ipopt_alpha_for_y: "min"
+            ipopt_recalc_y: "yes"
+            ipopt_mu_init: 0.1
+          }
+          enable_constraint_check: false
+          enable_hand_derivative: false
+          enable_derivative_check: false
+          enable_initial_final_check: false
+        }
+        delta_t: 0.5
+        max_position_error_to_end_point: 0.05
+        max_theta_error_to_end_point: 0.05
+        is_near_destination_threshold: 0.05
+      }
+    }
+  }
+}
+default_task_config: {
+  task_type: OPEN_SPACE_ROI_DECIDER
+  open_space_roi_decider_config {
+    roi_longitudinal_range: 15.0
+    parking_start_range: 20.0
+    parking_inwards: false
+    enable_perception_obstacles: false
+  }
+}
+default_task_config: {
+  task_type: OPEN_SPACE_FALLBACK_DECIDER
+  open_space_fallback_decider_config {
+    open_space_prediction_time_period: 5.0
+    open_space_fall_back_collision_distance: 5.0
+    open_space_fall_back_stop_safety_gap: 1.0
   }
 }

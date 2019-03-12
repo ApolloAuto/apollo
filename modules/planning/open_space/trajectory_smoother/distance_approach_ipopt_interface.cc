@@ -20,17 +20,15 @@
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/planning_block.h"
 
-#include "modules/planning/open_space/trajectory_smoother/planning_block.h"
-
 namespace apollo {
 namespace planning {
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
-    size_t horizon, double ts, Eigen::MatrixXd ego, const Eigen::MatrixXd& xWS,
-    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
-    const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& x0,
-    const Eigen::MatrixXd& xf, const Eigen::MatrixXd& last_time_u,
-    const std::vector<double>& XYbounds,
+    const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
+    const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
     const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const PlannerOpenSpaceConfig& planner_open_space_config)
@@ -394,7 +392,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
   ADEBUG << "get_starting_point";
-  CHECK(init_x == true) << "Warm start init_x setting failed";
+  CHECK(init_x) << "Warm start init_x setting failed";
 
   CHECK_EQ(horizon_, uWS_.cols());
   CHECK_EQ(horizon_ + 1, xWS_.cols());
@@ -2291,35 +2289,26 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
 
-    if (FLAGS_enable_cuda) {
-      fill_lower_left(iRow, jCol, rind_L, cind_L, nnz_L);
-    } else {
-      for (int idx = 0; idx < nnz_L; idx++) {
-        iRow[idx] = rind_L[idx];
-        jCol[idx] = cind_L[idx];
-      }
+    for (int idx = 0; idx < nnz_L; idx++) {
+      iRow[idx] = rind_L[idx];
+      jCol[idx] = cind_L[idx];
     }
   } else {
     // return the values. This is a symmetric matrix, fill the lower left
     // triangle only
 
     obj_lam[0] = obj_factor;
-    if (FLAGS_enable_cuda) {
-      data_transfer(&obj_lam[1], lambda, m);
-    } else {
-      for (int idx = 0; idx < m; idx++) {
-        obj_lam[1 + idx] = lambda[idx];
-      }
+
+    for (int idx = 0; idx < m; idx++) {
+      obj_lam[1 + idx] = lambda[idx];
     }
 
     set_param_vec(tag_L, m + 1, obj_lam);
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
                 &hessval, options_L);
 
-    if (!data_transfer(values, hessval, nnz_L)) {
-      for (int idx = 0; idx < nnz_L; idx++) {
-        values[idx] = hessval[idx];
-      }
+    for (int idx = 0; idx < nnz_L; idx++) {
+      values[idx] = hessval[idx];
     }
   }
 

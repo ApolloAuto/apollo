@@ -73,14 +73,14 @@ bool CosThetaReferenceLineSmoother::Smooth(
                              anchor_point.path_point.y());
     anchorpoints_lateralbound.emplace_back(anchor_point.lateral_bound);
   }
-  if (anchor_points_.front().enforced == true) {
+  if (anchor_points_.front().enforced) {
     has_start_point_constraint_ = true;
 
     start_x_derivative_ = anchor_points_.front().path_point.x_derivative();
 
     start_y_derivative_ = anchor_points_.front().path_point.y_derivative();
   }
-  if (anchor_points_.back().enforced == true) {
+  if (anchor_points_.back().enforced) {
     has_end_point_constraint_ = true;
   }
 

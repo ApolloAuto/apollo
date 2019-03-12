@@ -82,15 +82,16 @@ bool KalmanMotionFusion::InitFilter(const SensorObjectConstPtr& sensor_object) {
                         sensor_object->GetTimestamp());
   }
 
-  if (kalman_filter_.Init(global_states, global_uncertainty) == false) {
+  if (!kalman_filter_.Init(global_states, global_uncertainty)) {
     return false;
   }
-  if (kalman_filter_.SetGainBreakdownThresh(
-          gain_break_down, gain_break_down_threshold) == false ||
-      kalman_filter_.SetValueBreakdownThresh(
-          value_break_down, value_break_down_threshold) == false) {
+  if (!kalman_filter_.SetGainBreakdownThresh(gain_break_down,
+                                             gain_break_down_threshold) ||
+      !kalman_filter_.SetValueBreakdownThresh(value_break_down,
+                                              value_break_down_threshold)) {
     return false;
   }
+
   return true;
 }
 
@@ -119,9 +120,9 @@ void KalmanMotionFusion::UpdateWithoutMeasurement(const std::string& sensor_id,
     fused_acceleration_(0) = kalman_filter_.GetStates()(4);
     fused_acceleration_(1) = kalman_filter_.GetStates()(5);
   }
-  /* originally, we would reset filter_init_ to false, when there is no
-   * valid lidar & radar measurement. now, as the quality of estimation
-   * of camera improved, this step is not needed. */
+  // Originally, we would reset filter_init_ to false, when there is no
+  // valid lidar & radar measurement. now, as the quality of estimation
+  // of camera improved, this step is not needed.
   UpdateMotionState();
 }
 
@@ -144,7 +145,7 @@ void KalmanMotionFusion::UpdateWithMeasurement(
   SensorObjectConstPtr lidar_ptr = track_ref_->GetLatestLidarObject();
   SensorObjectConstPtr radar_ptr = track_ref_->GetLatestRadarObject();
   SensorObjectConstPtr camera_ptr = track_ref_->GetLatestCameraObject();
-  /* motion fusion */
+  // Motion fusion
   if (is_lidar || is_radar || is_camera) {
     if (filter_init_) {
       MotionFusionWithMeasurement(measurement, time_diff);
@@ -152,13 +153,13 @@ void KalmanMotionFusion::UpdateWithMeasurement(
       filter_init_ = InitFilter(measurement);
     }
     if (!filter_init_) {
-      // no kalman result, no matter which sensortype
+      // No kalman result, no matter which sensortype
       // of measurement, use measurement's
       // anchor point and velocity
       return;
     }
   }
-  /* shape & location fusion */
+  // shape & location fusion
   if (is_lidar || is_radar) {
     if (is_lidar || (is_radar && lidar_ptr == nullptr)) {
       // 1) measurement is lidar: use lidar's anchor point
@@ -204,9 +205,9 @@ void KalmanMotionFusion::UpdateWithMeasurement(
   }
   fused_acceleration_(0) = kalman_filter_.GetStates()(4);
   fused_acceleration_(1) = kalman_filter_.GetStates()(5);
-  /* originally, we would reset filter_init_ to false, when there is no
-   * valid lidar & radar measurement. now, as the quality of estimation
-   * of camera improved, this step is not needed. */
+  // Originally, we would reset filter_init_ to false, when there is no
+  // valid lidar & radar measurement. now, as the quality of estimation
+  // of camera improved, this step is not needed.
   UpdateMotionState();
 }
 
@@ -223,20 +224,20 @@ void KalmanMotionFusion::MotionFusionWithoutMeasurement(
 
 void KalmanMotionFusion::MotionFusionWithMeasurement(
     const SensorObjectConstPtr& measurement, double time_diff) {
-  /* we use kalman filter to update our tracker.
-   * The pipeline is detailed as follows:
-   * 1) compute the time diff to predict the tracker
-   *    (although we introduce the acceleration, we
-   *    doesn't use it to update the position)
-   * 2) DeCorrelation the uncertainty matrix (we belief
-   *    that the velocity won`t be affected by position)
-   * 3) compute the acceleration of the measurement
-   * 4) use the history radar or lidar(depend on which sensor
-   *    type in current) to correct the observation
-   * 5) set r_matrix according to converged or not
-   * 6) use kalman to correct the predict before
-   * 7) use correction breakdown to eliminate the unreasonable
-   *    acceleration gain or velocity noise*/
+  // we use kalman filter to update our tracker.
+  // The pipeline is detailed as follows:
+  // 1) compute the time diff to predict the tracker
+  //    (although we introduce the acceleration, we
+  //    doesn't use it to update the position)
+  // 2) DeCorrelation the uncertainty matrix (we belief
+  //    that the velocity won`t be affected by position)
+  // 3) compute the acceleration of the measurement
+  // 4) use the history radar or lidar(depend on which sensor
+  //    type in current) to correct the observation
+  // 5) set r_matrix according to converged or not
+  // 6) use kalman to correct the predict before
+  // 7) use correction breakdown to eliminate the unreasonable
+  //    acceleration gain or velocity noise
   Eigen::MatrixXd transform_matrix;
   Eigen::MatrixXd env_uncertainty;
 
@@ -283,7 +284,7 @@ void KalmanMotionFusion::MotionFusionWithMeasurement(
          << "," << r_matrix(2, 2) << "," << r_matrix(2, 3) << ","
          << r_matrix(3, 2) << "," << r_matrix(3, 3) << ")";
 
-  /* compute pseudo measurement */
+  // Compute pseudo measurement
   Eigen::Vector4d temp_observation = observation.head(4);
   Eigen::Vector4d pseudo_measurement =
       ComputePseudoMeasurement(temp_observation, measurement->GetSensorType());
@@ -295,7 +296,7 @@ void KalmanMotionFusion::MotionFusionWithMeasurement(
                         measurement->GetTimestamp());
   }
 
-  /* adapt noise level to rewarding status */
+  // Adapt noise level to rewarding status
   RewardRMatrix(measurement->GetSensorType(),
                 measurement->GetBaseObject()->velocity_converged, &r_matrix);
 
@@ -331,14 +332,14 @@ void KalmanMotionFusion::UpdateMotionState() {
   base::ObjectPtr obj = track_ref_->GetFusedObject()->GetBaseObject();
   obj->velocity = fused_velocity_.cast<float>();
   obj->acceleration = fused_acceleration_.cast<float>();
-  /* previously, obj velocity uncertainty would be updated according to the
-   * uncertainty within kalman filter. however, rewarding strategy within
-   * motion fusion could change kalman filter's uncertainty, which could
-   * not reflect the reality of cov.
-   * TEMPORARYLY, we keep obj's velocity covariance as it computed in
-   * single sensor. THIS IS AS SAME AS 2-1-19-1.
-   * a more general probabilisitic method would be try in this week, and
-   * codes would be updated after benchmarking. */
+  // Previously, obj velocity uncertainty would be updated according to the
+  // uncertainty within kalman filter. however, rewarding strategy within
+  // motion fusion could change kalman filter's uncertainty, which could
+  // not reflect the reality of cov.
+  // TEMPORARYLY, we keep obj's velocity covariance as it computed in
+  // single sensor. THIS IS AS SAME AS 2-1-19-1.
+  // a more general probabilisitic method would be try in this week, and
+  // codes would be updated after benchmarking.
   obj->center_uncertainty = center_uncertainty_;
   obj->velocity_uncertainty = velo_uncertainty_;
   obj->acceleration_uncertainty = acc_uncertainty_;
@@ -395,13 +396,12 @@ void KalmanMotionFusion::RewardRMatrix(const base::SensorType& sensor_type,
 
 Eigen::Vector4d KalmanMotionFusion::ComputePseudoMeasurement(
     const Eigen::Vector4d& measurement, const base::SensorType& sensor_type) {
-  /* what is a pseudo-lidar estimation? if given lidar estimation could trace
-   * a good radar estimation within a short window, then project radar
-   * estimation on given lidar one. otherwise, use original lidar estimation.
-   *
-   * what is a pseudo-radar estimation? if given radar estimation is good,
-   * project it on its last good lidar estimation within a short window.
-   * otherwise, use current belief. */
+  // What is a pseudo-lidar estimation? if given lidar estimation could trace
+  // a good radar estimation within a short window, then project radar
+  // estimation on given lidar one. otherwise, use original lidar estimation.
+  // what is a pseudo-radar estimation? if given radar estimation is good,
+  // project it on its last good lidar estimation within a short window.
+  // otherwise, use current belief
   common::SensorManager* sensor_manager = common::SensorManager::Instance();
   if (sensor_manager->IsLidar(sensor_type)) {
     return ComputePseudoLidarMeasurement(measurement);
@@ -419,7 +419,7 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoMeasurement(
 
 Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
     const Eigen::Vector4d& measurement) {
-  /* initialize status variables */
+  // Initialize status variables
   int trace_count = 0;
   const float velocity_angle_change_thresh_ = static_cast<float>(M_PI / 20.0);
   const float acceleration_angle_change_thresh_ =
@@ -430,13 +430,13 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
   Eigen::Vector3d fused_acceleration = Eigen::Vector3d::Zero();
   fused_acceleration(0) = kalman_filter_.GetStates()(4);
   fused_acceleration(1) = kalman_filter_.GetStates()(5);
-  /* return if lidar velocity is already small enough */
+  // Return if lidar velocity is already small enough
   double lidar_velocity_norm = lidar_velocity.norm();
   if (lidar_velocity_norm < DBL_EPSILON) {
     return pseudo_measurement;
   }
-  /* trace back radar velocity history, try to find good radar measurement
-   * which could help lidar velocity get a more accurate pseudo measurement */
+  // Trace back radar velocity history, try to find good radar measurement
+  // which could help lidar velocity get a more accurate pseudo measurement
   for (size_t count = 1; count < history_sensor_type_.size(); ++count) {
     size_t history_index = history_sensor_type_.size() - count;
     base::SensorType& history_type = history_sensor_type_[history_index];
@@ -444,18 +444,18 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
       trace_count++;
       Eigen::Vector3d radar_velocity = history_velocity_[history_index];
       double radar_velocity_norm = radar_velocity.norm();
-      /* abandon radar history, if their velocity lengths are too different*/
+      // Abandon radar history, if their velocity lengths are too different
       if (fabs(radar_velocity_norm - lidar_velocity_norm) >
           velocity_length_change_thresh_) {
         continue;
       }
-      /* abandon radar history, if its velocity angle change is too large */
+      // Abandon radar history, if its velocity angle change is too large
       double velocity_angle_change =
           common::CalculateTheta2DXY(radar_velocity, lidar_velocity);
       if (fabs(velocity_angle_change) > velocity_angle_change_thresh_) {
         continue;
       }
-      /* abandon radar history, if its acceleration angle change is too large */
+      // Abandon radar history, if its acceleration angle change is too large
       Eigen::Vector3d radar_velocity_project_on_lidar_velocity =
           common::Calculate2DXYProjectVector(radar_velocity, lidar_velocity);
       Eigen::Vector3d radar_velocity_project_on_lidar_velocity_gain =
@@ -465,15 +465,15 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
       if (fabs(acceleration_angle_change) > acceleration_angle_change_thresh_) {
         continue;
       }
-      /* compute normalized velocity gain */
+      // Compute normalized velocity gain
       double normalized_radar_velocity_project_on_lidar_velocity_gain =
           radar_velocity_project_on_lidar_velocity_gain.head(2).norm() /
           std::max(radar_velocity_project_on_lidar_velocity.head(2).norm(),
                    lidar_velocity.head(2).norm());
-      /* compute normalized velocity angle change */
+      // Compute normalized velocity angle change
       double normalized_velocity_angle_change =
           fabs(velocity_angle_change) / velocity_angle_change_thresh_;
-      /* abandon radar history, if normalized diff is too large */
+      // Abandon radar history, if normalized diff is too large
       if (normalized_radar_velocity_project_on_lidar_velocity_gain *
               normalized_velocity_angle_change >
           0.5) {
@@ -494,7 +494,7 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoLidarMeasurement(
 
 Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
     const Eigen::Vector4d& measurement) {
-  /* initialize status variables */
+  // Initialize status variables
   int trace_count = 0;
   const float velocity_angle_change_thresh_ = static_cast<float>(M_PI / 10.0);
   const float acceleration_angle_change_thresh_ =
@@ -505,13 +505,13 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
   Eigen::Vector3d fused_acceleration = Eigen::Vector3d::Zero();
   fused_acceleration(0) = kalman_filter_.GetStates()(4);
   fused_acceleration(1) = kalman_filter_.GetStates()(5);
-  /* return if camera velocity is already small enough */
+  // Return if camera velocity is already small enough
   double camera_velocity_norm = camera_velocity.norm();
   if (camera_velocity_norm < DBL_EPSILON) {
     return pseudo_measurement;
   }
-  /* trace back radar velocity history, try to find good radar measurement
-   * which could help camera velocity get a more accurate pseudo measurement */
+  // Trace back radar velocity history, try to find good radar measurement
+  // which could help camera velocity get a more accurate pseudo measurement
   for (size_t count = 1; count < history_sensor_type_.size(); ++count) {
     size_t history_index = history_sensor_type_.size() - count;
     base::SensorType& history_type = history_sensor_type_[history_index];
@@ -519,18 +519,18 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
       trace_count++;
       Eigen::Vector3d radar_velocity = history_velocity_[history_index];
       double radar_velocity_norm = radar_velocity.norm();
-      // //  abandon radar history, if their velocity lengths are too different
+      // Abandon radar history, if their velocity lengths are too different
       if (fabs(radar_velocity_norm - camera_velocity_norm) >
           velocity_length_change_thresh_) {
         continue;
       }
-      /* abandon radar history, if its velocity angle change is too large */
+      // Abandon radar history, if its velocity angle change is too large
       double velocity_angle_change =
           common::CalculateTheta2DXY(radar_velocity, camera_velocity);
       if (fabs(velocity_angle_change) > velocity_angle_change_thresh_) {
         continue;
       }
-      /* abandon radar history, if its acceleration angle change is too large */
+      // Abandon radar history, if its acceleration angle change is too large
       Eigen::Vector3d radar_velocity_project_on_camera_velocity =
           common::Calculate2DXYProjectVector(radar_velocity, camera_velocity);
       Eigen::Vector3d radar_velocity_project_on_camera_velocity_gain =
@@ -540,15 +540,15 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
       if (fabs(acceleration_angle_change) > acceleration_angle_change_thresh_) {
         continue;
       }
-      /* compute normalized velocity gain */
+      // Compute normalized velocity gain
       double normalized_radar_velocity_project_on_camera_velocity_gain =
           radar_velocity_project_on_camera_velocity_gain.head(2).norm() /
           std::max(radar_velocity_project_on_camera_velocity.head(2).norm(),
                    camera_velocity.head(2).norm());
-      /* compute normalized velocity angle change */
+      // Compute normalized velocity angle change
       double normalized_velocity_angle_change =
           fabs(velocity_angle_change) / velocity_angle_change_thresh_;
-      /* abandon radar history, if normalized diff is too large */
+      // Abandon radar history, if normalized diff is too large
       if (normalized_radar_velocity_project_on_camera_velocity_gain *
               normalized_velocity_angle_change >
           0.3) {
@@ -569,14 +569,14 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoCameraMeasurement(
 
 Eigen::Vector4d KalmanMotionFusion::ComputePseudoRadarMeasurement(
     const Eigen::Vector4d& measurement) {
-  /* initialize status variables */
+  // Initialize status variables
   int lidar_trace_count = 0;
   int camera_trace_count = 0;
   Eigen::Vector4d pseudo_measurement = measurement;
   int lidar_camera_history_length =
       GetSensorHistoryLength(base::SensorType::VELODYNE_64) +
       GetSensorHistoryLength(base::SensorType::MONOCULAR_CAMERA);
-  /* keep motion if lidar & camera history is empty */
+  // Keep motion if lidar & camera history is empty
   if (lidar_camera_history_length == 0) {
     pseudo_measurement(2) = kalman_filter_.GetStates()(2);
     pseudo_measurement(3) = kalman_filter_.GetStates()(3);
@@ -588,17 +588,17 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoRadarMeasurement(
   fused_acceleration(0) = kalman_filter_.GetStates()(4);
   fused_acceleration(1) = kalman_filter_.GetStates()(5);
   common::SensorManager* sensor_manager = common::SensorManager::Instance();
-  /* trace back lidar and camera history, try to find good lidar/camera
-   * measurement which could help radar velocity get a more robust pseudo
-   * measurement. */
+  // Trace back lidar and camera history, try to find good lidar/camera
+  // measurement which could help radar velocity get a more robust pseudo
+  // measurement.
   for (size_t count = 1; count < history_sensor_type_.size(); ++count) {
     size_t history_index = history_sensor_type_.size() - count;
     base::SensorType& history_type = history_sensor_type_[history_index];
-    if ((!sensor_manager->IsLidar(history_type)) &&
-        (!sensor_manager->IsCamera(history_type))) {
+    if (!sensor_manager->IsLidar(history_type) &&
+        !sensor_manager->IsCamera(history_type)) {
       continue;
     }
-    /* keep motion, if no good history been found */
+    // Keep motion, if no good history been found
     if (lidar_trace_count == s_eval_window_ ||
         camera_trace_count == s_eval_window_) {
       pseudo_measurement(2) = kalman_filter_.GetStates()(2);
@@ -606,13 +606,13 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoRadarMeasurement(
       return pseudo_measurement;
     }
     Eigen::Vector3d history_velocity = history_velocity_[history_index];
-    /* abandon history measurement, if its speed is too small */
+    // Abandon history measurement, if its speed is too small
     if (history_velocity.norm() < DBL_EPSILON) {
       pseudo_measurement(2) = history_velocity(0);
       pseudo_measurement(3) = history_velocity(1);
       return pseudo_measurement;
     }
-    /* compute velocity angle change and acceleration angle change */
+    // Compute velocity angle change and acceleration angle change
     double velocity_angle_change =
         common::CalculateTheta2DXY(radar_velocity, history_velocity);
     Eigen::Vector3d radar_velocity_project_on_history_velocity =
@@ -621,27 +621,27 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoRadarMeasurement(
         radar_velocity_project_on_history_velocity - history_velocity;
     double acceleration_angle_change = common::CalculateTheta2DXY(
         fused_acceleration, radar_velocity_project_on_history_velocity_gain);
-    /* compute normalized velocity gain */
+    // Compute normalized velocity gain
     double normalized_radar_velocity_project_on_history_velocity_gain =
         radar_velocity_project_on_history_velocity_gain.head(2).norm() /
         std::max(radar_velocity_project_on_history_velocity.head(2).norm(),
                  history_velocity.head(2).norm());
-    /* handle lidar history */
+    // Handle lidar history
     if (sensor_manager->IsLidar(history_type)) {
       lidar_trace_count++;
-      /* abandon lidar measurement, if its velocity angle change is too big */
+      // Abandon lidar measurement, if its velocity angle change is too big
       if (fabs(velocity_angle_change) > M_PI / 20) {
         continue;
       }
-      /* abandon lidar measurement, if its acceleration angle change is too
-       * big*/
+      // Abandon lidar measurement, if its acceleration angle change is too
+      // big
       if (fabs(acceleration_angle_change) > M_PI / 3) {
         continue;
       }
-      /* compute normalized velocity angle change */
+      // Compute normalized velocity angle change
       double normalized_velocity_angle_change =
           fabs(velocity_angle_change) / (M_PI / 20);
-      /* abandon lidar measurement, if normalized diff is too big */
+      // Abandon lidar measurement, if normalized diff is too big
       if (normalized_radar_velocity_project_on_history_velocity_gain *
               normalized_velocity_angle_change >
           0.5) {
@@ -651,20 +651,20 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoRadarMeasurement(
       pseudo_measurement(3) = radar_velocity_project_on_history_velocity(1);
       return pseudo_measurement;
     } else {
-      camera_trace_count++;
-      /* abandon camera measurement, if its velocity angle change is too big */
+      ++camera_trace_count;
+      // Abandon camera measurement, if its velocity angle change is too big
       if (fabs(velocity_angle_change) > M_PI / 10) {
         continue;
       }
-      /* abandon camera measurement, if its acceleration angle change is too
-       * big*/
+      // Abandon camera measurement, if its acceleration angle change is too
+      // big
       if (fabs(acceleration_angle_change) > M_PI / 3) {
         continue;
       }
-      /* compute normalized velocity angle change */
+      // Compute normalized velocity angle change
       double normalized_velocity_angle_change =
           fabs(velocity_angle_change) / (M_PI / 10);
-      /* abandon lidar measurement, if normalized diff is too big */
+      // Abandon lidar measurement, if normalized diff is too big
       if (normalized_radar_velocity_project_on_history_velocity_gain *
               normalized_velocity_angle_change >
           0.3) {
@@ -675,7 +675,7 @@ Eigen::Vector4d KalmanMotionFusion::ComputePseudoRadarMeasurement(
       return pseudo_measurement;
     }
   }
-  /* use original measurement, if history is not enough */
+  // Use original measurement, if history is not enough
   pseudo_measurement = measurement;
   return pseudo_measurement;
 }
@@ -704,7 +704,7 @@ int KalmanMotionFusion::GetSensorHistoryLength(
   int sensor_history_length = 0;
   for (size_t i = 0; i < history_sensor_type_.size(); ++i) {
     if (history_sensor_type_[i] == sensor_type) {
-      sensor_history_length++;
+      ++sensor_history_length;
     }
   }
   return sensor_history_length;
@@ -717,15 +717,13 @@ int KalmanMotionFusion::GetSensorHistoryIndex(
   for (size_t i = 1; i <= history_sensor_type_.size(); ++i) {
     history_index = static_cast<int>(history_sensor_type_.size() - i);
     if (history_sensor_type_[history_index] == sensor_type) {
-      history_count++;
+      ++history_count;
     }
     if (history_count == trace_length) {
-      break;
+      return history_index;
     }
   }
-  if (history_count == trace_length) {
-    return history_index;
-  }
+
   return -1;
 }
 

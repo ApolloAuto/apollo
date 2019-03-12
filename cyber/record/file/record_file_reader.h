@@ -48,9 +48,9 @@ class RecordFileReader : public RecordFileBase {
   void Close() override;
   bool Reset();
   bool ReadSection(Section* section);
-  bool SkipSection(uint64_t size);
+  bool SkipSection(int64_t size);
   template <typename T>
-  bool ReadSection(uint64_t size, T* message);
+  bool ReadSection(int64_t size, T* message);
   bool ReadIndex();
   bool EndOfFile() { return end_of_file_; }
 
@@ -60,12 +60,9 @@ class RecordFileReader : public RecordFileBase {
 };
 
 template <typename T>
-bool RecordFileReader::ReadSection(uint64_t size, T* message) {
-  if (size > INT_MAX) {
-    AERROR << "Size is larger than " << INT_MAX;
-    return false;
-  } else if (size == 0) {
-    AERROR << "Size is zero.";
+bool RecordFileReader::ReadSection(int64_t size, T* message) {
+  if (size < INT_MIN || size > INT_MAX) {
+    AERROR << "Size value greater than the range of int value.";
     return false;
   }
   FileInputStream raw_input(fd_, static_cast<int>(size));

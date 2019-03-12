@@ -17,4 +17,5 @@ message SpeedBoundsDeciderConfig {
   optional double static_obs_nudge_speed_ratio = 12;
   optional double dynamic_obs_nudge_speed_ratio = 13;
   optional double centri_jerk_speed_coeff = 14;
+  optional bool path_point_decision_guide_flag = 15 [default = false];
 }

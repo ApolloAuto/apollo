@@ -573,5 +573,4 @@ cc_proto_library(
     ],
 )
 
-
 cpplint()

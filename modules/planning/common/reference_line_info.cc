@@ -197,8 +197,8 @@ bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   return overlap.start_s - kEpsilon <= s && s <= overlap.end_s + kEpsilon;
 }
 
-void ReferenceLineInfo::SetJunctionRightOfWay(double junction_s,
-                                              bool is_protected) {
+void ReferenceLineInfo::SetJunctionRightOfWay(const double junction_s,
+                                              const bool is_protected) const {
   auto* right_of_way =
       PlanningContext::MutablePlanningStatus()->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();

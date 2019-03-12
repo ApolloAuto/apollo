@@ -142,9 +142,7 @@ int main(int argc, char **argv) {
 
   Eigen::Vector3d imu_ant_offset = Eigen::Vector3d::Zero();
   if (imu_to_ant_offset_file != "") {
-    bool suc =
-        LoadGnssAntennaExtrinsic(imu_to_ant_offset_file, &imu_ant_offset);
-    if (suc == false) {
+    if (!LoadGnssAntennaExtrinsic(imu_to_ant_offset_file, &imu_ant_offset)) {
       return 0;
     }
   }

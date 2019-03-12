@@ -443,7 +443,7 @@ DEFINE_bool(open_space_planner_switchable, false,
 DEFINE_bool(use_dual_variable_warm_start, true,
             "whether or not enable dual variable warm start ");
 
-DEFINE_bool(use_gear_shift_trajectory, true,
+DEFINE_bool(use_gear_shift_trajectory, false,
             "allow some time for the vehicle to shift gear");
 
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
@@ -497,5 +497,4 @@ DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 DEFINE_bool(enable_parallel_open_space_smoother, false,
             "True to enable open space smoother parallel implementation.");
-DEFINE_bool(enable_cuda, false,
-            "True to enable cuda parallel implementation.");
+DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");

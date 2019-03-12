@@ -53,20 +53,23 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
     return;
   }
 
-  /* TODO(all): to be fixed
-  const std::string traffic_light_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (traffic_light_overlap_id.empty()) {
+  if (PlanningContext::GetScenarioInfo()
+          ->current_traffic_light_overlaps.empty()) {
+    AERROR << "Could not find traffic-light(s)";
     return;
   }
 
-  hdmap::SignalInfoConstPtr traffic_light = HDMapUtil::BaseMap().GetSignalById(
-      hdmap::MakeMapId(traffic_light_overlap_id));
-  if (!traffic_light) {
-    AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
-    return;
+  for (const auto& traffic_light_overlap :
+       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
+    const std::string traffic_light_overlap_id =
+        traffic_light_overlap.object_id;
+    hdmap::SignalInfoConstPtr traffic_light =
+        HDMapUtil::BaseMap().GetSignalById(
+            hdmap::MakeMapId(traffic_light_overlap_id));
+    if (!traffic_light) {
+      AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
+    }
   }
-  */
 
   init_ = true;
 }

@@ -14,21 +14,40 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <opencv2/opencv.hpp>
+
+#include <fstream>
 #include <iomanip>
 
 #include "cyber/common/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
+#include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
+#include "modules/perception/camera/lib/calibrator/laneline/laneline_calibrator.h"
+#include "modules/perception/camera/lib/feature_extractor/tfe/external_feature_extractor.h"
+#include "modules/perception/camera/lib/feature_extractor/tfe/project_feature.h"
+#include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
+#include "modules/perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.h"
+#include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
+#include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/darkSCNN_lane_postprocessor.h"
+#include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
+#include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
+#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
+#include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
 #include "modules/perception/common/io/io_util.h"
 
-DEFINE_string(test_list, "full_test_list.txt", "exe image list");
+DEFINE_string(test_list,
+              "/apollo/modules/perception/testdata/camera/lib/obstacle/"
+              "detector/yolo/img/full_test_list.txt",
+              "test image list");
 DEFINE_string(image_root,
               "/apollo/modules/perception/testdata/camera/lib/obstacle/"
               "detector/yolo/img/",
-              "root dir of images");
+              "root directory of images");
 DEFINE_string(image_ext, ".jpg", "extension of image name");
 DEFINE_string(image_color, "bgr", "color space of image");
 DEFINE_string(config_root,
@@ -37,18 +56,35 @@ DEFINE_string(config_root,
 DEFINE_string(tf_file, "", "tf file");
 DEFINE_string(config_file, "obstacle.pt", "config_file");
 DEFINE_string(narrow_name, "front_12mm", " camera for projecting");
-DEFINE_string(base_camera_name, "front_6mm", "camera to be peojected");
+DEFINE_string(base_camera_name, "front_6mm", "camera to be projected");
 DEFINE_string(sensor_name, "front_6mm,front_12mm", "camera to use");
 DEFINE_string(params_dir, "/apollo/modules/perception/data/params",
-              "params dir");
-DEFINE_string(visualize_dir, "/tmp/0000", "visualize dir");
+              "params directory");
+DEFINE_string(visualize_dir, "/tmp/0000", "visualize directory");
 DEFINE_double(camera_fps, 15, "camera_fps");
 DEFINE_bool(do_undistortion, false, "do_undistortion");
-DEFINE_string(undistortion_save_dir, "", "save imgs dir after undistortion");
+DEFINE_string(undistortion_save_dir, "./undistortion_result",
+              "Directory to save undistored images.");
+DEFINE_string(save_dir, "./result",
+              "Directory to save result images with detections.");
 
 namespace apollo {
 namespace perception {
 namespace camera {
+
+REGISTER_OBSTACLE_DETECTOR(YoloObstacleDetector);
+REGISTER_OBSTACLE_TRACKER(OMTObstacleTracker);
+REGISTER_FEATURE_EXTRACTOR(TrackingFeatureExtractor);
+REGISTER_OBSTACLE_TRANSFORMER(MultiCueObstacleTransformer);
+REGISTER_OBSTACLE_POSTPROCESSOR(LocationRefinerObstaclePostprocessor);
+REGISTER_FEATURE_EXTRACTOR(ProjectFeature);
+REGISTER_FEATURE_EXTRACTOR(ExternalFeatureExtractor);
+REGISTER_LANE_POSTPROCESSOR(DenselineLanePostprocessor);
+REGISTER_LANE_DETECTOR(DenselineLaneDetector);
+REGISTER_CALIBRATOR(LaneLineCalibrator);
+REGISTER_CALIBRATION_SERVICE(OnlineCalibrationService);
+REGISTER_LANE_DETECTOR(DarkSCNNLaneDetector);
+REGISTER_LANE_POSTPROCESSOR(DarkSCNNLanePostprocessor);
 
 static const float kDefaultPitchAngle = 0.0f;
 static const float kDefaultCameraHeight = 1.5f;
@@ -66,9 +102,9 @@ int work() {
   ObstacleCameraPerception perception;
   CameraPerceptionInitOptions init_option;
   CameraPerceptionOptions options;
-  AERROR << "config_root: " << FLAGS_config_root;
+  AINFO << "config_root: " << FLAGS_config_root;
   init_option.root_dir = FLAGS_config_root;
-  AERROR << "config_file: " << FLAGS_config_file;
+  AINFO << "config_file: " << FLAGS_config_file;
   init_option.conf_file = FLAGS_config_file;
   init_option.lane_calibration_working_sensor_name = FLAGS_base_camera_name;
   init_option.use_cyber_work_root = true;
@@ -86,7 +122,7 @@ int work() {
   std::ifstream fin;
   fin.open(FLAGS_test_list, std::ifstream::in);
   if (!fin.is_open()) {
-    AERROR << "Cannot open exe list: " << FLAGS_test_list;
+    AERROR << "Cannot open image list: " << FLAGS_test_list;
     return -1;
   }
 
@@ -192,9 +228,8 @@ int work() {
     camera_name = temp_strs[0];
     image_name = temp_strs[1];
 
-    AINFO << "image: " << image_name << " camera_name:" << camera_name;
-    std::string image_path = FLAGS_image_root + "/" + camera_name + "/" +
-                             image_name + FLAGS_image_ext;
+    AINFO << "image: " << image_name << ", camera_name: " << camera_name;
+    std::string image_path = FLAGS_image_root + image_name + FLAGS_image_ext;
     cv::Mat image;
     if (FLAGS_image_color == "gray") {
       image = cv::imread(image_path, CV_LOAD_IMAGE_GRAYSCALE);
@@ -259,7 +294,7 @@ int work() {
     perception.GetCalibrationService(&frame.calibration_service);
 
     // save distortion images
-    std::string save_dir = FLAGS_undistortion_save_dir + "/" + camera_name;
+    std::string save_dir = FLAGS_undistortion_save_dir;
     if (FLAGS_do_undistortion && (FLAGS_undistortion_save_dir != "") &&
         cyber::common::PathExists(save_dir)) {
       base::Image8U image1;
@@ -267,10 +302,44 @@ int work() {
       image_options.target_color = base::Color::BGR;
       frame.data_provider->GetImage(image_options, &image1);
       save_image(save_dir + "/" + image_name + FLAGS_image_ext, image1);
+      AINFO << "Undistorted image saved to : "
+            << save_dir + "/" + image_name + FLAGS_image_ext;
     }
 
     CHECK(perception.Perception(options, &frame));
     visualize.ShowResult(image, frame);
+
+    save_dir = FLAGS_save_dir;
+    if (!cyber::common::PathExists(save_dir)) {
+      AERROR << "save_dir does not exist : " << save_dir;
+    } else {
+      std::ofstream myfile;
+      myfile.open(save_dir + "/" + image_name + ".txt");
+      for (auto obj : frame.detected_objects) {
+        auto &box = obj->camera_supplement.box;
+        myfile << base::kSubType2NameMap.at(obj->sub_type) << " "
+               << static_cast<int>(box.xmin) << " "
+               << static_cast<int>(box.ymin) << " "
+               << static_cast<int>(box.xmax) << " "
+               << static_cast<int>(box.ymax) << " "
+               << obj->sub_type_probs[static_cast<int>(obj->sub_type)] << "\n";
+        cv::rectangle(
+            image,
+            cv::Point(static_cast<int>(box.xmin), static_cast<int>(box.ymin)),
+            cv::Point(static_cast<int>(box.xmax), static_cast<int>(box.ymax)),
+            cv::Scalar(0, 255, 0), 2);
+        std::stringstream text;
+        text << base::kSubType2NameMap.at(obj->sub_type) << " - "
+             << obj->sub_type_probs[static_cast<int>(obj->sub_type)];
+        cv::putText(
+            image, text.str(),
+            cv::Point(static_cast<int>(box.xmin), static_cast<int>(box.ymin)),
+            cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(255, 127, 0), 2);
+      }
+      cv::imwrite(save_dir + "/" + image_name + FLAGS_image_ext, image);
+      AINFO << "Result saved to : "
+            << save_dir + "/" + image_name + FLAGS_image_ext;
+    }
   }
   return 0;
 }

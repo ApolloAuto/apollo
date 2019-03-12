@@ -37,16 +37,16 @@ using Json = nlohmann::json;
 using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
 
-SimulationWorldUpdater::SimulationWorldUpdater(WebSocketHandler *websocket,
-                                               WebSocketHandler *map_ws,
-                                               SimControl *sim_control,
-                                               const MapService *map_service,
-                                               bool routing_from_file)
+SimulationWorldUpdater::SimulationWorldUpdater(
+    WebSocketHandler *websocket, WebSocketHandler *map_ws,
+    SimControl *sim_control, const MapService *map_service,
+    DataCollectionMonitor *data_collection_monitor, bool routing_from_file)
     : sim_world_service_(map_service, routing_from_file),
       map_service_(map_service),
       websocket_(websocket),
       map_ws_(map_ws),
-      sim_control_(sim_control) {
+      sim_control_(sim_control),
+      data_collection_monitor_(data_collection_monitor) {
   RegisterMessageHandlers();
 }
 
@@ -248,6 +248,18 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
             sim_control_->Stop();
           }
         }
+      });
+  websocket_->RegisterMessageHandler(
+      "RequestDataCollectionProgress",
+      [this](const Json &json, WebSocketHandler::Connection *conn) {
+        if (!data_collection_monitor_->IsEnabled()) {
+          return;
+        }
+
+        Json response;
+        response["type"] = "DataCollectionProgress";
+        response["data"] = data_collection_monitor_->GetProgressAsJson();
+        websocket_->SendData(conn, response.dump());
       });
 }
 

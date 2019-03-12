@@ -1420,13 +1420,15 @@ void Obstacle::SetNearbyObstacles() {
     double obstacle_s = lane_sequence->lane_s();
     double obstacle_l = lane_sequence->lane_l();
     NearbyObstacle forward_obstacle;
-    ObstacleClusters::ForwardNearbyObstacle(*lane_sequence, id_, obstacle_s,
-                                            obstacle_l, &forward_obstacle);
-    lane_sequence->add_nearby_obstacle()->CopyFrom(forward_obstacle);
+    if (ObstacleClusters::ForwardNearbyObstacle(
+            *lane_sequence, id_, obstacle_s, obstacle_l, &forward_obstacle)) {
+      lane_sequence->add_nearby_obstacle()->CopyFrom(forward_obstacle);
+    }
     NearbyObstacle backward_obstacle;
-    ObstacleClusters::BackwardNearbyObstacle(*lane_sequence, id_, obstacle_s,
-                                             obstacle_l, &backward_obstacle);
-    lane_sequence->add_nearby_obstacle()->CopyFrom(backward_obstacle);
+    if (ObstacleClusters::BackwardNearbyObstacle(
+            *lane_sequence, id_, obstacle_s, obstacle_l, &backward_obstacle)) {
+      lane_sequence->add_nearby_obstacle()->CopyFrom(backward_obstacle);
+    }
   }
 }
 

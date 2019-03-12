@@ -31,7 +31,7 @@ cc_test(
     name = "localization_msf_ndt_map_test",
     size = "small",
     timeout = "short",
-    srcs = ["ndt_map_test.cpp"],
+    srcs = ["ndt_map_test.cc"],
     data = [":localization_msf_ndt_map_test_data"],
     deps = [
         "//cyber",
@@ -46,7 +46,7 @@ cc_test(
     name = "localization_msf_ndt_map_config_test",
     size = "small",
     timeout = "short",
-    srcs = ["ndt_map_config_test.cpp"],
+    srcs = ["ndt_map_config_test.cc"],
     deps = [
         "//cyber",
         "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",

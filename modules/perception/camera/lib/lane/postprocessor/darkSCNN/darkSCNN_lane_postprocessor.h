@@ -87,6 +87,12 @@ class DarkSCNNLanePostprocessor : public BaseLanePostprocessor {
   int64_t time_3 = 0;
   int time_num = 0;
 
+  float max_longitudinal_distance_ = 300.0f;
+  float min_longitudinal_distance_ = 0.0f;
+
+  // number of lane type (13)
+  int lane_type_num_;
+
   lane::DarkSCNNLanePostprocessorParam lane_postprocessor_param_;
 
  private:

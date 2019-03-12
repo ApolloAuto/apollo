@@ -42,7 +42,7 @@ bool FusionComponent::Init() {
   radius_for_roi_object_check_ = comp_config.radius_for_roi_object_check();
 
   // init algorithm plugin
-  CHECK(InitAlgorithmPlugin() == true) << "Failed to init algorithm plugin.";
+  CHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
   writer_ = node_->CreateWriter<PerceptionObstacles>(
       comp_config.output_obstacles_channel_name());
   inner_writer_ = node_->CreateWriter<SensorFrameMessage>(
@@ -61,7 +61,7 @@ bool FusionComponent::Proc(const std::shared_ptr<SensorFrameMessage>& message) {
   std::shared_ptr<SensorFrameMessage> viz_message(new (std::nothrow)
                                                       SensorFrameMessage);
   bool status = InternalProc(message, out_message, viz_message);
-  if (status == true) {
+  if (status) {
     // TODO(conver sensor id)
     if (message->sensor_id_ != fusion_main_sensor_) {
       AINFO << "Fusion receive non " << fusion_main_sensor_

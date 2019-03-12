@@ -55,6 +55,7 @@ class ScenarioManager final {
       const Frame& frame,
       const hdmap::PathOverlap& first_encountered_traffic_Light_overlap);
   ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
+  ScenarioConfig::ScenarioType SelectValetParkingScenario(const Frame& frame);
 
   // functions for scenario voter implementation
   // do NOT delete the code yet
@@ -71,22 +72,18 @@ class ScenarioManager final {
 
   void ReadTrafficLight(const Frame& frame);
 
-  bool IsStopSignScenario(
-      const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
   bool IsTrafficLightScenario(
       const ScenarioConfig::ScenarioType& scenario_type);
 
-  void UpdatePlanningContext(
-      const Frame& frame,
-      const ScenarioConfig::ScenarioType& scenario_type);
+  void UpdatePlanningContext(const Frame& frame,
+                             const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContextStopSignScenario(
-      const Frame& frame,
-      const ScenarioConfig::ScenarioType& scenario_type);
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContextTrafficLightScenario(
-      const Frame& frame,
-      const ScenarioConfig::ScenarioType& scenario_type);
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
  private:
   std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
@@ -100,7 +97,7 @@ class ScenarioManager final {
                      std::hash<int>> first_encountered_overlap_map_;
 
   // TODO(all): move to scenario conf later
-  const double signal_expire_time_sec_ = 5.0;      // sec
+  const double signal_expire_time_sec_ = 5.0;  // sec
 };
 
 }  // namespace scenario

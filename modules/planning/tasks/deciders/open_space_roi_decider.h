@@ -19,7 +19,6 @@
  **/
 
 #pragma once
-#pragma once
 
 #include <algorithm>
 #include <memory>
@@ -46,13 +45,10 @@ namespace apollo {
 namespace planning {
 class OpenSpaceRoiDecider : public Decider {
  public:
-  explicit OpenSpaceRoiDecider(const TaskConfig& config);
+  explicit OpenSpaceRoiDecider(const TaskConfig &config);
 
  private:
-  apollo::common::Status Process(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
-
-  apollo::common::Status Process(Frame* frame);
+  apollo::common::Status Process(Frame *frame) override;
 
  private:
   // private functions copied from open_space_ROI.h

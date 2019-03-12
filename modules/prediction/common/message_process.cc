@@ -90,38 +90,7 @@ void MessageProcess::OnPerception(
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK(ptr_obstacles_container != nullptr);
 
-  ptr_obstacles_container->Insert(perception_obstacles);
-  auto end_time2 = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_time2 - end_time1;
-  ADEBUG << "Time to insert obstacles: " << diff.count() * 1000 << " msec.";
-
-  // Scenario analysis
-  ScenarioManager::Instance()->Run();
-  auto end_time3 = std::chrono::system_clock::now();
-  diff = end_time3 - end_time2;
-  ADEBUG << "Time for scenario_manager: " << diff.count() * 1000 << " msec.";
-
-  // If in junction, BuildJunctionFeature();
-  // If not, BuildLaneGraph().
-  const Scenario& scenario = ScenarioManager::Instance()->scenario();
-  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id() &&
-      FLAGS_enable_junction_feature) {
-    JunctionAnalyzer::Init(scenario.junction_id());
-    ptr_obstacles_container->BuildJunctionFeature();
-  }
-  auto end_time4 = std::chrono::system_clock::now();
-  diff = end_time4 - end_time3;
-  ADEBUG << "Time to build junction features: " << diff.count() * 1000
-         << " msec.";
-  ptr_obstacles_container->BuildLaneGraph();
-  auto end_time5 = std::chrono::system_clock::now();
-  diff = end_time5 - end_time4;
-  ADEBUG << "Time to build cruise features: " << diff.count() * 1000
-         << " msec.";
-  ADEBUG << "Received a perception message ["
-         << perception_obstacles.ShortDebugString() << "].";
-
-  // Insert ADC into the obstacle_container as well.
+  // Insert ADC into the obstacle_container.
   auto ptr_ego_pose_container =
       ContainerManager::Instance()->GetContainer<PoseContainer>(
           AdapterConfig::LOCALIZATION);
@@ -141,7 +110,41 @@ void MessageProcess::OnPerception(
            << ", " << std::fixed << std::setprecision(6) << y << "].";
     ptr_ego_trajectory_container->SetPosition({x, y});
   }
+  auto end_time2 = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_time2 - end_time1;
+  ADEBUG << "Time to insert ADC: " << diff.count() * 1000 << " msec.";
+
+  // Insert perception_obstacles
+  ptr_obstacles_container->Insert(perception_obstacles);
+  auto end_time3 = std::chrono::system_clock::now();
+  diff = end_time3 - end_time2;
+  ADEBUG << "Time to insert obstacles: " << diff.count() * 1000 << " msec.";
+
+  // Scenario analysis
+  ScenarioManager::Instance()->Run();
+  auto end_time4 = std::chrono::system_clock::now();
+  diff = end_time4 - end_time3;
+  ADEBUG << "Time for scenario_manager: " << diff.count() * 1000 << " msec.";
+
+  // If in junction, BuildJunctionFeature();
+  // If not, BuildLaneGraph().
+  const Scenario& scenario = ScenarioManager::Instance()->scenario();
+  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id() &&
+      FLAGS_enable_junction_feature) {
+    JunctionAnalyzer::Init(scenario.junction_id());
+    ptr_obstacles_container->BuildJunctionFeature();
+  }
+  auto end_time5 = std::chrono::system_clock::now();
+  diff = end_time5 - end_time4;
+  ADEBUG << "Time to build junction features: " << diff.count() * 1000
+         << " msec.";
+  ptr_obstacles_container->BuildLaneGraph();
   auto end_time6 = std::chrono::system_clock::now();
+  diff = end_time6 - end_time5;
+  ADEBUG << "Time to build cruise features: " << diff.count() * 1000
+         << " msec.";
+  ADEBUG << "Received a perception message ["
+         << perception_obstacles.ShortDebugString() << "].";
 
   // Insert features to FeatureOutput for offline_mode
   if (FLAGS_prediction_offline_mode == 1) {
