@@ -285,7 +285,6 @@ Status OpenSpaceTrajectoryPartition::Process() {
       return Status::OK();
     }
   }
-
   AdjustRelativeTimeAndS(paritioned_trajectories, current_trajectory_index,
                          current_trajectory_point_index,
                          chosen_paritioned_trajectory);

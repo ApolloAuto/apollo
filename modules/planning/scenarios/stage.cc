@@ -149,7 +149,6 @@ bool Stage::ExecuteTaskOnOpenSpace(Frame* frame) {
     *(frame->mutable_open_space_info()->mutable_publishable_trajectory_data()) =
         std::move(publishable_traj_and_gear);
   }
-
   return true;
 }
 
