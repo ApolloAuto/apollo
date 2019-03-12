@@ -98,7 +98,9 @@ class OpenSpaceTrajectoryGenerator {
 
   void Stop();
 
-  void RecordDebugInfo(const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWs,
+  void RecordDebugInfo(const Vec2d& translate_origin,
+                       const double& rotate_angle, const Eigen::MatrixXd& xWS,
+                       const Eigen::MatrixXd& uWs,
                        const Eigen::MatrixXd& l_warm_up,
                        const Eigen::MatrixXd& n_warm_up,
                        const Eigen::MatrixXd& dual_l_result_ds,
