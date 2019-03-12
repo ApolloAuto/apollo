@@ -381,7 +381,7 @@ void PredictionMap::NearbyLanesByCurrentLanes(
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes,
     const int max_num_lane,
     std::vector<std::shared_ptr<const LaneInfo>>* nearby_lanes) {
-  if (lanes.size() == 0) {
+  if (lanes.empty()) {
     std::vector<std::shared_ptr<const LaneInfo>> prev_lanes;
     OnLane(prev_lanes, point, heading, radius, false, max_num_lane,
            FLAGS_max_lane_angle_diff, nearby_lanes);
@@ -514,7 +514,7 @@ bool PredictionMap::IsLeftNeighborLane(
 bool PredictionMap::IsLeftNeighborLane(
     std::shared_ptr<const LaneInfo> target_lane,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes) {
-  if (lanes.size() == 0) {
+  if (lanes.empty()) {
     return true;
   }
   for (auto& lane : lanes) {
@@ -546,7 +546,7 @@ bool PredictionMap::IsRightNeighborLane(
 bool PredictionMap::IsRightNeighborLane(
     std::shared_ptr<const LaneInfo> target_lane,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes) {
-  if (lanes.size() == 0) {
+  if (lanes.empty()) {
     return true;
   }
   for (const auto& lane : lanes) {
@@ -576,7 +576,7 @@ bool PredictionMap::IsSuccessorLane(std::shared_ptr<const LaneInfo> target_lane,
 bool PredictionMap::IsSuccessorLane(
     std::shared_ptr<const LaneInfo> target_lane,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes) {
-  if (lanes.size() == 0) {
+  if (lanes.empty()) {
     return true;
   }
   for (auto& lane : lanes) {
@@ -607,7 +607,7 @@ bool PredictionMap::IsPredecessorLane(
 bool PredictionMap::IsPredecessorLane(
     std::shared_ptr<const LaneInfo> target_lane,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes) {
-  if (lanes.size() == 0) {
+  if (lanes.empty()) {
     return true;
   }
   for (auto& lane : lanes) {
@@ -629,7 +629,7 @@ bool PredictionMap::IsIdenticalLane(std::shared_ptr<const LaneInfo> other_lane,
 bool PredictionMap::IsIdenticalLane(
     std::shared_ptr<const LaneInfo> other_lane,
     const std::vector<std::shared_ptr<const LaneInfo>>& lanes) {
-  if (lanes.size() == 0) {
+  if (lanes.empty()) {
     return true;
   }
   for (auto& lane : lanes) {

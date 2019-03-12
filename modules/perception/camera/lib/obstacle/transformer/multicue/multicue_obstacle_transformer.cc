@@ -214,7 +214,7 @@ void MultiCueObstacleTransformer::FillResults(
 
 bool MultiCueObstacleTransformer::Transform(
     const ObstacleTransformerOptions &options, CameraFrame *frame) {
-  if (frame->detected_objects.size() == 0) {
+  if (frame->detected_objects.empty()) {
     ADEBUG << "No object input to transformer.";
     return true;
   }

@@ -66,7 +66,7 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const std::vector<std::vector<common::math::Vec2d>>&
         obstacles_vertices_vec) {
-  if (!vehicle_state.has_x() || XYbounds.size() == 0 || end_pose.size() == 0 ||
+  if (!vehicle_state.has_x() || XYbounds.empty() || end_pose.empty() ||
       obstacles_edges_num.cols() == 0 || obstacles_A.cols() == 0 ||
       obstacles_b.cols() == 0) {
     return Status(ErrorCode::PLANNING_ERROR, "Generator input data not ready");

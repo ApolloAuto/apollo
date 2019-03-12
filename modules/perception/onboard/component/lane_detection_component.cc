@@ -476,7 +476,7 @@ int LaneDetectionComponent::InitCameraFrames() {
   }
   // fixed size
   camera_frames_.resize(frame_capacity_);
-  if (camera_frames_.size() == 0) {
+  if (camera_frames_.empty()) {
     AERROR << "frame_capacity_ must > 0";
     return cyber::FAIL;
   }

@@ -54,7 +54,7 @@ bool TrackingFeatureExtractor::Init(
         break;
     }
   }
-  if (roi_poolings_.size() == 0) {
+  if (roi_poolings_.empty()) {
     AERROR << "no proper extractor";
     return false;
   }
@@ -88,7 +88,7 @@ bool TrackingFeatureExtractor::Extract(const FeatureExtractorOptions &options,
   if (frame == nullptr) {
     return false;
   }
-  if (frame->detected_objects.size() == 0) {
+  if (frame->detected_objects.empty()) {
     return true;
   }
   if (!options.normalized) {

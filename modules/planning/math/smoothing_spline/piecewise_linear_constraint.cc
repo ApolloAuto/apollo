@@ -29,7 +29,7 @@ namespace planning {
 namespace {
 
 Eigen::MatrixXd MergeMaxtrices(const std::vector<Eigen::MatrixXd>& matrices) {
-  if (matrices.size() == 0) {
+  if (matrices.empty()) {
     return Eigen::MatrixXd(0, 0);
   }
   int32_t d = 0;

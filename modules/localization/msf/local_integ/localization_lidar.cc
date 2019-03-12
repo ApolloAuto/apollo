@@ -125,7 +125,7 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
                               const Eigen::Vector3d velocity,
                               const LidarFrame& lidar_frame, bool use_avx) {
   // check whether loaded map
-  if (is_map_loaded_ == false) {
+  if (!is_map_loaded_) {
     map_.LoadMapArea(pose.translation(), resolution_id_, zone_id_,
                      search_range_x_, search_range_y_);
     is_map_loaded_ = true;
@@ -245,7 +245,7 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d* pose) {
 
   const double height_diff = vehicle_lidar_height_;
 
-  if (is_pre_ground_height_valid_ == false) {
+  if (!is_pre_ground_height_valid_) {
     is_pre_ground_height_valid_ = true;
     pre_vehicle_ground_height_ = lidar_pose.translation()(2) - height_diff;
   }

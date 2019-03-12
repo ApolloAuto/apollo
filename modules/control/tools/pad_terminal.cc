@@ -81,7 +81,7 @@ class PadTerminal {
     // check if chassis enter security mode, if enter, after 10s should reset to
     // manual
     if (chassis.driving_mode() == Chassis::EMERGENCY_MODE) {
-      if (is_first_emergency_mode == true) {
+      if (is_first_emergency_mode) {
         count_start = AsInt64<std::chrono::microseconds>(Clock::Now());
         is_first_emergency_mode = false;
         AINFO << "detect emergency mode.";

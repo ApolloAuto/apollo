@@ -7,9 +7,8 @@ If you encounter problems when starting Dreamview in the `docker/scripts/dev` se
 ```bash
 $ bash docker/scripts/dev_start.sh
 $ bash docker/scripts/dev_into.sh
-$ cd /apollo
 $ bash apollo.sh build
-$ bash scripts/dreamview.sh
+$ bash scripts/bootstrap.sh
 ```
 ### Dreamview Fails to Start
 
@@ -198,3 +197,4 @@ To resolve this issue, in apollo/apollo.sh, comment or delete:
 ```
 --copt=-mavx2
 ```
+Then try to build and start dreamview again.

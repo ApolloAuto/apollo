@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
         std::vector<unsigned int> layer_counts;
         lossless_matrix.GetMapCell(row, col).GetCount(&layer_counts);
         lossless_matrix.GetMapCell(row, col).GetAlt(&layer_alts);
-        if (layer_counts.size() == 0 || layer_alts.size() == 0) {
+        if (layer_counts.empty() || layer_alts.empty()) {
           altitude_avg = lossless_node->GetAlt(row, col);
           is_ground_useful = false;
         } else {

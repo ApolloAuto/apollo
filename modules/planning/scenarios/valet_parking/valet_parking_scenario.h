@@ -38,7 +38,8 @@ struct ValetParkingContext {
   ScenarioValetParkingConfig scenario_config;
   std::string target_parking_spot_id;
   bool valet_parking_pre_stop_finished = false;
-  double valet_parking_pre_stop_fence_s = 0.0;
+  bool pre_stop_rightaway_flag = false;
+  hdmap::MapPathPoint pre_stop_rightaway_point;
 };
 
 class ValetParkingScenario : public Scenario {

@@ -52,7 +52,7 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const std::vector<std::vector<common::math::Vec2d>>&
         obstacles_vertices_vec) {
-  if (XYbounds.size() == 0 || end_pose.size() == 0 ||
+  if (XYbounds.empty() || end_pose.empty() ||
       obstacles_edges_num.cols() == 0 || obstacles_A.cols() == 0 ||
       obstacles_b.cols() == 0) {
     ADEBUG << "OpenSpaceTrajectoryOptimizer input data not ready";
@@ -251,7 +251,7 @@ void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
   size_t times_size = time_result.cols();
   size_t controls_size = control_result.cols();
   CHECK_EQ(states_size, times_size);
-  CHECK_EQ(states_size - 1, controls_size);
+  CHECK_EQ(states_size, controls_size);
   double relative_time = 0.0;
   for (size_t i = 0; i < states_size; ++i) {
     common::TrajectoryPoint point;

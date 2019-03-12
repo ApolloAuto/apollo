@@ -227,7 +227,7 @@ void VisualizationEngine::Preprocess(const std::string &map_folder,
     }
   }
 
-  if (map_bin_path.size() == 0) {
+  if (map_bin_path.empty()) {
     return;
   }
 

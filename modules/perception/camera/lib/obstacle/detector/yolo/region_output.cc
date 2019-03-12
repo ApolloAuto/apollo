@@ -15,6 +15,7 @@
  *****************************************************************************/
 
 #include "modules/perception/camera/lib/obstacle/detector/yolo/region_output.h"
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -108,7 +109,7 @@ void apply_softnms_fast(const std::vector<NormalizedBBox> &bboxes,
 
   // Do nms.
   indices->clear();
-  while (score_index_vec.size() != 0) {
+  while (!score_index_vec.empty()) {
     auto best_it =
         max_element(std::begin(score_index_vec), std::end(score_index_vec));
     const int best_idx = (*best_it).second;
@@ -219,7 +220,7 @@ void apply_nms_fast(const std::vector<NormalizedBBox> &bboxes,
   // Do nms.
   float adaptive_threshold = nms_threshold;
   indices->clear();
-  while (score_index_vec.size() != 0) {
+  while (!score_index_vec.empty()) {
     const int idx = score_index_vec.front().second;
     bool keep = true;
     for (int k = 0; k < static_cast<int>(indices->size()); ++k) {
