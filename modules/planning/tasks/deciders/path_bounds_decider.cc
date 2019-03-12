@@ -54,8 +54,8 @@ Status PathBoundsDecider::Process(
   CHECK_NOTNULL(reference_line_info);
 
   // The decided path bounds should be in the format of: (s, l_min, l_max).
-  std::vector<std::tuple<double, double, double>> fallback_path_boundaries;
-  std::vector<std::tuple<double, double, double>> path_boundaries;
+  PathBoundary fallback_path_boundaries;
+  PathBoundary path_boundaries;
 
   // Generate fallback path boundaries.
   std::string fallback_path_bounds_msg = GenerateFallbackPathBoundaries(
@@ -525,11 +525,9 @@ double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
 }
 
 // The tuple contains (is_start_s, s, l_min, l_max, obstacle_id)
-std::vector<std::tuple<int, double, double, double, std::string>>
-PathBoundsDecider::SortObstaclesForSweepLine(
+std::vector<ObstacleEdge> PathBoundsDecider::SortObstaclesForSweepLine(
     const IndexedList<std::string, Obstacle>& indexed_obstacles) {
-  std::vector<std::tuple<int, double, double, double, std::string>>
-      sorted_obstacles;
+  std::vector<ObstacleEdge> sorted_obstacles;
 
   // Go through every obstacle and preprocess it.
   for (const auto* obstacle : indexed_obstacles.Items()) {
@@ -578,27 +576,23 @@ PathBoundsDecider::SortObstaclesForSweepLine(
   }
 
   // Sort.
-  sort(sorted_obstacles.begin(), sorted_obstacles.end(),
-       [](const std::tuple<int, double, double, double, std::string>& lhs,
-          const std::tuple<int, double, double, double, std::string>& rhs) {
-         if (std::get<1>(lhs) != std::get<1>(rhs)) {
-           return std::get<1>(lhs) < std::get<1>(rhs);
-         } else {
-           return std::get<0>(lhs) < std::get<0>(rhs);
-         }
-       });
+  std::sort(sorted_obstacles.begin(), sorted_obstacles.end(),
+            [](const ObstacleEdge& lhs, const ObstacleEdge& rhs) {
+              if (std::get<1>(lhs) != std::get<1>(rhs)) {
+                return std::get<1>(lhs) < std::get<1>(rhs);
+              } else {
+                return std::get<0>(lhs) > std::get<0>(rhs);
+              }
+            });
 
   return sorted_obstacles;
 }
 
-int PathBoundsDecider::ConstructSubsequentPathBounds(
-    const std::vector<std::tuple<int, double, double, double, std::string>>&
-    sorted_obstacles,
+std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
+    const std::vector<ObstacleEdge>& sorted_obstacles,
     size_t path_idx, size_t obs_idx,
     std::unordered_map<std::string, std::tuple<bool, double>>*
-    const obs_id_to_details,
-    std::vector<std::tuple<double, double, double>>* const curr_path_bounds,
-    std::vector<std::tuple<double, double, double>>* const final_path_bounds) {
+    const obs_id_to_details, PathBoundary* const curr_path_bounds) {
   double left_bounds_from_obstacles = std::numeric_limits<double>::max();
   double right_bounds_from_obstacles = std::numeric_limits<double>::lowest();
   double curr_s = std::get<0>((*curr_path_bounds)[path_idx]);
@@ -606,14 +600,20 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
   // If searched through all available s and found a path, return.
   if (path_idx >= curr_path_bounds->size()) {
     ADEBUG << "Completed path bounds search ending at path_idx = " << path_idx;
-    *final_path_bounds = *curr_path_bounds;
-    return static_cast<int>(path_idx);
+
+    std::vector<PathBoundary> ret;
+    ret.push_back(*curr_path_bounds);
+    return ret;
   }
 
   //==============================================================
   // If there is no obstacle updates at this path_idx.
   if (obs_idx >= sorted_obstacles.size() ||
       std::get<1>(sorted_obstacles[obs_idx]) > curr_s) {
+    // 0. Backup the old memory.
+    double dummy = 0.0;
+    auto old_path_boundary = *curr_path_bounds;
+    // 1. Get the boundary from obstacles.
     for (auto it = obs_id_to_details->begin();
          it != obs_id_to_details->end(); ++it) {
       if (std::get<0>(it->second)) {
@@ -626,33 +626,35 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
             std::min(left_bounds_from_obstacles, std::get<1>(it->second));
       }
     }
-    double dummy = 0.0;
-    auto old_path_bound = (*curr_path_bounds)[path_idx];
+    // 2. Update the path boundary
     bool is_able_to_update = UpdatePathBoundaryAndCenterLine(
         path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
         curr_path_bounds, &dummy);
-    int ret_val = 0;
+    // 3. Return proper values.
+    std::vector<PathBoundary> ret;
     if (is_able_to_update) {
-      ret_val = ConstructSubsequentPathBounds(
+      ret = ConstructSubsequentPathBounds(
           sorted_obstacles, path_idx + 1, obs_idx,
-          obs_id_to_details, curr_path_bounds, final_path_bounds);
+          obs_id_to_details, curr_path_bounds);
     } else {
-      ret_val = static_cast<int>(path_idx);
+      TrimPathBounds(static_cast<int>(path_idx), curr_path_bounds);
+      ret.push_back(*curr_path_bounds);
     }
-    (*curr_path_bounds)[path_idx] = old_path_bound;
-    return ret_val;
+    *curr_path_bounds = old_path_boundary;
+    return ret;
   }
 
   //==============================================================
   // If there are obstacle changes
   // 0. Backup the old memory.
   std::unordered_map<std::string, std::tuple<bool, double>>
-  old_obs_id_to_details = *obs_id_to_details;
+      old_obs_id_to_details = *obs_id_to_details;
+  auto old_path_boundary = *curr_path_bounds;
+  double dummy = 0.0;
   // 1. Go through all obstacle changes.
   //    - For exiting obstacle, remove from our memory.
   //    - For entering obstalce, save it to a vector.
-  std::vector<std::tuple<int, double, double, double, std::string>>
-  new_entering_obstacles;
+  std::vector<ObstacleEdge> new_entering_obstacles;
   size_t new_obs_idx = obs_idx;
   while (new_obs_idx < sorted_obstacles.size() &&
          std::get<1>(sorted_obstacles[new_obs_idx]) <= curr_s) {
@@ -668,11 +670,9 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
   // 2. For new entering obstacles, decide possible pass directions.
   //    (ranked in terms of optimality)
   auto pass_direction_decisions =
-      DecidePassDirections(&new_entering_obstacles);
+      DecidePassDirections(0.0, 0.0, &new_entering_obstacles);
   // 3. Try constructing subsequent path-bounds for all possible directions.
-  int best_ret_val = static_cast<int>(path_idx);
-  std::vector<std::tuple<double, double, double>> best_final_path_bounds =
-      *curr_path_bounds;
+  std::vector<PathBoundary> ret;
   for (size_t i = 0; i < pass_direction_decisions.size(); ++i) {
     // For each possible direction:
     // a. Update the obs_id_to_details
@@ -701,44 +701,111 @@ int PathBoundsDecider::ConstructSubsequentPathBounds(
       }
     }
     // c. Update for this path_idx, and construct the subsequent path bounds.
-    double dummy = 0.0;
-    auto old_path_bound = (*curr_path_bounds)[path_idx];
-    std::vector<std::tuple<double, double, double>> curr_final_path_bounds;
+    std::vector<PathBoundary> curr_dir_path_boundaries;
     bool is_able_to_update = UpdatePathBoundaryAndCenterLine(
         path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
         curr_path_bounds, &dummy);
-    int ret_val = 0;
     if (is_able_to_update) {
-      ret_val = ConstructSubsequentPathBounds(
-          sorted_obstacles, path_idx + 1, obs_idx,
-          obs_id_to_details, curr_path_bounds, &curr_final_path_bounds);
+      curr_dir_path_boundaries = ConstructSubsequentPathBounds(
+          sorted_obstacles, path_idx + 1, new_obs_idx,
+          obs_id_to_details, curr_path_bounds);
     } else {
-      ret_val = static_cast<int>(path_idx);
-      curr_final_path_bounds = *curr_path_bounds;
+      TrimPathBounds(static_cast<int>(path_idx), curr_path_bounds);
+      curr_dir_path_boundaries.push_back(*curr_path_bounds);
     }
-    // d. If it's a longer path, update the best_path_bounds info.
-    if (ret_val > best_ret_val) {
-      best_ret_val = ret_val;
-      best_final_path_bounds = curr_final_path_bounds;
-    }
-    (*curr_path_bounds)[path_idx] = old_path_bound;
+    // d. Update the path_bounds into the vector, and revert changes
+    //    to curr_path_bounds for next cycle.
+    ret.insert(ret.end(), curr_dir_path_boundaries.begin(),
+               curr_dir_path_boundaries.end());
+    *curr_path_bounds = old_path_boundary;
   }
+  // 4. Select the best path_bounds in ret.
   *obs_id_to_details = old_obs_id_to_details;
-  *final_path_bounds = best_final_path_bounds;
-  return best_ret_val;
+  *curr_path_bounds = old_path_boundary;
+  std::sort(ret.begin(), ret.end(),
+            [](const PathBoundary& lhs, const PathBoundary& rhs) {
+              return lhs.size() > rhs.size();
+            });
+  while (ret.size() > 3) {
+    ret.pop_back();
+  }
+  return ret;
 }
 
 std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
-    std::vector<std::tuple<int, double, double, double, std::string>>* const
-    new_entering_obstacles) {
-  std::vector<std::vector<bool>> decision;
-  return decision;
+    const double& l_min, const double& l_max,
+    std::vector<ObstacleEdge>* const new_entering_obstacles) {
+  std::vector<std::vector<bool>> decisions;
+
+  // Convert into lateral edges.
+  std::vector<ObstacleEdge> lateral_edges;
+  lateral_edges.emplace_back(
+      1, std::numeric_limits<double>::lowest(), 0.0, 0.0, "l_min");
+  lateral_edges.emplace_back(
+      0, l_min, 0.0, 0.0, "l_min");
+  lateral_edges.emplace_back(
+      1, l_max, 0.0, 0.0, "l_max");
+  lateral_edges.emplace_back(
+      0, std::numeric_limits<double>::max(), 0.0, 0.0, "l_max");
+  for (size_t i = 0; i < new_entering_obstacles->size(); ++i) {
+    if (std::get<3>((*new_entering_obstacles)[i]) < l_min ||
+        std::get<2>((*new_entering_obstacles)[i]) > l_max) {
+      continue;
+    }
+    lateral_edges.emplace_back(
+        1, std::get<2>((*new_entering_obstacles)[i]),
+        0.0, 0.0, std::get<4>((*new_entering_obstacles)[i]));
+    lateral_edges.emplace_back(
+        0, std::get<3>((*new_entering_obstacles)[i]),
+        0.0, 0.0, std::get<4>((*new_entering_obstacles)[i]));
+  }
+  // Sort the lateral edges for lateral sweep-line algorithm.
+  std::sort(lateral_edges.begin(), lateral_edges.end(),
+            [](const ObstacleEdge& lhs, const ObstacleEdge& rhs) {
+              if (std::get<1>(lhs) != std::get<1>(rhs)) {
+                return std::get<1>(lhs) < std::get<1>(rhs);
+              } else {
+                return std::get<0>(lhs) > std::get<0>(rhs);
+              }
+            });
+
+  // Go through the lateral edges and find any possible slot.
+  std::vector<double> empty_slot;
+  int num_obs = 0;
+  for (size_t i = 0; i < lateral_edges.size(); ++i) {
+    // Update obstacle overlapping info.
+    if (std::get<0>(lateral_edges[i])) {
+      ++ num_obs;
+    } else {
+      -- num_obs;
+    }
+    // If there is an empty slot within lane boundary.
+    if (num_obs == 0 && i != lateral_edges.size() - 1) {
+      empty_slot.push_back(
+          (std::get<1>(lateral_edges[i]) + std::get<1>(lateral_edges[i+1]))
+          / 2.0);
+    }
+  }
+  // For each empty slot, update a corresponding pass direction
+  for (size_t i = 0; i < empty_slot.size(); ++i) {
+    double pass_position = empty_slot[i];
+    std::vector<bool> pass_direction;
+    for (size_t j = 0; j < new_entering_obstacles->size(); ++j) {
+      if (std::get<2>((*new_entering_obstacles)[j]) > pass_position) {
+        pass_direction.push_back(false);
+      } else {
+        pass_direction.push_back(true);
+      }
+    }
+    decisions.push_back(pass_direction);
+  }
+
+  return decisions;
 }
 
 bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
     size_t idx, double left_bound, double right_bound,
-    std::vector<std::tuple<double, double, double>>* const path_boundaries,
-    double* const center_line) {
+    PathBoundary* const path_boundaries, double* const center_line) {
   // Update the right bound (l_min):
   double new_l_min = std::fmax(
       std::get<1>((*path_boundaries)[idx]),
@@ -763,8 +830,7 @@ bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
 }
 
 void PathBoundsDecider::TrimPathBounds(
-    int path_blocked_idx,
-    std::vector<std::tuple<double, double, double>>* const path_boundaries) {
+    int path_blocked_idx, PathBoundary* const path_boundaries) {
   if (path_blocked_idx != -1) {
     if (path_blocked_idx == 0) {
       ADEBUG << "Completely blocked. Cannot move at all.";
@@ -777,7 +843,7 @@ void PathBoundsDecider::TrimPathBounds(
 }
 
 void PathBoundsDecider::PathBoundsDebugString(
-      const std::vector<std::tuple<double, double, double>>* path_boundaries) {
+    const PathBoundary* path_boundaries) {
   for (size_t i = 0; i < path_boundaries->size(); ++i) {
     ADEBUG << "idx " << i
            << "; s = " << std::get<0>((*path_boundaries)[i])
