@@ -70,6 +70,8 @@ DEFINE_double(caution_search_distance_backward_for_merge, 60.0,
 DEFINE_double(caution_search_distance_backward_for_overlap, 30.0,
               "The distance backward to search caution-lebel obstacles "
               "in the case of overlap");
+DEFINE_double(caution_pedestrian_approach_time, 3.0,
+              "The time for a pedestrian to approach adc trajectory");
 
 // Obstacle features
 DEFINE_int32(ego_vehicle_id, -1, "The obstacle ID of the ego vehicle.");
