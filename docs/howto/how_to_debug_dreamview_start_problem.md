@@ -197,4 +197,4 @@ To resolve this issue, in apollo/apollo.sh, comment or delete:
 ```
 --copt=-mavx2
 ```
-Then  try to build and start dreamview again.
+Then try to build and start dreamview again.
