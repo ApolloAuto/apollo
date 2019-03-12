@@ -251,7 +251,7 @@ void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
   size_t times_size = time_result.cols();
   size_t controls_size = control_result.cols();
   CHECK_EQ(states_size, times_size);
-  CHECK_EQ(states_size - 1, controls_size);
+  CHECK_EQ(states_size, controls_size);
   double relative_time = 0.0;
   for (size_t i = 0; i < states_size; ++i) {
     common::TrajectoryPoint point;
