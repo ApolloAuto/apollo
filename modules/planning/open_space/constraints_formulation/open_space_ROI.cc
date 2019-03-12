@@ -234,9 +234,7 @@ bool OpenSpaceROI::GetOpenSpaceROI() {
   double right_top_l = 0.0;
   if (!(nearby_path->GetProjection(left_top, &left_top_s, &left_top_l) &&
         nearby_path->GetProjection(right_top, &right_top_s, &right_top_l))) {
-    std::string msg(
-        "fail to get parking spot points' projections on reference line");
-    AERROR << msg;
+    AERROR << "fail to get parking spot points' projections on reference line";
     return false;
   }
   // start or end, left or right is decided by the vehicle's heading
