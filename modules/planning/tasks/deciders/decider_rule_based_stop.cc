@@ -30,6 +30,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
+using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
 using apollo::common::util::WithinBound;
@@ -159,6 +160,7 @@ void DeciderRuleBasedStop::CheckOpenSpacePreStop(
   }
 
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
+  const VehicleState& vehicle_state = frame->vehicle_state();
   const auto& target_parking_spot_id =
       frame->open_space_info().target_parking_spot_id();
   const auto& nearby_path = reference_line_info->reference_line().map_path();
@@ -201,6 +203,7 @@ void DeciderRuleBasedStop::CheckOpenSpacePreStop(
   double stop_distance_to_target = config_.decider_rule_based_stop_config()
                                        .open_space()
                                        .stop_distance_to_target();
+  double static_linear_velocity_epsilon = 1.0e-2;
   CHECK_GE(stop_distance_to_target, 1.0e-8);
   double target_vehicle_offset = target_area_center_s - adc_front_edge_s;
   if (target_vehicle_offset > stop_distance_to_target) {
@@ -209,9 +212,15 @@ void DeciderRuleBasedStop::CheckOpenSpacePreStop(
     stop_line_s = target_area_center_s + stop_distance_to_target;
   } else if (target_vehicle_offset < -stop_distance_to_target) {
     if (!frame->open_space_info().pre_stop_rightaway_flag()) {
+      // TODO(Jinyun) Use constant comfortable deacceleration rather than
+      // distance by config to set stop fence
       stop_line_s = adc_front_edge_s + config_.decider_rule_based_stop_config()
                                            .open_space()
                                            .rightaway_stop_distance();
+      if (std::abs(vehicle_state.linear_velocity()) <
+          static_linear_velocity_epsilon) {
+        stop_line_s = adc_front_edge_s;
+      }
       *(frame->mutable_open_space_info()->mutable_pre_stop_rightaway_point()) =
           nearby_path.GetSmoothPoint(stop_line_s);
       frame->mutable_open_space_info()->set_pre_stop_rightaway_flag(true);
