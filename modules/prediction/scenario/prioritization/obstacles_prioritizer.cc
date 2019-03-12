@@ -335,6 +335,13 @@ void ObstaclesPrioritizer::AssignCautionLevelInJunction(
 }
 
 void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
+  ObstaclesContainer* obstacles_container =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
+  if (obstacles_container == nullptr) {
+    AERROR << "Null obstacles container found";
+    return;
+  }
   ADCTrajectoryContainer* adc_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
@@ -385,7 +392,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     accumulated_s += lane_info_ptr->total_length();
   }
 
-  // then loop of lane_ids to AssignCaution
+  // then loop through lane_ids to AssignCaution for obstacle vehicles
   accumulated_s = 0.0;
   for (const std::string& lane_id : lane_ids) {
     std::shared_ptr<const LaneInfo> lane_info_ptr =
@@ -399,6 +406,56 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     AssignCautionByOverlap(lane_info_ptr);
     if (accumulated_s > FLAGS_caution_search_distance_ahead + ego_vehicle_s) {
       break;
+    }
+  }
+
+  // finally loop through all pedestrian to AssignCaution
+  for (const int obstacle_id :
+       obstacles_container->curr_frame_predictable_obstacle_ids()) {
+    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+    if (obstacle_ptr->history_size() == 0) {
+      AERROR << "Obstacle [" << obstacle_ptr->id() << "] has no feature.";
+      continue;
+    }
+    Feature* latest_feature_ptr = obstacle_ptr->mutable_latest_feature();
+    if (latest_feature_ptr->type() != PerceptionObstacle::PEDESTRIAN) {
+      continue;
+    }
+    double start_x = latest_feature_ptr->position().x();
+    double start_y = latest_feature_ptr->position().y();
+    double end_x = start_x + FLAGS_caution_pedestrian_approach_time *
+        latest_feature_ptr->raw_velocity().x();
+    double end_y = start_y + FLAGS_caution_pedestrian_approach_time *
+        latest_feature_ptr->raw_velocity().y();
+    std::vector<std::string> nearby_lane_ids = PredictionMap::NearbyLaneIds(
+        {start_x, start_y}, FLAGS_pedestrian_nearby_lane_search_radius);
+    if (nearby_lane_ids.empty()) {
+      continue;
+    }
+    for (const std::string& lane_id : nearby_lane_ids) {
+      if (!adc_trajectory_container->IsLaneIdInReferenceLine(lane_id)) {
+        continue;
+      }
+      std::shared_ptr<const LaneInfo> lane_info_ptr =
+        PredictionMap::LaneById(lane_id);
+      if (lane_info_ptr == nullptr) {
+        AERROR << "Null lane info pointer found.";
+        continue;
+      }
+      double start_s = 0.0;
+      double start_l = 0.0;
+      double end_s = 0.0;
+      double end_l = 0.0;
+      if (PredictionMap::GetProjection({start_x, start_y},
+                         lane_info_ptr, &start_s, &start_l) &&
+          PredictionMap::GetProjection({end_x, end_y},
+                         lane_info_ptr, &end_s, &end_l)) {
+        if (std::abs(start_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
+            std::abs(end_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
+            start_l * end_l < 0.0) {
+          obstacle_ptr->SetCaution();
+        }
+      }
     }
   }
 }
