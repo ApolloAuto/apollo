@@ -775,9 +775,9 @@ std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
   for (size_t i = 0; i < lateral_edges.size(); ++i) {
     // Update obstacle overlapping info.
     if (std::get<0>(lateral_edges[i])) {
-      ++ num_obs;
+      ++num_obs;
     } else {
-      -- num_obs;
+      --num_obs;
     }
     // If there is an empty slot within lane boundary.
     if (num_obs == 0 && i != lateral_edges.size() - 1) {
