@@ -94,7 +94,7 @@ bool CCRFOneShotTypeFusion::FuseOneShotTypeProbs(const ObjectPtr& object,
   }
   const auto& vecs = object->lidar_supplement.raw_probs;
   const auto& names = object->lidar_supplement.raw_classification_methods;
-  if (vecs.size() == 0) {
+  if (vecs.empty()) {
     return false;
   }
 
@@ -161,7 +161,7 @@ bool CCRFSequenceTypeFusion::TypeFusion(const TypeFusionOption& option,
   if (tracked_objects == nullptr) {
     return false;
   }
-  if (tracked_objects->size() == 0) {
+  if (tracked_objects->empty()) {
     return false;
   }
   return FuseWithConditionalProbabilityInference(tracked_objects);
