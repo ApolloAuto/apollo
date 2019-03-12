@@ -53,6 +53,8 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
 
   void Stop();
 
+  void Restart();
+
  private:
   apollo::common::Status Process() override;
 
