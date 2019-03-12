@@ -98,20 +98,7 @@ void ObstaclesPrioritizer::PrioritizeObstacles(
 
 void ObstaclesPrioritizer::AssignCautionLevel(
     const std::shared_ptr<ScenarioFeatures> scenario_features) {
-  switch (scenario_features->scenario().type()) {
-    case Scenario::JUNCTION: {
-      AssignCautionLevelInJunction(scenario_features);
-      break;
-    }
-    case Scenario::CRUISE: {
-      AssignCautionLevelInCruise(scenario_features);
-      break;
-    }
-    default: {
-      AssignCautionLevelInCruise(scenario_features);
-      break;
-    }
-  }
+  AssignCautionLevelInCruise(scenario_features);
 }
 
 void ObstaclesPrioritizer::AssignIgnoreLevel(
