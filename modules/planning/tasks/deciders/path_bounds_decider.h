@@ -89,7 +89,7 @@ class PathBoundsDecider : public Decider {
 
   std::vector<std::vector<bool>> DecidePassDirections(
       const double& l_min, const double& l_max,
-      std::vector<ObstacleEdge>* const new_entering_obstacles);
+      const std::vector<ObstacleEdge>& new_entering_obstacles);
 
   /**
     * @brief Update the path_boundary at "idx", as well as the new center-line.
@@ -106,7 +106,7 @@ class PathBoundsDecider : public Decider {
       PathBoundary* const path_boundaries, double* const center_line);
 
   void TrimPathBounds(
-      int path_blocked_idx, PathBoundary* const path_boundaries);
+      const int path_blocked_idx, PathBoundary* const path_boundaries);
 
   void PathBoundsDebugString(
       const PathBoundary* path_boundaries);
