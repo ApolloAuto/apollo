@@ -58,10 +58,10 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
   // TODO(all): remove when pnc_junction completely available on map
   const auto& pnc_junction_overlaps =
       reference_line_info.reference_line().map_path().pnc_junction_overlaps();
-  if (pnc_junction_overlaps.size() == 0) {
+  if (pnc_junction_overlaps.empty()) {
     // pnc_junction not exist on map, use current traffic_light's end_s
     if (PlanningContext::GetScenarioInfo()
-            ->current_traffic_light_overlaps.size() == 0) {
+            ->current_traffic_light_overlaps.empty()) {
       return FinishStage();
     }
 

@@ -416,7 +416,7 @@ class OpenSpaceROITest {
     segments_vector.push_back(nearby_lanesegment);
     nearby_path_ = std::unique_ptr<Path>(new Path(segments_vector));
     const auto& parking_space_overlaps = nearby_path_->parking_space_overlaps();
-    if (parking_space_overlaps.size() == 0) {
+    if (parking_space_overlaps.empty()) {
       std::cout << "No parking overlaps found on the lane requested"
                 << std::endl;
       return false;

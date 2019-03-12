@@ -96,7 +96,7 @@ bool ObjectInRoiCheck(const HdmapStructConstPtr roi,
                       const std::vector<ObjectPtr>& objects,
                       std::vector<ObjectPtr>* valid_objects) {
   if (roi == nullptr ||
-      roi->road_polygons.size() + roi->junction_polygons.size() == 0) {
+      (roi->road_polygons.empty() && roi->junction_polygons.empty())) {
     valid_objects->assign(objects.begin(), objects.end());
     return true;
   }

@@ -28,7 +28,7 @@ TrackData::TrackData(TrackedObjectPtr obj, int track_id) {}
 TrackData::~TrackData() {}
 
 std::pair<double, TrackedObjectPtr> TrackData::GetHistoryObject(int idx) {
-  if (history_objects_.size() == 0) {
+  if (history_objects_.empty()) {
     AWARN << "no object in track";
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
@@ -55,7 +55,7 @@ std::pair<double, TrackedObjectPtr> TrackData::GetHistoryObject(int idx) {
 
 const std::pair<double, TrackedObjectConstPtr> TrackData::GetHistoryObject(
     int idx) const {
-  if (history_objects_.size() == 0) {
+  if (history_objects_.empty()) {
     AINFO << "no object in track";
     return std::pair<double, TrackedObjectPtr>(0.0, TrackedObjectPtr(nullptr));
   }
