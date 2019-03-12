@@ -377,7 +377,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     double s = 0.0;
     double l = 0.0;
     if (PredictionMap::GetProjection({pose_x, pose_y}, lane_info_ptr, &s, &l)) {
-      if (l < ego_vehicle_l) {
+      if (std::abs(l) < std::abs(ego_vehicle_l)) {
         ego_vehicle_s = accumulated_s + s;
         ego_vehicle_l = l;
       }
