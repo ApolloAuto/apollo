@@ -64,7 +64,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
   const auto& reference_line_info = frame->reference_line_info().front();
 
   if (PlanningContext::GetScenarioInfo()
-          ->current_traffic_light_overlaps.size() == 0) {
+          ->current_traffic_light_overlaps.empty()) {
     return FinishStage();
   }
 

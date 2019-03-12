@@ -411,13 +411,11 @@ void OpenSpaceROI::SearchTargetParkingSpotOnPath(
     std::shared_ptr<Path> *nearby_path,
     ParkingSpaceInfoConstPtr *target_parking_spot) {
   const auto &parking_space_overlaps = (*nearby_path)->parking_space_overlaps();
-  if (parking_space_overlaps.size() != 0) {
-    for (const auto &parking_overlap : parking_space_overlaps) {
-      if (parking_overlap.object_id == target_parking_spot_id_) {
-        hdmap::Id id;
-        id.set_id(parking_overlap.object_id);
-        *target_parking_spot = hdmap_->GetParkingSpaceById(id);
-      }
+  for (const auto &parking_overlap : parking_space_overlaps) {
+    if (parking_overlap.object_id == target_parking_spot_id_) {
+      hdmap::Id id;
+      id.set_id(parking_overlap.object_id);
+      *target_parking_spot = hdmap_->GetParkingSpaceById(id);
     }
   }
 }

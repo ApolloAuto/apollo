@@ -62,7 +62,7 @@ void ObstacleReference::UpdateReference(const CameraFrame *frame,
 
   auto &refs = reference_[sensor];
   auto &ref_map = ref_map_[sensor];
-  if (ref_map.size() == 0) {
+  if (ref_map.empty()) {
     ref_map = init_ref_map_;
   }
   for (auto &&reference : refs) {

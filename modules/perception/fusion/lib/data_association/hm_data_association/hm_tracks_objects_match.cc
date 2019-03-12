@@ -299,7 +299,7 @@ void HMTrackersObjectsAssociation::ComputeAssociationDistanceMat(
     const std::vector<size_t>& unassigned_tracks,
     const std::vector<size_t>& unassigned_measurements,
     std::vector<std::vector<double>>* association_mat) {
-  // if (sensor_objects.size() == 0) return;
+  // if (sensor_objects.empty()) return;
   TrackObjectDistanceOptions opt;
   // TODO(linjian) ref_point
   Eigen::Vector3d tmp = Eigen::Vector3d::Zero();

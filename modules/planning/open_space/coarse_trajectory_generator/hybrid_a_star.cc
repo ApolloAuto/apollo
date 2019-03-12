@@ -82,7 +82,7 @@ bool HybridAStar::RSPCheck(
 }
 
 bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {
-  if (obstacles_linesegments_vec_.size() == 0) {
+  if (obstacles_linesegments_vec_.empty()) {
     return true;
   }
   size_t node_step_size = node->GetStepSize();
@@ -237,7 +237,7 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
     std::vector<double> x = current_node->GetXs();
     std::vector<double> y = current_node->GetYs();
     std::vector<double> phi = current_node->GetPhis();
-    if (x.size() == 0 || y.size() == 0 || phi.size() == 0) {
+    if (x.empty() || y.empty() || phi.empty()) {
       AERROR << "result size check failed";
       return false;
     }

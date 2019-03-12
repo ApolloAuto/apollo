@@ -29,7 +29,7 @@ namespace perception {
 namespace camera {
 
 bool MultiCamerasProjection::Init(const MultiCamerasInitOption& options) {
-  if (options.camera_names.size() == 0) {
+  if (options.camera_names.empty()) {
     AERROR << "no cameras to be projected";
     return false;
   }
