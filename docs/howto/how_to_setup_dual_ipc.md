@@ -159,7 +159,7 @@ There are two steps in the installation process:
 
 # License
 
-  [Apache license](https://github.com/natashadsouza/apollo/blob/master/LICENSE)
+  [Apache license](https://github.com/ApolloAuto/apollo/blob/master/LICENSE)
 
 
 
