@@ -400,7 +400,8 @@ int main(int argc, char** argv) {
     play_param.delay_time_s = opt_delay;
     play_param.preload_time_s = opt_preload;
     play_param.files_to_play.insert(opt_file_vec.begin(), opt_file_vec.end());
-    play_param.black_channels.insert(opt_black_channels.begin(), opt_black_channels.end());
+    play_param.black_channels.insert(opt_black_channels.begin(), 
+                                     opt_black_channels.end());
     play_param.channels_to_play.insert(opt_white_channels.begin(),
                                        opt_white_channels.end());
     Player player(play_param);
