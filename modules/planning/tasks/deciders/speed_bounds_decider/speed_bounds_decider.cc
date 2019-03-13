@@ -48,8 +48,6 @@ Status SpeedBoundsDecider::Process(
   const TrajectoryPoint &init_point = frame->PlanningStartPoint();
   const ReferenceLine &reference_line = reference_line_info->reference_line();
   PathDecision *const path_decision = reference_line_info->path_decision();
-  const auto &path_point_decision_guide =
-      reference_line_info->path_point_decision_guide();
 
   // 1. Map obstacles into st graph
   StBoundaryMapper boundary_mapper(adc_sl_boundary, speed_bounds_config_,
@@ -86,8 +84,7 @@ Status SpeedBoundsDecider::Process(
 
   SpeedLimit speed_limit;
   if (!speed_limit_decider
-           .GetSpeedLimits(path_decision->obstacles(),
-                           path_point_decision_guide, &speed_limit)
+           .GetSpeedLimits(path_decision->obstacles(), &speed_limit)
            .ok()) {
     std::string msg("Getting speed limits failed!");
     AERROR << msg;

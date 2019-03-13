@@ -68,8 +68,34 @@ bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
   return true;
 }
 
+bool PathData::SetPathPointDecisionGuide(
+    const std::vector<std::tuple<double, PathPointType, double>>
+        &path_point_decision_guide) {
+  if (reference_line_ == nullptr) {
+    AERROR << "Should NOT set path_point_decision_guide when reference line is "
+              "nullptr. ";
+    return false;
+  }
+  if (frenet_path_.empty() || discretized_path_.empty()) {
+    AERROR << "Should NOT set path_point_decision_guide when frenet_path or "
+              "world frame trajectory is empty. ";
+    return false;
+  }
+  path_point_decision_guide_ = path_point_decision_guide;
+  return true;
+}
+
 const DiscretizedPath &PathData::discretized_path() const {
   return discretized_path_;
+}
+
+const FrenetFramePath &PathData::frenet_frame_path() const {
+  return frenet_path_;
+}
+
+const std::vector<std::tuple<double, PathData::PathPointType, double>>
+    &PathData::path_point_decision_guide() const {
+  return path_point_decision_guide_;
 }
 
 bool PathData::Empty() const {
@@ -79,10 +105,6 @@ bool PathData::Empty() const {
 std::list<std::pair<DiscretizedPath, FrenetFramePath>>
     &PathData::path_data_history() {
   return path_data_history_;
-}
-
-const FrenetFramePath &PathData::frenet_frame_path() const {
-  return frenet_path_;
 }
 
 void PathData::SetReferenceLine(const ReferenceLine *reference_line) {
@@ -137,6 +159,7 @@ bool PathData::GetPathPointWithRefS(const double ref_s,
 void PathData::Clear() {
   discretized_path_.clear();
   frenet_path_.clear();
+  path_point_decision_guide_.clear();
   reference_line_ = nullptr;
 }
 
