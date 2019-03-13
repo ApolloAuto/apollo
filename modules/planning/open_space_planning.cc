@@ -642,7 +642,7 @@ void OpenSpacePlanning::GenerateStopTrajectory(
   for (size_t i = 0; i < stop_trajectory_length; i++) {
     auto* point = ptr_trajectory_pb->add_trajectory_point();
     point->mutable_path_point()->set_x(frame_->vehicle_state().x());
-    point->mutable_path_point()->set_y(frame_->vehicle_state().x());
+    point->mutable_path_point()->set_y(frame_->vehicle_state().y());
     point->mutable_path_point()->set_theta(frame_->vehicle_state().heading());
     point->mutable_path_point()->set_s(0.0);
     point->mutable_path_point()->set_kappa(0.0);
