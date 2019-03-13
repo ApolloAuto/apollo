@@ -449,7 +449,7 @@ class LabelGenerator(object):
                         exit_pos_dict[junction_exit.exit_lane_id] = exit_pos
                         delta_pos = exit_pos - curr_pos
                         angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
-                        d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
+                        d_idx = int((angle / (2.0 * np.pi) + 1.0 / 24) * 12 % 12)
                         mask[d_idx] = 1
 
                 # Searching for up to 100 frames (10 seconds)
@@ -466,7 +466,7 @@ class LabelGenerator(object):
                             delta_pos = exit_pos - curr_pos
                             angle = math.atan2(
                                 delta_pos[1], delta_pos[0]) - heading
-                            d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
+                            d_idx = int((angle / (2.0 * np.pi) + 1.0 / 24) * 12 % 12)
                             label = [0] * 12
                             label[d_idx] = 1
                             fea.junction_feature.junction_mlp_label.extend(label)
