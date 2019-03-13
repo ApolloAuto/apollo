@@ -391,7 +391,8 @@ int main(int argc, char** argv) {
     ::apollo::cyber::Init(argv[0]);
     bool play_result = true;
     PlayParam play_param;
-    play_param.is_play_all_channels = opt_white_channels.empty();
+    play_param.is_play_all_channels = opt_all ? 
+                                      opt_all : opt_white_channels.empty();
     play_param.is_loop_playback = opt_loop;
     play_param.play_rate = opt_rate;
     play_param.begin_time_ns = opt_begin;
@@ -400,7 +401,7 @@ int main(int argc, char** argv) {
     play_param.delay_time_s = opt_delay;
     play_param.preload_time_s = opt_preload;
     play_param.files_to_play.insert(opt_file_vec.begin(), opt_file_vec.end());
-    play_param.black_channels.insert(opt_black_channels.begin(), 
+    play_param.black_channels.insert(opt_black_channels.begin(),
                                      opt_black_channels.end());
     play_param.channels_to_play.insert(opt_white_channels.begin(),
                                        opt_white_channels.end());
