@@ -42,9 +42,9 @@ Status PathAssessmentDecider::Process(
       reference_line_info->mutable_path_data();
   PathData* fallback_path_data =
       reference_line_info->mutable_fallback_path_data();
-  bool is_valid_regular_path = IsValidPath(
+  bool is_valid_regular_path = IsValidRegularPath(
       *reference_line_info, *regular_path_data);
-  bool is_valid_fallback_path = IsValidPath(
+  bool is_valid_fallback_path = IsValidFallbackPath(
       *reference_line_info, *fallback_path_data);
   // 2. If neither is valid, use the reference_line as the ultimate fallback.
   if (!is_valid_regular_path && !is_valid_fallback_path) {
@@ -60,7 +60,7 @@ Status PathAssessmentDecider::Process(
   return Status::OK();
 }
 
-bool PathAssessmentDecider::IsValidPath(
+bool PathAssessmentDecider::IsValidRegularPath(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
   // Check if the path is greatly off the reference line.
   if (IsGreatlyOffReferenceLine(path_data)) {
@@ -72,6 +72,19 @@ bool PathAssessmentDecider::IsValidPath(
   }
   // Check if there is any collision.
   if (IsCollidingWithStaticObstacles(reference_line_info, path_data)) {
+    return false;
+  }
+  return true;
+}
+
+bool PathAssessmentDecider::IsValidFallbackPath(
+    const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
+  // Check if the path is greatly off the reference line.
+  if (IsGreatlyOffReferenceLine(path_data)) {
+    return false;
+  }
+  // Check if the path is greatly off the road.
+  if (IsGreatlyOffRoad(reference_line_info, path_data)) {
     return false;
   }
   return true;
