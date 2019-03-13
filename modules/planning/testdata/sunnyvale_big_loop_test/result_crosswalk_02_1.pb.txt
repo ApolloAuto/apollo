@@ -20,11 +20,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.18715111178
-            y: 4141284.3878496005
+            x: 586260.233675317
+            y: 4141284.4917570944
             z: 0
           }
-          fence_heading: -1.3350939032979112
+          fence_heading: -1.3577543487779731
         }
       }
     }
@@ -35,11 +35,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.15192675858
-            y: 4141284.5336506325
+            x: 586260.20623721776
+            y: 4141284.6137085222
             z: 0
           }
-          fence_heading: -1.3504537501621541
+          fence_heading: -1.3577543487779731
         }
       }
     }
@@ -64,6 +64,9 @@ routing_header {
   sequence_num: 3
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "188_1_-1"
+}
 lane_id {
   id: "2726_1_-1"
 }

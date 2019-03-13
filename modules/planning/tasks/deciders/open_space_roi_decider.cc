@@ -48,13 +48,10 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
   vehicle_state_ = frame->vehicle_state();
   ROI_parking_boundary_.clear();
   obstacles_by_frame_ = frame->GetObstacleList();
-  if (frame->local_view().routing->routing_request().has_parking_space() &&
-      frame->local_view().routing->routing_request().parking_space().has_id()) {
-    target_parking_spot_id_ = frame->local_view()
-                                  .routing->routing_request()
-                                  .parking_space()
-                                  .id()
-                                  .id();
+  const auto &routing_request = frame->local_view().routing->routing_request();
+  if (routing_request.has_parking_space() &&
+      routing_request.parking_space().has_id()) {
+    target_parking_spot_id_ = routing_request.parking_space().id().id();
   } else {
     const std::string msg = "Failed to get parking space id from routing";
     AERROR << msg;
@@ -331,54 +328,56 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
   CHECK_GE(parking_depth_buffer, 0.0);
   const bool parking_inwards =
       config_.open_space_roi_decider_config().parking_inwards();
+  const double top_to_down_distance = left_top.y() - left_down.y();
   if (parking_spot_heading_ > kMathEpsilon) {
     if (parking_inwards) {
       end_y =
-          left_down.y() - (std::max(3 * (left_down.y() - left_top.y()) / 4,
+          left_down.y() - (std::max(3.0 * -top_to_down_distance / 4.0,
                                     vehicle_params_.front_edge_to_center()) +
                            parking_depth_buffer);
 
     } else {
-      end_y = left_down.y() - (std::max((left_down.y() - left_top.y()) / 4,
+      end_y = left_down.y() - (std::max(-top_to_down_distance / 4.0,
                                         vehicle_params_.back_edge_to_center()) +
                                parking_depth_buffer);
     }
   } else {
     if (parking_inwards) {
       end_y =
-          left_down.y() + (std::max(3 * (left_top.y() - left_down.y()) / 4,
+          left_down.y() + (std::max(3.0 * top_to_down_distance / 4.0,
                                     vehicle_params_.front_edge_to_center()) +
                            parking_depth_buffer);
     } else {
-      end_y = left_down.y() + (std::max((left_top.y() - left_down.y()) / 4,
+      end_y = left_down.y() + (std::max(top_to_down_distance / 4.0,
                                         vehicle_params_.back_edge_to_center()) +
                                parking_depth_buffer);
     }
   }
 
-  auto *mutable_open_space_end_pose =
+  auto *end_pose =
       frame_->mutable_open_space_info()->mutable_open_space_end_pose();
-  mutable_open_space_end_pose->emplace_back(end_x);
-  mutable_open_space_end_pose->emplace_back(end_y);
+  end_pose->emplace_back(end_x);
+  end_pose->emplace_back(end_y);
   if (parking_inwards) {
-    mutable_open_space_end_pose->emplace_back(parking_spot_heading_);
+    end_pose->emplace_back(parking_spot_heading_);
   } else {
-    mutable_open_space_end_pose->emplace_back(
+    end_pose->emplace_back(
         common::math::NormalizeAngle(parking_spot_heading_ + M_PI));
   }
-  mutable_open_space_end_pose->emplace_back(0.0);
+  // end_pose velocity is set to be zero
+  end_pose->emplace_back(0.0);
 
   // get xy boundary of the ROI
   double x_min = std::min({start_left.x(), start_right.x()});
   double x_max = std::max({end_left.x(), end_right.x()});
   double y_min = std::min({left_down.y(), start_right.y(), start_left.y()});
   double y_max = std::max({left_down.y(), start_right.y(), start_left.y()});
-  auto *mutable_ROI_xy_boundary =
+  auto *xy_boundary =
       frame_->mutable_open_space_info()->mutable_ROI_xy_boundary();
-  mutable_ROI_xy_boundary->emplace_back(x_min);
-  mutable_ROI_xy_boundary->emplace_back(x_max);
-  mutable_ROI_xy_boundary->emplace_back(y_min);
-  mutable_ROI_xy_boundary->emplace_back(y_max);
+  xy_boundary->emplace_back(x_min);
+  xy_boundary->emplace_back(x_max);
+  xy_boundary->emplace_back(y_min);
+  xy_boundary->emplace_back(y_max);
 
   // check if vehicle in range of xy_boundary
   Vec2d vehicle_xy = Vec2d(vehicle_state_.x(), vehicle_state_.y());
