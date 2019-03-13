@@ -25,6 +25,9 @@ routing_header {
 }
 right_of_way_status: PROTECTED
 lane_id {
+  id: "150_1_-1"
+}
+lane_id {
   id: "149_1_-1"
 }
 lane_id {
