@@ -37,6 +37,13 @@ using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 
+// PathBoundPoint contains: (s, l_min, l_max).
+using PathBoundPoint = std::tuple<double, double, double>;
+// PathBoundary contains a vector of PathBoundPoints.
+using PathBoundary = std::vector<PathBoundPoint>;
+// ObstacleEdge contains: (is_start_s, s, l_min, l_max, obstacle_id).
+using ObstacleEdge = std::tuple<int, double, double, double, std::string>;
+
 constexpr double kPathBoundsDeciderHorizon = 100.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
@@ -131,7 +138,7 @@ std::string PathBoundsDecider::GeneratePathBoundaries(
     AERROR << msg;
     return msg;
   }
-  // PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(*path_boundaries);
 
   // 2. Decide a rough boundary based on road info and ADC's position
   if (!GetBoundariesFromLanesAndADC(reference_line_info->reference_line(),
@@ -142,7 +149,7 @@ std::string PathBoundsDecider::GeneratePathBoundaries(
     AERROR << msg;
     return msg;
   }
-  PathBoundsDebugString(path_boundaries);
+  PathBoundsDebugString(*path_boundaries);
 
   // 3. Fine-tune the boundary based on static obstacles
   // TODO(all): in the future, add side-pass functionality.
@@ -154,7 +161,7 @@ std::string PathBoundsDecider::GeneratePathBoundaries(
     AERROR << msg;
     return msg;
   }
-  // PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(*path_boundaries);
 
   // 4. Adjust the boundary considering dynamic obstacles
   // TODO(all): may need to implement this in the future.
@@ -178,7 +185,7 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundaries(
     AERROR << msg;
     return msg;
   }
-  // PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(*path_boundaries);
 
   // 2. Decide a rough boundary based on road info and ADC's position
   if (!GetBoundariesFromLanesAndADC(reference_line_info->reference_line(),
@@ -189,7 +196,7 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundaries(
     AERROR << msg;
     return msg;
   }
-  // PathBoundsDebugString(path_boundaries);
+  // PathBoundsDebugString(*path_boundaries);
 
   ADEBUG << "Completed generating fallback path boundaries.";
   return "";
@@ -730,7 +737,7 @@ std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
 }
 
 std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
-    const double& l_min, const double& l_max,
+    double l_min, double l_max,
     const std::vector<ObstacleEdge>& new_entering_obstacles) {
   std::vector<std::vector<bool>> decisions;
 
@@ -841,12 +848,12 @@ void PathBoundsDecider::TrimPathBounds(
 }
 
 void PathBoundsDecider::PathBoundsDebugString(
-    const PathBoundary* path_boundaries) {
-  for (size_t i = 0; i < path_boundaries->size(); ++i) {
+    const PathBoundary& path_boundaries) {
+  for (size_t i = 0; i < path_boundaries.size(); ++i) {
     ADEBUG << "idx " << i
-           << "; s = " << std::get<0>((*path_boundaries)[i])
-           << "; l_min = " << std::get<1>((*path_boundaries)[i])
-           << "; l_max = " << std::get<2>((*path_boundaries)[i]);
+           << "; s = " << std::get<0>(path_boundaries[i])
+           << "; l_min = " << std::get<1>(path_boundaries[i])
+           << "; l_max = " << std::get<2>(path_boundaries[i]);
   }
 }
 

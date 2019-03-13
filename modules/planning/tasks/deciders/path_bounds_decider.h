@@ -34,13 +34,6 @@
 namespace apollo {
 namespace planning {
 
-// PathBoundPoint contains: (s, l_min, l_max).
-using PathBoundPoint = std::tuple<double, double, double>;
-// PathBoundary contains a vector of PathBoundPoints.
-using PathBoundary = std::vector<PathBoundPoint>;
-// ObstacleEdge contains: (is_start_s, s, l_min, l_max, obstacle_id).
-using ObstacleEdge = std::tuple<int, double, double, double, std::string>;
-
 class PathBoundsDecider : public Decider {
  public:
   explicit PathBoundsDecider(const TaskConfig& config);
@@ -81,15 +74,19 @@ class PathBoundsDecider : public Decider {
   SortObstaclesForSweepLine(
       const IndexedList<std::string, Obstacle>& indexed_obstacles);
 
-  std::vector<PathBoundary> ConstructSubsequentPathBounds(
-      const std::vector<ObstacleEdge>& sorted_obstacles,
+  std::vector<std::vector<std::tuple<double, double, double>>>
+  ConstructSubsequentPathBounds(
+      const std::vector<std::tuple<int, double, double, double, std::string>>&
+      sorted_obstacles,
       size_t path_idx, size_t obs_idx,
       std::unordered_map<std::string, std::tuple<bool, double>>*
-      const obs_id_to_details, PathBoundary* const curr_path_bounds);
+      const obs_id_to_details,
+      std::vector<std::tuple<double, double, double>>* const curr_path_bounds);
 
   std::vector<std::vector<bool>> DecidePassDirections(
-      const double& l_min, const double& l_max,
-      const std::vector<ObstacleEdge>& new_entering_obstacles);
+      double l_min, double l_max,
+      const std::vector<std::tuple<int, double, double, double, std::string>>&
+      new_entering_obstacles);
 
   /**
     * @brief Update the path_boundary at "idx", as well as the new center-line.
@@ -103,13 +100,15 @@ class PathBoundsDecider : public Decider {
     */
   bool UpdatePathBoundaryAndCenterLine(
       size_t idx, double left_bound, double right_bound,
-      PathBoundary* const path_boundaries, double* const center_line);
+      std::vector<std::tuple<double, double, double>>* const path_boundaries,
+      double* const center_line);
 
   void TrimPathBounds(
-      const int path_blocked_idx, PathBoundary* const path_boundaries);
+      const int path_blocked_idx,
+      std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   void PathBoundsDebugString(
-      const PathBoundary* path_boundaries);
+      const std::vector<std::tuple<double, double, double>>& path_boundaries);
 
  private:
   std::string blocking_obstacle_id_ = "";
