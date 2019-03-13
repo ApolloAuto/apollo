@@ -120,6 +120,9 @@ bool PlayTaskProducer::ReadRecordInfo() {
     for (auto& item : channel_info) {
       auto& channel_name = item.first;
       auto& msg_type = item.second.message_type();
+      if(play_param_.black_channels.find(channel_name) != play_param_.black_channels.end()) {
+        continue;
+      }
       msg_types_[channel_name] = msg_type;
 
       if (!play_param_.is_play_all_channels &&
@@ -204,6 +207,9 @@ bool PlayTaskProducer::CreateWriters() {
 
     if (play_param_.is_play_all_channels ||
         play_param_.channels_to_play.count(channel_name) > 0) {
+      if(play_param_.black_channels.find(channel_name) != play_param_.black_channels.end()) {
+        continue;
+      }
       proto::RoleAttributes attr;
       attr.set_channel_name(channel_name);
       attr.set_message_type(msg_type);
