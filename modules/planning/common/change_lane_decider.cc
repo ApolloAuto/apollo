@@ -18,6 +18,8 @@
  * @file
  **/
 
+#include <limits>
+
 #include "modules/planning/common/change_lane_decider.h"
 
 #include "modules/common/time/time.h"
@@ -27,6 +29,7 @@
 namespace apollo {
 namespace planning {
 
+using common::SLPoint;
 using common::time::Clock;
 
 void ChangeLaneDecider::UpdateStatus(ChangeLaneStatus::Status status_code,
@@ -154,6 +157,86 @@ bool ChangeLaneDecider::Apply(
   }
 
   return true;
+}
+
+bool ChangeLaneDecider::IsClearToChangeLane(
+    ReferenceLineInfo* reference_line_info, const double ego_v) {
+  double ego_start_s = reference_line_info->AdcSlBoundary().start_s();
+  double ego_end_s = reference_line_info->AdcSlBoundary().end_s();
+
+  for (auto* obstacle :
+       reference_line_info->path_decision()->obstacles().Items()) {
+    if (obstacle->IsVirtual() || obstacle->IsStatic()) {
+      AERROR << "skip one virtual or static obstacle";
+      continue;
+    }
+
+    double start_s = std::numeric_limits<double>::max();
+    double end_s = -std::numeric_limits<double>::max();
+    double start_l = std::numeric_limits<double>::max();
+    double end_l = -std::numeric_limits<double>::max();
+
+    for (const auto& p : obstacle->PerceptionPolygon().points()) {
+      SLPoint sl_point;
+      reference_line_info->reference_line().XYToSL({p.x(), p.y()}, &sl_point);
+      start_s = std::fmin(start_s, sl_point.s());
+      end_s = std::fmax(end_s, sl_point.s());
+
+      start_l = std::fmin(start_l, sl_point.l());
+      end_l = std::fmax(end_l, sl_point.l());
+    }
+
+    /**
+    AERROR << "has dynamic obstacle";
+    AERROR << "obs start_s:\t" << start_s;
+    AERROR << "obs end_s:\t" << end_s;
+    AERROR << "obs start_l:\t" << start_l;
+    AERROR << "obs end_l:\t" << end_l;
+    AERROR << "obs v:\t" << obstacle->speed();
+    **/
+    if (reference_line_info->IsChangeLanePath()) {
+      constexpr double kLateralShift = 2.5;
+      if (end_l < -kLateralShift || start_l > kLateralShift) {
+        continue;
+      }
+    }
+
+    constexpr double kSafeTime = 3.0;
+    constexpr double kForwardMinSafeDistance = 6.0;
+    constexpr double kBackwardMinSafeDistance = 8.0;
+    constexpr double kDistanceBuffer = 0.5;
+
+    const auto kForwardSafeDistance = std::fmax(
+        kForwardMinSafeDistance, (ego_v - obstacle->speed()) * kSafeTime);
+    const auto kBackwardSafeDistance = std::fmax(
+        kBackwardMinSafeDistance, (obstacle->speed() - ego_v) * kSafeTime);
+    if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance,
+                         kDistanceBuffer, obstacle->IsLaneChangeBlocking()) &&
+        HysteresisFilter(start_s - ego_end_s, kForwardSafeDistance,
+                         kDistanceBuffer, obstacle->IsLaneChangeBlocking())) {
+      reference_line_info->path_decision()
+          ->Find(obstacle->Id())
+          ->SetLaneChangeBlocking(true);
+      AERROR << "Lane Change is blocked by obstacle" << obstacle->Id();
+      return false;
+    } else {
+      reference_line_info->path_decision()
+          ->Find(obstacle->Id())
+          ->SetLaneChangeBlocking(false);
+    }
+  }
+  return true;
+}
+
+bool ChangeLaneDecider::HysteresisFilter(const double obstacle_distance,
+                                         const double safe_distance,
+                                         const double distance_buffer,
+                                         const bool is_obstacle_blocking) {
+  if (is_obstacle_blocking) {
+    return obstacle_distance < safe_distance + distance_buffer;
+  } else {
+    return obstacle_distance < safe_distance - distance_buffer;
+  }
 }
 
 }  // namespace planning

@@ -31,6 +31,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -115,7 +116,7 @@ Stage::StageStatus LaneFollowStage::Process(
   bool has_drivable_reference_line = false;
 
   ADEBUG << "Number of reference lines:\t"
-      << frame->mutable_reference_line_info()->size();
+         << frame->mutable_reference_line_info()->size();
 
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (has_drivable_reference_line) {
@@ -130,8 +131,8 @@ Stage::StageStatus LaneFollowStage::Process(
       if (reference_line_info.IsChangeLanePath()) {
         AERROR << "reference line is lane change ref.";
         if (reference_line_info.Cost() < kStraightForwardLineCost &&
-            IsClearToChangeLane(&reference_line_info, frame,
-                                planning_start_point.v())) {
+            ChangeLaneDecider::IsClearToChangeLane(&reference_line_info,
+                                                   planning_start_point.v())) {
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
           AERROR << "\tclear for lane change";
@@ -312,87 +313,6 @@ SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
       {stop_decision.stop_point().x(), stop_decision.stop_point().y()},
       &sl_point);
   return sl_point;
-}
-
-// a hysteresis filter used to improve decision consistency in lane change
-bool LaneFollowStage::HysteresisFilter(const double obstacle_distance,
-                                       const double safe_distance,
-                                       const double distance_buffer,
-                                       const bool is_obstacle_blocking) {
-  if (is_obstacle_blocking) {
-    return obstacle_distance < safe_distance + distance_buffer;
-  } else {
-    return obstacle_distance < safe_distance - distance_buffer;
-  }
-}
-
-bool LaneFollowStage::IsClearToChangeLane(
-    ReferenceLineInfo* reference_line_info, Frame* frame, const double ego_v) {
-  CHECK(reference_line_info->IsChangeLanePath());
-
-  double ego_start_s = reference_line_info->AdcSlBoundary().start_s();
-  double ego_end_s = reference_line_info->AdcSlBoundary().end_s();
-
-  for (auto* obstacle :
-       reference_line_info->path_decision()->obstacles().Items()) {
-    if (obstacle->IsVirtual() || obstacle->IsStatic()) {
-      AERROR << "skip one virtual or static obstacle";
-      continue;
-    }
-
-    double start_s = std::numeric_limits<double>::max();
-    double end_s = -std::numeric_limits<double>::max();
-    double start_l = std::numeric_limits<double>::max();
-    double end_l = -std::numeric_limits<double>::max();
-
-    for (const auto& p : obstacle->PerceptionPolygon().points()) {
-      SLPoint sl_point;
-      reference_line_info->reference_line().XYToSL({p.x(), p.y()}, &sl_point);
-      start_s = std::fmin(start_s, sl_point.s());
-      end_s = std::fmax(end_s, sl_point.s());
-
-      start_l = std::fmin(start_l, sl_point.l());
-      end_l = std::fmax(end_l, sl_point.l());
-    }
-
-    /**
-    AERROR << "has dynamic obstacle";
-    AERROR << "obs start_s:\t" << start_s;
-    AERROR << "obs end_s:\t" << end_s;
-    AERROR << "obs start_l:\t" << start_l;
-    AERROR << "obs end_l:\t" << end_l;
-    AERROR << "obs v:\t" << obstacle->speed();
-    **/
-
-    constexpr double kLateralShift = 2.5;
-    if (end_l < -kLateralShift || start_l > kLateralShift) {
-      continue;
-    }
-    constexpr double kSafeTime = 3.0;
-    constexpr double kForwardMinSafeDistance = 6.0;
-    constexpr double kBackwardMinSafeDistance = 8.0;
-    constexpr double kDistanceBuffer = 0.5;
-
-    const auto kForwardSafeDistance = std::fmax(
-        kForwardMinSafeDistance, (ego_v - obstacle->speed()) * kSafeTime);
-    const auto kBackwardSafeDistance = std::fmax(
-        kBackwardMinSafeDistance, (obstacle->speed() - ego_v) * kSafeTime);
-    if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance,
-                         kDistanceBuffer, obstacle->IsLaneChangeBlocking()) &&
-        HysteresisFilter(start_s - ego_end_s, kForwardSafeDistance,
-                         kDistanceBuffer, obstacle->IsLaneChangeBlocking())) {
-      reference_line_info->path_decision()
-          ->Find(obstacle->Id())
-          ->SetLaneChangeBlocking(true);
-      AERROR << "Lane Change is blocked by obstacle" << obstacle->Id();
-      return false;
-    } else {
-      reference_line_info->path_decision()
-          ->Find(obstacle->Id())
-          ->SetLaneChangeBlocking(false);
-    }
-  }
-  return true;
 }
 
 }  // namespace lane_follow
