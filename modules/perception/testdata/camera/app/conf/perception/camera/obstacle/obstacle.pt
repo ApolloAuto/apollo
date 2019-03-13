@@ -5,7 +5,7 @@ detector_param {
     root_dir: "/apollo/modules/perception/production/data/perception/camera/models/yolo_obstacle_detector"
     config_file: "config.pt"
   }
-  camera_name : "onsemi_obstacle"
+  camera_name : "front_6mm"
 }
 tracker_param {
   plugin_param{

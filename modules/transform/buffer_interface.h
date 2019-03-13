@@ -130,8 +130,8 @@ class BufferInterface {
   // Transform, advanced api, with pre-allocation
   template <typename T>
   T& transform(const T& in, T& out, const std::string& target_frame,  // NOLINT
-               const cyber::Time& target_time,
-               const std::string& fixed_frame, float timeout = 0.0f) const {
+               const cyber::Time& target_time, const std::string& fixed_frame,
+               float timeout = 0.0f) const {
     // do the transform
     tf2::doTransform(
         in, out,
@@ -143,8 +143,8 @@ class BufferInterface {
   // transform, advanced api, no pre-allocation
   template <typename T>
   T transform(const T& in, const std::string& target_frame,
-              const cyber::Time& target_time,
-              const std::string& fixed_frame, float timeout = 0.0f) const {
+              const cyber::Time& target_time, const std::string& fixed_frame,
+              float timeout = 0.0f) const {
     T out;
     return transform(in, out, target_frame, target_time, fixed_frame, timeout);
   }
@@ -152,8 +152,8 @@ class BufferInterface {
   // Transform, advanced api, different types, with pre-allocation
   template <typename A, typename B>
   B& transform(const A& in, B& out, const std::string& target_frame,  // NOLINT
-               const cyber::Time& target_time,
-               const std::string& fixed_frame, float timeout = 0.0f) const {
+               const cyber::Time& target_time, const std::string& fixed_frame,
+               float timeout = 0.0f) const {
     // do the transform
     A copy = transform(in, target_frame, target_time, fixed_frame, timeout);
     tf2::convert(copy, out);

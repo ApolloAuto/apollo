@@ -4,9 +4,7 @@ The modules of Apollo 3.5 are separately launched from two industrial PCs. This 
 
 ## Software
 
-  - nVidia GTX 1080 Driver
   - Apollo 3.5
-  - Apollo Kernel RT (based upon linux kernel 4.4.32)
   - Linux precision time protocol 
  
 ## Runtime Framework
@@ -161,7 +159,7 @@ There are two steps in the installation process:
 
 # License
 
-  [Apache license](https://github.com/natashadsouza/apollo/blob/master/LICENSE)
+  [Apache license](https://github.com/ApolloAuto/apollo/blob/master/LICENSE)
 
 
 

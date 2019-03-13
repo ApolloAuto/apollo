@@ -17,18 +17,17 @@
 /*
  * @file
  */
-
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
 
 namespace apollo {
 namespace planning {
 
 DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
-    size_t horizon, double ts, Eigen::MatrixXd ego, const Eigen::MatrixXd& xWS,
-    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
-    const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& x0,
-    const Eigen::MatrixXd& xf, const Eigen::MatrixXd& last_time_u,
-    const std::vector<double>& XYbounds,
+    const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+    const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
+    const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
     const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const PlannerOpenSpaceConfig& planner_open_space_config)
@@ -50,6 +49,11 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   horizon_ = static_cast<int>(horizon);
   CHECK(obstacles_num < std::numeric_limits<int>::max())
       << "Invalid cast on obstacles_num in open space planner";
+
+  if (FLAGS_enable_parallel_open_space_smoother) {
+    AINFO << "parallel jacobian ...";
+  }
+
   obstacles_num_ = static_cast<int>(obstacles_num);
   w_ev_ = ego_(1, 0) + ego_(3, 0);
   l_ev_ = ego_(0, 0) + ego_(2, 0);
@@ -101,6 +105,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
       vehicle_param_.max_steer_angle_rate() / vehicle_param_.steer_ratio();
   use_fix_time_ = distance_approach_config_.use_fix_time();
   wheelbase_ = vehicle_param_.wheel_base();
+  enable_constraint_check_ =
+      distance_approach_config_.enable_constraint_check();
 }
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
@@ -110,19 +116,19 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   ADEBUG << "get_nlp_info";
   // n1 : states variables, 4 * (N+1)
   int n1 = 4 * (horizon_ + 1);
-
+  AINFO << "n1: " << n1;
   // n2 : control inputs variables
   int n2 = 2 * horizon_;
-
+  AINFO << "n2: " << n2;
   // n3 : sampling time variables
   int n3 = horizon_ + 1;
-
+  AINFO << "n3: " << n3;
   // n4 : dual multiplier associated with obstacle shape
   lambda_horizon_ = obstacles_edges_num_.sum() * (horizon_ + 1);
-
+  AINFO << "lambda_horizon_: " << lambda_horizon_;
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
   miu_horizon_ = obstacles_num_ * 4 * (horizon_ + 1);
-
+  AINFO << "miu_horizon_: " << miu_horizon_;
   // m1 : dynamics constatins
   int m1 = 4 * horizon_;
 
@@ -385,7 +391,7 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
   ADEBUG << "get_starting_point";
-  CHECK(init_x == true) << "Warm start init_x setting failed";
+  CHECK(init_x) << "Warm start init_x setting failed";
 
   CHECK_EQ(horizon_, uWS_.cols());
   CHECK_EQ(horizon_ + 1, xWS_.cols());
@@ -407,7 +413,8 @@ bool DistanceApproachIPOPTInterface::get_starting_point(
 
   // 2. time scale variable initialization, horizon_ + 1
   for (int i = 0; i < horizon_ + 1; ++i) {
-    x[time_start_index_ + i] = 0.5;
+    x[time_start_index_ + i] =
+        0.5 * (min_time_sample_scaling_ + max_time_sample_scaling_);
   }
 
   // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
@@ -437,13 +444,127 @@ bool DistanceApproachIPOPTInterface::eval_f(int n, const double* x, bool new_x,
 
 bool DistanceApproachIPOPTInterface::eval_grad_f(int n, const double* x,
                                                  bool new_x, double* grad_f) {
-  gradient(tag_f, n, x, grad_f);
+  if (distance_approach_config_.enable_hand_derivative()) {
+    eval_grad_f_hand(n, x, new_x, grad_f);
+    if (distance_approach_config_.enable_derivative_check()) {
+      // check gradients
+      int kN = n;
+      double grad_f_check[kN];
+      std::fill(grad_f_check, grad_f_check + n, 0.0);
+      gradient(tag_f, n, x, grad_f_check);
+      double delta_v = 1e-6;
+      for (int i = 0; i < n; ++i) {
+        if (std::abs(grad_f_check[i] - grad_f[i]) > delta_v) {
+          AERROR << "cost gradient not match at: " << i
+                 << ", grad by hand: " << grad_f[i]
+                 << ", grad by adolc: " << grad_f_check[i];
+        }
+      }
+    }
+  } else {
+    gradient(tag_f, n, x, grad_f);
+  }
+  return true;
+}
+
+bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
+                                                      bool new_x,
+                                                      double* grad_f) {
+  ADEBUG << "eval_grad_f by hand";
+  // Objective is from eval_f:
+  // min control inputs
+  // min input rate
+  // min time (if the time step is not fixed)
+  // regularization wrt warm start trajectory
+  DCHECK(ts_ != 0) << "ts in distance_approach_ is 0";
+  int control_index = control_start_index_;
+  int time_index = time_start_index_;
+  int state_index = state_start_index_;
+
+  if (grad_f == NULL) {
+    AERROR << "grad_f pt is nullptr";
+    return false;
+  } else {
+    std::fill(grad_f, grad_f + n, 0.0);
+    // 1. objective to minimize state diff to warm up
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      grad_f[state_index] +=
+          2 * weight_state_x_ * (x[state_index] - xWS_(0, i));
+      grad_f[state_index + 1] +=
+          2 * weight_state_y_ * (x[state_index + 1] - xWS_(1, i));
+      grad_f[state_index + 2] +=
+          2 * weight_state_phi_ * (x[state_index + 2] - xWS_(2, i));
+      grad_f[state_index + 3] = 2 * weight_state_v_ * x[state_index + 3];
+      state_index += 4;
+    }
+
+    // 2. objective to minimize u square
+    for (int i = 0; i < horizon_; ++i) {
+      grad_f[control_index] += 2 * weight_input_steer_ * x[control_index];
+      grad_f[control_index + 1] += 2 * weight_input_a_ * x[control_index + 1];
+      control_index += 2;
+    }
+
+    // 3. objective to minimize input change rate for first horizon
+    // assume: x[time_index] > 0
+    control_index = control_start_index_;
+    double last_time_steer_rate =
+        (x[control_index] - last_time_u_(0, 0)) / x[time_index] / ts_;
+    double last_time_a_rate =
+        (x[control_index + 1] - last_time_u_(1, 0)) / x[time_index] / ts_;
+
+    grad_f[control_index] += 2.0 * last_time_steer_rate *
+                             (weight_stitching_steer_ / x[time_index] / ts_);
+    grad_f[control_index + 1] +=
+        2.0 * last_time_a_rate * (weight_stitching_a_ / x[time_index] / ts_);
+    grad_f[time_index] +=
+        -2.0 *
+        (weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
+         weight_stitching_a_ * last_time_a_rate * last_time_a_rate) /
+        x[time_index];
+
+    // 4. objective to minimize input change rates, [0- horizon_ -2]
+    // assume: x[time_index] > 0
+    time_index++;
+    for (int i = 0; i < horizon_ - 1; ++i) {
+      double steering_rate =
+          (x[control_index + 2] - x[control_index]) / x[time_index] / ts_;
+      grad_f[control_index + 2] +=
+          2.0 * steering_rate * (weight_rate_steer_ / x[time_index] / ts_);
+      grad_f[control_index] +=
+          -2.0 * steering_rate * (weight_rate_steer_ / x[time_index] / ts_);
+      grad_f[time_index] += -2.0 * weight_rate_steer_ * steering_rate *
+                            steering_rate / x[time_index];
+
+      double a_rate =
+          (x[control_index + 3] - x[control_index + 1]) / x[time_index] / ts_;
+      grad_f[control_index + 3] +=
+          2.0 * a_rate * (weight_rate_a_ / x[time_index] / ts_);
+      grad_f[control_index + 1] +=
+          -2.0 * a_rate * (weight_rate_a_ / x[time_index] / ts_);
+      grad_f[time_index] +=
+          -2.0 * weight_rate_a_ * a_rate * a_rate / x[time_index];
+
+      control_index += 2;
+      time_index++;
+    }
+
+    // 5. objective to minimize total time [0, horizon_]
+    time_index = time_start_index_;
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      grad_f[time_index] += weight_first_order_time_ +
+                            2.0 * weight_second_order_time_ * x[time_index];
+      time_index++;
+    }
+  }
+
   return true;
 }
 
 bool DistanceApproachIPOPTInterface::eval_g(int n, const double* x, bool new_x,
                                             int m, double* g) {
   eval_constraints(n, x, m, g);
+  if (enable_constraint_check_) check_g(n, x, m, g);
   return true;
 }
 
@@ -451,6 +572,888 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                                                 bool new_x, int m, int nele_jac,
                                                 int* iRow, int* jCol,
                                                 double* values) {
+  if (!FLAGS_enable_parallel_open_space_smoother) {
+    return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
+  } else {
+    return eval_jac_g_par(n, x, new_x, m, nele_jac, iRow, jCol, values);
+  }
+}
+
+bool DistanceApproachIPOPTInterface::eval_jac_g_par(int n, const double* x,
+                                                    bool new_x, int m,
+                                                    int nele_jac, int* iRow,
+                                                    int* jCol, double* values) {
+  ADEBUG << "eval_jac_g";
+  CHECK_EQ(n, num_of_variables_)
+      << "No. of variables wrong in eval_jac_g. n : " << n;
+  CHECK_EQ(m, num_of_constraints_)
+      << "No. of constraints wrong in eval_jac_g. n : " << m;
+
+  if (values == nullptr) {
+    int nz_index = 0;
+    int constraint_index = 0;
+    int state_index = state_start_index_;
+    int control_index = control_start_index_;
+    int time_index = time_start_index_;
+
+    // 1. State Constraint with respect to variables
+    for (int i = 0; i < horizon_; ++i) {
+      // g(0)' with respect to x0 ~ x7
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = state_index;
+      ++nz_index;
+
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = state_index + 2;
+      ++nz_index;
+
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = state_index + 3;
+      ++nz_index;
+
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = state_index + 4;
+      ++nz_index;
+
+      // g(0)' with respect to u0 ~ u1'
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = control_index;
+      ++nz_index;
+
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = control_index + 1;
+      ++nz_index;
+
+      // g(0)' with respect to time
+      iRow[nz_index] = state_index;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // g(1)' with respect to x0 ~ x7
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = state_index + 1;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = state_index + 2;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = state_index + 3;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = state_index + 5;
+      ++nz_index;
+
+      // g(1)' with respect to u0 ~ u1'
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = control_index;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = control_index + 1;
+      ++nz_index;
+
+      // g(1)' with respect to time
+      iRow[nz_index] = state_index + 1;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // g(2)' with respect to x0 ~ x7
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = state_index + 2;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = state_index + 3;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = state_index + 6;
+      ++nz_index;
+
+      // g(2)' with respect to u0 ~ u1'
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = control_index;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = control_index + 1;
+      ++nz_index;
+
+      // g(2)' with respect to time
+      iRow[nz_index] = state_index + 2;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // g(3)'  with x0 ~ x7
+      iRow[nz_index] = state_index + 3;
+      jCol[nz_index] = state_index + 3;
+      ++nz_index;
+
+      iRow[nz_index] = state_index + 3;
+      jCol[nz_index] = state_index + 7;
+      ++nz_index;
+
+      // g(3)' with respect to u0 ~ u1'
+      iRow[nz_index] = state_index + 3;
+      jCol[nz_index] = control_index + 1;
+      ++nz_index;
+
+      // g(3)' with respect to time
+      iRow[nz_index] = state_index + 3;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      state_index += 4;
+      control_index += 2;
+      time_index++;
+      constraint_index += 4;
+    }
+
+    // 2. only have control rate constraints on u0 , range [0, horizon_-1]
+    control_index = control_start_index_;
+    state_index = state_start_index_;
+    time_index = time_start_index_;
+
+    // First one, with respect to u(0, 0)
+    iRow[nz_index] = constraint_index;
+    jCol[nz_index] = control_index;
+    ++nz_index;
+
+    // First element, with respect to time
+    iRow[nz_index] = constraint_index;
+    jCol[nz_index] = time_index;
+    ++nz_index;
+
+    control_index += 2;
+    time_index++;
+    constraint_index++;
+
+    for (int i = 1; i < horizon_; ++i) {
+      // with respect to u(0, i-1)
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = control_index - 2;
+      ++nz_index;
+
+      // with respect to u(0, i)
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = control_index;
+      ++nz_index;
+
+      // with respect to time
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // only consider rate limits on u0
+      control_index += 2;
+      constraint_index++;
+      time_index++;
+    }
+
+    // 3. Time constraints [0, horizon_ -1]
+    time_index = time_start_index_;
+
+    for (int i = 0; i < horizon_; ++i) {
+      // with respect to timescale(0, i-1)
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = time_index;
+      ++nz_index;
+
+      // with respect to timescale(0, i)
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = time_index + 1;
+      ++nz_index;
+
+      time_index++;
+      constraint_index++;
+    }
+
+    // 4. Three obstacles related equal constraints, one equality constraints,
+    // [0, horizon_] * [0, obstacles_num_-1] * 4
+    state_index = state_start_index_;
+    int l_index = l_start_index_;
+    int n_index = n_start_index_;
+
+#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
+    for (int iter = 0; iter < (horizon_ + 1) * obstacles_num_; iter++) {
+      int i = iter / obstacles_num_;
+      int j = iter % obstacles_num_;
+      int current_edges_num = obstacles_edges_num_(j, 0);
+      int nz_index_tmp = nz_index;
+      int l_index_tmp = l_index;
+      // count nz_len
+      for (int jj = 0; jj < obstacles_num_; ++jj) {
+        if (jj < j) {
+          nz_index_tmp += 4 * (i + 1) * obstacles_edges_num_(jj, 0);
+          nz_index_tmp += 13 * (i + 1);
+          l_index_tmp += (i + 1) * obstacles_edges_num_(jj, 0);
+        } else {
+          nz_index_tmp += 4 * i * obstacles_edges_num_(jj, 0);
+          nz_index_tmp += 13 * i;
+          l_index_tmp += i * obstacles_edges_num_(jj, 0);
+        }
+      }
+      int n_index_tmp = n_index + (i * obstacles_num_ + j) * 4;
+      int constraint_index_tmp =
+          constraint_index + (i * obstacles_num_ + j) * 4;
+      int state_index_tmp = state_index + i * 4;
+
+      // 1. norm(A* lambda == 1)
+      for (int k = 0; k < current_edges_num; ++k) {
+        // with respect to l
+        iRow[nz_index_tmp] = constraint_index_tmp;
+        jCol[nz_index_tmp] = l_index_tmp + k;
+        ++nz_index_tmp;  // current_edges_num
+      }
+
+      // 2. G' * mu + R' * lambda == 0, part 1
+      // With respect to x
+      iRow[nz_index_tmp] = constraint_index_tmp + 1;
+      jCol[nz_index_tmp] = state_index_tmp + 2;
+      ++nz_index_tmp;  // 1
+
+      // with respect to l
+      for (int k = 0; k < current_edges_num; ++k) {
+        iRow[nz_index_tmp] = constraint_index_tmp + 1;
+        jCol[nz_index_tmp] = l_index_tmp + k;
+        ++nz_index_tmp;  // current_edges_num
+      }
+
+      // With respect to n
+      iRow[nz_index_tmp] = constraint_index_tmp + 1;
+      jCol[nz_index_tmp] = n_index_tmp;
+      ++nz_index_tmp;  // 1
+
+      iRow[nz_index_tmp] = constraint_index_tmp + 1;
+      jCol[nz_index_tmp] = n_index_tmp + 2;
+      ++nz_index_tmp;  // 1
+
+      // 2. G' * mu + R' * lambda == 0, part 2
+      // With respect to x
+      iRow[nz_index_tmp] = constraint_index_tmp + 2;
+      jCol[nz_index_tmp] = state_index_tmp + 2;
+      ++nz_index_tmp;  // 1
+
+      // with respect to l
+      for (int k = 0; k < current_edges_num; ++k) {
+        iRow[nz_index_tmp] = constraint_index_tmp + 2;
+        jCol[nz_index_tmp] = l_index_tmp + k;
+        ++nz_index_tmp;  // current_edges_num
+      }
+
+      // With respect to n
+      iRow[nz_index_tmp] = constraint_index_tmp + 2;
+      jCol[nz_index_tmp] = n_index_tmp + 1;
+      ++nz_index_tmp;  // 1
+
+      iRow[nz_index_tmp] = constraint_index_tmp + 2;
+      jCol[nz_index_tmp] = n_index_tmp + 3;
+      ++nz_index_tmp;  // 1
+
+      // 3. -g'*mu + (A*t - b)*lambda > 0
+      // With respect to x
+      iRow[nz_index_tmp] = constraint_index_tmp + 3;
+      jCol[nz_index_tmp] = state_index_tmp;
+      ++nz_index_tmp;  // 1
+
+      iRow[nz_index_tmp] = constraint_index_tmp + 3;
+      jCol[nz_index_tmp] = state_index_tmp + 1;
+      ++nz_index_tmp;  // 1
+
+      iRow[nz_index_tmp] = constraint_index_tmp + 3;
+      jCol[nz_index_tmp] = state_index_tmp + 2;
+      ++nz_index_tmp;  // 1
+
+      // with respect to l
+      for (int k = 0; k < current_edges_num; ++k) {
+        iRow[nz_index_tmp] = constraint_index_tmp + 3;
+        jCol[nz_index_tmp] = l_index_tmp + k;
+        ++nz_index_tmp;  // current_edges_num
+      }
+
+      // with respect to n
+      for (int k = 0; k < 4; ++k) {
+        iRow[nz_index_tmp] = constraint_index_tmp + 3;
+        jCol[nz_index_tmp] = n_index_tmp + k;
+        ++nz_index_tmp;  // 4
+      }
+    }
+    // update index
+    for (int jj = 0; jj < obstacles_num_; ++jj) {
+      nz_index += 4 * (horizon_ + 1) * obstacles_edges_num_(jj, 0);
+      nz_index += 13 * (horizon_ + 1);
+    }
+    constraint_index += 4 * (horizon_ + 1) * obstacles_num_;
+    state_index += 4 * (horizon_ + 1);
+
+    // 5. load variable bounds as constraints
+    state_index = state_start_index_;
+    control_index = control_start_index_;
+    time_index = time_start_index_;
+    l_index = l_start_index_;
+    n_index = n_start_index_;
+
+    // start configuration
+    iRow[nz_index] = constraint_index;
+    jCol[nz_index] = state_index;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 1;
+    jCol[nz_index] = state_index + 1;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 2;
+    jCol[nz_index] = state_index + 2;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 3;
+    jCol[nz_index] = state_index + 3;
+    nz_index++;
+    constraint_index += 4;
+    state_index += 4;
+
+    for (int i = 1; i < horizon_; ++i) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = state_index;
+      nz_index++;
+      iRow[nz_index] = constraint_index + 1;
+      jCol[nz_index] = state_index + 1;
+      nz_index++;
+      iRow[nz_index] = constraint_index + 2;
+      jCol[nz_index] = state_index + 3;
+      nz_index++;
+      constraint_index += 3;
+      state_index += 4;
+    }
+
+    // end configuration
+    iRow[nz_index] = constraint_index;
+    jCol[nz_index] = state_index;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 1;
+    jCol[nz_index] = state_index + 1;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 2;
+    jCol[nz_index] = state_index + 2;
+    nz_index++;
+    iRow[nz_index] = constraint_index + 3;
+    jCol[nz_index] = state_index + 3;
+    nz_index++;
+    constraint_index += 4;
+    state_index += 4;
+
+    for (int i = 0; i < horizon_; ++i) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = control_index;
+      nz_index++;
+      iRow[nz_index] = constraint_index + 1;
+      jCol[nz_index] = control_index + 1;
+      nz_index++;
+      constraint_index += 2;
+      control_index += 2;
+    }
+
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = time_index;
+      nz_index++;
+      constraint_index++;
+      time_index++;
+    }
+
+    for (int i = 0; i < lambda_horizon_; ++i) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = l_index;
+      nz_index++;
+      constraint_index++;
+      l_index++;
+    }
+
+    for (int i = 0; i < miu_horizon_; ++i) {
+      iRow[nz_index] = constraint_index;
+      jCol[nz_index] = n_index;
+      nz_index++;
+      constraint_index++;
+      n_index++;
+    }
+
+    CHECK_EQ(nz_index, static_cast<int>(nele_jac));
+    CHECK_EQ(constraint_index, static_cast<int>(m));
+  } else {
+    std::fill(values, values + nele_jac, 0.0);
+    int nz_index = 0;
+
+    int time_index = time_start_index_;
+    int state_index = state_start_index_;
+    int control_index = control_start_index_;
+    // TODO(QiL) : initially implemented to be debug friendly, later iterate
+    // towards better efficiency
+    // 1. state constraints 4 * [0, horizons-1]
+    for (int i = 0; i < horizon_; ++i) {
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          x[time_index] * ts_ *
+          (x[state_index + 3] +
+           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          std::sin(x[state_index + 2] +
+                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                       std::tan(x[control_index]) / wheelbase_);  // a.
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (x[time_index] * ts_ *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_) +
+           x[time_index] * ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               (-1) * x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) /
+               wheelbase_ *
+               std::sin(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_));  // b
+      ++nz_index;
+
+      values[nz_index] = 1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          x[time_index] * ts_ *
+          (x[state_index + 3] +
+           x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+          std::sin(x[state_index + 2] +
+                   x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                       std::tan(x[control_index]) / wheelbase_) *
+          x[time_index] * ts_ * 0.5 * x[state_index + 3] /
+          (std::cos(x[control_index]) * std::cos(x[control_index])) /
+          wheelbase_;  // c
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
+                  std::cos(x[state_index + 2] +
+                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                               std::tan(x[control_index]) / wheelbase_));  // d
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_) +
+           x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_) -
+           x[time_index] * ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) /
+               wheelbase_ *
+               std::sin(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_));  // e
+      ++nz_index;
+
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ *
+                  (x[state_index + 3] +
+                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+                  std::cos(x[state_index + 2] +
+                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                               std::tan(x[control_index]) / wheelbase_));  // f.
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (x[time_index] * ts_ *
+               std::sin(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_) +
+           x[time_index] * ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[time_index] * ts_ * 0.5 * std::tan(x[control_index]) /
+               wheelbase_ *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_));  // g
+      ++nz_index;
+
+      values[nz_index] = 1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ *
+                  (x[state_index + 3] +
+                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+                  std::cos(x[state_index + 2] +
+                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                               std::tan(x[control_index]) / wheelbase_) *
+                  x[time_index] * ts_ * 0.5 * x[state_index + 3] /
+                  (std::cos(x[control_index]) * std::cos(x[control_index])) /
+                  wheelbase_);  // h
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
+                  std::sin(x[state_index + 2] +
+                           x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                               std::tan(x[control_index]) / wheelbase_));  // i
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 *
+          (ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               std::sin(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_) +
+           x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
+               std::sin(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_) +
+           x[time_index] * ts_ *
+               (x[state_index + 3] +
+                x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+               x[state_index + 3] * ts_ * 0.5 * std::tan(x[control_index]) /
+               wheelbase_ *
+               std::cos(x[state_index + 2] +
+                        x[time_index] * ts_ * 0.5 * x[state_index + 3] *
+                            std::tan(x[control_index]) / wheelbase_));  // j
+      ++nz_index;
+
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      values[nz_index] = -1.0 * x[time_index] * ts_ *
+                         std::tan(x[control_index]) / wheelbase_;  // k.
+      ++nz_index;
+
+      values[nz_index] = 1.0;
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ *
+                  (x[state_index + 3] +
+                   x[time_index] * ts_ * 0.5 * x[control_index + 1]) /
+                  (std::cos(x[control_index]) * std::cos(x[control_index])) /
+                  wheelbase_);  // l.
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (x[time_index] * ts_ * x[time_index] * ts_ * 0.5 *
+                  std::tan(x[control_index]) / wheelbase_);  // m.
+      ++nz_index;
+
+      values[nz_index] =
+          -1.0 * (ts_ *
+                      (x[state_index + 3] +
+                       x[time_index] * ts_ * 0.5 * x[control_index + 1]) *
+                      std::tan(x[control_index]) / wheelbase_ +
+                  x[time_index] * ts_ * ts_ * 0.5 * x[control_index + 1] *
+                      std::tan(x[control_index]) / wheelbase_);  // n.
+      ++nz_index;
+
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      values[nz_index] = 1.0;
+      ++nz_index;
+
+      values[nz_index] = -1.0 * ts_ * x[time_index];  // o.
+      ++nz_index;
+
+      values[nz_index] = -1.0 * ts_ * x[control_index + 1];  // p.
+      ++nz_index;
+
+      state_index += 4;
+      control_index += 2;
+      time_index++;
+    }
+
+    // 2. control rate constraints 1 * [0, horizons-1]
+    control_index = control_start_index_;
+    state_index = state_start_index_;
+    time_index = time_start_index_;
+
+    // First horizon
+
+    // with respect to u(0, 0)
+    values[nz_index] = 1.0 / x[time_index] / ts_;  // q
+    ++nz_index;
+
+    // with respect to time
+    values[nz_index] = -1.0 * (x[control_index] - last_time_u_(0, 0)) /
+                       x[time_index] / x[time_index] / ts_;
+    ++nz_index;
+    time_index++;
+    control_index += 2;
+
+    for (int i = 1; i < horizon_; ++i) {
+      // with respect to u(0, i-1)
+
+      values[nz_index] = -1.0 / x[time_index] / ts_;
+      ++nz_index;
+
+      // with respect to u(0, i)
+      values[nz_index] = 1.0 / x[time_index] / ts_;
+      ++nz_index;
+
+      // with respect to time
+      values[nz_index] = -1.0 * (x[control_index] - x[control_index - 2]) /
+                         x[time_index] / x[time_index] / ts_;
+      ++nz_index;
+
+      control_index += 2;
+      time_index++;
+    }
+
+    ADEBUG << "After fulfilled control rate constraints derivative, nz_index : "
+           << nz_index << " nele_jac : " << nele_jac;
+
+    // 3. Time constraints [0, horizon_ -1]
+    time_index = time_start_index_;
+    for (int i = 0; i < horizon_; ++i) {
+      // with respect to timescale(0, i-1)
+      values[nz_index] = -1.0;
+      ++nz_index;
+
+      // with respect to timescale(0, i)
+      values[nz_index] = 1.0;
+      ++nz_index;
+
+      time_index++;
+    }
+
+    ADEBUG << "After fulfilled time constraints derivative, nz_index : "
+           << nz_index << " nele_jac : " << nele_jac;
+
+    // 4. Three obstacles related equal constraints, one equality constraints,
+    // [0, horizon_] * [0, obstacles_num_-1] * 4
+
+    state_index = state_start_index_;
+    int l_index = l_start_index_;
+    int n_index = n_start_index_;
+
+#pragma omp parallel for schedule(dynamic, 1) num_threads(4)
+    for (int iter = 0; iter < (horizon_ + 1) * obstacles_num_; iter++) {
+      int i = iter / obstacles_num_;
+      int j = iter % obstacles_num_;
+
+      int current_edges_num = obstacles_edges_num_(j, 0);
+      int edges_counter = 0;
+      int nz_index_tmp = nz_index;
+      int l_index_tmp = l_index;
+
+      // count nz_len
+      for (int jj = 0; jj < obstacles_num_; ++jj) {
+        if (jj < j) {
+          nz_index_tmp += 4 * (i + 1) * obstacles_edges_num_(jj, 0);
+          nz_index_tmp += 13 * (i + 1);
+          l_index_tmp += (i + 1) * obstacles_edges_num_(jj, 0);
+          edges_counter += obstacles_edges_num_(jj, 0);
+        } else {
+          nz_index_tmp += 4 * i * obstacles_edges_num_(jj, 0);
+          nz_index_tmp += 13 * i;
+          l_index_tmp += i * obstacles_edges_num_(jj, 0);
+        }
+      }
+      int n_index_tmp = n_index + (i * obstacles_num_ + j) * 4;
+      int state_index_tmp = state_index + i * 4;
+
+      Eigen::MatrixXd Aj =
+          obstacles_A_.block(edges_counter, 0, current_edges_num, 2);
+      Eigen::MatrixXd bj =
+          obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
+
+      // TODO(QiL) : Remove redudant calculation
+      double tmp1 = 0;
+      double tmp2 = 0;
+      for (int k = 0; k < current_edges_num; ++k) {
+        // TODO(QiL) : replace this one directly with x
+        tmp1 += Aj(k, 0) * x[l_index_tmp + k];
+        tmp2 += Aj(k, 1) * x[l_index_tmp + k];
+      }
+
+      // 1. norm(A* lambda == 1)
+      for (int k = 0; k < current_edges_num; ++k) {
+        // with respect to l
+        values[nz_index_tmp] =
+            2 * tmp1 * Aj(k, 0) + 2 * tmp2 * Aj(k, 1);  // t0~tk
+        ++nz_index_tmp;                                 // current_edges_num
+      }
+
+      // 2. G' * mu + R' * lambda == 0, part 1
+      // With respect to x
+      values[nz_index_tmp] = -std::sin(x[state_index_tmp + 2]) * tmp1 +
+                             std::cos(x[state_index_tmp + 2]) * tmp2;  // u
+      ++nz_index_tmp;                                                  // 1
+
+      // with respect to l
+      for (int k = 0; k < current_edges_num; ++k) {
+        values[nz_index_tmp] =
+            std::cos(x[state_index_tmp + 2]) * Aj(k, 0) +
+            std::sin(x[state_index_tmp + 2]) * Aj(k, 1);  // v0~vn
+        ++nz_index_tmp;                                   // current_edges_num
+      }
+
+      // With respect to n
+      values[nz_index_tmp] = 1.0;  // w0
+      ++nz_index_tmp;              // 1
+
+      values[nz_index_tmp] = -1.0;  // w2
+      ++nz_index_tmp;               // 1
+
+      // 3. G' * mu + R' * lambda == 0, part 2
+      // With respect to x
+      values[nz_index_tmp] = -std::cos(x[state_index_tmp + 2]) * tmp1 -
+                             std::sin(x[state_index_tmp + 2]) * tmp2;  // x
+      ++nz_index_tmp;                                                  // 1
+
+      // with respect to l
+      for (int k = 0; k < current_edges_num; ++k) {
+        values[nz_index_tmp] =
+            -std::sin(x[state_index_tmp + 2]) * Aj(k, 0) +
+            std::cos(x[state_index_tmp + 2]) * Aj(k, 1);  // y0~yn
+        ++nz_index_tmp;                                   // current_edges_num
+      }
+
+      // With respect to n
+      values[nz_index_tmp] = 1.0;  // z1
+      ++nz_index_tmp;              // 1
+
+      values[nz_index_tmp] = -1.0;  // z3
+      ++nz_index_tmp;               // 1
+
+      //  3. -g'*mu + (A*t - b)*lambda > 0
+      double tmp3 = 0.0;
+      double tmp4 = 0.0;
+      for (int k = 0; k < 4; ++k) {
+        tmp3 += -g_[k] * x[n_index_tmp + k];
+      }
+
+      for (int k = 0; k < current_edges_num; ++k) {
+        tmp4 += bj(k, 0) * x[l_index_tmp + k];
+      }
+
+      // With respect to x
+      values[nz_index_tmp] = tmp1;  // aa1
+      ++nz_index_tmp;               // 1
+
+      values[nz_index_tmp] = tmp2;  // bb1
+      ++nz_index_tmp;               // 1
+
+      values[nz_index_tmp] =
+          -std::sin(x[state_index_tmp + 2]) * offset_ * tmp1 +
+          std::cos(x[state_index_tmp + 2]) * offset_ * tmp2;  // cc1
+      ++nz_index_tmp;                                         // 1
+
+      // with respect to l
+      for (int k = 0; k < current_edges_num; ++k) {
+        values[nz_index_tmp] =
+            (x[state_index_tmp] + std::cos(x[state_index_tmp + 2]) * offset_) *
+                Aj(k, 0) +
+            (x[state_index_tmp + 1] +
+             std::sin(x[state_index_tmp + 2]) * offset_) *
+                Aj(k, 1) -
+            bj(k, 0);    // ddk
+        ++nz_index_tmp;  // current_edges_num
+      }
+
+      // with respect to n
+      for (int k = 0; k < 4; ++k) {
+        values[nz_index_tmp] = -g_[k];  // eek
+        ++nz_index_tmp;                 // 4
+      }
+    }
+    // update index
+    for (int jj = 0; jj < obstacles_num_; ++jj) {
+      nz_index += 4 * (horizon_ + 1) * obstacles_edges_num_(jj, 0);
+      nz_index += 13 * (horizon_ + 1);
+    }
+
+    // 5. load variable bounds as constraints
+    state_index = state_start_index_;
+    control_index = control_start_index_;
+    time_index = time_start_index_;
+    l_index = l_start_index_;
+    n_index = n_start_index_;
+
+    // start configuration
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+
+    for (int i = 1; i < horizon_; ++i) {
+      values[nz_index] = 1.0;
+      nz_index++;
+      values[nz_index] = 1.0;
+      nz_index++;
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
+    // end configuration
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+    values[nz_index] = 1.0;
+    nz_index++;
+
+    for (int i = 0; i < horizon_; ++i) {
+      values[nz_index] = 1.0;
+      nz_index++;
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
+    for (int i = 0; i < lambda_horizon_; ++i) {
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
+    for (int i = 0; i < miu_horizon_; ++i) {
+      values[nz_index] = 1.0;
+      nz_index++;
+    }
+
+    ADEBUG << "eval_jac_g, fulfilled obstacle constraint values";
+    CHECK_EQ(nz_index, static_cast<int>(nele_jac));
+  }
+
+  ADEBUG << "eval_jac_g done";
+  return true;
+}  // NOLINT
+
+bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
+                                                    bool new_x, int m,
+                                                    int nele_jac, int* iRow,
+                                                    int* jCol, double* values) {
   ADEBUG << "eval_jac_g";
   CHECK_EQ(n, num_of_variables_)
       << "No. of variables wrong in eval_jac_g. n : " << n;
@@ -1294,7 +2297,10 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
     // triangle only
 
     obj_lam[0] = obj_factor;
-    for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
+
+    for (int idx = 0; idx < m; idx++) {
+      obj_lam[1 + idx] = lambda[idx];
+    }
 
     set_param_vec(tag_L, m + 1, obj_lam);
     sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
@@ -1380,6 +2386,57 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   *time_result = time_result_;
   *dual_l_result = dual_l_result_;
   *dual_n_result = dual_n_result_;
+
+  if (!distance_approach_config_.enable_initial_final_check()) return;
+  CHECK_EQ(state_result_.cols(), xWS_.cols());
+  CHECK_EQ(state_result_.rows(), xWS_.rows());
+  double state_diff_max = 0.0;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      state_diff_max =
+          std::max(std::abs(xWS_(j, i) - state_result_(j, i)), state_diff_max);
+    }
+  }
+
+  // 2. control variable initialization, 2 * horizon_
+  // CHECK_EQ(control_result_.cols(), uWS_.cols());
+  CHECK_EQ(control_result_.rows(), uWS_.rows());
+  double control_diff_max = 0.0;
+  for (int i = 0; i < horizon_; ++i) {
+    control_diff_max = std::max(std::abs(uWS_(0, i) - control_result_(0, i)),
+                                control_diff_max);
+    control_diff_max = std::max(std::abs(uWS_(1, i) - control_result_(1, i)),
+                                control_diff_max);
+  }
+
+  // 2. time scale variable initialization, horizon_ + 1, no
+
+  // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
+  CHECK_EQ(dual_l_result_.cols(), l_warm_up_.cols());
+  CHECK_EQ(dual_l_result_.rows(), l_warm_up_.rows());
+  double l_diff_max = 0.0;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < obstacles_edges_sum_; ++j) {
+      l_diff_max = std::max(std::abs(l_warm_up_(j, i) - dual_l_result_(j, i)),
+                            l_diff_max);
+    }
+  }
+
+  // 4. lagrange constraint m, 4*obstacles_num * (horizon_+1)
+  CHECK_EQ(n_warm_up_.cols(), dual_n_result_.cols());
+  CHECK_EQ(n_warm_up_.rows(), dual_n_result_.rows());
+  double n_diff_max = 0.0;
+  for (int i = 0; i < horizon_ + 1; ++i) {
+    for (int j = 0; j < 4 * obstacles_num_; ++j) {
+      n_diff_max = std::max(std::abs(n_warm_up_(j, i) - dual_n_result_(j, i)),
+                            n_diff_max);
+    }
+  }
+
+  AINFO << "state_diff_max: " << state_diff_max;
+  AINFO << "control_diff_max: " << control_diff_max;
+  AINFO << "dual_l_diff_max: " << l_diff_max;
+  AINFO << "dual_n_diff_max: " << n_diff_max;
 }
 
 //***************    start ADOL-C part ***********************************
@@ -1555,7 +2612,6 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
 
   // 4. Three obstacles related equal constraints, one equality constraints,
   // [0, horizon_] * [0, obstacles_num_-1] * 4
-
   state_index = state_start_index_;
   int l_index = l_start_index_;
   int n_index = n_start_index_;
@@ -1676,6 +2732,83 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   return true;
 }
 
+bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
+                                             double* g) {
+  int kN = n;
+  int kM = m;
+  double x_u_tmp[kN];
+  double x_l_tmp[kN];
+  double g_u_tmp[kM];
+  double g_l_tmp[kM];
+
+  get_bounds_info(n, x_l_tmp, x_u_tmp, m, g_l_tmp, g_u_tmp);
+
+  double delta_v = 1e-4;
+  for (int idx = 0; idx < n; ++idx) {
+    x_u_tmp[idx] = x_u_tmp[idx] + delta_v;
+    x_l_tmp[idx] = x_l_tmp[idx] - delta_v;
+    if (x[idx] > x_u_tmp[idx] || x[idx] < x_l_tmp[idx]) {
+      AINFO << "x idx unfeasible: " << idx << ", x: " << x[idx]
+            << ", lower: " << x_l_tmp[idx] << ", upper: " << x_u_tmp[idx];
+    }
+  }
+
+  // m1 : dynamics constatins
+  int m1 = 4 * horizon_;
+
+  // m2 : control rate constraints (only steering)
+  int m2 = m1 + horizon_;
+
+  // m3 : sampling time equality constraints
+  int m3 = m2 + horizon_;
+
+  // m4 : obstacle constraints
+  int m4 = m3 + 4 * obstacles_num_ * (horizon_ + 1);
+
+  // 5. load variable bounds as constraints
+  // start configuration
+  int m5 = m4 + 3 + 1;
+
+  // constraints on x,y,v
+  int m6 = m5 + 3 * (horizon_ - 1);
+
+  // end configuration
+  int m7 = m6 + 3 + 1;
+
+  // control variable bnd
+  int m8 = m7 + 2 * horizon_;
+
+  // time interval variable bnd
+  int m9 = m8 + (horizon_ + 1);
+
+  // lambda_horizon_
+  int m10 = m9 + lambda_horizon_;
+
+  // miu_horizon_
+  int m11 = m10 + miu_horizon_;
+
+  AINFO << "dynamics constatins to: " << m1;
+  AINFO << "control rate constraints (only steering) to: " << m2;
+  AINFO << "sampling time equality constraints to: " << m3;
+  AINFO << "obstacle constraints to: " << m4;
+  AINFO << "start conf constraints to: " << m5;
+  AINFO << "constraints on x,y,v to: " << m6;
+  AINFO << "end constraints to: " << m7;
+  AINFO << "control bnd to: " << m8;
+  AINFO << "time interval constraints to: " << m9;
+  AINFO << "lambda constraints to: " << m10;
+  AINFO << "miu constraints to: " << m11;
+  AINFO << "total variables: " << num_of_variables_;
+
+  for (int idx = 0; idx < m; ++idx) {
+    if (g[idx] > g_u_tmp[idx] + delta_v || g[idx] < g_l_tmp[idx] - delta_v) {
+      AINFO << "constratins idx unfeasible: " << idx << ", g: " << g[idx]
+            << ", lower: " << g_l_tmp[idx] << ", upper: " << g_u_tmp[idx];
+    }
+  }
+  return true;
+}
+
 void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
                                                     int* nnz_h_lag) {
   double* xp = new double[n];
@@ -1697,7 +2830,9 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_on(tag_f);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
 
   eval_obj(n, xa, &obj_value);
 
@@ -1707,18 +2842,26 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_on(tag_g);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
 
   eval_constraints(n, xa, m, g);
 
-  for (int idx = 0; idx < m; idx++) g[idx] >>= dummy;
+  for (int idx = 0; idx < m; idx++) {
+    g[idx] >>= dummy;
+  }
 
   trace_off();
 
   trace_on(tag_L);
 
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
-  for (int idx = 0; idx < m; idx++) lam[idx] = 1.0;
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  for (int idx = 0; idx < m; idx++) {
+    lam[idx] = 1.0;
+  }
   sig = 1.0;
 
   eval_obj(n, xa, &obj_value);
@@ -1726,7 +2869,9 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
   obj_value *= mkparam(sig);
   eval_constraints(n, xa, m, g);
 
-  for (int idx = 0; idx < m; idx++) obj_value += g[idx] * mkparam(lam[idx]);
+  for (int idx = 0; idx < m; idx++) {
+    obj_value += g[idx] * mkparam(lam[idx]);
+  }
 
   obj_value >>= dummy;
 

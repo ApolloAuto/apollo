@@ -141,8 +141,7 @@ bool OpenSpaceROI::HPresentationObstacle() {
 }
 
 bool OpenSpaceROI::ObsHRep(
-    const size_t &obstacles_num,
-    const Eigen::MatrixXi &obstacles_edges_num,
+    const size_t &obstacles_num, const Eigen::MatrixXi &obstacles_edges_num,
     const std::vector<std::vector<Vec2d>> &obstacles_vertices_vec,
     Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all) {
   if (obstacles_num != obstacles_vertices_vec.size()) {
@@ -235,9 +234,7 @@ bool OpenSpaceROI::GetOpenSpaceROI() {
   double right_top_l = 0.0;
   if (!(nearby_path->GetProjection(left_top, &left_top_s, &left_top_l) &&
         nearby_path->GetProjection(right_top, &right_top_s, &right_top_l))) {
-    std::string msg(
-        "fail to get parking spot points' projections on reference line");
-    AERROR << msg;
+    AERROR << "fail to get parking spot points' projections on reference line";
     return false;
   }
   // start or end, left or right is decided by the vehicle's heading
@@ -412,13 +409,11 @@ void OpenSpaceROI::SearchTargetParkingSpotOnPath(
     std::shared_ptr<Path> *nearby_path,
     ParkingSpaceInfoConstPtr *target_parking_spot) {
   const auto &parking_space_overlaps = (*nearby_path)->parking_space_overlaps();
-  if (parking_space_overlaps.size() != 0) {
-    for (const auto &parking_overlap : parking_space_overlaps) {
-      if (parking_overlap.object_id == target_parking_spot_id_) {
-        hdmap::Id id;
-        id.set_id(parking_overlap.object_id);
-        *target_parking_spot = hdmap_->GetParkingSpaceById(id);
-      }
+  for (const auto &parking_overlap : parking_space_overlaps) {
+    if (parking_overlap.object_id == target_parking_spot_id_) {
+      hdmap::Id id;
+      id.set_id(parking_overlap.object_id);
+      *target_parking_spot = hdmap_->GetParkingSpaceById(id);
     }
   }
 }

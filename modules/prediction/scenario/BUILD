@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/prediction/scenario/analyzer:scenario_analyzer",
         "//modules/prediction/scenario/feature_extractor",
+        "//modules/prediction/scenario/prioritization:obstacles_prioritizer",
     ],
 )
 

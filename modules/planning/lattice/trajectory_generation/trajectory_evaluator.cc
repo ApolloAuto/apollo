@@ -26,17 +26,17 @@
 #include "cyber/common/log.h"
 #include "modules/common/math/path_matcher.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/trajectory1d/piecewise_acceleration_trajectory1d.h"
 #include "modules/planning/constraint_checker/constraint_checker1d.h"
-#include "modules/planning/lattice/trajectory1d/piecewise_acceleration_trajectory1d.h"
 #include "modules/planning/lattice/trajectory_generation/piecewise_braking_trajectory_generator.h"
 
 namespace apollo {
 namespace planning {
 
 using Trajectory1d = Curve1d;
-using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
+using apollo::common::math::PathMatcher;
 using Trajectory1dPair =
     std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>;
 
@@ -100,7 +100,7 @@ size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
 
 std::pair<PtrTrajectory1d, PtrTrajectory1d>
 TrajectoryEvaluator::next_top_trajectory_pair() {
-  CHECK(has_more_trajectory_pairs() == true);
+  CHECK(has_more_trajectory_pairs());
   auto top = cost_queue_.top();
   cost_queue_.pop();
   return top.first;

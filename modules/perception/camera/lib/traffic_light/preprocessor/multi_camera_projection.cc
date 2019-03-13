@@ -1,25 +1,25 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/camera/lib/traffic_light/preprocessor/multi_camera_projection.h"
 
 #include <algorithm>
 #include <limits>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/common/io/io_util.h"
 #include "modules/perception/common/sensor_manager/sensor_manager.h"
@@ -29,7 +29,7 @@ namespace perception {
 namespace camera {
 
 bool MultiCamerasProjection::Init(const MultiCamerasInitOption& options) {
-  if (options.camera_names.size() == 0) {
+  if (options.camera_names.empty()) {
     AERROR << "no cameras to be projected";
     return false;
   }
@@ -39,7 +39,7 @@ bool MultiCamerasProjection::Init(const MultiCamerasInitOption& options) {
   }
 
   for (size_t i = 0; i < options.camera_names.size(); ++i) {
-    const std::string &cur_camera_name = options.camera_names.at(i);
+    const std::string& cur_camera_name = options.camera_names.at(i);
     AINFO << "init camera " << cur_camera_name;
 
     if (!sensor_manager->IsSensorExist(cur_camera_name)) {
@@ -48,32 +48,32 @@ bool MultiCamerasProjection::Init(const MultiCamerasInitOption& options) {
     }
     camera_models_[cur_camera_name] =
         std::dynamic_pointer_cast<base::BrownCameraDistortionModel>(
-        sensor_manager->GetDistortCameraModel(cur_camera_name));
+            sensor_manager->GetDistortCameraModel(cur_camera_name));
     if (!(camera_models_[cur_camera_name])) {
-      AERROR << "get null camera_model, camera_name: "
-          << cur_camera_name;
+      AERROR << "get null camera_model, camera_name: " << cur_camera_name;
       return false;
     }
     camera_names_.push_back(cur_camera_name);
   }
   // sort camera_names_ by focal lengths (descending order)
   std::sort(camera_names_.begin(), camera_names_.end(),
-      [&](const std::string& lhs, const std::string& rhs) {
-    const auto lhs_cam_intrinsics =
-        camera_models_[lhs]->get_intrinsic_params();
-    const auto rhs_cam_intrinsics =
-        camera_models_[rhs]->get_intrinsic_params();
-    auto lhs_focal_length = 0.5 * (lhs_cam_intrinsics(0, 0) +
-        lhs_cam_intrinsics(1, 1));
-    auto rhs_focal_length = 0.5 * (rhs_cam_intrinsics(0, 0) +
-        rhs_cam_intrinsics(1, 1));
-    return lhs_focal_length > rhs_focal_length;
-  });
+            [&](const std::string& lhs, const std::string& rhs) {
+              const auto lhs_cam_intrinsics =
+                  camera_models_[lhs]->get_intrinsic_params();
+              const auto rhs_cam_intrinsics =
+                  camera_models_[rhs]->get_intrinsic_params();
+              auto lhs_focal_length =
+                  0.5 * (lhs_cam_intrinsics(0, 0) + lhs_cam_intrinsics(1, 1));
+              auto rhs_focal_length =
+                  0.5 * (rhs_cam_intrinsics(0, 0) + rhs_cam_intrinsics(1, 1));
+              return lhs_focal_length > rhs_focal_length;
+            });
   AINFO << "camera_names sorted by descending focal lengths: "
-      << std::accumulate(camera_names_.begin(), camera_names_.end(),
-          std::string(""), [](std::string &sum, const std::string &s) {
-    return sum + s + " ";
-  });
+        << std::accumulate(camera_names_.begin(), camera_names_.end(),
+                           std::string(""),
+                           [](std::string& sum, const std::string& s) {
+                             return sum + s + " ";
+                           });
 
   return true;
 }
@@ -94,22 +94,22 @@ bool MultiCamerasProjection::Project(const CarPose& pose,
 
   bool ret = false;
   AINFO << "project use camera_name: " << option.camera_name;
-  ret = BoundaryBasedProject(camera_models_.at(option.camera_name),
-                             c2w_pose, light->region.points, light);
+  ret = BoundaryBasedProject(camera_models_.at(option.camera_name), c2w_pose,
+                             light->region.points, light);
 
   if (!ret) {
     AWARN << "Projection failed projection the traffic light. "
-               << "camera_name: " << option.camera_name;
+          << "camera_name: " << option.camera_name;
     return false;
   }
   return true;
 }
 
 bool MultiCamerasProjection::HasCamera(const std::string& camera_name) const {
-  auto iter = std::find(camera_names_.begin(), camera_names_.end(),
-      camera_name);
+  auto iter =
+      std::find(camera_names_.begin(), camera_names_.end(), camera_name);
   return iter != camera_names_.end() &&
-      camera_models_.find(camera_name) != camera_models_.end();
+         camera_models_.find(camera_name) != camera_models_.end();
 }
 
 int MultiCamerasProjection::getImageWidth(
@@ -132,9 +132,9 @@ int MultiCamerasProjection::getImageHeight(
 
 bool MultiCamerasProjection::BoundaryBasedProject(
     const base::BrownCameraDistortionModelPtr camera_model,
-    const Eigen::Matrix4d &c2w_pose,
-    const std::vector<base::PointXYZID> &points,
-    base::TrafficLight *light) const {
+    const Eigen::Matrix4d& c2w_pose,
+    const std::vector<base::PointXYZID>& points,
+    base::TrafficLight* light) const {
   CHECK_NOTNULL(camera_model.get());
   int width = static_cast<int>(camera_model->get_width());
   int height = static_cast<int>(camera_model->get_height());
@@ -148,9 +148,11 @@ bool MultiCamerasProjection::BoundaryBasedProject(
   auto c2w_pose_inverse = c2w_pose.inverse();
 
   for (int i = 0; i < bound_size; ++i) {
-    const auto &pt3d_world = points.at(i);
-    Eigen::Vector3d pt3d_cam = (c2w_pose_inverse * Eigen::Vector4d(
-        pt3d_world.x, pt3d_world.y, pt3d_world.z, 1.0)).head(3);
+    const auto& pt3d_world = points.at(i);
+    Eigen::Vector3d pt3d_cam =
+        (c2w_pose_inverse *
+         Eigen::Vector4d(pt3d_world.x, pt3d_world.y, pt3d_world.z, 1.0))
+            .head(3);
     if (std::islessequal(pt3d_cam[2], 0.0)) {
       AWARN << "light bound point behind the car: " << pt3d_cam;
       return false;
@@ -162,7 +164,7 @@ bool MultiCamerasProjection::BoundaryBasedProject(
   int max_x = std::numeric_limits<int>::min();
   int min_y = std::numeric_limits<int>::max();
   int max_y = std::numeric_limits<int>::min();
-  for (const auto &pt : pts2d) {
+  for (const auto& pt : pts2d) {
     min_x = std::min(pt[0], min_x);
     max_x = std::max(pt[0], max_x);
     min_y = std::min(pt[1], min_y);

@@ -62,9 +62,9 @@ double PIDICController::Control(const double error, const double dt) {
     output_saturation_status_ = 0;
   }
 
-  output = common::math::Clamp(
-      error * kp_ + integral_ + diff * kd_, output_saturation_high_,
-      output_saturation_low_);  // Ki already applied
+  output = common::math::Clamp(error * kp_ + integral_ + diff * kd_,
+                               output_saturation_high_,
+                               output_saturation_low_);  // Ki already applied
   previous_output_ = output;
   return output;
 }

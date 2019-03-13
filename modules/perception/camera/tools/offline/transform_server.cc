@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include <yaml-cpp/yaml.h>
 
 #include "cyber/common/log.h"
@@ -25,38 +25,38 @@ namespace camera {
 
 bool TransformServer::Init(const std::vector<std::string> &camera_names,
                            const std::string &params_path) {
-  std::string params_dir = params_path;
-  // 1. init lidar height
+  const std::string params_dir = params_path;
+  // 1. Init lidar height
   try {
     YAML::Node lidar_height =
-      YAML::LoadFile(params_dir + "/" + "velodyne64_height.yaml");
+        YAML::LoadFile(params_dir + "/" + "velodyne128_height.yaml");
     Eigen::Affine3d trans;
     trans.linear() = Eigen::Matrix3d::Identity();
     AINFO << trans.translation() << " "
-             << lidar_height["vehicle"]["parameters"]["height"];
+          << lidar_height["vehicle"]["parameters"]["height"];
     trans.translation() << 0.0, 0.0,
-      lidar_height["vehicle"]["parameters"]["height"].as<double>();
-    AddTransform("velodyne64", "ground", trans);
+        lidar_height["vehicle"]["parameters"]["height"].as<double>();
+    AddTransform("velodyne128", "ground", trans);
   } catch (YAML::InvalidNode &in) {
-    AERROR << "load velodyne64 extrisic file error"
-              << " YAML::InvalidNode exception";
+    AERROR << "load velodyne128 extrisic file error"
+           << " YAML::InvalidNode exception";
     return false;
   } catch (YAML::TypedBadConversion<float> &bc) {
-    AERROR << "load velodyne64 extrisic file error, "
-              << "YAML::TypedBadConversion exception";
+    AERROR << "load velodyne128 extrisic file error, "
+           << "YAML::TypedBadConversion exception";
     return false;
   } catch (YAML::Exception &e) {
-    AERROR << "load velodyne64 extrisic file "
-              << " error, YAML exception:" << e.what();
+    AERROR << "load velodyne128 extrisic file "
+           << " error, YAML exception:" << e.what();
     return false;
   }
-  // 2. init lidar and camera extrinsic
+  // 2. Init lidar and camera extrinsic
   std::vector<std::string> extrinsic_filelist;
-  extrinsic_filelist.push_back(
-    params_dir + "/velodyne64_novatel_extrinsics.yaml");
+  extrinsic_filelist.push_back(params_dir +
+                               "/velodyne128_novatel_extrinsics.yaml");
   for (const auto &camera_name : camera_names) {
-    extrinsic_filelist.push_back(
-      params_dir + "/" + camera_name + "_extrinsics.yaml");
+    extrinsic_filelist.push_back(params_dir + "/" + camera_name +
+                                 "_extrinsics.yaml");
   }
 
   for (const auto &yaml_file : extrinsic_filelist) {
@@ -79,22 +79,21 @@ bool TransformServer::Init(const std::vector<std::string> &camera_names,
       Eigen::Affine3d trans;
       trans.linear() = qq.matrix();
       trans.translation() << t[0], t[1], t[2];
-      bool added = AddTransform(child_frame_id, frame_id, trans);
-      if (!added) {
-        AINFO << "failed to add transform from "
-                 << child_frame_id << " to " << frame_id << std::endl;
+      if (!AddTransform(child_frame_id, frame_id, trans)) {
+        AINFO << "failed to add transform from " << child_frame_id << " to "
+              << frame_id << std::endl;
       }
     } catch (YAML::InvalidNode &in) {
       AERROR << "load camera extrisic file " << yaml_file
-                << " with error, YAML::InvalidNode exception";
+             << " with error, YAML::InvalidNode exception";
       return false;
     } catch (YAML::TypedBadConversion<double> &bc) {
       AERROR << "load camera extrisic file " << yaml_file
-                << " with error, YAML::TypedBadConversion exception";
+             << " with error, YAML::TypedBadConversion exception";
       return false;
     } catch (YAML::Exception &e) {
       AERROR << "load camera extrisic file " << yaml_file
-                << " with error, YAML exception:" << e.what();
+             << " with error, YAML exception:" << e.what();
       return false;
     }
   }
@@ -102,7 +101,7 @@ bool TransformServer::Init(const std::vector<std::string> &camera_names,
 }
 
 bool TransformServer::LoadFromFile(const std::string &tf_input,
-                                  float frequency) {
+                                   float frequency) {
   if (frequency <= 0) {
     AERROR << "Error frequency value:" << frequency;
     return false;
@@ -124,7 +123,7 @@ bool TransformServer::LoadFromFile(const std::string &tf_input,
   fin.close();
   error_limit_ = 1 / frequency / 2.0f;
   AINFO << "Load tf successfully. count: " << tf_.size()
-           << " error limit:" << error_limit_;
+        << " error limit:" << error_limit_;
   return true;
 }
 
@@ -165,8 +164,7 @@ bool TransformServer::AddTransform(const std::string &child_frame_id,
   e_inv.child_frame_id = frame_id;
   e_inv.frame_id = child_frame_id;
   e_inv.transform = transform.inverse();
-  ADEBUG
-  << "Add transform between " << frame_id << " and " << child_frame_id;
+  ADEBUG << "Add transform between " << frame_id << " and " << child_frame_id;
   edges_.insert({child_frame_id, e});
   edges_.insert({frame_id, e_inv});
 
@@ -185,7 +183,7 @@ bool TransformServer::QueryTransform(const std::string &child_frame_id,
   auto cf_iter = vertices_.find(child_frame_id);
   auto f_iter = vertices_.find(frame_id);
 
-  // vertices do not exist
+  // Vertices do not exist
   if (cf_iter == vertices_.end() || f_iter == vertices_.end()) {
     return false;
   }
@@ -195,8 +193,7 @@ bool TransformServer::QueryTransform(const std::string &child_frame_id,
     visited[item] = false;
   }
 
-  bool bfound = FindTransform(child_frame_id, frame_id, transform, &visited);
-  return bfound;
+  return FindTransform(child_frame_id, frame_id, transform, &visited);
 }
 
 bool TransformServer::FindTransform(const std::string &child_frame_id,
@@ -215,8 +212,8 @@ bool TransformServer::FindTransform(const std::string &child_frame_id,
       continue;
     }
 
-    ADEBUG
-    << "from " << edge.child_frame_id << " to " << edge.frame_id << std::endl;
+    ADEBUG << "from " << edge.child_frame_id << " to " << edge.frame_id
+           << std::endl;
 
     loc_transform = edge.transform * loc_transform;
 
@@ -226,8 +223,7 @@ bool TransformServer::FindTransform(const std::string &child_frame_id,
     }
 
     Eigen::Affine3d tr = Eigen::Affine3d::Identity();
-    bool bfound = FindTransform(edge.frame_id, frame_id, &tr, visited);
-    if (bfound) {
+    if (FindTransform(edge.frame_id, frame_id, &tr, visited)) {
       loc_transform = tr * loc_transform;
       *transform = loc_transform;
       return true;
@@ -244,15 +240,14 @@ void TransformServer::print() {
     AINFO << item.first << std::endl;
     AINFO << "edge: " << std::endl;
     AINFO << "from " << item.second.child_frame_id << " to "
-             << item.second.frame_id << std::endl;
+          << item.second.frame_id << std::endl;
     Eigen::Affine3d trans = item.second.transform;
     Eigen::Quaterniond quat(trans.linear());
     AINFO << "rot: " << quat.x() << " " << quat.y() << " " << quat.z() << " "
-             << quat.w() << std::endl;
-    AINFO << "trans: "
-             << trans.translation()[0] << " "
-             << trans.translation()[1] << " "
-             << trans.translation()[2] << std::endl;
+          << quat.w() << std::endl;
+    AINFO << "trans: " << trans.translation()[0] << " "
+          << trans.translation()[1] << " " << trans.translation()[2]
+          << std::endl;
   }
 }
 

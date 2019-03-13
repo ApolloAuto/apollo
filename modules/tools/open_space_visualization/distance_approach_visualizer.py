@@ -94,8 +94,8 @@ def SmoothTrajectory(visualize_flag):
         print("planning fail")
         success = False
     #   exit()
-    end = time.time()
-    print("planning time is " + str(end - start))
+    planning_time = time.time() - start
+    print("planning time is " + str(planning_time))
 
     x_out = []
     y_out = []
@@ -233,7 +233,7 @@ def SmoothTrajectory(visualize_flag):
                 opt_a_out.append(float(opt_a[i]))
                 opt_steer_out.append(float(opt_steer[i]))
                 opt_time_out.append(float(opt_time[i]))
-        return success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out
+        return success, opt_x_out, opt_y_out, opt_phi_out, opt_v_out, opt_a_out, opt_steer_out, opt_time_out, planning_time
 
 if __name__ == '__main__':
     visualize_flag = True

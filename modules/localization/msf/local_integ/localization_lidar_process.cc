@@ -18,10 +18,10 @@
 
 #include "yaml-cpp/yaml.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/time/timer.h"
-#include "modules/common/util/file.h"
 
 namespace apollo {
 namespace localization {
@@ -442,7 +442,7 @@ bool LocalizationLidarProcess::LoadLidarHeight(const std::string& file_path,
                                                LidarHeight* height) {
   CHECK_NOTNULL(height);
 
-  if (!common::util::PathExists(file_path)) {
+  if (!cyber::common::PathExists(file_path)) {
     return false;
   }
 

@@ -60,4 +60,24 @@ Should you see this error while building Apollo, please confirm the following:
 3. Do not use `sudo` parameter, when executing `dev_start.sh` and `dev_into.sh`
 
 ---
+
+## Git LFS is causing a Build Failure?
+
+The key to understanding whether the build failure is caused by Git LFS. Try the following command `git lfs fetch`. If it returns an output like the image below, the build was successful
+
+![](images/git_lfs.png)
+
+If it returns any other output, try the following steps:
+
+```bash
+git clone https://github.com/ApolloAuto/apollo.git
+# you only have to do this one time,
+# if you have never used git lfs, then that's why it's not working
+git lfs install
+git lfs fetch --all
+```
+
+Additional material on Git LFS: https://git-lfs.github.com/
+
+---
 **More Software FAQs to follow.**

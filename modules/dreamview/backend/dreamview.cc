@@ -18,10 +18,9 @@
 
 #include <vector>
 
+#include "cyber/common/file.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
-
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 namespace apollo {
@@ -29,7 +28,7 @@ namespace dreamview {
 
 using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
-using apollo::common::util::PathExists;
+using cyber::common::PathExists;
 
 Dreamview::~Dreamview() { Stop(); }
 
@@ -76,12 +75,14 @@ Status Dreamview::Init() {
   map_service_.reset(new MapService());
   image_.reset(new ImageHandler());
   sim_control_.reset(new SimControl(map_service_.get()));
+  data_collection_monitor_.reset(new DataCollectionMonitor());
 
   sim_world_updater_.reset(new SimulationWorldUpdater(
       websocket_.get(), map_ws_.get(), sim_control_.get(), map_service_.get(),
-      FLAGS_routing_from_file));
+      data_collection_monitor_.get(), FLAGS_routing_from_file));
   point_cloud_updater_.reset(new PointCloudUpdater(point_cloud_ws_.get()));
-  hmi_.reset(new HMI(websocket_.get(), map_service_.get()));
+  hmi_.reset(new HMI(websocket_.get(), map_service_.get(),
+                     data_collection_monitor_.get()));
 
   server_->addWebSocketHandler("/websocket", *websocket_);
   server_->addWebSocketHandler("/map", *map_ws_);

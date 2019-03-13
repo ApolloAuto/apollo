@@ -34,11 +34,11 @@ namespace cyber {
 namespace message {
 
 using apollo::cyber::proto::ProtoDesc;
+using google::protobuf::Descriptor;
 using google::protobuf::DescriptorPool;
 using google::protobuf::DynamicMessageFactory;
 using google::protobuf::FileDescriptor;
 using google::protobuf::FileDescriptorProto;
-using google::protobuf::Descriptor;
 
 class ErrorCollector : public google::protobuf::DescriptorPool::ErrorCollector {
   using ErrorLocation =

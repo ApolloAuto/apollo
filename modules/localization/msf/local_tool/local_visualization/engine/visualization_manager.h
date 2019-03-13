@@ -156,8 +156,7 @@ class VisualizationManager {
     return visual_manage;
   }
 
-  bool Init(const std::string &map_folder,
-            const std::string &map_visual_folder,
+  bool Init(const std::string &map_folder, const std::string &map_visual_folder,
             const Eigen::Affine3d &velodyne_extrinsic,
             const VisualMapParam &map_param);
   bool Init(const VisualizationManagerParams &params);

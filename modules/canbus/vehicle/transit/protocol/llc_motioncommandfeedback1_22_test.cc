@@ -47,20 +47,20 @@ TEST_F(Motioncommandfeedback1_22_test, General) {
   const double equivalent_Brakepercentsetpoint = 93.3524;
   const int equivalent_Motioncommandfeedback1_count = 3;
   const int equivalent_Motioncommandfeedback1_check = 248;
-  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_steeringanglesetpoint(bytes,
-                    length_Steeringanglesetpoint),
-                    equivalent_Steeringanglesetpoint);
-  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_throttlesetpoint(bytes,
-                    length_Throttlesetpoint),
-                    equivalent_Throttlesetpoint);
-  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_brakepercentsetpoint(bytes,
-                    length_Brakepercentsetpoint),
-                    equivalent_Brakepercentsetpoint);
-  EXPECT_EQ(feedback_.llc_motioncommandfeedback1_count(bytes,
-            length_Motioncommandfeedback1_count),
+  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_steeringanglesetpoint(
+                       bytes, length_Steeringanglesetpoint),
+                   equivalent_Steeringanglesetpoint);
+  EXPECT_DOUBLE_EQ(
+      feedback_.llc_fbk_throttlesetpoint(bytes, length_Throttlesetpoint),
+      equivalent_Throttlesetpoint);
+  EXPECT_DOUBLE_EQ(feedback_.llc_fbk_brakepercentsetpoint(
+                       bytes, length_Brakepercentsetpoint),
+                   equivalent_Brakepercentsetpoint);
+  EXPECT_EQ(feedback_.llc_motioncommandfeedback1_count(
+                bytes, length_Motioncommandfeedback1_count),
             equivalent_Motioncommandfeedback1_count);
-  EXPECT_EQ(feedback_.llc_motioncommandfeedback1_check(bytes,
-            length_Motioncommandfeedback1_check),
+  EXPECT_EQ(feedback_.llc_motioncommandfeedback1_check(
+                bytes, length_Motioncommandfeedback1_check),
             equivalent_Motioncommandfeedback1_check);
 }
 

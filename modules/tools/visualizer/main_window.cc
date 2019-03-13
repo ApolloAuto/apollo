@@ -172,7 +172,7 @@ MainWindow::MainWindow(QWidget* parent)
 
       grid_(nullptr),
       enable_grid_checkBox_(nullptr),
-      grid_root_Item_(nullptr),
+      grid_root_item_(nullptr),
 
       pointcloud_top_item_(nullptr),
       pointcloud_comboBox_(new QComboBox),
@@ -249,7 +249,6 @@ MainWindow::~MainWindow() {
   }
 
   pointcloud_reader_mutex_.unlock();
-
 
   if (pointcloud_channel_Reader_) {
     delete pointcloud_channel_Reader_;
@@ -381,7 +380,7 @@ void MainWindow::ActionAddGrid(void) {
     }
   }
 
-  if (grid_root_Item_ == nullptr) {
+  if (grid_root_item_ == nullptr) {
     QTreeWidgetItem* colorChild = nullptr;
     QTreeWidgetItem* cellCountChild = nullptr;
     QSpinBox* spinbox = nullptr;
@@ -400,16 +399,16 @@ void MainWindow::ActionAddGrid(void) {
       goto _ret2;
     }
 
-    grid_root_Item_ = new QTreeWidgetItem(ui_->treeWidget);
-    if (grid_root_Item_ == nullptr) {
+    grid_root_item_ = new QTreeWidgetItem(ui_->treeWidget);
+    if (grid_root_item_ == nullptr) {
       goto _ret3;
     }
 
-    colorChild = new QTreeWidgetItem(grid_root_Item_);
+    colorChild = new QTreeWidgetItem(grid_root_item_);
     if (colorChild == nullptr) {
       goto _ret4;
     }
-    grid_root_Item_->addChild(colorChild);
+    grid_root_item_->addChild(colorChild);
     colorChild->setText(0, "Color");
     colorChild->setText(1, tr("%1;%2;%3")
                                .arg(grid_->red())
@@ -426,11 +425,11 @@ void MainWindow::ActionAddGrid(void) {
     spinbox->setValue(grid_->CellCount());
     spinbox->setStyleSheet(globalTreeItemStyle);
 
-    cellCountChild = new QTreeWidgetItem(grid_root_Item_);
+    cellCountChild = new QTreeWidgetItem(grid_root_item_);
     if (cellCountChild == nullptr) {
       goto _ret6;
     }
-    grid_root_Item_->addChild(cellCountChild);
+    grid_root_item_->addChild(cellCountChild);
     cellCountChild->setText(0, "CellCount");
 
     grid_->set_shader_program(grid_shader_);
@@ -440,12 +439,12 @@ void MainWindow::ActionAddGrid(void) {
 
     enable_grid_checkBox_->setText("Enable");
     enable_grid_checkBox_->setChecked(true);
-    grid_root_Item_->setText(0, "Grid");
-    grid_root_Item_->setText(1, "");
+    grid_root_item_->setText(0, "Grid");
+    grid_root_item_->setText(1, "");
 
-    ui_->treeWidget->addTopLevelItem(grid_root_Item_);
+    ui_->treeWidget->addTopLevelItem(grid_root_item_);
 
-    ui_->treeWidget->setItemWidget(grid_root_Item_, 1, enable_grid_checkBox_);
+    ui_->treeWidget->setItemWidget(grid_root_item_, 1, enable_grid_checkBox_);
     ui_->treeWidget->setItemWidget(cellCountChild, 1, spinbox);
 
     connect(enable_grid_checkBox_, SIGNAL(clicked(bool)), this,
@@ -463,7 +462,7 @@ void MainWindow::ActionAddGrid(void) {
   _ret5:
     delete colorChild;
   _ret4:
-    delete grid_root_Item_;
+    delete grid_root_item_;
   _ret3:
     delete enable_grid_checkBox_;
   _ret2:
@@ -484,7 +483,8 @@ void MainWindow::ChangeGridCellCountBySize(int v) {
 }
 
 void MainWindow::EditGridColor(QTreeWidgetItem* item, int column) {
-  if (column && item == grid_root_Item_->child(0)) {
+  if (column && item != nullptr && grid_root_item_ != nullptr &&
+      item == grid_root_item_->child(0)) {
     QStringList rgb = item->text(1).split(';');
     QColor color(rgb.at(0).toInt(), rgb.at(1).toInt(), rgb.at(2).toInt());
 
@@ -848,7 +848,7 @@ void MainWindow::UpdateActions(void) {
   ui_->actionDelImage->setEnabled(false);
   if (item) {
     if (!item->parent() && item != pointcloud_top_item_ &&
-        item != all_channel_root_ && item != grid_root_Item_) {
+        item != all_channel_root_ && item != grid_root_item_) {
       ui_->actionDelImage->setEnabled(true);
     }
   }

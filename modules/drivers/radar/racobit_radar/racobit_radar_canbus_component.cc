@@ -20,6 +20,7 @@
 
 #include "modules/drivers/radar/racobit_radar/racobit_radar_canbus_component.h"
 
+#include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/drivers/proto/racobit_radar.pb.h"
 #include "modules/drivers/radar/racobit_radar/racobit_radar_message_manager.h"
@@ -45,8 +46,8 @@ bool RacobitRadarCanbusComponent::Init() {
   ADEBUG << "Canbus_conf:" << racobit_radar_conf_.ShortDebugString();
   racobit_radar_writer_ =
       node_->CreateWriter<RacobitRadar>(FLAGS_racobit_radar_topic);
-  if (!::apollo::common::util::GetProtoFromFile(ConfigFilePath(),
-                                                &racobit_radar_conf_)) {
+  if (!cyber::common::GetProtoFromFile(ConfigFilePath(),
+                                       &racobit_radar_conf_)) {
     return OnError("Unable to load canbus conf file: " + ConfigFilePath()).ok();
   }
 

@@ -25,11 +25,18 @@
 #include "modules/common/status/status.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 #include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider.h"
+#include "modules/planning/tasks/deciders/open_space_fallback_decider.h"
+#include "modules/planning/tasks/deciders/open_space_roi_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_path_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_safety.h"
+#include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
+#include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
+#include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
+#include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"
 #include "modules/planning/tasks/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
@@ -51,6 +58,14 @@ std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
     TaskFactory::default_task_configs_;
 
 void TaskFactory::Init(const PlanningConfig& config) {
+  task_factory_.Register(TaskConfig::PATH_BOUND_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathBoundsDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PIECEWISE_JERK_PATH_OPTIMIZER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PiecewiseJerkPathOptimizer(config);
+                         });
   task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new DpStSpeedOptimizer(config);
@@ -83,6 +98,7 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new QpPiecewiseJerkPathOptimizer(config);
                          });
+
   task_factory_.Register(TaskConfig::PROCEED_WITH_CAUTION_SPEED,
                          [](const TaskConfig& config) -> Task* {
                            return new ProceedWithCautionSpeedGenerator(config);
@@ -99,9 +115,32 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new SidePassSafety(config);
                          });
-  task_factory_.Register(TaskConfig::DECIDER_RSS,
+  task_factory_.Register(
+      TaskConfig::DECIDER_RSS,
+      [](const TaskConfig& config) -> Task* { return new RssDecider(config); });
+  task_factory_.Register(TaskConfig::SPEED_BOUNDS_PRIORI_DECIDER,
                          [](const TaskConfig& config) -> Task* {
-                           return new RssDecider(config);
+                           return new SpeedBoundsDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::SPEED_BOUNDS_FINAL_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new SpeedBoundsDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::OPEN_SPACE_ROI_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new OpenSpaceRoiDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::OPEN_SPACE_TRAJECTORY_PROVIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new OpenSpaceTrajectoryProvider(config);
+                         });
+  task_factory_.Register(TaskConfig::OPEN_SPACE_TRAJECTORY_PARTITION,
+                         [](const TaskConfig& config) -> Task* {
+                           return new OpenSpaceTrajectoryPartition(config);
+                         });
+  task_factory_.Register(TaskConfig::OPEN_SPACE_FALLBACK_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new OpenSpaceFallbackDecider(config);
                          });
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =

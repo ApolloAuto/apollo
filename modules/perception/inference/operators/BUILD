@@ -36,14 +36,14 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "perception_inference_operators_test",
-    size = "small",
-    srcs = ["roipooling_layer_test.cc"],
-    deps = [
-        ":perception_inference_operators",
-        "@gtest//:main",
-    ],
-)
+#cc_test(
+#    name = "perception_inference_operators_test",
+#    size = "small",
+#    srcs = ["roipooling_layer_test.cc"],
+#    deps = [
+#        ":perception_inference_operators",
+#        "@gtest//:main",
+#    ],
+#)
 
 cpplint()

@@ -18,8 +18,7 @@
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
 
-DEFINE_string(routing_dump_file,
-              "/tmp/routing.pb.txt",
+DEFINE_string(routing_dump_file, "/tmp/routing.pb.txt",
               "file name to dump routing response.");
 
 void MessageCallback(
@@ -32,16 +31,15 @@ void MessageCallback(
   }
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   google::ParseCommandLineFlags(&argc, &argv, true);
 
   apollo::cyber::Init(argv[0]);
   FLAGS_alsologtostderr = true;
 
   auto listener_node = apollo::cyber::CreateNode("routing_dump");
-  auto listener =
-      listener_node->CreateReader<apollo::planning::ADCTrajectory>(
-          FLAGS_planning_trajectory_topic, MessageCallback);
+  auto listener = listener_node->CreateReader<apollo::planning::ADCTrajectory>(
+      FLAGS_planning_trajectory_topic, MessageCallback);
   apollo::cyber::WaitForShutdown();
   return 0;
 }

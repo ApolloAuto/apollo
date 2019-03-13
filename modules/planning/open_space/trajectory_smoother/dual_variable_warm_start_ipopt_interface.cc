@@ -102,9 +102,9 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
   ADEBUG << "get_starting_point";
-  CHECK(init_x == true) << "Warm start init_x setting failed";
-  CHECK(init_z == false) << "Warm start init_z setting failed";
-  CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
+  CHECK(init_x) << "Warm start init_x setting failed";
+  CHECK(!init_z) << "Warm start init_z setting failed";
+  CHECK(!init_lambda) << "Warm start init_lambda setting failed";
 
   int l_index = l_start_index_;
   int n_index = n_start_index_;
@@ -115,7 +115,7 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
   // 1. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      x[l_index] = 0.5;
+      x[l_index] = 0.0;
       ++l_index;
     }
   }
@@ -123,7 +123,7 @@ bool DualVariableWarmStartIPOPTInterface::get_starting_point(
   // 2. lagrange constraint n, 4*obstacles_num * (horizon_+1)
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      x[n_index] = 1.0;
+      x[n_index] = 0.0;
       ++n_index;
     }
   }
@@ -559,7 +559,7 @@ void DualVariableWarmStartIPOPTInterface::finalize_solution(
   // horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
-      l_warm_up_(0, i) = x[variable_index];
+      l_warm_up_(j, i) = x[variable_index];
       ++variable_index;
     }
   }
@@ -568,7 +568,7 @@ void DualVariableWarmStartIPOPTInterface::finalize_solution(
   // 2. lagrange constraint n, [0, 4*obstacles_num-1] * [0, horizon_]
   for (int i = 0; i < horizon_ + 1; ++i) {
     for (int j = 0; j < 4 * obstacles_num_; ++j) {
-      n_warm_up_(0, i) = x[variable_index];
+      n_warm_up_(j, i) = x[variable_index];
       ++variable_index;
     }
   }
@@ -621,6 +621,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_constraints(int n, const T* x,
 
   for (int i = 0; i < horizon_ + 1; ++i) {
     int edges_counter = 0;
+    // assume: stationary obstacles
     for (int j = 0; j < obstacles_num_; ++j) {
       int current_edges_num = obstacles_edges_num_(j, 0);
       Eigen::MatrixXd Aj =

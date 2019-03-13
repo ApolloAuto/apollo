@@ -346,8 +346,8 @@ std::vector<common::PathPoint> SpiralReferenceLineSmoother::Interpolate(
   size_t num_of_points =
       static_cast<size_t>(std::ceil(delta_s / resolution) + 1);
   for (size_t i = 1; i <= num_of_points; ++i) {
-    const double inter_s = delta_s / static_cast<double>(num_of_points)
-        * static_cast<double>(i);
+    const double inter_s =
+        delta_s / static_cast<double>(num_of_points) * static_cast<double>(i);
     const double dx = spiral_curve.ComputeCartesianDeviationX<10>(inter_s);
     const double dy = spiral_curve.ComputeCartesianDeviationY<10>(inter_s);
 

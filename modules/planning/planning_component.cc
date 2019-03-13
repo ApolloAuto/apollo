@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/planning/planning_component.h"
 
+#include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/configs/config_gflags.h"
 #include "modules/common/util/message_util.h"
@@ -23,8 +24,8 @@
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/navi_planning.h"
+#include "modules/planning/on_lane_planning.h"
 #include "modules/planning/open_space_planning.h"
-#include "modules/planning/std_planning.h"
 
 namespace apollo {
 namespace planning {
@@ -43,11 +44,11 @@ bool PlanningComponent::Init() {
     if (FLAGS_use_navigation_mode) {
       planning_base_ = std::make_unique<NaviPlanning>();
     } else {
-      planning_base_ = std::make_unique<StdPlanning>();
+      planning_base_ = std::make_unique<OnLanePlanning>();
     }
   }
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_planning_config_file,
-                                               &config_))
+  CHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
+                                                &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
   planning_base_->Init(config_);
 
@@ -119,15 +120,13 @@ bool PlanningComponent::Proc(
         hdmap::PncMap::IsNewRouting(*local_view_.routing, routing_)) {
       local_view_.routing =
           std::make_shared<routing::RoutingResponse>(routing_);
-      local_view_.is_new_routing = true;
-    } else {
-      local_view_.is_new_routing = false;
     }
   }
   {
     std::lock_guard<std::mutex> lock(mutex_);
     local_view_.traffic_light =
         std::make_shared<TrafficLightDetection>(traffic_light_);
+    local_view_.relative_map = std::make_shared<MapMsg>(relative_map_);
   }
 
   if (!CheckInput()) {
@@ -171,10 +170,20 @@ bool PlanningComponent::CheckInput() {
     not_ready->set_reason("localization not ready");
   } else if (local_view_.chassis == nullptr) {
     not_ready->set_reason("chassis not ready");
-  } else if (!local_view_.routing->has_header()) {
-    not_ready->set_reason("routing not ready");
   } else if (HDMapUtil::BaseMapPtr() == nullptr) {
     not_ready->set_reason("map not ready");
+  } else {
+    // nothing
+  }
+
+  if (FLAGS_use_navigation_mode) {
+    if (!local_view_.relative_map->has_header()) {
+      not_ready->set_reason("relative map not ready");
+    }
+  } else {
+    if (!local_view_.routing->has_header()) {
+      not_ready->set_reason("routing not ready");
+    }
   }
 
   if (not_ready->has_reason()) {

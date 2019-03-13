@@ -174,9 +174,8 @@ int main(int argc, char **argv) {
       (new nvinfer1::Int8EntropyCalibrator(stream, 0, true,
                                            FLAGS_cal_table_root));
   apollo::perception::inference::RTNet *rt_net =
-      new apollo::perception::inference::RTNet(FLAGS_proto_file,
-                                               FLAGS_weight_file, outputs,
-                                               inputs, calibrator);
+      new apollo::perception::inference::RTNet(
+          FLAGS_proto_file, FLAGS_weight_file, outputs, inputs, calibrator);
   rt_net->Init(std::map<std::string, std::vector<int>>());
   rt_net->Infer();
   delete rt_net;

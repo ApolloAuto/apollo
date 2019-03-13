@@ -330,7 +330,7 @@ void Obstacle::BuildReferenceLineStBoundary(const ReferenceLine& reference_line,
                              STPoint(end_s - adc_start_s, 0.0));
     point_pairs.emplace_back(STPoint(start_s - adc_start_s, FLAGS_st_max_t),
                              STPoint(end_s - adc_start_s, FLAGS_st_max_t));
-    reference_line_st_boundary_ = StBoundary(point_pairs);
+    reference_line_st_boundary_ = STBoundary(point_pairs);
   } else {
     if (BuildTrajectoryStBoundary(reference_line, adc_start_s,
                                   &reference_line_st_boundary_)) {
@@ -347,7 +347,7 @@ void Obstacle::BuildReferenceLineStBoundary(const ReferenceLine& reference_line,
 
 bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
                                          const double adc_start_s,
-                                         StBoundary* const st_boundary) {
+                                         STBoundary* const st_boundary) {
   if (!IsValidObstacle(perception_obstacle_)) {
     AERROR << "Fail to build trajectory st boundary because object is not "
               "valid. PerceptionObstacle: "
@@ -499,7 +499,7 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
                             });
     polygon_points.erase(last, polygon_points.end());
     if (polygon_points.size() > 2) {
-      *st_boundary = StBoundary(polygon_points);
+      *st_boundary = STBoundary(polygon_points);
     }
   } else {
     return false;
@@ -507,11 +507,11 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
   return true;
 }
 
-const StBoundary& Obstacle::reference_line_st_boundary() const {
+const STBoundary& Obstacle::reference_line_st_boundary() const {
   return reference_line_st_boundary_;
 }
 
-const StBoundary& Obstacle::st_boundary() const { return st_boundary_; }
+const STBoundary& Obstacle::st_boundary() const { return st_boundary_; }
 
 const std::vector<std::string>& Obstacle::decider_tags() const {
   return decider_tags_;
@@ -686,27 +686,27 @@ const SLBoundary& Obstacle::PerceptionSLBoundary() const {
   return sl_boundary_;
 }
 
-void Obstacle::SetStBoundary(const StBoundary& boundary) {
+void Obstacle::SetStBoundary(const STBoundary& boundary) {
   st_boundary_ = boundary;
 }
 
-void Obstacle::SetStBoundaryType(const StBoundary::BoundaryType type) {
+void Obstacle::SetStBoundaryType(const STBoundary::BoundaryType type) {
   st_boundary_.SetBoundaryType(type);
 }
 
-void Obstacle::EraseStBoundary() { st_boundary_ = StBoundary(); }
+void Obstacle::EraseStBoundary() { st_boundary_ = STBoundary(); }
 
-void Obstacle::SetReferenceLineStBoundary(const StBoundary& boundary) {
+void Obstacle::SetReferenceLineStBoundary(const STBoundary& boundary) {
   reference_line_st_boundary_ = boundary;
 }
 
 void Obstacle::SetReferenceLineStBoundaryType(
-    const StBoundary::BoundaryType type) {
+    const STBoundary::BoundaryType type) {
   reference_line_st_boundary_.SetBoundaryType(type);
 }
 
 void Obstacle::EraseReferenceLineStBoundary() {
-  reference_line_st_boundary_ = StBoundary();
+  reference_line_st_boundary_ = STBoundary();
 }
 
 bool Obstacle::IsValidObstacle(
@@ -746,6 +746,10 @@ void Obstacle::CheckLaneBlocking(const ReferenceLine& reference_line) {
   }
 
   is_lane_blocking_ = false;
+}
+
+void Obstacle::SetLaneChangeBlocking(const bool is_distance_clear) {
+  is_lane_change_blocking_ = is_distance_clear;
 }
 
 }  // namespace planning

@@ -42,7 +42,6 @@ cc_library(
         ":multicue_proto",
         ":obj_mapper",
         "//cyber",
-        "//modules/common/util:file_util",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
     ],

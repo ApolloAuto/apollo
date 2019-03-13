@@ -96,17 +96,11 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
              << all_possible_paths[optimal_path_index].segs_types[i];
     }
     AERROR << "x, y, phi are: "
-        << all_possible_paths[optimal_path_index].x.back()
-        << ", "
-        << all_possible_paths[optimal_path_index].y.back()
-        << ", "
-        << all_possible_paths[optimal_path_index].phi.back();
-    AERROR << "end x, y, phi are: "
-        << end_node->GetX()
-        << ", "
-        << end_node->GetY()
-        << ", "
-        << end_node->GetPhi();
+           << all_possible_paths[optimal_path_index].x.back() << ", "
+           << all_possible_paths[optimal_path_index].y.back() << ", "
+           << all_possible_paths[optimal_path_index].phi.back();
+    AERROR << "end x, y, phi are: " << end_node->GetX() << ", "
+           << end_node->GetY() << ", " << end_node->GetPhi();
     return false;
   }
   (*optimal_path).x = all_possible_paths[optimal_path_index].x;
@@ -928,8 +922,7 @@ bool ReedShepp::SetRSP(const int& size, const double* lengths,
 // TODO(Jinyun) : reformulate GenerateLocalConfigurations.
 bool ReedShepp::GenerateLocalConfigurations(
     const std::shared_ptr<Node3d> start_node,
-    const std::shared_ptr<Node3d> end_node,
-    ReedSheppPath* shortest_path) {
+    const std::shared_ptr<Node3d> end_node, ReedSheppPath* shortest_path) {
   double step_scaled =
       planner_open_space_config_.warm_start_config().step_size() * max_kappa_;
 
@@ -1048,8 +1041,7 @@ void ReedShepp::Interpolation(const int& index, const double& pd, const char& m,
   }
 }
 
-bool ReedShepp::SetRSPPar(const int& size,
-                          const double* lengths,
+bool ReedShepp::SetRSPPar(const int& size, const double* lengths,
                           const std::string& types,
                           std::vector<ReedSheppPath>* all_possible_paths,
                           const int& idx) {
@@ -1090,7 +1082,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
   int RSP_nums = 46;
   all_possible_paths->resize(RSP_nums);
   bool succ = true;
-  #pragma omp parallel for schedule(dynamic, 2) num_threads(8)
+#pragma omp parallel for schedule(dynamic, 2) num_threads(8)
   for (int i = 0; i < RSP_nums; ++i) {
     RSPParam RSP_param;
     int tmp_length = 0;
@@ -1113,19 +1105,13 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       } else {
         rd_type = "SLS";
       }
-      SLS(x,
-          y_param * y,
-          y_param * dphi,
-          &RSP_param);
+      SLS(x, y_param * y, y_param * dphi, &RSP_param);
       tmp_length = 3;
       RSP_lengths[0] = RSP_param.t;
       RSP_lengths[1] = RSP_param.u;
       RSP_lengths[2] = RSP_param.v;
     } else if (i < 6) {  // CSC, LSL case
-      LSL(x_param * x,
-          y_param * y,
-          x_param * y_param * dphi,
-          &RSP_param);
+      LSL(x_param * x, y_param * y, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0) {
         rd_type = "LSL";
       } else {
@@ -1136,10 +1122,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[1] = x_param * RSP_param.u;
       RSP_lengths[2] = x_param * RSP_param.v;
     } else if (i < 10) {  // CSC, LSR case
-      LSR(x_param * x,
-          y_param * y,
-          x_param * y_param * dphi,
-          &RSP_param);
+      LSR(x_param * x, y_param * y, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0) {
         rd_type = "LSR";
       } else {
@@ -1150,10 +1133,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[1] = x_param * RSP_param.u;
       RSP_lengths[2] = x_param * RSP_param.v;
     } else if (i < 14) {  // CCC, LRL case
-      LRL(x_param * x,
-          y_param * y,
-          x_param * y_param * dphi,
-          &RSP_param);
+      LRL(x_param * x, y_param * y, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0) {
         rd_type = "LRL";
       } else {
@@ -1164,10 +1144,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[1] = x_param * RSP_param.u;
       RSP_lengths[2] = x_param * RSP_param.v;
     } else if (i < 18) {  // CCC, LRL case, backward
-      LRL(x_param * xb,
-          y_param * yb,
-          x_param * y_param * dphi,
-          &RSP_param);
+      LRL(x_param * xb, y_param * yb, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0) {
         rd_type = "LRL";
       } else {
@@ -1178,10 +1155,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[1] = x_param * RSP_param.u;
       RSP_lengths[2] = x_param * RSP_param.t;
     } else if (i < 22) {  // CCCC, LRLRn
-      LRLRn(x_param * x,
-            y_param * y,
-            x_param * y_param * dphi,
-            &RSP_param);
+      LRLRn(x_param * x, y_param * y, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0.0) {
         rd_type = "LRLR";
       } else {
@@ -1193,10 +1167,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[2] = -x_param * RSP_param.u;
       RSP_lengths[3] = x_param * RSP_param.v;
     } else if (i < 26) {  // CCCC, LRLRp
-      LRLRp(x_param * x,
-            y_param * y,
-            x_param * y_param * dphi,
-            &RSP_param);
+      LRLRp(x_param * x, y_param * y, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0.0) {
         rd_type = "LRLR";
       } else {
@@ -1209,10 +1180,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[3] = x_param * RSP_param.v;
     } else if (i < 30) {  // CCSC, LRLRn
       tmp_length = 4;
-      LRLRn(x_param * x,
-            y_param * y,
-            x_param * y_param * dphi,
-            &RSP_param);
+      LRLRn(x_param * x, y_param * y, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0.0) {
         rd_type = "LRSL";
       } else {
@@ -1232,10 +1200,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[3] = x_param * RSP_param.v;
     } else if (i < 34) {  // CCSC, LRLRp
       tmp_length = 4;
-      LRLRp(x_param * x,
-            y_param * y,
-            x_param * y_param * dphi,
-            &RSP_param);
+      LRLRp(x_param * x, y_param * y, x_param * y_param * dphi, &RSP_param);
       if (y_param) {
         rd_type = "LRSR";
       } else {
@@ -1251,10 +1216,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[3] = x_param * RSP_param.v;
     } else if (i < 38) {  // CCSC, LRLRn, backward
       tmp_length = 4;
-      LRLRn(x_param * xb,
-            y_param * yb,
-            x_param * y_param * dphi,
-            &RSP_param);
+      LRLRn(x_param * xb, y_param * yb, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0) {
         rd_type = "LSRL";
       } else {
@@ -1266,10 +1228,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[3] = x_param * RSP_param.t;
     } else if (i < 42) {  // CCSC, LRLRp, backward
       tmp_length = 4;
-      LRLRp(x_param * xb,
-            y_param * yb,
-            x_param * y_param * dphi,
-            &RSP_param);
+      LRLRp(x_param * xb, y_param * yb, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0) {
         rd_type = "RSRL";
       } else {
@@ -1281,10 +1240,7 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
       RSP_lengths[3] = x_param * RSP_param.t;
     } else {  // CCSCC, LRSLR
       tmp_length = 5;
-      LRSLR(x_param * x,
-            y_param * y,
-            x_param * y_param * dphi,
-            &RSP_param);
+      LRSLR(x_param * x, y_param * y, x_param * y_param * dphi, &RSP_param);
       if (y_param > 0.0) {
         rd_type = "LRSLR";
       } else {
@@ -1299,15 +1255,14 @@ bool ReedShepp::GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
 
     if (tmp_length > 0) {
       if (RSP_param.flag &&
-          !SetRSPPar(tmp_length, RSP_lengths, rd_type,
-            all_possible_paths, i)) {
+          !SetRSPPar(tmp_length, RSP_lengths, rd_type, all_possible_paths, i)) {
         AERROR << "Fail at SetRSP, idx#: " << i;
         succ = false;
       }
     }
   }
 
-  if (succ != true) {
+  if (!succ) {
     AERROR << "RSP parallel fails";
     return false;
   }

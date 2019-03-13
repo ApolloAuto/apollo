@@ -18,7 +18,7 @@
 
 #include <limits>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -80,6 +80,13 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     CHECK(lane_sequence_ptr != nullptr);
     std::vector<double> feature_values;
     ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
+    // Insert features to DataForLearning
+    if (FLAGS_prediction_offline_mode == 2 && !obstacle_ptr->IsNearJunction()) {
+      FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
+                                           "mlp");
+      ADEBUG << "Save extracted features for learning locally.";
+      return;  // Skip Compute probability for offline mode
+    }
     double probability = ComputeProbability(feature_values);
 
     double centripetal_acc_probability =
@@ -124,10 +131,6 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
                          obstacle_feature_values.end());
   feature_values->insert(feature_values->end(), lane_feature_values.begin(),
                          lane_feature_values.end());
-
-  if (FLAGS_prediction_offline_mode && !obstacle_ptr->IsNearJunction()) {
-    SaveOfflineFeatures(lane_sequence_ptr, *feature_values);
-  }
 }
 
 void MLPEvaluator::SaveOfflineFeatures(
@@ -150,8 +153,8 @@ void MLPEvaluator::SetObstacleFeatureValues(
   std::vector<double> speeds;
   std::vector<double> timestamps;
 
-  double duration = obstacle_ptr->timestamp() -
-      FLAGS_prediction_trajectory_time_length;
+  double duration =
+      obstacle_ptr->timestamp() - FLAGS_prediction_trajectory_time_length;
   int count = 0;
   for (std::size_t i = 0; i < obstacle_ptr->history_size(); ++i) {
     const Feature& feature = obstacle_ptr->feature(i);
@@ -329,7 +332,7 @@ void MLPEvaluator::SetLaneFeatureValues(Obstacle* obstacle_ptr,
 void MLPEvaluator::LoadModel(const std::string& model_file) {
   model_ptr_.reset(new FnnVehicleModel());
   CHECK(model_ptr_ != nullptr);
-  CHECK(common::util::GetProtoFromFile(model_file, model_ptr_.get()))
+  CHECK(cyber::common::GetProtoFromFile(model_file, model_ptr_.get()))
       << "Unable to load model file: " << model_file << ".";
 
   AINFO << "Succeeded in loading the model file: " << model_file << ".";

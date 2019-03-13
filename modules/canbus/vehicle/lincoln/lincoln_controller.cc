@@ -171,7 +171,7 @@ Chassis LincolnController::chassis() {
   }
   // 5
   if (chassis_detail.has_vehicle_spd() &&
-      static_cast<float>(chassis_detail.vehicle_spd().has_vehicle_spd())) {
+      chassis_detail.vehicle_spd().has_vehicle_spd()) {
     chassis_.set_speed_mps(
         static_cast<float>(chassis_detail.vehicle_spd().vehicle_spd()));
     chassis_.mutable_wheel_speed()->set_is_wheel_spd_rr_valid(
@@ -429,7 +429,7 @@ ErrorCode LincolnController::EnableSteeringOnlyMode() {
   steering_64_->set_enable();
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
     Emergency();
     return ErrorCode::CANBUS_ERROR;
@@ -452,7 +452,7 @@ ErrorCode LincolnController::EnableSpeedOnlyMode() {
   steering_64_->set_disable();
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
     Emergency();
     return ErrorCode::CANBUS_ERROR;
@@ -783,7 +783,7 @@ void LincolnController::SecurityDogThreadFunc() {
     // 1. steer control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_STEER_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++steer_ctrl_fail;
       if (steer_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -796,7 +796,7 @@ void LincolnController::SecurityDogThreadFunc() {
     // 2. speed control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_SPEED_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++speed_ctrl_fail;
       if (speed_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;

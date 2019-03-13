@@ -46,8 +46,7 @@ void SummaryMonitor::EscalateStatus(const ComponentStatus::Status new_status,
 
 // Set interval to 0, so it runs every time when ticking.
 SummaryMonitor::SummaryMonitor()
-    : RecurrentRunner(FLAGS_summary_monitor_name, 0) {
-}
+    : RecurrentRunner(FLAGS_summary_monitor_name, 0) {}
 
 void SummaryMonitor::RunOnce(const double current_time) {
   auto manager = MonitorManager::Instance();
@@ -76,8 +75,8 @@ void SummaryMonitor::RunOnce(const double current_time) {
 
   if (system_status_fp_ != new_fp ||
       current_time - last_broadcast_ > FLAGS_system_status_publish_interval) {
-    static auto writer = manager->CreateWriter<SystemStatus>(
-        FLAGS_system_status_topic);
+    static auto writer =
+        manager->CreateWriter<SystemStatus>(FLAGS_system_status_topic);
 
     apollo::common::util::FillHeader("SystemMonitor", status);
     writer->Write(*status);

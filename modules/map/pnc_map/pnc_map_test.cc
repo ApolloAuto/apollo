@@ -19,7 +19,7 @@
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -47,7 +47,7 @@ class PncMapTest : public ::testing::Test {
       CHECK(false);
     }
     pnc_map_.reset(new PncMap(&hdmap_));
-    if (!common::util::GetProtoFromFile(FLAGS_test_routing_file, &routing_)) {
+    if (!cyber::common::GetProtoFromFile(FLAGS_test_routing_file, &routing_)) {
       AERROR << "Failed to load routing: " << FLAGS_test_routing_file;
       CHECK(false);
     }

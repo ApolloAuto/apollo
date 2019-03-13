@@ -10,9 +10,9 @@ message Options {
         optional double max = 2;
         optional string label_string = 3;
 
-        optional double window_size = 4;
-        optional double step_size = 5;
-        optional double mid_value = 6;
+        optional double window_size = 4; //size of the axis of your graph which is then divided into measuring grades
+        optional double step_size = 5;   //size of the smaller measuring grades in the axis found between two larger measuring grades
+        optional double mid_value = 6;   //midpoint taken within the dataset. If it is not specified, we will calculate it for you.
     }
 
     optional bool legend_display = 1 [default = true];

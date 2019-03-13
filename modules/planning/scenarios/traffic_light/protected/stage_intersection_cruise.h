@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
@@ -32,9 +30,10 @@ namespace traffic_light {
 
 struct TrafficLightProtectedContext;
 
-class StageIntersectionCruise : public Stage {
+class TrafficLightProtectedStageIntersectionCruise : public Stage {
  public:
-  explicit StageIntersectionCruise(const ScenarioConfig::StageConfig& config)
+  explicit TrafficLightProtectedStageIntersectionCruise(
+      const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:

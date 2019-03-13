@@ -14,20 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/data/data_component.h"
+
+#include "cyber/common/file.h"
+#include "cyber/cyber.h"
+#include "cyber/init.h"
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
 
-#include "cyber/cyber.h"
-#include "cyber/init.h"
-
-#include "modules/data/proto/data.pb.h"
-#include "modules/data/proto/data_conf.pb.h"
-#include "modules/data/data_component.h"
-
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/time/time.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/message_util.h"
+#include "modules/data/proto/data.pb.h"
+#include "modules/data/proto/data_conf.pb.h"
 
 namespace apollo {
 namespace data {
@@ -37,9 +36,7 @@ using apollo::cyber::Writer;
 
 class DataComponentTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    SetupCyber();
-  }
+  virtual void SetUp() { SetupCyber(); }
 
  protected:
   void SetupCyber();

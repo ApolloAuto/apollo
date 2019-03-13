@@ -22,6 +22,8 @@
 #include <vector>
 
 #include "Eigen/Dense"
+#include "cyber/common/file.h"
+
 #include "modules/common/math/box2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -358,7 +360,7 @@ class OpenSpaceROITest {
       return false;
     }
 
-    CHECK(common::util::GetProtoFromFile(
+    CHECK(cyber::common::GetProtoFromFile(
         FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
         << "Failed to load open space config file "
         << FLAGS_planner_open_space_config_filename;
@@ -414,7 +416,7 @@ class OpenSpaceROITest {
     segments_vector.push_back(nearby_lanesegment);
     nearby_path_ = std::unique_ptr<Path>(new Path(segments_vector));
     const auto& parking_space_overlaps = nearby_path_->parking_space_overlaps();
-    if (parking_space_overlaps.size() == 0) {
+    if (parking_space_overlaps.empty()) {
       std::cout << "No parking overlaps found on the lane requested"
                 << std::endl;
       return false;

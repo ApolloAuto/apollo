@@ -34,16 +34,15 @@ class Crosswalk : public TrafficRule {
   virtual ~Crosswalk() = default;
 
   common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+                           ReferenceLineInfo* const reference_line_info);
 
  private:
   void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
   bool FindCrosswalks(ReferenceLineInfo* const reference_line_info);
-  bool CheckStopForObstacle(
-      ReferenceLineInfo* const reference_line_info,
-      const hdmap::CrosswalkInfoConstPtr crosswalk_ptr,
-      const Obstacle& obstacle);
+  bool CheckStopForObstacle(ReferenceLineInfo* const reference_line_info,
+                            const hdmap::CrosswalkInfoConstPtr crosswalk_ptr,
+                            const Obstacle& obstacle);
   int BuildStopDecision(Frame* frame,
                         ReferenceLineInfo* const reference_line_info,
                         hdmap::PathOverlap* const crosswalk_overlap,

@@ -74,6 +74,7 @@ enum ImuType {
   G320N = 40;          // EPSON G320N
   CPT_XW5651 = 41;     // IMU@SPAN-CPT, and XingWangYuda 5651
   UM442 = 42;          // UM442
+  IAM20680 = 57;       // InvenSense-IAM20680
 }
 
 message TF {

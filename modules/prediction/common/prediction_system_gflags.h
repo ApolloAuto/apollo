@@ -31,8 +31,7 @@ DECLARE_bool(prediction_test_mode);
 DECLARE_double(prediction_test_duration);
 
 DECLARE_string(prediction_offline_bags);
-DECLARE_bool(prediction_offline_mode);
-DECLARE_bool(prediction_offline_dataforlearning);
+DECLARE_int32(prediction_offline_mode);
 
 // Bag replay timestamp gap
 DECLARE_double(replay_timestamp_gap);

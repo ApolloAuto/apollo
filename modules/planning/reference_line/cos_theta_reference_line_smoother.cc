@@ -21,6 +21,7 @@
 #include "IpIpoptApplication.hpp"
 #include "IpSolveStatistics.hpp"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
@@ -37,8 +38,8 @@ using apollo::common::time::Clock;
 CosThetaReferenceLineSmoother::CosThetaReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
-  CHECK(common::util::GetProtoFromFile(FLAGS_reopt_smoother_config_filename,
-                                       &reopt_smoother_config_))
+  CHECK(cyber::common::GetProtoFromFile(FLAGS_reopt_smoother_config_filename,
+                                        &reopt_smoother_config_))
       << "Failed to load smoother config file "
       << FLAGS_reopt_smoother_config_filename;
 
@@ -72,14 +73,14 @@ bool CosThetaReferenceLineSmoother::Smooth(
                              anchor_point.path_point.y());
     anchorpoints_lateralbound.emplace_back(anchor_point.lateral_bound);
   }
-  if (anchor_points_.front().enforced == true) {
+  if (anchor_points_.front().enforced) {
     has_start_point_constraint_ = true;
 
     start_x_derivative_ = anchor_points_.front().path_point.x_derivative();
 
     start_y_derivative_ = anchor_points_.front().path_point.y_derivative();
   }
-  if (anchor_points_.back().enforced == true) {
+  if (anchor_points_.back().enforced) {
     has_end_point_constraint_ = true;
   }
 

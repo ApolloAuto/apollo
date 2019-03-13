@@ -49,6 +49,7 @@ lat_controller_conf {
   mean_filter_window_size: 10
   max_iteration: 150
   max_lateral_acceleration: 5.0
+  enable_reverse_leadlag_compensation: false
   lat_err_gain_scheduler {
     scheduler {
       speed: 4.0
@@ -93,6 +94,12 @@ lat_controller_conf {
       ratio: 0.1
     }
   }
+  reverse_leadlag_conf {
+    innerstate_saturation_level: 3000
+    alpha: 1.0
+    beta: 1.0
+    tau: 0.0
+  }
 }
 lon_controller_conf {
   ts: 0.01
@@ -102,6 +109,7 @@ lon_controller_conf {
   station_error_limit: 2.0
   preview_window: 20.0
   standstill_acceleration: -3.0
+  enable_reverse_leadlag_compensation: false
   station_pid_conf {
     integrator_enable: false
     integrator_saturation_level: 0.3
@@ -137,6 +145,18 @@ lon_controller_conf {
     kp: 0.05
     ki: 0.0
     kd: 0.0
+  }
+  reverse_station_leadlag_conf {
+    innerstate_saturation_level: 1000
+    alpha: 1.0
+    beta: 1.0
+    tau: 0.0
+  }
+  reverse_speed_leadlag_conf {
+    innerstate_saturation_level: 1000
+    alpha: 1.0
+    beta: 1.0
+    tau: 0.0
   }
   pitch_angle_filter_conf {
     cutoff_freq: 5
@@ -6653,6 +6673,8 @@ mpc_controller_conf {
   standstill_acceleration: -3.0
   brake_deadzone: 15.5
   throttle_deadzone: 18.0
+  enable_mpc_feedforward_compensation: false
+  unconstraint_control_diff_limit: 5.0
   lat_err_gain_scheduler {
     scheduler {
       speed: 4.0

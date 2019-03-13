@@ -16,18 +16,30 @@
 
 #include "cyber/tools/cyber_recorder/recorder.h"
 
+#include "cyber/record/header_builder.h"
+
 namespace apollo {
 namespace cyber {
 namespace record {
 
 Recorder::Recorder(const std::string& output, bool all_channels,
                    const std::vector<std::string>& channel_vec)
-    : output_(output), all_channels_(all_channels), channel_vec_(channel_vec) {}
+    : output_(output), all_channels_(all_channels), channel_vec_(channel_vec) {
+  header_ = HeaderBuilder::GetHeader();
+}
+
+Recorder::Recorder(const std::string& output, bool all_channels,
+                   const std::vector<std::string>& channel_vec,
+                   const proto::Header& header)
+    : output_(output),
+      all_channels_(all_channels),
+      channel_vec_(channel_vec),
+      header_(header) {}
 
 Recorder::~Recorder() { Stop(); }
 
 bool Recorder::Start() {
-  writer_.reset(new RecordWriter());
+  writer_.reset(new RecordWriter(header_));
   if (!writer_->Open(output_)) {
     AERROR << "Datafile open file error.";
     return false;
@@ -150,7 +162,7 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
     std::weak_ptr<Recorder> weak_this = shared_from_this();
     std::shared_ptr<ReaderBase> reader = nullptr;
     auto callback = [weak_this, channel_name](
-        const std::shared_ptr<RawMessage>& raw_message) {
+                        const std::shared_ptr<RawMessage>& raw_message) {
       auto share_this = weak_this.lock();
       if (!share_this) {
         return;

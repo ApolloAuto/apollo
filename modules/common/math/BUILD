@@ -7,6 +7,7 @@ cc_library(
     deps = [
         ":angle",
         ":cartesian_frenet_conversion",
+        ":curve_fitting",
         ":euler_angles_zxy",
         ":factorial",
         ":geometry",
@@ -18,7 +19,6 @@ cc_library(
         ":quaternion",
         ":search",
         ":sin_table",
-        ":curve_fitting",
     ],
 )
 
@@ -44,8 +44,8 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util:string_util",
-        "@osqp",
         "@eigen",
+        "@osqp",
     ],
 )
 

@@ -126,3 +126,17 @@ DECLARE_double(localization_std_y_threshold_1);
 
 DECLARE_double(localization_std_x_threshold_2);
 DECLARE_double(localization_std_y_threshold_2);
+
+// ndt_localization
+DECLARE_string(ndt_map_dir);
+DECLARE_bool(ndt_debug_log_flag);
+DECLARE_double(online_resolution);
+DECLARE_int32(ndt_max_iterations);
+DECLARE_double(ndt_target_resolution);
+DECLARE_double(ndt_line_search_step_size);
+DECLARE_double(ndt_transformation_epsilon);
+DECLARE_int32(ndt_filter_size_x);
+DECLARE_int32(ndt_filter_size_y);
+DECLARE_int32(ndt_bad_score_count_threshold);
+DECLARE_double(ndt_warnning_ndt_score);
+DECLARE_double(ndt_error_ndt_score);

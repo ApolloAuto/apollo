@@ -29,8 +29,10 @@
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
@@ -38,12 +40,12 @@ namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using common::time::Clock;
 using common::TrajectoryPoint;
+using common::time::Clock;
 using hdmap::PathOverlap;
 using perception::TrafficLight;
 
-Stage::StageStatus StageCreep::Process(
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Creep";
   CHECK_NOTNULL(frame);
@@ -56,54 +58,75 @@ Stage::StageStatus StageCreep::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageCreep planning error";
+    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the traffic_light is still along referenceline
-  std::string traffic_light_overlap_id = GetContext()->traffic_light_id;
-  const std::vector<PathOverlap>& traffic_light_overlaps =
-      reference_line_info.reference_line().map_path().signal_overlaps();
-  auto traffic_light_overlap_it =
-      std::find_if(traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
-                   [&traffic_light_overlap_id](const PathOverlap& overlap) {
-                     return overlap.object_id == traffic_light_overlap_id;
-                   });
-  if (traffic_light_overlap_it == traffic_light_overlaps.end()) {
-    return FinishScenario();
-  }
-
-  // check on traffic light color
-  if (PlanningContext::GetScenarioInfo()->traffic_light_color ==
-      TrafficLight::GREEN) {
+  if (PlanningContext::GetScenarioInfo()
+          ->current_traffic_light_overlaps.empty()) {
     return FinishStage();
   }
 
+  PathOverlap traffic_light;
+  bool traffic_light_all_green = true;
+  for (const auto& traffic_light_overlap :
+       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
+    // check if the traffic_light is still along reference_line
+    if (scenario::CheckTrafficLightDone(reference_line_info,
+                                        traffic_light_overlap.object_id)) {
+      continue;
+    }
+
+    // set right_of_way_status
+    reference_line_info.SetJunctionRightOfWay(
+        traffic_light_overlap.start_s, false);
+
+    auto signal_color =
+        scenario::GetSignal(traffic_light_overlap.object_id).color();
+    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id
+           << "] start_s[" << traffic_light_overlap.start_s << "] color["
+           << signal_color << "]";
+
+    // check on traffic light color
+    if (signal_color != TrafficLight::GREEN) {
+      traffic_light_all_green = false;
+      break;
+    }
+
+    traffic_light = traffic_light_overlap;
+  }
+
+  if (traffic_light_all_green) {
+    return FinishStage();
+  }
+
+  // creep
   const double wait_time =
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout = scenario_config_.creep_timeout();
-  auto *task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
+  auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
   if (task && task->CheckCreepDone(*frame, reference_line_info,
-                                   traffic_light_overlap_it->end_s,
-                                   wait_time, timeout)) {
+                                   traffic_light.end_s, wait_time, timeout)) {
     return FinishStage();
   }
 
   // set param for PROCEED_WITH_CAUTION_SPEED
   dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
       ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
-                                        traffic_light_overlap_it->end_s);
+                                        traffic_light.end_s);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StageCreep planning error";
+    AERROR << "TrafficLightUnprotectedRightTurnStageCreep planning error";
   }
+
   return Stage::RUNNING;
 }
 
-Stage::StageStatus StageCreep::FinishStage() {
-  next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE;
+Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::FinishStage() {
+  next_stage_ =
+      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
 

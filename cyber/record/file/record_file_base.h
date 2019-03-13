@@ -28,18 +28,18 @@ namespace record {
 
 const int HEADER_LENGTH = 2048;
 
-using ::apollo::cyber::proto::Header;
 using ::apollo::cyber::proto::Channel;
-using ::apollo::cyber::proto::ChunkHeader;
-using ::apollo::cyber::proto::ChunkBody;
-using ::apollo::cyber::proto::SingleMessage;
-using ::apollo::cyber::proto::Index;
-using ::apollo::cyber::proto::SingleIndex;
 using ::apollo::cyber::proto::ChannelCache;
-using ::apollo::cyber::proto::ChunkHeaderCache;
+using ::apollo::cyber::proto::ChunkBody;
 using ::apollo::cyber::proto::ChunkBodyCache;
-using ::apollo::cyber::proto::SectionType;
+using ::apollo::cyber::proto::ChunkHeader;
+using ::apollo::cyber::proto::ChunkHeaderCache;
 using ::apollo::cyber::proto::CompressType;
+using ::apollo::cyber::proto::Header;
+using ::apollo::cyber::proto::Index;
+using ::apollo::cyber::proto::SectionType;
+using ::apollo::cyber::proto::SingleIndex;
+using ::apollo::cyber::proto::SingleMessage;
 
 class RecordFileBase {
  public:
@@ -50,8 +50,8 @@ class RecordFileBase {
   std::string GetPath() { return path_; }
   Header GetHeader() { return header_; }
   Index GetIndex() { return index_; }
-  uint64_t CurrentPosition();
-  bool SetPosition(uint64_t position);
+  int64_t CurrentPosition();
+  bool SetPosition(int64_t position);
 
  protected:
   std::mutex mutex_;

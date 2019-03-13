@@ -14,10 +14,9 @@ limitations under the License.
 =========================================================================*/
 #include "modules/map/hdmap/hdmap_util.h"
 
-#include "modules/map/relative_map/proto/navigation.pb.h"
-
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/common/util/string_tokenizer.h"
+#include "modules/map/relative_map/proto/navigation.pb.h"
 
 namespace apollo {
 namespace hdmap {
@@ -33,7 +32,7 @@ std::string FindFirstExist(const std::string& dir, const std::string& files) {
   for (const auto& filename : candidates) {
     const std::string file_path =
         apollo::common::util::StrCat(FLAGS_map_dir, "/", filename);
-    if (apollo::common::util::PathExists(file_path)) {
+    if (cyber::common::PathExists(file_path)) {
       return file_path;
     }
   }

@@ -43,14 +43,12 @@ TEST(EgoInfoTest, EgoInfoSimpleTest) {
 
   uint32_t sequence_num = 0;
   common::TrajectoryPoint planning_start_point;
-  const double start_time = 102342.0;
   common::VehicleState vehicle_state;
   ReferenceLineProvider reference_line_provider;
-  ADCTrajectory trajectory;
 
   LocalView dummy_local_view;
-  Frame frame(sequence_num, dummy_local_view, planning_start_point, start_time,
-              vehicle_state, &reference_line_provider, &trajectory);
+  Frame frame(sequence_num, dummy_local_view, planning_start_point,
+              vehicle_state, &reference_line_provider);
   ego_info->CalculateFrontObstacleClearDistance(frame.obstacles());
 }
 

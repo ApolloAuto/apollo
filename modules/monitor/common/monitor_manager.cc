@@ -16,10 +16,10 @@
 
 #include "modules/monitor/common/monitor_manager.h"
 
+#include "cyber/common/file.h"
 #include "gflags/gflags.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/map_util.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 #include "modules/dreamview/backend/hmi/hmi_worker.h"
@@ -31,9 +31,8 @@ using apollo::canbus::Chassis;
 using apollo::dreamview::HMIWorker;
 
 MonitorManager::MonitorManager()
-    : hmi_config_(HMIWorker::LoadConfig())
-    , log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {
-}
+    : hmi_config_(HMIWorker::LoadConfig()),
+      log_buffer_(apollo::common::monitor::MonitorMessageItem::MONITOR) {}
 
 void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
   node_ = node;
@@ -44,8 +43,8 @@ void MonitorManager::Init(const std::shared_ptr<apollo::cyber::Node>& node) {
 
 bool MonitorManager::StartFrame(const double current_time) {
   // Get latest HMIStatus.
-  static auto hmi_status_reader = CreateReader<apollo::dreamview::HMIStatus>(
-      FLAGS_hmi_status_topic);
+  static auto hmi_status_reader =
+      CreateReader<apollo::dreamview::HMIStatus>(FLAGS_hmi_status_topic);
   hmi_status_reader->Observe();
   const auto hmi_status = hmi_status_reader->GetLatestObserved();
   if (hmi_status == nullptr) {

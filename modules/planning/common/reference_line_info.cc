@@ -20,6 +20,8 @@
 
 #include "modules/planning/common/reference_line_info.h"
 
+#include <algorithm>
+
 #include "cyber/task/task.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
 
@@ -176,6 +178,16 @@ void ReferenceLineInfo::InitFirstOverlaps() {
                       &pnc_junction_overlap)) {
     first_encounter_overlaps_.push_back({PNC_JUNCTION, pnc_junction_overlap});
   }
+
+  // sort by start_s
+  if (!first_encounter_overlaps_.empty()) {
+    std::sort(first_encounter_overlaps_.begin(),
+              first_encounter_overlaps_.end(),
+              [](const std::pair<OverlapType, hdmap::PathOverlap>& a,
+                 const std::pair<OverlapType, hdmap::PathOverlap>& b) {
+                return a.second.start_s < b.second.start_s;
+              });
+  }
 }
 
 bool ReferenceLineInfo::IsInited() const { return is_inited_; }
@@ -185,8 +197,8 @@ bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   return overlap.start_s - kEpsilon <= s && s <= overlap.end_s + kEpsilon;
 }
 
-void ReferenceLineInfo::SetJunctionRightOfWay(double junction_s,
-                                              bool is_protected) {
+void ReferenceLineInfo::SetJunctionRightOfWay(const double junction_s,
+                                              const bool is_protected) const {
   auto* right_of_way =
       PlanningContext::MutablePlanningStatus()->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
@@ -229,8 +241,8 @@ bool ReferenceLineInfo::CheckChangeLane() const {
     const auto& sl_boundary = obstacle->PerceptionSLBoundary();
 
     constexpr float kLateralShift = 2.5f;
-    if (sl_boundary.start_l() < -kLateralShift ||
-        sl_boundary.end_l() > kLateralShift) {
+    if (sl_boundary.end_l() < -kLateralShift ||
+        sl_boundary.start_l() > kLateralShift) {
       continue;
     }
     constexpr double kChangeLaneIgnoreDistance = 50.0;
@@ -441,7 +453,7 @@ bool ReferenceLineInfo::CombinePathAndSpeedProfile(
   const double kDenseTimeResoltuion = FLAGS_trajectory_time_min_interval;
   const double kSparseTimeResolution = FLAGS_trajectory_time_max_interval;
   const double kDenseTimeSec = FLAGS_trajectory_time_high_density_period;
-  if (path_data_.discretized_path().size() == 0) {
+  if (path_data_.discretized_path().empty()) {
     AWARN << "path data is empty";
     return false;
   }
@@ -786,6 +798,22 @@ void ReferenceLineInfo::SetPathTurnType() {
 
   path_turn_type_ = hdmap::Lane::NO_TURN;
   return;
+}
+
+int ReferenceLineInfo::GetPnCJunction(
+    const double s, hdmap::PathOverlap* pnc_junction_overlap) const {
+  CHECK_NOTNULL(pnc_junction_overlap);
+  const std::vector<hdmap::PathOverlap>& pnc_junction_overlaps =
+      reference_line_.map_path().pnc_junction_overlaps();
+
+  constexpr double kError = 1.0;  // meter
+  for (const auto& overlap : pnc_junction_overlaps) {
+    if (s >= overlap.start_s - kError && s <= overlap.end_s + kError) {
+      *pnc_junction_overlap = overlap;
+      return 1;
+    }
+  }
+  return 0;
 }
 
 }  // namespace planning

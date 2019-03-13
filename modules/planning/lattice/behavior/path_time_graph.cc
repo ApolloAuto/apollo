@@ -33,12 +33,12 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::lerp;
-using apollo::common::math::Box2d;
-using apollo::common::math::Polygon2d;
-using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
+using apollo::common::math::Box2d;
+using apollo::common::math::lerp;
+using apollo::common::math::PathMatcher;
+using apollo::common::math::Polygon2d;
 
 PathTimeGraph::PathTimeGraph(
     const std::vector<const Obstacle*>& obstacles,
@@ -104,19 +104,6 @@ void PathTimeGraph::SetupObstacles(
             });
 
   for (auto& path_time_obstacle : path_time_obstacle_map_) {
-    double s_upper = std::max(path_time_obstacle.second.bottom_right().s(),
-                              path_time_obstacle.second.upper_right().s());
-    double s_lower = std::min(path_time_obstacle.second.bottom_left().s(),
-                              path_time_obstacle.second.upper_left().s());
-    path_time_obstacle.second.set_path_lower(s_lower);
-    path_time_obstacle.second.set_path_upper(s_upper);
-
-    double t_upper = std::max(path_time_obstacle.second.bottom_right().t(),
-                              path_time_obstacle.second.upper_right().t());
-    double t_lower = std::min(path_time_obstacle.second.bottom_left().t(),
-                              path_time_obstacle.second.upper_left().t());
-    path_time_obstacle.second.set_time_lower(t_lower);
-    path_time_obstacle.second.set_time_upper(t_upper);
     path_time_obstacles_.push_back(path_time_obstacle.second);
   }
 }
@@ -142,17 +129,15 @@ void PathTimeGraph::SetStaticObstacle(
     return;
   }
 
-  path_time_obstacle_map_[obstacle_id].set_obstacle_id(obstacle_id);
-  path_time_obstacle_map_[obstacle_id].mutable_bottom_left()->CopyFrom(
+  path_time_obstacle_map_[obstacle_id].set_id(obstacle_id);
+  path_time_obstacle_map_[obstacle_id].set_bottom_left_point(
       SetPathTimePoint(obstacle_id, sl_boundary.start_s(), 0.0));
-  path_time_obstacle_map_[obstacle_id].mutable_bottom_right()->CopyFrom(
-      SetPathTimePoint(obstacle_id, sl_boundary.start_s(),
-                       FLAGS_trajectory_time_length));
-  path_time_obstacle_map_[obstacle_id].mutable_upper_left()->CopyFrom(
+  path_time_obstacle_map_[obstacle_id].set_bottom_right_point(SetPathTimePoint(
+      obstacle_id, sl_boundary.start_s(), FLAGS_trajectory_time_length));
+  path_time_obstacle_map_[obstacle_id].set_upper_left_point(
       SetPathTimePoint(obstacle_id, sl_boundary.end_s(), 0.0));
-  path_time_obstacle_map_[obstacle_id].mutable_upper_right()->CopyFrom(
-      SetPathTimePoint(obstacle_id, sl_boundary.end_s(),
-                       FLAGS_trajectory_time_length));
+  path_time_obstacle_map_[obstacle_id].set_upper_right_point(SetPathTimePoint(
+      obstacle_id, sl_boundary.end_s(), FLAGS_trajectory_time_length));
   static_obs_sl_boundaries_.push_back(std::move(sl_boundary));
   ADEBUG << "ST-Graph mapping static obstacle: " << obstacle_id
          << ", start_s : " << sl_boundary.start_s()
@@ -192,40 +177,35 @@ void PathTimeGraph::SetDynamicObstacle(
 
     if (path_time_obstacle_map_.find(obstacle->Id()) ==
         path_time_obstacle_map_.end()) {
-      path_time_obstacle_map_[obstacle->Id()].set_obstacle_id(obstacle->Id());
+      path_time_obstacle_map_[obstacle->Id()].set_id(obstacle->Id());
 
-      path_time_obstacle_map_[obstacle->Id()].mutable_bottom_left()->CopyFrom(
+      path_time_obstacle_map_[obstacle->Id()].set_bottom_left_point(
           SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(),
                            relative_time));
-      path_time_obstacle_map_[obstacle->Id()].mutable_upper_left()->CopyFrom(
+      path_time_obstacle_map_[obstacle->Id()].set_upper_left_point(
           SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time));
     }
 
-    path_time_obstacle_map_[obstacle->Id()].mutable_bottom_right()->CopyFrom(
+    path_time_obstacle_map_[obstacle->Id()].set_bottom_right_point(
         SetPathTimePoint(obstacle->Id(), sl_boundary.start_s(), relative_time));
-    path_time_obstacle_map_[obstacle->Id()].mutable_upper_right()->CopyFrom(
+    path_time_obstacle_map_[obstacle->Id()].set_upper_right_point(
         SetPathTimePoint(obstacle->Id(), sl_boundary.end_s(), relative_time));
     relative_time += FLAGS_trajectory_time_resolution;
   }
 }
 
-PathTimePoint PathTimeGraph::SetPathTimePoint(const std::string& obstacle_id,
-                                              const double s,
-                                              const double t) const {
-  PathTimePoint path_time_point;
-  path_time_point.set_s(s);
-  path_time_point.set_t(t);
-  path_time_point.set_obstacle_id(obstacle_id);
+STPoint PathTimeGraph::SetPathTimePoint(const std::string& obstacle_id,
+                                        const double s, const double t) const {
+  STPoint path_time_point(s, t);
   return path_time_point;
 }
 
-const std::vector<PathTimeObstacle>& PathTimeGraph::GetPathTimeObstacles()
-    const {
+const std::vector<STBoundary>& PathTimeGraph::GetPathTimeObstacles() const {
   return path_time_obstacles_;
 }
 
 bool PathTimeGraph::GetPathTimeObstacle(const std::string& obstacle_id,
-                                        PathTimeObstacle* path_time_obstacle) {
+                                        STBoundary* path_time_obstacle) {
   if (path_time_obstacle_map_.find(obstacle_id) ==
       path_time_obstacle_map_.end()) {
     return false;
@@ -239,16 +219,18 @@ std::vector<std::pair<double, double>> PathTimeGraph::GetPathBlockingIntervals(
   CHECK(time_range_.first <= t && t <= time_range_.second);
   std::vector<std::pair<double, double>> intervals;
   for (const auto& pt_obstacle : path_time_obstacles_) {
-    if (t > pt_obstacle.time_upper() || t < pt_obstacle.time_lower()) {
+    if (t > pt_obstacle.max_t() || t < pt_obstacle.min_t()) {
       continue;
     }
-    double s_upper =
-        lerp(pt_obstacle.upper_left().s(), pt_obstacle.upper_left().t(),
-             pt_obstacle.upper_right().s(), pt_obstacle.upper_right().t(), t);
+    double s_upper = lerp(pt_obstacle.upper_left_point().s(),
+                          pt_obstacle.upper_left_point().t(),
+                          pt_obstacle.upper_right_point().s(),
+                          pt_obstacle.upper_right_point().t(), t);
 
-    double s_lower =
-        lerp(pt_obstacle.bottom_left().s(), pt_obstacle.bottom_left().t(),
-             pt_obstacle.bottom_right().s(), pt_obstacle.bottom_right().t(), t);
+    double s_lower = lerp(pt_obstacle.bottom_left_point().s(),
+                          pt_obstacle.bottom_left_point().t(),
+                          pt_obstacle.bottom_right_point().s(),
+                          pt_obstacle.bottom_right_point().t(), t);
 
     intervals.emplace_back(s_lower, s_upper);
   }
@@ -274,11 +256,11 @@ std::pair<double, double> PathTimeGraph::get_time_range() const {
   return time_range_;
 }
 
-std::vector<PathTimePoint> PathTimeGraph::GetObstacleSurroundingPoints(
+std::vector<STPoint> PathTimeGraph::GetObstacleSurroundingPoints(
     const std::string& obstacle_id, const double s_dist,
     const double t_min_density) const {
   CHECK(t_min_density > 0.0);
-  std::vector<PathTimePoint> pt_pairs;
+  std::vector<STPoint> pt_pairs;
   if (path_time_obstacle_map_.find(obstacle_id) ==
       path_time_obstacle_map_.end()) {
     return pt_pairs;
@@ -292,17 +274,17 @@ std::vector<PathTimePoint> PathTimeGraph::GetObstacleSurroundingPoints(
   double t0 = 0.0;
   double t1 = 0.0;
   if (s_dist > 0.0) {
-    s0 = pt_obstacle.upper_left().s();
-    s1 = pt_obstacle.upper_right().s();
+    s0 = pt_obstacle.upper_left_point().s();
+    s1 = pt_obstacle.upper_right_point().s();
 
-    t0 = pt_obstacle.upper_left().t();
-    t1 = pt_obstacle.upper_right().t();
+    t0 = pt_obstacle.upper_left_point().t();
+    t1 = pt_obstacle.upper_right_point().t();
   } else {
-    s0 = pt_obstacle.bottom_left().s();
-    s1 = pt_obstacle.bottom_right().s();
+    s0 = pt_obstacle.bottom_left_point().s();
+    s1 = pt_obstacle.bottom_right_point().s();
 
-    t0 = pt_obstacle.bottom_left().t();
-    t1 = pt_obstacle.bottom_right().t();
+    t0 = pt_obstacle.bottom_left_point().t();
+    t1 = pt_obstacle.bottom_right_point().t();
   }
 
   double time_gap = t1 - t0;
@@ -316,8 +298,7 @@ std::vector<PathTimePoint> PathTimeGraph::GetObstacleSurroundingPoints(
     double t = t_interval * static_cast<double>(i) + t0;
     double s = lerp(s0, t0, s1, t1, t) + s_dist;
 
-    PathTimePoint ptt;
-    ptt.set_obstacle_id(obstacle_id);
+    STPoint ptt;
     ptt.set_t(t);
     ptt.set_s(s);
     pt_pairs.push_back(std::move(ptt));

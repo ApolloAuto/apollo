@@ -18,6 +18,8 @@
 """
 Message Handle
 """
+
+import ast
 import curses
 import importlib
 from curses import panel
@@ -42,12 +44,11 @@ class ModuleConf(object):
 
     def parse_from_file(self):
         mod = importlib.import_module(self.proto_file)
-        self.proto = eval("mod." + self.proto_class)
+        self.proto = ast.literal_eval("mod." + self.proto_class)
 
         try:
-            prototxt = open(APOLLO_ROOT + self.conf_file, 'r')
-            text_format.Parse(prototxt.read(), self.proto)
-            prototxt.close()
+            with open(APOLLO_ROOT + self.conf_file, 'r') as prototxt:
+                text_format.Parse(prototxt.read(), self.proto)
         except:
             self.found_conf = False
         return
@@ -125,11 +126,11 @@ class Field(object):
                     self.win.addstr(row, col, descript.name + ": ")
                     row, col = self.prefetch(item, descript, row + 1, col + 2,
                                              descript_path)
-                    row = row - 1
-                    col = col - 2
+                    row -= 1
+                    col -= 2
                 else:
                     self.prefetch(item, descript, row, col, descript_path)
-                row = row + 1
+                row += 1
                 descript_path.pop()
             return row, col
 
@@ -148,9 +149,8 @@ class Field(object):
         self.win.refresh()
 
     def write_to_file(self):
-        prototxt = open(APOLLO_ROOT + self.conf_file, 'w')
-        prototxt.write(text_format.MessageToString(self.proto_root))
-        prototxt.close()
+        with open(APOLLO_ROOT + self.conf_file, 'w') as prototxt:
+            prototxt.write(text_format.MessageToString(self.proto_root))
 
     def process_input(self):
         self.win.keypad(1)
@@ -218,7 +218,6 @@ class element(object):
         if self.is_repeated:
             printstring = "[Repeated Item: " + str(len(self.value)) + "]"
             win.addstr(printstring, attr)
-
         elif self.descriptor.type == self.descriptor.TYPE_ENUM:
             enum_type = self.descriptor.enum_type.values_by_number[
                 self.value].name
@@ -313,7 +312,7 @@ class element(object):
                     value = float(s)
                     self.modified = True
                     self.value = value
-                except:
+                except ValueError:
                     pass
             elif self.descriptor.type == self.descriptor.TYPE_STRING:
                 if s != self.value:
@@ -324,7 +323,7 @@ class element(object):
                     value = int(s)
                     self.modified = True
                     self.value = value
-                except:
+                except ValueError:
                     pass
             curses.noecho()
 

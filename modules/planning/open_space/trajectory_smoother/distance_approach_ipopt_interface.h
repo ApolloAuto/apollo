@@ -19,31 +19,27 @@
  */
 
 #pragma once
-
+#include <omp.h>
+#include <algorithm>
 #include <limits>
 #include <vector>
-
 #include "Eigen/Dense"
 #include "IpTNLP.hpp"
 #include "IpTypes.hpp"
+
 #include "adolc/adolc.h"
+#include "adolc/adolc_openmp.h"
 #include "adolc/adolc_sparse.h"
 #include "adolc/adouble.h"
-
-// TO-DO[runxin]: still have issue with adolc parallel
-#ifdef _OPENMP
-#include <omp.h>
-#include <adolc/adolc_openmp.h>
-#endif
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
 #include "modules/common/configs/proto/vehicle_config.pb.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/math_utils.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/open_space/trajectory_smoother/distance_approach_interface.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
 #define tag_f 1
@@ -54,24 +50,23 @@
 namespace apollo {
 namespace planning {
 
-class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
+class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
  public:
   explicit DistanceApproachIPOPTInterface(
-      size_t horizon, double ts, Eigen::MatrixXd ego,
+      const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
       const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
       const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
       const Eigen::MatrixXd& last_time_u, const std::vector<double>& XYbounds,
-      const Eigen::MatrixXi& obstacles_edges_num,
-      const size_t obstacles_num, const Eigen::MatrixXd& obstacles_A,
-      const Eigen::MatrixXd& obstacles_b,
+      const Eigen::MatrixXi& obstacles_edges_num, const size_t obstacles_num,
+      const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
       const PlannerOpenSpaceConfig& planner_open_space_config);
 
   virtual ~DistanceApproachIPOPTInterface() = default;
 
   /** Method to return some info about the nlp */
-  bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
-                    IndexStyleEnum& index_style) override;
+  bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,  // NOLINT
+                    IndexStyleEnum& index_style) override;           // NOLINT
 
   /** Method to return the bounds for my problem */
   bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l,
@@ -87,9 +82,14 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   /** Method to return the gradient of the objective */
   bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f) override;
+  // eval_grad_f by hand.
+  bool eval_grad_f_hand(int n, const double* x, bool new_x, double* grad_f);
 
   /** Method to return the constraint residuals */
   bool eval_g(int n, const double* x, bool new_x, int m, double* g) override;
+
+  /** Check unfeasible constraints for futher study**/
+  bool check_g(int n, const double* x, int m, double* g) override;
 
   /** Method to return:
    *   1) The structure of the jacobian (if "values" is nullptr)
@@ -97,6 +97,12 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
    */
   bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
                   int* iRow, int* jCol, double* values) override;
+  // sequential implementation to jac_g
+  bool eval_jac_g_ser(int n, const double* x, bool new_x, int m, int nele_jac,
+                      int* iRow, int* jCol, double* values) override;
+  // parallel implementation to jac_g
+  bool eval_jac_g_par(int n, const double* x, bool new_x, int m, int nele_jac,
+                      int* iRow, int* jCol, double* values) override;
 
   /** Method to return:
    *   1) The structure of the hessian of the lagrangian (if "values" is
@@ -120,7 +126,7 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
                                 Eigen::MatrixXd* control_result,
                                 Eigen::MatrixXd* time_result,
                                 Eigen::MatrixXd* dual_l_result,
-                                Eigen::MatrixXd* dual_n_result) const;
+                                Eigen::MatrixXd* dual_n_result) const override;
 
   //***************    start ADOL-C part ***********************************
   /** Template to return the objective value */
@@ -151,6 +157,9 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   Eigen::MatrixXd xf_;
   Eigen::MatrixXd last_time_u_;
   std::vector<double> XYbounds_;
+
+  // debug flag
+  bool enable_constraint_check_;
 
   // penalty
   double weight_state_x_ = 0.0;

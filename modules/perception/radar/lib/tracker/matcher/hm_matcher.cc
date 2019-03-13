@@ -1,32 +1,32 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #include "modules/perception/radar/lib/tracker/matcher/hm_matcher.h"
 
 #include <string>
 #include <utility>
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
-#include "modules/common/util/file.h"
 #include "modules/perception/proto/tracker_config.pb.h"
 
 namespace apollo {
 namespace perception {
 namespace radar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 HMMatcher::HMMatcher() { name_ = "HMMatcher"; }
 
@@ -42,17 +42,17 @@ bool HMMatcher::Init() {
     return false;
   }
 
-  const std::string& work_root = config_manager->work_root();
+  const std::string &work_root = config_manager->work_root();
   std::string root_path;
   CHECK(model_config->get_value("root_path", &root_path))
-       << "Failed to get value of root_path.";
+      << "Failed to get value of root_path.";
   std::string config_file;
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "hm_matcher.conf");
   // get config params
   MatcherConfig config_params;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config_params))
-       << "Failed to parse MatcherConfig config file.";
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config_params))
+      << "Failed to parse MatcherConfig config file.";
   double max_match_distance = config_params.max_match_distance();
   double bound_match_distance = config_params.bound_match_distance();
   BaseMatcher::SetMaxMatchDistance(max_match_distance);
@@ -117,7 +117,7 @@ void HMMatcher::TrackObjectPropertyMatch(
                         *unassigned_objects, &association_mat);
 
   // from perception-common
-  common::SecureMat<double>* global_costs =
+  common::SecureMat<double> *global_costs =
       hungarian_matcher_.mutable_global_costs();
   global_costs->Resize(unassigned_tracks->size(), unassigned_objects->size());
   for (size_t i = 0; i < unassigned_tracks->size(); ++i) {
@@ -129,8 +129,7 @@ void HMMatcher::TrackObjectPropertyMatch(
   std::vector<size_t> property_unassigned_tracks;
   std::vector<size_t> property_unassigned_objects;
   hungarian_matcher_.Match(
-      BaseMatcher::GetMaxMatchDistance(),
-      BaseMatcher::GetBoundMatchDistance(),
+      BaseMatcher::GetMaxMatchDistance(), BaseMatcher::GetBoundMatchDistance(),
       common::GatedHungarianMatcher<double>::OptimizeFlag::OPTMIN,
       &property_assignments, &property_unassigned_tracks,
       &property_unassigned_objects);

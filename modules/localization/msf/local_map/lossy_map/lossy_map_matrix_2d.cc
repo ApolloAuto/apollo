@@ -133,8 +133,9 @@ void LossyMapMatrix2D::DecodeIntensity(unsigned char data,
 uint16_t LossyMapMatrix2D::EncodeVar(const LossyMapCell2D& cell) const {
   float var = cell.intensity_var;
   var = std::sqrt(var);
-  int intensity_var = static_cast<int>(static_cast<const float>(var_range_) /
-    (var * static_cast<const float>(var_ratio_) + 1.0));
+  int intensity_var =
+      static_cast<int>(static_cast<const float>(var_range_) /
+                       (var * static_cast<const float>(var_ratio_) + 1.0));
   if (intensity_var > var_range_) {
     intensity_var = var_range_;
   }
@@ -147,7 +148,7 @@ uint16_t LossyMapMatrix2D::EncodeVar(const LossyMapCell2D& cell) const {
 void LossyMapMatrix2D::DecodeVar(uint16_t data, LossyMapCell2D* cell) const {
   float var = data;
   var = static_cast<float>((static_cast<const float>(var_range_) / var - 1.0) /
-        static_cast<const float>(var_ratio_));
+                           static_cast<const float>(var_ratio_));
   cell->intensity_var = var * var;
 }
 
@@ -345,7 +346,7 @@ unsigned int LossyMapMatrix2D::CreateBinary(unsigned char* buf,
     for (unsigned int y = 0; y < rows_; ++y) {
       for (unsigned int x = 0; x < cols_; ++x) {
         const LossyMapCell2D& cell = map_cells_[y * cols_ + x];
-        if (cell.is_ground_useful == false) {
+        if (!cell.is_ground_useful) {
           continue;
         }
         if (cell.altitude_ground > alt_ground_max_) {
@@ -429,11 +430,10 @@ unsigned int LossyMapMatrix2D::GetBinarySize() const {
   unsigned int target_size =
       static_cast<unsigned int>(sizeof(unsigned int) * 2 + sizeof(float) * 4);
   // count, intensity, intensity_var, altitude_avg, altitude_ground
-  target_size +=
-      static_cast<unsigned int>(rows_ * cols_ * (sizeof(unsigned char)
-                                + sizeof(unsigned char)
-                                + sizeof(uint16_t) + sizeof(uint16_t)
-                                + sizeof(uint16_t)));
+  target_size += static_cast<unsigned int>(
+      rows_ * cols_ *
+      (sizeof(unsigned char) + sizeof(unsigned char) + sizeof(uint16_t) +
+       sizeof(uint16_t) + sizeof(uint16_t)));
   return target_size;
 }
 

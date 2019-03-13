@@ -54,17 +54,17 @@ struct PointXYZITHBL : public PointXYZITHB<T> {
   uint8_t label = 0;
 };
 
-using PointF         = Point<float>;
-using PointD         = Point<double>;
+using PointF = Point<float>;
+using PointD = Point<double>;
 
-using PointXYZIF     = Point<float>;
-using PointXYZID     = Point<double>;
-using PointXYZITF    = PointXYZIT<float>;
-using PointXYZITD    = PointXYZIT<double>;
-using PointXYZITHF   = PointXYZITH<float>;
-using PointXYZITHD   = PointXYZITH<double>;
-using PointXYZITHBF  = PointXYZITHB<float>;
-using PointXYZITHBD  = PointXYZITHB<double>;
+using PointXYZIF = Point<float>;
+using PointXYZID = Point<double>;
+using PointXYZITF = PointXYZIT<float>;
+using PointXYZITD = PointXYZIT<double>;
+using PointXYZITHF = PointXYZITH<float>;
+using PointXYZITHD = PointXYZITH<double>;
+using PointXYZITHBF = PointXYZITHB<float>;
+using PointXYZITHBD = PointXYZITHB<double>;
 using PointXYZITHBLF = PointXYZITHBL<float>;
 using PointXYZITHBLD = PointXYZITHBL<double>;
 

@@ -171,6 +171,8 @@ usage: cyber_recorder record [options]
     -o, --output <file>                output record file
     -a, --all                          all channels
     -c, --channel <name>               channel name
+    -i, --segment-interval <seconds>   record segmented every n second(s)
+    -m, --segment-size <MB>            record segmented every n megabyte(s)
     -h, --help                         show help message
 
 ```
@@ -188,6 +190,7 @@ usage: cyber_recorder play [options]
     -e, --end <2018-07-01 00:01:00>	play the record end at  
     -s, --start <seconds>		play started at n seconds  
     -d, --delay <seconds>		play delayed n seconds  
+    -p, --preload <seconds>		play after trying to preload n second(s)  
     -h, --help				show help message  
 ```
 

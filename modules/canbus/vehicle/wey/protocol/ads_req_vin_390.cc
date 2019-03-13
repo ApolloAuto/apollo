@@ -55,8 +55,8 @@ Adsreqvin390* Adsreqvin390::set_req_vin_signal(
 // 'precision': 1.0, 'len': 8, 'is_signed_var': False,
 // 'offset': 0.0, 'physical_range': '[0|255]', 'bit': 7,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
-void Adsreqvin390::set_p_req_vin_signal(uint8_t* data,
-    Ads_req_vin_390::Req_vin_signalType req_vin_signal) {
+void Adsreqvin390::set_p_req_vin_signal(
+    uint8_t* data, Ads_req_vin_390::Req_vin_signalType req_vin_signal) {
   int x = req_vin_signal;
 
   Byte to_set(data + 0);

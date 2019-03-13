@@ -70,7 +70,7 @@ cc_library(
         ":simulation_world_service",
         "//modules/common/util:map_util",
         "//modules/dreamview/backend/common:dreamview_gflags",
-        #"//modules/dreamview/backend/handlers:image_handler",
+        "//modules/dreamview/backend/data_collection_monitor",
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/sim_control",

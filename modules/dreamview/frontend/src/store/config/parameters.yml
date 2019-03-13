@@ -78,6 +78,8 @@ options:
   # task panel options
   showPNCMonitor:
     default: false
+  showDataCollectionMonitor:
+    default: false
   enableSimControl:
     default: false
   lockTaskPanel:
@@ -193,6 +195,9 @@ options:
   showMapParkingSpace:
     default: true
     menuId: mapParkingSpace
+  showMapLaneId:
+    default: false
+    menuId: mapLaneId
 
 routingEditor:
   radiusOfMapRequest: 2000.0 # meters

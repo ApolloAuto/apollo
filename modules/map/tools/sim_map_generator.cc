@@ -16,9 +16,9 @@
 
 #include "gflags/gflags.h"
 
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/common/configs/config_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/points_downsampler.h"
 #include "modules/map/hdmap/adapter/opendrive_adapter.h"
 #include "modules/map/hdmap/hdmap_util.h"
@@ -40,7 +40,7 @@ DEFINE_int32(steep_turn_downsample_distance, 1,
 using apollo::common::PointENU;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::DownsampleByDistance;
-using apollo::common::util::GetProtoFromFile;
+using apollo::cyber::common::GetProtoFromFile;
 using apollo::hdmap::Curve;
 using apollo::hdmap::Map;
 using apollo::hdmap::adapter::OpendriveAdapter;

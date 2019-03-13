@@ -83,6 +83,9 @@ class ReferenceLine {
   common::FrenetFramePoint GetFrenetPoint(
       const common::PathPoint& path_point) const;
 
+  std::pair<std::array<double, 3>, std::array<double, 3>> ToFrenetFrame(
+      const common::TrajectoryPoint& traj_point) const;
+
   std::vector<ReferencePoint> GetReferencePoints(double start_s,
                                                  double end_s) const;
 
@@ -145,9 +148,9 @@ class ReferenceLine {
   bool IsOnRoad(const SLBoundary& sl_boundary) const;
 
   /**
-   * @brief Check if a box is blocking the road surface. The crieria is to check
-   * whether the remaining space on the road surface is larger than the provided
-   * gap space.
+   * @brief Check if a box is blocking the road surface. The criteria is to
+   * check whether the remaining space on the road surface is larger than the
+   * provided gap space.
    * @param boxed the provided box
    * @param gap check the gap of the space
    * @return true if the box blocks the road.

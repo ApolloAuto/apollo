@@ -32,9 +32,10 @@ namespace traffic_light {
 
 struct TrafficLightUnprotectedRightTurnContext;
 
-class StageIntersectionCruise : public Stage {
+class TrafficLightUnprotectedRightTurnStageIntersectionCruise : public Stage {
  public:
-  explicit StageIntersectionCruise(const ScenarioConfig::StageConfig& config)
+  explicit TrafficLightUnprotectedRightTurnStageIntersectionCruise(
+      const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:

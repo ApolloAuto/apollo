@@ -248,7 +248,7 @@ void SerialStream::close(void) {
 }
 
 bool SerialStream::Disconnect() {
-  if (is_open_ == false) {
+  if (!is_open_) {
     // not open
     return false;
   }

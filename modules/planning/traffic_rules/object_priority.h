@@ -31,7 +31,7 @@ class ObjectPriority : public TrafficRule {
   virtual ~ObjectPriority() = default;
 
   common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+                           ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning

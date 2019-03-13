@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <map>
@@ -41,14 +41,13 @@ namespace apollo {
 namespace perception {
 namespace onboard {
 
-class TrafficLightsPerceptionComponent :
-    public apollo::cyber::Component<> {
+class TrafficLightsPerceptionComponent : public apollo::cyber::Component<> {
  public:
   TrafficLightsPerceptionComponent() = default;
   ~TrafficLightsPerceptionComponent() = default;
 
-  TrafficLightsPerceptionComponent(
-      const TrafficLightsPerceptionComponent&) = delete;
+  TrafficLightsPerceptionComponent(const TrafficLightsPerceptionComponent&) =
+      delete;
   TrafficLightsPerceptionComponent& operator=(
       const TrafficLightsPerceptionComponent&) = delete;
 
@@ -62,56 +61,52 @@ class TrafficLightsPerceptionComponent :
 
   int InitV2XListener();
 
-  void OnReceiveImage(
-      const std::shared_ptr<apollo::drivers::Image> image,
-      const std::string& camera_name);
+  void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image> image,
+                      const std::string& camera_name);
 
   void OnReceiveV2XMsg(
       const std::shared_ptr<apollo::v2x::IntersectionTrafficLightData> v2x_msg);
 
-  bool QueryPoseAndSignals(const double ts,
-      camera::CarPose* pose,
-      std::vector<apollo::hdmap::Signal>* signals);
+  bool QueryPoseAndSignals(const double ts, camera::CarPose* pose,
+                           std::vector<apollo::hdmap::Signal>* signals);
 
-  bool VerifyLightsProjection(
-      const double& ts, const camera::TLPreprocessorOption& option,
-      const std::string& camera_name,
-      camera::CameraFrame* image_lights);
+  bool VerifyLightsProjection(const double& ts,
+                              const camera::TLPreprocessorOption& option,
+                              const std::string& camera_name,
+                              camera::CameraFrame* image_lights);
 
   bool UpdateCameraSelection(double timestamp,
                              const camera::TLPreprocessorOption& option,
                              camera::CameraFrame* frame);
 
   bool CheckCameraImageStatus(double timestamp, double interval,
-      const std::string& camera_name);
+                              const std::string& camera_name);
 
-  bool GetCarPose(const double timestamp, camera::CarPose *pose);
+  bool GetCarPose(const double timestamp, camera::CarPose* pose);
 
-  bool GetPoseFromTF(const double timestamp,
-      const std::string& frame_id,
-      const std::string& child_frame_id,
-      Eigen::Matrix4d* pose_matrix);
+  bool GetPoseFromTF(const double timestamp, const std::string& frame_id,
+                     const std::string& child_frame_id,
+                     Eigen::Matrix4d* pose_matrix);
 
   double stopline_distance(const Eigen::Matrix4d& cam_pose);
-  bool TransformOutputMessage(camera::CameraFrame* frame,
-                              const std::string& camera_name,
-                              std::shared_ptr<apollo::perception::
-                                              TrafficLightDetection>* out_msg);
+  bool TransformOutputMessage(
+      camera::CameraFrame* frame, const std::string& camera_name,
+      std::shared_ptr<apollo::perception::TrafficLightDetection>* out_msg);
 
-  bool TransformDebugMessage(const camera::CameraFrame* frame,
-                             std::shared_ptr<apollo::perception::
-                                             TrafficLightDetection>* out_msg);
+  bool TransformDebugMessage(
+      const camera::CameraFrame* frame,
+      std::shared_ptr<apollo::perception::TrafficLightDetection>* out_msg);
   void SendSimulationMsg();
   void GenerateTrafficLights(
       const std::vector<apollo::hdmap::Signal>& signals,
-      std::vector<base::TrafficLightPtr> *traffic_lights);
-  void TransRect2Box(const base::RectI &rect,
-      apollo::perception::TrafficLightBox* box);
+      std::vector<base::TrafficLightPtr>* traffic_lights);
+  void TransRect2Box(const base::RectI& rect,
+                     apollo::perception::TrafficLightBox* box);
 
  private:
   void Visualize(const camera::CameraFrame& frame,
                  const std::vector<base::TrafficLightPtr>& lights) const;
-  void SyncV2XTrafficLights(camera::CameraFrame *frame);
+  void SyncV2XTrafficLights(camera::CameraFrame* frame);
 
  private:
   std::mutex mutex_;
@@ -130,12 +125,12 @@ class TrafficLightsPerceptionComponent :
   std::vector<std::string> camera_names_;
   std::vector<std::string> input_camera_channel_names_;
   // camera_name -> TransformWrapper
-  std::map<std::string, std::shared_ptr<TransformWrapper> >
+  std::map<std::string, std::shared_ptr<TransformWrapper>>
       camera2world_trans_wrapper_map_;
   // camera_name -> image_border_size
   std::map<std::string, int> image_border_sizes_;
 
-  std::vector<std::shared_ptr<cyber::Node> > camera_listener_nodes_;
+  std::vector<std::shared_ptr<cyber::Node>> camera_listener_nodes_;
 
   double last_sub_tf_ts_ = 0.0;
 
@@ -171,8 +166,8 @@ class TrafficLightsPerceptionComponent :
   camera::DataProvider::InitOptions data_provider_init_options_;
 
   // pre-allocated-mem data_provider; camera_id -> data_provider
-  std::map<std::string,
-      std::shared_ptr<camera::DataProvider> > data_providers_map_;
+  std::map<std::string, std::shared_ptr<camera::DataProvider>>
+      data_providers_map_;
 
   // image
   camera::CameraFrame frame_;
@@ -187,8 +182,9 @@ class TrafficLightsPerceptionComponent :
   std::string simulation_channel_name_;
   std::string traffic_light_output_channel_name_;
 
-  std::shared_ptr<apollo::cyber::Writer<
-        apollo::perception::TrafficLightDetection>> writer_;
+  std::shared_ptr<
+      apollo::cyber::Writer<apollo::perception::TrafficLightDetection>>
+      writer_;
 
   // traffic lights
   apollo::perception::base::TLColor detected_trafficlight_color_;

@@ -170,8 +170,8 @@ uint64_t GlobalData::RegisterNode(const std::string& node_name) {
   if (node_id_map_.Has(id)) {
     std::string* name = nullptr;
     node_id_map_.Get(id, &name);
-    CHECK(node_name == *name) << " Node name hash collision: " << node_name
-                              << " <=> " << *name;
+    CHECK(node_name == *name)
+        << " Node name hash collision: " << node_name << " <=> " << *name;
   }
   node_id_map_.Set(id, node_name);
   return id;
@@ -190,8 +190,8 @@ uint64_t GlobalData::RegisterChannel(const std::string& channel) {
   if (channel_id_map_.Has(id)) {
     std::string* name = nullptr;
     channel_id_map_.Get(id, &name);
-    CHECK(channel == *name) << "Channel name hash collision: " << channel
-                            << " <=> " << *name;
+    CHECK(channel == *name)
+        << "Channel name hash collision: " << channel << " <=> " << *name;
   }
   channel_id_map_.Set(id, channel);
   return id;
@@ -210,8 +210,8 @@ uint64_t GlobalData::RegisterService(const std::string& service) {
   if (service_id_map_.Has(id)) {
     std::string* name = nullptr;
     service_id_map_.Get(id, &name);
-    CHECK(service == *name) << "Service name hash collision: " << service
-                            << " <=> " << *name;
+    CHECK(service == *name)
+        << "Service name hash collision: " << service << " <=> " << *name;
   }
   service_id_map_.Set(id, service);
   return id;
@@ -230,8 +230,8 @@ uint64_t GlobalData::RegisterTaskName(const std::string& task_name) {
   if (task_id_map_.Has(id)) {
     std::string* name = nullptr;
     task_id_map_.Get(id, &name);
-    CHECK(task_name == *name) << "Task name hash collision: " << task_name
-                              << " <=> " << *name;
+    CHECK(task_name == *name)
+        << "Task name hash collision: " << task_name << " <=> " << *name;
   }
   task_id_map_.Set(id, task_name);
   return id;

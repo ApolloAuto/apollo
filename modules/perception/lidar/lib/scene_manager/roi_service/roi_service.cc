@@ -15,7 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lidar/lib/scene_manager/roi_service/roi_service.h"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lidar/lib/scene_manager/roi_service/proto/roi_service.pb.h"
 
@@ -23,7 +23,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
 void ROIServiceContent::GetCopy(SceneServiceContent* content) const {
   ROIServiceContent* roi_content = dynamic_cast<ROIServiceContent*>(content);
@@ -94,7 +94,7 @@ bool ROIService::Init(const SceneServiceInitOptions& options) {
   config_file = GetAbsolutePath(work_root, root_path);
   config_file = GetAbsolutePath(config_file, "roi_service.conf");
   ROIServiceConfig config;
-  CHECK(apollo::common::util::GetProtoFromFile(config_file, &config));
+  CHECK(cyber::common::GetProtoFromFile(config_file, &config));
   roi_content_ref_->cell_size_ = config.cell_size();
   roi_content_ref_->range_ = config.range();
   return true;

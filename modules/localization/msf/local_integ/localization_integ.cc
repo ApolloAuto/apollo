@@ -86,18 +86,18 @@ void LocalizationInteg::GnssHeadingProcess(
   return;
 }
 
-const LocalizationResult& LocalizationInteg::
-    GetLastestLidarLocalization() const {
+const LocalizationResult &LocalizationInteg::GetLastestLidarLocalization()
+    const {
   return localization_integ_impl_->GetLastestLidarLocalization();
 }
 
-const LocalizationResult& LocalizationInteg::
-    GetLastestIntegLocalization() const {
+const LocalizationResult &LocalizationInteg::GetLastestIntegLocalization()
+    const {
   return localization_integ_impl_->GetLastestIntegLocalization();
 }
 
-const LocalizationResult& LocalizationInteg::
-    GetLastestGnssLocalization() const {
+const LocalizationResult &LocalizationInteg::GetLastestGnssLocalization()
+    const {
   return localization_integ_impl_->GetLastestGnssLocalization();
 }
 

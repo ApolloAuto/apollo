@@ -32,7 +32,8 @@ class LidarLibGroundServiceDetectorTest : public testing::Test {
     putenv(cyber_path);
     char module_path[] = "MODULE_PATH=";
     putenv(module_path);
-    FLAGS_work_root = "/apollo/modules/perception/testdata/"
+    FLAGS_work_root =
+        "/apollo/modules/perception/testdata/"
         "lidar/lib/ground_detector/ground_service_detector";
     FLAGS_config_manager_path = "./conf";
     lib::ConfigManager::Instance()->Reset();
@@ -47,7 +48,7 @@ void LoadPlanes(std::string path, GroundNode* node_ptr) {
   while (file.good()) {
     std::string buf;
     getline(file, buf);
-    if (buf.size() == 0) {
+    if (buf.empty()) {
       continue;
     }
     std::stringstream ss;
@@ -69,7 +70,7 @@ void LoadPoints(const std::string path, std::vector<std::vector<double>>* pts,
     pt.clear();
     std::string buf;
     getline(file, buf);
-    if (buf.size() == 0) {
+    if (buf.empty()) {
       continue;
     }
     std::stringstream ss;
@@ -92,8 +93,8 @@ TEST_F(LidarLibGroundServiceDetectorTest,
 
   EXPECT_TRUE(SceneManager::Instance().Init());
   EXPECT_TRUE(ground_service_detector.Init(GroundDetectorInitOptions()));
-  EXPECT_FALSE(ground_service_detector.Detect(GroundDetectorOptions()
-    , nullptr));
+  EXPECT_FALSE(
+      ground_service_detector.Detect(GroundDetectorOptions(), nullptr));
   LidarFrame frame;
   EXPECT_FALSE(ground_service_detector.Detect(GroundDetectorOptions(), &frame));
   frame.world_cloud = base::PointDCloudPool::Instance().Get();
@@ -117,7 +118,8 @@ TEST_F(LidarLibGroundServiceDetectorTest,
   GroundNode* node_ptr =
       ground_service_cast->GetGroundServiceContent()->grid_.DataPtr();
   ground_service_cast->GetGroundServiceContent()->grid_center_
-      << 461957.33791688998, 4404672.5859791003, 19.143968966679999;
+      << 461957.33791688998,
+      4404672.5859791003, 19.143968966679999;
   LoadPlanes(
       "/apollo/modules/perception/testdata/lidar/lib/ground_detector/"
       "ground_service_detector/data/resources/planes.txt",

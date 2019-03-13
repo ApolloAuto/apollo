@@ -31,11 +31,13 @@ namespace dreamview {
 using apollo::common::util::JsonUtil;
 using Json = WebSocketHandler::Json;
 
-HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
+HMI::HMI(WebSocketHandler* websocket, MapService* map_service,
+         DataCollectionMonitor* data_collection_monitor)
     : hmi_worker_(new HMIWorker()),
       monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
       websocket_(websocket),
-      map_service_(map_service) {
+      map_service_(map_service),
+      data_collection_monitor_(data_collection_monitor) {
   if (websocket_) {
     RegisterMessageHandlers();
   }
@@ -102,6 +104,13 @@ void HMI::RegisterMessageHandlers() {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
+        } else if (hmi_action == HMIAction::CHANGE_MODE) {
+          static constexpr char kCalibrationMode[] = "Vehicle Calibration";
+          if (value == kCalibrationMode) {
+            data_collection_monitor_->Start();
+          } else {
+            data_collection_monitor_->Stop();
+          }
         }
       });
 
@@ -113,12 +122,16 @@ void HMI::RegisterMessageHandlers() {
         uint64_t event_time_ms;
         std::string event_msg;
         std::vector<std::string> event_types;
+        bool is_reportable;
         if (JsonUtil::GetNumberFromJson(json, "event_time_ms",
                                         &event_time_ms) &&
             JsonUtil::GetStringFromJson(json, "event_msg", &event_msg) &&
             JsonUtil::GetStringVectorFromJson(json, "event_type",
-                                              &event_types)) {
-          hmi_worker_->SubmitDriveEvent(event_time_ms, event_msg, event_types);
+                                              &event_types) &&
+            JsonUtil::GetBooleanFromJson(json, "is_reportable",
+                                         &is_reportable)) {
+          hmi_worker_->SubmitDriveEvent(event_time_ms, event_msg, event_types,
+                                        is_reportable);
           monitor_log_buffer_.INFO("Drive event added.");
         } else {
           AERROR << "Truncated SubmitDriveEvent request.";

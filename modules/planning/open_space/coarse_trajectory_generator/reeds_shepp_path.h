@@ -23,9 +23,9 @@
 
 #include <limits>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 
 #include "cyber/common/log.h"
 #include "cyber/common/macros.h"
@@ -80,8 +80,8 @@ class ReedShepp {
                    std::vector<ReedSheppPath>* all_possible_paths);
   // Set the general profile of the movement primitives, parallel implementation
   bool GenerateRSPPar(const std::shared_ptr<Node3d> start_node,
-                   const std::shared_ptr<Node3d> end_node,
-                   std::vector<ReedSheppPath>* all_possible_paths);
+                      const std::shared_ptr<Node3d> end_node,
+                      std::vector<ReedSheppPath>* all_possible_paths);
   // Set local exact configurations profile of each movement primitive
   bool GenerateLocalConfigurations(const std::shared_ptr<Node3d> start_node,
                                    const std::shared_ptr<Node3d> end_node,

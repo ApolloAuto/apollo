@@ -16,14 +16,14 @@
 
 #include <thread>
 
+#include "cyber/common/file.h"
+#include "cyber/common/log.h"
 #include "cyber/cyber.h"
 #include "cyber/time/rate.h"
 
-#include "cyber/common/log.h"
 #include "gflags/gflags.h"
 #include "modules/canbus/common/canbus_gflags.h"
 #include "modules/common/adapters/adapter_gflags.h"
-#include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
 
 using apollo::control::ControlCommand;
@@ -44,8 +44,8 @@ int main(int32_t argc, char **argv) {
       node_->CreateWriter<ControlCommand>(FLAGS_control_command_topic);
 
   ControlCommand control_cmd;
-  if (!apollo::common::util::GetProtoFromFile(FLAGS_canbus_test_file,
-                                              &control_cmd)) {
+  if (!apollo::cyber::common::GetProtoFromFile(FLAGS_canbus_test_file,
+                                               &control_cmd)) {
     AERROR << "failed to load file: " << FLAGS_canbus_test_file;
     return -1;
   }

@@ -189,9 +189,8 @@ float ObjectInCameraView(SensorObjectConstPtr sensor_object,
   const double dist_slope = 0.25;
   auto sigmoid_like_fun = [max_dist, dist_slope](double obj_dist) {
     double x = obj_dist - max_dist;
-    return 0.5 -
-           0.5 * x * dist_slope /
-               std::sqrt(1 + x * x * dist_slope * dist_slope);
+    return 0.5 - 0.5 * x * dist_slope /
+                     std::sqrt(1 + x * x * dist_slope * dist_slope);
   };
   Eigen::Vector4d center3d_local = world2sensor_pose * center.homogeneous();
   double dist_to_camera = center3d_local.z();

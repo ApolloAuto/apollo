@@ -28,12 +28,14 @@ class RoutingComponent final
  public:
   RoutingComponent() = default;
   ~RoutingComponent() = default;
+
  public:
   bool Init() override;
   bool Proc(const std::shared_ptr<RoutingRequest>& request) override;
+
  private:
-  std::shared_ptr<::apollo::cyber::Writer<RoutingResponse>>
-      response_writer_ = nullptr;
+  std::shared_ptr<::apollo::cyber::Writer<RoutingResponse>> response_writer_ =
+      nullptr;
   std::shared_ptr<::apollo::cyber::Writer<RoutingResponse>>
       response_history_writer_ = nullptr;
   Routing routing_;

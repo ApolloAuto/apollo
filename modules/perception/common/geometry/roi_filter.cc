@@ -96,7 +96,7 @@ bool ObjectInRoiCheck(const HdmapStructConstPtr roi,
                       const std::vector<ObjectPtr>& objects,
                       std::vector<ObjectPtr>* valid_objects) {
   if (roi == nullptr ||
-      roi->road_polygons.size() + roi->junction_polygons.size() == 0) {
+      (roi->road_polygons.empty() && roi->junction_polygons.empty())) {
     valid_objects->assign(objects.begin(), objects.end());
     return true;
   }
@@ -108,36 +108,8 @@ bool ObjectInRoiCheck(const HdmapStructConstPtr roi,
       valid_objects->push_back(objects[i]);
     }
   }
-  return true;
-}
 
-bool ObjectInRoiSlackCheck(const HdmapStructConstPtr roi,
-                           const std::vector<ObjectPtr>& objects,
-                           std::vector<ObjectPtr>* valid_objects) {
-  if (roi == nullptr ||
-      roi->road_polygons.size() + roi->junction_polygons.size() == 0) {
-    valid_objects->assign(objects.begin(), objects.end());
-    return true;
-  }
-  valid_objects->clear();
-  valid_objects->reserve(objects.size());
-  for (std::size_t i = 0; i < objects.size(); i++) {
-    // keep object when its ct in roi
-    if (IsObjectInRoi(roi, objects[i])) {
-      valid_objects->push_back(objects[i]);
-      continue;
-    }
-    // keep known object when its bbox in roi
-    if (objects[i]->type == ObjectType::UNKNOWN ||
-        objects[i]->type == ObjectType::UNKNOWN_MOVABLE ||
-        objects[i]->type == ObjectType::UNKNOWN_UNMOVABLE) {
-      continue;
-    }
-    if (IsObjectBboxInRoi(roi, objects[i])) {
-      valid_objects->push_back(objects[i]);
-    }
-  }
-  return true;
+  return valid_objects->size() > 0;
 }
 
 }  // namespace common

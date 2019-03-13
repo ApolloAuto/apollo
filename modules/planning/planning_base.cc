@@ -34,7 +34,7 @@ using apollo::planning_internal::STGraphDebug;
 
 PlanningBase::~PlanningBase() {}
 
-apollo::common::Status PlanningBase::Init(const PlanningConfig& config) {
+Status PlanningBase::Init(const PlanningConfig& config) {
   PlanningContext::Instance()->Init();
   TaskFactory::Init(config);
   return Status::OK();
@@ -51,33 +51,8 @@ void PlanningBase::FillPlanningPb(const double timestamp,
     trajectory_pb->mutable_header()->set_radar_timestamp(
         local_view_.prediction_obstacles->header().radar_timestamp());
   }
-
-  // TODO(all): integrate reverse gear
-  trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
   trajectory_pb->mutable_routing_header()->CopyFrom(
       local_view_.routing->header());
-
-  if (FLAGS_use_planning_fallback &&
-      trajectory_pb->trajectory_point_size() == 0) {
-    SetFallbackTrajectory(trajectory_pb);
-  }
-}
-
-void PlanningBase::SetFallbackTrajectory(ADCTrajectory* const trajectory_pb) {
-  CHECK_NOTNULL(trajectory_pb);
-  // use planning trajectory from last cycle
-  if (last_planning_ != nullptr) {
-    const double current_time_stamp = trajectory_pb->header().timestamp_sec();
-    const double pre_time_stamp = last_planning_->header().timestamp_sec();
-
-    for (int i = 0; i < last_planning_->trajectory_point_size(); ++i) {
-      const double t = last_planning_->trajectory_point(i).relative_time() +
-                       pre_time_stamp - current_time_stamp;
-      auto* p = trajectory_pb->add_trajectory_point();
-      p->CopyFrom(last_planning_->trajectory_point(i));
-      p->set_relative_time(t);
-    }
-  }
 }
 
 void AddStGraph(const STGraphDebug& st_graph, Chart* chart) {

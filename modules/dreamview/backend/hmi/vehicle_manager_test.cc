@@ -15,9 +15,9 @@
  *****************************************************************************/
 #include "modules/dreamview/backend/hmi/vehicle_manager.h"
 
+#include "cyber/common/file.h"
 #include "gflags/gflags.h"
 #include "gtest/gtest.h"
-#include "modules/common/util/file.h"
 #include "modules/common/util/string_util.h"
 
 DECLARE_string(vehicle_data_config_filename);
@@ -45,13 +45,13 @@ TEST_F(VehicleManagerTest, Failure) {
 }
 
 TEST_F(VehicleManagerTest, Success) {
-  ASSERT_TRUE(apollo::common::util::EnsureDirectory(kTargetDir));
+  ASSERT_TRUE(cyber::common::EnsureDirectory(kTargetDir));
 
   EXPECT_TRUE(VehicleManager::Instance()->UseVehicle(kTestVehicle));
-  EXPECT_TRUE(apollo::common::util::PathExists(
-      StrCat(kTargetDir, "/vehicle_data.pb.txt")));
+  EXPECT_TRUE(
+      cyber::common::PathExists(StrCat(kTargetDir, "/vehicle_data.pb.txt")));
 
-  ASSERT_TRUE(apollo::common::util::RemoveAllFiles(kTargetDir));
+  ASSERT_TRUE(cyber::common::RemoveAllFiles(kTargetDir));
 }
 
 }  // namespace dreamview

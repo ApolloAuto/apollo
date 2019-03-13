@@ -23,8 +23,8 @@ namespace apollo {
 namespace perception {
 namespace common {
 
-using base::PointF;
 using base::PointCloud;
+using base::PointF;
 
 TEST(PointCloudProcessingDownsamplingTest, downsampling_circular_test1) {
   PointF center_pt, tmp_pt;

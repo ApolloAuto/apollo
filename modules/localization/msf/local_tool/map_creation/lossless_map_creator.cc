@@ -45,10 +45,11 @@ bool ParseCommandLine(int argc, char* argv[],
       // ("use_plane_fitting_ransac",
       // boost::program_options::value<bool>()->required(),
       //  "use plane fitting ransac")
-      ("pcd_folders", boost::program_options::value<std::vector<std::string>>()
-                          ->multitoken()
-                          ->composing()
-                          ->required(),
+      ("pcd_folders",
+       boost::program_options::value<std::vector<std::string>>()
+           ->multitoken()
+           ->composing()
+           ->required(),
        "pcd folders(repeated)")(
           "pose_files",
           boost::program_options::value<std::vector<std::string>>()
@@ -321,7 +322,7 @@ int main(int argc, char** argv) {
         unsigned int layer_id = 0;
         std::vector<unsigned int> layer_counts;
         map.GetCountSafe(pt3d, zone_id, resolution_id, &layer_counts);
-        if (layer_counts.size() == 0) {
+        if (layer_counts.empty()) {
           AERROR << "No ground layer, skip.";
           continue;
         }

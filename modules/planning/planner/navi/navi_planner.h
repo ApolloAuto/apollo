@@ -71,7 +71,8 @@ class NaviPlanner : public PlannerWithReferenceLine {
    * @return OK if planning succeeds; error otherwise.
    */
   common::Status Plan(const common::TrajectoryPoint& planning_init_point,
-                      Frame* frame) override;
+                      Frame* frame,
+                      ADCTrajectory* ptr_computed_trajectory) override;
 
   void Stop() override {}
 

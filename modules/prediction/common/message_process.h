@@ -38,14 +38,14 @@ class MessageProcess {
 
   static void OnPerception(
       const perception::PerceptionObstacles &perception_obstacles,
-      PredictionObstacles* const prediction_obstacles);
+      PredictionObstacles *const prediction_obstacles);
 
   static void OnLocalization(
       const localization::LocalizationEstimate &localization);
 
   static void OnPlanning(const planning::ADCTrajectory &adc_trajectory);
 
-  static void ProcessOfflineData(const std::string& record_filename);
+  static void ProcessOfflineData(const std::string &record_filename);
 };
 
 }  // namespace prediction

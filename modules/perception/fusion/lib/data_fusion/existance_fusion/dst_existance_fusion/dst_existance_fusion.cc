@@ -19,7 +19,7 @@
 
 #include "boost/format.hpp"
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
 #include "modules/perception/fusion/base/base_init_options.h"
 #include "modules/perception/fusion/base/sensor_data_manager.h"
 #include "modules/perception/fusion/common/camera_util.h"
@@ -30,10 +30,10 @@ namespace apollo {
 namespace perception {
 namespace fusion {
 
-using apollo::common::util::GetAbsolutePath;
+using cyber::common::GetAbsolutePath;
 
-const char* DstExistanceFusion::name_ = "DstExistanceFusion";
-const char* DstExistanceFusion::toic_name_ = "DstToicFusion";
+const char *DstExistanceFusion::name_ = "DstExistanceFusion";
+const char *DstExistanceFusion::toic_name_ = "DstToicFusion";
 ExistanceDstMaps DstExistanceFusion::existance_dst_maps_;
 ToicDstMaps DstExistanceFusion::toic_dst_maps_;
 DstExistanceFusionOptions DstExistanceFusion::options_;
@@ -56,7 +56,7 @@ bool DstExistanceFusion::Init() {
   std::string config = GetAbsolutePath(woork_root_config, options.conf_file);
   DstExistanceFusionConfig params;
 
-  if (!apollo::common::util::GetProtoFromFile(config, &params)) {
+  if (!cyber::common::GetProtoFromFile(config, &params)) {
     AERROR << "Read config failed: " << config;
     return false;
   }
@@ -64,15 +64,14 @@ bool DstExistanceFusion::Init() {
     std::string camera_id = valid_dist.camera_name();
     options_.camera_max_valid_dist_[camera_id] = valid_dist.valid_dist();
     AINFO << "dst existance fusion params: " << camera_id
-             << " max valid dist: "
-             << options_.camera_max_valid_dist_[camera_id];
+          << " max valid dist: " << options_.camera_max_valid_dist_[camera_id];
   }
 
   options_.track_object_max_match_distance_ =
       params.track_object_max_match_distance();
   AINFO << "dst existance fusion params: "
-           << " track_object_max_match_distance: "
-           << options_.track_object_max_match_distance_;
+        << " track_object_max_match_distance: "
+        << options_.track_object_max_match_distance_;
 
   DstManager::Instance()->AddApp(name_, existance_dst_maps_.fod_subsets_,
                                  existance_dst_maps_.subset_names_);
@@ -111,11 +110,11 @@ void DstExistanceFusion::UpdateWithMeasurement(
   fused_existance_ =
       fused_existance_ + existance_evidence * exist_fused_w * association_prob;
   ADEBUG << " update with, EXIST prob: " << GetExistanceProbability()
-            << " obj_id " << measurement->GetBaseObject()->track_id
-            << " association_prob: " << association_prob << " decay: " << decay
-            << " exist_prob: " << obj_exist_prob
-            << " sensor_id: " << measurement->GetSensorId()
-            << " track_id: " << track_ref_->GetTrackId();
+         << " obj_id " << measurement->GetBaseObject()->track_id
+         << " association_prob: " << association_prob << " decay: " << decay
+         << " exist_prob: " << obj_exist_prob
+         << " sensor_id: " << measurement->GetSensorId()
+         << " track_id: " << track_ref_->GetTrackId();
   if (IsCamera(measurement)) {
     UpdateToicWithCameraMeasurement(measurement, match_dist);
   }
@@ -157,15 +156,14 @@ void DstExistanceFusion::UpdateWithoutMeasurement(const std::string &sensor_id,
     //   options_.track_object_max_match_distance_, 0.0);
     // }
     ADEBUG << " before update exist prob: " << GetExistanceProbability()
-              << " min_match_dist: " << min_match_dist
-              << " min_match_dist_score: " << min_match_dist_score;
-    fused_existance_ =
-        fused_existance_ +
-        existance_evidence * unexist_fused_w * (1 - min_match_dist_score);
+           << " min_match_dist: " << min_match_dist
+           << " min_match_dist_score: " << min_match_dist_score;
+    fused_existance_ = fused_existance_ + existance_evidence * unexist_fused_w *
+                                              (1 - min_match_dist_score);
     ADEBUG << " update without, EXIST prob: " << GetExistanceProbability()
-              << " 1 - match_dist_score: " << 1 - min_match_dist_score
-              << " sensor_id: " << sensor_id << " dist_decay: " << dist_decay
-              << " track_id: " << track_ref_->GetTrackId();
+           << " 1 - match_dist_score: " << 1 - min_match_dist_score
+           << " sensor_id: " << sensor_id << " dist_decay: " << dist_decay
+           << " track_id: " << track_ref_->GetTrackId();
   }
   UpdateExistanceState();
 }
@@ -178,16 +176,16 @@ double DstExistanceFusion::ComputeDistDecay(base::ObjectConstPtr obj,
   Eigen::Affine3d sensor2world_pose;
   bool status = SensorDataManager::Instance()->GetPose(sensor_id, timestamp,
                                                        &sensor2world_pose);
-  if (status == false) {
+  if (!status) {
     AERROR << "Failed to get pose";
     return dist_decay;
   }
   Eigen::Matrix4d world2sensor_pose = sensor2world_pose.matrix().inverse();
   if (!world2sensor_pose.allFinite()) {
     AERROR << boost::format(
-                     "The obtained camera pose is invalid. sensor_id : %s"
-                     " timestamp %16.6f") %
-                     sensor_id % timestamp;
+                  "The obtained camera pose is invalid. sensor_id : %s"
+                  " timestamp %16.6f") %
+                  sensor_id % timestamp;
     return dist_decay;
   }
   Eigen::Vector3d obj_ct = obj->center;
@@ -210,8 +208,8 @@ double DstExistanceFusion::ComputeFeatureInfluence(
   velocity_fact = velocity > 4.0 ? velocity_fact : 0.0;
   double confidence = measurement->GetBaseObject()->confidence;
   ADEBUG << " sensor_id: " << measurement->GetSensorId()
-            << " velocity: " << velocity << " velocity_fact: " << velocity_fact
-            << " confidence: " << confidence;
+         << " velocity: " << velocity << " velocity_fact: " << velocity_fact
+         << " confidence: " << confidence;
   return velocity_fact * confidence;
 }
 
@@ -255,8 +253,8 @@ void DstExistanceFusion::UpdateToicWithoutCameraMeasurement(
 
   base::BaseCameraModelPtr camera_model =
       sensor_manager->GetCameraIntrinsic(sensor_id);
-  CHECK(camera_model != nullptr) << "Failed to get camera intrinsic for "
-                                 << sensor_id;
+  CHECK(camera_model != nullptr)
+      << "Failed to get camera intrinsic for " << sensor_id;
 
   Eigen::Affine3d sensor2world_pose;
   bool status = sensor_manager->GetPose(sensor_id, measurement_timestamp,
@@ -264,9 +262,9 @@ void DstExistanceFusion::UpdateToicWithoutCameraMeasurement(
   auto max_dist_it = options_.camera_max_valid_dist_.find(sensor_id);
   if (max_dist_it == options_.camera_max_valid_dist_.end()) {
     AWARN << boost::format(
-                    "There is no pre-defined max valid camera"
-                    " dist for sensor type: %s") %
-                    sensor_id;
+                 "There is no pre-defined max valid camera"
+                 " dist for sensor type: %s") %
+                 sensor_id;
   }
   if (status && max_dist_it != options_.camera_max_valid_dist_.end()) {
     SensorObjectConstPtr lidar_object = track_ref_->GetLatestLidarObject();
@@ -301,8 +299,8 @@ void DstExistanceFusion::UpdateToicWithCameraMeasurement(
 
   base::BaseCameraModelPtr camera_model =
       sensor_manager->GetCameraIntrinsic(sensor_id);
-  CHECK(camera_model != nullptr) << "Failed to get camera intrinsic for "
-                                 << sensor_id;
+  CHECK(camera_model != nullptr)
+      << "Failed to get camera intrinsic for " << sensor_id;
 
   Eigen::Affine3d sensor2world_pose;
   bool status =
@@ -310,9 +308,9 @@ void DstExistanceFusion::UpdateToicWithCameraMeasurement(
   auto max_dist_it = options_.camera_max_valid_dist_.find(sensor_id);
   if (max_dist_it == options_.camera_max_valid_dist_.end()) {
     AWARN << boost::format(
-                    "There is no pre-defined max valid camera"
-                    " dist for sensor type: %s") %
-                    sensor_id;
+                 "There is no pre-defined max valid camera"
+                 " dist for sensor type: %s") %
+                 sensor_id;
   } else {
     ADEBUG << "camera dist: " << sensor_id << " " << max_dist_it->second;
   }
@@ -392,7 +390,7 @@ void DstExistanceFusion::UpdateExistanceState() {
     toic_score_ = 0.5;
   } else {
     AERROR << boost::format("this fused object: %d has no sensor objects") %
-                     track_ref_->GetTrackId();
+                  track_ref_->GetTrackId();
     toic_score_ = 0.5;
   }
 }

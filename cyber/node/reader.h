@@ -58,8 +58,8 @@ class Reader : public ReaderBase {
       typename std::list<std::shared_ptr<MessageT>>::const_iterator;
 
   explicit Reader(const proto::RoleAttributes& role_attr,
-         const CallbackFunc<MessageT>& reader_func = nullptr,
-         uint32_t pending_queue_size = DEFAULT_PENDING_QUEUE_SIZE);
+                  const CallbackFunc<MessageT>& reader_func = nullptr,
+                  uint32_t pending_queue_size = DEFAULT_PENDING_QUEUE_SIZE);
   virtual ~Reader();
 
   bool Init() override;
@@ -106,7 +106,8 @@ template <typename MessageT>
 Reader<MessageT>::Reader(const proto::RoleAttributes& role_attr,
                          const CallbackFunc<MessageT>& reader_func,
                          uint32_t pending_queue_size)
-    : ReaderBase(role_attr), pending_queue_size_(pending_queue_size),
+    : ReaderBase(role_attr),
+      pending_queue_size_(pending_queue_size),
       reader_func_(reader_func) {
   blocker_.reset(new blocker::Blocker<MessageT>(blocker::BlockerAttr(
       role_attr.qos_profile().depth(), role_attr.channel_name())));

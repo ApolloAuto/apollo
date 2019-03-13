@@ -37,16 +37,16 @@ struct TrackedObject {
 
   void Reset();
 
-  void Reset(base::ObjectPtr obj_ptr,
-      const Eigen::Affine3d& pose,
+  void Reset(
+      base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
       const Eigen::Vector3d& global_to_local_offset = Eigen::Vector3d::Zero(),
       const base::SensorInfo& sensor = base::SensorInfo());
 
   std::string ToString() const;
   void ComputeShapeFeatures();
 
-  void AttachObject(base::ObjectPtr obj_ptr,
-      const Eigen::Affine3d& pose,
+  void AttachObject(
+      base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose,
       const Eigen::Vector3d& global_to_local_offset = Eigen::Vector3d::Zero(),
       const base::SensorInfo& sensor = base::SensorInfo());
 
@@ -121,13 +121,13 @@ struct TrackedObject {
   Eigen::Vector3d belief_velocity_gain;
 
   // filter covariances
-  Eigen::Matrix3d         velocity_covariance;
-  Eigen::Matrix3d         belief_velocity_online_covariance;
+  Eigen::Matrix3d velocity_covariance;
+  Eigen::Matrix3d belief_velocity_online_covariance;
 
   // combine velocity and acceleration
-  Eigen::Vector4d         state;
-  Eigen::Matrix4d         measurement_covariance;
-  Eigen::Matrix4d         state_covariance;
+  Eigen::Vector4d state;
+  Eigen::Matrix4d measurement_covariance;
+  Eigen::Matrix4d state_covariance;
 
   // motion score (calculated in kalman_filter)
   // the three scores are
@@ -145,7 +145,7 @@ struct TrackedObject {
   Eigen::Vector3d output_direction;
   Eigen::Vector3d output_center;
   Eigen::Vector3d output_size;
-  base::SensorInfo              sensor_info;
+  base::SensorInfo sensor_info;
 };  // struct TrackedObject
 
 typedef std::shared_ptr<TrackedObject> TrackedObjectPtr;

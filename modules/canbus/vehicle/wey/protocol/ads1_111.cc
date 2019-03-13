@@ -54,8 +54,7 @@ void Ads1111::Reset() {
   ads_aeb_tgtdecel_req_ = Ads1_111::ADS_AEB_TGTDECEL_REQ_NO_DEMAND;
 }
 
-Ads1111* Ads1111::set_ads_dectostop(
-    Ads1_111::Ads_dectostopType ads_dectostop) {
+Ads1111* Ads1111::set_ads_dectostop(Ads1_111::Ads_dectostopType ads_dectostop) {
   ads_dectostop_ = ads_dectostop;
   return this;
 }
@@ -66,16 +65,14 @@ Ads1111* Ads1111::set_ads_dectostop(
 // 'is_signed_var': False, 'offset': 0.0, 'physical_range': '[0|1]', 'bit': 17,
 // 'type': 'enum', 'order': 'motorola', 'physical_unit': ''}
 void Ads1111::set_p_ads_dectostop(uint8_t* data,
-    Ads1_111::Ads_dectostopType ads_dectostop) {
+                                  Ads1_111::Ads_dectostopType ads_dectostop) {
   int x = ads_dectostop;
 
   Byte to_set(data + 2);
   to_set.set_value(static_cast<uint8_t>(x), 1, 1);
 }
 
-
-Ads1111* Ads1111::set_ads_mode(
-    Ads1_111::Ads_modeType ads_mode) {
+Ads1111* Ads1111::set_ads_mode(Ads1_111::Ads_modeType ads_mode) {
   ads_mode_ = ads_mode;
   return this;
 }
@@ -86,17 +83,14 @@ Ads1111* Ads1111::set_ads_mode(
 // 'len': 5, 'name': 'ADS_Mode', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|31]', 'bit': 7, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads1111::set_p_ads_mode(uint8_t* data,
-    Ads1_111::Ads_modeType ads_mode) {
+void Ads1111::set_p_ads_mode(uint8_t* data, Ads1_111::Ads_modeType ads_mode) {
   int x = ads_mode;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 3, 5);
 }
 
-
-Ads1111* Ads1111::set_ads_taracce(
-    double ads_taracce) {
+Ads1111* Ads1111::set_ads_taracce(double ads_taracce) {
   ads_taracce_ = ads_taracce;
   return this;
 }
@@ -105,15 +99,13 @@ Ads1111* Ads1111::set_ads_taracce(
 // 'offset': -7.0, 'precision': 0.05, 'len': 8, 'name': 'ADS_TarAcce',
 // 'is_signed_var': False, 'physical_range': '[-7|5.75]', 'bit': 15, 'type':
 // 'double', 'order': 'motorola', 'physical_unit': 'm/s2'}
-void Ads1111::set_p_ads_taracce(uint8_t* data,
-    double ads_taracce) {
+void Ads1111::set_p_ads_taracce(uint8_t* data, double ads_taracce) {
   ads_taracce = ProtocolData::BoundedValue(-7.0, 5.75, ads_taracce);
   int x = static_cast<int>((ads_taracce - -7.000000) / 0.050000);
 
   Byte to_set(data + 1);
   to_set.set_value(static_cast<uint8_t>(x), 0, 8);
 }
-
 
 Ads1111* Ads1111::set_ads_driveoff_req(
     Ads1_111::Ads_driveoff_reqType ads_driveoff_req) {
@@ -126,17 +118,15 @@ Ads1111* Ads1111::set_ads_driveoff_req(
 // 'len': 1, 'name': 'ADS_Driveoff_Req', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 1, 'type': 'enum', 'order': 'motorola',
 // 'physical_unit': ''}
-void Ads1111::set_p_ads_driveoff_req(uint8_t* data,
-    Ads1_111::Ads_driveoff_reqType ads_driveoff_req) {
+void Ads1111::set_p_ads_driveoff_req(
+    uint8_t* data, Ads1_111::Ads_driveoff_reqType ads_driveoff_req) {
   int x = ads_driveoff_req;
 
   Byte to_set(data + 0);
   to_set.set_value(static_cast<uint8_t>(x), 1, 1);
 }
 
-
-Ads1111* Ads1111::set_ads_aeb_taracce(
-    double ads_aeb_taracce) {
+Ads1111* Ads1111::set_ads_aeb_taracce(double ads_aeb_taracce) {
   ads_aeb_taracce_ = ads_aeb_taracce;
   return this;
 }
@@ -145,8 +135,7 @@ Ads1111* Ads1111::set_ads_aeb_taracce(
 // 'offset': -16.0, 'precision': 0.000488, 'len': 16, 'name': 'ADS_AEB_TarAcce',
 // 'is_signed_var': False, 'physical_range': '[-16|16]', 'bit': 39, 'type':
 // 'double', 'order': 'motorola', 'physical_unit': 'm/s2'}
-void Ads1111::set_p_ads_aeb_taracce(uint8_t* data,
-    double ads_aeb_taracce) {
+void Ads1111::set_p_ads_aeb_taracce(uint8_t* data, double ads_aeb_taracce) {
   ads_aeb_taracce = ProtocolData::BoundedValue(-16.0, 16.0, ads_aeb_taracce);
   int x = static_cast<int>((ads_aeb_taracce - -16.000000) / 0.000488);
   uint8_t t = 0;
@@ -161,7 +150,6 @@ void Ads1111::set_p_ads_aeb_taracce(uint8_t* data,
   to_set1.set_value(t, 0, 8);
 }
 
-
 Ads1111* Ads1111::set_ads_aeb_tgtdecel_req(
     Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req) {
   ads_aeb_tgtdecel_req_ = ads_aeb_tgtdecel_req;
@@ -174,8 +162,8 @@ Ads1111* Ads1111::set_ads_aeb_tgtdecel_req(
 // 'name': 'ADS_AEB_TgtDecel_Req', 'is_signed_var': False, 'offset': 0.0,
 // 'physical_range': '[0|1]', 'bit': 31, 'type': 'enum', 'order':'motorola',
 // 'physical_unit': ''}
-void Ads1111::set_p_ads_aeb_tgtdecel_req(uint8_t* data,
-    Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req) {
+void Ads1111::set_p_ads_aeb_tgtdecel_req(
+    uint8_t* data, Ads1_111::Ads_aeb_tgtdecel_reqType ads_aeb_tgtdecel_req) {
   int x = ads_aeb_tgtdecel_req;
 
   Byte to_set(data + 3);

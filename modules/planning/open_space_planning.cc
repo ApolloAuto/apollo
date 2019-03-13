@@ -35,7 +35,8 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/common/trajectory/trajectory_stitcher.h"
+#include "modules/planning/common/trajectory_stitcher.h"
+#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -47,35 +48,6 @@ using apollo::common::VehicleStateProvider;
 using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 using apollo::routing::RoutingResponse;
-
-namespace {
-
-bool IsVehicleStateValid(const VehicleState& vehicle_state) {
-  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
-      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
-      std::isnan(vehicle_state.kappa()) ||
-      std::isnan(vehicle_state.linear_velocity()) ||
-      std::isnan(vehicle_state.linear_acceleration())) {
-    return false;
-  }
-  return true;
-}
-
-bool IsDifferentRouting(const RoutingResponse& first,
-                        const RoutingResponse& second) {
-  if (first.has_header() && second.has_header()) {
-    if (first.header().sequence_num() != second.header().sequence_num()) {
-      return true;
-    }
-    if (first.header().timestamp_sec() != second.header().timestamp_sec()) {
-      return true;
-    }
-    return false;
-  } else {
-    return true;
-  }
-}
-}  // namespace
 
 OpenSpacePlanning::~OpenSpacePlanning() {
   planner_->Stop();
@@ -119,11 +91,9 @@ Status OpenSpacePlanning::Init(const PlanningConfig& config) {
 
 Status OpenSpacePlanning::InitFrame(const uint32_t sequence_num,
                                     const TrajectoryPoint& planning_start_point,
-                                    const double start_time,
-                                    const VehicleState& vehicle_state,
-                                    ADCTrajectory* output_trajectory) {
+                                    const VehicleState& vehicle_state) {
   frame_.reset(new Frame(sequence_num, local_view_, planning_start_point,
-                         start_time, vehicle_state, output_trajectory));
+                         vehicle_state));
   if (frame_ == nullptr) {
     return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
   }
@@ -193,9 +163,8 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
       last_publishable_trajectory_.get(), &replan_reason);
 
   const size_t frame_num = seq_num_++;
-  status =
-      InitFrame(static_cast<uint32_t>(frame_num), stitching_trajectory.back(),
-                start_timestamp, vehicle_state, ptr_trajectory_pb);
+  status = InitFrame(static_cast<uint32_t>(frame_num),
+                     stitching_trajectory.back(), vehicle_state);
 
   ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
@@ -224,7 +193,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
     }
 
     FillPlanningPb(start_timestamp, ptr_trajectory_pb);
-    frame_->mutable_trajectory()->CopyFrom(*ptr_trajectory_pb);
+    frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
     FrameHistory::Instance()->Add(n, std::move(frame_));
     return;
@@ -260,7 +229,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
   FillPlanningPb(start_timestamp, ptr_trajectory_pb);
   ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
 
-  frame_->mutable_trajectory()->CopyFrom(*ptr_trajectory_pb);
+  frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
 
   const uint32_t n = frame_->SequenceNum();
   FrameHistory::Instance()->Add(n, std::move(frame_));
@@ -278,43 +247,43 @@ Status OpenSpacePlanning::Plan(
   Status trajectory_partition_status;
 
   if (status == Status::OK()) {
-    ADCTrajectory* trajectory_after_stitching_point =
-        frame_->mutable_trajectory();
+    auto trajectory_after_stitching_point =
+        frame_->current_frame_planned_trajectory();
     last_stitching_trajectory_ = frame_->last_stitching_trajectory();
-    trajectory_after_stitching_point->mutable_header()->set_timestamp_sec(
+    trajectory_after_stitching_point.mutable_header()->set_timestamp_sec(
         current_time_stamp);
 
     // adjust the relative time and relative s
     int size_of_trajectory_after_stitching_point =
-        trajectory_after_stitching_point->trajectory_point_size();
+        trajectory_after_stitching_point.trajectory_point_size();
     double last_stitching_trajectory_relative_time =
         last_stitching_trajectory_.back().relative_time();
     double last_stitching_trajectory_relative_s =
         last_stitching_trajectory_.back().path_point().s();
     for (int i = 0; i < size_of_trajectory_after_stitching_point; i++) {
-      trajectory_after_stitching_point->mutable_trajectory_point(i)
+      trajectory_after_stitching_point.mutable_trajectory_point(i)
           ->set_relative_time(
-              trajectory_after_stitching_point->mutable_trajectory_point(i)
+              trajectory_after_stitching_point.mutable_trajectory_point(i)
                   ->relative_time() +
               last_stitching_trajectory_relative_time);
-      trajectory_after_stitching_point->mutable_trajectory_point(i)
+      trajectory_after_stitching_point.mutable_trajectory_point(i)
           ->mutable_path_point()
-          ->set_s(trajectory_after_stitching_point->mutable_trajectory_point(i)
+          ->set_s(trajectory_after_stitching_point.mutable_trajectory_point(i)
                       ->path_point()
                       .s() +
                   last_stitching_trajectory_relative_s);
     }
 
     last_publishable_trajectory_.reset(
-        new PublishableTrajectory(*trajectory_after_stitching_point));
+        new PublishableTrajectory(trajectory_after_stitching_point));
+    frame_->set_current_frame_planned_trajectory(
+        trajectory_after_stitching_point);
 
     ADEBUG << "current_time_stamp: " << std::to_string(current_time_stamp);
 
-    if (FLAGS_enable_stitch_last_trajectory) {
-      last_publishable_trajectory_->PrependTrajectoryPoints(
-          std::vector<TrajectoryPoint>(last_stitching_trajectory_.begin(),
-                                       last_stitching_trajectory_.end() - 1));
-    }
+    last_publishable_trajectory_->PrependTrajectoryPoints(
+        std::vector<TrajectoryPoint>(last_stitching_trajectory_.begin(),
+                                     last_stitching_trajectory_.end() - 1));
 
     // save the publishable trajectory for use when no planning is generated
     last_trajectory_ = std::make_unique<PublishableTrajectory>(
@@ -613,10 +582,6 @@ void OpenSpacePlanning::FillPlanningPb(const double timestamp,
   ptr_trajectory_pb->mutable_routing_header()->CopyFrom(
       local_view_.routing->header());
 
-  if (FLAGS_use_planning_fallback &&
-      ptr_trajectory_pb->trajectory_point_size() == 0) {
-    SetFallbackTrajectory(ptr_trajectory_pb);
-  }
   const double dt = timestamp - Clock::NowInSeconds();
   for (auto& p : *ptr_trajectory_pb->mutable_trajectory_point()) {
     p.set_relative_time(p.relative_time() - dt);
@@ -677,7 +642,7 @@ void OpenSpacePlanning::GenerateStopTrajectory(
   for (size_t i = 0; i < stop_trajectory_length; i++) {
     auto* point = ptr_trajectory_pb->add_trajectory_point();
     point->mutable_path_point()->set_x(frame_->vehicle_state().x());
-    point->mutable_path_point()->set_y(frame_->vehicle_state().x());
+    point->mutable_path_point()->set_y(frame_->vehicle_state().y());
     point->mutable_path_point()->set_theta(frame_->vehicle_state().heading());
     point->mutable_path_point()->set_s(0.0);
     point->mutable_path_point()->set_kappa(0.0);

@@ -35,9 +35,9 @@ namespace velodyne {
 using apollo::cyber::Component;
 using apollo::cyber::Reader;
 using apollo::cyber::Writer;
+using apollo::cyber::base::CCObjectPool;
 using apollo::drivers::PointCloud;
 using apollo::drivers::velodyne::VelodyneScan;
-using apollo::cyber::base::CCObjectPool;
 
 class VelodyneConvertComponent : public Component<VelodyneScan> {
  public:

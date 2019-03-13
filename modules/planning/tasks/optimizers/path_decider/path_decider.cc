@@ -20,6 +20,8 @@
 
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
 
+#include <string>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -36,27 +38,34 @@ PathDecider::PathDecider(const TaskConfig &config) : Task(config) {
   SetName("PathDecider");
 }
 
-apollo::common::Status PathDecider::Execute(
-    Frame *frame, ReferenceLineInfo *reference_line_info) {
+Status PathDecider::Execute(Frame *frame,
+                            ReferenceLineInfo *reference_line_info) {
   Task::Execute(frame, reference_line_info);
-  return Process(reference_line_info->path_data(),
+  return Process(reference_line_info,
+                 reference_line_info->path_data(),
                  reference_line_info->path_decision());
 }
 
-Status PathDecider::Process(const PathData &path_data,
+Status PathDecider::Process(const ReferenceLineInfo* reference_line_info,
+                            const PathData &path_data,
                             PathDecision *const path_decision) {
   CHECK_NOTNULL(path_decision);
-  if (!MakeObjectDecision(path_data, path_decision)) {
+  std::string blocking_obstacle_id =
+      reference_line_info->GetBlockingObstacleId();
+  if (!MakeObjectDecision(
+          path_data, blocking_obstacle_id, path_decision)) {
     AERROR << "Failed to make decision based on tunnel";
     return Status(ErrorCode::PLANNING_ERROR, "dp_road_graph decision ");
   }
   return Status::OK();
 }
 
-bool PathDecider::MakeObjectDecision(const PathData &path_data,
-                                     PathDecision *const path_decision) {
+bool PathDecider::MakeObjectDecision(
+    const PathData &path_data, const std::string& blocking_obstacle_id,
+    PathDecision *const path_decision) {
   DCHECK_NOTNULL(path_decision);
-  if (!MakeStaticObstacleDecision(path_data, path_decision)) {
+  if (!MakeStaticObstacleDecision(
+          path_data, blocking_obstacle_id, path_decision)) {
     AERROR << "Failed to make decisions for static obstacles";
     return false;
   }
@@ -64,7 +73,8 @@ bool PathDecider::MakeObjectDecision(const PathData &path_data,
 }
 
 bool PathDecider::MakeStaticObstacleDecision(
-    const PathData &path_data, PathDecision *const path_decision) {
+    const PathData &path_data, const std::string& blocking_obstacle_id,
+    PathDecision *const path_decision) {
   DCHECK_NOTNULL(path_decision);
   const auto &frenet_path = path_data.frenet_frame_path();
   if (frenet_path.empty()) {
@@ -99,8 +109,17 @@ bool PathDecider::MakeStaticObstacleDecision(
       // STOP decision
       continue;
     }
+
+    if (obstacle->Id() == blocking_obstacle_id) {
+      // Add stop decision
+      ObjectDecisionType object_decision;
+      *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
+      path_decision->AddLongitudinalDecision("PathDecider/blocking_obstacle",
+                                               obstacle->Id(), object_decision);
+      continue;
+    }
     if (obstacle->reference_line_st_boundary().boundary_type() ==
-        StBoundary::BoundaryType::KEEP_CLEAR) {
+        STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
 
@@ -121,12 +140,17 @@ bool PathDecider::MakeStaticObstacleDecision(
 
     const auto frenet_point = frenet_path.GetNearestPoint(sl_boundary);
     const double curr_l = frenet_point.l();
+    double min_nudge_l =
+        half_width + FLAGS_static_decision_nudge_l_buffer / 2.0;
+
     if (curr_l - lateral_radius > sl_boundary.end_l() ||
         curr_l + lateral_radius < sl_boundary.start_l()) {
       // ignore
       path_decision->AddLateralDecision("PathDecider/not-in-l", obstacle->Id(),
                                         object_decision);
-    } else if (obstacle->IsLaneBlocking()) {
+    } else if (obstacle->IsLaneBlocking() ||
+               (curr_l - sl_boundary.end_l() < min_nudge_l &&
+                curr_l - sl_boundary.start_l() > min_nudge_l)) {
       // stop
       *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
 

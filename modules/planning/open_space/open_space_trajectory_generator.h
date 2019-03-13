@@ -29,22 +29,18 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
-#include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/proto/planning_internal.pb.h"
-
-/*
-Initially inspired by "Optimization-Based Collision Avoidance" from Xiaojing
-Zhanga , Alexander Linigerb and Francesco Borrellia
-*/
 
 /**
  * @namespace apollo::planning
  * @brief apollo::planning
  */
+
 namespace apollo {
 namespace planning {
 
@@ -102,7 +98,9 @@ class OpenSpaceTrajectoryGenerator {
 
   void Stop();
 
-  void RecordDebugInfo(const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWs,
+  void RecordDebugInfo(const Vec2d& translate_origin,
+                       const double& rotate_angle, const Eigen::MatrixXd& xWS,
+                       const Eigen::MatrixXd& uWs,
                        const Eigen::MatrixXd& l_warm_up,
                        const Eigen::MatrixXd& n_warm_up,
                        const Eigen::MatrixXd& dual_l_result_ds,

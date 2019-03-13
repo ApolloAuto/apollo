@@ -26,7 +26,7 @@ namespace apollo {
 namespace perception {
 namespace lidar {
 
-class MultiHmBipartiteGraphMatcher: public BaseBipartiteGraphMatcher{
+class MultiHmBipartiteGraphMatcher : public BaseBipartiteGraphMatcher {
  public:
   MultiHmBipartiteGraphMatcher();
   ~MultiHmBipartiteGraphMatcher();
@@ -40,9 +40,7 @@ class MultiHmBipartiteGraphMatcher: public BaseBipartiteGraphMatcher{
              std::vector<NodeNodePair> *assignments,
              std::vector<size_t> *unassigned_rows,
              std::vector<size_t> *unassigned_cols);
-  std::string Name() const {
-      return "MultiHmBipartiteGraphMatcher";
-  }
+  std::string Name() const { return "MultiHmBipartiteGraphMatcher"; }
 
  protected:
   common::GatedHungarianMatcher<float> optimizer_;

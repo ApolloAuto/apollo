@@ -76,38 +76,47 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
   return 0;
 }
 
-double EvaluateQuinticPolynomial(
-    const std::array<double, 6>& coeffs,
-    const double t, const uint32_t order,
-    const double end_t, const double end_v) {
+double EvaluateQuinticPolynomial(const std::array<double, 6>& coeffs,
+                                 const double t, const uint32_t order,
+                                 const double end_t, const double end_v) {
   if (t >= end_t) {
     switch (order) {
       case 0: {
-        double end_value = ((((coeffs[5] * end_t + coeffs[4]) * end_t +
-            coeffs[3]) * end_t + coeffs[2]) * end_t + coeffs[1]) * end_t +
+        double end_value =
+            ((((coeffs[5] * end_t + coeffs[4]) * end_t + coeffs[3]) * end_t +
+              coeffs[2]) *
+                 end_t +
+             coeffs[1]) *
+                end_t +
             coeffs[0];
         return end_value + end_v * (t - end_t);
       }
       case 1: {
         return end_v;
       }
-      default: {
-        return 0.0;
-      }
+      default: { return 0.0; }
     }
   }
   switch (order) {
     case 0: {
-      return ((((coeffs[5] * t + coeffs[4]) * t + coeffs[3]) * t +
-               coeffs[2]) * t + coeffs[1]) * t + coeffs[0];
+      return ((((coeffs[5] * t + coeffs[4]) * t + coeffs[3]) * t + coeffs[2]) *
+                  t +
+              coeffs[1]) *
+                 t +
+             coeffs[0];
     }
     case 1: {
-      return (((5.0 * coeffs[5] * t + 4.0 * coeffs[4]) * t +
-               3.0 * coeffs[3]) * t + 2.0 * coeffs[2]) * t + coeffs[1];
+      return (((5.0 * coeffs[5] * t + 4.0 * coeffs[4]) * t + 3.0 * coeffs[3]) *
+                  t +
+              2.0 * coeffs[2]) *
+                 t +
+             coeffs[1];
     }
     case 2: {
       return (((20.0 * coeffs[5] * t + 12.0 * coeffs[4]) * t) +
-              6.0 * coeffs[3]) * t + 2.0 * coeffs[2];
+              6.0 * coeffs[3]) *
+                 t +
+             2.0 * coeffs[2];
     }
     case 3: {
       return (60.0 * coeffs[5] * t + 24.0 * coeffs[4]) * t + 6.0 * coeffs[3];
@@ -123,33 +132,35 @@ double EvaluateQuinticPolynomial(
   }
 }
 
-double EvaluateQuarticPolynomial(
-    const std::array<double, 5>& coeffs,
-    const double t, const uint32_t order,
-    const double end_t, const double end_v) {
+double EvaluateQuarticPolynomial(const std::array<double, 5>& coeffs,
+                                 const double t, const uint32_t order,
+                                 const double end_t, const double end_v) {
   if (t >= end_t) {
     switch (order) {
       case 0: {
-        double end_value = (((coeffs[4] * end_t + coeffs[3]) * end_t +
-            coeffs[2]) * end_t + coeffs[1]) * end_t + coeffs[0];
+        double end_value =
+            (((coeffs[4] * end_t + coeffs[3]) * end_t + coeffs[2]) * end_t +
+             coeffs[1]) *
+                end_t +
+            coeffs[0];
         return end_value + (t - end_t) * end_v;
       }
       case 1: {
         return end_v;
       }
-      default: {
-        return 0.0;
-      }
+      default: { return 0.0; }
     }
   }
   switch (order) {
     case 0: {
-      return (((coeffs[4] * t + coeffs[3]) * t + coeffs[2]) * t +
-              coeffs[1]) * t + coeffs[0];
+      return (((coeffs[4] * t + coeffs[3]) * t + coeffs[2]) * t + coeffs[1]) *
+                 t +
+             coeffs[0];
     }
     case 1: {
-      return ((4.0 * coeffs[4] * t + 3.0 * coeffs[3]) * t +
-              2.0 * coeffs[2]) * t + coeffs[1];
+      return ((4.0 * coeffs[4] * t + 3.0 * coeffs[3]) * t + 2.0 * coeffs[2]) *
+                 t +
+             coeffs[1];
     }
     case 2: {
       return (12.0 * coeffs[4] * t + 6.0 * coeffs[3]) * t + 2.0 * coeffs[2];
@@ -165,41 +176,39 @@ double EvaluateQuarticPolynomial(
   }
 }
 
-double EvaluateCubicPolynomial(
-    const std::array<double, 4>& coefs,
-    const double t, const uint32_t order, const double end_t,
-    const double end_v) {
+double EvaluateCubicPolynomial(const std::array<double, 4>& coefs,
+                               const double t, const uint32_t order,
+                               const double end_t, const double end_v) {
   if (t > end_t) {
     switch (order) {
-    case 0: {
-      double end_value = ((coefs[3] * end_t + coefs[2]) * end_t + coefs[1])
-          * end_t + coefs[0];
-      return end_value + (t - end_t) * end_v;
-    }
-    case 1: {
-      return end_v;
-    }
-    default: {
-      return 0.0;
-    }
+      case 0: {
+        double end_value =
+            ((coefs[3] * end_t + coefs[2]) * end_t + coefs[1]) * end_t +
+            coefs[0];
+        return end_value + (t - end_t) * end_v;
+      }
+      case 1: {
+        return end_v;
+      }
+      default: { return 0.0; }
     }
   }
 
   switch (order) {
-  case 0: {
-    return ((coefs[3] * t + coefs[2]) * t + coefs[1]) * t + coefs[0];
-  }
-  case 1: {
-    return (3.0 * coefs[3] * t + 2.0 * coefs[2]) * t + coefs[1];
-  }
-  case 2: {
-    return 6.0 * coefs[3] * t + 2.0 * coefs[2];
-  }
-  case 3: {
-    return 6.0 * coefs[3];
-  }
-  default:
-    return 0.0;
+    case 0: {
+      return ((coefs[3] * t + coefs[2]) * t + coefs[1]) * t + coefs[0];
+    }
+    case 1: {
+      return (3.0 * coefs[3] * t + 2.0 * coefs[2]) * t + coefs[1];
+    }
+    case 2: {
+      return 6.0 * coefs[3] * t + 2.0 * coefs[2];
+    }
+    case 3: {
+      return 6.0 * coefs[3];
+    }
+    default:
+      return 0.0;
   }
 }
 
@@ -305,15 +314,12 @@ double AdjustSpeedByCurvature(const double speed, const double curvature) {
   if (std::abs(curvature) > FLAGS_turning_curvature_upper_bound) {
     return FLAGS_speed_at_upper_curvature;
   }
-  return apollo::common::math::lerp(FLAGS_speed_at_lower_curvature,
-                                    FLAGS_turning_curvature_lower_bound,
-                                    FLAGS_speed_at_upper_curvature,
-                                    FLAGS_turning_curvature_upper_bound,
-                                    curvature);
+  return apollo::common::math::lerp(
+      FLAGS_speed_at_lower_curvature, FLAGS_turning_curvature_lower_bound,
+      FLAGS_speed_at_upper_curvature, FLAGS_turning_curvature_upper_bound,
+      curvature);
 }
 
 }  // namespace predictor_util
 }  // namespace prediction
 }  // namespace apollo
-
-

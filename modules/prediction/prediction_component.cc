@@ -53,12 +53,13 @@ std::string PredictionComponent::Name() const {
 
 void PredictionComponent::OfflineProcessFeatureProtoFile(
     const std::string& features_proto_file_name) {
-  auto obstacles_container_ptr = ContainerManager::Instance()->GetContainer<
-      ObstaclesContainer>(AdapterConfig::PERCEPTION_OBSTACLES);
+  auto obstacles_container_ptr =
+      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
+          AdapterConfig::PERCEPTION_OBSTACLES);
   obstacles_container_ptr->Clear();
   Features features;
-  apollo::cyber::common::GetProtoFromBinaryFile(
-      features_proto_file_name, &features);
+  apollo::cyber::common::GetProtoFromBinaryFile(features_proto_file_name,
+                                                &features);
   for (const Feature& feature : features.feature()) {
     obstacles_container_ptr->InsertFeatureProto(feature);
     Obstacle* obstacle_ptr = obstacles_container_ptr->GetObstacle(feature.id());
@@ -83,31 +84,6 @@ bool PredictionComponent::Init() {
   prediction_writer_ =
       node_->CreateWriter<PredictionObstacles>(FLAGS_prediction_topic);
 
-  if (FLAGS_prediction_offline_mode) {
-    if (!FeatureOutput::Ready()) {
-      AERROR << "Feature output is not ready.";
-      return false;
-    }
-    if (FLAGS_prediction_offline_bags.empty()) {
-      return true;  // use listen to ROS topic mode
-    }
-    std::vector<std::string> inputs;
-    common::util::Split(FLAGS_prediction_offline_bags, ':', &inputs);
-    for (const auto& input : inputs) {
-      std::vector<std::string> offline_bags;
-      GetRecordFileNames(boost::filesystem::path(input), &offline_bags);
-      std::sort(offline_bags.begin(), offline_bags.end());
-      AINFO << "For input " << input << ", found " << offline_bags.size()
-            << "  rosbags to process";
-      for (std::size_t i = 0; i < offline_bags.size(); ++i) {
-        AINFO << "\tProcessing: [ " << i << " / " << offline_bags.size()
-              << " ]: " << offline_bags[i];
-        MessageProcess::ProcessOfflineData(offline_bags[i]);
-      }
-    }
-    FeatureOutput::Close();
-    return false;
-  }
   return true;
 }
 
@@ -134,15 +110,15 @@ bool PredictionComponent::Proc(
   localization_reader_->Observe();
   auto ptr_localization_msg = localization_reader_->GetLatestObserved();
   if (ptr_localization_msg == nullptr) {
-    AERROR <<"Prediction: cannot receive any localization message.";
+    AERROR << "Prediction: cannot receive any localization message.";
     return false;
   }
   auto localization_msg = *ptr_localization_msg;
   MessageProcess::OnLocalization(localization_msg);
   auto end_time2 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time2 - end_time1;
-  ADEBUG << "Time for updating PoseContainer: "
-        << diff.count() * 1000 << " msec.";
+  ADEBUG << "Time for updating PoseContainer: " << diff.count() * 1000
+         << " msec.";
 
   // Read planning info. of last frame and call OnPlanning to update
   // the ADCTrajectoryContainer
@@ -154,8 +130,8 @@ bool PredictionComponent::Proc(
   }
   auto end_time3 = std::chrono::system_clock::now();
   diff = end_time3 - end_time2;
-  ADEBUG << "Time for updating ADCTrajectoryContainer: "
-        << diff.count() * 1000 << " msec.";
+  ADEBUG << "Time for updating ADCTrajectoryContainer: " << diff.count() * 1000
+         << " msec.";
 
   // Get all perception_obstacles of this frame and call OnPerception to
   // process them all.
@@ -164,8 +140,8 @@ bool PredictionComponent::Proc(
   MessageProcess::OnPerception(perception_msg, &prediction_obstacles);
   auto end_time4 = std::chrono::system_clock::now();
   diff = end_time4 - end_time3;
-  ADEBUG << "Time for updating PerceptionContainer: "
-        << diff.count() * 1000 << " msec.";
+  ADEBUG << "Time for updating PerceptionContainer: " << diff.count() * 1000
+         << " msec.";
 
   // Postprocess prediction obstacles message
   prediction_obstacles.set_start_timestamp(frame_start_time_);
@@ -177,8 +153,7 @@ bool PredictionComponent::Proc(
   prediction_obstacles.mutable_header()->set_radar_timestamp(
       perception_msg.header().radar_timestamp());
 
-  prediction_obstacles.set_perception_error_code(
-      perception_msg.error_code());
+  prediction_obstacles.set_perception_error_code(perception_msg.error_code());
 
   if (FLAGS_prediction_test_mode) {
     for (auto const& prediction_obstacle :

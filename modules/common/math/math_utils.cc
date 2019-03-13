@@ -84,8 +84,8 @@ double Gaussian(const double u, const double std, const double x) {
 // Sigmoid
 double Sigmoid(const double x) { return 1.0 / (1.0 + std::exp(-x)); }
 
-Eigen::Vector2d RotateVector2d(
-    const Eigen::Vector2d& v_in, const double theta) {
+Eigen::Vector2d RotateVector2d(const Eigen::Vector2d& v_in,
+                               const double theta) {
   const double cos_theta = std::cos(theta);
   const double sin_theta = std::sin(theta);
 

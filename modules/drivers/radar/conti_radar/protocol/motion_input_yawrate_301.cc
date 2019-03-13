@@ -22,8 +22,8 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-using apollo::drivers::canbus::Byte;
 using apollo::drivers::ContiRadar;
+using apollo::drivers::canbus::Byte;
 
 const uint32_t MotionInputYawRate301::ID = 0x301;
 
@@ -48,20 +48,16 @@ void MotionInputYawRate301::UpdateData(uint8_t* data) {
   uint32_t yaw_rate_value = static_cast<uint32_t>((yaw_rate_ + 327.68) * 100);
   Byte yaw_rate_low(data);
   yaw_rate_low.set_value(
-      static_cast<unsigned char>((yaw_rate_value & 0xFF00) >> 8),
-      0, 8);
+      static_cast<unsigned char>((yaw_rate_value & 0xFF00) >> 8), 0, 8);
   Byte yaw_rate_high(data + 1);
-  yaw_rate_high.set_value(
-      static_cast<unsigned char>(yaw_rate_value & 0x00FF),
-      0, 8);
+  yaw_rate_high.set_value(static_cast<unsigned char>(yaw_rate_value & 0x00FF),
+                          0, 8);
 }
 
 /**
  * @brief reset the private variables
  */
-void MotionInputYawRate301::Reset() {
-  yaw_rate_ = NAN;
-}
+void MotionInputYawRate301::Reset() { yaw_rate_ = NAN; }
 
 void MotionInputYawRate301::SetYawRate(const float& yaw_rate) {
   yaw_rate_ = yaw_rate;

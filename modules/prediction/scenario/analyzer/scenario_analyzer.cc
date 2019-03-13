@@ -25,7 +25,6 @@ namespace prediction {
 
 std::shared_ptr<ScenarioFeatures> ScenarioAnalyzer::Analyze(
     const EnvironmentFeatures& environment_features) {
-
   Scenario::Type scenario_type = Scenario::UNKNOWN;
 
   if (environment_features.has_front_junction() &&

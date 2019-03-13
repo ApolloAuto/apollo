@@ -276,23 +276,18 @@ def decode_polyline(polyline_str):
     return coordinates
 
 
-def run_flask():
-    app.run(debug=False, port=5001, host='0.0.0.0')
-
-
 if __name__ == "__main__":
     key_file_name = os.path.dirname(os.path.abspath(__file__)) + \
         "/map_api_key/api_key"
     try:
-        f = open(key_file_name, 'r')
-        with f:
+        with open(key_file_name, 'r') as f:
             for line in f:
-                API_KEY = line.replace('\n', "")
+                API_KEY = line.strip()
                 break
     except IOError:
-        print "Could not read file:", key_file_name
+        print('Could not read file: %s' % key_file_name)
 
     add_listener()
-    thread.start_new_thread(run_flask, ())
+    # thread.start_new_thread(run_flask, ())
     # app.run(debug=False, port=5001, host='localhost')
     rospy.spin()

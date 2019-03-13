@@ -3,10 +3,7 @@ syntax = "proto2";
 package apollo.prediction;
 
 import "modules/prediction/proto/feature.proto";
-
-message Features {
-  repeated Feature feature = 1;
-}
+import "modules/prediction/proto/prediction_obstacle.proto";
 
 message CNNFeatures {
   optional uint32 dim0 = 1;
@@ -18,6 +15,8 @@ message CNNFeatures {
 }
 
 message DataForLearning {
+  // The task category of the data for learning
+  optional string category = 5;
   // The info. needed for identifying a unique data point:
   optional int32 id = 1;
   optional double timestamp = 2;
@@ -29,4 +28,22 @@ message DataForLearning {
 
 message ListDataForLearning {
   repeated DataForLearning data_for_learning = 1;
+}
+
+message PredictionResult {
+  optional int32 id = 1;
+  optional double timestamp = 2;
+  repeated Trajectory trajectory = 3;
+}
+
+message ListPredictionResult {
+  repeated PredictionResult prediction_result = 1;
+}
+
+message ListFrameEnv {
+  repeated FrameEnv frame_env = 1;
+}
+
+message Features {
+  repeated Feature feature = 1;
 }

@@ -28,9 +28,9 @@ GnssDriverComponent::GnssDriverComponent()
 bool GnssDriverComponent::Init() {
   config::Config gnss_config;
   if (!apollo::cyber::common::GetProtoFromFile(config_file_path_,
-                                                   &gnss_config)) {
-    monitor_logger_buffer_.ERROR(
-        "Unable to load gnss conf file: " + config_file_path_);
+                                               &gnss_config)) {
+    monitor_logger_buffer_.ERROR("Unable to load gnss conf file: " +
+                                 config_file_path_);
     return false;
   }
   AINFO << "Gnss config: " << gnss_config.DebugString();

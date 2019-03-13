@@ -60,8 +60,8 @@ void SingleLanePredictor::Predict(Obstacle* obstacle) {
            << "] with probability [" << sequence.probability() << "].";
 
     std::vector<TrajectoryPoint> points;
-    GenerateTrajectoryPoints(*obstacle, sequence,
-        FLAGS_prediction_trajectory_time_length,
+    GenerateTrajectoryPoints(
+        *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
         FLAGS_prediction_trajectory_time_resolution, &points);
 
     if (points.empty()) {

@@ -23,8 +23,8 @@ namespace prediction {
 
 using common::adapter::AdapterConfig;
 using common::math::Vec2d;
-using hdmap::LaneInfo;
 using hdmap::JunctionInfo;
+using hdmap::LaneInfo;
 using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
 using JunctionInfoPtr = std::shared_ptr<const JunctionInfo>;
 
@@ -38,17 +38,14 @@ EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
   if (ego_state_container == nullptr ||
       ego_state_container->ToPerceptionObstacle() == nullptr) {
     AERROR << "Null ego state container found or "
-        "the container pointer is nullptr";
+              "the container pointer is nullptr";
     return environment_features;
   }
 
   auto ptr_ego_state = ego_state_container->ToPerceptionObstacle();
-  if (!ptr_ego_state->has_position() ||
-      !ptr_ego_state->position().has_x() ||
-      !ptr_ego_state->position().has_y() ||
-      !ptr_ego_state->has_theta() ||
-      !ptr_ego_state->has_velocity() ||
-      !ptr_ego_state->velocity().has_x() ||
+  if (!ptr_ego_state->has_position() || !ptr_ego_state->position().has_x() ||
+      !ptr_ego_state->position().has_y() || !ptr_ego_state->has_theta() ||
+      !ptr_ego_state->has_velocity() || !ptr_ego_state->velocity().has_x() ||
       !ptr_ego_state->velocity().has_y()) {
     AERROR << "Incomplete ego pose information.";
     return environment_features;
@@ -64,22 +61,21 @@ EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
   }
 
   Vec2d ego_position(ptr_ego_state->position().x(),
-      ptr_ego_state->position().y());
+                     ptr_ego_state->position().y());
 
   Vec2d ego_velocity(ptr_ego_state->velocity().x(),
-      ptr_ego_state->velocity().y());
+                     ptr_ego_state->velocity().y());
 
   environment_features.set_ego_speed(ego_velocity.Length());
   environment_features.set_ego_heading(ptr_ego_state->theta());
 
-  auto ptr_ego_lane = GetEgoLane(ptr_ego_state->position(),
-      ptr_ego_state->theta());
+  auto ptr_ego_lane =
+      GetEgoLane(ptr_ego_state->position(), ptr_ego_state->theta());
 
-  ExtractEgoLaneFeatures(&environment_features,
-      ptr_ego_lane, ego_position);
+  ExtractEgoLaneFeatures(&environment_features, ptr_ego_lane, ego_position);
 
-  ExtractNeighborLaneFeatures(
-      &environment_features, ptr_ego_lane, ego_position);
+  ExtractNeighborLaneFeatures(&environment_features, ptr_ego_lane,
+                              ego_position);
 
   ExtractFrontJunctionFeatures(&environment_features);
 
@@ -88,9 +84,7 @@ EnvironmentFeatures FeatureExtractor::ExtractEnvironmentFeatures() {
 
 void FeatureExtractor::ExtractEgoLaneFeatures(
     EnvironmentFeatures* ptr_environment_features,
-    const LaneInfoPtr& ptr_ego_lane,
-    const common::math::Vec2d& ego_position) {
-
+    const LaneInfoPtr& ptr_ego_lane, const common::math::Vec2d& ego_position) {
   if (ptr_ego_lane == nullptr) {
     AERROR << "Ego vehicle is not on any lane.";
     return;
@@ -110,20 +104,20 @@ void FeatureExtractor::ExtractEgoLaneFeatures(
       ptr_ego_lane->lane().left_boundary().boundary_type_size() != 0 &&
       ptr_ego_lane->lane().left_boundary().boundary_type(0).types_size() != 0 &&
       ptr_ego_lane->lane().left_boundary().boundary_type(0).types(0) !=
-      hdmap::LaneBoundaryType::CURB) {
+          hdmap::LaneBoundaryType::CURB) {
     const auto& reverse_lanes =
         ptr_ego_lane->lane().left_neighbor_reverse_lane_id();
-    std::for_each(reverse_lanes.begin(), reverse_lanes.end(),
+    std::for_each(
+        reverse_lanes.begin(), reverse_lanes.end(),
         [&ptr_environment_features](decltype(*reverse_lanes.begin())& t) {
-      ptr_environment_features->AddNonneglectableReverseLanes(t.id());
-    });
+          ptr_environment_features->AddNonneglectableReverseLanes(t.id());
+        });
   }
 }
 
 void FeatureExtractor::ExtractNeighborLaneFeatures(
     EnvironmentFeatures* ptr_environment_features,
     const LaneInfoPtr& ptr_ego_lane, const Vec2d& ego_position) {
-
   if (ptr_ego_lane == nullptr) {
     AERROR << "Ego vehicle is not on any lane.";
     return;
@@ -136,8 +130,8 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
   if (ptr_left_neighbor_lane != nullptr) {
     double left_neighbor_lane_s = 0.0;
     double left_neighbor_lane_l = 0.0;
-    ptr_left_neighbor_lane->GetProjection(ego_position,
-        &left_neighbor_lane_s, &left_neighbor_lane_l);
+    ptr_left_neighbor_lane->GetProjection(ego_position, &left_neighbor_lane_s,
+                                          &left_neighbor_lane_l);
     ptr_environment_features->SetLeftNeighborLane(
         ptr_left_neighbor_lane->id().id(), left_neighbor_lane_s);
   }
@@ -149,8 +143,8 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
   if (ptr_right_neighbor_lane != nullptr) {
     double right_neighbor_lane_s = 0.0;
     double right_neighbor_lane_l = 0.0;
-    ptr_right_neighbor_lane->GetProjection(ego_position,
-        &right_neighbor_lane_s, &right_neighbor_lane_l);
+    ptr_right_neighbor_lane->GetProjection(ego_position, &right_neighbor_lane_s,
+                                           &right_neighbor_lane_l);
     ptr_environment_features->SetRightNeighborLane(
         ptr_right_neighbor_lane->id().id(), right_neighbor_lane_s);
   }
@@ -158,8 +152,9 @@ void FeatureExtractor::ExtractNeighborLaneFeatures(
 
 void FeatureExtractor::ExtractFrontJunctionFeatures(
     EnvironmentFeatures* ptr_environment_features) {
-  auto ego_trajectory_container = ContainerManager::Instance()->GetContainer<
-      ADCTrajectoryContainer>(AdapterConfig::PLANNING_TRAJECTORY);
+  auto ego_trajectory_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
   if (ego_trajectory_container == nullptr) {
     AERROR << "Null ego trajectory container";
     return;
@@ -170,10 +165,10 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
   }
   // Only consider junction have overlap with signal or stop_sign
   bool need_consider = FLAGS_enable_all_junction;
-  for (const auto &overlap_id : junction->junction().overlap_id()) {
+  for (const auto& overlap_id : junction->junction().overlap_id()) {
     if (PredictionMap::OverlapById(overlap_id.id()) != nullptr) {
-      for (const auto &object :
-        PredictionMap::OverlapById(overlap_id.id())->overlap().object()) {
+      for (const auto& object :
+           PredictionMap::OverlapById(overlap_id.id())->overlap().object()) {
         if (object.has_signal_overlap_info() ||
             object.has_stop_sign_overlap_info()) {
           need_consider = true;
@@ -182,20 +177,20 @@ void FeatureExtractor::ExtractFrontJunctionFeatures(
     }
   }
   if (need_consider) {
-    ptr_environment_features->SetFrontJunction(junction->id().id(),
-          ego_trajectory_container->ADCDistanceToJunction());
+    ptr_environment_features->SetFrontJunction(
+        junction->id().id(), ego_trajectory_container->ADCDistanceToJunction());
   }
 }
 
 LaneInfoPtr FeatureExtractor::GetEgoLane(const common::Point3D& position,
-    const double heading) {
+                                         const double heading) {
   common::PointENU position_enu;
   position_enu.set_x(position.x());
   position_enu.set_y(position.y());
   position_enu.set_z(position.z());
 
-  return PredictionMap::GetMostLikelyCurrentLane(position_enu,
-      FLAGS_lane_distance_threshold, heading,
+  return PredictionMap::GetMostLikelyCurrentLane(
+      position_enu, FLAGS_lane_distance_threshold, heading,
       FLAGS_lane_angle_difference_threshold);
 }
 

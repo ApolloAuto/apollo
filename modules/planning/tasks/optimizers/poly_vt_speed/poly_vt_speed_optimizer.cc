@@ -24,13 +24,12 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
-#include "modules/common/util/file.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
+#include "modules/planning/tasks/deciders/speed_bounds_decider/st_boundary_mapper.h"
 #include "modules/planning/tasks/optimizers/poly_vt_speed/piecewise_poly_vt_speed_sampler.h"
-#include "modules/planning/tasks/optimizers/st_graph/speed_limit_decider.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_boundary_mapper.h"
 #include "modules/planning/tuning/autotuning_raw_feature_generator.h"
 #include "modules/planning/tuning/speed_model/autotuning_speed_feature_builder.h"
 #include "modules/planning/tuning/speed_model/autotuning_speed_mlp_model.h"
@@ -106,7 +105,7 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
     if (!obstacle->st_boundary().IsEmpty()) {
       mutable_obstacle->SetBlockingObstacle(true);
     } else {
-      path_decision->SetStBoundary(
+      path_decision->SetSTBoundary(
           id, path_decision->Find(id)->reference_line_st_boundary());
     }
   }
@@ -187,24 +186,24 @@ void PolyVTSpeedOptimizer::RecordSTGraphDebug(
     auto boundary_debug = st_graph_debug->add_boundary();
     boundary_debug->set_name(boundary->id());
     switch (boundary->boundary_type()) {
-      case StBoundary::BoundaryType::FOLLOW:
+      case STBoundary::BoundaryType::FOLLOW:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_FOLLOW);
         break;
-      case StBoundary::BoundaryType::OVERTAKE:
+      case STBoundary::BoundaryType::OVERTAKE:
         boundary_debug->set_type(
             StGraphBoundaryDebug::ST_BOUNDARY_TYPE_OVERTAKE);
         break;
-      case StBoundary::BoundaryType::STOP:
+      case STBoundary::BoundaryType::STOP:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_STOP);
         break;
-      case StBoundary::BoundaryType::UNKNOWN:
+      case STBoundary::BoundaryType::UNKNOWN:
         boundary_debug->set_type(
             StGraphBoundaryDebug::ST_BOUNDARY_TYPE_UNKNOWN);
         break;
-      case StBoundary::BoundaryType::YIELD:
+      case STBoundary::BoundaryType::YIELD:
         boundary_debug->set_type(StGraphBoundaryDebug::ST_BOUNDARY_TYPE_YIELD);
         break;
-      case StBoundary::BoundaryType::KEEP_CLEAR:
+      case STBoundary::BoundaryType::KEEP_CLEAR:
         boundary_debug->set_type(
             StGraphBoundaryDebug::ST_BOUNDARY_TYPE_KEEP_CLEAR);
         break;

@@ -27,14 +27,12 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::PointENU;
-using apollo::hdmap::LaneInfo;
 using apollo::hdmap::JunctionInfo;
+using apollo::hdmap::LaneInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
-std::shared_ptr<const JunctionInfo>
-    JunctionAnalyzer::junction_info_ptr_;
-std::unordered_map<std::string, JunctionExit>
-    JunctionAnalyzer::junction_exits_;
+std::shared_ptr<const JunctionInfo> JunctionAnalyzer::junction_info_ptr_;
+std::unordered_map<std::string, JunctionExit> JunctionAnalyzer::junction_exits_;
 std::unordered_map<std::string, JunctionFeature>
     JunctionAnalyzer::junction_features_;
 
@@ -57,12 +55,12 @@ void JunctionAnalyzer::Clear() {
 
 void JunctionAnalyzer::SetAllJunctionExits() {
   CHECK_NOTNULL(junction_info_ptr_);
-  for (const auto &overlap_id : junction_info_ptr_->junction().overlap_id()) {
+  for (const auto& overlap_id : junction_info_ptr_->junction().overlap_id()) {
     auto overlap_info_ptr = PredictionMap::OverlapById(overlap_id.id());
     if (overlap_info_ptr == nullptr) {
       continue;
     }
-    for (const auto &object : overlap_info_ptr->overlap().object()) {
+    for (const auto& object : overlap_info_ptr->overlap().object()) {
       if (object.has_lane_overlap_info()) {
         const std::string& lane_id = object.id().id();
         auto lane_info_ptr = PredictionMap::LaneById(lane_id);
@@ -143,8 +141,7 @@ JunctionFeature JunctionAnalyzer::GetJunctionFeature(
   for (const std::string& start_lane_id : start_lane_ids) {
     JunctionFeature junction_feature = GetJunctionFeature(start_lane_id);
     if (!initialized) {
-      merged_junction_feature.set_junction_id(
-          junction_feature.junction_id());
+      merged_junction_feature.set_junction_id(junction_feature.junction_id());
       merged_junction_feature.set_junction_range(
           junction_feature.junction_range());
       initialized = true;

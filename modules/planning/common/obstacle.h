@@ -51,7 +51,7 @@ namespace planning {
  * The decisions have two categories: lateral decision and longitudinal
  * decision.
  * Lateral decision includes: nudge, ignore.
- * Lateral decision saftey priority: nudge > ignore.
+ * Lateral decision safety priority: nudge > ignore.
  * Longitudinal decision includes: stop, yield, follow, overtake, ignore.
  * Decision safety priorities order: stop > yield >= follow > overtake > ignore
  *
@@ -142,9 +142,9 @@ class Obstacle {
 
   const SLBoundary& PerceptionSLBoundary() const;
 
-  const StBoundary& reference_line_st_boundary() const;
+  const STBoundary& reference_line_st_boundary() const;
 
-  const StBoundary& st_boundary() const;
+  const STBoundary& st_boundary() const;
 
   const std::vector<std::string>& decider_tags() const;
 
@@ -157,15 +157,15 @@ class Obstacle {
                           const ObjectDecisionType& decision);
   bool HasLateralDecision() const;
 
-  void SetStBoundary(const StBoundary& boundary);
+  void SetStBoundary(const STBoundary& boundary);
 
-  void SetStBoundaryType(const StBoundary::BoundaryType type);
+  void SetStBoundaryType(const STBoundary::BoundaryType type);
 
   void EraseStBoundary();
 
-  void SetReferenceLineStBoundary(const StBoundary& boundary);
+  void SetReferenceLineStBoundary(const STBoundary& boundary);
 
-  void SetReferenceLineStBoundaryType(const StBoundary::BoundaryType type);
+  void SetReferenceLineStBoundaryType(const STBoundary::BoundaryType type);
 
   void EraseReferenceLineStBoundary();
 
@@ -212,6 +212,8 @@ class Obstacle {
    */
   bool IsLaneBlocking() const { return is_lane_blocking_; }
   void CheckLaneBlocking(const ReferenceLine& reference_line);
+  bool IsLaneChangeBlocking() const { return is_lane_change_blocking_; }
+  void SetLaneChangeBlocking(const bool is_distance_clear);
 
  private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);
@@ -223,7 +225,7 @@ class Obstacle {
 
   bool BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
                                  const double adc_start_s,
-                                 StBoundary* const st_boundary);
+                                 STBoundary* const st_boundary);
   bool IsValidObstacle(
       const perception::PerceptionObstacle& perception_obstacle);
 
@@ -243,8 +245,8 @@ class Obstacle {
   std::vector<std::string> decider_tags_;
   SLBoundary sl_boundary_;
 
-  StBoundary reference_line_st_boundary_;
-  StBoundary st_boundary_;
+  STBoundary reference_line_st_boundary_;
+  STBoundary st_boundary_;
 
   ObjectDecisionType lateral_decision_;
   ObjectDecisionType longitudinal_decision_;
@@ -253,6 +255,8 @@ class Obstacle {
   bool is_blocking_obstacle_ = false;
 
   bool is_lane_blocking_ = false;
+
+  bool is_lane_change_blocking_ = false;
 
   double min_radius_stop_distance_ = -1.0;
 

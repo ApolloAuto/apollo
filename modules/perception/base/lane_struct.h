@@ -37,11 +37,14 @@ enum class LaneLinePositionType {
   THIRD_LEFT = -3,
   ADJACENT_LEFT = -2,  //!< lane marking on the left side next to ego lane
   EGO_LEFT = -1,       //!< left lane marking of the ego lane
+  EGO_CENTER = 0,      //!< center lane marking of the ego lane, changing lane
   EGO_RIGHT = 1,       //!< right lane marking of the ego lane
   ADJACENT_RIGHT = 2,  //!< lane marking on the right side next to ego lane
   THIRD_RIGHT = 3,
   FOURTH_RIGHT = 4,
-  CURB_RIGHT = 5
+  CURB_RIGHT = 5,
+  OTHER = 6,   //!< other types of lane
+  UNKNOWN = 7  //!< background
 };
 
 // Definition of the use type of a lane mark in lane adjustment
@@ -66,6 +69,8 @@ struct EndPoints {
 struct LaneLine {
   LaneLineType type;
   LaneLinePositionType pos_type;
+  // @brief image coordinate system
+  LaneLineCubicCurve curve_car_coord;
   // @brief camera coordinate system
   LaneLineCubicCurve curve_camera_coord;
   // @brief image coordinate system
@@ -74,7 +79,8 @@ struct LaneLine {
   std::vector<Point2DF> curve_image_point_set;
   // @brief curve camera point set
   std::vector<Point3DF> curve_camera_point_set;
-
+  // @brief curve car coord point set, only on XY plane
+  std::vector<Point2DF> curve_car_coord_point_set;
   // @brief image end point set
   std::vector<EndPoints> image_end_point_set;
   // @brief track id

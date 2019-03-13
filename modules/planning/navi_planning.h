@@ -66,7 +66,6 @@ class NaviPlanning : public PlanningBase {
   void RunOnce(const LocalView& local_view,
                ADCTrajectory* const trajectory_pb) override;
 
-
   apollo::common::Status Plan(
       const double current_time_stamp,
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
@@ -75,9 +74,7 @@ class NaviPlanning : public PlanningBase {
  private:
   common::Status InitFrame(const uint32_t sequence_num,
                            const common::TrajectoryPoint& planning_start_point,
-                           const double start_time,
-                           const common::VehicleState& vehicle_state,
-                           ADCTrajectory* output_trajectory);
+                           const common::VehicleState& vehicle_state);
 
   bool CheckPlanningConfig(const PlanningConfig& config);
 
@@ -99,7 +96,7 @@ class NaviPlanning : public PlanningBase {
   /**
    * @brief get the left neighbors lane info of the lane which the vehicle is
    *located
-   * @lane_info_group output left neighors info which sorted from near to
+   * @lane_info_group output left neighbors info which sorted from near to
    *far
    */
   void GetLeftNeighborLanesInfo(
@@ -108,7 +105,7 @@ class NaviPlanning : public PlanningBase {
   /**
    * @brief get the right neighbors lane of the lane which the vehicle is
    * located
-   * @lane_info_group output right neighors info which sorted from near to
+   * @lane_info_group output right neighbors info which sorted from near to
    *far
    */
   void GetRightNeighborLanesInfo(

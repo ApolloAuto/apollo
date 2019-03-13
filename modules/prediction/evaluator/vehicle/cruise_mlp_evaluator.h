@@ -20,6 +20,9 @@
 #include <string>
 #include <vector>
 
+#include "torch/script.h"
+#include "torch/torch.h"
+
 #include "modules/prediction/evaluator/evaluator.h"
 #include "modules/prediction/network/cruise_model/cruise_model.h"
 
@@ -54,9 +57,9 @@ class CruiseMLPEvaluator : public Evaluator {
                             std::vector<double>* feature_values);
 
   /**
-    * @brief Get the name of evaluator.
-    */
-  std::string GetName() override {return "CRUISE_MLP_EVALUATOR";}
+   * @brief Get the name of evaluator.
+   */
+  std::string GetName() override { return "CRUISE_MLP_EVALUATOR"; }
 
   void Clear();
 
@@ -91,24 +94,13 @@ class CruiseMLPEvaluator : public Evaluator {
 
   /**
    * @brief Load mode files
-   * @param Go model file name
-   * @param Cutin model file name
    */
-  void LoadModels(const std::string& go_model_file,
-                  const std::string& cutin_model_file);
+  void LoadModels();
 
-  /**
-   * @brief Compute probability of a junction exit
-   */
-  double ComputeFinishTime(const std::vector<double>& feature_values);
-
-  /**
-   * @brief Save offline feature values in proto
-   * @param Lane sequence
-   * @param Vector of feature values
-   */
-  void SaveOfflineFeatures(LaneSequence* sequence,
-                           const std::vector<double>& feature_values);
+  void ModelInference(
+      const std::vector<torch::jit::IValue>& torch_inputs,
+      std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+      LaneSequence* lane_sequence_ptr);
 
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 23 + 5 * 9;
@@ -116,8 +108,9 @@ class CruiseMLPEvaluator : public Evaluator {
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 20;
 
-  std::shared_ptr<network::CruiseModel> go_model_ptr_;
-  std::shared_ptr<network::CruiseModel> cutin_model_ptr_;
+  std::shared_ptr<torch::jit::script::Module> torch_go_model_ptr_ = nullptr;
+  std::shared_ptr<torch::jit::script::Module> torch_cutin_model_ptr_ = nullptr;
+  torch::Device device_;
 };
 
 }  // namespace prediction

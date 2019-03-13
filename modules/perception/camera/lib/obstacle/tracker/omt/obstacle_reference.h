@@ -1,18 +1,18 @@
 /******************************************************************************
-* Copyright 2018 The Apollo Authors. All Rights Reserved.
-*
-* Licensed under the Apache License, Version 2.0 (the License);
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an AS IS BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*****************************************************************************/
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 #pragma once
 
 #include <map>
@@ -38,9 +38,7 @@ struct Reference {
 
 class ObstacleReference {
  public:
-  void Init(const omt::ReferenceParam &ref_param,
-            float width,
-            float height);
+  void Init(const omt::ReferenceParam &ref_param, float width, float height);
   void UpdateReference(const CameraFrame *frame,
                        const std::vector<Target> &targets);
   void CorrectSize(CameraFrame *frame);
@@ -48,18 +46,15 @@ class ObstacleReference {
  private:
   void SyncGroundEstimator(const std::string &sensor,
                            const Eigen::Matrix3f &camera_k_matrix,
-                           int img_width,
-                           int img_height) {
-    if (ground_estimator_mapper_.find(sensor)
-        == ground_estimator_mapper_.end()) {
+                           int img_width, int img_height) {
+    if (ground_estimator_mapper_.find(sensor) ==
+        ground_estimator_mapper_.end()) {
       auto &ground_estimator = ground_estimator_mapper_[sensor];
       const float fx = camera_k_matrix(0, 0);
       const float fy = camera_k_matrix(1, 1);
       const float cx = camera_k_matrix(0, 2);
       const float cy = camera_k_matrix(1, 2);
-      std::vector<float> k_mat = {fx, 0, cx,
-                                  0, fy, cy,
-                                  0, 0, 1};
+      std::vector<float> k_mat = {fx, 0, cx, 0, fy, cy, 0, 0, 1};
       ground_estimator.Init(k_mat, img_width, img_height, common::IRec(fx));
     }
   }
