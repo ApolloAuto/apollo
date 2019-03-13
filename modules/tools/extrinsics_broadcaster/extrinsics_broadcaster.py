@@ -20,8 +20,8 @@
 Broadcaster static transform
 """
 
-import sys
 from subprocess import call
+import sys
 import yaml
 
 def main():
@@ -35,8 +35,8 @@ def main():
 
     with open(sys.argv[1]) as fp:
         transform_stamped = yaml.safe_load(fp)
-        command = 'rosrun tf2_ros static_transform_publisher '\
-                  '%f %f %f %f %f %f %f %s %s' %\
+        command = 'rosrun tf2_ros static_transform_publisher ' \
+                  '%f %f %f %f %f %f %f %s %s' % \
                   (transform_stamped['transform']['translation']['x'],
                    transform_stamped['transform']['translation']['y'],
                    transform_stamped['transform']['translation']['z'],
