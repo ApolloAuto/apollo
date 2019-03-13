@@ -7,10 +7,8 @@ import math
 import time
 
 import numpy
-import rospy
 import simplejson
-from std_msgs.msg import String
-
+from cyber_py.record import RecordReader
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
 from modules.perception.proto.perception_obstacle_pb2 import Point
@@ -207,14 +205,16 @@ def generate_perception(perception_description, prev_perception):
 
 def perception_publisher(perception_topic, files, period):
     """publisher"""
-    rospy.init_node('perception', anonymous=True)
+    #rospy.init_node('perception', anonymous=True)
+    cyber.init()
+    node = cyber.Node("perception")
     pub = rospy.Publisher(perception_topic, PerceptionObstacles, queue_size=1)
     perception_description = load_descrptions(files)
     rate = rospy.Rate(int(1.0 / period)) # 10hz
     global _s_delta_t
     _s_delta_t = period
     perception = None
-    while not rospy.is_shutdown():
+    while not cyber.is_shutdown():
         perception = generate_perception(perception_description, perception)
         print str(perception)
         pub.publish(perception)
@@ -231,7 +231,5 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
             help="set the perception topic publish time duration")
     args = parser.parse_args()
-    try:
-        perception_publisher(args.topic, args.files, args.period)
-    except rospy.ROSInterruptException:
-        pass
+
+    perception_publisher(args.topic, args.files, args.period)
