@@ -7,8 +7,6 @@ import sys
 import time
 
 import numpy
-import rospy
-from std_msgs.msg import String
 
 import common.proto_utils as proto_utils
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacle

@@ -8,7 +8,8 @@ import time
 
 import numpy
 import simplejson
-from cyber_py.record import RecordReader
+from cyber_py import cyber
+
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
 from modules.perception.proto.perception_obstacle_pb2 import Point
@@ -95,12 +96,6 @@ def init_perception(description):
     perception.height = description["height"]
     perception.polygon_point.extend(generate_polygon(perception.position, perception.theta,
             perception.length, perception.width))
-    # for point in generate_polygon(perception.position, perception.theta,
-    #         perception.length, perception.width):
-    #     p = perception.polygon_point.add()
-    #     p.x = point[0]
-    #     p.y = point[1]
-    #     p.z = point[2]
     perception.tracking_time = description["tracking_time"]
     perception.type = PerceptionObstacle.Type.Value(description["type"])
     perception.timestamp=rospy.get_time()
@@ -205,20 +200,19 @@ def generate_perception(perception_description, prev_perception):
 
 def perception_publisher(perception_topic, files, period):
     """publisher"""
-    #rospy.init_node('perception', anonymous=True)
     cyber.init()
     node = cyber.Node("perception")
-    pub = rospy.Publisher(perception_topic, PerceptionObstacles, queue_size=1)
+    writer = node.create_writer(perception_topic, PerceptionObstacles)
     perception_description = load_descrptions(files)
-    rate = rospy.Rate(int(1.0 / period)) # 10hz
+    sleep_time = int(1.0 / period)) # 10hz
     global _s_delta_t
     _s_delta_t = period
     perception = None
     while not cyber.is_shutdown():
         perception = generate_perception(perception_description, perception)
         print str(perception)
-        pub.publish(perception)
-        rate.sleep()
+        writer.write(perception)
+        time.sleep(sleep_time)
 
 
 if __name__ == '__main__':

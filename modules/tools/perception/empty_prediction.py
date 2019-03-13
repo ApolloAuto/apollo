@@ -7,8 +7,8 @@ import math
 import time
 
 import numpy
-import rospy
 import simplejson
+from cyber_py import cyber
 from std_msgs.msg import String
 
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacle
@@ -17,9 +17,10 @@ from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
 
 def prediction_publisher(prediction_topic, rate):
     """publisher"""
-    pub = rospy.Publisher(prediction_topic, String, queue_size=1)
-    rospy.init_node('prediction', anonymous=True)
-    rate = rospy.Rate(rate)
+    cyber.init()
+    node = cyber.Node("prediction")
+    writer = node.create_writer(prediction_topic, String)
+    sleep_time = 1.0 / rate
     seq_num = 1
     while not rospy.is_shutdown():
         prediction = PredictionObstacles()
@@ -29,9 +30,10 @@ def prediction_publisher(prediction_topic, rate):
         print str(prediction)
         s = String()
         s.data = prediction.SerializeToString()
-        pub.publish(s)
+        #pub.publish(s)
+        writer.write(s)
         seq_num += 1
-        rate.sleep()
+        time.sleep(sleep_time)
 
 
 if __name__ == '__main__':
@@ -42,7 +44,4 @@ if __name__ == '__main__':
     parser.add_argument("-r", "--rate", action="store", type=int, default=10,
             help="set the prediction topic publish time duration")
     args = parser.parse_args()
-    try:
-        prediction_publisher(args.topic, args.rate)
-    except rospy.ROSInterruptException:
-        pass
+    prediction_publisher(args.topic, args.rate)
