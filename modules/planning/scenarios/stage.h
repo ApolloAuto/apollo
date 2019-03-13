@@ -55,7 +55,7 @@ class Stage {
 
   /**
    * @brief Each stage does its business logic inside Process function.
-   * If the stage want to transite to a different stage after finish,
+   * If the stage want to transit to a different stage after finish,
    * it should set the type of 'next_stage_'.
    */
   virtual StageStatus Process(
@@ -93,7 +93,7 @@ class Stage {
   std::vector<Task*> task_list_;
   ScenarioConfig::StageConfig config_;
   ScenarioConfig::StageType next_stage_;
-  void* context_;
+  void* context_ = nullptr;
   std::string name_;
 };
 
