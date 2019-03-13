@@ -186,13 +186,12 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   const double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
   const double distance_to_stop_line = stop_line_s - obstacle_end_s;
 
-  if (distance_to_stop_line < 0 ||
-      scenario_config_.watch_vehicle_max_valid_stop_distance()) {
+  if (distance_to_stop_line >
+        scenario_config_.watch_vehicle_max_valid_stop_distance()) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "] distance_to_stop_line[" << distance_to_stop_line
            << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
-           << obstacle_end_s
-           << "] too far from stop line or pass stop line. skip";
+           << obstacle_end_s << "] too far from stop line. skip";
     return -1;
   }
 
