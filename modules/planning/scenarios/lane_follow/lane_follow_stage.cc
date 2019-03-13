@@ -131,8 +131,7 @@ Stage::StageStatus LaneFollowStage::Process(
       if (reference_line_info.IsChangeLanePath()) {
         AERROR << "reference line is lane change ref.";
         if (reference_line_info.Cost() < kStraightForwardLineCost &&
-            ChangeLaneDecider::IsClearToChangeLane(&reference_line_info,
-                                                   planning_start_point.v())) {
+            ChangeLaneDecider::IsClearToChangeLane(&reference_line_info)) {
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
           AERROR << "\tclear for lane change";

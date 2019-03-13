@@ -63,6 +63,8 @@ class ReferenceLineInfo {
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   Obstacle* AddObstacle(const Obstacle* obstacle);
 
+  const common::VehicleState& vehicle_state() { return vehicle_state_; }
+
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
   const ReferenceLine& reference_line() const;
@@ -175,9 +177,7 @@ class ReferenceLineInfo {
     path_boundaries_s_resolution_ = resolution_s;
   }
 
-  std::string GetBlockingObstacleId() const {
-    return blocking_obstacle_id_;
-  }
+  std::string GetBlockingObstacleId() const { return blocking_obstacle_id_; }
 
   void GetFallbackPathBoundaries(
       std::vector<std::pair<double, double>>* const ptr_path_boundaries,

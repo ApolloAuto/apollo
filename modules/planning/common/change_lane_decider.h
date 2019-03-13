@@ -37,11 +37,11 @@ class ChangeLaneDecider {
   bool Apply(std::list<ReferenceLineInfo>* reference_line_info);
 
   /**
-   * @brief static function to check if the ChangeLanePath is safe or if current
-   * lane is safa to deviate away and come back
+   * @brief static function to check if the ChangeLanePath type of reference
+   * line is safe or if current reference line is safa to deviate away and come
+   * back
    */
-  static bool IsClearToChangeLane(ReferenceLineInfo* reference_line_info,
-                                  const double ego_v);
+  static bool IsClearToChangeLane(ReferenceLineInfo* reference_line_info);
 
  private:
   static bool HysteresisFilter(const double obstacle_distance,

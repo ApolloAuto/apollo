@@ -18,9 +18,9 @@
  * @file
  **/
 
-#include <limits>
-
 #include "modules/planning/common/change_lane_decider.h"
+
+#include <limits>
 
 #include "modules/common/time/time.h"
 #include "modules/planning/common/planning_context.h"
@@ -160,9 +160,11 @@ bool ChangeLaneDecider::Apply(
 }
 
 bool ChangeLaneDecider::IsClearToChangeLane(
-    ReferenceLineInfo* reference_line_info, const double ego_v) {
+    ReferenceLineInfo* reference_line_info) {
   double ego_start_s = reference_line_info->AdcSlBoundary().start_s();
   double ego_end_s = reference_line_info->AdcSlBoundary().end_s();
+  double ego_v =
+      std::abs(reference_line_info->vehicle_state().linear_velocity());
 
   for (auto* obstacle :
        reference_line_info->path_decision()->obstacles().Items()) {
@@ -186,14 +188,6 @@ bool ChangeLaneDecider::IsClearToChangeLane(
       end_l = std::fmax(end_l, sl_point.l());
     }
 
-    /**
-    AERROR << "has dynamic obstacle";
-    AERROR << "obs start_s:\t" << start_s;
-    AERROR << "obs end_s:\t" << end_s;
-    AERROR << "obs start_l:\t" << start_l;
-    AERROR << "obs end_l:\t" << end_l;
-    AERROR << "obs v:\t" << obstacle->speed();
-    **/
     if (reference_line_info->IsChangeLanePath()) {
       constexpr double kLateralShift = 2.5;
       if (end_l < -kLateralShift || start_l > kLateralShift) {
@@ -201,15 +195,45 @@ bool ChangeLaneDecider::IsClearToChangeLane(
       }
     }
 
+    // Raw estimation on whether same direction with ADC or not based on
+    // prediction trajectory
+    bool same_direction = true;
+    if (obstacle->HasTrajectory()) {
+      double obstacle_moving_direction =
+          obstacle->Trajectory().trajectory_point(0).path_point().theta();
+      const auto& vehicle_state = reference_line_info->vehicle_state();
+      double vehicle_moving_direction = vehicle_state.heading();
+      if (vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE) {
+        vehicle_moving_direction =
+            common::math::NormalizeAngle(vehicle_moving_direction + M_PI);
+      }
+      double heading_difference = std::abs(common::math::NormalizeAngle(
+          obstacle_moving_direction - vehicle_moving_direction));
+      same_direction = heading_difference < (M_PI / 2.0);
+    }
+
+    // TODO(All) move to confs
     constexpr double kSafeTime = 3.0;
-    constexpr double kForwardMinSafeDistance = 6.0;
+    constexpr double kForwardMinSafeDistanceOnSameDirection = 6.0;
+    constexpr double kForwardMinSafeDistanceOnOppositeDirection = 12.0;
     constexpr double kBackwardMinSafeDistance = 8.0;
     constexpr double kDistanceBuffer = 0.5;
 
-    const auto kForwardSafeDistance = std::fmax(
-        kForwardMinSafeDistance, (ego_v - obstacle->speed()) * kSafeTime);
-    const auto kBackwardSafeDistance = std::fmax(
-        kBackwardMinSafeDistance, (obstacle->speed() - ego_v) * kSafeTime);
+    double kForwardSafeDistance = 0.0;
+    double kBackwardSafeDistance = 0.0;
+    if (same_direction) {
+      kForwardSafeDistance = std::fmax(kForwardMinSafeDistanceOnSameDirection,
+                                       (ego_v - obstacle->speed()) * kSafeTime);
+      kBackwardSafeDistance =
+          std::fmax(kBackwardMinSafeDistance,
+                    (obstacle->speed() - ego_v) * kSafeTime);
+    } else {
+      kForwardSafeDistance =
+          std::fmin(kForwardMinSafeDistanceOnOppositeDirection,
+                    (ego_v + obstacle->speed()) * kSafeTime);
+      kBackwardSafeDistance = kBackwardMinSafeDistance;
+    }
+
     if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance,
                          kDistanceBuffer, obstacle->IsLaneChangeBlocking()) &&
         HysteresisFilter(start_s - ego_end_s, kForwardSafeDistance,
