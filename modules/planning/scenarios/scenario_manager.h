@@ -48,12 +48,23 @@ class ScenarioManager final {
   void RegisterScenarios();
 
   ScenarioConfig::ScenarioType SelectChangeLaneScenario(const Frame& frame);
+
   ScenarioConfig::ScenarioType SelectStopSignScenario(
       const Frame& frame,
       const hdmap::PathOverlap& first_encountered_stop_sign_overlap);
+
   ScenarioConfig::ScenarioType SelectTrafficLightScenario(
       const Frame& frame,
       const hdmap::PathOverlap& first_encountered_traffic_Light_overlap);
+
+  ScenarioConfig::ScenarioType SelectYieldSignScenario(
+      const Frame& frame,
+      const hdmap::PathOverlap& first_encountered_yield_sign_overlap);
+
+  ScenarioConfig::ScenarioType SelectBareJunctionScenario(
+      const Frame& frame,
+      const hdmap::PathOverlap& first_encountered_pnc_juntion_overlap);
+
   ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
   ScenarioConfig::ScenarioType SelectValetParkingScenario(const Frame& frame);
 

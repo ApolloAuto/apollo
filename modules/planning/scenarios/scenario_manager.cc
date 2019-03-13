@@ -267,6 +267,48 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   return current_scenario_->scenario_type();
 }
 
+ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
+    const Frame& frame,
+    const hdmap::PathOverlap& first_encountered_yield_sign_overlap) {
+  // TODO(all)
+  return current_scenario_->scenario_type();
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::SelectBareJunctionScenario(
+    const Frame& frame,
+    const hdmap::PathOverlap& first_encountered_pnc_juntion_overlap) {
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double pnc_junction_overlap_start_s =
+      first_encountered_pnc_juntion_overlap.start_s;
+  const double adc_distance_to_pnc_junction =
+      pnc_junction_overlap_start_s - adc_front_edge_s;
+  ADEBUG << "adc_distance_to_pnc_junction[" << adc_distance_to_pnc_junction
+         << "] pnc_junction[" << first_encountered_pnc_juntion_overlap.object_id
+         << "] pnc_junction_overlap_start_s["
+         << pnc_junction_overlap_start_s << "]";
+
+  // TODO(all)
+  // const bool bare_junction_scenario =
+  //    (adc_distance_to_pnc_junction > 0 && false);
+
+  switch (current_scenario_->scenario_type()) {
+    case ScenarioConfig::LANE_FOLLOW:
+    case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::APPROACH:
+    case ScenarioConfig::STOP_SIGN_PROTECTED:
+    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+    default:
+      break;
+  }
+
+  return current_scenario_->scenario_type();
+}
+
 ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
     const Frame& frame) {
   // TODO(all): to be updated when SIDE_PASS obstacle decisions
@@ -343,9 +385,10 @@ void ScenarioManager::Observe(const Frame& frame) {
   const auto& first_encountered_overlaps =
       reference_line_info.FirstEncounteredOverlaps();
   for (const auto& overlap : first_encountered_overlaps) {
-    if (overlap.first == ReferenceLineInfo::STOP_SIGN ||
+    if (overlap.first == ReferenceLineInfo::PNC_JUNCTION ||
         overlap.first == ReferenceLineInfo::SIGNAL ||
-        overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
+        overlap.first == ReferenceLineInfo::STOP_SIGN ||
+        overlap.first == ReferenceLineInfo::YIELD_SIGN) {
       first_encountered_overlap_map_[overlap.first] = overlap.second;
     }
   }
@@ -428,37 +471,49 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   ////////////////////////////////////////
   // intersection scenarios
   if (scenario_type == default_scenario_type_) {
-    hdmap::PathOverlap* stop_sign_overlap = nullptr;
-    auto map_itr =
-        first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
-    if (map_itr != first_encountered_overlap_map_.end()) {
-      stop_sign_overlap = &(map_itr->second);
-    }
+    hdmap::PathOverlap* traffic_sign_overlap = nullptr;
+    hdmap::PathOverlap* pnc_junction_overlap = nullptr;
+    ReferenceLineInfo::OverlapType overlap_type;
 
-    hdmap::PathOverlap* traffic_light_overlap = nullptr;
-    map_itr = first_encountered_overlap_map_.find(ReferenceLineInfo::SIGNAL);
-    if (map_itr != first_encountered_overlap_map_.end()) {
-      traffic_light_overlap = &(map_itr->second);
-    }
-
-    bool stop_sign_found = (stop_sign_overlap != nullptr);
-    bool traffic_light_found = (traffic_light_overlap != nullptr);
-    if (stop_sign_overlap && traffic_light_overlap) {
-      stop_sign_found =
-          stop_sign_overlap->start_s < traffic_light_overlap->start_s;
-      traffic_light_found = !stop_sign_found;
-    }
-
-    if (stop_sign_found) {
-      if (FLAGS_enable_scenario_stop_sign) {
-        scenario_type = SelectStopSignScenario(frame, *stop_sign_overlap);
+    const auto& reference_line_info = frame.reference_line_info().front();
+    const auto& first_encountered_overlaps =
+        reference_line_info.FirstEncounteredOverlaps();
+    // note: first_encountered_overlaps already sorted
+    for (const auto& overlap : first_encountered_overlaps) {
+      if (overlap.first == ReferenceLineInfo::SIGNAL ||
+          overlap.first == ReferenceLineInfo::STOP_SIGN ||
+          overlap.first == ReferenceLineInfo::YIELD_SIGN) {
+        overlap_type = overlap.first;
+        traffic_sign_overlap = const_cast<hdmap::PathOverlap*>(&overlap.second);
+        break;
+      } else if (overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
+        pnc_junction_overlap = const_cast<hdmap::PathOverlap*>(&overlap.second);
       }
-    } else if (traffic_light_found) {
-      if (FLAGS_enable_scenario_traffic_light) {
-        scenario_type =
-            SelectTrafficLightScenario(frame, *traffic_light_overlap);
+    }
+
+    if (traffic_sign_overlap) {
+      switch (overlap_type) {
+        case ReferenceLineInfo::STOP_SIGN:
+          if (FLAGS_enable_scenario_stop_sign) {
+            scenario_type = SelectStopSignScenario(
+                frame, *traffic_sign_overlap);
+          }
+          break;
+        case ReferenceLineInfo::SIGNAL:
+          if (FLAGS_enable_scenario_traffic_light) {
+            scenario_type = SelectTrafficLightScenario(
+                frame, *traffic_sign_overlap);
+          }
+          break;
+        case ReferenceLineInfo::YIELD_SIGN:
+          // TODO(all): to be added
+          // scenario_type = SelectYieldSignScenario(
+          //     frame, *traffic_sign_overlap);
+          break;
+        default:
+          break;
       }
-    } else {
+    } else if (pnc_junction_overlap) {
       // junction with no signs(stop_sign/traffic_light/etc)
       // TODO(all): to be added
     }
