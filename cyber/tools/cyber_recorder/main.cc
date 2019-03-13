@@ -43,7 +43,7 @@ using apollo::cyber::record::Spliter;
 
 const char INFO_OPTIONS[] = "h";
 const char RECORD_OPTIONS[] = "o:ac:i:m:h";
-const char PLAY_OPTIONS[] = "f:c:lr:b:e:s:d:p:h";
+const char PLAY_OPTIONS[] = "f:ac:k:lr:b:e:s:d:p:h";
 const char SPLIT_OPTIONS[] = "f:o:c:k:b:e:h";
 const char RECOVER_OPTIONS[] = "f:o:h";
 
