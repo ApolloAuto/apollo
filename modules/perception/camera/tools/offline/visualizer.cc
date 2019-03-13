@@ -138,7 +138,7 @@ bool Visualizer::Init_all_info_single_camera(
   ex_camera2lidar_ = extrinsic_map_.at(camera_name);
   AINFO << "ex_camera2lidar_ = " << extrinsic_map_.at(camera_name);
 
-  AINFO << "ex_lidar2imu_ =" << AINFO << ex_lidar2imu_;
+  AINFO << "ex_lidar2imu_ =" << ex_lidar2imu_;
 
   // 2. transform camera->lidar->imu
   ex_camera2imu_ = ex_lidar2imu_ * ex_camera2lidar_;
