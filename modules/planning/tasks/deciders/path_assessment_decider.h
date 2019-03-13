@@ -38,9 +38,18 @@ class PathAssessmentDecider : public Decider {
   common::Status Process(Frame* const frame,
       ReferenceLineInfo* const reference_line_info) override;
 
-  bool IsValidPath(const PathData& path_data);
+  bool IsValidPath(
+      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
   void SetPathInfo();
+
+  bool IsGreatlyOffReferenceLine(const PathData& path_data);
+
+  bool IsGreatlyOffRoad(
+    const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+
+  bool IsCollidingWithStaticObstacles(
+    const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 };
 
 }  // namespace planning

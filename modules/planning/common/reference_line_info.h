@@ -101,6 +101,8 @@ class ReferenceLineInfo {
   LatencyStats* mutable_latency_stats() { return &latency_stats_; }
   const LatencyStats& latency_stats() const { return latency_stats_; }
 
+  void SetFeasiblePathData(int tag) { feasible_path_data_ = tag; }
+  int GetFeasiblePathData() { return feasible_path_data_; }
   const PathData& path_data() const;
   const PathData& fallback_path_data() const;
   const SpeedData& speed_data() const;
@@ -289,6 +291,8 @@ class ReferenceLineInfo {
   double fallback_path_boundaries_s_start_ = 0.0;
   double fallback_path_boundaries_s_resolution_ = 0.1;
 
+  // 1: path_data_; 0: fallback_path_data_; -1: neither.
+  int feasible_path_data_ = 1;
   PathData path_data_;
   PathData fallback_path_data_;
   SpeedData speed_data_;
