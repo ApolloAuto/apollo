@@ -147,36 +147,41 @@ bool ReferenceLineInfo::GetFirstOverlap(
 
 void ReferenceLineInfo::InitFirstOverlaps() {
   const auto& map_path = reference_line_.map_path();
+  // clear_zone
+  hdmap::PathOverlap clear_area_overlap;
+  if (GetFirstOverlap(map_path.clear_area_overlaps(), &clear_area_overlap)) {
+    first_encounter_overlaps_.emplace_back(CLEAR_AREA, clear_area_overlap);
+  }
 
   // crosswalk
   hdmap::PathOverlap crosswalk_overlap;
   if (GetFirstOverlap(map_path.crosswalk_overlaps(), &crosswalk_overlap)) {
-    first_encounter_overlaps_.push_back({CROSSWALK, crosswalk_overlap});
-  }
-
-  // signal
-  hdmap::PathOverlap signal_overlap;
-  if (GetFirstOverlap(map_path.signal_overlaps(), &signal_overlap)) {
-    first_encounter_overlaps_.push_back({SIGNAL, signal_overlap});
-  }
-
-  // stop_sign
-  hdmap::PathOverlap stop_sign_overlap;
-  if (GetFirstOverlap(map_path.stop_sign_overlaps(), &stop_sign_overlap)) {
-    first_encounter_overlaps_.push_back({STOP_SIGN, stop_sign_overlap});
-  }
-
-  // clear_zone
-  hdmap::PathOverlap clear_area_overlap;
-  if (GetFirstOverlap(map_path.clear_area_overlaps(), &clear_area_overlap)) {
-    first_encounter_overlaps_.push_back({CLEAR_AREA, clear_area_overlap});
+    first_encounter_overlaps_.emplace_back(CROSSWALK, crosswalk_overlap);
   }
 
   // pnc_junction
   hdmap::PathOverlap pnc_junction_overlap;
   if (GetFirstOverlap(map_path.pnc_junction_overlaps(),
                       &pnc_junction_overlap)) {
-    first_encounter_overlaps_.push_back({PNC_JUNCTION, pnc_junction_overlap});
+    first_encounter_overlaps_.emplace_back(PNC_JUNCTION, pnc_junction_overlap);
+  }
+
+  // signal
+  hdmap::PathOverlap signal_overlap;
+  if (GetFirstOverlap(map_path.signal_overlaps(), &signal_overlap)) {
+    first_encounter_overlaps_.emplace_back(SIGNAL, signal_overlap);
+  }
+
+  // stop_sign
+  hdmap::PathOverlap stop_sign_overlap;
+  if (GetFirstOverlap(map_path.stop_sign_overlaps(), &stop_sign_overlap)) {
+    first_encounter_overlaps_.emplace_back(STOP_SIGN, stop_sign_overlap);
+  }
+
+  // yield_sign
+  hdmap::PathOverlap yield_sign_overlap;
+  if (GetFirstOverlap(map_path.yield_sign_overlaps(), &yield_sign_overlap)) {
+    first_encounter_overlaps_.emplace_back(YIELD_SIGN, yield_sign_overlap);
   }
 
   // sort by start_s

@@ -226,6 +226,7 @@ class ReferenceLineInfo {
     PNC_JUNCTION = 4,
     SIGNAL = 5,
     STOP_SIGN = 6,
+    YIELD_SIGN = 7,
   };
 
   const std::vector<std::pair<OverlapType, hdmap::PathOverlap>>&
