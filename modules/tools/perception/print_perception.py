@@ -6,7 +6,7 @@ import math
 import time
 
 import numpy
-import rospy
+from cyber_py import cyber
 from std_msgs.msg import String
 
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
@@ -22,9 +22,10 @@ def receiver(data):
 
 def perception_receiver(perception_topic):
     """publisher"""
-    rospy.init_node('perception', anonymous=True)
-    pub = rospy.Subscriber(perception_topic, String, receiver)
-    rospy.spin()
+    cyber.init()
+    node = cyber.Node("perception")
+    node.create_reader(perception_topic, String, receiver)
+    node.spin()
 
 
 if __name__ == '__main__':
@@ -32,7 +33,6 @@ if __name__ == '__main__':
             prog="replay_perception.py")
     parser.add_argument("-t", "--topic", action="store", type=str, default="/perception/obstacles",
             help="set the perception topic")
-    parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
-            help="set the perception topic publish time duration")
+            
     args = parser.parse_args()
     perception_receiver(args.topic)
