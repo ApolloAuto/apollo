@@ -391,7 +391,7 @@ int main(int argc, char** argv) {
     ::apollo::cyber::Init(argv[0]);
     bool play_result = true;
     PlayParam play_param;
-    play_param.is_play_all_channels = opt_all ? 
+    play_param.is_play_all_channels = opt_all ?
                                       opt_all : opt_white_channels.empty();
     play_param.is_loop_playback = opt_loop;
     play_param.play_rate = opt_rate;
