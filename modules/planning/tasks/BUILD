@@ -37,6 +37,7 @@ cc_library(
         ":task",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/tasks/deciders:decider",
+        "//modules/planning/tasks/deciders:path_bounds_decider",
         "//modules/planning/tasks/optimizers/dp_poly_path:dp_poly_path_optimizer",
         "//modules/planning/tasks/optimizers/dp_st_speed:dp_st_speed_optimizer",
         "//modules/planning/tasks/optimizers/open_space_trajectory_partition:open_space_trajectory_partition",
