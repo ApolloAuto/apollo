@@ -47,6 +47,8 @@ class Stage {
 
   explicit Stage(const ScenarioConfig::StageConfig& config);
 
+  virtual ~Stage() = default;
+
   const ScenarioConfig::StageConfig& config() const { return config_; }
 
   ScenarioConfig::StageType stage_type() const { return config_.stage_type(); }
