@@ -371,7 +371,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     double s = 0.0;
     double l = 0.0;
     if (PredictionMap::GetProjection({pose_x, pose_y}, lane_info_ptr, &s, &l)) {
-      if (std::abs(l) < std::abs(ego_vehicle_l)) {
+      if (std::fabs(l) < std::fabs(ego_vehicle_l)) {
         ego_vehicle_s = accumulated_s + s;
         ego_vehicle_l = l;
       }
@@ -437,8 +437,8 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
                          lane_info_ptr, &start_s, &start_l) &&
           PredictionMap::GetProjection({end_x, end_y},
                          lane_info_ptr, &end_s, &end_l)) {
-        if (std::abs(start_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
-            std::abs(end_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
+        if (std::fabs(start_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
+            std::fabs(end_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
             start_l * end_l < 0.0) {
           obstacle_ptr->SetCaution();
         }
