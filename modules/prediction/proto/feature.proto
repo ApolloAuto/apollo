@@ -39,6 +39,7 @@ message Feature {
     optional int32 id = 1;
 
     // Obstacle features
+    repeated apollo.common.Point3D polygon_point = 30;
     optional apollo.common.Point3D position = 2;
     optional apollo.common.Point3D velocity = 3;
     optional apollo.common.Point3D acceleration = 4;
