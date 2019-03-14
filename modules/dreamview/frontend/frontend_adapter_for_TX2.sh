@@ -54,8 +54,8 @@ function fix_check_arch() {
 function main() {
   if [ ! -d "./node_modules" ]; then
     echo "ERROR: can not find directory node_modules, please execute `yarn install` first, and ignore the errors"
-    exit 0
-  fi  
+    exit 1
+  fi
   
   fix_phantomjs
   fix_node_sass
