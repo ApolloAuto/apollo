@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/planning/tasks/deciders/path_assessment_decider.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
-
-#include "modules/planning/tasks/deciders/path_assessment_decider.h"
 
 namespace apollo {
 namespace planning {
@@ -26,6 +26,8 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
+
+constexpr double kStaticObstacleSpeedThreshold = 0.5;
 
 PathAssessmentDecider::PathAssessmentDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -48,7 +50,8 @@ Status PathAssessmentDecider::Process(
       *reference_line_info, *fallback_path_data);
   // 2. If neither is valid, use the reference_line as the ultimate fallback.
   if (!is_valid_regular_path && !is_valid_fallback_path) {
-    reference_line_info->SetFeasiblePathData(-1);
+    reference_line_info->SetFeasiblePathData(
+        ReferenceLineInfo::PathDataType::REFERENCE_LINE_PATH);
     const std::string msg =
         "Neither regular nor fallback path is valid.";
     AERROR << msg;
@@ -99,8 +102,8 @@ bool PathAssessmentDecider::IsGreatlyOffReferenceLine(
     const PathData& path_data) {
   constexpr double kOffReferenceLineThreshold = 20.0;
   auto frenet_path = path_data.frenet_frame_path();
-  for (size_t i = 0; i < frenet_path.size(); ++i) {
-    if (std::fabs(frenet_path[i].l()) > kOffReferenceLineThreshold) {
+  for (const auto& frenet_path_point : frenet_path) {
+    if (std::fabs(frenet_path_point.l()) > kOffReferenceLineThreshold) {
       return true;
     }
   }
@@ -111,13 +114,13 @@ bool PathAssessmentDecider::IsGreatlyOffRoad(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
   constexpr double kOffRoadThreshold = 10.0;
   auto frenet_path = path_data.frenet_frame_path();
-  for (size_t i = 0; i < frenet_path.size(); ++i) {
+  for (const auto& frenet_path_point : frenet_path) {
     double road_left_width = 0.0;
     double road_right_width = 0.0;
     if (reference_line_info.reference_line().GetRoadWidth(
-            frenet_path[i].s(), &road_left_width, &road_right_width)) {
-      if (frenet_path[i].l() > road_left_width + kOffRoadThreshold ||
-          frenet_path[i].l() < -road_right_width - kOffRoadThreshold) {
+            frenet_path_point.s(), &road_left_width, &road_right_width)) {
+      if (frenet_path_point.l() > road_left_width + kOffRoadThreshold ||
+          frenet_path_point.l() < -road_right_width - kOffRoadThreshold) {
         return true;
       }
     }
@@ -144,7 +147,7 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
     }
     //  - Must be non-static
     if (!obstacle->IsStatic() ||
-        obstacle->speed() > 0.5) {
+        obstacle->speed() > kStaticObstacleSpeedThreshold) {
       continue;
     }
     // Convert into polygon and save it.
@@ -162,11 +165,11 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
     const auto& vehicle_box =
         common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
     std::vector<Vec2d> ABCDpoints = vehicle_box.GetAllCorners();
-    for (size_t i = 0; i < ABCDpoints.size(); ++i) {
+    for (const auto& corner_point : ABCDpoints) {
       // For each corner point, project it onto reference_line
       common::SLPoint curr_point_sl;
       if (!reference_line_info.reference_line().
-          XYToSL(ABCDpoints[i], &curr_point_sl)) {
+          XYToSL(corner_point, &curr_point_sl)) {
         AERROR << "Failed to get the projection from point onto "
                   "reference_line";
         return true;
