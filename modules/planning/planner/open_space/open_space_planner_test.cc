@@ -14,10 +14,6 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- **/
-
 #include "modules/planning/planner/open_space/open_space_planner.h"
 
 #include "gtest/gtest.h"
@@ -25,7 +21,9 @@
 namespace apollo {
 namespace planning {
 
-TEST(OpenSpacePlanner, add_boundary) {}
+TEST(OpenSpacePlanner, add_boundary) {
+  // TODO(JasonZhou): Finish.
+}
 
 }  // namespace planning
 }  // namespace apollo
