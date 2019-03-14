@@ -146,10 +146,8 @@ apollo::common::Status OpenSpacePlanner::Plan(
       open_space_trajectory_generator_->GetStitchingTrajectory(
           &stitching_trajectory_);
       LoadTrajectoryToFrame(frame);
-      return status;
-    } else {
-      return status;
     }
+    return status;
   }
 }
 

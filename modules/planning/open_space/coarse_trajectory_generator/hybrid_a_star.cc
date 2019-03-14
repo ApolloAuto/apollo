@@ -75,10 +75,7 @@ bool HybridAStar::RSPCheck(
   std::shared_ptr<Node3d> node = std::shared_ptr<Node3d>(new Node3d(
       reeds_shepp_to_end->x, reeds_shepp_to_end->y, reeds_shepp_to_end->phi,
       XYbounds_, planner_open_space_config_));
-  if (!ValidityCheck(node)) {
-    return false;
-  }
-  return true;
+  return ValidityCheck(node);
 }
 
 bool HybridAStar::ValidityCheck(std::shared_ptr<Node3d> node) {

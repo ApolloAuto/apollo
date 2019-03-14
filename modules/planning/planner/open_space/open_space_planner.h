@@ -60,9 +60,8 @@ struct OpenSpaceThreadData {
 /**
  * @class OpenSpacePlanner
  * @brief OpenSpacePlanner is a derived class of Planner.
- *        It reads a recorded trajectory from a trajectory file and
- *        outputs proper segment of the trajectory according to vehicle
- * position.
+ *        It reads a recorded trajectory from a trajectory file and outputs
+ *        proper segment of the trajectory according to vehicle position.
  */
 
 class OpenSpacePlanner : public Planner {
