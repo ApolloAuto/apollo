@@ -275,7 +275,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
         vehicle_moving_direction =
             NormalizeAngle(vehicle_moving_direction + M_PI);
       }
-      if (std::abs(traj_point_moving_direction - vehicle_moving_direction) <
+      if (std::abs(NormalizeAngle(traj_point_moving_direction -
+                                  vehicle_moving_direction)) <
           open_space_trajectory_partition_config_.heading_searching_range()) {
         distance_and_angle_matched_point_found = true;
         current_trajectory_index = closest_trajectory_index;
