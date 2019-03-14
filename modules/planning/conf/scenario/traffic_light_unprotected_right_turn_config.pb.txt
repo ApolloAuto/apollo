@@ -1,6 +1,7 @@
 scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
 traffic_light_unprotected_right_turn_config: {
   start_traffic_light_scenario_distance: 5.0
+  enable_right_turn_on_red: false
   max_valid_stop_distance: 2.0
   max_adc_stop_speed: 0.3
   min_pass_s_distance: 3.0
