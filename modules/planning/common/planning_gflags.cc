@@ -498,7 +498,9 @@ DEFINE_bool(enable_parallel_hybrid_a, false,
 DEFINE_bool(enable_parallel_open_space_smoother, false,
             "True to enable open space smoother parallel implementation.");
 
-DEFINE_double(vehicle_low_speed_threshold, 1.0,
-              "Vehicle low speed threshold.");
+DEFINE_double(vehicle_low_speed_threshold, 1.0, "Vehicle low speed threshold.");
 
 DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");
+
+DEFINE_bool(enable_nonscenario_side_pass, false,
+            "true to enable side pass without scenario management");
