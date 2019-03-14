@@ -62,6 +62,6 @@ DEFINE_int32(relative_map_path_frame_ahead, 1500,
 DEFINE_bool(load_navigation_path_when_start, false, "load navigation path "
             "in c++ when start the process");
 
- DEFINE_string(relative_map_navigation_path_filename, 
+DEFINE_string(relative_map_navigation_path_filename,
             "moules/map/relative_map/conf/navigation_path.yaml",
             "the navigation path filename");

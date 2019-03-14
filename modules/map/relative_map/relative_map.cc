@@ -16,10 +16,12 @@
 
 #include "modules/map/relative_map/relative_map.h"
 
-#include "modules/map/proto/map_lane.pb.h"
+#include <utility>
 
-#include <yaml-cpp/yaml.h>
+#include "yaml-cpp/yaml.h"
 #include "third_party/json/json.hpp"
+
+#include "modules/map/proto/map_lane.pb.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/math/vec2d.h"
@@ -123,7 +125,7 @@ apollo::common::Status RelativeMap::Start() {
       ros::Duration(1.0 / FLAGS_relative_map_loop_rate), &RelativeMap::OnTimer,
       this);
 
-  // donot receive topic navigation while 
+  // donot receive topic navigation while
   // FLAGS_load_navigation_path_when_start is true
   if (!FLAGS_load_navigation_path_when_start) {
     AdapterManager::AddNavigationCallback(&RelativeMap::OnReceiveNavigationInfo,
@@ -254,7 +256,7 @@ void RelativeMap::LoadNavigationPath() {
     AINFO << "begin to load navigation path " << path_file;
     std::ifstream fstr(path_file, std::ios::in);
     if (!fstr.is_open()) {
-      AERROR << "Failed to open navigation path file " 
+      AERROR << "Failed to open navigation path file "
              << FLAGS_relative_map_navigation_path_filename;
       return;
     }
@@ -275,7 +277,7 @@ void RelativeMap::LoadNavigationPath() {
         point->set_theta(json_node["theta"]);
         point->set_kappa(json_node["kappa"]);
         point->set_dkappa(json_node["dkappa"]);
-      } 
+      }
     } catch (const std::exception& e) {
         AERROR << "Failed to load navigation path file, catch exception "
                << e.what();
@@ -287,9 +289,9 @@ void RelativeMap::LoadNavigationPath() {
     priority++;
   }
 
-   PublishNavigationInfo(&navigation_info);
+  PublishNavigationInfo(&navigation_info);
 
-   navigation_lane_.UpdateNavigationInfo(std::move(navigation_info));
+  navigation_lane_.UpdateNavigationInfo(std::move(navigation_info));
 }
 
 void RelativeMap::Stop() {
