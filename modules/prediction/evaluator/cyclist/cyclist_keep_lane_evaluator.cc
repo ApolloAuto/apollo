@@ -47,11 +47,9 @@ void CyclistKeepLaneEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   std::string curr_lane_id =
       latest_feature_ptr->lane().lane_feature().lane_id();
 
-  for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
-    LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
-    CHECK_NOTNULL(lane_sequence_ptr);
-    double probability = ComputeProbability(curr_lane_id, *lane_sequence_ptr);
-    lane_sequence_ptr->set_probability(probability);
+  for (auto& lane_sequence : *lane_graph_ptr->mutable_lane_sequence()) {
+    const double probability = ComputeProbability(curr_lane_id, lane_sequence);
+    lane_sequence.set_probability(probability);
   }
 }
 
