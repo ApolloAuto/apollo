@@ -853,7 +853,7 @@ decision {
   main_decision {
     stop {
       reason_code: STOP_REASON_SIGNAL
-      reason: "stop by SL_1084"
+      reason: "stop by TL_1084"
       stop_point {
         x: 587702.1233458264
         y: 4141445.1279618954
@@ -879,8 +879,8 @@ decision {
       }
     }
     decision {
-      id: "SL_1084"
-      perception_id: -913124622
+      id: "TL_1084"
+      perception_id: -1364908909
       object_decision {
         stop {
           reason_code: STOP_REASON_SIGNAL
@@ -895,8 +895,8 @@ decision {
       }
     }
     decision {
-      id: "SL_1083"
-      perception_id: -1183609310
+      id: "TL_1083"
+      perception_id: -272827151
       object_decision {
         stop {
           reason_code: STOP_REASON_SIGNAL
