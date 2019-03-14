@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include "modules/planning/common/change_lane_decider.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
@@ -49,7 +51,41 @@ Status SpeedBoundsDecider::Process(
   const ReferenceLine &reference_line = reference_line_info->reference_line();
   PathDecision *const path_decision = reference_line_info->path_decision();
 
-  // 1. Map obstacles into st graph
+  // 1. Rule_based speed planning configurations for different traffic scenarios
+  if (FLAGS_enable_nonscenario_side_pass) {
+    double stop_s_on_pathdata = 0.0;
+    bool set_stop_fence = false;
+    const auto &side_pass_info = PlanningContext::side_pass_info();
+    auto *mutable_side_pass_info = PlanningContext::mutable_side_pass_info();
+    if (side_pass_info.change_lane_stop_flag) {
+      // Check if stop at last frame stop fence
+      if (CheckADCStop(*reference_line_info,
+                       side_pass_info.change_lane_stop_path_point)) {
+        if (!ChangeLaneDecider::IsClearToChangeLane(reference_line_info)) {
+          if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
+            set_stop_fence = BuildSidePassStopFence(
+                stop_s_on_pathdata,
+                &(mutable_side_pass_info->change_lane_stop_path_point));
+          }
+        }
+      } else {
+        if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
+          set_stop_fence = BuildSidePassStopFence(
+              stop_s_on_pathdata,
+              &(mutable_side_pass_info->change_lane_stop_path_point));
+        }
+      }
+    } else {
+      if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
+        set_stop_fence = BuildSidePassStopFence(
+            stop_s_on_pathdata,
+            &(mutable_side_pass_info->change_lane_stop_path_point));
+      }
+    }
+    mutable_side_pass_info->change_lane_stop_flag = set_stop_fence;
+  }
+
+  // 2. Map obstacles into st graph
   StBoundaryMapper boundary_mapper(adc_sl_boundary, speed_bounds_config_,
                                    reference_line, path_data,
                                    speed_bounds_config_.total_path_length(),
@@ -78,7 +114,7 @@ Status SpeedBoundsDecider::Process(
     }
   }
 
-  // 2. Create speed limit along path
+  // 3. Create speed limit along path
   SpeedLimitDecider speed_limit_decider(adc_sl_boundary, speed_bounds_config_,
                                         reference_line, path_data);
 
@@ -114,6 +150,25 @@ Status SpeedBoundsDecider::Process(
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
 
   return Status::OK();
+}
+
+// @brief Check if necessary to set stop fence used for nonscenario side pass
+bool SpeedBoundsDecider::CheckSidePassStop(const PathData &path_data,
+                                           double *stop_s_on_pathdata) {
+  return true;
+}
+
+// @brief Set stop fence for side pass
+bool SpeedBoundsDecider::BuildSidePassStopFence(
+    double stop_s_on_pathdata, common::PathPoint *stop_pathpoint) {
+  return true;
+}
+
+// @brief Check if ADV stop at a stop fence
+bool SpeedBoundsDecider::CheckADCStop(
+    const ReferenceLineInfo &reference_line_info,
+    const common::PathPoint &stop_point) {
+  return true;
 }
 
 void SpeedBoundsDecider::RecordSTGraphDebug(
