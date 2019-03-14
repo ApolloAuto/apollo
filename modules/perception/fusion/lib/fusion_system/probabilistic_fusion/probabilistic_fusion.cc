@@ -31,6 +31,7 @@
 #include "modules/perception/lib/config_manager/config_manager.h"
 #include "modules/perception/lib/utils/perf.h"
 #include "modules/perception/proto/probabilistic_fusion_config.pb.h"
+#include "modules/common/util/auto_lock.h"
 
 namespace apollo {
 namespace perception {
@@ -112,17 +113,14 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
 
   auto* sensor_data_manager = SensorDataManager::Instance();
   // 1. save frame data
-  data_mutex_.lock();
+  AutoLock<std::mutex> autolock(&data_mutex_);
   if (sensor_data_manager->IsLidar(sensor_frame) && !params_.use_lidar) {
-    data_mutex_.unlock();
     return true;
   }
   if (sensor_data_manager->IsRadar(sensor_frame) && !params_.use_radar) {
-    data_mutex_.unlock();
     return true;
   }
   if (sensor_data_manager->IsCamera(sensor_frame) && !params_.use_camera) {
-    data_mutex_.unlock();
     return true;
   }
 
@@ -138,7 +136,7 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
     sensor_data_manager->AddSensorMeasurements(sensor_frame);
   }
 
-  data_mutex_.unlock();
+  autolock.UnLock();
   if (!is_publish_sensor) {
     return true;
   }
