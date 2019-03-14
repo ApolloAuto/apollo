@@ -21,6 +21,21 @@ namespace prediction {
 
 void InteractionPredictor::Predict(Obstacle* obstacle) {
   // TODO(kechxu) implement
+  /*
+  for each lane_sequence {
+    Sample trajectories
+    for each traj in trajectories {
+      assign_cost(traj) {
+        * centripetal acc
+        * collision with ego vehicle if his right of way is lower
+      }
+    }
+
+    Select lowest cost best_traj, compute its likelihood probability
+    Associate likelihood with model prior probability -> posterior probability
+  }
+  output trajectories with relatively higher posterior probabilities
+    */
 }
 
 }  // namespace prediction
