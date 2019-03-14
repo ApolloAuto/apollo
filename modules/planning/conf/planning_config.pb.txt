@@ -23,7 +23,7 @@ default_task_config: {
       stop_distance: 1.0
     }
     traffic_light: {
-      enabled: false
+      enabled: true
       stop_distance: 1.0
       signal_expire_time_sec: 5.0
     }

@@ -91,7 +91,7 @@ config: {
 
 config: {
   rule_id: SIGNAL_LIGHT
-  enabled: true
+  enabled: false
   signal_light {
     stop_distance: 1.0
     max_stop_deceleration: 6.0
