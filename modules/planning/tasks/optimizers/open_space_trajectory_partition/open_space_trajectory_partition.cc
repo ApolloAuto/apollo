@@ -212,7 +212,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
     // If close to the end point, start on the next trajectory
     if (distance_to_trajs_end <= open_space_trajectory_partition_config_
                                      .kepsilon_to_midway_point() &&
-        std::abs(traj_end_point_moving_direction - vehicle_moving_direction) <
+        std::abs(NormalizeAngle(traj_end_point_moving_direction -
+                                vehicle_moving_direction)) <
             open_space_trajectory_partition_config_.heading_searching_range()) {
       if (i + 1 >= trajectories_size) {
         current_trajectory_index = trajectories_size - 1;
