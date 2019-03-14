@@ -36,6 +36,7 @@
 #include "modules/planning/scenarios/side_pass/stage_generate_path.h"
 #include "modules/planning/scenarios/side_pass/stage_pass_obstacle.h"
 #include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
+#include "modules/planning/scenarios/side_pass/stage_side_pass.h"
 
 namespace apollo {
 namespace planning {
@@ -53,6 +54,7 @@ constexpr double kClearDistance = 15.0;
 
 void SidePassScenario::RegisterStages() {
   s_stage_factory_.Clear();
+  /**
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_APPROACH_OBSTACLE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
@@ -82,6 +84,12 @@ void SidePassScenario::RegisterStages() {
       ScenarioConfig::SIDE_PASS_BACKUP,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new StageBackup(config);
+      });
+  **/
+  s_stage_factory_.Register(
+      ScenarioConfig::SIDE_PASS_DEFAULT_STAGE,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new StageSidePass(config);
       });
 }
 
