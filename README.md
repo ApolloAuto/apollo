@@ -66,7 +66,7 @@ for information about migrating to the updated Apollo master from an old version
 
 The following diagram highlights the scope and features of each Apollo release:
 
-![](docs/demo_guide/images/apollo_versions_3.png)
+![](docs/demo_guide/images/Apollo_Timeline.png)
 
 [**Apollo 1.0:**](docs/quickstart/apollo_1_0_hardware_system_installation_guide.md) 
 
