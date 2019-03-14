@@ -201,6 +201,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
 void Obstacle::SetStatus(const PerceptionObstacle& perception_obstacle,
                          const double timestamp, Feature* feature) {
   SetTimestamp(perception_obstacle, timestamp, feature);
+  SetPolygonPoints(perception_obstacle, feature);
   SetPosition(perception_obstacle, feature);
   SetVelocity(perception_obstacle, feature);
   SetAcceleration(feature);
@@ -327,6 +328,34 @@ void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
 
   ADEBUG << "Obstacle [" << id_ << "] has timestamp [" << std::fixed
          << std::setprecision(6) << ts << "].";
+}
+
+void Obstacle::SetPolygonPoints(const PerceptionObstacle& perception_obstacle,
+                                Feature* feature) {
+  for (const auto& polygon_point : perception_obstacle.polygon_point()) {
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
+    if (polygon_point.has_x()) {
+      x = polygon_point.x();
+    }
+    if (polygon_point.has_y()) {
+      y = polygon_point.y();
+    }
+    if (polygon_point.has_z()) {
+      z = polygon_point.z();
+    }
+
+    auto* ptr_polygon_point = feature->add_polygon_point();
+    ptr_polygon_point->set_x(x);
+    ptr_polygon_point->set_y(y);
+    ptr_polygon_point->set_z(z);
+
+    ADEBUG << "Obstacle [" << id_ << "] has new corner point [" << std::fixed
+           << std::setprecision(6) << x << ", " << std::fixed
+           << std::setprecision(6) << y << ", " << std::fixed
+           << std::setprecision(6) << z << "].";
+  }
 }
 
 void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
