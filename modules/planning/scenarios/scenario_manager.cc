@@ -133,9 +133,10 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
     const Frame& frame) {
   if (frame.reference_line_info().size() > 1) {
     // TODO(all): to be implemented
-    return ScenarioConfig::LANE_FOLLOW;
+    return default_scenario_type_;
   }
-  return ScenarioConfig::LANE_FOLLOW;
+
+  return default_scenario_type_;
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
@@ -167,9 +168,9 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
       break;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      if (current_scenario_->GetStatus() ==
+      if (current_scenario_->GetStatus() !=
           Scenario::ScenarioStatus::STATUS_DONE) {
-        return ScenarioConfig::LANE_FOLLOW;
+        return current_scenario_->scenario_type();
       }
       break;
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
@@ -179,7 +180,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
       break;
   }
 
-  return current_scenario_->scenario_type();
+  return default_scenario_type_;
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
@@ -249,16 +250,16 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-      if (current_scenario_->GetStatus() ==
+      if (current_scenario_->GetStatus() !=
           Scenario::ScenarioStatus::STATUS_DONE) {
-        return ScenarioConfig::LANE_FOLLOW;
+        return current_scenario_->scenario_type();
       }
       break;
     default:
       break;
   }
 
-  return current_scenario_->scenario_type();
+  return default_scenario_type_;
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
@@ -295,7 +296,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareJunctionScenario(
       break;
   }
 
-  return current_scenario_->scenario_type();
+  return default_scenario_type_;
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
@@ -311,7 +312,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
   if (scenario->IsTransferable(*current_scenario_, frame)) {
     return ScenarioConfig::SIDE_PASS;
   }
-  return ScenarioConfig::LANE_FOLLOW;
+
+  return default_scenario_type_;
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
@@ -325,7 +327,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
           frame, parking_spot_range_to_start)) {
     return ScenarioConfig::VALET_PARKING;
   }
-  return ScenarioConfig::LANE_FOLLOW;
+
+  return default_scenario_type_;
 }
 
 /*
