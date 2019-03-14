@@ -20,8 +20,6 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <atomic>
-#include <condition_variable>
-#include <mutex>
 
 #include "cyber/common/macros.h"
 #include "cyber/transport/shm/notifier_base.h"
@@ -34,9 +32,8 @@ const uint32_t kBufLength = 4096;
 
 class ConditionNotifier : public NotifierBase {
   struct Indicator {
-    std::mutex mtx;
-    std::condition_variable cv;
-    uint64_t written_info_num = 0;
+    std::atomic<uint64_t> next_idx_to_write = {0};
+    std::atomic<uint64_t> written_info_num = {0};
     ReadableInfo infos[kBufLength];
   };
 
