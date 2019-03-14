@@ -32,9 +32,9 @@ namespace traffic_light {
 
 struct TrafficLightProtectedContext;
 
-class TrafficLightProtectedStageStop : public Stage {
+class TrafficLightProtectedStageApproach : public Stage {
  public:
-  explicit TrafficLightProtectedStageStop(
+  explicit TrafficLightProtectedStageApproach(
       const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
