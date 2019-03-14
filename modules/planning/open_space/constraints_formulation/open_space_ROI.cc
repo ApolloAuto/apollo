@@ -45,13 +45,10 @@ bool OpenSpaceROI::GenerateRegionOfInterest(Frame *frame) {
   // open space planner to save computation effort
   vehicle_state_ = frame->vehicle_state();
   obstacles_by_frame_ = frame->GetObstacleList();
-  if (frame->local_view().routing->routing_request().has_parking_space() &&
-      frame->local_view().routing->routing_request().parking_space().has_id()) {
-    target_parking_spot_id_ = frame->local_view()
-                                  .routing->routing_request()
-                                  .parking_space()
-                                  .id()
-                                  .id();
+  const auto& parking_space =
+      frame->local_view().routing->routing_request().parking_space();
+  if (parking_space.has_id()) {
+    target_parking_spot_id_ = parking_space.id().id();
   } else {
     AERROR << "Failed to get parking space id from routing";
     return false;

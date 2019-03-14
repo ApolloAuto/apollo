@@ -22,6 +22,7 @@
 
 namespace apollo {
 namespace planning {
+
 GridSearch::GridSearch(const PlannerOpenSpaceConfig& open_space_conf) {
   xy_grid_resolution_ =
       open_space_conf.warm_start_config().grid_a_star_xy_resolution();

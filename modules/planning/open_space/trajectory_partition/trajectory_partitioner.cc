@@ -100,12 +100,10 @@ Status TrajectoryPartitioner::TrajectoryPartition(
     gear_positions.push_back(canbus::Chassis::GEAR_REVERSE);
   } else {
     if (init_direction > 0) {
-      ADEBUG << "initial speed oscillate too "
-                "frequent around zero";
+      ADEBUG << "initial speed oscillate too frequent around zero";
       gear_positions.push_back(canbus::Chassis::GEAR_DRIVE);
     } else if (init_direction < 0) {
-      ADEBUG << "initial speed oscillate too "
-                "frequent around zero";
+      ADEBUG << "initial speed oscillate too frequent around zero";
       gear_positions.push_back(canbus::Chassis::GEAR_REVERSE);
     } else {
       ADEBUG << "Invalid trajectory start! initial speeds too small to decide "
@@ -133,24 +131,21 @@ Status TrajectoryPartitioner::TrajectoryPartition(
       distance_s = 0.0;
     }
 
+    const auto& path_point_i = zigzag_trajectory[i].path_point();
     auto* point = current_trajectory->add_trajectory_point();
     point->set_relative_time(zigzag_trajectory[i].relative_time());
-    point->mutable_path_point()->set_x(zigzag_trajectory[i].path_point().x());
-    point->mutable_path_point()->set_y(zigzag_trajectory[i].path_point().y());
-    point->mutable_path_point()->set_theta(
-        zigzag_trajectory[i].path_point().theta());
+    point->mutable_path_point()->set_x(path_point_i.x());
+    point->mutable_path_point()->set_y(path_point_i.y());
+    point->mutable_path_point()->set_theta(path_point_i.theta());
     if (i > 0) {
+      const auto& path_point_pre_i = zigzag_trajectory[i - 1].path_point();
       distance_s +=
           (gear_positions.back() == canbus::Chassis::GEAR_REVERSE ? -1.0
                                                                   : 1.0) *
-          std::sqrt((zigzag_trajectory[i].path_point().x() -
-                     zigzag_trajectory[i - 1].path_point().x()) *
-                        (zigzag_trajectory[i].path_point().x() -
-                         zigzag_trajectory[i - 1].path_point().x()) +
-                    (zigzag_trajectory[i].path_point().y() -
-                     zigzag_trajectory[i - 1].path_point().y()) *
-                        (zigzag_trajectory[i].path_point().y() -
-                         zigzag_trajectory[i - 1].path_point().y()));
+          std::sqrt((path_point_i.x() - path_point_pre_i.x()) *
+                        (path_point_i.x() - path_point_pre_i.x()) +
+                    (path_point_i.y() - path_point_pre_i.y()) *
+                        (path_point_i.y() - path_point_pre_i.y()));
     }
     point->mutable_path_point()->set_s(distance_s);
 
