@@ -14,6 +14,7 @@ cc_library(
         "//cyber",
         "//modules/common/time",
         "//modules/common/util",
+        "//modules/common/util:auto_lock",
         "//modules/perception/base",
         "//modules/perception/common:perception_gflags",
         "//modules/perception/common/graph",
