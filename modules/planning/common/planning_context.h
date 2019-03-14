@@ -76,6 +76,7 @@ class PlanningContext {
   // @brief a container logging the data required for non-scenario side pass
   // functionality
   struct SidePassInfo {
+    bool change_lane_stop_flag = false;
     common::PathPoint change_lane_stop_path_point;
   };
 
