@@ -77,6 +77,9 @@ class RelativeMap : public RelativeMapInterface {
 
   void OnReceiveNavigationInfo(const NavigationInfo& navigation_info);
 
+  bool GetNavigationPathList(std::vector<std::string>* const path_list);
+  void LoadNavigationPath();
+
   common::adapter::AdapterManagerConfig adapter_conf_;
   RelativeMapConfig config_;
   apollo::common::monitor::MonitorLogger monitor_logger_;
