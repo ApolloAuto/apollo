@@ -77,6 +77,22 @@ decision {
         }
       }
     }
+    decision {
+      id: "TL_2516"
+      perception_id: -191858794
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_SIGNAL
+          distance_s: -1
+          stop_point {
+            x: 586261.34696462157
+            y: 4141304.4974646466
+            z: 0
+          }
+          stop_heading: -1.7940405570566935
+        }
+      }
+    }
   }
   vehicle_signal {
     turn_signal: TURN_LEFT

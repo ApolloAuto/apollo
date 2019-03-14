@@ -72,7 +72,7 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
 
 DEFINE_bool(enable_scenario_stop_sign, true,
             "enable stop_sign scenarios in planning");
-DEFINE_bool(enable_scenario_traffic_light, false,
+DEFINE_bool(enable_scenario_traffic_light, true,
             "enable traffic_light scenarios in planning");
 
 DEFINE_string(traffic_rule_config_filename,
