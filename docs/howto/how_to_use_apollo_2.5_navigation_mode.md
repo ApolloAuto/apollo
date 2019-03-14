@@ -213,6 +213,22 @@ In Docker, execute the following command to send the navigation line data made i
 cd /apollo/modules/tools/navigator
 python navigator.py ./path_2018-04-01-09-58-00.bag.txt.smoothed
 ```
+
+**Note:**
+
+When the route path is too long(the file size of bag.txt.smoothed is more than 5M), there may be two problems:
+1. Updateing a long path can cause `relative_map`，`planning` and `dreamview` to consume plenty of computation resource.
+2. There is a high possibility that `relative_map` and `dreamview` can not receive `navigation` topic published by `navigator.py`.
+
+As for problem 1, add a new feature named partial update of `relative_map`, please refer to configuration item `relative_map_path_frame_ahead`. This feature is only available on ARM64 now.
+
+As for problem 2, load path file when launch program `relative_map`, and then publish topic `navigation` to `dreamview`.
+Please refer to configuration items `load_navigation_path_when_start`，`relative_map_navigation_path_filename`.
+
+The default configuration file of path is `modules/map/relative_map/conf/navigation_path.yaml`, loading multiple path files at the same time is allowed.
+
+If `load_navigation_path_when_start` is set true(default is false), then it doesn't need to use script `navigator.py` to publish path data.
+
 The following screenshot shows the interface after Dreamview receives navigation line data during offline mock testing. You can see the Baidu Map interface in the upper left corner. Our navigation line is shown as red lines in the Baidu Map, and white lines in the main interface.
 
 ![img](images/navigation_mode/navigation_mode_with_reference_line_test.png) 
