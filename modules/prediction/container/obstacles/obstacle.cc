@@ -434,58 +434,18 @@ void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
 
 void Obstacle::SetPolygonPoints(const PerceptionObstacle& perception_obstacle,
                                 Feature* feature) {
-  for (int i = 0; i < perception_obstacle.polygon_point_size(); i++) {
-    double x = 0.0;
-    double y = 0.0;
-    double z = 0.0;
-    if (perception_obstacle.polygon_point(i).has_x()) {
-      x = perception_obstacle.polygon_point(i).x();
-    }
-    if (perception_obstacle.polygon_point(i).has_y()) {
-      y = perception_obstacle.polygon_point(i).y();
-    }
-    if (perception_obstacle.polygon_point(i).has_z()) {
-      z = perception_obstacle.polygon_point(i).z();
-    }
-
-    auto* ptr_polygon_point = feature->add_polygon_point();
-    ptr_polygon_point->set_x(x);
-    ptr_polygon_point->set_y(y);
-    ptr_polygon_point->set_z(z);
-
-    ADEBUG << "Obstacle [" << id_ << "] has new corner point [" << std::fixed
-           << std::setprecision(6) << x << ", " << std::fixed
-           << std::setprecision(6) << y << ", " << std::fixed
-           << std::setprecision(6) << z << "].";
+  for (const auto& polygon_point : perception_obstacle.polygon_point()) {
+    *feature->add_polygon_point() = polygon_point;
+    ADEBUG << "Obstacle [" << id_ << "] has new corner point:"
+           << polygon_point.DebugString();
   }
 }
 
 void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
                            Feature* feature) {
-  double x = 0.0;
-  double y = 0.0;
-  double z = 0.0;
-
-  if (perception_obstacle.has_position()) {
-    if (perception_obstacle.position().has_x()) {
-      x = perception_obstacle.position().x();
-    }
-    if (perception_obstacle.position().has_y()) {
-      y = perception_obstacle.position().y();
-    }
-    if (perception_obstacle.position().has_z()) {
-      z = perception_obstacle.position().z();
-    }
-  }
-
-  feature->mutable_position()->set_x(x);
-  feature->mutable_position()->set_y(y);
-  feature->mutable_position()->set_z(z);
-
-  ADEBUG << "Obstacle [" << id_ << "] has position [" << std::fixed
-         << std::setprecision(6) << x << ", " << std::fixed
-         << std::setprecision(6) << y << ", " << std::fixed
-         << std::setprecision(6) << z << "].";
+  *feature->mutable_position() = perception_obstacle.position();
+  ADEBUG << "Obstacle [" << id_ << "] has position:"
+         << perception_obstacle.position().DebugString();
 }
 
 void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
