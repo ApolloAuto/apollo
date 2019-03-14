@@ -160,7 +160,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
-    case ScenarioConfig::APPROACH:
       if (stop_sign_scenario) {
         return stop_sign_all_way ? ScenarioConfig::STOP_SIGN_PROTECTED
                                  : ScenarioConfig::STOP_SIGN_UNPROTECTED;
@@ -231,7 +230,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
-    case ScenarioConfig::APPROACH:
       if (traffic_light_scenario) {
         if (right_turn && red_light) {
           return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
@@ -288,7 +286,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareJunctionScenario(
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
-    case ScenarioConfig::APPROACH:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
@@ -438,8 +435,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
           Scenario::ScenarioStatus::STATUS_DONE) {
         scenario_type = current_scenario_->scenario_type();
       }
-      break;
-    case ScenarioConfig::APPROACH:
       break;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
