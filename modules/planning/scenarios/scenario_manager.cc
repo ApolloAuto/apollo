@@ -139,17 +139,14 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
-    const Frame& frame,
-    const hdmap::PathOverlap& first_encountered_stop_sign_overlap) {
+    const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap) {
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double stop_sign_overlap_start_s =
-      first_encountered_stop_sign_overlap.start_s;
   const double adc_distance_to_stop_sign =
-      stop_sign_overlap_start_s - adc_front_edge_s;
+      stop_sign_overlap.start_s - adc_front_edge_s;
   ADEBUG << "adc_distance_to_stop_sign[" << adc_distance_to_stop_sign
-         << "] stop_sign[" << first_encountered_stop_sign_overlap.object_id
-         << "] stop_sign_overlap_start_s[" << stop_sign_overlap_start_s << "]";
+         << "] stop_sign[" << stop_sign_overlap.object_id
+         << "] stop_sign_overlap_start_s[" << stop_sign_overlap.start_s << "]";
 
   const bool stop_sign_scenario =
       (adc_distance_to_stop_sign > 0 &&
@@ -187,8 +184,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
-    const Frame& frame,
-    const hdmap::PathOverlap& first_encountered_traffic_Light_overlap) {
+    const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap) {
   auto scenario_config = config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
                              .traffic_light_unprotected_right_turn_config();
 
@@ -268,25 +264,21 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
-    const Frame& frame,
-    const hdmap::PathOverlap& first_encountered_yield_sign_overlap) {
+    const Frame& frame, const hdmap::PathOverlap& yield_sign_overlap) {
   // TODO(all)
   return current_scenario_->scenario_type();
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectBareJunctionScenario(
-    const Frame& frame,
-    const hdmap::PathOverlap& first_encountered_pnc_juntion_overlap) {
+    const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap) {
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double pnc_junction_overlap_start_s =
-      first_encountered_pnc_juntion_overlap.start_s;
   const double adc_distance_to_pnc_junction =
-      pnc_junction_overlap_start_s - adc_front_edge_s;
+      pnc_junction_overlap.start_s - adc_front_edge_s;
   ADEBUG << "adc_distance_to_pnc_junction[" << adc_distance_to_pnc_junction
-         << "] pnc_junction[" << first_encountered_pnc_juntion_overlap.object_id
+         << "] pnc_junction[" << pnc_junction_overlap.object_id
          << "] pnc_junction_overlap_start_s["
-         << pnc_junction_overlap_start_s << "]";
+         << pnc_junction_overlap.start_s << "]";
 
   // TODO(all)
   // const bool bare_junction_scenario =
