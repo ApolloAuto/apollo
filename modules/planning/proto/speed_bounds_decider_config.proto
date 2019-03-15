@@ -18,4 +18,7 @@ message SpeedBoundsDeciderConfig {
   optional double dynamic_obs_nudge_speed_ratio = 13;
   optional double centri_jerk_speed_coeff = 14;
   optional bool path_point_decision_guide_flag = 15 [default = false];
+  //Rule based side pass stop
+  optional double max_adc_stop_speed = 16 [default = 0.3];
+  optional double max_valid_stop_distance = 17 [default = 0.5];
 }
