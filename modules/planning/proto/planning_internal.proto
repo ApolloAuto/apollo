@@ -140,7 +140,8 @@ message OpenSpaceDebug {
   repeated double optimized_dual_miu = 7;
   repeated double xy_boundary = 8;
   repeated apollo.planning_internal.ObstacleDebug obstacles = 9;
-  optional apollo.common.PathPoint roi_shift_point = 10;
+  optional apollo.common.TrajectoryPoint roi_shift_point = 10;
+  optional apollo.common.TrajectoryPoint end_point = 11;
 }
 
 message SmootherDebug {

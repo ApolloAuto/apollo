@@ -212,8 +212,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   // record debug info
   if (FLAGS_enable_record_debug) {
     open_space_debug_.Clear();
-    RecordDebugInfo(translate_origin, rotate_angle, xWS, uWS, l_warm_up,
-                    n_warm_up, dual_l_result_ds, dual_n_result_ds,
+    RecordDebugInfo(translate_origin, rotate_angle, end_pose, xWS, uWS,
+                    l_warm_up, n_warm_up, dual_l_result_ds, dual_n_result_ds,
                     state_result_ds, control_result_ds, time_result_ds,
                     XYbounds_, obstacles_vertices_vec);
   }
@@ -256,9 +256,9 @@ void OpenSpaceTrajectoryGenerator::GetStitchingTrajectory(
 
 void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     const Vec2d& translate_origin, const double& rotate_angle,
-    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
-    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
-    const Eigen::MatrixXd& dual_l_result_ds,
+    const std::vector<double>& end_pose, const Eigen::MatrixXd& xWS,
+    const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
+    const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& dual_l_result_ds,
     const Eigen::MatrixXd& dual_n_result_ds,
     const Eigen::MatrixXd& state_result_ds,
     const Eigen::MatrixXd& control_result_ds,
@@ -266,10 +266,19 @@ void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
     const std::vector<std::vector<common::math::Vec2d>>&
         obstacles_vertices_vec) {
   // load translation origin and heading angle
-  auto* roi_shift_point = open_space_debug_.mutable_roi_shift_point();
+  auto* roi_shift_point =
+      open_space_debug_.mutable_roi_shift_point()->mutable_path_point();
   roi_shift_point->set_x(translate_origin.x());
   roi_shift_point->set_y(translate_origin.y());
   roi_shift_point->set_theta(rotate_angle);
+
+  // load end_pose into debug
+  auto* end_point = open_space_debug_.mutable_end_point();
+  end_point->mutable_path_point()->set_x(end_pose[0]);
+  end_point->mutable_path_point()->set_y(end_pose[1]);
+  end_point->mutable_path_point()->set_theta(end_pose[2]);
+  end_point->set_v(end_pose[3]);
+
   // load warm start trajectory
   auto* warm_start_trajectory =
       open_space_debug_.mutable_warm_start_trajectory();
