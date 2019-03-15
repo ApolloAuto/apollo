@@ -46,7 +46,6 @@ class SunnyvaleLoopTest : public PlanningTestBase {
 
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
     ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
-    ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
   }
 };
 

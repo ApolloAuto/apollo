@@ -136,7 +136,6 @@ message TrafficRuleConfig {
     REFERENCE_LINE_END = 7;
     REROUTING = 8;
     SIGNAL_LIGHT = 9;
-    STOP_SIGN = 10;
   }
   optional RuleId rule_id = 1;
   optional bool enabled = 2;
