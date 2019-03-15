@@ -29,10 +29,14 @@ DEFINE_bool(enable_collision_detection, false,
             "enable collision detection in planning");
 
 // scenario related
-DEFINE_string(
-    scenario_lane_follow_config_file,
-    "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt",
-    "The lane follow scenario configuration file");
+DEFINE_string(scenario_bare_intersection_protected_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/bare_intersection_protected_config.pb.txt",
+              "The bare_intersection_protected scenario configuration file");
+DEFINE_string(scenario_lane_follow_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/lane_follow_config.pb.txt",
+              "The lane follow scenario configuration file");
 DEFINE_string(scenario_side_pass_config_file,
               "/apollo/modules/planning/conf/scenario/side_pass_config.pb.txt",
               "side pass scenario configuration file");
@@ -70,6 +74,8 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
 
+DEFINE_bool(enable_scenario_bare_intersection, false,
+            "enable bare_intersection scenarios in planning");
 DEFINE_bool(enable_scenario_stop_sign, true,
             "enable stop_sign scenarios in planning");
 DEFINE_bool(enable_scenario_traffic_light, true,
