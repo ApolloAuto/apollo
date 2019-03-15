@@ -94,9 +94,10 @@ void DeciderRuleBasedStop::CheckStopSign(
            << "] stop_line_s[" << stop_line_s << "]";
 
     BuildStopDecision(
-        frame, reference_line_info, stop_wall_id, stop_line_s, stop_distance,
+        stop_wall_id, stop_line_s, stop_distance,
         StopReasonCode::STOP_REASON_STOP_SIGN,
-        PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles);
+        PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles, frame,
+        reference_line_info);
   }
 }
 
@@ -147,9 +148,9 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
            << "] stop_line_s[" << stop_line_s << "]";
     std::vector<std::string> wait_for_obstacles;
-    BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s,
-                      stop_distance, StopReasonCode::STOP_REASON_SIGNAL,
-                      wait_for_obstacles);
+    BuildStopDecision(stop_wall_id, stop_line_s, stop_distance,
+                      StopReasonCode::STOP_REASON_SIGNAL, wait_for_obstacles,
+                      frame, reference_line_info);
   }
 }
 
@@ -239,16 +240,17 @@ void DeciderRuleBasedStop::CheckOpenSpacePreStop(
   std::vector<std::string> wait_for_obstacles;
   frame->mutable_open_space_info()->set_open_space_pre_stop_fence_s(
       stop_line_s);
-  BuildStopDecision(frame, reference_line_info, stop_wall_id, stop_line_s, 0.0,
+  BuildStopDecision(stop_wall_id, stop_line_s, 0.0,
                     StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP,
-                    wait_for_obstacles);
+                    wait_for_obstacles, frame, reference_line_info);
 }
 
+// TODO(Jinyun) Move to more general folder for common use
 bool DeciderRuleBasedStop::BuildStopDecision(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info,
     const std::string& stop_wall_id, const double stop_line_s,
     const double stop_distance, const StopReasonCode& stop_reason_code,
-    const std::vector<std::string>& wait_for_obstacles) {
+    const std::vector<std::string>& wait_for_obstacles, Frame* const frame,
+    ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
