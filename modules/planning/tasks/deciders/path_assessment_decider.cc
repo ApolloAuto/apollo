@@ -18,6 +18,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
 namespace apollo {
 namespace planning {
@@ -26,8 +27,6 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-
-constexpr double kStaticObstacleSpeedThreshold = 0.5;
 
 PathAssessmentDecider::PathAssessmentDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -91,7 +90,8 @@ bool PathAssessmentDecider::IsValidFallbackPath(
   return true;
 }
 
-void PathAssessmentDecider::SetPathInfo() {
+void PathAssessmentDecider::SetPathInfo(
+    const ReferenceLineInfo& reference_line_info, PathData* const path_data) {
   // TODO(jiacheng): implement this.
   return;
 }
@@ -133,18 +133,7 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
   auto indexed_obstacles = reference_line_info.path_decision().obstacles();
   for (const auto* obstacle : indexed_obstacles.Items()) {
     // Filter out unrelated obstacles.
-    //  - Must be non-virtual
-    if (obstacle->IsVirtual()) {
-      continue;
-    }
-    //  - Must not be ignore-decision obstacles.
-    if (obstacle->HasLongitudinalDecision() && obstacle->HasLateralDecision() &&
-        obstacle->IsIgnore()) {
-      continue;
-    }
-    //  - Must be non-static
-    if (!obstacle->IsStatic() ||
-        obstacle->speed() > kStaticObstacleSpeedThreshold) {
+    if (!IsWithinPathDeciderScopeObstacle(*obstacle)) {
       continue;
     }
     // Convert into polygon and save it.
