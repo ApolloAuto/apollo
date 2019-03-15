@@ -377,6 +377,7 @@ Status OnLanePlanning::Plan(
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
         stitching_trajectory.back());
+    // 1, ptr_debug -> open_space_info
   }
 
   auto status =
