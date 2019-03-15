@@ -28,6 +28,9 @@ using apollo::common::Status;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 
+// PointDecision contains (s, PathPointType, distance to closest obstacle).
+using PathPointDecision = std::tuple<double, PathData::PathPointType, double>;
+
 PathAssessmentDecider::PathAssessmentDecider(const TaskConfig& config)
     : Decider(config) {}
 
@@ -92,7 +95,15 @@ bool PathAssessmentDecider::IsValidFallbackPath(
 
 void PathAssessmentDecider::SetPathInfo(
     const ReferenceLineInfo& reference_line_info, PathData* const path_data) {
-  // TODO(jiacheng): implement this.
+  // Go through every path_point, and label its:
+  //  - in-lane/out-of-lane info
+  //  - distance to the closest obstacle.
+  std::vector<PathPointDecision> path_decision;
+  InitPathPointDecision(*path_data, &path_decision);
+  SetPathPointType(reference_line_info, *path_data, &path_decision);
+  SetObstacleDistance(reference_line_info, *path_data, &path_decision);
+
+  path_data->SetPathPointDecisionGuide(path_decision);
   return;
 }
 
@@ -171,6 +182,26 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
   }
 
   return false;
+}
+
+void PathAssessmentDecider::InitPathPointDecision(
+    const PathData& path_data,
+    std::vector<PathPointDecision>* const path_decision) {
+  return;
+}
+
+void PathAssessmentDecider::SetPathPointType(
+    const ReferenceLineInfo& reference_line_info,
+    const PathData& path_data,
+    std::vector<PathPointDecision>* const path_decision) {
+  return;
+}
+
+void PathAssessmentDecider::SetObstacleDistance(
+    const ReferenceLineInfo& reference_line_info,
+    const PathData& path_data,
+    std::vector<PathPointDecision>* const path_decision) {
+  return;
 }
 
 }  // namespace planning
