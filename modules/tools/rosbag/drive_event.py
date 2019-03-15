@@ -34,47 +34,24 @@ from common import proto_utils
 g_message_manager = PbMessageManager()
 
 g_args = None
-
 g_localization = None
-
 
 def OnReceiveLocalization(localization_msg):
     global g_localization
     g_localization = localization_msg
 
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="A tool to write events when recording rosbag")
-    parser.add_argument(
-        "--drive_event_topic",
-        action="store",
-        default="/apollo/drive_event",
-        help="""the drive event topic""")
-    parser.add_argument(
-        "--localization_topic",
-        action="store",
-        default="/apollo/localization/pose",
-        help="""the drive event topic""")
-    parser.add_argument(
-        "--dir",
-        action="store",
-        default="data/bag",
-        help="""The log export directory.""")
-    g_args = parser.parse_args()
-
+def main(args):
     drive_event_meta_msg = g_message_manager.get_msg_meta_by_topic(
-        g_args.drive_event_topic)
+        args.drive_event_topic)
     if not drive_event_meta_msg:
-        print "Unknown drive_event topic name: %s" % (g_args.drive_event_topic)
-        sys.exit(0)
+        print('Unknown drive_event topic name: %s' % args.drive_event_topic)
+        sys.exit(1)
 
     localization_meta_msg = g_message_manager.get_msg_meta_by_topic(
-        g_args.localization_topic)
+        args.localization_topic)
     if not localization_meta_msg:
-        print "Unknown localization topic name: %s" % (
-            g_args.localization_topic)
-        sys.exit(0)
+        print('Unknown localization topic name: %s' % args.localization_topic)
+        sys.exit(1)
 
     cyber.init()
     node = cyber.Node("derive_event_node")
@@ -110,7 +87,29 @@ if __name__ == "__main__":
         writer.write(event_msg)
         time_str = datetime.datetime.fromtimestamp(current_time).strftime(
             "%Y%m%d%H%M%S")
-        filename = os.path.join(g_args.dir, "%s_drive_event.pb.txt" % time_str)
+        filename = os.path.join(args.dir, "%s_drive_event.pb.txt" % time_str)
         proto_utils.write_pb_to_text_file(event_msg, filename)
-        print("logged to rosbag and written to file %s" % filename)
+        print('Logged to rosbag and written to file %s' % filename)
         time.sleep(0.1)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="A tool to write events when recording rosbag")
+    parser.add_argument(
+        "--drive_event_topic",
+        action="store",
+        default="/apollo/drive_event",
+        help="""the drive event topic""")
+    parser.add_argument(
+        "--localization_topic",
+        action="store",
+        default="/apollo/localization/pose",
+        help="""the drive event topic""")
+    parser.add_argument(
+        "--dir",
+        action="store",
+        default="data/bag",
+        help="""The log export directory.""")
+
+    g_args = parser.parse_args()
+    main(g_args)
