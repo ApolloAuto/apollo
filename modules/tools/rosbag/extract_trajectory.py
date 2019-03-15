@@ -38,7 +38,6 @@ def write_to_file(file_path, topic_pb):
     """
     with open(file_path, 'w') as fp:
         fp.write(str(topic_pb))
-        fp.close()
 
 def extract_record(in_record, output):
     freader = record.RecordReader(in_record)
