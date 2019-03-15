@@ -293,7 +293,6 @@ bool DeciderRuleBasedStop::BuildStopDecision(
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision("DeciderRuleBasedStop",
                                          stop_wall->Id(), stop);
-
   return 0;
 }
 

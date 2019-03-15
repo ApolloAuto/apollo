@@ -18,8 +18,12 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 
+#include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/change_lane_decider.h"
+#include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
@@ -32,6 +36,7 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
+using apollo::common::util::WithinBound;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 
@@ -64,22 +69,25 @@ Status SpeedBoundsDecider::Process(
         if (!ChangeLaneDecider::IsClearToChangeLane(reference_line_info)) {
           if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
             set_stop_fence = BuildSidePassStopFence(
-                stop_s_on_pathdata,
-                &(mutable_side_pass_info->change_lane_stop_path_point));
+                path_data, stop_s_on_pathdata,
+                &(mutable_side_pass_info->change_lane_stop_path_point), frame,
+                reference_line_info);
           }
         }
       } else {
         if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
           set_stop_fence = BuildSidePassStopFence(
-              stop_s_on_pathdata,
-              &(mutable_side_pass_info->change_lane_stop_path_point));
+              path_data, stop_s_on_pathdata,
+              &(mutable_side_pass_info->change_lane_stop_path_point), frame,
+              reference_line_info);
         }
       }
     } else {
       if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
         set_stop_fence = BuildSidePassStopFence(
-            stop_s_on_pathdata,
-            &(mutable_side_pass_info->change_lane_stop_path_point));
+            path_data, stop_s_on_pathdata,
+            &(mutable_side_pass_info->change_lane_stop_path_point), frame,
+            reference_line_info);
       }
     }
     mutable_side_pass_info->change_lane_stop_flag = set_stop_fence;
@@ -155,12 +163,63 @@ Status SpeedBoundsDecider::Process(
 // @brief Check if necessary to set stop fence used for nonscenario side pass
 bool SpeedBoundsDecider::CheckSidePassStop(const PathData &path_data,
                                            double *stop_s_on_pathdata) {
-  return true;
+  const std::vector<std::tuple<double, PathData::PathPointType, double>>
+      &path_point_decision_guide = path_data.path_point_decision_guide();
+  PathData::PathPointType last_path_point_type =
+      PathData::PathPointType::UNKNOWN;
+  for (const auto &point_guide : path_point_decision_guide) {
+    if (last_path_point_type == PathData::PathPointType::IN_LANE &&
+        (std::get<1>(point_guide) == PathData::PathPointType::IN_LANE ||
+         std::get<1>(point_guide) ==
+             PathData::PathPointType::OUT_ON_REVERSE_LANE)) {
+      *stop_s_on_pathdata = std::get<0>(point_guide);
+      return true;
+    }
+    last_path_point_type = std::get<1>(point_guide);
+  }
+  return false;
 }
 
 // @brief Set stop fence for side pass
 bool SpeedBoundsDecider::BuildSidePassStopFence(
-    double stop_s_on_pathdata, common::PathPoint *stop_pathpoint) {
+    const PathData &path_data, const double stop_s_on_pathdata,
+    common::PathPoint *stop_pathpoint, Frame *const frame,
+    ReferenceLineInfo *const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  if (!path_data.GetPathPointWithPathS(stop_s_on_pathdata, stop_pathpoint)) {
+    return false;
+  }
+
+  const std::string stop_wall_id = "side_pass_stop";
+
+  const auto &nearby_path = reference_line_info->reference_line().map_path();
+  double stop_point_s = 0.0;
+  double stop_point_l = 0.0;
+  nearby_path.GetNearestPoint({stop_pathpoint->x(), stop_pathpoint->y()},
+                              &stop_point_s, &stop_point_l);
+
+  // check
+  const auto &reference_line = reference_line_info->reference_line();
+  if (!WithinBound(0.0, reference_line.Length(), stop_point_s)) {
+    AERROR << "stop_line_s[" << stop_point_s << "] is not on reference line";
+    return 0;
+  }
+
+  // create virtual stop wall
+  auto *obstacle = frame->CreateStopObstacle(reference_line_info, stop_wall_id,
+                                             stop_point_s);
+  if (!obstacle) {
+    AERROR << "Failed to create obstacle [" << stop_wall_id << "]";
+    return -1;
+  }
+  Obstacle *stop_wall = reference_line_info->AddObstacle(obstacle);
+  if (!stop_wall) {
+    AERROR << "Failed to create obstacle for: " << stop_wall_id;
+    return -1;
+  }
+
   return true;
 }
 
@@ -168,6 +227,30 @@ bool SpeedBoundsDecider::BuildSidePassStopFence(
 bool SpeedBoundsDecider::CheckADCStop(
     const ReferenceLineInfo &reference_line_info,
     const common::PathPoint &stop_point) {
+  const double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  if (adc_speed > speed_bounds_config_.max_adc_stop_speed()) {
+    ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
+    return false;
+  }
+
+  // check stop close enough to stop line of the stop_sign
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const auto &nearby_path = reference_line_info.reference_line().map_path();
+  double stop_point_s = 0.0;
+  double stop_point_l = 0.0;
+  nearby_path.GetNearestPoint({stop_point.x(), stop_point.y()}, &stop_point_s,
+                              &stop_point_l);
+
+  const double distance_stop_line_to_adc_front_edge =
+      stop_point_s - adc_front_edge_s;
+
+  if (distance_stop_line_to_adc_front_edge >
+      speed_bounds_config_.max_valid_stop_distance()) {
+    ADEBUG << "not a valid stop. too far from stop line.";
+    return false;
+  }
+
   return true;
 }
 
