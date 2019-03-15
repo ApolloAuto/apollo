@@ -8,6 +8,5 @@ Relative map module is a middle layer connecting HDMap/Perception module and pla
   * LaneMarker from perception module
   * Localization from localization module
 
-## Outputs
+## Output
   * Relative map follows map format defined in modules/map/proto/map.proto
-  * NavigationInfo received from dreamview module
