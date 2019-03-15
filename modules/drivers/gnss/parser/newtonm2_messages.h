@@ -500,7 +500,7 @@ struct ImuParameter {
 
 using ::apollo::drivers::gnss::config::ImuType;
 inline ImuParameter GetImuParameter(ImuType type) {
-  switch (type) {
+  switch (type) {    
     case ImuType::ADIS16488:
       // 720/2**31 deg/LSB, 200/2**31 m/s/LSB
       return {5.8516723170686385e-09, 9.31322574615478515625e-8, 200.0};
