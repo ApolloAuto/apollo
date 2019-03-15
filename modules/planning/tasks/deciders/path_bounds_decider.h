@@ -42,25 +42,55 @@ class PathBoundsDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
 
-  std::string GeneratePathBoundaries(
+  /**
+    * @brief: The regular path boundary generation considers the ADC itself
+    *   and other static environments:
+    *   - ADC's position (lane-changing considerations)
+    *   - lane info
+    *   - static obstacles
+    *   The philosophy is: static environment must be and can only be taken
+    *   care of by the path planning.
+    * @param: frame
+    * @param: reference_line_info
+    * @param: The generated regular path_boundary, if there is one.
+    * @return: A failure message. If succeeded, return "" (empty string).
+    */
+  std::string GenerateRegularPathBoundary(
       Frame* frame, ReferenceLineInfo* reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
-  std::string GenerateFallbackPathBoundaries(
+  /**
+    * @brief: The fallback path only considers:
+    *   - ADC's position (so that boundary must contain ADC's position)
+    *   - lane info
+    *   It is supposed to be the last resort in case regular path generation
+    *   fails so that speed decider can at least have some path and won't
+    *   fail drastically.
+    *   Therefore, it be reliable so that optimizer will not likely to
+    *   fail with this boundary, and therefore doesn't consider any static
+    *   obstacle. When the fallback path is used, stopping before static
+    *   obstacles should be taken care of by the speed decider. Also, it
+    *   doesn't consider any lane-borrowing.
+    * @param: frame
+    * @param: reference_line_info
+    * @param: The generated fallback path_boundary, if there is one.
+    * @return: A failure message. If succeeded, return "" (empty string).
+    */
+  std::string GenerateFallbackPathBoundary(
       Frame* frame, ReferenceLineInfo* reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
-  bool InitPathBoundaries(
+  bool InitPathBoundary(
       const ReferenceLine& reference_line,
       const common::TrajectoryPoint& planning_start_point,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
-  bool GetBoundariesFromLanesAndADC(
-      const ReferenceLine& reference_line, int lane_borrowing,
-      double ADC_buffer,
+  bool GetBoundaryFromLanesAndADC(
+      const ReferenceLine& reference_line,
+      int lane_borrowing, double ADC_buffer,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
-  bool GetBoundariesFromStaticObstacles(
+  bool GetBoundaryFromStaticObstacles(
       PathDecision* const path_decision,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
