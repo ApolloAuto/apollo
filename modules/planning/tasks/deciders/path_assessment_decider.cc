@@ -16,8 +16,12 @@
 
 #include "modules/planning/tasks/deciders/path_assessment_decider.h"
 
+#include <cmath>
+#include <limits>
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
 namespace apollo {
@@ -27,6 +31,8 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
+using apollo::common::VehicleConfigHelper;
+using apollo::hdmap::HDMapUtil;
 
 // PointDecision contains (s, PathPointType, distance to closest obstacle).
 using PathPointDecision = std::tuple<double, PathData::PathPointType, double>;
@@ -210,10 +216,13 @@ void PathAssessmentDecider::SetPathPointType(
   CHECK_NOTNULL(path_decision);
 
   // Go through every path_point, and add in-lane/out-of-lane info.
-  bool is_out_of_lane = false;
   const auto& frenet_path = path_data.frenet_frame_path();
+  const auto& discrete_path = path_data.discretized_path();
+  double adc_half_width =
+      VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   for (size_t i = 0; i < frenet_path.size(); ++i) {
     const auto& frenet_path_point = frenet_path[i];
+    const auto& discrete_path_point = discrete_path[i];
     double lane_left_width = 0.0;
     double lane_right_width = 0.0;
     if (reference_line_info.reference_line().GetLaneWidth(
@@ -221,21 +230,33 @@ void PathAssessmentDecider::SetPathPointType(
       if (frenet_path_point.l() > lane_left_width ||
           frenet_path_point.l() < -lane_right_width ) {
         // The path point is out of the reference_line's lane.
-        is_out_of_lane = true;
-        // Analyze whether it is a forward lane or reverse lane.
+        // To be conservative, by default treat it as reverse lane.
         std::get<1>((*path_decision)[i]) =
             PathData::PathPointType::OUT_ON_REVERSE_LANE;
-        // TODO:(jiacheng) check lane direction.
+        // Only when the lanes that contain this path point are all
+        // forward lanes and none is reverse lane, then treat this
+        // path point as OUT_ON_FORWARD_LANE.
+        std::vector<hdmap::LaneInfoConstPtr> forward_lanes;
+        std::vector<hdmap::LaneInfoConstPtr> reverse_lanes;
+        if (HDMapUtil::BaseMapPtr()->GetLanesWithHeading(
+                common::util::MakePointENU(discrete_path_point.x(),
+                                           discrete_path_point.y(), 0.0),
+                adc_half_width, discrete_path_point.theta(),
+                M_PI / 2.0, &forward_lanes) == 0 &&
+            HDMapUtil::BaseMapPtr()->GetLanesWithHeading(
+                common::util::MakePointENU(discrete_path_point.x(),
+                                           discrete_path_point.y(), 0.0),
+                adc_half_width, discrete_path_point.theta() - M_PI,
+                M_PI / 2.0, &reverse_lanes) == 0) {
+          if (!forward_lanes.empty() && reverse_lanes.empty()) {
+            std::get<1>((*path_decision)[i]) =
+                PathData::PathPointType::OUT_ON_FORWARD_LANE;
+          }
+        }
       } else {
         // The path point is within the reference_line's lane.
-        if (is_out_of_lane) {
-          is_out_of_lane = false;
-          std::get<1>((*path_decision)[i]) =
-              PathData::PathPointType::BACK_TO_IN_LANE;
-        } else {
-          std::get<1>((*path_decision)[i]) =
-              PathData::PathPointType::IN_LANE;
-        }
+        std::get<1>((*path_decision)[i]) =
+            PathData::PathPointType::IN_LANE;
       }
     }
   }
@@ -246,6 +267,7 @@ void PathAssessmentDecider::SetObstacleDistance(
     const ReferenceLineInfo& reference_line_info,
     const PathData& path_data,
     std::vector<PathPointDecision>* const path_decision) {
+  // Check
   return;
 }
 
