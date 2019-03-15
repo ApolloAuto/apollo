@@ -33,7 +33,9 @@ kHMIInfoTopic = '/apollo/hmi/status'
 
 
 class StaticInfoCalculator(object):
-    """Stat static info."""
+    """
+    Stat static information
+    """
 
     def __init__(self):
         self.vehicle_name = None
@@ -46,7 +48,7 @@ class StaticInfoCalculator(object):
         """
         try:
             reader = RecordReader(bag_file)
-            print "begin to process bag file {}".format(bag_file)
+            print("Begin to process bag file {}".format(bag_file))
             for msg in reader.read_messages():
                 print msg.topic
                 if msg.topic == kChassisInfoTopic and self.vehicle_vin == None:
@@ -64,11 +66,13 @@ class StaticInfoCalculator(object):
                     return True
         except:
             return False
-        print "finished processing bag file {}".format(bag_file)
+        print("Finished processing bag file {}".format(bag_file))
         return self.done()
 
     def process_dir(self, bag_dir):
-        """Process a directory."""
+        """
+        Process a directory
+        """
         files = []
         dirs = []
         for f in os.listdir(bag_dir):
@@ -89,13 +93,21 @@ class StaticInfoCalculator(object):
         return False
 
     def done(self):
-        """Check if all info are collected."""
+        """
+        Check if all info are collected
+        """
         # Currently we only care about vehicle name.
         return bool(self.vehicle_name)
 
+def main():
+    """
+    Process a path
+    """
+    if len(sys.argv) < 2:
+        print("Usage: %s <bag_file|task_dir>" % sys.argv[0])
+        sys.exit(0)
 
-def main(path):
-    """Process a path."""
+    path = sys.argv[1]
     calc = StaticInfoCalculator()
     if os.path.isfile(path):
         calc.process_file(path)
@@ -103,9 +115,8 @@ def main(path):
         calc.process_dir(path)
 
     # Output result, which might be None
-    print 'vehicle_name:', calc.vehicle_name
-    print 'vehicle_vin:', calc.vehicle_vin
-
+    print('vehicle_name: %s' % calc.vehicle_name)
+    print('vehicle_vin: %s' % calc.vehicle_vin)
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    main()
