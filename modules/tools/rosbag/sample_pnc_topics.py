@@ -78,16 +78,15 @@ class SamplePNC(object):
         freader = RecordReader(input_record)
         fwriter = RecordWriter()
         if not fwriter.open(output_record):
-            print "writer open failed!"
+            print('writer open failed!')
             return
-        print "+++ begin to process..."
+        print '----- Begin to process record -----'
         for channelname, msg, datatype, timestamp in freader.read_messages():
             if channelname in SamplePNC.TOPICS:
                 desc = freader.get_protodesc(channelname)
                 fwriter.write_channel(channelname, datatype, desc)
                 fwriter.write_message(channelname, msg, timestamp)
-        print "+++ Finished  processing..."
-
+        print '----- Finish processing record -----'
 
 if __name__ == '__main__':
     cyber.init()
