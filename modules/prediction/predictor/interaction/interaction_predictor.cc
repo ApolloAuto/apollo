@@ -65,6 +65,7 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 
     std::vector<TrajectoryPoint> points;
     DrawTrajectory(*obstacle, lane_sequence,
+        best_trajectory_lat_lon_pair,
         FLAGS_prediction_trajectory_time_length,
         FLAGS_prediction_trajectory_time_resolution,
         &points);
@@ -78,6 +79,7 @@ void InteractionPredictor::Clear() { Predictor::Clear(); }
 
 bool InteractionPredictor::DrawTrajectory(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const LatLonPolynomialPair& trajectory_lat_lon_pair,
     const double total_time, const double period,
     std::vector<TrajectoryPoint>* points) {
   // TODO(kechxu) implement
@@ -100,14 +102,14 @@ double InteractionPredictor::ComputeTrajectoryCost(
 }
 
 double InteractionPredictor::ComputeLikelihood(const double cost) {
-  // TODO(kechxu) implement
-  return 0.0;
+  // TODO(kechxu) adjust alpha
+  double alpha = 1.0;
+  return std::exp(-alpha * cost);
 }
 
 double InteractionPredictor::ComputePosterior(
     const double prior, const double likelihood) {
-  // TODO(kechxu) implement
-  return 0.0;
+  return prior * likelihood;
 }
 
 }  // namespace prediction
