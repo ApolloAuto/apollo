@@ -41,15 +41,16 @@ class PathAssessmentDecider : public Decider {
   bool IsValidRegularPath(const ReferenceLineInfo& reference_line_info,
                           const PathData& path_data);
 
-  bool IsValidFallbackPath(const ReferenceLineInfo& reference_line_info,
-                           const PathData& path_data);
+  bool IsValidFallbackPath(
+      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
-  void SetPathInfo();
+  void SetPathInfo(
+      const ReferenceLineInfo& reference_line_info, PathData* const path_data);
 
   bool IsGreatlyOffReferenceLine(const PathData& path_data);
 
-  bool IsGreatlyOffRoad(const ReferenceLineInfo& reference_line_info,
-                        const PathData& path_data);
+  bool IsGreatlyOffRoad(
+      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
   bool IsCollidingWithStaticObstacles(
       const ReferenceLineInfo& reference_line_info, const PathData& path_data);
