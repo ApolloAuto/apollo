@@ -61,7 +61,6 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
     ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
     ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-    ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
   }
 };
 
@@ -492,7 +491,6 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "101";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -513,7 +511,6 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "102";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -534,7 +531,6 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_03) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "103";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -555,7 +551,6 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, true);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "200";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -576,7 +571,6 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, true);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "201";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -616,7 +610,6 @@ TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "300";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -632,7 +625,6 @@ TEST_F(SunnyvaleBigLoopTest, change_lane_abort_for_fast_back_vehicle) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "400";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -655,7 +647,6 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "600";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -683,7 +674,6 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "601";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -750,7 +740,6 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
   ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   std::string seq_num = "601";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
