@@ -16,7 +16,8 @@
 # limitations under the License.
 ###############################################################################
 """
-This program can dump a cyber record into separate text files that contains the pb messages
+This program can dump a cyber record into separate text files that contains
+the pb messages
 """
 
 import argparse
@@ -31,36 +32,35 @@ from common.message_manager import PbMessageManager
 
 g_message_manager = PbMessageManager()
 
-
 def write_to_file(file_path, topic_pb):
-    """write pb message to file"""
-    f = file(file_path, 'w')
-    f.write(str(topic_pb))
-    f.close()
-
+    """
+    Write pb message to file
+    """
+    with open(file_path, 'w') as fp:
+        fp.write(str(topic_pb))
 
 def dump_record(in_record, out_dir, start_time, duration, filter_topic):
     freader = record.RecordReader()
     if not freader.open(in_record):
-        print("Failed to open: %s" % in_record)
+        print('Failed to open: %s' % in_record)
         return
     time.sleep(1)
     seq = 0
     while not freader.endoffile():
         read_msg_succ = freader.read_message()
         if not read_msg_succ:
-            print("Read failed")
+            print('Read failed')
             return
         t_sec = freader.currentmessage_time()
         if start_time and t_sec < start_time:
-            print "not yet reached the start time"
+            print('Not yet reached the start time')
             continue
         if start_time and t_sec >= start_time + duration:
-            print "done"
+            print('Done')
             break
         topic = freader.currentmessage_channelname()
         msg_type = freader.get_messagetype(topic)
-        if topic == "/apollo/sensor/mobileye":
+        if topic == '/apollo/sensor/mobileye':
             continue
         if not filter_topic or topic == filter_topic:
             message_file = topic.replace("/", "_")
@@ -68,7 +68,7 @@ def dump_record(in_record, out_dir, start_time, duration, filter_topic):
                                      str(seq) + message_file + ".pb.txt")
             meta_msg = g_message_manager.get_msg_meta_by_topic(topic)
             if meta_msg is None:
-                print("Unknown topic: %s " % topic)
+                print('Unknown topic: %s' % topic)
                 continue
             msg = meta_msg.msg_type()
             msg.ParseFromString(freader.current_rawmessage())
@@ -76,8 +76,7 @@ def dump_record(in_record, out_dir, start_time, duration, filter_topic):
         seq += 1
     freader.close()
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="A tool to dump the protobuf messages in a cyber record into text files"
     )
@@ -109,8 +108,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     if not os.path.exists(args.out_dir):
-        print("%s does not exist" % args.out_dir)
-        sys.exit(0)
+        print('%s does not exist' % args.out_dir)
+        sys.exit(1)
 
     dump_record(args.in_record, args.out_dir, args.start_time, args.duration,
                 args.topic)
