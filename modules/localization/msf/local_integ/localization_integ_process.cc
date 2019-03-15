@@ -270,7 +270,7 @@ void LocalizationIntegProcess::MeasureDataThreadLoop() {
         measure_data_queue_.pop();
         --size;
       }
-      if (measure_data_queue_.size() == 0) {
+      if (measure_data_queue_.empty()) {
         lock.unlock();
         cyber::Yield();
         continue;

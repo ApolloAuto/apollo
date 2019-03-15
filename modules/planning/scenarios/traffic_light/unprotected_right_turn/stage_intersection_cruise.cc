@@ -24,7 +24,6 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/util/util.h"
 
-
 namespace apollo {
 namespace planning {
 namespace scenario {
@@ -41,19 +40,27 @@ TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "TrafficLightUnprotectedRightTurnStageIntersectionCruise "
-        << "plan error";
+           << "plan error";
   }
 
   const auto& reference_line_info = frame->reference_line_info().front();
+
+  // set right_of_way_status
+  if (PlanningContext::GetScenarioInfo()
+      ->current_traffic_light_overlaps.size() > 0) {
+    const double traffic_light_start_s = PlanningContext::GetScenarioInfo()
+        ->current_traffic_light_overlaps[0].start_s;
+    reference_line_info.SetJunctionRightOfWay(traffic_light_start_s, true);
+  }
 
   // check pass pnc_junction
   // TODO(all): remove when pnc_junction completely available on map
   const auto& pnc_junction_overlaps =
       reference_line_info.reference_line().map_path().pnc_junction_overlaps();
-  if (pnc_junction_overlaps.size() == 0) {
+  if (pnc_junction_overlaps.empty()) {
     // pnc_junction not exist on map, use current traffic_light's end_s
     if (PlanningContext::GetScenarioInfo()
-        ->current_traffic_light_overlaps.size() == 0) {
+            ->current_traffic_light_overlaps.empty()) {
       return FinishStage();
     }
 
@@ -61,12 +68,13 @@ TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
     const double adc_back_edge_s =
         reference_line_info.AdcSlBoundary().start_s();
     const double traffic_light_end_s = PlanningContext::GetScenarioInfo()
-        ->current_traffic_light_overlaps[0].end_s;
-    const double distance_adc_pass_traffic_light = adc_back_edge_s -
-        traffic_light_end_s;
+                                           ->current_traffic_light_overlaps[0]
+                                           .end_s;
+    const double distance_adc_pass_traffic_light =
+        adc_back_edge_s - traffic_light_end_s;
     ADEBUG << "distance_adc_pass_traffic_light["
-        << distance_adc_pass_traffic_light
-        << "] traffic_light_end_s[" << traffic_light_end_s << "]";
+           << distance_adc_pass_traffic_light << "] traffic_light_end_s["
+           << traffic_light_end_s << "]";
 
     if (distance_adc_pass_traffic_light >= kIntersectionPassDist) {
       return FinishStage();

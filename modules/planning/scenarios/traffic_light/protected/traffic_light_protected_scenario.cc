@@ -25,8 +25,8 @@
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/traffic_light/protected/stage_approach.h"
 #include "modules/planning/scenarios/traffic_light/protected/stage_intersection_cruise.h"
-#include "modules/planning/scenarios/traffic_light/protected/stage_stop.h"
 
 namespace apollo {
 namespace planning {
@@ -49,7 +49,7 @@ void TrafficLightProtectedScenario::Init() {
   }
 
   if (PlanningContext::GetScenarioInfo()
-      ->current_traffic_light_overlaps.empty()) {
+          ->current_traffic_light_overlaps.empty()) {
     AERROR << "Could not find traffic-light(s)";
     return;
   }
@@ -79,9 +79,9 @@ void TrafficLightProtectedScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_STOP,
+      ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new TrafficLightProtectedStageStop(config);
+        return new TrafficLightProtectedStageApproach(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE,

@@ -52,6 +52,10 @@ class TrajectoryStitcher {
       const common::TrajectoryPoint& matched_trajectory_point);
 
   static std::vector<common::TrajectoryPoint> ComputeReinitStitchingTrajectory(
+      const double planning_cycle_time,
+      const common::VehicleState& vehicle_state);
+
+  static common::TrajectoryPoint ComputeTrajectoryPointFromVehicleState(
       const common::VehicleState& vehicle_state);
 };
 

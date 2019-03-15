@@ -100,9 +100,9 @@ bool DualVariableWarmStartIPOPTQPInterface::get_starting_point(
     int n, bool init_x, double* x, bool init_z, double* z_L, double* z_U, int m,
     bool init_lambda, double* lambda) {
   ADEBUG << "get_starting_point";
-  CHECK(init_x == true) << "Warm start init_x setting failed";
-  CHECK(init_z == false) << "Warm start init_z setting failed";
-  CHECK(init_lambda == false) << "Warm start init_lambda setting failed";
+  CHECK(init_x) << "Warm start init_x setting failed";
+  CHECK(!init_z) << "Warm start init_z setting failed";
+  CHECK(!init_lambda) << "Warm start init_lambda setting failed";
 
   int l_index = l_start_index_;
   int n_index = n_start_index_;

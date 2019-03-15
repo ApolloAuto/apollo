@@ -5,11 +5,11 @@ traffic_light_protected_config: {
   max_adc_stop_speed: 0.3
   min_pass_s_distance: 3.0
 }
-stage_type: TRAFFIC_LIGHT_PROTECTED_STOP
+stage_type: TRAFFIC_LIGHT_PROTECTED_APPROACH
 stage_type: TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE
 
 stage_config: {
-  stage_type: TRAFFIC_LIGHT_PROTECTED_STOP
+  stage_type: TRAFFIC_LIGHT_PROTECTED_APPROACH
   enabled: true
   task_type: DECIDER_RULE_BASED_STOP
   task_type: DP_POLY_PATH_OPTIMIZER

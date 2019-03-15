@@ -33,12 +33,11 @@ Stage::StageStatus StageParking::Process(
     AERROR << "StageParking planning error";
     return StageStatus::ERROR;
   }
+  frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);
   return StageStatus::RUNNING;
 }
 
-Stage::StageStatus StageParking::FinishStage() {
-  return Stage::FINISHED;
-}
+Stage::StageStatus StageParking::FinishStage() { return Stage::FINISHED; }
 
 }  // namespace valet_parking
 }  // namespace scenario

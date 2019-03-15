@@ -96,7 +96,7 @@ int Velodyne64Driver::PollStandardSync(std::shared_ptr<VelodyneScan> scan) {
 
       if (rc == 0) {
         // check the angle for every packet if a packet has a angle
-        if (CheckAngle(*packet) == true &&
+        if (CheckAngle(*packet) &&
             (scan->firing_pkts_size() > 0.5 * config_.npackets())) {
           return 0;
         } else {

@@ -95,6 +95,20 @@ class OpenSpaceInfo {
     open_space_pre_stop_fence_s_ = s;
   }
 
+  bool pre_stop_rightaway_flag() const { return pre_stop_rightaway_flag_; }
+
+  void set_pre_stop_rightaway_flag(const bool flag) {
+    pre_stop_rightaway_flag_ = flag;
+  }
+
+  const hdmap::MapPathPoint &pre_stop_rightaway_point() const {
+    return pre_stop_rightaway_point_;
+  }
+
+  hdmap::MapPathPoint *mutable_pre_stop_rightaway_point() {
+    return &pre_stop_rightaway_point_;
+  }
+
   bool is_on_open_space_trajectory() const {
     return is_on_open_space_trajectory_;
   }
@@ -261,6 +275,10 @@ class OpenSpaceInfo {
   hdmap::ParkingSpaceInfoConstPtr target_parking_spot_ = nullptr;
 
   double open_space_pre_stop_fence_s_ = 0.0;
+
+  bool pre_stop_rightaway_flag_ = false;
+
+  hdmap::MapPathPoint pre_stop_rightaway_point_;
 
   bool is_on_open_space_trajectory_ = false;
   // @brief obstacles total num including perception obstacles and parking space

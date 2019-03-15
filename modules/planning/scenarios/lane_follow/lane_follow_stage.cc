@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
+#include <limits>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -30,6 +31,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
+#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -112,27 +114,40 @@ void LaneFollowStage::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 Stage::StageStatus LaneFollowStage::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   bool has_drivable_reference_line = false;
-  bool disable_low_priority_path = false;
+
+  ADEBUG << "Number of reference lines:\t"
+         << frame->mutable_reference_line_info()->size();
+
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
-    if (disable_low_priority_path) {
+    if (has_drivable_reference_line) {
       reference_line_info.SetDrivable(false);
+      break;
     }
-    if (!reference_line_info.IsDrivable()) {
-      continue;
-    }
+
     auto cur_status =
         PlanOnReferenceLine(planning_start_point, frame, &reference_line_info);
-    if (cur_status.ok() && reference_line_info.IsDrivable()) {
-      has_drivable_reference_line = true;
-      if (FLAGS_prioritize_change_lane &&
-          reference_line_info.IsChangeLanePath() &&
-          reference_line_info.Cost() < kStraightForwardLineCost) {
-        disable_low_priority_path = true;
+
+    if (cur_status.ok()) {
+      if (reference_line_info.IsChangeLanePath()) {
+        AERROR << "reference line is lane change ref.";
+        if (reference_line_info.Cost() < kStraightForwardLineCost &&
+            ChangeLaneDecider::IsClearToChangeLane(&reference_line_info)) {
+          has_drivable_reference_line = true;
+          reference_line_info.SetDrivable(true);
+          AERROR << "\tclear for lane change";
+        } else {
+          reference_line_info.SetDrivable(false);
+          AERROR << "\tlane change failed";
+        }
+      } else {
+        AERROR << "reference line is NOT lane change ref.";
+        has_drivable_reference_line = true;
       }
     } else {
       reference_line_info.SetDrivable(false);
     }
   }
+
   return has_drivable_reference_line ? StageStatus::RUNNING
                                      : StageStatus::ERROR;
 }
@@ -177,7 +192,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
   RecordObstacleDebugInfo(reference_line_info);
 
   if (reference_line_info->path_data().Empty()) {
-    ADEBUG << "Path fallback.";
+    AERROR << "Path fallback.";
     GenerateFallbackPathProfile(reference_line_info,
                                 reference_line_info->mutable_path_data());
     reference_line_info->AddCost(kPathOptimizationFallbackCost);
@@ -185,7 +200,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
   }
 
   if (!ret.ok() || reference_line_info->speed_data().empty()) {
-    ADEBUG << "Speed fallback.";
+    AERROR << "Speed fallback.";
 
     *reference_line_info->mutable_speed_data() =
         SpeedProfileGenerator::GenerateFallbackSpeedProfile();

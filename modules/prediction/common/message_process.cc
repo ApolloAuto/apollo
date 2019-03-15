@@ -146,7 +146,6 @@ void MessageProcess::OnPerception(
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 
-
   // Insert features to FeatureOutput for offline_mode
   if (FLAGS_prediction_offline_mode == 1) {
     for (const int id :

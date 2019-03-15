@@ -173,8 +173,7 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
         CHECK_NOTNULL(evaluator);
       } else {
         ADEBUG << "Obstacle: " << obstacle->id()
-               << " is neither "
-                  "on lane, nor in junction. Skip evaluating.";
+               << " is neither on lane, nor in junction. Skip evaluating.";
       }
       break;
     }

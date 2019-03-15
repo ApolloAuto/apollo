@@ -106,17 +106,11 @@ class Fem1dQpProblem {
 
   virtual bool Optimize();
 
-  virtual std::vector<double> x() const { return x_; }
+  const std::vector<double>& x() const { return x_; }
 
-  virtual std::vector<double> x_derivative() const { return dx_; }
+  const std::vector<double>& x_derivative() const { return dx_; }
 
-  virtual std::vector<double> x_second_order_derivative() const { return ddx_; }
-
-  virtual std::vector<double> x_third_order_derivative() const { return dddx_; }
-
-  // modify output resolution. If not set, the output resolution is by default
-  // identical to the original resolution.
-  virtual void SetOutputResolution(const double resolution);
+  const std::vector<double>& x_second_order_derivative() const { return ddx_; }
 
  protected:
   // naming convention follows osqp solver.
@@ -153,7 +147,6 @@ class Fem1dQpProblem {
   std::vector<double> x_;
   std::vector<double> dx_;
   std::vector<double> ddx_;
-  std::vector<double> dddx_;
 
   std::array<double, 3> x_init_;
   std::vector<std::pair<double, double>> x_bounds_;

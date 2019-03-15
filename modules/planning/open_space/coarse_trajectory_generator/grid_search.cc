@@ -22,6 +22,7 @@
 
 namespace apollo {
 namespace planning {
+
 GridSearch::GridSearch(const PlannerOpenSpaceConfig& open_space_conf) {
   xy_grid_resolution_ =
       open_space_conf.warm_start_config().grid_a_star_xy_resolution();
@@ -34,7 +35,7 @@ double GridSearch::EuclidDistance(const double& x1, const double& y1,
 }
 
 bool GridSearch::CheckConstraints(std::shared_ptr<Node2d> node) {
-  if (obstacles_linesegments_vec_.size() == 0) {
+  if (obstacles_linesegments_vec_.empty()) {
     return true;
   }
   double node_grid_x = node->GetGridX();

@@ -288,8 +288,10 @@ function main(){
     info "Starting docker container \"${APOLLO_DEV}\" ..."
 
     DOCKER_CMD="nvidia-docker"
+    USE_GPU=1
     if ! [ -x "$(command -v ${DOCKER_CMD})" ]; then
         DOCKER_CMD="docker"
+        USE_GPU=0
     fi
 
     ${DOCKER_CMD} run -it \
@@ -306,6 +308,7 @@ function main(){
         -e DOCKER_GRP="$GRP" \
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
+        -e USE_GPU=$USE_GPU \
         $(local_volumes) \
         --net host \
         -w /apollo \

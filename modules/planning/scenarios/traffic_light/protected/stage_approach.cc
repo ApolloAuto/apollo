@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "modules/planning/scenarios/traffic_light/protected/stage_stop.h"
+#include "modules/planning/scenarios/traffic_light/protected/stage_approach.h"
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
@@ -35,9 +35,9 @@ namespace traffic_light {
 using common::TrajectoryPoint;
 using perception::TrafficLight;
 
-Stage::StageStatus TrafficLightProtectedStageStop::Process(
+Stage::StageStatus TrafficLightProtectedStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
-  ADEBUG << "stage: Stop";
+  ADEBUG << "stage: Approach";
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
@@ -59,13 +59,12 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
     }
 
     // set right_of_way_status
-    reference_line_info.SetJunctionRightOfWay(
-        traffic_light_overlap.start_s, false);
+    reference_line_info.SetJunctionRightOfWay(traffic_light_overlap.start_s,
+                                              false);
 
-    const double adc_front_edge_s =
-        reference_line_info.AdcSlBoundary().end_s();
-    const double distance_adc_to_stop_line = traffic_light_overlap.start_s -
-        adc_front_edge_s;
+    const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+    const double distance_adc_to_stop_line =
+        traffic_light_overlap.start_s - adc_front_edge_s;
     auto signal_color =
         scenario::GetSignal(traffic_light_overlap.object_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id
@@ -94,14 +93,14 @@ Stage::StageStatus TrafficLightProtectedStageStop::Process(
   return Stage::RUNNING;
 }
 
-Stage::StageStatus TrafficLightProtectedStageStop::FinishScenario() {
+Stage::StageStatus TrafficLightProtectedStageApproach::FinishScenario() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
-Stage::StageStatus TrafficLightProtectedStageStop::FinishStage() {
+Stage::StageStatus TrafficLightProtectedStageApproach::FinishStage() {
   PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
   for (const auto& traffic_light_overlap :
        PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {

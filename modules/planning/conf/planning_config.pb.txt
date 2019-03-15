@@ -8,21 +8,18 @@ standard_planning_config {
      scenario_type: TRAFFIC_LIGHT_PROTECTED
      scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
      scenario_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN
+     scenario_type: VALET_PARKING
   }
 }
 default_task_config: {
   task_type: DECIDER_RULE_BASED_STOP
   decider_rule_based_stop_config: {
-    crosswalk: {
-      enabled: false
-      stop_distance: 1.0
-    }
     stop_sign: {
       enabled: true
       stop_distance: 1.0
     }
     traffic_light: {
-      enabled: false
+      enabled: true
       stop_distance: 1.0
       signal_expire_time_sec: 5.0
     }
@@ -37,6 +34,15 @@ default_task_config: {
     min_look_ahead_distance: 60.0
     lateral_buffer: 0.2
     path_output_resolution: 0.1
+  }
+}
+default_task_config: {
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  piecewise_jerk_path_config {
+    l_weight: 1.0
+    dl_weight: 50.0
+    ddl_weight: 1000.0
+    dddl_weight: 10000.0
   }
 }
 default_task_config: {
@@ -198,11 +204,12 @@ default_task_config: {
   open_space_trajectory_partition_config {
     gear_shift_max_t: 3.0
     gear_shift_unit_t: 0.02
-    interpolated_pieces_num: 50
+    interpolated_pieces_num: 20
     initial_gear_check_horizon: 3
-    heading_searching_range: 0.3
+    heading_searching_range: 0.2
+    heading_tracking_range: 1.57
     gear_shift_period_duration: 2.0
-    kepsilon_to_midway_point: 1.0e-6
+    kepsilon_to_midway_point: 1.0e-2
   }
 }
 default_task_config: {
@@ -292,10 +299,11 @@ default_task_config: {
 default_task_config: {
   task_type: OPEN_SPACE_ROI_DECIDER
   open_space_roi_decider_config {
-    roi_longitudinal_range: 10.0
-    parking_start_range: 7.0
+    roi_longitudinal_range: 15
+    parking_start_range: 20.0
     parking_inwards: false
     enable_perception_obstacles: false
+    parking_depth_buffer: 0.2
   }
 }
 default_task_config: {

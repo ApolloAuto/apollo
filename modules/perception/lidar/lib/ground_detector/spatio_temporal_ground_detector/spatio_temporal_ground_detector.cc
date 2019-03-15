@@ -85,7 +85,7 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
     AERROR << "Input null frame cloud.";
     return false;
   }
-  if (frame->cloud->size() == 0 || frame->world_cloud->size() == 0) {
+  if (frame->cloud->empty() || frame->world_cloud->empty()) {
     AERROR << "Input none points.";
     return false;
   }
@@ -107,7 +107,7 @@ bool SpatioTemporalGroundDetector::Detect(const GroundDetectorOptions& options,
   // check output
   frame->non_ground_indices.indices.clear();
 
-  if (frame->roi_indices.indices.size() == 0) {
+  if (frame->roi_indices.indices.empty()) {
     use_roi_ = false;
   }
 

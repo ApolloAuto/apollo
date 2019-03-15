@@ -35,7 +35,7 @@ Fem1dQpProblem::Fem1dQpProblem(const size_t num_of_knots,
                                const double delta_s,
                                const std::array<double, 5>& w,
                                const double max_x_third_order_derivative) {
-  CHECK_GE(num_of_knots, 4);
+  CHECK_GE(num_of_knots, 2);
   num_of_knots_ = num_of_knots;
 
   x_init_ = x_init;
@@ -72,10 +72,6 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
     OSQPSettings* settings) {
   // Define Solver settings as default
   osqp_set_default_settings(settings);
-  settings->alpha = 1.0;  // Change alpha parameter
-  settings->eps_abs = 1.0e-05;
-  settings->eps_rel = 1.0e-05;
-  settings->max_iter = 5000;
   settings->polish = true;
   settings->verbose = FLAGS_enable_osqp_debug;
 
@@ -95,6 +91,20 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
 
   // Solve Problem
   osqp_solve(*work);
+
+  auto status = (*work)->info->status_val;
+
+  if (status < 0) {
+    AERROR << "failed optimization status:\t" << (*work)->info->status;
+    return false;
+  }
+
+  /**
+  if (status != 1 && status != 2) {
+    AERROR << "failed optimization status:\t" << (*work)->info->status;
+    return false;
+  }
+  **/
   return true;
 }
 
@@ -177,53 +187,6 @@ void Fem1dQpProblem::SetVariableSecondOrderDerivativeBounds(
   ProcessBound(ddx_bounds, &ddx_bounds_);
 }
 
-void Fem1dQpProblem::SetOutputResolution(const double resolution) {
-  // It is assumed that the third order derivative of x is const between each s
-  // positions
-  const double kEps = 1e-12;
-  if (resolution < kEps || x_.empty()) {
-    return;
-  }
-  std::vector<double> new_x;
-  std::vector<double> new_dx;
-  std::vector<double> new_ddx;
-  std::vector<double> new_dddx;
-
-  const double total_s = delta_s_ * (static_cast<double>(x_.size()) - 1.0);
-  for (double s = resolution; s < total_s; s += resolution) {
-    const size_t idx = static_cast<size_t>(std::floor(s / delta_s_));
-    const double ds = s - delta_s_ * static_cast<double>(idx);
-
-    double x = 0.0;
-    double dx = 0.0;
-    double d2x = 0.0;
-    double d3x = 0.0;
-
-    if (idx == 0) {
-      d3x = dddx_.front();
-      d2x = x_init_[2] + d3x * ds;
-      dx = x_init_[1] + x_init_[2] * ds + 0.5 * d3x * ds * ds;
-      x = x_init_[0] + x_init_[1] * ds + 0.5 * x_init_[2] * ds * ds +
-          d3x * ds * ds * ds / 6.0;
-    } else {
-      d3x = dddx_[idx - 1];
-      d2x = ddx_[idx - 1] + d3x * ds;
-      dx = dx_[idx - 1] + ddx_[idx - 1] * ds + 0.5 * d3x * ds * ds;
-      x = x_[idx - 1] + dx_[idx - 1] * ds + 0.5 * ddx_[idx - 1] * ds * ds +
-          d3x * ds * ds * ds / 6.0;
-    }
-
-    new_x.push_back(x);
-    new_dx.push_back(dx);
-    new_ddx.push_back(d2x);
-    new_ddx.push_back(d3x);
-  }
-  x_ = new_x;
-  dx_ = new_dx;
-  ddx_ = new_ddx;
-  dddx_ = new_dddx;
-}
-
 bool Fem1dQpProblem::Optimize() {
   // calculate kernel
   std::vector<c_float> P_data;
@@ -260,11 +223,18 @@ bool Fem1dQpProblem::Optimize() {
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
   OSQPWorkspace* work = nullptr;
 
-  OptimizeWithOsqp(3 * num_of_knots_, lower_bounds.size(), P_data, P_indices,
-                   P_indptr, A_data, A_indices, A_indptr, lower_bounds,
-                   upper_bounds, q, data, &work, settings);
-  if (work == nullptr || work->solution == nullptr) {
-    AERROR << "Failed to find QP solution.";
+  bool res = OptimizeWithOsqp(3 * num_of_knots_, lower_bounds.size(),
+                   P_data, P_indices, P_indptr, A_data, A_indices, A_indptr,
+                   lower_bounds, upper_bounds, q, data, &work, settings);
+  if (res == false || work == nullptr || work->solution == nullptr) {
+    AERROR << "Failed to find solution.";
+    // Cleanup
+    osqp_cleanup(work);
+    c_free(data->A);
+    c_free(data->P);
+    c_free(data);
+    c_free(settings);
+
     return false;
   }
 
@@ -298,23 +268,59 @@ void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                      std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
-  P_data->resize(kNumParam);
-  P_indices->resize(kNumParam);
-  P_indptr->resize(kNumParam + 1);
+  const int kNumValue = kNumParam + (N - 1);
+  std::vector<std::vector<std::pair<c_int, c_float>>> columns;
+  columns.resize(kNumParam);
+  int value_index = 0;
 
-  for (int i = 0; i < kNumParam; ++i) {
-    if (i < N) {
-      P_data->at(i) = 2.0 * (weight_.x_w + weight_.x_mid_line_w);
-    } else if (i < 2 * N) {
-      P_data->at(i) = 2.0 * weight_.x_derivative_w;
-    } else {
-      P_data->at(i) = 2.0 * weight_.x_second_order_derivative_w;
-    }
-    P_indices->at(i) = i;
-    P_indptr->at(i) = i;
+  // x(i)^2 * (w_x + w_mid_line)
+  for (int i = 0; i < N; ++i) {
+    columns[i].emplace_back(i, (weight_.x_w + weight_.x_mid_line_w));
+    ++value_index;
   }
-  P_indptr->at(kNumParam) = kNumParam;
-  CHECK_EQ(P_data->size(), P_indices->size());
+
+  // x(i)'^2 * w_dx
+  for (int i = 0; i < N; ++i) {
+    columns[N + i].emplace_back(N + i, weight_.x_derivative_w);
+    ++value_index;
+  }
+
+  // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
+  columns[2 * N].emplace_back(2 * N, weight_.x_second_order_derivative_w +
+                              weight_.x_third_order_derivative_w / delta_s_sq_);
+  ++value_index;
+  for (int i = 1; i < N - 1; ++i) {
+    columns[2 * N + i].emplace_back(2 * N + i,
+                       weight_.x_second_order_derivative_w +
+                       2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
+    ++value_index;
+  }
+  columns[3 * N - 1].emplace_back(3 * N - 1, weight_.x_second_order_derivative_w
+                     + weight_.x_third_order_derivative_w / delta_s_sq_);
+  ++value_index;
+
+  // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
+  for (int i = 0; i < N - 1; ++i) {
+    columns[2 * N + i].emplace_back(2 * N + i + 1,
+                       -2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
+    ++value_index;
+  }
+
+  CHECK_EQ(value_index, kNumValue);
+
+  int ind_p = 0;
+  for (int i = 0; i < kNumParam; ++i) {
+    P_indptr->push_back(ind_p);
+    for (const auto& row_data_pair : columns[i]) {
+      P_data->push_back(row_data_pair.second * 2.0);
+      P_indices->push_back(row_data_pair.first);
+      ++ind_p;
+    }
+  }
+  P_indptr->push_back(ind_p);
+  ADEBUG << "P_data.size()=" << P_data->size();
+  ADEBUG << "P_indices.size()=" << P_indices->size();
+  ADEBUG << "P_indptr.size()=" << P_indptr->size();
 }
 
 void Fem1dQpProblem::CalculateAffineConstraint(

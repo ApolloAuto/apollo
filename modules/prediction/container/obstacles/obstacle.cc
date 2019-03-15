@@ -434,58 +434,18 @@ void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
 
 void Obstacle::SetPolygonPoints(const PerceptionObstacle& perception_obstacle,
                                 Feature* feature) {
-  for (int i = 0; i < perception_obstacle.polygon_point_size(); i++) {
-    double x = 0.0;
-    double y = 0.0;
-    double z = 0.0;
-    if (perception_obstacle.polygon_point(i).has_x()) {
-      x = perception_obstacle.polygon_point(i).x();
-    }
-    if (perception_obstacle.polygon_point(i).has_y()) {
-      y = perception_obstacle.polygon_point(i).y();
-    }
-    if (perception_obstacle.polygon_point(i).has_z()) {
-      z = perception_obstacle.polygon_point(i).z();
-    }
-
-    auto* ptr_polygon_point = feature->add_polygon_point();
-    ptr_polygon_point->set_x(x);
-    ptr_polygon_point->set_y(y);
-    ptr_polygon_point->set_z(z);
-
-    ADEBUG << "Obstacle [" << id_ << "] has new corner point [" << std::fixed
-           << std::setprecision(6) << x << ", " << std::fixed
-           << std::setprecision(6) << y << ", " << std::fixed
-           << std::setprecision(6) << z << "].";
+  for (const auto& polygon_point : perception_obstacle.polygon_point()) {
+    *feature->add_polygon_point() = polygon_point;
+    ADEBUG << "Obstacle [" << id_ << "] has new corner point:"
+           << polygon_point.DebugString();
   }
 }
 
 void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
                            Feature* feature) {
-  double x = 0.0;
-  double y = 0.0;
-  double z = 0.0;
-
-  if (perception_obstacle.has_position()) {
-    if (perception_obstacle.position().has_x()) {
-      x = perception_obstacle.position().x();
-    }
-    if (perception_obstacle.position().has_y()) {
-      y = perception_obstacle.position().y();
-    }
-    if (perception_obstacle.position().has_z()) {
-      z = perception_obstacle.position().z();
-    }
-  }
-
-  feature->mutable_position()->set_x(x);
-  feature->mutable_position()->set_y(y);
-  feature->mutable_position()->set_z(z);
-
-  ADEBUG << "Obstacle [" << id_ << "] has position [" << std::fixed
-         << std::setprecision(6) << x << ", " << std::fixed
-         << std::setprecision(6) << y << ", " << std::fixed
-         << std::setprecision(6) << z << "].";
+  *feature->mutable_position() = perception_obstacle.position();
+  ADEBUG << "Obstacle [" << id_ << "] has position:"
+         << perception_obstacle.position().DebugString();
 }
 
 void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
@@ -1104,8 +1064,7 @@ void Obstacle::SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr) {
     return;
   }
   double accumulate_s = 0.0;
-  for (int i = 0; i < lane_sequence_ptr->lane_segment_size(); ++i) {
-    const LaneSegment& lane_segment = lane_sequence_ptr->lane_segment(i);
+  for (const LaneSegment& lane_segment : lane_sequence_ptr->lane_segment()) {
     const StopSign& stop_sign =
         ObstacleClusters::QueryStopSignByLaneId(lane_segment.lane_id());
     if (stop_sign.has_stop_sign_id() &&
@@ -1133,12 +1092,10 @@ void Obstacle::GetNeighborLaneSegments(
   }
   if (is_left) {
     std::vector<std::string> curr_left_lane_ids;
-    for (int i = 0;
-         i < center_lane_info->lane().left_neighbor_forward_lane_id().size();
-         ++i) {
-      if (center_lane_info->lane().left_neighbor_forward_lane_id(i).has_id()) {
-        std::string lane_id =
-            center_lane_info->lane().left_neighbor_forward_lane_id(i).id();
+    for (const auto& left_lane_id :
+         center_lane_info->lane().left_neighbor_forward_lane_id()) {
+      if (left_lane_id.has_id()) {
+        const std::string& lane_id = left_lane_id.id();
         // If haven't seen this lane id before.
         if (existing_lane_ids->count(lane_id) == 0) {
           existing_lane_ids->insert(lane_id);
@@ -1148,20 +1105,17 @@ void Obstacle::GetNeighborLaneSegments(
       }
     }
 
-    for (size_t i = 0; i < curr_left_lane_ids.size(); ++i) {
-      GetNeighborLaneSegments(
-          PredictionMap::LaneById(curr_left_lane_ids[i]),
-          true, recursion_depth - 1,
-          lane_ids_ordered, existing_lane_ids);
+    for (const std::string& lane_id : curr_left_lane_ids) {
+      GetNeighborLaneSegments(PredictionMap::LaneById(lane_id),
+                              true, recursion_depth - 1,
+                              lane_ids_ordered, existing_lane_ids);
     }
   } else {
     std::vector<std::string> curr_right_lane_ids;
-    for (int i = 0;
-         i < center_lane_info->lane().right_neighbor_forward_lane_id().size();
-         ++i) {
-      if (center_lane_info->lane().right_neighbor_forward_lane_id(i).has_id()) {
-        std::string lane_id =
-            center_lane_info->lane().right_neighbor_forward_lane_id(i).id();
+    for (const auto& right_lane_id :
+         center_lane_info->lane().right_neighbor_forward_lane_id()) {
+      if (right_lane_id.has_id()) {
+        const std::string& lane_id = right_lane_id.id();
         // If haven't seen this lane id before.
         if (existing_lane_ids->count(lane_id) == 0) {
           existing_lane_ids->insert(lane_id);
@@ -1171,11 +1125,10 @@ void Obstacle::GetNeighborLaneSegments(
       }
     }
 
-    for (size_t i = 0; i < curr_right_lane_ids.size(); ++i) {
-      GetNeighborLaneSegments(
-          PredictionMap::LaneById(curr_right_lane_ids[i]),
-          false, recursion_depth - 1,
-          lane_ids_ordered, existing_lane_ids);
+    for (const std::string& lane_id : curr_right_lane_ids) {
+      GetNeighborLaneSegments(PredictionMap::LaneById(lane_id),
+                              false, recursion_depth - 1,
+                              lane_ids_ordered, existing_lane_ids);
     }
   }
 }
@@ -1221,21 +1174,17 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   GetNeighborLaneSegments(
       center_lane_info, false, 5, &lane_ids_ordered_list, &existing_lane_ids);
 
-  std::vector<std::string> lane_ids_ordered;
-  for (auto it = lane_ids_ordered_list.begin();
-       it != lane_ids_ordered_list.end(); ++it) {
-    lane_ids_ordered.push_back(*it);
-  }
+  const std::vector<std::string> lane_ids_ordered(lane_ids_ordered_list.begin(),
+                                                  lane_ids_ordered_list.end());
   // TODO(all): sort the lane_segments from left to right (again)
   //            to double-check and make sure it's well sorted.
   // Build lane_graph for every lane_segment and update it into proto.
   int seq_id = 0;
-  for (size_t i = 0; i < lane_ids_ordered.size(); ++i) {
+  for (const std::string& lane_id : lane_ids_ordered) {
     // Construct the local lane_graph based on the current lane_segment.
-    bool vehicle_is_on_lane =
-        (lane_ids_ordered[i] == center_lane_info->lane().id().id());
+    bool vehicle_is_on_lane = (lane_id == center_lane_info->lane().id().id());
     std::shared_ptr<const LaneInfo> curr_lane_info =
-        PredictionMap::LaneById(lane_ids_ordered[i]);
+        PredictionMap::LaneById(lane_id);
     const LaneGraph& local_lane_graph =
         ObstacleClusters::GetLaneGraphWithoutMemorizing(
             feature->lane().lane_feature().lane_s(), road_graph_search_distance,
@@ -1421,12 +1370,12 @@ void Obstacle::SetNearbyObstacles() {
     double obstacle_l = lane_sequence->lane_l();
     NearbyObstacle forward_obstacle;
     if (ObstacleClusters::ForwardNearbyObstacle(
-        *lane_sequence, id_, obstacle_s, obstacle_l, &forward_obstacle)) {
+            *lane_sequence, id_, obstacle_s, obstacle_l, &forward_obstacle)) {
       lane_sequence->add_nearby_obstacle()->CopyFrom(forward_obstacle);
     }
     NearbyObstacle backward_obstacle;
     if (ObstacleClusters::BackwardNearbyObstacle(
-        *lane_sequence, id_, obstacle_s, obstacle_l, &backward_obstacle)) {
+            *lane_sequence, id_, obstacle_s, obstacle_l, &backward_obstacle)) {
       lane_sequence->add_nearby_obstacle()->CopyFrom(backward_obstacle);
     }
   }

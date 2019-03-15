@@ -72,7 +72,7 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
 
 DEFINE_bool(enable_scenario_stop_sign, true,
             "enable stop_sign scenarios in planning");
-DEFINE_bool(enable_scenario_traffic_light, false,
+DEFINE_bool(enable_scenario_traffic_light, true,
             "enable traffic_light scenarios in planning");
 
 DEFINE_string(traffic_rule_config_filename,
@@ -443,7 +443,7 @@ DEFINE_bool(open_space_planner_switchable, false,
 DEFINE_bool(use_dual_variable_warm_start, true,
             "whether or not enable dual variable warm start ");
 
-DEFINE_bool(use_gear_shift_trajectory, true,
+DEFINE_bool(use_gear_shift_trajectory, false,
             "allow some time for the vehicle to shift gear");
 
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
@@ -497,4 +497,10 @@ DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
 DEFINE_bool(enable_parallel_open_space_smoother, false,
             "True to enable open space smoother parallel implementation.");
+
+DEFINE_double(vehicle_low_speed_threshold, 1.0, "Vehicle low speed threshold.");
+
 DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");
+
+DEFINE_bool(enable_nonscenario_side_pass, false,
+            "true to enable side pass without scenario management");

@@ -54,7 +54,7 @@ bool LocationRefinerObstaclePostprocessor::Process(
     return true;
   }
   Eigen::Vector4d plane;
-  if (options.do_refinement_with_calibration_service == true &&
+  if (options.do_refinement_with_calibration_service &&
       !frame->calibration_service->QueryGroundPlaneInCameraFrame(&plane)) {
     AINFO << "No valid ground plane in the service.";
   }

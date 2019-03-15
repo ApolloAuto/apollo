@@ -6,21 +6,18 @@ cc_library(
     name = "decider",
     srcs = [
         "decider_creep.cc",
-        "decider_rule_based_stop.cc",
-        "path_bounds_decider.cc",
         "side_pass_path_decider.cc",
         "side_pass_safety.cc",
     ],
     hdrs = [
         "decider_creep.h",
-        "decider_rule_based_stop.h",
-        "path_bounds_decider.h",
         "side_pass_path_decider.h",
         "side_pass_safety.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
+        ":decider_rule_based_stop",
         ":open_space_fallback_decider",
         ":open_space_roi_decider",
         "//modules/perception/proto:perception_proto",
@@ -32,6 +29,59 @@ cc_library(
         "//modules/planning/scenarios/util:util_lib",
         "//modules/planning/tasks/deciders/speed_bounds_decider",
         "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
+    ],
+)
+
+cc_library(
+    name = "decider_rule_based_stop",
+    srcs = [
+        "decider_rule_based_stop.cc",
+    ],
+    hdrs = [
+        "decider_rule_based_stop.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        ":decider_base",
+        "//modules/planning/common:planning_context",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:reference_line_info",
+        "//modules/planning/scenarios/util:util_lib",
+    ],
+)
+
+cc_library(
+    name = "path_assessment_decider",
+    srcs = [
+        "path_assessment_decider.cc",
+    ],
+    hdrs = [
+        "path_assessment_decider.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        ":decider_base",
+        ":path_bounds_decider",
+        "//modules/planning/common:planning_context",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:reference_line_info",
+    ],
+)
+
+cc_library(
+    name = "path_bounds_decider",
+    srcs = [
+        "path_bounds_decider.cc",
+    ],
+    hdrs = [
+        "path_bounds_decider.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        ":decider_base",
+        "//modules/planning/common:planning_context",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/common:reference_line_info",
     ],
 )
 

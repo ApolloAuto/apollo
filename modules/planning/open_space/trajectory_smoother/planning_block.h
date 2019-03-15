@@ -46,16 +46,15 @@ TEMPLATE_ROUTINE_INSTANCE(bool, data_transfer(type *dst,    \
 
 bool InitialCuda();
 
-__global__ void fill_lower_left_gpu(int *iRow, int *jCol,
-    unsigned int *rind_L, unsigned int *cind_L, const int nnz_L);
+__global__ void fill_lower_left_gpu(int *iRow, int *jCol, unsigned int *rind_L,
+                                    unsigned int *cind_L, const int nnz_L);
 
-template<typename T>
-__global__ void data_transfer_gpu(T *dst, const T *src,
-    const int size);
+template <typename T>
+__global__ void data_transfer_gpu(T *dst, const T *src, const int size);
 
-bool fill_lower_left(int *iRow, int *jCol,
-    unsigned int *rind_L, unsigned int *cind_L, const int nnz_L);
-template<typename T>
+bool fill_lower_left(int *iRow, int *jCol, unsigned int *rind_L,
+                     unsigned int *cind_L, const int nnz_L);
+template <typename T>
 bool data_transfer(T *dst, const T *src, const int size);
 
 }  // namespace planning

@@ -101,6 +101,9 @@
 		"showPNCMonitor": {
 			"default": false
 		},
+		"showDataCollectionMonitor": {
+			"default": false
+		},
 		"enableSimControl": {
 			"default": false
 		},

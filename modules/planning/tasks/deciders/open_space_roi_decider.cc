@@ -46,14 +46,12 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
   // TODO(Jinyun) only run GetOpenSpaceROI() at the first frame of
   // open space planner to save computation effort
   vehicle_state_ = frame->vehicle_state();
+  ROI_parking_boundary_.clear();
   obstacles_by_frame_ = frame->GetObstacleList();
-  if (frame->local_view().routing->routing_request().has_parking_space() &&
-      frame->local_view().routing->routing_request().parking_space().has_id()) {
-    target_parking_spot_id_ = frame->local_view()
-                                  .routing->routing_request()
-                                  .parking_space()
-                                  .id()
-                                  .id();
+  const auto &routing_request = frame->local_view().routing->routing_request();
+  if (routing_request.has_parking_space() &&
+      routing_request.parking_space().has_id()) {
+    target_parking_spot_id_ = routing_request.parking_space().id().id();
   } else {
     const std::string msg = "Failed to get parking space id from routing";
     AERROR << msg;
@@ -257,9 +255,7 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
   double right_top_l = 0.0;
   if (!(nearby_path->GetProjection(left_top, &left_top_s, &left_top_l) &&
         nearby_path->GetProjection(right_top, &right_top_s, &right_top_l))) {
-    std::string msg(
-        "fail to get parking spot points' projections on reference line");
-    AERROR << msg;
+    AERROR << "fail to get parking spot points' projections on reference line";
     return false;
   }
   // start or end, left or right is decided by the vehicle's heading
@@ -325,59 +321,63 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
 
   // get end_pose of the parking spot
   parking_spot_heading_ = (left_down - left_top).Angle();
-  double end_x = (left_top.x() + right_top.x()) / 2;
+  double end_x = (left_top.x() + right_top.x()) / 2.0;
   double end_y = 0.0;
+  const double parking_depth_buffer =
+      config_.open_space_roi_decider_config().parking_depth_buffer();
+  CHECK_GE(parking_depth_buffer, 0.0);
+  const bool parking_inwards =
+      config_.open_space_roi_decider_config().parking_inwards();
+  const double top_to_down_distance = left_top.y() - left_down.y();
   if (parking_spot_heading_ > kMathEpsilon) {
-    if (config_.open_space_roi_decider_config().parking_inwards()) {
-      end_y = left_down.y() - std::max(3 * (left_down.y() - left_top.y()) / 4,
-                                       vehicle_params_.front_edge_to_center());
+    if (parking_inwards) {
+      end_y =
+          left_down.y() - (std::max(3.0 * -top_to_down_distance / 4.0,
+                                    vehicle_params_.front_edge_to_center()) +
+                           parking_depth_buffer);
+
     } else {
-      end_y = left_down.y() - std::max((left_down.y() - left_top.y()) / 4,
-                                       vehicle_params_.back_edge_to_center());
+      end_y = left_down.y() - (std::max(-top_to_down_distance / 4.0,
+                                        vehicle_params_.back_edge_to_center()) +
+                               parking_depth_buffer);
     }
   } else {
-    if (config_.open_space_roi_decider_config().parking_inwards()) {
-      end_y = left_down.y() + std::max(3 * (left_top.y() - left_down.y()) / 4,
-                                       vehicle_params_.front_edge_to_center());
+    if (parking_inwards) {
+      end_y =
+          left_down.y() + (std::max(3.0 * top_to_down_distance / 4.0,
+                                    vehicle_params_.front_edge_to_center()) +
+                           parking_depth_buffer);
     } else {
-      end_y = left_down.y() + std::max((left_top.y() - left_down.y()) / 4,
-                                       vehicle_params_.back_edge_to_center());
+      end_y = left_down.y() + (std::max(top_to_down_distance / 4.0,
+                                        vehicle_params_.back_edge_to_center()) +
+                               parking_depth_buffer);
     }
   }
 
-  frame_->mutable_open_space_info()
-      ->mutable_open_space_end_pose()
-      ->emplace_back(end_x);
-  frame_->mutable_open_space_info()
-      ->mutable_open_space_end_pose()
-      ->emplace_back(end_y);
-  if (config_.open_space_roi_decider_config().parking_inwards()) {
-    frame_->mutable_open_space_info()
-        ->mutable_open_space_end_pose()
-        ->emplace_back(parking_spot_heading_);
+  auto *end_pose =
+      frame_->mutable_open_space_info()->mutable_open_space_end_pose();
+  end_pose->emplace_back(end_x);
+  end_pose->emplace_back(end_y);
+  if (parking_inwards) {
+    end_pose->emplace_back(parking_spot_heading_);
   } else {
-    frame_->mutable_open_space_info()
-        ->mutable_open_space_end_pose()
-        ->emplace_back(
-            common::math::NormalizeAngle(parking_spot_heading_ + M_PI));
+    end_pose->emplace_back(
+        common::math::NormalizeAngle(parking_spot_heading_ + M_PI));
   }
-  frame_->mutable_open_space_info()
-      ->mutable_open_space_end_pose()
-      ->emplace_back(0.0);
+  // end_pose velocity is set to be zero
+  end_pose->emplace_back(0.0);
 
   // get xy boundary of the ROI
   double x_min = std::min({start_left.x(), start_right.x()});
   double x_max = std::max({end_left.x(), end_right.x()});
   double y_min = std::min({left_down.y(), start_right.y(), start_left.y()});
   double y_max = std::max({left_down.y(), start_right.y(), start_left.y()});
-  frame_->mutable_open_space_info()->mutable_ROI_xy_boundary()->emplace_back(
-      x_min);
-  frame_->mutable_open_space_info()->mutable_ROI_xy_boundary()->emplace_back(
-      x_max);
-  frame_->mutable_open_space_info()->mutable_ROI_xy_boundary()->emplace_back(
-      y_min);
-  frame_->mutable_open_space_info()->mutable_ROI_xy_boundary()->emplace_back(
-      y_max);
+  auto *xy_boundary =
+      frame_->mutable_open_space_info()->mutable_ROI_xy_boundary();
+  xy_boundary->emplace_back(x_min);
+  xy_boundary->emplace_back(x_max);
+  xy_boundary->emplace_back(y_min);
+  xy_boundary->emplace_back(y_max);
 
   // check if vehicle in range of xy_boundary
   Vec2d vehicle_xy = Vec2d(vehicle_state_.x(), vehicle_state_.y());
@@ -385,8 +385,7 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
   vehicle_xy.SelfRotate(-1.0 * frame_->open_space_info().origin_heading());
   if (vehicle_xy.x() > x_max || vehicle_xy.x() < x_min ||
       vehicle_xy.y() > y_max || vehicle_xy.y() < y_min) {
-    std::string msg("vehicle pose outside of xy boundary of parking ROI");
-    AERROR << msg;
+    AERROR << "vehicle pose outside of xy boundary of parking ROI";
     return false;
   }
   // If smaller than zero, the parking spot is on the right of the lane
@@ -452,13 +451,11 @@ void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
     std::shared_ptr<Path> *nearby_path,
     ParkingSpaceInfoConstPtr *target_parking_spot) {
   const auto &parking_space_overlaps = (*nearby_path)->parking_space_overlaps();
-  if (parking_space_overlaps.size() != 0) {
-    for (const auto &parking_overlap : parking_space_overlaps) {
-      if (parking_overlap.object_id == target_parking_spot_id_) {
-        hdmap::Id id;
-        id.set_id(parking_overlap.object_id);
-        *target_parking_spot = hdmap_->GetParkingSpaceById(id);
-      }
+  for (const auto &parking_overlap : parking_space_overlaps) {
+    if (parking_overlap.object_id == target_parking_spot_id_) {
+      hdmap::Id id;
+      id.set_id(parking_overlap.object_id);
+      *target_parking_spot = hdmap_->GetParkingSpaceById(id);
     }
   }
 }
@@ -506,17 +503,14 @@ bool OpenSpaceRoiDecider::GetMapInfo(
   }
 
   if (*target_parking_spot == nullptr) {
-    std::string msg(
-        "No such parking spot found after searching all path forward possible");
-    AERROR << msg << target_parking_spot_id_;
+    AERROR << "No such parking spot found after searching all path forward "
+              "possible";
     return false;
   }
 
   if (!CheckDistanceToParkingSpot(nearby_path, target_parking_spot)) {
-    std::string msg(
-        "target parking spot found, but too far, distance larger than "
-        "pre-defined distance");
-    AERROR << msg << target_parking_spot_id_;
+    AERROR << "target parking spot found, but too far, distance larger than "
+              "pre-defined distance";
     return false;
   }
 

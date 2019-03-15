@@ -30,27 +30,27 @@ markers = [
 ]
 
 if len(sys.argv) < 2:
-    print "usage: python plot_results.py result.csv"
-f = open(sys.argv[1], 'r')
+    print("Usage: python plot_results.py result.csv")
+    sys.exit(1)
 
-cmd_table = {}
+with open(sys.argv[1], 'r') as f:
+   cmd_table = {}
 
-for line in f:
-    items = line.split(',')
-    cmd = round(float(items[0]))
-    speed = float(items[1])
-    acc = float(items[2])
-    if cmd in cmd_table:
-        speed_table = cmd_table[cmd]
-        if speed in speed_table:
-            speed_table[speed].append(acc)
+    for line in f:
+        items = line.split(',')
+        cmd = round(float(items[0]))
+        speed = float(items[1])
+        acc = float(items[2])
+        if cmd in cmd_table:
+            speed_table = cmd_table[cmd]
+            if speed in speed_table:
+                speed_table[speed].append(acc)
+            else:
+                speed_table[speed] = [acc]
         else:
+            speed_table = {}
             speed_table[speed] = [acc]
-    else:
-        speed_table = {}
-        speed_table[speed] = [acc]
-        cmd_table[cmd] = speed_table
-f.close()
+            cmd_table[cmd] = speed_table
 
 NCURVES = len(cmd_table)
 np.random.seed(101)
@@ -66,7 +66,7 @@ cmds.sort()
 
 fig, ax = plt.subplots()
 for cmd in cmds:
-    print "ctrl cmd = ", cmd
+    print('ctrl cmd = %s' % cmd)
     speed_table = cmd_table[cmd]
     X = []
     Y = []

@@ -49,7 +49,7 @@ DEFINE_double(lane_search_radius, 3.0, "Search radius for a candidate lane");
 DEFINE_double(lane_search_radius_in_junction, 15.0,
               "Search radius for a candidate lane");
 DEFINE_double(junction_search_radius, 1.0, "Search radius for a junction");
-DEFINE_double(pedestrian_nearby_lane_search_radius, 3.0,
+DEFINE_double(pedestrian_nearby_lane_search_radius, 5.0,
               "Radius to determine if pedestrian-like obstacle is near lane.");
 
 // Scenario
@@ -62,14 +62,16 @@ DEFINE_bool(enable_junction_feature, true,
             "If to enable building junction feature for obstacles");
 DEFINE_bool(enable_all_junction, false,
             "If consider all junction with junction_mlp_model.");
-DEFINE_double(caution_search_distance_ahead, 40.0,
+DEFINE_double(caution_search_distance_ahead, 50.0,
               "The distance ahead to search caution-level obstacles");
-DEFINE_double(caution_search_distance_backward_for_merge, 30.0,
+DEFINE_double(caution_search_distance_backward_for_merge, 60.0,
               "The distance backward to search caution-lebel obstacles "
               "in the case of merging");
-DEFINE_double(caution_search_distance_backward_for_overlap, 20.0,
+DEFINE_double(caution_search_distance_backward_for_overlap, 30.0,
               "The distance backward to search caution-lebel obstacles "
               "in the case of overlap");
+DEFINE_double(caution_pedestrian_approach_time, 3.0,
+              "The time for a pedestrian to approach adc trajectory");
 
 // Obstacle features
 DEFINE_int32(ego_vehicle_id, -1, "The obstacle ID of the ego vehicle.");
@@ -129,18 +131,15 @@ DEFINE_string(evaluator_vehicle_mlp_file,
 DEFINE_string(evaluator_vehicle_rnn_file,
               "/apollo/modules/prediction/data/rnn_vehicle_model.bin",
               "rnn model file for vehicle evaluator");
-DEFINE_string(evaluator_cruise_vehicle_go_model_file,
-              "/apollo/modules/prediction/data/cruise_go_vehicle_model.bin",
-              "Vehicle cruise go model file");
-DEFINE_string(evaluator_cruise_vehicle_cutin_model_file,
-              "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.bin",
-              "Vehicle cruise cut-in model file");
 DEFINE_string(torch_vehicle_junction_mlp_file,
               "/apollo/modules/prediction/data/junction_mlp_vehicle_model.pt",
               "Vehicle junction MLP model file");
-DEFINE_string(evaluator_vehicle_junction_mlp_file,
-              "/apollo/modules/prediction/data/junction_mlp_vehicle_model.bin",
-              "Vehicle junction MLP model file");
+DEFINE_string(torch_vehicle_cruise_go_file,
+              "/apollo/modules/prediction/data/cruise_go_vehicle_model.pt",
+              "Vehicle cruise cutin model file");
+DEFINE_string(torch_vehicle_cruise_cutin_file,
+              "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.pt",
+              "Vehicle cruise go model file");
 DEFINE_int32(max_num_obstacles, 300,
              "maximal number of obstacles stored in obstacles container.");
 DEFINE_double(valid_position_diff_threshold, 0.5,

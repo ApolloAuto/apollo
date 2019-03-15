@@ -19,7 +19,7 @@ simplejson
 
 # Python tools
 pymongo
-pyproj
+pyproj == 1.9.6
 shapely
 
 # Data format

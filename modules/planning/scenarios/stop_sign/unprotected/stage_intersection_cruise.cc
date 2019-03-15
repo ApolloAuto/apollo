@@ -53,7 +53,7 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
   // TODO(all): remove when pnc_junction completely available on map
   const auto& pnc_junction_overlaps =
       reference_line_info.reference_line().map_path().pnc_junction_overlaps();
-  if (pnc_junction_overlaps.size() == 0) {
+  if (pnc_junction_overlaps.empty()) {
     // pnc_junction not exist on map, use current stop_sign's end_s
 
     constexpr double kIntersectionPassDist = 20.0;  // unit: m
@@ -61,11 +61,10 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
         reference_line_info.AdcSlBoundary().start_s();
     const double stop_sign_end_s =
         PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
-    const double distance_adc_pass_stop_sign = adc_back_edge_s -
-        stop_sign_end_s;
-    ADEBUG << "distance_adc_pass_stop_sign["
-        << distance_adc_pass_stop_sign
-        << "] stop_sign_end_s[" << stop_sign_end_s << "]";
+    const double distance_adc_pass_stop_sign =
+        adc_back_edge_s - stop_sign_end_s;
+    ADEBUG << "distance_adc_pass_stop_sign[" << distance_adc_pass_stop_sign
+           << "] stop_sign_end_s[" << stop_sign_end_s << "]";
 
     if (distance_adc_pass_stop_sign >= kIntersectionPassDist) {
       return FinishStage();

@@ -228,7 +228,7 @@ Parser::MessageType NovatelParser::GetMessage(MessagePtr* message_ptr) {
   }
 
   while (data_ < data_end_) {
-    if (buffer_.size() == 0) {  // Looking for SYNC0
+    if (buffer_.empty()) {  // Looking for SYNC0
       if (*data_ == novatel::SYNC_0) {
         buffer_.push_back(*data_);
       }

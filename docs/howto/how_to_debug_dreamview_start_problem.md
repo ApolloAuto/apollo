@@ -7,9 +7,8 @@ If you encounter problems when starting Dreamview in the `docker/scripts/dev` se
 ```bash
 $ bash docker/scripts/dev_start.sh
 $ bash docker/scripts/dev_into.sh
-$ cd /apollo
 $ bash apollo.sh build
-$ bash scripts/dreamview.sh
+$ bash scripts/bootstrap.sh
 ```
 ### Dreamview Fails to Start
 
@@ -49,11 +48,13 @@ $ start_gdb dreamview
 
 Once gdb is launched, press `r` and `enter` key to run,  if dreamview crashes, then get the backtrace with `bt`.
 
+### CPU does not support FMA/FMA3 instructions
+
 If you see an error `Illegal instruction` and something related with **libpcl_sample_consensus.so.1.7** in gdb backtrace, then you probably need to rebuild pcl lib from source by yourself and replace the one in the docker.
 
 This usually happens when you're trying to run Apollo/dreamview on a machine that the CPU does not support FMA/FMA3 instructions, it will fail because the prebuilt pcl lib shipped with docker image is compiled with FMA/FMA3 support.
 
-There are 2 steps to deducing this issue:
+There are 2 steps to resolve this issue:
 1. Identify if the issue is due to pcl lib through gdb:
     find the coredump file under /apollo/data/core/ with name core_dreamview.$PID.
 If you see logs like:
@@ -160,6 +161,7 @@ cd pcl
 mkdir build
 cd build
 cmake  ..
+make
 (We don't know the parameters that Apollo used, so we keep it by default)
 
 #backup pcl lib
@@ -178,3 +180,21 @@ And finally restart Dreamview using
     bash scripts/bootstrap.sh start
 ```
 
+### CPU does not support AVX instructions
+
+If CPU does not support AVX instructions, and you gdb the coredump file under /apollo/data/core/ with name core_dreamview.$PID, you may see logs like:
+
+```
+Program terminated with signal SIGILL, Illegal instruction.
+#0  0x000000000112b70a in std::_Hashtable<std::string, std::string, std::allocator<std::string>, std::__detail::_Identity, std::equal_to<std::string>, google::protobuf::hash<std::string>, std::__detail::_Mod_range_hashing, std::__detail::_Default_ranged_hash, std::__detail::_Prime_rehash_policy, std::__detail::_Hashtable_traits<true, true, true> >::_Hashtable (this=0x3640288, __bucket_hint=10, 
+    __h1=..., __h2=..., __h=..., __eq=..., __exk=..., __a=...)
+---Type <return> to continue, or q <return> to quit---
+    at /usr/include/c++/4.8/bits/hashtable.h:828
+828          _M_rehash_policy()
+```
+
+To resolve this issue, in apollo/apollo.sh, comment or delete:
+```
+--copt=-mavx2
+```
+Then try to build and start dreamview again.

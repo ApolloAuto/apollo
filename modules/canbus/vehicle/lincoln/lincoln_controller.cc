@@ -382,7 +382,9 @@ Chassis LincolnController::chassis() {
 void LincolnController::Emergency() {
   set_driving_mode(Chassis::EMERGENCY_MODE);
   ResetProtocol();
-  set_chassis_error_code(Chassis::CHASSIS_ERROR);
+  if (chassis_error_code() == Chassis::NO_ERROR) {
+    set_chassis_error_code(Chassis::CHASSIS_ERROR);
+  }
 }
 
 ErrorCode LincolnController::EnableAutoMode() {
@@ -399,6 +401,7 @@ ErrorCode LincolnController::EnableAutoMode() {
       CHECK_RESPONSE_STEER_UNIT_FLAG | CHECK_RESPONSE_SPEED_UNIT_FLAG;
   if (!CheckResponse(flag, true)) {
     AERROR << "Failed to switch to COMPLETE_AUTO_DRIVE mode.";
+    CheckChassisError();
     Emergency();
     return ErrorCode::CANBUS_ERROR;
   } else {
@@ -429,8 +432,9 @@ ErrorCode LincolnController::EnableSteeringOnlyMode() {
   steering_64_->set_enable();
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
+    CheckChassisError();
     Emergency();
     return ErrorCode::CANBUS_ERROR;
   } else {
@@ -452,8 +456,9 @@ ErrorCode LincolnController::EnableSpeedOnlyMode() {
   steering_64_->set_disable();
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
+    CheckChassisError();
     Emergency();
     return ErrorCode::CANBUS_ERROR;
   } else {
@@ -643,12 +648,13 @@ void LincolnController::ResetProtocol() {
 }
 
 bool LincolnController::CheckChassisError() {
-  // steer fault
   ChassisDetail chassis_detail;
   message_manager_->GetSensorData(&chassis_detail);
 
   int32_t error_cnt = 0;
   int32_t chassis_error_mask = 0;
+
+  // steer fault
   bool steer_fault = chassis_detail.eps().watchdog_fault() |
                      chassis_detail.eps().channel_1_fault() |
                      chassis_detail.eps().channel_2_fault() |
@@ -656,15 +662,15 @@ bool LincolnController::CheckChassisError() {
                      chassis_detail.eps().connector_fault();
 
   chassis_error_mask |=
-      ((chassis_detail.eps().watchdog_fault()) << (error_cnt++));
+      ((chassis_detail.eps().watchdog_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.eps().channel_1_fault()) << (error_cnt++));
+      ((chassis_detail.eps().channel_1_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.eps().channel_2_fault()) << (error_cnt++));
+      ((chassis_detail.eps().channel_2_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.eps().calibration_fault()) << (error_cnt++));
+      ((chassis_detail.eps().calibration_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.eps().connector_fault()) << (error_cnt++));
+      ((chassis_detail.eps().connector_fault()) << (++error_cnt));
 
   if (!chassis_detail.has_brake()) {
     AERROR_EVERY(100) << "ChassisDetail has NO brake."
@@ -679,14 +685,14 @@ bool LincolnController::CheckChassisError() {
                      chassis_detail.brake().connector_fault();
 
   chassis_error_mask |=
-      ((chassis_detail.brake().watchdog_fault()) << (error_cnt++));
+      ((chassis_detail.brake().watchdog_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.brake().channel_1_fault()) << (error_cnt++));
+      ((chassis_detail.brake().channel_1_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.brake().channel_2_fault()) << (error_cnt++));
-  chassis_error_mask |= ((chassis_detail.brake().boo_fault()) << (error_cnt++));
+      ((chassis_detail.brake().channel_2_fault()) << (++error_cnt));
+  chassis_error_mask |= ((chassis_detail.brake().boo_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.brake().connector_fault()) << (error_cnt++));
+      ((chassis_detail.brake().connector_fault()) << (++error_cnt));
 
   if (!chassis_detail.has_gas()) {
     AERROR_EVERY(100) << "ChassisDetail has NO gas."
@@ -700,13 +706,13 @@ bool LincolnController::CheckChassisError() {
                         chassis_detail.gas().connector_fault();
 
   chassis_error_mask |=
-      ((chassis_detail.gas().watchdog_fault()) << (error_cnt++));
+      ((chassis_detail.gas().watchdog_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.gas().channel_1_fault()) << (error_cnt++));
+      ((chassis_detail.gas().channel_1_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.gas().channel_2_fault()) << (error_cnt++));
+      ((chassis_detail.gas().channel_2_fault()) << (++error_cnt));
   chassis_error_mask |=
-      ((chassis_detail.gas().connector_fault()) << (error_cnt++));
+      ((chassis_detail.gas().connector_fault()) << (++error_cnt));
 
   if (!chassis_detail.has_gear()) {
     AERROR_EVERY(100) << "ChassisDetail has NO gear."
@@ -717,11 +723,12 @@ bool LincolnController::CheckChassisError() {
   bool gear_fault = chassis_detail.gear().canbus_fault();
 
   chassis_error_mask |=
-      ((chassis_detail.gear().canbus_fault()) << (error_cnt++));
+      ((chassis_detail.gear().canbus_fault()) << (++error_cnt));
 
   set_chassis_error_mask(chassis_error_mask);
 
   if (steer_fault) {
+    set_chassis_error_code(Chassis::CHASSIS_ERROR_ON_STEER);
     AERROR_EVERY(100) << "Steering fault detected: "
                       << chassis_detail.eps().watchdog_fault() << ", "
                       << chassis_detail.eps().channel_1_fault() << ", "
@@ -731,6 +738,7 @@ bool LincolnController::CheckChassisError() {
   }
 
   if (brake_fault) {
+    set_chassis_error_code(Chassis::CHASSIS_ERROR_ON_BRAKE);
     AERROR_EVERY(100) << "Brake fault detected: "
                       << chassis_detail.brake().watchdog_fault() << ", "
                       << chassis_detail.brake().channel_1_fault() << ", "
@@ -740,6 +748,7 @@ bool LincolnController::CheckChassisError() {
   }
 
   if (throttle_fault) {
+    set_chassis_error_code(Chassis::CHASSIS_ERROR_ON_THROTTLE);
     AERROR_EVERY(100) << "Throttle fault detected: "
                       << chassis_detail.gas().watchdog_fault() << ", "
                       << chassis_detail.gas().channel_1_fault() << ", "
@@ -748,6 +757,7 @@ bool LincolnController::CheckChassisError() {
   }
 
   if (gear_fault) {
+    set_chassis_error_code(Chassis::CHASSIS_ERROR_ON_GEAR);
     AERROR_EVERY(100) << "Gear fault detected: "
                       << chassis_detail.gear().canbus_fault();
   }
@@ -783,7 +793,7 @@ void LincolnController::SecurityDogThreadFunc() {
     // 1. steer control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_STEER_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++steer_ctrl_fail;
       if (steer_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -796,7 +806,7 @@ void LincolnController::SecurityDogThreadFunc() {
     // 2. speed control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_SPEED_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++speed_ctrl_fail;
       if (speed_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -806,7 +816,6 @@ void LincolnController::SecurityDogThreadFunc() {
       speed_ctrl_fail = 0;
     }
     if (CheckChassisError()) {
-      set_chassis_error_code(Chassis::CHASSIS_ERROR);
       emergency_mode = true;
     }
 

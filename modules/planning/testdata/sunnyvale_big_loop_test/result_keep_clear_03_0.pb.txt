@@ -13,6 +13,21 @@ decision {
     }
   }
   object_decision {
+    decision {
+      id: "9830_0"
+      perception_id: 9830
+      object_decision {
+        follow {
+          distance_s: -3
+          fence_point {
+            x: 586436.26475142757
+            y: 4140725.6605456178
+            z: 0
+          }
+          fence_heading: 1.3183887244443382
+        }
+      }
+    }
   }
   vehicle_signal {
     turn_signal: TURN_NONE

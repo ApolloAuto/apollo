@@ -8,6 +8,7 @@ message OpenSpaceTrajectoryPartitionConfig{
     optional uint64 interpolated_pieces_num = 3;
     optional uint64 initial_gear_check_horizon = 4;
     optional double heading_searching_range = 5;
-    optional double gear_shift_period_duration = 6;
-    optional double kepsilon_to_midway_point = 7 [default = 1.0e-6];
+    optional double heading_tracking_range = 6;
+    optional double gear_shift_period_duration = 7;
+    optional double kepsilon_to_midway_point = 8 [default = 1.0e-6];
 }

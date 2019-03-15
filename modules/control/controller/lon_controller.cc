@@ -254,7 +254,7 @@ Status LonController::ComputeControlCommand(
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(VehicleStateProvider::Instance()->pitch()));
 
-  if (isnan(slope_offset_compenstaion)) {
+  if (std::isnan(slope_offset_compenstaion)) {
     slope_offset_compenstaion = 0;
   }
 

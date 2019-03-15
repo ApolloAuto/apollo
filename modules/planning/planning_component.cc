@@ -120,9 +120,6 @@ bool PlanningComponent::Proc(
         hdmap::PncMap::IsNewRouting(*local_view_.routing, routing_)) {
       local_view_.routing =
           std::make_shared<routing::RoutingResponse>(routing_);
-      local_view_.is_new_routing = true;
-    } else {
-      local_view_.is_new_routing = false;
     }
   }
   {

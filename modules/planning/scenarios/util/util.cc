@@ -90,12 +90,11 @@ bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
   }
 
   constexpr double kIntersectionPassDist = 2.0;  // unit: m
-  const double distance_adc_pass_intersection = adc_back_edge_s -
-      pnc_junction_overlap.end_s;
-  ADEBUG << "distance_adc_pass_intersection["
-      << distance_adc_pass_intersection
-      << "] pnc_junction_overlap[" << pnc_junction_overlap.object_id
-      << "] start_s[" << pnc_junction_overlap.start_s << "]";
+  const double distance_adc_pass_intersection =
+      adc_back_edge_s - pnc_junction_overlap.end_s;
+  ADEBUG << "distance_adc_pass_intersection[" << distance_adc_pass_intersection
+         << "] pnc_junction_overlap[" << pnc_junction_overlap.object_id
+         << "] start_s[" << pnc_junction_overlap.start_s << "]";
 
   if (distance_adc_pass_intersection >= kIntersectionPassDist) {
     return false;

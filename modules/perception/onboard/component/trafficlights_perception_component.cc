@@ -179,7 +179,7 @@ int TrafficLightsPerceptionComponent::InitAlgorithmPlugin() {
     return cyber::FAIL;
   }
   if (camera_names_.size() != input_camera_channel_names_.size() ||
-      camera_names_.size() == 0) {
+      camera_names_.empty()) {
     AERROR << "invalid camera_names config";
     return cyber::FAIL;
   }
@@ -845,7 +845,7 @@ void TrafficLightsPerceptionComponent::TransRect2Box(
 
 double TrafficLightsPerceptionComponent::stopline_distance(
     const Eigen::Matrix4d& cam_pose) {
-  if (stoplines_.size() == 0) {
+  if (stoplines_.empty()) {
     AWARN << "compute car to stopline's distance failed(no stopline). "
           << "cam_pose:" << cam_pose;
     return -1;

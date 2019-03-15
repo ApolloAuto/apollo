@@ -95,7 +95,7 @@ class Visualizer {
   bool cv_imshow_img_ = true;
   // homograph between image and ground plane
   Eigen::Matrix3d homography_image2ground_ = Eigen::Matrix3d::Identity(3, 3);
-  Eigen::Matrix3d homography_ground2image_ = Eigen::Matrix3d::Identity(3, 3);;
+  Eigen::Matrix3d homography_ground2image_ = Eigen::Matrix3d::Identity(3, 3);
 
  private:
   std::map<std::string, cv::Mat> camera_image_;
@@ -139,7 +139,6 @@ class Visualizer {
 
   void draw_range_circle();
 
-
   // map for store params
   std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
   std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
@@ -154,8 +153,6 @@ class Visualizer {
 
   Eigen::Matrix4d projection_matrix_;
   Eigen::Matrix3d K_;
-
-
 
   // Visualization related variables
   bool use_class_color_ = true;

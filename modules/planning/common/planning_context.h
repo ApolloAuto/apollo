@@ -73,6 +73,13 @@ class PlanningContext {
     std::string side_pass_front_blocking_obstacle_id;
   };
 
+  // @brief a container logging the data required for non-scenario side pass
+  // functionality
+  struct SidePassInfo {
+    bool change_lane_stop_flag = false;
+    common::PathPoint change_lane_stop_path_point;
+  };
+
   static void Clear();
 
   static void Init();
@@ -83,9 +90,14 @@ class PlanningContext {
 
   static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
 
+  static const SidePassInfo& side_pass_info() { return side_pass_info_; }
+
+  static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
+
  private:
   static PlanningStatus planning_status_;
   static ScenarioInfo scenario_info_;
+  static SidePassInfo side_pass_info_;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext)

@@ -41,9 +41,6 @@ bool IsDifferentRouting(const RoutingResponse& first,
     if (first.header().sequence_num() != second.header().sequence_num()) {
       return true;
     }
-    if (first.header().timestamp_sec() != second.header().timestamp_sec()) {
-      return true;
-    }
     return false;
   } else {
     return true;

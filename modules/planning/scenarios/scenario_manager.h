@@ -48,13 +48,21 @@ class ScenarioManager final {
   void RegisterScenarios();
 
   ScenarioConfig::ScenarioType SelectChangeLaneScenario(const Frame& frame);
+
   ScenarioConfig::ScenarioType SelectStopSignScenario(
-      const Frame& frame,
-      const hdmap::PathOverlap& first_encountered_stop_sign_overlap);
+      const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap);
+
   ScenarioConfig::ScenarioType SelectTrafficLightScenario(
-      const Frame& frame,
-      const hdmap::PathOverlap& first_encountered_traffic_Light_overlap);
+      const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap);
+
+  ScenarioConfig::ScenarioType SelectYieldSignScenario(
+      const Frame& frame, const hdmap::PathOverlap& yield_sign_overlap);
+
+  ScenarioConfig::ScenarioType SelectBareJunctionScenario(
+      const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap);
+
   ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
+  ScenarioConfig::ScenarioType SelectValetParkingScenario(const Frame& frame);
 
   // functions for scenario voter implementation
   // do NOT delete the code yet
