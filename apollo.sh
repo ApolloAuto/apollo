@@ -134,7 +134,7 @@ function build() {
   MACHINE_ARCH=$(uname -m)
   JOB_ARG="--jobs=$(nproc)"
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
-    JOB_ARG="--jobs=3 --local_resources 2048,.5,1.0"
+    JOB_ARG="--jobs=6 --local_resources 16384,6,1.0"
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
 
@@ -189,7 +189,7 @@ function cibuild() {
 
   JOB_ARG="--jobs=$(nproc)"
   if [ "$MACHINE_ARCH" == 'aarch64' ]; then
-    JOB_ARG="--jobs=3  --local_resources 2048,.5,1.0"
+    JOB_ARG="--jobs=6 --local_resources 16384,6,1.0"
   fi
   info "Building with $JOB_ARG for $MACHINE_ARCH"
 

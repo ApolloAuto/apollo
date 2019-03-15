@@ -501,35 +501,12 @@ struct ImuParameter {
 using ::apollo::drivers::gnss::config::ImuType;
 inline ImuParameter GetImuParameter(ImuType type) {
   switch (type) {
-    case ImuType::IMAR_FSAS:
-      // 0.1 * (2 ** -8) * (math.pi / 180 / 3600), (0.05 * (2 ** -15)
-      return {1.893803441835e-9, 1.52587890625e-6, 200.0};
-
     case ImuType::ADIS16488:
       // 720/2**31 deg/LSB, 200/2**31 m/s/LSB
       return {5.8516723170686385e-09, 9.31322574615478515625e-8, 200.0};
 
-    case ImuType::STIM300:
-      // 2**-21 deg/LSB, 2**-22 m/s/LSB
-      return {8.32237840649762e-09, 2.384185791015625e-07, 125.0};
-
-    case ImuType::ISA100:
-    case ImuType::ISA100C:
-      // 1.0e-9 rad/LSB, 2.0e-8 m/s/LSB
-      return {1.0e-9, 2.0e-8, 200.0};
-
-    case ImuType::ISA100_400HZ:
-    case ImuType::ISA100C_400HZ:
-      return {1.0e-9, 2.0e-8, 400.0};
-
-    case ImuType::G320N:
-      return {1.7044230976507124e-11, 2.3929443359375006e-10, 125.0};
-
     case ImuType::CPT_XW5651:
       return {1.0850694444444445e-07, 1.52587890625e-06, 100.0};
-
-    case ImuType::UM442:
-      return {6.6581059144655048e-6, 2.99127170628e-5, 20.0};
 
     default:
       return {0.0, 0.0, 0.0};

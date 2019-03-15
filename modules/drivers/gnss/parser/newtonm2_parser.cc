@@ -641,7 +641,7 @@ bool NewtonM2Parser::HandleRawImu(const newtonm2::RawImu* imu) {
     newtonm2::ImuParameter param = newtonm2::GetImuParameter(imu_type_);
 
     if (newtonm2::is_zero(param.sampling_rate_hz)) {
-      AERROR_EVERY(5) << "Unsupported IMU type ADUS16488.";
+      AERROR_EVERY(5) << "Unsupported IMU type";
       return false;
     }
     gyro_scale = param.gyro_scale * param.sampling_rate_hz;
