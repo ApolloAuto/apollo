@@ -17,12 +17,6 @@ message DeciderCreepConfig {
   optional double ignore_min_st_min_s = 6 [default = 15.0];  // meter
 }
 
-message RuleCrosswalkConfig {
-  optional bool enabled = 1 [default = true];
-  // stop distance(m) to the stop line of the crosswalk
-  optional double stop_distance = 2 [default = 1.0];  // meter
-}
-
 message RuleStopSignConfig {
   optional bool enabled = 1 [default = true];
   // stop distance(m) to the stop line of the stop sign
@@ -42,10 +36,9 @@ message RuleOpenSpaceStopConfig {
 }
 
 message DeciderRuleBasedStopConfig {
-  optional RuleCrosswalkConfig crosswalk = 1;
-  optional RuleStopSignConfig stop_sign = 2;
-  optional RuleTrafficLightConfig traffic_light = 3;
-  optional RuleOpenSpaceStopConfig open_space = 4;
+  optional RuleStopSignConfig stop_sign = 1;
+  optional RuleTrafficLightConfig traffic_light = 2;
+  optional RuleOpenSpaceStopConfig open_space = 3;
 }
 
 message SidePassSafetyConfig {
