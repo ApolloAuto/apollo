@@ -78,14 +78,6 @@ new_local_repository(
     path = "/home/tmp/ros",
 )
 
-# OpenCV 2.4.13.2
-new_http_archive(
-    name = "opencv2",
-    build_file = "third_party/opencv2.BUILD",
-    strip_prefix = "opencv-2.4.13.2",
-    url = "file:///home/tmp/opencv-2.4.13.2.zip",
-)
-
 # PCL 1.7
 # =======
 # This requires libpcl-dev to be installed in your Ubuntu/Debian.
