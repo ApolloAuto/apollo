@@ -16,26 +16,98 @@
 
 #include "modules/prediction/predictor/interaction/interaction_predictor.h"
 
+#include <limits>
+
+#include "modules/prediction/common/prediction_gflags.h"
+
 namespace apollo {
 namespace prediction {
 
+using LatLonPolynomialPair = std::pair<std::array<double, 6>,
+                                       std::array<double, 5>>;
+using apollo::common::TrajectoryPoint;
+
 void InteractionPredictor::Predict(Obstacle* obstacle) {
-  // TODO(kechxu) implement
-  /*
-  for each lane_sequence {
-    Sample trajectories
-    for each traj in trajectories {
-      assign_cost(traj) {
-        * centripetal acc
-        * collision with ego vehicle if his right of way is lower
+  Clear();
+
+  CHECK_NOTNULL(obstacle);
+  CHECK_GT(obstacle->history_size(), 0);
+
+  const Feature& feature = obstacle->latest_feature();
+
+  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
+    AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
+    return;
+  }
+
+  double smallest_cost = std::numeric_limits<double>::max();
+  LatLonPolynomialPair best_trajectory_lat_lon_pair;
+  for (const LaneSequence& lane_sequence :
+       feature.lane().lane_graph().lane_sequence()) {
+    std::vector<LatLonPolynomialPair> trajectory_lat_lon_pairs =
+        SampleTrajectoryPolynomials();
+    for (const auto& trajectory_lat_lon_pair : trajectory_lat_lon_pairs) {
+      double cost = ComputeTrajectoryCost(trajectory_lat_lon_pair);
+      if (cost < smallest_cost) {
+        smallest_cost = cost;
+        best_trajectory_lat_lon_pair = trajectory_lat_lon_pair;
       }
     }
 
-    Select lowest cost best_traj, compute its likelihood probability
-    Associate likelihood with model prior probability -> posterior probability
+    double likelihood = ComputeLikelihood(smallest_cost);
+    double prior = lane_sequence.probability();
+    double posterior = ComputePosterior(prior, likelihood);
+
+    double probability_threshold = 0.5;
+    if (posterior < probability_threshold) {
+      continue;
+    }
+
+    std::vector<TrajectoryPoint> points;
+    DrawTrajectory(*obstacle, lane_sequence,
+        FLAGS_prediction_trajectory_time_length,
+        FLAGS_prediction_trajectory_time_resolution,
+        &points);
+    Trajectory trajectory = GenerateTrajectory(points);
+    trajectory.set_probability(posterior);
+    trajectories_.push_back(std::move(trajectory));
   }
-  output trajectories with relatively higher posterior probabilities
-    */
+}
+
+void InteractionPredictor::Clear() { Predictor::Clear(); }
+
+bool InteractionPredictor::DrawTrajectory(
+    const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const double total_time, const double period,
+    std::vector<TrajectoryPoint>* points) {
+  // TODO(kechxu) implement
+  return false;
+}
+
+std::vector<LatLonPolynomialPair>
+InteractionPredictor::SampleTrajectoryPolynomials() {
+  std::vector<LatLonPolynomialPair> trajectory_lat_lon_pairs;
+  // TODO(kechxu) implement
+  return trajectory_lat_lon_pairs;
+}
+
+double InteractionPredictor::ComputeTrajectoryCost(
+    const LatLonPolynomialPair& trajectory_lat_lon_pair) {
+  // TODO(kechxu) implement
+  // * centripetal acc
+  // * collision with ego vehicle if his right of way is lower
+  return 0.0;
+}
+
+double InteractionPredictor::ComputeLikelihood(const double cost) {
+  // TODO(kechxu) implement
+  return 0.0;
+}
+
+double InteractionPredictor::ComputePosterior(
+    const double prior, const double likelihood) {
+  // TODO(kechxu) implement
+  return 0.0;
 }
 
 }  // namespace prediction

@@ -21,6 +21,7 @@
 #pragma once
 
 #include <vector>
+#include <utility>
 
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
 
@@ -44,6 +45,25 @@ class InteractionPredictor : public SequencePredictor {
    * @param Obstacle pointer
    */
   void Predict(Obstacle* obstacle) override;
+
+ private:
+  void Clear();
+
+  bool DrawTrajectory(
+    const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const double total_time, const double period,
+    std::vector<apollo::common::TrajectoryPoint>* points);
+
+  std::vector<std::pair<std::array<double, 6>, std::array<double, 5>>>
+  SampleTrajectoryPolynomials();
+
+  double ComputeTrajectoryCost(
+      const std::pair<std::array<double, 6>, std::array<double, 5>>&
+      trajectory_lat_lon_pair);
+
+  double ComputeLikelihood(const double cost);
+
+  double ComputePosterior(const double prior, const double likelihood);
 };
 
 }  // namespace prediction
