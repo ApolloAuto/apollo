@@ -18,8 +18,8 @@
 """
 Stat static info.
 Usage:
-    ./stat_static_info.py <bag_file>
-    ./stat_static_info.py <task_dir>  # <task_dir> contains a list of bags.
+    ./stat_static_info.py <record_file>
+    ./stat_static_info.py <task_dir>  # <task_dir> contains a list of records.
 """
 
 import os
@@ -41,22 +41,22 @@ class StaticInfoCalculator(object):
         self.vehicle_name = None
         self.vehicle_vin = None
 
-    def process_file(self, bag_file):
+    def process_file(self, record_file):
         """
-        Extract information from bag file. 
+        Extract information from record file. 
         Return True if we are done collecting all information.
         """
         try:
-            reader = RecordReader(bag_file)
-            print("Begin to process bag file {}".format(bag_file))
+            reader = RecordReader(record_file)
+            print("Begin to process record file {}".format(record_file))
             for msg in reader.read_messages():
                 print msg.topic
-                if msg.topic == kChassisInfoTopic and self.vehicle_vin == None:
+                if msg.topic == kChassisInfoTopic and self.vehicle_vin is None:
                     chassis = chassis_pb2.Chassis()
                     chassis.ParseFromString(msg.message)
                     if chassis.license.vin:
                         self.vehicle_vin = chassis.license.vin
-                elif msg.topic == kHMIInfoTopic and self.vehicle_name == None:
+                elif msg.topic == kHMIInfoTopic and self.vehicle_name is None:
                     hmistatus = hmi_status_pb2.HMIStatus()
                     hmistatus.ParseFromString(msg.message)
                     if hmistatus.current_map:
@@ -66,26 +66,26 @@ class StaticInfoCalculator(object):
                     return True
         except:
             return False
-        print("Finished processing bag file {}".format(bag_file))
+        print("Finished processing record file {}".format(record_file))
         return self.done()
 
-    def process_dir(self, bag_dir):
+    def process_dir(self, record_dir):
         """
         Process a directory
         """
         files = []
         dirs = []
-        for f in os.listdir(bag_dir):
-            f_path = os.path.join(bag_dir, f)
+        for f in os.listdir(record_dir):
+            f_path = os.path.join(record_dir, f)
             if os.path.isfile(f_path):
                 files.append(f_path)
             elif os.path.isdir(f_path):
                 dirs.append(f_path)
             # Ignore links.
 
-        # Reverse sort the bags or dirs, trying to get info from the latest.
-        for bag in sorted(files, reverse=True):
-            if self.process_file(bag):
+        # Reverse sort the records or dirs, trying to get info from the latest.
+        for record in sorted(files, reverse=True):
+            if self.process_file(record):
                 return True
         for subdir in sorted(dirs, reverse=True):
             if self.process_dir(subdir):
@@ -104,7 +104,7 @@ def main():
     Process a path
     """
     if len(sys.argv) < 2:
-        print("Usage: %s <bag_file|task_dir>" % sys.argv[0])
+        print("Usage: %s <record_file|task_dir>" % sys.argv[0])
         sys.exit(0)
 
     path = sys.argv[1]
