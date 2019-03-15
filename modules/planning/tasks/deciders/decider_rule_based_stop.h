@@ -51,12 +51,11 @@ class DeciderRuleBasedStop : public Decider {
   void CheckOpenSpacePreStop(Frame* const frame,
                              ReferenceLineInfo* const reference_line_info);
 
-  bool BuildStopDecision(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info,
-                         const std::string& stop_wall_id,
-                         const double stop_line_s, const double stop_distance,
-                         const StopReasonCode& stop_reason_code,
-                         const std::vector<std::string>& wait_for_obstacles);
+  bool BuildStopDecision(
+      Frame* const frame, ReferenceLineInfo* const reference_line_info,
+      const std::string& stop_wall_id, const double stop_line_s,
+      const double stop_distance, const StopReasonCode& stop_reason_code,
+      const std::vector<std::string>& wait_for_obstacles);
 
  private:
   static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";

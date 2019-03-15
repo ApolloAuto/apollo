@@ -42,8 +42,11 @@ class SpeedBoundsDecider : public Decider {
   bool CheckSidePassStop(const PathData& path_data, double* stop_s_on_pathdata);
 
   // @brief Set stop fence for side pass
-  bool BuildSidePassStopFence(double stop_s_on_pathdata,
-                              common::PathPoint* stop_pathpoint);
+  bool BuildSidePassStopFence(const PathData& path_data,
+                              const double stop_s_on_pathdata,
+                              common::PathPoint* stop_pathpoint,
+                              Frame* const frame,
+                              ReferenceLineInfo* const reference_line_info);
 
   // @brief Check if ADV stop at a stop fence
   bool CheckADCStop(const ReferenceLineInfo& reference_line_info,
