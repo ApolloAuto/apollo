@@ -62,6 +62,23 @@ class OpenSpaceTrajectoryOptimizer {
     *optimized_trajectory = optimized_trajectory_;
   }
 
+  void RecordDebugInfo(const Vec2d& translate_origin,
+                       const double& rotate_angle, const Eigen::MatrixXd& xWS,
+                       const Eigen::MatrixXd& uWs,
+                       const Eigen::MatrixXd& l_warm_up,
+                       const Eigen::MatrixXd& n_warm_up,
+                       const Eigen::MatrixXd& dual_l_result_ds,
+                       const Eigen::MatrixXd& dual_n_result_ds,
+                       const Eigen::MatrixXd& state_result_ds,
+                       const Eigen::MatrixXd& control_result_ds,
+                       const Eigen::MatrixXd& time_result_ds,
+                       const std::vector<double>& XYbounds,
+                       const std::vector<std::vector<common::math::Vec2d>>&
+                           obstacles_vertices_vec);
+
+  void UpdateDebugInfo(
+      ::apollo::planning_internal::OpenSpaceDebug* open_space_debug);
+
  private:
   bool IsInitPointNearDestination(
       const common::TrajectoryPoint& planning_init_point,
@@ -89,6 +106,8 @@ class OpenSpaceTrajectoryOptimizer {
 
   std::vector<common::TrajectoryPoint> stitching_trajectory_;
   DiscretizedTrajectory optimized_trajectory_;
+
+  apollo::planning_internal::OpenSpaceDebug open_space_debug_;
 };
 }  // namespace planning
 }  // namespace apollo

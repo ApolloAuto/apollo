@@ -159,6 +159,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
 
     if (previous_frame->open_space_info().open_space_provider_success()) {
       ReuseLastFrameResult(previous_frame, trajectory_data);
+      // reuse last frame debug when use last frame traj
       return Status(ErrorCode::OK,
                     "Waiting for open_space_trajectory_optimizer in "
                     "open_space_trajectory_provider");

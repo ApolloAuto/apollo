@@ -184,16 +184,149 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
                   "Distance approach problem failed to solve");
   }
 
+  // record debug info
+  if (FLAGS_enable_record_debug) {
+    open_space_debug_.Clear();
+    RecordDebugInfo(translate_origin, rotate_angle, xWS, uWS, l_warm_up,
+                    n_warm_up, dual_l_result_ds, dual_n_result_ds,
+                    state_result_ds, control_result_ds, time_result_ds,
+                    XYbounds, obstacles_vertices_vec);
+  }
+
   // rescale the states to the world frame
   for (size_t i = 0; i < horizon + 1; ++i) {
     PathPointDeNormalizing(rotate_angle, translate_origin,
-                           &(state_result_ds(0, i)), &(state_result_ds(1, i)),
+                           &(state_result_ds(0, i)),
+                           &(state_result_ds(1, i)),
                            &(state_result_ds(2, i)));
   }
 
   LoadTrajectory(state_result_ds, control_result_ds, time_result_ds);
 
   return Status::OK();
+}
+
+void OpenSpaceTrajectoryOptimizer::RecordDebugInfo(
+    const Vec2d& translate_origin, const double& rotate_angle,
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+    const Eigen::MatrixXd& dual_l_result_ds,
+    const Eigen::MatrixXd& dual_n_result_ds,
+    const Eigen::MatrixXd& state_result_ds,
+    const Eigen::MatrixXd& control_result_ds,
+    const Eigen::MatrixXd& time_result_ds, const std::vector<double>& XYbounds,
+    const std::vector<std::vector<common::math::Vec2d>>&
+        obstacles_vertices_vec) {
+  // load translation origin and heading angle
+  auto* roi_shift_point = open_space_debug_.mutable_roi_shift_point();
+  roi_shift_point->set_x(translate_origin.x());
+  roi_shift_point->set_y(translate_origin.y());
+  roi_shift_point->set_theta(rotate_angle);
+
+  // load warm start trajectory
+  size_t horizon = uWS.cols();
+  auto* warm_start_trajectory =
+      open_space_debug_.mutable_warm_start_trajectory();
+  for (size_t i = 0; i < horizon; ++i) {
+    auto* warm_start_point = warm_start_trajectory->add_vehicle_motion_point();
+    warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_x(
+        xWS(0, i));
+    warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_y(
+        xWS(1, i));
+    warm_start_point->mutable_trajectory_point()
+        ->mutable_path_point()
+        ->set_theta(xWS(2, i));
+    warm_start_point->mutable_trajectory_point()->set_v(xWS(3, i));
+    warm_start_point->set_steer(uWS(0, i));
+    warm_start_point->mutable_trajectory_point()->set_a(uWS(1, i));
+  }
+  auto* warm_start_point = warm_start_trajectory->add_vehicle_motion_point();
+  warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_x(
+      xWS(0, horizon));
+  warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_y(
+      xWS(1, horizon));
+  warm_start_point->mutable_trajectory_point()->mutable_path_point()->set_theta(
+      xWS(2, horizon));
+  warm_start_point->mutable_trajectory_point()->set_v(xWS(3, horizon));
+
+  // load warm start dual variables
+  size_t l_warm_up_cols = l_warm_up.rows();
+  for (size_t i = 0; i < horizon; ++i) {
+    for (size_t j = 0; j < l_warm_up_cols; j++) {
+      open_space_debug_.add_warm_start_dual_lambda(l_warm_up(j, i));
+    }
+  }
+  size_t n_warm_up_cols = n_warm_up.rows();
+  for (size_t i = 0; i < horizon; ++i) {
+    for (size_t j = 0; j < n_warm_up_cols; j++) {
+      open_space_debug_.add_warm_start_dual_miu(n_warm_up(j, i));
+    }
+  }
+
+  // load optimized dual variables
+  size_t dual_l_result_ds_cols = dual_l_result_ds.rows();
+  for (size_t i = 0; i < horizon; ++i) {
+    for (size_t j = 0; j < dual_l_result_ds_cols; j++) {
+      open_space_debug_.add_optimized_dual_lambda(dual_l_result_ds(j, i));
+    }
+  }
+  size_t dual_n_result_ds_cols = dual_n_result_ds.rows();
+  for (size_t i = 0; i < horizon; ++i) {
+    for (size_t j = 0; j < dual_n_result_ds_cols; j++) {
+      open_space_debug_.add_optimized_dual_miu(dual_n_result_ds(j, i));
+    }
+  }
+
+  double relative_time = 0;
+
+  // load smoothed trajectory
+  auto* smoothed_trajectory = open_space_debug_.mutable_smoothed_trajectory();
+  for (size_t i = 0; i < horizon; ++i) {
+    auto* smoothed_point = smoothed_trajectory->add_vehicle_motion_point();
+    smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_x(
+        state_result_ds(0, i));
+    smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_y(
+        state_result_ds(1, i));
+    smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_theta(
+        state_result_ds(2, i));
+    smoothed_point->mutable_trajectory_point()->set_v(state_result_ds(3, i));
+    smoothed_point->set_steer(control_result_ds(0, i));
+    smoothed_point->mutable_trajectory_point()->set_a(control_result_ds(1, i));
+    relative_time += time_result_ds(0, i);
+    smoothed_point->mutable_trajectory_point()->set_relative_time(
+        relative_time);
+  }
+  auto* smoothed_point = smoothed_trajectory->add_vehicle_motion_point();
+  smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_x(
+      state_result_ds(0, horizon));
+  smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_y(
+      state_result_ds(1, horizon));
+  smoothed_point->mutable_trajectory_point()->mutable_path_point()->set_theta(
+      state_result_ds(2, horizon));
+  smoothed_point->mutable_trajectory_point()->set_v(
+      state_result_ds(3, horizon));
+  relative_time += time_result_ds(0, horizon);
+  smoothed_point->mutable_trajectory_point()->set_relative_time(relative_time);
+  // load xy boundary (xmin, xmax, ymin, ymax)
+  open_space_debug_.add_xy_boundary(XYbounds[0]);
+  open_space_debug_.add_xy_boundary(XYbounds[1]);
+  open_space_debug_.add_xy_boundary(XYbounds[2]);
+  open_space_debug_.add_xy_boundary(XYbounds[3]);
+
+  // load obstacles
+  for (const auto& obstacle_vertices : obstacles_vertices_vec) {
+    auto* obstacle_ptr = open_space_debug_.add_obstacles();
+    size_t vertices_size = obstacle_vertices.size();
+    for (size_t i = 0; i < vertices_size; ++i) {
+      obstacle_ptr->add_vertices_x_coords(obstacle_vertices[i].x());
+      obstacle_ptr->add_vertices_y_coords(obstacle_vertices[i].y());
+    }
+  }
+}
+
+void OpenSpaceTrajectoryOptimizer::UpdateDebugInfo(
+    planning_internal::OpenSpaceDebug* open_space_debug) {
+  open_space_debug->MergeFrom(open_space_debug_);
 }
 
 bool OpenSpaceTrajectoryOptimizer::IsInitPointNearDestination(
