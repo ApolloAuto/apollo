@@ -96,7 +96,6 @@ TEST_F(GarageTest, follow) {
  */
 TEST_F(GarageTest, dest_stop_01) {
   ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
-  ENABLE_RULE(TrafficRuleConfig::STOP_SIGN, false);
 
   FLAGS_test_prediction_file = "stop_dest_prediction.pb.txt";
   FLAGS_test_localization_file = "stop_dest_localization.pb.txt";
