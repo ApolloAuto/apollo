@@ -34,7 +34,6 @@ from common.message_manager import PbMessageManager
 g_message_manager = PbMessageManager()
 g_args = None
 
-
 def stat_planning(planning_msg):
     stats = {}
     if planning_msg.HasField("estop"):
@@ -49,9 +48,7 @@ def stat_planning(planning_msg):
     stats["other"] = stats["total_time"] - used_time
     return stats
 
-
 g_first_time = True
-
 
 def print_stat(msg, fhandle):
     if not msg:
@@ -83,11 +80,9 @@ def print_stat(msg, fhandle):
         fhandle.flush()
     output.close()
 
-
 def on_receive_planning(planning_msg):
     ss = stat_planning(planning_msg)
     print_stat(ss, g_args.report)
-
 
 def dump_bag(in_bag, msg_meta, fhandle):
     bag = rosbag.Bag(in_bag, 'r')
@@ -97,8 +92,28 @@ def dump_bag(in_bag, msg_meta, fhandle):
         ss = stat_planning(msg)
         print_stat(ss, g_args.report)
 
+def main(args):
+    if not args.report:
+        args.report = sys.stdout
+    else:
+        args.report = file(args.report, 'w')
+    meta_msg = g_message_manager.get_msg_meta_by_topic(args.topic)
+    if not meta_msg:
+        print('Failed to find topic [%s] in message manager' % args.topic)
+        sys.exit(1)
 
-if __name__ == "__main__":
+    if args.rosbag:
+        dump_bag(args.rosbag, meta_msg, args.report)
+    else:
+        rospy.init_node("stat_planning", anonymous=True)
+        rospy.Subscriber(args.topic, meta_msg.msg_type,
+                         on_receive_planning)
+        rospy.spin()
+
+    if args.report != sys.stdout:
+        args.report.close()
+
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="A tool to profile the runtime statistic of planning module"
     )
@@ -116,22 +131,4 @@ if __name__ == "__main__":
         help="The planning module topic name")
 
     g_args = parser.parse_args()
-    if not g_args.report:
-        g_args.report = sys.stdout
-    else:
-        g_args.report = file(g_args.report, 'w')
-    meta_msg = g_message_manager.get_msg_meta_by_topic(g_args.topic)
-    if not meta_msg:
-        print("Failed to find topic[%s] in message manager" % (g_args.topic))
-        sys.exit(0)
-
-    if g_args.rosbag:
-        dump_bag(g_args.rosbag, meta_msg, g_args.report)
-    else:
-        rospy.init_node("stat_planning", anonymous=True)
-        rospy.Subscriber(g_args.topic, meta_msg.msg_type,
-                         on_receive_planning)
-        rospy.spin()
-
-    if g_args.report != sys.stdout:
-        g_args.report.close()
+    main(g_args)
