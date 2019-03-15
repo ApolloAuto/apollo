@@ -187,6 +187,18 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
 void PathAssessmentDecider::InitPathPointDecision(
     const PathData& path_data,
     std::vector<PathPointDecision>* const path_decision) {
+  // Sanity checks.
+  CHECK_NOTNULL(path_decision);
+  path_decision->clear();
+
+  // Go through every path point in path data, and initialize a
+  // corresponding path point decision.
+  for (const auto& frenet_path_point : path_data.frenet_frame_path()) {
+    path_decision->emplace_back(
+        frenet_path_point.s(),
+        PathData::PathPointType::UNKNOWN,
+        std::numeric_limits<double>::max());
+  }
   return;
 }
 
@@ -194,6 +206,39 @@ void PathAssessmentDecider::SetPathPointType(
     const ReferenceLineInfo& reference_line_info,
     const PathData& path_data,
     std::vector<PathPointDecision>* const path_decision) {
+  // Sanity checks.
+  CHECK_NOTNULL(path_decision);
+
+  // Go through every path_point, and add in-lane/out-of-lane info.
+  bool is_out_of_lane = false;
+  const auto& frenet_path = path_data.frenet_frame_path();
+  for (size_t i = 0; i < frenet_path.size(); ++i) {
+    const auto& frenet_path_point = frenet_path[i];
+    double lane_left_width = 0.0;
+    double lane_right_width = 0.0;
+    if (reference_line_info.reference_line().GetLaneWidth(
+            frenet_path_point.s(), &lane_left_width, &lane_right_width)) {
+      if (frenet_path_point.l() > lane_left_width ||
+          frenet_path_point.l() < -lane_right_width ) {
+        // The path point is out of the reference_line's lane.
+        is_out_of_lane = true;
+        // Analyze whether it is a forward lane or reverse lane.
+        std::get<1>((*path_decision)[i]) =
+            PathData::PathPointType::OUT_ON_REVERSE_LANE;
+        // TODO:(jiacheng) check lane direction.
+      } else {
+        // The path point is within the reference_line's lane.
+        if (is_out_of_lane) {
+          is_out_of_lane = false;
+          std::get<1>((*path_decision)[i]) =
+              PathData::PathPointType::BACK_TO_IN_LANE;
+        } else {
+          std::get<1>((*path_decision)[i]) =
+              PathData::PathPointType::IN_LANE;
+        }
+      }
+    }
+  }
   return;
 }
 
