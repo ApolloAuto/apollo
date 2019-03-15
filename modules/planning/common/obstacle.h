@@ -124,6 +124,10 @@ class Obstacle {
 
   static bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
 
+  inline bool IsCautionLevelObstacle() const {
+    return is_caution_level_obstacle_;
+  }
+
   // const Obstacle* obstacle() const;
 
   /**
@@ -257,6 +261,8 @@ class Obstacle {
   bool is_lane_blocking_ = false;
 
   bool is_lane_change_blocking_ = false;
+
+  bool is_caution_level_obstacle_ = false;
 
   double min_radius_stop_distance_ = -1.0;
 
