@@ -36,12 +36,11 @@ namespace planning {
 class PathData {
  public:
   enum class PathPointType {
-    UNKNOWN,
-    OFF_ROAD,
     IN_LANE,
     OUT_ON_FORWARD_LANE,
     OUT_ON_REVERSE_LANE,
-    BACK_TO_IN_LANE,
+    OFF_ROAD,
+    UNKNOWN,
   };
 
   PathData() = default;
