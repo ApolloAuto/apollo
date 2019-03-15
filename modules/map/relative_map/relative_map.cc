@@ -128,8 +128,8 @@ apollo::common::Status RelativeMap::Start() {
   // donot receive topic navigation while
   // FLAGS_load_navigation_path_when_start is true
   if (!FLAGS_load_navigation_path_when_start) {
-    AdapterManager::AddNavigationCallback(&RelativeMap::OnReceiveNavigationInfo,
-                                        this);
+    AdapterManager::AddNavigationCallback(
+        &RelativeMap::OnReceiveNavigationInfo, this);
   }
 
   if (AdapterManager::GetPerceptionObstacles()->Empty()) {

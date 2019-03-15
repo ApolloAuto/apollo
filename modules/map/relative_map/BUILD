@@ -19,9 +19,6 @@ cc_library(
     data = [
         ":relative_map_conf",
     ],
-    linkopts = [
-        "-lyaml-cpp",
-    ],
     deps = [
         ":navigation_lane_lib",
         "//modules/common",
@@ -36,6 +33,7 @@ cc_library(
         "//modules/map/relative_map/proto:relative_map_config_proto",
         "//modules/perception/proto:perception_proto",
         "//third_party/json",
+        "@yaml_cpp//:yaml",
     ],
 )
 
