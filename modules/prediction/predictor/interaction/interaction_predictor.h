@@ -51,7 +51,8 @@ class InteractionPredictor : public SequencePredictor {
 
   bool DrawTrajectory(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double total_time, const double period,
+    const std::pair<std::array<double, 6>, std::array<double, 5>>&
+          trajectory_lat_lon_pair, const double total_time, const double period,
     std::vector<apollo::common::TrajectoryPoint>* points);
 
   std::vector<std::pair<std::array<double, 6>, std::array<double, 5>>>
