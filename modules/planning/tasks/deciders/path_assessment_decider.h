@@ -54,6 +54,20 @@ class PathAssessmentDecider : public Decider {
 
   bool IsCollidingWithStaticObstacles(
       const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+
+  void InitPathPointDecision(const PathData& path_data,
+      std::vector<std::tuple<double, PathData::PathPointType, double>>*
+      const path_decision);
+
+  void SetPathPointType(
+      const ReferenceLineInfo& reference_line_info, const PathData& path_data,
+      std::vector<std::tuple<double, PathData::PathPointType, double>>*
+      const path_decision);
+
+  void SetObstacleDistance(
+      const ReferenceLineInfo& reference_line_info, const PathData& path_data,
+      std::vector<std::tuple<double, PathData::PathPointType, double>>*
+      const path_decision);
 };
 
 }  // namespace planning
