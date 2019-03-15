@@ -17,16 +17,16 @@
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 
 #include <string>
-#include <vector>
 #include <tuple>
+#include <vector>
 
-#include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
+#include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/st_boundary_mapper.h"
 
@@ -36,7 +36,6 @@ namespace planning {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
-using apollo::common::util::WithinBound;
 using apollo::planning_internal::StGraphBoundaryDebug;
 using apollo::planning_internal::STGraphDebug;
 
@@ -193,6 +192,8 @@ bool SpeedBoundsDecider::BuildSidePassStopFence(
   }
 
   const std::string stop_wall_id = "side_pass_stop";
+  // TODO(Jinyun) load relavent surrounding obstacles
+  std::vector<std::string> wait_for_obstacles;
 
   const auto &nearby_path = reference_line_info->reference_line().map_path();
   double stop_point_s = 0.0;
@@ -200,25 +201,10 @@ bool SpeedBoundsDecider::BuildSidePassStopFence(
   nearby_path.GetNearestPoint({stop_pathpoint->x(), stop_pathpoint->y()},
                               &stop_point_s, &stop_point_l);
 
-  // check
-  const auto &reference_line = reference_line_info->reference_line();
-  if (!WithinBound(0.0, reference_line.Length(), stop_point_s)) {
-    AERROR << "stop_line_s[" << stop_point_s << "] is not on reference line";
-    return 0;
-  }
-
-  // create virtual stop wall
-  auto *obstacle = frame->CreateStopObstacle(reference_line_info, stop_wall_id,
-                                             stop_point_s);
-  if (!obstacle) {
-    AERROR << "Failed to create obstacle [" << stop_wall_id << "]";
-    return -1;
-  }
-  Obstacle *stop_wall = reference_line_info->AddObstacle(obstacle);
-  if (!stop_wall) {
-    AERROR << "Failed to create obstacle for: " << stop_wall_id;
-    return -1;
-  }
+  DeciderRuleBasedStop::BuildStopDecision(
+      stop_wall_id, stop_point_s, 0.0,
+      StopReasonCode::STOP_REASON_SIDEPASS_SAFETY, wait_for_obstacles, frame,
+      reference_line_info);
 
   return true;
 }
