@@ -16,6 +16,8 @@
 #include "modules/perception/camera/tools/offline/visualizer.h"
 
 #include <limits>
+#include <iostream>
+#include <fstream>
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -107,9 +109,9 @@ bool Visualizer::Init_all_info_single_camera(
     const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
     const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
     const Eigen::Matrix4d &ex_lidar2imu,
-    const double &pitch_adj_degree,
-    const double &yaw_adj_degree,
-    const double &roll_adj_degree,
+    const double pitch_adj_degree,
+    const double yaw_adj_degree,
+    const double roll_adj_degree,
     const int image_height,
     const int image_width) {
   image_height_ = image_height;
@@ -211,15 +213,18 @@ bool Visualizer::Init_all_info_single_camera(
   return true;
 }
 
-bool Visualizer::adjust_angles(const std::string &camera_name,
-                               const double &pitch_adj_degree,
-                               const double &yaw_adj_degree,
-                               const double &roll_adj_degree) {
-  // Convert degree angles to radian angles
-  double pitch_adj_radian = pitch_adj_degree * degree_to_radian_factor;
-  double yaw_adj_radian = yaw_adj_degree * degree_to_radian_factor;
-  double roll_adj_radian = roll_adj_degree * degree_to_radian_factor;
+bool Visualizer::adjust_angles(
+    const std::string &camera_name,
+    const double pitch_adj_degree,
+    const double yaw_adj_degree,
+    const double roll_adj_degree) {
 
+  // Convert degree angles to radian angles
+  double pitch_adj_radian = pitch_adj_degree * degree_to_radian_factor_;
+  double yaw_adj_radian = yaw_adj_degree * degree_to_radian_factor_;
+  double roll_adj_radian = roll_adj_degree * degree_to_radian_factor_;
+
+  // We use "right handed ZYX" coordinate system for euler angles
   // adjust pitch yaw roll in camera coords
   // Remember that camera coordinate
   // (Z)----> X
@@ -229,17 +234,17 @@ bool Visualizer::adjust_angles(const std::string &camera_name,
   //  Y
   Eigen::Matrix4d Rx;  // pitch
   Rx << 1, 0, 0, 0,
-        0, cos(pitch_adj_radian), sin(pitch_adj_radian), 0,
-        0, -sin(pitch_adj_radian), cos(pitch_adj_radian), 0,
+        0, cos(pitch_adj_radian), -sin(pitch_adj_radian), 0,
+        0, sin(pitch_adj_radian), cos(pitch_adj_radian), 0,
         0, 0, 0, 1;
   Eigen::Matrix4d Ry;  // yaw
-  Ry << cos(yaw_adj_radian), 0, -sin(yaw_adj_radian), 0,
+  Ry << cos(yaw_adj_radian), 0, sin(yaw_adj_radian), 0,
         0, 1, 0, 0,
-        sin(yaw_adj_radian), 0, cos(yaw_adj_radian), 0,
+        -sin(yaw_adj_radian), 0, cos(yaw_adj_radian), 0,
         0, 0, 0, 1;
   Eigen::Matrix4d Rz;  // roll
-  Rz << cos(roll_adj_radian), sin(roll_adj_radian), 0, 0,
-        -sin(roll_adj_radian), cos(roll_adj_radian), 0, 0,
+  Rz << cos(roll_adj_radian), -sin(roll_adj_radian), 0, 0,
+        sin(roll_adj_radian), cos(roll_adj_radian), 0, 0,
         0, 0, 1, 0,
         0, 0, 0, 1;
 
@@ -378,6 +383,244 @@ bool Visualizer::reset_key() {
   return true;
 }
 
+double Visualizer::regularize_angle(const double radian_angle) {
+  if (radian_angle <= -M_PI) {
+    return radian_angle + M_PI * 2.0;
+  } else if (radian_angle > M_PI) {
+    return radian_angle - M_PI * 2.0;
+  }
+  return radian_angle;
+}
+// ZYX Euler angles to quaternion
+bool Visualizer::euler_to_quaternion(
+  Eigen::Vector4d *quarternion,
+  const double pitch_radian,
+  const double yaw_radian,
+  const double roll_radian) {
+  // // Option 1. ZYX Euler to quortonian
+  // double cy = cos(yaw_radian * 0.5);
+  // double sy = sin(yaw_radian * 0.5);
+  // double cp = cos(pitch_radian * 0.5);
+  // double sp = sin(pitch_radian * 0.5);
+  // double cr = cos(roll_radian * 0.5);
+  // double sr = sin(roll_radian * 0.5);
+
+  // quarternion[0] = sy * cp * cr - cy * sp * sr;  // Q.x
+  // quarternion[1] = cy * sp * cr + sy * cp * sr;  // Q.y
+  // quarternion[2] = cy * cp * sr - sy * sp * cr;  // Q.z
+  // quarternion[3] = cy * cp * cr + sy * sp * sr;  // Q.w
+
+  // AINFO << "fast quarternion(x, y, z, w): ("
+  //       << quarternion[0] << ", "
+  //       << quarternion[1] << ", "
+  //       << quarternion[2] << ", "
+  //       << quarternion[3] << ")";
+
+  // Option 2. Rotation matrix to quaternion
+  Eigen::Matrix3d Rx;  // pitch
+  Rx << 1, 0, 0,
+        0, cos(pitch_radian), -sin(pitch_radian),
+        0, sin(pitch_radian), cos(pitch_radian);
+  Eigen::Matrix3d Ry;  // yaw
+  Ry << cos(yaw_radian), 0, sin(yaw_radian),
+        0, 1, 0,
+        -sin(yaw_radian), 0, cos(yaw_radian);
+  Eigen::Matrix3d Rz;  // roll
+  Rz << cos(roll_radian), -sin(roll_radian), 0,
+        sin(roll_radian), cos(roll_radian), 0,
+        0, 0, 1;
+  Eigen::Matrix3d R;
+  R = Rz * Ry * Rx;
+  AINFO << "Rotation matrix R: " << R;
+  double qw = 0.5 * sqrt(1.0 + R(0, 0) + R(1, 1) + R(2, 2));
+  if (fabs(qw) > 1.0e-6) {
+    (*quarternion)[0] = 0.25 * (R(2, 1) - R(1, 2)) / qw;  // Q.x
+    (*quarternion)[1] = 0.25 * (R(0, 2) - R(2, 0)) / qw;  // Q.y
+    (*quarternion)[2] = 0.25 * (R(1, 0) - R(0, 1)) / qw;  // Q.z
+    (*quarternion)[3] = qw;  // Q.w
+    AINFO << "quarternion(x, y, z, w): ("
+          << (*quarternion)[0] << ", "
+          << (*quarternion)[1] << ", "
+          << (*quarternion)[2] << ", "
+          << (*quarternion)[3] << ")";
+  } else {
+    double qx = 0.5 * sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
+    if (fabs(qx) < 1.0e-6) {
+      AWARN << "quarternion is degenerate qw: " << qw << "qx: " << qx;
+      return false;
+    } else {
+      (*quarternion)[0] = qx;  // Q.x
+      (*quarternion)[1] = 0.25 * (R(0, 1) + R(1, 0)) / qx;  // Q.y
+      (*quarternion)[2] = 0.25 * (R(0, 2) + R(2, 0)) / qx;  // Q.z
+      (*quarternion)[3] = 0.25 * (R(2, 1) - R(1, 2)) / qx;  // Q.w
+      AINFO << "second quarternion(x, y, z, w): ("
+            << (*quarternion)[0] << ", "
+            << (*quarternion)[1] << ", "
+            << (*quarternion)[2] << ", "
+            << (*quarternion)[3] << ")";
+    }
+  }
+  return true;
+}
+
+bool Visualizer::copy_backup_file(
+  const std::string &filename) {
+  static int index = 0;
+  // int last_index = 0;
+  // std::string files = filename + "*";
+  // for (const auto &file : std::filesysfs::directory_iterator(files)) {
+  //     AINFO << file.path() << std::endl;
+  //     // Extract index
+  //     last_index = get_index(file.path());
+  // }
+  // index = last_index;
+
+  ++index;
+  std::string yaml_bak_file = filename + "__" + std::to_string(index);
+  AINFO << "yaml_bak_file: " << yaml_bak_file;
+
+  int is_success = 1;
+  std::string command;
+  command = "cp " + filename + " " + yaml_bak_file;
+  is_success = system(command.c_str());
+  if (is_success == 0) {
+    AINFO << "Couldn't backup the file, " << filename;
+  } else {
+    AINFO << "Backup file, " << filename << " saved.";
+  }
+
+  return true;
+}
+
+bool Visualizer::save_extrinsic_in_yaml(
+  const std::string &camera_name,
+  const Eigen::Matrix4d &extrinsic,
+  const Eigen::Vector4d &quarternion,
+  const double pitch_radian,
+  const double yaw_radian,
+  const double roll_radian) {
+  std::string yaml_file = FLAGS_obs_sensor_intrinsic_path + "/" + camera_name
+                        + "_extrinsics.yaml";
+
+  copy_backup_file(yaml_file);
+
+  AINFO << "extrinsic: " << extrinsic;
+
+  // Save data
+  // Option 1. Save using streaming
+  std::ofstream y_file(yaml_file);
+
+  y_file << "header:\n";
+  y_file << "  seq: 0\n";
+  y_file << "  stamp:\n";
+  y_file << "    secs: 0\n";
+  y_file << "    nsecs: 0\n";
+  y_file << "  frame_id: velodyne128\n";
+  y_file << "child_frame_id: front_6mm\n";
+  y_file << "transform:\n";
+  y_file << "  translation:\n";
+  y_file << "    x: " << extrinsic(0, 3) << "\n";
+  y_file << "    y: " << extrinsic(1, 3) << "\n";
+  y_file << "    z: " << extrinsic(2, 3) << "\n";
+  y_file << "  rotation:\n";
+  y_file << "     x: " << quarternion[0] << "\n";
+  y_file << "     y: " << quarternion[1] << "\n";
+  y_file << "     z: " << quarternion[2] << "\n";
+  y_file << "     w: " << quarternion[3] << "\n";
+  y_file << "  euler_angles_degree:\n";
+  y_file << "     pitch: " << pitch_radian * radian_to_degree_factor_ << "\n";
+  y_file << "     yaw: " << yaw_radian * radian_to_degree_factor_ << "\n";
+  y_file << "     roll: " << roll_radian * radian_to_degree_factor_ << "\n";
+    // Option 2. Use YAML write function.
+  // Alert! Couldn't find a library to save YAML node.
+  // YAML::Node node = YAML::LoadFile(yaml_file);
+
+  // try{
+  //   if (node.IsNull()) {
+  //     AINFO << "Load " << yaml_file << " failed! please check!";
+  //     return false;
+  //   }
+  //   // Replace rotation only
+  //   node["transform"]["rotation"]["x"].as<double>() = quarternion[0];
+  //   node["transform"]["rotation"]["y"].as<double>() = quarternion[1];
+  //   node["transform"]["rotation"]["z"].as<double>() = quarternion[2];
+  //   node["transform"]["rotation"]["w"].as<double>() = quarternion[3];
+  //
+  //   node.SaveFile(yaml_file);
+  //   if (node.IsNull()) {
+  //     AINFO << "Save " << yaml_file << " failed! please check!";
+  //     return false;
+  //   }
+  // } catch (YAML::InvalidNode &in) {
+  //   AERROR << "load/save camera extrisic file " << yaml_file
+  //          << " with error, YAML::InvalidNode exception";
+  //   return false;
+  // } catch (YAML::TypedBadConversion<double> &bc) {
+  //   AERROR << "load camera extrisic file " << yaml_file
+  //          << " with error, YAML::TypedBadConversion exception";
+  //   return false;
+  // } catch (YAML::Exception &e) {
+  //   AERROR << "load camera extrisic file " << yaml_file
+  //          << " with error, YAML exception:" << e.what();
+  //   return false;
+  // }
+
+  return true;
+}
+
+
+bool Visualizer::save_manual_calibration_parameter(
+  const std::string &camera_name,
+  const double pitch_adj_degree,
+  const double yaw_adj_degree,
+  const double roll_adj_degree) {
+  // Convert degree angles to radian angles
+  double pitch_adj_radian = pitch_adj_degree * degree_to_radian_factor_;
+  double yaw_adj_radian = yaw_adj_degree * degree_to_radian_factor_;
+  double roll_adj_radian = roll_adj_degree * degree_to_radian_factor_;
+
+  // Get current angle from extrinsics
+  // ex_camera2lidar_ = extrinsic_map_.at(camera_name);
+  Eigen::Matrix3d R = ex_camera2lidar_.block(0, 0, 3, 3);
+
+  double old_pitch_radian = regularize_angle(atan2(R(2, 1), R(2, 2)));
+  double old_roll_radian = regularize_angle(
+    atan2(-R(2, 0), sqrt(R(2, 1) * R(2, 1) + R(2, 2) * R(2, 2))));
+  double old_yaw_radian = regularize_angle(atan2(R(1, 0), R(0, 0)));
+  AINFO << "Old pitch: " << old_pitch_radian * radian_to_degree_factor_;
+  AINFO << "Old yaw: " << old_yaw_radian * radian_to_degree_factor_;
+  AINFO << "Old roll: " << old_roll_radian * radian_to_degree_factor_;
+  AINFO << "Adjusted pitch: " << pitch_adj_degree;
+  AINFO << "Adjusted yaw: " << yaw_adj_degree;
+  AINFO << "Adjusted roll: " << roll_adj_degree;
+
+  // Convert value here since the coordinate system is different
+
+  // Apply changed angles to each angle
+  double new_pitch_radian =
+    regularize_angle(old_pitch_radian + pitch_adj_radian);
+  double new_yaw_radian = regularize_angle(old_yaw_radian - yaw_adj_radian);
+  double new_roll_radian = regularize_angle(old_roll_radian + roll_adj_radian);
+
+  AINFO << "New pitch: " << new_pitch_radian * radian_to_degree_factor_;
+  AINFO << "New yaw: " << new_yaw_radian * radian_to_degree_factor_;
+  AINFO << "New roll: " << new_roll_radian * radian_to_degree_factor_;
+
+  Eigen::Vector4d quarternion;
+  euler_to_quaternion(&quarternion,
+    new_pitch_radian, new_roll_radian, new_yaw_radian);
+  AINFO << "Quarternion X: " << quarternion[0]
+        << ", Y: " << quarternion[1]
+        << ", Z: " << quarternion[2]
+        << ", W: " << quarternion[3];
+  // Save the file
+  // Yaw and Roll are swapped.
+  save_extrinsic_in_yaml(camera_name, ex_camera2lidar_, quarternion,
+    new_pitch_radian, new_yaw_radian, new_roll_radian);
+
+  return true;
+}
+
 bool Visualizer::key_handler(const std::string &camera_name, const int key) {
   AINFO << "Pressed Key: " << key;
   if (key <= 0) {
@@ -442,40 +685,50 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
       show_velocity_ = (show_velocity_ + 1) % 2;
       break;
     case 65362:  // Up_Arrow
-      if (pitch_adj_degree_ - 0.05 <= max_pitch_degree_) {
-        pitch_adj_degree_ += 0.05;
-      }
-      AINFO << "Current pitch: " << pitch_adj_degree_;
-      break;
-    case 65364:  // Down_Arrow
-      if (pitch_adj_degree_ + 0.05 >= min_pitch_degree_) {
+      if (pitch_adj_degree_ + 0.05 <= max_pitch_degree_) {
         pitch_adj_degree_ -= 0.05;
       }
       AINFO << "Current pitch: " << pitch_adj_degree_;
       break;
-    case 65363:  // Right_Arrow
-      if (yaw_adj_degree_ - 0.05 <= max_yaw_degree_) {
-        yaw_adj_degree_ += 0.05;
+    case 65364:  // Down_Arrow
+      if (pitch_adj_degree_ - 0.05 >= min_pitch_degree_) {
+        pitch_adj_degree_ += 0.05;
       }
-      AINFO << "Current yaw: " << yaw_adj_degree_;
+      AINFO << "Current pitch: " << pitch_adj_degree_;
       break;
-    case 65361:  // Left_Arrow
-      if (yaw_adj_degree_ + 0.05 >= min_yaw_degree_) {
+    case 65363:  // Right_Arrow
+      if (yaw_adj_degree_ + 0.05 <= max_yaw_degree_) {
         yaw_adj_degree_ -= 0.05;
       }
       AINFO << "Current yaw: " << yaw_adj_degree_;
       break;
+    case 65361:  // Left_Arrow
+      if (yaw_adj_degree_ - 0.05 >= min_yaw_degree_) {
+        yaw_adj_degree_ += 0.05;
+      }
+      AINFO << "Current yaw: " << yaw_adj_degree_;
+      break;
     case 130899:  // SHIFT + Right_Arrow
-      if (roll_adj_degree_ - 0.05 <= max_roll_degree_) {
-        roll_adj_degree_ += 0.05;
+      if (roll_adj_degree_ + 0.05 <= max_roll_degree_) {
+        roll_adj_degree_ -= 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_;
       break;
     case 130897:  // SHIFT + Left_Arrow
-      if (roll_adj_degree_ + 0.05 >= min_roll_degree_) {
-        roll_adj_degree_ -= 0.05;
+      if (roll_adj_degree_ - 0.05 >= min_roll_degree_) {
+        roll_adj_degree_ += 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_;
+      break;
+    case 262259:  // CTRL + S
+      save_manual_calibration_parameter(camera_name,
+        pitch_adj_degree_,
+        yaw_adj_degree_,
+        roll_adj_degree_);
+        AINFO << "Saved calibration parameters(pyr): ("
+              << pitch_adj_degree_ << ", "
+              << yaw_adj_degree_ << ", "
+              << roll_adj_degree_ << ")";
       break;
     default:
       break;
@@ -630,13 +883,10 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
     draw_range_circle();
   }
 
-  cv::putText(image, "timestamp:" + std::to_string(frame.timestamp),
-              cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              cv::Scalar(0, 0, 255), 3);
-  cv::putText(image, "camera_name: " + camera_name, cv::Point(10, 100),
+  cv::putText(image, camera_name, cv::Point(10, 50),
               cv::FONT_HERSHEY_DUPLEX, 1.3, cv::Scalar(0, 0, 255), 3);
-  cv::putText(image, "frame id: " + std::to_string(frame.frame_id),
-              cv::Point(10, 150), cv::FONT_HERSHEY_DUPLEX, 1.3,
+  cv::putText(image, "frame #: " + std::to_string(frame.frame_id),
+              cv::Point(10, 100), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
   Draw2Dand3D(image, frame);
 }
@@ -856,13 +1106,10 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   // draw results on visulization panel
   cv::Mat image = img.clone();
   std::string camera_name = frame.data_provider->sensor_name();
-  cv::putText(image, "timestamp:" + std::to_string(frame.timestamp),
-              cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX, 1.3,
-              cv::Scalar(0, 0, 255), 3);
-  cv::putText(image, "camera_name: " + camera_name, cv::Point(10, 100),
+  cv::putText(image, camera_name, cv::Point(10, 50),
               cv::FONT_HERSHEY_DUPLEX, 1.3, cv::Scalar(0, 0, 255), 3);
   cv::putText(image, "frame id: " + std::to_string(frame.frame_id),
-              cv::Point(10, 150), cv::FONT_HERSHEY_DUPLEX, 1.3,
+              cv::Point(10, 100), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
   if (intrinsic_map_.find(camera_name) != intrinsic_map_.end() &&
       extrinsic_map_.find(camera_name) != extrinsic_map_.end()) {
@@ -881,7 +1128,6 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
       bigimg(cv::Rect(0, small_h_, small_w_, small_h_)));
   world_image_.copyTo(bigimg(cv::Rect(small_w_, 0, wide_pixel_, world_h_)));
 
-  AINFO << "image copied";
   // output visualization panel
   if (write_out_img_) {
     char path[1000];
@@ -919,10 +1165,8 @@ void Visualizer::draw_range_circle() {
 
 cv::Point Visualizer::world_point_to_bigimg(const Eigen::Vector2d &p) {
   cv::Point point;
-  AINFO << "[world_point_to_bigimg] p: " << p;
   point.x = static_cast<int>(-p[1] * m2pixel_ + wide_pixel_ * 0.5);
   point.y = static_cast<int>(world_h_ - p[0] * m2pixel_);
-  AINFO << "[world_point_to_bigimg] point.[x,y]: " << point;
   return point;
 }
 
@@ -931,8 +1175,6 @@ Eigen::Vector2d Visualizer::image2ground(cv::Point p_img) {
 
   p_homo << p_img.x, p_img.y, 1;
   Eigen::Vector3d p_ground;
-  AINFO << "p_image: " << p_homo;
-  AINFO << "homography_image2ground_: " << homography_image2ground_;
   p_ground = homography_image2ground_ * p_homo;
   if (fabs(p_ground[2]) > std::numeric_limits<double>::min()) {
     p_ground[0] = p_ground[0] / p_ground[2];
@@ -940,7 +1182,6 @@ Eigen::Vector2d Visualizer::image2ground(cv::Point p_img) {
   } else {
     AINFO << "p_ground[2] too small :" << p_ground[2];
   }
-  AINFO << "p_ground: " << p_ground;
   return p_ground.block(0, 0, 2, 1);
 }
 cv::Point Visualizer::ground2image(Eigen::Vector2d p_ground) {
