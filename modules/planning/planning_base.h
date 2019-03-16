@@ -75,9 +75,6 @@ class PlanningBase {
   virtual void FillPlanningPb(const double timestamp,
                               ADCTrajectory* const trajectory_pb);
 
-  virtual void ExportChart(const planning_internal::Debug& debug_info,
-                           planning_internal::Debug* debug_chart);
-
   LocalView local_view_;
   const hdmap::HDMap* hdmap_ = nullptr;
 
