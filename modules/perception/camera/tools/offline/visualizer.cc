@@ -322,7 +322,7 @@ std::string Visualizer::type_to_string(
     case apollo::perception::base::ObjectType::VEHICLE:
       return "VEH";
     default:
-      return "WRNG";
+      break;
   }
   return "WRNG";
 }
@@ -355,10 +355,11 @@ std::string Visualizer::sub_type_to_string(
     case apollo::perception::base::ObjectSubType::TRAFFICCONE:
       return "CONE";
     default:
-      return "WRNG";
+      break;
   }
   return "WRNG";
 }
+
 bool Visualizer::reset_key() {
   use_class_color_ = true;
   capture_screen_ = false;
@@ -391,6 +392,7 @@ double Visualizer::regularize_angle(const double radian_angle) {
   }
   return radian_angle;
 }
+
 // ZYX Euler angles to quaternion
 bool Visualizer::euler_to_quaternion(
   Eigen::Vector4d *quarternion,
@@ -448,17 +450,16 @@ bool Visualizer::euler_to_quaternion(
     if (fabs(qx) < 1.0e-6) {
       AWARN << "quarternion is degenerate qw: " << qw << "qx: " << qx;
       return false;
-    } else {
-      (*quarternion)[0] = qx;  // Q.x
-      (*quarternion)[1] = 0.25 * (R(0, 1) + R(1, 0)) / qx;  // Q.y
-      (*quarternion)[2] = 0.25 * (R(0, 2) + R(2, 0)) / qx;  // Q.z
-      (*quarternion)[3] = 0.25 * (R(2, 1) - R(1, 2)) / qx;  // Q.w
-      AINFO << "second quarternion(x, y, z, w): ("
-            << (*quarternion)[0] << ", "
-            << (*quarternion)[1] << ", "
-            << (*quarternion)[2] << ", "
-            << (*quarternion)[3] << ")";
     }
+    (*quarternion)[0] = qx;  // Q.x
+    (*quarternion)[1] = 0.25 * (R(0, 1) + R(1, 0)) / qx;  // Q.y
+    (*quarternion)[2] = 0.25 * (R(0, 2) + R(2, 0)) / qx;  // Q.z
+    (*quarternion)[3] = 0.25 * (R(2, 1) - R(1, 2)) / qx;  // Q.w
+    AINFO << "second quarternion(x, y, z, w): ("
+          << (*quarternion)[0] << ", "
+          << (*quarternion)[1] << ", "
+          << (*quarternion)[2] << ", "
+          << (*quarternion)[3] << ")";
   }
   return true;
 }
@@ -477,14 +478,12 @@ bool Visualizer::copy_backup_file(
 
   ++index;
   std::string yaml_bak_file = filename + "__" + std::to_string(index);
-  AINFO << "yaml_bak_file: " << yaml_bak_file;
+  AINFO << "yaml_backup_file: " << yaml_bak_file;
 
-  int is_success = 1;
-  std::string command;
-  command = "cp " + filename + " " + yaml_bak_file;
-  is_success = system(command.c_str());
-  if (is_success == 0) {
-    AINFO << "Couldn't backup the file, " << filename;
+  std::string command = "cp " + filename + " " + yaml_bak_file;
+  int ret = system(command.c_str());
+  if (ret != 0) {
+    AINFO << "Cannot backup the file, " << filename;
   } else {
     AINFO << "Backup file, " << filename << " saved.";
   }
@@ -500,7 +499,7 @@ bool Visualizer::save_extrinsic_in_yaml(
   const double yaw_radian,
   const double roll_radian) {
   std::string yaml_file = FLAGS_obs_sensor_intrinsic_path + "/" + camera_name
-                        + "_extrinsics.yaml";
+                          + "_extrinsics.yaml";
 
   copy_backup_file(yaml_file);
 
@@ -1117,7 +1116,7 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
         image, frame, intrinsic_map_.at(camera_name).cast<double>(),
         extrinsic_map_.at(camera_name));
   } else {
-    AERROR << "fail to find necessuary intrinsic or extrinsic params.";
+    AERROR << "Failed to find necessuary intrinsic or extrinsic params.";
   }
 
   // copy visual results into visualization panel
