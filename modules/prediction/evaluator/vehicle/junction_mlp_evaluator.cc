@@ -361,6 +361,7 @@ void JunctionMLPEvaluator::LoadModel() {
   //   ADEBUG << "CUDA is available";
   //   device_ = torch::Device(torch::kCUDA);
   // }
+  torch::set_num_threads(1);
   torch_model_ptr_ =
       torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
 }
