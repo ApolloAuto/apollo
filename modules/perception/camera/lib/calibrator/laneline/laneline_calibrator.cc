@@ -35,16 +35,15 @@ bool LaneLineCalibrator::Calibrate(const CalibratorOptions &options,
                                    float *pitch_angle) {
   CHECK(pitch_angle != nullptr);
   EgoLane ego_lane;
-  bool loaded = LoadEgoLaneline(*options.lane_objects, &ego_lane);
-  if (!loaded) {
-    AINFO << "Fail to get the ego lane";
+  if (!LoadEgoLaneline(*options.lane_objects, &ego_lane)) {
+    AINFO << "Failed to get the ego lane.";
     return false;
   }
 
   double cam_ori[4] = {0};
   cam_ori[3] = 1.0;
 
-  // camera to world pose
+  // Camera to world pose
   Eigen::Affine3d c2w = *options.camera2world_pose;
 
   double p2w[12] = {
@@ -98,7 +97,7 @@ bool LaneLineCalibrator::LoadEgoLaneline(
   CHECK(ego_lane != nullptr);
   bool found_ego_left = false;
   bool found_ego_right = false;
-  // using points from model fitting
+  // Using points from model fitting
   for (size_t i = 0; i < lane_objects.size(); ++i) {
     if (lane_objects[i].pos_type == base::LaneLinePositionType::EGO_LEFT) {
       int num_points =
