@@ -20,8 +20,11 @@
 
 #include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 
+#include <algorithm>
+
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/util/util.h"
@@ -110,6 +113,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     return;
   }
 
+  const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
 
   const std::vector<PathOverlap>& traffic_light_overlaps =
@@ -125,6 +129,38 @@ void DeciderRuleBasedStop::CheckTrafficLight(
         std::find(stop_done_overlap_ids.begin(), stop_done_overlap_ids.end(),
                   traffic_light_overlap.object_id)) {
       continue;
+    }
+
+    // work around incorrect s-projection along round routing
+    const double kTrafficLightLookForwardDistanceConfGuard = 135.0;
+    const double kTrafficLightDistance = 50.0;
+    const double monitor_forward_distance =
+        std::max(kTrafficLightLookForwardDistanceConfGuard,
+                 config_.decider_rule_based_stop_config().traffic_light()
+                     .max_monitor_forward_distance());
+    if (traffic_light_overlap.start_s - adc_front_edge_s >
+        monitor_forward_distance) {
+      const auto& reference_line = reference_line_info->reference_line();
+      common::SLPoint traffic_light_sl;
+      traffic_light_sl.set_s(traffic_light_overlap.start_s);
+      traffic_light_sl.set_l(0);
+      common::math::Vec2d traffic_light_point;
+      reference_line.SLToXY(traffic_light_sl, &traffic_light_point);
+
+      common::math::Vec2d adc_position = {
+          common::VehicleStateProvider::Instance()->x(),
+          common::VehicleStateProvider::Instance()->y()};
+
+      const double distance =
+          common::util::DistanceXY(traffic_light_point, adc_position);
+      ADEBUG << "traffic_light[" << traffic_light_overlap.object_id
+             << "] start_s[" << traffic_light_overlap.start_s
+             << "] actual_distance[" << distance << "]";
+      if (distance < kTrafficLightDistance) {
+        ADEBUG << "SKIP traffic_light[" << traffic_light_overlap.object_id
+               << "] close in position, but far away along reference line";
+        continue;
+      }
     }
 
     auto signal_color =
