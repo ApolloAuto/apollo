@@ -253,8 +253,7 @@ void PathAssessmentDecider::SetPathPointType(
         }
       } else {
         // The path point is within the reference_line's lane.
-        std::get<1>((*path_decision)[i]) =
-            PathData::PathPointType::IN_LANE;
+        std::get<1>((*path_decision)[i]) = PathData::PathPointType::IN_LANE;
       }
     }
   }
