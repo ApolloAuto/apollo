@@ -20,6 +20,8 @@
 #include <mutex>
 #include <stdexcept>
 
+#include "glog/logging.h"
+
 /**
  * @brief MUST implement the following two routine if don't use std::mutex
  */
@@ -31,58 +33,51 @@ void InternalUnLock(T *t);
 /**
  * @brief override these two routines for other synchronization methods.
  */
-void InternalLock(std::mutex *t) noexcept(false) {
-    if (!t)
-        throw std::errc::bad_address;
-    else
-        t->lock();
+void InternalLock(std::mutex *t) {
+  CHECK(t != nullptr);
+  t->lock();
 }
 
-void InternalUnLock(std::mutex *t) noexcept(false) {
-    if (!t)
-        throw std::errc::bad_address;
-    else
-        t->unlock();
+void InternalUnLock(std::mutex *t) {
+  CHECK(t !=  nullptr);
+  t->unlock();
 }
-
 
 template<typename T = std::mutex>
 class AutoLock {
  public:
-    explicit AutoLock(std::mutex *t) noexcept(false):
-        t_(t),
-        lock_(false) {
-        Lock();
-    }
+  explicit AutoLock(std::mutex *t) :
+    t_(t),
+    lock_(false) {
+    Lock();
+  }
 
-    ~AutoLock() noexcept(false) {
-        UnLock();
-    }
+  ~AutoLock() {
+    UnLock();
+  }
 
  public:
-    void UnLock() noexcept(false) {
-        if (!t_)
-            throw std::errc::bad_address;
-        if (lock_) {
-            InternalUnLock(t_);
-            lock_ = false;
-        }
+  void UnLock() {
+    CHECK( t != nullptr);
+    if (lock_) {
+      InternalUnLock(t_);
+      lock_ = false;
     }
+  }
 
  private:
-    void Lock() noexcept(false) {
-        if (!t_)
-            throw std::errc::bad_address;
-        if (!lock_) {
-            InternalLock(t_);
-            lock_ = true;
-        }
+  void Lock() {
+    CHECK(t != nullptr);
+    if (!lock_) {
+      InternalLock(t_);
+      lock_ = true;
     }
+  }
 
  private:
-    T *t_;
-    std::atomic_bool lock_;
+  T *t_;
+  std::atomic_bool lock_;
 
  private:
-    AutoLock &operator= (const AutoLock &rhs);
+  AutoLock &operator= (const AutoLock &rhs);
 };
