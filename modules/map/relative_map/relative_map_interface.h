@@ -54,16 +54,6 @@ class RelativeMapInterface : public apollo::common::ApolloApp {
         Name(), relative_map);
     apollo::common::adapter::AdapterManager::PublishRelativeMap(*relative_map);
   }
-
-  /**
-   * @brief Fill the header and publish the navigation info message.
-   */
-  void PublishNavigationInfo(NavigationInfo* const navigation_info) {
-    apollo::common::adapter::AdapterManager::FillNavigationHeader(
-        Name(), navigation_info);
-    apollo::common::adapter::AdapterManager::PublishNavigation(
-        *navigation_info);
-  }
 };
 
 }  // namespace relative_map

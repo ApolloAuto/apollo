@@ -219,7 +219,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
 }
 
 bool RelativeMap::GetNavigationPathList(
-                  std::vector<std::string>* const path_list) {
+    std::vector<std::string>* const path_list) const {
   if (!path_list) {
     return false;
   }
@@ -292,6 +292,14 @@ void RelativeMap::LoadNavigationPath() {
   PublishNavigationInfo(&navigation_info);
 
   navigation_lane_.UpdateNavigationInfo(std::move(navigation_info));
+}
+
+void RelativeMap::PublishNavigationInfo(
+    NavigationInfo* const navigation_info) const {
+  apollo::common::adapter::AdapterManager::FillNavigationHeader(
+      Name(), navigation_info);
+  apollo::common::adapter::AdapterManager::PublishNavigation(
+      *navigation_info);
 }
 
 void RelativeMap::Stop() {
