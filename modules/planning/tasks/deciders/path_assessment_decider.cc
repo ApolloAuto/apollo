@@ -276,12 +276,8 @@ void PathAssessmentDecider::SetObstacleDistance(
       continue;
     }
     // Convert into polygon and save it.
-    const auto obstacle_sl = obstacle->PerceptionSLBoundary();
-    obstacle_polygons.push_back(
-        Polygon2d({Vec2d(obstacle_sl.start_s(), obstacle_sl.start_l()),
-                   Vec2d(obstacle_sl.start_s(), obstacle_sl.end_l()),
-                   Vec2d(obstacle_sl.end_s(), obstacle_sl.end_l()),
-                   Vec2d(obstacle_sl.end_s(), obstacle_sl.start_l())}));
+    const auto obstacle_box = obstacle->PerceptionBoundingBox();
+    obstacle_polygons.push_back(Polygon2d(obstacle_box));
   }
 
   // Go through every path point, update closest obstacle info.
@@ -292,7 +288,7 @@ void PathAssessmentDecider::SetObstacleDistance(
     const auto& vehicle_box =
         common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
     // Go through all the obstacle polygons, and update the min distance.
-    double min_distance_to_obstacles = 10000.0;
+    double min_distance_to_obstacles = std::numeric_limits<double>::max();
     for (const auto& obstacle_polygon : obstacle_polygons) {
       double distance_to_vehicle = obstacle_polygon.DistanceTo(vehicle_box);
       min_distance_to_obstacles = std::min(
