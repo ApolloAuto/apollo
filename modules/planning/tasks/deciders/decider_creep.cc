@@ -62,7 +62,8 @@ Status DeciderCreep::Process(Frame* frame,
 }
 
 double DeciderCreep::FindCreepDistance(
-    const Frame& frame, const ReferenceLineInfo& reference_line_info) {
+    const Frame& frame,
+    const ReferenceLineInfo& reference_line_info) {
   // more delicate design of creep distance
   return 0.5;
 }
@@ -116,8 +117,8 @@ bool DeciderCreep::BuildStopDecision(const double stop_sign_overlap_end_s,
 bool DeciderCreep::CheckCreepDone(const Frame& frame,
                                   const ReferenceLineInfo& reference_line_info,
                                   const double stop_sign_overlap_end_s,
-                                  const double wait_time,
-                                  const double timeout) {
+                                  const double wait_time_sec,
+                                  const double timeout_sec) {
   const auto& creep_config = config_.decider_creep_config();
   bool creep_done = false;
   double creep_stop_s =
@@ -126,7 +127,7 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
   const double distance =
       creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
   if (distance < creep_config.max_valid_stop_distance() ||
-      wait_time >= timeout) {
+      wait_time_sec >= timeout_sec) {
     bool all_far_away = true;
     for (auto* obstacle :
          reference_line_info.path_decision().obstacles().Items()) {

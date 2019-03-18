@@ -87,7 +87,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   const double wait_time = Clock::NowInSeconds() - start_time;
   ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
          << "]";
-  if (wait_time < scenario_config_.stop_duration()) {
+  if (wait_time < scenario_config_.stop_duration_sec()) {
     return Stage::RUNNING;
   }
 
@@ -125,7 +125,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
           PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
 
   // check timeout while waiting for only one vehicle
-  if (wait_time > scenario_config_.stop_timeout() &&
+  if (wait_time > scenario_config_.stop_timeout_sec() &&
       watch_vehicle_ids.size() <= 1) {
     return FinishStage();
   }
