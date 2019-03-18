@@ -101,13 +101,8 @@ message ScenarioSidePassConfig {
   optional double stop_fence_distance_to_blocking_obstacle = 10 [default = 6.0];
 }
 
-message ScenarioBareIntersectionProtectedConfig {
-  optional double start_bare_intersection_protected_scenario_distance = 1 [default = 5.0];  // meter
-  optional double min_pass_s_distance = 2 [default = 3.0];  // meter
-}
-
 message ScenarioBareIntersectionUnprotectedConfig {
-  optional double start_bare_intersection_unprotected_scenario_distance = 1 [default = 40.0];  // meter
+  optional double start_bare_intersection_scenario_distance = 1 [default = 40.0];  // meter
   optional double min_pass_s_distance = 2 [default = 3.0];  // meter
   optional float stop_timeout = 3 [default = 8.0];  // sec
   optional float creep_timeout = 4 [default = 10.0];  // sec
@@ -166,20 +161,19 @@ message ScenarioConfig {
     SIDE_PASS = 2;  // go around an object when it blocks the road
 
     // intersection involved
-    BARE_INTERSECTION_PROTECTED = 3;
-    BARE_INTERSECTION_UNPROTECTED = 4;
-    STOP_SIGN_PROTECTED = 5;
-    STOP_SIGN_UNPROTECTED = 6;
-    TRAFFIC_LIGHT_PROTECTED = 7;
-    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN = 8;
-    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN = 9;
-    YIELD_SIGN_UNPROTECTED = 10;
+    BARE_INTERSECTION_UNPROTECTED = 3;
+    STOP_SIGN_PROTECTED = 4;
+    STOP_SIGN_UNPROTECTED = 5;
+    TRAFFIC_LIGHT_PROTECTED = 6;
+    TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN = 7;
+    TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN = 8;
+    YIELD_SIGN_UNPROTECTED = 9;
 
     // parking
-    VALET_PARKING = 11;
+    VALET_PARKING = 10;
 
     // misc
-    NARROW_STREET_U_TURN = 12;
+    NARROW_STREET_U_TURN = 11;
   }
 
   // StageType is a superset of stages from all scenarios.
@@ -196,12 +190,9 @@ message ScenarioConfig {
     SIDE_PASS_PASS_OBSTACLE = 104;
     SIDE_PASS_BACKUP = 105;
 
-    BARE_INTERSECTION_PROTECTED_APPROACH = 200;
-    BARE_INTERSECTION_PROTECTED_INTERSECTION_CRUISE = 201;
-
-    BARE_INTERSECTION_UNPROTECTED_APPROCH = 210;
-    BARE_INTERSECTION_UNPROTECTED_CREEP = 211 ;
-    BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE = 212;
+    BARE_INTERSECTION_UNPROTECTED_APPROACH = 200;
+    BARE_INTERSECTION_UNPROTECTED_CREEP = 201 ;
+    BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE = 202;
 
     STOP_SIGN_UNPROTECTED_PRE_STOP = 300;
     STOP_SIGN_UNPROTECTED_STOP = 301;
@@ -235,19 +226,18 @@ message ScenarioConfig {
   oneof scenario_config {
     ScenarioLaneFollowConfig lane_follow_config = 2;
     ScenarioSidePassConfig side_pass_config = 3;
-    ScenarioBareIntersectionProtectedConfig bare_intersection_protected_config = 4;
-    ScenarioBareIntersectionUnprotectedConfig bare_intersection_unprotected_config = 5;
-    ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 6;
-    ScenarioTrafficLightProtectedConfig traffic_light_protected_config = 7;
-    ScenarioTrafficLightUnprotectedRightTurnConfig traffic_light_unprotected_right_turn_config = 8;
-    ScenarioTrafficLightUnprotectedLeftTurnConfig traffic_light_unprotected_left_turn_config = 9;
-    ScenarioValetParkingConfig valet_parking_config = 10;
-    ScenarioNarrowStreetUTurnConfig narrow_street_u_turn_config = 11;
+    ScenarioBareIntersectionUnprotectedConfig bare_intersection_unprotected_config = 4;
+    ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 5;
+    ScenarioTrafficLightProtectedConfig traffic_light_protected_config = 6;
+    ScenarioTrafficLightUnprotectedRightTurnConfig traffic_light_unprotected_right_turn_config = 7;
+    ScenarioTrafficLightUnprotectedLeftTurnConfig traffic_light_unprotected_left_turn_config = 8;
+    ScenarioValetParkingConfig valet_parking_config = 9;
+    ScenarioNarrowStreetUTurnConfig narrow_street_u_turn_config = 10;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
-  repeated StageType stage_type = 12;
+  repeated StageType stage_type = 11;
   // an unordered list of stage configs.
-  repeated StageConfig stage_config = 13;
+  repeated StageConfig stage_config = 12;
 }
 
 message PlannerPublicRoadConfig {

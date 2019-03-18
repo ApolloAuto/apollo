@@ -3,14 +3,14 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "bare_intersection_protected_scenario",
+    name = "bare_intersection_unprotected_scenario",
     srcs = [
-        "bare_intersection_protected_scenario.cc",
+        "bare_intersection_unprotected_scenario.cc",
         "stage_approach.cc",
         "stage_intersection_cruise.cc",
     ],
     hdrs = [
-        "bare_intersection_protected_scenario.h",
+        "bare_intersection_unprotected_scenario.h",
         "stage_approach.h",
         "stage_intersection_cruise.h",
     ],
@@ -29,12 +29,12 @@ cc_library(
 )
 
 cc_test(
-    name = "bare_intersection_protected_scenario_test",
+    name = "bare_intersection_unprotected_scenario_test",
     size = "small",
-    srcs = ["bare_intersection_protected_scenario_test.cc"],
+    srcs = ["bare_intersection_unprotected_scenario_test.cc"],
     data = ["//modules/planning:planning_conf"],
     deps = [
-        ":bare_intersection_protected_scenario",
+        ":bare_intersection_unprotected_scenario",
         "@gtest//:main",
     ],
 )

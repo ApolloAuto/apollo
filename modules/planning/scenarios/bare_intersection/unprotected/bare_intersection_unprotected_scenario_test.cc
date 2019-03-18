@@ -20,7 +20,7 @@
 
 #define protected public
 #define private public
-#include "modules/planning/scenarios/bare_intersection/protected/bare_intersection_protected_scenario.h"
+#include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 
 #include "gtest/gtest.h"
 
@@ -33,37 +33,37 @@ namespace planning {
 namespace scenario {
 namespace bare_intersection {
 
-class BareIntersectionProtectedScenarioTest : public ::testing::Test {
+class BareIntersectionUnprotectedScenarioTest : public ::testing::Test {
  public:
   virtual void SetUp() {}
 
  protected:
-  std::unique_ptr<BareIntersectionProtectedScenario> scenario_;
+  std::unique_ptr<BareIntersectionUnprotectedScenario> scenario_;
 };
 
-TEST_F(BareIntersectionProtectedScenarioTest, VerifyConf) {
-  FLAGS_scenario_bare_intersection_protected_config_file =
+TEST_F(BareIntersectionUnprotectedScenarioTest, VerifyConf) {
+  FLAGS_scenario_bare_intersection_unprotected_config_file =
       "/apollo/modules/planning/conf/"
-      "scenario/bare_intersection_protected_config.pb.txt";
+      "scenario/bare_intersection_unprotected_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_bare_intersection_protected_config_file, &config));
+      FLAGS_scenario_bare_intersection_unprotected_config_file, &config));
 }
 
-TEST_F(BareIntersectionProtectedScenarioTest, Init) {
-  FLAGS_scenario_bare_intersection_protected_config_file =
+TEST_F(BareIntersectionUnprotectedScenarioTest, Init) {
+  FLAGS_scenario_bare_intersection_unprotected_config_file =
       "/apollo/modules/planning/testdata/conf/"
-      "scenario/bare_intersection_protected_config.pb.txt";
+      "scenario/bare_intersection_unprotected_config.pb.txt";
 
   ScenarioConfig config;
   EXPECT_TRUE(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_scenario_bare_intersection_protected_config_file, &config));
+      FLAGS_scenario_bare_intersection_unprotected_config_file, &config));
 
   ScenarioContext context;
-  scenario_.reset(new BareIntersectionProtectedScenario(config, &context));
+  scenario_.reset(new BareIntersectionUnprotectedScenario(config, &context));
   EXPECT_EQ(scenario_->scenario_type(),
-            ScenarioConfig::BARE_INTERSECTION_PROTECTED);
+            ScenarioConfig::BARE_INTERSECTION_UNPROTECTED);
 }
 
 }  // namespace bare_intersection

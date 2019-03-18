@@ -18,40 +18,39 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/bare_intersection/protected/stage_intersection_cruise.h"
+#pragma once
 
-#include "cyber/common/log.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
-#include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
+
+#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace bare_intersection {
 
-using common::TrajectoryPoint;
-using hdmap::PathOverlap;
+struct BareIntersectionUnprotectedContext;
 
-Stage::StageStatus BareIntersectionProtectedStageIntersectionCruise::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
-  ADEBUG << "stage: IntersectionCruise";
-  CHECK_NOTNULL(frame);
+class BareIntersectionUnprotectedStageIntersectionCruise : public Stage {
+ public:
+  explicit BareIntersectionUnprotectedStageIntersectionCruise(
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
 
-  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "BareIntersectionProtectedStageIntersectionCruise plan error";
+ private:
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
+
+  BareIntersectionUnprotectedContext* GetContext() {
+    return GetContextAs<BareIntersectionUnprotectedContext>();
   }
 
-  // TODO(all): to be implemented
+ private:
+  Stage::StageStatus FinishStage();
 
-  return Stage::RUNNING;
-}
-
-Stage::StageStatus
-BareIntersectionProtectedStageIntersectionCruise::FinishStage() {
-  return FinishScenario();
-}
+ private:
+  ScenarioBareIntersectionUnprotectedConfig scenario_config_;
+};
 
 }  // namespace bare_intersection
 }  // namespace scenario
