@@ -257,10 +257,12 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
     return;
   }
 
-  double speed_limit =
+  const double speed_limit =
       st_graph_data_.speed_limit().GetSpeedLimitByS(unit_s_ * r);
-  double soft_speed_limit =
-      st_graph_data_.speed_limit().GetSoftSpeedLimitByS(unit_s_ * r);
+  const double soft_speed_limit =
+      FLAGS_enable_soft_speed_limit
+          ? st_graph_data_.speed_limit().GetSoftSpeedLimitByS(unit_s_ * r)
+          : speed_limit;
 
   if (c == 1) {
     const double acc = (r * unit_s_ / unit_t_ - init_point_.v()) / unit_t_;
