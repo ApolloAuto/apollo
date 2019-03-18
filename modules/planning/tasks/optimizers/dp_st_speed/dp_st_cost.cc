@@ -189,14 +189,17 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
             -det_speed * unit_t_;
   }
 
-  double soft_det_speed = (speed - soft_speed_limit) / soft_speed_limit;
-  if (soft_det_speed > 0) {
-    cost += config_.exceed_soft_speed_penalty() * config_.default_speed_cost() *
-            fabs(speed * speed) * unit_t_;
-  } else if (soft_det_speed < 0) {
-    cost += config_.low_soft_speed_penalty() * config_.default_speed_cost() *
-            -soft_det_speed * unit_t_;
+  if (FLAGS_enable_soft_speed_limit) {
+    double soft_det_speed = (speed - soft_speed_limit) / soft_speed_limit;
+    if (soft_det_speed > 0) {
+      cost += config_.exceed_soft_speed_penalty() *
+              config_.default_speed_cost() * fabs(speed * speed) * unit_t_;
+    } else if (soft_det_speed < 0) {
+      cost += config_.low_soft_speed_penalty() * config_.default_speed_cost() *
+              -soft_det_speed * unit_t_;
+    }
   }
+
   return cost;
 }
 
