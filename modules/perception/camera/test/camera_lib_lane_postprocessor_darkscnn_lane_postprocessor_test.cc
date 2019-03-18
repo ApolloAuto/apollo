@@ -187,9 +187,8 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
   extrinsic_map["onsemi_obstacle"] = ex_camera2lidar;
 
   EXPECT_TRUE(visualize_.Init_all_info_single_camera(
-      visual_camera, intrinsic_map, extrinsic_map, ex_lidar2imu,
-      pitch_adj, yaw_adj, roll_adj,
-      calibration_service_init_options.image_height,
+      visual_camera, intrinsic_map, extrinsic_map, ex_lidar2imu, pitch_adj,
+      yaw_adj, roll_adj, calibration_service_init_options.image_height,
       calibration_service_init_options.image_width));
   homography_im2car_ = visualize_.homography_im2car();
   lane_postprocessor->SetIm2CarHomography(homography_im2car_);

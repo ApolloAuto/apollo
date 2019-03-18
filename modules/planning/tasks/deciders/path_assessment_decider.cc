@@ -40,20 +40,18 @@ Status PathAssessmentDecider::Process(
 
   // Check the validity of paths (the optimization output).
   // 1. Check the validity of regular and fallback paths.
-  PathData* regular_path_data =
-      reference_line_info->mutable_path_data();
+  PathData* regular_path_data = reference_line_info->mutable_path_data();
   PathData* fallback_path_data =
       reference_line_info->mutable_fallback_path_data();
-  bool is_valid_regular_path = IsValidRegularPath(
-      *reference_line_info, *regular_path_data);
-  bool is_valid_fallback_path = IsValidFallbackPath(
-      *reference_line_info, *fallback_path_data);
+  bool is_valid_regular_path =
+      IsValidRegularPath(*reference_line_info, *regular_path_data);
+  bool is_valid_fallback_path =
+      IsValidFallbackPath(*reference_line_info, *fallback_path_data);
   // 2. If neither is valid, use the reference_line as the ultimate fallback.
   if (!is_valid_regular_path && !is_valid_fallback_path) {
     reference_line_info->SetFeasiblePathData(
         ReferenceLineInfo::PathDataType::REFERENCE_LINE_PATH);
-    const std::string msg =
-        "Neither regular nor fallback path is valid.";
+    const std::string msg = "Neither regular nor fallback path is valid.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
@@ -140,8 +138,7 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
       continue;
     }
     //  - Must not be ignore-decision obstacles.
-    if (obstacle->HasLongitudinalDecision() &&
-        obstacle->HasLateralDecision() &&
+    if (obstacle->HasLongitudinalDecision() && obstacle->HasLateralDecision() &&
         obstacle->IsIgnore()) {
       continue;
     }
@@ -168,8 +165,8 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
     for (const auto& corner_point : ABCDpoints) {
       // For each corner point, project it onto reference_line
       common::SLPoint curr_point_sl;
-      if (!reference_line_info.reference_line().
-          XYToSL(corner_point, &curr_point_sl)) {
+      if (!reference_line_info.reference_line().XYToSL(corner_point,
+                                                       &curr_point_sl)) {
         AERROR << "Failed to get the projection from point onto "
                   "reference_line";
         return true;

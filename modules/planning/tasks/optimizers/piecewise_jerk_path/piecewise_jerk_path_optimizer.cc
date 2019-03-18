@@ -46,31 +46,28 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
-  std::array<double, 5> w = {
-      piecewise_jerk_path_config.l_weight(),
-      piecewise_jerk_path_config.dl_weight(),
-      piecewise_jerk_path_config.ddl_weight(),
-      piecewise_jerk_path_config.dddl_weight(),
-      0.0
-  };
+  std::array<double, 5> w = {piecewise_jerk_path_config.l_weight(),
+                             piecewise_jerk_path_config.dl_weight(),
+                             piecewise_jerk_path_config.ddl_weight(),
+                             piecewise_jerk_path_config.dddl_weight(), 0.0};
 
   {
     std::vector<std::pair<double, double>> lat_boundaries;
     double start_s = 0.0;
     double delta_s = 0.0;
-    reference_line_info_->GetPathBoundaries(
-        &lat_boundaries, &start_s, &delta_s);
+    reference_line_info_->GetPathBoundaries(&lat_boundaries, &start_s,
+                                            &delta_s);
     if (lat_boundaries.size() >= 2) {
       std::vector<double> opt_l;
       std::vector<double> opt_dl;
       std::vector<double> opt_ddl;
 
       bool res_opt = OptimizePath(init_frenet_state, delta_s, lat_boundaries, w,
-          &opt_l, &opt_dl, &opt_ddl);
+                                  &opt_l, &opt_dl, &opt_ddl);
 
       if (res_opt) {
-        auto frenet_frame_path = ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
-            delta_s, start_s);
+        auto frenet_frame_path =
+            ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, delta_s, start_s);
 
         path_data->SetReferenceLine(&reference_line);
         path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
@@ -83,8 +80,8 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     std::vector<std::pair<double, double>> lat_boundaries;
     double start_s = 0.0;
     double delta_s = 0.0;
-    reference_line_info_->GetFallbackPathBoundaries(
-        &lat_boundaries, &start_s, &delta_s);
+    reference_line_info_->GetFallbackPathBoundaries(&lat_boundaries, &start_s,
+                                                    &delta_s);
     CHECK_GT(lat_boundaries.size(), 1);
 
     std::vector<double> opt_l;
@@ -92,11 +89,11 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     std::vector<double> opt_ddl;
 
     bool res_opt = OptimizePath(init_frenet_state, delta_s, lat_boundaries, w,
-        &opt_l, &opt_dl, &opt_ddl);
+                                &opt_l, &opt_dl, &opt_ddl);
 
     if (res_opt) {
-      auto frenet_frame_path = ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
-          delta_s, start_s);
+      auto frenet_frame_path =
+          ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, delta_s, start_s);
 
       path_data->SetReferenceLine(&reference_line);
       path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
@@ -104,33 +101,30 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     }
   }
   return Status(ErrorCode::PLANNING_ERROR,
-      "Path Optimizer failed to generate path");
+                "Path Optimizer failed to generate path");
 }
 
 bool PiecewiseJerkPathOptimizer::OptimizePath(
-    const std::pair<const std::array<double, 3>,
-    const std::array<double, 3>>& init_state,
+    const std::pair<const std::array<double, 3>, const std::array<double, 3>>&
+        init_state,
     const double delta_s,
     const std::vector<std::pair<double, double>>& lat_boundaries,
-    const std::array<double, 5>& w,
-    std::vector<double>* x,
-    std::vector<double>* dx,
-    std::vector<double>* ddx) {
-
+    const std::array<double, 5>& w, std::vector<double>* x,
+    std::vector<double>* dx, std::vector<double>* ddx) {
   std::unique_ptr<Fem1dQpProblem> fem_1d_qp(
       new Fem1dQpProblem(lat_boundaries.size(), init_state.second, delta_s, w,
-          FLAGS_lateral_jerk_bound));
+                         FLAGS_lateral_jerk_bound));
 
   auto start_time = std::chrono::system_clock::now();
 
   fem_1d_qp->SetZeroOrderBounds(lat_boundaries);
 
   double first_order_bounds = AdjustLateralDerivativeBounds(
-      init_state.first[1],
-      init_state.second[1], init_state.second[2],
+      init_state.first[1], init_state.second[1], init_state.second[2],
       FLAGS_lateral_derivative_bound_default);
   AERROR << "adjusted lateral derivative bound from \t"
-      << FLAGS_lateral_derivative_bound_default << "\t" << first_order_bounds;
+         << FLAGS_lateral_derivative_bound_default << "\t"
+         << first_order_bounds;
   // TODO(all): temp. disable AdjustLateralDerivativeBounds, enable later
   // fem_1d_qp->SetFirstOrderBounds(first_order_bounds);
   fem_1d_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
@@ -158,13 +152,12 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
     const std::vector<double>& x, const std::vector<double>& dx,
     const std::vector<double>& ddx, const double delta_s,
     const double start_s) const {
-
   CHECK(!x.empty());
   CHECK(!dx.empty());
   CHECK(!ddx.empty());
 
-  PiecewiseJerkTrajectory1d piecewise_jerk_traj(x.front(),
-      dx.front(), ddx.front());
+  PiecewiseJerkTrajectory1d piecewise_jerk_traj(x.front(), dx.front(),
+                                                ddx.front());
 
   for (std::size_t i = 1; i < x.size(); ++i) {
     const auto dddl = (ddx[i] - ddx[i - 1]) / delta_s;

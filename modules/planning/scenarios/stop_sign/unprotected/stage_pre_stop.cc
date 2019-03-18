@@ -187,7 +187,7 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   const double distance_to_stop_line = stop_line_s - obstacle_end_s;
 
   if (distance_to_stop_line >
-        scenario_config_.watch_vehicle_max_valid_stop_distance()) {
+      scenario_config_.watch_vehicle_max_valid_stop_distance()) {
     ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
            << "] distance_to_stop_line[" << distance_to_stop_line
            << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
@@ -226,12 +226,12 @@ bool StopSignUnprotectedStagePreStop::CheckADCStop(
       PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
   const double distance_stop_line_to_adc_front_edge =
       stop_line_start_s - adc_front_edge_s;
-  ADEBUG << "distance_stop_line_to_adc_front_edge["
-      << distance_stop_line_to_adc_front_edge
-      << "] stop_sign["
+  ADEBUG
+      << "distance_stop_line_to_adc_front_edge["
+      << distance_stop_line_to_adc_front_edge << "] stop_sign["
       << PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id
-      << "] stop_line_start_s[" << stop_line_start_s
-      << "] adc_front_edge_s[" << adc_front_edge_s << "]";
+      << "] stop_line_start_s[" << stop_line_start_s << "] adc_front_edge_s["
+      << adc_front_edge_s << "]";
 
   if (distance_stop_line_to_adc_front_edge >
       scenario_config_.max_valid_stop_distance()) {

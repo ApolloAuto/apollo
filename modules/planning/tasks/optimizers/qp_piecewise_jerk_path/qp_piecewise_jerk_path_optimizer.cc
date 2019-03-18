@@ -230,8 +230,8 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   auto lateral_second_order_derivative_bounds =
       GetLateralSecondOrderDerivativeBounds(init_point, qp_delta_s);
 
-  std::array<double, 3> init_lateral_state { init_frenet_point.l(),
-      init_frenet_point.dl(), init_frenet_point.ddl() };
+  std::array<double, 3> init_lateral_state{
+      init_frenet_point.l(), init_frenet_point.dl(), init_frenet_point.ddl()};
   const int n = static_cast<int>(path_length / qp_delta_s);
 
   std::array<double, 5> w = {
@@ -243,9 +243,8 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   };
 
   constexpr double kMaxLThirdOrderDerivative = 2.0;
-  std::unique_ptr<Fem1dQpProblem> fem_1d_qp(
-      new Fem1dQpProblem(n, init_lateral_state, qp_delta_s, w,
-          kMaxLThirdOrderDerivative));
+  std::unique_ptr<Fem1dQpProblem> fem_1d_qp(new Fem1dQpProblem(
+      n, init_lateral_state, qp_delta_s, w, kMaxLThirdOrderDerivative));
 
   auto start_time = std::chrono::system_clock::now();
 
@@ -275,7 +274,7 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   CHECK(!ddx.empty());
 
   PiecewiseJerkTrajectory1d piecewise_jerk_traj1d(x.front(), dx.front(),
-      ddx.front());
+                                                  ddx.front());
   for (std::size_t i = 1; i < x.size(); ++i) {
     auto dddx = (ddx[i] - ddx[i - 1]) / qp_delta_s;
     piecewise_jerk_traj1d.AppendSegment(dddx, qp_delta_s);

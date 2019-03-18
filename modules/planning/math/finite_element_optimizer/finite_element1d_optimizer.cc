@@ -30,10 +30,9 @@ namespace {
 constexpr double kMaxVariableRange = 1.0e10;
 }  // namespace
 
-
-FiniteElement1dOptimizer::FiniteElement1dOptimizer(const size_t num_of_knots,
-                               const std::array<double, 3>& x_init,
-                               const double delta_s) {
+FiniteElement1dOptimizer::FiniteElement1dOptimizer(
+    const size_t num_of_knots, const std::array<double, 3>& x_init,
+    const double delta_s) {
   CHECK_GE(num_of_knots, 2);
   num_of_knots_ = num_of_knots;
 
@@ -134,9 +133,8 @@ void FiniteElement1dOptimizer::SetSecondOrderBounds(const double ddx_bound) {
 }
 
 bool FiniteElement1dOptimizer::Solve(std::vector<double>* ptr_x,
-    std::vector<double>* ptr_dx,
-    std::vector<double>* ptr_ddx) {
-
+                                     std::vector<double>* ptr_dx,
+                                     std::vector<double>* ptr_ddx) {
   // calculate kernel
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
@@ -172,9 +170,9 @@ bool FiniteElement1dOptimizer::Solve(std::vector<double>* ptr_x,
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
   OSQPWorkspace* work = nullptr;
 
-  bool res = Solve(3 * num_of_knots_, lower_bounds.size(),
-                   P_data, P_indices, P_indptr, A_data, A_indices, A_indptr,
-                   lower_bounds, upper_bounds, q, data, &work, settings);
+  bool res = Solve(3 * num_of_knots_, lower_bounds.size(), P_data, P_indices,
+                   P_indptr, A_data, A_indices, A_indptr, lower_bounds,
+                   upper_bounds, q, data, &work, settings);
   if (res == false || work == nullptr || work->solution == nullptr) {
     AERROR << "Failed to find solution.";
     // Cleanup
@@ -211,8 +209,8 @@ bool FiniteElement1dOptimizer::Solve(std::vector<double>* ptr_x,
 }
 
 void FiniteElement1dOptimizer::CalculateKernel(std::vector<c_float>* P_data,
-                                     std::vector<c_int>* P_indices,
-                                     std::vector<c_int>* P_indptr) {
+                                               std::vector<c_int>* P_indices,
+                                               std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   P_data->resize(kNumParam);
@@ -272,10 +270,8 @@ void FiniteElement1dOptimizer::CalculateAffineConstraint(
   for (int i = 0; i + 1 < N; ++i) {
     columns[2 * N + i].emplace_back(constraint_index, -1.0);
     columns[2 * N + i + 1].emplace_back(constraint_index, 1.0);
-    lower_bounds->at(constraint_index) =
-        -dddx_bound_ * delta_s_;
-    upper_bounds->at(constraint_index) =
-        dddx_bound_ * delta_s_;
+    lower_bounds->at(constraint_index) = -dddx_bound_ * delta_s_;
+    upper_bounds->at(constraint_index) = dddx_bound_ * delta_s_;
     ++constraint_index;
   }
 
@@ -295,10 +291,10 @@ void FiniteElement1dOptimizer::CalculateAffineConstraint(
     columns[i].emplace_back(constraint_index, -1.0);
     columns[i + 1].emplace_back(constraint_index, 1.0);
     columns[N + i].emplace_back(constraint_index, -delta_s_);
-    columns[2 * N + i].emplace_back(
-        constraint_index, -delta_s_ * delta_s_ / 3.0);
-    columns[2 * N + i + 1].emplace_back(
-        constraint_index, -delta_s_ * delta_s_ / 6.0);
+    columns[2 * N + i].emplace_back(constraint_index,
+                                    -delta_s_ * delta_s_ / 3.0);
+    columns[2 * N + i + 1].emplace_back(constraint_index,
+                                        -delta_s_ * delta_s_ / 6.0);
 
     lower_bounds->at(constraint_index) = 0.0;
     upper_bounds->at(constraint_index) = 0.0;

@@ -37,7 +37,8 @@ class FiniteElement1dOptimizer {
    * delta_s: s(k) - s(k-1)
    */
   FiniteElement1dOptimizer(const size_t num_var,
-      const std::array<double, 3>& x_init, const double delta_s);
+                           const std::array<double, 3>& x_init,
+                           const double delta_s);
 
   virtual ~FiniteElement1dOptimizer() = default;
 
@@ -53,37 +54,35 @@ class FiniteElement1dOptimizer {
 
   void SetSecondOrderBounds(const double ddx_bound);
 
-  void SetThirdOrderBound(const double dddx_bound) {
-    dddx_bound_ = dddx_bound;
-  }
+  void SetThirdOrderBound(const double dddx_bound) { dddx_bound_ = dddx_bound; }
 
-  void SetWeightX(const double weight_x) {
-    weight_x_ = weight_x;
-  }
+  void SetWeightX(const double weight_x) { weight_x_ = weight_x; }
 
-  void SetWeightXDerivative(const double weight_dx) {
-    weight_dx_ = weight_dx;
-  }
+  void SetWeightXDerivative(const double weight_dx) { weight_dx_ = weight_dx; }
 
   void SetWeightXSecondOrderDerivative(const double weight_ddx) {
     weight_ddx_ = weight_ddx;
   }
 
   bool Solve(std::vector<double>* ptr_x, std::vector<double>* ptr_dx_,
-      std::vector<double>* ptr_ddx_);
+             std::vector<double>* ptr_ddx_);
 
  protected:
   // naming convention follows osqp solver.
   virtual void CalculateKernel(std::vector<c_float>* P_data,
-      std::vector<c_int>* P_indices, std::vector<c_int>* P_indptr);
+                               std::vector<c_int>* P_indices,
+                               std::vector<c_int>* P_indptr);
 
   virtual void CalculateOffset(std::vector<c_float>* q);
 
   virtual void CalculateAffineConstraint(std::vector<c_float>* A_data,
-      std::vector<c_int>* A_indices, std::vector<c_int>* A_indptr,
-      std::vector<c_float>* lower_bounds, std::vector<c_float>* upper_bounds);
+                                         std::vector<c_int>* A_indices,
+                                         std::vector<c_int>* A_indptr,
+                                         std::vector<c_float>* lower_bounds,
+                                         std::vector<c_float>* upper_bounds);
 
-  bool Solve(const size_t kernel_dim, const size_t num_affine_constraint,
+  bool Solve(
+      const size_t kernel_dim, const size_t num_affine_constraint,
       std::vector<c_float>& P_data, std::vector<c_int>& P_indices,    // NOLINT
       std::vector<c_int>& P_indptr, std::vector<c_float>& A_data,     // NOLINT
       std::vector<c_int>& A_indices, std::vector<c_int>& A_indptr,    // NOLINT

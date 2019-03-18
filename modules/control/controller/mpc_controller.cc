@@ -376,15 +376,17 @@ Status MPCController::ComputeControlCommand(
           Wheel2SteerPct(control[0](0, 0) - unconstraint_control);
       if (fabs(unconstraint_control_diff) <= unconstraint_control_diff_limit_) {
         steer_angle_ff_compensation =
-            Wheel2SteerPct(debug->curvature() * (control_gain[0](0, 2) *
-                           (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
-                           addition_gain[0](0, 0) * v));
+            Wheel2SteerPct(debug->curvature() *
+                           (control_gain[0](0, 2) *
+                                (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
+                            addition_gain[0](0, 0) * v));
       } else {
         control_gain_truncation_ratio = control[0](0, 0) / unconstraint_control;
         steer_angle_ff_compensation =
-            Wheel2SteerPct(debug->curvature() * (control_gain[0](0, 2) *
-                           (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
-                           addition_gain[0](0, 0) * v) *
+            Wheel2SteerPct(debug->curvature() *
+                           (control_gain[0](0, 2) *
+                                (lr_ - lf_ / cr_ * mass_ * v * v / wheelbase_) -
+                            addition_gain[0](0, 0) * v) *
                            control_gain_truncation_ratio);
       }
     } else {

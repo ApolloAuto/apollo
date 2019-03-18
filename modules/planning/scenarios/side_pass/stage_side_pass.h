@@ -32,9 +32,8 @@ class StageSidePass : public Stage {
  public:
   explicit StageSidePass(const ScenarioConfig::StageConfig& config);
 
-  Stage::StageStatus Process(
-      const common::TrajectoryPoint& planning_init_point,
-      Frame* frame) override;
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
 
  private:
   common::Status ExecuteTasks(

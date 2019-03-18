@@ -224,9 +224,9 @@ bool LaneDetectionComponent::Init() {
   AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
   CHECK(visualize_.Init_all_info_single_camera(
-       visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu,
-       pitch_adj_degree, yaw_adj_degree, roll_adj_degree,
-       image_height_, image_width_));
+      visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu,
+      pitch_adj_degree, yaw_adj_degree, roll_adj_degree, image_height_,
+      image_width_));
   homography_image2ground_ = visualize_.homography_im2car();
   camera_lane_pipeline_->SetIm2CarHomography(homography_image2ground_);
 

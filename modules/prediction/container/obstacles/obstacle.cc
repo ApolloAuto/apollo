@@ -436,16 +436,16 @@ void Obstacle::SetPolygonPoints(const PerceptionObstacle& perception_obstacle,
                                 Feature* feature) {
   for (const auto& polygon_point : perception_obstacle.polygon_point()) {
     *feature->add_polygon_point() = polygon_point;
-    ADEBUG << "Obstacle [" << id_ << "] has new corner point:"
-           << polygon_point.DebugString();
+    ADEBUG << "Obstacle [" << id_
+           << "] has new corner point:" << polygon_point.DebugString();
   }
 }
 
 void Obstacle::SetPosition(const PerceptionObstacle& perception_obstacle,
                            Feature* feature) {
   *feature->mutable_position() = perception_obstacle.position();
-  ADEBUG << "Obstacle [" << id_ << "] has position:"
-         << perception_obstacle.position().DebugString();
+  ADEBUG << "Obstacle [" << id_
+         << "] has position:" << perception_obstacle.position().DebugString();
 }
 
 void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
@@ -1106,9 +1106,9 @@ void Obstacle::GetNeighborLaneSegments(
     }
 
     for (const std::string& lane_id : curr_left_lane_ids) {
-      GetNeighborLaneSegments(PredictionMap::LaneById(lane_id),
-                              true, recursion_depth - 1,
-                              lane_ids_ordered, existing_lane_ids);
+      GetNeighborLaneSegments(PredictionMap::LaneById(lane_id), true,
+                              recursion_depth - 1, lane_ids_ordered,
+                              existing_lane_ids);
     }
   } else {
     std::vector<std::string> curr_right_lane_ids;
@@ -1126,9 +1126,9 @@ void Obstacle::GetNeighborLaneSegments(
     }
 
     for (const std::string& lane_id : curr_right_lane_ids) {
-      GetNeighborLaneSegments(PredictionMap::LaneById(lane_id),
-                              false, recursion_depth - 1,
-                              lane_ids_ordered, existing_lane_ids);
+      GetNeighborLaneSegments(PredictionMap::LaneById(lane_id), false,
+                              recursion_depth - 1, lane_ids_ordered,
+                              existing_lane_ids);
     }
   }
 }

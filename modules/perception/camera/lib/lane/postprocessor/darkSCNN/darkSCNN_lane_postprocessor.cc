@@ -171,8 +171,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
           }
           uv_point << static_cast<float>(x * roi_width_ / lane_map.cols),
               static_cast<float>(y * roi_height_ / lane_map.rows + roi_start_);
-          if (xy_points[value].size() < minNumPoints_ ||
-              xy_point(0) < 50.0f ||
+          if (xy_points[value].size() < minNumPoints_ || xy_point(0) < 50.0f ||
               std::fabs(xy_point(1) - xy_points[value].back()(1)) < 1.0f) {
             xy_points[value].push_back(xy_point);
             uv_points[value].push_back(uv_point);
@@ -198,8 +197,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
           }
           uv_point << static_cast<float>(x * roi_width_ / lane_map.cols),
               static_cast<float>(y * roi_height_ / lane_map.rows + roi_start_);
-          if (xy_points[value].size() < minNumPoints_ ||
-              xy_point(0) < 50.0f ||
+          if (xy_points[value].size() < minNumPoints_ || xy_point(0) < 50.0f ||
               std::fabs(xy_point(1) - xy_points[value].back()(1)) < 1.0f) {
             xy_points[value].push_back(xy_point);
             uv_points[value].push_back(uv_point);

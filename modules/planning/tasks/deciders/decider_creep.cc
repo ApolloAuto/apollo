@@ -45,13 +45,14 @@ Status DeciderCreep::Process(Frame* frame,
 
   double stop_sign_overlap_end_s = 0.0;
   if (!PlanningContext::GetScenarioInfo()
-      ->current_stop_sign_overlap.object_id.empty()) {
-    stop_sign_overlap_end_s =  PlanningContext::GetScenarioInfo()
-        ->current_stop_sign_overlap.end_s;
+           ->current_stop_sign_overlap.object_id.empty()) {
+    stop_sign_overlap_end_s =
+        PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
   } else if (PlanningContext::GetScenarioInfo()
-      ->current_traffic_light_overlaps.size() > 0) {
-    stop_sign_overlap_end_s =  PlanningContext::GetScenarioInfo()
-        ->current_traffic_light_overlaps[0].end_s;
+                 ->current_traffic_light_overlaps.size() > 0) {
+    stop_sign_overlap_end_s = PlanningContext::GetScenarioInfo()
+                                  ->current_traffic_light_overlaps[0]
+                                  .end_s;
   }
   if (stop_sign_overlap_end_s > 0.0) {
     BuildStopDecision(stop_sign_overlap_end_s, frame, reference_line_info);

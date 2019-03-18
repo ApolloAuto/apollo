@@ -11,8 +11,8 @@ cc_library(
         "stage_detect_safety.cc",
         "stage_generate_path.cc",
         "stage_pass_obstacle.cc",
+        "stage_side_pass.cc",
         "stage_stop_on_wait_point.cc",
-        "stage_side_pass.cc"
     ],
     hdrs = [
         "side_pass_scenario.h",
@@ -21,8 +21,8 @@ cc_library(
         "stage_detect_safety.h",
         "stage_generate_path.h",
         "stage_pass_obstacle.h",
+        "stage_side_pass.h",
         "stage_stop_on_wait_point.h",
-        "stage_side_pass.h"
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

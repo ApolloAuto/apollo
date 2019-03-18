@@ -94,14 +94,15 @@ class ScenarioManager final {
 
  private:
   std::unordered_map<ScenarioConfig::ScenarioType, ScenarioConfig,
-                     std::hash<int>> config_map_;
+                     std::hash<int>>
+      config_map_;
   std::unique_ptr<Scenario> current_scenario_;
   ScenarioConfig::ScenarioType default_scenario_type_;
   std::set<ScenarioConfig::ScenarioType> supported_scenarios_;
   ScenarioContext scenario_context_;
-  std::unordered_map<ReferenceLineInfo::OverlapType,
-                     hdmap::PathOverlap,
-                     std::hash<int>> first_encountered_overlap_map_;
+  std::unordered_map<ReferenceLineInfo::OverlapType, hdmap::PathOverlap,
+                     std::hash<int>>
+      first_encountered_overlap_map_;
 
   // TODO(all): move to scenario conf later
   const double signal_expire_time_sec_ = 5.0;  // sec

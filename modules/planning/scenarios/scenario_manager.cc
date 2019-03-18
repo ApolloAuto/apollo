@@ -276,8 +276,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareJunctionScenario(
       pnc_junction_overlap.start_s - adc_front_edge_s;
   ADEBUG << "adc_distance_to_pnc_junction[" << adc_distance_to_pnc_junction
          << "] pnc_junction[" << pnc_junction_overlap.object_id
-         << "] pnc_junction_overlap_start_s["
-         << pnc_junction_overlap.start_s << "]";
+         << "] pnc_junction_overlap_start_s[" << pnc_junction_overlap.start_s
+         << "]";
 
   // TODO(all)
   // const bool bare_junction_scenario =
@@ -485,14 +485,14 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       switch (overlap_type) {
         case ReferenceLineInfo::STOP_SIGN:
           if (FLAGS_enable_scenario_stop_sign) {
-            scenario_type = SelectStopSignScenario(
-                frame, *traffic_sign_overlap);
+            scenario_type =
+                SelectStopSignScenario(frame, *traffic_sign_overlap);
           }
           break;
         case ReferenceLineInfo::SIGNAL:
           if (FLAGS_enable_scenario_traffic_light) {
-            scenario_type = SelectTrafficLightScenario(
-                frame, *traffic_sign_overlap);
+            scenario_type =
+                SelectTrafficLightScenario(frame, *traffic_sign_overlap);
           }
           break;
         case ReferenceLineInfo::YIELD_SIGN:
