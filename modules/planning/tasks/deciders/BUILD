@@ -95,9 +95,6 @@ cc_library(
     hdrs = [
         "path_decider_obstacle_utils.h",
     ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
     deps = [
         "//modules/planning/common:frame",
     ],

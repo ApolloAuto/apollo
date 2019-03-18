@@ -147,7 +147,7 @@ std::string PathBoundsDecider::GenerateRegularPathBoundary(
     AERROR << msg;
     return msg;
   }
-  PathBoundsDebugString(*path_boundaries);
+  // PathBoundsDebugString(*path_boundaries);
 
   // 3. Fine-tune the boundary based on static obstacles
   // TODO(all): in the future, add side-pass functionality.
