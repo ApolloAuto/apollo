@@ -28,6 +28,7 @@ message RuleTrafficLightConfig {
   // stop distance(m) to the stop line of the traffic light
   optional double stop_distance = 2 [default = 1.0];  // meter
   optional double signal_expire_time_sec = 3 [default = 5.0];  // second
+  optional double max_monitor_forward_distance = 4 [default = 135.0]; // meter
 }
 
 message RuleOpenSpaceStopConfig {
