@@ -83,6 +83,7 @@ def load_calibration_raw_data_old(fn):
                 acc_table = {}
                 acc_table[acc] = [cmd]
                 speed_table[speed] = acc_table
+
     return speed_table
 
 
@@ -103,11 +104,10 @@ def get_calibration_table_pb(speed_table):
             item.command = cmd
     return calibration_table_pb
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     if len(sys.argv) != 3:
         print("Usage: %s old_control_conf.pb.txt result.csv" % sys.argv[0])
-        sys.exit(1)
+        sys.exit(0)
 
     ctl_conf_pb = proto_utils.get_pb_from_text_file(sys.argv[1], ControlConf())
     speed_table_dict = load_calibration_raw_data(sys.argv[2])

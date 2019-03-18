@@ -30,8 +30,8 @@ markers = [
 ]
 
 if len(sys.argv) < 2:
-    print "usage: python plot_results.py result.csv"
-    sys.exit()
+    print('Usage: %s result.csv' % sys.argv[0])
+    sys.exit(0)
 
 fn = sys.argv[1]
 

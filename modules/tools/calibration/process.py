@@ -29,7 +29,6 @@ warnings.simplefilter('ignore', np.RankWarning)
 SPEED_INTERVAL = 0.2
 SPEED_DELAY = 130  # Speed report delay relative to IMU information
 
-
 def preprocess(filename):
     data = np.genfromtxt(filename, delimiter=',', names=True)
     data = data[np.where(data['io'] == 0)[0]]
@@ -42,7 +41,6 @@ def preprocess(filename):
     data['imu'] = np.append(data['imu'][-SPEED_DELAY / 10:],
                             data['imu'][0:-SPEED_DELAY / 10])
     return data
-
 
 def get_start_index(data):
     if np.all(data['vehicle_speed'] == 0):
@@ -58,7 +56,6 @@ def get_start_index(data):
             else:
                 break
         return ind
-    
     else:
         ind = 0
         while ind < len(data):
@@ -67,7 +64,6 @@ def get_start_index(data):
             else:
                 break
         return ind
-
 
 def process(data):
     """
@@ -113,7 +109,7 @@ def process(data):
         firstindex = 0
 
         while speedsection[firstindex] == 0:
-            firstindex = firstindex + 1
+            firstindex += 1
         firstindex = max(firstindex - 2, 0)
         speedsection = speedsection[firstindex:]
         timesection = timesection[firstindex:]
@@ -142,11 +138,11 @@ def process(data):
             if is_increase:
                 while val_ind < len(
                         speedsection) - 1 and value > speedsection[val_ind]:
-                    val_ind = val_ind + 1
+                    val_ind += 1
             else:
                 while val_ind < len(
                         speedsection) - 1 and value < speedsection[val_ind]:
-                    val_ind = val_ind + 1
+                    val_ind += 1
             if val_ind == 0:
                 imu_value = imusection[val_ind]
             else:
