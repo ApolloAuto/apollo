@@ -88,6 +88,9 @@ Status SpeedLimitDecider::GetSpeedLimits(
   GetAvgKappa(path_data_.discretized_path(), &avg_kappa);
   const auto& discretized_path = path_data_.discretized_path();
   const auto& frenet_path = path_data_.frenet_frame_path();
+  const auto& path_point_decision_guide =
+      path_data_.path_point_decision_guide();
+
   for (uint32_t i = 0; i < discretized_path.size(); ++i) {
     const double path_s = discretized_path.at(i).s();
     const double frenet_point_s = frenet_path.at(i).s();
@@ -124,59 +127,60 @@ Status SpeedLimitDecider::GetSpeedLimits(
 
     // (3) speed limit from nudge obstacles
     double nudge_obstacle_speed_limit = std::numeric_limits<double>::max();
-    for (const auto* const_obstacle : obstacles.Items()) {
-      if (const_obstacle->IsVirtual()) {
-        continue;
-      }
-      if (!const_obstacle->LateralDecision().has_nudge()) {
-        continue;
-      }
-
-      /* ref line:
-       * -------------------------------
-       *    start_s   end_s
-       * ------|  adc   |---------------
-       * ------------|  obstacle |------
-       */
-      if (frenet_point_s + vehicle_param_.front_edge_to_center() <
-              const_obstacle->PerceptionSLBoundary().start_s() ||
-          frenet_point_s - vehicle_param_.back_edge_to_center() >
-              const_obstacle->PerceptionSLBoundary().end_s()) {
-        continue;
-      }
-      constexpr double kRange = 1.0;  // meters
-      const auto& nudge = const_obstacle->LateralDecision().nudge();
-
-      // Please notice the differences between adc_l and frenet_point_l
-      const double frenet_point_l = frenet_path.at(i).l();
-
-      // obstacle is on the right of ego vehicle (at path point i)
-      bool is_close_on_left =
-          (nudge.type() == ObjectNudge::LEFT_NUDGE) &&
-          (frenet_point_l - vehicle_param_.right_edge_to_center() - kRange <
-           const_obstacle->PerceptionSLBoundary().end_l());
-
-      // obstacle is on the left of ego vehicle (at path point i)
-      bool is_close_on_right =
-          (nudge.type() == ObjectNudge::RIGHT_NUDGE) &&
-          (const_obstacle->PerceptionSLBoundary().start_l() - kRange <
-           frenet_point_l + vehicle_param_.left_edge_to_center());
-
-      if (is_close_on_left || is_close_on_right) {
-        double nudge_speed_ratio = 1.0;
-        if (const_obstacle->IsStatic()) {
-          nudge_speed_ratio =
-              speed_bounds_config_.static_obs_nudge_speed_ratio();
-        } else {
-          nudge_speed_ratio =
-              speed_bounds_config_.dynamic_obs_nudge_speed_ratio();
+    if (!FLAGS_enable_soft_speed_limit) {
+      for (const auto* const_obstacle : obstacles.Items()) {
+        if (const_obstacle->IsVirtual()) {
+          continue;
         }
-        nudge_obstacle_speed_limit =
-            nudge_speed_ratio * speed_limit_on_reference_line;
-        break;
+        if (!const_obstacle->LateralDecision().has_nudge()) {
+          continue;
+        }
+
+        /* ref line:
+         * -------------------------------
+         *    start_s   end_s
+         * ------|  adc   |---------------
+         * ------------|  obstacle |------
+         */
+        if (frenet_point_s + vehicle_param_.front_edge_to_center() <
+                const_obstacle->PerceptionSLBoundary().start_s() ||
+            frenet_point_s - vehicle_param_.back_edge_to_center() >
+                const_obstacle->PerceptionSLBoundary().end_s()) {
+          continue;
+        }
+        constexpr double kRange = 1.0;  // meters
+        const auto& nudge = const_obstacle->LateralDecision().nudge();
+
+        // Please notice the differences between adc_l and frenet_point_l
+        const double frenet_point_l = frenet_path.at(i).l();
+
+        // obstacle is on the right of ego vehicle (at path point i)
+        bool is_close_on_left =
+            (nudge.type() == ObjectNudge::LEFT_NUDGE) &&
+            (frenet_point_l - vehicle_param_.right_edge_to_center() - kRange <
+             const_obstacle->PerceptionSLBoundary().end_l());
+
+        // obstacle is on the left of ego vehicle (at path point i)
+        bool is_close_on_right =
+            (nudge.type() == ObjectNudge::RIGHT_NUDGE) &&
+            (const_obstacle->PerceptionSLBoundary().start_l() - kRange <
+             frenet_point_l + vehicle_param_.left_edge_to_center());
+
+        if (is_close_on_left || is_close_on_right) {
+          double nudge_speed_ratio = 1.0;
+          if (const_obstacle->IsStatic()) {
+            nudge_speed_ratio =
+                speed_bounds_config_.static_obs_nudge_speed_ratio();
+          } else {
+            nudge_speed_ratio =
+                speed_bounds_config_.dynamic_obs_nudge_speed_ratio();
+          }
+          nudge_obstacle_speed_limit =
+              nudge_speed_ratio * speed_limit_on_reference_line;
+          break;
+        }
       }
     }
-
     double curr_speed_limit = 0.0;
     if (FLAGS_enable_nudge_slowdown) {
       curr_speed_limit =
@@ -193,10 +197,12 @@ Status SpeedLimitDecider::GetSpeedLimits(
     }
 
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
-    // TODO(Jinyun) implement
-    // if (speed_bounds_config_.path_point_decision_guide_flag()) {}
-
-    speed_limit_data->AppendSoftSpeedLimit(path_s, curr_speed_limit);
+  }
+  CHECK_EQ(frenet_path.size(), path_point_decision_guide.size());
+  CHECK_LE(std::get<0>(path_point_decision_guide.back()),
+           frenet_path.back().s());
+  if (FLAGS_enable_soft_speed_limit) {
+    speed_limit_data->AppendSoftSpeedLimit(0.0, 0.0);
   }
   return Status::OK();
 }
