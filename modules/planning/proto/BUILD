@@ -277,27 +277,13 @@ proto_library(
     ],
 )
 
-# cc_proto_library(
-#     name = "poly_vt_speed_config_proto",
-#     deps = [
-#         ":poly_vt_speed_config_proto_lib",
-#     ],
-# )
-
-# proto_library(
-#     name = "poly_vt_speed_config_proto_lib",
-#     srcs = [
-#         "poly_vt_speed_config.proto",
-#     ],
-#     deps = [
-#         ":st_boundary_config_proto_lib",
-#     ],
-# )
-
 proto_library(
     name = "sl_boundary_proto_lib",
     srcs = [
         "sl_boundary.proto",
+    ],
+    deps = [
+        "//modules/common/proto:pnc_point_proto_lib",
     ],
 )
 
