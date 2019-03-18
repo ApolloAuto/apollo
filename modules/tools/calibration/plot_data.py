@@ -31,19 +31,19 @@ from process import process
 
 class Plotter(object):
     """
-    plot the speed info
+    Plot the speed info
     """
 
     def __init__(self):
         """
-        init the speed info
+        Init the speed info
         """
         np.set_printoptions(precision=3)
         self.file = open('temp_result.csv', 'a')
 
     def process_data(self, filename):
         """
-        load the file and preprocess th data
+        Load the file and preprocess th data
         """
         self.data = preprocess(filename)
 
@@ -52,7 +52,7 @@ class Plotter(object):
 
     def plot_result(self):
         """
-        plot the desired data
+        Plot the desired data
         """
         fig, axarr = plt.subplots(2, 1, sharex=True)
         plt.tight_layout()
@@ -116,7 +116,7 @@ class Plotter(object):
                     self.file.write("%s, %s, %s\n" %
                                     (self.tablecmd[i], self.tablespeed[i][j],
                                      self.tableacc[i][j]))
-            print "Done writing results"
+            print("Finished writing results")
 
 
 def main():
@@ -124,18 +124,17 @@ def main():
     demo
     """
     if len(sys.argv) == 2:
-        # get the latest file
+        # Get the latest file
         file_path = sys.argv[1]
     else:
         file_path = tkFileDialog.askopenfilename(
             initialdir="/home/caros/.ros",
             filetypes=(("csv files", ".csv"), ("all files", "*.*")))
-    print 'File path:', file_path
+    print('File path: %s' % file_path)
     plotter = Plotter()
     plotter.process_data(file_path)
-    print 'Done reading the file.'
+    print('Finished reading the file.')
     plotter.plot_result()
-
 
 if __name__ == '__main__':
     main()
