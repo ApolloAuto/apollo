@@ -156,7 +156,8 @@ void SignalLight::MakeDecisions(Frame* const frame,
          stop_deceleration <
              config_.signal_light().max_stop_deceleration_yellow_light())) {
       if (config_.signal_light().righ_turn_creep().enabled() &&
-          reference_line_info->GetPathTurnType() == hdmap::Lane::RIGHT_TURN) {
+          reference_line_info->GetPathTurnType(adc_front_edge_s)
+              == hdmap::Lane::RIGHT_TURN) {
         SetCreepForwardSignalDecision(reference_line_info, &signal_light);
       }
       if (BuildStopDecision(frame, reference_line_info, &signal_light)) {
