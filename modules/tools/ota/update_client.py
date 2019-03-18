@@ -1,4 +1,4 @@
-"""OTA update client"""
+#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2017 The Apollo Authors. All Rights Reserved.
