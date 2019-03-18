@@ -269,6 +269,9 @@ cc_library(
 cc_library(
     name = "auto_lock",
     hdrs = ["auto_lock.h"],
+    linkopts = [
+        "-lglog",
+    ],
 )
 
 cc_test(
