@@ -78,8 +78,9 @@ class RelativeMap : public RelativeMapInterface {
 
   void OnReceiveNavigationInfo(const NavigationInfo& navigation_info);
 
-  bool GetNavigationPathList(std::vector<std::string>* const path_list);
+  bool GetNavigationPathList(std::vector<std::string>* const path_list) const;
   void LoadNavigationPath();
+  void PublishNavigationInfo(NavigationInfo* const navigation_info) const;
 
   common::adapter::AdapterManagerConfig adapter_conf_;
   RelativeMapConfig config_;
