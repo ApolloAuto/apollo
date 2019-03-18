@@ -97,10 +97,11 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
 
   std::vector<std::shared_ptr<cyber::Node>> camera_listener_nodes_;
 
-  std::vector<std::string> camera_names_;  // camera sensor names
+  // Camera sensor names
+  std::vector<std::string> camera_names_;
   std::vector<std::string> input_camera_channel_names_;
 
-  // camera name -> SensorInfo
+  // Camera name -> SensorInfo
   std::map<std::string, base::SensorInfo> sensor_info_map_;
 
   // camera_height
@@ -119,32 +120,32 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
   std::map<std::string, std::shared_ptr<camera::DataProvider>>
       data_providers_map_;
 
-  // map for store params
+  // Map for store params
   std::map<std::string, Eigen::Matrix4d> extrinsic_map_;
   std::map<std::string, Eigen::Matrix3f> intrinsic_map_;
   Eigen::Matrix3d homography_im2car_;
 
-  // camera obstacle pipeline
+  // Camera obstacle pipeline
   camera::CameraPerceptionInitOptions camera_perception_init_options_;
   camera::CameraPerceptionOptions camera_perception_options_;
   std::unique_ptr<camera::ObstacleCameraPerception> camera_obstacle_pipeline_;
 
-  // fixed size camera frames
+  // Fixed size camera frames
   int frame_capacity_ = 20;
   int frame_id_ = 0;
   std::vector<camera::CameraFrame> camera_frames_;
 
-  // image info.
+  // Image info.
   int image_width_ = 1920;
   int image_height_ = 1080;
   int image_channel_num_ = 3;
   int image_data_size_ = -1;
 
-  // default camera pitch angle & height
+  // Default camera pitch angle & height
   float default_camera_pitch_ = 0.f;
   float default_camera_height_ = 1.6f;
 
-  // options for DataProvider
+  // Options for DataProvider
   bool enable_undistortion_ = false;
 
   double timestamp_offset_ = 0.0;

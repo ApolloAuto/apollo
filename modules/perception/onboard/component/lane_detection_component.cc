@@ -51,11 +51,11 @@ static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
   if (!cyber::common::GetProtoFromFile(config_file, &perception_param)) {
-    AERROR << "Read config failed: " << config_file;
+    AERROR << "Failed to read config file: " << config_file;
     return -1;
   }
   if (!perception_param.has_gpu_id()) {
-    AINFO << "gpu id not found.";
+    AINFO << "GPU id not found.";
     return -1;
   }
   return perception_param.gpu_id();
@@ -77,14 +77,14 @@ static bool SetCameraHeight(const std::string &sensor_name,
     AINFO << camera_offset;
     *camera_height = base_h + camera_offset;
   } catch (YAML::InvalidNode &in) {
-    AERROR << "load camera extrisic file error, YAML::InvalidNode exception";
+    AERROR << "Load camera extrisic file error, YAML::InvalidNode exception.";
     return false;
   } catch (YAML::TypedBadConversion<float> &bc) {
-    AERROR << "load camera extrisic file error, "
-           << "YAML::TypedBadConversion exception";
+    AERROR << "Load camera extrisic file error, "
+           << "YAML::TypedBadConversion exception.";
     return false;
   } catch (YAML::Exception &e) {
-    AERROR << "load camera extrisic file "
+    AERROR << "Load camera extrisic file "
            << " error, YAML exception:" << e.what();
     return false;
   }
@@ -95,7 +95,7 @@ static bool SetCameraHeight(const std::string &sensor_name,
 static bool LoadExtrinsics(const std::string &yaml_file,
                            Eigen::Matrix4d *camera_extrinsic) {
   if (!apollo::cyber::common::PathExists(yaml_file)) {
-    AINFO << yaml_file << " not exist!";
+    AINFO << "yaml file: " << yaml_file << " does not exist!";
     return false;
   }
   YAML::Node node = YAML::LoadFile(yaml_file);
@@ -108,7 +108,7 @@ static bool LoadExtrinsics(const std::string &yaml_file,
   double tz = 0.0;
   try {
     if (node.IsNull()) {
-      AINFO << "Load " << yaml_file << " failed! please check!";
+      AINFO << "Failed to load yaml file: " << yaml_file << ", please check!";
       return false;
     }
     qw = node["transform"]["rotation"]["w"].as<double>();
@@ -119,15 +119,15 @@ static bool LoadExtrinsics(const std::string &yaml_file,
     ty = node["transform"]["translation"]["y"].as<double>();
     tz = node["transform"]["translation"]["z"].as<double>();
   } catch (YAML::InvalidNode &in) {
-    AERROR << "load camera extrisic file " << yaml_file
-           << " with error, YAML::InvalidNode exception";
+    AERROR << "Load camera extrisic file " << yaml_file
+           << " with error, YAML::InvalidNode exception.";
     return false;
   } catch (YAML::TypedBadConversion<double> &bc) {
-    AERROR << "load camera extrisic file " << yaml_file
-           << " with error, YAML::TypedBadConversion exception";
+    AERROR << "Load camera extrisic file: " << yaml_file
+           << " with error, YAML::TypedBadConversion exception.";
     return false;
   } catch (YAML::Exception &e) {
-    AERROR << "load camera extrisic file " << yaml_file
+    AERROR << "Load camera extrisic file: " << yaml_file
            << " with error, YAML exception:" << e.what();
     return false;
   }
@@ -151,23 +151,19 @@ static bool GetProjectMatrix(
     const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
     const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
     Eigen::Matrix3d *project_matrix, double *pitch_diff = nullptr) {
-  if (camera_names.size() != 2) {
-    AINFO << "camera number must be 2!";
-    return false;
-  }
   *project_matrix =
       intrinsic_map.at(camera_names[0]).cast<double>() *
       extrinsic_map.at(camera_names[0]).block<3, 3>(0, 0).inverse() *
       extrinsic_map.at(camera_names[1]).block<3, 3>(0, 0) *
       intrinsic_map.at(camera_names[1]).cast<double>().inverse();
-  // extract the pitch_diff = pitch_narrow - pitch_obstacle
+  // Extract the pitch_diff = pitch_narrow - pitch_obstacle
   if (pitch_diff != nullptr) {
     Eigen::Vector3d euler =
         (extrinsic_map.at(camera_names[0]).block<3, 3>(0, 0).inverse() *
          extrinsic_map.at(camera_names[1]).block<3, 3>(0, 0))
             .eulerAngles(0, 1, 2);
     *pitch_diff = euler(0);
-    AINFO << "pitch diff: " << *pitch_diff;
+    AINFO << "Pitch diff: " << *pitch_diff;
   }
   return true;
 }
@@ -216,10 +212,10 @@ bool LaneDetectionComponent::Init() {
   double pitch_adj_degree = 0.0;
   double yaw_adj_degree = 0.0;
   double roll_adj_degree = 0.0;
-  // load in lidar to imu extrinsic
+  // Load in lidar to imu extrinsic
   Eigen::Matrix4d ex_lidar2imu;
   LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
-                     "velodyne128_novatel_extrinsics.yaml",
+                 "velodyne128_novatel_extrinsics.yaml",
                  &ex_lidar2imu);
   AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
@@ -236,7 +232,7 @@ bool LaneDetectionComponent::Init() {
       visualize_.SetDirectory(visual_debug_folder_);
     }
   }
-  AINFO << "Init processes all succeed";
+  AINFO << "Init processes all succeed.";
   return true;
 }
 
@@ -287,19 +283,19 @@ void LaneDetectionComponent::OnReceiveImage(
   std::lock_guard<std::mutex> lock(mutex_);
   const double msg_timestamp = message->measurement_time() + timestamp_offset_;
   AINFO << "Enter LaneDetectionComponent::Proc(), "
-        << " camera_name: " << camera_name
-        << " image ts: " + std::to_string(msg_timestamp);
-  // timestamp should be almost monotonic
+        << "camera_name: " << camera_name
+        << ", image ts: " << std::to_string(msg_timestamp);
+  // Timestamp should be almost monotonic
   if (last_timestamp_ - msg_timestamp > ts_diff_) {
     AINFO << "Received an old message. Last ts is " << std::setprecision(19)
-          << last_timestamp_ << " current ts is " << msg_timestamp
-          << " last - current is " << last_timestamp_ - msg_timestamp;
+          << last_timestamp_ << ", current ts is " << msg_timestamp
+          << ", last - current is " << last_timestamp_ - msg_timestamp;
     return;
   }
   last_timestamp_ = msg_timestamp;
   ++seq_num_;
 
-  // for e2e lantency statistics
+  // For e2e lantency statistics
   {
     const double cur_time = lib::TimeUtil::GetCurrentTime();
     const double start_latency = (cur_time - message->measurement_time()) * 1e3;
@@ -309,21 +305,21 @@ void LaneDetectionComponent::OnReceiveImage(
           << "]";
   }
 
-  // protobuf msg
+  // Protobuf msg
   std::shared_ptr<apollo::perception::PerceptionLanes> out_message(
       new (std::nothrow) apollo::perception::PerceptionLanes);
   apollo::common::ErrorCode error_code = apollo::common::OK;
 
-  // prefused msg
+  // Prefused msg
   std::shared_ptr<SensorFrameMessage> prefused_message(new (std::nothrow)
                                                            SensorFrameMessage);
   if (InternalProc(message, camera_name, &error_code, prefused_message.get(),
                    out_message.get()) != cyber::SUCC) {
-    AERROR << "InternalProc failed, error_code: " << error_code;
+    AERROR << "InternalProc() failed, error_code: " << error_code;
     return;
   }
 
-  // for e2e lantency statistics
+  // For e2e lantency statistics
   {
     const double end_timestamp =
         apollo::perception::lib::TimeUtil::GetCurrentTime();
@@ -337,14 +333,14 @@ void LaneDetectionComponent::OnReceiveImage(
 }
 
 int LaneDetectionComponent::InitConfig() {
-  // the macro READ_CONF would return cyber::FAIL if config not exists
+  // The macro READ_CONF would return cyber::FAIL if config does not exist.
   apollo::perception::onboard::LaneDetection lane_detection_param;
   if (!GetProtoConfig(&lane_detection_param)) {
-    AINFO << "load lane detection component proto param failed";
+    AINFO << "Failed to load lane detection component proto param.";
     return false;
   }
 
-  std::string camera_names_str = lane_detection_param.camera_names();
+  const std::string camera_names_str = lane_detection_param.camera_names();
   boost::algorithm::split(camera_names_, camera_names_str,
                           boost::algorithm::is_any_of(","));
   if (camera_names_.size() != 2) {
@@ -358,7 +354,7 @@ int LaneDetectionComponent::InitConfig() {
                           input_camera_channel_names_str,
                           boost::algorithm::is_any_of(","));
   if (input_camera_channel_names_.size() != camera_names_.size()) {
-    AERROR << "wrong input_camera_channel_names_.size(): "
+    AERROR << "Wrong input_camera_channel_names_.size(): "
            << input_camera_channel_names_.size();
     return cyber::FAIL;
   }
@@ -411,19 +407,19 @@ int LaneDetectionComponent::InitConfig() {
 
 int LaneDetectionComponent::InitSensorInfo() {
   if (camera_names_.size() != 2) {
-    AERROR << "invalid camera_names_.size(): " << camera_names_.size();
+    AERROR << "Invalid camera_names_.size(): " << camera_names_.size();
     return cyber::FAIL;
   }
 
   auto *sensor_manager = common::SensorManager::Instance();
   for (size_t i = 0; i < camera_names_.size(); ++i) {
     if (!sensor_manager->IsSensorExist(camera_names_[i])) {
-      AERROR << ("sensor_name: " + camera_names_[i] + " not exists.");
+      AERROR << "sensor_name: " << camera_names_[i] <<  " does not exist.";
       return cyber::FAIL;
     }
 
     base::SensorInfo sensor_info;
-    if (!(sensor_manager->GetSensorInfo(camera_names_[i], &sensor_info))) {
+    if (!sensor_manager->GetSensorInfo(camera_names_[i], &sensor_info)) {
       AERROR << "Failed to get sensor info, sensor name: " << camera_names_[i];
       return cyber::FAIL;
     }
@@ -470,18 +466,14 @@ int LaneDetectionComponent::InitAlgorithmPlugin() {
 }
 
 int LaneDetectionComponent::InitCameraFrames() {
-  if (camera_names_.size() != 2) {
-    AERROR << "invalid camera_names_.size(): " << camera_names_.size();
-    return cyber::FAIL;
-  }
-  // fixed size
+  // Fixed size
   camera_frames_.resize(frame_capacity_);
   if (camera_frames_.empty()) {
-    AERROR << "frame_capacity_ must > 0";
+    AERROR << "frame_capacity_ must larger than 0";
     return cyber::FAIL;
   }
 
-  // init data_providers for each camera
+  // Init data_providers for each camera
   for (const auto &camera_name : camera_names_) {
     camera::DataProvider::InitOptions data_provider_init_options;
     data_provider_init_options.image_height = image_height_;
@@ -538,11 +530,11 @@ int LaneDetectionComponent::InitCameraFrames() {
 int LaneDetectionComponent::InitProjectMatrix() {
   if (!GetProjectMatrix(camera_names_, extrinsic_map_, intrinsic_map_,
                         &project_matrix_, &pitch_diff_)) {
-    AERROR << "GetProjectMatrix failed";
+    AERROR << "GetProjectMatrix() failed";
     return cyber::FAIL;
   }
-  AINFO << "project_matrix_: " << project_matrix_;
-  AINFO << "pitch_diff_:" << pitch_diff_;
+  AINFO << "Project matrix: " << project_matrix_;
+  AINFO << "pitch diff: " << pitch_diff_;
   name_camera_pitch_angle_diff_map_[camera_names_[0]] = 0.f;
   name_camera_pitch_angle_diff_map_[camera_names_[1]] =
       static_cast<float>(pitch_diff_);
@@ -557,7 +549,7 @@ int LaneDetectionComponent::InitMotionService() {
                 std::placeholders::_1);
   auto motion_service_reader =
       node_->CreateReader(channel_name_local, motion_service_callback);
-  // initialize motion buffer
+  // Initialize motion buffer
   if (mot_buffer_ == nullptr) {
     mot_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
   } else {
@@ -571,7 +563,7 @@ int LaneDetectionComponent::InitCameraListeners() {
     const std::string &camera_name = camera_names_[i];
     const std::string &channel_name = input_camera_channel_names_[i];
     const std::string &listener_name = camera_name + "_fusion_camera_listener";
-    AINFO << "listener name: " << listener_name;
+    AINFO << "Listener name: " << listener_name;
 
     typedef std::shared_ptr<apollo::drivers::Image> ImageMsgType;
     std::function<void(const ImageMsgType &)> camera_callback =
@@ -610,10 +602,9 @@ int LaneDetectionComponent::InternalProc(
   Eigen::Affine3d camera2world_trans;
   if (!camera2world_trans_wrapper_map_[camera_name]->GetSensor2worldTrans(
           msg_timestamp, &camera2world_trans)) {
-    std::string err_str = "failed to get camera to world pose, ts: " +
-                          std::to_string(msg_timestamp) +
-                          " camera_name: " + camera_name;
-    AERROR << err_str;
+    AERROR << "Failed to get camera to world pose, ts: "
+           << std::to_string(msg_timestamp) << ", camera_name: " << camera_name;
+
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_TF;
     prefused_message->error_code_ = *error_code;
     return cyber::FAIL;
@@ -631,7 +622,7 @@ int LaneDetectionComponent::InternalProc(
 
   camera_frame.frame_id = frame_id_;
   camera_frame.timestamp = msg_timestamp;
-  // get narrow to short projection matrix
+  // Get narrow to short projection matrix
   if (camera_frame.data_provider->sensor_name() == camera_names_[1]) {
     camera_frame.project_matrix = project_matrix_;
   } else {
@@ -645,7 +636,7 @@ int LaneDetectionComponent::InternalProc(
 
   if (!camera_lane_pipeline_->Perception(camera_perception_options_,
                                          &camera_frame)) {
-    AERROR << "camera_lane_pipeline_->Perception() failed"
+    AERROR << "camera_lane_pipeline_->Perception() failed."
            << " msg_timestamp: " << std::to_string(msg_timestamp);
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_PROCESS;
     prefused_message->error_code_ = *error_code;
@@ -680,7 +671,7 @@ int LaneDetectionComponent::InternalProc(
     std::shared_ptr<base::Blob<uint8_t>> image_blob(new base::Blob<uint8_t>);
     camera_frame.data_provider->GetImageBlob(image_options, image_blob.get());
 
-    // visualize right away
+    // Visualize right away
     if (camera_name == visual_camera_) {
       cv::Mat output_image(image_height_, image_width_, CV_8UC3,
                            cv::Scalar(0, 0, 0));
@@ -692,13 +683,13 @@ int LaneDetectionComponent::InternalProc(
     }
   }
 
-  // send out lane message
+  // Send out lane message
   // TODO(yg13): add lanes in world coordinates
   std::shared_ptr<apollo::perception::PerceptionLanes> lanes_msg(
       new (std::nothrow) apollo::perception::PerceptionLanes);
   if (MakeProtobufMsg(msg_timestamp, camera_name, camera_frame,
                       lanes_msg.get()) != cyber::SUCC) {
-    AERROR << "make lanes_msg failed";
+    AERROR << "Failed to make lanes_msg.";
     return cyber::FAIL;
   }
   writer_->Write(lanes_msg);
@@ -710,7 +701,7 @@ int LaneDetectionComponent::ConvertLaneToCameraLaneline(
     const base::LaneLine &lane_line,
     apollo::perception::camera::CameraLaneLine *camera_laneline) {
   CHECK_NOTNULL(camera_laneline);
-  // fill the lane line attribute
+  // Fill the lane line attribute
   apollo::perception::camera::LaneLineType line_type =
       static_cast<apollo::perception::camera::LaneLineType>(lane_line.type);
   camera_laneline->set_type(line_type);
@@ -724,7 +715,7 @@ int LaneDetectionComponent::ConvertLaneToCameraLaneline(
       static_cast<apollo::perception::camera::LaneLineUseType>(
           lane_line.use_type);
   camera_laneline->set_use_type(use_type);
-  // fill the curve camera coord
+  // Fill the curve camera coord
   camera_laneline->mutable_curve_camera_coord()->set_longitude_min(
       lane_line.curve_camera_coord.x_start);
   camera_laneline->mutable_curve_camera_coord()->set_longitude_max(
@@ -737,7 +728,7 @@ int LaneDetectionComponent::ConvertLaneToCameraLaneline(
       lane_line.curve_camera_coord.c);
   camera_laneline->mutable_curve_camera_coord()->set_d(
       lane_line.curve_camera_coord.d);
-  // fill the curve image coord
+  // Fill the curve image coord
   camera_laneline->mutable_curve_image_coord()->set_longitude_min(
       lane_line.curve_image_coord.x_start);
   camera_laneline->mutable_curve_image_coord()->set_longitude_max(
@@ -750,7 +741,7 @@ int LaneDetectionComponent::ConvertLaneToCameraLaneline(
       lane_line.curve_image_coord.c);
   camera_laneline->mutable_curve_image_coord()->set_d(
       lane_line.curve_image_coord.d);
-  // fill the curve image point set
+  // Fill the curve image point set
   for (size_t i = 0; i < lane_line.curve_image_point_set.size(); i++) {
     const base::Point2DF &image_point2d = lane_line.curve_image_point_set[i];
     apollo::common::Point2D *lane_point_2d =
@@ -758,7 +749,7 @@ int LaneDetectionComponent::ConvertLaneToCameraLaneline(
     lane_point_2d->set_x(image_point2d.x);
     lane_point_2d->set_y(image_point2d.y);
   }
-  // fill the curve camera point set
+  // Fill the curve camera point set
   for (size_t i = 0; i < lane_line.curve_camera_point_set.size(); i++) {
     const base::Point3DF &point3d = lane_line.curve_camera_point_set[i];
     apollo::common::Point3D *lane_point_3d =
@@ -767,7 +758,7 @@ int LaneDetectionComponent::ConvertLaneToCameraLaneline(
     lane_point_3d->set_y(point3d.y);
     lane_point_3d->set_z(point3d.z);
   }
-  // fill the line end point set
+  // Fill the line end point set
   for (size_t i = 0; i < lane_line.image_end_point_set.size(); i++) {
     const base::EndPoints &end_points = lane_line.image_end_point_set[i];
     apollo::perception::camera::EndPoints *lane_end_points =
@@ -787,7 +778,7 @@ int LaneDetectionComponent::MakeProtobufMsg(
   CHECK_NOTNULL(lanes_msg);
   auto itr = std::find(camera_names_.begin(), camera_names_.end(), camera_name);
   if (itr == camera_names_.end()) {
-    AERROR << "invalid camera_name: " << camera_name;
+    AERROR << "Invalid camera_name: " << camera_name;
     return cyber::FAIL;
   }
   int input_camera_channel_names_idx =
@@ -796,9 +787,9 @@ int LaneDetectionComponent::MakeProtobufMsg(
       static_cast<int>(input_camera_channel_names_.size());
   if (input_camera_channel_names_idx < 0 ||
       input_camera_channel_names_idx >= input_camera_channel_names_size) {
-    AERROR << "invalid input_camera_channel_names_idx: "
+    AERROR << "Invalid input_camera_channel_names_idx: "
            << input_camera_channel_names_idx
-           << " input_camera_channel_names_.size(): "
+           << ", input_camera_channel_names_.size(): "
            << input_camera_channel_names_.size();
     return cyber::FAIL;
   }
