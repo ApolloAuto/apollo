@@ -58,7 +58,7 @@ class AutoLock {
 
  public:
   void UnLock() {
-    CHECK( t != nullptr);
+    CHECK(t != nullptr);
     if (lock_) {
       InternalUnLock(t_);
       lock_ = false;
