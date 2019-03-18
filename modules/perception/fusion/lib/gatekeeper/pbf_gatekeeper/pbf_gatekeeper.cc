@@ -72,9 +72,8 @@ bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
   if (invisible_in_lidar && invisible_in_radar &&
       (!params_.use_camera_3d || invisible_in_camera)) {
     auto sensor_obj = track->GetFusedObject();
-    if (sensor_obj != nullptr &&
-        sensor_obj->GetBaseObject()->sub_type !=
-            base::ObjectSubType::TRAFFICCONE) {
+    if (sensor_obj != nullptr && sensor_obj->GetBaseObject()->sub_type !=
+                                     base::ObjectSubType::TRAFFICCONE) {
       return false;
     }
   }

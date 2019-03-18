@@ -39,8 +39,8 @@ class PathBoundsDecider : public Decider {
   explicit PathBoundsDecider(const TaskConfig& config);
 
  private:
-  common::Status Process(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
+  common::Status Process(Frame* frame,
+                         ReferenceLineInfo* reference_line_info) override;
 
   std::string GeneratePathBoundaries(
       Frame* frame, ReferenceLineInfo* reference_line_info,
@@ -56,17 +56,17 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundariesFromLanesAndADC(
-      const ReferenceLine& reference_line,
-      int lane_borrowing, double ADC_buffer,
+      const ReferenceLine& reference_line, int lane_borrowing,
+      double ADC_buffer,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundariesFromStaticObstacles(
       PathDecision* const path_decision,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
-  bool GetLaneInfoFromPoint(
-      double point_x, double point_y, double point_z, double point_theta,
-      hdmap::LaneInfoConstPtr *const lane);
+  bool GetLaneInfoFromPoint(double point_x, double point_y, double point_z,
+                            double point_theta,
+                            hdmap::LaneInfoConstPtr* const lane);
 
   double GetBufferBetweenADCCenterAndEdge();
 
@@ -77,27 +77,27 @@ class PathBoundsDecider : public Decider {
   std::vector<std::vector<std::tuple<double, double, double>>>
   ConstructSubsequentPathBounds(
       const std::vector<std::tuple<int, double, double, double, std::string>>&
-      sorted_obstacles,
+          sorted_obstacles,
       size_t path_idx, size_t obs_idx,
-      std::unordered_map<std::string, std::tuple<bool, double>>*
-      const obs_id_to_details,
+      std::unordered_map<std::string, std::tuple<bool, double>>* const
+          obs_id_to_details,
       std::vector<std::tuple<double, double, double>>* const curr_path_bounds);
 
   std::vector<std::vector<bool>> DecidePassDirections(
       double l_min, double l_max,
       const std::vector<std::tuple<int, double, double, double, std::string>>&
-      new_entering_obstacles);
+          new_entering_obstacles);
 
   /**
-    * @brief Update the path_boundary at "idx", as well as the new center-line.
-    *        It also checks if ADC is blocked (lmax < lmin).
-    * @param The current index of the path_bounds
-    * @param The minimum left boundary (l_max)
-    * @param The maximum right boundary (l_min)
-    * @param The path_boundaries (its content at idx will be updated)
-    * @param The center_line (to be updated)
-    * @return If path is good, true; if path is blocked, false.
-    */
+   * @brief Update the path_boundary at "idx", as well as the new center-line.
+   *        It also checks if ADC is blocked (lmax < lmin).
+   * @param The current index of the path_bounds
+   * @param The minimum left boundary (l_max)
+   * @param The maximum right boundary (l_min)
+   * @param The path_boundaries (its content at idx will be updated)
+   * @param The center_line (to be updated)
+   * @return If path is good, true; if path is blocked, false.
+   */
   bool UpdatePathBoundaryAndCenterLine(
       size_t idx, double left_bound, double right_bound,
       std::vector<std::tuple<double, double, double>>* const path_boundaries,

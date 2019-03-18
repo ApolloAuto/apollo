@@ -79,8 +79,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     }
 
     // set right_of_way_status
-    reference_line_info.SetJunctionRightOfWay(
-        traffic_light_overlap.start_s, false);
+    reference_line_info.SetJunctionRightOfWay(traffic_light_overlap.start_s,
+                                              false);
 
     auto signal_color =
         scenario::GetSignal(traffic_light_overlap.object_id).color();

@@ -33,8 +33,8 @@ using common::Status;
 using common::TrajectoryPoint;
 using common::time::Clock;
 
-StageSidePass::StageSidePass(const ScenarioConfig::StageConfig& config) :
-    Stage(config) {}
+StageSidePass::StageSidePass(const ScenarioConfig::StageConfig& config)
+    : Stage(config) {}
 
 Stage::StageStatus StageSidePass::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -48,12 +48,12 @@ Stage::StageStatus StageSidePass::Process(
     return StageStatus::ERROR;
   }
 
-  auto tasks_status = ExecuteTasks(planning_init_point, frame,
-      &reference_line_info);
+  auto tasks_status =
+      ExecuteTasks(planning_init_point, frame, &reference_line_info);
 
   if (tasks_status != Status::OK()) {
-    auto fallback_status = PlanFallbackTrajectory(planning_init_point,
-        frame, &reference_line_info);
+    auto fallback_status = PlanFallbackTrajectory(planning_init_point, frame,
+                                                  &reference_line_info);
 
     if (fallback_status != Status::OK()) {
       AERROR << "computing fallback trajectory failed";
@@ -64,10 +64,9 @@ Stage::StageStatus StageSidePass::Process(
   return Stage::StageStatus::RUNNING;
 }
 
-Status StageSidePass::ExecuteTasks(
-    const TrajectoryPoint& planning_start_point, Frame* frame,
-    ReferenceLineInfo* reference_line_info) {
-
+Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
+                                   Frame* frame,
+                                   ReferenceLineInfo* reference_line_info) {
   for (auto* ptr_task : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
     auto task_status = ptr_task->Execute(frame, reference_line_info);

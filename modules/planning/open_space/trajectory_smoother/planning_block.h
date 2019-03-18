@@ -22,17 +22,16 @@
 namespace apollo {
 namespace planning {
 
-#define BLOCK_WIDTH     16
-#define BLOCK_HEIGHT    16
+#define BLOCK_WIDTH 16
+#define BLOCK_HEIGHT 16
 
-#define BLOCK_1        256
+#define BLOCK_1 256
 
-#define TEMPLATE_ROUTINE_INSTANCE(ret, routine) \
-template ret routine
+#define TEMPLATE_ROUTINE_INSTANCE(ret, routine) template ret routine
 
-#define DATA_TRANSFER_INST(type)                            \
-TEMPLATE_ROUTINE_INSTANCE(bool, data_transfer(type *dst,    \
-    const type *src, const int size))
+#define DATA_TRANSFER_INST(type) \
+  TEMPLATE_ROUTINE_INSTANCE(     \
+      bool, data_transfer(type *dst, const type *src, const int size))
 
 #define CUDA_CHECK(call)                                                   \
   {                                                                        \

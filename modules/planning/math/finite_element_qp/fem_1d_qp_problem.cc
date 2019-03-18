@@ -223,9 +223,10 @@ bool Fem1dQpProblem::Optimize() {
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
   OSQPWorkspace* work = nullptr;
 
-  bool res = OptimizeWithOsqp(3 * num_of_knots_, lower_bounds.size(),
-                   P_data, P_indices, P_indptr, A_data, A_indices, A_indptr,
-                   lower_bounds, upper_bounds, q, data, &work, settings);
+  bool res =
+      OptimizeWithOsqp(3 * num_of_knots_, lower_bounds.size(), P_data,
+                       P_indices, P_indptr, A_data, A_indices, A_indptr,
+                       lower_bounds, upper_bounds, q, data, &work, settings);
   if (res == false || work == nullptr || work->solution == nullptr) {
     AERROR << "Failed to find solution.";
     // Cleanup
@@ -286,23 +287,25 @@ void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
   }
 
   // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
-  columns[2 * N].emplace_back(2 * N, weight_.x_second_order_derivative_w +
-                              weight_.x_third_order_derivative_w / delta_s_sq_);
+  columns[2 * N].emplace_back(
+      2 * N, weight_.x_second_order_derivative_w +
+                 weight_.x_third_order_derivative_w / delta_s_sq_);
   ++value_index;
   for (int i = 1; i < N - 1; ++i) {
-    columns[2 * N + i].emplace_back(2 * N + i,
-                       weight_.x_second_order_derivative_w +
+    columns[2 * N + i].emplace_back(
+        2 * N + i, weight_.x_second_order_derivative_w +
                        2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
     ++value_index;
   }
-  columns[3 * N - 1].emplace_back(3 * N - 1, weight_.x_second_order_derivative_w
-                     + weight_.x_third_order_derivative_w / delta_s_sq_);
+  columns[3 * N - 1].emplace_back(
+      3 * N - 1, weight_.x_second_order_derivative_w +
+                     weight_.x_third_order_derivative_w / delta_s_sq_);
   ++value_index;
 
   // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
   for (int i = 0; i < N - 1; ++i) {
-    columns[2 * N + i].emplace_back(2 * N + i + 1,
-                       -2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
+    columns[2 * N + i].emplace_back(
+        2 * N + i + 1, -2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
     ++value_index;
   }
 

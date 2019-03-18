@@ -99,9 +99,10 @@ bool PathDecision::MergeWithMainStop(const ObjectStop &obj_stop,
   }
 
   // check stop_line_s vs adc_s, ignore if it is further way than main stop
-  const auto& vehicle_config = common::VehicleConfigHelper::GetConfig();
-  stop_line_s = std::fmax(stop_line_s, adc_sl_boundary.end_s() -
-      vehicle_config.vehicle_param().front_edge_to_center());
+  const auto &vehicle_config = common::VehicleConfigHelper::GetConfig();
+  stop_line_s = std::fmax(
+      stop_line_s, adc_sl_boundary.end_s() -
+                       vehicle_config.vehicle_param().front_edge_to_center());
 
   if (stop_line_s >= stop_reference_line_s_) {
     ADEBUG << "stop point is farther than current main stop point.";

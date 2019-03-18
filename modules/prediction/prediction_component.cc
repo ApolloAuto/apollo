@@ -172,8 +172,7 @@ bool PredictionComponent::Proc(
 
   auto end_time5 = std::chrono::system_clock::now();
   diff = end_time5 - end_time1;
-  ADEBUG << "End to end time elapsed: " << diff.count() * 1000
-         << " msec.";
+  ADEBUG << "End to end time elapsed: " << diff.count() * 1000 << " msec.";
 
   // Publish output
   common::util::FillHeader(node_->Name(), &prediction_obstacles);
