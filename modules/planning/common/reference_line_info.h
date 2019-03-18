@@ -296,7 +296,6 @@ class ReferenceLineInfo {
   double fallback_path_boundaries_s_start_ = 0.0;
   double fallback_path_boundaries_s_resolution_ = 0.1;
 
-  // 1: path_data_; 0: fallback_path_data_; -1: neither.
   PathDataType feasible_path_data_ = PathDataType::REGULAR_PATH;
   PathData path_data_;
   PathData fallback_path_data_;

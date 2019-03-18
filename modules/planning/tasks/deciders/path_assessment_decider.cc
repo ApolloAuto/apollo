@@ -110,7 +110,6 @@ void PathAssessmentDecider::SetPathInfo(
   SetObstacleDistance(reference_line_info, *path_data, &path_decision);
 
   path_data->SetPathPointDecisionGuide(path_decision);
-  return;
 }
 
 bool PathAssessmentDecider::IsGreatlyOffReferenceLine(
@@ -205,7 +204,6 @@ void PathAssessmentDecider::InitPathPointDecision(
         PathData::PathPointType::UNKNOWN,
         std::numeric_limits<double>::max());
   }
-  return;
 }
 
 void PathAssessmentDecider::SetPathPointType(
@@ -260,15 +258,48 @@ void PathAssessmentDecider::SetPathPointType(
       }
     }
   }
-  return;
 }
 
 void PathAssessmentDecider::SetObstacleDistance(
     const ReferenceLineInfo& reference_line_info,
     const PathData& path_data,
     std::vector<PathPointDecision>* const path_decision) {
-  // Check
-  return;
+  // Sanity checks
+  CHECK_NOTNULL(path_decision);
+
+  // Get all obstacles and convert them into frenet-frame polygons.
+  std::vector<Polygon2d> obstacle_polygons;
+  auto indexed_obstacles = reference_line_info.path_decision().obstacles();
+  for (const auto* obstacle : indexed_obstacles.Items()) {
+    // Filter out unrelated obstacles.
+    if (!IsWithinPathDeciderScopeObstacle(*obstacle)) {
+      continue;
+    }
+    // Convert into polygon and save it.
+    const auto obstacle_sl = obstacle->PerceptionSLBoundary();
+    obstacle_polygons.push_back(
+        Polygon2d({Vec2d(obstacle_sl.start_s(), obstacle_sl.start_l()),
+                   Vec2d(obstacle_sl.start_s(), obstacle_sl.end_l()),
+                   Vec2d(obstacle_sl.end_s(), obstacle_sl.end_l()),
+                   Vec2d(obstacle_sl.end_s(), obstacle_sl.start_l())}));
+  }
+
+  // Go through every path point, update closest obstacle info.
+  const auto& discrete_path = path_data.discretized_path();
+  for (size_t i = 0; i < discrete_path.size(); ++i) {
+    const auto& path_point = discrete_path[i];
+    // Get the bounding box of the vehicle at that point.
+    const auto& vehicle_box =
+        common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);
+    // Go through all the obstacle polygons, and update the min distance.
+    double min_distance_to_obstacles = 10000.0;
+    for (const auto& obstacle_polygon : obstacle_polygons) {
+      double distance_to_vehicle = obstacle_polygon.DistanceTo(vehicle_box);
+      min_distance_to_obstacles = std::min(
+          min_distance_to_obstacles, distance_to_vehicle);
+    }
+    std::get<2>((*path_decision)[i]) = min_distance_to_obstacles;
+  }
 }
 
 }  // namespace planning
