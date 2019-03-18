@@ -29,7 +29,7 @@ DEFINE_bool(enable_collision_detection, false,
             "enable collision detection in planning");
 
 // scenario related
-DEFINE_string(scenario_bare_intersection_protected_config_file,
+DEFINE_string(scenario_bare_intersection_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/bare_intersection_protected_config.pb.txt",
               "The bare_intersection_protected scenario configuration file");
