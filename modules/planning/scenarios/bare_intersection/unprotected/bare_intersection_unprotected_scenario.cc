@@ -18,15 +18,15 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/bare_intersection/protected/bare_intersection_protected_scenario.h"
+#include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/scenarios/bare_intersection/protected/stage_approach.h"
-#include "modules/planning/scenarios/bare_intersection/protected/stage_intersection_cruise.h"
+#include "modules/planning/scenarios/bare_intersection/unprotected/stage_approach.h"
+#include "modules/planning/scenarios/bare_intersection/unprotected/stage_intersection_cruise.h"
 
 namespace apollo {
 namespace planning {
@@ -35,7 +35,7 @@ namespace bare_intersection {
 
 using hdmap::HDMapUtil;
 
-void BareIntersectionProtectedScenario::Init() {
+void BareIntersectionUnprotectedScenario::Init() {
   if (init_) {
     return;
   }
@@ -53,25 +53,25 @@ void BareIntersectionProtectedScenario::Init() {
 apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
-    BareIntersectionProtectedScenario::s_stage_factory_;
+    BareIntersectionUnprotectedScenario::s_stage_factory_;
 
-void BareIntersectionProtectedScenario::RegisterStages() {
+void BareIntersectionUnprotectedScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::BARE_INTERSECTION_PROTECTED_APPROACH,
+      ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_APPROACH,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new BareIntersectionProtectedStageApproach(config);
+        return new BareIntersectionUnprotectedStageApproach(config);
       });
   s_stage_factory_.Register(
-      ScenarioConfig::BARE_INTERSECTION_PROTECTED_INTERSECTION_CRUISE,
+      ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new BareIntersectionProtectedStageIntersectionCruise(config);
+        return new BareIntersectionUnprotectedStageIntersectionCruise(config);
       });
 }
 
-std::unique_ptr<Stage> BareIntersectionProtectedScenario::CreateStage(
+std::unique_ptr<Stage> BareIntersectionUnprotectedScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
   if (s_stage_factory_.Empty()) {
     RegisterStages();
@@ -84,7 +84,7 @@ std::unique_ptr<Stage> BareIntersectionProtectedScenario::CreateStage(
   return ptr;
 }
 
-bool BareIntersectionProtectedScenario::IsTransferable(
+bool BareIntersectionUnprotectedScenario::IsTransferable(
     const Scenario& current_scenario, const Frame& frame) {
   return false;
 }
@@ -92,13 +92,13 @@ bool BareIntersectionProtectedScenario::IsTransferable(
 /*
  * read scenario specific configs and set in context_ for stages to read
  */
-bool BareIntersectionProtectedScenario::GetScenarioConfig() {
-  if (!config_.has_bare_intersection_protected_config()) {
+bool BareIntersectionUnprotectedScenario::GetScenarioConfig() {
+  if (!config_.has_bare_intersection_unprotected_config()) {
     AERROR << "miss scenario specific config";
     return false;
   }
   context_.scenario_config.CopyFrom(
-      config_.bare_intersection_protected_config());
+      config_.bare_intersection_unprotected_config());
   return true;
 }
 

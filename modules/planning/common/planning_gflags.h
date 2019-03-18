@@ -24,7 +24,7 @@ DECLARE_double(test_duration);
 DECLARE_string(planning_config_file);
 
 // scenarios related
-DECLARE_string(scenario_bare_intersection_protected_config_file);
+DECLARE_string(scenario_bare_intersection_unprotected_config_file);
 DECLARE_string(scenario_lane_follow_config_file);
 DECLARE_string(scenario_side_pass_config_file);
 DECLARE_string(scenario_stop_sign_unprotected_config_file);

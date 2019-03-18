@@ -34,14 +34,15 @@ namespace scenario {
 namespace bare_intersection {
 
 // stage context
-struct BareIntersectionProtectedContext {
-  ScenarioBareIntersectionProtectedConfig scenario_config;
+struct BareIntersectionUnprotectedContext {
+  ScenarioBareIntersectionUnprotectedConfig scenario_config;
 };
 
-class BareIntersectionProtectedScenario : public Scenario {
+class BareIntersectionUnprotectedScenario : public Scenario {
  public:
-  BareIntersectionProtectedScenario(const ScenarioConfig& config,
-                                    const ScenarioContext* context)
+  explicit BareIntersectionUnprotectedScenario(
+      const ScenarioConfig& config,
+      const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;
@@ -52,7 +53,7 @@ class BareIntersectionProtectedScenario : public Scenario {
   bool IsTransferable(const Scenario& current_scenario,
                       const Frame& frame) override;
 
-  BareIntersectionProtectedContext* GetContext() { return &context_; }
+  BareIntersectionUnprotectedContext* GetContext() { return &context_; }
 
  private:
   static void RegisterStages();
@@ -64,7 +65,7 @@ class BareIntersectionProtectedScenario : public Scenario {
 
  private:
   bool init_ = false;
-  BareIntersectionProtectedContext context_;
+  BareIntersectionUnprotectedContext context_;
 };
 
 }  // namespace bare_intersection

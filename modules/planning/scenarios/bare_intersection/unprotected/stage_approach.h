@@ -20,7 +20,9 @@
 
 #pragma once
 
-#include "modules/planning/scenarios/bare_intersection/protected/bare_intersection_protected_scenario.h"
+#include <string>
+
+#include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
@@ -28,27 +30,27 @@ namespace planning {
 namespace scenario {
 namespace bare_intersection {
 
-struct BareIntersectionProtectedContext;
+struct BareIntersectionUnprotectedContext;
 
-class BareIntersectionProtectedStageIntersectionCruise : public Stage {
+class BareIntersectionUnprotectedStageApproach : public Stage {
  public:
-  explicit BareIntersectionProtectedStageIntersectionCruise(
+  explicit BareIntersectionUnprotectedStageApproach(
       const ScenarioConfig::StageConfig& config)
       : Stage(config) {}
 
  private:
   Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                              Frame* frame) override;
-
-  BareIntersectionProtectedContext* GetContext() {
-    return GetContextAs<BareIntersectionProtectedContext>();
+  BareIntersectionUnprotectedContext* GetContext() {
+    return GetContextAs<BareIntersectionUnprotectedContext>();
   }
 
  private:
+  Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage();
 
  private:
-  ScenarioBareIntersectionProtectedConfig scenario_config_;
+  ScenarioBareIntersectionUnprotectedConfig scenario_config_;
 };
 
 }  // namespace bare_intersection

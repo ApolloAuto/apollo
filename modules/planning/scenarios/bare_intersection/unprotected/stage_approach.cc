@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/bare_intersection/protected/stage_approach.h"
+#include "modules/planning/scenarios/bare_intersection/unprotected/stage_approach.h"
 
 #include <vector>
 
@@ -34,7 +34,7 @@ namespace bare_intersection {
 
 using common::TrajectoryPoint;
 
-Stage::StageStatus BareIntersectionProtectedStageApproach::Process(
+Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: Approach";
   CHECK_NOTNULL(frame);
@@ -43,20 +43,21 @@ Stage::StageStatus BareIntersectionProtectedStageApproach::Process(
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "BareIntersectionProtectedStop planning error";
+    AERROR << "BareIntersectionUnprotectedStop planning error";
   }
 
   // TODO(all): to be implemented
   return Stage::RUNNING;
 }
 
-Stage::StageStatus BareIntersectionProtectedStageApproach::FinishScenario() {
+Stage::StageStatus BareIntersectionUnprotectedStageApproach::FinishScenario() {
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
-Stage::StageStatus BareIntersectionProtectedStageApproach::FinishStage() {
-  next_stage_ = ScenarioConfig::BARE_INTERSECTION_PROTECTED_INTERSECTION_CRUISE;
+Stage::StageStatus BareIntersectionUnprotectedStageApproach::FinishStage() {
+  next_stage_ =
+      ScenarioConfig::BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE;
   return Stage::FINISHED;
 }
 
