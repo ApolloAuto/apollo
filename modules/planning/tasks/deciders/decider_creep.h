@@ -42,17 +42,20 @@ class DeciderCreep : public Decider {
   bool CheckCreepDone(const Frame& frame,
                       const ReferenceLineInfo& reference_line_info,
                       const double stop_sign_overlap_end_s,
-                      const double wait_time, const double timeout);
+                      const double wait_time_sec,
+                      const double timeout_sec);
 
   void SetProceedWithCautionSpeedParam(
-      const Frame& frame, const ReferenceLineInfo& reference_line_info,
+      const Frame& frame,
+      const ReferenceLineInfo& reference_line_info,
       const double stop_sign_overlap_end_s);
 
   double FindCreepDistance(const Frame& frame,
                            const ReferenceLineInfo& reference_line_info);
 
  private:
-  bool BuildStopDecision(const double stop_sign_overlap_end_s, Frame* frame,
+  bool BuildStopDecision(const double stop_sign_overlap_end_s,
+                         Frame* frame,
                          ReferenceLineInfo* reference_line_info);
 
  private:

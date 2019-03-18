@@ -104,7 +104,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
         const double wait_time = Clock::NowInSeconds() - start_time;
         ADEBUG << "stop_start_time[" << start_time << "] wait_time["
                << wait_time << "]";
-        if (wait_time > scenario_config_.red_light_right_turn_stop_duration()) {
+        if (wait_time >
+            scenario_config_.red_light_right_turn_stop_duration_sec()) {
           return FinishStage(false);
         }
       }
