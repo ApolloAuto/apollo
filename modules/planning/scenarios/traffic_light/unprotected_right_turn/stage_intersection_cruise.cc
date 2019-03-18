@@ -47,9 +47,10 @@ TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
 
   // set right_of_way_status
   if (PlanningContext::GetScenarioInfo()
-      ->current_traffic_light_overlaps.size() > 0) {
+          ->current_traffic_light_overlaps.size() > 0) {
     const double traffic_light_start_s = PlanningContext::GetScenarioInfo()
-        ->current_traffic_light_overlaps[0].start_s;
+                                             ->current_traffic_light_overlaps[0]
+                                             .start_s;
     reference_line_info.SetJunctionRightOfWay(traffic_light_start_s, true);
   }
 

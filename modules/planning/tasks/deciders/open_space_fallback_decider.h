@@ -48,10 +48,9 @@ class OpenSpaceFallbackDecider : public Decider {
 
   // bool IsCollisionFreeTrajectory(const ADCTrajectory& trajectory_pb);
 
-  void BuildPredictedEnvironment(
-    const std::vector<const Obstacle*>& obstacles,
-    std::vector<std::vector<common::math::Box2d>>
-        &predicted_bounding_rectangles);
+  void BuildPredictedEnvironment(const std::vector<const Obstacle*>& obstacles,
+                                 std::vector<std::vector<common::math::Box2d>>&
+                                     predicted_bounding_rectangles);
 
   bool IsCollisionFreeTrajectory(
       const TrajGearPair& trajectory_pb,

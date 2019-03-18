@@ -41,7 +41,6 @@ DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
 DECLARE_bool(enable_scenario_stop_sign);
 DECLARE_bool(enable_scenario_traffic_light);
 
-
 DECLARE_string(traffic_rule_config_filename);
 DECLARE_string(smoother_config_filename);
 DECLARE_string(reopt_smoother_config_filename);

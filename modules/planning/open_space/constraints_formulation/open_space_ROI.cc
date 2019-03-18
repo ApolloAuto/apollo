@@ -45,7 +45,7 @@ bool OpenSpaceROI::GenerateRegionOfInterest(Frame *frame) {
   // open space planner to save computation effort
   vehicle_state_ = frame->vehicle_state();
   obstacles_by_frame_ = frame->GetObstacleList();
-  const auto& parking_space =
+  const auto &parking_space =
       frame->local_view().routing->routing_request().parking_space();
   if (parking_space.has_id()) {
     target_parking_spot_id_ = parking_space.id().id();

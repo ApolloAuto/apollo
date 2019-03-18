@@ -175,7 +175,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane, const float &velocity,
   accumulated_straight_driving_in_meter_ += distance_traveled_in_meter;
   //  std::cout << "acc_d: " << accumulated_straight_driving_in_meter_ << "\n";
   if (accumulated_straight_driving_in_meter_ >
-      params_.min_distance_to_update_calibration_in_meter &&
+          params_.min_distance_to_update_calibration_in_meter &&
       pitch_histogram_.Process()) {
     pitch_estimation_ = pitch_histogram_.get_val_estimation();
     const float cy = k_mat_[5];
@@ -294,7 +294,8 @@ bool LaneBasedCalibrator::SelectTwoPointsFromLineForVanishingPoint(
   int nr_samples = nr_pts * static_cast<int>(params_.sampling_lane_point_rate);
   int offset_end = nr_pts - nr_samples - 1;
   int sampled_start = GetCenterIndex(line.lane_point.data(), nr_samples);
-  int sampled_end = offset_end +
+  int sampled_end =
+      offset_end +
       GetCenterIndex(line.lane_point.data() + offset_end, nr_samples);
 
   if (sampled_start >= 0 && sampled_end >= 0) {

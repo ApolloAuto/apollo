@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/bare_intersection/protected/bare_intersection_protected_scenario.h"
+#include "modules/planning/scenarios/stage.h"
 
 namespace apollo {
 namespace planning {

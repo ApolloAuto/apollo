@@ -411,9 +411,9 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     double start_x = latest_feature_ptr->position().x();
     double start_y = latest_feature_ptr->position().y();
     double end_x = start_x + FLAGS_caution_pedestrian_approach_time *
-        latest_feature_ptr->raw_velocity().x();
+                                 latest_feature_ptr->raw_velocity().x();
     double end_y = start_y + FLAGS_caution_pedestrian_approach_time *
-        latest_feature_ptr->raw_velocity().y();
+                                 latest_feature_ptr->raw_velocity().y();
     std::vector<std::string> nearby_lane_ids = PredictionMap::NearbyLaneIds(
         {start_x, start_y}, FLAGS_pedestrian_nearby_lane_search_radius);
     if (nearby_lane_ids.empty()) {
@@ -424,7 +424,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
         continue;
       }
       std::shared_ptr<const LaneInfo> lane_info_ptr =
-        PredictionMap::LaneById(lane_id);
+          PredictionMap::LaneById(lane_id);
       if (lane_info_ptr == nullptr) {
         AERROR << "Null lane info pointer found.";
         continue;
@@ -433,10 +433,10 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
       double start_l = 0.0;
       double end_s = 0.0;
       double end_l = 0.0;
-      if (PredictionMap::GetProjection({start_x, start_y},
-                         lane_info_ptr, &start_s, &start_l) &&
-          PredictionMap::GetProjection({end_x, end_y},
-                         lane_info_ptr, &end_s, &end_l)) {
+      if (PredictionMap::GetProjection({start_x, start_y}, lane_info_ptr,
+                                       &start_s, &start_l) &&
+          PredictionMap::GetProjection({end_x, end_y}, lane_info_ptr, &end_s,
+                                       &end_l)) {
         if (std::fabs(start_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
             std::fabs(end_l) < FLAGS_pedestrian_nearby_lane_search_radius ||
             start_l * end_l < 0.0) {

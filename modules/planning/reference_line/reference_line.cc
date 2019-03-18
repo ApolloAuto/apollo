@@ -208,7 +208,6 @@ common::FrenetFramePoint ReferenceLine::GetFrenetPoint(
   return frenet_frame_point;
 }
 
-
 std::pair<std::array<double, 3>, std::array<double, 3> >
 ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
   CHECK(!reference_points_.empty());
@@ -219,11 +218,12 @@ ReferenceLine::ToFrenetFrame(const common::TrajectoryPoint& traj_point) const {
   std::array<double, 3> s_condition;
   std::array<double, 3> l_condition;
   ReferencePoint ref_point = GetReferencePoint(sl_point.s());
-  CartesianFrenetConverter::cartesian_to_frenet(sl_point.s(), ref_point.x(),
-      ref_point.y(), ref_point.heading(), ref_point.kappa(), ref_point.dkappa(),
-      traj_point.path_point().x(), traj_point.path_point().y(), traj_point.v(),
-      traj_point.a(), traj_point.path_point().theta(),
-      traj_point.path_point().kappa(), &s_condition, &l_condition);
+  CartesianFrenetConverter::cartesian_to_frenet(
+      sl_point.s(), ref_point.x(), ref_point.y(), ref_point.heading(),
+      ref_point.kappa(), ref_point.dkappa(), traj_point.path_point().x(),
+      traj_point.path_point().y(), traj_point.v(), traj_point.a(),
+      traj_point.path_point().theta(), traj_point.path_point().kappa(),
+      &s_condition, &l_condition);
 
   return std::make_pair(s_condition, l_condition);
 }

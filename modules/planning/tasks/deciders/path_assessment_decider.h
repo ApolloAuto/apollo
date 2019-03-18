@@ -36,23 +36,23 @@ class PathAssessmentDecider : public Decider {
 
  private:
   common::Status Process(Frame* const frame,
-      ReferenceLineInfo* const reference_line_info) override;
+                         ReferenceLineInfo* const reference_line_info) override;
 
-  bool IsValidRegularPath(
-      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+  bool IsValidRegularPath(const ReferenceLineInfo& reference_line_info,
+                          const PathData& path_data);
 
-  bool IsValidFallbackPath(
-    const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+  bool IsValidFallbackPath(const ReferenceLineInfo& reference_line_info,
+                           const PathData& path_data);
 
   void SetPathInfo();
 
   bool IsGreatlyOffReferenceLine(const PathData& path_data);
 
-  bool IsGreatlyOffRoad(
-    const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+  bool IsGreatlyOffRoad(const ReferenceLineInfo& reference_line_info,
+                        const PathData& path_data);
 
   bool IsCollidingWithStaticObstacles(
-    const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 };
 
 }  // namespace planning

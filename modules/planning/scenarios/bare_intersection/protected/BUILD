@@ -5,14 +5,14 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "bare_intersection_protected_scenario",
     srcs = [
+        "bare_intersection_protected_scenario.cc",
         "stage_approach.cc",
         "stage_intersection_cruise.cc",
-        "bare_intersection_protected_scenario.cc",
     ],
     hdrs = [
+        "bare_intersection_protected_scenario.h",
         "stage_approach.h",
         "stage_intersection_cruise.h",
-        "bare_intersection_protected_scenario.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

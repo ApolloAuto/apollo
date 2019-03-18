@@ -50,23 +50,23 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     auto fallback_trajectory_vec =
         frame_->mutable_open_space_info()->mutable_fallback_trajectory()->first;
 
-    double stop_distance = std::max(0.0,
-        collision_distance - config_.open_space_fallback_decider_config().
-            open_space_fall_back_stop_safety_gap());
+    double stop_distance = std::max(
+        0.0, collision_distance - config_.open_space_fallback_decider_config()
+                                      .open_space_fall_back_stop_safety_gap());
     if (stop_distance > 0.0) {
       // the accelerate = v0^2 / (2*s), where s is slowing down distance
-      double accelerate =
-          (frame_->vehicle_state().linear_velocity() *
-           frame_->vehicle_state().linear_velocity()) /
-           2.0 / stop_distance;
+      double accelerate = (frame_->vehicle_state().linear_velocity() *
+                           frame_->vehicle_state().linear_velocity()) /
+                          2.0 / stop_distance;
       double current_v = frame_->vehicle_state().linear_velocity();
       size_t temp_horizon =
           frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
       for (size_t i = 0; i < temp_horizon; ++i) {
-        double next_v = std::max(0.0, current_v -
-            accelerate * frame_->open_space_info().
-                fallback_trajectory().first.
-                TrajectoryPointAt(i).relative_time());
+        double next_v = std::max(
+            0.0, current_v - accelerate * frame_->open_space_info()
+                                              .fallback_trajectory()
+                                              .first.TrajectoryPointAt(i)
+                                              .relative_time());
         fallback_trajectory_vec[i].set_v(next_v);
         fallback_trajectory_vec[i].set_a(-accelerate);
         current_v = next_v;
@@ -121,9 +121,8 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
     const auto& trajectory_point = trajectory_pb.TrajectoryPointAt(i);
     double ego_theta = trajectory_point.path_point().theta();
     Box2d ego_box(
-        {trajectory_point.path_point().x(),
-         trajectory_point.path_point().y()},
-         ego_theta, ego_length, ego_width);
+        {trajectory_point.path_point().x(), trajectory_point.path_point().y()},
+        ego_theta, ego_length, ego_width);
     double shift_distance =
         ego_length / 2.0 - vehicle_config.vehicle_param().back_edge_to_center();
     Vec2d shift_vec{shift_distance * std::cos(ego_theta),
