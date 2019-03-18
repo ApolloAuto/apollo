@@ -509,4 +509,7 @@ DEFINE_double(vehicle_low_speed_threshold, 1.0, "Vehicle low speed threshold.");
 DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");
 
 DEFINE_bool(enable_nonscenario_side_pass, false,
-            "true to enable side pass without scenario management");
+            "True to enable side pass without scenario management");
+
+DEFINE_bool(enable_soft_speed_limit, false,
+            "True to set soft speed limit guided by path optimization result");
