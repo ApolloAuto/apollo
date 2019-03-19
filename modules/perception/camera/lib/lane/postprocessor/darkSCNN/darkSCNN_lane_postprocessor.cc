@@ -310,16 +310,15 @@ bool DarkSCNNLanePostprocessor::Process2D(
     cur_object.pos_type = spatialLUT[i];
 
     // [3] Determine which lines are valid according to the y value at x = 3
-    if (i < 5 && c0s[i] < c0s[i + 1])
+    if ((i < 5 && c0s[i] < c0s[i + 1]) ||
+        (i > 5 && i < 10 && c0s[i] > c0s[i - 1])) {
       continue;
-    else if (i > 5 && i < 10 && c0s[i] > c0s[i - 1])
-      continue;
+    }
     if (i == 11 || i == 12) {
       std::sort(c0s.begin(), c0s.begin() + 10);
-      if (c0s[i] > c0s[0] && i == 12)
+      if ((c0s[i] > c0s[0] && i == 12) || (c0s[i] < c0s[9] && i == 11)) {
         continue;
-      else if (c0s[i] < c0s[9] && i == 11)
-        continue;
+      }
     }
     // [4] Write values
     cur_object.curve_car_coord.x_start =
@@ -357,10 +356,11 @@ bool DarkSCNNLanePostprocessor::Process2D(
   int has_center_ = 0;
   for (auto lane_ : frame->lane_objects) {
     if (lane_.pos_type == base::LaneLinePositionType::EGO_CENTER) {
-      if (lane_.curve_car_coord.d >= 0)
+      if (lane_.curve_car_coord.d >= 0) {
         has_center_ = 1;
-      else if (lane_.curve_car_coord.d < 0)
+      } else if (lane_.curve_car_coord.d < 0) {
         has_center_ = 2;
+      }
       break;
     }
   }
