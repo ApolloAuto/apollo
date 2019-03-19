@@ -321,6 +321,7 @@ cc_library(
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line:reference_line_provider",
+        "//modules/planning/util:util_lib",
         "@eigen",
     ],
 )
