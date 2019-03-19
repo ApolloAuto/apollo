@@ -239,9 +239,9 @@ if __name__ == '__main__':
     parser.add_argument("files", action="store", type=str, nargs="*",
             help="obstacle description files")
     parser.add_argument("-c", "--channel", action="store", type=str, default="/apollo/perception/obstacles",
-            help="set the perception topic")
+            help="set the perception channel")
     parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
-            help="set the perception topic publish time duration")
+            help="set the perception channel publish time duration")
     args = parser.parse_args()
 
     perception_publisher(args.channel, args.files, args.period)
