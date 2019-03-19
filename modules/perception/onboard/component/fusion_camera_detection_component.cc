@@ -76,7 +76,7 @@ bool SetCameraHeight(const std::string &sensor_name,
            << "YAML::TypedBadConversion exception";
     return false;
   } catch (YAML::Exception &e) {
-    AERROR << "load camera extrisic file error, YAML exception:" << e.what();
+    AERROR << "Load camera extrisic file error, YAML exception:" << e.what();
     return false;
   }
   return true;
@@ -86,7 +86,7 @@ bool SetCameraHeight(const std::string &sensor_name,
 bool LoadExtrinsics(const std::string &yaml_file,
                     Eigen::Matrix4d *camera_extrinsic) {
   if (!apollo::cyber::common::PathExists(yaml_file)) {
-    AINFO << "yaml file: " << yaml_file << " does not exist!";
+    AINFO << "Yaml file: " << yaml_file << " does not exist!";
     return false;
   }
   YAML::Node node = YAML::LoadFile(yaml_file);
@@ -304,7 +304,7 @@ void FusionCameraDetectionComponent::OnReceiveImage(
 }
 
 int FusionCameraDetectionComponent::InitConfig() {
-  // the macro READ_CONF would return cyber::FAIL if config not exists
+  // The macro READ_CONF would return cyber::FAIL if config not exists
   apollo::perception::onboard::FusionCameraDetection
       fusion_camera_detection_param;
   if (!GetProtoConfig(&fusion_camera_detection_param)) {
@@ -408,7 +408,7 @@ int FusionCameraDetectionComponent::InitSensorInfo() {
     }
 
     base::SensorInfo sensor_info;
-    if (!(sensor_manager->GetSensorInfo(camera_names_[i], &sensor_info))) {
+    if (!sensor_manager->GetSensorInfo(camera_names_[i], &sensor_info)) {
       AERROR << "Failed to get sensor info, sensor name: " << camera_names_[i];
       return cyber::FAIL;
     }
@@ -476,7 +476,7 @@ int FusionCameraDetectionComponent::InitCameraFrames() {
     data_provider_init_options.device_id = gpu_id;
     AINFO << "data_provider_init_options.device_id: "
           << data_provider_init_options.device_id
-          << " camera_name: " << camera_name;
+          << ", camera_name: " << camera_name;
 
     std::shared_ptr<camera::DataProvider> data_provider(
         new camera::DataProvider);
@@ -598,7 +598,7 @@ int FusionCameraDetectionComponent::InternalProc(
 
   camera_frame.frame_id = frame_id_;
   camera_frame.timestamp = msg_timestamp;
-  // get narrow to short projection matrix
+  // Get narrow to short projection matrix
   if (camera_frame.data_provider->sensor_name() == camera_names_[1]) {
     camera_frame.project_matrix = project_matrix_;
   } else {
