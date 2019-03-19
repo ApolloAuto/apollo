@@ -82,7 +82,6 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--distance", action="store", type=float, default=70.0,
             help="set the prediction distance")
     args = parser.parse_args()
-    prediction_data = proto_utils.get_pb_from_file(args.prediction,
-                                                   PredictionObstacles())
+    prediction_data = proto_utils.get_pb_from_file(args.prediction, PredictionObstacles())
     extended_prediction = extend_prediction(prediction_data, args.distance, args.period)
     print extended_prediction

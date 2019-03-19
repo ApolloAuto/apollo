@@ -28,15 +28,14 @@ import numpy
 import simplejson
 from cyber_py import cyber
 
-from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacle
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
 
 
-def prediction_publisher(prediction_topic, rate):
+def prediction_publisher(prediction_channel, rate):
     """publisher"""
     cyber.init()
     node = cyber.Node("prediction")
-    writer = node.create_writer(prediction_topic, PredictionObstacles)
+    writer = node.create_writer(prediction_channel, PredictionObstacles)
     sleep_time = 1.0 / rate
     seq_num = 1
     while not cyber.is_shutdown():
@@ -45,8 +44,6 @@ def prediction_publisher(prediction_topic, rate):
         prediction.header.timestamp_sec = time.time()
         prediction.header.module_name = "prediction"
         print str(prediction)
-        #s = String()
-        #s.data = prediction.SerializeToString()
         writer.write(prediction)
         seq_num += 1
         time.sleep(sleep_time)
@@ -55,9 +52,9 @@ def prediction_publisher(prediction_topic, rate):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="create empty prediction message",
             prog="replay_prediction.py")
-    parser.add_argument("-t", "--topic", action="store", type=str, default="/pnc/prediction",
-            help="set the prediction topic")
+    parser.add_argument("-c", "--channel", action="store", type=str, default="/apollo/prediction",
+            help="set the prediction channel")
     parser.add_argument("-r", "--rate", action="store", type=int, default=10,
             help="set the prediction topic publish time duration")
     args = parser.parse_args()
-    prediction_publisher(args.topic, args.rate)
+    prediction_publisher(args.channel, args.rate)

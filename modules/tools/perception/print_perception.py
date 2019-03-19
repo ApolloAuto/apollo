@@ -44,7 +44,7 @@ def perception_receiver(perception_channel):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="create fake perception obstacles",
             prog="print_perception.py")
-    parser.add_argument("-t", "--channel", action="store", type=str, default="/perception/obstacles",
+    parser.add_argument("-t", "--channel", action="store", type=str, default="/apollo/perception/obstacles",
             help="set the perception channel")
 
     args = parser.parse_args()

@@ -216,11 +216,11 @@ def generate_perception(perception_description, prev_perception):
         return perceptions
 
 
-def perception_publisher(perception_topic, files, period):
+def perception_publisher(perception_channel, files, period):
     """publisher"""
     cyber.init()
     node = cyber.Node("perception")
-    writer = node.create_writer(perception_topic, PerceptionObstacles)
+    writer = node.create_writer(perception_channel, PerceptionObstacles)
     perception_description = load_descrptions(files)
     sleep_time = int(1.0 / period)) # 10hz
     global _s_delta_t
@@ -238,10 +238,10 @@ if __name__ == '__main__':
             prog="replay_perception.py")
     parser.add_argument("files", action="store", type=str, nargs="*",
             help="obstacle description files")
-    parser.add_argument("-t", "--topic", action="store", type=str, default="/apollo/perception/obstacles",
+    parser.add_argument("-c", "--channel", action="store", type=str, default="/apollo/perception/obstacles",
             help="set the perception topic")
     parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
             help="set the perception topic publish time duration")
     args = parser.parse_args()
 
-    perception_publisher(args.topic, args.files, args.period)
+    perception_publisher(args.channel, args.files, args.period)
