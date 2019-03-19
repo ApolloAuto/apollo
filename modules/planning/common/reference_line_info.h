@@ -113,6 +113,8 @@ class ReferenceLineInfo {
   PathData* mutable_fallback_path_data();
   SpeedData* mutable_speed_data();
 
+  const std::vector<PathData>& GetCandidatePathData() const;
+
   const RSSInfo& rss_info() const;
   RSSInfo* mutable_rss_info();
   // aggregate final result together by some configuration
@@ -297,6 +299,8 @@ class ReferenceLineInfo {
   PathData path_data_;
   PathData fallback_path_data_;
   SpeedData speed_data_;
+
+  std::vector<PathData> candidate_path_data_;
 
   DiscretizedTrajectory discretized_trajectory_;
 
