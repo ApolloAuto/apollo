@@ -219,9 +219,10 @@ void OpenSpaceTrajectoryOptimizer::RecordDebugInfo(
         obstacles_vertices_vec) {
   // load translation origin and heading angle
   auto* roi_shift_point = open_space_debug_.mutable_roi_shift_point();
-  roi_shift_point->set_x(translate_origin.x());
-  roi_shift_point->set_y(translate_origin.y());
-  roi_shift_point->set_theta(rotate_angle);
+  // pathpoint
+  roi_shift_point->mutable_path_point()->set_x(translate_origin.x());
+  roi_shift_point->mutable_path_point()->set_y(translate_origin.y());
+  roi_shift_point->mutable_path_point()->set_theta(rotate_angle);
 
   // load warm start trajectory
   size_t horizon = uWS.cols();
@@ -316,10 +317,9 @@ void OpenSpaceTrajectoryOptimizer::RecordDebugInfo(
   // load obstacles
   for (const auto& obstacle_vertices : obstacles_vertices_vec) {
     auto* obstacle_ptr = open_space_debug_.add_obstacles();
-    size_t vertices_size = obstacle_vertices.size();
-    for (size_t i = 0; i < vertices_size; ++i) {
-      obstacle_ptr->add_vertices_x_coords(obstacle_vertices[i].x());
-      obstacle_ptr->add_vertices_y_coords(obstacle_vertices[i].y());
+    for (const auto& vertex : obstacle_vertices) {
+      obstacle_ptr->add_vertices_x_coords(vertex.x());
+      obstacle_ptr->add_vertices_y_coords(vertex.y());
     }
   }
 }

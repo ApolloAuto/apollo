@@ -41,9 +41,11 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
+using apollo::planning_internal::Debug;
 
 typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
     TrajGearPair;
@@ -60,7 +62,7 @@ struct GearSwitchStates {
 
 class OpenSpaceInfo {
  public:
-  OpenSpaceInfo();
+  OpenSpaceInfo() = default;
   ~OpenSpaceInfo() = default;
 
   bool open_space_pre_stop_finished() const {
@@ -274,6 +276,32 @@ class OpenSpaceInfo {
     return publishable_trajectory_data_;
   }
 
+  apollo::planning_internal::Debug *mutable_debug() {
+    return debug_;
+  }
+
+  void set_debug(apollo::planning_internal::Debug *debug) {
+    debug_ = debug;
+  }
+
+  const apollo::planning_internal::Debug &debug() const {
+    return *debug_;
+  }
+
+  const apollo::planning_internal::Debug debug_instance() const {
+    return debug_instance_;
+  }
+
+  apollo::planning_internal::Debug *mutable_debug_instance() {
+    return &debug_instance_;
+  }
+
+  void sync_debug_instance() {
+    debug_instance_ = *debug_;
+  }
+
+  void RecordDebug();
+
  private:
   // @brief vehicle needs to stop first in open space related scenarios
   bool open_space_pre_stop_finished_ = true;
@@ -344,6 +372,13 @@ class OpenSpaceInfo {
 
   std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
       publishable_trajectory_data_;
+
+  // the pointer from ADCtrajectory
+  apollo::planning_internal::Debug* debug_;
+
+  // the instance inside debug,
+  // if ADCtrajectory is NULL, blank; else same to ADCtrajectory
+  apollo::planning_internal::Debug debug_instance_;
 };
 
 }  // namespace planning

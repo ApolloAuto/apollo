@@ -383,7 +383,8 @@ Status OnLanePlanning::Plan(
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
         stitching_trajectory.back());
-    // 1, ptr_debug -> open_space_info
+    frame_->mutable_open_space_info()->set_debug(ptr_debug);
+    frame_->mutable_open_space_info()->sync_debug_instance();
   }
 
   auto status =
@@ -399,6 +400,12 @@ Status OnLanePlanning::Plan(
         frame_->open_space_info().publishable_trajectory_data().second;
     publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
     trajectory_pb->set_gear(publishable_trajectory_gear);
+
+    if (FLAGS_enable_record_debug && FLAGS_export_chart) {
+      // call open space info load debug
+      ExportOpenSpaceChart(
+          frame_->open_space_info().debug_instance(), ptr_debug);
+    }
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
     if (!best_ref_info) {
@@ -410,7 +417,7 @@ Status OnLanePlanning::Plan(
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
     if (FLAGS_export_chart) {
-      ExportChart(best_ref_info->debug(), ptr_debug);
+      ExportOnLaneChart(best_ref_info->debug(), ptr_debug);
     } else {
       ptr_debug->MergeFrom(best_ref_info->debug());
       ExportReferenceLineDebug(ptr_debug);
@@ -493,14 +500,25 @@ bool OnLanePlanning::CheckPlanningConfig(const PlanningConfig& config) {
   return true;
 }
 
+void PopulateChartOptions(
+    double x_min, double x_max, std::string x_label,
+    double y_min, double y_max, std::string y_label,
+    bool display, Chart *chart) {
+  auto* options = chart->mutable_options();
+  options->mutable_x()->set_min(x_min);
+  options->mutable_x()->set_max(x_max);
+  options->mutable_y()->set_min(y_min);
+  options->mutable_y()->set_max(y_max);
+  options->mutable_x()->set_label_string(x_label);
+  options->mutable_y()->set_label_string(y_label);
+  options->set_legend_display(display);
+}
+
 void AddStGraph(const STGraphDebug& st_graph, Chart* chart) {
   chart->set_title(st_graph.name());
-  auto* options = chart->mutable_options();
-  options->mutable_x()->set_min(-2.0);
-  options->mutable_x()->set_max(10.0);
-  options->mutable_x()->set_label_string("t(second)");
-  options->mutable_y()->set_label_string("s(meter)");
-  options->set_legend_display(false);
+  PopulateChartOptions(
+      -2.0, 10.0, "t (second)", 0.0, 80.0, "s (meter)", true, chart);
+
   for (const auto& boundary : st_graph.boundary()) {
     auto* boundary_chart = chart->add_polygon();
 
@@ -518,13 +536,8 @@ void AddStGraph(const STGraphDebug& st_graph, Chart* chart) {
 
 void AddSlFrame(const SLFrameDebug& sl_frame, Chart* chart) {
   chart->set_title(sl_frame.name());
-  auto* options = chart->mutable_options();
-  options->mutable_x()->set_min(0.0);
-  options->mutable_x()->set_max(80.0);
-  options->mutable_x()->set_label_string("s (meter)");
-  options->mutable_y()->set_min(-8.0);
-  options->mutable_y()->set_max(8.0);
-  options->mutable_y()->set_label_string("l (meter)");
+  PopulateChartOptions(
+    0.0, 80.0, "s (meter)", -8.0, 8.0, "l (meter)", false, chart);
   auto* sl_line = chart->add_line();
   sl_line->set_label("SL Path");
   for (const auto& sl_point : sl_frame.sl_path()) {
@@ -538,13 +551,9 @@ void AddSpeedPlan(
     const ::google::protobuf::RepeatedPtrField<SpeedPlan>& speed_plans,
     Chart* chart) {
   chart->set_title("Speed Plan");
-  auto* options = chart->mutable_options();
-  options->mutable_x()->set_min(0.0);
-  options->mutable_x()->set_max(80.0);
-  options->mutable_x()->set_label_string("s (meter)");
-  options->mutable_y()->set_min(0.0);
-  options->mutable_y()->set_max(50.0);
-  options->mutable_y()->set_label_string("v (m/s)");
+  PopulateChartOptions(
+      0.0, 80.0, "s (meter)", 0.0, 50.0, "v (m/s)", false, chart);
+
   for (const auto& speed_plan : speed_plans) {
     auto* line = chart->add_line();
     line->set_label(speed_plan.name());
@@ -568,8 +577,9 @@ void AddSpeedPlan(
   }
 }
 
-void OnLanePlanning::ExportChart(const planning_internal::Debug& debug_info,
-                                 planning_internal::Debug* debug_chart) {
+void OnLanePlanning::ExportOnLaneChart(
+    const planning_internal::Debug& debug_info,
+    planning_internal::Debug* debug_chart) {
   for (const auto& st_graph : debug_info.planning_data().st_graph()) {
     AddStGraph(st_graph, debug_chart->mutable_planning_data()->add_chart());
   }
@@ -579,6 +589,90 @@ void OnLanePlanning::ExportChart(const planning_internal::Debug& debug_info,
 
   AddSpeedPlan(debug_info.planning_data().speed_plan(),
                debug_chart->mutable_planning_data()->add_chart());
+}
+
+void OnLanePlanning::ExportOpenSpaceChart(
+    const planning_internal::Debug& debug_info,
+    planning_internal::Debug* debug_chart) {
+  // Export Trajectory Visualization Chart.
+  if (FLAGS_enable_record_debug) {
+    AddOpenSpaceOptimizerResult(debug_info, debug_chart);
+    // AddStitchSpeedProfile(debug);
+    // AddPublishedSpeed(debug, ptr_trajectory_pb);
+    // AddPublishedAcceleration(debug, ptr_trajectory_pb);
+  }
+}
+
+void OnLanePlanning::AddOpenSpaceOptimizerResult(
+    const planning_internal::Debug& debug_info,
+    planning_internal::Debug* debug_chart) {
+  // if open space info provider success run
+  if (!frame_->open_space_info().open_space_provider_success()) { return; }
+
+  auto chart = debug_chart->mutable_planning_data()->add_chart();
+  auto open_space_debug = debug_info.planning_data().open_space();
+
+  chart->set_title("Open Space Trajectory Visualization");
+  PopulateChartOptions(
+    open_space_debug.xy_boundary(0) - 1.0,
+    open_space_debug.xy_boundary(1) + 1.0,
+    "x (meter)",
+    open_space_debug.xy_boundary(2) - 1.0,
+    open_space_debug.xy_boundary(3) + 1.0,
+    "y (meter)",
+    false, chart);
+
+  int obstacle_index = 1;
+  for (const auto& obstacle : open_space_debug.obstacles()) {
+    auto* obstacle_outline = chart->add_line();
+    obstacle_outline->set_label("boundary_" + std::to_string(obstacle_index));
+    obstacle_index += 1;
+    for (int vertice_index = 0;
+         vertice_index < obstacle.vertices_x_coords_size(); vertice_index++) {
+      auto* point_debug = obstacle_outline->add_point();
+      point_debug->set_x(obstacle.vertices_x_coords(vertice_index));
+      point_debug->set_y(obstacle.vertices_y_coords(vertice_index));
+    }
+    // Set chartJS's dataset properties
+    auto* obstacle_properties = obstacle_outline->mutable_properties();
+    (*obstacle_properties)["borderWidth"] = "2";
+    (*obstacle_properties)["pointRadius"] = "0";
+    (*obstacle_properties)["lineTension"] = "0";
+    (*obstacle_properties)["fill"] = "false";
+    (*obstacle_properties)["showLine"] = "true";
+  }
+
+  auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
+  auto* smoothed_line = chart->add_line();
+  smoothed_line->set_label("smoothed");
+  for (const auto& point : smoothed_trajectory.vehicle_motion_point()) {
+    auto* point_debug = smoothed_line->add_point();
+    point_debug->set_x(point.trajectory_point().path_point().x());
+    point_debug->set_y(point.trajectory_point().path_point().y());
+  }
+  // Set chartJS's dataset properties
+  auto* smoothed_properties = smoothed_line->mutable_properties();
+  (*smoothed_properties)["borderWidth"] = "2";
+  (*smoothed_properties)["pointRadius"] = "0";
+  (*smoothed_properties)["lineTension"] = "0";
+  (*smoothed_properties)["fill"] = "false";
+  (*smoothed_properties)["showLine"] = "true";
+
+  auto warm_start_trajectory = open_space_debug.warm_start_trajectory();
+  auto* warm_start_line = chart->add_line();
+  warm_start_line->set_label("warm_start");
+  for (const auto& point : warm_start_trajectory.vehicle_motion_point()) {
+    auto* point_debug = warm_start_line->add_point();
+    point_debug->set_x(point.trajectory_point().path_point().x());
+    point_debug->set_y(point.trajectory_point().path_point().y());
+  }
+  // Set chartJS's dataset properties
+  auto* warm_start_properties = warm_start_line->mutable_properties();
+  (*warm_start_properties)["borderWidth"] = "2";
+  (*warm_start_properties)["pointRadius"] = "0";
+  (*warm_start_properties)["lineTension"] = "0";
+  (*warm_start_properties)["fill"] = "false";
+  (*warm_start_properties)["showLine"] = "true";
 }
 
 }  // namespace planning
