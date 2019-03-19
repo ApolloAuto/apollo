@@ -118,7 +118,6 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   SetCruiseSpeed(FLAGS_default_cruise_speed);
 
   is_safe_to_change_lane_ = CheckChangeLane();
-  is_inited_ = true;
   return true;
 }
 
@@ -191,8 +190,6 @@ void ReferenceLineInfo::InitFirstOverlaps() {
               });
   }
 }
-
-bool ReferenceLineInfo::IsInited() const { return is_inited_; }
 
 bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   constexpr double kEpsilon = 1e-2;
