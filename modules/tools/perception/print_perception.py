@@ -28,9 +28,7 @@ from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
 
 def receiver(data):
     """receiver"""
-    perception = PerceptionObstacles()
-    perception.ParseFromString(data.data)
-    print str(perception)
+    print(data)
 
 
 def perception_receiver(perception_channel):
