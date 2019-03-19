@@ -50,8 +50,9 @@ class InteractionPredictor : public SequencePredictor {
   struct LatLonPolynomialBundle {
     std::array<double, 6> lat_polynomial_coeffs;
     std::array<double, 5> lon_polynomial_coeffs;
-    double end_t;
-    double end_v;
+    double lat_end_t;
+    double lon_end_t;
+    double lon_end_v;
   };
 
   void Clear();

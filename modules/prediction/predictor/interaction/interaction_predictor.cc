@@ -108,8 +108,9 @@ bool InteractionPredictor::DrawTrajectory(
       trajectory_lat_lon_bundle.lat_polynomial_coeffs;
   std::array<double, 5> longitudinal_coeffs =
       trajectory_lat_lon_bundle.lon_polynomial_coeffs;
-  double end_t = trajectory_lat_lon_bundle.end_t;
-  double end_v = trajectory_lat_lon_bundle.end_v;
+  double lon_end_t = trajectory_lat_lon_bundle.lon_end_t;
+  double lon_end_v = trajectory_lat_lon_bundle.lon_end_v;
+  double lat_end_t = trajectory_lat_lon_bundle.lat_end_t;
 
   int lane_segment_index = 0;
   std::string lane_id =
@@ -131,13 +132,13 @@ bool InteractionPredictor::DrawTrajectory(
     double theta = M_PI;
 
     lane_l = EvaluateQuinticPolynomial(lateral_coeffs, relative_time, 0,
-                                       relative_time, 0.0);
+                                       lat_end_t, 0.0);
     double curr_s =
         EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 0,
-                                  end_t, end_v);
+                                  lon_end_t, lon_end_v);
     double prev_s = (i > 0) ? EvaluateQuarticPolynomial(
                                   longitudinal_coeffs, relative_time - period,
-                                  0, end_t, end_v)
+                                  0, lon_end_t, lon_end_v)
                             : 0.0;
     lane_s += std::max(0.0, (curr_s - prev_s));
     if (curr_s + FLAGS_double_precision < prev_s) {
@@ -153,10 +154,10 @@ bool InteractionPredictor::DrawTrajectory(
     prev_lane_l = lane_l;
     double lane_speed =
         EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 1,
-                                  end_t, end_v);
+                                  lon_end_t, lon_end_v);
     double lane_acc =
         EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 2,
-                                  end_t, end_v);
+                                  lon_end_t, lon_end_v);
 
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
