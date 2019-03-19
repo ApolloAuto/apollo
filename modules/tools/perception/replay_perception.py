@@ -1,4 +1,4 @@
-modules/tools/perception/replay_perception.py#!/usr/bin/env python
+#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -30,7 +30,7 @@ from cyber_py import cyber
 
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
-from modules.perception.proto.perception_obstacle_pb2 import Point
+from modules.common.proto.geometry_pb2 import Point3D
 
 _s_seq_num = 0
 _s_delta_t = 0.1
@@ -45,7 +45,7 @@ def get_seq_num():
 
 def get_velocity(theta, speed):
     """get velocity from theta and speed"""
-    point = Point()
+    point = Point3D()
     point.x = math.cos(theta) * speed
     point.y = math.sin(theta) * speed
     point.z = 0.0
@@ -68,7 +68,7 @@ def generate_polygon(point, heading, length, width):
                (half_l * cos_h + half_w * sin_h,
                 half_l * sin_h - half_w * cos_h)]
     for x, y in vectors:
-        p = Point()
+        p = Point3D()
         p.x = point.x + x
         p.y = point.y + y
         p.z = point.z
@@ -93,7 +93,7 @@ def load_descrptions(files):
 
 def get_point(a, b, ratio):
     """get point from a to b with ratio"""
-    p = Point()
+    p = Point3D()
     p.x = a[0] + ratio * (b[0] - a[0])
     p.y = a[1] + ratio * (b[1] - a[1])
     p.z = a[2] + ratio * (b[2] - a[2])
@@ -222,7 +222,7 @@ def perception_publisher(perception_channel, files, period):
     node = cyber.Node("perception")
     writer = node.create_writer(perception_channel, PerceptionObstacles)
     perception_description = load_descrptions(files)
-    sleep_time = int(1.0 / period)) # 10hz
+    sleep_time = int(1.0 / period) # 10hz
     global _s_delta_t
     _s_delta_t = period
     perception = None
