@@ -205,12 +205,13 @@ default_task_config: {
   open_space_trajectory_partition_config {
     gear_shift_max_t: 3.0
     gear_shift_unit_t: 0.02
+    gear_shift_period_duration: 2.0
     interpolated_pieces_num: 20
     initial_gear_check_horizon: 3
-    heading_searching_range: 0.2
-    heading_tracking_range: 1.8
-    gear_shift_period_duration: 2.0
-    kepsilon_to_midway_point: 0.01
+    heading_search_range: 0.2
+    heading_track_range: 1.57
+    vehicle_box_iou_threshold: 0.95
+    distance_search_range: 0.1
   }
 }
 default_task_config: {

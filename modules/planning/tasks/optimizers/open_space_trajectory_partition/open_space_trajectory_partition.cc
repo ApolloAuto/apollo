@@ -19,18 +19,24 @@
  **/
 #include <limits>
 #include <queue>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 
+#include "modules/common/math/polygon2d.h"
+#include "modules/common/status/status.h"
+
 namespace apollo {
 namespace planning {
 
+using apollo::common::ErrorCode;
 using common::PathPoint;
 using common::Status;
 using common::TrajectoryPoint;
 using common::math::NormalizeAngle;
+using common::math::Polygon2d;
 using common::math::Vec2d;
 using common::time::Clock;
 
@@ -171,18 +177,22 @@ Status OpenSpaceTrajectoryPartition::Process() {
   // vehicle state is only updated at the every beginning at RunOnce()
   const common::VehicleState& vehicle_state = frame_->vehicle_state();
 
-  auto comp = [](const std::pair<std::pair<size_t, int>, double>& left,
-                 const std::pair<std::pair<size_t, int>, double>& right) {
-    return left.second >= right.second;
+  auto pair_comp =
+      [](const std::pair<std::pair<size_t, size_t>, double>& left,
+         const std::pair<std::pair<size_t, size_t>, double>& right) {
+        return left.second <= right.second;
+      };
+  auto comp = [](const std::pair<size_t, double>& left,
+                 const std::pair<size_t, double>& right) {
+    return left.second <= right.second;
   };
-  std::priority_queue<std::pair<std::pair<size_t, int>, double>,
-                      std::vector<std::pair<std::pair<size_t, int>, double>>,
-                      decltype(comp)>
-      closest_points(comp);
+
+  std::priority_queue<std::pair<std::pair<size_t, size_t>, double>,
+                      std::vector<std::pair<std::pair<size_t, size_t>, double>>,
+                      decltype(pair_comp)>
+      closest_point_on_trajs(pair_comp);
 
   for (size_t i = 0; i < trajectories_size; ++i) {
-    double min_distance = std::numeric_limits<double>::max();
-
     const auto& trajectory = paritioned_trajectories_ptr->at(i).first;
 
     size_t trajectory_size = trajectory.size();
@@ -210,23 +220,34 @@ Status OpenSpaceTrajectoryPartition::Process() {
           NormalizeAngle(vehicle_moving_direction + M_PI);
     }
     // If close to the end point, start on the next trajectory
-    if (distance_to_trajs_end <= open_space_trajectory_partition_config_
-                                     .kepsilon_to_midway_point() &&
+    if (distance_to_trajs_end <=
+            open_space_trajectory_partition_config_.distance_search_range() &&
         std::abs(NormalizeAngle(traj_end_point_moving_direction -
                                 vehicle_moving_direction)) <
-            open_space_trajectory_partition_config_.heading_searching_range()) {
-      if (i + 1 >= trajectories_size) {
-        current_trajectory_index = trajectories_size - 1;
-        current_trajectory_point_index = trajectory_size - 1;
-      } else {
-        current_trajectory_index = i + 1;
-        current_trajectory_point_index = 0;
+            open_space_trajectory_partition_config_.heading_search_range()) {
+      // get vehicle box and path point box, compare with a threadhold in IOU
+      double end_point_IOU_ratio = 0.0;
+      if (end_point_IOU_ratio <
+          open_space_trajectory_partition_config_.vehicle_box_iou_threshold()) {
+        if (i + 1 >= trajectories_size) {
+          current_trajectory_index = trajectories_size - 1;
+          current_trajectory_point_index = trajectory_size - 1;
+        } else {
+          current_trajectory_index = i + 1;
+          current_trajectory_point_index = 0;
+        }
+        flag_change_to_next = true;
+        break;
       }
-      flag_change_to_next = true;
-      break;
     }
 
     // Choose the closest point to track
+    std::priority_queue<std::pair<size_t, double>,
+                        std::vector<std::pair<size_t, double>>, decltype(comp)>
+        closest_point(comp);
+    bool closest_point_found = false;
+    size_t closest_point_index = 0;
+    double min_IOU_ratio = 0.0;
     for (size_t j = 0; j < trajectory_size; ++j) {
       const TrajectoryPoint& trajectory_point = trajectory.at(j);
       const PathPoint& path_point = trajectory_point.path_point();
@@ -237,35 +258,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
       Vec2d tracking_vector(path_point.x() - vehicle_state.x(),
                             path_point.y() - vehicle_state.y());
       double tracking_direction = tracking_vector.Angle();
-      if (distance < min_distance &&
-          std::abs(
-              NormalizeAngle(tracking_direction - vehicle_moving_direction)) <
-              open_space_trajectory_partition_config_
-                  .heading_tracking_range()) {
-        min_distance = distance;
-        current_trajectory_point_index = j;
-      }
-    }
-
-    closest_points.push(std::make_pair(
-        std::make_pair(i, current_trajectory_point_index), min_distance));
-  }
-
-  if (!flag_change_to_next) {
-    bool distance_and_angle_matched_point_found = false;
-    size_t closest_point_trajectory_index = closest_points.top().first.first;
-    size_t closest_point_index = closest_points.top().first.second;
-    while (!closest_points.empty()) {
-      auto closest_point = closest_points.top();
-      const auto& closest_trajectory_index = closest_point.first.first;
-      const auto& closest_trajectory_point_index = closest_point.first.second;
-      closest_points.pop();
-      double traj_point_moving_direction =
-          paritioned_trajectories_ptr->at(closest_trajectory_index)
-              .first.at(closest_trajectory_point_index)
-              .path_point()
-              .theta();
-      if (paritioned_trajectories_ptr->at(closest_trajectory_index).second ==
+      double traj_point_moving_direction = path_point.theta();
+      if (paritioned_trajectories_ptr->at(i).second ==
           canbus::Chassis::GEAR_REVERSE) {
         traj_point_moving_direction =
             NormalizeAngle(traj_point_moving_direction + M_PI);
@@ -275,18 +269,43 @@ Status OpenSpaceTrajectoryPartition::Process() {
         vehicle_moving_direction =
             NormalizeAngle(vehicle_moving_direction + M_PI);
       }
-      if (std::abs(NormalizeAngle(traj_point_moving_direction -
+      double IOU_ratio = 0.0;
+      if (distance <
+              open_space_trajectory_partition_config_.distance_search_range() &&
+          std::abs(
+              NormalizeAngle(tracking_direction - vehicle_moving_direction)) <
+              open_space_trajectory_partition_config_.heading_track_range() &&
+          std::abs(NormalizeAngle(traj_end_point_moving_direction -
                                   vehicle_moving_direction)) <
-          open_space_trajectory_partition_config_.heading_searching_range()) {
-        distance_and_angle_matched_point_found = true;
-        current_trajectory_index = closest_trajectory_index;
-        current_trajectory_point_index = closest_trajectory_point_index;
-        break;
+              open_space_trajectory_partition_config_.heading_search_range()) {
+        closest_point_found = true;
+        // get vehicle box and path point box, compute IOU
+        closest_point.push(std::make_pair(j, IOU_ratio));
       }
     }
-    if (!distance_and_angle_matched_point_found) {
+    if (!closest_point_found) {
+      closest_point_index = 0;
+      min_IOU_ratio = 0.0;
+    } else {
+      closest_point_index = closest_point.top().first;
+      min_IOU_ratio = closest_point.top().second;
+    }
+    closest_point_on_trajs.push(
+        std::make_pair(std::make_pair(i, closest_point_index), min_IOU_ratio));
+  }
+
+  if (!flag_change_to_next) {
+    size_t closest_point_trajectory_index =
+        closest_point_on_trajs.top().first.first;
+    size_t closest_point_index = closest_point_on_trajs.top().first.second;
+    double trajectories_min_IOU_ratio = closest_point_on_trajs.top().second;
+    if (trajectories_min_IOU_ratio != std::numeric_limits<double>::max()) {
       current_trajectory_index = closest_point_trajectory_index;
       current_trajectory_point_index = closest_point_index;
+    } else {
+      std::string msg("Fail to find nearest trajectory point to follow");
+      AERROR << msg;
+      Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
 
