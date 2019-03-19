@@ -47,20 +47,26 @@ class InteractionPredictor : public SequencePredictor {
   void Predict(Obstacle* obstacle) override;
 
  private:
+  struct LatLonPolynomialBundle {
+    std::array<double, 6> lat_polynomial_coeffs;
+    std::array<double, 5> lon_polynomial_coeffs;
+    double end_t;
+    double end_v;
+  };
+
   void Clear();
 
   bool DrawTrajectory(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const std::pair<std::array<double, 6>, std::array<double, 5>>&
-          trajectory_lat_lon_pair, const double total_time, const double period,
-    std::vector<apollo::common::TrajectoryPoint>* points);
+    const LatLonPolynomialBundle& lat_lon_polynomial_bundle,
+    const double total_time, const double period,
+    std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
 
-  std::vector<std::pair<std::array<double, 6>, std::array<double, 5>>>
-  SampleTrajectoryPolynomials();
+  bool SampleTrajectoryPolynomials(
+      std::vector<LatLonPolynomialBundle>* lat_lon_polynomial_bundles);
 
   double ComputeTrajectoryCost(
-      const std::pair<std::array<double, 6>, std::array<double, 5>>&
-      trajectory_lat_lon_pair);
+      const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
 
   double ComputeLikelihood(const double cost);
 
