@@ -388,7 +388,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
       std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
   // AINFO << "Time for writing: " << microseconds - microseconds_2 << " us";
   time_3 += microseconds - microseconds_2;
-  ++time_num
+  ++time_num;
 
   ADEBUG << "Avg sampling time: " << time_1 / time_num
          << " Avg fitting time: " << time_2 / time_num
