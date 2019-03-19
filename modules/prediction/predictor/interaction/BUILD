@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["interaction_predictor.h"],
     deps = [
         "//modules/prediction/predictor/sequence:sequence_predictor",
+        "//modules/prediction/common:prediction_util",
     ],
 )
 
