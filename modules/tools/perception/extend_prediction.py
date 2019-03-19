@@ -39,8 +39,8 @@ def get_trajectory_length(trajectory):
     """get_trajectory_length"""
     total = 0.0
     for i in range(1, len(trajectory.trajectory_point)):
-        total += distance(trajectory.trajectory_point[i - 1],
-                trajectory.trajectory_point[i])
+        total += distance(trajectory.trajectory_point[i - 1].path_point,
+                trajectory.trajectory_point[i].path_point)
     return total
 
 
@@ -53,20 +53,20 @@ def extend_prediction(prediction, min_length, min_time):
             points = trajectory.trajectory_point
             point_num = len(points)
             trajectory_length = get_trajectory_length(trajectory)
-            print >> sys.stderr, "%s trajectory %s length %s" % (obstacle.perception_obstacle.id, i, trajectory_length)
+            print >> sys.stderr, "obstacle_id :%s trajectory_id: %s length: %s" % (obstacle.perception_obstacle.id, i, trajectory_length)
             i += 1
             if trajectory_length < min_length:
                 second_last = points[point_num - 2]
                 last_point = points[point_num - 1]
-                x_diff = last_point.x - second_last.x
-                y_diff = last_point.y - second_last.y
-                t_diff = last_point.t - second_last.t
+                x_diff = last_point.path_point.x - second_last.path_point.x
+                y_diff = last_point.path_point.y - second_last.path_point.y
+                #t_diff = last_point.path_point.t - second_last.path_point.t
                 delta_diff = math.sqrt(x_diff ** 2 + y_diff ** 2)
                 cur_len = trajectory_length
-                while cur_len < min_length:
-                    last_point.x += x_diff
-                    last_point.y += y_diff
-                    last_point.t += t_diff
+                while cur_len < min_length && cur_len != 0.0:
+                    last_point.path_point.x += x_diff
+                    last_point.path_point.y += y_diff
+                    #last_point.path_point.t += t_diff
                     p = points.add()
                     p.CopyFrom(last_point)
                     last_point = p
