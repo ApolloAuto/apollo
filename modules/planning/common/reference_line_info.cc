@@ -121,6 +121,10 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   return true;
 }
 
+const std::vector<PathData>& ReferenceLineInfo::GetCandidatePathData() const {
+  return candidate_path_data_;
+}
+
 bool ReferenceLineInfo::GetFirstOverlap(
     const std::vector<hdmap::PathOverlap>& path_overlaps,
     hdmap::PathOverlap* path_overlap) {
