@@ -63,8 +63,6 @@ class ReferenceLineInfo {
 
   bool Init(const std::vector<const Obstacle*>& obstacles);
 
-  bool IsInited() const;
-
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   Obstacle* AddObstacle(const Obstacle* obstacle);
 
@@ -281,8 +279,6 @@ class ReferenceLineInfo {
    * line. The lower the better.
    */
   double cost_ = 0.0;
-
-  bool is_inited_ = false;
 
   bool is_drivable_ = true;
 
