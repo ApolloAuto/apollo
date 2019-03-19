@@ -144,6 +144,14 @@ Status OpenSpaceTrajectoryProvider::Process() {
     if (trajectory_updated_) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       LoadResult(trajectory_data);
+      if (FLAGS_enable_record_debug) {
+        // call merge debug ptr, open_space_trajectory_optimizer_
+        auto* debug_ptr = frame_->mutable_open_space_info()->mutable_debug();
+        open_space_trajectory_optimizer_->UpdateDebugInfo(
+          debug_ptr->mutable_planning_data()->mutable_open_space());
+        // sync debug instance
+        frame_->mutable_open_space_info()->sync_debug_instance();
+      }
       trajectory_updated_.store(false);
       return Status::OK();
     }
@@ -159,6 +167,10 @@ Status OpenSpaceTrajectoryProvider::Process() {
 
     if (previous_frame->open_space_info().open_space_provider_success()) {
       ReuseLastFrameResult(previous_frame, trajectory_data);
+      if (FLAGS_enable_record_debug) {
+        // copy previous debug to current frame
+        ReuseLastFrameDebug(previous_frame);
+      }
       // reuse last frame debug when use last frame traj
       return Status(ErrorCode::OK,
                     "Waiting for open_space_trajectory_optimizer in "
@@ -323,6 +335,16 @@ void OpenSpaceTrajectoryProvider::ReuseLastFrameResult(
   *(trajectory_data) =
       last_frame->open_space_info().stitched_trajectory_result();
   frame_->mutable_open_space_info()->set_open_space_provider_success(true);
+}
+
+void OpenSpaceTrajectoryProvider::ReuseLastFrameDebug(
+    const Frame* last_frame) {
+  // reuse last frame's instance
+  auto* debug_ptr = frame_->mutable_open_space_info()->mutable_debug_instance();
+  debug_ptr->mutable_planning_data()->mutable_open_space()->MergeFrom(
+      last_frame->open_space_info().debug_instance().
+      planning_data().open_space());
+  // frame_->mutable_open_space_info()->sync_debug_instance();
 }
 
 }  // namespace planning
