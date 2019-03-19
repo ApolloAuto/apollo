@@ -72,6 +72,8 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
   void ReuseLastFrameResult(const Frame* last_frame,
                             DiscretizedTrajectory* const trajectory_data);
 
+  void ReuseLastFrameDebug(const Frame* last_frame);
+
  private:
   bool thread_init_flag_ = false;
 

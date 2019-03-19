@@ -76,8 +76,12 @@ class OnLanePlanning : public PlanningBase {
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
   bool CheckPlanningConfig(const PlanningConfig& config);
   void GenerateStopTrajectory(ADCTrajectory* trajectory_pb);
-  void ExportChart(const planning_internal::Debug& debug_info,
-                   planning_internal::Debug* debug_chart);
+  void ExportOnLaneChart(const planning_internal::Debug& debug_info,
+                         planning_internal::Debug* debug_chart);
+  void ExportOpenSpaceChart(const planning_internal::Debug& debug_info,
+                            planning_internal::Debug* debug_chart);
+  void AddOpenSpaceOptimizerResult(const planning_internal::Debug& debug_info,
+                                   planning_internal::Debug* debug_chart);
 
  private:
   routing::RoutingResponse last_routing_;

@@ -79,6 +79,10 @@ class OpenSpaceTrajectoryOptimizer {
   void UpdateDebugInfo(
       ::apollo::planning_internal::OpenSpaceDebug* open_space_debug);
 
+  apollo::planning_internal::OpenSpaceDebug* mutable_open_space_debug() {
+    return &open_space_debug_;
+  }
+
  private:
   bool IsInitPointNearDestination(
       const common::TrajectoryPoint& planning_init_point,
