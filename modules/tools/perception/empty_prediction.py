@@ -27,7 +27,6 @@ import time
 import numpy
 import simplejson
 from cyber_py import cyber
-from std_msgs.msg import String
 
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacle
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
@@ -37,19 +36,18 @@ def prediction_publisher(prediction_topic, rate):
     """publisher"""
     cyber.init()
     node = cyber.Node("prediction")
-    writer = node.create_writer(prediction_topic, String)
+    writer = node.create_writer(prediction_topic, PredictionObstacles)
     sleep_time = 1.0 / rate
     seq_num = 1
-    while not rospy.is_shutdown():
+    while not cyber.is_shutdown():
         prediction = PredictionObstacles()
         prediction.header.sequence_num = seq_num
-        prediction.header.timestamp_sec = rospy.Time.now().to_sec()
+        prediction.header.timestamp_sec = time.time()
         prediction.header.module_name = "prediction"
         print str(prediction)
-        s = String()
-        s.data = prediction.SerializeToString()
-        #pub.publish(s)
-        writer.write(s)
+        #s = String()
+        #s.data = prediction.SerializeToString()
+        writer.write(prediction)
         seq_num += 1
         time.sleep(sleep_time)
 

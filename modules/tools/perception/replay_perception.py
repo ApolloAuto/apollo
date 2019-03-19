@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+modules/tools/perception/replay_perception.py#!/usr/bin/env python
 
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
@@ -116,7 +116,7 @@ def init_perception(description):
             perception.length, perception.width))
     perception.tracking_time = description["tracking_time"]
     perception.type = PerceptionObstacle.Type.Value(description["type"])
-    perception.timestamp=rospy.get_time()
+    perception.timestamp = time.time()
     return perception
 
 
@@ -161,7 +161,7 @@ def linear_project_perception(description, prev_perception):
     """get perception from linear projection of description"""
     perception = PerceptionObstacle()
     perception = prev_perception
-    perception.timestamp = rospy.get_time()
+    perception.timestamp = time.time()
     if "trace" not in description:
         return perception
     trace = description["trace"]
@@ -196,7 +196,7 @@ def generate_perception(perception_description, prev_perception):
     perceptions = PerceptionObstacles()
     perceptions.header.sequence_num = get_seq_num()
     perceptions.header.module_name = "perception"
-    perceptions.header.timestamp_sec = rospy.get_time()
+    perceptions.header.timestamp_sec = time.time()
     if not perception_description:
         return perceptions
     if prev_perception is None:

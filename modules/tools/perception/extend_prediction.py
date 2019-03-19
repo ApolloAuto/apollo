@@ -27,7 +27,6 @@ import time
 import numpy
 
 import common.proto_utils as proto_utils
-from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacle
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
 
 
