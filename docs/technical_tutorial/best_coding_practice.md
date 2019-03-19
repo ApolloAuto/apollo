@@ -1,11 +1,13 @@
 # Best Coding Practice
 
 1. Always compile all, test all and lint all.
+
    ```bash
    apollo.sh check
    ```
 
 1. Always write unit test and put it along with the source code.
+
    ```text
    foobar.h
    foobar.cc
@@ -13,6 +15,7 @@
    ```
 
 1. A bazel target contains at most one header and one source file.
+
    ```text
    cc_library(
      name = "foobar",
@@ -32,12 +35,19 @@
      ]
    )
    ```
-1. In general, we follow Google C++ coding style.
-   ```https://google.github.io/styleguide/cppguide.html```
-   
+
+   You could setup and run `scripts/buildifier.sh <some/path>` to fix BUILD file
+   style issues.
+
+1. In general, we follow
+   [Google C++ coding style](https://google.github.io/styleguide/cppguide.html).
+   You could run `scripts/clang-format.sh <some/path>` to fix C++ style issues.
+
 1. Simple and unified function signature.
+
    ```C++
-   void FooBar(const InputType& input1, const int input2, ...,
+   // It's callers' responsibility to make sure output pointers are not NULL.
+   void FooBar(const InputObjectType& input1, const InputScalaType input2, ...,
                OutputType* output1, ...);
 
    // RVO machanism will help you avoid unnecessary object copy.
@@ -46,6 +56,7 @@
    ```
 
 1. Use const whenever possible.
+
    ```C++
    // Variables that don't change.
    const int current_size = vec.size();
