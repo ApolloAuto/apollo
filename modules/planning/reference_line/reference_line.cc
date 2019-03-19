@@ -668,13 +668,11 @@ bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
     Vec2d v1(sl_point_mid.s() - sl_corners[index0].s(),
              sl_point_mid.l() - sl_corners[index0].l());
 
-    auto ptr_sl_point = sl_boundary->add_boundary_point();
-    *ptr_sl_point = sl_corners[index0];
+    *sl_boundary->add_boundary_point() = sl_corners[index0];
 
     // sl_point is outside of polygon; add to the vertex list
     if (v0.CrossProd(v1) < 0.0) {
-      auto ptr_sl_point = sl_boundary->add_boundary_point();
-      *ptr_sl_point = sl_point_mid;
+      *sl_boundary->add_boundary_point() = sl_point_mid;
     }
   }
 
