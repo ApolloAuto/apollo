@@ -173,30 +173,29 @@ class PlannigAnalyzer:
 
     def print_simulation_results(self):
         results = {}
-        # TODO(yifei) temporarily disable frechet distance
-        # results['frechet_dist'] = sum(self.frechet_distance_list) /\
-        #    len(self.frechet_distance_list)
 
-        results['hard_brake_cycle_num'] = len(self.hard_break_list)
+        results['hard_brake_cnt'] = len(self.hard_break_list)
 
-        curvature_99pctl = np.percentile(self.init_point_curvature, 99)
-        results['curvature_99pctl'] = curvature_99pctl
-        curvature_avg = np.average(self.init_point_curvature)
-        results['curvature_avg'] = curvature_avg
+        if len(self.init_point_curvature) > 0:
+            results['curvature_max'] = max(self.init_point_curvature, key=abs)
+            curvature_avg = np.average(np.absolute(self.init_point_curvature))
+            results['curvature_avg'] = curvature_avg
+        else:
+            # TODO(yifei) will change to None after the change of dreamland
+            results['curvature_max'] = -99999
+            results['curvature_avg'] = -99999
 
-        dcurvature_99pctl = np.percentile(self.init_point_dcurvature, 99)
-        results['dcurvature_99pctl'] = dcurvature_99pctl
-        dcurvature_avg = np.average(self.init_point_dcurvature)
-        results['dcurvature_avg'] = dcurvature_avg
+        if len(self.init_point_dcurvature) > 0:
+            results['dcurvature_max'] = max(self.init_point_dcurvature, key=abs)
+            dcurvature_avg = np.average(np.absolute(self.init_point_dcurvature))
+            results['dcurvature_avg'] = dcurvature_avg
+        else:
+            # TODO(yifei) will change to None after the change of dreamland
+            results['dcurvature_max'] = -99999
+            results['dcurvature_avg'] = -99999
 
-        results['overall_score'] = 1 - results['hard_brake_cycle_num'] /\
+        results['overall_score'] = 1 - results['hard_brake_cnt'] /\
             float(self.total_cycle_num)
-        # TODO(yifei) temporarily disable frechet distance
-        #if results['frechet_dist'] > 10:
-        #    results['overall_score'] += 0.0
-        #else:
-        #    results['overall_score'] += (1 - results['frechet_dist'] / 10.0)
-        #results['overall_score'] /= 2.0
 
         print json.dumps(results)
 
