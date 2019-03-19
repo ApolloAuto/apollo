@@ -22,7 +22,6 @@ default_task_config: {
       enabled: true
       stop_distance: 1.0
       signal_expire_time_sec: 5.0
-      max_monitor_forward_distance: 135.0
     }
   }
 }
