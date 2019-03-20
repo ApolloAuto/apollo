@@ -471,11 +471,12 @@ bool OpenSpaceRoiDecider::GetMapInfo(
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
   // Check if last frame lane is avaiable
-  const auto *previous_frame = FrameHistory::Instance()->Latest();
-  if (previous_frame->open_space_info().target_parking_lane() != nullptr &&
-      previous_frame->open_space_info().target_parking_spot_id() ==
+  const auto& previous_open_space_info =
+      FrameHistory::Instance()->Latest()->open_space_info();
+  if (previous_open_space_info.target_parking_lane() != nullptr &&
+      previous_open_space_info.target_parking_spot_id() ==
           frame->open_space_info().target_parking_spot_id()) {
-    nearest_lane = previous_frame->open_space_info().target_parking_lane();
+    nearest_lane = previous_open_space_info.target_parking_lane();
   } else {
     int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
         point, 10.0, vehicle_state_.heading(), M_PI / 2.0, &nearest_lane,
