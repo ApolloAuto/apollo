@@ -31,8 +31,8 @@ DEFINE_bool(enable_collision_detection, false,
 // scenario related
 DEFINE_string(scenario_bare_intersection_unprotected_config_file,
               "/apollo/modules/planning/conf/"
-              "scenario/bare_intersection_protected_config.pb.txt",
-              "The bare_intersection_protected scenario configuration file");
+              "scenario/bare_intersection_unprotected_config.pb.txt",
+              "The bare_intersection_unprotected scenario configuration file");
 DEFINE_string(scenario_lane_follow_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/lane_follow_config.pb.txt",
