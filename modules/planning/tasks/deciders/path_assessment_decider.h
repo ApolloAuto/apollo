@@ -41,33 +41,34 @@ class PathAssessmentDecider : public Decider {
   bool IsValidRegularPath(const ReferenceLineInfo& reference_line_info,
                           const PathData& path_data);
 
-  bool IsValidFallbackPath(
-      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+  bool IsValidFallbackPath(const ReferenceLineInfo& reference_line_info,
+                           const PathData& path_data);
 
-  void SetPathInfo(
-      const ReferenceLineInfo& reference_line_info, PathData* const path_data);
+  void SetPathInfo(const ReferenceLineInfo& reference_line_info,
+                   PathData* const path_data);
 
   bool IsGreatlyOffReferenceLine(const PathData& path_data);
 
-  bool IsGreatlyOffRoad(
-      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+  bool IsGreatlyOffRoad(const ReferenceLineInfo& reference_line_info,
+                        const PathData& path_data);
 
   bool IsCollidingWithStaticObstacles(
       const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
-  void InitPathPointDecision(const PathData& path_data,
-      std::vector<std::tuple<double, PathData::PathPointType, double>>*
-      const path_decision);
+  void InitPathPointDecision(
+      const PathData& path_data,
+      std::vector<std::tuple<double, PathData::PathPointType, double>>* const
+          path_decision);
 
   void SetPathPointType(
       const ReferenceLineInfo& reference_line_info, const PathData& path_data,
-      std::vector<std::tuple<double, PathData::PathPointType, double>>*
-      const path_decision);
+      std::vector<std::tuple<double, PathData::PathPointType, double>>* const
+          path_decision);
 
   void SetObstacleDistance(
       const ReferenceLineInfo& reference_line_info, const PathData& path_data,
-      std::vector<std::tuple<double, PathData::PathPointType, double>>*
-      const path_decision);
+      std::vector<std::tuple<double, PathData::PathPointType, double>>* const
+          path_decision);
 };
 
 }  // namespace planning

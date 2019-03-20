@@ -27,8 +27,7 @@ bool IsWithinPathDeciderScopeObstacle(const Obstacle& obstacle) {
     return false;
   }
   // Obstacle should not have ignore decision.
-  if (obstacle.HasLongitudinalDecision() &&
-      obstacle.HasLateralDecision() &&
+  if (obstacle.HasLongitudinalDecision() && obstacle.HasLateralDecision() &&
       obstacle.IsIgnore()) {
     return false;
   }

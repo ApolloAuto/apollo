@@ -136,7 +136,8 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     const double kTrafficLightDistance = 50.0;
     const double monitor_forward_distance =
         std::max(kTrafficLightLookForwardDistanceConfGuard,
-                 config_.decider_rule_based_stop_config().traffic_light()
+                 config_.decider_rule_based_stop_config()
+                     .traffic_light()
                      .max_monitor_forward_distance());
     if (traffic_light_overlap.start_s - adc_front_edge_s >
         monitor_forward_distance) {

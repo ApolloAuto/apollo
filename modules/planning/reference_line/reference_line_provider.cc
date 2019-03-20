@@ -312,7 +312,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     return false;
   }
   const std::string adc_lane_id = adc_lane_way_point.lane->id().id();
-  auto* adc_navigation_path = apollo::common::util::FindOrNull(
+  auto *adc_navigation_path = apollo::common::util::FindOrNull(
       relative_map_->navigation_path(), adc_lane_id);
   if (adc_navigation_path == nullptr) {
     AERROR << "adc lane cannot be found in relative_map_->navigation_path";
