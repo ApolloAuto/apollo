@@ -57,7 +57,8 @@ class OpenSpaceRoiDecider : public Decider {
 
   // @brief generate the path by vehicle location and return the target parking
   // spot on that path
-  bool GetMapInfo(hdmap::ParkingSpaceInfoConstPtr *target_parking_spot,
+  bool GetMapInfo(Frame *frame,
+                  hdmap::ParkingSpaceInfoConstPtr *target_parking_spot,
                   std::shared_ptr<hdmap::Path> *nearby_path);
 
   // @brief search target parking spot on the path by vehicle location, if
@@ -74,7 +75,7 @@ class OpenSpaceRoiDecider : public Decider {
   // @brief "Region of Interest", load open space xy boundary and parking
   // space boundary from pnc map (only for T shape parking space) to
   // ROI_xy_boundary_ and ROI_parking_boundary_
-  bool GetOpenSpaceROI();
+  bool GetOpenSpaceROI(Frame *frame);
 
   // @brief Represent the obstacles in vertices and load it into
   // obstacles_vertices_vec_ in clock wise order. Take different approach
