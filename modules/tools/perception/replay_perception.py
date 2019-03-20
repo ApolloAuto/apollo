@@ -88,11 +88,11 @@ def load_descrptions(files):
     for file in files:
         with open(file, 'r') as fp:
             obstacle = simplejson.loads(fp.read())
-            if "trace" in obstacle:
-                for i in range(1, len(obstacle["trace"])):
-                    if same_point(obstacle["trace"][i], obstacle["trace"][i - 1]):
-                        print('same trace point found in obstacle: %s' % obstacle["id"])
-                        return None
+            trace = obstacle.get('trace', [])
+            for i in range(1, len(trace)):
+                if same_point(trace[i], trace[i - 1]):
+                    print('same trace point found in obstacle: %s' % obstacle["id"])
+                    return None
             objects.append(obstacle)
 
     return objects
