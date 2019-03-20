@@ -28,6 +28,7 @@ using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
+using apollo::hdmap::LaneInfoConstPtr;
 using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
@@ -58,7 +59,7 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!(GetOpenSpaceROI() && GetOpenSpaceInfo())) {
+  if (!(GetOpenSpaceROI(frame) && GetOpenSpaceInfo())) {
     const std::string msg = "Fail to get open space roi";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
@@ -234,11 +235,11 @@ bool OpenSpaceRoiDecider::ObsHRep(
   return true;
 }
 
-bool OpenSpaceRoiDecider::GetOpenSpaceROI() {
+bool OpenSpaceRoiDecider::GetOpenSpaceROI(Frame *frame) {
   // Find parking spot by getting nearestlane
   ParkingSpaceInfoConstPtr target_parking_spot = nullptr;
   std::shared_ptr<Path> nearby_path = nullptr;
-  if (!GetMapInfo(&target_parking_spot, &nearby_path)) {
+  if (!GetMapInfo(frame, &target_parking_spot, &nearby_path)) {
     AERROR << "fail to get map info in open space planner";
     return false;
   }
@@ -462,20 +463,29 @@ void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
 
 // TODO(Jinyun) Deprecate because of duplicate code in valet parking scenario
 bool OpenSpaceRoiDecider::GetMapInfo(
-    ParkingSpaceInfoConstPtr *target_parking_spot,
+    Frame *frame, ParkingSpaceInfoConstPtr *target_parking_spot,
     std::shared_ptr<Path> *nearby_path) {
   auto point = common::util::MakePointENU(
       vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
-  hdmap::LaneInfoConstPtr nearest_lane;
+  LaneInfoConstPtr nearest_lane;
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
-  int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
-      point, 10.0, vehicle_state_.heading(), M_PI / 2.0, &nearest_lane,
-      &vehicle_lane_s, &vehicle_lane_l);
-  if (status != 0) {
-    AERROR << "Getlane failed at OpenSpaceRoiDecider::GetOpenSpaceROI()";
-    return false;
+  // Check if last frame lane is avaiable
+  const auto *previous_frame = FrameHistory::Instance()->Latest();
+  if (previous_frame->open_space_info().target_parking_lane() != nullptr &&
+      previous_frame->open_space_info().target_parking_spot_id() ==
+          frame->open_space_info().target_parking_spot_id()) {
+    nearest_lane = previous_frame->open_space_info().target_parking_lane();
+  } else {
+    int status = HDMapUtil::BaseMap().GetNearestLaneWithHeading(
+        point, 10.0, vehicle_state_.heading(), M_PI / 2.0, &nearest_lane,
+        &vehicle_lane_s, &vehicle_lane_l);
+    if (status != 0) {
+      AERROR << "Getlane failed at OpenSpaceRoiDecider::GetOpenSpaceROI()";
+      return false;
+    }
   }
+  frame->mutable_open_space_info()->set_target_parking_lane(nearest_lane);
   LaneSegment nearest_lanesegment =
       LaneSegment(nearest_lane, nearest_lane->accumulate_s().front(),
                   nearest_lane->accumulate_s().back());
