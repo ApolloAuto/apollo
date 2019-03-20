@@ -35,11 +35,11 @@ class PathBoundary {
 
   double delta_s() const;
 
-  const std::vector<std::pair<double, double>>& path_boundary() const;
+  const std::vector<std::pair<double, double>>& boundary() const;
  private:
   double start_s_;
   double delta_s_;
-  std::vector<std::pair<double, double>> path_boundary_;
+  std::vector<std::pair<double, double>> boundary_;
 };
 
 }  // namespace planning
