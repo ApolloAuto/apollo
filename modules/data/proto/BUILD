@@ -16,17 +16,6 @@ proto_library(
     ],
 )
 
-proto_library(
-    name = "record_proto_lib",
-    srcs = ["record.proto"],
-    deps = [
-        "//cyber/proto:record_proto",
-        "//modules/common/proto:drive_event_proto_lib",
-        "//modules/common/proto:geometry_proto_lib",
-        "//modules/dreamview/proto:hmi_status_proto_lib",
-    ],
-)
-
 cc_proto_library(
     name = "record_request_proto",
     deps = [":record_request_proto_lib"],
