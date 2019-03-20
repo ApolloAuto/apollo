@@ -41,5 +41,13 @@ PathBoundary::boundary() const {
   return boundary_;
 }
 
+void PathBoundary::set_label(const std::string& label) {
+  label_ = label;
+}
+
+const std::string& PathBoundary::label() const {
+  return label_;
+}
+
 }  // namespace planning
 }  // namespace apollo
