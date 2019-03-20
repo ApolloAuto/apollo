@@ -252,8 +252,10 @@ bool ReferenceLineProvider::GetReferenceLines(
 
   AWARN << "Reference line is NOT ready.";
   if (reference_line_history_.empty()) {
+    AERROR << "Failed to use reference line latest history";
     return false;
   }
+
   reference_lines->assign(reference_line_history_.back().begin(),
                           reference_line_history_.back().end());
   segments->assign(route_segments_history_.back().begin(),
