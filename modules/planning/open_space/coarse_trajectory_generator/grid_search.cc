@@ -185,7 +185,7 @@ bool GridSearch::GenerateDpMap(
   // Grid a star begins
   size_t explored_node_num = 0;
   while (!open_pq.empty()) {
-    std::string current_id = open_pq.top().first;
+    const std::string current_id = open_pq.top().first;
     open_pq.pop();
     std::shared_ptr<Node2d> current_node = open_set[current_id];
     dp_map_.insert(std::make_pair(current_node->GetIndex(), current_node));
