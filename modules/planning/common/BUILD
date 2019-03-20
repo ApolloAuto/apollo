@@ -121,6 +121,18 @@ cc_library(
 )
 
 cc_library(
+    name = "path_boundary",
+    srcs = [
+        "path_boundary.cc",
+    ],
+    hdrs = [
+        "path_boundary.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "planning_context",
     srcs = [
         "planning_context.cc",
@@ -188,6 +200,7 @@ cc_library(
     ],
     deps = [
         ":ego_info",
+        ":path_boundary",
         ":path_decision",
         ":planning_gflags",
         ":st_graph_data",

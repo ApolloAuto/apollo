@@ -38,12 +38,14 @@ using apollo::common::Status;
 using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 
+namespace {
 // PathBoundPoint contains: (s, l_min, l_max).
 using PathBoundPoint = std::tuple<double, double, double>;
 // PathBoundary contains a vector of PathBoundPoints.
-using PathBoundary = std::vector<PathBoundPoint>;
+using PathBound = std::vector<PathBoundPoint>;
 // ObstacleEdge contains: (is_start_s, s, l_min, l_max, obstacle_id).
 using ObstacleEdge = std::tuple<int, double, double, double, std::string>;
+}
 
 constexpr double kPathBoundsDeciderHorizon = 100.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
@@ -62,8 +64,8 @@ Status PathBoundsDecider::Process(
   CHECK_NOTNULL(reference_line_info);
 
   // The decided path bounds should be in the format of: (s, l_min, l_max).
-  PathBoundary fallback_path_boundaries;
-  PathBoundary path_boundaries;
+  PathBound fallback_path_boundaries;
+  PathBound path_boundaries;
 
   // Generate fallback path boundaries.
   std::string fallback_path_bounds_msg = GenerateFallbackPathBoundary(
@@ -569,12 +571,12 @@ std::vector<ObstacleEdge> PathBoundsDecider::SortObstaclesForSweepLine(
   return sorted_obstacles;
 }
 
-std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
+std::vector<PathBound> PathBoundsDecider::ConstructSubsequentPathBounds(
     const std::vector<ObstacleEdge>& sorted_obstacles, size_t path_idx,
     size_t obs_idx,
     std::unordered_map<std::string, std::tuple<bool, double>>* const
         obs_id_to_details,
-    PathBoundary* const curr_path_bounds) {
+        PathBound* const curr_path_bounds) {
   double left_bounds_from_obstacles = std::numeric_limits<double>::max();
   double right_bounds_from_obstacles = std::numeric_limits<double>::lowest();
   double curr_s = std::get<0>((*curr_path_bounds)[path_idx]);
@@ -610,7 +612,7 @@ std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
         path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
         curr_path_bounds, &dummy);
     // 3. Return proper values.
-    std::vector<PathBoundary> ret;
+    std::vector<PathBound> ret;
     if (is_able_to_update) {
       ret =
           ConstructSubsequentPathBounds(sorted_obstacles, path_idx + 1, obs_idx,
@@ -651,7 +653,7 @@ std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
   auto pass_direction_decisions =
       DecidePassDirections(0.0, 0.0, new_entering_obstacles);
   // 3. Try constructing subsequent path-bounds for all possible directions.
-  std::vector<PathBoundary> ret;
+  std::vector<PathBound> ret;
   for (size_t i = 0; i < pass_direction_decisions.size(); ++i) {
     // For each possible direction:
     // a. Update the obs_id_to_details
@@ -680,7 +682,7 @@ std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
       }
     }
     // c. Update for this path_idx, and construct the subsequent path bounds.
-    std::vector<PathBoundary> curr_dir_path_boundaries;
+    std::vector<PathBound> curr_dir_path_boundaries;
     bool is_able_to_update = UpdatePathBoundaryAndCenterLine(
         path_idx, left_bounds_from_obstacles, right_bounds_from_obstacles,
         curr_path_bounds, &dummy);
@@ -702,7 +704,7 @@ std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
   *obs_id_to_details = old_obs_id_to_details;
   *curr_path_bounds = old_path_boundary;
   std::sort(ret.begin(), ret.end(),
-            [](const PathBoundary& lhs, const PathBoundary& rhs) {
+            [](const PathBound& lhs, const PathBound& rhs) {
               return lhs.size() > rhs.size();
             });
   while (ret.size() > 3) {
@@ -781,7 +783,7 @@ std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
 
 bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
     size_t idx, double left_bound, double right_bound,
-    PathBoundary* const path_boundaries, double* const center_line) {
+    PathBound* const path_boundaries, double* const center_line) {
   // Update the right bound (l_min):
   double new_l_min =
       std::fmax(std::get<1>((*path_boundaries)[idx]),
@@ -806,7 +808,7 @@ bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(
 }
 
 void PathBoundsDecider::TrimPathBounds(const int path_blocked_idx,
-                                       PathBoundary* const path_boundaries) {
+                                       PathBound* const path_boundaries) {
   if (path_blocked_idx != -1) {
     if (path_blocked_idx == 0) {
       ADEBUG << "Completely blocked. Cannot move at all.";
@@ -819,7 +821,7 @@ void PathBoundsDecider::TrimPathBounds(const int path_blocked_idx,
 }
 
 void PathBoundsDecider::PathBoundsDebugString(
-    const PathBoundary& path_boundaries) {
+    const PathBound& path_boundaries) {
   for (size_t i = 0; i < path_boundaries.size(); ++i) {
     ADEBUG << "idx " << i << "; s = " << std::get<0>(path_boundaries[i])
            << "; l_min = " << std::get<1>(path_boundaries[i])
