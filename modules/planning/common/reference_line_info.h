@@ -78,9 +78,7 @@ class ReferenceLineInfo {
   bool ReachedDestination() const;
 
   void SetTrajectory(const DiscretizedTrajectory& trajectory);
-
   const DiscretizedTrajectory& trajectory() const;
-  double TrajectoryLength() const;
 
   double Cost() const { return cost_; }
   void AddCost(double cost) { cost_ += cost; }
