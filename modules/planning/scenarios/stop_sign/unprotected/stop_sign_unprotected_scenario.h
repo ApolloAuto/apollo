@@ -49,8 +49,8 @@ struct StopSignUnprotectedContext {
 
 class StopSignUnprotectedScenario : public Scenario {
  public:
-  explicit StopSignUnprotectedScenario(const ScenarioConfig& config,
-                                       const ScenarioContext* context)
+  StopSignUnprotectedScenario(const ScenarioConfig& config,
+                              const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;

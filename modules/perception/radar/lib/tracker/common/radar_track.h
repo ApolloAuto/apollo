@@ -34,7 +34,7 @@ namespace radar {
 
 class RadarTrack {
  public:
-  explicit RadarTrack(const base::ObjectPtr &obs, const double timestamp);
+  RadarTrack(const base::ObjectPtr &obs, const double timestamp);
   ~RadarTrack() {}
   // update the object after association with a radar obervation
   void UpdataObsRadar(const base::ObjectPtr &obs_radar, const double timestamp);

@@ -46,8 +46,7 @@ class Scenario {
     STATUS_DONE = 2,
   };
 
-  explicit Scenario(const ScenarioConfig& config,
-                    const ScenarioContext* context);
+  Scenario(const ScenarioConfig& config, const ScenarioContext* context);
 
   static bool LoadConfig(const std::string& config_file,
                          ScenarioConfig* config);

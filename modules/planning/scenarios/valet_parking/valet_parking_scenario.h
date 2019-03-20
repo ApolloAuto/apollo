@@ -44,8 +44,8 @@ struct ValetParkingContext {
 
 class ValetParkingScenario : public Scenario {
  public:
-  explicit ValetParkingScenario(const ScenarioConfig& config,
-                                const ScenarioContext* context)
+  ValetParkingScenario(const ScenarioConfig& config,
+                       const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;

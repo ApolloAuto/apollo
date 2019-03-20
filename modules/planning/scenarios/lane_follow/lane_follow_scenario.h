@@ -42,8 +42,8 @@ namespace lane_follow {
 
 class LaneFollowScenario : public Scenario {
  public:
-  explicit LaneFollowScenario(const ScenarioConfig& config,
-                              const ScenarioContext* context)
+  LaneFollowScenario(const ScenarioConfig& config,
+                     const ScenarioContext* context)
       : Scenario(config, context) {}
 
   std::unique_ptr<Stage> CreateStage(
