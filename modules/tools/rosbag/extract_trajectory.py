@@ -62,7 +62,7 @@ def extract_record(in_record, output):
     print("Finished extracting from record {}".format(in_record))
 
 def main(args):
-    out = file(args.output, 'w') if args.output or sys.stdout
+    out = open(args.output, 'w') if args.output or sys.stdout
     for record_file in args.in_record:
         extract_record(record_file, out)
     out.close()
