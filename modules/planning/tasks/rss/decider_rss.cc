@@ -226,7 +226,8 @@ Status RssDecider::Process(Frame *frame,
   static const double kTrajectoryLenFactor = 10.0;
   // skip to populate RSS cur_dist_lon if it is too large.
   if (front_obstacle_distance <
-      kTrajectoryLenFactor * reference_line_info->TrajectoryLength()) {
+      kTrajectoryLenFactor *
+      reference_line_info->trajectory().GetSpatialLength()) {
     reference_line_info->mutable_rss_info()->set_cur_dist_lon(
         front_obstacle_distance);
   }
