@@ -27,8 +27,8 @@
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
-#include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
 namespace apollo {
 namespace planning {
@@ -92,8 +92,8 @@ Status PathBoundsDecider::Process(
   }
 
   // Generate path boundaries.
-  std::string path_bounds_msg = GenerateRegularPathBoundary(
-      frame, reference_line_info, &path_boundaries);
+  std::string path_bounds_msg =
+      GenerateRegularPathBoundary(frame, reference_line_info, &path_boundaries);
   if (path_bounds_msg != "") {
     return Status(ErrorCode::PLANNING_ERROR, path_bounds_msg);
   }
@@ -139,8 +139,8 @@ std::string PathBoundsDecider::GenerateRegularPathBoundary(
   // PathBoundsDebugString(*path_boundaries);
 
   // 2. Decide a rough boundary based on road info and ADC's position
-  if (!GetBoundaryFromLanesAndADC(reference_line_info->reference_line(),
-                                  0, 0.1, path_boundaries)) {
+  if (!GetBoundaryFromLanesAndADC(reference_line_info->reference_line(), 0, 0.1,
+                                  path_boundaries)) {
     const std::string msg =
         "Failed to decide a rough boundary based on "
         "road information.";
@@ -151,8 +151,8 @@ std::string PathBoundsDecider::GenerateRegularPathBoundary(
 
   // 3. Fine-tune the boundary based on static obstacles
   // TODO(all): in the future, add side-pass functionality.
-  if (!GetBoundaryFromStaticObstacles(
-          reference_line_info->path_decision(), path_boundaries)) {
+  if (!GetBoundaryFromStaticObstacles(reference_line_info->path_decision(),
+                                      path_boundaries)) {
     const std::string msg =
         "Failed to decide fine tune the boundaries after "
         "taking into consideration all static obstacles.";
@@ -185,8 +185,8 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundary(
   // PathBoundsDebugString(*path_boundaries);
 
   // 2. Decide a rough boundary based on road info and ADC's position
-  if (!GetBoundaryFromLanesAndADC(reference_line_info->reference_line(),
-                                  0, 0.5, path_boundaries)) {
+  if (!GetBoundaryFromLanesAndADC(reference_line_info->reference_line(), 0, 0.5,
+                                  path_boundaries)) {
     const std::string msg =
         "Failed to decide a rough fallback boundary based on "
         "road information.";
@@ -247,8 +247,7 @@ bool PathBoundsDecider::InitPathBoundary(
 }
 
 bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
-    const ReferenceLine& reference_line,
-    int lane_borrowing, double ADC_buffer,
+    const ReferenceLine& reference_line, int lane_borrowing, double ADC_buffer,
     std::vector<std::tuple<double, double, double>>* const path_boundaries) {
   // Sanity checks.
   CHECK_NOTNULL(path_boundaries);
