@@ -23,6 +23,7 @@ apollo::cyber::PyReader *pr = NULL;
 int cbfun(const char *channel_name) {
   AINFO << "recv->[ " << channel_name << " ]";
   if (pr) AINFO << "read->[ " << pr->read() << " ]";
+  return 1;
 }
 
 int main(int argc, char *argv[]) {
