@@ -303,15 +303,15 @@ Status OpenSpaceTrajectoryPartition::Process() {
         path_point_box.Shift(shift_vec);
         double iou_ratio =
             Polygon2d(ego_box).ComputeIoU(Polygon2d(path_point_box));
-        closest_point.push(std::make_pair(j, iou_ratio));
+        closest_point.emplace(j, iou_ratio);
       }
     }
 
     if (!closest_point.empty()) {
       size_t closest_point_index = closest_point.top().first;
       double max_iou_ratio = closest_point.top().second;
-      closest_point_on_trajs.push(std::make_pair(
-          std::make_pair(i, closest_point_index), max_iou_ratio));
+      closest_point_on_trajs.emplace(
+          std::make_pair(i, closest_point_index), max_iou_ratio);
     }
   }
 
