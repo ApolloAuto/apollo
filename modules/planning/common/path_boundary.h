@@ -19,6 +19,7 @@
  **/
 #pragma once
 
+#include <string.h>
 #include <utility>
 #include <vector>
 
@@ -29,6 +30,7 @@ class PathBoundary {
  public:
   PathBoundary(const double start_s, const double delta_s,
       std::vector<std::pair<double, double>> path_boundary);
+
   virtual ~PathBoundary() = default;
 
   double start_s() const;
@@ -36,10 +38,16 @@ class PathBoundary {
   double delta_s() const;
 
   const std::vector<std::pair<double, double>>& boundary() const;
+
+  void set_label(const std::string& label);
+
+  const std::string& label() const;
+
  private:
   double start_s_;
   double delta_s_;
   std::vector<std::pair<double, double>> boundary_;
+  std::string label_ = "normal";
 };
 
 }  // namespace planning
