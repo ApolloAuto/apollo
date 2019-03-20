@@ -163,6 +163,7 @@ class PyReader {
   std::condition_variable msg_cond_;
 };
 
+using PyMsgWrapPtr = std::shared_ptr<apollo::cyber::message::PyMessageWrap>;
 class PyService {
  public:
   PyService(const std::string& service_name, const std::string& data_type,
@@ -175,7 +176,7 @@ class PyService {
         const std::shared_ptr<const apollo::cyber::message::PyMessageWrap>&
             request,
         std::shared_ptr<apollo::cyber::message::PyMessageWrap>& response) {
-      this->cb(request, response);
+      response = this->cb(request);
     };
     service_ = node_->CreateService<apollo::cyber::message::PyMessageWrap,
                                     apollo::cyber::message::PyMessageWrap>(
@@ -201,9 +202,9 @@ class PyService {
   }
 
  private:
-  void cb(const std::shared_ptr<const apollo::cyber::message::PyMessageWrap>&
-              request,
-          std::shared_ptr<apollo::cyber::message::PyMessageWrap>& response) {
+  PyMsgWrapPtr cb(
+      const std::shared_ptr<const apollo::cyber::message::PyMessageWrap>&
+          request) {
     std::lock_guard<std::mutex> lg(msg_lock_);
 
     request_cache_.push_back(request->data());
@@ -218,9 +219,9 @@ class PyService {
       response_cache_.pop_front();
     }
 
-    std::shared_ptr<apollo::cyber::message::PyMessageWrap> m;
-    m.reset(new apollo::cyber::message::PyMessageWrap(msg, data_type_));
-    response = m;
+    PyMsgWrapPtr response;
+    response.reset(new apollo::cyber::message::PyMessageWrap(msg, data_type_));
+    return response;
   }
 
   apollo::cyber::Node* node_;
