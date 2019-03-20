@@ -60,13 +60,13 @@ def extend_prediction(prediction, min_length, min_time):
                 last_point = points[point_num - 1]
                 x_diff = last_point.path_point.x - second_last.path_point.x
                 y_diff = last_point.path_point.y - second_last.path_point.y
-                #t_diff = last_point.path_point.t - second_last.path_point.t
+                t_diff = last_point.path_point.theta - second_last.path_point.theta
                 delta_diff = math.sqrt(x_diff ** 2 + y_diff ** 2)
                 cur_len = trajectory_length
-                while cur_len < min_length add cur_len != 0.0:
+                while cur_len < min_length and abs(cur_len - 0.0) > 0.000001:
                     last_point.path_point.x += x_diff
                     last_point.path_point.y += y_diff
-                    #last_point.path_point.t += t_diff
+                    last_point.path_point.theta += t_diff
                     p = points.add()
                     p.CopyFrom(last_point)
                     last_point = p
