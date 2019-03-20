@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <limits>
+#include <algorithm>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
