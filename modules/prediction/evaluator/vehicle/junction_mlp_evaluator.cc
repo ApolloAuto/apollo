@@ -95,9 +95,6 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     torch_input[0][i] = static_cast<float>(feature_values[i]);
   }
   torch_inputs.push_back(torch_input.to(device_));
-  std::shared_ptr<torch::jit::script::Module> torch_module =
-      torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
-
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
     CHECK_NOTNULL(torch_model_ptr_);
