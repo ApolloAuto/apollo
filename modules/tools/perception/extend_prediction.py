@@ -53,7 +53,8 @@ def extend_prediction(prediction, min_length, min_time):
             points = trajectory.trajectory_point
             point_num = len(points)
             trajectory_length = get_trajectory_length(trajectory)
-            print >> sys.stderr, "obstacle_id :%s trajectory_id: %s length: %s" % (obstacle.perception_obstacle.id, i, trajectory_length)
+            sys.stderr.write("obstacle_id :%s trajectory_id: %s length: %s\n" % (
+                obstacle.perception_obstacle.id, i, trajectory_length))
             i += 1
             if trajectory_length < min_length:
                 second_last = points[point_num - 2]
