@@ -24,6 +24,7 @@
 #include <limits>
 #include <memory>
 #include <queue>
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -37,55 +38,55 @@ namespace planning {
 
 class Node2d {
  public:
-  Node2d(const double& x, const double& y, const double& xy_resolution,
+  Node2d(const double x, const double y, const double xy_resolution,
          const std::vector<double>& XYbounds) {
     // XYbounds with xmin, xmax, ymin, ymax
-    grid_x_ = std::round((x - XYbounds[0]) / xy_resolution);
-    grid_y_ = std::round((y - XYbounds[2]) / xy_resolution);
-    index_ = grid_x_ * (XYbounds[3] - XYbounds[2]) + grid_y_;
+    grid_x_ = static_cast<int>((x - XYbounds[0]) / xy_resolution);
+    grid_y_ = static_cast<int>((y - XYbounds[2]) / xy_resolution);
+    index_ = std::to_string(grid_x_) + "_" + std::to_string(grid_y_);
   }
-  Node2d(const double& grid_x, const double& grid_y,
+  Node2d(const int grid_x, const int grid_y,
          const std::vector<double>& XYbounds) {
     grid_x_ = grid_x;
     grid_y_ = grid_y;
-    index_ = grid_x_ * (XYbounds[3] - XYbounds[2]) + grid_y_;
+    index_ = std::to_string(grid_x_) + "_" + std::to_string(grid_y_);
   }
-  void SetPathCost(const double& path_cost) {
+  void SetPathCost(const double path_cost) {
     path_cost_ = path_cost;
     cost_ = path_cost_ + heuristic_;
   }
-  void SetHeuristic(const double& heuristic) {
+  void SetHeuristic(const double heuristic) {
     heuristic_ = heuristic;
     cost_ = path_cost_ + heuristic_;
   }
-  void SetCost(const double& cost) { cost_ = cost; }
+  void SetCost(const double cost) { cost_ = cost; }
   void SetPreNode(std::shared_ptr<Node2d> pre_node) { pre_node_ = pre_node; }
   double GetGridX() const { return grid_x_; }
   double GetGridY() const { return grid_y_; }
   double GetPathCost() const { return path_cost_; }
   double GetHeuCost() const { return heuristic_; }
-  double GetCost() { return cost_; }
-  double GetIndex() const { return index_; }
-  std::shared_ptr<Node2d> GetPreNode() { return pre_node_; }
-  static double CalcIndex(const double& x, const double& y,
-                          const double& xy_resolution,
-                          const std::vector<double>& XYbounds) {
+  double GetCost() const { return cost_; }
+  std::string GetIndex() const { return index_; }
+  std::shared_ptr<Node2d> GetPreNode() const { return pre_node_; }
+  static std::string CalcIndex(const double x, const double y,
+                               const double xy_resolution,
+                               const std::vector<double>& XYbounds) {
     // XYbounds with xmin, xmax, ymin, ymax
-    double grid_x = std::round((x - XYbounds[0]) / xy_resolution);
-    double grid_y = std::round((y - XYbounds[2]) / xy_resolution);
-    return grid_x * (XYbounds[3] - XYbounds[2]) + grid_y;
+    int grid_x = static_cast<int>((x - XYbounds[0]) / xy_resolution);
+    int grid_y = static_cast<int>((y - XYbounds[2]) / xy_resolution);
+    return std::to_string(grid_x) + "_" + std::to_string(grid_y);
   }
   bool operator==(const Node2d& right) const {
     return right.GetIndex() == index_;
   }
 
  private:
-  double grid_x_ = 0.0;
-  double grid_y_ = 0.0;
+  int grid_x_ = 0;
+  int grid_y_ = 0;
   double path_cost_ = 0.0;
   double heuristic_ = 0.0;
   double cost_ = 0.0;
-  double index_ = 0.0;
+  std::string index_;
   std::shared_ptr<Node2d> pre_node_ = nullptr;
 };
 
@@ -132,12 +133,12 @@ class GridSearch {
       obstacles_linesegments_vec_;
 
   struct cmp {
-    bool operator()(const std::pair<double, double>& left,
-                    const std::pair<double, double>& right) const {
+    bool operator()(const std::pair<std::string, double>& left,
+                    const std::pair<std::string, double>& right) const {
       return left.second >= right.second;
     }
   };
-  std::unordered_map<double, std::shared_ptr<Node2d>> dp_map_;
+  std::unordered_map<std::string, std::shared_ptr<Node2d>> dp_map_;
 };
 }  // namespace planning
 }  // namespace apollo
