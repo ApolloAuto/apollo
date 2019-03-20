@@ -31,6 +31,7 @@
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/util/map_util.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -484,10 +485,9 @@ void ReferenceLine::GetLaneFromS(
   CHECK_NOTNULL(lanes);
   auto ref_point = GetReferencePoint(s);
   std::unordered_set<hdmap::LaneInfoConstPtr> lane_set;
-  for (auto& lane_waypoint : ref_point.lane_waypoints()) {
-    if (lane_set.find(lane_waypoint.lane) == lane_set.end()) {
+  for (const auto& lane_waypoint : ref_point.lane_waypoints()) {
+    if (common::util::InsertIfNotPresent(&lane_set, lane_waypoint.lane)) {
       lanes->push_back(lane_waypoint.lane);
-      lane_set.insert(lane_waypoint.lane);
     }
   }
 }

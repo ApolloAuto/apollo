@@ -403,9 +403,8 @@ bool HybridAStar::Plan(
         CalculateNodeCost(current_node, next_node);
         end_time = Clock::NowInSeconds();
         heuristic_time += end_time - start_time;
-        open_set_.insert(std::make_pair(next_node->GetIndex(), next_node));
-        open_pq_.push(
-            std::make_pair(next_node->GetIndex(), next_node->GetCost()));
+        open_set_.emplace(next_node->GetIndex(), next_node);
+        open_pq_.emplace(next_node->GetIndex(), next_node->GetCost());
       }
     }
   }
