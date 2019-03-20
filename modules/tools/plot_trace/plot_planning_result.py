@@ -57,7 +57,7 @@ def plot_planning(ax, planning_file):
         print('Failed to open file %s' % (planning_file))
         return
     planning_pb = planning_pb2.ADCTrajectory()
-    text_format.Merge(fhandle.read(), planning_pb)
+    text_format.Merge(fp.read(), planning_pb)
     trajectory = get_3d_trajectory(planning_pb)
     ax.plot(
         trajectory[0],
