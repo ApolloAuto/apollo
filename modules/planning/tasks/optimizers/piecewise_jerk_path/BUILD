@@ -20,6 +20,7 @@ cc_library(
         "//modules/common/util",
         "//modules/map/proto:map_proto",
         "//modules/planning/common:obstacle",
+        "//modules/planning/common:path_boundary",
         "//modules/planning/common:path_decision",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/path:discretized_path",
