@@ -25,7 +25,7 @@ namespace planning {
 
 PathBoundary::PathBoundary(const double start_s, const double delta_s,
     std::vector<std::pair<double, double>> path_boundary) :
-    start_s_(start_s), delta_s_(delta_s), path_boundary_(
+    start_s_(start_s), delta_s_(delta_s), boundary_(
         std::move(path_boundary)) {}
 
 double PathBoundary::start_s() const {
@@ -37,8 +37,8 @@ double PathBoundary::delta_s() const {
 }
 
 const std::vector<std::pair<double, double> >&
-PathBoundary::path_boundary() const {
-  return path_boundary_;
+PathBoundary::boundary() const {
+  return boundary_;
 }
 
 }  // namespace planning
