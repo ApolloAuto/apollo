@@ -58,7 +58,7 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType SelectYieldSignScenario(
       const Frame& frame, const hdmap::PathOverlap& yield_sign_overlap);
 
-  ScenarioConfig::ScenarioType SelectBareJunctionScenario(
+  ScenarioConfig::ScenarioType SelectBareIntersectionScenario(
       const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap);
 
   ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);

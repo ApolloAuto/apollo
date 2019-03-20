@@ -51,6 +51,7 @@ cc_library(
         "//modules/common",
         "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_context",
+        "//modules/planning/scenarios/bare_intersection/unprotected:bare_intersection_unprotected_scenario",
         "//modules/planning/scenarios/lane_follow",
         "//modules/planning/scenarios/side_pass",
         "//modules/planning/scenarios/stop_sign/unprotected:stop_sign_unprotected_scenario",
