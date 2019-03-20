@@ -268,7 +268,8 @@ void ObstacleCameraPerception::InitCalibrationService(
             calibration_service_param.plugin_param().name()));
     CHECK(calibration_service_ != nullptr);
     CHECK(calibration_service_->Init(calibration_service_init_options))
-        << "Failed to init: " << calibration_service_param.plugin_param().name();
+        << "Failed to init: "
+        << calibration_service_param.plugin_param().name();
     AINFO << "calibration_service: " << calibration_service_->Name();
   }
 }
