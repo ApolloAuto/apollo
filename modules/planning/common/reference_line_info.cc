@@ -403,13 +403,6 @@ const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
 }
 
-double ReferenceLineInfo::TrajectoryLength() const {
-  if (discretized_trajectory_.empty()) {
-    return 0.0;
-  }
-  return discretized_trajectory_.back().path_point().s();
-}
-
 void ReferenceLineInfo::SetStopPoint(const StopPoint& stop_point) {
   planning_target_.mutable_stop_point()->CopyFrom(stop_point);
 }
