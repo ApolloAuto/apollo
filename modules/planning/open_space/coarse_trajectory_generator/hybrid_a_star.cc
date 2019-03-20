@@ -370,7 +370,7 @@ bool HybridAStar::Plan(
   double end_time = 0.0;
   while (!open_pq_.empty()) {
     // take out the lowest cost neighboring node
-    size_t current_id = open_pq_.top().first;
+    const std::string current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
     // check if a analystic curve could be connected from current

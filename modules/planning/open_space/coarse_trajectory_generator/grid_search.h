@@ -43,13 +43,13 @@ class Node2d {
     // XYbounds with xmin, xmax, ymin, ymax
     grid_x_ = static_cast<int>((x - XYbounds[0]) / xy_resolution);
     grid_y_ = static_cast<int>((y - XYbounds[2]) / xy_resolution);
-    index_ = std::to_string(grid_x_) + "_" + std::to_string(grid_y_);
+    index_ = ComputeStringIndex(grid_x_, grid_y_);
   }
   Node2d(const int grid_x, const int grid_y,
          const std::vector<double>& XYbounds) {
     grid_x_ = grid_x;
     grid_y_ = grid_y;
-    index_ = std::to_string(grid_x_) + "_" + std::to_string(grid_y_);
+    index_ = ComputeStringIndex(grid_x_, grid_y_);
   }
   void SetPathCost(const double path_cost) {
     path_cost_ = path_cost;
@@ -66,7 +66,7 @@ class Node2d {
   double GetPathCost() const { return path_cost_; }
   double GetHeuCost() const { return heuristic_; }
   double GetCost() const { return cost_; }
-  std::string GetIndex() const { return index_; }
+  const std::string& GetIndex() const { return index_; }
   std::shared_ptr<Node2d> GetPreNode() const { return pre_node_; }
   static std::string CalcIndex(const double x, const double y,
                                const double xy_resolution,
@@ -74,10 +74,15 @@ class Node2d {
     // XYbounds with xmin, xmax, ymin, ymax
     int grid_x = static_cast<int>((x - XYbounds[0]) / xy_resolution);
     int grid_y = static_cast<int>((y - XYbounds[2]) / xy_resolution);
-    return std::to_string(grid_x) + "_" + std::to_string(grid_y);
+    return ComputeStringIndex(grid_x, grid_y);
   }
   bool operator==(const Node2d& right) const {
     return right.GetIndex() == index_;
+  }
+
+ private:
+  static std::string ComputeStringIndex(int x_grid, int y_grid) {
+    return std::to_string(x_grid) + "_" + std::to_string(y_grid);
   }
 
  private:

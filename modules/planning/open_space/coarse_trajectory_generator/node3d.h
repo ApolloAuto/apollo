@@ -21,6 +21,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "modules/planning/proto/planner_open_space_config.pb.h"
@@ -36,42 +37,46 @@ using apollo::common::math::Vec2d;
 
 class Node3d {
  public:
-  Node3d(double x, double y, double phi);
-  Node3d(double x, double y, double phi,
+  Node3d(const double x, const double y, const double phi);
+  Node3d(const double x, const double y, const double phi,
          const std::vector<double>& XYbounds,
          const PlannerOpenSpaceConfig& open_space_conf);
-  Node3d(std::vector<double> traversed_x_, std::vector<double> traversed_y_,
-         std::vector<double> traversed_phi_,
+  Node3d(const std::vector<double>& traversed_x,
+         const std::vector<double>& traversed_y,
+         const std::vector<double>& traversed_phi,
          const std::vector<double>& XYbounds,
          const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~Node3d() = default;
   static Box2d GetBoundingBox(const common::VehicleParam& vehicle_param_,
-                              const double& x, const double& y,
-                              const double& phi);
-  double GetCost() { return traj_cost_ + heuristic_cost_; }
-  double GetTrajCost() { return traj_cost_; }
-  double GetHeuCost() { return heuristic_cost_; }
-  size_t GetGridX() { return x_grid_; }
-  size_t GetGridY() { return y_grid_; }
-  size_t GetGridPhi() { return phi_grid_; }
-  double GetX() { return x_; }
-  double GetY() { return y_; }
-  double GetPhi() { return phi_; }
-  bool operator==(const std::shared_ptr<Node3d> right) const;
-  size_t GetIndex() { return index_; }
-  size_t GetStepSize() { return step_size_; }
-  bool GetDirec() { return direction_; }
-  double GetSteer() { return steering_; }
-  std::shared_ptr<Node3d> GetPreNode() { return pre_node_; }
-  const std::vector<double>& GetXs() { return traversed_x_; }
-  const std::vector<double>& GetYs() { return traversed_y_; }
-  const std::vector<double>& GetPhis() { return traversed_phi_; }
-  size_t GetSize();
+                              const double x, const double y, const double phi);
+  double GetCost() const { return traj_cost_ + heuristic_cost_; }
+  double GetTrajCost() const { return traj_cost_; }
+  double GetHeuCost() const { return heuristic_cost_; }
+  size_t GetGridX() const { return x_grid_; }
+  size_t GetGridY() const { return y_grid_; }
+  size_t GetGridPhi() const { return phi_grid_; }
+  double GetX() const { return x_; }
+  double GetY() const { return y_; }
+  double GetPhi() const { return phi_; }
+  bool operator==(const Node3d& right) const;
+  const std::string& GetIndex() const { return index_; }
+  size_t GetStepSize() const { return step_size_; }
+  bool GetDirec() const { return direction_; }
+  double GetSteer() const { return steering_; }
+  std::shared_ptr<Node3d> GetPreNode() const { return pre_node_; }
+  const std::vector<double>& GetXs() const { return traversed_x_; }
+  const std::vector<double>& GetYs() const { return traversed_y_; }
+  const std::vector<double>& GetPhis() const { return traversed_phi_; }
+  size_t GetSize() const;
   void SetPre(std::shared_ptr<Node3d> pre_node) { pre_node_ = pre_node; }
   void SetDirec(bool direction) { direction_ = direction; }
   void SetTrajCost(double cost) { traj_cost_ = cost; }
   void SetHeuCost(double cost) { heuristic_cost_ = cost; }
   void SetSteer(double steering) { steering_ = steering; }
+
+ private:
+  static std::string ComputeStringIndex(size_t x_grid, size_t y_grid,
+                                  size_t phi_grid);
 
  private:
   double x_ = 0.0;
@@ -84,7 +89,7 @@ class Node3d {
   size_t x_grid_ = 0;
   size_t y_grid_ = 0;
   size_t phi_grid_ = 0;
-  size_t index_ = 0;
+  std::string index_;
   double traj_cost_ = 0.0;
   double heuristic_cost_ = 0.0;
   double cost_ = 0.0;

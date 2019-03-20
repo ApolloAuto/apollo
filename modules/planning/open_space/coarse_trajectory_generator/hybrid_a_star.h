@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <queue>
+#include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -112,16 +113,16 @@ class HybridAStar {
       obstacles_linesegments_vec_;
 
   struct cmp {
-    bool operator()(const std::pair<size_t, double>& left,
-                    const std::pair<size_t, double>& right) const {
+    bool operator()(const std::pair<std::string, double>& left,
+                    const std::pair<std::string, double>& right) const {
       return left.second >= right.second;
     }
   };
-  std::priority_queue<std::pair<size_t, double>,
-                      std::vector<std::pair<size_t, double>>, cmp>
+  std::priority_queue<std::pair<std::string, double>,
+                      std::vector<std::pair<std::string, double>>, cmp>
       open_pq_;
-  std::unordered_map<size_t, std::shared_ptr<Node3d>> open_set_;
-  std::unordered_map<size_t, std::shared_ptr<Node3d>> close_set_;
+  std::unordered_map<std::string, std::shared_ptr<Node3d>> open_set_;
+  std::unordered_map<std::string, std::shared_ptr<Node3d>> close_set_;
   std::unique_ptr<ReedShepp> reed_shepp_generator_;
   std::unique_ptr<GridSearch> grid_a_star_heuristic_generator_;
 };
