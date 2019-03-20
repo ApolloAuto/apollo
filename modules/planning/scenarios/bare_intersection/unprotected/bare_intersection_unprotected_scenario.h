@@ -40,8 +40,8 @@ struct BareIntersectionUnprotectedContext {
 
 class BareIntersectionUnprotectedScenario : public Scenario {
  public:
-  explicit BareIntersectionUnprotectedScenario(const ScenarioConfig& config,
-                                               const ScenarioContext* context)
+  BareIntersectionUnprotectedScenario(const ScenarioConfig& config,
+                                      const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;
