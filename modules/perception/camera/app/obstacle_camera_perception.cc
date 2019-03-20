@@ -383,7 +383,7 @@ bool ObstacleCameraPerception::Perception(
                   perception_param_.debug_param().detection_out_dir() + "/" +
                   std::to_string(frame->frame_id) + ".txt",
                   frame->detected_objects);
-  if (extractor_ != nullptr && !extractor_->Extract(extractor_options, frame)) {
+  if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
       AERROR << "Failed to extractor";
       return false;
   }
