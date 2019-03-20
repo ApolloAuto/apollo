@@ -106,9 +106,9 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout_sec = scenario_config_.creep_timeout_sec();
   auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
-  if (task && task->CheckCreepDone(*frame, reference_line_info,
-                                   traffic_light.end_s,
-                                   wait_time, timeout_sec)) {
+  if (task &&
+      task->CheckCreepDone(*frame, reference_line_info, traffic_light.end_s,
+                           wait_time, timeout_sec)) {
     return FinishStage();
   }
 

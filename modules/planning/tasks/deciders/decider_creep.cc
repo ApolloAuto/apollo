@@ -62,8 +62,7 @@ Status DeciderCreep::Process(Frame* frame,
 }
 
 double DeciderCreep::FindCreepDistance(
-    const Frame& frame,
-    const ReferenceLineInfo& reference_line_info) {
+    const Frame& frame, const ReferenceLineInfo& reference_line_info) {
   // more delicate design of creep distance
   return 0.5;
 }

@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <limits>
+#include <algorithm>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -29,9 +30,9 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::VehicleConfigHelper;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
-using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 
 // PointDecision contains (s, PathPointType, distance to closest obstacle).
@@ -199,16 +200,14 @@ void PathAssessmentDecider::InitPathPointDecision(
   // Go through every path point in path data, and initialize a
   // corresponding path point decision.
   for (const auto& frenet_path_point : path_data.frenet_frame_path()) {
-    path_decision->emplace_back(
-        frenet_path_point.s(),
-        PathData::PathPointType::UNKNOWN,
-        std::numeric_limits<double>::max());
+    path_decision->emplace_back(frenet_path_point.s(),
+                                PathData::PathPointType::UNKNOWN,
+                                std::numeric_limits<double>::max());
   }
 }
 
 void PathAssessmentDecider::SetPathPointType(
-    const ReferenceLineInfo& reference_line_info,
-    const PathData& path_data,
+    const ReferenceLineInfo& reference_line_info, const PathData& path_data,
     std::vector<PathPointDecision>* const path_decision) {
   // Sanity checks.
   CHECK_NOTNULL(path_decision);
@@ -226,7 +225,7 @@ void PathAssessmentDecider::SetPathPointType(
     if (reference_line_info.reference_line().GetLaneWidth(
             frenet_path_point.s(), &lane_left_width, &lane_right_width)) {
       if (frenet_path_point.l() > lane_left_width ||
-          frenet_path_point.l() < -lane_right_width ) {
+          frenet_path_point.l() < -lane_right_width) {
         // The path point is out of the reference_line's lane.
         // To be conservative, by default treat it as reverse lane.
         std::get<1>((*path_decision)[i]) =
@@ -239,13 +238,13 @@ void PathAssessmentDecider::SetPathPointType(
         if (HDMapUtil::BaseMapPtr()->GetLanesWithHeading(
                 common::util::MakePointENU(discrete_path_point.x(),
                                            discrete_path_point.y(), 0.0),
-                adc_half_width, discrete_path_point.theta(),
-                M_PI / 2.0, &forward_lanes) == 0 &&
+                adc_half_width, discrete_path_point.theta(), M_PI / 2.0,
+                &forward_lanes) == 0 &&
             HDMapUtil::BaseMapPtr()->GetLanesWithHeading(
                 common::util::MakePointENU(discrete_path_point.x(),
                                            discrete_path_point.y(), 0.0),
-                adc_half_width, discrete_path_point.theta() - M_PI,
-                M_PI / 2.0, &reverse_lanes) == 0) {
+                adc_half_width, discrete_path_point.theta() - M_PI, M_PI / 2.0,
+                &reverse_lanes) == 0) {
           if (!forward_lanes.empty() && reverse_lanes.empty()) {
             std::get<1>((*path_decision)[i]) =
                 PathData::PathPointType::OUT_ON_FORWARD_LANE;
@@ -260,8 +259,7 @@ void PathAssessmentDecider::SetPathPointType(
 }
 
 void PathAssessmentDecider::SetObstacleDistance(
-    const ReferenceLineInfo& reference_line_info,
-    const PathData& path_data,
+    const ReferenceLineInfo& reference_line_info, const PathData& path_data,
     std::vector<PathPointDecision>* const path_decision) {
   // Sanity checks
   CHECK_NOTNULL(path_decision);
@@ -290,8 +288,8 @@ void PathAssessmentDecider::SetObstacleDistance(
     double min_distance_to_obstacles = std::numeric_limits<double>::max();
     for (const auto& obstacle_polygon : obstacle_polygons) {
       double distance_to_vehicle = obstacle_polygon.DistanceTo(vehicle_box);
-      min_distance_to_obstacles = std::min(
-          min_distance_to_obstacles, distance_to_vehicle);
+      min_distance_to_obstacles =
+          std::min(min_distance_to_obstacles, distance_to_vehicle);
     }
     std::get<2>((*path_decision)[i]) = min_distance_to_obstacles;
   }

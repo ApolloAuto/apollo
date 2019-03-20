@@ -207,12 +207,10 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const bool right_turn =
-      (reference_line_info.GetPathTurnType(adc_front_edge_s) ==
-          hdmap::Lane::RIGHT_TURN);
-  const bool left_turn =
-      (reference_line_info.GetPathTurnType(adc_front_edge_s) ==
-          hdmap::Lane::LEFT_TURN);
+  const bool right_turn = (reference_line_info.GetPathTurnType(
+                               adc_front_edge_s) == hdmap::Lane::RIGHT_TURN);
+  const bool left_turn = (reference_line_info.GetPathTurnType(
+                              adc_front_edge_s) == hdmap::Lane::LEFT_TURN);
 
   bool traffic_light_scenario = false;
   bool red_light = false;
