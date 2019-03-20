@@ -53,14 +53,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   {
     auto ptr_path_boundary = reference_line_info_->GetPathBoundary();
-    if (ptr_path_boundary->path_boundary().size() >= 2) {
+    if (ptr_path_boundary->boundary().size() >= 2) {
       std::vector<double> opt_l;
       std::vector<double> opt_dl;
       std::vector<double> opt_ddl;
 
       bool res_opt = OptimizePath(init_frenet_state,
                                   ptr_path_boundary->delta_s(),
-                                  ptr_path_boundary->path_boundary(), w,
+                                  ptr_path_boundary->boundary(), w,
                                   &opt_l, &opt_dl, &opt_ddl);
 
       if (res_opt) {
@@ -79,14 +79,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   {
     auto ptr_path_boundary = reference_line_info_->GetFallbackPathBoundary();
 
-    CHECK_GT(ptr_path_boundary->path_boundary().size(), 1);
+    CHECK_GT(ptr_path_boundary->boundary().size(), 1);
 
     std::vector<double> opt_l;
     std::vector<double> opt_dl;
     std::vector<double> opt_ddl;
 
     bool res_opt = OptimizePath(init_frenet_state, ptr_path_boundary->delta_s(),
-                                ptr_path_boundary->path_boundary(), w,
+                                ptr_path_boundary->boundary(), w,
                                 &opt_l, &opt_dl, &opt_ddl);
 
     if (res_opt) {
