@@ -105,11 +105,11 @@ bool GridSearch::GenerateAStarPath(
     const std::vector<std::vector<common::math::LineSegment2d>>&
         obstacles_linesegments_vec,
     GridAStartResult* result) {
-  std::priority_queue<std::pair<double, double>,
-                      std::vector<std::pair<double, double>>, cmp>
+  std::priority_queue<std::pair<std::string, double>,
+                      std::vector<std::pair<std::string, double>>, cmp>
       open_pq;
-  std::unordered_map<double, std::shared_ptr<Node2d>> open_set;
-  std::unordered_map<double, std::shared_ptr<Node2d>> close_set;
+  std::unordered_map<std::string, std::shared_ptr<Node2d>> open_set;
+  std::unordered_map<std::string, std::shared_ptr<Node2d>> close_set;
   XYbounds_ = XYbounds;
   std::shared_ptr<Node2d> start_node =
       std::make_shared<Node2d>(sx, sy, xy_grid_resolution_, XYbounds_);
@@ -123,7 +123,7 @@ bool GridSearch::GenerateAStarPath(
   // Grid a star begins
   size_t explored_node_num = 0;
   while (!open_pq.empty()) {
-    double current_id = open_pq.top().first;
+    std::string current_id = open_pq.top().first;
     open_pq.pop();
     std::shared_ptr<Node2d> current_node = open_set[current_id];
     // Check destination
@@ -167,10 +167,10 @@ bool GridSearch::GenerateDpMap(
     const double& ex, const double& ey, const std::vector<double>& XYbounds,
     const std::vector<std::vector<common::math::LineSegment2d>>&
         obstacles_linesegments_vec) {
-  std::priority_queue<std::pair<double, double>,
-                      std::vector<std::pair<double, double>>, cmp>
+  std::priority_queue<std::pair<std::string, double>,
+                      std::vector<std::pair<std::string, double>>, cmp>
       open_pq;
-  std::unordered_map<double, std::shared_ptr<Node2d>> open_set;
+  std::unordered_map<std::string, std::shared_ptr<Node2d>> open_set;
   dp_map_ = decltype(dp_map_)();
   XYbounds_ = XYbounds;
   // XYbounds with xmin, xmax, ymin, ymax
@@ -185,7 +185,7 @@ bool GridSearch::GenerateDpMap(
   // Grid a star begins
   size_t explored_node_num = 0;
   while (!open_pq.empty()) {
-    double current_id = open_pq.top().first;
+    std::string current_id = open_pq.top().first;
     open_pq.pop();
     std::shared_ptr<Node2d> current_node = open_set[current_id];
     dp_map_.insert(std::make_pair(current_node->GetIndex(), current_node));
@@ -217,7 +217,7 @@ bool GridSearch::GenerateDpMap(
 }
 
 double GridSearch::CheckDpMap(const double& sx, const double& sy) {
-  double index = Node2d::CalcIndex(sx, sy, xy_grid_resolution_, XYbounds_);
+  std::string index = Node2d::CalcIndex(sx, sy, xy_grid_resolution_, XYbounds_);
   if (dp_map_.find(index) != dp_map_.end()) {
     return dp_map_[index]->GetCost() * xy_grid_resolution_;
   } else {
