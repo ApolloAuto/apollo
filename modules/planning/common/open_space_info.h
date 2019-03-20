@@ -87,6 +87,14 @@ class OpenSpaceInfo {
     return &target_parking_spot_;
   }
 
+  const hdmap::LaneInfoConstPtr target_parking_lane() const {
+    return target_parking_lane_;
+  }
+
+  void set_target_parking_lane(hdmap::LaneInfoConstPtr lane_info_const_ptr) {
+    target_parking_lane_ = lane_info_const_ptr;
+  }
+
   double open_space_pre_stop_fence_s() const {
     return open_space_pre_stop_fence_s_;
   }
@@ -273,6 +281,8 @@ class OpenSpaceInfo {
   std::string target_parking_spot_id_;
 
   hdmap::ParkingSpaceInfoConstPtr target_parking_spot_ = nullptr;
+
+  hdmap::LaneInfoConstPtr target_parking_lane_ = nullptr;
 
   double open_space_pre_stop_fence_s_ = 0.0;
 
