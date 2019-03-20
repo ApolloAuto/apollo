@@ -90,15 +90,14 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
   auto& watch_vehicles = GetContext()->watch_vehicles;
 
   std::vector<std::string> watch_vehicle_ids;
-  for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {
-    std::copy(it->second.begin(), it->second.end(),
+  for (const auto& vehicle : watch_vehicles) {
+    std::copy(vehicle.second.begin(), vehicle.second.end(),
               std::back_inserter(watch_vehicle_ids));
 
     // for debug string
-    std::string associated_lane_id = it->first;
+    std::string associated_lane_id = vehicle.first;
     std::string s;
-    for (size_t i = 0; i < it->second.size(); ++i) {
-      std::string vehicle_id = (it->second)[i];
+    for (const std::string& vehicle_id : vehicle.second) {
       s = s.empty() ? vehicle_id : s + "," + vehicle_id;
     }
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
