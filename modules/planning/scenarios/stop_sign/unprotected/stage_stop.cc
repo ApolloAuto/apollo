@@ -99,16 +99,15 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   // get all vehicles currently watched
   std::vector<std::string> watch_vehicle_ids;
-  for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {
-    std::copy(it->second.begin(), it->second.end(),
+  for (const auto& vehicle : watch_vehicles) {
+    std::copy(vehicle.second.begin(), vehicle.second.end(),
               std::back_inserter(watch_vehicle_ids));
     // for debug
-    std::string associated_lane_id = it->first;
     std::string s;
-    for (size_t i = 0; i < watch_vehicle_ids.size(); ++i) {
-      std::string vehicle = watch_vehicle_ids[i];
+    for (const std::string& vehicle : watch_vehicle_ids) {
       s = s.empty() ? vehicle : s + "," + vehicle;
     }
+    const std::string& associated_lane_id = vehicle.first;
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
            << s << "]";
   }
@@ -143,9 +142,9 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     const PathDecision& path_decision, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {
+  for (auto& vehicle : *watch_vehicles) {
     // associated_lane/stop_sign info
-    std::string associated_lane_id = it->first;
+    std::string associated_lane_id = vehicle.first;
     auto assoc_lane_it = std::find_if(
         GetContext()->associated_lanes.begin(),
         GetContext()->associated_lanes.end(),
@@ -175,7 +174,8 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     auto stop_sign_point = lane.get()->GetSmoothPoint(stop_line_end_s);
 
     std::vector<std::string> remove_vehicles;
-    for (auto obstacle_id : it->second) {
+    auto& vehicles = vehicle.second;
+    for (const auto& obstacle_id : vehicles) {
       // watched-vehicle info
       auto* obstacle = path_decision.Find(obstacle_id);
       if (!obstacle) {
@@ -204,11 +204,11 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
         remove_vehicles.push_back(obstacle_id);
       }
     }
-    for (auto obstacle_id : remove_vehicles) {
+    for (const auto& obstacle_id : remove_vehicles) {
       ADEBUG << "ERASE obstacle_id[" << obstacle_id << "]";
-      it->second.erase(
-          std::remove(it->second.begin(), it->second.end(), obstacle_id),
-          it->second.end());
+      vehicles.erase(
+          std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
+          vehicles.end());
     }
   }
 

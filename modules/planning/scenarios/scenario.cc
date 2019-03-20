@@ -43,8 +43,7 @@ void Scenario::Init() {
   }
   for (int i = 0; i < config_.stage_type_size(); ++i) {
     auto stage_type = config_.stage_type(i);
-    auto iter = stage_config_map_.find(stage_type);
-    CHECK(iter != stage_config_map_.end())
+    CHECK(common::util::ContainsKey(stage_config_map_, stage_type))
         << "stage type : " << ScenarioConfig::StageType_Name(stage_type)
         << " has no config";
   }
