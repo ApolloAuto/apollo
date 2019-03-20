@@ -804,7 +804,7 @@ const hdmap::Lane::LaneTurn& ReferenceLineInfo::GetPathTurnType(
   return hdmap::Lane::NO_TURN;
 }
 
-const bool ReferenceLineInfo::GetIntersectiomRighoffRoad(
+const bool ReferenceLineInfo::GetIntersectionRighoffRoad(
     const hdmap::PathOverlap& pnc_junction_overlap) const {
   if (GetPathTurnType(pnc_junction_overlap.start_s) != hdmap::Lane::NO_TURN) {
     return false;
