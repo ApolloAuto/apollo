@@ -258,6 +258,7 @@ bool ReferenceLineProvider::GetReferenceLines(
                           reference_line_history_.back().end());
   segments->assign(route_segments_history_.back().begin(),
                    route_segments_history_.back().end());
+  AWARN << "Use reference line from history!";
   return true;
 }
 
