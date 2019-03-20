@@ -18,4 +18,5 @@ message OpenSpaceTrajectoryPartitionConfig{
     // @brief IOU, intersection over union
     optional double vehicle_box_iou_threshold = 8 [default = 0.95];
     optional double distance_search_range = 9 [default = 1.0e-6];
+    optional double distance_to_midpoint = 10 [default = 0.1];
 }
