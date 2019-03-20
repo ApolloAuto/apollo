@@ -131,7 +131,7 @@ bool GridSearch::GenerateAStarPath(
       final_node_ = current_node;
       break;
     }
-    close_set.insert(std::make_pair(current_node->GetIndex(), current_node));
+    close_set.emplace(current_node->GetIndex(), current_node);
     std::vector<std::shared_ptr<Node2d>> next_nodes =
         std::move(GenerateNextNodes(current_node));
     for (auto& next_node : next_nodes) {

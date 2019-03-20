@@ -219,13 +219,12 @@ void Crosswalk::MakeDecisions(Frame* const frame,
     std::string crosswalk = firsts_crosswalk_to_stop->object_id;
     mutable_crosswalk_status->set_crosswalk_id(crosswalk);
     mutable_crosswalk_status->clear_stop_time();
-    for (auto it = crosswalk_stop_timer[crosswalk].begin();
-         it != crosswalk_stop_timer[crosswalk].end(); ++it) {
+    for (const auto& timer : crosswalk_stop_timer[crosswalk]) {
       auto* stop_time = mutable_crosswalk_status->add_stop_time();
-      stop_time->set_obstacle_id(it->first);
-      stop_time->set_obstacle_stop_timestamp(it->second);
+      stop_time->set_obstacle_id(timer.first);
+      stop_time->set_obstacle_stop_timestamp(timer.second);
       ADEBUG << "UPDATE stop_time: id[" << crosswalk << "] obstacle_id["
-             << it->first << "] stop_timestamp[" << it->second << "]";
+             << timer.first << "] stop_timestamp[" << timer.second << "]";
     }
 
     // update CrosswalkStatus.finished_crosswalk
