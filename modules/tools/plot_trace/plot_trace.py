@@ -33,7 +33,6 @@ CHASSIS_TOPIC = "/apollo/canbus/chassis"
 LOCALIZATION_TOPIC = "/apollo/localization/pose"
 IS_AUTO_MODE = False
 
-
 def chassis_callback(chassis_data):
     global IS_AUTO_MODE
     if chassis_data.driving_mode == chassis_pb2.Chassis.COMPLETE_AUTO_DRIVE:
@@ -52,7 +51,6 @@ def localization_callback(localization_data):
         GPS_X.append(localization_data.pose.position.x)
         GPS_Y.append(localization_data.pose.position.y)
 
-
 def setup_listener(node):
     node.create_reader(CHASSIS_TOPIC, chassis_pb2.Chassis, chassis_callback)
     node.create_reader(LOCALIZATION_TOPIC,
@@ -61,14 +59,12 @@ def setup_listener(node):
     while not cyber.is_shutdown():
         time.sleep(0.002)
 
-
 def update(frame_number):
     global GPS_X
     global GPS_Y
     if IS_AUTO_MODE and len(GPS_X) > 1:
         min_len = min(len(GPS_X), len(GPS_Y)) - 1
         GPS_LINE.set_data(GPS_X[-min_len:], GPS_Y[-min_len:])
-
 
 if __name__ == '__main__':
     import argparse
@@ -92,10 +88,9 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots()
 
-    handle = file(args.trace, 'r')
-    trace_data = np.genfromtxt(handle, delimiter=',', names=True)
-    ax.plot(trace_data['x'], trace_data['y'], 'b-', alpha=0.5, linewidth=1)
-    handle.close()
+    with open(args.trace, 'r') as fp:
+        trace_data = np.genfromtxt(handle, delimiter=',', names=True)
+        ax.plot(trace_data['x'], trace_data['y'], 'b-', alpha=0.5, linewidth=1)
 
     cyber.init()
     node = cyber.Node("plot_trace")
