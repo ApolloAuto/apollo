@@ -239,26 +239,25 @@ bool ReferenceLineProvider::GetReferenceLines(
       reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
       segments->assign(route_segments_.begin(), route_segments_.end());
       return true;
-    } else {
-      AWARN << "Reference line is NOT ready.";
-      if (reference_line_history_.empty()) {
-        return false;
-      }
-      reference_lines->assign(reference_line_history_.back().begin(),
-                              reference_line_history_.back().end());
-      segments->assign(route_segments_history_.back().begin(),
-                       route_segments_history_.back().end());
     }
   } else {
     double start_time = Clock::NowInSeconds();
-    if (!CreateReferenceLine(reference_lines, segments)) {
-      AERROR << "Failed to create reference line";
-      return false;
+    if (CreateReferenceLine(reference_lines, segments)) {
+      UpdateReferenceLine(*reference_lines, *segments);
+      double end_time = Clock::NowInSeconds();
+      last_calculation_time_ = end_time - start_time;
+      return true;
     }
-    UpdateReferenceLine(*reference_lines, *segments);
-    double end_time = Clock::NowInSeconds();
-    last_calculation_time_ = end_time - start_time;
   }
+
+  AWARN << "Reference line is NOT ready.";
+  if (reference_line_history_.empty()) {
+    return false;
+  }
+  reference_lines->assign(reference_line_history_.back().begin(),
+                          reference_line_history_.back().end());
+  segments->assign(route_segments_history_.back().begin(),
+                   route_segments_history_.back().end());
   return true;
 }
 
