@@ -36,6 +36,7 @@
 
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
+#include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/st_graph_data.h"
@@ -55,6 +56,7 @@ class ReferenceLineInfo {
     FALLBACK_PATH,
     REFERENCE_LINE_PATH,
   };
+
   ReferenceLineInfo() = default;
   explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
                              const common::TrajectoryPoint& adc_planning_point,
@@ -168,38 +170,31 @@ class ReferenceLineInfo {
     offset_to_other_reference_line_ = offset;
   }
 
-  void GetPathBoundaries(
-      std::vector<std::pair<double, double>>* const ptr_path_boundaries,
-      double* const ptr_start_s, double* const ptr_resolution_s) {
-    *ptr_path_boundaries = path_boundaries_;
-    *ptr_start_s = path_boundaries_s_start_;
-    *ptr_resolution_s = path_boundaries_s_resolution_;
+  std::shared_ptr<PathBoundary> GetPathBoundary() const {
+    CHECK(ptr_path_boundary_ != nullptr);
+    return ptr_path_boundary_;
+  }
+
+  std::shared_ptr<PathBoundary> GetFallbackPathBoundary() const {
+    CHECK(ptr_fallback_path_boundary_ != nullptr);
+    return ptr_fallback_path_boundary_;
   }
 
   void SetPathBoundaries(
-      const std::vector<std::pair<double, double>>& path_boundaries,
+      std::vector<std::pair<double, double>> path_boundaries,
       const double start_s, const double resolution_s) {
-    path_boundaries_ = path_boundaries;
-    path_boundaries_s_start_ = start_s;
-    path_boundaries_s_resolution_ = resolution_s;
+    ptr_path_boundary_ = std::make_shared<PathBoundary>(start_s, resolution_s,
+        std::move(path_boundaries));
   }
 
   std::string GetBlockingObstacleId() const { return blocking_obstacle_id_; }
 
-  void GetFallbackPathBoundaries(
-      std::vector<std::pair<double, double>>* const ptr_path_boundaries,
-      double* const ptr_start_s, double* const ptr_resolution_s) {
-    *ptr_path_boundaries = fallback_path_boundaries_;
-    *ptr_start_s = fallback_path_boundaries_s_start_;
-    *ptr_resolution_s = fallback_path_boundaries_s_resolution_;
-  }
-
   void SetFallbackPathBoundaries(
-      const std::vector<std::pair<double, double>>& path_boundaries,
+      std::vector<std::pair<double, double>> path_boundaries,
       const double start_s, const double resolution_s) {
-    fallback_path_boundaries_ = path_boundaries;
-    fallback_path_boundaries_s_start_ = start_s;
-    fallback_path_boundaries_s_resolution_ = resolution_s;
+    ptr_fallback_path_boundary_ = std::make_shared<PathBoundary>(
+        start_s, resolution_s,
+        std::move(path_boundaries));
   }
 
   void SetBlockingObstacleId(const std::string& blocking_obstacle_id) {
@@ -283,14 +278,10 @@ class ReferenceLineInfo {
 
   PathDecision path_decision_;
 
-  std::vector<std::pair<double, double>> path_boundaries_;
-  double path_boundaries_s_start_ = 0.0;
-  double path_boundaries_s_resolution_ = 0.1;
+  std::shared_ptr<PathBoundary> ptr_path_boundary_ = nullptr;
   std::string blocking_obstacle_id_ = "";
 
-  std::vector<std::pair<double, double>> fallback_path_boundaries_;
-  double fallback_path_boundaries_s_start_ = 0.0;
-  double fallback_path_boundaries_s_resolution_ = 0.1;
+  std::shared_ptr<PathBoundary> ptr_fallback_path_boundary_ = nullptr;
 
   PathDataType feasible_path_data_ = PathDataType::REGULAR_PATH;
   PathData path_data_;
