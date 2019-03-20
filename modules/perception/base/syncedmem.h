@@ -101,7 +101,7 @@ class SyncedMemory {
   enum SyncedHead { UNINITIALIZED, HEAD_AT_CPU, HEAD_AT_GPU, SYNCED };
 
   explicit SyncedMemory(bool use_cuda);
-  explicit SyncedMemory(size_t size, bool use_cuda);
+  SyncedMemory(size_t size, bool use_cuda);
   SyncedMemory(const SyncedMemory&) = delete;
   void operator=(const SyncedMemory&) = delete;
   ~SyncedMemory();

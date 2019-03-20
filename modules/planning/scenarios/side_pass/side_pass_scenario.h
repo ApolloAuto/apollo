@@ -42,8 +42,8 @@ struct SidePassContext {
 
 class SidePassScenario : public Scenario {
  public:
-  explicit SidePassScenario(const ScenarioConfig& config,
-                            const ScenarioContext* scenario_context);
+  SidePassScenario(const ScenarioConfig& config,
+                   const ScenarioContext* scenario_context);
 
   bool IsTransferable(const Scenario& current_scenario,
                       const Frame& frame) override;

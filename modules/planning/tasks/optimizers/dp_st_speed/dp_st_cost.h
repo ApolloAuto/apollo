@@ -38,10 +38,10 @@ namespace planning {
 
 class DpStCost {
  public:
-  explicit DpStCost(const DpStSpeedConfig& dp_st_speed_config,
-                    const double total_time,
-                    const std::vector<const Obstacle*>& obstacles,
-                    const common::TrajectoryPoint& init_point);
+  DpStCost(const DpStSpeedConfig& dp_st_speed_config,
+           const double total_time,
+           const std::vector<const Obstacle*>& obstacles,
+           const common::TrajectoryPoint& init_point);
 
   double GetObstacleCost(const StGraphPoint& point);
 

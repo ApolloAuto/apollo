@@ -27,7 +27,7 @@ namespace lidar {
 
 class MatchCost {
  public:
-  explicit MatchCost(size_t ridx, size_t cidx, double cost);
+  MatchCost(size_t ridx, size_t cidx, double cost);
 
   // @brief access RowIdx
   size_t RowIdx() const;
