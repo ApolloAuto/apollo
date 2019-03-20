@@ -31,8 +31,8 @@ namespace narrow_street_u_turn {
 
 class NarrowStreetUTurnScenario : public Scenario {
  public:
-  explicit NarrowStreetUTurnScenario(const ScenarioConfig& config,
-                                     const ScenarioContext* context)
+  NarrowStreetUTurnScenario(const ScenarioConfig& config,
+                            const ScenarioContext* context)
       : Scenario(config, context) {}
 
   std::unique_ptr<Stage> CreateStage(

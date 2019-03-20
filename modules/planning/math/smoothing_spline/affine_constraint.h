@@ -30,9 +30,9 @@ class AffineConstraint {
  public:
   AffineConstraint() = default;
   explicit AffineConstraint(const bool is_equality);
-  explicit AffineConstraint(const Eigen::MatrixXd& constraint_matrix,
-                            const Eigen::MatrixXd& constraint_boundary,
-                            const bool is_equality);
+  AffineConstraint(const Eigen::MatrixXd& constraint_matrix,
+                   const Eigen::MatrixXd& constraint_boundary,
+                   const bool is_equality);
 
   void SetIsEquality(const double is_equality);
 

@@ -35,12 +35,11 @@ class SensorObject {
 
   explicit SensorObject(const std::shared_ptr<const base::Object>& object_ptr);
 
-  explicit SensorObject(
-      const std::shared_ptr<const base::Object>& object_ptr,
-      const std::shared_ptr<const SensorFrameHeader>& frame_header);
+  SensorObject(const std::shared_ptr<const base::Object>& object_ptr,
+               const std::shared_ptr<const SensorFrameHeader>& frame_header);
 
-  explicit SensorObject(const std::shared_ptr<const base::Object>& object_ptr,
-                        const std::shared_ptr<SensorFrame>& frame_ptr);
+  SensorObject(const std::shared_ptr<const base::Object>& object_ptr,
+               const std::shared_ptr<SensorFrame>& frame_ptr);
 
   // Getter
   // @brief get frame timestamp which might be different with object timestamp

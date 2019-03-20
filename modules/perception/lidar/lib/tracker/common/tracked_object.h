@@ -31,7 +31,7 @@ namespace lidar {
 
 struct TrackedObject {
   TrackedObject() = default;
-  explicit TrackedObject(base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose);
+  TrackedObject(base::ObjectPtr obj_ptr, const Eigen::Affine3d& pose);
   TrackedObject(const TrackedObject& rhs) = default;
   TrackedObject& operator=(const TrackedObject& rhs) = default;
 
