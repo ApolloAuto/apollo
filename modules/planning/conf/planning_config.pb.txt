@@ -22,7 +22,6 @@ default_task_config: {
       enabled: true
       stop_distance: 1.0
       signal_expire_time_sec: 5.0
-      max_monitor_forward_distance: 135.0
     }
   }
 }
@@ -205,12 +204,14 @@ default_task_config: {
   open_space_trajectory_partition_config {
     gear_shift_max_t: 3.0
     gear_shift_unit_t: 0.02
+    gear_shift_period_duration: 2.0
     interpolated_pieces_num: 20
     initial_gear_check_horizon: 3
-    heading_searching_range: 0.2
-    heading_tracking_range: 1.57
-    gear_shift_period_duration: 2.0
-    kepsilon_to_midway_point: 1.0e-2
+    heading_search_range: 0.79
+    heading_track_range: 1.57
+    vehicle_box_iou_threshold: 0.8
+    distance_search_range: 1.0
+    distance_to_midpoint: 0.1
   }
 }
 default_task_config: {

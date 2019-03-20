@@ -151,7 +151,11 @@ Status OpenSpaceTrajectoryProvider::Process() {
     if (trajectory_error_) {
       ++optimizer_thread_counter;
       trajectory_error_.store(false);
-      if (optimizer_thread_counter > 5) {
+      // TODO(Jinyun) Use other fallback mechanism when last iteration smoothing
+      // result has out of bound pathpoint which is not allowed for next
+      // iteration hybrid astar algorithm which requires start position to be
+      // strictly in bound
+      if (optimizer_thread_counter > 1000) {
         return Status(ErrorCode::PLANNING_ERROR,
                       "open_space_optimizer failed too many times");
       }

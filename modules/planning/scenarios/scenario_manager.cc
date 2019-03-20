@@ -27,6 +27,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
@@ -67,6 +68,11 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       ptr.reset(new scenario::side_pass::SidePassScenario(
           config_map_[scenario_type], &scenario_context_));
       break;
+    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+      ptr.reset(
+          new scenario::bare_intersection::BareIntersectionUnprotectedScenario(
+              config_map_[scenario_type], &scenario_context_));
+      break;
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       ptr.reset(new scenario::stop_sign::StopSignUnprotectedScenario(
           config_map_[scenario_type], &scenario_context_));
@@ -101,12 +107,19 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
 void ScenarioManager::RegisterScenarios() {
   // lane_follow
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
-                             &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_lane_follow_config_file,
+      &config_map_[ScenarioConfig::LANE_FOLLOW]));
 
   // side_pass
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_side_pass_config_file,
-                             &config_map_[ScenarioConfig::SIDE_PASS]));
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_side_pass_config_file,
+      &config_map_[ScenarioConfig::SIDE_PASS]));
+
+  // bare_intersection
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_bare_intersection_unprotected_config_file,
+      &config_map_[ScenarioConfig::BARE_INTERSECTION_UNPROTECTED]));
 
   // stop_sign
   CHECK(Scenario::LoadConfig(
@@ -125,8 +138,9 @@ void ScenarioManager::RegisterScenarios() {
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
 
   // valet parking
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
-                             &config_map_[ScenarioConfig::VALET_PARKING]));
+  CHECK(Scenario::LoadConfig(
+      FLAGS_scenario_valet_parking_config_file,
+      &config_map_[ScenarioConfig::VALET_PARKING]));
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
@@ -166,6 +180,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
                                  : ScenarioConfig::STOP_SIGN_UNPROTECTED;
       }
       break;
+    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+      break;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       if (current_scenario_->GetStatus() !=
@@ -176,6 +192,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+    case ScenarioConfig::YIELD_SIGN_UNPROTECTED:
     default:
       break;
   }
@@ -244,6 +261,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
         return ScenarioConfig::TRAFFIC_LIGHT_PROTECTED;
       }
       break;
+    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
       break;
@@ -268,7 +286,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
   return current_scenario_->scenario_type();
 }
 
-ScenarioConfig::ScenarioType ScenarioManager::SelectBareJunctionScenario(
+ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
     const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap) {
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -287,6 +305,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareJunctionScenario(
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
@@ -430,22 +449,12 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // check current_scenario (not switchable)
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
-      break;
     case ScenarioConfig::CHANGE_LANE:
       break;
     case ScenarioConfig::SIDE_PASS:
-      if (current_scenario_->GetStatus() !=
-          Scenario::ScenarioStatus::STATUS_DONE) {
-        scenario_type = current_scenario_->scenario_type();
-      }
-      break;
+    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      if (current_scenario_->GetStatus() !=
-          Scenario::ScenarioStatus::STATUS_DONE) {
-        scenario_type = current_scenario_->scenario_type();
-      }
-      break;
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
@@ -504,8 +513,16 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
           break;
       }
     } else if (pnc_junction_overlap) {
-      // junction with no signs(stop_sign/traffic_light/etc)
-      // TODO(all): to be added
+      // bare intersection
+      if (FLAGS_enable_scenario_bare_intersection) {
+        if (reference_line_info.GetIntersectionRighoffRoad(
+            *pnc_junction_overlap)) {
+          scenario_type = default_scenario_type_;
+        } else {
+          scenario_type =
+              SelectBareIntersectionScenario(frame, *pnc_junction_overlap);
+        }
+      }
     }
   }
 

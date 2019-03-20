@@ -343,6 +343,16 @@ bool Polygon2d::ComputeOverlap(const Polygon2d &other_polygon,
   return ComputeConvexHull(points, overlap_polygon);
 }
 
+double Polygon2d::ComputeIoU(const Polygon2d &other_polygon) const {
+  Polygon2d overlap_polygon;
+  if (!ComputeOverlap(other_polygon, &overlap_polygon)) {
+    return 0.0;
+  }
+  double intersection_area = overlap_polygon.area();
+  double union_area = area_ + other_polygon.area() - overlap_polygon.area();
+  return intersection_area / union_area;
+}
+
 bool Polygon2d::HasOverlap(const LineSegment2d &line_segment) const {
   CHECK_GE(points_.size(), 3);
   if ((line_segment.start().x() < min_x_ && line_segment.end().x() < min_x_) ||
