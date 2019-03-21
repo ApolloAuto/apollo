@@ -95,6 +95,7 @@ Status PathBoundsDecider::Process(
   }
   candidate_path_boundaries.emplace_back(std::get<0>(fallback_path_bound[0]),
       kPathBoundsDeciderResolution, fallback_path_bound_pair);
+  candidate_path_boundaries.back().set_label("fallback");
 
   // Generate regular path boundaries.
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
@@ -129,9 +130,12 @@ Status PathBoundsDecider::Process(
     }
     candidate_path_boundaries.emplace_back(std::get<0>(regular_path_bound[0]),
         kPathBoundsDeciderResolution, path_boundaries_pair);
+    candidate_path_boundaries.back().set_label("regular");
+    candidate_path_boundaries.back().set_blocking_obstacle_id(
+        blocking_obstacle_id_);
     // TODO(jiacheng): don't forget to set blocking obstacle info here.
-    // Need to modify the folowing line:
-    reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
+    // Need to remove the folowing line:
+    // reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
   }
 
   // Success
@@ -593,11 +597,10 @@ std::vector<ObstacleEdge> PathBoundsDecider::SortObstaclesForSweepLine(
 }
 
 std::vector<PathBound> PathBoundsDecider::ConstructSubsequentPathBounds(
-    const std::vector<ObstacleEdge>& sorted_obstacles, size_t path_idx,
-    size_t obs_idx,
+    const std::vector<ObstacleEdge>& sorted_obstacles,
+    size_t path_idx, size_t obs_idx,
     std::unordered_map<std::string, std::tuple<bool, double>>* const
-        obs_id_to_details,
-        PathBound* const curr_path_bounds) {
+    obs_id_to_details, PathBound* const curr_path_bounds) {
   double left_bounds_from_obstacles = std::numeric_limits<double>::max();
   double right_bounds_from_obstacles = std::numeric_limits<double>::lowest();
   double curr_s = std::get<0>((*curr_path_bounds)[path_idx]);
