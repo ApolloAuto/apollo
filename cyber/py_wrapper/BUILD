@@ -72,8 +72,8 @@ cc_library(
     srcs = ["cyber_time_wrap.cc"],
     hdrs = ["py_time.h"],
     deps = [
-				"//cyber:cyber_core",
-				"@fastrtps",
+        "//cyber:cyber_core",
+        "@fastrtps",
         "@python27",
     ],
 )
@@ -91,7 +91,7 @@ cc_library(
     srcs = ["cyber_timer_wrap.cc"],
     hdrs = ["py_timer.h"],
     deps = [
-				"//cyber:cyber_core",
+        "//cyber:cyber_core",
         "@python27",
     ],
 )
