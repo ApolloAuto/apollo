@@ -174,7 +174,7 @@ std::string PathBoundsDecider::GenerateRegularPathBoundary(
 
   // 2. Decide a rough boundary based on road info and ADC's position
   if (!GetBoundaryFromLanesAndADC(reference_line_info.reference_line(),
-                                  0, 0.1, path_boundary)) {
+                                  lane_borrow_info, 0.1, path_boundary)) {
     const std::string msg =
         "Failed to decide a rough boundary based on "
         "road information.";
@@ -218,7 +218,8 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundary(
   // PathBoundsDebugString(*path_boundaries);
 
   // 2. Decide a rough boundary based on road info and ADC's position
-  if (!GetBoundaryFromLanesAndADC(reference_line_info->reference_line(), 0, 0.5,
+  if (!GetBoundaryFromLanesAndADC(reference_line_info->reference_line(),
+                                  LaneBorrowInfo::NO_BORROW, 0.5,
                                   path_boundaries)) {
     const std::string msg =
         "Failed to decide a rough fallback boundary based on "
@@ -257,7 +258,8 @@ bool PathBoundsDecider::InitPathBoundary(
 }
 
 bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
-    const ReferenceLine& reference_line, int lane_borrowing, double ADC_buffer,
+    const ReferenceLine& reference_line,
+    const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
     std::vector<std::tuple<double, double, double>>* const path_boundaries) {
   // Sanity checks.
   CHECK_NOTNULL(path_boundaries);
@@ -300,7 +302,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     } else {
       curr_lane = lane_info_ptr->lane();
       hdmap::LaneInfoConstPtr adjacent_lane = nullptr;
-      if (lane_borrowing == 1) {
+      if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
         // Borrowing left neighbor lane.
         if (curr_lane.left_neighbor_forward_lane_id_size() > 0) {
           adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
@@ -310,7 +312,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
           adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
               curr_lane.left_neighbor_reverse_lane_id(0));
         }
-      } else if (lane_borrowing == -1) {
+      } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
         // Borrowing right neighbor lane.
         if (curr_lane.right_neighbor_forward_lane_id_size() > 0) {
           adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
@@ -347,7 +349,8 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
 
     double curr_left_bound_lane =
         curr_lane_left_width +
-        (lane_borrowing == 1 ? curr_neighbor_lane_width : 0.0);
+        (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW ?
+         curr_neighbor_lane_width : 0.0);
     double curr_left_bound_adc =
         std::fmax(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) +
         GetBufferBetweenADCCenterAndEdge() + ADC_buffer;
@@ -356,7 +359,8 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
 
     double curr_right_bound_lane =
         -curr_lane_right_width -
-        (lane_borrowing == -1 ? curr_neighbor_lane_width : 0.0);
+        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW ?
+         curr_neighbor_lane_width : 0.0);
     double curr_right_bound_adc =
         std::fmin(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) -
         GetBufferBetweenADCCenterAndEdge() - ADC_buffer;
