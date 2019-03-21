@@ -112,53 +112,49 @@ bool ProbabilisticFusion::Fuse(const FusionOptions& options,
 
   auto* sensor_data_manager = SensorDataManager::Instance();
   // 1. save frame data
-  data_mutex_.lock();
-  if (sensor_data_manager->IsLidar(sensor_frame) && !params_.use_lidar) {
-    data_mutex_.unlock();
-    return true;
-  }
-  if (sensor_data_manager->IsRadar(sensor_frame) && !params_.use_radar) {
-    data_mutex_.unlock();
-    return true;
-  }
-  if (sensor_data_manager->IsCamera(sensor_frame) && !params_.use_camera) {
-    data_mutex_.unlock();
-    return true;
-  }
+  {
+    std::lock_guard<std::mutex> data_lock(data_mutex_);
+    if (sensor_data_manager->IsLidar(sensor_frame) && !params_.use_lidar) {
+      return true;
+    }
+    if (sensor_data_manager->IsRadar(sensor_frame) && !params_.use_radar) {
+      return true;
+    }
+    if (sensor_data_manager->IsCamera(sensor_frame) && !params_.use_camera) {
+      return true;
+    }
 
-  bool is_publish_sensor = this->IsPublishSensor(sensor_frame);
-  if (is_publish_sensor) {
-    started_ = true;
-  }
+    bool is_publish_sensor = this->IsPublishSensor(sensor_frame);
+    if (is_publish_sensor) {
+      started_ = true;
+    }
 
-  if (started_) {
-    AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
-          << ", obj_cnt : " << sensor_frame->objects.size() << ", "
-          << GLOG_TIMESTAMP(sensor_frame->timestamp);
-    sensor_data_manager->AddSensorMeasurements(sensor_frame);
-  }
+    if (started_) {
+      AINFO << "add sensor measurement: " << sensor_frame->sensor_info.name
+            << ", obj_cnt : " << sensor_frame->objects.size() << ", "
+            << GLOG_TIMESTAMP(sensor_frame->timestamp);
+      sensor_data_manager->AddSensorMeasurements(sensor_frame);
+    }
 
-  data_mutex_.unlock();
-  if (!is_publish_sensor) {
-    return true;
+    if (!is_publish_sensor) {
+      return true;
+    }
   }
 
   // 2. query related sensor_frames for fusion
-  fuse_mutex_.lock();
+  std::lock_guard<std::mutex> fuse_lock(fuse_mutex_);
   double fusion_time = sensor_frame->timestamp;
   std::vector<SensorFramePtr> frames;
   sensor_data_manager->GetLatestFrames(fusion_time, &frames);
   AINFO << "Get " << frames.size() << " related frames for fusion";
 
   // 3. peform fusion on related frames
-  for (size_t i = 0; i < frames.size(); ++i) {
-    this->FuseFrame(frames[i]);
+  for (const auto& frame : frames) {
+    FuseFrame(frame);
   }
 
   // 4. collect fused objects
-  this->CollectFusedObjects(fusion_time, fused_objects);
-
-  fuse_mutex_.unlock();
+  CollectFusedObjects(fusion_time, fused_objects);
   return true;
 }
 
