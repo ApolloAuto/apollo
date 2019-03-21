@@ -1,6 +1,6 @@
-header: 
+header:
   seq: 0
-  stamp: 
+  stamp:
     secs: 0
     nsecs:         0
   frame_id: front_6mm
@@ -13,7 +13,7 @@ R: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
 P: [1983.97376, 0.0, 998.341216, 0.0, 0.0, 1981.62916, 621.618227, 0.0, 0.0, 0.0, 1.0, 0.0]
 binning_x: 0
 binning_y: 0
-roi: 
+roi:
   x_offset: 0
   y_offset: 0
   height: 0
