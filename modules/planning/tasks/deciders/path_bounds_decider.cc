@@ -162,7 +162,8 @@ void PathBoundsDecider::InitPathBoundsDecider(
 
 std::string PathBoundsDecider::GenerateRegularPathBoundary(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
-    const LaneBorrowInfo lane_borrow_info, PathBoundary* const path_boundary) {
+    const LaneBorrowInfo lane_borrow_info,
+    PathBound* const path_boundary) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
   if (!InitPathBoundary(reference_line_info.reference_line(), path_boundary)) {
     const std::string msg = "Failed to initialize path boundaries.";
@@ -202,7 +203,7 @@ std::string PathBoundsDecider::GenerateRegularPathBoundary(
 
 std::string PathBoundsDecider::GenerateFallbackPathBoundary(
     Frame* frame, ReferenceLineInfo* reference_line_info,
-    PathBoundary* const path_boundaries) {
+    PathBound* const path_boundaries) {
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -232,8 +233,8 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundary(
   return "";
 }
 
-bool PathBoundsDecider::InitPathBoundary(const ReferenceLine& reference_line,
-                                         PathBoundary* const path_boundary) {
+bool PathBoundsDecider::InitPathBoundary(
+    const ReferenceLine& reference_line, PathBound* const path_boundary) {
   // Sanity checks.
   CHECK_NOTNULL(path_boundary);
   path_boundary->clear();
