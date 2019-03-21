@@ -17,6 +17,8 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
         "//modules/routing:routing_lib",
+        "//modules/common/util",
+        "//modules/planning/proto:planning_proto",   
     ],
 )
 
