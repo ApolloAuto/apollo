@@ -225,14 +225,11 @@ def generate_perception(perception_description, prev_perception):
             p.CopyFrom(init_perception(description))
         return perceptions
     # Linear projection
-    description_dict = {}
-    for desc in perception_description:
-        description_dict[desc["id"]] = desc
+    description_dict = {desc["id"] : desc for desc in perception_description}
     for obstacle in prev_perception.perception_obstacle:
         description = description_dict[obstacle.id]
-        p = perceptions.perception_obstacle.add()
         next_obstacle = linear_project_perception(description, obstacle)
-        p.CopyFrom(next_obstacle)
+        perceptions.perception_obstacle.add().CopyFrom(next_obstacle)
     return perceptions
 
 def perception_publisher(perception_channel, files, period):
