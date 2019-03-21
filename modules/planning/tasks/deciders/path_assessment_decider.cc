@@ -46,26 +46,46 @@ Status PathAssessmentDecider::Process(
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
+  const auto& candidate_path_data =
+      reference_line_info->GetCandidatePathData();
 
-  // Check the validity of paths (the optimization output).
-  // 1. Check the validity of regular and fallback paths.
-  PathData* regular_path_data = reference_line_info->mutable_path_data();
-  PathData* fallback_path_data =
-      reference_line_info->mutable_fallback_path_data();
-  bool is_valid_regular_path =
-      IsValidRegularPath(*reference_line_info, *regular_path_data);
-  bool is_valid_fallback_path =
-      IsValidFallbackPath(*reference_line_info, *fallback_path_data);
-  // 2. If neither is valid, use the reference_line as the ultimate fallback.
-  if (!is_valid_regular_path && !is_valid_fallback_path) {
-    reference_line_info->SetFeasiblePathData(
-        ReferenceLineInfo::PathDataType::REFERENCE_LINE_PATH);
+  // Remove invalid path.
+  std::vector<PathData> valid_path_data;
+  for (const auto& curr_path_data : candidate_path_data) {
+    if (curr_path_data.path_label() == "fallback") {
+      if (IsValidFallbackPath(*reference_line_info, curr_path_data)) {
+        valid_path_data.push_back(curr_path_data);
+      }
+    } else {
+      if (IsValidRegularPath(*reference_line_info, curr_path_data)) {
+        valid_path_data.push_back(curr_path_data);
+      }
+    }
+  }
+
+  // If there is no valid path_data, exit.
+  if (valid_path_data.empty()) {
     const std::string msg = "Neither regular nor fallback path is valid.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   // Analyze and add important info for speed decider to use.
+  for (auto curr_path_data : valid_path_data) {
+    SetPathInfo(*reference_line_info, &curr_path_data);
+  }
+
+  // Pick the optimal path
+  std::sort(valid_path_data.begin(), valid_path_data.end(),
+            [](const PathData& lhs, const PathData& rhs) {
+              if (lhs.path_label() != rhs.path_label()) {
+                return lhs.path_label() == "regular";
+              }
+              return true;
+            });
+  *(reference_line_info->mutable_path_data()) = valid_path_data.front();
+  reference_line_info->SetBlockingObstacleId(
+      valid_path_data.front().blocking_obstacle_id());
 
   return Status::OK();
 }
