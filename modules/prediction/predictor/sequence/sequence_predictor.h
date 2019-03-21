@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "gtest/gtest.h"
 
@@ -61,6 +62,15 @@ class SequencePredictor : public Predictor {
   FRIEND_TEST(SequencePredictorTest, General);
 
  protected:
+  bool GetLongitudinalPolynomial(const Obstacle& obstacle,
+                                 const LaneSequence& lane_sequence,
+                                 const std::pair<double, double>& lon_end_state,
+                                 std::array<double, 5>* coefficients);
+
+  bool GetLateralPolynomial(const Obstacle& obstacle,
+                            const LaneSequence& lane_sequence,
+                            const double time_to_end_state,
+                            std::array<double, 6>* coefficients);
   /**
    * @brief Filter lane sequences
    * @param Lane graph
