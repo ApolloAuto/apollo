@@ -26,6 +26,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/common/path_boundary.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
@@ -62,68 +63,80 @@ Status PathBoundsDecider::Process(
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
+  const TaskConfig& config = Decider::config_;
+  std::vector<PathBoundary> candidate_path_boundaries;
 
   // Initialize.
   InitPathBoundsDecider(*frame, *reference_line_info);
 
-  // The decided path bounds should be in the format of: (s, l_min, l_max).
-  PathBound fallback_path_boundaries;
-  PathBound path_boundaries;
-
-  // Generate fallback path boundaries.
+  // Generate the fallback path boundary.
+  PathBound fallback_path_bound;
   std::string fallback_path_bounds_msg = GenerateFallbackPathBoundary(
-      frame, reference_line_info, &fallback_path_boundaries);
+      frame, reference_line_info, &fallback_path_bound);
   if (fallback_path_bounds_msg != "") {
+    ADEBUG << "Cannot generate a fallback path bound.";
     return Status(ErrorCode::PLANNING_ERROR, fallback_path_bounds_msg);
   }
-  // Update the fallback path boundary into the reference_line_info.
-  if (fallback_path_boundaries.empty()) {
+  if (fallback_path_bound.empty()) {
     const std::string msg = "Failed to get a valid fallback path boundary";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
-  std::vector<std::pair<double, double>> fallback_path_boundaries_pair;
-  for (size_t i = 0; i < fallback_path_boundaries.size(); ++i) {
-    fallback_path_boundaries_pair.emplace_back(
-        std::get<1>(fallback_path_boundaries[i]),
-        std::get<2>(fallback_path_boundaries[i]));
+  if (!fallback_path_bound.empty()) {
+    CHECK_LE(adc_frenet_l_, std::get<2>(fallback_path_bound[0]));
+    CHECK_GE(adc_frenet_l_, std::get<1>(fallback_path_bound[0]));
   }
-  reference_line_info->SetFallbackPathBoundaries(
-      fallback_path_boundaries_pair, std::get<0>(fallback_path_boundaries[0]),
-      kPathBoundsDeciderResolution);
-  if (!fallback_path_boundaries.empty()) {
-    CHECK_LE(adc_frenet_l_, std::get<2>(fallback_path_boundaries[0]));
-    CHECK_GE(adc_frenet_l_, std::get<1>(fallback_path_boundaries[0]));
+  // Update the fallback path boundary into the reference_line_info.
+  std::vector<std::pair<double, double>> fallback_path_bound_pair;
+  for (size_t i = 0; i < fallback_path_bound.size(); ++i) {
+    fallback_path_bound_pair.emplace_back(
+        std::get<1>(fallback_path_bound[i]),
+        std::get<2>(fallback_path_bound[i]));
   }
+  candidate_path_boundaries.emplace_back(std::get<0>(fallback_path_bound[0]),
+      kPathBoundsDeciderResolution, fallback_path_bound_pair);
 
-  // Generate path boundaries.
-  std::string path_bounds_msg =
-      GenerateRegularPathBoundary(*frame, *reference_line_info,
-                                  LaneBorrowInfo::NO_BORROW, &path_boundaries);
-  if (path_bounds_msg != "") {
-    return Status(ErrorCode::PLANNING_ERROR, path_bounds_msg);
+  // Generate regular path boundaries.
+  std::vector<LaneBorrowInfo> lane_borrow_info_list;
+  if (config.path_bound_decider_config().is_lane_borrowing()) {
+    // Try borrowing from left and from right neighbor lane.
+    lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
+                             LaneBorrowInfo::RIGHT_BORROW};
+  } else {
+    // Only use self-lane with no lane borrowing
+    lane_borrow_info_list = {LaneBorrowInfo::NO_BORROW};
   }
-  // Update the path boundary into the reference_line_info.
-  if (path_boundaries.empty()) {
-    const std::string msg = "Failed to get a valid path boundary";
-    AERROR << msg;
-    return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-  std::vector<std::pair<double, double>> path_boundaries_pair;
-  for (size_t i = 0; i < path_boundaries.size(); ++i) {
-    path_boundaries_pair.emplace_back(std::get<1>(path_boundaries[i]),
-                                      std::get<2>(path_boundaries[i]));
-  }
-  reference_line_info->SetPathBoundaries(path_boundaries_pair,
-                                         std::get<0>(path_boundaries[0]),
-                                         kPathBoundsDeciderResolution);
-  reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
-  if (!path_boundaries.empty()) {
-    CHECK_LE(adc_frenet_l_, std::get<2>(path_boundaries[0]));
-    CHECK_GE(adc_frenet_l_, std::get<1>(path_boundaries[0]));
+  // Try every possible lane-borrow option:
+  for (const auto& lane_borrow_info : lane_borrow_info_list) {
+    PathBound regular_path_bound;
+    std::string path_bounds_msg = GenerateRegularPathBoundary(
+        *frame, *reference_line_info, lane_borrow_info,
+        &regular_path_bound);
+    if (path_bounds_msg != "") {
+      continue;
+    }
+    if (regular_path_bound.empty()) {
+      continue;
+    }
+    if (!regular_path_bound.empty()) {
+      CHECK_LE(adc_frenet_l_, std::get<2>(regular_path_bound[0]));
+      CHECK_GE(adc_frenet_l_, std::get<1>(regular_path_bound[0]));
+    }
+    // Update the path boundary into the reference_line_info.
+    std::vector<std::pair<double, double>> path_boundaries_pair;
+    for (size_t i = 0; i < regular_path_bound.size(); ++i) {
+      path_boundaries_pair.emplace_back(std::get<1>(regular_path_bound[i]),
+                                        std::get<2>(regular_path_bound[i]));
+    }
+    candidate_path_boundaries.emplace_back(std::get<0>(regular_path_bound[0]),
+        kPathBoundsDeciderResolution, path_boundaries_pair);
+    // TODO(jiacheng): don't forget to set blocking obstacle info here.
+    // Need to modify the folowing line:
+    reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
   }
 
   // Success
+  reference_line_info->SetCandidatePathBoundaries(candidate_path_boundaries);
   ADEBUG << "Completed regular and fallback path boundaries generation.";
   return Status::OK();
 }
