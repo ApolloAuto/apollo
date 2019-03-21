@@ -107,7 +107,7 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   apollo::perception::onboard::TrafficLight traffic_light_param;
   if (!GetProtoConfig(&traffic_light_param)) {
     AINFO << "load trafficlights perception component proto param failed";
-    return false;
+    return cyber::FAIL;
   }
 
   tf2_frame_id_ = traffic_light_param.tl_tf2_frame_id();
