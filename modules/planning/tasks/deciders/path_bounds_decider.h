@@ -63,7 +63,7 @@ class PathBoundsDecider : public Decider {
     * @param: The generated regular path_boundary, if there is one.
     * @return: A failure message. If succeeded, return "" (empty string).
     */
-  std::string GenerateRegularPathBoundary(
+  std::string GenerateRegularPathBound(
       const Frame& frame, const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo lane_borrow_info,
       std::vector<std::tuple<double, double, double>>* const path_boundary);
