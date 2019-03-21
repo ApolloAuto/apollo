@@ -51,19 +51,19 @@ class PathBoundsDecider : public Decider {
                              const ReferenceLineInfo& reference_line_info);
 
   /** @brief: The regular path boundary generation considers the ADC itself
-   *   and other static environments:
-   *   - ADC's position (lane-changing considerations)
-   *   - lane info
-   *   - static obstacles
-   *   The philosophy is: static environment must be and can only be taken
-   *   care of by the path planning.
-   * @param: frame
-   * @param: reference_line_info
-   * @param: lane_borrow_info: which lane to borrow.
-   * @param: The generated regular path_boundary, if there is one.
-   * @return: A failure message. If succeeded, return "" (empty string).
-   */
-  std::string GenerateRegularPathBoundary(
+    *   and other static environments:
+    *   - ADC's position (lane-changing considerations)
+    *   - lane info
+    *   - static obstacles
+    *   The philosophy is: static environment must be and can only be taken
+    *   care of by the path planning.
+    * @param: frame
+    * @param: reference_line_info
+    * @param: lane_borrow_info: which lane to borrow.
+    * @param: The generated regular path_boundary, if there is one.
+    * @return: A failure message. If succeeded, return "" (empty string).
+    */
+  std::string GenerateRegularPathBound(
       const Frame& frame, const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo lane_borrow_info,
       std::vector<std::tuple<double, double, double>>* const path_boundary);
