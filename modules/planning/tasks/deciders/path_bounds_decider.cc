@@ -42,7 +42,7 @@ using apollo::hdmap::HDMapUtil;
 namespace {
 // PathBoundPoint contains: (s, l_min, l_max).
 using PathBoundPoint = std::tuple<double, double, double>;
-// PathBoundary contains a vector of PathBoundPoints.
+// PathBound contains a vector of PathBoundPoints.
 using PathBound = std::vector<PathBoundPoint>;
 // ObstacleEdge contains: (is_start_s, s, l_min, l_max, obstacle_id).
 using ObstacleEdge = std::tuple<int, double, double, double, std::string>;
@@ -63,10 +63,10 @@ Status PathBoundsDecider::Process(
   // Sanity checks.
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
-  const TaskConfig& config = Decider::config_;
   std::vector<PathBoundary> candidate_path_boundaries;
+  const TaskConfig& config = Decider::config_;
 
-  // Initialize.
+  // Initialization.
   InitPathBoundsDecider(*frame, *reference_line_info);
 
   // Generate the fallback path boundary.
@@ -109,7 +109,7 @@ Status PathBoundsDecider::Process(
   // Try every possible lane-borrow option:
   for (const auto& lane_borrow_info : lane_borrow_info_list) {
     PathBound regular_path_bound;
-    std::string path_bounds_msg = GenerateRegularPathBoundary(
+    std::string path_bounds_msg = GenerateRegularPathBound(
         *frame, *reference_line_info, lane_borrow_info,
         &regular_path_bound);
     if (path_bounds_msg != "") {
@@ -173,7 +173,7 @@ void PathBoundsDecider::InitPathBoundsDecider(
   }
 }
 
-std::string PathBoundsDecider::GenerateRegularPathBoundary(
+std::string PathBoundsDecider::GenerateRegularPathBound(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
     const LaneBorrowInfo lane_borrow_info,
     PathBound* const path_boundary) {
