@@ -51,17 +51,17 @@ def get_debug_paths(planning_pb):
     return results
 
 def plot_planning(ax, planning_file):
-        with open(planning_file, 'r') as fp:
-            planning_pb = planning_pb2.ADCTrajectory()
-            text_format.Merge(fp.read(), planning_pb)
-            trajectory = get_3d_trajectory(planning_pb)
-            ax.plot(trajectory[0], trajectory[1], trajectory[2],
-                    label="Trajectory:%s" % planning_file)
-            paths = get_debug_paths(planning_pb)
-            if paths:
-                for name, path in paths:
-                    ax.plot(path[0], path[1], label="%s:%s" % (name, planning_file))
-            ax.legend()
+    with open(planning_file, 'r') as fp:
+        planning_pb = planning_pb2.ADCTrajectory()
+        text_format.Merge(fp.read(), planning_pb)
+        trajectory = get_3d_trajectory(planning_pb)
+        ax.plot(trajectory[0], trajectory[1], trajectory[2],
+                label="Trajectory:%s" % planning_file)
+        paths = get_debug_paths(planning_pb)
+        if paths:
+            for name, path in paths:
+                ax.plot(path[0], path[1], label="%s:%s" % (name, planning_file))
+        ax.legend()
 
 def press_key(event):
     if event.key == 'c':
