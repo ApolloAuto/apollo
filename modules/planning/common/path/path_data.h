@@ -84,6 +84,10 @@ class PathData {
 
   std::string DebugString() const;
 
+  void set_path_label(std::string label);
+
+  const std::string& path_label() const;
+
  private:
   /*
    * convert frenet path to cartesian path by reference line
@@ -104,6 +108,8 @@ class PathData {
   std::vector<std::tuple<double, PathPointType, double>>
       path_point_decision_guide_;
   std::list<std::pair<DiscretizedPath, FrenetFramePath>> path_data_history_;
+
+  std::string path_label_ = "normal";
 };
 
 }  // namespace planning

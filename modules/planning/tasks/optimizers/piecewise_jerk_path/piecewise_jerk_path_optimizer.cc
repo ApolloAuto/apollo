@@ -42,7 +42,8 @@ PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
 
 common::Status PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
-    const common::TrajectoryPoint& init_point, PathData* const path_data) {
+    const common::TrajectoryPoint& init_point,
+    PathData* const final_path_data) {
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
@@ -51,57 +52,46 @@ common::Status PiecewiseJerkPathOptimizer::Process(
                              piecewise_jerk_path_config.ddl_weight(),
                              piecewise_jerk_path_config.dddl_weight(), 0.0};
 
-  {
-    auto ptr_path_boundary = reference_line_info_->GetPathBoundary();
-    if (ptr_path_boundary->boundary().size() >= 2) {
-      std::vector<double> opt_l;
-      std::vector<double> opt_dl;
-      std::vector<double> opt_ddl;
+  const auto& path_boundaries =
+      reference_line_info_->GetCandidatePathBoundaries();
 
-      bool res_opt = OptimizePath(init_frenet_state,
-                                  ptr_path_boundary->delta_s(),
-                                  ptr_path_boundary->boundary(), w,
-                                  &opt_l, &opt_dl, &opt_ddl);
-
-      if (res_opt) {
-        auto frenet_frame_path =
-            ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
-                                ptr_path_boundary->delta_s(),
-                                ptr_path_boundary->start_s());
-
-        path_data->SetReferenceLine(&reference_line);
-        path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
-        return Status::OK();
-      }
+  std::vector<PathData> candidate_path_data;
+  for (const auto& path_boundary : path_boundaries) {
+    // if the path_boundary is normal, it is possible to have less than 2 points
+    // skip path boundary of this kind
+    if (path_boundary.label() == "normal" &&
+        path_boundary.boundary().size() < 2) {
+      continue;
     }
-  }
-
-  {
-    auto ptr_path_boundary = reference_line_info_->GetFallbackPathBoundary();
-
-    CHECK_GT(ptr_path_boundary->boundary().size(), 1);
+    CHECK_GT(path_boundary.boundary().size(), 1);
 
     std::vector<double> opt_l;
     std::vector<double> opt_dl;
     std::vector<double> opt_ddl;
-
-    bool res_opt = OptimizePath(init_frenet_state, ptr_path_boundary->delta_s(),
-                                ptr_path_boundary->boundary(), w,
+    bool res_opt = OptimizePath(init_frenet_state,
+                                path_boundary.delta_s(),
+                                path_boundary.boundary(), w,
                                 &opt_l, &opt_dl, &opt_ddl);
 
     if (res_opt) {
-      auto frenet_frame_path =
-          ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
-                              ptr_path_boundary->delta_s(),
-                              ptr_path_boundary->start_s());
+      auto frenet_frame_path = ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
+                                                   path_boundary.delta_s(),
+                                                   path_boundary.start_s());
 
-      path_data->SetReferenceLine(&reference_line);
-      path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
-      return Status::OK();
+      // TODO(all): double-check this;
+      // final_path_data might carry info from upper stream
+      PathData path_data = *final_path_data;
+      path_data.SetReferenceLine(&reference_line);
+      path_data.SetFrenetPath(FrenetFramePath(frenet_frame_path));
+      path_data.set_path_label(path_boundary.label());
+      candidate_path_data.push_back(std::move(path_data));
     }
   }
-  return Status(ErrorCode::PLANNING_ERROR,
-                "Path Optimizer failed to generate path");
+  if (candidate_path_data.empty()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+        "Path Optimizer failed to generate path");
+  }
+  return Status::OK();
 }
 
 bool PiecewiseJerkPathOptimizer::OptimizePath(

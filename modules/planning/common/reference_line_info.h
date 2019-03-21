@@ -51,17 +51,21 @@ namespace planning {
  */
 class ReferenceLineInfo {
  public:
+  //////////////////////////////////////////////////////////////
+  // TODO(all): remove this when the interface is complete
   enum class PathDataType {
     REGULAR_PATH,
     FALLBACK_PATH,
     REFERENCE_LINE_PATH,
   };
+  //////////////////////////////////////////////////////////////
 
   ReferenceLineInfo() = default;
-  ReferenceLineInfo(const common::VehicleState& vehicle_state,
-                    const common::TrajectoryPoint& adc_planning_point,
-                    const ReferenceLine& reference_line,
-                    const hdmap::RouteSegments& segments);
+
+  explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
+                             const common::TrajectoryPoint& adc_planning_point,
+                             const ReferenceLine& reference_line,
+                             const hdmap::RouteSegments& segments);
 
   bool Init(const std::vector<const Obstacle*>& obstacles);
 
@@ -112,8 +116,6 @@ class ReferenceLineInfo {
   PathData* mutable_path_data();
   PathData* mutable_fallback_path_data();
   SpeedData* mutable_speed_data();
-
-  const std::vector<PathData>& GetCandidatePathData() const;
 
   const RSSInfo& rss_info() const;
   RSSInfo* mutable_rss_info();
@@ -171,24 +173,24 @@ class ReferenceLineInfo {
     offset_to_other_reference_line_ = offset;
   }
 
-  std::shared_ptr<PathBoundary> GetPathBoundary() const {
-    CHECK(ptr_path_boundary_ != nullptr);
-    return ptr_path_boundary_;
-  }
+  // TODO(all): use the new interface in PathBoundDecider
+  const std::vector<PathBoundary>& GetCandidatePathBoundaries() const;
 
-  std::shared_ptr<PathBoundary> GetFallbackPathBoundary() const {
-    CHECK(ptr_fallback_path_boundary_ != nullptr);
-    return ptr_fallback_path_boundary_;
-  }
+  void SetCandidatePathBoundaries(
+      std::vector<PathBoundary> candidate_path_boundaries);
 
+  const std::vector<PathData>& GetCandidatePathData() const;
+
+  void SetCandidatePathData(std::vector<PathData> candidate_path_data);
+
+  /////////////////////////////////////////////////////////////
+  // TODO(all): remove this when the interface is complete
   void SetPathBoundaries(
       std::vector<std::pair<double, double>> path_boundaries,
       const double start_s, const double resolution_s) {
     ptr_path_boundary_ = std::make_shared<PathBoundary>(start_s, resolution_s,
         std::move(path_boundaries));
   }
-
-  std::string GetBlockingObstacleId() const { return blocking_obstacle_id_; }
 
   void SetFallbackPathBoundaries(
       std::vector<std::pair<double, double>> path_boundaries,
@@ -197,6 +199,9 @@ class ReferenceLineInfo {
         start_s, resolution_s,
         std::move(path_boundaries));
   }
+  /////////////////////////////////////////////////////////////
+
+  std::string GetBlockingObstacleId() const { return blocking_obstacle_id_; }
 
   void SetBlockingObstacleId(const std::string& blocking_obstacle_id) {
     blocking_obstacle_id_ = blocking_obstacle_id;
@@ -279,17 +284,21 @@ class ReferenceLineInfo {
 
   PathDecision path_decision_;
 
-  std::shared_ptr<PathBoundary> ptr_path_boundary_ = nullptr;
   std::string blocking_obstacle_id_ = "";
 
+  /////////////////////////////////////////////////////////////
+  // TODO(all): remove these members when interface is complete
+  std::shared_ptr<PathBoundary> ptr_path_boundary_ = nullptr;
   std::shared_ptr<PathBoundary> ptr_fallback_path_boundary_ = nullptr;
-
-  PathDataType feasible_path_data_ = PathDataType::REGULAR_PATH;
-  PathData path_data_;
   PathData fallback_path_data_;
-  SpeedData speed_data_;
+  PathDataType feasible_path_data_ = PathDataType::REGULAR_PATH;
+  /////////////////////////////////////////////////////////////
 
+  std::vector<PathBoundary> candidate_path_boundaries_;
   std::vector<PathData> candidate_path_data_;
+
+  PathData path_data_;
+  SpeedData speed_data_;
 
   DiscretizedTrajectory discretized_trajectory_;
 
