@@ -19,7 +19,7 @@
  **/
 #pragma once
 
-#include <string.h>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -44,8 +44,8 @@ class PathBoundary {
   const std::string& label() const;
 
  private:
-  double start_s_;
-  double delta_s_;
+  double start_s_ = 0.0;
+  double delta_s_ = 0.0;
   std::vector<std::pair<double, double>> boundary_;
   std::string label_ = "normal";
 };
