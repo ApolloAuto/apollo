@@ -250,6 +250,9 @@ bool PathBoundsDecider::InitPathBoundary(
   CHECK_NOTNULL(path_bound);
   path_bound->clear();
 
+  // TODO(jiacheng): remove this later.
+  blocking_obstacle_id_ = "";
+
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
   for (double curr_s = adc_frenet_s_;
@@ -523,36 +526,6 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
   return true;
 }
 
-bool PathBoundsDecider::GetLaneInfoFromPoint(
-    double point_x, double point_y, double point_z, double point_theta,
-    hdmap::LaneInfoConstPtr* const lane) {
-  constexpr double kLaneSearchRadius = 1.0;
-  constexpr double kLaneSearchMaxThetaDiff = M_PI / 3.0;
-  double s = 0.0;
-  double l = 0.0;
-  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
-          common::util::MakePointENU(point_x, point_y, point_z),
-          kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff, lane, &s,
-          &l) != 0) {
-    AWARN << "Failed to find nearest lane from map at position: "
-          << "(x, y, z) = (" << point_x << ", " << point_y << ", " << point_z
-          << ")"
-          << ", heading = " << point_theta;
-    return false;
-  }
-  return true;
-}
-
-double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
-  double adc_half_width =
-      VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
-  // TODO(all): currently it's a fixed number. But it can take into account many
-  // factors such as: ADC length, possible turning angle, speed, etc.
-  constexpr double kAdcEdgeBuffer = 0.0;
-
-  return (adc_half_width + kAdcEdgeBuffer);
-}
-
 // The tuple contains (is_start_s, s, l_min, l_max, obstacle_id)
 std::vector<ObstacleEdge> PathBoundsDecider::SortObstaclesForSweepLine(
     const IndexedList<std::string, Obstacle>& indexed_obstacles) {
@@ -801,6 +774,36 @@ std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
   // TODO(jiacheng): sort the decisions based on the feasibility.
 
   return decisions;
+}
+
+bool PathBoundsDecider::GetLaneInfoFromPoint(
+    double point_x, double point_y, double point_z, double point_theta,
+    hdmap::LaneInfoConstPtr* const lane) {
+  constexpr double kLaneSearchRadius = 1.0;
+  constexpr double kLaneSearchMaxThetaDiff = M_PI / 3.0;
+  double s = 0.0;
+  double l = 0.0;
+  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
+          common::util::MakePointENU(point_x, point_y, point_z),
+          kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff, lane, &s,
+          &l) != 0) {
+    AWARN << "Failed to find nearest lane from map at position: "
+          << "(x, y, z) = (" << point_x << ", " << point_y << ", " << point_z
+          << ")"
+          << ", heading = " << point_theta;
+    return false;
+  }
+  return true;
+}
+
+double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
+  double adc_half_width =
+      VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
+  // TODO(all): currently it's a fixed number. But it can take into account many
+  // factors such as: ADC length, possible turning angle, speed, etc.
+  constexpr double kAdcEdgeBuffer = 0.0;
+
+  return (adc_half_width + kAdcEdgeBuffer);
 }
 
 bool PathBoundsDecider::UpdatePathBoundaryAndCenterLine(

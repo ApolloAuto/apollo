@@ -72,6 +72,9 @@ Status PathAssessmentDecider::Process(
 
   // Analyze and add important info for speed decider to use.
   for (auto curr_path_data : valid_path_data) {
+    if (curr_path_data.path_label() == "fallback") {
+      continue;
+    }
     SetPathInfo(*reference_line_info, &curr_path_data);
   }
 
