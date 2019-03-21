@@ -316,3 +316,9 @@ default_task_config: {
     open_space_fall_back_stop_safety_gap: 1.0
   }
 }
+default_task_config: {
+  task_type: PATH_BOUND_DECIDER
+  path_bound_decider_config {
+    is_lane_borrowing: false
+  }
+}
