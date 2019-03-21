@@ -28,12 +28,12 @@ Stage::StageStatus StageParking::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   // Open space planning doesn't use planning_init_point from upstream because
   // of different stitching strategy
+  frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);
   bool plan_ok = ExecuteTaskOnOpenSpace(frame);
   if (!plan_ok) {
     AERROR << "StageParking planning error";
     return StageStatus::ERROR;
   }
-  frame->mutable_open_space_info()->set_is_on_open_space_trajectory(true);
   return StageStatus::RUNNING;
 }
 
