@@ -60,7 +60,7 @@ bool GetWayNodes(const RoutingRequest& request, const TopoGraph* graph,
   for (const auto& point : request.waypoint()) {
     const auto* cur_node = graph->GetNode(point.id());
     if (cur_node == nullptr) {
-      AERROR << "Can't find way point in graph! Id: " << point.id();
+      AERROR << "Cannot find way point in graph! Id: " << point.id();
       return false;
     }
     way_nodes->push_back(cur_node);
@@ -139,11 +139,10 @@ bool Navigator::MergeRoute(
       result_node_vec->push_back(node);
     } else {
       if (result_node_vec->back().EndS() < node.StartS()) {
-        AERROR << "Result route is not coninuous";
+        AERROR << "Result route is not continuous.";
         return false;
-      } else {
-        result_node_vec->back().SetEndS(node.EndS());
       }
+      result_node_vec->back().SetEndS(node.EndS());
     }
   }
   return true;
