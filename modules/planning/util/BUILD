@@ -13,6 +13,8 @@ cc_library(
     deps = [
         "//modules/common/vehicle_state/proto:vehicle_state_proto",
         "//modules/routing:routing_lib",
+        "//modules/common/util",
+        "//modules/planning/proto:planning_proto",   
     ],
 )
 
