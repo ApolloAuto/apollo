@@ -317,9 +317,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     AERROR << "Planning failed:" << status.ToString();
     if (FLAGS_publish_estop) {
       AERROR << "Planning failed and set estop";
-      // Because the function "Control::ProduceControlCommand()" checks the
-      // "estop" signal with the following line (Line 170 in control.cc):
-      // estop_ = estop_ || trajectory_.estop().is_estop();
+      // "estop" signal check in function "Control::ProduceControlCommand()"
+      // estop_ = estop_ || local_view_.trajectory.estop().is_estop();
       // we should add more information to ensure the estop being triggered.
       EStop* estop = trajectory_pb->mutable_estop();
       estop->set_is_estop(true);
