@@ -80,4 +80,10 @@ git lfs fetch --all
 Additional material on Git LFS: https://git-lfs.github.com/
 
 ---
+## Bootstrap error: unix:///tmp/supervisor.sock refused connection
+
+There could be a number of reasons why this error occurs. 
+Please follow the steps recommended in the [following thread](https://github.com/ApolloAuto/apollo/issues/5344). There are quite a few suggestions. If it still does not work for you, comment on the thread mentioned above.
+
+---
 **More Software FAQs to follow.**
