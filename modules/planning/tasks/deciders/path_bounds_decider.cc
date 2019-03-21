@@ -118,18 +118,16 @@ Status PathBoundsDecider::Process(
     if (regular_path_bound.empty()) {
       continue;
     }
-    if (!regular_path_bound.empty()) {
-      CHECK_LE(adc_frenet_l_, std::get<2>(regular_path_bound[0]));
-      CHECK_GE(adc_frenet_l_, std::get<1>(regular_path_bound[0]));
-    }
+    CHECK_LE(adc_frenet_l_, std::get<2>(regular_path_bound[0]));
+    CHECK_GE(adc_frenet_l_, std::get<1>(regular_path_bound[0]));
     // Update the path boundary into the reference_line_info.
-    std::vector<std::pair<double, double>> path_boundaries_pair;
+    std::vector<std::pair<double, double>> regular_path_bound_pair;
     for (size_t i = 0; i < regular_path_bound.size(); ++i) {
-      path_boundaries_pair.emplace_back(std::get<1>(regular_path_bound[i]),
-                                        std::get<2>(regular_path_bound[i]));
+      regular_path_bound_pair.emplace_back(std::get<1>(regular_path_bound[i]),
+                                           std::get<2>(regular_path_bound[i]));
     }
     candidate_path_boundaries.emplace_back(std::get<0>(regular_path_bound[0]),
-        kPathBoundsDeciderResolution, path_boundaries_pair);
+        kPathBoundsDeciderResolution, regular_path_bound_pair);
     candidate_path_boundaries.back().set_label("regular");
     candidate_path_boundaries.back().set_blocking_obstacle_id(
         blocking_obstacle_id_);
