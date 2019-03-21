@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,8 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
   for (const LaneSequence& lane_sequence :
        feature.lane().lane_graph().lane_sequence()) {
     std::vector<LatLonPolynomialBundle> trajectory_lat_lon_bundles;
-    SampleTrajectoryPolynomials(&trajectory_lat_lon_bundles);
+    SampleTrajectoryPolynomials(*obstacle, lane_sequence,
+        &trajectory_lat_lon_bundles);
     for (const auto& trajectory_lat_lon_bundle : trajectory_lat_lon_bundles) {
       double cost = ComputeTrajectoryCost(trajectory_lat_lon_bundle);
       if (cost < smallest_cost) {
@@ -105,12 +106,12 @@ bool InteractionPredictor::DrawTrajectory(
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
 
   std::array<double, 6> lateral_coeffs =
-      trajectory_lat_lon_bundle.lat_polynomial_coeffs;
+      trajectory_lat_lon_bundle.lat_polynomial_coeffs();
   std::array<double, 5> longitudinal_coeffs =
-      trajectory_lat_lon_bundle.lon_polynomial_coeffs;
-  double lon_end_t = trajectory_lat_lon_bundle.lon_end_t;
-  double lon_end_v = trajectory_lat_lon_bundle.lon_end_v;
-  double lat_end_t = trajectory_lat_lon_bundle.lat_end_t;
+      trajectory_lat_lon_bundle.lon_polynomial_coeffs();
+  double lon_end_t = trajectory_lat_lon_bundle.lon_end_t();
+  double lon_end_v = trajectory_lat_lon_bundle.lon_end_v();
+  double lat_end_t = trajectory_lat_lon_bundle.lat_end_t();
 
   int lane_segment_index = 0;
   std::string lane_id =
@@ -184,9 +185,33 @@ bool InteractionPredictor::DrawTrajectory(
 }
 
 bool InteractionPredictor::SampleTrajectoryPolynomials(
+    const Obstacle& obstacle,
+    const LaneSequence& lane_sequence,
     std::vector<LatLonPolynomialBundle>* lat_lon_polynomial_bundles) {
-  // TODO(kechxu) implement
-  return false;
+  lat_lon_polynomial_bundles->clear();
+  CHECK_GT(obstacle.history_size(), 0);
+  const Feature& feature = obstacle.latest_feature();
+  double curr_v = feature.speed();
+  std::vector<double> candidate_times{1.0, 2.0, 3.0};
+  int num_v_sample = 5;
+  double v_gap = curr_v / static_cast<double>(num_v_sample);
+  std::vector<double> candidate_speeds;
+  for (int i = 0; i < num_v_sample; ++i) {
+    candidate_speeds.push_back(v_gap * static_cast<double>(i) + 1.0);
+  }
+  for (const double lon_end_v : candidate_speeds) {
+    for (const double lon_end_t : candidate_times) {
+      double lat_end_t = 3.0;
+      std::array<double, 6> lat_coeffs;
+      std::array<double, 5> lon_coeffs;
+      GetLongitudinalPolynomial(
+          obstacle, lane_sequence, {lon_end_v, lon_end_t}, &lon_coeffs);
+      GetLateralPolynomial(obstacle, lane_sequence, lat_end_t, &lat_coeffs);
+      lat_lon_polynomial_bundles->emplace_back(
+          lat_coeffs, lon_coeffs, lat_end_t, lon_end_t, lon_end_v);
+    }
+  }
+  return true;
 }
 
 double InteractionPredictor::ComputeTrajectoryCost(

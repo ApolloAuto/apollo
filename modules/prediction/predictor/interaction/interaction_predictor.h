@@ -47,12 +47,38 @@ class InteractionPredictor : public SequencePredictor {
   void Predict(Obstacle* obstacle) override;
 
  private:
-  struct LatLonPolynomialBundle {
-    std::array<double, 6> lat_polynomial_coeffs;
-    std::array<double, 5> lon_polynomial_coeffs;
-    double lat_end_t;
-    double lon_end_t;
-    double lon_end_v;
+  class LatLonPolynomialBundle {
+   public:
+    LatLonPolynomialBundle() = default;
+    ~LatLonPolynomialBundle() = default;
+    LatLonPolynomialBundle(
+        const std::array<double, 6>& lat_polynomial_coeffs,
+        const std::array<double, 5>& lon_polynomial_coeffs,
+        const double lat_end_t,
+        const double lon_end_t,
+        const double lon_end_v) :
+      lat_polynomial_coeffs_(lat_polynomial_coeffs),
+      lon_polynomial_coeffs_(lon_polynomial_coeffs),
+      lat_end_t_(lat_end_t),
+      lon_end_t_(lon_end_t),
+      lon_end_v_(lon_end_v) {}
+
+    std::array<double, 6> lat_polynomial_coeffs() const {
+      return lat_polynomial_coeffs_;
+    }
+    std::array<double, 5> lon_polynomial_coeffs() const {
+      return lon_polynomial_coeffs_;
+    }
+    double lat_end_t() const { return lat_end_t_; }
+    double lon_end_t() const { return lon_end_t_; }
+    double lon_end_v() const { return lon_end_v_; }
+
+   private:
+    std::array<double, 6> lat_polynomial_coeffs_;
+    std::array<double, 5> lon_polynomial_coeffs_;
+    double lat_end_t_;
+    double lon_end_t_;
+    double lon_end_v_;
   };
 
   void Clear();
@@ -64,6 +90,8 @@ class InteractionPredictor : public SequencePredictor {
     std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
 
   bool SampleTrajectoryPolynomials(
+      const Obstacle& obstacle,
+      const LaneSequence& lane_sequence,
       std::vector<LatLonPolynomialBundle>* lat_lon_polynomial_bundles);
 
   double ComputeTrajectoryCost(

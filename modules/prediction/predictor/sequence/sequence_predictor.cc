@@ -20,6 +20,7 @@
 #include <memory>
 #include <utility>
 
+#include "modules/common/proto/geometry.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -28,6 +29,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::PathPoint;
+using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
@@ -319,6 +321,103 @@ void SequencePredictor::DrawConstantAccelerationTrajectory(
 
     lane_l *= FLAGS_go_approach_rate;
   }
+}
+
+bool SequencePredictor::GetLongitudinalPolynomial(
+    const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const std::pair<double, double>& lon_end_vt,
+    std::array<double, 5>* coefficients) {
+  // Sanity check.
+  CHECK_NOTNULL(coefficients);
+  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
+
+  // Get obstacle info.
+  const Feature& feature = obstacle.latest_feature();
+  double theta = feature.velocity_heading();
+  double v = feature.speed();
+  double a = 0.0;
+
+  // Get lane info.
+  if (FLAGS_enable_lane_sequence_acc && lane_sequence.has_acceleration()) {
+    a = lane_sequence.acceleration();
+  }
+  double lane_heading = lane_sequence.lane_segment(0).lane_point(0).heading();
+
+  // Set the initial conditions for the diff. eqn.
+  double s0 = 0.0;
+  double ds0 = v * std::cos(theta - lane_heading);
+  double dds0 = a * std::cos(theta - lane_heading);
+  // double min_end_speed = std::min(FLAGS_still_obstacle_speed_threshold, ds0);
+  // double ds1 = std::max(min_end_speed, ds0 + dds0 * time_to_end_state);
+  double ds1 = lon_end_vt.first;
+  double dds1 = 0.0;
+  double p = lon_end_vt.second;  // time to lon end state
+
+  // Solve for the coefficients.
+  coefficients->operator[](0) = s0;
+  coefficients->operator[](1) = ds0;
+  coefficients->operator[](2) = 0.5 * dds0;
+  double b0 = ds1 - dds0 * p - ds0;
+  double b1 = dds1 - dds0;
+  double p2 = p * p;
+  double p3 = p2 * p;
+  coefficients->operator[](3) = b0 / p2 - b1 / 3.0 / p;
+  coefficients->operator[](4) = -0.5 / p3 * b0 + 0.25 / p2 * b1;
+  return true;
+}
+
+bool SequencePredictor::GetLateralPolynomial(
+    const Obstacle& obstacle, const LaneSequence& lane_sequence,
+    const double time_to_end_state, std::array<double, 6>* coefficients) {
+  // Sanity check.
+  CHECK_NOTNULL(coefficients);
+  CHECK_GT(obstacle.history_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment_size(), 0);
+  CHECK_GT(lane_sequence.lane_segment(0).lane_point_size(), 0);
+
+  // Get obstacle info.
+  const Feature& feature = obstacle.latest_feature();
+  double theta = feature.velocity_heading();
+  double v = feature.speed();
+  Point3D position = feature.position();
+  const LanePoint& start_lane_point =
+      lane_sequence.lane_segment(0).lane_point(0);
+
+  // Get lane info.
+  double pos_delta_x = position.x() - start_lane_point.position().x();
+  double pos_delta_y = position.y() - start_lane_point.position().y();
+  double lane_heading_x = std::cos(start_lane_point.heading());
+  double lane_heading_y = std::sin(start_lane_point.heading());
+
+  // Check if obstacle is to the left(+) or right(-) of the lane.
+  double cross_prod =
+      lane_heading_x * pos_delta_y - lane_heading_y * pos_delta_x;
+  double shift = std::hypot(pos_delta_x, pos_delta_y);
+
+  // Set the initial conditions for solving diff. eqn.
+  double l0 = (cross_prod > 0) ? shift : -shift;
+  double dl0 = v * std::sin(theta - start_lane_point.heading());
+  double ddl0 = 0.0;
+  double l1 = 0.0;
+  double dl1 = 0.0;
+  double ddl1 = 0.0;
+
+  // Solve for the coefficients.
+  coefficients->operator[](0) = l0;
+  coefficients->operator[](1) = dl0;
+  coefficients->operator[](2) = ddl0 / 2.0;
+  double p = time_to_end_state;
+  double p2 = p * p;
+  double p3 = p2 * p;
+  double c0 = (l1 - 0.5 * p2 * ddl0 - dl0 * p - l0) / p3;
+  double c1 = (dl1 - ddl0 * p - dl0) / p2;
+  double c2 = (ddl1 - ddl0) / p;
+  coefficients->operator[](3) = 0.5 * (20.0 * c0 - 8.0 * c1 + c2);
+  coefficients->operator[](4) = (-15.0 * c0 + 7.0 * c1 - c2) / p;
+  coefficients->operator[](5) = (6.0 * c0 - 3.0 * c1 + 0.5 * c2) / p2;
+  return true;
 }
 
 }  // namespace prediction
