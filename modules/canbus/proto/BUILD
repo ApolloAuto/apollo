@@ -13,6 +13,7 @@ proto_library(
         "canbus_conf.proto",
         "chassis.proto",
         "chassis_detail.proto",
+        "ch.proto",
         "vehicle_parameter.proto",
     ],
     deps = [
