@@ -8,7 +8,7 @@ cc_binary(
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
-				"//cyber/py_wrapper:py_node",
+        "//cyber/py_wrapper:py_node",
     ],
 )
 
@@ -18,7 +18,7 @@ cc_binary(
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
-				"//cyber/py_wrapper:py_node",
+        "//cyber/py_wrapper:py_node",
     ],
 )
 
@@ -28,7 +28,7 @@ cc_binary(
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
-				"//cyber/py_wrapper:py_node",
+        "//cyber/py_wrapper:py_node",
     ],
 )
 
@@ -38,7 +38,7 @@ cc_binary(
     deps = [
         "//cyber",
         "//cyber/proto:unit_test_cc_proto",
-				"//cyber/py_wrapper:py_record",
+        "//cyber/py_wrapper:py_record",
     ],
 )
 
