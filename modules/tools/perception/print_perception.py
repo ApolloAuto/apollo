@@ -20,7 +20,6 @@
 print received perception message
 """
 import argparse
-import numpy
 from cyber_py import cyber
 
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
@@ -41,9 +40,10 @@ def perception_receiver(perception_channel):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="create fake perception obstacles",
-            prog="print_perception.py")
-    parser.add_argument("-c", "--channel", action="store", type=str, default="/apollo/perception/obstacles",
-            help="set the perception channel")
+                                     prog="print_perception.py")
+    parser.add_argument("-c", "--channel", action="store", type=str,
+                        default="/apollo/perception/obstacles",
+                        help="set the perception channel")
 
     args = parser.parse_args()
     perception_receiver(args.channel)

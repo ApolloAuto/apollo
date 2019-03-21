@@ -32,7 +32,7 @@ from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
 
 def distance(p1, p2):
     """distance between two trajectory points"""
-    return math.sqrt((p1.y - p2.y)**2 + (p1.x - p2.x)**2);
+    return math.sqrt((p1.y - p2.y)**2 + (p1.x - p2.x)**2)
 
 
 def get_trajectory_length(trajectory):
@@ -40,7 +40,7 @@ def get_trajectory_length(trajectory):
     total = 0.0
     for i in range(1, len(trajectory.trajectory_point)):
         total += distance(trajectory.trajectory_point[i - 1].path_point,
-                trajectory.trajectory_point[i].path_point)
+                          trajectory.trajectory_point[i].path_point)
     return total
 
 
@@ -48,7 +48,7 @@ def extend_prediction(prediction, min_length, min_time):
     """extend prediction"""
     obstacles = len(prediction.prediction_obstacle)
     for obstacle in prediction.prediction_obstacle:
-        i = 0;
+        i = 0
         for trajectory in obstacle.trajectory:
             points = trajectory.trajectory_point
             point_num = len(points)
@@ -76,13 +76,17 @@ def extend_prediction(prediction, min_length, min_time):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="extend prediction trajectory")
-    parser.add_argument("prediction", action="store", type=str, help="set the prediction file")
+    parser = argparse.ArgumentParser(
+        description="extend prediction trajectory")
+    parser.add_argument("prediction", action="store",
+                        type=str, help="set the prediction file")
     parser.add_argument("-p", "--period", action="store", type=float, default=10.0,
-            help="set the prediction period")
+                        help="set the prediction period")
     parser.add_argument("-d", "--distance", action="store", type=float, default=70.0,
-            help="set the prediction distance")
+                        help="set the prediction distance")
     args = parser.parse_args()
-    prediction_data = proto_utils.get_pb_from_file(args.prediction, PredictionObstacles())
-    extended_prediction = extend_prediction(prediction_data, args.distance, args.period)
-    print extended_prediction
+    prediction_data = proto_utils.get_pb_from_file(
+        args.prediction, PredictionObstacles())
+    extended_prediction = extend_prediction(
+        prediction_data, args.distance, args.period)
+    print(extended_prediction)
