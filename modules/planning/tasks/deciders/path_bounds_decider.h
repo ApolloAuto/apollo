@@ -99,8 +99,8 @@ class PathBoundsDecider : public Decider {
     *   accordingly to include ADC's current position.
     */
   bool GetBoundaryFromLanesAndADC(
-      const ReferenceLine& reference_line, int lane_borrowing,
-      double ADC_buffer,
+      const ReferenceLine& reference_line,
+      const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   bool GetBoundaryFromStaticObstacles(
