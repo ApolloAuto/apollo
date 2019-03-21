@@ -61,6 +61,9 @@ Status PathBoundsDecider::Process(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
+  // Initialize.
+  InitPathBoundsDecider(*frame, *reference_line_info);
+
   // The decided path bounds should be in the format of: (s, l_min, l_max).
   PathBoundary fallback_path_boundaries;
   PathBoundary path_boundaries;
@@ -92,8 +95,9 @@ Status PathBoundsDecider::Process(
   }
 
   // Generate path boundaries.
-  std::string path_bounds_msg =
-      GenerateRegularPathBoundary(frame, reference_line_info, &path_boundaries);
+  std::string path_bounds_msg = GenerateRegularPathBoundary(
+      *frame, *reference_line_info, LaneBorrowInfo::NO_BORROW,
+      &path_boundaries);
   if (path_bounds_msg != "") {
     return Status(ErrorCode::PLANNING_ERROR, path_bounds_msg);
   }
@@ -122,91 +126,12 @@ Status PathBoundsDecider::Process(
   return Status::OK();
 }
 
-std::string PathBoundsDecider::GenerateRegularPathBoundary(
-    Frame* frame, ReferenceLineInfo* reference_line_info,
-    std::vector<std::tuple<double, double, double>>* const path_boundaries) {
-  // Sanity checks.
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-
-  // 1. Initialize the path boundaries to be an indefinitely large area.
-  if (!InitPathBoundary(reference_line_info->reference_line(),
-                        frame->PlanningStartPoint(), path_boundaries)) {
-    const std::string msg = "Failed to initialize path boundaries.";
-    AERROR << msg;
-    return msg;
-  }
-  // PathBoundsDebugString(*path_boundaries);
-
-  // 2. Decide a rough boundary based on road info and ADC's position
-  if (!GetBoundaryFromLanesAndADC(reference_line_info->reference_line(), 0, 0.1,
-                                  path_boundaries)) {
-    const std::string msg =
-        "Failed to decide a rough boundary based on "
-        "road information.";
-    AERROR << msg;
-    return msg;
-  }
-  // PathBoundsDebugString(*path_boundaries);
-
-  // 3. Fine-tune the boundary based on static obstacles
-  // TODO(all): in the future, add side-pass functionality.
-  if (!GetBoundaryFromStaticObstacles(reference_line_info->path_decision(),
-                                      path_boundaries)) {
-    const std::string msg =
-        "Failed to decide fine tune the boundaries after "
-        "taking into consideration all static obstacles.";
-    AERROR << msg;
-    return msg;
-  }
-  // PathBoundsDebugString(*path_boundaries);
-
-  // 4. Adjust the boundary considering dynamic obstacles
-  // TODO(all): may need to implement this in the future.
-
-  ADEBUG << "Completed generating path boundaries.";
-  return "";
-}
-
-std::string PathBoundsDecider::GenerateFallbackPathBoundary(
-    Frame* frame, ReferenceLineInfo* reference_line_info,
-    std::vector<std::tuple<double, double, double>>* const path_boundaries) {
-  // Sanity checks.
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-
-  // 1. Initialize the path boundaries to be an indefinitely large area.
-  if (!InitPathBoundary(reference_line_info->reference_line(),
-                        frame->PlanningStartPoint(), path_boundaries)) {
-    const std::string msg = "Failed to initialize fallback path boundaries.";
-    AERROR << msg;
-    return msg;
-  }
-  // PathBoundsDebugString(*path_boundaries);
-
-  // 2. Decide a rough boundary based on road info and ADC's position
-  if (!GetBoundaryFromLanesAndADC(reference_line_info->reference_line(), 0, 0.5,
-                                  path_boundaries)) {
-    const std::string msg =
-        "Failed to decide a rough fallback boundary based on "
-        "road information.";
-    AERROR << msg;
-    return msg;
-  }
-  // PathBoundsDebugString(*path_boundaries);
-
-  ADEBUG << "Completed generating fallback path boundaries.";
-  return "";
-}
-
-bool PathBoundsDecider::InitPathBoundary(
-    const ReferenceLine& reference_line,
-    const common::TrajectoryPoint& planning_start_point,
-    std::vector<std::tuple<double, double, double>>* const path_boundaries) {
-  // Sanity checks.
-  CHECK_NOTNULL(path_boundaries);
-  path_boundaries->clear();
-
+void PathBoundsDecider::InitPathBoundsDecider(
+    const Frame& frame, const ReferenceLineInfo& reference_line_info) {
+  const ReferenceLine& reference_line =
+      reference_line_info.reference_line();
+  const common::TrajectoryPoint& planning_start_point =
+      frame.PlanningStartPoint();
   // Reset variables.
   blocking_obstacle_id_ = "";
   adc_frenet_s_ = 0.0;
@@ -232,6 +157,86 @@ bool PathBoundsDecider::InitPathBoundary(
   } else {
     adc_lane_width_ = lane_left_width + lane_right_width;
   }
+}
+
+std::string PathBoundsDecider::GenerateRegularPathBoundary(
+    const Frame& frame, const ReferenceLineInfo& reference_line_info,
+    const LaneBorrowInfo lane_borrow_info,
+    PathBoundary* const path_boundary) {
+  // 1. Initialize the path boundaries to be an indefinitely large area.
+  if (!InitPathBoundary(reference_line_info.reference_line(),
+                        path_boundary)) {
+    const std::string msg = "Failed to initialize path boundaries.";
+    AERROR << msg;
+    return msg;
+  }
+  // PathBoundsDebugString(*path_boundary);
+
+  // 2. Decide a rough boundary based on road info and ADC's position
+  if (!GetBoundaryFromLanesAndADC(reference_line_info.reference_line(),
+                                  0, 0.1, path_boundary)) {
+    const std::string msg =
+        "Failed to decide a rough boundary based on "
+        "road information.";
+    AERROR << msg;
+    return msg;
+  }
+  // PathBoundsDebugString(*path_boundary);
+
+  // 3. Fine-tune the boundary based on static obstacles
+  if (!GetBoundaryFromStaticObstacles(
+          reference_line_info.path_decision(), path_boundary)) {
+    const std::string msg =
+        "Failed to decide fine tune the boundaries after "
+        "taking into consideration all static obstacles.";
+    AERROR << msg;
+    return msg;
+  }
+  // PathBoundsDebugString(*path_boundary);
+
+  // 4. Adjust the boundary considering dynamic obstacles
+  // TODO(all): may need to implement this in the future.
+
+  ADEBUG << "Completed generating path boundaries.";
+  return "";
+}
+
+std::string PathBoundsDecider::GenerateFallbackPathBoundary(
+    Frame* frame, ReferenceLineInfo* reference_line_info,
+    PathBoundary* const path_boundaries) {
+  // Sanity checks.
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  // 1. Initialize the path boundaries to be an indefinitely large area.
+  if (!InitPathBoundary(reference_line_info->reference_line(),
+                        path_boundaries)) {
+    const std::string msg = "Failed to initialize fallback path boundaries.";
+    AERROR << msg;
+    return msg;
+  }
+  // PathBoundsDebugString(*path_boundaries);
+
+  // 2. Decide a rough boundary based on road info and ADC's position
+  if (!GetBoundaryFromLanesAndADC(reference_line_info->reference_line(), 0, 0.5,
+                                  path_boundaries)) {
+    const std::string msg =
+        "Failed to decide a rough fallback boundary based on "
+        "road information.";
+    AERROR << msg;
+    return msg;
+  }
+  // PathBoundsDebugString(*path_boundaries);
+
+  ADEBUG << "Completed generating fallback path boundaries.";
+  return "";
+}
+
+bool PathBoundsDecider::InitPathBoundary(
+    const ReferenceLine& reference_line, PathBoundary* const path_boundary) {
+  // Sanity checks.
+  CHECK_NOTNULL(path_boundary);
+  path_boundary->clear();
 
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
@@ -239,10 +244,15 @@ bool PathBoundsDecider::InitPathBoundary(
        curr_s < std::min(adc_frenet_s_ + kPathBoundsDeciderHorizon,
                          reference_line.Length());
        curr_s += kPathBoundsDeciderResolution) {
-    path_boundaries->emplace_back(curr_s, std::numeric_limits<double>::lowest(),
+    path_boundary->emplace_back(curr_s, std::numeric_limits<double>::lowest(),
                                   std::numeric_limits<double>::max());
   }
 
+  // return.
+  if (path_boundary->empty()) {
+    ADEBUG << "Empty path boundary in InitPathBoundary";
+    return false;
+  }
   return true;
 }
 
@@ -374,10 +384,10 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
 // obstacles whose headings differ from road-headings a lot.
 // TODO(all): (future work) this can be improved in the future.
 bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
-    PathDecision* const path_decision,
+    const PathDecision& path_decision,
     std::vector<std::tuple<double, double, double>>* const path_boundaries) {
   // Preprocessing.
-  auto indexed_obstacles = path_decision->obstacles();
+  auto indexed_obstacles = path_decision.obstacles();
   auto sorted_obstacles = SortObstaclesForSweepLine(indexed_obstacles);
   double center_line = adc_frenet_l_;
   size_t obs_idx = 0;
