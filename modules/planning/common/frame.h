@@ -87,8 +87,6 @@ class Frame {
 
   void RecordInputDebug(planning_internal::Debug *debug);
 
-  void RecordOpenSpacePlannerDebug(planning_internal::Debug *debug);
-
   const std::list<ReferenceLineInfo> &reference_line_info() const;
   std::list<ReferenceLineInfo> *mutable_reference_line_info();
 
