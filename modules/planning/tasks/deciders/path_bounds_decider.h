@@ -57,16 +57,15 @@ class PathBoundsDecider : public Decider {
     *   - static obstacles
     *   The philosophy is: static environment must be and can only be taken
     *   care of by the path planning.
-    * @param: frame
     * @param: reference_line_info
     * @param: lane_borrow_info: which lane to borrow.
     * @param: The generated regular path_boundary, if there is one.
     * @return: A failure message. If succeeded, return "" (empty string).
     */
   std::string GenerateRegularPathBound(
-      const Frame& frame, const ReferenceLineInfo& reference_line_info,
+      const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo lane_borrow_info,
-      std::vector<std::tuple<double, double, double>>* const path_boundary);
+      std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief: The fallback path only considers:
     *   - ADC's position (so that boundary must contain ADC's position)
@@ -79,14 +78,13 @@ class PathBoundsDecider : public Decider {
     *   obstacle. When the fallback path is used, stopping before static
     *   obstacles should be taken care of by the speed decider. Also, it
     *   doesn't consider any lane-borrowing.
-    * @param: frame
     * @param: reference_line_info
     * @param: The generated fallback path_boundary, if there is one.
     * @return: A failure message. If succeeded, return "" (empty string).
     */
-  std::string GenerateFallbackPathBoundary(
-      Frame* frame, ReferenceLineInfo* reference_line_info,
-      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+  std::string GenerateFallbackPathBound(
+      const ReferenceLineInfo& reference_line_info,
+      std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief: Initializes an empty path boundary.
     */
