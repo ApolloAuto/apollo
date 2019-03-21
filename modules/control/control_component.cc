@@ -198,7 +198,9 @@ Status ControlComponent::ProduceControlCommand(
                : local_view_.trajectory.estop().is_estop();
 
   if (local_view_.trajectory.estop().is_estop()) {
-    estop_reason_ = "estop from planning";
+    estop_ = true;
+    estop_reason_ = "estop from planning : ";
+    estop_reason_ += local_view_.trajectory.estop().reason();
   }
 
   if (local_view_.trajectory.trajectory_point_size() == 0) {
@@ -207,7 +209,6 @@ Status ControlComponent::ProduceControlCommand(
     estop_reason_ = "estop for empty planning trajectory";
   }
 
-  // if planning set estop, then no control process triggered
   if (!estop_) {
     if (local_view_.chassis.driving_mode() == Chassis::COMPLETE_MANUAL) {
       controller_agent_.Reset();
@@ -239,7 +240,7 @@ Status ControlComponent::ProduceControlCommand(
       status = status_compute;
     }
   }
-
+  // if planning set estop, then no control process triggered
   if (estop_) {
     AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
     // set Estop command
