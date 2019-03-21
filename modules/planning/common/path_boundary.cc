@@ -49,5 +49,13 @@ const std::string& PathBoundary::label() const {
   return label_;
 }
 
+void PathBoundary::set_blocking_obstacle_id(const std::string& obs_id) {
+  blocking_obstacle_id_ = obs_id;
+}
+
+const std::string& PathBoundary::blocking_obstacle_id() const {
+  return blocking_obstacle_id_;
+}
+
 }  // namespace planning
 }  // namespace apollo

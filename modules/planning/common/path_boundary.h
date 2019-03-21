@@ -40,14 +40,17 @@ class PathBoundary {
   const std::vector<std::pair<double, double>>& boundary() const;
 
   void set_label(const std::string& label);
-
   const std::string& label() const;
+
+  void set_blocking_obstacle_id(const std::string& obs_id);
+  const std::string& blocking_obstacle_id() const;
 
  private:
   double start_s_ = 0.0;
   double delta_s_ = 0.0;
   std::vector<std::pair<double, double>> boundary_;
   std::string label_ = "normal";
+  std::string blocking_obstacle_id_ = "";
 };
 
 }  // namespace planning
