@@ -160,7 +160,7 @@ void OnlineLocalizationExpert::CheckImuMissingStatus(
 
 void OnlineLocalizationExpert::CheckGnssLidarMsfStatus(
     const double &cur_imu_time) {
-  msf_status_mutex_.lock();
+  std::lock_guard<std::mutex> lock(msf_status_mutex_);
   latest_gnsspos_timestamp_mutex_.lock();
   if (cur_imu_time - latest_gnsspos_timestamp_ >
       bestgnsspose_loss_time_threshold_) {
@@ -182,14 +182,12 @@ void OnlineLocalizationExpert::CheckGnssLidarMsfStatus(
     msf_status_.set_local_lidar_quality(LocalLidarQuality::MSF_LOCAL_LIDAR_BAD);
   }
   latest_lidar_timestamp_mutex_.unlock();
-  msf_status_mutex_.unlock();
-  return;
 }
 
 void OnlineLocalizationExpert::SetLocalizationStatus(
     const LocalizationEstimate &data) {
   apollo::common::Point3D position_std = data.uncertainty().position_std_dev();
-  msf_status_mutex_.lock();
+  std::lock_guard<std::mutex> lock(msf_status_mutex_);
   if (position_std.x() < localization_std_x_threshold_1_ &&
       position_std.y() < localization_std_y_threshold_1_) {
     switch (msf_status_.gnsspos_position_type()) {
@@ -431,35 +429,32 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
         break;
     }
   }
-  msf_status_mutex_.unlock();
-  return;
 }
 
 void OnlineLocalizationExpert::GetFusionStatus(
     MsfStatus *msf_status, MsfSensorMsgStatus *sensor_status,
     LocalizationIntegStatus *integ_status) {
-  msf_status_mutex_.lock();
-  msf_status->set_local_lidar_consistency(
-      msf_status_.local_lidar_consistency());
-  msf_status->set_gnss_consistency(msf_status_.gnss_consistency());
-  msf_status->set_local_lidar_status(msf_status_.local_lidar_status());
-  msf_status->set_gnsspos_position_type(msf_status_.gnsspos_position_type());
-  msf_status->set_msf_running_status(msf_status_.msf_running_status());
-  msf_status->set_local_lidar_quality(msf_status_.local_lidar_quality());
-  msf_status_mutex_.unlock();
+  {
+    std::unique_lock<std::mutex> lock(msf_status_mutex_);
+    msf_status->set_local_lidar_consistency(
+        msf_status_.local_lidar_consistency());
+    msf_status->set_gnss_consistency(msf_status_.gnss_consistency());
+    msf_status->set_local_lidar_status(msf_status_.local_lidar_status());
+    msf_status->set_gnsspos_position_type(msf_status_.gnsspos_position_type());
+    msf_status->set_msf_running_status(msf_status_.msf_running_status());
+    msf_status->set_local_lidar_quality(msf_status_.local_lidar_quality());
+  }
 
   sensor_status->set_imu_delay_status(sensor_status_.imu_delay_status());
   sensor_status->set_imu_missing_status(sensor_status_.imu_missing_status());
   sensor_status->set_imu_data_status(sensor_status_.imu_data_status());
 
   *integ_status = integ_status_;
-  return;
 }
 
 void OnlineLocalizationExpert::GetGnssStatus(MsfStatus *msf_status) {
   std::unique_lock<std::mutex> lock(msf_status_mutex_);
   msf_status->set_gnsspos_position_type(msf_status_.gnsspos_position_type());
-  return;
 }
 
 }  // namespace msf
