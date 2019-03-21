@@ -148,7 +148,8 @@ Status OpenSpaceTrajectoryProvider::Process() {
         // call merge debug ptr, open_space_trajectory_optimizer_
         auto* debug_ptr = frame_->mutable_open_space_info()->mutable_debug();
         open_space_trajectory_optimizer_->UpdateDebugInfo(
-          debug_ptr->mutable_planning_data()->mutable_open_space());
+            debug_ptr->mutable_planning_data()->mutable_open_space());
+
         // sync debug instance
         frame_->mutable_open_space_info()->sync_debug_instance();
       }
@@ -341,14 +342,14 @@ void OpenSpaceTrajectoryProvider::ReuseLastFrameResult(
   frame_->mutable_open_space_info()->set_open_space_provider_success(true);
 }
 
-void OpenSpaceTrajectoryProvider::ReuseLastFrameDebug(
-    const Frame* last_frame) {
+void OpenSpaceTrajectoryProvider::ReuseLastFrameDebug(const Frame* last_frame) {
   // reuse last frame's instance
   auto* debug_ptr = frame_->mutable_open_space_info()->mutable_debug_instance();
   debug_ptr->mutable_planning_data()->mutable_open_space()->MergeFrom(
-      last_frame->open_space_info().debug_instance().
-      planning_data().open_space());
-  // frame_->mutable_open_space_info()->sync_debug_instance();
+      last_frame->open_space_info()
+          .debug_instance()
+          .planning_data()
+          .open_space());
 }
 
 }  // namespace planning
