@@ -48,12 +48,12 @@ using apollo::common::VehicleState;
 using apollo::common::VehicleStateProvider;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
-using apollo::hdmap::HDMapUtil;
-using apollo::routing::RoutingResponse;
 using apollo::dreamview::Chart;
+using apollo::hdmap::HDMapUtil;
 using apollo::planning_internal::SLFrameDebug;
 using apollo::planning_internal::SpeedPlan;
 using apollo::planning_internal::STGraphDebug;
+using apollo::routing::RoutingResponse;
 
 OnLanePlanning::~OnLanePlanning() {
   if (reference_line_provider_) {
@@ -401,10 +401,14 @@ Status OnLanePlanning::Plan(
     publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
     trajectory_pb->set_gear(publishable_trajectory_gear);
 
-    if (FLAGS_enable_record_debug && FLAGS_export_chart) {
-      // call open space info load debug
-      ExportOpenSpaceChart(
-          frame_->open_space_info().debug_instance(), ptr_debug);
+    if (FLAGS_enable_record_debug) {
+      ptr_debug->MergeFrom(frame_->open_space_info().debug_instance());
+      ADEBUG << "Open space debug information added!";
+      if (FLAGS_export_chart) {
+        // call open space info load debug
+        ExportOpenSpaceChart(frame_->open_space_info().debug_instance(),
+                             ptr_debug);
+      }
     }
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
@@ -500,10 +504,9 @@ bool OnLanePlanning::CheckPlanningConfig(const PlanningConfig& config) {
   return true;
 }
 
-void PopulateChartOptions(
-    double x_min, double x_max, std::string x_label,
-    double y_min, double y_max, std::string y_label,
-    bool display, Chart *chart) {
+void PopulateChartOptions(double x_min, double x_max, std::string x_label,
+                          double y_min, double y_max, std::string y_label,
+                          bool display, Chart* chart) {
   auto* options = chart->mutable_options();
   options->mutable_x()->set_min(x_min);
   options->mutable_x()->set_max(x_max);
@@ -516,8 +519,8 @@ void PopulateChartOptions(
 
 void AddStGraph(const STGraphDebug& st_graph, Chart* chart) {
   chart->set_title(st_graph.name());
-  PopulateChartOptions(
-      -2.0, 10.0, "t (second)", 0.0, 80.0, "s (meter)", true, chart);
+  PopulateChartOptions(-2.0, 10.0, "t (second)", 0.0, 80.0, "s (meter)", true,
+                       chart);
 
   for (const auto& boundary : st_graph.boundary()) {
     auto* boundary_chart = chart->add_polygon();
@@ -536,8 +539,8 @@ void AddStGraph(const STGraphDebug& st_graph, Chart* chart) {
 
 void AddSlFrame(const SLFrameDebug& sl_frame, Chart* chart) {
   chart->set_title(sl_frame.name());
-  PopulateChartOptions(
-    0.0, 80.0, "s (meter)", -8.0, 8.0, "l (meter)", false, chart);
+  PopulateChartOptions(0.0, 80.0, "s (meter)", -8.0, 8.0, "l (meter)", false,
+                       chart);
   auto* sl_line = chart->add_line();
   sl_line->set_label("SL Path");
   for (const auto& sl_point : sl_frame.sl_path()) {
@@ -551,8 +554,8 @@ void AddSpeedPlan(
     const ::google::protobuf::RepeatedPtrField<SpeedPlan>& speed_plans,
     Chart* chart) {
   chart->set_title("Speed Plan");
-  PopulateChartOptions(
-      0.0, 80.0, "s (meter)", 0.0, 50.0, "v (m/s)", false, chart);
+  PopulateChartOptions(0.0, 80.0, "s (meter)", 0.0, 50.0, "v (m/s)", false,
+                       chart);
 
   for (const auto& speed_plan : speed_plans) {
     auto* line = chart->add_line();
@@ -607,20 +610,19 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
     const planning_internal::Debug& debug_info,
     planning_internal::Debug* debug_chart) {
   // if open space info provider success run
-  if (!frame_->open_space_info().open_space_provider_success()) { return; }
+  if (!frame_->open_space_info().open_space_provider_success()) {
+    return;
+  }
 
   auto chart = debug_chart->mutable_planning_data()->add_chart();
   auto open_space_debug = debug_info.planning_data().open_space();
 
   chart->set_title("Open Space Trajectory Visualization");
-  PopulateChartOptions(
-    open_space_debug.xy_boundary(0) - 1.0,
-    open_space_debug.xy_boundary(1) + 1.0,
-    "x (meter)",
-    open_space_debug.xy_boundary(2) - 1.0,
-    open_space_debug.xy_boundary(3) + 1.0,
-    "y (meter)",
-    false, chart);
+  PopulateChartOptions(open_space_debug.xy_boundary(0) - 1.0,
+                       open_space_debug.xy_boundary(1) + 1.0, "x (meter)",
+                       open_space_debug.xy_boundary(2) - 1.0,
+                       open_space_debug.xy_boundary(3) + 1.0, "y (meter)",
+                       false, chart);
 
   int obstacle_index = 1;
   for (const auto& obstacle : open_space_debug.obstacles()) {
