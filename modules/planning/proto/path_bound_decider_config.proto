@@ -3,4 +3,5 @@ syntax = "proto2";
 package apollo.planning;
 
 message PathBoundDeciderConfig {
+  optional bool is_lane_borrowing = 1;
 }
