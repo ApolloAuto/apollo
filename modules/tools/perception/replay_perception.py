@@ -24,7 +24,6 @@ import argparse
 import math
 import time
 
-import numpy
 import simplejson
 from cyber_py import cyber
 
@@ -160,7 +159,7 @@ def is_within(a, b, c):
     """
     if b < a:
         b, a = a, b
-    return a - _s_epsilon < c and c < b + _s_epsilon
+    return a - _s_epsilon < c < b + _s_epsilon
 
 def on_segment(a, b, c):
     """
@@ -225,16 +224,16 @@ def generate_perception(perception_description, prev_perception):
             p = perceptions.perception_obstacle.add()
             p.CopyFrom(init_perception(description))
         return perceptions
-    else: # Linear projection
-        description_dict = {}
-        for desc in perception_description:
-            description_dict[desc["id"]] = desc
-        for obstacle in prev_perception.perception_obstacle:
-            description = description_dict[obstacle.id]
-            p = perceptions.perception_obstacle.add()
-            next_obstacle = linear_project_perception(description, obstacle)
-            p.CopyFrom(next_obstacle)
-        return perceptions
+    # Linear projection
+    description_dict = {}
+    for desc in perception_description:
+        description_dict[desc["id"]] = desc
+    for obstacle in prev_perception.perception_obstacle:
+        description = description_dict[obstacle.id]
+        p = perceptions.perception_obstacle.add()
+        next_obstacle = linear_project_perception(description, obstacle)
+        p.CopyFrom(next_obstacle)
+    return perceptions
 
 def perception_publisher(perception_channel, files, period):
     """
