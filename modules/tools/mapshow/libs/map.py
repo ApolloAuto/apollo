@@ -135,14 +135,27 @@ class Map:
         cnt = 1
         for pnc_junction in self.map_pb.pnc_junction:
             color_val = self.colors[cnt % len(self.colors)]
-            self._draw_pnc_boundary(pnc_junction, ax, color_val)
+            self._draw_polygon_boundary(pnc_junction.polygon, ax, color_val)
             self._draw_pnc_junction_id(pnc_junction, ax, color_val)
             cnt += 1
 
     def _draw_pnc_junction_id(self, pnc_junction, ax, color_val):
         x = pnc_junction.polygon.point[0].x
-        y = pnc_junction.polygon.point[1].y
+        y = pnc_junction.polygon.point[0].y
         self._draw_label(pnc_junction.id.id, (x,y), ax, color_val);
+
+    def draw_crosswalks(self, ax):
+        cnt = 1
+        for crosswalk in self.map_pb.crosswalk:
+            color_val = self.colors[cnt % len(self.colors)]
+            self._draw_polygon_boundary(crosswalk.polygon, ax, color_val)
+            self._draw_crosswalk_id(crosswalk, ax, color_val)
+            cnt += 1
+
+    def _draw_crosswalk_id(self, crosswalk, ax, color_val):
+        x = crosswalk.polygon.point[0].x
+        y = crosswalk.polygon.point[0].y
+        self._draw_label(crosswalk.id.id, (x,y), ax, color_val);
 
     @staticmethod
     def _draw_label(label_id, point, ax, color_val):
@@ -226,11 +239,11 @@ class Map:
                 ax.plot(px, py, ls=':', c=color_val, alpha=0.5)
 
     @staticmethod
-    def _draw_pnc_boundary(pnc_junction, ax, color_val):
-        """draw boundary"""
+    def _draw_polygon_boundary(polygon, ax, color_val):
+        """draw polygon boundary"""
         px = []
         py = []
-        for point in pnc_junction.polygon.point:
+        for point in polygon.point:
             px.append(point.x)
             py.append(point.y)
         ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
