@@ -72,7 +72,7 @@ ErrorCode SocketCanClientRaw::Start() {
   // init config and state
   // 1. set receive message_id filter, ie white list
   struct can_filter filter[2048];
-  for (int i = 0; i < sizeof(filter)/sizeof(filter[0]); ++i) {
+  for (size_t i = 0; i < sizeof(filter) / sizeof(filter[0]); ++i) {
     filter[i].can_id = 0x000 + i;
     filter[i].can_mask = CAN_SFF_MASK;
   }

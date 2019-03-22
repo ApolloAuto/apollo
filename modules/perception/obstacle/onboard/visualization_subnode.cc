@@ -342,7 +342,7 @@ void VisualizationSubnode::SetFusionContent(const std::string& data_key,
     const std::vector<double>& ts = fusion_item->frame_ts;
     const std::vector<std::string>& device_id = fusion_item->frame_device_id;
 
-    for (int i = 0; i < ts.size(); ++i) {
+    for (size_t i = 0; i < ts.size(); ++i) {
       double trigger_ts = ts[i];
       std::string trigger_device_id = device_id[i];
       std::string data_key_sensor;
