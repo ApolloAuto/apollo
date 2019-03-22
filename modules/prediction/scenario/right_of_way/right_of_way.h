@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,43 +14,24 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
-
-#pragma once
-
-#include <memory>
-
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
-#include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
-#include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
+
 
 namespace apollo {
 namespace prediction {
 
-class ScenarioManager {
+class RightOfWay {
  public:
   /**
-   * @brief Run scenario analysis
+   * @brief Constructor
    */
-  void Run();
+  RightOfWay() = delete;
 
   /**
-   * @brief Assign right_of_way for current frame
+   * @brief Set right_of_way for all lane_sequence
+   * @return Scenario features
    */
-  void AssignRightOfWay();
-
-  /**
-   * @brief Get scenario analysis result
-   */
-  const Scenario& scenario() const;
-
- private:
-  Scenario current_scenario_;
-
-  DECLARE_SINGLETON(ScenarioManager)
+  static void Analyze();
 };
 
 }  // namespace prediction

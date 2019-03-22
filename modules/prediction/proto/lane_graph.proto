@@ -51,7 +51,7 @@ message StopSign {
   optional double lane_sequence_s = 4;  // the s value along lane sequence
 }
 
-// next id = 21
+// next id = 22
 message LaneSequence {
   optional int32 lane_sequence_id = 1;
   repeated LaneSegment lane_segment = 2;
@@ -60,6 +60,7 @@ message LaneSequence {
   optional double lane_s = 17;
   optional double lane_l = 18;
   optional StopSign stop_sign = 20;
+  optional int32 right_of_way = 21; // right_of_way score
 
   message Features {
     repeated double mlp_features = 1;
