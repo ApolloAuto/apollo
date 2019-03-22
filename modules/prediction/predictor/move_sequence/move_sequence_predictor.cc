@@ -88,7 +88,7 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
           *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
           FLAGS_prediction_trajectory_time_resolution, acceleration, &points);
     } else {
-      DrawMoveSequenceTrajectoryPointsUsingBestTrajectorySelection(
+      DrawMoveSequenceTrajectoryPoints(
           *obstacle, sequence, FLAGS_prediction_trajectory_time_length,
           FLAGS_prediction_trajectory_time_resolution, &points);
     }
