@@ -229,6 +229,7 @@ class OpenSpaceInfo {
   }
 
   const std::vector<TrajGearPair> &paritioned_trajectories() const {
+    // to-do(Runxin): export to chart
     return paritioned_trajectories_;
   }
 
@@ -245,6 +246,7 @@ class OpenSpaceInfo {
   }
 
   const TrajGearPair &chosen_paritioned_trajectory() const {
+    // to-do(Runxin): export to chart
     return chosen_paritioned_trajectory_;
   }
 
