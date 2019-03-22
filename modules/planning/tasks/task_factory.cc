@@ -27,6 +27,7 @@
 #include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 #include "modules/planning/tasks/deciders/open_space_fallback_decider.h"
 #include "modules/planning/tasks/deciders/open_space_roi_decider.h"
+#include "modules/planning/tasks/deciders/path_assessment_decider.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_path_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_safety.h"
@@ -141,6 +142,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::OPEN_SPACE_FALLBACK_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new OpenSpaceFallbackDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_ASSESSMENT_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathAssessmentDecider(config);
                          });
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =
