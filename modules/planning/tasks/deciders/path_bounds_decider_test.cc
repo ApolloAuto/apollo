@@ -53,10 +53,24 @@ TEST_F(PathBoundsDeciderTest, InitPathBoundary) {
   PathBoundsDecider path_bounds_decider(config_);
   path_bounds_decider.adc_frenet_s_ = 10.0;
 
+  // TODO(all): implement this unit test.
+
   // ReferenceLine reference_line;
   // reference_line.map_path_.length_ = 200.0;
 
   // std::vector<std::tuple<double, double, double>> path_boundary;
+}
+
+TEST_F(PathBoundsDeciderTest, GetBoundaryFromLanesAndADC) {
+  PathBoundsDecider path_bounds_decider(config_);
+  path_bounds_decider.adc_frenet_s_ = 10.0;
+  // TODO(all): implement this unit test.
+}
+
+TEST_F(PathBoundsDeciderTest, GetBoundaryFromStaticObstacles) {
+  PathBoundsDecider path_bounds_decider(config_);
+  std::vector<std::tuple<double, double, double>> path_bound;
+  PathDecision path_decision;
 }
 
 }  // namespace planning
