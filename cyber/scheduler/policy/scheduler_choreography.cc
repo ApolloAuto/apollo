@@ -44,7 +44,6 @@ using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
 SchedulerChoreography::SchedulerChoreography() {
-  // get sched config
   std::string conf("conf/");
   conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
   auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
@@ -82,7 +81,6 @@ SchedulerChoreography::SchedulerChoreography() {
     }
   }
 
-  // default val for case w/o config:
   if (proc_num_ == 0) {
     auto& global_conf = GlobalData::Instance()->Config();
     if (global_conf.has_scheduler_conf() &&
@@ -110,7 +108,6 @@ void SchedulerChoreography::CreateProcessor() {
     processors_.emplace_back(proc);
   }
 
-  // Put tasks w/o processor assigned into a classic pool.
   for (uint32_t i = 0; i < task_pool_size_; i++) {
     auto ctx = std::make_shared<ClassicContext>();
 
@@ -148,7 +145,6 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
     }
   }
 
-  // Create CRoutine context;
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
     if (id_cr_.find(cr->id()) != id_cr_.end()) {
@@ -163,8 +159,6 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
     // Enqueue task to Choreo Policy.
     static_cast<ChoreographyContext*>(pctxs_[pid].get())->Enqueue(cr);
   } else {
-    // fallback for tasks w/o processor assigned.
-
     // Check if task prio is reasonable.
     if (cr->priority() >= MAX_PRIO) {
       AWARN << cr->name() << " prio great than MAX_PRIO.";
@@ -275,11 +269,9 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
                                             cr->processor_id());
 
   if (cr->processor_id() != -1) {
-    // Notify processor in choreo context.
     auto pid = cr->processor_id();
     static_cast<ChoreographyContext*>(pctxs_[pid].get())->Notify();
   } else {
-    // Notify processor in pool.
     ClassicContext::Notify(cr->group_name());
   }
 
