@@ -20,24 +20,28 @@ import sys
 import time
 
 from cyber_py import cyber
-from cyber.proto.unit_test_pb2  import ChatterBenchmark
+from cyber.proto.unit_test_pb2 import ChatterBenchmark
+
 
 def callback(data):
-    print "-"*80
+    print "-" * 80
     print "get Request [ ", data, " ]"
-    # print "req type is ", type(data) # <class 'cyber.proto.chatter_pb2.ChatterBenchmark'>
+    # print "req type is ", type(data) # <class
+    # 'cyber.proto.chatter_pb2.ChatterBenchmark'>
     response = ChatterBenchmark()
     response.content = "svr: Hello client!"
     response.seq = data.seq + 2
     return response
 
+
 def test_service_class():
     """
-    reader message.
+    Reader message.
     """
     print "=" * 120
     node = cyber.Node("service_node")
-    r = node.create_service("server_01", ChatterBenchmark, ChatterBenchmark, callback)
+    r = node.create_service(
+        "server_01", ChatterBenchmark, ChatterBenchmark, callback)
     node.spin()
 
 if __name__ == '__main__':

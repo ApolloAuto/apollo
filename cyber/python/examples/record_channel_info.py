@@ -21,8 +21,9 @@ import sys
 
 from cyber_py import cyber
 from cyber_py import record
-from cyber.proto  import record_pb2
+from cyber.proto import record_pb2
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
+
 
 def print_channel_info(file_path):
     freader = record.RecordReader(file_path)
@@ -44,7 +45,7 @@ def print_channel_info(file_path):
     counts = 1
     for channel in channels:
         desc = freader.get_protodesc(channel)
-        print "[", counts , "]", "channel name: ", channel, "; desc size is ", len(desc)
+        print "[", counts, "]", "channel name: ", channel, "; desc size is ", len(desc)
         counts = counts + 1
         # print desc
     print "++++++++++++Finish Channel Info Statistics++++++++++++++"
