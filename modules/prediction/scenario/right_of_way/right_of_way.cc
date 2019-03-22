@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,44 +14,30 @@
  * limitations under the License.
  *****************************************************************************/
 
-/**
- * @file
- */
-
-#pragma once
+#include "modules/prediction/scenario/right_of_way/right_of_way.h"
 
 #include <memory>
 
-#include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
-#include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
-#include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
+#include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/obstacles/obstacle_clusters.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
 
-class ScenarioManager {
- public:
-  /**
-   * @brief Run scenario analysis
-   */
-  void Run();
+using apollo::perception::PerceptionObstacle;
+using common::adapter::AdapterConfig;
+using hdmap::LaneInfo;
+using hdmap::OverlapInfo;
+using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
-  /**
-   * @brief Assign right_of_way for current frame
-   */
-  void AssignRightOfWay();
 
-  /**
-   * @brief Get scenario analysis result
-   */
-  const Scenario& scenario() const;
-
- private:
-  Scenario current_scenario_;
-
-  DECLARE_SINGLETON(ScenarioManager)
-};
+void RightOfWay::Analyze() {
+  // TODO(Hongyi): implement
+}
 
 }  // namespace prediction
 }  // namespace apollo
