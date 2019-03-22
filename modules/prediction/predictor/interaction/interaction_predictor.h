@@ -33,7 +33,7 @@ class InteractionPredictor : public SequencePredictor {
   /**
    * @brief Constructor
    */
-  InteractionPredictor() = default;
+  InteractionPredictor();
 
   /**
    * @brief Destructor
@@ -83,6 +83,8 @@ class InteractionPredictor : public SequencePredictor {
 
   void Clear();
 
+  void BuildADCTrajectory(const double resolution);
+
   bool DrawTrajectory(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
     const LatLonPolynomialBundle& lat_lon_polynomial_bundle,
@@ -96,12 +98,15 @@ class InteractionPredictor : public SequencePredictor {
 
   double ComputeTrajectoryCost(
       const Obstacle& obstacle,
+      const LaneSequence& lane_sequence,
       const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
 
   double CentripetalAccelerationCost(
+      const LaneSequence& lane_sequence,
       const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
 
   double CollisionWithEgoVehicleCost(
+      const LaneSequence& lane_sequence,
       const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
 
   bool LowerRightOfWayThanEgo(const Obstacle& obstacle);
@@ -109,6 +114,9 @@ class InteractionPredictor : public SequencePredictor {
   double ComputeLikelihood(const double cost);
 
   double ComputePosterior(const double prior, const double likelihood);
+
+ private:
+  std::vector<apollo::common::TrajectoryPoint> adc_trajectory_;
 };
 
 }  // namespace prediction
