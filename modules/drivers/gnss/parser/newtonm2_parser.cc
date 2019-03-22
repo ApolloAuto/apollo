@@ -19,14 +19,14 @@
 // properly.
 //
 
+#include "modules/drivers/gnss/parser/newtonm2_parser.h"
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <vector>
-#include "ros/include/ros/ros.h"
 #include "modules/common/log.h"
-#include "modules/drivers/gnss/parser/newtonm2_messages.h"
+#include "modules/drivers/gnss/parser/novatel_messages.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm_decode.h"
 #include "modules/drivers/gnss/proto/gnss.pb.h"
@@ -36,7 +36,7 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/gnss/util/time_conversion.h"
-#include "modules/drivers/gnss/parser/newtonm2_parser.h"
+#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace drivers {
