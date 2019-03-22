@@ -1013,6 +1013,20 @@ void SimulationWorldService::UpdateSimulationWorld(
 template <>
 void SimulationWorldService::UpdateSimulationWorld(
     const NavigationInfo &navigation_info) {
+  static const std::string topic_name = "NavigationInfo";
+  if (navigation_info.has_hashcode()) {
+    const auto hashcode = navigation_info.hashcode();
+    if (topic_hashcode_map_.find(topic_name) !=
+        topic_hashcode_map_.end()) {
+      // it seems to be the same topic, ignore this update
+      if (topic_hashcode_map_[topic_name] == hashcode) {
+        return;
+      }
+    }
+
+    topic_hashcode_map_[topic_name] = hashcode;
+  }
+
   world_.clear_navigation_path();
   for (auto &navigation_path : navigation_info.navigation_path()) {
     if (navigation_path.has_path()) {
