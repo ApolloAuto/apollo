@@ -213,6 +213,24 @@ rosbag play -l /apollo/data/bag/2018-04-01-09-58-00.bag
 cd /apollo/modules/tools/navigator
 python navigator.py ./path_2018-04-01-09-58-00.bag.txt.smoothed
 ```
+
+**注意事项：**
+
+当路线比较长时（bag.txt.smoothed大于5M），可能存在两个问题：
+1. 刷新过长的路线导致`relative_map`，`planning`和`dreamview`消耗大量的资源
+2. 大概率出现`relative_map`和`dreamview`收不到`navigator.py`发布的`navigation` topic
+
+针对问题1，新增了`relative_map`局部刷新的特性，请参考`relative_map_path_frame_ahead`配置项，该特性目前只在ARM64上有效。
+
+针对问题2，增加了在C++层，即`relative_map`进程启动时读取路线文件，并将`navigation`发布给`dreamview`。
+请参考配置项`load_navigation_path_when_start`，`relative_map_navigation_path_filename`。
+
+路线的配置文件默认为`modules/map/relative_map/conf/navigation_path.yaml`，支持同时配置多个路线。
+
+如果`load_navigation_path_when_start`配置为true（默认为false），不再需要执行`navigator.py`脚本发布路线数据。
+
+
+
 下图是**线下模拟测试情形下**`Dreamview`接收到参考线后的界面，注意界面左上角已出现了百度地图界面，我们发送的参考线在百度地图中以红线方式、在主界面中以白色车道线的方式展现。
 
 ![img](images/navigation_mode/navigation_mode_with_reference_line_test.png) 

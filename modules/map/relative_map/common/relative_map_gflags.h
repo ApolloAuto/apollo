@@ -34,5 +34,7 @@ DECLARE_bool(enable_cyclic_rerouting);
 DECLARE_bool(relative_map_generate_left_boundray);
 DECLARE_bool(navigator_down_sample);
 DECLARE_int32(relative_map_path_frame_ahead);
+DECLARE_bool(load_navigation_path_when_start);
+DECLARE_string(relative_map_navigation_path_filename);
 
 #endif  // MODULES_MAP_RELATIVE_MAP_RELATIVE_MAP_GFLAGS_H_

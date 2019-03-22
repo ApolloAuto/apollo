@@ -47,7 +47,7 @@ class RelativeMapInterface : public apollo::common::ApolloApp {
   virtual void RunOnce() = 0;
 
   /**
-   * @brief Fill the header and publish the prediction message.
+   * @brief Fill the header and publish the relativemap message.
    */
   void Publish(MapMsg *relative_map) {
     apollo::common::adapter::AdapterManager::FillRelativeMapHeader(
