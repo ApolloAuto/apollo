@@ -195,6 +195,7 @@ class PathBoundsDecider : public Decider {
   hdmap::LaneInfoConstPtr adc_lane_info_;
 
   FRIEND_TEST(PathBoundsDeciderTest, InitPathBoundary);
+  FRIEND_TEST(PathBoundsDeciderTest, GetBoundaryFromLanesAndADC);
 };
 
 }  // namespace planning
