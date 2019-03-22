@@ -26,6 +26,7 @@ import sys
 import time
 
 from cyber_py import cyber
+from cyber_py import cyber_time
 from modules.routing.proto import routing_pb2
 
 
@@ -39,7 +40,7 @@ def main():
 
     routing_request = routing_pb2.RoutingRequest()
 
-    routing_request.header.timestamp_sec = time.time()
+    routing_request.header.timestamp_sec = cyber_time.Time.now().to_sec()
     routing_request.header.module_name = 'routing_request'
     routing_request.header.sequence_num = sequence_num
     sequence_num = sequence_num + 1
