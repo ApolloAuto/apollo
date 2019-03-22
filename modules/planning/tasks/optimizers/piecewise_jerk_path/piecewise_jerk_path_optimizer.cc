@@ -92,6 +92,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     return Status(ErrorCode::PLANNING_ERROR,
         "Path Optimizer failed to generate path");
   }
+  reference_line_info_->SetCandidatePathData(std::move(candidate_path_data));
   return Status::OK();
 }
 
