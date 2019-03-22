@@ -28,6 +28,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::PathPoint;
+using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
 using apollo::hdmap::LaneInfo;
 using apollo::prediction::math_util::EvaluateQuarticPolynomial;
@@ -272,8 +273,33 @@ double InteractionPredictor::CentripetalAccelerationCost(
 double InteractionPredictor::CollisionWithEgoVehicleCost(
     const LaneSequence& lane_sequence,
     const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
-  // TODO(kechxu) implement
-  return 0.0;
+  auto lon_coeffs = lat_lon_polynomial_bundle.lon_polynomial_coeffs();
+  auto lat_coeffs = lat_lon_polynomial_bundle.lat_polynomial_coeffs();
+  double lat_end_t = lat_lon_polynomial_bundle.lat_end_t();
+  double lon_end_v = lat_lon_polynomial_bundle.lon_end_v();
+  double lon_end_t = lat_lon_polynomial_bundle.lon_end_t();
+
+  double cost_abs_sum = 0.0;
+  double cost_sqr_sum = 0.0;
+  for (size_t i = 0; i < adc_trajectory_.size(); ++i) {
+    double relative_time = static_cast<double>(i);
+    double s = EvaluateQuarticPolynomial(lon_coeffs, relative_time, 0,
+                                         lon_end_t, lon_end_v);
+    double l = EvaluateQuinticPolynomial(lat_coeffs, relative_time, 0,
+                                         lat_end_t, 0.0);
+    Point3D position = GetPositionByLaneSequenceSL(lane_sequence, s, l);
+    double pos_x = position.x();
+    double pos_y = position.y();
+    const auto& adc_traj_point = adc_trajectory_[i];
+    double adc_x = adc_traj_point.path_point().x();
+    double adc_y = adc_traj_point.path_point().y();
+    double distance = std::hypot(adc_x - pos_x, adc_y - pos_y);
+    // TODO(kechxu) adjust parameter
+    double cost = std::exp(-1.0 * distance * distance);
+    cost_abs_sum += std::abs(cost);
+    cost_sqr_sum += cost * cost;
+  }
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_double_precision);
 }
 
 bool InteractionPredictor::LowerRightOfWayThanEgo(const Obstacle& obstacle) {

@@ -120,6 +120,16 @@ class SequencePredictor : public Predictor {
                                      const double s);
 
   /**
+   * @brief Get position by s
+   * @param lane sequence
+   * @param s
+   * @param l
+   * @return the position
+   */
+  apollo::common::Point3D GetPositionByLaneSequenceSL(
+      const LaneSequence& lane_sequence, const double s, const double l);
+
+  /**
    * @brief Clear private members
    */
   void Clear();

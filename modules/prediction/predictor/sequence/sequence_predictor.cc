@@ -329,6 +329,13 @@ double SequencePredictor::GetLaneSequenceCurvatureByS(
   return 0.0;
 }
 
+Point3D SequencePredictor::GetPositionByLaneSequenceSL(
+    const LaneSequence& lane_sequence, const double s, const double l) {
+  // TODO(kechxu) implement
+  Point3D position;
+  return position;
+}
+
 bool SequencePredictor::GetLongitudinalPolynomial(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
     const std::pair<double, double>& lon_end_vt,
