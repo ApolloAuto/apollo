@@ -26,7 +26,7 @@ http://localhost:8888/
 ```bash
 cyber_launch start /apollo/modules/transform/launch/static_transform.launch
 ```
-7. If the image is a compressed launch image in the decompression module
+7. If the image is compressed, launch the image decompression module
 ```
 cyber_launch start /apollo/modules/tools/image_decompress/launch/image_decompress.launch
 ```
