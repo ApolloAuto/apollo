@@ -28,6 +28,8 @@
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
+// #define ADEBUG AINFO
+
 namespace apollo {
 namespace planning {
 
@@ -54,6 +56,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   const auto& path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();
+  ADEBUG << "There are " << path_boundaries.size() << " path boundaries.";
 
   std::vector<PathData> candidate_path_data;
   for (const auto& path_boundary : path_boundaries) {

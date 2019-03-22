@@ -25,6 +25,8 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
+// #define ADEBUG AINFO
+
 namespace apollo {
 namespace planning {
 
@@ -50,6 +52,10 @@ Status PathAssessmentDecider::Process(
   CHECK_NOTNULL(reference_line_info);
   const auto& candidate_path_data = reference_line_info->GetCandidatePathData();
 
+  if (candidate_path_data.empty()) {
+    ADEBUG << "Candidate path data is empty.";
+  }
+
   // Remove invalid path.
   std::vector<PathData> valid_path_data;
   for (const auto& curr_path_data : candidate_path_data) {
@@ -69,6 +75,8 @@ Status PathAssessmentDecider::Process(
     const std::string msg = "Neither regular nor fallback path is valid.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
+  } else {
+    ADEBUG << "There are " << valid_path_data.size() << " valid path data.";
   }
 
   // Analyze and add important info for speed decider to use.
@@ -76,6 +84,7 @@ Status PathAssessmentDecider::Process(
     if (curr_path_data.path_label() == "fallback") {
       continue;
     }
+    ADEBUG << "Path length = " << curr_path_data.frenet_frame_path().size();
     SetPathInfo(*reference_line_info, &curr_path_data);
   }
 
@@ -89,6 +98,7 @@ Status PathAssessmentDecider::Process(
               // in sorting.
               return lhs.path_label() == "regular";
             });
+  ADEBUG << "Using " << valid_path_data.front().path_label() << " path.";
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
@@ -100,14 +110,17 @@ bool PathAssessmentDecider::IsValidRegularPath(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
   // Check if the path is greatly off the reference line.
   if (IsGreatlyOffReferenceLine(path_data)) {
+    ADEBUG << "Regular Path: ADC is greatly off reference line.";
     return false;
   }
   // Check if the path is greatly off the road.
   if (IsGreatlyOffRoad(reference_line_info, path_data)) {
+    ADEBUG << "Regular Path: ADC is greatly off road.";
     return false;
   }
   // Check if there is any collision.
   if (IsCollidingWithStaticObstacles(reference_line_info, path_data)) {
+    ADEBUG << "Regular Path: ADC has collision.";
     return false;
   }
   return true;
@@ -117,10 +130,12 @@ bool PathAssessmentDecider::IsValidFallbackPath(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
   // Check if the path is greatly off the reference line.
   if (IsGreatlyOffReferenceLine(path_data)) {
+    ADEBUG << "Fallback Path: ADC is greatly off reference line.";
     return false;
   }
   // Check if the path is greatly off the road.
   if (IsGreatlyOffRoad(reference_line_info, path_data)) {
+    ADEBUG << "Fallback Path: ADC is greatly off road.";
     return false;
   }
   return true;
