@@ -55,7 +55,7 @@ namespace {
 // Maximum lateral error used in trajectory approximation.
 const double kTrajectoryApproximationMaxError = 2.0;
 
-} // namespace
+}  // namespace
 
 PncMap::PncMap(const HDMap *hdmap) : hdmap_(hdmap) {}
 
