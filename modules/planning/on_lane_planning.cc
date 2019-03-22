@@ -414,11 +414,10 @@ Status OnLanePlanning::Plan(
     if (FLAGS_enable_record_debug) {
       ptr_debug->MergeFrom(frame_->open_space_info().debug_instance());
       ADEBUG << "Open space debug information added!";
-      if (FLAGS_export_chart) {
-        // call open space info load debug
-        ExportOpenSpaceChart(frame_->open_space_info().debug_instance(),
-                             ptr_debug);
-      }
+      // call open space info load debug
+      // to-do: runxin, create a new flag to enable openspace chart
+      ExportOpenSpaceChart(frame_->open_space_info().debug_instance(),
+                           ptr_debug);
     }
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
