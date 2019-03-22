@@ -499,7 +499,7 @@ double ReferenceLine::GetDrivingWidth(const SLBoundary& sl_boundary) const {
   double driving_width = std::max(lane_left_width - sl_boundary.end_l(),
                                   lane_right_width + sl_boundary.start_l());
   driving_width = std::min(lane_left_width + lane_right_width, driving_width);
-  ADEBUG << "driving width [" << driving_width << "].";
+  ADEBUG << "Driving width [" << driving_width << "].";
   return driving_width;
 }
 
@@ -519,8 +519,8 @@ bool ReferenceLine::IsOnLane(const SLBoundary& sl_boundary) const {
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
   map_path_.GetLaneWidth(middle_s, &lane_left_width, &lane_right_width);
-  return !sl_boundary.start_l() > lane_left_width ||
-         !sl_boundary.end_l() < -lane_right_width;
+  return sl_boundary.start_l() <= lane_left_width &&
+         sl_boundary.end_l() >= -lane_right_width;
 }
 
 bool ReferenceLine::IsOnLane(const SLPoint& sl_point) const {
@@ -534,7 +534,7 @@ bool ReferenceLine::IsOnLane(const SLPoint& sl_point) const {
     return false;
   }
 
-  return !sl_point.l() < -right_width || !sl_point.l() > left_width;
+  return sl_point.l() >= -right_width && sl_point.l() <= left_width;
 }
 
 bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
@@ -555,8 +555,8 @@ bool ReferenceLine::IsOnRoad(const SLBoundary& sl_boundary) const {
   double road_left_width = 0.0;
   double road_right_width = 0.0;
   map_path_.GetRoadWidth(middle_s, &road_left_width, &road_right_width);
-  return !sl_boundary.start_l() > road_left_width ||
-         !sl_boundary.end_l() < -road_right_width;
+  return sl_boundary.start_l() <= road_left_width &&
+         sl_boundary.end_l() >= -road_right_width;
 }
 
 bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {
@@ -570,7 +570,7 @@ bool ReferenceLine::IsOnRoad(const SLPoint& sl_point) const {
     return false;
   }
 
-  return !sl_point.l() < -road_right_width || !sl_point.l() > road_left_width;
+  return sl_point.l() >= -road_right_width && sl_point.l() <= road_left_width;
 }
 
 // Return a rough approximated SLBoundary using box length. It is guaranteed to
