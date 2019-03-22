@@ -95,7 +95,16 @@ class InteractionPredictor : public SequencePredictor {
       std::vector<LatLonPolynomialBundle>* lat_lon_polynomial_bundles);
 
   double ComputeTrajectoryCost(
+      const Obstacle& obstacle,
       const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
+
+  double CentripetalAccelerationCost(
+      const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
+
+  double CollisionWithEgoVehicleCost(
+      const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
+
+  bool LowerRightOfWayThanEgo(const Obstacle& obstacle);
 
   double ComputeLikelihood(const double cost);
 

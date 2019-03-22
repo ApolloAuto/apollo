@@ -54,7 +54,7 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
     SampleTrajectoryPolynomials(*obstacle, lane_sequence,
         &trajectory_lat_lon_bundles);
     for (const auto& trajectory_lat_lon_bundle : trajectory_lat_lon_bundles) {
-      double cost = ComputeTrajectoryCost(trajectory_lat_lon_bundle);
+      double cost = ComputeTrajectoryCost(*obstacle, trajectory_lat_lon_bundle);
       if (cost < smallest_cost) {
         smallest_cost = cost;
         best_trajectory_lat_lon_bundle = trajectory_lat_lon_bundle;
@@ -215,11 +215,38 @@ bool InteractionPredictor::SampleTrajectoryPolynomials(
 }
 
 double InteractionPredictor::ComputeTrajectoryCost(
+    const Obstacle& obstacle,
+    const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
+  // TODO(kechxu) adjust and move to gflags
+  double centri_acc_weight = 1.0;
+  double collision_weight = 1.0;
+  double total_cost = 0.0;
+  double centri_acc_cost =
+      CentripetalAccelerationCost(lat_lon_polynomial_bundle);
+  total_cost += centri_acc_weight * centri_acc_cost;
+  if (LowerRightOfWayThanEgo(obstacle)) {
+    double collision_cost =
+      CollisionWithEgoVehicleCost(lat_lon_polynomial_bundle);
+    total_cost += collision_weight * collision_cost;
+  }
+  return total_cost;
+}
+
+double InteractionPredictor::CentripetalAccelerationCost(
     const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
   // TODO(kechxu) implement
-  // * centripetal acc
-  // * collision with ego vehicle if his right of way is lower
   return 0.0;
+}
+
+double InteractionPredictor::CollisionWithEgoVehicleCost(
+    const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
+  // TODO(kechxu) implement
+  return 0.0;
+}
+
+bool InteractionPredictor::LowerRightOfWayThanEgo(const Obstacle& obstacle) {
+  // TODO(kechxu) implement
+  return false;
 }
 
 double InteractionPredictor::ComputeLikelihood(const double cost) {
