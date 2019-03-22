@@ -24,9 +24,10 @@ from cyber_py import record
 
 TEST_RECORD_FILE = "trans_ret.record"
 
+
 def test_record_trans(reader_path):
     """
-    record trans.
+    Record trans.
     """
     fwriter = record.RecordWriter()
     if not fwriter.open(TEST_RECORD_FILE):
@@ -42,7 +43,7 @@ def test_record_trans(reader_path):
         fwriter.write_channel(channelname, datatype, desc)
         fwriter.write_message(channelname, msg, timestamp)
         count = count + 1
-    print "-"*80
+    print "-" * 80
     print "message count is ", count
     print "channel info:"
     channel_list = fread.get_channellist()
@@ -53,4 +54,3 @@ if __name__ == '__main__':
     cyber.init()
     test_record_trans(sys.argv[1])
     cyber.shutdown()
-
