@@ -25,6 +25,7 @@ import signal
 import time
 
 from cyber_py import cyber
+from cyber_py import cyber_time
 
 from plot_data import Plotter
 
@@ -85,7 +86,7 @@ class DataCollector(object):
         self.controlcmd.header.module_name = "control"
         self.controlcmd.header.sequence_num = self.sequence_num
         self.sequence_num = self.sequence_num + 1
-        self.controlcmd.header.timestamp_sec = time.time()
+        self.controlcmd.header.timestamp_sec = cyber_time.Time.now().to_sec()
         self.controlcmd.pad_msg.action = 2
         self.control_pub.write(self.controlcmd)
 
@@ -102,9 +103,9 @@ class DataCollector(object):
         self.canmsg_received = False
 
         while self.in_session:
-            now = time.time()
+            now = cyber_time.Time.now().to_sec()
             self.publish_control()
-            sleep_time = 0.01 - (time.time() - now)
+            sleep_time = 0.01 - (cyber_time.Time.now().to_sec() - now)
             if sleep_time > 0:
                 time.sleep(sleep_time)
 
@@ -167,7 +168,7 @@ class DataCollector(object):
             if self.vehicle_speed == 0:
                 self.in_session = False
 
-        self.controlcmd.header.timestamp_sec = time.time()
+        self.controlcmd.header.timestamp_sec = cyber_time.Time.now().to_sec()
         self.control_pub.write(self.controlcmd)
         self.write_file(self.controlcmd.header.timestamp_sec, 1)
         if self.in_session == False:

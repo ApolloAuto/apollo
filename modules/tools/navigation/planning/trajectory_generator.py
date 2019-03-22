@@ -16,12 +16,11 @@
 # limitations under the License.
 ###############################################################################
 import math
-import time
-import rospy
 from numpy.polynomial.polynomial import polyval
 from modules.planning.proto import planning_pb2
 from modules.canbus.proto import chassis_pb2
 from modules.common.proto import drive_state_pb2
+from cyber_py import cyber_time
 
 
 def euclidean_distance(point1, point2):
@@ -44,11 +43,11 @@ class TrajectoryGenerator:
                  start_timestamp):
         path_x, path_y = path.get_xy()
         adc_trajectory = planning_pb2.ADCTrajectory()
-        adc_trajectory.header.timestamp_sec = rospy.Time.now().to_sec()
+        adc_trajectory.header.timestamp_sec = cyber_time.Time.now().to_sec()
         adc_trajectory.header.module_name = "planning"
         adc_trajectory.gear = chassis_pb2.Chassis.GEAR_DRIVE
         adc_trajectory.latency_stats.total_time_ms = \
-            (time.time() - start_timestamp) * 1000
+            (cyber_time.Time.now().to_sec() - start_timestamp) * 1000
         s = 0
         relative_time = 0
         adc_trajectory.engage_advice.advice \
