@@ -298,7 +298,7 @@ void Obstacle::SetJunctionFeatureWithoutEnterLane(Feature* const feature_ptr) {
     }
   }
   if (start_lane_ids.empty()) {
-    AERROR << "Obstacle [" << id_ << "] has no lane in junction";
+    ADEBUG << "Obstacle [" << id_ << "] has no lane in junction";
     return;
   }
   // TODO(kechxu) Maybe output all exits if no start lane found
