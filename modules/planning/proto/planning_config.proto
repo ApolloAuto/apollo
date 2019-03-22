@@ -9,7 +9,7 @@ import "modules/planning/proto/open_space_fallback_decider_config.proto";
 import "modules/planning/proto/open_space_roi_decider_config.proto";
 import "modules/planning/proto/open_space_trajectory_provider_config.proto";
 import "modules/planning/proto/open_space_trajectory_partition_config.proto";
-import "modules/planning/proto/path_bound_decider_config.proto";
+import "modules/planning/proto/path_bounds_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
 import "modules/planning/proto/planner_open_space_config.proto";
@@ -54,7 +54,7 @@ message TaskConfig {
     SPEED_BOUNDS_PRIORI_DECIDER = 17;
     SPEED_BOUNDS_FINAL_DECIDER = 18;
     PIECEWISE_JERK_PATH_OPTIMIZER = 19;
-    PATH_BOUND_DECIDER = 20;
+    PATH_BOUNDS_DECIDER = 20;
     OPEN_SPACE_ROI_DECIDER = 21;
     OPEN_SPACE_TRAJECTORY_PROVIDER = 22;
     OPEN_SPACE_TRAJECTORY_PARTITION = 23;
@@ -76,7 +76,7 @@ message TaskConfig {
     // PolyVTSpeedConfig poly_vt_speed_config = 14;
     SpeedBoundsDeciderConfig speed_bounds_decider_config = 15;
     PiecewiseJerkPathConfig piecewise_jerk_path_config = 16;
-    PathBoundDeciderConfig path_bound_decider_config = 17;
+    PathBoundsDeciderConfig path_bounds_decider_config = 17;
     OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config = 18;
     OpenSpaceRoiDeciderConfig open_space_roi_decider_config = 19;
     OpenSpaceTrajectoryProviderConfig open_space_trajectory_provider_config = 20;

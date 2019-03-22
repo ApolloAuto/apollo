@@ -27,6 +27,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "gtest/gtest.h"
+
 #include "modules/planning/proto/decider_config.pb.h"
 #include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
@@ -47,6 +49,14 @@ class PathBoundsDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Every time when Process function is called, it will:
+  //  1. Initialize.
+  //  2. Generate Fallback Path Bound.
+  //  3. Generate Regular Path Bound(s).
+
+  /** @brief The initialization function.
+    */
   void InitPathBoundsDecider(
       const Frame& frame, const ReferenceLineInfo& reference_line_info);
 
@@ -86,10 +96,16 @@ class PathBoundsDecider : public Decider {
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
+  /////////////////////////////////////////////////////////////////////////////
+  // When generating Path Bound, it will call:
+  //  1. InitPathBoundary
+  //  2. GetBoundaryFromLanesAndADC
+  //  3. GetBoundaryFromStaticObstacles
+
   /** @brief Initializes an empty path boundary.
     */
   bool InitPathBoundary(const ReferenceLine& reference_line,
-      std::vector<std::tuple<double, double, double>>* const path_boundary);
+      std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief Refine the boundary based on lane-info and ADC's location.
     *   It will comply to the lane-boundary. However, if the ADC itself
@@ -99,7 +115,7 @@ class PathBoundsDecider : public Decider {
   bool GetBoundaryFromLanesAndADC(
       const ReferenceLine& reference_line,
       const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
-      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+      std::vector<std::tuple<double, double, double>>* const path_bound);
 
   bool GetLaneInfoFromPoint(double point_x, double point_y, double point_z,
                             double point_theta,
@@ -172,6 +188,8 @@ class PathBoundsDecider : public Decider {
   double adc_frenet_ld_ = 0.0;
   double adc_lane_width_ = 0.0;
   hdmap::LaneInfoConstPtr adc_lane_info_;
+
+  FRIEND_TEST(PathBoundsDeciderTest, InitPathBoundary);
 };
 
 }  // namespace planning

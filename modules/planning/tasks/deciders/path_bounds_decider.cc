@@ -99,7 +99,7 @@ Status PathBoundsDecider::Process(
 
   // Generate regular path boundaries.
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
-  if (config.path_bound_decider_config().is_lane_borrowing()) {
+  if (config.path_bounds_decider_config().is_lane_borrowing()) {
     // Try borrowing from left and from right neighbor lane.
     lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
                              LaneBorrowInfo::RIGHT_BORROW};
@@ -260,8 +260,8 @@ bool PathBoundsDecider::InitPathBoundary(
                          reference_line.Length());
        curr_s += kPathBoundsDeciderResolution) {
     path_bound->emplace_back(curr_s,
-                                std::numeric_limits<double>::lowest(),
-                                std::numeric_limits<double>::max());
+                             std::numeric_limits<double>::lowest(),
+                             std::numeric_limits<double>::max());
   }
 
   // return.
