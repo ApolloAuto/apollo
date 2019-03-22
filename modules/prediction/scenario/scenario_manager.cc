@@ -20,6 +20,7 @@
 
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/scenario/prioritization/obstacles_prioritizer.h"
+#include "modules/prediction/scenario/right_of_way/right_of_way.h"
 
 namespace apollo {
 namespace prediction {
@@ -43,6 +44,10 @@ void ScenarioManager::Run() {
                                               ptr_scenario_features);
   }
   // TODO(all) other functionalities including lane, junction filters
+}
+
+void ScenarioManager::AssignRightOfWay() {
+  RightOfWay::Analyze();
 }
 
 const Scenario& ScenarioManager::scenario() const { return current_scenario_; }
