@@ -289,6 +289,15 @@ void RelativeMap::LoadNavigationPath() {
     priority++;
   }
 
+  // Generate the hash code, dreamview doesnot update the navigation data having the same
+  // hash code with the latest navigation data.
+  // Generate hash code before filling proto header.
+  std::string proto_content;
+  navigation_info.SerializeToString(&proto_content);
+  static std::hash<std::string> hash_func;
+  std::size_t hash_code = hash_func(proto_content);
+  navigation_info.set_hashcode(hash_code);
+
   PublishNavigationInfo(&navigation_info);
 
   navigation_lane_.UpdateNavigationInfo(std::move(navigation_info));

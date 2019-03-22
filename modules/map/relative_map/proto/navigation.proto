@@ -17,6 +17,10 @@ message NavigationPath {
 message NavigationInfo {
   optional apollo.common.Header header = 1;
   repeated NavigationPath navigation_path = 2;
+  // in dreamview, use hashcode to check if the topic is different 
+  // with the lastest topic, if not, donot update it.
+  // donot set hashcode to ignore the check process.
+  optional uint64 hashcode = 3;
 }
 
 // The map message in transmission format.
