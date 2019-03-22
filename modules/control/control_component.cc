@@ -206,7 +206,8 @@ Status ControlComponent::ProduceControlCommand(
   if (local_view_.trajectory.trajectory_point_size() == 0) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     estop_ = true;
-    estop_reason_ = "estop for empty planning trajectory";
+    estop_reason_ = "estop for empty planning trajectory, planning headers: " +
+                    local_view_.trajectory.header().ShortDebugString();
   }
 
   if (!estop_) {
