@@ -159,23 +159,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "cruise_model_proto",
-    deps = [
-        ":cruise_model_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "cruise_model_proto_lib",
-    srcs = [
-        "cruise_model.proto",
-    ],
-    deps = [
-        ":network_model_proto_lib",
-    ],
-)
-
-cc_proto_library(
     name = "prediction_point_proto",
     deps = [
         ":prediction_point_proto_lib",
