@@ -100,7 +100,7 @@ void Scheduler::ParseCpuset(const std::string& str, std::vector<int>* cpuset) {
         cpuset->push_back(i);
       }
     } else {
-      ADEBUG << "Parsing cpuset format error.";
+      AERROR << "Parsing cpuset format error.";
       exit(0);
     }
   }
