@@ -25,6 +25,15 @@ message Subsignal {
   optional apollo.common.PointENU location = 3;
 }
 
+message SignInfo {
+  enum Type {
+    None = 0;
+    NO_RIGHT_TURN_ON_RED = 1;
+  };
+
+  optional Type type = 1;
+}
+
 message Signal {
   enum Type {
     UNKNOWN = 1;
@@ -43,4 +52,6 @@ message Signal {
   optional Type type = 5;
   // stop line
   repeated Curve stop_line = 6;
+
+  repeated SignInfo sign_info = 7;
 }
