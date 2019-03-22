@@ -21,12 +21,16 @@
 #include <memory>
 #include <string>
 
+#include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
 namespace apollo {
 namespace prediction {
 
+using apollo::common::AdapterConfig;
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
@@ -92,7 +96,10 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 void InteractionPredictor::Clear() { Predictor::Clear(); }
 
 void InteractionPredictor::BuildADCTrajectory(const double resolution) {
-  // TODO(kechxu) implement
+  // auto adc_trajectory_container =
+  //     ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+  //         AdapterConfig::PLANNING_TRAJECTORY);
+  // const auto& adc_trajectory = adc_trajectory_container->adc_trajectory();
 }
 
 bool InteractionPredictor::DrawTrajectory(
@@ -304,7 +311,7 @@ double InteractionPredictor::CollisionWithEgoVehicleCost(
 
 bool InteractionPredictor::LowerRightOfWayThanEgo(const Obstacle& obstacle) {
   // TODO(kechxu) implement
-  return false;
+  return true;
 }
 
 double InteractionPredictor::ComputeLikelihood(const double cost) {
