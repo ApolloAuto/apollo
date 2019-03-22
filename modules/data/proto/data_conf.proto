@@ -1,7 +1,0 @@
-syntax = "proto2";
-
-package apollo.data;
-
-message DataConf {
-  optional bool data_enabled = 1 [default = false];
-}
