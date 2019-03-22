@@ -10,7 +10,6 @@ import "modules/planning/proto/poly_st_speed_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
-import "modules/planning/proto/planner_open_space_config.proto";
 
 enum TaskType {
   DP_POLY_PATH_OPTIMIZER = 0;
