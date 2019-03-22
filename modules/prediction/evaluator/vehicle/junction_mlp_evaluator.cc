@@ -16,6 +16,8 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
+#include <omp.h>
+
 #include <algorithm>
 #include <unordered_map>
 #include <utility>
@@ -60,6 +62,7 @@ void JunctionMLPEvaluator::Clear() {}
 
 void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
+  omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();

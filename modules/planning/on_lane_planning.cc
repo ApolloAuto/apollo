@@ -41,6 +41,7 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::EngageAdvice;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
@@ -398,6 +399,17 @@ Status OnLanePlanning::Plan(
         frame_->open_space_info().publishable_trajectory_data().second;
     publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
     trajectory_pb->set_gear(publishable_trajectory_gear);
+
+    // TODO(QiL): refine engage advice in open space trajectory optimizer.
+    auto* engage_advice = trajectory_pb->mutable_engage_advice();
+    engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
+    engage_advice->set_reason("Keep enage while in parking");
+
+    // TODO(QiL): refine the export decision in open space info
+    trajectory_pb->mutable_decision()
+        ->mutable_main_decision()
+        ->mutable_parking()
+        ->set_status(MainParking::IN_PARKING);
 
     if (FLAGS_enable_record_debug) {
       ptr_debug->MergeFrom(frame_->open_space_info().debug_instance());

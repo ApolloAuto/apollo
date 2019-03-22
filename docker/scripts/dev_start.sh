@@ -309,7 +309,6 @@ function main(){
         -e DOCKER_GRP_ID=$GRP_ID \
         -e DOCKER_IMG=$IMG \
         -e USE_GPU=$USE_GPU \
-        -e OMP_NUM_THREADS=1 \
         $(local_volumes) \
         --net host \
         -w /apollo \

@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
+
+#include <omp.h>
 
 #include <limits>
 #include <utility>
@@ -24,7 +27,6 @@
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -52,6 +54,7 @@ void CruiseMLPEvaluator::Clear() {}
 
 void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
+  omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
