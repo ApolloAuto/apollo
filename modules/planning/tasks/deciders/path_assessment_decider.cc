@@ -71,7 +71,7 @@ Status PathAssessmentDecider::Process(
   }
 
   // Analyze and add important info for speed decider to use.
-  for (auto curr_path_data : valid_path_data) {
+  for (auto& curr_path_data : valid_path_data) {
     if (curr_path_data.path_label() == "fallback") {
       continue;
     }
@@ -84,7 +84,9 @@ Status PathAssessmentDecider::Process(
               if (lhs.path_label() != rhs.path_label()) {
                 return lhs.path_label() == "regular";
               }
-              return true;
+              // TODO(jiacheng): update this to include more lane-info
+              // in sorting.
+              return lhs.path_label() == "regular";
             });
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
   reference_line_info->SetBlockingObstacleId(

@@ -115,7 +115,7 @@ class PathData {
       path_point_decision_guide_;
   std::list<std::pair<DiscretizedPath, FrenetFramePath>> path_data_history_;
 
-  std::string path_label_ = "normal";
+  std::string path_label_ = "regular";
   std::string blocking_obstacle_id_ = "";
 };
 
