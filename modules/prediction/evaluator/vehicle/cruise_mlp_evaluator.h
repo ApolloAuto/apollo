@@ -24,7 +24,6 @@
 #include "torch/torch.h"
 
 #include "modules/prediction/evaluator/evaluator.h"
-#include "modules/prediction/network/cruise_model/cruise_model.h"
 
 namespace apollo {
 namespace prediction {

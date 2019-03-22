@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 
 #include <omp.h>
