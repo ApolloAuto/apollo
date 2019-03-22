@@ -14,10 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <limits>
-#include <utility>
+#include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 
 #include <omp.h>
+
+#include <limits>
+#include <utility>
 
 #include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
@@ -26,7 +28,6 @@
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 
 namespace apollo {
 namespace prediction {
