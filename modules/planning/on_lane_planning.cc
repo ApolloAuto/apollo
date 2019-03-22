@@ -400,13 +400,12 @@ Status OnLanePlanning::Plan(
     publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
     trajectory_pb->set_gear(publishable_trajectory_gear);
 
-    // TODO:(QiL) refine engage advice in open space trajectory optimizer.
-    trajectory_pb->mutable_engage_advice()->set_advice(
-        EngageAdvice::KEEP_ENGAGED);
-    trajectory_pb->mutable_engage_advice()->set_reason(
-        "Keep enage while in parking");
+    // TODO(QiL): refine engage advice in open space trajectory optimizer.
+    auto* engage_advice = trajectory_pb->mutable_engage_advice();
+    engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
+    engage_advice->set_reason("Keep enage while in parking");
 
-    // TODO:(QiL) refine the export decision in open space info
+    // TODO(QiL): refine the export decision in open space info
     trajectory_pb->mutable_decision()
         ->mutable_main_decision()
         ->mutable_parking()
