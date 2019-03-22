@@ -49,7 +49,7 @@ class PathBoundary {
   double start_s_ = 0.0;
   double delta_s_ = 0.0;
   std::vector<std::pair<double, double>> boundary_;
-  std::string label_ = "normal";
+  std::string label_ = "regular";
   std::string blocking_obstacle_id_ = "";
 };
 

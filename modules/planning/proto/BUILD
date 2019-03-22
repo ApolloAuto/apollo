@@ -196,7 +196,7 @@ proto_library(
         ":planner_open_space_config_proto_lib",
         # ":poly_vt_speed_config_proto_lib",
         ":proceed_with_caution_speed_config_proto_lib",
-        ":path_bound_decider_config_proto_lib",
+        ":path_bounds_decider_config_proto_lib",
         ":piecewise_jerk_path_config_proto_lib",
         ":qp_piecewise_jerk_path_config_proto_lib",
         ":qp_spline_path_config_proto_lib",
@@ -330,16 +330,16 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "path_bound_decider_config_proto",
+    name = "path_bounds_decider_config_proto",
     deps = [
-        ":path_bound_decider_config_proto_lib",
+        ":path_bounds_decider_config_proto_lib",
     ],
 )
 
 proto_library(
-    name = "path_bound_decider_config_proto_lib",
+    name = "path_bounds_decider_config_proto_lib",
     srcs = [
-        "path_bound_decider_config.proto",
+        "path_bounds_decider_config.proto",
     ],
 )
 

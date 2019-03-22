@@ -185,4 +185,16 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "path_bounds_decider_test",
+    size = "small",
+    srcs = [
+        "path_bounds_decider_test.cc",
+    ],
+    deps = [
+        "path_bounds_decider",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()
