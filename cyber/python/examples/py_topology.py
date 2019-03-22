@@ -21,10 +21,13 @@ import sys
 sys.path.append("../")
 from cyber_py import topology_manager
 
+
 class Test_Topology_Manager(object):
+
     """
     Class for cyber Node wrapper.
     """
+
     def __init__(self):
         """
         Init Topology Manager.
@@ -130,12 +133,12 @@ class Test_Topology_Manager(object):
 
 if __name__ == "__main__":
     topology_manager_instance = Test_Topology_Manager()
-    #topology_manager_instance.test_has_node("monitor")
-    #topology_manager_instance.test_get_node_list()
-    #topology_manager_instance.test_get_channel_list()
-    #topology_manager_instance.test_get_node_writes("monitor")
-    #topology_manager_instance.test_get_node_readers("monitor")
-    #topology_manager_instance.test_get_reader_list()
-    #topology_manager_instance.test_get_writer_list()
-    #topology_manager_instance.test_show_node_info("control")
-    #topology_manager_instance.test_show_channel_info("/apollo/control")
+    # topology_manager_instance.test_has_node("monitor")
+    # topology_manager_instance.test_get_node_list()
+    # topology_manager_instance.test_get_channel_list()
+    # topology_manager_instance.test_get_node_writes("monitor")
+    # topology_manager_instance.test_get_node_readers("monitor")
+    # topology_manager_instance.test_get_reader_list()
+    # topology_manager_instance.test_get_writer_list()
+    # topology_manager_instance.test_show_node_info("control")
+    # topology_manager_instance.test_show_channel_info("/apollo/control")

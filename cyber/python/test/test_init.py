@@ -22,13 +22,16 @@ import unittest
 sys.path.append("../")
 from cyber_py import cyber
 
+
 class TestInit(unittest.TestCase):
+
     """
     Class for init unit test.
     """
+
     def test_init(self):
         """
-        test cyber.
+        Test cyber.
         """
         self.assertTrue(cyber.init())
         self.assertTrue(cyber.ok())
