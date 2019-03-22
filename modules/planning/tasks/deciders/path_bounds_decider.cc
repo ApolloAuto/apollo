@@ -31,6 +31,8 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
+// #define ADEBUG AINFO
+
 namespace apollo {
 namespace planning {
 
@@ -52,7 +54,7 @@ constexpr double kPathBoundsDeciderHorizon = 100.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
-constexpr double kObstacleSBuffer = 1.0;
+constexpr double kObstacleSBuffer = 2.0;
 constexpr double kObstacleLBuffer = 0.4;
 
 PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
@@ -101,8 +103,8 @@ Status PathBoundsDecider::Process(
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
   if (config.path_bounds_decider_config().is_lane_borrowing()) {
     // Try borrowing from left and from right neighbor lane.
-    lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
-                             LaneBorrowInfo::RIGHT_BORROW};
+    lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW};//,
+                             //LaneBorrowInfo::RIGHT_BORROW};
   } else {
     // Only use self-lane with no lane borrowing
     lane_borrow_info_list = {LaneBorrowInfo::NO_BORROW};
@@ -207,7 +209,7 @@ std::string PathBoundsDecider::GenerateRegularPathBound(
     AERROR << msg;
     return msg;
   }
-  // PathBoundsDebugString(*path_bound);
+  PathBoundsDebugString(*path_bound);
 
   // 4. Adjust the boundary considering dynamic obstacles
   // TODO(all): may need to implement this in the future.
@@ -319,6 +321,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
       hdmap::LaneInfoConstPtr adjacent_lane = nullptr;
       if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
         // Borrowing left neighbor lane.
+        ADEBUG << "Borrowing the left lane.";
         if (curr_lane.left_neighbor_forward_lane_id_size() > 0) {
           adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
               curr_lane.left_neighbor_forward_lane_id(0));
@@ -329,6 +332,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
         }
       } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
         // Borrowing right neighbor lane.
+        ADEBUG << "Borrowing the right lane.";
         if (curr_lane.right_neighbor_forward_lane_id_size() > 0) {
           adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
               curr_lane.right_neighbor_forward_lane_id(0));
