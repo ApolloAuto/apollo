@@ -61,7 +61,6 @@ cc_library(
     srcs = ["newtonm2_parser.cc"],
     hdrs = [
         "novatel_messages.h",
-        "newtonm2_messages.h",
         "parser.h",
         "newtonm2_parser.h",
         "rtcm_decode.h",
