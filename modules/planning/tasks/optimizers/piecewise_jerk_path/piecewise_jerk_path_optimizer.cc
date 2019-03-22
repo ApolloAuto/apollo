@@ -59,7 +59,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   for (const auto& path_boundary : path_boundaries) {
     // if the path_boundary is normal, it is possible to have less than 2 points
     // skip path boundary of this kind
-    if (path_boundary.label() == "normal" &&
+    if (path_boundary.label() == "regular" &&
         path_boundary.boundary().size() < 2) {
       continue;
     }
@@ -84,6 +84,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       path_data.SetReferenceLine(&reference_line);
       path_data.SetFrenetPath(FrenetFramePath(frenet_frame_path));
       path_data.set_path_label(path_boundary.label());
+      path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());
       candidate_path_data.push_back(std::move(path_data));
     }
   }
