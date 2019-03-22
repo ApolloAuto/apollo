@@ -20,6 +20,8 @@
 #include <unordered_map>
 #include <utility>
 
+#include <omp.h>
+
 #include "cyber/common/file.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/common/math/vec2d.h"
@@ -60,6 +62,7 @@ void JunctionMLPEvaluator::Clear() {}
 
 void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
+  omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();

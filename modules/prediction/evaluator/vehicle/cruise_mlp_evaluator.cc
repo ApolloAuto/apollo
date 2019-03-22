@@ -17,6 +17,8 @@
 #include <limits>
 #include <utility>
 
+#include <omp.h>
+
 #include "cyber/common/file.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -52,6 +54,7 @@ void CruiseMLPEvaluator::Clear() {}
 
 void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
+  omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
