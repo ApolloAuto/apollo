@@ -33,6 +33,11 @@ using apollo::hdmap::LaneInfo;
 using apollo::prediction::math_util::EvaluateQuarticPolynomial;
 using apollo::prediction::math_util::EvaluateQuinticPolynomial;
 
+InteractionPredictor::InteractionPredictor() {
+  // TODO(kechxu) move constants to gflags
+  BuildADCTrajectory(1.0);
+}
+
 void InteractionPredictor::Predict(Obstacle* obstacle) {
   Clear();
 
@@ -54,7 +59,8 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
     SampleTrajectoryPolynomials(*obstacle, lane_sequence,
         &trajectory_lat_lon_bundles);
     for (const auto& trajectory_lat_lon_bundle : trajectory_lat_lon_bundles) {
-      double cost = ComputeTrajectoryCost(*obstacle, trajectory_lat_lon_bundle);
+      double cost = ComputeTrajectoryCost(*obstacle, lane_sequence,
+          trajectory_lat_lon_bundle);
       if (cost < smallest_cost) {
         smallest_cost = cost;
         best_trajectory_lat_lon_bundle = trajectory_lat_lon_bundle;
@@ -83,6 +89,10 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 }
 
 void InteractionPredictor::Clear() { Predictor::Clear(); }
+
+void InteractionPredictor::BuildADCTrajectory(const double resolution) {
+  // TODO(kechxu) implement
+}
 
 bool InteractionPredictor::DrawTrajectory(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
@@ -216,29 +226,51 @@ bool InteractionPredictor::SampleTrajectoryPolynomials(
 
 double InteractionPredictor::ComputeTrajectoryCost(
     const Obstacle& obstacle,
+    const LaneSequence& lane_sequence,
     const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
   // TODO(kechxu) adjust and move to gflags
   double centri_acc_weight = 1.0;
   double collision_weight = 1.0;
   double total_cost = 0.0;
   double centri_acc_cost =
-      CentripetalAccelerationCost(lat_lon_polynomial_bundle);
+      CentripetalAccelerationCost(lane_sequence, lat_lon_polynomial_bundle);
   total_cost += centri_acc_weight * centri_acc_cost;
   if (LowerRightOfWayThanEgo(obstacle)) {
     double collision_cost =
-      CollisionWithEgoVehicleCost(lat_lon_polynomial_bundle);
+      CollisionWithEgoVehicleCost(lane_sequence, lat_lon_polynomial_bundle);
     total_cost += collision_weight * collision_cost;
   }
   return total_cost;
 }
 
 double InteractionPredictor::CentripetalAccelerationCost(
+    const LaneSequence& lane_sequence,
     const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
-  // TODO(kechxu) implement
-  return 0.0;
+  auto lon_coeffs = lat_lon_polynomial_bundle.lon_polynomial_coeffs();
+  double lon_end_v = lat_lon_polynomial_bundle.lon_end_v();
+  double lon_end_t = lat_lon_polynomial_bundle.lon_end_t();
+
+  double cost_abs_sum = 0.0;
+  double cost_sqr_sum = 0.0;
+  // TODO(kechxu) use flags
+  double time_resolution = 1.0;
+  double curr_time = 0.0;
+  while (curr_time < FLAGS_prediction_trajectory_time_length) {
+    double s = EvaluateQuarticPolynomial(lon_coeffs, curr_time, 0,
+                                         lon_end_t, lon_end_v);
+    double v = EvaluateQuarticPolynomial(lon_coeffs, curr_time, 1,
+                                         lon_end_t, lon_end_v);
+    double kappa = GetLaneSequenceCurvatureByS(lane_sequence, s);
+    double centri_acc = v * v * kappa;
+    cost_abs_sum += std::abs(centri_acc);
+    cost_sqr_sum += centri_acc * centri_acc;
+    curr_time += time_resolution;
+  }
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_double_precision);
 }
 
 double InteractionPredictor::CollisionWithEgoVehicleCost(
+    const LaneSequence& lane_sequence,
     const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
   // TODO(kechxu) implement
   return 0.0;

@@ -323,6 +323,12 @@ void SequencePredictor::DrawConstantAccelerationTrajectory(
   }
 }
 
+double SequencePredictor::GetLaneSequenceCurvatureByS(
+    const LaneSequence& lane_sequence, const double s) {
+  // TODO(kechxu) implement
+  return 0.0;
+}
+
 bool SequencePredictor::GetLongitudinalPolynomial(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
     const std::pair<double, double>& lon_end_vt,

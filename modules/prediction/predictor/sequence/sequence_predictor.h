@@ -111,6 +111,15 @@ class SequencePredictor : public Predictor {
       std::vector<apollo::common::TrajectoryPoint>* points);
 
   /**
+   * @brief Get lane sequence curvature by s
+   * @param lane sequence
+   * @param s
+   * @return the curvature
+   */
+  double GetLaneSequenceCurvatureByS(const LaneSequence& lane_sequence,
+                                     const double s);
+
+  /**
    * @brief Clear private members
    */
   void Clear();
