@@ -58,7 +58,7 @@ std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
     TaskFactory::default_task_configs_;
 
 void TaskFactory::Init(const PlanningConfig& config) {
-  task_factory_.Register(TaskConfig::PATH_BOUND_DECIDER,
+  task_factory_.Register(TaskConfig::PATH_BOUNDS_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathBoundsDecider(config);
                          });

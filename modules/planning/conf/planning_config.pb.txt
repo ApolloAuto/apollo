@@ -308,8 +308,8 @@ default_task_config: {
   }
 }
 default_task_config: {
-  task_type: PATH_BOUND_DECIDER
-  path_bound_decider_config {
+  task_type: PATH_BOUNDS_DECIDER
+  path_bounds_decider_config {
     is_lane_borrowing: false
   }
 }
