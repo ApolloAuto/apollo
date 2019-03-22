@@ -32,6 +32,8 @@ cc_library(
         "//modules/map/relative_map/proto:navigation_proto",
         "//modules/map/relative_map/proto:relative_map_config_proto",
         "//modules/perception/proto:perception_proto",
+        "//third_party/json",
+        "@yaml_cpp//:yaml",
     ],
 )
 

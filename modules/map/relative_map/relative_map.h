@@ -20,6 +20,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 
 #include "modules/map/relative_map/proto/navigation.pb.h"
 #include "modules/map/relative_map/proto/relative_map_config.pb.h"
@@ -76,6 +77,10 @@ class RelativeMap : public RelativeMapInterface {
   bool CreateMapFromNavigationLane(MapMsg* map_msg);
 
   void OnReceiveNavigationInfo(const NavigationInfo& navigation_info);
+
+  bool GetNavigationPathList(std::vector<std::string>* const path_list) const;
+  void LoadNavigationPath();
+  void PublishNavigationInfo(NavigationInfo* const navigation_info) const;
 
   common::adapter::AdapterManagerConfig adapter_conf_;
   RelativeMapConfig config_;

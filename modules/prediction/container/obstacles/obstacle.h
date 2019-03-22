@@ -190,6 +190,10 @@ class Obstacle {
   void SetTimestamp(const perception::PerceptionObstacle& perception_obstacle,
                     const double timestamp, Feature* feature);
 
+  void SetPolygonPoints(
+      const perception::PerceptionObstacle& perception_obstacle,
+      Feature* feature);
+
   void SetPosition(const perception::PerceptionObstacle& perception_obstacle,
                    Feature* feature);
 
