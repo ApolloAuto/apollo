@@ -26,6 +26,7 @@ import time
 
 import simplejson
 from cyber_py import cyber
+from cyber_py import cyber_time
 
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacle
 from modules.perception.proto.perception_obstacle_pb2 import PerceptionObstacles
@@ -35,6 +36,7 @@ _s_seq_num = 0
 _s_delta_t = 0.1
 _s_epsilon = 1e-8
 
+
 def get_seq_num():
     """
     Return the sequence number
@@ -42,6 +44,7 @@ def get_seq_num():
     global _s_seq_num
     _s_seq_num += 1
     return _s_seq_num
+
 
 def get_velocity(theta, speed):
     """
@@ -52,6 +55,7 @@ def get_velocity(theta, speed):
     point.y = math.sin(theta) * speed
     point.z = 0.0
     return point
+
 
 def generate_polygon(point, heading, length, width):
     """
@@ -79,6 +83,7 @@ def generate_polygon(point, heading, length, width):
 
     return points
 
+
 def load_descrptions(files):
     """
     Load description files
@@ -90,11 +95,13 @@ def load_descrptions(files):
             trace = obstacle.get('trace', [])
             for i in range(1, len(trace)):
                 if same_point(trace[i], trace[i - 1]):
-                    print('same trace point found in obstacle: %s' % obstacle["id"])
+                    print('same trace point found in obstacle: %s' %
+                          obstacle["id"])
                     return None
             objects.append(obstacle)
 
     return objects
+
 
 def get_point(a, b, ratio):
     """
@@ -106,6 +113,7 @@ def get_point(a, b, ratio):
     p.z = a[2] + ratio * (b[2] - a[2])
     return p
 
+
 def init_perception(description):
     """
     Create perception from description
@@ -116,24 +124,27 @@ def init_perception(description):
     perception.position.y = description["position"][1]
     perception.position.z = description["position"][2]
     perception.theta = description["theta"]
-    perception.velocity.CopyFrom(get_velocity(description["theta"], description["speed"]))
+    perception.velocity.CopyFrom(get_velocity(
+        description["theta"], description["speed"]))
     perception.length = description["length"]
     perception.width = description["width"]
     perception.height = description["height"]
     perception.polygon_point.extend(generate_polygon(perception.position,
-        perception.theta, perception.length, perception.width))
+                                                     perception.theta, perception.length, perception.width))
     perception.tracking_time = description["tracking_time"]
     perception.type = PerceptionObstacle.Type.Value(description["type"])
-    perception.timestamp = time.time()
+    perception.timestamp = cyber_time.Time.now().to_sec()
 
     return perception
+
 
 def same_point(a, b):
     """
     Test if a and b are the same point
     """
     return math.fabs(b[0] - a[0]) < _s_epsilon and \
-            math.fabs(b[1] - a[1]) < _s_epsilon
+        math.fabs(b[1] - a[1]) < _s_epsilon
+
 
 def inner_product(a, b):
     """
@@ -141,17 +152,20 @@ def inner_product(a, b):
     """
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 
+
 def cross_product(a, b):
     """
     Cross product
     """
     return a[0] * b[1] - a[1] * b[0]
 
+
 def distance(a, b):
     """
     Return distance between a and b
     """
     return math.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2 + (b[2] - a[2])**2)
+
 
 def is_within(a, b, c):
     """
@@ -160,6 +174,7 @@ def is_within(a, b, c):
     if b < a:
         b, a = a, b
     return a - _s_epsilon < c < b + _s_epsilon
+
 
 def on_segment(a, b, c):
     """
@@ -170,7 +185,7 @@ def on_segment(a, b, c):
     if math.fabs(cross_product(ac, ab)) > _s_epsilon:
         return False
     return is_within(a[0], b[0], c[0]) and is_within(a[1], b[1], c[1]) \
-            and is_within(a[2], b[2], c[2])
+        and is_within(a[2], b[2], c[2])
 
 
 def linear_project_perception(description, prev_perception):
@@ -179,12 +194,12 @@ def linear_project_perception(description, prev_perception):
     """
     perception = PerceptionObstacle()
     perception = prev_perception
-    perception.timestamp = time.time()
+    perception.timestamp = cyber_time.Time.now().to_sec()
     if "trace" not in description:
         return perception
     trace = description["trace"]
     prev_point = (prev_perception.position.x, prev_perception.position.y,
-            prev_perception.position.z)
+                  prev_perception.position.z)
     delta_s = description["speed"] * _s_delta_t
     for i in range(1, len(trace)):
         if on_segment(trace[i - 1], trace[i], prev_point):
@@ -198,16 +213,18 @@ def linear_project_perception(description, prev_perception):
                 else:
                     return init_perception(description)
             ratio = delta_s / dist
-            perception.position.CopyFrom(get_point(trace[i - 1], trace[i], ratio))
+            perception.position.CopyFrom(
+                get_point(trace[i - 1], trace[i], ratio))
             perception.theta = math.atan2(trace[i][1] - trace[i - 1][1],
-                    trace[i][0] - trace[i - 1][0])
+                                          trace[i][0] - trace[i - 1][0])
 
             perception.ClearField("polygon_point")
             perception.polygon_point.extend(generate_polygon(perception.position, perception.theta,
-            perception.length, perception.width))
+                                                             perception.length, perception.width))
             return perception
 
     return perception
+
 
 def generate_perception(perception_description, prev_perception):
     """
@@ -216,7 +233,7 @@ def generate_perception(perception_description, prev_perception):
     perceptions = PerceptionObstacles()
     perceptions.header.sequence_num = get_seq_num()
     perceptions.header.module_name = "perception"
-    perceptions.header.timestamp_sec = time.time()
+    perceptions.header.timestamp_sec = cyber_time.Time.now().to_sec()
     if not perception_description:
         return perceptions
     if prev_perception is None:
@@ -225,12 +242,13 @@ def generate_perception(perception_description, prev_perception):
             p.CopyFrom(init_perception(description))
         return perceptions
     # Linear projection
-    description_dict = {desc["id"] : desc for desc in perception_description}
+    description_dict = {desc["id"]: desc for desc in perception_description}
     for obstacle in prev_perception.perception_obstacle:
         description = description_dict[obstacle.id]
         next_obstacle = linear_project_perception(description, obstacle)
         perceptions.perception_obstacle.add().CopyFrom(next_obstacle)
     return perceptions
+
 
 def perception_publisher(perception_channel, files, period):
     """
@@ -240,7 +258,7 @@ def perception_publisher(perception_channel, files, period):
     node = cyber.Node("perception")
     writer = node.create_writer(perception_channel, PerceptionObstacles)
     perception_description = load_descrptions(files)
-    sleep_time = int(1.0 / period) # 10hz
+    sleep_time = int(1.0 / period)  # 10hz
     global _s_delta_t
     _s_delta_t = period
     perception = None
@@ -250,16 +268,17 @@ def perception_publisher(perception_channel, files, period):
         writer.write(perception)
         time.sleep(sleep_time)
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="create fake perception obstacles",
-            prog="replay_perception.py")
+                                     prog="replay_perception.py")
     parser.add_argument("files", action="store", type=str, nargs="*",
-            help="obstacle description files")
+                        help="obstacle description files")
     parser.add_argument("-c", "--channel", action="store", type=str,
-            default="/apollo/perception/obstacles",
-            help="set the perception channel")
+                        default="/apollo/perception/obstacles",
+                        help="set the perception channel")
     parser.add_argument("-p", "--period", action="store", type=float, default=0.1,
-            help="set the perception channel publish time duration")
+                        help="set the perception channel publish time duration")
     args = parser.parse_args()
 
     perception_publisher(args.channel, args.files, args.period)

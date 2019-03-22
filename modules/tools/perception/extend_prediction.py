@@ -22,7 +22,6 @@ print received prediction message
 import argparse
 import math
 import sys
-import time
 
 import numpy
 
@@ -46,7 +45,6 @@ def get_trajectory_length(trajectory):
 
 def extend_prediction(prediction, min_length, min_time):
     """extend prediction"""
-    obstacles = len(prediction.prediction_obstacle)
     for obstacle in prediction.prediction_obstacle:
         i = 0
         for trajectory in obstacle.trajectory:
