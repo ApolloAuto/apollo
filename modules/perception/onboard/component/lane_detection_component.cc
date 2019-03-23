@@ -43,6 +43,14 @@ namespace onboard {
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::localization::LocalizationEstimate;
 
+LaneInitFunInfo LaneDetectionComponent::init_func_arry_[] = {
+    {&LaneDetectionComponent::InitSensorInfo, "InitSensorInfo"},
+    {&LaneDetectionComponent::InitAlgorithmPlugin, "InitAlgorithmPlugin"},
+    {&LaneDetectionComponent::InitCameraFrames, "InitCameraFrames"},
+    {&LaneDetectionComponent::InitProjectMatrix, "InitProjectMatrix"},
+    {&LaneDetectionComponent::InitMotionService, "InitMotionService"},
+    {&LaneDetectionComponent::InitCameraListeners, "InitCameraListeners"} };
+
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
   std::string work_root = "";
@@ -181,6 +189,12 @@ bool LaneDetectionComponent::Init() {
   }
 
   writer_ = node_->CreateWriter<PerceptionLanes>(output_lanes_channel_name_);
+  for (auto &itor : LaneDetectionComponent::init_func_arry_) {
+    if ((this->*(itor.init_function_))() != cyber::SUCC) {
+      AERROR << itor.init_fun_name_<< "() failed.";
+      return false;
+    }
+  }
 
   if (InitSensorInfo() != cyber::SUCC) {
     AERROR << "InitSensorInfo() failed.";

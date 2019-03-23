@@ -51,6 +51,14 @@ namespace onboard {
 
 typedef Eigen::Matrix4d MotionType;
 
+class LaneDetectionComponent;
+class LaneInitFunInfo {
+ public:
+  typedef int (LaneDetectionComponent::*InitFunction)();
+  InitFunction init_function_;
+  std::string init_fun_name_;
+};
+
 class LaneDetectionComponent : public apollo::cyber::Component<> {
  public:
   LaneDetectionComponent() : seq_num_(0) {}
@@ -60,6 +68,9 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
   LaneDetectionComponent& operator=(const LaneDetectionComponent&) = delete;
 
   bool Init() override;
+
+  typedef int (LaneDetectionComponent::*InitFunction)();
+  friend LaneInitFunInfo;
 
  private:
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image>& in_message,
@@ -165,6 +176,8 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
 
   camera::Visualizer visualize_;
   bool write_visual_img_;
+  static std::map<InitFunction, std::string> init_func_list_;
+  static LaneInitFunInfo init_func_arry_[];
 };
 
 CYBER_REGISTER_COMPONENT(LaneDetectionComponent);
