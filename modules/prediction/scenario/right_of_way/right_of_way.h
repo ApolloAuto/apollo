@@ -16,7 +16,6 @@
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 
-
 namespace apollo {
 namespace prediction {
 
