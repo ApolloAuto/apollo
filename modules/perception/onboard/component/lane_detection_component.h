@@ -176,7 +176,6 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
 
   camera::Visualizer visualize_;
   bool write_visual_img_;
-  static std::map<InitFunction, std::string> init_func_list_;
   static LaneInitFunInfo init_func_arry_[];
 };
 

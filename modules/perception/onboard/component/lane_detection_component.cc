@@ -195,31 +195,6 @@ bool LaneDetectionComponent::Init() {
       return false;
     }
   }
-
-  if (InitSensorInfo() != cyber::SUCC) {
-    AERROR << "InitSensorInfo() failed.";
-    return false;
-  }
-  if (InitAlgorithmPlugin() != cyber::SUCC) {
-    AERROR << "InitAlgorithmPlugin() failed.";
-    return false;
-  }
-  if (InitCameraFrames() != cyber::SUCC) {
-    AERROR << "InitCameraFrames() failed.";
-    return false;
-  }
-  if (InitProjectMatrix() != cyber::SUCC) {
-    AERROR << "InitProjectMatrix() failed.";
-    return false;
-  }
-  if (InitMotionService() != cyber::SUCC) {
-    AERROR << "InitMotionService() failed.";
-    return false;
-  }
-  if (InitCameraListeners() != cyber::SUCC) {
-    AERROR << "InitCameraListeners() failed.";
-    return false;
-  }
   SetCameraHeightAndPitch();
 
   // Init visualizer
