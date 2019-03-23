@@ -40,6 +40,7 @@ export default class HMI {
     utmZoneId = 10;
 
     @observable isCalibrationMode = false;
+    @observable dataCollectionUpdateStatus = observable.map();
     @observable dataCollectionProgress = observable.map();
 
     @action toggleCoDriverFlag() {
@@ -65,6 +66,7 @@ export default class HMI {
         if (newStatus.currentMode) {
             this.isCalibrationMode = (newStatus.currentMode.toLowerCase().includes('calibration'));
             if (this.currentMode !== newStatus.currentMode) {
+                this.dataCollectionUpdateStatus.clear();
                 this.dataCollectionProgress.clear();
             }
             this.currentMode = newStatus.currentMode;
@@ -143,6 +145,8 @@ export default class HMI {
             }
             return category1.localeCompare(category2);
         }).forEach((category) => {
+            const isUpdated = this.dataCollectionProgress.get(category) !== data[category];
+            this.dataCollectionUpdateStatus.set(category, isUpdated);
             this.dataCollectionProgress.set(category, data[category]);
         });
     }

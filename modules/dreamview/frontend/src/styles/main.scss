@@ -73,6 +73,10 @@ body {
     }
 }
 
+.no-data {
+    padding: 20px;
+    color: #B43131;
+}
 
 
 /* Adjust the scrollbar style. */
@@ -349,35 +353,73 @@ body {
         }
 
         .data-collection-monitor {
-            .no-data {
-                padding: 20px;
-                color: #B43131;
-            }
-
             .category {
-                position: relative;
-                height: 30px;
-                margin: 10px;
-                border: 1px solid #999999;
-
-                background-color: rgba(0, 0, 0, 0.5);
-                text-align: left;
-                line-height: 30px;
-
-                .category-progress {
-                    position: absolute;
-                    height: 100%;
-                    background: linear-gradient(to right, #2D3B50 0%, #006AFF 100%);;
-                }
-
                 .category-description {
-                    position: absolute;
+                    position: relative;
                     left: 10px;
+                    margin-top: 20px;
+
+                    color: #888888;
+                }
+                .category-updated {
+                    color: #FFFFFF;
                 }
 
-                .category-percentage {
-                    position: absolute;
-                    right: 10px;
+                .category-progress-background {
+                    position: relative;
+                    height: 8px;
+                    margin: 5px 10% 20px 15%;
+                    border-radius: 5px;
+                    background-color: #333639;
+
+                    .category-progress {
+                        position: absolute;
+                        height: 100%;
+                        border-radius: 5px;
+                        background: linear-gradient(to right, #0070FD 0%, #00C4EC 99.5%, #216675 100%);
+                    }
+                }
+
+                .overall-progress {
+                    margin: 10px;
+                }
+            }
+            .section-divider {
+                position: relative;
+                height: 1.5em;
+                line-height: 1em;
+                margin: 40px 10px 10px 10px;
+                padding-left: 10px;
+                outline: 0;
+                border: 0;
+
+                color: #FFFFFF;
+                text-align: left;
+
+                &:first-child {
+                    margin-top: 10px;
+                }
+
+                &:before {
+                  content: '';
+                  background: #999999;
+                  position: absolute;
+                  left: 0;
+                  top: 45%;
+                  width: 100%;
+                  height: 2px;
+                }
+                &:after {
+                  content: attr(data-content);
+                  position: relative;
+                  display: inline-block;
+
+                  padding: 0px 0.7em;
+                  line-height: 1.5em;
+
+                  font-size: 16px;
+                  color: #FFFFFF;
+                  background-color: #1D2226;
                 }
             }
         }
@@ -1130,7 +1172,7 @@ body {
     }
 
     .delay {
-        min-width: 240px;
+        min-width: 260px;
         line-height: 26px;
 
         @include small-screen {
