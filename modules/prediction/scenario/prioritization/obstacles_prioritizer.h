@@ -15,6 +15,8 @@
  *****************************************************************************/
 
 #include <memory>
+#include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
@@ -61,6 +63,9 @@ class ObstaclesPrioritizer {
   static void SetCautionBackward(
       std::shared_ptr<const hdmap::LaneInfo> start_lane_info_ptr,
       const double distance);
+
+ private:
+  static std::unordered_set<std::string> ego_back_lane_id_set_;
 };
 
 }  // namespace prediction
