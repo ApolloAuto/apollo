@@ -52,6 +52,7 @@ bool Scheduler::CreateTask(std::function<void()>&& func,
   auto cr = std::make_shared<CRoutine>(func);
   cr->set_id(task_id);
   cr->set_name(name);
+  AINFO << "create croutine: " << name;
 
   if (!DispatchTask(cr)) {
     return false;

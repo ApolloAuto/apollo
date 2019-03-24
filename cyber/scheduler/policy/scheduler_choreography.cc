@@ -49,29 +49,24 @@ SchedulerChoreography::SchedulerChoreography() {
 
   apollo::cyber::proto::CyberConfig cfg;
   if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
-    proc_num_ =
-        cfg.scheduler_conf().choreography_conf().choreography_processor_num();
-    choreography_affinity_ =
-        cfg.scheduler_conf().choreography_conf().choreography_affinity();
-    choreography_processor_policy_ = cfg.scheduler_conf()
-                                         .choreography_conf()
+    const apollo::cyber::proto::ChoreographyConf& choreography_conf =
+          cfg.scheduler_conf().choreography_conf();
+    proc_num_ = choreography_conf.choreography_processor_num();
+    choreography_affinity_ = choreography_conf.choreography_affinity();
+    choreography_processor_policy_ = choreography_conf
                                          .choreography_processor_policy();
-    choreography_processor_prio_ =
-        cfg.scheduler_conf().choreography_conf().choreography_processor_prio();
-    ParseCpuset(cfg.scheduler_conf().choreography_conf().choreography_cpuset(),
-                &choreography_cpuset_);
 
-    task_pool_size_ =
-        cfg.scheduler_conf().choreography_conf().pool_processor_num();
-    pool_affinity_ = cfg.scheduler_conf().choreography_conf().pool_affinity();
-    pool_processor_policy_ =
-        cfg.scheduler_conf().choreography_conf().pool_processor_policy();
-    pool_processor_prio_ =
-        cfg.scheduler_conf().choreography_conf().pool_processor_prio();
-    ParseCpuset(cfg.scheduler_conf().choreography_conf().pool_cpuset(),
-                &pool_cpuset_);
+    choreography_processor_prio_ = choreography_conf
+                                         .choreography_processor_prio();
+    ParseCpuset(choreography_conf.choreography_cpuset(), &choreography_cpuset_);
 
-    for (auto& task : cfg.scheduler_conf().choreography_conf().tasks()) {
+    task_pool_size_ = choreography_conf.pool_processor_num();
+    pool_affinity_ = choreography_conf.pool_affinity();
+    pool_processor_policy_ = choreography_conf.pool_processor_policy();
+    pool_processor_prio_ = choreography_conf.pool_processor_prio();
+    ParseCpuset(choreography_conf.pool_cpuset(), &pool_cpuset_);
+
+    for (const auto& task : choreography_conf.tasks()) {
       cr_confs_[task.name()] = task;
     }
   }
