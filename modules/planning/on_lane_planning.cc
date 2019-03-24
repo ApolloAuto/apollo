@@ -415,7 +415,7 @@ Status OnLanePlanning::Plan(
       ptr_debug->MergeFrom(frame_->open_space_info().debug_instance());
       ADEBUG << "Open space debug information added!";
       // call open space info load debug
-      // to-do: runxin, create a new flag to enable openspace chart
+      // TODO(Runxin): create a new flag to enable openspace chart
       ExportOpenSpaceChart(frame_->open_space_info().debug_instance(),
                            ptr_debug);
     }
