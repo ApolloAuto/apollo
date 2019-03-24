@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-#include "modules/tools/image_decompress/image_decompress.h"
+#include "modules/drivers/tools/image_decompress/image_decompress.h"
 
 #include "cyber/init.h"
 #include "gtest/gtest.h"

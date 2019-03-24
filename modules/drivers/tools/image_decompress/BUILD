@@ -18,7 +18,7 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/drivers/proto:sensor_proto",
-        "//modules/tools/image_decompress/proto:decompress_proto",
+        "//modules/drivers/tools/image_decompress/proto:decompress_proto",
     ],
 )
 
