@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/tools/image_decompress/image_decompress.h"
+#include "modules/drivers/tools/image_decompress/image_decompress.h"
 
 #include <vector>
 
