@@ -48,7 +48,7 @@ TrafficLightUnprotectedLeftTurnStageIntersectionCruise::Process(
   CHECK_NOTNULL(frame);
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
-  
+
   if (!config_.enabled()) {
     ADEBUG << "stage IntersectionCruise finished because not enable.";
     return FinishStage();
