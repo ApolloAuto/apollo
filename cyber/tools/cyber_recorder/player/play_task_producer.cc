@@ -52,17 +52,7 @@ bool PlayTaskProducer::Init() {
     return false;
   }
 
-  if (!ReadRecordInfo()) {
-    is_initialized_.exchange(false);
-    return false;
-  }
-
-  if (!UpdatePlayParam()) {
-    is_initialized_.exchange(false);
-    return false;
-  }
-
-  if (!CreateWriters()) {
+  if (!ReadRecordInfo() || !UpdatePlayParam() || !CreateWriters()) {
     is_initialized_.exchange(false);
     return false;
   }
