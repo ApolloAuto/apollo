@@ -67,7 +67,10 @@ void DeciderRuleBasedStop::CheckStopSign(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!config_.decider_rule_based_stop_config().stop_sign().enabled()) {
+  const auto& stop_sign_config =
+      config_.decider_rule_based_stop_config().stop_sign();
+
+  if (!stop_sign_config.enabled()) {
     return;
   }
 
@@ -91,8 +94,7 @@ void DeciderRuleBasedStop::CheckStopSign(
     const std::string stop_wall_id =
         STOP_SIGN_VO_ID_PREFIX + stop_sign_overlap.object_id;
     const double stop_line_s = stop_sign_overlap.start_s;
-    const double stop_distance =
-        config_.decider_rule_based_stop_config().stop_sign().stop_distance();
+    const double stop_distance = stop_sign_config.stop_distance();
     ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
            << "] stop_line_s[" << stop_line_s << "]";
 
@@ -109,7 +111,10 @@ void DeciderRuleBasedStop::CheckTrafficLight(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!config_.decider_rule_based_stop_config().traffic_light().enabled()) {
+  const auto& traffic_light_config =
+      config_.decider_rule_based_stop_config().traffic_light();
+
+  if (!traffic_light_config.enabled()) {
     return;
   }
 
@@ -132,7 +137,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     }
 
     // work around incorrect s-projection along round routing
-    constexpr double kSDiscrepanctTolerance = 10.0;
+    constexpr double kSDiscrepanceTolerance = 10.0;
     const auto& reference_line = reference_line_info->reference_line();
     common::SLPoint traffic_light_sl;
     traffic_light_sl.set_s(traffic_light_overlap.start_s);
@@ -150,7 +155,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
            << "] s_distance[" << s_distance
            << "] actual_distance[" << distance << "]";
     if (s_distance >= 0 &&
-        fabs(s_distance - distance) > kSDiscrepanctTolerance) {
+        fabs(s_distance - distance) > kSDiscrepanceTolerance) {
       ADEBUG << "SKIP traffic_light[" << traffic_light_overlap.object_id
              << "] close in position, but far away along reference line";
       continue;
@@ -165,14 +170,21 @@ void DeciderRuleBasedStop::CheckTrafficLight(
       continue;
     }
 
-    // TODO(all): add stop_deceleration check based on signal colors
+    // Red/Yellow/Unown: check deceleration
+    const double stop_deceleration = scenario::GetADCStopDeceleration(
+        adc_front_edge_s,
+        traffic_light_overlap.start_s);
+    ADEBUG << "stop_deceleration[" << stop_deceleration << "]";
+
+    if (stop_deceleration > traffic_light_config.max_stop_deceleration()) {
+      AWARN << "stop_deceleration too big to achieve.  SKIP red light";
+      continue;
+    }
 
     const std::string stop_wall_id =
         TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_overlap.object_id;
     const double stop_line_s = traffic_light_overlap.start_s;
-    const double stop_distance = config_.decider_rule_based_stop_config()
-                                     .traffic_light()
-                                     .stop_distance();
+    const double stop_distance = traffic_light_config.stop_distance();
 
     ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
            << "] stop_line_s[" << stop_line_s << "]";
@@ -185,6 +197,9 @@ void DeciderRuleBasedStop::CheckTrafficLight(
 
 void DeciderRuleBasedStop::CheckOpenSpacePreStop(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
+  const auto& open_space_config =
+      config_.decider_rule_based_stop_config().open_space();
+
   if (frame->open_space_info().open_space_pre_stop_finished()) {
     return;
   }
@@ -230,9 +245,7 @@ void DeciderRuleBasedStop::CheckOpenSpacePreStop(
       << "no target parking spot found on reference line";
 
   double stop_line_s = 0.0;
-  double stop_distance_to_target = config_.decider_rule_based_stop_config()
-                                       .open_space()
-                                       .stop_distance_to_target();
+  double stop_distance_to_target = open_space_config.stop_distance_to_target();
   double static_linear_velocity_epsilon = 1.0e-2;
   CHECK_GE(stop_distance_to_target, 1.0e-8);
   double target_vehicle_offset = target_area_center_s - adc_front_edge_s;
@@ -244,9 +257,8 @@ void DeciderRuleBasedStop::CheckOpenSpacePreStop(
     if (!frame->open_space_info().pre_stop_rightaway_flag()) {
       // TODO(Jinyun) Use constant comfortable deacceleration rather than
       // distance by config to set stop fence
-      stop_line_s = adc_front_edge_s + config_.decider_rule_based_stop_config()
-                                           .open_space()
-                                           .rightaway_stop_distance();
+      stop_line_s = adc_front_edge_s +
+          open_space_config.rightaway_stop_distance();
       if (std::abs(vehicle_state.linear_velocity()) <
           static_linear_velocity_epsilon) {
         stop_line_s = adc_front_edge_s;
