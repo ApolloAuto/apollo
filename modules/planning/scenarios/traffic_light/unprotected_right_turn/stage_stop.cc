@@ -46,7 +46,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
 
   if (!config_.enabled()) {
     ADEBUG << "stage Stop finished because not enable.";
-    return FinishStage();
+    return FinishStage(false);
   }
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);

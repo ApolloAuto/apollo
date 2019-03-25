@@ -39,12 +39,12 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
   ADEBUG << "stage: Approach";
   CHECK_NOTNULL(frame);
 
+  scenario_config_.CopyFrom(GetContext()->scenario_config);
+  
   if (!config_.enabled()) {
     ADEBUG << "stage Approach finished because not enable.";
     return Stage::FINISHED;
   }
-
-  scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {

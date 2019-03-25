@@ -113,11 +113,6 @@ void LaneFollowStage::RecordDebugInfo(ReferenceLineInfo* reference_line_info,
 
 Stage::StageStatus LaneFollowStage::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
-  if (!config_.enabled()) {
-    ADEBUG << "stage LaneFollow finished because not enable.";
-    return StageStatus::FINISHED;
-  }
-
   bool has_drivable_reference_line = false;
 
   ADEBUG << "Number of reference lines:\t"
