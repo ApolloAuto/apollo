@@ -36,11 +36,9 @@ sys.path.append(CYBER_DIR + "/cyber/")
 _CYBER_RECORD = importlib.import_module('_cyber_record')
 PyBagMessage = collections.namedtuple('PyBagMessage',
                                       'topic message data_type timestamp')
-#//////////////////////////////record file class//////////////////////////////
 
-
+# Record file class
 class RecordReader(object):
-
     """
     Class for cyber RecordReader wrapper.
     """
@@ -154,13 +152,13 @@ class RecordWriter(object):
             return _CYBER_RECORD.PyRecordWriter_WriteMessage(
                 self.record_writer,
                 channel_name, data, time, "")
-        else:
-            file_desc = data.DESCRIPTOR.file
-            proto = FileDescriptorProto()
-            file_desc.CopyToProto(proto)
-            proto.name = file_desc.name
-            desc_str = proto.SerializeToString()
-            return _CYBER_RECORD.PyRecordWriter_WriteMessage(
+
+        file_desc = data.DESCRIPTOR.file
+        proto = FileDescriptorProto()
+        file_desc.CopyToProto(proto)
+        proto.name = file_desc.name
+        desc_str = proto.SerializeToString()
+        return _CYBER_RECORD.PyRecordWriter_WriteMessage(
                 self.record_writer,
                 channel_name, data.SerializeToString(), time, desc_str)
 
