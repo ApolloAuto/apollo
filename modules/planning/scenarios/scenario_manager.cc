@@ -152,6 +152,10 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
     const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap) {
+  const auto& scenario_config =
+      config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]
+                  .stop_sign_unprotected_config();
+
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double adc_distance_to_stop_sign =
@@ -163,9 +167,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
   const bool stop_sign_scenario =
       (adc_distance_to_stop_sign > 0 &&
        adc_distance_to_stop_sign <=
-           config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]
-               .stop_sign_unprotected_config()
-               .start_stop_sign_scenario_distance());
+           scenario_config.start_stop_sign_scenario_distance());
   const bool stop_sign_all_way = false;  // TODO(all)
 
   switch (current_scenario_->scenario_type()) {
@@ -199,42 +201,63 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap) {
-  auto scenario_config = config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
-                             .traffic_light_unprotected_right_turn_config();
+  const auto& scenario_config =
+      config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
+                  .traffic_light_unprotected_right_turn_config();
 
   const auto& reference_line_info = frame.reference_line_info().front();
+
+  // first encountered traffic light overlap
+  const auto first_encountered_traffic_light_itr =
+      first_encountered_overlap_map_.find(ReferenceLineInfo::SIGNAL);
+  if (first_encountered_traffic_light_itr ==
+      first_encountered_overlap_map_.end()) {
+    return default_scenario_type_;
+  }
+  const auto& first_encountered_traffic_light =
+      first_encountered_traffic_light_itr->second;
+
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const bool right_turn = (reference_line_info.GetPathTurnType(
-                               adc_front_edge_s) == hdmap::Lane::RIGHT_TURN);
-  const bool left_turn = (reference_line_info.GetPathTurnType(
-                              adc_front_edge_s) == hdmap::Lane::LEFT_TURN);
+
+  // find all the traffic light belong to
+  // the same group as first encountered traffic light
+  std::vector<hdmap::PathOverlap> next_traffic_lights;
+  constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
+  const std::vector<PathOverlap>& traffic_light_overlaps =
+      reference_line_info.reference_line().map_path().signal_overlaps();
+  for (const auto& traffic_light_overlap : traffic_light_overlaps) {
+    const double dist = traffic_light_overlap.start_s -
+        first_encountered_traffic_light.start_s;
+    if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
+      next_traffic_lights.push_back(traffic_light_overlap);
+    }
+  }
 
   bool traffic_light_scenario = false;
   bool red_light = false;
-  const std::vector<PathOverlap>& traffic_light_overlaps =
-      reference_line_info.reference_line().map_path().signal_overlaps();
 
-  // note: need iterate all lights to check no RED
-  for (const auto& traffic_light_overlap : traffic_light_overlaps) {
+  // note: need iterate all lights to check no RED/YELLOW/UNKNOWN
+  for (const auto& traffic_light_overlap : next_traffic_lights) {
     const double adc_distance_to_traffic_light =
-        traffic_light_overlap.start_s - adc_front_edge_s;
-    ADEBUG << "adc_distance_to_traffic_light[" << adc_distance_to_traffic_light
-           << "] right_turn[" << right_turn << "] left_turn[" << left_turn
-           << "]";
+        first_encountered_traffic_light.start_s - adc_front_edge_s;
+    ADEBUG << "traffic_light[" << traffic_light_overlap.object_id
+           << "] start_s[" << traffic_light_overlap.start_s
+           << "] adc_distance_to_traffic_light["
+           << adc_distance_to_traffic_light << "]";
 
-    // check distance
+    // enter traffic-light scenarios: based on distance only
     if (adc_distance_to_traffic_light > 0 &&
         adc_distance_to_traffic_light <=
-            config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
-                .traffic_light_protected_config()
-                .start_traffic_light_scenario_distance()) {
+            scenario_config.start_traffic_light_scenario_distance()) {
       traffic_light_scenario = true;
-      auto signal_color =
+
+      const auto& signal_color =
           scenario::GetSignal(traffic_light_overlap.object_id).color();
       ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
-             << "] start_s[" << traffic_light_overlap.start_s << "] color["
-             << signal_color << "]";
-      if (signal_color != TrafficLight::GREEN) {
+             << "] start_s[" << traffic_light_overlap.start_s
+             << "] color[" << signal_color << "]";
+
+      if (signal_color == TrafficLight::RED) {
         red_light = true;
         break;
       }
@@ -246,6 +269,11 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
       if (traffic_light_scenario) {
+        const auto& turn_type = reference_line_info.GetPathTurnType(
+            first_encountered_traffic_light.start_s);
+        const bool right_turn = (turn_type == hdmap::Lane::RIGHT_TURN);
+        const bool left_turn = (turn_type == hdmap::Lane::LEFT_TURN);
+
         if (right_turn && red_light) {
           return ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN;
         }
@@ -334,11 +362,13 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
     const Frame& frame) {
+  const auto& scenario_config =
+      config_map_[ScenarioConfig::VALET_PARKING]
+                  .valet_parking_config();
+
   // TODO(All) triger valet parking by route message definition as of now
   double parking_spot_range_to_start =
-      config_map_[ScenarioConfig::VALET_PARKING]
-          .valet_parking_config()
-          .parking_spot_range_to_start();
+      scenario_config.parking_spot_range_to_start();
   if (scenario::valet_parking::ValetParkingScenario::IsTransferable(
           frame, parking_spot_range_to_start)) {
     return ScenarioConfig::VALET_PARKING;
