@@ -78,6 +78,7 @@ class PlanningContext {
   struct SidePassInfo {
     bool change_lane_stop_flag = false;
     common::PathPoint change_lane_stop_path_point;
+    bool check_clear_flag = false;
   };
 
   static void Clear();

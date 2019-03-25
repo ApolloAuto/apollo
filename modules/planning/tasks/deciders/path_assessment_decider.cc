@@ -248,6 +248,8 @@ void PathAssessmentDecider::SetPathPointType(
   const double ego_back_to_center =
       vehicle_config.vehicle_param().back_edge_to_center();
   const double ego_half_width = ego_width / 2.0;
+  const double ego_center_shift_distance =
+      ego_length / 2.0 - ego_back_to_center;
 
   for (size_t i = 0; i < frenet_path.size(); ++i) {
     const auto& frenet_path_point = frenet_path[i];
@@ -255,9 +257,8 @@ void PathAssessmentDecider::SetPathPointType(
     const double ego_theta = rear_center_path_point.theta();
     Box2d ego_box({rear_center_path_point.x(), rear_center_path_point.y()},
                   ego_theta, ego_length, ego_width);
-    double shift_distance = ego_length / 2.0 - ego_back_to_center;
-    Vec2d shift_vec{shift_distance * std::cos(ego_theta),
-                    shift_distance * std::sin(ego_theta)};
+    Vec2d shift_vec{ego_center_shift_distance * std::cos(ego_theta),
+                    ego_center_shift_distance * std::sin(ego_theta)};
     ego_box.Shift(shift_vec);
     SLBoundary ego_sl_boundary;
     reference_line_info.reference_line().GetSLBoundary(ego_box,
@@ -276,6 +277,7 @@ void PathAssessmentDecider::SetPathPointType(
     double lane_right_width = 0.0;
     if (reference_line_info.reference_line().GetLaneWidth(
             frenet_path_point.s(), &lane_left_width, &lane_right_width)) {
+      // Rough sl boundary estimate using single point lane width
       if (ego_sl_boundary.end_l() > lane_left_width ||
           ego_sl_boundary.start_l() < -lane_right_width) {
         // The path point is out of the reference_line's lane.
@@ -315,6 +317,7 @@ void PathAssessmentDecider::SetPathPointType(
                 ego_half_width,
                 NormalizeAngle(front_center_path_point_theta - M_PI),
                 M_PI / 2.0, &front_reverse_lanes);
+        // TODO(Jinyun) refine the logic on seperating forward and backward lane
         if (rear_axis_forward_search == 0 || rear_axis_backward_search == 0 ||
             front_axis_forward_search == 0 || front_axis_backward_search == 0) {
           if ((!rear_forward_lanes.empty() || !front_forward_lanes.empty()) &&

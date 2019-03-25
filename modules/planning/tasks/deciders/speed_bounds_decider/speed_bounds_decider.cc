@@ -34,6 +34,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
+using apollo::common::SLPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::planning_internal::StGraphBoundaryDebug;
@@ -65,14 +66,15 @@ Status SpeedBoundsDecider::Process(
       // Check if stop at last frame stop fence
       if (CheckADCStop(*reference_line_info,
                        side_pass_info.change_lane_stop_path_point)) {
-        if (!ChangeLaneDecider::IsClearToChangeLane(reference_line_info)) {
-          if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
-            set_stop_fence = BuildSidePassStopFence(
-                path_data, stop_s_on_pathdata,
-                &(mutable_side_pass_info->change_lane_stop_path_point), frame,
-                reference_line_info);
-          }
+        if (ChangeLaneDecider::IsClearToChangeLane(reference_line_info)) {
+          mutable_side_pass_info->check_clear_flag = true;
+        } else if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
+          set_stop_fence = BuildSidePassStopFence(
+              path_data, stop_s_on_pathdata,
+              &(mutable_side_pass_info->change_lane_stop_path_point), frame,
+              reference_line_info);
         }
+
       } else {
         if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
           set_stop_fence = BuildSidePassStopFence(
@@ -82,11 +84,17 @@ Status SpeedBoundsDecider::Process(
         }
       }
     } else {
-      if (CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
+      if (!side_pass_info.check_clear_flag &&
+          CheckSidePassStop(path_data, &stop_s_on_pathdata)) {
         set_stop_fence = BuildSidePassStopFence(
             path_data, stop_s_on_pathdata,
             &(mutable_side_pass_info->change_lane_stop_path_point), frame,
             reference_line_info);
+      }
+      if (side_pass_info.check_clear_flag &&
+          CheckClearDone(*reference_line_info,
+                         side_pass_info.change_lane_stop_path_point)) {
+        mutable_side_pass_info->check_clear_flag = false;
       }
     }
     mutable_side_pass_info->change_lane_stop_flag = set_stop_fence;
@@ -157,7 +165,7 @@ Status SpeedBoundsDecider::Process(
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
 
   return Status::OK();
-}
+}  // namespace planning
 
 // @brief Check if necessary to set stop fence used for nonscenario side pass
 bool SpeedBoundsDecider::CheckSidePassStop(const PathData &path_data,
@@ -238,6 +246,30 @@ bool SpeedBoundsDecider::CheckADCStop(
   }
 
   return true;
+}
+
+bool SpeedBoundsDecider::CheckClearDone(
+    const ReferenceLineInfo &reference_line_info,
+    const common::PathPoint &stop_point) {
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
+  const double adc_start_l = reference_line_info.AdcSlBoundary().start_l();
+  const double adc_end_l = reference_line_info.AdcSlBoundary().end_l();
+  double lane_left_width = 0.0;
+  double lane_right_width = 0.0;
+  reference_line_info.reference_line().GetLaneWidth(
+      (adc_front_edge_s + adc_back_edge_s) / 2.0, &lane_left_width,
+      &lane_right_width);
+  SLPoint stop_sl_point;
+  reference_line_info.reference_line().XYToSL({stop_point.x(), stop_point.y()},
+                                              &stop_sl_point);
+  // use distance to last stop point to determine if needed to check clear again
+  if (adc_back_edge_s > stop_sl_point.s()) {
+    if (adc_start_l > -lane_right_width || adc_end_l < lane_left_width) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void SpeedBoundsDecider::RecordSTGraphDebug(
