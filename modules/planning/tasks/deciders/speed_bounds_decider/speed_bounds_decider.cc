@@ -187,7 +187,7 @@ bool SpeedBoundsDecider::BuildSidePassStopFence(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!path_data.GetPathPointWithPathS(stop_s_on_pathdata, stop_pathpoint)) {
+  if (!path_data.GetPathPointWithRefS(stop_s_on_pathdata, stop_pathpoint)) {
     return false;
   }
 
