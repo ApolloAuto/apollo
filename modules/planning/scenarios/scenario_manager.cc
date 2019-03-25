@@ -107,14 +107,12 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
 
 void ScenarioManager::RegisterScenarios() {
   // lane_follow
-  CHECK(Scenario::LoadConfig(
-      FLAGS_scenario_lane_follow_config_file,
-      &config_map_[ScenarioConfig::LANE_FOLLOW]));
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
+                             &config_map_[ScenarioConfig::LANE_FOLLOW]));
 
   // side_pass
-  CHECK(Scenario::LoadConfig(
-      FLAGS_scenario_side_pass_config_file,
-      &config_map_[ScenarioConfig::SIDE_PASS]));
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_side_pass_config_file,
+                             &config_map_[ScenarioConfig::SIDE_PASS]));
 
   // bare_intersection
   CHECK(Scenario::LoadConfig(
@@ -138,9 +136,8 @@ void ScenarioManager::RegisterScenarios() {
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
 
   // valet parking
-  CHECK(Scenario::LoadConfig(
-      FLAGS_scenario_valet_parking_config_file,
-      &config_map_[ScenarioConfig::VALET_PARKING]));
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
+                             &config_map_[ScenarioConfig::VALET_PARKING]));
 }
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
@@ -516,7 +513,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       // bare intersection
       if (FLAGS_enable_scenario_bare_intersection) {
         if (reference_line_info.GetIntersectionRighoffRoad(
-            *pnc_junction_overlap)) {
+                *pnc_junction_overlap)) {
           scenario_type = default_scenario_type_;
         } else {
           scenario_type =

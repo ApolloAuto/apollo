@@ -31,8 +31,8 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
-using cyber::common::GetAbsolutePath;
 using cyber::common::EnsureDirectory;
+using cyber::common::GetAbsolutePath;
 
 bool ObstacleCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {
@@ -342,8 +342,8 @@ bool ObstacleCameraPerception::Perception(
         frame->data_provider->sensor_name(), "LanePostprocessor3D");
 
     if (write_out_lane_file_) {
-      std::string lane_file_path = out_lane_dir_ + "/" +
-                                   std::to_string(frame->frame_id) + ".txt";
+      std::string lane_file_path =
+          out_lane_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
       WriteLanelines(write_out_lane_file_, lane_file_path, frame->lane_objects);
     }
   } else {
@@ -356,8 +356,8 @@ bool ObstacleCameraPerception::Perception(
   }
 
   if (write_out_calib_file_) {
-    std::string calib_file_path = out_calib_dir_ + "/" +
-                                  std::to_string(frame->frame_id) + ".txt";
+    std::string calib_file_path =
+        out_calib_dir_ + "/" + std::to_string(frame->frame_id) + ".txt";
     WriteCalibrationOutput(write_out_calib_file_, calib_file_path, frame);
   }
 
@@ -382,11 +382,11 @@ bool ObstacleCameraPerception::Perception(
   // Save all detections results as kitti format
   WriteDetections(perception_param_.debug_param().has_detection_out_dir(),
                   perception_param_.debug_param().detection_out_dir() + "/" +
-                  std::to_string(frame->frame_id) + ".txt",
+                      std::to_string(frame->frame_id) + ".txt",
                   frame->detected_objects);
   if (extractor_ && !extractor_->Extract(extractor_options, frame)) {
-      AERROR << "Failed to extractor";
-      return false;
+    AERROR << "Failed to extractor";
+    return false;
   }
   PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(frame->data_provider->sensor_name(),
                                            "external_feature");
@@ -394,7 +394,7 @@ bool ObstacleCameraPerception::Perception(
   // Save detection results with bbox, detection_feature
   WriteDetections(perception_param_.debug_param().has_detect_feature_dir(),
                   perception_param_.debug_param().detect_feature_dir() + "/" +
-                  std::to_string(frame->frame_id) + ".txt",
+                      std::to_string(frame->frame_id) + ".txt",
                   frame);
   // Set the sensor name of each object
   for (size_t i = 0; i < frame->detected_objects.size(); ++i) {
@@ -452,7 +452,7 @@ bool ObstacleCameraPerception::Perception(
   WriteDetections(
       perception_param_.debug_param().has_tracked_detection_out_dir(),
       perception_param_.debug_param().tracked_detection_out_dir() + "/" +
-      std::to_string(frame->frame_id) + ".txt",
+          std::to_string(frame->frame_id) + ".txt",
       frame->tracked_objects);
 
   // Fill polygon and set anchor point
