@@ -52,6 +52,10 @@ class SpeedBoundsDecider : public Decider {
   bool CheckADCStop(const ReferenceLineInfo& reference_line_info,
                     const common::PathPoint& stop_point);
 
+  // @brief Check if needed to check clear again for side pass
+  bool CheckClearDone(const ReferenceLineInfo& reference_line_info,
+                      const common::PathPoint& stop_point);
+
   void RecordSTGraphDebug(
       const StGraphData& st_graph_data,
       planning_internal::STGraphDebug* st_graph_debug) const;
