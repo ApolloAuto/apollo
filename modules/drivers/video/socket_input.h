@@ -1,5 +1,5 @@
 /******************************************************************************                                                                                                                              
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@
 
 #include <unistd.h>
 #include <stdio.h>
-//#include <pcap.h>
 
+#include <memory>
+#include <string>
+#include <map>
 #include "cyber/cyber.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
-
-#include "modules/drivers/video/input.h"
 
 namespace apollo {
 namespace drivers {
@@ -40,13 +40,13 @@ using apollo::drivers::CompressedImage;
 
 /** @brief Live Velodyne input from socket. */
 class SocketInput{
-public:
+ public:
   SocketInput();
   virtual ~SocketInput();
   void Init(uint32_t port);
-  int get_frame_packet(std::shared_ptr<CompressedImage>& h265);
+  int get_frame_packet(std::shared_ptr<CompressedImage> h265);
 
-private:
+ private:
   int _sockfd;
   int _port;
   uint8_t *_buf = nullptr;
@@ -58,8 +58,8 @@ private:
   std::map<int, std::string> _fpd_frameid_map;
 };
 
-} //video
-} //drivers
-} //apollo
+}  // namespace video
+}  // namespace drivers
+}  // namespace apollo
 
 

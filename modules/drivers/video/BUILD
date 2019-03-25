@@ -17,25 +17,41 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util:message_util",
-        "//modules/drivers/video:video_lib",
+        "//modules/drivers/video:driver",
+        "//modules/drivers/video:socket",
     ],
 )
 
 cc_library(
-    name = "video_lib",
+    name = "driver",
     srcs = [
         "driver.cc",
-        "socket_input.cc",
     ],
     hdrs = [
         "driver.h",
-        "input.h",
         "socket_input.h",
     ],
     deps = [
         "//cyber",
         "//modules/common/util",
         "//modules/drivers/video/proto:video_proto",
+        "//modules/drivers/proto:sensor_proto",
+    ],
+)
+
+
+cc_library(
+    name = "socket",
+    srcs = [
+        "socket_input.cc",
+    ],
+    hdrs = [
+        "input.h",
+        "socket_input.h",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/common/util",
         "//modules/drivers/proto:sensor_proto",
     ],
 )
