@@ -34,8 +34,8 @@
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_factory.h"
-#include "cyber/scheduler/common/mutex_wrapper.h"
 #include "cyber/proto/choreography_conf.pb.h"
+#include "cyber/scheduler/common/mutex_wrapper.h"
 
 namespace apollo {
 namespace cyber {
@@ -72,8 +72,7 @@ class Scheduler {
   virtual bool NotifyProcessor(uint64_t crid) = 0;
   virtual bool RemoveCRoutine(uint64_t crid) = 0;
 
-  void SetInnerThreadConfs(std::unordered_map<std::string, InnerThread>
-                           confs) {
+  void SetInnerThreadConfs(std::unordered_map<std::string, InnerThread> confs) {
     inner_thr_confs_ = confs;
   }
 

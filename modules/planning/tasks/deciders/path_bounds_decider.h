@@ -47,57 +47,58 @@ class PathBoundsDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
 
-  void InitPathBoundsDecider(
-      const Frame& frame, const ReferenceLineInfo& reference_line_info);
+  void InitPathBoundsDecider(const Frame& frame,
+                             const ReferenceLineInfo& reference_line_info);
 
   /** @brief: The regular path boundary generation considers the ADC itself
-    *   and other static environments:
-    *   - ADC's position (lane-changing considerations)
-    *   - lane info
-    *   - static obstacles
-    *   The philosophy is: static environment must be and can only be taken
-    *   care of by the path planning.
-    * @param: frame
-    * @param: reference_line_info
-    * @param: lane_borrow_info: which lane to borrow.
-    * @param: The generated regular path_boundary, if there is one.
-    * @return: A failure message. If succeeded, return "" (empty string).
-    */
+   *   and other static environments:
+   *   - ADC's position (lane-changing considerations)
+   *   - lane info
+   *   - static obstacles
+   *   The philosophy is: static environment must be and can only be taken
+   *   care of by the path planning.
+   * @param: frame
+   * @param: reference_line_info
+   * @param: lane_borrow_info: which lane to borrow.
+   * @param: The generated regular path_boundary, if there is one.
+   * @return: A failure message. If succeeded, return "" (empty string).
+   */
   std::string GenerateRegularPathBoundary(
       const Frame& frame, const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo lane_borrow_info,
       std::vector<std::tuple<double, double, double>>* const path_boundary);
 
   /** @brief: The fallback path only considers:
-    *   - ADC's position (so that boundary must contain ADC's position)
-    *   - lane info
-    *   It is supposed to be the last resort in case regular path generation
-    *   fails so that speed decider can at least have some path and won't
-    *   fail drastically.
-    *   Therefore, it be reliable so that optimizer will not likely to
-    *   fail with this boundary, and therefore doesn't consider any static
-    *   obstacle. When the fallback path is used, stopping before static
-    *   obstacles should be taken care of by the speed decider. Also, it
-    *   doesn't consider any lane-borrowing.
-    * @param: frame
-    * @param: reference_line_info
-    * @param: The generated fallback path_boundary, if there is one.
-    * @return: A failure message. If succeeded, return "" (empty string).
-    */
+   *   - ADC's position (so that boundary must contain ADC's position)
+   *   - lane info
+   *   It is supposed to be the last resort in case regular path generation
+   *   fails so that speed decider can at least have some path and won't
+   *   fail drastically.
+   *   Therefore, it be reliable so that optimizer will not likely to
+   *   fail with this boundary, and therefore doesn't consider any static
+   *   obstacle. When the fallback path is used, stopping before static
+   *   obstacles should be taken care of by the speed decider. Also, it
+   *   doesn't consider any lane-borrowing.
+   * @param: frame
+   * @param: reference_line_info
+   * @param: The generated fallback path_boundary, if there is one.
+   * @return: A failure message. If succeeded, return "" (empty string).
+   */
   std::string GenerateFallbackPathBoundary(
       Frame* frame, ReferenceLineInfo* reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   /** @brief: Initializes an empty path boundary.
-    */
-  bool InitPathBoundary(const ReferenceLine& reference_line,
+   */
+  bool InitPathBoundary(
+      const ReferenceLine& reference_line,
       std::vector<std::tuple<double, double, double>>* const path_boundary);
 
   /** @brief: Refine the boundary based on lane-info and ADC's location.
-    *   It will comply to the lane-boundary. However, if the ADC itself
-    *   is out of the given lane(s), it will adjust the boundary
-    *   accordingly to include ADC's current position.
-    */
+   *   It will comply to the lane-boundary. However, if the ADC itself
+   *   is out of the given lane(s), it will adjust the boundary
+   *   accordingly to include ADC's current position.
+   */
   bool GetBoundaryFromLanesAndADC(
       const ReferenceLine& reference_line,
       const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
@@ -132,14 +133,14 @@ class PathBoundsDecider : public Decider {
           new_entering_obstacles);
 
   /** @brief Update the path_boundary at "idx", as well as the new center-line.
-    *        It also checks if ADC is blocked (lmax < lmin).
-    * @param The current index of the path_bounds
-    * @param The minimum left boundary (l_max)
-    * @param The maximum right boundary (l_min)
-    * @param The path_boundaries (its content at idx will be updated)
-    * @param The center_line (to be updated)
-    * @return If path is good, true; if path is blocked, false.
-    */
+   *        It also checks if ADC is blocked (lmax < lmin).
+   * @param The current index of the path_bounds
+   * @param The minimum left boundary (l_max)
+   * @param The maximum right boundary (l_min)
+   * @param The path_boundaries (its content at idx will be updated)
+   * @param The center_line (to be updated)
+   * @return If path is good, true; if path is blocked, false.
+   */
   bool UpdatePathBoundaryAndCenterLine(
       size_t idx, double left_bound, double right_bound,
       std::vector<std::tuple<double, double, double>>* const path_boundaries,

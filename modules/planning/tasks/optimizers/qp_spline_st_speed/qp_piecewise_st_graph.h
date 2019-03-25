@@ -43,8 +43,7 @@ namespace planning {
 class QpPiecewiseStGraph {
  public:
   QpPiecewiseStGraph(const QpStSpeedConfig& qp_st_speed_config,
-                     const double total_path_length,
-                     const double total_time);
+                     const double total_path_length, const double total_time);
 
   void SetDebugLogger(planning_internal::STGraphDebug* st_graph_debug);
 

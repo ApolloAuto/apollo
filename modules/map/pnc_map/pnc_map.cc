@@ -71,9 +71,9 @@ LaneWaypoint PncMap::ToLaneWaypoint(
 double PncMap::LookForwardDistance(double velocity) {
   auto forward_distance = velocity * FLAGS_look_forward_time_sec;
 
-  return forward_distance > FLAGS_look_forward_short_distance ?
-         FLAGS_look_forward_long_distance :
-         FLAGS_look_forward_short_distance;
+  return forward_distance > FLAGS_look_forward_short_distance
+             ? FLAGS_look_forward_long_distance
+             : FLAGS_look_forward_short_distance;
 }
 
 LaneSegment PncMap::ToLaneSegment(const routing::LaneSegment &segment) const {
@@ -95,20 +95,21 @@ void PncMap::UpdateNextRoutingWaypointIndex(int cur_index) {
   while (next_routing_waypoint_index_ != 0 &&
          next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
          routing_waypoint_index_[next_routing_waypoint_index_].index >
-         cur_index) {
+             cur_index) {
     --next_routing_waypoint_index_;
   }
   while (next_routing_waypoint_index_ != 0 &&
          next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
          routing_waypoint_index_[next_routing_waypoint_index_].index ==
-         cur_index && adc_waypoint_.s <
-         routing_waypoint_index_[next_routing_waypoint_index_].waypoint.s) {
+             cur_index &&
+         adc_waypoint_.s <
+             routing_waypoint_index_[next_routing_waypoint_index_].waypoint.s) {
     --next_routing_waypoint_index_;
   }
   // Search forwards
   while (next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
          routing_waypoint_index_[next_routing_waypoint_index_].index <
-         cur_index) {
+             cur_index) {
     ++next_routing_waypoint_index_;
   }
   while (next_routing_waypoint_index_ < routing_waypoint_index_.size() &&
@@ -158,7 +159,7 @@ bool PncMap::UpdateVehicleState(const VehicleState &vehicle_state) {
   if (!adc_state_.has_x() ||
       (common::util::DistanceXY(adc_state_, vehicle_state) >
        FLAGS_replan_lateral_distance_threshold +
-       FLAGS_replan_longitudinal_distance_threshold)) {
+           FLAGS_replan_longitudinal_distance_threshold)) {
     // Position is reset, but not replan.
     next_routing_waypoint_index_ = 0;
     adc_route_index_ = -1;
@@ -254,7 +255,8 @@ bool PncMap::UpdateRoutingResponse(const routing::RoutingResponse &routing) {
                                             request_waypoints.Get(i))) {
       routing_waypoint_index_.emplace_back(
           LaneWaypoint(route_indices_[j].segment.lane,
-                       request_waypoints.Get(i).s()), j);
+                       request_waypoints.Get(i).s()),
+          j);
       ++i;
     }
   }
@@ -291,9 +293,9 @@ bool PncMap::ValidateRouting(const RoutingResponse &routing) {
 int PncMap::SearchForwardWaypointIndex(int start,
                                        const LaneWaypoint &waypoint) const {
   int i = std::max(start, 0);
-  while (i < static_cast<int>(route_indices_.size()) &&
-         !RouteSegments::WithinLaneSegment(route_indices_[i].segment,
-                                           waypoint)) {
+  while (
+      i < static_cast<int>(route_indices_.size()) &&
+      !RouteSegments::WithinLaneSegment(route_indices_[i].segment, waypoint)) {
     ++i;
   }
   return i;
@@ -333,8 +335,8 @@ int PncMap::GetWaypointIndex(const LaneWaypoint &waypoint) const {
     return forward_index;
   }
 
-  return (backward_index + 1 == adc_route_index_) ?
-          backward_index : forward_index;
+  return (backward_index + 1 == adc_route_index_) ? backward_index
+                                                  : forward_index;
 }
 
 bool PncMap::PassageToSegments(routing::Passage passage,
@@ -659,7 +661,7 @@ bool PncMap::ExtendSegments(const RouteSegments &segments, double start_s,
     if (adjusted_start_s < adjusted_end_s) {
       if (!truncated_segments->empty() &&
           truncated_segments->back().lane->id().id() ==
-          lane_segment.lane->id().id()) {
+              lane_segment.lane->id().id()) {
         truncated_segments->back().end_s = adjusted_end_s;
       } else if (unique_lanes.find(lane_segment.lane->id().id()) ==
                  unique_lanes.end()) {
