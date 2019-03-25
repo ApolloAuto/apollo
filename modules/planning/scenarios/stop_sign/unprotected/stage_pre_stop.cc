@@ -57,6 +57,7 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
   if (!config_.enabled()) {
+    ADEBUG << "stage Prestop finished because not enable.";
     return FinishStage();
   }
 
