@@ -337,7 +337,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
     const Frame& frame) {
-  // TODO(All) triger valet parking by route message definition as of now
+  // TODO(All) trigger valet parking by route message definition as of now
   double parking_spot_range_to_start =
       config_map_[ScenarioConfig::VALET_PARKING]
           .valet_parking_config()
