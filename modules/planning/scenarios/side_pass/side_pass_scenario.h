@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "modules/common/util/factory.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
