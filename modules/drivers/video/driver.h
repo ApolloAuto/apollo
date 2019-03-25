@@ -1,5 +1,5 @@
 /******************************************************************************                                                                                                                              
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <memory>
 #include "cyber/cyber.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/drivers/video/proto/video_h265cfg.pb.h"
@@ -25,26 +26,25 @@ namespace apollo {
 namespace drivers {
 namespace video {
 
-using apollo::drivers::video::config::CameraH265Config ;
+using apollo::drivers::video::config::CameraH265Config;
 using apollo::drivers::CompressedImage;
 
 class CameraDriver {
-public:
-  CameraDriver(CameraH265Config& h265_cfg);
+ public:
+  explicit CameraDriver(const CameraH265Config *h265_cfg);
   ~CameraDriver() {}
 
-  bool poll(std::shared_ptr<CompressedImage>&  h265);
+  bool poll(std::shared_ptr<CompressedImage> h265);
   void Init();
   int Port() {return _config.udp_port();}
   int Record() { return _config.record(); }
-protected:
+ protected:
   CameraH265Config _config;
   std::shared_ptr<SocketInput> _input;
-  bool poll_by_frame(std::shared_ptr<CompressedImage>& h265);
-
+  bool poll_by_frame(std::shared_ptr<CompressedImage> h265);
 };
 
-} //video
-} //drivers
-} //apollo
+}  // namespace video
+}  // namespace drivers
+}  // namespace apollo
 
