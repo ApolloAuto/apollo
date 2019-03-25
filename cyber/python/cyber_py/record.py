@@ -16,10 +16,11 @@
 # -*- coding: utf-8 -*-
 """Module for wrapper cyber record."""
 
-import sys
-import os
-import importlib
 import collections
+import importlib
+import os
+import sys
+
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
 # init vars
@@ -141,8 +142,8 @@ class RecordWriter(object):
         """
         Writer channel by channelname,typename,protodesc
         """
-        return _CYBER_RECORD.PyRecordWriter_WriteChannel(self.record_writer,
-                                                         channel_name, type_name, proto_desc)
+        return _CYBER_RECORD.PyRecordWriter_WriteChannel(
+            self.record_writer, channel_name, type_name, proto_desc)
 
     def write_message(self, channel_name, data, time, raw=True):
         """
@@ -150,8 +151,7 @@ class RecordWriter(object):
         """
         if raw:
             return _CYBER_RECORD.PyRecordWriter_WriteMessage(
-                self.record_writer,
-                channel_name, data, time, "")
+                self.record_writer, channel_name, data, time, "")
 
         file_desc = data.DESCRIPTOR.file
         proto = FileDescriptorProto()
@@ -159,8 +159,8 @@ class RecordWriter(object):
         proto.name = file_desc.name
         desc_str = proto.SerializeToString()
         return _CYBER_RECORD.PyRecordWriter_WriteMessage(
-                self.record_writer,
-                channel_name, data.SerializeToString(), time, desc_str)
+            self.record_writer,
+            channel_name, data.SerializeToString(), time, desc_str)
 
     def set_size_fileseg(self, size_kilobytes):
         """
