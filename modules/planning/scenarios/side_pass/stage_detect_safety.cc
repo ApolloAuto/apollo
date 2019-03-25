@@ -40,6 +40,12 @@ using apollo::common::TrajectoryPoint;
 Stage::StageStatus StageDetectSafety::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   ADEBUG << "SIDEPASS: Detecting if it's safe to side-pass.";
+
+  if (!config_.enabled()) {
+    ADEBUG << "stage DetectSafety finished because not enable.";
+    return Stage::FINISHED;
+  }
+
   const auto& reference_line_info = frame->reference_line_info().front();
   bool update_success = GetContext()->path_data_.UpdateFrenetFramePath(
       &reference_line_info.reference_line());

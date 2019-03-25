@@ -43,6 +43,12 @@ using apollo::common::TrajectoryPoint;
 Stage::StageStatus StageApproachObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   ADEBUG << "SIDEPASS: Approaching obstacle.";
+
+  if (!config_.enabled()) {
+    ADEBUG << "stage Approach finished because not enable.";
+    return Stage::FINISHED;
+  }
+
   std::string blocking_obstacle_id = GetContext()->front_blocking_obstacle_id_;
   const SLBoundary& adc_sl_boundary =
       frame->reference_line_info().front().AdcSlBoundary();

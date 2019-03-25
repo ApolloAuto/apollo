@@ -38,6 +38,11 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
+  if (!config_.enabled()) {
+    ADEBUG << "stage IntersectionCruise finished because not enable.";
+    return FinishStage();
+  }
+
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "TrafficLightProtectedStageIntersectionCruise plan error";

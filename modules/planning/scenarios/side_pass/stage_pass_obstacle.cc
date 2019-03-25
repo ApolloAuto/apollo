@@ -42,6 +42,12 @@ using apollo::common::math::Vec2d;
 Stage::StageStatus StagePassObstacle::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   ADEBUG << "SIDEPASS: Side-passing!";
+
+  if (!config_.enabled()) {
+    ADEBUG << "stage PassObstacle finished because not enable.";
+    return Stage::FINISHED;
+  }
+
   const auto& reference_line_info = frame->reference_line_info().front();
   bool update_success = GetContext()->path_data_.UpdateFrenetFramePath(
       &reference_line_info.reference_line());

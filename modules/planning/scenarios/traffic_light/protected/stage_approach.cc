@@ -42,6 +42,11 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
+  if (!config_.enabled()) {
+    ADEBUG << "stage Approachh finished because not enable.";
+    return FinishStage();
+  }
+
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "TrafficLightProtectedStop planning error";

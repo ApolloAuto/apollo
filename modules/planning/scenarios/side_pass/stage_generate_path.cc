@@ -39,6 +39,12 @@ using apollo::common::TrajectoryPoint;
 Stage::StageStatus StageGeneratePath::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   ADEBUG << "SIDEPASS: Generating path.";
+
+  if (!config_.enabled()) {
+    ADEBUG << "stage GeneratePath finished because not enable.";
+    return Stage::FINISHED;
+  }
+
   if (!ExecuteTaskOnReferenceLine(planning_start_point, frame)) {
     AERROR << "Fail to plan on reference_line.";
     GetContext()->backup_stage_cycle_num_ = 0;

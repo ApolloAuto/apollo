@@ -46,6 +46,11 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
   ADEBUG << "SIDEPASS: Stopping on wait point.";
 
+  if (!config_.enabled()) {
+    ADEBUG << "stage StopOnWaitPoint finished because not enable.";
+    return Stage::FINISHED;
+  }
+
   // Sanity checks.
   const ReferenceLineInfo& reference_line_info =
       frame->reference_line_info().front();

@@ -38,6 +38,11 @@ StageSidePass::StageSidePass(const ScenarioConfig::StageConfig& config)
 
 Stage::StageStatus StageSidePass::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
+  if (!config_.enabled()) {
+    ADEBUG << "stage SidePass finished because not enable.";
+    return Stage::FINISHED;
+  }
+
   if (frame->mutable_reference_line_info()->empty()) {
     AERROR << "No reference line available for side pass stage";
     return StageStatus::ERROR;

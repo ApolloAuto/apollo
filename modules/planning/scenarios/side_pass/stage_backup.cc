@@ -41,6 +41,10 @@ using apollo::common::TrajectoryPoint;
  */
 Stage::StageStatus StageBackup::Process(
     const TrajectoryPoint& planning_start_point, Frame* frame) {
+  if (!config_.enabled()) {
+    ADEBUG << "stage BackUp finished because not enable.";
+    return Stage::FINISHED;
+  }
   // Check for front blocking obstacles.
   const auto& reference_line_info = frame->reference_line_info().front();
   const PathDecision& path_decision = reference_line_info.path_decision();
