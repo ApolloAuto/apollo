@@ -64,11 +64,8 @@ GlobalData::GlobalData() {
   } else {
     process_group_ = "cyber_default_" + std::to_string(process_id_);
   }
-  is_reality_mode_ = (config_.has_run_mode_conf() &&
-                      config_.run_mode_conf().run_mode() ==
-                          apollo::cyber::proto::RunMode::MODE_SIMULATION)
-                         ? false
-                         : true;
+  is_reality_mode_ =
+      config_.run_mode_conf().run_mode() == proto::RunMode::MODE_REALITY;
 
   const char* run_mode_val = ::getenv("CYBER_RUN_MODE");
   if (run_mode_val != nullptr) {
