@@ -140,7 +140,7 @@ bool StopSignUnprotectedScenario::GetScenarioConfig() {
 /*
  * get all the lanes associated/guarded by a stop sign
  */
-int StopSignUnprotectedScenario::GetAssociatedLanes(
+void StopSignUnprotectedScenario::GetAssociatedLanes(
     const StopSignInfo& stop_sign_info) {
   context_.associated_lanes.clear();
 
@@ -172,8 +172,6 @@ int StopSignUnprotectedScenario::GetAssociatedLanes(
       }
     }
   }
-
-  return 0;
 }
 
 }  // namespace stop_sign

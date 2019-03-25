@@ -56,6 +56,10 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
+  if (!config_.enabled()) {
+    return FinishStage();
+  }
+
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "StopSignUnprotectedStagePreStop planning error";
@@ -133,6 +137,7 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
 
   // check type
+  // why perdestrian and unknown_unmovable skip ?
   if (obstacle_type != PerceptionObstacle::UNKNOWN &&
       obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
       obstacle_type != PerceptionObstacle::BICYCLE &&

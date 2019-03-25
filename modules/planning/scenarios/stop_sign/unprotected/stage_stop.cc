@@ -54,6 +54,10 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
+  if (!config_.enabled()) {
+    return FinishStage();
+  }
+
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "StopSignUnprotectedPreStop planning error";
@@ -206,9 +210,8 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     }
     for (const auto& obstacle_id : remove_vehicles) {
       ADEBUG << "ERASE obstacle_id[" << obstacle_id << "]";
-      vehicles.erase(
-          std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
-          vehicles.end());
+      vehicles.erase(std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
+                     vehicles.end());
     }
   }
 
