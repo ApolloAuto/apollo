@@ -216,7 +216,8 @@ bool ChangeLaneDecider::IsClearToChangeLane(
     constexpr double kSafeTime = 3.0;
     constexpr double kForwardMinSafeDistanceOnSameDirection = 6.0;
     constexpr double kForwardMinSafeDistanceOnOppositeDirection = 12.0;
-    constexpr double kBackwardMinSafeDistance = 8.0;
+    constexpr double kBackwardMinSafeDistanceOnSameDirection = 8.0;
+    constexpr double kBackwardMinSafeDistanceOnOppositeDirection = 1.0;
     constexpr double kDistanceBuffer = 0.5;
 
     double kForwardSafeDistance = 0.0;
@@ -225,12 +226,12 @@ bool ChangeLaneDecider::IsClearToChangeLane(
       kForwardSafeDistance = std::fmax(kForwardMinSafeDistanceOnSameDirection,
                                        (ego_v - obstacle->speed()) * kSafeTime);
       kBackwardSafeDistance = std::fmax(
-          kBackwardMinSafeDistance, (obstacle->speed() - ego_v) * kSafeTime);
+          kBackwardMinSafeDistanceOnSameDirection, (obstacle->speed() - ego_v) * kSafeTime);
     } else {
       kForwardSafeDistance =
           std::fmin(kForwardMinSafeDistanceOnOppositeDirection,
                     (ego_v + obstacle->speed()) * kSafeTime);
-      kBackwardSafeDistance = kBackwardMinSafeDistance;
+      kBackwardSafeDistance = kBackwardMinSafeDistanceOnOppositeDirection;
     }
 
     if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance,
