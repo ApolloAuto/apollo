@@ -49,10 +49,6 @@ class PathBoundsDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
 
-<<<<<<< HEAD
-  void InitPathBoundsDecider(const Frame& frame,
-                             const ReferenceLineInfo& reference_line_info);
-=======
   /////////////////////////////////////////////////////////////////////////////
   // Every time when Process function is called, it will:
   //  1. Initialize.
@@ -63,7 +59,6 @@ class PathBoundsDecider : public Decider {
     */
   void InitPathBoundsDecider(
       const Frame& frame, const ReferenceLineInfo& reference_line_info);
->>>>>>> Planning: added unit tests for path_bounds_decider.
 
   /** @brief The regular path boundary generation considers the ADC itself
     *   and other static environments:
