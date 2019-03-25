@@ -30,14 +30,17 @@ using apollo::cyber::proto::Chatter;
 using apollo::cyber::message::PyMessageWrap;
 apollo::cyber::PyService *server = nullptr;
 int service_callback(const char *channel_name) {
-  AINFO << "server recv->[ " << channel_name << " ]";
-
-  if (server) {
-    Chatter chat;
-    std::string res = server->read();
-    chat.ParseFromString(res);
-    AINFO << "server read: responese: " << chat.ShortDebugString();
+  if (server == nullptr) {
+    AERROR << "server is null.";
+    return -1;
   }
+
+  AINFO << "server recv channelname ->[ " << channel_name << " ]";
+
+  Chatter chat;
+  std::string res = server->read();
+  chat.ParseFromString(res);
+  AINFO << "server read: responese: " << chat.ShortDebugString();
 
   Chatter driver_msg;
   static uint64_t id = 0;
@@ -47,7 +50,7 @@ int service_callback(const char *channel_name) {
   std::string org_data;
   driver_msg.SerializeToString(&org_data);
   server->write(org_data);
-  return -1;
+  return 1;
 }
 
 int main(int argc, char *argv[]) {
