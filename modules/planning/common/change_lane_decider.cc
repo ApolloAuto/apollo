@@ -225,8 +225,9 @@ bool ChangeLaneDecider::IsClearToChangeLane(
     if (same_direction) {
       kForwardSafeDistance = std::fmax(kForwardMinSafeDistanceOnSameDirection,
                                        (ego_v - obstacle->speed()) * kSafeTime);
-      kBackwardSafeDistance = std::fmax(
-          kBackwardMinSafeDistanceOnSameDirection, (obstacle->speed() - ego_v) * kSafeTime);
+      kBackwardSafeDistance =
+          std::fmax(kBackwardMinSafeDistanceOnSameDirection,
+                    (obstacle->speed() - ego_v) * kSafeTime);
     } else {
       kForwardSafeDistance =
           std::fmin(kForwardMinSafeDistanceOnOppositeDirection,
