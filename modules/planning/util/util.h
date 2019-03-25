@@ -28,8 +28,9 @@ bool IsVehicleStateValid(const apollo::common::VehicleState& vehicle_state);
 bool IsDifferentRouting(const apollo::routing::RoutingResponse& first,
                         const apollo::routing::RoutingResponse& second);
 
-bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary, const double s,
-    double* ptr_l_min, double* ptr_l_max);
+bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary,
+                                   const double s, double* ptr_l_min,
+                                   double* ptr_l_max);
 
 }  // namespace planning
 }  // namespace apollo
