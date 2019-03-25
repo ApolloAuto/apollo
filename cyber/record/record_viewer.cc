@@ -58,7 +58,7 @@ bool RecordViewer::IsValid() const {
 
 bool RecordViewer::Update(RecordMessage* message) {
   bool find = false;
-  while (!find) {
+  do {
     if (msg_buffer_.empty() && !FillBuffer()) {
       break;
     }
@@ -68,7 +68,8 @@ bool RecordViewer::Update(RecordMessage* message) {
       find = true;
     }
     msg_buffer_.erase(msg_buffer_.begin());
-  }
+  } while (!find);
+
   return find;
 }
 
