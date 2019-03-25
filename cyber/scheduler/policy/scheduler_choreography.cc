@@ -16,7 +16,6 @@
 
 #include "cyber/scheduler/policy/scheduler_choreography.h"
 
-#include <sched.h>
 #include <memory>
 #include <string>
 #include <utility>
@@ -71,10 +70,6 @@ SchedulerChoreography::SchedulerChoreography() {
         cfg.scheduler_conf().choreography_conf().pool_processor_prio();
     ParseCpuset(cfg.scheduler_conf().choreography_conf().pool_cpuset(),
                 &pool_cpuset_);
-
-    for (auto& thr : cfg.scheduler_conf().choreography_conf().threads()) {
-      inner_thr_confs_[thr.name()] = thr;
-    }
 
     for (auto& task : cfg.scheduler_conf().choreography_conf().tasks()) {
       cr_confs_[task.name()] = task;
@@ -278,39 +273,6 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
   return true;
 }
 
-void SchedulerChoreography::SetInnerThreadAttr(const std::string& name,
-                                               std::thread* thr) {
-  if (thr != nullptr && inner_thr_confs_.find(name) != inner_thr_confs_.end()) {
-    auto th_conf = inner_thr_confs_[name];
-    auto cpuset = th_conf.cpuset();
-
-    std::vector<int> cpus;
-    ParseCpuset(cpuset, &cpus);
-    cpu_set_t set;
-    CPU_ZERO(&set);
-    for (const auto cpu : cpus) {
-      CPU_SET(cpu, &set);
-    }
-    pthread_setaffinity_np(thr->native_handle(), sizeof(set), &set);
-
-    auto policy = th_conf.policy();
-    auto prio = th_conf.prio();
-    int p;
-    if (!policy.compare("SCHED_FIFO")) {
-      p = SCHED_FIFO;
-    } else if (!policy.compare("SCHED_RR")) {
-      p = SCHED_RR;
-    } else {
-      return;
-    }
-
-    struct sched_param sp;
-    memset(static_cast<void*>(&sp), 0, sizeof(sp));
-    sp.sched_priority = prio;
-    pthread_setschedparam(thr->native_handle(), p, &sp);
-  }
-  return;
-}
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo

@@ -90,6 +90,13 @@ TEST(SchedulerPolicyTest, sched_classic) {
   cr1->set_id(GlobalData::RegisterTaskName("xxxxxx"));
   cr1->set_name("xxxxxx");
   EXPECT_TRUE(sched1->DispatchTask(cr1));
+
+  auto t = std::thread(func);
+  sched1->SetInnerThreadAttr("shm", &t);
+  if (t.joinable()) {
+    t.join();
+  }
+
   sched1->Shutdown();
 
   GlobalData::Instance()->SetProcessGroup("not_exist_sched");

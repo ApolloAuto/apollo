@@ -16,6 +16,7 @@
 
 #include "cyber/scheduler/scheduler.h"
 
+#include <sched.h>
 #include <utility>
 
 #include "cyber/common/environment.h"
@@ -104,6 +105,40 @@ void Scheduler::ParseCpuset(const std::string& str, std::vector<int>* cpuset) {
       exit(0);
     }
   }
+}
+
+void Scheduler::SetInnerThreadAttr(const std::string& name,
+                                               std::thread* thr) {
+  if (thr != nullptr && inner_thr_confs_.find(name) != inner_thr_confs_.end()) {
+    auto th_conf = inner_thr_confs_[name];
+    auto cpuset = th_conf.cpuset();
+
+    std::vector<int> cpus;
+    ParseCpuset(cpuset, &cpus);
+    cpu_set_t set;
+    CPU_ZERO(&set);
+    for (const auto cpu : cpus) {
+      CPU_SET(cpu, &set);
+    }
+    pthread_setaffinity_np(thr->native_handle(), sizeof(set), &set);
+
+    auto policy = th_conf.policy();
+    auto prio = th_conf.prio();
+    int p;
+    if (!policy.compare("SCHED_FIFO")) {
+      p = SCHED_FIFO;
+    } else if (!policy.compare("SCHED_RR")) {
+      p = SCHED_RR;
+    } else {
+      return;
+    }
+
+    struct sched_param sp;
+    memset(static_cast<void*>(&sp), 0, sizeof(sp));
+    sp.sched_priority = prio;
+    pthread_setschedparam(thr->native_handle(), p, &sp);
+  }
+  return;
 }
 
 void Scheduler::Shutdown() {
