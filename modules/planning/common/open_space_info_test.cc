@@ -38,8 +38,9 @@ class OpenSpaceInfoTest : public ::testing::Test {
 
 TEST_F(OpenSpaceInfoTest, Init) { EXPECT_NE(&open_space_info_, nullptr); }
 
-bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary, const double s,
-    double* ptr_l_min, double* ptr_l_max);
+bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary,
+                                   const double s, double* ptr_l_min,
+                                   double* ptr_l_max);
 
 }  // namespace planning
 }  // namespace apollo
