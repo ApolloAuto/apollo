@@ -16,10 +16,11 @@
 
 #include "modules/planning/util/util.h"
 
+#include <cmath>
+#include <limits>
+
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/util/util.h"
-
-#include <cmath>
 
 namespace apollo {
 namespace planning {
@@ -50,9 +51,9 @@ bool IsDifferentRouting(const RoutingResponse& first,
   }
 }
 
-bool ComputeSLBoundaryIntersection(
-    const SLBoundary& sl_boundary, const double s, double* ptr_l_min,
-    double* ptr_l_max) {
+bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary,
+                                   const double s, double* ptr_l_min,
+                                   double* ptr_l_max) {
   *ptr_l_min = std::numeric_limits<double>::max();
   *ptr_l_max = -std::numeric_limits<double>::max();
 
@@ -67,8 +68,8 @@ bool ComputeSLBoundaryIntersection(
     const auto& p0 = sl_boundary.boundary_point(i);
     const auto& p1 = sl_boundary.boundary_point(j);
 
-    if (common::util::WithinBound<double>(
-        std::fmin(p0.s(), p1.s()), std::fmax(p0.s(), p1.s()), s)) {
+    if (common::util::WithinBound<double>(std::fmin(p0.s(), p1.s()),
+                                          std::fmax(p0.s(), p1.s()), s)) {
       has_intersection = true;
       auto l = common::math::lerp<double>(p0.l(), p0.s(), p1.l(), p1.s(), s);
       if (l < *ptr_l_min) {
