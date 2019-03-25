@@ -20,8 +20,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <limits>
-#include <utility>
 #include <map>
+#include <utility>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -50,14 +50,14 @@ class TLInfo {
 };
 
 std::map<base::TLColor, TLInfo> s_tl_infos = {
-    {base::TLColor::TL_UNKNOWN_COLOR, {cv::Scalar(255, 255, 255), "UNKNOWN",
-        "UNKNOWN traffic light"} },
-    {base::TLColor::TL_RED, {cv::Scalar(0, 0, 255), "RED",
-        "RED traffic light"} },
-    {base::TLColor::TL_GREEN, {cv::Scalar(0, 255, 0), "GREEN",
-        "GREEN traffic light"} },
-    {base::TLColor::TL_YELLOW, {cv::Scalar(0, 255, 255), "YELLOW",
-        "YELLOW traffic light"} } };
+    {base::TLColor::TL_UNKNOWN_COLOR,
+     {cv::Scalar(255, 255, 255), "UNKNOWN", "UNKNOWN traffic light"}},
+    {base::TLColor::TL_RED,
+     {cv::Scalar(0, 0, 255), "RED", "RED traffic light"}},
+    {base::TLColor::TL_GREEN,
+     {cv::Scalar(0, 255, 0), "GREEN", "GREEN traffic light"}},
+    {base::TLColor::TL_YELLOW,
+     {cv::Scalar(0, 255, 255), "YELLOW", "YELLOW traffic light"}}};
 
 static int GetGpuId(
     const apollo::perception::camera::CameraPerceptionInitOptions& options) {

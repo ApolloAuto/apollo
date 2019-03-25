@@ -22,6 +22,6 @@
 
 namespace apollo {
 namespace planning {
-  // TODO(deidaraho): record more trajectory information to info debug
+// TODO(deidaraho): record more trajectory information to info debug
 }  // namespace planning
 }  // namespace apollo

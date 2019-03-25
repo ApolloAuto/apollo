@@ -48,7 +48,7 @@ bool py_init() {
     return true;
   }
 
-  if (!apollo::cyber::Init("cyber_python")) {
+  if (!Init("cyber_python")) {
     AINFO << "cyber::Init failed.";
     return false;
   }
@@ -57,12 +57,12 @@ bool py_init() {
   return true;
 }
 
-bool py_OK() { return apollo::cyber::OK(); }
+bool py_OK() { return OK(); }
 
 class PyWriter {
  public:
   PyWriter(const std::string& channel, const std::string& type,
-           const uint32_t qos_depth, apollo::cyber::Node* node)
+           const uint32_t qos_depth, Node* node)
       : channel_name_(channel),
         data_type_(type),
         qos_depth_(qos_depth),
@@ -80,8 +80,7 @@ class PyWriter {
     role_attr.set_proto_desc(proto_desc);
     auto qos_profile = role_attr.mutable_qos_profile();
     qos_profile->set_depth(qos_depth_);
-    writer_ =
-        node_->CreateWriter<apollo::cyber::message::PyMessageWrap>(role_attr);
+    writer_ = node_->CreateWriter<message::PyMessageWrap>(role_attr);
   }
 
   ~PyWriter() {}
@@ -97,21 +96,19 @@ class PyWriter {
   std::string channel_name_;
   std::string data_type_;
   uint32_t qos_depth_;
-  apollo::cyber::Node* node_ = nullptr;
-  std::shared_ptr<apollo::cyber::Writer<apollo::cyber::message::PyMessageWrap>>
-      writer_;
+  Node* node_ = nullptr;
+  std::shared_ptr<Writer<message::PyMessageWrap>> writer_;
 };
 
 class PyReader {
  public:
-  PyReader(const std::string& channel, const std::string& type,
-           apollo::cyber::Node* node)
+  PyReader(const std::string& channel, const std::string& type, Node* node)
       : channel_name_(channel), data_type_(type), node_(node), func_(nullptr) {
-    auto f = [this](
-        const std::shared_ptr<const apollo::cyber::message::PyMessageWrap>&
-            request) { this->cb(request); };
-    reader_ =
-        node_->CreateReader<apollo::cyber::message::PyMessageWrap>(channel, f);
+    auto f =
+        [this](const std::shared_ptr<const message::PyMessageWrap>& request) {
+          this->cb(request);
+        };
+    reader_ = node_->CreateReader<message::PyMessageWrap>(channel, f);
   }
 
   ~PyReader() {}
@@ -140,8 +137,7 @@ class PyReader {
   }
 
  private:
-  void cb(const std::shared_ptr<const apollo::cyber::message::PyMessageWrap>&
-              message) {
+  void cb(const std::shared_ptr<const message::PyMessageWrap>& message) {
     {
       std::lock_guard<std::mutex> lg(msg_lock_);
       cache_.push_back(message->data());
@@ -154,33 +150,31 @@ class PyReader {
 
   std::string channel_name_;
   std::string data_type_;
-  apollo::cyber::Node* node_ = nullptr;
+  Node* node_ = nullptr;
   int (*func_)(const char*) = nullptr;
-  std::shared_ptr<apollo::cyber::Reader<apollo::cyber::message::PyMessageWrap>>
-      reader_;
+  std::shared_ptr<Reader<message::PyMessageWrap>> reader_;
   std::deque<std::string> cache_;
   std::mutex msg_lock_;
   std::condition_variable msg_cond_;
 };
 
-using PyMsgWrapPtr = std::shared_ptr<apollo::cyber::message::PyMessageWrap>;
+using PyMsgWrapPtr = std::shared_ptr<message::PyMessageWrap>;
 class PyService {
  public:
   PyService(const std::string& service_name, const std::string& data_type,
-            apollo::cyber::Node* node)
+            Node* node)
       : node_(node),
         service_name_(service_name),
         data_type_(data_type),
         func_(nullptr) {
     auto f = [this](
-        const std::shared_ptr<const apollo::cyber::message::PyMessageWrap>&
-            request,
-        std::shared_ptr<apollo::cyber::message::PyMessageWrap>& response) {
+                 const std::shared_ptr<const message::PyMessageWrap>& request,
+                 std::shared_ptr<message::PyMessageWrap>& response) {
       response = this->cb(request);
     };
-    service_ = node_->CreateService<apollo::cyber::message::PyMessageWrap,
-                                    apollo::cyber::message::PyMessageWrap>(
-        service_name, f);
+    service_ =
+        node_->CreateService<message::PyMessageWrap, message::PyMessageWrap>(
+            service_name, f);
   }
 
   ~PyService() {}
@@ -203,8 +197,7 @@ class PyService {
 
  private:
   PyMsgWrapPtr cb(
-      const std::shared_ptr<const apollo::cyber::message::PyMessageWrap>&
-          request) {
+      const std::shared_ptr<const message::PyMessageWrap>& request) {
     std::lock_guard<std::mutex> lg(msg_lock_);
 
     request_cache_.push_back(request->data());
@@ -220,16 +213,15 @@ class PyService {
     }
 
     PyMsgWrapPtr response;
-    response.reset(new apollo::cyber::message::PyMessageWrap(msg, data_type_));
+    response.reset(new message::PyMessageWrap(msg, data_type_));
     return response;
   }
 
-  apollo::cyber::Node* node_;
+  Node* node_;
   std::string service_name_;
   std::string data_type_;
   int (*func_)(const char*) = nullptr;
-  std::shared_ptr<apollo::cyber::Service<apollo::cyber::message::PyMessageWrap,
-                                         apollo::cyber::message::PyMessageWrap>>
+  std::shared_ptr<Service<message::PyMessageWrap, message::PyMessageWrap>>
       service_;
   std::mutex msg_lock_;
   std::deque<std::string> request_cache_;
@@ -238,18 +230,18 @@ class PyService {
 
 class PyClient {
  public:
-  PyClient(const std::string& name, const std::string& data_type,
-           apollo::cyber::Node* node)
+  PyClient(const std::string& name, const std::string& data_type, Node* node)
       : node_(node), service_name_(name), data_type_(data_type) {
-    client_ = node_->CreateClient<apollo::cyber::message::PyMessageWrap,
-                                  apollo::cyber::message::PyMessageWrap>(name);
+    client_ =
+        node_->CreateClient<message::PyMessageWrap, message::PyMessageWrap>(
+            name);
   }
 
   ~PyClient() {}
 
   std::string send_request(std::string request) {
-    std::shared_ptr<apollo::cyber::message::PyMessageWrap> m;
-    m.reset(new apollo::cyber::message::PyMessageWrap(request, data_type_));
+    std::shared_ptr<message::PyMessageWrap> m;
+    m.reset(new message::PyMessageWrap(request, data_type_));
 
     auto response = client_->SendRequest(m);
     if (response == nullptr) {
@@ -262,18 +254,17 @@ class PyClient {
   }
 
  private:
-  apollo::cyber::Node* node_;
+  Node* node_;
   std::string service_name_;
   std::string data_type_;
-  std::shared_ptr<apollo::cyber::Client<apollo::cyber::message::PyMessageWrap,
-                                        apollo::cyber::message::PyMessageWrap>>
+  std::shared_ptr<Client<message::PyMessageWrap, message::PyMessageWrap>>
       client_;
 };
 
 class PyNode {
  public:
   explicit PyNode(const std::string& node_name) : node_name_(node_name) {
-    node_ = apollo::cyber::CreateNode(node_name);
+    node_ = CreateNode(node_name);
   }
   ~PyNode() {}
 
@@ -292,8 +283,7 @@ class PyNode {
   }
 
   void register_message(const std::string& desc) {
-    apollo::cyber::message::ProtobufFactory::Instance()->RegisterPythonMessage(
-        desc);
+    message::ProtobufFactory::Instance()->RegisterPythonMessage(desc);
   }
 
   PyReader* create_reader(const std::string& channel, const std::string& type) {
@@ -320,7 +310,7 @@ class PyNode {
 
  private:
   std::string node_name_;
-  std::unique_ptr<apollo::cyber::Node> node_ = nullptr;
+  std::unique_ptr<Node> node_ = nullptr;
 };
 
 }  // namespace cyber

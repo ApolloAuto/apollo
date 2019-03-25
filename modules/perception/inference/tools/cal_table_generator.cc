@@ -118,8 +118,8 @@ int evaluate_image_list() {
         return -1;
       }
 
-      int num = std::min(static_cast<int>(img_list.size() - i),
-                         FLAGS_batch_size);
+      int num =
+          std::min(static_cast<int>(img_list.size() - i), FLAGS_batch_size);
       int channels = img.channels();
       int rows = img.rows;
       int cols = img.cols;

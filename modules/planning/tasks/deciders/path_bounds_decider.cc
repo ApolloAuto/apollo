@@ -95,9 +95,9 @@ Status PathBoundsDecider::Process(
   }
 
   // Generate path boundaries.
-  std::string path_bounds_msg = GenerateRegularPathBoundary(
-      *frame, *reference_line_info, LaneBorrowInfo::NO_BORROW,
-      &path_boundaries);
+  std::string path_bounds_msg =
+      GenerateRegularPathBoundary(*frame, *reference_line_info,
+                                  LaneBorrowInfo::NO_BORROW, &path_boundaries);
   if (path_bounds_msg != "") {
     return Status(ErrorCode::PLANNING_ERROR, path_bounds_msg);
   }
@@ -128,8 +128,7 @@ Status PathBoundsDecider::Process(
 
 void PathBoundsDecider::InitPathBoundsDecider(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
-  const ReferenceLine& reference_line =
-      reference_line_info.reference_line();
+  const ReferenceLine& reference_line = reference_line_info.reference_line();
   const common::TrajectoryPoint& planning_start_point =
       frame.PlanningStartPoint();
   // Reset variables.
@@ -161,11 +160,9 @@ void PathBoundsDecider::InitPathBoundsDecider(
 
 std::string PathBoundsDecider::GenerateRegularPathBoundary(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
-    const LaneBorrowInfo lane_borrow_info,
-    PathBoundary* const path_boundary) {
+    const LaneBorrowInfo lane_borrow_info, PathBoundary* const path_boundary) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
-  if (!InitPathBoundary(reference_line_info.reference_line(),
-                        path_boundary)) {
+  if (!InitPathBoundary(reference_line_info.reference_line(), path_boundary)) {
     const std::string msg = "Failed to initialize path boundaries.";
     AERROR << msg;
     return msg;
@@ -184,8 +181,8 @@ std::string PathBoundsDecider::GenerateRegularPathBoundary(
   // PathBoundsDebugString(*path_boundary);
 
   // 3. Fine-tune the boundary based on static obstacles
-  if (!GetBoundaryFromStaticObstacles(
-          reference_line_info.path_decision(), path_boundary)) {
+  if (!GetBoundaryFromStaticObstacles(reference_line_info.path_decision(),
+                                      path_boundary)) {
     const std::string msg =
         "Failed to decide fine tune the boundaries after "
         "taking into consideration all static obstacles.";
@@ -233,8 +230,8 @@ std::string PathBoundsDecider::GenerateFallbackPathBoundary(
   return "";
 }
 
-bool PathBoundsDecider::InitPathBoundary(
-    const ReferenceLine& reference_line, PathBoundary* const path_boundary) {
+bool PathBoundsDecider::InitPathBoundary(const ReferenceLine& reference_line,
+                                         PathBoundary* const path_boundary) {
   // Sanity checks.
   CHECK_NOTNULL(path_boundary);
   path_boundary->clear();
@@ -246,7 +243,7 @@ bool PathBoundsDecider::InitPathBoundary(
                          reference_line.Length());
        curr_s += kPathBoundsDeciderResolution) {
     path_boundary->emplace_back(curr_s, std::numeric_limits<double>::lowest(),
-                                  std::numeric_limits<double>::max());
+                                std::numeric_limits<double>::max());
   }
 
   // return.
@@ -258,8 +255,8 @@ bool PathBoundsDecider::InitPathBoundary(
 }
 
 bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
-    const ReferenceLine& reference_line,
-    const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
+    const ReferenceLine& reference_line, const LaneBorrowInfo lane_borrow_info,
+    double ADC_buffer,
     std::vector<std::tuple<double, double, double>>* const path_boundaries) {
   // Sanity checks.
   CHECK_NOTNULL(path_boundaries);
@@ -348,9 +345,9 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
                               kMaxLateralAccelerations / 2.0;
 
     double curr_left_bound_lane =
-        curr_lane_left_width +
-        (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW ?
-         curr_neighbor_lane_width : 0.0);
+        curr_lane_left_width + (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW
+                                    ? curr_neighbor_lane_width
+                                    : 0.0);
     double curr_left_bound_adc =
         std::fmax(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) +
         GetBufferBetweenADCCenterAndEdge() + ADC_buffer;
@@ -359,8 +356,9 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
 
     double curr_right_bound_lane =
         -curr_lane_right_width -
-        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW ?
-         curr_neighbor_lane_width : 0.0);
+        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW
+             ? curr_neighbor_lane_width
+             : 0.0);
     double curr_right_bound_adc =
         std::fmin(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) -
         GetBufferBetweenADCCenterAndEdge() - ADC_buffer;

@@ -76,7 +76,7 @@ class Node3d {
 
  private:
   static std::string ComputeStringIndex(size_t x_grid, size_t y_grid,
-                                  size_t phi_grid);
+                                        size_t phi_grid);
 
  private:
   double x_ = 0.0;
