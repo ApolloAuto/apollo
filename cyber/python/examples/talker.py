@@ -23,9 +23,10 @@ import sys
 
 sys.path.append("../")
 
+
 def test_talker_class():
     """
-    test talker.
+    Test talker.
     """
     msg = SimpleMessage()
     msg.text = "talker:send Alex!"
@@ -40,7 +41,7 @@ def test_talker_class():
         time.sleep(1)
         g_count = g_count + 1
         msg.integer = g_count
-        print "="*80
+        print "=" * 80
         print "write msg -> %s" % msg
         writer.write(msg)
 

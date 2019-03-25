@@ -27,6 +27,7 @@ import time
 import numpy
 import simplejson
 from cyber_py import cyber
+from cyber_py import cyber_time
 
 from modules.prediction.proto.prediction_obstacle_pb2 import PredictionObstacles
 
@@ -41,7 +42,7 @@ def prediction_publisher(prediction_channel, rate):
     while not cyber.is_shutdown():
         prediction = PredictionObstacles()
         prediction.header.sequence_num = seq_num
-        prediction.header.timestamp_sec = time.time()
+        prediction.header.timestamp_sec = cyber_time.Time.now().to_sec()
         prediction.header.module_name = "prediction"
         print(str(prediction))
         writer.write(prediction)

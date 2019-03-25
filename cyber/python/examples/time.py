@@ -22,6 +22,7 @@ import time
 from cyber_py import cyber
 from cyber_py import cyber_time
 
+
 def test_time():
     ct = cyber_time.Time(123)
     print ct.to_nsec()
@@ -35,7 +36,7 @@ def test_time():
 
     td1 = cyber_time.Duration(111)
     tm1 = ct - td1
-    print "ct sub du is ", tm1 
+    print "ct sub du is ", tm1
     tm1 = ct - td1
     print tm1
 
@@ -43,10 +44,11 @@ def test_time():
     tm7 = cyber_time.Time(tm5)
     print tm7
 
+
 def test_duration():
     td1 = cyber_time.Duration(111)
     td2 = cyber_time.Duration(601000000000)
-    td3 = td2-td1
+    td3 = td2 - td1
     print td1, td1.to_nsec()
     print td2, td2.to_nsec()
     print td3, td3.to_nsec()
@@ -58,9 +60,10 @@ def test_duration():
     print type(td6)
     td7 = cyber_time.Duration(td6)
     print td7
-    #td7 = cyber_time.Duration("zzz")
-    #print td7
-    #print type(td2)
+    # td7 = cyber_time.Duration("zzz")
+    # print td7
+    # print type(td2)
+
 
 def test_rate():
     rt1 = cyber_time.Rate(111)
@@ -71,11 +74,11 @@ def test_rate():
     print rt3
 
 if __name__ == '__main__':
-    #cyber.init()
-    print "test time","-"*50
+    # cyber.init()
+    print "test time", "-" * 50
     test_time()
-    print "test duration","-"*50
+    print "test duration", "-" * 50
     test_duration()
-    print "test rate","-"*50
+    print "test rate", "-" * 50
     test_rate()
-    #cyber.shutdown()
+    # cyber.shutdown()

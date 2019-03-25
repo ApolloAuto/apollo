@@ -20,6 +20,7 @@ This program can publish drive event message
 """
 
 from cyber_py import cyber
+from cyber_py import cyber_time
 
 import argparse
 import datetime
@@ -37,9 +38,11 @@ g_args = None
 
 g_localization = None
 
+
 def OnReceiveLocalization(localization_msg):
     global g_localization
     g_localization = localization_msg
+
 
 def main(args):
     drive_event_meta_msg = g_message_manager.get_msg_meta_by_topic(
@@ -69,7 +72,7 @@ def main(args):
         event_type = event_type.strip()
         if len(event_type) != 1 or event_type[0].lower() != 'd':
             continue
-        current_time = time.time()
+        current_time = cyber_time.Time.now().to_sec()
         event_str = None
         while not event_str:
             event_str = raw_input("Type Event:>")
@@ -90,6 +93,7 @@ def main(args):
         proto_utils.write_pb_to_text_file(event_msg, filename)
         print('Logged to rosbag and written to file %s' % filename)
         time.sleep(0.1)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

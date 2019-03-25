@@ -20,9 +20,7 @@
 #include <limits>
 #include <memory>
 #include <queue>
-#include <string>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 
 #include "modules/prediction/common/prediction_gflags.h"
@@ -42,6 +40,8 @@ using common::math::Vec2d;
 using hdmap::LaneInfo;
 using hdmap::OverlapInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
+
+std::unordered_set<std::string> ObstaclesPrioritizer::ego_back_lane_id_set_;
 
 namespace {
 
@@ -329,6 +329,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     AERROR << "Null obstacles container found";
     return;
   }
+
   ADCTrajectoryContainer* adc_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
@@ -360,6 +361,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
   double ego_vehicle_s = std::numeric_limits<double>::max();
   double ego_vehicle_l = std::numeric_limits<double>::max();
   double accumulated_s = 0.0;
+  std::string ego_lane_id = "";
   // first loop of lane_ids to findout ego_vehicle_s
   for (const std::string& lane_id : lane_ids) {
     std::shared_ptr<const LaneInfo> lane_info_ptr =
@@ -374,14 +376,25 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
       if (std::fabs(l) < std::fabs(ego_vehicle_l)) {
         ego_vehicle_s = accumulated_s + s;
         ego_vehicle_l = l;
+        ego_lane_id = lane_id;
       }
     }
     accumulated_s += lane_info_ptr->total_length();
   }
 
-  // then loop through lane_ids to AssignCaution for obstacle vehicles
   accumulated_s = 0.0;
   for (const std::string& lane_id : lane_ids) {
+    ego_back_lane_id_set_.insert(lane_id);
+    if (lane_id == ego_lane_id) {
+      break;
+    }
+  }
+
+  // then loop through lane_ids to AssignCaution for obstacle vehicles
+  for (const std::string& lane_id : lane_ids) {
+    if (ego_back_lane_id_set_.find(lane_id) != ego_back_lane_id_set_.end()) {
+      continue;
+    }
     std::shared_ptr<const LaneInfo> lane_info_ptr =
         PredictionMap::LaneById(lane_id);
     if (lane_info_ptr == nullptr) {
@@ -476,6 +489,11 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
 void ObstaclesPrioritizer::SetCautionBackward(
     std::shared_ptr<const LaneInfo> start_lane_info_ptr,
     const double max_distance) {
+  std::string start_lane_id = start_lane_info_ptr->id().id();
+  if (ego_back_lane_id_set_.find(start_lane_id) !=
+      ego_back_lane_id_set_.end()) {
+    return;
+  }
   ObstaclesContainer* obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
@@ -515,6 +533,10 @@ void ObstaclesPrioritizer::SetCautionBackward(
       continue;
     }
     for (const auto& pre_lane_id : curr_lane->lane().predecessor_id()) {
+      if (ego_back_lane_id_set_.find(pre_lane_id.id()) !=
+          ego_back_lane_id_set_.end()) {
+        continue;
+      }
       ConstLaneInfoPtr pre_lane_ptr = PredictionMap::LaneById(pre_lane_id.id());
       lane_info_queue.emplace(pre_lane_ptr,
                               cumu_distance + pre_lane_ptr->total_length());
