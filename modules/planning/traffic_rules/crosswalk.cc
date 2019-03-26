@@ -35,7 +35,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/proto/planning_status.pb.h"
-#include "modules/planning/traffic_rules/util.h"
+#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -188,9 +188,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
 
     if (!pedestrians.empty()) {
       // stop decision
-      double stop_deceleration = util::GetADCStopDeceleration(
-          reference_line_info, crosswalk_overlap->start_s,
-          config_.crosswalk().min_pass_s_distance());
+      double stop_deceleration = GetADCStopDeceleration(
+          adc_front_edge_s, crosswalk_overlap->start_s);
       if (stop_deceleration < config_.crosswalk().max_stop_deceleration()) {
         crosswalks_to_stop.push_back(
             std::make_pair(crosswalk_overlap, pedestrians));
