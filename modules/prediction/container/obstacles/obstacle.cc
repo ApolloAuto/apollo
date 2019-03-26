@@ -1003,7 +1003,7 @@ void Obstacle::BuildLaneGraph() {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
     const LaneGraph& lane_graph = ObstacleClusters::GetLaneGraph(
-        lane.lane_s(), road_graph_search_distance, lane_info);
+        lane.lane_s(), road_graph_search_distance, true, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++curr_lane_count;
     }
@@ -1030,7 +1030,7 @@ void Obstacle::BuildLaneGraph() {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
     const LaneGraph& lane_graph = ObstacleClusters::GetLaneGraph(
-        lane.lane_s(), road_graph_search_distance, lane_info);
+        lane.lane_s(), road_graph_search_distance, false, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++nearby_lane_count;
     }
@@ -1187,8 +1187,8 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
         PredictionMap::LaneById(lane_id);
     const LaneGraph& local_lane_graph =
         ObstacleClusters::GetLaneGraphWithoutMemorizing(
-            feature->lane().lane_feature().lane_s(), road_graph_search_distance,
-            curr_lane_info);
+            feature->lane().lane_feature().lane_s(),
+            road_graph_search_distance, true, curr_lane_info);
     // Update it into the Feature proto
     for (const auto& lane_seq : local_lane_graph.lane_sequence()) {
       LaneSequence* lane_seq_ptr = feature->mutable_lane()

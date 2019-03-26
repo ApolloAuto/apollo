@@ -85,8 +85,10 @@ int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane) {
 }
 
 RoadGraph::RoadGraph(const double start_s, const double length,
+                     const bool consider_divide,
                      std::shared_ptr<const LaneInfo> lane_info_ptr)
-    : start_s_(start_s), length_(length), lane_info_ptr_(lane_info_ptr) {}
+    : start_s_(start_s), length_(length), consider_divide_(consider_divide),
+      lane_info_ptr_(lane_info_ptr) {}
 
 Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   // Sanity checks.
@@ -106,8 +108,8 @@ Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
   std::vector<LaneSegment> lane_segments;
   double accumulated_s = 0.0;
   ComputeLaneSequence(accumulated_s, start_s_, lane_info_ptr_,
-                      FLAGS_road_graph_max_search_horizon, &lane_segments,
-                      lane_graph_ptr);
+                      FLAGS_road_graph_max_search_horizon, consider_divide_,
+                      &lane_segments, lane_graph_ptr);
 
   return Status::OK();
 }
@@ -133,7 +135,7 @@ bool RoadGraph::IsOnLaneGraph(std::shared_ptr<const LaneInfo> lane_info_ptr,
 void RoadGraph::ComputeLaneSequence(
     const double accumulated_s, const double start_s,
     std::shared_ptr<const LaneInfo> lane_info_ptr,
-    const int graph_search_horizon,
+    const int graph_search_horizon, const bool consider_divide,
     std::vector<LaneSegment>* const lane_segments,
     LaneGraph* const lane_graph_ptr) const {
   // Sanity checks.
@@ -181,11 +183,21 @@ void RoadGraph::ComputeLaneSequence(
     }
     std::sort(successor_lanes.begin(), successor_lanes.end(), IsAtLeft);
 
-    // Run recursion function to perform DFS.
-    for (size_t i = 0; i < successor_lanes.size(); i++) {
-      ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lanes[i],
-                          graph_search_horizon - 1, lane_segments,
-                          lane_graph_ptr);
+    if (consider_divide) {
+      if (successor_lanes.size() > 1) {
+        // Run recursion function to perform DFS.
+        for (size_t i = 0; i < successor_lanes.size(); i++) {
+          ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lanes[i],
+                              graph_search_horizon - 1,  false, lane_segments,
+                              lane_graph_ptr);
+        }
+      } else {
+        ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lanes[0],
+                            graph_search_horizon - 1,  true, lane_segments,
+                            lane_graph_ptr);
+      }
+    } else {
+      // TODO(kechxu) select a successor lane
     }
   }
   lane_segments->pop_back();
