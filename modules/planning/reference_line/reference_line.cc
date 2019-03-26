@@ -544,7 +544,7 @@ bool ReferenceLine::IsBlockRoad(const common::math::Box2d& box2d,
 
 bool ReferenceLine::IsOnRoad(const common::math::Vec2d& vec2d_point) const {
   common::SLPoint sl_point;
-  return XYToSL(vec2d_point, &sl_point) ? IsOnRoad(sl_point) : false;
+  return XYToSL(vec2d_point, &sl_point) && IsOnRoad(sl_point);
 }
 
 bool ReferenceLine::IsOnRoad(const SLBoundary& sl_boundary) const {
