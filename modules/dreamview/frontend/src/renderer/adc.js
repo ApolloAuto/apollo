@@ -16,6 +16,10 @@ const CAR_PROPERTIES = {
         menuOptionName: 'showPlanningCar',
         carMaterial: null,
     },
+    'shadowAdc': {
+        menuOptionName: 'showPositionShadow',
+        carMaterial: null,
+    },
 };
 
 const RSS_UNSAFE_MESH = drawImage(iconRssUnsafe, 1.5, 1.5);

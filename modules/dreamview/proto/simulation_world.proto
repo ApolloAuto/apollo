@@ -262,4 +262,7 @@ message SimulationWorld {
 
   // RSS info
   optional bool is_rss_safe = 25 [default = true];
+
+  // Shadow localization
+  optional Object shadow_localization = 26;
 }
