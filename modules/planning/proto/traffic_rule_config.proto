@@ -106,24 +106,6 @@ message ReroutingConfig {
   optional double prepare_rerouting_time = 2 [default = 2.0];  // seconds
 }
 
-message SignalLightConfig {
-  // stop distance from stop line
-  optional double stop_distance = 1 [default = 1.0];  // meter
-  // max deceleration
-  optional double max_stop_deceleration = 2 [default = 4.0];
-  // min s_distance for adc to be considered have passed signal_light
-  // (stop_line_end_s)
-  optional double min_pass_s_distance = 3 [default = 4.0];  // meter
-  // treat yellow light as red when deceleration (abstract value in m/s^2)
-  // is less than this threshold; otherwise treated as green light
-  optional double max_stop_deceleration_yellow_light = 4 [default = 3.0];
-  optional double signal_expire_time_sec = 5 [default = 5.0];  // second
-  optional double max_monitor_forward_distance = 6 [default = 135.0]; // meter
-  optional CreepConfig righ_turn_creep = 7;
-  // consider the signal msg is expired if its timestamp over this threshold(s)
-
-}
-
 // TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
@@ -148,7 +130,6 @@ message TrafficRuleConfig {
     PullOverConfig pull_over = 8;
     ReferenceLineEndConfig reference_line_end = 9;
     ReroutingConfig rerouting = 10;
-    SignalLightConfig signal_light = 11;
   }
 }
 

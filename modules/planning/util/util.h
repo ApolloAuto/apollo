@@ -27,5 +27,8 @@ bool IsVehicleStateValid(const apollo::common::VehicleState& vehicle_state);
 bool IsDifferentRouting(const apollo::routing::RoutingResponse& first,
                         const apollo::routing::RoutingResponse& second);
 
+double GetADCStopDeceleration(const double adc_front_edge_s,
+                              const double stop_line_s);
+
 }  // namespace planning
 }  // namespace apollo
