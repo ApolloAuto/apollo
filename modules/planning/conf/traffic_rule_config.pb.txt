@@ -88,3 +88,12 @@ config: {
     cooldown_time: 3.0
   }
 }
+
+config: {
+  rule_id: TRAFFIC_LIGHT
+  enabled: true
+  traffic_light {
+    stop_distance: 1.0
+    max_stop_deceleration: 6.0
+  }
+}

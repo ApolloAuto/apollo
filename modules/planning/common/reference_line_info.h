@@ -211,8 +211,6 @@ class ReferenceLineInfo {
 
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
 
-  void InitFirstOverlaps();
-
   uint32_t GetPriority() const { return reference_line_.GetPriority(); }
 
   void SetPriority(uint32_t priority) { reference_line_.SetPriority(priority); }
@@ -250,6 +248,8 @@ class ReferenceLineInfo {
                      hdmap::PathOverlap* pnc_junction_overlap) const;
 
  private:
+  void InitFirstOverlaps();
+
   bool CheckChangeLane() const;
 
   void ExportTurnSignal(common::VehicleSignal* signal) const;

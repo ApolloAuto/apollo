@@ -51,9 +51,6 @@ class DeciderRuleBasedStop : public Decider {
   void CheckStopSign(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
 
-  void CheckTrafficLight(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info);
-
   void CheckOpenSpacePreStop(Frame* const frame,
                              ReferenceLineInfo* const reference_line_info);
 
