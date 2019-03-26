@@ -41,6 +41,7 @@
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/proto/motion_service.pb.h"
 #include "modules/perception/proto/perception_lane.pb.h"
+#include "modules/common/util/util.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
@@ -52,13 +53,7 @@ namespace onboard {
 typedef Eigen::Matrix4d MotionType;
 
 class LaneDetectionComponent;
-class LaneInitFunInfo {
- public:
-  typedef int (LaneDetectionComponent::*InitFunction)();
-  InitFunction init_function_;
-  std::string init_fun_name_;
-};
-
+typedef FunctionInfo<LaneDetectionComponent> FunInfoType;
 class LaneDetectionComponent : public apollo::cyber::Component<> {
  public:
   LaneDetectionComponent() : seq_num_(0) {}
@@ -69,8 +64,8 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
 
   bool Init() override;
 
-  typedef int (LaneDetectionComponent::*InitFunction)();
-  friend LaneInitFunInfo;
+  template<typename T>
+  friend class FunctionInfo;
 
  private:
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image>& in_message,
@@ -176,7 +171,7 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
 
   camera::Visualizer visualize_;
   bool write_visual_img_;
-  static LaneInitFunInfo init_func_arry_[];
+  static FunInfoType init_func_arry_[];
 };
 
 CYBER_REGISTER_COMPONENT(LaneDetectionComponent);
