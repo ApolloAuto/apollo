@@ -606,7 +606,6 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   RUN_GOLDEN_TEST_DECISION(1);
 }
 
-/* TODO(all): will turn on in next commit
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
@@ -621,7 +620,6 @@ TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
 
   RUN_GOLDEN_TEST_DECISION(0);
 }
-*/
 
 TEST_F(SunnyvaleBigLoopTest, change_lane_abort_for_fast_back_vehicle) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);

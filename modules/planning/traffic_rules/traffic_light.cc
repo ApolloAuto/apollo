@@ -20,11 +20,9 @@
 
 #include "modules/planning/traffic_rules/traffic_light.h"
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/proto/planning_internal.pb.h"
 
+#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
@@ -35,17 +33,21 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
-using apollo::common::VehicleState;
-using apollo::common::math::Vec2d;
-using apollo::common::util::WithinBound;
-using apollo::hdmap::PathOverlap;
+using common::Status;
+using common::time::Clock;
+using common::VehicleState;
+using common::math::Vec2d;
+using common::util::WithinBound;
+using hdmap::PathOverlap;
+using perception::TrafficLightDetection;
 
 TrafficLight::TrafficLight(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
 Status TrafficLight::ApplyRule(Frame* const frame,
                               ReferenceLineInfo* const reference_line_info) {
+  ReadTrafficLights(frame->local_view().traffic_light);
+
   MakeDecisions(frame, reference_line_info);
 
   return Status::OK();
@@ -113,8 +115,7 @@ void TrafficLight::MakeDecisions(
       continue;
     }
 
-    auto signal_color =
-        util::GetSignal(traffic_light_overlap.object_id).color();
+    auto signal_color = GetSignal(traffic_light_overlap.object_id).color();
     const double stop_deceleration = util::GetADCStopDeceleration(
         adc_front_edge_s, traffic_light_overlap.start_s);
     ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
@@ -145,6 +146,42 @@ void TrafficLight::MakeDecisions(
            << "] start_s[" << traffic_light_overlap.start_s << "]";
     BuildStopDecision(frame, reference_line_info, traffic_light_overlap);
   }
+}
+
+void TrafficLight::ReadTrafficLights(
+    const std::shared_ptr<TrafficLightDetection>& traffic_light_detection) {
+  traffic_lights_.clear();
+  if (traffic_light_detection == nullptr) {
+    return;
+  }
+  const double delay =
+      traffic_light_detection->header().timestamp_sec() -
+      Clock::NowInSeconds();
+  if (delay > config_.traffic_light().signal_expire_time_sec()) {
+    ADEBUG << "traffic signals msg is expired, delay = " << delay
+           << " seconds.";
+    return;
+  }
+  for (int i = 0; i < traffic_light_detection->traffic_light_size(); i++) {
+    const perception::TrafficLight& traffic_light =
+        traffic_light_detection->traffic_light(i);
+    traffic_lights_[traffic_light.id()] = &traffic_light;
+  }
+}
+
+perception::TrafficLight TrafficLight::GetSignal(
+    const std::string& traffic_light_id) {
+  const auto* result =
+      apollo::common::util::FindPtrOrNull(traffic_lights_, traffic_light_id);
+  if (result == nullptr) {
+    perception::TrafficLight traffic_light;
+    traffic_light.set_id(traffic_light_id);
+    traffic_light.set_color(perception::TrafficLight::UNKNOWN);
+    traffic_light.set_confidence(0.0);
+    traffic_light.set_tracking_time(0.0);
+    return traffic_light;
+  }
+  return *result;
 }
 
 int TrafficLight::BuildStopDecision(
