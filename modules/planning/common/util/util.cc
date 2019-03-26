@@ -22,7 +22,6 @@
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -107,24 +106,6 @@ bool CheckTrafficLightOnReferenceLine(
                      return overlap.object_id == traffic_light_overlap_id;
                    });
   return (traffic_light_overlap_it == traffic_light_overlaps.end());
-}
-
-/*
- * @brief: read signal info
- */
-TrafficLight GetSignal(const std::string& traffic_light_id) {
-  const auto* result = apollo::common::util::FindPtrOrNull(
-      PlanningContext::GetScenarioInfo()->traffic_lights, traffic_light_id);
-
-  if (result == nullptr) {
-    TrafficLight traffic_light;
-    traffic_light.set_id(traffic_light_id);
-    traffic_light.set_color(TrafficLight::UNKNOWN);
-    traffic_light.set_confidence(0.0);
-    traffic_light.set_tracking_time(0.0);
-    return traffic_light;
-  }
-  return *result;
 }
 
 /*

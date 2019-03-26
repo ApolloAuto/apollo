@@ -35,6 +35,7 @@
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
+#include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
@@ -252,7 +253,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       traffic_light_scenario = true;
 
       const auto& signal_color =
-          util::GetSignal(traffic_light_overlap.object_id).color();
+          scenario::util::GetSignal(traffic_light_overlap.object_id).color();
       ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
              << "] start_s[" << traffic_light_overlap.start_s
              << "] color[" << signal_color << "]";
