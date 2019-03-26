@@ -25,8 +25,8 @@
 #include <string>
 
 #include "modules/planning/tasks/task.h"
-#include "rss/core/RssCheck.hpp"
-#include "rss/test_support/TestSupport.hpp"
+#include "ad_rss/core/RssCheck.hpp"
+#include "TestSupport.hpp"
 
 namespace apollo {
 namespace planning {
