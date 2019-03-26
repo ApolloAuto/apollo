@@ -229,7 +229,7 @@ Status RssDecider::Process(Frame *frame,
   rssCheck.calculateAccelerationRestriction(
       worldModel, accelerationRestriction);
 
-  if (double(front_obstacle_distance) > double(dMin_lon)) {
+  if (front_obstacle_distance > static_cast<double> (dMin_lon)) {
     ADEBUG << "Task " << Name() << " Distance is RSS-Safe";
     reference_line_info->mutable_rss_info()->set_is_rss_safe(true);
   } else {
@@ -249,19 +249,19 @@ Status RssDecider::Process(Frame *frame,
   }
 
   reference_line_info->mutable_rss_info()->set_rss_safe_dist_lon(
-      double(dMin_lon));
+      static_cast<double> (dMin_lon));
   reference_line_info->mutable_rss_info()->set_acc_lon_range_minimum(
-      double(accelerationRestriction.longitudinalRange.minimum));
+      static_cast<double> (accelerationRestriction.longitudinalRange.minimum));
   reference_line_info->mutable_rss_info()->set_acc_lon_range_maximum(
-      double(accelerationRestriction.longitudinalRange.maximum));
+      static_cast<double> (accelerationRestriction.longitudinalRange.maximum));
   reference_line_info->mutable_rss_info()->set_acc_lat_left_range_minimum(
-      double(accelerationRestriction.lateralLeftRange.minimum));
+      static_cast<double> (accelerationRestriction.lateralLeftRange.minimum));
   reference_line_info->mutable_rss_info()->set_acc_lat_left_range_maximum(
-      double(accelerationRestriction.lateralLeftRange.maximum));
+      static_cast<double> (accelerationRestriction.lateralLeftRange.maximum));
   reference_line_info->mutable_rss_info()->set_acc_lat_right_range_minimum(
-      double(accelerationRestriction.lateralRightRange.minimum));
+      static_cast<double> (accelerationRestriction.lateralRightRange.minimum));
   reference_line_info->mutable_rss_info()->set_acc_lat_right_range_maximum(
-      double(accelerationRestriction.lateralRightRange.maximum));
+      static_cast<double> (accelerationRestriction.lateralRightRange.maximum));
 
   ADEBUG << " is_rss_safe : " << reference_line_info->rss_info().is_rss_safe();
   ADEBUG << " cur_dist_lon: " << reference_line_info->rss_info().cur_dist_lon();
