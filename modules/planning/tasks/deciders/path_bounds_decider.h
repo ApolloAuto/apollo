@@ -46,14 +46,16 @@ class PathBoundsDecider : public Decider {
   explicit PathBoundsDecider(const TaskConfig& config);
 
  private:
+  /** @brief Every time when Process function is called, it will:
+    *   1. Initialize.
+    *   2. Generate Fallback Path Bound.
+    *   3. Generate Regular Path Bound(s).
+    */
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
 
   /////////////////////////////////////////////////////////////////////////////
-  // Every time when Process function is called, it will:
-  //  1. Initialize.
-  //  2. Generate Fallback Path Bound.
-  //  3. Generate Regular Path Bound(s).
+  // Below are functions called every frame when executing PathBoundsDecider.
 
   /** @brief The initialization function.
     */
@@ -70,12 +72,14 @@ class PathBoundsDecider : public Decider {
     * @param reference_line_info
     * @param lane_borrow_info: which lane to borrow.
     * @param The generated regular path_boundary, if there is one.
+    * @param The blocking obstacle's id. If none, then it's not modified.
     * @return A failure message. If succeeded, return "" (empty string).
     */
   std::string GenerateRegularPathBound(
       const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo lane_borrow_info,
-      std::vector<std::tuple<double, double, double>>* const path_bound);
+      std::vector<std::tuple<double, double, double>>* const path_bound,
+      std::string* const blocking_obstacle_id);
 
   /** @brief The fallback path only considers:
     *   - ADC's position (so that boundary must contain ADC's position)
@@ -97,7 +101,7 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /////////////////////////////////////////////////////////////////////////////
-  // When generating Path Bound, it will call:
+  // Below are functions called when generating path bounds.
   //  1. InitPathBoundary
   //  2. GetBoundaryFromLanesAndADC
   //  3. GetBoundaryFromStaticObstacles
@@ -127,7 +131,8 @@ class PathBoundsDecider : public Decider {
     */
   bool GetBoundaryFromStaticObstacles(
       const PathDecision& path_decision,
-      std::vector<std::tuple<double, double, double>>* const path_boundaries);
+      std::vector<std::tuple<double, double, double>>* const path_boundaries,
+      std::string* const blocking_obstacle_id);
 
   std::vector<std::tuple<int, double, double, double, std::string>>
   SortObstaclesForSweepLine(
