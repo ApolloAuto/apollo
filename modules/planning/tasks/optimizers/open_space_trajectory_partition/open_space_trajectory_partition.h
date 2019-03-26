@@ -60,6 +60,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
       const std::vector<TrajGearPair>& paritioned_trajectories,
       const size_t current_trajectory_index,
       const size_t closest_trajectory_point_index,
+      DiscretizedTrajectory* stitched_trajectory_result,
       TrajGearPair* current_paritioned_trajectory);
 
  private:
