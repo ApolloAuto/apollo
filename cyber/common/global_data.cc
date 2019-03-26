@@ -164,11 +164,15 @@ const CyberConfig& GlobalData::Config() const { return config_; }
 
 uint64_t GlobalData::RegisterNode(const std::string& node_name) {
   auto id = Hash(node_name);
-  if (node_id_map_.Has(id)) {
+  while (node_id_map_.Has(id)) {
     std::string* name = nullptr;
     node_id_map_.Get(id, &name);
-    CHECK(node_name == *name)
-        << " Node name hash collision: " << node_name << " <=> " << *name;
+    if (node_name != *name) {
+      ++id;
+      AWARN << " Node name hash collision: " << node_name << " <=> " << *name;
+    } else {
+      break;
+    }
   }
   node_id_map_.Set(id, node_name);
   return id;
@@ -184,11 +188,15 @@ std::string GlobalData::GetNodeById(uint64_t id) {
 
 uint64_t GlobalData::RegisterChannel(const std::string& channel) {
   auto id = Hash(channel);
-  if (channel_id_map_.Has(id)) {
+  while (channel_id_map_.Has(id)) {
     std::string* name = nullptr;
     channel_id_map_.Get(id, &name);
-    CHECK(channel == *name)
-        << "Channel name hash collision: " << channel << " <=> " << *name;
+    if (channel != *name) {
+      ++id;
+      AWARN << "Channel name hash collision: " << channel << " <=> " << *name;
+    } else {
+      break;
+    }
   }
   channel_id_map_.Set(id, channel);
   return id;
@@ -204,11 +212,15 @@ std::string GlobalData::GetChannelById(uint64_t id) {
 
 uint64_t GlobalData::RegisterService(const std::string& service) {
   auto id = Hash(service);
-  if (service_id_map_.Has(id)) {
+  while (service_id_map_.Has(id)) {
     std::string* name = nullptr;
     service_id_map_.Get(id, &name);
-    CHECK(service == *name)
-        << "Service name hash collision: " << service << " <=> " << *name;
+    if (service != *name) {
+      ++id;
+      AWARN << "Service name hash collision: " << service << " <=> " << *name;
+    } else {
+      break;
+    }
   }
   service_id_map_.Set(id, service);
   return id;
@@ -224,11 +236,15 @@ std::string GlobalData::GetServiceById(uint64_t id) {
 
 uint64_t GlobalData::RegisterTaskName(const std::string& task_name) {
   auto id = Hash(task_name);
-  if (task_id_map_.Has(id)) {
+  while (task_id_map_.Has(id)) {
     std::string* name = nullptr;
     task_id_map_.Get(id, &name);
-    CHECK(task_name == *name)
-        << "Task name hash collision: " << task_name << " <=> " << *name;
+    if (task_name != *name) {
+      ++id;
+      AWARN << "Task name hash collision: " << task_name << " <=> " << *name;
+    } else {
+      break;
+    }
   }
   task_id_map_.Set(id, task_name);
   return id;
