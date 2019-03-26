@@ -25,8 +25,6 @@
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
-// #define ADEBUG AINFO
-
 namespace apollo {
 namespace planning {
 
@@ -75,9 +73,8 @@ Status PathAssessmentDecider::Process(
     const std::string msg = "Neither regular nor fallback path is valid.";
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
-  } else {
-    ADEBUG << "There are " << valid_path_data.size() << " valid path data.";
   }
+  ADEBUG << "There are " << valid_path_data.size() << " valid path data.";
 
   // Analyze and add important info for speed decider to use.
   for (auto& curr_path_data : valid_path_data) {
@@ -103,6 +100,12 @@ Status PathAssessmentDecider::Process(
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
 
+  const auto &path_points = reference_line_info->path_data().discretized_path();
+  auto *ptr_optimized_path =
+      reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
+  ptr_optimized_path->set_name("Path Planning Output");
+  ptr_optimized_path->mutable_path_point()->CopyFrom(
+      {path_points.begin(), path_points.end()});
   return Status::OK();
 }
 
