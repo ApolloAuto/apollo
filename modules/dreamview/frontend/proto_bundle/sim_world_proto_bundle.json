@@ -2675,6 +2675,13 @@
                   "options": {
                     "default": 5
                   }
+                },
+                "maxStopDeceleration": {
+                  "type": "double",
+                  "id": 4,
+                  "options": {
+                    "default": 4
+                  }
                 }
               }
             },
@@ -7432,56 +7439,6 @@
                 }
               }
             },
-            "SignalLightConfig": {
-              "fields": {
-                "stopDistance": {
-                  "type": "double",
-                  "id": 1,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "maxStopDeceleration": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 4
-                  }
-                },
-                "minPassSDistance": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 4
-                  }
-                },
-                "maxStopDecelerationYellowLight": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 3
-                  }
-                },
-                "signalExpireTimeSec": {
-                  "type": "double",
-                  "id": 5,
-                  "options": {
-                    "default": 5
-                  }
-                },
-                "maxMonitorForwardDistance": {
-                  "type": "double",
-                  "id": 6,
-                  "options": {
-                    "default": 135
-                  }
-                },
-                "righTurnCreep": {
-                  "type": "CreepConfig",
-                  "id": 7
-                }
-              }
-            },
             "TrafficRuleConfig": {
               "oneofs": {
                 "config": {
@@ -7493,8 +7450,7 @@
                     "keepClear",
                     "pullOver",
                     "referenceLineEnd",
-                    "rerouting",
-                    "signalLight"
+                    "rerouting"
                   ]
                 }
               },
@@ -7538,10 +7494,6 @@
                 "rerouting": {
                   "type": "ReroutingConfig",
                   "id": 10
-                },
-                "signalLight": {
-                  "type": "SignalLightConfig",
-                  "id": 11
                 }
               },
               "nested": {
@@ -9801,6 +9753,22 @@
                 }
               }
             },
+            "SignInfo": {
+              "fields": {
+                "type": {
+                  "type": "Type",
+                  "id": 1
+                }
+              },
+              "nested": {
+                "Type": {
+                  "values": {
+                    "None": 0,
+                    "NO_RIGHT_TURN_ON_RED": 1
+                  }
+                }
+              }
+            },
             "Signal": {
               "fields": {
                 "id": {
@@ -9829,6 +9797,11 @@
                   "rule": "repeated",
                   "type": "Curve",
                   "id": 6
+                },
+                "signInfo": {
+                  "rule": "repeated",
+                  "type": "SignInfo",
+                  "id": 7
                 }
               },
               "nested": {
