@@ -89,7 +89,6 @@ std::unique_ptr<Stage> SidePassScenario::CreateStage(
 bool SidePassScenario::IsTransferable(const Scenario& target_scenario,
                                       const Frame& frame) {
   // Sanity checks.
-  return false;
   if (frame.reference_line_info().size() > 1) {
     return false;
   }

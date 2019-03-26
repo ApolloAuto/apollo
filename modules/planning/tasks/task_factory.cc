@@ -29,7 +29,6 @@
 #include "modules/planning/tasks/deciders/open_space_roi_decider.h"
 #include "modules/planning/tasks/deciders/path_assessment_decider.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider.h"
-#include "modules/planning/tasks/deciders/path_assessment_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_path_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_safety.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
