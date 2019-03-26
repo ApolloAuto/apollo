@@ -96,7 +96,6 @@ bool PredictionComponent::Proc(
   }
 
   // Update relative map if needed
-  // AdapterManager::Observe();
   if (FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Relative map is empty.";
     return false;
