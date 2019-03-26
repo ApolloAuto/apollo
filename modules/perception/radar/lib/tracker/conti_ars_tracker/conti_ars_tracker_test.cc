@@ -27,17 +27,16 @@ namespace perception {
 namespace radar {
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_init_test) {
-  BaseTracker* tracker = new ContiArsTracker();
+  std::unique_ptr<BaseTracker> tracker(new ContiArsTracker());
   FLAGS_work_root =
       "/apollo/modules/perception/testdata/"
       "radar/conti_ars_tracker";
-  EXPECT_EQ(tracker->Init(), true);
+  EXPECT_TRUE(tracker->Init());
   EXPECT_EQ(tracker->Name(), "ContiArsTracker");
-  delete tracker;
 }
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_track_test) {
-  BaseTracker* tracker = new ContiArsTracker();
+  std::unique_ptr<BaseTracker> tracker(new ContiArsTracker());
   FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   tracker->Init();
   base::Frame radar_frame;
@@ -54,8 +53,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_track_test) {
   TrackerOptions options;
   base::FramePtr tracked_frame(new base::Frame);
   bool state = tracker->Track(radar_frame, options, tracked_frame);
-  EXPECT_EQ(state, true);
-  delete tracker;
+  EXPECT_TRUE(state);
 }
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_collect_test) {
@@ -66,7 +64,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_collect_test) {
   double timestamp = 123456789.0;
   RadarTrackPtr radar_track(new RadarTrack(object, timestamp));
 
-  ContiArsTracker* tracker = new ContiArsTracker();
+  std::unique_ptr<ContiArsTracker> tracker(new ContiArsTracker());
   FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   tracker->Init();
   tracker->track_manager_->ClearTracks();
@@ -77,7 +75,6 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_collect_test) {
   RadarTrack::SetTrackedTimesThreshold(0);
   tracker->CollectTrackedFrame(tracked_frame);
   EXPECT_EQ(tracked_frame->objects.size(), 1);
-  delete tracker;
 }
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_unassigned_test) {
@@ -95,7 +92,7 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_unassigned_test) {
   radar_frame.timestamp =
       timestamp + ContiArsTracker::s_tracking_time_win_ + 1e-5;
 
-  ContiArsTracker* tracker = new ContiArsTracker();
+  std::unique_ptr<ContiArsTracker> tracker(new ContiArsTracker());
   FLAGS_work_root = "./radar_test_data/conti_ars_tracker";
   tracker->Init();
   tracker->track_manager_->ClearTracks();
@@ -122,7 +119,6 @@ TEST(ContiArsTrackerTest, conti_ars_tracker_unassigned_test) {
   tracker->UpdateUnassignedTracks(radar_frame, unassigned_tracks);
   tracker->track_manager_->RemoveLostTracks();
   EXPECT_EQ(tracker->track_manager_->GetTracks().size(), 0);
-  delete tracker;
 }
 
 }  // namespace radar
