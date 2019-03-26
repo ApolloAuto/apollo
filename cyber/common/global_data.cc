@@ -167,12 +167,11 @@ uint64_t GlobalData::RegisterNode(const std::string& node_name) {
   while (node_id_map_.Has(id)) {
     std::string* name = nullptr;
     node_id_map_.Get(id, &name);
-    if (node_name != *name) {
-      ++id;
-      AWARN << " Node name hash collision: " << node_name << " <=> " << *name;
-    } else {
+    if (node_name == *name) {
       break;
     }
+    ++id;
+    AWARN << " Node name hash collision: " << node_name << " <=> " << *name;
   }
   node_id_map_.Set(id, node_name);
   return id;
@@ -191,12 +190,11 @@ uint64_t GlobalData::RegisterChannel(const std::string& channel) {
   while (channel_id_map_.Has(id)) {
     std::string* name = nullptr;
     channel_id_map_.Get(id, &name);
-    if (channel != *name) {
-      ++id;
-      AWARN << "Channel name hash collision: " << channel << " <=> " << *name;
-    } else {
+    if (channel == *name) {
       break;
     }
+    ++id;
+    AWARN << "Channel name hash collision: " << channel << " <=> " << *name;
   }
   channel_id_map_.Set(id, channel);
   return id;
@@ -215,12 +213,11 @@ uint64_t GlobalData::RegisterService(const std::string& service) {
   while (service_id_map_.Has(id)) {
     std::string* name = nullptr;
     service_id_map_.Get(id, &name);
-    if (service != *name) {
-      ++id;
-      AWARN << "Service name hash collision: " << service << " <=> " << *name;
-    } else {
+    if (service == *name) {
       break;
     }
+    ++id;
+    AWARN << "Service name hash collision: " << service << " <=> " << *name;
   }
   service_id_map_.Set(id, service);
   return id;
@@ -239,12 +236,11 @@ uint64_t GlobalData::RegisterTaskName(const std::string& task_name) {
   while (task_id_map_.Has(id)) {
     std::string* name = nullptr;
     task_id_map_.Get(id, &name);
-    if (task_name != *name) {
-      ++id;
-      AWARN << "Task name hash collision: " << task_name << " <=> " << *name;
-    } else {
+    if (task_name == *name) {
       break;
     }
+    ++id;
+    AWARN << "Task name hash collision: " << task_name << " <=> " << *name;
   }
   task_id_map_.Set(id, task_name);
   return id;
