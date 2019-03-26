@@ -14,25 +14,74 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/common/util/util.h"
 
+#include <cmath>
+#include <limits>
 #include <vector>
 
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
+namespace util {
 
+using common::VehicleState;
 using hdmap::PathOverlap;
 using perception::TrafficLight;
+using routing::RoutingResponse;
+
+bool IsVehicleStateValid(const VehicleState& vehicle_state) {
+  if (std::isnan(vehicle_state.x()) || std::isnan(vehicle_state.y()) ||
+      std::isnan(vehicle_state.z()) || std::isnan(vehicle_state.heading()) ||
+      std::isnan(vehicle_state.kappa()) ||
+      std::isnan(vehicle_state.linear_velocity()) ||
+      std::isnan(vehicle_state.linear_acceleration())) {
+    return false;
+  }
+  return true;
+}
+
+bool IsDifferentRouting(const RoutingResponse& first,
+                        const RoutingResponse& second) {
+  if (first.has_header() && second.has_header()) {
+    if (first.header().sequence_num() != second.header().sequence_num()) {
+      return true;
+    }
+    return false;
+  } else {
+    return true;
+  }
+}
+
+double GetADCStopDeceleration(const double adc_front_edge_s,
+                              const double stop_line_s) {
+  double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  if (adc_speed < FLAGS_max_stop_speed) {
+    return 0.0;
+  }
+
+  double stop_distance = 0;
+
+  if (stop_line_s > adc_front_edge_s) {
+    stop_distance = stop_line_s - adc_front_edge_s;
+  }
+  if (stop_distance < 1e-5) {
+    return std::numeric_limits<double>::max();
+  }
+  return (adc_speed * adc_speed) / (2 * stop_distance);
+}
 
 /*
  * @brief: check if a stop_sign_overlap is still along reference_line
  */
-bool CheckStopSignDone(const ReferenceLineInfo& reference_line_info,
-                       const std::string& stop_sign_overlap_id) {
+bool CheckStopSignOnReferenceLine(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& stop_sign_overlap_id) {
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
   auto stop_sign_overlap_it =
@@ -46,12 +95,14 @@ bool CheckStopSignDone(const ReferenceLineInfo& reference_line_info,
 /*
  * @brief: check if a traffic_light_overlap is still along reference_line
  */
-bool CheckTrafficLightDone(const ReferenceLineInfo& reference_line_info,
-                           const std::string& traffic_light_overlap_id) {
+bool CheckTrafficLightOnReferenceLine(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& traffic_light_overlap_id) {
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
   auto traffic_light_overlap_it =
-      std::find_if(traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
+      std::find_if(traffic_light_overlaps.begin(),
+                   traffic_light_overlaps.end(),
                    [&traffic_light_overlap_id](const PathOverlap& overlap) {
                      return overlap.object_id == traffic_light_overlap_id;
                    });
@@ -103,6 +154,6 @@ bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info) {
   return true;
 }
 
-}  // namespace scenario
+}  // namespace util
 }  // namespace planning
 }  // namespace apollo

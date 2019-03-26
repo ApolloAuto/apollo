@@ -35,8 +35,8 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -355,7 +355,7 @@ Status Frame::InitFrameData() {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
   vehicle_state_ = common::VehicleStateProvider::Instance()->vehicle_state();
-  if (!IsVehicleStateValid(vehicle_state_)) {
+  if (!util::IsVehicleStateValid(vehicle_state_)) {
     AERROR << "Adc init point is not set";
     return Status(ErrorCode::PLANNING_ERROR, "Adc init point is not set");
   }
