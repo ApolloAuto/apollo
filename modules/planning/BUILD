@@ -72,7 +72,7 @@ cc_library(
         "//modules/planning/tasks:task_factory",
         "//modules/planning/tasks/smoothers:smoother",
         "//modules/planning/traffic_rules:traffic_decider",
-        "//modules/planning/util:util_lib",
+        "//modules/planning/common/util:util_lib",
         "//modules/prediction/proto:prediction_proto",
     ],
 )

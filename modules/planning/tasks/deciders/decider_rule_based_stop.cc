@@ -27,8 +27,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/util/util.h"
+#include "modules/planning/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -163,7 +162,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     }
 
     auto signal_color =
-        scenario::GetSignal(traffic_light_overlap.object_id).color();
+        util::GetSignal(traffic_light_overlap.object_id).color();
     ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
            << "] start_s[" << traffic_light_overlap.start_s << "] color["
            << signal_color << "]";
@@ -172,7 +171,7 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     }
 
     // Red/Yellow/Unown: check deceleration
-    const double stop_deceleration = GetADCStopDeceleration(
+    const double stop_deceleration = util::GetADCStopDeceleration(
         adc_front_edge_s, traffic_light_overlap.start_s);
     ADEBUG << "stop_deceleration[" << stop_deceleration << "]";
 

@@ -30,13 +30,13 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory_stitcher.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/on_lane_planning.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/tasks/task_factory.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
-#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -213,7 +213,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
                         ->mutable_main_decision()
                         ->mutable_not_ready();
 
-  if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
+  if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
     std::string msg("Update VehicleStateProvider failed");
     AERROR << msg;
     not_ready->set_reason(msg);
@@ -225,7 +225,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  if (IsDifferentRouting(last_routing_, *local_view_.routing)) {
+  if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
     PlanningContext::MutablePlanningStatus()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);

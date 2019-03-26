@@ -65,7 +65,8 @@ Stage::StageStatus TrafficLightUnprotectedLeftTurnStageCreep::Process(
   // check if the traffic_light is still along reference_line
   std::string traffic_light_overlap_id =
       PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (CheckTrafficLightDone(reference_line_info, traffic_light_overlap_id)) {
+  if (util::CheckTrafficLightOnReferenceLine(
+      reference_line_info, traffic_light_overlap_id)) {
     return FinishScenario();
   }
 
