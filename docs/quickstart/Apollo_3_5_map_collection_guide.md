@@ -5,7 +5,7 @@ This guide describes the process of map data collection for Apollo 3.5.
 ## Hardware and Software Requirement
 Please refer to
 [Apollo 3.5 Hardware and System Installation Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_3_5_hardware_system_installation_guide.md)
-for the steps to install the hardware components. IN order to proceed with Data collection, we need to use a single 16-Line LiDAR for traffic light detection placed on top of the car, tilted upwards as described below:
+for the steps to install the hardware components. In order to proceed with Data collection, we need to use a single 16-Line LiDAR for traffic light detection placed on top of the car, tilted upwards as described below:
 
 ### Installation of VLP-16 lidar
 
@@ -40,6 +40,8 @@ for Sensor Calibration information.
 2. Please make sure that the camera lens' are clean.
 
 3. **Driving speed:** Try to keep you speed below 60 km/h (~ 37 mph). For roads with a higher speed limit, drive additional laps of the route (at least 2 or 3 more) to ensure accurate data collection.
+
+4. Refer to the [best practices guide](apollo_3_5_map_data_collection_best_practices_guide.md) for information regarding setup and post collection steps
 
 
 ## Data Collection Steps
