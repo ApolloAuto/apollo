@@ -1446,7 +1446,7 @@ body {
         }
 
         .drive-event-row {
-            span {
+            .event-time {
                 position: relative;
                 padding: 10px 5px 10px 10px;
                 background: #101315;
@@ -1521,6 +1521,16 @@ body {
         .submit-button:active {
             @extend %drive-event-button;
             background: #383838;
+        }
+
+        .multiple-items {
+            display: flex;
+            justify-content: flex-start;
+            justify-content: space-between;
+
+            padding: 0px;
+            border: none;
+            background: #1D2226;
         }
     }
 }
