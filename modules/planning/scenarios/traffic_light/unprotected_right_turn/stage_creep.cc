@@ -33,6 +33,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
@@ -73,8 +74,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
   for (const auto& traffic_light_overlap :
        PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
     // check if the traffic_light is still along reference_line
-    if (util::CheckTrafficLightOnReferenceLine(reference_line_info,
-                                        traffic_light_overlap.object_id)) {
+    if (planning::util::CheckTrafficLightOnReferenceLine(
+        reference_line_info, traffic_light_overlap.object_id)) {
       continue;
     }
 
@@ -83,7 +84,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
                                               false);
 
     auto signal_color =
-        util::GetSignal(traffic_light_overlap.object_id).color();
+        scenario::util::GetSignal(traffic_light_overlap.object_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id
            << "] start_s[" << traffic_light_overlap.start_s << "] color["
            << signal_color << "]";

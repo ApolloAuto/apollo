@@ -26,6 +26,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -53,7 +54,7 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
   for (const auto& traffic_light_overlap :
        PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
     // check if the traffic_light is still along reference_line
-    if (util::CheckTrafficLightOnReferenceLine(
+    if (planning::util::CheckTrafficLightOnReferenceLine(
         reference_line_info, traffic_light_overlap.object_id)) {
       continue;
     }
@@ -66,7 +67,7 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
     const double distance_adc_to_stop_line =
         traffic_light_overlap.start_s - adc_front_edge_s;
     auto signal_color =
-        util::GetSignal(traffic_light_overlap.object_id).color();
+        scenario::util::GetSignal(traffic_light_overlap.object_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id
            << "] start_s[" << traffic_light_overlap.start_s
            << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line

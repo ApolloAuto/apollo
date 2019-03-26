@@ -14,36 +14,37 @@
  * limitations under the License.
  *****************************************************************************/
 
-#pragma once
+#include "modules/planning/scenarios/util/util.h"
 
-#include <string>
-
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/common/reference_line_info.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/common/util/map_util.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
+namespace scenario {
 namespace util {
 
-bool IsVehicleStateValid(const apollo::common::VehicleState& vehicle_state);
+using perception::TrafficLight;
 
-bool IsDifferentRouting(const apollo::routing::RoutingResponse& first,
-                        const apollo::routing::RoutingResponse& second);
+/*
+ * @brief: read signal info
+ */
+TrafficLight GetSignal(const std::string& traffic_light_id) {
+  const auto* result = common::util::FindPtrOrNull(
+      PlanningContext::GetScenarioInfo()->traffic_lights, traffic_light_id);
 
-double GetADCStopDeceleration(const double adc_front_edge_s,
-                              const double stop_line_s);
-
-bool CheckStopSignOnReferenceLine(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& stop_sign_overlap_id);
-
-bool CheckTrafficLightOnReferenceLine(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& traffic_light_overlap_id);
-
-bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info);
+  if (result == nullptr) {
+    TrafficLight traffic_light;
+    traffic_light.set_id(traffic_light_id);
+    traffic_light.set_color(TrafficLight::UNKNOWN);
+    traffic_light.set_confidence(0.0);
+    traffic_light.set_tracking_time(0.0);
+    return traffic_light;
+  }
+  return *result;
+}
 
 }  // namespace util
+}  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
