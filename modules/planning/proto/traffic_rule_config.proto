@@ -112,6 +112,7 @@ message TrafficLightConfig {
   optional double stop_distance = 2 [default = 1.0];  // meter
   // max deceleration
   optional double max_stop_deceleration = 3 [default = 4.0];
+  optional double signal_expire_time_sec = 4 [default = 5.0];
 }
 
 // TODO(all) migrate all other traffic rules to pb config

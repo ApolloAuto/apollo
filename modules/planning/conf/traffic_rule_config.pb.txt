@@ -95,5 +95,6 @@ config: {
   traffic_light {
     stop_distance: 1.0
     max_stop_deceleration: 6.0
+    signal_expire_time_sec: 5.0
   }
 }
