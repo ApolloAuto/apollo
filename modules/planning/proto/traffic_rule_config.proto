@@ -106,6 +106,14 @@ message ReroutingConfig {
   optional double prepare_rerouting_time = 2 [default = 2.0];  // seconds
 }
 
+message TrafficLightConfig {
+  optional bool enabled = 1 [default = true];
+  // stop distance(m) to the stop line of the traffic light
+  optional double stop_distance = 2 [default = 1.0];  // meter
+  // max deceleration
+  optional double max_stop_deceleration = 3 [default = 4.0];
+}
+
 // TODO(all) migrate all other traffic rules to pb config
 message TrafficRuleConfig {
   enum RuleId {
@@ -117,7 +125,8 @@ message TrafficRuleConfig {
     PULL_OVER = 6;
     REFERENCE_LINE_END = 7;
     REROUTING = 8;
-    SIGNAL_LIGHT = 9;
+    STOP_SIGN = 9;
+    TRAFFIC_LIGHT = 10;
   }
   optional RuleId rule_id = 1;
   optional bool enabled = 2;
@@ -130,6 +139,7 @@ message TrafficRuleConfig {
     PullOverConfig pull_over = 8;
     ReferenceLineEndConfig reference_line_end = 9;
     ReroutingConfig rerouting = 10;
+    TrafficLightConfig traffic_light = 11;
   }
 }
 

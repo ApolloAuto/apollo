@@ -122,7 +122,7 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   double first_order_bounds = AdjustLateralDerivativeBounds(
       init_state.first[1], init_state.second[1], init_state.second[2],
       FLAGS_lateral_derivative_bound_default);
-  AERROR << "adjusted lateral derivative bound from \t"
+  ADEBUG << "adjusted lateral derivative bound from \t"
          << FLAGS_lateral_derivative_bound_default << "\t"
          << first_order_bounds;
   // TODO(all): temp. disable AdjustLateralDerivativeBounds, enable later
