@@ -102,7 +102,8 @@ Status PathBoundsDecider::Process(
   if (config.path_bounds_decider_config().is_lane_borrowing()) {
     // Try borrowing from left and from right neighbor lane.
     lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
-                             LaneBorrowInfo::RIGHT_BORROW};
+                             LaneBorrowInfo::RIGHT_BORROW,
+                             LaneBorrowInfo::NO_BORROW};
   } else {
     // Only use self-lane with no lane borrowing
     lane_borrow_info_list = {LaneBorrowInfo::NO_BORROW};
@@ -110,8 +111,10 @@ Status PathBoundsDecider::Process(
   // Try every possible lane-borrow option:
   for (const auto& lane_borrow_info : lane_borrow_info_list) {
     PathBound regular_path_bound;
+    std::string blocking_obstacle_id = "";
     std::string path_bounds_msg = GenerateRegularPathBound(
-        *reference_line_info, lane_borrow_info, &regular_path_bound);
+        *reference_line_info, lane_borrow_info, &regular_path_bound,
+        &blocking_obstacle_id);
     if (path_bounds_msg != "") {
       continue;
     }
@@ -128,12 +131,21 @@ Status PathBoundsDecider::Process(
     }
     candidate_path_boundaries.emplace_back(std::get<0>(regular_path_bound[0]),
         kPathBoundsDeciderResolution, regular_path_bound_pair);
-    candidate_path_boundaries.back().set_label("regular");
+    std::string path_label = "";
+    switch (lane_borrow_info) {
+      case LaneBorrowInfo::LEFT_BORROW:
+        path_label = "left";
+        break;
+      case LaneBorrowInfo::RIGHT_BORROW:
+        path_label = "right";
+        break;
+      default:
+        path_label = "self";
+        break;
+    }
+    candidate_path_boundaries.back().set_label("regular/" + path_label);
     candidate_path_boundaries.back().set_blocking_obstacle_id(
-        blocking_obstacle_id_);
-    // TODO(jiacheng): don't forget to set blocking obstacle info here.
-    // Need to remove the folowing line:
-    // reference_line_info->SetBlockingObstacleId(blocking_obstacle_id_);
+        blocking_obstacle_id);
   }
 
   // Success
@@ -149,7 +161,6 @@ void PathBoundsDecider::InitPathBoundsDecider(
   const common::TrajectoryPoint& planning_start_point =
       frame.PlanningStartPoint();
   // Reset variables.
-  blocking_obstacle_id_ = "";
   adc_frenet_s_ = 0.0;
   adc_frenet_l_ = 0.0;
   adc_lane_width_ = 0.0;
@@ -177,7 +188,8 @@ void PathBoundsDecider::InitPathBoundsDecider(
 
 std::string PathBoundsDecider::GenerateRegularPathBound(
     const ReferenceLineInfo& reference_line_info,
-    const LaneBorrowInfo lane_borrow_info, PathBound* const path_bound) {
+    const LaneBorrowInfo lane_borrow_info, PathBound* const path_bound,
+    std::string* const blocking_obstacle_id) {
   // 1. Initialize the path boundaries to be an indefinitely large area.
   if (!InitPathBoundary(reference_line_info.reference_line(),
                         path_bound)) {
@@ -200,7 +212,8 @@ std::string PathBoundsDecider::GenerateRegularPathBound(
 
   // 3. Fine-tune the boundary based on static obstacles
   if (!GetBoundaryFromStaticObstacles(
-          reference_line_info.path_decision(), path_bound)) {
+          reference_line_info.path_decision(), path_bound,
+          blocking_obstacle_id)) {
     const std::string msg =
         "Failed to decide fine tune the boundaries after "
         "taking into consideration all static obstacles.";
@@ -249,9 +262,6 @@ bool PathBoundsDecider::InitPathBoundary(
   // Sanity checks.
   CHECK_NOTNULL(path_bound);
   path_bound->clear();
-
-  // TODO(jiacheng): remove this later.
-  blocking_obstacle_id_ = "";
 
   // Starting from ADC's current position, increment until the horizon, and
   // set lateral bounds to be infinite at every spot.
@@ -406,7 +416,8 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
 // obstacles whose headings differ from road-headings a lot.
 // TODO(all): (future work) this can be improved in the future.
 bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
-    const PathDecision& path_decision, PathBound* const path_boundaries) {
+    const PathDecision& path_decision, PathBound* const path_boundaries,
+    std::string* const blocking_obstacle_id) {
   // Preprocessing.
   auto indexed_obstacles = path_decision.obstacles();
   auto sorted_obstacles = SortObstaclesForSweepLine(indexed_obstacles);
@@ -442,8 +453,6 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
           //   - Update the left/right bound accordingly.
           //   - If boundaries blocked, then decide whether can side-pass.
           //   - If yes, then borrow neighbor lane to side-pass.
-          // TODO(all): (future work) can make this DFS all possible
-          // directions. (with proper early stopping mechanisms to save time)
           if (curr_obstacle_l_min + curr_obstacle_l_max < center_line * 2) {
             // Obstacle is to the right of center-line, should pass from left.
             obs_id_to_direction[curr_obstacle_id] = true;
@@ -452,7 +461,7 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
                     i, *left_bounds.begin(), *right_bounds.begin(),
                     path_boundaries, &center_line)) {
               path_blocked_idx = static_cast<int>(i);
-              blocking_obstacle_id_ = curr_obstacle_id;
+              *blocking_obstacle_id = curr_obstacle_id;
               break;
             }
           } else {
@@ -463,7 +472,7 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
                     i, *left_bounds.begin(), *right_bounds.begin(),
                     path_boundaries, &center_line)) {
               path_blocked_idx = static_cast<int>(i);
-              blocking_obstacle_id_ = curr_obstacle_id;
+              *blocking_obstacle_id = curr_obstacle_id;
               break;
             }
           }
