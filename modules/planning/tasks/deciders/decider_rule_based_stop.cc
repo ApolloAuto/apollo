@@ -55,8 +55,6 @@ Status DeciderRuleBasedStop::Process(Frame* frame,
 
   CheckStopSign(frame, reference_line_info);
 
-  CheckTrafficLight(frame, reference_line_info);
-
   CheckOpenSpacePreStop(frame, reference_line_info);
 
   return Status::OK();
@@ -103,94 +101,6 @@ void DeciderRuleBasedStop::CheckStopSign(
         StopReasonCode::STOP_REASON_STOP_SIGN,
         PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles, frame,
         reference_line_info);
-  }
-}
-
-void DeciderRuleBasedStop::CheckTrafficLight(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-
-  const auto& traffic_light_config =
-      config_.decider_rule_based_stop_config().traffic_light();
-
-  if (!traffic_light_config.enabled()) {
-    return;
-  }
-
-  const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
-
-  const std::vector<PathOverlap>& traffic_light_overlaps =
-      reference_line_info->reference_line().map_path().signal_overlaps();
-  for (const auto& traffic_light_overlap : traffic_light_overlaps) {
-    if (traffic_light_overlap.end_s <= adc_back_edge_s) {
-      continue;
-    }
-
-    const auto& stop_done_overlap_ids =
-        PlanningContext::GetScenarioInfo()->stop_done_overlap_ids;
-    if (stop_done_overlap_ids.end() !=
-        std::find(stop_done_overlap_ids.begin(), stop_done_overlap_ids.end(),
-                  traffic_light_overlap.object_id)) {
-      continue;
-    }
-
-    // work around incorrect s-projection along round routing
-    constexpr double kSDiscrepanceTolerance = 10.0;
-    const auto& reference_line = reference_line_info->reference_line();
-    common::SLPoint traffic_light_sl;
-    traffic_light_sl.set_s(traffic_light_overlap.start_s);
-    traffic_light_sl.set_l(0);
-    common::math::Vec2d traffic_light_point;
-    reference_line.SLToXY(traffic_light_sl, &traffic_light_point);
-    common::math::Vec2d adc_position = {
-        common::VehicleStateProvider::Instance()->x(),
-        common::VehicleStateProvider::Instance()->y()};
-    const double distance =
-        common::util::DistanceXY(traffic_light_point, adc_position);
-    const double s_distance = traffic_light_overlap.start_s - adc_front_edge_s;
-    ADEBUG << "traffic_light[" << traffic_light_overlap.object_id
-           << "] start_s[" << traffic_light_overlap.start_s
-           << "] s_distance[" << s_distance
-           << "] actual_distance[" << distance << "]";
-    if (s_distance >= 0 &&
-        fabs(s_distance - distance) > kSDiscrepanceTolerance) {
-      ADEBUG << "SKIP traffic_light[" << traffic_light_overlap.object_id
-             << "] close in position, but far away along reference line";
-      continue;
-    }
-
-    auto signal_color =
-        util::GetSignal(traffic_light_overlap.object_id).color();
-    ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
-           << "] start_s[" << traffic_light_overlap.start_s << "] color["
-           << signal_color << "]";
-    if (signal_color == TrafficLight::GREEN) {
-      continue;
-    }
-
-    // Red/Yellow/Unown: check deceleration
-    const double stop_deceleration = util::GetADCStopDeceleration(
-        adc_front_edge_s, traffic_light_overlap.start_s);
-    ADEBUG << "stop_deceleration[" << stop_deceleration << "]";
-
-    if (stop_deceleration > traffic_light_config.max_stop_deceleration()) {
-      AWARN << "stop_deceleration too big to achieve.  SKIP red light";
-      continue;
-    }
-
-    const std::string stop_wall_id =
-        TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_overlap.object_id;
-    const double stop_line_s = traffic_light_overlap.start_s;
-    const double stop_distance = traffic_light_config.stop_distance();
-
-    ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
-           << "] stop_line_s[" << stop_line_s << "]";
-    std::vector<std::string> wait_for_obstacles;
-    BuildStopDecision(stop_wall_id, stop_line_s, stop_distance,
-                      StopReasonCode::STOP_REASON_SIGNAL, wait_for_obstacles,
-                      frame, reference_line_info);
   }
 }
 

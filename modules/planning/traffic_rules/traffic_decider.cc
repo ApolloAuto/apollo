@@ -32,6 +32,7 @@
 #include "modules/planning/traffic_rules/pull_over.h"
 #include "modules/planning/traffic_rules/reference_line_end.h"
 #include "modules/planning/traffic_rules/rerouting.h"
+#include "modules/planning/traffic_rules/traffic_light.h"
 
 namespace apollo {
 namespace planning {
@@ -74,6 +75,10 @@ void TrafficDecider::RegisterRules() {
   s_rule_factory.Register(TrafficRuleConfig::REROUTING,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new Rerouting(config);
+                          });
+  s_rule_factory.Register(TrafficRuleConfig::TRAFFIC_LIGHT,
+                          [](const TrafficRuleConfig &config) -> TrafficRule * {
+                            return new TrafficLight(config);
                           });
 }
 

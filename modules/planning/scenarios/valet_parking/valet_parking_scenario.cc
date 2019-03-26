@@ -108,7 +108,7 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
     target_parking_spot_id =
         frame.local_view().routing->routing_request().parking_space().id().id();
   } else {
-    AERROR << "No parking space id from routing";
+    ADEBUG << "No parking space id from routing";
     return false;
   }
 
@@ -123,7 +123,7 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
 
   if (!SearchTargetParkingSpotOnPath(nearby_path, target_parking_spot_id,
                                      &parking_space_overlap)) {
-    AERROR << "No such parking spot found after searching all path forward "
+    ADEBUG << "No such parking spot found after searching all path forward "
               "possible"
            << target_parking_spot_id;
     return false;
@@ -131,7 +131,7 @@ bool ValetParkingScenario::IsTransferable(const Frame& frame,
 
   if (!CheckDistanceToParkingSpot(vehicle_state, nearby_path,
                                   parking_start_range, parking_space_overlap)) {
-    AERROR << "target parking spot found, but too far, distance larger than "
+    ADEBUG << "target parking spot found, but too far, distance larger than "
               "pre-defined distance"
            << target_parking_spot_id;
     return false;

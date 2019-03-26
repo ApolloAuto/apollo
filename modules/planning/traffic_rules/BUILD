@@ -14,6 +14,7 @@ cc_library(
         "pull_over.cc",
         "reference_line_end.cc",
         "rerouting.cc",
+        "traffic_light.cc",
     ],
     hdrs = [
         "backside_vehicle.h",
@@ -25,6 +26,7 @@ cc_library(
         "pull_over.h",
         "reference_line_end.h",
         "rerouting.h",
+        "traffic_light.h",
         "traffic_rule.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
