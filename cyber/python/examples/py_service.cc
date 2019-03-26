@@ -50,7 +50,7 @@ int service_callback(const char *channel_name) {
   std::string org_data;
   driver_msg.SerializeToString(&org_data);
   server->write(org_data);
-  return 1;
+  return 0;
 }
 
 int main(int argc, char *argv[]) {
