@@ -30,8 +30,8 @@
 #include "modules/perception/proto/perception_obstacle.pb.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/proto/sl_boundary.pb.h"
-#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -506,7 +506,7 @@ bool PullOver::CheckPullOverComplete() {
 
 bool PullOver::CheckStopDeceleration(const double stop_line_s) const {
   const double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
-  double stop_deceleration = GetADCStopDeceleration(
+  double stop_deceleration = util::GetADCStopDeceleration(
       adc_front_edge_s, stop_line_s);
   return (stop_deceleration <= config_.pull_over().max_stop_deceleration());
 }

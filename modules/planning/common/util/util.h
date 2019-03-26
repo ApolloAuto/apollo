@@ -18,22 +18,34 @@
 
 #include <string>
 
+#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/planning/common/reference_line_info.h"
+#include "modules/routing/proto/routing.pb.h"
 
 namespace apollo {
 namespace planning {
-namespace scenario {
+namespace util {
 
-bool CheckStopSignDone(const ReferenceLineInfo& reference_line_info,
-                       const std::string& stop_sign_overlap_id);
+bool IsVehicleStateValid(const apollo::common::VehicleState& vehicle_state);
 
-bool CheckTrafficLightDone(const ReferenceLineInfo& reference_line_info,
-                           const std::string& traffic_light_overlap_id);
+bool IsDifferentRouting(const apollo::routing::RoutingResponse& first,
+                        const apollo::routing::RoutingResponse& second);
+
+double GetADCStopDeceleration(const double adc_front_edge_s,
+                              const double stop_line_s);
+
+bool CheckStopSignOnReferenceLine(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& stop_sign_overlap_id);
+
+bool CheckTrafficLightOnReferenceLine(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& traffic_light_overlap_id);
 
 perception::TrafficLight GetSignal(const std::string& signal_id);
 
 bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info);
 
-}  // namespace scenario
+}  // namespace util
 }  // namespace planning
 }  // namespace apollo

@@ -27,6 +27,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
@@ -34,7 +35,6 @@
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
-#include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
@@ -252,7 +252,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       traffic_light_scenario = true;
 
       const auto& signal_color =
-          scenario::GetSignal(traffic_light_overlap.object_id).color();
+          util::GetSignal(traffic_light_overlap.object_id).color();
       ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
              << "] start_s[" << traffic_light_overlap.start_s
              << "] color[" << signal_color << "]";

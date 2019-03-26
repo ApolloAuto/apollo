@@ -22,7 +22,7 @@
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -84,7 +84,7 @@ TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
     }
   }
 
-  if (!scenario::CheckInsidePnCJunction(reference_line_info)) {
+  if (!util::CheckInsidePnCJunction(reference_line_info)) {
     return FinishStage();
   }
 
