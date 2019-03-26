@@ -48,7 +48,7 @@ export default class AutoDrivingCar {
             x: 1, y: 1, z: 1}, object => {
                 this.mesh = object;
                 this.mesh.rotation.x = Math.PI / 2;
-                this.mesh.visible = STORE.options[properties.menuOptionName];
+                this.mesh.visible = false;
                 scene.add(this.mesh);
             });
     }
