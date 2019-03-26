@@ -89,9 +89,10 @@ bool Info::Display(const std::string& file) {
     AERROR << "read index section of the file fail. file: " << file;
     return false;
   }
-
+  
+  Index idx = file_reader.GetIndex();
   // channel info
-  for (int i = 0; i < file_reader.GetIndex().indexes_size(); ++i) {
+  for (int i = 0; i < idx.indexes_size(); ++i) {
     ChannelCache* cache = idx.mutable_indexes(i)->mutable_channel_cache();
     if (idx.mutable_indexes(i)->type() == SectionType::SECTION_CHANNEL) {
       if (i == 0) {
