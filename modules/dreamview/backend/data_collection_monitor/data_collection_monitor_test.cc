@@ -72,41 +72,41 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
     bool hasField;
 
     hasField = JsonUtil::GetNumberFromJson(progress, "mps < 10", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(0.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "mps >= 10", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(50.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Throttle == 30%", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(0.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Throttle != 30%", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(25.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Brake <= 30%", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(50.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Brake > 30%", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(0.0, value);
 
     hasField =
         JsonUtil::GetNumberFromJson(progress, "Left steering < 20%", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(0.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Right steering 20% ~ 40%",
                                            &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(10.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Overall", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(10.0, value);
   }
 
@@ -119,25 +119,25 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
     bool hasField;
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Brake <= 30%", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(100.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Throttle != 30%", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(75.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Right steering 20% ~ 40%",
                                            &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(30.0, value);
 
     hasField = JsonUtil::GetNumberFromJson(progress, "Overall", &value);
-    EXPECT_EQ(true, hasField);
+    EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(30.0, value);
   }
 
   data_collection_monitor_->Stop();
-  EXPECT_EQ(false, data_collection_monitor_->IsEnabled());
+  EXPECT_FALSE(data_collection_monitor_->IsEnabled());
 }
 
 }  // namespace dreamview

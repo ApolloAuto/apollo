@@ -102,9 +102,9 @@ TEST_F(ConfigManagerTest, TestModelConfig) {
 
   bool bool_value = false;
   EXPECT_TRUE(model_config->get_value("bool_value_true", &bool_value));
-  EXPECT_EQ(bool_value, true);
+  EXPECT_TRUE(bool_value);
   EXPECT_TRUE(model_config->get_value("bool_value_false", &bool_value));
-  EXPECT_EQ(bool_value, false);
+  EXPECT_FALSE(bool_value);
 
   std::vector<int> int_list;
   EXPECT_TRUE(model_config->get_value("array_p1", &int_list));
@@ -124,7 +124,7 @@ TEST_F(ConfigManagerTest, TestModelConfig) {
   std::vector<bool> bool_list;
   EXPECT_TRUE(model_config->get_value("array_bool", &bool_list));
   EXPECT_EQ(bool_list.size(), 4u);
-  EXPECT_EQ(bool_list[2], true);
+  EXPECT_TRUE(bool_list[2]);
 
   // not exist
   EXPECT_FALSE(model_config->get_value("array_p3", &double_list));

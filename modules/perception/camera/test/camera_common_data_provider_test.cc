@@ -294,9 +294,9 @@ TEST(DataProvider, test_undistortion) {
   init_options.do_undistortion = true;
   init_options.sensor_name = "none_onsemi_obstacle";
   init_options.device_id = 0;
-  EXPECT_EQ(data_provider.Init(init_options), false);
+  EXPECT_FALSE(data_provider.Init(init_options));
   init_options.sensor_name = "onsemi_obstacle";
-  EXPECT_EQ(data_provider.Init(init_options), true);
+  EXPECT_TRUE(data_provider.Init(init_options));
 
   EXPECT_TRUE(
       data_provider.FillImageData(img.rows, img.cols, img.data, "bgr8"));
