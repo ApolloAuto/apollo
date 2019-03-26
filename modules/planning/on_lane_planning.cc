@@ -417,8 +417,7 @@ Status OnLanePlanning::Plan(
       ADEBUG << "Open space debug information added!";
       // call open space info load debug
       // TODO(Runxin): create a new flag to enable openspace chart
-      ExportOpenSpaceChart(trajectory_pb->debug(),
-                           ptr_debug);
+      ExportOpenSpaceChart(trajectory_pb->debug(), ptr_debug);
     }
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
@@ -610,6 +609,7 @@ void OnLanePlanning::ExportOpenSpaceChart(
   // Export Trajectory Visualization Chart.
   if (FLAGS_enable_record_debug) {
     AddOpenSpaceOptimizerResult(debug_info, debug_chart);
+    AddPartitionedTrajectory(debug_info, debug_chart);
     // AddStitchSpeedProfile(debug);
     // AddPublishedSpeed(debug, ptr_trajectory_pb);
     // AddPublishedAcceleration(debug, ptr_trajectory_pb);
@@ -685,6 +685,65 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   (*warm_start_properties)["lineTension"] = "0";
   (*warm_start_properties)["fill"] = "false";
   (*warm_start_properties)["showLine"] = "true";
+}
+
+void OnLanePlanning::AddPartitionedTrajectory(
+    const planning_internal::Debug& debug_info,
+    planning_internal::Debug* debug_chart) {
+  // if open space info provider success run
+  if (!frame_->open_space_info().open_space_provider_success()) {
+    return;
+  }
+  // if empty return
+  auto chart = debug_chart->mutable_planning_data()->add_chart();
+  auto open_space_debug = debug_info.planning_data().open_space();
+
+  auto chosen_trajectories = open_space_debug.chosen_trajectory().trajectory();
+  if (chosen_trajectories.empty() ||
+      chosen_trajectories[0].trajectory_point().empty()) {
+    return;
+  }
+  chart->set_title("Open Space Partitioned Trajectory");
+  // has to define chart boundary first
+  auto chosen_trajectory =
+      open_space_debug.chosen_trajectory().trajectory()[0];
+  double anchor_x = chosen_trajectory.trajectory_point()[0].path_point().x();
+  double anchor_y = chosen_trajectory.trajectory_point()[0].path_point().y();
+  PopulateChartOptions(anchor_x - 10.0, anchor_x + 20.0, "x (meter)",
+                       anchor_y - 20.0, anchor_y + 10.0, "y (meter)",
+                       false, chart);
+  auto* chosen_line = chart->add_line();
+  chosen_line->set_label("chosen");
+  for (const auto& point : chosen_trajectory.trajectory_point()) {
+    auto* point_debug = chosen_line->add_point();
+    point_debug->set_x(point.path_point().x());
+    point_debug->set_y(point.path_point().y());
+  }
+  // Set chartJS's dataset properties
+  auto* chosen_properties = chosen_line->mutable_properties();
+  (*chosen_properties)["borderWidth"] = "2";
+  (*chosen_properties)["pointRadius"] = "0";
+  (*chosen_properties)["lineTension"] = "0";
+  (*chosen_properties)["fill"] = "false";
+  (*chosen_properties)["showLine"] = "true";
+
+  for (const auto& partitioned_trajectory :
+      open_space_debug.partitioned_trajectories().trajectory()) {
+    auto* partition_line = chart->add_line();
+    partition_line->set_label("patitioned");
+    for (const auto& point : partitioned_trajectory.trajectory_point()) {
+      auto* point_debug = partition_line->add_point();
+      point_debug->set_x(point.path_point().x());
+      point_debug->set_y(point.path_point().y());
+    }
+
+    auto* partition_properties = partition_line->mutable_properties();
+    (*partition_properties)["borderWidth"] = "2";
+    (*partition_properties)["pointRadius"] = "0";
+    (*partition_properties)["lineTension"] = "0";
+    (*partition_properties)["fill"] = "false";
+    (*partition_properties)["showLine"] = "true";
+  }
 }
 
 }  // namespace planning
