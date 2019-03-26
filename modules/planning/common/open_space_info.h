@@ -294,7 +294,7 @@ class OpenSpaceInfo {
 
   void sync_debug_instance() { debug_instance_ = *debug_; }
 
-  void RecordDebug();
+  void RecordDebug(apollo::planning_internal::Debug* ptr_debug);
 
  private:
   // @brief vehicle needs to stop first in open space related scenarios
