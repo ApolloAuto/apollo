@@ -29,7 +29,7 @@ TEST_F(RoadGraphTest, General) {
 
   double start_s = 99.0;
   double length = 100.0;
-  RoadGraph road_graph(start_s, length, lane);
+  RoadGraph road_graph(start_s, length, true, lane);
 
   LaneGraph lane_graph;
   EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
@@ -63,7 +63,7 @@ TEST_F(RoadGraphTest, NegativeStartS) {
 
   double start_s = -10.0;
   double length = 50.0;
-  RoadGraph road_graph(start_s, length, lane);
+  RoadGraph road_graph(start_s, length, true, lane);
 
   LaneGraph lane_graph;
   EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
@@ -86,7 +86,7 @@ TEST_F(RoadGraphTest, LengthLongerThanEnd) {
 
   double start_s = 200.0;
   double length = 200.0;
-  RoadGraph road_graph(start_s, length, lane);
+  RoadGraph road_graph(start_s, length, true, lane);
 
   LaneGraph lane_graph;
   EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
@@ -111,7 +111,7 @@ TEST_F(RoadGraphTest, MultipleLaneSequence) {
 
   double start_s = 200.0;
   double length = 200.0;
-  RoadGraph road_graph(start_s, length, lane);
+  RoadGraph road_graph(start_s, length, true, lane);
 
   LaneGraph lane_graph;
   EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
