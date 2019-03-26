@@ -31,10 +31,11 @@
 
 namespace apollo {
 namespace cyber {
+
 class PyNodeManager {
  public:
   PyNodeManager() {
-    topology_ = apollo::cyber::service_discovery::TopologyManager::Instance();
+    topology_ = service_discovery::TopologyManager::Instance();
     sleep(2);
     node_manager_ = topology_->node_manager();
     channel_manager_ = topology_->channel_manager();
@@ -142,16 +143,15 @@ class PyNodeManager {
   }
 
  private:
-  apollo::cyber::service_discovery::TopologyManager* topology_ = nullptr;
-  std::shared_ptr<apollo::cyber::service_discovery::NodeManager> node_manager_;
-  std::shared_ptr<apollo::cyber::service_discovery::ChannelManager>
-      channel_manager_;
+  service_discovery::TopologyManager* topology_ = nullptr;
+  std::shared_ptr<service_discovery::NodeManager> node_manager_;
+  std::shared_ptr<service_discovery::ChannelManager> channel_manager_;
 };
 
 class PyChannelManager {
  public:
   PyChannelManager() {
-    topology_ = apollo::cyber::service_discovery::TopologyManager::Instance();
+    topology_ = service_discovery::TopologyManager::Instance();
     sleep(2);
     node_manager_ = topology_->node_manager();
     channel_manager_ = topology_->channel_manager();
@@ -256,12 +256,11 @@ class PyChannelManager {
   PyObject* ShowChannelInfo(const std::string& channel_name) {
     bool notFound = true;
     PyObject* pyobj_list = PyList_New(0);
-    std::unordered_map<std::string,
-                       std::vector<apollo::cyber::proto::RoleAttributes>>
+    std::unordered_map<std::string, std::vector<proto::RoleAttributes>>
         roles_info;
     if (channel_manager_->HasWriter(channel_name) ||
         channel_manager_->HasReader(channel_name)) {
-      std::vector<apollo::cyber::proto::RoleAttributes> tmpVec;
+      std::vector<proto::RoleAttributes> tmpVec;
       channel_manager_->GetWriters(&tmpVec);
       std::stringstream convert_temp;
       for (auto& attr : tmpVec) {
@@ -329,10 +328,9 @@ class PyChannelManager {
   }
 
  private:
-  apollo::cyber::service_discovery::TopologyManager* topology_ = nullptr;
-  std::shared_ptr<apollo::cyber::service_discovery::NodeManager> node_manager_;
-  std::shared_ptr<apollo::cyber::service_discovery::ChannelManager>
-      channel_manager_;
+  service_discovery::TopologyManager* topology_ = nullptr;
+  std::shared_ptr<service_discovery::NodeManager> node_manager_;
+  std::shared_ptr<service_discovery::ChannelManager> channel_manager_;
 };
 
 }  // namespace cyber
