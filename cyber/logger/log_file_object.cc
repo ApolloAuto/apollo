@@ -196,9 +196,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
     return;
   }
 
-  if (static_cast<int>(file_length_ >> 20) >=
-          ::apollo::cyber::logger::MaxLogSize() ||
-      apollo::cyber::logger::PidHasChanged()) {
+  if (static_cast<int>(file_length_ >> 20) >= MaxLogSize() || PidHasChanged()) {
     if (file_ != nullptr) fclose(file_);
     file_ = nullptr;
     file_length_ = bytes_since_flush_ = dropped_mem_length_ = 0;
@@ -236,8 +234,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
       std::string stripped_filename =
           base_filename_ + ".log." + LC_LOG_SEVERITY_NAMES[severity_] + ".";
 
-      const std::vector<std::string>& log_dirs =
-          ::apollo::cyber::logger::GetLoggingDirectories();
+      const std::vector<std::string>& log_dirs = GetLoggingDirectories();
 
       for (std::vector<std::string>::const_iterator dir = log_dirs.begin();
            dir != log_dirs.end(); ++dir) {
@@ -297,7 +294,7 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
       bytes_since_flush_ += message_len;
     }
   } else {
-    if (::apollo::cyber::logger::CycleClock_Now() >= next_flush_time_) {
+    if (CycleClock_Now() >= next_flush_time_) {
       stop_writing = false;  // check to see if disk has free space.
     }
     return;  // no need to flush
@@ -305,8 +302,8 @@ void LogFileObject::Write(bool force_flush, time_t timestamp,
 
   // See important msgs *now*.  Also, flush logs at least every 10^6 chars,
   // or every "FLAGS_logbufsecs" seconds.
-  if (force_flush || (bytes_since_flush_ >= 1000000) ||
-      (::apollo::cyber::logger::CycleClock_Now() >= next_flush_time_)) {
+  if (force_flush || bytes_since_flush_ >= 1000000 ||
+      CycleClock_Now() >= next_flush_time_) {
     FlushUnlocked();
   }
 }
