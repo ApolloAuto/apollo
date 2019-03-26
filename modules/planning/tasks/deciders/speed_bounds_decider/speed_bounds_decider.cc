@@ -165,7 +165,7 @@ Status SpeedBoundsDecider::Process(
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
 
   return Status::OK();
-}  // namespace planning
+}
 
 // @brief Check if necessary to set stop fence used for nonscenario side pass
 bool SpeedBoundsDecider::CheckSidePassStop(const PathData &path_data,
