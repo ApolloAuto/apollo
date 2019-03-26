@@ -49,6 +49,9 @@ class Renderer {
         // The car that projects the starting point of the planning trajectory
         this.planningAdc = OFFLINE_PLAYBACK ? null : new AutoDrivingCar('planningAdc', this.scene);
 
+        // The shadow localization
+        this.shadowAdc = new AutoDrivingCar('shadowAdc', this.scene);
+
         // The planning trajectory.
         this.planningTrajectory = new PlanningTrajectory();
 
@@ -366,6 +369,16 @@ class Renderer {
                 heading: planningAdcPose.theta,
             };
             this.planningAdc.update(this.coordinates, pose);
+        }
+
+        const shadowLocalizationPose = world.shadowLocalization;
+        if (shadowLocalizationPose) {
+            const shadowAdcPose = {
+                positionX: shadowLocalizationPose.positionX,
+                positionY: shadowLocalizationPose.positionY,
+                heading: shadowLocalizationPose.heading,
+            };
+            this.shadowAdc.update(this.coordinates, shadowAdcPose);
         }
     }
 
