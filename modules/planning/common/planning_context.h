@@ -83,7 +83,8 @@ class PlanningContext {
 
   static const LaneFollowInfo& lane_follow_info() { return lane_follow_info_; }
 
-  static LaneFollowInfo* mutable_lane_follow_info() { return &lane_follow_info_; }
+  static LaneFollowInfo* mutable_lane_follow_info() {
+      return &lane_follow_info_; }
 
  private:
   static PlanningStatus planning_status_;
