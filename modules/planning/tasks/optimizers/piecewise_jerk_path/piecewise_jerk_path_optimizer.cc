@@ -28,8 +28,6 @@
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
 
-// #define ADEBUG AINFO
-
 namespace apollo {
 namespace planning {
 
