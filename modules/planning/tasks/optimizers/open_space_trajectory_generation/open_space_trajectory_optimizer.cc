@@ -391,14 +391,19 @@ void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
   CHECK_EQ(states_size, times_size);
   CHECK_EQ(states_size, controls_size);
   double relative_time = 0.0;
+  double relative_s = 0.0;
+  common::math::Vec2d last_path_point(state_result(0, 0), state_result(1, 0));
   for (size_t i = 0; i < states_size; ++i) {
     common::TrajectoryPoint point;
     point.mutable_path_point()->set_x(state_result(0, i));
     point.mutable_path_point()->set_y(state_result(1, i));
     point.mutable_path_point()->set_theta(state_result(2, i));
     point.set_relative_time(relative_time);
-    relative_time += time_result(0, i);
     point.set_v(state_result(3, i));
+    relative_time += time_result(0, i);
+    common::math::Vec2d cur_path_point(state_result(0, i), state_result(1, i));
+    relative_s += cur_path_point.DistanceTo(last_path_point);
+    point.mutable_path_point()->set_s(relative_s);
     // TODO(Jinyun) Evaluate how to set end states control input
     if (i == controls_size) {
       point.set_steer(0.0);
@@ -408,6 +413,7 @@ void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
       point.set_a(control_result(1, i));
     }
     optimized_trajectory_.emplace_back(point);
+    last_path_point = cur_path_point;
   }
 }
 
