@@ -135,13 +135,13 @@ class RtkRecord(object):
         cargear = self.chassis.gear_location
 
         if abs(carspeed) >= speed_epsilon:
-            if self.startmoving == False:
+            if self.startmoving is False:
                 self.logger.info(
                     "carspeed !=0 and startmoving is False, Start Recording")
             self.startmoving = True
 
         if self.startmoving:
-            self.cars = self.cars + carspeed * 0.01
+            self.cars += carspeed * 0.01
             self.write(
                 "%s, %s, %s, %s, %s, %s, %s, %.4f, %s, %s, %s, %s, %s, %s\n" %
                 (carx, cary, carz, carspeed, caracceleration, self.carcurvature,

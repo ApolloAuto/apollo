@@ -60,7 +60,7 @@ class RtkPlayer(object):
         self.logger.info("Load record file from: %s" % record_file)
         try:
             file_handler = open(record_file, 'r')
-        except:
+        except IOError:
             self.logger.error("Cannot find file: " + record_file)
             file_handler.close()
             sys.exit(0)
@@ -185,7 +185,7 @@ class RtkPlayer(object):
         self.sequence_num = self.sequence_num + 1
 
         self.logger.debug(
-            "publish_planningmsg: before adjust start: self.start = %s, self.end=%s"
+            "publish_planningmsg: before adjust start: self.start=%s, self.end=%s"
             % (self.start, self.end))
         if self.replan or self.sequence_num <= 1 or not self.automode:
             self.logger.info(
@@ -209,7 +209,7 @@ class RtkPlayer(object):
             self.end = len(self.data) - 1
 
         self.logger.debug(
-            "publish_planningmsg: after adjust start: self.start = %s, self.end=%s"
+            "publish_planningmsg: after adjust start: self.start=%s, self.end=%s"
             % (self.start, self.end))
 
         planningdata.total_path_length = self.data['s'][self.end] - \
