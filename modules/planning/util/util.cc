@@ -17,6 +17,10 @@
 #include "modules/planning/util/util.h"
 
 #include <cmath>
+#include <limits>
+
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
+#include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
@@ -45,6 +49,25 @@ bool IsDifferentRouting(const RoutingResponse& first,
   } else {
     return true;
   }
+}
+
+double GetADCStopDeceleration(const double adc_front_edge_s,
+                              const double stop_line_s) {
+  double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  if (adc_speed < FLAGS_max_stop_speed) {
+    return 0.0;
+  }
+
+  double stop_distance = 0;
+
+  if (stop_line_s > adc_front_edge_s) {
+    stop_distance = stop_line_s - adc_front_edge_s;
+  }
+  if (stop_distance < 1e-5) {
+    return std::numeric_limits<double>::max();
+  }
+  return (adc_speed * adc_speed) / (2 * stop_distance);
 }
 
 }  // namespace planning

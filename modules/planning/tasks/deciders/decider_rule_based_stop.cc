@@ -28,6 +28,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/scenarios/util/util.h"
+#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -171,9 +172,8 @@ void DeciderRuleBasedStop::CheckTrafficLight(
     }
 
     // Red/Yellow/Unown: check deceleration
-    const double stop_deceleration = scenario::GetADCStopDeceleration(
-        adc_front_edge_s,
-        traffic_light_overlap.start_s);
+    const double stop_deceleration = GetADCStopDeceleration(
+        adc_front_edge_s, traffic_light_overlap.start_s);
     ADEBUG << "stop_deceleration[" << stop_deceleration << "]";
 
     if (stop_deceleration > traffic_light_config.max_stop_deceleration()) {

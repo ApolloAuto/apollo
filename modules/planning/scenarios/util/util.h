@@ -34,9 +34,6 @@ perception::TrafficLight GetSignal(const std::string& signal_id);
 
 bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info);
 
-double GetADCStopDeceleration(const double adc_front_edge_s,
-                              const double stop_line_s);
-
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo
