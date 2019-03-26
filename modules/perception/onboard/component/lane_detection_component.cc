@@ -43,7 +43,7 @@ namespace onboard {
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::localization::LocalizationEstimate;
 
-LaneInitFunInfo LaneDetectionComponent::init_func_arry_[] = {
+FunInfoType LaneDetectionComponent::init_func_arry_[] = {
     {&LaneDetectionComponent::InitSensorInfo, "InitSensorInfo"},
     {&LaneDetectionComponent::InitAlgorithmPlugin, "InitAlgorithmPlugin"},
     {&LaneDetectionComponent::InitCameraFrames, "InitCameraFrames"},
@@ -189,11 +189,9 @@ bool LaneDetectionComponent::Init() {
   }
 
   writer_ = node_->CreateWriter<PerceptionLanes>(output_lanes_channel_name_);
-  for (auto &itor : LaneDetectionComponent::init_func_arry_) {
-    if ((this->*(itor.init_function_))() != cyber::SUCC) {
-      AERROR << itor.init_fun_name_<< "() failed.";
-      return false;
-    }
+  if (!EXEC_ALL_FUNS(LaneDetectionComponent, this,
+    LaneDetectionComponent::init_func_arry_)) {
+    return false;
   }
   SetCameraHeightAndPitch();
 
