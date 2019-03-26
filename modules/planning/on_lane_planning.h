@@ -82,6 +82,8 @@ class OnLanePlanning : public PlanningBase {
                             planning_internal::Debug* debug_chart);
   void AddOpenSpaceOptimizerResult(const planning_internal::Debug& debug_info,
                                    planning_internal::Debug* debug_chart);
+  void AddPartitionedTrajectory(const planning_internal::Debug& debug_info,
+                                planning_internal::Debug* debug_chart);
 
  private:
   routing::RoutingResponse last_routing_;
