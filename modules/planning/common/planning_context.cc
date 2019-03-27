@@ -35,5 +35,7 @@ void PlanningContext::Clear() {
   side_pass_info_ = {};
 }
 
+int PlanningContext::front_static_obstacle_cycle_counter_ = 0;
+
 }  // namespace planning
 }  // namespace apollo
