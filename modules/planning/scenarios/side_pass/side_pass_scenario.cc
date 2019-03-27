@@ -50,6 +50,8 @@ common::util::Factory<
 // The clearance distance from intersection/destination.
 // If ADC is too close, then do not enter SIDE_PASS.
 constexpr double kClearDistance = 15.0;
+constexpr double kSidePassMaxSpeed = 7.0; // (25km/h or 15mph)
+constexpr double kSidePassMaxDistance = 10.0;
 
 void SidePassScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
@@ -117,7 +119,6 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
         ptr_front_blocking_obstacle->PerceptionSLBoundary().start_s() -
         ego_front_edge_s;
 
-    constexpr double kSidePassMaxDistance = 10.0;
     if (obstacle_ego_distance > kSidePassMaxDistance) {
       ADEBUG << "Obstacle " << front_blocking_obstacle_id
              << " has distance " << obstacle_ego_distance << " which is larger "
@@ -148,14 +149,22 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 }
 
 bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
-  return IsFarFromDestination(frame) && IsFarFromIntersection(frame) &&
-         HasBlockingObstacle(frame);
+  // return IsFarFromDestination(frame) && IsFarFromIntersection(frame) &&
+  //        HasBlockingObstacle(frame);
+  return HasSingleReferenceLine(frame) &&
+         IsFarFromDestination(frame) &&
+         IsFarFromIntersection(frame) &&
+         IsWithinSidePassingSpeedADC(frame) &&
+         IsSidePassableObstacle(frame, frame.reference_line_info().front(),
+             frame.reference_line_info().front().path_data().
+                 blocking_obstacle_id());
+}
+
+bool SidePassScenario::HasSingleReferenceLine(const Frame& frame) {
+  return frame.reference_line_info().size() <= 1;
 }
 
 bool SidePassScenario::IsFarFromDestination(const Frame& frame) const {
-  if (frame.reference_line_info().size() > 1) {
-    return false;
-  }
   const auto& reference_line_info = frame.reference_line_info().front();
   if (reference_line_info.SDistanceToDestination() < kClearDistance) {
     ADEBUG << "Too close to destination; don't SIDE_PASS";
@@ -165,9 +174,6 @@ bool SidePassScenario::IsFarFromDestination(const Frame& frame) const {
 }
 
 bool SidePassScenario::IsFarFromIntersection(const Frame& frame) const {
-  if (frame.reference_line_info().size() > 1) {
-    return false;
-  }
   const SLBoundary& adc_sl_boundary =
       frame.reference_line_info().front().AdcSlBoundary();
   const auto& first_encountered_overlaps =
@@ -203,16 +209,21 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) const {
   return true;
 }
 
-// TODO(jiacheng): implement this.
 bool SidePassScenario::IsWithinSidePassingSpeedADC(const Frame& frame) const {
-  return true;
+  return frame.PlanningStartPoint().v() < kSidePassMaxSpeed;
 }
 
 // TODO(jiacheng): implement this to replace HasBlockingObstacle.
 bool SidePassScenario::IsSidePassableObstacle(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
     const std::string& blocking_obstacle_id) const {
-  return true;
+  const Obstacle* blocking_obstacle = reference_line_info.path_decision().
+                                obstacles().Find(blocking_obstacle_id);
+  if (blocking_obstacle == nullptr) {
+    ADEBUG << "Doesn't exist such blocking obstalce.";
+    return true;
+  }
+  return IsNonmovableObstacle(reference_line_info, *blocking_obstacle);
 }
 
 bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
