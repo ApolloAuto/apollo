@@ -52,11 +52,15 @@ Status PathAssessmentDecider::Process(
 
   if (candidate_path_data.empty()) {
     ADEBUG << "Candidate path data is empty.";
+  } else {
+    ADEBUG << "There are " << candidate_path_data.size() << " candidate paths";
   }
 
   // 1. Remove invalid path.
   std::vector<PathData> valid_path_data;
   for (const auto& curr_path_data : candidate_path_data) {
+    // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
+    //                 reference_line_info);
     if (curr_path_data.path_label().find("fallback") != std::string::npos) {
       if (IsValidFallbackPath(*reference_line_info, curr_path_data)) {
         valid_path_data.push_back(curr_path_data);
@@ -146,18 +150,15 @@ Status PathAssessmentDecider::Process(
               // Otherwise, they are the same path, lhs is not < rhs.
               return false;
             });
+  ADEBUG << "There are " << valid_path_data.size() << " path(s).";
   ADEBUG << "Using " << valid_path_data.front().path_label() << " path.";
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
 
   // Plot the path in simulator for debug purpose.
-  const auto &path_points = reference_line_info->path_data().discretized_path();
-  auto *ptr_optimized_path =
-      reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
-  ptr_optimized_path->set_name("Path Planning Output");
-  ptr_optimized_path->mutable_path_point()->CopyFrom(
-      {path_points.begin(), path_points.end()});
+  RecordDebugInfo(reference_line_info->path_data(), "PathData",
+                  reference_line_info);
   return Status::OK();
 }
 
@@ -309,6 +310,8 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
       // Check if it's in any polygon of other static obstacles.
       for (const auto& obstacle_polygon : obstacle_polygons) {
         if (obstacle_polygon.IsPointIn(curr_point)) {
+          ADEBUG << "ADC is colliding with obstacle at path s = "
+                 << path_point.s();
           return true;
         }
       }
@@ -475,6 +478,17 @@ void PathAssessmentDecider::SetObstacleDistance(
     }
     std::get<2>((*path_point_decision)[i]) = min_distance_to_obstacles;
   }
+}
+
+void PathAssessmentDecider::RecordDebugInfo(
+    const PathData& path_data, const std::string& debug_name,
+    ReferenceLineInfo *const reference_line_info) {
+  const auto &path_points = path_data.discretized_path();
+  auto *ptr_optimized_path =
+      reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
+  ptr_optimized_path->set_name(debug_name);
+  ptr_optimized_path->mutable_path_point()->CopyFrom(
+      {path_points.begin(), path_points.end()});
 }
 
 bool ContainsOutOnReverseLane(
