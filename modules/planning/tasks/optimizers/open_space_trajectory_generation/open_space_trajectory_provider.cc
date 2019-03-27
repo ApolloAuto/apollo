@@ -160,6 +160,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
 
     if (trajectory_error_) {
       ++optimizer_thread_counter;
+      std::lock_guard<std::mutex> lock(open_space_mutex_);
       trajectory_error_.store(false);
       // TODO(Jinyun) Use other fallback mechanism when last iteration smoothing
       // result has out of bound pathpoint which is not allowed for next
@@ -235,14 +236,17 @@ void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
           thread_data.obstacles_A, thread_data.obstacles_b,
           thread_data.obstacles_vertices_vec);
       if (status == Status::OK()) {
+        std::lock_guard<std::mutex> lock(open_space_mutex_);
         trajectory_updated_.store(true);
       } else {
         AERROR_EVERY(200) << "open_space_trajectory_optimizer not returning "
                              "OK() with status: "
                           << status.ToString();
         if (status.ok()) {
+          std::lock_guard<std::mutex> lock(open_space_mutex_);
           trajectory_skipped_.store(true);
         } else {
+          std::lock_guard<std::mutex> lock(open_space_mutex_);
           trajectory_error_.store(true);
         }
       }
