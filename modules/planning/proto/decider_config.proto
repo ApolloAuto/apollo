@@ -17,20 +17,13 @@ message DeciderCreepConfig {
   optional double ignore_min_st_min_s = 6 [default = 15.0];  // meter
 }
 
-message RuleStopSignConfig {
-  optional bool enabled = 1 [default = true];
-  // stop distance(m) to the stop line of the stop sign
-  optional double stop_distance = 2 [default = 1.0];  // meter
-}
-
 message RuleOpenSpaceStopConfig {
   optional double rightaway_stop_distance = 1 [default = 2.0];  // meter
   optional double stop_distance_to_target = 2 [default = 5.0];  // second
 }
 
 message DeciderRuleBasedStopConfig {
-  optional RuleStopSignConfig stop_sign = 1;
-  optional RuleOpenSpaceStopConfig open_space = 2;
+  optional RuleOpenSpaceStopConfig open_space = 1;
 }
 
 message SidePassSafetyConfig {

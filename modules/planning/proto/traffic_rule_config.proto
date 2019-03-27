@@ -106,6 +106,12 @@ message ReroutingConfig {
   optional double prepare_rerouting_time = 2 [default = 2.0];  // seconds
 }
 
+message StopSignConfig {
+  optional bool enabled = 1 [default = true];
+  // stop distance(m) to the stop line of the stop sign
+  optional double stop_distance = 2 [default = 1.0];  // meter
+}
+
 message TrafficLightConfig {
   optional bool enabled = 1 [default = true];
   // stop distance(m) to the stop line of the traffic light
@@ -140,7 +146,8 @@ message TrafficRuleConfig {
     PullOverConfig pull_over = 8;
     ReferenceLineEndConfig reference_line_end = 9;
     ReroutingConfig rerouting = 10;
-    TrafficLightConfig traffic_light = 11;
+    StopSignConfig stop_sign = 11;
+    TrafficLightConfig traffic_light = 12;
   }
 }
 
