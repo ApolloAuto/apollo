@@ -55,6 +55,8 @@ class PathAssessmentDecider : public Decider {
   void SetPathInfo(const ReferenceLineInfo& reference_line_info,
                    PathData* const path_data);
 
+  void TrimTailingOutLanePoints(PathData* const path_data);
+
   /////////////////////////////////////////////////////////////////////////////
   //
 
@@ -66,15 +68,14 @@ class PathAssessmentDecider : public Decider {
   bool IsCollidingWithStaticObstacles(
       const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
-  /** @brief Check if the path ever returns to the self-lane.
-    * @param reference_line_info
-    * @param path_data
-    * @return It returns the last index that the path returns to self-lane.
-    *   If the path always stays within self-lane, it returns the size()-1.
-    *   If the path never returns back to self-lane, returns -1.
-    */
-  int IsReturningToSelfLane(
-      const ReferenceLineInfo& reference_line_info, const PathData& path_data);
+  // * @brief Check if the path ever returns to the self-lane.
+  //   * @param reference_line_info
+  //   * @param path_data
+  //   * @return It returns the last index that the path returns to self-lane.
+  //   *   If the path always stays within self-lane, it returns the size()-1.
+  //   *   If the path never returns back to self-lane, returns -1.
+  // int IsReturningToSelfLane(
+  // const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
   /////////////////////////////////////////////////////////////////////////////
   //
@@ -93,18 +94,18 @@ class PathAssessmentDecider : public Decider {
       const ReferenceLineInfo& reference_line_info, const PathData& path_data,
       std::vector<std::tuple<double, PathData::PathPointType, double>>* const
           path_point_decision);
-
-  /////////////////////////////////////////////////////////////////////////////
-  //
-
-  bool ContainsOutOnReverseLane(
-      const std::vector<std::tuple<double, PathData::PathPointType, double>>&
-          path_point_decision);
-
-  int GetBackToInLaneIndex(
-      const std::vector<std::tuple<double, PathData::PathPointType, double>>&
-          path_point_decision);
 };
+
+/////////////////////////////////////////////////////////////////////////////
+// Below are helper functions.
+
+bool ContainsOutOnReverseLane(
+    const std::vector<std::tuple<double, PathData::PathPointType, double>>&
+        path_point_decision);
+
+int GetBackToInLaneIndex(
+    const std::vector<std::tuple<double, PathData::PathPointType, double>>&
+        path_point_decision);
 
 }  // namespace planning
 }  // namespace apollo
