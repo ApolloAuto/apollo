@@ -58,7 +58,7 @@ class PathAssessmentDecider : public Decider {
   void TrimTailingOutLanePoints(PathData* const path_data);
 
   /////////////////////////////////////////////////////////////////////////////
-  //
+  // Below are functions used when checking validity of path.
 
   bool IsGreatlyOffReferenceLine(const PathData& path_data);
 
@@ -78,7 +78,7 @@ class PathAssessmentDecider : public Decider {
   // const ReferenceLineInfo& reference_line_info, const PathData& path_data);
 
   /////////////////////////////////////////////////////////////////////////////
-  //
+  // Below are functions used for setting path point type info.
 
   void InitPathPointDecision(
       const PathData& path_data,
