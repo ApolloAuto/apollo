@@ -252,7 +252,7 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
     AERROR << msg;
     return msg;
   }
-  // PathBoundsDebugString(*path_bound);
+  PathBoundsDebugString(*path_bound);
 
   ADEBUG << "Completed generating fallback path boundaries.";
   return "";
