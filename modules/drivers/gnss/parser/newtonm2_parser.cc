@@ -19,14 +19,14 @@
 // properly.
 //
 
+#include "modules/drivers/gnss/parser/newtonm2_parser.h"
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <vector>
-#include "ros/include/ros/ros.h"
 #include "modules/common/log.h"
-#include "modules/drivers/gnss/parser/newtonm2_messages.h"
+#include "modules/drivers/gnss/parser/novatel_messages.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm_decode.h"
 #include "modules/drivers/gnss/proto/gnss.pb.h"
@@ -36,7 +36,7 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/gnss/util/time_conversion.h"
-#include "modules/drivers/gnss/parser/newtonm2_parser.h"
+#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace drivers {
@@ -79,25 +79,25 @@ Parser::MessageType NewtonM2Parser::GetMessage(MessagePtr* message_ptr) {
 
   while (data_ < data_end_) {
     if (buffer_.size() == 0) {  // Looking for SYNC0
-      if (*data_ == newtonm2::SYNC_0) {
+      if (*data_ == novatel::SYNC_0) {
         buffer_.push_back(*data_);
       }
       ++data_;
     } else if (buffer_.size() == 1) {  // Looking for SYNC1
-      if (*data_ == newtonm2::SYNC_1) {
+      if (*data_ == novatel::SYNC_1) {
         buffer_.push_back(*data_++);
       } else {
         buffer_.clear();
       }
     } else if (buffer_.size() == 2) {  // Looking for SYNC2
       switch (*data_) {
-        case newtonm2::SYNC_2_LONG_HEADER:
+        case novatel::SYNC_2_LONG_HEADER:
           buffer_.push_back(*data_++);
-          header_length_ = sizeof(newtonm2::LongHeader);
+          header_length_ = sizeof(novatel::LongHeader);
           break;
-        case newtonm2::SYNC_2_SHORT_HEADER:
+        case novatel::SYNC_2_SHORT_HEADER:
           buffer_.push_back(*data_++);
-          header_length_ = sizeof(newtonm2::ShortHeader);
+          header_length_ = sizeof(novatel::ShortHeader);
           break;
         default:
           buffer_.clear();
@@ -106,15 +106,14 @@ Parser::MessageType NewtonM2Parser::GetMessage(MessagePtr* message_ptr) {
       if (buffer_.size() < header_length_) {
         buffer_.push_back(*data_++);
       } else {
-        if (header_length_ == sizeof(newtonm2::LongHeader)) {
+        if (header_length_ == sizeof(novatel::LongHeader)) {
+          total_length_ = header_length_ + novatel::CRC_LENGTH +
+                          reinterpret_cast<novatel::LongHeader*>(buffer_.data())
+                              ->message_length;
+        } else if (header_length_ == sizeof(novatel::ShortHeader)) {
           total_length_ =
-              header_length_ + newtonm2::CRC_LENGTH +
-              reinterpret_cast<newtonm2::LongHeader*>(buffer_.data())
-                  ->message_length;
-        } else if (header_length_ == sizeof(newtonm2::ShortHeader)) {
-          total_length_ =
-              header_length_ + newtonm2::CRC_LENGTH +
-              reinterpret_cast<newtonm2::ShortHeader*>(buffer_.data())
+              header_length_ + novatel::CRC_LENGTH +
+              reinterpret_cast<novatel::ShortHeader*>(buffer_.data())
                   ->message_length;
         } else {
           AERROR << "Incorrect header_length_. Should never reach here.";
@@ -139,7 +138,7 @@ Parser::MessageType NewtonM2Parser::GetMessage(MessagePtr* message_ptr) {
 }
 
 bool NewtonM2Parser::check_crc() {
-  size_t l = buffer_.size() - newtonm2::CRC_LENGTH;
+  size_t l = buffer_.size() - novatel::CRC_LENGTH;
   return newtonm2::crc32_block(buffer_.data(), l) ==
          *reinterpret_cast<uint32_t*>(buffer_.data() + l);
 }
@@ -151,179 +150,177 @@ Parser::MessageType NewtonM2Parser::PrepareMessage(MessagePtr* message_ptr) {
   }
 
   uint8_t* message = nullptr;
-  newtonm2::MessageId message_id;
+  novatel::MessageId message_id;
   uint16_t message_length;
   uint16_t gps_week;
   uint32_t gps_millisecs;
-  if (buffer_[2] == newtonm2::SYNC_2_LONG_HEADER) {
-    auto header = reinterpret_cast<const newtonm2::LongHeader*>(buffer_.data());
-    message = buffer_.data() + sizeof(newtonm2::LongHeader);
+  if (buffer_[2] == novatel::SYNC_2_LONG_HEADER) {
+    auto header = reinterpret_cast<const novatel::LongHeader*>(buffer_.data());
+    message = buffer_.data() + sizeof(novatel::LongHeader);
     gps_week = header->gps_week;
     gps_millisecs = header->gps_millisecs;
     message_id = header->message_id;
     message_length = header->message_length;
   } else {
-    auto header =
-        reinterpret_cast<const newtonm2::ShortHeader*>(buffer_.data());
-    message = buffer_.data() + sizeof(newtonm2::ShortHeader);
+    auto header = reinterpret_cast<const novatel::ShortHeader*>(buffer_.data());
+    message = buffer_.data() + sizeof(novatel::ShortHeader);
     gps_week = header->gps_week;
     gps_millisecs = header->gps_millisecs;
     message_id = header->message_id;
     message_length = header->message_length;
   }
   switch (message_id) {
-    case newtonm2::BESTGNSSPOS:
-      if (message_length != sizeof(newtonm2::BestPos)) {
+    case novatel::BESTGNSSPOS:
+      if (message_length != sizeof(novatel::BestPos)) {
         AERROR << "Incorrect message_length";
         break;
       }
-      if (HandleGnssBestpos(reinterpret_cast<newtonm2::BestPos*>(message),
+      if (HandleGnssBestpos(reinterpret_cast<novatel::BestPos*>(message),
                             gps_week, gps_millisecs)) {
         *message_ptr = &bestpos_;
         return MessageType::BEST_GNSS_POS;
       }
       break;
 
-    case newtonm2::BESTPOS:
-    case newtonm2::PSRPOS:
-      if (message_length != sizeof(newtonm2::BestPos)) {
+    case novatel::BESTPOS:
+    case novatel::PSRPOS:
+      if (message_length != sizeof(novatel::BestPos)) {
         AERROR << "Incorrect message_length";
         break;
       }
-      if (HandleBestPos(reinterpret_cast<newtonm2::BestPos*>(message), gps_week,
+      if (HandleBestPos(reinterpret_cast<novatel::BestPos*>(message), gps_week,
                         gps_millisecs)) {
         *message_ptr = &gnss_;
         return MessageType::GNSS;
       }
       break;
 
-    case newtonm2::BESTGNSSVEL:
-    case newtonm2::BESTVEL:
-    case newtonm2::PSRVEL:
-      if (message_length != sizeof(newtonm2::BestVel)) {
+    case novatel::BESTGNSSVEL:
+    case novatel::BESTVEL:
+    case novatel::PSRVEL:
+      if (message_length != sizeof(novatel::BestVel)) {
         AERROR << "Incorrect message_length";
         break;
       }
-      if (HandleBestVel(reinterpret_cast<newtonm2::BestVel*>(message), gps_week,
+      if (HandleBestVel(reinterpret_cast<novatel::BestVel*>(message), gps_week,
                         gps_millisecs)) {
         *message_ptr = &gnss_;
         return MessageType::GNSS;
       }
       break;
 
-    case newtonm2::CORRIMUDATA:
-    case newtonm2::CORRIMUDATAS:
-      if (message_length != sizeof(newtonm2::CorrImuData)) {
+    case novatel::CORRIMUDATA:
+    case novatel::CORRIMUDATAS:
+      if (message_length != sizeof(novatel::CorrImuData)) {
         AERROR << "Incorrect message_length";
         break;
       }
 
-      if (HandleCorrImuData(
-              reinterpret_cast<newtonm2::CorrImuData*>(message))) {
+      if (HandleCorrImuData(reinterpret_cast<novatel::CorrImuData*>(message))) {
         *message_ptr = &ins_;
         return MessageType::INS;
       }
       break;
 
-    case newtonm2::INSCOV:
-    case newtonm2::INSCOVS:
-      if (message_length != sizeof(newtonm2::InsCov)) {
+    case novatel::INSCOV:
+    case novatel::INSCOVS:
+      if (message_length != sizeof(novatel::InsCov)) {
         AERROR << "Incorrect message_length";
         break;
       }
 
-      if (HandleInsCov(reinterpret_cast<newtonm2::InsCov*>(message))) {
+      if (HandleInsCov(reinterpret_cast<novatel::InsCov*>(message))) {
         *message_ptr = &ins_;
         return MessageType::INS;
       }
       break;
 
-    case newtonm2::INSPVA:
-    case newtonm2::INSPVAS:
-      if (message_length != sizeof(newtonm2::InsPva)) {
+    case novatel::INSPVA:
+    case novatel::INSPVAS:
+      if (message_length != sizeof(novatel::InsPva)) {
         AERROR << "Incorrect message_length";
         break;
       }
 
-      if (HandleInsPva(reinterpret_cast<newtonm2::InsPva*>(message))) {
+      if (HandleInsPva(reinterpret_cast<novatel::InsPva*>(message))) {
         *message_ptr = &ins_;
         return MessageType::INS;
       }
       break;
 
-    case newtonm2::RAWIMUX:
-    case newtonm2::RAWIMUSX:
-      if (message_length != sizeof(newtonm2::RawImuX)) {
+    case novatel::RAWIMUX:
+    case novatel::RAWIMUSX:
+      if (message_length != sizeof(novatel::RawImuX)) {
         AERROR << "Incorrect message_length";
         break;
       }
 
-      if (HandleRawImuX(reinterpret_cast<newtonm2::RawImuX*>(message))) {
+      if (HandleRawImuX(reinterpret_cast<novatel::RawImuX*>(message))) {
         *message_ptr = &imu_;
         return MessageType::IMU;
       }
       break;
 
-    case newtonm2::RAWIMU:
-    case newtonm2::RAWIMUS:
-      if (message_length != sizeof(newtonm2::RawImu)) {
+    case novatel::RAWIMU:
+    case novatel::RAWIMUS:
+      if (message_length != sizeof(novatel::RawImu)) {
         AERROR << "Incorrect message_length";
         break;
       }
 
-      if (HandleRawImu(reinterpret_cast<newtonm2::RawImu*>(message))) {
+      if (HandleRawImu(reinterpret_cast<novatel::RawImu*>(message))) {
         *message_ptr = &imu_;
         return MessageType::IMU;
       }
       break;
 
-    case newtonm2::INSPVAX:
-      if (message_length != sizeof(newtonm2::InsPvaX)) {
+    case novatel::INSPVAX:
+      if (message_length != sizeof(novatel::InsPvaX)) {
         AERROR << "Incorrect message_length";
         break;
       }
 
-      if (HandleInsPvax(reinterpret_cast<newtonm2::InsPvaX*>(message), gps_week,
+      if (HandleInsPvax(reinterpret_cast<novatel::InsPvaX*>(message), gps_week,
                         gps_millisecs)) {
         *message_ptr = &ins_stat_;
         return MessageType::INS_STAT;
       }
       break;
 
-    case newtonm2::BDSEPHEMERIS:
-      if (message_length != sizeof(newtonm2::BDS_Ephemeris)) {
+    case novatel::BDSEPHEMERIS:
+      if (message_length != sizeof(novatel::BDS_Ephemeris)) {
         AERROR << "Incorrect BDSEPHEMERIS message_length";
         break;
       }
-      if (HandleBdsEph(reinterpret_cast<newtonm2::BDS_Ephemeris*>(message))) {
+      if (HandleBdsEph(reinterpret_cast<novatel::BDS_Ephemeris*>(message))) {
         *message_ptr = &gnss_ephemeris_;
         return MessageType::BDSEPHEMERIDES;
       }
       break;
 
-    case newtonm2::GPSEPHEMERIS:
-      if (message_length != sizeof(newtonm2::GPS_Ephemeris)) {
+    case novatel::GPSEPHEMERIS:
+      if (message_length != sizeof(novatel::GPS_Ephemeris)) {
         AERROR << "Incorrect GPSEPHEMERIS message_length";
         break;
       }
-      if (HandleGpsEph(reinterpret_cast<newtonm2::GPS_Ephemeris*>(message))) {
+      if (HandleGpsEph(reinterpret_cast<novatel::GPS_Ephemeris*>(message))) {
         *message_ptr = &gnss_ephemeris_;
         return MessageType::GPSEPHEMERIDES;
       }
       break;
 
-    case newtonm2::GLOEPHEMERIS:
-      if (message_length != sizeof(newtonm2::GLO_Ephemeris)) {
+    case novatel::GLOEPHEMERIS:
+      if (message_length != sizeof(novatel::GLO_Ephemeris)) {
         AERROR << "Incorrect GLOEPHEMERIS message length";
         break;
       }
-      if (HandleGloEph(reinterpret_cast<newtonm2::GLO_Ephemeris*>(message))) {
+      if (HandleGloEph(reinterpret_cast<novatel::GLO_Ephemeris*>(message))) {
         *message_ptr = &gnss_ephemeris_;
         return MessageType::GLOEPHEMERIDES;
       }
       break;
 
-    case newtonm2::RANGE:
+    case novatel::RANGE:
       if (DecodeGnssObservation(buffer_.data(),
                                 buffer_.data() + buffer_.size())) {
         *message_ptr = &gnss_observation_;
@@ -331,12 +328,12 @@ Parser::MessageType NewtonM2Parser::PrepareMessage(MessagePtr* message_ptr) {
       }
       break;
 
-    case newtonm2::HEADING:
-      if (message_length != sizeof(newtonm2::Heading)) {
+    case novatel::HEADING:
+      if (message_length != sizeof(novatel::Heading)) {
         AERROR << "Incorrect message_length";
         break;
       }
-      if (HandleHeading(reinterpret_cast<newtonm2::Heading*>(message), gps_week,
+      if (HandleHeading(reinterpret_cast<novatel::Heading*>(message), gps_week,
                         gps_millisecs)) {
         *message_ptr = &heading_;
         return MessageType::HEADING;
@@ -349,7 +346,7 @@ Parser::MessageType NewtonM2Parser::PrepareMessage(MessagePtr* message_ptr) {
   return MessageType::NONE;
 }
 
-bool NewtonM2Parser::HandleGnssBestpos(const newtonm2::BestPos* pos,
+bool NewtonM2Parser::HandleGnssBestpos(const novatel::BestPos* pos,
                                        uint16_t gps_week,
                                        uint32_t gps_millisecs) {
   bestpos_.set_sol_status(
@@ -382,7 +379,7 @@ bool NewtonM2Parser::HandleGnssBestpos(const newtonm2::BestPos* pos,
   return true;
 }
 
-bool NewtonM2Parser::HandleBestPos(const newtonm2::BestPos* pos,
+bool NewtonM2Parser::HandleBestPos(const novatel::BestPos* pos,
                                    uint16_t gps_week, uint32_t gps_millisecs) {
   gnss_.mutable_position()->set_lon(pos->longitude);
   gnss_.mutable_position()->set_lat(pos->latitude);
@@ -400,47 +397,47 @@ bool NewtonM2Parser::HandleBestPos(const newtonm2::BestPos* pos,
     AINFO << "Position type: " << static_cast<int>(position_type_);
   }
   gnss_.set_solution_status(static_cast<uint32_t>(pos->solution_status));
-  if (pos->solution_status == newtonm2::SolutionStatus::SOL_COMPUTED) {
+  if (pos->solution_status == novatel::SolutionStatus::SOL_COMPUTED) {
     gnss_.set_position_type(static_cast<uint32_t>(pos->position_type));
     switch (pos->position_type) {
-      case newtonm2::SolutionType::SINGLE:
-      case newtonm2::SolutionType::INS_PSRSP:
+      case novatel::SolutionType::SINGLE:
+      case novatel::SolutionType::INS_PSRSP:
         gnss_.set_type(apollo::drivers::gnss::Gnss::SINGLE);
         break;
-      case newtonm2::SolutionType::PSRDIFF:
-      case newtonm2::SolutionType::WAAS:
-      case newtonm2::SolutionType::INS_SBAS:
+      case novatel::SolutionType::PSRDIFF:
+      case novatel::SolutionType::WAAS:
+      case novatel::SolutionType::INS_SBAS:
         gnss_.set_type(apollo::drivers::gnss::Gnss::PSRDIFF);
         break;
-      case newtonm2::SolutionType::FLOATCONV:
-      case newtonm2::SolutionType::L1_FLOAT:
-      case newtonm2::SolutionType::IONOFREE_FLOAT:
-      case newtonm2::SolutionType::NARROW_FLOAT:
-      case newtonm2::SolutionType::RTK_DIRECT_INS:
-      case newtonm2::SolutionType::INS_RTKFLOAT:
+      case novatel::SolutionType::FLOATCONV:
+      case novatel::SolutionType::L1_FLOAT:
+      case novatel::SolutionType::IONOFREE_FLOAT:
+      case novatel::SolutionType::NARROW_FLOAT:
+      case novatel::SolutionType::RTK_DIRECT_INS:
+      case novatel::SolutionType::INS_RTKFLOAT:
         gnss_.set_type(apollo::drivers::gnss::Gnss::RTK_FLOAT);
         break;
-      case newtonm2::SolutionType::WIDELANE:
-      case newtonm2::SolutionType::NARROWLANE:
-      case newtonm2::SolutionType::L1_INT:
-      case newtonm2::SolutionType::WIDE_INT:
-      case newtonm2::SolutionType::NARROW_INT:
-      case newtonm2::SolutionType::INS_RTKFIXED:
+      case novatel::SolutionType::WIDELANE:
+      case novatel::SolutionType::NARROWLANE:
+      case novatel::SolutionType::L1_INT:
+      case novatel::SolutionType::WIDE_INT:
+      case novatel::SolutionType::NARROW_INT:
+      case novatel::SolutionType::INS_RTKFIXED:
         gnss_.set_type(apollo::drivers::gnss::Gnss::RTK_INTEGER);
         break;
-      case newtonm2::SolutionType::OMNISTAR:
-      case newtonm2::SolutionType::INS_OMNISTAR:
-      case newtonm2::SolutionType::INS_OMNISTAR_HP:
-      case newtonm2::SolutionType::INS_OMNISTAR_XP:
-      case newtonm2::SolutionType::OMNISTAR_HP:
-      case newtonm2::SolutionType::OMNISTAR_XP:
-      case newtonm2::SolutionType::PPP_CONVERGING:
-      case newtonm2::SolutionType::PPP:
-      case newtonm2::SolutionType::INS_PPP_CONVERGING:
-      case newtonm2::SolutionType::INS_PPP:
+      case novatel::SolutionType::OMNISTAR:
+      case novatel::SolutionType::INS_OMNISTAR:
+      case novatel::SolutionType::INS_OMNISTAR_HP:
+      case novatel::SolutionType::INS_OMNISTAR_XP:
+      case novatel::SolutionType::OMNISTAR_HP:
+      case novatel::SolutionType::OMNISTAR_XP:
+      case novatel::SolutionType::PPP_CONVERGING:
+      case novatel::SolutionType::PPP:
+      case novatel::SolutionType::INS_PPP_CONVERGING:
+      case novatel::SolutionType::INS_PPP:
         gnss_.set_type(apollo::drivers::gnss::Gnss::PPP);
         break;
-      case newtonm2::SolutionType::PROPOGATED:
+      case novatel::SolutionType::PROPOGATED:
         gnss_.set_type(apollo::drivers::gnss::Gnss::PROPAGATED);
         break;
       default:
@@ -450,7 +447,7 @@ bool NewtonM2Parser::HandleBestPos(const newtonm2::BestPos* pos,
     gnss_.set_type(apollo::drivers::gnss::Gnss::INVALID);
     gnss_.set_position_type(0);
   }
-  if (pos->datum_id != newtonm2::DatumId::WGS84) {
+  if (pos->datum_id != novatel::DatumId::WGS84) {
     AERROR_EVERY(5) << "Unexpected Datum Id: "
                     << static_cast<int>(pos->datum_id);
   }
@@ -463,7 +460,7 @@ bool NewtonM2Parser::HandleBestPos(const newtonm2::BestPos* pos,
   return true;
 }
 
-bool NewtonM2Parser::HandleBestVel(const newtonm2::BestVel* vel,
+bool NewtonM2Parser::HandleBestVel(const novatel::BestVel* vel,
                                    uint16_t gps_week, uint32_t gps_millisecs) {
   if (velocity_type_ != vel->velocity_type) {
     velocity_type_ = vel->velocity_type;
@@ -487,7 +484,7 @@ bool NewtonM2Parser::HandleBestVel(const newtonm2::BestVel* vel,
   return true;
 }
 
-bool NewtonM2Parser::HandleCorrImuData(const newtonm2::CorrImuData* imu) {
+bool NewtonM2Parser::HandleCorrImuData(const novatel::CorrImuData* imu) {
   newtonm2::rfu_to_flu(imu->x_velocity_change * imu_measurement_hz_,
                        imu->y_velocity_change * imu_measurement_hz_,
                        imu->z_velocity_change * imu_measurement_hz_,
@@ -508,7 +505,7 @@ bool NewtonM2Parser::HandleCorrImuData(const newtonm2::CorrImuData* imu) {
   return true;
 }
 
-bool NewtonM2Parser::HandleInsCov(const newtonm2::InsCov* cov) {
+bool NewtonM2Parser::HandleInsCov(const novatel::InsCov* cov) {
   for (int i = 0; i < 9; ++i) {
     ins_.set_position_covariance(i, cov->position_covariance[i]);
     ins_.set_euler_angles_covariance(
@@ -519,7 +516,7 @@ bool NewtonM2Parser::HandleInsCov(const newtonm2::InsCov* cov) {
   return false;
 }
 
-bool NewtonM2Parser::HandleInsPva(const newtonm2::InsPva* pva) {
+bool NewtonM2Parser::HandleInsPva(const novatel::InsPva* pva) {
   if (ins_status_ != pva->status) {
     ins_status_ = pva->status;
     AINFO << "INS status: " << static_cast<int>(ins_status_);
@@ -536,13 +533,13 @@ bool NewtonM2Parser::HandleInsPva(const newtonm2::InsPva* pva) {
   ins_.mutable_linear_velocity()->set_z(pva->up_velocity);
 
   switch (pva->status) {
-    case newtonm2::InsStatus::ALIGNMENT_COMPLETE:
-    case newtonm2::InsStatus::SOLUTION_GOOD:
+    case novatel::InsStatus::ALIGNMENT_COMPLETE:
+    case novatel::InsStatus::SOLUTION_GOOD:
       ins_.set_type(apollo::drivers::gnss::Ins::GOOD);
       break;
-    case newtonm2::InsStatus::ALIGNING:
-    case newtonm2::InsStatus::HIGH_VARIANCE:
-    case newtonm2::InsStatus::SOLUTION_FREE:
+    case novatel::InsStatus::ALIGNING:
+    case novatel::InsStatus::HIGH_VARIANCE:
+    case novatel::InsStatus::SOLUTION_FREE:
       ins_.set_type(apollo::drivers::gnss::Ins::CONVERGING);
       break;
     default:
@@ -560,7 +557,7 @@ bool NewtonM2Parser::HandleInsPva(const newtonm2::InsPva* pva) {
   return true;
 }
 
-bool NewtonM2Parser::HandleInsPvax(const newtonm2::InsPvaX* pvax,
+bool NewtonM2Parser::HandleInsPvax(const novatel::InsPvaX* pvax,
                                    uint16_t gps_week, uint32_t gps_millisecs) {
   double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   double unix_sec = common::time::TimeUtil::Gps2unix(seconds);
@@ -570,14 +567,14 @@ bool NewtonM2Parser::HandleInsPvax(const newtonm2::InsPvaX* pvax,
   return true;
 }
 
-bool NewtonM2Parser::HandleRawImuX(const newtonm2::RawImuX* imu) {
+bool NewtonM2Parser::HandleRawImuX(const novatel::RawImuX* imu) {
   if (imu->imu_error != 0) {
     AWARN << "IMU error. Status: " << std::hex << std::showbase
           << imu->imuStatus;
   }
   if (newtonm2::is_zero(gyro_scale_)) {
     config::ImuType imu_type = imu_type_;
-    newtonm2::ImuParameter param = newtonm2::GetImuParameter(imu_type);
+    novatel::ImuParameter param = novatel::GetImuParameter(imu_type);
     AINFO << "IMU type: " << config::ImuType_Name(imu_type) << "; "
           << "Gyro scale: " << param.gyro_scale << "; "
           << "Accel scale: " << param.accel_scale << "; "
@@ -632,13 +629,13 @@ bool NewtonM2Parser::HandleRawImuX(const newtonm2::RawImuX* imu) {
   return true;
 }
 
-bool NewtonM2Parser::HandleRawImu(const newtonm2::RawImu* imu) {
+bool NewtonM2Parser::HandleRawImu(const novatel::RawImu* imu) {
   double gyro_scale = 0.0;
   double accel_scale = 0.0;
   float imu_measurement_span = 1.0 / 200.0;
 
   if (newtonm2::is_zero(gyro_scale_)) {
-    newtonm2::ImuParameter param = newtonm2::GetImuParameter(imu_type_);
+    novatel::ImuParameter param = novatel::GetImuParameter(imu_type_);
 
     if (newtonm2::is_zero(param.sampling_rate_hz)) {
       AERROR_EVERY(5) << "Unsupported IMU type ADUS16488.";
@@ -693,7 +690,7 @@ bool NewtonM2Parser::HandleRawImu(const newtonm2::RawImu* imu) {
   return true;
 }
 
-bool NewtonM2Parser::HandleGpsEph(const newtonm2::GPS_Ephemeris* gps_emph) {
+bool NewtonM2Parser::HandleGpsEph(const novatel::GPS_Ephemeris* gps_emph) {
   gnss_ephemeris_.set_gnss_type(apollo::drivers::gnss::GnssType::GPS_SYS);
 
   apollo::drivers::gnss::KepplerOrbit* keppler_orbit =
@@ -732,7 +729,7 @@ bool NewtonM2Parser::HandleGpsEph(const newtonm2::GPS_Ephemeris* gps_emph) {
   return true;
 }
 
-bool NewtonM2Parser::HandleBdsEph(const newtonm2::BDS_Ephemeris* bds_emph) {
+bool NewtonM2Parser::HandleBdsEph(const novatel::BDS_Ephemeris* bds_emph) {
   gnss_ephemeris_.set_gnss_type(apollo::drivers::gnss::GnssType::BDS_SYS);
 
   apollo::drivers::gnss::KepplerOrbit* keppler_orbit =
@@ -771,7 +768,7 @@ bool NewtonM2Parser::HandleBdsEph(const newtonm2::BDS_Ephemeris* bds_emph) {
   return true;
 }
 
-bool NewtonM2Parser::HandleGloEph(const newtonm2::GLO_Ephemeris* glo_emph) {
+bool NewtonM2Parser::HandleGloEph(const novatel::GLO_Ephemeris* glo_emph) {
   gnss_ephemeris_.set_gnss_type(apollo::drivers::gnss::GnssType::GLO_SYS);
 
   apollo::drivers::gnss::GlonassOrbit* glonass_orbit =
@@ -810,7 +807,7 @@ bool NewtonM2Parser::HandleGloEph(const newtonm2::GLO_Ephemeris* glo_emph) {
   return true;
 }
 
-bool NewtonM2Parser::HandleHeading(const newtonm2::Heading* heading,
+bool NewtonM2Parser::HandleHeading(const novatel::Heading* heading,
                                    uint16_t gps_week, uint32_t gps_millisecs) {
   heading_.set_solution_status(static_cast<uint32_t>(heading->solution_status));
   heading_.set_position_type(static_cast<uint32_t>(heading->position_type));

@@ -265,7 +265,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
       cipv_options.yaw_rate = motion_buffer_[0].yaw_rate;
     }
     ADEBUG << "[CIPVSubnode] velocity " << cipv_options.velocity
-          << ", yaw rate: " << cipv_options.yaw_rate;
+           << ", yaw rate: " << cipv_options.yaw_rate;
     camera_timestamp_ = 0;
     lidar_timestamp_ = 0;
     radar_timestamp_ = 0;
@@ -314,7 +314,7 @@ Status FusionSubnode::Process(const EventMeta &event_meta,
     const std::string &device_id = events[0].reserve;
     fusion_item_ptr->fused_sensor_device_id = device_id;
 
-    for (int i = 0; i < options.fused_frame_ts.size(); ++i) {
+    for (size_t i = 0; i < options.fused_frame_ts.size(); ++i) {
       fusion_item_ptr->frame_ts.push_back(options.fused_frame_ts[i]);
       fusion_item_ptr->frame_device_id.push_back(
           options.fused_frame_device_id[i]);

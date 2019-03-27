@@ -26,9 +26,9 @@
 #include <limits>
 #include <memory>
 #include <vector>
-#include "ros/include/ros/ros.h"
 #include "modules/common/log.h"
-#include "modules/drivers/gnss/parser/newtonm2_messages.h"
+#include "ros/include/ros/ros.h"
+#include "modules/drivers/gnss/parser/novatel_messages.h"
 #include "modules/drivers/gnss/parser/parser.h"
 #include "modules/drivers/gnss/parser/rtcm_decode.h"
 #include "modules/drivers/gnss/proto/gnss.pb.h"
@@ -118,40 +118,40 @@ class NewtonM2Parser : public Parser {
   Parser::MessageType PrepareMessage(MessagePtr* message_ptr);
 
   // The handle_xxx functions return whether a message is ready.
-  bool HandleBestPos(const newtonm2::BestPos* pos, uint16_t gps_week,
+  bool HandleBestPos(const novatel::BestPos* pos, uint16_t gps_week,
                      uint32_t gps_millisecs);
 
-  bool HandleGnssBestpos(const newtonm2::BestPos* pos, uint16_t gps_week,
+  bool HandleGnssBestpos(const novatel::BestPos* pos, uint16_t gps_week,
                          uint32_t gps_millisecs);
 
-  bool HandleBestVel(const newtonm2::BestVel* vel, uint16_t gps_week,
+  bool HandleBestVel(const novatel::BestVel* vel, uint16_t gps_week,
                      uint32_t gps_millisecs);
 
-  bool HandleCorrImuData(const newtonm2::CorrImuData* imu);
+  bool HandleCorrImuData(const novatel::CorrImuData* imu);
 
-  bool HandleInsCov(const newtonm2::InsCov* cov);
+  bool HandleInsCov(const novatel::InsCov* cov);
 
-  bool HandleInsPva(const newtonm2::InsPva* pva);
+  bool HandleInsPva(const novatel::InsPva* pva);
 
-  bool HandleInsPvax(const newtonm2::InsPvaX* pvax, uint16_t gps_week,
+  bool HandleInsPvax(const novatel::InsPvaX* pvax, uint16_t gps_week,
                      uint32_t gps_millisecs);
 
-  bool HandleRawImuX(const newtonm2::RawImuX* imu);
+  bool HandleRawImuX(const novatel::RawImuX* imu);
 
-  bool HandleRawImu(const newtonm2::RawImu* imu);
+  bool HandleRawImu(const novatel::RawImu* imu);
 
-  bool HandleBdsEph(const newtonm2::BDS_Ephemeris* bds_emph);
+  bool HandleBdsEph(const novatel::BDS_Ephemeris* bds_emph);
 
-  bool HandleGpsEph(const newtonm2::GPS_Ephemeris* gps_emph);
+  bool HandleGpsEph(const novatel::GPS_Ephemeris* gps_emph);
 
-  bool HandleGloEph(const newtonm2::GLO_Ephemeris* glo_emph);
+  bool HandleGloEph(const novatel::GLO_Ephemeris* glo_emph);
 
   void SetObservationTime();
 
   bool DecodeGnssObservation(const uint8_t* obs_data,
                              const uint8_t* obs_data_end);
 
-  bool HandleHeading(const newtonm2::Heading* heading, uint16_t gps_week,
+  bool HandleHeading(const novatel::Heading* heading, uint16_t gps_week,
                      uint32_t gps_millisecs);
   double gyro_scale_ = 0.0;
 
@@ -173,13 +173,11 @@ class NewtonM2Parser : public Parser {
   config::ImuType imu_type_ = config::ImuType::CPT_XW5651;
 
   // -1 is an unused value.
-  newtonm2::SolutionStatus solution_status_ =
-      static_cast<newtonm2::SolutionStatus>(-1);
-  newtonm2::SolutionType position_type_ =
-      static_cast<newtonm2::SolutionType>(-1);
-  newtonm2::SolutionType velocity_type_ =
-      static_cast<newtonm2::SolutionType>(-1);
-  newtonm2::InsStatus ins_status_ = static_cast<newtonm2::InsStatus>(-1);
+  novatel::SolutionStatus solution_status_ =
+      static_cast<novatel::SolutionStatus>(-1);
+  novatel::SolutionType position_type_ = static_cast<novatel::SolutionType>(-1);
+  novatel::SolutionType velocity_type_ = static_cast<novatel::SolutionType>(-1);
+  novatel::InsStatus ins_status_ = static_cast<novatel::InsStatus>(-1);
 
   raw_t raw_;  // used for observation data
 
