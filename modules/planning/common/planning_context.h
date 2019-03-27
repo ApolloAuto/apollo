@@ -40,6 +40,8 @@
 namespace apollo {
 namespace planning {
 
+constexpr int kPathScenarioTransitionHysteresisFrame = 5;
+
 class PlanningContext {
  public:
   // TODO(all): to be removed/cleaned up. put all of them inside Planningstatus
@@ -74,8 +76,16 @@ class PlanningContext {
 
   static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
-  static void IncreaseFrontStaticObstacleCycleCounter() {
-    front_static_obstacle_cycle_counter_++;
+  static void IncrementFrontStaticObstacleCycleCounter() {
+    front_static_obstacle_cycle_counter_ = std::min(
+        front_static_obstacle_cycle_counter_ + 1,
+        kPathScenarioTransitionHysteresisFrame);
+  }
+
+  static void DecrementFrontStaticObstacleCycleCounter() {
+    front_static_obstacle_cycle_counter_ = std::max(
+        front_static_obstacle_cycle_counter_ - 1,
+        -kPathScenarioTransitionHysteresisFrame);
   }
 
   static void ResetFrontStaticObstacleCycleCounter() {
