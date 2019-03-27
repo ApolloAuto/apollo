@@ -61,6 +61,12 @@ class SidePassScenario : public Scenario {
 
   bool IsFarFromDestination(const Frame& frame);
 
+  bool IsWithinSidePassingSpeedADC(const Frame& frame);
+
+  bool IsSidePassableObstacle(
+    const Frame& frame, const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id);
+
   bool HasBlockingObstacle(const Frame& frame);
 
  private:
