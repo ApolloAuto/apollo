@@ -60,7 +60,7 @@ Status PathAssessmentDecider::Process(
   std::vector<PathData> valid_path_data;
   for (const auto& curr_path_data : candidate_path_data) {
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
-    //                 reference_line_info);
+    //                  reference_line_info);
     if (curr_path_data.path_label().find("fallback") != std::string::npos) {
       if (IsValidFallbackPath(*reference_line_info, curr_path_data)) {
         valid_path_data.push_back(curr_path_data);
@@ -95,6 +95,9 @@ Status PathAssessmentDecider::Process(
   // 3. Pick the optimal path.
   std::sort(valid_path_data.begin(), valid_path_data.end(),
             [](const PathData& lhs, const PathData& rhs) {
+              if (lhs.Empty() || rhs.Empty()) {
+                return rhs.Empty();
+              }
               // Regular path goes before fallback path.
               bool lhs_is_regular =
                   lhs.path_label().find("regular") != std::string::npos;

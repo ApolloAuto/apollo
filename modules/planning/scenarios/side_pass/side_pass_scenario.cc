@@ -151,15 +151,18 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
 }
 
 bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
-  // return IsFarFromDestination(frame) && IsFarFromIntersection(frame) &&
-  //        HasBlockingObstacle(frame);
   return HasSingleReferenceLine(frame) &&
          IsFarFromDestination(frame) &&
          IsFarFromIntersection(frame) &&
-         IsWithinSidePassingSpeedADC(frame) &&
-         IsSidePassableObstacle(frame, frame.reference_line_info().front(),
-             frame.reference_line_info().front().path_data().
-                 blocking_obstacle_id());
+         HasBlockingObstacle(frame);
+
+  // return HasSingleReferenceLine(frame) &&
+  //        IsFarFromDestination(frame) &&
+  //        IsFarFromIntersection(frame) &&
+  //        IsWithinSidePassingSpeedADC(frame) &&
+  //        IsSidePassableObstacle(frame, frame.reference_line_info().front(),
+  //            frame.reference_line_info().front().path_data().
+  //                blocking_obstacle_id());
 }
 
 bool SidePassScenario::HasSingleReferenceLine(const Frame& frame) {
