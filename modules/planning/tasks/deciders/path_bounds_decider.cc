@@ -52,7 +52,8 @@ constexpr double kPathBoundsDeciderHorizon = 100.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
-constexpr double kObstacleSBuffer = 2.0;
+constexpr double kObstacleStartSBuffer = 4.0;
+constexpr double kObstacleEndSBuffer = 2.0;
 constexpr double kObstacleLBuffer = 0.4;
 
 PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
@@ -555,14 +556,14 @@ std::vector<ObstacleEdge> PathBoundsDecider::SortObstaclesForSweepLine(
     // Decompose each obstacle's rectangle into two edges: one at
     // start_s; the other at end_s.
     const auto obstacle_sl = obstacle->PerceptionSLBoundary();
-    sorted_obstacles.emplace_back(1, obstacle_sl.start_s() - kObstacleSBuffer,
-                                  obstacle_sl.start_l() - kObstacleLBuffer,
-                                  obstacle_sl.end_l() + kObstacleLBuffer,
-                                  obstacle->Id());
-    sorted_obstacles.emplace_back(0, obstacle_sl.end_s() + kObstacleSBuffer,
-                                  obstacle_sl.start_l() - kObstacleLBuffer,
-                                  obstacle_sl.end_l() + kObstacleLBuffer,
-                                  obstacle->Id());
+    sorted_obstacles.emplace_back(
+        1, obstacle_sl.start_s() - kObstacleStartSBuffer,
+        obstacle_sl.start_l() - kObstacleLBuffer,
+        obstacle_sl.end_l() + kObstacleLBuffer, obstacle->Id());
+    sorted_obstacles.emplace_back(
+        0, obstacle_sl.end_s() + kObstacleEndSBuffer,
+        obstacle_sl.start_l() - kObstacleLBuffer,
+        obstacle_sl.end_l() + kObstacleLBuffer, obstacle->Id());
   }
 
   // Sort.
