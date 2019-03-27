@@ -70,7 +70,7 @@ void StopSign::MakeDecisions(
       continue;
     }
 
-    AERROR << "BuildStopDecision: stop_sign["
+    ADEBUG << "BuildStopDecision: stop_sign["
            << stop_sign_overlap.object_id
            << "] start_s[" << stop_sign_overlap.start_s << "]";
     BuildStopDecision(
