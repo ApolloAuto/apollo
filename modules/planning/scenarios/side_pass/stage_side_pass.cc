@@ -83,6 +83,34 @@ Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
     ADEBUG << ptr_task->Name() << " time spend: " << time_diff_ms << " ms.";
   }
 
+  /**
+  if (reference_line_info->speed_data().empty()) {
+    *reference_line_info->mutable_speed_data() =
+        SpeedProfileGenerator::GenerateFallbackSpeedProfile();
+    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
+    reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
+  } else {
+    reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
+  }
+  **/
+
+  if(reference_line_info->path_data().Empty() ||
+     reference_line_info->speed_data().empty()) {
+    AERROR << "Unexpected empty path data or speed data";
+    return Status(common::ErrorCode::PLANNING_ERROR);
+  }
+
+  reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
+  DiscretizedTrajectory trajectory;
+  if (!reference_line_info->CombinePathAndSpeedProfile(
+          planning_start_point.relative_time(),
+          planning_start_point.path_point().s(), &trajectory)) {
+    AERROR << "Fail to aggregate planning trajectory.";
+    return Status(common::ErrorCode::PLANNING_ERROR);
+  }
+  reference_line_info->SetTrajectory(trajectory);
+  reference_line_info->SetDrivable(true);
+
   return Status::OK();
 }
 
