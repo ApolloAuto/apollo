@@ -41,11 +41,6 @@ class StopSign : public TrafficRule {
   void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
 
-  int BuildStopDecision(Frame* const frame,
-                        ReferenceLineInfo* const reference_line_info,
-                        const hdmap::PathOverlap& stop_sign_overlap,
-                        const std::vector<std::string>& wait_for_obstacles);
-
  private:
   static constexpr char const* const STOP_SIGN_VO_ID_PREFIX = "SS_";
 };
