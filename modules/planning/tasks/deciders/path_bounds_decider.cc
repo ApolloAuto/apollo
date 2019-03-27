@@ -315,57 +315,59 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     double curr_neighbor_lane_width = 0.0;
     hdmap::Lane curr_lane;
     hdmap::LaneInfoConstPtr lane_info_ptr;
-    if (!GetLaneInfoFromPoint(
-            reference_line.GetReferencePoint(curr_s).x(),
-            reference_line.GetReferencePoint(curr_s).y(), 0.0,
-            reference_line.GetReferencePoint(curr_s).heading(),
-            &lane_info_ptr)) {
-      // If cannot even find the current LaneInfo, use past results.
-      ADEBUG << "Cannot find the true current lane; therefore, use the "
-                "planning starting point's lane as a substitute.";
-      curr_neighbor_lane_width = past_neighbor_lane_width;
-    } else {
-      // Otherwise:
-      curr_lane = lane_info_ptr->lane();
-      hdmap::LaneInfoConstPtr adjacent_lane = nullptr;
-      if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
-        // Borrowing left neighbor lane.
-        ADEBUG << "Borrowing the left lane.";
-        if (curr_lane.left_neighbor_forward_lane_id_size() > 0) {
-          adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-              curr_lane.left_neighbor_forward_lane_id(0));
-
-        } else if (curr_lane.left_neighbor_reverse_lane_id_size() > 0) {
-          adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-              curr_lane.left_neighbor_reverse_lane_id(0));
-        }
-      } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
-        // Borrowing right neighbor lane.
-        ADEBUG << "Borrowing the right lane.";
-        if (curr_lane.right_neighbor_forward_lane_id_size() > 0) {
-          adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-              curr_lane.right_neighbor_forward_lane_id(0));
-        } else if (curr_lane.right_neighbor_reverse_lane_id_size() > 0) {
-          adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-              curr_lane.right_neighbor_reverse_lane_id(0));
-        }
-      }
-      common::SLPoint sl_curr_s;
-      sl_curr_s.set_s(curr_s);
-      sl_curr_s.set_l(0.0);
-      common::math::Vec2d xy_curr_s;
-      reference_line.SLToXY(sl_curr_s, &xy_curr_s);
-      double adjacent_lane_s = 0.0;
-      double adjacent_lane_l = 0.0;
-      if (adjacent_lane == nullptr ||
-          !adjacent_lane->GetProjection(xy_curr_s,
-                                        &adjacent_lane_s,
-                                        &adjacent_lane_l)) {
-        ADEBUG << "Unable to get the neighbor lane's width.";
+    if (lane_borrow_info != LaneBorrowInfo::NO_BORROW) {
+      if (!GetLaneInfoFromPoint(
+              reference_line.GetReferencePoint(curr_s).x(),
+              reference_line.GetReferencePoint(curr_s).y(), 0.0,
+              reference_line.GetReferencePoint(curr_s).heading(),
+              &lane_info_ptr)) {
+        // If cannot even find the current LaneInfo, use past results.
+        ADEBUG << "Cannot find the true current lane; therefore, use the "
+                  "planning starting point's lane as a substitute.";
         curr_neighbor_lane_width = past_neighbor_lane_width;
       } else {
-        curr_neighbor_lane_width = adjacent_lane->GetWidth(adjacent_lane_s);
-        past_neighbor_lane_width = curr_neighbor_lane_width;
+        // Otherwise:
+        curr_lane = lane_info_ptr->lane();
+        hdmap::LaneInfoConstPtr adjacent_lane = nullptr;
+        if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
+          // Borrowing left neighbor lane.
+          ADEBUG << "Borrowing the left lane.";
+          if (curr_lane.left_neighbor_forward_lane_id_size() > 0) {
+            adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+                curr_lane.left_neighbor_forward_lane_id(0));
+
+          } else if (curr_lane.left_neighbor_reverse_lane_id_size() > 0) {
+            adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+                curr_lane.left_neighbor_reverse_lane_id(0));
+          }
+        } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
+          // Borrowing right neighbor lane.
+          ADEBUG << "Borrowing the right lane.";
+          if (curr_lane.right_neighbor_forward_lane_id_size() > 0) {
+            adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+                curr_lane.right_neighbor_forward_lane_id(0));
+          } else if (curr_lane.right_neighbor_reverse_lane_id_size() > 0) {
+            adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
+                curr_lane.right_neighbor_reverse_lane_id(0));
+          }
+        }
+        common::SLPoint sl_curr_s;
+        sl_curr_s.set_s(curr_s);
+        sl_curr_s.set_l(0.0);
+        common::math::Vec2d xy_curr_s;
+        reference_line.SLToXY(sl_curr_s, &xy_curr_s);
+        double adjacent_lane_s = 0.0;
+        double adjacent_lane_l = 0.0;
+        if (adjacent_lane == nullptr ||
+            !adjacent_lane->GetProjection(xy_curr_s,
+                                          &adjacent_lane_s,
+                                          &adjacent_lane_l)) {
+          ADEBUG << "Unable to get the neighbor lane's width.";
+          curr_neighbor_lane_width = past_neighbor_lane_width;
+        } else {
+          curr_neighbor_lane_width = adjacent_lane->GetWidth(adjacent_lane_s);
+          past_neighbor_lane_width = curr_neighbor_lane_width;
+        }
       }
     }
 
