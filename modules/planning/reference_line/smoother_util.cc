@@ -150,7 +150,7 @@ class SmootherUtil {
       const auto& point = ref_points_[i];
       ofs << std::fixed << "{\"kappa\": " << point.kappa() << ", \"s\": " << s
           << ", \"theta\": " << point.heading() << ", \"x\":" << point.x()
-          << ", \"y\":" << point.y() << ", \"dkappa\":" << point.dkappa() 
+          << ", \"y\":" << point.y() << ", \"dkappa\":" << point.dkappa()
           << "}";
       s += DistanceXY(point, ref_points_[i + 1]);
     }
