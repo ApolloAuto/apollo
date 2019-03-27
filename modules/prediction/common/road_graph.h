@@ -20,10 +20,9 @@
 #include <string>
 #include <vector>
 
-#include "modules/prediction/proto/lane_graph.pb.h"
-
 #include "modules/common/status/status.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
