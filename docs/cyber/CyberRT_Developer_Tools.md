@@ -182,7 +182,8 @@ usage: cyber_recorder record [options]
 ```
 $ cyber_recorder play -h
 usage: cyber_recorder play [options]
-    -f, --file <file>			input record file  
+    -f, --file <file>			input record file
+    -a, --all				play all
     -c, --white-channel <name>		only play the specified channel
     -k, --black-channel <name>		not play the specified channel
     -l, --loop				loop play  
