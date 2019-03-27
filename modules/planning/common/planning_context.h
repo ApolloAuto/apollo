@@ -46,13 +46,6 @@ class PlanningContext {
   static const SidePassInfo& side_pass_info() { return side_pass_info_; }
   static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
-  struct LaneFollowInfo {
-    bool blocked_by_front_obstacle = false;
-    std::string front_obstacle_id = "";
-    double front_obstacle_distance = 0.0;
-    int num_of_blocked_cycles = 0;
-  };
-
   static void Clear();
 
   static void Init();
@@ -67,15 +60,23 @@ class PlanningContext {
 
   static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
-  static const LaneFollowInfo& lane_follow_info() { return lane_follow_info_; }
+  static void IncreaseFrontStaticObstacleCycleCounter() {
+    front_static_obstacle_cycle_counter_++;
+  }
 
-  static LaneFollowInfo* mutable_lane_follow_info() {
-      return &lane_follow_info_; }
+  static void ResetFrontStaticObstacleCycleCounter() {
+    front_static_obstacle_cycle_counter_ = 0;
+  }
+
+  static int front_static_obstacle_cycle_counter() {
+    return front_static_obstacle_cycle_counter_;
+  }
 
  private:
   static PlanningStatus planning_status_;
   static SidePassInfo side_pass_info_;
-  static LaneFollowInfo lane_follow_info_;
+
+  static int front_static_obstacle_cycle_counter_ = 0;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext)
