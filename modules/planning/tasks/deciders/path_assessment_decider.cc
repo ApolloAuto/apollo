@@ -157,7 +157,7 @@ Status PathAssessmentDecider::Process(
       valid_path_data.front().blocking_obstacle_id());
 
   // Plot the path in simulator for debug purpose.
-  RecordDebugInfo(reference_line_info->path_data(), "PathData",
+  RecordDebugInfo(reference_line_info->path_data(), "Planning PathData",
                   reference_line_info);
   return Status::OK();
 }
