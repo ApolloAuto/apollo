@@ -102,6 +102,7 @@ DECLARE_double(heading_filter_param);
 DECLARE_uint64(max_num_lane_point);
 DECLARE_double(distance_threshold_to_junction_exit);
 DECLARE_double(angle_threshold_to_junction_exit);
+DECLARE_uint32(sample_size_for_average_lane_curvature);
 
 // Validation checker
 DECLARE_double(centripetal_acc_coeff);

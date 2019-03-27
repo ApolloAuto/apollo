@@ -178,29 +178,76 @@ void RoadGraph::ComputeLaneSequence(
     // Sort the successor lane_segments from left to right.
     std::vector<std::shared_ptr<const hdmap::LaneInfo>> successor_lanes;
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
-      successor_lanes.push_back(
+      successor_lanes.emplace_back(
           PredictionMap::LaneById(successor_lane_id.id()));
     }
     std::sort(successor_lanes.begin(), successor_lanes.end(), IsAtLeft);
 
-    if (consider_divide) {
-      if (successor_lanes.size() > 1) {
-        // Run recursion function to perform DFS.
-        for (size_t i = 0; i < successor_lanes.size(); i++) {
-          ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lanes[i],
-                              graph_search_horizon - 1,  false, lane_segments,
-                              lane_graph_ptr);
+    if (!successor_lanes.empty()) {
+      if (consider_divide) {
+        if (successor_lanes.size() > 1) {
+          // Run recursion function to perform DFS.
+          for (size_t i = 0; i < successor_lanes.size(); i++) {
+            ComputeLaneSequence(
+                successor_accumulated_s, 0.0, successor_lanes[i],
+                graph_search_horizon - 1,  false, lane_segments,
+                lane_graph_ptr);
+          }
+        } else {
+          ComputeLaneSequence(
+              successor_accumulated_s, 0.0, successor_lanes[0],
+              graph_search_horizon - 1,  true, lane_segments,
+              lane_graph_ptr);
         }
       } else {
-        ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lanes[0],
-                            graph_search_horizon - 1,  true, lane_segments,
-                            lane_graph_ptr);
+        auto selected_successor_lane =
+            LaneWithSmallestAverageCurvature(successor_lanes);
+          ComputeLaneSequence(
+              successor_accumulated_s, 0.0, selected_successor_lane,
+              graph_search_horizon - 1,  false, lane_segments,
+              lane_graph_ptr);
       }
-    } else {
-      // TODO(kechxu) select a successor lane
     }
   }
   lane_segments->pop_back();
+}
+
+std::shared_ptr<const hdmap::LaneInfo>
+RoadGraph::LaneWithSmallestAverageCurvature(
+    const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lane_infos)
+const {
+  CHECK(!lane_infos.empty());
+  size_t sample_size = FLAGS_sample_size_for_average_lane_curvature;
+  std::shared_ptr<const hdmap::LaneInfo> selected_lane_info = lane_infos[0];
+  double smallest_curvature = AverageCurvature(
+      selected_lane_info->id().id(), sample_size);
+  for (size_t i = 1; i < lane_infos.size(); ++i) {
+    std::shared_ptr<const hdmap::LaneInfo> lane_info = lane_infos[i];
+    double curvature = AverageCurvature(lane_info->id().id(), sample_size);
+    if (curvature < smallest_curvature) {
+      smallest_curvature = curvature;
+      selected_lane_info = lane_info;
+    }
+  }
+  return selected_lane_info;
+}
+
+double RoadGraph::AverageCurvature(
+    const std::string& lane_id, const size_t sample_size) const {
+  CHECK_GT(sample_size, 0);
+  std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr =
+      PredictionMap::LaneById(lane_id);
+  if (lane_info_ptr == nullptr) {
+    return 0.0;
+  }
+  double lane_length = lane_info_ptr->total_length();
+  double s_gap = lane_length / static_cast<double>(sample_size);
+  double curvature_sum = 0.0;
+  for (size_t i = 0; i < sample_size; ++i) {
+    double s = s_gap * static_cast<double>(i);
+    curvature_sum += PredictionMap::CurvatureOnLane(lane_id, s);
+  }
+  return curvature_sum / static_cast<double>(sample_size);
 }
 
 }  // namespace prediction
