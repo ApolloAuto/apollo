@@ -76,7 +76,7 @@ class PlanningContext {
   static PlanningStatus planning_status_;
   static SidePassInfo side_pass_info_;
 
-  static int front_static_obstacle_cycle_counter_ = 0;
+  static int front_static_obstacle_cycle_counter_;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext)
