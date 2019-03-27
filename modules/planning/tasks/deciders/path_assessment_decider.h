@@ -94,6 +94,12 @@ class PathAssessmentDecider : public Decider {
       const ReferenceLineInfo& reference_line_info, const PathData& path_data,
       std::vector<std::tuple<double, PathData::PathPointType, double>>* const
           path_point_decision);
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Below are helper functions.
+  void RecordDebugInfo(
+    const PathData& path_data, const std::string& debug_name,
+    ReferenceLineInfo *const reference_line_info);
 };
 
 /////////////////////////////////////////////////////////////////////////////
