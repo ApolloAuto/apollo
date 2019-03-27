@@ -178,7 +178,7 @@ void RoadGraph::ComputeLaneSequence(
     // Sort the successor lane_segments from left to right.
     std::vector<std::shared_ptr<const hdmap::LaneInfo>> successor_lanes;
     for (const auto& successor_lane_id : lane_info_ptr->lane().successor_id()) {
-      successor_lanes.emplace_back(
+      successor_lanes.push_back(
           PredictionMap::LaneById(successor_lane_id.id()));
     }
     std::sort(successor_lanes.begin(), successor_lanes.end(), IsAtLeft);
@@ -245,7 +245,7 @@ double RoadGraph::AverageCurvature(
   double curvature_sum = 0.0;
   for (size_t i = 0; i < sample_size; ++i) {
     double s = s_gap * static_cast<double>(i);
-    curvature_sum += PredictionMap::CurvatureOnLane(lane_id, s);
+    curvature_sum += std::abs(PredictionMap::CurvatureOnLane(lane_id, s));
   }
   return curvature_sum / static_cast<double>(sample_size);
 }
