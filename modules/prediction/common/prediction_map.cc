@@ -51,6 +51,10 @@ double PredictionMap::HeadingOnLane(
 double PredictionMap::CurvatureOnLane(const std::string& lane_id,
                                       const double s) {
   std::shared_ptr<const hdmap::LaneInfo> lane_info = LaneById(lane_id);
+  if (lane_info == nullptr) {
+    AERROR << "Null lane_info ptr found";
+    return 0.0;
+  }
   return lane_info->Curvature(s);
 }
 
