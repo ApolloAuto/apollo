@@ -57,7 +57,7 @@ Status PathAssessmentDecider::Process(
   // 1. Remove invalid path.
   std::vector<PathData> valid_path_data;
   for (const auto& curr_path_data : candidate_path_data) {
-    if (curr_path_data.path_label().find("fallback")) {
+    if (curr_path_data.path_label().find("fallback") != std::string::npos) {
       if (IsValidFallbackPath(*reference_line_info, curr_path_data)) {
         valid_path_data.push_back(curr_path_data);
       }
@@ -67,6 +67,19 @@ Status PathAssessmentDecider::Process(
       }
     }
   }
+
+  // 2. Analyze and add important info for speed decider to use.
+  for (auto& curr_path_data : valid_path_data) {
+    if (curr_path_data.path_label().find("fallback") != std::string::npos) {
+      continue;
+    }
+    ADEBUG << "Path length = " << curr_path_data.frenet_frame_path().size();
+    SetPathInfo(*reference_line_info, &curr_path_data);
+    // Trim all the lane-borrowing paths so that it ends with an in-lane
+    // position.
+    TrimTailingOutLanePoints(&curr_path_data);
+    // TODO(jiacheng): remove empty path_data.
+  }
   // If there is no valid path_data, exit.
   if (valid_path_data.empty()) {
     const std::string msg = "Neither regular nor fallback path is valid.";
@@ -75,25 +88,50 @@ Status PathAssessmentDecider::Process(
   }
   ADEBUG << "There are " << valid_path_data.size() << " valid path data.";
 
-  // 2. Analyze and add important info for speed decider to use.
-  for (auto& curr_path_data : valid_path_data) {
-    if (curr_path_data.path_label().find("fallback")) {
-      continue;
-    }
-    ADEBUG << "Path length = " << curr_path_data.frenet_frame_path().size();
-    SetPathInfo(*reference_line_info, &curr_path_data);
-  }
-
   // 3. Pick the optimal path.
   std::sort(valid_path_data.begin(), valid_path_data.end(),
             [](const PathData& lhs, const PathData& rhs) {
+              // Regular path goes before fallback path.
               if (lhs.path_label().find("regular") !=
                   rhs.path_label().find("regular")) {
-                return lhs.path_label().find("regular");
+                return lhs.path_label().find("regular") != std::string::npos;
               }
-              // TODO(jiacheng): update this to include more lane-info
-              // in sorting (such as left or right, forward or reverse).
-                return lhs.path_label().find("regular");
+              // Select longer path.
+              constexpr double kPathLengthComparisonTolerance = 5.0;
+              if (std::fabs(lhs.discretized_path().back().s() -
+                            rhs.discretized_path().back().s()) >
+                  kPathLengthComparisonTolerance) {
+                return lhs.discretized_path().size() <
+                       rhs.discretized_path().size();
+              }
+              // If roughly same length,
+              // then select self-lane path over borrowed-lane paths.
+              if (lhs.path_label().find("self") != std::string::npos ||
+                  rhs.path_label().find("self") != std::string::npos) {
+                return lhs.path_label().find("self") != std::string::npos;
+              }
+              // If roughly same length, and must borrow neighbor lane,
+              // then prefer to borrow forward lane rather than reverse lane.
+              if (ContainsOutOnReverseLane(lhs.path_point_decision_guide()) !=
+                  ContainsOutOnReverseLane(rhs.path_point_decision_guide())) {
+                return !ContainsOutOnReverseLane(
+                           lhs.path_point_decision_guide());
+              }
+              // If same length, both neighbor lane are forward,
+              // then select the one that returns back to in-lane earlier.
+              if (GetBackToInLaneIndex(lhs.path_point_decision_guide()) !=
+                  GetBackToInLaneIndex(rhs.path_point_decision_guide())) {
+                return GetBackToInLaneIndex(lhs.path_point_decision_guide()) <
+                       GetBackToInLaneIndex(rhs.path_point_decision_guide());
+              }
+              // If same length, both forward, back to inlane at same time,
+              // select the left one to side-pass.
+              if (lhs.path_label().find("left") !=
+                  rhs.path_label().find("left")) {
+                return lhs.path_label().find("left") != std::string::npos;
+              }
+              // Otherwise, they are the same path, lhs is not < rhs.
+              return false;
             });
   ADEBUG << "Using " << valid_path_data.front().path_label() << " path.";
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
@@ -132,16 +170,6 @@ bool PathAssessmentDecider::IsValidRegularPath(
     ADEBUG << "Regular Path: ADC has collision.";
     return false;
   }
-  // Check if it ever returns to self-lane.
-  if (!path_data.path_label().find("self")) {
-    if (IsReturningToSelfLane(reference_line_info, path_data) == -1) {
-      ADEBUG << "Regular Path: Borrowed neighbor lane but is not able to "
-                "return to self-lane eventually.";
-      return false;
-    } else {
-      // TODO(jiacheng): trim the non-inlane part.
-    }
-  }
   return true;
 }
 
@@ -176,6 +204,28 @@ void PathAssessmentDecider::SetPathInfo(
   SetObstacleDistance(reference_line_info, *path_data, &path_decision);
 
   path_data->SetPathPointDecisionGuide(path_decision);
+}
+
+void PathAssessmentDecider::TrimTailingOutLanePoints(
+    PathData* const path_data) {
+  // Don't trim self-lane path or fallback path.
+  if (path_data->path_label().find("fallback") != std::string::npos ||
+      path_data->path_label().find("self") != std::string::npos) {
+    return;
+  }
+
+  // Trim.
+  auto frenet_path = path_data->frenet_frame_path();
+  auto path_point_decision = path_data->path_point_decision_guide();
+  CHECK_EQ(frenet_path.size(), path_point_decision.size());
+  while (!path_point_decision.empty() &&
+         std::get<1>(path_point_decision.back()) !=
+            PathData::PathPointType::IN_LANE) {
+    frenet_path.pop_back();
+    path_point_decision.pop_back();
+  }
+  path_data->SetFrenetPath(frenet_path);
+  path_data->SetPathPointDecisionGuide(path_point_decision);
 }
 
 bool PathAssessmentDecider::IsGreatlyOffReferenceLine(
@@ -253,12 +303,6 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
   }
 
   return false;
-}
-
-// TODO(jiacheng): implement this.
-int PathAssessmentDecider::IsReturningToSelfLane(
-    const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
-  return static_cast<int>(path_data.frenet_frame_path().size()) - 1;
 }
 
 void PathAssessmentDecider::InitPathPointDecision(
@@ -420,7 +464,7 @@ void PathAssessmentDecider::SetObstacleDistance(
   }
 }
 
-bool PathAssessmentDecider::ContainsOutOnReverseLane(
+bool ContainsOutOnReverseLane(
     const std::vector<PathPointDecision>& path_point_decision) {
   for (const auto& curr_decision : path_point_decision) {
     if (std::get<1>(curr_decision) ==
@@ -431,9 +475,18 @@ bool PathAssessmentDecider::ContainsOutOnReverseLane(
   return false;
 }
 
-// TODO(jiacheng): implement this.
-int PathAssessmentDecider::GetBackToInLaneIndex(
+int GetBackToInLaneIndex(
     const std::vector<PathPointDecision>& path_point_decision) {
+  // CHECK(!path_point_decision.empty());
+  // CHECK(std::get<1>(path_point_decision.back()) ==
+  //       PathData::PathPointType::IN_LANE);
+
+  for (int i = static_cast<int>(path_point_decision.size()) - 1; i >= 0; --i) {
+    if (std::get<1>(path_point_decision[i]) !=
+        PathData::PathPointType::IN_LANE) {
+      return i + 1;
+    }
+  }
   return 0;
 }
 
