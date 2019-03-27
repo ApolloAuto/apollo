@@ -133,12 +133,12 @@ void TrafficLight::MakeDecisions(
 
     if (signal_color == perception::TrafficLight::GREEN) {
       continue;
-    }
-
-    // Red/Yellow/Unown: check deceleration
-    if (stop_deceleration > config_.traffic_light().max_stop_deceleration()) {
-      AWARN << "stop_deceleration too big to achieve.  SKIP red light";
-      continue;
+    } else {
+      // Red/Yellow/Unown: check deceleration
+      if (stop_deceleration > config_.traffic_light().max_stop_deceleration()) {
+        AWARN << "stop_deceleration too big to achieve.  SKIP red light";
+        continue;
+      }
     }
 
     ADEBUG << "BuildStopDecision: traffic_light["
@@ -215,7 +215,6 @@ int TrafficLight::BuildStopDecision(
     return -1;
   }
 
-  // build stop decision
   // build stop decision
   const double stop_s =
       traffic_light_overlap.start_s - config_.traffic_light().stop_distance();
