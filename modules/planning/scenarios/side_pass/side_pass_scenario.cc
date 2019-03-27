@@ -86,7 +86,7 @@ std::unique_ptr<Stage> SidePassScenario::CreateStage(
   return ptr;
 }
 
-bool SidePassScenario::IsTransferable(const Scenario& from_scenario,
+bool SidePassScenario::IsTransferable(const Scenario& target_scenario,
                                       const Frame& frame) {
   // Sanity checks.
   if (frame.reference_line_info().size() > 1) {
@@ -97,7 +97,7 @@ bool SidePassScenario::IsTransferable(const Scenario& from_scenario,
       PlanningContext::Planningstatus().side_pass()
           .front_blocking_obstacle_id();
 
-  if (from_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
+  if (target_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     // Check if the blocking obstacle is still static.
     // If not, then switch to LANE_FOLLOW.
     const auto ptr_front_blocking_obstacle =
@@ -107,7 +107,6 @@ bool SidePassScenario::IsTransferable(const Scenario& from_scenario,
              << " not exist any more. Change scenario to default scenario.";
       return false;
     }
-
     if (!ptr_front_blocking_obstacle->IsStatic()) {
       ADEBUG << "Obstacle " << front_blocking_obstacle_id
              << " starts to move. Change scenario to default scenario.";
@@ -129,32 +128,25 @@ bool SidePassScenario::IsTransferable(const Scenario& from_scenario,
       return false;
     }
     msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
-    return (from_scenario.GetStatus() !=
+    return (target_scenario.GetStatus() !=
             Scenario::ScenarioStatus::STATUS_DONE);
-  } else if (from_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
+  } else if (target_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
     // If in some other special scenario, then don't try to switch
     // to SIDE_PASS scenario.
     return false;
   } else {
     // If originally in LANE_FOLLOW, then decide whether we should
     // switch to SIDE_PASS scenario.
-    if (!IsFarFromDestination(frame)) {
-      return false;
+    ADEBUG << "Checking if it's needed to switch from LANE_FOLLOW to "
+              "SIDE_PASS: ";
+    bool is_side_pass = IsSidePassScenario(frame);
+    if (is_side_pass) {
+      ADEBUG << "   YES!";
+      msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
+    } else {
+      ADEBUG << "   NO!";
     }
-
-    if (!IsFarFromIntersection(frame)) {
-      return false;
-    }
-
-    if (!HasBlockingObstacle(frame)) {
-      return false;
-    }
-
-    // TODO(all): make 5 a flag/config
-    if (PlanningContext::front_static_obstacle_cycle_counter() < 5) {
-      return false;
-    }
-    return true;
+    return is_side_pass;
   }
 }
 
@@ -214,8 +206,19 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
   return true;
 }
 
-bool SidePassScenario::HasBlockingObstacle(const Frame& frame,
-                                           const ScenarioConfig& config) {
+// TODO(jiacheng): implement this.
+bool SidePassScenario::IsWithinSidePassingSpeedADC(const Frame& frame) {
+  return true;
+}
+
+// TODO(jiacheng): implement this to replace HasBlockingObstacle.
+bool SidePassScenario::IsSidePassableObstacle(
+    const Frame& frame, const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id) {
+  return true;
+}
+
+bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
   // Sanity checks.
   if (frame.reference_line_info().size() > 1) {
     return false;

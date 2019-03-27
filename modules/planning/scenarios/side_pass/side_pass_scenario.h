@@ -63,8 +63,13 @@ class SidePassScenario : public Scenario {
 
   static bool IsFarFromDestination(const Frame& frame);
 
-  static bool HasBlockingObstacle(const Frame& frame,
-                                  const ScenarioConfig& config);
+  bool IsWithinSidePassingSpeedADC(const Frame& frame);
+
+  bool IsSidePassableObstacle(
+    const Frame& frame, const ReferenceLineInfo& reference_line_info,
+    const std::string& blocking_obstacle_id);
+
+  bool HasBlockingObstacle(const Frame& frame);
 
  private:
   static apollo::common::util::Factory<
