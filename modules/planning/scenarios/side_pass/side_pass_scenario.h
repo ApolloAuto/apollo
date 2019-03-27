@@ -57,6 +57,8 @@ class SidePassScenario : public Scenario {
 
   bool IsSidePassScenario(const Frame& frame);
 
+  bool HasSingleReferenceLine(const Frame& frame);
+
   bool IsFarFromIntersection(const Frame& frame) const;
 
   bool IsFarFromDestination(const Frame& frame) const;
