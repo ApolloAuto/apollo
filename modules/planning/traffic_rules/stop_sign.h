@@ -20,6 +20,9 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
@@ -40,7 +43,8 @@ class StopSign : public TrafficRule {
 
   int BuildStopDecision(Frame* const frame,
                         ReferenceLineInfo* const reference_line_info,
-                        const hdmap::PathOverlap& traffic_light_overlap);
+                        const hdmap::PathOverlap& stop_sign_overlap,
+                        const std::vector<std::string>& wait_for_obstacles);
 
  private:
   static constexpr char const* const STOP_SIGN_VO_ID_PREFIX = "SS_";

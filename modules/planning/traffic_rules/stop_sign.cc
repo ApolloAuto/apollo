@@ -20,9 +20,6 @@
 
 #include "modules/planning/traffic_rules/stop_sign.h"
 
-#include <string>
-#include <vector>
-
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
@@ -76,14 +73,17 @@ void StopSign::MakeDecisions(
     AERROR << "BuildStopDecision: stop_sign["
            << stop_sign_overlap.object_id
            << "] start_s[" << stop_sign_overlap.start_s << "]";
-    BuildStopDecision(frame, reference_line_info, stop_sign_overlap);
+    BuildStopDecision(
+        frame, reference_line_info, stop_sign_overlap,
+        PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles);
   }
 }
 
 int StopSign::BuildStopDecision(
     Frame* const frame,
     ReferenceLineInfo* const reference_line_info,
-    const hdmap::PathOverlap& stop_sign_overlap) {
+    const hdmap::PathOverlap& stop_sign_overlap,
+    const std::vector<std::string>& wait_for_obstacles) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -125,6 +125,10 @@ int StopSign::BuildStopDecision(
   stop_decision->mutable_stop_point()->set_x(stop_point.x());
   stop_decision->mutable_stop_point()->set_y(stop_point.y());
   stop_decision->mutable_stop_point()->set_z(0.0);
+
+  for (size_t i = 0; i < wait_for_obstacles.size(); ++i) {
+    stop_decision->add_wait_for_obstacle(wait_for_obstacles[i]);
+  }
 
   auto* path_decision = reference_line_info->path_decision();
   path_decision->AddLongitudinalDecision(
