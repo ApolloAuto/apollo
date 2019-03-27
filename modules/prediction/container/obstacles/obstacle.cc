@@ -988,8 +988,7 @@ void Obstacle::BuildLaneGraph() {
   }
   double speed = feature->speed();
   double t_max = FLAGS_prediction_trajectory_time_length;
-  double a_max = FLAGS_vehicle_max_linear_acc;
-  auto estimated_move_distance = speed * t_max + 0.5 * a_max * t_max * t_max;
+  auto estimated_move_distance = speed * t_max;
 
   double road_graph_search_distance = std::fmax(
       estimated_move_distance, FLAGS_min_prediction_trajectory_spatial_length);

@@ -162,6 +162,8 @@ DEFINE_double(distance_threshold_to_junction_exit, 1.0,
               "Threshold of distance to junction exit");
 DEFINE_double(angle_threshold_to_junction_exit, M_PI * 0.25,
               "Threshold of angle to junction exit");
+DEFINE_uint32(sample_size_for_average_lane_curvature, 10,
+              "The sample size to compute average lane curvature");
 
 // Validation checker
 DEFINE_double(centripetal_acc_coeff, 0.5,
