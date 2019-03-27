@@ -14,6 +14,7 @@ cc_library(
         "pull_over.cc",
         "reference_line_end.cc",
         "rerouting.cc",
+        "stop_sign.cc",
         "traffic_light.cc",
     ],
     hdrs = [
@@ -26,6 +27,7 @@ cc_library(
         "pull_over.h",
         "reference_line_end.h",
         "rerouting.h",
+        "stop_sign.h",
         "traffic_light.h",
         "traffic_rule.h",
     ],

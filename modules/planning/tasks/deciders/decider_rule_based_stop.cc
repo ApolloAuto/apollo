@@ -53,55 +53,9 @@ Status DeciderRuleBasedStop::Process(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  CheckStopSign(frame, reference_line_info);
-
   CheckOpenSpacePreStop(frame, reference_line_info);
 
   return Status::OK();
-}
-
-void DeciderRuleBasedStop::CheckStopSign(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-
-  const auto& stop_sign_config =
-      config_.decider_rule_based_stop_config().stop_sign();
-
-  if (!stop_sign_config.enabled()) {
-    return;
-  }
-
-  const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
-
-  const std::vector<PathOverlap>& stop_sign_overlaps =
-      reference_line_info->reference_line().map_path().stop_sign_overlaps();
-  for (const auto& stop_sign_overlap : stop_sign_overlaps) {
-    if (stop_sign_overlap.end_s <= adc_back_edge_s) {
-      continue;
-    }
-
-    const auto& stop_done_overlap_ids =
-        PlanningContext::GetScenarioInfo()->stop_done_overlap_ids;
-    if (stop_done_overlap_ids.end() != std::find(stop_done_overlap_ids.begin(),
-                                                 stop_done_overlap_ids.end(),
-                                                 stop_sign_overlap.object_id)) {
-      continue;
-    }
-
-    const std::string stop_wall_id =
-        STOP_SIGN_VO_ID_PREFIX + stop_sign_overlap.object_id;
-    const double stop_line_s = stop_sign_overlap.start_s;
-    const double stop_distance = stop_sign_config.stop_distance();
-    ADEBUG << "DeciderRuleBasedStop: stop_wall_id[" << stop_wall_id
-           << "] stop_line_s[" << stop_line_s << "]";
-
-    BuildStopDecision(
-        stop_wall_id, stop_line_s, stop_distance,
-        StopReasonCode::STOP_REASON_STOP_SIGN,
-        PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles, frame,
-        reference_line_info);
-  }
 }
 
 void DeciderRuleBasedStop::CheckOpenSpacePreStop(

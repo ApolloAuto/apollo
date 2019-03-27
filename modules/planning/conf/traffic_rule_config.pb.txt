@@ -90,6 +90,14 @@ config: {
 }
 
 config: {
+  rule_id: STOP_SIGN
+  enabled: true
+  stop_sign: {
+    stop_distance: 1.0
+  }
+}
+
+config: {
   rule_id: TRAFFIC_LIGHT
   enabled: true
   traffic_light {
