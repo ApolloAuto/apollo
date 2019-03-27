@@ -75,12 +75,12 @@ void StopSign::MakeDecisions(
     std::string virtual_obstacle_id =
         STOP_SIGN_VO_ID_PREFIX + stop_sign_overlap.object_id;
     BuildStopDecision(
-        frame, reference_line_info,
         virtual_obstacle_id,
         stop_sign_overlap.start_s,
         config_.stop_sign().stop_distance(),
         StopReasonCode::STOP_REASON_STOP_SIGN,
-        PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles);
+        PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles,
+        frame, reference_line_info);
   }
 }
 
