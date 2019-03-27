@@ -79,7 +79,7 @@ Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000.0;
 
     ADEBUG << "after optimizer " << ptr_task->Name() << ":"
-           << reference_line_info->PathSpeedDebugString() << std::endl;
+           << reference_line_info->PathSpeedDebugString();
     ADEBUG << ptr_task->Name() << " time spend: " << time_diff_ms << " ms.";
   }
 
