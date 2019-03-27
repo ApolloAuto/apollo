@@ -37,7 +37,6 @@ using common::Status;
 using common::time::Clock;
 using common::VehicleState;
 using common::math::Vec2d;
-using common::util::WithinBound;
 using hdmap::PathOverlap;
 using perception::TrafficLightDetection;
 

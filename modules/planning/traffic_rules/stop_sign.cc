@@ -28,8 +28,6 @@ namespace apollo {
 namespace planning {
 
 using common::Status;
-using common::math::Vec2d;
-using common::util::WithinBound;
 using hdmap::PathOverlap;
 
 StopSign::StopSign(const TrafficRuleConfig& config)
