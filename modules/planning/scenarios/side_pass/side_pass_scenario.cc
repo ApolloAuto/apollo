@@ -131,8 +131,7 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
     return (current_scenario.GetStatus() !=
             Scenario::ScenarioStatus::STATUS_DONE);
   } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
-    // If in some other special scenario, then don't try to switch
-    // to SIDE_PASS scenario.
+    // If in some other scenario, then don't try to switch to SIDE_PASS.
     return false;
   } else {
     // If originally in LANE_FOLLOW, then decide whether we should
