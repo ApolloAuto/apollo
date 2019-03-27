@@ -147,12 +147,12 @@ void TrafficLight::MakeDecisions(
     std::string virtual_obstacle_id =
         TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_overlap.object_id;
     const std::vector<std::string> wait_for_obstacles;
-    BuildStopDecision(frame, reference_line_info,
-                      virtual_obstacle_id,
+    BuildStopDecision(virtual_obstacle_id,
                       traffic_light_overlap.start_s,
                       config_.traffic_light().stop_distance(),
                       StopReasonCode::STOP_REASON_SIGNAL,
-                      wait_for_obstacles);
+                      wait_for_obstacles,
+                      frame, reference_line_info);
   }
 }
 

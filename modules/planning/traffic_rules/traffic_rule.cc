@@ -28,13 +28,13 @@ namespace planning {
 using common::util::WithinBound;
 
 int TrafficRule::BuildStopDecision(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info,
     const std::string& stop_wall_id,
     const double stop_line_s,
     const double stop_distance,
     const StopReasonCode& stop_reason_code,
-    const std::vector<std::string>& wait_for_obstacles) {
+    const std::vector<std::string>& wait_for_obstacles,
+    Frame* const frame,
+    ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
