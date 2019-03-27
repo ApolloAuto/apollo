@@ -183,7 +183,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
     ADEBUG << "after optimizer " << optimizer->Name() << ":"
-           << reference_line_info->PathSpeedDebugString() << std::endl;
+           << reference_line_info->PathSpeedDebugString();
     ADEBUG << optimizer->Name() << " time spend: " << time_diff_ms << " ms.";
 
     RecordDebugInfo(reference_line_info, optimizer->Name(), time_diff_ms);
