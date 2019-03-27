@@ -32,4 +32,7 @@ message Header {
   optional StatusPb status = 8;
 
   optional string frame_id = 9;
+
+  // The processing time in ms
+  optional double processing_time_ms = 10;
 }
