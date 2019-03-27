@@ -265,10 +265,6 @@ class SimulationWorldService {
   // Whether the sim_world is ready to push to frontend
   std::atomic<bool> ready_to_push_;
 
-  // the hashcode of the lastest topic, used to check if the topic needs
-  // to be updated
-  std::unordered_map<std::string, std::size_t> topic_hashcode_map_;
-
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorSuccess);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorRemove);
   FRIEND_TEST(SimulationWorldServiceTest, UpdateMonitorTruncate);

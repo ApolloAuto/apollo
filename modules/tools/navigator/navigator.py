@@ -19,6 +19,7 @@
 import rospy
 import sys
 import json
+import time
 from modules.map.relative_map.proto import navigation_pb2
 
 if __name__ == '__main__':
@@ -30,6 +31,7 @@ if __name__ == '__main__':
     # generate navigation info
     navigation_info = navigation_pb2.NavigationInfo()
     priority = 0
+    navigation_info.header.timestamp_sec = time.time()
     for fdata in navi_files:
         print "processing " + fdata
         navigation_path = navigation_info.navigation_path.add()
