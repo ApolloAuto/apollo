@@ -138,27 +138,23 @@ bool SidePassScenario::IsTransferable(const Scenario& from_scenario,
   } else {
     // If originally in LANE_FOLLOW, then decide whether we should
     // switch to SIDE_PASS scenario.
-
-    const auto& planning_context = PlanningContext::lane_follow_info();
-    if (!planning_context.blocked_by_front_obstacle) {
+    if (!IsFarFromDestination(frame)) {
       return false;
     }
 
-    if (planning_context.num_of_blocked_cycles < 5) {
+    if (!IsFarFromIntersection(frame)) {
+      return false;
+    }
+
+    if (!HasBlockingObstacle(frame)) {
+      return false;
+    }
+
+    // TODO(all): make 5 a flag/config
+    if (PlanningContext::front_static_obstacle_cycle_counter() < 5) {
       return false;
     }
     return true;
-
-    /**
-    ADEBUG << "Checking if it's needed to switch from LANE_FOLLOW to "
-              "SIDE_PASS: ";
-    bool is_side_pass = IsSidePassScenario(frame, config);
-    if (is_side_pass) {
-      // msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
-    } else {
-    }
-    return is_side_pass;
-    **/
   }
 }
 
