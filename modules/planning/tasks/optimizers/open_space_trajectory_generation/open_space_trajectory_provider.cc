@@ -105,7 +105,6 @@ Status OpenSpaceTrajectoryProvider::Process() {
   auto stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
       vehicle_state, start_timestamp, planning_cycle_time,
       &last_frame_complete_trajectory, &replan_reason);
-
   // Get open_space_info from current frame
   const auto& open_space_info = frame_->open_space_info();
 
@@ -129,6 +128,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
       thread_data_.obstacles_vertices_vec =
           open_space_info.obstacles_vertices_vec();
       thread_data_.XYbounds = open_space_info.ROI_xy_boundary();
+      data_ready_.store(true);
     }
 
     // Check vehicle state
@@ -154,6 +154,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
         frame_->mutable_open_space_info()->sync_debug_instance();
       }
       trajectory_updated_.store(false);
+      data_ready_.store(false);
       return Status::OK();
     }
 
@@ -221,18 +222,18 @@ Status OpenSpaceTrajectoryProvider::Process() {
 
 void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
   while (!is_stop_) {
-    OpenSpaceTrajectoryThreadData thread_data;
-    {
-      std::lock_guard<std::mutex> lock(open_space_mutex_);
-      thread_data = thread_data_;
-    }
-    if (!trajectory_updated_) {
+    if (!trajectory_updated_ && data_ready_) {
+      OpenSpaceTrajectoryThreadData thread_data;
+      {
+        std::lock_guard<std::mutex> lock(open_space_mutex_);
+        thread_data = thread_data_;
+      }
       Status status = open_space_trajectory_optimizer_->Plan(
           thread_data.stitching_trajectory, thread_data.end_pose,
           thread_data.XYbounds, thread_data.rotate_angle,
           thread_data.translate_origin, thread_data.obstacles_edges_num,
           thread_data.obstacles_A, thread_data.obstacles_b,
-          thread_data_.obstacles_vertices_vec);
+          thread_data.obstacles_vertices_vec);
       if (status == Status::OK()) {
         trajectory_updated_.store(true);
       } else {
