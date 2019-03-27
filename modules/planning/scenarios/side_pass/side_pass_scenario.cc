@@ -155,7 +155,7 @@ bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
          HasBlockingObstacle(frame);
 }
 
-bool SidePassScenario::IsFarFromDestination(const Frame& frame) {
+bool SidePassScenario::IsFarFromDestination(const Frame& frame) const {
   if (frame.reference_line_info().size() > 1) {
     return false;
   }
@@ -167,7 +167,7 @@ bool SidePassScenario::IsFarFromDestination(const Frame& frame) {
   return true;
 }
 
-bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
+bool SidePassScenario::IsFarFromIntersection(const Frame& frame) const {
   if (frame.reference_line_info().size() > 1) {
     return false;
   }
@@ -207,14 +207,14 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
 }
 
 // TODO(jiacheng): implement this.
-bool SidePassScenario::IsWithinSidePassingSpeedADC(const Frame& frame) {
+bool SidePassScenario::IsWithinSidePassingSpeedADC(const Frame& frame) const {
   return true;
 }
 
 // TODO(jiacheng): implement this to replace HasBlockingObstacle.
 bool SidePassScenario::IsSidePassableObstacle(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
-    const std::string& blocking_obstacle_id) {
+    const std::string& blocking_obstacle_id) const {
   return true;
 }
 
