@@ -50,10 +50,6 @@ class TrafficLight : public TrafficRule {
 
   perception::TrafficLight GetSignal(const std::string& traffic_light_id);
 
-  int BuildStopDecision(Frame* const frame,
-                        ReferenceLineInfo* const reference_line_info,
-                        const hdmap::PathOverlap& traffic_light_overlap);
-
  private:
   static constexpr char const* const TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_";
   std::unordered_map<std::string, const apollo::perception::TrafficLight*>

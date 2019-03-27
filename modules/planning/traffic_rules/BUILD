@@ -16,6 +16,7 @@ cc_library(
         "rerouting.cc",
         "stop_sign.cc",
         "traffic_light.cc",
+        "traffic_rule.cc",
     ],
     hdrs = [
         "backside_vehicle.h",
