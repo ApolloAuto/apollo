@@ -85,7 +85,7 @@ std::unique_ptr<Stage> SidePassScenario::CreateStage(
   return ptr;
 }
 
-bool SidePassScenario::IsTransferable(const Scenario& target_scenario,
+bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
                                       const Frame& frame) {
   // Sanity checks.
   if (frame.reference_line_info().size() > 1) {
@@ -95,7 +95,7 @@ bool SidePassScenario::IsTransferable(const Scenario& target_scenario,
   std::string front_blocking_obstacle_id =
       PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id;
 
-  if (target_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
+  if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     // Check if the blocking obstacle is still static.
     // If not, then switch to LANE_FOLLOW.
     const auto ptr_front_blocking_obstacle =
@@ -126,9 +126,9 @@ bool SidePassScenario::IsTransferable(const Scenario& target_scenario,
       return false;
     }
     msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
-    return (target_scenario.GetStatus() !=
+    return (current_scenario.GetStatus() !=
             Scenario::ScenarioStatus::STATUS_DONE);
-  } else if (target_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
+  } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
     // If in some other special scenario, then don't try to switch
     // to SIDE_PASS scenario.
     return false;
