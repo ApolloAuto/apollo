@@ -92,43 +92,56 @@ Status PathAssessmentDecider::Process(
   std::sort(valid_path_data.begin(), valid_path_data.end(),
             [](const PathData& lhs, const PathData& rhs) {
               // Regular path goes before fallback path.
-              if (lhs.path_label().find("regular") !=
-                  rhs.path_label().find("regular")) {
-                return lhs.path_label().find("regular") != std::string::npos;
+              bool lhs_is_regular =
+                  lhs.path_label().find("regular") != std::string::npos;
+              bool rhs_is_regular =
+                  rhs.path_label().find("regular") != std::string::npos;
+              if (lhs_is_regular != rhs_is_regular) {
+                return lhs_is_regular;
               }
               // Select longer path.
               constexpr double kPathLengthComparisonTolerance = 5.0;
-              if (std::fabs(lhs.discretized_path().back().s() -
-                            rhs.discretized_path().back().s()) >
+              double lhs_path_length = lhs.discretized_path().back().s();
+              double rhs_path_length = rhs.discretized_path().back().s();
+              if (std::fabs(lhs_path_length - rhs_path_length) >
                   kPathLengthComparisonTolerance) {
-                return lhs.discretized_path().size() <
-                       rhs.discretized_path().size();
+                return lhs_path_length > rhs_path_length;
               }
               // If roughly same length,
               // then select self-lane path over borrowed-lane paths.
-              if (lhs.path_label().find("self") != std::string::npos ||
-                  rhs.path_label().find("self") != std::string::npos) {
-                return lhs.path_label().find("self") != std::string::npos;
+              bool lhs_on_selflane =
+                  lhs.path_label().find("self") != std::string::npos;
+              bool rhs_on_selflane =
+                  rhs.path_label().find("self") != std::string::npos;
+              if (lhs_on_selflane || rhs_on_selflane) {
+                return lhs_on_selflane;
               }
               // If roughly same length, and must borrow neighbor lane,
               // then prefer to borrow forward lane rather than reverse lane.
-              if (ContainsOutOnReverseLane(lhs.path_point_decision_guide()) !=
-                  ContainsOutOnReverseLane(rhs.path_point_decision_guide())) {
-                return !ContainsOutOnReverseLane(
-                           lhs.path_point_decision_guide());
+              bool lhs_on_reverse =
+                  ContainsOutOnReverseLane(lhs.path_point_decision_guide());
+              bool rhs_on_reverse =
+                  ContainsOutOnReverseLane(rhs.path_point_decision_guide());
+              if (lhs_on_reverse != rhs_on_reverse) {
+                return !lhs_on_reverse;
               }
               // If same length, both neighbor lane are forward,
               // then select the one that returns back to in-lane earlier.
-              if (GetBackToInLaneIndex(lhs.path_point_decision_guide()) !=
-                  GetBackToInLaneIndex(rhs.path_point_decision_guide())) {
-                return GetBackToInLaneIndex(lhs.path_point_decision_guide()) <
-                       GetBackToInLaneIndex(rhs.path_point_decision_guide());
+              int lhs_back_idx =
+                  GetBackToInLaneIndex(lhs.path_point_decision_guide());
+              int rhs_back_idx =
+                  GetBackToInLaneIndex(rhs.path_point_decision_guide());
+              if (lhs_back_idx != rhs_back_idx) {
+                return lhs_back_idx < rhs_back_idx;
               }
               // If same length, both forward, back to inlane at same time,
               // select the left one to side-pass.
-              if (lhs.path_label().find("left") !=
-                  rhs.path_label().find("left")) {
-                return lhs.path_label().find("left") != std::string::npos;
+              bool lhs_on_leftlane =
+                  lhs.path_label().find("left") != std::string::npos;
+              bool rhs_on_leftlane =
+                  rhs.path_label().find("left") != std::string::npos;
+              if (lhs_on_leftlane != rhs_on_leftlane) {
+                return lhs_on_leftlane;
               }
               // Otherwise, they are the same path, lhs is not < rhs.
               return false;
