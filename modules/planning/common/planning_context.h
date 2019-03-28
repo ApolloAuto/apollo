@@ -66,9 +66,6 @@ class PlanningContext {
     std::vector<std::string> stop_done_overlap_ids;
 
     ProceedWithCautionSpeedParam proceed_with_caution_speed;
-
-    // TODO(all): to be removed when SidePass obstacle decision impl is done
-    std::string side_pass_front_blocking_obstacle_id;
   };
 
   // @brief a container logging the data required for non-scenario side pass
