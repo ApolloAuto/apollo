@@ -111,7 +111,7 @@ Status PathAssessmentDecider::Process(
                 return lhs_is_regular;
               }
               // Select longer path.
-              constexpr double kPathLengthComparisonTolerance = 3.0;
+              constexpr double kPathLengthComparisonTolerance = 8.0;
               double lhs_path_length = lhs.frenet_frame_path().back().s();
               double rhs_path_length = rhs.frenet_frame_path().back().s();
               if (std::fabs(lhs_path_length - rhs_path_length) >
@@ -318,8 +318,13 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
     if (!IsWithinPathDeciderScopeObstacle(*obstacle)) {
       continue;
     }
-    // Convert into polygon and save it.
+    // Ignore too small obstacles.
     const auto obstacle_sl = obstacle->PerceptionSLBoundary();
+    if ((obstacle_sl.end_s() - obstacle_sl.start_s()) *
+        (obstacle_sl.end_l() - obstacle_sl.start_l()) < 1e-4) {
+      continue;
+    }
+    // Convert into polygon and save it.
     obstacle_polygons.push_back(
         Polygon2d({Vec2d(obstacle_sl.start_s(), obstacle_sl.start_l()),
                    Vec2d(obstacle_sl.start_s(), obstacle_sl.end_l()),
