@@ -34,8 +34,8 @@
 #include "modules/planning/scenarios/side_pass/stage_detect_safety.h"
 #include "modules/planning/scenarios/side_pass/stage_generate_path.h"
 #include "modules/planning/scenarios/side_pass/stage_pass_obstacle.h"
-#include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
 #include "modules/planning/scenarios/side_pass/stage_side_pass.h"
+#include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
 
 namespace apollo {
 namespace planning {
@@ -57,7 +57,8 @@ void SidePassScenario::RegisterStages() {
   if (!s_stage_factory_.Empty()) {
     return;
   }
-  s_stage_factory_.Register(ScenarioConfig::SIDE_PASS_DEFAULT_STAGE,
+  s_stage_factory_.Register(
+      ScenarioConfig::SIDE_PASS_DEFAULT_STAGE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new StageSidePass(config);
       });
@@ -148,9 +149,11 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
         ego_front_edge_s;
 
     if (obstacle_ego_distance > kSidePassMaxDistance) {
-      ADEBUG << "Obstacle " << front_blocking_obstacle_id
-             << " has distance " << obstacle_ego_distance << " which is larger "
-                 "than the predefined threshold " << kSidePassMaxDistance;
+      ADEBUG << "Obstacle " << front_blocking_obstacle_id << " has distance "
+             << obstacle_ego_distance
+             << " which is larger "
+                "than the predefined threshold "
+             << kSidePassMaxDistance;
       ADEBUG << "Change scenario to default scenario.";
       return false;
     }
@@ -249,8 +252,9 @@ bool SidePassScenario::IsWithinSidePassingSpeedADC(const Frame& frame) const {
 bool SidePassScenario::IsSidePassableObstacle(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
     const std::string& blocking_obstacle_id) const {
-  const Obstacle* blocking_obstacle = reference_line_info.path_decision().
-                                obstacles().Find(blocking_obstacle_id);
+  const Obstacle* blocking_obstacle =
+      reference_line_info.path_decision().obstacles().Find(
+          blocking_obstacle_id);
   if (blocking_obstacle == nullptr) {
     ADEBUG << "Doesn't exist such blocking obstalce.";
     return true;
