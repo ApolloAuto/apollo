@@ -49,6 +49,9 @@ void StopSign::MakeDecisions(
     return;
   }
 
+  const auto& stop_sign_status =
+      PlanningContext::Planningstatus().stop_sign();
+
   const double adc_back_edge_s =
       reference_line_info->AdcSlBoundary().start_s();
 
@@ -59,12 +62,8 @@ void StopSign::MakeDecisions(
       continue;
     }
 
-    const auto& stop_done_overlap_ids =
-        PlanningContext::GetScenarioInfo()->stop_done_overlap_ids;
-    if (stop_done_overlap_ids.end() !=
-        std::find(stop_done_overlap_ids.begin(),
-                  stop_done_overlap_ids.end(),
-                  stop_sign_overlap.object_id)) {
+    if (stop_sign_overlap.object_id ==
+        stop_sign_status.done_stop_sign_overlap_id()) {
       continue;
     }
 
@@ -74,12 +73,17 @@ void StopSign::MakeDecisions(
            << "] start_s[" << stop_sign_overlap.start_s << "]";
     std::string virtual_obstacle_id =
         STOP_SIGN_VO_ID_PREFIX + stop_sign_overlap.object_id;
+    std::vector<std::string> wait_for_obstacle_ids;
+    std::copy(
+        stop_sign_status.wait_for_obstacle_id().begin(),
+        stop_sign_status.wait_for_obstacle_id().end(),
+        std::back_inserter(wait_for_obstacle_ids));
     BuildStopDecision(
         virtual_obstacle_id,
         stop_sign_overlap.start_s,
         config_.stop_sign().stop_distance(),
         StopReasonCode::STOP_REASON_STOP_SIGN,
-        PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles,
+        wait_for_obstacle_ids,
         frame, reference_line_info);
   }
 }

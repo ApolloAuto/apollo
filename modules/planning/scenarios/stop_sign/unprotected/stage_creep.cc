@@ -31,6 +31,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
@@ -62,19 +63,27 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
 
   // check if the stop_sign is still along reference_line
   std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
-  if (util::CheckStopSignOnReferenceLine(
+      GetContext()->current_stop_sign_overlap_id;
+  if (planning::util::CheckStopSignOnReferenceLine(
       reference_line_info, stop_sign_overlap_id)) {
     return FinishScenario();
   }
 
+  // refresh overlap along reference line
+  PathOverlap* current_stop_sign_overlap =
+      scenario::util::RefreshOverlapOnReferenceLine(
+          reference_line_info,
+          stop_sign_overlap_id,
+          ReferenceLineInfo::STOP_SIGN);
+  if (!current_stop_sign_overlap) {
+    return FinishScenario();
+  }
+
   // set right_of_way_status
-  const double stop_sign_start_s =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
+  const double stop_sign_start_s = current_stop_sign_overlap->start_s;
   reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
 
-  const double stop_sign_end_s =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
+  const double stop_sign_end_s = current_stop_sign_overlap->end_s;
   const double wait_time =
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout_sec = scenario_config_.creep_timeout_sec();

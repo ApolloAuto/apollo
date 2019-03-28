@@ -87,23 +87,14 @@ message SidePassStatus {
 }
 
 message StopSignStatus {
-  enum Status {
-    UNKNOWN = 0;
-    DRIVE = 1;
-    STOP = 2;
-    WAIT = 3;
-    CREEP = 4;
-    STOP_DONE = 5;
-  }
-  message LaneWatchVehicles {
-    optional string lane_id = 1;
-    repeated string watch_vehicles = 2;
-  }
+  optional string current_stop_sign_overlap_id = 1;
+  optional string done_stop_sign_overlap_id = 2;
+  repeated string wait_for_obstacle_id = 3;
+}
 
-  optional string stop_sign_id = 1;
-  optional Status status = 2;
-  optional double stop_start_time = 3;
-  repeated LaneWatchVehicles lane_watch_vehicles = 4;
+message TrafficLightStatus {
+  repeated string current_traffic_light_overlap_id = 1;
+  repeated string done_traffic_light_overlap_id = 2;
 }
 
 message DestinationStatus {
@@ -113,11 +104,13 @@ message DestinationStatus {
 message PlanningStatus {
   optional ChangeLaneStatus change_lane = 1;
   optional CrosswalkStatus crosswalk = 2;
-  optional apollo.common.EngageAdvice engage_advice = 3;
-  optional ReroutingStatus rerouting = 4;
-  optional RightOfWayStatus right_of_way = 5;
-  optional SidePassStatus side_pass = 6;
-  optional StopSignStatus stop_sign = 7;
-  optional DestinationStatus destination = 8;
-  optional PullOverStatus pull_over = 9;
+  optional DestinationStatus destination = 3;
+  optional apollo.common.EngageAdvice engage_advice = 4;
+  optional PullOverStatus pull_over = 5;
+  optional ReroutingStatus rerouting = 6;
+  optional RightOfWayStatus right_of_way = 7;
+  optional SidePassStatus side_pass = 8;
+  optional StopSignStatus stop_sign = 9;
+  optional TrafficLightStatus traffic_light = 10;
+
 }
