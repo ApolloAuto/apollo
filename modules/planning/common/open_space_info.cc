@@ -23,8 +23,8 @@
 namespace apollo {
 namespace planning {
 void CopyTrajectory(
-  const apollo::planning::DiscretizedTrajectory trajectory_src,
-  apollo::common::Trajectory* trajectory_tgt_ptr) {
+    const apollo::planning::DiscretizedTrajectory trajectory_src,
+    apollo::common::Trajectory* trajectory_tgt_ptr) {
   size_t horizon = trajectory_src.NumOfPoints();
   for (size_t i = 0; i < horizon; ++i) {
     auto* added_pt = trajectory_tgt_ptr->add_trajectory_point();
@@ -43,19 +43,20 @@ void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
 
   // 2, record partitioned trajectories into debug_ptr
   auto* ptr_partitioned_trajectories = ptr_debug->mutable_planning_data()
-      ->mutable_open_space()->mutable_partitioned_trajectories();
+                                           ->mutable_open_space()
+                                           ->mutable_partitioned_trajectories();
 
   for (auto& iter : paritioned_trajectories_) {
     auto picked_trajectory = iter.first;
-    auto* ptr_added_trajectory =
-        ptr_partitioned_trajectories->add_trajectory();
+    auto* ptr_added_trajectory = ptr_partitioned_trajectories->add_trajectory();
     CopyTrajectory(picked_trajectory, ptr_added_trajectory);
   }
 
   // 3, record chosed partitioned into debug_ptr
   auto* ptr_chosen_trajectory = ptr_debug->mutable_planning_data()
-      ->mutable_open_space()->mutable_chosen_trajectory()
-      ->add_trajectory();
+                                    ->mutable_open_space()
+                                    ->mutable_chosen_trajectory()
+                                    ->add_trajectory();
   auto chosen_trajectory = chosen_paritioned_trajectory_.first;
   CopyTrajectory(chosen_trajectory, ptr_chosen_trajectory);
 }
