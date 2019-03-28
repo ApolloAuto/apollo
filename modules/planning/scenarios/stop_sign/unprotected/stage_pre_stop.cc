@@ -117,9 +117,9 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
 
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
-  for (const auto& obstacle_id : watch_vehicle_ids) {
+  for (const auto& perception_obstacle_id : watch_vehicle_ids) {
     PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
-        ->add_wait_for_obstacle_id(obstacle_id);
+        ->add_wait_for_obstacle_id(perception_obstacle_id);
   }
 
   for (const auto* obstacle : path_decision.obstacles().Items()) {
@@ -138,7 +138,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   CHECK_NOTNULL(watch_vehicles);
 
   const PerceptionObstacle& perception_obstacle = obstacle.Perception();
-  const std::string& obstacle_id = std::to_string(perception_obstacle.id());
+  const std::string& perception_obstacle_id =
+      std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
 
@@ -147,8 +148,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
       obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
       obstacle_type != PerceptionObstacle::BICYCLE &&
       obstacle_type != PerceptionObstacle::VEHICLE) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-           << "]. skip";
+    ADEBUG << "obstacle_id[" << perception_obstacle_id
+           << "] type[" << obstacle_type_name << "]. skip";
     return 0;
   }
 
@@ -161,10 +162,11 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
           point, 5.0, perception_obstacle.theta(), M_PI / 3.0, &obstacle_lane,
           &obstacle_s, &obstacle_l) != 0) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+    ADEBUG << "obstacle_id[" << perception_obstacle_id
+           << "] type[" << obstacle_type_name
            << "]: Failed to find nearest lane from map for position: "
            << point.DebugString()
-           << "; heading:" << perception_obstacle.theta();
+           << "; heading[" << perception_obstacle.theta() << "]";
     return -1;
   }
 
@@ -178,7 +180,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
         return assc_lane.first.get()->id().id() == obstable_lane_id;
       });
   if (assoc_lane_it == GetContext()->associated_lanes.end()) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+    ADEBUG << "obstacle_id[" << perception_obstacle_id
+           << "] type[" << obstacle_type_name
            << "] lane_id[" << obstable_lane_id
            << "] not associated with current stop_sign. skip";
     return -1;
@@ -197,7 +200,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
 
   if (distance_to_stop_line >
       scenario_config_.watch_vehicle_max_valid_stop_distance()) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+    ADEBUG << "obstacle_id[" << perception_obstacle_id
+           << "] type[" << obstacle_type_name
            << "] distance_to_stop_line[" << distance_to_stop_line
            << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
            << obstacle_end_s << "] too far from stop line. skip";
@@ -207,11 +211,12 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   // use a vector since motocycles/bicycles can be more than one
   std::vector<std::string> vehicles =
       (*watch_vehicles)[obstacle_lane->id().id()];
-  if (std::find(vehicles.begin(), vehicles.end(), obstacle_id) ==
+  if (std::find(vehicles.begin(), vehicles.end(), perception_obstacle_id) ==
       vehicles.end()) {
     ADEBUG << "AddWatchVehicle: lane[" << obstacle_lane->id().id()
-           << "] obstacle_id[" << obstacle_id << "]";
-    (*watch_vehicles)[obstacle_lane->id().id()].push_back(obstacle_id);
+           << "] obstacle_id[" << perception_obstacle_id << "]";
+    (*watch_vehicles)[obstacle_lane->id().id()]
+                      .push_back(perception_obstacle_id);
   }
 
   return 0;
