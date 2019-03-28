@@ -479,6 +479,11 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     case ScenarioConfig::CHANGE_LANE:
       break;
     case ScenarioConfig::SIDE_PASS:
+      if (current_scenario_->IsTransferable(*current_scenario_, frame)) {
+        ADEBUG << "Continuing side-pass";
+        scenario_type = current_scenario_->scenario_type();
+      }
+      break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
