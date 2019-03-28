@@ -19,7 +19,9 @@
  **/
 
 #include <math.h>
+
 #include <chrono>
+#include <memory>
 
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"
@@ -48,8 +50,8 @@ TEST(FiniteElement1dOptimizerTest, test) {
   }
 
   double delta_s = 1.0;
-  FiniteElement1dOptimizer* fem_optimizer =
-      new FiniteElement1dOptimizer(n, x_init, delta_s);
+  std::unique_ptr<FiniteElement1dOptimizer> fem_optimizer(
+      new FiniteElement1dOptimizer(n, x_init, delta_s));
 
   fem_optimizer->SetFirstOrderBounds(x_bounds);
   fem_optimizer->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
@@ -72,7 +74,6 @@ TEST(FiniteElement1dOptimizerTest, test) {
     EXPECT_LE(x[i], fem_optimizer->x_bounds_[i].second);
     EXPECT_GE(x[i], fem_optimizer->x_bounds_[i].first);
   }
-  delete fem_optimizer;
 }
 
 }  // namespace planning
