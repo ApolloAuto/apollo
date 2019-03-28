@@ -3,7 +3,7 @@
 
 Apollo Cyber RT framework is built based on the concept of component. As a basic building block of Apollo Cyber RT framework, each component contains a specific algorithm module which process a set of data inputs and generate a set of outputs.
 
-In order to successfully create and launch a new compoent, there are four essential steps that need to happen:
+In order to successfully create and launch a new component, there are four essential steps that need to happen:
 
 - Set up the component file structure
 - Implement the component class

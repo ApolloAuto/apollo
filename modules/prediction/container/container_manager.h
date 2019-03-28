@@ -64,7 +64,7 @@ class ContainerManager {
 
  private:
   /**
-   * @breif Register a container
+   * @brief Register a container
    * @param Container type
    */
   void RegisterContainer(

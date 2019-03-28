@@ -516,7 +516,7 @@ bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
       delta_yaw = delta_yaw + rad_round;
     }
 
-    AINFO << "yaw caculated from position difference: "
+    AINFO << "yaw calculated from position difference: "
           << yaw_from_vel * RAD_TO_DEG;
     constexpr double rad_5deg = 5 * DEG_TO_RAD;
     if (delta_yaw > rad_5deg || delta_yaw < -rad_5deg) {
