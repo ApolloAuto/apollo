@@ -54,7 +54,7 @@ void LidarMsgTransfer::Transfer(const drivers::PointCloud &msg,
       }
     }
   } else {
-    AINFO << "Receiving un-origanized-point-cloud, width " << msg.width()
+    AINFO << "Receiving un-organized-point-cloud, width " << msg.width()
           << " height " << msg.height() << "size " << msg.point_size();
     for (int i = 0; i < msg.point_size(); ++i) {
       Eigen::Vector3d pt3d;

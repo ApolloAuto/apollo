@@ -37,7 +37,7 @@ bool IsWithinPathDeciderScopeObstacle(const Obstacle& obstacle) {
     return false;
   }
   // TODO(jiacheng):
-  // Some obstalces are not moving, but only because they are waiting for
+  // Some obstacles are not moving, but only because they are waiting for
   // red light (traffic rule) or because they are blocked by others (social).
   // These obstacles will almost certainly move in the near future and we
   // should not side-pass such obstacles.

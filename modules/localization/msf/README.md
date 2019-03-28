@@ -44,7 +44,7 @@
   We provide a script (`apollo/scripts/msf_local_map_creator.sh`) to generate localization map. You need to provide a group of point cloud frames (as .pcd file), corresponding poses file, and UTM zone id. The format of the poses file is `pcd_number timestamp x y z qx qy qz qw`.
 
 ## Visualization Tool
-  We provide a simple online visualization tool for debug multi-sensor fusion localization module. The parameter `use_visualize` in localizaiton.conf is used to enable the online visualization tool.
+  We provide a simple online visualization tool for debug multi-sensor fusion localization module. The parameter `use_visualize` in localization.conf is used to enable the online visualization tool.
 
   We also provide an advanced online visualization tool which can show localization map, point cloud, horizontal position and variance circle of LiDAR-localization, GNSS-localization, and fused localization results. This tool is simply launched by `./scripts/localization_online_visualizer.sh`.
 

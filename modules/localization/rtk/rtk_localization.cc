@@ -221,7 +221,7 @@ void RTKLocalization::FillLocalizationStatusMsg(
     case drivers::gnss::SolutionType::INS_RTKFLOAT:
       localization_status->set_fusion_status(MeasureState::WARNNING);
       localization_status->set_state_message(
-          "Warnning: Current Localization Is Unstable.");
+          "Warning: Current Localization Is Unstable.");
       break;
     default:
       localization_status->set_fusion_status(MeasureState::ERROR);

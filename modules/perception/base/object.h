@@ -35,7 +35,7 @@ struct alignas(16) Object {
   std::string ToString() const;
   void Reset();
 
-  // @breif object id per frame, required
+  // @brief object id per frame, required
   int id = -1;
 
   // @brief convex hull of the object, required

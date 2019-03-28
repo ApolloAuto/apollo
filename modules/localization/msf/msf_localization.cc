@@ -229,7 +229,7 @@ void MSFLocalization::OnRawImu(
 
   if (result.state() == msf::LocalizationMeasureState::OK ||
       result.state() == msf::LocalizationMeasureState::VALID) {
-    // caculate orientation_vehicle_world
+    // calculate orientation_vehicle_world
     LocalizationEstimate local_result = result.localization();
     CompensateImuVehicleExtrinsic(&local_result);
 
@@ -313,7 +313,7 @@ void MSFLocalization::SetPublisher(
 void MSFLocalization::CompensateImuVehicleExtrinsic(
     LocalizationEstimate *local_result) {
   CHECK_NOTNULL(local_result);
-  // caculate orientation_vehicle_world
+  // calculate orientation_vehicle_world
   apollo::localization::Pose *posepb_loc = local_result->mutable_pose();
   const apollo::common::Quaternion &orientation = posepb_loc->orientation();
   const Eigen::Quaternion<double> quaternion(
