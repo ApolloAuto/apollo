@@ -167,6 +167,8 @@ void PathBoundsDecider::InitPathBoundsDecider(
 
   // Initialize some private variables.
   // ADC s/l info.
+
+  // TODO(jiacheng): using ToFrenetFrame only.
   auto adc_frenet_position =
       reference_line.GetFrenetPoint(planning_start_point.path_point());
   adc_frenet_s_ = adc_frenet_position.s();
@@ -174,6 +176,7 @@ void PathBoundsDecider::InitPathBoundsDecider(
   auto adc_sl_info = reference_line.ToFrenetFrame(planning_start_point);
   adc_frenet_sd_ = adc_sl_info.first[1];
   adc_frenet_ld_ = adc_sl_info.second[1] * adc_frenet_sd_;
+
   // ADC's lane width.
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
