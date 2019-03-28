@@ -270,7 +270,7 @@ void PathAssessmentDecider::TrimTailingOutLanePoints(
   CHECK_EQ(frenet_path.size(), path_point_decision.size());
   while (!path_point_decision.empty() &&
          std::get<1>(path_point_decision.back()) !=
-            PathData::PathPointType::IN_LANE) {
+             PathData::PathPointType::IN_LANE) {
     frenet_path.pop_back();
     path_point_decision.pop_back();
   }
@@ -416,8 +416,10 @@ void PathAssessmentDecider::SetPathPointType(
 
     double lane_left_width = 0.0;
     double lane_right_width = 0.0;
+    double middle_s =
+        (ego_sl_boundary.start_s() + ego_sl_boundary.end_s()) / 2.0;
     if (reference_line_info.reference_line().GetLaneWidth(
-            frenet_path_point.s(), &lane_left_width, &lane_right_width)) {
+            middle_s, &lane_left_width, &lane_right_width)) {
       // Rough sl boundary estimate using single point lane width
       if (ego_sl_boundary.end_l() > lane_left_width ||
           ego_sl_boundary.start_l() < -lane_right_width) {
@@ -518,9 +520,9 @@ void PathAssessmentDecider::SetObstacleDistance(
 
 void PathAssessmentDecider::RecordDebugInfo(
     const PathData& path_data, const std::string& debug_name,
-    ReferenceLineInfo *const reference_line_info) {
-  const auto &path_points = path_data.discretized_path();
-  auto *ptr_optimized_path =
+    ReferenceLineInfo* const reference_line_info) {
+  const auto& path_points = path_data.discretized_path();
+  auto* ptr_optimized_path =
       reference_line_info->mutable_debug()->mutable_planning_data()->add_path();
   ptr_optimized_path->set_name(debug_name);
   ptr_optimized_path->mutable_path_point()->CopyFrom(

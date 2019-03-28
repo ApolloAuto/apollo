@@ -23,6 +23,7 @@
 #include <utility>
 
 #include "modules/common/time/time.h"
+#include "modules/planning/common/speed_profile_generator.h"
 
 namespace apollo {
 namespace planning {
@@ -32,6 +33,12 @@ namespace side_pass {
 using common::Status;
 using common::TrajectoryPoint;
 using common::time::Clock;
+
+namespace {
+constexpr double kPathOptimizationFallbackCost = 2e4;
+constexpr double kSpeedOptimizationFallbackCost = 2e4;
+constexpr double kStraightForwardLineCost = 10.0;
+}  // namespace
 
 StageSidePass::StageSidePass(const ScenarioConfig::StageConfig& config)
     : Stage(config) {}
@@ -94,8 +101,8 @@ Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
   }
   **/
 
-  if(reference_line_info->path_data().Empty() ||
-     reference_line_info->speed_data().empty()) {
+  if (reference_line_info->path_data().Empty() ||
+      reference_line_info->speed_data().empty()) {
     AERROR << "Unexpected empty path data or speed data";
     return Status(common::ErrorCode::PLANNING_ERROR);
   }
@@ -119,10 +126,26 @@ Status StageSidePass::PlanFallbackTrajectory(
     const TrajectoryPoint& planning_start_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
   // path and trajectory fall-back
-  // TODO(all): finish later
   if (reference_line_info->path_data().Empty()) {
-  } else if (reference_line_info->speed_data().empty()) {
+    // TODO(all): finish later
   }
+  if (reference_line_info->speed_data().empty()) {
+    // TODO(Jinyun) will move it inside speed planning
+    *reference_line_info->mutable_speed_data() =
+        SpeedProfileGenerator::GenerateFallbackSpeedProfile();
+    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
+    reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
+  }
+
+  DiscretizedTrajectory trajectory;
+  if (!reference_line_info->CombinePathAndSpeedProfile(
+          planning_start_point.relative_time(),
+          planning_start_point.path_point().s(), &trajectory)) {
+    AERROR << "Fail to aggregate planning trajectory.";
+    return Status(common::ErrorCode::PLANNING_ERROR);
+  }
+  reference_line_info->SetTrajectory(trajectory);
+  reference_line_info->SetDrivable(true);
   return Status::OK();
 }
 
