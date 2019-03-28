@@ -17,6 +17,7 @@
 #include "modules/planning/scenarios/util/util.h"
 
 #include "modules/common/util/map_util.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 
 namespace apollo {
@@ -24,6 +25,7 @@ namespace planning {
 namespace scenario {
 namespace util {
 
+using hdmap::PathOverlap;
 using perception::TrafficLight;
 
 /*
@@ -42,6 +44,31 @@ TrafficLight GetSignal(const std::string& traffic_light_id) {
     return traffic_light;
   }
   return *result;
+}
+
+hdmap::PathOverlap* RefreshOverlapOnReferenceLine(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& overlap_id,
+    const ReferenceLineInfo::OverlapType& overlap_type) {
+  if (overlap_type == ReferenceLineInfo::STOP_SIGN) {
+    const auto& stop_sign_overlaps =
+        reference_line_info.reference_line().map_path().stop_sign_overlaps();
+    for (const auto& stop_sign_overlap : stop_sign_overlaps) {
+      if (stop_sign_overlap.object_id == overlap_id) {
+        return const_cast<hdmap::PathOverlap*>(&stop_sign_overlap);
+      }
+    }
+  } else if (overlap_type == ReferenceLineInfo::SIGNAL) {
+    const auto& traffic_light_overlaps =
+        reference_line_info.reference_line().map_path().signal_overlaps();
+    for (const auto& traffic_light_overlap : traffic_light_overlaps) {
+      if (traffic_light_overlap.object_id == overlap_id) {
+        return const_cast<hdmap::PathOverlap*>(&traffic_light_overlap);
+      }
+    }
+  }
+
+  return nullptr;
 }
 
 }  // namespace util

@@ -27,6 +27,7 @@ cc_library(
         "//modules/planning/common:st_graph_data",
         "//modules/planning/math/finite_element_qp:fem_1d_qp_problem",
         "//modules/planning/common/util:util_lib",
+        "//modules/planning/scenarios/util:scenario_util_lib",
         "//modules/planning/tasks/deciders/speed_bounds_decider",
         "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
     ],

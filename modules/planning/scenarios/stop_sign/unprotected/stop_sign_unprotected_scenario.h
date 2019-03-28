@@ -40,6 +40,7 @@ namespace stop_sign {
 // stage context
 struct StopSignUnprotectedContext {
   ScenarioStopSignUnprotectedConfig scenario_config;
+  std::string current_stop_sign_overlap_id;
   double stop_start_time = 0.0;
   double creep_start_time = 0.0;
   std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;

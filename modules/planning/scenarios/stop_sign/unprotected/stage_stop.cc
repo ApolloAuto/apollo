@@ -31,6 +31,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -42,6 +43,7 @@ using common::time::Clock;
 using hdmap::HDMapUtil;
 using hdmap::LaneInfoConstPtr;
 using hdmap::OverlapInfoConstPtr;
+using hdmap::PathOverlap;
 using perception::PerceptionObstacle;
 
 using StopSignLaneVehicles =
@@ -63,15 +65,24 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   // check if the stop_sign is still along reference_line
   std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
-  if (util::CheckStopSignOnReferenceLine(
+      GetContext()->current_stop_sign_overlap_id;
+  if (planning::util::CheckStopSignOnReferenceLine(
       reference_line_info, stop_sign_overlap_id)) {
     return FinishScenario();
   }
 
+  // refresh overlap along reference line
+  PathOverlap* current_stop_sign_overlap =
+      scenario::util::RefreshOverlapOnReferenceLine(
+          reference_line_info,
+          stop_sign_overlap_id,
+          ReferenceLineInfo::STOP_SIGN);
+  if (!current_stop_sign_overlap) {
+    return FinishScenario();
+  }
+
   // set right_of_way_status
-  const double stop_sign_start_s =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
+  const double stop_sign_start_s = current_stop_sign_overlap->start_s;
   reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
 
   constexpr double kPassStopLineBuffer = 1.0;  // unit: m
@@ -118,11 +129,10 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
-  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
-  std::copy(
-      watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
-      std::back_inserter(
-          PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
+  for (const auto& obstacle_id : watch_vehicle_ids) {
+    PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+        ->add_wait_for_obstacle_id(obstacle_id);
+  }
 
   // check timeout while waiting for only one vehicle
   if (wait_time > scenario_config_.stop_timeout_sec() &&
@@ -216,8 +226,7 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
 }
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
-  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+  PlanningContext::MutablePlanningStatus()->clear_stop_sign();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
@@ -225,11 +234,12 @@ Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   // update PlanningContext
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.push_back(
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id);
+  PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+      ->set_done_stop_sign_overlap_id(
+          GetContext()->current_stop_sign_overlap_id);
+  PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+      ->clear_wait_for_obstacle_id();
 
-  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
   GetContext()->creep_start_time = Clock::NowInSeconds();
 
   next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;

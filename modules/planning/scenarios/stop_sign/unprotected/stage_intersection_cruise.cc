@@ -20,10 +20,14 @@
 
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
 
+#include <string>
+
 #include "cyber/common/log.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -31,6 +35,7 @@ namespace scenario {
 namespace stop_sign {
 
 using common::TrajectoryPoint;
+using hdmap::PathOverlap;
 
 Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     const TrajectoryPoint& planning_init_point, Frame* frame) {
@@ -44,9 +49,20 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
+  // refresh overlap along reference line
+  std::string stop_sign_overlap_id =
+      GetContext()->current_stop_sign_overlap_id;
+  PathOverlap* current_stop_sign_overlap =
+      scenario::util::RefreshOverlapOnReferenceLine(
+          reference_line_info,
+          stop_sign_overlap_id,
+          ReferenceLineInfo::STOP_SIGN);
+  if (!current_stop_sign_overlap) {
+    return FinishScenario();
+  }
+
   // set right_of_way_status
-  const double stop_sign_start_s =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
+  const double stop_sign_start_s = current_stop_sign_overlap->start_s;
   reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
 
   // check pass pnc_junction
@@ -59,8 +75,7 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     constexpr double kIntersectionPassDist = 20.0;  // unit: m
     const double adc_back_edge_s =
         reference_line_info.AdcSlBoundary().start_s();
-    const double stop_sign_end_s =
-        PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
+    const double stop_sign_end_s = current_stop_sign_overlap->end_s;
     const double distance_adc_pass_stop_sign =
         adc_back_edge_s - stop_sign_end_s;
     ADEBUG << "distance_adc_pass_stop_sign[" << distance_adc_pass_stop_sign
@@ -73,7 +88,7 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     }
   }
 
-  if (!util::CheckInsidePnCJunction(reference_line_info)) {
+  if (!planning::util::CheckInsidePnCJunction(reference_line_info)) {
     return FinishStage();
   }
 

@@ -20,12 +20,19 @@
 
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 
+#include "modules/planning/common/reference_line_info.h"
+
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace util {
 
 perception::TrafficLight GetSignal(const std::string& signal_id);
+
+hdmap::PathOverlap* RefreshOverlapOnReferenceLine(
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& overlap_id,
+    const ReferenceLineInfo::OverlapType& overlap_type);
 
 }  // namespace util
 }  // namespace scenario
