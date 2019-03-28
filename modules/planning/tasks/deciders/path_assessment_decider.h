@@ -105,7 +105,7 @@ class PathAssessmentDecider : public Decider {
 /////////////////////////////////////////////////////////////////////////////
 // Below are helper functions.
 
-bool ContainsOutOnReverseLane(
+int ContainsOutOnReverseLane(
     const std::vector<std::tuple<double, PathData::PathPointType, double>>&
         path_point_decision);
 

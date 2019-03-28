@@ -84,6 +84,9 @@ Status PathAssessmentDecider::Process(
     // position.
     TrimTailingOutLanePoints(&curr_path_data);
     // TODO(jiacheng): remove empty path_data.
+
+    // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
+    //                 reference_line_info);
   }
   // If there is no valid path_data, exit.
   if (valid_path_data.empty()) {
@@ -108,9 +111,9 @@ Status PathAssessmentDecider::Process(
                 return lhs_is_regular;
               }
               // Select longer path.
-              constexpr double kPathLengthComparisonTolerance = 5.0;
-              double lhs_path_length = lhs.discretized_path().back().s();
-              double rhs_path_length = rhs.discretized_path().back().s();
+              constexpr double kPathLengthComparisonTolerance = 3.0;
+              double lhs_path_length = lhs.frenet_frame_path().back().s();
+              double rhs_path_length = rhs.frenet_frame_path().back().s();
               if (std::fabs(lhs_path_length - rhs_path_length) >
                   kPathLengthComparisonTolerance) {
                 return lhs_path_length > rhs_path_length;
@@ -126,12 +129,13 @@ Status PathAssessmentDecider::Process(
               }
               // If roughly same length, and must borrow neighbor lane,
               // then prefer to borrow forward lane rather than reverse lane.
-              bool lhs_on_reverse =
+              int lhs_on_reverse =
                   ContainsOutOnReverseLane(lhs.path_point_decision_guide());
-              bool rhs_on_reverse =
+              int rhs_on_reverse =
                   ContainsOutOnReverseLane(rhs.path_point_decision_guide());
-              if (lhs_on_reverse != rhs_on_reverse) {
-                return !lhs_on_reverse;
+              // TODO(jiacheng): make this a flag.
+              if (std::abs(lhs_on_reverse - rhs_on_reverse) > 6) {
+                return lhs_on_reverse < rhs_on_reverse;
               }
               // If same length, both neighbor lane are forward,
               // then select the one that returns back to in-lane earlier.
@@ -139,7 +143,13 @@ Status PathAssessmentDecider::Process(
                   GetBackToInLaneIndex(lhs.path_point_decision_guide());
               int rhs_back_idx =
                   GetBackToInLaneIndex(rhs.path_point_decision_guide());
-              if (lhs_back_idx != rhs_back_idx) {
+              double lhs_back_s =
+                  lhs.frenet_frame_path()[lhs_back_idx].s();
+              double rhs_back_s =
+                  rhs.frenet_frame_path()[rhs_back_idx].s();
+              // TODO(jiacheng): make this a flag.
+              if (std::fabs(lhs_back_s - rhs_back_s) >
+                  kPathLengthComparisonTolerance) {
                 return lhs_back_idx < rhs_back_idx;
               }
               // If same length, both forward, back to inlane at same time,
@@ -149,6 +159,7 @@ Status PathAssessmentDecider::Process(
               bool rhs_on_leftlane =
                   rhs.path_label().find("left") != std::string::npos;
               if (lhs_on_leftlane != rhs_on_leftlane) {
+                ADEBUG << "Select left lane over right lane.";
                 return lhs_on_leftlane;
               }
               // Otherwise, they are the same path, lhs is not < rhs.
@@ -516,15 +527,16 @@ void PathAssessmentDecider::RecordDebugInfo(
       {path_points.begin(), path_points.end()});
 }
 
-bool ContainsOutOnReverseLane(
+int ContainsOutOnReverseLane(
     const std::vector<PathPointDecision>& path_point_decision) {
+  int ret = 0;
   for (const auto& curr_decision : path_point_decision) {
     if (std::get<1>(curr_decision) ==
         PathData::PathPointType::OUT_ON_REVERSE_LANE) {
-      return true;
+      ++ret;
     }
   }
-  return false;
+  return ret;
 }
 
 int GetBackToInLaneIndex(
@@ -536,7 +548,7 @@ int GetBackToInLaneIndex(
   for (int i = static_cast<int>(path_point_decision.size()) - 1; i >= 0; --i) {
     if (std::get<1>(path_point_decision[i]) !=
         PathData::PathPointType::IN_LANE) {
-      return i + 1;
+      return i;
     }
   }
   return 0;
