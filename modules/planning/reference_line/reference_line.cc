@@ -467,7 +467,36 @@ bool ReferenceLine::GetLaneWidth(const double s, double* const lane_left_width,
   if (map_path_.path_points().empty()) {
     return false;
   }
-  return map_path_.GetLaneWidth(s, lane_left_width, lane_right_width);
+
+  // temp. fix for the inconsistency of center line and reference line
+  auto ref_pos = GetNearestReferencePoint(s);
+  double map_s = 0.0;
+  double map_l = 0.0;
+
+  bool res_projection = map_path_.GetProjection({ref_pos.x(), ref_pos.y()},
+      &map_s, &map_l);
+  if (!res_projection) {
+    return false;
+  }
+
+  auto map_pos = map_path_.GetSmoothPoint(map_s);
+
+  auto theta = map_pos.heading();
+  auto cos_theta = std::cos(theta);
+  auto sin_theta = std::sin(theta);
+
+  auto dx = ref_pos.x() - map_pos.x();
+  auto dy = ref_pos.y() - map_pos.y();
+
+  auto pcross = cos_theta * dy - sin_theta * dx;
+
+  if (!map_path_.GetLaneWidth(s, lane_left_width, lane_right_width)) {
+    return false;
+  }
+
+  *lane_left_width -= pcross;
+  *lane_right_width += pcross;
+  return true;
 }
 
 bool ReferenceLine::GetRoadWidth(const double s, double* const road_left_width,
