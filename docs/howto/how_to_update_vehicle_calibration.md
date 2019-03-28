@@ -25,7 +25,7 @@ Preparation consists of the following task sequence:
 
 ## Update the Vehicle Calibration
 
-After preparation, complete the following task sequence from `modules/tools/calibration`:
+After preparation, complete the following task sequence from `modules/tools/vehicle_calibration`:
 
 - Collect data.
 - Process data.
