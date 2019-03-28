@@ -36,5 +36,4 @@ message LonControllerConf {
   optional calibrationtable.ControlCalibrationTable calibration_table = 19;
 
   optional bool enable_reverse_leadlag_compensation = 20 [default = false];
-
 }
