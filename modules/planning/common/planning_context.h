@@ -82,11 +82,32 @@ class PlanningContext {
     return front_static_obstacle_cycle_counter_;
   }
 
+  static void IncrementAbleToUseSelfLaneCounter() {
+    able_to_use_self_lane_counter_ = std::min(
+        able_to_use_self_lane_counter_ + 1,
+        kPathScenarioTransitionHysteresisFrame);
+  }
+
+  static void DecrementAbleToUseSelfLaneCounter() {
+    able_to_use_self_lane_counter_ = std::max(
+        able_to_use_self_lane_counter_ - 1,
+        -kPathScenarioTransitionHysteresisFrame);
+  }
+
+  static void ResetAbleToUseSelfLaneCounter() {
+    able_to_use_self_lane_counter_ = 0;
+  }
+
+  static int able_to_use_self_lane_counter() {
+    return able_to_use_self_lane_counter_;
+  }
+
  private:
   static PlanningStatus planning_status_;
   static SidePassInfo side_pass_info_;
 
   static int front_static_obstacle_cycle_counter_;
+  static int able_to_use_self_lane_counter_;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext)

@@ -23,6 +23,7 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
 namespace apollo {
@@ -60,7 +61,7 @@ Status PathAssessmentDecider::Process(
   std::vector<PathData> valid_path_data;
   for (const auto& curr_path_data : candidate_path_data) {
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
-    //                  reference_line_info);
+    //                 reference_line_info);
     if (curr_path_data.path_label().find("fallback") != std::string::npos) {
       if (IsValidFallbackPath(*reference_line_info, curr_path_data)) {
         valid_path_data.push_back(curr_path_data);
@@ -158,6 +159,27 @@ Status PathAssessmentDecider::Process(
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
+
+  if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
+    if (PlanningContext::front_static_obstacle_cycle_counter() < 0) {
+      PlanningContext::ResetFrontStaticObstacleCycleCounter();
+    }
+    PlanningContext::IncrementFrontStaticObstacleCycleCounter();
+  } else {
+    PlanningContext::ResetFrontStaticObstacleCycleCounter();
+  }
+
+  if (reference_line_info->path_data().path_label().find("self") !=
+      std::string::npos && std::get<1>(reference_line_info->path_data().
+      path_point_decision_guide().front()) ==
+      PathData::PathPointType::IN_LANE) {
+    if (PlanningContext::able_to_use_self_lane_counter() < 0) {
+      PlanningContext::ResetAbleToUseSelfLaneCounter();
+    }
+    PlanningContext::IncrementAbleToUseSelfLaneCounter();
+  } else {
+    PlanningContext::ResetAbleToUseSelfLaneCounter();
+  }
 
   // Plot the path in simulator for debug purpose.
   RecordDebugInfo(reference_line_info->path_data(), "Planning PathData",
