@@ -712,11 +712,11 @@ bool ScenarioManager::IsTrafficLightScenario(
 
 void ScenarioManager::UpdatePlanningContext(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  if (!IsStopSignScenario(scenario_type) &&
-      !IsTrafficLightScenario(scenario_type)) {
+  if (!IsStopSignScenario(scenario_type)) {
     PlanningContext::MutablePlanningStatus()->mutable_stop_sign()->Clear();
+  }
+  if (!IsTrafficLightScenario(scenario_type)) {
     PlanningContext::MutablePlanningStatus()->mutable_traffic_light()->Clear();
-    return;
   }
 
   // StopSign scenario
