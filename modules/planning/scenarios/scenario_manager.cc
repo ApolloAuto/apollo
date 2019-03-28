@@ -715,11 +715,8 @@ void ScenarioManager::UpdatePlanningContext(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsStopSignScenario(scenario_type) &&
       !IsTrafficLightScenario(scenario_type)) {
-    PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
-        PathOverlap();
-    PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps.clear();
-    PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
-    PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+    PlanningContext::MutablePlanningStatus()->mutable_stop_sign()->Clear();
+    PlanningContext::MutablePlanningStatus()->mutable_traffic_light()->Clear();
     return;
   }
 
@@ -736,50 +733,26 @@ void ScenarioManager::UpdatePlanningContext(
   }
 }
 
-// update: PlanningContext::GetScenarioInfo()->current_stop_sign_overlap
+// update: stop_sign status in PlanningContext
 void ScenarioManager::UpdatePlanningContextStopSignScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  const auto& reference_line_info = frame.reference_line_info().front();
+  if (scenario_type == current_scenario_->scenario_type()) {
+    return;
+  }
 
-  if (scenario_type != current_scenario_->scenario_type()) {
-    PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
-        PathOverlap();
-
-    // set to first_encountered stop sign
-    const auto map_itr =
-        first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
-    if (map_itr != first_encountered_overlap_map_.end()) {
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
-          map_itr->second;
-      ADEBUG << "Update PlanningContext with first_encountered stop sign["
-             << map_itr->second.object_id << "] start_s["
-             << map_itr->second.start_s << "]";
-    }
-  } else {
-    // refresh with current_stop_sign_overlap
-    const std::string current_stop_sign_overlap_id =
-        PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
-
-    PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
-        PathOverlap();
-    const std::vector<PathOverlap>& stop_sign_overlaps =
-        reference_line_info.reference_line().map_path().stop_sign_overlaps();
-    auto stop_sign_overlap_itr = std::find_if(
-        stop_sign_overlaps.begin(), stop_sign_overlaps.end(),
-        [&current_stop_sign_overlap_id](const hdmap::PathOverlap& overlap) {
-          return overlap.object_id == current_stop_sign_overlap_id;
-        });
-    if (stop_sign_overlap_itr != stop_sign_overlaps.end()) {
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap =
-          *stop_sign_overlap_itr;
-      ADEBUG << "refresh PlanningContext with current stop sign["
-             << stop_sign_overlap_itr->object_id << "] start_s["
-             << stop_sign_overlap_itr->start_s << "]";
-    }
+  // set to first_encountered stop sign
+  const auto map_itr =
+      first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
+  if (map_itr != first_encountered_overlap_map_.end()) {
+    PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+        ->set_current_stop_sign_overlap_id(map_itr->second.object_id);
+    AERROR << "Update PlanningContext with first_encountered stop sign["
+           << map_itr->second.object_id << "] start_s["
+           << map_itr->second.start_s << "]";
   }
 }
 
-// update: PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps
+// update: traffic_light(s) status in PlanningContext
 void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   const auto& reference_line_info = frame.reference_line_info().front();

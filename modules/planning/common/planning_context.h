@@ -47,6 +47,7 @@ class PlanningContext {
     double distance = 5.0;  // m
   };
 
+  // TODO(all): to be removed/cleaned up. put all of them inside Planningstatus
   // scenario context
   struct ScenarioInfo {
     /////////////////////////
@@ -57,8 +58,6 @@ class PlanningContext {
 
     /////////////////////////
     // scenario specific info, set up by ScenarioManager::ScenarioDispatch()
-    // current stop sign
-    apollo::hdmap::PathOverlap current_stop_sign_overlap;
     // current traffic light (vector)
     std::vector<apollo::hdmap::PathOverlap> current_traffic_light_overlaps;
 
@@ -67,7 +66,6 @@ class PlanningContext {
     std::vector<std::string> stop_done_overlap_ids;
 
     ProceedWithCautionSpeedParam proceed_with_caution_speed;
-    std::vector<std::string> stop_sign_wait_for_obstacles;
 
     // TODO(all): to be removed when SidePass obstacle decision impl is done
     std::string side_pass_front_blocking_obstacle_id;

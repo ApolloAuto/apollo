@@ -25,11 +25,13 @@
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
 
-using apollo::common::Status;
+using common::Status;
+using hdmap::PathOverlap;
 
 uint32_t DeciderCreep::creep_clear_counter_ = 0;
 
@@ -43,19 +45,28 @@ Status DeciderCreep::Process(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  double stop_sign_overlap_end_s = 0.0;
-  if (!PlanningContext::GetScenarioInfo()
-           ->current_stop_sign_overlap.object_id.empty()) {
-    stop_sign_overlap_end_s =
-        PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
+  double stop_line_s = 0.0;
+  std::string stop_sign_overlap_id =
+      PlanningContext::Planningstatus().stop_sign()
+          .current_stop_sign_overlap_id();
+  if (!stop_sign_overlap_id.empty()) {
+    // refresh overlap along reference line
+    PathOverlap* current_stop_sign_overlap =
+        scenario::util::RefreshOverlapOnReferenceLine(
+            *reference_line_info,
+            stop_sign_overlap_id,
+            ReferenceLineInfo::STOP_SIGN);
+    if (current_stop_sign_overlap) {
+      stop_line_s = current_stop_sign_overlap->end_s;
+    }
   } else if (PlanningContext::GetScenarioInfo()
                  ->current_traffic_light_overlaps.size() > 0) {
-    stop_sign_overlap_end_s = PlanningContext::GetScenarioInfo()
+    stop_line_s = PlanningContext::GetScenarioInfo()
                                   ->current_traffic_light_overlaps[0]
                                   .end_s;
   }
-  if (stop_sign_overlap_end_s > 0.0) {
-    BuildStopDecision(stop_sign_overlap_end_s, frame, reference_line_info);
+  if (stop_line_s > 0.0) {
+    BuildStopDecision(stop_line_s, frame, reference_line_info);
   }
 
   return Status::OK();
@@ -68,14 +79,14 @@ double DeciderCreep::FindCreepDistance(
 }
 
 // TODO(all): revisit & rewrite
-bool DeciderCreep::BuildStopDecision(const double stop_sign_overlap_end_s,
+bool DeciderCreep::BuildStopDecision(const double stop_line_s,
                                      Frame* frame,
                                      ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
   double creep_stop_s =
-      stop_sign_overlap_end_s + FindCreepDistance(*frame, *reference_line_info);
+      stop_line_s + FindCreepDistance(*frame, *reference_line_info);
 
   // create virtual stop wall
   std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + std::string("SS");
