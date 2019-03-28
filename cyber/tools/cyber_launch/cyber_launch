@@ -470,7 +470,7 @@ def stop_launch(launch_file):
     sys.exit(0)
 
 
-def signal_handler(sig):
+def signal_handler(sig, frame):
     logger.info('Keyboard interrupt received. Stop all processes.')
     stop(sig)
 
