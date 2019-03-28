@@ -231,9 +231,9 @@ class MPCController : public Controller {
 
   double standstill_acceleration_ = 0.0;
 
-  double throttle_deadzone_ = 0.0;
+  double throttle_lowerbound_ = 0.0;
 
-  double brake_deadzone_ = 0.0;
+  double brake_lowerbound_ = 0.0;
 
   double steer_angle_feedforwardterm_ = 0.0;
 

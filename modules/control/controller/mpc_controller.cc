@@ -106,8 +106,12 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
 
   mpc_eps_ = control_conf->mpc_controller_conf().eps();
   mpc_max_iteration_ = control_conf->mpc_controller_conf().max_iteration();
-  throttle_deadzone_ = control_conf->mpc_controller_conf().throttle_deadzone();
-  brake_deadzone_ = control_conf->mpc_controller_conf().brake_deadzone();
+  throttle_lowerbound_ =
+      std::max(control_conf->mpc_controller_conf().throttle_deadzone(),
+               control_conf->mpc_controller_conf().throttle_minimum_action());
+  brake_lowerbound_ =
+      std::max(control_conf->mpc_controller_conf().brake_deadzone(),
+               control_conf->mpc_controller_conf().brake_minimum_action());
 
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
   standstill_acceleration_ =
@@ -456,13 +460,11 @@ Status MPCController::ComputeControlCommand(
   double throttle_cmd = 0.0;
   double brake_cmd = 0.0;
   if (calibration_value >= 0) {
-    throttle_cmd = calibration_value > throttle_deadzone_ ? calibration_value
-                                                          : throttle_deadzone_;
+    throttle_cmd = std::max(calibration_value, throttle_lowerbound_);
     brake_cmd = 0.0;
   } else {
     throttle_cmd = 0.0;
-    brake_cmd = -calibration_value > brake_deadzone_ ? -calibration_value
-                                                     : brake_deadzone_;
+    brake_cmd = std::max(-calibration_value, brake_lowerbound_);
   }
 
   cmd->set_steering_rate(FLAGS_steer_angle_rate);
