@@ -79,7 +79,7 @@ class OnLanePlanning : public PlanningBase {
   void ExportOnLaneChart(const planning_internal::Debug& debug_info,
                          planning_internal::Debug* debug_chart);
   void ExportOpenSpaceChart(const planning_internal::Debug& debug_info,
-                            ADCTrajectory* const trajectory_pb,
+                            const ADCTrajectory& trajectory_pb,
                             planning_internal::Debug* debug_chart);
   void AddOpenSpaceOptimizerResult(const planning_internal::Debug& debug_info,
                                    planning_internal::Debug* debug_chart);
@@ -88,10 +88,10 @@ class OnLanePlanning : public PlanningBase {
 
   void AddStitchSpeedProfile(planning_internal::Debug* debug_chart);
 
-  void AddPublishedSpeed(ADCTrajectory* const trajectory_pb,
+  void AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
                          planning_internal::Debug* debug_chart);
 
-  void AddPublishedAcceleration(ADCTrajectory* const ptr_trajectory_pb,
+  void AddPublishedAcceleration(const ADCTrajectory& trajectory_pb,
                                 planning_internal::Debug* debug);
 
  private:

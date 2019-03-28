@@ -417,7 +417,7 @@ Status OnLanePlanning::Plan(
       ADEBUG << "Open space debug information added!";
       // call open space info load debug
       // TODO(Runxin): create a new flag to enable openspace chart
-      ExportOpenSpaceChart(trajectory_pb->debug(), trajectory_pb, ptr_debug);
+      ExportOpenSpaceChart(trajectory_pb->debug(), *trajectory_pb, ptr_debug);
     }
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
@@ -605,7 +605,7 @@ void OnLanePlanning::ExportOnLaneChart(
 
 void OnLanePlanning::ExportOpenSpaceChart(
     const planning_internal::Debug& debug_info,
-    ADCTrajectory* const trajectory_pb, planning_internal::Debug* debug_chart) {
+    const ADCTrajectory& trajectory_pb, planning_internal::Debug* debug_chart) {
   // Export Trajectory Visualization Chart.
   if (FLAGS_enable_record_debug) {
     AddOpenSpaceOptimizerResult(debug_info, debug_chart);
@@ -788,7 +788,7 @@ void OnLanePlanning::AddStitchSpeedProfile(
   (*speed_profile_properties)["showLine"] = "true";
 }
 
-void OnLanePlanning::AddPublishedSpeed(ADCTrajectory* const trajectory_pb,
+void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
                                        planning_internal::Debug* debug_chart) {
   // if open space info provider success run
   if (!frame_->open_space_info().open_space_provider_success()) {
@@ -808,14 +808,14 @@ void OnLanePlanning::AddPublishedSpeed(ADCTrajectory* const trajectory_pb,
   // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
   auto* speed_profile = chart->add_line();
   speed_profile->set_label("Speed Profile");
-  for (const auto& point : trajectory_pb->trajectory_point()) {
+  for (const auto& point : trajectory_pb.trajectory_point()) {
     auto* point_debug = speed_profile->add_point();
     point_debug->set_x(point.relative_time() +
-                       trajectory_pb->header().timestamp_sec());
-    if (trajectory_pb->gear() == canbus::Chassis::GEAR_DRIVE) {
+                       trajectory_pb.header().timestamp_sec());
+    if (trajectory_pb.gear() == canbus::Chassis::GEAR_DRIVE) {
       point_debug->set_y(point.v());
     }
-    if (trajectory_pb->gear() == canbus::Chassis::GEAR_REVERSE) {
+    if (trajectory_pb.gear() == canbus::Chassis::GEAR_REVERSE) {
       point_debug->set_y(-point.v());
     }
   }
@@ -847,7 +847,7 @@ void OnLanePlanning::AddPublishedSpeed(ADCTrajectory* const trajectory_pb,
 }
 
 void OnLanePlanning::AddPublishedAcceleration(
-    ADCTrajectory* const ptr_trajectory_pb, planning_internal::Debug* debug) {
+    const ADCTrajectory& trajectory_pb, planning_internal::Debug* debug) {
   // if open space info provider success run
   if (!frame_->open_space_info().open_space_provider_success()) {
     return;
@@ -865,13 +865,13 @@ void OnLanePlanning::AddPublishedAcceleration(
 
   auto* acceleration_profile = chart->add_line();
   acceleration_profile->set_label("Acceleration Profile");
-  for (const auto& point : ptr_trajectory_pb->trajectory_point()) {
+  for (const auto& point : trajectory_pb.trajectory_point()) {
     auto* point_debug = acceleration_profile->add_point();
     point_debug->set_x(point.relative_time() +
-                       ptr_trajectory_pb->header().timestamp_sec());
-    if (ptr_trajectory_pb->gear() == canbus::Chassis::GEAR_DRIVE)
+                       trajectory_pb.header().timestamp_sec());
+    if (trajectory_pb.gear() == canbus::Chassis::GEAR_DRIVE)
       point_debug->set_y(point.a());
-    if (ptr_trajectory_pb->gear() == canbus::Chassis::GEAR_REVERSE)
+    if (trajectory_pb.gear() == canbus::Chassis::GEAR_REVERSE)
       point_debug->set_y(-point.a());
   }
   // Set chartJS's dataset properties
