@@ -114,9 +114,9 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
   }
 
   // set param for PROCEED_WITH_CAUTION_SPEED
-  dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-      ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
-                                        traffic_light.end_s);
+  // dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
+  //    ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
+  //                                      traffic_light.end_s);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
