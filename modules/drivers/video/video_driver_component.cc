@@ -30,32 +30,32 @@ bool CompCameraH265Compressed::Init() {
 
   AINFO << "Velodyne config: " << video_config.DebugString();
 
-  _camera_device.reset(new CameraDriver(&video_config));
-  _camera_device->Init();
+  camera_deivce_.reset(new CameraDriver(&video_config));
+  camera_deivce_->Init();
 
-  if (_camera_device->Record()) {
+  if (camera_deivce_->Record()) {
     char * folder  = getenv("H265_SAVE_FOLDER");
     struct stat st = {0};
     if (folder) {
-      _record_folder = folder;
+      record_folder_ = folder;
     } else {
       AINFO <<
         "hasn't find environment H265_SAVE_FOLDER, " <<
         "just used current directory to save record file";
-      _record_folder = ".";
+      record_folder_ = ".";
     }
-    AINFO << "record_folder is " << _record_folder;
-    if (stat(_record_folder.c_str(), &st) == -1) {
+    AINFO << "record_folder is " << record_folder_;
+    if (stat(record_folder_.c_str(), &st) == -1) {
       char cmd[256];
-      snprintf(cmd, sizeof(cmd), "mkdir -p %s", _record_folder.c_str());
+      snprintf(cmd, sizeof(cmd), "mkdir -p %s", record_folder_.c_str());
       int ret = system(cmd);
       if (ret == 0) {
         AINFO << "cmd " << " cmd " << " execute sucessfuly";
       }
     }
   }
-  _pb_image.reset(new CompressedImage);
-  _pb_image->mutable_data()->reserve(1920*1080*4);
+  pb_image_.reset(new CompressedImage);
+  pb_image_->mutable_data()->reserve(1920*1080*4);
 
   writer_ = node_->CreateWriter<CompressedImage>(
       video_config.compress_conf().output_channel());
@@ -63,39 +63,39 @@ bool CompCameraH265Compressed::Init() {
 
   runing_ = true;
   video_thread_ = std::shared_ptr<std::thread>(new std::thread(
-        std::bind(&CompCameraH265Compressed::video_poll, this)));
+        std::bind(&CompCameraH265Compressed::VideoPoll, this)));
   video_thread_->detach();
 
   return true;
 }
 
-void CompCameraH265Compressed::video_poll() {
+void CompCameraH265Compressed::VideoPoll() {
   std::ofstream fout;
-  if (_camera_device->Record()) {
+  if (camera_deivce_->Record()) {
     char name[256];
     snprintf(name, sizeof(name), "%s/encode_%d.h265",
-        _record_folder.c_str(), _camera_device->Port());
+        record_folder_.c_str(), camera_deivce_->Port());
     AINFO << "output name " << name;
     fout.open(name, std::ios::binary);
     if (!fout) AERROR << "open " << name << "  fail";
   }
   while (!apollo::cyber::IsShutdown()) {
-    if (_camera_device->poll(_pb_image)) {
-      _pb_image->mutable_header()->set_timestamp_sec(
+    if (camera_deivce_->Poll(pb_image_)) {
+      pb_image_->mutable_header()->set_timestamp_sec(
           cyber::Time::Now().ToSecond());
       AINFO << "Send CompressedImage";
-      writer_->Write(_pb_image);
+      writer_->Write(pb_image_);
     } else {
-      AERROR << "port " << _camera_device->Port() << " h265 poll fail....";
+      AERROR << "port " << camera_deivce_->Port() << " h265 poll fail....";
       continue;
     }
 
-    if (_camera_device->Record()) {
-      fout.write(_pb_image->data().c_str(), _pb_image->data().size());
+    if (camera_deivce_->Record()) {
+      fout.write(pb_image_->data().c_str(), pb_image_->data().size());
     }
   }
 
-  if (_camera_device->Record()) {
+  if (camera_deivce_->Record()) {
     fout.close();
   }
 }

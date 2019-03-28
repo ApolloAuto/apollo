@@ -24,23 +24,23 @@ using apollo::drivers::video::config::CameraH265Config;
 using apollo::drivers::CompressedImage;
 
 CameraDriver::CameraDriver(const CameraH265Config *h265_cfg) {
-  _config = *h265_cfg;
+  config_ = *h265_cfg;
 }
 
-bool CameraDriver::poll(std::shared_ptr<CompressedImage> h265) {
-  return poll_by_frame(h265);
+bool CameraDriver::Poll(std::shared_ptr<CompressedImage> h265) {
+  return PollByFrame(h265);
 }
 
-bool CameraDriver::poll_by_frame(std::shared_ptr<CompressedImage> h265Pb) {
+bool CameraDriver::PollByFrame(std::shared_ptr<CompressedImage> h265Pb) {
   while (true) {
-    int rc = _input->get_frame_packet(h265Pb);
+    int rc = input_->GetFramePacket(h265Pb);
     if (rc == 0) {
-      h265Pb->set_frame_id(_config.frame_id());
+      h265Pb->set_frame_id(config_.frame_id());
 
       uint64_t camera_timestamp =
         h265Pb->mutable_header()->camera_timestamp();
       uint64_t current_time = cyber::Time().Now().ToNanosecond();
-      AINFO << "get frame from port " << _config.udp_port() <<
+      AINFO << "get frame from port " << config_.udp_port() <<
         "  size = " << h265Pb->data().size() << " ts: camera/host " <<
         camera_timestamp << "/" << current_time << " diff: " <<
         static_cast<double>(current_time - camera_timestamp) * 1e-6;
@@ -54,8 +54,8 @@ bool CameraDriver::poll_by_frame(std::shared_ptr<CompressedImage> h265Pb) {
 }
 
 void CameraDriver::Init() {
-  _input.reset(new SocketInput());
-  _input->Init(_config.udp_port());
+  input_.reset(new SocketInput());
+  input_->Init(config_.udp_port());
 }
 
 }  // namespace video

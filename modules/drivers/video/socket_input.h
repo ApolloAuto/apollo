@@ -32,7 +32,7 @@ namespace video {
 static const int SOCKET_TIMEOUT = -2;
 static const int RECIEVE_FAIL = -3;
 static const int POLL_TIMEOUT = 1000;  // one second (in msec)
-static const size_t H265_FRAME_PACKAGE_SIZE = 4*1024*1024;
+static const size_t H265_FRAME_PACKAGE_SIZE = 4 * 1024 * 1024;
 static const size_t H265_PDU_SIZE = 1500;
 
 
@@ -44,18 +44,17 @@ class SocketInput{
   SocketInput();
   virtual ~SocketInput();
   void Init(uint32_t port);
-  int get_frame_packet(std::shared_ptr<CompressedImage> h265);
+  int GetFramePacket(std::shared_ptr<CompressedImage> h265);
 
  private:
-  int _sockfd;
-  int _port;
-  uint8_t *_buf = nullptr;
-  uint8_t *_pdu = nullptr;
-  int _pkgNum;
-  int _bytesNum;
-  uint32_t _frame_id;
-  bool input_available(int timeout);
-  std::map<int, std::string> _fpd_frameid_map;
+  int sockfd_;
+  int port_;
+  uint8_t *buf_ = nullptr;
+  uint8_t *pdu_ = nullptr;
+  int pkg_num_;
+  int bytes_num_;
+  uint32_t frame_id_;
+  bool InputAvailable(int timeout);
 };
 
 }  // namespace video
