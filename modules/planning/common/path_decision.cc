@@ -20,11 +20,15 @@
 
 #include "modules/planning/common/path_decision.h"
 
+#include "modules/perception/proto/perception_obstacle.pb.h"
+
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
 
 namespace apollo {
 namespace planning {
+
+using perception::PerceptionObstacle;
 
 Obstacle *PathDecision::AddObstacle(const Obstacle &obstacle) {
   return obstacles_.Add(obstacle.Id(), obstacle);
@@ -38,6 +42,18 @@ Obstacle *PathDecision::Find(const std::string &object_id) {
 
 const Obstacle *PathDecision::Find(const std::string &object_id) const {
   return obstacles_.Find(object_id);
+}
+
+const perception::PerceptionObstacle *PathDecision::FindPerceptionObstacle(
+    const std::string &perception_obstacle_id) const {
+  for (const auto *obstacle : obstacles_.Items()) {
+    if (std::to_string(obstacle->Perception().id()) ==
+        perception_obstacle_id) {
+      return &(obstacle->Perception());
+    }
+  }
+
+  return nullptr;
 }
 
 void PathDecision::SetSTBoundary(const std::string &id,
