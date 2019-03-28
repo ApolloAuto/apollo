@@ -89,7 +89,7 @@ class Map:
     def _draw_lane_id(self, lane, ax, color_val):
         """draw lane id"""
         x, y = self._find_lane_central_point(lane)
-        self._draw_label(lane_id.id, (x, y), ax, color_val);
+        self._draw_label(lane.id.id, (x, y), ax, color_val);
 
     def _draw_lane_details(self, lane, ax, color_val):
         """draw lane id"""
