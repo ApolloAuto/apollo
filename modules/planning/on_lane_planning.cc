@@ -155,8 +155,8 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
 }
 
 // TODO(all): fix this! this will cause unexpected behavior from controller
-void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
-  trajectory_pb->clear_trajectory_point();
+void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
+  ptr_trajectory_pb->clear_trajectory_point();
 
   const auto& vehicle_state = VehicleStateProvider::Instance()->vehicle_state();
   const double max_t = FLAGS_fallback_total_time;
@@ -172,13 +172,13 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* trajectory_pb) {
   tp.set_a(0.0);
   for (double t = 0.0; t < max_t; t += unit_t) {
     tp.set_relative_time(t);
-    auto next_point = trajectory_pb->add_trajectory_point();
+    auto next_point = ptr_trajectory_pb->add_trajectory_point();
     next_point->CopyFrom(tp);
   }
 }
 
 void OnLanePlanning::RunOnce(const LocalView& local_view,
-                             ADCTrajectory* const trajectory_pb) {
+                             ADCTrajectory* const ptr_trajectory_pb) {
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
 
@@ -209,7 +209,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     vehicle_state.set_timestamp(start_timestamp);
   }
 
-  auto* not_ready = trajectory_pb->mutable_decision()
+  auto* not_ready = ptr_trajectory_pb->mutable_decision()
                         ->mutable_main_decision()
                         ->mutable_not_ready();
 
@@ -217,11 +217,11 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     std::string msg("Update VehicleStateProvider failed");
     AERROR << msg;
     not_ready->set_reason(msg);
-    status.Save(trajectory_pb->mutable_header()->mutable_status());
+    status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
     // TODO(all): integrate reverse gear
-    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-    FillPlanningPb(start_timestamp, trajectory_pb);
-    GenerateStopTrajectory(trajectory_pb);
+    ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+    FillPlanningPb(start_timestamp, ptr_trajectory_pb);
+    GenerateStopTrajectory(ptr_trajectory_pb);
     return;
   }
 
@@ -256,9 +256,9 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   }
 
   if (FLAGS_enable_record_debug) {
-    frame_->RecordInputDebug(trajectory_pb->mutable_debug());
+    frame_->RecordInputDebug(ptr_trajectory_pb->mutable_debug());
   }
-  trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
+  ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
   if (!status.ok() || !update_ego_info) {
     AERROR << status.ToString();
@@ -271,19 +271,19 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
-      trajectory_pb->CopyFrom(estop_trajectory);
+      ptr_trajectory_pb->CopyFrom(estop_trajectory);
     } else {
-      trajectory_pb->mutable_decision()
+      ptr_trajectory_pb->mutable_decision()
           ->mutable_main_decision()
           ->mutable_not_ready()
           ->set_reason(status.ToString());
-      status.Save(trajectory_pb->mutable_header()->mutable_status());
-      GenerateStopTrajectory(trajectory_pb);
+      status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
+      GenerateStopTrajectory(ptr_trajectory_pb);
     }
     // TODO(all): integrate reverse gear
-    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-    FillPlanningPb(start_timestamp, trajectory_pb);
-    frame_->set_current_frame_planned_trajectory(*trajectory_pb);
+    ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+    FillPlanningPb(start_timestamp, ptr_trajectory_pb);
+    frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
     const uint32_t n = frame_->SequenceNum();
     FrameHistory::Instance()->Add(n, std::move(frame_));
     return;
@@ -301,56 +301,56 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     }
   }
 
-  status = Plan(start_timestamp, stitching_trajectory, trajectory_pb);
+  status = Plan(start_timestamp, stitching_trajectory, ptr_trajectory_pb);
 
-  for (const auto& p : trajectory_pb->trajectory_point()) {
+  for (const auto& p : ptr_trajectory_pb->trajectory_point()) {
     ADEBUG << p.DebugString();
   }
   const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
-  trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
+  ptr_trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   ADEBUG << "Planning latency: "
-         << trajectory_pb->latency_stats().DebugString();
+         << ptr_trajectory_pb->latency_stats().DebugString();
 
   if (!status.ok()) {
-    status.Save(trajectory_pb->mutable_header()->mutable_status());
+    status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
     AERROR << "Planning failed:" << status.ToString();
     if (FLAGS_publish_estop) {
       AERROR << "Planning failed and set estop";
       // "estop" signal check in function "Control::ProduceControlCommand()"
       // estop_ = estop_ || local_view_.trajectory.estop().is_estop();
       // we should add more information to ensure the estop being triggered.
-      EStop* estop = trajectory_pb->mutable_estop();
+      EStop* estop = ptr_trajectory_pb->mutable_estop();
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
     }
   }
 
-  trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
-  if (trajectory_pb->is_replan()) {
-    trajectory_pb->set_replan_reason(replan_reason);
+  ptr_trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
+  if (ptr_trajectory_pb->is_replan()) {
+    ptr_trajectory_pb->set_replan_reason(replan_reason);
   }
 
   if (frame_->open_space_info().is_on_open_space_trajectory()) {
-    FillPlanningPb(start_timestamp, trajectory_pb);
-    ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
-    frame_->set_current_frame_planned_trajectory(*trajectory_pb);
+    FillPlanningPb(start_timestamp, ptr_trajectory_pb);
+    ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
+    frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
   } else {
     auto* ref_line_task =
-        trajectory_pb->mutable_latency_stats()->add_task_stats();
+        ptr_trajectory_pb->mutable_latency_stats()->add_task_stats();
     ref_line_task->set_time_ms(reference_line_provider_->LastTimeDelay() *
                                1000.0);
     ref_line_task->set_name("ReferenceLineProvider");
     // TODO(all): integrate reverse gear
-    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
-    FillPlanningPb(start_timestamp, trajectory_pb);
-    ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
+    ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
+    FillPlanningPb(start_timestamp, ptr_trajectory_pb);
+    ADEBUG << "Planning pb:" << ptr_trajectory_pb->header().DebugString();
 
-    frame_->set_current_frame_planned_trajectory(*trajectory_pb);
+    frame_->set_current_frame_planned_trajectory(*ptr_trajectory_pb);
     if (FLAGS_enable_planning_smoother) {
       planning_smoother_.Smooth(FrameHistory::Instance(), frame_.get(),
-                                trajectory_pb);
+                                ptr_trajectory_pb);
     }
   }
 
@@ -377,8 +377,8 @@ void OnLanePlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
 Status OnLanePlanning::Plan(
     const double current_time_stamp,
     const std::vector<TrajectoryPoint>& stitching_trajectory,
-    ADCTrajectory* const trajectory_pb) {
-  auto* ptr_debug = trajectory_pb->mutable_debug();
+    ADCTrajectory* const ptr_trajectory_pb) {
+  auto* ptr_debug = ptr_trajectory_pb->mutable_debug();
   if (FLAGS_enable_record_debug) {
     ptr_debug->mutable_planning_data()->mutable_init_point()->CopyFrom(
         stitching_trajectory.back());
@@ -386,8 +386,8 @@ Status OnLanePlanning::Plan(
     frame_->mutable_open_space_info()->sync_debug_instance();
   }
 
-  auto status =
-      planner_->Plan(stitching_trajectory.back(), frame_.get(), trajectory_pb);
+  auto status = planner_->Plan(stitching_trajectory.back(), frame_.get(),
+                               ptr_trajectory_pb);
 
   ptr_debug->mutable_planning_data()->set_front_clear_distance(
       EgoInfo::Instance()->front_clear_distance());
@@ -397,16 +397,16 @@ Status OnLanePlanning::Plan(
         frame_->open_space_info().publishable_trajectory_data().first;
     const auto& publishable_trajectory_gear =
         frame_->open_space_info().publishable_trajectory_data().second;
-    publishable_trajectory.PopulateTrajectoryProtobuf(trajectory_pb);
-    trajectory_pb->set_gear(publishable_trajectory_gear);
+    publishable_trajectory.PopulateTrajectoryProtobuf(ptr_trajectory_pb);
+    ptr_trajectory_pb->set_gear(publishable_trajectory_gear);
 
     // TODO(QiL): refine engage advice in open space trajectory optimizer.
-    auto* engage_advice = trajectory_pb->mutable_engage_advice();
+    auto* engage_advice = ptr_trajectory_pb->mutable_engage_advice();
     engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
     engage_advice->set_reason("Keep enage while in parking");
 
     // TODO(QiL): refine the export decision in open space info
-    trajectory_pb->mutable_decision()
+    ptr_trajectory_pb->mutable_decision()
         ->mutable_main_decision()
         ->mutable_parking()
         ->set_status(MainParking::IN_PARKING);
@@ -417,7 +417,8 @@ Status OnLanePlanning::Plan(
       ADEBUG << "Open space debug information added!";
       // call open space info load debug
       // TODO(Runxin): create a new flag to enable openspace chart
-      ExportOpenSpaceChart(trajectory_pb->debug(), *trajectory_pb, ptr_debug);
+      ExportOpenSpaceChart(ptr_trajectory_pb->debug(), *ptr_trajectory_pb,
+                           ptr_debug);
     }
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
@@ -435,22 +436,23 @@ Status OnLanePlanning::Plan(
       ptr_debug->MergeFrom(best_ref_info->debug());
       ExportReferenceLineDebug(ptr_debug);
     }
-    trajectory_pb->mutable_latency_stats()->MergeFrom(
+    ptr_trajectory_pb->mutable_latency_stats()->MergeFrom(
         best_ref_info->latency_stats());
     // set right of way status
-    trajectory_pb->set_right_of_way_status(
+    ptr_trajectory_pb->set_right_of_way_status(
         best_ref_info->GetRightOfWayStatus());
     for (const auto& id : best_ref_info->TargetLaneId()) {
-      trajectory_pb->add_lane_id()->CopyFrom(id);
+      ptr_trajectory_pb->add_lane_id()->CopyFrom(id);
     }
 
-    trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());
+    ptr_trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());
 
     if (FLAGS_enable_rss_info) {
-      trajectory_pb->mutable_rss_info()->CopyFrom(best_ref_info->rss_info());
+      ptr_trajectory_pb->mutable_rss_info()->CopyFrom(
+          best_ref_info->rss_info());
     }
 
-    best_ref_info->ExportDecision(trajectory_pb->mutable_decision());
+    best_ref_info->ExportDecision(ptr_trajectory_pb->mutable_decision());
 
     // Add debug information.
     if (FLAGS_enable_record_debug) {
@@ -492,9 +494,10 @@ Status OnLanePlanning::Plan(
         std::vector<TrajectoryPoint>(stitching_trajectory.begin(),
                                      stitching_trajectory.end() - 1));
 
-    last_publishable_trajectory_->PopulateTrajectoryProtobuf(trajectory_pb);
+    last_publishable_trajectory_->PopulateTrajectoryProtobuf(ptr_trajectory_pb);
 
-    best_ref_info->ExportEngageAdvice(trajectory_pb->mutable_engage_advice());
+    best_ref_info->ExportEngageAdvice(
+        ptr_trajectory_pb->mutable_engage_advice());
   }
 
   return status;
