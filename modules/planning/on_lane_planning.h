@@ -85,6 +85,14 @@ class OnLanePlanning : public PlanningBase {
   void AddPartitionedTrajectory(const planning_internal::Debug& debug_info,
                                 planning_internal::Debug* debug_chart);
 
+  void AddStitchSpeedProfile(planning_internal::Debug* debug);
+
+  void AddPublishedSpeed(planning_internal::Debug* debug,
+                         ADCTrajectory* const ptr_trajectory_pb);
+
+  void AddPublishedAcceleration(planning_internal::Debug* debug,
+                                ADCTrajectory* const ptr_trajectory_pb);
+
  private:
   routing::RoutingResponse last_routing_;
   std::unique_ptr<Frame> frame_;
