@@ -34,14 +34,14 @@ class CameraDriver {
   explicit CameraDriver(const CameraH265Config *h265_cfg);
   ~CameraDriver() {}
 
-  bool poll(std::shared_ptr<CompressedImage> h265);
+  bool Poll(std::shared_ptr<CompressedImage> h265);
   void Init();
-  int Port() {return _config.udp_port();}
-  int Record() { return _config.record(); }
+  int Port() {return config_.udp_port();}
+  int Record() { return config_.record(); }
  protected:
-  CameraH265Config _config;
-  std::shared_ptr<SocketInput> _input;
-  bool poll_by_frame(std::shared_ptr<CompressedImage> h265);
+  CameraH265Config config_;
+  std::shared_ptr<SocketInput> input_;
+  bool PollByFrame(std::shared_ptr<CompressedImage> h265);
 };
 
 }  // namespace video
