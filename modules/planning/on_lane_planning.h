@@ -79,6 +79,7 @@ class OnLanePlanning : public PlanningBase {
   void ExportOnLaneChart(const planning_internal::Debug& debug_info,
                          planning_internal::Debug* debug_chart);
   void ExportOpenSpaceChart(const planning_internal::Debug& debug_info,
+                            ADCTrajectory* const trajectory_pb,
                             planning_internal::Debug* debug_chart);
   void AddOpenSpaceOptimizerResult(const planning_internal::Debug& debug_info,
                                    planning_internal::Debug* debug_chart);
@@ -87,11 +88,11 @@ class OnLanePlanning : public PlanningBase {
 
   void AddStitchSpeedProfile(planning_internal::Debug* debug_chart);
 
-  void AddPublishedSpeed(planning_internal::Debug* debug,
-                         ADCTrajectory* const ptr_trajectory_pb);
+  void AddPublishedSpeed(ADCTrajectory* const trajectory_pb,
+                         planning_internal::Debug* debug_chart);
 
-  void AddPublishedAcceleration(planning_internal::Debug* debug,
-                                ADCTrajectory* const ptr_trajectory_pb);
+  void AddPublishedAcceleration(ADCTrajectory* const ptr_trajectory_pb,
+                                planning_internal::Debug* debug);
 
  private:
   routing::RoutingResponse last_routing_;
