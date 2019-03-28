@@ -705,8 +705,7 @@ void OnLanePlanning::AddPartitionedTrajectory(
   }
   chart->set_title("Open Space Partitioned Trajectory");
   // has to define chart boundary first
-  auto chosen_trajectory =
-      open_space_debug.chosen_trajectory().trajectory()[0];
+  auto chosen_trajectory = open_space_debug.chosen_trajectory().trajectory()[0];
   double anchor_x = chosen_trajectory.trajectory_point()[0].path_point().x();
   double anchor_y = chosen_trajectory.trajectory_point()[0].path_point().y();
   PopulateChartOptions(anchor_x - 10.0, anchor_x + 20.0, "x (meter)",
@@ -728,7 +727,7 @@ void OnLanePlanning::AddPartitionedTrajectory(
   (*chosen_properties)["showLine"] = "true";
 
   for (const auto& partitioned_trajectory :
-      open_space_debug.partitioned_trajectories().trajectory()) {
+       open_space_debug.partitioned_trajectories().trajectory()) {
     auto* partition_line = chart->add_line();
     partition_line->set_label("patitioned");
     for (const auto& point : partitioned_trajectory.trajectory_point()) {

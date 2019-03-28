@@ -78,9 +78,8 @@ double GetADCStopDeceleration(const double adc_front_edge_s,
 /*
  * @brief: check if a stop_sign_overlap is still along reference_line
  */
-bool CheckStopSignOnReferenceLine(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& stop_sign_overlap_id) {
+bool CheckStopSignOnReferenceLine(const ReferenceLineInfo& reference_line_info,
+                                  const std::string& stop_sign_overlap_id) {
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info.reference_line().map_path().stop_sign_overlaps();
   auto stop_sign_overlap_it =
@@ -100,8 +99,7 @@ bool CheckTrafficLightOnReferenceLine(
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
   auto traffic_light_overlap_it =
-      std::find_if(traffic_light_overlaps.begin(),
-                   traffic_light_overlaps.end(),
+      std::find_if(traffic_light_overlaps.begin(), traffic_light_overlaps.end(),
                    [&traffic_light_overlap_id](const PathOverlap& overlap) {
                      return overlap.object_id == traffic_light_overlap_id;
                    });

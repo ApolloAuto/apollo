@@ -41,14 +41,13 @@ int TrafficRule::BuildStopDecision(
   // check
   const auto& reference_line = reference_line_info->reference_line();
   if (!WithinBound(0.0, reference_line.Length(), stop_line_s)) {
-    AERROR << "stop_line_s[" << stop_line_s
-           << "] is not on reference line";
+    AERROR << "stop_line_s[" << stop_line_s << "] is not on reference line";
     return 0;
   }
 
   // create virtual stop wall
-  auto* obstacle = frame->CreateStopObstacle(
-      reference_line_info, stop_wall_id, stop_line_s);
+  auto* obstacle =
+      frame->CreateStopObstacle(reference_line_info, stop_wall_id, stop_line_s);
   if (!obstacle) {
     AERROR << "Failed to create obstacle [" << stop_wall_id << "]";
     return -1;

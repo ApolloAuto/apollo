@@ -506,8 +506,8 @@ bool PullOver::CheckPullOverComplete() {
 
 bool PullOver::CheckStopDeceleration(const double stop_line_s) const {
   const double adc_front_edge_s = reference_line_info_->AdcSlBoundary().end_s();
-  double stop_deceleration = util::GetADCStopDeceleration(
-      adc_front_edge_s, stop_line_s);
+  double stop_deceleration =
+      util::GetADCStopDeceleration(adc_front_edge_s, stop_line_s);
   return (stop_deceleration <= config_.pull_over().max_stop_deceleration());
 }
 
