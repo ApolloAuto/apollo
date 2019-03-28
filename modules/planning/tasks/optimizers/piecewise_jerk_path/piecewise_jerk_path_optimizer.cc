@@ -60,7 +60,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   for (const auto& path_boundary : path_boundaries) {
     // if the path_boundary is normal, it is possible to have less than 2 points
     // skip path boundary of this kind
-    if (path_boundary.label() == "regular" &&
+    if (path_boundary.label().find("regular") != std::string::npos &&
         path_boundary.boundary().size() < 2) {
       continue;
     }
