@@ -709,8 +709,8 @@ void OnLanePlanning::AddPartitionedTrajectory(
   double anchor_x = chosen_trajectory.trajectory_point()[0].path_point().x();
   double anchor_y = chosen_trajectory.trajectory_point()[0].path_point().y();
   PopulateChartOptions(anchor_x - 10.0, anchor_x + 20.0, "x (meter)",
-                       anchor_y - 20.0, anchor_y + 10.0, "y (meter)",
-                       false, chart);
+                       anchor_y - 20.0, anchor_y + 10.0, "y (meter)", false,
+                       chart);
   auto* chosen_line = chart->add_line();
   chosen_line->set_label("chosen");
   for (const auto& point : chosen_trajectory.trajectory_point()) {
@@ -743,6 +743,144 @@ void OnLanePlanning::AddPartitionedTrajectory(
     (*partition_properties)["fill"] = "false";
     (*partition_properties)["showLine"] = "true";
   }
+}
+
+void OnLanePlanning::AddStitchSpeedProfile(planning_internal::Debug* debug) {
+  if (!FrameHistory::Instance()->Latest()) {
+    AINFO << "Planning frame is empty!";
+    return;
+  }
+  auto chart = debug->mutable_planning_data()->add_chart();
+  auto open_space_debug = debug->planning_data().open_space();
+  chart->set_title("Open Space Speed Plan Visualization");
+  auto* options = chart->mutable_options();
+  // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
+  options->mutable_x()->set_window_size(20.0);
+  options->mutable_x()->set_label_string("time (s)");
+  options->mutable_y()->set_min(2.1);
+  options->mutable_y()->set_max(-1.1);
+  options->mutable_y()->set_label_string("speed (m/s)");
+
+  // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
+  auto* speed_profile = chart->add_line();
+  speed_profile->set_label("Speed Profile");
+  const auto& last_trajectory =
+      FrameHistory::Instance()->Latest()->current_frame_planned_trajectory();
+  for (const auto& point : last_trajectory.trajectory_point()) {
+    auto* point_debug = speed_profile->add_point();
+    point_debug->set_x(point.relative_time() +
+                       last_trajectory.header().timestamp_sec());
+    point_debug->set_y(point.v());
+  }
+  // Set chartJS's dataset properties
+  auto* speed_profile_properties = speed_profile->mutable_properties();
+  (*speed_profile_properties)["borderWidth"] = "2";
+  (*speed_profile_properties)["pointRadius"] = "0";
+  (*speed_profile_properties)["lineTension"] = "0";
+  (*speed_profile_properties)["fill"] = "false";
+  (*speed_profile_properties)["showLine"] = "true";
+}
+
+void OnLanePlanning::AddPublishedSpeed(planning_internal::Debug* debug,
+                                       ADCTrajectory* const ptr_trajectory_pb) {
+  auto chart = debug->mutable_planning_data()->add_chart();
+  chart->set_title("Speed Partition Visualization");
+  auto* options = chart->mutable_options();
+  // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
+  options->mutable_x()->set_window_size(10.0);
+  options->mutable_x()->set_label_string("time (s)");
+  options->mutable_y()->set_min(2.1);
+  options->mutable_y()->set_max(-1.1);
+  options->mutable_y()->set_label_string("speed (m/s)");
+
+  // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
+  auto* speed_profile = chart->add_line();
+  speed_profile->set_label("Speed Profile");
+  for (const auto& point : ptr_trajectory_pb->trajectory_point()) {
+    auto* point_debug = speed_profile->add_point();
+    point_debug->set_x(point.relative_time() +
+                       ptr_trajectory_pb->header().timestamp_sec());
+    if (ptr_trajectory_pb->gear() == canbus::Chassis::GEAR_DRIVE)
+      point_debug->set_y(point.v());
+    if (ptr_trajectory_pb->gear() == canbus::Chassis::GEAR_REVERSE)
+      point_debug->set_y(-point.v());
+  }
+  // Set chartJS's dataset properties
+  auto* speed_profile_properties = speed_profile->mutable_properties();
+  (*speed_profile_properties)["borderWidth"] = "2";
+  (*speed_profile_properties)["pointRadius"] = "0";
+  (*speed_profile_properties)["lineTension"] = "0";
+  (*speed_profile_properties)["fill"] = "false";
+  (*speed_profile_properties)["showLine"] = "true";
+
+  auto* sliding_line = chart->add_line();
+  sliding_line->set_label("Current Time");
+
+  auto* point_debug_up = sliding_line->add_point();
+  point_debug_up->set_x(Clock::NowInSeconds());
+  point_debug_up->set_y(2.1);
+  auto* point_debug_down = sliding_line->add_point();
+  point_debug_down->set_x(Clock::NowInSeconds());
+  point_debug_down->set_y(-1.1);
+
+  // Set chartJS's dataset properties
+  auto* sliding_line_properties = sliding_line->mutable_properties();
+  (*sliding_line_properties)["borderWidth"] = "2";
+  (*sliding_line_properties)["pointRadius"] = "0";
+  (*sliding_line_properties)["lineTension"] = "0";
+  (*sliding_line_properties)["fill"] = "false";
+  (*sliding_line_properties)["showLine"] = "true";
+}
+
+void OnLanePlanning::AddPublishedAcceleration(
+    planning_internal::Debug* debug, ADCTrajectory* ptr_trajectory_pb) {
+  auto chart = debug->mutable_planning_data()->add_chart();
+  chart->set_title("Acceleration Partition Visualization");
+  auto* options = chart->mutable_options();
+  // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
+  options->mutable_x()->set_window_size(10.0);
+  options->mutable_x()->set_label_string("time (s)");
+  options->mutable_y()->set_min(2.1);
+  options->mutable_y()->set_max(-1.1);
+  options->mutable_y()->set_label_string("Acceleration (m/s^2)");
+
+  auto* acceleration_profile = chart->add_line();
+  acceleration_profile->set_label("Acceleration Profile");
+  for (const auto& point : ptr_trajectory_pb->trajectory_point()) {
+    auto* point_debug = acceleration_profile->add_point();
+    point_debug->set_x(point.relative_time() +
+                       ptr_trajectory_pb->header().timestamp_sec());
+    if (ptr_trajectory_pb->gear() == canbus::Chassis::GEAR_DRIVE)
+      point_debug->set_y(point.a());
+    if (ptr_trajectory_pb->gear() == canbus::Chassis::GEAR_REVERSE)
+      point_debug->set_y(-point.a());
+  }
+  // Set chartJS's dataset properties
+  auto* acceleration_profile_properties =
+      acceleration_profile->mutable_properties();
+  (*acceleration_profile_properties)["borderWidth"] = "2";
+  (*acceleration_profile_properties)["pointRadius"] = "0";
+  (*acceleration_profile_properties)["lineTension"] = "0";
+  (*acceleration_profile_properties)["fill"] = "false";
+  (*acceleration_profile_properties)["showLine"] = "true";
+
+  auto* sliding_line = chart->add_line();
+  sliding_line->set_label("Current Time");
+
+  auto* point_debug_up = sliding_line->add_point();
+  point_debug_up->set_x(Clock::NowInSeconds());
+  point_debug_up->set_y(2.1);
+  auto* point_debug_down = sliding_line->add_point();
+  point_debug_down->set_x(Clock::NowInSeconds());
+  point_debug_down->set_y(-1.1);
+
+  // Set chartJS's dataset properties
+  auto* sliding_line_properties = sliding_line->mutable_properties();
+  (*sliding_line_properties)["borderWidth"] = "2";
+  (*sliding_line_properties)["pointRadius"] = "0";
+  (*sliding_line_properties)["lineTension"] = "0";
+  (*sliding_line_properties)["fill"] = "false";
+  (*sliding_line_properties)["showLine"] = "true";
 }
 
 }  // namespace planning
