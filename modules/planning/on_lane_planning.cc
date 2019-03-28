@@ -417,7 +417,7 @@ Status OnLanePlanning::Plan(
       ADEBUG << "Open space debug information added!";
       // call open space info load debug
       // TODO(Runxin): create a new flag to enable openspace chart
-      ExportOpenSpaceChart(trajectory_pb->debug(), ptr_debug);
+      ExportOpenSpaceChart(trajectory_pb->debug(), trajectory_pb, ptr_debug);
     }
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
@@ -605,14 +605,14 @@ void OnLanePlanning::ExportOnLaneChart(
 
 void OnLanePlanning::ExportOpenSpaceChart(
     const planning_internal::Debug& debug_info,
-    planning_internal::Debug* debug_chart) {
+    ADCTrajectory* const trajectory_pb, planning_internal::Debug* debug_chart) {
   // Export Trajectory Visualization Chart.
   if (FLAGS_enable_record_debug) {
     AddOpenSpaceOptimizerResult(debug_info, debug_chart);
     AddPartitionedTrajectory(debug_info, debug_chart);
     AddStitchSpeedProfile(debug_chart);
-    // AddPublishedSpeed(debug_info, ptr_trajectory_pb);
-    // AddPublishedAcceleration(debug, ptr_trajectory_pb);
+    AddPublishedSpeed(trajectory_pb, debug_chart);
+    AddPublishedAcceleration(trajectory_pb, debug_chart);
   }
 }
 
@@ -696,16 +696,17 @@ void OnLanePlanning::AddPartitionedTrajectory(
   }
   // if empty return
   auto chart = debug_chart->mutable_planning_data()->add_chart();
-  auto open_space_debug = debug_info.planning_data().open_space();
+  const auto& open_space_debug = debug_info.planning_data().open_space();
 
-  auto chosen_trajectories = open_space_debug.chosen_trajectory().trajectory();
+  const auto& chosen_trajectories =
+      open_space_debug.chosen_trajectory().trajectory();
   if (chosen_trajectories.empty() ||
       chosen_trajectories[0].trajectory_point().empty()) {
     return;
   }
   chart->set_title("Open Space Partitioned Trajectory");
   // has to define chart boundary first
-  auto chosen_trajectory = open_space_debug.chosen_trajectory().trajectory()[0];
+  const auto& chosen_trajectory = chosen_trajectories[0];
   double anchor_x = chosen_trajectory.trajectory_point()[0].path_point().x();
   double anchor_y = chosen_trajectory.trajectory_point()[0].path_point().y();
   PopulateChartOptions(anchor_x - 10.0, anchor_x + 20.0, "x (meter)",
@@ -758,7 +759,6 @@ void OnLanePlanning::AddStitchSpeedProfile(
   }
 
   auto chart = debug_chart->mutable_planning_data()->add_chart();
-  auto open_space_debug = debug_chart->planning_data().open_space();
   chart->set_title("Open Space Speed Plan Visualization");
   auto* options = chart->mutable_options();
   // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
@@ -788,9 +788,14 @@ void OnLanePlanning::AddStitchSpeedProfile(
   (*speed_profile_properties)["showLine"] = "true";
 }
 
-void OnLanePlanning::AddPublishedSpeed(planning_internal::Debug* debug,
-                                       ADCTrajectory* const ptr_trajectory_pb) {
-  auto chart = debug->mutable_planning_data()->add_chart();
+void OnLanePlanning::AddPublishedSpeed(ADCTrajectory* const trajectory_pb,
+                                       planning_internal::Debug* debug_chart) {
+  // if open space info provider success run
+  if (!frame_->open_space_info().open_space_provider_success()) {
+    return;
+  }
+
+  auto chart = debug_chart->mutable_planning_data()->add_chart();
   chart->set_title("Speed Partition Visualization");
   auto* options = chart->mutable_options();
   // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
@@ -803,14 +808,16 @@ void OnLanePlanning::AddPublishedSpeed(planning_internal::Debug* debug,
   // auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
   auto* speed_profile = chart->add_line();
   speed_profile->set_label("Speed Profile");
-  for (const auto& point : ptr_trajectory_pb->trajectory_point()) {
+  for (const auto& point : trajectory_pb->trajectory_point()) {
     auto* point_debug = speed_profile->add_point();
     point_debug->set_x(point.relative_time() +
-                       ptr_trajectory_pb->header().timestamp_sec());
-    if (ptr_trajectory_pb->gear() == canbus::Chassis::GEAR_DRIVE)
+                       trajectory_pb->header().timestamp_sec());
+    if (trajectory_pb->gear() == canbus::Chassis::GEAR_DRIVE) {
       point_debug->set_y(point.v());
-    if (ptr_trajectory_pb->gear() == canbus::Chassis::GEAR_REVERSE)
+    }
+    if (trajectory_pb->gear() == canbus::Chassis::GEAR_REVERSE) {
       point_debug->set_y(-point.v());
+    }
   }
   // Set chartJS's dataset properties
   auto* speed_profile_properties = speed_profile->mutable_properties();
@@ -840,7 +847,12 @@ void OnLanePlanning::AddPublishedSpeed(planning_internal::Debug* debug,
 }
 
 void OnLanePlanning::AddPublishedAcceleration(
-    planning_internal::Debug* debug, ADCTrajectory* ptr_trajectory_pb) {
+    ADCTrajectory* const ptr_trajectory_pb, planning_internal::Debug* debug) {
+  // if open space info provider success run
+  if (!frame_->open_space_info().open_space_provider_success()) {
+    return;
+  }
+
   auto chart = debug->mutable_planning_data()->add_chart();
   chart->set_title("Acceleration Partition Visualization");
   auto* options = chart->mutable_options();
