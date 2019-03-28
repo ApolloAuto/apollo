@@ -85,7 +85,7 @@ class OnLanePlanning : public PlanningBase {
   void AddPartitionedTrajectory(const planning_internal::Debug& debug_info,
                                 planning_internal::Debug* debug_chart);
 
-  void AddStitchSpeedProfile(planning_internal::Debug* debug);
+  void AddStitchSpeedProfile(planning_internal::Debug* debug_chart);
 
   void AddPublishedSpeed(planning_internal::Debug* debug,
                          ADCTrajectory* const ptr_trajectory_pb);
