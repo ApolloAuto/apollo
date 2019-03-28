@@ -179,22 +179,5 @@ bool DeciderCreep::CheckCreepDone(const Frame& frame,
   return creep_done;
 }
 
-void DeciderCreep::SetProceedWithCautionSpeedParam(
-    const Frame& frame, const ReferenceLineInfo& reference_line_info,
-    const double stop_sign_overlap_end_s) {
-  double creep_stop_s =
-      stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
-
-  const double adc_front_end_s = reference_line_info.AdcSlBoundary().end_s();
-  const double creep_distance = creep_stop_s - adc_front_end_s;
-
-  PlanningContext::GetScenarioInfo()
-      ->proceed_with_caution_speed.is_fixed_distance = true;
-  PlanningContext::GetScenarioInfo()->proceed_with_caution_speed.distance =
-      creep_distance;
-  ADEBUG << "creep_stop_s[" << creep_stop_s << "] adc_front_end_s["
-         << adc_front_end_s << "] creep distance[" << creep_distance << "]";
-}
-
 }  // namespace planning
 }  // namespace apollo

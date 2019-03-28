@@ -42,11 +42,6 @@ namespace planning {
 
 class PlanningContext {
  public:
-  struct ProceedWithCautionSpeedParam {
-    bool is_fixed_distance = false;
-    double distance = 5.0;  // m
-  };
-
   // TODO(all): to be removed/cleaned up. put all of them inside Planningstatus
   // scenario context
   struct ScenarioInfo {
@@ -64,8 +59,6 @@ class PlanningContext {
     // still in the scenario for this overlap, but stop already done
     // => no stop fence from decider_rule_based_stop task
     std::vector<std::string> stop_done_overlap_ids;
-
-    ProceedWithCautionSpeedParam proceed_with_caution_speed;
   };
 
   // @brief a container logging the data required for non-scenario side pass
