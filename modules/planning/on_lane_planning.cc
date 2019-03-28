@@ -610,8 +610,8 @@ void OnLanePlanning::ExportOpenSpaceChart(
   if (FLAGS_enable_record_debug) {
     AddOpenSpaceOptimizerResult(debug_info, debug_chart);
     AddPartitionedTrajectory(debug_info, debug_chart);
-    // AddStitchSpeedProfile(debug);
-    // AddPublishedSpeed(debug, ptr_trajectory_pb);
+    AddStitchSpeedProfile(debug_chart);
+    // AddPublishedSpeed(debug_info, ptr_trajectory_pb);
     // AddPublishedAcceleration(debug, ptr_trajectory_pb);
   }
 }
@@ -745,13 +745,20 @@ void OnLanePlanning::AddPartitionedTrajectory(
   }
 }
 
-void OnLanePlanning::AddStitchSpeedProfile(planning_internal::Debug* debug) {
+void OnLanePlanning::AddStitchSpeedProfile(
+    planning_internal::Debug* debug_chart) {
   if (!FrameHistory::Instance()->Latest()) {
     AINFO << "Planning frame is empty!";
     return;
   }
-  auto chart = debug->mutable_planning_data()->add_chart();
-  auto open_space_debug = debug->planning_data().open_space();
+
+  // if open space info provider success run
+  if (!frame_->open_space_info().open_space_provider_success()) {
+    return;
+  }
+
+  auto chart = debug_chart->mutable_planning_data()->add_chart();
+  auto open_space_debug = debug_chart->planning_data().open_space();
   chart->set_title("Open Space Speed Plan Visualization");
   auto* options = chart->mutable_options();
   // options->mutable_x()->set_mid_value(Clock::NowInSeconds());
