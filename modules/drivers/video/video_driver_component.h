@@ -48,14 +48,14 @@ class CompCameraH265Compressed : public Component<>{
   bool Init();
 
  private:
-  void video_poll();
+  void VideoPoll();
 
   std::shared_ptr<apollo::cyber::Writer<CompressedImage>> writer_;
   std::shared_ptr<std::thread> video_thread_;
   volatile bool runing_;
-  std::unique_ptr<CameraDriver> _camera_device;
-  std::string _record_folder;
-  std::shared_ptr<CompressedImage> _pb_image = nullptr;
+  std::unique_ptr<CameraDriver> camera_deivce_;
+  std::string record_folder_;
+  std::shared_ptr<CompressedImage> pb_image_ = nullptr;
 };
 
 CYBER_REGISTER_COMPONENT(CompCameraH265Compressed);
