@@ -20,7 +20,7 @@ For each new file, please include a license at the top of the file.
 
 * C++ code License example [util.h](modules/common/util/util.h);
 
-* Python code License example [process.py](modules/tools/calibration/process.py);
+* Python code License example [process.py](modules/tools/vehicle_calibration/process.py);
 
 * Bash code License example [apollo_base.sh](scripts/apollo_base.sh);
 
