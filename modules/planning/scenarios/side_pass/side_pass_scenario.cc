@@ -92,7 +92,8 @@ SidePassScenario::SidePassScenario(const ScenarioConfig& config,
 
   // TODO(all): to be removed when SidePass obstacle decision impl is ready
   side_pass_context_.front_blocking_obstacle_id_ =
-      PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id;
+      PlanningContext::Planningstatus().side_pass()
+          .front_blocking_obstacle_id();
 }
 
 std::unique_ptr<Stage> SidePassScenario::CreateStage(
@@ -119,7 +120,8 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
   }
 
   std::string front_blocking_obstacle_id =
-      PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id;
+      PlanningContext::Planningstatus().side_pass()
+          .front_blocking_obstacle_id();
 
   if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     // Check if the blocking obstacle is still static.
@@ -255,9 +257,9 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
         side_pass_context_.front_blocking_obstacle_id_ = obstacle->Id();
         // TODO(all): to be removed
         //            when SidePass obstacle decision impl is ready
-        PlanningContext::GetScenarioInfo()
-            ->side_pass_front_blocking_obstacle_id =
-            side_pass_context_.front_blocking_obstacle_id_;
+        PlanningContext::MutablePlanningStatus()
+            ->mutable_side_pass()->set_front_blocking_obstacle_id(
+                side_pass_context_.front_blocking_obstacle_id_);
       }
     }
   }
@@ -266,8 +268,9 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
   } else {
     side_pass_context_.front_blocking_obstacle_id_ = "";
     // TODO(all): to be removed when SidePass obstacle decision impl is ready
-    PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id =
-        side_pass_context_.front_blocking_obstacle_id_;
+    PlanningContext::MutablePlanningStatus()
+        ->mutable_side_pass()->set_front_blocking_obstacle_id(
+            side_pass_context_.front_blocking_obstacle_id_);
     return false;
   }
 }

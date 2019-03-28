@@ -72,6 +72,7 @@ message RightOfWayStatus {
 }
 
 message SidePassStatus {
+  optional string front_blocking_obstacle_id = 1;
 }
 
 message StopSignStatus {
