@@ -36,6 +36,7 @@ void PlanningContext::Clear() {
 }
 
 int PlanningContext::front_static_obstacle_cycle_counter_ = 0;
+int PlanningContext::able_to_use_self_lane_counter_ = 0;
 
 }  // namespace planning
 }  // namespace apollo

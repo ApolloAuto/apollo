@@ -94,6 +94,34 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
     return false;
   }
 
+  if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
+    // Check side-pass exiting conditions.
+    ADEBUG << "Checking if it's needed to exit SIDE_PASS:";
+    ADEBUG << "Able to use self-lane counter = "
+           << PlanningContext::able_to_use_self_lane_counter();
+    return PlanningContext::able_to_use_self_lane_counter() < 3;
+  } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
+    // If in some other scenario, then don't try to switch to SIDE_PASS.
+    ADEBUG << "Currently in some other scenario.";
+    return false;
+  } else {
+    // If originally in LANE_FOLLOW, then decide whether we should
+    // switch to SIDE_PASS scenario.
+    ADEBUG << "Checking if it's needed to switch from LANE_FOLLOW to "
+              "SIDE_PASS: ";
+    bool is_side_pass = IsSidePassScenario(frame);
+    if (is_side_pass) {
+      ADEBUG << "   YES!";
+    } else {
+      ADEBUG << "   NO!";
+    }
+    return is_side_pass &&
+           PlanningContext::front_static_obstacle_cycle_counter() >= 5;
+  }
+
+  // TODO(all): the following is the old legacy code. Retire them when the new
+  //            code gets steady.
+  /*
   std::string front_blocking_obstacle_id =
       PlanningContext::GetScenarioInfo()->side_pass_front_blocking_obstacle_id;
 
@@ -146,21 +174,22 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
     }
     return is_side_pass;
   }
+  */
 }
 
 bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
-  return HasSingleReferenceLine(frame) &&
-         IsFarFromDestination(frame) &&
-         IsFarFromIntersection(frame) &&
-         HasBlockingObstacle(frame);
-
   // return HasSingleReferenceLine(frame) &&
   //        IsFarFromDestination(frame) &&
   //        IsFarFromIntersection(frame) &&
-  //        IsWithinSidePassingSpeedADC(frame) &&
-  //        IsSidePassableObstacle(frame, frame.reference_line_info().front(),
-  //            frame.reference_line_info().front().path_data().
-  //                blocking_obstacle_id());
+  //        HasBlockingObstacle(frame);
+
+  return HasSingleReferenceLine(frame) &&
+         IsFarFromDestination(frame) &&
+         IsFarFromIntersection(frame) &&
+         IsWithinSidePassingSpeedADC(frame) &&
+         IsSidePassableObstacle(frame, frame.reference_line_info().front(),
+             frame.reference_line_info().front().path_data().
+                 blocking_obstacle_id());
 }
 
 bool SidePassScenario::HasSingleReferenceLine(const Frame& frame) {
