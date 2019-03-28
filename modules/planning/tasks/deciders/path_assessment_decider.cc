@@ -380,7 +380,6 @@ void PathAssessmentDecider::SetPathPointType(
   CHECK_NOTNULL(path_point_decision);
 
   // Go through every path_point, and add in-lane/out-of-lane info.
-  const auto& frenet_path = path_data.frenet_frame_path();
   const auto& discrete_path = path_data.discretized_path();
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
@@ -392,8 +391,7 @@ void PathAssessmentDecider::SetPathPointType(
   const double ego_center_shift_distance =
       ego_length / 2.0 - ego_back_to_center;
 
-  for (size_t i = 0; i < frenet_path.size(); ++i) {
-    const auto& frenet_path_point = frenet_path[i];
+  for (size_t i = 0; i < discrete_path.size(); ++i) {
     const auto& rear_center_path_point = discrete_path[i];
     const double ego_theta = rear_center_path_point.theta();
     Box2d ego_box({rear_center_path_point.x(), rear_center_path_point.y()},
