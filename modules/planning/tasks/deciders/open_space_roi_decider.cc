@@ -81,7 +81,7 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
     frame_->mutable_open_space_info()->set_obstacles_num(
         perception_obstacles_num + parking_boundaries_num);
     if (perception_obstacles_num == 0) {
-      AERROR << "no obstacle given by percption";
+      AERROR << "no obstacle given by perception";
     }
     // load vertice vector for distance approach
     Eigen::MatrixXi perception_obstacles_edges_num_ =

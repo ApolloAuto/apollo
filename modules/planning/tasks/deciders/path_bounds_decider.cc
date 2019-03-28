@@ -643,7 +643,7 @@ std::vector<PathBoundary> PathBoundsDecider::ConstructSubsequentPathBounds(
   double dummy = 0.0;
   // 1. Go through all obstacle changes.
   //    - For exiting obstacle, remove from our memory.
-  //    - For entering obstalce, save it to a vector.
+  //    - For entering obstacle, save it to a vector.
   std::vector<ObstacleEdge> new_entering_obstacles;
   size_t new_obs_idx = obs_idx;
   while (new_obs_idx < sorted_obstacles.size() &&
