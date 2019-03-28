@@ -72,18 +72,6 @@ message RightOfWayStatus {
 }
 
 message SidePassStatus {
-  // a sidepass sequence includes:
-  // driving -> wait -> sidepass -> driving
-  enum Status {
-    UNKNOWN = 0;
-    DRIVE = 1;
-    WAIT = 2;
-    SIDEPASS = 3;
-  }
-  optional Status status = 1;
-  optional double wait_start_time = 2;
-  optional string pass_obstacle_id = 3;
-  optional apollo.planning.ObjectSidePass.Type pass_side = 4;
 }
 
 message StopSignStatus {
