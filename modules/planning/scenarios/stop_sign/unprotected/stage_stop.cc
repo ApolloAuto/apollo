@@ -110,15 +110,15 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   // get all vehicles currently watched
   std::vector<std::string> watch_vehicle_ids;
-  for (const auto& vehicle : watch_vehicles) {
-    std::copy(vehicle.second.begin(), vehicle.second.end(),
+  for (const auto& watch_vehicle : watch_vehicles) {
+    std::copy(watch_vehicle.second.begin(), watch_vehicle.second.end(),
               std::back_inserter(watch_vehicle_ids));
     // for debug
     std::string s;
-    for (const std::string& vehicle : watch_vehicle_ids) {
+    for (const std::string& vehicle : watch_vehicle.second) {
       s = s.empty() ? vehicle : s + "," + vehicle;
     }
-    const std::string& associated_lane_id = vehicle.first;
+    const std::string& associated_lane_id = watch_vehicle.first;
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
            << s << "]";
   }
@@ -128,9 +128,9 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
-  for (const auto& obstacle_id : watch_vehicle_ids) {
+  for (const auto& perception_obstacle_id : watch_vehicle_ids) {
     PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
-        ->add_wait_for_obstacle_id(obstacle_id);
+        ->add_wait_for_obstacle_id(perception_obstacle_id);
   }
 
   // check timeout while waiting for only one vehicle
@@ -185,39 +185,41 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
 
     std::vector<std::string> remove_vehicles;
     auto& vehicles = vehicle.second;
-    for (const auto& obstacle_id : vehicles) {
+    for (const auto& perception_obstacle_id : vehicles) {
       // watched-vehicle info
-      auto* obstacle = path_decision.Find(obstacle_id);
-      if (!obstacle) {
-        ADEBUG << "mark ERASE obstacle_id[" << obstacle_id << "] not exist";
-        remove_vehicles.push_back(obstacle_id);
+      const PerceptionObstacle *perception_obstacle =
+          path_decision.FindPerceptionObstacle(perception_obstacle_id);
+      if (!perception_obstacle) {
+        ADEBUG << "mark ERASE obstacle_id["
+               << perception_obstacle_id << "] not exist";
+        remove_vehicles.push_back(perception_obstacle_id);
         continue;
       }
 
-      const PerceptionObstacle& perception_obstacle = obstacle->Perception();
-      PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
+      PerceptionObstacle::Type obstacle_type = perception_obstacle->type();
       std::string obstacle_type_name =
           PerceptionObstacle_Type_Name(obstacle_type);
       auto obstacle_point =
-          common::util::MakePointENU(perception_obstacle.position().x(),
-                                     perception_obstacle.position().y(),
-                                     perception_obstacle.position().z());
+          common::util::MakePointENU(perception_obstacle->position().x(),
+                                     perception_obstacle->position().y(),
+                                     perception_obstacle->position().z());
 
       double distance =
           common::util::DistanceXY(stop_sign_point, obstacle_point);
-      ADEBUG << "obstacle_id[" << obstacle_id << "] distance[" << distance
-             << "]";
+      ADEBUG << "obstacle_id[" << perception_obstacle_id
+             << "] distance[" << distance << "]";
 
       // TODO(all): move 10.0 to conf
       if (distance > 10.0) {
-        ADEBUG << "mark ERASE obstacle_id[" << obstacle_id << "]";
-        remove_vehicles.push_back(obstacle_id);
+        ADEBUG << "mark ERASE obstacle_id[" << perception_obstacle_id << "]";
+        remove_vehicles.push_back(perception_obstacle_id);
       }
     }
-    for (const auto& obstacle_id : remove_vehicles) {
-      ADEBUG << "ERASE obstacle_id[" << obstacle_id << "]";
-      vehicles.erase(std::remove(vehicles.begin(), vehicles.end(), obstacle_id),
-                     vehicles.end());
+    for (const auto& perception_obstacle_id : remove_vehicles) {
+      ADEBUG << "ERASE obstacle_id[" << perception_obstacle_id << "]";
+      vehicles.erase(std::remove(vehicles.begin(), vehicles.end(),
+                                 perception_obstacle_id),
+                                 vehicles.end());
     }
   }
 
