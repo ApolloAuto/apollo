@@ -105,6 +105,8 @@ lon_controller_conf {
   ts: 0.01
   brake_deadzone: 15.5
   throttle_deadzone: 18.0
+  brake_minimum_action: 0.0
+  throttle_minimum_action: 0.0
   speed_controller_input_limit: 2.0
   station_error_limit: 2.0
   preview_window: 20.0
@@ -6673,6 +6675,8 @@ mpc_controller_conf {
   standstill_acceleration: -3.0
   brake_deadzone: 15.5
   throttle_deadzone: 18.0
+  brake_minimum_action: 0.0
+  throttle_minimum_action: 0.0
   enable_mpc_feedforward_compensation: false
   unconstraint_control_diff_limit: 5.0
   lat_err_gain_scheduler {
