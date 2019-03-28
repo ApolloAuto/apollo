@@ -66,10 +66,9 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
   const auto& reference_line_info = frame->reference_line_info().front();
 
   // check if the stop_sign is still along reference_line
-  std::string stop_sign_overlap_id =
-      GetContext()->current_stop_sign_overlap_id;
-  if (planning::util::CheckStopSignOnReferenceLine(
-      reference_line_info, stop_sign_overlap_id)) {
+  std::string stop_sign_overlap_id = GetContext()->current_stop_sign_overlap_id;
+  if (planning::util::CheckStopSignOnReferenceLine(reference_line_info,
+                                                   stop_sign_overlap_id)) {
     return FinishScenario();
   }
 
@@ -115,7 +114,6 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
            << s << "]";
   }
-
 
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
@@ -223,8 +221,7 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
  * @brief: check valid stop_sign stop
  */
 bool StopSignUnprotectedStagePreStop::CheckADCStop(
-    const double adc_front_edge_s,
-    const double stop_line_s) {
+    const double adc_front_edge_s, const double stop_line_s) {
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > scenario_config_.max_adc_stop_speed()) {

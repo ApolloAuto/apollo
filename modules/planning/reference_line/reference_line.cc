@@ -91,8 +91,7 @@ bool ReferenceLine::Stitch(const ReferenceLine& other) {
   if (!first_join && !last_join) {
     common::SLPoint other_first;
     if (!XYToSL(other_points.front(), &other_first)) {
-      AERROR << "Cannot project point : "
-             << other_points.front().DebugString();
+      AERROR << "Cannot project point : " << other_points.front().DebugString();
       return false;
     }
     bool other_on_current = other_first.s() >= 0 &&
