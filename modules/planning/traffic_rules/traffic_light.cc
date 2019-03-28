@@ -34,9 +34,9 @@ namespace apollo {
 namespace planning {
 
 using common::Status;
-using common::time::Clock;
 using common::VehicleState;
 using common::math::Vec2d;
+using common::time::Clock;
 using hdmap::PathOverlap;
 using perception::TrafficLightDetection;
 
@@ -44,7 +44,7 @@ TrafficLight::TrafficLight(const TrafficRuleConfig& config)
     : TrafficRule(config) {}
 
 Status TrafficLight::ApplyRule(Frame* const frame,
-                              ReferenceLineInfo* const reference_line_info) {
+                               ReferenceLineInfo* const reference_line_info) {
   ReadTrafficLights(frame->local_view().traffic_light);
 
   MakeDecisions(frame, reference_line_info);
@@ -52,9 +52,8 @@ Status TrafficLight::ApplyRule(Frame* const frame,
   return Status::OK();
 }
 
-void TrafficLight::MakeDecisions(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
+void TrafficLight::MakeDecisions(Frame* const frame,
+                                 ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -163,8 +162,7 @@ void TrafficLight::ReadTrafficLights(
     return;
   }
   const double delay =
-      traffic_light_detection->header().timestamp_sec() -
-      Clock::NowInSeconds();
+      traffic_light_detection->header().timestamp_sec() - Clock::NowInSeconds();
   if (delay > config_.traffic_light().signal_expire_time_sec()) {
     ADEBUG << "traffic signals msg is expired, delay = " << delay
            << " seconds.";

@@ -27,11 +27,10 @@
 namespace apollo {
 namespace planning {
 
-using common::Status;
-using hdmap::PathOverlap;
+using apollo::common::Status;
+using apollo::hdmap::PathOverlap;
 
-StopSign::StopSign(const TrafficRuleConfig& config)
-    : TrafficRule(config) {}
+StopSign::StopSign(const TrafficRuleConfig& config) : TrafficRule(config) {}
 
 Status StopSign::ApplyRule(Frame* const frame,
                            ReferenceLineInfo* const reference_line_info) {
@@ -39,9 +38,8 @@ Status StopSign::ApplyRule(Frame* const frame,
   return Status::OK();
 }
 
-void StopSign::MakeDecisions(
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
+void StopSign::MakeDecisions(Frame* const frame,
+                             ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -49,11 +47,8 @@ void StopSign::MakeDecisions(
     return;
   }
 
-  const auto& stop_sign_status =
-      PlanningContext::Planningstatus().stop_sign();
-
-  const double adc_back_edge_s =
-      reference_line_info->AdcSlBoundary().start_s();
+  const auto& stop_sign_status = PlanningContext::Planningstatus().stop_sign();
+  const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
 
   const std::vector<PathOverlap>& stop_sign_overlaps =
       reference_line_info->reference_line().map_path().stop_sign_overlaps();
@@ -71,13 +66,11 @@ void StopSign::MakeDecisions(
     ADEBUG << "BuildStopDecision: stop_sign["
            << stop_sign_overlap.object_id
            << "] start_s[" << stop_sign_overlap.start_s << "]";
-    std::string virtual_obstacle_id =
+    const std::string virtual_obstacle_id =
         STOP_SIGN_VO_ID_PREFIX + stop_sign_overlap.object_id;
-    std::vector<std::string> wait_for_obstacle_ids;
-    std::copy(
+    const std::vector<std::string> wait_for_obstacle_ids(
         stop_sign_status.wait_for_obstacle_id().begin(),
-        stop_sign_status.wait_for_obstacle_id().end(),
-        std::back_inserter(wait_for_obstacle_ids));
+        stop_sign_status.wait_for_obstacle_id().end());
     BuildStopDecision(
         virtual_obstacle_id,
         stop_sign_overlap.start_s,

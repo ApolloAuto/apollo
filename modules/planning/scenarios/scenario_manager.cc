@@ -155,7 +155,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
     const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap) {
   const auto& scenario_config =
       config_map_[ScenarioConfig::STOP_SIGN_UNPROTECTED]
-                  .stop_sign_unprotected_config();
+          .stop_sign_unprotected_config();
 
   const auto& reference_line_info = frame.reference_line_info().front();
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
@@ -204,7 +204,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap) {
   const auto& scenario_config =
       config_map_[ScenarioConfig::TRAFFIC_LIGHT_PROTECTED]
-                  .traffic_light_unprotected_right_turn_config();
+          .traffic_light_unprotected_right_turn_config();
 
   const auto& reference_line_info = frame.reference_line_info().front();
 
@@ -364,8 +364,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
 ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
     const Frame& frame) {
   const auto& scenario_config =
-      config_map_[ScenarioConfig::VALET_PARKING]
-                  .valet_parking_config();
+      config_map_[ScenarioConfig::VALET_PARKING].valet_parking_config();
 
   // TODO(All) triger valet parking by route message definition as of now
   double parking_spot_range_to_start =

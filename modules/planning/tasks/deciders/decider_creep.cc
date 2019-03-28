@@ -62,8 +62,8 @@ Status DeciderCreep::Process(Frame* frame,
   } else if (PlanningContext::GetScenarioInfo()
                  ->current_traffic_light_overlaps.size() > 0) {
     stop_line_s = PlanningContext::GetScenarioInfo()
-                                  ->current_traffic_light_overlaps[0]
-                                  .end_s;
+                      ->current_traffic_light_overlaps[0]
+                      .end_s;
   }
   if (stop_line_s > 0.0) {
     BuildStopDecision(stop_line_s, frame, reference_line_info);

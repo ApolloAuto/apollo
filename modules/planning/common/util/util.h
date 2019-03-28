@@ -34,9 +34,8 @@ bool IsDifferentRouting(const apollo::routing::RoutingResponse& first,
 double GetADCStopDeceleration(const double adc_front_edge_s,
                               const double stop_line_s);
 
-bool CheckStopSignOnReferenceLine(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& stop_sign_overlap_id);
+bool CheckStopSignOnReferenceLine(const ReferenceLineInfo& reference_line_info,
+                                  const std::string& stop_sign_overlap_id);
 
 bool CheckTrafficLightOnReferenceLine(
     const ReferenceLineInfo& reference_line_info,
