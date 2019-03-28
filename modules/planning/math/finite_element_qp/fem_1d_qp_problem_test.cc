@@ -19,7 +19,9 @@
  **/
 
 #include <math.h>
+
 #include <chrono>
+#include <memory>
 
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"
@@ -51,8 +53,8 @@ TEST(Fem1dQPProblemTest, basic_test) {
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 1.25;
 
-  Fem1dQpProblem* fem_qp =
-      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative);
+  std::unique_ptr<Fem1dQpProblem> fem_qp(
+      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative));
 
   fem_qp->SetVariableBounds(x_bounds);
   fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
@@ -70,7 +72,6 @@ TEST(Fem1dQPProblemTest, basic_test) {
     EXPECT_LE(x[i], fem_qp->x_bounds_[i].second);
     EXPECT_GE(x[i], fem_qp->x_bounds_[i].first);
   }
-  delete fem_qp;
 }
 
 TEST(Fem1dQPProblemTest, add_bounds_test) {
@@ -81,8 +82,8 @@ TEST(Fem1dQPProblemTest, add_bounds_test) {
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 0.25;
 
-  Fem1dQpProblem* fem_qp =
-      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative);
+  std::unique_ptr<Fem1dQpProblem> fem_qp(
+      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative));
 
   std::vector<std::tuple<double, double, double>> x_bounds;
   for (size_t i = 10; i < 20; ++i) {
@@ -98,8 +99,6 @@ TEST(Fem1dQPProblemTest, add_bounds_test) {
     EXPECT_DOUBLE_EQ(std::get<0>(x[i]), -1.81);
     EXPECT_DOUBLE_EQ(std::get<1>(x[i]), 1.95);
   }
-
-  delete fem_qp;
 }
 
 TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
@@ -114,8 +113,8 @@ TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
   std::array<double, 5> w = {1.0, 100.0, 1000.0, 1000.0, 0.0};
   double max_x_third_order_derivative = 2.0;
 
-  Fem1dQpProblem* fem_qp =
-      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative);
+  std::unique_ptr<Fem1dQpProblem> fem_qp(
+      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative));
 
   fem_qp->SetVariableBounds(x_bounds);
   fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
@@ -148,8 +147,6 @@ TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
     EXPECT_LT(dx[i] - 1e-12, fem_qp->dx_bounds_[i].second);
     EXPECT_GT(dx[i] + 1e-12, fem_qp->dx_bounds_[i].first);
   }
-
-  delete fem_qp;
 }
 
 }  // namespace planning
