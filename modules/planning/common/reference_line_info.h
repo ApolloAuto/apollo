@@ -34,6 +34,7 @@
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/path_boundary.h"
@@ -51,6 +52,12 @@ namespace planning {
  */
 class ReferenceLineInfo {
  public:
+  enum class LaneType {
+    LeftForward,
+    LeftReverse,
+    RightForward,
+    RightReverse
+  };
   ReferenceLineInfo() = default;
 
   explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
@@ -84,6 +91,11 @@ class ReferenceLineInfo {
   void SetStopPoint(const StopPoint& stop_point);
   void SetCruiseSpeed(double speed);
   const PlanningTarget& planning_target() const { return planning_target_; }
+
+  hdmap::LaneInfoConstPtr LocateLaneInfo(const double s) const;
+
+  bool GetNeighborLaneInfo(const ReferenceLineInfo::LaneType lane_type,
+      const double s, hdmap::Id* ptr_lane_id, double* ptr_lane_width) const;
 
   /**
    * @brief check if current reference line is started from another reference

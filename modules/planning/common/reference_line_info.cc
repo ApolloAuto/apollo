@@ -141,6 +141,78 @@ void ReferenceLineInfo::SetCandidatePathBoundaries(
   candidate_path_boundaries_ = std::move(path_boundaries);
 }
 
+hdmap::LaneInfoConstPtr
+ReferenceLineInfo::LocateLaneInfo(const double s) const {
+  std::vector<hdmap::LaneInfoConstPtr> lanes;
+  reference_line_.GetLaneFromS(s, &lanes);
+  if (lanes.empty()) {
+    AWARN << "cannot get any lane using s";
+    return nullptr;
+  }
+
+  return lanes.front();
+}
+
+bool ReferenceLineInfo::GetNeighborLaneInfo(
+    const ReferenceLineInfo::LaneType lane_type, const double s,
+    hdmap::Id* ptr_lane_id, double* ptr_lane_width) const {
+
+  auto ptr_lane_info = LocateLaneInfo(s);
+  if (ptr_lane_info == nullptr) {
+    return false;
+  }
+
+  switch (lane_type) {
+  case LaneType::LeftForward: {
+    if (ptr_lane_info->lane().left_neighbor_forward_lane_id_size() == 0) {
+      return false;
+    }
+    *ptr_lane_id = ptr_lane_info->lane().left_neighbor_forward_lane_id(0);
+    break;
+  }
+  case LaneType::LeftReverse: {
+    if (ptr_lane_info->lane().left_neighbor_reverse_lane_id_size() == 0) {
+      return false;
+    }
+    *ptr_lane_id = ptr_lane_info->lane().left_neighbor_reverse_lane_id(0);
+    break;
+  }
+  case LaneType::RightForward: {
+    if (ptr_lane_info->lane().right_neighbor_forward_lane_id_size() == 0) {
+      return false;
+    }
+    *ptr_lane_id = ptr_lane_info->lane().right_neighbor_forward_lane_id(0);
+    break;
+  }
+  case LaneType::RightReverse: {
+    if (ptr_lane_info->lane().right_neighbor_reverse_lane_id_size() == 0) {
+      return false;
+    }
+    *ptr_lane_id = ptr_lane_info->lane().right_neighbor_reverse_lane_id(0);
+    break;
+  }
+  default:
+    CHECK(false);
+  }
+  auto ptr_neighbor_lane =
+      hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(*ptr_lane_id);
+  if (ptr_neighbor_lane == nullptr) {
+    return false;
+  }
+
+  auto ref_point = reference_line_.GetReferencePoint(s);
+
+  double neighbor_s = 0.0;
+  double neighbor_l = 0.0;
+  if (!ptr_neighbor_lane->GetProjection(
+      {ref_point.x(), ref_point.y()}, &neighbor_s, &neighbor_l)) {
+    return false;
+  }
+
+  *ptr_lane_width = ptr_neighbor_lane->GetWidth(neighbor_s);
+  return true;
+}
+
 bool ReferenceLineInfo::GetFirstOverlap(
     const std::vector<hdmap::PathOverlap>& path_overlaps,
     hdmap::PathOverlap* path_overlap) {
