@@ -24,6 +24,7 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/time/time.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
@@ -36,6 +37,7 @@ namespace traffic_light {
 
 using common::TrajectoryPoint;
 using common::time::Clock;
+using hdmap::PathOverlap;
 using perception::TrafficLight;
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
@@ -50,29 +52,44 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
     AERROR << "TrafficLightRightTurnUnprotectedStop planning error";
   }
 
+  if (GetContext()->current_traffic_light_overlap_ids.size() == 0) {
+    return FinishScenario();
+  }
+
   const auto& reference_line_info = frame->reference_line_info().front();
 
   bool traffic_light_all_stop = true;
   bool traffic_light_all_green = true;
-  for (const auto& traffic_light_overlap :
-       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
+
+  for (const auto& traffic_light_overlap_id :
+      GetContext()->current_traffic_light_overlap_ids) {
     // check if the traffic_light is still along reference_line
     if (planning::util::CheckTrafficLightOnReferenceLine(
-            reference_line_info, traffic_light_overlap.object_id)) {
+        reference_line_info, traffic_light_overlap_id)) {
+      continue;
+    }
+
+    // refresh overlap along reference line
+    PathOverlap* current_traffic_light_overlap =
+      scenario::util::RefreshOverlapOnReferenceLine(
+          reference_line_info,
+          traffic_light_overlap_id,
+          ReferenceLineInfo::SIGNAL);
+    if (!current_traffic_light_overlap) {
       continue;
     }
 
     // set right_of_way_status
-    reference_line_info.SetJunctionRightOfWay(traffic_light_overlap.start_s,
-                                              false);
+    reference_line_info.SetJunctionRightOfWay(
+        current_traffic_light_overlap->start_s, false);
 
     const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
     const double distance_adc_to_stop_line =
-        traffic_light_overlap.start_s - adc_front_edge_s;
+        current_traffic_light_overlap->start_s - adc_front_edge_s;
     auto signal_color =
-        scenario::util::GetSignal(traffic_light_overlap.object_id).color();
-    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id
-           << "] start_s[" << traffic_light_overlap.start_s
+        scenario::util::GetSignal(traffic_light_overlap_id).color();
+    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
+           << "] start_s[" << current_traffic_light_overlap->start_s
            << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
            << "] color[" << signal_color << "]";
 
@@ -117,7 +134,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
 }
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
+  PlanningContext::MutablePlanningStatus()->clear_traffic_light();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
@@ -132,11 +149,12 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
   } else {
     // creep
     // update PlanningContext
-    PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
-    for (const auto& traffic_light_overlap :
-         PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
-      PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.push_back(
-          traffic_light_overlap.object_id);
+    PlanningContext::MutablePlanningStatus()->mutable_traffic_light()
+        ->mutable_done_traffic_light_overlap_id()->Clear();
+    for (const auto& traffic_light_overlap_id :
+        GetContext()->current_traffic_light_overlap_ids) {
+      PlanningContext::MutablePlanningStatus()->mutable_traffic_light()
+          ->add_done_traffic_light_overlap_id(traffic_light_overlap_id);
     }
 
     GetContext()->creep_start_time = Clock::NowInSeconds();

@@ -739,13 +739,13 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
     return;
   }
 
-  // set to first_encountered stop sign
+  // set to first_encountered stop_sign
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
   if (map_itr != first_encountered_overlap_map_.end()) {
     PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
         ->set_current_stop_sign_overlap_id(map_itr->second.object_id);
-    AERROR << "Update PlanningContext with first_encountered stop sign["
+    ADEBUG << "Update PlanningContext with first_encountered stop sign["
            << map_itr->second.object_id << "] start_s["
            << map_itr->second.start_s << "]";
   }
@@ -754,34 +754,25 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
 // update: traffic_light(s) status in PlanningContext
 void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  const auto& reference_line_info = frame.reference_line_info().front();
+  if (scenario_type == current_scenario_->scenario_type()) {
+    return;
+  }
 
+  // get first_encountered traffic_light
   std::string current_traffic_light_overlap_id;
-  if (scenario_type != current_scenario_->scenario_type()) {
-    const auto map_itr =
-        first_encountered_overlap_map_.find(ReferenceLineInfo::SIGNAL);
-    if (map_itr != first_encountered_overlap_map_.end()) {
-      current_traffic_light_overlap_id = map_itr->second.object_id;
-    }
-  } else {
-    // refresh with current_traffic_light_overlaps
-    if (!PlanningContext::GetScenarioInfo()
-             ->current_traffic_light_overlaps.empty()) {
-      current_traffic_light_overlap_id = PlanningContext::GetScenarioInfo()
-                                             ->current_traffic_light_overlaps[0]
-                                             .object_id;
-    }
+  const auto map_itr =
+      first_encountered_overlap_map_.find(ReferenceLineInfo::SIGNAL);
+  if (map_itr != first_encountered_overlap_map_.end()) {
+    current_traffic_light_overlap_id = map_itr->second.object_id;
   }
 
   if (current_traffic_light_overlap_id.empty()) {
-    PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps.clear();
+    PlanningContext::MutablePlanningStatus()->mutable_traffic_light()->Clear();
     return;
   }
 
   // find all the traffic light at/within the same location/group
-  // and refresh the overlap info
-  PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps.clear();
-
+  const auto& reference_line_info = frame.reference_line_info().front();
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
   auto traffic_light_overlap_itr = std::find_if(
@@ -789,19 +780,23 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
       [&current_traffic_light_overlap_id](const hdmap::PathOverlap& overlap) {
         return overlap.object_id == current_traffic_light_overlap_id;
       });
-  double current_traffic_light_overlap_start_s;
-  if (traffic_light_overlap_itr != traffic_light_overlaps.end()) {
-    current_traffic_light_overlap_start_s = traffic_light_overlap_itr->start_s;
+  if (traffic_light_overlap_itr == traffic_light_overlaps.end()) {
+    PlanningContext::MutablePlanningStatus()->mutable_traffic_light()->Clear();
+    return;
   }
 
   constexpr double kTrafficLightGroupingMaxDist = 2.0;  // unit: m
+  const double current_traffic_light_overlap_start_s =
+      traffic_light_overlap_itr->start_s;
   for (const auto& traffic_light_overlap : traffic_light_overlaps) {
     const double dist =
         traffic_light_overlap.start_s - current_traffic_light_overlap_start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
-      PlanningContext::GetScenarioInfo()
-          ->current_traffic_light_overlaps.push_back(traffic_light_overlap);
-      ADEBUG << "traffic_light[" << traffic_light_overlap.object_id
+      PlanningContext::MutablePlanningStatus()->mutable_traffic_light()
+          ->add_current_traffic_light_overlap_id(
+              traffic_light_overlap.object_id);
+      ADEBUG << "Update PlanningContext with first_encountered traffic_light["
+             << traffic_light_overlap.object_id
              << "] start_s[" << traffic_light_overlap.start_s << "]";
     }
   }

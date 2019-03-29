@@ -61,8 +61,13 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     return;
   }
 
-  const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
-  const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
+  const auto& traffic_light_status =
+      PlanningContext::Planningstatus().traffic_light();
+
+  const double adc_front_edge_s =
+      reference_line_info->AdcSlBoundary().end_s();
+  const double adc_back_edge_s =
+      reference_line_info->AdcSlBoundary().start_s();
 
   // debug info
   planning_internal::SignalLightDebug* signal_light_debug =
@@ -80,11 +85,17 @@ void TrafficLight::MakeDecisions(Frame* const frame,
       continue;
     }
 
-    const auto& stop_done_overlap_ids =
-        PlanningContext::GetScenarioInfo()->stop_done_overlap_ids;
-    if (stop_done_overlap_ids.end() !=
-        std::find(stop_done_overlap_ids.begin(), stop_done_overlap_ids.end(),
-                  traffic_light_overlap.object_id)) {
+    // check if traffic-light-stop already finished, set by scenario/stage
+    bool traffic_light_done = false;
+    for (int i = 0;
+        i < traffic_light_status.done_traffic_light_overlap_id_size(); i++) {
+      if (traffic_light_overlap.object_id ==
+          traffic_light_status.done_traffic_light_overlap_id(i)) {
+        traffic_light_done = true;
+        break;
+      }
+    }
+    if (traffic_light_done) {
       continue;
     }
 
