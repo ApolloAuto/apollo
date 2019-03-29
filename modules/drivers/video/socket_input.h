@@ -1,4 +1,4 @@
-/******************************************************************************                                                                                                                              
+/******************************************************************************
  * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +16,13 @@
 
 #pragma once
 
-#include <unistd.h>
 #include <stdio.h>
+#include <unistd.h>
 
+#include <map>
 #include <memory>
 #include <string>
-#include <map>
+
 #include "cyber/cyber.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 
@@ -35,11 +36,8 @@ static const int POLL_TIMEOUT = 1000;  // one second (in msec)
 static const size_t H265_FRAME_PACKAGE_SIZE = 4 * 1024 * 1024;
 static const size_t H265_PDU_SIZE = 1500;
 
-
-using apollo::drivers::CompressedImage;
-
 /** @brief Live Velodyne input from socket. */
-class SocketInput{
+class SocketInput {
  public:
   SocketInput();
   virtual ~SocketInput();
@@ -60,5 +58,3 @@ class SocketInput{
 }  // namespace video
 }  // namespace drivers
 }  // namespace apollo
-
-
