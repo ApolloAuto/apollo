@@ -147,7 +147,6 @@ class ConfigManager {
 
  private:
   bool InitInternal();
-  std::string get_env(const std::string &var_name);
 
   // key: model_name
   std::map<std::string, ModelConfig *> model_config_map_;

@@ -33,16 +33,12 @@ bool CompCameraH265Compressed::Init() {
   camera_deivce_->Init();
 
   if (camera_deivce_->Record()) {
-    char* folder = getenv("H265_SAVE_FOLDER");
-    struct stat st = {0};
-    if (folder) {
-      record_folder_ = folder;
-    } else {
-      AINFO << "hasn't find environment H265_SAVE_FOLDER, "
-            << "just used current directory to save record file";
-      record_folder_ = ".";
-    }
+    // Use current directory to save record file if H265_SAVE_FOLDER environment
+    // is not set.
+    record_folder_ = cyber::common::GetEnv("H265_SAVE_FOLDER", ".");
     AINFO << "record_folder is " << record_folder_;
+
+    struct stat st = {0};
     if (stat(record_folder_.c_str(), &st) == -1) {
       char cmd[256];
       snprintf(cmd, sizeof(cmd), "mkdir -p %s", record_folder_.c_str());
