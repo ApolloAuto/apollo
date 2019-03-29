@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/camera/common/util.h"
 
+#include "cyber/common/environment.h"
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -155,18 +156,10 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_blob,
 }
 
 void GetCyberWorkRoot(std::string *work_root) {
-  char *var = nullptr;
-  var = std::getenv("MODULE_PATH");
-  if (var != nullptr) {
-    *work_root = std::string(var);
-    return;
+  *work_root = cyber::common::GetEnv("MODULE_PATH");
+  if (work_root->empty()) {
+    *work_root = cyber::common::GetEnv("CYBER_PATH");
   }
-  var = std::getenv("CYBER_PATH");
-  if (var != nullptr) {
-    *work_root = std::string(var);
-    return;
-  }
-  *work_root = std::string("");
 }
 
 void FillObjectPolygonFromBBox3D(base::Object *object_ptr) {

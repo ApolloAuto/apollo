@@ -50,8 +50,6 @@ TEST_F(ConfigManagerTest, TestInit) {
   EXPECT_TRUE(config_manager_->Init());
   EXPECT_TRUE(config_manager_->Reset());
   EXPECT_EQ(config_manager_->NumModels(), 2u);
-  EXPECT_EQ(config_manager_->get_env(""), "");
-  config_manager_->get_env("PATH");
   ConfigManager config_manager;
   config_manager.set_work_root("");
   EXPECT_EQ(config_manager.work_root(), "");
