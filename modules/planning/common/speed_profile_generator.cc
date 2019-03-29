@@ -21,6 +21,7 @@
 #include "modules/planning/common/speed_profile_generator.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "cyber/common/log.h"
 #include "modules/planning/common/ego_info.h"
@@ -124,17 +125,34 @@ std::vector<SpeedPoint> SpeedProfileGenerator::GenerateSpeedHotStart(
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile() {
   const double init_v = EgoInfo::Instance()->start_point().v();
   const double init_a = EgoInfo::Instance()->start_point().a();
+  const double stop_distance = std::numeric_limits<double>::infinity();
   if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
-    auto speed_data = GenerateStopProfileFromPolynomial(init_v, init_a);
+    auto speed_data =
+        GenerateStopProfileFromPolynomial(init_v, init_a, stop_distance);
     if (!speed_data.empty()) {
       return speed_data;
     }
   }
-  return GenerateStopProfile(init_v, init_a);
+  return GenerateStopProfile(init_v, init_a, stop_distance);
 }
 
-SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
-                                                     const double init_acc) {
+SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfileWithStopDistance(
+    const double stop_distance) {
+  const double init_v = EgoInfo::Instance()->start_point().v();
+  const double init_a = EgoInfo::Instance()->start_point().a();
+  if (init_v > FLAGS_polynomial_speed_fallback_velocity) {
+    auto speed_data =
+        GenerateStopProfileFromPolynomial(init_v, init_a, stop_distance);
+    if (!speed_data.empty()) {
+      return speed_data;
+    }
+  }
+  return GenerateStopProfile(init_v, init_a, stop_distance);
+}
+
+SpeedData SpeedProfileGenerator::GenerateStopProfile(
+    const double init_speed, const double init_acc,
+    const double stop_distance) {
   AERROR << "Using fallback stopping profile: Slowing down the car!";
   SpeedData speed_data;
 
@@ -143,7 +161,13 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
 
   double pre_s = 0.0;
   double pre_v = init_speed;
-  double acc = FLAGS_slowdown_profile_deceleration;
+  const double acc =
+      stop_distance == std::numeric_limits<double>::infinity()
+          ? FLAGS_slowdown_profile_deceleration
+          : -(std::min(stop_distance,
+                       EgoInfo::Instance()->front_clear_distance()) *
+              2.0) /
+                (max_t * max_t);
 
   for (double t = 0.0; t < max_t; t += unit_t) {
     double s = 0.0;
@@ -159,13 +183,16 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
 }
 
 SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
-    const double init_speed, const double init_acc) {
+    const double init_speed, const double init_acc,
+    const double stop_distance) {
   AERROR << "Slowing down the car with polynomial.";
   constexpr double kMaxT = 4.0;
+  // TODO(Jinyun) reduce or refactor below configuration numbers
+  const double max_s =
+      std::min(std::min(50.0, EgoInfo::Instance()->front_clear_distance()),
+               stop_distance);
   for (double t = 2.0; t <= kMaxT; t += 0.5) {
-    for (double s = 0.0;
-         s < std::min(50.0, EgoInfo::Instance()->front_clear_distance() - 0.3);
-         s += 1.0) {
+    for (double s = 0.0; s < max_s; s += 1.0) {
       QuinticPolynomialCurve1d curve(0.0, init_speed, init_acc, s, 0.0, 0.0, t);
       if (!IsValidProfile(curve)) {
         continue;

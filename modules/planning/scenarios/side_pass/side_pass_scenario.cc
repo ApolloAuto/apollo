@@ -50,7 +50,7 @@ common::util::Factory<
 // The clearance distance from intersection/destination.
 // If ADC is too close, then do not enter SIDE_PASS.
 constexpr double kClearDistance = 15.0;
-constexpr double kSidePassMaxSpeed = 5.0; // (10mph)
+constexpr double kSidePassMaxSpeed = 5.0;  // (10mph)
 constexpr double kSidePassMaxDistance = 10.0;
 
 void SidePassScenario::RegisterStages() {
@@ -118,7 +118,7 @@ bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
       ADEBUG << "   NO!";
     }
     return is_side_pass &&
-           PlanningContext::front_static_obstacle_cycle_counter() >= 5;
+           PlanningContext::front_static_obstacle_cycle_counter() >= 1;
   }
 
   // TODO(all): the following is the old legacy code. Retire them when the new
@@ -188,13 +188,13 @@ bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
   //        IsFarFromIntersection(frame) &&
   //        HasBlockingObstacle(frame);
 
-  return HasSingleReferenceLine(frame) &&
-         IsFarFromDestination(frame) &&
-         IsFarFromIntersection(frame) &&
-         IsWithinSidePassingSpeedADC(frame) &&
+  return HasSingleReferenceLine(frame) && IsFarFromDestination(frame) &&
+         IsFarFromIntersection(frame) && IsWithinSidePassingSpeedADC(frame) &&
          IsSidePassableObstacle(frame, frame.reference_line_info().front(),
-             frame.reference_line_info().front().path_data().
-                 blocking_obstacle_id());
+                                frame.reference_line_info()
+                                    .front()
+                                    .path_data()
+                                    .blocking_obstacle_id());
 }
 
 bool SidePassScenario::HasSingleReferenceLine(const Frame& frame) {
