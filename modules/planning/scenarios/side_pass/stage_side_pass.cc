@@ -74,6 +74,15 @@ Stage::StageStatus StageSidePass::Process(
 Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
                                    Frame* frame,
                                    ReferenceLineInfo* reference_line_info) {
+  auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
+  auto speed_profile = SpeedProfileGenerator::GenerateInitSpeedProfile(
+      planning_start_point, reference_line_info);
+  if (speed_profile.empty()) {
+    speed_profile =
+        SpeedProfileGenerator::GenerateSpeedHotStart(planning_start_point);
+    ADEBUG << "Using dummy hot start for speed vector";
+  }
+  *heuristic_speed_data = SpeedData(speed_profile);
   for (auto* ptr_task : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
     auto task_status = ptr_task->Execute(frame, reference_line_info);
