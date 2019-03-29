@@ -344,7 +344,8 @@ void LaneScanningEvaluator::ModelInference(
   for (size_t i = 0; i < SHORT_TERM_TRAJECTORY_SIZE; ++i) {
     TrajectoryPoint point;
     double dx = static_cast<double>(torch_output[0][0][i]);
-    double dy = static_cast<double>(torch_output[0][0][i + 10]);
+    double dy = static_cast<double>(
+        torch_output[0][0][i + SHORT_TERM_TRAJECTORY_SIZE]);
     Vec2d offset(dx, dy);
     Vec2d rotated_offset = offset.rotate(feature_ptr->velocity_heading());
     double point_x = feature_ptr->position().x() + rotated_offset.x();
