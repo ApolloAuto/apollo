@@ -20,12 +20,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/traffic_rules/traffic_rule.h"
 
 namespace apollo {
@@ -44,16 +38,8 @@ class TrafficLight : public TrafficRule {
   void MakeDecisions(Frame* const frame,
                      ReferenceLineInfo* const reference_line_info);
 
-  void ReadTrafficLights(
-      const std::shared_ptr<perception::TrafficLightDetection>&
-          traffic_light_detection);
-
-  perception::TrafficLight GetSignal(const std::string& traffic_light_id);
-
  private:
   static constexpr char const* const TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_";
-  std::unordered_map<std::string, const apollo::perception::TrafficLight*>
-      traffic_lights_;
 };
 
 }  // namespace planning
