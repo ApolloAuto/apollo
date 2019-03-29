@@ -8,6 +8,9 @@ cc_binary(
     deps = [
         "//modules/prediction/common:message_process",
     ],
+    linkopts = [
+        "-lboost_filesystem",
+    ],
 )
 
 cpplint()
