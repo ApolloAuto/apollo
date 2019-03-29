@@ -31,6 +31,7 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
+#include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
@@ -87,6 +88,17 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
       Clock::NowInSeconds() - GetContext()->creep_start_time;
   const double timeout_sec = scenario_config_.creep_timeout_sec();
   auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
+
+  double creep_stop_s =
+      stop_sign_end_s + task->FindCreepDistance(*frame, reference_line_info);
+  const double distance =
+      creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
+  if (distance <= 0.0) {
+    auto& rfl_info = frame->mutable_reference_line_info()->front();
+    *(rfl_info.mutable_speed_data()) =
+        SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(0.0, 0);
+  }
+
   if (task && task->CheckCreepDone(*frame, reference_line_info, stop_sign_end_s,
                                    wait_time, timeout_sec)) {
     return FinishStage();
@@ -97,10 +109,6 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   //    ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
   //                                      stop_sign_end_s);
 
-  plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "StopSignUnprotectedStageCreep planning error";
-  }
   return Stage::RUNNING;
 }
 
