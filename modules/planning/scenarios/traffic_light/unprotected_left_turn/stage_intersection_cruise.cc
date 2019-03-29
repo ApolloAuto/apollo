@@ -53,27 +53,7 @@ TrafficLightUnprotectedLeftTurnStageIntersectionCruise::Process(
            << "plan error";
   }
 
-  /* TODO(all): to be fixed
-  const auto& reference_line_info = frame->reference_line_info().front();
-
-  // check if the traffic_light is still along reference_line
-  std::string traffic_light_overlap_id =
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.object_id;
-  if (CheckTrafficLightDone(reference_line_info, traffic_light_overlap_id)) {
-    return FinishScenario();
-  }
-
-  // check pass intersection
-  // TODO(all): update when pnc-junction is ready
-  constexpr double kIntersectionLength = 10.0;  // unit: m
-  const double adc_back_edge_s = reference_line_info.AdcSlBoundary().start_s();
-  const double distance_adc_pass_traffic_light =
-      adc_back_edge_s -
-      PlanningContext::GetScenarioInfo()->next_traffic_light_overlap.end_s;
-  if (distance_adc_pass_traffic_light > kIntersectionLength) {
-    return FinishStage();
-  }
-  */
+  // TODO(all): to be added
 
   return Stage::RUNNING;
 }
