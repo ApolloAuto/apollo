@@ -30,7 +30,7 @@
 namespace apollo {
 namespace prediction {
 
-using apollo::common::AdapterConfig;
+using apollo::common::adapter::AdapterConfig;
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
