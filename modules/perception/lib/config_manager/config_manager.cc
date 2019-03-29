@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/lib/config_manager/config_manager.h"
 
+#include "cyber/common/environment.h"
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 #include "modules/perception/common/io/io_util.h"
@@ -32,9 +33,9 @@ ConfigManager::ConfigManager() {
 
   // For start at arbitrary path
   if (work_root_.empty()) {
-    work_root_ = get_env("MODULE_PATH");
+    work_root_ = cyber::common::GetEnv("MODULE_PATH");
     if (work_root_.empty()) {
-      work_root_ = get_env("CYBER_PATH");
+      work_root_ = cyber::common::GetEnv("CYBER_PATH");
     }
   }
 }
@@ -116,12 +117,6 @@ bool ConfigManager::Reset() {
   MutexLock lock(&mutex_);
   inited_ = false;
   return InitInternal();
-}
-
-std::string ConfigManager::get_env(const std::string &var_name) {
-  const char *var = getenv(var_name.c_str());
-
-  return !var ? std::string("") : std::string(var);
 }
 
 bool ConfigManager::GetModelConfig(const std::string &model_name,
