@@ -19,8 +19,8 @@
 #include <map>
 #include <utility>
 
-#include "cyber/common/file.h"
-
+// #include "cyber/common/log.h"
+#include "modules/common/util/file.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/camera/common/math_functions.h"
 #include "modules/perception/lib/utils/timer.h"
@@ -30,7 +30,6 @@ namespace perception {
 namespace camera {
 
 using apollo::cyber::common::GetAbsolutePath;
-using apollo::cyber::common::GetProtoFromFile;
 
 std::vector<base::LaneLinePositionType> spatialLUT(
     {base::LaneLinePositionType::UNKNOWN,
@@ -43,7 +42,8 @@ std::vector<base::LaneLinePositionType> spatialLUT(
      base::LaneLinePositionType::ADJACENT_RIGHT,
      base::LaneLinePositionType::THIRD_RIGHT,
      base::LaneLinePositionType::FOURTH_RIGHT,
-     base::LaneLinePositionType::OTHER, base::LaneLinePositionType::CURB_LEFT,
+     base::LaneLinePositionType::OTHER,
+     base::LaneLinePositionType::CURB_LEFT,
      base::LaneLinePositionType::CURB_RIGHT});
 
 std::map<base::LaneLinePositionType, int> spatialLUTind = {
@@ -80,7 +80,7 @@ bool DarkSCNNLanePostprocessor::Init(
   darkSCNN::DarkSCNNParam darkscnn_param;
   const std::string& proto_path =
       GetAbsolutePath(options.detect_config_root, options.detect_config_name);
-  if (!GetProtoFromFile(proto_path, &darkscnn_param)) {
+  if (!apollo::common::util::GetProtoFromFile(proto_path, &darkscnn_param)) {
     AINFO << "Failed to load proto param, root dir: " << options.root_dir;
     return false;
   }
@@ -98,7 +98,8 @@ bool DarkSCNNLanePostprocessor::Init(
   const std::string& postprocessor_config =
       GetAbsolutePath(root_dir, conf_file);
   AINFO << "postprocessor_config: " << postprocessor_config;
-  if (!GetProtoFromFile(postprocessor_config, &lane_postprocessor_param_)) {
+  if (!apollo::common::util::GetProtoFromFile(postprocessor_config,
+                                              &lane_postprocessor_param_)) {
     AERROR << "Failed to read config detect_param: " << postprocessor_config;
     return false;
   }

@@ -12,9 +12,6 @@ cc_library(
     deps = [
         "//cyber",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-    ],
 )
 
 cpplint()

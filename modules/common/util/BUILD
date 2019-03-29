@@ -14,6 +14,7 @@ cc_library(
     deps = [
         ":color",
         ":disjoint_set",
+        ":file_util",
         ":http_client",
         ":json_util",
         ":lru_cache",
@@ -97,6 +98,7 @@ cc_library(
         "message_util.h",
     ],
     deps = [
+        ":file_util",
         ":string_util",
         "//modules/common/time",
         "@com_google_protobuf//:protobuf",
@@ -171,6 +173,20 @@ cc_test(
         ":factory",
         "//modules/common",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "file_util",
+    hdrs = [
+        "file.h",
+    ],
+    linkopts = [
+        "-lboost_filesystem",
+        "-lboost_system",
+    ],
+    deps = [
+        "//cyber/common:file",
     ],
 )
 
