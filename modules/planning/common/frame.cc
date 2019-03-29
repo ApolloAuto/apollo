@@ -496,7 +496,7 @@ void Frame::ReadTrafficLights() {
 }
 
 perception::TrafficLight Frame::GetSignal(
-    const std::string& traffic_light_id) {
+    const std::string& traffic_light_id) const {
   const auto* result =
       apollo::common::util::FindPtrOrNull(traffic_lights_, traffic_light_id);
   if (result == nullptr) {
