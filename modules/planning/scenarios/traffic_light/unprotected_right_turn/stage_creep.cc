@@ -87,7 +87,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
         current_traffic_light_overlap->start_s, false);
 
     auto signal_color =
-        scenario::util::GetSignal(traffic_light_overlap_id).color();
+        frame->GetSignal(traffic_light_overlap_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
            << "] start_s[" << current_traffic_light_overlap->start_s
            << "] color[" << signal_color << "]";

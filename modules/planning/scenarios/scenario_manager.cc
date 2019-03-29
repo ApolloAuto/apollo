@@ -253,7 +253,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       traffic_light_scenario = true;
 
       const auto& signal_color =
-          scenario::util::GetSignal(traffic_light_overlap.object_id).color();
+          frame.GetSignal(traffic_light_overlap.object_id).color();
       ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
              << "] start_s[" << traffic_light_overlap.start_s
              << "] color[" << signal_color << "]";
