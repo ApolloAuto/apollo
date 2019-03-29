@@ -27,6 +27,10 @@
 
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
+#ifdef __aarch64__
+#include "modules/common/configs/cpu_bind_helper.h"
+#endif
+
 namespace apollo {
 namespace dreamview {
 
@@ -79,6 +83,10 @@ void Dreamview::CheckAdapters() {
 }
 
 Status Dreamview::Init() {
+#ifdef __aarch64__
+  apollo::common::CpuBindHelper::instance()->BindCpu(Name());
+#endif
+
   AdapterManager::Init(FLAGS_dreamview_adapter_config_filename);
   VehicleConfigHelper::Init();
 

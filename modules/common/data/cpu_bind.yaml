@@ -1,0 +1,7 @@
+cpubind:
+  - module: dreamview
+    cores: [1]
+  - module: perception
+    cores: [2]
+  - module: cpu_bind_helper_test
+    cores: [0, 2, 3]

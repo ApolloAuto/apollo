@@ -40,6 +40,10 @@
 #include "modules/perception/traffic_light/onboard/tl_preprocessor_subnode.h"
 #include "modules/perception/traffic_light/onboard/tl_proc_subnode.h"
 
+#ifdef __aarch64__
+#include "modules/common/configs/cpu_bind_helper.h"
+#endif
+
 namespace apollo {
 namespace perception {
 
@@ -50,6 +54,10 @@ using apollo::common::ErrorCode;
 std::string Perception::Name() const { return "perception"; }
 
 Status Perception::Init() {
+#ifdef __aarch64__
+  apollo::common::CpuBindHelper::instance()->BindCpu(Name());
+#endif
+
   AdapterManager::Init(FLAGS_perception_adapter_config_filename);
 
   RegistAllOnboardClass();

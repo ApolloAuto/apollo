@@ -38,6 +38,21 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "cpu_bind_helper",
+    srcs = [
+        "cpu_bind_helper.cc",
+    ],
+    hdrs = [
+        "cpu_bind_helper.h",
+    ],
+    deps = [
+        ":config_gflags",
+        "//modules/common",
+        "@yaml_cpp//:yaml",
+    ],
+)
+
 cc_test(
     name = "vehicle_config_helper_test",
     size = "small",
@@ -46,6 +61,18 @@ cc_test(
     ],
     deps = [
         "vehicle_config_helper",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "cpu_bind_helper_test",
+    size = "small",
+    srcs = [
+        "cpu_bind_helper_test.cc",
+    ],
+    deps = [
+        "cpu_bind_helper",
         "@gtest//:main",
     ],
 )
