@@ -70,15 +70,14 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     std::vector<double> opt_l;
     std::vector<double> opt_dl;
     std::vector<double> opt_ddl;
-    bool res_opt = OptimizePath(init_frenet_state,
-                                path_boundary.delta_s(),
-                                path_boundary.boundary(), w,
-                                &opt_l, &opt_dl, &opt_ddl);
+    bool res_opt =
+        OptimizePath(init_frenet_state, path_boundary.delta_s(),
+                     path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl);
 
     if (res_opt) {
-      auto frenet_frame_path = ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
-                                                   path_boundary.delta_s(),
-                                                   path_boundary.start_s());
+      auto frenet_frame_path =
+          ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, path_boundary.delta_s(),
+                              path_boundary.start_s());
 
       // TODO(all): double-check this;
       // final_path_data might carry info from upper stream
@@ -92,7 +91,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   }
   if (candidate_path_data.empty()) {
     return Status(ErrorCode::PLANNING_ERROR,
-        "Path Optimizer failed to generate path");
+                  "Path Optimizer failed to generate path");
   }
   reference_line_info_->SetCandidatePathData(std::move(candidate_path_data));
   return Status::OK();
