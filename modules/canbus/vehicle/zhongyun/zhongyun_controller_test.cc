@@ -17,11 +17,12 @@
 #include <string>
 
 #include "gtest/gtest.h"
+
+#include "cyber/common/file.h"
 #include "modules/canbus/proto/canbus_conf.pb.h"
 #include "modules/canbus/proto/chassis.pb.h"
 #include "modules/canbus/vehicle/zhongyun/zhongyun_controller.h"
 #include "modules/canbus/vehicle/zhongyun/zhongyun_message_manager.h"
-#include "modules/common/util/file.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 
@@ -37,7 +38,7 @@ class ZhongyunControllerTest : public ::testing::Test {
   virtual void SetUp() {
     const std::string canbus_conf_file =
         "modules/canbus/testdata/conf/zhongyun_canbus_conf_test.pb.txt";
-    apollo::common::util::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
+    apollo::cyber::common::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
   }
 
