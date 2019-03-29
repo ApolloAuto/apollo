@@ -41,6 +41,13 @@ class RssDecider : public Task {
  private:
   apollo::common::Status Process(Frame *frame,
                                  ReferenceLineInfo *reference_line_info);
+  ad_rss::core::RssCheck rssCheck;
+
+  void rss_config_default_dynamics(::ad_rss::world::Dynamics *dynamics);
+  void rss_create_ego_object(::ad_rss::world::Object *ego,
+      double vel_lon, double vel_lat);
+  void rss_create_other_object(::ad_rss::world::Object *other,
+      double vel_lon, double vel_lat);
 };
 
 }  // namespace planning
