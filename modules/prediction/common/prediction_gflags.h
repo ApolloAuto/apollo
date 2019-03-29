@@ -88,6 +88,7 @@ DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(torch_vehicle_junction_mlp_file);
 DECLARE_string(torch_vehicle_cruise_go_file);
 DECLARE_string(torch_vehicle_cruise_cutin_file);
+DECLARE_string(torch_vehicle_lane_scanning_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_string(evaluator_vehicle_cruise_mlp_file);
 DECLARE_int32(max_num_obstacles);

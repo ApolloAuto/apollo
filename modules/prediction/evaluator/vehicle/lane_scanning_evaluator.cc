@@ -19,6 +19,7 @@
 #include <utility>
 
 #include "cyber/common/file.h"
+#include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -30,9 +31,12 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
+using apollo::common::TrajectoryPoint;
 using apollo::cyber::common::GetProtoFromFile;
 
-LaneScanningEvaluator::LaneScanningEvaluator() {}
+LaneScanningEvaluator::LaneScanningEvaluator() : device_(torch::kCPU) {
+  LoadModel();
+}
 
 void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   std::vector<Obstacle*> dummy_dynamic_env;
@@ -77,7 +81,16 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
     ADEBUG << "Save extracted features for learning locally.";
     return;
   }
-  // TODO(jiacheng): once the model is trained, implement this online part.
+
+  std::vector<torch::jit::IValue> torch_inputs;
+  torch::Tensor torch_input =
+      torch::zeros({1, static_cast<int>(feature_values.size())});
+  for (size_t i = 0; i < feature_values.size(); ++i) {
+    torch_input[0][i] = static_cast<float>(feature_values[i]);
+  }
+  torch_inputs.push_back(std::move(torch_input));
+  ModelInference(torch_inputs, torch_lane_scanning_model_ptr_,
+                 latest_feature_ptr);
 }
 
 bool LaneScanningEvaluator::ExtractFeatures(
@@ -294,7 +307,41 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
     }
   }
 
+  size_t max_feature_size = LANE_POINTS_SIZE * SINGLE_LANE_FEATURE_SIZE *
+                            MAX_NUM_LANE;
+  while (feature_values->size() < max_feature_size) {
+    feature_values->push_back(0.0);
+  }
+
   return true;
+}
+
+void LaneScanningEvaluator::LoadModel() {
+  // TODO(all) uncomment the following when cuda issue is resolved
+  // if (torch::cuda::is_available()) {
+  //   ADEBUG << "CUDA is available";
+  //   device_ = torch::Device(torch::kCUDA);
+  // }
+  torch::set_num_threads(1);
+  torch_lane_scanning_model_ptr_ =
+      torch::jit::load(FLAGS_torch_vehicle_lane_scanning_file, device_);
+}
+
+void LaneScanningEvaluator::ModelInference(
+    const std::vector<torch::jit::IValue>& torch_inputs,
+    std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+    Feature* feature_ptr) {
+  auto torch_output_tensor = torch_model_ptr->forward(torch_inputs).toTensor();
+  auto torch_output = torch_output_tensor.accessor<float, 2>();
+  for (size_t i = 0; i < SHORT_TERM_TRAJECTORY_SIZE; ++i) {
+    TrajectoryPoint point;
+    double x = static_cast<double>(torch_output[0][2 * i]);
+    double y = static_cast<double>(torch_output[0][2 * i + 1]);
+    point.mutable_path_point()->set_x(x);
+    point.mutable_path_point()->set_y(y);
+    feature_ptr->add_short_term_predicted_trajectory_points()
+               ->CopyFrom(point);
+  }
 }
 
 }  // namespace prediction

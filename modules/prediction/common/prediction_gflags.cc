@@ -140,6 +140,9 @@ DEFINE_string(torch_vehicle_cruise_go_file,
 DEFINE_string(torch_vehicle_cruise_cutin_file,
               "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.pt",
               "Vehicle cruise go model file");
+DEFINE_string(torch_vehicle_lane_scanning_file,
+              "/apollo/modules/prediction/data/lane_scanning_vehicle_model.pt",
+              "Vehicle lane scanning model file");
 DEFINE_int32(max_num_obstacles, 300,
              "maximal number of obstacles stored in obstacles container.");
 DEFINE_double(valid_position_diff_threshold, 0.5,
