@@ -34,6 +34,7 @@ using ad_rss::world::Object;
 using ad_rss::world::RoadArea;
 using ad_rss::world::Scene;
 using ad_rss::physics::Distance;
+using ad_rss::physics::Speed;
 using ad_rss::physics::ParametricValue;
 
 RssDecider::RssDecider(const TaskConfig &config) : Task(config) {
@@ -94,6 +95,39 @@ Status RssDecider::Process(Frame *frame,
     }
   }
 
+  // there is no obstacle in front of adc
+  if (front_obstacle_distance == std::numeric_limits<double>::max()) {
+    ::ad_rss::world::Dynamics dynamics;
+    rss_config_default_dynamics(&dynamics);
+
+    reference_line_info->mutable_rss_info()->set_is_rss_safe(true);
+
+    static const double kTrajectoryLenFactor = 10.0;
+    // skip to populate RSS cur_dist_lon if it is too large.
+    front_obstacle_distance =
+      kTrajectoryLenFactor * reference_line_info->TrajectoryLength();
+
+    reference_line_info->mutable_rss_info()->set_cur_dist_lon(
+        front_obstacle_distance);
+    reference_line_info->mutable_rss_info()->set_rss_safe_dist_lon(
+        front_obstacle_distance);
+
+    reference_line_info->mutable_rss_info()->set_acc_lon_range_minimum(
+      -1 * static_cast<double> (dynamics.alphaLon.brakeMax));
+    reference_line_info->mutable_rss_info()->set_acc_lon_range_maximum(
+      static_cast<double> (dynamics.alphaLon.accelMax));
+    reference_line_info->mutable_rss_info()->set_acc_lat_left_range_minimum(
+      -1 * static_cast<double> (dynamics.alphaLat.brakeMin));
+    reference_line_info->mutable_rss_info()->set_acc_lat_left_range_maximum(
+      static_cast<double> (dynamics.alphaLat.accelMax));
+    reference_line_info->mutable_rss_info()->set_acc_lat_right_range_minimum(
+      -1 * static_cast<double> (dynamics.alphaLat.brakeMin));
+    reference_line_info->mutable_rss_info()->set_acc_lat_right_range_maximum(
+      static_cast<double> (dynamics.alphaLat.accelMax));
+
+    return Status::OK();
+  }
+
   bool in_test_mode = false;
   if (in_test_mode) {
     double obs_s_dist = nearest_obs_s_end - nearest_obs_s_start;
@@ -139,9 +173,8 @@ Status RssDecider::Process(Frame *frame,
 
   scene.situationType = ad_rss::situation::SituationType::SameDirection;
 
-  leadingObject =
-      ad_rss::createObject(nearest_obs_speed, 0.0);  // TODO(l1212s): refine
-  leadingObject.objectId = 0;
+  rss_create_other_object(&leadingObject, nearest_obs_speed, 0);
+
   ad_rss::world::OccupiedRegion occupiedRegion_leading;
   occupiedRegion_leading.segmentId = 0;
   occupiedRegion_leading.lonRange.minimum =
@@ -165,9 +198,8 @@ Status RssDecider::Process(Frame *frame,
          << " occupiedRegion_leading.latRange.maximum = "
          << double(occupiedRegion_leading.latRange.maximum);
 
-  followingObject =
-      ad_rss::createObject(adc_velocity, 0.0);  // TODO(l1212s): refine
-  followingObject.objectId = 1;
+  RssDecider::rss_create_ego_object(&followingObject, adc_velocity, 0.0);
+
   ad_rss::world::OccupiedRegion occupiedRegion_following;
   occupiedRegion_following.segmentId = 0;
   occupiedRegion_following.lonRange.minimum =
@@ -214,20 +246,24 @@ Status RssDecider::Process(Frame *frame,
          << double(laneSegment.width.maximum);
 
   ad_rss::world::WorldModel worldModel;
-  worldModel.egoVehicle = ad_rss::objectAsEgo(followingObject);
+  worldModel.egoVehicle = followingObject;
   scene.object = leadingObject;
   scene.egoVehicleRoad = roadArea;
   worldModel.scenes.push_back(scene);
-  worldModel.timeIndex = 1;
+  worldModel.timeIndex = frame->SequenceNum();
 
   Distance dMin_lon =
-      ad_rss::calculateLongitudinalMinSafeDistance(
+      ::ad_rss::calculateLongitudinalMinSafeDistance(
       followingObject, leadingObject);
 
   ad_rss::world::AccelerationRestriction accelerationRestriction;
-  ad_rss::core::RssCheck rssCheck;
-  rssCheck.calculateAccelerationRestriction(
+  bool rss_check_result = rssCheck.calculateAccelerationRestriction(
       worldModel, accelerationRestriction);
+
+  if (!rss_check_result) {
+    std::string msg("rssCheck is invalid");
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
 
   if (front_obstacle_distance > static_cast<double> (dMin_lon)) {
     ADEBUG << "Task " << Name() << " Distance is RSS-Safe";
@@ -281,6 +317,36 @@ Status RssDecider::Process(Frame *frame,
          << reference_line_info->rss_info().acc_lat_right_range_maximum();
 
   return Status::OK();
+}
+
+void RssDecider::rss_config_default_dynamics(
+  ::ad_rss::world::Dynamics *dynamics) {
+  dynamics->alphaLon.accelMax = ::ad_rss::physics::Acceleration(3.5);
+  dynamics->alphaLon.brakeMax = ::ad_rss::physics::Acceleration(8);
+  dynamics->alphaLon.brakeMin = ::ad_rss::physics::Acceleration(4.);
+  dynamics->alphaLon.brakeMinCorrect = ::ad_rss::physics::Acceleration(3.);
+  dynamics->alphaLat.accelMax = ::ad_rss::physics::Acceleration(0.2);
+  dynamics->alphaLat.brakeMin = ::ad_rss::physics::Acceleration(0.8);
+}
+
+void RssDecider::rss_create_ego_object(::ad_rss::world::Object *ego,
+                                       double vel_lon, double vel_lat) {
+  ego->objectId = 1;
+  ego->objectType = ::ad_rss::world::ObjectType::EgoVehicle;
+  ego->velocity.speedLon = Speed(vel_lon);
+  ego->velocity.speedLat = Speed(vel_lat);
+  rss_config_default_dynamics(&(ego->dynamics));
+  ego->responseTime = ::ad_rss::physics::Duration(1.);
+}
+
+void RssDecider::rss_create_other_object(::ad_rss::world::Object *other,
+                                         double vel_lon, double vel_lat) {
+  other->objectId = 0;
+  other->objectType = ::ad_rss::world::ObjectType::OtherVehicle;
+  other->velocity.speedLon = Speed(vel_lon);
+  other->velocity.speedLat = Speed(vel_lat);
+  rss_config_default_dynamics(&(other->dynamics));
+  other->responseTime = ::ad_rss::physics::Duration(2.);
 }
 
 }  //  namespace planning
