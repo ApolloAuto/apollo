@@ -34,11 +34,10 @@ cc_library(
     deps = [
         "//cyber",
         "//modules/common/util",
-        "//modules/drivers/video/proto:video_proto",
         "//modules/drivers/proto:sensor_proto",
+        "//modules/drivers/video/proto:video_proto",
     ],
 )
-
 
 cc_library(
     name = "socket",

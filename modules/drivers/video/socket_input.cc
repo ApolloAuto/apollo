@@ -1,12 +1,12 @@
-/******************************************************************************                                                                                                                              
+/******************************************************************************
  * Copyright 2019 The Apollo Authors. All Rights Reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- 
+
  * http://www.apache.org/licenses/LICENSE-2.0
- 
+
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,18 +14,19 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <unistd.h>
-#include <sys/socket.h>
 #include <arpa/inet.h>
-#include <poll.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/file.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 #include <memory>
+
 #include "cyber/cyber.h"
-#include "modules/drivers/video/socket_input.h"
 #include "modules/drivers/video/input.h"
+#include "modules/drivers/video/socket_input.h"
 
 namespace apollo {
 namespace drivers {
@@ -36,7 +37,7 @@ namespace video {
 ////////////////////////////////////////////////////////////////////////
 
 /** @brief constructor
- 
+
  *  @param private_nh private node handle for driver
  *  @param udpport UDP port number to connect
  */
@@ -48,8 +49,8 @@ SocketInput::SocketInput() : sockfd_(-1), port_(0) {
 
 /** @brief destructor */
 SocketInput::~SocketInput(void) {
-  if (buf_) delete [] buf_;
-  if (pdu_) delete [] pdu_;
+  if (buf_) delete[] buf_;
+  if (pdu_) delete[] pdu_;
   (void)close(sockfd_);
 }
 
@@ -77,8 +78,8 @@ void SocketInput::Init(uint32_t port) {
   my_addr.sin_port = htons(uint16_t(port));  // short, in network byte order
   my_addr.sin_addr.s_addr = INADDR_ANY;      // automatically fill in my IP
 
-  if (bind(sockfd_, reinterpret_cast<sockaddr*>(&my_addr),
-        sizeof(sockaddr_in)) == -1) {
+  if (bind(sockfd_, reinterpret_cast<sockaddr *>(&my_addr),
+           sizeof(sockaddr_in)) == -1) {
     AERROR << "Socket bind failed! Port " << port_;
   }
 
@@ -86,11 +87,10 @@ void SocketInput::Init(uint32_t port) {
     AERROR << "non-block! Port " << port_;
   }
 
-  const int nRecvBuf = 4*1024*1024;
+  const int nRecvBuf = 4 * 1024 * 1024;
   if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVBUF, &nRecvBuf, sizeof(int))) {
     AERROR << "set socket recieve buff error";
   }
-
 
   int enable = 1;
   if (setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
@@ -124,8 +124,7 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
     }
     // Receive packets that should now be available from the
     // socket using a blocking read.
-    ssize_t pdu_len =
-      recvfrom(sockfd_, pdu_data, H265_PDU_SIZE, 0, NULL, NULL);
+    ssize_t pdu_len = recvfrom(sockfd_, pdu_data, H265_PDU_SIZE, 0, NULL, NULL);
 
     if (pdu_len < 0) {
       if (errno != EWOULDBLOCK) {
@@ -139,9 +138,9 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
     uint16_t local_seq = ntohs(pdu_pkg->rtp_header.seq);
     // AINFO << "package seq number " << local_seq;
     if (local_seq - pre_seq != 1 && (pre_seq > 1) && (local_seq > 0)) {
-      AERROR << "error: port " << port_ <<
-        " package sequence is wrong, curent/pre " << local_seq << "/"
-        << pre_seq;
+      AERROR << "error: port " << port_
+             << " package sequence is wrong, curent/pre " << local_seq << "/"
+             << pre_seq;
     }
     pre_seq = local_seq;
 
@@ -155,14 +154,14 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
 
       uint32_t frame_id = ntohl(pdu_pkg->header.frame_id);
       if (frame_id - frame_id_ != 1 && frame_id_ > 1 && frame_id > 1) {
-        AERROR << "error: port " << port_ <<
-          " Frame losing, pre_frame_id/frame_id " << frame_id_ << "/"
-          << frame_id;
+        AERROR << "error: port " << port_
+               << " Frame losing, pre_frame_id/frame_id " << frame_id_ << "/"
+               << frame_id;
       }
       frame_id_ = frame_id;
 
       cyber::Time image_time(ntohl(pdu_pkg->header.ts_sec),
-          1000 * ntohl(pdu_pkg->header.ts_usec));
+                             1000 * ntohl(pdu_pkg->header.ts_usec));
       // AINFO << "image_time second: " << ntohl(pdu_pkg->header.ts_sec) <<
       // " usec: " << ntohl(pdu_pkg->header.ts_usec);
       uint64_t camera_timestamp = image_time.ToNanosecond();
@@ -170,16 +169,17 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
       h265Pb->set_measurement_time(image_time.ToSecond());
       h265Pb->set_format("h265");
       h265Pb->set_frame_type(static_cast<int>(pdu_pkg->header.frame_type));
-      AINFO << "port " << port_ << ", receive frameSize = " <<
-        ntohl(pdu_pkg->header.frame_size) << " frame type = " <<
-        static_cast<int>(pdu_pkg->header.frame_type) << " PhyNo = " <<
-        static_cast<int>(pdu_pkg->header.PhyNo) << " frame_id = " << frame_id;
+      AINFO << "port " << port_
+            << ", receive frameSize = " << ntohl(pdu_pkg->header.frame_size)
+            << " frame type = " << static_cast<int>(pdu_pkg->header.frame_type)
+            << " PhyNo = " << static_cast<int>(pdu_pkg->header.PhyNo)
+            << " frame_id = " << frame_id;
 
       frame_len = ntohl(pdu_pkg->header.frame_size);
       total = static_cast<int>(frame_len);
       frame_data = &buf_[0];
       continue;
-    }  else {
+    } else {
       // receive camera frame data
       if (total > 0) {
         pkg_len = static_cast<int>(pdu_len - sizeof(RtpHeader));
@@ -197,7 +197,7 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
           h265Pb->set_data(buf_, frame_len);
           break;
         } else {
-          AERROR << "error: frame info is error, frame len = " <<  frame_len;
+          AERROR << "error: frame info is error, frame len = " << frame_len;
           continue;
         }
       }
@@ -235,7 +235,7 @@ bool SocketInput::InputAvailable(int timeout) {
     if (retval < 0) {  // poll() error?
       if (errno != EINTR) {
         AERROR << "hwcamera h265 port " << port_
-          << "poll() error: " << strerror(errno);
+               << "poll() error: " << strerror(errno);
       }
       return false;
     }
@@ -246,8 +246,8 @@ bool SocketInput::InputAvailable(int timeout) {
 
     if ((fds[0].revents & POLLERR) || (fds[0].revents & POLLHUP) ||
         (fds[0].revents & POLLNVAL)) {  // device error?
-      AERROR << "h265 camera port " << port_  <<
-        "poll() reports h265camera error";
+      AERROR << "h265 camera port " << port_
+             << "poll() reports h265camera error";
       return false;
     }
   } while ((fds[0].revents & POLLIN) == 0);
@@ -258,7 +258,3 @@ bool SocketInput::InputAvailable(int timeout) {
 }  // namespace video
 }  // namespace drivers
 }  // namespace apollo
-
-
-
-
