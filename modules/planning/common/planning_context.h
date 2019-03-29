@@ -50,15 +50,6 @@ class PlanningContext {
     // all traffic lights ahead, with signal info
     std::unordered_map<std::string, const apollo::perception::TrafficLight*>
         traffic_lights;
-
-    /////////////////////////
-    // scenario specific info, set up by ScenarioManager::ScenarioDispatch()
-    // current traffic light (vector)
-    std::vector<apollo::hdmap::PathOverlap> current_traffic_light_overlaps;
-
-    // still in the scenario for this overlap, but stop already done
-    // => no stop fence from decider_rule_based_stop task
-    std::vector<std::string> stop_done_overlap_ids;
   };
 
   // @brief a container logging the data required for non-scenario side pass
