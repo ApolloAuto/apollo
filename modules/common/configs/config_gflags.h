@@ -34,6 +34,7 @@ DECLARE_string(speed_control_filename);
 DECLARE_double(look_forward_time_sec);
 
 DECLARE_string(vehicle_config_path);
+DECLARE_string(cpubind_config_path);
 
 DECLARE_bool(use_ros_time);
 

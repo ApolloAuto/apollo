@@ -29,7 +29,12 @@ cc_library(
         "//modules/perception/traffic_light/onboard",
         "@com_google_protobuf//:protobuf",
         "@ros//:ros_common",
-    ],
+    ]  + select({
+        "//tools/platforms:aarch64": [
+            "//modules/common/configs:cpu_bind_helper",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 cc_binary(

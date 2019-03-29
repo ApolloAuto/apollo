@@ -21,7 +21,12 @@ cc_library(
         "//modules/dreamview/backend/simulation_world:simulation_world_updater",
         "//modules/map/hdmap:hdmap_util",
         "@civetweb//:civetweb++",
-    ],
+    ] + select({
+        "//tools/platforms:aarch64": [
+            "//modules/common/configs:cpu_bind_helper",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 cpplint()

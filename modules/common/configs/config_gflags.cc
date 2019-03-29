@@ -37,6 +37,9 @@ DEFINE_string(speed_control_filename, "speed_control.pb.txt",
 DEFINE_string(vehicle_config_path, "modules/common/data/mkz_config.pb.txt",
               "the file path of vehicle config file");
 
+DEFINE_string(cpubind_config_path, "modules/common/data/cpu_bind.yaml",
+              "the file path of cpu bind config file");
+
 DEFINE_bool(use_ros_time, false,
             "Whether Clock::Now() gets time from system_clock::now() or from "
             "ros::Time::now().");
