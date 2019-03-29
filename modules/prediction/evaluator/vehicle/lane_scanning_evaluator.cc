@@ -14,6 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
+
+#include <omp.h>
+
 #include <algorithm>
 #include <limits>
 #include <utility>
@@ -25,7 +29,6 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/evaluator/vehicle/lane_scanning_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -46,6 +49,7 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
                                      std::vector<Obstacle*> dynamic_env) {
   // Sanity checks.
+  omp_set_num_threads(1);
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
   if (!obstacle_ptr->latest_feature().IsInitialized()) {
@@ -81,6 +85,8 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
     ADEBUG << "Save extracted features for learning locally.";
     return;
   }
+
+  feature_values.push_back(static_cast<double>(MAX_NUM_LANE));
 
   std::vector<torch::jit::IValue> torch_inputs;
   torch::Tensor torch_input =
@@ -332,13 +338,15 @@ void LaneScanningEvaluator::ModelInference(
     std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
     Feature* feature_ptr) {
   auto torch_output_tensor = torch_model_ptr->forward(torch_inputs).toTensor();
-  auto torch_output = torch_output_tensor.accessor<float, 2>();
+  auto torch_output = torch_output_tensor.accessor<float, 3>();
   for (size_t i = 0; i < SHORT_TERM_TRAJECTORY_SIZE; ++i) {
     TrajectoryPoint point;
-    double x = static_cast<double>(torch_output[0][2 * i]);
-    double y = static_cast<double>(torch_output[0][2 * i + 1]);
-    point.mutable_path_point()->set_x(x);
-    point.mutable_path_point()->set_y(y);
+    double dx = static_cast<double>(torch_output[0][0][3 * i]);
+    double dy = static_cast<double>(torch_output[0][0][3 * i + 1]);
+    point.mutable_path_point()->set_x(dx + feature_ptr->position().x());
+    point.mutable_path_point()->set_y(dy + feature_ptr->position().y());
+    point.set_relative_time(static_cast<double>(i) *
+        FLAGS_prediction_trajectory_time_resolution);
     feature_ptr->add_short_term_predicted_trajectory_points()
                ->CopyFrom(point);
   }
