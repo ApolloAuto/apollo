@@ -341,8 +341,8 @@ void LaneScanningEvaluator::ModelInference(
   auto torch_output = torch_output_tensor.accessor<float, 3>();
   for (size_t i = 0; i < SHORT_TERM_TRAJECTORY_SIZE; ++i) {
     TrajectoryPoint point;
-    double dx = static_cast<double>(torch_output[0][0][3 * i]);
-    double dy = static_cast<double>(torch_output[0][0][3 * i + 1]);
+    double dx = static_cast<double>(torch_output[0][0][2 * i]);
+    double dy = static_cast<double>(torch_output[0][0][2 * i + 1]);
     point.mutable_path_point()->set_x(dx + feature_ptr->position().x());
     point.mutable_path_point()->set_y(dy + feature_ptr->position().y());
     point.set_relative_time(static_cast<double>(i) *

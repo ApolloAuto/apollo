@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/prediction/predictor/extention/extention_predictor.h"
+#include "modules/prediction/predictor/extrapolation/extrapolation_predictor.h"
 
 namespace apollo {
 namespace prediction {
 
-void ExtentionPredictor::Predict(Obstacle* obstacle) {
+void ExtrapolationPredictor::Predict(Obstacle* obstacle) {
   Clear();
 
   CHECK_NOTNULL(obstacle);
@@ -37,7 +37,7 @@ void ExtentionPredictor::Predict(Obstacle* obstacle) {
   trajectories_.push_back(std::move(trajectory));
 }
 
-void ExtentionPredictor::DrawShortTermTrajectory(const Feature& feature,
+void ExtrapolationPredictor::DrawShortTermTrajectory(const Feature& feature,
     std::vector<apollo::common::TrajectoryPoint>* points) {
   for (const auto& point : feature.short_term_predicted_trajectory_points()) {
     points->push_back(point);
