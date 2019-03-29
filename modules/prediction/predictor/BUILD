@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["predictor_manager.h"],
     deps = [
         "//modules/prediction/common:feature_output",
-        "//modules/prediction/predictor/extention:extention_predictor",
+        "//modules/prediction/predictor/extrapolation:extrapolation_predictor",
         "//modules/prediction/predictor/free_move:free_move_predictor",
         "//modules/prediction/predictor/junction:junction_predictor",
         "//modules/prediction/predictor/lane_sequence:lane_sequence_predictor",

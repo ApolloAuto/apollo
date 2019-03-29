@@ -16,7 +16,7 @@
 
 /**
  * @file
- * @brief Define extention predictor
+ * @brief Define extrapolation predictor
  */
 
 #pragma once
@@ -30,17 +30,17 @@
 namespace apollo {
 namespace prediction {
 
-class ExtentionPredictor : public SequencePredictor {
+class ExtrapolationPredictor : public SequencePredictor {
  public:
   /**
    * @brief Constructor
    */
-  ExtentionPredictor() = default;
+  ExtrapolationPredictor() = default;
 
   /**
    * @brief Destructor
    */
-  virtual ~ExtentionPredictor() = default;
+  virtual ~ExtrapolationPredictor() = default;
 
   /**
    * @brief Make prediction
