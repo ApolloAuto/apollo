@@ -18,7 +18,8 @@
 #include <algorithm>
 #include <map>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
+
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/resize.h"
@@ -28,10 +29,11 @@ namespace perception {
 namespace camera {
 
 using apollo::cyber::common::GetAbsolutePath;
+using apollo::cyber::common::GetProtoFromFile;
 
 bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!apollo::common::util::GetProtoFromFile(proto_path, &darkscnn_param_)) {
+  if (!GetProtoFromFile(proto_path, &darkscnn_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }
@@ -181,10 +183,10 @@ bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
   ADEBUG << "input_blob: " << blob_channel << " " << blob_height << " "
          << blob_width << std::endl;
 
-  CHECK_EQ(blob_height, resize_height_)
-      << "height is not equal" << blob_height << " vs " << resize_height_;
-  CHECK_EQ(blob_width, resize_width_)
-      << "width is not equal" << blob_width << " vs " << resize_width_;
+  CHECK_EQ(blob_height, resize_height_) << "height is not equal" << blob_height
+                                        << " vs " << resize_height_;
+  CHECK_EQ(blob_width, resize_width_) << "width is not equal" << blob_width
+                                      << " vs " << resize_width_;
 
   ADEBUG << "image_blob: " << image_src_.blob()->shape_string();
   ADEBUG << "input_blob: " << input_blob->shape_string();
