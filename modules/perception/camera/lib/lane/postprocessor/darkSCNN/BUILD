@@ -26,7 +26,6 @@ cc_library(
     ],
     deps = [
         ":darkSCNN_postprocessor_proto",
-        "//modules/common/util:file_util",
         "//modules/perception/base",
         "//modules/perception/camera/common",
         "//modules/perception/camera/lib/interface",
