@@ -43,6 +43,8 @@ class StageSidePass : public Stage {
   common::Status PlanFallbackTrajectory(
       const common::TrajectoryPoint& planning_start_point, Frame* frame,
       ReferenceLineInfo* reference_line_info);
+  void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
+                                   PathData* path_data);
 };
 
 }  // namespace side_pass
