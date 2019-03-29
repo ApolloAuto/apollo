@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
 
@@ -36,6 +37,7 @@ namespace traffic_light {
 // stage context
 struct TrafficLightProtectedContext {
   ScenarioTrafficLightProtectedConfig scenario_config;
+  std::vector<std::string> current_traffic_light_overlap_ids;
 };
 
 class TrafficLightProtectedScenario : public Scenario {
