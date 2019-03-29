@@ -23,6 +23,7 @@
 #include <utility>
 
 #include "cyber/common/file.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -34,6 +35,7 @@ namespace apollo {
 namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
+using apollo::common::math::Vec2d;
 using apollo::common::TrajectoryPoint;
 using apollo::cyber::common::GetProtoFromFile;
 
@@ -341,10 +343,14 @@ void LaneScanningEvaluator::ModelInference(
   auto torch_output = torch_output_tensor.accessor<float, 3>();
   for (size_t i = 0; i < SHORT_TERM_TRAJECTORY_SIZE; ++i) {
     TrajectoryPoint point;
-    double dx = static_cast<double>(torch_output[0][0][2 * i]);
-    double dy = static_cast<double>(torch_output[0][0][2 * i + 1]);
-    point.mutable_path_point()->set_x(dx + feature_ptr->position().x());
-    point.mutable_path_point()->set_y(dy + feature_ptr->position().y());
+    double dx = static_cast<double>(torch_output[0][0][i]);
+    double dy = static_cast<double>(torch_output[0][0][i + 10]);
+    Vec2d offset(dx, dy);
+    Vec2d rotated_offset = offset.rotate(feature_ptr->velocity_heading());
+    double point_x = feature_ptr->position().x() + rotated_offset.x();
+    double point_y = feature_ptr->position().y() + rotated_offset.y();
+    point.mutable_path_point()->set_x(point_x);
+    point.mutable_path_point()->set_y(point_y);
     point.set_relative_time(static_cast<double>(i) *
         FLAGS_prediction_trajectory_time_resolution);
     feature_ptr->add_short_term_predicted_trajectory_points()
