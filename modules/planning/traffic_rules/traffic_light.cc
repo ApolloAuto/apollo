@@ -87,10 +87,9 @@ void TrafficLight::MakeDecisions(Frame* const frame,
 
     // check if traffic-light-stop already finished, set by scenario/stage
     bool traffic_light_done = false;
-    for (int i = 0;
-        i < traffic_light_status.done_traffic_light_overlap_id_size(); i++) {
-      if (traffic_light_overlap.object_id ==
-          traffic_light_status.done_traffic_light_overlap_id(i)) {
+    for (const auto& done_traffic_light_overlap_id :
+         traffic_light_status.done_traffic_light_overlap_id()) {
+      if (traffic_light_overlap.object_id == done_traffic_light_overlap_id) {
         traffic_light_done = true;
         break;
       }
