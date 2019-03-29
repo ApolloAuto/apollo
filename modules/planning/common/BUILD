@@ -147,6 +147,7 @@ cc_library(
         ":planning_gflags",
         "//cyber/common:log",
         "//modules/map/pnc_map:path",
+        "//modules/planning/common/path:path_data",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",

@@ -23,6 +23,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 
 #include "cyber/common/macros.h"
 
@@ -30,6 +31,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/common/path/path_data.h"
 #include "modules/planning/proto/planning_status.pb.h"
 #include "modules/routing/proto/routing.pb.h"
 
@@ -83,6 +85,10 @@ class PlanningContext {
     bool check_clear_flag = false;
   };
 
+  struct FallBackInfo {
+    PathData last_successful_path;
+  };
+
   static void Clear();
 
   static void Init();
@@ -97,16 +103,20 @@ class PlanningContext {
 
   static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
+  static const FallBackInfo& fallback_info() { return fallback_info_; }
+
+  static FallBackInfo* mutable_fallback_info() { return &fallback_info_; }
+
   static void IncrementFrontStaticObstacleCycleCounter() {
-    front_static_obstacle_cycle_counter_ = std::min(
-        front_static_obstacle_cycle_counter_ + 1,
-        kPathScenarioTransitionHysteresisFrame);
+    front_static_obstacle_cycle_counter_ =
+        std::min(front_static_obstacle_cycle_counter_ + 1,
+                 kPathScenarioTransitionHysteresisFrame);
   }
 
   static void DecrementFrontStaticObstacleCycleCounter() {
-    front_static_obstacle_cycle_counter_ = std::max(
-        front_static_obstacle_cycle_counter_ - 1,
-        -kPathScenarioTransitionHysteresisFrame);
+    front_static_obstacle_cycle_counter_ =
+        std::max(front_static_obstacle_cycle_counter_ - 1,
+                 -kPathScenarioTransitionHysteresisFrame);
   }
 
   static void ResetFrontStaticObstacleCycleCounter() {
@@ -118,15 +128,15 @@ class PlanningContext {
   }
 
   static void IncrementAbleToUseSelfLaneCounter() {
-    able_to_use_self_lane_counter_ = std::min(
-        able_to_use_self_lane_counter_ + 1,
-        kPathScenarioTransitionHysteresisFrame);
+    able_to_use_self_lane_counter_ =
+        std::min(able_to_use_self_lane_counter_ + 1,
+                 kPathScenarioTransitionHysteresisFrame);
   }
 
   static void DecrementAbleToUseSelfLaneCounter() {
-    able_to_use_self_lane_counter_ = std::max(
-        able_to_use_self_lane_counter_ - 1,
-        -kPathScenarioTransitionHysteresisFrame);
+    able_to_use_self_lane_counter_ =
+        std::max(able_to_use_self_lane_counter_ - 1,
+                 -kPathScenarioTransitionHysteresisFrame);
   }
 
   static void ResetAbleToUseSelfLaneCounter() {
@@ -141,6 +151,7 @@ class PlanningContext {
   static PlanningStatus planning_status_;
   static ScenarioInfo scenario_info_;
   static SidePassInfo side_pass_info_;
+  static FallBackInfo fallback_info_;
 
   static int front_static_obstacle_cycle_counter_;
   static int able_to_use_self_lane_counter_;
