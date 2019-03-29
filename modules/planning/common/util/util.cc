@@ -87,7 +87,7 @@ bool CheckStopSignOnReferenceLine(const ReferenceLineInfo& reference_line_info,
                    [&stop_sign_overlap_id](const PathOverlap& overlap) {
                      return overlap.object_id == stop_sign_overlap_id;
                    });
-  return (stop_sign_overlap_it == stop_sign_overlaps.end());
+  return (stop_sign_overlap_it != stop_sign_overlaps.end());
 }
 
 /*
@@ -103,7 +103,7 @@ bool CheckTrafficLightOnReferenceLine(
                    [&traffic_light_overlap_id](const PathOverlap& overlap) {
                      return overlap.object_id == traffic_light_overlap_id;
                    });
-  return (traffic_light_overlap_it == traffic_light_overlaps.end());
+  return (traffic_light_overlap_it != traffic_light_overlaps.end());
 }
 
 /*

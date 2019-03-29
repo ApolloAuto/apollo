@@ -63,7 +63,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
 
   // check if the stop_sign is still along reference_line
   std::string stop_sign_overlap_id = GetContext()->current_stop_sign_overlap_id;
-  if (planning::util::CheckStopSignOnReferenceLine(reference_line_info,
+  if (!planning::util::CheckStopSignOnReferenceLine(reference_line_info,
                                                    stop_sign_overlap_id)) {
     return FinishScenario();
   }
