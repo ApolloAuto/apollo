@@ -38,9 +38,8 @@ cc_library(
         "src/world/RssObjectPositionExtractor.cpp",
     ] + glob(["src/**/*.hpp"]),
     hdrs = glob(["include/**/*.hpp"]),
-    copts = ["-fPIC","-std=c++11","-Werror","-Wall","-Wextra","-pedantic","-Wconversion", "-Wsign-conversion", "--coverage"],
+    copts = ["-fPIC","-std=c++11","-Werror","-Wall","-Wextra","-pedantic","-Wconversion", "-Wsign-conversion"],
     includes = ["include", "include/generated", "src", "tests/test_support"], 
-    linkopts = ["--coverage"],
 )
 
 ################################################################################
