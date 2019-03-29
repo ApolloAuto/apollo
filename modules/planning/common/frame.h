@@ -167,7 +167,8 @@ class Frame {
 
   OpenSpaceInfo *mutable_open_space_info() { return open_space_info_.get(); }
 
-  perception::TrafficLight GetSignal(const std::string& traffic_light_id);
+  perception::TrafficLight GetSignal(
+      const std::string& traffic_light_id) const;
 
  private:
   common::Status InitFrameData();

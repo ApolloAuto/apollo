@@ -77,7 +77,7 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
     const double distance_adc_to_stop_line =
         current_traffic_light_overlap->start_s - adc_front_edge_s;
     auto signal_color =
-        scenario::util::GetSignal(traffic_light_overlap_id).color();
+        frame->GetSignal(traffic_light_overlap_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
            << "] start_s[" << current_traffic_light_overlap->start_s
            << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
