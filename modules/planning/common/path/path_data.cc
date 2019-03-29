@@ -27,7 +27,6 @@
 #include "modules/common/math/cartesian_frenet_conversion.h"
 #include "modules/common/util/string_util.h"
 #include "modules/common/util/util.h"
-#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
