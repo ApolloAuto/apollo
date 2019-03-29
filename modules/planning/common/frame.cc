@@ -490,9 +490,7 @@ void Frame::ReadTrafficLights() {
            << " seconds.";
     return;
   }
-  for (int i = 0; i < traffic_light_detection->traffic_light_size(); i++) {
-    const perception::TrafficLight& traffic_light =
-        traffic_light_detection->traffic_light(i);
+  for (const auto& traffic_light : traffic_light_detection->traffic_light()) {
     traffic_lights_[traffic_light.id()] = &traffic_light;
   }
 }
