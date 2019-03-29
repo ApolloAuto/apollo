@@ -24,6 +24,7 @@ namespace planning {
 PlanningStatus PlanningContext::planning_status_;
 PlanningContext::ScenarioInfo PlanningContext::scenario_info_;
 PlanningContext::SidePassInfo PlanningContext::side_pass_info_;
+PlanningContext::FallBackInfo PlanningContext::fallback_info_;
 
 PlanningContext::PlanningContext() {}
 
@@ -33,6 +34,7 @@ void PlanningContext::Clear() {
   planning_status_.Clear();
   scenario_info_ = {};
   side_pass_info_ = {};
+  fallback_info_ = {};
 }
 
 int PlanningContext::front_static_obstacle_cycle_counter_ = 0;

@@ -21,8 +21,10 @@
 #include "modules/planning/scenarios/side_pass/stage_side_pass.h"
 
 #include <utility>
+#include <vector>
 
 #include "modules/common/time/time.h"
+#include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/speed_profile_generator.h"
 
 namespace apollo {
@@ -83,6 +85,7 @@ Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
     ADEBUG << "Using dummy hot start for speed vector";
   }
   *heuristic_speed_data = SpeedData(speed_profile);
+
   for (auto* ptr_task : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
     auto task_status = ptr_task->Execute(frame, reference_line_info);
@@ -99,20 +102,9 @@ Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
     ADEBUG << ptr_task->Name() << " time spend: " << time_diff_ms << " ms.";
   }
 
-  /**
-  if (reference_line_info->speed_data().empty()) {
-    *reference_line_info->mutable_speed_data() =
-        SpeedProfileGenerator::GenerateFallbackSpeedProfile();
-    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
-    reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
-  } else {
-    reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
-  }
-  **/
-
   if (reference_line_info->path_data().Empty() ||
       reference_line_info->speed_data().empty()) {
-    AERROR << "Unexpected empty path data or speed data";
+    AERROR << "Unexpected path or speed optimizer failure.";
     return Status(common::ErrorCode::PLANNING_ERROR);
   }
 
@@ -134,17 +126,24 @@ Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
 Status StageSidePass::PlanFallbackTrajectory(
     const TrajectoryPoint& planning_start_point, Frame* frame,
     ReferenceLineInfo* reference_line_info) {
-  // path and trajectory fall-back
+  // path and speed fall back
   if (reference_line_info->path_data().Empty()) {
-    // TODO(all): finish later
+    AERROR << "Path fallback due to algorithm failure";
+    GenerateFallbackPathProfile(reference_line_info,
+                                reference_line_info->mutable_path_data());
+    reference_line_info->AddCost(kPathOptimizationFallbackCost);
+    reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
   }
-  if (reference_line_info->speed_data().empty()) {
-    // TODO(Jinyun) will move it inside speed planning
-    *reference_line_info->mutable_speed_data() =
-        SpeedProfileGenerator::GenerateFallbackSpeedProfile();
-    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
-    reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
-  }
+
+  AERROR << "Speed fallback due to algorithm failure";
+  // TODO(Jinyun) calculate front clear distance for fixed distance fallback
+  const double stop_distance =
+      reference_line_info->path_data().discretized_path().Length();
+  *reference_line_info->mutable_speed_data() =
+      SpeedProfileGenerator::GenerateFallbackSpeedProfileWithStopDistance(
+          stop_distance);
+  reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
+  reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
 
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
@@ -156,6 +155,35 @@ Status StageSidePass::PlanFallbackTrajectory(
   reference_line_info->SetTrajectory(trajectory);
   reference_line_info->SetDrivable(true);
   return Status::OK();
+}
+
+void StageSidePass::GenerateFallbackPathProfile(
+    const ReferenceLineInfo* reference_line_info, PathData* path_data) {
+  auto adc_point = EgoInfo::Instance()->start_point();
+  double adc_s = reference_line_info->AdcSlBoundary().end_s();
+  const double max_s = 150.0;
+  const double unit_s = 1.0;
+
+  // projection of adc point onto reference line
+  const auto& adc_ref_point =
+      reference_line_info->reference_line().GetReferencePoint(adc_s);
+
+  DCHECK(adc_point.has_path_point());
+  const double dx = adc_point.path_point().x() - adc_ref_point.x();
+  const double dy = adc_point.path_point().y() - adc_ref_point.y();
+
+  std::vector<common::PathPoint> path_points;
+  for (double s = adc_s; s < max_s; s += unit_s) {
+    const auto& ref_point =
+        reference_line_info->reference_line().GetReferencePoint(adc_s);
+    common::PathPoint path_point = common::util::MakePathPoint(
+        ref_point.x() + dx, ref_point.y() + dy, 0.0, ref_point.heading(),
+        ref_point.kappa(), ref_point.dkappa(), 0.0);
+    path_point.set_s(s);
+
+    path_points.push_back(std::move(path_point));
+  }
+  path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }
 
 }  // namespace side_pass
