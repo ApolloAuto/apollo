@@ -77,8 +77,6 @@ class ScenarioManager final {
   void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
                         const Frame& frame);
 
-  void ReadTrafficLight(const Frame& frame);
-
   bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
   bool IsTrafficLightScenario(
       const ScenarioConfig::ScenarioType& scenario_type);

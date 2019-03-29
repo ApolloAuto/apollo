@@ -21,9 +21,6 @@
 #include <utility>
 #include <vector>
 
-#include "modules/perception/proto/traffic_light_detection.pb.h"
-
-#include "modules/common/time/time.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -42,10 +39,7 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
-using apollo::common::time::Clock;
 using apollo::hdmap::PathOverlap;
-using apollo::perception::TrafficLight;
-using apollo::perception::TrafficLightDetection;
 
 bool ScenarioManager::Init(
     const std::set<ScenarioConfig::ScenarioType>& supported_scenarios) {
@@ -258,7 +252,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
              << "] start_s[" << traffic_light_overlap.start_s
              << "] color[" << signal_color << "]";
 
-      if (signal_color == TrafficLight::RED) {
+      if (signal_color == perception::TrafficLight::RED) {
         red_light = true;
         break;
       }
@@ -414,9 +408,6 @@ bool ScenarioManager::SelectScenario(
 */
 
 void ScenarioManager::Observe(const Frame& frame) {
-  // read traffic light signal info
-  ReadTrafficLight(frame);
-
   // init first_encountered_overlap_map_
   first_encountered_overlap_map_.clear();
   const auto& reference_line_info = frame.reference_line_info().front();
@@ -429,30 +420,6 @@ void ScenarioManager::Observe(const Frame& frame) {
         overlap.first == ReferenceLineInfo::YIELD_SIGN) {
       first_encountered_overlap_map_[overlap.first] = overlap.second;
     }
-  }
-}
-
-void ScenarioManager::ReadTrafficLight(const Frame& frame) {
-  PlanningContext::GetScenarioInfo()->traffic_lights.clear();
-  const auto traffic_light_detection = frame.local_view().traffic_light;
-  if (traffic_light_detection == nullptr) {
-    ADEBUG << "traffic_light_detection is null";
-    return;
-  }
-
-  const double delay =
-      traffic_light_detection->header().timestamp_sec() - Clock::NowInSeconds();
-
-  if (delay > signal_expire_time_sec_) {
-    ADEBUG << "traffic signal is expired, delay[" << delay << "] seconds.";
-    return;
-  }
-
-  for (int i = 0; i < traffic_light_detection->traffic_light_size(); i++) {
-    const TrafficLight& traffic_light =
-        traffic_light_detection->traffic_light(i);
-    PlanningContext::GetScenarioInfo()->traffic_lights[traffic_light.id()] =
-        &traffic_light;
   }
 }
 
