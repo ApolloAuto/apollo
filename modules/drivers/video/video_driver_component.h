@@ -22,23 +22,20 @@
 
 #include "cyber/base/concurrent_object_pool.h"
 #include "cyber/cyber.h"
+#include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/drivers/video/driver.h"
 #include "modules/drivers/video/proto/video_h265cfg.pb.h"
- #include "modules/drivers/proto/sensor_image.pb.h"
-
 
 namespace apollo {
 namespace drivers {
 namespace video {
 
-
-using apollo::cyber::Writer;
 using apollo::cyber::Component;
+using apollo::cyber::Writer;
 using apollo::cyber::base::CCObjectPool;
-using apollo::drivers::CompressedImage;
 using apollo::drivers::video::config::CameraH265Config;
 
-class CompCameraH265Compressed : public Component<>{
+class CompCameraH265Compressed : public Component<> {
  public:
   ~CompCameraH265Compressed() {
     if (video_thread_->joinable()) {

@@ -1,4 +1,4 @@
-/******************************************************************************                                                                                                                              
+/******************************************************************************
  * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,12 +27,12 @@ extern "C" {
 #endif
 
 typedef struct RtpHeader {
-  uint16_t csrc_count:4;
-  uint16_t extension:1;
-  uint16_t padding:1;
-  uint16_t version:2;
-  uint16_t payloadtype:7;
-  uint16_t marker:1;
+  uint16_t csrc_count : 4;
+  uint16_t extension : 1;
+  uint16_t padding : 1;
+  uint16_t version : 2;
+  uint16_t payloadtype : 7;
+  uint16_t marker : 1;
   uint16_t seq;
   uint32_t timestamp;
   uint32_t ssrc;
@@ -45,10 +45,10 @@ typedef struct FrameHeader {
   uint32_t magic0; /* 0xBBAABBAA */
   uint32_t magic1; /* 0xAABBAABB */
   //  uint32_t ChanNo;
-  uint8_t  PhyNo;
-  uint8_t  frame_type; /* IDR: 1, other: 0 */
-  uint8_t  error;     /* error:1, other: 0 */
-  uint8_t  resv;
+  uint8_t PhyNo;
+  uint8_t frame_type; /* IDR: 1, other: 0 */
+  uint8_t error;      /* error:1, other: 0 */
+  uint8_t resv;
   uint32_t frame_size;
   uint32_t frame_id;
   uint32_t ts_sec;
@@ -65,7 +65,6 @@ typedef struct HwPduPacket {
   FrameHeader header;
 } HwPduPacket;
 
-
 #ifdef __cplusplus
 }
 #endif
@@ -73,5 +72,3 @@ typedef struct HwPduPacket {
 }  // namespace video
 }  // namespace drivers
 }  // namespace apollo
-
-

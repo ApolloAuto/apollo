@@ -1,4 +1,4 @@
-/******************************************************************************                                                                                                                              
+/******************************************************************************
  * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,10 +20,9 @@ namespace apollo {
 namespace drivers {
 namespace video {
 
-
 bool CompCameraH265Compressed::Init() {
   AINFO << "video driver component init";
-  CameraH265Config  video_config;
+  CameraH265Config video_config;
   if (!GetProtoConfig(&video_config)) {
     return false;
   }
@@ -34,14 +33,13 @@ bool CompCameraH265Compressed::Init() {
   camera_deivce_->Init();
 
   if (camera_deivce_->Record()) {
-    char * folder  = getenv("H265_SAVE_FOLDER");
+    char* folder = getenv("H265_SAVE_FOLDER");
     struct stat st = {0};
     if (folder) {
       record_folder_ = folder;
     } else {
-      AINFO <<
-        "hasn't find environment H265_SAVE_FOLDER, " <<
-        "just used current directory to save record file";
+      AINFO << "hasn't find environment H265_SAVE_FOLDER, "
+            << "just used current directory to save record file";
       record_folder_ = ".";
     }
     AINFO << "record_folder is " << record_folder_;
@@ -49,21 +47,18 @@ bool CompCameraH265Compressed::Init() {
       char cmd[256];
       snprintf(cmd, sizeof(cmd), "mkdir -p %s", record_folder_.c_str());
       int ret = system(cmd);
-      if (ret == 0) {
-        AINFO << "cmd " << " cmd " << " execute sucessfuly";
-      }
+      AINFO_IF(ret == 0) << "Command execute sucessfuly";
     }
   }
   pb_image_.reset(new CompressedImage);
-  pb_image_->mutable_data()->reserve(1920*1080*4);
+  pb_image_->mutable_data()->reserve(1920 * 1080 * 4);
 
   writer_ = node_->CreateWriter<CompressedImage>(
       video_config.compress_conf().output_channel());
 
-
   runing_ = true;
-  video_thread_ = std::shared_ptr<std::thread>(new std::thread(
-        std::bind(&CompCameraH265Compressed::VideoPoll, this)));
+  video_thread_ = std::shared_ptr<std::thread>(
+      new std::thread(std::bind(&CompCameraH265Compressed::VideoPoll, this)));
   video_thread_->detach();
 
   return true;
@@ -73,8 +68,8 @@ void CompCameraH265Compressed::VideoPoll() {
   std::ofstream fout;
   if (camera_deivce_->Record()) {
     char name[256];
-    snprintf(name, sizeof(name), "%s/encode_%d.h265",
-        record_folder_.c_str(), camera_deivce_->Port());
+    snprintf(name, sizeof(name), "%s/encode_%d.h265", record_folder_.c_str(),
+             camera_deivce_->Port());
     AINFO << "output name " << name;
     fout.open(name, std::ios::binary);
     if (!fout) AERROR << "open " << name << "  fail";
