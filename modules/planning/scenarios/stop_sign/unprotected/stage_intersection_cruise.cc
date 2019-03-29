@@ -49,10 +49,10 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // refresh overlap along reference line
+  // get overlap along reference line
   std::string stop_sign_overlap_id = GetContext()->current_stop_sign_overlap_id;
   PathOverlap* current_stop_sign_overlap =
-      scenario::util::RefreshOverlapOnReferenceLine(
+      scenario::util::GetOverlapOnReferenceLine(
           reference_line_info,
           stop_sign_overlap_id,
           ReferenceLineInfo::STOP_SIGN);

@@ -29,7 +29,7 @@ namespace util {
 
 perception::TrafficLight GetSignal(const std::string& signal_id);
 
-hdmap::PathOverlap* RefreshOverlapOnReferenceLine(
+hdmap::PathOverlap* GetOverlapOnReferenceLine(
     const ReferenceLineInfo& reference_line_info,
     const std::string& overlap_id,
     const ReferenceLineInfo::OverlapType& overlap_type);
