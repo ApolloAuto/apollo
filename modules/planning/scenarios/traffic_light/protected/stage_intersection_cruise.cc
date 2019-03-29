@@ -50,9 +50,9 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // refresh overlap along reference line
+  // get overlap along reference line
   PathOverlap* current_traffic_light_overlap =
-        scenario::util::RefreshOverlapOnReferenceLine(
+        scenario::util::GetOverlapOnReferenceLine(
             reference_line_info,
             GetContext()->current_traffic_light_overlap_ids[0],
             ReferenceLineInfo::SIGNAL);

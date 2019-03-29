@@ -46,7 +46,7 @@ TrafficLight GetSignal(const std::string& traffic_light_id) {
   return *result;
 }
 
-hdmap::PathOverlap* RefreshOverlapOnReferenceLine(
+hdmap::PathOverlap* GetOverlapOnReferenceLine(
     const ReferenceLineInfo& reference_line_info,
     const std::string& overlap_id,
     const ReferenceLineInfo::OverlapType& overlap_type) {

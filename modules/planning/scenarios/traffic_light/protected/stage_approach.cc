@@ -59,15 +59,9 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
   bool traffic_light_all_done = true;
   for (const auto& traffic_light_overlap_id :
       GetContext()->current_traffic_light_overlap_ids) {
-    // check if the traffic_light is still along reference_line
-    if (!planning::util::CheckTrafficLightOnReferenceLine(
-        reference_line_info, traffic_light_overlap_id)) {
-      continue;
-    }
-
-    // refresh overlap along reference line
+    // get overlap along reference line
     PathOverlap* current_traffic_light_overlap =
-      scenario::util::RefreshOverlapOnReferenceLine(
+      scenario::util::GetOverlapOnReferenceLine(
           reference_line_info,
           traffic_light_overlap_id,
           ReferenceLineInfo::SIGNAL);
