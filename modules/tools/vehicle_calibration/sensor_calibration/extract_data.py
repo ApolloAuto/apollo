@@ -40,6 +40,8 @@ from cyber.proto import record_pb2
 
 CYBER_PATH = os.environ['CYBER_PATH']
 
+CYBER_RECORD_HEADER_LENGTH = 2048
+
 def process_dir(path, operation):
     """
     Create or remove directory
@@ -118,6 +120,11 @@ def validate_record(record_file):
     header_msg = record_reader.get_headerstring()
     header = record_pb2.Header()
     header.ParseFromString(header_msg)
+
+    if len(header) != CYBER_RECORD_HEADER_LENGTH:
+        print('Record file: %s. header length should be %d.' %
+              (record_file, CYBER_RECORD_HEADER_LENGTH))
+        return False
 
     if header.size == 0:
         print('Record file: %s. size is 0.' % record_file)
