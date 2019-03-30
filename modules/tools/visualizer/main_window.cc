@@ -581,7 +581,7 @@ void MainWindow::DoOpenRadarChannel(bool b, RadarData* radarProxy) {
   if (b) {
     if (radarProxy->channel_name_combobox_.currentText().isEmpty()) {
       QMessageBox::warning(
-          this, tr("Settup Channel Name"),
+          this, tr("Setup Channel Name"),
           tr("Channel Name cannot be empty!!!\nPlease select one!"),
           QMessageBox::Ok);
       radarProxy->action_item_button_.setChecked(false);
@@ -614,7 +614,7 @@ void MainWindow::DoOpenRadarChannel(bool b, RadarData* radarProxy) {
               radarProxy->channel_name_combobox_.currentText().toStdString(),
               nodeName)) {
         QMessageBox::warning(
-            this, tr("Settup Channel Callback"),
+            this, tr("Setup Channel Callback"),
             tr("Channel Callback cannot be installed!!!\nPlease check it!"),
             QMessageBox::Ok);
         delete radarProxy->channel_reader_;
@@ -873,7 +873,7 @@ void MainWindow::PlayRenderableObject(bool b) {
   if (b) {
     if (pointcloud_comboBox_->currentText().isEmpty()) {
       QMessageBox::warning(
-          this, tr("Settup Channel Name"),
+          this, tr("Setup Channel Name"),
           tr("Channel Name cannot be empty!!!\nPlease Select it!"),
           QMessageBox::Ok);
       pointcloud_button_->setChecked(false);
@@ -903,7 +903,7 @@ void MainWindow::PlayRenderableObject(bool b) {
               pointCallback, pointcloud_comboBox_->currentText().toStdString(),
               nodeName)) {
         QMessageBox::warning(
-            this, tr("Settup Channel Callback"),
+            this, tr("Setup Channel Callback"),
             tr("Channel Callback cannot be installed!!!\nPlease check it!"),
             QMessageBox::Ok);
         delete pointcloud_channel_Reader_;
@@ -992,7 +992,7 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
   if (b) {
     if (theVideoImg->channel_name_combobox_.currentText().isEmpty()) {
       QMessageBox::warning(
-          this, tr("Settup Channel Name"),
+          this, tr("Setup Channel Name"),
           tr("Channel Name cannot be empty!!!\nPlease select one!"),
           QMessageBox::Ok);
       theVideoImg->action_item_button_.setChecked(false);
@@ -1045,7 +1045,7 @@ void MainWindow::DoPlayVideoImage(bool b, VideoImgProxy* theVideoImg) {
       }
       if (!ret) {
         QMessageBox::warning(
-            this, tr("Settup Channel Callback"),
+            this, tr("Setup Channel Callback"),
             tr("Channel Callback cannot be installed!!!\nPlease check it!"),
             QMessageBox::Ok);
 

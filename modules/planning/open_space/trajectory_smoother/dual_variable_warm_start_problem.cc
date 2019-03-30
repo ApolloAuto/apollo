@@ -55,7 +55,7 @@ bool DualVariableWarmStartProblem::Solve(
       ptop->get_optimization_results(l_warm_up, n_warm_up);
 
       auto t_end = cyber::Time::Now().ToSecond();
-      AINFO << "Dual vairable warm start solving time in second : "
+      AINFO << "Dual variable warm start solving time in second : "
             << t_end - t_start;
       return true;
     }
@@ -149,7 +149,7 @@ bool DualVariableWarmStartProblem::Solve(
             << '.';
       auto t_end = cyber::Time::Now().ToSecond();
 
-      AINFO << "Dual vairable warm start solving time in second : "
+      AINFO << "Dual variable warm start solving time in second : "
             << t_end - t_start;
     } else {
       AINFO << "Solve not succeeding, return status: " << int(status);
@@ -242,7 +242,7 @@ bool DualVariableWarmStartProblem::Solve(
             << '.';
       auto t_end = cyber::Time::Now().ToSecond();
 
-      AINFO << "Dual vairable warm start solving time in second : "
+      AINFO << "Dual variable warm start solving time in second : "
             << t_end - t_start;
     } else {
       AINFO << "Solve not succeeding, return status: " << int(status);
@@ -268,7 +268,7 @@ bool DualVariableWarmStartProblem::Solve(
     ptop_osqp->get_optimization_results(l_warm_up, n_warm_up);
 
     auto t_end = cyber::Time::Now().ToSecond();
-    AINFO << "Dual vairable warm start solving time in second : "
+    AINFO << "Dual variable warm start solving time in second : "
           << t_end - t_start;
 
     // ipoptqp result
