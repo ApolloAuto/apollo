@@ -55,11 +55,7 @@ struct RawMessage {
   }
 
   bool SerializeToArray(void *data, int size) const {
-    if (data == nullptr) {
-      return false;
-    }
-
-    if (size < ByteSize()) {
+    if (data == nullptr || size < ByteSize()) {
       return false;
     }
 
