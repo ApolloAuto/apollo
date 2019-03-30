@@ -35,6 +35,18 @@ namespace onboard {
 
 using apollo::cyber::common::GetAbsolutePath;
 
+FunInfoType FusionCameraDetectionComponent::init_func_arry_[] = {
+    {&FusionCameraDetectionComponent::InitSensorInfo,
+    "InitSensorInfo()"},
+    {&FusionCameraDetectionComponent::InitAlgorithmPlugin,
+    "InitAlgorithmPlugin()"},
+    {&FusionCameraDetectionComponent::InitCameraFrames,
+    "InitCameraFrames()"},
+    {&FusionCameraDetectionComponent::InitProjectMatrix,
+    "InitProjectMatrix()"},
+    {&FusionCameraDetectionComponent::InitCameraListeners,
+    "InitCameraListeners()"} };
+
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
   std::string work_root = "";
@@ -181,24 +193,8 @@ bool FusionCameraDetectionComponent::Init() {
   camera_debug_writer_ =
       node_->CreateWriter<apollo::perception::camera::CameraDebug>(
           camera_debug_channel_name_);
-  if (InitSensorInfo() != cyber::SUCC) {
-    AERROR << "InitSensorInfo() failed.";
-    return false;
-  }
-  if (InitAlgorithmPlugin() != cyber::SUCC) {
-    AERROR << "InitAlgorithmPlugin() failed.";
-    return false;
-  }
-  if (InitCameraFrames() != cyber::SUCC) {
-    AERROR << "InitCameraFrames() failed.";
-    return false;
-  }
-  if (InitProjectMatrix() != cyber::SUCC) {
-    AERROR << "InitProjectMatrix() failed.";
-    return false;
-  }
-  if (InitCameraListeners() != cyber::SUCC) {
-    AERROR << "InitCameraListeners() failed.";
+  if (!EXEC_ALL_FUNS(FusionCameraDetectionComponent, this,
+    FusionCameraDetectionComponent::init_func_arry_)) {
     return false;
   }
   SetCameraHeightAndPitch();

@@ -36,11 +36,14 @@
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/proto/perception_camera.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/common/util/util.h"
 
 namespace apollo {
 namespace perception {
 namespace onboard {
 
+class FusionCameraDetectionComponent;
+typedef FunctionInfo<FusionCameraDetectionComponent> FunInfoType;
 class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
  public:
   FusionCameraDetectionComponent() : seq_num_(0) {}
@@ -52,6 +55,9 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
       const FusionCameraDetectionComponent&) = delete;
 
   bool Init() override;
+
+  template<typename T>
+  friend class FunctionInfo;
 
  private:
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image>& in_message,
@@ -184,6 +190,7 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
 
   camera::Visualizer visualize_;
   bool write_visual_img_;
+  static FunInfoType init_func_arry_[];
 };
 
 CYBER_REGISTER_COMPONENT(FusionCameraDetectionComponent);
