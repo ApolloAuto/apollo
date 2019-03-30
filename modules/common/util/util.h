@@ -32,12 +32,12 @@
 
 #include "google/protobuf/util/message_differencer.h"
 
+#include "cyber/common/types.h"
+#include "cyber/common/log.h"
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 
 #include "modules/common/math/vec2d.h"
-#include "cyber/common/types.h"
-#include "cyber/common/log.h"
 
 // The helper function "std::make_unique()" is defined since C++14.
 // The definition of "std::make_unique()" borrowed from C++14 is given here
