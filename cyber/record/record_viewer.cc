@@ -188,12 +188,8 @@ RecordViewer::Iterator::Iterator(RecordViewer* viewer, bool end)
     return;
   }
   viewer_->Reset();
-  if (!viewer_->IsValid()) {
-    end_ = true;
-  } else {
-    if (!viewer_->Update(&message_instance_)) {
+  if (!viewer_->IsValid() || !viewer_->Update(&message_instance_)) {
       end_ = true;
-    }
   }
 }
 
