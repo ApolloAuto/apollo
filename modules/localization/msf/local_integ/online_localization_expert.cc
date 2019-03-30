@@ -357,13 +357,13 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_NOSOL_LIDAR_GNSS);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable";
+              "FATAL_ERROR: Current Localization Is NOT Available";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_NOSOL_X_GNSS);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "Lidar Localization Is Abnormal";
         }
         break;
@@ -379,14 +379,14 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_NOSOL_LIDAR_X);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "GNSS Localization Is Unstable";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_NOSOL_X_X);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "Both GNSS And Lidar Localization Is Unstable";
         }
         break;
@@ -398,14 +398,14 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_NOSOL_LIDAR_XX);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "GNSS Localization Is Abnormal";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_NOSOL_X_XX);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "Both GNSS And Lidar Localization Is Abnormal";
         }
         break;
@@ -416,14 +416,14 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_NOSOL_LIDAR_XXX);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "GNSS Localization Is Invalid";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_NOSOL_X_XXX);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "Both GNSS And Lidar Localization Is Invalid";
         }
         break;

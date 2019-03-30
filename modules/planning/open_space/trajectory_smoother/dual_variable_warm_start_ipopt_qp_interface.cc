@@ -398,7 +398,7 @@ bool DualVariableWarmStartIPOPTQPInterface::eval_jac_g(int n, const double* x,
         ++nz_index;
 
         //  2. -g'*mu + (A*t - b)*lambda > 0
-        // TODO(QiL) Revise dual vairables modeling here.
+        // TODO(QiL): Revise dual variables modeling here.
         double tmp3 = 0.0;
         double tmp4 = 0.0;
         for (int k = 0; k < 4; ++k) {
@@ -551,7 +551,7 @@ bool DualVariableWarmStartIPOPTQPInterface::eval_obj(int n, const T* x,
   return true;
 }
 
-/** Template to compute contraints */
+/** Template to compute constraints */
 template <class T>
 bool DualVariableWarmStartIPOPTQPInterface::eval_constraints(int n, const T* x,
                                                              int m, T* g) {
