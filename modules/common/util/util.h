@@ -34,6 +34,7 @@
 
 #include "cyber/common/types.h"
 #include "cyber/common/log.h"
+
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 
