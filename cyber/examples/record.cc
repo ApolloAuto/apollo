@@ -53,25 +53,24 @@ void test_read(const std::string &readfile) {
   RecordReader reader(readfile);
   RecordMessage message;
   uint64_t msg_count = reader.GetMessageNumber(CHANNEL_NAME_1);
-  AINFO << "MSGTYPE: " << reader.GetMessageType(CHANNEL_NAME_1);
-  AINFO << "MSGDESC: " << reader.GetProtoDesc(CHANNEL_NAME_1);
+  AINFO << "MSG_TYPE: " << reader.GetMessageType(CHANNEL_NAME_1);
+  AINFO << "MSG_DESC: " << reader.GetProtoDesc(CHANNEL_NAME_1);
 
   // read all message
-  uint64_t i = 0;
   uint64_t valid = 0;
-  for (i = 0; i < msg_count; ++i) {
+  for (auto i = 0; i < msg_count; ++i) {
     if (reader.ReadMessage(&message)) {
       AINFO << "msg[" << i << "]-> "
             << "channel name: " << message.channel_name
             << "; content: " << message.content
             << "; msg time: " << message.time;
-      valid++;
+      ++valid;
     } else {
       AERROR << "read msg[" << i << "] failed";
     }
   }
-  AINFO << "static msg=================";
-  AINFO << "MSG validmsg:totalcount: " << valid << ":" << msg_count;
+  AINFO << "=================statistic message=================";
+  AINFO << "MSG valid_msg:total_count: " << valid << ":" << msg_count;
 }
 
 int main(int argc, char *argv[]) {
