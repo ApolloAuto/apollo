@@ -16,14 +16,11 @@
 # -*- coding: utf-8 -*-
 """Module for example of record."""
 
-import time
 import sys
 
 from cyber_py import cyber
 from cyber_py import record
 from cyber.proto import record_pb2
-from google.protobuf.descriptor_pb2 import FileDescriptorProto
-
 
 def print_channel_info(file_path):
     freader = record.RecordReader(file_path)
@@ -33,27 +30,27 @@ def print_channel_info(file_path):
     header = record_pb2.Header()
     header.ParseFromString(header_msg)
 
-    print ""
-    print "++++++++++++Begin Channel Info Statistics++++++++++++++"
-    print "-" * 40
-    print "record version: %d.%d" % (header.major_version, header.minor_version)
-    print "record message_number: ", header.message_number
-    print "record file size(Byte) ", header.size
-    print "chunk_number: ", header.chunk_number
-    print "channel counts: ", len(channels)
-    print "-" * 40
-    counts = 1
+    print('\n++++++++++++Begin Channel Info Statistics++++++++++++++')
+    print('-' * 40)
+    print('record version: [%d:%d]' % (header.major_version, header.minor_version))
+    print('record message_number: %s' % str(header.message_number))
+    print('record file size(Byte): %s' % str(header.size))
+    print('chunk_number: %d' % header.chunk_number)
+    print('channel count: %d' % len(channels))
+    print('-' * 40)
+    count = 0
     for channel in channels:
         desc = freader.get_protodesc(channel)
-        print "[", counts, "]", "channel name: ", channel, "; desc size is ", len(desc)
-        counts = counts + 1
+        count += 1
+        print('Channel: %s, count: %d, desc size: %d' % (channel, count, len(desc)))
         # print desc
-    print "++++++++++++Finish Channel Info Statistics++++++++++++++"
-
-    print ""
+    print "++++++++++++Finish Channel Info Statistics++++++++++++++\n"
 
 if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print('Usage: %s record_file' % sys.argv[0])
+        sys.exit(0)
+
     cyber.init()
-    rec_file = (sys.argv[1])
-    print_channel_info(rec_file)
+    print_channel_info(sys.argv[1])
     cyber.shutdown()
