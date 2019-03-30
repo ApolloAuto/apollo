@@ -988,8 +988,7 @@ void Obstacle::BuildLaneGraph() {
   }
   double speed = feature->speed();
   double t_max = FLAGS_prediction_trajectory_time_length;
-  double a_max = FLAGS_vehicle_max_linear_acc;
-  auto estimated_move_distance = speed * t_max + 0.5 * a_max * t_max * t_max;
+  auto estimated_move_distance = speed * t_max;
 
   double road_graph_search_distance = std::fmax(
       estimated_move_distance, FLAGS_min_prediction_trajectory_spatial_length);
@@ -1003,7 +1002,7 @@ void Obstacle::BuildLaneGraph() {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
     const LaneGraph& lane_graph = ObstacleClusters::GetLaneGraph(
-        lane.lane_s(), road_graph_search_distance, lane_info);
+        lane.lane_s(), road_graph_search_distance, true, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++curr_lane_count;
     }
@@ -1030,7 +1029,7 @@ void Obstacle::BuildLaneGraph() {
     std::shared_ptr<const LaneInfo> lane_info =
         PredictionMap::LaneById(lane.lane_id());
     const LaneGraph& lane_graph = ObstacleClusters::GetLaneGraph(
-        lane.lane_s(), road_graph_search_distance, lane_info);
+        lane.lane_s(), road_graph_search_distance, false, lane_info);
     if (lane_graph.lane_sequence_size() > 0) {
       ++nearby_lane_count;
     }
@@ -1187,8 +1186,8 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
         PredictionMap::LaneById(lane_id);
     const LaneGraph& local_lane_graph =
         ObstacleClusters::GetLaneGraphWithoutMemorizing(
-            feature->lane().lane_feature().lane_s(), road_graph_search_distance,
-            curr_lane_info);
+            feature->lane().lane_feature().lane_s(),
+            road_graph_search_distance, true, curr_lane_info);
     // Update it into the Feature proto
     for (const auto& lane_seq : local_lane_graph.lane_sequence()) {
       LaneSequence* lane_seq_ptr = feature->mutable_lane()

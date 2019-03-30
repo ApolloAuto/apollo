@@ -58,7 +58,7 @@ bool RecordViewer::IsValid() const {
 
 bool RecordViewer::Update(RecordMessage* message) {
   bool find = false;
-  while (!find) {
+  do {
     if (msg_buffer_.empty() && !FillBuffer()) {
       break;
     }
@@ -68,7 +68,8 @@ bool RecordViewer::Update(RecordMessage* message) {
       find = true;
     }
     msg_buffer_.erase(msg_buffer_.begin());
-  }
+  } while (!find);
+
   return find;
 }
 
@@ -187,12 +188,8 @@ RecordViewer::Iterator::Iterator(RecordViewer* viewer, bool end)
     return;
   }
   viewer_->Reset();
-  if (!viewer_->IsValid()) {
+  if (!viewer_->IsValid() || !viewer_->Update(&message_instance_)) {
     end_ = true;
-  } else {
-    if (!viewer_->Update(&message_instance_)) {
-      end_ = true;
-    }
   }
 }
 

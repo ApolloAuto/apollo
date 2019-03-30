@@ -55,7 +55,7 @@ TEST_F(PidControllerTest, StationPidController) {
   EXPECT_NEAR(control_value, -0.01, 1e-6);
   dt = 0.0;
   EXPECT_EQ(pid_controller.Control(100, dt), control_value);
-  EXPECT_EQ(pid_controller.IntegratorHold(), false);
+  EXPECT_FALSE(pid_controller.IntegratorHold());
 }
 
 TEST_F(PidControllerTest, SpeedPidController) {

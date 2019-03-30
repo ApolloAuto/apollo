@@ -41,12 +41,10 @@ using apollo::cyber::scheduler::Scheduler;
 using apollo::cyber::service_discovery::TopologyManager;
 
 namespace {
+
 bool g_atexit_registered = false;
 std::mutex g_mutex;
 logger::AsyncLogger* async_logger = nullptr;
-}  // namespace
-
-namespace {
 
 void InitLogger(const char* binary_name) {
   const char* slash = strrchr(binary_name, '/');
@@ -75,6 +73,7 @@ void StopLogger() {
     async_logger->Stop();
   }
 }
+
 }  // namespace
 
 void OnShutdown(int sig) {

@@ -575,7 +575,7 @@ void VisualizationEngine::UpdateLevel() {
   if (cur_scale_ > max_stride_ * 1.5) SetScale(max_stride_ * 1.5);
   if (cur_scale_ < 0.5) SetScale(0.5);
 
-  // caculate which image level to use
+  // calculate which image level to use
   cur_level_ = 0;
   cur_stride_ = 1;
   double radius = cur_scale_ / 2;
@@ -607,7 +607,7 @@ void VisualizationEngine::GenerateMutiResolutionImages(
   y_max += 1;
   x_max += 1;
 
-  // caculate how many level need to create
+  // calculate how many level need to create
   int level = 1;
   int range = 1;
   while (range < x_max - x_min || range < y_max - y_min) {

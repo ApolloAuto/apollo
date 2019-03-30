@@ -78,8 +78,8 @@ bool DarkSCNNLanePostprocessor::Init(
     const LanePostprocessorInitOptions& options) {
   // Read detector config parameter
   darkSCNN::DarkSCNNParam darkscnn_param;
-  const std::string& proto_path = GetAbsolutePath(options.detect_config_root,
-                                                  options.detect_config_name);
+  const std::string& proto_path =
+      GetAbsolutePath(options.detect_config_root, options.detect_config_name);
   if (!apollo::common::util::GetProtoFromFile(proto_path, &darkscnn_param)) {
     AINFO << "Failed to load proto param, root dir: " << options.root_dir;
     return false;

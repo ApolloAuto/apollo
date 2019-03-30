@@ -88,6 +88,7 @@ DECLARE_string(evaluator_vehicle_mlp_file);
 DECLARE_string(torch_vehicle_junction_mlp_file);
 DECLARE_string(torch_vehicle_cruise_go_file);
 DECLARE_string(torch_vehicle_cruise_cutin_file);
+DECLARE_string(torch_vehicle_lane_scanning_file);
 DECLARE_string(evaluator_vehicle_rnn_file);
 DECLARE_string(evaluator_vehicle_cruise_mlp_file);
 DECLARE_int32(max_num_obstacles);
@@ -102,6 +103,7 @@ DECLARE_double(heading_filter_param);
 DECLARE_uint64(max_num_lane_point);
 DECLARE_double(distance_threshold_to_junction_exit);
 DECLARE_double(angle_threshold_to_junction_exit);
+DECLARE_uint32(sample_size_for_average_lane_curvature);
 
 // Validation checker
 DECLARE_double(centripetal_acc_coeff);

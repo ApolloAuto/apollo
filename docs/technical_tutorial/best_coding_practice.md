@@ -46,7 +46,14 @@
 1. Simple and unified function signature.
 
    ```C++
-   // It's callers' responsibility to make sure output pointers are not NULL.
+   // 1. For input objects, const reference guarantes that it is valid, while
+   //    pointers might be NULL or wild. Don't give others the chance to break
+   //    you.
+   // 2. For input scalas, just pass by value, which gives better locality and
+   //    thus performance.
+   // 3. For output, it's callers' responsibility to make sure the pointers are
+   //    valid. No need to do sanity check, and also no need to mark as
+   //    "OutputType* const", because pointer redirection is never allowed.
    void FooBar(const InputObjectType& input1, const InputScalaType input2, ...,
                OutputType* output1, ...);
 
@@ -63,3 +70,16 @@
    // Functions that have no side effect.
    const std::string& name() const;
    ```
+
+1. The DRY principle.
+
+   Don't repeat yourself, in any way. Avoid duplicate classes, functions, const
+   variables, or a simple piece of code. Some examples:
+
+   - It's fine to refer a name with full path once, like
+     `apollo::common::util::Type`, but better to make a short alias
+     if you need to use twice or more: `using apollo::common::util::Type;`.
+   - It's fine to access a sub-field of proto once in cascade style, like
+     `a_proto.field_1().field_2().field_3()`, but better to save the reference
+     of a common part first if you need to access it twice or more:
+     `const auto& field_2 = a_proto.field_1().field_2();`.

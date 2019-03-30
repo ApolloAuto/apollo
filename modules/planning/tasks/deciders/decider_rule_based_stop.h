@@ -48,18 +48,10 @@ class DeciderRuleBasedStop : public Decider {
   apollo::common::Status Process(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
-  void CheckStopSign(Frame* const frame,
-                     ReferenceLineInfo* const reference_line_info);
-
-  void CheckTrafficLight(Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info);
-
   void CheckOpenSpacePreStop(Frame* const frame,
                              ReferenceLineInfo* const reference_line_info);
 
  private:
-  static constexpr const char* STOP_SIGN_VO_ID_PREFIX = "SS_";
-  static constexpr const char* TRAFFIC_LIGHT_VO_ID_PREFIX = "TL_";
   static constexpr const char* OPEN_SPACE_VO_ID_PREFIX = "OP_";
 };
 

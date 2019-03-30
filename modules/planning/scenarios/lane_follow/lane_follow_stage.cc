@@ -129,7 +129,7 @@ Stage::StageStatus LaneFollowStage::Process(
 
     if (cur_status.ok()) {
       if (reference_line_info.IsChangeLanePath()) {
-        AERROR << "reference line is lane change ref.";
+        ADEBUG << "reference line is lane change ref.";
         if (reference_line_info.Cost() < kStraightForwardLineCost &&
             ChangeLaneDecider::IsClearToChangeLane(&reference_line_info)) {
           has_drivable_reference_line = true;
@@ -140,7 +140,7 @@ Stage::StageStatus LaneFollowStage::Process(
           AERROR << "\tlane change failed";
         }
       } else {
-        AERROR << "reference line is NOT lane change ref.";
+        ADEBUG << "reference line is NOT lane change ref.";
         has_drivable_reference_line = true;
       }
     } else {
@@ -183,7 +183,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
     ADEBUG << "after optimizer " << optimizer->Name() << ":"
-           << reference_line_info->PathSpeedDebugString() << std::endl;
+           << reference_line_info->PathSpeedDebugString();
     ADEBUG << optimizer->Name() << " time spend: " << time_diff_ms << " ms.";
 
     RecordDebugInfo(reference_line_info, optimizer->Name(), time_diff_ms);

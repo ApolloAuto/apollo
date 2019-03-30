@@ -310,8 +310,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
     if (!closest_point.empty()) {
       size_t closest_point_index = closest_point.top().first;
       double max_iou_ratio = closest_point.top().second;
-      closest_point_on_trajs.emplace(
-          std::make_pair(i, closest_point_index), max_iou_ratio);
+      closest_point_on_trajs.emplace(std::make_pair(i, closest_point_index),
+                                     max_iou_ratio);
     }
   }
 
@@ -325,7 +325,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     current_trajectory_point_index = closest_point_on_trajs.top().first.second;
   }
 
-  auto chosen_paritioned_trajectory =
+  auto* chosen_paritioned_trajectory =
       open_space_info_ptr->mutable_chosen_paritioned_trajectory();
 
   const auto& paritioned_trajectories =
@@ -338,8 +338,11 @@ Status OpenSpaceTrajectoryPartition::Process() {
       return Status::OK();
     }
   }
+
+  auto* mutable_trajectory =
+      open_space_info_ptr->mutable_stitched_trajectory_result();
   AdjustRelativeTimeAndS(paritioned_trajectories, current_trajectory_index,
-                         current_trajectory_point_index,
+                         current_trajectory_point_index, mutable_trajectory,
                          chosen_paritioned_trajectory);
   return Status::OK();
 }
@@ -439,7 +442,11 @@ void OpenSpaceTrajectoryPartition::AdjustRelativeTimeAndS(
     const std::vector<TrajGearPair>& paritioned_trajectories,
     const size_t current_trajectory_index,
     const size_t closest_trajectory_point_index,
+    DiscretizedTrajectory* unpartitioned_trajectory_result,
     TrajGearPair* current_paritioned_trajectory) {
+  const size_t paritioned_trajectories_size = paritioned_trajectories.size();
+  CHECK_GT(paritioned_trajectories_size, current_trajectory_index);
+
   // Reassign relative time and relative s to have the closest point as origin
   // point
   *(current_paritioned_trajectory) =
@@ -449,9 +456,37 @@ void OpenSpaceTrajectoryPartition::AdjustRelativeTimeAndS(
       trajectory->at(closest_trajectory_point_index).relative_time();
   double s_shift =
       trajectory->at(closest_trajectory_point_index).path_point().s();
-  size_t trajectory_size = trajectory->size();
+  const size_t trajectory_size = trajectory->size();
   for (size_t i = 0; i < trajectory_size; ++i) {
     TrajectoryPoint* trajectory_point = &(trajectory->at(i));
+    trajectory_point->set_relative_time(trajectory_point->relative_time() -
+                                        time_shift);
+    trajectory_point->mutable_path_point()->set_s(
+        trajectory_point->path_point().s() - s_shift);
+  }
+
+  // Reassign relative t and s on stitched_trajectory_result for accurate next
+  // frame stitching
+  const size_t interpolated_pieces_num =
+      open_space_trajectory_partition_config_.interpolated_pieces_num();
+  const size_t unpartitioned_trajectory_size =
+      unpartitioned_trajectory_result->size();
+  size_t index_estimate = 0;
+  for (size_t i = 0; i < current_trajectory_index; ++i) {
+    index_estimate += paritioned_trajectories.at(i).first.size();
+  }
+  index_estimate += closest_trajectory_point_index;
+  index_estimate /= interpolated_pieces_num;
+  if (index_estimate >= unpartitioned_trajectory_size) {
+    index_estimate = unpartitioned_trajectory_size - 1;
+  }
+  time_shift =
+      unpartitioned_trajectory_result->at(index_estimate).relative_time();
+  s_shift =
+      unpartitioned_trajectory_result->at(index_estimate).path_point().s();
+  for (size_t i = 0; i < unpartitioned_trajectory_size; ++i) {
+    TrajectoryPoint* trajectory_point =
+        &(unpartitioned_trajectory_result->at(i));
     trajectory_point->set_relative_time(trajectory_point->relative_time() -
                                         time_shift);
     trajectory_point->mutable_path_point()->set_s(

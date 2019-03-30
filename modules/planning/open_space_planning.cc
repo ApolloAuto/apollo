@@ -36,7 +36,7 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory_stitcher.h"
-#include "modules/planning/util/util.h"
+#include "modules/planning/common/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -141,7 +141,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
     vehicle_state.set_y(future_xy.y());
     vehicle_state.set_timestamp(start_timestamp);
   }
-  if (!IsVehicleStateValid(vehicle_state)) {
+  if (!util::IsVehicleStateValid(vehicle_state)) {
     std::string msg("Update VehicleStateProvider failed");
     AERROR << msg;
     status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
@@ -149,7 +149,7 @@ void OpenSpacePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  if (IsDifferentRouting(last_routing_, *local_view_.routing)) {
+  if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
     // TODO(QiL): Get latest parking info from new routing
   }

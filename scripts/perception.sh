@@ -24,9 +24,9 @@ source "${DIR}/apollo_base.sh"
 # run command_name module_name
 # run perception "$@"
 cyber_launch stop /apollo/modules/perception/production/launch/perception_all.launch
-cyber_launch stop /apollo/modules/tools/image_decompress/launch/image_decompress.launch
+cyber_launch stop /apollo/modules/drivers/tools/image_decompress/launch/image_decompress.launch
 cyber_launch stop /apollo/modules/transform/launch/static_transform.launch
 
 cyber_launch start /apollo/modules/transform/launch/static_transform.launch &
-cyber_launch start /apollo/modules/tools/image_decompress/launch/image_decompress.launch &
+cyber_launch start /apollo/modules/drivers/tools/image_decompress/launch/image_decompress.launch &
 cyber_launch start /apollo/modules/perception/production/launch/perception_all.launch &

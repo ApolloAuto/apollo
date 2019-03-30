@@ -14,15 +14,6 @@ standard_planning_config {
 default_task_config: {
   task_type: DECIDER_RULE_BASED_STOP
   decider_rule_based_stop_config: {
-    stop_sign: {
-      enabled: true
-      stop_distance: 1.0
-    }
-    traffic_light: {
-      enabled: true
-      stop_distance: 1.0
-      signal_expire_time_sec: 5.0
-    }
   }
 }
 default_task_config: {

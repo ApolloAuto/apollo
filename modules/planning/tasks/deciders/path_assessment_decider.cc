@@ -16,9 +16,9 @@
 
 #include "modules/planning/tasks/deciders/path_assessment_decider.h"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
-#include <algorithm>
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/proto/pnc_point.pb.h"

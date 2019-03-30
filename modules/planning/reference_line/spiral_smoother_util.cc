@@ -146,7 +146,7 @@ class SpiralSmootherUtil {
       ofs << std::fixed << "{\"kappa\": " << point.kappa()
           << ", \"s\": " << point.s() << ", \"theta\": " << point.theta()
           << ", \"x\":" << point.x() << ", \"y\":" << point.y()
-          << ", \"dkappa\":" << point.dkappa() << "}" << std::endl;
+          << ", \"dkappa\":" << point.dkappa() << "}";
     }
     ofs.close();
     AINFO << "Smoothed result saved to " << filename;

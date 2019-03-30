@@ -81,7 +81,7 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
     frame_->mutable_open_space_info()->set_obstacles_num(
         perception_obstacles_num + parking_boundaries_num);
     if (perception_obstacles_num == 0) {
-      AERROR << "no obstacle given by percption";
+      AERROR << "no obstacle given by perception";
     }
     // load vertice vector for distance approach
     Eigen::MatrixXi perception_obstacles_edges_num_ =
@@ -471,7 +471,7 @@ bool OpenSpaceRoiDecider::GetMapInfo(
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
   // Check if last frame lane is avaiable
-  const auto& previous_open_space_info =
+  const auto &previous_open_space_info =
       FrameHistory::Instance()->Latest()->open_space_info();
   if (previous_open_space_info.target_parking_lane() != nullptr &&
       previous_open_space_info.target_parking_spot_id() ==

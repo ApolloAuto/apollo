@@ -140,6 +140,9 @@ DEFINE_string(torch_vehicle_cruise_go_file,
 DEFINE_string(torch_vehicle_cruise_cutin_file,
               "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.pt",
               "Vehicle cruise go model file");
+DEFINE_string(torch_vehicle_lane_scanning_file,
+              "/apollo/modules/prediction/data/lane_scanning_vehicle_model.pt",
+              "Vehicle lane scanning model file");
 DEFINE_int32(max_num_obstacles, 300,
              "maximal number of obstacles stored in obstacles container.");
 DEFINE_double(valid_position_diff_threshold, 0.5,
@@ -162,6 +165,8 @@ DEFINE_double(distance_threshold_to_junction_exit, 1.0,
               "Threshold of distance to junction exit");
 DEFINE_double(angle_threshold_to_junction_exit, M_PI * 0.25,
               "Threshold of angle to junction exit");
+DEFINE_uint32(sample_size_for_average_lane_curvature, 10,
+              "The sample size to compute average lane curvature");
 
 // Validation checker
 DEFINE_double(centripetal_acc_coeff, 0.5,

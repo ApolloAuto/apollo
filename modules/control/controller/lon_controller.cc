@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/control/controller/lon_controller.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -278,8 +279,12 @@ Status LonController::ComputeControlCommand(
     debug->set_is_full_stop(true);
   }
 
-  double throttle_deadzone = lon_controller_conf.throttle_deadzone();
-  double brake_deadzone = lon_controller_conf.brake_deadzone();
+  double throttle_lowerbound =
+      std::max(lon_controller_conf.throttle_deadzone(),
+               lon_controller_conf.throttle_minimum_action());
+  double brake_lowerbound =
+      std::max(lon_controller_conf.brake_deadzone(),
+               lon_controller_conf.brake_minimum_action());
   double calibration_value = 0.0;
   double acceleration_lookup =
       (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
@@ -295,15 +300,11 @@ Status LonController::ComputeControlCommand(
   }
 
   if (calibration_value >= 0) {
-    throttle_cmd = std::abs(calibration_value) > throttle_deadzone
-                       ? std::abs(calibration_value)
-                       : throttle_deadzone;
+    throttle_cmd = std::max(calibration_value, throttle_lowerbound);
     brake_cmd = 0.0;
   } else {
     throttle_cmd = 0.0;
-    brake_cmd = std::abs(calibration_value) > brake_deadzone
-                    ? std::abs(calibration_value)
-                    : brake_deadzone;
+    brake_cmd = std::max(-calibration_value, brake_lowerbound);
   }
 
   debug->set_station_error_limited(station_error_limited);

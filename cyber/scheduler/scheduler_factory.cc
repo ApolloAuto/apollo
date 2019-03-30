@@ -21,6 +21,7 @@
 
 #include <atomic>
 #include <string>
+#include <unordered_map>
 
 #include "cyber/common/environment.h"
 #include "cyber/common/file.h"
@@ -56,8 +57,12 @@ Scheduler* Instance() {
       conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
       auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
       apollo::cyber::proto::CyberConfig cfg;
+      std::unordered_map<std::string, InnerThread> inner_thr_confs;
       if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
         policy = cfg.scheduler_conf().policy();
+        for (auto& thr : cfg.scheduler_conf().threads()) {
+          inner_thr_confs[thr.name()] = thr;
+        }
       } else {
         AWARN << "Pls make sure schedconf exist and which format is correct.\n";
       }
@@ -69,6 +74,7 @@ Scheduler* Instance() {
         AWARN << "Invalid scheduler policy: " << policy;
         obj = new SchedulerClassic();
       }
+      obj->SetInnerThreadConfs(inner_thr_confs);
       instance.store(obj, std::memory_order_release);
     }
   }

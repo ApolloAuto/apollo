@@ -2825,14 +2825,14 @@ bool DistanceApproachIPOPTCUDAInterface::check_g(int n, const double* x, int m,
 
 void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
                                                         int* nnz_h_lag) {
-  double* xp = new double[n];
-  double* lamp = new double[m];
-  double* zl = new double[m];
-  double* zu = new double[m];
+  std::vector<double> xp(n);
+  std::vector<double> lamp(m);
+  std::vector<double> zl(m);
+  std::vector<double> zu(m);
 
-  adouble* xa = new adouble[n];
-  adouble* g = new adouble[m];
-  double* lam = new double[m];
+  std::vector<adouble> xa(n);
+  std::vector<adouble> g(m);
+  std::vector<double> lam(m);
   double sig;
   adouble obj_value;
 
@@ -2840,7 +2840,7 @@ void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
 
   obj_lam = new double[m + 1];
 
-  get_starting_point(n, 1, xp, 0, zl, zu, m, 0, lamp);
+  get_starting_point(n, 1, &xp[0], 0, &zl[0], &zu[0], m, 0, &lamp[0]);
 
   trace_on(tag_f);
 
@@ -2848,7 +2848,7 @@ void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
     xa[idx] <<= xp[idx];
   }
 
-  eval_obj(n, xa, &obj_value);
+  eval_obj(n, &xa[0], &obj_value);
 
   obj_value >>= dummy;
 
@@ -2860,7 +2860,7 @@ void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
     xa[idx] <<= xp[idx];
   }
 
-  eval_constraints(n, xa, m, g);
+  eval_constraints(n, &xa[0], m, &g[0]);
 
   for (int idx = 0; idx < m; idx++) {
     g[idx] >>= dummy;
@@ -2878,10 +2878,10 @@ void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
   }
   sig = 1.0;
 
-  eval_obj(n, xa, &obj_value);
+  eval_obj(n, &xa[0], &obj_value);
 
   obj_value *= mkparam(sig);
-  eval_constraints(n, xa, m, g);
+  eval_constraints(n, &xa[0], m, &g[0]);
 
   for (int idx = 0; idx < m; idx++) {
     obj_value += g[idx] * mkparam(lam[idx]);
@@ -2899,16 +2899,9 @@ void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
   options_L[0] = 0;
   options_L[1] = 1;
 
-  sparse_hess(tag_L, n, 0, xp, &nnz_L, &rind_L, &cind_L, &hessval, options_L);
+  sparse_hess(tag_L, n, 0, &xp[0], &nnz_L, &rind_L, &cind_L, &hessval,
+              options_L);
   *nnz_h_lag = nnz_L;
-
-  delete[] lam;
-  delete[] g;
-  delete[] xa;
-  delete[] zu;
-  delete[] zl;
-  delete[] lamp;
-  delete[] xp;
 }
 //***************    end   ADOL-C part ***********************************
 

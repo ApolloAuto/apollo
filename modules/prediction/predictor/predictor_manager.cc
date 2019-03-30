@@ -21,6 +21,7 @@
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/predictor/extrapolation/extrapolation_predictor.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/junction/junction_predictor.h"
 #include "modules/prediction/predictor/lane_sequence/lane_sequence_predictor.h"
@@ -44,6 +45,7 @@ void PredictorManager::RegisterPredictors() {
   RegisterPredictor(ObstacleConf::REGIONAL_PREDICTOR);
   RegisterPredictor(ObstacleConf::EMPTY_PREDICTOR);
   RegisterPredictor(ObstacleConf::JUNCTION_PREDICTOR);
+  RegisterPredictor(ObstacleConf::EXTRAPOLATION_PREDICTOR);
 }
 
 void PredictorManager::Init(const PredictionConf& config) {
@@ -268,6 +270,10 @@ std::unique_ptr<Predictor> PredictorManager::CreatePredictor(
     }
     case ObstacleConf::JUNCTION_PREDICTOR: {
       predictor_ptr.reset(new JunctionPredictor());
+      break;
+    }
+    case ObstacleConf::EXTRAPOLATION_PREDICTOR: {
+      predictor_ptr.reset(new ExtrapolationPredictor());
       break;
     }
     default: { break; }

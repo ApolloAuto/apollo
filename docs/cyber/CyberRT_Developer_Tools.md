@@ -182,8 +182,10 @@ usage: cyber_recorder record [options]
 ```
 $ cyber_recorder play -h
 usage: cyber_recorder play [options]
-    -f, --file <file>			input record file  
-    -c, --white-channel <name>		only play the specified channel  
+    -f, --file <file>			input record file
+    -a, --all				play all
+    -c, --white-channel <name>		only play the specified channel
+    -k, --black-channel <name>		not play the specified channel
     -l, --loop				loop play  
     -r, --rate <1.0>			multiply the play rate by FACTOR  
     -b, --begin <2018-07-01 00:00:00>	play the record begin at  

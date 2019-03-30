@@ -20,11 +20,15 @@ from common.statistical_analyzer import StatisticalAnalyzer
 from common.statistical_analyzer import PrintColors
 
 
-class LidarEndToEndAnalyzer:
-    """control analyzer"""
+class LidarEndToEndAnalyzer(object):
+    """
+    Control analyzer
+    """
 
     def __init__(self):
-        """init"""
+        """
+        Init
+        """
         self.control_endtoend_latency = []
         self.control_unprocessed_lidar_timestamps = []
 
@@ -32,7 +36,9 @@ class LidarEndToEndAnalyzer:
         self.planning_unprocessed_lidar_timestamps = []
 
     def put_control(self, control_cmd):
-        """put control data"""
+        """
+        Put control data
+        """
         if control_cmd.header.lidar_timestamp in \
                 self.control_unprocessed_lidar_timestamps:
             ind = self.control_unprocessed_lidar_timestamps.index(
@@ -43,7 +49,9 @@ class LidarEndToEndAnalyzer:
                 control_cmd.header.lidar_timestamp * 1.0e-9) * 1000.0)
 
     def put_planning(self, planning_cmd):
-        """put control data"""
+        """
+        Put control data
+        """
         if planning_cmd.header.lidar_timestamp in \
                 self.planning_unprocessed_lidar_timestamps:
             ind = self.planning_unprocessed_lidar_timestamps.index(
@@ -54,29 +62,33 @@ class LidarEndToEndAnalyzer:
                 planning_cmd.header.lidar_timestamp * 1.0e-9) * 1000.0)
 
     def put_lidar(self, point_cloud):
-        """put lidar data"""
+        """
+        Put lidar data
+        """
         self.control_unprocessed_lidar_timestamps.append(
             point_cloud.header.lidar_timestamp)
         self.planning_unprocessed_lidar_timestamps.append(
             point_cloud.header.lidar_timestamp)
 
     def print_endtoend_latency(self):
-        """print_endtoend_latency"""
-        print "\n\n"
-        print PrintColors.HEADER + "* End to End (Control) Latency (ms)" + \
-            PrintColors.ENDC
+        """
+        Print end to end latency
+        """
+        print("\n\n")
+        print(PrintColors.HEADER + "* End to End (Control) Latency (ms)" + \
+            PrintColors.ENDC)
         analyzer = StatisticalAnalyzer()
         analyzer.print_statistical_results(self.control_endtoend_latency)
 
-        print PrintColors.FAIL + "  - MISS # OF LIDAR: " + \
+        print(PrintColors.FAIL + "  - MISS # OF LIDAR: " + \
             str(len(self.control_unprocessed_lidar_timestamps)) + \
-            PrintColors.ENDC
+            PrintColors.ENDC)
 
-        print PrintColors.HEADER + "* End to End (Planning) Latency (ms)" + \
-            PrintColors.ENDC
+        print(PrintColors.HEADER + "* End to End (Planning) Latency (ms)" + \
+            PrintColors.ENDC)
         analyzer = StatisticalAnalyzer()
         analyzer.print_statistical_results(self.planning_endtoend_latency)
 
-        print PrintColors.FAIL + "  - MISS # OF LIDAR: " + \
+        print(PrintColors.FAIL + "  - MISS # OF LIDAR: " + \
             str(len(self.planning_unprocessed_lidar_timestamps)) + \
-            PrintColors.ENDC
+            PrintColors.ENDC)

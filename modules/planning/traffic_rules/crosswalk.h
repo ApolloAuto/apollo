@@ -43,10 +43,6 @@ class Crosswalk : public TrafficRule {
   bool CheckStopForObstacle(ReferenceLineInfo* const reference_line_info,
                             const hdmap::CrosswalkInfoConstPtr crosswalk_ptr,
                             const Obstacle& obstacle);
-  int BuildStopDecision(Frame* frame,
-                        ReferenceLineInfo* const reference_line_info,
-                        hdmap::PathOverlap* const crosswalk_overlap,
-                        std::vector<std::string> pedestrians);
 
  private:
   static constexpr char const* const CROSSWALK_VO_ID_PREFIX = "CW_";

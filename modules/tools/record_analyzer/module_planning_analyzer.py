@@ -46,10 +46,11 @@ class PlannigAnalyzer:
         self.total_cycle_num = 0
         self.init_point_curvature = []
         self.init_point_dcurvature = []
+        self.init_point_accel = []
+        self.init_point_decel = []
 
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
-        """put"""
         if not self.is_simulation:
             latency = adc_trajectory.latency_stats.total_time_ms
             self.module_latency.append(latency)
@@ -69,15 +70,18 @@ class PlannigAnalyzer:
                         adc_trajectory.estop.reason, 0) + 1
 
         if self.is_simulation:
-            for point in adc_trajectory.trajectory_point:
-                if point.a <= -2.0:
-                    self.hard_break_list.append(point.a)
-
             if adc_trajectory.debug.planning_data.HasField('init_point'):
                 self.init_point_curvature.append(
                     abs(adc_trajectory.debug.planning_data.init_point.path_point.kappa))
                 self.init_point_dcurvature.append(
                     abs(adc_trajectory.debug.planning_data.init_point.path_point.dkappa))
+                accel = adc_trajectory.debug.planning_data.init_point.a
+                if accel > 0:
+                    self.init_point_accel.append(accel)
+                if accel < 0:
+                    self.init_point_decel.append(abs(accel))
+                if accel < -2:
+                    self.hard_break_list.append(accel)
 
         # TODO(yifei) temporarily disable frechet distance
         #if self.last_adc_trajectory is not None and self.is_simulation:
@@ -181,21 +185,30 @@ class PlannigAnalyzer:
             curvature_avg = np.average(np.absolute(self.init_point_curvature))
             results['curvature_avg'] = curvature_avg
         else:
-            # TODO(yifei) will change to None after the change of dreamland
-            results['curvature_max'] = -99999
-            results['curvature_avg'] = -99999
+            results['curvature_max'] = None
+            results['curvature_avg'] = None
 
         if len(self.init_point_dcurvature) > 0:
             results['dcurvature_max'] = max(self.init_point_dcurvature, key=abs)
             dcurvature_avg = np.average(np.absolute(self.init_point_dcurvature))
             results['dcurvature_avg'] = dcurvature_avg
         else:
-            # TODO(yifei) will change to None after the change of dreamland
-            results['dcurvature_max'] = -99999
-            results['dcurvature_avg'] = -99999
+            results['dcurvature_max'] = None
+            results['dcurvature_avg'] = None
 
-        results['overall_score'] = 1 - results['hard_brake_cnt'] /\
-            float(self.total_cycle_num)
+        if len(self.init_point_accel) > 0:
+            results["accel_max"] = max(self.init_point_accel)
+            results["accel_avg"] = np.average(self.init_point_accel)
+        else:
+            results["accel_max"] = 0
+            results["accel_avg"] = 0
+        
+        if len(self.init_point_decel) > 0:
+            results["decel_max"] = max(self.init_point_decel)
+            results["decel_avg"] = np.average(self.init_point_decel)
+        else:
+            results["decel_max"] = 0
+            results["decel_avg"] = 0
 
         print json.dumps(results)
 

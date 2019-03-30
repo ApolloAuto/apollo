@@ -46,9 +46,7 @@ void ScenarioManager::Run() {
   // TODO(all) other functionalities including lane, junction filters
 }
 
-void ScenarioManager::AssignRightOfWay() {
-  RightOfWay::Analyze();
-}
+void ScenarioManager::AssignRightOfWay() { RightOfWay::Analyze(); }
 
 const Scenario& ScenarioManager::scenario() const { return current_scenario_; }
 

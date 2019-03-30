@@ -117,7 +117,7 @@ export default class DriveEventEditor extends React.Component {
                             <tr className="drive-event-row">
                                 <td>Event Time</td>
                                 <td>
-                                    <span>
+                                    <span className="event-time">
                                         {this.state.eventTime.toString()}
                                         <button
                                             className="timestamp-button"
@@ -131,17 +131,6 @@ export default class DriveEventEditor extends React.Component {
                                 <td>Types</td>
                                 <td>{this.renderTypeCheckBox()}</td>
                             </tr>
-                            <tr className="drive-event-row">
-                                <td>File a ticket</td>
-                                <td>
-                                    <CheckboxItem
-                                        id={"showPNCMonitor"}
-                                        isChecked={this.state.isReportable}
-                                        disabled={false}
-                                        onClick={this.toggleTicket}
-                                    />
-                                </td>
-                            </tr>
                             <tr className="drive-event-msg-row">
                                 <td>Message</td>
                                 <td>
@@ -153,15 +142,27 @@ export default class DriveEventEditor extends React.Component {
                                         onChange={this.handleMessageChange} />
                                 </td>
                             </tr>
-                            <tr>
-                                <td />
-                                <td>
-                                    <button className="submit-button" onClick={this.handleSubmit}>
-                                        Submit
-                                    </button>
-                                    <button className="cancel-button" onClick={this.handleCancel}>
-                                        Cancel
-                                    </button>
+                            <tr className="drive-event-row">
+                                <td>File a ticket</td>
+                                <td className="multiple-items">
+                                    <span>
+                                        <CheckboxItem
+                                            id={"showPNCMonitor"}
+                                            isChecked={this.state.isReportable}
+                                            disabled={false}
+                                            onClick={this.toggleTicket}
+                                        />
+                                    </span>
+                                    <span>
+                                        <button className="cancel-button"
+                                                onClick={this.handleCancel}>
+                                            Cancel
+                                        </button>
+                                        <button className="submit-button"
+                                                onClick={this.handleSubmit}>
+                                            Submit
+                                        </button>
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>

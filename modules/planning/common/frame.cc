@@ -28,6 +28,7 @@
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/math/vec2d.h"
+#include "modules/common/time/time.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/map/pnc_map/path.h"
@@ -35,14 +36,15 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
-#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::time::Clock;
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
 using apollo::prediction::PredictionObstacles;
@@ -355,7 +357,7 @@ Status Frame::InitFrameData() {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
   CHECK_NOTNULL(hdmap_);
   vehicle_state_ = common::VehicleStateProvider::Instance()->vehicle_state();
-  if (!IsVehicleStateValid(vehicle_state_)) {
+  if (!util::IsVehicleStateValid(vehicle_state_)) {
     AERROR << "Adc init point is not set";
     return Status(ErrorCode::PLANNING_ERROR, "Adc init point is not set");
   }
@@ -381,6 +383,9 @@ Status Frame::InitFrameData() {
       return Status(ErrorCode::PLANNING_ERROR, err_str);
     }
   }
+
+  ReadTrafficLights();
+
   return Status::OK();
 }
 
@@ -469,6 +474,40 @@ Obstacle *Frame::Find(const std::string &id) { return obstacles_.Find(id); }
 
 void Frame::AddObstacle(const Obstacle &obstacle) {
   obstacles_.Add(obstacle.Id(), obstacle);
+}
+
+void Frame::ReadTrafficLights() {
+  traffic_lights_.clear();
+
+  const auto traffic_light_detection = local_view_.traffic_light;
+  if (traffic_light_detection == nullptr) {
+    return;
+  }
+  const double delay =
+      traffic_light_detection->header().timestamp_sec() - Clock::NowInSeconds();
+  if (delay > FLAGS_signal_expire_time_sec) {
+    ADEBUG << "traffic signals msg is expired, delay = " << delay
+           << " seconds.";
+    return;
+  }
+  for (const auto& traffic_light : traffic_light_detection->traffic_light()) {
+    traffic_lights_[traffic_light.id()] = &traffic_light;
+  }
+}
+
+perception::TrafficLight Frame::GetSignal(
+    const std::string& traffic_light_id) const {
+  const auto* result =
+      apollo::common::util::FindPtrOrNull(traffic_lights_, traffic_light_id);
+  if (result == nullptr) {
+    perception::TrafficLight traffic_light;
+    traffic_light.set_id(traffic_light_id);
+    traffic_light.set_color(perception::TrafficLight::UNKNOWN);
+    traffic_light.set_confidence(0.0);
+    traffic_light.set_tracking_time(0.0);
+    return traffic_light;
+  }
+  return *result;
 }
 
 const ReferenceLineInfo *Frame::FindDriveReferenceLineInfo() {

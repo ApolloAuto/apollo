@@ -16,10 +16,11 @@
 # -*- coding: utf-8 -*-
 """Module for wrapper cyber record."""
 
-import sys
-import os
-import importlib
 import collections
+import importlib
+import os
+import sys
+
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 
 # init vars
@@ -36,11 +37,9 @@ sys.path.append(CYBER_DIR + "/cyber/")
 _CYBER_RECORD = importlib.import_module('_cyber_record')
 PyBagMessage = collections.namedtuple('PyBagMessage',
                                       'topic message data_type timestamp')
-#//////////////////////////////record file class//////////////////////////////
 
-
+# Record file class
 class RecordReader(object):
-
     """
     Class for cyber RecordReader wrapper.
     """
@@ -143,8 +142,8 @@ class RecordWriter(object):
         """
         Writer channel by channelname,typename,protodesc
         """
-        return _CYBER_RECORD.PyRecordWriter_WriteChannel(self.record_writer,
-                                                         channel_name, type_name, proto_desc)
+        return _CYBER_RECORD.PyRecordWriter_WriteChannel(
+            self.record_writer, channel_name, type_name, proto_desc)
 
     def write_message(self, channel_name, data, time, raw=True):
         """
@@ -152,17 +151,16 @@ class RecordWriter(object):
         """
         if raw:
             return _CYBER_RECORD.PyRecordWriter_WriteMessage(
-                self.record_writer,
-                channel_name, data, time, "")
-        else:
-            file_desc = data.DESCRIPTOR.file
-            proto = FileDescriptorProto()
-            file_desc.CopyToProto(proto)
-            proto.name = file_desc.name
-            desc_str = proto.SerializeToString()
-            return _CYBER_RECORD.PyRecordWriter_WriteMessage(
-                self.record_writer,
-                channel_name, data.SerializeToString(), time, desc_str)
+                self.record_writer, channel_name, data, time, "")
+
+        file_desc = data.DESCRIPTOR.file
+        proto = FileDescriptorProto()
+        file_desc.CopyToProto(proto)
+        proto.name = file_desc.name
+        desc_str = proto.SerializeToString()
+        return _CYBER_RECORD.PyRecordWriter_WriteMessage(
+            self.record_writer,
+            channel_name, data.SerializeToString(), time, desc_str)
 
     def set_size_fileseg(self, size_kilobytes):
         """

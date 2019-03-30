@@ -205,7 +205,7 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_SOL_X_GNSS);
           integ_status_.integ_state = LocalizationIntegState::WARNNING;
           integ_status_.state_message =
-              "Warnning: Lidar Localization Is Abnormal";
+              "Warning: Lidar Localization Is Abnormal";
         }
         break;
       case apollo::localization::FLOATCONV:
@@ -220,7 +220,7 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_SOL_LIDAR_X);
           integ_status_.integ_state = LocalizationIntegState::WARNNING;
           integ_status_.state_message =
-              "Warnning: GNSS Localization Is Unstable";
+              "Warning: GNSS Localization Is Unstable";
         } else {
           msf_status_.set_msf_running_status(apollo::localization::MSF_SOL_X_X);
           integ_status_.integ_state = LocalizationIntegState::ERROR;
@@ -236,7 +236,7 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_SOL_LIDAR_XX);
           integ_status_.integ_state = LocalizationIntegState::WARNNING;
           integ_status_.state_message =
-              "Warnning: GNSS Localization Is Abnormal";
+              "Warning: GNSS Localization Is Abnormal";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_SOL_X_XX);

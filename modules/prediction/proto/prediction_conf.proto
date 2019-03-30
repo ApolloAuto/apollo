@@ -31,6 +31,7 @@ message ObstacleConf {
     EMPTY_PREDICTOR = 4;
     SINGLE_LANE_PREDICTOR = 5;
     JUNCTION_PREDICTOR = 6;
+    EXTRAPOLATION_PREDICTOR = 7;
   }
 
   optional apollo.perception.PerceptionObstacle.Type obstacle_type = 1;

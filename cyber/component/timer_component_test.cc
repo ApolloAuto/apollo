@@ -43,8 +43,8 @@ TEST(TimerComponent, timertest) {
   compcfg.set_interval(100);
 
   std::shared_ptr<Component_Timer> com = std::make_shared<Component_Timer>();
-  EXPECT_EQ(true, com->Initialize(compcfg));
-  EXPECT_EQ(true, com->Process());
+  EXPECT_TRUE(com->Initialize(compcfg));
+  EXPECT_TRUE(com->Process());
 }
 
 TEST(TimerComponentFalse, timerfail) {
@@ -56,8 +56,8 @@ TEST(TimerComponentFalse, timerfail) {
   compcfg.set_interval(100);
 
   std::shared_ptr<Component_Timer> com = std::make_shared<Component_Timer>();
-  EXPECT_EQ(false, com->Initialize(compcfg));
-  EXPECT_EQ(false, com->Process());
+  EXPECT_FALSE(com->Initialize(compcfg));
+  EXPECT_FALSE(com->Process());
 }
 }  // namespace cyber
 }  // namespace apollo

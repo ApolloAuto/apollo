@@ -86,6 +86,7 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
   std::future<void> task_future_;
   std::atomic<bool> is_stop_{false};
   std::atomic<bool> trajectory_updated_{false};
+  std::atomic<bool> data_ready_{false};
   std::atomic<bool> trajectory_error_{false};
   std::atomic<bool> trajectory_skipped_{false};
   std::mutex open_space_mutex_;

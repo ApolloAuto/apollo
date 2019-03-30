@@ -80,15 +80,15 @@ TEST(TimerComponent, init) {
   apollo::cyber::proto::ReaderOption *read_opt = compcfg.add_readers();
   read_opt->set_channel("/perception/channel");
   auto comC = std::make_shared<Component_C<RawMessage>>();
-  EXPECT_EQ(true, comC->Initialize(compcfg));
-  EXPECT_EQ(true, comC->Process(msg_str1));
+  EXPECT_TRUE(comC->Initialize(compcfg));
+  EXPECT_TRUE(comC->Process(msg_str1));
 
   compcfg.set_name("perception2");
   apollo::cyber::proto::ReaderOption *read_opt2 = compcfg.add_readers();
   read_opt2->set_channel("/driver/channel1");
   auto comB = std::make_shared<Component_B<RawMessage, RawMessage>>();
-  EXPECT_EQ(true, comB->Initialize(compcfg));
-  EXPECT_EQ(true, comB->Process(msg_str1, msg_str2));
+  EXPECT_TRUE(comB->Initialize(compcfg));
+  EXPECT_TRUE(comB->Process(msg_str1, msg_str2));
 
   compcfg.set_name("perception3");
   apollo::cyber::proto::ReaderOption *read_opt3 = compcfg.add_readers();
@@ -98,8 +98,8 @@ TEST(TimerComponent, init) {
   read_opt4->set_channel("/driver/channel3");
   auto comA = std::make_shared<
       Component_A<RawMessage, RawMessage, RawMessage, RawMessage>>();
-  EXPECT_EQ(true, comA->Initialize(compcfg));
-  EXPECT_EQ(true, comA->Process(msg_str1, msg_str2, msg_str3, msg_str4));
+  EXPECT_TRUE(comA->Initialize(compcfg));
+  EXPECT_TRUE(comA->Process(msg_str1, msg_str2, msg_str3, msg_str4));
 }
 
 TEST(TimerComponentFail, init) {
@@ -116,23 +116,23 @@ TEST(TimerComponentFail, init) {
   apollo::cyber::proto::ReaderOption *read_opt = compcfg.add_readers();
   read_opt->set_channel("/perception/channel");
   auto comC = std::make_shared<Component_C<RawMessage>>();
-  EXPECT_EQ(false, comC->Initialize(compcfg));
-  EXPECT_EQ(false, comC->Process(msg_str1));
+  EXPECT_FALSE(comC->Initialize(compcfg));
+  EXPECT_FALSE(comC->Process(msg_str1));
 
   compcfg.set_name("perception2_f");
   apollo::cyber::proto::ReaderOption *read_opt2 = compcfg.add_readers();
   read_opt2->set_channel("/driver/channel");
   auto comB = std::make_shared<Component_B<RawMessage, RawMessage>>();
-  EXPECT_EQ(false, comB->Initialize(compcfg));
-  EXPECT_EQ(false, comB->Process(msg_str1, msg_str2));
+  EXPECT_FALSE(comB->Initialize(compcfg));
+  EXPECT_FALSE(comB->Process(msg_str1, msg_str2));
 
   compcfg.set_name("perception3_F");
   apollo::cyber::proto::ReaderOption *read_opt3 = compcfg.add_readers();
   read_opt3->set_channel("/driver/channel");
   auto comA = std::make_shared<
       Component_A<RawMessage, RawMessage, RawMessage, RawMessage>>();
-  EXPECT_EQ(false, comA->Initialize(compcfg));
-  EXPECT_EQ(false, comA->Process(msg_str1, msg_str2, msg_str3, msg_str4));
+  EXPECT_FALSE(comA->Initialize(compcfg));
+  EXPECT_FALSE(comA->Process(msg_str1, msg_str2, msg_str3, msg_str4));
 }
 
 }  // namespace cyber

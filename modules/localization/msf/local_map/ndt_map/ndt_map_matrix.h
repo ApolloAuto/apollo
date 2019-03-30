@@ -84,7 +84,7 @@ class NdtMapSingleCell {
   Eigen::Matrix3f centroid_icov_;
   /**@brief the inverse covariance avaliable flag. */
   unsigned char is_icov_available_ = 0;
-  /**@breif minimum number of points needed. */
+  /**@brief minimum number of points needed. */
   const unsigned int minimum_points_threshold_ = 6;
 };
 

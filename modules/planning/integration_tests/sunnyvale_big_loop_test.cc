@@ -60,7 +60,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     ENABLE_RULE(TrafficRuleConfig::DESTINATION, false);
     ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
     ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
-    ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+    ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
   }
 };
 
@@ -83,10 +83,10 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  auto* scenario_info = PlanningContext::GetScenarioInfo();
-  EXPECT_EQ(scenario_info->current_stop_sign_overlap.object_id, "");
-  EXPECT_EQ(scenario_info->stop_done_overlap_ids.size(), 0);
-  EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
+  const auto& stop_sign_status = PlanningContext::Planningstatus().stop_sign();
+  EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "");
+  EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
+  EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
 }
 
 /*
@@ -107,10 +107,10 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  auto* scenario_info = PlanningContext::GetScenarioInfo();
-  EXPECT_EQ(scenario_info->current_stop_sign_overlap.object_id, "1017");
-  EXPECT_EQ(scenario_info->stop_done_overlap_ids.size(), 0);
-  EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
+  const auto& stop_sign_status = PlanningContext::Planningstatus().stop_sign();
+  EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
+  EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
+  EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
 }
 
 /*
@@ -132,10 +132,10 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  auto* scenario_info = PlanningContext::GetScenarioInfo();
-  EXPECT_EQ(scenario_info->current_stop_sign_overlap.object_id, "1017");
-  EXPECT_EQ(scenario_info->stop_done_overlap_ids.size(), 0);
-  EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
+  const auto& stop_sign_status = PlanningContext::Planningstatus().stop_sign();
+  EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
+  EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
+  EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
 
   usleep(1000);
 
@@ -143,10 +143,11 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningContext content
-  scenario_info = PlanningContext::GetScenarioInfo();
-  EXPECT_EQ(scenario_info->current_stop_sign_overlap.object_id, "1017");
-  EXPECT_EQ(scenario_info->stop_done_overlap_ids.size(), 0);
-  EXPECT_EQ(scenario_info->stop_sign_wait_for_obstacles.size(), 0);
+  const auto& stop_sign_status_2 =
+      PlanningContext::Planningstatus().stop_sign();
+  EXPECT_EQ(stop_sign_status_2.current_stop_sign_overlap_id(), "1017");
+  EXPECT_EQ(stop_sign_status_2.done_stop_sign_overlap_id(), "");
+  EXPECT_EQ(stop_sign_status_2.wait_for_obstacle_id_size(), 0);
 }
 
 /*
@@ -490,7 +491,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
 TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
   std::string seq_num = "101";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -510,7 +511,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_01) {
 TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
   std::string seq_num = "102";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -530,7 +531,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_02) {
 TEST_F(SunnyvaleBigLoopTest, keep_clear_03) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, true);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
   std::string seq_num = "103";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -550,7 +551,7 @@ TEST_F(SunnyvaleBigLoopTest, keep_clear_03) {
 TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, true);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
 
   std::string seq_num = "200";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -570,7 +571,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_01) {
 TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, true);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
 
   std::string seq_num = "201";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -609,7 +610,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
 TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
 
   std::string seq_num = "300";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -624,7 +625,7 @@ TEST_F(SunnyvaleBigLoopTest, traffic_light_green) {
 TEST_F(SunnyvaleBigLoopTest, change_lane_abort_for_fast_back_vehicle) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, true);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, true);
 
   std::string seq_num = "400";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -646,7 +647,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
   std::string seq_num = "600";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -673,7 +674,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
   std::string seq_num = "601";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -739,7 +740,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
   ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
   std::string seq_num = "601";
   FLAGS_test_routing_response_file = seq_num + "_routing.pb.txt";
@@ -795,7 +796,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
 /*
 // TODO(all): this test need rewrite
 TEST_F(SunnyvaleBigLoopTest, bypass_parked_bus) {
-  ENABLE_RULE(TrafficRuleConfig::SIGNAL_LIGHT, false);
+  ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
 
   double acc_lower_bound = FLAGS_longitudinal_acceleration_lower_bound;

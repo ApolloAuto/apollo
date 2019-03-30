@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -166,6 +167,9 @@ class Frame {
 
   OpenSpaceInfo *mutable_open_space_info() { return open_space_info_.get(); }
 
+  perception::TrafficLight GetSignal(
+      const std::string& traffic_light_id) const;
+
  private:
   common::Status InitFrameData();
 
@@ -188,6 +192,8 @@ class Frame {
 
   void AddObstacle(const Obstacle &obstacle);
 
+  void ReadTrafficLights();
+
  private:
   uint32_t sequence_num_ = 0;
   LocalView local_view_;
@@ -204,6 +210,9 @@ class Frame {
   const ReferenceLineInfo *drive_reference_line_info_ = nullptr;
 
   ThreadSafeIndexedObstacles obstacles_;
+  std::unordered_map<std::string, const perception::TrafficLight*>
+      traffic_lights_;
+
   ChangeLaneDecider change_lane_decider_;
   ADCTrajectory current_frame_planned_trajectory_;  // last published trajectory
 

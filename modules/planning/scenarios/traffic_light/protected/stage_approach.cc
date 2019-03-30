@@ -23,8 +23,10 @@
 #include "modules/planning/scenarios/traffic_light/protected/stage_approach.h"
 
 #include "cyber/common/log.h"
+#include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
@@ -33,6 +35,7 @@ namespace scenario {
 namespace traffic_light {
 
 using common::TrajectoryPoint;
+using hdmap::PathOverlap;
 using perception::TrafficLight;
 
 Stage::StageStatus TrafficLightProtectedStageApproach::Process(
@@ -47,28 +50,36 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
     AERROR << "TrafficLightProtectedStop planning error";
   }
 
+  if (GetContext()->current_traffic_light_overlap_ids.size() == 0) {
+    return FinishScenario();
+  }
+
   const auto& reference_line_info = frame->reference_line_info().front();
 
   bool traffic_light_all_done = true;
-  for (const auto& traffic_light_overlap :
-       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
-    // check if the traffic_light is still along reference_line
-    if (scenario::CheckTrafficLightDone(reference_line_info,
-                                        traffic_light_overlap.object_id)) {
+  for (const auto& traffic_light_overlap_id :
+      GetContext()->current_traffic_light_overlap_ids) {
+    // get overlap along reference line
+    PathOverlap* current_traffic_light_overlap =
+      scenario::util::GetOverlapOnReferenceLine(
+          reference_line_info,
+          traffic_light_overlap_id,
+          ReferenceLineInfo::SIGNAL);
+    if (!current_traffic_light_overlap) {
       continue;
     }
 
     // set right_of_way_status
-    reference_line_info.SetJunctionRightOfWay(traffic_light_overlap.start_s,
-                                              false);
+    reference_line_info.SetJunctionRightOfWay(
+        current_traffic_light_overlap->start_s, false);
 
     const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
     const double distance_adc_to_stop_line =
-        traffic_light_overlap.start_s - adc_front_edge_s;
+        current_traffic_light_overlap->start_s - adc_front_edge_s;
     auto signal_color =
-        scenario::GetSignal(traffic_light_overlap.object_id).color();
-    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap.object_id
-           << "] start_s[" << traffic_light_overlap.start_s
+        frame->GetSignal(traffic_light_overlap_id).color();
+    ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
+           << "] start_s[" << current_traffic_light_overlap->start_s
            << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
            << "] color[" << signal_color << "]";
 
@@ -94,18 +105,19 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
 }
 
 Stage::StageStatus TrafficLightProtectedStageApproach::FinishScenario() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
+  PlanningContext::MutablePlanningStatus()->clear_traffic_light();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
 Stage::StageStatus TrafficLightProtectedStageApproach::FinishStage() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
-  for (const auto& traffic_light_overlap :
-       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
-    PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.push_back(
-        traffic_light_overlap.object_id);
+  PlanningContext::MutablePlanningStatus()->mutable_traffic_light()
+      ->mutable_done_traffic_light_overlap_id()->Clear();
+  for (const auto& traffic_light_overlap_id :
+      GetContext()->current_traffic_light_overlap_ids) {
+    PlanningContext::MutablePlanningStatus()->mutable_traffic_light()
+        ->add_done_traffic_light_overlap_id(traffic_light_overlap_id);
   }
 
   next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE;

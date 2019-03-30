@@ -248,7 +248,8 @@ DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
 DEFINE_double(signal_light_min_pass_s_distance, 4.0,
               "min s_distance for adc to be considered "
               "have passed signal_light (stop_line_end_s)");
-
+DEFINE_double(signal_expire_time_sec, 5.0,
+              "traffic light signal info read expire time in sec");
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
 DEFINE_double(destination_check_distance, 5.0,

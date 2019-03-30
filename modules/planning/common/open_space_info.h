@@ -229,6 +229,7 @@ class OpenSpaceInfo {
   }
 
   const std::vector<TrajGearPair> &paritioned_trajectories() const {
+    // TODO(Runxin): export to chart
     return paritioned_trajectories_;
   }
 
@@ -245,6 +246,7 @@ class OpenSpaceInfo {
   }
 
   const TrajGearPair &chosen_paritioned_trajectory() const {
+    // TODO(Runxin): export to chart
     return chosen_paritioned_trajectory_;
   }
 
@@ -276,17 +278,11 @@ class OpenSpaceInfo {
     return publishable_trajectory_data_;
   }
 
-  apollo::planning_internal::Debug *mutable_debug() {
-    return debug_;
-  }
+  apollo::planning_internal::Debug *mutable_debug() { return debug_; }
 
-  void set_debug(apollo::planning_internal::Debug *debug) {
-    debug_ = debug;
-  }
+  void set_debug(apollo::planning_internal::Debug *debug) { debug_ = debug; }
 
-  const apollo::planning_internal::Debug &debug() const {
-    return *debug_;
-  }
+  const apollo::planning_internal::Debug &debug() const { return *debug_; }
 
   const apollo::planning_internal::Debug debug_instance() const {
     return debug_instance_;
@@ -296,11 +292,9 @@ class OpenSpaceInfo {
     return &debug_instance_;
   }
 
-  void sync_debug_instance() {
-    debug_instance_ = *debug_;
-  }
+  void sync_debug_instance() { debug_instance_ = *debug_; }
 
-  void RecordDebug();
+  void RecordDebug(apollo::planning_internal::Debug *ptr_debug);
 
  private:
   // @brief vehicle needs to stop first in open space related scenarios
@@ -374,7 +368,7 @@ class OpenSpaceInfo {
       publishable_trajectory_data_;
 
   // the pointer from ADCtrajectory
-  apollo::planning_internal::Debug* debug_;
+  apollo::planning_internal::Debug *debug_;
 
   // the instance inside debug,
   // if ADCtrajectory is NULL, blank; else same to ADCtrajectory

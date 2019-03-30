@@ -385,6 +385,9 @@ bool ReferenceLineInfo::AddObstacles(
 }
 
 bool ReferenceLineInfo::IsUnrelaventObstacle(const Obstacle* obstacle) {
+  if (obstacle->IsCautionLevelObstacle()) {
+    return false;
+  }
   // if adc is on the road, and obstacle behind adc, ignore
   if (obstacle->PerceptionSLBoundary().end_s() > reference_line_.Length()) {
     return true;

@@ -1,0 +1,125 @@
+# Define all coms in DAG streaming.
+module_config {
+    module_library : "/apollo/bazel-bin/modules/drivers/tools/image_decompress/libimage_decompress.so"
+
+    components {
+      class_name : "ImageDecompressComponent"
+      config {
+        name : "camera_front_6mm_decompress"
+        config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_front_6mm.pb.txt"
+        readers {
+          channel: "/apollo/sensor/camera/front_6mm/image/compressed"
+          pending_queue_size: 10
+        }
+      }
+    }
+
+    components {
+      class_name : "ImageDecompressComponent"
+      config {
+        name : "camera_front_12mm_decompress"
+        config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_front_12mm.pb.txt"
+        readers {
+          channel: "/apollo/sensor/camera/front_12mm/image/compressed"
+          pending_queue_size: 10
+        }
+      }
+    }
+
+    # components {
+    #   class_name : "ImageDecompressComponent"
+    #   config {
+    #     name : "camera_front_fisheye_decompress"
+    #     config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_front_fisheye.pb.txt"
+    #     readers {
+    #       channel: "/apollo/sensor/camera/front_fisheye/image/compressed"
+    #       pending_queue_size: 10
+    #     }
+    #   }
+    # }
+
+    # components {
+    #   class_name : "ImageDecompressComponent"
+    #   config {
+    #     name : "camera_left_front_decompress"
+    #     config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_left_front.pb.txt"
+    #     readers {
+    #       channel: "/apollo/sensor/camera/left_front/image/compressed"
+    #       pending_queue_size: 10
+    #     }
+    #   }
+    # }
+
+    # components {
+    #   class_name : "ImageDecompressComponent"
+    #   config {
+    #     name : "camera_left_rear_decompress"
+    #     config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_left_rear.pb.txt"
+    #     readers {
+    #       channel: "/apollo/sensor/camera/left_rear/image/compressed"
+    #       pending_queue_size: 10
+    #     }
+    #   }
+    # }
+
+    components {
+      class_name : "ImageDecompressComponent"
+      config {
+        name : "camera_left_fisheye_decompress"
+        config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_left_fisheye.pb.txt"
+        readers {
+          channel: "/apollo/sensor/camera/left_fisheye/image/compressed"
+          pending_queue_size: 10
+        }
+      }
+    }
+
+    # components {
+    #   class_name : "ImageDecompressComponent"
+    #   config {
+    #     name : "camera_right_front_decompress"
+    #     config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_right_front.pb.txt"
+    #     readers {
+    #       channel: "/apollo/sensor/camera/right_front/image/compressed"
+    #       pending_queue_size: 10
+    #     }
+    #   }
+    # }
+
+    # components {
+    #   class_name : "ImageDecompressComponent"
+    #   config {
+    #     name : "camera_right_rear_decompress"
+    #     config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_right_rear.pb.txt"
+    #     readers {
+    #       channel: "/apollo/sensor/camera/right_rear/image/compressed"
+    #       pending_queue_size: 10
+    #     }
+    #   }
+    # }
+
+    components {
+      class_name : "ImageDecompressComponent"
+      config {
+        name : "camera_right_fisheye_decompress"
+        config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_right_fisheye.pb.txt"
+        readers {
+          channel: "/apollo/sensor/camera/right_fisheye/image/compressed"
+          pending_queue_size: 10
+        }
+      }
+    }
+
+    components {
+      class_name : "ImageDecompressComponent"
+      config {
+        name : "camera_rear_6mm_decompress"
+        config_file_path : "/apollo/modules/drivers/tools/image_decompress/conf/camera_rear_6mm.pb.txt"
+        readers {
+          channel: "/apollo/sensor/camera/rear_6mm/image/compressed"
+          pending_queue_size: 10
+        }
+      }
+    }
+}
+
