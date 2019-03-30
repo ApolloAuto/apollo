@@ -29,21 +29,20 @@ RecordReader::~RecordReader() {}
 RecordReader::RecordReader(const std::string& file) {
   file_reader_.reset(new RecordFileReader());
   if (!file_reader_->Open(file)) {
-    AERROR << "Open record file failed, file: " << file;
+    AERROR << "Failed to open record file: " << file;
     return;
   }
   is_valid_ = true;
   header_ = file_reader_->GetHeader();
   if (file_reader_->ReadIndex()) {
     index_ = file_reader_->GetIndex();
-    const int kIndexSize = index_.indexes_size();
-    for (int i = 0; i < kIndexSize; ++i) {
+    for (int i = 0; i < index_.indexes_size(); ++i) {
       auto single_idx = index_.mutable_indexes(i);
       if (single_idx->type() != SectionType::SECTION_CHANNEL) {
         continue;
       }
       if (!single_idx->has_channel_cache()) {
-        AERROR << "single channel index does not have channel_cache.";
+        AERROR << "Single channel index does not have channel_cache.";
         continue;
       }
       auto channel_cache = single_idx->mutable_channel_cache();
@@ -96,13 +95,13 @@ bool RecordReader::ReadMessage(RecordMessage* message, uint64_t begin_time,
     return true;
   }
 
-  ADEBUG << "read next chunk.";
+  ADEBUG << "Read next chunk.";
   if (ReadNextChunk(begin_time, end_time)) {
-    ADEBUG << "read chunk successfully.";
+    ADEBUG << "Read chunk successfully.";
     message_index_ = 0;
     return ReadMessage(message, begin_time, end_time);
   }
-  ADEBUG << "no chunk to read.";
+  ADEBUG << "No chunk to read.";
   return false;
 }
 
@@ -111,7 +110,7 @@ bool RecordReader::ReadNextChunk(uint64_t begin_time, uint64_t end_time) {
   while (!reach_end_) {
     Section section;
     if (!file_reader_->ReadSection(&section)) {
-      AERROR << "Read section failed, file: " << file_reader_->GetPath();
+      AERROR << "Failed to read section, file: " << file_reader_->GetPath();
       return false;
     }
     switch (section.type) {
