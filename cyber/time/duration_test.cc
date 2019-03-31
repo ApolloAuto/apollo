@@ -37,28 +37,26 @@ TEST(DurationTest, constructor) {
   EXPECT_DOUBLE_EQ(1.000000001, duration.ToSecond());
 
   Duration d2(duration);
-  EXPECT_TRUE(duration == d2);
+  EXPECT_EQ(duration, d2);
 }
 
 TEST(DurationTest, operators) {
   Duration d1(100);
   Duration d2(200);
   Duration d3(300);
-  EXPECT_TRUE(d1 != d3);
-  EXPECT_TRUE(d1 < d3);
-  EXPECT_TRUE(d1 <= d3);
-  EXPECT_TRUE(d3 > d1);
-  EXPECT_TRUE(d3 >= d1);
-  EXPECT_TRUE(d1 + d2 == d3);
-  EXPECT_TRUE(d2 == d1 * 2);
-  EXPECT_TRUE(d3 - d2 == d1);
-  EXPECT_TRUE((d1 += d2) == d3);
-  EXPECT_TRUE(d1 >= d3);
-  EXPECT_TRUE(d1 <= d3);
-  EXPECT_TRUE(Duration(100) == (d1 -= d2));
-  EXPECT_TRUE(d2 == (d1 *= 2));
-
-  std::cout << "Duration is: " << d1 << std::endl;
+  EXPECT_NE(d1, d3);
+  EXPECT_LT(d1, d3);
+  EXPECT_LE(d1, d3);
+  EXPECT_GT(d3, d1);
+  EXPECT_GE(d3, d1);
+  EXPECT_EQ(d1 + d2, d3);
+  EXPECT_EQ(d2, d1 * 2);
+  EXPECT_EQ(d3 - d2, d1);
+  EXPECT_EQ(d1 += d2, d3);
+  EXPECT_GE(d1, d3);
+  EXPECT_LE(d1, d3);
+  EXPECT_EQ(Duration(100), d1 -= d2);
+  EXPECT_EQ(d2, d1 *= 2);
 }
 
 TEST(DurationTest, is_zero) {
