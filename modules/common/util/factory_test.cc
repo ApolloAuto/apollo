@@ -37,10 +37,10 @@ TEST(FactoryTest, Register) {
   EXPECT_TRUE(factory.Register("derived_class",
                                []() -> Base* { return new Derived(); }));
   auto derived_ptr = factory.CreateObject("derived_class");
-  EXPECT_TRUE(derived_ptr != nullptr);
+  EXPECT_NE(nullptr, derived_ptr);
   EXPECT_EQ("derived", derived_ptr->Name());
   auto non_exist_ptr = factory.CreateObject("non_exist_class");
-  EXPECT_TRUE(non_exist_ptr == nullptr);
+  EXPECT_EQ(nullptr, non_exist_ptr);
 }
 
 TEST(FactoryTest, Unregister) {
@@ -49,16 +49,16 @@ TEST(FactoryTest, Unregister) {
                                []() -> Base* { return new Derived(); }));
   EXPECT_FALSE(factory.Unregister("fake_class"));
   auto derived_ptr = factory.CreateObject("derived_class");
-  EXPECT_TRUE(derived_ptr != nullptr);
+  EXPECT_NE(nullptr, derived_ptr);
   EXPECT_TRUE(factory.Unregister("derived_class"));
   auto non_exist_ptr = factory.CreateObject("derived_class");
-  EXPECT_TRUE(non_exist_ptr == nullptr);
+  EXPECT_EQ(nullptr, non_exist_ptr);
 }
 
 class ArgConstructor {
  public:
   explicit ArgConstructor(const std::string& name) : name_(name) {}
-  explicit ArgConstructor(const std::string& name, int value)
+  ArgConstructor(const std::string& name, int value)
       : name_(name), value_(value) {}
   std::string Name() const { return name_; }
   int Value() const { return value_; }
@@ -74,7 +74,7 @@ TEST(FactoryTest, OneArgConstructor) {
   EXPECT_TRUE(factory.Register(
       "arg_1", [](const std::string& arg) { return new ArgConstructor(arg); }));
   auto ptr = factory.CreateObject("arg_1", "name_1");
-  EXPECT_TRUE(ptr != nullptr);
+  EXPECT_NE(nullptr, ptr);
   EXPECT_EQ("name_1", ptr->Name());
   EXPECT_EQ(0, ptr->Value());
 }
@@ -87,7 +87,7 @@ TEST(FactoryTest, TwoArgConstructor) {
     return new ArgConstructor(arg, value);
   }));
   auto ptr = factory.CreateObject("arg_2", "name_2", 10);
-  EXPECT_TRUE(ptr != nullptr);
+  EXPECT_NE(nullptr, ptr);
   EXPECT_EQ("name_2", ptr->Name());
   EXPECT_EQ(10, ptr->Value());
 }
