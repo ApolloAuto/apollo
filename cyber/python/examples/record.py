@@ -33,18 +33,18 @@ MSG_TYPE_CHATTER = "apollo.cyber.proto.Chatter"
 
 def test_record_writer(writer_path):
     """
-    record writer.
+    Record writer.
     """
     fwriter = record.RecordWriter()
     fwriter.set_size_fileseg(0)
     fwriter.set_intervaltime_fileseg(0)
 
     if not fwriter.open(writer_path):
-        print "writer open failed!"
+        print('Failed to open record writer!')
         return
-    print "+++ begin to writer..."
+    print('+++ Begin to writer +++')
 
-    # writer 2 SimpleMessage
+    # Writer 2 SimpleMessage
     msg = SimpleMessage()
     msg.text = "AAAAAA"
 
@@ -59,7 +59,7 @@ def test_record_writer(writer_path):
     fwriter.write_message('simplemsg_channel', msg, 990, False)
     fwriter.write_message('simplemsg_channel', msg.SerializeToString(), 991)
 
-    # writer 2 Chatter
+    # Writer 2 Chatter
     msg = Chatter()
     msg.timestamp = 99999
     msg.lidar_timestamp = 100
@@ -81,41 +81,43 @@ def test_record_writer(writer_path):
 
 def test_record_reader(reader_path):
     """
-    record reader.
+    Record reader.
     """
     freader = record.RecordReader(reader_path)
     time.sleep(1)
-    print "+" * 80
-    print "+++begin to read..."
-    count = 1
-    for channelname, msg, datatype, timestamp in freader.read_messages():
-        print "=" * 80
-        print "read [%d] msg" % count
-        print "chnanel_name -> %s" % channelname
-        print "msgtime -> %d" % timestamp
-        print "msgnum -> %d" % freader.get_messagenumber(channelname)
-        print "msgtype -> %s" % datatype
+    print('+' * 80)
+    print('+++ Begin to read +++')
+    count = 0
+    for channel_name, msg, datatype, timestamp in freader.read_messages():
+        cout += 1
+        print('=' * 80)
+        print('read [%d] messages' % count)
+        print('chnanel_name -> %s' % channel_name)
+        print('msgtime -> %d' % timestamp)
+        print('msgnum -> %d' % freader.get_messagenumber(channel_name))
+        print('msgtype -> %s' % datatype)
         # print "pbdesc -> %s" % freader.get_protodesc(channelname)
-        count = count + 1
-        print "msg is -> %s" % msg
-        print "***after parse(if need),the msg is ->"
+        print('message is -> %s' % msg)
+        print('***After parse(if needed),the message is ->')
         if datatype == MSG_TYPE:
             msg_new = SimpleMessage()
             msg_new.ParseFromString(msg)
-            print msg_new
+            print(msg_new)
         if datatype == MSG_TYPE_CHATTER:
             msg_new = Chatter()
             msg_new.ParseFromString(msg)
-            print msg_new
+            print(msg_new)
 
 if __name__ == '__main__':
-    cyber.init()
-    if len(sys.argv) == 2:
-        read_file = (sys.argv[1])
-        print "begin read record file: ", read_file
-        test_record_reader(read_file)
-        cyber.shutdown()
+    if len(sys.argv) < 2:
+        print('Usage: %s record_file' % sys.argv[0])
         sys.exit(0)
+
+    cyber.init()
+    print('Begin to read record file: %s' % sys.argv[1])
+    test_record_reader(sys.argv[1])
+    cyber.shutdown()
+    sys.exit(0)
 
     test_record_writer(TEST_RECORD_FILE)
     test_record_reader(TEST_RECORD_FILE)
