@@ -90,16 +90,13 @@ bool Info::Display(const std::string& file) {
     return false;
   }
 
-  Index idx = file_reader.GetIndex();
   // channel info
+  std::cout << std::setw(w) << "channel_info: ";
+  Index idx = file_reader.GetIndex();
   for (int i = 0; i < idx.indexes_size(); ++i) {
     ChannelCache* cache = idx.mutable_indexes(i)->mutable_channel_cache();
     if (idx.mutable_indexes(i)->type() == SectionType::SECTION_CHANNEL) {
-      if (i == 0) {
-        std::cout << std::setw(w) << "channel_info:";
-      } else {
-        std::cout << std::setw(w) << "";
-      }
+      std::cout << std::setw(w) << "";
       std::cout << resetiosflags(std::ios::right);
       std::cout << std::setw(50) << cache->name();
       std::cout << setiosflags(std::ios::right);
