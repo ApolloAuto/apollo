@@ -325,14 +325,45 @@ void SequencePredictor::DrawConstantAccelerationTrajectory(
 
 double SequencePredictor::GetLaneSequenceCurvatureByS(
     const LaneSequence& lane_sequence, const double s) {
-  // TODO(kechxu) implement
+  CHECK_GT(lane_sequence.lane_segment_size(), 0);
+  double lane_s = s + lane_sequence.lane_segment(0).start_s();
+  for (const LaneSegment& lane_segment : lane_sequence.lane_segment()) {
+    std::string lane_id = lane_segment.lane_id();
+    std::shared_ptr<const LaneInfo> lane_info_ptr =
+        PredictionMap::LaneById(lane_id);
+    double lane_length = lane_info_ptr->total_length();
+    if (lane_s > lane_length + FLAGS_double_precision) {
+      lane_s -= lane_length;
+    } else {
+      return lane_info_ptr->Curvature(lane_s);
+    }
+  }
+  AERROR << "Cannot find curvature by lane s";
   return 0.0;
 }
 
-Point3D SequencePredictor::GetPositionByLaneSequenceSL(
-    const LaneSequence& lane_sequence, const double s, const double l) {
-  // TODO(kechxu) implement
+Point3D SequencePredictor::GetPositionByLaneSequenceS(
+    const LaneSequence& lane_sequence, const double s) {
+  CHECK_GT(lane_sequence.lane_segment_size(), 0);
   Point3D position;
+  double lane_s = s + lane_sequence.lane_segment(0).start_s();
+  for (const LaneSegment& lane_segment : lane_sequence.lane_segment()) {
+    std::string lane_id = lane_segment.lane_id();
+    std::shared_ptr<const LaneInfo> lane_info_ptr =
+        PredictionMap::LaneById(lane_id);
+    double lane_length = lane_info_ptr->total_length();
+    if (lane_s > lane_length + FLAGS_double_precision) {
+      lane_s -= lane_length;
+    } else {
+      apollo::common::PointENU point_enu =
+          lane_info_ptr->GetSmoothPoint(lane_s);
+      position.set_x(point_enu.x());
+      position.set_y(point_enu.y());
+      position.set_z(point_enu.z());
+      return position;
+    }
+  }
+  AERROR << "Cannot find position by lane s";
   return position;
 }
 
