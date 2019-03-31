@@ -10,6 +10,7 @@ cc_library(
         "//modules/prediction/common:feature_output",
         "//modules/prediction/predictor/extrapolation:extrapolation_predictor",
         "//modules/prediction/predictor/free_move:free_move_predictor",
+        "//modules/prediction/predictor/interaction:interaction_predictor",
         "//modules/prediction/predictor/junction:junction_predictor",
         "//modules/prediction/predictor/lane_sequence:lane_sequence_predictor",
         "//modules/prediction/predictor/move_sequence:move_sequence_predictor",
