@@ -37,24 +37,24 @@ TEST(TimeTest, constructor) {
   EXPECT_DOUBLE_EQ(1.000000001, time.ToSecond());
 
   Time time2(time);
-  EXPECT_TRUE(time == time2);
+  EXPECT_EQ(time, time2);
 }
 
 TEST(TimeTest, operators) {
   Time t1(100);
   Duration d(200);
   Time t2(300);
-  EXPECT_TRUE(t1 != t2);
-  EXPECT_TRUE(t1 < t2);
-  EXPECT_TRUE(t1 <= t2);
-  EXPECT_TRUE(t2 > t1);
-  EXPECT_TRUE(t2 >= t1);
-  EXPECT_TRUE(t1 + d == t2);
-  EXPECT_TRUE(t2 - d == t1);
-  EXPECT_TRUE((t1 += d) == t2);
-  EXPECT_TRUE(t1 >= t2);
-  EXPECT_TRUE(t1 <= t2);
-  EXPECT_TRUE(Time(100) == (t1 -= d));
+  EXPECT_NE(t1, t2);
+  EXPECT_LT(t1, t2);
+  EXPECT_LE(t1, t2);
+  EXPECT_GT(t2, t1);
+  EXPECT_GE(t2, t1);
+  EXPECT_EQ(t1 + d, t2);
+  EXPECT_EQ(t2 - d, t1);
+  EXPECT_EQ(t1 += d, t2);
+  EXPECT_GE(t1, t2);
+  EXPECT_LE(t1, t2);
+  EXPECT_EQ(Time(100), t1 -= d);
 }
 
 TEST(TimeTest, to_string) {
