@@ -30,7 +30,7 @@ TEST(GraphTest, vertice) {
 
   Vertice b(a);
   EXPECT_TRUE(b.IsDummy());
-  EXPECT_TRUE(b == a);
+  EXPECT_EQ(b, a);
 
   Vertice c = a;
   EXPECT_TRUE(c.IsDummy());
@@ -39,7 +39,7 @@ TEST(GraphTest, vertice) {
 
   Vertice d("d");
   EXPECT_FALSE(d.IsDummy());
-  EXPECT_TRUE(d != a);
+  EXPECT_NE(d, a);
   EXPECT_NE(d.GetKey(), a.GetKey());
   EXPECT_EQ(d.value(), "d");
 }
@@ -50,46 +50,46 @@ TEST(GraphTest, edge) {
 
   Edge b(a);
   EXPECT_FALSE(b.IsValid());
-  EXPECT_TRUE(b == a);
+  EXPECT_EQ(b, a);
   EXPECT_EQ(b.GetKey(), a.GetKey());
 
   Edge c = a;
   EXPECT_FALSE(c.IsValid());
-  EXPECT_TRUE(c == a);
+  EXPECT_EQ(c, a);
   EXPECT_EQ(c.GetKey(), a.GetKey());
   a = a;
 
   Edge d;
   d = c;
   EXPECT_FALSE(d.IsValid());
-  EXPECT_TRUE(d == c);
+  EXPECT_EQ(d, c);
   EXPECT_EQ(d.GetKey(), c.GetKey());
 
-  std::string value = "value";
+  const std::string value = "value";
   a.set_value(value);
-  EXPECT_TRUE(a.value() == value);
+  EXPECT_EQ(a.value(), value);
   EXPECT_FALSE(a == b);
   EXPECT_FALSE(a.IsValid());
   b.set_value(value);
-  EXPECT_TRUE(a == b);
+  EXPECT_EQ(a, b);
 
   Vertice src("src");
   Vertice dst("dst");
   a.set_src(src);
   b.set_dst(dst);
-  EXPECT_TRUE(a.src() == src);
-  EXPECT_TRUE(b.dst() == dst);
+  EXPECT_EQ(a.src(), src);
+  EXPECT_EQ(b.dst(), dst);
   EXPECT_FALSE(a == b);
   EXPECT_TRUE(a.IsValid());
   EXPECT_TRUE(b.IsValid());
 
   a.set_dst(dst);
   b.set_src(src);
-  EXPECT_TRUE(a == b);
+  EXPECT_EQ(a, b);
   EXPECT_EQ(a.GetKey(), "value_dst");
 
   Edge e(src, dst, value);
-  EXPECT_TRUE(e == a);
+  EXPECT_EQ(e, a);
 }
 
 TEST(GraphTest, graph) {
