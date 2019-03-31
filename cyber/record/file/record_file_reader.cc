@@ -29,19 +29,19 @@ RecordFileReader::~RecordFileReader() {}
 bool RecordFileReader::Open(const std::string& path) {
   std::lock_guard<std::mutex> lock(mutex_);
   path_ = path;
-  if (!::apollo::cyber::common::PathExists(path_)) {
-    AERROR << "File not exist, file: " << path_;
+  if (!common::PathExists(path_)) {
+    AERROR << "File does not exist. file: " << path_;
     return false;
   }
   fd_ = open(path_.data(), O_RDONLY);
   if (fd_ < 0) {
-    AERROR << "Open file failed, file: " << path_ << ", fd: " << fd_
+    AERROR << "Failed to open file: " << path_ << ", fd: " << fd_
            << ", errno: " << errno;
     return false;
   }
   end_of_file_ = false;
   if (!ReadHeader()) {
-    AERROR << "Read header section fail, file: " << path_;
+    AERROR << "Failed to read header section. file: " << path_;
     return false;
   }
   return true;
@@ -51,7 +51,7 @@ void RecordFileReader::Close() { close(fd_); }
 
 bool RecordFileReader::Reset() {
   if (!SetPosition(sizeof(struct Section) + HEADER_LENGTH)) {
-    AERROR << "Reset position fail, file: " << path_;
+    AERROR << "Failed to reset position. file: " << path_;
     return false;
   }
   end_of_file_ = false;
@@ -61,8 +61,8 @@ bool RecordFileReader::Reset() {
 bool RecordFileReader::ReadHeader() {
   Section section;
   if (!ReadSection(&section)) {
-    AERROR << "Read header section fail, file is broken of it is not a record "
-              "file.";
+    AERROR << "Failed to read header section, file is broken or it is not a "
+              "record file.";
     return false;
   }
   if (section.type != SectionType::SECTION_HEADER) {
@@ -72,12 +72,12 @@ bool RecordFileReader::ReadHeader() {
     return false;
   }
   if (!ReadSection<Header>(section.size, &header_)) {
-    AERROR << "Read header section fail, file is broken or it is not a record "
-              "file.";
+    AERROR << "Failed to read header section, file is broken or it is not a "
+              "record file.";
     return false;
   }
   if (!SetPosition(sizeof(struct Section) + HEADER_LENGTH)) {
-    AERROR << "Skip bytes for reaching the nex section failed.";
+    AERROR << "Skip bytes for reaching the next section failed.";
     return false;
   }
   return true;
@@ -94,8 +94,7 @@ bool RecordFileReader::ReadIndex() {
   }
   Section section;
   if (!ReadSection(&section)) {
-    AERROR << "Read index section fail, maybe file is broken."
-              "file.";
+    AERROR << "Failed to read index section, maybe file is broken."
     return false;
   }
   if (section.type != SectionType::SECTION_INDEX) {
@@ -105,7 +104,7 @@ bool RecordFileReader::ReadIndex() {
     return false;
   }
   if (!ReadSection<Index>(section.size, &index_)) {
-    AERROR << "Read index section fail.";
+    AERROR << "Failed to read index section.";
     return false;
   }
   Reset();

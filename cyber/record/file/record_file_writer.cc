@@ -32,13 +32,13 @@ RecordFileWriter::~RecordFileWriter() { Close(); }
 bool RecordFileWriter::Open(const std::string& path) {
   std::lock_guard<std::mutex> lock(mutex_);
   path_ = path;
-  if (::apollo::cyber::common::PathExists(path_)) {
-    AWARN << "File exist and overwrite, file: " << path_;
+  if (common::PathExists(path_)) {
+    AWARN << "File exist and overwrite. file: " << path_;
   }
   fd_ = open(path_.data(), O_CREAT | O_WRONLY,
              S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
   if (fd_ < 0) {
-    AERROR << "Open file failed, file: " << path_ << ", fd: " << fd_
+    AERROR << "Failed to open file: " << path_ << ", fd: " << fd_
            << ", errno: " << errno;
     return false;
   }
@@ -80,16 +80,16 @@ void RecordFileWriter::Close() {
     }
 
     if (!WriteIndex()) {
-      AERROR << "Write index section failed, file: " << path_;
+      AERROR << "Failed to write index section. file: " << path_;
     }
 
     header_.set_is_complete(true);
     if (!WriteHeader(header_)) {
-      AERROR << "Overwrite header section failed, file: " << path_;
+      AERROR << "Failed to overwrite header section. file: " << path_;
     }
 
     if (close(fd_) < 0) {
-      AERROR << "Close file failed, file: " << path_ << ", fd: " << fd_
+      AERROR << "Failed to close file: " << path_ << ", fd: " << fd_
              << ", errno: " << errno;
       return;
     }
@@ -100,7 +100,7 @@ bool RecordFileWriter::WriteHeader(const Header& header) {
   std::lock_guard<std::mutex> lock(mutex_);
   header_ = header;
   if (!WriteSection<Header>(header_)) {
-    AERROR << "Write header section fail";
+    AERROR << "Failed to write header section.";
     return false;
   }
   return true;
@@ -108,7 +108,7 @@ bool RecordFileWriter::WriteHeader(const Header& header) {
 
 bool RecordFileWriter::WriteIndex() {
   std::lock_guard<std::mutex> lock(mutex_);
-  for (int i = 0; i < index_.indexes_size(); i++) {
+  for (int i = 0; i < index_.indexes_size(); ++i) {
     SingleIndex* single_index = index_.mutable_indexes(i);
     if (single_index->type() == SectionType::SECTION_CHANNEL) {
       ChannelCache* channel_cache = single_index->mutable_channel_cache();
@@ -121,7 +121,7 @@ bool RecordFileWriter::WriteIndex() {
   }
   header_.set_index_position(CurrentPosition());
   if (!WriteSection<Index>(index_)) {
-    AERROR << "Write section fail";
+    AERROR << "Failed to write section.";
     return false;
   }
   return true;
@@ -130,7 +130,7 @@ bool RecordFileWriter::WriteIndex() {
 bool RecordFileWriter::WriteChannel(const Channel& channel) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!WriteSection<Channel>(channel)) {
-    AERROR << "Write section fail";
+    AERROR << "Failed to write section.";
     return false;
   }
   header_.set_channel_number(header_.channel_number() + 1);
@@ -150,7 +150,7 @@ bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
                                   const ChunkBody& chunk_body) {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!WriteSection<ChunkHeader>(chunk_header)) {
-    AERROR << "Write chunk header fail";
+    AERROR << "Failed to write chunk header.";
     return false;
   }
   SingleIndex* single_index = index_.add_indexes();
@@ -163,7 +163,7 @@ bool RecordFileWriter::WriteChunk(const ChunkHeader& chunk_header,
   chunk_header_cache->set_raw_size(chunk_header.raw_size());
   single_index->set_allocated_chunk_header_cache(chunk_header_cache);
   if (!WriteSection<ChunkBody>(chunk_body)) {
-    AERROR << "Write chunk body fail";
+    AERROR << "Failed to write chunk body.";
     return false;
   }
   header_.set_chunk_number(header_.chunk_number() + 1);
@@ -186,7 +186,7 @@ bool RecordFileWriter::WriteMessage(const SingleMessage& message) {
   chunk_active_->add(message);
   auto it = channel_message_number_map_.find(message.channel_name());
   if (it != channel_message_number_map_.end()) {
-    it->second++;
+    ++it->second;
   } else {
     channel_message_number_map_.insert(
         std::make_pair(message.channel_name(), 1));
@@ -194,7 +194,7 @@ bool RecordFileWriter::WriteMessage(const SingleMessage& message) {
   bool need_flush = false;
   if (header_.chunk_interval() > 0 &&
       message.time() - chunk_active_->header_.begin_time() >
-          header_.chunk_interval()) {
+      header_.chunk_interval()) {
     need_flush = true;
   }
   if (header_.chunk_raw_size() > 0 &&
@@ -224,7 +224,7 @@ void RecordFileWriter::Flush() {
       continue;
     }
     if (!WriteChunk(chunk_flush_->header_, chunk_flush_->body_)) {
-      AERROR << "Write chunk fail.";
+      AERROR << "Failed to write chunk.";
     }
     chunk_flush_->clear();
   }
