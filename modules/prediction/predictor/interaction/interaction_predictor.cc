@@ -39,8 +39,7 @@ using apollo::prediction::math_util::EvaluateQuarticPolynomial;
 using apollo::prediction::math_util::EvaluateQuinticPolynomial;
 
 InteractionPredictor::InteractionPredictor() {
-  // TODO(kechxu) move constants to gflags
-  BuildADCTrajectory(1.0);
+  BuildADCTrajectory(FLAGS_collision_cost_time_resolution);
 }
 
 void InteractionPredictor::Predict(Obstacle* obstacle) {
@@ -99,6 +98,10 @@ void InteractionPredictor::BuildADCTrajectory(const double time_resolution) {
   auto adc_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
+  if (adc_trajectory_container == nullptr) {
+    AERROR << "Null adc trajectory container";
+    return;
+  }
   const auto& adc_trajectory = adc_trajectory_container->adc_trajectory();
   double curr_timestamp = 0.0;
   for (const TrajectoryPoint& point : adc_trajectory.trajectory_point()) {
@@ -243,9 +246,8 @@ double InteractionPredictor::ComputeTrajectoryCost(
     const Obstacle& obstacle,
     const LaneSequence& lane_sequence,
     const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
-  // TODO(kechxu) adjust and move to gflags
-  double centri_acc_weight = 1.0;
-  double collision_weight = 1.0;
+  double centri_acc_weight = FLAGS_centripedal_acceleration_cost_weight;
+  double collision_weight = FLAGS_collision_cost_weight;
   double total_cost = 0.0;
   double centri_acc_cost =
       CentripetalAccelerationCost(lane_sequence, lat_lon_polynomial_bundle);
@@ -267,8 +269,6 @@ double InteractionPredictor::CentripetalAccelerationCost(
 
   double cost_abs_sum = 0.0;
   double cost_sqr_sum = 0.0;
-  // TODO(kechxu) use flags
-  double time_resolution = 1.0;
   double curr_time = 0.0;
   while (curr_time < FLAGS_prediction_trajectory_time_length) {
     double s = EvaluateQuarticPolynomial(lon_coeffs, curr_time, 0,
@@ -279,7 +279,7 @@ double InteractionPredictor::CentripetalAccelerationCost(
     double centri_acc = v * v * kappa;
     cost_abs_sum += std::abs(centri_acc);
     cost_sqr_sum += centri_acc * centri_acc;
-    curr_time += time_resolution;
+    curr_time += FLAGS_collision_cost_time_resolution;
   }
   return cost_sqr_sum / (cost_abs_sum + FLAGS_double_precision);
 }
@@ -303,8 +303,8 @@ double InteractionPredictor::CollisionWithEgoVehicleCost(
     double adc_x = adc_trajectory_point.path_point().x();
     double adc_y = adc_trajectory_point.path_point().y();
     double distance = std::hypot(adc_x - pos_x, adc_y - pos_y);
-    // TODO(kechxu) adjust parameter
-    double cost = std::exp(-1.0 * distance * distance);
+    double cost = std::exp(-FLAGS_collision_cost_exp_coefficient *
+                           distance * distance);
     cost_abs_sum += std::abs(cost);
     cost_sqr_sum += cost * cost;
   }
@@ -317,8 +317,7 @@ bool InteractionPredictor::LowerRightOfWayThanEgo(
 }
 
 double InteractionPredictor::ComputeLikelihood(const double cost) {
-  // TODO(kechxu) adjust alpha
-  double alpha = 1.0;
+  double alpha = FLAGS_likelihood_exp_coefficient;
   return std::exp(-alpha * cost);
 }
 

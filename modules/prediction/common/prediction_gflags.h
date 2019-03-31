@@ -40,6 +40,7 @@ DECLARE_double(lane_search_radius);
 DECLARE_double(lane_search_radius_in_junction);
 DECLARE_double(junction_search_radius);
 DECLARE_double(pedestrian_nearby_lane_search_radius);
+DECLARE_int32(road_graph_max_search_horizon);
 
 // Scenario
 DECLARE_double(junction_distance_threshold);
@@ -147,7 +148,12 @@ DECLARE_double(cost_function_alpha);
 DECLARE_double(cost_function_sigma);
 DECLARE_bool(use_bell_curve_for_cost_function);
 
-DECLARE_int32(road_graph_max_search_horizon);
+// interaction predictor
+DECLARE_double(collision_cost_time_resolution);
+DECLARE_double(centripedal_acceleration_cost_weight);
+DECLARE_double(collision_cost_weight);
+DECLARE_double(collision_cost_exp_coefficient);
+DECLARE_double(likelihood_exp_coefficient);
 
 // scenario feature extraction
 DECLARE_double(lane_distance_threshold);
