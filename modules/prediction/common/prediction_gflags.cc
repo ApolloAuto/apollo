@@ -51,6 +51,8 @@ DEFINE_double(lane_search_radius_in_junction, 15.0,
 DEFINE_double(junction_search_radius, 1.0, "Search radius for a junction");
 DEFINE_double(pedestrian_nearby_lane_search_radius, 5.0,
               "Radius to determine if pedestrian-like obstacle is near lane.");
+DEFINE_int32(road_graph_max_search_horizon, 20,
+             "Maximal search depth for building road graph");
 
 // Scenario
 DEFINE_double(junction_distance_threshold, 10.0,
@@ -251,8 +253,17 @@ DEFINE_double(cost_function_sigma, 5.0,
 DEFINE_bool(use_bell_curve_for_cost_function, false,
             "Whether to use bell curve for the cost function or not.");
 
-DEFINE_int32(road_graph_max_search_horizon, 20,
-             "Maximal search depth for building road graph");
+// interaction predictor
+DEFINE_double(collision_cost_time_resolution, 1.0,
+              "The time resolution used to compute the collision cost");
+DEFINE_double(centripedal_acceleration_cost_weight, 1.0,
+              "The weight of the cost related to centripedal acceleration");
+DEFINE_double(collision_cost_weight, 1.0,
+              "The weight of the cost related to collision");
+DEFINE_double(collision_cost_exp_coefficient, 1.0,
+              "The coefficient in the collision exponential cost function");
+DEFINE_double(likelihood_exp_coefficient, 1.0,
+              "The coefficient in the likelihood exponential function");
 
 DEFINE_double(lane_distance_threshold, 3.0,
               "The threshold for distance to ego/neighbor lane "
