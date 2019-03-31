@@ -109,7 +109,8 @@ class InteractionPredictor : public SequencePredictor {
       const LaneSequence& lane_sequence,
       const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
 
-  bool LowerRightOfWayThanEgo(const Obstacle& obstacle);
+  bool LowerRightOfWayThanEgo(const Obstacle& obstacle,
+                              const LaneSequence& lane_sequence);
 
   double ComputeLikelihood(const double cost);
 
