@@ -83,7 +83,7 @@ class InteractionPredictor : public SequencePredictor {
 
   void Clear();
 
-  void BuildADCTrajectory(const double resolution);
+  void BuildADCTrajectory(const double time_resolution);
 
   bool DrawTrajectory(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,

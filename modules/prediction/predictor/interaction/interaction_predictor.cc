@@ -95,11 +95,18 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 
 void InteractionPredictor::Clear() { Predictor::Clear(); }
 
-void InteractionPredictor::BuildADCTrajectory(const double resolution) {
-  // auto adc_trajectory_container =
-  //     ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
-  //         AdapterConfig::PLANNING_TRAJECTORY);
-  // const auto& adc_trajectory = adc_trajectory_container->adc_trajectory();
+void InteractionPredictor::BuildADCTrajectory(const double time_resolution) {
+  auto adc_trajectory_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  const auto& adc_trajectory = adc_trajectory_container->adc_trajectory();
+  double curr_timestamp = 0.0;
+  for (const TrajectoryPoint& point : adc_trajectory.trajectory_point()) {
+    if (point.relative_time() + FLAGS_double_precision > curr_timestamp) {
+      adc_trajectory_.push_back(point);
+      curr_timestamp += time_resolution;
+    }
+  }
 }
 
 bool InteractionPredictor::DrawTrajectory(
