@@ -30,8 +30,8 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/common/util/util.h"
 #include "modules/planning/common/speed_profile_generator.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
@@ -66,10 +66,9 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
 
   // get overlap along reference line
   PathOverlap* current_stop_sign_overlap =
-      scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          stop_sign_overlap_id,
-          ReferenceLineInfo::STOP_SIGN);
+      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                stop_sign_overlap_id,
+                                                ReferenceLineInfo::STOP_SIGN);
   if (!current_stop_sign_overlap) {
     return FinishScenario();
   }

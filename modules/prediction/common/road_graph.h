@@ -83,10 +83,9 @@ class RoadGraph {
    * @param The vector of lane infos
    * @return The pointer to the lane with the smallest average curvature
    */
-  std::shared_ptr<const hdmap::LaneInfo>
-  LaneWithSmallestAverageCurvature(
+  std::shared_ptr<const hdmap::LaneInfo> LaneWithSmallestAverageCurvature(
       const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lane_infos)
-  const;
+      const;
 
   /**
    * @brief Get the average curvature along a lane with the ID lane_id

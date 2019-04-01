@@ -167,8 +167,7 @@ class Frame {
 
   OpenSpaceInfo *mutable_open_space_info() { return open_space_info_.get(); }
 
-  perception::TrafficLight GetSignal(
-      const std::string& traffic_light_id) const;
+  perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
  private:
   common::Status InitFrameData();
@@ -210,7 +209,7 @@ class Frame {
   const ReferenceLineInfo *drive_reference_line_info_ = nullptr;
 
   ThreadSafeIndexedObstacles obstacles_;
-  std::unordered_map<std::string, const perception::TrafficLight*>
+  std::unordered_map<std::string, const perception::TrafficLight *>
       traffic_lights_;
 
   ChangeLaneDecider change_lane_decider_;

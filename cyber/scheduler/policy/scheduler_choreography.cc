@@ -50,14 +50,14 @@ SchedulerChoreography::SchedulerChoreography() {
   apollo::cyber::proto::CyberConfig cfg;
   if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
     const apollo::cyber::proto::ChoreographyConf& choreography_conf =
-          cfg.scheduler_conf().choreography_conf();
+        cfg.scheduler_conf().choreography_conf();
     proc_num_ = choreography_conf.choreography_processor_num();
     choreography_affinity_ = choreography_conf.choreography_affinity();
-    choreography_processor_policy_ = choreography_conf
-                                         .choreography_processor_policy();
+    choreography_processor_policy_ =
+        choreography_conf.choreography_processor_policy();
 
-    choreography_processor_prio_ = choreography_conf
-                                         .choreography_processor_prio();
+    choreography_processor_prio_ =
+        choreography_conf.choreography_processor_prio();
     ParseCpuset(choreography_conf.choreography_cpuset(), &choreography_cpuset_);
 
     task_pool_size_ = choreography_conf.pool_processor_num();

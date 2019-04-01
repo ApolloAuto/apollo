@@ -318,10 +318,10 @@ cc_library(
         "//modules/map/pnc_map",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
+        "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line:reference_line_provider",
-        "//modules/planning/common/util:util_lib",
         "@eigen",
     ],
 )

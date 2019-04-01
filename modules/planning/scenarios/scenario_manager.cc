@@ -221,8 +221,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
   for (const auto& traffic_light_overlap : traffic_light_overlaps) {
-    const double dist = traffic_light_overlap.start_s -
-        first_encountered_traffic_light.start_s;
+    const double dist =
+        traffic_light_overlap.start_s - first_encountered_traffic_light.start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
       next_traffic_lights.push_back(traffic_light_overlap);
     }
@@ -710,7 +710,8 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
   if (map_itr != first_encountered_overlap_map_.end()) {
-    PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+    PlanningContext::MutablePlanningStatus()
+        ->mutable_stop_sign()
         ->set_current_stop_sign_overlap_id(map_itr->second.object_id);
     ADEBUG << "Update PlanningContext with first_encountered stop sign["
            << map_itr->second.object_id << "] start_s["
@@ -759,7 +760,8 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const double dist =
         traffic_light_overlap.start_s - current_traffic_light_overlap_start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
-      PlanningContext::MutablePlanningStatus()->mutable_traffic_light()
+      PlanningContext::MutablePlanningStatus()
+          ->mutable_traffic_light()
           ->add_current_traffic_light_overlap_id(
               traffic_light_overlap.object_id);
       ADEBUG << "Update PlanningContext with first_encountered traffic_light["

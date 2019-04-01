@@ -120,8 +120,8 @@ void DeciderRuleBasedStop::CheckOpenSpacePreStop(
     if (!frame->open_space_info().pre_stop_rightaway_flag()) {
       // TODO(Jinyun) Use constant comfortable deacceleration rather than
       // distance by config to set stop fence
-      stop_line_s = adc_front_edge_s +
-          open_space_config.rightaway_stop_distance();
+      stop_line_s =
+          adc_front_edge_s + open_space_config.rightaway_stop_distance();
       if (std::abs(vehicle_state.linear_velocity()) <
           static_linear_velocity_epsilon) {
         stop_line_s = adc_front_edge_s;

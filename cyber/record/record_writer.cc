@@ -83,7 +83,7 @@ bool RecordWriter::SplitOutfile() {
     AERROR << "Failed to write header for record file: " << path_;
     return false;
   }
-  for (const auto &i : channel_message_number_map_) {
+  for (const auto& i : channel_message_number_map_) {
     Channel channel;
     channel.set_name(i.first);
     channel.set_message_type(channel_message_type_map_[i.first]);
