@@ -146,8 +146,7 @@ class AtomicHashMap {
 
     void Insert(K key, const V &value) {
       Entry *prev = nullptr;
-      Entry *target = nullptr;
-      Entry *new_entry = new Entry(key, value);
+      Entry *target = nullptr;    
       V *new_value = new V(value);
       while (true) {
         if (Find(key, &prev, &target)) {
@@ -156,11 +155,11 @@ class AtomicHashMap {
           if (target->value_ptr.compare_exchange_strong(
                   old_val_ptr, new_value, std::memory_order_acq_rel,
                   std::memory_order_relaxed)) {
-            delete new_entry;
             return;
           }
           continue;
         } else {
+          Entry *new_entry = new Entry(key, value);
           new_entry->next.store(target, std::memory_order_release);
           if (prev->next.compare_exchange_strong(target, new_entry,
                                                  std::memory_order_acq_rel,
@@ -177,7 +176,6 @@ class AtomicHashMap {
     void Insert(K key, V &&value) {
       Entry *prev = nullptr;
       Entry *target = nullptr;
-      Entry *new_entry = new Entry(key, value);
       auto new_value = new V(std::forward<V>(value));
       while (true) {
         if (Find(key, &prev, &target)) {
@@ -186,11 +184,11 @@ class AtomicHashMap {
           if (target->value_ptr.compare_exchange_strong(
                   old_val_ptr, new_value, std::memory_order_acq_rel,
                   std::memory_order_relaxed)) {
-            delete new_entry;
             return;
           }
           continue;
         } else {
+          Entry *new_entry = new Entry(key, value);
           new_entry->next.store(target, std::memory_order_release);
           if (prev->next.compare_exchange_strong(target, new_entry,
                                                  std::memory_order_acq_rel,
@@ -207,7 +205,6 @@ class AtomicHashMap {
     void Insert(K key) {
       Entry *prev = nullptr;
       Entry *target = nullptr;
-      Entry *new_entry = new Entry(key);
       auto new_value = new V();
       while (true) {
         if (Find(key, &prev, &target)) {
@@ -216,11 +213,11 @@ class AtomicHashMap {
           if (target->value_ptr.compare_exchange_strong(
                   old_val_ptr, new_value, std::memory_order_acq_rel,
                   std::memory_order_relaxed)) {
-            delete new_entry;
             return;
           }
           continue;
         } else {
+          Entry *new_entry = new Entry(key);
           new_entry->next.store(target, std::memory_order_release);
           if (prev->next.compare_exchange_strong(target, new_entry,
                                                  std::memory_order_acq_rel,
