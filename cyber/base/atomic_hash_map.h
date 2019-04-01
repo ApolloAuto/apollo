@@ -146,7 +146,7 @@ class AtomicHashMap {
 
     void Insert(K key, const V &value) {
       Entry *prev = nullptr;
-      Entry *target = nullptr;    
+      Entry *target = nullptr;
       V *new_value = new V(value);
       while (true) {
         if (Find(key, &prev, &target)) {
