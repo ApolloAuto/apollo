@@ -2,9 +2,10 @@ syntax = "proto2";
 
 package apollo.planning;
 
-import "modules/routing/proto/routing.proto";
 import "modules/common/proto/drive_state.proto";
 import "modules/common/proto/geometry.proto";
+import "modules/planning/proto/planning_config.proto";
+import "modules/routing/proto/routing.proto";
 
 /*
   This file defines the data types that represents the internal state of the
@@ -23,6 +24,10 @@ message ChangeLaneStatus {
   optional string path_id = 2;
   // the time stamp when the state started.
   optional double timestamp = 3;
+}
+
+message DestinationStatus {
+  optional bool has_passed_destination = 1 [default = false];
 }
 
 message StopTime {
@@ -70,6 +75,11 @@ message RightOfWayStatus {
   map<string, bool> junction = 1;
 }
 
+message ScenarioStatus {
+  optional ScenarioConfig.ScenarioType scenario_type = 1;
+  optional ScenarioConfig.StageType stage_type = 2;
+}
+
 message SidePassStatus {
   optional string front_blocking_obstacle_id = 1;
 }
@@ -85,9 +95,6 @@ message TrafficLightStatus {
   repeated string done_traffic_light_overlap_id = 2;
 }
 
-message DestinationStatus {
-  optional bool has_passed_destination = 1 [default = false];
-}
 
 message PlanningStatus {
   optional ChangeLaneStatus change_lane = 1;
@@ -97,8 +104,9 @@ message PlanningStatus {
   optional PullOverStatus pull_over = 5;
   optional ReroutingStatus rerouting = 6;
   optional RightOfWayStatus right_of_way = 7;
-  optional SidePassStatus side_pass = 8;
-  optional StopSignStatus stop_sign = 9;
-  optional TrafficLightStatus traffic_light = 10;
+  optional ScenarioStatus scenario = 8;
+  optional SidePassStatus side_pass = 9;
+  optional StopSignStatus stop_sign = 10;
+  optional TrafficLightStatus traffic_light = 11;
 
 }
