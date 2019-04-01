@@ -94,15 +94,10 @@ void ObstaclesPrioritizer::PrioritizeObstacles() {
   AssignCautionLevel();
 }
 
-void ObstaclesPrioritizer::AssignCautionLevel() {
-  AssignCautionLevelInCruise();
-}
-
 void ObstaclesPrioritizer::AssignIgnoreLevel() {
   auto obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
-
   if (obstacles_container == nullptr) {
     AERROR << "Obstacles container pointer is a null pointer.";
     return;
@@ -126,7 +121,6 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
   double pose_theta = pose_obstacle_ptr->theta();
   double pose_x = pose_obstacle_ptr->position().x();
   double pose_y = pose_obstacle_ptr->position().y();
-
   ADEBUG << "Get pose (" << pose_x << ", " << pose_y << ", " << pose_theta
          << ")";
 
@@ -137,7 +131,6 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
 
   const auto& obstacle_ids =
       obstacles_container->curr_frame_predictable_obstacle_ids();
-
   for (const int& obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
     if (obstacle_ptr->history_size() == 0) {
@@ -181,8 +174,8 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
   }
 }
 
-void ObstaclesPrioritizer::AssignCautionLevelInCruise() {
-  // TODO(kechxu) integrate change lane when ready to check change lane
+void ObstaclesPrioritizer::AssignCautionLevel() {
+  // TODO(kechxu): integrate change lane when ready to check change lane
   AssignCautionLevelCruiseKeepLane();
   AssignCautionLevelByEgoReferenceLine();
 }
@@ -205,6 +198,7 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
     AERROR << "Ego vehicle has no history";
     return;
   }
+  // TODO(Hongyi): using current frame when NearbyObstacles are ready
   const Feature& ego_latest_feature = ego_vehicle->feature(1);
   for (const LaneSequence& lane_sequence :
        ego_latest_feature.lane().lane_graph().lane_sequence()) {
@@ -284,37 +278,6 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseChangeLane() {
   }
 }
 
-void ObstaclesPrioritizer::AssignCautionLevelInJunction(
-    const std::shared_ptr<ScenarioFeatures> scenario_features) {
-  if (scenario_features->scenario().type() != Scenario::JUNCTION) {
-    ADEBUG << "Not in Junction Scenario";
-    return;
-  }
-  std::string junction_id = scenario_features->scenario().junction_id();
-  ObstaclesContainer* obstacles_container =
-      ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
-          AdapterConfig::PERCEPTION_OBSTACLES);
-  if (obstacles_container == nullptr) {
-    AERROR << "Null obstacles container found";
-    return;
-  }
-  Obstacle* ego_vehicle =
-      obstacles_container->GetObstacle(FLAGS_ego_vehicle_id);
-  if (ego_vehicle == nullptr) {
-    AERROR << "Ego vehicle not found";
-    return;
-  }
-  for (const int id :
-       obstacles_container->curr_frame_predictable_obstacle_ids()) {
-    Obstacle* obstacle_ptr = obstacles_container->GetObstacle(id);
-    if (obstacle_ptr != nullptr && obstacle_ptr->IsInJunction(junction_id)) {
-      obstacle_ptr->SetCaution();
-      ADEBUG << "SetCaution for obstacle [" << obstacle_ptr->id() << "]";
-    }
-  }
-  AssignCautionLevelByEgoReferenceLine();
-}
-
 void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
   ObstaclesContainer* obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
@@ -356,7 +319,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
   double ego_vehicle_l = std::numeric_limits<double>::max();
   double accumulated_s = 0.0;
   std::string ego_lane_id = "";
-  // first loop of lane_ids to findout ego_vehicle_s
+  // first loop for lane_ids to findout ego_vehicle_s
   for (const std::string& lane_id : lane_ids) {
     std::shared_ptr<const LaneInfo> lane_info_ptr =
         PredictionMap::LaneById(lane_id);
@@ -376,6 +339,7 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
     accumulated_s += lane_info_ptr->total_length();
   }
 
+  // insert ego_back_lane_id
   accumulated_s = 0.0;
   for (const std::string& lane_id : lane_ids) {
     ego_back_lane_id_set_.insert(lane_id);

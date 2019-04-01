@@ -32,19 +32,14 @@ class ObstaclesPrioritizer {
 
   static void PrioritizeObstacles();
 
- private:
   static void AssignIgnoreLevel();
 
   static void AssignCautionLevel();
 
-  static void AssignCautionLevelInCruise();
-
+ private:
   static void AssignCautionLevelCruiseKeepLane();
 
   static void AssignCautionLevelCruiseChangeLane();
-
-  static void AssignCautionLevelInJunction(
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
 
   static void AssignCautionLevelByEgoReferenceLine();
 
