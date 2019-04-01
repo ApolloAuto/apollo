@@ -86,28 +86,24 @@ class InteractionPredictor : public SequencePredictor {
   void BuildADCTrajectory(const double time_resolution);
 
   bool DrawTrajectory(
-    const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const LatLonPolynomialBundle& lat_lon_polynomial_bundle,
+    const Obstacle& obstacle,
+    const LaneSequence& lane_sequence,
+    const double lon_acceleration,
     const double total_time, const double period,
     std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
-
-  bool SampleTrajectoryPolynomials(
-      const Obstacle& obstacle,
-      const LaneSequence& lane_sequence,
-      std::vector<LatLonPolynomialBundle>* lat_lon_polynomial_bundles);
 
   double ComputeTrajectoryCost(
       const Obstacle& obstacle,
       const LaneSequence& lane_sequence,
-      const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
+      const double acceleration);
 
   double CentripetalAccelerationCost(
       const LaneSequence& lane_sequence,
-      const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
+      const double speed, const double acceleration);
 
   double CollisionWithEgoVehicleCost(
       const LaneSequence& lane_sequence,
-      const LatLonPolynomialBundle& lat_lon_polynomial_bundle);
+      const double speed, const double acceleration);
 
   bool LowerRightOfWayThanEgo(const Obstacle& obstacle,
                               const LaneSequence& lane_sequence);
