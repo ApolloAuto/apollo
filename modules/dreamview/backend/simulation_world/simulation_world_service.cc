@@ -1015,7 +1015,8 @@ void SimulationWorldService::UpdateSimulationWorld(
     const NavigationInfo &navigation_info) {
   static double previous_timestamp = 0.0;
   double topic_timestamp = navigation_info.header().timestamp_sec();
-  if (previous_timestamp == topic_timestamp) {
+  if (std::fabs(
+      previous_timestamp - topic_timestamp) < common::math::kMathEpsilon) {
     // it seems to be the same topic, ignore this update
     return;
   }
