@@ -21,7 +21,7 @@
 #ifndef MODULES_CONFIGS_CPU_BIND_H_
 #define MODULES_CONFIGS_CPU_BIND_H_
 
-#include <string.h>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -43,7 +43,7 @@ namespace common {
  * The binding rules are defined in modules/common/data/cpu_set.json
  */
 class CpuBindHelper {
-public:
+ public:
   /**
    * @brief Load the content of the binding rules file into memory.
    * Then, process function can call BindCpu function to bind cpu with
@@ -59,7 +59,7 @@ public:
    */
   void BindCpu(const std::string& module_name);
 
-private:
+ private:
   std::unordered_map<std::string, std::vector<int>> bindrule_map_;
   bool init_ = false;
 

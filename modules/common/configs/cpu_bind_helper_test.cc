@@ -16,11 +16,11 @@
 
 #include "modules/common/configs/cpu_bind_helper.h"
 
+#include <sched.h>
+#include <unistd.h>
+
 #include <cmath>
 #include <string>
-
-#include <unistd.h>
-#include <sched.h>
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
