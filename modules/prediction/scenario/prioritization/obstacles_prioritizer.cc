@@ -172,6 +172,7 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
           ObstaclePriority::NORMAL);
     }
   }
+  obstacles_container->SetConsideredObstacleIds();
 }
 
 void ObstaclesPrioritizer::AssignCautionLevel() {

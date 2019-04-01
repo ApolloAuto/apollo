@@ -121,7 +121,7 @@ void RightOfWay::Analyze() {
 
   // then loop through all obstacle vehicles
   for (const int id :
-       obstacles_container->curr_frame_predictable_obstacle_ids()) {
+       obstacles_container->curr_frame_considered_obstacle_ids()) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       continue;
