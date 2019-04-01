@@ -48,19 +48,25 @@ class SidePassScenario : public Scenario {
   bool IsTransferable(const Scenario& current_scenario,
                       const Frame& frame) override;
 
+  static bool IsTransferable(const Frame& frame,
+                             const ScenarioConfig& config,
+                             const Scenario& current_scenario);
+
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
 
  private:
   static void RegisterStages();
 
-  bool IsSidePassScenario(const Frame& frame);
+  static bool IsSidePassScenario(const Frame& frame,
+                                 const ScenarioConfig& config);
 
-  bool IsFarFromIntersection(const Frame& frame);
+  static bool IsFarFromIntersection(const Frame& frame);
 
-  bool IsFarFromDestination(const Frame& frame);
+  static bool IsFarFromDestination(const Frame& frame);
 
-  bool HasBlockingObstacle(const Frame& frame);
+  static bool HasBlockingObstacle(const Frame& frame,
+                                  const ScenarioConfig& config);
 
  private:
   static apollo::common::util::Factory<
