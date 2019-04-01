@@ -45,9 +45,6 @@ class SidePassScenario : public Scenario {
   SidePassScenario(const ScenarioConfig& config,
                    const ScenarioContext* scenario_context);
 
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
-
   static bool IsTransferable(const Frame& frame,
                              const ScenarioConfig& config,
                              const Scenario& current_scenario);

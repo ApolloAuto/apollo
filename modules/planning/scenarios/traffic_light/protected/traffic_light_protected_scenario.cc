@@ -109,11 +109,6 @@ std::unique_ptr<Stage> TrafficLightProtectedScenario::CreateStage(
   return ptr;
 }
 
-bool TrafficLightProtectedScenario::IsTransferable(
-    const Scenario& current_scenario, const Frame& frame) {
-  return false;
-}
-
 /*
  * read scenario specific configs and set in context_ for stages to read
  */
