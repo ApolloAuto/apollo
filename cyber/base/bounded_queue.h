@@ -173,9 +173,10 @@ bool BoundedQueue<T>::WaitEnqueue(const T& element) {
       return true;
     }
     if (wait_strategy_->EmptyWait()) {
-        continue;
+      continue;
     }
     // wait timeout
+    break;
   }
 
   return false;
@@ -191,6 +192,7 @@ bool BoundedQueue<T>::WaitEnqueue(T&& element) {
       continue;
     }
     // wait timeout
+    break;
   }
 
   return false;
@@ -206,6 +208,7 @@ bool BoundedQueue<T>::WaitDequeue(T* element) {
         continue;
     }
     // wait timeout
+    break;
   }
 
   return false;
