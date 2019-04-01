@@ -338,7 +338,7 @@ double SequencePredictor::GetLaneSequenceCurvatureByS(
       return lane_info_ptr->Curvature(lane_s);
     }
   }
-  AERROR << "Cannot find curvature by lane s";
+  ADEBUG << "Outside lane sequence range, use 0.0 to approximate.";
   return 0.0;
 }
 
