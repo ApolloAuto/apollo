@@ -89,21 +89,16 @@ int NearestBackwardObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
 
 }  // namespace
 
-void ObstaclesPrioritizer::PrioritizeObstacles(
-    const EnvironmentFeatures& environment_features,
-    const std::shared_ptr<ScenarioFeatures> scenario_features) {
-  AssignIgnoreLevel(environment_features, scenario_features);
-  AssignCautionLevel(scenario_features);
+void ObstaclesPrioritizer::PrioritizeObstacles() {
+  AssignIgnoreLevel();
+  AssignCautionLevel();
 }
 
-void ObstaclesPrioritizer::AssignCautionLevel(
-    const std::shared_ptr<ScenarioFeatures> scenario_features) {
-  AssignCautionLevelInCruise(scenario_features);
+void ObstaclesPrioritizer::AssignCautionLevel() {
+  AssignCautionLevelInCruise();
 }
 
-void ObstaclesPrioritizer::AssignIgnoreLevel(
-    const EnvironmentFeatures& environment_features,
-    const std::shared_ptr<ScenarioFeatures> ptr_scenario_features) {
+void ObstaclesPrioritizer::AssignIgnoreLevel() {
   auto obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
@@ -186,8 +181,7 @@ void ObstaclesPrioritizer::AssignIgnoreLevel(
   }
 }
 
-void ObstaclesPrioritizer::AssignCautionLevelInCruise(
-    const std::shared_ptr<ScenarioFeatures> scenario_features) {
+void ObstaclesPrioritizer::AssignCautionLevelInCruise() {
   // TODO(kechxu) integrate change lane when ready to check change lane
   AssignCautionLevelCruiseKeepLane();
   AssignCautionLevelByEgoReferenceLine();
