@@ -48,7 +48,7 @@ TEST_F(FreeMovePredictorTest, General) {
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(15);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   FreeMovePredictor predictor;
   predictor.Predict(obstacle_ptr);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();

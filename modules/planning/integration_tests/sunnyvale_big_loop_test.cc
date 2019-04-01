@@ -597,10 +597,9 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
       PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::CROSSWALK);
   double stop_timeout = crosswalk_config->crosswalk().stop_timeout();
   double wait_time = stop_timeout + 0.5;
-  for (int i = 0; i < crosswalk_status->stop_time_size(); ++i) {
-    auto stop_time = crosswalk_status->mutable_stop_time(i);
-    if (stop_time->obstacle_id() == "11652") {
-      stop_time->set_obstacle_stop_timestamp(Clock::NowInSeconds() - wait_time);
+  for (auto& stop_time : *crosswalk_status->mutable_stop_time()) {
+    if (stop_time.obstacle_id() == "11652") {
+      stop_time.set_obstacle_stop_timestamp(Clock::NowInSeconds() - wait_time);
     }
   }
 
@@ -698,8 +697,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
 
   // check PlanningStatus value: PULL OVER
   auto* planning_status = PlanningContext::MutablePlanningStatus();
-  EXPECT_TRUE(planning_status->has_pull_over() &&
-              planning_status->pull_over().in_pull_over());
+  EXPECT_TRUE(planning_status->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_status->pull_over().reason());
 
   common::PointENU start_point_0 = planning_status->pull_over().start_point();
@@ -711,8 +709,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   // check PULL OVER decision
   RUN_GOLDEN_TEST_DECISION(1);
 
-  EXPECT_TRUE(planning_status->has_pull_over() &&
-              planning_status->pull_over().in_pull_over());
+  EXPECT_TRUE(planning_status->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_status->pull_over().reason());
 
   common::PointENU start_point_1 = planning_status->pull_over().start_point();
@@ -765,8 +762,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
 
   // check PlanningStatus value: PULL OVER
   auto* planning_status = PlanningContext::MutablePlanningStatus();
-  EXPECT_TRUE(planning_status->has_pull_over() &&
-              planning_status->pull_over().in_pull_over());
+  EXPECT_TRUE(planning_status->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_status->pull_over().reason());
 
   // step 2: pull over failed, stop inlane
