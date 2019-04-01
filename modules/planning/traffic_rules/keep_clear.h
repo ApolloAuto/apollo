@@ -39,6 +39,9 @@ class KeepClear : public TrafficRule {
                            ReferenceLineInfo* const reference_line_info);
 
  private:
+  bool IsCreeping(const double pnc_junction_start_s,
+                  const double adc_front_edge_s) const;
+
   bool BuildKeepClearObstacle(Frame* const frame,
                               ReferenceLineInfo* const reference_line_info,
                               const std::string& virtual_obstacle_id,
