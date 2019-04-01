@@ -42,7 +42,6 @@ void CpuBindHelper::Init(const std::string &config_file) {
       const std::string module_name = module_node["module"].as<std::string>();
       const std::size_t core_size = module_node["cores"].size();
       std::vector<int> core_list(core_size);
-      core_list.resize(core_size);
       for (std::size_t j = 0; j < core_size; ++j) {
         core_list[j] = module_node["cores"][j].as<int>();
       }
