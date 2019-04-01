@@ -47,6 +47,8 @@ class StGraphData {
 
   const std::vector<const STBoundary*>& st_boundaries() const;
 
+  double min_s_on_st_boundaries() const;
+
   const apollo::common::TrajectoryPoint& init_point() const;
 
   const SpeedLimit& speed_limit() const;

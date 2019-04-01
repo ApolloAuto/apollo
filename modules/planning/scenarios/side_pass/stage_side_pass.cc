@@ -20,6 +20,8 @@
 
 #include "modules/planning/scenarios/side_pass/stage_side_pass.h"
 
+#include <algorithm>
+#include <limits>
 #include <utility>
 #include <vector>
 
@@ -137,11 +139,15 @@ Status StageSidePass::PlanFallbackTrajectory(
 
   AERROR << "Speed fallback due to algorithm failure";
   // TODO(Jinyun) calculate front clear distance for fixed distance fallback
-  const double stop_distance =
+  const double stop_path_distance =
       reference_line_info->path_data().discretized_path().Length();
+  const double stop_speed_distance =
+      reference_line_info->st_graph_data().is_initialized()
+          ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
+          : std::numeric_limits<double>::infinity();
   *reference_line_info->mutable_speed_data() =
       SpeedProfileGenerator::GenerateFallbackSpeedProfileWithStopDistance(
-          stop_distance);
+          std::min(stop_path_distance, stop_speed_distance));
   reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
   reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
 
