@@ -40,8 +40,7 @@ void ScenarioManager::Run() {
   current_scenario_ = ptr_scenario_features->scenario();
 
   if (FLAGS_enable_prioritize_obstacles) {
-    ObstaclesPrioritizer::PrioritizeObstacles(environment_features,
-                                              ptr_scenario_features);
+    ObstaclesPrioritizer::PrioritizeObstacles();
   }
   // TODO(all) other functionalities including lane, junction filters
 }

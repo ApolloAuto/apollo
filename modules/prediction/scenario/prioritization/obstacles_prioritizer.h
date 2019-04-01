@@ -30,20 +30,14 @@ class ObstaclesPrioritizer {
  public:
   ObstaclesPrioritizer() = delete;
 
-  static void PrioritizeObstacles(
-      const EnvironmentFeatures& environment_features,
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
+  static void PrioritizeObstacles();
 
  private:
-  static void AssignIgnoreLevel(
-      const EnvironmentFeatures& environment_features,
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
+  static void AssignIgnoreLevel();
 
-  static void AssignCautionLevel(
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
+  static void AssignCautionLevel();
 
-  static void AssignCautionLevelInCruise(
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
+  static void AssignCautionLevelInCruise();
 
   static void AssignCautionLevelCruiseKeepLane();
 
