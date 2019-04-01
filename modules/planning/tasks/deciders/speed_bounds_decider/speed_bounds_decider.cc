@@ -16,6 +16,7 @@
 
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 
+#include <limits>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -120,18 +121,24 @@ Status SpeedBoundsDecider::Process(
   }
 
   std::vector<const STBoundary *> boundaries;
+  double min_s = std::numeric_limits<double>::infinity();
   for (auto *obstacle : path_decision->obstacles().Items()) {
-    auto id = obstacle->Id();
-    if (!obstacle->st_boundary().IsEmpty()) {
-      if (obstacle->st_boundary().boundary_type() ==
-          STBoundary::BoundaryType::KEEP_CLEAR) {
+    const auto &id = obstacle->Id();
+    const auto &st_boundary = obstacle->st_boundary();
+    if (!st_boundary.IsEmpty()) {
+      if (min_s > st_boundary.min_s()) {
+        min_s = st_boundary.min_s();
+      }
+      if (st_boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
         path_decision->Find(id)->SetBlockingObstacle(false);
       } else {
         path_decision->Find(id)->SetBlockingObstacle(true);
       }
-      boundaries.push_back(&obstacle->st_boundary());
+      boundaries.push_back(&st_boundary);
     }
   }
+
+  const double min_s_on_st_boundaries = min_s;
 
   // 3. Create speed limit along path
   SpeedLimitDecider speed_limit_decider(adc_sl_boundary, speed_bounds_config_,
@@ -161,9 +168,9 @@ Status SpeedBoundsDecider::Process(
   auto *debug = reference_line_info_->mutable_debug();
   STGraphDebug *st_graph_debug = debug->mutable_planning_data()->add_st_graph();
 
-  st_graph_data->LoadData(boundaries, init_point, speed_limit, path_data_length,
-                          path_length_by_conf, total_time_by_conf,
-                          st_graph_debug);
+  st_graph_data->LoadData(boundaries, min_s_on_st_boundaries, init_point,
+                          speed_limit, path_data_length, path_length_by_conf,
+                          total_time_by_conf, st_graph_debug);
 
   // Create and record st_graph debug info
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
@@ -181,7 +188,8 @@ bool SpeedBoundsDecider::CheckSidePassStop(
       PathData::PathPointType::UNKNOWN;
   for (const auto &point_guide : path_point_decision_guide) {
     if (last_path_point_type == PathData::PathPointType::IN_LANE &&
-        std::get<1>(point_guide) == PathData::PathPointType::OUT_ON_REVERSE_LANE) {
+        std::get<1>(point_guide) ==
+            PathData::PathPointType::OUT_ON_REVERSE_LANE) {
       *stop_s_on_pathdata = std::get<0>(point_guide);
       // Approximate the stop fence s based on the vehicle position
       const auto &vehicle_config =
