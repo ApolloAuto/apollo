@@ -46,6 +46,14 @@ OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig &config)
 Status OpenSpaceRoiDecider::Process(Frame *frame) {
   // TODO(Jinyun) only run GetOpenSpaceROI() at the first frame of
   // open space planner to save computation effort
+
+  if (frame == nullptr) {
+    const std::string msg =
+        "Invalid frame, fail to process the OpenSpaceRoiDecider.";
+    AERROR << msg;
+    return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+
   vehicle_state_ = frame->vehicle_state();
   ROI_parking_boundary_.clear();
   obstacles_by_frame_ = frame->GetObstacleList();
@@ -461,18 +469,29 @@ void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
   }
 }
 
-// TODO(Jinyun) Deprecate because of duplicate code in valet parking scenario
 bool OpenSpaceRoiDecider::GetMapInfo(
     Frame *frame, ParkingSpaceInfoConstPtr *target_parking_spot,
     std::shared_ptr<Path> *nearby_path) {
+  if (frame == nullptr) {
+    AERROR << "Invalid frame, fail to GetMapInfo from frame. ";
+    return false;
+  }
+
   auto point = common::util::MakePointENU(
       vehicle_state_.x(), vehicle_state_.y(), vehicle_state_.z());
   LaneInfoConstPtr nearest_lane;
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
   // Check if last frame lane is avaiable
-  const auto &previous_open_space_info =
-      FrameHistory::Instance()->Latest()->open_space_info();
+  const auto &ptr_last_frame = FrameHistory::Instance()->Latest();
+
+  if (ptr_last_frame == nullptr) {
+    AERROR << "Last frame failed, fail to GetMapInfo from frame "
+              "history.";
+    return false;
+  }
+
+  const auto &previous_open_space_info = ptr_last_frame->open_space_info();
   if (previous_open_space_info.target_parking_lane() != nullptr &&
       previous_open_space_info.target_parking_spot_id() ==
           frame->open_space_info().target_parking_spot_id()) {

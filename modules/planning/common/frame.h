@@ -163,9 +163,9 @@ class Frame {
 
   ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
 
-  const OpenSpaceInfo &open_space_info() const { return *open_space_info_; }
+  const OpenSpaceInfo &open_space_info() const { return open_space_info_; }
 
-  OpenSpaceInfo *mutable_open_space_info() { return open_space_info_.get(); }
+  OpenSpaceInfo *mutable_open_space_info() { return &open_space_info_; }
 
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
@@ -222,7 +222,7 @@ class Frame {
 
   const ReferenceLineProvider *reference_line_provider_ = nullptr;
 
-  std::unique_ptr<OpenSpaceInfo> open_space_info_;
+  OpenSpaceInfo open_space_info_;
 
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
