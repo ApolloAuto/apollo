@@ -112,6 +112,17 @@ class ObstaclesContainer : public Container {
   const std::vector<int>& curr_frame_non_predictable_obstacle_ids();
 
   /**
+   * @brief Get non-ignore obstacle IDs in the current frame
+   * @return Non-ignore obstacle IDs in the current frame
+   */
+  const std::vector<int>& curr_frame_considered_obstacle_ids();
+
+  /*
+   * @brief Set non-ignore obstacle IDs in the current frame
+   */
+  void SetConsideredObstacleIds();
+
+  /**
    * @brief Get current frame obstacle IDs in the current frame
    * @return Current frame obstacle IDs in the current frame
    */
@@ -146,6 +157,7 @@ class ObstaclesContainer : public Container {
   common::util::LRUCache<int, int> id_mapping_;
   std::vector<int> curr_frame_predictable_obstacle_ids_;
   std::vector<int> curr_frame_non_predictable_obstacle_ids_;
+  std::vector<int> curr_frame_considered_obstacle_ids_;
   // perception_id -> prediction_id
   std::unordered_map<int, int> curr_frame_id_mapping_;
   // prediction_id -> perception_obstacle

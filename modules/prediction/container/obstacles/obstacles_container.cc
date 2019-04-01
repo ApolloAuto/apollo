@@ -42,6 +42,7 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   curr_frame_id_mapping_.clear();
   curr_frame_predictable_obstacle_ids_.clear();
   curr_frame_non_predictable_obstacle_ids_.clear();
+  curr_frame_considered_obstacle_ids_.clear();
   curr_frame_id_perception_obstacle_map_.clear();
 
   PerceptionObstacles perception_obstacles;
@@ -166,6 +167,27 @@ ObstaclesContainer::curr_frame_predictable_obstacle_ids() {
 const std::vector<int>&
 ObstaclesContainer::curr_frame_non_predictable_obstacle_ids() {
   return curr_frame_non_predictable_obstacle_ids_;
+}
+
+const std::vector<int>&
+ObstaclesContainer::curr_frame_considered_obstacle_ids() {
+  return curr_frame_considered_obstacle_ids_;
+}
+
+void ObstaclesContainer::SetConsideredObstacleIds() {
+  curr_frame_considered_obstacle_ids_.clear();
+  for (const int id : curr_frame_predictable_obstacle_ids_) {
+    Obstacle* obstacle_ptr = GetObstacle(id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle found.";
+      continue;
+    }
+    if (obstacle_ptr->ToIgnore()) {
+      ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
+      continue;
+    }
+    curr_frame_considered_obstacle_ids_.push_back(id);
+  }
 }
 
 std::vector<int> ObstaclesContainer::curr_frame_obstacle_ids() {
