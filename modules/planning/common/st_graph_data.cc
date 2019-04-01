@@ -48,6 +48,10 @@ const std::vector<const STBoundary*>& StGraphData::st_boundaries() const {
   return st_boundaries_;
 }
 
+double StGraphData::min_s_on_st_boundaries() const {
+  return min_s_on_st_boundaries_;
+}
+
 const TrajectoryPoint& StGraphData::init_point() const { return init_point_; }
 
 const SpeedLimit& StGraphData::speed_limit() const { return speed_limit_; }
