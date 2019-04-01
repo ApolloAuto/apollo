@@ -44,9 +44,9 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::time::Clock;
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
+using apollo::common::time::Clock;
 using apollo::prediction::PredictionObstacles;
 
 constexpr double kMathEpsilon = 1e-8;
@@ -490,14 +490,14 @@ void Frame::ReadTrafficLights() {
            << " seconds.";
     return;
   }
-  for (const auto& traffic_light : traffic_light_detection->traffic_light()) {
+  for (const auto &traffic_light : traffic_light_detection->traffic_light()) {
     traffic_lights_[traffic_light.id()] = &traffic_light;
   }
 }
 
 perception::TrafficLight Frame::GetSignal(
-    const std::string& traffic_light_id) const {
-  const auto* result =
+    const std::string &traffic_light_id) const {
+  const auto *result =
       apollo::common::util::FindPtrOrNull(traffic_lights_, traffic_light_id);
   if (result == nullptr) {
     perception::TrafficLight traffic_light;

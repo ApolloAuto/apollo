@@ -46,24 +46,25 @@ Status DeciderCreep::Process(Frame* frame,
   CHECK_NOTNULL(reference_line_info);
 
   double stop_line_s = 0.0;
-  const std::string stop_sign_overlap_id =
-      PlanningContext::Planningstatus().stop_sign()
-          .current_stop_sign_overlap_id();
+  const std::string stop_sign_overlap_id = PlanningContext::Planningstatus()
+                                               .stop_sign()
+                                               .current_stop_sign_overlap_id();
   if (!stop_sign_overlap_id.empty()) {
     // get overlap along reference line
     PathOverlap* current_stop_sign_overlap =
-        scenario::util::GetOverlapOnReferenceLine(
-            *reference_line_info,
-            stop_sign_overlap_id,
-            ReferenceLineInfo::STOP_SIGN);
+        scenario::util::GetOverlapOnReferenceLine(*reference_line_info,
+                                                  stop_sign_overlap_id,
+                                                  ReferenceLineInfo::STOP_SIGN);
     if (current_stop_sign_overlap) {
       stop_line_s = current_stop_sign_overlap->end_s;
     }
-  } else if (PlanningContext::Planningstatus().traffic_light()
-      .current_traffic_light_overlap_id_size() > 0) {
+  } else if (PlanningContext::Planningstatus()
+                 .traffic_light()
+                 .current_traffic_light_overlap_id_size() > 0) {
     // get overlap along reference line
     const std::string current_traffic_light_overlap_id =
-        PlanningContext::Planningstatus().traffic_light()
+        PlanningContext::Planningstatus()
+            .traffic_light()
             .current_traffic_light_overlap_id(0);
     PathOverlap* current_traffic_light_overlap =
         scenario::util::GetOverlapOnReferenceLine(

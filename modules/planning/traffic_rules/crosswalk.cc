@@ -202,8 +202,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   for (auto crosswalk_to_stop : crosswalks_to_stop) {
     // build stop decision
     const auto* crosswalk_overlap = crosswalk_to_stop.first;
-    ADEBUG << "BuildStopDecision: crosswalk["
-           << crosswalk_overlap->object_id
+    ADEBUG << "BuildStopDecision: crosswalk[" << crosswalk_overlap->object_id
            << "] start_s[" << crosswalk_overlap->start_s << "]";
     std::string virtual_obstacle_id =
         CROSSWALK_VO_ID_PREFIX + crosswalk_overlap->object_id;

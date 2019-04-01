@@ -49,7 +49,7 @@ FunInfoType LaneDetectionComponent::init_func_arry_[] = {
     {&LaneDetectionComponent::InitCameraFrames, "InitCameraFrames"},
     {&LaneDetectionComponent::InitProjectMatrix, "InitProjectMatrix"},
     {&LaneDetectionComponent::InitMotionService, "InitMotionService"},
-    {&LaneDetectionComponent::InitCameraListeners, "InitCameraListeners"} };
+    {&LaneDetectionComponent::InitCameraListeners, "InitCameraListeners"}};
 
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
@@ -190,7 +190,7 @@ bool LaneDetectionComponent::Init() {
 
   writer_ = node_->CreateWriter<PerceptionLanes>(output_lanes_channel_name_);
   if (!EXEC_ALL_FUNS(LaneDetectionComponent, this,
-    LaneDetectionComponent::init_func_arry_)) {
+                     LaneDetectionComponent::init_func_arry_)) {
     return false;
   }
   SetCameraHeightAndPitch();

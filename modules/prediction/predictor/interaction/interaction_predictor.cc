@@ -24,16 +24,16 @@
 #include "modules/common/adapters/proto/adapter_config.pb.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
-#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
+#include "modules/prediction/container/container_manager.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterConfig;
 using apollo::common::PathPoint;
 using apollo::common::Point3D;
 using apollo::common::TrajectoryPoint;
+using apollo::common::adapter::AdapterConfig;
 using apollo::hdmap::LaneInfo;
 using apollo::prediction::math_util::EvaluateQuarticPolynomial;
 using apollo::prediction::math_util::EvaluateQuinticPolynomial;
@@ -65,8 +65,8 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
   for (const LaneSequence& lane_sequence :
        feature_ptr->lane().lane_graph().lane_sequence()) {
     for (const double lon_acceleration : candidate_lon_accelerations) {
-      double cost = ComputeTrajectoryCost(*obstacle, lane_sequence,
-                                          lon_acceleration);
+      double cost =
+          ComputeTrajectoryCost(*obstacle, lane_sequence, lon_acceleration);
       if (cost < smallest_cost) {
         smallest_cost = cost;
         best_lon_acceleration = lon_acceleration;
@@ -86,11 +86,12 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
            feature_ptr->lane().lane_graph().lane_sequence_size());
   for (int i = 0; i < feature_ptr->lane().lane_graph().lane_sequence_size();
        ++i) {
-    double normalized_posterior = posteriors[i] /
-        (posterior_sum + FLAGS_double_precision);
-    feature_ptr->mutable_lane()->mutable_lane_graph()
-               ->mutable_lane_sequence(i)
-               ->set_probability(normalized_posterior);
+    double normalized_posterior =
+        posteriors[i] / (posterior_sum + FLAGS_double_precision);
+    feature_ptr->mutable_lane()
+        ->mutable_lane_graph()
+        ->mutable_lane_sequence(i)
+        ->set_probability(normalized_posterior);
     if (normalized_posterior > largest_posterior) {
       largest_posterior = normalized_posterior;
       best_seq_idx = i;
@@ -204,8 +205,8 @@ bool InteractionPredictor::DrawTrajectory(
     trajectory_point.set_relative_time(relative_time);
     trajectory_points->emplace_back(std::move(trajectory_point));
 
-    lane_s += std::max(0.0,
-        speed * period + 0.5 * lon_acceleration * period * period);
+    lane_s += std::max(
+        0.0, speed * period + 0.5 * lon_acceleration * period * period);
     speed += lon_acceleration * period;
 
     while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
@@ -233,7 +234,7 @@ double InteractionPredictor::ComputeTrajectoryCost(const Obstacle& obstacle,
   total_cost += centri_acc_weight * centri_acc_cost;
   if (LowerRightOfWayThanEgo(obstacle, lane_sequence)) {
     double collision_cost =
-      CollisionWithEgoVehicleCost(lane_sequence, speed, acceleration);
+        CollisionWithEgoVehicleCost(lane_sequence, speed, acceleration);
     total_cost += collision_weight * collision_cost;
   }
   return total_cost;
@@ -271,8 +272,8 @@ double InteractionPredictor::CollisionWithEgoVehicleCost(
     double adc_x = adc_trajectory_point.path_point().x();
     double adc_y = adc_trajectory_point.path_point().y();
     double distance = std::hypot(adc_x - pos_x, adc_y - pos_y);
-    double cost = std::exp(-FLAGS_collision_cost_exp_coefficient *
-                           distance * distance);
+    double cost =
+        std::exp(-FLAGS_collision_cost_exp_coefficient * distance * distance);
     cost_abs_sum += std::abs(cost);
     cost_sqr_sum += cost * cost;
   }
@@ -289,8 +290,8 @@ double InteractionPredictor::ComputeLikelihood(const double cost) {
   return std::exp(-alpha * cost);
 }
 
-double InteractionPredictor::ComputePosterior(
-    const double prior, const double likelihood) {
+double InteractionPredictor::ComputePosterior(const double prior,
+                                              const double likelihood) {
   return prior * likelihood;
 }
 

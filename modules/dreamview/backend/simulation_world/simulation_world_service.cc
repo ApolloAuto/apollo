@@ -466,9 +466,9 @@ void SimulationWorldService::UpdateSimulationWorld(const Gps &gps) {
 
     const auto &pose = gps.localization();
     gps_position->set_position_x(pose.position().x() +
-                                map_service_->GetXOffset());
+                                 map_service_->GetXOffset());
     gps_position->set_position_y(pose.position().y() +
-                                map_service_->GetYOffset());
+                                 map_service_->GetYOffset());
 
     double heading = apollo::common::math::QuaternionToHeading(
         pose.orientation().qw(), pose.orientation().qx(),

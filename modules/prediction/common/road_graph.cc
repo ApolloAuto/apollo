@@ -87,7 +87,9 @@ int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane) {
 RoadGraph::RoadGraph(const double start_s, const double length,
                      const bool consider_divide,
                      std::shared_ptr<const LaneInfo> lane_info_ptr)
-    : start_s_(start_s), length_(length), consider_divide_(consider_divide),
+    : start_s_(start_s),
+      length_(length),
+      consider_divide_(consider_divide),
       lane_info_ptr_(lane_info_ptr) {}
 
 Status RoadGraph::BuildLaneGraph(LaneGraph* const lane_graph_ptr) {
@@ -215,12 +217,12 @@ void RoadGraph::ComputeLaneSequence(
 std::shared_ptr<const hdmap::LaneInfo>
 RoadGraph::LaneWithSmallestAverageCurvature(
     const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lane_infos)
-const {
+    const {
   CHECK(!lane_infos.empty());
   size_t sample_size = FLAGS_sample_size_for_average_lane_curvature;
   std::shared_ptr<const hdmap::LaneInfo> selected_lane_info = lane_infos[0];
-  double smallest_curvature = AverageCurvature(
-      selected_lane_info->id().id(), sample_size);
+  double smallest_curvature =
+      AverageCurvature(selected_lane_info->id().id(), sample_size);
   for (size_t i = 1; i < lane_infos.size(); ++i) {
     std::shared_ptr<const hdmap::LaneInfo> lane_info = lane_infos[i];
     double curvature = AverageCurvature(lane_info->id().id(), sample_size);
@@ -232,8 +234,8 @@ const {
   return selected_lane_info;
 }
 
-double RoadGraph::AverageCurvature(
-    const std::string& lane_id, const size_t sample_size) const {
+double RoadGraph::AverageCurvature(const std::string& lane_id,
+                                   const size_t sample_size) const {
   CHECK_GT(sample_size, 0);
   std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr =
       PredictionMap::LaneById(lane_id);

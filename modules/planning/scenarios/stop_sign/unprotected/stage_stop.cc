@@ -67,10 +67,9 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   // refresh overlap along reference line
   PathOverlap* current_stop_sign_overlap =
-      scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          stop_sign_overlap_id,
-          ReferenceLineInfo::STOP_SIGN);
+      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                stop_sign_overlap_id,
+                                                ReferenceLineInfo::STOP_SIGN);
   if (!current_stop_sign_overlap) {
     return FinishScenario();
   }
@@ -124,7 +123,8 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
   for (const auto& perception_obstacle_id : watch_vehicle_ids) {
-    PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+    PlanningContext::MutablePlanningStatus()
+        ->mutable_stop_sign()
         ->add_wait_for_obstacle_id(perception_obstacle_id);
   }
 
@@ -182,7 +182,7 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     auto& vehicles = vehicle.second;
     for (const auto& perception_obstacle_id : vehicles) {
       // watched-vehicle info
-      const PerceptionObstacle *perception_obstacle =
+      const PerceptionObstacle* perception_obstacle =
           path_decision.FindPerceptionObstacle(perception_obstacle_id);
       if (!perception_obstacle) {
         ADEBUG << "mark ERASE obstacle_id["
@@ -212,9 +212,9 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     }
     for (const auto& perception_obstacle_id : remove_vehicles) {
       ADEBUG << "ERASE obstacle_id[" << perception_obstacle_id << "]";
-      vehicles.erase(std::remove(vehicles.begin(), vehicles.end(),
-                                 perception_obstacle_id),
-                                 vehicles.end());
+      vehicles.erase(
+          std::remove(vehicles.begin(), vehicles.end(), perception_obstacle_id),
+          vehicles.end());
     }
   }
 
@@ -230,10 +230,12 @@ Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   // update PlanningContext
-  PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+  PlanningContext::MutablePlanningStatus()
+      ->mutable_stop_sign()
       ->set_done_stop_sign_overlap_id(
           GetContext()->current_stop_sign_overlap_id);
-  PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+  PlanningContext::MutablePlanningStatus()
+      ->mutable_stop_sign()
       ->clear_wait_for_obstacle_id();
 
   GetContext()->creep_start_time = Clock::NowInSeconds();

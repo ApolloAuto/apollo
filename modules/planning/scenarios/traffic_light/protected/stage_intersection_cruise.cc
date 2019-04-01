@@ -52,10 +52,10 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
 
   // get overlap along reference line
   PathOverlap* current_traffic_light_overlap =
-        scenario::util::GetOverlapOnReferenceLine(
-            reference_line_info,
-            GetContext()->current_traffic_light_overlap_ids[0],
-            ReferenceLineInfo::SIGNAL);
+      scenario::util::GetOverlapOnReferenceLine(
+          reference_line_info,
+          GetContext()->current_traffic_light_overlap_ids[0],
+          ReferenceLineInfo::SIGNAL);
   if (!current_traffic_light_overlap) {
     return FinishStage();
   }

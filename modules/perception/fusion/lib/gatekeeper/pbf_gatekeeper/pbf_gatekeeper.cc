@@ -184,11 +184,11 @@ bool PbfGatekeeper::CameraAbleToPublish(const TrackPtr &track, bool is_night) {
         camera_object->GetBaseObject()->camera_supplement.local_center.norm();
     // If sub_type of object is traffic cone publish it regardless of range
     if ((camera_object->GetBaseObject()->sub_type ==
-             base::ObjectSubType::TRAFFICCONE) ||
+         base::ObjectSubType::TRAFFICCONE) ||
         (range >= params_.min_camera_publish_distance ||
-          ((camera_object->GetBaseObject()->type ==
-             base::ObjectType::UNKNOWN_UNMOVABLE) &&
-           (range >= params_.min_camera_publish_distance)))) {
+         ((camera_object->GetBaseObject()->type ==
+           base::ObjectType::UNKNOWN_UNMOVABLE) &&
+          (range >= params_.min_camera_publish_distance)))) {
       double exist_prob = track->GetExistanceProb();
       if (exist_prob > params_.existance_threshold) {
         static int cnt_cam = 1;

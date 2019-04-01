@@ -37,7 +37,8 @@ void ExtrapolationPredictor::Predict(Obstacle* obstacle) {
   trajectories_.push_back(std::move(trajectory));
 }
 
-void ExtrapolationPredictor::DrawShortTermTrajectory(const Feature& feature,
+void ExtrapolationPredictor::DrawShortTermTrajectory(
+    const Feature& feature,
     std::vector<apollo::common::TrajectoryPoint>* points) {
   for (const auto& point : feature.short_term_predicted_trajectory_points()) {
     points->push_back(point);
