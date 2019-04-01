@@ -240,7 +240,7 @@ void ProbabilisticFusion::CollectFusedObjects(
       obj->clone(*(fused_object->object));
       obj->track_id = tracks[i]->GetTrackId();
       std::shared_ptr<PbfSensorObject> pobj =
-          tracks[i]->GetLidarObject("lidar");
+          tracks[i]->GetLidarObject(fused_object->sensor_id);
       if (pobj != nullptr) {
         obj->local_lidar_track_id = pobj->object->track_id;
       }
