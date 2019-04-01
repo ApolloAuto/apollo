@@ -212,6 +212,16 @@ double EvaluateCubicPolynomial(const std::array<double, 4>& coefs,
   }
 }
 
+double GetSByConstantAcceleration(
+    const double v0, const double acceleration, const double t) {
+  if (acceleration > -FLAGS_double_precision) {
+    return v0 * t + 0.5 * acceleration * t * t;
+  }
+  double t_stop = v0 / (-acceleration);
+  double t_actual = std::min(t, t_stop);
+  return v0 * t_actual + 0.5 * acceleration * t_actual * t_actual;
+}
+
 }  // namespace math_util
 
 namespace predictor_util {

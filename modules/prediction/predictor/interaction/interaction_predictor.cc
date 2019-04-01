@@ -37,6 +37,7 @@ using apollo::common::TrajectoryPoint;
 using apollo::hdmap::LaneInfo;
 using apollo::prediction::math_util::EvaluateQuarticPolynomial;
 using apollo::prediction::math_util::EvaluateQuinticPolynomial;
+using apollo::prediction::math_util::GetSByConstantAcceleration;
 
 InteractionPredictor::InteractionPredictor() {
   BuildADCTrajectory(FLAGS_collision_cost_time_resolution);
@@ -48,46 +49,79 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
   CHECK_NOTNULL(obstacle);
   CHECK_GT(obstacle->history_size(), 0);
 
-  const Feature& feature = obstacle->latest_feature();
+  Feature* feature_ptr = obstacle->mutable_latest_feature();
 
-  if (!feature.has_lane() || !feature.lane().has_lane_graph()) {
+  if (!feature_ptr->has_lane() || !feature_ptr->lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
     return;
   }
 
+  std::vector<double> candidate_lon_accelerations =
+      {0.0, -0.5, -1.0, -1.5, -2.0, -2.5, -3.0};
+  double best_lon_acceleration = 0.0;
   double smallest_cost = std::numeric_limits<double>::max();
-  LatLonPolynomialBundle best_trajectory_lat_lon_bundle;
+  std::vector<double> posteriors;
+  double posterior_sum = 0.0;
   for (const LaneSequence& lane_sequence :
-       feature.lane().lane_graph().lane_sequence()) {
-    std::vector<LatLonPolynomialBundle> trajectory_lat_lon_bundles;
-    SampleTrajectoryPolynomials(*obstacle, lane_sequence,
-        &trajectory_lat_lon_bundles);
-    for (const auto& trajectory_lat_lon_bundle : trajectory_lat_lon_bundles) {
+       feature_ptr->lane().lane_graph().lane_sequence()) {
+    for (const double lon_acceleration : candidate_lon_accelerations) {
       double cost = ComputeTrajectoryCost(*obstacle, lane_sequence,
-          trajectory_lat_lon_bundle);
+                                          lon_acceleration);
       if (cost < smallest_cost) {
         smallest_cost = cost;
-        best_trajectory_lat_lon_bundle = trajectory_lat_lon_bundle;
+        best_lon_acceleration = lon_acceleration;
       }
     }
 
     double likelihood = ComputeLikelihood(smallest_cost);
     double prior = lane_sequence.probability();
     double posterior = ComputePosterior(prior, likelihood);
+    posteriors.push_back(posterior);
+    posterior_sum += posterior;
+  }
 
-    double probability_threshold = 0.5;
-    if (posterior < probability_threshold) {
-      continue;
+  int best_seq_idx = 0;
+  double largest_posterior = 0.0;
+  CHECK_EQ(posteriors.size(),
+           feature_ptr->lane().lane_graph().lane_sequence_size());
+  for (int i = 0; i < feature_ptr->lane().lane_graph().lane_sequence_size();
+       ++i) {
+    double normalized_posterior = posteriors[i] /
+        (posterior_sum + FLAGS_double_precision);
+    feature_ptr->mutable_lane()->mutable_lane_graph()
+               ->mutable_lane_sequence(i)
+               ->set_probability(normalized_posterior);
+    if (normalized_posterior > largest_posterior) {
+      largest_posterior = normalized_posterior;
+      best_seq_idx = i;
     }
+  }
 
-    std::vector<TrajectoryPoint> points;
-    DrawTrajectory(*obstacle, lane_sequence,
-        best_trajectory_lat_lon_bundle,
+  double probability_threshold = 0.5;
+  if (largest_posterior > probability_threshold) {
+    for (const LaneSequence& lane_sequence :
+         feature_ptr->lane().lane_graph().lane_sequence()) {
+      if (lane_sequence.probability() < probability_threshold) {
+        continue;
+      }
+      std::vector<TrajectoryPoint> points;
+      DrawTrajectory(*obstacle, lane_sequence,
+        best_lon_acceleration,
         FLAGS_prediction_trajectory_time_length,
         FLAGS_prediction_trajectory_time_resolution,
         &points);
     Trajectory trajectory = GenerateTrajectory(points);
-    trajectory.set_probability(posterior);
+    trajectories_.push_back(std::move(trajectory));
+    }
+  } else {
+    std::vector<TrajectoryPoint> points;
+    DrawTrajectory(*obstacle,
+        feature_ptr->lane().lane_graph().lane_sequence(best_seq_idx),
+        best_lon_acceleration,
+        FLAGS_prediction_trajectory_time_length,
+        FLAGS_prediction_trajectory_time_resolution,
+        &points);
+    Trajectory trajectory = GenerateTrajectory(points);
     trajectories_.push_back(std::move(trajectory));
   }
 }
@@ -113,8 +147,9 @@ void InteractionPredictor::BuildADCTrajectory(const double time_resolution) {
 }
 
 bool InteractionPredictor::DrawTrajectory(
-    const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const LatLonPolynomialBundle& trajectory_lat_lon_bundle,
+    const Obstacle& obstacle,
+    const LaneSequence& lane_sequence,
+    const double lon_acceleration,
     const double total_time, const double period,
     std::vector<TrajectoryPoint>* trajectory_points) {
   // Sanity check.
@@ -128,18 +163,8 @@ bool InteractionPredictor::DrawTrajectory(
     return false;
   }
 
-  // Evaluate all candidates using the cost function and select the best one.
-
-  // Set up some initial conditions.
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
-
-  std::array<double, 6> lateral_coeffs =
-      trajectory_lat_lon_bundle.lat_polynomial_coeffs();
-  std::array<double, 5> longitudinal_coeffs =
-      trajectory_lat_lon_bundle.lon_polynomial_coeffs();
-  double lon_end_t = trajectory_lat_lon_bundle.lon_end_t();
-  double lon_end_v = trajectory_lat_lon_bundle.lon_end_v();
-  double lat_end_t = trajectory_lat_lon_bundle.lat_end_t();
+  double speed = feature.speed();
 
   int lane_segment_index = 0;
   std::string lane_id =
@@ -151,43 +176,21 @@ bool InteractionPredictor::DrawTrajectory(
     AERROR << "Failed in getting lane s and lane l";
     return false;
   }
-  double prev_lane_l = lane_l;
-
-  // Draw each trajectory point within the total time of prediction
+  double approach_rate = FLAGS_go_approach_rate;
+  if (!lane_sequence.vehicle_on_lane()) {
+    approach_rate = FLAGS_cutin_approach_rate;
+  }
   size_t total_num = static_cast<size_t>(total_time / period);
   for (size_t i = 0; i < total_num; ++i) {
     double relative_time = static_cast<double>(i) * period;
     Eigen::Vector2d point;
     double theta = M_PI;
-
-    lane_l = EvaluateQuinticPolynomial(lateral_coeffs, relative_time, 0,
-                                       lat_end_t, 0.0);
-    double curr_s =
-        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 0,
-                                  lon_end_t, lon_end_v);
-    double prev_s = (i > 0) ? EvaluateQuarticPolynomial(
-                                  longitudinal_coeffs, relative_time - period,
-                                  0, lon_end_t, lon_end_v)
-                            : 0.0;
-    lane_s += std::max(0.0, (curr_s - prev_s));
-    if (curr_s + FLAGS_double_precision < prev_s) {
-      lane_l = prev_lane_l;
-    }
     if (!PredictionMap::SmoothPointFromLane(lane_id, lane_s, lane_l, &point,
                                             &theta)) {
       AERROR << "Unable to get smooth point from lane [" << lane_id
              << "] with s [" << lane_s << "] and l [" << lane_l << "]";
       break;
     }
-
-    prev_lane_l = lane_l;
-    double lane_speed =
-        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 1,
-                                  lon_end_t, lon_end_v);
-    double lane_acc =
-        EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 2,
-                                  lon_end_t, lon_end_v);
-
     TrajectoryPoint trajectory_point;
     PathPoint path_point;
     path_point.set_x(point.x());
@@ -196,10 +199,14 @@ bool InteractionPredictor::DrawTrajectory(
     path_point.set_theta(theta);
     path_point.set_lane_id(lane_id);
     trajectory_point.mutable_path_point()->CopyFrom(path_point);
-    trajectory_point.set_v(lane_speed);
-    trajectory_point.set_a(lane_acc);
+    trajectory_point.set_v(speed);
+    trajectory_point.set_a(lon_acceleration);
     trajectory_point.set_relative_time(relative_time);
     trajectory_points->emplace_back(std::move(trajectory_point));
+
+    lane_s += std::max(0.0,
+        speed * period + 0.5 * lon_acceleration * period * period);
+    speed += lon_acceleration * period;
 
     while (lane_s > PredictionMap::LaneById(lane_id)->total_length() &&
            lane_segment_index + 1 < lane_sequence.lane_segment_size()) {
@@ -207,54 +214,26 @@ bool InteractionPredictor::DrawTrajectory(
       lane_s = lane_s - PredictionMap::LaneById(lane_id)->total_length();
       lane_id = lane_sequence.lane_segment(lane_segment_index).lane_id();
     }
+
+    lane_l *= approach_rate;
   }
 
   return true;
 }
 
-bool InteractionPredictor::SampleTrajectoryPolynomials(
-    const Obstacle& obstacle,
-    const LaneSequence& lane_sequence,
-    std::vector<LatLonPolynomialBundle>* lat_lon_polynomial_bundles) {
-  lat_lon_polynomial_bundles->clear();
+double InteractionPredictor::ComputeTrajectoryCost(const Obstacle& obstacle,
+    const LaneSequence& lane_sequence, const double acceleration) {
   CHECK_GT(obstacle.history_size(), 0);
-  const Feature& feature = obstacle.latest_feature();
-  double curr_v = feature.speed();
-  std::vector<double> candidate_times{1.0, 2.0, 3.0};
-  int num_v_sample = 5;
-  double v_gap = curr_v / static_cast<double>(num_v_sample);
-  std::vector<double> candidate_speeds;
-  for (int i = 0; i < num_v_sample; ++i) {
-    candidate_speeds.push_back(v_gap * static_cast<double>(i) + 1.0);
-  }
-  for (const double lon_end_v : candidate_speeds) {
-    for (const double lon_end_t : candidate_times) {
-      double lat_end_t = 3.0;
-      std::array<double, 6> lat_coeffs;
-      std::array<double, 5> lon_coeffs;
-      GetLongitudinalPolynomial(
-          obstacle, lane_sequence, {lon_end_v, lon_end_t}, &lon_coeffs);
-      GetLateralPolynomial(obstacle, lane_sequence, lat_end_t, &lat_coeffs);
-      lat_lon_polynomial_bundles->emplace_back(
-          lat_coeffs, lon_coeffs, lat_end_t, lon_end_t, lon_end_v);
-    }
-  }
-  return true;
-}
-
-double InteractionPredictor::ComputeTrajectoryCost(
-    const Obstacle& obstacle,
-    const LaneSequence& lane_sequence,
-    const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
   double centri_acc_weight = FLAGS_centripedal_acceleration_cost_weight;
   double collision_weight = FLAGS_collision_cost_weight;
+  double speed = obstacle.latest_feature().speed();
   double total_cost = 0.0;
   double centri_acc_cost =
-      CentripetalAccelerationCost(lane_sequence, lat_lon_polynomial_bundle);
+      CentripetalAccelerationCost(lane_sequence, speed, acceleration);
   total_cost += centri_acc_weight * centri_acc_cost;
   if (LowerRightOfWayThanEgo(obstacle, lane_sequence)) {
     double collision_cost =
-      CollisionWithEgoVehicleCost(lane_sequence, lat_lon_polynomial_bundle);
+      CollisionWithEgoVehicleCost(lane_sequence, speed, acceleration);
     total_cost += collision_weight * collision_cost;
   }
   return total_cost;
@@ -262,19 +241,13 @@ double InteractionPredictor::ComputeTrajectoryCost(
 
 double InteractionPredictor::CentripetalAccelerationCost(
     const LaneSequence& lane_sequence,
-    const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
-  auto lon_coeffs = lat_lon_polynomial_bundle.lon_polynomial_coeffs();
-  double lon_end_v = lat_lon_polynomial_bundle.lon_end_v();
-  double lon_end_t = lat_lon_polynomial_bundle.lon_end_t();
-
+    const double speed, const double acceleration) {
   double cost_abs_sum = 0.0;
   double cost_sqr_sum = 0.0;
   double curr_time = 0.0;
   while (curr_time < FLAGS_prediction_trajectory_time_length) {
-    double s = EvaluateQuarticPolynomial(lon_coeffs, curr_time, 0,
-                                         lon_end_t, lon_end_v);
-    double v = EvaluateQuarticPolynomial(lon_coeffs, curr_time, 1,
-                                         lon_end_t, lon_end_v);
+    double s = GetSByConstantAcceleration(speed, acceleration, curr_time);
+    double v = std::max(0.0, speed + acceleration * curr_time);
     double kappa = GetLaneSequenceCurvatureByS(lane_sequence, s);
     double centri_acc = v * v * kappa;
     cost_abs_sum += std::abs(centri_acc);
@@ -286,17 +259,12 @@ double InteractionPredictor::CentripetalAccelerationCost(
 
 double InteractionPredictor::CollisionWithEgoVehicleCost(
     const LaneSequence& lane_sequence,
-    const LatLonPolynomialBundle& lat_lon_polynomial_bundle) {
-  auto lon_coeffs = lat_lon_polynomial_bundle.lon_polynomial_coeffs();
-  double lon_end_v = lat_lon_polynomial_bundle.lon_end_v();
-  double lon_end_t = lat_lon_polynomial_bundle.lon_end_t();
-
+    const double speed, const double acceleration) {
   double cost_abs_sum = 0.0;
   double cost_sqr_sum = 0.0;
   for (const TrajectoryPoint& adc_trajectory_point : adc_trajectory_) {
     double relative_time = adc_trajectory_point.relative_time();
-    double s = EvaluateQuarticPolynomial(
-        lon_coeffs, relative_time, 0, lon_end_t, lon_end_v);
+    double s = GetSByConstantAcceleration(speed, acceleration, relative_time);
     Point3D position = GetPositionByLaneSequenceS(lane_sequence, s);
     double pos_x = position.x();
     double pos_y = position.y();
