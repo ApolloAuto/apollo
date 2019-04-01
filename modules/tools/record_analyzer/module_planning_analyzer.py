@@ -208,13 +208,13 @@ class PlannigAnalyzer:
     def print_simulation_results(self):
         results = {}
 
-        results['decel[2,3)'] = self.breaking_2_3_cnt
-        results['decel[3,5)'] = self.breaking_3_5_cnt
-        results['decel[5,)'] = self.breaking_5_cnt
+        results['decel_2_3'] = self.breaking_2_3_cnt
+        results['decel_3_5'] = self.breaking_3_5_cnt
+        results['decel_5_'] = self.breaking_5_cnt
 
-        results['accel[2,3)'] = self.throttle_2_3_cnt
-        results['accel[3,5)'] = self.throttle_3_5_cnt
-        results['accel[5,)'] = self.throttle_5_cnt
+        results['accel_2_3'] = self.throttle_2_3_cnt
+        results['accel_3_5'] = self.throttle_3_5_cnt
+        results['accel_5_'] = self.throttle_5_cnt
 
         if len(self.init_point_curvature) > 0:
             results['curvature_max'] = max(self.init_point_curvature, key=abs)
