@@ -21,6 +21,7 @@
 #include "modules/planning/scenarios/scenario.h"
 
 #include "cyber/common/file.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -38,6 +39,12 @@ bool Scenario::LoadConfig(const std::string& config_file,
 
 void Scenario::Init() {
   CHECK(!config_.stage_type().empty());
+
+  // set scenario_type in PlanningContext
+  PlanningContext::MutablePlanningStatus()->mutable_scenario()->Clear();
+  PlanningContext::MutablePlanningStatus()->mutable_scenario()
+      ->set_scenario_type(scenario_type());
+
   for (const auto& stage_config : config_.stage_config()) {
     stage_config_map_[stage_config.stage_type()] = &stage_config;
   }
