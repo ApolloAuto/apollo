@@ -50,7 +50,7 @@ common::util::Factory<
 // The clearance distance from intersection/destination.
 // If ADC is too close, then do not enter SIDE_PASS.
 constexpr double kClearDistance = 15.0;
-constexpr double kSidePassMaxSpeed = 2.0;  // (10mph)
+constexpr double kSidePassMaxSpeed = 2.0;
 constexpr double kSidePassMaxDistance = 10.0;
 
 void SidePassScenario::RegisterStages() {

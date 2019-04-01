@@ -68,23 +68,37 @@ Status SpeedBoundsDecider::Process(
       // Check if stop at last frame stop fence
       if (CheckADCStop(*reference_line_info,
                        side_pass_info.change_lane_stop_path_point)) {
+        ADEBUG << "ADV Stopped due to change lane in side pass";
         if (ChangeLaneDecider::IsClearToChangeLane(reference_line_info)) {
+          ADEBUG << "Environment clear for ADC to change lane in side pass";
           mutable_side_pass_info->check_clear_flag = true;
-        } else if (CheckSidePassStop(path_data, *reference_line_info,
-                                     &stop_s_on_pathdata)) {
-          set_stop_fence = BuildSidePassStopFence(
-              path_data, stop_s_on_pathdata,
-              &(mutable_side_pass_info->change_lane_stop_path_point), frame,
-              reference_line_info);
+        } else {
+          if (CheckSidePassStop(path_data, *reference_line_info,
+                                &stop_s_on_pathdata) &&
+              BuildSidePassStopFence(
+                  path_data, stop_s_on_pathdata,
+                  &(mutable_side_pass_info->change_lane_stop_path_point), frame,
+                  reference_line_info)) {
+            set_stop_fence = true;
+          } else {
+            set_stop_fence = BuildSidePassStopFence(
+                side_pass_info.change_lane_stop_path_point, frame,
+                reference_line_info);
+          }
         }
 
       } else {
         if (CheckSidePassStop(path_data, *reference_line_info,
-                              &stop_s_on_pathdata)) {
-          set_stop_fence = BuildSidePassStopFence(
-              path_data, stop_s_on_pathdata,
-              &(mutable_side_pass_info->change_lane_stop_path_point), frame,
-              reference_line_info);
+                              &stop_s_on_pathdata) &&
+            BuildSidePassStopFence(
+                path_data, stop_s_on_pathdata,
+                &(mutable_side_pass_info->change_lane_stop_path_point), frame,
+                reference_line_info)) {
+          set_stop_fence = true;
+        } else {
+          set_stop_fence =
+              BuildSidePassStopFence(side_pass_info.change_lane_stop_path_point,
+                                     frame, reference_line_info);
         }
       }
     } else {
@@ -121,14 +135,10 @@ Status SpeedBoundsDecider::Process(
   }
 
   std::vector<const STBoundary *> boundaries;
-  double min_s = std::numeric_limits<double>::infinity();
   for (auto *obstacle : path_decision->obstacles().Items()) {
     const auto &id = obstacle->Id();
     const auto &st_boundary = obstacle->st_boundary();
     if (!st_boundary.IsEmpty()) {
-      if (min_s > st_boundary.min_s()) {
-        min_s = st_boundary.min_s();
-      }
       if (st_boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
         path_decision->Find(id)->SetBlockingObstacle(false);
       } else {
@@ -138,7 +148,26 @@ Status SpeedBoundsDecider::Process(
     }
   }
 
-  const double min_s_on_st_boundaries = min_s;
+  // Set min_s_on_st_boundaries to guide speed fallback. Different stop distance
+  // is taken when there is an obstacle moving in opposite direction of ADV
+  constexpr double kEpsilon = 1.0e-6;
+  double min_s_non_reverse = std::numeric_limits<double>::infinity();
+  double min_s_reverse = std::numeric_limits<double>::infinity();
+  for (auto *obstacle : path_decision->obstacles().Items()) {
+    const auto &st_boundary = obstacle->st_boundary();
+    if (!st_boundary.IsEmpty()) {
+      const auto &left_bottom_point = st_boundary.bottom_left_point();
+      const auto &right_bottom_point = st_boundary.bottom_right_point();
+      if (right_bottom_point.s() - left_bottom_point.s() > kEpsilon &&
+          min_s_reverse > left_bottom_point.s()) {
+        min_s_reverse = left_bottom_point.s();
+      } else if (min_s_non_reverse > left_bottom_point.s()) {
+        min_s_non_reverse = left_bottom_point.s();
+      }
+    }
+  }
+  const double min_s_on_st_boundaries =
+      min_s_non_reverse > min_s_reverse ? kEpsilon : min_s_non_reverse;
 
   // 3. Create speed limit along path
   SpeedLimitDecider speed_limit_decider(adc_sl_boundary, speed_bounds_config_,
@@ -188,8 +217,7 @@ bool SpeedBoundsDecider::CheckSidePassStop(
       PathData::PathPointType::UNKNOWN;
   for (const auto &point_guide : path_point_decision_guide) {
     if (last_path_point_type == PathData::PathPointType::IN_LANE &&
-        std::get<1>(point_guide) ==
-            PathData::PathPointType::OUT_ON_REVERSE_LANE) {
+        std::get<1>(point_guide) != PathData::PathPointType::IN_LANE) {
       *stop_s_on_pathdata = std::get<0>(point_guide);
       // Approximate the stop fence s based on the vehicle position
       const auto &vehicle_config =
@@ -209,8 +237,8 @@ bool SpeedBoundsDecider::CheckSidePassStop(
           shift_vec + Vec2d(stop_pathpoint.x(), stop_pathpoint.y());
       double stop_l_on_pathdata = 0.0;
       const auto &nearby_path = reference_line_info.reference_line().map_path();
-      nearby_path.GetNearestPoint(stop_fence_pose, stop_s_on_pathdata,
-                                  &stop_l_on_pathdata);
+      stop_s_on_pathdata -= nearby_path.GetNearestPoint(
+          stop_fence_pose, stop_s_on_pathdata, &stop_l_on_pathdata);
       return true;
     }
     last_path_point_type = std::get<1>(point_guide);
@@ -227,21 +255,30 @@ bool SpeedBoundsDecider::BuildSidePassStopFence(
   CHECK_NOTNULL(reference_line_info);
 
   if (!path_data.GetPathPointWithRefS(stop_s_on_pathdata, stop_pathpoint)) {
+    AERROR << "Can't get stop point on path data";
     return false;
   }
 
-  const std::string stop_wall_id = "side_pass_stop";
+  return BuildSidePassStopFence(*stop_pathpoint, frame, reference_line_info);
+}
+
+bool SpeedBoundsDecider::BuildSidePassStopFence(
+    const common::PathPoint &stop_point, Frame *const frame,
+    ReferenceLineInfo *const reference_line_info) {
+  const std::string stop_wall_id = "Side_Pass_Stop";
   // TODO(Jinyun) load relavent surrounding obstacles
   std::vector<std::string> wait_for_obstacles;
 
   const auto &nearby_path = reference_line_info->reference_line().map_path();
   double stop_point_s = 0.0;
   double stop_point_l = 0.0;
-  nearby_path.GetNearestPoint({stop_pathpoint->x(), stop_pathpoint->y()},
-                              &stop_point_s, &stop_point_l);
+  nearby_path.GetNearestPoint({stop_point.x(), stop_point.y()}, &stop_point_s,
+                              &stop_point_l);
 
+  // TODO(Jinyun) move to confs
+  constexpr double stop_buffer = 0.25;
   DeciderRuleBasedStop::BuildStopDecision(
-      stop_wall_id, stop_point_s, 0.0,
+      stop_wall_id, stop_point_s - stop_buffer, 0.0,
       StopReasonCode::STOP_REASON_SIDEPASS_SAFETY, wait_for_obstacles, frame,
       reference_line_info);
 

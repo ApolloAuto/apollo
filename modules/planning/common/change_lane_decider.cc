@@ -169,7 +169,7 @@ bool ChangeLaneDecider::IsClearToChangeLane(
   for (auto* obstacle :
        reference_line_info->path_decision()->obstacles().Items()) {
     if (obstacle->IsVirtual() || obstacle->IsStatic()) {
-      AERROR << "skip one virtual or static obstacle";
+      ADEBUG << "skip one virtual or static obstacle";
       continue;
     }
 

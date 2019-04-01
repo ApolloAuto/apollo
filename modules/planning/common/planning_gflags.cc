@@ -410,6 +410,9 @@ DEFINE_bool(use_planning_fallback, true,
 DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
 DEFINE_double(fallback_time_unit, 0.02,
               "fallback trajectory unit time in seconds");
+DEFINE_double(
+    fallback_distance_buffer, 0.5,
+    "fallback distance to end buffer when doing fixed distance speed fallback");
 DEFINE_double(polynomial_speed_fallback_velocity, 3.5,
               "velocity to use polynomial speed fallback.");
 
