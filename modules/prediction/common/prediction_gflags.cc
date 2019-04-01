@@ -58,10 +58,6 @@ DEFINE_int32(road_graph_max_search_horizon, 20,
 DEFINE_double(junction_distance_threshold, 10.0,
               "Distance threshold "
               "to junction to consider as junction scenario");
-DEFINE_bool(enable_prioritize_obstacles, true,
-            "If to enable the functionality to prioritize obstacles");
-DEFINE_bool(enable_junction_feature, true,
-            "If to enable building junction feature for obstacles");
 DEFINE_bool(enable_all_junction, false,
             "If consider all junction with junction_mlp_model.");
 DEFINE_double(caution_search_distance_ahead, 50.0,
