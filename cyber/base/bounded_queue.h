@@ -171,14 +171,13 @@ bool BoundedQueue<T>::WaitEnqueue(const T& element) {
   while (!break_all_wait_) {
     if (Enqueue(element)) {
       return true;
-    } else {
-      if (wait_strategy_->EmptyWait()) {
-        continue;
-      }
-      // wait timeout
-      return false;
     }
+    if (wait_strategy_->EmptyWait()) {
+        continue;
+    }
+    // wait timeout
   }
+
   return false;
 }
 
@@ -187,14 +186,13 @@ bool BoundedQueue<T>::WaitEnqueue(T&& element) {
   while (!break_all_wait_) {
     if (Enqueue(element)) {
       return true;
-    } else {
-      if (wait_strategy_->EmptyWait()) {
-        continue;
-      }
-      // wait timeout
-      return false;
     }
+    if (wait_strategy_->EmptyWait()) {
+      continue;
+    }
+    // wait timeout
   }
+
   return false;
 }
 
@@ -203,14 +201,13 @@ bool BoundedQueue<T>::WaitDequeue(T* element) {
   while (!break_all_wait_) {
     if (Dequeue(element)) {
       return true;
-    } else {
-      if (wait_strategy_->EmptyWait()) {
-        continue;
-      }
-      // wait timeout
-      return false;
     }
+    if (wait_strategy_->EmptyWait()) {
+        continue;
+    }
+    // wait timeout
   }
+
   return false;
 }
 
