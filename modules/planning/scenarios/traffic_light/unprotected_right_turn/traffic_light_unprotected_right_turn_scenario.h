@@ -54,9 +54,6 @@ class TrafficLightUnprotectedRightTurnScenario : public Scenario {
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config);
 
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
-
   TrafficLightUnprotectedRightTurnContext* GetContext() { return &context_; }
 
  private:

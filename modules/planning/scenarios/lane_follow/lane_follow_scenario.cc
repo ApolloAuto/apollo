@@ -39,16 +39,6 @@ std::unique_ptr<Stage> LaneFollowScenario::CreateStage(
   return std::unique_ptr<Stage>(new LaneFollowStage(stage_config));
 }
 
-bool LaneFollowScenario::IsTransferable(const Scenario& current_scenario,
-                                        const Frame& frame) {
-  // implement here
-  if (current_scenario.scenario_type() == ScenarioConfig::LANE_FOLLOW) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 }  // namespace lane_follow
 }  // namespace scenario
 }  // namespace planning

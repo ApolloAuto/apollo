@@ -112,11 +112,6 @@ std::unique_ptr<Stage> SidePassScenario::CreateStage(
   return ptr;
 }
 
-bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
-                                      const Frame& frame) {
-  return false;
-}
-
 bool SidePassScenario::IsTransferable(const Frame& frame,
                                       const ScenarioConfig& config,
                                       const Scenario& current_scenario) {
