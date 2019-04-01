@@ -151,7 +151,7 @@ class LatController : public Controller {
   // the maximum turn of steer
   double steer_single_direction_max_degree_ = 0.0;
 
-  //calculation result for steer_ration & steer direction
+  // calculation result for steer_ration & steer direction
   double steer_ratio_direction_calc = 0.0;
 
   // limit steering to maximum theoretical lateral acceleration
