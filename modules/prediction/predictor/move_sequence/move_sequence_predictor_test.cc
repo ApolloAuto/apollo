@@ -27,7 +27,7 @@ namespace prediction {
 class MoveSequencePredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    std::string file =
+    const std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     cyber::common::GetProtoFromFile(file, &perception_obstacles_);
   }
@@ -47,7 +47,7 @@ TEST_F(MoveSequencePredictorTest, OnLaneCase) {
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr);
   MoveSequencePredictor predictor;
   predictor.Predict(obstacle_ptr);
@@ -65,7 +65,7 @@ TEST_F(MoveSequencePredictorTest, Polynomial) {
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr);
   MoveSequencePredictor predictor;
   const Feature& feature = obstacle_ptr->latest_feature();
@@ -93,7 +93,7 @@ TEST_F(MoveSequencePredictorTest, Utils) {
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr);
   MoveSequencePredictor predictor;
   const Feature& feature = obstacle_ptr->latest_feature();

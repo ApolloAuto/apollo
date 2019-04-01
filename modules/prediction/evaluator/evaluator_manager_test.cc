@@ -29,7 +29,7 @@ using apollo::common::adapter::AdapterConfig;
 class EvaluatorManagerTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    std::string file =
+    const std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
@@ -58,7 +58,7 @@ TEST_F(EvaluatorManagerTest, General) {
   EvaluatorManager::Instance()->Run();
 
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   const Feature& feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();
   for (const auto& lane_sequence : lane_graph.lane_sequence()) {

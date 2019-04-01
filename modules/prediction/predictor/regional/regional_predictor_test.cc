@@ -48,7 +48,7 @@ TEST_F(RegionalPredictorTest, Predict) {
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(101);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
   predictor.Predict(obstacle_ptr);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
@@ -64,7 +64,7 @@ TEST_F(RegionalPredictorTest, MovingPedestrian) {
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(101);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
   predictor.GenerateMovingTrajectory(obstacle_ptr, 1.0);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
@@ -96,7 +96,7 @@ TEST_F(RegionalPredictorTest, StationaryPedestrian) {
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(102);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
   predictor.GenerateStillTrajectory(obstacle_ptr, 1.0);
   const std::vector<Trajectory>& trajectories = predictor.trajectories();
