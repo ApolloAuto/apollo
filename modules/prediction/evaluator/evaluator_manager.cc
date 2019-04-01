@@ -139,7 +139,7 @@ void EvaluatorManager::Run() {
   }
 
   std::vector<Obstacle*> dynamic_env;
-  for (int id : obstacles_container->curr_frame_predictable_obstacle_ids()) {
+  for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
     if (id < 0) {
       ADEBUG << "The obstacle has invalid id [" << id << "].";
       continue;
@@ -149,8 +149,8 @@ void EvaluatorManager::Run() {
     if (obstacle == nullptr) {
       continue;
     }
-    if (obstacle->ToIgnore() || obstacle->IsStill()) {
-      ADEBUG << "Ignore obstacle [" << id << "] in evaluator_manager";
+    if (obstacle->IsStill()) {
+      ADEBUG << "Ignore still obstacle [" << id << "] in evaluator_manager";
       continue;
     }
 

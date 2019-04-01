@@ -331,14 +331,10 @@ int ObstaclesContainer::PerceptionIdToPredictionId(const int perception_id) {
 void ObstaclesContainer::BuildLaneGraph() {
   // Go through every obstacle in the current frame, after some
   // sanity checks, build lane graph for non-junction cases.
-  for (const int id : curr_frame_predictable_obstacle_ids_) {
+  for (const int id : curr_frame_considered_obstacle_ids_) {
     Obstacle* obstacle_ptr = GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Null obstacle found.";
-      continue;
-    }
-    if (obstacle_ptr->ToIgnore()) {
-      ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
       continue;
     }
     ADEBUG << "Building Lane Graph.";
@@ -360,14 +356,10 @@ void ObstaclesContainer::BuildLaneGraph() {
 void ObstaclesContainer::BuildJunctionFeature() {
   // Go through every obstacle in the current frame, after some
   // sanity checks, build junction features for those that are in junction.
-  for (const int id : curr_frame_predictable_obstacle_ids_) {
+  for (const int id : curr_frame_considered_obstacle_ids_) {
     Obstacle* obstacle_ptr = GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Null obstacle found.";
-      continue;
-    }
-    if (obstacle_ptr->ToIgnore()) {
-      ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
       continue;
     }
     const std::string& junction_id = JunctionAnalyzer::GetJunctionId();
