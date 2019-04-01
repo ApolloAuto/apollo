@@ -354,8 +354,8 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double x,
   }
 
   size_t index_start = index_min == 0 ? index_min : index_min - 1;
-  size_t index_end = index_min + 1 == reference_points_.size() ?
-                     index_min : index_min + 1;
+  size_t index_end =
+      index_min + 1 == reference_points_.size() ? index_min : index_min + 1;
 
   if (index_start == index_end) {
     return reference_points_[index_start];

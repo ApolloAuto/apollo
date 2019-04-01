@@ -52,10 +52,9 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
   // get overlap along reference line
   std::string stop_sign_overlap_id = GetContext()->current_stop_sign_overlap_id;
   PathOverlap* current_stop_sign_overlap =
-      scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          stop_sign_overlap_id,
-          ReferenceLineInfo::STOP_SIGN);
+      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                stop_sign_overlap_id,
+                                                ReferenceLineInfo::STOP_SIGN);
   if (!current_stop_sign_overlap) {
     return FinishScenario();
   }

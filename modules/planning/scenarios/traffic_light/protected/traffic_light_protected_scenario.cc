@@ -58,7 +58,7 @@ void TrafficLightProtectedScenario::Init() {
 
   context_.current_traffic_light_overlap_ids.clear();
   for (int i = 0;
-      i < traffic_light_status.current_traffic_light_overlap_id_size(); i++) {
+       i < traffic_light_status.current_traffic_light_overlap_id_size(); i++) {
     const std::string traffic_light_overlap_id =
         traffic_light_status.current_traffic_light_overlap_id(i);
     hdmap::SignalInfoConstPtr traffic_light =
