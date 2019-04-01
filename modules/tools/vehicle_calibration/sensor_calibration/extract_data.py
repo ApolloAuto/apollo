@@ -53,7 +53,7 @@ def process_dir(path, operation):
         elif operation == 'remove':
             os.remove(path)
         else:
-            print('Error: Unsupport operation %s.' % operation)
+            print('Error! Unsupported operation %s for directory.' % operation)
             return False
     except (OSError, IOError) as e:
         print('Failed to %s directory: %s. Error: %s' %
@@ -69,8 +69,8 @@ def extract_jpg_data(dest_dir, msg, ratio):
     time_nseconds = []
     pre_time_second = 0
     bridge = cv_bridge.CvBridge()
-    seq = 0
 
+    seq = 0
     # Check timestamp.
     while True:
         cur_time_second = msg.header.stamp.to_sec()
@@ -80,26 +80,37 @@ def extract_jpg_data(dest_dir, msg, ratio):
         time_nseconds.append(msg.header.stamp.to_nsec())
 
         # Save image.
-        seq += 1
         msg.encoding = 'yuv422'
         img = bridge.imgmsg_to_cv(msg, 'yuv422')
         img = cv.cvtColor(img, cv.COLOR_YUV2BGR_YUYV)
         img_file = os.path.join(dest_dir, '{}.jpg'.format(seq))
         cv.imwrite(img_file, img)
+        seq += 1
 
 
-def extract_pcd_data(msg, seq):
+def extract_pcd_data(dest_dir, msg, ratio):
     """
     Extract PCD file
     """
-    # seq = 0
-    # TODO (liujie) maybe it's proper to loop over msg to extract PCD file
-    pcd = pcl.PointCloud()
-    pcd.from_file(msg)
-    dfilter = pcd.make_statistical_outlier_filter()
-    dfilter.set_mean_k(50)
-    dfilter.set_std_dev_mul_thresh(1.0)
-    dfilter.filter().to_file(seq + 'pcd')
+    time_nseconds = []
+    pre_time_second = 0
+
+    seq = 0
+    # Check timestamp.
+    while True:
+        cur_time_second = msg.header.stamp.to_sec()
+        if cur_time_second - pre_time_second < ratio:
+            continue
+        pre_time_second = cur_time_second
+        time_nseconds.append(msg.header.stamp.to_nsec())
+        pcd = pcl.PointCloud()
+        pcd.from_file(msg)
+        dfilter = pcd.make_statistical_outlier_filter()
+        dfilter.set_mean_k(50)
+        dfilter.set_std_dev_mul_thresh(1.0)
+        pcd_file = os.path.join(dest_dir, '{}.pcd'.format(seq))
+        dfilter.filter().to_file(pcd_file)
+        seq += 1
 
 
 def get_sensor_channel_list(record_file):
@@ -143,32 +154,43 @@ def validate_record(record_file):
         print('Record file: %s is not completed.' % record_file)
         return False
     if header.message_number < 1 or header.channel_number < 1:
-        print('Record file: %s. message|channel number [%d|%d] is invalid.' %
+        print('Record file: %s. [message:channel] number [%d:%d] is invalid.' %
               (record_file, header.message_number, header.channel_number))
         return False
 
     # There should be at least has one sensor channel
     sensor_channels = get_sensor_channel_list(record_file)
     if len(sensor_channels) < 1:
-        print('Record file: %s. cannot found sensor channels.' % record_file)
+        print('Record file: %s. cannot find sensor channels.' % record_file)
         return False
 
     return True
 
 
 def extract_channel_data(record_reader, output_path, channel_name,
-                         extraction_ratio):
+                         begin_time, extraction_ratio):
     """
-    Process desired channel message
+    Process channel messages.
     """
-    # TODO (liujie) process each message
     for msg in record_reader.read_messages():
-        pass
+        timestamp = msg.timestamp / float(1e9)
+        # The begin time to extract data should be at least later 1 second
+        # than message time.
+        if abs(begin_time - timestamp) > 2:
+            channel_desc = record_reader.get_protodesc(channel_name)
+            if channel_desc == 'apollo.drivers.Image':
+                extract_jpg_data(output_path, msg, extraction_ratio)
+            elif channel_desc == 'apollo.drivers.PointCloud':
+                extract_pcd_data(output_path, msg, extraction_ratio)
+            else:
+                # (TODO) (Liujie/Yuanfan) Handle binary data extraction.
+                print('Not implemented!')
 
     return True
 
 
-def extract_data(record_file, output_path, channel_name, extraction_ratio):
+def extract_data(record_file, output_path, channel_name, timestamp,
+                 extraction_ratio):
     """
     Extract the desired channel messages if channel_name is specified.
     Otherwise extract all sensor calibration messages according to
@@ -176,12 +198,12 @@ def extract_data(record_file, output_path, channel_name, extraction_ratio):
     """
     if channel_name != ' ':
         ret = extract_channel_data(record_file, output_path, channel_name,
-                                   extraction_ratio)
+                                   timestamp, extraction_ratio)
         return ret
 
     sensor_channels = get_sensor_channel_list(record_file)
     channel_num = len(sensor_channels)
-    print('Sensor channel number: [%d] in record file: %s' %
+    print('Sensor channel number [%d] in record file: %s' %
           (channel_num, record_file))
 
     process_channel_success_num = 0
@@ -190,14 +212,14 @@ def extract_data(record_file, output_path, channel_name, extraction_ratio):
     for msg in record_reader.read_messages():
         if msg.topic in sensor_channels:
             ret = extract_channel_data(record_reader, output_path, msg.topic,
-                                       extraction_ratio)
+                                       timestamp, extraction_ratio)
             if ret is False:
                 print('Failed to extract data from channel: %s' % msg.topic)
                 process_channel_failure_num += 1
                 continue
             process_channel_success_num += 1
 
-    print('Processed [%d] channels, and [%d] was failed.' %
+    print('Successfully processed [%d] channels, and [%d] was failed.' %
           process_channel_success_num, process_channel_failure_num)
 
     return True
@@ -236,12 +258,14 @@ def main():
                         default="", help="The output directory to restore message.")
     parser.add_argument("-c", "--channel_name", action="store", type=str,
                         default="", help="The output compressed file.")
+    parser.add_argument("-t", "--timestamp", action="store", type=float,
+                        help="Specify the timestamp to extract data information.")
     parser.add_argument("-r", "--extraction_ratio", action="store", type=int,
                         default=10, help="The output compressed file.")
 
     args = parser.parse_args()
 
-    # (TODO: liujie) Add logger info to trace the extraction process
+    # (TODO: Liujie) Add logger info to trace the extraction process
     ret = validate_record(args.record_path)
     if ret is False:
         print('Failed to validate record file: %s' % args.record_path)
@@ -254,7 +278,7 @@ def main():
         sys.exit(1)
 
     ret = extract_data(args.record_path, args.output_path, args.channel_name,
-                       args.extraction_ratio)
+                       args.timestamp, args.extraction_ratio)
     if ret is False:
         print('Failed to extract data!')
 
