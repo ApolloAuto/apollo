@@ -127,15 +127,6 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
   // 3. Sort the Obstacles
   ObstacleClusters::SortObstacles();
-
-  // 4. Deduct the NearbyObstacles info. from the sorted Obstacles
-  for (const int id : curr_frame_predictable_obstacle_ids_) {
-    Obstacle* obstacle_ptr = GetObstacle(id);
-    if (obstacle_ptr == nullptr) {
-      continue;
-    }
-    obstacle_ptr->SetNearbyObstacles();
-  }
 }
 
 Obstacle* ObstaclesContainer::GetObstacle(const int id) {
@@ -332,6 +323,7 @@ void ObstaclesContainer::BuildLaneGraph() {
     obstacle_ptr->BuildLaneGraph();
     ADEBUG << "Building ordered Lane Graph.";
     // obstacle_ptr->BuildLaneGraphFromLeftToRight();
+    obstacle_ptr->SetNearbyObstacles();
   }
 
   Obstacle* ego_vehicle_ptr = GetObstacle(FLAGS_ego_vehicle_id);
