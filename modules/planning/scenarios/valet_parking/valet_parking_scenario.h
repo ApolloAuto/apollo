@@ -56,13 +56,6 @@ class ValetParkingScenario : public Scenario {
   static bool IsTransferable(const Frame& frame,
                              const double parking_start_range);
 
-  // TODO(Jinyun) Dummy function, will be removed after the decision using
-  // central scenario dispatcher
-  bool IsTransferable(const Scenario& other_scenario,
-                      const Frame& frame) override {
-    return true;
-  }
-
   ValetParkingContext* GetContext() { return &context_; }
 
  private:

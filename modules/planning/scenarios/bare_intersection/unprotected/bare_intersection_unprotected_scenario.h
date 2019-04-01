@@ -49,9 +49,6 @@ class BareIntersectionUnprotectedScenario : public Scenario {
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config);
 
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
-
   BareIntersectionUnprotectedContext* GetContext() { return &context_; }
 
  private:
