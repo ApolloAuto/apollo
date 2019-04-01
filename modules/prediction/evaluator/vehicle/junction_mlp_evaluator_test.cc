@@ -28,7 +28,7 @@ namespace prediction {
 class JunctionMLPEvaluatorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    std::string file =
+    const std::string file =
         "modules/prediction/testdata/"
         "single_perception_vehicle_injunction.pb.txt";
     CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
@@ -51,7 +51,7 @@ TEST_F(JunctionMLPEvaluatorTest, InJunctionCase) {
   container.Insert(perception_obstacles_);
   container.BuildJunctionFeature();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   junction_mlp_evaluator.Evaluate(obstacle_ptr);
   const JunctionFeature& junction_feature =
       obstacle_ptr->latest_feature().junction_feature();
