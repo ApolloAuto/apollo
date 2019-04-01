@@ -50,6 +50,10 @@ class SpeedBoundsDecider : public Decider {
                               Frame* const frame,
                               ReferenceLineInfo* const reference_line_info);
 
+  bool BuildSidePassStopFence(const common::PathPoint& stop_point,
+                              Frame* const frame,
+                              ReferenceLineInfo* const reference_line_info);
+
   // @brief Check if ADV stop at a stop fence
   bool CheckADCStop(const ReferenceLineInfo& reference_line_info,
                     const common::PathPoint& stop_point);

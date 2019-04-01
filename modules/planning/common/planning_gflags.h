@@ -213,6 +213,7 @@ DECLARE_double(nudge_buffer);
 DECLARE_bool(use_planning_fallback);
 DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
+DECLARE_double(fallback_distance_buffer);
 DECLARE_double(polynomial_speed_fallback_velocity);
 
 DECLARE_double(speed_bump_speed_limit);
