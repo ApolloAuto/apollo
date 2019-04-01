@@ -24,6 +24,7 @@
 #include <utility>
 
 #include "modules/common/time/time.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
 #include "modules/planning/tasks/task_factory.h"
@@ -42,6 +43,10 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 }  // namespace
 
 Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
+  // set stage_type in PlanningContext
+  PlanningContext::MutablePlanningStatus()->mutable_scenario()
+      ->set_stage_type(stage_type());
+
   name_ = ScenarioConfig::StageType_Name(config_.stage_type());
   next_stage_ = config_.stage_type();
   std::unordered_map<TaskConfig::TaskType, const TaskConfig*, std::hash<int>>
