@@ -87,6 +87,7 @@ Status PathAssessmentDecider::Process(
 
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
     //                 reference_line_info);
+    ADEBUG << "Path length = " << curr_path_data.frenet_frame_path().size();
   }
   // If there is no valid path_data, exit.
   if (valid_path_data.empty()) {
@@ -99,6 +100,9 @@ Status PathAssessmentDecider::Process(
   // 3. Pick the optimal path.
   std::sort(valid_path_data.begin(), valid_path_data.end(),
             [](const PathData& lhs, const PathData& rhs) {
+              if (lhs.Empty() && rhs.Empty()) {
+                return false;
+              }
               if (lhs.Empty() || rhs.Empty()) {
                 return rhs.Empty();
               }
