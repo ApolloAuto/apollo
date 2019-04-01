@@ -66,7 +66,8 @@ std::string GetSensorType(SensorType sensor_type) {
 }
 
 bool is_lidar(SensorType sensor_type) {
-  return (sensor_type == SensorType::VELODYNE_64);
+  return (sensor_type == SensorType::VELODYNE_64) ||
+         (sensor_type == SensorType::VELODYNE_16);
 }
 
 bool is_radar(SensorType sensor_type) {
