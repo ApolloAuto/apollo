@@ -49,6 +49,15 @@ class PlannigAnalyzer:
         self.init_point_accel = []
         self.init_point_decel = []
 
+        self.last_init_point_speed = None
+        self.last_init_point_t = None
+        self.breaking_2_3_cnt = 0
+        self.breaking_3_5_cnt = 0
+        self.breaking_5_cnt = 0
+        self.throttle_2_3_cnt = 0
+        self.throttle_3_5_cnt = 0
+        self.throttle_5_cnt = 0
+
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
         if not self.is_simulation:
@@ -75,13 +84,34 @@ class PlannigAnalyzer:
                     abs(adc_trajectory.debug.planning_data.init_point.path_point.kappa))
                 self.init_point_dcurvature.append(
                     abs(adc_trajectory.debug.planning_data.init_point.path_point.dkappa))
-                accel = adc_trajectory.debug.planning_data.init_point.a
-                if accel > 0:
-                    self.init_point_accel.append(accel)
-                if accel < 0:
-                    self.init_point_decel.append(abs(accel))
-                if accel < -2:
-                    self.hard_break_list.append(accel)
+
+                speed = adc_trajectory.debug.planning_data.init_point.v
+                t = adc_trajectory.header.timestamp_sec + \
+                    adc_trajectory.debug.planning_data.init_point.relative_time
+                if self.last_init_point_speed is not None:
+                    duration = t - self.last_init_point_t
+                    accel = (speed - self.last_init_point_speed) / duration
+                    if accel > 0:
+                        self.init_point_accel.append(accel)
+                    if accel < 0:
+                        self.init_point_decel.append(abs(accel))
+                        
+                    if -3 < accel <= -2:
+                        self.breaking_2_3_cnt += 1
+                    if -5 < accel <= -3:
+                        self.breaking_3_5_cnt += 1
+                    if accel <= -5:
+                        self.breaking_5_cnt += 1
+
+                    if 2 <= accel < 3:
+                        self.throttle_2_3_cnt += 1
+                    if 3 <= accel < 5:
+                        self.throttle_3_5_cnt += 1
+                    if 5 <= accel :
+                        self.throttle_5_cnt += 1
+
+                self.last_init_point_speed = speed
+                self.last_init_point_t = t
 
         # TODO(yifei) temporarily disable frechet distance
         #if self.last_adc_trajectory is not None and self.is_simulation:
@@ -178,7 +208,13 @@ class PlannigAnalyzer:
     def print_simulation_results(self):
         results = {}
 
-        results['hard_brake_cnt'] = len(self.hard_break_list)
+        results['decel[2,3)'] = self.breaking_2_3_cnt
+        results['decel[3,5)'] = self.breaking_3_5_cnt
+        results['decel[5,)'] = self.breaking_5_cnt
+
+        results['accel[2,3)'] = self.throttle_2_3_cnt
+        results['accel[3,5)'] = self.throttle_3_5_cnt
+        results['accel[5,)'] = self.throttle_5_cnt
 
         if len(self.init_point_curvature) > 0:
             results['curvature_max'] = max(self.init_point_curvature, key=abs)
