@@ -129,8 +129,7 @@ void MessageProcess::OnPerception(
   // If in junction, BuildJunctionFeature();
   // If not, BuildLaneGraph().
   const Scenario& scenario = ScenarioManager::Instance()->scenario();
-  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id() &&
-      FLAGS_enable_junction_feature) {
+  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
     JunctionAnalyzer::Init(scenario.junction_id());
     ptr_obstacles_container->BuildJunctionFeature();
   }
