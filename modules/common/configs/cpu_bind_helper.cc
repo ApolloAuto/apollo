@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
- 
 #include "modules/common/configs/cpu_bind_helper.h"
 
-#include <unistd.h>
 #include <sched.h>
+#include <unistd.h>
+
 #include <fstream>
+#include <utility>
 
 #include "modules/common/configs/config_gflags.h"
 #include "yaml-cpp/yaml.h"
@@ -53,7 +54,7 @@ void CpuBindHelper::Init(const std::string &config_file) {
 
 void CpuBindHelper::BindCpu(const std::string& module_name) {
   if (!init_) {
-    Init(FLAGS_cpubind_config_path); 
+    Init(FLAGS_cpubind_config_path);
   }
 
   if (bindrule_map_.find(module_name) != bindrule_map_.end()) {
@@ -64,7 +65,7 @@ void CpuBindHelper::BindCpu(const std::string& module_name) {
     for (const auto& elem : core_list) {
       CPU_SET(elem, &mask);
     }
-    
+
     sched_setaffinity(0, sizeof(mask), &mask);
   }
 }
