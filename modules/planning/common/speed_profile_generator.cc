@@ -153,18 +153,24 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfileWithStopDistance(
 SpeedData SpeedProfileGenerator::GenerateStopProfile(
     const double init_speed, const double init_acc,
     const double stop_distance) {
-  AERROR << "Using fallback stopping profile.";
+  AERROR << "Slowing down the car with fallback stopping profile.";
   SpeedData speed_data;
 
+  constexpr double kEpsilon = 1.0e-8;
   double max_t = FLAGS_fallback_total_time;
   const double unit_t = FLAGS_fallback_time_unit;
   double acc = FLAGS_slowdown_profile_deceleration;
-
   double pre_s = 0.0;
   double pre_v = init_speed;
   if (stop_distance != std::numeric_limits<double>::infinity()) {
+    double buffered_stop_distance =
+        stop_distance > 0.0 ? stop_distance : kEpsilon;
+    buffered_stop_distance =
+        stop_distance - FLAGS_fallback_distance_buffer > 0.0
+            ? stop_distance - FLAGS_fallback_distance_buffer
+            : stop_distance;
     acc = -(init_speed * init_speed) /
-          (2.0 * std::min(stop_distance,
+          (2.0 * std::min(buffered_stop_distance,
                           EgoInfo::Instance()->front_clear_distance()));
     max_t = std::abs(init_speed / acc);
   }
