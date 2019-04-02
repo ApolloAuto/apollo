@@ -54,7 +54,7 @@ class OnLanePlanning : public PlanningBase {
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init(const PlanningConfig& config) override;
+  common::Status Init(const PlanningConfig& config) override;
 
   /**
    * @brief main logic of the planning module, runs periodically triggered by
@@ -63,7 +63,7 @@ class OnLanePlanning : public PlanningBase {
   void RunOnce(const LocalView& local_view,
                ADCTrajectory* const ptr_trajectory_pb) override;
 
-  apollo::common::Status Plan(
+  common::Status Plan(
       const double current_time_stamp,
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       ADCTrajectory* const trajectory) override;
@@ -72,6 +72,10 @@ class OnLanePlanning : public PlanningBase {
   common::Status InitFrame(const uint32_t sequence_num,
                            const common::TrajectoryPoint& planning_start_point,
                            const common::VehicleState& vehicle_state);
+
+  common::VehicleState AlignTimeStamp(
+      const common::VehicleState& vehicle_state,
+      const double curr_timestamp) const;
 
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
   bool CheckPlanningConfig(const PlanningConfig& config);
