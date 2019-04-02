@@ -191,21 +191,6 @@ default_task_config: {
   }
 }
 default_task_config: {
-  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
-  open_space_trajectory_partition_config {
-    gear_shift_max_t: 3.0
-    gear_shift_unit_t: 0.02
-    gear_shift_period_duration: 2.0
-    interpolated_pieces_num: 20
-    initial_gear_check_horizon: 3
-    heading_search_range: 0.79
-    heading_track_range: 1.57
-    vehicle_box_iou_threshold: 0.8
-    distance_search_range: 1.0
-    distance_to_midpoint: 0.1
-  }
-}
-default_task_config: {
   task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
   open_space_trajectory_provider_config {
     open_space_trajectory_optimizer_config {
@@ -220,7 +205,7 @@ default_task_config: {
           traj_gear_switch_penalty: 10.0
           traj_steer_penalty: 0.0
           traj_steer_change_penalty: 0.0
-          grid_a_star_xy_resolution: 1.0
+          grid_a_star_xy_resolution: 0.5
           node_radius: 0.5
         }
         dual_variable_warm_start_config {
@@ -290,12 +275,27 @@ default_task_config: {
   }
 }
 default_task_config: {
+  task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+  open_space_trajectory_partition_config {
+    gear_shift_max_t: 3.0
+    gear_shift_unit_t: 0.02
+    gear_shift_period_duration: 2.0
+    interpolated_pieces_num: 20
+    initial_gear_check_horizon: 1
+    heading_search_range: 0.79
+    heading_track_range: 3.14
+    vehicle_box_iou_threshold: 0.8
+    distance_search_range: 1.0
+    distance_to_midpoint: 0.1
+  }
+}
+default_task_config: {
   task_type: OPEN_SPACE_ROI_DECIDER
   open_space_roi_decider_config {
     roi_longitudinal_range: 15
     parking_start_range: 20.0
     parking_inwards: false
-    enable_perception_obstacles: false
+    enable_perception_obstacles: true
     parking_depth_buffer: 0.2
   }
 }

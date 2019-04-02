@@ -85,6 +85,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
   int direction_flag = 0;
   int init_direction = 0;
   for (size_t i = 0; i < initial_horizon; ++i) {
+    ADEBUG << "Initial speeds are "
+           << interpolated_trajectory_result_ptr->at(i).v();
     if (interpolated_trajectory_result_ptr->at(i).v() > kepsilon) {
       direction_flag++;
       if (init_direction == 0) {
@@ -99,19 +101,23 @@ Status OpenSpaceTrajectoryPartition::Process() {
   }
 
   if (direction_flag > 1) {
+    ADEBUG << "Initial gear set to DRIVE";
     current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
   } else if (direction_flag < -1) {
+    ADEBUG << "Initial gear set to REVERSE";
     current_trajectory->second = canbus::Chassis::GEAR_REVERSE;
   } else {
     if (init_direction > 0) {
-      ADEBUG << "initial speed oscillate too frequent around zero";
+      ADEBUG << "Gear set to DRIVE but initial speed oscillate too frequent "
+                "around zero";
       current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
     } else if (init_direction < 0) {
-      ADEBUG << "initial speed oscillate too frequent around zero";
+      ADEBUG << "Gear set to REVERSE but initial speed oscillate too frequent "
+                "around zero";
       current_trajectory->second = canbus::Chassis::GEAR_REVERSE;
     } else {
       ADEBUG << "Invalid trajectory start! Speed values of initial points are "
-                "too small to decide gear";
+                "too small to decide gear. DRIVE is set as default";
       current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
     }
   }
@@ -126,6 +132,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
         current_trajectory->second == canbus::Chassis::GEAR_DRIVE) {
       paritioned_trajectories_ptr->emplace_back();
       current_trajectory = &(paritioned_trajectories_ptr->back());
+      ADEBUG << "Gear set to REVERSE";
       current_trajectory->second = canbus::Chassis::GEAR_REVERSE;
       distance_s = 0.0;
     }
@@ -135,6 +142,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
         current_trajectory->second == canbus::Chassis::GEAR_REVERSE) {
       paritioned_trajectories_ptr->emplace_back();
       current_trajectory = &(paritioned_trajectories_ptr->back());
+      ADEBUG << "Gear set to DRIVE";
       current_trajectory->second = canbus::Chassis::GEAR_DRIVE;
       distance_s = 0.0;
     }
