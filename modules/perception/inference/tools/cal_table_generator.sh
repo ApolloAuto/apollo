@@ -23,5 +23,5 @@ mkdir -p $batch_root
     -batch_root $batch_root \
     -cal_table_root $cal_table_root \
     -names_file $names_file \
-    -weight_file $model_root/deploy.md \
+    -weight_file $model_root/deploy.model \
     -proto_file $model_root/deploy.pt

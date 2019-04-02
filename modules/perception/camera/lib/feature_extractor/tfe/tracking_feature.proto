@@ -37,7 +37,7 @@ message PSROIPoolingParam {
 message ExternalParam {
     optional string model_type = 1 [default = "CaffeNet"];
     optional string proto_file = 2 [default = "caffe.pt"];
-    optional string weight_file = 3 [default = "caffe.md"];
+    optional string weight_file = 3 [default = "caffe.model"];
     optional int32 resize_height = 4 [default = 1080];
     optional int32 resize_width = 5 [default = 1920];
     optional string input_blob = 6;
