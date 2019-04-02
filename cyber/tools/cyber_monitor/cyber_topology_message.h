@@ -60,7 +60,7 @@ class CyberTopologyMessage : public RenderableMessage {
   SecondColumnType second_column_;
 
   int pid_;
-  int col1_width_;
+  int col1_width_, col2_width_; 
   const std::string& specified_channel_;
   std::map<std::string, GeneralChannelMessage*> all_channels_map_;
 };

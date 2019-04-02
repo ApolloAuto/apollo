@@ -98,6 +98,13 @@ double GeneralChannelMessage::frame_ratio(void) {
   return frame_ratio_;
 }
 
+double GeneralChannelMessage::band_width(void) {
+  if (frame_ratio_) {
+    band_width_ = (channel_message_->ByteSize() * frame_ratio_) / (1024 * 1024);
+  }
+  return band_width_;
+}
+
 GeneralChannelMessage* GeneralChannelMessage::OpenChannel(
     const std::string& channelName) {
   if (channelName.empty() || node_name_.empty()) {
@@ -232,6 +239,12 @@ void GeneralChannelMessage::RenderDebugString(const Screen* s, int key,
       outStr << std::fixed << std::setprecision(FrameRatio_Precision)
              << frame_ratio();
       s->AddStr(outStr.str().c_str());
+
+      s->AddStr(0, lineNo++, "BandWidth: ");
+      std::ostringstream bandwidthStr;
+      bandwidthStr << std::fixed << std::setprecision(FrameRatio_Precision)
+                   << band_width();
+      s->AddStr(bandwidthStr.str().c_str());
 
       decltype(channel_message_) channelMsg = CopyMsgPtr();
 

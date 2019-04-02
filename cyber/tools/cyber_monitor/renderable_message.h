@@ -48,7 +48,8 @@ class RenderableMessage {
         page_index_(0),
         page_item_count_(24),
         parent_(parent),
-        frame_ratio_(0.0) {}
+        frame_ratio_(0.0),
+        band_width_(0.0) {}
 
   virtual ~RenderableMessage() { parent_ = nullptr; }
 
@@ -56,6 +57,7 @@ class RenderableMessage {
   virtual RenderableMessage* Child(int /* lineNo */) const = 0;
 
   virtual double frame_ratio(void) { return frame_ratio_; }
+  virtual double band_width(void) {return band_width_;}
 
   RenderableMessage* parent(void) const { return parent_; }
   void set_parent(RenderableMessage* parent) {
@@ -82,6 +84,7 @@ class RenderableMessage {
   int page_item_count_;
   RenderableMessage* parent_;
   double frame_ratio_;
+  double band_width_;
 
   friend class Screen;
 };  // RenderableMessage

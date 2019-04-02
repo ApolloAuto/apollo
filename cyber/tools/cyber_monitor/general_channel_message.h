@@ -72,6 +72,8 @@ class GeneralChannelMessage : public GeneralMessageBase {
 
   double frame_ratio(void) override;
 
+  double band_width(void) override;
+
   const std::string& NodeName(void) const { return node_name_; }
 
   void add_reader(const std::string& reader) { DoAdd(readers_, reader); }
