@@ -371,7 +371,7 @@ Status Frame::InitFrameData() {
        Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
     AddObstacle(*ptr);
   }
-  if (FLAGS_enable_collision_detection && planning_start_point_.v() < 1e-3) {
+  if (planning_start_point_.v() < 1e-3) {
     const auto *collision_obstacle = FindCollisionObstacle();
     if (collision_obstacle != nullptr) {
       std::string err_str =
