@@ -225,7 +225,7 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
   FrameEnv curr_frame_env;
   curr_frame_env.set_timestamp(obstacles_container->timestamp());
   std::vector<int> obstacle_ids =
-      obstacles_container->curr_frame_predictable_obstacle_ids();
+      obstacles_container->curr_frame_movable_obstacle_ids();
   obstacle_ids.push_back(-1);
   for (int id : obstacle_ids) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);

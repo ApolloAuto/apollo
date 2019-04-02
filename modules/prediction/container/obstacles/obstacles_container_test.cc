@@ -56,7 +56,7 @@ TEST_F(ObstaclesContainerTest, Vehicles) {
   Obstacle* obstacle_ptr4 = container_.GetObstacle(4);
   EXPECT_EQ(nullptr, obstacle_ptr4);
 
-  EXPECT_EQ(container_.curr_frame_predictable_obstacle_ids().size(), 6);
+  EXPECT_EQ(container_.curr_frame_movable_obstacle_ids().size(), 6);
 }
 
 TEST_F(ObstaclesContainerTest, Pedestrian) {
