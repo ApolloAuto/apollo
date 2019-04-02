@@ -24,10 +24,6 @@ DEFINE_double(test_duration, -1.0,
 
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
-// TODO(all) enable this when perception issue is fixed.
-DEFINE_bool(enable_collision_detection, false,
-            "enable collision detection in planning");
-
 // scenario related
 DEFINE_string(scenario_bare_intersection_unprotected_config_file,
               "/apollo/modules/planning/conf/"

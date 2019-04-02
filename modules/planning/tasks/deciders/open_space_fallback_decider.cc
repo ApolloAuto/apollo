@@ -36,6 +36,10 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
   double obstacle_to_vehicle_distance = 0.0;
 
   BuildPredictedEnvironment(frame->obstacles(), predicted_bounding_rectangles);
+  ADEBUG << "Numbers of obstsacles are: " << frame->obstacles().size();
+  ADEBUG << "Numbers of predicted bounding rectangles are: "
+         << predicted_bounding_rectangles[0].size()
+         << " and : " << predicted_bounding_rectangles.size();
 
   if (!IsCollisionFreeTrajectory(
           frame->open_space_info().chosen_paritioned_trajectory(),
