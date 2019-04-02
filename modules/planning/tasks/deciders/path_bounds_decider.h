@@ -79,7 +79,8 @@ class PathBoundsDecider : public Decider {
       const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo lane_borrow_info,
       std::vector<std::tuple<double, double, double>>* const path_bound,
-      std::string* const blocking_obstacle_id);
+      std::string* const blocking_obstacle_id,
+      std::string* const borrow_lane_type);
 
   /** @brief The fallback path only considers:
     *   - ADC's position (so that boundary must contain ADC's position)
@@ -117,9 +118,10 @@ class PathBoundsDecider : public Decider {
     *   accordingly to include ADC's current position.
     */
   bool GetBoundaryFromLanesAndADC(
-      const ReferenceLine& reference_line,
+      const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
-      std::vector<std::tuple<double, double, double>>* const path_bound);
+      std::vector<std::tuple<double, double, double>>* const path_bound,
+      std::string* const borrow_lane_type);
 
   bool GetLaneInfoFromPoint(double point_x, double point_y, double point_z,
                             double point_theta,
