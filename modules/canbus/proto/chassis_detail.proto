@@ -3,6 +3,7 @@ syntax = "proto2";
 package apollo.canbus;
 
 import "modules/canbus/proto/chassis.proto";
+import "modules/canbus/proto/ch.proto";
 
 message ChassisDetail {
   enum Type {
@@ -27,6 +28,7 @@ message ChassisDetail {
   optional License license = 16;            // License info
   optional Surround surround = 17;          // Surround information
   optional Gem gem = 18;
+  optional Ch ch = 19;       // vehicle
 }
 
 // CheckResponseSignal
