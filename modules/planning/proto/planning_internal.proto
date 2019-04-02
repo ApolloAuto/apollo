@@ -144,6 +144,7 @@ message OpenSpaceDebug {
   optional apollo.common.TrajectoryPoint end_point = 11;
   optional apollo.planning_internal.Trajectories partitioned_trajectories = 12;
   optional apollo.planning_internal.Trajectories chosen_trajectory = 13;
+  optional bool is_fallback_trajectory = 14;
 }
 
 message SmootherDebug {
