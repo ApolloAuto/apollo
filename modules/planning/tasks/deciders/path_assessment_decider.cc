@@ -38,8 +38,11 @@ using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
 
+namespace {
 // PointDecision contains (s, PathPointType, distance to closest obstacle).
 using PathPointDecision = std::tuple<double, PathData::PathPointType, double>;
+constexpr double kMinObstacleArea = 1e-4;
+}
 
 PathAssessmentDecider::PathAssessmentDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -151,7 +154,6 @@ Status PathAssessmentDecider::Process(
                   lhs.frenet_frame_path()[lhs_back_idx].s();
               double rhs_back_s =
                   rhs.frenet_frame_path()[rhs_back_idx].s();
-              // TODO(jiacheng): make this a flag.
               if (std::fabs(lhs_back_s - rhs_back_s) >
                   kPathLengthComparisonTolerance) {
                 return lhs_back_idx < rhs_back_idx;
@@ -325,7 +327,7 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
     // Ignore too small obstacles.
     const auto obstacle_sl = obstacle->PerceptionSLBoundary();
     if ((obstacle_sl.end_s() - obstacle_sl.start_s()) *
-        (obstacle_sl.end_l() - obstacle_sl.start_l()) < 1e-4) {
+        (obstacle_sl.end_l() - obstacle_sl.start_l()) < kMinObstacleArea) {
       continue;
     }
     // Convert into polygon and save it.
@@ -504,6 +506,9 @@ void PathAssessmentDecider::SetObstacleDistance(
     }
     // Convert into polygon and save it.
     const auto obstacle_box = obstacle->PerceptionBoundingBox();
+    if (obstacle_box.area() < kMinObstacleArea) {
+      continue;
+    }
     obstacle_polygons.push_back(Polygon2d(obstacle_box));
   }
 
