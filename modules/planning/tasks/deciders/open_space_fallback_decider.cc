@@ -33,13 +33,13 @@ OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
 
 Status OpenSpaceFallbackDecider::Process(Frame* frame) {
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles;
-  double obstacle_to_vichcle_distance = 0.0;
+  double obstacle_to_vehicle_distance = 0.0;
 
   BuildPredictedEnvironment(frame->obstacles(), predicted_bounding_rectangles);
 
   if (!IsCollisionFreeTrajectory(
           frame->open_space_info().chosen_paritioned_trajectory(),
-          predicted_bounding_rectangles, &obstacle_to_vichcle_distance)) {
+          predicted_bounding_rectangles, &obstacle_to_vehicle_distance)) {
     // change gflag
     frame_->mutable_open_space_info()->set_fallback_flag(true);
 
@@ -51,7 +51,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
         frame_->mutable_open_space_info()->mutable_fallback_trajectory();
 
     double stop_distance =
-        std::max(0.0, obstacle_to_vichcle_distance -
+        std::max(0.0, obstacle_to_vehicle_distance -
                           config_.open_space_fallback_decider_config()
                               .open_space_fall_back_stop_safety_gap());
     if (stop_distance > 0.0) {
@@ -100,7 +100,7 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
     const TrajGearPair& trajectory_gear_pair,
     const std::vector<std::vector<common::math::Box2d>>&
         predicted_bounding_rectangles,
-    double* obstacle_to_vichcle_distance) {
+    double* obstacle_to_vehicle_distance) {
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
@@ -128,7 +128,7 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
           if (obstacle_box.DistanceTo(vehicle_vec) <
               config_.open_space_fallback_decider_config()
                   .open_space_fall_back_collision_distance()) {
-            *obstacle_to_vichcle_distance =
+            *obstacle_to_vehicle_distance =
                 obstacle_box.DistanceTo(vehicle_vec);
             return false;
           }
