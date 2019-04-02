@@ -28,6 +28,8 @@
 
 #include "modules/planning/common/path_boundary.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/util/string_util.h"
+#include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
@@ -36,6 +38,7 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::util::StrCat;
 using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 
@@ -148,7 +151,7 @@ Status PathBoundsDecider::Process(
         break;
     }
     candidate_path_boundaries.back().set_label(
-        "regular/" + path_label + "/" + borrow_lane_type);
+        StrCat("regular/", path_label, "/", borrow_lane_type));
     candidate_path_boundaries.back().set_blocking_obstacle_id(
         blocking_obstacle_id);
   }
