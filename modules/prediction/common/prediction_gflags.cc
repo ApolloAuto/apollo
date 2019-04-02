@@ -105,9 +105,9 @@ DEFINE_double(still_unknown_speed_threshold, 0.5,
 DEFINE_double(still_obstacle_position_std, 1.0,
               "Position standard deviation for still obstacles");
 DEFINE_double(still_pedestrian_position_std, 0.5,
-              "Position standard deviation for still obstacles");
+              "Position standard deviation for still pedestrians");
 DEFINE_double(still_unknown_position_std, 0.5,
-              "Position standard deviation for still obstacles");
+              "Position standard deviation for still unknown obstacles");
 DEFINE_double(max_history_time, 7.0, "Obstacles' maximal historical time.");
 DEFINE_double(target_lane_gap, 2.0, "Gap between two lane points.");
 DEFINE_double(dense_lane_gap, 0.2,
