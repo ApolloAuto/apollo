@@ -18,6 +18,7 @@
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 #include "modules/canbus/vehicle/gem/gem_vehicle_factory.h"
 #include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
+#include "modules/canbus/vehicle/ch/ch_vehicle_factory.h"
 
 namespace apollo {
 namespace canbus {
@@ -28,6 +29,9 @@ void VehicleFactory::RegisterVehicleFactory() {
   });
   Register(VehicleParameter::GEM, []() -> AbstractVehicleFactory * {
     return new GemVehicleFactory();
+  });
+  Register(VehicleParameter::CH, []() -> AbstractVehicleFactory * {
+    return new ChVehicleFactory();
   });
 }
 
