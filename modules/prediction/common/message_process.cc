@@ -158,7 +158,7 @@ void MessageProcess::OnPerception(
   // Insert features to FeatureOutput for offline_mode
   if (FLAGS_prediction_offline_mode == 1) {
     for (const int id :
-         ptr_obstacles_container->curr_frame_predictable_obstacle_ids()) {
+         ptr_obstacles_container->curr_frame_movable_obstacle_ids()) {
       Obstacle* obstacle_ptr = ptr_obstacles_container->GetObstacle(id);
       if (obstacle_ptr == nullptr) {
         AERROR << "Null obstacle found.";

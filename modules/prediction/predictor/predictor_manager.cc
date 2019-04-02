@@ -153,8 +153,8 @@ void PredictorManager::Run() {
 
     PerceptionObstacle perception_obstacle =
         obstacles_container->GetPerceptionObstacle(id);
-    // if obstacle == nullptr, that means obstacle is not predictable
-    // Checkout the logic of non-predictable in obstacle.cc
+    // if obstacle == nullptr, that means obstacle is unmovable
+    // Checkout the logic of unmovable in obstacle.cc
     if (obstacle != nullptr) {
       PredictObstacle(obstacle, &prediction_obstacle, adc_trajectory_container);
     } else {  // obstacle == nullptr
