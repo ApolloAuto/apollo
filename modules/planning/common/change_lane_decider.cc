@@ -213,26 +213,30 @@ bool ChangeLaneDecider::IsClearToChangeLane(
     }
 
     // TODO(All) move to confs
-    constexpr double kSafeTime = 3.0;
+    constexpr double kSafeTimeOnSameDirection = 3.0;
+    constexpr double kSafeTimeOnOppositeDirection = 5.0;
     constexpr double kForwardMinSafeDistanceOnSameDirection = 6.0;
-    constexpr double kForwardMinSafeDistanceOnOppositeDirection = 12.0;
     constexpr double kBackwardMinSafeDistanceOnSameDirection = 8.0;
+    constexpr double kForwardMinSafeDistanceOnOppositeDirection = 50.0;
     constexpr double kBackwardMinSafeDistanceOnOppositeDirection = 1.0;
     constexpr double kDistanceBuffer = 0.5;
 
     double kForwardSafeDistance = 0.0;
     double kBackwardSafeDistance = 0.0;
     if (same_direction) {
-      kForwardSafeDistance = std::fmax(kForwardMinSafeDistanceOnSameDirection,
-                                       (ego_v - obstacle->speed()) * kSafeTime);
+      kForwardSafeDistance =
+          std::fmax(kForwardMinSafeDistanceOnSameDirection,
+                    (ego_v - obstacle->speed()) * kSafeTimeOnSameDirection);
       kBackwardSafeDistance =
           std::fmax(kBackwardMinSafeDistanceOnSameDirection,
-                    (obstacle->speed() - ego_v) * kSafeTime);
+                    (obstacle->speed() - ego_v) * kSafeTimeOnSameDirection);
     } else {
       kForwardSafeDistance =
-          std::fmin(kForwardMinSafeDistanceOnOppositeDirection,
-                    (ego_v + obstacle->speed()) * kSafeTime);
+          std::fmax(kForwardMinSafeDistanceOnOppositeDirection,
+                    (ego_v + obstacle->speed()) * kSafeTimeOnOppositeDirection);
       kBackwardSafeDistance = kBackwardMinSafeDistanceOnOppositeDirection;
+      AERROR << "haha";
+      AERROR << "kForwardSafeDistance " << kForwardSafeDistance;
     }
 
     if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance,
