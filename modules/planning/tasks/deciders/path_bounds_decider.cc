@@ -358,6 +358,7 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
       }
     }
 
+    // TODO(jiacheng): retire the following chunk of code when ready.
     /*
     hdmap::Lane curr_lane;
     hdmap::LaneInfoConstPtr lane_info_ptr;

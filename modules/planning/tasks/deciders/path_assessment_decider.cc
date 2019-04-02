@@ -103,12 +103,9 @@ Status PathAssessmentDecider::Process(
   // 3. Pick the optimal path.
   std::sort(valid_path_data.begin(), valid_path_data.end(),
             [](const PathData& lhs, const PathData& rhs) {
-              if (lhs.Empty() && rhs.Empty()) {
-                return false;
-              }
-              if (lhs.Empty() || rhs.Empty()) {
-                return rhs.Empty();
-              }
+              // Empty path_data is never the larger one.
+              if (lhs.Empty()) { return false; }
+              if (rhs.Empty()) { return true; }
               // Regular path goes before fallback path.
               bool lhs_is_regular =
                   lhs.path_label().find("regular") != std::string::npos;
