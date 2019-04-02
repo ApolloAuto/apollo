@@ -99,10 +99,7 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
     default:
       return nullptr;
   }
-
-  if (ptr != nullptr) {
-    ptr->Init();
-  }
+  ptr->Init();
   return ptr;
 }
 
@@ -366,7 +363,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
   const auto& scenario_config =
       config_map_[ScenarioConfig::VALET_PARKING].valet_parking_config();
 
-  // TODO(All) triger valet parking by route message definition as of now
+  // TODO(All) trigger valet parking by route message definition as of now
   double parking_spot_range_to_start =
       scenario_config.parking_spot_range_to_start();
   if (scenario::valet_parking::ValetParkingScenario::IsTransferable(
