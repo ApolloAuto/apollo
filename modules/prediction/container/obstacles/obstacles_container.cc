@@ -40,8 +40,8 @@ ObstaclesContainer::ObstaclesContainer()
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   // Clean up the history and get the PerceptionObstacles
   curr_frame_id_mapping_.clear();
-  curr_frame_predictable_obstacle_ids_.clear();
-  curr_frame_non_predictable_obstacle_ids_.clear();
+  curr_frame_movable_obstacle_ids_.clear();
+  curr_frame_unmovable_obstacle_ids_.clear();
   curr_frame_considered_obstacle_ids_.clear();
   curr_frame_id_perception_obstacle_map_.clear();
 
@@ -160,13 +160,13 @@ const PerceptionObstacle& ObstaclesContainer::GetPerceptionObstacle(
 }
 
 const std::vector<int>&
-ObstaclesContainer::curr_frame_predictable_obstacle_ids() {
-  return curr_frame_predictable_obstacle_ids_;
+ObstaclesContainer::curr_frame_movable_obstacle_ids() {
+  return curr_frame_movable_obstacle_ids_;
 }
 
 const std::vector<int>&
-ObstaclesContainer::curr_frame_non_predictable_obstacle_ids() {
-  return curr_frame_non_predictable_obstacle_ids_;
+ObstaclesContainer::curr_frame_unmovable_obstacle_ids() {
+  return curr_frame_unmovable_obstacle_ids_;
 }
 
 const std::vector<int>&
@@ -176,7 +176,7 @@ ObstaclesContainer::curr_frame_considered_obstacle_ids() {
 
 void ObstaclesContainer::SetConsideredObstacleIds() {
   curr_frame_considered_obstacle_ids_.clear();
-  for (const int id : curr_frame_predictable_obstacle_ids_) {
+  for (const int id : curr_frame_movable_obstacle_ids_) {
     Obstacle* obstacle_ptr = GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Null obstacle found.";
@@ -191,10 +191,10 @@ void ObstaclesContainer::SetConsideredObstacleIds() {
 }
 
 std::vector<int> ObstaclesContainer::curr_frame_obstacle_ids() {
-  std::vector<int> curr_frame_obs_ids = curr_frame_predictable_obstacle_ids_;
+  std::vector<int> curr_frame_obs_ids = curr_frame_movable_obstacle_ids_;
   curr_frame_obs_ids.insert(curr_frame_obs_ids.end(),
-                            curr_frame_non_predictable_obstacle_ids_.begin(),
-                            curr_frame_non_predictable_obstacle_ids_.end());
+                            curr_frame_unmovable_obstacle_ids_.begin(),
+                            curr_frame_unmovable_obstacle_ids_.end());
   return curr_frame_obs_ids;
 }
 
@@ -211,10 +211,10 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     AERROR << "Invalid ID [" << id << "]";
     return;
   }
-  if (!IsPredictable(perception_obstacle)) {
+  if (!IsMovable(perception_obstacle)) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id()
-           << "] is not predictable.";
-    curr_frame_non_predictable_obstacle_ids_.push_back(id);
+           << "] is unmovable.";
+    curr_frame_unmovable_obstacle_ids_.push_back(id);
     return;
   }
 
@@ -234,7 +234,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   }
 
   if (id != -1) {
-    curr_frame_predictable_obstacle_ids_.push_back(id);
+    curr_frame_movable_obstacle_ids_.push_back(id);
   }
 }
 
@@ -403,7 +403,7 @@ bool ObstaclesContainer::AdaptTracking(
   return false;
 }
 
-bool ObstaclesContainer::IsPredictable(
+bool ObstaclesContainer::IsMovable(
     const PerceptionObstacle& perception_obstacle) {
   if (!perception_obstacle.has_type() ||
       perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {
