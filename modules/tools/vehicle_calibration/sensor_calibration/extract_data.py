@@ -187,7 +187,7 @@ def extract_channel_data(record_reader, output_path, channel_name,
         if abs(begin_time - timestamp) > 2:
             channel_desc = record_reader.get_protodesc(channel_name)
             if channel_desc == 'apollo.drivers.Image':
-                extract_jpg_data(output_path, msg, extraction_ratio)
+                extract_camera_data(output_path, msg, extraction_ratio)
             elif channel_desc == 'apollo.drivers.PointCloud':
                 extract_pcd_data(output_path, msg, extraction_ratio)
             else:
