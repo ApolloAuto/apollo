@@ -1389,11 +1389,13 @@ void Obstacle::SetMotionStatus() {
   double std = FLAGS_still_obstacle_position_std;
   double speed_threshold = FLAGS_still_obstacle_speed_threshold;
   if (type_ == PerceptionObstacle::PEDESTRIAN ||
-      type_ == PerceptionObstacle::BICYCLE ||
-      type_ == PerceptionObstacle::UNKNOWN ||
-      type_ == PerceptionObstacle::UNKNOWN_MOVABLE) {
+      type_ == PerceptionObstacle::BICYCLE) {
     speed_threshold = FLAGS_still_pedestrian_speed_threshold;
     std = FLAGS_still_pedestrian_position_std;
+  } else if (type_ == PerceptionObstacle::UNKNOWN ||
+      type_ == PerceptionObstacle::UNKNOWN_MOVABLE) {
+    speed_threshold = FLAGS_still_unknown_speed_threshold;
+    std = FLAGS_still_unknown_position_std;
   }
   double speed = feature_history_.front().speed();
 
