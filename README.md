@@ -59,9 +59,6 @@ for information about migrating to the updated Apollo master from an old version
  and modules are functioning correctly and clear various version test cases,
  before progressing to a higher more capable version for your safety and the safety of those around you.
 
- - Please note, if you do not have a vehicle, proceed to the [Installation - Without Hardware](#without-hardware) 
-
-
 #### Individual Version Requirements:
 
 The following diagram highlights the scope and features of each Apollo release:
@@ -230,7 +227,7 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 
 * [Launch and Run Apollo](docs/howto/how_to_launch_Apollo.md)
 
-If at this point, you do not have a Hardware setup, please go to [Without Hardware](#without-hardware). 
+Congratulations! You have successfully built out Apollo without Hardware. If you do have a vehicle and hardware setup for a particular version, please pick the Quickstart guide most relevant to your setup:
 
 ### With Hardware:
 
@@ -245,11 +242,6 @@ If at this point, you do not have a Hardware setup, please go to [Without Hardwa
 * [Apollo 3.0 QuickStart Guide](docs/quickstart/apollo_3_0_quick_start.md)
 
 * [Apollo 3.5 QuickStart Guide](docs/quickstart/apollo_3_5_quick_start.md)
-
-
-### Without Hardware:
-
-* [How to Build Apollo ](https://github.com/ApolloAuto/apollo/tree/master/docs/demo_guide)
 
 ## Documents
 

@@ -67,3 +67,5 @@ cyber_recorder play -f docs/demo_guide/demo_3.5.record -l
 Dreamview should show a running vehicle now. (The following image might be different due to changes in frontend.)
 
 ![Dreamview with Trajectory](images/dv_trajectory_2.5.png)
+
+Congratulations! You have successfully built out Apollo!! If you do have the necessary Hardware setup, please go back to our [Readme](https://github.com/ApolloAuto/apollo/blob/master/README.md) for additional guidelines.

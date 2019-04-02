@@ -42,6 +42,8 @@ You can use command `bash apollo.sh test` to run all unit tests.
 
 * **BUILD coding style** : you can use command `bash apollo.sh buildify` to format your BUILD files before you submit.
 
+* **Best coding practice**: Follow [this guide](docs/technical_tutorial/best_coding_practice.md)
+
 #### Documentation
 
 If your code is not straightforward for other contributors to understand, it is recommended to implement the code in a clear and efficient way, and provide sufficient comments and documentation.
