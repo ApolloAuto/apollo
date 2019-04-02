@@ -33,13 +33,13 @@ OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
 
 Status OpenSpaceFallbackDecider::Process(Frame* frame) {
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles;
-  double collision_distance;
+  double obstacle_to_vichcle_distance = 0.0;
 
   BuildPredictedEnvironment(frame->obstacles(), predicted_bounding_rectangles);
 
   if (!IsCollisionFreeTrajectory(
           frame->open_space_info().chosen_paritioned_trajectory(),
-          predicted_bounding_rectangles, &collision_distance)) {
+          predicted_bounding_rectangles, &obstacle_to_vichcle_distance)) {
     // change gflag
     frame_->mutable_open_space_info()->set_fallback_flag(true);
 
@@ -47,36 +47,27 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     // vehicle speed is decreased to zero inside safety distance
     *(frame_->mutable_open_space_info()->mutable_fallback_trajectory()) =
         frame->open_space_info().chosen_paritioned_trajectory();
-    auto fallback_trajectory_vec =
-        frame_->mutable_open_space_info()->mutable_fallback_trajectory()->first;
+    auto fallback_trajectory_pair =
+        frame_->mutable_open_space_info()->mutable_fallback_trajectory();
 
     double stop_distance = std::max(
-        0.0, collision_distance - config_.open_space_fallback_decider_config()
-                                      .open_space_fall_back_stop_safety_gap());
+        0.0, obstacle_to_vichcle_distance -
+            config_.open_space_fallback_decider_config().
+                open_space_fall_back_stop_safety_gap());
     if (stop_distance > 0.0) {
       // the accelerate = v0^2 / (2*s), where s is slowing down distance
-      double accelerate = (frame_->vehicle_state().linear_velocity() *
-                           frame_->vehicle_state().linear_velocity()) /
-                          2.0 / stop_distance;
-      double current_v = frame_->vehicle_state().linear_velocity();
+      // TODO(Runxin): a better fallback trajectory
       size_t temp_horizon =
           frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
       for (size_t i = 0; i < temp_horizon; ++i) {
-        double next_v = std::max(
-            0.0, current_v - accelerate * frame_->open_space_info()
-                                              .fallback_trajectory()
-                                              .first.TrajectoryPointAt(i)
-                                              .relative_time());
-        fallback_trajectory_vec[i].set_v(next_v);
-        fallback_trajectory_vec[i].set_a(-accelerate);
-        current_v = next_v;
+        fallback_trajectory_pair->first[i].set_v(0.0);
       }
     } else {
       // if the stop distance is not enough, stop at current location
       size_t temp_horizon =
           frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
       for (size_t i = 0; i < temp_horizon; ++i) {
-        fallback_trajectory_vec[i].set_v(0.0);
+        fallback_trajectory_pair->first[i].set_v(0.0);
       }
     }
   } else {
@@ -109,7 +100,7 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
     const TrajGearPair& trajectory_gear_pair,
     const std::vector<std::vector<common::math::Box2d>>&
         predicted_bounding_rectangles,
-    double* collision_distance) {
+    double* obstacle_to_vichcle_distance) {
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();
@@ -137,7 +128,8 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
           if (obstacle_box.DistanceTo(vehicle_vec) <
               config_.open_space_fallback_decider_config()
                   .open_space_fall_back_collision_distance()) {
-            *collision_distance = obstacle_box.DistanceTo(vehicle_vec);
+            *obstacle_to_vichcle_distance =
+                obstacle_box.DistanceTo(vehicle_vec);
             return false;
           }
         }
