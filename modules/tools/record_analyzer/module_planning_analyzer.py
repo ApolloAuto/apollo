@@ -90,7 +90,10 @@ class PlannigAnalyzer:
                     adc_trajectory.debug.planning_data.init_point.relative_time
                 if self.last_init_point_speed is not None:
                     duration = t - self.last_init_point_t
-                    accel = (speed - self.last_init_point_speed) / duration
+                    if duration <= 0:
+                        accel = 0
+                    else:
+                        accel = (speed - self.last_init_point_speed) / duration
                     if accel > 0:
                         self.init_point_accel.append(accel)
                     if accel < 0:
