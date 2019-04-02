@@ -1393,7 +1393,7 @@ void Obstacle::SetMotionStatus() {
     speed_threshold = FLAGS_still_pedestrian_speed_threshold;
     std = FLAGS_still_pedestrian_position_std;
   } else if (type_ == PerceptionObstacle::UNKNOWN ||
-      type_ == PerceptionObstacle::UNKNOWN_MOVABLE) {
+             type_ == PerceptionObstacle::UNKNOWN_MOVABLE) {
     speed_threshold = FLAGS_still_unknown_speed_threshold;
     std = FLAGS_still_unknown_position_std;
   }
