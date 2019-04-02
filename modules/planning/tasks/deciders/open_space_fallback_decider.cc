@@ -91,9 +91,11 @@ void OpenSpaceFallbackDecider::BuildPredictedEnvironment(
                              .open_space_prediction_time_period()) {
     std::vector<Box2d> predicted_env;
     for (const Obstacle* obstacle : obstacles) {
-      TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
-      Box2d box = obstacle->GetBoundingBox(point);
-      predicted_env.push_back(std::move(box));
+      if (!obstacle->IsVirtual()) {
+        TrajectoryPoint point = obstacle->GetPointAtTime(relative_time);
+        Box2d box = obstacle->GetBoundingBox(point);
+        predicted_env.push_back(std::move(box));
+      }
     }
     predicted_bounding_rectangles.emplace_back(std::move(predicted_env));
     relative_time += FLAGS_trajectory_time_resolution;
