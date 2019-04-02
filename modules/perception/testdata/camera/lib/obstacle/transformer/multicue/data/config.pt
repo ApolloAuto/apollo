@@ -1,7 +1,7 @@
 model_param {
   model_name: "./"
   model_type: "RTNet"
-  weight_file: "caffe.md"
+  weight_file: "caffe.model"
   proto_file: "caffe.pt"
   anchors_file: "test_anchors.txt"
   types_file: "test_types.txt"

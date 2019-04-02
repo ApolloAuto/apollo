@@ -16,6 +16,6 @@ message DetectionParam {
     optional string model_name = 11 [default = "RTNet"];
     optional string model_type = 12 [default = "RTNet"];
     optional string proto_file = 13 [default = "caffe.pt"];
-    optional string weight_file = 14 [default = "caffe.md"];
+    optional string weight_file = 14 [default = "caffe.model"];
     optional int32  max_batch_size = 15 [default = 1];
 }
