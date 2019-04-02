@@ -47,27 +47,27 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     // vehicle speed is decreased to zero inside safety distance
     *(frame_->mutable_open_space_info()->mutable_fallback_trajectory()) =
         frame->open_space_info().chosen_paritioned_trajectory();
-    auto fallback_trajectory_pair =
+    auto ptr_fallback_trajectory_pair =
         frame_->mutable_open_space_info()->mutable_fallback_trajectory();
 
-    double stop_distance = std::max(
-        0.0, obstacle_to_vichcle_distance -
-            config_.open_space_fallback_decider_config().
-                open_space_fall_back_stop_safety_gap());
+    double stop_distance =
+        std::max(0.0, obstacle_to_vichcle_distance -
+                          config_.open_space_fallback_decider_config()
+                              .open_space_fall_back_stop_safety_gap());
     if (stop_distance > 0.0) {
       // the accelerate = v0^2 / (2*s), where s is slowing down distance
       // TODO(Runxin): a better fallback trajectory
       size_t temp_horizon =
           frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
       for (size_t i = 0; i < temp_horizon; ++i) {
-        fallback_trajectory_pair->first[i].set_v(0.0);
+        ptr_fallback_trajectory_pair->first[i].set_v(0.0);
       }
     } else {
       // if the stop distance is not enough, stop at current location
       size_t temp_horizon =
           frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
       for (size_t i = 0; i < temp_horizon; ++i) {
-        fallback_trajectory_pair->first[i].set_v(0.0);
+        ptr_fallback_trajectory_pair->first[i].set_v(0.0);
       }
     }
   } else {
