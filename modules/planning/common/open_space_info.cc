@@ -59,6 +59,11 @@ void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
                                     ->add_trajectory();
   auto chosen_trajectory = chosen_paritioned_trajectory_.first;
   CopyTrajectory(chosen_trajectory, ptr_chosen_trajectory);
+
+  // 4, record if the trajectory is fallback trajecotry
+  ptr_debug->mutable_planning_data()
+      ->mutable_open_space()
+      ->set_is_fallback_trajectory(fallback_flag_);
 }
 
 }  // namespace planning
