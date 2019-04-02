@@ -31,12 +31,13 @@ import tarfile
 
 import six
 
-import cv2 as cv
-import cv_bridge
+import cv2.cv as cv
 import pcl
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
+
+from modules.drivers.proto.sensor_image_pb2 import Image
 
 CYBER_PATH = os.environ['CYBER_PATH']
 
@@ -62,13 +63,12 @@ def process_dir(path, operation):
 
     return True
 
-def extract_jpg_data(dest_dir, msg, ratio):
+def extract_camera_data(dest_dir, msg, ratio):
     """
-    Extract JPG file from message according to ratio
+    Extract camera file from message according to ratio
     """
     time_nseconds = []
     pre_time_second = 0
-    bridge = cv_bridge.CvBridge()
 
     seq = 0
     # Check timestamp.
@@ -79,12 +79,20 @@ def extract_jpg_data(dest_dir, msg, ratio):
         pre_time_second = cur_time_second
         time_nseconds.append(msg.header.stamp.to_nsec())
 
-        # Save image.
-        msg.encoding = 'yuv422'
-        img = bridge.imgmsg_to_cv(msg, 'yuv422')
-        img = cv.cvtColor(img, cv.COLOR_YUV2BGR_YUYV)
-        img_file = os.path.join(dest_dir, '{}.jpg'.format(seq))
-        cv.imwrite(img_file, img)
+        Image.ParseFromString(msg)
+
+        # Save image according to cyber format.
+        # height = 4, image height, that is, number of rows.
+        # width = 5,  image width, that is, number of columns.
+        # encoding = 6, as string, type is 'rgb8', 'bgr8' or 'gray'.
+        # step = 7, full row length in bytes.
+        # data = 8, actual matrix data in bytes, size is (step * rows).
+        # type = CV_8UC1 if image step is equal to width as gray, CV_8UC3
+        # if step * 3 is equal to width.
+        _type = cv.CV_8UC1 if Image.step == Image.width else cv.CV_8UC3
+        mat = cv.CreateMat(Image.height, Image.width, _type)
+        image_file = os.path.join(dest_dir, '{}.png'.format(seq))
+        cv.SaveImage(image_file, dest_dir + str(seq))
         seq += 1
 
 
@@ -179,7 +187,7 @@ def extract_channel_data(record_reader, output_path, channel_name,
         if abs(begin_time - timestamp) > 2:
             channel_desc = record_reader.get_protodesc(channel_name)
             if channel_desc == 'apollo.drivers.Image':
-                extract_jpg_data(output_path, msg, extraction_ratio)
+                extract_camera_data(output_path, msg, extraction_ratio)
             elif channel_desc == 'apollo.drivers.PointCloud':
                 extract_pcd_data(output_path, msg, extraction_ratio)
             else:
