@@ -1,11 +1,14 @@
 # How to Build and Release your Docker Container
 
-* [1. Install Docker](#docker)
-* [2. Build and Release](#build_release)
-* [3. Build in VSCode](#build_in_vscode)
-* [4. Test](#test)
+* [1. Install Docker](#install-docker)
+* [2. Git LFS](#install-git-lfs)
+* [3. Build Apollo](#build-apollo)
+* [4. What's next](#what's-next)
+* [5. Build in VSCode](#build-in-visual-studio-code)
+* [6. Test](#test)
+* [7. Legal Disclaimer](#legal-disclaimer)
 
-## <span id="docker">Install Docker</span>
+## Install Docker
 The system requirement for building Apollo is Ubuntu 14.04. Using a Docker container is the simplest way to set up the build environment for Apollo project. A Detailed docker tutorial can be found [here](https://docs.docker.com/).
 
 To install docker, you may refer to
@@ -13,10 +16,9 @@ To install docker, you may refer to
 Don't forget to test it using 
 [post-installation steps for Linux](https://docs.docker.com/install/linux/linux-postinstall).
 
-## *New - Git LFS*
+## Install Git LFS
 
-Now we leverage [git-lfs](https://git-lfs.github.com) to manage large files in
-Apollo. Please make sure you installed the plugin by following the steps on its webpage or refer to [the Migration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md) for additional information
+We now leverage [git-lfs](https://git-lfs.github.com) to manage large files in Apollo. Please make sure you installed the plugin by following the steps on its webpage or refer to [the Migration Guide](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_migrate_to_the_updated_apollo_master_from_old_versions.md) for additional information
 
 ```bash
 # Required for Ubuntu 14.04 / 16.04.
@@ -33,7 +35,7 @@ But for old versions like Git 1.x, you may need to call it explicitly with
 `git lfs clone` and `git lfs pull`.
 
 
-## Build and Release
+## Build Apollo
 
 ### Start container
 We provide a build image named *dev-latest*. The Container will mount your local apollo repo to */apollo*.
@@ -60,21 +62,12 @@ bash apollo.sh build_cpu
 bash apollo.sh build --local_resources 2048,1.0,1.0
 ```
 
-### Release binaries
+## What's next
 
-```bash
-bash apollo.sh release
-```
-This command will generate a release directory, which contains the ROS environment, running scripts, binaries and dependent shared libraries (.so files).
+1. If at this point, you do not have a vehicle setup or you want to confirm that Apollo has been built out correctly, please continue to [How to Launch and Run Apollo](how_to_launch_Apollo.md)
+2. If you do have a vehicle setup, please continue back to our [Software Installation guide](https://github.com/ApolloAuto/apollo/blob/master/docs/quickstart/apollo_software_installation_guide.md)
 
-To create a release excluding proprietary software (such as ESD CAN library), use:
-```bash
-bash apollo.sh release_noproprietary
-```
-
-In order to generate and push your images to your own docker repository, please refer to [How to Generate and Push Docker images](how_to_generate_and_push_docker_images.md)
-
-## <span id="build_in_vscode">Build in Visual Studio Code</span>
+## Build in Visual Studio Code
 ### Install VSCode
 The easiest way to install for Debian/Ubuntu based distributions is to download from  https://code.visualstudio.com and install the .deb package (64-bit) either through the graphical software center if it's available or through the command line with:
 ```bash
