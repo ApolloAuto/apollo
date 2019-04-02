@@ -281,10 +281,10 @@ default_task_config: {
     gear_shift_unit_t: 0.02
     gear_shift_period_duration: 2.0
     interpolated_pieces_num: 20
-    initial_gear_check_horizon: 1
+    initial_gear_check_horizon: 7
     heading_search_range: 0.79
-    heading_track_range: 3.14
-    vehicle_box_iou_threshold: 0.8
+    heading_track_range: 1.57
+    vehicle_box_iou_threshold: 0.9
     distance_search_range: 1.0
     distance_to_midpoint: 0.1
   }
