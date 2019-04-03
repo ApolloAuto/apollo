@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 import Chart from "chart.js";
 import _ from "lodash";
 
+import STORE from "store";
+
 Chart.plugins.register({
     afterDatasetsDraw: function(chart, easing) {
         const fontSize = 15;
@@ -44,7 +46,8 @@ Chart.plugins.register({
                 chart.ctx.font = Chart.helpers.fontString(20, fontStyle, fontFamily);
                 chart.ctx.translate(position.x, position.y);
                 chart.ctx.rotate(-rotationInPixels); // ChartJS's rotation is clockwise
-                chart.ctx.fillText("►", 0, 0);
+                chart.ctx.fillStyle = dataset.borderColor;
+                chart.ctx.fillText("➡", 0, 0);
 
                 chart.ctx.restore();
             }
@@ -81,6 +84,13 @@ export default class ScatterGraph extends React.Component {
             },
             legend: {
                 display: options.legend.display,
+                labels: {
+                    filter: (legendItem, data) => {
+                        // skip label that starts with 'skip_',
+                        // such as the one for car's bounding box
+                        return !legendItem.text.startsWith('skip_');
+                    }
+                }
             },
             tooltips: {
                 enable: true,
@@ -157,6 +167,41 @@ export default class ScatterGraph extends React.Component {
         }
     }
 
+    updateCar(name, point, properties) {
+        // draw heading arrow
+        {
+            const arrowName = name + '_arrow';
+            if (this.name2idx[arrowName] === undefined) {
+                this.name2idx[arrowName] = this.chart.data.datasets.length;
+            }
+            const idx = this.name2idx[arrowName];
+            const arrowProperties = properties;
+            arrowProperties.specialMarker = 'car';
+            arrowProperties.borderWidth = 0;
+            arrowProperties.pointRadius = 0;
+            this.updateData(idx, arrowName, arrowProperties, [point]);
+        }
+
+        // draw ego-vehicle bounding box
+        {
+            const polygonName = 'skip_legend_' + name + '_car_bounding_box';
+            if (this.name2idx[polygonName] === undefined) {
+                this.name2idx[polygonName] = this.chart.data.datasets.length;
+            }
+            const idx2 = this.name2idx[polygonName];
+            const polygon = STORE.hmi.calculateCarPolygonPoints(point.x, point.y, point.heading);
+            const polygonProperties = {
+                borderWidth: 1,
+                pointRadius: 0,
+                color: properties.color,
+                showLine: true,
+                fill: false,
+                lineTension: 0,
+            };
+            this.updateData(idx2, polygonName, polygonProperties, polygon);
+        }
+    }
+
     updateChart(props) {
         if (!props.data || !props.properties) {
             return;
@@ -166,16 +211,9 @@ export default class ScatterGraph extends React.Component {
 
         // Draw cars
         for (const name in props.properties.cars) {
-            if (this.name2idx[name] === undefined) {
-                this.name2idx[name] = this.chart.data.datasets.length;
-            }
-            const idx = this.name2idx[name];
             const point = _.get(datasets, `cars[${name}]`, {});
             const properties = _.get(props, `properties.cars[${name}]`, {});
-            properties.specialMarker = 'car';
-            properties.borderWidth = 0;
-            properties.pointRadius = 0;
-            this.updateData(idx, name, properties, [point]);
+            this.updateCar(name, point, properties);
         }
 
         // Draw lines
