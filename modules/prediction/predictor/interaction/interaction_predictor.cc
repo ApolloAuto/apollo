@@ -54,27 +54,29 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
     return;
   }
 
+  int num_lane_sequence = feature_ptr->lane().lane_graph().lane_sequence_size();
+  std::vector<double> best_lon_accelerations(num_lane_sequence, 0.0);
   std::vector<double> candidate_lon_accelerations =
       {0.0, -0.5, -1.0, -1.5, -2.0, -2.5, -3.0};
-  double best_lon_acceleration = 0.0;
   double smallest_cost = std::numeric_limits<double>::max();
-  std::vector<double> posteriors;
+  std::vector<double> posteriors(num_lane_sequence, 0.0);
   double posterior_sum = 0.0;
-  for (const LaneSequence& lane_sequence :
-       feature_ptr->lane().lane_graph().lane_sequence()) {
+  for (int i = 0; i < num_lane_sequence; ++i) {
+    const LaneSequence& lane_sequence =
+        feature_ptr->lane().lane_graph().lane_sequence(i);
     for (const double lon_acceleration : candidate_lon_accelerations) {
       double cost =
           ComputeTrajectoryCost(*obstacle, lane_sequence, lon_acceleration);
       if (cost < smallest_cost) {
         smallest_cost = cost;
-        best_lon_acceleration = lon_acceleration;
+        best_lon_accelerations[i] = lon_acceleration;
       }
     }
 
     double likelihood = ComputeLikelihood(smallest_cost);
     double prior = lane_sequence.probability();
     double posterior = ComputePosterior(prior, likelihood);
-    posteriors.push_back(posterior);
+    posteriors[i] = posterior;
     posterior_sum += posterior;
   }
 
@@ -82,8 +84,7 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
   double largest_posterior = 0.0;
   CHECK_EQ(posteriors.size(),
            feature_ptr->lane().lane_graph().lane_sequence_size());
-  for (int i = 0; i < feature_ptr->lane().lane_graph().lane_sequence_size();
-       ++i) {
+  for (int i = 0; i < num_lane_sequence; ++i) {
     double normalized_posterior =
         posteriors[i] / (posterior_sum + FLAGS_double_precision);
     feature_ptr->mutable_lane()
@@ -98,21 +99,39 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 
   double probability_threshold = 0.5;
   if (largest_posterior > probability_threshold) {
-    for (const LaneSequence& lane_sequence :
-         feature_ptr->lane().lane_graph().lane_sequence()) {
+    for (int i = 0; i < num_lane_sequence; ++i) {
+      const LaneSequence& lane_sequence =
+          feature_ptr->lane().lane_graph().lane_sequence(i);
       if (lane_sequence.probability() < probability_threshold) {
         continue;
       }
+      double best_lon_acceleration = best_lon_accelerations[i];
+      if (lane_sequence.has_stop_sign()) {
+        double stop_acceleration = 0.0;
+        double stop_distance = lane_sequence.stop_sign().lane_sequence_s() -
+                               lane_sequence.lane_s();
+        SupposedToStop(*feature_ptr, stop_distance, &stop_acceleration);
+        best_lon_acceleration =
+            std::min(best_lon_acceleration, stop_acceleration);
+      }
       std::vector<TrajectoryPoint> points;
       DrawTrajectory(*obstacle, lane_sequence,
-        best_lon_acceleration,
-        FLAGS_prediction_trajectory_time_length,
-        FLAGS_prediction_trajectory_time_resolution,
-        &points);
-    Trajectory trajectory = GenerateTrajectory(points);
-    trajectories_.push_back(std::move(trajectory));
+          best_lon_acceleration,
+          FLAGS_prediction_trajectory_time_length,
+          FLAGS_prediction_trajectory_time_resolution,
+          &points);
+      Trajectory trajectory = GenerateTrajectory(points);
+      trajectories_.push_back(std::move(trajectory));
     }
   } else {
+    const LaneSequence& sequence =
+        feature_ptr->lane().lane_graph().lane_sequence(best_seq_idx);
+    double best_lon_acceleration = best_lon_accelerations[best_seq_idx];
+    if (sequence.has_stop_sign()) {
+      double stop_distance =
+          sequence.stop_sign().lane_sequence_s() - sequence.lane_s();
+      SupposedToStop(*feature_ptr, stop_distance, &best_lon_acceleration);
+    }
     std::vector<TrajectoryPoint> points;
     DrawTrajectory(*obstacle,
         feature_ptr->lane().lane_graph().lane_sequence(best_seq_idx),
