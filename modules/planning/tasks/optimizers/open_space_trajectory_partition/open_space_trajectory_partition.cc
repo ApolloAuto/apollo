@@ -77,7 +77,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
   TrajGearPair* current_trajectory = &(paritioned_trajectories_ptr->back());
   // Set initial gear position for first ADCTrajectory depending on v
   // and check potential edge cases
-  constexpr double kepsilon = 0.0;
+  constexpr double kEpsilon = 0.0;
   size_t horizon = interpolated_trajectory_result_ptr->size();
   size_t initial_horizon = std::min(
       horizon, static_cast<size_t>(open_space_trajectory_partition_config_
@@ -85,12 +85,12 @@ Status OpenSpaceTrajectoryPartition::Process() {
   int direction_flag = 0;
   int init_direction = 0;
   for (size_t i = 0; i < initial_horizon; ++i) {
-    if (interpolated_trajectory_result_ptr->at(i).v() > kepsilon) {
+    if (interpolated_trajectory_result_ptr->at(i).v() > kEpsilon) {
       direction_flag++;
       if (init_direction == 0) {
         init_direction++;
       }
-    } else if (interpolated_trajectory_result_ptr->at(i).v() < -kepsilon) {
+    } else if (interpolated_trajectory_result_ptr->at(i).v() < -kEpsilon) {
       direction_flag--;
       if (init_direction == 0) {
         init_direction--;
@@ -124,11 +124,11 @@ Status OpenSpaceTrajectoryPartition::Process() {
   for (size_t i = 0; i < initial_horizon; ++i) {
     auto* trajectory_point_i = &(interpolated_trajectory_result_ptr->at(i));
     if (current_trajectory->second == canbus::Chassis::GEAR_REVERSE) {
-      trajectory_point_i->set_v(trajectory_point_i->v() > kepsilon
+      trajectory_point_i->set_v(trajectory_point_i->v() > kEpsilon
                                     ? -trajectory_point_i->v()
                                     : trajectory_point_i->v());
     } else {
-      trajectory_point_i->set_v(trajectory_point_i->v() < -kepsilon
+      trajectory_point_i->set_v(trajectory_point_i->v() < -kEpsilon
                                     ? -trajectory_point_i->v()
                                     : trajectory_point_i->v());
     }
@@ -140,7 +140,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     const TrajectoryPoint& trajectory_point_i =
         interpolated_trajectory_result_ptr->at(i);
     // ADEBUG << "trajectory velocity is " << trajectory_point_i.v();
-    if (trajectory_point_i.v() < -kepsilon &&
+    if (trajectory_point_i.v() < -kEpsilon &&
         current_trajectory->second == canbus::Chassis::GEAR_DRIVE) {
       paritioned_trajectories_ptr->emplace_back();
       current_trajectory = &(paritioned_trajectories_ptr->back());
@@ -150,7 +150,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
     }
     // Shift from GEAR_REVERSE to GEAR_DRIVE if v > 0
     // then add a new trajectory with GEAR_DRIVE
-    if (trajectory_point_i.v() > kepsilon &&
+    if (trajectory_point_i.v() > kEpsilon &&
         current_trajectory->second == canbus::Chassis::GEAR_REVERSE) {
       paritioned_trajectories_ptr->emplace_back();
       current_trajectory = &(paritioned_trajectories_ptr->back());
@@ -239,7 +239,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
       vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE
           ? NormalizeAngle(vehicle_state.heading() + M_PI)
           : vehicle_state.heading();
-  // TODO(Jinyun) move to confs
+  // TODO(Jinyun): Move to confs
   constexpr double abs_static_linear_velocity = 0.2;
   constexpr double abs_static_linear_acceleration = 0.1;
   const bool is_vehicle_static =
