@@ -105,6 +105,10 @@ if __name__ == "__main__":
         "-s", "--simulation", action="store_const", const=True,
         help="For simulation API call")
     parser.add_argument(
+        "-sim", "--simulation2", action="store_const", const=True,
+        help="For dreamland API call")
+
+    parser.add_argument(
         "-path", "--planningpath", action="store_const", const=True,
         help="plot planing paths in cartesian coordinate.")
 
@@ -121,7 +125,7 @@ if __name__ == "__main__":
     reader = RecordReader(record_file)
 
     control_analyzer = ControlAnalyzer()
-    planning_analyzer = PlannigAnalyzer(args.simulation)
+    planning_analyzer = PlannigAnalyzer(args.simulation, args.simulation2)
     lidar_endtoend_analyzer = LidarEndToEndAnalyzer()
 
     process(control_analyzer, planning_analyzer,
@@ -130,6 +134,8 @@ if __name__ == "__main__":
 
     if args.simulation:
         planning_analyzer.print_simulation_results()
+    elif args.simulation2:
+        planning_analyzer.print_sim_results()
     elif args.planningpath or args.planningrefpath:
         plt.axis('equal')
         plt.show()
