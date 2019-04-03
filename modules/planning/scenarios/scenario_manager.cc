@@ -671,6 +671,11 @@ void ScenarioManager::ScenarioSelfVote(const common::TrajectoryPoint& ego_point,
 }
 */
 
+bool ScenarioManager::IsBareIntersectionScenario(
+    const ScenarioConfig::ScenarioType& scenario_type) {
+  return (scenario_type == ScenarioConfig::BARE_INTERSECTION_UNPROTECTED);
+}
+
 bool ScenarioManager::IsStopSignScenario(
     const ScenarioConfig::ScenarioType& scenario_type) {
   return (scenario_type == ScenarioConfig::STOP_SIGN_PROTECTED ||
@@ -687,29 +692,49 @@ bool ScenarioManager::IsTrafficLightScenario(
 
 void ScenarioManager::UpdatePlanningContext(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
-  if (!IsStopSignScenario(scenario_type)) {
-    PlanningContext::MutablePlanningStatus()->mutable_stop_sign()->Clear();
-  }
-  if (!IsTrafficLightScenario(scenario_type)) {
-    PlanningContext::MutablePlanningStatus()->mutable_traffic_light()->Clear();
-  }
+  // BareIntersection scenario
+  UpdatePlanningContextBareIntersectionScenario(frame, scenario_type);
 
   // StopSign scenario
-  if (IsStopSignScenario(scenario_type)) {
-    UpdatePlanningContextStopSignScenario(frame, scenario_type);
+  UpdatePlanningContextStopSignScenario(frame, scenario_type);
+
+  // TrafficLight scenario
+  UpdatePlanningContextTrafficLightScenario(frame, scenario_type);
+}
+
+// update: bare_intersection status in PlanningContext
+void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  if (!IsBareIntersectionScenario(scenario_type)) {
+    PlanningContext::MutablePlanningStatus()->mutable_bare_intersection()
+                                            ->Clear();
     return;
   }
 
-  // TrafficLight scenario
-  if (IsTrafficLightScenario(scenario_type)) {
-    UpdatePlanningContextTrafficLightScenario(frame, scenario_type);
+  if (scenario_type == current_scenario_->scenario_type()) {
     return;
+  }
+
+  // set to first_encountered pnc_junction
+  const auto map_itr =
+      first_encountered_overlap_map_.find(ReferenceLineInfo::PNC_JUNCTION);
+  if (map_itr != first_encountered_overlap_map_.end()) {
+    PlanningContext::MutablePlanningStatus()->mutable_bare_intersection()
+        ->set_current_pnc_junction_overlap_id(map_itr->second.object_id);
+    ADEBUG << "Update PlanningContext with first_encountered pnc_junction["
+           << map_itr->second.object_id << "] start_s["
+           << map_itr->second.start_s << "]";
   }
 }
 
 // update: stop_sign status in PlanningContext
 void ScenarioManager::UpdatePlanningContextStopSignScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  if (!IsStopSignScenario(scenario_type)) {
+    PlanningContext::MutablePlanningStatus()->mutable_stop_sign()->Clear();
+    return;
+  }
+
   if (scenario_type == current_scenario_->scenario_type()) {
     return;
   }
@@ -729,6 +754,11 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
 // update: traffic_light(s) status in PlanningContext
 void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  if (!IsTrafficLightScenario(scenario_type)) {
+    PlanningContext::MutablePlanningStatus()->mutable_traffic_light()->Clear();
+    return;
+  }
+
   if (scenario_type == current_scenario_->scenario_type()) {
     return;
   }

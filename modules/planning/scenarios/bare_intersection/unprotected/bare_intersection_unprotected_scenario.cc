@@ -47,6 +47,23 @@ void BareIntersectionUnprotectedScenario::Init() {
     return;
   }
 
+  const std::string pnc_junction_overlap_id =
+      PlanningContext::Planningstatus().bare_intersection()
+                                       .current_pnc_junction_overlap_id();
+  if (pnc_junction_overlap_id.empty()) {
+    AERROR << "Could not find pnc_junction";
+    return;
+  }
+  hdmap::PNCJunctionInfoConstPtr pnc_junction =
+      HDMapUtil::BaseMap().GetPNCJunctionById(
+          hdmap::MakeMapId(pnc_junction_overlap_id));
+  if (!pnc_junction) {
+    AERROR << "Could not find pnc_junction: " << pnc_junction_overlap_id;
+    return;
+  }
+
+  context_.current_pnc_junction_overlap_id = pnc_junction_overlap_id;
+
   init_ = true;
 }
 
