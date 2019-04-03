@@ -36,8 +36,11 @@ ConditionNotifier::ConditionNotifier() {
 
   if (!Init()) {
     AERROR << "fail to init condition notifier.";
-    is_shutdown_.exchange(true);
+    is_shutdown_.store(true);
+    return;
   }
+  next_seq_ = indicator_->next_seq.load();
+  ADEBUG << "next_seq: " << next_seq_;
 }
 
 ConditionNotifier::~ConditionNotifier() { Shutdown(); }
@@ -57,9 +60,10 @@ bool ConditionNotifier::Notify(const ReadableInfo& info) {
     return false;
   }
 
-  auto idx = indicator_->next_idx_to_write.fetch_add(1) % kBufLength;
+  uint64_t seq = indicator_->next_seq.fetch_add(1);
+  uint64_t idx = seq % kBufLength;
   indicator_->infos[idx] = info;
-  ++indicator_->written_info_num;
+  indicator_->seqs[idx] = seq;
 
   return true;
 }
@@ -77,15 +81,16 @@ bool ConditionNotifier::Listen(int timeout_ms, ReadableInfo* info) {
 
   int timeout_us = timeout_ms * 1000;
   while (!is_shutdown_.load()) {
-    uint64_t written_info_num = indicator_->written_info_num.load();
-    if (written_info_num > next_listen_num_) {
-      if (next_listen_num_ == 0) {
-        next_listen_num_ = written_info_num - 1;
+    uint64_t seq = indicator_->next_seq.load();
+    if (seq != next_seq_) {
+      auto idx = next_seq_ % kBufLength;
+      if (indicator_->seqs[idx] == next_seq_) {
+        *info = indicator_->infos[idx];
+        ++next_seq_;
+        return true;
+      } else {
+        ADEBUG << "seq[" << next_seq_ << "] is writing, can not read now.";
       }
-      auto idx = next_listen_num_ % kBufLength;
-      *info = indicator_->infos[idx];
-      next_listen_num_ += 1;
-      return true;
     }
 
     if (timeout_us > 0) {
