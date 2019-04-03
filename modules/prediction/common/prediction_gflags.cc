@@ -186,7 +186,7 @@ DEFINE_double(distance_beyond_junction, 0.5,
               "consider it in junction.");
 DEFINE_double(defualt_junction_range, 10.0,
               "Default value for the range of a junction.");
-DEFINE_double(distance_to_slow_down_at_stop_sign, 40.0,
+DEFINE_double(distance_to_slow_down_at_stop_sign, 80.0,
               "The distance to slow down at stop sign");
 
 // Evaluator
