@@ -32,7 +32,6 @@ import tarfile
 import six
 import numpy as np
 import cv2.cv as cv
-#import pcl
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
@@ -72,12 +71,13 @@ def extract_camera_data(dest_dir, msg, ratio):
 
     seq = 0
     # Check timestamp.
+    #TODO: change saving logic 
     #while True:
     if True:
         cur_time_second = msg.timestamp
 
-        Image = sensor_image_pb2.Image()
-        Image.ParseFromString(msg.message)
+        image = sensor_image_pb2.Image()
+        image.ParseFromString(msg.message)
         # Save image according to cyber format.
         # height = 4, image height, that is, number of rows.
         # width = 5,  image width, that is, number of columns.
@@ -87,27 +87,27 @@ def extract_camera_data(dest_dir, msg, ratio):
         # type = CV_8UC1 if image step is equal to width as gray, CV_8UC3
         # if step * 3 is equal to width.
 
-        if Image.encoding == "rgb8" or Image.encoding == "bgr8":
-            if Image.step != Image.width * 3:
+        if image.encoding == "rgb8" or image.encoding == "bgr8":
+            if image.step != image.width * 3:
                 print("Image.step %d does not equal Image.width %d * 3 for color image" %
-                    (Image.step, Image.width))
+                    (image.step, image.width))
                 return False
-        elif Image.encoding == "gray" or Image.encoding == "y":
-            if Image.step != Image.width:
+        elif image.encoding == "gray" or image.encoding == "y":
+            if image.step != image.width:
                 print("Image.step %d does not equal Image.width %d or gray image" %
-                    (Image.step, Image.width))
+                    (image.step, image.width))
                 return False
         else:
             print("Unsupported image encoding type %s" %encoding)
             return False
 
-        channel_num = Image.step / Image.width
-        image_mat = np.fromstring(Image.data, dtype=np.uint8).reshape(
-                        (Image.height, Image.width, channel_num))
+        channel_num = image.step / image.width
+        image_mat = np.fromstring(image.data, dtype=np.uint8).reshape(
+                        (image.height, image.width, channel_num))
 
         image_file = os.path.join(dest_dir, '{}.png'.format(cur_time_second))
         #python cv2 save image in BGR oder
-        if Image.encoding == "rgb8":
+        if image.encoding == "rgb8":
             image_mat = image_mat[:, :, ::-1]
             cv.SaveImage(image_file, cv.fromarray(image_mat))
         else:
