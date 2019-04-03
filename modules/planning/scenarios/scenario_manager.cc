@@ -309,6 +309,14 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
 ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
     const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap) {
   const auto& reference_line_info = frame.reference_line_info().front();
+  if (reference_line_info.GetIntersectionRightoffRoad(pnc_junction_overlap)) {
+    return default_scenario_type_;
+  }
+
+  const auto& scenario_config =
+      config_map_[ScenarioConfig::BARE_INTERSECTION_UNPROTECTED]
+                  .bare_intersection_unprotected_config();
+
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double adc_distance_to_pnc_junction =
       pnc_junction_overlap.start_s - adc_front_edge_s;
@@ -317,15 +325,25 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
          << "] pnc_junction_overlap_start_s[" << pnc_junction_overlap.start_s
          << "]";
 
-  // TODO(all)
-  // const bool bare_junction_scenario =
-  //    (adc_distance_to_pnc_junction > 0 && false);
+  const bool bare_junction_scenario =
+      (adc_distance_to_pnc_junction > 0 &&
+       adc_distance_to_pnc_junction <=
+           scenario_config.start_bare_intersection_scenario_distance());
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
+      if (bare_junction_scenario) {
+        return ScenarioConfig::BARE_INTERSECTION_UNPROTECTED;
+      }
+      break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+      if (current_scenario_->GetStatus() !=
+          Scenario::ScenarioStatus::STATUS_DONE) {
+        return current_scenario_->scenario_type();
+      }
+      break;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
@@ -504,13 +522,8 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     } else if (pnc_junction_overlap) {
       // bare intersection
       if (FLAGS_enable_scenario_bare_intersection) {
-        if (reference_line_info.GetIntersectionRightoffRoad(
-                *pnc_junction_overlap)) {
-          scenario_type = default_scenario_type_;
-        } else {
-          scenario_type =
-              SelectBareIntersectionScenario(frame, *pnc_junction_overlap);
-        }
+        scenario_type =
+            SelectBareIntersectionScenario(frame, *pnc_junction_overlap);
       }
     }
   }
