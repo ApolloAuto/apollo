@@ -150,4 +150,30 @@ export default class HMI {
             this.dataCollectionProgress.set(category, data[category]);
         });
     }
+
+    rotate2DPoint({ x, y }, rotationInRad) {
+        return {
+            x: x * Math.cos(rotationInRad) - y * Math.sin(rotationInRad),
+            y: x * Math.sin(rotationInRad) + y * Math.cos(rotationInRad),
+        };
+    }
+
+    calculateCarPolygonPoints(positionX, positionY, headingInRad) {
+        const config = this.vehicleParam;
+        const polygonPoints = [
+            { y: -config.leftEdgeToCenter, x: config.frontEdgeToCenter },
+            { y: config.rightEdgeToCenter, x: config.frontEdgeToCenter },
+            { y: config.rightEdgeToCenter, x: -config.backEdgeToCenter },
+            { y: -config.leftEdgeToCenter, x: -config.backEdgeToCenter },
+            { y: -config.leftEdgeToCenter, x: config.frontEdgeToCenter },
+        ];
+
+        polygonPoints.forEach((point) => {
+            const newPoint = this.rotate2DPoint(point, headingInRad);
+            point.x = positionX + newPoint.x;
+            point.y = positionY + newPoint.y;
+        });
+
+        return polygonPoints;
+    }
 }
