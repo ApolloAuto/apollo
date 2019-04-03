@@ -317,9 +317,9 @@ class PlannigAnalyzer:
         else:
             v2_results["accel"]["max"] = 0.0
             v2_results["accel"]["avg"] = 0.0
-        v2_results["accel"]['2 to 3 cnt'] = self.throttle_2_3_cnt
-        v2_results["accel"]['3 to 5 cnt'] = self.throttle_3_5_cnt
-        v2_results["accel"]['5 and up cnt'] = self.throttle_5_cnt
+        v2_results["accel"]["cnt 2,3"] = self.throttle_2_3_cnt
+        v2_results["accel"]["cnt 3,5"] = self.throttle_3_5_cnt
+        v2_results["accel"]["cnt 5,"] = self.throttle_5_cnt
         
         # deceleration
         v2_results["decel"] = {}
@@ -329,9 +329,9 @@ class PlannigAnalyzer:
         else:
             v2_results["decel"]["max"] = 0.0
             v2_results["decel"]["avg"] = 0.0
-        v2_results["decel"]['2 to 3 cnt'] = self.breaking_2_3_cnt
-        v2_results["decel"]['3 to 5 cnt'] = self.breaking_3_5_cnt
-        v2_results["decel"]['5 and up cnt'] = self.breaking_5_cnt
+        v2_results["decel"]["cnt 2,3"] = self.breaking_2_3_cnt
+        v2_results["decel"]["cnt 3,5"] = self.breaking_3_5_cnt
+        v2_results["decel"]["cnt 5,"] = self.breaking_5_cnt
 
         # jerk
         v2_results["jerk"] = {}
