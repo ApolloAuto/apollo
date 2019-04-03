@@ -222,9 +222,9 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
     case SecondColumnType::MessageFrameRatio:
       s->AddStr(col1_width_ + SecondColumnOffset, 0, Screen::WHITE_BLACK,
                 "FrameRatio");
-    col2_width_ = 10;
-    s->AddStr(col1_width_ + col2_width_ + 2 * SecondColumnOffset, 0,
-	          Screen::WHITE_BLACK, "Bandwidth");                
+      col2_width_ = 10;
+      s->AddStr(col1_width_ + col2_width_ + 2 * SecondColumnOffset, 0,
+                Screen::WHITE_BLACK, "Bandwidth");
       break;
   }
 
@@ -274,8 +274,7 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
           bandwidthStr << std::fixed << std::setprecision(FrameRatio_Precision)
 		               << iter->second->band_width();
           s->AddStr(col1_width_ + col2_width_ + 2 * SecondColumnOffset, line,
-		            bandwidthStr.str().c_str());                
-          break;          
+		            bandwidthStr.str().c_str());
         } break;
       }
     } else {
