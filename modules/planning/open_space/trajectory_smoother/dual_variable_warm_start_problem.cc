@@ -413,9 +413,9 @@ bool DualVariableWarmStartProblem::Solve(
                                                      l_warm_up_ipopt(r, c)));
       }
     }
-    AINFO << "max l warm up diff between osqp & ipopt: " << l_max_diff1;
-    AINFO << "max l warm up diff between osqp & ipoptqp: " << l_max_diff2;
-    AINFO << "max l warm up diff between ipopt & ipoptqp: " << l_max_diff3;
+    ADEBUG << "max l warm up diff between osqp & ipopt: " << l_max_diff1;
+    ADEBUG << "max l warm up diff between osqp & ipoptqp: " << l_max_diff2;
+    ADEBUG << "max l warm up diff between ipopt & ipoptqp: " << l_max_diff3;
 
     double n_max_diff1 = 0.0;
     double n_max_diff2 = 0.0;
@@ -430,9 +430,9 @@ bool DualVariableWarmStartProblem::Solve(
                                                      n_warm_up_ipopt(r, c)));
       }
     }
-    AINFO << "max n warm up diff between osqp & ipopt: " << n_max_diff1;
-    AINFO << "max n warm up diff between osqp & ipoptqp: " << n_max_diff2;
-    AINFO << "max n warm up diff between ipopt & ipoptqp: " << n_max_diff3;
+    ADEBUG << "max n warm up diff between osqp & ipopt: " << n_max_diff1;
+    ADEBUG << "max n warm up diff between osqp & ipoptqp: " << n_max_diff2;
+    ADEBUG << "max n warm up diff between ipopt & ipoptqp: " << n_max_diff3;
 
     return true;
   }
