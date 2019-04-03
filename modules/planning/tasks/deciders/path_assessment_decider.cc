@@ -187,9 +187,10 @@ Status PathAssessmentDecider::Process(
   }
 
   if (reference_line_info->path_data().path_label().find("self") !=
-      std::string::npos && std::get<1>(reference_line_info->path_data().
-      path_point_decision_guide().front()) ==
-      PathData::PathPointType::IN_LANE) {
+          std::string::npos &&
+      std::get<1>(reference_line_info->path_data()
+                      .path_point_decision_guide()
+                      .front()) == PathData::PathPointType::IN_LANE) {
     if (PlanningContext::able_to_use_self_lane_counter() < 0) {
       PlanningContext::ResetAbleToUseSelfLaneCounter();
     }
@@ -398,7 +399,6 @@ void PathAssessmentDecider::SetPathPointType(
   const double ego_width = vehicle_config.vehicle_param().width();
   const double ego_back_to_center =
       vehicle_config.vehicle_param().back_edge_to_center();
-  const double ego_half_width = ego_width / 2.0;
   const double ego_center_shift_distance =
       ego_length / 2.0 - ego_back_to_center;
 
@@ -413,15 +413,6 @@ void PathAssessmentDecider::SetPathPointType(
     SLBoundary ego_sl_boundary;
     reference_line_info.reference_line().GetSLBoundary(ego_box,
                                                        &ego_sl_boundary);
-    const Vec2d front_center_path_point_vec2d =
-        shift_vec +
-        Vec2d(rear_center_path_point.x(), rear_center_path_point.y());
-    const double rear_center_path_point_x = rear_center_path_point.x();
-    const double rear_center_path_point_y = rear_center_path_point.y();
-    const double rear_center_path_point_theta = ego_theta;
-    const double front_center_path_point_x = front_center_path_point_vec2d.x();
-    const double front_center_path_point_y = front_center_path_point_vec2d.y();
-    const double front_center_path_point_theta = ego_theta;
 
     double lane_left_width = 0.0;
     double lane_right_width = 0.0;
@@ -432,51 +423,16 @@ void PathAssessmentDecider::SetPathPointType(
       // Rough sl boundary estimate using single point lane width
       if (ego_sl_boundary.end_l() > lane_left_width ||
           ego_sl_boundary.start_l() < -lane_right_width) {
-        // The path point is out of the reference_line's lane.
-        // To be conservative, by default treat it as reverse lane.
-        std::get<1>((*path_point_decision)[i]) =
-            PathData::PathPointType::OUT_ON_REVERSE_LANE;
-        // Only when the lanes that contain this path point are all
-        // forward lanes and none is reverse lane, then treat this
-        // path point as OUT_ON_FORWARD_LANE.
-        std::vector<hdmap::LaneInfoConstPtr> rear_forward_lanes;
-        std::vector<hdmap::LaneInfoConstPtr> rear_reverse_lanes;
-        std::vector<hdmap::LaneInfoConstPtr> front_forward_lanes;
-        std::vector<hdmap::LaneInfoConstPtr> front_reverse_lanes;
-        const auto& rear_axis_forward_search =
-            HDMapUtil::BaseMapPtr()->GetLanesWithHeading(
-                common::util::MakePointENU(
-                    {rear_center_path_point_x, rear_center_path_point_y}),
-                ego_half_width, rear_center_path_point_theta, M_PI / 2.0,
-                &rear_forward_lanes);
-        const auto& rear_axis_backward_search =
-            HDMapUtil::BaseMapPtr()->GetLanesWithHeading(
-                common::util::MakePointENU(
-                    {rear_center_path_point_x, rear_center_path_point_y}),
-                ego_half_width,
-                NormalizeAngle(rear_center_path_point_theta - M_PI), M_PI / 2.0,
-                &rear_reverse_lanes);
-        const auto& front_axis_forward_search =
-            HDMapUtil::BaseMapPtr()->GetLanesWithHeading(
-                common::util::MakePointENU(
-                    {front_center_path_point_x, front_center_path_point_y}),
-                ego_half_width, front_center_path_point_theta, M_PI / 2.0,
-                &front_forward_lanes);
-        const auto& front_axis_backward_search =
-            HDMapUtil::BaseMapPtr()->GetLanesWithHeading(
-                common::util::MakePointENU(
-                    {front_center_path_point_x, front_center_path_point_y}),
-                ego_half_width,
-                NormalizeAngle(front_center_path_point_theta - M_PI),
-                M_PI / 2.0, &front_reverse_lanes);
-        // TODO(Jinyun) refine the logic on seperating forward and backward lane
-        if (rear_axis_forward_search == 0 || rear_axis_backward_search == 0 ||
-            front_axis_forward_search == 0 || front_axis_backward_search == 0) {
-          if ((!rear_forward_lanes.empty() || !front_forward_lanes.empty()) &&
-              front_reverse_lanes.empty() && rear_reverse_lanes.empty()) {
-            std::get<1>((*path_point_decision)[i]) =
-                PathData::PathPointType::OUT_ON_FORWARD_LANE;
-          }
+        if (path_data.path_label().find("reverse") != std::string::npos) {
+          std::get<1>((*path_point_decision)[i]) =
+              PathData::PathPointType::OUT_ON_REVERSE_LANE;
+        } else if (path_data.path_label().find("forward") !=
+                   std::string::npos) {
+          std::get<1>((*path_point_decision)[i]) =
+              PathData::PathPointType::OUT_ON_FORWARD_LANE;
+        } else {
+          std::get<1>((*path_point_decision)[i]) =
+              PathData::PathPointType::UNKNOWN;
         }
       } else {
         // The path point is within the reference_line's lane.
