@@ -77,12 +77,18 @@ class ScenarioManager final {
   void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
                         const Frame& frame);
 
-  bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsBareIntersectionScenario(
+      const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsStopSignScenario(
+      const ScenarioConfig::ScenarioType& scenario_type);
   bool IsTrafficLightScenario(
       const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContext(const Frame& frame,
                              const ScenarioConfig::ScenarioType& scenario_type);
+
+  void UpdatePlanningContextBareIntersectionScenario(
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContextStopSignScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
