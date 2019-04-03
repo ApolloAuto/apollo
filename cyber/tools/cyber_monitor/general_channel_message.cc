@@ -89,9 +89,13 @@ double GeneralChannelMessage::frame_ratio(void) {
     if (old == 0) {
       return 0.0;
     }
+    int old_size = frame_size_sum_;
+    while (!frame_size_sum_.compare_exchange_strong(old_size, 0)) {
+    }
     auto curMsgTime = msg_time_;
     auto deltaTime = curMsgTime - last_time_;
     frame_ratio_ = old / deltaTime.ToSecond();
+    band_width_ = (old_size / deltaTime.ToSecond()) / (1024 * 1024);
     last_time_ = curMsgTime;
     time_last_calc_ = time_now;
   }
@@ -99,9 +103,6 @@ double GeneralChannelMessage::frame_ratio(void) {
 }
 
 double GeneralChannelMessage::band_width(void) {
-  if (frame_ratio_) {
-    band_width_ = (channel_message_->ByteSize() * frame_ratio_) / (1024 * 1024);
-  }
   return band_width_;
 }
 

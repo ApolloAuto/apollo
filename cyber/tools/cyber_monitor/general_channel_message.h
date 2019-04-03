@@ -107,6 +107,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
         has_message_come_(false),
         message_type_(),
         frame_counter_(0),
+        frame_size_sum_(0),
         last_time_(apollo::cyber::Time::MonoTime()),
         msg_time_(last_time_.ToNanosecond() + 1),
         channel_node_(nullptr),
@@ -148,6 +149,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
     std::lock_guard<std::mutex> _g(inner_lock_);
     channel_message_.reset();
     channel_message_ = rawMsg;
+    frame_size_sum_.fetch_add(channel_message_->ByteSize());
   }
 
   std::shared_ptr<apollo::cyber::message::RawMessage> CopyMsgPtr(void) const {
@@ -171,6 +173,7 @@ class GeneralChannelMessage : public GeneralMessageBase {
   bool has_message_come_;
   std::string message_type_;
   std::atomic<int> frame_counter_;
+  std::atomic<int> frame_size_sum_;
   apollo::cyber::Time last_time_;
   apollo::cyber::Time msg_time_;
   apollo::cyber::Time time_last_calc_ = apollo::cyber::Time::MonoTime();

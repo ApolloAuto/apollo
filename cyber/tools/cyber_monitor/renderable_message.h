@@ -84,7 +84,7 @@ class RenderableMessage {
   int page_item_count_;
   RenderableMessage* parent_;
   double frame_ratio_;
-  double band_width_;
+  double band_width_;  // MBps
 
   friend class Screen;
 };  // RenderableMessage
