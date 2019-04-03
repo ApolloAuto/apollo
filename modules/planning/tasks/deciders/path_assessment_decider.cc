@@ -115,21 +115,27 @@ Status PathAssessmentDecider::Process(
                 return lhs_is_regular;
               }
               // Select longer path.
-              constexpr double kPathLengthComparisonTolerance = 8.0;
-              double lhs_path_length = lhs.frenet_frame_path().back().s();
-              double rhs_path_length = rhs.frenet_frame_path().back().s();
-              if (std::fabs(lhs_path_length - rhs_path_length) >
-                  kPathLengthComparisonTolerance) {
-                return lhs_path_length > rhs_path_length;
-              }
-              // If roughly same length,
-              // then select self-lane path over borrowed-lane paths.
+              // If roughly same length, then select self-lane path.
               bool lhs_on_selflane =
                   lhs.path_label().find("self") != std::string::npos;
               bool rhs_on_selflane =
                   rhs.path_label().find("self") != std::string::npos;
+              constexpr double kSelfPathLengthComparisonTolerance = 15.0;
+              constexpr double kNeighborPathLengthComparisonTolerance = 25.0;
+              double lhs_path_length = lhs.frenet_frame_path().back().s();
+              double rhs_path_length = rhs.frenet_frame_path().back().s();
               if (lhs_on_selflane || rhs_on_selflane) {
-                return lhs_on_selflane;
+                if (std::fabs(lhs_path_length - rhs_path_length) >
+                    kSelfPathLengthComparisonTolerance) {
+                  return lhs_path_length > rhs_path_length;
+                } else {
+                  return lhs_on_selflane;
+                }
+              } else {
+                if (std::fabs(lhs_path_length - rhs_path_length) >
+                    kNeighborPathLengthComparisonTolerance) {
+                  return lhs_path_length > rhs_path_length;
+                }
               }
               // If roughly same length, and must borrow neighbor lane,
               // then prefer to borrow forward lane rather than reverse lane.
@@ -143,6 +149,7 @@ Status PathAssessmentDecider::Process(
               }
               // If same length, both neighbor lane are forward,
               // then select the one that returns back to in-lane earlier.
+              constexpr double kBackToSelfLaneComparisonTolerance = 8.0;
               int lhs_back_idx =
                   GetBackToInLaneIndex(lhs.path_point_decision_guide());
               int rhs_back_idx =
@@ -152,7 +159,7 @@ Status PathAssessmentDecider::Process(
               double rhs_back_s =
                   rhs.frenet_frame_path()[rhs_back_idx].s();
               if (std::fabs(lhs_back_s - rhs_back_s) >
-                  kPathLengthComparisonTolerance) {
+                  kBackToSelfLaneComparisonTolerance) {
                 return lhs_back_idx < rhs_back_idx;
               }
               // If same length, both forward, back to inlane at same time,
