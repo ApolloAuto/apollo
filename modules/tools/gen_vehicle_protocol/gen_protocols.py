@@ -66,7 +66,11 @@ def gen_report_cpp(car_type, p, output_dir):
         fmt_val["protocol_name_lower"] = p["name"]
         classname = p["name"].replace('_', '').capitalize()
         fmt_val["classname"] = classname
-        fmt_val["id_upper"] = p["id"].upper()
+        a = int(p["id"].upper(),16)
+        if id > 2048:
+            fmt_val["id_upper"] = gen_esd_can_extended(p["id"].upper())
+        else:
+            fmt_val["id_upper"] = p["id"].upper()
         set_var_to_protocol_list = []
         func_impl_list = []
         for var in p["vars"]:
@@ -367,7 +371,11 @@ def gen_control_cpp(car_type, p, output_dir):
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
         fmt_val["protocol_name_lower"] = p["name"]
-        fmt_val["id_upper"] = p["id"].upper()
+        a = int(p["id"].upper(),16)
+        if id > 2048:
+            fmt_val["id_upper"] = gen_esd_can_extended(p["id"].upper())
+        else:
+            fmt_val["id_upper"] = p["id"].upper()
         classname = p["name"].replace('_', '').capitalize()
         fmt_val["classname"] = classname
 
@@ -449,6 +457,15 @@ def gen_protocols(protocol_conf_file, protocol_dir):
                 print "Unknown protocol_type:%s" % p["protocol_type"]
         gen_build_file(car_type, protocol_dir)
 
+def gen_esd_can_extended(s):
+    """
+        id string:
+    """
+    a = int(s,16)
+    a = a & 0x1FFFFFFF
+    a = a | 0x20000000
+    s = hex(a).replace('0x','')
+    return s
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
