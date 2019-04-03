@@ -30,14 +30,14 @@ import re
 import tarfile
 
 import six
-
+import numpy as np
 import cv2.cv as cv
-import pcl
+#import pcl
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
 
-from modules.drivers.proto.sensor_image_pb2 import Image
+from modules.drivers.proto import sensor_image_pb2
 
 CYBER_PATH = os.environ['CYBER_PATH']
 
@@ -49,8 +49,8 @@ def process_dir(path, operation):
     """
     try:
         if operation == 'create':
-            dir_path = path + re.sub(r'[^0-9]', '', str(datetime.now()))
-            os.mkdir(dir_path)
+            print("create folder %s" % path)
+            os.makedirs(path)
         elif operation == 'remove':
             os.remove(path)
         else:
@@ -72,15 +72,12 @@ def extract_camera_data(dest_dir, msg, ratio):
 
     seq = 0
     # Check timestamp.
-    while True:
-        cur_time_second = msg.header.stamp.to_sec()
-        if cur_time_second - pre_time_second < ratio:
-            continue
-        pre_time_second = cur_time_second
-        time_nseconds.append(msg.header.stamp.to_nsec())
+    #while True:
+    if True:
+        cur_time_second = msg.timestamp
 
-        Image.ParseFromString(msg)
-
+        Image = sensor_image_pb2.Image()
+        Image.ParseFromString(msg.message)
         # Save image according to cyber format.
         # height = 4, image height, that is, number of rows.
         # width = 5,  image width, that is, number of columns.
@@ -89,12 +86,33 @@ def extract_camera_data(dest_dir, msg, ratio):
         # data = 8, actual matrix data in bytes, size is (step * rows).
         # type = CV_8UC1 if image step is equal to width as gray, CV_8UC3
         # if step * 3 is equal to width.
-        _type = cv.CV_8UC1 if Image.step == Image.width else cv.CV_8UC3
-        mat = cv.CreateMat(Image.height, Image.width, _type)
-        image_file = os.path.join(dest_dir, '{}.png'.format(seq))
-        cv.SaveImage(image_file, dest_dir + str(seq))
-        seq += 1
 
+        if Image.encoding == "rgb8" or Image.encoding == "bgr8":
+            if Image.step != Image.width * 3:
+                print("Image.step %d does not equal Image.width %d * 3 for color image" %
+                    (Image.step, Image.width))
+                return False
+        elif Image.encoding == "gray" or Image.encoding == "y":
+            if Image.step != Image.width:
+                print("Image.step %d does not equal Image.width %d or gray image" %
+                    (Image.step, Image.width))
+                return False
+        else:
+            print("Unsupported image encoding type %s" %encoding)
+            return False
+
+        channel_num = Image.step / Image.width
+        image_mat = np.fromstring(Image.data, dtype=np.uint8).reshape(
+                        (Image.height, Image.width, channel_num))
+
+        image_file = os.path.join(dest_dir, '{}.png'.format(cur_time_second))
+        #python cv2 save image in BGR oder
+        if Image.encoding == "rgb8":
+            image_mat = image_mat[:, :, ::-1]
+            cv.SaveImage(image_file, cv.fromarray(image_mat))
+        else:
+            cv.SaveImage(image_file, cv.fromarray(image_mat))
+        seq += 1
 
 def extract_pcd_data(dest_dir, msg, ratio):
     """
@@ -111,7 +129,8 @@ def extract_pcd_data(dest_dir, msg, ratio):
             continue
         pre_time_second = cur_time_second
         time_nseconds.append(msg.header.stamp.to_nsec())
-        pcd = pcl.PointCloud()
+        # pcd = pcl.PointCloud()
+        pcd = []
         pcd.from_file(msg)
         dfilter = pcd.make_statistical_outlier_filter()
         dfilter.set_mean_k(50)
@@ -126,7 +145,7 @@ def get_sensor_channel_list(record_file):
     Get the channel list of sensors for calibration
     """
     record_reader = RecordReader(record_file)
-    return [channel_name for channel_name in record_reader.read_messages()
+    return [channel_name for channel_name in record_reader.get_channellist()
             if 'sensor' in channel_name]
 
 
@@ -139,16 +158,14 @@ def validate_record(record_file):
     header_msg = record_reader.get_headerstring()
     header = record_pb2.Header()
     header.ParseFromString(header_msg)
+    print("header is {}".format(header))
 
-    if len(header) != CYBER_RECORD_HEADER_LENGTH:
-        print('Record file: %s. header length should be %d.' %
-              (record_file, CYBER_RECORD_HEADER_LENGTH))
+    if not header.is_complete:
+        print('Record file: %s is not completed.' % record_file)
         return False
-
     if header.size == 0:
         print('Record file: %s. size is 0.' % record_file)
         return False
-
     if header.major_version != 1 and header.minor_version != 0:
         print('Record file: %s. version [%d:%d] is wrong.' %
               (record_file, header.major_version, header.minor_version))
@@ -158,9 +175,7 @@ def validate_record(record_file):
               'end time [%s].' %
               (record_file, header.begin_time, header.end_time))
         return False
-    if not header.is_complete:
-        print('Record file: %s is not completed.' % record_file)
-        return False
+
     if header.message_number < 1 or header.channel_number < 1:
         print('Record file: %s. [message:channel] number [%d:%d] is invalid.' %
               (record_file, header.message_number, header.channel_number))
@@ -180,12 +195,18 @@ def extract_channel_data(record_reader, output_path, channel_name,
     """
     Process channel messages.
     """
+    count = 0
     for msg in record_reader.read_messages():
+        if count == 1: # test for now
+            break
+        if msg.topic != channel_name:
+            continue
+        count += 1
         timestamp = msg.timestamp / float(1e9)
         # The begin time to extract data should be at least later 1 second
         # than message time.
         if abs(begin_time - timestamp) > 2:
-            channel_desc = record_reader.get_protodesc(channel_name)
+            channel_desc = msg.data_type
             if channel_desc == 'apollo.drivers.Image':
                 extract_camera_data(output_path, msg, extraction_ratio)
             elif channel_desc == 'apollo.drivers.PointCloud':
@@ -204,8 +225,9 @@ def extract_data(record_file, output_path, channel_name, timestamp,
     Otherwise extract all sensor calibration messages according to
     extraction ratio, 10% by default.
     """
+    record_reader = RecordReader(record_file)
     if channel_name != ' ':
-        ret = extract_channel_data(record_file, output_path, channel_name,
+        ret = extract_channel_data(record_reader, output_path, channel_name,
                                    timestamp, extraction_ratio)
         return ret
 
@@ -216,7 +238,6 @@ def extract_data(record_file, output_path, channel_name, timestamp,
 
     process_channel_success_num = 0
     process_channel_failure_num = 0
-    record_reader = RecordReader(record_file)
     for msg in record_reader.read_messages():
         if msg.topic in sensor_channels:
             ret = extract_channel_data(record_reader, output_path, msg.topic,
@@ -268,7 +289,7 @@ def main():
                         default="", help="The output compressed file.")
     parser.add_argument("-t", "--timestamp", action="store", type=float,
                         help="Specify the timestamp to extract data information.")
-    parser.add_argument("-r", "--extraction_ratio", action="store", type=int,
+    parser.add_argument("-e", "--extraction_ratio", action="store", type=int,
                         default=10, help="The output compressed file.")
 
     args = parser.parse_args()
@@ -280,17 +301,19 @@ def main():
         sys.exit(1)
 
     # Create directory to save the extracted data
-    ret = process_dir(args.output_path, 'create')
+    output_path = args.output_path + re.sub(r'[^0-9]', '', str(datetime.now()))
+
+    ret = process_dir(output_path, 'create')
     if ret is False:
         print('Failed to create extrated data directory: %s' % args.output_path)
         sys.exit(1)
 
-    ret = extract_data(args.record_path, args.output_path, args.channel_name,
+    ret = extract_data(args.record_path, output_path, args.channel_name,
                        args.timestamp, args.extraction_ratio)
     if ret is False:
         print('Failed to extract data!')
 
-    generate_compressed_file(args.output_path, args.compressed_file)
+    generate_compressed_file(output_path, args.compressed_file)
 
     print('Data extraction is completed successfully!')
     sys.exit(0)
