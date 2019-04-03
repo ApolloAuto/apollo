@@ -145,8 +145,7 @@ void MessageProcess::OnPerception(
   ptr_obstacles_container->BuildLaneGraph();
   auto end_time6 = std::chrono::system_clock::now();
   diff = end_time6 - end_time5;
-  ADEBUG << "Time to build LaneGraph: " << diff.count() * 1000
-         << " msec.";
+  ADEBUG << "Time to build LaneGraph: " << diff.count() * 1000 << " msec.";
   ADEBUG << "Received a perception message ["
          << perception_obstacles.ShortDebugString() << "].";
 

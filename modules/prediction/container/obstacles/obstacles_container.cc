@@ -236,6 +236,7 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   if (id != -1) {
     curr_frame_movable_obstacle_ids_.push_back(id);
   }
+  SetConsideredObstacleIds();
 }
 
 void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
