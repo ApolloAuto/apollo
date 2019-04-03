@@ -64,7 +64,7 @@ bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
     return false;
   }
 
-  AINFO << "Reach the end configuration with Reed Sharp";
+  ADEBUG << "Reach the end configuration with Reed Sharp";
   // load the whole RSP as nodes and add to the close set
   final_node_ = LoadRSPinCS(reeds_shepp_to_check, current_node);
   return true;
@@ -356,7 +356,7 @@ bool HybridAStar::Plan(
   double map_time = Clock::NowInSeconds();
   grid_a_star_heuristic_generator_->GenerateDpMap(ex, ey, XYbounds_,
                                                   obstacles_linesegments_vec_);
-  AINFO << "map time " << Clock::NowInSeconds() - map_time;
+  ADEBUG << "map time " << Clock::NowInSeconds() - map_time;
   // load open set, pq
   open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
   open_pq_.push(
@@ -416,9 +416,9 @@ bool HybridAStar::Plan(
     AERROR << "GetResult failed";
     return false;
   }
-  AINFO << "explored node num is " << explored_node_num;
-  AINFO << "heuristic time is " << heuristic_time;
-  AINFO << "rs time is " << rs_time;
+  ADEBUG << "explored node num is " << explored_node_num;
+  ADEBUG << "heuristic time is " << heuristic_time;
+  ADEBUG << "rs time is " << rs_time;
   return true;
 }
 }  // namespace planning

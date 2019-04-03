@@ -128,11 +128,11 @@ bool DistanceApproachProblem::Solve(
       status == Ipopt::Solved_To_Acceptable_Level) {
     // Retrieve some statistics about the solve
     Ipopt::Index iter_count = app->Statistics()->IterationCount();
-    AINFO << "*** The problem solved in " << iter_count << " iterations!";
+    ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
 
     Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-    AINFO << "*** The final value of the objective function is " << final_obj
-          << '.';
+    ADEBUG << "*** The final value of the objective function is " << final_obj
+           << '.';
 
     auto t_end = cyber::Time::Now().ToSecond();
 
