@@ -13,6 +13,7 @@ cc_library(
     deps = [
         "//modules/drivers/canbus/can_client",
         "//third_party/can_card_library/esd_can",
+        "//modules/drivers/canbus:sensor_gflags",
     ],
 )
 
