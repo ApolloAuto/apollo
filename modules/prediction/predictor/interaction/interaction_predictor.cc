@@ -280,6 +280,13 @@ double InteractionPredictor::CollisionWithEgoVehicleCost(
 
 bool InteractionPredictor::LowerRightOfWayThanEgo(
     const Obstacle& obstacle, const LaneSequence& lane_sequence) {
+  auto adc_trajectory_container =
+      ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
+          AdapterConfig::PLANNING_TRAJECTORY);
+  if (adc_trajectory_container != nullptr &&
+      adc_trajectory_container->IsProtected()) {
+    return true;
+  }
   return lane_sequence.right_of_way() < 0;
 }
 
