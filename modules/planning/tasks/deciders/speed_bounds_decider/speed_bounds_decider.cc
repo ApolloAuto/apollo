@@ -217,7 +217,8 @@ bool SpeedBoundsDecider::CheckSidePassStop(
       PathData::PathPointType::UNKNOWN;
   for (const auto &point_guide : path_point_decision_guide) {
     if (last_path_point_type == PathData::PathPointType::IN_LANE &&
-        std::get<1>(point_guide) != PathData::PathPointType::IN_LANE) {
+        std::get<1>(point_guide) ==
+            PathData::PathPointType::OUT_ON_REVERSE_LANE) {
       *stop_s_on_pathdata = std::get<0>(point_guide);
       // Approximate the stop fence s based on the vehicle position
       const auto &vehicle_config =
