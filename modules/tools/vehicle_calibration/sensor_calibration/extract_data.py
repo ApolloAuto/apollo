@@ -31,7 +31,7 @@ import tarfile
 
 import six
 import numpy as np
-import cv2.cv as cv
+import cv2
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
@@ -41,6 +41,7 @@ from modules.drivers.proto import sensor_image_pb2
 CYBER_PATH = os.environ['CYBER_PATH']
 
 CYBER_RECORD_HEADER_LENGTH = 2048
+IMAGE_OBJ = sensor_image_pb2.Image()
 
 def process_dir(path, operation):
     """
@@ -62,57 +63,46 @@ def process_dir(path, operation):
 
     return True
 
-def extract_camera_data(dest_dir, msg, ratio):
+def extract_camera_data(dest_dir, msg):
     """
     Extract camera file from message according to ratio
     """
-    time_nseconds = []
-    pre_time_second = 0
-
-    seq = 0
-    # Check timestamp.
     #TODO: change saving logic 
-    #while True:
-    if True:
-        cur_time_second = msg.timestamp
-
-        image = sensor_image_pb2.Image()
-        image.ParseFromString(msg.message)
-        # Save image according to cyber format.
-        # height = 4, image height, that is, number of rows.
-        # width = 5,  image width, that is, number of columns.
-        # encoding = 6, as string, type is 'rgb8', 'bgr8' or 'gray'.
-        # step = 7, full row length in bytes.
-        # data = 8, actual matrix data in bytes, size is (step * rows).
-        # type = CV_8UC1 if image step is equal to width as gray, CV_8UC3
-        # if step * 3 is equal to width.
-
-        if image.encoding == "rgb8" or image.encoding == "bgr8":
-            if image.step != image.width * 3:
-                print("Image.step %d does not equal Image.width %d * 3 for color image" %
-                    (image.step, image.width))
-                return False
-        elif image.encoding == "gray" or image.encoding == "y":
-            if image.step != image.width:
-                print("Image.step %d does not equal Image.width %d or gray image" %
-                    (image.step, image.width))
-                return False
-        else:
-            print("Unsupported image encoding type %s" %encoding)
+    cur_time_second = msg.timestamp
+    image = IMAGE_OBJ
+    image.ParseFromString(msg.message)
+    # Save image according to cyber format, defined in sensor camera proto.
+    # height = 4, image height, that is, number of rows.
+    # width = 5,  image width, that is, number of columns.
+    # encoding = 6, as string, type is 'rgb8', 'bgr8' or 'gray'.
+    # step = 7, full row length in bytes.
+    # data = 8, actual matrix data in bytes, size is (step * rows).
+    # type = CV_8UC1 if image step is equal to width as gray, CV_8UC3
+    # if step * 3 is equal to width.
+    if image.encoding == "rgb8" or image.encoding == "bgr8":
+        if image.step != image.width * 3:
+            print("Image.step %d does not equal Image.width %d * 3 for color image" %
+                (image.step, image.width))
             return False
+    elif image.encoding == "gray" or image.encoding == "y":
+        if image.step != image.width:
+            print("Image.step %d does not equal Image.width %d or gray image" %
+                (image.step, image.width))
+            return False
+    else:
+        print("Unsupported image encoding type %s" %encoding)
+        return False
 
-        channel_num = image.step / image.width
-        image_mat = np.fromstring(image.data, dtype=np.uint8).reshape(
-                        (image.height, image.width, channel_num))
+    channel_num = image.step / image.width
+    image_mat = np.fromstring(image.data, dtype=np.uint8).reshape(
+                    (image.height, image.width, channel_num))
 
-        image_file = os.path.join(dest_dir, '{}.png'.format(cur_time_second))
-        #python cv2 save image in BGR oder
-        if image.encoding == "rgb8":
-            image_mat = image_mat[:, :, ::-1]
-            cv.SaveImage(image_file, cv.fromarray(image_mat))
-        else:
-            cv.SaveImage(image_file, cv.fromarray(image_mat))
-        seq += 1
+    image_file = os.path.join(dest_dir, '{}.png'.format(cur_time_second))
+    #python cv2 save image in BGR oder
+    if image.encoding == "rgb8":
+        cv2.imwrite(image_file, cv2.cvtColor(image_mat, cv2.COLOR_RGB2BGR))
+    else:
+        cv2.imwrite(image_file, image_mat)
 
 def extract_pcd_data(dest_dir, msg, ratio):
     """
@@ -145,8 +135,10 @@ def get_sensor_channel_list(record_file):
     Get the channel list of sensors for calibration
     """
     record_reader = RecordReader(record_file)
-    return [channel_name for channel_name in record_reader.get_channellist()
-            if 'sensor' in channel_name]
+    return set(channel_name for channel_name in record_reader.get_channellist()
+            if 'sensor' in channel_name)
+    # return [channel_name for channel_name in record_reader.get_channellist()
+            # if 'sensor' in channel_name]
 
 
 def validate_record(record_file):
@@ -190,66 +182,104 @@ def validate_record(record_file):
     return True
 
 
-def extract_channel_data(record_reader, output_path, channel_name,
-                         begin_time, extraction_ratio):
+def extract_channel_data(output_path, msg):
     """
     Process channel messages.
     """
-    count = 0
-    for msg in record_reader.read_messages():
-        if count == 1: # test for now
-            break
-        if msg.topic != channel_name:
-            continue
-        count += 1
-        timestamp = msg.timestamp / float(1e9)
-        # The begin time to extract data should be at least later 1 second
-        # than message time.
-        if abs(begin_time - timestamp) > 2:
-            channel_desc = msg.data_type
-            if channel_desc == 'apollo.drivers.Image':
-                extract_camera_data(output_path, msg, extraction_ratio)
-            elif channel_desc == 'apollo.drivers.PointCloud':
-                extract_pcd_data(output_path, msg, extraction_ratio)
-            else:
-                # (TODO) (Liujie/Yuanfan) Handle binary data extraction.
-                print('Not implemented!')
+    #    timestamp = msg.timestamp / float(1e9)
+    #    if abs(begin_time - timestamp) > 2:
+    channel_desc = msg.data_type
+    if channel_desc == 'apollo.drivers.Image':
+        extract_camera_data(output_path, msg)
+    elif channel_desc == 'apollo.drivers.PointCloud':
+        extract_pcd_data(output_path, msg, extraction_ratio)
+    else:
+        # (TODO) (Liujie/Yuanfan) Handle binary data extraction.
+        print('Not implemented!')
 
     return True
 
+def validate_channel_list(channels, dictionary):
+    ret = True
+    for channel in channels:
+        if channel not in dictionary:
+            print("ERROR: channel %s does not exist in record\
+                    sensor channels" % channel)
+            ret = False
 
-def extract_data(record_file, output_path, channel_name, timestamp,
-                 extraction_ratio):
+    return ret
+
+def in_range(v, s, e):
+    return True if v >= s and v <= e else False
+
+def extract_data(record_file, output_path, channel_list,
+                start_timestamp, end_timestamp, extraction_ratio):
     """
-    Extract the desired channel messages if channel_name is specified.
+    Extract the desired channel messages if channel_list is specified.
     Otherwise extract all sensor calibration messages according to
     extraction ratio, 10% by default.
     """
-    record_reader = RecordReader(record_file)
-    if channel_name != ' ':
-        ret = extract_channel_data(record_reader, output_path, channel_name,
-                                   timestamp, extraction_ratio)
-        return ret
+    #validate extration_ratio, and set it as an integer
+    if extraction_ratio < 1.0:
+        raise ValueError("Extraction rate must be a number no less than 1")
+    extraction_ratio = np.floor(extraction_ratio)
 
     sensor_channels = get_sensor_channel_list(record_file)
-    channel_num = len(sensor_channels)
-    print('Sensor channel number [%d] in record file: %s' %
-          (channel_num, record_file))
+    if len(channel_list) > 0 and validate_channel_list(
+         channel_list, sensor_channels) is False:
+        print("input channel list not valid")
+        return False
 
-    process_channel_success_num = 0
+    #If channel_list is empty(no input arguments), extract all the sensor channels
+    print(sensor_channels)
+    if len(channel_list) == 0:
+        channel_list = sensor_channels
+
+    #Declare logging variables
+    process_channel_success_num = len(channel_list)
     process_channel_failure_num = 0
-    for msg in record_reader.read_messages():
-        if msg.topic in sensor_channels:
-            ret = extract_channel_data(record_reader, output_path, msg.topic,
-                                       timestamp, extraction_ratio)
-            if ret is False:
-                print('Failed to extract data from channel: %s' % msg.topic)
-                process_channel_failure_num += 1
-                continue
-            process_channel_success_num += 1
+    process_msg_failure_num = 0
 
+    channel_success_dict = {}
+    channel_occur_time = {}
+    channel_output_path = {}
+    for channel in channel_list:
+        channel_success_dict[channel] = True
+        channel_occur_time[channel] = -1
+        topic_name = channel.replace("/", "_")
+        channel_output_path[channel] = os.path.join(output_path,topic_name)
+        process_dir(channel_output_path[channel], operation="create")
+
+    record_reader = RecordReader(record_file)
+    for msg in record_reader.read_messages():
+        if msg.topic in channel_list:
+            # only care about messages in certain time intervals
+            msg_timestamp_sec = msg.timestamp/1e9
+            if not in_range(msg_timestamp_sec, start_timestamp, end_timestamp):
+                continue
+
+            channel_occur_time[msg.topic] += 1
+            # extract the topic according to extraction_ratio
+            if channel_occur_time[msg.topic] % extraction_ratio != 0:
+                continue
+
+            ret = extract_channel_data(channel_output_path[msg.topic], msg)
+            # calculate parsing statistics
+            if ret is False:
+                process_msg_failure_num += 1
+                if channel_success_dict[msg.topic] is True:
+                    channel_success_dict[msg.topic] = False;
+                    process_channel_failure_num += 1
+                    process_channel_success_num -= 1
+                    print('Failed to extract data from channel: %s' % msg.topic)
+
+    #Logging statics about channel extraction
+    print('Extracted sensor channel number [%d] in record file: %s' %
+          (len(channel_list), record_file))
     print('Successfully processed [%d] channels, and [%d] was failed.' %
-          process_channel_success_num, process_channel_failure_num)
+          (process_channel_success_num, process_channel_failure_num))
+    if process_msg_failure_num > 0:
+        print('Channel Extraction Failure number is: %d' % process_msg_failure_num)
 
     return True
 
@@ -277,7 +307,7 @@ def main():
 
     parser = argparse.ArgumentParser(
         description='A tool to extract data information for sensor calibration.')
-    parser.add_argument("-r", "--record_path", action="store", type=str,
+    parser.add_argument("-i", "--record_path", action="store", type=str,
                         required=True,
                         help="Specify the record file to extract data information.")
     parser.add_argument("-o", "--output_path", action="store", type=str,
@@ -285,14 +315,18 @@ def main():
                         help="The output directory to restore message.")
     parser.add_argument("-z", "--compressed_file", action="store", type=str,
                         default="", help="The output directory to restore message.")
-    parser.add_argument("-c", "--channel_name", action="store", type=str,
-                        default="", help="The output compressed file.")
-    parser.add_argument("-t", "--timestamp", action="store", type=float,
-                        help="Specify the timestamp to extract data information.")
-    parser.add_argument("-e", "--extraction_ratio", action="store", type=int,
+    parser.add_argument("-c", "--channel_name", dest='channel_list', action="append",
+                        default=[], help="list of channel_name that needs parsing.")
+    parser.add_argument("-s", "--start_timestamp", action="store", type=float,
+                        default=np.finfo(np.float32).min, help="Specify the begining time to extract data information.")
+    parser.add_argument("-e", "--end_timestamp", action="store", type=float,
+                        default=np.finfo(np.float32).max, help="Specify the ending timestamp to extract data information.")
+    parser.add_argument("-r", "--extraction_ratio", action="store", type=int,
                         default=10, help="The output compressed file.")
 
     args = parser.parse_args()
+
+    print("parsing the following channels:%s" % args.channel_list)
 
     # (TODO: Liujie) Add logger info to trace the extraction process
     ret = validate_record(args.record_path)
@@ -308,8 +342,9 @@ def main():
         print('Failed to create extrated data directory: %s' % args.output_path)
         sys.exit(1)
 
-    ret = extract_data(args.record_path, output_path, args.channel_name,
-                       args.timestamp, args.extraction_ratio)
+    channel_list = set(channel_name for channel_name in args.channel_list)
+    ret = extract_data(args.record_path, output_path, channel_list,
+                       args.start_timestamp, args.end_timestamp, args.extraction_ratio)
     if ret is False:
         print('Failed to extract data!')
 
