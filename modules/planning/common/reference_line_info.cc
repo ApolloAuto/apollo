@@ -807,13 +807,13 @@ const hdmap::Lane::LaneTurn& ReferenceLineInfo::GetPathTurnType(
   return hdmap::Lane::NO_TURN;
 }
 
-const bool ReferenceLineInfo::GetIntersectionRighoffRoad(
+const bool ReferenceLineInfo::GetIntersectionRightoffRoad(
     const hdmap::PathOverlap& pnc_junction_overlap) const {
   if (GetPathTurnType(pnc_junction_overlap.start_s) != hdmap::Lane::NO_TURN) {
     return false;
   }
 
-  // TODO(all): iterate eixsts of intersection to check/compare speed-limit
+  // TODO(all): iterate exits of intersection to check/compare speed-limit
   return true;
 }
 
