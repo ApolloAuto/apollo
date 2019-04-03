@@ -504,7 +504,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     } else if (pnc_junction_overlap) {
       // bare intersection
       if (FLAGS_enable_scenario_bare_intersection) {
-        if (reference_line_info.GetIntersectionRighoffRoad(
+        if (reference_line_info.GetIntersectionRightoffRoad(
                 *pnc_junction_overlap)) {
           scenario_type = default_scenario_type_;
         } else {
