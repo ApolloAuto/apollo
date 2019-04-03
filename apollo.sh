@@ -285,6 +285,8 @@ function release() {
   echo "git_commit: $(git rev-parse HEAD)" >> $META
   echo "car_type: LINCOLN.MKZ" >> $META
   echo "arch: ${MACHINE_ARCH}" >> $META
+  echo "LOCALIZATION_VOLUME_IMAGE: ${LOCALIZATION_VOLUME_IMAGE}" >> $META
+  echo "YOLO3D_VOLUME_IMAGE: ${YOLO3D_VOLUME_IMAGE}" >> $META
 }
 
 function gen_coverage() {
