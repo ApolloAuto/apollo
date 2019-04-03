@@ -2635,56 +2635,6 @@
                 }
               }
             },
-            "RuleStopSignConfig": {
-              "fields": {
-                "enabled": {
-                  "type": "bool",
-                  "id": 1,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "stopDistance": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 1
-                  }
-                }
-              }
-            },
-            "RuleTrafficLightConfig": {
-              "fields": {
-                "enabled": {
-                  "type": "bool",
-                  "id": 1,
-                  "options": {
-                    "default": true
-                  }
-                },
-                "stopDistance": {
-                  "type": "double",
-                  "id": 2,
-                  "options": {
-                    "default": 1
-                  }
-                },
-                "signalExpireTimeSec": {
-                  "type": "double",
-                  "id": 3,
-                  "options": {
-                    "default": 5
-                  }
-                },
-                "maxStopDeceleration": {
-                  "type": "double",
-                  "id": 4,
-                  "options": {
-                    "default": 4
-                  }
-                }
-              }
-            },
             "RuleOpenSpaceStopConfig": {
               "fields": {
                 "rightawayStopDistance": {
@@ -2705,17 +2655,9 @@
             },
             "DeciderRuleBasedStopConfig": {
               "fields": {
-                "stopSign": {
-                  "type": "RuleStopSignConfig",
-                  "id": 1
-                },
-                "trafficLight": {
-                  "type": "RuleTrafficLightConfig",
-                  "id": 2
-                },
                 "openSpace": {
                   "type": "RuleOpenSpaceStopConfig",
-                  "id": 3
+                  "id": 1
                 }
               }
             },
@@ -5302,7 +5244,7 @@
                   "type": "double",
                   "id": 1,
                   "options": {
-                    "default": 40
+                    "default": 25
                   }
                 },
                 "minPassSDistance": {
@@ -5902,6 +5844,17 @@
                 }
               }
             },
+            "DestinationStatus": {
+              "fields": {
+                "hasPassedDestination": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": false
+                  }
+                }
+              }
+            },
             "StopTime": {
               "fields": {
                 "obstacleId": {
@@ -6014,90 +5967,54 @@
                 }
               }
             },
-            "SidePassStatus": {
+            "ScenarioStatus": {
               "fields": {
-                "status": {
-                  "type": "Status",
+                "scenarioType": {
+                  "type": "ScenarioConfig.ScenarioType",
                   "id": 1
                 },
-                "waitStartTime": {
-                  "type": "double",
+                "stageType": {
+                  "type": "ScenarioConfig.StageType",
                   "id": 2
-                },
-                "passObstacleId": {
-                  "type": "string",
-                  "id": 3
-                },
-                "passSide": {
-                  "type": "apollo.planning.ObjectSidePass.Type",
-                  "id": 4
                 }
-              },
-              "nested": {
-                "Status": {
-                  "values": {
-                    "UNKNOWN": 0,
-                    "DRIVE": 1,
-                    "WAIT": 2,
-                    "SIDEPASS": 3
-                  }
+              }
+            },
+            "SidePassStatus": {
+              "fields": {
+                "frontBlockingObstacleId": {
+                  "type": "string",
+                  "id": 1
                 }
               }
             },
             "StopSignStatus": {
               "fields": {
-                "stopSignId": {
+                "currentStopSignOverlapId": {
                   "type": "string",
                   "id": 1
                 },
-                "status": {
-                  "type": "Status",
+                "doneStopSignOverlapId": {
+                  "type": "string",
                   "id": 2
                 },
-                "stopStartTime": {
-                  "type": "double",
-                  "id": 3
-                },
-                "laneWatchVehicles": {
+                "waitForObstacleId": {
                   "rule": "repeated",
-                  "type": "LaneWatchVehicles",
-                  "id": 4
-                }
-              },
-              "nested": {
-                "Status": {
-                  "values": {
-                    "UNKNOWN": 0,
-                    "DRIVE": 1,
-                    "STOP": 2,
-                    "WAIT": 3,
-                    "CREEP": 4,
-                    "STOP_DONE": 5
-                  }
-                },
-                "LaneWatchVehicles": {
-                  "fields": {
-                    "laneId": {
-                      "type": "string",
-                      "id": 1
-                    },
-                    "watchVehicles": {
-                      "rule": "repeated",
-                      "type": "string",
-                      "id": 2
-                    }
-                  }
+                  "type": "string",
+                  "id": 3
                 }
               }
             },
-            "DestinationStatus": {
+            "TrafficLightStatus": {
               "fields": {
-                "hasPassedDestination": {
-                  "type": "bool",
-                  "id": 1,
-                  "options": {
-                    "default": false
-                  }
+                "currentTrafficLightOverlapId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 1
+                },
+                "doneTrafficLightOverlapId": {
+                  "rule": "repeated",
+                  "type": "string",
+                  "id": 2
                 }
               }
             },
@@ -6111,33 +6028,41 @@
                   "type": "CrosswalkStatus",
                   "id": 2
                 },
-                "engageAdvice": {
-                  "type": "apollo.common.EngageAdvice",
-                  "id": 3
-                },
-                "rerouting": {
-                  "type": "ReroutingStatus",
-                  "id": 4
-                },
-                "rightOfWay": {
-                  "type": "RightOfWayStatus",
-                  "id": 5
-                },
-                "sidePass": {
-                  "type": "SidePassStatus",
-                  "id": 6
-                },
-                "stopSign": {
-                  "type": "StopSignStatus",
-                  "id": 7
-                },
                 "destination": {
                   "type": "DestinationStatus",
-                  "id": 8
+                  "id": 3
+                },
+                "engageAdvice": {
+                  "type": "apollo.common.EngageAdvice",
+                  "id": 4
                 },
                 "pullOver": {
                   "type": "PullOverStatus",
+                  "id": 5
+                },
+                "rerouting": {
+                  "type": "ReroutingStatus",
+                  "id": 6
+                },
+                "rightOfWay": {
+                  "type": "RightOfWayStatus",
+                  "id": 7
+                },
+                "scenario": {
+                  "type": "ScenarioStatus",
+                  "id": 8
+                },
+                "sidePass": {
+                  "type": "SidePassStatus",
                   "id": 9
+                },
+                "stopSign": {
+                  "type": "StopSignStatus",
+                  "id": 10
+                },
+                "trafficLight": {
+                  "type": "TrafficLightStatus",
+                  "id": 11
                 }
               }
             },
@@ -7439,6 +7364,49 @@
                 }
               }
             },
+            "StopSignConfig": {
+              "fields": {
+                "enabled": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "stopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                }
+              }
+            },
+            "TrafficLightConfig": {
+              "fields": {
+                "enabled": {
+                  "type": "bool",
+                  "id": 1,
+                  "options": {
+                    "default": true
+                  }
+                },
+                "stopDistance": {
+                  "type": "double",
+                  "id": 2,
+                  "options": {
+                    "default": 1
+                  }
+                },
+                "maxStopDeceleration": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 4
+                  }
+                }
+              }
+            },
             "TrafficRuleConfig": {
               "oneofs": {
                 "config": {
@@ -7450,7 +7418,9 @@
                     "keepClear",
                     "pullOver",
                     "referenceLineEnd",
-                    "rerouting"
+                    "rerouting",
+                    "stopSign",
+                    "trafficLight"
                   ]
                 }
               },
@@ -7494,6 +7464,14 @@
                 "rerouting": {
                   "type": "ReroutingConfig",
                   "id": 10
+                },
+                "stopSign": {
+                  "type": "StopSignConfig",
+                  "id": 11
+                },
+                "trafficLight": {
+                  "type": "TrafficLightConfig",
+                  "id": 12
                 }
               },
               "nested": {
@@ -7507,7 +7485,8 @@
                     "PULL_OVER": 6,
                     "REFERENCE_LINE_END": 7,
                     "REROUTING": 8,
-                    "SIGNAL_LIGHT": 9
+                    "STOP_SIGN": 9,
+                    "TRAFFIC_LIGHT": 10
                   }
                 }
               }
@@ -8050,6 +8029,18 @@
                 "endPoint": {
                   "type": "apollo.common.TrajectoryPoint",
                   "id": 11
+                },
+                "partitionedTrajectories": {
+                  "type": "apollo.planning_internal.Trajectories",
+                  "id": 12
+                },
+                "chosenTrajectory": {
+                  "type": "apollo.planning_internal.Trajectories",
+                  "id": 13
+                },
+                "isFallbackTrajectory": {
+                  "type": "bool",
+                  "id": 14
                 }
               }
             },
@@ -10216,6 +10207,11 @@
                   "rule": "repeated",
                   "type": "PredictionTrajectoryPoint",
                   "id": 31
+                },
+                "shortTermPredictedTrajectoryPoints": {
+                  "rule": "repeated",
+                  "type": "common.TrajectoryPoint",
+                  "id": 32
                 }
               }
             },
