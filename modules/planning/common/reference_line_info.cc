@@ -301,6 +301,10 @@ const ReferenceLine& ReferenceLineInfo::reference_line() const {
   return reference_line_;
 }
 
+ReferenceLine* ReferenceLineInfo::mutable_reference_line() {
+  return &reference_line_;
+}
+
 void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
   discretized_trajectory_ = trajectory;
 }
