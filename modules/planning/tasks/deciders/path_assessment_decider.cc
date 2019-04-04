@@ -181,6 +181,14 @@ Status PathAssessmentDecider::Process(
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
 
+  std::vector<PathData> new_candidate_path_data;
+  for (const auto& curr_path_data : valid_path_data) {
+    if (!curr_path_data.Empty()) {
+      new_candidate_path_data.push_back(curr_path_data);
+    }
+  }
+  reference_line_info->SetCandidatePathData(new_candidate_path_data);
+
   if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
     if (PlanningContext::front_static_obstacle_cycle_counter() < 0) {
       PlanningContext::ResetFrontStaticObstacleCycleCounter();
