@@ -63,6 +63,11 @@ message VehicleParam {
 
   // minimum differentiable vehicle speed, in m/s
   optional float max_abs_speed_when_stopped = 18;
+
+  // minimum value get from chassis.brake, in percentage
+  optional float brake_deadzone = 19;
+  // minimum value get from chassis.throttle, in percentage
+  optional float throttle_deadzone = 20;
 }
 
 message VehicleConfig {
