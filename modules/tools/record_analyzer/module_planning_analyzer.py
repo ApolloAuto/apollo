@@ -164,7 +164,7 @@ class PlannigAnalyzer:
 
                 if self.ACCEL_M_LB <= accel < self.ACCEL_M_UB:
                     self.accel_medium_cnt += 1
-                if self.ACCEL_H_LB <= accel :
+                if self.ACCEL_H_LB <= accel:
                     self.accel_high_cnt += 1
 
                 if self.last_init_point_a is not None:
