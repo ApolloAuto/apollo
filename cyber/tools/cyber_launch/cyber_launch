@@ -103,7 +103,7 @@ def module_monitor(mod):
     while True:
         line = mod.popen.stdout.readline()
         if line:
-            logger.debug('%s: %s' % (mod.name, line.strip('\n')))
+            logger.debug('%s# %s' % (mod.name, line.strip('\n')))
             continue
         time.sleep(0.01)
 
