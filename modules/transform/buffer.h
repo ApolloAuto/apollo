@@ -55,7 +55,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
-  virtual apollo::transform::TransformStamped lookupTransform(
+  virtual TransformStamped lookupTransform(
       const std::string& target_frame, const std::string& source_frame,
       const cyber::Time& time, const float timeout_second = 0.01f) const;
 
@@ -75,7 +75,7 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
    * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
-  virtual apollo::transform::TransformStamped lookupTransform(
+  virtual TransformStamped lookupTransform(
       const std::string& target_frame, const cyber::Time& target_time,
       const std::string& source_frame, const cyber::Time& source_time,
       const std::string& fixed_frame, const float timeout_second = 0.01f) const;
@@ -117,28 +117,24 @@ class Buffer : public BufferInterface, public tf2::BufferCore {
 
  private:
   void SubscriptionCallback(
-      const std::shared_ptr<const apollo::transform::TransformStampeds>&
-          transform);
+      const std::shared_ptr<const TransformStampeds>& transform);
   void StaticSubscriptionCallback(
-      const std::shared_ptr<const apollo::transform::TransformStampeds>&
-          transform);
+      const std::shared_ptr<const TransformStampeds>& transform);
   void SubscriptionCallbackImpl(
-      const std::shared_ptr<const apollo::transform::TransformStampeds>&
-          transform,
+      const std::shared_ptr<const TransformStampeds>& transform,
       bool is_static);
 
-  void TF2MsgToCyber(
-      const geometry_msgs::TransformStamped& tf2_trans_stamped,
-      apollo::transform::TransformStamped& trans_stamped) const;  // NOLINT
+  void TF2MsgToCyber(const geometry_msgs::TransformStamped& tf2_trans_stamped,
+                     TransformStamped& trans_stamped) const;  // NOLINT
 
   std::unique_ptr<cyber::Node> node_;
-  std::shared_ptr<cyber::Reader<apollo::transform::TransformStampeds>>
-      message_subscriber_tf_;
-  std::shared_ptr<cyber::Reader<apollo::transform::TransformStampeds>>
+  std::shared_ptr<cyber::Reader<TransformStampeds>> message_subscriber_tf_;
+  std::shared_ptr<cyber::Reader<TransformStampeds>>
       message_subscriber_tf_static_;
 
   cyber::Time last_update_;
   std::vector<geometry_msgs::TransformStamped> static_msgs_;
+
   DECLARE_SINGLETON(Buffer)
 };  // class
 
