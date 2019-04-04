@@ -205,7 +205,7 @@ bool BoundedQueue<T>::WaitDequeue(T* element) {
       return true;
     }
     if (wait_strategy_->EmptyWait()) {
-        continue;
+      continue;
     }
     // wait timeout
     break;
