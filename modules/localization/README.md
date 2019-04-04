@@ -9,7 +9,7 @@
   In the provided RTK localization method, there are two inputs:
   - GPS - The Global Positioning System
   - IMU - Inertial Measurement Unit
-  
+
   In the  multi-sensor fusion localization method, there are three inputs:
   - GPS - The Global Positioning System
   - IMU - Inertial Measurement Unit
@@ -20,7 +20,7 @@
   Guowei Wan, Xiaolong Yang, Renlan Cai, Hao Li, Yao Zhou, Hao Wang, Shiyu Song. "Robust and Precise Vehicle Localization Based on Multi-Sensor Fusion in Diverse City Scenes," 2018 IEEE International Conference on Robotics and Automation (ICRA), Brisbane, QLD, 2018, pp. 4670-4677.
   doi: 10.1109/ICRA.2018.8461224. [link](https://ieeexplore.ieee.org/document/8461224)
 
-## Output 
+## Output
 An object instance defined by Protobuf message `LocalizationEstimate`, which can be found in file `localization/proto/localization.proto`.
 
 ## Implementing Localization
@@ -35,7 +35,7 @@ An object instance defined by Protobuf message `LocalizationEstimate`, which can
   ```
    localization_factory_.Register(LocalizationConfig::FOO, []()->LocalizationBase* { return new FooLocalization(); });
   ```
-  
+
   4. Make sure your code compiles by including the header files that defines class `FooLocalization`
 
   1. Now you can go back to the `apollo` root directory and build your code with command `bash apollo.sh build`

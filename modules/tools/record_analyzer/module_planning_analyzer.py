@@ -58,12 +58,12 @@ class PlannigAnalyzer:
         self.centripetal_jerk_list = []
         self.centripetal_accel_list = []
         self.jerk_list = []
-        
+
         # [2, 4) unit m/s^2
-        self.ACCEL_M_LB = 2 
+        self.ACCEL_M_LB = 2
         self.ACCEL_M_UB = 4
         self.accel_medium_cnt = 0
-        
+
         # [4, ) unit m/s^2
         self.ACCEL_H_LB = 4
         self.accel_high_cnt = 0
@@ -100,7 +100,7 @@ class PlannigAnalyzer:
         self.LAT_ACCEL_H_LB_P = 2
         self.LAT_ACCEL_H_UB_N = -2
         self.lat_accel_high_cnt = 0
-        
+
         # [0.5,1) [-1, -0.5)
         self.LAT_JERK_M_LB_P = 0.5
         self.LAT_JERK_M_UB_P = 1
@@ -156,7 +156,7 @@ class PlannigAnalyzer:
                     self.init_point_accel.append(accel)
                 elif accel < 0:
                     self.init_point_decel.append(abs(accel))
-                    
+
                 if self.DECEL_M_LB < accel <= self.DECEL_M_UB:
                     self.decel_medium_cnt += 1
                 if accel <= self.DECEL_H_UB:
@@ -185,7 +185,7 @@ class PlannigAnalyzer:
                     * init_point.path_point.kappa + init_point.v \
                         * init_point.v * init_point.path_point.dkappa
                 self.centripetal_jerk_list.append(centripetal_jerk)
-                
+
                 if self.LAT_JERK_M_LB_P <= centripetal_jerk < self.LAT_JERK_M_UB_P \
                     or self.LAT_JERK_M_LB_N < centripetal_jerk <= self.LAT_JERK_M_UB_N:
                     self.lat_jerk_medium_cnt += 1
@@ -331,7 +331,7 @@ class PlannigAnalyzer:
         else:
             results["jerk_max"] = 0
             results["jerk_avg"] = 0
-        
+
         results['jerk_medium_cnt'] = self.jerk_medium_cnt
         results['jerk_high_cnt'] = self.jerk_high_cnt
 
@@ -375,7 +375,7 @@ class PlannigAnalyzer:
             v2_results["accel"]["avg"] = 0.0
         v2_results["accel"]["medium_cnt"] = self.accel_medium_cnt
         v2_results["accel"]["high_cnt"] = self.accel_high_cnt
-        
+
         # deceleration
         v2_results["decel"] = {}
         if len(self.init_point_decel) > 0:

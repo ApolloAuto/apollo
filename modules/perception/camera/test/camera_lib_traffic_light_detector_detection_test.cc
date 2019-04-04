@@ -66,7 +66,7 @@ TEST(DetectionTest, all) {
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/detection/img/img.png");
   cv::cvtColor(origin_image, origin_image, cv::COLOR_BGR2RGB);
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -151,7 +151,7 @@ TEST(DetectionTest, no_light) {
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/detection/img/img.png");
   cv::cvtColor(origin_image, origin_image, cv::COLOR_BGR2RGB);
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -201,7 +201,7 @@ TEST(DetectionTest, out_of_img_light) {
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/detection/img/img.png");
   cv::cvtColor(origin_image, origin_image, cv::COLOR_BGR2RGB);
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();

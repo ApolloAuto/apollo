@@ -487,7 +487,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_grad_f_hand(int n,
   int time_index = time_start_index_;
   int state_index = state_start_index_;
 
-  if (grad_f == NULL) {
+  if (grad_f == nullptr) {
     AERROR << "grad_f pt is nullptr";
     return false;
   } else {
@@ -2292,7 +2292,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_h(int n, const double* x,
                                                 bool new_lambda, int nele_hess,
                                                 int* iRow, int* jCol,
                                                 double* values) {
-  if (values == NULL) {
+  if (values == nullptr) {
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
 #ifdef USE_GPU
@@ -2891,10 +2891,10 @@ void DistanceApproachIPOPTCUDAInterface::generate_tapes(int n, int m,
 
   trace_off();
 
-  rind_L = NULL;
-  cind_L = NULL;
+  rind_L = nullptr;
+  cind_L = nullptr;
 
-  hessval = NULL;
+  hessval = nullptr;
 
   options_L[0] = 0;
   options_L[1] = 1;

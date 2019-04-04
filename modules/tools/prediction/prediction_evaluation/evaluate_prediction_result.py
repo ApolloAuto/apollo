@@ -115,7 +115,7 @@ def Evaluate(dirpath, time_range):
             list_prediction_result.ParseFromString(f.read())
         for prediction_result in list_prediction_result.prediction_result:
             portion_correct_predicted, num_obstacle, num_trajectory = \
-                CorrectlyPredictePortion(prediction_result, future_status_dict, 
+                CorrectlyPredictePortion(prediction_result, future_status_dict,
                                          time_range)
             portion_correct_predicted_sum += portion_correct_predicted
             num_obstacle_sum += num_obstacle

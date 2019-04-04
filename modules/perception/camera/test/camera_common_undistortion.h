@@ -43,10 +43,10 @@ class ImageGpuPreprocessHandler {
                              int *height, std::vector<double> *D,
                              std::vector<double> *K);
 
-  float *_d_mapx = NULL;
-  float *_d_mapy = NULL;
-  uint8_t *_d_rgb = NULL;
-  uint8_t *_d_dst = NULL;
+  float *_d_mapx = nullptr;
+  float *_d_mapy = nullptr;
+  uint8_t *_d_rgb = nullptr;
+  uint8_t *_d_dst = nullptr;
 
   int _width = 0;     // image cols
   int _height = 0;    // image rows
