@@ -179,6 +179,32 @@ message SimpleMPCDebug {
   optional double steer_angle_feedforward_compensation = 32;
   repeated double matrix_q_updated = 33;  // matrix_q_updated_ size = 6
   repeated double matrix_r_updated = 34;  // matrix_r_updated_ size = 2
+
+  // time derivative of lateral error rate, in m/s^2
+  optional double lateral_acceleration = 35;
+  // second time derivative of lateral error rate, in m/s^3
+  optional double lateral_jerk = 36;
+
+  optional double ref_heading_rate = 37;
+  optional double heading_rate = 38;
+
+  // heading_acceleration, as known as yaw acceleration, is the time derivative
+  // of heading rate,  in rad/s^2
+  optional double ref_heading_acceleration = 39;
+  optional double heading_acceleration = 40;
+  optional double heading_error_acceleration = 41;
+
+  // heading_jerk, as known as yaw jerk, is the second time derivative of
+  // heading rate, in rad/s^3
+  optional double ref_heading_jerk = 42;
+  optional double heading_jerk = 43;
+  optional double heading_error_jerk = 44;
+
+  optional double acceleration_feedback = 45;
+  optional double acceleration_error = 46;
+  optional double jerk_reference = 47;
+  optional double jerk_feedback = 48;
+  optional double jerk_error = 49;
 }
 
 message InputDebug {
