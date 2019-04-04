@@ -458,7 +458,10 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
+      break;
     case ScenarioConfig::SIDE_PASS:
+      // for SIDE_PASS, need re-check
+      scenario_type = SelectSidePassScenario(frame);
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
@@ -466,6 +469,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+      // must continue until finish
       if (current_scenario_->GetStatus() !=
           Scenario::ScenarioStatus::STATUS_DONE) {
         scenario_type = current_scenario_->scenario_type();
