@@ -22,23 +22,23 @@ self-check the validity of the uploaded data and able to inform developer's when
 the data is not qualified, and reduce the size of uploaded data significantly.
 """
 
-import os
-import sys
-import argparse
 from datetime import datetime
+import argparse
+import os
 import re
+import sys
 import tarfile
 
-import six
-import numpy as np
 import cv2
+import numpy as np
+import pypcd
+import six
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
 
 from modules.drivers.proto import sensor_image_pb2
 from modules.drivers.proto import pointcloud_pb2
-import pypcd
 
 CYBER_PATH = os.environ['CYBER_PATH']
 
@@ -358,7 +358,7 @@ def main():
 
     print("parsing the following channels:%s" % args.channel_list)
 
-    # (TODO: Liujie) Add logger info to trace the extraction process
+    # TODO(Liujie): Add logger info to trace the extraction process
     ret = validate_record(args.record_path)
     if ret is False:
         print('Failed to validate record file: %s' % args.record_path)
