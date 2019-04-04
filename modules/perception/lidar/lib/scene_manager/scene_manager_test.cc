@@ -98,7 +98,7 @@ TEST_F(LidarLibSceneManagerTest, lidar_lib_scene_manager_test) {
   EXPECT_TRUE(SceneManager::Instance().Init());
   EXPECT_TRUE(SceneManager::Instance().Reset());
   EXPECT_TRUE(SceneManager::Instance().Init());
-  EXPECT_TRUE((SceneManager::Instance().GetServiceNum() > 0));
+  EXPECT_GT(SceneManager::Instance().GetServiceNum(), 0);
 }
 
 TEST_F(LidarLibSceneManagerTest, lidar_lib_scene_manager_ground_service_test) {
