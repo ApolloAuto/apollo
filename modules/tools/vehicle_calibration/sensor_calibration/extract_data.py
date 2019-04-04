@@ -69,7 +69,7 @@ def extract_camera_data(dest_dir, msg):
     """
     Extract camera file from message according to ratio
     """
-    #TODO: change saving logic 
+    #TODO: change saving logic
     cur_time_second = msg.timestamp
     image = IMAGE_OBJ
     image.ParseFromString(msg.message)

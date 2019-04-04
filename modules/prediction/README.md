@@ -1,7 +1,7 @@
 # Prediction
 
 ## Introduction
-The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module. 
+The Prediction module studies and predicts the behavior of all the obstacles detected by the perception module.
 Prediction receives obstacle data along with basic perception information including positions, headings, velocities, accelerations, and then generates predicted trajectories with probabilities for those obstacles.
 
 ```
@@ -9,7 +9,7 @@ Note:
 The Prediction module only predicts the behavior of obstacles and not the EGO car. The Planning module plans the trajectory of the EGO car.
 
 ```
- 
+
 ## Input
   * Obstacles information from the perception module
   * Localization information from the localization module
