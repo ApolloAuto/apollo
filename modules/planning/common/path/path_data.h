@@ -84,7 +84,7 @@ class PathData {
 
   std::string DebugString() const;
 
-  void set_path_label(std::string label);
+  void set_path_label(const std::string& label);
   const std::string &path_label() const;
 
   void set_blocking_obstacle_id(const std::string &obs_id) {

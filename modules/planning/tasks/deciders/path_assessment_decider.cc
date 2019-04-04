@@ -288,7 +288,7 @@ void PathAssessmentDecider::TrimTailingOutLanePoints(
 bool PathAssessmentDecider::IsGreatlyOffReferenceLine(
     const PathData& path_data) {
   constexpr double kOffReferenceLineThreshold = 20.0;
-  auto frenet_path = path_data.frenet_frame_path();
+  const auto& frenet_path = path_data.frenet_frame_path();
   for (const auto& frenet_path_point : frenet_path) {
     if (std::fabs(frenet_path_point.l()) > kOffReferenceLineThreshold) {
       return true;
@@ -300,7 +300,7 @@ bool PathAssessmentDecider::IsGreatlyOffReferenceLine(
 bool PathAssessmentDecider::IsGreatlyOffRoad(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
   constexpr double kOffRoadThreshold = 10.0;
-  auto frenet_path = path_data.frenet_frame_path();
+  const auto& frenet_path = path_data.frenet_frame_path();
   for (const auto& frenet_path_point : frenet_path) {
     double road_left_width = 0.0;
     double road_right_width = 0.0;
@@ -319,14 +319,15 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
     const ReferenceLineInfo& reference_line_info, const PathData& path_data) {
   // Get all obstacles and convert them into frenet-frame polygons.
   std::vector<Polygon2d> obstacle_polygons;
-  auto indexed_obstacles = reference_line_info.path_decision().obstacles();
+  const auto& indexed_obstacles =
+      reference_line_info.path_decision().obstacles();
   for (const auto* obstacle : indexed_obstacles.Items()) {
     // Filter out unrelated obstacles.
     if (!IsWithinPathDeciderScopeObstacle(*obstacle)) {
       continue;
     }
     // Ignore too small obstacles.
-    const auto obstacle_sl = obstacle->PerceptionSLBoundary();
+    const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     if ((obstacle_sl.end_s() - obstacle_sl.start_s()) *
         (obstacle_sl.end_l() - obstacle_sl.start_l()) < kMinObstacleArea) {
       continue;
@@ -454,18 +455,19 @@ void PathAssessmentDecider::SetObstacleDistance(
 
   // Get all obstacles and convert them into frenet-frame polygons.
   std::vector<Polygon2d> obstacle_polygons;
-  auto indexed_obstacles = reference_line_info.path_decision().obstacles();
+  const auto& indexed_obstacles =
+      reference_line_info.path_decision().obstacles();
   for (const auto* obstacle : indexed_obstacles.Items()) {
     // Filter out unrelated obstacles.
     if (!IsWithinPathDeciderScopeObstacle(*obstacle)) {
       continue;
     }
     // Convert into polygon and save it.
-    const auto obstacle_box = obstacle->PerceptionBoundingBox();
+    const auto& obstacle_box = obstacle->PerceptionBoundingBox();
     if (obstacle_box.area() < kMinObstacleArea) {
       continue;
     }
-    obstacle_polygons.push_back(Polygon2d(obstacle_box));
+    obstacle_polygons.emplace_back(obstacle_box);
   }
 
   // Go through every path point, update closest obstacle info.

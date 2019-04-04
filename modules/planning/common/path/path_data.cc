@@ -47,7 +47,7 @@ bool PathData::SetDiscretizedPath(const DiscretizedPath &path) {
     return false;
   }
   DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
-  path_data_history_.push_back(std::make_pair(discretized_path_, frenet_path_));
+  path_data_history_.emplace_back(discretized_path_, frenet_path_);
   return true;
 }
 
@@ -63,7 +63,7 @@ bool PathData::SetFrenetPath(const FrenetFramePath &frenet_path) {
     return false;
   }
   DCHECK_EQ(discretized_path_.size(), frenet_path_.size());
-  path_data_history_.push_back(std::make_pair(discretized_path_, frenet_path_));
+  path_data_history_.emplace_back(discretized_path_, frenet_path_);
   return true;
 }
 
@@ -167,9 +167,9 @@ std::string PathData::DebugString() const {
       std::min(discretized_path_.size(),
                static_cast<size_t>(FLAGS_trajectory_point_num_for_debug));
 
-  return apollo::common::util::StrCat(
+  return common::util::StrCat(
       "[\n",
-      apollo::common::util::PrintDebugStringIter(
+      common::util::PrintDebugStringIter(
           discretized_path_.begin(), discretized_path_.begin() + limit, ",\n"),
       "]\n");
 }
@@ -258,12 +258,10 @@ bool PathData::LeftTrimWithRefS(const common::FrenetFramePoint &frenet_point) {
       continue;
     }
     if (fp.s() > frenet_point.s()) {
-      frenet_frame_points.push_back(std::move(fp));
+      frenet_frame_points.push_back(fp);
     }
   }
-  const FrenetFramePath frenet_path =
-      FrenetFramePath(std::move(frenet_frame_points));
-  SetFrenetPath(frenet_path);
+  SetFrenetPath(FrenetFramePath(std::move(frenet_frame_points)));
   return true;
 }
 
@@ -272,7 +270,7 @@ bool PathData::UpdateFrenetFramePath(const ReferenceLine *reference_line) {
   return SetDiscretizedPath(discretized_path_);
 }
 
-void PathData::set_path_label(std::string label) {
+void PathData::set_path_label(const std::string& label) {
   path_label_ = label;
 }
 
