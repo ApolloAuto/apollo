@@ -37,12 +37,14 @@ from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
 
 from modules.drivers.proto import sensor_image_pb2
+from modules.drivers.proto import pointcloud_pb2
+import pypcd
 
 CYBER_PATH = os.environ['CYBER_PATH']
 
 CYBER_RECORD_HEADER_LENGTH = 2048
 IMAGE_OBJ = sensor_image_pb2.Image()
-
+POINTCLOUD_OBJ = pointcloud_pb2.PointCloud()
 def process_dir(path, operation):
     """
     Create or remove directory
@@ -104,31 +106,59 @@ def extract_camera_data(dest_dir, msg):
     else:
         cv2.imwrite(image_file, image_mat)
 
-def extract_pcd_data(dest_dir, msg, ratio):
+def convert_xyzit_pb_to_array(xyz_i_t, data_type):
+    arr = np.zeros(len(xyz_i_t), dtype=data_type)
+    for i, point in enumerate(xyz_i_t):
+        arr[i] = (point.x, point.y, point.z,
+                  point.intensity, point.timestamp)
+
+    return arr
+
+def make_xyzit_point_cloud(xyz_i_t):
+    """ Make a pointcloud object from PointXYZIT message, as in Pointcloud.proto.
+    message PointXYZIT {
+      optional float x = 1 [default = nan];
+      optional float y = 2 [default = nan];
+      optional float z = 3 [default = nan];
+      optional uint32 intensity = 4 [default = 0];
+      optional uint64 timestamp = 5 [default = 0];
+    }
+    """
+
+    md = {'version': .7,
+          'fields': ['x', 'y', 'z', 'intensity', 'timestamp'],
+          'count': [1, 1, 1, 1, 1],
+          'width': len(xyz_i_t),
+          'height': 1,
+          'viewpoint': [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
+          'points': len(xyz_i_t),
+          'type': ['F', 'F', 'F', 'U', 'U'],
+          'size': [4, 4, 4, 4, 8],
+          'data': 'binary_compressed'}
+
+    typenames = []
+    for t, s in zip(md['type'], md['size']):
+        np_type = pypcd.pcd_type_to_numpy_type[(t,s)]
+        typenames.append(np_type)
+
+    np_dtype = np.dtype(zip(md['fields'], typenames))
+    pc_data = convert_xyzit_pb_to_array(xyz_i_t, data_type=np_dtype)
+    pc = pypcd.PointCloud(md, pc_data)
+    return pc
+
+def extract_pcd_data(dest_dir, msg):
     """
     Extract PCD file
+    Transform protobuf PointXYZIT to standard PCL bin_compressed_file (*.pcd)
     """
-    time_nseconds = []
-    pre_time_second = 0
+    cur_time_second = msg.timestamp
+    pointcloud = POINTCLOUD_OBJ
+    pointcloud.ParseFromString(msg.message)
 
-    seq = 0
-    # Check timestamp.
-    while True:
-        cur_time_second = msg.header.stamp.to_sec()
-        if cur_time_second - pre_time_second < ratio:
-            continue
-        pre_time_second = cur_time_second
-        time_nseconds.append(msg.header.stamp.to_nsec())
-        # pcd = pcl.PointCloud()
-        pcd = []
-        pcd.from_file(msg)
-        dfilter = pcd.make_statistical_outlier_filter()
-        dfilter.set_mean_k(50)
-        dfilter.set_std_dev_mul_thresh(1.0)
-        pcd_file = os.path.join(dest_dir, '{}.pcd'.format(seq))
-        dfilter.filter().to_file(pcd_file)
-        seq += 1
-
+    pc_meta = make_xyzit_point_cloud(pointcloud.point)
+    pcd_file = os.path.join(dest_dir, '{}.pcd'.format(cur_time_second))
+    pypcd.save_point_cloud_bin_compressed(pc_meta, pcd_file)
+    return True
 
 def get_sensor_channel_list(record_file):
     """
@@ -192,9 +222,9 @@ def extract_channel_data(output_path, msg):
     if channel_desc == 'apollo.drivers.Image':
         extract_camera_data(output_path, msg)
     elif channel_desc == 'apollo.drivers.PointCloud':
-        extract_pcd_data(output_path, msg, extraction_ratio)
+        extract_pcd_data(output_path, msg)
     else:
-        # (TODO) (Liujie/Yuanfan) Handle binary data extraction.
+        # (TODO) (LiuJie/gchen-Apollo) Handle binary data extraction.
         print('Not implemented!')
 
     return True
