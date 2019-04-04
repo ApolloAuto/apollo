@@ -12,7 +12,7 @@ stage_config: {
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
   task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  task_type: DECIDER_RSS
+  # task_type: DECIDER_RSS
 
   task_config: {
     task_type: DECIDER_RULE_BASED_STOP
