@@ -21,7 +21,7 @@ import yaml
 import shlex
 import re
 
-MAX_CAN_ID = 4096000000 #2048
+MAX_CAN_ID = 4096000000  # 2048
 
 
 def extract_var_info(items):
