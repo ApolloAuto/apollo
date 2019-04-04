@@ -33,8 +33,6 @@ using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 
-constexpr double kMathEpsilon = 1e-8;
-
 OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig &config)
     : Decider(config) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
@@ -338,7 +336,7 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI(Frame *frame) {
   const bool parking_inwards =
       config_.open_space_roi_decider_config().parking_inwards();
   const double top_to_down_distance = left_top.y() - left_down.y();
-  if (parking_spot_heading_ > kMathEpsilon) {
+  if (parking_spot_heading_ > common::math::kMathEpsilon) {
     if (parking_inwards) {
       end_y =
           left_down.y() - (std::max(3.0 * -top_to_down_distance / 4.0,

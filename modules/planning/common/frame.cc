@@ -49,8 +49,6 @@ using apollo::common::math::Polygon2d;
 using apollo::common::time::Clock;
 using apollo::prediction::PredictionObstacles;
 
-constexpr double kMathEpsilon = 1e-8;
-
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
 
