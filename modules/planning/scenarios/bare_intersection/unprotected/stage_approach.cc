@@ -80,11 +80,14 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
   }
 
   // set speed_limit to slow down
-  // -1 and + 1.0 are added to make sure it can be sampled.
-  // reference_line_info.reference_line().AddSpeedLimit(
-  //    0.0,
-  //    current_pnc_junction->start_s,
-  //    scenario_config_.approach_speed_limit());
+  if (frame->mutable_reference_line_info()) {
+    auto* reference_line =
+        frame->mutable_reference_line_info()->front().mutable_reference_line();
+    reference_line->AddSpeedLimit(
+        0.0,
+        current_pnc_junction->start_s,
+        scenario_config_.approach_speed_limit());
+  }
 
   // set right_of_way_status
   reference_line_info.SetJunctionRightOfWay(

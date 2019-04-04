@@ -72,7 +72,9 @@ class ReferenceLineInfo {
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
+
   const ReferenceLine& reference_line() const;
+  ReferenceLine* mutable_reference_line();
 
   double SDistanceToDestination() const;
   bool ReachedDestination() const;
