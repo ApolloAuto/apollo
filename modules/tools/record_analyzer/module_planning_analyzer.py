@@ -108,7 +108,7 @@ class PlannigAnalyzer:
                     self.init_point_accel.append(accel)
                 if accel < 0:
                     self.init_point_decel.append(abs(accel))
-                    
+
                 if -3 < accel <= -2:
                     self.breaking_2_3_cnt += 1
                 if -5 < accel <= -3:
@@ -269,7 +269,7 @@ class PlannigAnalyzer:
         else:
             results["accel_max"] = 0.0
             results["accel_avg"] = 0.0
-        
+
         if len(self.init_point_decel) > 0:
             results["decel_max"] = max(self.init_point_decel)
             results["decel_avg"] = np.average(self.init_point_decel)
@@ -320,7 +320,7 @@ class PlannigAnalyzer:
         v2_results["accel"]['2 to 3 cnt'] = self.throttle_2_3_cnt
         v2_results["accel"]['3 to 5 cnt'] = self.throttle_3_5_cnt
         v2_results["accel"]['5 and up cnt'] = self.throttle_5_cnt
-        
+
         # deceleration
         v2_results["decel"] = {}
         if len(self.init_point_decel) > 0:

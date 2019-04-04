@@ -71,7 +71,7 @@ def extract_camera_data(dest_dir, msg, ratio):
 
     seq = 0
     # Check timestamp.
-    #TODO: change saving logic 
+    #TODO: change saving logic
     #while True:
     if True:
         cur_time_second = msg.timestamp

@@ -270,7 +270,7 @@ class TrajectoryToSample(object):
             assign a label and a finish_time.
 
             -10: Lane jittering
-            
+
             -1: False Cut-in
             1: True Cut-in but not to lane_center
             3: True Cut-in and reached lane_center
