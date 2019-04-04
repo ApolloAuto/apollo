@@ -319,7 +319,7 @@ void NdtMapCells::Reduce(NdtMapCells* cell, const NdtMapCells& cell_new) {
 NdtMapMatrix::NdtMapMatrix() {
   rows_ = 0;
   cols_ = 0;
-  map3d_cells_ = NULL;
+  map3d_cells_ = nullptr;
 }
 
 NdtMapMatrix::~NdtMapMatrix() {
@@ -352,7 +352,7 @@ void NdtMapMatrix::Init(unsigned int rows, unsigned int cols) {
   if (map3d_cells_) {
     delete[] map3d_cells_;
   }
-  map3d_cells_ = NULL;
+  map3d_cells_ = nullptr;
   map3d_cells_ = new NdtMapCells[rows * cols];
   rows_ = rows;
   cols_ = cols;

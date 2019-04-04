@@ -25,7 +25,7 @@ Default enable recorder and play under `/apollo` utilizing:
 bash scripts/rtk_recorder.sh
 ```
 
-and 
+and
 
 ```bash
 bash scripts/rtk_player.sh

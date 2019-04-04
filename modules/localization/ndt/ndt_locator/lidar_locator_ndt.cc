@@ -428,7 +428,7 @@ void LidarLocatorNdt::ComposeMapCells(
       if (map_nodes_zones[y * 3 + x][2] - map_nodes_zones[y * 3 + x][0] >= 0 &&
           map_nodes_zones[y * 3 + x][3] - map_nodes_zones[y * 3 + x][1] >= 0) {
         // get map node
-        NdtMapNode* map_node_ptr = NULL;
+        NdtMapNode* map_node_ptr = nullptr;
         if (x == 0 && y == 0) {
           map_node_ptr = map_node_lt;
         } else {

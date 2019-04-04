@@ -27,13 +27,13 @@ namespace camera {
 
 TEST(CommonFunctions, poly_fit_error_test) {
   {
-    Eigen::Matrix<float, max_poly_order + 1, 1> *coeff = NULL;
+    Eigen::Matrix<float, max_poly_order + 1, 1> *coeff = nullptr;
     std::vector<Eigen::Matrix<float, 2, 1> > pos_vec;
     int order = max_poly_order;
     EXPECT_FALSE(PolyFit(pos_vec, order, coeff));
   }
   {
-    Eigen::Matrix<float, max_poly_order + 1, 1> *coeff = NULL;
+    Eigen::Matrix<float, max_poly_order + 1, 1> *coeff = nullptr;
     std::vector<Eigen::Matrix<float, 2, 1> > pos_vec;
     int order = max_poly_order + 1;
     EXPECT_FALSE(PolyFit(pos_vec, order, coeff));

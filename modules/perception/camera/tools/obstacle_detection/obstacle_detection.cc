@@ -236,7 +236,7 @@ int main() {
     EXPECT_TRUE(transformer->Transform(transformer_options, &frame));
 
     FILE *fp = fopen(result_path.c_str(), "w");
-    if (fp == NULL) {
+    if (fp == nullptr) {
       AINFO << "Failed to open " << result_path;
       return -1;
     }

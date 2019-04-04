@@ -102,7 +102,7 @@ def HybridAStarPlan(visualize_flag):
             v_out.append(float(v[i]))
             a_out.append(float(a[i]))
             steer_out.append(float(steer[i]))
-        
+
         # plot
         fig1 = plt.figure(1)
         ax = fig1.add_subplot(111)
