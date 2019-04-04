@@ -102,10 +102,6 @@ double GeneralChannelMessage::frame_ratio(void) {
   return frame_ratio_;
 }
 
-double GeneralChannelMessage::band_width(void) {
-  return band_width_;
-}
-
 GeneralChannelMessage* GeneralChannelMessage::OpenChannel(
     const std::string& channelName) {
   if (channelName.empty() || node_name_.empty()) {
