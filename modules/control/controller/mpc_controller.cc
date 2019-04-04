@@ -107,10 +107,10 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
   mpc_eps_ = control_conf->mpc_controller_conf().eps();
   mpc_max_iteration_ = control_conf->mpc_controller_conf().max_iteration();
   throttle_lowerbound_ =
-      std::max(control_conf->mpc_controller_conf().throttle_deadzone(),
+      std::max(vehicle_param_.throttle_deadzone(),
                control_conf->mpc_controller_conf().throttle_minimum_action());
   brake_lowerbound_ =
-      std::max(control_conf->mpc_controller_conf().brake_deadzone(),
+      std::max(vehicle_param_.brake_deadzone(),
                control_conf->mpc_controller_conf().brake_minimum_action());
 
   minimum_speed_protection_ = control_conf->minimum_speed_protection();
