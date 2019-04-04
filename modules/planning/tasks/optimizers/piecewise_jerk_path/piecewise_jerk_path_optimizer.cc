@@ -65,6 +65,13 @@ common::Status PiecewiseJerkPathOptimizer::Process(
         path_boundary.boundary().size() < 2) {
       continue;
     }
+
+    int max_iter = 4000;
+    // lower max_iter for regular/self/
+    if (path_boundary.label().find("self") != std::string::npos) {
+      max_iter = 500;
+    }
+
     CHECK_GT(path_boundary.boundary().size(), 1);
 
     std::vector<double> opt_l;
@@ -72,7 +79,8 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     std::vector<double> opt_ddl;
     bool res_opt =
         OptimizePath(init_frenet_state, path_boundary.delta_s(),
-                     path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl);
+                     path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl,
+                     max_iter);
 
     if (res_opt) {
       auto frenet_frame_path =
@@ -103,7 +111,7 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     const double delta_s,
     const std::vector<std::pair<double, double>>& lat_boundaries,
     const std::array<double, 5>& w, std::vector<double>* x,
-    std::vector<double>* dx, std::vector<double>* ddx) {
+    std::vector<double>* dx, std::vector<double>* ddx, const int max_iter) {
   std::unique_ptr<Fem1dQpProblem> fem_1d_qp(
       new Fem1dQpProblem(lat_boundaries.size(), init_state.second, delta_s, w,
                          FLAGS_lateral_jerk_bound));
@@ -123,7 +131,7 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   fem_1d_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
   fem_1d_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
 
-  bool success = fem_1d_qp->Optimize();
+  bool success = fem_1d_qp->Optimize(max_iter);
 
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
