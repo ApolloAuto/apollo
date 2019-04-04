@@ -68,11 +68,11 @@ class PlanningContext {
 
   static PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
 
-  static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
+//  static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
 
-  static const SidePassInfo& side_pass_info() { return side_pass_info_; }
+//  static const SidePassInfo& side_pass_info() { return side_pass_info_; }
 
-  static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
+//  static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
   static const FallBackInfo& fallback_info() { return fallback_info_; }
 

@@ -339,8 +339,13 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
     const Frame& frame) {
   // TODO(all): to be updated when SIDE_PASS obstacle decisions
   //            from ReferenceLine is ready
-  if (scenario::side_pass::SidePassScenario::IsTransferable(
-      frame, config_map_[ScenarioConfig::SIDE_PASS], *current_scenario_)) {
+  if (current_scenario_->scenario_type() == ScenarioConfig::SIDE_PASS &&
+      current_scenario_->IsTransferable(*current_scenario_, frame)) {
+    return ScenarioConfig::SIDE_PASS;
+  }
+
+  auto scenario = CreateScenario(ScenarioConfig::SIDE_PASS);
+  if (scenario->IsTransferable(*current_scenario_, frame)) {
     return ScenarioConfig::SIDE_PASS;
   }
 

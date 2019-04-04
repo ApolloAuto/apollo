@@ -268,11 +268,6 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
     return false;
   }
 
-  if (!config.has_side_pass_config()) {
-    AERROR << "miss scenario specific config";
-    return false;
-  }
-
   const auto& reference_line_info = frame.reference_line_info().front();
   const PathDecision& path_decision = reference_line_info.path_decision();
   double distance_to_closest_blocking_obstacle = -100.0;
@@ -281,12 +276,14 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
   // by other obstacles or traffic rules.
   // Loop through every obstacle to locate the closest blocking one, if there
   // exists such an obstacle.
+
+  const auto& config = side_pass_context_.scenario_config_;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     if (IsBlockingObstacleToSidePass(
             frame, obstacle,
-            config.side_pass_config().block_obstacle_min_speed(),
-            config.side_pass_config().min_front_obstacle_distance(),
-            config.side_pass_config().enable_obstacle_blocked_check())) {
+            config.block_obstacle_min_speed(),
+            config.min_front_obstacle_distance(),
+            config.enable_obstacle_blocked_check())) {
       exists_a_blocking_obstacle = true;
       double distance_between_adc_and_obstacle =
           GetDistanceBetweenADCAndObstacle(frame, obstacle);
