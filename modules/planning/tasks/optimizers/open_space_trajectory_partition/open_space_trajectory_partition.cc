@@ -239,13 +239,6 @@ Status OpenSpaceTrajectoryPartition::Process() {
       vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE
           ? NormalizeAngle(vehicle_state.heading() + M_PI)
           : vehicle_state.heading();
-  // TODO(Jinyun): Move to confs
-  constexpr double abs_static_linear_velocity = 0.2;
-  constexpr double abs_static_linear_acceleration = 0.1;
-  const bool is_vehicle_static =
-      std::abs(vehicle_state.linear_velocity()) < abs_static_linear_velocity &&
-      std::abs(vehicle_state.linear_acceleration()) <
-          abs_static_linear_acceleration;
 
   for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& trajectory = paritioned_trajectories_ptr->at(i).first;
@@ -320,14 +313,9 @@ Status OpenSpaceTrajectoryPartition::Process() {
       const double heading_search_difference = std::abs(NormalizeAngle(
           traj_point_moving_direction - vehicle_moving_direction));
 
-      if (distance < distance_search_range) {
-        if (!is_vehicle_static &&
-            heading_search_difference > heading_search_range) {
-          continue;
-        }
-        if (!is_vehicle_static && head_track_difference > heading_track_range) {
-          continue;
-        }
+      if (distance < distance_search_range &&
+          heading_search_difference < heading_search_range &&
+          head_track_difference < heading_track_range) {
         // get vehicle box and path point box, compute IOU
         Box2d path_point_box({path_point_x, path_point_y}, path_point_theta,
                              ego_length, ego_width);
@@ -350,12 +338,63 @@ Status OpenSpaceTrajectoryPartition::Process() {
 
   if (!flag_change_to_next) {
     if (closest_point_on_trajs.empty()) {
-      std::string msg("Fail to find nearest trajectory point to follow");
-      AERROR << msg;
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+      AERROR << "Trajectory paritition fail, using failsafe search";
+      std::priority_queue<
+          std::pair<std::pair<size_t, size_t>, double>,
+          std::vector<std::pair<std::pair<size_t, size_t>, double>>,
+          decltype(pair_comp)>
+          failsafe_closest_point_on_trajs(pair_comp);
+      for (size_t i = 0; i < trajectories_size; ++i) {
+        size_t trajectory_size = trajectory.size();
+        CHECK_GT(trajectory_size, 0);
+        std::priority_queue<std::pair<size_t, double>,
+                            std::vector<std::pair<size_t, double>>,
+                            decltype(comp)>
+            failsafe_closest_point(comp);
+
+        for (size_t j = 0; j < trajectory_size; ++j) {
+          const TrajectoryPoint& trajectory_point = trajectory.at(j);
+          const PathPoint& path_point = trajectory_point.path_point();
+          const double path_point_x = path_point.x();
+          const double path_point_y = path_point.y();
+          const double path_point_theta = path_point.theta();
+          const Vec2d tracking_vector(path_point_x - ego_x,
+                                      path_point_y - ego_y);
+          const double distance = tracking_vector.Length();
+          if (distance < distance_search_range) {
+            // get vehicle box and path point box, compute IOU
+            Box2d path_point_box({path_point_x, path_point_y}, path_point_theta,
+                                 ego_length, ego_width);
+            Vec2d shift_vec{shift_distance * std::cos(path_point_theta),
+                            shift_distance * std::sin(path_point_theta)};
+            path_point_box.Shift(shift_vec);
+            double iou_ratio =
+                Polygon2d(ego_box).ComputeIoU(Polygon2d(path_point_box));
+            failsafe_closest_point.emplace(j, iou_ratio);
+          }
+        }
+        if (!failsafe_closest_point.empty()) {
+          size_t closest_point_index = failsafe_closest_point.top().first;
+          double max_iou_ratio = failsafe_closest_point.top().second;
+          failsafe_closest_point_on_trajs.emplace(
+              std::make_pair(i, closest_point_index), max_iou_ratio);
+        }
+      }
+      if (failsafe_closest_point_on_trajs.empty()) {
+        std::string msg("Fail to find nearest trajectory point to follow");
+        AERROR << msg;
+        return Status(ErrorCode::PLANNING_ERROR, msg);
+      } else {
+        current_trajectory_index =
+            failsafe_closest_point_on_trajs.top().first.first;
+        current_trajectory_point_index =
+            failsafe_closest_point_on_trajs.top().first.second;
+      }
+    } else {
+      current_trajectory_index = closest_point_on_trajs.top().first.first;
+      current_trajectory_point_index =
+          closest_point_on_trajs.top().first.second;
     }
-    current_trajectory_index = closest_point_on_trajs.top().first.first;
-    current_trajectory_point_index = closest_point_on_trajs.top().first.second;
   }
 
   auto* chosen_paritioned_trajectory =
