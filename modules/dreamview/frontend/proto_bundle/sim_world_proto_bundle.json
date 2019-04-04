@@ -3873,11 +3873,11 @@
                     "default": 5
                   }
                 },
-                "openSpaceFallBackStopSafetyGap": {
+                "openSpaceFallBackStopDistance": {
                   "type": "double",
                   "id": 3,
                   "options": {
-                    "default": 1
+                    "default": 2
                   }
                 }
               }
@@ -5254,16 +5254,23 @@
                     "default": 3
                   }
                 },
+                "approachSpeedLimit": {
+                  "type": "double",
+                  "id": 3,
+                  "options": {
+                    "default": 6.7056
+                  }
+                },
                 "stopTimeoutSec": {
                   "type": "float",
-                  "id": 3,
+                  "id": 4,
                   "options": {
                     "default": 8
                   }
                 },
                 "creepTimeoutSec": {
                   "type": "float",
-                  "id": 4,
+                  "id": 5,
                   "options": {
                     "default": 10
                   }
@@ -5819,6 +5826,18 @@
                 }
               }
             },
+            "BareIntersectionStatus": {
+              "fields": {
+                "currentPncJunctionOverlapId": {
+                  "type": "string",
+                  "id": 1
+                },
+                "donePncJunctionOverlapId": {
+                  "type": "string",
+                  "id": 2
+                }
+              }
+            },
             "ChangeLaneStatus": {
               "fields": {
                 "status": {
@@ -6020,49 +6039,53 @@
             },
             "PlanningStatus": {
               "fields": {
+                "bareIntersection": {
+                  "type": "BareIntersectionStatus",
+                  "id": 1
+                },
                 "changeLane": {
                   "type": "ChangeLaneStatus",
-                  "id": 1
+                  "id": 2
                 },
                 "crosswalk": {
                   "type": "CrosswalkStatus",
-                  "id": 2
+                  "id": 3
                 },
                 "destination": {
                   "type": "DestinationStatus",
-                  "id": 3
+                  "id": 4
                 },
                 "engageAdvice": {
                   "type": "apollo.common.EngageAdvice",
-                  "id": 4
+                  "id": 5
                 },
                 "pullOver": {
                   "type": "PullOverStatus",
-                  "id": 5
+                  "id": 6
                 },
                 "rerouting": {
                   "type": "ReroutingStatus",
-                  "id": 6
+                  "id": 7
                 },
                 "rightOfWay": {
                   "type": "RightOfWayStatus",
-                  "id": 7
+                  "id": 8
                 },
                 "scenario": {
                   "type": "ScenarioStatus",
-                  "id": 8
+                  "id": 9
                 },
                 "sidePass": {
                   "type": "SidePassStatus",
-                  "id": 9
+                  "id": 10
                 },
                 "stopSign": {
                   "type": "StopSignStatus",
-                  "id": 10
+                  "id": 11
                 },
                 "trafficLight": {
                   "type": "TrafficLightStatus",
-                  "id": 11
+                  "id": 12
                 }
               }
             },
