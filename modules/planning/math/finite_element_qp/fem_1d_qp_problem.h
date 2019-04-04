@@ -104,7 +104,7 @@ class Fem1dQpProblem {
 
   virtual void PreSetKernel() {}
 
-  virtual bool Optimize();
+  virtual bool Optimize(const int max_iter = 4000);
 
   const std::vector<double>& x() const { return x_; }
 

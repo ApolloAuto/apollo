@@ -70,10 +70,6 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
     std::vector<c_float>& upper_bounds,                             // NOLINT
     std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
     OSQPSettings* settings) {
-  // Define Solver settings as default
-  osqp_set_default_settings(settings);
-  settings->polish = true;
-  settings->verbose = FLAGS_enable_osqp_debug;
 
   data->n = kernel_dim;
   data->m = num_affine_constraint;
@@ -187,7 +183,7 @@ void Fem1dQpProblem::SetVariableSecondOrderDerivativeBounds(
   ProcessBound(ddx_bounds, &ddx_bounds_);
 }
 
-bool Fem1dQpProblem::Optimize() {
+bool Fem1dQpProblem::Optimize(const int max_iter) {
   // calculate kernel
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
@@ -221,6 +217,13 @@ bool Fem1dQpProblem::Optimize() {
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
   OSQPSettings* settings =
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  // Define Solver settings
+  osqp_set_default_settings(settings);
+  settings->max_iter = max_iter;
+  settings->polish = true;
+  settings->verbose = FLAGS_enable_osqp_debug;
+  settings->scaled_termination = true;
+
   OSQPWorkspace* work = nullptr;
 
   bool res =
