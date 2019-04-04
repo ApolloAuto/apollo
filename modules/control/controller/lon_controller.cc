@@ -279,8 +279,8 @@ Status LonController::ComputeControlCommand(
     debug->set_is_full_stop(true);
   }
 
-  double throttle_deadzone = lon_controller_conf.throttle_deadzone();
-  double brake_deadzone = lon_controller_conf.brake_deadzone();
+  double throttle_deadzone = vehicle_param_.throttle_deadzone();
+  double brake_deadzone = vehicle_param_.brake_deadzone();
   double calibration_value = 0.0;
   double acceleration_lookup =
       (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
