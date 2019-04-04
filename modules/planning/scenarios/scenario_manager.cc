@@ -309,7 +309,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectYieldSignScenario(
 ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
     const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap) {
   const auto& reference_line_info = frame.reference_line_info().front();
-  if (reference_line_info.GetIntersectionRightoffRoad(pnc_junction_overlap)) {
+  if (reference_line_info.GetIntersectionRightofWayStatus(
+      pnc_junction_overlap)) {
     return default_scenario_type_;
   }
 

@@ -161,7 +161,7 @@ class ReferenceLineInfo {
 
   const hdmap::Lane::LaneTurn& GetPathTurnType(const double s) const;
 
-  const bool GetIntersectionRightoffRoad(
+  const bool GetIntersectionRightofWayStatus(
       const hdmap::PathOverlap& pnc_junction_overlap) const;
 
   double OffsetToOtherReferenceLine() const {
