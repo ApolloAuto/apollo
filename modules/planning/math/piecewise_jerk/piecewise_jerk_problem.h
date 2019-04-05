@@ -31,7 +31,6 @@ namespace planning {
 
 /*
  * @brief:
- * FEM stands for finite element method.
  * This class solve an optimization problem:
  * x
  * |
@@ -47,8 +46,12 @@ namespace planning {
  * which makes the line P(start), P0, P(1) ... P(k-1) "smooth".
  */
 
-class Fem1dQpProblem {
+class PiecewiseJerkProblem {
  public:
+  PiecewiseJerkProblem() = default;
+
+  virtual ~PiecewiseJerkProblem() = default;
+
   /*
    * @param
    * x_init: the init status of x, x', x''
@@ -62,14 +65,10 @@ class Fem1dQpProblem {
    * -- w[4]: default reference line weight, (x_bounds[k].first +
    * x_bounds[k].second)/2
    */
-  Fem1dQpProblem(const size_t num_var, const std::array<double, 3>& x_init,
-                 const double delta_s, const std::array<double, 5>& w,
-                 const double max_x_third_order_derivative);
-
-  virtual ~Fem1dQpProblem() = default;
-
-  virtual void AddReferenceLineKernel(const std::vector<double>& ref_line,
-                                      const double wweight) {}
+  virtual void InitProblem(const size_t num_var,
+                           const std::array<double, 3>& x_init,
+                           const double delta_s, const std::array<double, 5>& w,
+                           const double max_x_third_order_derivative);
 
   virtual void ResetInitConditions(const std::array<double, 3>& x_init) {
     x_init_ = x_init;
@@ -101,8 +100,6 @@ class Fem1dQpProblem {
   // s doesn't need to be sorted
   virtual void SetVariableSecondOrderDerivativeBounds(
       const std::vector<std::tuple<double, double, double>>& ddx_bounds);
-
-  virtual void PreSetKernel() {}
 
   virtual bool Optimize(const int max_iter = 4000);
 
