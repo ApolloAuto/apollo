@@ -168,7 +168,7 @@ void OpenSpacePlanner::GenerateTrajectoryThread() {
       if (status == Status::OK()) {
         trajectory_updated_.store(true);
       } else {
-        AERROR_EVERY(200)
+        AERROR
             << "Multi-thread trajectory generator not OK with return status : "
             << status.ToString();
       }
