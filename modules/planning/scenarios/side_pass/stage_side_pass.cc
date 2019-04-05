@@ -22,11 +22,13 @@
 
 #include <algorithm>
 #include <limits>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include "modules/common/time/time.h"
 #include "modules/planning/common/ego_info.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/speed_profile_generator.h"
 
 namespace apollo {
@@ -109,7 +111,9 @@ Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
     AERROR << "Unexpected path or speed optimizer failure.";
     return Status(common::ErrorCode::PLANNING_ERROR);
   }
-
+  // TODO(Jinyun): Save last successful label across scenario
+  // PlanningContext::mutable_fallback_info()->last_successful_path_label =
+  // reference_line_info->path_data().path_label();
   reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
@@ -137,8 +141,21 @@ Status StageSidePass::PlanFallbackTrajectory(
     reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
   }
 
+  // TODO(Jinyun): Use last successful frame path data label
+  if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
+    const auto& candidate_path_data =
+        reference_line_info->GetCandidatePathData();
+    for (const auto& path_data : candidate_path_data) {
+      if (path_data.path_label().find("self") != std::string::npos) {
+        *reference_line_info->mutable_path_data() = path_data;
+        break;
+      }
+    }
+    AERROR << "reference_line_info->path_data() "
+           << reference_line_info->path_data().path_label();
+  }
+
   AERROR << "Speed fallback due to algorithm failure";
-  // TODO(Jinyun) calculate front clear distance for fixed distance fallback
   const double stop_path_distance =
       reference_line_info->path_data().discretized_path().Length();
   const double stop_speed_distance =

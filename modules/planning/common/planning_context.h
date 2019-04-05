@@ -57,7 +57,7 @@ class PlanningContext {
   static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
   struct FallBackInfo {
-    PathData last_successful_path;
+    std::string last_successful_path_label;
   };
 
   static void Clear();
@@ -69,10 +69,6 @@ class PlanningContext {
   static PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
 
 //  static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
-
-//  static const SidePassInfo& side_pass_info() { return side_pass_info_; }
-
-//  static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
   static const FallBackInfo& fallback_info() { return fallback_info_; }
 
