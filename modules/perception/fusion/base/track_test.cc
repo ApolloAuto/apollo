@@ -166,8 +166,9 @@ TEST(TrackTest, test) {
 
   EXPECT_EQ(track.GetSensorObject("incorrect_id"), nullptr);
 
-  EXPECT_TRUE(fabs(track.GetTrackingPeriod() - frame_6->GetTimestamp() +
-                   timestamp) < 1e-6);
+  EXPECT_LT(
+      fabs(track.GetTrackingPeriod() - frame_6->GetTimestamp() + timestamp),
+      1e-6);
 
   track.UpdateWithoutSensorObject(vlp64_info.name, timestamp + 0.2);
   EXPECT_FALSE(track.IsVisible(vlp64_info.name));
