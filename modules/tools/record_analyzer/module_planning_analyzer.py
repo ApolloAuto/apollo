@@ -146,12 +146,11 @@ class PlannigAnalyzer:
 
             accel = None
             jerk = None
-            if self.last_init_point is not None:
+            duration = 0
+            if self.last_init_point_t is not None:
                 duration = t - self.last_init_point_t
-                if duration <= 0:
-                    accel = 0
-                else:
-                    accel = (init_point.v - self.last_init_point.v) / duration
+            if self.last_init_point is not None and duration > 0.03:
+                accel = (init_point.v - self.last_init_point.v) / duration
                 if accel > 0:
                     self.init_point_accel.append(accel)
                 elif accel < 0:
