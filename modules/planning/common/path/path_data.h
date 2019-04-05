@@ -84,7 +84,8 @@ class PathData {
 
   std::string DebugString() const;
 
-  void set_path_label(const std::string& label);
+  void set_path_label(const std::string &label);
+
   const std::string &path_label() const;
 
   void set_blocking_obstacle_id(const std::string &obs_id) {
@@ -116,7 +117,7 @@ class PathData {
   std::list<std::pair<DiscretizedPath, FrenetFramePath>> path_data_history_;
 
   std::string path_label_ = "regular";
-  std::string blocking_obstacle_id_ = "";
+  std::string blocking_obstacle_id_;
 };
 
 }  // namespace planning
