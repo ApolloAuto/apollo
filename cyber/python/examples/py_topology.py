@@ -52,7 +52,7 @@ class TestTopologyManager(object):
         """
         node_list = self.test_topology_manager.get_node_list()
         print(len(node_list))
-        if not node_list:
+        if node_list:
             for node in node_list:
                 print(node)
         else:
@@ -63,7 +63,7 @@ class TestTopologyManager(object):
         Test Show Node Info.
         """
         ret = self.test_topology_manager.show_node_info(node_name)
-        if not ret:
+        if ret:
             for item in ret:
                 print(item)
 
@@ -72,7 +72,7 @@ class TestTopologyManager(object):
         Test Get Channel List Info.
         """
         channel_list = self.test_topology_manager.get_channel_list()
-        if not channel_list:
+        if channel_list:
             for channel in channel_list:
                 print(channel)
         else:
@@ -83,7 +83,7 @@ class TestTopologyManager(object):
         Test Get Reader List.
         """
         reader_list = self.test_topology_manager.get_reader_list()
-        if not reader_list:
+        if reader_list:
             for reader in reader_list:
                 print(reader)
         else:
@@ -94,7 +94,7 @@ class TestTopologyManager(object):
         Test Get Writer List.
         """
         writer_list = self.test_topology_manager.get_writer_list()
-        if not writer_list:
+        if writer_list:
             for writer in writer_list:
                 print(writer)
         else:
@@ -105,7 +105,7 @@ class TestTopologyManager(object):
         Test Get Node Writes.
         """
         node_writers = self.test_topology_manager.get_node_writes(node_name)
-        if not node_writers:
+        if node_writers:
             for node_writer in node_writers:
                 print(node_writer)
         else:
@@ -116,7 +116,7 @@ class TestTopologyManager(object):
         Test Get Node Readers.
         """
         node_readers = self.test_topology_manager.get_node_readers(node_name)
-        if not node_readers:
+        if node_readers:
             for node_reader in node_readers:
                 print(node_reader)
         else:
@@ -127,7 +127,7 @@ class TestTopologyManager(object):
         Test Show Channel Info.
         """
         ret = self.test_topology_manager.show_channel_info(channel_name)
-        if not ret:
+        if ret:
             for item in ret:
                 print(item)
 
