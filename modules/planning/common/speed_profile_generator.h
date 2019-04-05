@@ -64,6 +64,12 @@ class SpeedProfileGenerator {
       const double init_speed, const double init_acc,
       const double stop_distance);
 
+  static SpeedData GenerateStopProfile(const double init_speed,
+                                       const double init_acc);
+
+  static SpeedData GenerateStopProfileFromPolynomial(const double init_speed,
+                                                     const double init_acc);
+
   static bool IsValidProfile(const QuinticPolynomialCurve1d& curve);
 };
 
