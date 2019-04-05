@@ -27,7 +27,7 @@ import argparse
 import os
 import re
 import sys
-import tarfile
+import shutil
 import six
 
 import numpy as np
@@ -392,15 +392,18 @@ def save_msg_list_to_file(out_path, channel, msg_list):
     else:
         raise ValueError("saving func for {} not implemented".format(channel))
 
-def generate_compressed_file(extracted_data_path,
-                             compressed_file='sensor_data'):
+def generate_compressed_file(input_path, input_name,
+                             output_path, compressed_file='sensor_data'):
     """
-    Compress each data file to compressed package
+    Compress data extraction directory as a single tar.gz archive
     """
-    # Note that ZipFile support compress a directory in Python, but GZIP not.
-    # We only support GZ compression type with tarfile for now.
-    with tarfile.open(compressed_file + '.tar.gz', 'w:gz') as g_out:
-        g_out.add(extracted_data_path, arcname=compressed_file)
+    cwd_path = os.getcwd()
+    os.chdir(input_path)
+    shutil.make_archive(base_name=os.path.join(output_path, compressed_file),
+                        format='gztar',
+                        root_dir=input_path,
+                        base_dir=input_name)
+    os.chdir(cwd_path)
 
 def generate_extraction_rate_dict(channel_list, large_topic_extraction_rate,
                                     small_topic_extraction_rate=1):
@@ -444,7 +447,7 @@ def main():
                         default="./extracted_data",
                         help="The output directory to restore message.")
     parser.add_argument("-z", "--compressed_file", action="store", type=str,
-                        default="", help="The output directory to restore message.")
+                        default="extraction_data", help="The output compressed filename.")
     parser.add_argument("-c", "--channel_name", dest='channel_list', action="append",
                         default=[], help="list of channel_name that needs parsing.")
     parser.add_argument("-s", "--start_timestamp", action="store", type=float,
@@ -466,11 +469,13 @@ def main():
         sys.exit(1)
 
     # Create directory to save the extracted data
-    output_path = args.output_path + re.sub(r'[^0-9]', '', str(datetime.now()))
+    # use time now() as folder name
+    output_relative_path = datetime.now().strftime("%Y-%m-%d-%H-%M")
+    output_abs_path = os.path.join(args.output_path, output_relative_path)
 
-    ret = process_dir(output_path, 'create')
+    ret = process_dir(output_abs_path, 'create')
     if ret is False:
-        print('Failed to create extrated data directory: %s' % args.output_path)
+        print('Failed to create extrated data directory: %s' % output_abs_path)
         sys.exit(1)
 
     channel_list = set(channel_name for channel_name in args.channel_list)
@@ -478,12 +483,15 @@ def main():
                                 large_topic_extraction_rate=args.extraction_rate,
                                 small_topic_extraction_rate=1)
 
-    ret = extract_data(args.record_path, output_path, channel_list,
+    ret = extract_data(args.record_path, output_abs_path, channel_list,
                        args.start_timestamp, args.end_timestamp, extraction_rate_dict)
     if ret is False:
         print('Failed to extract data!')
 
-    generate_compressed_file(output_path, args.compressed_file)
+    generate_compressed_file(input_path=args.output_path,
+                             input_name=output_relative_path,
+                             output_path=args.output_path,
+                             compressed_file=args.compressed_file)
 
     print('Data extraction is completed successfully!')
     sys.exit(0)
