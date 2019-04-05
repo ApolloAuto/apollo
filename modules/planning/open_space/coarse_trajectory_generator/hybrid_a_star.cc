@@ -56,7 +56,7 @@ bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
       std::make_shared<ReedSheppPath>();
   if (!reed_shepp_generator_->ShortestRSP(current_node, end_node_,
                                           reeds_shepp_to_check)) {
-    AERROR_EVERY(100) << "ShortestRSP failed";
+    ADEBUG << "ShortestRSP failed";
     return false;
   }
 
@@ -346,11 +346,11 @@ bool HybridAStar::Plan(
   end_node_.reset(
       new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
   if (!ValidityCheck(start_node_)) {
-    AERROR_EVERY(1000) << "start_node in collision with obstacles";
+    ADEBUG << "start_node in collision with obstacles";
     return false;
   }
   if (!ValidityCheck(end_node_)) {
-    AERROR_EVERY(1000) << "end_node in collision with obstacles";
+    ADEBUG << "end_node in collision with obstacles";
     return false;
   }
   double map_time = Clock::NowInSeconds();
@@ -409,11 +409,11 @@ bool HybridAStar::Plan(
     }
   }
   if (final_node_ == nullptr) {
-    AERROR_EVERY(100) << "Hybrid A searching return null ptr(open_set ran out)";
+    ADEBUG << "Hybrid A searching return null ptr(open_set ran out)";
     return false;
   }
   if (!GetResult(result)) {
-    AERROR_EVERY(100) << "GetResult failed";
+    ADEBUG << "GetResult failed";
     return false;
   }
   ADEBUG << "explored node num is " << explored_node_num;
