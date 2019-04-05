@@ -284,7 +284,7 @@ TEST(TwodThreedUtilTest, GetDxDzForCenterFromGroundLineSegTest) {
     float dx_dz[2] = {0};
     GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
                                       ratio_x_over_z, dx_dz, true);
-    EXPECT_TRUE(dx_dz[1] < 1e-5);
+    EXPECT_LT(dx_dz[1], 1e-5);
   }
   {
     int width = 1920;
@@ -298,7 +298,7 @@ TEST(TwodThreedUtilTest, GetDxDzForCenterFromGroundLineSegTest) {
     float dx_dz[2] = {0};
     GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
                                       ratio_x_over_z, dx_dz, true);
-    EXPECT_TRUE(dx_dz[1] < 1e-5);
+    EXPECT_LT(dx_dz[1], 1e-5);
   }
   {
     int width = 1193;
@@ -314,10 +314,10 @@ TEST(TwodThreedUtilTest, GetDxDzForCenterFromGroundLineSegTest) {
     float dx_dz[2] = {0};
     GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
                                       ratio_x_over_z, dx_dz, true);
-    EXPECT_FALSE(dx_dz[1] < 1e-5);
+    EXPECT_GE(dx_dz[1], 1e-5);
     GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
                                       ratio_x_over_z, dx_dz, false);
-    EXPECT_FALSE(dx_dz[1] < 1e-5);
+    EXPECT_GE(dx_dz[1], 1e-5);
   }
   {
     int width = 1193;
@@ -333,10 +333,10 @@ TEST(TwodThreedUtilTest, GetDxDzForCenterFromGroundLineSegTest) {
     float dx_dz[2] = {0};
     GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
                                       ratio_x_over_z, dx_dz, true);
-    EXPECT_FALSE(dx_dz[1] < 1e-5);
+    EXPECT_GE(dx_dz[1], 1e-5);
     GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
                                       ratio_x_over_z, dx_dz, false);
-    EXPECT_FALSE(dx_dz[1] < 1e-5);
+    EXPECT_GE(dx_dz[1], 1e-5);
   }
   {
     int width = 1193;
@@ -352,7 +352,7 @@ TEST(TwodThreedUtilTest, GetDxDzForCenterFromGroundLineSegTest) {
     float dx_dz[2] = {0};
     GetDxDzForCenterFromGroundLineSeg(ls, plane, pts_c, k_mat, width, height,
                                       ratio_x_over_z, dx_dz, false);
-    EXPECT_TRUE(dx_dz[1] < -1e-5);
+    EXPECT_LT(dx_dz[1], -1e-5);
   }
 }
 

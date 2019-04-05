@@ -306,8 +306,8 @@ bool LocalizationLidarProcess::GetPredictPose(const double lidar_time,
     init_pose.qz = quatd.z();
     init_pose.qw = quatd.w();
 
-    state = pose_forecastor_->GetBestForcastPose(
-        lidar_time, pre_location_time_, init_pose, &forecast_pose);
+    state = pose_forecastor_->GetBestForcastPose(lidar_time, pre_location_time_,
+                                                 init_pose, &forecast_pose);
   }
 
   if (state < 0) {

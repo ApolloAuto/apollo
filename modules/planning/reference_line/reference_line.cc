@@ -236,8 +236,8 @@ ReferencePoint ReferenceLine::GetNearestReferencePoint(const double s) const {
     return reference_points_.front();
   }
   if (s > accumulated_s.back() + 1e-2) {
-    AWARN << "The requested s: " << s << " > reference line length: "
-          << accumulated_s.back();
+    AWARN << "The requested s: " << s
+          << " > reference line length: " << accumulated_s.back();
     return reference_points_.back();
   }
   auto it_lower =
@@ -294,8 +294,8 @@ ReferencePoint ReferenceLine::GetReferencePoint(const double s) const {
     return reference_points_.front();
   }
   if (s > accumulated_s.back() + 1e-2) {
-    AWARN << "The requested s: " << s << " > reference line length: "
-          << accumulated_s.back();
+    AWARN << "The requested s: " << s
+          << " > reference line length: " << accumulated_s.back();
     return reference_points_.back();
   }
 

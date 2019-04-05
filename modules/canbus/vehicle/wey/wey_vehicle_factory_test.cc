@@ -35,11 +35,11 @@ class WeyVehicleFactoryTest : public ::testing::Test {
 };
 
 TEST_F(WeyVehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(wey_factory_.CreateVehicleController() != nullptr);
+  EXPECT_NE(wey_factory_.CreateVehicleController(), nullptr);
 }
 
 TEST_F(WeyVehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(wey_factory_.CreateMessageManager() != nullptr);
+  EXPECT_NE(wey_factory_.CreateMessageManager(), nullptr);
 }
 
 }  // namespace canbus

@@ -18,9 +18,8 @@
  * @file
  **/
 
-
-#include "ad_rss/core/RssCheck.hpp"
 #include "TestSupport.hpp"
+#include "ad_rss/core/RssCheck.hpp"
 
 namespace ad_rss {
 namespace core {
@@ -101,24 +100,24 @@ TEST_F(RssCheckSameDirectionTests, OtherLeading_FixDistance) {
   ::ad_rss::world::AccelerationRestriction accelerationRestriction;
   ::ad_rss::core::RssCheck rssCheck;
 
-  ASSERT_TRUE(rssCheck.calculateAccelerationRestriction(worldModel,
-      accelerationRestriction));
+  ASSERT_TRUE(rssCheck.calculateAccelerationRestriction(
+      worldModel, accelerationRestriction));
 
   if (accelerationRestriction.longitudinalRange.maximum ==
       -1. * worldModel.egoVehicle.dynamics.alphaLon.brakeMin) {
     printf("[----------] RSS unsafe!!!\n");
     EXPECT_EQ(accelerationRestriction.longitudinalRange.maximum,
-      -1. * worldModel.egoVehicle.dynamics.alphaLon.brakeMin);
+              -1. * worldModel.egoVehicle.dynamics.alphaLon.brakeMin);
   } else {
     printf("[----------] RSS safe!!!\n");
     EXPECT_EQ(accelerationRestriction.longitudinalRange.maximum,
-      worldModel.egoVehicle.dynamics.alphaLon.accelMax);
+              worldModel.egoVehicle.dynamics.alphaLon.accelMax);
   }
   // following judgement only true for leading-v v(0,0.5) and ego-v v(11,-0.5)
-  EXPECT_EQ(accelerationRestriction.lateralLeftRange.maximum, -1 *
-      worldModel.egoVehicle.dynamics.alphaLat.brakeMin);
+  EXPECT_EQ(accelerationRestriction.lateralLeftRange.maximum,
+            -1 * worldModel.egoVehicle.dynamics.alphaLat.brakeMin);
   EXPECT_EQ(accelerationRestriction.lateralRightRange.maximum,
-      worldModel.egoVehicle.dynamics.alphaLat.accelMax);
+            worldModel.egoVehicle.dynamics.alphaLat.accelMax);
 }
 
 }  // namespace core

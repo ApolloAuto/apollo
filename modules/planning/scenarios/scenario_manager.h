@@ -79,8 +79,7 @@ class ScenarioManager final {
 
   bool IsBareIntersectionScenario(
       const ScenarioConfig::ScenarioType& scenario_type);
-  bool IsStopSignScenario(
-      const ScenarioConfig::ScenarioType& scenario_type);
+  bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
   bool IsTrafficLightScenario(
       const ScenarioConfig::ScenarioType& scenario_type);
 

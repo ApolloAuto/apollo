@@ -190,24 +190,21 @@ void RoadGraph::ComputeLaneSequence(
         if (successor_lanes.size() > 1) {
           // Run recursion function to perform DFS.
           for (size_t i = 0; i < successor_lanes.size(); i++) {
-            ComputeLaneSequence(
-                successor_accumulated_s, 0.0, successor_lanes[i],
-                graph_search_horizon - 1,  false, lane_segments,
-                lane_graph_ptr);
+            ComputeLaneSequence(successor_accumulated_s, 0.0,
+                                successor_lanes[i], graph_search_horizon - 1,
+                                false, lane_segments, lane_graph_ptr);
           }
         } else {
-          ComputeLaneSequence(
-              successor_accumulated_s, 0.0, successor_lanes[0],
-              graph_search_horizon - 1,  true, lane_segments,
-              lane_graph_ptr);
+          ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lanes[0],
+                              graph_search_horizon - 1, true, lane_segments,
+                              lane_graph_ptr);
         }
       } else {
         auto selected_successor_lane =
             LaneWithSmallestAverageCurvature(successor_lanes);
-          ComputeLaneSequence(
-              successor_accumulated_s, 0.0, selected_successor_lane,
-              graph_search_horizon - 1,  false, lane_segments,
-              lane_graph_ptr);
+        ComputeLaneSequence(successor_accumulated_s, 0.0,
+                            selected_successor_lane, graph_search_horizon - 1,
+                            false, lane_segments, lane_graph_ptr);
       }
     }
   }

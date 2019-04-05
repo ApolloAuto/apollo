@@ -57,11 +57,9 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
   }
 
   // get overlap along reference line
-  PathOverlap* current_pnc_junction =
-      scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          pnc_junction_overlap_id,
-          ReferenceLineInfo::PNC_JUNCTION);
+  PathOverlap* current_pnc_junction = scenario::util::GetOverlapOnReferenceLine(
+      reference_line_info, pnc_junction_overlap_id,
+      ReferenceLineInfo::PNC_JUNCTION);
   if (!current_pnc_junction) {
     return FinishScenario();
   }
@@ -71,9 +69,9 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
   const double distance_adc_to_pnc_junction =
       current_pnc_junction->start_s - adc_front_edge_s;
   ADEBUG << "pnc_junction_overlap_id[" << pnc_junction_overlap_id
-           << "] start_s[" << current_pnc_junction->start_s
-           << "] distance_adc_to_pnc_junction[" << distance_adc_to_pnc_junction
-           << "]";
+         << "] start_s[" << current_pnc_junction->start_s
+         << "] distance_adc_to_pnc_junction[" << distance_adc_to_pnc_junction
+         << "]";
   if (distance_adc_to_pnc_junction > kPassStopLineBuffer) {
     // passed stop line
     return FinishStage();
@@ -83,21 +81,18 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
   if (frame->mutable_reference_line_info()) {
     auto* reference_line =
         frame->mutable_reference_line_info()->front().mutable_reference_line();
-    reference_line->AddSpeedLimit(
-        0.0,
-        current_pnc_junction->start_s,
-        scenario_config_.approach_speed_limit());
+    reference_line->AddSpeedLimit(0.0, current_pnc_junction->start_s,
+                                  scenario_config_.approach_speed_limit());
   }
 
   // set right_of_way_status
-  reference_line_info.SetJunctionRightOfWay(
-      current_pnc_junction->start_s, false);
+  reference_line_info.SetJunctionRightOfWay(current_pnc_junction->start_s,
+                                            false);
 
   plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
     AERROR << "BareIntersectionUnprotectedStageApproach planning error";
   }
-
 
   bool clear = false;
   // TODO(all): check CLEAR

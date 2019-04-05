@@ -50,14 +50,14 @@ TEST(PinholeCameraModelTest, camera_model_project_test) {
   Eigen::Matrix3f ret_intrinsic = camera_model.get_intrinsic_params();
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
-      EXPECT_TRUE(fabs(intrinsic_params(i, j) - ret_intrinsic(i, j)) < 1.0e-6);
+      EXPECT_LT(fabs(intrinsic_params(i, j) - ret_intrinsic(i, j)), 1.0e-6);
     }
   }
   Eigen::Vector3f pt3d(10, 20, 50);
   Eigen::Vector2f pt2d(800, 956);
   Eigen::Vector2f proj2d = camera_model.Project(pt3d);
 
-  EXPECT_TRUE((pt2d - proj2d).norm() < 1.0e-6);
+  EXPECT_LT((pt2d - proj2d).norm(), 1.0e-6);
 
   Eigen::Vector3f uproj3d = camera_model.UnProject(pt2d);
   EXPECT_TRUE(
