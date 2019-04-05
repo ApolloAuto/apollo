@@ -66,6 +66,7 @@ Status SpeedBoundsDecider::Process(
     auto *mutable_side_pass_info = PlanningContext::mutable_side_pass_info();
     if (side_pass_info.change_lane_stop_flag) {
       // Check if stop at last frame stop fence
+      ADEBUG << "stop fence is set due to side pass on reverse lane";
       if (CheckADCStop(*reference_line_info,
                        side_pass_info.change_lane_stop_path_point)) {
         ADEBUG << "ADV Stopped due to change lane in side pass";
