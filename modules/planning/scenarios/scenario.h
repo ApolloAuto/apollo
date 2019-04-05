@@ -71,7 +71,7 @@ class Scenario {
   virtual bool IsTransferable(const Scenario& other_scenario,
                               const Frame& frame) {
     return true;
-  };
+  }
 
   ScenarioStatus Process(const common::TrajectoryPoint& planning_init_point,
                          Frame* frame);
