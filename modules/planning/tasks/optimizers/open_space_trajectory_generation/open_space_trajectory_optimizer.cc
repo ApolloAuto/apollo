@@ -102,7 +102,7 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
                         xF(2, 0), XYbounds, obstacles_vertices_vec, &result)) {
     ADEBUG << "State warm start problem solved successfully!";
   } else {
-    AERROR << "State warm start problem failed to solve";
+    AERROR_EVERY(1000) << "State warm start problem failed to solve";
     return Status(ErrorCode::PLANNING_ERROR,
                   "State warm start problem failed to solve");
   }
@@ -155,7 +155,7 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
             obstacles_b, xWS, &l_warm_up, &n_warm_up)) {
       ADEBUG << "Dual variable problem solved successfully!";
     } else {
-      AERROR << "Dual variable problem failed to solve";
+      AERROR_EVERY(10) << "Dual variable problem failed to solve";
       return Status(ErrorCode::PLANNING_ERROR,
                     "Dual variable problem failed to solve");
     }

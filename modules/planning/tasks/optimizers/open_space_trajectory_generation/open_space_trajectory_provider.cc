@@ -239,9 +239,6 @@ void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
         std::lock_guard<std::mutex> lock(open_space_mutex_);
         trajectory_updated_.store(true);
       } else {
-        AERROR_EVERY(200) << "open_space_trajectory_optimizer not returning "
-                             "OK() with status: "
-                          << status.ToString();
         if (status.ok()) {
           std::lock_guard<std::mutex> lock(open_space_mutex_);
           trajectory_skipped_.store(true);
