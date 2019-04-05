@@ -70,11 +70,14 @@ class OdometryFileObject(FileObject):
             raise ValueError("Odometry data must be in a list")
         data_size = len(data)
         self._file_object.write(struct.pack('i', data_size))
-        # TODO: gchen-Apollo, Check why pack_d still have 72 byte,
-        # not 68 = 8 + 4 + 7*8
-        s = struct.Struct('di7d')
+        # have to pack seperate, to avoid struct padding, now 8+4+7*8 = 68 bytes
+        # TODO (yuanfan / gchen-Apollo): follow protobuf across tools.
+
+        s0 = struct.Struct('d')
+        s1 = struct.Struct('I')
+        s2 = struct.Struct('7d')
         for d in data:
-            pack_d = s.pack(d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8])
+            self._file_object.write(s0.pack(d[0]))
+            self._file_object.write(s1.pack(d[1]))
+            pack_d = s2.pack(d[2], d[3], d[4], d[5], d[6], d[7], d[8])
             self._file_object.write(pack_d)
-            print("pack_d length: %d" % len(pack_d))
-            print(d)
