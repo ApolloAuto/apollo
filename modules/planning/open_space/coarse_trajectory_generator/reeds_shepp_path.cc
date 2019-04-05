@@ -59,8 +59,8 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
                             std::shared_ptr<ReedSheppPath> optimal_path) {
   std::vector<ReedSheppPath> all_possible_paths;
   if (!GenerateRSPs(start_node, end_node, &all_possible_paths)) {
-    AERROR_EVERY(10) << "Fail to generate different combination of Reed Shepp "
-                        "paths";
+    AERROR_EVERY(100) << "Fail to generate different combination of Reed Shepp "
+                         "paths";
     return false;
   }
 
@@ -88,18 +88,18 @@ bool ReedShepp::ShortestRSP(const std::shared_ptr<Node3d> start_node,
                end_node->GetY()) > 1e-3 ||
       std::abs(all_possible_paths[optimal_path_index].phi.back() -
                end_node->GetPhi()) > 1e-3) {
-    AERROR_EVERY(10) << "RSP end position not right";
+    AERROR_EVERY(100) << "RSP end position not right";
     for (size_t i = 0;
          i < all_possible_paths[optimal_path_index].segs_types.size(); ++i) {
-      AERROR_EVERY(10) << "types are "
-                       << all_possible_paths[optimal_path_index].segs_types[i];
+      AERROR_EVERY(100) << "types are "
+                        << all_possible_paths[optimal_path_index].segs_types[i];
     }
-    AERROR_EVERY(10) << "x, y, phi are: "
-                     << all_possible_paths[optimal_path_index].x.back() << ", "
-                     << all_possible_paths[optimal_path_index].y.back() << ", "
-                     << all_possible_paths[optimal_path_index].phi.back();
-    AERROR_EVERY(10) << "end x, y, phi are: " << end_node->GetX() << ", "
-                     << end_node->GetY() << ", " << end_node->GetPhi();
+    AERROR_EVERY(100) << "x, y, phi are: "
+                      << all_possible_paths[optimal_path_index].x.back() << ", "
+                      << all_possible_paths[optimal_path_index].y.back() << ", "
+                      << all_possible_paths[optimal_path_index].phi.back();
+    AERROR_EVERY(100) << "end x, y, phi are: " << end_node->GetX() << ", "
+                      << end_node->GetY() << ", " << end_node->GetPhi();
     return false;
   }
   (*optimal_path).x = all_possible_paths[optimal_path_index].x;
@@ -121,7 +121,7 @@ bool ReedShepp::GenerateRSPs(const std::shared_ptr<Node3d> start_node,
   if (FLAGS_enable_parallel_hybrid_a) {
     // AINFO << "parallel hybrid a*";
     if (!GenerateRSPPar(start_node, end_node, all_possible_paths)) {
-      AERROR_EVERY(10) << "Fail to generate general profile of different RSPs";
+      AERROR_EVERY(100) << "Fail to generate general profile of different RSPs";
       return false;
     }
   } else {
