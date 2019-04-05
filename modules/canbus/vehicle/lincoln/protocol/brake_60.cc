@@ -28,7 +28,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Brake60::ID = 0x60;
 
 uint32_t Brake60::GetPeriod() const {
-  static const uint32_t PERIOD = 10 * 1000;
+  static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
 
