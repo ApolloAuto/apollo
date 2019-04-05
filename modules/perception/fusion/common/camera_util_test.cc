@@ -66,7 +66,7 @@ TEST(CameraUtilTest, test_object_in_camera_view_and_is_behind_camera) {
   std::string sensor_id = "camera_smartereye";
   base::BaseCameraModelPtr camera_model =
       common::SensorManager::Instance()->GetUndistortCameraModel(sensor_id);
-  EXPECT_TRUE(camera_model != nullptr);
+  EXPECT_NE(camera_model, nullptr);
 
   bool flag1 = IsObjectEightVerticesAllBehindCamera(
       base_lidar_object, pose.matrix(), camera_model);

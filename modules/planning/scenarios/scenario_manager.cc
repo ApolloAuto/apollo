@@ -221,8 +221,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   const std::vector<PathOverlap>& traffic_light_overlaps =
       reference_line_info.reference_line().map_path().signal_overlaps();
   for (const auto& traffic_light_overlap : traffic_light_overlaps) {
-    const double dist = traffic_light_overlap.start_s -
-        first_encountered_traffic_light.start_s;
+    const double dist =
+        traffic_light_overlap.start_s - first_encountered_traffic_light.start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
       next_traffic_lights.push_back(traffic_light_overlap);
     }
@@ -249,8 +249,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
       const auto& signal_color =
           frame.GetSignal(traffic_light_overlap.object_id).color();
       ADEBUG << "traffic_light_id[" << traffic_light_overlap.object_id
-             << "] start_s[" << traffic_light_overlap.start_s
-             << "] color[" << signal_color << "]";
+             << "] start_s[" << traffic_light_overlap.start_s << "] color["
+             << signal_color << "]";
 
       if (signal_color == perception::TrafficLight::RED) {
         red_light = true;
@@ -310,13 +310,13 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
     const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap) {
   const auto& reference_line_info = frame.reference_line_info().front();
   if (reference_line_info.GetIntersectionRightofWayStatus(
-      pnc_junction_overlap)) {
+          pnc_junction_overlap)) {
     return default_scenario_type_;
   }
 
   const auto& scenario_config =
       config_map_[ScenarioConfig::BARE_INTERSECTION_UNPROTECTED]
-                  .bare_intersection_unprotected_config();
+          .bare_intersection_unprotected_config();
 
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double adc_distance_to_pnc_junction =
@@ -362,7 +362,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
   // TODO(all): to be updated when SIDE_PASS obstacle decisions
   //            from ReferenceLine is ready
   if (scenario::side_pass::SidePassScenario::IsTransferable(
-      frame, config_map_[ScenarioConfig::SIDE_PASS], *current_scenario_)) {
+          frame, config_map_[ScenarioConfig::SIDE_PASS], *current_scenario_)) {
     return ScenarioConfig::SIDE_PASS;
   }
 
@@ -708,8 +708,9 @@ void ScenarioManager::UpdatePlanningContext(
 void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsBareIntersectionScenario(scenario_type)) {
-    PlanningContext::MutablePlanningStatus()->mutable_bare_intersection()
-                                            ->Clear();
+    PlanningContext::MutablePlanningStatus()
+        ->mutable_bare_intersection()
+        ->Clear();
     return;
   }
 
@@ -721,7 +722,8 @@ void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::PNC_JUNCTION);
   if (map_itr != first_encountered_overlap_map_.end()) {
-    PlanningContext::MutablePlanningStatus()->mutable_bare_intersection()
+    PlanningContext::MutablePlanningStatus()
+        ->mutable_bare_intersection()
         ->set_current_pnc_junction_overlap_id(map_itr->second.object_id);
     ADEBUG << "Update PlanningContext with first_encountered pnc_junction["
            << map_itr->second.object_id << "] start_s["
@@ -745,7 +747,8 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
   if (map_itr != first_encountered_overlap_map_.end()) {
-    PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+    PlanningContext::MutablePlanningStatus()
+        ->mutable_stop_sign()
         ->set_current_stop_sign_overlap_id(map_itr->second.object_id);
     ADEBUG << "Update PlanningContext with first_encountered stop sign["
            << map_itr->second.object_id << "] start_s["
@@ -799,12 +802,13 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const double dist =
         traffic_light_overlap.start_s - current_traffic_light_overlap_start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
-      PlanningContext::MutablePlanningStatus()->mutable_traffic_light()
+      PlanningContext::MutablePlanningStatus()
+          ->mutable_traffic_light()
           ->add_current_traffic_light_overlap_id(
               traffic_light_overlap.object_id);
       ADEBUG << "Update PlanningContext with first_encountered traffic_light["
-             << traffic_light_overlap.object_id
-             << "] start_s[" << traffic_light_overlap.start_s << "]";
+             << traffic_light_overlap.object_id << "] start_s["
+             << traffic_light_overlap.start_s << "]";
     }
   }
 }

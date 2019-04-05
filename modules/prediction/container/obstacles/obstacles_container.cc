@@ -159,8 +159,7 @@ const PerceptionObstacle& ObstaclesContainer::GetPerceptionObstacle(
   return curr_frame_id_perception_obstacle_map_[id];
 }
 
-const std::vector<int>&
-ObstaclesContainer::curr_frame_movable_obstacle_ids() {
+const std::vector<int>& ObstaclesContainer::curr_frame_movable_obstacle_ids() {
   return curr_frame_movable_obstacle_ids_;
 }
 

@@ -119,7 +119,7 @@ TEST(DetectionTest, all) {
 #ifndef CPU_ONLY
   EXPECT_TRUE(detector->Detect(detetor_options, &frame));
 
-  EXPECT_TRUE(lights.size() == gt_lights.size());
+  EXPECT_EQ(lights.size(), gt_lights.size());
   for (int i = 0; i < lights.size(); i++) {
     bool get = false;
     base::RectI region = lights[i]->region.detection_roi;

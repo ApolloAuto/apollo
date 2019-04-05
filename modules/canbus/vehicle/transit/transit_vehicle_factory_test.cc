@@ -37,11 +37,11 @@ class TransitVehicleFactoryTest : public ::testing::Test {
 };
 
 TEST_F(TransitVehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(transit_factory_.CreateVehicleController() != nullptr);
+  EXPECT_NE(transit_factory_.CreateVehicleController(), nullptr);
 }
 
 TEST_F(TransitVehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(transit_factory_.CreateMessageManager() != nullptr);
+  EXPECT_NE(transit_factory_.CreateMessageManager(), nullptr);
 }
 
 }  // namespace canbus

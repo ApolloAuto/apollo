@@ -185,7 +185,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningStatus value: STOP_DONE
-  EXPECT_TRUE(stop_sign_status->status() == StopSignStatus::STOP_DONE);
+  EXPECT_EQ(stop_sign_status->status(), StopSignStatus::STOP_DONE);
 }
 */
 
@@ -298,14 +298,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningStatus value: WAIT
-  EXPECT_TRUE(stop_sign_status->status() == StopSignStatus::WAIT);
+  EXPECT_EQ(stop_sign_status->status(), StopSignStatus::WAIT);
   // check PlanningStatus value on watch vehicles
   // waiting for vehicle 4059 on lane 868_1_-1
   EXPECT_EQ(1, stop_sign_status->lane_watch_vehicles_size());
   auto lane_watch_vehicles = stop_sign_status->lane_watch_vehicles(0);
   EXPECT_EQ("868_1_-1", lane_watch_vehicles.lane_id());
-  EXPECT_TRUE(lane_watch_vehicles.watch_vehicles_size() == 1);
-  EXPECT_TRUE(lane_watch_vehicles.watch_vehicles(0) == "4059");
+  EXPECT_EQ(lane_watch_vehicles.watch_vehicles_size(), 1);
+  EXPECT_EQ(lane_watch_vehicles.watch_vehicles(0), "4059");
 
   // step 3:
   // wait time is enough
@@ -325,7 +325,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
   RUN_GOLDEN_TEST_DECISION(2);
 
   // check PlanningStatus value: WAIT
-  EXPECT_TRUE(stop_sign_status->status() == StopSignStatus::WAIT);
+  EXPECT_EQ(stop_sign_status->status(), StopSignStatus::WAIT);
   // check PlanningStatus value on watch vehicles
   EXPECT_EQ(0, stop_sign_status->lane_watch_vehicles_size());
 
@@ -334,7 +334,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
 
   RUN_GOLDEN_TEST_DECISION(3);
   // check PlanningStatus value: STOP_DONE
-  EXPECT_TRUE(stop_sign_status->status() == StopSignStatus::STOP_DONE);
+  EXPECT_EQ(stop_sign_status->status(), StopSignStatus::STOP_DONE);
 }
 */
 
@@ -373,14 +373,14 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
   auto* stop_sign_status =
       PlanningContext::MutablePlanningStatus()->mutable_stop_sign();
   EXPECT_EQ("9762", stop_sign_status->stop_sign_id());
-  EXPECT_TRUE(stop_sign_status->status() == StopSignStatus::DRIVE);
+  EXPECT_EQ(stop_sign_status->status(), StopSignStatus::DRIVE);
   EXPECT_FALSE(stop_sign_status->has_stop_start_time());
   // waiting for vehicle 4059 on lane 868_1_-1
   EXPECT_EQ(1, stop_sign_status->lane_watch_vehicles_size());
   auto lane_watch_vehicles = stop_sign_status->lane_watch_vehicles(0);
   EXPECT_EQ("1706a_1_-1", lane_watch_vehicles.lane_id());
-  EXPECT_TRUE(lane_watch_vehicles.watch_vehicles_size() == 1);
-  EXPECT_TRUE(lane_watch_vehicles.watch_vehicles(0) == "12257");
+  EXPECT_EQ(lane_watch_vehicles.watch_vehicles_size(), 1);
+  EXPECT_EQ(lane_watch_vehicles.watch_vehicles(0), "12257");
 
   // step 2: pass stop sign
   seq_num = "13";
@@ -460,7 +460,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   RUN_GOLDEN_TEST_DECISION(1);
 
   // check PlanningStatus value: CREEP
-  EXPECT_TRUE(stop_sign_status->status() == StopSignStatus::CREEP);
+  EXPECT_EQ(stop_sign_status->status(), StopSignStatus::CREEP);
 
   // step 3: STOP_DONE
 
@@ -472,7 +472,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
   RUN_GOLDEN_TEST_DECISION(2);
 
   // check PlanningStatus value
-  EXPECT_TRUE(stop_sign_status->status() == StopSignStatus::STOP_DONE);
+  EXPECT_EQ(stop_sign_status->status(), StopSignStatus::STOP_DONE);
 }
 */
 
