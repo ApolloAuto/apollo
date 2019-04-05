@@ -254,7 +254,6 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
   int direction_flag = 0;
   int init_direction = 0;
   for (size_t i = 0; i < initial_horizon; ++i) {
-    // ADEBUG << "Initial speed is " << interpolated_trajectory->at(i).v();
     if (interpolated_trajectory->at(i).v() > 0.0) {
       direction_flag++;
       if (init_direction == 0) {
