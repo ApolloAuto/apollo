@@ -48,12 +48,12 @@ def get_start_index(data):
     if np.all(data['vehicle_speed'] == 0):
         return 0
 
-    start_ind = np.where(data['brake_percentage'] == 40)[0][0]
+    start_ind = np.where(data['vehicle_speed'] == 0.0)[0][0]
 
     ind = start_ind
     while ind < len(data):
-        if data['brake_percentage'][
-                ind] == 40:  #or data['vehicle_speed'][ind] == 0.0:
+        if data['vehicle_speed'][
+                ind] == 0.0:  #or data['vehicle_speed'][ind] == 0.0:
             ind = ind + 1
         else:
             break
