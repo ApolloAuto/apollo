@@ -460,9 +460,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     case ScenarioConfig::CHANGE_LANE:
       break;
     case ScenarioConfig::SIDE_PASS:
-      // for SIDE_PASS, need re-check
-      scenario_type = SelectSidePassScenario(frame);
-      break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
