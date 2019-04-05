@@ -169,7 +169,7 @@ default_task_config: {
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
     centri_jerk_speed_coeff: 1.0
-    max_valid_stop_distance: 1.0
+    max_valid_stop_distance: 0.25
   }
 }
 default_task_config: {
@@ -189,7 +189,7 @@ default_task_config: {
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
     centri_jerk_speed_coeff: 1.0
-    max_valid_stop_distance: 1.0
+    max_valid_stop_distance: 0.25
   }
 }
 default_task_config: {
