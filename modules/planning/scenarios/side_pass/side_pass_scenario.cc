@@ -29,13 +29,7 @@
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/scenarios/side_pass/stage_approach_obstacle.h"
-#include "modules/planning/scenarios/side_pass/stage_backup.h"
-#include "modules/planning/scenarios/side_pass/stage_detect_safety.h"
-#include "modules/planning/scenarios/side_pass/stage_generate_path.h"
-#include "modules/planning/scenarios/side_pass/stage_pass_obstacle.h"
 #include "modules/planning/scenarios/side_pass/stage_side_pass.h"
-#include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
 
 namespace apollo {
 namespace planning {
