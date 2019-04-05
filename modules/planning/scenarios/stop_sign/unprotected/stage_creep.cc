@@ -99,7 +99,7 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   }
 
   if (task->CheckCreepDone(*frame, reference_line_info, stop_sign_end_s,
-                                   wait_time, timeout_sec)) {
+                           wait_time, timeout_sec)) {
     return FinishStage();
   }
 

@@ -38,7 +38,7 @@ void do_test(std::shared_ptr<SemanticReviser> _reviser,
     frame.traffic_lights = light;
     _reviser->Track(option, &frame);
     frame.timestamp += 0.1;
-    EXPECT_TRUE(light[0]->status.color == color);
+    EXPECT_EQ(light[0]->status.color, color);
   }
 }
 
@@ -278,7 +278,7 @@ TEST(SemanticReviser, mix_yellow_red_flash) {
                 base::TLColor(gt_list[i]));
     EXPECT_TRUE(frame.traffic_lights.at(1)->status.color ==
                 base::TLColor(gt_list[i]));
-    EXPECT_TRUE(frame.traffic_lights.at(2)->status.color == base::TLColor(0));
+    EXPECT_EQ(frame.traffic_lights.at(2)->status.color, base::TLColor(0));
   }
 }
 

@@ -45,8 +45,7 @@ class SidePassScenario : public Scenario {
   SidePassScenario(const ScenarioConfig& config,
                    const ScenarioContext* scenario_context);
 
-  static bool IsTransferable(const Frame& frame,
-                             const ScenarioConfig& config,
+  static bool IsTransferable(const Frame& frame, const ScenarioConfig& config,
                              const Scenario& current_scenario);
 
   std::unique_ptr<Stage> CreateStage(

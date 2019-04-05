@@ -154,8 +154,8 @@ TEST_F(FeatureGeneratorTest, basic_test) {
     EXPECT_TRUE(generator_->Init(param, &feature_blob));
     InitCPUBlobs(true);
     generator_->GenerateCPU(pc_ptr, point2grid);
-    EXPECT_FALSE(generator_->mean_intensity_data_ == nullptr);
-    EXPECT_FALSE(generator_->top_intensity_data_ == nullptr);
+    EXPECT_NE(generator_->mean_intensity_data_, nullptr);
+    EXPECT_NE(generator_->top_intensity_data_, nullptr);
     // save feature map
     std::ofstream ofs("cpu_top_intensity_map.txt");
     CHECK(ofs.is_open());
@@ -176,8 +176,8 @@ TEST_F(FeatureGeneratorTest, basic_test) {
     EXPECT_TRUE(generator_->Init(param, &feature_blob));
     InitCPUBlobs(false);
     generator_->GenerateCPU(pc_ptr, point2grid);
-    EXPECT_TRUE(generator_->mean_intensity_data_ == nullptr);
-    EXPECT_TRUE(generator_->top_intensity_data_ == nullptr);
+    EXPECT_EQ(generator_->mean_intensity_data_, nullptr);
+    EXPECT_EQ(generator_->top_intensity_data_, nullptr);
   }
   // gpu generator test
   {
@@ -187,8 +187,8 @@ TEST_F(FeatureGeneratorTest, basic_test) {
     feature_blob.Reshape(1, 8, param.height(), param.width());
     EXPECT_TRUE(generator_->Init(param, &feature_blob));
     generator_->GenerateGPU(pc_ptr, point2grid);
-    EXPECT_FALSE(generator_->mean_intensity_data_ == nullptr);
-    EXPECT_FALSE(generator_->top_intensity_data_ == nullptr);
+    EXPECT_NE(generator_->mean_intensity_data_, nullptr);
+    EXPECT_NE(generator_->top_intensity_data_, nullptr);
     // save feature map
     size_t map_size = param.height() * param.width();
     std::vector<float> top_intensity_data(map_size);
@@ -212,8 +212,8 @@ TEST_F(FeatureGeneratorTest, basic_test) {
     feature_blob.Reshape(1, 6, param.height(), param.width());
     EXPECT_TRUE(generator_->Init(param, &feature_blob));
     generator_->GenerateGPU(pc_ptr, point2grid);
-    EXPECT_TRUE(generator_->mean_intensity_data_ == nullptr);
-    EXPECT_TRUE(generator_->top_intensity_data_ == nullptr);
+    EXPECT_EQ(generator_->mean_intensity_data_, nullptr);
+    EXPECT_EQ(generator_->top_intensity_data_, nullptr);
   }
 }
 

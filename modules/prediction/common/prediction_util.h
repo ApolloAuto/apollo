@@ -123,8 +123,8 @@ inline std::array<double, 4> ComputePolynomial<3>(
   return coefs;
 }
 
-double GetSByConstantAcceleration(
-    const double v0, const double acceleration, const double t);
+double GetSByConstantAcceleration(const double v0, const double acceleration,
+                                  const double t);
 
 }  // namespace math_util
 
