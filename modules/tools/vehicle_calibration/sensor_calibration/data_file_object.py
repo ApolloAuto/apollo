@@ -24,16 +24,16 @@ import re
 import sys
 import struct
 
-class FileObject:
-    """ Wrapper for file object """
+class FileObject(object):
+    """Wrapper for file object"""
 
     # Initalizing file obj
     def __init__(self, file_path, operation='write', filetype='binary'):
         if operation != 'write' and operation != 'read':
-            raise ValueError("Unsupported file operation: %s " % operation)
+            raise ValueError("Unsupported file operation: %s" % operation)
 
         if filetype != 'binary' and filetype != 'txt':
-            raise ValueError("Unsupported file type: %s " % filetype)
+            raise ValueError("Unsupported file type: %s" % filetype)
 
         operator = 'w' if operation == 'write' else 'r'
         operator += 'b' if filetype == 'binary' else ''
@@ -41,7 +41,7 @@ class FileObject:
         try:
             self._file_object = open(file_path, operator)
         except IOError:
-            raise ValueError("cannot open file: {}".format(file_path))
+            raise ValueError("Cannot open file: {}".format(file_path))
 
     def file_object(self):
         return self._file_object
@@ -66,7 +66,7 @@ class OdometryFileObject(FileObject):
         double x, y, z
         ]
         """
-        if type(data) != list:
+        if not isinstance(data, list):
             raise ValueError("Odometry data must be in a list")
         data_size = len(data)
         self._file_object.write(struct.pack('i', data_size))
@@ -76,5 +76,5 @@ class OdometryFileObject(FileObject):
         for d in data:
             pack_d = s.pack(d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8])
             self._file_object.write(pack_d)
-            print("pack_d length is %d " % len(pack_d))
+            print("pack_d length: %d" % len(pack_d))
             print(d)
