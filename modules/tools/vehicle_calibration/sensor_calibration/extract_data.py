@@ -206,9 +206,9 @@ def extract_gps_data(dest_dir, msg, out_msg_list):
     """
     Save gps information to bin file, to be fed into following tools
     """
-    if type(out_msg_list) != list:
-        raise ValueError("Gps/Odometry msg should be saved as a list,\
-                          not %s " % type(out_msg_list))
+    if not isinstance(out_msg_list, list):
+        raise ValueError("Gps/Odometry msg should be saved as a list, not %s"
+                         % type(out_msg_list))
 
     gps = GPS_OBJ
     gps.ParseFromString(msg.message)
