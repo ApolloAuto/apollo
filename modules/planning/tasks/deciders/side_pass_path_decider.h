@@ -33,7 +33,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
-#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
+#include "modules/planning/math/piecewise_jerk/fem_1d_qp_problem.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
