@@ -172,7 +172,7 @@ class PlannigAnalyzer:
                         jerk = 0
                     else:
                         jerk = (accel - self.last_init_point_a) / duration
-                    self.jerk_list.append(jerk)
+                    self.jerk_list.append(abs(jerk))
 
                     if self.JERK_M_LB_P <= jerk < self.JERK_M_UB_P or \
                         self.JERK_M_LB_N < jerk <= self.JERK_M_UB_N:
@@ -184,7 +184,7 @@ class PlannigAnalyzer:
                 centripetal_jerk = 2 * init_point.v * init_point.a \
                     * init_point.path_point.kappa + init_point.v \
                         * init_point.v * init_point.path_point.dkappa
-                self.centripetal_jerk_list.append(centripetal_jerk)
+                self.centripetal_jerk_list.append(abs(centripetal_jerk))
 
                 if self.LAT_JERK_M_LB_P <= centripetal_jerk < self.LAT_JERK_M_UB_P \
                     or self.LAT_JERK_M_LB_N < centripetal_jerk <= self.LAT_JERK_M_UB_N:
@@ -196,7 +196,7 @@ class PlannigAnalyzer:
                 # centripetal_accel
                 centripetal_accel = init_point.v * init_point.v \
                     * init_point.path_point.kappa
-                self.centripetal_accel_list.append(centripetal_accel)
+                self.centripetal_accel_list.append(abs(centripetal_accel))
 
                 if self.LAT_ACCEL_M_LB_P <= centripetal_accel < self.LAT_ACCEL_M_UB_P \
                     or self.LAT_ACCEL_M_LB_N < centripetal_accel <= self.LAT_ACCEL_M_UB_N:
