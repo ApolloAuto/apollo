@@ -29,7 +29,7 @@ const int32_t Steering64::ID = 0x64;
 uint32_t Steering64::GetPeriod() const {
   // receive rate??
   // receive timeout would trigger fault, letting en=0 and etc.
-  static const uint32_t PERIOD = 10 * 1000;
+  static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
 
