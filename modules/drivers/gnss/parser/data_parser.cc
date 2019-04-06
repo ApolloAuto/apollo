@@ -14,31 +14,30 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/drivers/gnss/parser/data_parser.h"
-
-#include <proj_api.h>
-#include <std_msgs/String.h>
-#include <Eigen/Geometry>
-#include <boost/array.hpp>
 #include <cmath>
 #include <memory>
 #include <string>
-#include "ros/include/ros/ros.h"
+#include <proj_api.h>
+#include <Eigen/Geometry>
+#include <boost/array.hpp>
+#include <std_msgs/String.h>
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/drivers/gnss/gnss_gflags.h"
-#include "modules/drivers/gnss/parser/parser.h"
-#include "modules/drivers/gnss/proto/gnss.pb.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
-#include "modules/drivers/gnss/proto/heading.pb.h"
-#include "modules/drivers/gnss/proto/imu.pb.h"
-#include "modules/drivers/gnss/proto/ins.pb.h"
-#include "modules/drivers/gnss/util/time_conversion.h"
+#include "ros/include/ros/ros.h"
 #include "modules/drivers/gnss/util/utils.h"
-#include "modules/drivers/gnss/parser/newtonm2_parser.h"
+#include "modules/drivers/gnss/gnss_gflags.h"
 #include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/imu.pb.h"
+#include "modules/drivers/gnss/proto/imu.pb.h"
+#include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/drivers/gnss/proto/gnss.pb.h"
+#include "modules/drivers/gnss/parser/parser.h"
+#include "modules/drivers/gnss/proto/heading.pb.h"
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/drivers/gnss/parser/data_parser.h"
+#include "modules/drivers/gnss/util/time_conversion.h"
+#include "modules/drivers/gnss/parser/newtonm2_parser.h"
+#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 
 namespace apollo {
 namespace drivers {
