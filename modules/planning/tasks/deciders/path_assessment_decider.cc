@@ -149,7 +149,7 @@ Status PathAssessmentDecider::Process(
               }
               // If same length, both neighbor lane are forward,
               // then select the one that returns back to in-lane earlier.
-              constexpr double kBackToSelfLaneComparisonTolerance = 8.0;
+              constexpr double kBackToSelfLaneComparisonTolerance = 20.0;
               int lhs_back_idx =
                   GetBackToInLaneIndex(lhs.path_point_decision_guide());
               int rhs_back_idx =
