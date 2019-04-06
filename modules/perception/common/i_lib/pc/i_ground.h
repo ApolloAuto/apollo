@@ -104,9 +104,8 @@ struct GroundPlaneLiDAR {
   bool IsValid() const {
     if (nr_support && (params[0] != 0 || params[1] != 0 || params[2] != 0)) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   int GetNrSupport() const { return nr_support; }
