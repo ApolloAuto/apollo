@@ -39,6 +39,9 @@ fi
 if [ -e /dev/novatel2 ]; then
   chmod a+rw /dev/novatel2
 fi
+if [ -e /dev/ttyACM0 ]; then
+  chmod a+rw /dev/ttyACM0
+fi
 
 # setup camera device
 if [ -e /dev/camera/obstacle ]; then

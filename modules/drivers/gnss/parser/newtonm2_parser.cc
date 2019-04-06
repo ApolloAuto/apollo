@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
  *****************************************************************************/
 
-// An parser for decoding binary messages from a NovAtel receiver. The following
-// messages must be
-// logged in order for this parser to work properly.
+// An parser for decoding binary messages from a Starneto Newton-M2 receiver.
+// The following messages must be logged in order for this parser to work
+// properly.
 //
+
+#include "modules/drivers/gnss/parser/newtonm2_parser.h"
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <vector>
-
-#include "ros/include/ros/ros.h"
-
 #include "modules/common/log.h"
 #include "modules/drivers/gnss/parser/novatel_messages.h"
 #include "modules/drivers/gnss/parser/parser.h"
@@ -37,179 +36,32 @@
 #include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/drivers/gnss/proto/ins.pb.h"
 #include "modules/drivers/gnss/util/time_conversion.h"
+#include "ros/include/ros/ros.h"
 
 namespace apollo {
 namespace drivers {
 namespace gnss {
 
-// Anonymous namespace that contains helper constants and functions.
-namespace {
-
-constexpr size_t BUFFER_SIZE = 256;
-
-constexpr int SECONDS_PER_WEEK = 60 * 60 * 24 * 7;
-
-constexpr double DEG_TO_RAD = M_PI / 180.0;
-
-constexpr float FLOAT_NAN = std::numeric_limits<float>::quiet_NaN();
-
-// The NovAtel's orientation covariance matrix is pitch, roll, and yaw. We use
-// the index array below
-// to convert it to the orientation covariance matrix with order roll, pitch,
-// and yaw.
-constexpr int INDEX[] = {4, 3, 5, 1, 0, 2, 7, 6, 8};
-static_assert(sizeof(INDEX) == 9 * sizeof(int), "Incorrect size of INDEX");
-
-template <typename T>
-constexpr bool is_zero(T value) {
-  return value == static_cast<T>(0);
+Parser* Parser::CreateNewtonM2(const config::Config& config) {
+  return new NewtonM2Parser(config);
 }
 
-// CRC algorithm from the NovAtel document.
-inline uint32_t crc32_word(uint32_t word) {
-  for (int j = 0; j < 8; ++j) {
-    if (word & 1) {
-      word = (word >> 1) ^ 0xEDB88320;
-    } else {
-      word >>= 1;
-    }
-  }
-  return word;
-}
-
-inline uint32_t crc32_block(const uint8_t* buffer, size_t length) {
-  uint32_t word = 0;
-  while (length--) {
-    uint32_t t1 = (word >> 8) & 0xFFFFFF;
-    uint32_t t2 = crc32_word((word ^ *buffer++) & 0xFF);
-    word = t1 ^ t2;
-  }
-  return word;
-}
-
-// Converts NovAtel's azimuth (north = 0, east = 90) to FLU yaw (east = 0, north
-// = pi/2).
-constexpr double azimuth_deg_to_yaw_rad(double azimuth) {
-  return (90.0 - azimuth) * DEG_TO_RAD;
-}
-
-// A helper that fills an Point3D object (which uses the FLU frame) using RFU
-// measurements.
-inline void rfu_to_flu(double r, double f, double u,
-                       ::apollo::common::Point3D* flu) {
-  flu->set_x(f);
-  flu->set_y(-r);
-  flu->set_z(u);
-}
-
-}  // namespace
-
-class NovatelParser : public Parser {
- public:
-  NovatelParser();
-  explicit NovatelParser(const config::Config& config);
-
-  virtual MessageType GetMessage(MessagePtr* message_ptr);
-
- private:
-  bool check_crc();
-
-  Parser::MessageType PrepareMessage(MessagePtr* message_ptr);
-
-  // The handle_xxx functions return whether a message is ready.
-  bool HandleBestPos(const novatel::BestPos* pos, uint16_t gps_week,
-                     uint32_t gps_millisecs);
-
-  bool HandleGnssBestpos(const novatel::BestPos* pos, uint16_t gps_week,
-                         uint32_t gps_millisecs);
-
-  bool HandleBestVel(const novatel::BestVel* vel, uint16_t gps_week,
-                     uint32_t gps_millisecs);
-
-  bool HandleCorrImuData(const novatel::CorrImuData* imu);
-
-  bool HandleInsCov(const novatel::InsCov* cov);
-
-  bool HandleInsPva(const novatel::InsPva* pva);
-
-  bool HandleInsPvax(const novatel::InsPvaX* pvax, uint16_t gps_week,
-                     uint32_t gps_millisecs);
-
-  bool HandleRawImuX(const novatel::RawImuX* imu);
-
-  bool HandleRawImu(const novatel::RawImu* imu);
-
-  bool HandleBdsEph(const novatel::BDS_Ephemeris* bds_emph);
-
-  bool HandleGpsEph(const novatel::GPS_Ephemeris* gps_emph);
-
-  bool HandleGloEph(const novatel::GLO_Ephemeris* glo_emph);
-
-  void SetObservationTime();
-
-  bool DecodeGnssObservation(const uint8_t* obs_data,
-                             const uint8_t* obs_data_end);
-
-  bool HandleHeading(const novatel::Heading* heading, uint16_t gps_week,
-                     uint32_t gps_millisecs);
-  double gyro_scale_ = 0.0;
-
-  double accel_scale_ = 0.0;
-
-  float imu_measurement_span_ = 1.0 / 200.0;
-  float imu_measurement_hz_ = 200.0;
-
-  int imu_frame_mapping_ = 5;
-
-  double imu_measurement_time_previous_ = -1.0;
-
-  std::vector<uint8_t> buffer_;
-
-  size_t header_length_ = 0;
-
-  size_t total_length_ = 0;
-
-  config::ImuType imu_type_ = config::ImuType::ADIS16488;
-
-  // -1 is an unused value.
-  novatel::SolutionStatus solution_status_ =
-      static_cast<novatel::SolutionStatus>(-1);
-  novatel::SolutionType position_type_ = static_cast<novatel::SolutionType>(-1);
-  novatel::SolutionType velocity_type_ = static_cast<novatel::SolutionType>(-1);
-  novatel::InsStatus ins_status_ = static_cast<novatel::InsStatus>(-1);
-
-  raw_t raw_;  // used for observation data
-
-  ::apollo::drivers::gnss::Gnss gnss_;
-  ::apollo::drivers::gnss::GnssBestPose bestpos_;
-  ::apollo::drivers::gnss::Imu imu_;
-  ::apollo::drivers::gnss::Ins ins_;
-  ::apollo::drivers::gnss::InsStat ins_stat_;
-  ::apollo::drivers::gnss::GnssEphemeris gnss_ephemeris_;
-  ::apollo::drivers::gnss::EpochObservation gnss_observation_;
-  ::apollo::drivers::gnss::Heading heading_;
-};
-
-Parser* Parser::CreateNovatel(const config::Config& config) {
-  return new NovatelParser(config);
-}
-
-NovatelParser::NovatelParser() {
-  buffer_.reserve(BUFFER_SIZE);
-  ins_.mutable_position_covariance()->Resize(9, FLOAT_NAN);
-  ins_.mutable_euler_angles_covariance()->Resize(9, FLOAT_NAN);
-  ins_.mutable_linear_velocity_covariance()->Resize(9, FLOAT_NAN);
+NewtonM2Parser::NewtonM2Parser() {
+  buffer_.reserve(newtonm2::BUFFER_SIZE);
+  ins_.mutable_position_covariance()->Resize(9, newtonm2::FLOAT_NAN);
+  ins_.mutable_euler_angles_covariance()->Resize(9, newtonm2::FLOAT_NAN);
+  ins_.mutable_linear_velocity_covariance()->Resize(9, newtonm2::FLOAT_NAN);
 
   if (1 != init_raw(&raw_)) {
     AFATAL << "memory allocation error for observation data structure.";
   }
 }
 
-NovatelParser::NovatelParser(const config::Config& config) {
-  buffer_.reserve(BUFFER_SIZE);
-  ins_.mutable_position_covariance()->Resize(9, FLOAT_NAN);
-  ins_.mutable_euler_angles_covariance()->Resize(9, FLOAT_NAN);
-  ins_.mutable_linear_velocity_covariance()->Resize(9, FLOAT_NAN);
+NewtonM2Parser::NewtonM2Parser(const config::Config& config) {
+  buffer_.reserve(newtonm2::BUFFER_SIZE);
+  ins_.mutable_position_covariance()->Resize(9, newtonm2::FLOAT_NAN);
+  ins_.mutable_euler_angles_covariance()->Resize(9, newtonm2::FLOAT_NAN);
+  ins_.mutable_linear_velocity_covariance()->Resize(9, newtonm2::FLOAT_NAN);
 
   if (config.has_imu_type()) {
     imu_type_ = config.imu_type();
@@ -220,7 +72,7 @@ NovatelParser::NovatelParser(const config::Config& config) {
   }
 }
 
-Parser::MessageType NovatelParser::GetMessage(MessagePtr* message_ptr) {
+Parser::MessageType NewtonM2Parser::GetMessage(MessagePtr* message_ptr) {
   if (data_ == nullptr) {
     return MessageType::NONE;
   }
@@ -285,13 +137,13 @@ Parser::MessageType NovatelParser::GetMessage(MessagePtr* message_ptr) {
   return MessageType::NONE;
 }
 
-bool NovatelParser::check_crc() {
+bool NewtonM2Parser::check_crc() {
   size_t l = buffer_.size() - novatel::CRC_LENGTH;
-  return crc32_block(buffer_.data(), l) ==
+  return newtonm2::crc32_block(buffer_.data(), l) ==
          *reinterpret_cast<uint32_t*>(buffer_.data() + l);
 }
 
-Parser::MessageType NovatelParser::PrepareMessage(MessagePtr* message_ptr) {
+Parser::MessageType NewtonM2Parser::PrepareMessage(MessagePtr* message_ptr) {
   if (!check_crc()) {
     AERROR << "CRC check failed.";
     return MessageType::NONE;
@@ -494,9 +346,9 @@ Parser::MessageType NovatelParser::PrepareMessage(MessagePtr* message_ptr) {
   return MessageType::NONE;
 }
 
-bool NovatelParser::HandleGnssBestpos(const novatel::BestPos* pos,
-                                      uint16_t gps_week,
-                                      uint32_t gps_millisecs) {
+bool NewtonM2Parser::HandleGnssBestpos(const novatel::BestPos* pos,
+                                       uint16_t gps_week,
+                                       uint32_t gps_millisecs) {
   bestpos_.set_sol_status(
       static_cast<apollo::drivers::gnss::SolutionStatus>(pos->solution_status));
   bestpos_.set_sol_type(
@@ -521,14 +373,14 @@ bool NovatelParser::HandleGnssBestpos(const novatel::BestPos* pos,
   bestpos_.set_galileo_beidou_used_mask(pos->galileo_beidou_used_mask);
   bestpos_.set_gps_glonass_used_mask(pos->gps_glonass_used_mask);
 
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   bestpos_.set_measurement_time(seconds);
   // AINFO << "Best gnss pose:\r\n" << bestpos_.DebugString();
   return true;
 }
 
-bool NovatelParser::HandleBestPos(const novatel::BestPos* pos,
-                                  uint16_t gps_week, uint32_t gps_millisecs) {
+bool NewtonM2Parser::HandleBestPos(const novatel::BestPos* pos,
+                                   uint16_t gps_week, uint32_t gps_millisecs) {
   gnss_.mutable_position()->set_lon(pos->longitude);
   gnss_.mutable_position()->set_lat(pos->latitude);
   gnss_.mutable_position()->set_height(pos->height_msl + pos->undulation);
@@ -600,7 +452,7 @@ bool NovatelParser::HandleBestPos(const novatel::BestPos* pos,
                     << static_cast<int>(pos->datum_id);
   }
 
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   if (gnss_.measurement_time() != seconds) {
     gnss_.set_measurement_time(seconds);
     return false;
@@ -608,8 +460,8 @@ bool NovatelParser::HandleBestPos(const novatel::BestPos* pos,
   return true;
 }
 
-bool NovatelParser::HandleBestVel(const novatel::BestVel* vel,
-                                  uint16_t gps_week, uint32_t gps_millisecs) {
+bool NewtonM2Parser::HandleBestVel(const novatel::BestVel* vel,
+                                   uint16_t gps_week, uint32_t gps_millisecs) {
   if (velocity_type_ != vel->velocity_type) {
     velocity_type_ = vel->velocity_type;
     AINFO << "Velocity type: " << static_cast<int>(velocity_type_);
@@ -619,12 +471,12 @@ bool NovatelParser::HandleBestVel(const novatel::BestVel* vel,
     AINFO << "Velocity latency: " << static_cast<int>(vel->latency);
     gnss_.set_velocity_latency(vel->latency);
   }
-  double yaw = azimuth_deg_to_yaw_rad(vel->track_over_ground);
+  double yaw = newtonm2::azimuth_deg_to_yaw_rad(vel->track_over_ground);
   gnss_.mutable_linear_velocity()->set_x(vel->horizontal_speed * cos(yaw));
   gnss_.mutable_linear_velocity()->set_y(vel->horizontal_speed * sin(yaw));
   gnss_.mutable_linear_velocity()->set_z(vel->vertical_speed);
 
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   if (gnss_.measurement_time() != seconds) {
     gnss_.set_measurement_time(seconds);
     return false;
@@ -632,17 +484,18 @@ bool NovatelParser::HandleBestVel(const novatel::BestVel* vel,
   return true;
 }
 
-bool NovatelParser::HandleCorrImuData(const novatel::CorrImuData* imu) {
-  rfu_to_flu(imu->x_velocity_change * imu_measurement_hz_,
-             imu->y_velocity_change * imu_measurement_hz_,
-             imu->z_velocity_change * imu_measurement_hz_,
-             ins_.mutable_linear_acceleration());
-  rfu_to_flu(imu->x_angle_change * imu_measurement_hz_,
-             imu->y_angle_change * imu_measurement_hz_,
-             imu->z_angle_change * imu_measurement_hz_,
-             ins_.mutable_angular_velocity());
+bool NewtonM2Parser::HandleCorrImuData(const novatel::CorrImuData* imu) {
+  newtonm2::rfu_to_flu(imu->x_velocity_change * imu_measurement_hz_,
+                       imu->y_velocity_change * imu_measurement_hz_,
+                       imu->z_velocity_change * imu_measurement_hz_,
+                       ins_.mutable_linear_acceleration());
+  newtonm2::rfu_to_flu(imu->x_angle_change * imu_measurement_hz_,
+                       imu->y_angle_change * imu_measurement_hz_,
+                       imu->z_angle_change * imu_measurement_hz_,
+                       ins_.mutable_angular_velocity());
 
-  double seconds = imu->gps_week * SECONDS_PER_WEEK + imu->gps_seconds;
+  double seconds =
+      imu->gps_week * newtonm2::SECONDS_PER_WEEK + imu->gps_seconds;
   if (ins_.measurement_time() != seconds) {
     ins_.set_measurement_time(seconds);
     return false;
@@ -652,17 +505,19 @@ bool NovatelParser::HandleCorrImuData(const novatel::CorrImuData* imu) {
   return true;
 }
 
-bool NovatelParser::HandleInsCov(const novatel::InsCov* cov) {
+bool NewtonM2Parser::HandleInsCov(const novatel::InsCov* cov) {
   for (int i = 0; i < 9; ++i) {
     ins_.set_position_covariance(i, cov->position_covariance[i]);
     ins_.set_euler_angles_covariance(
-        INDEX[i], (DEG_TO_RAD * DEG_TO_RAD) * cov->attitude_covariance[i]);
+        newtonm2::INDEX[i],
+        (newtonm2::DEG_TO_RAD_M2 * newtonm2::DEG_TO_RAD_M2) *
+            cov->attitude_covariance[i]);
     ins_.set_linear_velocity_covariance(i, cov->velocity_covariance[i]);
   }
   return false;
 }
 
-bool NovatelParser::HandleInsPva(const novatel::InsPva* pva) {
+bool NewtonM2Parser::HandleInsPva(const novatel::InsPva* pva) {
   if (ins_status_ != pva->status) {
     ins_status_ = pva->status;
     AINFO << "INS status: " << static_cast<int>(ins_status_);
@@ -670,9 +525,10 @@ bool NovatelParser::HandleInsPva(const novatel::InsPva* pva) {
   ins_.mutable_position()->set_lon(pva->longitude);
   ins_.mutable_position()->set_lat(pva->latitude);
   ins_.mutable_position()->set_height(pva->height);
-  ins_.mutable_euler_angles()->set_x(pva->roll * DEG_TO_RAD);
-  ins_.mutable_euler_angles()->set_y(-pva->pitch * DEG_TO_RAD);
-  ins_.mutable_euler_angles()->set_z(azimuth_deg_to_yaw_rad(pva->azimuth));
+  ins_.mutable_euler_angles()->set_x(pva->roll * newtonm2::DEG_TO_RAD_M2);
+  ins_.mutable_euler_angles()->set_y(-pva->pitch * newtonm2::DEG_TO_RAD_M2);
+  ins_.mutable_euler_angles()->set_z(
+      newtonm2::azimuth_deg_to_yaw_rad(pva->azimuth));
   ins_.mutable_linear_velocity()->set_x(pva->east_velocity);
   ins_.mutable_linear_velocity()->set_y(pva->north_velocity);
   ins_.mutable_linear_velocity()->set_z(pva->up_velocity);
@@ -691,7 +547,8 @@ bool NovatelParser::HandleInsPva(const novatel::InsPva* pva) {
       ins_.set_type(apollo::drivers::gnss::Ins::INVALID);
   }
 
-  double seconds = pva->gps_week * SECONDS_PER_WEEK + pva->gps_seconds;
+  double seconds =
+      pva->gps_week * newtonm2::SECONDS_PER_WEEK + pva->gps_seconds;
   if (ins_.measurement_time() != seconds) {
     ins_.set_measurement_time(seconds);
     return false;
@@ -701,9 +558,9 @@ bool NovatelParser::HandleInsPva(const novatel::InsPva* pva) {
   return true;
 }
 
-bool NovatelParser::HandleInsPvax(const novatel::InsPvaX* pvax,
-                                  uint16_t gps_week, uint32_t gps_millisecs) {
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+bool NewtonM2Parser::HandleInsPvax(const novatel::InsPvaX* pvax,
+                                   uint16_t gps_week, uint32_t gps_millisecs) {
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   double unix_sec = common::time::TimeUtil::Gps2unix(seconds);
   ins_stat_.mutable_header()->set_timestamp_sec(unix_sec);
   ins_stat_.set_ins_status(pvax->ins_status);
@@ -711,12 +568,12 @@ bool NovatelParser::HandleInsPvax(const novatel::InsPvaX* pvax,
   return true;
 }
 
-bool NovatelParser::HandleRawImuX(const novatel::RawImuX* imu) {
+bool NewtonM2Parser::HandleRawImuX(const novatel::RawImuX* imu) {
   if (imu->imu_error != 0) {
     AWARN << "IMU error. Status: " << std::hex << std::showbase
           << imu->imuStatus;
   }
-  if (is_zero(gyro_scale_)) {
+  if (newtonm2::is_zero(gyro_scale_)) {
     config::ImuType imu_type = imu_type_;
     novatel::ImuParameter param = novatel::GetImuParameter(imu_type);
     AINFO << "IMU type: " << config::ImuType_Name(imu_type) << "; "
@@ -724,7 +581,7 @@ bool NovatelParser::HandleRawImuX(const novatel::RawImuX* imu) {
           << "Accel scale: " << param.accel_scale << "; "
           << "Sampling rate: " << param.sampling_rate_hz << ".";
 
-    if (is_zero(param.sampling_rate_hz)) {
+    if (newtonm2::is_zero(param.sampling_rate_hz)) {
       AERROR_EVERY(5) << "Unsupported IMU type: "
                       << config::ImuType_Name(imu_type);
       return false;
@@ -736,7 +593,7 @@ bool NovatelParser::HandleRawImuX(const novatel::RawImuX* imu) {
     imu_.set_measurement_span(imu_measurement_span_);
   }
 
-  double time = imu->gps_week * SECONDS_PER_WEEK + imu->gps_seconds;
+  double time = imu->gps_week * newtonm2::SECONDS_PER_WEEK + imu->gps_seconds;
   if (imu_measurement_time_previous_ > 0.0 &&
       fabs(time - imu_measurement_time_previous_ - imu_measurement_span_) >
           1e-4) {
@@ -746,24 +603,24 @@ bool NovatelParser::HandleRawImuX(const novatel::RawImuX* imu) {
   imu_.set_measurement_time(time);
   switch (imu_frame_mapping_) {
     case 5:  // Default mapping.
-      rfu_to_flu(imu->x_velocity_change * accel_scale_,
-                 -imu->y_velocity_change_neg * accel_scale_,
-                 imu->z_velocity_change * accel_scale_,
-                 imu_.mutable_linear_acceleration());
-      rfu_to_flu(imu->x_angle_change * gyro_scale_,
-                 -imu->y_angle_change_neg * gyro_scale_,
-                 imu->z_angle_change * gyro_scale_,
-                 imu_.mutable_angular_velocity());
+      newtonm2::rfu_to_flu(imu->x_velocity_change * accel_scale_,
+                           -imu->y_velocity_change_neg * accel_scale_,
+                           imu->z_velocity_change * accel_scale_,
+                           imu_.mutable_linear_acceleration());
+      newtonm2::rfu_to_flu(imu->x_angle_change * gyro_scale_,
+                           -imu->y_angle_change_neg * gyro_scale_,
+                           imu->z_angle_change * gyro_scale_,
+                           imu_.mutable_angular_velocity());
       break;
     case 6:
-      rfu_to_flu(-imu->y_velocity_change_neg * accel_scale_,
-                 imu->x_velocity_change * accel_scale_,
-                 -imu->z_velocity_change * accel_scale_,
-                 imu_.mutable_linear_acceleration());
-      rfu_to_flu(-imu->y_angle_change_neg * gyro_scale_,
-                 imu->x_angle_change * gyro_scale_,
-                 -imu->z_angle_change * gyro_scale_,
-                 imu_.mutable_angular_velocity());
+      newtonm2::rfu_to_flu(-imu->y_velocity_change_neg * accel_scale_,
+                           imu->x_velocity_change * accel_scale_,
+                           -imu->z_velocity_change * accel_scale_,
+                           imu_.mutable_linear_acceleration());
+      newtonm2::rfu_to_flu(-imu->y_angle_change_neg * gyro_scale_,
+                           imu->x_angle_change * gyro_scale_,
+                           -imu->z_angle_change * gyro_scale_,
+                           imu_.mutable_angular_velocity());
       break;
     default:
       AERROR_EVERY(5) << "Unsupported IMU frame mapping: "
@@ -773,15 +630,15 @@ bool NovatelParser::HandleRawImuX(const novatel::RawImuX* imu) {
   return true;
 }
 
-bool NovatelParser::HandleRawImu(const novatel::RawImu* imu) {
+bool NewtonM2Parser::HandleRawImu(const novatel::RawImu* imu) {
   double gyro_scale = 0.0;
   double accel_scale = 0.0;
   float imu_measurement_span = 1.0 / 200.0;
 
-  if (is_zero(gyro_scale_)) {
+  if (newtonm2::is_zero(gyro_scale_)) {
     novatel::ImuParameter param = novatel::GetImuParameter(imu_type_);
 
-    if (is_zero(param.sampling_rate_hz)) {
+    if (newtonm2::is_zero(param.sampling_rate_hz)) {
       AERROR_EVERY(5) << "Unsupported IMU type ADUS16488.";
       return false;
     }
@@ -796,7 +653,7 @@ bool NovatelParser::HandleRawImu(const novatel::RawImu* imu) {
     imu_.set_measurement_span(imu_measurement_span);
   }
 
-  double time = imu->gps_week * SECONDS_PER_WEEK + imu->gps_seconds;
+  double time = imu->gps_week * newtonm2::SECONDS_PER_WEEK + imu->gps_seconds;
   if (imu_measurement_time_previous_ > 0.0 &&
       fabs(time - imu_measurement_time_previous_ - imu_measurement_span) >
           1e-4) {
@@ -807,24 +664,24 @@ bool NovatelParser::HandleRawImu(const novatel::RawImu* imu) {
   imu_.set_measurement_time(time);
   switch (imu_frame_mapping_) {
     case 5:  // Default mapping.
-      rfu_to_flu(imu->x_velocity_change * accel_scale,
-                 -imu->y_velocity_change_neg * accel_scale,
-                 imu->z_velocity_change * accel_scale,
-                 imu_.mutable_linear_acceleration());
-      rfu_to_flu(imu->x_angle_change * gyro_scale,
-                 -imu->y_angle_change_neg * gyro_scale,
-                 imu->z_angle_change * gyro_scale,
-                 imu_.mutable_angular_velocity());
+      newtonm2::rfu_to_flu(imu->x_velocity_change * accel_scale,
+                           -imu->y_velocity_change_neg * accel_scale,
+                           imu->z_velocity_change * accel_scale,
+                           imu_.mutable_linear_acceleration());
+      newtonm2::rfu_to_flu(imu->x_angle_change * gyro_scale,
+                           -imu->y_angle_change_neg * gyro_scale,
+                           imu->z_angle_change * gyro_scale,
+                           imu_.mutable_angular_velocity());
       break;
     case 6:
-      rfu_to_flu(-imu->y_velocity_change_neg * accel_scale,
-                 imu->x_velocity_change * accel_scale,
-                 -imu->z_velocity_change * accel_scale,
-                 imu_.mutable_linear_acceleration());
-      rfu_to_flu(-imu->y_angle_change_neg * gyro_scale,
-                 imu->x_angle_change * gyro_scale,
-                 -imu->z_angle_change * gyro_scale,
-                 imu_.mutable_angular_velocity());
+      newtonm2::rfu_to_flu(-imu->y_velocity_change_neg * accel_scale,
+                           imu->x_velocity_change * accel_scale,
+                           -imu->z_velocity_change * accel_scale,
+                           imu_.mutable_linear_acceleration());
+      newtonm2::rfu_to_flu(-imu->y_angle_change_neg * gyro_scale,
+                           imu->x_angle_change * gyro_scale,
+                           -imu->z_angle_change * gyro_scale,
+                           imu_.mutable_angular_velocity());
       break;
     default:
       AERROR_EVERY(5) << "Unsupported IMU frame mapping: "
@@ -834,7 +691,7 @@ bool NovatelParser::HandleRawImu(const novatel::RawImu* imu) {
   return true;
 }
 
-bool NovatelParser::HandleGpsEph(const novatel::GPS_Ephemeris* gps_emph) {
+bool NewtonM2Parser::HandleGpsEph(const novatel::GPS_Ephemeris* gps_emph) {
   gnss_ephemeris_.set_gnss_type(apollo::drivers::gnss::GnssType::GPS_SYS);
 
   apollo::drivers::gnss::KepplerOrbit* keppler_orbit =
@@ -873,7 +730,7 @@ bool NovatelParser::HandleGpsEph(const novatel::GPS_Ephemeris* gps_emph) {
   return true;
 }
 
-bool NovatelParser::HandleBdsEph(const novatel::BDS_Ephemeris* bds_emph) {
+bool NewtonM2Parser::HandleBdsEph(const novatel::BDS_Ephemeris* bds_emph) {
   gnss_ephemeris_.set_gnss_type(apollo::drivers::gnss::GnssType::BDS_SYS);
 
   apollo::drivers::gnss::KepplerOrbit* keppler_orbit =
@@ -912,7 +769,7 @@ bool NovatelParser::HandleBdsEph(const novatel::BDS_Ephemeris* bds_emph) {
   return true;
 }
 
-bool NovatelParser::HandleGloEph(const novatel::GLO_Ephemeris* glo_emph) {
+bool NewtonM2Parser::HandleGloEph(const novatel::GLO_Ephemeris* glo_emph) {
   gnss_ephemeris_.set_gnss_type(apollo::drivers::gnss::GnssType::GLO_SYS);
 
   apollo::drivers::gnss::GlonassOrbit* glonass_orbit =
@@ -951,8 +808,8 @@ bool NovatelParser::HandleGloEph(const novatel::GLO_Ephemeris* glo_emph) {
   return true;
 }
 
-bool NovatelParser::HandleHeading(const novatel::Heading* heading,
-                                  uint16_t gps_week, uint32_t gps_millisecs) {
+bool NewtonM2Parser::HandleHeading(const novatel::Heading* heading,
+                                   uint16_t gps_week, uint32_t gps_millisecs) {
   heading_.set_solution_status(static_cast<uint32_t>(heading->solution_status));
   heading_.set_position_type(static_cast<uint32_t>(heading->position_type));
   heading_.set_baseline_length(heading->length);
@@ -970,12 +827,12 @@ bool NovatelParser::HandleHeading(const novatel::Heading* heading,
   heading_.set_extended_solution_status(heading->extended_solution_status);
   heading_.set_galileo_beidou_sig_mask(heading->galileo_beidou_sig_mask);
   heading_.set_gps_glonass_sig_mask(heading->gps_glonass_sig_mask);
-  double seconds = gps_week * SECONDS_PER_WEEK + gps_millisecs * 1e-3;
+  double seconds = gps_week * newtonm2::SECONDS_PER_WEEK + gps_millisecs * 1e-3;
   heading_.set_measurement_time(seconds);
   return true;
 }
 
-void NovatelParser::SetObservationTime() {
+void NewtonM2Parser::SetObservationTime() {
   int week = 0;
   double second = time2gpst(raw_.time, &week);
   gnss_observation_.set_gnss_time_type(apollo::drivers::gnss::GPS_TIME);
@@ -983,8 +840,8 @@ void NovatelParser::SetObservationTime() {
   gnss_observation_.set_gnss_second_s(second);
 }
 
-bool NovatelParser::DecodeGnssObservation(const uint8_t* obs_data,
-                                          const uint8_t* obs_data_end) {
+bool NewtonM2Parser::DecodeGnssObservation(const uint8_t* obs_data,
+                                           const uint8_t* obs_data_end) {
   while (obs_data < obs_data_end) {
     const int status = input_oem4(&raw_, *obs_data++);
     switch (status) {
@@ -1014,7 +871,7 @@ bool NovatelParser::DecodeGnssObservation(const uint8_t* obs_data,
 
           int j = 0;
           for (j = 0; j < NFREQ + NEXOBS; ++j) {
-            if (is_zero(raw_.obs.data[i].L[j])) {
+            if (newtonm2::is_zero(raw_.obs.data[i].L[j])) {
               break;
             }
 

@@ -13,6 +13,7 @@ cc_library(
         "compression.h",
         "extract_ground_plane.h",
         "rect2d.h",
+        "math_util.h",
         "system_utility.h",
         "threadpool.h",
         "voxel_grid_covariance_hdmap.h",

@@ -73,8 +73,10 @@ class LocalizationIntegImpl {
   // gnss best pose process
   void GnssBestPoseProcess(const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
-  void GetLastestLidarLocalization(LocalizationMeasureState *state,
-                                   LocalizationEstimate *lidar_localization);
+  void GnssHeadingProcess(const drivers::gnss::Heading &gnssheading_msg);
+
+  void GetLastestLidarLocalization(LocalizationMeasureState* state,
+                                   LocalizationEstimate* lidar_localization);
 
   void GetLastestIntegLocalization(LocalizationMeasureState *state,
                                    LocalizationEstimate *integ_localization);
@@ -105,6 +107,9 @@ class LocalizationIntegImpl {
       const drivers::gnss::GnssEphemeris& gnss_orbit_msg);
   void GnssBestPoseProcessImpl(
       const drivers::gnss::GnssBestPose& bestgnsspos_msg);
+
+  void GnssHeadingThreadLoop();
+  void GnssHeadingProcessImpl(const drivers::gnss::Heading &gnssheading_msg);
 
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
                                          LocalizationEstimate *localization);
@@ -158,6 +163,15 @@ class LocalizationIntegImpl {
   std::mutex gnss_function_queue_mutex_;
 
   bool debug_log_flag_;
+
+  // gnss heading process thread
+  std::atomic<bool> keep_gnss_heading_running_;
+  std::thread gnss_heading_function_thread_;
+  std::condition_variable gnss_heading_function_signal_;
+  std::queue<std::function<void()>> gnss_heading_function_queue_;
+  int gnss_heading_queue_max_size_;
+  std::mutex gnss_heading_function_queue_mutex_;
+
   bool enable_lidar_localization_;
 
   Eigen::Affine3d gnss_antenna_extrinsic_;
