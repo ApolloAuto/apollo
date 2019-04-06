@@ -25,7 +25,6 @@ the data is not qualified, and reduce the size of uploaded data significantly.
 from datetime import datetime
 import argparse
 import os
-import re
 import sys
 import shutil
 import six
@@ -111,7 +110,7 @@ def process_dir(path, operation):
 
 def extract_camera_data(dest_dir, msg):
     """Extract camera file from message according to rate."""
-    #TODO: change saving logic
+    # TODO(gchen-Apollo): change saving logic
     cur_time_second = msg.timestamp
     image = IMAGE_OBJ
     image.ParseFromString(msg.message)
@@ -199,7 +198,7 @@ def extract_pcd_data(dest_dir, msg):
     pc_meta = make_xyzit_point_cloud(pointcloud.point)
     pcd_file = os.path.join(dest_dir, '{}.pcd'.format(cur_time_second))
     pypcd.save_point_cloud_bin_compressed(pc_meta, pcd_file)
-    #TODO: (@gchen-Apollo) add saint check
+    # TODO(gchen-Apollo): add saint check
     return True
 
 def extract_gps_data(dest_dir, msg, out_msg_list):
@@ -228,7 +227,7 @@ def extract_gps_data(dest_dir, msg, out_msg_list):
 
     print(gps)
 
-    #TODO: gchen-Apollo, build class, to encapsulate inner data structure
+    # TODO(gchen-Apollo): build class, to encapsulate inner data structure
     return out_msg_list
 
 def get_sensor_channel_list(record_file):
@@ -236,45 +235,6 @@ def get_sensor_channel_list(record_file):
     record_reader = RecordReader(record_file)
     return set(channel_name for channel_name in record_reader.get_channellist()
                if 'sensor' in channel_name)
-
-def validate_record(record_file):
-    """Validate the record file."""
-    # Check the validity of a cyber record file according to header info.
-    record_reader = RecordReader(record_file)
-    header_msg = record_reader.get_headerstring()
-    header = record_pb2.Header()
-    header.ParseFromString(header_msg)
-    print("header is {}".format(header))
-
-    if not header.is_complete:
-        print('Record file: %s is not completed.' % record_file)
-        return False
-    if header.size == 0:
-        print('Record file: %s. size is 0.' % record_file)
-        return False
-    if header.major_version != 1 and header.minor_version != 0:
-        print('Record file: %s. version [%d:%d] is wrong.' %
-              (record_file, header.major_version, header.minor_version))
-        return False
-    if header.begin_time >= header.end_time:
-        print('Record file: %s. begin time [%s] is equal or larger than '
-              'end time [%s].' %
-              (record_file, header.begin_time, header.end_time))
-        return False
-
-    if header.message_number < 1 or header.channel_number < 1:
-        print('Record file: %s. [message:channel] number [%d:%d] is invalid.' %
-              (record_file, header.message_number, header.channel_number))
-        return False
-
-    # There should be at least one sensor channel
-    sensor_channels = get_sensor_channel_list(record_file)
-    if len(sensor_channels) < 1:
-        print('Record file: %s. cannot find sensor channels.' % record_file)
-        return False
-
-    return True
-
 
 def extract_channel_data(output_path, msg, channel_msgs_dict={}):
     """Process channel messages."""
@@ -287,7 +247,7 @@ def extract_channel_data(output_path, msg, channel_msgs_dict={}):
         channel_msgs_dict[msg.topic] = extract_gps_data(output_path, msg,
                                         channel_msgs_dict[msg.topic])
     else:
-        # (TODO) (LiuJie/gchen-Apollo) Handle binary data extraction.
+        # TODO(LiuJie/gchen-Apollo): Handle binary data extraction.
         print('Not implemented!')
 
     return True, channel_msgs_dict
@@ -305,17 +265,18 @@ def validate_channel_list(channels, dictionary):
 def in_range(v, s, e):
     return True if v >= s and v <= e else False
 
-def extract_data(record_file, output_path, channel_list,
+def extract_data(record_file_list, output_path, channel_list,
                  start_timestamp, end_timestamp, extraction_rate_dict):
     """
     Extract the desired channel messages if channel_list is specified.
     Otherwise extract all sensor calibration messages according to
     extraction rate, 10% by default.
     """
+    # all records have identical sensor channels.
+    sensor_channels = get_sensor_channel_list(record_file_list[0])
 
-    sensor_channels = get_sensor_channel_list(record_file)
-    if len(channel_list) > 0 and validate_channel_list(channel_list,
-                                                       sensor_channels) is False:
+    if len(channel_list) > 0 and \
+       not validate_channel_list(channel_list, sensor_channels):
         print('Input channel list is invalid.')
         return False
 
@@ -343,29 +304,33 @@ def extract_data(record_file, output_path, channel_list,
         if channel in SMALL_TOPICS:
             channel_msgs_dict[channel] = list()
 
-    record_reader = RecordReader(record_file)
-    for msg in record_reader.read_messages():
-        if msg.topic in channel_list:
-            # Only care about messages in certain time intervals
-            msg_timestamp_sec = msg.timestamp / 1e9
-            if not in_range(msg_timestamp_sec, start_timestamp, end_timestamp):
-                continue
+    for record_file in record_file_list:
+        record_reader = RecordReader(record_file)
+        for msg in record_reader.read_messages():
+            if msg.topic in channel_list:
+                # Only care about messages in certain time intervals
+                msg_timestamp_sec = msg.timestamp / 1e9
+                if not in_range(msg_timestamp_sec, start_timestamp, end_timestamp):
+                    continue
 
-            channel_occur_time[msg.topic] += 1
-            # Extract the topic according to extraction_rate
-            if channel_occur_time[msg.topic] % extraction_rate_dict[msg.topic] != 0:
-                continue
+                channel_occur_time[msg.topic] += 1
+                # Extract the topic according to extraction_rate
+                if channel_occur_time[msg.topic] % extraction_rate_dict[msg.topic] != 0:
+                    continue
 
-            ret, channel_msgs_dict = extract_channel_data(channel_output_path[msg.topic], msg,
-                                       channel_msgs_dict)
-            # Calculate parsing statistics
-            if ret is False:
-                process_msg_failure_num += 1
-                if channel_success_dict[msg.topic] is True:
-                    channel_success_dict[msg.topic] = False
-                    process_channel_failure_num += 1
-                    process_channel_success_num -= 1
-                    print('Failed to extract data from channel: %s' % msg.topic)
+                ret, channel_msgs_dict =\
+                    extract_channel_data(channel_output_path[msg.topic],
+                                         msg, channel_msgs_dict)
+
+                # Calculate parsing statistics
+                if not ret:
+                    process_msg_failure_num += 1
+                    if channel_success_dict[msg.topic]:
+                        channel_success_dict[msg.topic] = False
+                        process_channel_failure_num += 1
+                        process_channel_success_num -= 1
+                        print('Failed to extract data from channel: %s in record %s '\
+                             % (msg.topic, record_file))
 
     # traverse the dict, if any channel topic stored as a list
     # then save the list as a summary file, mostly binary file
@@ -427,6 +392,90 @@ def generate_extraction_rate_dict(channel_list, large_topic_extraction_rate,
 
     return rate_dict
 
+def validate_record(record_file):
+    """Validate the record file."""
+    # Check the validity of a cyber record file according to header info.
+    record_reader = RecordReader(record_file)
+    header_msg = record_reader.get_headerstring()
+    header = record_pb2.Header()
+    header.ParseFromString(header_msg)
+    print("header is {}".format(header))
+
+    if not header.is_complete:
+        print('Record file: %s is not completed.' % record_file)
+        return False
+    if header.size == 0:
+        print('Record file: %s. size is 0.' % record_file)
+        return False
+    if header.major_version != 1 and header.minor_version != 0:
+        print('Record file: %s. version [%d:%d] is wrong.' %
+              (record_file, header.major_version, header.minor_version))
+        return False
+    if header.begin_time >= header.end_time:
+        print('Record file: %s. begin time [%s] is equal or larger than '
+              'end time [%s].' %
+              (record_file, header.begin_time, header.end_time))
+        return False
+
+    if header.message_number < 1 or header.channel_number < 1:
+        print('Record file: %s. [message:channel] number [%d:%d] is invalid.' %
+              (record_file, header.message_number, header.channel_number))
+        return False
+
+    # There should be at least one sensor channel
+    sensor_channels = get_sensor_channel_list(record_file)
+    if len(sensor_channels) < 1:
+        print('Record file: %s. cannot find sensor channels.' % record_file)
+        return False
+
+    return True
+
+def validate_record_files(file_list, kword='.record.'):
+
+    # load file list from directory if needs
+    file_abs_paths = []
+    if not isinstance(file_list, list):
+        raise ValueError("files must be in a list")
+
+    if len(file_list) == 1 and os.path.isdir(file_list[0]) :
+        print('load cyber records from: %s' % file_list[0])
+        for f in os.listdir(file_list[0]):
+            if kword in f:
+                file_abs_path = os.path.join(file_list[0], f)
+                if validate_record(file_abs_path):
+                    file_abs_paths.append(file_abs_path)
+                else:
+                    print("record file not valid: %s" % file_abs_path)
+    else:
+        for f in file_list:
+            if not os.path.isfile(f):
+                raise ValueError("input cyber record not exists or not a file: %s" % f)
+
+            if validate_record(f):
+                file_abs_paths.append(f)
+            else:
+                print("record file not valid: %s" % f)
+
+    if len(file_abs_paths) < 1:
+        raise ValueError("the input files are all invalid")
+
+    # validate all record file have the same sensor topics
+    default_channel_list = []
+    for i, f in enumerate(file_abs_paths):
+        channel_list = get_sensor_channel_list(f)
+        if i == 0:
+            default_channel_list = channel_list
+        else:
+           if channel_list != default_channel_list:
+                print("channel list in %s is:" % file_abs_paths[0])
+                print(default_channel_list)
+                print("but channel list in %s is: " % file_abs_paths[i])
+                print(channel_list)
+                raise ValueError("the record files shoud contain the same channel list")
+
+
+    return file_abs_paths
+
 def main():
     """
     Main function
@@ -440,9 +489,8 @@ def main():
 
     parser = argparse.ArgumentParser(
         description='A tool to extract data information for sensor calibration.')
-    parser.add_argument("-i", "--record_path", action="store", type=str,
-                        required=True,
-                        help="Specify the record file to extract data information.")
+    parser.add_argument("-i", "--record_path", action="append", default=[], required=True,
+                        dest='record_list', help="Specify the record file to extract data information.")
     parser.add_argument("-o", "--output_path", action="store", type=str,
                         default="./extracted_data",
                         help="The output directory to restore message.")
@@ -463,10 +511,8 @@ def main():
 
     print('parsing the following channels: %s' % args.channel_list)
 
-    ret = validate_record(args.record_path)
-    if ret is False:
-        print('Failed to validate record file: %s' % args.record_path)
-        sys.exit(1)
+
+    valid_record_list = validate_record_files(args.record_list, kword='.record.')
 
     # Create directory to save the extracted data
     # use time now() as folder name
@@ -474,7 +520,7 @@ def main():
     output_abs_path = os.path.join(args.output_path, output_relative_path)
 
     ret = process_dir(output_abs_path, 'create')
-    if ret is False:
+    if not ret:
         print('Failed to create extrated data directory: %s' % output_abs_path)
         sys.exit(1)
 
@@ -483,9 +529,9 @@ def main():
                                 large_topic_extraction_rate=args.extraction_rate,
                                 small_topic_extraction_rate=1)
 
-    ret = extract_data(args.record_path, output_abs_path, channel_list,
+    ret = extract_data(valid_record_list, output_abs_path, channel_list,
                        args.start_timestamp, args.end_timestamp, extraction_rate_dict)
-    if ret is False:
+    if not ret:
         print('Failed to extract data!')
 
     generate_compressed_file(input_path=args.output_path,
