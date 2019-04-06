@@ -77,6 +77,17 @@ Status MSFLocalization::Start() {
     AdapterManager::AddPointCloudCallback(&MSFLocalization::OnPointCloud, this);
   }
 
+  if (FLAGS_enable_gps_heading) {
+    if (!AdapterManager::GetGnssHeading()) {
+      buffer.ERROR(
+          "GnssHeading input not initialized. Check your adapter.conf file!");
+      buffer.PrintLog();
+      return Status(common::LOCALIZATION_ERROR_MSG, "no gnss heading adapter");
+    }
+    AdapterManager::AddGnssHeadingCallback(&MSFLocalization::OnGnssHeading,
+      this);
+  }
+
   if (FLAGS_gnss_mode == 1) {
     // Gnss Rtk Obs
     if (!AdapterManager::GetGnssRtkObs()) {
@@ -220,7 +231,7 @@ void MSFLocalization::InitParams() {
     CHECK(LoadGnssAntennaExtrinsic(ant_imu_leverarm_file, &offset_x, &offset_y,
                                    &offset_z, &uncertainty_x, &uncertainty_y,
                                    &uncertainty_z));
-
+    localizaiton_param_.ant_imu_leverarm_file = ant_imu_leverarm_file;
     localizaiton_param_.imu_to_ant_offset.offset_x = offset_x;
     localizaiton_param_.imu_to_ant_offset.offset_y = offset_y;
     localizaiton_param_.imu_to_ant_offset.offset_z = offset_z;
@@ -391,6 +402,11 @@ void MSFLocalization::OnGnssRtkEph(
 
   localization_integ_.RawEphemerisProcess(gnss_orbit_msg);
   return;
+}
+
+void MSFLocalization::OnGnssHeading(
+  const drivers::gnss::Heading &gnssheading_msg) {
+  localization_integ_.GnssHeadingProcess(gnssheading_msg);
 }
 
 bool MSFLocalization::LoadGnssAntennaExtrinsic(

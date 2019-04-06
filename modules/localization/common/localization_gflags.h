@@ -36,6 +36,8 @@ DECLARE_string(msf_visual_adapter_config_file);
 DECLARE_bool(enable_gps_imu_interprolate);
 DECLARE_bool(enable_map_reference_unify);
 DECLARE_bool(enable_watchdog);
+DECLARE_bool(enable_gps_heading);
+DECLARE_bool(enable_heading_filter);
 
 DECLARE_double(gps_time_delay_tolerance);
 DECLARE_double(gps_imu_timestamp_sec_diff_tolerance);

@@ -83,6 +83,11 @@ void LocalizationInteg::GnssBestPoseProcess(
   return;
 }
 
+void LocalizationInteg::GnssHeadingProcess(
+    const drivers::gnss::Heading &gnssheading_msg) {
+  localization_integ_impl_->GnssHeadingProcess(gnssheading_msg);
+}
+
 void LocalizationInteg::GetLastestLidarLocalization(
     LocalizationMeasureState *state,
     LocalizationEstimate *lidar_localization) {
