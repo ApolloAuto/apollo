@@ -52,8 +52,7 @@ def get_start_index(data):
 
     ind = start_ind
     while ind < len(data):
-        if data['vehicle_speed'][
-                ind] == 0:  
+        if data['vehicle_speed'][ind] == 0:  
             ind = ind + 1
             # begin from vehicle_speed > 0 
         else:
