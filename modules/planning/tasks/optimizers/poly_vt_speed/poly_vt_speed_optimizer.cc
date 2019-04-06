@@ -54,7 +54,7 @@ apollo::common::Status PolyVTSpeedOptimizer::Execute(
     Frame* frame, ReferenceLineInfo* reference_line_info) {
   if (frame == nullptr) {
     AERROR << "Frame info is empty!";
-    return Status(ErrorCode::PLANNING_ERROR, "No Frame info");
+    return Status(ErrorCode::PLANNING_ERROR, "No Frame info!");
   }
 
   if (reference_line_info == nullptr) {

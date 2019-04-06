@@ -269,8 +269,8 @@ Status QpSplineStGraph::AddConstraint(
   DCHECK_EQ(t_evaluated_.size(), accel_upper_bound.size());
   if (!constraint->AddSecondDerivativeBoundary(t_evaluated_, accel_lower_bound,
                                                accel_upper_bound)) {
-    const std::string msg = "Fail to apply acceleration constraints.";
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Failed to apply acceleration constraints.");
   }
   for (size_t i = 0; i < t_evaluated_.size(); ++i) {
     ADEBUG << "t_evaluated_: " << t_evaluated_[i]

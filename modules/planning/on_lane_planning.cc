@@ -82,7 +82,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
   CHECK(apollo::cyber::common::GetProtoFromFile(
       FLAGS_traffic_rule_config_filename, &traffic_rule_configs_))
-      << "Failed to load traffic rule config file "
+      << "Failed to load traffic rule config file: "
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
@@ -90,7 +90,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
 
   // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
-  CHECK(hdmap_) << "Failed to load map";
+  CHECK(hdmap_) << "Failed to load map.";
 
   // instantiate reference line provider
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
@@ -115,15 +115,14 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
                          vehicle_state, reference_line_provider_.get()));
 
   if (frame_ == nullptr) {
-    return Status(ErrorCode::PLANNING_ERROR, "Fail to init frame: nullptr.");
+    return Status(ErrorCode::PLANNING_ERROR, "Failed to init frame: nullptr.");
   }
 
   std::list<ReferenceLine> reference_lines;
   std::list<hdmap::RouteSegments> segments;
   if (!reference_line_provider_->GetReferenceLines(&reference_lines,
                                                    &segments)) {
-    std::string msg = "Failed to create reference line";
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return Status(ErrorCode::PLANNING_ERROR, "Failed to create reference line.");
   }
   DCHECK_EQ(reference_lines.size(), segments.size());
 
@@ -133,22 +132,22 @@ Status OnLanePlanning::InitFrame(const uint32_t sequence_num,
   for (auto& ref_line : reference_lines) {
     if (!ref_line.Shrink(Vec2d(vehicle_state.x(), vehicle_state.y()),
                          FLAGS_look_backward_distance, forword_limit)) {
-      std::string msg = "Fail to shrink reference line.";
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Failed to shrink reference line.");
     }
   }
   for (auto& seg : segments) {
     if (!seg.Shrink(Vec2d(vehicle_state.x(), vehicle_state.y()),
                     FLAGS_look_backward_distance, forword_limit)) {
-      std::string msg = "Fail to shrink routing segments.";
-      return Status(ErrorCode::PLANNING_ERROR, msg);
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Failed to shrink routing segments.");
     }
   }
 
   auto status = frame_->Init(reference_lines, segments,
                              reference_line_provider_->FutureRouteWaypoints());
   if (!status.ok()) {
-    AERROR << "failed to init frame:" << status.ToString();
+    AERROR << "Failed to init frame: " << status.ToString();
     return status;
   }
   return Status::OK();
@@ -423,7 +422,7 @@ Status OnLanePlanning::Plan(
   } else {
     const auto* best_ref_info = frame_->FindDriveReferenceLineInfo();
     if (!best_ref_info) {
-      std::string msg("planner failed to make a driving plan");
+      std::string msg("Planner failed to make a driving plan.");
       AERROR << msg;
       if (last_publishable_trajectory_) {
         last_publishable_trajectory_->Clear();
@@ -504,14 +503,12 @@ Status OnLanePlanning::Plan(
 }
 
 bool OnLanePlanning::CheckPlanningConfig(const PlanningConfig& config) {
-  if (!config.has_standard_planning_config()) {
+  if (!config.has_standard_planning_config() ||
+      config.standard_planning_config().planner_public_road_config()
+                                       .scenario_type_size() == 0) {
     return false;
   }
-  if (config.standard_planning_config()
-          .planner_public_road_config()
-          .scenario_type_size() == 0) {
-    return false;
-  }
+
   // TODO(All): check other config params
   return true;
 }
@@ -641,9 +638,9 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   for (const auto& obstacle : open_space_debug.obstacles()) {
     auto* obstacle_outline = chart->add_line();
     obstacle_outline->set_label("boundary_" + std::to_string(obstacle_index));
-    obstacle_index += 1;
+    ++obstacle_index;
     for (int vertice_index = 0;
-         vertice_index < obstacle.vertices_x_coords_size(); vertice_index++) {
+         vertice_index < obstacle.vertices_x_coords_size(); ++vertice_index) {
       auto* point_debug = obstacle_outline->add_point();
       point_debug->set_x(obstacle.vertices_x_coords(vertice_index));
       point_debug->set_y(obstacle.vertices_y_coords(vertice_index));

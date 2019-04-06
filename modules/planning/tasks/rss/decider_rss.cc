@@ -249,13 +249,11 @@ Status RssDecider::Process(Frame *frame,
   bool rss_result = ::ad_rss::core::RssSituationExtraction::extractSituations(
       worldModel, situationVector);
   if (!rss_result) {
-    std::string msg("ad_rss::extractSituation failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return Status(ErrorCode::PLANNING_ERROR, "ad_rss::extractSituation failed.");
   }
 
   if (situationVector.size() == 0) {
-    std::string msg("situationVector unexpected empty");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return Status(ErrorCode::PLANNING_ERROR, "situationVector unexpected empty.");
   }
 
   ::ad_rss::state::ResponseStateVector responseStateVector;
@@ -263,13 +261,12 @@ Status RssDecider::Process(Frame *frame,
   rss_result = RssCheck.checkSituations(situationVector, responseStateVector);
 
   if (!rss_result) {
-    std::string msg("ad_rss::checkSituation failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return Status(ErrorCode::PLANNING_ERROR, "ad_rss::checkSituation failed.");
   }
 
   if (responseStateVector.size() == 0) {
-    std::string msg("responseStateVector unexpected empty");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "responseStateVector unexpected empty.");
   }
 
   ::ad_rss::state::ResponseState properResponse;
@@ -278,8 +275,8 @@ Status RssDecider::Process(Frame *frame,
       RssResponse.provideProperResponse(responseStateVector, properResponse);
 
   if (!rss_result) {
-    std::string msg("ad_rss::provideProperResponse failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "ad_rss::provideProperResponse failed.");
   }
 
   ::ad_rss::world::AccelerationRestriction accelerationRestriction;
@@ -287,8 +284,8 @@ Status RssDecider::Process(Frame *frame,
       worldModel, properResponse, accelerationRestriction);
 
   if (!rss_result) {
-    std::string msg("ad_rss::transformProperResponse failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "ad_rss::transformProperResponse failed.");
   }
 
   Distance const currentLonDistance =
@@ -303,9 +300,8 @@ Status RssDecider::Process(Frame *frame,
       ::ad_rss::situation::calculateSafeLongitudinalDistanceSameDirection(
           leadingVehicleState, followingVehicleState, safeLonDistance);
   if (!rss_result) {
-    std::string msg(
+    return Status(ErrorCode::PLANNING_ERROR,
         "ad_rss::calculateSafeLongitudinalDistanceSameDirection failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
   if (responseStateVector[0].longitudinalState.isSafe) {
