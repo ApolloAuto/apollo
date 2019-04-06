@@ -161,7 +161,7 @@ void PathTimeGraph::SetDynamicObstacle(
     ptr_reference_line_info_->reference_line().GetLaneWidth(
         sl_boundary.start_s(), &left_width, &right_width);
 
-    // the obstacle is not shown on the region to be considered.
+    // The obstacle is not shown on the region to be considered.
     if (sl_boundary.start_s() > path_range_.second ||
         sl_boundary.end_s() < path_range_.first ||
         sl_boundary.start_l() > left_width ||
@@ -169,10 +169,9 @@ void PathTimeGraph::SetDynamicObstacle(
       if (path_time_obstacle_map_.find(obstacle->Id()) !=
           path_time_obstacle_map_.end()) {
         break;
-      } else {
-        relative_time += FLAGS_trajectory_time_resolution;
-        continue;
       }
+      relative_time += FLAGS_trajectory_time_resolution;
+      continue;
     }
 
     if (path_time_obstacle_map_.find(obstacle->Id()) ==
