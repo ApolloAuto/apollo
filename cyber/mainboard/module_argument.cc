@@ -62,7 +62,6 @@ void ModuleArgument::ParseArgument(const int argc, char* const argv[]) {
 }
 
 void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
-  opterr = 0;  // extern int opterr
   int long_index = 0;
   const std::string short_opts = "hd:p:s:";
   static const struct option long_opts[] = {
@@ -89,12 +88,11 @@ void ModuleArgument::GetOptions(const int argc, char* const argv[]) {
     switch (opt) {
       case 'd':
         dag_conf_list_.emplace_back(std::string(optarg));
-        for (int i = optind; i < argc; i++) {
-          if (*argv[i] != '-') {
-            dag_conf_list_.emplace_back(std::string(argv[i]));
-          } else {
+        for (int i = optind; i < argc; ++i) {
+          if (*argv[i] == '-') {
             break;
           }
+          dag_conf_list_.emplace_back(std::string(argv[i]));
         }
         break;
       case 'p':
