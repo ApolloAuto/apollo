@@ -51,11 +51,12 @@ OpenSpaceTrajectoryProvider::~OpenSpaceTrajectoryProvider() {
   }
 }
 
-// TODO(Jinyun) Fix "no associate state" error.
 void OpenSpaceTrajectoryProvider::Stop() {
   if (FLAGS_enable_open_space_planner_thread) {
     is_stop_.store(true);
-    task_future_.get();
+    if (thread_init_flag_) {
+      task_future_.get();
+    }
     trajectory_updated_.store(false);
     trajectory_error_.store(false);
     trajectory_skipped_.store(false);
@@ -63,12 +64,12 @@ void OpenSpaceTrajectoryProvider::Stop() {
   }
 }
 
-// TODO(Jinyun) Fix "no associate state error". Driving out of parking spot not
-// supported right now
 void OpenSpaceTrajectoryProvider::Restart() {
   if (FLAGS_enable_open_space_planner_thread) {
     is_stop_.store(true);
-    task_future_.get();
+    if (thread_init_flag_) {
+      task_future_.get();
+    }
     is_stop_.store(false);
     thread_init_flag_ = false;
     trajectory_updated_.store(false);
