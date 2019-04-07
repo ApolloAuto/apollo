@@ -59,7 +59,7 @@ Status MeasureRepublishProcess::Init(
 
   std::ifstream imu_ant_fin(params.ant_imu_leverarm_file.c_str());
   AINFO << "the ant_imu_leverarm file: "
-        << params.ant_imu_leverarm_file.c_str() << std::endl;
+        << params.ant_imu_leverarm_file.c_str();
   if (imu_ant_fin) {
     bool success = LoadImuGnssAntennaExtrinsic(params.ant_imu_leverarm_file,
                                                &imu_gnssant_extrinsic_);

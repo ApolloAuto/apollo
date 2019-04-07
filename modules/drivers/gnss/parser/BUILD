@@ -9,7 +9,7 @@ cc_library(
         ":novatel_parser",
         ":rtcm_parser",
         ":rtcm3_parser",
-        ":newtonm2_parser"
+        ":newtonm2_parser",
     ],
 )
 
