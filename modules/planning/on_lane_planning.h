@@ -94,6 +94,9 @@ class OnLanePlanning : public PlanningBase {
   void AddPublishedAcceleration(const ADCTrajectory& trajectory_pb,
                                 planning_internal::Debug* debug);
 
+  void AddFallbackTrajectory(const planning_internal::Debug& debug_info,
+                             planning_internal::Debug* debug_chart);
+
  private:
   routing::RoutingResponse last_routing_;
   std::unique_ptr<Frame> frame_;

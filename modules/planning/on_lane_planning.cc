@@ -616,6 +616,7 @@ void OnLanePlanning::ExportOpenSpaceChart(
     AddStitchSpeedProfile(debug_chart);
     AddPublishedSpeed(trajectory_pb, debug_chart);
     AddPublishedAcceleration(trajectory_pb, debug_chart);
+    // AddFallbackTrajectory(debug_info, debug_chart);
   }
 }
 
@@ -746,6 +747,33 @@ void OnLanePlanning::AddPartitionedTrajectory(
     (*partition_properties)["lineTension"] = "0";
     (*partition_properties)["fill"] = "false";
     (*partition_properties)["showLine"] = "true";
+  }
+
+  // plot fallback trajectory compared with the partitioned
+  if (open_space_debug.is_fallback_trajectory()) {
+    const auto& fallback_trajectories =
+      open_space_debug.fallback_trajectory().trajectory();
+    if (fallback_trajectories.empty() ||
+        fallback_trajectories[0].trajectory_point().empty()) {
+      return;
+    }
+
+    const auto& fallback_trajectory = fallback_trajectories[0];
+    // has to define chart boundary first
+    auto* fallback_line = chart->add_line();
+    fallback_line->set_label("fallback");
+    for (const auto& point : fallback_trajectory.trajectory_point()) {
+      auto* point_debug = fallback_line->add_point();
+      point_debug->set_x(point.path_point().x());
+      point_debug->set_y(point.path_point().y());
+    }
+    // Set chartJS's dataset properties
+    auto* fallback_properties = fallback_line->mutable_properties();
+    (*fallback_properties)["borderWidth"] = "3";
+    (*fallback_properties)["pointRadius"] = "2";
+    (*fallback_properties)["lineTension"] = "0";
+    (*fallback_properties)["fill"] = "false";
+    (*fallback_properties)["showLine"] = "true";
   }
 }
 
