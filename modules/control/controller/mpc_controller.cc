@@ -548,6 +548,8 @@ void MPCController::UpdateMatrix(SimpleMPCDebug *debug) {
   matrix_ad_ = (matrix_i - ts_ * 0.5 * matrix_a_).inverse() *
                (matrix_i + ts_ * 0.5 * matrix_a_);
 
+  matrix_bd_ = (matrix_i - ts * 0.5 * matrix_a_).inverse() * matrix_bd_;
+
   matrix_c_(1, 0) = (lr_ * cr_ - lf_ * cf_) / mass_ / v - v;
   matrix_c_(3, 0) = -(lf_ * lf_ * cf_ + lr_ * lr_ * cr_) / iz_ / v;
   matrix_cd_ = matrix_c_ * debug->heading_error_rate() * ts_;
