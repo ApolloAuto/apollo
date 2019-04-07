@@ -180,11 +180,9 @@ bool TransformServer::QueryTransform(const std::string &child_frame_id,
     return true;
   }
 
-  auto cf_iter = vertices_.find(child_frame_id);
-  auto f_iter = vertices_.find(frame_id);
-
-  // Vertices do not exist
-  if (cf_iter == vertices_.end() || f_iter == vertices_.end()) {
+  // Vertices does not exist
+  if (vertices_.find(child_frame_id) == vertices_.end() ||
+      vertices_.find(frame_id) == vertices_.end()) {
     return false;
   }
 
