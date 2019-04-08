@@ -27,6 +27,7 @@
 #include <iostream>
 
 constexpr int SecondColumnOffset = 4;
+constexpr int SecondColumnWidth = 10;
 
 CyberTopologyMessage::CyberTopologyMessage(const std::string& channel)
     : RenderableMessage(nullptr, 1),
@@ -222,7 +223,7 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
     case SecondColumnType::MessageFrameRatio:
       s->AddStr(col1_width_ + SecondColumnOffset, 0, Screen::WHITE_BLACK,
                 "FrameRatio");
-      s->AddStr(col1_width_ + 10 + 2 * SecondColumnOffset, 0,
+      s->AddStr(col1_width_ + SecondColumnWidth + 2 * SecondColumnOffset, 0,
                 Screen::WHITE_BLACK, "Bandwidth");
       break;
   }
@@ -272,7 +273,7 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
           std::ostringstream bandwidthStr;
           bandwidthStr << std::fixed << std::setprecision(FrameRatio_Precision)
 		               << iter->second->band_width();
-          s->AddStr(col1_width_ + 10 + 2 * SecondColumnOffset, line,
+          s->AddStr(col1_width_ + SecondColumnWidth + 2 * SecondColumnOffset, line,
 		            bandwidthStr.str().c_str());
         } break;
       }
