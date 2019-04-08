@@ -136,22 +136,24 @@ bool HoughTransfer::GetLines(int min_pt_num, int r_neibor, int theta_neibor,
   if (!lines) {
     return false;
   }
-  int r_step = 2 * r_neibor + 1;
-  int theta_step = 2 * theta_neibor + 1;
 
-  // search one vote neibor for max_vote position in the region
+  auto r_step = 2 * r_neibor + 1;
+  auto theta_step = 2 * theta_neibor + 1;
+
+  // Search one vote neibor for max_vote position in the region
   std::set<int> max_vote_lines;
   GetMaxVotes(min_pt_num, r_neibor, theta_neibor, r_step, theta_step,
               &max_vote_lines);
 
-  // from max vote pos to get line params
+  // From max vote pos to get line params
   lines->resize(max_vote_lines.size());
-  int idx = 0;
-  for (auto i = max_vote_lines.begin(); i != max_vote_lines.end(); ++i) {
+  for (auto idx = 0, i = max_vote_lines.begin(); i != max_vote_lines.end();
+       ++i) {
     if (!VotePosToHoughLine(*i, with_distribute, &(*lines)[idx++])) {
       return false;
     }
   }
+
   return true;
 }
 
@@ -221,14 +223,13 @@ bool HoughTransfer::CheckPrepared() const {
 void HoughTransfer::GetMaxVotes(int min_pt_num, int r_neibor, int theta_neibor,
                                 int r_step, int theta_step,
                                 std::set<int>* max_vote_lines) const {
-  for (int i = r_neibor; i < r_size_ - r_neibor; i += r_step) {
-    for (int j = theta_neibor; j < theta_size_ - theta_neibor;
+  for (auto i = r_neibor; i < r_size_ - r_neibor; i += r_step) {
+    for (auto j = theta_neibor; j < theta_size_ - theta_neibor;
          j += theta_step) {
-      int max_pos = -1;
-      int max_vote = min_pt_num;
-      for (int m = -r_neibor; m <= r_neibor; ++m) {
-        for (int n = -theta_neibor; n <= theta_neibor; ++n) {
-          int neibor_pos = (i + m) * theta_size_ + j + n;
+      auto max_pos = -1;
+      for (auto max_vote = min_pt_num, m = -r_neibor; m <= r_neibor; ++m) {
+        for (auto n = -theta_neibor; n <= theta_neibor; ++n) {
+          auto neibor_pos = (i + m) * theta_size_ + j + n;
           if (vote_map_[neibor_pos] >= max_vote) {
             max_pos = neibor_pos;
             max_vote = vote_map_[neibor_pos];
