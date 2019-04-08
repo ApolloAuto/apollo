@@ -37,11 +37,11 @@ class GemVehicleFactoryTest : public ::testing::Test {
 };
 
 TEST_F(GemVehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(gem_factory_.CreateVehicleController() != nullptr);
+  EXPECT_NE(gem_factory_.CreateVehicleController(), nullptr);
 }
 
 TEST_F(GemVehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(gem_factory_.CreateMessageManager() != nullptr);
+  EXPECT_NE(gem_factory_.CreateMessageManager(), nullptr);
 }
 
 }  // namespace canbus

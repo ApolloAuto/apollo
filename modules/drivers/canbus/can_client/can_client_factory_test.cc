@@ -26,7 +26,7 @@ namespace canbus {
 
 TEST(CanClientFactoryTest, CreateCanClient) {
   auto can_factory = CanClientFactory::Instance();
-  EXPECT_TRUE(can_factory != nullptr);
+  EXPECT_NE(can_factory, nullptr);
 
   can_factory->RegisterCanClients();
 
@@ -36,7 +36,7 @@ TEST(CanClientFactoryTest, CreateCanClient) {
   can_card_parameter.set_type(CANCardParameter::PCI_CARD);
   can_card_parameter.set_channel_id(CANCardParameter::CHANNEL_ID_ZERO);
 
-  EXPECT_TRUE(can_factory->CreateCANClient(can_card_parameter) != nullptr);
+  EXPECT_NE(can_factory->CreateCANClient(can_card_parameter), nullptr);
 #endif
 }
 

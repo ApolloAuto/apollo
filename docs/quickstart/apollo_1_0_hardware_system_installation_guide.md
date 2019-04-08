@@ -85,7 +85,7 @@ The key hardware components to install include:
 - Controller Area Network (CAN) Card ─ ESD CAN-PCIe/402-1
 - General Positioning System (GPS) and Inertial Measurement Unit (IMU) ─
   You can select one of the following options:
-  - NovAtel SPN-IGM-A1
+  - NovAtel SPAN-IGM-A1
   - NovAtel SPAN® ProPak6™ and NovAtel IMU-IGM-A1
 
 ## Additional Components Required

@@ -26,6 +26,6 @@ TIME_RANGE=$2
 set -e
 
 source /apollo/scripts/apollo_base.sh
-source /apollo/cyber/setup.bash 
+source /apollo/cyber/setup.bash
 
 python modules/tools/prediction/prediction_evaluation/evaluate_prediction_result.py ${SRC_DIR} ${TIME_RANGE}

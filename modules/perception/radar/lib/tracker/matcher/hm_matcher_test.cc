@@ -30,7 +30,7 @@ namespace radar {
 
 TEST(HMMatcherTest, hm_matcher_init_test) {
   BaseMatcher* matcher = new HMMatcher();
-  EXPECT_TRUE(matcher != nullptr);
+  EXPECT_NE(matcher, nullptr);
   FLAGS_work_root = "/apollo/modules/perception/testdata/radar/matcher";
   EXPECT_TRUE(matcher->Init());
   delete matcher;
@@ -59,7 +59,7 @@ TEST(HMMatcherTest, hm_matcher_propterty_match_test) {
 
 TEST(HMMatcherTest, hm_matcher_test) {
   BaseMatcher* matcher = new HMMatcher();
-  EXPECT_TRUE(matcher != nullptr);
+  EXPECT_NE(matcher, nullptr);
   FLAGS_work_root = "/apollo/modules/perception/testdata/radar/matcher";
   EXPECT_TRUE(matcher->Init());
   EXPECT_EQ(matcher->Name(), "HMMatcher");

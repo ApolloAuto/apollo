@@ -74,7 +74,9 @@ class ReferenceLineInfo {
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
+
   const ReferenceLine& reference_line() const;
+  ReferenceLine* mutable_reference_line();
 
   double SDistanceToDestination() const;
   bool ReachedDestination() const;
@@ -164,7 +166,7 @@ class ReferenceLineInfo {
 
   const hdmap::Lane::LaneTurn& GetPathTurnType(const double s) const;
 
-  const bool GetIntersectionRighoffRoad(
+  const bool GetIntersectionRightofWayStatus(
       const hdmap::PathOverlap& pnc_junction_overlap) const;
 
   double OffsetToOtherReferenceLine() const {

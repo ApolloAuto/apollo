@@ -2,7 +2,7 @@
 # Dreamview
 
 ## Introduction
-Dreamview or Apollo's HMI module provides a web application that helps developers visualize the output of other relevant autonomous driving modules, e.g. the vehicle's planning trajectory, car localization, chassis status etc. 
+Dreamview or Apollo's HMI module provides a web application that helps developers visualize the output of other relevant autonomous driving modules, e.g. the vehicle's planning trajectory, car localization, chassis status etc.
 
 ## Input
   Currently Dreamview monitors the following messages:
@@ -13,7 +13,7 @@ Dreamview or Apollo's HMI module provides a web application that helps developer
   * Perception Obstacles, defined by Protobuf message `PerceptionObstacles`, which can be found in file `perception/proto/perception_obstacle.proto`.
   * Prediction, defined by Protobuf message `PredictionObstacles`, which can be found in file `prediction/proto/prediction_obstacle.proto`.
   * Routing, defined by Protobuf message `RoutingResponse`, which can be found in file `routing/proto/routing.proto`.
-  
+
 ## Output
   A web-based dynamic 3D rendering of the monitored messages in a simulated world.
 

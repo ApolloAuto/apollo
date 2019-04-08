@@ -116,19 +116,19 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   ADEBUG << "get_nlp_info";
   // n1 : states variables, 4 * (N+1)
   int n1 = 4 * (horizon_ + 1);
-  AINFO << "n1: " << n1;
+  ADEBUG << "n1: " << n1;
   // n2 : control inputs variables
   int n2 = 2 * horizon_;
-  AINFO << "n2: " << n2;
+  ADEBUG << "n2: " << n2;
   // n3 : sampling time variables
   int n3 = horizon_ + 1;
-  AINFO << "n3: " << n3;
+  ADEBUG << "n3: " << n3;
   // n4 : dual multiplier associated with obstacle shape
   lambda_horizon_ = obstacles_edges_num_.sum() * (horizon_ + 1);
-  AINFO << "lambda_horizon_: " << lambda_horizon_;
+  ADEBUG << "lambda_horizon_: " << lambda_horizon_;
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
   miu_horizon_ = obstacles_num_ * 4 * (horizon_ + 1);
-  AINFO << "miu_horizon_: " << miu_horizon_;
+  ADEBUG << "miu_horizon_: " << miu_horizon_;
   // m1 : dynamics constatins
   int m1 = 4 * horizon_;
 
@@ -481,7 +481,7 @@ bool DistanceApproachIPOPTInterface::eval_grad_f_hand(int n, const double* x,
   int time_index = time_start_index_;
   int state_index = state_start_index_;
 
-  if (grad_f == NULL) {
+  if (grad_f == nullptr) {
     AERROR << "grad_f pt is nullptr";
     return false;
   } else {
@@ -2284,7 +2284,7 @@ bool DistanceApproachIPOPTInterface::eval_h(int n, const double* x, bool new_x,
                                             bool new_lambda, int nele_hess,
                                             int* iRow, int* jCol,
                                             double* values) {
-  if (values == NULL) {
+  if (values == nullptr) {
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
 
@@ -2433,10 +2433,10 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
     }
   }
 
-  AINFO << "state_diff_max: " << state_diff_max;
-  AINFO << "control_diff_max: " << control_diff_max;
-  AINFO << "dual_l_diff_max: " << l_diff_max;
-  AINFO << "dual_n_diff_max: " << n_diff_max;
+  ADEBUG << "state_diff_max: " << state_diff_max;
+  ADEBUG << "control_diff_max: " << control_diff_max;
+  ADEBUG << "dual_l_diff_max: " << l_diff_max;
+  ADEBUG << "dual_n_diff_max: " << n_diff_max;
 }
 
 //***************    start ADOL-C part ***********************************
@@ -2748,8 +2748,8 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
     x_u_tmp[idx] = x_u_tmp[idx] + delta_v;
     x_l_tmp[idx] = x_l_tmp[idx] - delta_v;
     if (x[idx] > x_u_tmp[idx] || x[idx] < x_l_tmp[idx]) {
-      AINFO << "x idx unfeasible: " << idx << ", x: " << x[idx]
-            << ", lower: " << x_l_tmp[idx] << ", upper: " << x_u_tmp[idx];
+      ADEBUG << "x idx unfeasible: " << idx << ", x: " << x[idx]
+             << ", lower: " << x_l_tmp[idx] << ", upper: " << x_u_tmp[idx];
     }
   }
 
@@ -2787,23 +2787,23 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
   // miu_horizon_
   int m11 = m10 + miu_horizon_;
 
-  AINFO << "dynamics constatins to: " << m1;
-  AINFO << "control rate constraints (only steering) to: " << m2;
-  AINFO << "sampling time equality constraints to: " << m3;
-  AINFO << "obstacle constraints to: " << m4;
-  AINFO << "start conf constraints to: " << m5;
-  AINFO << "constraints on x,y,v to: " << m6;
-  AINFO << "end constraints to: " << m7;
-  AINFO << "control bnd to: " << m8;
-  AINFO << "time interval constraints to: " << m9;
-  AINFO << "lambda constraints to: " << m10;
-  AINFO << "miu constraints to: " << m11;
-  AINFO << "total variables: " << num_of_variables_;
+  ADEBUG << "dynamics constatins to: " << m1;
+  ADEBUG << "control rate constraints (only steering) to: " << m2;
+  ADEBUG << "sampling time equality constraints to: " << m3;
+  ADEBUG << "obstacle constraints to: " << m4;
+  ADEBUG << "start conf constraints to: " << m5;
+  ADEBUG << "constraints on x,y,v to: " << m6;
+  ADEBUG << "end constraints to: " << m7;
+  ADEBUG << "control bnd to: " << m8;
+  ADEBUG << "time interval constraints to: " << m9;
+  ADEBUG << "lambda constraints to: " << m10;
+  ADEBUG << "miu constraints to: " << m11;
+  ADEBUG << "total variables: " << num_of_variables_;
 
   for (int idx = 0; idx < m; ++idx) {
     if (g[idx] > g_u_tmp[idx] + delta_v || g[idx] < g_l_tmp[idx] - delta_v) {
-      AINFO << "constratins idx unfeasible: " << idx << ", g: " << g[idx]
-            << ", lower: " << g_l_tmp[idx] << ", upper: " << g_u_tmp[idx];
+      ADEBUG << "constratins idx unfeasible: " << idx << ", g: " << g[idx]
+             << ", lower: " << g_l_tmp[idx] << ", upper: " << g_u_tmp[idx];
     }
   }
   return true;
@@ -2877,10 +2877,10 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_off();
 
-  rind_L = NULL;
-  cind_L = NULL;
+  rind_L = nullptr;
+  cind_L = nullptr;
 
-  hessval = NULL;
+  hessval = nullptr;
 
   options_L[0] = 0;
   options_L[1] = 1;

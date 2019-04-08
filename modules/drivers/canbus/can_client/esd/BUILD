@@ -11,7 +11,8 @@ cc_library(
         "esd_can_client.h",
     ],
     deps = [
-        "//modules/drivers/canbus/can_client",
+        "//modules/drivers/canbus:sensor_gflags",
+        "//modules/drivers/canbus/can_client",     
         "//third_party/can_card_library/esd_can",
     ],
 )

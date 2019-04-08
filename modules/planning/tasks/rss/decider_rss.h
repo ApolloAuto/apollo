@@ -24,9 +24,15 @@
 #include <limits>
 #include <string>
 
+#include "ad_rss/core/RssResponseResolving.hpp"
+#include "ad_rss/core/RssResponseTransformation.hpp"
+#include "ad_rss/core/RssSituationChecking.hpp"
+#include "ad_rss/core/RssSituationExtraction.hpp"
+#include "ad_rss/situation/SituationVector.hpp"
+#include "ad_rss/state/ResponseState.hpp"
+#include "ad_rss/state/ResponseStateVector.hpp"
 #include "modules/planning/tasks/task.h"
-#include "rss/core/RssCheck.hpp"
-#include "rss/test_support/TestSupport.hpp"
+#include "situation/RSSFormulas.hpp"
 
 namespace apollo {
 namespace planning {
@@ -41,6 +47,12 @@ class RssDecider : public Task {
  private:
   apollo::common::Status Process(Frame *frame,
                                  ReferenceLineInfo *reference_line_info);
+
+  void rss_config_default_dynamics(::ad_rss::world::Dynamics *dynamics);
+  void rss_create_ego_object(::ad_rss::world::Object *ego, double vel_lon,
+                             double vel_lat);
+  void rss_create_other_object(::ad_rss::world::Object *other, double vel_lon,
+                               double vel_lat);
 };
 
 }  // namespace planning

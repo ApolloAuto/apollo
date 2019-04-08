@@ -25,16 +25,16 @@ TEST(ObjectTest, object_construct_test) {
   Object object;
 
   EXPECT_EQ(object.id, -1);
-  EXPECT_TRUE((object.direction - Eigen::Vector3f(1, 0, 0)).norm() < 1.0e-6);
-  EXPECT_TRUE(fabs(object.theta) < 1.0e-6);
-  EXPECT_TRUE(fabs(object.theta_variance) < 1.0e-6);
+  EXPECT_LT((object.direction - Eigen::Vector3f(1, 0, 0)).norm(), 1.0e-6);
+  EXPECT_LT(fabs(object.theta), 1.0e-6);
+  EXPECT_LT(fabs(object.theta_variance), 1.0e-6);
   EXPECT_EQ(object.type, ObjectType::UNKNOWN);
   EXPECT_EQ(object.type_probs.size(),
             static_cast<int>(ObjectType::MAX_OBJECT_TYPE));
   EXPECT_EQ(object.track_id, -1);
-  EXPECT_TRUE(fabs(object.tracking_time) < 1.0e-6);
-  EXPECT_TRUE(fabs(object.latest_tracked_time) < 1.0e-6);
-  EXPECT_TRUE(fabs(object.confidence - 1.0f) < 1.0e-6);
+  EXPECT_LT(fabs(object.tracking_time), 1.0e-6);
+  EXPECT_LT(fabs(object.latest_tracked_time), 1.0e-6);
+  EXPECT_LT(fabs(object.confidence - 1.0f), 1.0e-6);
 
   std::string str_object = object.ToString();
 
@@ -81,7 +81,7 @@ TEST(ObjectTest, object_reset_test) {
 
   object.Reset();
   std::string reset_obj_str = object.ToString();
-  EXPECT_TRUE(str_obj == reset_obj_str);
+  EXPECT_EQ(str_obj, reset_obj_str);
 }
 
 }  //  namespace base

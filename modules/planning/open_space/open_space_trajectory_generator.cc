@@ -75,8 +75,8 @@ apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
   // Generate Stop trajectory if init point close to destination
   if (IsInitPointNearDestination(stitching_trajectory.back(), end_pose,
                                  rotate_angle, translate_origin)) {
-    AINFO << "Planning init point is close to destination, skip new "
-             "trajectory generation.";
+    ADEBUG << "Planning init point is close to destination, skip new "
+              "trajectory generation.";
 
     return Status(ErrorCode::OK,
                   "Planning init point is close to destination, skip new "
@@ -417,7 +417,7 @@ bool OpenSpaceTrajectoryGenerator::IsInitPointNearDestination(
 
   if (distance_to_init_point <
       planner_open_space_config_.is_near_destination_threshold()) {
-    AINFO << "init_point reach end_pose";
+    ADEBUG << "init_point reach end_pose";
     return true;
   }
 

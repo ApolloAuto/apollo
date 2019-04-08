@@ -33,8 +33,6 @@ using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 
-constexpr double kMathEpsilon = 1e-8;
-
 OpenSpaceRoiDecider::OpenSpaceRoiDecider(const TaskConfig &config)
     : Decider(config) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
@@ -85,6 +83,11 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
 
   if (config_.open_space_roi_decider_config().enable_perception_obstacles()) {
     size_t perception_obstacles_num = obstacles_by_frame_->Items().size();
+    for (const auto &ob : obstacles_by_frame_->Items()) {
+      if (ob->IsVirtual()) {
+        --perception_obstacles_num;
+      }
+    }
 
     frame_->mutable_open_space_info()->set_obstacles_num(
         perception_obstacles_num + parking_boundaries_num);
@@ -109,13 +112,20 @@ bool OpenSpaceRoiDecider::VPresentationObstacle() {
     const auto &origin_point = frame_->open_space_info().origin_point();
     const auto &origin_heading = frame_->open_space_info().origin_heading();
     for (const auto &obstacle : obstacles_by_frame_->Items()) {
+      if (obstacle->IsVirtual()) {
+        continue;
+      }
+
       Box2d original_box = obstacle->PerceptionBoundingBox();
       original_box.Shift(-1.0 * origin_point);
-      original_box.RotateFromCenter(-1.0 * origin_heading);
+      // TODO(Runxin): rotate from origin instead
+      // original_box.RotateFromCenter(-1.0 * origin_heading);
       std::vector<Vec2d> vertices_ccw = original_box.GetAllCorners();
       std::vector<Vec2d> vertices_cw;
       while (!vertices_ccw.empty()) {
-        vertices_cw.emplace_back(vertices_ccw.back());
+        auto current_corner_pt = vertices_ccw.back();
+        current_corner_pt.SelfRotate(-1.0 * origin_heading);
+        vertices_cw.emplace_back(current_corner_pt);
         vertices_ccw.pop_back();
       }
       // As the perception obstacle is a closed convex set, the first vertice is
@@ -338,7 +348,7 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI(Frame *frame) {
   const bool parking_inwards =
       config_.open_space_roi_decider_config().parking_inwards();
   const double top_to_down_distance = left_top.y() - left_down.y();
-  if (parking_spot_heading_ > kMathEpsilon) {
+  if (parking_spot_heading_ > common::math::kMathEpsilon) {
     if (parking_inwards) {
       end_y =
           left_down.y() - (std::max(3.0 * -top_to_down_distance / 4.0,

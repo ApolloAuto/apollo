@@ -42,8 +42,7 @@ class TrafficRule {
 
  protected:
   int BuildStopDecision(const std::string& stop_wall_id,
-                        const double stop_line_s,
-                        const double stop_distance,
+                        const double stop_line_s, const double stop_distance,
                         const StopReasonCode& stop_reason_code,
                         const std::vector<std::string>& wait_for_obstacles,
                         Frame* const frame,

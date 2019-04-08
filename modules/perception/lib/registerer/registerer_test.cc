@@ -51,7 +51,7 @@ TEST(RegistererTest, Test) {
   EXPECT_FALSE(BaseClassRegisterer::IsValid("NotExists"));
   EXPECT_EQ(BaseClassRegisterer::GetUniqInstanceName(), "DerivedClass1");
   BaseClass* ptr1 = BaseClassRegisterer::GetUniqInstance();
-  EXPECT_FALSE(ptr1 == nullptr);
+  EXPECT_NE(ptr1, nullptr);
   std::vector<std::string> derived_classes;
   EXPECT_TRUE(GetRegisteredClasses("BaseClass", &derived_classes));
   EXPECT_FALSE(GetRegisteredClasses("BaseClass2", &derived_classes));

@@ -46,7 +46,7 @@ bool PolyFit(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
              const int& order,
              Eigen::Matrix<Dtype, max_poly_order + 1, 1>* coeff,
              const bool& is_x_axis = true) {
-  if (coeff == NULL) {
+  if (coeff == nullptr) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
   }
@@ -110,7 +110,7 @@ template <typename Dtype>
 bool RansacFitting(std::vector<Eigen::Matrix<Dtype, 2, 1>>* pos_vec,
                    Eigen::Matrix<Dtype, 4, 1>* coeff, const int max_iters = 100,
                    const int N = 5, Dtype inlier_thres = 0.1) {
-  if (coeff == NULL) {
+  if (coeff == nullptr) {
     AERROR << "The coefficient pointer is NULL.";
     return false;
   }

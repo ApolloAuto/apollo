@@ -15,7 +15,7 @@
   * Localization result defined by Protobuf message `LocalizationEstimate`, which can be found in file `localization/proto/localization.proto`. ( `/apollo/localization/pose`)
 
 ### NDT Localization Setting
-under some circumstance, we need to balance the speed and accuracy of the algorithm. So we expose some parameters of NDT matching process, It includes `online_resolution` for online pointcloud, `ndt_max_iterations` for iterative optimization of NDT matching, `ndt_target_resolution` for target resolution, `ndt_line_search_step_size` for searching step size of iteration and `ndt_transformation_epsilon` for convergence condition. 
+under some circumstance, we need to balance the speed and accuracy of the algorithm. So we expose some parameters of NDT matching process, It includes `online_resolution` for online pointcloud, `ndt_max_iterations` for iterative optimization of NDT matching, `ndt_target_resolution` for target resolution, `ndt_line_search_step_size` for searching step size of iteration and `ndt_transformation_epsilon` for convergence condition.
 
 ## Generate NDT Localization Map
   NDT Localization map is used for NDT-based localization, which is a voxel-grid representation of the environment. Each cell stores the centroid and relative covariance of the points in the cell. The map is organized as a group of map nodes. For more information, please refer to `apollo/modules/localization/msf/local_map/ndt_map`.

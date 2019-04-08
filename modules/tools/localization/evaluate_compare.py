@@ -26,7 +26,7 @@ def get_stat2_from_data(data):
        than 30cm, 20cm and 10cm
 
     Arguments:
-        data: error array 
+        data: error array
     Returns:
         stat: array of max number of continuous frames
     """
@@ -66,7 +66,7 @@ def get_angle_stat2_from_data(data):
        than 1.0d, 0.6d and 0.3d
 
     Arguments:
-        data: error array 
+        data: error array
     Returns:
         stat: array of max number of continuous frames
     """

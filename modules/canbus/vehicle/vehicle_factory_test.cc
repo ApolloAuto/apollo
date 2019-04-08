@@ -38,16 +38,16 @@ TEST_F(VehicleFactoryTest, CreateVehicle) {
   VehicleParameter parameter;
 
   parameter.set_brand(VehicleParameter::GEM);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 
   parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 
   parameter.set_brand(VehicleParameter::GE3);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 
   parameter.set_brand(VehicleParameter::WEY);
-  EXPECT_TRUE(factory_.CreateVehicle(parameter) != nullptr);
+  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 }
 
 }  // namespace canbus

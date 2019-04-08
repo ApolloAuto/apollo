@@ -71,12 +71,12 @@ class RoadGraph {
    * @param The vector of lane_segments visited (DFS).
    * @param The LaneGraph that we need to write in.
    */
-  void ComputeLaneSequence(
-      const double accumulated_s, const double start_s,
-      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
-      const int graph_search_horizon, const bool consider_divide,
-      std::vector<LaneSegment>* const lane_segments,
-      LaneGraph* const lane_graph_ptr) const;
+  void ComputeLaneSequence(const double accumulated_s, const double start_s,
+                           std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+                           const int graph_search_horizon,
+                           const bool consider_divide,
+                           std::vector<LaneSegment>* const lane_segments,
+                           LaneGraph* const lane_graph_ptr) const;
 
   /**
    * @brief Get the pointer to the lane with the smallest average curvature
