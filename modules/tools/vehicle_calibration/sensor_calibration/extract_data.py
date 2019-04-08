@@ -94,7 +94,7 @@ def process_dir(path, operation):
     """Create or remove directory."""
     try:
         if operation == 'create':
-            print("create folder %s" % path)
+            print('create folder: %s' % path)
             os.makedirs(path)
         elif operation == 'remove':
             os.remove(path)
@@ -124,16 +124,16 @@ def extract_camera_data(dest_dir, msg):
     # if step * 3 is equal to width.
     if image.encoding == 'rgb8' or image.encoding == 'bgr8':
         if image.step != image.width * 3:
-            print('Image.step %d does not equal to Image.width %d * 3 for color image.' %
-                  (image.step, image.width))
+            print('Image.step %d does not equal to Image.width %d * 3 for color image.'
+                  % (image.step, image.width))
             return False
     elif image.encoding == 'gray' or image.encoding == 'y':
         if image.step != image.width:
-            print('Image.step %d does not equal Image.width %d or gray image.' %
-                  (image.step, image.width))
+            print('Image.step %d does not equal to Image.width %d or gray image.'
+                  % (image.step, image.width))
             return False
     else:
-        print('Unsupported image encoding type %s.' % image.encoding)
+        print('Unsupported image encoding type: %s.' % image.encoding)
         return False
 
     channel_num = image.step / image.width
@@ -201,13 +201,13 @@ def extract_pcd_data(dest_dir, msg):
     # TODO(gchen-Apollo): add saint check
     return True
 
-def extract_gps_data(dest_dir, msg, out_msg_list):
+def extract_gps_data(dest_dir, msg, out_msgs):
     """
     Save gps information to bin file, to be fed into following tools
     """
-    if not isinstance(out_msg_list, list):
+    if not isinstance(out_msgs, list):
         raise ValueError("Gps/Odometry msg should be saved as a list, not %s"
-                         % type(out_msg_list))
+                         % type(out_msgs))
 
     gps = GPS_OBJ
     gps.ParseFromString(msg.message)
@@ -223,12 +223,12 @@ def extract_gps_data(dest_dir, msg, out_msg_list):
     y = gps.localization.position.y
     z = gps.localization.position.z
     # save 9 values as a tuple, for eaisier struct packing during storage
-    out_msg_list.append((ts, point_type, qw, qx, qy, qz, x, y, z))
+    out_msgs.append((ts, point_type, qw, qx, qy, qz, x, y, z))
 
     print(gps)
 
     # TODO(gchen-Apollo): build class, to encapsulate inner data structure
-    return out_msg_list
+    return out_msgs
 
 def get_sensor_channel_list(record_file):
     """Get the channel list of sensors for calibration."""
@@ -236,7 +236,8 @@ def get_sensor_channel_list(record_file):
     return set(channel_name for channel_name in record_reader.get_channellist()
                if 'sensor' in channel_name)
 
-def extract_channel_data(output_path, msg, channel_msgs_dict={}):
+
+def extract_channel_data(output_path, msg, channel_msgs=None):
     """Process channel messages."""
     channel_desc = msg.data_type
     if channel_desc == 'apollo.drivers.Image':
@@ -244,20 +245,20 @@ def extract_channel_data(output_path, msg, channel_msgs_dict={}):
     elif channel_desc == 'apollo.drivers.PointCloud':
         extract_pcd_data(output_path, msg)
     elif channel_desc == 'apollo.localization.Gps':
-        channel_msgs_dict[msg.topic] = extract_gps_data(output_path, msg,
-                                        channel_msgs_dict[msg.topic])
+        channel_msgs[msg.topic] = extract_gps_data(output_path, msg,
+                                                   channel_msgs[msg.topic])
     else:
         # TODO(LiuJie/gchen-Apollo): Handle binary data extraction.
         print('Not implemented!')
 
-    return True, channel_msgs_dict
+    return True, channel_msgs
 
 def validate_channel_list(channels, dictionary):
     ret = True
     for channel in channels:
         if channel not in dictionary:
-            print('ERROR: channel %s does not exist in record \
-                   sensor channels' % channel)
+            print('ERROR: channel %s does not exist in record sensor channels'
+                  % channel)
             ret = False
 
     return ret
@@ -265,49 +266,49 @@ def validate_channel_list(channels, dictionary):
 def in_range(v, s, e):
     return True if v >= s and v <= e else False
 
-def extract_data(record_file_list, output_path, channel_list,
-                 start_timestamp, end_timestamp, extraction_rate_dict):
+def extract_data(record_files, output_path, channels,
+                 start_timestamp, end_timestamp, extraction_rates):
     """
     Extract the desired channel messages if channel_list is specified.
     Otherwise extract all sensor calibration messages according to
     extraction rate, 10% by default.
     """
     # all records have identical sensor channels.
-    sensor_channels = get_sensor_channel_list(record_file_list[0])
+    sensor_channels = get_sensor_channel_list(record_files[0])
 
-    if len(channel_list) > 0 and \
-       not validate_channel_list(channel_list, sensor_channels):
-        print('Input channel list is invalid.')
+    if (len(channels) > 0 and not validate_channel_list(channels,
+                                                        sensor_channels)):
+        print('The input channel list is invalid.')
         return False
 
     # Extract all the sensor channels if channel_list is empty(no input arguments).
     print(sensor_channels)
-    if len(channel_list) == 0:
-        channel_list = sensor_channels
+    if len(channels) == 0:
+        channels = sensor_channels
 
     # Declare logging variables
-    process_channel_success_num = len(channel_list)
+    process_channel_success_num = len(channels)
     process_channel_failure_num = 0
     process_msg_failure_num = 0
 
-    channel_success_dict = {}
+    channel_success = {}
     channel_occur_time = {}
     channel_output_path = {}
-    channel_msgs_dict = {}
-    for channel in channel_list:
-        channel_success_dict[channel] = True
+    channel_messages = {}
+    for channel in channels:
+        channel_success[channel] = True
         channel_occur_time[channel] = -1
         topic_name = channel.replace('/', '_')
         channel_output_path[channel] = os.path.join(output_path, topic_name)
         process_dir(channel_output_path[channel], operation='create')
 
         if channel in SMALL_TOPICS:
-            channel_msgs_dict[channel] = list()
+            channel_messages[channel] = list()
 
-    for record_file in record_file_list:
+    for record_file in record_files:
         record_reader = RecordReader(record_file)
         for msg in record_reader.read_messages():
-            if msg.topic in channel_list:
+            if msg.topic in channels:
                 # Only care about messages in certain time intervals
                 msg_timestamp_sec = msg.timestamp / 1e9
                 if not in_range(msg_timestamp_sec, start_timestamp, end_timestamp):
@@ -315,47 +316,46 @@ def extract_data(record_file_list, output_path, channel_list,
 
                 channel_occur_time[msg.topic] += 1
                 # Extract the topic according to extraction_rate
-                if channel_occur_time[msg.topic] % extraction_rate_dict[msg.topic] != 0:
+                if channel_occur_time[msg.topic] % extraction_rates[msg.topic] != 0:
                     continue
 
-                ret, channel_msgs_dict =\
-                    extract_channel_data(channel_output_path[msg.topic],
-                                         msg, channel_msgs_dict)
+                ret, _ = extract_channel_data(
+                    channel_output_path[msg.topic], msg, channel_messages)
 
                 # Calculate parsing statistics
                 if not ret:
                     process_msg_failure_num += 1
-                    if channel_success_dict[msg.topic]:
-                        channel_success_dict[msg.topic] = False
+                    if channel_success[msg.topic]:
+                        channel_success[msg.topic] = False
                         process_channel_failure_num += 1
                         process_channel_success_num -= 1
-                        print('Failed to extract data from channel: %s in record %s '\
-                             % (msg.topic, record_file))
+                        print('Failed to extract data from channel: %s in record %s'
+                              % (msg.topic, record_file))
 
     # traverse the dict, if any channel topic stored as a list
     # then save the list as a summary file, mostly binary file
-    for channel, msg_list in channel_msgs_dict.items():
-        save_msg_list_to_file(channel_output_path[channel], channel, msg_list)
+    for channel, messages in channel_messages.items():
+        save_msg_list_to_file(channel_output_path[channel], channel, messages)
 
     # Logging statics about channel extraction
-    print('Extracted sensor channel number [%d] in record file: %s' %
-          (len(channel_list), record_file))
-    print('Successfully processed [%d] channels, and [%d] was failed.' %
-          (process_channel_success_num, process_channel_failure_num))
+    print('Extracted sensor channel number [%d] from record files: %s'
+          % (len(channels), ' '.join(record_files)))
+    print('Successfully processed [%d] channels, and [%d] was failed.'
+          % (process_channel_success_num, process_channel_failure_num))
     if process_msg_failure_num > 0:
-        print('Channel extraction failure number is: %d' % process_msg_failure_num)
+        print('Channel extraction failure number is [%d].' % process_msg_failure_num)
 
     return True
 
-def save_msg_list_to_file(out_path, channel, msg_list):
+def save_msg_list_to_file(out_path, channel, messages):
     if 'odometry' in channel:
         # generate file objects for small topics I/O
         file_path = os.path.join(out_path, 'messages.bin')
         odometry_file_obj = OdometryFileObject(file_path)
-        print(len(msg_list))
-        odometry_file_obj.save_to_file(msg_list)
+        print(len(messages))
+        odometry_file_obj.save_to_file(messages)
     else:
-        raise ValueError("saving func for {} not implemented".format(channel))
+        raise ValueError("saving function for {} not implemented".format(channel))
 
 def generate_compressed_file(input_path, input_name,
                              output_path, compressed_file='sensor_data'):
@@ -370,8 +370,8 @@ def generate_compressed_file(input_path, input_name,
                         base_dir=input_name)
     os.chdir(cwd_path)
 
-def generate_extraction_rate_dict(channel_list, large_topic_extraction_rate,
-                                    small_topic_extraction_rate=1):
+def generate_extraction_rate_dict(channels, large_topic_extraction_rate,
+                                  small_topic_extraction_rate=1):
     """
     Default extraction rate for small topics is 1, which means no sampling
     """
@@ -383,14 +383,14 @@ def generate_extraction_rate_dict(channel_list, large_topic_extraction_rate,
     large_topic_extraction_rate = np.floor(large_topic_extraction_rate)
     small_topic_extraction_rate = np.floor(small_topic_extraction_rate)
 
-    rate_dict = {}
-    for channel in channel_list:
+    rates = {}
+    for channel in channels:
         if channel in SMALL_TOPICS:
-            rate_dict[channel] = small_topic_extraction_rate
+            rates[channel] = small_topic_extraction_rate
         else:
-            rate_dict[channel] = large_topic_extraction_rate
+            rates[channel] = large_topic_extraction_rate
 
-    return rate_dict
+    return rates
 
 def validate_record(record_file):
     """Validate the record file."""
@@ -430,51 +430,49 @@ def validate_record(record_file):
 
     return True
 
-def validate_record_files(file_list, kword='.record.'):
+def validate_record_files(record_files, kword='.record.'):
 
     # load file list from directory if needs
     file_abs_paths = []
-    if not isinstance(file_list, list):
-        raise ValueError("files must be in a list")
+    if not isinstance(record_files, list):
+        raise ValueError("Record files must be in a list")
 
-    if len(file_list) == 1 and os.path.isdir(file_list[0]) :
-        print('load cyber records from: %s' % file_list[0])
-        for f in os.listdir(file_list[0]):
+    if len(record_files) == 1 and os.path.isdir(record_files[0]):
+        print('Load cyber records from: %s' % record_files[0])
+        for f in os.listdir(record_files[0]):
             if kword in f:
-                file_abs_path = os.path.join(file_list[0], f)
+                file_abs_path = os.path.join(record_files[0], f)
                 if validate_record(file_abs_path):
                     file_abs_paths.append(file_abs_path)
                 else:
-                    print("record file not valid: %s" % file_abs_path)
+                    print('Invalid record file: %s' % file_abs_path)
     else:
-        for f in file_list:
+        for f in record_files:
             if not os.path.isfile(f):
-                raise ValueError("input cyber record not exists or not a file: %s" % f)
+                raise ValueError("Input cyber record does not exist or not a regular file: %s" % f)
 
             if validate_record(f):
                 file_abs_paths.append(f)
             else:
-                print("record file not valid: %s" % f)
+                print('Invalid record file: %s' % f)
 
     if len(file_abs_paths) < 1:
-        raise ValueError("the input files are all invalid")
+        raise ValueError("All the input record files are invalid")
 
-    # validate all record file have the same sensor topics
-    default_channel_list = []
-    for i, f in enumerate(file_abs_paths):
-        channel_list = get_sensor_channel_list(f)
-        if i == 0:
-            default_channel_list = channel_list
-        else:
-           if channel_list != default_channel_list:
-                print("channel list in %s is:" % file_abs_paths[0])
-                print(default_channel_list)
-                print("but channel list in %s is: " % file_abs_paths[i])
-                print(channel_list)
-                raise ValueError("the record files shoud contain the same channel list")
-
+    # Validate all record files have the same sensor topics
+    first_record_file = file_abs_paths[0]
+    default_sensor_channels = get_sensor_channle_list(first_record_file)
+    for i, f in enumerate(file_abs_paths[1:]):
+        sensor_channels = get_sensor_channel_list(f)
+        if sensor_channels != default_sensor_channels:
+            print('Default sensor channel list in %s is: ' % first_record_file)
+            print(default_sensor_channels)
+            print('but sensor channel list in %s is: ' % file_abs_paths[i])
+            print(sensor_channels)
+            raise ValueError("The record files should contain the same channel list")
 
     return file_abs_paths
+
 
 def main():
     """
@@ -490,7 +488,8 @@ def main():
     parser = argparse.ArgumentParser(
         description='A tool to extract data information for sensor calibration.')
     parser.add_argument("-i", "--record_path", action="append", default=[], required=True,
-                        dest='record_list', help="Specify the record file to extract data information.")
+                        dest='record_list',
+                        help="Specify the record file to extract data information.")
     parser.add_argument("-o", "--output_path", action="store", type=str,
                         default="./extracted_data",
                         help="The output directory to restore message.")
@@ -525,9 +524,10 @@ def main():
         sys.exit(1)
 
     channel_list = set(channel_name for channel_name in args.channel_list)
-    extraction_rate_dict = generate_extraction_rate_dict(channel_list,
-                                large_topic_extraction_rate=args.extraction_rate,
-                                small_topic_extraction_rate=1)
+    extraction_rate_dict = generate_extraction_rate_dict(
+        channel_list,
+        large_topic_extraction_rate=args.extraction_rate,
+        small_topic_extraction_rate=1)
 
     ret = extract_data(valid_record_list, output_abs_path, channel_list,
                        args.start_timestamp, args.end_timestamp, extraction_rate_dict)
