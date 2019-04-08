@@ -461,7 +461,7 @@ def validate_record_files(record_files, kword='.record.'):
 
     # Validate all record files have the same sensor topics
     first_record_file = file_abs_paths[0]
-    default_sensor_channels = get_sensor_channle_list(first_record_file)
+    default_sensor_channels = get_sensor_channel_list(first_record_file)
     for i, f in enumerate(file_abs_paths[1:]):
         sensor_channels = get_sensor_channel_list(f)
         if sensor_channels != default_sensor_channels:
