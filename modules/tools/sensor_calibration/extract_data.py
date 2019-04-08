@@ -173,7 +173,7 @@ def make_xyzit_point_cloud(xyz_i_t):
           'height': 1,
           'viewpoint': [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
           'points': len(xyz_i_t),
-          'type': ['F', 'F', 'F', 'U', 'U'],
+          'type': ['F', 'F', 'F', 'U', 'F'],
           'size': [4, 4, 4, 4, 8],
           'data': 'binary_compressed'}
 
