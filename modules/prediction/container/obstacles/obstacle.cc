@@ -152,9 +152,9 @@ bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   if (!SetId(perception_obstacle, &feature, prediction_obstacle_id)) {
     return false;
   }
-  if (!SetType(perception_obstacle, &feature)) {
-    return false;
-  }
+
+  SetType(perception_obstacle, &feature);
+
   SetStatus(perception_obstacle, timestamp, &feature);
 
   // Set obstacle observation for KF tracking
@@ -411,12 +411,11 @@ bool Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
   return true;
 }
 
-bool Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
+void Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
                        Feature* feature) {
   type_ = perception_obstacle.type();
   ADEBUG << "Obstacle [" << id_ << "] has type [" << type_ << "].";
   feature->set_type(type_);
-  return true;
 }
 
 void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
