@@ -14,45 +14,46 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/drivers/gnss/parser/data_parser.h"
+
+#include <proj_api.h>
 #include <cmath>
 #include <memory>
 #include <string>
-#include <proj_api.h>
-#include <Eigen/Geometry>
-#include <boost/array.hpp>
-#include <std_msgs/String.h>
 
-#include "ros/include/ros/ros.h"
-#include "modules/drivers/gnss/util/utils.h"
-#include "modules/drivers/gnss/gnss_gflags.h"
-#include "modules/localization/proto/gps.pb.h"
-#include "modules/localization/proto/imu.pb.h"
-#include "modules/drivers/gnss/proto/imu.pb.h"
-#include "modules/drivers/gnss/proto/ins.pb.h"
-#include "modules/drivers/gnss/proto/gnss.pb.h"
-#include "modules/drivers/gnss/parser/parser.h"
-#include "modules/drivers/gnss/proto/heading.pb.h"
+#include "Eigen/Geometry"
+#include "boost/array.hpp"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/drivers/gnss/parser/data_parser.h"
-#include "modules/drivers/gnss/util/time_conversion.h"
+#include "modules/drivers/gnss/gnss_gflags.h"
 #include "modules/drivers/gnss/parser/newtonm2_parser.h"
+#include "modules/drivers/gnss/parser/parser.h"
+#include "modules/drivers/gnss/proto/gnss.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/drivers/gnss/proto/heading.pb.h"
+#include "modules/drivers/gnss/proto/imu.pb.h"
+#include "modules/drivers/gnss/proto/ins.pb.h"
+#include "modules/drivers/gnss/util/time_conversion.h"
+#include "modules/drivers/gnss/util/utils.h"
+#include "modules/localization/proto/gps.pb.h"
+#include "modules/localization/proto/imu.pb.h"
+#include "ros/include/ros/ros.h"
+#include "std_msgs/String.h"
 
 namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using ::apollo::drivers::gnss::InsStat;
+using ::apollo::common::adapter::AdapterManager;
+using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::GnssBestPose;
 using ::apollo::drivers::gnss::GnssEphemeris;
-using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::Heading;
 using ::apollo::drivers::gnss::Imu;
-using ::apollo::localization::CorrectedImu;
 using ::apollo::drivers::gnss::Ins;
+using ::apollo::drivers::gnss::InsStat;
+using ::apollo::localization::CorrectedImu;
 using ::apollo::localization::Gps;
-using ::apollo::common::adapter::AdapterManager;
 
 namespace {
 
