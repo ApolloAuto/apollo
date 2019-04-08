@@ -131,31 +131,31 @@ TEST(TrackTest, test) {
   EXPECT_EQ(frame_6->GetForegroundObjects().size(), 1);
 
   Track track;
-  EXPECT_TRUE(track.GetFusedObject() != nullptr);
+  EXPECT_NE(track.GetFusedObject(), nullptr);
   EXPECT_EQ(track.GetTrackId(), -1);
 
   track.Initialize(frame_1->GetForegroundObjects()[0], false);
-  EXPECT_TRUE(track.GetLatestLidarObject() != nullptr);
+  EXPECT_NE(track.GetLatestLidarObject(), nullptr);
   EXPECT_EQ(track.GetTrackId(), 1);
-  EXPECT_TRUE(track.GetSensorObject(vlp64_info.name) != nullptr);
+  EXPECT_NE(track.GetSensorObject(vlp64_info.name), nullptr);
 
   track.UpdateWithSensorObject(frame_2->GetForegroundObjects()[0]);
-  EXPECT_TRUE(track.GetLatestRadarObject() != nullptr);
-  EXPECT_TRUE(track.GetSensorObject(radar_info.name) != nullptr);
+  EXPECT_NE(track.GetLatestRadarObject(), nullptr);
+  EXPECT_NE(track.GetSensorObject(radar_info.name), nullptr);
 
   track.UpdateWithSensorObject(frame_3->GetForegroundObjects()[0]);
   EXPECT_EQ(track.GetRadarObjects().size(), 2);
   SensorObjectConstPtr radar_obj = track.GetLatestRadarObject();
-  EXPECT_TRUE(radar_obj != nullptr);
-  EXPECT_TRUE(track.GetSensorObject(radar_rear_info.name) != nullptr);
+  EXPECT_NE(radar_obj, nullptr);
+  EXPECT_NE(track.GetSensorObject(radar_rear_info.name), nullptr);
 
   track.UpdateWithSensorObject(frame_4->GetForegroundObjects()[0]);
   EXPECT_EQ(track.GetCameraObjects().size(), 1);
-  EXPECT_TRUE(track.GetSensorObject(camera_info.name) != nullptr);
+  EXPECT_NE(track.GetSensorObject(camera_info.name), nullptr);
 
   track.UpdateWithSensorObject(frame_5->GetForegroundObjects()[0]);
   EXPECT_EQ(track.GetLidarObjects().size(), 1);
-  EXPECT_TRUE(track.GetSensorObject(vlp64_info.name) != nullptr);
+  EXPECT_NE(track.GetSensorObject(vlp64_info.name), nullptr);
 
   track.UpdateWithSensorObject(frame_6->GetForegroundObjects()[0]);
   EXPECT_EQ(track.GetRadarObjects().size(), 2);
@@ -164,10 +164,11 @@ TEST(TrackTest, test) {
   EXPECT_TRUE(track.IsRadarVisible());
   EXPECT_TRUE(track.IsCameraVisible());
 
-  EXPECT_TRUE(track.GetSensorObject("incorrect_id") == nullptr);
+  EXPECT_EQ(track.GetSensorObject("incorrect_id"), nullptr);
 
-  EXPECT_TRUE(fabs(track.GetTrackingPeriod() - frame_6->GetTimestamp() +
-                   timestamp) < 1e-6);
+  EXPECT_LT(
+      fabs(track.GetTrackingPeriod() - frame_6->GetTimestamp() + timestamp),
+      1e-6);
 
   track.UpdateWithoutSensorObject(vlp64_info.name, timestamp + 0.2);
   EXPECT_FALSE(track.IsVisible(vlp64_info.name));
@@ -200,7 +201,7 @@ TEST(TrackTest, test) {
 
   track.Reset();
   EXPECT_EQ(track.GetTrackId(), 0);
-  EXPECT_TRUE(track.GetFusedObject() != nullptr);
+  EXPECT_NE(track.GetFusedObject(), nullptr);
   EXPECT_TRUE(track.GetLidarObjects().empty());
   EXPECT_TRUE(track.GetRadarObjects().empty());
   EXPECT_TRUE(track.GetCameraObjects().empty());

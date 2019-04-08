@@ -65,7 +65,8 @@ SidePassScenario::SidePassScenario(const ScenarioConfig& config,
 
   // TODO(all): to be removed when SidePass obstacle decision impl is ready
   side_pass_context_.front_blocking_obstacle_id_ =
-      PlanningContext::Planningstatus().side_pass()
+      PlanningContext::Planningstatus()
+          .side_pass()
           .front_blocking_obstacle_id();
 }
 
@@ -290,8 +291,8 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
         // TODO(all): to be removed
         //            when SidePass obstacle decision impl is ready
         PlanningContext::MutablePlanningStatus()
-            ->mutable_side_pass()->set_front_blocking_obstacle_id(
-                obstacle->Id());
+            ->mutable_side_pass()
+            ->set_front_blocking_obstacle_id(obstacle->Id());
       }
     }
   }
@@ -300,7 +301,8 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
   } else {
     // TODO(all): to be removed when SidePass obstacle decision impl is ready
     PlanningContext::MutablePlanningStatus()
-        ->mutable_side_pass()->clear_front_blocking_obstacle_id();
+        ->mutable_side_pass()
+        ->clear_front_blocking_obstacle_id();
     return false;
   }
 }

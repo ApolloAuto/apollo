@@ -56,7 +56,7 @@ TEST_F(LincolnMessageManagerTest, Accel6b) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Accel6b::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Accel6b *>(pd)->ID, Accel6b::ID);
 }
 
@@ -64,7 +64,7 @@ TEST_F(LincolnMessageManagerTest, Brake60) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Brake60::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Brake60 *>(pd)->ID, Brake60::ID);
 }
 
@@ -72,7 +72,7 @@ TEST_F(LincolnMessageManagerTest, Brake61) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Brake61::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Brake61 *>(pd)->ID, Brake61::ID);
 }
 
@@ -80,7 +80,7 @@ TEST_F(LincolnMessageManagerTest, Brakeinfo74) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Brakeinfo74::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Brakeinfo74 *>(pd)->ID, Brakeinfo74::ID);
 }
 
@@ -88,7 +88,7 @@ TEST_F(LincolnMessageManagerTest, Fuellevel72) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Fuellevel72::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Fuellevel72 *>(pd)->ID, Fuellevel72::ID);
 }
 
@@ -96,7 +96,7 @@ TEST_F(LincolnMessageManagerTest, Gear66) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Gear66::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gear66 *>(pd)->ID, Gear66::ID);
 }
 
@@ -104,7 +104,7 @@ TEST_F(LincolnMessageManagerTest, Gear67) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Gear67::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gear67 *>(pd)->ID, Gear67::ID);
 }
 
@@ -112,7 +112,7 @@ TEST_F(LincolnMessageManagerTest, Gps6d) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Gps6d::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gps6d *>(pd)->ID, Gps6d::ID);
 }
 
@@ -120,7 +120,7 @@ TEST_F(LincolnMessageManagerTest, Gps6e) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Gps6e::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gps6e *>(pd)->ID, Gps6e::ID);
 }
 
@@ -128,7 +128,7 @@ TEST_F(LincolnMessageManagerTest, Gps6f) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Gps6f::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gps6f *>(pd)->ID, Gps6f::ID);
 }
 
@@ -136,7 +136,7 @@ TEST_F(LincolnMessageManagerTest, Gyro6c) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Gyro6c::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Gyro6c *>(pd)->ID, Gyro6c::ID);
 }
 
@@ -144,7 +144,7 @@ TEST_F(LincolnMessageManagerTest, Misc69) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Misc69::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Misc69 *>(pd)->ID, Misc69::ID);
 }
 
@@ -152,7 +152,7 @@ TEST_F(LincolnMessageManagerTest, Steering64) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Steering64::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Steering64 *>(pd)->ID, Steering64::ID);
 }
 
@@ -160,7 +160,7 @@ TEST_F(LincolnMessageManagerTest, Steering65) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Steering65::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Steering65 *>(pd)->ID, Steering65::ID);
 }
 
@@ -168,7 +168,7 @@ TEST_F(LincolnMessageManagerTest, Throttle62) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Throttle62::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Throttle62 *>(pd)->ID, Throttle62::ID);
 }
 
@@ -176,7 +176,7 @@ TEST_F(LincolnMessageManagerTest, Throttle63) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Throttle63::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Throttle63 *>(pd)->ID, Throttle63::ID);
 }
 
@@ -184,7 +184,7 @@ TEST_F(LincolnMessageManagerTest, Throttleinfo75) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Throttleinfo75::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Throttleinfo75 *>(pd)->ID, Throttleinfo75::ID);
 }
 
@@ -192,7 +192,7 @@ TEST_F(LincolnMessageManagerTest, Tirepressure71) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Tirepressure71::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Tirepressure71 *>(pd)->ID, Tirepressure71::ID);
 }
 
@@ -200,7 +200,7 @@ TEST_F(LincolnMessageManagerTest, Turnsignal68) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Turnsignal68::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Turnsignal68 *>(pd)->ID, Turnsignal68::ID);
 }
 
@@ -208,7 +208,7 @@ TEST_F(LincolnMessageManagerTest, Version7f) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Version7f::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Version7f *>(pd)->ID, Version7f::ID);
 }
 
@@ -216,7 +216,7 @@ TEST_F(LincolnMessageManagerTest, Wheelspeed6a) {
   LincolnMessageManager manager;
   ProtocolData<ChassisDetail> *pd =
       manager.GetMutableProtocolDataById(Wheelspeed6a::ID);
-  EXPECT_TRUE(pd != nullptr);
+  EXPECT_NE(pd, nullptr);
   EXPECT_EQ(static_cast<Wheelspeed6a *>(pd)->ID, Wheelspeed6a::ID);
 }
 

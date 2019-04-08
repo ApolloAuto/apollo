@@ -251,8 +251,12 @@ bool PlanningTestBase::RunPlanning(const std::string& test_case_name,
         !common::util::IsProtoEqual(golden_result, adc_trajectory_)) {
       char tmp_fname[100] = "/tmp/XXXXXX";
       int fd = mkstemp(tmp_fname);
+      if (fd < 0) {
+        AERROR << "Failed to create temporary file: " << tmp_fname;
+        return false;
+      }
       if (!cyber::common::SetProtoToASCIIFile(adc_trajectory_, fd)) {
-        AERROR << "Failed to write to file " << tmp_fname;
+        AERROR << "Failed to write to file: " << tmp_fname;
       }
       AERROR << "found error\ndiff -y " << tmp_fname << " " << full_golden_path;
       AERROR << "to override error\nmv " << tmp_fname << " "

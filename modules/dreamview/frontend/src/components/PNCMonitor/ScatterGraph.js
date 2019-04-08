@@ -3,6 +3,19 @@ import ReactDOM from "react-dom";
 import Chart from "chart.js";
 import _ from "lodash";
 
+import STORE from "store";
+
+const defaultPolygonProperties = {
+    color: 'rgba(255, 0, 0, 0.8)', // red
+    borderWidth: 2,
+    pointRadius: 0,
+    fill: false,
+    showLine: true,
+    showText: true,
+    cubicInterpolationMode: 'monotone',
+    lineTension: 0,
+};
+
 Chart.plugins.register({
     afterDatasetsDraw: function(chart, easing) {
         const fontSize = 15;
@@ -44,7 +57,8 @@ Chart.plugins.register({
                 chart.ctx.font = Chart.helpers.fontString(20, fontStyle, fontFamily);
                 chart.ctx.translate(position.x, position.y);
                 chart.ctx.rotate(-rotationInPixels); // ChartJS's rotation is clockwise
-                chart.ctx.fillText("►", 0, 0);
+                chart.ctx.fillStyle = dataset.borderColor;
+                chart.ctx.fillText("➡", 0, 0);
 
                 chart.ctx.restore();
             }
@@ -54,21 +68,67 @@ Chart.plugins.register({
 
 Chart.defaults.global.defaultFontColor = '#FFFFFF';
 
-const defaultPolygonProperties = {
-    color: 'rgba(255, 0, 0, 0.8)', // red
-    borderWidth: 2,
-    pointRadius: 0,
-    fill: false,
-    showLine: true,
-    showText: true,
-    cubicInterpolationMode: 'monotone',
-    lineTension: 0,
-};
-
 function updateTickWindow(scale, windowSize, midValue) {
     const mid = midValue || Math.floor((scale.max + scale.min) / 2);
     scale.max = mid + windowSize / 2;
     scale.min = mid - windowSize / 2;
+}
+
+function syncXYWindowSize(scale) {
+    function isValidValue(value) {
+        return value !== null && value !== undefined && !isNaN(value) && isFinite(value);
+    }
+    function IDMatches(meta) {
+        return scale.isHorizontal() ? meta.xAxisID === scale.id : meta.yAxisID === scale.id;
+    }
+
+    // calculate the range for both x and y
+    const min = {
+        x: null,
+        y: null,
+    };
+    const max = {
+        x: null,
+        y: null,
+    };
+    const chart = scale.chart;
+    const datasets = chart.data.datasets;
+    Chart.helpers.each(datasets, function(dataset, datasetIndex) {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        if (chart.isDatasetVisible(datasetIndex) && IDMatches(meta)) {
+            Chart.helpers.each(dataset.data, function(rawValue, index) {
+                if (!isValidValue(rawValue.x) ||
+                    !isValidValue(rawValue.y) ||
+                    meta.data[index].hidden) {
+                    return;
+                }
+
+                if (min.x === null || rawValue.x < min.x) {
+                    min.x = rawValue.x;
+                }
+                if (max.x === null || rawValue.x > max.x) {
+                    max.x = rawValue.x;
+                }
+                if (min.y === null || rawValue.y < min.y) {
+                    min.y = rawValue.y;
+                }
+                if (max.y === null || rawValue.y > max.y) {
+                    max.y = rawValue.y;
+                }
+            });
+        }
+    });
+
+    // set min/max based on the larger range
+    if (isValidValue(min.x) && isValidValue(min.y) &&
+        isValidValue(max.x) && isValidValue(max.y)) {
+        const max_diff = Math.max(max.x - min.x, max.y - min.y);
+        const mid = scale.isHorizontal()
+                        ? Math.floor((max.x + min.x) / 2)
+                        : Math.floor((max.y + min.y) / 2);
+        scale.max = mid + max_diff / 2;
+        scale.min = mid - max_diff / 2;
+    }
 }
 
 export default class ScatterGraph extends React.Component {
@@ -81,12 +141,20 @@ export default class ScatterGraph extends React.Component {
             },
             legend: {
                 display: options.legend.display,
+                labels: {
+                    filter: (legendItem, data) => {
+                        // skip label that starts with 'skip_',
+                        // such as the one for car's bounding box
+                        return !legendItem.text.startsWith('skip_');
+                    }
+                }
             },
             tooltips: {
                 enable: true,
                 mode: "nearest",
                 intersect: false,
             },
+            aspectRatio: options.aspectRatio,
         };
 
         if (options.axes) {
@@ -112,15 +180,17 @@ export default class ScatterGraph extends React.Component {
                     gridLines: {
                         color: 'rgba(153, 153, 153, 0.5)',
                         zeroLineColor: 'rgba(153, 153, 153, 0.7)',
-                    }
+                    },
                 };
                 if (!chartOptions.scales[name]) {
                     chartOptions.scales[name] = [];
                 }
                 if (setting.windowSize) {
-                    axisOptions.afterDataLimits = (chart) => {
-                        updateTickWindow(chart, setting.windowSize, setting.midValue);
+                    axisOptions.afterDataLimits = (scale) => {
+                        updateTickWindow(scale, setting.windowSize, setting.midValue);
                     };
+                } else if (options.syncXYWindowSize) {
+                    axisOptions.afterDataLimits = syncXYWindowSize;
                 }
                 chartOptions.scales[name].push(axisOptions);
             }
@@ -157,25 +227,52 @@ export default class ScatterGraph extends React.Component {
         }
     }
 
+    updateCar(name, point, properties) {
+        // draw heading arrow
+        {
+            const arrowName = name + '_arrow';
+            if (this.name2idx[arrowName] === undefined) {
+                this.name2idx[arrowName] = this.chart.data.datasets.length;
+            }
+            const idx = this.name2idx[arrowName];
+            const arrowProperties = properties;
+            arrowProperties.specialMarker = 'car';
+            arrowProperties.borderWidth = 0;
+            arrowProperties.pointRadius = 0;
+            this.updateData(idx, arrowName, arrowProperties, [point]);
+        }
+
+        // draw ego-vehicle bounding box
+        {
+            const polygonName = 'skip_legend_' + name + '_car_bounding_box';
+            if (this.name2idx[polygonName] === undefined) {
+                this.name2idx[polygonName] = this.chart.data.datasets.length;
+            }
+            const idx2 = this.name2idx[polygonName];
+            const polygon = STORE.hmi.calculateCarPolygonPoints(point.x, point.y, point.heading);
+            const polygonProperties = {
+                borderWidth: 1,
+                pointRadius: 0,
+                color: properties.color,
+                showLine: true,
+                fill: false,
+                lineTension: 0,
+            };
+            this.updateData(idx2, polygonName, polygonProperties, polygon);
+        }
+    }
+
     updateChart(props) {
         if (!props.data || !props.properties) {
             return;
         }
-
         const datasets = props.data;
 
         // Draw cars
         for (const name in props.properties.cars) {
-            if (this.name2idx[name] === undefined) {
-                this.name2idx[name] = this.chart.data.datasets.length;
-            }
-            const idx = this.name2idx[name];
             const point = _.get(datasets, `cars[${name}]`, {});
             const properties = _.get(props, `properties.cars[${name}]`, {});
-            properties.specialMarker = 'car';
-            properties.borderWidth = 0;
-            properties.pointRadius = 0;
-            this.updateData(idx, name, properties, [point]);
+            this.updateCar(name, point, properties);
         }
 
         // Draw lines

@@ -28,7 +28,7 @@ SCENARIO=$3
 set -e
 
 source /apollo/scripts/apollo_base.sh
-source /apollo/cyber/setup.bash 
+source /apollo/cyber/setup.bash
 
 if [ ${SCENARIO} == "junction" ]; then
     python /apollo/modules/tools/prediction/data_pipelines/data_preprocessing/combine_features_and_labels_for_junction.py ${SRC_DIR} ${LBL_DIR}

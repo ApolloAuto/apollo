@@ -47,25 +47,25 @@ class Ge3MessageManagerTest : public ::testing::Test {
 };
 
 TEST_F(Ge3MessageManagerTest, GetSendProtocols) {
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Pcbcm201::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Pcbcs202::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Pcepb203::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Pceps204::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Pcvcu205::ID) != nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Pcbcm201::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Pcbcs202::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Pcepb203::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Pceps204::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Pcvcu205::ID), nullptr);
 }
 
 TEST_F(Ge3MessageManagerTest, GetRecvProtocols) {
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scu1301::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scu2302::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scu3303::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scubcm304::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scubcs1306::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scubcs2307::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scubcs3308::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scuepb310::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scueps311::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scuvcu1312::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Scuvcu2313::ID) != nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scu1301::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scu2302::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scu3303::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scubcm304::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scubcs1306::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scubcs2307::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scubcs3308::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scuepb310::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scueps311::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scuvcu1312::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Scuvcu2313::ID), nullptr);
 }
 
 }  // namespace ge3

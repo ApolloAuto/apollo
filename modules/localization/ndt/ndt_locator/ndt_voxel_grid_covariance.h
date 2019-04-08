@@ -161,7 +161,7 @@ class VoxelGridCovariance {
   inline LeafConstPtr GetLeaf(int index) {
     typename std::map<size_t, Leaf>::iterator leaf_iter = leaves_.find(index);
     if (leaf_iter == leaves_.end()) {
-      return NULL;
+      return nullptr;
     }
     LeafConstPtr ret(&(leaf_iter->second));
     return ret;
@@ -189,7 +189,7 @@ class VoxelGridCovariance {
     // Find leaf associated with index
     typename std::map<size_t, Leaf>::iterator leaf_iter = leaves_.find(idx);
     if (leaf_iter == leaves_.end()) {
-      return NULL;
+      return nullptr;
     }
     // If such a leaf exists return the pointer to the leaf structure
     LeafConstPtr ret(&(leaf_iter->second));
@@ -216,7 +216,7 @@ class VoxelGridCovariance {
     // Find leaf associated with index
     typename std::map<size_t, Leaf>::iterator leaf_iter = leaves_.find(idx);
     if (leaf_iter == leaves_.end()) {
-      return NULL;
+      return nullptr;
     }
     // If such a leaf exists return the pointer to the leaf structure
     LeafConstPtr ret(&(leaf_iter->second));

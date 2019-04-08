@@ -38,7 +38,7 @@ class BufferInterface {
    * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
-  virtual apollo::transform::TransformStamped lookupTransform(
+  virtual TransformStamped lookupTransform(
       const std::string& target_frame, const std::string& source_frame,
       const cyber::Time& time, const float timeout_second = 0.01f) const = 0;
 
@@ -58,7 +58,7 @@ class BufferInterface {
    * Possible exceptions tf2::LookupException, tf2::ConnectivityException,
    * tf2::ExtrapolationException, tf2::InvalidArgumentException
    */
-  virtual apollo::transform::TransformStamped lookupTransform(
+  virtual TransformStamped lookupTransform(
       const std::string& target_frame, const cyber::Time& target_time,
       const std::string& source_frame, const cyber::Time& source_time,
       const std::string& fixed_frame,

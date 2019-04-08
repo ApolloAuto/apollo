@@ -143,7 +143,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_jac_g_par) {
   double values_ser[kNnzJac];
   std::fill_n(values_ser, n, 0.0);
   bool res2 = ptop_->eval_jac_g_ser(n, x, new_x, m, kNnzJac, i_row_ser,
-                                    j_col_ser, NULL);
+                                    j_col_ser, nullptr);
   EXPECT_TRUE(res2);
   bool res3 = ptop_->eval_jac_g_ser(n, x, new_x, m, kNnzJac, i_row_ser,
                                     j_col_ser, values_ser);
@@ -154,7 +154,7 @@ TEST_F(DistanceApproachIPOPTInterfaceTest, eval_jac_g_par) {
   double values_par[kNnzJac];
   std::fill_n(values_par, n, 0.0);
   bool res4 = ptop_->eval_jac_g_par(n, x, new_x, m, kNnzJac, i_row_par,
-                                    j_col_par, NULL);
+                                    j_col_par, nullptr);
   EXPECT_TRUE(res4);
   for (int i = 0; i < kNnzJac; ++i) {
     EXPECT_EQ(i_row_ser[i], i_row_par[i]) << "iRow differ at index " << i;

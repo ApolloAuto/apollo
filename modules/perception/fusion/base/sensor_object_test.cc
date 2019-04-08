@@ -57,7 +57,7 @@ TEST(SensorObjectTest, test) {
   EXPECT_TRUE(object->GetRelatedFramePose(&pose));
   EXPECT_EQ((pose.matrix() - sensor2world_pose.matrix()).trace(), 0.0);
   EXPECT_EQ(object->GetSensorId(), "test");
-  EXPECT_TRUE(object->GetBaseObject() != nullptr);
+  EXPECT_NE(object->GetBaseObject(), nullptr);
 
   object->frame_header_ = nullptr;
   EXPECT_DOUBLE_EQ(object->GetTimestamp(), 0);
@@ -65,7 +65,7 @@ TEST(SensorObjectTest, test) {
   EXPECT_EQ(object->GetSensorId(), "");
 
   FusedObjectPtr fused_object(new FusedObject());
-  EXPECT_TRUE(fused_object->GetBaseObject() != nullptr);
+  EXPECT_NE(fused_object->GetBaseObject(), nullptr);
   EXPECT_DOUBLE_EQ(fused_object->GetTimestamp(), 0);
 }
 

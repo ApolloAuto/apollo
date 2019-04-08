@@ -212,8 +212,8 @@ double EvaluateCubicPolynomial(const std::array<double, 4>& coefs,
   }
 }
 
-double GetSByConstantAcceleration(
-    const double v0, const double acceleration, const double t) {
+double GetSByConstantAcceleration(const double v0, const double acceleration,
+                                  const double t) {
   if (acceleration > -FLAGS_double_precision) {
     return v0 * t + 0.5 * acceleration * t * t;
   }

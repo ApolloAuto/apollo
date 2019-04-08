@@ -30,7 +30,7 @@ TEST(RecognizeTest, yellow) {
   cv::Mat origin_image = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/recognition/img/yellow.jpg");
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -86,7 +86,7 @@ TEST(RecognizeTest, red) {
   cv::Mat origin_image = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/recognition/img/red.jpg");
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -142,7 +142,7 @@ TEST(RecognizeTest, green) {
   cv::Mat origin_image = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/recognition/img/green.jpg");
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -194,7 +194,7 @@ TEST(RecognizeTest, black) {
   cv::Mat origin_image = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/recognition/img/black.jpg");
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -250,7 +250,7 @@ TEST(RecognizeTest, no_detection) {
   cv::Mat origin_image = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/recognition/img/black.jpg");
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -302,7 +302,7 @@ TEST(RecognizeTest, unknown_class) {
   cv::Mat origin_image = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/recognition/img/yellow.jpg");
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -356,7 +356,7 @@ TEST(RecognizeTest, quadrate) {
   cv::Mat origin_image = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/recognition/img/green.jpg");
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -412,7 +412,7 @@ TEST(RecognizeTest, horizontal) {
   cv::Mat origin_image = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/recognition/img/horizontal.jpg");
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();
@@ -474,7 +474,7 @@ TEST(RecognizeTest, no_light) {
   cv::Mat origin_image = cv::imread(
       "/apollo/modules/perception/testdata/"
       "camera/lib/traffic_light/detector/recognition/img/horizontal.jpg");
-  ASSERT_FALSE(origin_image.data == NULL);
+  ASSERT_FALSE(origin_image.data == nullptr);
 
   std::shared_ptr<base::SyncedMemory> img_gpu_data;
   int size = origin_image.cols * origin_image.rows * origin_image.channels();

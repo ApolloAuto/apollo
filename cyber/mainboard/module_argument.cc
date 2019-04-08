@@ -25,10 +25,6 @@ namespace apollo {
 namespace cyber {
 namespace mainboard {
 
-ModuleArgument::ModuleArgument() {}
-
-ModuleArgument::~ModuleArgument() {}
-
 void ModuleArgument::DisplayUsage() {
   AINFO << "Usage: \n    " << binary_name_ << " [OPTION]...\n"
         << "Description: \n"

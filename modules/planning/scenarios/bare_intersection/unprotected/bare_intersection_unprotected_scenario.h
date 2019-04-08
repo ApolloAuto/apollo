@@ -36,6 +36,7 @@ namespace bare_intersection {
 // stage context
 struct BareIntersectionUnprotectedContext {
   ScenarioBareIntersectionUnprotectedConfig scenario_config;
+  std::string current_pnc_junction_overlap_id;
 };
 
 class BareIntersectionUnprotectedScenario : public Scenario {

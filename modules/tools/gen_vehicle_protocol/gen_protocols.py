@@ -25,27 +25,27 @@ import sys
 import yaml
 
 
-def gen_report_header(car_type, p, output_dir):
+def gen_report_header(car_type, protocol, output_dir):
     """
         doc string:
     """
     report_header_tpl_file = "template/report_protocol.h.tpl"
     FMT = get_tpl_fmt(report_header_tpl_file)
-    report_header_file = output_dir + "%s.h" % p["name"]
+    report_header_file = output_dir + "%s.h" % protocol["name"]
     with open(report_header_file, 'w') as h_fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type.lower()
         fmt_val["car_type_upper"] = car_type.upper()
-        fmt_val["protocol_name_upper"] = p["name"].upper()
-        fmt_val["classname"] = p["name"].replace('_', '').capitalize()
+        fmt_val["protocol_name_upper"] = protocol["name"].upper()
+        fmt_val["classname"] = protocol["name"].replace('_', '').capitalize()
         func_declare_list = []
-        for var in p["vars"]:
+        for var in protocol["vars"]:
             fmt = """
   // config detail: %s
   %s %s(const std::uint8_t* bytes, const int32_t length) const;"""
             returntype = var["type"]
             if var["type"] == "enum":
-                returntype = p["name"].capitalize(
+                returntype = protocol["name"].capitalize(
                 ) + "::" + var["name"].capitalize() + "Type"
             declare = fmt % (str(var), returntype, var["name"].lower())
             func_declare_list.append(declare)
@@ -53,28 +53,32 @@ def gen_report_header(car_type, p, output_dir):
         h_fp.write(FMT % fmt_val)
 
 
-def gen_report_cpp(car_type, p, output_dir):
+def gen_report_cpp(car_type, protocol, output_dir):
     """
         doc string:
     """
     report_cpp_tpl_file = "template/report_protocol.cc.tpl"
     FMT = get_tpl_fmt(report_cpp_tpl_file)
-    report_cpp_file = output_dir + "%s.cc" % p["name"]
+    report_cpp_file = output_dir + "%s.cc" % protocol["name"]
     with open(report_cpp_file, 'w') as fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
-        fmt_val["protocol_name_lower"] = p["name"]
-        classname = p["name"].replace('_', '').capitalize()
+        fmt_val["protocol_name_lower"] = protocol["name"]
+        classname = protocol["name"].replace('_', '').capitalize()
         fmt_val["classname"] = classname
-        fmt_val["id_upper"] = p["id"].upper()
+        protocol_id = int(protocol["id"].upper(), 16)
+        if id > 2048:
+            fmt_val["id_upper"] = gen_esd_can_extended(protocol["id"].upper())
+        else:
+            fmt_val["id_upper"] = protocol["id"].upper()
         set_var_to_protocol_list = []
         func_impl_list = []
-        for var in p["vars"]:
+        for var in protocol["vars"]:
             var["name"] = var["name"].lower()
 
             returntype = var["type"]
             if var["type"] == "enum":
-                returntype = p["name"].capitalize(
+                returntype = protocol["name"].capitalize(
                 ) + "::" + var["name"].capitalize() + "Type"
             # gen func top
             fmt = """
@@ -85,13 +89,13 @@ def gen_report_cpp(car_type, p, output_dir):
             byte_info = get_byte_info(var)
             impl = impl + gen_parse_value_impl(var, byte_info)
 
-            impl = impl + gen_report_value_offset_precision(var, p)
+            impl = impl + gen_report_value_offset_precision(var, protocol)
             impl = impl + "}"
 
             func_impl_list.append(impl)
             proto_set_fmt = "  chassis->mutable_%s()->mutable_%s()->set_%s(%s(bytes, length));"
             func_name = var["name"]
-            proto_set = proto_set_fmt % (car_type, p["name"], var["name"],
+            proto_set = proto_set_fmt % (car_type, protocol["name"], var["name"],
                                          func_name)
             set_var_to_protocol_list.append(proto_set)
         fmt_val["set_var_to_protocol_list"] = "\n".join(
@@ -100,7 +104,7 @@ def gen_report_cpp(car_type, p, output_dir):
         fp.write(FMT % fmt_val)
 
 
-def gen_report_value_offset_precision(var, p):
+def gen_report_value_offset_precision(var, protocol):
     """
         doc string:
     """
@@ -113,7 +117,7 @@ def gen_report_value_offset_precision(var, p):
 
     returntype = var["type"]
     if var["type"] == "enum":
-        returntype = p["name"].capitalize() + "::" + var["name"].capitalize(
+        returntype = protocol["name"].capitalize() + "::" + var["name"].capitalize(
         ) + "Type"
     impl = impl + "\n  " + returntype + " ret = "
 
@@ -152,19 +156,19 @@ def gen_parse_value_impl(var, byte_info):
     return impl
 
 
-def gen_control_header(car_type, p, output_dir):
+def gen_control_header(car_type, protocol, output_dir):
     """
         doc string:
     """
     control_header_tpl_file = "template/control_protocol.h.tpl"
     FMT = get_tpl_fmt(control_header_tpl_file)
-    control_header_file = output_dir + "%s.h" % p["name"]
+    control_header_file = output_dir + "%s.h" % protocol["name"]
     with open(control_header_file, 'w') as h_fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
         fmt_val["car_type_upper"] = car_type.upper()
-        fmt_val["protocol_name_upper"] = p["name"].upper()
-        classname = p["name"].replace('_', '').capitalize()
+        fmt_val["protocol_name_upper"] = protocol["name"].upper()
+        classname = protocol["name"].replace('_', '').capitalize()
         fmt_val["classname"] = classname
         declare_public_func_list = []
         declare_private_func_list = []
@@ -172,10 +176,10 @@ def gen_control_header(car_type, p, output_dir):
 
         fmtpub = "\n  // config detail: %s\n  %s* set_%s(%s %s);"
         fmtpri = "\n  // config detail: %s\n  void set_p_%s(uint8_t* data, %s %s);"
-        for var in p["vars"]:
+        for var in protocol["vars"]:
             returntype = var["type"]
             if var["type"] == "enum":
-                returntype = p["name"].capitalize(
+                returntype = protocol["name"].capitalize(
                 ) + "::" + var["name"].capitalize() + "Type"
             private_var = ""
             public_func_declare = fmtpub % (str(var), classname,
@@ -312,7 +316,7 @@ def gen_control_encode_value_impl(var, byte_info):
     return impl
 
 
-def gen_control_value_func_impl(classname, var, p):
+def gen_control_value_func_impl(classname, var, protocol):
     """
         doc string:
     """
@@ -338,7 +342,7 @@ void %(classname)s::set_p_%(var_name)s(uint8_t* data,
     fmt_val["var_name"] = var["name"].lower()
     returntype = var["type"]
     if var["type"] == "enum":
-        returntype = p["name"].capitalize() + "::" + var["name"].capitalize(
+        returntype = protocol["name"].capitalize() + "::" + var["name"].capitalize(
         ) + "Type"
     fmt_val["var_type"] = returntype
     fmt_val["config"] = str(var)
@@ -356,26 +360,30 @@ void %(classname)s::set_p_%(var_name)s(uint8_t* data,
     return impl + "}\n"
 
 
-def gen_control_cpp(car_type, p, output_dir):
+def gen_control_cpp(car_type, protocol, output_dir):
     """
         doc string:
     """
     control_cpp_tpl_file = "template/control_protocol.cc.tpl"
     FMT = get_tpl_fmt(control_cpp_tpl_file)
-    control_cpp_file = output_dir + "%s.cc" % p["name"]
+    control_cpp_file = output_dir + "%s.cc" % protocol["name"]
     with open(control_cpp_file, 'w') as fp:
         fmt_val = {}
         fmt_val["car_type_lower"] = car_type
-        fmt_val["protocol_name_lower"] = p["name"]
-        fmt_val["id_upper"] = p["id"].upper()
-        classname = p["name"].replace('_', '').capitalize()
+        fmt_val["protocol_name_lower"] = protocol["name"]
+        protocol_id = int(protocol["id"].upper(), 16)
+        if id > 2048:
+            fmt_val["id_upper"] = gen_esd_can_extended(protocol["id"].upper())
+        else:
+            fmt_val["id_upper"] = protocol["id"].upper()
+        classname = protocol["name"].replace('_', '').capitalize()
         fmt_val["classname"] = classname
 
         set_private_var_list = []
         set_private_var_init_list = []
         set_func_impl_list = []
-        for var in p["vars"]:
-            func_impl = gen_control_value_func_impl(classname, var, p)
+        for var in protocol["vars"]:
+            func_impl = gen_control_value_func_impl(classname, var, protocol)
             set_func_impl_list.append(func_impl)
             set_private_var = "  set_p_%s(data, %s_);" % (var["name"].lower(),
                                                           var["name"].lower())
@@ -387,10 +395,10 @@ def gen_control_cpp(car_type, p, output_dir):
                 init_val = "false"
             elif var["type"] == "enum":
                 if 0 in var["enum"]:
-                    init_val = p["name"].capitalize(
+                    init_val = protocol["name"].capitalize(
                     ) + "::" + var["enum"][0].upper()
                 else:
-                    init_val = p["name"].capitalize(
+                    init_val = protocol["name"].capitalize(
                     ) + "::" + var["enum"].values()[0].upper()
 
             set_private_var_init_list.append("  %s_ = %s;" %
@@ -436,19 +444,28 @@ def gen_protocols(protocol_conf_file, protocol_dir):
         protocols = content["protocols"]
         car_type = content["car_type"]
         for p_name in protocols:
-            p = protocols[p_name]
+            protocol = protocols[p_name]
 
-            if p["protocol_type"] == "report":
-                gen_report_header(car_type, p, protocol_dir)
-                gen_report_cpp(car_type, p, protocol_dir)
-            elif p["protocol_type"] == "control":
-                gen_control_header(car_type, p, protocol_dir)
-                gen_control_cpp(car_type, p, protocol_dir)
+            if protocol["protocol_type"] == "report":
+                gen_report_header(car_type, protocol, protocol_dir)
+                gen_report_cpp(car_type, protocol, protocol_dir)
+            elif protocol["protocol_type"] == "control":
+                gen_control_header(car_type, protocol, protocol_dir)
+                gen_control_cpp(car_type, protocol, protocol_dir)
 
             else:
-                print "Unknown protocol_type:%s" % p["protocol_type"]
+                print "Unknown protocol_type:%s" % protocol["protocol_type"]
         gen_build_file(car_type, protocol_dir)
 
+def gen_esd_can_extended(str):
+    """
+        id string:
+    """
+    int_id = int(str,16)
+    int_id &= 0x1FFFFFFF
+    int_id |= 0x20000000
+    str = hex(int_id).replace('0x', '')
+    return str
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

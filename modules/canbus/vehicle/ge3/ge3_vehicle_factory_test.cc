@@ -35,11 +35,11 @@ class Ge3VehicleFactoryTest : public ::testing::Test {
 };
 
 TEST_F(Ge3VehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(ge3_factory_.CreateVehicleController() != nullptr);
+  EXPECT_NE(ge3_factory_.CreateVehicleController(), nullptr);
 }
 
 TEST_F(Ge3VehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(ge3_factory_.CreateMessageManager() != nullptr);
+  EXPECT_NE(ge3_factory_.CreateMessageManager(), nullptr);
 }
 
 }  // namespace canbus

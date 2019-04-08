@@ -32,7 +32,7 @@ TEST(BaseMatcherTest, base_matcher_test) {
   double match_distance = 2.5;
   BaseMatcher::SetMaxMatchDistance(match_distance);
   double distance = BaseMatcher::GetMaxMatchDistance();
-  EXPECT_TRUE(std::fabs(match_distance - distance) < 1e-5);
+  EXPECT_LT(std::fabs(match_distance - distance), 1e-5);
 
   std::vector<RadarTrackPtr> radar_tracks;
   base::Frame radar_frame;
