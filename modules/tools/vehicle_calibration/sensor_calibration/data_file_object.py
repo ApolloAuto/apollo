@@ -27,21 +27,25 @@ import struct
 class FileObject(object):
     """Wrapper for file object"""
 
-    # Initalizing file obj
-    def __init__(self, file_path, operation='write', filetype='binary'):
+    # Initalizing file object
+    def __init__(self, file_path, operation='write', file_type='binary'):
         if operation != 'write' and operation != 'read':
             raise ValueError("Unsupported file operation: %s" % operation)
 
-        if filetype != 'binary' and filetype != 'txt':
-            raise ValueError("Unsupported file type: %s" % filetype)
+        if file_type != 'binary' and file_type != 'txt':
+            raise ValueError("Unsupported file type: %s" % file_type)
 
         operator = 'w' if operation == 'write' else 'r'
-        operator += 'b' if filetype == 'binary' else ''
+        operator += 'b' if file_type == 'binary' else ''
 
         try:
             self._file_object = open(file_path, operator)
         except IOError:
             raise ValueError("Cannot open file: {}".format(file_path))
+
+    # Safely close file
+    def __del__(self):
+        self._file_object.close()
 
     def file_object(self):
         return self._file_object
@@ -49,9 +53,6 @@ class FileObject(object):
     def save_to_file(self, data):
         raise NotImplementedError
 
-    # Safely close file
-    def __del__(self):
-        self._file_object.close()
 
 class OdometryFileObject(FileObject):
     """class to handle gnss/odometry topic"""
