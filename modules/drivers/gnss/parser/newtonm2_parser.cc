@@ -19,12 +19,13 @@
 // properly.
 //
 
-#include "modules/drivers/gnss/parser/newtonm2_parser.h"
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <vector>
+
+#include "modules/drivers/gnss/parser/newtonm2_parser.h"
 #include "modules/common/log.h"
 #include "modules/drivers/gnss/parser/novatel_messages.h"
 #include "modules/drivers/gnss/parser/parser.h"
@@ -639,7 +640,7 @@ bool NewtonM2Parser::HandleRawImu(const novatel::RawImu* imu) {
     novatel::ImuParameter param = novatel::GetImuParameter(imu_type_);
 
     if (newtonm2::is_zero(param.sampling_rate_hz)) {
-      AERROR_EVERY(5) << "Unsupported IMU type ADUS16488.";
+      AERROR_EVERY(5) << "Unsupported IMU type.";
       return false;
     }
     gyro_scale = param.gyro_scale * param.sampling_rate_hz;
