@@ -55,8 +55,8 @@ def GetPredictionResultFiles(dirpath):
     return prediction_result_files
 
 
-def IsCorrectlyPredicted(future_point, prediction_result):
-    future_relative_time = future_point[3] - prediction_result.timestamp
+def IsCorrectlyPredicted(future_point, curr_time, prediction_result):
+    future_relative_time = future_point[6] - curr_time
     for predicted_traj in prediction_result.trajectory:
         i = 0
         while i + 1 < len(predicted_traj.trajectory_point) and \
@@ -83,14 +83,14 @@ def CorrectlyPredictePortion(prediction_result, future_status_dict, time_range):
         return 0.0, 0.0, 0.0
 
     portion_correct_predicted = 0.0
-    curr_timestamp = obstacle_future_status[0][3]
+    curr_timestamp = obstacle_future_status[0][6]
 
     total_future_point_count = 0.0
     correct_future_point_count = 0.0
     for future_point in obstacle_future_status:
-        if future_point[3] - curr_timestamp > time_range:
+        if future_point[6] - curr_timestamp > time_range:
             break
-        if IsCorrectlyPredicted(future_point, prediction_result):
+        if IsCorrectlyPredicted(future_point, curr_timestamp, prediction_result):
             correct_future_point_count += 1.0
         total_future_point_count += 1.0
     if total_future_point_count == 0:
