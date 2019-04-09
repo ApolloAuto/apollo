@@ -93,7 +93,10 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
     default:
       return nullptr;
   }
-  ptr->Init();
+
+  if (ptr != nullptr) {
+    ptr->Init();
+  }
   return ptr;
 }
 
@@ -358,18 +361,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
     const Frame& frame) {
   // TODO(all): to be updated when SIDE_PASS obstacle decisions
   //            from ReferenceLine is ready
-//<<<<<<< HEAD
-  if (current_scenario_->scenario_type() == ScenarioConfig::SIDE_PASS &&
-      current_scenario_->IsTransferable(*current_scenario_, frame)) {
-    return ScenarioConfig::SIDE_PASS;
-  }
-
-  auto scenario = CreateScenario(ScenarioConfig::SIDE_PASS);
-  if (scenario->IsTransferable(*current_scenario_, frame)) {
-//=======
-//  if (scenario::side_pass::SidePassScenario::IsTransferable(
-//          frame, config_map_[ScenarioConfig::SIDE_PASS], *current_scenario_)) {
-//>>>>>>> master
+  if (scenario::side_pass::SidePassScenario::IsTransferable(
+          frame, config_map_[ScenarioConfig::SIDE_PASS], *current_scenario_)) {
     return ScenarioConfig::SIDE_PASS;
   }
 
@@ -381,7 +374,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
   const auto& scenario_config =
       config_map_[ScenarioConfig::VALET_PARKING].valet_parking_config();
 
-  // TODO(All) trigger valet parking by route message definition as of now
+  // TODO(All) triger valet parking by route message definition as of now
   double parking_spot_range_to_start =
       scenario_config.parking_spot_range_to_start();
   if (scenario::valet_parking::ValetParkingScenario::IsTransferable(
@@ -467,11 +460,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     case ScenarioConfig::CHANGE_LANE:
       break;
     case ScenarioConfig::SIDE_PASS:
-      if (current_scenario_->IsTransferable(*current_scenario_, frame)) {
-        ADEBUG << "Continuing side-pass";
-        scenario_type = current_scenario_->scenario_type();
-      }
-      break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
