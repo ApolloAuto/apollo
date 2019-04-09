@@ -1086,17 +1086,42 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
 }
 
 void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
-                                                   const CameraFrame &frame) {
+    const CameraFrame &frame,
+    const base::MotionBufferPtr motion_buffer) {
   if (frame.timestamp - last_timestamp_ < 0.02) return;
 
   // draw results on visulization panel
+  int line_pos = 0;
   cv::Mat image = img.clone();
   std::string camera_name = frame.data_provider->sensor_name();
-  cv::putText(image, camera_name, cv::Point(10, 50), cv::FONT_HERSHEY_DUPLEX,
-              1.3, cv::Scalar(0, 0, 255), 3);
+  line_pos += 50;
+  cv::putText(image, camera_name, cv::Point(10, line_pos),
+              cv::FONT_HERSHEY_DUPLEX, 1.3, cv::Scalar(0, 0, 255), 3);
+  line_pos += 50;
   cv::putText(image, "frame id: " + std::to_string(frame.frame_id),
-              cv::Point(10, 100), cv::FONT_HERSHEY_DUPLEX, 1.3,
+              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
+  line_pos += 50;
+  cv::putText(image,
+              "yaw rate: " + std::to_string(motion_buffer->back().yaw_rate),
+              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+              cv::Scalar(0, 0, 255), 3);
+  line_pos += 50;
+  cv::putText(image,
+             "pitch rate: " + std::to_string(motion_buffer->back().pitch_rate),
+              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+              cv::Scalar(0, 0, 255), 3);
+  line_pos += 50;
+  cv::putText(image,
+              "roll rate: " + std::to_string(motion_buffer->back().roll_rate),
+              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+              cv::Scalar(0, 0, 255), 3);
+  line_pos += 50;
+  cv::putText(image,
+              "velocity: " + std::to_string(motion_buffer->back().velocity),
+              cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+              cv::Scalar(0, 0, 255), 3);
+
   if (intrinsic_map_.find(camera_name) != intrinsic_map_.end() &&
       extrinsic_map_.find(camera_name) != extrinsic_map_.end()) {
     Draw2Dand3D_all_info_single_camera(
