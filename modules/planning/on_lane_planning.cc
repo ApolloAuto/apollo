@@ -752,7 +752,7 @@ void OnLanePlanning::AddPartitionedTrajectory(
   // plot fallback trajectory compared with the partitioned
   if (open_space_debug.is_fallback_trajectory()) {
     const auto& fallback_trajectories =
-      open_space_debug.fallback_trajectory().trajectory();
+        open_space_debug.fallback_trajectory().trajectory();
     if (fallback_trajectories.empty() ||
         fallback_trajectories[0].trajectory_point().empty()) {
       return;

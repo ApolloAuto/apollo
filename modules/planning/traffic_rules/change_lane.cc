@@ -95,7 +95,7 @@ bool ChangeLane::CreateGuardObstacle(
   const auto& reference_line = reference_line_info->reference_line();
   const double end_s = std::min(reference_line.Length(),
                                 reference_line_info->AdcSlBoundary().end_s() +
-                                config_.change_lane().guard_distance());
+                                    config_.change_lane().guard_distance());
   SLPoint sl_point;
   if (!reference_line.XYToSL(last_point.path_point(), &sl_point)) {
     return false;
@@ -166,8 +166,8 @@ ObjectDecisionType ChangeLane::CreateOvertakeDecision(
   ObjectDecisionType overtake;
   overtake.mutable_overtake();
   double distance =
-        std::max(obstacle->speed() * config_.change_lane().min_overtake_time(),
-                 config_.change_lane().min_overtake_distance());
+      std::max(obstacle->speed() * config_.change_lane().min_overtake_time(),
+               config_.change_lane().min_overtake_distance());
   overtake.mutable_overtake()->set_distance_s(distance);
   double fence_s = obstacle->PerceptionSLBoundary().end_s() + distance;
   auto point = reference_line.GetReferencePoint(fence_s);
