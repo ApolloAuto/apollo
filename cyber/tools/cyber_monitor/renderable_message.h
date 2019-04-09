@@ -57,7 +57,7 @@ class RenderableMessage {
   virtual RenderableMessage* Child(int /* lineNo */) const = 0;
 
   virtual double frame_ratio(void) { return frame_ratio_; }
-  double band_width(void) {return band_width_; }
+  double band_width(void) { return band_width_; }
 
   RenderableMessage* parent(void) const { return parent_; }
   void set_parent(RenderableMessage* parent) {
