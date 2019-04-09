@@ -93,6 +93,10 @@ class OpenSpaceRoiDecider : public Decider {
                    &obstacles_vertices_vec,
                Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all);
 
+  // @brief Helper function for fuse line segments into convex constraints
+  bool FuseLineSegments(
+      std::vector<std::vector<common::math::Vec2d>> *line_segments_vec);
+
  private:
   ThreadSafeIndexedObstacles *obstacles_by_frame_;
 
@@ -118,12 +122,8 @@ class OpenSpaceRoiDecider : public Decider {
   // ROI_parking_boundary_ in form of {{1,2,3},{3,4},{4,5,6},{7,8}}
   std::vector<std::vector<common::math::Vec2d>> ROI_parking_boundary_;
 
-  // @brief parking_spot_heading_ is heading the direction pointing away from
-  // the lane
-  double parking_spot_heading_ = 0.0;
-
   // @brief parking_spot_id from routing
-  std::string target_parking_spot_id_ = "";
+  std::string target_parking_spot_id_;
 };
 }  // namespace planning
 }  // namespace apollo
