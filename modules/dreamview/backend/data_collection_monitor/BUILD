@@ -14,6 +14,7 @@ cc_library(
         "//cyber",
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:vehicle_config_helper",
         "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/proto:data_collection_table_proto",
         "//third_party/json",

@@ -8064,6 +8064,10 @@
                 "isFallbackTrajectory": {
                   "type": "bool",
                   "id": 14
+                },
+                "fallbackTrajectory": {
+                  "type": "apollo.planning_internal.Trajectories",
+                  "id": 15
                 }
               }
             },
