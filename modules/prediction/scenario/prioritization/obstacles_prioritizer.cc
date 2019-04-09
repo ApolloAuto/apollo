@@ -199,8 +199,7 @@ void ObstaclesPrioritizer::AssignCautionLevelCruiseKeepLane() {
     AERROR << "Ego vehicle has no history";
     return;
   }
-  // TODO(Hongyi): using current frame when NearbyObstacles are ready
-  const Feature& ego_latest_feature = ego_vehicle->feature(1);
+  const Feature& ego_latest_feature = ego_vehicle->latest_feature();
   for (const LaneSequence& lane_sequence :
        ego_latest_feature.lane().lane_graph().lane_sequence()) {
     int nearest_front_obstacle_id =
