@@ -24,16 +24,17 @@ message Extrinsics {
 // Vehicle parameters shared among several modules.
 // By default, all are measured with the SI units (meters, meters per second,
 // etc.).
-message VehicleParam {
-  enum VehicleBrand {
-    LINCOLN_MKZ = 0;
-    GEM = 1;
-    LEXUS = 2;
-    TRANSIT = 3;
-    GE3 = 4;
-    WEY = 5;
-  }
 
+enum VehicleBrand {
+  LINCOLN_MKZ = 0;
+  GEM = 1;
+  LEXUS = 2;
+  TRANSIT = 3;
+  GE3 = 4;
+  WEY = 5;
+}
+
+message VehicleParam {
   optional VehicleBrand brand = 1;
   // Car center point is car reference point, i.e., center of rear axle.
   optional double front_edge_to_center = 2;
