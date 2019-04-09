@@ -68,7 +68,7 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
   int InitCameraListeners();
   int InitMotionService();
   void SetCameraHeightAndPitch();
-  void OnMotionService(const MotionServiceMsgType &message);
+  void OnMotionService(const MotionServiceMsgType& message);
 
   int InternalProc(
       const std::shared_ptr<apollo::drivers::Image const>& in_message,
