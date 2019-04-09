@@ -938,6 +938,14 @@ body {
             .meter-label {
                 font-size: 13px;
                 color: #ffffff;
+
+                .meter-value {
+                    position: absolute;
+                    top: 2px;
+                    right: 10px;
+
+                    font-size: 10px;
+                }
             }
 
             .meter-head {
