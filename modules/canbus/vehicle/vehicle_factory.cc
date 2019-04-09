@@ -27,22 +27,22 @@ namespace apollo {
 namespace canbus {
 
 void VehicleFactory::RegisterVehicleFactory() {
-  Register(VehicleParameter::LINCOLN_MKZ, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::LINCOLN_MKZ, []() -> AbstractVehicleFactory * {
     return new LincolnVehicleFactory();
   });
-  Register(VehicleParameter::GEM, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::GEM, []() -> AbstractVehicleFactory * {
     return new GemVehicleFactory();
   });
-  Register(VehicleParameter::LEXUS, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::LEXUS, []() -> AbstractVehicleFactory * {
     return new LexusVehicleFactory();
   });
-  Register(VehicleParameter::TRANSIT, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::TRANSIT, []() -> AbstractVehicleFactory * {
     return new TransitVehicleFactory();
   });
-  Register(VehicleParameter::GE3, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::GE3, []() -> AbstractVehicleFactory * {
     return new Ge3VehicleFactory();
   });
-  Register(VehicleParameter::WEY, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::WEY, []() -> AbstractVehicleFactory * {
     return new WeyVehicleFactory();
   });
 }

@@ -27,7 +27,7 @@ class TransitVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::TRANSIT);
+    parameter.set_brand(apollo::common::TRANSIT);
     transit_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}

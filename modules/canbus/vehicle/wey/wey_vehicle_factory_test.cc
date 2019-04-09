@@ -25,7 +25,7 @@ class WeyVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::WEY);
+    parameter.set_brand(apollo::common::WEY);
     wey_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}
