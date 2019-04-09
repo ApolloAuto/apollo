@@ -44,9 +44,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
          << " and : " << predicted_bounding_rectangles.size();
   if (!IsCollisionFreeTrajectory(
           frame->open_space_info().chosen_paritioned_trajectory(),
-          predicted_bounding_rectangles,
-          &current_idx,
-          &first_collision_idx)) {
+          predicted_bounding_rectangles, &current_idx, &first_collision_idx)) {
     // change gflag
     frame_->mutable_open_space_info()->set_fallback_flag(true);
 
@@ -58,25 +56,24 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
         frame_->mutable_open_space_info()->mutable_fallback_trajectory();
     const auto collision_point =
         ptr_fallback_trajectory_pair->first[first_collision_idx];
-    auto previous_point =
-        ptr_fallback_trajectory_pair->first[current_idx];
+    auto previous_point = ptr_fallback_trajectory_pair->first[current_idx];
     double relative_collision_distance =
         collision_point.path_point().s() - previous_point.path_point().s();
     double stopping_distance = relative_collision_distance;
     // the accelerate = -v0^2 / (2*s), where s is slowing down distance
     size_t temp_horizon =
         frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
-    const double accelerate = -previous_point.v() * previous_point.v()
-        / (2.0 * stopping_distance);
+    const double accelerate =
+        -previous_point.v() * previous_point.v() / (2.0 * stopping_distance);
     double relative_stopping_time = std::abs(previous_point.v()) / accelerate;
     for (size_t i = current_idx; i < temp_horizon; ++i) {
       double temp_relative_time =
-          ptr_fallback_trajectory_pair->first[i].relative_time()
-          - previous_point.relative_time();
+          ptr_fallback_trajectory_pair->first[i].relative_time() -
+          previous_point.relative_time();
       double temp_v = previous_point.v() + accelerate * temp_relative_time;
 
-      if (ptr_fallback_trajectory_pair->first[i].relative_time()
-          > relative_stopping_time) {
+      if (ptr_fallback_trajectory_pair->first[i].relative_time() >
+          relative_stopping_time) {
         ptr_fallback_trajectory_pair->first[i].mutable_path_point()->set_x(
             previous_point.path_point().x());
         ptr_fallback_trajectory_pair->first[i].mutable_path_point()->set_y(
@@ -123,8 +120,7 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
     const TrajGearPair& trajectory_gear_pair,
     const std::vector<std::vector<common::math::Box2d>>&
         predicted_bounding_rectangles,
-    size_t* current_idx,
-    size_t* first_collision_idx) {
+    size_t* current_idx, size_t* first_collision_idx) {
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
   double ego_length = vehicle_config.vehicle_param().length();

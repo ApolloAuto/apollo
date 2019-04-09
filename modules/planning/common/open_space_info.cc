@@ -68,9 +68,9 @@ void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
   // 5, record fallback trajectory if needed
   if (fallback_flag_) {
     auto* ptr_fallback_trajectory = ptr_debug->mutable_planning_data()
-                                    ->mutable_open_space()
-                                    ->mutable_fallback_trajectory()
-                                    ->add_trajectory();
+                                        ->mutable_open_space()
+                                        ->mutable_fallback_trajectory()
+                                        ->add_trajectory();
     const auto& fallback_trajectory = fallback_trajectory_.first;
     CopyTrajectory(fallback_trajectory, ptr_fallback_trajectory);
   }
