@@ -40,6 +40,10 @@ class SpeedBoundsDecider : public Decider {
 
   void CheckLaneChangeUrgency(Frame* const frame);
 
+  // @brief Rule-based stop for side pass on reverse lane
+  void StopOnSidePass(Frame* const frame,
+                      ReferenceLineInfo* const reference_line_info);
+
   // @brief Check if necessary to set stop fence used for nonscenario side pass
   bool CheckSidePassStop(const PathData& path_data,
                          const ReferenceLineInfo& reference_line_info,
