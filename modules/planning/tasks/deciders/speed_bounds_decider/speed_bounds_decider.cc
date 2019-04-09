@@ -60,64 +60,7 @@ Status SpeedBoundsDecider::Process(
 
   // 1. Rule_based speed planning configurations for different traffic scenarios
   if (FLAGS_enable_nonscenario_side_pass) {
-    double stop_s_on_pathdata = 0.0;
-    bool set_stop_fence = false;
-    const auto &side_pass_info = PlanningContext::side_pass_info();
-    auto *mutable_side_pass_info = PlanningContext::mutable_side_pass_info();
-    if (side_pass_info.change_lane_stop_flag) {
-      // Check if stop at last frame stop fence
-      ADEBUG << "stop fence is set due to side pass on reverse lane";
-      if (CheckADCStop(*reference_line_info,
-                       side_pass_info.change_lane_stop_path_point)) {
-        ADEBUG << "ADV Stopped due to change lane in side pass";
-        if (ChangeLaneDecider::IsClearToChangeLane(reference_line_info)) {
-          ADEBUG << "Environment clear for ADC to change lane in side pass";
-          mutable_side_pass_info->check_clear_flag = true;
-        } else {
-          if (CheckSidePassStop(path_data, *reference_line_info,
-                                &stop_s_on_pathdata) &&
-              BuildSidePassStopFence(
-                  path_data, stop_s_on_pathdata,
-                  &(mutable_side_pass_info->change_lane_stop_path_point), frame,
-                  reference_line_info)) {
-            set_stop_fence = true;
-          } else {
-            set_stop_fence = BuildSidePassStopFence(
-                side_pass_info.change_lane_stop_path_point, frame,
-                reference_line_info);
-          }
-        }
-
-      } else {
-        if (CheckSidePassStop(path_data, *reference_line_info,
-                              &stop_s_on_pathdata) &&
-            BuildSidePassStopFence(
-                path_data, stop_s_on_pathdata,
-                &(mutable_side_pass_info->change_lane_stop_path_point), frame,
-                reference_line_info)) {
-          set_stop_fence = true;
-        } else {
-          set_stop_fence =
-              BuildSidePassStopFence(side_pass_info.change_lane_stop_path_point,
-                                     frame, reference_line_info);
-        }
-      }
-    } else {
-      if (!side_pass_info.check_clear_flag &&
-          CheckSidePassStop(path_data, *reference_line_info,
-                            &stop_s_on_pathdata)) {
-        set_stop_fence = BuildSidePassStopFence(
-            path_data, stop_s_on_pathdata,
-            &(mutable_side_pass_info->change_lane_stop_path_point), frame,
-            reference_line_info);
-      }
-      if (side_pass_info.check_clear_flag &&
-          CheckClearDone(*reference_line_info,
-                         side_pass_info.change_lane_stop_path_point)) {
-        mutable_side_pass_info->check_clear_flag = false;
-      }
-    }
-    mutable_side_pass_info->change_lane_stop_flag = set_stop_fence;
+    StopOnSidePass(frame, reference_line_info);
   }
 
   // 2. Map obstacles into st graph
@@ -206,6 +149,76 @@ Status SpeedBoundsDecider::Process(
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
 
   return Status::OK();
+}
+
+void SpeedBoundsDecider::StopOnSidePass(
+    Frame *const frame, ReferenceLineInfo *const reference_line_info) {
+  const PathData &path_data = reference_line_info->path_data();
+  double stop_s_on_pathdata = 0.0;
+  bool set_stop_fence = false;
+  const auto &side_pass_info = PlanningContext::side_pass_info();
+  auto *mutable_side_pass_info = PlanningContext::mutable_side_pass_info();
+
+  if (path_data.path_label().find("self") != std::string::npos) {
+    mutable_side_pass_info->check_clear_flag = false;
+    mutable_side_pass_info->change_lane_stop_flag = false;
+    mutable_side_pass_info->change_lane_stop_path_point.Clear();
+    return;
+  }
+
+  if (side_pass_info.change_lane_stop_flag) {
+    // Check if stop at last frame stop fence
+    ADEBUG << "stop fence is set due to side pass on reverse lane";
+    if (CheckADCStop(*reference_line_info,
+                     side_pass_info.change_lane_stop_path_point)) {
+      ADEBUG << "ADV Stopped due to change lane in side pass";
+      if (ChangeLaneDecider::IsClearToChangeLane(reference_line_info)) {
+        ADEBUG << "Environment clear for ADC to change lane in side pass";
+        mutable_side_pass_info->check_clear_flag = true;
+      } else {
+        if (CheckSidePassStop(path_data, *reference_line_info,
+                              &stop_s_on_pathdata) &&
+            BuildSidePassStopFence(
+                path_data, stop_s_on_pathdata,
+                &(mutable_side_pass_info->change_lane_stop_path_point), frame,
+                reference_line_info)) {
+          set_stop_fence = true;
+        } else {
+          set_stop_fence =
+              BuildSidePassStopFence(side_pass_info.change_lane_stop_path_point,
+                                     frame, reference_line_info);
+        }
+      }
+    } else {
+      if (CheckSidePassStop(path_data, *reference_line_info,
+                            &stop_s_on_pathdata) &&
+          BuildSidePassStopFence(
+              path_data, stop_s_on_pathdata,
+              &(mutable_side_pass_info->change_lane_stop_path_point), frame,
+              reference_line_info)) {
+        set_stop_fence = true;
+      } else {
+        set_stop_fence =
+            BuildSidePassStopFence(side_pass_info.change_lane_stop_path_point,
+                                   frame, reference_line_info);
+      }
+    }
+  } else {
+    if (!side_pass_info.check_clear_flag &&
+        CheckSidePassStop(path_data, *reference_line_info,
+                          &stop_s_on_pathdata)) {
+      set_stop_fence = BuildSidePassStopFence(
+          path_data, stop_s_on_pathdata,
+          &(mutable_side_pass_info->change_lane_stop_path_point), frame,
+          reference_line_info);
+    }
+    if (side_pass_info.check_clear_flag &&
+        CheckClearDone(*reference_line_info,
+                       side_pass_info.change_lane_stop_path_point)) {
+      mutable_side_pass_info->check_clear_flag = false;
+    }
+  }
+  mutable_side_pass_info->change_lane_stop_flag = set_stop_fence;
 }
 
 // @brief Check if necessary to set stop fence used for nonscenario side pass
