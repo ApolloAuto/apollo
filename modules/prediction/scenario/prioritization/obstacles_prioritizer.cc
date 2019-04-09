@@ -343,10 +343,10 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
   // insert ego_back_lane_id
   accumulated_s = 0.0;
   for (const std::string& lane_id : lane_ids) {
-    ego_back_lane_id_set_.insert(lane_id);
     if (lane_id == ego_lane_id) {
       break;
     }
+    ego_back_lane_id_set_.insert(lane_id);
   }
 
   // then loop through lane_ids to AssignCaution for obstacle vehicles
@@ -361,7 +361,9 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
       continue;
     }
     accumulated_s += lane_info_ptr->total_length();
-    AssignCautionByMerge(lane_info_ptr);
+    if (lane_id != ego_lane_id) {
+      AssignCautionByMerge(lane_info_ptr);
+    }
     AssignCautionByOverlap(lane_info_ptr);
     if (accumulated_s > FLAGS_caution_search_distance_ahead + ego_vehicle_s) {
       break;
