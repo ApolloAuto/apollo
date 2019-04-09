@@ -26,6 +26,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/time/time.h"
 #include "modules/map/hdmap/hdmap_util.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -34,7 +35,6 @@
 #include "modules/planning/scenarios/side_pass/stage_detect_safety.h"
 #include "modules/planning/scenarios/side_pass/stage_generate_path.h"
 #include "modules/planning/scenarios/side_pass/stage_pass_obstacle.h"
-#include "modules/planning/scenarios/side_pass/stage_side_pass.h"
 #include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
 
 namespace apollo {
@@ -42,7 +42,7 @@ namespace planning {
 namespace scenario {
 namespace side_pass {
 
-common::util::Factory<
+apollo::common::util::Factory<
     ScenarioConfig::StageType, Stage,
     Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
     SidePassScenario::s_stage_factory_;
@@ -50,18 +50,9 @@ common::util::Factory<
 // The clearance distance from intersection/destination.
 // If ADC is too close, then do not enter SIDE_PASS.
 constexpr double kClearDistance = 15.0;
-constexpr double kSidePassMaxSpeed = 5.0;  // (10mph)
-constexpr double kSidePassMaxDistance = 10.0;
 
 void SidePassScenario::RegisterStages() {
-  if (!s_stage_factory_.Empty()) {
-    return;
-  }
-  s_stage_factory_.Register(
-      ScenarioConfig::SIDE_PASS_DEFAULT_STAGE,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageSidePass(config);
-      });
+  s_stage_factory_.Clear();
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_APPROACH_OBSTACLE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
@@ -92,7 +83,6 @@ void SidePassScenario::RegisterStages() {
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new StageBackup(config);
       });
-
 }
 
 SidePassScenario::SidePassScenario(const ScenarioConfig& config,
@@ -109,7 +99,9 @@ SidePassScenario::SidePassScenario(const ScenarioConfig& config,
 
 std::unique_ptr<Stage> SidePassScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
-  RegisterStages();
+  if (s_stage_factory_.Empty()) {
+    RegisterStages();
+  }
   auto ptr = s_stage_factory_.CreateObjectOrNull(stage_config.stage_type(),
                                                  stage_config);
   if (ptr == nullptr) {
@@ -121,117 +113,73 @@ std::unique_ptr<Stage> SidePassScenario::CreateStage(
   return ptr;
 }
 
-bool SidePassScenario::IsTransferable(const Scenario& current_scenario,
-                                      const Frame& frame) {
+bool SidePassScenario::IsTransferable(const Frame& frame,
+                                      const ScenarioConfig& config,
+                                      const Scenario& current_scenario) {
   // Sanity checks.
   if (frame.reference_line_info().size() > 1) {
     return false;
   }
 
-  if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
-    // Check side-pass exiting conditions.
-    ADEBUG << "Checking if it's needed to exit SIDE_PASS:";
-    ADEBUG << "Able to use self-lane counter = "
-           << PlanningContext::able_to_use_self_lane_counter();
-    return PlanningContext::able_to_use_self_lane_counter() < 3;
-  } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
-    // If in some other scenario, then don't try to switch to SIDE_PASS.
-    ADEBUG << "Currently in some other scenario.";
-    return false;
-  } else {
-    // If originally in LANE_FOLLOW, then decide whether we should
-    // switch to SIDE_PASS scenario.
-    ADEBUG << "Checking if it's needed to switch from LANE_FOLLOW to "
-              "SIDE_PASS: ";
-    bool is_side_pass = IsSidePassScenario(frame);
-    if (is_side_pass) {
-      ADEBUG << "   YES!";
-    } else {
-      ADEBUG << "   NO!";
-    }
-    return is_side_pass &&
-           PlanningContext::front_static_obstacle_cycle_counter() >= 1;
-  }
-
-  // TODO(all): the following is the old legacy code. Retire them when the new
-  //            code gets steady.
-  /*
-  std::string front_blocking_obstacle_id =
-      PlanningContext::Planningstatus().side_pass()
-          .front_blocking_obstacle_id();
+  std::string front_blocking_obstacle_id = PlanningContext::Planningstatus()
+                                               .side_pass()
+                                               .front_blocking_obstacle_id();
+  AERROR << front_blocking_obstacle_id;
 
   if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     // Check if the blocking obstacle is still static.
     // If not, then switch to LANE_FOLLOW.
-    const auto ptr_front_blocking_obstacle =
+    const auto front_blocking_obstacle =
         const_cast<Frame&>(frame).Find(front_blocking_obstacle_id);
-    if (!ptr_front_blocking_obstacle) {
+    if (!front_blocking_obstacle) {
       ADEBUG << "Obstacle " << front_blocking_obstacle_id
              << " not exist any more. Change scenario to default scenario.";
       return false;
     }
-    if (!ptr_front_blocking_obstacle->IsStatic()) {
+    const auto& reference_line_info = frame.reference_line_info().front();
+    const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+    const double distance =
+        front_blocking_obstacle->PerceptionSLBoundary().start_s() -
+        adc_front_edge_s;
+
+    constexpr double kSidePassMaxDistance = 10.0;
+    if (!front_blocking_obstacle->IsStatic() ||
+        distance > kSidePassMaxDistance) {
       ADEBUG << "Obstacle " << front_blocking_obstacle_id
              << " starts to move. Change scenario to default scenario.";
       return false;
     }
-
-    const auto& reference_line_info = frame.reference_line_info().front();
-    const double ego_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-    const double obstacle_ego_distance =
-        ptr_front_blocking_obstacle->PerceptionSLBoundary().start_s() -
-        ego_front_edge_s;
-
-    if (obstacle_ego_distance > kSidePassMaxDistance) {
-      ADEBUG << "Obstacle " << front_blocking_obstacle_id << " has distance "
-             << obstacle_ego_distance
-             << " which is larger "
-                "than the predefined threshold "
-             << kSidePassMaxDistance;
-      ADEBUG << "Change scenario to default scenario.";
-      return false;
-    }
-    msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
+    // msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
     return (current_scenario.GetStatus() !=
             Scenario::ScenarioStatus::STATUS_DONE);
   } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
-    // If in some other scenario, then don't try to switch to SIDE_PASS.
+    // If in some other special scenario, then don't try to switch
+    // to SIDE_PASS scenario.
     return false;
   } else {
     // If originally in LANE_FOLLOW, then decide whether we should
     // switch to SIDE_PASS scenario.
     ADEBUG << "Checking if it's needed to switch from LANE_FOLLOW to "
               "SIDE_PASS: ";
-    bool is_side_pass = IsSidePassScenario(frame);
+    bool is_side_pass = IsSidePassScenario(frame, config);
     if (is_side_pass) {
-      ADEBUG << "   YES!";
-      msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
+      // msg_ = "side pass obstacle: " + front_blocking_obstacle_id;
     } else {
-      ADEBUG << "   NO!";
     }
     return is_side_pass;
   }
-  */
 }
 
-bool SidePassScenario::IsSidePassScenario(const Frame& frame) {
-  // return HasSingleReferenceLine(frame) &&
-  //        IsFarFromDestination(frame) &&
-  //        IsFarFromIntersection(frame) &&
-  //        HasBlockingObstacle(frame);
-
-  return HasSingleReferenceLine(frame) && IsFarFromDestination(frame) &&
-         IsFarFromIntersection(frame) && IsWithinSidePassingSpeedADC(frame) &&
-         IsSidePassableObstacle(frame, frame.reference_line_info().front(),
-                                frame.reference_line_info().front()
-                                     .path_data().blocking_obstacle_id());
+bool SidePassScenario::IsSidePassScenario(const Frame& frame,
+                                          const ScenarioConfig& config) {
+  return (IsFarFromDestination(frame) && IsFarFromIntersection(frame) &&
+          HasBlockingObstacle(frame, config));
 }
 
-bool SidePassScenario::HasSingleReferenceLine(const Frame& frame) {
-  return frame.reference_line_info().size() <= 1;
-}
-
-bool SidePassScenario::IsFarFromDestination(const Frame& frame) const {
+bool SidePassScenario::IsFarFromDestination(const Frame& frame) {
+  if (frame.reference_line_info().size() > 1) {
+    return false;
+  }
   const auto& reference_line_info = frame.reference_line_info().front();
   if (reference_line_info.SDistanceToDestination() < kClearDistance) {
     ADEBUG << "Too close to destination; don't SIDE_PASS";
@@ -240,7 +188,10 @@ bool SidePassScenario::IsFarFromDestination(const Frame& frame) const {
   return true;
 }
 
-bool SidePassScenario::IsFarFromIntersection(const Frame& frame) const {
+bool SidePassScenario::IsFarFromIntersection(const Frame& frame) {
+  if (frame.reference_line_info().size() > 1) {
+    return false;
+  }
   const SLBoundary& adc_sl_boundary =
       frame.reference_line_info().front().AdcSlBoundary();
   const auto& first_encountered_overlaps =
@@ -276,27 +227,15 @@ bool SidePassScenario::IsFarFromIntersection(const Frame& frame) const {
   return true;
 }
 
-bool SidePassScenario::IsWithinSidePassingSpeedADC(const Frame& frame) const {
-  return frame.PlanningStartPoint().v() < kSidePassMaxSpeed;
-}
-
-// TODO(jiacheng): implement this to replace HasBlockingObstacle.
-bool SidePassScenario::IsSidePassableObstacle(
-    const Frame& frame, const ReferenceLineInfo& reference_line_info,
-    const std::string& blocking_obstacle_id) const {
-  const Obstacle* blocking_obstacle =
-      reference_line_info.path_decision().obstacles().Find(
-          blocking_obstacle_id);
-  if (blocking_obstacle == nullptr) {
-    ADEBUG << "Doesn't exist such blocking obstalce.";
-    return true;
-  }
-  return IsNonmovableObstacle(reference_line_info, *blocking_obstacle);
-}
-
-bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
+bool SidePassScenario::HasBlockingObstacle(const Frame& frame,
+                                           const ScenarioConfig& config) {
   // Sanity checks.
   if (frame.reference_line_info().size() > 1) {
+    return false;
+  }
+
+  if (!config.has_side_pass_config()) {
+    AERROR << "miss scenario specific config";
     return false;
   }
 
@@ -308,14 +247,12 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame) {
   // by other obstacles or traffic rules.
   // Loop through every obstacle to locate the closest blocking one, if there
   // exists such an obstacle.
-
-  const auto& config = side_pass_context_.scenario_config_;
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     if (IsBlockingObstacleToSidePass(
             frame, obstacle,
-            config.block_obstacle_min_speed(),
-            config.min_front_obstacle_distance(),
-            config.enable_obstacle_blocked_check())) {
+            config.side_pass_config().block_obstacle_min_speed(),
+            config.side_pass_config().min_front_obstacle_distance(),
+            config.side_pass_config().enable_obstacle_blocked_check())) {
       exists_a_blocking_obstacle = true;
       double distance_between_adc_and_obstacle =
           GetDistanceBetweenADCAndObstacle(frame, obstacle);
