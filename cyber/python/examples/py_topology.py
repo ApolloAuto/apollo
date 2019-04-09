@@ -127,9 +127,8 @@ class TestTopologyManager(object):
         Test Show Channel Info.
         """
         ret = self.test_topology_manager.show_channel_info(channel_name)
-        if ret:
-            for item in ret:
-                print(item)
+        for item in ret:
+            print(item)
 
 if __name__ == "__main__":
     topology_manager_instance = TestTopologyManager()
