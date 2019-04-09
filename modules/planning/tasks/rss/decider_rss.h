@@ -49,10 +49,10 @@ struct rss_world_model_struct {
   double ego_v_s_end;
   double ego_v_l_start;
   double ego_v_l_end;
-  double lane_width_ego;
-  double lane_width_obs;
-  double left_width_obs;
+  double lane_leftmost;
+  double lane_rightmost;
   double lane_length;
+  double lane_width;
   double OR_front_lon_min;
   double OR_front_lon_max;
   double OR_front_lat_min;

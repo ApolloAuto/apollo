@@ -123,27 +123,16 @@ Status RssDecider::Process(Frame *frame,
     return Status::OK();
   }
 
-  bool in_test_mode = false;
-  if (in_test_mode) {
-    double obs_s_dist = nearest_obs_s_end - nearest_obs_s_start;
-    nearest_obs_s_start = ego_v_s_end + 5.0;
-    nearest_obs_s_end = nearest_obs_s_start + obs_s_dist;
-    front_obstacle_distance = nearest_obs_s_start - ego_v_s_end;
-  }
-
-  double left_width_ego = 0.0;
-  double right_width_ego = 0.0;
-  reference_line_info->reference_line().GetLaneWidth(
-      ego_v_s_start, &left_width_ego, &right_width_ego);
-
-  double left_width_obs = 0.0;
-  double right_width_obs = 0.0;
-  reference_line_info->reference_line().GetLaneWidth(
-      nearest_obs_s_start, &left_width_obs, &right_width_obs);
-
-  double total_lane_width_ego = left_width_ego + right_width_ego;
-  double total_lane_width_obs = left_width_obs + right_width_obs;
-  double total_lane_length = std::max(nearest_obs_s_end, ego_v_s_end);
+#if RSS_FAKE_INPUT
+  nearest_obs_l_start = -4.2608;
+  nearest_obs_l_end = -1.42591;
+  ego_v_l_start = -1.05554;
+  ego_v_l_end = 1.08416;
+#endif
+  double lane_leftmost = std::max(ego_v_l_end, nearest_obs_l_end);
+  double lane_rightmost = std::min(ego_v_l_start, nearest_obs_l_start);
+  double lane_width = std::abs(lane_leftmost-lane_rightmost);
+  double lane_length = std::max(nearest_obs_s_end, ego_v_s_end);
 
   rss_world_info.front_obs_dist = front_obstacle_distance;
   rss_world_info.obs_s_start = nearest_obs_s_start;
@@ -155,10 +144,10 @@ Status RssDecider::Process(Frame *frame,
   rss_world_info.ego_v_s_end = ego_v_s_end;
   rss_world_info.ego_v_l_start = ego_v_l_start;
   rss_world_info.ego_v_l_end = ego_v_l_end;
-  rss_world_info.lane_width_ego = total_lane_width_ego;
-  rss_world_info.lane_width_obs = total_lane_width_obs;
-  rss_world_info.left_width_obs = left_width_obs;
-  rss_world_info.lane_length = total_lane_length;
+  rss_world_info.lane_leftmost = lane_leftmost;
+  rss_world_info.lane_rightmost = lane_rightmost;
+  rss_world_info.lane_width = lane_width;
+  rss_world_info.lane_length = lane_length;
 
   Object followingObject;
   Object leadingObject;
@@ -172,15 +161,14 @@ Status RssDecider::Process(Frame *frame,
   ad_rss::world::OccupiedRegion occupiedRegion_leading;
   occupiedRegion_leading.segmentId = 0;
   occupiedRegion_leading.lonRange.minimum =
-      ParametricValue(nearest_obs_s_start / total_lane_length);
+      ParametricValue(nearest_obs_s_start / lane_length);
   occupiedRegion_leading.lonRange.maximum =
-      ParametricValue(nearest_obs_s_end / total_lane_length);
+      ParametricValue(nearest_obs_s_end / lane_length);
   occupiedRegion_leading.latRange.minimum = ParametricValue(
-      std::max((left_width_obs - nearest_obs_l_end) /
-          total_lane_width_obs, 0.0));
+      std::abs(ego_v_l_end - lane_leftmost) / lane_width);
   occupiedRegion_leading.latRange.maximum = ParametricValue(
-      std::min((left_width_obs - nearest_obs_l_start) /
-          total_lane_width_obs, 1.0));
+      std::abs(ego_v_l_start - lane_leftmost) / lane_width);
+
   leadingObject.occupiedRegions.push_back(occupiedRegion_leading);
 
   rss_world_info.OR_front_lon_min =
@@ -197,13 +185,14 @@ Status RssDecider::Process(Frame *frame,
   ad_rss::world::OccupiedRegion occupiedRegion_following;
   occupiedRegion_following.segmentId = 0;
   occupiedRegion_following.lonRange.minimum =
-      ParametricValue(ego_v_s_start / total_lane_length);
+      ParametricValue(ego_v_s_start / lane_length);
   occupiedRegion_following.lonRange.maximum =
-      ParametricValue(ego_v_s_end / total_lane_length);
-  occupiedRegion_following.latRange.minimum =
-      ParametricValue((left_width_ego - ego_v_l_end) / total_lane_width_ego);
-  occupiedRegion_following.latRange.maximum =
-      ParametricValue((left_width_ego - ego_v_l_start) / total_lane_width_ego);
+      ParametricValue(ego_v_s_end / lane_length);
+  occupiedRegion_following.latRange.minimum = ParametricValue(
+      std::abs(nearest_obs_l_end - lane_leftmost) / lane_width);
+  occupiedRegion_following.latRange.maximum = ParametricValue(
+      std::abs(nearest_obs_l_start - lane_leftmost) / lane_width);
+
   followingObject.occupiedRegions.push_back(occupiedRegion_following);
 
   rss_world_info.adc_vel = adc_velocity;
@@ -212,22 +201,20 @@ Status RssDecider::Process(Frame *frame,
   rss_world_info.OR_rear_lon_max =
       static_cast<double> (occupiedRegion_following.lonRange.maximum);
   rss_world_info.OR_rear_lat_min =
-      static_cast<double> (occupiedRegion_following.lonRange.minimum);
+      static_cast<double> (occupiedRegion_following.latRange.minimum);
   rss_world_info.OR_rear_lat_max =
-      static_cast<double> (occupiedRegion_following.lonRange.maximum);
+      static_cast<double> (occupiedRegion_following.latRange.maximum);
 
   ad_rss::world::RoadSegment roadSegment;
   ad_rss::world::LaneSegment laneSegment;
 
   laneSegment.id = 0;
-  laneSegment.length.minimum = Distance(total_lane_length);
-  laneSegment.length.maximum = Distance(total_lane_length);
-  laneSegment.width.minimum = Distance(std::min(total_lane_width_ego,
-      total_lane_width_obs));
-  laneSegment.width.maximum = Distance(std::max(total_lane_width_ego,
-      total_lane_width_obs));
-  roadSegment.push_back(laneSegment);
+  laneSegment.length.minimum = Distance(lane_length);
+  laneSegment.length.maximum = Distance(lane_length);
+  laneSegment.width.minimum = Distance(lane_width);
+  laneSegment.width.maximum = Distance(lane_width);
 
+  roadSegment.push_back(laneSegment);
   roadArea.push_back(roadSegment);
 
   rss_world_info.laneSeg_len_min =
@@ -420,9 +407,9 @@ void RssDecider::rss_dump_world_info(const struct
          << " ego_v_s_end: " << rss_info.ego_v_s_end
          << " ego_v_l_start: " << rss_info.ego_v_l_start
          << " ego_v_l_end: " << rss_info.ego_v_l_end
-         << " lane_width_ego: " << rss_info.lane_width_ego
-         << " lane_width_obs: " << rss_info.lane_width_obs
-         << " left_width_obs: " << rss_info.left_width_obs
+         << " lane_leftmost: " << rss_info.lane_leftmost
+         << " lane_rightmost: " << rss_info.lane_rightmost
+         << " lane_width: " << rss_info.lane_width
          << " lane_length: " << rss_info.lane_length
          << " OR_front_lon_min: " << rss_info.OR_front_lon_min
          << " OR_front_lon_max: " << rss_info.OR_front_lon_max
