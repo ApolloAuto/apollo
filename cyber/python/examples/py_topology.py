@@ -63,9 +63,8 @@ class TestTopologyManager(object):
         Test Show Node Info.
         """
         ret = self.test_topology_manager.show_node_info(node_name)
-        if ret:
-            for item in ret:
-                print(item)
+        for item in ret:
+            print(item)
 
     def test_get_channel_list(self):
         """
