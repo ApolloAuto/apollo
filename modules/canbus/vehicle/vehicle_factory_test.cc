@@ -37,16 +37,16 @@ class VehicleFactoryTest : public ::testing::Test {
 TEST_F(VehicleFactoryTest, CreateVehicle) {
   VehicleParameter parameter;
 
-  parameter.set_brand(VehicleParameter::GEM);
+  parameter.set_brand(apollo::common::GEM);
   EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 
-  parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
+  parameter.set_brand(apollo::common::LINCOLN_MKZ);
   EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 
-  parameter.set_brand(VehicleParameter::GE3);
+  parameter.set_brand(apollo::common::GE3);
   EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 
-  parameter.set_brand(VehicleParameter::WEY);
+  parameter.set_brand(apollo::common::WEY);
   EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 }
 
