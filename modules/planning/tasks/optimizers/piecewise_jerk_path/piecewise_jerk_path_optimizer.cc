@@ -127,9 +127,11 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
          << FLAGS_lateral_derivative_bound_default << "\t"
          << first_order_bounds;
   // TODO(all): temp. disable AdjustLateralDerivativeBounds, enable later
-  // fem_1d_qp->SetFirstOrderBounds(first_order_bounds);
-  fem_1d_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
-  fem_1d_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
+  // fem_1d_qp->SetFirstOrderBounds(-first_order_bounds, first_order_bounds);
+  fem_1d_qp->SetFirstOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                                  FLAGS_lateral_derivative_bound_default);
+  fem_1d_qp->SetSecondOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                                   FLAGS_lateral_derivative_bound_default);
 
   bool success = fem_1d_qp->Optimize(max_iter);
 

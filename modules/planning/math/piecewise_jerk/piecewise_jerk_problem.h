@@ -80,11 +80,14 @@ class PiecewiseJerkProblem {
 
   void SetSecondOrderBounds(std::vector<std::pair<double, double>> d2x_bounds);
 
-  void SetZeroOrderBounds(const double x_bound);
+  void SetZeroOrderBounds(const double x_lower_bound,
+                          const double x_upper_bound);
 
-  void SetFirstOrderBounds(const double dx_bound);
+  void SetFirstOrderBounds(const double dx_lower_bound,
+                           const double dx_upper_bound);
 
-  void SetSecondOrderBounds(const double ddx_bound);
+  void SetSecondOrderBounds(const double ddx_lower_bound,
+                            const double ddx_upper_bound);
 
   // x_bounds: tuple(s, lower_bounds, upper_bounds)
   // s doesn't need to be sorted
