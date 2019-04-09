@@ -74,14 +74,10 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
 
       if (ptr_fallback_trajectory_pair->first[i].relative_time() >
           relative_stopping_time) {
-        ptr_fallback_trajectory_pair->first[i].mutable_path_point()->set_x(
-            previous_point.path_point().x());
-        ptr_fallback_trajectory_pair->first[i].mutable_path_point()->set_y(
-            previous_point.path_point().y());
+        ptr_fallback_trajectory_pair->first[i].mutable_path_point()->CopyFrom(
+            previous_point.path_point());
         ptr_fallback_trajectory_pair->first[i].set_v(0.0);
         ptr_fallback_trajectory_pair->first[i].set_a(0.0);
-        ptr_fallback_trajectory_pair->first[i].mutable_path_point()->set_s(
-            previous_point.path_point().s());
       } else {
         ptr_fallback_trajectory_pair->first[i].set_v(temp_v);
         ptr_fallback_trajectory_pair->first[i].set_a(accelerate);
