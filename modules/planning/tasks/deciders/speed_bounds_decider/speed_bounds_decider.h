@@ -38,6 +38,8 @@ class SpeedBoundsDecider : public Decider {
       Frame* const frame,
       ReferenceLineInfo* const reference_line_info) override;
 
+  void CheckLaneChangeUrgency(Frame *const frame);
+
   // @brief Check if necessary to set stop fence used for nonscenario side pass
   bool CheckSidePassStop(const PathData& path_data, double* stop_s_on_pathdata);
 
@@ -58,6 +60,7 @@ class SpeedBoundsDecider : public Decider {
 
  private:
   SpeedBoundsDeciderConfig speed_bounds_config_;
+  bool is_clear_to_change_lane_ = false;
 };
 
 }  // namespace planning
