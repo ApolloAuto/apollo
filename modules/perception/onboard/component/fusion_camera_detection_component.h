@@ -34,8 +34,12 @@
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+#include "modules/perception/proto/motion_service.pb.h"
 #include "modules/perception/proto/perception_camera.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+typedef std::shared_ptr<apollo::perception::Motion_Service>
+    MotionServiceMsgType;
 
 namespace apollo {
 namespace perception {
@@ -62,7 +66,9 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
   int InitCameraFrames();
   int InitProjectMatrix();
   int InitCameraListeners();
+  int InitMotionService();
   void SetCameraHeightAndPitch();
+  void OnMotionService(const MotionServiceMsgType &message);
 
   int InternalProc(
       const std::shared_ptr<apollo::drivers::Image const>& in_message,
@@ -182,6 +188,11 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
       apollo::cyber::Writer<apollo::perception::camera::CameraDebug>>
       camera_debug_writer_;
 
+  // variable for motion service
+  base::MotionBufferPtr mot_buffer_;
+  const int motion_buffer_size_ = 100;
+
+  // variables for visualization
   camera::Visualizer visualize_;
   bool write_visual_img_;
 };

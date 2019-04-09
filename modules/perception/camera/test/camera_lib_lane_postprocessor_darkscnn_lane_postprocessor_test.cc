@@ -159,6 +159,7 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
   DataProvider::InitOptions dp_init_options;
   DataProvider data_provider;
   frame.data_provider = &data_provider;
+  base::MotionBufferPtr motion_buffer;
 
   // initilize visualizer and set homography for lane_postprocessor
   Visualizer visualize_;
@@ -232,7 +233,7 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
     if (enable_visualization_) {
       frame.frame_id = i;
       frame.timestamp = static_cast<double>(i);
-      visualize_.ShowResult_all_info_single_camera(img, frame);
+      visualize_.ShowResult_all_info_single_camera(img, frame, motion_buffer);
     }
 
     // delete detector;
