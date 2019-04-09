@@ -121,27 +121,27 @@ void PiecewiseJerkProblem::SetSecondOrderBounds(
   ddx_bounds_ = std::move(d2x_bounds);
 }
 
-void PiecewiseJerkProblem::SetZeroOrderBounds(const double x_bound) {
-  CHECK_GT(x_bound, 0.0);
+void PiecewiseJerkProblem::SetZeroOrderBounds(const double x_lower_bound,
+                                              const double x_upper_bound) {
   for (auto& x : x_bounds_) {
-    x.first = -x_bound;
-    x.second = x_bound;
+    x.first = x_lower_bound;
+    x.second = x_upper_bound;
   }
 }
 
-void PiecewiseJerkProblem::SetFirstOrderBounds(const double dx_bound) {
-  CHECK_GT(dx_bound, 0.0);
+void PiecewiseJerkProblem::SetFirstOrderBounds(const double dx_lower_bound,
+                                               const double dx_upper_bound) {
   for (auto& x : dx_bounds_) {
-    x.first = -dx_bound;
-    x.second = dx_bound;
+    x.first = dx_lower_bound;
+    x.second = dx_upper_bound;
   }
 }
 
-void PiecewiseJerkProblem::SetSecondOrderBounds(const double ddx_bound) {
-  CHECK_GT(ddx_bound, 0.0);
+void PiecewiseJerkProblem::SetSecondOrderBounds(const double ddx_lower_bound,
+                                                const double ddx_upper_bound) {
   for (auto& x : ddx_bounds_) {
-    x.first = -ddx_bound;
-    x.second = ddx_bound;
+    x.first = ddx_lower_bound;
+    x.second = ddx_upper_bound;
   }
 }
 

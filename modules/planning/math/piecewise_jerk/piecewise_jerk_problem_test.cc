@@ -57,8 +57,10 @@ TEST(PiecewiseJerkProblemTest, basic_test) {
       new PiecewiseJerkProblem(n, x_init, delta_s, w, max_x_third_order_derivative));
 
   fem_qp->SetVariableBounds(x_bounds);
-  fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
-  fem_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetFirstOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                               FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetSecondOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                                FLAGS_lateral_derivative_bound_default);
 
   auto start_time = std::chrono::system_clock::now();
   EXPECT_TRUE(fem_qp->Optimize());
@@ -117,8 +119,10 @@ TEST(PiecewiseJerkProblemTest, derivative_constraint_test) {
       new PiecewiseJerkProblem(n, x_init, delta_s, w, max_x_third_order_derivative));
 
   fem_qp->SetVariableBounds(x_bounds);
-  fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
-  fem_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetFirstOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                               FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetSecondOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                                FLAGS_lateral_derivative_bound_default);
 
   const double dx_max = std::sqrt(0.5) / 15.0;
   std::vector<std::tuple<double, double, double>> dx_bounds;
