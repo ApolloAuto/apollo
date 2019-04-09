@@ -135,19 +135,19 @@ export default class HMI {
     }
 
     @action updateDataCollectionProgress(data) {
-        const overallKeyName = 'Overall';
-        Object.keys(data).sort((category1, category2) => {
-            if (category1 === overallKeyName) {
-                return -1;
+        Object.keys(data).sort().forEach((scenarioName) => {
+            if (!this.dataCollectionProgress.has(scenarioName)) {
+                this.dataCollectionProgress.set(scenarioName, observable.map());
+                this.dataCollectionUpdateStatus.set(scenarioName, observable.map());
             }
-            if (category2 === overallKeyName) {
-                return 1;
-            }
-            return category1.localeCompare(category2);
-        }).forEach((category) => {
-            const isUpdated = this.dataCollectionProgress.get(category) !== data[category];
-            this.dataCollectionUpdateStatus.set(category, isUpdated);
-            this.dataCollectionProgress.set(category, data[category]);
+            const categoryProgress = this.dataCollectionProgress.get(scenarioName);
+            const categoryStatus =  this.dataCollectionUpdateStatus.get(scenarioName);
+            const scenario = data[scenarioName];
+            Object.keys(scenario).sort().forEach((categoryName) => {
+                const isUpdated = categoryProgress.get(categoryName) !== scenario[categoryName];
+                categoryProgress.set(categoryName, scenario[categoryName]);
+                categoryStatus.set(categoryName, isUpdated);
+            });
         });
     }
 
