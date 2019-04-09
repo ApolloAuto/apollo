@@ -28,6 +28,10 @@ message VehicleParam {
   enum VehicleBrand {
     LINCOLN_MKZ = 0;
     GEM = 1;
+    LEXUS = 2;
+    TRANSIT = 3;
+    GE3 = 4;
+    WEY = 5;
   }
 
   optional VehicleBrand brand = 1;
