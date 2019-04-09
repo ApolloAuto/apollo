@@ -35,18 +35,18 @@ dual_variable_warm_start_config {
   min_safety_distance: 0.0
 }
 distance_approach_config {
-  weight_steer: 0.3
-  weight_a: 1.1
-  weight_steer_rate: 3.0
-  weight_a_rate: 2.5
-  weight_x: 2.3
-  weight_y: 0.7
-  weight_phi: 1.5
-  weight_v: 3.75
-  weight_steer_stitching: 1.75
-  weight_a_stitching: 3.25
-  weight_first_order_time: 4.25
-  weight_second_order_time: 13.5
+  weight_steer: 2.81768216794
+  weight_a: 2.41080617189
+  weight_steer_rate: 6.89770262911
+  weight_a_rate: 3.22944303573
+  weight_x: 3.0436663773
+  weight_y: 1.15424143089
+  weight_phi: 1.82633720001
+  weight_v: 1.97354768207
+  weight_steer_stitching: 0.135919815119
+  weight_a_stitching: 3.10267750174
+  weight_first_order_time: 1.97298969291
+  weight_second_order_time: 12.3039448573
   min_safety_distance: 0.0
   max_speed_forward: 2.0
   max_speed_reverse: 1.0

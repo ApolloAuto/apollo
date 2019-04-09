@@ -47,7 +47,6 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
           predicted_bounding_rectangles, &current_idx, &first_collision_idx)) {
     // change gflag
     frame_->mutable_open_space_info()->set_fallback_flag(true);
-
     // generate fallback trajectory base on current partition trajectory
     // vehicle speed is decreased to zero inside safety distance
     *(frame_->mutable_open_space_info()->mutable_fallback_trajectory()) =
@@ -72,16 +71,14 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
           previous_point.relative_time();
       double temp_v = previous_point.v() + accelerate * temp_relative_time;
 
-      if (ptr_fallback_trajectory_pair->first[i].relative_time() >
-          relative_stopping_time) {
-        ptr_fallback_trajectory_pair->first[i].mutable_path_point()->set_x(
-            previous_point.path_point().x());
-        ptr_fallback_trajectory_pair->first[i].mutable_path_point()->set_y(
-            previous_point.path_point().y());
+      if (ptr_fallback_trajectory_pair->first[i].relative_time()
+          > relative_stopping_time) {
+        double tmp_rt = ptr_fallback_trajectory_pair->first[i].relative_time();
+        *(ptr_fallback_trajectory_pair->first[i].mutable_path_point())
+            = previous_point.path_point();
         ptr_fallback_trajectory_pair->first[i].set_v(0.0);
         ptr_fallback_trajectory_pair->first[i].set_a(0.0);
-        ptr_fallback_trajectory_pair->first[i].mutable_path_point()->set_s(
-            previous_point.path_point().s());
+        ptr_fallback_trajectory_pair->first[i].set_relative_time(tmp_rt);
       } else {
         ptr_fallback_trajectory_pair->first[i].set_v(temp_v);
         ptr_fallback_trajectory_pair->first[i].set_a(accelerate);

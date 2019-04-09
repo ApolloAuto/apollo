@@ -24,15 +24,15 @@ import numpy as np
 import time
 import math
 
-def SmoothTrajectory(visualize_flag):
+def SmoothTrajectory(visualize_flag, sx=-8, sy=4, sphi=0.0):
     # initialze object
     OpenSpacePlanner = DistancePlanner()
 
     # parameter(except max, min and car size is defined in proto)
     num_output_buffer = 10000
-    sx = -8
-    sy = 4
-    sphi = 0.0
+    # sx = -8
+    # sy = 4
+    # sphi = 0.0
 
     scenario = "backward"
     # scenario = "parallel"
