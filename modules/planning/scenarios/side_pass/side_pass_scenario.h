@@ -25,7 +25,6 @@
 #include <vector>
 
 #include "modules/common/util/factory.h"
-#include "modules/planning/common/frame.h"
 #include "modules/planning/scenarios/scenario.h"
 
 namespace apollo {
@@ -46,9 +45,8 @@ class SidePassScenario : public Scenario {
   SidePassScenario(const ScenarioConfig& config,
                    const ScenarioContext* scenario_context);
 
-  bool IsTransferable(
-      const Scenario& current_scenario,
-      const Frame& frame);
+  static bool IsTransferable(const Frame& frame, const ScenarioConfig& config,
+                             const Scenario& current_scenario);
 
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
@@ -56,21 +54,15 @@ class SidePassScenario : public Scenario {
  private:
   static void RegisterStages();
 
-  bool IsSidePassScenario(const Frame& frame);
+  static bool IsSidePassScenario(const Frame& frame,
+                                 const ScenarioConfig& config);
 
-  bool HasSingleReferenceLine(const Frame& frame);
+  static bool IsFarFromIntersection(const Frame& frame);
 
-  bool IsFarFromIntersection(const Frame& frame) const;
+  static bool IsFarFromDestination(const Frame& frame);
 
-  bool IsFarFromDestination(const Frame& frame) const;
-
-  bool IsWithinSidePassingSpeedADC(const Frame& frame) const;
-
-  bool IsSidePassableObstacle(
-    const Frame& frame, const ReferenceLineInfo& reference_line_info,
-    const std::string& blocking_obstacle_id) const;
-
-  bool HasBlockingObstacle(const Frame& frame);
+  static bool HasBlockingObstacle(const Frame& frame,
+                                  const ScenarioConfig& config);
 
  private:
   static apollo::common::util::Factory<
