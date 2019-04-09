@@ -42,4 +42,17 @@ cc_library(
         ":piecewise_jerk_problem",
     ],
 )
+
+cc_library(
+    name = "path_time_qp_problem",
+    srcs = [
+        "path_time_qp_problem.cc",
+    ],
+    hdrs = [
+        "path_time_qp_problem.h",
+    ],
+    deps = [
+        ":piecewise_jerk_problem",
+    ],
+)
 cpplint()
