@@ -25,26 +25,25 @@
  * prediction.cc和prediction.h:
 	  * Name()函数：返回节点名字prediction。
 	  * Init()函数：
-       * 使用配置文件prediction_conf.pb.txt设置prediction_conf_，主要设置preditor的产生的通道类型。
-       * 使用配置文件adapter.conf设置adapter_conf_，设置节点话题类型。
-       * 初始化AdapterManager，定义nodehandle和话题。
-       * 初始化ContainerManager，每一个接受话题创建一个Container，用于接受话题数据。
-       * 初始化EvaluatorManager：注册一个Evaluator：MLP_EVALUATOR；根据prediction_conf.pb.txt配置MLP_EVALUATOR，似乎关注路上的车辆，设置vehicle_on_lane_evaluator_。
-       * 初始化PredictorManager：注册四个Predictor，并设置了vehicle_on_lane_predictor_，vehicle_off_lane_predictor_和pedestrian_predictor_。
-       * 检测localization和perception节点是否准备好。
-       * 设置localization和perception数据的回调函数OnLocalization和OnPerception。
+        * 使用配置文件prediction_conf.pb.txt设置prediction_conf_，主要设置preditor的产生的通道类型。
+        * 使用配置文件adapter.conf设置adapter_conf_，设置节点话题类型。
+        * 初始化AdapterManager，定义nodehandle和话题。
+        * 初始化ContainerManager，每一个接受话题创建一个Container，用于接受话题数据。
+        * 初始化EvaluatorManager：注册一个Evaluator：MLP_EVALUATOR；根据prediction_conf.pb.txt配置MLP_EVALUATOR，似乎关注路上的车辆，设置vehicle_on_lane_evaluator_。
+        * 初始化PredictorManager：注册四个Predictor，并设置了vehicle_on_lane_predictor_，vehicle_off_lane_predictor_和pedestrian_predictor_。
+        * 检测localization和perception节点是否准备好。
+        * 设置localization和perception数据的回调函数OnLocalization和OnPerception。
 	  * OnLocalization函数：
-       * 获取障碍物容器obstacles_container。
-       * 获取位置pose_container。
-       * 将新到的位置消息存入pose_container。
-       * 将位置转换为障碍物信息（不太清楚如何转化：//TODO）
-       * 更新障碍物信息。
+        * 获取障碍物容器obstacles_container。
+        * 获取位置pose_container。
+        * 将新到的位置消息存入pose_container。
+        * 更新障碍物信息。
 	  * OnPerception函数：
-       * 获取障碍物容器obstacles_container。
-       * 将新到的障碍物信息存入obstacles_container。
-       * 运行Evaluator。
-       * 运行Predictor。
-       * 跟新待发布数据prediction_obstacles header结构，发布消息。
+        * 获取障碍物容器obstacles_container。
+        * 将新到的障碍物信息存入obstacles_container。
+        * 运行Evaluator。
+        * 运行Predictor。
+        * 跟新待发布数据prediction_obstacles header结构，发布消息。
 
 ## 评估器Evaluator:
  * 创建一个新的NewEvaluator：
