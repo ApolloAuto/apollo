@@ -103,7 +103,7 @@ void ReferenceLineProvider::UpdateVehicleState(
 }
 
 bool ReferenceLineProvider::Start() {
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_use_navigation_mode || FLAGS_use_navigation_with_utm) {
     return true;
   }
   if (!is_initialized_) {
@@ -184,7 +184,7 @@ void ReferenceLineProvider::GenerateThread() {
     std::this_thread::sleep_for(
         std::chrono::duration<double, std::milli>(kSleepTime));
     double start_time = Clock::NowInSeconds();
-    if (!has_routing_) {
+    if (!has_routing_ && !FLAGS_use_navigation_with_utm) {
       AERROR << "Routing is not ready.";
       continue;
     }
@@ -217,7 +217,7 @@ bool ReferenceLineProvider::GetReferenceLines(
   CHECK_NOTNULL(reference_lines);
   CHECK_NOTNULL(segments);
 
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_use_navigation_mode || FLAGS_use_navigation_with_utm) {
     double start_time = Clock::NowInSeconds();
     bool result = GetReferenceLinesFromRelativeMap(
         AdapterManager::GetRelativeMap()->GetLatestObserved(), reference_lines,
@@ -549,13 +549,11 @@ bool ReferenceLineProvider::CreateReferenceLine(
     vehicle_state = vehicle_state_;
   }
 
-  routing::RoutingResponse routing;
-  {
+  bool is_new_routing = false;
+  if (!FLAGS_use_navigation_with_utm) {
+    routing::RoutingResponse routing;
     std::lock_guard<std::mutex> lock(routing_mutex_);
     routing = routing_;
-  }
-  bool is_new_routing = false;
-  {
     // Update routing in pnc_map
     if (pnc_map_->IsNewRouting(routing)) {
       is_new_routing = true;

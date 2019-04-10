@@ -23,6 +23,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "modules/common/configs/config_gflags.h"
 #include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/map/relative_map/proto/navigation.pb.h"

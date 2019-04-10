@@ -18,8 +18,8 @@
 
 #include <utility>
 
-#include "yaml-cpp/yaml.h"
 #include "third_party/json/json.hpp"
+#include "yaml-cpp/yaml.h"
 
 #include "modules/map/proto/map_lane.pb.h"
 
@@ -32,11 +32,11 @@
 namespace apollo {
 namespace relative_map {
 
-using nlohmann::json;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::VehicleStateProvider;
 using apollo::common::adapter::AdapterManager;
+using nlohmann::json;
 using apollo::common::util::operator+;
 using apollo::common::math::Vec2d;
 using apollo::common::monitor::MonitorLogBuffer;
@@ -47,12 +47,16 @@ RelativeMap::RelativeMap()
     : monitor_logger_(MonitorMessageItem::RELATIVE_MAP) {}
 
 Status RelativeMap::Init() {
-  if (!FLAGS_use_navigation_mode) {
-    AERROR << "FLAGS_use_navigation_mode is false, system is not configured "
-              "for relative map mode";
+  if (!FLAGS_use_navigation_with_utm && !FLAGS_use_navigation_mode) {
+    AERROR << "FLAGS_use_navigation_with_utm is false and "
+              "FLAGS_use_navigation_mode "
+              "is false neither, system is not configured "
+              "for relative map.";
     return Status(ErrorCode::RELATIVE_MAP_ERROR,
-                  "FLAGS_use_navigation_mode is not true.");
+                  "FLAGS_use_navigation_with_utm is not true , neither "
+                  "FLAGS_use_navigation_mode.");
   }
+
   adapter_conf_.Clear();
   if (!common::util::GetProtoFromFile(
           FLAGS_relative_map_adapter_config_filename, &adapter_conf_)) {
@@ -128,8 +132,8 @@ apollo::common::Status RelativeMap::Start() {
   // donot receive topic navigation while
   // FLAGS_load_navigation_path_when_start is true
   if (!FLAGS_load_navigation_path_when_start) {
-    AdapterManager::AddNavigationCallback(
-        &RelativeMap::OnReceiveNavigationInfo, this);
+    AdapterManager::AddNavigationCallback(&RelativeMap::OnReceiveNavigationInfo,
+                                          this);
   }
 
   if (AdapterManager::GetPerceptionObstacles()->Empty()) {
@@ -214,7 +218,7 @@ bool RelativeMap::CreateMapFromNavigationLane(MapMsg* map_msg) {
   }
 
   ADEBUG << "There is/are " << map_msg->navigation_path().size()
-        << " navigation path(s) in the current reltative map.";
+         << " navigation path(s) in the current reltative map.";
   return true;
 }
 
@@ -224,8 +228,8 @@ bool RelativeMap::GetNavigationPathList(
     return false;
   }
 
-  YAML::Node path_root = YAML::LoadFile(
-      FLAGS_relative_map_navigation_path_filename);
+  YAML::Node path_root =
+      YAML::LoadFile(FLAGS_relative_map_navigation_path_filename);
   if (!path_root["navigation_path"]) {
     return false;
   }
@@ -279,10 +283,10 @@ void RelativeMap::LoadNavigationPath() {
         point->set_dkappa(json_node["dkappa"]);
       }
     } catch (const std::exception& e) {
-        AERROR << "Failed to load navigation path file, catch exception "
-               << e.what();
-        fstr.close();
-        return;
+      AERROR << "Failed to load navigation path file, catch exception "
+             << e.what();
+      fstr.close();
+      return;
     }
 
     fstr.close();
@@ -298,8 +302,7 @@ void RelativeMap::PublishNavigationInfo(
     NavigationInfo* const navigation_info) const {
   apollo::common::adapter::AdapterManager::FillNavigationHeader(
       Name(), navigation_info);
-  apollo::common::adapter::AdapterManager::PublishNavigation(
-      *navigation_info);
+  apollo::common::adapter::AdapterManager::PublishNavigation(*navigation_info);
 }
 
 void RelativeMap::Stop() {

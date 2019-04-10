@@ -464,7 +464,7 @@ void Frame::RecordInputDebug(planning_internal::Debug *debug) {
   auto debug_chassis = planning_data->mutable_chassis();
   debug_chassis->CopyFrom(chassis);
 
-  if (!FLAGS_use_navigation_mode) {
+  if (!FLAGS_use_navigation_mode && !FLAGS_use_navigation_with_utm) {
     auto debug_routing = planning_data->mutable_routing();
     debug_routing->CopyFrom(
         AdapterManager::GetRoutingResponse()->GetLatestObserved());
