@@ -621,7 +621,7 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   auto chart = debug_chart->mutable_planning_data()->add_chart();
   auto open_space_debug = debug_info.planning_data().open_space();
 
-  chart->set_title("Open Space Trajectory Visualization");
+  chart->set_title("Open Space Trajectory Optimizer Visualization");
   PopulateChartOptions(open_space_debug.xy_boundary(0) - 1.0,
                        open_space_debug.xy_boundary(1) + 1.0, "x (meter)",
                        open_space_debug.xy_boundary(2) - 1.0,
@@ -652,9 +652,18 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   auto* smoothed_line = chart->add_line();
   smoothed_line->set_label("Smooth");
   for (const auto& point : smoothed_trajectory.vehicle_motion_point()) {
+    const auto& x = point.trajectory_point().path_point().x();
+    const auto& y = point.trajectory_point().path_point().y();
+    const auto& heading = point.trajectory_point().path_point().theta();
     auto* point_debug = smoothed_line->add_point();
-    point_debug->set_x(point.trajectory_point().path_point().x());
-    point_debug->set_y(point.trajectory_point().path_point().y());
+    auto* adc_shape = chart->add_car();
+    adc_shape->set_x(x);
+    adc_shape->set_y(y);
+    adc_shape->set_heading(heading);
+    adc_shape->set_color("\"rgba(54, 162, 235, 1)\"");
+    adc_shape->set_label(std::to_string(x) + std::to_string(y));
+    point_debug->set_x(x);
+    point_debug->set_y(y);
   }
   // Set chartJS's dataset properties
   auto* smoothed_properties = smoothed_line->mutable_properties();

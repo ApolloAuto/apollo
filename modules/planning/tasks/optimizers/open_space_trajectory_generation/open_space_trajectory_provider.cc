@@ -89,10 +89,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
     thread_init_flag_ = true;
   }
   // Get stitching trajectory from last frame
-  const double start_timestamp = Clock::NowInSeconds();
   const common::VehicleState vehicle_state = frame_->vehicle_state();
-  const double planning_cycle_time = FLAGS_open_space_planning_period;
-  std::string replan_reason;
   auto* previous_frame = FrameHistory::Instance()->Latest();
   // Use complete raw trajectory from last frame for stitching purpose
   std::vector<TrajectoryPoint> stitching_trajectory;
@@ -104,15 +101,20 @@ Status OpenSpaceTrajectoryProvider::Process() {
         previous_frame->current_frame_planned_trajectory()
             .header()
             .timestamp_sec();
+    const double planning_cycle_time = FLAGS_open_space_planning_period;
     PublishableTrajectory last_frame_complete_trajectory(
         previous_planning_header, previous_planning);
+    std::string replan_reason;
+    const double start_timestamp = Clock::NowInSeconds();
     stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
         vehicle_state, start_timestamp, planning_cycle_time,
         &last_frame_complete_trajectory, &replan_reason);
   } else {
-    AERROR << "hahahahhhhhhhhhhhhhhhhhhhhhhhhh";
+    ADEBUG << "Replan due to fallback stop";
+    const double planning_cycle_time =
+        1.0 / static_cast<double>(FLAGS_planning_loop_rate);
     stitching_trajectory = TrajectoryStitcher::ComputeReinitStitchingTrajectory(
-        0.1, vehicle_state);
+        planning_cycle_time, vehicle_state);
   }
   // Get open_space_info from current frame
   const auto& open_space_info = frame_->open_space_info();
