@@ -119,13 +119,18 @@ if __name__ == "__main__":
     parser.add_argument(
         "-a", "--alldata", action="store_const", const=True,
         help="Analyze all data (both auto and manual), otherwise auto data only without this option.")
+
+    parser.add_argument(
+        "-acc", "--showacc", action="store_const", const=True,
+        help="Analyze all data (both auto and manual), otherwise auto data only without this option.")
+
     args = parser.parse_args()
 
     record_file = args.file
     reader = RecordReader(record_file)
 
     control_analyzer = ControlAnalyzer()
-    planning_analyzer = PlannigAnalyzer(args.simulation, args.simulation2)
+    planning_analyzer = PlannigAnalyzer(args)
     lidar_endtoend_analyzer = LidarEndToEndAnalyzer()
 
     process(control_analyzer, planning_analyzer,
