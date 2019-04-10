@@ -158,7 +158,7 @@ class DataCollector(object):
                 self.controlcmd.brake = 0
             else:
                 self.controlcmd.throttle = 0
-                self.controlcmd.brake = -self.cmd[0]
+                self.controlcmd.brake = -self.cmd[2]
             if self.vehicle_speed == 0:
                 self.in_session = False
 
