@@ -64,7 +64,6 @@ void show_detect_point_set(
     }
   }
   cv::imwrite(save_path, draw_mat);
-  return;
 }
 
 void show_all_infer_point_set(const cv::Mat& image,
@@ -80,7 +79,6 @@ void show_all_infer_point_set(const cv::Mat& image,
     cv::circle(draw_mat, cv::Point(point_x, point_y), draw_size, color, 4);
   }
   cv::imwrite(save_path, draw_mat);
-  return;
 }
 
 void show_lane_lines(const cv::Mat& image,
@@ -157,7 +155,6 @@ void show_lane_lines(const cv::Mat& image,
   cv::Rect roi(0, 0, ipm_width, ipm_height);
   draw_ipm.copyTo(draw_mat(roi));
   cv::imwrite(save_path, draw_mat);
-  return;
 }
 
 void show_lane_ccs(const std::vector<unsigned char>& lane_map,
@@ -207,7 +204,6 @@ void show_lane_ccs(const std::vector<unsigned char>& lane_map,
   }
   cv::imwrite(save_path, lane_draw);
   AINFO << msg;
-  return;
 }
 
 void output_laneline_to_json(const std::vector<base::LaneLine>& lane_objects,
@@ -284,7 +280,6 @@ void output_laneline_to_json(const std::vector<base::LaneLine>& lane_objects,
   }
   fprintf(file_save, "]\n");
   fclose(file_save);
-  return;
 }
 
 void output_laneline_to_txt(const std::vector<base::LaneLine>& lane_objects,
@@ -329,7 +324,6 @@ void output_laneline_to_txt(const std::vector<base::LaneLine>& lane_objects,
     fprintf(file_save, "\n");
   }
   fclose(file_save);
-  return;
 }
 
 void show_detect_point_set(
@@ -347,7 +341,6 @@ void show_detect_point_set(
                draw_size, color, 4);
   }
   cv::imwrite(save_path, draw_mat);
-  return;
 }
 
 void show_neighbor_point_set(
@@ -381,7 +374,6 @@ void show_neighbor_point_set(
                 CV_FONT_HERSHEY_COMPLEX_SMALL, 1.0, cv::Scalar(255, 255, 255));
   }
   cv::imwrite(save_path, draw_mat);
-  return;
 }
 
 void show_detect_point_set(
@@ -403,7 +395,6 @@ void show_detect_point_set(
                draw_size, color, 4);
   }
   cv::imwrite(save_path, draw_mat);
-  return;
 }
 
 }  // namespace camera
