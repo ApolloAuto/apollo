@@ -351,7 +351,7 @@ class Renderer {
     updateWorld(world) {
         const adcPose = world.autoDrivingCar;
         this.adc.update(this.coordinates, adcPose);
-        if (isNaN(adcPose.positionX) || isNaN(adcPose.positionY)) {
+        if (!_.isNumber(adcPose.positionX) || !_.isNumber(adcPose.positionY)) {
             console.error(`Invalid ego car position: ${adcPose.positionX}, ${adcPose.positionY}!`);
             return;
         }
