@@ -93,19 +93,27 @@ Status OpenSpaceTrajectoryProvider::Process() {
   const common::VehicleState vehicle_state = frame_->vehicle_state();
   const double planning_cycle_time = FLAGS_open_space_planning_period;
   std::string replan_reason;
-  auto previous_frame = FrameHistory::Instance()->Latest();
+  auto* previous_frame = FrameHistory::Instance()->Latest();
   // Use complete raw trajectory from last frame for stitching purpose
-  const auto& previous_planning =
-      previous_frame->open_space_info().stitched_trajectory_result();
-  const auto& previous_planning_header =
-      previous_frame->current_frame_planned_trajectory()
-          .header()
-          .timestamp_sec();
-  PublishableTrajectory last_frame_complete_trajectory(previous_planning_header,
-                                                       previous_planning);
-  auto stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
-      vehicle_state, start_timestamp, planning_cycle_time,
-      &last_frame_complete_trajectory, &replan_reason);
+  std::vector<TrajectoryPoint> stitching_trajectory;
+  if (!IsVehicleStopDueToFallBack(
+          previous_frame->open_space_info().fallback_flag(), vehicle_state)) {
+    const auto& previous_planning =
+        previous_frame->open_space_info().stitched_trajectory_result();
+    const auto& previous_planning_header =
+        previous_frame->current_frame_planned_trajectory()
+            .header()
+            .timestamp_sec();
+    PublishableTrajectory last_frame_complete_trajectory(
+        previous_planning_header, previous_planning);
+    stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
+        vehicle_state, start_timestamp, planning_cycle_time,
+        &last_frame_complete_trajectory, &replan_reason);
+  } else {
+    AERROR << "hahahahhhhhhhhhhhhhhhhhhhhhhhhh";
+    stitching_trajectory = TrajectoryStitcher::ComputeReinitStitchingTrajectory(
+        0.1, vehicle_state);
+  }
   // Get open_space_info from current frame
   const auto& open_space_info = frame_->open_space_info();
 
@@ -273,6 +281,21 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
                                 .is_near_destination_threshold()) {
     ADEBUG << "vehicle reach end_pose";
     frame_->mutable_open_space_info()->set_destination_reached(true);
+    return true;
+  }
+  return false;
+}
+
+bool OpenSpaceTrajectoryProvider::IsVehicleStopDueToFallBack(
+    const bool& is_on_fallback, const common::VehicleState& vehicle_state) {
+  if (!is_on_fallback) {
+    return false;
+  }
+  constexpr double kEpsilon = 1.0e-1;
+  const double adc_speed = vehicle_state.linear_velocity();
+  const double adc_acceleration = vehicle_state.linear_acceleration();
+  if (std::abs(adc_speed) < kEpsilon && std::abs(adc_acceleration) < kEpsilon) {
+    ADEBUG << "ADC stops due to fallback trajectory";
     return true;
   }
   return false;
