@@ -364,6 +364,7 @@ bool HybridAStar::Plan(
 
   // Hybrid A* begins
   size_t explored_node_num = 0;
+  double astar_start_time = Clock::NowInSeconds();
   double heuristic_time = 0.0;
   double rs_time = 0.0;
   double start_time = 0.0;
@@ -418,7 +419,9 @@ bool HybridAStar::Plan(
   }
   ADEBUG << "explored node num is " << explored_node_num;
   ADEBUG << "heuristic time is " << heuristic_time;
-  ADEBUG << "rs time is " << rs_time;
+  ADEBUG << "reed shepp time is " << rs_time;
+  ADEBUG << "hybrid astar total time is "
+         << Clock::NowInSeconds() - astar_start_time;
   return true;
 }
 }  // namespace planning
