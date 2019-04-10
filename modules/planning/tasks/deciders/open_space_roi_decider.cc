@@ -272,11 +272,13 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI(Frame *frame) {
   double left_top_l = 0.0;
   double right_top_s = 0.0;
   double right_top_l = 0.0;
+  double average_l = 0.0;
   if (!(nearby_path->GetProjection(left_top, &left_top_s, &left_top_l) &&
         nearby_path->GetProjection(right_top, &right_top_s, &right_top_l))) {
     AERROR << "fail to get parking spot points' projections on reference line";
     return false;
   }
+  average_l = (left_top_l + right_top_l) / 2.0;
   // start or end, left or right of the lane and s is decided by the lane's
   // heading
   double center_line_s = (left_top_s + right_top_s) / 2.0;
@@ -348,8 +350,8 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI(Frame *frame) {
 
   // rotate the points to have the lane to be horizontal to x axis positive
   // direction and scale them base on the origin point
-  frame->mutable_open_space_info()->set_origin_heading(
-      nearby_path->GetSmoothPoint(center_line_s).heading());
+  Vec2d heading_vec = right_top - left_top;
+  frame->mutable_open_space_info()->set_origin_heading(heading_vec.Angle());
   frame->mutable_open_space_info()->mutable_origin_point()->set_x(left_top.x());
   frame->mutable_open_space_info()->mutable_origin_point()->set_y(left_top.y());
   const auto &origin_point = frame->open_space_info().origin_point();
@@ -377,16 +379,16 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI(Frame *frame) {
   // Left, right, down or opposite of the boundary is decided when viewing the
   // parking spot upward
   std::vector<Vec2d> boundary_points;
-  if (left_top_l < 0) {
-    // if left_top_l is lower than zero, the parking spot is on the right
-    // lane boundary and assume that the lane half width is left_top_l
+  if (average_l < 0) {
+    // if average_l is lower than zero, the parking spot is on the right
+    // lane boundary and assume that the lane half width is average_l
     size_t point_size = right_lane_boundary.size();
     for (size_t i = 0; i < point_size; i++) {
       right_lane_boundary[i].SelfRotate(origin_heading);
       right_lane_boundary[i] += origin_point;
       right_lane_boundary[i] -= center_lane_boundary[i];
       right_lane_boundary[i] /= right_lane_road_width[i];
-      right_lane_boundary[i] *= (-left_top_l);
+      right_lane_boundary[i] *= (-average_l);
       right_lane_boundary[i] += center_lane_boundary[i];
       right_lane_boundary[i] -= origin_point;
       right_lane_boundary[i].SelfRotate(-origin_heading);
@@ -465,15 +467,15 @@ bool OpenSpaceRoiDecider::GetOpenSpaceROI(Frame *frame) {
     }
 
   } else {
-    // if left_top_l is higher than zero, the parking spot is on the left
-    // lane boundary and assume that the lane half width is left_top_l
+    // if average_l is higher than zero, the parking spot is on the left
+    // lane boundary and assume that the lane half width is average_l
     size_t point_size = left_lane_boundary.size();
     for (size_t i = 0; i < point_size; i++) {
       left_lane_boundary[i].SelfRotate(origin_heading);
       left_lane_boundary[i] += origin_point;
       left_lane_boundary[i] -= center_lane_boundary[i];
       left_lane_boundary[i] /= left_lane_road_width[i];
-      left_lane_boundary[i] *= left_top_l;
+      left_lane_boundary[i] *= average_l;
       left_lane_boundary[i] += center_lane_boundary[i];
       left_lane_boundary[i] -= origin_point;
       left_lane_boundary[i].SelfRotate(-origin_heading);
