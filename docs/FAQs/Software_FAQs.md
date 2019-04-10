@@ -91,4 +91,5 @@ Please follow the steps recommended in the [following thread](https://github.com
 If you see an error like this, you do not have enough memory to build Apollo. Please ensure that you have at least **16GB** memory available before building Apollo.
 You could also find `--jobs=$(nproc)` in apollo.sh file and replace it with `--jobs=2`. This will make build process to use only 2 cores. Building will be longer, but will use less memory.
 
+---
 **More Software FAQs to follow.**
