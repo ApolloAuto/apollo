@@ -196,9 +196,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       VehicleStateProvider::Instance()->vehicle_state();
   DCHECK_GE(start_timestamp, received_vehicle_state.timestamp());
 
-  if (!status.ok() || !util::IsVehicleStateValid(received_vehicle_state) ||
-      start_timestamp - received_vehicle_state.timestamp()
-      > FLAGS_message_latency_threshold) {
+  if (!status.ok() || !util::IsVehicleStateValid(received_vehicle_state)) {
     std::string msg("Update VehicleStateProvider failed "
         "or the vehicle state is out dated.");
     AERROR << msg;
