@@ -428,7 +428,8 @@ void ObstaclesPrioritizer::AssignCautionByMerge(
     std::shared_ptr<const LaneInfo> lane_info_ptr,
     std::unordered_set<std::string>* const visited_lanes) {
   SetCautionBackward(lane_info_ptr,
-      FLAGS_caution_search_distance_backward_for_merge, visited_lanes);
+                     FLAGS_caution_search_distance_backward_for_merge,
+                     visited_lanes);
 }
 
 void ObstaclesPrioritizer::AssignCautionByOverlap(
@@ -451,7 +452,8 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
         // ahead_s is the length in front of the overlap
         double ahead_s = overlap_lane_ptr->total_length() -
                          object.lane_overlap_info().start_s();
-        SetCautionBackward(overlap_lane_ptr,
+        SetCautionBackward(
+            overlap_lane_ptr,
             ahead_s + FLAGS_caution_search_distance_backward_for_overlap,
             visited_lanes);
       }
