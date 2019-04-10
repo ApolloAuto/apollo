@@ -70,7 +70,7 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
 
     std::string scenarioName = "Go Straight";
     auto scenario = progress.find(scenarioName);
-    EXPECT_TRUE(scenario != progress.end());
+    EXPECT_NE(scenario, progress.end());
 
     double value;
     bool hasField;
@@ -124,7 +124,7 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
 
     std::string scenarioName = "Go Straight";
     auto scenario = progress.find(scenarioName);
-    EXPECT_TRUE(scenario != progress.end());
+    EXPECT_NE(scenario, progress.end());
 
     float value;
     bool hasField;
