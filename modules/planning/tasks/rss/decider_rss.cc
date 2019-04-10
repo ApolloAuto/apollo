@@ -307,10 +307,10 @@ Status RssDecider::Process(Frame *frame,
   }
 
   if (responseStateVector[0].longitudinalState.isSafe) {
-    AERROR << "Task " << Name() << " Distance is RSS-Safe";
+    ADEBUG << "Task " << Name() << " Distance is RSS-Safe";
     reference_line_info->mutable_rss_info()->set_is_rss_safe(true);
   } else {
-    AERROR << "Task " << Name() << " Distance is not RSS-Safe";
+    ADEBUG << "Task " << Name() << " Distance is not RSS-Safe";
     reference_line_info->mutable_rss_info()->set_is_rss_safe(false);
     if (FLAGS_enable_rss_fallback) {
       reference_line_info->mutable_speed_data()->clear();
