@@ -303,7 +303,7 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
     }
   }
   // Partition trajectory points into each trajectory
-  constexpr double kGearShiftEpsilon = 0.5;
+  constexpr double kGearShiftEpsilon = 0.0;
   double distance_s = 0.0;
   for (size_t i = 0; i < horizon; ++i) {
     // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
