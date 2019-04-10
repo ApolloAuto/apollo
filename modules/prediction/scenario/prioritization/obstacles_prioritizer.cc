@@ -439,6 +439,19 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
   const std::vector<std::shared_ptr<const OverlapInfo>> cross_lanes =
       lane_info_ptr->cross_lanes();
   for (const auto overlap_ptr : cross_lanes) {
+    bool consider_overlap = true;
+    for (const auto& object : overlap_ptr->overlap().object()) {
+      const auto& object_id = object.id().id();
+      if (object_id == lane_info_ptr->id().id() &&
+          object.lane_overlap_info().end_s() < ego_lane_s_) {
+        consider_overlap = false;
+      }
+    }
+
+    if (!consider_overlap) {
+      continue;
+    }
+
     for (const auto& object : overlap_ptr->overlap().object()) {
       const auto& object_id = object.id().id();
       if (object_id == lane_info_ptr->id().id()) {
@@ -446,9 +459,6 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
       } else {
         std::shared_ptr<const LaneInfo> overlap_lane_ptr =
             PredictionMap::LaneById(object_id);
-        if (object.lane_overlap_info().start_s() < ego_lane_s_) {
-          continue;
-        }
         // ahead_s is the length in front of the overlap
         double ahead_s = overlap_lane_ptr->total_length() -
                          object.lane_overlap_info().start_s();
