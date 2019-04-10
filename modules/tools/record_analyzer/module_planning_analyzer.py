@@ -32,7 +32,7 @@ from common.frechet_distance import frechet_distance
 class PlannigAnalyzer:
     """planning analyzer"""
 
-    def __init__(self, is_simulation, is_sim):
+    def __init__(self, arguments):
         """init"""
         self.module_latency = []
         self.trajectory_type_dist = {}
@@ -41,8 +41,8 @@ class PlannigAnalyzer:
         self.error_msg_analyzer = ErrorMsgAnalyzer()
         self.last_adc_trajectory = None
         self.frechet_distance_list = []
-        self.is_simulation = is_simulation
-        self.is_sim = is_sim
+        self.is_simulation = arguments.simulation
+        self.is_sim = arguments.simulation2
         self.hard_break_list = []
         self.total_cycle_num = 0
 
@@ -113,6 +113,9 @@ class PlannigAnalyzer:
         self.LAT_JERK_H_UB_N = -1
         self.lat_jerk_high_cnt = 0
 
+        self.bag_start_time_t = None
+        self.print_acc = arguments.showacc
+
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
         if not self.is_simulation and not self.is_sim:
@@ -144,6 +147,9 @@ class PlannigAnalyzer:
 
             t = adc_trajectory.header.timestamp_sec + init_point.relative_time
 
+            if self.bag_start_time_t is None:
+                self.bag_start_time_t = t
+
             accel = None
             jerk = None
             duration = 0
@@ -151,6 +157,9 @@ class PlannigAnalyzer:
                 duration = t - self.last_init_point_t
             if self.last_init_point is not None and duration > 0.03:
                 accel = (init_point.v - self.last_init_point.v) / duration
+                if self.print_acc and abs(accel) > 4:
+                    print("---------------")
+                    print(t - self.bag_start_time_t, "acc = ", accel)
                 if accel > 0:
                     self.init_point_accel.append(accel)
                 elif accel < 0:
