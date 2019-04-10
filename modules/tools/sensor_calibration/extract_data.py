@@ -29,9 +29,11 @@ import sys
 import shutil
 import six
 import numpy as np
+from google.protobuf import text_format
 
 from cyber_py.record import RecordReader
 from cyber.proto import record_pb2
+from modules.tools.sensor_calibration.proto import extractor_config_pb2
 
 from sensor_msg_extractor import *
 #from scripts.record_bag import SMALL_TOPICS
@@ -336,6 +338,18 @@ def validate_record_files(record_files, kword='.record.'):
 
     return file_abs_paths
 
+def parse_channel_config(channels):
+    channel_list = set()
+    extraction_rate_dict = dict()
+
+    for channel in channels:
+        if channel.name in channel_list:
+            raise ValueError("Duplicated channel config for : %s" % channel.name)
+        else:
+            channel_list.add(channel.name)
+            extraction_rate_dict[channel.name] = channel.extraction_rate
+
+    return channel_list, extraction_rate_dict
 
 def main():
     """
@@ -350,57 +364,75 @@ def main():
 
     parser = argparse.ArgumentParser(
         description='A tool to extract data information for sensor calibration.')
-    parser.add_argument("-i", "--record_path", action="append", default=[], required=True,
-                        dest='record_list',
-                        help="Specify the record file to extract data information.")
-    parser.add_argument("-o", "--output_path", action="store", type=str,
-                        default="./extracted_data",
-                        help="The output directory to restore message.")
-    parser.add_argument("-z", "--compressed_file", action="store", type=str,
-                        default="extraction_data", help="The output compressed filename.")
-    parser.add_argument("-c", "--channel_name", dest='channel_list', action="append",
-                        default=[], help="list of channel_name that needs parsing.")
-    parser.add_argument("-s", "--start_timestamp", action="store", type=float,
-                        default=np.finfo(np.float32).min,
-                        help="Specify the begining time to extract data information.")
-    parser.add_argument("-e", "--end_timestamp", action="store", type=float,
-                        default=np.finfo(np.float32).max,
-                        help="Specify the ending timestamp to extract data information.")
-    parser.add_argument("-r", "--extraction_rate", action="store", type=int,
-                        default=10, help="extraction rate for channel with large storage cost.")
-
+    # parser.add_argument("-i", "--record_path", action="append", default=[], required=True,
+    #                     dest='record_list',
+    #                     help="Specify the record file to extract data information.")
+    # parser.add_argument("-o", "--output_path", action="store", type=str,
+    #                     default="./extracted_data",
+    #                     help="The output directory to restore message.")
+    # # parser.add_argument("-z", "--compressed_file", action="store", type=str,
+    # #                     default="extraction_data", help="The output compressed filename.")
+    # parser.add_argument("-t", "--task_name", action="store", type=str, default="tmp",
+    #                     help="name of the data extraction task, e.g., Camera_Lidar_Calibration.")
+    # parser.add_argument("-c", "--channel_name", dest='channel_list', action="append",
+    #                     default=[], help="list of channel_name that needs parsing.")
+    # parser.add_argument("-s", "--start_timestamp", action="store", type=float,
+    #                     default=np.finfo(np.float32).min,
+    #                     help="Specify the begining time to extract data information.")
+    # parser.add_argument("-e", "--end_timestamp", action="store", type=float,
+    #                     default=np.finfo(np.float32).max,
+    #                     help="Specify the ending timestamp to extract data information.")
+    # parser.add_argument("-r", "--extraction_rate", action="store", type=int,
+    #                     default=10, help="extraction rate for channel with large storage cost.")
+    parser.add_argument("--config", action="store", type=str, required=True, dest="config",
+                        help="protobuf text format configuration file abosolute path")
     args = parser.parse_args()
 
-    print('parsing the following channels: %s' % args.channel_list)
+    config = extractor_config_pb2.DataExtractionConfig()
+    with open(args.config, "r") as f:
+        proto_block = f.read()
+        text_format.Merge(proto_block, config)
 
+    records = []
+    for r in  config.records.record_path:
+        records.append(str(r))
 
-    valid_record_list = validate_record_files(args.record_list, kword='.record.')
+    valid_record_list = validate_record_files(records, kword='.record.')
+
+    channels, extraction_rates = parse_channel_config(config.channels.channel)
+    print('parsing the following channels: %s' % channels)
+
+    start_timestamp = -1
+    end_timestamp = -1
+    if config.io_config.start_timestamp == "FLOAT_MIN":
+        start_timestamp = np.finfo(np.float32).min
+    else:
+        start_timestamp = np.float32(config.io_config.start_timestamp)
+
+    if config.io_config.end_timestamp == "FLOAT_MAX":
+        end_timestamp = np.finfo(np.float32).max
+    else:
+        end_timestamp = np.float32(config.io_config.end_timestamp)
 
     # Create directory to save the extracted data
     # use time now() as folder name
-    output_relative_path = datetime.now().strftime("%Y-%m-%d-%H-%M")
-    output_abs_path = os.path.join(args.output_path, output_relative_path)
+    output_relative_path = config.io_config.task_name + datetime.now().strftime("-%Y-%m-%d-%H-%M")
+    output_abs_path = os.path.join(config.io_config.output_path, output_relative_path)
 
     ret = process_dir(output_abs_path, 'create')
     if not ret:
         print('Failed to create extrated data directory: %s' % output_abs_path)
         sys.exit(1)
 
-    channel_list = set(channel_name for channel_name in args.channel_list)
-    extraction_rate_dict = generate_extraction_rate_dict(
-        channel_list,
-        large_topic_extraction_rate=args.extraction_rate,
-        small_topic_extraction_rate=1)
-
-    ret = extract_data(valid_record_list, output_abs_path, channel_list,
-                       args.start_timestamp, args.end_timestamp, extraction_rate_dict)
+    ret = extract_data(valid_record_list, output_abs_path, channels,
+                       start_timestamp, end_timestamp, extraction_rates)
     if not ret:
         print('Failed to extract data!')
 
-    generate_compressed_file(input_path=args.output_path,
+    generate_compressed_file(input_path=config.io_config.output_path,
                              input_name=output_relative_path,
-                             output_path=args.output_path,
-                             compressed_file=args.compressed_file)
+                             output_path=config.io_config.output_path,
+                             compressed_file=config.io_config.task_name)
 
     print('Data extraction is completed successfully!')
     sys.exit(0)
