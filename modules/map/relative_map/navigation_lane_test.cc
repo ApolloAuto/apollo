@@ -97,6 +97,8 @@ bool GenerateNavigationInfo(
 class NavigationLaneTest : public testing::Test {
  public:
   virtual void SetUp() {
+    FLAGS_use_navigation_mode = true;
+    FLAGS_use_navigation_with_utm = false;
     common::adapter::AdapterManagerConfig adapter_conf;
     RelativeMapConfig config;
 

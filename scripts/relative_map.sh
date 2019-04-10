@@ -27,4 +27,4 @@ source "${DIR}/apollo_base.sh"
 # FIXME(all): temporary enable --use_navigation_mode in this script to make
 # it easier to test relative_map node. Need removed in the future.
 
-run_customized_path map/relative_map relative_map "$@" --use_navigation_mode
+run_customized_path map/relative_map relative_map "$@"

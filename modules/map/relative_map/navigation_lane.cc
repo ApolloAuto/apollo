@@ -266,7 +266,7 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(const int line_index,
   }
 
   int lane_marker_index = 0;
-  const double kWeight = 0.9;
+  double weight = FLAGS_use_navigation_mode ? 0.9 : 1.0;
   for (int i = 0; i < path->path_point_size(); ++i) {
     auto *point = path->mutable_path_point(i);
     double s = point->s();
@@ -277,12 +277,12 @@ void NavigationLane::MergeNavigationLineAndLaneMarker(const int line_index,
     // used for merging.
     const int marker_size = lane_marker_path.path_point_size();
     if (lane_marker_index < 0 || lane_marker_index > (marker_size - 1)) {
-      point->set_y(kWeight * point->y() + (1 - kWeight) * lane_maker_point.y());
+      point->set_y(weight * point->y() + (1 - weight) * lane_maker_point.y());
       lane_marker_index = 0;
       continue;
     }
     *point = common::util::GetWeightedAverageOfTwoPathPoints(
-        *point, lane_maker_point, kWeight, 1 - kWeight);
+        *point, lane_maker_point, weight, 1 - weight);
   }
 }
 
@@ -375,22 +375,23 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
         for (int i = start; i < end; ++i) {
           auto *point = path->add_path_point();
           point->CopyFrom(navigation_path.path_point(i));
+          if (FLAGS_use_navigation_mode) {
+            double flu_x = 0.0;
+            double flu_y = 0.0;
+            double flu_theta = 0.0;
+            enu_to_flu_func(point->x(), point->y(), point->theta(), &flu_x,
+                            &flu_y, &flu_theta);
 
-          double flu_x = 0.0;
-          double flu_y = 0.0;
-          double flu_theta = 0.0;
-          enu_to_flu_func(point->x(), point->y(), point->theta(), &flu_x,
-                          &flu_y, &flu_theta);
+            point->set_x(flu_x);
+            point->set_y(flu_y);
+            point->set_theta(flu_theta);
+            const double accumulated_s =
+                navigation_path.path_point(i).s() - ref_s + ref_s_base;
+            point->set_s(accumulated_s);
 
-          point->set_x(flu_x);
-          point->set_y(flu_y);
-          point->set_theta(flu_theta);
-          const double accumulated_s =
-              navigation_path.path_point(i).s() - ref_s + ref_s_base;
-          point->set_s(accumulated_s);
-
-          if (accumulated_s > max_length) {
-            break;
+            if (accumulated_s > max_length) {
+              break;
+            }
           }
         }
       };
@@ -429,12 +430,12 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
 #ifdef __aarch64__
       const int path_size_ahead =
           std::min(current_project_index + FLAGS_relative_map_path_frame_ahead,
-          path_size);
+                   path_size);
 #else
       const int path_size_ahead = path_size;
 #endif
-      gen_navi_path_loop_func(stitch_end_index,
-                              path_size_ahead, length,
+
+      gen_navi_path_loop_func(stitch_end_index, path_size_ahead, length,
                               FLAGS_max_len_from_navigation_line, path);
       return true;
     }
@@ -445,9 +446,8 @@ bool NavigationLane::ConvertNavigationLineToPath(const int line_index,
   }
   const int path_size = navigation_path.path_point_size();
 #ifdef __aarch64__
-  const int path_size_ahead =
-      std::min(current_project_index + FLAGS_relative_map_path_frame_ahead,
-      path_size);
+  const int path_size_ahead = std::min(
+      current_project_index + FLAGS_relative_map_path_frame_ahead, path_size);
 #else
   const int path_size_ahead = path_size;
 #endif

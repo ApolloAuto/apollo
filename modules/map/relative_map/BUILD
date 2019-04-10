@@ -46,6 +46,7 @@ cc_library(
         "navigation_lane.h",
     ],
     deps = [
+        "//modules/common/configs:config_gflags",
         "//modules/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",

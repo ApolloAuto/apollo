@@ -109,7 +109,7 @@ std::unique_ptr<HDMap> HDMapUtil::sim_map_ = nullptr;
 std::mutex HDMapUtil::sim_map_mutex_;
 
 const HDMap* HDMapUtil::BaseMapPtr() {
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_use_navigation_mode || FLAGS_use_navigation_with_utm) {
     std::lock_guard<std::mutex> lock(base_map_mutex_);
     auto* relative_map = AdapterManager::GetRelativeMap();
     if (!relative_map) {
@@ -141,7 +141,7 @@ const HDMap* HDMapUtil::BaseMapPtr() {
 const HDMap& HDMapUtil::BaseMap() { return *CHECK_NOTNULL(BaseMapPtr()); }
 
 const HDMap* HDMapUtil::SimMapPtr() {
-  if (FLAGS_use_navigation_mode) {
+  if (FLAGS_use_navigation_mode || FLAGS_use_navigation_with_utm) {
     return BaseMapPtr();
   } else if (sim_map_ == nullptr) {
     std::lock_guard<std::mutex> lock(sim_map_mutex_);

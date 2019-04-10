@@ -97,13 +97,19 @@ Status StdPlanning::Init() {
   }
   CHECK_ADAPTER(Localization);
   CHECK_ADAPTER(Chassis);
-  CHECK_ADAPTER(RoutingResponse);
-  CHECK_ADAPTER(RoutingRequest);
+  if (!FLAGS_use_navigation_with_utm) {
+    CHECK_ADAPTER(RoutingResponse);
+    CHECK_ADAPTER(RoutingRequest);
+  } else {
+    CHECK_ADAPTER(RelativeMap);
+  }
   CHECK_ADAPTER(Prediction);
   CHECK_ADAPTER(TrafficLightDetection);
 
-  hdmap_ = HDMapUtil::BaseMapPtr();
-  CHECK(hdmap_) << "Failed to load map";
+  if (!FLAGS_use_navigation_with_utm) {
+    hdmap_ = HDMapUtil::BaseMapPtr();
+    CHECK(hdmap_) << "Failed to load map";
+  }
   reference_line_provider_ = std::make_unique<ReferenceLineProvider>(hdmap_);
   planner_ = planner_dispatcher_->DispatchPlanner();
   if (!planner_) {
@@ -166,7 +172,8 @@ void StdPlanning::RunOnce() {
     not_ready->set_reason("localization not ready");
   } else if (AdapterManager::GetChassis()->Empty()) {
     not_ready->set_reason("chassis not ready");
-  } else if (AdapterManager::GetRoutingResponse()->Empty()) {
+  } else if (AdapterManager::GetRoutingResponse()->Empty() &&
+             !FLAGS_use_navigation_with_utm) {
     not_ready->set_reason("routing not ready");
   } else if (HDMapUtil::BaseMapPtr() == nullptr) {
     not_ready->set_reason("map not ready");
@@ -215,12 +222,14 @@ void StdPlanning::RunOnce() {
     return;
   }
 
-  const auto& latest_routing =
-      AdapterManager::GetRoutingResponse()->GetLatestObserved();
-  if (IsDifferentRouting(last_routing_, latest_routing)) {
-    last_routing_ = latest_routing;
-    GetPlanningStatus()->Clear();
-    reference_line_provider_->UpdateRoutingResponse(latest_routing);
+  if (!FLAGS_use_navigation_with_utm) {
+    const auto& latest_routing =
+        AdapterManager::GetRoutingResponse()->GetLatestObserved();
+    if (IsDifferentRouting(last_routing_, latest_routing)) {
+      last_routing_ = latest_routing;
+      GetPlanningStatus()->Clear();
+      reference_line_provider_->UpdateRoutingResponse(latest_routing);
+    }
   }
 
   if (AdapterManager::GetPrediction()->Empty()) {
