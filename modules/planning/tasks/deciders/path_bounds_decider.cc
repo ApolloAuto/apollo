@@ -57,8 +57,8 @@ constexpr double kPathBoundsDeciderHorizon = 100.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
-constexpr double kObstacleStartSBuffer = 4.0;
-constexpr double kObstacleEndSBuffer = 2.0;
+constexpr double kObstacleStartSBuffer = 1.0;
+constexpr double kObstacleEndSBuffer = 1.0;
 constexpr double kObstacleLBuffer = 0.4;
 
 PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
