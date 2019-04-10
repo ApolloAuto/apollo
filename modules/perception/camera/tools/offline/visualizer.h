@@ -24,6 +24,7 @@
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
+#include "modules/perception/proto/motion_service.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -52,7 +53,8 @@ class Visualizer {
   void ShowResult(const cv::Mat &img, const CameraFrame &frame);
   void Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame);
   void ShowResult_all_info_single_camera(const cv::Mat &img,
-                                         const CameraFrame &frame);
+                                     const CameraFrame &frame,
+                                     const base::MotionBufferPtr motion_buffer);
   void Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
                                           const CameraFrame &frame,
                                           Eigen::Matrix3d intrinsic,

@@ -675,7 +675,8 @@ int LaneDetectionComponent::InternalProc(
       camera_frame.data_provider->GetImage(image_options, &out_image);
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame);
+      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                   mot_buffer_);
     }
   }
 

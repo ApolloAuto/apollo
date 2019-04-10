@@ -242,7 +242,7 @@ class Obstacle {
   bool SetId(const perception::PerceptionObstacle& perception_obstacle,
              Feature* feature, const int prediction_id = -1);
 
-  bool SetType(const perception::PerceptionObstacle& perception_obstacle,
+  void SetType(const perception::PerceptionObstacle& perception_obstacle,
                Feature* feature);
 
   void SetIsNearJunction(

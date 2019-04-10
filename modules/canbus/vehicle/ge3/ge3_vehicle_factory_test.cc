@@ -25,7 +25,7 @@ class Ge3VehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::GE3);
+    parameter.set_brand(apollo::common::GE3);
     ge3_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}

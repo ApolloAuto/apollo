@@ -39,7 +39,7 @@ namespace canbus {
  * vehicle factories based on the vehicle brand.
  */
 class VehicleFactory
-    : public common::util::Factory<VehicleParameter::VehicleBrand,
+    : public common::util::Factory<apollo::common::VehicleBrand,
                                    AbstractVehicleFactory> {
  public:
   /**

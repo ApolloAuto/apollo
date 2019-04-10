@@ -606,6 +606,7 @@ void OnLanePlanning::ExportOpenSpaceChart(
     AddStitchSpeedProfile(debug_chart);
     AddPublishedSpeed(trajectory_pb, debug_chart);
     AddPublishedAcceleration(trajectory_pb, debug_chart);
+    // AddFallbackTrajectory(debug_info, debug_chart);
   }
 }
 
@@ -624,13 +625,13 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   PopulateChartOptions(open_space_debug.xy_boundary(0) - 1.0,
                        open_space_debug.xy_boundary(1) + 1.0, "x (meter)",
                        open_space_debug.xy_boundary(2) - 1.0,
-                       open_space_debug.xy_boundary(3) + 1.0, "y (meter)",
-                       false, chart);
+                       open_space_debug.xy_boundary(3) + 1.0, "y (meter)", true,
+                       chart);
 
   int obstacle_index = 1;
   for (const auto& obstacle : open_space_debug.obstacles()) {
     auto* obstacle_outline = chart->add_line();
-    obstacle_outline->set_label("boundary_" + std::to_string(obstacle_index));
+    obstacle_outline->set_label("Bdr" + std::to_string(obstacle_index));
     obstacle_index += 1;
     for (int vertice_index = 0;
          vertice_index < obstacle.vertices_x_coords_size(); vertice_index++) {
@@ -649,7 +650,7 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
 
   auto smoothed_trajectory = open_space_debug.smoothed_trajectory();
   auto* smoothed_line = chart->add_line();
-  smoothed_line->set_label("smoothed");
+  smoothed_line->set_label("Smooth");
   for (const auto& point : smoothed_trajectory.vehicle_motion_point()) {
     auto* point_debug = smoothed_line->add_point();
     point_debug->set_x(point.trajectory_point().path_point().x());
@@ -665,7 +666,7 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
 
   auto warm_start_trajectory = open_space_debug.warm_start_trajectory();
   auto* warm_start_line = chart->add_line();
-  warm_start_line->set_label("warm_start");
+  warm_start_line->set_label("WarmStart");
   for (const auto& point : warm_start_trajectory.vehicle_motion_point()) {
     auto* point_debug = warm_start_line->add_point();
     point_debug->set_x(point.trajectory_point().path_point().x());
@@ -703,10 +704,10 @@ void OnLanePlanning::AddPartitionedTrajectory(
   double anchor_x = chosen_trajectory.trajectory_point()[0].path_point().x();
   double anchor_y = chosen_trajectory.trajectory_point()[0].path_point().y();
   PopulateChartOptions(anchor_x - 10.0, anchor_x + 20.0, "x (meter)",
-                       anchor_y - 20.0, anchor_y + 10.0, "y (meter)", false,
+                       anchor_y - 20.0, anchor_y + 10.0, "y (meter)", true,
                        chart);
   auto* chosen_line = chart->add_line();
-  chosen_line->set_label("chosen");
+  chosen_line->set_label("Chosen");
   for (const auto& point : chosen_trajectory.trajectory_point()) {
     auto* point_debug = chosen_line->add_point();
     point_debug->set_x(point.path_point().x());
@@ -723,7 +724,7 @@ void OnLanePlanning::AddPartitionedTrajectory(
   for (const auto& partitioned_trajectory :
        open_space_debug.partitioned_trajectories().trajectory()) {
     auto* partition_line = chart->add_line();
-    partition_line->set_label("partitioned");
+    partition_line->set_label("Patitioned");
     for (const auto& point : partitioned_trajectory.trajectory_point()) {
       auto* point_debug = partition_line->add_point();
       point_debug->set_x(point.path_point().x());
@@ -736,6 +737,33 @@ void OnLanePlanning::AddPartitionedTrajectory(
     (*partition_properties)["lineTension"] = "0";
     (*partition_properties)["fill"] = "false";
     (*partition_properties)["showLine"] = "true";
+  }
+
+  // plot fallback trajectory compared with the partitioned
+  if (open_space_debug.is_fallback_trajectory()) {
+    const auto& fallback_trajectories =
+        open_space_debug.fallback_trajectory().trajectory();
+    if (fallback_trajectories.empty() ||
+        fallback_trajectories[0].trajectory_point().empty()) {
+      return;
+    }
+
+    const auto& fallback_trajectory = fallback_trajectories[0];
+    // has to define chart boundary first
+    auto* fallback_line = chart->add_line();
+    fallback_line->set_label("Fallback");
+    for (const auto& point : fallback_trajectory.trajectory_point()) {
+      auto* point_debug = fallback_line->add_point();
+      point_debug->set_x(point.path_point().x());
+      point_debug->set_y(point.path_point().y());
+    }
+    // Set chartJS's dataset properties
+    auto* fallback_properties = fallback_line->mutable_properties();
+    (*fallback_properties)["borderWidth"] = "3";
+    (*fallback_properties)["pointRadius"] = "2";
+    (*fallback_properties)["lineTension"] = "0";
+    (*fallback_properties)["fill"] = "false";
+    (*fallback_properties)["showLine"] = "true";
   }
 }
 
@@ -821,7 +849,7 @@ void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
   (*speed_profile_properties)["showLine"] = "true";
 
   auto* sliding_line = chart->add_line();
-  sliding_line->set_label("Current Time");
+  sliding_line->set_label("Time");
 
   auto* point_debug_up = sliding_line->add_point();
   point_debug_up->set_x(Clock::NowInSeconds());
@@ -891,7 +919,7 @@ void OnLanePlanning::AddPublishedAcceleration(
   (*acceleration_profile_properties)["showLine"] = "true";
 
   auto* sliding_line = chart->add_line();
-  sliding_line->set_label("Current Time");
+  sliding_line->set_label("Time");
 
   auto* point_debug_up = sliding_line->add_point();
   point_debug_up->set_x(Clock::NowInSeconds());
