@@ -114,8 +114,9 @@ bool IsBlockingObstacleToSidePass(const Frame& frame, const Obstacle* obstacle,
   }
 
   // Obstacle is far away.
+  constexpr double kAdcDistanceSidePassThreshold = 15.0; 
   if (obstacle->PerceptionSLBoundary().start_s() >
-      adc_sl_boundary.end_s() + kAdcDistanceThreshold) {
+      adc_sl_boundary.end_s() + kAdcDistanceSidePassThreshold) {
     ADEBUG << " - It is too far ahead.";
     return false;
   }
