@@ -441,8 +441,7 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
   for (const auto overlap_ptr : cross_lanes) {
     bool consider_overlap = true;
     for (const auto& object : overlap_ptr->overlap().object()) {
-      const auto& object_id = object.id().id();
-      if (object_id == lane_info_ptr->id().id() &&
+      if (object.id().id() == lane_info_ptr->id().id() &&
           object.lane_overlap_info().end_s() < ego_lane_s_) {
         consider_overlap = false;
       }
