@@ -120,6 +120,11 @@ Status SpeedBoundsDecider::Process(
     mutable_side_pass_info->change_lane_stop_flag = set_stop_fence;
   }
 
+  // Check the lane change urgency at current frame
+  if (FLAGS_enable_lane_change_urgency_checking) {
+    CheckLaneChangeUrgency(frame);
+  }
+
   // 2. Map obstacles into st graph
   StBoundaryMapper boundary_mapper(adc_sl_boundary, speed_bounds_config_,
                                    reference_line, path_data,
@@ -206,6 +211,53 @@ Status SpeedBoundsDecider::Process(
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
 
   return Status::OK();
+}
+
+void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
+  for (auto &reference_line_info : *frame->mutable_reference_line_info()) {
+    // Check if the target lane is blocked or not
+    if (reference_line_info.IsChangeLanePath()) {
+      is_clear_to_change_lane_ =
+          ChangeLaneDecider::IsClearToChangeLane(&reference_line_info);
+      continue;
+    }
+    // If it's not in lane-change scenario or target lane is not blocked, skip
+    if (frame->reference_line_info().size() <= 1 || is_clear_to_change_lane_) {
+      continue;
+    }
+    // When the target lane is blocked in change-lane case, check the urgency
+    // Get the end point of current routing
+    const auto &route_end_waypoint =
+        reference_line_info.Lanes().RouteEndWaypoint();
+    // If can't get lane from the route's end waypoint, then skip
+    if (!route_end_waypoint.lane) {
+      continue;
+    }
+    auto point = route_end_waypoint.lane->GetSmoothPoint(route_end_waypoint.s);
+    auto *reference_line = reference_line_info.mutable_reference_line();
+    common::SLPoint sl_point;
+    // Project the end point to sl_point on current reference lane
+    if (reference_line->XYToSL({point.x(), point.y()}, &sl_point) &&
+        reference_line->IsOnLane(sl_point)) {
+      // Check the distance from ADC to the end point of current routing
+      double distance_to_passage_end =
+          sl_point.s() - reference_line_info.AdcSlBoundary().end_s();
+      // If ADC is still far from the end of routing, no need to stop, skip
+      if (distance_to_passage_end >
+          speed_bounds_config_.approach_distance_for_lane_change()) {
+        continue;
+      }
+      // In urgent case, set a temporary stop fence and wait to change lane
+      // TODO(Jiaxuan Xu): replace the stop fence to more intelligent actions
+      const std::string stop_wall_id = "lane_change_stop";
+      std::vector<std::string> wait_for_obstacles;
+      DeciderRuleBasedStop::BuildStopDecision(
+          stop_wall_id, sl_point.s(),
+          speed_bounds_config_.urgent_distance_for_lane_change(),
+          StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY, wait_for_obstacles,
+          frame, &reference_line_info);
+    }
+  }
 }
 
 // @brief Check if necessary to set stop fence used for nonscenario side pass

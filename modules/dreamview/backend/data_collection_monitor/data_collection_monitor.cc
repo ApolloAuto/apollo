@@ -21,20 +21,23 @@
 
 #include "cyber/common/file.h"
 #include "modules/common/adapters/adapter_gflags.h"
+#include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/dreamview/backend/common/dreamview_gflags.h"
 
 namespace apollo {
 namespace dreamview {
 
 using apollo::canbus::Chassis;
+using apollo::common::VehicleConfigHelper;
 using Json = nlohmann::json;
 
 namespace {
 
-bool GetProtobufFloatByFieldName(const google::protobuf::Message& message,
-                                 const google::protobuf::Descriptor* descriptor,
-                                 const google::protobuf::Reflection* reflection,
-                                 const std::string& field_name, float* value) {
+bool IsValidProtobufConversionInput(
+    const google::protobuf::Descriptor* descriptor,
+    const google::protobuf::Reflection* reflection,
+    const std::string& field_name,
+    google::protobuf::FieldDescriptor::CppType cpp_type) {
   if (!descriptor) {
     AERROR << "Protobuf descriptor not found";
     return false;
@@ -47,15 +50,43 @@ bool GetProtobufFloatByFieldName(const google::protobuf::Message& message,
   }
 
   if (field_descriptor->is_repeated() ||
-      field_descriptor->cpp_type() !=
-          google::protobuf::FieldDescriptor::CppType::CPPTYPE_FLOAT) {
+      field_descriptor->cpp_type() != cpp_type) {
     AWARN << field_name << " has unsupported conversion type: "
           << field_descriptor->cpp_type();
     return false;
   }
 
-  *value = reflection->GetFloat(message, field_descriptor);
+  return true;
+}
 
+bool GetProtobufDoubleByFieldName(
+    const google::protobuf::Message& message,
+    const google::protobuf::Descriptor* descriptor,
+    const google::protobuf::Reflection* reflection,
+    const std::string& field_name, double* value) {
+  if (!IsValidProtobufConversionInput(
+          descriptor, reflection, field_name,
+          google::protobuf::FieldDescriptor::CppType::CPPTYPE_DOUBLE)) {
+    return false;
+  }
+
+  const auto* field_descriptor = descriptor->FindFieldByName(field_name);
+  *value = reflection->GetDouble(message, field_descriptor);
+  return true;
+}
+
+bool GetProtobufFloatByFieldName(const google::protobuf::Message& message,
+                                 const google::protobuf::Descriptor* descriptor,
+                                 const google::protobuf::Reflection* reflection,
+                                 const std::string& field_name, float* value) {
+  if (!IsValidProtobufConversionInput(
+          descriptor, reflection, field_name,
+          google::protobuf::FieldDescriptor::CppType::CPPTYPE_FLOAT)) {
+    return false;
+  }
+
+  const auto* field_descriptor = descriptor->FindFieldByName(field_name);
+  *value = reflection->GetFloat(message, field_descriptor);
   return true;
 }
 
@@ -103,15 +134,21 @@ void DataCollectionMonitor::LoadConfiguration(
     const std::string& data_collection_config_path) {
   CHECK(cyber::common::GetProtoFromFile(data_collection_config_path,
                                         &data_collection_table_))
-      << "Unable to parse calibration configuration from file "
+      << "Unable to parse data collection configuration from file "
       << data_collection_config_path;
 
-  current_progress_json_["Overall"] = 0.0;
-  for (const auto& iter : data_collection_table_.category()) {
-    const std::string& category_name = iter.first;
-    const Category& category = iter.second;
-    category_frame_count_.insert({category_name, 0.0});
-    current_progress_json_[category.description()] = 0.0;
+  for (const auto& scenario_iter : data_collection_table_.scenario()) {
+    const std::string& scenario_name = scenario_iter.first;
+    const Scenario& scenario = scenario_iter.second;
+
+    for (const auto& category_iter : scenario.category()) {
+      const std::string& category_name = category_iter.first;
+      const Category& category = category_iter.second;
+
+      category_consecutive_frame_count_[scenario_name][category_name] = 0.0;
+      category_frame_count_[scenario_name][category_name] = 0.0;
+      current_progress_json_[scenario_name][category.description()] = 0.0;
+    }
   }
 
   ADEBUG << "Configuration loaded.";
@@ -119,7 +156,7 @@ void DataCollectionMonitor::LoadConfiguration(
 
 void DataCollectionMonitor::Start() {
   if (!enabled_) {
-    current_frame_count_ = 0;
+    category_consecutive_frame_count_.clear();
     category_frame_count_.clear();
     current_progress_json_.clear();
     LoadConfiguration(FLAGS_data_collection_config_path);
@@ -134,67 +171,88 @@ void DataCollectionMonitor::OnChassis(const std::shared_ptr<Chassis>& chassis) {
     return;
   }
 
-  const auto* descriptor = chassis->GetDescriptor();
-  const auto* reflection = chassis->GetReflection();
-  bool should_increment_total_frame_count = false;
-  for (const auto& iter : data_collection_table_.category()) {
-    const std::string& category_name = iter.first;
-    const Category& category = iter.second;
+  const size_t frame_threshold = data_collection_table_.frame_threshold();
+  for (const auto& scenario_iter : data_collection_table_.scenario()) {
+    const std::string& scenario_name = scenario_iter.first;
+    const Scenario& scenario = scenario_iter.second;
 
-    // This category is done, skip
-    if (category_frame_count_[category_name] >= category.total_frames()) {
-      continue;
-    }
+    for (const auto& category_iter : scenario.category()) {
+      const std::string& category_name = category_iter.first;
+      const Category& category = category_iter.second;
 
-    bool is_complied_with_criteria = true;
-    for (const auto& criterion : category.criterion()) {
-      float actual_value;
-      if (!GetProtobufFloatByFieldName(*chassis, descriptor, reflection,
-                                       criterion.field(), &actual_value)) {
+      // This category is done, skip
+      if (category_frame_count_[scenario_name][category_name] >=
+          category.total_frames()) {
         continue;
       }
 
-      if (!IsCompliedWithCriterion(actual_value,
-                                   criterion.comparison_operator(),
-                                   criterion.value())) {
-        is_complied_with_criteria = false;
-        break;
+      if (!IsCompliedWithCriteria(chassis, category)) {
+        category_consecutive_frame_count_[scenario_name][category_name] = 0;
+        continue;
+      }
+
+      // Increment frame count only if consecutive count exceeds the threshold
+      const size_t consecutive_count =
+          ++category_consecutive_frame_count_[scenario_name][category_name];
+      if (consecutive_count == frame_threshold) {
+        category_frame_count_[scenario_name][category_name] +=
+            consecutive_count;
+      } else if (consecutive_count >= frame_threshold) {
+        category_frame_count_[scenario_name][category_name] += 1;
+      }
+
+      // Update category progress
+      const double progress_percentage =
+          100.0 *
+          static_cast<double>(
+              category_frame_count_[scenario_name][category_name]) /
+          static_cast<double>(category.total_frames());
+      {
+        boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
+        current_progress_json_[scenario_name][category.description()] =
+            progress_percentage;
       }
     }
-
-    if (is_complied_with_criteria) {
-      category_frame_count_[category_name]++;
-      should_increment_total_frame_count = true;
-    }
-  }
-
-  if (should_increment_total_frame_count) {
-    current_frame_count_++;
-
-    UpdateProgressInJson();
   }
 }
 
-void DataCollectionMonitor::UpdateProgressInJson() {
-  const double overall_percentage =
-      100.0 * static_cast<double>(current_frame_count_) /
-      static_cast<double>(data_collection_table_.total_frames());
-  {
-    boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-    current_progress_json_["Overall"] = overall_percentage;
-  }
+bool DataCollectionMonitor::IsCompliedWithCriteria(
+    const std::shared_ptr<Chassis>& chassis, const Category& category) {
+  const auto& vehicle_param = VehicleConfigHelper::GetConfig().vehicle_param();
+  const auto* vehicle_param_descriptor = vehicle_param.GetDescriptor();
+  const auto* vehicle_param_reflection = vehicle_param.GetReflection();
 
-  for (const auto& iter : data_collection_table_.category()) {
-    const std::string& category_name = iter.first;
-    const Category& category = iter.second;
-    const double progress_percentage =
-        100.0 * static_cast<double>(category_frame_count_[category_name]) /
-        static_cast<double>(category.total_frames());
-    {
-      boost::unique_lock<boost::shared_mutex> writer_lock(mutex_);
-      current_progress_json_[category.description()] = progress_percentage;
+  const auto* chassis_descriptor = chassis->GetDescriptor();
+  const auto* chassis_reflection = chassis->GetReflection();
+
+  for (const auto& criterion : category.criterion()) {
+    float target_value;
+    if (criterion.has_value()) {
+      target_value = criterion.value();
+    } else {
+      double target_value_in_double;
+      if (!GetProtobufDoubleByFieldName(
+              vehicle_param, vehicle_param_descriptor, vehicle_param_reflection,
+              criterion.vehicle_config(), &target_value_in_double)) {
+        continue;
+      }
+      target_value = static_cast<float>(target_value_in_double);
+    }
+
+    float actual_value;
+    if (!GetProtobufFloatByFieldName(*chassis, chassis_descriptor,
+                                     chassis_reflection, criterion.field(),
+                                     &actual_value)) {
+      continue;
+    }
+
+    if (!IsCompliedWithCriterion(actual_value, criterion.comparison_operator(),
+                                 target_value)) {
+      return false;
     }
   }
+
+  return true;
 }
 
 nlohmann::json DataCollectionMonitor::GetProgressAsJson() {

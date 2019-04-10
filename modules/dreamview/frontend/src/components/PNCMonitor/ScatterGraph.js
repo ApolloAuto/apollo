@@ -201,11 +201,10 @@ export default class ScatterGraph extends React.Component {
     }
 
     updateData(idx, name, properties, data) {
-        const trimmedLabel = name.substring(0, 5);
         if (this.chart.data.datasets[idx] === undefined) {
             // basic properties
             const config = {
-                label: trimmedLabel, //legend
+                label: name, //legend
                 showText: properties.showLabel,
                 text: name, // text in the graph
 

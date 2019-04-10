@@ -101,9 +101,9 @@ def CorrectlyPredictePortion(prediction_result, future_status_dict, time_range):
     return portion_correct_predicted, 1.0, len(prediction_result.trajectory)
 
 
-def Evaluate(dirpath, time_range):
-    future_status_dict = MergeFutureStatusDicts(dirpath)
-    prediction_result_file_list = GetPredictionResultFiles(dirpath)
+def Evaluate(results_dirpath, labels_dirpath, time_range):
+    future_status_dict = MergeFutureStatusDicts(labels_dirpath)
+    prediction_result_file_list = GetPredictionResultFiles(results_dirpath)
 
     portion_correct_predicted_sum = 0.0
     num_obstacle_sum = 0.0
@@ -132,10 +132,14 @@ def Evaluate(dirpath, time_range):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Performance Evaluation')
-    parser.add_argument('directory', type=str, help='directory of data')
+    parser.add_argument('results_directory', type=str,
+                        help='directory of prediction results')
+    parser.add_argument('labels_directory', type=str,
+                        help='directory of labels of future status')
     parser.add_argument('time_range', type=float, help='time range to evaluate')
     args = parser.parse_args()
-    dirpath = args.directory
+    results_dirpath = args.results_directory
+    labels_dirpath = args.labels_directory
     time_range = args.time_range
-    result_dict = Evaluate(dirpath, time_range)
-    np.save(dirpath + "/evaluation_result.npy", result_dict)
+    result_dict = Evaluate(results_dirpath, labels_dirpath, time_range)
+    np.save(os.path.join(results_dirpath, "evaluation_result.npy"), result_dict)

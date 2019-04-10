@@ -108,58 +108,46 @@ Status RssDecider::Process(Frame *frame,
         front_obstacle_distance);
 
     reference_line_info->mutable_rss_info()->set_acc_lon_range_minimum(
-        -1 * static_cast<double>(dynamics.alphaLon.brakeMax));
+      -1 * static_cast<double> (dynamics.alphaLon.brakeMax));
     reference_line_info->mutable_rss_info()->set_acc_lon_range_maximum(
-        static_cast<double>(dynamics.alphaLon.accelMax));
+      static_cast<double> (dynamics.alphaLon.accelMax));
     reference_line_info->mutable_rss_info()->set_acc_lat_left_range_minimum(
-        -1 * static_cast<double>(dynamics.alphaLat.brakeMin));
+      -1 * static_cast<double> (dynamics.alphaLat.brakeMin));
     reference_line_info->mutable_rss_info()->set_acc_lat_left_range_maximum(
-        static_cast<double>(dynamics.alphaLat.accelMax));
+      static_cast<double> (dynamics.alphaLat.accelMax));
     reference_line_info->mutable_rss_info()->set_acc_lat_right_range_minimum(
-        -1 * static_cast<double>(dynamics.alphaLat.brakeMin));
+      -1 * static_cast<double> (dynamics.alphaLat.brakeMin));
     reference_line_info->mutable_rss_info()->set_acc_lat_right_range_maximum(
-        static_cast<double>(dynamics.alphaLat.accelMax));
+      static_cast<double> (dynamics.alphaLat.accelMax));
 
     return Status::OK();
   }
 
-  bool in_test_mode = false;
-  if (in_test_mode) {
-    double obs_s_dist = nearest_obs_s_end - nearest_obs_s_start;
-    nearest_obs_s_start = ego_v_s_end + 5.0;
-    nearest_obs_s_end = nearest_obs_s_start + obs_s_dist;
-    front_obstacle_distance = nearest_obs_s_start - ego_v_s_end;
-  }
+#if RSS_FAKE_INPUT
+  nearest_obs_l_start = -4.2608;
+  nearest_obs_l_end = -1.42591;
+  ego_v_l_start = -1.05554;
+  ego_v_l_end = 1.08416;
+#endif
+  double lane_leftmost = std::max(ego_v_l_end, nearest_obs_l_end);
+  double lane_rightmost = std::min(ego_v_l_start, nearest_obs_l_start);
+  double lane_width = std::abs(lane_leftmost-lane_rightmost);
+  double lane_length = std::max(nearest_obs_s_end, ego_v_s_end);
 
-  double left_width_ego = 0.0;
-  double right_width_ego = 0.0;
-  reference_line_info->reference_line().GetLaneWidth(
-      ego_v_s_start, &left_width_ego, &right_width_ego);
-
-  double left_width_obs = 0.0;
-  double right_width_obs = 0.0;
-  reference_line_info->reference_line().GetLaneWidth(
-      nearest_obs_s_start, &left_width_obs, &right_width_obs);
-
-  double total_lane_width_ego = left_width_ego + right_width_ego;
-  double total_lane_width_obs = left_width_obs + right_width_obs;
-  double total_lane_length = std::max(nearest_obs_s_end, ego_v_s_end);
-
-  ADEBUG << "Task " << Name()
-         << " nearest_obstacle_distance = " << front_obstacle_distance
-         << " obs_s_start = " << nearest_obs_s_start
-         << " obs_s_end = " << nearest_obs_s_end
-         << " obs_l_start = " << nearest_obs_l_start
-         << " obs_l_end = " << nearest_obs_l_end
-         << " obs_speed = " << nearest_obs_speed
-         << " ego_v_s_start = " << ego_v_s_start
-         << " ego_v_s_end = " << ego_v_s_end
-         << " ego_v_l_start = " << ego_v_l_start
-         << " ego_v_l_end = " << ego_v_l_end
-         << " lane_width_ego = " << total_lane_width_ego
-         << " lane_width_obs = " << total_lane_width_obs
-         << " left_width_obs = " << left_width_obs
-         << " lane_length = " << total_lane_length;
+  rss_world_info.front_obs_dist = front_obstacle_distance;
+  rss_world_info.obs_s_start = nearest_obs_s_start;
+  rss_world_info.obs_s_end = nearest_obs_s_end;
+  rss_world_info.obs_l_start = nearest_obs_l_start;
+  rss_world_info.obs_l_end = nearest_obs_l_end;
+  rss_world_info.obs_speed = nearest_obs_speed;
+  rss_world_info.ego_v_s_start = ego_v_s_start;
+  rss_world_info.ego_v_s_end = ego_v_s_end;
+  rss_world_info.ego_v_l_start = ego_v_l_start;
+  rss_world_info.ego_v_l_end = ego_v_l_end;
+  rss_world_info.lane_leftmost = lane_leftmost;
+  rss_world_info.lane_rightmost = lane_rightmost;
+  rss_world_info.lane_width = lane_width;
+  rss_world_info.lane_length = lane_length;
 
   Object followingObject;
   Object leadingObject;
@@ -173,70 +161,70 @@ Status RssDecider::Process(Frame *frame,
   ad_rss::world::OccupiedRegion occupiedRegion_leading;
   occupiedRegion_leading.segmentId = 0;
   occupiedRegion_leading.lonRange.minimum =
-      ParametricValue(nearest_obs_s_start / total_lane_length);
+      ParametricValue(nearest_obs_s_start / lane_length);
   occupiedRegion_leading.lonRange.maximum =
-      ParametricValue(nearest_obs_s_end / total_lane_length);
-  occupiedRegion_leading.latRange.minimum = ParametricValue(std::max(
-      (left_width_obs - nearest_obs_l_end) / total_lane_width_obs, 0.0));
-  occupiedRegion_leading.latRange.maximum = ParametricValue(std::min(
-      (left_width_obs - nearest_obs_l_start) / total_lane_width_obs, 1.0));
+      ParametricValue(nearest_obs_s_end / lane_length);
+  occupiedRegion_leading.latRange.minimum = ParametricValue(
+      std::abs(ego_v_l_end - lane_leftmost) / lane_width);
+  occupiedRegion_leading.latRange.maximum = ParametricValue(
+      std::abs(ego_v_l_start - lane_leftmost) / lane_width);
+
   leadingObject.occupiedRegions.push_back(occupiedRegion_leading);
 
-  ADEBUG << " occupiedRegion_leading.lonRange.minimum = "
-         << static_cast<double>(occupiedRegion_leading.lonRange.minimum)
-         << " occupiedRegion_leading.lonRange.maximum = "
-         << static_cast<double>(occupiedRegion_leading.lonRange.maximum)
-         << " occupiedRegion_leading.latRange.minimum = "
-         << static_cast<double>(occupiedRegion_leading.latRange.minimum)
-         << " occupiedRegion_leading.latRange.maximum = "
-         << static_cast<double>(occupiedRegion_leading.latRange.maximum);
+  rss_world_info.OR_front_lon_min =
+      static_cast<double> (occupiedRegion_leading.lonRange.minimum);
+  rss_world_info.OR_front_lon_max =
+      static_cast<double> (occupiedRegion_leading.lonRange.maximum);
+  rss_world_info.OR_front_lat_min =
+      static_cast<double> (occupiedRegion_leading.latRange.minimum);
+  rss_world_info.OR_front_lat_max =
+      static_cast<double> (occupiedRegion_leading.latRange.maximum);
 
   RssDecider::rss_create_ego_object(&followingObject, adc_velocity, 0.0);
 
   ad_rss::world::OccupiedRegion occupiedRegion_following;
   occupiedRegion_following.segmentId = 0;
   occupiedRegion_following.lonRange.minimum =
-      ParametricValue(ego_v_s_start / total_lane_length);
+      ParametricValue(ego_v_s_start / lane_length);
   occupiedRegion_following.lonRange.maximum =
-      ParametricValue(ego_v_s_end / total_lane_length);
-  occupiedRegion_following.latRange.minimum =
-      ParametricValue((left_width_ego - ego_v_l_end) / total_lane_width_ego);
-  occupiedRegion_following.latRange.maximum =
-      ParametricValue((left_width_ego - ego_v_l_start) / total_lane_width_ego);
+      ParametricValue(ego_v_s_end / lane_length);
+  occupiedRegion_following.latRange.minimum = ParametricValue(
+      std::abs(nearest_obs_l_end - lane_leftmost) / lane_width);
+  occupiedRegion_following.latRange.maximum = ParametricValue(
+      std::abs(nearest_obs_l_start - lane_leftmost) / lane_width);
+
   followingObject.occupiedRegions.push_back(occupiedRegion_following);
 
-  ADEBUG << " adc_velocity = " << adc_velocity
-         << " occupiedRegion_following.lonRange.minimum = "
-         << static_cast<double>(occupiedRegion_following.lonRange.minimum)
-         << " occupiedRegion_following.lonRange.maximum = "
-         << static_cast<double>(occupiedRegion_following.lonRange.maximum)
-         << " occupiedRegion_following.latRange.minimum = "
-         << static_cast<double>(occupiedRegion_following.latRange.minimum)
-         << " occupiedRegion_following.latRange.maximum = "
-         << static_cast<double>(occupiedRegion_following.latRange.maximum);
+  rss_world_info.adc_vel = adc_velocity;
+  rss_world_info.OR_rear_lon_min =
+      static_cast<double> (occupiedRegion_following.lonRange.minimum);
+  rss_world_info.OR_rear_lon_max =
+      static_cast<double> (occupiedRegion_following.lonRange.maximum);
+  rss_world_info.OR_rear_lat_min =
+      static_cast<double> (occupiedRegion_following.latRange.minimum);
+  rss_world_info.OR_rear_lat_max =
+      static_cast<double> (occupiedRegion_following.latRange.maximum);
 
   ad_rss::world::RoadSegment roadSegment;
   ad_rss::world::LaneSegment laneSegment;
 
   laneSegment.id = 0;
-  laneSegment.length.minimum = Distance(total_lane_length);
-  laneSegment.length.maximum = Distance(total_lane_length);
-  laneSegment.width.minimum =
-      Distance(std::min(total_lane_width_ego, total_lane_width_obs));
-  laneSegment.width.maximum =
-      Distance(std::max(total_lane_width_ego, total_lane_width_obs));
-  roadSegment.push_back(laneSegment);
+  laneSegment.length.minimum = Distance(lane_length);
+  laneSegment.length.maximum = Distance(lane_length);
+  laneSegment.width.minimum = Distance(lane_width);
+  laneSegment.width.maximum = Distance(lane_width);
 
+  roadSegment.push_back(laneSegment);
   roadArea.push_back(roadSegment);
 
-  ADEBUG << " laneSegment.length.min = "
-         << static_cast<double>(laneSegment.length.minimum)
-         << " laneSegment.length.maximum = "
-         << static_cast<double>(laneSegment.length.maximum)
-         << " laneSegment.width.minimum = "
-         << static_cast<double>(laneSegment.width.minimum)
-         << " laneSegment.width.maximum = "
-         << static_cast<double>(laneSegment.width.maximum);
+  rss_world_info.laneSeg_len_min =
+      static_cast<double> (laneSegment.length.minimum);
+  rss_world_info.laneSeg_len_max =
+      static_cast<double> (laneSegment.length.maximum);
+  rss_world_info.laneSeg_width_min =
+      static_cast<double> (laneSegment.width.minimum);
+  rss_world_info.laneSeg_width_max =
+      static_cast<double> (laneSegment.width.maximum);
 
   ad_rss::world::WorldModel worldModel;
   worldModel.egoVehicle = followingObject;
@@ -246,73 +234,83 @@ Status RssDecider::Process(Frame *frame,
   worldModel.timeIndex = frame->SequenceNum();
 
   ad_rss::situation::SituationVector situationVector;
-  bool rss_result = ::ad_rss::core::RssSituationExtraction::extractSituations(
-      worldModel, situationVector);
+  bool rss_result = ::ad_rss::core::RssSituationExtraction::extractSituations
+                       (worldModel, situationVector);
   if (!rss_result) {
-    std::string msg("ad_rss::extractSituation failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    rss_world_info.err_code = "ad_rss::extractSituation failed";
+    rss_dump_world_info(rss_world_info);
+    return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
 
   if (situationVector.size() == 0) {
-    std::string msg("situationVector unexpected empty");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    rss_world_info.err_code = "situationVector unexpected empty";
+    rss_dump_world_info(rss_world_info);
+    return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
 
   ::ad_rss::state::ResponseStateVector responseStateVector;
   ::ad_rss::core::RssSituationChecking RssCheck;
-  rss_result = RssCheck.checkSituations(situationVector, responseStateVector);
+  rss_result = RssCheck.checkSituations(
+                   situationVector, responseStateVector);
 
   if (!rss_result) {
-    std::string msg("ad_rss::checkSituation failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    rss_world_info.err_code ="ad_rss::checkSituation failed";
+    rss_dump_world_info(rss_world_info);
+    return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
 
   if (responseStateVector.size() == 0) {
-    std::string msg("responseStateVector unexpected empty");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    rss_world_info.err_code = "responseStateVector unexpected empty";
+    rss_dump_world_info(rss_world_info);
+    return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
 
   ::ad_rss::state::ResponseState properResponse;
   ::ad_rss::core::RssResponseResolving RssResponse;
-  rss_result =
-      RssResponse.provideProperResponse(responseStateVector, properResponse);
+  rss_result = RssResponse.provideProperResponse(
+                   responseStateVector, properResponse);
 
   if (!rss_result) {
-    std::string msg("ad_rss::provideProperResponse failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    rss_world_info.err_code = "ad_rss::provideProperResponse failed";
+    rss_dump_world_info(rss_world_info);
+    return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
 
   ::ad_rss::world::AccelerationRestriction accelerationRestriction;
   rss_result = ad_rss::core::RssResponseTransformation::transformProperResponse(
-      worldModel, properResponse, accelerationRestriction);
+                   worldModel, properResponse, accelerationRestriction);
 
   if (!rss_result) {
-    std::string msg("ad_rss::transformProperResponse failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    rss_world_info.err_code = "ad_rss::transformProperResponse failed";
+    rss_dump_world_info(rss_world_info);
+    return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
 
-  Distance const currentLonDistance =
-      situationVector[0].relativePosition.longitudinalDistance;
+  Distance const currentLonDistance = situationVector[0].
+      relativePosition.longitudinalDistance;
   Distance safeLonDistance;
-  VehicleState const &leadingVehicleState =
-      situationVector[0].otherVehicleState;
-  VehicleState const &followingVehicleState =
-      situationVector[0].egoVehicleState;
+  VehicleState const& leadingVehicleState = situationVector[0].
+      otherVehicleState;
+  VehicleState const& followingVehicleState = situationVector[0].
+      egoVehicleState;
 
-  rss_result =
-      ::ad_rss::situation::calculateSafeLongitudinalDistanceSameDirection(
-          leadingVehicleState, followingVehicleState, safeLonDistance);
+  rss_result = ::ad_rss::situation::
+                   calculateSafeLongitudinalDistanceSameDirection(
+                       leadingVehicleState,
+                       followingVehicleState,
+                       safeLonDistance);
   if (!rss_result) {
-    std::string msg(
-        "ad_rss::calculateSafeLongitudinalDistanceSameDirection failed");
-    return Status(ErrorCode::PLANNING_ERROR, msg);
+    rss_world_info.err_code =
+      ("ad_rss::calculateSafeLongitudinalDistanceSameDirection failed");
+    rss_dump_world_info(rss_world_info);
+    return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
 
   if (responseStateVector[0].longitudinalState.isSafe) {
-    AERROR << "Task " << Name() << " Distance is RSS-Safe";
+    ADEBUG << "Task " << Name() << " Distance is RSS-Safe";
     reference_line_info->mutable_rss_info()->set_is_rss_safe(true);
   } else {
-    AERROR << "Task " << Name() << " Distance is not RSS-Safe";
+    ADEBUG << "Task " << Name() << " Distance is not RSS-Safe";
     reference_line_info->mutable_rss_info()->set_is_rss_safe(false);
     if (FLAGS_enable_rss_fallback) {
       reference_line_info->mutable_speed_data()->clear();
@@ -320,21 +318,21 @@ Status RssDecider::Process(Frame *frame,
   }
 
   reference_line_info->mutable_rss_info()->set_cur_dist_lon(
-      static_cast<double>(currentLonDistance));
+      static_cast<double> (currentLonDistance));
   reference_line_info->mutable_rss_info()->set_rss_safe_dist_lon(
-      static_cast<double>(safeLonDistance));
+      static_cast<double> (safeLonDistance));
   reference_line_info->mutable_rss_info()->set_acc_lon_range_minimum(
-      static_cast<double>(accelerationRestriction.longitudinalRange.minimum));
+      static_cast<double> (accelerationRestriction.longitudinalRange.minimum));
   reference_line_info->mutable_rss_info()->set_acc_lon_range_maximum(
-      static_cast<double>(accelerationRestriction.longitudinalRange.maximum));
+      static_cast<double> (accelerationRestriction.longitudinalRange.maximum));
   reference_line_info->mutable_rss_info()->set_acc_lat_left_range_minimum(
-      static_cast<double>(accelerationRestriction.lateralLeftRange.minimum));
+      static_cast<double> (accelerationRestriction.lateralLeftRange.minimum));
   reference_line_info->mutable_rss_info()->set_acc_lat_left_range_maximum(
-      static_cast<double>(accelerationRestriction.lateralLeftRange.maximum));
+      static_cast<double> (accelerationRestriction.lateralLeftRange.maximum));
   reference_line_info->mutable_rss_info()->set_acc_lat_right_range_minimum(
-      static_cast<double>(accelerationRestriction.lateralRightRange.minimum));
+      static_cast<double> (accelerationRestriction.lateralRightRange.minimum));
   reference_line_info->mutable_rss_info()->set_acc_lat_right_range_maximum(
-      static_cast<double>(accelerationRestriction.lateralRightRange.maximum));
+      static_cast<double> (accelerationRestriction.lateralRightRange.maximum));
 
   ADEBUG << " longitudinalState.isSafe: "
          << responseStateVector[0].longitudinalState.isSafe;
@@ -344,6 +342,10 @@ Status RssDecider::Process(Frame *frame,
          << responseStateVector[0].lateralStateRight.isSafe;
   ADEBUG << " is_rss_safe : " << reference_line_info->rss_info().is_rss_safe();
   ADEBUG << " cur_dist_lon: " << reference_line_info->rss_info().cur_dist_lon();
+  ADEBUG << " is_rss_safe : "
+         << reference_line_info->rss_info().is_rss_safe();
+  ADEBUG << " cur_dist_lon: "
+         << reference_line_info->rss_info().cur_dist_lon();
   ADEBUG << " rss_safe_dist_lon: "
          << reference_line_info->rss_info().rss_safe_dist_lon();
   ADEBUG << " acc_longitudianlRange_minimum: "
@@ -363,7 +365,7 @@ Status RssDecider::Process(Frame *frame,
 }
 
 void RssDecider::rss_config_default_dynamics(
-    ::ad_rss::world::Dynamics *dynamics) {
+  ::ad_rss::world::Dynamics *dynamics) {
   dynamics->alphaLon.accelMax = ::ad_rss::physics::Acceleration(3.5);
   dynamics->alphaLon.brakeMax = ::ad_rss::physics::Acceleration(8);
   dynamics->alphaLon.brakeMin = ::ad_rss::physics::Acceleration(4.);
@@ -390,6 +392,38 @@ void RssDecider::rss_create_other_object(::ad_rss::world::Object *other,
   other->velocity.speedLat = Speed(vel_lat);
   rss_config_default_dynamics(&(other->dynamics));
   other->responseTime = ::ad_rss::physics::Duration(2.);
+}
+
+void RssDecider::rss_dump_world_info(const struct
+                                     rss_world_model_struct &rss_info) {
+  AERROR << " RSS_INFO :"
+         << " front_obs_dist: " << rss_info.front_obs_dist
+         << " obs_s_start: " << rss_info.obs_s_start
+         << " obs_s_end: " << rss_info.obs_s_end
+         << " obs_l_start: " << rss_info.obs_l_start
+         << " obs_l_end: " << rss_info.obs_l_end
+         << " obs_speed: " << rss_info.obs_speed
+         << " ego_v_s_start: " << rss_info.ego_v_s_start
+         << " ego_v_s_end: " << rss_info.ego_v_s_end
+         << " ego_v_l_start: " << rss_info.ego_v_l_start
+         << " ego_v_l_end: " << rss_info.ego_v_l_end
+         << " lane_leftmost: " << rss_info.lane_leftmost
+         << " lane_rightmost: " << rss_info.lane_rightmost
+         << " lane_width: " << rss_info.lane_width
+         << " lane_length: " << rss_info.lane_length
+         << " OR_front_lon_min: " << rss_info.OR_front_lon_min
+         << " OR_front_lon_max: " << rss_info.OR_front_lon_max
+         << " OR_front_lat_min: " << rss_info.OR_front_lat_min
+         << " OR_front_lat_max: " << rss_info.OR_front_lat_max
+         << " OR_rear_lon_min: " << rss_info.OR_rear_lon_min
+         << " OR_rear_lon_max: " << rss_info.OR_rear_lon_max
+         << " OR_rear_lat_min: " << rss_info.OR_rear_lat_min
+         << " OR_rear_lat_max: " << rss_info.OR_rear_lat_max
+         << " adc_vel: " << rss_info.adc_vel
+         << " laneSeg_len_min: " << rss_info.laneSeg_len_min
+         << " laneSeg_len_max: " << rss_info.laneSeg_len_max
+         << " laneSeg_width_min: " << rss_info.laneSeg_width_min
+         << " laneSeg_width_max: " << rss_info.laneSeg_width_max;
 }
 
 }  //  namespace planning
