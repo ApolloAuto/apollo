@@ -134,8 +134,9 @@ class PointCloudParser(SensorMessageParser):
     def convert_xyzit_pb_to_array(self, xyz_i_t, data_type):
         arr = np.zeros(len(xyz_i_t), dtype=data_type)
         for i, point in enumerate(xyz_i_t):
+            # change timestamp to timestamp_sec
             arr[i] = (point.x, point.y, point.z,
-                      point.intensity, point.timestamp)
+                      point.intensity, point.timestamp/1e9)
         return arr
 
     def make_xyzit_point_cloud(self, xyz_i_t):
