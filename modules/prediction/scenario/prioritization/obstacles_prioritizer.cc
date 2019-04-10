@@ -41,8 +41,6 @@ using hdmap::LaneInfo;
 using hdmap::OverlapInfo;
 using ConstLaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
-std::unordered_set<std::string> ObstaclesPrioritizer::ego_back_lane_id_set_;
-
 namespace {
 
 bool IsLaneSequenceInReferenceLine(
@@ -89,7 +87,10 @@ int NearestBackwardObstacleIdOnLaneSequence(const LaneSequence& lane_sequence) {
 
 }  // namespace
 
+ObstaclesPrioritizer::ObstaclesPrioritizer() {}
+
 void ObstaclesPrioritizer::PrioritizeObstacles() {
+  ego_back_lane_id_set_.clear();
   AssignIgnoreLevel();
   AssignCautionLevel();
 }
@@ -318,7 +319,6 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
   double ego_vehicle_s = std::numeric_limits<double>::max();
   double ego_vehicle_l = std::numeric_limits<double>::max();
   double accumulated_s = 0.0;
-  std::string ego_lane_id = "";
   // first loop for lane_ids to findout ego_vehicle_s
   for (const std::string& lane_id : lane_ids) {
     std::shared_ptr<const LaneInfo> lane_info_ptr =
@@ -333,7 +333,8 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
       if (std::fabs(l) < std::fabs(ego_vehicle_l)) {
         ego_vehicle_s = accumulated_s + s;
         ego_vehicle_l = l;
-        ego_lane_id = lane_id;
+        ego_lane_id_ = lane_id;
+        ego_lane_s_ = s;
       }
     }
     accumulated_s += lane_info_ptr->total_length();
@@ -342,11 +343,14 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
   // insert ego_back_lane_id
   accumulated_s = 0.0;
   for (const std::string& lane_id : lane_ids) {
-    if (lane_id == ego_lane_id) {
+    if (lane_id == ego_lane_id_) {
       break;
     }
     ego_back_lane_id_set_.insert(lane_id);
   }
+
+  std::unordered_set<std::string> visited_lanes(lane_ids.begin(),
+                                                lane_ids.end());
 
   // then loop through lane_ids to AssignCaution for obstacle vehicles
   for (const std::string& lane_id : lane_ids) {
@@ -360,10 +364,10 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
       continue;
     }
     accumulated_s += lane_info_ptr->total_length();
-    if (lane_id != ego_lane_id) {
-      AssignCautionByMerge(lane_info_ptr);
+    if (lane_id != ego_lane_id_) {
+      AssignCautionByMerge(lane_info_ptr, &visited_lanes);
     }
-    AssignCautionByOverlap(lane_info_ptr);
+    AssignCautionByOverlap(lane_info_ptr, &visited_lanes);
     if (accumulated_s > FLAGS_caution_search_distance_ahead + ego_vehicle_s) {
       break;
     }
@@ -421,17 +425,19 @@ void ObstaclesPrioritizer::AssignCautionLevelByEgoReferenceLine() {
 }
 
 void ObstaclesPrioritizer::AssignCautionByMerge(
-    std::shared_ptr<const LaneInfo> lane_info_ptr) {
+    std::shared_ptr<const LaneInfo> lane_info_ptr,
+    std::unordered_set<std::string>* const visited_lanes) {
   SetCautionBackward(lane_info_ptr,
-                     FLAGS_caution_search_distance_backward_for_merge);
+      FLAGS_caution_search_distance_backward_for_merge, visited_lanes);
 }
 
 void ObstaclesPrioritizer::AssignCautionByOverlap(
-    std::shared_ptr<const LaneInfo> lane_info_ptr) {
+    std::shared_ptr<const LaneInfo> lane_info_ptr,
+    std::unordered_set<std::string>* const visited_lanes) {
   std::string lane_id = lane_info_ptr->id().id();
-  const std::vector<std::shared_ptr<const OverlapInfo>> cross_lanes_ =
+  const std::vector<std::shared_ptr<const OverlapInfo>> cross_lanes =
       lane_info_ptr->cross_lanes();
-  for (const auto overlap_ptr : cross_lanes_) {
+  for (const auto overlap_ptr : cross_lanes) {
     for (const auto& object : overlap_ptr->overlap().object()) {
       const auto& object_id = object.id().id();
       if (object_id == lane_info_ptr->id().id()) {
@@ -439,12 +445,15 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
       } else {
         std::shared_ptr<const LaneInfo> overlap_lane_ptr =
             PredictionMap::LaneById(object_id);
+        if (object.lane_overlap_info().start_s() < ego_lane_s_) {
+          continue;
+        }
         // ahead_s is the length in front of the overlap
         double ahead_s = overlap_lane_ptr->total_length() -
                          object.lane_overlap_info().start_s();
-        SetCautionBackward(
-            overlap_lane_ptr,
-            ahead_s + FLAGS_caution_search_distance_backward_for_overlap);
+        SetCautionBackward(overlap_lane_ptr,
+            ahead_s + FLAGS_caution_search_distance_backward_for_overlap,
+            visited_lanes);
       }
     }
   }
@@ -452,7 +461,8 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
 
 void ObstaclesPrioritizer::SetCautionBackward(
     std::shared_ptr<const LaneInfo> start_lane_info_ptr,
-    const double max_distance) {
+    const double max_distance,
+    std::unordered_set<std::string>* const visited_lanes) {
   std::string start_lane_id = start_lane_info_ptr->id().id();
   if (ego_back_lane_id_set_.find(start_lane_id) !=
       ego_back_lane_id_set_.end()) {
@@ -471,11 +481,10 @@ void ObstaclesPrioritizer::SetCautionBackward(
     double cumu_distance = lane_info_queue.front().second;
     lane_info_queue.pop();
     const std::string& lane_id = curr_lane->id().id();
-    std::unordered_set<std::string> visited_lanes;
-    if (visited_lanes.find(lane_id) == visited_lanes.end() &&
+    if (visited_lanes->find(lane_id) == visited_lanes->end() &&
         lane_obstacles.find(lane_id) != lane_obstacles.end() &&
         !lane_obstacles[lane_id].empty()) {
-      visited_lanes.insert(lane_id);
+      visited_lanes->insert(lane_id);
       // find the obstacle with largest lane_s on the lane
       int obstacle_id = lane_obstacles[lane_id].front().obstacle_id();
       double obstacle_s = lane_obstacles[lane_id].front().lane_s();
