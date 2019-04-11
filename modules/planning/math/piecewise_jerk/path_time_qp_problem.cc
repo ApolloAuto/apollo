@@ -84,6 +84,9 @@ void PathTimeQpProblem::CalculateOffset(std::vector<c_float>* q) {
   for (int i = 0; i < kNumParam; ++i) {
     q->at(i) = 0.0;
   }
+  q->at(N - 1) = 4.0 * weight_.x_w * x_end_[0];
+  q->at(N * 2 - 1) = 4.0 * weight_.x_derivative_w * x_end_[1];
+  q->at(N * 3 - 1) = 4.0 * weight_.x_second_order_derivative_w * x_end_[2];
 }
 
 }  // namespace planning

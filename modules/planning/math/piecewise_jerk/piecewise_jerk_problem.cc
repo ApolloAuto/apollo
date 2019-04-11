@@ -29,15 +29,15 @@ namespace {
 constexpr double kMaxVariableRange = 1e10;
 }  // namespace
 
-void PiecewiseJerkProblem::InitProblem(const size_t num_of_knots,
-                               const std::array<double, 3>& x_init,
-                               const double delta_s,
-                               const std::array<double, 5>& w,
-                               const double max_x_third_order_derivative) {
+void PiecewiseJerkProblem::InitProblem(
+    const size_t num_of_knots, const double delta_s,
+    const std::array<double, 5>& w, const double max_x_third_order_derivative,
+    const std::array<double, 3>& x_init, const std::array<double, 3>& x_end) {
   CHECK_GE(num_of_knots, 2);
   num_of_knots_ = num_of_knots;
 
   x_init_ = x_init;
+  x_end_ = x_end;
 
   weight_.x_w = w[0];
   weight_.x_derivative_w = w[1];
@@ -423,6 +423,9 @@ void PiecewiseJerkProblem::CalculateOffset(std::vector<c_float>* q) {
       q->at(i) = 0.0;
     }
   }
+  q->at(N - 1) = 4.0 * weight_.x_w * x_end_[0];
+  q->at(N * 2 - 1) = 4.0 * weight_.x_derivative_w * x_end_[1];
+  q->at(N * 3 - 1) = 4.0 * weight_.x_second_order_derivative_w * x_end_[2];
 }
 
 }  // namespace planning

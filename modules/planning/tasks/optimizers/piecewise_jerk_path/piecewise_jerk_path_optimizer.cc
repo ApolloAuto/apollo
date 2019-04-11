@@ -113,8 +113,8 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     const std::array<double, 5>& w, std::vector<double>* x,
     std::vector<double>* dx, std::vector<double>* ddx, const int max_iter) {
   std::unique_ptr<Fem1dQpProblem> fem_1d_qp(new Fem1dQpProblem());
-  fem_1d_qp->InitProblem(lat_boundaries.size(), init_state.second,
-                               delta_s, w, FLAGS_lateral_jerk_bound);
+  fem_1d_qp->InitProblem(lat_boundaries.size(), delta_s, w,
+                         FLAGS_lateral_jerk_bound, init_state.second);
 
   auto start_time = std::chrono::system_clock::now();
 

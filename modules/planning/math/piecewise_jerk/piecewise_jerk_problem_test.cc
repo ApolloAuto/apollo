@@ -85,7 +85,7 @@ TEST(PiecewiseJerkProblemTest, add_bounds_test) {
   double max_x_third_order_derivative = 0.25;
 
   std::unique_ptr<PiecewiseJerkProblem> fem_qp(
-      new PiecewiseJerkProblem(n, x_init, delta_s, w, max_x_third_order_derivative));
+      new PiecewiseJerkProblem(n, delta_s, w, max_x_third_order_derivative, x_init));
 
   std::vector<std::tuple<double, double, double>> x_bounds;
   for (size_t i = 10; i < 20; ++i) {
