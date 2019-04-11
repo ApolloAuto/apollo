@@ -102,7 +102,7 @@ export default class Ground {
             position = {x: 0, y: 0};
         }
 
-        this.mesh.position.set(position.x, position.y, 0);
+        this.mesh.position.set(position.x, position.y, -0.1);
         this.mesh.scale.set(xres * mpp, yres * mpp, 1);
         this.mesh.material.needsUpdate = true;
         this.mesh.overdraw = false;
