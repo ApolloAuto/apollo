@@ -70,7 +70,7 @@ class SequencePredictor : public Predictor {
   bool GetLateralPolynomial(const Obstacle& obstacle,
                             const LaneSequence& lane_sequence,
                             const double time_to_end_state,
-                            std::array<double, 6>* coefficients);
+                            std::array<double, 4>* coefficients);
   /**
    * @brief Filter lane sequences
    * @param Lane graph
