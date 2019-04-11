@@ -4371,8 +4371,16 @@
                 }
               }
             },
-            "PathBoundDeciderConfig": {
+            "PathAssessmentDeciderConfig": {
               "fields": {}
+            },
+            "PathBoundsDeciderConfig": {
+              "fields": {
+                "isLaneBorrowing": {
+                  "type": "bool",
+                  "id": 1
+                }
+              }
             },
             "PiecewiseJerkPathConfig": {
               "fields": {
@@ -5079,11 +5087,12 @@
                     "sidePassPathDeciderConfig",
                     "speedBoundsDeciderConfig",
                     "piecewiseJerkPathConfig",
-                    "pathBoundDeciderConfig",
+                    "pathBoundsDeciderConfig",
                     "openSpaceFallbackDeciderConfig",
                     "openSpaceRoiDeciderConfig",
                     "openSpaceTrajectoryProviderConfig",
-                    "openSpaceTrajectoryPartitionConfig"
+                    "openSpaceTrajectoryPartitionConfig",
+                    "pathAssessmentDeciderConfig"
                   ]
                 }
               },
@@ -5144,8 +5153,8 @@
                   "type": "PiecewiseJerkPathConfig",
                   "id": 16
                 },
-                "pathBoundDeciderConfig": {
-                  "type": "PathBoundDeciderConfig",
+                "pathBoundsDeciderConfig": {
+                  "type": "PathBoundsDeciderConfig",
                   "id": 17
                 },
                 "openSpaceFallbackDeciderConfig": {
@@ -5163,6 +5172,10 @@
                 "openSpaceTrajectoryPartitionConfig": {
                   "type": "OpenSpaceTrajectoryPartitionConfig",
                   "id": 21
+                },
+                "pathAssessmentDeciderConfig": {
+                  "type": "PathAssessmentDeciderConfig",
+                  "id": 22
                 }
               },
               "nested": {
@@ -5188,11 +5201,12 @@
                     "SPEED_BOUNDS_PRIORI_DECIDER": 17,
                     "SPEED_BOUNDS_FINAL_DECIDER": 18,
                     "PIECEWISE_JERK_PATH_OPTIMIZER": 19,
-                    "PATH_BOUND_DECIDER": 20,
+                    "PATH_BOUNDS_DECIDER": 20,
                     "OPEN_SPACE_ROI_DECIDER": 21,
                     "OPEN_SPACE_TRAJECTORY_PROVIDER": 22,
                     "OPEN_SPACE_TRAJECTORY_PARTITION": 23,
-                    "OPEN_SPACE_FALLBACK_DECIDER": 24
+                    "OPEN_SPACE_FALLBACK_DECIDER": 24,
+                    "PATH_ASSESSMENT_DECIDER": 25
                   }
                 }
               }
@@ -5623,6 +5637,7 @@
                     "SIDE_PASS_DETECT_SAFETY": 103,
                     "SIDE_PASS_PASS_OBSTACLE": 104,
                     "SIDE_PASS_BACKUP": 105,
+                    "SIDE_PASS_DEFAULT_STAGE": 106,
                     "BARE_INTERSECTION_UNPROTECTED_APPROACH": 200,
                     "BARE_INTERSECTION_UNPROTECTED_CREEP": 201,
                     "BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE": 202,
