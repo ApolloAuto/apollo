@@ -71,7 +71,7 @@ Status RssDecider::Process(Frame *frame,
   double nearest_obs_l_end = 0.0;
   double nearest_obs_speed = 0.0;
 
-  double front_obstacle_distance = std::numeric_limits<double>::max();
+  double front_obstacle_distance = FLAGS_rss_max_front_obstacle_distance;
   for (const auto *obstacle : path_decision->obstacles().Items()) {
     if (obstacle->IsVirtual()) {
       continue;
@@ -97,7 +97,7 @@ Status RssDecider::Process(Frame *frame,
   }
 
   // there is no obstacle in front of adc
-  if (front_obstacle_distance == std::numeric_limits<double>::max()) {
+  if (front_obstacle_distance >= FLAGS_rss_max_front_obstacle_distance) {
     ::ad_rss::world::Dynamics dynamics;
     rss_config_default_dynamics(&dynamics);
 

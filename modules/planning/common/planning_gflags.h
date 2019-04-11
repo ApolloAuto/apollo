@@ -243,6 +243,7 @@ DECLARE_double(default_front_clear_distance);
 DECLARE_double(max_trajectory_len);
 DECLARE_bool(enable_rss_fallback);
 DECLARE_bool(enable_rss_info);
+DECLARE_double(rss_max_front_obstacle_distance);
 
 DECLARE_bool(enable_planning_smoother);
 DECLARE_double(smoother_stop_distance);
