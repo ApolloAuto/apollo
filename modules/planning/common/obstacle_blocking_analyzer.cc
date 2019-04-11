@@ -34,8 +34,8 @@ using apollo::hdmap::HDMapUtil;
 constexpr double kAdcDistanceThreshold = 35.0;  // unit: m
 constexpr double kObstaclesDistanceThreshold = 5.0;
 
-bool IsNonmovableObstacle(
-    const ReferenceLineInfo& reference_line_info, const Obstacle& obstacle) {
+bool IsNonmovableObstacle(const ReferenceLineInfo& reference_line_info,
+                          const Obstacle& obstacle) {
   // Obstacle is far away.
   const SLBoundary& adc_sl_boundary = reference_line_info.AdcSlBoundary();
   if (obstacle.PerceptionSLBoundary().start_s() >

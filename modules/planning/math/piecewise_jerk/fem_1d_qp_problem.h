@@ -56,8 +56,8 @@ class Fem1dQpProblem : public PiecewiseJerkProblem {
  protected:
   // naming convention follows osqp solver.
   void CalculateKernel(std::vector<c_float>* P_data,
-                               std::vector<c_int>* P_indices,
-                               std::vector<c_int>* P_indptr) override;
+                       std::vector<c_int>* P_indices,
+                       std::vector<c_int>* P_indptr) override;
 
   void CalculateOffset(std::vector<c_float>* q) override;
 };

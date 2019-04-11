@@ -20,10 +20,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <algorithm>
 
 #include "cyber/common/macros.h"
 
@@ -68,7 +68,7 @@ class PlanningContext {
 
   static PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
 
-//  static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
+  //  static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
 
   static const FallBackInfo& fallback_info() { return fallback_info_; }
 

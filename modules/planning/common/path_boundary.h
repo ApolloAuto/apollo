@@ -29,7 +29,7 @@ namespace planning {
 class PathBoundary {
  public:
   PathBoundary(const double start_s, const double delta_s,
-      std::vector<std::pair<double, double>> path_boundary);
+               std::vector<std::pair<double, double>> path_boundary);
 
   virtual ~PathBoundary() = default;
 
