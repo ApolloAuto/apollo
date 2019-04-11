@@ -172,7 +172,7 @@ bool MoveSequencePredictor::DrawMoveSequenceTrajectoryPoints(
     double theta = M_PI;
 
     lane_l = EvaluateCubicPolynomial(lateral_coeffs, relative_time, 0,
-                                       time_to_lat_end_state, 0.0);
+                                     time_to_lat_end_state, 0.0);
     double curr_s =
         EvaluateQuarticPolynomial(longitudinal_coeffs, relative_time, 0,
                                   lon_end_vt.second, lon_end_vt.first);
