@@ -143,9 +143,10 @@ export default class ScatterGraph extends React.Component {
                 display: options.legend.display,
                 labels: {
                     filter: (legendItem, data) => {
-                        // skip label that starts with 'skip_',
-                        // such as the one for car's bounding box
-                        return !legendItem.text.startsWith('skip_');
+                        const hideLabel = _.get(data,
+                            `datasets[${legendItem.datasetIndex}].hideLabelInLegend`, false);
+
+                        return !hideLabel;
                     }
                 }
             },
@@ -205,7 +206,8 @@ export default class ScatterGraph extends React.Component {
             // basic properties
             const config = {
                 label: name, //legend
-                showText: properties.showLabel,
+                hideLabelInLegend: properties.hideLabelInLegend,
+                showText: properties.showText,
                 text: name, // text in the graph
 
                 backgroundColor: properties.color,
@@ -229,7 +231,7 @@ export default class ScatterGraph extends React.Component {
     updateCar(name, point, properties) {
         // draw heading arrow
         {
-            const arrowName = name + '_arrow';
+            const arrowName = name;
             if (this.name2idx[arrowName] === undefined) {
                 this.name2idx[arrowName] = this.chart.data.datasets.length;
             }
@@ -243,7 +245,7 @@ export default class ScatterGraph extends React.Component {
 
         // draw ego-vehicle bounding box
         {
-            const polygonName = 'skip_legend_' + name + '_car_bounding_box';
+            const polygonName = name + '_car_bounding_box';
             if (this.name2idx[polygonName] === undefined) {
                 this.name2idx[polygonName] = this.chart.data.datasets.length;
             }
@@ -256,6 +258,7 @@ export default class ScatterGraph extends React.Component {
                 showLine: true,
                 fill: false,
                 lineTension: 0,
+                hideLabelInLegend: true,
             };
             this.updateData(idx2, polygonName, polygonProperties, polygon);
         }
