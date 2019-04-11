@@ -18,6 +18,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -474,18 +475,17 @@ bool Visualizer::copy_backup_file(const std::string &filename) {
   // index = last_index;
 
   ++index;
-  std::string yaml_bak_file = filename + "__" + std::to_string(index);
+  const std::string yaml_bak_file = filename + "__" + std::to_string(index);
   AINFO << "yaml_backup_file: " << yaml_bak_file;
 
-  std::string command = "cp " + filename + " " + yaml_bak_file;
-  int ret = system(command.c_str());
-  if (ret != 0) {
+  bool ret = cyber::common::copy(filename, yaml_bak_file);
+  if (!ret) {
     AINFO << "Cannot backup the file, " << filename;
   } else {
     AINFO << "Backup file, " << filename << " saved.";
   }
 
-  return true;
+  return ret;
 }
 
 bool Visualizer::save_extrinsic_in_yaml(const std::string &camera_name,
