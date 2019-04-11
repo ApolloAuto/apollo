@@ -44,7 +44,7 @@ void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
 
   ptr_debug->MergeFrom(debug_instance_);
 
-  // 2, record partitioned trajectories into debug_ptr
+  // 2, record partitioned trajectories into ptr_debug
   auto* ptr_partitioned_trajectories = ptr_debug->mutable_planning_data()
                                            ->mutable_open_space()
                                            ->mutable_partitioned_trajectories();
@@ -55,7 +55,7 @@ void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
     CopyTrajectory(picked_trajectory, ptr_added_trajectory);
   }
 
-  // 3, record chosed partitioned into debug_ptr
+  // 3, record chosed partitioned into ptr_debug
   auto* ptr_chosen_trajectory = ptr_debug->mutable_planning_data()
                                     ->mutable_open_space()
                                     ->mutable_chosen_trajectory()
