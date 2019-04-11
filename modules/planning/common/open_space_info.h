@@ -278,6 +278,8 @@ class OpenSpaceInfo {
     return publishable_trajectory_data_;
   }
 
+  // TODO(QiL, Jinyun): refactor open_space_info vs debug
+
   apollo::planning_internal::Debug *mutable_debug() { return debug_; }
 
   void set_debug(apollo::planning_internal::Debug *debug) { debug_ = debug; }
