@@ -17,30 +17,41 @@
 /**
  * @file
  **/
-#include "modules/planning/common/open_space_info.h"
+#pragma once
 
-#include "gtest/gtest.h"
-
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
-#include "modules/routing/proto/routing.pb.h"
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace apollo {
 namespace planning {
 
-class OpenSpaceInfoTest : public ::testing::Test {
+class PathBoundary {
  public:
-  virtual void SetUp() {}
+  PathBoundary(const double start_s, const double delta_s,
+      std::vector<std::pair<double, double>> path_boundary);
 
- protected:
-  OpenSpaceInfo open_space_info_;
+  virtual ~PathBoundary() = default;
+
+  double start_s() const;
+
+  double delta_s() const;
+
+  const std::vector<std::pair<double, double>>& boundary() const;
+
+  void set_label(const std::string& label);
+  const std::string& label() const;
+
+  void set_blocking_obstacle_id(const std::string& obs_id);
+  const std::string& blocking_obstacle_id() const;
+
+ private:
+  double start_s_ = 0.0;
+  double delta_s_ = 0.0;
+  std::vector<std::pair<double, double>> boundary_;
+  std::string label_ = "regular";
+  std::string blocking_obstacle_id_ = "";
 };
-
-TEST_F(OpenSpaceInfoTest, Init) { EXPECT_NE(&open_space_info_, nullptr); }
-
-bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary,
-                                   const double s, double* ptr_l_min,
-                                   double* ptr_l_max);
 
 }  // namespace planning
 }  // namespace apollo

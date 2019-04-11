@@ -27,6 +27,7 @@
 #include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 #include "modules/planning/tasks/deciders/open_space_fallback_decider.h"
 #include "modules/planning/tasks/deciders/open_space_roi_decider.h"
+#include "modules/planning/tasks/deciders/path_assessment_decider.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_path_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_safety.h"
@@ -58,9 +59,13 @@ std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
     TaskFactory::default_task_configs_;
 
 void TaskFactory::Init(const PlanningConfig& config) {
-  task_factory_.Register(TaskConfig::PATH_BOUND_DECIDER,
+  task_factory_.Register(TaskConfig::PATH_BOUNDS_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathBoundsDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_ASSESSMENT_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathAssessmentDecider(config);
                          });
   task_factory_.Register(TaskConfig::PIECEWISE_JERK_PATH_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
@@ -141,6 +146,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::OPEN_SPACE_FALLBACK_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new OpenSpaceFallbackDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::PATH_ASSESSMENT_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathAssessmentDecider(config);
                          });
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =

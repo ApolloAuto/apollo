@@ -23,6 +23,7 @@ namespace planning {
 
 PlanningStatus PlanningContext::planning_status_;
 PlanningContext::SidePassInfo PlanningContext::side_pass_info_;
+PlanningContext::FallBackInfo PlanningContext::fallback_info_;
 
 PlanningContext::PlanningContext() {}
 
@@ -31,7 +32,11 @@ void PlanningContext::Init() {}
 void PlanningContext::Clear() {
   planning_status_.Clear();
   side_pass_info_ = {};
+  fallback_info_ = {};
 }
+
+int PlanningContext::front_static_obstacle_cycle_counter_ = 0;
+int PlanningContext::able_to_use_self_lane_counter_ = 0;
 
 }  // namespace planning
 }  // namespace apollo

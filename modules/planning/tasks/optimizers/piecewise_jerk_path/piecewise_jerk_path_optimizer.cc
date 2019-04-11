@@ -21,12 +21,13 @@
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
-#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
+#include "modules/planning/math/piecewise_jerk/fem_1d_qp_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -42,7 +43,8 @@ PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
 
 common::Status PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
-    const common::TrajectoryPoint& init_point, PathData* const path_data) {
+    const common::TrajectoryPoint& init_point,
+    PathData* const final_path_data) {
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
@@ -51,57 +53,56 @@ common::Status PiecewiseJerkPathOptimizer::Process(
                              piecewise_jerk_path_config.ddl_weight(),
                              piecewise_jerk_path_config.dddl_weight(), 0.0};
 
-  {
-    std::vector<std::pair<double, double>> lat_boundaries;
-    double start_s = 0.0;
-    double delta_s = 0.0;
-    reference_line_info_->GetPathBoundaries(&lat_boundaries, &start_s,
-                                            &delta_s);
-    if (lat_boundaries.size() >= 2) {
-      std::vector<double> opt_l;
-      std::vector<double> opt_dl;
-      std::vector<double> opt_ddl;
+  const auto& path_boundaries =
+      reference_line_info_->GetCandidatePathBoundaries();
+  ADEBUG << "There are " << path_boundaries.size() << " path boundaries.";
 
-      bool res_opt = OptimizePath(init_frenet_state, delta_s, lat_boundaries, w,
-                                  &opt_l, &opt_dl, &opt_ddl);
-
-      if (res_opt) {
-        auto frenet_frame_path =
-            ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, delta_s, start_s);
-
-        path_data->SetReferenceLine(&reference_line);
-        path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
-        return Status::OK();
-      }
+  std::vector<PathData> candidate_path_data;
+  for (const auto& path_boundary : path_boundaries) {
+    // if the path_boundary is normal, it is possible to have less than 2 points
+    // skip path boundary of this kind
+    if (path_boundary.label().find("regular") != std::string::npos &&
+        path_boundary.boundary().size() < 2) {
+      continue;
     }
-  }
 
-  {
-    std::vector<std::pair<double, double>> lat_boundaries;
-    double start_s = 0.0;
-    double delta_s = 0.0;
-    reference_line_info_->GetFallbackPathBoundaries(&lat_boundaries, &start_s,
-                                                    &delta_s);
-    CHECK_GT(lat_boundaries.size(), 1);
+    int max_iter = 4000;
+    // lower max_iter for regular/self/
+    if (path_boundary.label().find("self") != std::string::npos) {
+      max_iter = 500;
+    }
+
+    CHECK_GT(path_boundary.boundary().size(), 1);
 
     std::vector<double> opt_l;
     std::vector<double> opt_dl;
     std::vector<double> opt_ddl;
-
-    bool res_opt = OptimizePath(init_frenet_state, delta_s, lat_boundaries, w,
-                                &opt_l, &opt_dl, &opt_ddl);
+    bool res_opt =
+        OptimizePath(init_frenet_state, path_boundary.delta_s(),
+                     path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl,
+                     max_iter);
 
     if (res_opt) {
       auto frenet_frame_path =
-          ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, delta_s, start_s);
+          ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, path_boundary.delta_s(),
+                              path_boundary.start_s());
 
-      path_data->SetReferenceLine(&reference_line);
-      path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
-      return Status::OK();
+      // TODO(all): double-check this;
+      // final_path_data might carry info from upper stream
+      PathData path_data = *final_path_data;
+      path_data.SetReferenceLine(&reference_line);
+      path_data.SetFrenetPath(FrenetFramePath(frenet_frame_path));
+      path_data.set_path_label(path_boundary.label());
+      path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());
+      candidate_path_data.push_back(std::move(path_data));
     }
   }
-  return Status(ErrorCode::PLANNING_ERROR,
-                "Path Optimizer failed to generate path");
+  if (candidate_path_data.empty()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Path Optimizer failed to generate path");
+  }
+  reference_line_info_->SetCandidatePathData(std::move(candidate_path_data));
+  return Status::OK();
 }
 
 bool PiecewiseJerkPathOptimizer::OptimizePath(
@@ -110,10 +111,10 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     const double delta_s,
     const std::vector<std::pair<double, double>>& lat_boundaries,
     const std::array<double, 5>& w, std::vector<double>* x,
-    std::vector<double>* dx, std::vector<double>* ddx) {
-  std::unique_ptr<Fem1dQpProblem> fem_1d_qp(
-      new Fem1dQpProblem(lat_boundaries.size(), init_state.second, delta_s, w,
-                         FLAGS_lateral_jerk_bound));
+    std::vector<double>* dx, std::vector<double>* ddx, const int max_iter) {
+  std::unique_ptr<Fem1dQpProblem> fem_1d_qp(new Fem1dQpProblem());
+  fem_1d_qp->InitProblem(lat_boundaries.size(), init_state.second,
+                               delta_s, w, FLAGS_lateral_jerk_bound);
 
   auto start_time = std::chrono::system_clock::now();
 
@@ -130,7 +131,7 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   fem_1d_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
   fem_1d_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
 
-  bool success = fem_1d_qp->Optimize();
+  bool success = fem_1d_qp->Optimize(max_iter);
 
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;

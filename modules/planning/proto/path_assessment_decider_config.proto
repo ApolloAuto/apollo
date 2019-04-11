@@ -2,5 +2,5 @@ syntax = "proto2";
 
 package apollo.planning;
 
-message PathBoundDeciderConfig {
+message PathAssessmentDeciderConfig {
 }

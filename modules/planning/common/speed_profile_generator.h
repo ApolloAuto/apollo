@@ -46,6 +46,9 @@ class SpeedProfileGenerator {
 
   static SpeedData GenerateFallbackSpeedProfile();
 
+  static SpeedData GenerateFallbackSpeedProfileWithStopDistance(
+      const double stop_distance);
+
   static SpeedData GenerateFixedDistanceCreepProfile(const double distance,
                                                      const double max_speed);
 
@@ -53,6 +56,14 @@ class SpeedProfileGenerator {
                                                   const double max_speed);
 
  private:
+  static SpeedData GenerateStopProfile(const double init_speed,
+                                       const double init_acc,
+                                       const double stop_distance);
+
+  static SpeedData GenerateStopProfileFromPolynomial(
+      const double init_speed, const double init_acc,
+      const double stop_distance);
+
   static SpeedData GenerateStopProfile(const double init_speed,
                                        const double init_acc);
 

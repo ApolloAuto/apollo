@@ -23,6 +23,8 @@
 #include "cyber/common/file.h"
 #include "modules/planning/common/planning_context.h"
 
+#include "modules/planning/common/frame.h"
+
 namespace apollo {
 namespace planning {
 namespace scenario {

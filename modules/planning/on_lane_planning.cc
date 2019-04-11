@@ -192,31 +192,17 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   Status status = VehicleStateProvider::Instance()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
 
-  VehicleState vehicle_state =
+  VehicleState received_vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
-  DCHECK_GE(start_timestamp, vehicle_state.timestamp());
+  DCHECK_GE(start_timestamp, received_vehicle_state.timestamp());
 
-  // estimate (x, y) at current timestamp
-  // This estimate is only valid if the current time and vehicle state timestamp
-  // differs only a small amount (20ms). When the different is too large, the
-  // estimation is invalid.
-  if (FLAGS_estimate_current_vehicle_state &&
-      start_timestamp - vehicle_state.timestamp() < 0.020) {
-    auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
-        start_timestamp - vehicle_state.timestamp());
-    vehicle_state.set_x(future_xy.x());
-    vehicle_state.set_y(future_xy.y());
-    vehicle_state.set_timestamp(start_timestamp);
-  }
-
-  auto* not_ready = ptr_trajectory_pb->mutable_decision()
-                        ->mutable_main_decision()
-                        ->mutable_not_ready();
-
-  if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
-    std::string msg("Update VehicleStateProvider failed");
+  if (!status.ok() || !util::IsVehicleStateValid(received_vehicle_state)) {
+    std::string msg("Update VehicleStateProvider failed "
+        "or the vehicle state is out dated.");
     AERROR << msg;
-    not_ready->set_reason(msg);
+    ptr_trajectory_pb->mutable_decision()
+                     ->mutable_main_decision()
+                     ->mutable_not_ready()->set_reason(msg);
     status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
     // TODO(all): integrate reverse gear
     ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
@@ -225,6 +211,9 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
+  auto aligned_vehicle_state = AlignTimeStamp(received_vehicle_state,
+      start_timestamp);
+
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
     PlanningContext::MutablePlanningStatus()->Clear();
@@ -232,25 +221,26 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   }
 
   // Update reference line provider and reset pull over if necessary
-  reference_line_provider_->UpdateVehicleState(vehicle_state);
+  reference_line_provider_->UpdateVehicleState(aligned_vehicle_state);
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
   const double planning_cycle_time =
       1.0 / static_cast<double>(FLAGS_planning_loop_rate);
 
-  std::vector<TrajectoryPoint> stitching_trajectory;
   std::string replan_reason;
-  stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
-      vehicle_state, start_timestamp, planning_cycle_time,
+  std::vector<TrajectoryPoint> stitching_trajectory =
+      TrajectoryStitcher::ComputeStitchingTrajectory(
+      aligned_vehicle_state, start_timestamp, planning_cycle_time,
       last_publishable_trajectory_.get(), &replan_reason);
 
+  EgoInfo::Instance()->Update(stitching_trajectory.back(),
+                              aligned_vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
-  bool update_ego_info =
-      EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
-  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
+  status = InitFrame(frame_num, stitching_trajectory.back(),
+                     aligned_vehicle_state);
 
-  if (update_ego_info && status.ok()) {
+  if (status.ok()) {
     EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
         frame_->obstacles());
   }
@@ -260,7 +250,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   }
   ptr_trajectory_pb->mutable_latency_stats()->set_init_frame_time_ms(
       Clock::NowInSeconds() - start_timestamp);
-  if (!status.ok() || !update_ego_info) {
+  if (!status.ok()) {
     AERROR << status.ToString();
     if (FLAGS_publish_estop) {
       // "estop" signal check in function "Control::ProduceControlCommand()"
@@ -403,7 +393,7 @@ Status OnLanePlanning::Plan(
     // TODO(QiL): refine engage advice in open space trajectory optimizer.
     auto* engage_advice = ptr_trajectory_pb->mutable_engage_advice();
     engage_advice->set_advice(EngageAdvice::KEEP_ENGAGED);
-    engage_advice->set_reason("Keep enage while in parking");
+    engage_advice->set_reason("Keep engage while in parking");
 
     // TODO(QiL): refine the export decision in open space info
     ptr_trajectory_pb->mutable_decision()
@@ -529,7 +519,7 @@ void PopulateChartOptions(double x_min, double x_max, std::string x_label,
   options->set_legend_display(display);
 }
 
-void AddStGraph(const STGraphDebug& st_graph, Chart* chart) {
+void AddSTGraph(const STGraphDebug& st_graph, Chart* chart) {
   chart->set_title(st_graph.name());
   PopulateChartOptions(-2.0, 10.0, "t (second)", 0.0, 80.0, "s (meter)", true,
                        chart);
@@ -549,7 +539,7 @@ void AddStGraph(const STGraphDebug& st_graph, Chart* chart) {
   }
 }
 
-void AddSlFrame(const SLFrameDebug& sl_frame, Chart* chart) {
+void AddSLFrame(const SLFrameDebug& sl_frame, Chart* chart) {
   chart->set_title(sl_frame.name());
   PopulateChartOptions(0.0, 80.0, "s (meter)", -8.0, 8.0, "l (meter)", false,
                        chart);
@@ -596,10 +586,10 @@ void OnLanePlanning::ExportOnLaneChart(
     const planning_internal::Debug& debug_info,
     planning_internal::Debug* debug_chart) {
   for (const auto& st_graph : debug_info.planning_data().st_graph()) {
-    AddStGraph(st_graph, debug_chart->mutable_planning_data()->add_chart());
+    AddSTGraph(st_graph, debug_chart->mutable_planning_data()->add_chart());
   }
   for (const auto& sl_frame : debug_info.planning_data().sl_frame()) {
-    AddSlFrame(sl_frame, debug_chart->mutable_planning_data()->add_chart());
+    AddSLFrame(sl_frame, debug_chart->mutable_planning_data()->add_chart());
   }
 
   AddSpeedPlan(debug_info.planning_data().speed_plan(),
@@ -875,6 +865,20 @@ void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
   (*sliding_line_properties)["lineTension"] = "0";
   (*sliding_line_properties)["fill"] = "false";
   (*sliding_line_properties)["showLine"] = "true";
+}
+
+VehicleState OnLanePlanning::AlignTimeStamp(const VehicleState& vehicle_state,
+    const double curr_timestamp) const {
+  // TODO(Jinyun): use the same method in trajectory stitching
+  //               for forward prediction
+  auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(
+      curr_timestamp - vehicle_state.timestamp());
+
+  VehicleState aligned_vehicle_state = vehicle_state;
+  aligned_vehicle_state.set_x(future_xy.x());
+  aligned_vehicle_state.set_y(future_xy.y());
+  aligned_vehicle_state.set_timestamp(curr_timestamp);
+  return aligned_vehicle_state;
 }
 
 void OnLanePlanning::AddPublishedAcceleration(
