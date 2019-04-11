@@ -39,6 +39,9 @@ void CopyTrajectory(
 // record more trajectory information to info debug
 void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
   // 1, merge debug info into ptr_debug
+
+  ptr_debug->Clear();
+
   ptr_debug->MergeFrom(debug_instance_);
 
   // 2, record partitioned trajectories into debug_ptr
