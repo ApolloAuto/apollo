@@ -67,6 +67,8 @@ bool OMTObstacleTracker::Init(const ObstacleTrackerInitOptions &options) {
       fin >> kTypeAssociatedCost_[i][j];
     }
   }
+  targets_.clear();
+  used_.clear();
 
   // Init object template
   object_template_manager_ = ObjectTemplateManager::Instance();

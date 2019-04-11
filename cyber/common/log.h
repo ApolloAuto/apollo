@@ -18,8 +18,7 @@
  * @log
  */
 
-#ifndef CYBER_COMMON_LOG_H_
-#define CYBER_COMMON_LOG_H_
+#pragma once
 
 #include <stdarg.h>
 
@@ -107,4 +106,3 @@
     return val;                            \
   }
 
-#endif  // CYBER_COMMON_LOG_H_

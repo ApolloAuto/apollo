@@ -37,6 +37,7 @@
 #include "modules/perception/proto/motion_service.pb.h"
 #include "modules/perception/proto/perception_camera.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+#include "modules/perception/camera/app/cipv_camera.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
@@ -189,9 +190,17 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
       camera_debug_writer_;
 
   // variable for motion service
-  base::MotionBufferPtr mot_buffer_;
+  base::MotionBufferPtr motion_buffer_;
   const int motion_buffer_size_ = 100;
 
+  // // variables for CIPV
+  Cipv cipv_;
+  float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
+  float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
+  float max_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter;
+  float average_frame_rate_ = kAverageFrameRate;
+  bool image_based_cipv_ = false;
+  int debug_level_ = 0;
   // variables for visualization
   camera::Visualizer visualize_;
   bool write_visual_img_;

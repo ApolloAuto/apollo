@@ -31,7 +31,7 @@
     </module>
     <module>
         <name>motion_service</name>
-        <dag_conf>/apollo/modules/perception/production/dag/dag_motion_servic.dag</dag_conf>
+        <dag_conf>/apollo/modules/perception/production/dag/dag_motion_service.dag</dag_conf>
         <!-- if not set, use default process -->
         <process_name>motion_service</process_name>
         <version>1.0.0</version>

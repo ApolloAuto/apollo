@@ -154,7 +154,7 @@ struct alignas(16) CameraObjectSupplement {
   double truncated_horizontal = 0.0;
   double truncated_vertical = 0.0;
   // @brief center in camera coordinate system
-  Eigen::Vector3f local_center;
+  Eigen::Vector3f local_center = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
 
   // @brief visual object type, only used in camera module
   VisualObjectType visual_type = VisualObjectType::MAX_OBJECT_TYPE;
