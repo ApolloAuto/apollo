@@ -110,6 +110,7 @@ bool PathDecider::MakeStaticObstacleDecision(
 
     if (obstacle->Id() == blocking_obstacle_id) {
       // Add stop decision
+      ADEBUG << "Blocking obstacle = " << blocking_obstacle_id;
       ObjectDecisionType object_decision;
       *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
       path_decision->AddLongitudinalDecision("PathDecider/blocking_obstacle",

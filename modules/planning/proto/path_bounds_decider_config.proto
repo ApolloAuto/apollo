@@ -1,0 +1,7 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message PathBoundsDeciderConfig {
+  optional bool is_lane_borrowing = 1;
+}

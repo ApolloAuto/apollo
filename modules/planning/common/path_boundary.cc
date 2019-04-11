@@ -17,30 +17,45 @@
 /**
  * @file
  **/
-#include "modules/planning/common/open_space_info.h"
 
-#include "gtest/gtest.h"
-
-#include "modules/common/vehicle_state/proto/vehicle_state.pb.h"
-#include "modules/planning/proto/sl_boundary.pb.h"
-#include "modules/routing/proto/routing.pb.h"
+#include "modules/planning/common/path_boundary.h"
 
 namespace apollo {
 namespace planning {
 
-class OpenSpaceInfoTest : public ::testing::Test {
- public:
-  virtual void SetUp() {}
+PathBoundary::PathBoundary(const double start_s, const double delta_s,
+    std::vector<std::pair<double, double>> path_boundary) :
+    start_s_(start_s), delta_s_(delta_s), boundary_(
+        std::move(path_boundary)) {}
 
- protected:
-  OpenSpaceInfo open_space_info_;
-};
+double PathBoundary::start_s() const {
+  return start_s_;
+}
 
-TEST_F(OpenSpaceInfoTest, Init) { EXPECT_NE(&open_space_info_, nullptr); }
+double PathBoundary::delta_s() const {
+  return delta_s_;
+}
 
-bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary,
-                                   const double s, double* ptr_l_min,
-                                   double* ptr_l_max);
+const std::vector<std::pair<double, double> >&
+PathBoundary::boundary() const {
+  return boundary_;
+}
+
+void PathBoundary::set_label(const std::string& label) {
+  label_ = label;
+}
+
+const std::string& PathBoundary::label() const {
+  return label_;
+}
+
+void PathBoundary::set_blocking_obstacle_id(const std::string& obs_id) {
+  blocking_obstacle_id_ = obs_id;
+}
+
+const std::string& PathBoundary::blocking_obstacle_id() const {
+  return blocking_obstacle_id_;
+}
 
 }  // namespace planning
 }  // namespace apollo

@@ -130,7 +130,7 @@ TEST_F(DpStGraphTest, simple) {
   planning_internal::STGraphDebug st_graph_debug;
 
   st_graph_data_ = StGraphData();
-  st_graph_data_.LoadData(boundaries, init_point_, speed_limit_,
+  st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_,
                           path_data_length, 120, 7.0, &st_graph_debug);
 
   // adc_sl_boundary_

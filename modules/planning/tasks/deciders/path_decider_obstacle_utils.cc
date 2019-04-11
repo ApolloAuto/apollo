@@ -16,6 +16,12 @@
 
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
+#include <cmath>
+#include <limits>
+
+#include "modules/common/math/linear_interpolation.h"
+#include "modules/common/util/util.h"
+
 namespace apollo {
 namespace planning {
 
@@ -43,6 +49,38 @@ bool IsWithinPathDeciderScopeObstacle(const Obstacle& obstacle) {
   // should not side-pass such obstacles.
 
   return true;
+}
+
+bool ComputeSLBoundaryIntersection(const SLBoundary& sl_boundary,
+                                   const double s, double* ptr_l_min,
+                                   double* ptr_l_max) {
+  *ptr_l_min = std::numeric_limits<double>::max();
+  *ptr_l_max = -std::numeric_limits<double>::max();
+
+  // invalid polygon
+  if (sl_boundary.boundary_point_size() < 3) {
+    return false;
+  }
+
+  bool has_intersection = false;
+  for (auto i = 0; i < sl_boundary.boundary_point_size(); ++i) {
+    auto j = (i + 1) % sl_boundary.boundary_point_size();
+    const auto& p0 = sl_boundary.boundary_point(i);
+    const auto& p1 = sl_boundary.boundary_point(j);
+
+    if (common::util::WithinBound<double>(std::fmin(p0.s(), p1.s()),
+                                          std::fmax(p0.s(), p1.s()), s)) {
+      has_intersection = true;
+      auto l = common::math::lerp<double>(p0.l(), p0.s(), p1.l(), p1.s(), s);
+      if (l < *ptr_l_min) {
+        *ptr_l_min = l;
+      }
+      if (l > *ptr_l_max) {
+        *ptr_l_max = l;
+      }
+    }
+  }
+  return has_intersection;
 }
 
 }  // namespace planning

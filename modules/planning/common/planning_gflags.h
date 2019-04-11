@@ -212,6 +212,7 @@ DECLARE_double(nudge_buffer);
 DECLARE_bool(use_planning_fallback);
 DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
+DECLARE_double(fallback_distance_buffer);
 DECLARE_double(polynomial_speed_fallback_velocity);
 
 DECLARE_double(speed_bump_speed_limit);
@@ -266,4 +267,5 @@ DECLARE_bool(enable_cuda);
 DECLARE_bool(enable_nonscenario_side_pass);
 DECLARE_bool(enable_soft_speed_limit);
 
+DECLARE_double(message_latency_threshold);
 DECLARE_bool(enable_lane_change_urgency_checking);

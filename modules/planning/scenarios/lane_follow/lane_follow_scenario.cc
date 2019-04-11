@@ -21,7 +21,6 @@
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
 #include "cyber/common/log.h"
-#include "modules/planning/common/frame.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
 namespace apollo {

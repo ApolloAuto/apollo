@@ -406,6 +406,9 @@ DEFINE_bool(use_planning_fallback, true,
 DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
 DEFINE_double(fallback_time_unit, 0.02,
               "fallback trajectory unit time in seconds");
+DEFINE_double(
+    fallback_distance_buffer, 0.5,
+    "fallback distance to end buffer when doing fixed distance speed fallback");
 DEFINE_double(polynomial_speed_fallback_velocity, 3.5,
               "velocity to use polynomial speed fallback.");
 
@@ -511,5 +514,7 @@ DEFINE_bool(enable_nonscenario_side_pass, false,
 DEFINE_bool(enable_soft_speed_limit, false,
             "True to set soft speed limit guided by path optimization result");
 
+DEFINE_double(message_latency_threshold, 0.02,
+              "Threshold for message delay");
 DEFINE_bool(enable_lane_change_urgency_checking, false,
             "True to check the urgency of lane changing");
