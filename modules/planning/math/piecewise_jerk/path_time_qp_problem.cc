@@ -30,7 +30,7 @@ void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                         std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
-  const int kNumValue = 2 * N;
+  const int kNumValue = 2 * N + 1;
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
   columns.resize(kNumParam);
   int value_index = 0;
@@ -60,6 +60,10 @@ void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
 
   // x(n-1)^2 * w_x
   columns[N - 1].emplace_back(N - 1, weight_.x_w);
+  ++value_index;
+
+  // x(n-1)'^2 * w_dx
+  columns[N - 1].emplace_back(N - 1, weight_.x_derivative_w);
   ++value_index;
 
   CHECK_EQ(value_index, kNumValue);
