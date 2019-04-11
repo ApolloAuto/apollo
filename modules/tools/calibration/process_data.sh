@@ -18,9 +18,9 @@
 
 #! /bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}"  )" && pwd  )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"&&pwd)"
 rm $DIR/result.csv
-for f in `ls ${1}/*r0.csv`
+for f in `ls ${1}/t*b*r*.csv`
 do
     echo "Processing $f"
     python -W ignore process_data.py $f
