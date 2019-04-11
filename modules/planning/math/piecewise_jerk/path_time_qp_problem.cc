@@ -63,7 +63,7 @@ void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
   ++value_index;
 
   // x(n-1)'^2 * w_dx
-  columns[N - 1].emplace_back(N - 1, weight_.x_derivative_w);
+  columns[2 * N - 1].emplace_back(2 * N - 1, weight_.x_derivative_w);
   ++value_index;
 
   CHECK_EQ(value_index, kNumValue);
