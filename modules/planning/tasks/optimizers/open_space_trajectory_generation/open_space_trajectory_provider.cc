@@ -157,9 +157,9 @@ Status OpenSpaceTrajectoryProvider::Process() {
       LoadResult(trajectory_data);
       if (FLAGS_enable_record_debug) {
         // call merge debug ptr, open_space_trajectory_optimizer_
-        auto* debug_ptr = frame_->mutable_open_space_info()->mutable_debug();
+        auto* ptr_debug = frame_->mutable_open_space_info()->mutable_debug();
         open_space_trajectory_optimizer_->UpdateDebugInfo(
-            debug_ptr->mutable_planning_data()->mutable_open_space());
+            ptr_debug->mutable_planning_data()->mutable_open_space());
 
         // sync debug instance
         frame_->mutable_open_space_info()->sync_debug_instance();
@@ -372,8 +372,8 @@ void OpenSpaceTrajectoryProvider::ReuseLastFrameResult(
 
 void OpenSpaceTrajectoryProvider::ReuseLastFrameDebug(const Frame* last_frame) {
   // reuse last frame's instance
-  auto* debug_ptr = frame_->mutable_open_space_info()->mutable_debug_instance();
-  debug_ptr->mutable_planning_data()->mutable_open_space()->MergeFrom(
+  auto* ptr_debug = frame_->mutable_open_space_info()->mutable_debug_instance();
+  ptr_debug->mutable_planning_data()->mutable_open_space()->MergeFrom(
       last_frame->open_space_info()
           .debug_instance()
           .planning_data()
