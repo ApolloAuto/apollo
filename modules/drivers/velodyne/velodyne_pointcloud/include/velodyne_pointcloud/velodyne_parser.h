@@ -104,6 +104,11 @@ static const uint16_t LOWER_BANK = 0xddff;
 
 static const float ANGULAR_RESOLUTION = 0.00300919;
 
+/**
+ * maybe need some defines for VLP32C
+ * 
+ */
+
 /** Special Defines for VLP16 support **/
 static const int VLP16_FIRINGS_PER_BLOCK = 2;
 static const int VLP16_SCANS_PER_FIRING = 16;
