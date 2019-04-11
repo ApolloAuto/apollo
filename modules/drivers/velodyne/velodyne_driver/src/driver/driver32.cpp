@@ -33,6 +33,11 @@ Velodyne32Driver::Velodyne32Driver(const Config& config) { config_ = config; }
 void Velodyne32Driver::init(ros::NodeHandle& node) {
   double packet_rate = 1808.0;              // packet frequency (Hz)
   double frequency = (config_.rpm / 60.0);  // expected Hz rate
+  
+  // VLP32C packet_rate is 1507.0
+  if ("VLP32C" == config_.model) {
+    packet_rate = 1507.0;
+  }
 
   // default number of packets for each scan is a single revolution
   // (fractions rounded up)
