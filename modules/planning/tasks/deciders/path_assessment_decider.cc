@@ -42,7 +42,7 @@ namespace {
 // PointDecision contains (s, PathPointType, distance to closest obstacle).
 using PathPointDecision = std::tuple<double, PathData::PathPointType, double>;
 constexpr double kMinObstacleArea = 1e-4;
-}
+}  // namespace
 
 PathAssessmentDecider::PathAssessmentDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -104,8 +104,12 @@ Status PathAssessmentDecider::Process(
   std::sort(valid_path_data.begin(), valid_path_data.end(),
             [](const PathData& lhs, const PathData& rhs) {
               // Empty path_data is never the larger one.
-              if (lhs.Empty()) { return false; }
-              if (rhs.Empty()) { return true; }
+              if (lhs.Empty()) {
+                return false;
+              }
+              if (rhs.Empty()) {
+                return true;
+              }
               // Regular path goes before fallback path.
               bool lhs_is_regular =
                   lhs.path_label().find("regular") != std::string::npos;
@@ -154,10 +158,8 @@ Status PathAssessmentDecider::Process(
                   GetBackToInLaneIndex(lhs.path_point_decision_guide());
               int rhs_back_idx =
                   GetBackToInLaneIndex(rhs.path_point_decision_guide());
-              double lhs_back_s =
-                  lhs.frenet_frame_path()[lhs_back_idx].s();
-              double rhs_back_s =
-                  rhs.frenet_frame_path()[rhs_back_idx].s();
+              double lhs_back_s = lhs.frenet_frame_path()[lhs_back_idx].s();
+              double rhs_back_s = rhs.frenet_frame_path()[rhs_back_idx].s();
               if (std::fabs(lhs_back_s - rhs_back_s) >
                   kBackToSelfLaneComparisonTolerance) {
                 return lhs_back_idx < rhs_back_idx;
@@ -341,7 +343,8 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
     // Ignore too small obstacles.
     const auto& obstacle_sl = obstacle->PerceptionSLBoundary();
     if ((obstacle_sl.end_s() - obstacle_sl.start_s()) *
-        (obstacle_sl.end_l() - obstacle_sl.start_l()) < kMinObstacleArea) {
+            (obstacle_sl.end_l() - obstacle_sl.start_l()) <
+        kMinObstacleArea) {
       continue;
     }
     // Convert into polygon and save it.

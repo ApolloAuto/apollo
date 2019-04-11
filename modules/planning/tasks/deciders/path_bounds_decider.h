@@ -47,10 +47,10 @@ class PathBoundsDecider : public Decider {
 
  private:
   /** @brief Every time when Process function is called, it will:
-    *   1. Initialize.
-    *   2. Generate Fallback Path Bound.
-    *   3. Generate Regular Path Bound(s).
-    */
+   *   1. Initialize.
+   *   2. Generate Fallback Path Bound.
+   *   3. Generate Regular Path Bound(s).
+   */
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
 
@@ -58,23 +58,23 @@ class PathBoundsDecider : public Decider {
   // Below are functions called every frame when executing PathBoundsDecider.
 
   /** @brief The initialization function.
-    */
-  void InitPathBoundsDecider(
-      const Frame& frame, const ReferenceLineInfo& reference_line_info);
+   */
+  void InitPathBoundsDecider(const Frame& frame,
+                             const ReferenceLineInfo& reference_line_info);
 
   /** @brief The regular path boundary generation considers the ADC itself
-    *   and other static environments:
-    *   - ADC's position (lane-changing considerations)
-    *   - lane info
-    *   - static obstacles
-    *   The philosophy is: static environment must be and can only be taken
-    *   care of by the path planning.
-    * @param reference_line_info
-    * @param lane_borrow_info: which lane to borrow.
-    * @param The generated regular path_boundary, if there is one.
-    * @param The blocking obstacle's id. If none, then it's not modified.
-    * @return A failure message. If succeeded, return "" (empty string).
-    */
+   *   and other static environments:
+   *   - ADC's position (lane-changing considerations)
+   *   - lane info
+   *   - static obstacles
+   *   The philosophy is: static environment must be and can only be taken
+   *   care of by the path planning.
+   * @param reference_line_info
+   * @param lane_borrow_info: which lane to borrow.
+   * @param The generated regular path_boundary, if there is one.
+   * @param The blocking obstacle's id. If none, then it's not modified.
+   * @return A failure message. If succeeded, return "" (empty string).
+   */
   std::string GenerateRegularPathBound(
       const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo lane_borrow_info,
@@ -83,20 +83,20 @@ class PathBoundsDecider : public Decider {
       std::string* const borrow_lane_type);
 
   /** @brief The fallback path only considers:
-    *   - ADC's position (so that boundary must contain ADC's position)
-    *   - lane info
-    *   It is supposed to be the last resort in case regular path generation
-    *   fails so that speed decider can at least have some path and won't
-    *   fail drastically.
-    *   Therefore, it be reliable so that optimizer will not likely to
-    *   fail with this boundary, and therefore doesn't consider any static
-    *   obstacle. When the fallback path is used, stopping before static
-    *   obstacles should be taken care of by the speed decider. Also, it
-    *   doesn't consider any lane-borrowing.
-    * @param reference_line_info
-    * @param The generated fallback path_boundary, if there is one.
-    * @return A failure message. If succeeded, return "" (empty string).
-    */
+   *   - ADC's position (so that boundary must contain ADC's position)
+   *   - lane info
+   *   It is supposed to be the last resort in case regular path generation
+   *   fails so that speed decider can at least have some path and won't
+   *   fail drastically.
+   *   Therefore, it be reliable so that optimizer will not likely to
+   *   fail with this boundary, and therefore doesn't consider any static
+   *   obstacle. When the fallback path is used, stopping before static
+   *   obstacles should be taken care of by the speed decider. Also, it
+   *   doesn't consider any lane-borrowing.
+   * @param reference_line_info
+   * @param The generated fallback path_boundary, if there is one.
+   * @return A failure message. If succeeded, return "" (empty string).
+   */
   std::string GenerateFallbackPathBound(
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
@@ -108,15 +108,16 @@ class PathBoundsDecider : public Decider {
   //  3. GetBoundaryFromStaticObstacles
 
   /** @brief Initializes an empty path boundary.
-    */
-  bool InitPathBoundary(const ReferenceLine& reference_line,
+   */
+  bool InitPathBoundary(
+      const ReferenceLine& reference_line,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief Refine the boundary based on lane-info and ADC's location.
-    *   It will comply to the lane-boundary. However, if the ADC itself
-    *   is out of the given lane(s), it will adjust the boundary
-    *   accordingly to include ADC's current position.
-    */
+   *   It will comply to the lane-boundary. However, if the ADC itself
+   *   is out of the given lane(s), it will adjust the boundary
+   *   accordingly to include ADC's current position.
+   */
   bool GetBoundaryFromLanesAndADC(
       const ReferenceLineInfo& reference_line_info,
       const LaneBorrowInfo lane_borrow_info, double ADC_buffer,
@@ -128,9 +129,9 @@ class PathBoundsDecider : public Decider {
                             hdmap::LaneInfoConstPtr* const lane);
 
   /** @brief Refine the boundary based on static obstacles. It will make sure
-    *   the boundary doesn't contain any static obstacle so that the path
-    *   generated by optimizer won't collide with any static obstacle.
-    */
+   *   the boundary doesn't contain any static obstacle so that the path
+   *   generated by optimizer won't collide with any static obstacle.
+   */
   bool GetBoundaryFromStaticObstacles(
       const PathDecision& path_decision,
       std::vector<std::tuple<double, double, double>>* const path_boundaries,
@@ -158,8 +159,8 @@ class PathBoundsDecider : public Decider {
   // Below are several helper functions:
 
   /** @brief Get the distance between ADC's center and its edge.
-    * @return The distance.
-    */
+   * @return The distance.
+   */
   double GetBufferBetweenADCCenterAndEdge();
 
   /** @brief Update the path_boundary at "idx", as well as the new center-line.
@@ -177,13 +178,13 @@ class PathBoundsDecider : public Decider {
       double* const center_line);
 
   /** @brief Trim the path bounds starting at the idx where path is blocked.
-    */
+   */
   void TrimPathBounds(
       const int path_blocked_idx,
       std::vector<std::tuple<double, double, double>>* const path_boundaries);
 
   /** @brief Print out the path bounds for debugging purpose.
-    */
+   */
   void PathBoundsDebugString(
       const std::vector<std::tuple<double, double, double>>& path_boundaries);
 

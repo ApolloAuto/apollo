@@ -108,17 +108,17 @@ Status RssDecider::Process(Frame *frame,
         front_obstacle_distance);
 
     reference_line_info->mutable_rss_info()->set_acc_lon_range_minimum(
-      -1 * static_cast<double> (dynamics.alphaLon.brakeMax));
+        -1 * static_cast<double>(dynamics.alphaLon.brakeMax));
     reference_line_info->mutable_rss_info()->set_acc_lon_range_maximum(
-      static_cast<double> (dynamics.alphaLon.accelMax));
+        static_cast<double>(dynamics.alphaLon.accelMax));
     reference_line_info->mutable_rss_info()->set_acc_lat_left_range_minimum(
-      -1 * static_cast<double> (dynamics.alphaLat.brakeMin));
+        -1 * static_cast<double>(dynamics.alphaLat.brakeMin));
     reference_line_info->mutable_rss_info()->set_acc_lat_left_range_maximum(
-      static_cast<double> (dynamics.alphaLat.accelMax));
+        static_cast<double>(dynamics.alphaLat.accelMax));
     reference_line_info->mutable_rss_info()->set_acc_lat_right_range_minimum(
-      -1 * static_cast<double> (dynamics.alphaLat.brakeMin));
+        -1 * static_cast<double>(dynamics.alphaLat.brakeMin));
     reference_line_info->mutable_rss_info()->set_acc_lat_right_range_maximum(
-      static_cast<double> (dynamics.alphaLat.accelMax));
+        static_cast<double>(dynamics.alphaLat.accelMax));
 
     return Status::OK();
   }
@@ -131,7 +131,7 @@ Status RssDecider::Process(Frame *frame,
 #endif
   double lane_leftmost = std::max(ego_v_l_end, nearest_obs_l_end);
   double lane_rightmost = std::min(ego_v_l_start, nearest_obs_l_start);
-  double lane_width = std::abs(lane_leftmost-lane_rightmost);
+  double lane_width = std::abs(lane_leftmost - lane_rightmost);
   double lane_length = std::max(nearest_obs_s_end, ego_v_s_end);
 
   rss_world_info.front_obs_dist = front_obstacle_distance;
@@ -164,21 +164,21 @@ Status RssDecider::Process(Frame *frame,
       ParametricValue(nearest_obs_s_start / lane_length);
   occupiedRegion_leading.lonRange.maximum =
       ParametricValue(nearest_obs_s_end / lane_length);
-  occupiedRegion_leading.latRange.minimum = ParametricValue(
-      std::abs(ego_v_l_end - lane_leftmost) / lane_width);
-  occupiedRegion_leading.latRange.maximum = ParametricValue(
-      std::abs(ego_v_l_start - lane_leftmost) / lane_width);
+  occupiedRegion_leading.latRange.minimum =
+      ParametricValue(std::abs(ego_v_l_end - lane_leftmost) / lane_width);
+  occupiedRegion_leading.latRange.maximum =
+      ParametricValue(std::abs(ego_v_l_start - lane_leftmost) / lane_width);
 
   leadingObject.occupiedRegions.push_back(occupiedRegion_leading);
 
   rss_world_info.OR_front_lon_min =
-      static_cast<double> (occupiedRegion_leading.lonRange.minimum);
+      static_cast<double>(occupiedRegion_leading.lonRange.minimum);
   rss_world_info.OR_front_lon_max =
-      static_cast<double> (occupiedRegion_leading.lonRange.maximum);
+      static_cast<double>(occupiedRegion_leading.lonRange.maximum);
   rss_world_info.OR_front_lat_min =
-      static_cast<double> (occupiedRegion_leading.latRange.minimum);
+      static_cast<double>(occupiedRegion_leading.latRange.minimum);
   rss_world_info.OR_front_lat_max =
-      static_cast<double> (occupiedRegion_leading.latRange.maximum);
+      static_cast<double>(occupiedRegion_leading.latRange.maximum);
 
   RssDecider::rss_create_ego_object(&followingObject, adc_velocity, 0.0);
 
@@ -188,8 +188,8 @@ Status RssDecider::Process(Frame *frame,
       ParametricValue(ego_v_s_start / lane_length);
   occupiedRegion_following.lonRange.maximum =
       ParametricValue(ego_v_s_end / lane_length);
-  occupiedRegion_following.latRange.minimum = ParametricValue(
-      std::abs(nearest_obs_l_end - lane_leftmost) / lane_width);
+  occupiedRegion_following.latRange.minimum =
+      ParametricValue(std::abs(nearest_obs_l_end - lane_leftmost) / lane_width);
   occupiedRegion_following.latRange.maximum = ParametricValue(
       std::abs(nearest_obs_l_start - lane_leftmost) / lane_width);
 
@@ -197,13 +197,13 @@ Status RssDecider::Process(Frame *frame,
 
   rss_world_info.adc_vel = adc_velocity;
   rss_world_info.OR_rear_lon_min =
-      static_cast<double> (occupiedRegion_following.lonRange.minimum);
+      static_cast<double>(occupiedRegion_following.lonRange.minimum);
   rss_world_info.OR_rear_lon_max =
-      static_cast<double> (occupiedRegion_following.lonRange.maximum);
+      static_cast<double>(occupiedRegion_following.lonRange.maximum);
   rss_world_info.OR_rear_lat_min =
-      static_cast<double> (occupiedRegion_following.latRange.minimum);
+      static_cast<double>(occupiedRegion_following.latRange.minimum);
   rss_world_info.OR_rear_lat_max =
-      static_cast<double> (occupiedRegion_following.latRange.maximum);
+      static_cast<double>(occupiedRegion_following.latRange.maximum);
 
   ad_rss::world::RoadSegment roadSegment;
   ad_rss::world::LaneSegment laneSegment;
@@ -218,13 +218,13 @@ Status RssDecider::Process(Frame *frame,
   roadArea.push_back(roadSegment);
 
   rss_world_info.laneSeg_len_min =
-      static_cast<double> (laneSegment.length.minimum);
+      static_cast<double>(laneSegment.length.minimum);
   rss_world_info.laneSeg_len_max =
-      static_cast<double> (laneSegment.length.maximum);
+      static_cast<double>(laneSegment.length.maximum);
   rss_world_info.laneSeg_width_min =
-      static_cast<double> (laneSegment.width.minimum);
+      static_cast<double>(laneSegment.width.minimum);
   rss_world_info.laneSeg_width_max =
-      static_cast<double> (laneSegment.width.maximum);
+      static_cast<double>(laneSegment.width.maximum);
 
   ad_rss::world::WorldModel worldModel;
   worldModel.egoVehicle = followingObject;
@@ -234,8 +234,8 @@ Status RssDecider::Process(Frame *frame,
   worldModel.timeIndex = frame->SequenceNum();
 
   ad_rss::situation::SituationVector situationVector;
-  bool rss_result = ::ad_rss::core::RssSituationExtraction::extractSituations
-                       (worldModel, situationVector);
+  bool rss_result = ::ad_rss::core::RssSituationExtraction::extractSituations(
+      worldModel, situationVector);
   if (!rss_result) {
     rss_world_info.err_code = "ad_rss::extractSituation failed";
     rss_dump_world_info(rss_world_info);
@@ -250,11 +250,10 @@ Status RssDecider::Process(Frame *frame,
 
   ::ad_rss::state::ResponseStateVector responseStateVector;
   ::ad_rss::core::RssSituationChecking RssCheck;
-  rss_result = RssCheck.checkSituations(
-                   situationVector, responseStateVector);
+  rss_result = RssCheck.checkSituations(situationVector, responseStateVector);
 
   if (!rss_result) {
-    rss_world_info.err_code ="ad_rss::checkSituation failed";
+    rss_world_info.err_code = "ad_rss::checkSituation failed";
     rss_dump_world_info(rss_world_info);
     return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
@@ -267,8 +266,8 @@ Status RssDecider::Process(Frame *frame,
 
   ::ad_rss::state::ResponseState properResponse;
   ::ad_rss::core::RssResponseResolving RssResponse;
-  rss_result = RssResponse.provideProperResponse(
-                   responseStateVector, properResponse);
+  rss_result =
+      RssResponse.provideProperResponse(responseStateVector, properResponse);
 
   if (!rss_result) {
     rss_world_info.err_code = "ad_rss::provideProperResponse failed";
@@ -278,7 +277,7 @@ Status RssDecider::Process(Frame *frame,
 
   ::ad_rss::world::AccelerationRestriction accelerationRestriction;
   rss_result = ad_rss::core::RssResponseTransformation::transformProperResponse(
-                   worldModel, properResponse, accelerationRestriction);
+      worldModel, properResponse, accelerationRestriction);
 
   if (!rss_result) {
     rss_world_info.err_code = "ad_rss::transformProperResponse failed";
@@ -286,22 +285,20 @@ Status RssDecider::Process(Frame *frame,
     return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
 
-  Distance const currentLonDistance = situationVector[0].
-      relativePosition.longitudinalDistance;
+  Distance const currentLonDistance =
+      situationVector[0].relativePosition.longitudinalDistance;
   Distance safeLonDistance;
-  VehicleState const& leadingVehicleState = situationVector[0].
-      otherVehicleState;
-  VehicleState const& followingVehicleState = situationVector[0].
-      egoVehicleState;
+  VehicleState const &leadingVehicleState =
+      situationVector[0].otherVehicleState;
+  VehicleState const &followingVehicleState =
+      situationVector[0].egoVehicleState;
 
-  rss_result = ::ad_rss::situation::
-                   calculateSafeLongitudinalDistanceSameDirection(
-                       leadingVehicleState,
-                       followingVehicleState,
-                       safeLonDistance);
+  rss_result =
+      ::ad_rss::situation::calculateSafeLongitudinalDistanceSameDirection(
+          leadingVehicleState, followingVehicleState, safeLonDistance);
   if (!rss_result) {
     rss_world_info.err_code =
-      ("ad_rss::calculateSafeLongitudinalDistanceSameDirection failed");
+        ("ad_rss::calculateSafeLongitudinalDistanceSameDirection failed");
     rss_dump_world_info(rss_world_info);
     return Status(ErrorCode::PLANNING_ERROR, rss_world_info.err_code);
   }
@@ -318,21 +315,21 @@ Status RssDecider::Process(Frame *frame,
   }
 
   reference_line_info->mutable_rss_info()->set_cur_dist_lon(
-      static_cast<double> (currentLonDistance));
+      static_cast<double>(currentLonDistance));
   reference_line_info->mutable_rss_info()->set_rss_safe_dist_lon(
-      static_cast<double> (safeLonDistance));
+      static_cast<double>(safeLonDistance));
   reference_line_info->mutable_rss_info()->set_acc_lon_range_minimum(
-      static_cast<double> (accelerationRestriction.longitudinalRange.minimum));
+      static_cast<double>(accelerationRestriction.longitudinalRange.minimum));
   reference_line_info->mutable_rss_info()->set_acc_lon_range_maximum(
-      static_cast<double> (accelerationRestriction.longitudinalRange.maximum));
+      static_cast<double>(accelerationRestriction.longitudinalRange.maximum));
   reference_line_info->mutable_rss_info()->set_acc_lat_left_range_minimum(
-      static_cast<double> (accelerationRestriction.lateralLeftRange.minimum));
+      static_cast<double>(accelerationRestriction.lateralLeftRange.minimum));
   reference_line_info->mutable_rss_info()->set_acc_lat_left_range_maximum(
-      static_cast<double> (accelerationRestriction.lateralLeftRange.maximum));
+      static_cast<double>(accelerationRestriction.lateralLeftRange.maximum));
   reference_line_info->mutable_rss_info()->set_acc_lat_right_range_minimum(
-      static_cast<double> (accelerationRestriction.lateralRightRange.minimum));
+      static_cast<double>(accelerationRestriction.lateralRightRange.minimum));
   reference_line_info->mutable_rss_info()->set_acc_lat_right_range_maximum(
-      static_cast<double> (accelerationRestriction.lateralRightRange.maximum));
+      static_cast<double>(accelerationRestriction.lateralRightRange.maximum));
 
   ADEBUG << " longitudinalState.isSafe: "
          << responseStateVector[0].longitudinalState.isSafe;
@@ -342,10 +339,8 @@ Status RssDecider::Process(Frame *frame,
          << responseStateVector[0].lateralStateRight.isSafe;
   ADEBUG << " is_rss_safe : " << reference_line_info->rss_info().is_rss_safe();
   ADEBUG << " cur_dist_lon: " << reference_line_info->rss_info().cur_dist_lon();
-  ADEBUG << " is_rss_safe : "
-         << reference_line_info->rss_info().is_rss_safe();
-  ADEBUG << " cur_dist_lon: "
-         << reference_line_info->rss_info().cur_dist_lon();
+  ADEBUG << " is_rss_safe : " << reference_line_info->rss_info().is_rss_safe();
+  ADEBUG << " cur_dist_lon: " << reference_line_info->rss_info().cur_dist_lon();
   ADEBUG << " rss_safe_dist_lon: "
          << reference_line_info->rss_info().rss_safe_dist_lon();
   ADEBUG << " acc_longitudianlRange_minimum: "
@@ -365,7 +360,7 @@ Status RssDecider::Process(Frame *frame,
 }
 
 void RssDecider::rss_config_default_dynamics(
-  ::ad_rss::world::Dynamics *dynamics) {
+    ::ad_rss::world::Dynamics *dynamics) {
   dynamics->alphaLon.accelMax = ::ad_rss::physics::Acceleration(3.5);
   dynamics->alphaLon.brakeMax = ::ad_rss::physics::Acceleration(8);
   dynamics->alphaLon.brakeMin = ::ad_rss::physics::Acceleration(4.);
@@ -394,8 +389,8 @@ void RssDecider::rss_create_other_object(::ad_rss::world::Object *other,
   other->responseTime = ::ad_rss::physics::Duration(2.);
 }
 
-void RssDecider::rss_dump_world_info(const struct
-                                     rss_world_model_struct &rss_info) {
+void RssDecider::rss_dump_world_info(
+    const struct rss_world_model_struct &rss_info) {
   AERROR << " RSS_INFO :"
          << " front_obs_dist: " << rss_info.front_obs_dist
          << " obs_s_start: " << rss_info.obs_s_start

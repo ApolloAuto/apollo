@@ -36,10 +36,10 @@ class PathAssessmentDecider : public Decider {
 
  private:
   /** @brief Every time when Process function is called, it will:
-    *   1. Check the validity of regular/fallback paths, and remove if invalid.
-    *   2. Analyze the paths and label necessary info for speed planning use.
-    *   3. Pick the best one and update it into the reference_line.
-    */
+   *   1. Check the validity of regular/fallback paths, and remove if invalid.
+   *   2. Analyze the paths and label necessary info for speed planning use.
+   *   3. Pick the best one and update it into the reference_line.
+   */
   common::Status Process(Frame* const frame,
                          ReferenceLineInfo* const reference_line_info) override;
 
@@ -97,9 +97,8 @@ class PathAssessmentDecider : public Decider {
 
   /////////////////////////////////////////////////////////////////////////////
   // Below are helper functions.
-  void RecordDebugInfo(
-    const PathData& path_data, const std::string& debug_name,
-    ReferenceLineInfo *const reference_line_info);
+  void RecordDebugInfo(const PathData& path_data, const std::string& debug_name,
+                       ReferenceLineInfo* const reference_line_info);
 };
 
 /////////////////////////////////////////////////////////////////////////////

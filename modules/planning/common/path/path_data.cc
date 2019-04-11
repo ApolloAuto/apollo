@@ -270,13 +270,9 @@ bool PathData::UpdateFrenetFramePath(const ReferenceLine *reference_line) {
   return SetDiscretizedPath(discretized_path_);
 }
 
-void PathData::set_path_label(const std::string& label) {
-  path_label_ = label;
-}
+void PathData::set_path_label(const std::string &label) { path_label_ = label; }
 
-const std::string& PathData::path_label() const {
-  return path_label_;
-}
+const std::string &PathData::path_label() const { return path_label_; }
 
 }  // namespace planning
 }  // namespace apollo

@@ -73,9 +73,8 @@ class OnLanePlanning : public PlanningBase {
                            const common::TrajectoryPoint& planning_start_point,
                            const common::VehicleState& vehicle_state);
 
-  common::VehicleState AlignTimeStamp(
-      const common::VehicleState& vehicle_state,
-      const double curr_timestamp) const;
+  common::VehicleState AlignTimeStamp(const common::VehicleState& vehicle_state,
+                                      const double curr_timestamp) const;
 
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
   bool CheckPlanningConfig(const PlanningConfig& config);

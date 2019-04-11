@@ -26,8 +26,8 @@ namespace apollo {
 namespace planning {
 
 void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
-                                     std::vector<c_int>* P_indices,
-                                     std::vector<c_int>* P_indptr) {
+                                        std::vector<c_int>* P_indices,
+                                        std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   const int kNumValue = 2 * N;

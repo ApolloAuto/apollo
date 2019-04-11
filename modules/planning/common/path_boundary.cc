@@ -24,30 +24,22 @@ namespace apollo {
 namespace planning {
 
 PathBoundary::PathBoundary(const double start_s, const double delta_s,
-    std::vector<std::pair<double, double>> path_boundary) :
-    start_s_(start_s), delta_s_(delta_s), boundary_(
-        std::move(path_boundary)) {}
+                           std::vector<std::pair<double, double>> path_boundary)
+    : start_s_(start_s),
+      delta_s_(delta_s),
+      boundary_(std::move(path_boundary)) {}
 
-double PathBoundary::start_s() const {
-  return start_s_;
-}
+double PathBoundary::start_s() const { return start_s_; }
 
-double PathBoundary::delta_s() const {
-  return delta_s_;
-}
+double PathBoundary::delta_s() const { return delta_s_; }
 
-const std::vector<std::pair<double, double> >&
-PathBoundary::boundary() const {
+const std::vector<std::pair<double, double>>& PathBoundary::boundary() const {
   return boundary_;
 }
 
-void PathBoundary::set_label(const std::string& label) {
-  label_ = label;
-}
+void PathBoundary::set_label(const std::string& label) { label_ = label; }
 
-const std::string& PathBoundary::label() const {
-  return label_;
-}
+const std::string& PathBoundary::label() const { return label_; }
 
 void PathBoundary::set_blocking_obstacle_id(const std::string& obs_id) {
   blocking_obstacle_id_ = obs_id;

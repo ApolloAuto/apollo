@@ -68,8 +68,7 @@ Status DeciderCreep::Process(Frame* frame,
             .current_traffic_light_overlap_id(0);
     PathOverlap* current_traffic_light_overlap =
         scenario::util::GetOverlapOnReferenceLine(
-            *reference_line_info,
-            current_traffic_light_overlap_id,
+            *reference_line_info, current_traffic_light_overlap_id,
             ReferenceLineInfo::SIGNAL);
     if (current_traffic_light_overlap) {
       stop_line_s = current_traffic_light_overlap->end_s;
@@ -89,8 +88,7 @@ double DeciderCreep::FindCreepDistance(
 }
 
 // TODO(all): revisit & rewrite
-bool DeciderCreep::BuildStopDecision(const double stop_line_s,
-                                     Frame* frame,
+bool DeciderCreep::BuildStopDecision(const double stop_line_s, Frame* frame,
                                      ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
