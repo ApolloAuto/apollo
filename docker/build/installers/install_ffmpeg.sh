@@ -43,7 +43,11 @@ apt-get update -y && apt-get install -y \
   libnuma-dev
 wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
 tar xjvf nasm-2.14.02.tar.bz2
+HG_SETTING=$'[ui]\ntls = False'
+HG_SETTING_FILE="/root/.hgrc"
+echo "$HG_SETTING" > $HG_SETTING_FILE
 if cd x265 2> /dev/null; then hg pull && hg update && cd ..; else hg clone https://bitbucket.org/multicoreware/x265; fi
+rm $HG_SETTING_FILE
 wget -O ffmpeg-snapshot.tar.bz2 https://ffmpeg.org/releases/ffmpeg-snapshot.tar.bz2
 tar xjvf ffmpeg-snapshot.tar.bz2
 
