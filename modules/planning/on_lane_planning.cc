@@ -197,12 +197,14 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   DCHECK_GE(start_timestamp, received_vehicle_state.timestamp());
 
   if (!status.ok() || !util::IsVehicleStateValid(received_vehicle_state)) {
-    std::string msg("Update VehicleStateProvider failed "
+    std::string msg(
+        "Update VehicleStateProvider failed "
         "or the vehicle state is out dated.");
     AERROR << msg;
     ptr_trajectory_pb->mutable_decision()
-                     ->mutable_main_decision()
-                     ->mutable_not_ready()->set_reason(msg);
+        ->mutable_main_decision()
+        ->mutable_not_ready()
+        ->set_reason(msg);
     status.Save(ptr_trajectory_pb->mutable_header()->mutable_status());
     // TODO(all): integrate reverse gear
     ptr_trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
@@ -211,8 +213,8 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  auto aligned_vehicle_state = AlignTimeStamp(received_vehicle_state,
-      start_timestamp);
+  auto aligned_vehicle_state =
+      AlignTimeStamp(received_vehicle_state, start_timestamp);
 
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
@@ -231,14 +233,14 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   std::string replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-      aligned_vehicle_state, start_timestamp, planning_cycle_time,
-      last_publishable_trajectory_.get(), &replan_reason);
+          aligned_vehicle_state, start_timestamp, planning_cycle_time,
+          last_publishable_trajectory_.get(), &replan_reason);
 
   EgoInfo::Instance()->Update(stitching_trajectory.back(),
                               aligned_vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
-  status = InitFrame(frame_num, stitching_trajectory.back(),
-                     aligned_vehicle_state);
+  status =
+      InitFrame(frame_num, stitching_trajectory.back(), aligned_vehicle_state);
 
   if (status.ok()) {
     EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
@@ -877,7 +879,7 @@ void OnLanePlanning::AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
 }
 
 VehicleState OnLanePlanning::AlignTimeStamp(const VehicleState& vehicle_state,
-    const double curr_timestamp) const {
+                                            const double curr_timestamp) const {
   // TODO(Jinyun): use the same method in trajectory stitching
   //               for forward prediction
   auto future_xy = VehicleStateProvider::Instance()->EstimateFuturePosition(

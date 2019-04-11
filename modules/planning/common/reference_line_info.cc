@@ -121,8 +121,7 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   return true;
 }
 
-const std::vector<PathData>&
-ReferenceLineInfo::GetCandidatePathData() const {
+const std::vector<PathData>& ReferenceLineInfo::GetCandidatePathData() const {
   return candidate_path_data_;
 }
 
@@ -131,8 +130,8 @@ void ReferenceLineInfo::SetCandidatePathData(
   candidate_path_data_ = std::move(candidate_path_data);
 }
 
-const std::vector<PathBoundary>&
-ReferenceLineInfo::GetCandidatePathBoundaries() const {
+const std::vector<PathBoundary>& ReferenceLineInfo::GetCandidatePathBoundaries()
+    const {
   return candidate_path_boundaries_;
 }
 
@@ -141,8 +140,8 @@ void ReferenceLineInfo::SetCandidatePathBoundaries(
   candidate_path_boundaries_ = std::move(path_boundaries);
 }
 
-hdmap::LaneInfoConstPtr
-ReferenceLineInfo::LocateLaneInfo(const double s) const {
+hdmap::LaneInfoConstPtr ReferenceLineInfo::LocateLaneInfo(
+    const double s) const {
   std::vector<hdmap::LaneInfoConstPtr> lanes;
   reference_line_.GetLaneFromS(s, &lanes);
   if (lanes.empty()) {
@@ -156,43 +155,42 @@ ReferenceLineInfo::LocateLaneInfo(const double s) const {
 bool ReferenceLineInfo::GetNeighborLaneInfo(
     const ReferenceLineInfo::LaneType lane_type, const double s,
     hdmap::Id* ptr_lane_id, double* ptr_lane_width) const {
-
   auto ptr_lane_info = LocateLaneInfo(s);
   if (ptr_lane_info == nullptr) {
     return false;
   }
 
   switch (lane_type) {
-  case LaneType::LeftForward: {
-    if (ptr_lane_info->lane().left_neighbor_forward_lane_id_size() == 0) {
-      return false;
+    case LaneType::LeftForward: {
+      if (ptr_lane_info->lane().left_neighbor_forward_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().left_neighbor_forward_lane_id(0);
+      break;
     }
-    *ptr_lane_id = ptr_lane_info->lane().left_neighbor_forward_lane_id(0);
-    break;
-  }
-  case LaneType::LeftReverse: {
-    if (ptr_lane_info->lane().left_neighbor_reverse_lane_id_size() == 0) {
-      return false;
+    case LaneType::LeftReverse: {
+      if (ptr_lane_info->lane().left_neighbor_reverse_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().left_neighbor_reverse_lane_id(0);
+      break;
     }
-    *ptr_lane_id = ptr_lane_info->lane().left_neighbor_reverse_lane_id(0);
-    break;
-  }
-  case LaneType::RightForward: {
-    if (ptr_lane_info->lane().right_neighbor_forward_lane_id_size() == 0) {
-      return false;
+    case LaneType::RightForward: {
+      if (ptr_lane_info->lane().right_neighbor_forward_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().right_neighbor_forward_lane_id(0);
+      break;
     }
-    *ptr_lane_id = ptr_lane_info->lane().right_neighbor_forward_lane_id(0);
-    break;
-  }
-  case LaneType::RightReverse: {
-    if (ptr_lane_info->lane().right_neighbor_reverse_lane_id_size() == 0) {
-      return false;
+    case LaneType::RightReverse: {
+      if (ptr_lane_info->lane().right_neighbor_reverse_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().right_neighbor_reverse_lane_id(0);
+      break;
     }
-    *ptr_lane_id = ptr_lane_info->lane().right_neighbor_reverse_lane_id(0);
-    break;
-  }
-  default:
-    CHECK(false);
+    default:
+      CHECK(false);
   }
   auto ptr_neighbor_lane =
       hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(*ptr_lane_id);
@@ -204,8 +202,8 @@ bool ReferenceLineInfo::GetNeighborLaneInfo(
 
   double neighbor_s = 0.0;
   double neighbor_l = 0.0;
-  if (!ptr_neighbor_lane->GetProjection(
-      {ref_point.x(), ref_point.y()}, &neighbor_s, &neighbor_l)) {
+  if (!ptr_neighbor_lane->GetProjection({ref_point.x(), ref_point.y()},
+                                        &neighbor_s, &neighbor_l)) {
     return false;
   }
 

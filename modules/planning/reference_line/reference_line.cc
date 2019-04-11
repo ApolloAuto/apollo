@@ -473,8 +473,8 @@ bool ReferenceLine::GetLaneWidth(const double s, double* const lane_left_width,
   double map_s = 0.0;
   double map_l = 0.0;
 
-  bool res_projection = map_path_.GetProjection({ref_pos.x(), ref_pos.y()},
-      &map_s, &map_l);
+  bool res_projection =
+      map_path_.GetProjection({ref_pos.x(), ref_pos.y()}, &map_s, &map_l);
   if (!res_projection) {
     return false;
   }

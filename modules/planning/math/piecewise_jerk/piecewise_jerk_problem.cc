@@ -69,7 +69,6 @@ bool PiecewiseJerkProblem::OptimizeWithOsqp(
     std::vector<c_float>& upper_bounds,                             // NOLINT
     std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
     OSQPSettings* settings) {
-
   data->n = kernel_dim;
   data->m = num_affine_constraint;
   data->P = csc_matrix(data->n, data->n, P_data.size(), P_data.data(),
@@ -253,8 +252,8 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
 }
 
 void PiecewiseJerkProblem::CalculateKernel(std::vector<c_float>* P_data,
-                                     std::vector<c_int>* P_indices,
-                                     std::vector<c_int>* P_indptr) {
+                                           std::vector<c_int>* P_indices,
+                                           std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   const int kNumValue = kNumParam + (N - 1);

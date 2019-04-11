@@ -55,4 +55,5 @@ cc_library(
         ":piecewise_jerk_problem",
     ],
 )
+
 cpplint()

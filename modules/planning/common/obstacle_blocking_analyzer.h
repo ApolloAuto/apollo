@@ -20,8 +20,8 @@
 namespace apollo {
 namespace planning {
 
-bool IsNonmovableObstacle(
-    const ReferenceLineInfo& reference_line_info, const Obstacle& obstacle);
+bool IsNonmovableObstacle(const ReferenceLineInfo& reference_line_info,
+                          const Obstacle& obstacle);
 
 /**
  * @brief Decide whether an obstacle is a blocking one that needs to be

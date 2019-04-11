@@ -52,12 +52,7 @@ namespace planning {
  */
 class ReferenceLineInfo {
  public:
-  enum class LaneType {
-    LeftForward,
-    LeftReverse,
-    RightForward,
-    RightReverse
-  };
+  enum class LaneType { LeftForward, LeftReverse, RightForward, RightReverse };
   ReferenceLineInfo() = default;
 
   explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
@@ -97,7 +92,8 @@ class ReferenceLineInfo {
   hdmap::LaneInfoConstPtr LocateLaneInfo(const double s) const;
 
   bool GetNeighborLaneInfo(const ReferenceLineInfo::LaneType lane_type,
-      const double s, hdmap::Id* ptr_lane_id, double* ptr_lane_width) const;
+                           const double s, hdmap::Id* ptr_lane_id,
+                           double* ptr_lane_width) const;
 
   /**
    * @brief check if current reference line is started from another reference

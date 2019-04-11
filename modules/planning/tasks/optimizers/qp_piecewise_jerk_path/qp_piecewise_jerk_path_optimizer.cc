@@ -244,15 +244,15 @@ Status QpPiecewiseJerkPathOptimizer::Process(
 
   constexpr double kMaxLThirdOrderDerivative = 2.0;
   std::unique_ptr<Fem1dQpProblem> fem_1d_qp(new Fem1dQpProblem());
-  fem_1d_qp->InitProblem(
-      n, qp_delta_s, w, kMaxLThirdOrderDerivative, init_lateral_state);
+  fem_1d_qp->InitProblem(n, qp_delta_s, w, kMaxLThirdOrderDerivative,
+                         init_lateral_state);
 
   auto start_time = std::chrono::system_clock::now();
 
   fem_1d_qp->SetVariableBounds(lateral_bounds);
 
   fem_1d_qp->SetFirstOrderBounds(-FLAGS_lateral_derivative_bound_default,
-                                  FLAGS_lateral_derivative_bound_default);
+                                 FLAGS_lateral_derivative_bound_default);
 
   fem_1d_qp->SetVariableSecondOrderDerivativeBounds(
       lateral_second_order_derivative_bounds);

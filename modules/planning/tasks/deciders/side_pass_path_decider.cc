@@ -59,7 +59,8 @@ void SidePassPathDecider::InitSolver() {
 
   fem_qp_.reset(new Fem1dQpProblem());
   fem_qp_->InitProblem(n, delta_s_, w,
-      config.side_pass_path_decider_config().max_dddl(), l_init);
+                       config.side_pass_path_decider_config().max_dddl(),
+                       l_init);
 }
 
 Status SidePassPathDecider::Process(
