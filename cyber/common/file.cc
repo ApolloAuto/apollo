@@ -318,11 +318,7 @@ std::string GetFileName(const std::string &path, const bool remove_extension) {
 
 std::string GetCurrentPath() {
   char tmp[PATH_MAX];
-  if (getcwd(tmp, sizeof(tmp)) != NULL) {
-    return std::string(tmp);
-  } else {
-    return std::string("");
-  }
+  return getcwd(tmp, sizeof(tmp)) ? std::string(tmp) : std::string("");
 }
 
 }  // namespace common
