@@ -52,6 +52,7 @@ function parseDataset(lines, polygons, cars) {
         lines.forEach(dataset => {
             const label = dataset['label'];
             properties.lines[label] = parseDatasetProperties(dataset['properties']);
+            properties.lines[label].hideLabelInLegend = dataset['hideLabelInLegend'];
             data.lines[label] = dataset['point'];
         });
     }
@@ -75,6 +76,7 @@ function parseDataset(lines, polygons, cars) {
             // There're default properties for polygons, no need to set it if not specify
             if (dataset['properties']) {
                 properties.polygons[label] = parseDatasetProperties(dataset['properties']);
+                properties.polygons[label].hideLabelInLegend = dataset['hideLabelInLegend'];
             }
         });
     }
@@ -84,7 +86,10 @@ function parseDataset(lines, polygons, cars) {
         properties.cars = {};
         cars.forEach(dataset => {
             const label = dataset['label'];
-            properties.cars[label] = { color: dataset['color'] };
+            properties.cars[label] = {
+                color: dataset['color'],
+                hideLabelInLegend: dataset['hideLabelInLegend'],
+            };
             data.cars[label] = {
                 x: dataset['x'],
                 y: dataset['y'],
