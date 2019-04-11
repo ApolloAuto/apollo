@@ -124,7 +124,7 @@ bool SidePassScenario::IsTransferable(const Frame& frame,
   std::string front_blocking_obstacle_id = PlanningContext::Planningstatus()
                                                .side_pass()
                                                .front_blocking_obstacle_id();
-  AERROR << front_blocking_obstacle_id;
+  ADEBUG << "front_blocking_obstacle_id: " << front_blocking_obstacle_id;
 
   if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     // Check if the blocking obstacle is still static.
