@@ -245,7 +245,7 @@ Status QpPiecewiseJerkPathOptimizer::Process(
   constexpr double kMaxLThirdOrderDerivative = 2.0;
   std::unique_ptr<Fem1dQpProblem> fem_1d_qp(new Fem1dQpProblem());
   fem_1d_qp->InitProblem(
-      n, init_lateral_state, qp_delta_s, w, kMaxLThirdOrderDerivative);
+      n, qp_delta_s, w, kMaxLThirdOrderDerivative, init_lateral_state);
 
   auto start_time = std::chrono::system_clock::now();
 
