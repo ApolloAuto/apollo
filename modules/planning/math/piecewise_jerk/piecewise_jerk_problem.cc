@@ -238,8 +238,8 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
     dx_.at(i) = work->solution->x[i + num_of_knots_];
     ddx_.at(i) = work->solution->x[i + 2 * num_of_knots_];
   }
-  dx_.back() = 0.0;
-  ddx_.back() = 0.0;
+  dx_.back() = work->solution->x[2 * num_of_knots_ - 1];
+  ddx_.back() = work->solution->x[3 * num_of_knots_ - 1];
 
   // Cleanup
   osqp_cleanup(work);
@@ -416,15 +416,15 @@ void PiecewiseJerkProblem::CalculateOffset(std::vector<c_float>* q) {
   q->resize(kNumParam);
   for (int i = 0; i < kNumParam; ++i) {
     if (i < N) {
-      q->at(i) = -2.0 * weight_.x_mid_line_w *
+      q->at(i) = -0.5 * weight_.x_mid_line_w *
                  (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
     } else {
       q->at(i) = 0.0;
     }
   }
-  q->at(N - 1) = -4.0 * weight_.x_w * x_end_[0];
-  q->at(N * 2 - 1) = -4.0 * weight_.x_derivative_w * x_end_[1];
-  q->at(N * 3 - 1) = -4.0 * weight_.x_second_order_derivative_w * x_end_[2];
+  q->at(N - 1) = -2.0 * weight_.x_w * x_end_[0];
+  q->at(N * 2 - 1) = -2.0 * weight_.x_derivative_w * x_end_[1];
+  q->at(N * 3 - 1) = -2.0 * weight_.x_second_order_derivative_w * x_end_[2];
 }
 
 }  // namespace planning
