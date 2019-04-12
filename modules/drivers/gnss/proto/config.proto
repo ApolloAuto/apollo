@@ -78,8 +78,8 @@ enum ImuType {
   ISA100 = 34;         // Northrop Grumman Litef ISA-100
   ISA100_400HZ = 38;   // Northrop Grumman Litef ISA-100
   ISA100C_400HZ = 39;  // Northrop Grumman Litef ISA-100
-  G320N = 40;          // EPSON G320N
-  CPT_XW5651 = 41;     // IMU@SPAN-CPT, and XingWangYuda 5651
+  CPT_XW5651 = 40;     // IMU@SPAN-CPT, and XingWangYuda 5651
+  G320N = 41;          // EPSON G320N
   UM442 = 42;          // UM442
   IAM20680 = 57;       // InvenSense-IAM20680
 }
