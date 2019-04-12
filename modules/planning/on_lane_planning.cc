@@ -707,18 +707,28 @@ void OnLanePlanning::AddPartitionedTrajectory(
   if (!frame_->open_space_info().open_space_provider_success()) {
     return;
   }
-  // if empty return
-  auto chart = debug_chart->mutable_planning_data()->add_chart();
-  const auto& open_space_debug = debug_info.planning_data().open_space();
 
+  const auto& open_space_debug = debug_info.planning_data().open_space();
   const auto& chosen_trajectories =
       open_space_debug.chosen_trajectory().trajectory();
   if (chosen_trajectories.empty() ||
       chosen_trajectories[0].trajectory_point().empty()) {
     return;
   }
+
+  auto chart = debug_chart->mutable_planning_data()->add_chart();
   chart->set_title("Open Space Partitioned Trajectory");
-  // has to define chart boundary first
+
+  // Draw vehicle state
+  auto* adc_shape = chart->add_car();
+  const auto& vehicle_state = frame_->vehicle_state();
+  adc_shape->set_x(vehicle_state.x());
+  adc_shape->set_y(vehicle_state.y());
+  adc_shape->set_heading(vehicle_state.heading());
+  adc_shape->set_label("ADV");
+  adc_shape->set_color("rgba(54, 162, 235, 1)");
+
+  // Draw the chosen trajectories
   const auto& chosen_trajectory = chosen_trajectories[0];
   double anchor_x = chosen_trajectory.trajectory_point()[0].path_point().x();
   double anchor_y = chosen_trajectory.trajectory_point()[0].path_point().y();
@@ -732,7 +742,6 @@ void OnLanePlanning::AddPartitionedTrajectory(
     point_debug->set_x(point.path_point().x());
     point_debug->set_y(point.path_point().y());
   }
-  // Set chartJS's dataset properties
   auto* chosen_properties = chosen_line->mutable_properties();
   (*chosen_properties)["borderWidth"] = "2";
   (*chosen_properties)["pointRadius"] = "0";
@@ -740,10 +749,14 @@ void OnLanePlanning::AddPartitionedTrajectory(
   (*chosen_properties)["fill"] = "false";
   (*chosen_properties)["showLine"] = "true";
 
+  // Draw partitioned trajectories
+  size_t partitioned_trajectory_label = 0;
   for (const auto& partitioned_trajectory :
        open_space_debug.partitioned_trajectories().trajectory()) {
     auto* partition_line = chart->add_line();
-    partition_line->set_label("Patitioned");
+    partition_line->set_label("Patitioned " +
+                              std::to_string(partitioned_trajectory_label));
+    ++partitioned_trajectory_label;
     for (const auto& point : partitioned_trajectory.trajectory_point()) {
       auto* point_debug = partition_line->add_point();
       point_debug->set_x(point.path_point().x());
@@ -758,7 +771,7 @@ void OnLanePlanning::AddPartitionedTrajectory(
     (*partition_properties)["showLine"] = "true";
   }
 
-  // plot fallback trajectory compared with the partitioned
+  // Draw fallback trajectory compared with the partitioned
   if (open_space_debug.is_fallback_trajectory()) {
     const auto& fallback_trajectories =
         open_space_debug.fallback_trajectory().trajectory();
@@ -766,7 +779,6 @@ void OnLanePlanning::AddPartitionedTrajectory(
         fallback_trajectories[0].trajectory_point().empty()) {
       return;
     }
-
     const auto& fallback_trajectory = fallback_trajectories[0];
     // has to define chart boundary first
     auto* fallback_line = chart->add_line();
