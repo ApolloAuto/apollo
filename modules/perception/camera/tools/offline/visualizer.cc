@@ -18,6 +18,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -291,18 +292,13 @@ bool Visualizer::adjust_angles(const std::string &camera_name,
 }
 
 bool Visualizer::SetDirectory(const std::string &path) {
-  int is_success = 1;
-  std::string command;
-  command = "mkdir -p " + path;
-  is_success = system(command.c_str());
-  command = "rm " + path + "/*.jpg";
-  is_success = system(command.c_str());
-  path_ = path;
-  if (is_success > 0) {
-    return true;
-  } else {
+  if (!cyber::common::EnsureDirectory(path)) {
     return false;
   }
+  const std::string command = "rm " + path + "/*.jpg";
+  int ret = system(command.c_str());
+  path_ = path;
+  return ret ? false : true;
 }
 
 std::string Visualizer::type_to_string(
