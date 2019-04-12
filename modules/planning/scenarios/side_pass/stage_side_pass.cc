@@ -163,7 +163,7 @@ Status StageSidePass::PlanFallbackTrajectory(
           ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
           : std::numeric_limits<double>::infinity();
   *reference_line_info->mutable_speed_data() =
-      SpeedProfileGenerator::GenerateFallbackSpeedProfileWithStopDistance(
+      SpeedProfileGenerator::GenerateFallbackSpeed(
           std::min(stop_path_distance, stop_speed_distance));
   reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
   reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
