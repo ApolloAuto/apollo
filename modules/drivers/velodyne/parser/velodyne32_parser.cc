@@ -24,6 +24,9 @@ Velodyne32Parser::Velodyne32Parser(const Config& config)
     : VelodyneParser(config), previous_packet_stamp_(0), gps_base_usec_(0) {
   inner_time_ = &velodyne::INNER_TIME_HDL32E;
   need_two_pt_correction_ = false;
+  if (config_.model() == VLP32C) {
+    inner_time_ = &velodyne::INNER_TIME_VLP32C;
+  }
 }
 
 void Velodyne32Parser::GeneratePointcloud(
@@ -37,12 +40,18 @@ void Velodyne32Parser::GeneratePointcloud(
   gps_base_usec_ = scan_msg->basetime();
 
   size_t packets_size = scan_msg->firing_pkts_size();
-  for (size_t i = 0; i < packets_size; ++i) {
-    Unpack(scan_msg->firing_pkts(static_cast<int>(i)), out_msg);
-    last_time_stamp_ = out_msg->measurement_time();
-    ADEBUG << "stamp: " << std::fixed << last_time_stamp_;
+  if (config_.model() == VLP32C) {
+    for (size_t i = 0; i < packets_size; ++i) {
+      UnpackVLP32C(scan_msg->firing_pkts(static_cast<int>(i)), out_msg);
+      last_time_stamp_ = out_msg->measurement_time();
+    }
+  } else {
+    for (size_t i = 0; i < packets_size; ++i) {
+      Unpack(scan_msg->firing_pkts(static_cast<int>(i)), out_msg);
+      last_time_stamp_ = out_msg->measurement_time();
+      ADEBUG << "stamp: " << std::fixed << last_time_stamp_;
+    }
   }
-
   if (out_msg->point_size() == 0) {
     // we discard this pointcloud if empty
     AERROR << "All points is NAN!Please check velodyne:" << config_.model();
@@ -54,8 +63,83 @@ void Velodyne32Parser::GeneratePointcloud(
 uint64_t Velodyne32Parser::GetTimestamp(double base_time, float time_offset,
                                         uint16_t block_id) {
   double t = base_time - time_offset;
+  if (config_.model() == VLP32C) {
+    t = base_time + time_offset;
+  }
   uint64_t timestamp = GetGpsStamp(t, &previous_packet_stamp_, &gps_base_usec_);
   return timestamp;
+}
+
+void Velodyne32Parser::UnpackVLP32C(const VelodynePacket& pkt,
+                                    std::shared_ptr<PointCloud> pc) {
+  const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
+  double basetime = raw->gps_timestamp;  // usec
+  float azimuth = 0.0f;
+  float azimuth_diff = 0.0f;
+  float last_azimuth_diff = 0.0f;
+  float azimuth_corrected_f = 0.0f;
+  int azimuth_corrected = 0;
+
+  for (int i = 0; i < BLOCKS_PER_PACKET; i++) {  // 12
+    azimuth = static_cast<float>(raw->blocks[i].rotation);
+    if (i < (BLOCKS_PER_PACKET - 1)) {
+      azimuth_diff = static_cast<float>(
+          (36000 + raw->blocks[i + 1].rotation - raw->blocks[i].rotation) %
+          36000);
+      last_azimuth_diff = azimuth_diff;
+    } else {
+      azimuth_diff = last_azimuth_diff;
+    }
+    for (int laser_id = 0, k = 0; laser_id < SCANS_PER_BLOCK;
+         ++laser_id, k += RAW_SCAN_SIZE) {  // 32, 3
+      LaserCorrection& corrections = calibration_.laser_corrections_[laser_id];
+
+      union RawDistance raw_distance;
+      raw_distance.bytes[0] = raw->blocks[i].data[k];
+      raw_distance.bytes[1] = raw->blocks[i].data[k + 1];
+
+      // compute time
+      uint64_t timestamp = static_cast<uint64_t>(GetTimestamp(
+          basetime, (*inner_time_)[i][laser_id], static_cast<uint16_t>(i)));
+
+      if (laser_id == SCANS_PER_BLOCK - 1) {
+        // set header stamp before organize the point cloud
+        pc->set_measurement_time(static_cast<double>(timestamp) / 1e9);
+      }
+
+      azimuth_corrected_f =
+          azimuth + (azimuth_diff * (static_cast<float>(laser_id) / 2.0f) *
+                     CHANNEL_TDURATION / SEQ_TDURATION);
+      azimuth_corrected =
+          static_cast<int>(round(fmod(azimuth_corrected_f, 36000.0)));
+
+      float real_distance =
+          raw_distance.raw_distance * VLP32_DISTANCE_RESOLUTION;
+      float distance = real_distance + corrections.dist_correction;
+
+      // AINFO << "raw_distance:" << raw_distance.raw_distance << ", distance:"
+      // << distance;
+      if (raw_distance.raw_distance == 0 ||
+          !is_scan_valid(azimuth_corrected, distance)) {
+        if (config_.organized()) {
+          apollo::drivers::PointXYZIT* point_new = pc->add_point();
+          point_new->set_x(nan);
+          point_new->set_y(nan);
+          point_new->set_z(nan);
+          point_new->set_timestamp(timestamp);
+          point_new->set_intensity(0);
+        }
+        continue;
+      }
+
+      apollo::drivers::PointXYZIT* point = pc->add_point();
+      point->set_timestamp(timestamp);
+      // Position Calculation, append this point to the cloud
+      ComputeCoords(real_distance, corrections,
+                    static_cast<uint16_t>(azimuth_corrected), point);
+      point->set_intensity(raw->blocks[i].data[k + 2]);
+    }
+  }
 }
 
 void Velodyne32Parser::Unpack(const VelodynePacket& pkt,
@@ -112,6 +196,9 @@ void Velodyne32Parser::Unpack(const VelodynePacket& pkt,
 }
 
 void Velodyne32Parser::Order(std::shared_ptr<PointCloud> cloud) {
+  if (config_.model() == VLP32C) {
+    return;
+  }
   int width = 32;
   cloud->set_width(width);
   int height = cloud->point_size() / cloud->width();
