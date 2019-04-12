@@ -173,7 +173,7 @@ class OpenSpaceROI {
   // @brief parking_spot_id from routing
   std::string target_parking_spot_id_ = "";
 
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  PlannerOpenSpaceConfig planner_open_space_config_;
 
   apollo::common::VehicleParam vehicle_params_;
 };

@@ -22,9 +22,9 @@
 
 namespace apollo {
 namespace planning {
-void CopyTrajectory(
-    const apollo::planning::DiscretizedTrajectory trajectory_src,
-    apollo::common::Trajectory* trajectory_tgt_ptr) {
+
+void CopyTrajectory(const DiscretizedTrajectory trajectory_src,
+                    apollo::common::Trajectory* trajectory_tgt_ptr) {
   size_t horizon = trajectory_src.NumOfPoints();
   for (size_t i = 0; i < horizon; ++i) {
     auto* added_pt = trajectory_tgt_ptr->add_trajectory_point();

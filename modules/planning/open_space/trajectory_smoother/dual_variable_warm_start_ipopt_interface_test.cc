@@ -62,7 +62,7 @@ class DualVariableWarmStartIPOPTInterfaceTest : public ::testing::Test {
   int num_of_constraints_ = 0;
 
   std::unique_ptr<DualVariableWarmStartIPOPTInterface> ptop_ = nullptr;
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
 void DualVariableWarmStartIPOPTInterfaceTest::ProblemSetup() {
