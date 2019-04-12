@@ -85,15 +85,8 @@ The only special case is that the additional front lidar 16 (which is facing upw
     /apollo/sensor/lidar128/compensator/PointCloud2
     ```
 3. Sync Localization module with your GPS signal,
-    - **[IMPORTANT]** Stay stationary for 3~5 minutes for the GPS signal to sync
     -	Go outside the garage where the GPS signal is good, you can confirm that the strength of the GPS signal is good when it turns green in Dreamview as mentioned in Step 1.
-    -	[Optional – alternate method to check if GPS is working] Once you see the topic `gnss/best_pose` in cyber_monitor, then you know GPS is working
-    -	Inside the topic gnss/best_pose: click on it, if the `sol_type` specifies `narrow int` then it confirms that the signal is good enough to use
-    -	After confirming GPS is working, you can start the data collection process, click on the `Recorder` button as seen in the image below
-
-        ![](images/map2.png)
-
-    -	Then, drive your car around the parking lot a few times 
+    -	Once you see the topic `gnss/best_pose` in cyber_monitor, then you know GPS is working. Inside the topic gnss/best_pose: click on it, if the `sol_type` specifies `narrow int` then it confirms that the signal is good enough to use
     -	Check for topic called `tf` in cyber_monitor to see if the Localization module is up and running
     -	Note, Localization takes time to warm up
     -	If the map in Dreamview has jiggly lines as seen in the image below, please restart dreamview or rebuild Apollo
@@ -101,9 +94,16 @@ The only special case is that the additional front lidar 16 (which is facing upw
           ![](images/map3.png)
 
 4. Data collection,
-    Once the localization module has warmed up and you see the topic `tf` in cyber_monitor, you are now ready for map data collection. Remember:
-   - While collecting map date, we should ensure the same route can be covered more than five times in the speed under 60KM/h. Try to include as many lanes as possible while covering the route.
-   - You do not need to stop at any intersections, you can pass it slowly. But remember that at the intersection, it is necessary to collect at least 50m of all the lanes that enter the intersection in all directions to ensure the traffic lights and lane lines in all directions are captured completely and clearly.
+
+    Once the localization module has warmed up and you see the topic `tf` in cyber_monitor, you are now ready for map data collection.
+    -	After confirming GPS is working, you can start the data collection process, click on the `Recorder` button as seen in the image below
+
+        ![](images/map2.png)
+
+    - **[IMPORTANT]** Stay stationary for 3~5 minutes for the GPS signal to sync
+    - Drive around in figure 8 shape to warm up the localization module.
+    - While collecting map date, we should ensure the same route can be covered more than five times in the speed under 60KM/h. Try to include as many lanes as possible while covering the route.
+    - You do not need to stop at any intersections, you can pass it slowly. But remember that at the intersection, it is necessary to collect at least 50m of all the lanes that enter the intersection in all directions to ensure the traffic lights and lane lines in all directions are captured completely and clearly.
 5. Once you are done with data collection,
     -	Go to an area where the GPS signal is good 
     -	**[IMPORTANT]** Stay stationary for 3~5 minutes 
