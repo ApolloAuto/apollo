@@ -18,6 +18,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
@@ -298,7 +299,7 @@ bool Visualizer::SetDirectory(const std::string &path) {
   const std::string command = "rm " + path + "/*.jpg";
   int ret = system(command.c_str());
   path_ = path;
-  return ret ? false : true;
+  return ret == 0;
 }
 
 std::string Visualizer::type_to_string(
