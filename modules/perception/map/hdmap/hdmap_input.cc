@@ -69,11 +69,10 @@ bool HDMapInput::Reset() {
 bool HDMapInput::InitHDMap() {
   hdmap_.reset(new apollo::hdmap::HDMap());
   const std::string model_name = "HDMapInput";
-  std::string filename;
   const lib::ModelConfig* model_config = nullptr;
   if (!lib::ConfigManager::Instance()->GetModelConfig(model_name,
                                                       &model_config)) {
-    AERROR << "not found model: " << model_name;
+    AERROR << "Failed to find model: " << model_name;
     return false;
   }
   if (!model_config->get_value("hdmap_sample_step", &hdmap_sample_step_)) {
@@ -87,8 +86,7 @@ bool HDMapInput::InitHDMap() {
 
   // Option2: Load own map with different hdmap_sample_step_
   // Load hdmap path from global_flagfile.txt
-  hdmap_file_ =
-      apollo::common::util::StrCat(FLAGS_map_dir, "/base_map.bin", filename);
+  hdmap_file_ = apollo::common::util::StrCat(FLAGS_map_dir, "/base_map.bin");
   AINFO << "hdmap_file_: " << hdmap_file_;
   if (!apollo::cyber::common::PathExists(hdmap_file_)) {
     AERROR << "Failed to find hadmap file: " << hdmap_file_;
@@ -105,7 +103,7 @@ bool HDMapInput::InitHDMap() {
 
 bool HDMapInput::GetRoiHDMapStruct(
     const base::PointD& pointd, const double distance,
-    std::shared_ptr<base::HdmapStruct> hdmap_struct_prt) {
+    std::shared_ptr<base::HdmapStruct> hdmap_struct_ptr) {
   lib::MutexLock lock(&mutex_);
   CHECK_NOTNULL(hdmap_.get());
   // Get original road boundary and junction
@@ -120,23 +118,23 @@ bool HDMapInput::GetRoiHDMapStruct(
     AERROR << "Failed to get road boundary, point: " << point.DebugString();
     return false;
   }
-  if (hdmap_struct_prt == nullptr) {
+  if (hdmap_struct_ptr == nullptr) {
     return false;
   }
-  hdmap_struct_prt->hole_polygons.clear();
-  hdmap_struct_prt->junction_polygons.clear();
-  hdmap_struct_prt->road_boundary.clear();
-  hdmap_struct_prt->road_polygons.clear();
+  hdmap_struct_ptr->hole_polygons.clear();
+  hdmap_struct_ptr->junction_polygons.clear();
+  hdmap_struct_ptr->road_boundary.clear();
+  hdmap_struct_ptr->road_polygons.clear();
 
   // Merge boundary and junction
   std::vector<RoadBoundary> road_boundaries;
   MergeBoundaryJunction(road_boundary_vec, junctions_vec, &road_boundaries,
-                        &(hdmap_struct_prt->road_polygons),
-                        &(hdmap_struct_prt->junction_polygons));
+                        &(hdmap_struct_ptr->road_polygons),
+                        &(hdmap_struct_ptr->junction_polygons));
   // Filter road boundary by junction
   GetRoadBoundaryFilteredByJunctions(road_boundaries,
-                                     hdmap_struct_prt->junction_polygons,
-                                     &(hdmap_struct_prt->road_boundary));
+                                     hdmap_struct_ptr->junction_polygons,
+                                     &(hdmap_struct_ptr->road_boundary));
   return true;
 }
 
