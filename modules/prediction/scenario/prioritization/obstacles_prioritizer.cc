@@ -455,17 +455,16 @@ void ObstaclesPrioritizer::AssignCautionByOverlap(
       const auto& object_id = object.id().id();
       if (object_id == lane_info_ptr->id().id()) {
         continue;
-      } else {
-        std::shared_ptr<const LaneInfo> overlap_lane_ptr =
-            PredictionMap::LaneById(object_id);
-        // ahead_s is the length in front of the overlap
-        double ahead_s = overlap_lane_ptr->total_length() -
-                         object.lane_overlap_info().start_s();
-        SetCautionBackward(
-            overlap_lane_ptr,
-            ahead_s + FLAGS_caution_search_distance_backward_for_overlap,
-            visited_lanes);
       }
+      std::shared_ptr<const LaneInfo> overlap_lane_ptr =
+          PredictionMap::LaneById(object_id);
+      // ahead_s is the length in front of the overlap
+      double ahead_s = overlap_lane_ptr->total_length() -
+                       object.lane_overlap_info().start_s();
+      SetCautionBackward(
+          overlap_lane_ptr,
+          ahead_s + FLAGS_caution_search_distance_backward_for_overlap,
+          visited_lanes);
     }
   }
 }
