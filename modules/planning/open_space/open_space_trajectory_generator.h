@@ -119,15 +119,14 @@ class OpenSpaceTrajectoryGenerator {
       const std::vector<double>& end_pose, const double& rotate_angle,
       const Vec2d& translate_origin);
 
-  std::unique_ptr<::apollo::planning::HybridAStar> warm_start_;
-  std::unique_ptr<::apollo::planning::DistanceApproachProblem>
-      distance_approach_;
-  std::unique_ptr<::apollo::planning::DualVariableWarmStartProblem>
+  std::unique_ptr<HybridAStar> warm_start_;
+  std::unique_ptr<DistanceApproachProblem> distance_approach_;
+  std::unique_ptr<DualVariableWarmStartProblem>
       dual_variable_warm_start_;
   common::PathPoint init_state_;
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  PlannerOpenSpaceConfig planner_open_space_config_;
   common::TrajectoryPoint planning_init_point_;
   std::vector<common::TrajectoryPoint> stitching_trajectory_;
   double init_x_ = 0.0;
