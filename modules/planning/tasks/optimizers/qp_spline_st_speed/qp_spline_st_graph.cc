@@ -100,7 +100,8 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
         speed_data->AppendSpeedPoint(0.0, time, 0.0, 0.0, 0.0);
         time += t_output_resolution;
       }
-      return Status::OK();
+      const std::string msg = "Collision found in QpSplineStGraph!";
+      return Status(ErrorCode::PLANNING_ERROR, msg);
     }
   }
 
