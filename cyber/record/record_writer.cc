@@ -166,8 +166,8 @@ bool RecordWriter::SetIntervalOfFileSegmentation(uint64_t time_sec) {
 }
 
 bool RecordWriter::IsNewChannel(const std::string& channel_name) {
-  return (channel_message_number_map_.find(channel_name) ==
-          channel_message_number_map_.end()) ? true : false;
+  return channel_message_number_map_.find(channel_name) ==
+         channel_message_number_map_.end();
 }
 
 void RecordWriter::OnNewChannel(const std::string& channel_name,
