@@ -21,9 +21,9 @@
 #include <vector>
 
 #include "modules/planning/common/frame.h"
+#include "modules/planning/planner/on_lane_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
 #include "modules/planning/tasks/smoothers/smoother.h"
-#include "planner/on_lane_planner_dispatcher.h"
 
 /**
  * @namespace apollo::planning
