@@ -4,8 +4,7 @@
 
 - [Apollo 3.5 quick start](apollo_3_5_quick_start.md)
 - [Apollo 3.5 hardware system installation guide](apollo_3_5_hardware_system_installation_guide.md)
-- [Apollo 3.5 map collection guide](Apollo_3_5_map_collection_guide.md)
-- [Apollo 3.5 map data collection best practices guide](apollo_3_5_map_data_collection_best_practices_guide.md)
+- [Apollo 3.5 map collection guide](apollo_3_5_map_collection_guidelines.md)
 - [Apollo 3.5 technical guide](https://github.com/ApolloAuto/apollo/blob/master/docs/technical_tutorial/apollo_3.5_technical_tutorial.md) - Everything you need to know about Apollo 3.5
 
 ## Apollo 3.0
