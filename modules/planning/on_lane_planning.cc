@@ -716,12 +716,15 @@ void OnLanePlanning::AddPartitionedTrajectory(
     return;
   }
 
+  const auto& vehicle_state = frame_->vehicle_state();
   auto chart = debug_chart->mutable_planning_data()->add_chart();
   chart->set_title("Open Space Partitioned Trajectory");
+  auto* options = chart->mutable_options();
+  options->mutable_x()->set_label_string("x (meter)");
+  options->mutable_y()->set_label_string("y (meter)");
 
   // Draw vehicle state
   auto* adc_shape = chart->add_car();
-  const auto& vehicle_state = frame_->vehicle_state();
   adc_shape->set_x(vehicle_state.x());
   adc_shape->set_y(vehicle_state.y());
   adc_shape->set_heading(vehicle_state.heading());
@@ -730,11 +733,6 @@ void OnLanePlanning::AddPartitionedTrajectory(
 
   // Draw the chosen trajectories
   const auto& chosen_trajectory = chosen_trajectories[0];
-  double anchor_x = chosen_trajectory.trajectory_point()[0].path_point().x();
-  double anchor_y = chosen_trajectory.trajectory_point()[0].path_point().y();
-  PopulateChartOptions(anchor_x - 10.0, anchor_x + 20.0, "x (meter)",
-                       anchor_y - 20.0, anchor_y + 10.0, "y (meter)", true,
-                       chart);
   auto* chosen_line = chart->add_line();
   chosen_line->set_label("Chosen");
   for (const auto& point : chosen_trajectory.trajectory_point()) {
