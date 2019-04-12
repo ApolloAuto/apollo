@@ -91,7 +91,7 @@ void Fem1dQpProblem::CalculateOffset(std::vector<c_float>* q) {
   q->resize(kNumParam);
   for (int i = 0; i < kNumParam; ++i) {
     if (i < N) {
-      q->at(i) = -0.5 * weight_.x_mid_line_w *
+      q->at(i) = -1.0 * weight_.x_mid_line_w *
                  (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
     } else {
       q->at(i) = 0.0;
