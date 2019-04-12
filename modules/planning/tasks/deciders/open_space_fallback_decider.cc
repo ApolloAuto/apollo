@@ -26,7 +26,6 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
-using apollo::planning::TrajGearPair;
 
 OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
     : Decider(config) {}
