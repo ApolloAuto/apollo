@@ -14,6 +14,8 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/planning/on_lane_planning.h"
+
 #include <list>
 #include <utility>
 
@@ -31,7 +33,6 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory_stitcher.h"
 #include "modules/planning/common/util/util.h"
-#include "modules/planning/on_lane_planning.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/proto/planning_internal.pb.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
@@ -163,7 +164,7 @@ void OnLanePlanning::GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb) {
   const double unit_t = FLAGS_fallback_time_unit;
 
   TrajectoryPoint tp;
-  auto path_point = tp.mutable_path_point();
+  auto* path_point = tp.mutable_path_point();
   path_point->set_x(vehicle_state.x());
   path_point->set_y(vehicle_state.y());
   path_point->set_theta(vehicle_state.heading());
@@ -289,7 +290,6 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
       ref_line_info.SetDrivable(false);
       AWARN << "Reference line " << ref_line_info.Lanes().Id()
             << " traffic decider failed";
-      continue;
     }
   }
 
@@ -440,8 +440,7 @@ Status OnLanePlanning::Plan(
     ptr_trajectory_pb->set_trajectory_type(best_ref_info->trajectory_type());
 
     if (FLAGS_enable_rss_info) {
-      ptr_trajectory_pb->mutable_rss_info()->CopyFrom(
-          best_ref_info->rss_info());
+      *ptr_trajectory_pb->mutable_rss_info() = best_ref_info->rss_info();
     }
 
     best_ref_info->ExportDecision(ptr_trajectory_pb->mutable_decision());
@@ -587,15 +586,15 @@ void AddSpeedPlan(
 void OnLanePlanning::ExportOnLaneChart(
     const planning_internal::Debug& debug_info,
     planning_internal::Debug* debug_chart) {
-  for (const auto& st_graph : debug_info.planning_data().st_graph()) {
-    AddSTGraph(st_graph, debug_chart->mutable_planning_data()->add_chart());
+  const auto& src_data = debug_info.planning_data();
+  auto* dst_data = debug_chart->mutable_planning_data();
+  for (const auto& st_graph : src_data.st_graph()) {
+    AddSTGraph(st_graph, dst_data->add_chart());
   }
-  for (const auto& sl_frame : debug_info.planning_data().sl_frame()) {
-    AddSLFrame(sl_frame, debug_chart->mutable_planning_data()->add_chart());
+  for (const auto& sl_frame : src_data.sl_frame()) {
+    AddSLFrame(sl_frame, dst_data->add_chart());
   }
-
-  AddSpeedPlan(debug_info.planning_data().speed_plan(),
-               debug_chart->mutable_planning_data()->add_chart());
+  AddSpeedPlan(src_data.speed_plan(), dst_data->add_chart());
 }
 
 void OnLanePlanning::ExportOpenSpaceChart(
