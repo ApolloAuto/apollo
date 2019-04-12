@@ -106,12 +106,15 @@ message ScenarioSidePassConfig {
 
 message ScenarioBareIntersectionUnprotectedConfig {
   optional double start_bare_intersection_scenario_distance = 1 [default = 25.0];  // meter
-  optional double min_pass_s_distance = 2 [default = 3.0];  // meter
+  // explicit stop while waiting
+  optional bool enable_explicit_stop = 2 [default = false];
+  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
   // speed limit while approaching bare intersection with caution
   // default to 15 mph
-  optional double approach_speed_limit = 3 [default = 6.7056]; // meter/sec
-  optional float stop_timeout_sec = 4 [default = 8.0];  // sec
-  optional float creep_timeout_sec = 5 [default = 10.0];  // sec
+  optional double approach_speed_limit = 4 [default = 6.7056]; // meter/sec
+  optional double stop_distance = 5 [default = 0.5];  // meter
+  optional float stop_timeout_sec = 6 [default = 8.0];  // sec
+  optional float creep_timeout_sec = 7 [default = 10.0];  // sec
 }
 
 message ScenarioStopSignUnprotectedConfig {
