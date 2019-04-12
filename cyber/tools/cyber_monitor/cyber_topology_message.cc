@@ -272,9 +272,9 @@ void CyberTopologyMessage::Render(const Screen* s, int key) {
 
           std::ostringstream bandwidthStr;
           bandwidthStr << std::fixed << std::setprecision(FrameRatio_Precision)
-		                   << iter->second->band_width();
+                       << iter->second->band_width();
           s->AddStr(col1_width_ + SecondColumnWidth + 2 * SecondColumnOffset, line,
-		                bandwidthStr.str().c_str());
+                    bandwidthStr.str().c_str());
         } break;
       }
     } else {
