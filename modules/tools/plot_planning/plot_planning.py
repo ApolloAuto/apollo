@@ -17,37 +17,70 @@
 ###############################################################################
 
 import sys
+import threading
 import gflags
 from cyber_py import cyber
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from modules.control.proto import control_cmd_pb2
 from modules.planning.proto import planning_pb2
-BRAKE_LINE_DATA = []
-TROTTLE_LINE_DATA = []
+LAST_TRAJ_DATA = []
+LAST_TRAJ_T_DATA = []
+CURRENT_TRAJ_DATA = []
+CURRENT_TRAJ_T_DATA = []
 INIT_V_DATA = []
 INIT_T_DATA = []
+
+begin_t = None
+last_t = None
+lock = threading.Lock()
 
 FLAGS = gflags.FLAGS
 gflags.DEFINE_integer("data_length", 500, "Planning plot data length")
 
 
 def callback(planning_pb):
-    global INIT_V_DATA
-    global TROTTLE_LINE_DATA, BRAKE_LINE_DATA
+    global INIT_V_DATA, INIT_T_DATA
+    global CURRENT_TRAJ_DATA, LAST_TRAJ_DATA
+    global CURRENT_TRAJ_T_DATA, LAST_TRAJ_T_DATA
+    global begin_t, last_t
 
+    lock.acquire()
+
+    if begin_t is None:
+        begin_t = planning_pb.header.timestamp_sec
+    current_t = planning_pb.header.timestamp_sec
+    if last_t is not None and abs(current_t - last_t) > 1:
+        begin_t = planning_pb.header.timestamp_sec
+        LAST_TRAJ_DATA = []
+        LAST_TRAJ_T_DATA = []
+
+        CURRENT_TRAJ_DATA = []
+        CURRENT_TRAJ_T_DATA =[]
+        
+        INIT_V_DATA = []
+        INIT_T_DATA = []
+    
+    INIT_T_DATA.append(current_t - begin_t)    
     INIT_V_DATA.append(planning_pb.debug.planning_data.init_point.v)
-    if len(INIT_V_DATA) > FLAGS.data_length:
-        INIT_V_DATA = INIT_V_DATA[-FLAGS.data_length:]
 
-    #BRAKE_LINE_DATA.append(control_cmd_pb.brake)
-    if len(BRAKE_LINE_DATA) > FLAGS.data_length:
-        BRAKE_LINE_DATA = BRAKE_LINE_DATA[-FLAGS.data_length:]
+    LAST_TRAJ_DATA = []
+    for v in CURRENT_TRAJ_DATA:
+        LAST_TRAJ_DATA.append(v)
 
-    #TROTTLE_LINE_DATA.append(control_cmd_pb.throttle)
-    if len(TROTTLE_LINE_DATA) > FLAGS.data_length:
-        TROTTLE_LINE_DATA = TROTTLE_LINE_DATA[-FLAGS.data_length:]
+    LAST_TRAJ_T_DATA = []
+    for t in CURRENT_TRAJ_T_DATA:
+        LAST_TRAJ_T_DATA.append(t)
 
+    CURRENT_TRAJ_DATA = []
+    CURRENT_TRAJ_T_DATA = []
+    for traj_point in planning_pb.trajectory_point:
+        CURRENT_TRAJ_DATA.append(traj_point.v)
+        CURRENT_TRAJ_T_DATA.append(current_t - begin_t + traj_point.relative_time)
+    
+    lock.release()
+
+    last_t = current_t
 
 def listener():
     cyber.init()
@@ -65,18 +98,20 @@ def compensate(data_list):
 
 
 def update(frame_number):
-    #brake_data = compensate(BRAKE_LINE_DATA)
-    #brake_line.set_ydata(brake_data)
+    lock.acquire()
+    last_traj.set_xdata(LAST_TRAJ_T_DATA)
+    last_traj.set_ydata(LAST_TRAJ_DATA)
 
-    #throttle_data = compensate(TROTTLE_LINE_DATA)
-    #throttle_line.set_ydata(throttle_data)
+    current_traj.set_xdata(CURRENT_TRAJ_T_DATA)
+    current_traj.set_ydata(CURRENT_TRAJ_DATA)
 
-    steering_data = compensate(INIT_V_DATA)
-    init_data_line.set_ydata(steering_data)
-
+    init_data_line.set_xdata(INIT_T_DATA)
+    init_data_line.set_ydata(INIT_V_DATA)
+    lock.release()
     #brake_text.set_text('brake = %.1f' % brake_data[-1])
     #throttle_text.set_text('throttle = %.1f' % throttle_data[-1])
-    init_data_text.set_text('init point v = %.1f' % steering_data[-1])
+    if len(INIT_V_DATA) > 0:
+        init_data_text.set_text('init point v = %.1f' % INIT_V_DATA[-1])
 
 
 if __name__ == '__main__':
@@ -87,17 +122,17 @@ if __name__ == '__main__':
     Xs = [i * -1 for i in X]
     Xs.sort()
     init_data_line, = ax.plot(
-        Xs, [0] * FLAGS.data_length, 'b', lw=3, alpha=0.5, label='init_point_v')
-    #throttle_line, = ax.plot(
-    #    Xs, [0] * FLAGS.data_length, 'g', lw=3, alpha=0.5, label='throttle')
-    #brake_line, = ax.plot(
-    #    Xs, [0] * FLAGS.data_length, 'r', lw=3, alpha=0.5, label='brake')
+        INIT_T_DATA, INIT_V_DATA, 'b', lw=2, alpha=0.7, label='init_point_v')
+    current_traj, = ax.plot(
+        CURRENT_TRAJ_T_DATA, CURRENT_TRAJ_DATA, 'r', lw=1, alpha=0.5, label='current_traj')
+    last_traj, = ax.plot(
+        LAST_TRAJ_T_DATA, LAST_TRAJ_DATA, 'g', lw=1, alpha=0.5, label='last_traj')
 
     #brake_text = ax.text(0.75, 0.85, '', transform=ax.transAxes)
     #throttle_text = ax.text(0.75, 0.90, '', transform=ax.transAxes)
     init_data_text = ax.text(0.75, 0.95, '', transform=ax.transAxes)
     ani = animation.FuncAnimation(fig, update, interval=100)
-    ax.set_ylim(-1, 40)
-    ax.set_xlim(-1 * FLAGS.data_length, 10)
+    ax.set_ylim(-1, 30)
+    ax.set_xlim(-1, 60)
     ax.legend(loc="upper left")
     plt.show()
