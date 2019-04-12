@@ -133,8 +133,9 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
     common::VehicleConfigHelper::GetConfig().vehicle_param();
 
   std::array<double, 3> init_s = {0.0, init_v, init_a};
-  std::array<double, 3> end_s = {0.0, 0.0, 0.0};
-  std::array<double, 5> w = {1.0, 0.0, 10.0, 100.0, 0.0};
+  std::array<double, 3> end_s = {stop_distance, 0.0, 0.0};
+  // TODO(Hongyi): tunning the params and move to a config
+  std::array<double, 5> w = {10000.0, 0.0, 1.0, 0.01, 0.0};
   double delta_t = FLAGS_fallback_time_unit;
   double total_time = FLAGS_fallback_total_time;
   int num_of_knots = static_cast<int>(total_time / delta_t) + 1;
@@ -142,15 +143,17 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
   path_time_qp->InitProblem(num_of_knots, delta_t, w, FLAGS_lateral_jerk_bound,
                             init_s, end_s);
-  path_time_qp->SetZeroOrderBounds(0.0, 200.0);
+  path_time_qp->SetZeroOrderBounds(0.0, 100.0);
   path_time_qp->SetFirstOrderBounds(0.0, FLAGS_planning_upper_speed_limit);
   path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
+  // TODO(Hongyi): Set back to vehicle_params when ready
+  path_time_qp->SetSecondOrderBounds(-4.4, 2.0);
   SpeedData speed_data;
   // Sovle the problem
   if (!path_time_qp->Optimize()) {
     AERROR << "Piecewise jerk fallback speed optimizer failed!";
-    return speed_data;
+    return GenerateStopProfile(init_v, init_a);
   }
 
   // Extract output
@@ -160,6 +163,10 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
 
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
   for (int i = 1; i < num_of_knots; ++i) {
+    // Avoid the very last points when already stopped
+    if (ds[i] <= 0.0) {
+      break;
+    }
     speed_data.AppendSpeedPoint(s[i], delta_t * i, ds[i], dds[i],
                                 (dds[i]-dds[i-1]) / delta_t);
   }
