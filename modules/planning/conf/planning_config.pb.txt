@@ -236,7 +236,7 @@ default_task_config: {
           weight_x: 2.3
           weight_y: 0.7
           weight_phi: 1.5
-          weight_v: 3.75
+          weight_v: 0.0
           weight_steer_stitching: 1.75
           weight_a_stitching: 3.25
           weight_first_order_time: 4.25
