@@ -53,12 +53,26 @@ class PlanningContext {
     common::PathPoint change_lane_stop_path_point;
     bool check_clear_flag = false;
   };
+
   static const SidePassInfo& side_pass_info() { return side_pass_info_; }
+
   static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
   struct FallBackInfo {
     std::string last_successful_path_label;
   };
+
+  static const FallBackInfo& fallback_info() { return fallback_info_; }
+
+  static FallBackInfo* mutable_fallback_info() { return &fallback_info_; }
+
+  struct OpenSpaceInfo {
+    std::vector<std::string> partitioned_trajectories_index_history;
+  };
+
+  static const OpenSpaceInfo& open_space_info() { return open_space_info_; }
+
+  static OpenSpaceInfo* mutable_open_space_info() { return &open_space_info_; }
 
   static void Clear();
 
@@ -67,12 +81,6 @@ class PlanningContext {
   static const PlanningStatus& Planningstatus() { return planning_status_; }
 
   static PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
-
-  //  static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
-
-  static const FallBackInfo& fallback_info() { return fallback_info_; }
-
-  static FallBackInfo* mutable_fallback_info() { return &fallback_info_; }
 
   static void IncrementFrontStaticObstacleCycleCounter() {
     front_static_obstacle_cycle_counter_ =
@@ -118,6 +126,7 @@ class PlanningContext {
   static PlanningStatus planning_status_;
   static SidePassInfo side_pass_info_;
   static FallBackInfo fallback_info_;
+  static OpenSpaceInfo open_space_info_;
 
   static int front_static_obstacle_cycle_counter_;
   static int able_to_use_self_lane_counter_;
