@@ -108,6 +108,7 @@ static const float ANGULAR_RESOLUTION = 0.00300919;
  * maybe need some defines for VLP32C
  * 
  */
+static const float VLP32C_DISTANCEE_RESOLUTION = 0.04f;
 
 /** Special Defines for VLP16 support **/
 static const int VLP16_FIRINGS_PER_BLOCK = 2;
