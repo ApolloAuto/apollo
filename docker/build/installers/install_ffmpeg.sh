@@ -28,19 +28,8 @@ FFMPEG_BUILD=$FFMPEG_HOME/ffmpeg_build
 FFMPEG_BIN=$FFMPEG_HOME/ffmpeg_bin
 FFMPEG_TARGET=/usr/local/apollo/ffmpeg
 mkdir -p $FFMPEG_SOURCE $FFMPEG_BUILD && cd $FFMPEG_SOURCE
-apt-get update -y && apt-get install -y \
-  libass-dev \
-  libfreetype6-dev \
-  libgles2-mesa-dev \
-  libsdl2-dev \
-  libva-dev \
-  libvdpau-dev \
-  libvorbis-dev \
-  libxcb1-dev \
-  libxcb-shm0-dev \
-  libxcb-xfixes0-dev \
-  mercurial \
-  libnuma-dev
+apt-get update -y && apt-get install -y mercurial
+
 wget https://www.nasm.us/pub/nasm/releasebuilds/2.14.02/nasm-2.14.02.tar.bz2
 tar xjvf nasm-2.14.02.tar.bz2
 HG_SETTING=$'[ui]\ntls = False'
@@ -66,17 +55,16 @@ pushd x265/build/linux
 popd
 
 pushd ffmpeg
-  PATH="$FFMPEG_BIN:$PATH" PKG_CONFIG_PATH="$FFMPEG_BUILD/lib/pkgconfig" ./configure \
+  PATH="$FFMPEG_BIN:$PATH" PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$FFMPEG_BUILD/lib/pkgconfig" ./configure \
     --prefix="$FFMPEG_BUILD" \
     --pkg-config-flags="--static" \
     --extra-cflags="-I$FFMPEG_BUILD/include" \
     --extra-ldflags="-L$FFMPEG_BUILD/lib" \
-    --extra-libs="-lpthread -lm" \
+    --extra-libs="-lpthread -lm -lx265" \
     --bindir="$FFMPEG_BIN" \
     --enable-shared \
     --disable-stripping \
     --enable-pic \
-    --extra-libs="-ldl -lva -lva-drm -lz -lvdpau -lpthread -lm -lx265" \
     --enable-gpl \
     --enable-libx265 \
     --enable-nonfree
