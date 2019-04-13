@@ -49,6 +49,15 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
 
   void UpdateVehicleInfo();
 
+  bool EncodeTrajectory(const DiscretizedTrajectory& trajectory,
+                        std::string* const encoding);
+
+  bool CheckTrajTraversed(
+      const size_t trajectory_index,
+      const std::vector<std::string>& trajectories_encodings);
+
+  void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
+
   void PartitionTrajectory(DiscretizedTrajectory* interpolated_trajectory,
                            std::vector<TrajGearPair>* paritioned_trajectories);
 
