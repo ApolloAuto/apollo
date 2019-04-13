@@ -226,7 +226,7 @@ default_task_config: {
             ipopt_recalc_y: "yes"
           }
           qp_format: OSQP
-          min_safety_distance: 0.0
+          min_safety_distance: 0.01
         }
         distance_approach_config {
           weight_steer: 0.3
@@ -241,7 +241,7 @@ default_task_config: {
           weight_a_stitching: 3.25
           weight_first_order_time: 4.25
           weight_second_order_time: 13.5
-          min_safety_distance: 0.0
+          min_safety_distance: 0.01
           max_speed_forward: 2.0
           max_speed_reverse: 1.0
           max_acceleration_forward: 2.0
