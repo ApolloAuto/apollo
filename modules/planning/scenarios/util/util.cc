@@ -65,15 +65,12 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
 /*
  * @brief: build virtual obstacle of stop wall, and add STOP decision
  */
-int BuildStopDecision(
-    const std::string& stop_wall_id,
-    const double stop_line_s,
-    const double stop_distance,
-    const StopReasonCode& stop_reason_code,
-    const std::vector<std::string>& wait_for_obstacles,
-    const std::string &decision_tag,
-    Frame* const frame,
-    ReferenceLineInfo* const reference_line_info) {
+int BuildStopDecision(const std::string& stop_wall_id, const double stop_line_s,
+                      const double stop_distance,
+                      const StopReasonCode& stop_reason_code,
+                      const std::vector<std::string>& wait_for_obstacles,
+                      const std::string& decision_tag, Frame* const frame,
+                      ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 

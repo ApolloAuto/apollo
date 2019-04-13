@@ -61,10 +61,9 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     // the accelerate = -v0^2 / (2*s), where s is slowing down distance
     size_t temp_horizon =
         frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
-    const double accelerate =
-        - previous_point.v() * previous_point.v() /
-        (2.0 * (relative_collision_distance + 1e-6));
-    const double relative_stopping_time = - previous_point.v() / accelerate;
+    const double accelerate = -previous_point.v() * previous_point.v() /
+                              (2.0 * (relative_collision_distance + 1e-6));
+    const double relative_stopping_time = -previous_point.v() / accelerate;
     for (size_t i = current_idx; i < temp_horizon; ++i) {
       double temp_relative_time =
           ptr_fallback_trajectory_pair->first[i].relative_time() -
@@ -143,8 +142,9 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
           const auto& vehicle_state = frame_->vehicle_state();
           Vec2d vehicle_vec({vehicle_state.x(), vehicle_state.y()});
           if (std::abs(trajectory_point.relative_time() -
-                  static_cast<double>(j) * FLAGS_trajectory_time_resolution) <
-                  FLAGS_trajectory_time_resolution) {
+                       static_cast<double>(j) *
+                           FLAGS_trajectory_time_resolution) <
+              FLAGS_trajectory_time_resolution) {
             *first_collision_idx = i;
             return false;
           }
