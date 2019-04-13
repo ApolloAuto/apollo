@@ -130,7 +130,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   const double init_v = EgoInfo::Instance()->start_point().v();
   const double init_a = EgoInfo::Instance()->start_point().a();
   const auto& veh_param =
-    common::VehicleConfigHelper::GetConfig().vehicle_param();
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
 
   std::array<double, 3> init_s = {0.0, init_v, init_a};
   std::array<double, 3> end_s = {stop_distance, 0.0, 0.0};
@@ -168,7 +168,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
       break;
     }
     speed_data.AppendSpeedPoint(s[i], delta_t * i, ds[i], dds[i],
-                                (dds[i]-dds[i-1]) / delta_t);
+                                (dds[i] - dds[i - 1]) / delta_t);
   }
   return speed_data;
 }
