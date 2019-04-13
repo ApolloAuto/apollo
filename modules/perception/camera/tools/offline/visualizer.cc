@@ -474,12 +474,10 @@ bool Visualizer::copy_backup_file(const std::string &filename) {
   std::string yaml_bak_file = filename + "__" + std::to_string(index);
   AINFO << "yaml_backup_file: " << yaml_bak_file;
 
-  std::string command = "cp " + filename + " " + yaml_bak_file;
-  int ret = system(command.c_str());
-  if (ret != 0) {
-    AINFO << "Cannot backup the file, " << filename;
+  if (!cyber::common::Copy(filename, yaml_bak_file)) {
+    AERROR << "Cannot backup the file: " << filename;
   } else {
-    AINFO << "Backup file, " << filename << " saved.";
+    AINFO << "Backup file: " << filename << " saved successfully.";
   }
 
   return true;
