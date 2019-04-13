@@ -27,6 +27,7 @@
 
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/status/status.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -102,6 +103,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
                       pair_comp_>
       closest_point_on_trajs;
 
+  std::vector<std::string> trajectories_encodings;
+
   for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& trajectory = paritioned_trajectories->at(i).first;
     const auto& gear = paritioned_trajectories->at(i).second;
@@ -114,6 +117,10 @@ Status OpenSpaceTrajectoryPartition::Process() {
     if (flag_change_to_next) {
       break;
     }
+
+    std::string trajectory_encoding;
+    EncodeTrajectory(trajectory, &trajectory_encoding);
+    trajectories_encodings.emplace_back(trajectory_encoding);
 
     // Choose the closest point to track
     std::priority_queue<std::pair<size_t, double>,
@@ -161,7 +168,29 @@ Status OpenSpaceTrajectoryPartition::Process() {
   }
 
   if (!flag_change_to_next) {
+    bool use_fail_safe_search = false;
     if (closest_point_on_trajs.empty()) {
+      use_fail_safe_search = true;
+    } else {
+      bool closest_and_not_repeated_traj_found = false;
+      while (!closest_point_on_trajs.empty()) {
+        current_trajectory_index = closest_point_on_trajs.top().first.first;
+        current_trajectory_point_index =
+            closest_point_on_trajs.top().first.second;
+        if (CheckTrajTraversed(current_trajectory_index,
+                               trajectories_encodings)) {
+          closest_point_on_trajs.pop();
+        } else {
+          break;
+          closest_and_not_repeated_traj_found = true;
+        }
+      }
+      if (!closest_and_not_repeated_traj_found) {
+        use_fail_safe_search = true;
+      }
+    }
+
+    if (use_fail_safe_search) {
       if (!UseFailSafeSearch(*paritioned_trajectories,
                              &current_trajectory_index,
                              &current_trajectory_point_index)) {
@@ -169,12 +198,10 @@ Status OpenSpaceTrajectoryPartition::Process() {
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
-    } else {
-      current_trajectory_index = closest_point_on_trajs.top().first.first;
-      current_trajectory_point_index =
-          closest_point_on_trajs.top().first.second;
     }
   }
+
+  UpdateTrajHistory(trajectories_encodings[current_trajectory_index]);
 
   auto* chosen_paritioned_trajectory =
       open_space_info_ptr->mutable_chosen_paritioned_trajectory();
@@ -238,6 +265,70 @@ void OpenSpaceTrajectoryPartition::UpdateVehicleInfo() {
       vehicle_state.gear() == canbus::Chassis::GEAR_REVERSE
           ? NormalizeAngle(ego_theta_ + M_PI)
           : ego_theta_;
+}
+
+bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
+    const DiscretizedTrajectory& trajectory, std::string* const encoding) {
+  if (trajectory.empty()) {
+    AERROR << "Fail to encode trajectory because it is empty";
+    return false;
+  }
+  const auto& init_path_point = trajectory.front().path_point();
+  const auto& last_path_point = trajectory.back().path_point();
+
+  const std::string init_point_x_encoding =
+      std::to_string(static_cast<int>(init_path_point.x() * 100.0));
+  const std::string init_point_y_encoding =
+      std::to_string(static_cast<int>(init_path_point.y() * 100.0));
+  const std::string init_point_heading_encoding =
+      std::to_string(static_cast<int>(init_path_point.theta() * 100.0));
+  const std::string last_point_x_encoding =
+      std::to_string(static_cast<int>(last_path_point.x() * 100.0));
+  const std::string last_point_y_encoding =
+      std::to_string(static_cast<int>(last_path_point.y() * 100.0));
+  const std::string last_point_heading_encoding =
+      std::to_string(static_cast<int>(last_path_point.theta() * 100.0));
+
+  const std::string init_point_encoding = init_point_x_encoding + "_" +
+                                          init_point_y_encoding + "_" +
+                                          init_point_heading_encoding;
+  const std::string last_point_encoding = last_point_x_encoding + "_" +
+                                          last_point_y_encoding + "_" +
+                                          last_point_heading_encoding;
+
+  *encoding = init_point_encoding + "_" + last_point_encoding;
+  return true;
+}
+
+bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
+    const size_t trajectory_index,
+    const std::vector<std::string>& trajectories_encodings) {
+  const auto& index_history =
+      PlanningContext::open_space_info().partitioned_trajectories_index_history;
+  const size_t index_history_length = index_history.size();
+  if (index_history_length <= 1) {
+    return false;
+  }
+  for (size_t i = 0; i < index_history_length - 1; ++i) {
+    if (index_history[i] == trajectories_encodings[trajectory_index]) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void OpenSpaceTrajectoryPartition::UpdateTrajHistory(
+    const std::string& chosen_trajectory_encoding) {
+  auto* trajectory_history = &(PlanningContext::mutable_open_space_info()
+                                   ->partitioned_trajectories_index_history);
+  if (trajectory_history->empty()) {
+    trajectory_history->push_back(chosen_trajectory_encoding);
+    return;
+  }
+  if (trajectory_history->back() == chosen_trajectory_encoding) {
+    return;
+  }
+  trajectory_history->push_back(chosen_trajectory_encoding);
 }
 
 void OpenSpaceTrajectoryPartition::PartitionTrajectory(
