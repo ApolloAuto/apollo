@@ -57,11 +57,11 @@ def callback(planning_pb):
 
         CURRENT_TRAJ_DATA = []
         CURRENT_TRAJ_T_DATA =[]
-        
+
         INIT_V_DATA = []
         INIT_T_DATA = []
-    
-    INIT_T_DATA.append(current_t - begin_t)    
+
+    INIT_T_DATA.append(current_t - begin_t)
     INIT_V_DATA.append(planning_pb.debug.planning_data.init_point.v)
 
     LAST_TRAJ_DATA = []
@@ -77,7 +77,7 @@ def callback(planning_pb):
     for traj_point in planning_pb.trajectory_point:
         CURRENT_TRAJ_DATA.append(traj_point.v)
         CURRENT_TRAJ_T_DATA.append(current_t - begin_t + traj_point.relative_time)
-    
+
     lock.release()
 
     last_t = current_t

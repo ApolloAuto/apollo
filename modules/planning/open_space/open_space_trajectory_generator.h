@@ -121,8 +121,7 @@ class OpenSpaceTrajectoryGenerator {
 
   std::unique_ptr<HybridAStar> warm_start_;
   std::unique_ptr<DistanceApproachProblem> distance_approach_;
-  std::unique_ptr<DualVariableWarmStartProblem>
-      dual_variable_warm_start_;
+  std::unique_ptr<DualVariableWarmStartProblem> dual_variable_warm_start_;
   common::PathPoint init_state_;
   const common::VehicleParam& vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();

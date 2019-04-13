@@ -97,10 +97,9 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
   }
 
   // TODO(all): move to conf
-  constexpr double kConf_min_boundary_t = 6.0;  // second
-  constexpr double kConf_ignore_max_st_min_t = 0.1;  // second
+  constexpr double kConf_min_boundary_t = 6.0;        // second
+  constexpr double kConf_ignore_max_st_min_t = 0.1;   // second
   constexpr double kConf_ignore_min_st_min_s = 15.0;  // meter
-
 
   std::vector<std::string> wait_for_obstacle_ids;
   bool all_far_away = true;
@@ -109,8 +108,7 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     if (obstacle->IsVirtual() || obstacle->IsStatic()) {
       continue;
     }
-    if (obstacle->reference_line_st_boundary().min_t() <
-        kConf_min_boundary_t) {
+    if (obstacle->reference_line_st_boundary().min_t() < kConf_min_boundary_t) {
       const double kepsilon = 1e-6;
       double obstacle_traveled_s =
           obstacle->reference_line_st_boundary().bottom_left_point().s() -
@@ -143,8 +141,7 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     constexpr double kCheckClearDistance = 5.0;  // meter
     constexpr double kStartWatchDistance = 2.0;  // meter
     if (distance_adc_to_pnc_junction <= kCheckClearDistance &&
-        distance_adc_to_pnc_junction >= kStartWatchDistance &&
-        !all_far_away) {
+        distance_adc_to_pnc_junction >= kStartWatchDistance && !all_far_away) {
       clear_counter_ = 0;  // reset
       stop = true;
     } else if (distance_adc_to_pnc_junction < kStartWatchDistance) {
@@ -160,18 +157,16 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
     if (stop) {
       // build stop decision
       ADEBUG << "BuildStopDecision: bare pnc_junction["
-             << pnc_junction_overlap_id
-             << "] start_s[" << current_pnc_junction->start_s << "]";
+             << pnc_junction_overlap_id << "] start_s["
+             << current_pnc_junction->start_s << "]";
       const std::string virtual_obstacle_id =
           "PNC_JUNCTION_" + current_pnc_junction->object_id;
       scenario::util::BuildStopDecision(
-          virtual_obstacle_id,
-          current_pnc_junction->start_s,
+          virtual_obstacle_id, current_pnc_junction->start_s,
           scenario_config_.stop_distance(),
-          StopReasonCode::STOP_REASON_STOP_SIGN,
-          wait_for_obstacle_ids,
-          "bare intersection",
-          frame, &(frame->mutable_reference_line_info()->front()));
+          StopReasonCode::STOP_REASON_STOP_SIGN, wait_for_obstacle_ids,
+          "bare intersection", frame,
+          &(frame->mutable_reference_line_info()->front()));
     }
   } else if (distance_adc_to_pnc_junction <= 0) {
     // rely on st-graph
