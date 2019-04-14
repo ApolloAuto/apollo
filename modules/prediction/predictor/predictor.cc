@@ -131,7 +131,8 @@ bool Predictor::SupposedToStop(const Feature& feature,
   }
   double speed = feature.speed();
   *acceleration = -speed * speed / (2.0 * stop_distance);
-  if (*acceleration > -FLAGS_double_precision) {
+  if (*acceleration > -FLAGS_double_precision ||
+      *acceleration < FLAGS_vehicle_min_linear_acc) {
     return false;
   }
   return true;
