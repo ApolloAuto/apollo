@@ -634,10 +634,10 @@ scenario {
   key: "Branch Left/Right"
   value {
     category {
-      key: "Branch Left, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+      key: "Branch Left, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+        description: "Branch Left, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -666,16 +666,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Left, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+      key: "Branch Left, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+        description: "Branch Left, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -699,7 +699,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -743,10 +743,10 @@ scenario {
     }
 
     category {
-      key: "Branch Left, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+      key: "Branch Left, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+        description: "Branch Left, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -775,16 +775,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Left, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+      key: "Branch Left, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+        description: "Branch Left, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -808,7 +808,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -852,10 +852,10 @@ scenario {
     }
 
     category {
-      key: "Branch Left, Speed > 20 mps, Throttle deadzone ~ 20%"
+      key: "Branch Left, Speed > 20 mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed > 20 mps, Throttle deadzone ~ 20%"
+        description: "Branch Left, Speed > 20 mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -879,16 +879,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Left, Speed > 20 mps, Throttle 20% ~ 30%"
+      key: "Branch Left, Speed > 20 mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed > 20 mps, Throttle 20% ~ 30%"
+        description: "Branch Left, Speed > 20 mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -907,7 +907,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -984,10 +984,10 @@ scenario {
     }
 
     category {
-      key: "Branch Left, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+      key: "Branch Left, Speed 0 ~ 10mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+        description: "Branch Left, Speed 0 ~ 10mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1016,16 +1016,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Left, Speed 0 ~ 10mps, Brake > 30%"
+      key: "Branch Left, Speed 0 ~ 10mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed 0 ~ 10mps, Brake > 30%"
+        description: "Branch Left, Speed 0 ~ 10mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1049,7 +1049,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -1093,10 +1093,10 @@ scenario {
     }
 
     category {
-      key: "Branch Left, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+      key: "Branch Left, Speed 10 ~ 20mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+        description: "Branch Left, Speed 10 ~ 20mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1125,16 +1125,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Left, Speed 10 ~ 20mps, Brake > 30%"
+      key: "Branch Left, Speed 10 ~ 20mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed 10 ~ 20mps, Brake > 30%"
+        description: "Branch Left, Speed 10 ~ 20mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1158,7 +1158,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -1197,10 +1197,10 @@ scenario {
     }
 
     category {
-      key: "Branch Left, Speed > 20 mps, Brake 20% ~ 30%"
+      key: "Branch Left, Speed > 20 mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed > 20 mps, Brake 20% ~ 30%"
+        description: "Branch Left, Speed > 20 mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1224,16 +1224,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Left, Speed > 20 mps, Brake > 30%"
+      key: "Branch Left, Speed > 20 mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Branch Left, Speed > 20 mps, Brake > 30%"
+        description: "Branch Left, Speed > 20 mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1252,17 +1252,17 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
 
     
     category {
-      key: "Branch Right, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+      key: "Branch Right, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+        description: "Branch Right, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1291,16 +1291,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Right, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+      key: "Branch Right, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+        description: "Branch Right, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1324,7 +1324,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -1368,10 +1368,10 @@ scenario {
     }
 
     category {
-      key: "Branch Right, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+      key: "Branch Right, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+        description: "Branch Right, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1400,16 +1400,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Right, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+      key: "Branch Right, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+        description: "Branch Right, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1433,7 +1433,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -1477,10 +1477,10 @@ scenario {
     }
 
     category {
-      key: "Branch Right, Speed > 20 mps, Throttle deadzone ~ 20%"
+      key: "Branch Right, Speed > 20 mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed > 20 mps, Throttle deadzone ~ 20%"
+        description: "Branch Right, Speed > 20 mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1504,16 +1504,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Right, Speed > 20 mps, Throttle 20% ~ 30%"
+      key: "Branch Right, Speed > 20 mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed > 20 mps, Throttle 20% ~ 30%"
+        description: "Branch Right, Speed > 20 mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1532,7 +1532,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -1609,10 +1609,10 @@ scenario {
     }
 
     category {
-      key: "Branch Right, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+      key: "Branch Right, Speed 0 ~ 10mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+        description: "Branch Right, Speed 0 ~ 10mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1641,16 +1641,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Right, Speed 0 ~ 10mps, Brake > 30%"
+      key: "Branch Right, Speed 0 ~ 10mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed 0 ~ 10mps, Brake > 30%"
+        description: "Branch Right, Speed 0 ~ 10mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1674,7 +1674,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -1718,10 +1718,10 @@ scenario {
     }
 
     category {
-      key: "Branch Right, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+      key: "Branch Right, Speed 10 ~ 20mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+        description: "Branch Right, Speed 10 ~ 20mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1750,16 +1750,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Right, Speed 10 ~ 20mps, Brake > 30%"
+      key: "Branch Right, Speed 10 ~ 20mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed 10 ~ 20mps, Brake > 30%"
+        description: "Branch Right, Speed 10 ~ 20mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1783,7 +1783,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -1822,10 +1822,10 @@ scenario {
     }
 
     category {
-      key: "Branch Right, Speed > 20 mps, Brake 20% ~ 30%"
+      key: "Branch Right, Speed > 20 mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed > 20 mps, Brake 20% ~ 30%"
+        description: "Branch Right, Speed > 20 mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1849,16 +1849,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Branch Right, Speed > 20 mps, Brake > 30%"
+      key: "Branch Right, Speed > 20 mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Branch Right, Speed > 20 mps, Brake > 30%"
+        description: "Branch Right, Speed > 20 mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1877,7 +1877,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -1888,10 +1888,10 @@ scenario {
   key: "Turn Left/Right"
   value {
     category {
-      key: "Turn Left, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+      key: "Turn Left, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Turn Left, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+        description: "Turn Left, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1920,16 +1920,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Turn Left, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+      key: "Turn Left, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Turn Left, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+        description: "Turn Left, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -1953,7 +1953,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -1997,10 +1997,10 @@ scenario {
     }
 
     category {
-      key: "Turn Left, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+      key: "Turn Left, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Turn Left, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+        description: "Turn Left, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2029,16 +2029,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Turn Left, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+      key: "Turn Left, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Turn Left, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+        description: "Turn Left, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2062,7 +2062,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -2144,10 +2144,10 @@ scenario {
     }
 
     category {
-      key: "Turn Left, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+      key: "Turn Left, Speed 0 ~ 10mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Turn Left, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+        description: "Turn Left, Speed 0 ~ 10mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2176,16 +2176,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Turn Left, Speed 0 ~ 10mps, Brake > 30%"
+      key: "Turn Left, Speed 0 ~ 10mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Turn Left, Speed 0 ~ 10mps, Brake > 30%"
+        description: "Turn Left, Speed 0 ~ 10mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2209,7 +2209,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -2253,10 +2253,10 @@ scenario {
     }
 
     category {
-      key: "Turn Left, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+      key: "Turn Left, Speed 10 ~ 20mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Turn Left, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+        description: "Turn Left, Speed 10 ~ 20mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2285,16 +2285,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Turn Left, Speed 10 ~ 20mps, Brake > 30%"
+      key: "Turn Left, Speed 10 ~ 20mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Turn Left, Speed 10 ~ 20mps, Brake > 30%"
+        description: "Turn Left, Speed 10 ~ 20mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2318,16 +2318,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
     
     category {
-      key: "Turn Right, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+      key: "Turn Right, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Turn Right, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+        description: "Turn Right, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2356,16 +2356,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Turn Right, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+      key: "Turn Right, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Turn Right, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+        description: "Turn Right, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2389,7 +2389,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -2433,10 +2433,10 @@ scenario {
     }
 
     category {
-      key: "Turn Right, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+      key: "Turn Right, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Turn Right, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+        description: "Turn Right, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2465,16 +2465,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Turn Right, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+      key: "Turn Right, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Turn Right, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+        description: "Turn Right, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2498,7 +2498,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -2580,10 +2580,10 @@ scenario {
     }
 
     category {
-      key: "Turn Right, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+      key: "Turn Right, Speed 0 ~ 10mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Turn Right, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+        description: "Turn Right, Speed 0 ~ 10mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2612,16 +2612,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Turn Right, Speed 0 ~ 10mps, Brake > 30%"
+      key: "Turn Right, Speed 0 ~ 10mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Turn Right, Speed 0 ~ 10mps, Brake > 30%"
+        description: "Turn Right, Speed 0 ~ 10mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2645,7 +2645,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -2689,10 +2689,10 @@ scenario {
     }
 
     category {
-      key: "Turn Right, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+      key: "Turn Right, Speed 10 ~ 20mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Turn Right, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+        description: "Turn Right, Speed 10 ~ 20mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2721,13 +2721,13 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Turn Right, Speed 10 ~ 20mps, Brake > 30%"
+      key: "Turn Right, Speed 10 ~ 20mps, Brake > 25%"
       value {
         total_frames: 6000
         description: "Turn Right, Speed 10 ~ 20mps, Brake > 30%"
@@ -2754,7 +2754,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -2765,10 +2765,10 @@ scenario {
   key: "Sharp Left/Right"
   value {
     category {
-      key: "Sharp Left, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+      key: "Sharp Left, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Sharp Left, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+        description: "Sharp Left, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2792,16 +2792,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Sharp Left, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+      key: "Sharp Left, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Sharp Left, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+        description: "Sharp Left, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2820,7 +2820,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -2859,10 +2859,10 @@ scenario {
     }
 
     category {
-      key: "Sharp Left, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+      key: "Sharp Left, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Sharp Left, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+        description: "Sharp Left, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2886,16 +2886,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Sharp Left, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+      key: "Sharp Left, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Sharp Left, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+        description: "Sharp Left, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -2914,7 +2914,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -2986,10 +2986,10 @@ scenario {
     }
 
     category {
-      key: "Sharp Left, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+      key: "Sharp Left, Speed 0 ~ 10mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Sharp Left, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+        description: "Sharp Left, Speed 0 ~ 10mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -3013,16 +3013,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Sharp Left, Speed 0 ~ 10mps, Brake > 30%"
+      key: "Sharp Left, Speed 0 ~ 10mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Sharp Left, Speed 0 ~ 10mps, Brake > 30%"
+        description: "Sharp Left, Speed 0 ~ 10mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -3041,7 +3041,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -3080,10 +3080,10 @@ scenario {
     }
 
     category {
-      key: "Sharp Left, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+      key: "Sharp Left, Speed 10 ~ 20mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Sharp Left, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+        description: "Sharp Left, Speed 10 ~ 20mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -3107,16 +3107,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Sharp Left, Speed 10 ~ 20mps, Brake > 30%"
+      key: "Sharp Left, Speed 10 ~ 20mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Sharp Left, Speed 10 ~ 20mps, Brake > 30%"
+        description: "Sharp Left, Speed 10 ~ 20mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
@@ -3135,16 +3135,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
     
     category {
-      key: "Sharp Right, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+      key: "Sharp Right, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Sharp Right, Speed 0 ~ 10mps, Throttle deadzone ~ 20%"
+        description: "Sharp Right, Speed 0 ~ 10mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: LESS_THAN
@@ -3168,16 +3168,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Sharp Right, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+      key: "Sharp Right, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Sharp Right, Speed 0 ~ 10mps, Throttle 20% ~ 30%"
+        description: "Sharp Right, Speed 0 ~ 10mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: LESS_THAN
@@ -3196,7 +3196,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -3235,10 +3235,10 @@ scenario {
     }
 
     category {
-      key: "Sharp Right, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+      key: "Sharp Right, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
       value {
         total_frames: 6000
-        description: "Sharp Right, Speed 10 ~ 20mps, Throttle deadzone ~ 20%"
+        description: "Sharp Right, Speed 10 ~ 20mps, Throttle deadzone ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: LESS_THAN
@@ -3262,16 +3262,16 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: LESS_THAN
-          value: 20
+          value: 25
         }
       }
     }
 
     category {
-      key: "Sharp Right, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+      key: "Sharp Right, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
       value {
         total_frames: 6000
-        description: "Sharp Right, Speed 10 ~ 20mps, Throttle 20% ~ 30%"
+        description: "Sharp Right, Speed 10 ~ 20mps, Throttle 25% ~ 30%"
         criterion {
           field: "steering_percentage"
           comparison_operator: LESS_THAN
@@ -3290,7 +3290,7 @@ scenario {
         criterion {
           field: "throttle_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 20
+          value: 25
         }
         criterion {
           field: "throttle_percentage"
@@ -3362,10 +3362,10 @@ scenario {
     }
 
     category {
-      key: "Sharp Right, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+      key: "Sharp Right, Speed 0 ~ 10mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Sharp Right, Speed 0 ~ 10mps, Brake 20% ~ 30%"
+        description: "Sharp Right, Speed 0 ~ 10mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: LESS_THAN
@@ -3389,16 +3389,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Sharp Right, Speed 0 ~ 10mps, Brake > 30%"
+      key: "Sharp Right, Speed 0 ~ 10mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Sharp Right, Speed 0 ~ 10mps, Brake > 30%"
+        description: "Sharp Right, Speed 0 ~ 10mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: LESS_THAN
@@ -3417,7 +3417,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
@@ -3456,10 +3456,10 @@ scenario {
     }
 
     category {
-      key: "Sharp Right, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+      key: "Sharp Right, Speed 10 ~ 20mps, Brake 20% ~ 25%"
       value {
         total_frames: 6000
-        description: "Sharp Right, Speed 10 ~ 20mps, Brake 20% ~ 30%"
+        description: "Sharp Right, Speed 10 ~ 20mps, Brake 20% ~ 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: LESS_THAN
@@ -3483,16 +3483,16 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: LESS_THAN
-          value: 30
+          value: 25
         }
       }
     }
 
     category {
-      key: "Sharp Right, Speed 10 ~ 20mps, Brake > 30%"
+      key: "Sharp Right, Speed 10 ~ 20mps, Brake > 25%"
       value {
         total_frames: 6000
-        description: "Sharp Right, Speed 10 ~ 20mps, Brake > 30%"
+        description: "Sharp Right, Speed 10 ~ 20mps, Brake > 25%"
         criterion {
           field: "steering_percentage"
           comparison_operator: LESS_THAN
@@ -3511,7 +3511,7 @@ scenario {
         criterion {
           field: "brake_percentage"
           comparison_operator: GREATER_THAN_OR_EQUAL
-          value: 30
+          value: 25
         }
       }
     }
