@@ -398,12 +398,6 @@ void ChController::Steer(double angle, double angle_spd) {
   const double real_angle =
       // vehicle_params_.max_steer_angle() / M_PI * 180 * angle / 100.0;
       vehicle_params_.max_steer_angle() * angle / 100.0;
-  const double real_angle_spd =
-      ProtocolData<::apollo::canbus::ChassisDetail>::BoundedValue(
-          vehicle_params_.min_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180,
-          vehicle_params_.max_steer_angle_rate() / M_PI * 180 * angle_spd /
-              100.0);
   steer_command_112_->set_steer_angle_cmd(real_angle);
 }
 
