@@ -104,9 +104,17 @@ Status OpenSpaceTrajectoryPartition::Process() {
       closest_point_on_trajs;
 
   std::vector<std::string> trajectories_encodings;
-
   for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& trajectory = paritioned_trajectories->at(i).first;
+    std::string trajectory_encoding;
+    if (!EncodeTrajectory(trajectory, &trajectory_encoding)) {
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Trajectory empty in trajectory partition");
+    }
+    trajectories_encodings.emplace_back(std::move(trajectory_encoding));
+  }
+
+  for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& gear = paritioned_trajectories->at(i).second;
     size_t trajectory_size = trajectory.size();
     CHECK_GT(trajectory_size, 0);
@@ -117,10 +125,6 @@ Status OpenSpaceTrajectoryPartition::Process() {
     if (flag_change_to_next) {
       break;
     }
-
-    std::string trajectory_encoding;
-    EncodeTrajectory(trajectory, &trajectory_encoding);
-    trajectories_encodings.emplace_back(trajectory_encoding);
 
     // Choose the closest point to track
     std::priority_queue<std::pair<size_t, double>,
@@ -181,8 +185,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
                                trajectories_encodings)) {
           closest_point_on_trajs.pop();
         } else {
-          break;
           closest_and_not_repeated_traj_found = true;
+          break;
         }
       }
       if (!closest_and_not_repeated_traj_found) {
@@ -277,17 +281,17 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
   const auto& last_path_point = trajectory.back().path_point();
 
   const std::string init_point_x_encoding =
-      std::to_string(static_cast<int>(init_path_point.x() * 100.0));
+      std::to_string(static_cast<int>(init_path_point.x() * 1000.0));
   const std::string init_point_y_encoding =
-      std::to_string(static_cast<int>(init_path_point.y() * 100.0));
+      std::to_string(static_cast<int>(init_path_point.y() * 1000.0));
   const std::string init_point_heading_encoding =
-      std::to_string(static_cast<int>(init_path_point.theta() * 100.0));
+      std::to_string(static_cast<int>(init_path_point.theta() * 10000.0));
   const std::string last_point_x_encoding =
-      std::to_string(static_cast<int>(last_path_point.x() * 100.0));
+      std::to_string(static_cast<int>(last_path_point.x() * 1000.0));
   const std::string last_point_y_encoding =
-      std::to_string(static_cast<int>(last_path_point.y() * 100.0));
+      std::to_string(static_cast<int>(last_path_point.y() * 1000.0));
   const std::string last_point_heading_encoding =
-      std::to_string(static_cast<int>(last_path_point.theta() * 100.0));
+      std::to_string(static_cast<int>(last_path_point.theta() * 10000.0));
 
   const std::string init_point_encoding = init_point_x_encoding + "_" +
                                           init_point_y_encoding + "_" +
@@ -296,7 +300,7 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
                                           last_point_y_encoding + "_" +
                                           last_point_heading_encoding;
 
-  *encoding = init_point_encoding + "_" + last_point_encoding;
+  *encoding = init_point_encoding + "/" + last_point_encoding;
   return true;
 }
 
