@@ -132,11 +132,11 @@ GroundPlaneTracker::GroundPlaneTracker(int track_length) {
 void GroundPlaneTracker::Push(const std::vector<float> &ph,
                               const float &inlier_ratio) {
   CHECK_EQ(ph.size(), 2);
-  int i = 0;
   int length = static_cast<int>(pitch_height_inlier_tracks_.size());
   if (head_ == 0) {
-    if (length > 3) {                      // move backwards
-      for (i = length - 1; i >= 3; i--) {  // 3: pitch, height, inlier-number
+    if (length > 3) {  // move backwards
+      // 3: pitch, height, inlier-number
+      for (auto i = length - 1; i >= 3; i--) {
         pitch_height_inlier_tracks_[i] = pitch_height_inlier_tracks_[i - 3];
       }
     }
@@ -154,12 +154,12 @@ void GroundPlaneTracker::Push(const std::vector<float> &ph,
 void GroundPlaneTracker::GetGround(float *pitch, float *cam_height) {
   CHECK_NOTNULL(pitch);
   CHECK_NOTNULL(cam_height);
-  int i = 0;
   int length = static_cast<int>(pitch_height_inlier_tracks_.size() / 3);
   if (!length) {
     *pitch = *cam_height = 0.0f;
     return;
-  } else if (length == 1) {
+  }
+  if (length == 1) {
     *pitch = pitch_height_inlier_tracks_[0];
     *cam_height = pitch_height_inlier_tracks_[1];
     return;
@@ -167,7 +167,7 @@ void GroundPlaneTracker::GetGround(float *pitch, float *cam_height) {
 
   float ph[2] = {0};
   float w = 0.0f;
-  for (i = head_; i < length; i++) {
+  for (auto i = head_; i < length; ++i) {
     w = pitch_height_inlier_tracks_.at(i * 3 + 2);
     weight_.at(i) = const_weight_temporal_.at(i) * w;
   }
@@ -176,7 +176,7 @@ void GroundPlaneTracker::GetGround(float *pitch, float *cam_height) {
   float accm_wei = common::ISum(weight_.data() + head_, (length - head_));
 
   ph[0] = ph[1] = 0.0f;
-  for (i = head_; i < length; i++) {
+  for (auto i = head_; i < length; ++i) {
     w = weight_.at(i);
     int i3 = i * 3;
     ph[0] += pitch_height_inlier_tracks_.at(i3) * w;
@@ -192,8 +192,7 @@ void GroundPlaneTracker::Restart() {
   unsigned int track_length =
       static_cast<unsigned int>(pitch_height_inlier_tracks_.size() / 3);
   auto &data = pitch_height_inlier_tracks_;
-  unsigned int i = 0;
-  for (; i < track_length; ++i) {
+  for (unsigned int i = 0; i < track_length; ++i) {
     int i3 = i * 3;
     data.at(i3) = data.at(i3 + 1) = data.at(i3 + 2) = 0.0f;
     weight_.at(i) = 0.0f;
@@ -226,54 +225,53 @@ bool CameraGroundPlaneDetector::DetetGround(float pitch, float camera_height,
     //    l_);
     ConvertGround4ToGround3(baseline_, k_mat, plane, &ground3);
     FillGroundModel(ground3);
-    AINFO << "set ground plane from outside: " << plane[0] << ", " << plane[1]
+    AINFO << "Set ground plane from outside: " << plane[0] << ", " << plane[1]
           << ", " << plane[2] << ", " << plane[3];
     ground_is_valid_ = true;
     return true;
-  } else {
-    bool success = false;
-    float inlier_ratio = 0.0f;
-    std::vector<float> ph(2, 0);
-    if (CameraGroundPlaneDetector::DetectGroundFromSamples(vd, count_vd,
-                                                           &inlier_ratio)) {
-      ADEBUG << "l: " << l_[0] << ", " << l_[1] << ", " << l_[2];
-      ground3.assign(l_, l_ + 3);
-      GetGroundPlanePitchHeight(baseline_, k_mat, ground3, &ph[0], &ph[1]);
-      ADEBUG << "ph: " << ph[0] << ", " << ph[1];
-      success = fabs(ph[0]) < params_.max_tilt_angle &&
-                ph[1] < params_.max_camera_ground_height;
-      if (success) {
-        ground_plane_tracker_->Push(ph, inlier_ratio);
-        ground_plane_tracker_->GetGround(&ph[0], &ph[1]);
-        GetGround3FromPitchHeight(k_mat, baseline_, ph[0], ph[1], &ground3);
-        FillGroundModel(ground3);
-        ADEBUG << "l tracked: " << l_[0] << ", " << l_[1] << ", " << l_[2];
-        ADEBUG << "ph tracked: " << ph[0] << ", " << ph[1];
-      }
-    }
-
+  }
+  bool success = false;
+  float inlier_ratio = 0.0f;
+  std::vector<float> ph(2, 0);
+  if (CameraGroundPlaneDetector::DetectGroundFromSamples(vd, count_vd,
+                                                         &inlier_ratio)) {
+    ADEBUG << "l: " << l_[0] << ", " << l_[1] << ", " << l_[2];
+    ground3.assign(l_, l_ + 3);
+    GetGroundPlanePitchHeight(baseline_, k_mat, ground3, &ph[0], &ph[1]);
+    ADEBUG << "ph: " << ph[0] << ", " << ph[1];
+    success = fabs(ph[0]) < params_.max_tilt_angle &&
+              ph[1] < params_.max_camera_ground_height;
     if (success) {
-      ADEBUG << "succeed with inlier ratio: " << inlier_ratio;
-      ground_is_valid_ = true;
-      return true;
-    }
-
-    // backup using last successful frame or given pitch & height
-    if (ground_plane_tracker_->GetCurTrackLength() > 0) {
+      ground_plane_tracker_->Push(ph, inlier_ratio);
       ground_plane_tracker_->GetGround(&ph[0], &ph[1]);
       GetGround3FromPitchHeight(k_mat, baseline_, ph[0], ph[1], &ground3);
       FillGroundModel(ground3);
-    } else {
-      CHECK(fabs(pitch) < params_.max_tilt_angle);
-      CHECK(camera_height < params_.max_camera_ground_height);
-      CHECK_GT(camera_height, 0.f);
-      GetGround3FromPitchHeight(k_mat, baseline_, pitch, camera_height,
-                                &ground3);
-      FillGroundModel(ground3);
+      ADEBUG << "l tracked: " << l_[0] << ", " << l_[1] << ", " << l_[2];
+      ADEBUG << "ph tracked: " << ph[0] << ", " << ph[1];
     }
-    ground_plane_tracker_->Restart();
-    return false;
   }
+
+  if (success) {
+    ADEBUG << "succeed with inlier ratio: " << inlier_ratio;
+    ground_is_valid_ = true;
+    return true;
+  }
+
+  // Backup using last successful frame or given pitch & height
+  if (ground_plane_tracker_->GetCurTrackLength() > 0) {
+    ground_plane_tracker_->GetGround(&ph[0], &ph[1]);
+    GetGround3FromPitchHeight(k_mat, baseline_, ph[0], ph[1], &ground3);
+    FillGroundModel(ground3);
+  } else {
+    CHECK(fabs(pitch) < params_.max_tilt_angle);
+    CHECK(camera_height < params_.max_camera_ground_height);
+    CHECK_GT(camera_height, 0.f);
+    GetGround3FromPitchHeight(k_mat, baseline_, pitch, camera_height,
+                              &ground3);
+    FillGroundModel(ground3);
+  }
+  ground_plane_tracker_->Restart();
+  return false;
 }
 
 bool CameraGroundPlaneDetector::DetectGroundFromSamples(float *vd, int count_vd,
@@ -288,7 +286,7 @@ bool CameraGroundPlaneDetector::DetectGroundFromSamples(float *vd, int count_vd,
 
   double kMinInlierRatio = params_.min_inlier_ratio;
   float kThresInlier = params_.thres_inlier_plane_fitting;
-  /*standard RANSAC solution*/
+  // Standard RANSAC solution
   float *vs = ss_flt_.data();
   float *ds = vs + count_vd;
   for (int i = 0; i < count_vd; ++i) {
@@ -308,11 +306,10 @@ bool CameraGroundPlaneDetector::DetectGroundFromSamples(float *vd, int count_vd,
           0.99f, kMinInlierRatio)) {
     memset(l_, 0, sizeof(float) * 3);
     return false;
-  } else {
-    *inlier_ratio = static_cast<float>(nr_inliers) *
-                    common::IRec(static_cast<float>(count_vd));
   }
 
+  *inlier_ratio = static_cast<float>(nr_inliers) *
+                  common::IRec(static_cast<float>(count_vd));
   if (*inlier_ratio < kMinInlierRatio) {
     *inlier_ratio = 0.0f;
     memset(l_, 0, sizeof(float) * 3);
