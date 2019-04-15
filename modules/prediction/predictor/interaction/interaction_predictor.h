@@ -61,6 +61,8 @@ class InteractionPredictor : public SequencePredictor {
                                const LaneSequence& lane_sequence,
                                const double acceleration);
 
+  double LongitudinalAccelerationCost(const double acceleration);
+
   double CentripetalAccelerationCost(const LaneSequence& lane_sequence,
                                      const double speed,
                                      const double acceleration);

@@ -235,19 +235,24 @@ bool InteractionPredictor::DrawTrajectory(
 double InteractionPredictor::ComputeTrajectoryCost(const Obstacle& obstacle,
     const LaneSequence& lane_sequence, const double acceleration) {
   CHECK_GT(obstacle.history_size(), 0);
-  double centri_acc_weight = FLAGS_centripedal_acceleration_cost_weight;
-  double collision_weight = FLAGS_collision_cost_weight;
   double speed = obstacle.latest_feature().speed();
   double total_cost = 0.0;
+  double lon_acc_cost = LongitudinalAccelerationCost(acceleration);
+  total_cost += FLAGS_longitudinal_acceleration_cost_weight * lon_acc_cost;
   double centri_acc_cost =
       CentripetalAccelerationCost(lane_sequence, speed, acceleration);
-  total_cost += centri_acc_weight * centri_acc_cost;
+  total_cost += FLAGS_centripedal_acceleration_cost_weight * centri_acc_cost;
   if (LowerRightOfWayThanEgo(obstacle, lane_sequence)) {
     double collision_cost =
         CollisionWithEgoVehicleCost(lane_sequence, speed, acceleration);
-    total_cost += collision_weight * collision_cost;
+    total_cost += FLAGS_collision_cost_weight * collision_cost;
   }
   return total_cost;
+}
+
+double InteractionPredictor::LongitudinalAccelerationCost(
+    const double acceleration) {
+  return acceleration * acceleration;
 }
 
 double InteractionPredictor::CentripetalAccelerationCost(
