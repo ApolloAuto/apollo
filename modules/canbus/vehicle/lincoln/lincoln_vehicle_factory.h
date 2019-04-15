@@ -44,8 +44,8 @@ namespace canbus {
 class LincolnVehicleFactory : public AbstractVehicleFactory {
  public:
   /**
-  * @brief destructor
-  */
+   * @brief destructor
+   */
   virtual ~LincolnVehicleFactory() = default;
 
   /**

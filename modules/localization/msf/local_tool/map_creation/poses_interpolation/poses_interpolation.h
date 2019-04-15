@@ -24,8 +24,8 @@
 
 #include <Eigen/Geometry>
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
 /**
  * @namespace apollo::localization

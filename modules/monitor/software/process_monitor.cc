@@ -46,8 +46,7 @@ bool ContainsAll(const std::string &full, const Iterable &parts) {
 
 ProcessMonitor::ProcessMonitor()
     : RecurrentRunner(FLAGS_process_monitor_name,
-                      FLAGS_process_monitor_interval) {
-}
+                      FLAGS_process_monitor_interval) {}
 
 void ProcessMonitor::RunOnce(const double current_time) {
   // Get running processes.
@@ -76,16 +75,16 @@ void ProcessMonitor::UpdateModule(
   for (const auto &proc : running_processes) {
     if (ContainsAll(proc.second, config.process_cmd_keywords())) {
       status->mutable_process_status()->set_running(true);
-      ADEBUG << "Module " << module_name
-             << " is running on process " << proc.first;
+      ADEBUG << "Module " << module_name << " is running on process "
+             << proc.first;
       return;
     }
   }
 
   if (status->process_status().running()) {
     // The process stopped. Send monitor log.
-    const std::string msg = apollo::common::util::StrCat(
-        module_name, " process stopped!");
+    const std::string msg =
+        apollo::common::util::StrCat(module_name, " process stopped!");
     // In autonomous driving mode, it's a critical error. Or else just warn.
     if (MonitorManager::IsInAutonomousDriving()) {
       MonitorManager::LogBuffer().ERROR(msg);

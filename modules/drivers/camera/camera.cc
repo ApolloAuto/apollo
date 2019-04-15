@@ -23,9 +23,9 @@ namespace apollo {
 namespace drivers {
 namespace camera {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 
 Camera::~Camera() { Stop(); }
 
@@ -33,8 +33,8 @@ std::string Camera::Name() const { return FLAGS_camera_module_name; }
 
 Status Camera::Init() {
   CameraConf config;
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_camera_config_file,
-                                               &config))
+  CHECK(
+      apollo::common::util::GetProtoFromFile(FLAGS_camera_config_file, &config))
       << "failed to load camera config file " << FLAGS_camera_config_file;
 
   if (!AdapterManager::Initialized()) {

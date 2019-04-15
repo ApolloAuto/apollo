@@ -40,8 +40,7 @@ using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using std::make_unique;
 
-Monitor::Monitor() : monitor_thread_(FLAGS_monitor_running_interval) {
-}
+Monitor::Monitor() : monitor_thread_(FLAGS_monitor_running_interval) {}
 
 Status Monitor::Init() {
   AdapterManager::Init(FLAGS_monitor_adapter_config_filename);
@@ -66,8 +65,8 @@ Status Monitor::Init() {
     }
   }
   // Register resource monitor.
-  monitor_thread_.RegisterRunner(make_unique<ResourceMonitor>(
-      config.resource_conf()));
+  monitor_thread_.RegisterRunner(
+      make_unique<ResourceMonitor>(config.resource_conf()));
 
   // Register online reporters.
   if (MonitorManager::GetConfig().has_online_report_endpoint()) {
@@ -87,9 +86,7 @@ Status Monitor::Start() {
   return Status::OK();
 }
 
-void Monitor::Stop() {
-  monitor_thread_.Stop();
-}
+void Monitor::Stop() { monitor_thread_.Stop(); }
 
 }  // namespace monitor
 }  // namespace apollo

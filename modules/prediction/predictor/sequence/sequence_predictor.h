@@ -26,12 +26,12 @@
 #include <unordered_set>
 #include <vector>
 
-#include "gtest/gtest.h"
 #include "Eigen/Dense"
+#include "gtest/gtest.h"
 
 #include "modules/common/macro.h"
-#include "modules/prediction/proto/lane_graph.pb.h"
 #include "modules/prediction/predictor/predictor.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -113,8 +113,7 @@ class SequencePredictor : public Predictor {
    * @return Boolean if the lane sequence is enabled
    */
   bool LaneSequenceWithMaxProb(const LaneChangeType& type,
-                               const double probability,
-                               const double max_prob);
+                               const double probability, const double max_prob);
 
   /**
    * @brief Pick the lane change sequence with highest probability

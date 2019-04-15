@@ -167,9 +167,7 @@ void ControlTestBase::SetUpTestCase() {
   FLAGS_is_control_test_mode = true;
 }
 
-void ControlTestBase::SetUp() {
-  ++s_seq_num_;
-}
+void ControlTestBase::SetUp() { ++s_seq_num_; }
 
 }  // namespace control
 }  // namespace apollo

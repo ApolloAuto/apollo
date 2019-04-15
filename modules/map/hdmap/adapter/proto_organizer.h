@@ -24,8 +24,8 @@ limitations under the License.
 
 #include "modules/common/util/util.h"
 
-#include "modules/map/proto/map.pb.h"
 #include "modules/map/hdmap/adapter/xml_parser/common_define.h"
+#include "modules/map/proto/map.pb.h"
 
 namespace apollo {
 namespace hdmap {

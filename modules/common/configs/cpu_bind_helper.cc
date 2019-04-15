@@ -28,10 +28,9 @@
 namespace apollo {
 namespace common {
 
-CpuBindHelper::CpuBindHelper() {
-}
+CpuBindHelper::CpuBindHelper() {}
 
-void CpuBindHelper::Init(const std::string &config_file) {
+void CpuBindHelper::Init(const std::string& config_file) {
   init_ = true;
   YAML::Node root_node = YAML::LoadFile(config_file);
   if (root_node["cpubind"]) {
@@ -71,5 +70,3 @@ void CpuBindHelper::BindCpu(const std::string& module_name) {
 
 }  // namespace common
 }  // namespace apollo
-
-

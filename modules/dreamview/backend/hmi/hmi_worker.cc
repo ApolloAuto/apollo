@@ -215,7 +215,7 @@ void HMIWorker::SubmitDriveEvent(const uint64_t event_time_ms,
     if (DriveEvent::Type_Parse(type_name, &type)) {
       drive_event.add_type(type);
     } else {
-      AERROR << "Failed to parse drive event type:" <<type_name;
+      AERROR << "Failed to parse drive event type:" << type_name;
     }
   }
   AdapterManager::PublishDriveEvent(drive_event);

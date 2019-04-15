@@ -71,8 +71,8 @@ namespace apollo {
 namespace perception {
 
 using apollo::common::Header;
-using apollo::drivers::ContiRadarObs;
 using apollo::drivers::ContiRadar;
+using apollo::drivers::ContiRadarObs;
 
 struct RadarDetectorOptions {
   Eigen::Matrix4d *radar2world_pose = nullptr;

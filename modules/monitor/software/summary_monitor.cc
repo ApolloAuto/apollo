@@ -141,8 +141,8 @@ void SummaryMonitor::SummarizeHardware() {
         case HardwareStatus::NOT_PRESENT:
           UpdateStatusSummary(Summary::FATAL, status->detailed_msg(), status);
           break;
-        case HardwareStatus::NOT_READY:  // Fall through.
-        case HardwareStatus::WARN:  // Fall through.
+        case HardwareStatus::NOT_READY:             // Fall through.
+        case HardwareStatus::WARN:                  // Fall through.
         case HardwareStatus::GPS_UNSTABLE_WARNING:  // Fall through.
         case HardwareStatus::GPS_UNSTABLE_ERROR:
           // GPS instability could be a fatal error if it's the only

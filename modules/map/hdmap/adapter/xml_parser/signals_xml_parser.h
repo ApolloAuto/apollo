@@ -41,7 +41,7 @@ class SignalsXmlParser {
   static Status ToPbSignalType(const std::string& xml_type,
                                PbSignalType* signal_type);
   static Status ToPbSubSignalType(const std::string& xml_type,
-                               PbSubSignalType* sub_signal_type);
+                                  PbSubSignalType* sub_signal_type);
 };
 
 }  // namespace adapter

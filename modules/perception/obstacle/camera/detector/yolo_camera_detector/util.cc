@@ -28,10 +28,10 @@ namespace apollo {
 namespace perception {
 namespace yolo {
 
+using std::ifstream;
+using std::map;
 using std::string;
 using std::vector;
-using std::map;
-using std::ifstream;
 
 bool load_types(const string &path, vector<ObjectType> *types) {
   const map<string, ObjectType> type_map = {

@@ -472,9 +472,7 @@ void GemController::SetTurningSignal(const ControlCommand& command) {
   }
 }
 
-void GemController::ResetProtocol() {
-  message_manager_->ResetSendMessages();
-}
+void GemController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
 bool GemController::CheckChassisError() {
   // TODO(QiL) : implement it here

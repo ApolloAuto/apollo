@@ -64,7 +64,7 @@ class Parser {
   // Return a pointer to rtcm v3 parser. The caller should take ownership.
   static Parser *CreateRtcmV3(bool is_base_station = false);
 
-  static Parser* createZhd(const config::Config& config);
+  static Parser *createZhd(const config::Config &config);
 
   virtual ~Parser() {}
 

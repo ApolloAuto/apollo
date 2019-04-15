@@ -15,8 +15,8 @@
  *****************************************************************************/
 
 /**
-* @file
-**/
+ * @file
+ **/
 
 #ifndef MODULES_COMMON_UTIL_THREAD_POOL_H_
 #define MODULES_COMMON_UTIL_THREAD_POOL_H_
@@ -31,11 +31,11 @@ namespace common {
 namespace util {
 
 /**
-* @class ThreadPool
-*
-* @brief A wrapper around ctpl thread pool.
-* TODO(authors): Eventually migrate other threadpool usages to this.
-*/
+ * @class ThreadPool
+ *
+ * @brief A wrapper around ctpl thread pool.
+ * TODO(authors): Eventually migrate other threadpool usages to this.
+ */
 
 class ThreadPool {
  public:

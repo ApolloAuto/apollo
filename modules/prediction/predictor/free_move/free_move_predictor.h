@@ -61,8 +61,8 @@ class FreeMovePredictor : public Predictor {
    */
   void DrawFreeMoveTrajectoryPoints(
       const Eigen::Vector2d& position, const Eigen::Vector2d& velocity,
-      const Eigen::Vector2d& acc, const double theta,
-      const double total_time, const double period,
+      const Eigen::Vector2d& acc, const double theta, const double total_time,
+      const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 };
 

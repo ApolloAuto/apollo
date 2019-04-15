@@ -79,9 +79,7 @@ TEST(MathUtilsTest, Sqr) {
   EXPECT_DOUBLE_EQ(169.0, Sqr(-13.0));
 }
 
-TEST(MathUtilsTest, Sigmoid) {
-  EXPECT_DOUBLE_EQ(0.5, Sigmoid(0.0));
-}
+TEST(MathUtilsTest, Sigmoid) { EXPECT_DOUBLE_EQ(0.5, Sigmoid(0.0)); }
 
 TEST(MathUtilsTest, Clamp) {
   EXPECT_EQ(1, Clamp(1, 0, 6));

@@ -25,8 +25,8 @@ namespace apollo {
 namespace common {
 
 using apollo::common::time::Clock;
-using tf2_msgs::TFMessage;
 using std::placeholders::_1;
+using tf2_msgs::TFMessage;
 
 TransformListener::TransformListener(tf2::BufferCore* buffer,
                                      ros::NodeHandle* nh, bool spin_thread)

@@ -24,19 +24,29 @@ namespace localization {
 namespace msf {
 
 LidarMsgTransfer::LidarMsgTransfer()
-    : width_(0), height_(0), x_offset_(0), y_offset_(0), z_offset_(0),
-      t_offset_(0), i_offset_(0), x_datatype_(0), y_datatype_(0),
-      z_datatype_(0), x_count_(0), y_count_(0), z_count_(0) {}
+    : width_(0),
+      height_(0),
+      x_offset_(0),
+      y_offset_(0),
+      z_offset_(0),
+      t_offset_(0),
+      i_offset_(0),
+      x_datatype_(0),
+      y_datatype_(0),
+      z_datatype_(0),
+      x_count_(0),
+      y_count_(0),
+      z_count_(0) {}
 
-void LidarMsgTransfer::Transfer(
-    const sensor_msgs::PointCloud2 &message, LidarFrame *lidar_frame) {
+void LidarMsgTransfer::Transfer(const sensor_msgs::PointCloud2 &message,
+                                LidarFrame *lidar_frame) {
   LidarMsgTransfer transfer;
   transfer.TransferCloud(message, lidar_frame);
   return;
 }
 
-void LidarMsgTransfer::TransferCloud(
-    const sensor_msgs::PointCloud2 &lidar_data, LidarFrame *lidar_frame) {
+void LidarMsgTransfer::TransferCloud(const sensor_msgs::PointCloud2 &lidar_data,
+                                     LidarFrame *lidar_frame) {
   CHECK_NOTNULL(lidar_frame);
 
   ParseCloudField(lidar_data);
@@ -61,8 +71,7 @@ void LidarMsgTransfer::TransferCloud(
   lidar_frame->measurement_time = lidar_data.header.stamp.toSec();
 
   if (FLAGS_lidar_debug_log_flag) {
-    AINFO << std::setprecision(16)
-          << "LidarMsgTransfer Debug Log: lidar msg. "
+    AINFO << std::setprecision(16) << "LidarMsgTransfer Debug Log: lidar msg. "
           << "[time:" << lidar_frame->measurement_time << "]"
           << "[height:" << lidar_data.height << "]"
           << "[width:" << lidar_data.width << "]"
@@ -70,8 +79,7 @@ void LidarMsgTransfer::TransferCloud(
           << "[data_type:" << x_datatype_ << "]"
           << "[point_cnt:" << x_count_ << "]"
           << "[intensity_cnt:"
-          << static_cast<unsigned int>(lidar_frame->intensities.size())
-          << "]";
+          << static_cast<unsigned int>(lidar_frame->intensities.size()) << "]";
   }
   return;
 }
@@ -82,7 +90,7 @@ void LidarMsgTransfer::ParseCloudField(
   height_ = lidar_data.height;
 
   for (size_t i = 0; i < lidar_data.fields.size(); ++i) {
-    const sensor_msgs::PointField& f = lidar_data.fields[i];
+    const sensor_msgs::PointField &f = lidar_data.fields[i];
     if (f.name == "x") {
       x_offset_ = f.offset;
       x_datatype_ = f.datatype;
@@ -104,7 +112,7 @@ void LidarMsgTransfer::ParseCloudField(
 
   CHECK(x_datatype_ == y_datatype_ && y_datatype_ == z_datatype_);
   CHECK(x_datatype_ == 7 || x_datatype_ == 8);
-  CHECK(x_count_ > 0 && y_count_ > 0 && z_count_ >0);
+  CHECK(x_count_ > 0 && y_count_ > 0 && z_count_ > 0);
 
   return;
 }
@@ -118,14 +126,14 @@ void LidarMsgTransfer::TransferOrganizedCloud32(
       uint32_t index = i * lidar_data.width + j;
       Eigen::Vector3d pt3d;
       uint32_t offset = index * lidar_data.point_step;
-      pt3d[0] = static_cast<const double>(*reinterpret_cast<const float*>(
+      pt3d[0] = static_cast<const double>(*reinterpret_cast<const float *>(
           &lidar_data.data[offset + x_offset_]));
-      pt3d[1] = static_cast<const double>(*reinterpret_cast<const float*>(
+      pt3d[1] = static_cast<const double>(*reinterpret_cast<const float *>(
           &lidar_data.data[offset + y_offset_]));
-      pt3d[2] = static_cast<const double>(*reinterpret_cast<const float*>(
+      pt3d[2] = static_cast<const double>(*reinterpret_cast<const float *>(
           &lidar_data.data[offset + z_offset_]));
       if (!std::isnan(pt3d[0])) {
-        unsigned char intensity = *reinterpret_cast<const unsigned char*>(
+        unsigned char intensity = *reinterpret_cast<const unsigned char *>(
             &lidar_data.data[offset + i_offset_]);
         lidar_frame->pt_xs.push_back(pt3d[0]);
         lidar_frame->pt_ys.push_back(pt3d[1]);
@@ -146,14 +154,14 @@ void LidarMsgTransfer::TransferOrganizedCloud64(
       uint32_t index = i * lidar_data.width + j;
       Eigen::Vector3d pt3d;
       uint32_t offset = index * lidar_data.point_step;
-      pt3d[0] = *reinterpret_cast<const double*>(
+      pt3d[0] = *reinterpret_cast<const double *>(
           &lidar_data.data[offset + x_offset_]);
-      pt3d[1] = *reinterpret_cast<const double*>(
+      pt3d[1] = *reinterpret_cast<const double *>(
           &lidar_data.data[offset + y_offset_]);
-      pt3d[2] = *reinterpret_cast<const double*>(
+      pt3d[2] = *reinterpret_cast<const double *>(
           &lidar_data.data[offset + z_offset_]);
       if (!std::isnan(pt3d[0])) {
-        unsigned char intensity = *reinterpret_cast<const unsigned char*>(
+        unsigned char intensity = *reinterpret_cast<const unsigned char *>(
             &lidar_data.data[offset + i_offset_]);
         lidar_frame->pt_xs.push_back(pt3d[0]);
         lidar_frame->pt_ys.push_back(pt3d[1]);
@@ -174,14 +182,14 @@ void LidarMsgTransfer::TransferUnorganizedCloud32(
       uint32_t index = i * lidar_data.width + j;
       Eigen::Vector3d pt3d;
       uint32_t offset = index * lidar_data.point_step;
-      pt3d[0] = static_cast<const double>(*reinterpret_cast<const float*>(
+      pt3d[0] = static_cast<const double>(*reinterpret_cast<const float *>(
           &lidar_data.data[offset + x_offset_]));
-      pt3d[1] = static_cast<const double>(*reinterpret_cast<const float*>(
+      pt3d[1] = static_cast<const double>(*reinterpret_cast<const float *>(
           &lidar_data.data[offset + y_offset_]));
-      pt3d[2] = static_cast<const double>(*reinterpret_cast<const float*>(
+      pt3d[2] = static_cast<const double>(*reinterpret_cast<const float *>(
           &lidar_data.data[offset + z_offset_]));
       if (!std::isnan(pt3d[0])) {
-        unsigned char intensity = *reinterpret_cast<const unsigned char*>(
+        unsigned char intensity = *reinterpret_cast<const unsigned char *>(
             &lidar_data.data[offset + i_offset_]);
         lidar_frame->pt_xs.push_back(pt3d[0]);
         lidar_frame->pt_ys.push_back(pt3d[1]);
@@ -202,14 +210,14 @@ void LidarMsgTransfer::TransferUnorganizedCloud64(
       uint32_t index = i * lidar_data.width + j;
       Eigen::Vector3d pt3d;
       uint32_t offset = index * lidar_data.point_step;
-      pt3d[0] = *reinterpret_cast<const double*>(
+      pt3d[0] = *reinterpret_cast<const double *>(
           &lidar_data.data[offset + x_offset_]);
-      pt3d[1] = *reinterpret_cast<const double*>(
+      pt3d[1] = *reinterpret_cast<const double *>(
           &lidar_data.data[offset + y_offset_]);
-      pt3d[2] = *reinterpret_cast<const double*>(
+      pt3d[2] = *reinterpret_cast<const double *>(
           &lidar_data.data[offset + z_offset_]);
       if (!std::isnan(pt3d[0])) {
-        unsigned char intensity = *reinterpret_cast<const unsigned char*>(
+        unsigned char intensity = *reinterpret_cast<const unsigned char *>(
             &lidar_data.data[offset + i_offset_]);
         lidar_frame->pt_xs.push_back(pt3d[0]);
         lidar_frame->pt_ys.push_back(pt3d[1]);

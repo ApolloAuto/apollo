@@ -42,8 +42,8 @@ namespace canbus {
 class ChVehicleFactory : public AbstractVehicleFactory {
  public:
   /**
-  * @brief destructor
-  */
+   * @brief destructor
+   */
   virtual ~ChVehicleFactory() = default;
 
   /**
@@ -62,4 +62,3 @@ class ChVehicleFactory : public AbstractVehicleFactory {
 
 }  // namespace canbus
 }  // namespace apollo
-

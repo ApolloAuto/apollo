@@ -73,7 +73,7 @@ class LocalizationIntegImpl {
   // gnss best pose process
   void GnssBestPoseProcess(const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
-  void GnssHeadingProcess(const drivers::gnss::Heading &gnssheading_msg);
+  void GnssHeadingProcess(const drivers::gnss::Heading& gnssheading_msg);
 
   void GetLastestLidarLocalization(LocalizationMeasureState* state,
                                    LocalizationEstimate* lidar_localization);
@@ -109,7 +109,7 @@ class LocalizationIntegImpl {
       const drivers::gnss::GnssBestPose& bestgnsspos_msg);
 
   void GnssHeadingThreadLoop();
-  void GnssHeadingProcessImpl(const drivers::gnss::Heading &gnssheading_msg);
+  void GnssHeadingProcessImpl(const drivers::gnss::Heading& gnssheading_msg);
 
   void TransferGnssMeasureToLocalization(const MeasureData& measure,
                                          LocalizationEstimate* localization);

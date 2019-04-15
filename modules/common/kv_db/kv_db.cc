@@ -33,7 +33,7 @@ class BlockingEnv : public leveldb::EnvWrapper {
   BlockingEnv() : leveldb::EnvWrapper(leveldb::Env::Default()) {}
 
   // Block on trying to lock file.
-  leveldb::Status LockFile(const std::string& fname, leveldb::FileLock** lock) {
+  leveldb::Status LockFile(const std::string &fname, leveldb::FileLock **lock) {
     constexpr unsigned int USLEEP_INTERVAL = 100 * 1000;  // 0.1 second.
     while (!leveldb::EnvWrapper::LockFile(fname, lock).ok()) {
       AINFO_EVERY(100) << "Trying to get KVDB lock.";

@@ -16,8 +16,7 @@
 #include "transform.h"
 
 /** Main node entry point. */
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   ros::init(argc, argv, "transform_node");
 
   // create conversion class, which subscribes to raw data

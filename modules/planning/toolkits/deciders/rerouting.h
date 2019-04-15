@@ -38,7 +38,7 @@ class Rerouting : public TrafficRule {
   virtual ~Rerouting() = default;
 
   common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+                           ReferenceLineInfo* const reference_line_info);
 
  private:
   bool ChangeLaneFailRerouting();

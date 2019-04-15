@@ -27,9 +27,7 @@ class VehicleFactoryTest : public ::testing::Test {
  public:
   VehicleFactoryTest() : factory_() {}
 
-  virtual void SetUp() {
-    factory_.RegisterVehicleFactory();
-  }
+  virtual void SetUp() { factory_.RegisterVehicleFactory(); }
   virtual void TearDown() {}
 
  protected:
@@ -48,4 +46,3 @@ TEST_F(VehicleFactoryTest, CreateVehicle) {
 
 }  // namespace canbus
 }  // namespace apollo
-

@@ -41,16 +41,13 @@ class LateralQPOptimizer {
 
   virtual ~LateralQPOptimizer() = default;
 
-  bool optimize(
-      const std::array<double, 3>& d_state,
-      const double delta_s,
-      const std::vector<std::pair<double, double>>& d_bounds);
+  bool optimize(const std::array<double, 3>& d_state, const double delta_s,
+                const std::vector<std::pair<double, double>>& d_bounds);
 
   PiecewiseJerkTrajectory1d GetOptimalTrajectory() const;
 
  private:
-  void Init(const std::array<double, 3>& d_state,
-            const double delta_s,
+  void Init(const std::array<double, 3>& d_state, const double delta_s,
             const std::vector<std::pair<double, double>>& d_bounds);
 
  private:

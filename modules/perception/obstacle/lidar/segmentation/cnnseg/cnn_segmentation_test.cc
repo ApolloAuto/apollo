@@ -235,9 +235,8 @@ TEST(CNNSegmentationTest, CnnSegDet) {
   // do visualization of segmentation results (output object detections)
   string result_file(FLAGS_test_dir);
   result_file = result_file + FLAGS_pcd_name + "-detection.txt";
-  DrawDetection(in_pc, valid_idx, cnn_segmentor.height(),
-                cnn_segmentor.width(), cnn_segmentor.range(), out_objects,
-                result_file);
+  DrawDetection(in_pc, valid_idx, cnn_segmentor.height(), cnn_segmentor.width(),
+                cnn_segmentor.range(), out_objects, result_file);
 #endif
 }
 

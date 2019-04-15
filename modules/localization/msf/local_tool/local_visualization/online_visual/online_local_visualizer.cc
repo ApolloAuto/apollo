@@ -31,12 +31,12 @@ namespace apollo {
 namespace localization {
 namespace msf {
 
-using ::Eigen::Vector3d;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::ImuAdapter;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
 using apollo::common::time::Clock;
+using ::Eigen::Vector3d;
 
 OnlineLocalVisualizer::OnlineLocalVisualizer()
     : monitor_logger_(MonitorMessageItem::LOCALIZATION) {}

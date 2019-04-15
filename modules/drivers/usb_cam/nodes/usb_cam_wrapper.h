@@ -1,29 +1,31 @@
 #ifndef USB_CAM_INCLUDE_USB_CAM_USBCAMWRAPPER_H_
 #define USB_CAM_INCLUDE_USB_CAM_USBCAMWRAPPER_H_
 
-#include <ros/ros.h>
-#include <usb_cam/usb_cam.h>
-#include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
+#include <image_transport/image_transport.h>
 #include <pluginlib/class_loader.h>
-#include <sstream>
+#include <ros/ros.h>
 #include <std_srvs/Empty.h>
+#include <usb_cam/usb_cam.h>
+#include <sstream>
 
 namespace usb_cam {
 
 enum TriggerFrequence {
-    FPS_10HZ = 10,
-    FPS_15HZ = 15,
-    FPS_20HZ = 20,
-    DEFAULT_FPS = 30
+  FPS_10HZ = 10,
+  FPS_15HZ = 15,
+  FPS_20HZ = 20,
+  DEFAULT_FPS = 30
 };
 
 class UsbCamWrapper {
  public:
   UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh);
   virtual ~UsbCamWrapper();
-  bool service_start_cap(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
-  bool service_stop_cap(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
+  bool service_start_cap(std_srvs::Empty::Request &req,
+                         std_srvs::Empty::Response &res);
+  bool service_stop_cap(std_srvs::Empty::Request &req,
+                        std_srvs::Empty::Response &res);
   bool take_and_send_image();
   bool spin();
 
@@ -31,7 +33,7 @@ class UsbCamWrapper {
   // shared image message
   sensor_msgs::Image img_;
   sensor_msgs::CameraInfoPtr cam_info_ = nullptr;
-  //image_transport::CameraPublisher image_pub_;
+  // image_transport::CameraPublisher image_pub_;
 
   image_transport::PubLoaderPtr pub_loader_;
   boost::shared_ptr<image_transport::PublisherPlugin> image_pub_plugin_;
@@ -40,20 +42,20 @@ class UsbCamWrapper {
 
   // parameters
   std::string topic_name_;
-  std::string video_device_name_; 
-  std::string io_method_name_; 
+  std::string video_device_name_;
+  std::string io_method_name_;
   std::string pixel_format_name_;
   std::string camera_name_;
   std::string camera_info_url_;
 
-  //std::string start_service_name_, start_service_name_;
-  //bool streaming_status_;
+  // std::string start_service_name_, start_service_name_;
+  // bool streaming_status_;
   int image_width_;
   int image_height_;
   int framerate_;
   int exposure_;
   int brightness_;
-  int contrast_; 
+  int contrast_;
   int saturation_;
   int sharpness_;
   int focus_;
@@ -71,8 +73,8 @@ class UsbCamWrapper {
   UsbCam cam_;
   boost::shared_ptr<camera_info_manager::CameraInfoManager> cinfo_;
 
-  ros::ServiceServer service_start_; 
-  ros::ServiceServer service_stop_; 
+  ros::ServiceServer service_start_;
+  ros::ServiceServer service_stop_;
 
   // private ROS node handle
   ros::NodeHandle node_;
@@ -84,6 +86,6 @@ class UsbCamWrapper {
   float spin_interval_;
   int error_code_;
 };
-}
+}  // namespace usb_cam
 
 #endif /* USB_CAM_INCLUDE_USB_CAM_USBCAMWRAPPER_H_ */

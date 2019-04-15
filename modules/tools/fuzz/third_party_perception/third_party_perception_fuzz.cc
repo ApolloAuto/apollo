@@ -16,12 +16,12 @@
 
 #define private public
 
-#include "modules/third_party_perception/third_party_perception.h"
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/third_party_perception/common/third_party_perception_gflags.h"
+#include "modules/third_party_perception/third_party_perception.h"
 #include "modules/tools/fuzz/third_party_perception/proto/third_party_perception_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
@@ -31,8 +31,8 @@ namespace third_party_perception {
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterManagerConfig;
-using apollo::tools::fuzz::third_party_perception
-    ::ThirdPartyPerceptionFuzzMessage;
+using apollo::tools::fuzz::third_party_perception ::
+    ThirdPartyPerceptionFuzzMessage;
 
 class ThirdPartyPerceptionFuzz {
  public:
@@ -91,9 +91,8 @@ void ThirdPartyPerceptionFuzz::Fuzz(
   third_party_perception_->OnTimer(event);
 }
 
-DEFINE_PROTO_FUZZER(
-    const ThirdPartyPerceptionFuzzMessage& third_party_perception_fuzz_message
-  ) {
+DEFINE_PROTO_FUZZER(const ThirdPartyPerceptionFuzzMessage
+                        &third_party_perception_fuzz_message) {
   third_party_perception_fuzzer.Fuzz(third_party_perception_fuzz_message);
 }
 

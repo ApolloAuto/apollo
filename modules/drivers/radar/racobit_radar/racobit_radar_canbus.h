@@ -57,20 +57,20 @@ namespace drivers {
 namespace racobit_radar {
 
 /**
-* @class RacobitRadarCanbus
-*
-* @brief template of canbus-based sensor module main class (e.g.,
-* racobit_radar).
-*/
+ * @class RacobitRadarCanbus
+ *
+ * @brief template of canbus-based sensor module main class (e.g.,
+ * racobit_radar).
+ */
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
 using apollo::common::time::Clock;
-using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanClient;
+using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SenderMessage;
 using apollo::drivers::canbus::SensorCanbusConf;
@@ -83,26 +83,26 @@ class RacobitRadarCanbus : public apollo::common::ApolloApp {
       : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
   /**
-  * @brief obtain module name
-  * @return module name
-  */
+   * @brief obtain module name
+   * @return module name
+   */
   std::string Name() const override;
 
   /**
-  * @brief module initialization function
-  * @return initialization status
-  */
+   * @brief module initialization function
+   * @return initialization status
+   */
   apollo::common::Status Init() override;
 
   /**
-  * @brief module start function
-  * @return start status
-  */
+   * @brief module start function
+   * @return start status
+   */
   apollo::common::Status Start() override;
 
   /**
-  * @brief module stop function
-  */
+   * @brief module stop function
+   */
   void Stop() override;
 
  private:

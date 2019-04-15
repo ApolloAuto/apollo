@@ -47,9 +47,9 @@
 namespace apollo {
 namespace perception {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 
 std::string Perception::Name() const { return "perception"; }
 

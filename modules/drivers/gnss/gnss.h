@@ -45,16 +45,16 @@ namespace drivers {
 namespace gnss {
 
 /**
-* @class
-*
-* @brief smarterere camera sensor module main class.
-*/
+ * @class
+ *
+ * @brief smarterere camera sensor module main class.
+ */
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
 
 class GnssDriver : public apollo::common::ApolloApp {
  public:
@@ -62,26 +62,26 @@ class GnssDriver : public apollo::common::ApolloApp {
       : monitor_logger_(apollo::common::monitor::MonitorMessageItem::GNSS) {}
 
   /**
-  * @brief obtain module name
-  * @return module name
-  */
+   * @brief obtain module name
+   * @return module name
+   */
   std::string Name() const override;
 
   /**
-  * @brief module initialization function
-  * @return initialization status
-  */
+   * @brief module initialization function
+   * @return initialization status
+   */
   apollo::common::Status Init() override;
 
   /**
-  * @brief module start function
-  * @return start status
-  */
+   * @brief module start function
+   * @return start status
+   */
   apollo::common::Status Start() override;
 
   /**
-  * @brief module stop function
-  */
+   * @brief module stop function
+   */
   void Stop() override;
 
  private:

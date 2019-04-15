@@ -17,9 +17,9 @@
 #ifndef MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
 #define MODULES_PREDICTION_COMMON_PREDICTION_UTIL_H_
 
+#include <array>
 #include <utility>
 #include <vector>
-#include <array>
 
 #include "Eigen/Dense"
 #include "modules/common/proto/pnc_point.pb.h"
@@ -66,10 +66,9 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
  * @param parameter of the quintic polynomial.
  * @return order of derivative to evaluate.
  */
-double EvaluateQuinticPolynomial(
-    const std::array<double, 6>& coeffs,
-    const double t, const uint32_t order,
-    const double end_t, const double end_v);
+double EvaluateQuinticPolynomial(const std::array<double, 6>& coeffs,
+                                 const double t, const uint32_t order,
+                                 const double end_t, const double end_v);
 
 /**
  * @brief Evaluate quartic polynomial.
@@ -77,10 +76,9 @@ double EvaluateQuinticPolynomial(
  * @param parameter of the quartic polynomial.
  * @return order of derivative to evaluate.
  */
-double EvaluateQuarticPolynomial(
-    const std::array<double, 5>& coeffs,
-    const double t, const uint32_t order,
-    const double end_t, const double end_v);
+double EvaluateQuarticPolynomial(const std::array<double, 5>& coeffs,
+                                 const double t, const uint32_t order,
+                                 const double end_t, const double end_v);
 
 }  // namespace math_util
 

@@ -31,8 +31,8 @@
 namespace apollo {
 namespace perception {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::VehicleStateProvider;
+using apollo::common::adapter::AdapterManager;
 
 bool UltrasonicObstacleSubnode::InitInternal() {
   if (!InitAlgorithmPlugin()) {

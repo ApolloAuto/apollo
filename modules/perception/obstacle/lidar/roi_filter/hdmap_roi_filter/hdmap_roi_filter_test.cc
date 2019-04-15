@@ -85,9 +85,7 @@ class HdmapROIFilterTest : public testing::Test, HdmapROIFilter {
   pcl_util::PointCloudPtr pts_cloud_ptr_;
 };
 
-void HdmapROIFilterTest::init() {
-  ASSERT_TRUE(Init());
-}
+void HdmapROIFilterTest::init() { ASSERT_TRUE(Init()); }
 
 void HdmapROIFilterTest::filter() {
   pcl_util::PointIndices indices;

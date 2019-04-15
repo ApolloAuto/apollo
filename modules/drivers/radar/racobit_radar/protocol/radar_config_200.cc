@@ -22,8 +22,8 @@ namespace apollo {
 namespace drivers {
 namespace racobit_radar {
 
-using apollo::drivers::canbus::Byte;
 using apollo::drivers::RacobitRadar;
+using apollo::drivers::canbus::Byte;
 
 const uint32_t RadarConfig200::ID = 0x200;
 

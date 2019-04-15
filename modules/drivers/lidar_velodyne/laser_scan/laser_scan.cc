@@ -25,7 +25,7 @@ namespace lidar_velodyne {
 namespace {
 const int ring = -1;
 const double resolution = 0.007;
-}
+}  // namespace
 
 VelodyneLaserScan::VelodyneLaserScan(ros::NodeHandle& nh,
                                      ros::NodeHandle& nh_priv)

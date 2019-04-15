@@ -187,34 +187,31 @@ class Cluster2D {
     CHECK_EQ(static_cast<size_t>(count_obstacles), obstacles_.size());
   }
 
-  void FilterNoise(std::vector<int> *grids,
-                    const float* count_pt_ptr,
-                    const float enable_filter_thresh,
-                    const float filter_thresh) {
-      int ngrid = static_cast<int>(grids->size());
-      float max_pt_num = 0;
-      for (int j = ngrid-1; j >= 0; j--) {
-        max_pt_num = std::max(max_pt_num, count_pt_ptr[(*grids)[j]]);
-      }
-      max_pt_num = std::exp(max_pt_num);
-      if (max_pt_num < enable_filter_thresh)
-        return;
+  void FilterNoise(std::vector<int>* grids, const float* count_pt_ptr,
+                   const float enable_filter_thresh,
+                   const float filter_thresh) {
+    int ngrid = static_cast<int>(grids->size());
+    float max_pt_num = 0;
+    for (int j = ngrid - 1; j >= 0; j--) {
+      max_pt_num = std::max(max_pt_num, count_pt_ptr[(*grids)[j]]);
+    }
+    max_pt_num = std::exp(max_pt_num);
+    if (max_pt_num < enable_filter_thresh) return;
 
-      for (int j = ngrid-1; j >= 0; j--) {
-        float grid_pt_num = std::exp(count_pt_ptr[(*grids)[j]]);
+    for (int j = ngrid - 1; j >= 0; j--) {
+      float grid_pt_num = std::exp(count_pt_ptr[(*grids)[j]]);
 
-        if (grid_pt_num < filter_thresh) {
-          id_img_[(*grids)[j]] = -1;  //  reset to background
-          (*grids)[j] = grids->back();
-          grids->pop_back();
-        }
+      if (grid_pt_num < filter_thresh) {
+        id_img_[(*grids)[j]] = -1;  //  reset to background
+        (*grids)[j] = grids->back();
+        grids->pop_back();
       }
+    }
   }
 
   void Filter(const caffe::Blob<float>& confidence_pt_blob,
               const caffe::Blob<float>& height_pt_blob,
-              const float* count_pt_ptr,
-              const float filter_thresh,
+              const float* count_pt_ptr, const float filter_thresh,
               const float enable_filter_thresh) {
     const float* confidence_pt_data = confidence_pt_blob.cpu_data();
     const float* height_pt_data = height_pt_blob.cpu_data();
@@ -224,10 +221,7 @@ class Cluster2D {
       CHECK_GT(obs->grids.size(), 0);
 
       auto& grids = obs->grids;
-      FilterNoise(&grids,
-                  count_pt_ptr,
-                  enable_filter_thresh,
-                  filter_thresh);
+      FilterNoise(&grids, count_pt_ptr, enable_filter_thresh, filter_thresh);
 
       double score = 0.0;
       double height = 0.0;
@@ -301,11 +295,11 @@ class Cluster2D {
         continue;
       }
 
-  //    ADEBUG << "cnnseg cluster id: " << obstacle_id << " pt_number: ";
-  //    for (auto &grid : obs->grids) {
-  //      ADEBUG << static_cast<int>(std::exp(count_pt_ptr[grid])) << " ";
-  //    }
-  //    ADEBUG << std::endl;
+      //    ADEBUG << "cnnseg cluster id: " << obstacle_id << " pt_number: ";
+      //    for (auto &grid : obs->grids) {
+      //      ADEBUG << static_cast<int>(std::exp(count_pt_ptr[grid])) << " ";
+      //    }
+      //    ADEBUG << std::endl;
       std::shared_ptr<Object> out_obj(new apollo::perception::Object);
       out_obj->cloud = obs->cloud;
       out_obj->score = obs->score;

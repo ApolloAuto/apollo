@@ -25,36 +25,32 @@
 #include <dynamic_reconfigure/server.h>
 #include <velodyne_pointcloud/CloudNodeConfig.h>
 
-namespace velodyne_pointcloud
-{
-  class Convert
-  {
-  public:
+namespace velodyne_pointcloud {
+class Convert {
+ public:
+  Convert(ros::NodeHandle node, ros::NodeHandle private_nh);
+  ~Convert() {}
 
-    Convert(ros::NodeHandle node, ros::NodeHandle private_nh);
-    ~Convert() {}
+ private:
+  void callback(velodyne_pointcloud::CloudNodeConfig &config, uint32_t level);
+  void processScan(const velodyne_msgs::VelodyneScan::ConstPtr &scanMsg);
 
-  private:
-    
-    void callback(velodyne_pointcloud::CloudNodeConfig &config,
-                uint32_t level);
-    void processScan(const velodyne_msgs::VelodyneScan::ConstPtr &scanMsg);
+  /// Pointer to dynamic reconfigure service srv_
+  boost::shared_ptr<
+      dynamic_reconfigure::Server<velodyne_pointcloud::CloudNodeConfig> >
+      srv_;
 
-    ///Pointer to dynamic reconfigure service srv_
-    boost::shared_ptr<dynamic_reconfigure::Server<velodyne_pointcloud::
-      CloudNodeConfig> > srv_;
-    
-    boost::shared_ptr<velodyne_rawdata::RawData> data_;
-    ros::Subscriber velodyne_scan_;
-    ros::Publisher output_;
+  boost::shared_ptr<velodyne_rawdata::RawData> data_;
+  ros::Subscriber velodyne_scan_;
+  ros::Publisher output_;
 
-    /// configuration parameters
-    typedef struct {
-      int npackets;                    ///< number of packets to combine
-    } Config;
-    Config config_;
-  };
+  /// configuration parameters
+  typedef struct {
+    int npackets;  ///< number of packets to combine
+  } Config;
+  Config config_;
+};
 
-} // namespace velodyne_pointcloud
+}  // namespace velodyne_pointcloud
 
-#endif // _VELODYNE_POINTCLOUD_CONVERT_H_
+#endif  // _VELODYNE_POINTCLOUD_CONVERT_H_

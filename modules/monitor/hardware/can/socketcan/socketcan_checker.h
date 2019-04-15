@@ -49,14 +49,10 @@ class SocketCanChecker : public HwCheckerInterface {
   virtual ~SocketCanChecker() {}
 
   /// Returns the name of the HW this checker checks.
-  const std::string &get_name() const override {
-    return name_;
-  }
+  const std::string &get_name() const override { return name_; }
 
   // Returns the can id
-  const int get_id() const {
-    return can_id_;
-  }
+  const int get_id() const { return can_id_; }
 
   /// Runs HW status check, stores results in results.
   void run_check(std::vector<HwCheckResult> *results) override;

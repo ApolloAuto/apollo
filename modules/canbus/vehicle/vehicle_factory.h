@@ -44,8 +44,8 @@ class VehicleFactory
                                    AbstractVehicleFactory> {
  public:
   /**
-  * @brief register supported vehicle factories.
-  */
+   * @brief register supported vehicle factories.
+   */
   void RegisterVehicleFactory();
 
   /**

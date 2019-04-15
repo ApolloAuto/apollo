@@ -56,7 +56,7 @@ class StopSign : public TrafficRule {
                         StopSignLaneVehicles* watch_vehicles);
   bool CheckADCkStop(ReferenceLineInfo* const reference_line_info);
   void GetWatchVehicles(const hdmap::StopSignInfo& stop_sign_info,
-                       StopSignLaneVehicles* watch_vehicles);
+                        StopSignLaneVehicles* watch_vehicles);
   void UpdateWatchVehicles(StopSignLaneVehicles* watch_vehicles);
   int AddWatchVehicle(const PathObstacle& path_obstacle,
                       StopSignLaneVehicles* watch_vehicles);

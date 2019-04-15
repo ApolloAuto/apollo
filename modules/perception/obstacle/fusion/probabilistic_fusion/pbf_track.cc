@@ -124,7 +124,7 @@ void PbfTrack::UpdateWithSensorObject(std::shared_ptr<PbfSensorObject> obj,
   const SensorType &sensor_type = obj->sensor_type;
   const std::string sensor_id = obj->sensor_id;
   ADEBUG << "update with sensor object with track id " << GetTrackId()
-        << " type " << GetObjectName(obj->object->type);
+         << " type " << GetObjectName(obj->object->type);
   if (FLAGS_async_fusion) {
     PerformMotionFusionAsync(obj);
     std::cerr << "PBFIMF:track id is: " << GetTrackId() << std::endl;
@@ -636,8 +636,7 @@ BBA PbfTrack::TypeProbsToBba(const std::vector<float> &type_probs) {
   if (type_probs.size() > UNKNOWN_UNMOVABLE &&
       type_probs[static_cast<int>(UNKNOWN_UNMOVABLE)] > 0.0f) {
     ADEBUG << "unknonw_unmovable prob = "
-           << type_probs[static_cast<int>(UNKNOWN_UNMOVABLE)]
-          << " > 0.0f";
+           << type_probs[static_cast<int>(UNKNOWN_UNMOVABLE)] << " > 0.0f";
   }
   std::map<uint64_t, double> res_bba_map;
   for (size_t i = 0; i < type_probs.size(); ++i) {

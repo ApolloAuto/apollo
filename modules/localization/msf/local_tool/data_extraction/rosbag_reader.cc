@@ -43,7 +43,7 @@ void RosbagReader::Read(const std::string &file_name) {
 
   rosbag::View view(bag, rosbag::TopicQuery(topics_));
 
-  foreach(rosbag::MessageInstance const m, view) {
+  foreach (rosbag::MessageInstance const m, view) {
     const std::string tp = m.getTopic();
     std::cout << "Read topic: " << tp << std::endl;
 

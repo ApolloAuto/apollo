@@ -21,13 +21,13 @@
 #ifndef MODULES_DRIVERS_CANBUS_CAN_COMM_MESSAGE_MANAGER_H_
 #define MODULES_DRIVERS_CANBUS_CAN_COMM_MESSAGE_MANAGER_H_
 
+#include <condition_variable>
 #include <memory>
 #include <mutex>
 #include <set>
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include <condition_variable>
 
 #include "modules/common/log.h"
 #include "modules/common/proto/error_code.pb.h"
@@ -69,8 +69,8 @@ template <typename SensorType>
 class MessageManager {
  public:
   /*
-  * @brief constructor function
-  */
+   * @brief constructor function
+   */
   MessageManager() {}
   /*
    * @brief destructor function
@@ -88,7 +88,7 @@ class MessageManager {
 
   void ClearSensorData();
 
-  std::condition_variable* GetMutableCVar();
+  std::condition_variable *GetMutableCVar();
 
   /**
    * @brief get mutable protocol data by message id
@@ -213,7 +213,7 @@ void MessageManager<SensorType>::ClearSensorData() {
 }
 
 template <typename SensorType>
-std::condition_variable* MessageManager<SensorType>::GetMutableCVar() {
+std::condition_variable *MessageManager<SensorType>::GetMutableCVar() {
   return &cvar_;
 }
 

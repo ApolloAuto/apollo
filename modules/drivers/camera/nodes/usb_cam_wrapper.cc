@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <time.h>   /* for clock_gettime */
+#include <time.h> /* for clock_gettime */
 
 #include "image_transport/camera_common.h"
 #include "image_transport/publisher_plugin.h"
@@ -30,9 +30,9 @@ namespace apollo {
 namespace drivers {
 namespace camera {
 
-UsbCamWrapper::UsbCamWrapper(
-    ros::NodeHandle node, ros::NodeHandle private_nh, CameraConf config) :
-    node_(node), priv_node_(private_nh), config_(config), last_stamp_(0) {
+UsbCamWrapper::UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh,
+                             CameraConf config)
+    : node_(node), priv_node_(private_nh), config_(config), last_stamp_(0) {
   if (!::apollo::common::util::GetProtoFromFile(FLAGS_camera_config_file,
                                                 &config_)) {
     AERROR << "Unable to load camera conf file: " << FLAGS_camera_config_file;
@@ -55,7 +55,7 @@ UsbCamWrapper::UsbCamWrapper(
   // actual matrix data, size is (step * rows)
   size_t data_length = img_.step * img_.height;
   std::string image_data;
-  image_data.assign(reinterpret_cast<const char *>(img_.data.data()),
+  image_data.assign(reinterpret_cast<const char*>(img_.data.data()),
                     data_length);
   sensor_image_.set_data(image_data);
 
@@ -63,7 +63,6 @@ UsbCamWrapper::UsbCamWrapper(
       node_, config_.camera_name(), config_.camera_info_url()));
 
   // default 3000 ms
-
 
   // Warning when diff with last > 1.5* interval
   frame_warning_interval_ = 1.5 / config_.frame_rate();
@@ -77,13 +76,13 @@ UsbCamWrapper::UsbCamWrapper(
   std::string image_topic = node_.resolveName(config_.topic_name());
   pub_loader_ = boost::make_shared<image_transport::PubLoader>(
       "image_transport", "image_transport::PublisherPlugin");
-  std::string lookup_name = image_transport::PublisherPlugin::getLookupName(
-      std::string("raw"));
+  std::string lookup_name =
+      image_transport::PublisherPlugin::getLookupName(std::string("raw"));
   image_pub_plugin_ = pub_loader_->createInstance(lookup_name);
   if (image_pub_plugin_ != nullptr) {
-    image_pub_plugin_->advertise(node_, image_topic, 1,
-                                 image_transport::SubscriberStatusCallback(),
-           image_transport::SubscriberStatusCallback(), ros::VoidPtr(), false);
+    image_pub_plugin_->advertise(
+        node_, image_topic, 1, image_transport::SubscriberStatusCallback(),
+        image_transport::SubscriberStatusCallback(), ros::VoidPtr(), false);
   } else {
     AERROR << "create image publish plugin error. lookup_name: " << lookup_name;
     node_.shutdown();
@@ -91,8 +90,7 @@ UsbCamWrapper::UsbCamWrapper(
   }
 
   // camera info publish
-  std::string cam_info_topic =
-      image_transport::getCameraInfoTopic(image_topic);
+  std::string cam_info_topic = image_transport::getCameraInfoTopic(image_topic);
   cam_info_pub_ = node_.advertise<sensor_msgs::CameraInfo>(
       cam_info_topic, 1, ros::SubscriberStatusCallback(),
       ros::SubscriberStatusCallback(), ros::VoidPtr(), false);
@@ -115,11 +113,10 @@ UsbCamWrapper::UsbCamWrapper(
   // get the camera basical infomation
   cam_info_.reset(new sensor_msgs::CameraInfo(cinfo_->getCameraInfo()));
 
-  AINFO << "Starting '" << config_.camera_name()
-      << "' (" << config_.video_device()
-      << ") at " << config_.image_width() << "x" << config_.image_height()
-      << " via " << config_.io_method()  << " (" << config_.pixel_format()
-      << ") at %" << config_.frame_rate() << " FPS";
+  AINFO << "Starting '" << config_.camera_name() << "' ("
+        << config_.video_device() << ") at " << config_.image_width() << "x"
+        << config_.image_height() << " via " << config_.io_method() << " ("
+        << config_.pixel_format() << ") at %" << config_.frame_rate() << " FPS";
 
   // set the IO method
   UsbCam::io_method io_method =
@@ -132,8 +129,8 @@ UsbCamWrapper::UsbCamWrapper(
   }
 
   // set the pixel format
-  UsbCam::pixel_format pixel_format = UsbCam::pixel_format_from_string(
-      config_.pixel_format());
+  UsbCam::pixel_format pixel_format =
+      UsbCam::pixel_format_from_string(config_.pixel_format());
 
   if (pixel_format == UsbCam::PIXEL_FORMAT_UNKNOWN) {
     AFATAL << "Unknown pixel format '" << config_.pixel_format() << "'";
@@ -142,8 +139,7 @@ UsbCamWrapper::UsbCamWrapper(
   }
 
   // start the camera
-  cam_.start(config_.video_device(),
-             io_method, pixel_format,
+  cam_.start(config_.video_device(), io_method, pixel_format,
              config_.image_width(), config_.image_height(),
              config_.frame_rate());
 
@@ -198,8 +194,8 @@ UsbCamWrapper::UsbCamWrapper(
   }
 
   // trigger enable
-  int trigger_ret = cam_.trigger_enable(config_.trigger_fps(),
-                                        config_.trigger_internal());
+  int trigger_ret =
+      cam_.trigger_enable(config_.trigger_fps(), config_.trigger_internal());
   if (0 != trigger_ret) {
     AWARN << "Camera trigger Fail ret: " << trigger_ret;
     // node_.shutdown();
@@ -207,9 +203,7 @@ UsbCamWrapper::UsbCamWrapper(
   }
 }
 
-UsbCamWrapper::~UsbCamWrapper() {
-  cam_.shutdown();
-}
+UsbCamWrapper::~UsbCamWrapper() { cam_.shutdown(); }
 
 bool UsbCamWrapper::service_start_cap(std_srvs::Empty::Request& req,
                                       std_srvs::Empty::Response& res) {
@@ -246,8 +240,8 @@ bool UsbCamWrapper::take_and_send_image() {
       return true;
     }
     if (frame_warning_interval_ < diff) {
-      ROS_WARN_STREAM("stamp jump.last stamp:" << last_stamp_
-          << " current stamp:" << img_.header.stamp);
+      ROS_WARN_STREAM("stamp jump.last stamp:"
+                      << last_stamp_ << " current stamp:" << img_.header.stamp);
     }
     last_stamp_ = img_.header.stamp;
   }

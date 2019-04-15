@@ -83,10 +83,10 @@ class Angle {
   }
 
   /**
-  * @brief Constructs an Angle object from raw internal value.
-  * @param value Angle in degrees
-  * @return Angle object
-  */
+   * @brief Constructs an Angle object from raw internal value.
+   * @param value Angle in degrees
+   * @return Angle object
+   */
   explicit Angle(T value = 0) : value_(value) {}
   /// Internal representation of pi
   static constexpr T RAW_PI = std::numeric_limits<T>::min();
@@ -102,9 +102,9 @@ class Angle {
   static constexpr double RAW_TO_RAD = -M_PI / RAW_PI;
 
   /**
-  * @brief Getter of value_.
-  * @return Internal unsigned integer representation of angle
-  */
+   * @brief Getter of value_.
+   * @return Internal unsigned integer representation of angle
+   */
   T raw() const { return value_; }
 
   /**

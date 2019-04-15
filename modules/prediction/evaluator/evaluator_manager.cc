@@ -19,9 +19,9 @@
 #include "modules/common/log.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
+#include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/mlp_evaluator.h"
 #include "modules/prediction/evaluator/vehicle/rnn_evaluator.h"
-#include "modules/prediction/evaluator/vehicle/cost_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -70,7 +70,9 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           default_on_lane_evaluator_ = obstacle_conf.evaluator_type();
           break;
         }
-        default: { break; }
+        default: {
+          break;
+        }
       }
     }
   }
@@ -163,7 +165,9 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
       evaluator_ptr.reset(new CostEvaluator());
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
   return evaluator_ptr;
 }

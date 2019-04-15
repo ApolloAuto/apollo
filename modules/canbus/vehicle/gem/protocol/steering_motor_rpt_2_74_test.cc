@@ -33,15 +33,16 @@ TEST_F(Steeringmotorrpt274Test, reset) {
   ChassisDetail chassis_detail;
   uint8_t bytes[8] = {0x01, 0x02, 0x03, 0x04, 0x11, 0x12, 0x13, 0x14};
   steeringmotor2.Parse(bytes, length, &chassis_detail);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_motor_rpt_2_74()\
-.encoder_temperature(), 218);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_motor_rpt_2_74()\
-.motor_temperature(), 732);
-  EXPECT_DOUBLE_EQ(chassis_detail.gem().steering_motor_rpt_2_74()\
-.angular_speed(), 286397.20400000003);
+  EXPECT_DOUBLE_EQ(
+      chassis_detail.gem().steering_motor_rpt_2_74().encoder_temperature(),
+      218);
+  EXPECT_DOUBLE_EQ(
+      chassis_detail.gem().steering_motor_rpt_2_74().motor_temperature(), 732);
+  EXPECT_DOUBLE_EQ(
+      chassis_detail.gem().steering_motor_rpt_2_74().angular_speed(),
+      286397.20400000003);
 }
 
 }  // namespace gem
 }  // namespace canbus
 }  // namespace apollo
-

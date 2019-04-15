@@ -22,8 +22,8 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-using apollo::drivers::canbus::Byte;
 using apollo::drivers::ContiRadar;
+using apollo::drivers::canbus::Byte;
 
 const uint32_t RadarConfig200::ID = 0x200;
 
@@ -90,9 +90,7 @@ void RadarConfig200::Reset() {
   radar_conf_.set_rcs_threshold(RCS_THRESHOLD_STANDARD);
 }
 
-RadarConf RadarConfig200::radar_conf() {
-  return radar_conf_;
-}
+RadarConf RadarConfig200::radar_conf() { return radar_conf_; }
 
 RadarConfig200* RadarConfig200::set_radar_conf(RadarConf radar_conf) {
   radar_conf_.CopyFrom(radar_conf);

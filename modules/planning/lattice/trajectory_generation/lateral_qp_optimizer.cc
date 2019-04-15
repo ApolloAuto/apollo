@@ -15,14 +15,13 @@
  *****************************************************************************/
 
 #include "modules/planning/lattice/trajectory_generation/lateral_qp_optimizer.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/common/log.h"
+#include "modules/planning/common/planning_gflags.h"
 namespace apollo {
 namespace planning {
 
 bool LateralQPOptimizer::optimize(
-    const std::array<double, 3>& d_state,
-    const double delta_s,
+    const std::array<double, 3>& d_state, const double delta_s,
     const std::vector<std::pair<double, double>>& d_bounds) {
   delta_s_ = delta_s;
   const int num_var = static_cast<int>(d_bounds.size());
@@ -47,7 +46,8 @@ bool LateralQPOptimizer::optimize(
   std::fill(h_matrix, h_matrix + kNumOfMatrixElement, 0.0);
   for (int i = 0; i < kNumParam; ++i) {
     if (i < num_var) {
-      h_matrix[i * kNumParam + i] = 2.0 * FLAGS_weight_lateral_offset +
+      h_matrix[i * kNumParam + i] =
+          2.0 * FLAGS_weight_lateral_offset +
           2.0 * FLAGS_weight_lateral_obstacle_distance;
     } else if (i < 2 * num_var) {
       h_matrix[i * kNumParam + i] = 2.0 * FLAGS_weight_lateral_derivative;
@@ -161,10 +161,10 @@ bool LateralQPOptimizer::optimize(
 
   CHECK_EQ(constraint_index, kNumConstraint);
 
-  auto ret = qp_problem.init(
-      h_matrix, g_matrix, affine_constraint_matrix,
-      param_lower_bounds, param_upper_bounds,
-      constraint_lower_bounds, constraint_upper_bounds, max_iter);
+  auto ret = qp_problem.init(h_matrix, g_matrix, affine_constraint_matrix,
+                             param_lower_bounds, param_upper_bounds,
+                             constraint_lower_bounds, constraint_upper_bounds,
+                             max_iter);
   if (ret != qpOASES::SUCCESSFUL_RETURN) {
     if (ret == qpOASES::RET_MAX_NWSR_REACHED) {
       AERROR << "qpOASES solver failed due to reached max iteration";
@@ -185,8 +185,7 @@ bool LateralQPOptimizer::optimize(
   return qp_problem.isSolved() == qpOASES::BT_TRUE;
 }
 
-PiecewiseJerkTrajectory1d
-LateralQPOptimizer::GetOptimalTrajectory() const {
+PiecewiseJerkTrajectory1d LateralQPOptimizer::GetOptimalTrajectory() const {
   CHECK(!opt_d_.empty() && !opt_d_prime_.empty() && !opt_d_pprime_.empty());
 
   PiecewiseJerkTrajectory1d optimal_trajectory(

@@ -19,9 +19,9 @@
 
 #include <boost/thread.hpp>
 
-#include <ros/ros.h>
-#include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+#include <ros/ros.h>
 
 // #include "modules/common/log.h"
 // #include "modules/common/util/file.h"
@@ -57,4 +57,4 @@ class CameraNodelet {
 //                        ::apollo::drivers::camera::CameraNodelet,
 //                         nodelet::Nodelet);
 
-#endif // MODULES_DRIVERS_CAMERA_NODES_CAMERA_NODELET_H_
+#endif  // MODULES_DRIVERS_CAMERA_NODES_CAMERA_NODELET_H_

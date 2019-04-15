@@ -17,8 +17,8 @@
 #ifndef MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H_
 #define MODULES_PERCEPTION_OBSTACLE_CAMERA_TRACKER_BASE_AFFINITY_TRACKER_H_
 
-#include <opencv2/opencv.hpp>
 #include <limits>
+#include <opencv2/opencv.hpp>
 #include <vector>
 
 #include "Eigen/Core"

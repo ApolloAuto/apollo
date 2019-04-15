@@ -26,8 +26,8 @@ namespace racobit_radar {
 
 using apollo::drivers::RacobitRadar;
 using apollo::drivers::racobit_radar::OutputType;
-using apollo::drivers::racobit_radar::RcsThreshold;
 using apollo::drivers::racobit_radar::RadarConf;
+using apollo::drivers::racobit_radar::RcsThreshold;
 
 class RadarConfig200
     : public apollo::drivers::canbus::ProtocolData<RacobitRadar> {

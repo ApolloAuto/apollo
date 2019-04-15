@@ -21,11 +21,11 @@
 #ifndef MODULES_PLANNING_LATTICE_TRAJECTORY1D_PIECEWISE_JERK_TRAJECTORY1D_H_
 #define MODULES_PLANNING_LATTICE_TRAJECTORY1D_PIECEWISE_JERK_TRAJECTORY1D_H_
 
-#include <vector>
 #include <string>
+#include <vector>
 
-#include "modules/planning/math/curve1d/curve1d.h"
 #include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
+#include "modules/planning/math/curve1d/curve1d.h"
 
 namespace apollo {
 namespace planning {
@@ -36,8 +36,7 @@ class PiecewiseJerkTrajectory1d : public Curve1d {
 
   virtual ~PiecewiseJerkTrajectory1d() = default;
 
-  double Evaluate(const std::uint32_t order,
-                  const double param) const;
+  double Evaluate(const std::uint32_t order, const double param) const;
 
   double ParamLength() const;
 

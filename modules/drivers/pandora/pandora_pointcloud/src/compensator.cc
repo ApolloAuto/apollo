@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "pandora_pointcloud/compensator.h"
 #include <limits>
 #include <string>
-#include "pandora_pointcloud/compensator.h"
 #include "ros/this_node.h"
 
 namespace apollo {
@@ -30,8 +30,7 @@ Compensator::Compensator(ros::NodeHandle node, ros::NodeHandle private_nh)
       z_offset_(-1),
       timestamp_offset_(-1),
       timestamp_data_size_(0) {
-  private_nh.param("child_frame_id", child_frame_id_,
-                   std::string("hesai40"));
+  private_nh.param("child_frame_id", child_frame_id_, std::string("hesai40"));
   private_nh.param(
       "topic_compensated_pointcloud", topic_compensated_pointcloud_,
       std::string("/apollo/sensor/pandora/hesai40/compensator/PointCloud2"));
@@ -43,14 +42,12 @@ Compensator::Compensator(ros::NodeHandle node, ros::NodeHandle private_nh)
   // advertise output point cloud (before subscribing to input data)
   compensation_pub_ = node.advertise<sensor_msgs::PointCloud2>(
       topic_compensated_pointcloud_, queue_size_);
-  pointcloud_sub_ =
-      node.subscribe(topic_pointcloud_, queue_size_,
-                     &Compensator::pointcloud_callback,
-                     reinterpret_cast<Compensator*>(this));
+  pointcloud_sub_ = node.subscribe(topic_pointcloud_, queue_size_,
+                                   &Compensator::pointcloud_callback,
+                                   reinterpret_cast<Compensator*>(this));
 }
 
-void Compensator::pointcloud_callback(
-    sensor_msgs::PointCloud2ConstPtr msg) {
+void Compensator::pointcloud_callback(sensor_msgs::PointCloud2ConstPtr msg) {
   if (!check_message(msg)) {
     ROS_FATAL("MotionCompensation : Input point cloud data field is invalid");
     return;
@@ -99,8 +96,7 @@ inline void Compensator::get_timestamp_interval(
 }
 
 // TODO(a): if point type is always float, and timestamp is always double?
-inline bool Compensator::check_message(
-    sensor_msgs::PointCloud2ConstPtr msg) {
+inline bool Compensator::check_message(sensor_msgs::PointCloud2ConstPtr msg) {
   // check msg width and height
   if (msg->width == 0 || msg->height == 0) {
     return false;
@@ -217,8 +213,8 @@ void Compensator::motion_compensation(sensor_msgs::PointCloud2::Ptr msg,
                                       const Eigen::Affine3d& pose_min_time,
                                       const Eigen::Affine3d& pose_max_time) {
   using std::abs;
-  using std::sin;
   using std::acos;
+  using std::sin;
 
   Eigen::Vector3d translation =
       pose_min_time.translation() - pose_max_time.translation();

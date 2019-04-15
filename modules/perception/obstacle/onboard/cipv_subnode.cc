@@ -32,9 +32,9 @@ namespace perception {
 using apollo::common::ErrorCode;
 using apollo::common::Status;
 
-using std::vector;
 using std::string;
 using std::unordered_map;
+using std::vector;
 // using Event;
 // using EventID;
 // using EventMeta;

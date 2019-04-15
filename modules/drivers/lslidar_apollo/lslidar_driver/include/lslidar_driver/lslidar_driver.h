@@ -17,11 +17,11 @@ limitations under the License.                                              /
 #ifndef LSLIDAR_DRIVER_H
 #define LSLIDAR_DRIVER_H
 
-#include <unistd.h>
-#include <stdio.h>
 #include <netinet/in.h>
-#include <string>
+#include <stdio.h>
 #include <time.h>
+#include <unistd.h>
+#include <string>
 
 #include <boost/shared_ptr.hpp>
 
@@ -34,56 +34,54 @@ namespace apollo {
 namespace drivers {
 namespace lslidar_driver {
 
-//static uint16_t UDP_PORT_NUMBER = 8080;
+// static uint16_t UDP_PORT_NUMBER = 8080;
 static uint16_t PACKET_SIZE = 1206;
 
 class LslidarDriver {
-public:
+ public:
+  LslidarDriver(ros::NodeHandle& n, ros::NodeHandle& pn);
+  ~LslidarDriver();
 
-    LslidarDriver(ros::NodeHandle& n, ros::NodeHandle& pn);
-    ~LslidarDriver();
+  bool initialize();
+  bool polling();
 
-    bool initialize();
-    bool polling();
+  void initTimeStamp(void);
+  void getFPGA_GPSTimeStamp(lslidar_msgs::LslidarPacketPtr& packet);
 
-    void initTimeStamp(void);
-    void getFPGA_GPSTimeStamp(lslidar_msgs::LslidarPacketPtr &packet);
+  typedef boost::shared_ptr<LslidarDriver> LslidarDriverPtr;
+  typedef boost::shared_ptr<const LslidarDriver> LslidarDriverConstPtr;
 
-    typedef boost::shared_ptr<LslidarDriver> LslidarDriverPtr;
-    typedef boost::shared_ptr<const LslidarDriver> LslidarDriverConstPtr;
+ private:
+  bool loadParameters();
+  bool createRosIO();
+  bool openUDPPort();
+  int getPacket(lslidar_msgs::LslidarPacketPtr& msg);
 
-private:
+  // Ethernet related variables
+  std::string device_ip_string;
+  in_addr device_ip;
+  int UDP_PORT_NUMBER;
+  int socket_id;
 
-    bool loadParameters();
-    bool createRosIO();
-    bool openUDPPort();
-    int getPacket(lslidar_msgs::LslidarPacketPtr& msg);
+  // ROS related variables
+  ros::NodeHandle nh;
+  ros::NodeHandle pnh;
 
-    // Ethernet related variables
-    std::string device_ip_string;
-    in_addr device_ip;
-    int UDP_PORT_NUMBER;
-    int socket_id;
+  std::string frame_id;
+  ros::Publisher packet_pub;
 
-    // ROS related variables
-    ros::NodeHandle nh;
-    ros::NodeHandle pnh;
-
-    std::string frame_id;
-    ros::Publisher packet_pub;
-
-    uint64_t pointcloudTimeStamp;
-    unsigned char packetTimeStamp[10];
-    struct tm cur_time;
-    unsigned short int us;
-    unsigned short int ms;
-    ros::Time timeStamp;
+  uint64_t pointcloudTimeStamp;
+  unsigned char packetTimeStamp[10];
+  struct tm cur_time;
+  unsigned short int us;
+  unsigned short int ms;
+  ros::Time timeStamp;
 };
 
 typedef LslidarDriver::LslidarDriverPtr LslidarDriverPtr;
 typedef LslidarDriver::LslidarDriverConstPtr LslidarDriverConstPtr;
 
-} // namespace lslidar_driver
-}
-}
-#endif // _LSLIDAR_DRIVER_H_
+}  // namespace lslidar_driver
+}  // namespace drivers
+}  // namespace apollo
+#endif  // _LSLIDAR_DRIVER_H_

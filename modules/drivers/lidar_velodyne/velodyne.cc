@@ -29,9 +29,9 @@ namespace apollo {
 namespace drivers {
 namespace lidar_velodyne {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::ErrorCode;
 using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 using apollo::common::util::GetProtoFromFile;
 using velodyne_msgs::VelodyneScanUnifiedPtr;
 

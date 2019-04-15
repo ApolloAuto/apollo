@@ -17,10 +17,10 @@
 #ifndef MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
 #define MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
 
-#include <ros/ros.h>
-#include <image_transport/image_transport.h>
 #include <camera_info_manager/camera_info_manager.h>
+#include <image_transport/image_transport.h>
 #include <pluginlib/class_loader.h>
+#include <ros/ros.h>
 #include <std_srvs/Empty.h>
 
 #include <string>
@@ -34,16 +34,15 @@ namespace drivers {
 namespace camera {
 
 enum TriggerFrequence {
-    FPS_10HZ = 10,
-    FPS_15HZ = 15,
-    FPS_20HZ = 20,
-    DEFAULT_FPS = 30
+  FPS_10HZ = 10,
+  FPS_15HZ = 15,
+  FPS_20HZ = 20,
+  DEFAULT_FPS = 30
 };
 
 class UsbCamWrapper {
  public:
-  UsbCamWrapper(ros::NodeHandle node,
-                ros::NodeHandle private_nh,
+  UsbCamWrapper(ros::NodeHandle node, ros::NodeHandle private_nh,
                 CameraConf config);
   virtual ~UsbCamWrapper();
   bool service_start_cap(std_srvs::Empty::Request &req,
@@ -85,4 +84,4 @@ class UsbCamWrapper {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif // MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_
+#endif  // MODULES_DRIVERS_CAMERA_NODES_USB_CAM_WRAPPER_H_

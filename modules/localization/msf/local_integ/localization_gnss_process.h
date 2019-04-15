@@ -28,10 +28,10 @@
 #include "Eigen/Core"
 #include "Eigen/Geometry"
 
+#include "include/gnss_solver.h"
 #include "modules/common/status/status.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
-#include "include/gnss_solver.h"
 
 /**
  * @namespace apollo::localization::msf
@@ -56,17 +56,14 @@ struct EphKey {
   // toe = eph.toe + eph.week_num * sec_per_week
   double eph_toe;
   static const int second_per_week = 604800;
-  EphKey(const apollo::drivers::gnss::GnssType type,
-         const unsigned int prn,
+  EphKey(const apollo::drivers::gnss::GnssType type, const unsigned int prn,
          double toe) {
     gnss_type = type;
     sat_prn = prn;
     eph_toe = toe;
   }
-  EphKey(const apollo::drivers::gnss::GnssType type,
-         const unsigned int prn,
-         const unsigned int week_num,
-         double toe) {
+  EphKey(const apollo::drivers::gnss::GnssType type, const unsigned int prn,
+         const unsigned int week_num, double toe) {
     gnss_type = type;
     sat_prn = prn;
     eph_toe = toe + week_num * second_per_week;
@@ -76,7 +73,7 @@ struct EphKey {
     sat_prn = 0;
     eph_toe = -0.1;
   }
-  bool operator < (const EphKey& key2) const {
+  bool operator<(const EphKey &key2) const {
     if (gnss_type < key2.gnss_type) {
       return true;
     }
@@ -91,12 +88,11 @@ struct EphKey {
     }
     return false;
   }
-  bool operator == (const EphKey& key2) const {
-    return (gnss_type == key2.gnss_type)
-           && (sat_prn == key2.sat_prn)
-           && (eph_toe == key2.eph_toe);
+  bool operator==(const EphKey &key2) const {
+    return (gnss_type == key2.gnss_type) && (sat_prn == key2.sat_prn) &&
+           (eph_toe == key2.eph_toe);
   }
-  EphKey& operator = (const EphKey& key2) {
+  EphKey &operator=(const EphKey &key2) {
     gnss_type = key2.gnss_type;
     sat_prn = key2.sat_prn;
     eph_toe = key2.eph_toe;
@@ -113,8 +109,7 @@ class LocalizationGnssProcess {
   // raw data' field "receiver_id" differs rover (= 0) from baser (= 1)
   void RawObservationProcess(const drivers::gnss::EpochObservation &raw_obs);
   void RawEphemerisProcess(const drivers::gnss::GnssEphemeris &gnss_orbit);
-  void IntegSinsPvaProcess(const InsPva &sins_pva,
-                           const double variance[9][9]);
+  void IntegSinsPvaProcess(const InsPva &sins_pva, const double variance[9][9]);
   LocalizationMeasureState GetResult(MeasureData *gnss_measure);
 
  private:

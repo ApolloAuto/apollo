@@ -18,25 +18,25 @@
 
 #include <string>
 
-#include "modules/common/util/file.h"
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/map/hdmap/hdmap.h"
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/common/util/file.h"
+#include "modules/map/hdmap/hdmap.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/prediction/proto/prediction_conf.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
-#include "libfuzzer/libfuzzer_macro.h"
+#include "modules/prediction/proto/prediction_conf.pb.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterConfig;
+using apollo::common::adapter::AdapterManager;
 using apollo::perception::PerceptionObstacles;
 
 protobuf_mutator::protobuf::LogSilencer log_silincer;
@@ -48,13 +48,13 @@ class PredictorManagerFuzz {
  protected:
   common::adapter::AdapterManagerConfig adapter_conf_;
   PredictionConf prediction_conf_;
-}predictor_manager_fuzzer;
+} predictor_manager_fuzzer;
 
 void PredictorManagerFuzz::target(PerceptionObstacles obstacles) {
   FLAGS_enable_trim_prediction_trajectory = false;
   std::string conf_file = "modules/prediction/testdata/adapter_conf.pb.txt";
-  bool ret_load_conf = common::util::GetProtoFromFile(
-      conf_file, &adapter_conf_);
+  bool ret_load_conf =
+      common::util::GetProtoFromFile(conf_file, &adapter_conf_);
   EXPECT_TRUE(ret_load_conf);
   EXPECT_TRUE(adapter_conf_.IsInitialized());
 

@@ -17,23 +17,23 @@
 #define private public
 #define protected public
 
-#include "modules/planning/std_planning.h"
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/std_planning.h"
 #include "modules/tools/fuzz/planning/proto/std_planning_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
 namespace apollo {
 namespace planning {
 
-using apollo::hdmap::HDMapUtil;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterManagerConfig;
+using apollo::hdmap::HDMapUtil;
 using apollo::tools::fuzz::planning::StdPlanningFuzzMessage;
 
 class StdPlanningFuzz {
@@ -106,7 +106,7 @@ void StdPlanningFuzz::Fuzz(StdPlanningFuzzMessage std_planning_fuzz_message) {
   std_planning_->RunOnce();
 }
 
-DEFINE_PROTO_FUZZER(const StdPlanningFuzzMessage& std_planning_fuzz_message) {
+DEFINE_PROTO_FUZZER(const StdPlanningFuzzMessage &std_planning_fuzz_message) {
   std_planning_fuzzer.Fuzz(std_planning_fuzz_message);
 }
 

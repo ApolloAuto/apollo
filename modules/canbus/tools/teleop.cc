@@ -38,9 +38,9 @@ DEFINE_double(steer_inc_delta, 2.0, "steer delta percentage");
 namespace {
 
 using apollo::canbus::Chassis;
+using apollo::common::VehicleSignal;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::Clock;
-using apollo::common::VehicleSignal;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
 
@@ -244,14 +244,14 @@ class Teleop {
           }
 
           if (cnt == 0) {
-            control_command_.mutable_signal()->
-              set_turn_signal(VehicleSignal::TURN_NONE);
+            control_command_.mutable_signal()->set_turn_signal(
+                VehicleSignal::TURN_NONE);
           } else if (cnt == 1) {
-            control_command_.mutable_signal()->
-              set_turn_signal(VehicleSignal::TURN_LEFT);
+            control_command_.mutable_signal()->set_turn_signal(
+                VehicleSignal::TURN_LEFT);
           } else if (cnt == 2) {
-            control_command_.mutable_signal()->
-              set_turn_signal(VehicleSignal::TURN_RIGHT);
+            control_command_.mutable_signal()->set_turn_signal(
+                VehicleSignal::TURN_RIGHT);
           }
 
           break;
@@ -282,9 +282,7 @@ class Teleop {
     return;
   }  // end of keyboard loop thread
 
-  ControlCommand &control_command() {
-    return control_command_;
-  }
+  ControlCommand &control_command() { return control_command_; }
 
   Chassis::GearPosition GetGear(int32_t gear) {
     switch (gear) {
@@ -356,13 +354,11 @@ class Teleop {
     control_command_.set_engine_on_off(false);
     control_command_.set_driving_mode(Chassis::COMPLETE_MANUAL);
     control_command_.set_gear_location(Chassis::GEAR_INVALID);
-    control_command_.mutable_signal()->
-      set_turn_signal(VehicleSignal::TURN_NONE);
+    control_command_.mutable_signal()->set_turn_signal(
+        VehicleSignal::TURN_NONE);
   }
 
-  void OnChassis(const Chassis &chassis) {
-    Send();
-  }
+  void OnChassis(const Chassis &chassis) { Send(); }
 
   int32_t Start() {
     if (is_running_) {
@@ -391,9 +387,7 @@ class Teleop {
     }
   }
 
-  bool IsRunning() const {
-    return is_running_;
-  }
+  bool IsRunning() const { return is_running_; }
 
  private:
   std::unique_ptr<std::thread> keyboard_thread_;
@@ -401,9 +395,7 @@ class Teleop {
   bool is_running_ = false;
 };
 
-Teleop::Teleop() {
-  ResetControlCommand();
-}
+Teleop::Teleop() { ResetControlCommand(); }
 
 void signal_handler(int32_t signal_num) {
   if (signal_num != SIGINT) {

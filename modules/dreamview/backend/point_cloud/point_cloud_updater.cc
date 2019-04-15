@@ -129,7 +129,7 @@ void PointCloudUpdater::FilterPointCloud(
   voxel_grid.setLeafSize(FLAGS_voxel_filter_size, FLAGS_voxel_filter_size,
                          FLAGS_voxel_filter_height);
   pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_filtered_ptr(
-    new pcl::PointCloud<pcl::PointXYZ>);
+      new pcl::PointCloud<pcl::PointXYZ>);
   voxel_grid.filter(*pcl_filtered_ptr);
   AINFO << "filtered point cloud data size: " << pcl_filtered_ptr->size();
 

@@ -25,9 +25,9 @@ namespace perception {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using std::vector;
-using std::string;
 using std::ostringstream;
+using std::string;
+using std::vector;
 
 bool Subnode::Init(const DAGConfig::Subnode &subnode_config,
                    const vector<EventID> &sub_events,

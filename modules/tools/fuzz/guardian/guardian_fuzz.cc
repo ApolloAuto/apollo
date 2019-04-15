@@ -16,12 +16,12 @@
 
 #define private public
 
-#include "modules/guardian/guardian.h"
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
 #include "modules/guardian/common/guardian_gflags.h"
+#include "modules/guardian/guardian.h"
 #include "modules/tools/fuzz/guardian/proto/guardian_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
@@ -64,7 +64,7 @@ void GuardianFuzz::Init() {
   }
   AdapterManager::Init(config);
   FLAGS_adapter_config_filename =
-    "modules/tools/fuzz/guardian/conf/adapter.conf";
+      "modules/tools/fuzz/guardian/conf/adapter.conf";
   FLAGS_guardian_enabled = true;
   guardian_.reset(new Guardian());
   guardian_->Init();
@@ -74,13 +74,12 @@ void GuardianFuzz::Init() {
 void GuardianFuzz::Fuzz(GuardianFuzzMessage guardian_fuzz_message) {
   guardian_->OnChassis(guardian_fuzz_message.chassis());
   guardian_->OnSystemStatus(guardian_fuzz_message.system_status());
-  guardian_->OnControl(
-      guardian_fuzz_message.control_command());
+  guardian_->OnControl(guardian_fuzz_message.control_command());
   ros::TimerEvent event;
   guardian_->OnTimer(event);
 }
 
-DEFINE_PROTO_FUZZER(const GuardianFuzzMessage& guardian_fuzz_message) {
+DEFINE_PROTO_FUZZER(const GuardianFuzzMessage &guardian_fuzz_message) {
   guardian_fuzzer.Fuzz(guardian_fuzz_message);
 }
 

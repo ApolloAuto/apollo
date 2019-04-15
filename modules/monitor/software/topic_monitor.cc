@@ -67,9 +67,9 @@ AdapterBase *GetAdapterByMessageType(const AdapterConfig::MessageType type) {
 }  // namespace
 
 TopicMonitor::TopicMonitor(const TopicConf &config, TopicStatus *status)
-    : RecurrentRunner(FLAGS_topic_monitor_name, FLAGS_topic_monitor_interval)
-    , config_(config), status_(status) {
-}
+    : RecurrentRunner(FLAGS_topic_monitor_name, FLAGS_topic_monitor_interval),
+      config_(config),
+      status_(status) {}
 
 void TopicMonitor::RunOnce(const double current_time) {
   auto *adapter = GetAdapterByMessageType(config_.type());

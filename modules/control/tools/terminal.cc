@@ -30,12 +30,12 @@
 
 namespace {
 
+using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::time::AsInt64;
 using apollo::common::time::Clock;
 using apollo::control::DrivingAction;
 using apollo::control::PadMessage;
-using apollo::canbus::Chassis;
 
 const int ROS_QUEUE_SIZE = 1;
 const int RESET_COMMAND = 1;
@@ -134,9 +134,9 @@ int main(int argc, char **argv) {
 
   google::ParseCommandLineFlags(&argc, &argv, true);
 
-  using apollo::common::adapter::AdapterManagerConfig;
-  using apollo::common::adapter::AdapterManager;
   using apollo::common::adapter::AdapterConfig;
+  using apollo::common::adapter::AdapterManager;
+  using apollo::common::adapter::AdapterManagerConfig;
 
   ros::init(argc, argv, "terminal");
 

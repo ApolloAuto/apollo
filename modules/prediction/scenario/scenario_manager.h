@@ -24,8 +24,8 @@
 #include "modules/common/macro.h"
 #include "modules/common/proto/scenario.pb.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
-#include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
 #include "modules/prediction/scenario/analyzer/scenario_analyzer.h"
+#include "modules/prediction/scenario/feature_extractor/feature_extractor.h"
 
 namespace apollo {
 namespace prediction {

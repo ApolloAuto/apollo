@@ -43,9 +43,9 @@
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/canbus/sensor_gflags.h"
 #include "modules/drivers/canbus/proto/can_card_parameter.pb.h"
 #include "modules/drivers/canbus/proto/sensor_canbus_conf.pb.h"
+#include "modules/drivers/canbus/sensor_gflags.h"
 
 /**
  * @namespace apollo::drivers
@@ -55,19 +55,19 @@ namespace apollo {
 namespace drivers {
 
 /**
-* @class SensorCanbus
-*
-* @brief template of canbus-based sensor module main class (e.g., mobileye).
-*/
+ * @class SensorCanbus
+ *
+ * @brief template of canbus-based sensor module main class (e.g., mobileye).
+ */
 
+using apollo::common::ErrorCode;
+using apollo::common::Status;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessageItem;
-using apollo::common::Status;
-using apollo::common::ErrorCode;
 using apollo::common::time::Clock;
-using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanClient;
+using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SensorCanbusConf;
 
@@ -80,26 +80,26 @@ class SensorCanbus : public apollo::common::ApolloApp {
       : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
 
   /**
-  * @brief obtain module name
-  * @return module name
-  */
+   * @brief obtain module name
+   * @return module name
+   */
   std::string Name() const override;
 
   /**
-  * @brief module initialization function
-  * @return initialization status
-  */
+   * @brief module initialization function
+   * @return initialization status
+   */
   apollo::common::Status Init() override;
 
   /**
-  * @brief module start function
-  * @return start status
-  */
+   * @brief module start function
+   * @return start status
+   */
   apollo::common::Status Start() override;
 
   /**
-  * @brief module stop function
-  */
+   * @brief module stop function
+   */
   void Stop() override;
 
  private:
@@ -211,7 +211,7 @@ void SensorCanbus<SensorType>::OnTimer(const ros::TimerEvent &) {
 
 template <typename SensorType>
 void SensorCanbus<SensorType>::DataTrigger() {
-  std::condition_variable* cvar = sensor_message_manager_->GetMutableCVar();
+  std::condition_variable *cvar = sensor_message_manager_->GetMutableCVar();
   while (data_trigger_running_) {
     std::unique_lock<std::mutex> lock(mutex_);
     cvar->wait(lock);

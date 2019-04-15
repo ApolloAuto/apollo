@@ -25,10 +25,10 @@
 namespace apollo {
 namespace planning {
 
-using apollo::common::math::CartesianFrenetConverter;
-using apollo::common::math::PathMatcher;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
+using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::math::PathMatcher;
 
 DiscretizedTrajectory TrajectoryCombiner::Combine(
     const std::vector<PathPoint>& reference_line, const Curve1d& lon_trajectory,

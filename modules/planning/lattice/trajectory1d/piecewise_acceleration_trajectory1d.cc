@@ -38,8 +38,8 @@ PiecewiseAccelerationTrajectory1d::PiecewiseAccelerationTrajectory1d(
   t_.push_back(0.0);
 }
 
-void PiecewiseAccelerationTrajectory1d::AppendSegment(
-    const double a, const double t_duration) {
+void PiecewiseAccelerationTrajectory1d::AppendSegment(const double a,
+                                                      const double t_duration) {
   double s0 = s_.back();
   double v0 = v_.back();
   double t0 = t_.back();
@@ -82,7 +82,7 @@ std::string PiecewiseAccelerationTrajectory1d::ToString() const {
 }
 
 double PiecewiseAccelerationTrajectory1d::Evaluate(const std::uint32_t order,
-                                                  const double param) const {
+                                                   const double param) const {
   CHECK_GT(t_.size(), 1);
   CHECK(t_.front() <= param && param <= t_.back());
 

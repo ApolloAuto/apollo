@@ -18,9 +18,9 @@
 
 #include <string>
 
+#include "modules/localization/proto/gps.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 #include "modules/localization/proto/measure.pb.h"
-#include "modules/localization/proto/gps.pb.h"
 
 #include "modules/common/log.h"
 
@@ -171,8 +171,7 @@ void LocationExporter::FusionLocCallback(
 void LocationExporter::OdometryLocCallback(
     const rosbag::MessageInstance &msg_instance) {
   AINFO << "Odometry location callback.";
-  boost::shared_ptr<Gps> msg =
-      msg_instance.instantiate<Gps>();
+  boost::shared_ptr<Gps> msg = msg_instance.instantiate<Gps>();
   static unsigned int index = 1;
 
   double timestamp = msg->header().timestamp_sec();

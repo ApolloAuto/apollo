@@ -35,9 +35,9 @@ DEFINE_string(routing_test_file,
 int main(int argc, char** argv) {
   using std::this_thread::sleep_for;
 
+  using apollo::common::adapter::AdapterConfig;
   using apollo::common::adapter::AdapterManager;
   using apollo::common::adapter::AdapterManagerConfig;
-  using apollo::common::adapter::AdapterConfig;
 
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);

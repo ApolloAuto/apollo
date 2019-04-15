@@ -17,11 +17,11 @@
 #ifndef INCLUDE_PANDAR40P_H_
 #define INCLUDE_PANDAR40P_H_
 
-#include <boost/function.hpp>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <boost/function.hpp>
 
 #include <string>
 
@@ -45,8 +45,8 @@ class Pandar40P {
    *        start_angle       The start angle of every point cloud ,
    *                          should be <real angle> * 100.
    */
-  Pandar40P(const std::string &device_ip,
-            uint16_t lidar_port, uint16_t gps_port,
+  Pandar40P(const std::string &device_ip, uint16_t lidar_port,
+            uint16_t gps_port,
             boost::function<void(boost::shared_ptr<PPointCloud>, double)>
                 pcl_callback,
             boost::function<void(double)> gps_callback, uint16_t start_angle,

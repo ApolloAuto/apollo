@@ -34,42 +34,42 @@ namespace util {
 
 // Expose some useful utils from protobuf.
 // Find*()
+using google::protobuf::FindCopy;
+using google::protobuf::FindLinkedPtrOrDie;
+using google::protobuf::FindLinkedPtrOrNull;
 using google::protobuf::FindOrDie;
 using google::protobuf::FindOrDieNoPrint;
-using google::protobuf::FindWithDefault;
 using google::protobuf::FindOrNull;
 using google::protobuf::FindPtrOrNull;
-using google::protobuf::FindLinkedPtrOrNull;
-using google::protobuf::FindLinkedPtrOrDie;
-using google::protobuf::FindCopy;
+using google::protobuf::FindWithDefault;
 
 // Contains*()
 using google::protobuf::ContainsKey;
 using google::protobuf::ContainsKeyValuePair;
 
 // Insert*()
-using google::protobuf::InsertOrUpdate;
-using google::protobuf::InsertOrUpdateMany;
 using google::protobuf::InsertAndDeleteExisting;
 using google::protobuf::InsertIfNotPresent;
+using google::protobuf::InsertKeyOrDie;
 using google::protobuf::InsertOrDie;
 using google::protobuf::InsertOrDieNoPrint;
-using google::protobuf::InsertKeyOrDie;
+using google::protobuf::InsertOrUpdate;
+using google::protobuf::InsertOrUpdateMany;
 
 // Lookup*()
-using google::protobuf::LookupOrInsert;
 using google::protobuf::AddTokenCounts;
+using google::protobuf::LookupOrInsert;
 using google::protobuf::LookupOrInsertNew;
 using google::protobuf::LookupOrInsertNewLinkedPtr;
 using google::protobuf::LookupOrInsertNewSharedPtr;
 
 // Misc Utility Functions
-using google::protobuf::UpdateReturnCopy;
-using google::protobuf::InsertOrReturnExisting;
-using google::protobuf::EraseKeyReturnValuePtr;
-using google::protobuf::InsertKeysFromMap;
 using google::protobuf::AppendKeysFromMap;
 using google::protobuf::AppendValuesFromMap;
+using google::protobuf::EraseKeyReturnValuePtr;
+using google::protobuf::InsertKeysFromMap;
+using google::protobuf::InsertOrReturnExisting;
+using google::protobuf::UpdateReturnCopy;
 
 }  // namespace util
 }  // namespace common

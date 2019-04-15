@@ -13,35 +13,29 @@
 
 */
 
-#include <ros/ros.h>
-#include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+#include <ros/ros.h>
 
 #include "colors.h"
 
-namespace velodyne_pointcloud
-{
-  class RingColorsNodelet: public nodelet::Nodelet
-  {
-  public:
+namespace velodyne_pointcloud {
+class RingColorsNodelet : public nodelet::Nodelet {
+ public:
+  RingColorsNodelet() {}
+  ~RingColorsNodelet() {}
 
-    RingColorsNodelet() {}
-    ~RingColorsNodelet() {}
+ private:
+  virtual void onInit();
+  boost::shared_ptr<RingColors> colors_;
+};
 
-  private:
+/** @brief Nodelet initialization. */
+void RingColorsNodelet::onInit() {
+  colors_.reset(new RingColors(getNodeHandle(), getPrivateNodeHandle()));
+}
 
-    virtual void onInit();
-    boost::shared_ptr<RingColors> colors_;
-  };
-
-  /** @brief Nodelet initialization. */
-  void RingColorsNodelet::onInit()
-  {
-    colors_.reset(new RingColors(getNodeHandle(), getPrivateNodeHandle()));
-  }
-
-} // namespace velodyne_pointcloud
-
+}  // namespace velodyne_pointcloud
 
 // Register this plugin with pluginlib.  Names must match nodelets.xml.
 //

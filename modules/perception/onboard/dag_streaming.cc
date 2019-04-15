@@ -27,8 +27,8 @@
 namespace apollo {
 namespace perception {
 
-using std::string;
 using std::map;
+using std::string;
 using std::vector;
 
 DEFINE_int32(max_allowed_congestion_value, 0,

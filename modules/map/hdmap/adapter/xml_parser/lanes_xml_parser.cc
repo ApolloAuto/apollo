@@ -23,7 +23,7 @@ limitations under the License.
 namespace {
 double ToMPS(double speed) { return speed * 1000.0 / 3600.0; }
 bool IsReferenceLane(int lane_id) { return lane_id == 0; }
-};
+};  // namespace
 
 namespace apollo {
 namespace hdmap {
@@ -45,8 +45,7 @@ Status LanesXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
     std::string section_id = std::to_string(++section_cnt);
     section_internal.id = section_id;
     section_internal.section.mutable_id()->set_id(section_id);
-    RETURN_IF_ERROR(ParseLaneSection(*sub_node,
-                                     &section_internal.lanes));
+    RETURN_IF_ERROR(ParseLaneSection(*sub_node, &section_internal.lanes));
     RETURN_IF_ERROR(ParseSectionBoundary(
         *sub_node,
         section_internal.section.mutable_boundary()->mutable_outer_polygon()));
@@ -218,7 +217,7 @@ Status LanesXmlParser::ParseLane(const tinyxml2::XMLElement& xml_node,
     bool is_virtual = false;
     std::string virtual_border = "FALSE";
     checker = UtilXmlParser::QueryStringAttribute(*sub_node, "virtual",
-            &virtual_border);
+                                                  &virtual_border);
     if (checker == tinyxml2::XML_SUCCESS) {
       if (virtual_border == "TRUE") {
         is_virtual = true;
@@ -574,8 +573,8 @@ Status LanesXmlParser::ParseLaneOverlapGroup(
       std::string lane_id;
       double start_s = 0.0;
       double end_s = 0.0;
-      int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                   &lane_id);
+      int checker =
+          UtilXmlParser::QueryStringAttribute(*sub_node, "id", &lane_id);
       checker += sub_node->QueryDoubleAttribute("startOffset", &start_s);
       checker += sub_node->QueryDoubleAttribute("endOffset", &end_s);
       if (checker != tinyxml2::XML_SUCCESS) {
@@ -680,8 +679,8 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
       xml_node.FirstChildElement("predecessor");
   while (sub_node) {
     std::string lane_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                    &lane_id);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &lane_id);
     if (checker == tinyxml2::XML_SUCCESS) {
       PbID* pb_lane_id = lane->add_predecessor_id();
       pb_lane_id->set_id(lane_id);
@@ -692,8 +691,8 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
   sub_node = xml_node.FirstChildElement("successor");
   while (sub_node) {
     std::string lane_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                    &lane_id);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &lane_id);
     if (checker == tinyxml2::XML_SUCCESS) {
       PbID* pb_lane_id = lane->add_successor_id();
       pb_lane_id->set_id(lane_id);
@@ -705,8 +704,8 @@ void LanesXmlParser::ParseLaneLink(const tinyxml2::XMLElement& xml_node,
     std::string side;
     std::string direction;
     std::string lane_id;
-    int checker = UtilXmlParser::QueryStringAttribute(*sub_node, "id",
-                                                   &lane_id);
+    int checker =
+        UtilXmlParser::QueryStringAttribute(*sub_node, "id", &lane_id);
     checker += UtilXmlParser::QueryStringAttribute(*sub_node, "side", &side);
     checker +=
         UtilXmlParser::QueryStringAttribute(*sub_node, "direction", &direction);

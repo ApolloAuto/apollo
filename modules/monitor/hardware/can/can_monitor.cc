@@ -32,13 +32,12 @@ namespace monitor {
 
 using apollo::canbus::CanbusConf;
 
-CanMonitor::CanMonitor() : RecurrentRunner(FLAGS_can_monitor_name,
-                                           FLAGS_can_monitor_interval) {
-}
+CanMonitor::CanMonitor()
+    : RecurrentRunner(FLAGS_can_monitor_name, FLAGS_can_monitor_interval) {}
 
 void CanMonitor::RunOnce(const double current_time) {
-  static auto *status = MonitorManager::GetHardwareStatus(
-      FLAGS_can_hardware_name);
+  static auto *status =
+      MonitorManager::GetHardwareStatus(FLAGS_can_hardware_name);
 
   CanbusConf canbus_conf;
   CHECK(apollo::common::util::GetProtoFromFile(FLAGS_canbus_conf_file,

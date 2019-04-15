@@ -106,13 +106,9 @@ double PoseContainer::GetSpeed() const {
   return std::hypot(velocity_x, velocity_y);
 }
 
-double PoseContainer::GetTheta() const {
-  return obstacle_ptr_->theta();
-}
+double PoseContainer::GetTheta() const { return obstacle_ptr_->theta(); }
 
-Point PoseContainer::GetPosition() const {
-  return obstacle_ptr_->position();
-}
+Point PoseContainer::GetPosition() const { return obstacle_ptr_->position(); }
 
 }  // namespace prediction
 }  // namespace apollo

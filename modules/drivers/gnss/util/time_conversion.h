@@ -119,22 +119,26 @@ const int64_t ONE_BILLION = 1000000000L;
 
 inline int64_t UnixToGpsMicroSeconds(int64_t unix_microseconds) {
   return common::time::TimeUtil::Unix2gps(unix_microseconds / ONE_MILLION) *
-             ONE_MILLION + unix_microseconds % ONE_MILLION;
+             ONE_MILLION +
+         unix_microseconds % ONE_MILLION;
 }
 
 inline int64_t UnixToGpsNanoSeconds(int64_t unix_nanoseconds) {
   return common::time::TimeUtil::Unix2gps(unix_nanoseconds / ONE_BILLION) *
-             ONE_BILLION + unix_nanoseconds % ONE_BILLION;
+             ONE_BILLION +
+         unix_nanoseconds % ONE_BILLION;
 }
 
 inline int64_t GpsToUnixMicroSeconds(int64_t gps_microseconds) {
   return common::time::TimeUtil::Gps2unix(gps_microseconds / ONE_MILLION) *
-             ONE_MILLION + gps_microseconds % ONE_MILLION;
+             ONE_MILLION +
+         gps_microseconds % ONE_MILLION;
 }
 
 inline int64_t GpsToUnixNanoSeconds(int64_t gps_nanoseconds) {
   return common::time::TimeUtil::Gps2unix(gps_nanoseconds / ONE_BILLION) *
-             ONE_BILLION + gps_nanoseconds % ONE_BILLION;
+             ONE_BILLION +
+         gps_nanoseconds % ONE_BILLION;
 }
 
 }  // namespace util

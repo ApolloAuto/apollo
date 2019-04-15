@@ -22,13 +22,13 @@
 #define MODULES_LOCALIZATION_MSF_LOCAL_TOOL_VISUALIZATION_MANAGER_H
 
 #include <Eigen/Geometry>
+#include <atomic>
 #include <list>
 #include <map>
 #include <string>
 #include <thread>
 #include <utility>
 #include <vector>
-#include <atomic>
 #include "modules/localization/msf/local_tool/local_visualization/engine/visualization_engine.h"
 
 namespace apollo {
@@ -157,8 +157,7 @@ class VisualizationManager {
     return visual_manage;
   }
 
-  bool Init(const std::string &map_folder,
-            const std::string &map_visual_folder,
+  bool Init(const std::string &map_folder, const std::string &map_visual_folder,
             const Eigen::Affine3d &velodyne_extrinsic,
             const VisualMapParam &map_param);
   bool Init(const VisualizationManagerParams &params);

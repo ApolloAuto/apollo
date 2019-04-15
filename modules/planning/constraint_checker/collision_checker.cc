@@ -34,15 +34,14 @@
 namespace apollo {
 namespace planning {
 
+using apollo::common::PathPoint;
+using apollo::common::TrajectoryPoint;
 using apollo::common::math::Box2d;
 using apollo::common::math::PathMatcher;
 using apollo::common::math::Vec2d;
-using apollo::common::PathPoint;
-using apollo::common::TrajectoryPoint;
 
 CollisionChecker::CollisionChecker(
-    const std::vector<const Obstacle*>& obstacles,
-    const double ego_vehicle_s,
+    const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
     const double ego_vehicle_d,
     const std::vector<PathPoint>& discretized_reference_line,
     const ReferenceLineInfo* ptr_reference_line_info,
@@ -84,8 +83,7 @@ bool CollisionChecker::InCollision(
 }
 
 void CollisionChecker::BuildPredictedEnvironment(
-    const std::vector<const Obstacle*>& obstacles,
-    const double ego_vehicle_s,
+    const std::vector<const Obstacle*>& obstacles, const double ego_vehicle_s,
     const double ego_vehicle_d,
     const std::vector<PathPoint>& discretized_reference_line) {
   CHECK(predicted_bounding_rectangles_.empty());
@@ -125,8 +123,8 @@ void CollisionChecker::BuildPredictedEnvironment(
   }
 }
 
-bool CollisionChecker::IsEgoVehicleInLane(
-    const double ego_vehicle_s, const double ego_vehicle_d) {
+bool CollisionChecker::IsEgoVehicleInLane(const double ego_vehicle_s,
+                                          const double ego_vehicle_d) {
   double left_width = FLAGS_default_reference_line_width * 0.5;
   double right_width = FLAGS_default_reference_line_width * 0.5;
   ptr_reference_line_info_->reference_line().GetLaneWidth(

@@ -14,10 +14,10 @@ limitations under the License.
 ==============================================================================*/
 
 #include "modules/canbus/vehicle/ch/ch_controller.h"
-#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/canbus/vehicle/ch/ch_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
 #include "modules/common/log.h"
+#include "modules/common/proto/vehicle_signal.pb.h"
 #include "modules/common/time/time.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/protocol_data.h"
@@ -437,9 +437,7 @@ void ChController::SetTurningSignal(const ControlCommand& command) {}
 
 void ChController::ResetProtocol() { message_manager_->ResetSendMessages(); }
 
-bool ChController::CheckChassisError() {
-  return false;
-}
+bool ChController::CheckChassisError() { return false; }
 
 void ChController::SecurityDogThreadFunc() {
   int32_t vertical_ctrl_fail = 0;

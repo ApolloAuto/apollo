@@ -41,6 +41,8 @@
 #include <errno.h>
 #include <fcntl.h> /* low-level i/o */
 #include <malloc.h>
+#include <ros/ros.h>
+#include <sensor_msgs/fill_image.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,8 +52,6 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <ros/ros.h>
-#include <sensor_msgs/fill_image.h>
 #include <boost/lexical_cast.hpp>
 
 #ifdef __x86_64__
@@ -66,8 +66,8 @@
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
 #ifndef __x86_64__
-#define ADV_TRIGGER_ENABLE    1
-#define ADV_TRIGGER_DISABLE   0
+#define ADV_TRIGGER_ENABLE 1
+#define ADV_TRIGGER_DISABLE 0
 #endif
 
 namespace apollo {
@@ -359,8 +359,8 @@ void UsbCam::mjpeg2rgb(char *MJPEG, int len, char *RGB, int NumPixels) {
   int ysize = avcodec_context_->height;
   int pic_size = avpicture_get_size(avcodec_context_->pix_fmt, xsize, ysize);
   if (pic_size != avframe_camera_size_) {
-    AERROR << "outbuf size mismatch.  pic_size[" << pic_size
-        << "] bufsize[" << avframe_camera_size_ << "]";
+    AERROR << "outbuf size mismatch.  pic_size[" << pic_size << "] bufsize["
+           << avframe_camera_size_ << "]";
     return;
   }
 
@@ -422,8 +422,8 @@ int UsbCam::read_frame() {
       len = v4l_buf.bytesused;
       image_->tv_sec = v4l_buf.timestamp.tv_sec;
       image_->tv_usec = v4l_buf.timestamp.tv_usec;
-      ADEBUG << "new image timestamp: "
-          << image_->tv_sec << "." << image_->tv_usec;
+      ADEBUG << "new image timestamp: " << image_->tv_sec << "."
+             << image_->tv_usec;
 
       result = process_image(buffers_[v4l_buf.index].start, len, image_);
       if (!result) {
@@ -932,12 +932,12 @@ UsbCam::pixel_format UsbCam::pixel_format_from_string(const std::string &str) {
 }
 
 int UsbCam::trigger_enable(unsigned char fps, unsigned char internal) {
-  AINFO << "Trigger enable, dev[" << camera_dev_ << "] fps["
-      << fps << "] internal[" << internal << "]";
+  AINFO << "Trigger enable, dev[" << camera_dev_ << "] fps[" << fps
+        << "] internal[" << internal << "]";
 #ifdef __x86_64__
   return adv_trigger_enable(camera_dev_.c_str(), fps, internal);
-#else 
-   return ADV_TRIGGER_ENABLE;
+#else
+  return ADV_TRIGGER_ENABLE;
 #endif
 }
 
@@ -945,7 +945,7 @@ int UsbCam::trigger_disable() {
 #ifdef __x86_64__
   return adv_trigger_disable(camera_dev_.c_str());
 #else
-   return ADV_TRIGGER_DISABLE;
+  return ADV_TRIGGER_DISABLE;
 #endif
 }
 

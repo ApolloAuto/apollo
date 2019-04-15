@@ -22,8 +22,8 @@
 #include <map>
 #include <memory>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 namespace apollo {
 namespace perception {
 

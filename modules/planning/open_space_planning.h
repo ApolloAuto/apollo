@@ -17,9 +17,9 @@
 #ifndef MODULES_PLANNING_OPEN_SPACE_PLANNING_H_
 #define MODULES_PLANNING_OPEN_SPACE_PLANNING_H_
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include "modules/planning/common/frame_open_space.h"
 #include "modules/planning/planning_base.h"

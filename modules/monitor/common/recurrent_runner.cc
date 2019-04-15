@@ -27,11 +27,8 @@ namespace monitor {
 
 using apollo::common::time::Clock;
 
-RecurrentRunner::RecurrentRunner(const std::string &name,
-                                 const double interval)
-    : name_(name)
-    , interval_(interval) {
-}
+RecurrentRunner::RecurrentRunner(const std::string &name, const double interval)
+    : name_(name), interval_(interval) {}
 
 void RecurrentRunner::Tick(const double current_time) {
   if (next_round_ <= current_time) {
@@ -42,8 +39,7 @@ void RecurrentRunner::Tick(const double current_time) {
 }
 
 RecurrentRunnerThread::RecurrentRunnerThread(const double interval)
-    : interval_ms_(interval * 1000) {
-}
+    : interval_ms_(interval * 1000) {}
 
 void RecurrentRunnerThread::RegisterRunner(
     std::unique_ptr<RecurrentRunner> runner) {

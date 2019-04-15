@@ -14,12 +14,12 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include <ros/ros.h>
 #include <arpa/inet.h>
-#include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
-#include <sensor_msgs/PointCloud2.h>
+#include <image_transport/image_transport.h>
 #include <pcl_conversions/pcl_conversions.h>
+#include <ros/ros.h>
+#include <sensor_msgs/PointCloud2.h>
 #include "pandora/pandora.h"
 
 using apollo::drivers::hesai::Pandora;
@@ -45,12 +45,12 @@ class PandoraHesaiClient {
     std::string frameId = std::string("hesai40");
 
     // parse nodehandle param
-    bool ret = parseParameter(nh, &pandoraIP, &lidarRecvPort,
-            &gpsRecvPort, &startAngle, &pandoraCameraPort,
-            &lidarTopic, cameraTopics, &enableCamera, &timezone, &frameId);
+    bool ret = parseParameter(nh, &pandoraIP, &lidarRecvPort, &gpsRecvPort,
+                              &startAngle, &pandoraCameraPort, &lidarTopic,
+                              cameraTopics, &enableCamera, &timezone, &frameId);
     if (!ret) {
-        ROS_INFO("Parse parameters failed, please check parameters above.");
-        return;
+      ROS_INFO("Parse parameters failed, please check parameters above.");
+      return;
     }
 
     // advertise
@@ -63,12 +63,12 @@ class PandoraHesaiClient {
       }
     }
 
-    psdk = new Pandora(pandoraIP, lidarRecvPort, gpsRecvPort,
-            boost::bind(&PandoraHesaiClient::lidarCallback, this, _1, _2),
-            NULL, startAngle * 100, pandoraCameraPort,
-            boost::bind(&PandoraHesaiClient::cameraCallback,
-                        this, _1, _2, _3, _4),
-            enableCamera, timezone, frameId);
+    psdk = new Pandora(
+        pandoraIP, lidarRecvPort, gpsRecvPort,
+        boost::bind(&PandoraHesaiClient::lidarCallback, this, _1, _2), NULL,
+        startAngle * 100, pandoraCameraPort,
+        boost::bind(&PandoraHesaiClient::cameraCallback, this, _1, _2, _3, _4),
+        enableCamera, timezone, frameId);
     psdk->Start();
   }
 
@@ -120,27 +120,27 @@ class PandoraHesaiClient {
       nh.getParam("frame_id", *frameId);
     }
 
-    std::cout << "Configs: pandoraIP: " << *pandoraIP << ", lidarRecvPort: "
-        << *lidarRecvPort << ", gpsRecvPort: " << *gpsRecvPort
-        << ", startAngle: " << *startAngle << ", pandoraCameraPort: "
-        << *pandoraCameraPort << ", lidarTopic: " << *lidarTopic
-        << ", enableCamera: " << *enableCamera << ", frameId: "
-        << *frameId << std::endl;
+    std::cout << "Configs: pandoraIP: " << *pandoraIP
+              << ", lidarRecvPort: " << *lidarRecvPort
+              << ", gpsRecvPort: " << *gpsRecvPort
+              << ", startAngle: " << *startAngle
+              << ", pandoraCameraPort: " << *pandoraCameraPort
+              << ", lidarTopic: " << *lidarTopic
+              << ", enableCamera: " << *enableCamera
+              << ", frameId: " << *frameId << std::endl;
     for (int i = 0; i < 5; i++) {
       std::cout << "cameraTopic" << i << ": " << cameraTopics[i] << std::endl;
     }
 
     // check
     struct sockaddr_in sa;
-    return checkPort(*lidarRecvPort) && checkPort(*gpsRecvPort)
-        && checkPort(*pandoraCameraPort) && (*startAngle >= 0)
-        && (*startAngle < 360)
-        && (1 == inet_pton(AF_INET, pandoraIP->c_str(), &(sa.sin_addr)));
+    return checkPort(*lidarRecvPort) && checkPort(*gpsRecvPort) &&
+           checkPort(*pandoraCameraPort) && (*startAngle >= 0) &&
+           (*startAngle < 360) &&
+           (1 == inet_pton(AF_INET, pandoraIP->c_str(), &(sa.sin_addr)));
   }
 
-  bool checkPort(int port) {
-    return (port > 0) && (port < 65535);
-  }
+  bool checkPort(int port) { return (port > 0) && (port < 65535); }
 
   void cameraCallback(boost::shared_ptr<cv::Mat> matp, double timestamp,
                       int pic_id, bool distortion) {
@@ -164,17 +164,17 @@ class PandoraHesaiClient {
 
   ~PandoraHesaiClient() {
     if (NULL != psdk) {
-      delete(psdk);
+      delete (psdk);
     }
   }
 
  private:
   ros::Publisher lidarPublisher;
   image_transport::Publisher imgPublishers[5];
-  Pandora *psdk;
+  Pandora* psdk;
 };
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   ros::init(argc, argv, "pandora_ros");
   ros::NodeHandle nh("~");
   ros::NodeHandle node;

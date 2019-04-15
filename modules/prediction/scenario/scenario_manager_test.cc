@@ -18,20 +18,18 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/scenario/scenario_manager.h"
 
 namespace apollo {
 namespace prediction {
 
-using apollo::common::adapter::AdapterConfig;
 using apollo::common::Scenario;
+using apollo::common::adapter::AdapterConfig;
 
 class ScenarioManagerTest : public ::testing::Test {
  public:
-  virtual void SetUp() {
-    manager_ = ScenarioManager::instance();
-  }
+  virtual void SetUp() { manager_ = ScenarioManager::instance(); }
 
  protected:
   ScenarioManager* manager_ = nullptr;

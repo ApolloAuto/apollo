@@ -38,8 +38,8 @@ Status HttpClient::Post(const std::string &url, const Json &json,
     std::ostringstream response;
 
     request.setOpt(new curlpp::options::Url(url));
-    request.setOpt(new curlpp::options::HttpHeader(
-        {"Content-Type: application/json"}));
+    request.setOpt(
+        new curlpp::options::HttpHeader({"Content-Type: application/json"}));
     const std::string data = json.dump();
     request.setOpt(new curlpp::options::PostFields(data));
     request.setOpt(new curlpp::options::PostFieldSize(data.length()));

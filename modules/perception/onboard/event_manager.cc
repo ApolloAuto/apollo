@@ -24,8 +24,8 @@
 namespace apollo {
 namespace perception {
 
-using std::vector;
 using std::string;
+using std::vector;
 
 DEFINE_int32(max_event_queue_size, 1000, "The max size of event queue.");
 

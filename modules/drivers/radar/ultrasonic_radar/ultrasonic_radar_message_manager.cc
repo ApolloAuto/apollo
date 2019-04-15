@@ -21,7 +21,6 @@
 
 #include "modules/drivers/radar/ultrasonic_radar/ultrasonic_radar_message_manager.h"
 
-
 namespace apollo {
 namespace drivers {
 namespace ultrasonic_radar {
@@ -29,8 +28,7 @@ namespace ultrasonic_radar {
 using ::apollo::common::adapter::AdapterManager;
 
 UltrasonicRadarMessageManager::UltrasonicRadarMessageManager(int entrance_num)
-    : MessageManager<Ultrasonic>(),
-      entrance_num_(entrance_num) {
+    : MessageManager<Ultrasonic>(), entrance_num_(entrance_num) {
   sensor_data_.mutable_ranges()->Resize(entrance_num_, 0.0);
 }
 
@@ -40,7 +38,7 @@ void UltrasonicRadarMessageManager::set_can_client(
 }
 
 void UltrasonicRadarMessageManager::Parse(const uint32_t message_id,
-                                     const uint8_t *data, int32_t length) {
+                                          const uint8_t *data, int32_t length) {
   if (message_id == 0x301) {
     sensor_data_.set_ranges(0, data[1]);
     sensor_data_.set_ranges(1, data[2]);

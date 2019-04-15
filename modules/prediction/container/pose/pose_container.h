@@ -67,7 +67,7 @@ class PoseContainer : public Container {
    */
   double GetSpeed() const;
 
-   /**
+  /**
    * @brief Get heading of adc
    * @return heading of adc
    */

@@ -39,8 +39,8 @@ namespace common {
 /**
  * @class CpuBindHelper
  *
- * @Brief This is a helper class that helps bind a specified process on a cpu core.
- * The binding rules are defined in modules/common/data/cpu_set.json
+ * @Brief This is a helper class that helps bind a specified process on a cpu
+ * core. The binding rules are defined in modules/common/data/cpu_set.json
  */
 class CpuBindHelper {
  public:
@@ -49,12 +49,12 @@ class CpuBindHelper {
    * Then, process function can call BindCpu function to bind cpu with
    * the processname as the parameter.
    */
-  void Init(const std::string &config_file);
+  void Init(const std::string& config_file);
 
   /**
-   * @brief Given the process name, and bind current process on the reserved cpu.
-   * If the given process name can not be found, then nothing will happen,
-   * so changing the process name to another in configuration file is a 
+   * @brief Given the process name, and bind current process on the reserved
+   * cpu. If the given process name can not be found, then nothing will happen,
+   * so changing the process name to another in configuration file is a
    * easy way to cancel binding for a process.
    */
   void BindCpu(const std::string& module_name);
@@ -72,5 +72,3 @@ class CpuBindHelper {
 }  // namespace apollo
 
 #endif  // MODULES_CONFIGS_CPU_BIND_H_
-
-

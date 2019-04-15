@@ -30,9 +30,7 @@ class VelodyneUtilityTestSuite : public ::testing::Test {
 };
 
 /**@brief Test . */
-TEST_F(VelodyneUtilityTestSuite, test) {
-  ASSERT_TRUE(true);
-}
+TEST_F(VelodyneUtilityTestSuite, test) { ASSERT_TRUE(true); }
 
 }  // namespace msf
 }  // namespace localization

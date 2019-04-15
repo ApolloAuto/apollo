@@ -24,8 +24,8 @@
 
 #include <array>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 #include "Eigen/Dense"
 #include "gtest/gtest.h"
 
@@ -65,10 +65,10 @@ class MoveSequencePredictor : public SequencePredictor {
       const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
 
-  bool GetLongitudinalPolynomial(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      std::pair<double, double>* lon_end_state,
-      std::array<double, 5>* coefficients);
+  bool GetLongitudinalPolynomial(const Obstacle& obstacle,
+                                 const LaneSequence& lane_sequence,
+                                 std::pair<double, double>* lon_end_state,
+                                 std::array<double, 5>* coefficients);
 
   bool GetLateralPolynomial(const Obstacle& obstacle,
                             const LaneSequence& lane_sequence,
@@ -79,8 +79,7 @@ class MoveSequencePredictor : public SequencePredictor {
       const Obstacle& obstacle, const LaneSequence& lane_sequence);
 
   std::pair<double, double> ComputeLonEndState(
-      const std::array<double, 3>& init_s,
-      const LaneSequence& lane_sequence);
+      const std::array<double, 3>& init_s, const LaneSequence& lane_sequence);
 
   void GenerateCandidateTimes(std::vector<double>* candidate_times);
 };

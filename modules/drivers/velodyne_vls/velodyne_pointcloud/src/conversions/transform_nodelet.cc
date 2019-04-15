@@ -12,35 +12,29 @@
 
 */
 
-#include <ros/ros.h>
-#include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+#include <ros/ros.h>
 
 #include "transform.h"
 
-namespace velodyne_pointcloud
-{
-  class TransformNodelet: public nodelet::Nodelet
-  {
-  public:
+namespace velodyne_pointcloud {
+class TransformNodelet : public nodelet::Nodelet {
+ public:
+  TransformNodelet() {}
+  ~TransformNodelet() {}
 
-    TransformNodelet() {}
-    ~TransformNodelet() {}
+ private:
+  virtual void onInit();
+  boost::shared_ptr<Transform> tf_;
+};
 
-  private:
+/** @brief Nodelet initialization. */
+void TransformNodelet::onInit() {
+  tf_.reset(new Transform(getNodeHandle(), getPrivateNodeHandle()));
+}
 
-    virtual void onInit();
-    boost::shared_ptr<Transform> tf_;
-  };
-
-  /** @brief Nodelet initialization. */
-  void TransformNodelet::onInit()
-  {
-    tf_.reset(new Transform(getNodeHandle(), getPrivateNodeHandle()));
-  }
-
-} // namespace velodyne_pointcloud
-
+}  // namespace velodyne_pointcloud
 
 // Register this plugin with pluginlib.  Names must match nodelets.xml.
 //

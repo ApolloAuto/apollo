@@ -76,8 +76,7 @@ bool MPCController::LoadControlConf(const ControlConf *control_conf) {
     AERROR << "[MPCController] control_conf == nullptr";
     return false;
   }
-  vehicle_param_ =
-      VehicleConfigHelper::instance()->GetConfig().vehicle_param();
+  vehicle_param_ = VehicleConfigHelper::instance()->GetConfig().vehicle_param();
 
   ts_ = control_conf->mpc_controller_conf().ts();
   CHECK_GT(ts_, 0.0) << "[MPCController] Invalid control update interval.";

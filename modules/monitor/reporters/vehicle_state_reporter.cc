@@ -22,8 +22,8 @@
 #include "modules/common/util/json_util.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/data/util/info_collector.h"
-#include "modules/monitor/proto/online_report.pb.h"
 #include "modules/monitor/common/monitor_manager.h"
+#include "modules/monitor/proto/online_report.pb.h"
 
 DEFINE_string(vehicle_state_reporter_name, "VehicleStateReporter",
               "Vehicle state reporter name.");
@@ -36,8 +36,7 @@ namespace monitor {
 
 VehicleStateReporter::VehicleStateReporter()
     : RecurrentRunner(FLAGS_vehicle_state_reporter_name,
-                      FLAGS_vehicle_state_report_interval) {
-}
+                      FLAGS_vehicle_state_report_interval) {}
 
 void VehicleStateReporter::RunOnce(const double current_time) {
   VehicleStateReport report;

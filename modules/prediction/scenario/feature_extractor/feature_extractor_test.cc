@@ -27,7 +27,6 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/container/container_manager.h"
 
-
 namespace apollo {
 namespace prediction {
 
@@ -44,8 +43,7 @@ TEST_F(FeatureExtractorTest, junction) {
           AdapterConfig::PLANNING_TRAJECTORY);
   FeatureExtractor feature_extractor;
   feature_extractor.ExtractFrontJunctionFeatures();
-  ScenarioFeature scenario_feature =
-      feature_extractor.GetScenarioFeatures();
+  ScenarioFeature scenario_feature = feature_extractor.GetScenarioFeatures();
   EXPECT_TRUE(!scenario_feature.has_junction_id());
 }
 

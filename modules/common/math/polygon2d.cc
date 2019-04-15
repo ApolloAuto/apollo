@@ -405,9 +405,7 @@ void Polygon2d::GetAllVertices(std::vector<Vec2d> *const vertices) const {
   *vertices = points_;
 }
 
-std::vector<Vec2d> Polygon2d::GetAllVertices() const {
-  return points_;
-}
+std::vector<Vec2d> Polygon2d::GetAllVertices() const { return points_; }
 
 std::vector<LineSegment2d> Polygon2d::GetAllOverlaps(
     const LineSegment2d &line_segment) const {
@@ -586,9 +584,8 @@ Polygon2d Polygon2d::ExpandByDistance(const double distance) const {
     } else {
       const int count = static_cast<int>(diff / kMinAngle) + 1;
       for (int k = 0; k <= count; ++k) {
-        const double angle =
-            start_angle +
-            diff * static_cast<double>(k) / static_cast<double>(count);
+        const double angle = start_angle + diff * static_cast<double>(k) /
+                                               static_cast<double>(count);
         points.push_back(points_[i] + Vec2d::CreateUnitVec2d(angle) * distance);
       }
     }

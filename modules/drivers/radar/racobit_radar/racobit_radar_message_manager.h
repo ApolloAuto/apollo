@@ -35,9 +35,9 @@ namespace apollo {
 namespace drivers {
 namespace racobit_radar {
 
-using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::common::adapter::AdapterManager;
 using ::apollo::drivers::canbus::MessageManager;
+using ::apollo::drivers::canbus::ProtocolData;
 using Clock = ::apollo::common::time::Clock;
 using micros = std::chrono::microseconds;
 using ::apollo::common::ErrorCode;

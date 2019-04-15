@@ -75,7 +75,7 @@ class ObjectCameraExtendedKalmanFilter : public BaseCameraFilter {
       const float x, const float y, const float theta, const float v) const;
 
   Eigen::Matrix4f GetTransitionMatrix(const double theta, const double v,
-                                         const double dt) const;
+                                      const double dt) const;
 
   std::unordered_map<int, ObjectFilter> tracked_filters_;
 

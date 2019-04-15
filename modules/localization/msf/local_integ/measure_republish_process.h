@@ -83,7 +83,7 @@ class MeasureRepublishProcess {
                          MeasureData* measure);
 
   bool GnssHeadingProcess(const drivers::gnss::Heading& heading_msg,
-                          MeasureData *measure, int *status);
+                          MeasureData* measure, int* status);
 
  protected:
   bool IsSinsAlign();
@@ -97,7 +97,7 @@ class MeasureRepublishProcess {
                                     MeasureData* measure);
 
   bool LoadImuGnssAntennaExtrinsic(std::string file_path,
-                                 VehicleGnssAntExtrinsic* extrinsic) const;
+                                   VehicleGnssAntExtrinsic* extrinsic) const;
 
  private:
   MeasureData pre_bestgnsspose_;

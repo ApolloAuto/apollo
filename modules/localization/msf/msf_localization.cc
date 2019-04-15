@@ -85,7 +85,7 @@ Status MSFLocalization::Start() {
       return Status(common::LOCALIZATION_ERROR_MSG, "no gnss heading adapter");
     }
     AdapterManager::AddGnssHeadingCallback(&MSFLocalization::OnGnssHeading,
-      this);
+                                           this);
   }
 
   if (FLAGS_gnss_mode == 1) {
@@ -403,7 +403,7 @@ void MSFLocalization::OnGnssRtkEph(
 }
 
 void MSFLocalization::OnGnssHeading(
-  const drivers::gnss::Heading &gnssheading_msg) {
+    const drivers::gnss::Heading &gnssheading_msg) {
   localization_integ_.GnssHeadingProcess(gnssheading_msg);
 }
 

@@ -46,9 +46,11 @@ class SpiralReferenceLineSmoother : public ReferenceLineSmoother {
 
   // For offline navigation line smoothing
   bool SmoothStandAlone(std::vector<Eigen::Vector2d> point2d,
-      std::vector<double>* ptr_theta, std::vector<double>* ptr_kappa,
-      std::vector<double>* ptr_dkappa, std::vector<double>* ptr_s,
-      std::vector<double>* ptr_x, std::vector<double>* ptr_y) const;
+                        std::vector<double>* ptr_theta,
+                        std::vector<double>* ptr_kappa,
+                        std::vector<double>* ptr_dkappa,
+                        std::vector<double>* ptr_s, std::vector<double>* ptr_x,
+                        std::vector<double>* ptr_y) const;
 
   void SetAnchorPoints(const std::vector<AnchorPoint>&) override;
 

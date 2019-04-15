@@ -16,10 +16,11 @@
 
 #include "modules/control/controller/lon_controller.h"
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
-#include <iostream>
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
@@ -28,7 +29,6 @@
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 protobuf_mutator::protobuf::LogSilencer log_silincer;
 
@@ -102,8 +102,7 @@ class LonControllerFuzzer : LonController {
   LonControllerConf longitudinal_conf_;
   std::unique_ptr<LonController> controller_;
   double timestamp_ = 0.0;
-}lon_controller_fuzzer;
-
+} lon_controller_fuzzer;
 
 void LonControllerFuzzer::target(planning::ADCTrajectory trajectory_pb) {
   FLAGS_enable_map_reference_unify = false;
@@ -128,9 +127,9 @@ void LonControllerFuzzer::target(planning::ADCTrajectory trajectory_pb) {
 }  // namespace control
 }  // namespace apollo
 
-DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message) {
+DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory &message) {
   if (message.header().module_name() != "" &&
-    !message.trajectory_point().empty()) {
+      !message.trajectory_point().empty()) {
     apollo::control::lon_controller_fuzzer.target(message);
   }
 }

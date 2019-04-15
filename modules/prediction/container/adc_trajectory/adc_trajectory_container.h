@@ -23,10 +23,10 @@
 #define MODULES_PREDICTION_CONTAINER_ADC_TRAJECTORY_OBSTACLES_H_
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_set>
 #include <vector>
-#include <mutex>
 
 #include "Eigen/Dense"
 
@@ -34,9 +34,9 @@
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/math/vec2d.h"
 #include "modules/planning/proto/planning.pb.h"
+#include "modules/prediction/common/prediction_map.h"
 #include "modules/prediction/container/container.h"
 #include "modules/prediction/proto/lane_graph.pb.h"
-#include "modules/prediction/common/prediction_map.h"
 
 namespace apollo {
 namespace prediction {

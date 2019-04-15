@@ -24,10 +24,10 @@
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::math::Vec2d;
-using apollo::planning::ADCTrajectory;
 using apollo::hdmap::HDMapUtil;
-using apollo::hdmap::LaneInfo;
 using apollo::hdmap::JunctionInfo;
+using apollo::hdmap::LaneInfo;
+using apollo::planning::ADCTrajectory;
 using JunctionInfoPtr = std::shared_ptr<const JunctionInfo>;
 using LaneInfoPtr = std::shared_ptr<const LaneInfo>;
 
@@ -40,8 +40,7 @@ FeatureExtractor::FeatureExtractor() {
           AdapterConfig::PLANNING_TRAJECTORY));
 
   pose_container_ = dynamic_cast<PoseContainer*>(
-      ContainerManager::instance()->GetContainer(
-          AdapterConfig::LOCALIZATION));
+      ContainerManager::instance()->GetContainer(AdapterConfig::LOCALIZATION));
 }
 
 void FeatureExtractor::ExtractFeatures() {
@@ -52,8 +51,7 @@ void FeatureExtractor::ExtractFeatures() {
   ExtractEgoVehicleFeatures();
 
   auto ego_trajectory_point = pose_container_->GetPosition();
-  if (!ego_trajectory_point.has_x() ||
-      !ego_trajectory_point.has_y()) {
+  if (!ego_trajectory_point.has_x() || !ego_trajectory_point.has_y()) {
     AERROR << "Fail to get ego vehicle position";
     return;
   }
@@ -82,9 +80,8 @@ void FeatureExtractor::ExtractEgoVehicleFeatures() {
   // TODO(all): add acceleration if needed
 }
 
-void FeatureExtractor::ExtractEgoLaneFeatures(const LaneInfoPtr& ptr_ego_lane,
-    const common::math::Vec2d& ego_position) {
-
+void FeatureExtractor::ExtractEgoLaneFeatures(
+    const LaneInfoPtr& ptr_ego_lane, const common::math::Vec2d& ego_position) {
   if (ptr_ego_lane == nullptr) {
     AERROR << "Ego vehicle is not on any lane.";
     return;
@@ -98,7 +95,6 @@ void FeatureExtractor::ExtractEgoLaneFeatures(const LaneInfoPtr& ptr_ego_lane,
 
 void FeatureExtractor::ExtractNeighborLaneFeatures(
     const LaneInfoPtr& ptr_ego_lane, const Vec2d& ego_position) {
-
   if (ptr_ego_lane == nullptr) {
     AERROR << "Ego vehicle is not on any lane.";
     return;
@@ -137,12 +133,10 @@ void FeatureExtractor::ExtractFrontJunctionFeatures() {
   }
 }
 
-void FeatureExtractor::ExtractObstacleFeatures() {
-}
+void FeatureExtractor::ExtractObstacleFeatures() {}
 
 LaneInfoPtr FeatureExtractor::GetEgoLane(const Vec2d& ego_position) const {
-  const auto& trajectory =
-      ego_trajectory_containter_->adc_trajectory();
+  const auto& trajectory = ego_trajectory_containter_->adc_trajectory();
   for (const auto& lane_id : trajectory.lane_id()) {
     LaneInfoPtr lane_info =
         HDMapUtil::BaseMap().GetLaneById(hdmap::MakeMapId(lane_id.id()));

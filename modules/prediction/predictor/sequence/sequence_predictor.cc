@@ -91,8 +91,7 @@ void SequencePredictor::FilterLaneSequences(
     if (distance > 0.0 && distance < FLAGS_lane_change_dist) {
       bool obs_within_its_own_lane = true;
       for (const auto& polygon_point : feature.polygon_point()) {
-        Eigen::Vector2d position(polygon_point.x(),
-                                 polygon_point.y());
+        Eigen::Vector2d position(polygon_point.x(), polygon_point.y());
         std::shared_ptr<const LaneInfo> lane_info =
             PredictionMap::LaneById(lane_id);
         if (lane_info == nullptr) {

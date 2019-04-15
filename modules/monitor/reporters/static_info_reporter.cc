@@ -32,8 +32,7 @@ namespace monitor {
 
 StaticInfoReporter::StaticInfoReporter()
     : RecurrentRunner(FLAGS_static_info_reporter_name,
-                      FLAGS_static_info_report_interval) {
-}
+                      FLAGS_static_info_report_interval) {}
 
 void StaticInfoReporter::RunOnce(const double current_time) {
   AINFO << "Reported static info.";

@@ -27,7 +27,7 @@ template <typename T>
 void operator>>(const YAML::Node& node, T& i) {
   i = node.as<T>();
 }
-} /* YAML */
+}  // namespace YAML
 #endif  // HAVE_NEW_YAMLCPP
 
 #include <ros/ros.h>
@@ -258,4 +258,4 @@ void Calibration::write(const std::string& calibration_file) {
   fout.close();
 }
 
-} /* velodyne_pointcloud */
+}  // namespace velodyne_pointcloud

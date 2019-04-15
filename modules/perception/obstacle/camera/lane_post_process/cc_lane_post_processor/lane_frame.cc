@@ -83,7 +83,9 @@ ScalarType LaneFrame::ComputeMarkerPairDistance(const Marker& ref,
       displacement = tar.start_pos - ref.pos;
       break;
     }
-    default: { AERROR << "unknown marker shape type."; }
+    default: {
+      AERROR << "unknown marker shape type.";
+    }
   }
 
   ScalarType pos_dist = static_cast<ScalarType>(displacement.norm());
@@ -519,7 +521,9 @@ vector<int> LaneFrame::ComputeMarkerEdges(
         y_thresh = markers_[i].pos(0) - opts_.min_y_search_offset;
         break;
       }
-      default: { AERROR << "Error: unknown space type " << opts_.space_type; }
+      default: {
+        AERROR << "Error: unknown space type " << opts_.space_type;
+      }
     }
 
     for (size_t j = 0; j < tot_marker_num; ++j) {
@@ -678,7 +682,9 @@ bool LaneFrame::GreedyGroupConnectAssociation() {
         y_thresh = cur_group->end_pos(0) - opts_.min_y_search_offset;
         break;
       }
-      default: { AERROR << "unknown space type " << cur_group->space_type; }
+      default: {
+        AERROR << "unknown space type " << cur_group->space_type;
+      }
     }
 
     to_group_idx[k].reserve(n);
@@ -952,7 +958,9 @@ bool LaneFrame::Process(LaneInstancesPtr instances) {
       }
       break;
     }
-    default: { AERROR << "unknown marker association method."; }
+    default: {
+      AERROR << "unknown marker association method.";
+    }
   }
   ADEBUG << "number of lane instance candidates = " << graphs_.size();
 

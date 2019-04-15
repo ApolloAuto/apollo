@@ -20,8 +20,8 @@ namespace apollo {
 namespace planning {
 
 /**
-  * @brief: max considerred obstacle range
-  */
+ * @brief: max considerred obstacle range
+ */
 namespace {
 constexpr double kMaxFollow = 100.0;
 constexpr double kMaxOvertake = 100.0;
@@ -29,7 +29,7 @@ constexpr double kMaxStop = 60.0;
 constexpr double kMaxNudge = 60.0;
 constexpr double kMaxNudgeLateralDistance = 10.0;
 constexpr double kMaxSidePassDistance = 100.0;
-}
+}  // namespace
 
 common::Status AutotuningSpeedMLPModel::SetParams() {
   mlp_model_.reset(new AutotuningMLPModel());

@@ -157,6 +157,6 @@ class UsbCam {
   struct SwsContext *video_sws_;
   boost::shared_ptr<CameraImage> image_;
 };
-}
+}  // namespace usb_cam
 
 #endif

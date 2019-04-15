@@ -148,7 +148,8 @@ Pandar40P_Internal::~Pandar40P_Internal() {
  * @brief load the correction file
  * @param file The path of correction file
  */
-int Pandar40P_Internal::LoadCorrectionFile(const std::string &correction_content) {  // NOLINT
+int Pandar40P_Internal::LoadCorrectionFile(
+    const std::string &correction_content) {  // NOLINT
   std::istringstream ifs(correction_content);
 
   std::string line;
@@ -284,13 +285,13 @@ void Pandar40P_Internal::ProcessLiarPacket() {
       for (int i = 0; i < BLOCKS_PER_PACKET; ++i) {
         /* ready a round ? */
         uint16_t current_azimuth = pkt.blocks[i].azimuth;
-        int limit_degree = RATE_PER_PACKET * 100/2;
+        int limit_degree = RATE_PER_PACKET * 100 / 2;
         int gap = std::min(std::abs(current_azimuth - start_angle_),
-                36000 - std::abs(current_azimuth - start_angle_));
+                           36000 - std::abs(current_azimuth - start_angle_));
 
         // at lease 150 packets, no more than 182
-        if ((packetIndex > PACKETS_PER_ROUND * 5/6 && gap <= limit_degree) ||
-                packetIndex > PACKETS_PER_ROUND + 1) {
+        if ((packetIndex > PACKETS_PER_ROUND * 5 / 6 && gap <= limit_degree) ||
+            packetIndex > PACKETS_PER_ROUND + 1) {
           // ok
           if (pcl_callback_ && outMsg->points.size() > 0) {
             // std::cout << std::fixed << std::setprecision(18)
@@ -299,7 +300,8 @@ void Pandar40P_Internal::ProcessLiarPacket() {
             pcl_callback_(outMsg, timestamp_);
             outMsg.reset(new PPointCloud());
             // reset
-            packetIndex = 0; timestamp_ = 0;
+            packetIndex = 0;
+            timestamp_ = 0;
           }
         }
 
@@ -510,8 +512,7 @@ void Pandar40P_Internal::CalcPointXYZIT(Pandar40PPacket *pkt, int blockid,
 
     point.ring = i;
     // get smallest timestamp
-    if ((timestamp_ > 0 && timestamp_ < point.timestamp)
-            || timestamp_ <= 0) {
+    if ((timestamp_ > 0 && timestamp_ < point.timestamp) || timestamp_ <= 0) {
       timestamp_ = point.timestamp;
     }
 

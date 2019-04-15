@@ -27,8 +27,8 @@
 #include "modules/localization/msf/common/io/velodyne_utility.h"
 #include "modules/localization/msf/local_tool/local_visualization/offline_visual/offline_local_visualizer.h"
 
-static bool LoadGnssAntennaExtrinsic(
-    const std::string &file_path, Eigen::Vector3d *imu_ant_offset) {
+static bool LoadGnssAntennaExtrinsic(const std::string &file_path,
+                                     Eigen::Vector3d *imu_ant_offset) {
   CHECK_NOTNULL(imu_ant_offset);
 
   YAML::Node config = YAML::LoadFile(file_path);
@@ -49,17 +49,13 @@ static bool LoadGnssAntennaExtrinsic(
 int main(int argc, char **argv) {
   boost::program_options::options_description boost_desc("Allowed options");
   boost_desc.add_options()("help", "produce help message")(
-      "in_folder",
-      boost::program_options::value<std::string>(),
-      "provide the output folder")(
-      "loc_file_a",
-      boost::program_options::value<std::string>(),
-      "provide gnss localization file.")(
-      "loc_file_b",
-      boost::program_options::value<std::string>(),
+      "in_folder", boost::program_options::value<std::string>(),
+      "provide the output folder")("loc_file_a",
+                                   boost::program_options::value<std::string>(),
+                                   "provide gnss localization file.")(
+      "loc_file_b", boost::program_options::value<std::string>(),
       "provide lidar localization file.")(
-      "compare_file",
-      boost::program_options::value<std::string>(),
+      "compare_file", boost::program_options::value<std::string>(),
       "provide compare file.")(
       "imu_to_ant_offset_file",
       boost::program_options::value<std::string>()->default_value(""),
@@ -71,28 +67,26 @@ int main(int argc, char **argv) {
       boost_args);
   boost::program_options::notify(boost_args);
 
-  if (boost_args.count("help") ||
-      !boost_args.count("in_folder")) {
+  if (boost_args.count("help") || !boost_args.count("in_folder")) {
     std::cout << boost_desc << std::endl;
     return 0;
   }
 
-  const std::string in_folder =
-      boost_args["in_folder"].as<std::string>();
+  const std::string in_folder = boost_args["in_folder"].as<std::string>();
 
-  const std::string loc_file_a = in_folder + "/" +
-      boost_args["loc_file_a"].as<std::string>();
-  const std::string loc_file_b = in_folder + "/" +
-      boost_args["loc_file_b"].as<std::string>();
-  const std::string compare_file = in_folder + "/" +
-      boost_args["compare_file"].as<std::string>();
+  const std::string loc_file_a =
+      in_folder + "/" + boost_args["loc_file_a"].as<std::string>();
+  const std::string loc_file_b =
+      in_folder + "/" + boost_args["loc_file_b"].as<std::string>();
+  const std::string compare_file =
+      in_folder + "/" + boost_args["compare_file"].as<std::string>();
   const std::string imu_to_ant_offset_file =
       boost_args["imu_to_ant_offset_file"].as<std::string>();
 
   Eigen::Vector3d imu_ant_offset = Eigen::Vector3d::Zero();
   if (imu_to_ant_offset_file != "") {
-    bool suc = LoadGnssAntennaExtrinsic(
-        imu_to_ant_offset_file, &imu_ant_offset);
+    bool suc =
+        LoadGnssAntennaExtrinsic(imu_to_ant_offset_file, &imu_ant_offset);
     if (suc == false) {
       return 0;
     }
@@ -101,8 +95,8 @@ int main(int argc, char **argv) {
   std::vector<Eigen::Affine3d> poses_a;
   std::vector<Eigen::Vector3d> stds_a;
   std::vector<double> timestamps_a;
-  apollo::localization::msf::velodyne::
-      LoadPosesAndStds(loc_file_a, &poses_a, &stds_a, &timestamps_a);
+  apollo::localization::msf::velodyne::LoadPosesAndStds(loc_file_a, &poses_a,
+                                                        &stds_a, &timestamps_a);
   if (poses_a.size() == 0) {
     return 0;
   }
@@ -110,8 +104,8 @@ int main(int argc, char **argv) {
   std::vector<Eigen::Affine3d> poses_b;
   std::vector<Eigen::Vector3d> stds_b;
   std::vector<double> timestamps_b;
-  apollo::localization::msf::velodyne::
-      LoadPosesAndStds(loc_file_b, &poses_b, &stds_b, &timestamps_b);
+  apollo::localization::msf::velodyne::LoadPosesAndStds(loc_file_b, &poses_b,
+                                                        &stds_b, &timestamps_b);
   if (poses_b.size() == 0) {
     return 0;
   }
@@ -122,13 +116,13 @@ int main(int argc, char **argv) {
   std::map<unsigned int, Eigen::Vector3d> out_stds_b;
 
   apollo::localization::msf::OfflineLocalVisualizer::
-      PoseAndStdInterpolationByTime(poses_b, stds_b,
-        timestamps_b, timestamps_a, &out_poses_b, &out_stds_b);
+      PoseAndStdInterpolationByTime(poses_b, stds_b, timestamps_b, timestamps_a,
+                                    &out_poses_b, &out_stds_b);
   apollo::localization::msf::OfflineLocalVisualizer::
-      PoseAndStdInterpolationByTime(poses_a, stds_a,
-        timestamps_a, timestamps_a, &out_poses_a, &out_stds_a);
+      PoseAndStdInterpolationByTime(poses_a, stds_a, timestamps_a, timestamps_a,
+                                    &out_poses_a, &out_stds_a);
 
-  if (out_poses_a.size() == 0 ||out_poses_b.size() == 0) {
+  if (out_poses_a.size() == 0 || out_poses_b.size() == 0) {
     return 0;
   }
 
@@ -162,7 +156,7 @@ int main(int argc, char **argv) {
         Eigen::Quaterniond quatd_b(pose_b.linear());
         Eigen::Translation3d transd_b(pose_b.translation());
         apollo::common::math::EulerAnglesZXY<double> euler_b(
-          quatd_b.w(), quatd_b.x(), quatd_b.y(), quatd_b.z());
+            quatd_b.w(), quatd_b.x(), quatd_b.y(), quatd_b.z());
         double roll_b = euler_b.roll();
         double pitch_b = euler_b.pitch();
         double yaw_b = euler_b.yaw();
@@ -178,7 +172,7 @@ int main(int argc, char **argv) {
         double roll_diff = fabs(roll_a - roll_b) * 180.0 / M_PI;
         double pitch_diff = fabs(pitch_a - pitch_b) * 180.0 / M_PI;
         double yaw_diff = fabs(yaw_a - yaw_b);
-        yaw_diff = std::min(yaw_diff, 2.0 * M_PI - yaw_diff)  * 180.0 / M_PI;
+        yaw_diff = std::min(yaw_diff, 2.0 * M_PI - yaw_diff) * 180.0 / M_PI;
 
         vec_idx.push_back(idx);
         vec_timestamp.push_back(timestamps_a[idx]);
@@ -198,11 +192,10 @@ int main(int argc, char **argv) {
 
   std::ofstream file(compare_file.c_str());
   for (unsigned int i = 0; i < vec_idx.size(); ++i) {
-    file << vec_idx[i] << " " << std::setprecision(13)
-      << vec_timestamp[i] << " "
-      << vec_x_diff[i] << " " << vec_y_diff[i] << " " << vec_z_diff[i] << " "
-      << vec_roll_diff[i] << " " << vec_pitch_diff[i] << " " << vec_yaw_diff[i]
-      << std::endl;
+    file << vec_idx[i] << " " << std::setprecision(13) << vec_timestamp[i]
+         << " " << vec_x_diff[i] << " " << vec_y_diff[i] << " " << vec_z_diff[i]
+         << " " << vec_roll_diff[i] << " " << vec_pitch_diff[i] << " "
+         << vec_yaw_diff[i] << std::endl;
   }
   file.close();
 }

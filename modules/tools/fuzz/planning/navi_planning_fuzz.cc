@@ -17,13 +17,13 @@
 #define private public
 #define protected public
 
-#include "modules/planning/navi_planning.h"
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/log.h"
-#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/navi_planning.h"
 #include "modules/tools/fuzz/planning/proto/navi_planning_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
@@ -106,7 +106,7 @@ void NaviPlanningFuzz::Fuzz(
   navi_planning_->RunOnce();
 }
 
-DEFINE_PROTO_FUZZER(const NaviPlanningFuzzMessage& navi_planning_fuzz_message) {
+DEFINE_PROTO_FUZZER(const NaviPlanningFuzzMessage &navi_planning_fuzz_message) {
   navi_planning_fuzzer.Fuzz(navi_planning_fuzz_message);
 }
 

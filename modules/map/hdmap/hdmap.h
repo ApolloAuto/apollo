@@ -30,12 +30,12 @@
 #include "modules/map/proto/map_junction.pb.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/map/proto/map_overlap.pb.h"
+#include "modules/map/proto/map_parking_space.pb.h"
 #include "modules/map/proto/map_road.pb.h"
 #include "modules/map/proto/map_signal.pb.h"
 #include "modules/map/proto/map_speed_bump.pb.h"
 #include "modules/map/proto/map_stop_sign.pb.h"
 #include "modules/map/proto/map_yield_sign.pb.h"
-#include "modules/map/proto/map_parking_space.pb.h"
 
 /**
  * @namespace apollo::hdmap
@@ -165,10 +165,9 @@ class HDMap {
    * @param parking spaces store all clear areas in target range
    * @return 0:success, otherwise failed
    */
-  int GetParkingSpaces(const apollo::common::PointENU& point,
-                       double distance,
-                       std::vector<ParkingSpaceInfoConstPtr>*
-                       parking_spaces) const;
+  int GetParkingSpaces(
+      const apollo::common::PointENU& point, double distance,
+      std::vector<ParkingSpaceInfoConstPtr>* parking_spaces) const;
   /**
    * @brief get nearest lane from target point,
    * @param point the target point

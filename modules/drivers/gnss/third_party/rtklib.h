@@ -1,77 +1,77 @@
 /*********************************************************************************
-* The RTKLIB software package is distributed under the following BSD 2-clause
-* license (http://opensource.org/licenses/BSD-2-Clause) and additional two
-* exclusive clauses. Users are permitted to develop, produce or sell their own
-* non-commercial or commercial products utilizing, linking or including RTKLIB
-*as
-* long as they comply with the license.
-*
-*           Copyright (c) 2007-2013, T. Takasu, All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-*modification,
-* are permitted provided that the following conditions are met:
-*
-* - Redistributions of source code must retain the above copyright notice, this
-*   list of conditions and the following disclaimer.
-*
-* - Redistributions in binary form must reproduce the above copyright notice,
-*this
-*   list of conditions and the following disclaimer in the documentation and/or
-*   other materials provided with the distribution.
-*
-* - The software package includes some companion executive binaries or shared
-*   libraries necessary to execute APs on Windows. These licenses succeed to the
-*   original ones of these software.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-* LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-* CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-*SUBSTITUTE
-* GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-*OF
-* THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-***********************************************************************************/
+ * The RTKLIB software package is distributed under the following BSD 2-clause
+ * license (http://opensource.org/licenses/BSD-2-Clause) and additional two
+ * exclusive clauses. Users are permitted to develop, produce or sell their own
+ * non-commercial or commercial products utilizing, linking or including RTKLIB
+ *as
+ * long as they comply with the license.
+ *
+ *           Copyright (c) 2007-2013, T. Takasu, All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ *modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *this
+ *   list of conditions and the following disclaimer in the documentation and/or
+ *   other materials provided with the distribution.
+ *
+ * - The software package includes some companion executive binaries or shared
+ *   libraries necessary to execute APs on Windows. These licenses succeed to
+ *the original ones of these software.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *SUBSTITUTE
+ * GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ *OF
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ ***********************************************************************************/
 
 /*------------------------------------------------------------------------------
-* rtklib.h : rtklib constants, types and function prototypes
-*
-*          Copyright (C) 2007-2015 by T.TAKASU, All rights reserved.
-*
-* options : -DENAGLO   enable GLONASS
-*           -DENAGAL   enable Galileo
-*           -DENAQZS   enable QZSS
-*           -DENACMP   enable BeiDou
-*           -DNFREQ=n  set number of obs codes/frequencies
-*           -DNEXOBS=n set number of extended obs codes
-*           -DMAXOBS=n set max number of obs data in an epoch
-*           -DEXTLEX   enable QZSS LEX extension
-*
-* version : $Revision: 1.1 $ $Date: 2008/07/17 21:48:06 $
-* history : 2007/01/13 1.0  rtklib ver.1.0.0
-*           2007/03/20 1.1  rtklib ver.1.1.0
-*           2008/07/15 1.2  rtklib ver.2.1.0
-*           2008/10/19 1.3  rtklib ver.2.1.1
-*           2009/01/31 1.4  rtklib ver.2.2.0
-*           2009/04/30 1.5  rtklib ver.2.2.1
-*           2009/07/30 1.6  rtklib ver.2.2.2
-*           2009/12/25 1.7  rtklib ver.2.3.0
-*           2010/07/29 1.8  rtklib ver.2.4.0
-*           2011/05/27 1.9  rtklib ver.2.4.1
-*           2013/03/28 1.10 rtklib ver.2.4.2
-*-----------------------------------------------------------------------------*/
+ * rtklib.h : rtklib constants, types and function prototypes
+ *
+ *          Copyright (C) 2007-2015 by T.TAKASU, All rights reserved.
+ *
+ * options : -DENAGLO   enable GLONASS
+ *           -DENAGAL   enable Galileo
+ *           -DENAQZS   enable QZSS
+ *           -DENACMP   enable BeiDou
+ *           -DNFREQ=n  set number of obs codes/frequencies
+ *           -DNEXOBS=n set number of extended obs codes
+ *           -DMAXOBS=n set max number of obs data in an epoch
+ *           -DEXTLEX   enable QZSS LEX extension
+ *
+ * version : $Revision: 1.1 $ $Date: 2008/07/17 21:48:06 $
+ * history : 2007/01/13 1.0  rtklib ver.1.0.0
+ *           2007/03/20 1.1  rtklib ver.1.1.0
+ *           2008/07/15 1.2  rtklib ver.2.1.0
+ *           2008/10/19 1.3  rtklib ver.2.1.1
+ *           2009/01/31 1.4  rtklib ver.2.2.0
+ *           2009/04/30 1.5  rtklib ver.2.2.1
+ *           2009/07/30 1.6  rtklib ver.2.2.2
+ *           2009/12/25 1.7  rtklib ver.2.3.0
+ *           2010/07/29 1.8  rtklib ver.2.4.0
+ *           2011/05/27 1.9  rtklib ver.2.4.1
+ *           2013/03/28 1.10 rtklib ver.2.4.2
+ *-----------------------------------------------------------------------------*/
 
 /**
-* file: rtklib.h
-* version: rtklib ver.2.4.2
-* Copy from
-* https://github.com/tomojitakasu/RTKLIB/tree/76b9c97257f304aedad38b5a6bbbac444724aab3/src/rtklib.h
-*/
+ * file: rtklib.h
+ * version: rtklib ver.2.4.2
+ * Copy from
+ * https://github.com/tomojitakasu/RTKLIB/tree/76b9c97257f304aedad38b5a6bbbac444724aab3/src/rtklib.h
+ */
 #ifndef RTKLIB_H
 #define RTKLIB_H
 #include <ctype.h>
@@ -234,7 +234,7 @@ extern "C" {
 #endif
 #define NSYS                                         \
   (NSYSGPS + NSYSGLO + NSYSGAL + NSYSQZS + NSYSCMP + \
-  NSYSLEO) /* number of systems */
+   NSYSLEO) /* number of systems */
 
 #define MINPRNSBS 120 /* min satellite PRN number of SBAS */
 #define MAXPRNSBS 142 /* max satellite PRN number of SBAS */
@@ -862,7 +862,7 @@ typedef struct {     /* navigation data type */
   double ion_gal[4]; /* Galileo iono model parameters {ai0,ai1,ai2,0} */
   double ion_qzs[8]; /* QZSS iono model parameters {a0,a1,a2,a3,b0,b1,b2,b3} */
   double
-  ion_cmp[8]; /* BeiDou iono model parameters {a0,a1,a2,a3,b0,b1,b2,b3} */
+      ion_cmp[8]; /* BeiDou iono model parameters {a0,a1,a2,a3,b0,b1,b2,b3} */
   int leaps;      /* leap seconds (s) */
   double lam[MAXSAT][NFREQ];    /* carrier wave lengths (m) */
   double cbias[MAXSAT][3];      /* code bias (0:p1-p2,1:p1-c1,2:p2-c2) (m) */
@@ -894,11 +894,11 @@ typedef struct {        /* station parameter type */
   double hgt;           /* antenna height (m) */
 } sta_t;
 
-typedef struct {      /* solution type */
-  gtime_t time;       /* time (GPST) */
-  double rr[6];       /* position/velocity (m|m/s) */
+typedef struct { /* solution type */
+  gtime_t time;  /* time (GPST) */
+  double rr[6];  /* position/velocity (m|m/s) */
   /* {x,y,z,vx,vy,vz} or {e,n,u,ve,vn,vu} */
-  float qr[6];        /* position variance/covariance (m^2) */
+  float qr[6]; /* position variance/covariance (m^2) */
   /* {c_xx,c_yy,c_zz,c_xy,c_yz,c_zx} or */
   /* {c_ee,c_nn,c_uu,c_en,c_nu,c_ue} */
   double dtr[6];      /* receiver clock bias to time systems (s) */
@@ -968,7 +968,7 @@ typedef struct {        /* RTCM control struct type */
   unsigned int word;        /* word buffer for rtcm 2 */
   unsigned int nmsg2[100];  /* message count of RTCM 2 (1-99:1-99,0:other) */
   unsigned int
-  nmsg3[300]; /* message count of RTCM 3 (1-299:1001-1299,0:ohter) */
+      nmsg3[300]; /* message count of RTCM 3 (1-299:1001-1299,0:ohter) */
   char opt[256];  /* RTCM dependent options */
   int message_type;
 } rtcm_t;
@@ -1022,7 +1022,8 @@ typedef struct {     /* processing options type */
   double elmin;      /* elevation mask angle (rad) */
   snrmask_t snrmask; /* SNR mask */
   int sateph;        /* satellite ephemeris/clock (EPHOPT_???) */
-  int modear;        /* AR mode (0:off,1:continuous,2:instantaneous,3:fix and hold,4:ppp-ar) */
+  int modear;        /* AR mode (0:off,1:continuous,2:instantaneous,3:fix and
+                        hold,4:ppp-ar) */
   int glomodear;     /* GLONASS AR mode (0:off,1:on,2:auto cal,3:ext cal) */
   int bdsmodear;     /* BeiDou AR mode (0:off,1:on) */
   int maxout;        /* obs outage count to reset bias */
@@ -1046,7 +1047,7 @@ typedef struct {     /* processing options type */
   /* [0]:reserved */
   /* [1-3]:error factor a/b/c of phase (m) */
   /* [4]:doppler frequency (hz) */
-  double std[3];        /* initial-state std [0]bias,[1]iono [2]trop */
+  double std[3]; /* initial-state std [0]bias,[1]iono [2]trop */
   double prn[5]; /* process-noise std [0]bias,[1]iono [2]trop [3]acch [4]accv */
   double sclkstab;    /* satellite clock stability (sec/sec) */
   double thresar[4];  /* AR validation threshold */
@@ -1060,12 +1061,11 @@ typedef struct {     /* processing options type */
   double ru[3];       /* rover position for fixed mode {x,y,z} (ecef) (m) */
   double rb[3];       /* base position for relative mode {x,y,z} (ecef) (m) */
   char anttype[2][MAXANT]; /* antenna types {rover,base} */
-  double
-  antdel[2]
-  [3]; /* antenna delta {{rov_e,rov_n,rov_u},{ref_e,ref_n,ref_u}} */
-  pcv_t pcvr[2]; /* receiver antenna parameters {rov,base} */
+  double antdel[2][3];     /* antenna delta
+                              {{rov_e,rov_n,rov_u},{ref_e,ref_n,ref_u}} */
+  pcv_t pcvr[2];           /* receiver antenna parameters {rov,base} */
   unsigned char
-  exsats[MAXSAT];      /* excluded satellites (1:excluded,2:included) */
+      exsats[MAXSAT];      /* excluded satellites (1:excluded,2:included) */
   char rnxopt[2][256];     /* rinex options {rover,base} */
   int posopt[6];           /* positioning options */
   int syncsol;             /* solution sync mode (0:off,1:on) */
@@ -1089,8 +1089,8 @@ typedef struct { /* solution options type */
   int trace;     /* debug trace level (0:off,1-5:debug) */
   double nmeaintv[2]; /* nmea output interval (s) (<0:no,0:all) */
   /* nmeaintv[0]:gprmc,gpgga,nmeaintv[1]:gpgsv */
-  char sep[64];       /* field separator */
-  char prog[64];      /* program name */
+  char sep[64];  /* field separator */
+  char prog[64]; /* program name */
 } solopt_t;
 
 typedef struct {            /* file options type */
@@ -1178,8 +1178,8 @@ typedef struct {          /* RTK control/result type */
   double rb[6];           /* base position/velocity (ecef) (m|m/s) */
   int nx, na;             /* number of float states/fixed states */
   double tt;              /* time difference between current and previous (s) */
-  double* x, *P;          /* float states and their covariance */
-  double* xa, *Pa;        /* fixed states and their covariance */
+  double *x, *P;          /* float states and their covariance */
+  double *xa, *Pa;        /* fixed states and their covariance */
   int nfix;               /* number of continuous fixes of ambiguity */
   ambc_t ambc[MAXSAT];    /* ambibuity control */
   ssat_t ssat[MAXSAT];    /* satellite status */
@@ -1215,7 +1215,7 @@ typedef struct {     /* receiver raw data control type */
   unsigned char buff[MAXRAWLEN]; /* message buffer */
   char opt[256];                 /* receiver dependent options */
   double
-  receive_time; /* RT17: Reiceve time of week for week rollover detection */
+      receive_time; /* RT17: Reiceve time of week for week rollover detection */
   unsigned int plen;  /* RT17: Total size of packet to be read */
   unsigned int pbyte; /* RT17: How many packet bytes have been read so far */
   unsigned int page;  /* RT17: Last page number */

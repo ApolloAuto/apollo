@@ -37,8 +37,8 @@ NTCAN_RESULT EsdCanDetails::esdcan_do_test(int id) {
 
     ret = canStatus(h0, &if_status);
     if (ret != NTCAN_SUCCESS) {
-      AERROR << "Cannot get status of ESD-CAN device " << id
-             << ", ret=" << ret << " (" << esdcan_err_to_str(ret) << ")";
+      AERROR << "Cannot get status of ESD-CAN device " << id << ", ret=" << ret
+             << " (" << esdcan_err_to_str(ret) << ")";
       goto err;
     }
 
@@ -46,8 +46,8 @@ NTCAN_RESULT EsdCanDetails::esdcan_do_test(int id) {
     add_valid_field(EsdCanDetails::IF_STATUS);
     // else: fall-out to continue
   } else {
-    AERROR << "Failed to open ESD-CAN device " << id
-           << ", error: " << ret << " (" << esdcan_err_to_str(ret) << ")";
+    AERROR << "Failed to open ESD-CAN device " << id << ", error: " << ret
+           << " (" << esdcan_err_to_str(ret) << ")";
     goto err;
   }
 

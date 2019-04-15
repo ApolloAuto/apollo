@@ -273,9 +273,9 @@ void RawData::compute_xyzi(const uint8_t chan_id, const uint16_t azimuth_uint,
                        (1 - corrections.focal_distance / 13100);
   float focal_slope = corrections.focal_slope;
   *intensity +=
-      focal_slope * (abs(focal_offset -
-                         256 * (1 - static_cast<float>(azimuth_uint) / 65535) *
-                             (1 - static_cast<float>(azimuth_uint) / 65535)));
+      focal_slope *
+      (abs(focal_offset - 256 * (1 - static_cast<float>(azimuth_uint) / 65535) *
+                              (1 - static_cast<float>(azimuth_uint) / 65535)));
   *intensity = (*intensity < min_intensity) ? min_intensity : *intensity;
   *intensity = (*intensity > max_intensity) ? max_intensity : *intensity;
 }
@@ -405,9 +405,10 @@ void RawData::unpack_vlp16(const velodyne_msgs::VelodynePacket &pkt,
 
             // azimuth correction from the firing order in time-domain
             azimuth_corrected_f =
-                azimuth + (azimuth_diff * ((chan_id * CHANNEL_TDURATION) +
-                                           (seq_id * SEQ_TDURATION)) /
-                           VLP16_BLOCK_TDURATION);
+                azimuth +
+                (azimuth_diff *
+                 ((chan_id * CHANNEL_TDURATION) + (seq_id * SEQ_TDURATION)) /
+                 VLP16_BLOCK_TDURATION);
             azimuth_corrected =
                 (static_cast<uint16_t>(round(azimuth_corrected_f))) % 36000;
 

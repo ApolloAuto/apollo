@@ -36,7 +36,7 @@ class FrontVehicle : public TrafficRule {
   ~FrontVehicle() = default;
 
   common::Status ApplyRule(Frame* const frame,
-                 ReferenceLineInfo* const reference_line_info);
+                           ReferenceLineInfo* const reference_line_info);
 
  private:
   void MakeDecisions(Frame* const frame,

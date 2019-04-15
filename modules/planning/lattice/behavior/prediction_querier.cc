@@ -61,10 +61,12 @@ double PredictionQuerier::ProjectVelocityAlongReferenceLine(
     return 0.0;
   }
 
-  auto matched_it = std::lower_bound(trajectory.trajectory_point().begin(),
-      trajectory.trajectory_point().end(), t,
-      [](const common::TrajectoryPoint& p, const double t)
-      { return p.relative_time() < t; });
+  auto matched_it =
+      std::lower_bound(trajectory.trajectory_point().begin(),
+                       trajectory.trajectory_point().end(), t,
+                       [](const common::TrajectoryPoint& p, const double t) {
+                         return p.relative_time() < t;
+                       });
 
   double v = matched_it->v();
   double theta = matched_it->path_point().theta();

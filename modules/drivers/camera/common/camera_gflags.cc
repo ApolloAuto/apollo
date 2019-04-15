@@ -20,6 +20,5 @@ DEFINE_string(camera_module_name, "camera", "camera module name");
 DEFINE_string(camera_adapter_config_filename,
               "modules/drivers/camera/conf/adapter.conf",
               "The adapter configuration file");
-DEFINE_string(camera_config_file,
-              "modules/drivers/conf/camera_config.pb.txt",
+DEFINE_string(camera_config_file, "modules/drivers/conf/camera_config.pb.txt",
               "camera config file");

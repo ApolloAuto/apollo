@@ -31,7 +31,7 @@ double GetADCStopDeceleration(ReferenceLineInfo* const reference_line_info,
                               const double stop_line_s,
                               const double min_pass_s_distance);
 
-}  // util
+}  // namespace util
 }  // namespace planning
 }  // namespace apollo
 

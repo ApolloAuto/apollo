@@ -146,9 +146,8 @@ void AABox2d::MergeFrom(const Vec2d &other_point) {
 }
 
 std::string AABox2d::DebugString() const {
-  return util::StrCat(
-      "aabox2d ( center = ", center_.DebugString(),
-      "  length = ", length_, "  width = ", width_, " )");
+  return util::StrCat("aabox2d ( center = ", center_.DebugString(),
+                      "  length = ", length_, "  width = ", width_, " )");
 }
 
 }  // namespace math

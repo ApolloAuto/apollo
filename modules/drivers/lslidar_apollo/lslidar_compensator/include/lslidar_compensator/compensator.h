@@ -27,7 +27,7 @@ limitations under the License.                                              /
 
 namespace apollo {
 namespace drivers {
-namespace lslidar_compensator{
+namespace lslidar_compensator {
 
 class Compensator {
  public:
@@ -36,24 +36,24 @@ class Compensator {
 
  private:
   /**
-  * @brief get pointcloud2 msg, compensate it,publish pointcloud2 after
-  * compensator
-  */
+   * @brief get pointcloud2 msg, compensate it,publish pointcloud2 after
+   * compensator
+   */
   void pointcloud_callback(const sensor_msgs::PointCloud2ConstPtr& msg);
   /**
-  * @brief get pose affine from tf2 by gps timestamp
-  *   novatel-preprocess broadcast the tf2 transform.
-  */
+   * @brief get pose affine from tf2 by gps timestamp
+   *   novatel-preprocess broadcast the tf2 transform.
+   */
   bool query_pose_affine_from_tf2(const double& timestamp,
                                   Eigen::Affine3d& pose);
   /**
-  * @brief check if message is valid, check width, height, timestamp.
-  *   set timestamp_offset and point data type
-  */
+   * @brief check if message is valid, check width, height, timestamp.
+   *   set timestamp_offset and point data type
+   */
   bool check_message(const sensor_msgs::PointCloud2ConstPtr& msg);
   /**
-  * @brief motion compensation for point cloud
-  */
+   * @brief motion compensation for point cloud
+   */
   template <typename Scalar>
   void motion_compensation(sensor_msgs::PointCloud2::Ptr& msg,
                            const double timestamp_min,
@@ -61,14 +61,14 @@ class Compensator {
                            const Eigen::Affine3d& pose_min_time,
                            const Eigen::Affine3d& pose_max_time);
   /**
-  * @brief get min timestamp and max timestamp from points in pointcloud2
-  */
+   * @brief get min timestamp and max timestamp from points in pointcloud2
+   */
   inline void get_timestamp_interval(
       const sensor_msgs::PointCloud2ConstPtr& msg, double& timestamp_min,
       double& timestamp_max);
   /**
-  * @brief get point field size by sensor_msgs::datatype
-  */
+   * @brief get point field size by sensor_msgs::datatype
+   */
   inline uint get_field_size(const int data_type);
 
   // subscribe velodyne pointcloud2 msg.
@@ -99,7 +99,7 @@ class Compensator {
   int queue_size_;
 };
 
-}  // namespace lslidar
-}
-}
+}  // namespace lslidar_compensator
+}  // namespace drivers
+}  // namespace apollo
 #endif  // MODULES_DRIVERS_LSLIDAR_POINTCLOUD_COMPENSATOR_H_

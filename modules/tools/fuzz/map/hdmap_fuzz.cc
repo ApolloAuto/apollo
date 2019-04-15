@@ -17,16 +17,16 @@
 #define private public
 
 #include <vector>
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/map/hdmap/hdmap_impl.h"
 #include "modules/tools/fuzz/map/proto/hdmap_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 namespace apollo {
 namespace hdmap {
 
-using apollo::hdmap::Curve;
-using apollo::common::math::Vec2d;
 using apollo::common::math::LineSegment2d;
+using apollo::common::math::Vec2d;
+using apollo::hdmap::Curve;
 
 const double kDuplicatedPointsEpsilon = 1e-7;
 
@@ -38,10 +38,10 @@ const double kDuplicatedPointsEpsilon = 1e-7;
 //     HDMapImpl hdmap_impl_;
 // } hdmap_fuzzer;
 
-void RemoveDuplicates(std::vector<Vec2d> *points) {
+void RemoveDuplicates(std::vector<Vec2d>* points) {
   int count = 0;
   const double limit = kDuplicatedPointsEpsilon * kDuplicatedPointsEpsilon;
-  for (const auto &point : *points) {
+  for (const auto& point : *points) {
     if (count == 0 || point.DistanceSquareTo((*points)[count - 1]) > limit) {
       (*points)[count++] = point;
     }
@@ -49,12 +49,12 @@ void RemoveDuplicates(std::vector<Vec2d> *points) {
   points->resize(count);
 }
 
-void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
+void PointsFromCurve(const Curve& input_curve, std::vector<Vec2d>* points) {
   points->clear();
 
-  for (const auto &curve : input_curve.segment()) {
+  for (const auto& curve : input_curve.segment()) {
     if (curve.has_line_segment()) {
-      for (const auto &point : curve.line_segment().point()) {
+      for (const auto& point : curve.line_segment().point()) {
         points->emplace_back(point.x(), point.y());
       }
     }
@@ -63,8 +63,8 @@ void PointsFromCurve(const Curve &input_curve, std::vector<Vec2d> *points) {
 }
 
 void SegmentsFromCurve(
-    const Curve &curve,
-    std::vector<apollo::common::math::LineSegment2d> *segments) {
+    const Curve& curve,
+    std::vector<apollo::common::math::LineSegment2d>* segments) {
   std::vector<Vec2d> points;
   PointsFromCurve(curve, &points);
   for (size_t i = 0; i + 1 < points.size(); ++i) {
@@ -102,7 +102,7 @@ bool check_signal(apollo::hdmap::Signal signal) {
     return false;
   }
   std::vector<Vec2d> points;
-  for (const auto &segment : segments) {
+  for (const auto& segment : segments) {
     points.emplace_back(segment.start());
     points.emplace_back(segment.end());
   }
@@ -114,7 +114,7 @@ bool check_signal(apollo::hdmap::Signal signal) {
 
 bool check_yield(apollo::hdmap::YieldSign yield) {
   std::vector<LineSegment2d> segments;
-  for (const auto &stop_line : yield.stop_line()) {
+  for (const auto& stop_line : yield.stop_line()) {
     SegmentsFromCurve(stop_line, &segments);
   }
   if (segments.empty()) {
@@ -137,7 +137,7 @@ bool check_clear_area(apollo::hdmap::ClearArea clear_area) {
 
 bool check_speed_bump(apollo::hdmap::SpeedBump speed_bump) {
   std::vector<LineSegment2d> segments;
-  for (const auto &stop_line : speed_bump.position()) {
+  for (const auto& stop_line : speed_bump.position()) {
     SegmentsFromCurve(stop_line, &segments);
   }
   if (segments.empty()) {
@@ -160,7 +160,7 @@ bool check_junction(apollo::hdmap::Junction junction) {
 
 bool check_stop_sign(apollo::hdmap::StopSign stop_sign) {
   std::vector<LineSegment2d> segments;
-  for (const auto &stop_line : stop_sign.stop_line()) {
+  for (const auto& stop_line : stop_sign.stop_line()) {
     SegmentsFromCurve(stop_line, &segments);
   }
   if (segments.empty()) {

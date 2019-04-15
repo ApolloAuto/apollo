@@ -39,16 +39,16 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using ::apollo::drivers::gnss::InsStat;
+using ::apollo::common::adapter::AdapterManager;
+using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::GnssBestPose;
 using ::apollo::drivers::gnss::GnssEphemeris;
-using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::drivers::gnss::Heading;
 using ::apollo::drivers::gnss::Imu;
-using ::apollo::localization::CorrectedImu;
 using ::apollo::drivers::gnss::Ins;
+using ::apollo::drivers::gnss::InsStat;
+using ::apollo::localization::CorrectedImu;
 using ::apollo::localization::Gps;
-using ::apollo::common::adapter::AdapterManager;
 
 namespace {
 

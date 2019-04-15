@@ -16,11 +16,11 @@
 
 #define private public
 
+#include "libfuzzer/libfuzzer_macro.h"
+#include "modules/calibration/lidar_ex_checker/common/lidar_ex_checker_gflags.h"
 #include "modules/calibration/lidar_ex_checker/lidar_ex_checker.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/calibration/lidar_ex_checker/common/lidar_ex_checker_gflags.h"
 #include "modules/tools/fuzz/calibration/proto/lidar_ex_checker_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
@@ -70,7 +70,7 @@ void LidarExCheckerFuzz::Fuzz(
 }
 
 DEFINE_PROTO_FUZZER(
-    const LidarExCheckerFuzzMessage& lidar_ex_checker_fuzz_message) {
+    const LidarExCheckerFuzzMessage &lidar_ex_checker_fuzz_message) {
   lidar_ex_checker_fuzzer.Fuzz(lidar_ex_checker_fuzz_message);
 }
 

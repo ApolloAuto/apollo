@@ -37,7 +37,7 @@ class ObjectsXmlParser {
   static Status ParseStopLines(const tinyxml2::XMLElement& xml_node,
                                std::vector<StopLineInternal>* stop_lines);
   static Status ParseParkingSpaces(const tinyxml2::XMLElement& xml_node,
-                            std::vector<PbParkingSpace>* parking_spaces);
+                                   std::vector<PbParkingSpace>* parking_spaces);
 };
 
 }  // namespace adapter

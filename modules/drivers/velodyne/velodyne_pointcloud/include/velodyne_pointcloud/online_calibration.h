@@ -36,12 +36,8 @@ class OnlineCalibration {
   int decode(velodyne_msgs::VelodyneScanUnified::ConstPtr scan_msgs);
   void dump(const std::string& file_path);
   void get_unit_index();
-  bool inited() const {
-    return inited_;
-  }
-  Calibration calibration() const {
-    return calibration_;
-  }
+  bool inited() const { return inited_; }
+  Calibration calibration() const { return calibration_; }
 
  private:
   bool inited_;

@@ -16,11 +16,11 @@
 
 #define private public
 
+#include "libfuzzer/libfuzzer_macro.h"
+#include "modules/calibration/republish_msg/common/republish_msg_gflags.h"
 #include "modules/calibration/republish_msg/republish_msg.h"
 #include "modules/common/adapters/adapter_manager.h"
-#include "modules/calibration/republish_msg/common/republish_msg_gflags.h"
 #include "modules/tools/fuzz/calibration/proto/republish_msg_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
@@ -68,8 +68,7 @@ void RepublishMsgFuzz::Fuzz(
   republish_msg_->OnInsStat(republish_msg_fuzz_message.ins_stat());
 }
 
-DEFINE_PROTO_FUZZER(
-    const RepublishMsgFuzzMessage& republish_msg_fuzz_message) {
+DEFINE_PROTO_FUZZER(const RepublishMsgFuzzMessage &republish_msg_fuzz_message) {
   republish_msg_fuzzer.Fuzz(republish_msg_fuzz_message);
 }
 

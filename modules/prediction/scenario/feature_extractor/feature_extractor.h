@@ -27,10 +27,10 @@
 #include "gtest/gtest.h"
 
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/prediction/proto/scenario_feature.pb.h"
-#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
+#include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/pose/pose_container.h"
+#include "modules/prediction/proto/scenario_feature.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -88,4 +88,5 @@ class FeatureExtractor {
 }  // namespace prediction
 }  // namespace apollo
 
-#endif /* MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_ */
+#endif /* MODULES_PREDICTION_SCENARIO_FEATURE_EXTRACTOR_FEATURE_EXTRACTOR_H_ \
+        */

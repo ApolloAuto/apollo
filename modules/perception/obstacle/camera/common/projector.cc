@@ -23,11 +23,11 @@
 namespace apollo {
 namespace perception {
 
-using std::vector;
-using std::string;
-using std::ifstream;
-using Eigen::MatrixXf;
 using Eigen::Map;
+using Eigen::MatrixXf;
+using std::ifstream;
+using std::string;
+using std::vector;
 
 bool MatrixProjector::project(vector<float> *feature) {
   if (feature == nullptr) {

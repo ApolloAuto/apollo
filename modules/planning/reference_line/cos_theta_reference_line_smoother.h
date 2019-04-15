@@ -17,9 +17,9 @@
 #ifndef MODULES_PLANNING_REFERENCE_LINE_COSTHETA_REFERENCE_LINE_SMOOTHER_H_
 #define MODULES_PLANNING_REFERENCE_LINE_COSTHETA_REFERENCE_LINE_SMOOTHER_H_
 
+#include <memory>
 #include <utility>
 #include <vector>
-#include <memory>
 
 #include "Eigen/Dense"
 

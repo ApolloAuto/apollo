@@ -122,10 +122,12 @@ TEST_F(FileTest, Glob) {
   EXPECT_THAT(Glob("/apollo"), testing::ElementsAre(std::string("/apollo")));
   EXPECT_THAT(Glob("/apol?o"), testing::ElementsAre(std::string("/apollo")));
   // Match multiple.
-  EXPECT_THAT(Glob("/apol?o/modules/p*"), testing::AllOf(
-      testing::Contains(std::string("/apollo/modules/perception")),
-      testing::Contains(std::string("/apollo/modules/planning")),
-      testing::Contains(std::string("/apollo/modules/prediction"))));
+  EXPECT_THAT(
+      Glob("/apol?o/modules/p*"),
+      testing::AllOf(
+          testing::Contains(std::string("/apollo/modules/perception")),
+          testing::Contains(std::string("/apollo/modules/planning")),
+          testing::Contains(std::string("/apollo/modules/prediction"))));
 }
 
 TEST_F(FileTest, GetAbsolutePath) {

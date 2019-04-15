@@ -34,8 +34,8 @@ namespace traffic_light {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::time::Timer;
 using apollo::common::adapter::AdapterManager;
+using apollo::common::time::Timer;
 
 namespace {
 

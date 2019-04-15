@@ -74,9 +74,7 @@ class Calibration {
 
  public:
   Calibration() : initialized_(false) {}
-  Calibration(const std::string& calibration_file) {
-    read(calibration_file);
-  }
+  Calibration(const std::string& calibration_file) { read(calibration_file); }
 
   void read(const std::string& calibration_file);
   void write(const std::string& calibration_file);

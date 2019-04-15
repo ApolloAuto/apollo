@@ -18,16 +18,16 @@
 #define MODULES_DRIVERS_ROBOSENSE_RSLIDAR_DRIVER_INPUT_H_
 
 #include <ros/ros.h>
+#include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <signal.h>
 #include "rslidar_msgs/rslidarScan.h"
 
 namespace apollo {
 namespace drivers {
 namespace rslidar {
 
-static const size_t FIRING_DATA_PACKET_SIZE = 1248;  //1206
+static const size_t FIRING_DATA_PACKET_SIZE = 1248;  // 1206
 static const size_t POSITIONING_DATA_PACKET_SIZE = 512;
 static const size_t ETHERNET_HEADER_SIZE = 42;
 static const int SOCKET_TIMEOUT = -2;
@@ -61,4 +61,4 @@ class Input {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif 
+#endif

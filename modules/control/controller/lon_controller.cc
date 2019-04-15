@@ -221,7 +221,7 @@ Status LonController::ComputeControlCommand(
       GRA_ACC * std::sin(VehicleStateProvider::instance()->pitch()));
 
   if (isnan(slope_offset_compenstaion)) {
-      slope_offset_compenstaion = 0;
+    slope_offset_compenstaion = 0;
   }
 
   debug->set_slope_offset_compensation(slope_offset_compenstaion);
@@ -233,12 +233,12 @@ Status LonController::ComputeControlCommand(
   GetPathRemain(debug);
 
   if ((trajectory_message_->trajectory_type() ==
-   apollo::planning::ADCTrajectory::NORMAL) &&
+       apollo::planning::ADCTrajectory::NORMAL) &&
       ((std::fabs(debug->preview_acceleration_reference()) <=
-           FLAGS_max_acceleration_when_stopped &&
-       std::fabs(debug->preview_speed_reference()) <=
-           vehicle_param_.max_abs_speed_when_stopped()) ||
-      (debug->path_remain() < 0.3))) {
+            FLAGS_max_acceleration_when_stopped &&
+        std::fabs(debug->preview_speed_reference()) <=
+            vehicle_param_.max_abs_speed_when_stopped()) ||
+       (debug->path_remain() < 0.3))) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
     AINFO << "Stop location reached";
     debug->set_is_full_stop(true);

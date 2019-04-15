@@ -46,26 +46,26 @@ class DpStCost {
   float GetObstacleCost(const StGraphPoint& point);
 
   float GetReferenceCost(const STPoint& point,
-                          const STPoint& reference_point) const;
+                         const STPoint& reference_point) const;
 
   float GetSpeedCost(const STPoint& first, const STPoint& second,
-                      const float speed_limit) const;
+                     const float speed_limit) const;
 
   float GetAccelCostByTwoPoints(const float pre_speed, const STPoint& first,
-                                 const STPoint& second);
+                                const STPoint& second);
   float GetAccelCostByThreePoints(const STPoint& first, const STPoint& second,
-                                   const STPoint& third);
+                                  const STPoint& third);
 
   float GetJerkCostByTwoPoints(const float pre_speed, const float pre_acc,
-                                const STPoint& pre_point,
-                                const STPoint& curr_point);
+                               const STPoint& pre_point,
+                               const STPoint& curr_point);
   float GetJerkCostByThreePoints(const float first_speed,
-                                  const STPoint& first_point,
-                                  const STPoint& second_point,
-                                  const STPoint& third_point);
+                                 const STPoint& first_point,
+                                 const STPoint& second_point,
+                                 const STPoint& third_point);
 
   float GetJerkCostByFourPoints(const STPoint& first, const STPoint& second,
-                                 const STPoint& third, const STPoint& fourth);
+                                const STPoint& third, const STPoint& fourth);
 
  private:
   float GetAccelCost(const float accel);

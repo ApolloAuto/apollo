@@ -167,8 +167,9 @@ Status Control::ProduceControlCommand(ControlCommand *control_command) {
   }
 
   // check estop
-  estop_ = FLAGS_enable_persistent_estop ?
-    estop_ || trajectory_.estop().is_estop() : trajectory_.estop().is_estop();
+  estop_ = FLAGS_enable_persistent_estop
+               ? estop_ || trajectory_.estop().is_estop()
+               : trajectory_.estop().is_estop();
 
   if (trajectory_.estop().is_estop()) {
     estop_reason_ = "estop from planning";
@@ -342,8 +343,7 @@ void Control::SendCmd(ControlCommand *control_command) {
   // set header
   if (AdapterManager::GetPlanning() &&
       !AdapterManager::GetPlanning()->Empty()) {
-    const auto& planning =
-        AdapterManager::GetPlanning()->GetLatestObserved();
+    const auto &planning = AdapterManager::GetPlanning()->GetLatestObserved();
     control_command->mutable_header()->set_lidar_timestamp(
         planning.header().lidar_timestamp());
     control_command->mutable_header()->set_camera_timestamp(

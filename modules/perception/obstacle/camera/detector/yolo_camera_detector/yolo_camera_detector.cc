@@ -20,15 +20,15 @@
 #if (CV_MAJOR_VERSION == 2)
 #include <opencv2/opencv.hpp>
 #ifdef HAVE_OPENCV_GPU
-#include <opencv2/gpu/gpu.hpp>
 #include <opencv2/core/gpumat.hpp>
+#include <opencv2/gpu/gpu.hpp>
 #endif
 #else
 #include <opencv2/core.hpp>
-#include <opencv2/cudaimgproc.hpp>
-#include <opencv2/cudawarping.hpp>
 #include <opencv2/cudaarithm.hpp>
 #include <opencv2/cudafilters.hpp>
+#include <opencv2/cudaimgproc.hpp>
+#include <opencv2/cudawarping.hpp>
 #endif
 
 #include <cmath>
@@ -57,8 +57,8 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
   CHECK(GetProtoFromFile(FLAGS_yolo_camera_detector_config, &config_));
 
   const string &yolo_root = config_.yolo_root();
-  const string yolo_config = GetAbsolutePath(yolo_root,
-                                             FLAGS_yolo_config_filename);
+  const string yolo_config =
+      GetAbsolutePath(yolo_root, FLAGS_yolo_config_filename);
   const string lane_config = GetAbsolutePath(yolo_root, "lane.pt");
 
   CHECK(apollo::common::util::GetProtoFromASCIIFile(yolo_config, &yolo_param_));
@@ -74,12 +74,12 @@ bool YoloCameraDetector::Init(const CameraDetectorInitOptions &options) {
 
 void YoloCameraDetector::init_anchor(const string &yolo_root) {
   const auto &model_param = yolo_param_.model_param();
-  const string model_root = GetAbsolutePath(yolo_root,
-                                            model_param.model_name());
+  const string model_root =
+      GetAbsolutePath(yolo_root, model_param.model_name());
 
   // loading anchors
-  const string anchors_file = GetAbsolutePath(model_root,
-                                              model_param.anchors_file());
+  const string anchors_file =
+      GetAbsolutePath(model_root, model_param.anchors_file());
   vector<float> anchors;
   yolo::load_anchors(anchors_file, &anchors);
   num_anchors_ = anchors.size() / 2;
@@ -90,8 +90,8 @@ void YoloCameraDetector::init_anchor(const string &yolo_root) {
   memcpy(anchor_cpu_data, anchors.data(), anchors.size() * sizeof(float));
 
   // loading types
-  const string types_file = GetAbsolutePath(model_root,
-                                            model_param.types_file());
+  const string types_file =
+      GetAbsolutePath(model_root, model_param.types_file());
   yolo::load_types(types_file, &types_);
 
   res_box_tensor_.reset(
@@ -195,14 +195,14 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
 
   const auto &net_param = yolo_param_.net_param();
   const auto &model_param = yolo_param_.model_param();
-  const string model_root = GetAbsolutePath(yolo_root,
-                                            model_param.model_name());
-  const string proto_file = GetAbsolutePath(model_root,
-                                            model_param.proto_file());
-  const string weight_file = GetAbsolutePath(model_root,
-                                             model_param.weight_file());
-  const string feature_file = GetAbsolutePath(model_root,
-                                              model_param.feature_file());
+  const string model_root =
+      GetAbsolutePath(yolo_root, model_param.model_name());
+  const string proto_file =
+      GetAbsolutePath(model_root, model_param.proto_file());
+  const string weight_file =
+      GetAbsolutePath(model_root, model_param.weight_file());
+  const string feature_file =
+      GetAbsolutePath(model_root, model_param.feature_file());
 
   ADEBUG << " proto_file: " << proto_file;
   ADEBUG << " weight_file: " << weight_file;
@@ -212,16 +212,10 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   const auto &model_type = model_param.model_type();
 
   vector<string> input_names = {net_param.input_blob()};
-  vector<string> output_names = {
-      net_param.loc_blob(),
-      net_param.obj_blob(),
-      net_param.cls_blob(),
-      net_param.ori_blob(),
-      net_param.dim_blob(),
-      net_param.lof_blob(),
-      net_param.lor_blob(),
-      net_param.seg_blob()
-  };
+  vector<string> output_names = {net_param.loc_blob(), net_param.obj_blob(),
+                                 net_param.cls_blob(), net_param.ori_blob(),
+                                 net_param.dim_blob(), net_param.lof_blob(),
+                                 net_param.lor_blob(), net_param.seg_blob()};
 
   FeatureParam feat_param;
   CHECK(apollo::common::util::GetProtoFromASCIIFile(feature_file, &feat_param));
@@ -262,8 +256,8 @@ bool YoloCameraDetector::init_cnn(const string &yolo_root) {
   }
 
   if (feat_param.has_remap_model()) {
-    const string track_model = GetAbsolutePath(model_root,
-                                               feat_param.remap_model());
+    const string track_model =
+        GetAbsolutePath(model_root, feat_param.remap_model());
     ADEBUG << "Using tracking model: " << track_model;
     projector_.reset(new MatrixProjector(track_model));
   } else {
@@ -293,12 +287,12 @@ bool YoloCameraDetector::init_cnn_lane(const string &yolo_root) {
 
   auto const &net_param = lane_param_.net_param();
   const auto &model_param = lane_param_.model_param();
-  const string model_root = GetAbsolutePath(yolo_root,
-                                            model_param.model_name());
-  const string proto_file = GetAbsolutePath(model_root,
-                                            model_param.proto_file());
-  const string weight_file = GetAbsolutePath(model_root,
-                                             model_param.weight_file());
+  const string model_root =
+      GetAbsolutePath(yolo_root, model_param.model_name());
+  const string proto_file =
+      GetAbsolutePath(model_root, model_param.proto_file());
+  const string weight_file =
+      GetAbsolutePath(model_root, model_param.weight_file());
 
   ADEBUG << " proto_file: " << proto_file;
   ADEBUG << " weight_file: " << weight_file;
@@ -377,28 +371,31 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
   cv::Rect roi(0, offset_y_, roi_w, roi_h);
   cv::Mat img(frame, roi);
 
-  if ( FLAGS_enable_opencv_gpu < 1 ) {
-    cv::resize(img, img, cv::Size(lane_output_height_lane_,
-                        lane_output_width_lane_), 0, 0);
+  if (FLAGS_enable_opencv_gpu < 1) {
+    cv::resize(img, img,
+               cv::Size(lane_output_height_lane_, lane_output_width_lane_), 0,
+               0);
   } else {
 #if (CV_MAJOR_VERSION == 2)
 #ifdef HAVE_OPENCV_GPU
     cv::gpu::GpuMat matsrc, matdst;
     matsrc.upload(img);
-    cv::gpu::resize(matsrc, matdst, cv::Size(lane_output_height_lane_,
-                                   lane_output_width_lane_));
+    cv::gpu::resize(
+        matsrc, matdst,
+        cv::Size(lane_output_height_lane_, lane_output_width_lane_));
     matdst.download(img);
 #endif
 #else
     cv::cuda::GpuMat matsrc, matdst;
     matsrc.upload(img);
-    cv::cuda::resize(matsrc, matdst, cv::Size(lane_output_height_lane_,
-                                   lane_output_width_lane_));
+    cv::cuda::resize(
+        matsrc, matdst,
+        cv::Size(lane_output_height_lane_, lane_output_width_lane_));
     matdst.download(img);
 #endif
   }
-  const auto input_blob = cnnadapter_lane_->get_blob_by_name(
-      lane_param_.net_param().input_blob());
+  const auto input_blob =
+      cnnadapter_lane_->get_blob_by_name(lane_param_.net_param().input_blob());
 
   resize(img, input_blob.get(), image_data_lane_, 0);
   pre_time.Stop();
@@ -424,26 +421,27 @@ bool YoloCameraDetector::Lanetask(const cv::Mat &frame,
   cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
   for (int i = 0; i < num_lanes_; ++i) {
     // cv::Mat tmp(lane_output_height_lane_, lane_output_width_lane_, CV_32FC1);
-    memcpy(tmp.data, seg_blob->cpu_data() +
-                         lane_output_width_lane_ * lane_output_height_lane_ * i,
+    memcpy(tmp.data,
+           seg_blob->cpu_data() +
+               lane_output_width_lane_ * lane_output_height_lane_ * i,
            lane_output_width_lane_ * lane_output_height_lane_ * sizeof(float));
-    if ( FLAGS_enable_opencv_gpu < 1 ) {
+    if (FLAGS_enable_opencv_gpu < 1) {
       cv::resize(tmp, tmp, cv::Size(lane_output_width_, lane_output_height_), 0,
-               0);
+                 0);
     } else {
 #if (CV_MAJOR_VERSION == 2)
 #ifdef HAVE_OPENCV_GPU
       cv::gpu::GpuMat matsrc, matdst;
       matsrc.upload(tmp);
-      cv::gpu::resize(matsrc, matdst, cv::Size(lane_output_width_,
-                                      lane_output_height_));
+      cv::gpu::resize(matsrc, matdst,
+                      cv::Size(lane_output_width_, lane_output_height_));
       matdst.download(tmp);
 #endif
 #else
       cv::cuda::GpuMat matsrc, matdst;
       matsrc.upload(tmp);
-      cv::cuda::resize(matsrc, matdst, cv::Size(lane_output_width_,
-                                      lane_output_height_));
+      cv::cuda::resize(matsrc, matdst,
+                       cv::Size(lane_output_width_, lane_output_height_));
       matdst.download(tmp);
 #endif
     }
@@ -506,10 +504,10 @@ bool YoloCameraDetector::Detect(
            << sizeof(obj->internal_type_probs);
   }
 
-  const auto ori_blob = cnnadapter_->get_blob_by_name(
-      yolo_param_.net_param().ori_blob());
-  const auto dim_blob = cnnadapter_->get_blob_by_name(
-      yolo_param_.net_param().dim_blob());
+  const auto ori_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().ori_blob());
+  const auto dim_blob =
+      cnnadapter_->get_blob_by_name(yolo_param_.net_param().dim_blob());
   if (ori_blob != nullptr && dim_blob != nullptr) {
     int valid_obj_idx = 0;
     int total_obj_idx = 0;

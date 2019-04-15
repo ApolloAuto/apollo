@@ -24,8 +24,8 @@
 #include "IpSolveStatistics.hpp"
 
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer_interface.h"
 #include "modules/planning/lattice/trajectory1d/constant_jerk_trajectory1d.h"
+#include "modules/planning/lattice/trajectory_generation/lateral_trajectory_optimizer_interface.h"
 
 namespace apollo {
 namespace planning {
@@ -40,11 +40,9 @@ bool LateralTrajectoryOptimizer::optimize(
       FLAGS_lateral_third_order_derivative_max, lateral_bounds);
 
   ptr_interface->set_objective_weights(
-      FLAGS_weight_lateral_offset,
-      FLAGS_weight_lateral_derivative,
+      FLAGS_weight_lateral_offset, FLAGS_weight_lateral_derivative,
       FLAGS_weight_lateral_second_order_derivative,
       FLAGS_weight_lateral_obstacle_distance);
-
 
   Ipopt::SmartPtr<Ipopt::TNLP> problem = ptr_interface;
 
@@ -56,7 +54,7 @@ bool LateralTrajectoryOptimizer::optimize(
   app->Options()->SetIntegerValue("acceptable_iter", 5);
   app->Options()->SetNumericValue("tol", 1.0e-3);
   app->Options()->SetNumericValue("acceptable_tol", 1.0e-3);
-//  app->Options()->SetStringValue("mehrotra_algorithm", "yes");
+  //  app->Options()->SetStringValue("mehrotra_algorithm", "yes");
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
@@ -85,8 +83,8 @@ bool LateralTrajectoryOptimizer::optimize(
          status == Ipopt::Solved_To_Acceptable_Level;
 }
 
-PiecewiseJerkTrajectory1d
-LateralTrajectoryOptimizer::GetOptimalTrajectory() const {
+PiecewiseJerkTrajectory1d LateralTrajectoryOptimizer::GetOptimalTrajectory()
+    const {
   CHECK(!opt_d_.empty() && !opt_d_prime_.empty() && !opt_d_pprime_.empty());
 
   PiecewiseJerkTrajectory1d optimal_trajectory(

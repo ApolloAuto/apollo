@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
-#include <iostream>
 
 #include "gmock/gmock.h"
 #include "google/protobuf/text_format.h"
@@ -26,17 +26,16 @@
 
 #define private public
 
-#include "modules/control/control.h"
+#include "libfuzzer/libfuzzer_macro.h"
+#include "modules/common/adapters/adapter_manager.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
 #include "modules/common/util/util.h"
 #include "modules/control/common/control_gflags.h"
-#include "modules/common/adapters/adapter_manager.h"
+#include "modules/control/control.h"
 #include "modules/control/proto/control_cmd.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/tools/fuzz/control/proto/control_message.pb.h"
-
 
 using apollo::common::time::Clock;
 using apollo::tools::fuzz::control::ControlFuzzMessage;
@@ -46,40 +45,38 @@ protobuf_mutator::protobuf::LogSilencer log_silincer;
 namespace apollo {
 namespace control {
 
+using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessage;
 using apollo::control::ControlCommand;
 using apollo::control::PadMessage;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
-using apollo::canbus::Chassis;
 
 class ControlFuzz {
  public:
   void SetUp();
   bool FuzzTarget(PadMessage pad_message,
-    LocalizationEstimate localization_message,
-    ADCTrajectory planning_message,
-    Chassis chassis_message);
+                  LocalizationEstimate localization_message,
+                  ADCTrajectory planning_message, Chassis chassis_message);
   void target();
 
  private:
   ControlCommand control_command_;
   Control control_;
-}control_fuzzer;
+} control_fuzzer;
 
 void ControlFuzz::SetUp() {
-    ros::Time::init();
-    FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
-    FLAGS_control_adapter_config_filename =
+  ros::Time::init();
+  FLAGS_control_conf_file = "modules/control/testdata/conf/lincoln.pb.txt";
+  FLAGS_control_adapter_config_filename =
       "modules/control/testdata/conf/adapter.conf";
-    FLAGS_is_control_test_mode = true;
+  FLAGS_is_control_test_mode = true;
 }
-bool ControlFuzz::FuzzTarget(
-  PadMessage pad_message,
-  LocalizationEstimate localization_message,
-  ADCTrajectory planning_message,
-  Chassis chassis_message) {
+bool ControlFuzz::FuzzTarget(PadMessage pad_message,
+                             LocalizationEstimate localization_message,
+                             ADCTrajectory planning_message,
+                             Chassis chassis_message) {
   if (!common::util::GetProtoFromFile(FLAGS_control_conf_file,
                                       &control_.control_conf_)) {
     AERROR << "Unable to load control conf file: " << FLAGS_control_conf_file;
@@ -117,18 +114,16 @@ bool ControlFuzz::FuzzTarget(
 /******************************************************************************
  * Entry point of the fuzz test. The control_message combines PadMessage,
  * LocalizationEstimate, ADCTrajectory, and Chassis messages together to
- * fuzz the control module. 
+ * fuzz the control module.
  *****************************************************************************/
 
 DEFINE_PROTO_FUZZER(const ControlFuzzMessage& message) {
   apollo::control::control_fuzzer.SetUp();
   if (message.has_planning() &&
-    message.planning().header().module_name() == "planning"
-    && message.planning().trajectory_point().size() > 0) {
+      message.planning().header().module_name() == "planning" &&
+      message.planning().trajectory_point().size() > 0) {
     apollo::control::control_fuzzer.FuzzTarget(
-      message.pad(),
-      message.localization(),
-      message.planning(),
-      message.chassis());
+        message.pad(), message.localization(), message.planning(),
+        message.chassis());
   }
 }

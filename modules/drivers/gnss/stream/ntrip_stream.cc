@@ -31,7 +31,7 @@ template <typename T>
 constexpr bool is_zero(T value) {
   return value == static_cast<T>(0);
 }
-}
+}  // namespace
 
 namespace apollo {
 namespace drivers {

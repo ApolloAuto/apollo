@@ -70,8 +70,8 @@ Status RoadsXmlParser::Parse(const tinyxml2::XMLElement& xml_node,
       // speed_bumps
       ObjectsXmlParser::ParseSpeedBumps(*sub_node, &road_internal.speed_bumps);
       // parking_spaces
-      ObjectsXmlParser::ParseParkingSpaces(
-                                    *sub_node, &road_internal.parking_spaces);
+      ObjectsXmlParser::ParseParkingSpaces(*sub_node,
+                                           &road_internal.parking_spaces);
     }
 
     // signals

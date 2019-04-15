@@ -16,11 +16,11 @@ limitations under the License.
 #define MODULES_MAP_HDMAP_ADAPTER_XML_PARSER_STATUS_H_
 
 #include <cstddef>
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "modules/common/status/status.h"
 
@@ -30,10 +30,10 @@ namespace adapter {
 
 using apollo::common::Status;
 
-#define RETURN_IF_ERROR(expr)                            \
-  do {                                                   \
-    const apollo::common::Status status_ = (expr);         \
-    if (!status_.ok()) return status_; \
+#define RETURN_IF_ERROR(expr)                      \
+  do {                                             \
+    const apollo::common::Status status_ = (expr); \
+    if (!status_.ok()) return status_;             \
   } while (0)
 
 }  // namespace adapter

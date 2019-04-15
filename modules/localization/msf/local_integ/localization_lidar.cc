@@ -22,10 +22,14 @@ namespace msf {
 
 LocalizationLidar::LocalizationLidar()
     : lidar_locator_(new LidarLocator()),
-      search_range_x_(21), search_range_y_(21),
-      node_size_x_(1024), node_size_y_(1024),
-      resolution_(0.125), lidar_map_node_(nullptr),
-      config_("lossy_map"), map_(&config_),
+      search_range_x_(21),
+      search_range_y_(21),
+      node_size_x_(1024),
+      node_size_y_(1024),
+      resolution_(0.125),
+      lidar_map_node_(nullptr),
+      config_("lossy_map"),
+      map_(&config_),
       map_node_pool_(25, 8),
       resolution_id_(0),
       is_map_loaded_(false),
@@ -72,8 +76,8 @@ bool LocalizationLidar::Init(const std::string& map_path,
 
   search_range_x_ = search_range_x;
   search_range_y_ = search_range_y;
-  lidar_locator_->Init(search_range_x_, search_range_y_,
-                      resolution_, node_size_x_, node_size_y_);
+  lidar_locator_->Init(search_range_x_, search_range_y_, resolution_,
+                       node_size_x_, node_size_y_);
   return true;
 }
 
@@ -83,7 +87,7 @@ void LocalizationLidar::SetVelodyneExtrinsic(const Eigen::Affine3d& pose) {
   Eigen::Quaterniond quat = Eigen::Quaterniond(pose.linear());
 
   lidar_locator_->SetVelodyneExtrinsic(trans.x(), trans.y(), trans.z(),
-      quat.x(), quat.y(), quat.z(), quat.w());
+                                       quat.x(), quat.y(), quat.z(), quat.w());
   return;
 }
 
@@ -122,8 +126,8 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
                               const LidarFrame& lidar_frame) {
   // check whether loaded map
   if (is_map_loaded_ == false) {
-    map_.LoadMapArea(pose.translation(), resolution_id_,
-                     zone_id_, search_range_x_, search_range_y_);
+    map_.LoadMapArea(pose.translation(), resolution_id_, zone_id_,
+                     search_range_x_, search_range_y_);
     is_map_loaded_ = true;
     AINFO << "Reflectance locator map first loading is done.";
   }
@@ -135,12 +139,10 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
   Eigen::Vector3d pose_trans = imu_pose.translation();
   Eigen::Quaterniond pose_quat(imu_pose.linear());
   pose_quat.normalize();
-  map_.LoadMapArea(pose_trans, resolution_id_,
-                   zone_id_, 0, 0);
+  map_.LoadMapArea(pose_trans, resolution_id_, zone_id_, 0, 0);
 
   // preload map for next locate
-  map_.PreloadMapArea(pose_trans, velocity, resolution_id_,
-                      zone_id_);
+  map_.PreloadMapArea(pose_trans, velocity, resolution_id_, zone_id_);
 
   // generate composed map for compare
   ComposeMapNode(pose_trans);
@@ -149,9 +151,10 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
   int node_width = lidar_map_node_->width;
   int node_height = lidar_map_node_->height;
   int node_level_num = 1;
-  lidar_locator_->SetMapNodeData(node_width, node_height, node_level_num,
-      &(lidar_map_node_->intensities), &(lidar_map_node_->intensities_var),
-      &(lidar_map_node_->altitudes), &(lidar_map_node_->count));
+  lidar_locator_->SetMapNodeData(
+      node_width, node_height, node_level_num, &(lidar_map_node_->intensities),
+      &(lidar_map_node_->intensities_var), &(lidar_map_node_->altitudes),
+      &(lidar_map_node_->count));
   lidar_locator_->SetMapNodeLeftTopCorner(map_left_top_corner_(0),
                                           map_left_top_corner_(1));
 
@@ -162,19 +165,15 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
       lidar_frame.pt_zs.data(), lidar_frame.intensities.data());
 
   // compute
-  int error = lidar_locator_->Compute(pose_trans(0),
-                                     pose_trans(1),
-                                     pose_trans(2),
-                                     pose_quat.x(),
-                                     pose_quat.y(),
-                                     pose_quat.z(),
-                                     pose_quat.w());
+  int error = lidar_locator_->Compute(
+      pose_trans(0), pose_trans(1), pose_trans(2), pose_quat.x(), pose_quat.y(),
+      pose_quat.z(), pose_quat.w());
 
   return error;
 }
 
-void LocalizationLidar::GetResult(Eigen::Affine3d *location,
-                                  Eigen::Matrix3d *covariance) {
+void LocalizationLidar::GetResult(Eigen::Affine3d* location,
+                                  Eigen::Matrix3d* covariance) {
   if (!location || !covariance) {
     return;
   }
@@ -209,12 +208,12 @@ void LocalizationLidar::GetResult(Eigen::Affine3d *location,
 }
 
 void LocalizationLidar::GetLocalizationDistribution(
-    Eigen::MatrixXd *distribution) {
+    Eigen::MatrixXd* distribution) {
   CHECK_NOTNULL(distribution);
 
   int width = 0;
   int height = 0;
-  const double *data = nullptr;
+  const double* data = nullptr;
   lidar_locator_->GetSSDDistribution(&data, &width, &height);
 
   if (width > 0 && height > 0 && data != nullptr) {
@@ -228,7 +227,7 @@ void LocalizationLidar::GetLocalizationDistribution(
   return;
 }
 
-void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d *pose) {
+void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d* pose) {
   CHECK_NOTNULL(pose);
 
   Eigen::Affine3d lidar_pose = *pose * velodyne_extrinsic_;
@@ -237,8 +236,7 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d *pose) {
   // Read the altitude from the map
   MapNodeIndex index = MapNodeIndex::GetMapNodeIndex(
       map_.GetConfig(), lidar_trans, resolution_id_, zone_id_);
-  LossyMapNode* node =
-      static_cast<LossyMapNode*>(map_.GetMapNodeSafe(index));
+  LossyMapNode* node = static_cast<LossyMapNode*>(map_.GetMapNodeSafe(index));
   LossyMapMatrix& matrix =
       static_cast<LossyMapMatrix&>(node->GetMapCellMatrix());
 
@@ -266,17 +264,15 @@ void LocalizationLidar::RefineAltitudeFromMap(Eigen::Affine3d *pose) {
   }
 
   lidar_pose.translation()(2) = vehicle_ground_alt + height_diff;
-  Eigen::Affine3d transform_tmp
-        = lidar_pose * velodyne_extrinsic_.inverse();
+  Eigen::Affine3d transform_tmp = lidar_pose * velodyne_extrinsic_.inverse();
   pose->translation() = transform_tmp.translation();
   return;
 }
 
 void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
   Eigen::Vector2d center(trans(0), trans(1));
-  Eigen::Vector2d left_top_corner(
-      center(0) - node_size_x_ * resolution_ / 2.0,
-      center(1) - node_size_y_ * resolution_ / 2.0);
+  Eigen::Vector2d left_top_corner(center(0) - node_size_x_ * resolution_ / 2.0,
+                                  center(1) - node_size_y_ * resolution_ / 2.0);
 
   // get map node index 2x2
   MapNodeIndex map_node_idx[2][2];
@@ -298,16 +294,15 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
   LossyMapNode* map_node[2][2] = {nullptr};
   for (unsigned int y = 0; y < 2; ++y) {
     for (unsigned int x = 0; x < 2; ++x) {
-      map_node[y][x] = static_cast<LossyMapNode*>(
-          map_.GetMapNodeSafe(map_node_idx[y][x]));
+      map_node[y][x] =
+          static_cast<LossyMapNode*>(map_.GetMapNodeSafe(map_node_idx[y][x]));
     }
   }
 
   // compose map node
   unsigned int coord_x = 0;
   unsigned int coord_y = 0;
-  map_node[0][0]->GetCoordinate(
-      left_top_corner, &coord_x, &coord_y);
+  map_node[0][0]->GetCoordinate(left_top_corner, &coord_x, &coord_y);
   map_left_top_corner_ = map_node[0][0]->GetCoordinate(coord_x, coord_y);
 
   int coord_xi = coord_x;
@@ -358,7 +353,7 @@ void LocalizationLidar::ComposeMapNode(const Eigen::Vector3d& trans) {
       for (int y = 0; y < range_y; ++y) {
         int dst_base_x = (dst_y + y) * node_size_x_ + dst_x;
         for (int x = 0; x < range_x; ++x) {
-          auto &cell = map_cells[src_y + y][src_x + x];
+          auto& cell = map_cells[src_y + y][src_x + x];
           int dst_idx = dst_base_x + x;
           lidar_map_node_->intensities[dst_idx] = cell.intensity;
           lidar_map_node_->intensities_var[dst_idx] = cell.intensity_var;

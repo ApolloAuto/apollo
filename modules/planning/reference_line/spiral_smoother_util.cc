@@ -31,21 +31,21 @@ DEFINE_string(input_file, "", "input file with format x,y per line");
 DEFINE_string(output_file, "", "output file with format x,y per line");
 DEFINE_double(smooth_length, 200.0, "Smooth this amount of length ");
 DEFINE_double(minimum_point_spacing, 5.0,
-    "The minimum distance for input points.");
+              "The minimum distance for input points.");
 
 namespace apollo {
 namespace planning {
 
 class SpiralSmootherUtil {
  public:
-  static std::vector<Eigen::Vector2d>
-  ReadCoordinatesFromFile(const std::string& filename) {
+  static std::vector<Eigen::Vector2d> ReadCoordinatesFromFile(
+      const std::string& filename) {
     std::vector<Eigen::Vector2d> raw_points;
     std::ifstream ifs(filename.c_str(), std::ifstream::in);
     std::string point_str;
 
-    auto spacing_thres = FLAGS_minimum_point_spacing *
-        FLAGS_minimum_point_spacing;
+    auto spacing_thres =
+        FLAGS_minimum_point_spacing * FLAGS_minimum_point_spacing;
 
     while (std::getline(ifs, point_str)) {
       std::size_t idx = point_str.find(',');
@@ -74,7 +74,7 @@ class SpiralSmootherUtil {
   }
 
   static bool Smooth(std::vector<Eigen::Vector2d> raw_points,
-      std::vector<common::PathPoint>* ptr_smooth_points) {
+                     std::vector<common::PathPoint>* ptr_smooth_points) {
     if (raw_points.size() <= 2) {
       AERROR << "the original point size is " << raw_points.size();
       return false;
@@ -82,8 +82,7 @@ class SpiralSmootherUtil {
 
     Eigen::Vector2d start_point = raw_points.front();
     std::for_each(raw_points.begin(), raw_points.end(),
-        [&start_point](Eigen::Vector2d& p) {
-          p = p - start_point;});
+                  [&start_point](Eigen::Vector2d& p) { p = p - start_point; });
 
     ReferenceLineSmootherConfig config;
     CHECK(common::util::GetProtoFromFile(
@@ -97,8 +96,9 @@ class SpiralSmootherUtil {
     std::vector<double> opt_y;
 
     SpiralReferenceLineSmoother spiral_smoother(config);
-    auto res = spiral_smoother.SmoothStandAlone(raw_points,
-        &opt_theta, &opt_kappa, &opt_dkappa, &opt_s, &opt_x, &opt_y);
+    auto res =
+        spiral_smoother.SmoothStandAlone(raw_points, &opt_theta, &opt_kappa,
+                                         &opt_dkappa, &opt_s, &opt_x, &opt_y);
 
     if (!res) {
       AWARN << "Optimization failed; the result may not be smooth";
@@ -107,19 +107,19 @@ class SpiralSmootherUtil {
     }
 
     std::for_each(opt_x.begin(), opt_x.end(),
-        [&start_point](double& x) { x += start_point.x();});
+                  [&start_point](double& x) { x += start_point.x(); });
     std::for_each(opt_y.begin(), opt_y.end(),
-        [&start_point](double& y) { y += start_point.y();});
+                  [&start_point](double& y) { y += start_point.y(); });
 
     *ptr_smooth_points =
-    spiral_smoother.Interpolate(opt_theta, opt_kappa, opt_dkappa,
-        opt_s, opt_x, opt_y, config.resolution());
+        spiral_smoother.Interpolate(opt_theta, opt_kappa, opt_dkappa, opt_s,
+                                    opt_x, opt_y, config.resolution());
 
     return true;
   }
 
   static void Export(const std::string& filename,
-      const std::vector<common::PathPoint>& smoothed_points) {
+                     const std::vector<common::PathPoint>& smoothed_points) {
     std::ofstream ofs(filename.c_str());
     if (ofs.fail()) {
       AERROR << "Fail to open file " << filename;
@@ -130,10 +130,9 @@ class SpiralSmootherUtil {
     for (std::size_t i = 1; i + 1 < smoothed_points.size(); ++i) {
       const auto& point = smoothed_points[i];
       ofs << std::fixed << "{\"kappa\": " << point.kappa()
-          << ", \"s\": " << point.s()
-          << ", \"theta\": " << point.theta() << ", \"x\":" << point.x()
-          << ", \"y\":" << point.y() << ", \"dkappa\":" << point.dkappa() << "}"
-          << std::endl;
+          << ", \"s\": " << point.s() << ", \"theta\": " << point.theta()
+          << ", \"x\":" << point.x() << ", \"y\":" << point.y()
+          << ", \"dkappa\":" << point.dkappa() << "}" << std::endl;
     }
     ofs.close();
     AINFO << "Smoothed result saved to " << filename;
@@ -157,8 +156,8 @@ int main(int argc, char* argv[]) {
           FLAGS_input_file);
 
   std::vector<apollo::common::PathPoint> smooth_points;
-  auto res = apollo::planning::SpiralSmootherUtil::Smooth(
-      raw_points, &smooth_points);
+  auto res =
+      apollo::planning::SpiralSmootherUtil::Smooth(raw_points, &smooth_points);
   if (!res) {
     AERROR << "Failed to smooth a the line";
   }
@@ -167,7 +166,7 @@ int main(int argc, char* argv[]) {
     FLAGS_output_file = FLAGS_input_file + ".smoothed";
     AINFO << "Output file not provided, set to: " << FLAGS_output_file;
   }
-  apollo::planning::SpiralSmootherUtil::Export(
-      FLAGS_output_file, smooth_points);
+  apollo::planning::SpiralSmootherUtil::Export(FLAGS_output_file,
+                                               smooth_points);
   return 0;
 }

@@ -16,11 +16,11 @@
 
 #define private public
 
-#include "modules/prediction/prediction.h"
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/prediction.h"
 #include "modules/tools/fuzz/prediction/proto/prediction_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
@@ -72,14 +72,12 @@ void PredictionFuzz::Init() {
 }
 
 void PredictionFuzz::Fuzz(PredictionFuzzMessage prediction_fuzz_message) {
-  prediction_->OnLocalization(
-      prediction_fuzz_message.localization_estimate());
+  prediction_->OnLocalization(prediction_fuzz_message.localization_estimate());
   prediction_->OnPlanning(prediction_fuzz_message.adc_trajectory());
-  prediction_->RunOnce(
-      prediction_fuzz_message.perception_obstacles());
+  prediction_->RunOnce(prediction_fuzz_message.perception_obstacles());
 }
 
-DEFINE_PROTO_FUZZER(const PredictionFuzzMessage& prediction_fuzz_message) {
+DEFINE_PROTO_FUZZER(const PredictionFuzzMessage &prediction_fuzz_message) {
   prediction_fuzzer.Fuzz(prediction_fuzz_message);
 }
 

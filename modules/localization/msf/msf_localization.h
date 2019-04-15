@@ -29,15 +29,15 @@
 
 #include "gtest/gtest_prod.h"
 
-#include "ros/include/ros/ros.h"
 #include "Eigen/Core"
 #include "Eigen/Geometry"
+#include "ros/include/ros/ros.h"
 #include "sensor_msgs/PointCloud2.h"
 
-#include "modules/drivers/gnss/proto/imu.pb.h"
-#include "modules/drivers/gnss/proto/heading.pb.h"
-#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
+#include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
+#include "modules/drivers/gnss/proto/heading.pb.h"
+#include "modules/drivers/gnss/proto/imu.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 
 #include "modules/common/log.h"
@@ -89,9 +89,9 @@ class MSFLocalization : public LocalizationBase {
                                 double *offset_y, double *offset_z,
                                 double *uncertainty_x, double *uncertainty_y,
                                 double *uncertainty_z);
-  bool LoadImuVehicleExtrinsic(const std::string &file_path,
-                                double *quat_qx, double *quat_qy,
-                                double *quat_qz, double *quat_qw);
+  bool LoadImuVehicleExtrinsic(const std::string &file_path, double *quat_qx,
+                               double *quat_qy, double *quat_qz,
+                               double *quat_qw);
   bool LoadZoneIdFromFolder(const std::string &folder_path, int *zone_id);
 
  private:

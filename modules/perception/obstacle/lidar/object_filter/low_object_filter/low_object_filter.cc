@@ -27,9 +27,9 @@
 namespace apollo {
 namespace perception {
 
+using apollo::common::util::GetProtoFromFile;
 using pcl_util::PointCloud;
 using pcl_util::PointCloudPtr;
-using apollo::common::util::GetProtoFromFile;
 
 bool LowObjectFilter::Init() {
   if (!GetProtoFromFile(FLAGS_low_object_filter_config, &config_)) {

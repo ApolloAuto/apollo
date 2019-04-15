@@ -48,7 +48,7 @@ template <typename T>
 void operator>>(const YAML::Node& node, T& i) {
   i = node.as<T>();
 }
-} /* YAML */
+}  // namespace YAML
 // #endif  // HAVE_NEW_YAMLCPP
 
 namespace apollo {

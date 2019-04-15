@@ -34,11 +34,11 @@ namespace apollo {
 namespace hdmap {
 
 using common::math::Box2d;
+using common::math::kMathEpsilon;
 using common::math::LineSegment2d;
 using common::math::Polygon2d;
 using common::math::Sqr;
 using common::math::Vec2d;
-using common::math::kMathEpsilon;
 using std::placeholders::_1;
 
 namespace {

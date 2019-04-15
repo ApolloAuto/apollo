@@ -435,15 +435,15 @@ TEST_F(HDMapCommonTestSuite, DistanceToWithMoreInfo) {
   apollo::common::math::Vec2d foot_point;
   double s_offset = 0.0;
   int s_offset_index = 0;
-  double distance = lane_info.DistanceTo(
-      {170002.5, 3.0}, &foot_point, &s_offset, &s_offset_index);
+  double distance = lane_info.DistanceTo({170002.5, 3.0}, &foot_point,
+                                         &s_offset, &s_offset_index);
   EXPECT_NEAR(distance, 2.0, 1E-3);
   EXPECT_NEAR(foot_point.x(), 170002.5, 1E-3);
   EXPECT_NEAR(foot_point.y(), 1.0, 1E-3);
   EXPECT_NEAR(s_offset, 1.5, 1E-3);
 
-  distance = lane_info.DistanceTo(
-      {170000.5, 3.0}, &foot_point, &s_offset, &s_offset_index);
+  distance = lane_info.DistanceTo({170000.5, 3.0}, &foot_point, &s_offset,
+                                  &s_offset_index);
   EXPECT_NEAR(distance, 2.06155, 1E-3);
   EXPECT_NEAR(foot_point.x(), 170001.0, 1E-3);
   EXPECT_NEAR(foot_point.y(), 1.0, 1E-3);
@@ -476,8 +476,8 @@ TEST_F(HDMapCommonTestSuite, GetProjection) {
 
   double accumulate_s = 0.0;
   double lateral = 0.0;
-  bool success = lane_info.GetProjection({170002.4, 3.0}, &accumulate_s,
-                                        &lateral);
+  bool success =
+      lane_info.GetProjection({170002.4, 3.0}, &accumulate_s, &lateral);
   EXPECT_TRUE(success);
   EXPECT_NEAR(accumulate_s, 1.4, 1E-3);
   EXPECT_NEAR(lateral, 2.0, 1E-3);

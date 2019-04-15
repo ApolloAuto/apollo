@@ -77,8 +77,8 @@ std::ostream &operator<<(
 #define GET_ELEMENT_BY_ID(TYPE)                                     \
   const TYPE##InfoConstPtr Get##TYPE(const std::string &id) {       \
     auto ret = HDMapUtil::BaseMap().Get##TYPE##ById(MakeMapId(id)); \
-    AERROR_IF(ret == nullptr) << "failed to find " << #TYPE         \
-                              << " with id: " << id;                \
+    AERROR_IF(ret == nullptr)                                       \
+        << "failed to find " << #TYPE << " with id: " << id;        \
     return ret;                                                     \
   }
 

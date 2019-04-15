@@ -17,11 +17,11 @@
 #ifndef SRC_PANDAR40P_INTERNAL_H_
 #define SRC_PANDAR40P_INTERNAL_H_
 
-#include <boost/function.hpp>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <boost/function.hpp>
 
 #include <list>
 #include <string>
@@ -43,7 +43,7 @@
 #define REVOLUTION_SIZE (2)
 #define INFO_SIZE                                                  \
   (TIMESTAMP_SIZE + FACTORY_INFO_SIZE + ECHO_SIZE + RESERVE_SIZE + \
-  REVOLUTION_SIZE)
+   REVOLUTION_SIZE)
 #define UTC_TIME (6)
 #define PACKET_SIZE (BLOCK_SIZE * BLOCKS_PER_PACKET + INFO_SIZE + UTC_TIME)
 #define LASER_RETURN_TO_DISTANCE_RATE (0.004)

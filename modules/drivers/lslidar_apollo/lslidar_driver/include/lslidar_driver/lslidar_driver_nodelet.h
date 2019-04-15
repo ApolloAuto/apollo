@@ -14,34 +14,31 @@ See the License for the specific language governing permissions and         /
 limitations under the License.                                              /
 ****************************************************************************/
 
-#include <string>
 #include <boost/thread.hpp>
+#include <string>
 
-#include <ros/ros.h>
-#include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+#include <ros/ros.h>
 
 #include <lslidar_driver/lslidar_driver.h>
 namespace apollo {
 namespace drivers {
-namespace lslidar_driver{
+namespace lslidar_driver {
 
-class LslidarDriverNodelet: public nodelet::Nodelet
-{
-public:
-
+class LslidarDriverNodelet : public nodelet::Nodelet {
+ public:
   LslidarDriverNodelet();
   ~LslidarDriverNodelet();
 
-private:
-
+ private:
   virtual void onInit(void);
   virtual void devicePoll(void);
 
-  volatile bool running;               ///< device thread is running
+  volatile bool running;  ///< device thread is running
   boost::shared_ptr<boost::thread> device_thread;
 
-  LslidarDriverPtr lslidar_driver; ///< driver implementation class
+  LslidarDriverPtr lslidar_driver;  ///< driver implementation class
 };
 
 }  // namespace lslidar_driver

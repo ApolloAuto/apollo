@@ -19,8 +19,8 @@
  */
 
 #include "modules/drivers/radar/conti_radar/conti_radar_canbus.h"
-#include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/drivers/radar/conti_radar/conti_radar_message_manager.h"
 
 /**
  * @namespace apollo::drivers::conti_radar
@@ -30,9 +30,7 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-std::string ContiRadarCanbus::Name() const {
-  return FLAGS_canbus_driver_name;
-}
+std::string ContiRadarCanbus::Name() const { return FLAGS_canbus_driver_name; }
 
 apollo::common::Status ContiRadarCanbus::Init() {
   AdapterManager::Init(FLAGS_adapter_config_filename);

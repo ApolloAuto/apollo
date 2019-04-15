@@ -16,10 +16,11 @@
 
 #include "modules/control/controller/lat_controller.h"
 
+#include <iostream>
 #include <memory>
 #include <string>
 #include <utility>
-#include <iostream>
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/log.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/file.h"
@@ -28,7 +29,6 @@
 #include "modules/control/proto/control_conf.pb.h"
 #include "modules/localization/common/localization_gflags.h"
 #include "modules/planning/proto/planning.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 protobuf_mutator::protobuf::LogSilencer log_silincer;
 
@@ -42,9 +42,9 @@ using ChassisPb = apollo::canbus::Chassis;
 using apollo::common::VehicleStateProvider;
 
 /******************************************************
-* Fuzzer class should inherit the target class in order
-* to invoke the target member function
-******************************************************/
+ * Fuzzer class should inherit the target class in order
+ * to invoke the target member function
+ ******************************************************/
 
 class LatControllerFuzzer : LatController {
  public:
@@ -98,13 +98,13 @@ class LatControllerFuzzer : LatController {
 };
 
 /******************************************************
-* Implements the target function that takes the protobuf
-* message structure. This function is modified from the 
-* original TEST_F gtest function. 
-******************************************************/
+ * Implements the target function that takes the protobuf
+ * message structure. This function is modified from the
+ * original TEST_F gtest function.
+ ******************************************************/
 
-void LatControllerFuzzer::target(planning::ADCTrajectory
-    planning_trajectory_pb) {
+void LatControllerFuzzer::target(
+    planning::ADCTrajectory planning_trajectory_pb) {
   timestamp_ = Clock::NowInSeconds();
 
   auto localization_pb = LoadLocalizationPb(
@@ -133,13 +133,13 @@ void LatControllerFuzzer::target(planning::ADCTrajectory
 }  // namespace apollo
 
 /******************************************************
-* The test driver function. feed the mutated message to
-* the target function. In addition, some doman specific
-* constraints can be added, befor feeding the message.
-* The constraints can also help bypass discovered bugs, 
-* that are not patched yet. 
-******************************************************/
-DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory& message) {
+ * The test driver function. feed the mutated message to
+ * the target function. In addition, some doman specific
+ * constraints can be added, befor feeding the message.
+ * The constraints can also help bypass discovered bugs,
+ * that are not patched yet.
+ ******************************************************/
+DEFINE_PROTO_FUZZER(const apollo::planning::ADCTrajectory &message) {
   apollo::control::LatControllerFuzzer fuzzer;
   if (message.header().module_name() != "") {
     fuzzer.target(message);

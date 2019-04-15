@@ -17,8 +17,8 @@
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 
 #include <memory>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "modules/common/log.h"
 #include "modules/prediction/common/prediction_gflags.h"
@@ -35,9 +35,7 @@ using ::apollo::hdmap::JunctionInfo;
 using ::apollo::planning::ADCTrajectory;
 
 ADCTrajectoryContainer::ADCTrajectoryContainer()
-    :adc_junction_info_ptr_(nullptr),
-     s_dist_to_junction_(0.0) {
-}
+    : adc_junction_info_ptr_(nullptr), s_dist_to_junction_(0.0) {}
 
 void ADCTrajectoryContainer::Insert(
     const ::google::protobuf::Message& message) {

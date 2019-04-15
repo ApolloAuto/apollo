@@ -33,9 +33,9 @@ using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::util::LookupOrInsert;
 
-MonitorManager::MonitorManager() :
-  logger_(apollo::common::monitor::MonitorMessageItem::MONITOR),
-  log_buffer_(&logger_) {
+MonitorManager::MonitorManager()
+    : logger_(apollo::common::monitor::MonitorMessageItem::MONITOR),
+      log_buffer_(&logger_) {
   CHECK(apollo::common::util::GetProtoFromASCIIFile(FLAGS_monitor_conf_path,
                                                     &config_));
 }
@@ -44,9 +44,7 @@ apollo::common::monitor::MonitorLogBuffer &MonitorManager::LogBuffer() {
   return instance()->log_buffer_;
 }
 
-const MonitorConf &MonitorManager::GetConfig() {
-  return instance()->config_;
-}
+const MonitorConf &MonitorManager::GetConfig() { return instance()->config_; }
 
 void MonitorManager::InitFrame(const double current_time) {
   // Clear old summaries.
@@ -61,21 +59,20 @@ void MonitorManager::InitFrame(const double current_time) {
 
   // Get current DrivingMode, which will affect how we monitor modules.
   instance()->in_autonomous_driving_ = false;
-  auto* adapter = CHECK_NOTNULL(AdapterManager::GetChassis());
+  auto *adapter = CHECK_NOTNULL(AdapterManager::GetChassis());
   adapter->Observe();
   if (!adapter->Empty()) {
-    const auto& chassis = adapter->GetLatestObserved();
+    const auto &chassis = adapter->GetLatestObserved();
     // Ignore old messages which is likely from replaying.
     instance()->in_autonomous_driving_ =
         chassis.driving_mode() == Chassis::COMPLETE_AUTO_DRIVE &&
-        chassis.header().timestamp_sec() + FLAGS_system_status_lifetime_seconds
-            >= current_time;
+        chassis.header().timestamp_sec() +
+                FLAGS_system_status_lifetime_seconds >=
+            current_time;
   }
 }
 
-SystemStatus *MonitorManager::GetStatus() {
-  return &instance()->status_;
-}
+SystemStatus *MonitorManager::GetStatus() { return &instance()->status_; }
 
 HardwareStatus *MonitorManager::GetHardwareStatus(
     const std::string &hardware_name) {

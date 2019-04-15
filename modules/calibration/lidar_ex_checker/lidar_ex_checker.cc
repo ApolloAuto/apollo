@@ -29,9 +29,9 @@
 namespace apollo {
 namespace calibration {
 
-using apollo::common::adapter::AdapterManager;
-using apollo::common::Status;
 using apollo::common::ErrorCode;
+using apollo::common::Status;
+using apollo::common::adapter::AdapterManager;
 
 std::string LidarExChecker::Name() const { return "lidar_extrinsics_checker"; }
 

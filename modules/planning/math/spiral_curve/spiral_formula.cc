@@ -41,9 +41,12 @@ std::array<double, 6> SpiralFormula::p_to_a_k5(const double sg,
 
   std::array<double, 6> result = {
       // p params to quintic params
-      p[0], p[1], p[2] / 2.0, -(575 * p[0] - 648 * p[3] + 81 * p[4] - 8 * p[5] +
-                                170 * p[1] * sg + 22 * p[2] * sg2) /
-                                  (8 * sg3),
+      p[0],
+      p[1],
+      p[2] / 2.0,
+      -(575 * p[0] - 648 * p[3] + 81 * p[4] - 8 * p[5] + 170 * p[1] * sg +
+        22 * p[2] * sg2) /
+          (8 * sg3),
       (333 * p[0] - 405 * p[3] + 81 * p[4] - 9 * p[5] + 90 * p[1] * sg +
        9 * p[2] * sg2) /
           (2 * sg2 * sg2),

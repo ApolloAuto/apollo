@@ -25,8 +25,8 @@
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_sender.h"
 #include "modules/drivers/canbus/can_comm/message_manager.h"
-#include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
 #include "modules/drivers/proto/conti_radar.pb.h"
+#include "modules/drivers/radar/conti_radar/protocol/radar_config_200.h"
 
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/drivers/canbus/sensor_gflags.h"
@@ -35,9 +35,9 @@ namespace apollo {
 namespace drivers {
 namespace conti_radar {
 
-using ::apollo::drivers::canbus::ProtocolData;
 using ::apollo::common::adapter::AdapterManager;
 using ::apollo::drivers::canbus::MessageManager;
+using ::apollo::drivers::canbus::ProtocolData;
 using Clock = ::apollo::common::time::Clock;
 using micros = std::chrono::microseconds;
 using ::apollo::common::ErrorCode;

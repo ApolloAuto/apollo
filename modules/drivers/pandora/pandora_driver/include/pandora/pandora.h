@@ -17,13 +17,13 @@
 #ifndef INCLUDE_PANDORA_PANDORA_H_
 #define INCLUDE_PANDORA_PANDORA_H_
 
-#include <boost/function.hpp>
-#include <opencv2/opencv.hpp>
 #include <opencv2/highgui/highgui_c.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <boost/function.hpp>
+#include <opencv2/opencv.hpp>
 
 #include <string>
 #include <vector>

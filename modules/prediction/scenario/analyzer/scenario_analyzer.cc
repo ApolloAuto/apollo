@@ -30,9 +30,7 @@ void ScenarioAnalyzer::Analyze(const ScenarioFeature& scenario_feature) {
   }
 }
 
-const Scenario& ScenarioAnalyzer::scenario() const {
-  return scenario_;
-}
+const Scenario& ScenarioAnalyzer::scenario() const { return scenario_; }
 
 }  // namespace prediction
 }  // namespace apollo

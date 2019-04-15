@@ -16,21 +16,21 @@
 
 #define private public
 
-#include "modules/control/control.h"
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/control/common/control_gflags.h"
+#include "modules/control/control.h"
 #include "modules/tools/fuzz/control/proto/control_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
 namespace apollo {
 namespace control {
 
+using apollo::canbus::Chassis;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::adapter::AdapterManagerConfig;
-using apollo::canbus::Chassis;
 using apollo::localization::LocalizationEstimate;
 using apollo::planning::ADCTrajectory;
 using apollo::tools::fuzz::control::ControlModuleFuzzMessage;
@@ -81,8 +81,7 @@ void ControlModuleFuzz::Init() {
 void ControlModuleFuzz::Fuzz(ControlModuleFuzzMessage message) {
   control_->OnMonitor(message.monitor_message());
   control_->OnPad(message.pad_message());
-  AdapterManager::FeedLocalizationData(
-      message.localization_estimate());
+  AdapterManager::FeedLocalizationData(message.localization_estimate());
   AdapterManager::FeedPlanningData(message.adc_trajectory());
   AdapterManager::FeedChassisData(message.chassis());
   ControlCommand control_command;
@@ -92,7 +91,7 @@ void ControlModuleFuzz::Fuzz(ControlModuleFuzzMessage message) {
   // AdapterManager::GetMonitor()->receive_callbacks_.clear();
 }
 
-DEFINE_PROTO_FUZZER(const ControlModuleFuzzMessage& message) {
+DEFINE_PROTO_FUZZER(const ControlModuleFuzzMessage &message) {
   control_module_fuzzer.Fuzz(message);
 }
 

@@ -30,8 +30,8 @@
 namespace apollo {
 namespace planning {
 
-using common::SpeedPoint;
 using common::SLPoint;
+using common::SpeedPoint;
 using common::TrajectoryPoint;
 using common::math::Vec2d;
 

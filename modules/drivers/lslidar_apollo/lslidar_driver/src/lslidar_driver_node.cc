@@ -14,24 +14,23 @@ See the License for the specific language governing permissions and         /
 limitations under the License.                                              /
 ****************************************************************************/
 
-#include <ros/ros.h>
 #include <lslidar_driver/lslidar_driver.h>
+#include <ros/ros.h>
 
-int main(int argc, char** argv)
-{
-    ros::init(argc, argv, "lslidar_driver_node");
-    ros::NodeHandle node;
-    ros::NodeHandle private_nh("~");
+int main(int argc, char** argv) {
+  ros::init(argc, argv, "lslidar_driver_node");
+  ros::NodeHandle node;
+  ros::NodeHandle private_nh("~");
 
-    // start the driver
-    apollo::drivers::lslidar_driver::LslidarDriver driver(node, private_nh);
-    if (!driver.initialize()) {
-        ROS_ERROR("Cannot initialize lslidar driver...");
-        return 0;
-    }
-    // loop until shut down or end of file
-    while(ros::ok() && driver.polling()) {
-        ros::spinOnce();
-    }
+  // start the driver
+  apollo::drivers::lslidar_driver::LslidarDriver driver(node, private_nh);
+  if (!driver.initialize()) {
+    ROS_ERROR("Cannot initialize lslidar driver...");
     return 0;
+  }
+  // loop until shut down or end of file
+  while (ros::ok() && driver.polling()) {
+    ros::spinOnce();
+  }
+  return 0;
 }

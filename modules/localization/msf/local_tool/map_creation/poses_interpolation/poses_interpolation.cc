@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 #include <fstream>
 #include <iomanip>
 #include "modules/localization/msf/common/io/velodyne_utility.h"
-#include "modules/localization/msf/local_tool/map_creation/poses_interpolation/poses_interpolation.h"
 
 namespace apollo {
 namespace localization {

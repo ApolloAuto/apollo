@@ -18,9 +18,9 @@
 
 #include "gtest/gtest.h"
 
-#include "modules/prediction/proto/scenario_feature.pb.h"
 #include "modules/prediction/common/kml_map_based_test.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/proto/scenario_feature.pb.h"
 
 namespace apollo {
 namespace prediction {

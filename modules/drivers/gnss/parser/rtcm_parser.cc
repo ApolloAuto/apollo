@@ -32,9 +32,9 @@ namespace apollo {
 namespace drivers {
 namespace gnss {
 
-using ::apollo::drivers::gnss::GnssEphemeris;
-using ::apollo::drivers::gnss::EpochObservation;
 using ::apollo::common::adapter::AdapterManager;
+using ::apollo::drivers::gnss::EpochObservation;
+using ::apollo::drivers::gnss::GnssEphemeris;
 
 bool RtcmParser::Init() {
   rtcm_parser_.reset(new Rtcm3Parser(true));

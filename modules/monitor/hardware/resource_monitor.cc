@@ -34,9 +34,8 @@ namespace monitor {
 
 ResourceMonitor::ResourceMonitor(const ResourceConf& config)
     : RecurrentRunner(FLAGS_resource_monitor_name,
-                      FLAGS_resource_monitor_interval)
-    , config_(config) {
-}
+                      FLAGS_resource_monitor_interval),
+      config_(config) {}
 
 void ResourceMonitor::RunOnce(const double current_time) {
   // Monitor directory available size.
@@ -46,9 +45,9 @@ void ResourceMonitor::RunOnce(const double current_time) {
       const auto space = boost::filesystem::space(path);
       const int available_gb = space.available >> 30;
       if (available_gb < min_available_gb) {
-        MonitorManager::LogBuffer().ERROR() <<
-            path << " has only " << available_gb << "GB space left, while " <<
-            min_available_gb << "GB is requried.";
+        MonitorManager::LogBuffer().ERROR()
+            << path << " has only " << available_gb << "GB space left, while "
+            << min_available_gb << "GB is requried.";
       }
     }
   }

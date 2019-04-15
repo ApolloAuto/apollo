@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/common/util/factory.h"
 #include <string>
 #include "gtest/gtest.h"
-#include "modules/common/util/factory.h"
 
 namespace apollo {
 namespace common {

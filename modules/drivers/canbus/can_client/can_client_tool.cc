@@ -93,10 +93,10 @@ class CanAgent {
   }
 
   void SendThreadFunc() {
-    using common::time::Clock;
-    using common::time::AsInt64;
-    using common::time::micros;
     using common::ErrorCode;
+    using common::time::AsInt64;
+    using common::time::Clock;
+    using common::time::micros;
     AINFO << "Send thread starting...";
     TestCanParam *param = param_ptr();
     CanClient *client = param->can_client;
@@ -178,10 +178,10 @@ class CanAgent {
   void is_sending_finish(bool val) { is_sending_finish_ = val; }
 
   void RecvThreadFunc() {
-    using common::time::Clock;
-    using common::time::AsInt64;
-    using common::time::micros;
     using common::ErrorCode;
+    using common::time::AsInt64;
+    using common::time::Clock;
+    using common::time::micros;
     AINFO << "Receive thread starting...";
     TestCanParam *param = param_ptr();
     CanClient *client = param->can_client;
@@ -252,12 +252,12 @@ int main(int32_t argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 
+  using apollo::common::ErrorCode;
+  using apollo::drivers::canbus::CanAgent;
   using apollo::drivers::canbus::CANCardParameter;
   using apollo::drivers::canbus::CanClient;
   using apollo::drivers::canbus::CanClientFactory;
   using apollo::drivers::canbus::TestCanParam;
-  using apollo::drivers::canbus::CanAgent;
-  using apollo::common::ErrorCode;
   CANCardParameter can_client_conf_a;
   std::shared_ptr<TestCanParam> param_ptr_a(new TestCanParam());
   std::shared_ptr<TestCanParam> param_ptr_b(new TestCanParam());

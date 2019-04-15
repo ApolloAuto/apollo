@@ -39,14 +39,14 @@ namespace apollo {
 namespace common {
 namespace monitor {
 
-#define REG_MSG_TYPE(TYPE)                             \
-    MonitorLogBuffer &TYPE(const std::string &msg) {   \
-    AddMonitorMsgItem(MonitorMessageItem::TYPE, msg);  \
-    return *this;                                      \
-  }                                                    \
-  MonitorLogBuffer &TYPE() {                           \
-    level_ = MonitorMessageItem::TYPE;                 \
-    return *this;                                      \
+#define REG_MSG_TYPE(TYPE)                            \
+  MonitorLogBuffer &TYPE(const std::string &msg) {    \
+    AddMonitorMsgItem(MonitorMessageItem::TYPE, msg); \
+    return *this;                                     \
+  }                                                   \
+  MonitorLogBuffer &TYPE() {                          \
+    level_ = MonitorMessageItem::TYPE;                \
+    return *this;                                     \
   }
 
 /**

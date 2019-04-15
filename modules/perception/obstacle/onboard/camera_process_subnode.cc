@@ -19,15 +19,15 @@
 #if (CV_MAJOR_VERSION == 2)
 #include <opencv2/opencv.hpp>
 #ifdef HAVE_OPENCV_GPU
-#include <opencv2/gpu/gpu.hpp>
 #include <opencv2/core/gpumat.hpp>
+#include <opencv2/gpu/gpu.hpp>
 #endif
 #else
 #include <opencv2/core.hpp>
-#include <opencv2/cudaimgproc.hpp>
-#include <opencv2/cudawarping.hpp>
 #include <opencv2/cudaarithm.hpp>
 #include <opencv2/cudafilters.hpp>
+#include <opencv2/cudaimgproc.hpp>
+#include <opencv2/cudawarping.hpp>
 #endif
 #include "eigen_conversions/eigen_msg.h"
 #include "modules/perception/common/perception_gflags.h"
@@ -56,8 +56,8 @@ bool CameraProcessSubnode::InitInternal() {
   FLAGS_enable_opencv_gpu = 0;
 #endif
 #else
-  FLAGS_enable_opencv_gpu = cv::cuda::getCudaEnabledDeviceCount
-  if (FLAGS_enable_opencv_gpu) {
+  FLAGS_enable_opencv_gpu =
+      cv::cuda::getCudaEnabledDeviceCount if (FLAGS_enable_opencv_gpu) {
     cv::Mat cmat = cv::Mat::zeros(cv::Size(1920, 1080), CV_16UC1);
     cv::cuda::GpuMat gmat(cmat);
   }
@@ -161,7 +161,7 @@ void CameraProcessSubnode::ImgCallback(const sensor_msgs::Image &message) {
     img = cv::imread(FLAGS_image_file_path, CV_LOAD_IMAGE_COLOR);
   }
 
-  if ( FLAGS_enable_opencv_gpu < 1 ) {
+  if (FLAGS_enable_opencv_gpu < 1) {
     cv::resize(img, img, cv::Size(1920, 1080), 0, 0);
   } else {
 #if (CV_MAJOR_VERSION == 2)
@@ -375,7 +375,7 @@ void CameraProcessSubnode::PublishDataAndEvent(
   cam_obj_data_->Add(key, sensor_objects);
   cam_shared_data_->Add(key, camera_item);
 
-  for (const EventMeta& event_meta : pub_meta_events_) {
+  for (const EventMeta &event_meta : pub_meta_events_) {
     Event event;
     event.event_id = event_meta.event_id;
     event.timestamp = timestamp;
@@ -405,8 +405,8 @@ void CameraProcessSubnode::PublishPerceptionPbObj(
 
   // Relative speed of objects + latest ego car speed in X
   for (auto obstacle : obstacles.perception_obstacle()) {
-    obstacle.mutable_velocity()->set_x(
-        obstacle.velocity().x() + chassis_.speed_mps());
+    obstacle.mutable_velocity()->set_x(obstacle.velocity().x() +
+                                       chassis_.speed_mps());
   }
 
   AdapterManager::PublishPerceptionObstacles(obstacles);

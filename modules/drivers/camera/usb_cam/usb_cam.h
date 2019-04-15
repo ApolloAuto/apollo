@@ -165,4 +165,4 @@ class UsbCam {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  /* MODULES_DRIVERS_CAMERA_USB_CAM_USB_CAM_H_ */
+#endif /* MODULES_DRIVERS_CAMERA_USB_CAM_USB_CAM_H_ */

@@ -23,8 +23,8 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <std_msgs/Time.h>
 
-#include "rslidar_pointcloud/rslidarParser.h"
 #include "rslidar_msgs/rslidarScan.h"
+#include "rslidar_pointcloud/rslidarParser.h"
 
 namespace apollo {
 namespace drivers {
@@ -33,7 +33,7 @@ namespace rslidar {
 // convert rslidar data to pointcloud and republish
 class Convert {
  public:
- Convert() {}
+  Convert() {}
   ~Convert();
 
   // init rslidar config struct from private_nh
@@ -46,13 +46,13 @@ class Convert {
 
   // RawData class for converting data to point cloud
   rslidarParser* data_;
-  
+
   ros::Subscriber rslidar_scan_;
   ros::Publisher pointcloud_pub_;
 
   std::string topic_packets_;
   std::string topic_pointcloud_;
- 
+
   int queue_size_;
 };
 
@@ -60,4 +60,4 @@ class Convert {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  
+#endif

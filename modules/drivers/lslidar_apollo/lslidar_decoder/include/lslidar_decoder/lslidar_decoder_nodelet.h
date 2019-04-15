@@ -17,29 +17,27 @@ limitations under the License.                                              /
 #ifndef LSLIDAR_DECODER_NODELET_H
 #define LSLIDAR_DECODER_NODELET_H
 
-#include <ros/ros.h>
-#include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+#include <ros/ros.h>
 
 #include <lslidar_decoder/lslidar_decoder.h>
 
 namespace apollo {
 namespace drivers {
 namespace lslidar_decoder {
-class LslidarDecoderNodelet: public nodelet::Nodelet {
-public:
-
+class LslidarDecoderNodelet : public nodelet::Nodelet {
+ public:
   LslidarDecoderNodelet() {}
   ~LslidarDecoderNodelet() {}
 
-private:
-
+ private:
   virtual void onInit();
   LslidarDecoderPtr decoder;
 };
 
-} // end namespace lslidar_n301_decoder
-}
-}
+}  // namespace lslidar_decoder
+}  // namespace drivers
+}  // namespace apollo
 
 #endif

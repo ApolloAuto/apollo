@@ -55,8 +55,8 @@ using apollo::common::adapter::AdapterManager;
 using apollo::common::monitor::MonitorMessage;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
-using apollo::common::time::ToSecond;
 using apollo::common::time::millis;
+using apollo::common::time::ToSecond;
 using apollo::common::util::DownsampleByAngle;
 using apollo::common::util::GetProtoFromFile;
 using apollo::control::ControlCommand;
@@ -1015,8 +1015,8 @@ void SimulationWorldService::UpdateSimulationWorld(
     const NavigationInfo &navigation_info) {
   static double previous_timestamp = 0.0;
   double topic_timestamp = navigation_info.header().timestamp_sec();
-  if (std::fabs(
-      previous_timestamp - topic_timestamp) < common::math::kMathEpsilon) {
+  if (std::fabs(previous_timestamp - topic_timestamp) <
+      common::math::kMathEpsilon) {
     // it seems to be the same topic, ignore this update
     return;
   }

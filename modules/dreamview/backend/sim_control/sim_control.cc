@@ -34,8 +34,8 @@ using apollo::common::Quaternion;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
 using apollo::common::math::HeadingToQuaternion;
-using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::InterpolateUsingLinearApproximation;
+using apollo::common::math::InverseQuaternionRotate;
 using apollo::common::math::NormalizeAngle;
 using apollo::common::math::QuaternionToHeading;
 using apollo::common::time::Clock;
@@ -127,21 +127,21 @@ void SimControl::InitStartPoint(double start_velocity,
     point.set_a(start_acceleration);
   } else {
     start_point_from_localization_ = true;
-    const auto& localization = AdapterManager::GetLocalization()
-        ->GetLatestObserved();
+    const auto& localization =
+        AdapterManager::GetLocalization()->GetLatestObserved();
     const auto& pose = localization.pose();
     point.mutable_path_point()->set_x(pose.position().x());
     point.mutable_path_point()->set_y(pose.position().y());
     point.mutable_path_point()->set_z(pose.position().z());
     point.mutable_path_point()->set_theta(pose.heading());
-    point.set_v(std::hypot(pose.linear_velocity().x(),
-                pose.linear_velocity().y()));
+    point.set_v(
+        std::hypot(pose.linear_velocity().x(), pose.linear_velocity().y()));
     // Calculates the dot product of acceleration and velocity. The sign
     // of this projection indicates whether this is acceleration or
     // deceleration.
-    double projection = pose.linear_acceleration().x()
-        * pose.linear_velocity().x()
-        + pose.linear_acceleration().y() * pose.linear_velocity().y();
+    double projection =
+        pose.linear_acceleration().x() * pose.linear_velocity().x() +
+        pose.linear_acceleration().y() * pose.linear_velocity().y();
 
     // Calculates the magnitude of the acceleration. Negate the value if
     // it is indeed a deceleration.

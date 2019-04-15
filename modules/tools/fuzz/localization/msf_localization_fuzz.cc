@@ -17,11 +17,11 @@
 #define private public
 
 #include <iostream>
-#include "modules/localization/msf/msf_localization.h"
+#include "libfuzzer/libfuzzer_macro.h"
 #include "modules/common/adapters/adapter_manager.h"
 #include "modules/localization/common/localization_gflags.h"
+#include "modules/localization/msf/msf_localization.h"
 #include "modules/tools/fuzz/localization/proto/msf_localization_fuzz.pb.h"
-#include "libfuzzer/libfuzzer_macro.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
@@ -41,7 +41,7 @@ class MSFLocalizationFuzz {
 
  private:
   std::unique_ptr<MSFLocalization> msf_localization_;
-}msf_localization_fuzzer;
+} msf_localization_fuzzer;
 
 void MSFLocalizationFuzz::Init() {
   AdapterManagerConfig config;
@@ -102,17 +102,15 @@ void MSFLocalizationFuzz::Fuzz(
   msf_localization_->OnRawImu(msf_localization_fuzz_message.imu());
   msf_localization_->OnGnssBestPose(
       msf_localization_fuzz_message.gnss_best_pose());
-  msf_localization_->OnGnssRtkObs(
-      msf_localization_fuzz_message.gnss_rtk_obs());
-  msf_localization_->OnGnssRtkEph(
-      msf_localization_fuzz_message.gnss_rtk_eph());
+  msf_localization_->OnGnssRtkObs(msf_localization_fuzz_message.gnss_rtk_obs());
+  msf_localization_->OnGnssRtkEph(msf_localization_fuzz_message.gnss_rtk_eph());
 }
 
 // Before fuzzing, need to comment out
 // "tf2_broadcaster_.reset(new tf2_ros::TransformBroadcaster);"
 // in msf_localization.cc
 DEFINE_PROTO_FUZZER(
-    const MSFLocalizationFuzzMessage& msf_localization_fuzz_message) {
+    const MSFLocalizationFuzzMessage &msf_localization_fuzz_message) {
   std::cout.setstate(std::ios_base::failbit);
   std::cerr.setstate(std::ios_base::failbit);
   msf_localization_fuzzer.Fuzz(msf_localization_fuzz_message);

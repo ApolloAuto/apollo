@@ -20,23 +20,24 @@
 
 #include <algorithm>
 
-#include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/common/log.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/lattice/trajectory1d/piecewise_jerk_trajectory1d.h"
 
 namespace apollo {
 namespace planning {
 
-PiecewiseJerkTrajectory1d::PiecewiseJerkTrajectory1d(
-    const double p, const double v, const double a) {
+PiecewiseJerkTrajectory1d::PiecewiseJerkTrajectory1d(const double p,
+                                                     const double v,
+                                                     const double a) {
   last_p_ = p;
   last_v_ = v;
   last_a_ = a;
   param_.push_back(0.0);
 }
 
-void PiecewiseJerkTrajectory1d::AppendSegment(
-    const double jerk, const double param) {
+void PiecewiseJerkTrajectory1d::AppendSegment(const double jerk,
+                                              const double param) {
   CHECK_GT(param, FLAGS_lattice_epsilon);
 
   param_.push_back(param_.back() + param);
@@ -51,7 +52,7 @@ void PiecewiseJerkTrajectory1d::AppendSegment(
 }
 
 double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
-    const double param) const {
+                                           const double param) const {
   CHECK_GE(param, -FLAGS_lattice_epsilon);
 
   auto it_lower = std::lower_bound(param_.begin(), param_.end(), param);
@@ -69,13 +70,9 @@ double PiecewiseJerkTrajectory1d::Evaluate(const std::uint32_t order,
   return segments_[index - 1].Evaluate(order, param - param_[index - 1]);
 }
 
-double PiecewiseJerkTrajectory1d::ParamLength() const {
-  return param_.back();
-}
+double PiecewiseJerkTrajectory1d::ParamLength() const { return param_.back(); }
 
-std::string PiecewiseJerkTrajectory1d::ToString() const {
-  return "";
-}
+std::string PiecewiseJerkTrajectory1d::ToString() const { return ""; }
 
 }  // namespace planning
 }  // namespace apollo

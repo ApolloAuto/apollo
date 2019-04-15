@@ -90,8 +90,8 @@ class BaseCameraLanePostProcessor {
                        LaneObjectsPtr* lane_instances) = 0;
 
   virtual bool ProcessWithoutCC(const cv::Mat& lane_map,
-                       const CameraLanePostProcessOptions& options,
-                       LaneObjectsPtr* lane_instances) = 0;
+                                const CameraLanePostProcessOptions& options,
+                                LaneObjectsPtr* lane_instances) = 0;
 
   virtual std::string name() const = 0;
 

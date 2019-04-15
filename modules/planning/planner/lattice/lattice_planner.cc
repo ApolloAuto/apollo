@@ -51,8 +51,8 @@ using apollo::common::PathPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterManager;
-using apollo::common::math::PathMatcher;
 using apollo::common::math::CartesianFrenetConverter;
+using apollo::common::math::PathMatcher;
 using apollo::common::time::Clock;
 
 namespace {
@@ -168,11 +168,9 @@ Status LatticePlanner::PlanOnReferenceLine(
 
   // 4. parse the decision and get the planning target.
   auto ptr_path_time_graph = std::make_shared<PathTimeGraph>(
-      ptr_prediction_querier->GetObstacles(),
-      *ptr_reference_line,
-      reference_line_info,
-      init_s[0], init_s[0] + FLAGS_decision_horizon,
-      0.0, FLAGS_trajectory_time_length, init_d);
+      ptr_prediction_querier->GetObstacles(), *ptr_reference_line,
+      reference_line_info, init_s[0], init_s[0] + FLAGS_decision_horizon, 0.0,
+      FLAGS_trajectory_time_length, init_d);
 
   double speed_limit =
       reference_line_info->reference_line().GetSpeedLimitFromS(init_s[0]);
@@ -264,28 +262,28 @@ Status LatticePlanner::PlanOnReferenceLine(
       ++combined_constraint_failure_count;
 
       switch (result) {
-      case ConstraintChecker::Result::LON_VELOCITY_OUT_OF_BOUND:
-        lon_vel_failure_count += 1;
-        break;
-      case ConstraintChecker::Result::LON_ACCELERATION_OUT_OF_BOUND:
-        lon_acc_failure_count += 1;
-        break;
-      case ConstraintChecker::Result::LON_JERK_OUT_OF_BOUND:
-        lon_jerk_failure_count += 1;
-        break;
-      case ConstraintChecker::Result::CURVATURE_OUT_OF_BOUND:
-        curvature_failure_count += 1;
-        break;
-      case ConstraintChecker::Result::LAT_ACCELERATION_OUT_OF_BOUND:
-        lat_acc_failure_count += 1;
-        break;
-      case ConstraintChecker::Result::LAT_JERK_OUT_OF_BOUND:
-        lat_jerk_failure_count += 1;
-        break;
-      case ConstraintChecker::Result::VALID:
-      default:
-        // Intentional empty
-        break;
+        case ConstraintChecker::Result::LON_VELOCITY_OUT_OF_BOUND:
+          lon_vel_failure_count += 1;
+          break;
+        case ConstraintChecker::Result::LON_ACCELERATION_OUT_OF_BOUND:
+          lon_acc_failure_count += 1;
+          break;
+        case ConstraintChecker::Result::LON_JERK_OUT_OF_BOUND:
+          lon_jerk_failure_count += 1;
+          break;
+        case ConstraintChecker::Result::CURVATURE_OUT_OF_BOUND:
+          curvature_failure_count += 1;
+          break;
+        case ConstraintChecker::Result::LAT_ACCELERATION_OUT_OF_BOUND:
+          lat_acc_failure_count += 1;
+          break;
+        case ConstraintChecker::Result::LAT_JERK_OUT_OF_BOUND:
+          lat_jerk_failure_count += 1;
+          break;
+        case ConstraintChecker::Result::VALID:
+        default:
+          // Intentional empty
+          break;
       }
       continue;
     }

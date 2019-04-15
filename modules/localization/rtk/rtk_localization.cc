@@ -195,7 +195,9 @@ bool RTKLocalization::FindMatchingIMU(const double gps_timestamp_sec,
 }
 
 bool RTKLocalization::InterpolateIMU(const CorrectedImu &imu1,
-  const CorrectedImu &imu2, const double timestamp_sec, CorrectedImu *imu_msg) {
+                                     const CorrectedImu &imu2,
+                                     const double timestamp_sec,
+                                     CorrectedImu *imu_msg) {
   DCHECK_NOTNULL(imu_msg);
   if (!(imu1.has_header() && imu1.header().has_timestamp_sec() &&
         imu2.has_header() && imu2.header().has_timestamp_sec())) {
@@ -265,10 +267,9 @@ void RTKLocalization::PrepareLocalizationMsg(
     imu_msg = AdapterManager::GetImu()->GetLatestObserved();
   }
 
-  if (imu_valid &&
-      fabs(gps_msg.header().timestamp_sec() -
-           imu_msg.header().timestamp_sec()) >
-          FLAGS_gps_imu_timestamp_sec_diff_tolerance) {
+  if (imu_valid && fabs(gps_msg.header().timestamp_sec() -
+                        imu_msg.header().timestamp_sec()) >
+                       FLAGS_gps_imu_timestamp_sec_diff_tolerance) {
     // not the same time stamp, 20ms threshold
     AERROR << "[PrepareLocalizationMsg]: time stamp of GPS["
            << gps_msg.header().timestamp_sec()

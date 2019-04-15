@@ -32,8 +32,8 @@ namespace monitor {
 
 using apollo::common::KVDB;
 using apollo::common::util::ContainsKey;
-using apollo::common::util::GetProtoFromFile;
 using apollo::common::util::FindOrNull;
+using apollo::common::util::GetProtoFromFile;
 using apollo::common::util::StrCat;
 
 SafetyManager::SafetyManager() {
@@ -64,7 +64,8 @@ void SafetyManager::CheckSafety(const double current_time) {
 
   // Trigger EStop if no action was taken in time.
   if (system_status->safety_mode_trigger_time() +
-      FLAGS_safety_mode_seconds_before_estop < current_time) {
+          FLAGS_safety_mode_seconds_before_estop <
+      current_time) {
     system_status->set_require_emergency_stop(true);
   }
 }
@@ -76,7 +77,7 @@ bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
   }
 
   const std::string mode_name = KVDB::Get("apollo:dreamview:mode");
-  auto& log = MonitorManager::LogBuffer();
+  auto &log = MonitorManager::LogBuffer();
   if (mode_name.empty()) {
     log.ERROR("Cannot get apollo mode");
     return true;
@@ -98,13 +99,13 @@ bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
     }
     if (status->summary() == Summary::ERROR ||
         status->summary() == Summary::FATAL) {
-      log.ERROR(StrCat(
-          "Hardware ", hardware, " triggers safety mode: ", status->msg()));
+      log.ERROR(StrCat("Hardware ", hardware,
+                       " triggers safety mode: ", status->msg()));
       return true;
     }
   }
 
-  const auto& modules_status = MonitorManager::GetStatus()->modules();
+  const auto &modules_status = MonitorManager::GetStatus()->modules();
   for (const auto &module : mode_conf->live_modules()) {
     const auto *status = FindOrNull(modules_status, module);
     if (status == nullptr) {
@@ -113,8 +114,8 @@ bool SafetyManager::ShouldTriggerSafeMode(const double current_time) {
     }
     if (status->summary() == Summary::ERROR ||
         status->summary() == Summary::FATAL) {
-      log.ERROR(StrCat(
-          "Module ", module, " triggers safety mode: ", status->msg()));
+      log.ERROR(
+          StrCat("Module ", module, " triggers safety mode: ", status->msg()));
       return true;
     }
   }

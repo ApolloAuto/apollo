@@ -16,10 +16,10 @@
 
 #define private public
 
-#include "modules/localization/rtk/rtk_localization.h"
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/tools/fuzz/localization/proto/rtk_localization_fuzz.pb.h"
 #include "libfuzzer/libfuzzer_macro.h"
+#include "modules/common/adapters/adapter_manager.h"
+#include "modules/localization/rtk/rtk_localization.h"
+#include "modules/tools/fuzz/localization/proto/rtk_localization_fuzz.pb.h"
 
 static google::protobuf::LogSilencer logSilencer;
 
@@ -76,7 +76,7 @@ void RTKLocalizationFuzz::Fuzz(
 // "tf2_broadcaster_.reset(new tf2_ros::TransformBroadcaster);"
 // in rtk_localization.cc
 DEFINE_PROTO_FUZZER(
-    const RTKLocalizationFuzzMessage& rtk_localization_fuzz_message) {
+    const RTKLocalizationFuzzMessage &rtk_localization_fuzz_message) {
   rtk_localization_fuzzer.Fuzz(rtk_localization_fuzz_message);
 }
 

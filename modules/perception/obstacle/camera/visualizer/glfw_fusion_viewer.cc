@@ -301,7 +301,7 @@ void GLFWFusionViewer::set_camera_para(Eigen::Vector3d i_position,
   view_mat_ << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -100, 0, 0, 0, 1;
 }
 
-void glfw_error_callback(int error, const char *desc) {
+void glfw_error_callback(int error, const char* desc) {
   AERROR << "Error: " << desc;
 }
 
@@ -895,19 +895,15 @@ void GLFWFusionViewer::save_extrinsics() {
   fs << "\t\tw: " << q.w() << "\n";
   fs << "\ttranslation:\n";
   fs << "\t\tx: " << v2c_copy(0, 3) << "\n";
-  fs << "\t\ty:  "<< v2c_copy(1, 3) << "\n";
+  fs << "\t\ty:  " << v2c_copy(1, 3) << "\n";
   fs << "\t\tz: " << v2c_copy(2, 3) << "\n";
 
   fs.close();
 }
 
-double GLFWFusionViewer::to_deg(double angle) {
-  return angle * 57.2957795;
-}
+double GLFWFusionViewer::to_deg(double angle) { return angle * 57.2957795; }
 
-double GLFWFusionViewer::to_rad(double angle) {
-  return angle * 0.0174532925;
-}
+double GLFWFusionViewer::to_rad(double angle) { return angle * 0.0174532925; }
 
 void GLFWFusionViewer::keyboard(int key) {
   help_str = "";
@@ -1058,13 +1054,13 @@ void GLFWFusionViewer::keyboard(int key) {
 
   if (change_rot) {
     Eigen::Vector3d eulers = v2c_copy.block<3, 3>(0, 0).eulerAngles(0, 1, 2);
-    help_str += "Rotation: \nX: " + std::to_string(eulers[0])
-                + "\nY: " + std::to_string(eulers[1])
-                + "\nZ: " + std::to_string(eulers[2]) + "\n";
+    help_str += "Rotation: \nX: " + std::to_string(eulers[0]) +
+                "\nY: " + std::to_string(eulers[1]) +
+                "\nZ: " + std::to_string(eulers[2]) + "\n";
   } else if (change_translation) {
-    help_str += "Translation: \nX: " + std::to_string(pos[0])
-                + "\nY: " + std::to_string(pos[1])
-                + "\nZ: " + std::to_string(pos[2]) + "\n";
+    help_str += "Translation: \nX: " + std::to_string(pos[0]) +
+                "\nY: " + std::to_string(pos[1]) +
+                "\nZ: " + std::to_string(pos[2]) + "\n";
   }
 
   if (key == GLFW_KEY_Z) {
@@ -1482,14 +1478,14 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
       if (x >= 0 && x < lane_map.cols && y >= 0 && y < lane_map.rows &&
           lane_map.at<float>(y, x) >= lane_map_threshold_) {
         // cv::Scalar lane_map_color =
-          // lane_map_colors[static_cast<int>(round(lane_map.at<float>(y, x)))];
-            cv::Scalar lane_map_color = cv::Scalar(255, 0, 0);
+        // lane_map_colors[static_cast<int>(round(lane_map.at<float>(y, x)))];
+        cv::Scalar lane_map_color = cv::Scalar(255, 0, 0);
         // AINFO << lane_map_color;
         for (uint16_t c = 0; c < 3; c++) {
           image_mat->at<cv::Vec3b>(h, w)[c] =
-            static_cast<unsigned char>(lane_map_color[c]);
-              // image_mat->at<cv::Vec3b>(h, w)[c] * alpha_blending +
-              // lane_map_color[c] * one_minus_alpha
+              static_cast<unsigned char>(lane_map_color[c]);
+          // image_mat->at<cv::Vec3b>(h, w)[c] * alpha_blending +
+          // lane_map_color[c] * one_minus_alpha
         }
       }
     }
@@ -1541,9 +1537,10 @@ bool GLFWFusionViewer::draw_lane_objects_image(cv::Mat* image_mat) {
     if (!FLAGS_use_whole_lane_line) {
       for (auto p = lane_objects_->at(k).image_pos.begin();
            p != lane_objects_->at(k).image_pos.end(); ++p) {
-        cv::circle(*image_mat, cv::Point(static_cast<int>(p->x()),
-                                         static_cast<int>(p->y())),
-                   3, cv::Scalar(0, 0, 0), -1);
+        cv::circle(
+            *image_mat,
+            cv::Point(static_cast<int>(p->x()), static_cast<int>(p->y())), 3,
+            cv::Scalar(0, 0, 0), -1);
       }
       // draw polynomial curve
       // Upper-left points in image coord
@@ -1960,9 +1957,10 @@ void GLFWFusionViewer::draw_camera_box3d(
       }
 
       if (show_camera_box3d_) {
-        draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
-                                              box3d_color[2]),
-                      offset_x, offset_y, image_width, image_height);
+        draw_8pts_box(
+            points,
+            Eigen::Vector3f(box3d_color[0], box3d_color[1], box3d_color[2]),
+            offset_x, offset_y, image_width, image_height);
       }
     }
   }
@@ -2401,9 +2399,10 @@ void GLFWFusionViewer::draw_camera_box(
 
     if (show_camera_box3d_) {
       ADEBUG << "draw_8pts_box";
-      draw_8pts_box(points, Eigen::Vector3f(box3d_color[0], box3d_color[1],
-                                            box3d_color[2]),
-                    offset_x, offset_y, image_width, image_height);
+      draw_8pts_box(
+          points,
+          Eigen::Vector3f(box3d_color[0], box3d_color[1], box3d_color[2]),
+          offset_x, offset_y, image_width, image_height);
     }
 
     // TODO(All) fix the code after continue

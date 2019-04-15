@@ -38,8 +38,8 @@ CameraNodelet::~CameraNodelet() {
 void CameraNodelet::OnInit() {
   AINFO << "Usb cam nodelet init";
   CameraConf config;
-  CHECK(apollo::common::util::GetProtoFromFile(FLAGS_camera_config_file,
-                                               &config))
+  CHECK(
+      apollo::common::util::GetProtoFromFile(FLAGS_camera_config_file, &config))
       << "failed to load camera config file: " << FLAGS_camera_config_file;
 
   // TODO(all)

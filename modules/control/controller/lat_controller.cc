@@ -109,9 +109,8 @@ bool LatController::LoadControlConf(const ControlConf *control_conf) {
   max_lat_acc_ = control_conf->lat_controller_conf().max_lateral_acceleration();
   min_turn_radius_ = vehicle_param_.min_turn_radius();
 
-  steer_ratio_direction_calc = 180 / M_PI *
-                               steer_ratio_ /
-                               steer_single_direction_max_degree_ * 100;
+  steer_ratio_direction_calc =
+      180 / M_PI * steer_ratio_ / steer_single_direction_max_degree_ * 100;
 
   const double mass_fl = control_conf->lat_controller_conf().mass_fl();
   const double mass_fr = control_conf->lat_controller_conf().mass_fr();
@@ -382,8 +381,8 @@ Status LatController::ComputeControlCommand(
   // feedback = - K * state
   // Convert vehicle steer angle from rad to degree and then to steer degree
   // then to 100% ratio
-  const double steer_angle_feedback = -(matrix_k_ * matrix_state_)(0, 0) *
-                                      steer_ratio_direction_calc;
+  const double steer_angle_feedback =
+      -(matrix_k_ * matrix_state_)(0, 0) * steer_ratio_direction_calc;
 
   const double steer_angle_feedforward = ComputeFeedForward(debug->curvature());
 
@@ -548,7 +547,7 @@ void LatController::ComputeLateralErrors(
     const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
     SimpleLateralDebug *debug) {
   TrajectoryPoint target_point;
-  if (FLAGS_use_navigation_mode  &&
+  if (FLAGS_use_navigation_mode &&
       !FLAGS_enable_navigation_mode_position_update) {
     target_point = trajectory_analyzer.QueryNearestPointByAbsoluteTime(
         Clock::NowInSeconds() + query_relative_time_);

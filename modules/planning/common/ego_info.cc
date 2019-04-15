@@ -26,8 +26,8 @@
 namespace apollo {
 namespace planning {
 
-using common::math::Vec2d;
 using common::math::Box2d;
+using common::math::Vec2d;
 
 EgoInfo::EgoInfo() {
   common::VehicleConfig ego_vehicle_config_ =

@@ -37,11 +37,11 @@ namespace apollo {
 namespace prediction {
 
 using ::apollo::common::ErrorCode;
+using ::apollo::common::PathPoint;
 using ::apollo::common::Point3D;
 using ::apollo::common::math::KalmanFilter;
 using ::apollo::common::util::FindOrDie;
 using ::apollo::common::util::FindOrNull;
-using ::apollo::common::PathPoint;
 using ::apollo::hdmap::LaneInfo;
 using ::apollo::perception::PerceptionObstacle;
 
@@ -180,7 +180,7 @@ void Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   SetLaneGraphFeature(&feature);
 
   if (FLAGS_adjust_vehicle_heading_by_lane &&
-     type_ == PerceptionObstacle::VEHICLE) {
+      type_ == PerceptionObstacle::VEHICLE) {
     AdjustHeadingByLane(&feature);
   }
 
@@ -410,8 +410,7 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
     velocity_heading = perception_obstacle.theta();
   }
 
-  if (!FLAGS_use_navigation_mode &&
-      FLAGS_adjust_velocity_by_position_shift &&
+  if (!FLAGS_use_navigation_mode && FLAGS_adjust_velocity_by_position_shift &&
       history_size() > 0) {
     double diff_x =
         feature->position().x() - feature_history_.front().position().x();
@@ -463,8 +462,7 @@ void Obstacle::SetVelocity(const PerceptionObstacle& perception_obstacle,
 }
 
 void Obstacle::AdjustHeadingByLane(Feature* feature) {
-  if (!feature->has_lane() ||
-      !feature->lane().has_lane_feature()) {
+  if (!feature->has_lane() || !feature->lane().has_lane_feature()) {
     return;
   }
   double velocity_heading = feature->velocity_heading();
@@ -741,9 +739,8 @@ void Obstacle::SetCurrentLanes(Feature* feature) {
     lane_search_radius = FLAGS_lane_search_radius_in_junction;
   }
   std::vector<std::shared_ptr<const LaneInfo>> current_lanes;
-  PredictionMap::OnLane(current_lanes_, point, heading,
-                        lane_search_radius, true, max_num_lane,
-                        max_angle_diff, &current_lanes);
+  PredictionMap::OnLane(current_lanes_, point, heading, lane_search_radius,
+                        true, max_num_lane, max_angle_diff, &current_lanes);
   current_lanes_ = current_lanes;
   if (current_lanes_.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no current lanes.";
@@ -812,8 +809,8 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
   double theta = feature->velocity_heading();
   std::vector<std::shared_ptr<const LaneInfo>> nearby_lanes;
   PredictionMap::NearbyLanesByCurrentLanes(
-      point, theta, FLAGS_lane_search_radius, current_lanes_,
-      max_num_lane, &nearby_lanes);
+      point, theta, FLAGS_lane_search_radius, current_lanes_, max_num_lane,
+      &nearby_lanes);
   if (nearby_lanes.empty()) {
     ADEBUG << "Obstacle [" << id_ << "] has no nearby lanes.";
     return;
@@ -868,10 +865,11 @@ void Obstacle::SetNearbyLanes(Feature* feature) {
 
 void Obstacle::SetLaneGraphFeature(Feature* feature) {
   double speed = feature->speed();
-  double road_graph_distance = std::max(
-      speed * FLAGS_prediction_duration +
-      0.5 * FLAGS_max_acc * FLAGS_prediction_duration *
-      FLAGS_prediction_duration, FLAGS_min_prediction_length);
+  double road_graph_distance =
+      std::max(speed * FLAGS_prediction_duration +
+                   0.5 * FLAGS_max_acc * FLAGS_prediction_duration *
+                       FLAGS_prediction_duration,
+               FLAGS_min_prediction_length);
 
   int seq_id = 0;
   int curr_lane_count = 0;

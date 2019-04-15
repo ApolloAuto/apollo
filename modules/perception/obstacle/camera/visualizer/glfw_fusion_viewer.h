@@ -362,27 +362,21 @@ class GLFWFusionViewer {
 
   inline Eigen::Matrix3d rotX(double angle) {
     Eigen::Matrix3d m;
-    m << 1, 0, 0,
-         0, cos(angle), -sin(angle),
-         0, sin(angle), cos(angle);
+    m << 1, 0, 0, 0, cos(angle), -sin(angle), 0, sin(angle), cos(angle);
 
     return m;
   }
 
   inline Eigen::Matrix3d rotY(double angle) {
     Eigen::Matrix3d m;
-    m << cos(angle), 0, sin(angle),
-         0, 1, 0,
-         -sin(angle), 0, cos(angle);
+    m << cos(angle), 0, sin(angle), 0, 1, 0, -sin(angle), 0, cos(angle);
 
     return m;
   }
 
   inline Eigen::Matrix3d rotZ(double angle) {
     Eigen::Matrix3d m;
-    m << cos(angle), -sin(angle), 0,
-         sin(angle), cos(angle), 0,
-         0, 0, 1;
+    m << cos(angle), -sin(angle), 0, sin(angle), cos(angle), 0, 0, 0, 1;
 
     return m;
   }

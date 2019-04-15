@@ -102,7 +102,7 @@ typedef struct {
   uint16_t diff_age;
   unsigned char reserve[2];
   uint16_t checksum;
-}gps_rtk_zhd_packet_t;
+} gps_rtk_zhd_packet_t;
 
 #pragma pack()
 

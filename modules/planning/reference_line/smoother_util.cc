@@ -28,9 +28,9 @@
 #include "modules/common/util/util.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
-#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 DEFINE_string(input_file, "", "input file with format x,y per line");
 DEFINE_string(output_file, "", "output file with format x,y per line");

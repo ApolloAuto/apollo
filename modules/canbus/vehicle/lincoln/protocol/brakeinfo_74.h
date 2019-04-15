@@ -22,8 +22,8 @@
 #ifndef MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_BRAKEINFO_74_H_
 #define MODULES_CANBUS_VEHICLE_LINCOLN_PROTOCOL_BRAKEINFO_74_H_
 
-#include "modules/drivers/canbus/can_comm/protocol_data.h"
 #include "modules/canbus/proto/chassis_detail.pb.h"
+#include "modules/drivers/canbus/can_comm/protocol_data.h"
 
 /**
  * @namespace apollo::canbus::lincoln
@@ -39,7 +39,7 @@ namespace lincoln {
  * @brief one of the protocol data of lincoln vehicle
  */
 class Brakeinfo74 : public ::apollo::drivers::canbus::ProtocolData<
-                    ::apollo::canbus::ChassisDetail> {
+                        ::apollo::canbus::ChassisDetail> {
  public:
   static const int32_t ID;
 

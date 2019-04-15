@@ -42,8 +42,8 @@ DEFINE_double(event_time_backtrack_seconds, 20,
 namespace apollo {
 namespace data {
 namespace {
-using apollo::common::adapter::AdapterManager;
 using apollo::canbus::Chassis;
+using apollo::common::adapter::AdapterManager;
 
 void OnSigInt(int32_t signal_num) {
   // only response for ctrl + c
@@ -62,7 +62,7 @@ void OnSigInt(int32_t signal_num) {
 
 class EventCollector {
  public:
-  void Init(int32_t argc, char **argv) {
+  void Init(int32_t argc, char** argv) {
     signal(SIGINT, OnSigInt);
 
     ros::init(argc, argv, "EventCollector");
@@ -151,8 +151,8 @@ class EventCollector {
 
   void SaveEvent(const double timestamp_sec, const std::string& type,
                  const std::string& description = "") {
-    const auto msg = apollo::common::util::StrCat(
-        timestamp_sec, " [", type, "] ", description);
+    const auto msg = apollo::common::util::StrCat(timestamp_sec, " [", type,
+                                                  "] ", description);
 
     AINFO << "SaveEvent: " << msg;
     events_.emplace_back(timestamp_sec, msg);
@@ -171,7 +171,7 @@ class EventCollector {
 }  // namespace data
 }  // namespace apollo
 
-int main(int32_t argc, char **argv) {
+int main(int32_t argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   google::ParseCommandLineFlags(&argc, &argv, true);
 

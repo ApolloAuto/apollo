@@ -29,8 +29,7 @@ namespace rslidar {
 
 // configuration parameters
 struct Config {
-  Config()
-      : npackets(0), rpm(0.0), msop_data_port(0), difop_data_port(0) {}
+  Config() : npackets(0), rpm(0.0), msop_data_port(0), difop_data_port(0) {}
   std::string frame_id;  ///< tf frame ID
   std::string model;     ///< device model name
   std::string topic;
@@ -75,13 +74,14 @@ class Rslidar64Driver : public RslidarDriver {
 };
 
 class Rslidar32Driver : public RslidarDriver {
-public:
-    explicit Rslidar32Driver(const Config &config);
-    virtual ~Rslidar32Driver() {}
-    void init(ros::NodeHandle &node);
-    bool poll(void);
-    void poll_positioning_packet();
-private:
+ public:
+  explicit Rslidar32Driver(const Config &config);
+  virtual ~Rslidar32Driver() {}
+  void init(ros::NodeHandle &node);
+  bool poll(void);
+  void poll_positioning_packet();
+
+ private:
   std::shared_ptr<Input> positioning_input_;
 };
 
@@ -107,4 +107,4 @@ class RslidarDriverFactory {
 }  // namespace drivers
 }  // namespace apollo
 
-#endif  
+#endif

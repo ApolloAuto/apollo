@@ -37,10 +37,10 @@ namespace apollo {
 namespace planning {
 
 using Trajectory1d = Curve1d;
-using apollo::common::math::PathMatcher;
 using apollo::common::FrenetFramePoint;
 using apollo::common::PathPoint;
 using apollo::common::SpeedPoint;
+using apollo::common::math::PathMatcher;
 using Trajectory1dPair =
     std::pair<std::shared_ptr<Curve1d>, std::shared_ptr<Curve1d>>;
 using CostComponentsPair = std::pair<std::vector<double>, double>;
@@ -48,8 +48,7 @@ using CostComponentsPair = std::pair<std::vector<double>, double>;
 using PtrTrajectory1d = std::shared_ptr<Trajectory1d>;
 
 TrajectoryEvaluator::TrajectoryEvaluator(
-    const std::array<double, 3>& init_s,
-    const PlanningTarget& planning_target,
+    const std::array<double, 3>& init_s, const PlanningTarget& planning_target,
     const std::vector<PtrTrajectory1d>& lon_trajectories,
     const std::vector<PtrTrajectory1d>& lat_trajectories,
     std::shared_ptr<PathTimeGraph> path_time_graph,
@@ -477,7 +476,6 @@ double TrajectoryEvaluator::LonCollisionCost(
 
 double TrajectoryEvaluator::CentripetalAccelerationCost(
     const PtrTrajectory1d& lon_trajectory) const {
-
   // Assumes the vehicle is not obviously deviate from the reference line.
   double centripetal_acc_sum = 0.0;
   double centripetal_acc_sqr_sum = 0.0;
@@ -522,8 +520,8 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
 
   if (!planning_target.has_stop_point()) {
     PiecewiseAccelerationTrajectory1d lon_traj(init_s_[0], cruise_v);
-    lon_traj.AppendSegment(0.0,
-        FLAGS_trajectory_time_length + + FLAGS_lattice_epsilon);
+    lon_traj.AppendSegment(
+        0.0, FLAGS_trajectory_time_length + +FLAGS_lattice_epsilon);
 
     for (double t = 0.0; t < FLAGS_trajectory_time_length;
          t += FLAGS_trajectory_time_resolution) {
@@ -533,8 +531,8 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
     double dist_s = planning_target.stop_point().s() - init_s_[0];
     if (dist_s < FLAGS_lattice_epsilon) {
       PiecewiseAccelerationTrajectory1d lon_traj(init_s_[0], 0.0);
-      lon_traj.AppendSegment(0.0,
-          FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
+      lon_traj.AppendSegment(
+          0.0, FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
 
       for (double t = 0.0; t < FLAGS_trajectory_time_length;
            t += FLAGS_trajectory_time_resolution) {
@@ -551,8 +549,7 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
     std::shared_ptr<Trajectory1d> lon_ref_trajectory =
         PiecewiseBrakingTrajectoryGenerator::Generate(
             planning_target.stop_point().s(), init_s_[0],
-            planning_target.cruise_speed(),
-            init_s_[1], a_comfort, d_comfort,
+            planning_target.cruise_speed(), init_s_[1], a_comfort, d_comfort,
             FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
 
     for (double t = 0.0; t < FLAGS_trajectory_time_length;

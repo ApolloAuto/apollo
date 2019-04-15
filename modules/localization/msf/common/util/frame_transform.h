@@ -36,21 +36,21 @@ struct UTMCoor {
 /* including log(longitude) and lat(latitude). */
 struct WGS84Corr {
   WGS84Corr() : log(0.0), lat(0.0) {}
-  double log;      // longitude
-  double lat;      // latitude
+  double log;  // longitude
+  double lat;  // latitude
 };
 
 void LatlonToUtmXY(const double lon, const double lat, UTMCoor *xy);
 
 void UtmXYToLatlon(const double x, const double y, const int zone,
-                     const bool southhemi, WGS84Corr *latlon);
+                   const bool southhemi, WGS84Corr *latlon);
 
 void XYZToBlh(const Eigen::Vector3d &xyz, Eigen::Vector3d *blh);
 
 void BlhToXYZ(const Eigen::Vector3d &blh, Eigen::Vector3d *xyz);
 
-}   // namespace msf
-}   // namespace localization
-}   // namespace apollo
+}  // namespace msf
+}  // namespace localization
+}  // namespace apollo
 
 #endif  // MODULES_LOCALIZATION_MSF_COMMON_FRAME_TRANSFORM_H_

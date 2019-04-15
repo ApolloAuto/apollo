@@ -37,8 +37,7 @@ PathPoint SplineInterpolate(const PathPoint &p0, const PathPoint &p1,
                             const double s);
 
 TrajectoryPoint SplineInterpolate(const TrajectoryPoint &tp0,
-                                  const TrajectoryPoint &tp1,
-                                  const double t);
+                                  const TrajectoryPoint &tp1, const double t);
 
 }  // namespace math
 }  // namespace common

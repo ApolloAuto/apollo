@@ -14,23 +14,20 @@ See the License for the specific language governing permissions and         /
 limitations under the License.                                              /
 ****************************************************************************/
 
-#include <string>
 #include <boost/thread.hpp>
+#include <string>
 
-#include <ros/ros.h>
-#include <pluginlib/class_list_macros.h>
 #include <nodelet/nodelet.h>
+#include <pluginlib/class_list_macros.h>
+#include <ros/ros.h>
 
 #include <lslidar_driver/lslidar_driver_nodelet.h>
 
 namespace apollo {
 namespace drivers {
-namespace lslidar_driver{
+namespace lslidar_driver {
 
-LslidarDriverNodelet::LslidarDriverNodelet():
-  running(false) {
-  return;
-}
+LslidarDriverNodelet::LslidarDriverNodelet() : running(false) { return; }
 
 LslidarDriverNodelet::~LslidarDriverNodelet() {
   if (running) {
@@ -42,11 +39,10 @@ LslidarDriverNodelet::~LslidarDriverNodelet() {
   return;
 }
 
-void LslidarDriverNodelet::onInit()
-{
+void LslidarDriverNodelet::onInit() {
   // start the driver
   lslidar_driver.reset(
-    new LslidarDriver(getNodeHandle(), getPrivateNodeHandle()));
+      new LslidarDriver(getNodeHandle(), getPrivateNodeHandle()));
   if (!lslidar_driver->initialize()) {
     ROS_ERROR("Cannot initialize lslidar driver...");
     return;
@@ -54,26 +50,24 @@ void LslidarDriverNodelet::onInit()
 
   // spawn device poll thread
   running = true;
-  device_thread = boost::shared_ptr< boost::thread >
-    (new boost::thread(boost::bind(&LslidarDriverNodelet::devicePoll, this)));
+  device_thread = boost::shared_ptr<boost::thread>(
+      new boost::thread(boost::bind(&LslidarDriverNodelet::devicePoll, this)));
 }
 
 /** @brief Device poll thread main loop. */
-void LslidarDriverNodelet::devicePoll()
-{
-  while(ros::ok()) {
+void LslidarDriverNodelet::devicePoll() {
+  while (ros::ok()) {
     // poll device until end of file
     running = lslidar_driver->polling();
     // ROS_INFO_THROTTLE(30, "polling data successfully");
-    if (!running)
-      break;
+    if (!running) break;
   }
   running = false;
 }
 
-} // namespace lslidar_driver
-}
-}
+}  // namespace lslidar_driver
+}  // namespace drivers
+}  // namespace apollo
 // Register this plugin with pluginlib.  Names must match nodelet_lslidar.xml.
 //
 // parameters are: package, class name, class type, base class type

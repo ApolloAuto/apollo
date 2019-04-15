@@ -49,7 +49,7 @@ class DSTInitiator {
     static DSTInitiator dst_initiator;
     return dst_initiator;
   }
-  bool typ_to_hyp(size_t object_type, uint64_t *hypothesis_type) const {
+  bool typ_to_hyp(size_t object_type, uint64_t* hypothesis_type) const {
     auto find_res = _typ_to_hyp_map.find(object_type);
     if (find_res == _typ_to_hyp_map.end()) {
       return false;
@@ -62,7 +62,7 @@ class DSTInitiator {
     // CHECK(find_res != _typ_to_hyp_map.end());
     return find_res->second;
   }
-  bool hyp_to_typ(uint64_t hypothesis_type, size_t *object_type) const {
+  bool hyp_to_typ(uint64_t hypothesis_type, size_t* object_type) const {
     auto find_res = _hyp_to_typ_map.find(hypothesis_type);
     if (find_res == _hyp_to_typ_map.end()) {
       return false;

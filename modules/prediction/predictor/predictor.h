@@ -25,8 +25,8 @@
 #include <vector>
 
 #include "modules/common/math/line_segment2d.h"
-#include "modules/prediction/proto/prediction_obstacle.pb.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/container/obstacles/obstacle.h"
@@ -76,9 +76,8 @@ class Predictor {
    * @brief Trim prediction trajectories by adc trajectory
    * @param ADC trajectory container
    */
-  void TrimTrajectories(
-      const Obstacle* obstacle,
-      const ADCTrajectoryContainer* adc_trajectory_container);
+  void TrimTrajectories(const Obstacle* obstacle,
+                        const ADCTrajectoryContainer* adc_trajectory_container);
 
  protected:
   /**
@@ -102,10 +101,9 @@ class Predictor {
    * @param trajectory The trimed prediction trajectory
    * @return If the prediction trajectory is trimed
    */
-  bool TrimTrajectory(
-      const Obstacle* obstacle,
-      const ADCTrajectoryContainer* adc_trajectory_container,
-      Trajectory* trajectory);
+  bool TrimTrajectory(const Obstacle* obstacle,
+                      const ADCTrajectoryContainer* adc_trajectory_container,
+                      Trajectory* trajectory);
 
  protected:
   std::vector<Trajectory> trajectories_;

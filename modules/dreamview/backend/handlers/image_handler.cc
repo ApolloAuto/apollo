@@ -50,8 +50,9 @@ void ImageHandler::OnImage(const sensor_msgs::Image &image) {
 
   cv::cvtColor(mat, mat, CV_RGB2BGR);
 
-  cv::resize(mat, mat, cv::Size(image.width * ImageHandler::kImageScale,
-                                image.height * ImageHandler::kImageScale),
+  cv::resize(mat, mat,
+             cv::Size(image.width * ImageHandler::kImageScale,
+                      image.height * ImageHandler::kImageScale),
              0, 0, CV_INTER_LINEAR);
 
   std::unique_lock<std::mutex> lock(mutex_);
