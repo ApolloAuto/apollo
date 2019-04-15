@@ -24,6 +24,8 @@ message DataForLearning {
   repeated double features_for_learning = 3;
   // The ground-truth labels:
   repeated double labels = 4;
+  // The lane sequence id if associated with a lane
+  optional int32 lane_sequence_id = 6;
 }
 
 message ListDataForLearning {

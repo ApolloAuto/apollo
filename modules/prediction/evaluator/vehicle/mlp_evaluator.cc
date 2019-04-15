@@ -83,7 +83,7 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     // Insert features to DataForLearning
     if (FLAGS_prediction_offline_mode == 2 && !obstacle_ptr->IsNearJunction()) {
       FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                           "mlp");
+                                           "mlp", lane_sequence_ptr);
       ADEBUG << "Save extracted features for learning locally.";
       return;  // Skip Compute probability for offline mode
     }
