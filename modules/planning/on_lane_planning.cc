@@ -721,6 +721,8 @@ void OnLanePlanning::AddPartitionedTrajectory(
   auto* options = chart->mutable_options();
   options->mutable_x()->set_label_string("x (meter)");
   options->mutable_y()->set_label_string("y (meter)");
+  options->set_sync_xy_window_size(true);
+  options->set_aspect_ratio(0.9);
 
   // Draw vehicle state
   auto* adc_shape = chart->add_car();
