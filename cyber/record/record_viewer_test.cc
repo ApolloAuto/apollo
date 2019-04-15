@@ -140,7 +140,7 @@ TEST(RecordTest, filter_test) {
 
   auto it_1 = viewer_3.begin();
   auto it_2 = viewer_4.begin();
-  EXPECT_FALSE(it_1 == it_2);
+  EXPECT_NE(it_1, it_2);
 
   // pick 2 frame
   RecordViewer viewer_5(reader, begin_time + 12 * step_time,
