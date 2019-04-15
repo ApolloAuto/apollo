@@ -23,56 +23,38 @@
 
 namespace apollo {
 namespace prediction {
+namespace {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::math::NormalizeAngle;
 using apollo::hdmap::Lane;
 using apollo::hdmap::LaneInfo;
 
 // Custom helper functions for sorting purpose.
-bool HeadingIsAtLeft(std::vector<double> heading1, std::vector<double> heading2,
-                     size_t idx);
-bool IsAtLeft(std::shared_ptr<const LaneInfo> lane1,
-              std::shared_ptr<const LaneInfo> lane2);
-int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane);
-
-bool HeadingIsAtLeft(std::vector<double> heading1, std::vector<double> heading2,
-                     size_t idx) {
-  if (heading1.empty() || heading2.empty()) {
-    return true;
-  }
+bool HeadingIsAtLeft(const std::vector<double>& heading1,
+                     const std::vector<double>& heading2,
+                     const size_t idx) {
   if (idx >= heading1.size() || idx >= heading2.size()) {
     return true;
   }
-  if (NormalizeAngle(heading1[idx] - heading2[idx]) > 0.0) {
+  const double angle =
+      apollo::common::math::NormalizeAngle(heading1[idx] - heading2[idx]);
+  if (angle > 0.0) {
     return true;
-  } else if (NormalizeAngle(heading1[idx] - heading2[idx]) < 0.0) {
+  } else if (angle < 0.0) {
     return false;
-  } else {
-    return HeadingIsAtLeft(heading1, heading2, idx + 1);
   }
+  return HeadingIsAtLeft(heading1, heading2, idx + 1);
 }
 
-bool IsAtLeft(std::shared_ptr<const LaneInfo> lane1,
-              std::shared_ptr<const LaneInfo> lane2) {
-  if (lane1->lane().has_turn() && lane2->lane().has_turn() &&
-      lane1->lane().turn() != lane2->lane().turn()) {
-    int degree_to_left_1 = ConvertTurnTypeToDegree(lane1);
-    int degree_to_left_2 = ConvertTurnTypeToDegree(lane2);
-    return degree_to_left_1 > degree_to_left_2;
-  }
-  return HeadingIsAtLeft(lane1->headings(), lane2->headings(), 0);
-}
-
-int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane) {
+int ConvertTurnTypeToDegree(const Lane& lane) {
   // Sanity checks.
-  if (!lane->lane().has_turn()) {
+  if (!lane.has_turn()) {
     return 0;
   }
 
   // Assign a number to measure how much it is bent to the left.
-  switch (lane->lane().turn()) {
+  switch (lane.turn()) {
     case Lane::NO_TURN:
       return 0;
     case Lane::LEFT_TURN:
@@ -85,6 +67,19 @@ int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane) {
 
   return -1;
 }
+
+bool IsAtLeft(std::shared_ptr<const LaneInfo> lane1,
+              std::shared_ptr<const LaneInfo> lane2) {
+  if (lane1->lane().has_turn() && lane2->lane().has_turn() &&
+      lane1->lane().turn() != lane2->lane().turn()) {
+    int degree_to_left_1 = ConvertTurnTypeToDegree(lane1->lane());
+    int degree_to_left_2 = ConvertTurnTypeToDegree(lane2->lane());
+    return degree_to_left_1 > degree_to_left_2;
+  }
+  return HeadingIsAtLeft(lane1->headings(), lane2->headings(), 0);
+}
+
+}  // namespace
 
 RoadGraph::RoadGraph(const double start_s, const double length,
                      const bool consider_divide,
