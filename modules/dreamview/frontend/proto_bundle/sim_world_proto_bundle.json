@@ -602,6 +602,17 @@
                 "y": {
                   "type": "Axis",
                   "id": 3
+                },
+                "aspectRatio": {
+                  "type": "double",
+                  "id": 4
+                },
+                "syncXyWindowSize": {
+                  "type": "bool",
+                  "id": 5,
+                  "options": {
+                    "default": false
+                  }
                 }
               },
               "nested": {
