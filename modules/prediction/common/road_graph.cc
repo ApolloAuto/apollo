@@ -53,19 +53,21 @@ bool HeadingIsAtLeft(std::vector<double> heading1, std::vector<double> heading2,
     return HeadingIsAtLeft(heading1, heading2, idx + 1);
   }
 }
+
 bool IsAtLeft(std::shared_ptr<const LaneInfo> lane1,
               std::shared_ptr<const LaneInfo> lane2) {
   if (lane1->lane().has_turn() && lane2->lane().has_turn() &&
       lane1->lane().turn() != lane2->lane().turn()) {
     int degree_to_left_1 = ConvertTurnTypeToDegree(lane1);
     int degree_to_left_2 = ConvertTurnTypeToDegree(lane2);
-    return (degree_to_left_1 > degree_to_left_2);
-  } else {
-    auto heading1 = lane1->headings();
-    auto heading2 = lane2->headings();
-    return HeadingIsAtLeft(heading1, heading2, 0);
+    return degree_to_left_1 > degree_to_left_2;
   }
+
+  auto heading1 = lane1->headings();
+  auto heading2 = lane2->headings();
+  return HeadingIsAtLeft(heading1, heading2, 0);
 }
+
 int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane) {
   // Sanity checks.
   if (!lane->lane().has_turn()) {
@@ -73,15 +75,18 @@ int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane) {
   }
 
   // Assign a number to measure how much it is bent to the left.
-  if (lane->lane().turn() == Lane::NO_TURN) {
-    return 0;
-  } else if (lane->lane().turn() == Lane::LEFT_TURN) {
-    return 1;
-  } else if (lane->lane().turn() == Lane::U_TURN) {
-    return 2;
-  } else {
-    return -1;
+  switch (lane->lane().turn()) {
+    case Lane::NO_TURN:
+      return 0;
+    case Lane::LEFT_TURN:
+      return 1;
+    case Lane::U_TURN:
+      return 2;
+    default:
+      break;
   }
+
+  return -1;
 }
 
 RoadGraph::RoadGraph(const double start_s, const double length,
@@ -189,7 +194,7 @@ void RoadGraph::ComputeLaneSequence(
       if (consider_divide) {
         if (successor_lanes.size() > 1) {
           // Run recursion function to perform DFS.
-          for (size_t i = 0; i < successor_lanes.size(); i++) {
+          for (size_t i = 0; i < successor_lanes.size(); ++i) {
             ComputeLaneSequence(successor_accumulated_s, 0.0,
                                 successor_lanes[i], graph_search_horizon - 1,
                                 false, lane_segments, lane_graph_ptr);
