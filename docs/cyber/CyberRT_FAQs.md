@@ -73,7 +73,7 @@ Of course you can change all three to RTPS. Or change `same_proc` and `diff_proc
 
 ## How to use the no serialization message?
 
-Cyber support the message type is serialization like protobuf, and other type is raw message.
+The message types supported by Cyber RT include both serializable structured data like protobuf and raw sequence of bytes.
 You can refer the sample code:
 - apollo::cyber::message::RawMessage
 - talker: https://github.com/gruminions/apollo/blob/record/cyber/examples/talker.cc
