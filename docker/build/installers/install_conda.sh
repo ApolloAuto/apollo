@@ -26,6 +26,8 @@ CONDA_PATH="/usr/local/miniconda"
 INSTALLER="Miniconda3-latest-Linux-x86_64.sh"
 wget "https://repo.continuum.io/miniconda/${INSTALLER}"
 bash "${INSTALLER}" -b -p "${CONDA_PATH}"
+# Update conda base to the latest.
+"${CONDA_PATH}/bin/conda" update -n base -c defaults conda
 
 # Init python 2.7 environment.
 "${CONDA_PATH}/bin/conda" env update -f py27_conda.yml
