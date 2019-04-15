@@ -81,7 +81,7 @@ void FeatureOutput::InsertFeatureProto(const Feature& feature) {
 
 void FeatureOutput::InsertDataForLearning(
     const Feature& feature, const std::vector<double>& feature_values,
-    const std::string& category) {
+    const std::string& category, const LaneSequence* lane_sequence_ptr) {
   DataForLearning* data_for_learning =
       list_data_for_learning_.add_data_for_learning();
   data_for_learning->set_id(feature.id());
@@ -92,6 +92,10 @@ void FeatureOutput::InsertDataForLearning(
   data_for_learning->set_category(category);
   ADEBUG << "Insert [" << category
          << "] data for learning with size = " << feature_values.size();
+  if (lane_sequence_ptr != nullptr) {
+    data_for_learning->set_lane_sequence_id(
+        lane_sequence_ptr->lane_sequence_id());
+  }
 }
 
 void FeatureOutput::InsertPredictionResult(

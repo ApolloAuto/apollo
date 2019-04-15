@@ -43,7 +43,7 @@ void PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   ExtractFeatures(obstacle_ptr, &feature_values);
   if (FLAGS_prediction_offline_mode == 2) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         "pedestrian");
+                                         "pedestrian", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
     return;
   }
