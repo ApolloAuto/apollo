@@ -62,10 +62,7 @@ bool IsAtLeft(std::shared_ptr<const LaneInfo> lane1,
     int degree_to_left_2 = ConvertTurnTypeToDegree(lane2);
     return degree_to_left_1 > degree_to_left_2;
   }
-
-  auto heading1 = lane1->headings();
-  auto heading2 = lane2->headings();
-  return HeadingIsAtLeft(heading1, heading2, 0);
+  return HeadingIsAtLeft(lane1->headings(), lane2->headings(), 0);
 }
 
 int ConvertTurnTypeToDegree(std::shared_ptr<const LaneInfo> lane) {
