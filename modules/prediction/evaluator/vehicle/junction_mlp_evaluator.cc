@@ -86,7 +86,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Insert features to DataForLearning
   if (FLAGS_prediction_offline_mode == 2) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         "junction");
+                                         "junction", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
     return;  // Skip Compute probability for offline mode
   }

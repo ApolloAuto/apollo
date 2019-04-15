@@ -111,7 +111,7 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
                             interaction_feature_values.begin(),
                             interaction_feature_values.end());
       FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                           "cruise");
+                                           "lane_scanning", lane_sequence_ptr);
       ADEBUG << "Save extracted features for learning locally.";
       return;  // Skip Compute probability for offline mode
     }
