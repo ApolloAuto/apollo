@@ -51,7 +51,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
     // vehicle speed is decreased to zero inside safety distance
     *(frame_->mutable_open_space_info()->mutable_fallback_trajectory()) =
         frame->open_space_info().chosen_paritioned_trajectory();
-    auto ptr_fallback_trajectory_pair =
+    auto* ptr_fallback_trajectory_pair =
         frame_->mutable_open_space_info()->mutable_fallback_trajectory();
     const auto collision_point =
         ptr_fallback_trajectory_pair->first[first_collision_idx];
