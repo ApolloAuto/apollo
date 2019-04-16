@@ -28,11 +28,7 @@ void CopyTrajectory(const DiscretizedTrajectory trajectory_src,
   size_t horizon = trajectory_src.NumOfPoints();
   for (size_t i = 0; i < horizon; ++i) {
     auto* added_pt = trajectory_tgt_ptr->add_trajectory_point();
-    auto* added_path_pt = added_pt->mutable_path_point();
-    auto picked_pt = trajectory_src.TrajectoryPointAt(i).path_point();
-    added_path_pt->set_x(picked_pt.x());
-    added_path_pt->set_y(picked_pt.y());
-    added_path_pt->set_theta(picked_pt.theta());
+    added_pt->CopyFrom(trajectory_src.TrajectoryPointAt(i));
   }
 }
 
