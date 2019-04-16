@@ -111,7 +111,7 @@ TEST_F(NdtSolverTestSuite, NdtSolver) {
   for (auto itr = buf.begin(); itr != buf.end(); ++itr, ++index) {
     msf::NdtMapNode* ndt_map_node =
         static_cast<msf::NdtMapNode*>(ndt_map.GetMapNodeSafe(*itr));
-    if (ndt_map_node == NULL) {
+    if (ndt_map_node == nullptr) {
       AERROR << "index: " << index << " is a NULL pointer!" << std::endl;
       continue;
     }

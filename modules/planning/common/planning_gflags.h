@@ -212,6 +212,7 @@ DECLARE_double(nudge_buffer);
 DECLARE_bool(use_planning_fallback);
 DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
+DECLARE_double(fallback_distance_buffer);
 DECLARE_double(polynomial_speed_fallback_velocity);
 
 DECLARE_double(speed_bump_speed_limit);
@@ -242,6 +243,7 @@ DECLARE_double(default_front_clear_distance);
 DECLARE_double(max_trajectory_len);
 DECLARE_bool(enable_rss_fallback);
 DECLARE_bool(enable_rss_info);
+DECLARE_double(rss_max_front_obstacle_distance);
 
 DECLARE_bool(enable_planning_smoother);
 DECLARE_double(smoother_stop_distance);
@@ -265,3 +267,6 @@ DECLARE_bool(enable_cuda);
 
 DECLARE_bool(enable_nonscenario_side_pass);
 DECLARE_bool(enable_soft_speed_limit);
+
+DECLARE_double(message_latency_threshold);
+DECLARE_bool(enable_lane_change_urgency_checking);

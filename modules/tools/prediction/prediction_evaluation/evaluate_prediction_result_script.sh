@@ -17,15 +17,18 @@
 ###############################################################################
 #
 # Usage:
-# sudo bash /apollo/modules/tools/prediction/mlp_train/scripts/evaluate_prediction_result_script.sh <input_dir> <time_range>
+# sudo bash /apollo/modules/tools/prediction/mlp_train/scripts/evaluate_prediction_result_script.sh
+#     <results_dir> <labels_dir> <time_range>
 #
 
-SRC_DIR=$1
-TIME_RANGE=$2
+RESULTS_DIR=$1
+LABELS_DIR=$2
+TIME_RANGE=$3
 
 set -e
 
 source /apollo/scripts/apollo_base.sh
-source /apollo/cyber/setup.bash 
+source /apollo/cyber/setup.bash
 
-python modules/tools/prediction/prediction_evaluation/evaluate_prediction_result.py ${SRC_DIR} ${TIME_RANGE}
+python /apollo/modules/tools/prediction/prediction_evaluation/evaluate_prediction_result.py \
+    ${RESULTS_DIR} ${LABELS_DIR} ${TIME_RANGE}

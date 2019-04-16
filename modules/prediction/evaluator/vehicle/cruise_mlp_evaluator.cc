@@ -96,8 +96,22 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
     // Insert features to DataForLearning
     if (FLAGS_prediction_offline_mode == 2) {
+      std::vector<double> interaction_feature_values;
+      SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
+                                  &interaction_feature_values);
+      if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
+        ADEBUG << "Obstacle [" << id << "] has fewer than "
+               << "expected lane feature_values"
+               << interaction_feature_values.size() << ".";
+        return;
+      }
+      ADEBUG << "Interaction feature size = "
+             << interaction_feature_values.size();
+      feature_values.insert(feature_values.end(),
+                            interaction_feature_values.begin(),
+                            interaction_feature_values.end());
       FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                           "junction");
+                                           "lane_scanning", lane_sequence_ptr);
       ADEBUG << "Save extracted features for learning locally.";
       return;  // Skip Compute probability for offline mode
     }
@@ -138,23 +152,6 @@ void CruiseMLPEvaluator::ExtractFeatureValues(
   ADEBUG << "Obstacle feature size = " << obstacle_feature_values.size();
   feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
-
-  /*
-  Extract interaction features.
-  std::vector<double> interaction_feature_values;
-  SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
-                              &interaction_feature_values);
-  if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
-    ADEBUG << "Obstacle [" << id << "] has fewer than "
-           << "expected lane feature_values"
-           << interaction_feature_values.size() << ".";
-    return;
-  }
-  ADEBUG << "Interaction feature size = " << interaction_feature_values.size();
-  feature_values->insert(feature_values->end(),
-                         interaction_feature_values.begin(),
-                         interaction_feature_values.end());
-  */
 
   // Extract lane related features.
   std::vector<double> lane_feature_values;

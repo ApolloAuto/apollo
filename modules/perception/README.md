@@ -6,7 +6,7 @@ The Perception module has been upgraded completely to handle comprehensive senso
 Apollo Perception has following new features:
 
  * **Support for VLS-128 Line LiDAR**
- * **Obstacle detection though multiple cameras**
+ * **Obstacle detection through multiple cameras**
  * **Advanced traffic light detection**
  * **Configurable sensor fusion**
 
@@ -44,7 +44,7 @@ The perception module outputs are:
 1. Set up the general settings in the configuration file `modules/perception/conf/perception_lowcost.conf`.
 2. Run the command  `./scripts/bootstrap.sh` to launch the web GUI.
 3. Select the vehicle model in the web GUI.
-4. Launch the perception module using the command `./scripts/perception_lowcost_vis.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception_lowcost_vis.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa. 
+4. Launch the perception module using the command `./scripts/perception_lowcost_vis.sh start` or by enabling the perception button on the *Module Controller* page of the web GUI. The command for stopping perception is `./scripts/perception_lowcost_vis.sh stop`. Note: please do not try to use GUI to enable perception but use script to stop it, vice versa.
 5. Download the demo data from the Apollo [Open Data Platform](http://data.apollo.auto).
 
 ```
@@ -59,7 +59,7 @@ Note:
 
     See [How to Run Perception Module on Your Local Computer](https://github.com/ApolloAuto/apollo/blob/master/docs/howto/how_to_run_perception_module_on_your_local_computer.md).
 
-3. This module contains a redistribution in binary form of a modified version of [caffe](https://github.com/BVLC/caffe). 
+3. This module contains a redistribution in binary form of a modified version of [caffe](https://github.com/BVLC/caffe).
 A copy of the caffe's original copyright statement is included below:
 
 ```

@@ -46,7 +46,7 @@ for information about migrating to the updated Apollo master from an old version
 
 * Vehicle equipped with by-wire system, including but not limited to brake by-wire, steering by-wire, throttle by-wire and shift by-wire (Apollo is currently tested on Lincoln MKZ)
 
-* A machine with a 4-core processor and 6GB memory minimum
+* A machine with a 4-core processor and 8GB memory minimum (16GB for Apollo 3.5)
 
 * Ubuntu 14.04
 

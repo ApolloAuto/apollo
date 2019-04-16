@@ -30,12 +30,12 @@
 
 #define private public
 #define protected public
-#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
+#include "modules/planning/math/piecewise_jerk/piesewise_jerk_problem.h"
 
 namespace apollo {
 namespace planning {
 
-TEST(Fem1dQPProblemTest, basic_test) {
+TEST(PiecewiseJerkProblemTest, basic_test) {
   FLAGS_enable_osqp_debug = true;
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
   double delta_s = 0.5;
@@ -53,12 +53,14 @@ TEST(Fem1dQPProblemTest, basic_test) {
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 1.25;
 
-  std::unique_ptr<Fem1dQpProblem> fem_qp(
-      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative));
+  std::unique_ptr<PiecewiseJerkProblem> fem_qp(new PiecewiseJerkProblem(
+      n, x_init, delta_s, w, max_x_third_order_derivative));
 
   fem_qp->SetVariableBounds(x_bounds);
-  fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
-  fem_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetFirstOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                              FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetSecondOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                               FLAGS_lateral_derivative_bound_default);
 
   auto start_time = std::chrono::system_clock::now();
   EXPECT_TRUE(fem_qp->Optimize());
@@ -74,7 +76,7 @@ TEST(Fem1dQPProblemTest, basic_test) {
   }
 }
 
-TEST(Fem1dQPProblemTest, add_bounds_test) {
+TEST(PiecewiseJerkProblemTest, add_bounds_test) {
   FLAGS_enable_osqp_debug = false;
   std::array<double, 3> x_init = {1.5, 0.01, 0.001};
   double delta_s = 0.5;
@@ -82,8 +84,8 @@ TEST(Fem1dQPProblemTest, add_bounds_test) {
   std::array<double, 5> w = {1.0, 2.0, 3.0, 4.0, 1.45};
   double max_x_third_order_derivative = 0.25;
 
-  std::unique_ptr<Fem1dQpProblem> fem_qp(
-      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative));
+  std::unique_ptr<PiecewiseJerkProblem> fem_qp(new PiecewiseJerkProblem(
+      n, delta_s, w, max_x_third_order_derivative, x_init));
 
   std::vector<std::tuple<double, double, double>> x_bounds;
   for (size_t i = 10; i < 20; ++i) {
@@ -101,7 +103,7 @@ TEST(Fem1dQPProblemTest, add_bounds_test) {
   }
 }
 
-TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
+TEST(PiecewiseJerkProblemTest, derivative_constraint_test) {
   FLAGS_enable_osqp_debug = true;
   std::array<double, 3> x_init = {4.5, 0.00, 0.0};
   double delta_s = 0.5;
@@ -113,12 +115,14 @@ TEST(Fem1dJerkQpProblemTest, derivative_constraint_test) {
   std::array<double, 5> w = {1.0, 100.0, 1000.0, 1000.0, 0.0};
   double max_x_third_order_derivative = 2.0;
 
-  std::unique_ptr<Fem1dQpProblem> fem_qp(
-      new Fem1dQpProblem(n, x_init, delta_s, w, max_x_third_order_derivative));
+  std::unique_ptr<PiecewiseJerkProblem> fem_qp(new PiecewiseJerkProblem(
+      n, x_init, delta_s, w, max_x_third_order_derivative));
 
   fem_qp->SetVariableBounds(x_bounds);
-  fem_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
-  fem_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetFirstOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                              FLAGS_lateral_derivative_bound_default);
+  fem_qp->SetSecondOrderBounds(-FLAGS_lateral_derivative_bound_default,
+                               FLAGS_lateral_derivative_bound_default);
 
   const double dx_max = std::sqrt(0.5) / 15.0;
   std::vector<std::tuple<double, double, double>> dx_bounds;

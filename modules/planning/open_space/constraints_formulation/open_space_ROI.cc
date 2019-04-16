@@ -29,8 +29,6 @@ using apollo::hdmap::LaneSegment;
 using apollo::hdmap::ParkingSpaceInfoConstPtr;
 using apollo::hdmap::Path;
 
-constexpr double kMathEpsilon = 1e-8;
-
 OpenSpaceROI::OpenSpaceROI(
     const PlannerOpenSpaceConfig &planner_open_space_config) {
   hdmap_ = hdmap::HDMapUtil::BaseMapPtr();
@@ -296,7 +294,7 @@ bool OpenSpaceROI::GetOpenSpaceROI() {
   parking_spot_heading_ = (left_down - left_top).Angle();
   double end_x = (left_top.x() + right_top.x()) / 2;
   double end_y = 0.0;
-  if (parking_spot_heading_ > kMathEpsilon) {
+  if (parking_spot_heading_ > common::math::kMathEpsilon) {
     if (planner_open_space_config_.roi_config().parking_inwards()) {
       end_y = left_down.y() - std::max(3 * (left_down.y() - left_top.y()) / 4,
                                        vehicle_params_.front_edge_to_center());

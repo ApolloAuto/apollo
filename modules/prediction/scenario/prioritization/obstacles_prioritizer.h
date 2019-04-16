@@ -19,6 +19,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "cyber/common/macros.h"
+
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
 #include "modules/prediction/scenario/scenario_features/scenario_features.h"
@@ -28,33 +30,40 @@ namespace prediction {
 
 class ObstaclesPrioritizer {
  public:
-  ObstaclesPrioritizer() = delete;
+  void PrioritizeObstacles();
 
-  static void PrioritizeObstacles();
+  void AssignIgnoreLevel();
 
-  static void AssignIgnoreLevel();
-
-  static void AssignCautionLevel();
+  void AssignCautionLevel();
 
  private:
-  static void AssignCautionLevelCruiseKeepLane();
+  void AssignCautionLevelCruiseKeepLane();
 
-  static void AssignCautionLevelCruiseChangeLane();
+  void AssignCautionLevelCruiseChangeLane();
 
-  static void AssignCautionLevelByEgoReferenceLine();
+  void AssignCautionLevelByEgoReferenceLine();
 
-  static void AssignCautionByMerge(
-      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
+  void AssignCautionByMerge(
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+      std::unordered_set<std::string>* const visited_lanes);
 
-  static void AssignCautionByOverlap(
-      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
+  void AssignCautionByOverlap(
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+      std::unordered_set<std::string>* const visited_lanes);
 
-  static void SetCautionBackward(
+  void SetCautionBackward(
       std::shared_ptr<const hdmap::LaneInfo> start_lane_info_ptr,
-      const double distance);
+      const double distance,
+      std::unordered_set<std::string>* const visited_lanes);
 
  private:
-  static std::unordered_set<std::string> ego_back_lane_id_set_;
+  std::unordered_set<std::string> ego_back_lane_id_set_;
+
+  std::string ego_lane_id_ = "";
+
+  double ego_lane_s_ = 0.0;
+
+  DECLARE_SINGLETON(ObstaclesPrioritizer)
 };
 
 }  // namespace prediction

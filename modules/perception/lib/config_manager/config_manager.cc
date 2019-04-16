@@ -49,9 +49,8 @@ bool ConfigManager::InitInternal() {
   if (inited_) {
     return true;
   }
-  std::map<std::string, ModelConfig *>::iterator iter =
-      model_config_map_.begin();
-  for (; iter != model_config_map_.end(); ++iter) {
+  for (auto iter = model_config_map_.begin(); iter != model_config_map_.end();
+       ++iter) {
     delete iter->second;
   }
   model_config_map_.clear();
@@ -72,7 +71,7 @@ bool ConfigManager::InitInternal() {
   for (const auto &model_config_file : model_config_files) {
     ModelConfigFileListProto file_list_proto;
     if (!GetProtoFromASCIIFile(model_config_file, &file_list_proto)) {
-      AERROR << "invalid ModelConfigFileListProto file: " << model_config_file;
+      AERROR << "Invalid ModelConfigFileListProto file: " << model_config_file;
       return false;
     }
 
@@ -82,7 +81,7 @@ bool ConfigManager::InitInternal() {
           GetAbsolutePath(work_root_, model_config_path);
       MultiModelConfigProto multi_model_config_proto;
       if (!GetProtoFromASCIIFile(abs_path, &multi_model_config_proto)) {
-        AERROR << "invalid MultiModelConfigProto file: " << abs_path;
+        AERROR << "Invalid MultiModelConfigProto file: " << abs_path;
         return false;
       }
 
@@ -95,7 +94,7 @@ bool ConfigManager::InitInternal() {
 
         AINFO << "load ModelConfig succ. name: " << model_config->name();
 
-        std::pair<std::map<std::string, ModelConfig *>::iterator, bool> result =
+        auto result =
             model_config_map_.emplace(model_config->name(), model_config);
         if (!result.second) {
           AWARN << "duplicate ModelConfig, name: " << model_config->name();
@@ -125,9 +124,7 @@ bool ConfigManager::GetModelConfig(const std::string &model_name,
     return false;
   }
 
-  std::map<std::string, ModelConfig *>::const_iterator citer =
-      model_config_map_.find(model_name);
-
+  auto citer = model_config_map_.find(model_name);
   if (citer == model_config_map_.end()) {
     return false;
   }
@@ -136,9 +133,8 @@ bool ConfigManager::GetModelConfig(const std::string &model_name,
 }
 
 ConfigManager::~ConfigManager() {
-  std::map<std::string, ModelConfig *>::iterator iter =
-      model_config_map_.begin();
-  for (; iter != model_config_map_.end(); ++iter) {
+  for (auto iter = model_config_map_.begin(); iter != model_config_map_.end();
+       ++iter) {
     delete iter->second;
   }
 }

@@ -298,6 +298,7 @@ body {
 
         .monitor {
             height: 100%;
+            width: 100%;
             border: 1px solid #000000;
             box-sizing: border-box;
         
@@ -353,11 +354,47 @@ body {
         }
 
         .data-collection-monitor {
+            position: relative;
+            width: 100%;
+
+            .scenario-container {
+                position: absolute;
+            }
+
+            .section-divider-on-top {
+                border-top: 2px solid #080A0C;
+            }
+
+            .category-container {
+                position: relative;
+                width: 100%;
+                margin-bottom: 15px;
+
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .dummy-category {
+                flex: 1 0 50%;
+                align-self: flex-end;
+                min-width: 130px;
+                overflow: hidden;
+                position: relative;
+            }
+
             .category {
+                flex: 1 0 50%;
+                align-self: flex-end;
+                min-width: 130px;
+                overflow: hidden;
+                position: relative;
+
                 .category-description {
                     position: relative;
-                    left: 10px;
-                    margin-top: 20px;
+                    margin: 15px 0px 0px 10px;
+                    font-size: 12px;
 
                     color: #888888;
                 }
@@ -367,59 +404,21 @@ body {
 
                 .category-progress-background {
                     position: relative;
-                    height: 8px;
-                    margin: 5px 10% 20px 15%;
-                    border-radius: 5px;
+                    height: 6px;
+                    margin: 5px 10px;
                     background-color: #333639;
 
-                    .category-progress {
+                    .category-in-progress {
                         position: absolute;
                         height: 100%;
-                        border-radius: 5px;
-                        background: linear-gradient(to right, #0070FD 0%, #00C4EC 99.5%, #216675 100%);
+                        background: #006AFF;
                     }
-                }
 
-                .overall-progress {
-                    margin: 10px;
-                }
-            }
-            .section-divider {
-                position: relative;
-                height: 1.5em;
-                line-height: 1em;
-                margin: 40px 10px 10px 10px;
-                padding-left: 10px;
-                outline: 0;
-                border: 0;
-
-                color: #FFFFFF;
-                text-align: left;
-
-                &:first-child {
-                    margin-top: 10px;
-                }
-
-                &:before {
-                  content: '';
-                  background: #999999;
-                  position: absolute;
-                  left: 0;
-                  top: 45%;
-                  width: 100%;
-                  height: 2px;
-                }
-                &:after {
-                  content: attr(data-content);
-                  position: relative;
-                  display: inline-block;
-
-                  padding: 0px 0.7em;
-                  line-height: 1.5em;
-
-                  font-size: 16px;
-                  color: #FFFFFF;
-                  background-color: #1D2226;
+                    .category-completed {
+                        position: absolute;
+                        height: 100%;
+                        background: #113B73;
+                    }
                 }
             }
         }
@@ -939,6 +938,14 @@ body {
             .meter-label {
                 font-size: 13px;
                 color: #ffffff;
+
+                .meter-value {
+                    position: absolute;
+                    top: 2px;
+                    right: 10px;
+
+                    font-size: 10px;
+                }
             }
 
             .meter-head {

@@ -20,18 +20,24 @@ function isEqual(point1, point2) {
     return point1.x === point2.x && point1.y === point2.y;
 }
 
+function parseString(valueInString) {
+    let value = null;
+    try {
+        value = JSON.parse(valueInString);
+    } catch (error) {
+        console.warn(`Failed to parse string ${valueInString}.`,
+                      'Set its value without parsing.');
+        value = valueInString;
+    }
+
+    return value;
+}
+
 function parseDatasetProperties(propertiesInString) {
     const properties = {};
 
     for (const key in propertiesInString) {
-        const valueInString = propertiesInString[key];
-        try {
-            properties[key] = JSON.parse(valueInString);
-        } catch (error) {
-            console.error(`Failed to parse chart property ${key}:${valueInString}.`,
-                          'Set its value without parsing.');
-            properties[key] = valueInString;
-        }
+        properties[key] = parseString(propertiesInString[key]);
     }
 
     // If color is not set, assign one.
@@ -50,8 +56,9 @@ function parseDataset(lines, polygons, cars) {
         data.lines = {};
         properties.lines = {};
         lines.forEach(dataset => {
-            const label = dataset['label'];
+            const label = JSON.stringify(dataset['label']);
             properties.lines[label] = parseDatasetProperties(dataset['properties']);
+            properties.lines[label].hideLabelInLegend = dataset['hideLabelInLegend'];
             data.lines[label] = dataset['point'];
         });
     }
@@ -65,7 +72,7 @@ function parseDataset(lines, polygons, cars) {
                 return;
             }
 
-            const label = dataset['label'];
+            const label = JSON.stringify(dataset['label']);
             data.polygons[label] = dataset['point'];
             if (!isEqual(dataset['point'][0], dataset['point'][length - 1])) {
                 // close the loop by adding the first point to the end
@@ -75,6 +82,7 @@ function parseDataset(lines, polygons, cars) {
             // There're default properties for polygons, no need to set it if not specify
             if (dataset['properties']) {
                 properties.polygons[label] = parseDatasetProperties(dataset['properties']);
+                properties.polygons[label].hideLabelInLegend = dataset['hideLabelInLegend'];
             }
         });
     }
@@ -83,8 +91,11 @@ function parseDataset(lines, polygons, cars) {
         data.cars = {};
         properties.cars = {};
         cars.forEach(dataset => {
-            const label = dataset['label'];
-            properties.cars[label] = { color: dataset['color'] };
+            const label = JSON.stringify(dataset['label']);
+            properties.cars[label] = {
+                color: parseString(dataset['color']),
+                hideLabelInLegend: dataset['hideLabelInLegend'],
+            };
             data.cars[label] = {
                 x: dataset['x'],
                 y: dataset['y'],
@@ -109,6 +120,8 @@ function parseChartDataFromProtoBuf(protobuf) {
             x: protobuf.options.x,
             y: protobuf.options.y,
         },
+        syncXYWindowSize: protobuf.options.syncXyWindowSize,
+        aspectRatio: protobuf.options.aspectRatio,
     };
 
     const { properties, data } = parseDataset(protobuf.line, protobuf.polygon, protobuf.car);

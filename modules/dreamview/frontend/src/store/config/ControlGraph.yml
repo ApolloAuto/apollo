@@ -1,6 +1,12 @@
 trajectoryGraph:
     title: 'Trajectory'
     options:
+        # This is the aspect ratio (width/height) of the entire chart.
+        # Given there's space used for title and legend in this chart,
+        # the ratio is reduced to get aspectRatio of x-axis/y-axis ~ 1.
+        aspectRatio: 0.9
+        # To make sure x-Axis and y-Axis has the same window size
+        syncXYWindowSize: true
         legend:
             display: true
         axes:

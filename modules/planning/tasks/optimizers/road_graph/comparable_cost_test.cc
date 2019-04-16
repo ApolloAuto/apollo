@@ -42,7 +42,7 @@ TEST(ComparableCost, add_cost) {
   EXPECT_FLOAT_EQ(cc.safety_cost, 16.22);
   EXPECT_FLOAT_EQ(cc.smoothness_cost, 5.96);
 
-  EXPECT_TRUE(cc1 > cc2);
+  EXPECT_GT(cc1, cc2);
 
   cc1 += cc2;
 
@@ -55,12 +55,12 @@ TEST(ComparableCost, add_cost) {
   ComparableCost cc3(true, false, false, 10.12, 2.51);
   ComparableCost cc4(false, true, true, 6.1, 3.45);
 
-  EXPECT_TRUE(cc3 > cc4);
+  EXPECT_GT(cc3, cc4);
 
   ComparableCost cc5(false, false, false, 10.12, 2.51);
   ComparableCost cc6(false, true, true, 6.1, 3.45);
 
-  EXPECT_TRUE(cc5 < cc6);
+  EXPECT_LT(cc5, cc6);
 
   ComparableCost cc7 = cc5 + cc6;
 
@@ -70,29 +70,29 @@ TEST(ComparableCost, add_cost) {
   EXPECT_FLOAT_EQ(cc7.safety_cost, 16.22);
   EXPECT_FLOAT_EQ(cc7.smoothness_cost, 5.96);
 
-  EXPECT_TRUE(cc5 < cc6);
+  EXPECT_LT(cc5, cc6);
 }
 
 TEST(ComparableCost, compare_to) {
   ComparableCost cc1(true, false, false, 10.12, 2.51);
   ComparableCost cc2(false, false, true, 6.1, 3.45);
-  EXPECT_TRUE(cc1 > cc2);
+  EXPECT_GT(cc1, cc2);
 
   ComparableCost cc3(false, true, false, 10.12, 2.51);
   ComparableCost cc4(false, false, false, 6.1, 3.45);
-  EXPECT_TRUE(cc3 > cc4);
+  EXPECT_GT(cc3, cc4);
 
   ComparableCost cc5(false, false, true, 10.12, 2.51);
   ComparableCost cc6(false, false, false, 6.1, 3.45);
-  EXPECT_TRUE(cc5 > cc6);
+  EXPECT_GT(cc5, cc6);
 
   ComparableCost cc7(false, false, false, 10.12, 2.51);
   ComparableCost cc8(false, false, false, 6.1, 3.45);
-  EXPECT_TRUE(cc7 > cc8);
+  EXPECT_GT(cc7, cc8);
 
   ComparableCost cc9(false, false, false, 0.12, 2.51);
   ComparableCost cc10(false, false, false, 6.1, 3.45);
-  EXPECT_TRUE(cc9 < cc10);
+  EXPECT_LT(cc9, cc10);
 }
 
 }  // namespace planning

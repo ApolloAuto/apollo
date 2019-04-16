@@ -27,7 +27,7 @@ class LincolnVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
+    parameter.set_brand(apollo::common::LINCOLN_MKZ);
     lincoln_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}
@@ -37,11 +37,11 @@ class LincolnVehicleFactoryTest : public ::testing::Test {
 };
 
 TEST_F(LincolnVehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(lincoln_factory_.CreateVehicleController() != nullptr);
+  EXPECT_NE(lincoln_factory_.CreateVehicleController(), nullptr);
 }
 
 TEST_F(LincolnVehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(lincoln_factory_.CreateMessageManager() != nullptr);
+  EXPECT_NE(lincoln_factory_.CreateMessageManager(), nullptr);
 }
 
 }  // namespace canbus

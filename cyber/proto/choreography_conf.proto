@@ -18,6 +18,6 @@ message ChoreographyConf {
   optional string pool_affinity = 7;
   optional string pool_processor_policy = 8;
   optional int32 pool_processor_prio = 9;
-  optional string pool_cpuset = 10; 
+  optional string pool_cpuset = 10;
   repeated ChoreographyTask tasks = 11;
 }

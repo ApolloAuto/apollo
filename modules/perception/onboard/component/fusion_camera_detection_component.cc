@@ -201,6 +201,11 @@ bool FusionCameraDetectionComponent::Init() {
     AERROR << "InitCameraListeners() failed.";
     return false;
   }
+  if (InitMotionService() != cyber::SUCC) {
+    AERROR << "InitMotionService() failed.";
+    return false;
+  }
+
   SetCameraHeightAndPitch();
 
   // Init visualizer
@@ -221,8 +226,8 @@ bool FusionCameraDetectionComponent::Init() {
 
   CHECK(visualize_.Init_all_info_single_camera(
       visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu,
-      pitch_adj_degree, yaw_adj_degree, roll_adj_degree,
-      image_height_, image_width_));
+      pitch_adj_degree, yaw_adj_degree, roll_adj_degree, image_height_,
+      image_width_));
 
   homography_im2car_ = visualize_.homography_im2car();
   camera_obstacle_pipeline_->SetIm2CarHomography(homography_im2car_);
@@ -559,6 +564,63 @@ int FusionCameraDetectionComponent::InitCameraListeners() {
   return cyber::SUCC;
 }
 
+int FusionCameraDetectionComponent::InitMotionService() {
+  const std::string &channel_name_local = "/apollo/perception/motion_service";
+  std::function<void(const MotionServiceMsgType &)> motion_service_callback =
+      std::bind(&FusionCameraDetectionComponent::OnMotionService, this,
+                std::placeholders::_1);
+  auto motion_service_reader =
+      node_->CreateReader(channel_name_local, motion_service_callback);
+  // initialize motion buffer
+  if (mot_buffer_ == nullptr) {
+    mot_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
+  } else {
+    mot_buffer_->set_capacity(motion_buffer_size_);
+  }
+  return cyber::SUCC;
+}
+
+// On receiving motion service input, convert it to motion_buff_
+void FusionCameraDetectionComponent::OnMotionService(
+    const MotionServiceMsgType &message) {
+  // Comment: use the circular buff to do it smartly, only push the latest
+  // circular_buff only saves only the incremental motion between frames.
+  // motion_service is now hard-coded for camera front 6mm
+  base::VehicleStatus vehicledata;
+  vehicledata.roll_rate = message->vehicle_status()[0].roll_rate();
+  vehicledata.pitch_rate = message->vehicle_status()[0].pitch_rate();
+  vehicledata.yaw_rate = message->vehicle_status()[0].yaw_rate();
+  vehicledata.velocity = message->vehicle_status()[0].velocity();
+  vehicledata.velocity_x = message->vehicle_status()[0].velocity_x();
+  vehicledata.velocity_y = message->vehicle_status()[0].velocity_y();
+  vehicledata.velocity_z = message->vehicle_status()[0].velocity_z();
+  vehicledata.time_ts = message->vehicle_status()[0].time_ts();
+  vehicledata.time_d = message->vehicle_status()[0].time_d();
+
+  base::MotionType motion_2d = base::MotionType::Identity();
+  motion_2d(0, 0) = message->vehicle_status()[0].motion().m00();
+  motion_2d(0, 1) = message->vehicle_status()[0].motion().m01();
+  motion_2d(0, 2) = message->vehicle_status()[0].motion().m02();
+  motion_2d(0, 3) = message->vehicle_status()[0].motion().m03();
+  motion_2d(1, 0) = message->vehicle_status()[0].motion().m10();
+  motion_2d(1, 1) = message->vehicle_status()[0].motion().m11();
+  motion_2d(1, 2) = message->vehicle_status()[0].motion().m12();
+  motion_2d(1, 3) = message->vehicle_status()[0].motion().m13();
+  motion_2d(2, 0) = message->vehicle_status()[0].motion().m20();
+  motion_2d(2, 1) = message->vehicle_status()[0].motion().m21();
+  motion_2d(2, 2) = message->vehicle_status()[0].motion().m22();
+  motion_2d(2, 3) = message->vehicle_status()[0].motion().m23();
+  motion_2d(3, 0) = message->vehicle_status()[0].motion().m30();
+  motion_2d(3, 1) = message->vehicle_status()[0].motion().m31();
+  motion_2d(3, 2) = message->vehicle_status()[0].motion().m32();
+  motion_2d(3, 3) = message->vehicle_status()[0].motion().m33();
+  vehicledata.motion = motion_2d;
+
+  mot_buffer_->push_back(vehicledata);
+
+  // TODO(@yg13): output motion in text file
+}
+
 void FusionCameraDetectionComponent::SetCameraHeightAndPitch() {
   camera_obstacle_pipeline_->SetCameraHeightAndPitch(
       camera_height_map_, name_camera_pitch_angle_diff_map_,
@@ -690,7 +752,8 @@ int FusionCameraDetectionComponent::InternalProc(
       camera_frame.data_provider->GetImage(image_options, &out_image);
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame);
+      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                   mot_buffer_);
     }
   }
 

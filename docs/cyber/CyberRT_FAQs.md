@@ -57,5 +57,27 @@ If you have not modified anything at runtime framework layer and have only worke
 - It is recommended to run source setup.bash when opening a new terminal
 - Fork and clone the Apollo repo with the new framework code which can be found at [apollo/cyber](https://github.com/ApolloAuto/apollo/tree/master/cyber/)
 
+## How to enable SHM to decrease the latency?
+
+To decrease number of threads, the readable notification mechanism of shared memory was changed in CyberRT. The default mechanism is UDP multicast, and system call(sendto) will cause some latency.
+
+So, to decrease the latency, you can change the mechanism, The steps are listed as following:
+1. update the CyberRT to the latest version;
+2. uncomment the transport_conf in https://github.com/ApolloAuto/apollo/blob/master/cyber/conf/cyber.pb.conf;
+3. change **notifier_type** of **shm_conf** from "multicast" to "condition";
+4. build CyberRT with opt like `bazel build -c opt --copt=-fpic //cyber/...`;
+5. run talker and listener;
+
+Note:You can select the corresponding transmission method according to the relationship between nodes.For example, the default configuration is **INTRA** in the process, **SHM** between the host process, and **RTPS** across the host.
+Of course you can change all three to RTPS. Or change `same_proc` and `diff_proc` to **SHM**;
+
+## How to use the no serialization message?
+
+The message types supported by Cyber RT include both serializable structured data like protobuf and raw sequence of bytes.
+You can refer the sample code:
+- apollo::cyber::message::RawMessage
+- talker: https://github.com/gruminions/apollo/blob/record/cyber/examples/talker.cc
+- listener: https://github.com/gruminions/apollo/blob/record/cyber/examples/listener.cc
+
 ---
 More FAQs to follow...

@@ -115,9 +115,9 @@ TEST(SensorDataManagerTest, test) {
       sensor_data_manager->GetPose("velodyne64", query_timestamp, &pose));
   EXPECT_EQ((pose.matrix() - sensor2world_pose.matrix()).trace(), 0.0);
 
-  EXPECT_TRUE(sensor_data_manager->GetCameraIntrinsic("velodyne64") == nullptr);
-  EXPECT_TRUE(sensor_data_manager->GetCameraIntrinsic("camera_smartereye") !=
-              nullptr);
+  EXPECT_EQ(sensor_data_manager->GetCameraIntrinsic("velodyne64"), nullptr);
+  EXPECT_NE(sensor_data_manager->GetCameraIntrinsic("camera_smartereye"),
+            nullptr);
 }
 
 }  // namespace fusion

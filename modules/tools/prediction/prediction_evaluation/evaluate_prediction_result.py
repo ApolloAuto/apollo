@@ -55,8 +55,8 @@ def GetPredictionResultFiles(dirpath):
     return prediction_result_files
 
 
-def IsCorrectlyPredicted(future_point, prediction_result):
-    future_relative_time = future_point[3] - prediction_result.timestamp
+def IsCorrectlyPredicted(future_point, curr_time, prediction_result):
+    future_relative_time = future_point[6] - curr_time
     for predicted_traj in prediction_result.trajectory:
         i = 0
         while i + 1 < len(predicted_traj.trajectory_point) and \
@@ -83,14 +83,14 @@ def CorrectlyPredictePortion(prediction_result, future_status_dict, time_range):
         return 0.0, 0.0, 0.0
 
     portion_correct_predicted = 0.0
-    curr_timestamp = obstacle_future_status[0][3]
+    curr_timestamp = obstacle_future_status[0][6]
 
     total_future_point_count = 0.0
     correct_future_point_count = 0.0
     for future_point in obstacle_future_status:
-        if future_point[3] - curr_timestamp > time_range:
+        if future_point[6] - curr_timestamp > time_range:
             break
-        if IsCorrectlyPredicted(future_point, prediction_result):
+        if IsCorrectlyPredicted(future_point, curr_timestamp, prediction_result):
             correct_future_point_count += 1.0
         total_future_point_count += 1.0
     if total_future_point_count == 0:
@@ -101,9 +101,9 @@ def CorrectlyPredictePortion(prediction_result, future_status_dict, time_range):
     return portion_correct_predicted, 1.0, len(prediction_result.trajectory)
 
 
-def Evaluate(dirpath, time_range):
-    future_status_dict = MergeFutureStatusDicts(dirpath)
-    prediction_result_file_list = GetPredictionResultFiles(dirpath)
+def Evaluate(results_dirpath, labels_dirpath, time_range):
+    future_status_dict = MergeFutureStatusDicts(labels_dirpath)
+    prediction_result_file_list = GetPredictionResultFiles(results_dirpath)
 
     portion_correct_predicted_sum = 0.0
     num_obstacle_sum = 0.0
@@ -115,7 +115,7 @@ def Evaluate(dirpath, time_range):
             list_prediction_result.ParseFromString(f.read())
         for prediction_result in list_prediction_result.prediction_result:
             portion_correct_predicted, num_obstacle, num_trajectory = \
-                CorrectlyPredictePortion(prediction_result, future_status_dict, 
+                CorrectlyPredictePortion(prediction_result, future_status_dict,
                                          time_range)
             portion_correct_predicted_sum += portion_correct_predicted
             num_obstacle_sum += num_obstacle
@@ -132,10 +132,14 @@ def Evaluate(dirpath, time_range):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Performance Evaluation')
-    parser.add_argument('directory', type=str, help='directory of data')
+    parser.add_argument('results_directory', type=str,
+                        help='directory of prediction results')
+    parser.add_argument('labels_directory', type=str,
+                        help='directory of labels of future status')
     parser.add_argument('time_range', type=float, help='time range to evaluate')
     args = parser.parse_args()
-    dirpath = args.directory
+    results_dirpath = args.results_directory
+    labels_dirpath = args.labels_directory
     time_range = args.time_range
-    result_dict = Evaluate(dirpath, time_range)
-    np.save(dirpath + "/evaluation_result.npy", result_dict)
+    result_dict = Evaluate(results_dirpath, labels_dirpath, time_range)
+    np.save(os.path.join(results_dirpath, "evaluation_result.npy"), result_dict)

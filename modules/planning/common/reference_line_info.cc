@@ -118,7 +118,96 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   SetCruiseSpeed(FLAGS_default_cruise_speed);
 
   is_safe_to_change_lane_ = CheckChangeLane();
-  is_inited_ = true;
+  return true;
+}
+
+const std::vector<PathData>& ReferenceLineInfo::GetCandidatePathData() const {
+  return candidate_path_data_;
+}
+
+void ReferenceLineInfo::SetCandidatePathData(
+    std::vector<PathData> candidate_path_data) {
+  candidate_path_data_ = std::move(candidate_path_data);
+}
+
+const std::vector<PathBoundary>& ReferenceLineInfo::GetCandidatePathBoundaries()
+    const {
+  return candidate_path_boundaries_;
+}
+
+void ReferenceLineInfo::SetCandidatePathBoundaries(
+    std::vector<PathBoundary> path_boundaries) {
+  candidate_path_boundaries_ = std::move(path_boundaries);
+}
+
+hdmap::LaneInfoConstPtr ReferenceLineInfo::LocateLaneInfo(
+    const double s) const {
+  std::vector<hdmap::LaneInfoConstPtr> lanes;
+  reference_line_.GetLaneFromS(s, &lanes);
+  if (lanes.empty()) {
+    AWARN << "cannot get any lane using s";
+    return nullptr;
+  }
+
+  return lanes.front();
+}
+
+bool ReferenceLineInfo::GetNeighborLaneInfo(
+    const ReferenceLineInfo::LaneType lane_type, const double s,
+    hdmap::Id* ptr_lane_id, double* ptr_lane_width) const {
+  auto ptr_lane_info = LocateLaneInfo(s);
+  if (ptr_lane_info == nullptr) {
+    return false;
+  }
+
+  switch (lane_type) {
+    case LaneType::LeftForward: {
+      if (ptr_lane_info->lane().left_neighbor_forward_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().left_neighbor_forward_lane_id(0);
+      break;
+    }
+    case LaneType::LeftReverse: {
+      if (ptr_lane_info->lane().left_neighbor_reverse_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().left_neighbor_reverse_lane_id(0);
+      break;
+    }
+    case LaneType::RightForward: {
+      if (ptr_lane_info->lane().right_neighbor_forward_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().right_neighbor_forward_lane_id(0);
+      break;
+    }
+    case LaneType::RightReverse: {
+      if (ptr_lane_info->lane().right_neighbor_reverse_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().right_neighbor_reverse_lane_id(0);
+      break;
+    }
+    default:
+      CHECK(false);
+  }
+  auto ptr_neighbor_lane =
+      hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(*ptr_lane_id);
+  if (ptr_neighbor_lane == nullptr) {
+    return false;
+  }
+
+  auto ref_point = reference_line_.GetReferencePoint(s);
+
+  double neighbor_s = 0.0;
+  double neighbor_l = 0.0;
+  if (!ptr_neighbor_lane->GetProjection({ref_point.x(), ref_point.y()},
+                                        &neighbor_s, &neighbor_l)) {
+    return false;
+  }
+
+  *ptr_lane_width = ptr_neighbor_lane->GetWidth(neighbor_s);
   return true;
 }
 
@@ -191,8 +280,6 @@ void ReferenceLineInfo::InitFirstOverlaps() {
               });
   }
 }
-
-bool ReferenceLineInfo::IsInited() const { return is_inited_; }
 
 bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   constexpr double kEpsilon = 1e-2;
@@ -301,6 +388,10 @@ const ReferenceLine& ReferenceLineInfo::reference_line() const {
   return reference_line_;
 }
 
+ReferenceLine* ReferenceLineInfo::mutable_reference_line() {
+  return &reference_line_;
+}
+
 void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
   discretized_trajectory_ = trajectory;
 }
@@ -403,13 +494,6 @@ bool ReferenceLineInfo::IsUnrelaventObstacle(const Obstacle* obstacle) {
 
 const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
-}
-
-double ReferenceLineInfo::TrajectoryLength() const {
-  if (discretized_trajectory_.empty()) {
-    return 0.0;
-  }
-  return discretized_trajectory_.back().path_point().s();
 }
 
 void ReferenceLineInfo::SetStopPoint(const StopPoint& stop_point) {
@@ -807,13 +891,13 @@ const hdmap::Lane::LaneTurn& ReferenceLineInfo::GetPathTurnType(
   return hdmap::Lane::NO_TURN;
 }
 
-const bool ReferenceLineInfo::GetIntersectionRighoffRoad(
+const bool ReferenceLineInfo::GetIntersectionRightofWayStatus(
     const hdmap::PathOverlap& pnc_junction_overlap) const {
   if (GetPathTurnType(pnc_junction_overlap.start_s) != hdmap::Lane::NO_TURN) {
     return false;
   }
 
-  // TODO(all): iterate eixsts of intersection to check/compare speed-limit
+  // TODO(all): iterate exits of intersection to check/compare speed-limit
   return true;
 }
 

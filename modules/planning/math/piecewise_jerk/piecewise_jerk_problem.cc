@@ -14,10 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_problem.h"
 
 #include <algorithm>
-#include <chrono>
 
 #include "cyber/common/log.h"
 
@@ -30,15 +29,15 @@ namespace {
 constexpr double kMaxVariableRange = 1e10;
 }  // namespace
 
-Fem1dQpProblem::Fem1dQpProblem(const size_t num_of_knots,
-                               const std::array<double, 3>& x_init,
-                               const double delta_s,
-                               const std::array<double, 5>& w,
-                               const double max_x_third_order_derivative) {
+void PiecewiseJerkProblem::InitProblem(
+    const size_t num_of_knots, const double delta_s,
+    const std::array<double, 5>& w, const double max_x_third_order_derivative,
+    const std::array<double, 3>& x_init, const std::array<double, 3>& x_end) {
   CHECK_GE(num_of_knots, 2);
   num_of_knots_ = num_of_knots;
 
   x_init_ = x_init;
+  x_end_ = x_end;
 
   weight_.x_w = w[0];
   weight_.x_derivative_w = w[1];
@@ -61,7 +60,7 @@ Fem1dQpProblem::Fem1dQpProblem(const size_t num_of_knots,
                      std::make_pair(-kMaxVariableRange, kMaxVariableRange));
 }
 
-bool Fem1dQpProblem::OptimizeWithOsqp(
+bool PiecewiseJerkProblem::OptimizeWithOsqp(
     const size_t kernel_dim, const size_t num_affine_constraint,
     std::vector<c_float>& P_data, std::vector<c_int>& P_indices,    // NOLINT
     std::vector<c_int>& P_indptr, std::vector<c_float>& A_data,     // NOLINT
@@ -70,11 +69,6 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
     std::vector<c_float>& upper_bounds,                             // NOLINT
     std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
     OSQPSettings* settings) {
-  // Define Solver settings as default
-  osqp_set_default_settings(settings);
-  settings->polish = true;
-  settings->verbose = FLAGS_enable_osqp_debug;
-
   data->n = kernel_dim;
   data->m = num_affine_constraint;
   data->P = csc_matrix(data->n, data->n, P_data.size(), P_data.data(),
@@ -108,49 +102,49 @@ bool Fem1dQpProblem::OptimizeWithOsqp(
   return true;
 }
 
-void Fem1dQpProblem::SetZeroOrderBounds(
+void PiecewiseJerkProblem::SetZeroOrderBounds(
     std::vector<std::pair<double, double>> x_bounds) {
   CHECK_EQ(x_bounds.size(), num_of_knots_);
   x_bounds_ = std::move(x_bounds);
 }
 
-void Fem1dQpProblem::SetFirstOrderBounds(
+void PiecewiseJerkProblem::SetFirstOrderBounds(
     std::vector<std::pair<double, double>> dx_bounds) {
   CHECK_EQ(dx_bounds.size(), num_of_knots_);
   dx_bounds_ = std::move(dx_bounds);
 }
 
-void Fem1dQpProblem::SetSecondOrderBounds(
+void PiecewiseJerkProblem::SetSecondOrderBounds(
     std::vector<std::pair<double, double>> d2x_bounds) {
   CHECK_EQ(d2x_bounds.size(), num_of_knots_);
   ddx_bounds_ = std::move(d2x_bounds);
 }
 
-void Fem1dQpProblem::SetZeroOrderBounds(const double x_bound) {
-  CHECK_GT(x_bound, 0.0);
+void PiecewiseJerkProblem::SetZeroOrderBounds(const double x_lower_bound,
+                                              const double x_upper_bound) {
   for (auto& x : x_bounds_) {
-    x.first = -x_bound;
-    x.second = x_bound;
+    x.first = x_lower_bound;
+    x.second = x_upper_bound;
   }
 }
 
-void Fem1dQpProblem::SetFirstOrderBounds(const double dx_bound) {
-  CHECK_GT(dx_bound, 0.0);
+void PiecewiseJerkProblem::SetFirstOrderBounds(const double dx_lower_bound,
+                                               const double dx_upper_bound) {
   for (auto& x : dx_bounds_) {
-    x.first = -dx_bound;
-    x.second = dx_bound;
+    x.first = dx_lower_bound;
+    x.second = dx_upper_bound;
   }
 }
 
-void Fem1dQpProblem::SetSecondOrderBounds(const double ddx_bound) {
-  CHECK_GT(ddx_bound, 0.0);
+void PiecewiseJerkProblem::SetSecondOrderBounds(const double ddx_lower_bound,
+                                                const double ddx_upper_bound) {
   for (auto& x : ddx_bounds_) {
-    x.first = -ddx_bound;
-    x.second = ddx_bound;
+    x.first = ddx_lower_bound;
+    x.second = ddx_upper_bound;
   }
 }
 
-void Fem1dQpProblem::ProcessBound(
+void PiecewiseJerkProblem::ProcessBound(
     const std::vector<std::tuple<double, double, double>>& src,
     std::vector<std::pair<double, double>>* dst) {
   DCHECK_NOTNULL(dst);
@@ -170,33 +164,29 @@ void Fem1dQpProblem::ProcessBound(
 }
 
 // x_bounds: tuple(s, lower_bounds, upper_bounds)
-void Fem1dQpProblem::SetVariableBounds(
+void PiecewiseJerkProblem::SetVariableBounds(
     const std::vector<std::tuple<double, double, double>>& x_bounds) {
   ProcessBound(x_bounds, &x_bounds_);
 }
 
 // dx_bounds: tuple(s, lower_bounds, upper_bounds)
-void Fem1dQpProblem::SetVariableDerivativeBounds(
+void PiecewiseJerkProblem::SetVariableDerivativeBounds(
     const std::vector<std::tuple<double, double, double>>& dx_bounds) {
   ProcessBound(dx_bounds, &dx_bounds_);
 }
 
 // ddx_bounds: tuple(s, lower_bounds, upper_bounds)
-void Fem1dQpProblem::SetVariableSecondOrderDerivativeBounds(
+void PiecewiseJerkProblem::SetVariableSecondOrderDerivativeBounds(
     const std::vector<std::tuple<double, double, double>>& ddx_bounds) {
   ProcessBound(ddx_bounds, &ddx_bounds_);
 }
 
-bool Fem1dQpProblem::Optimize() {
+bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   // calculate kernel
   std::vector<c_float> P_data;
   std::vector<c_int> P_indices;
   std::vector<c_int> P_indptr;
-  auto start_time = std::chrono::system_clock::now();
   CalculateKernel(&P_data, &P_indices, &P_indptr);
-  auto end_time1 = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_time1 - start_time;
-  ADEBUG << "Set Kernel used time: " << diff.count() * 1000 << " ms.";
 
   // calculate affine constraints
   std::vector<c_float> A_data;
@@ -206,21 +196,21 @@ bool Fem1dQpProblem::Optimize() {
   std::vector<c_float> upper_bounds;
   CalculateAffineConstraint(&A_data, &A_indices, &A_indptr, &lower_bounds,
                             &upper_bounds);
-  auto end_time2 = std::chrono::system_clock::now();
-  diff = end_time2 - end_time1;
-  ADEBUG << "CalculateAffineConstraint used time: " << diff.count() * 1000
-         << " ms.";
 
   // calculate offset
   std::vector<c_float> q;
   CalculateOffset(&q);
-  auto end_time3 = std::chrono::system_clock::now();
-  diff = end_time3 - end_time2;
-  ADEBUG << "CalculateOffset used time: " << diff.count() * 1000 << " ms.";
 
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
   OSQPSettings* settings =
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  // Define Solver settings
+  osqp_set_default_settings(settings);
+  settings->max_iter = max_iter;
+  settings->polish = true;
+  settings->verbose = FLAGS_enable_osqp_debug;
+  settings->scaled_termination = true;
+
   OSQPWorkspace* work = nullptr;
 
   bool res =
@@ -248,8 +238,8 @@ bool Fem1dQpProblem::Optimize() {
     dx_.at(i) = work->solution->x[i + num_of_knots_];
     ddx_.at(i) = work->solution->x[i + 2 * num_of_knots_];
   }
-  dx_.back() = 0.0;
-  ddx_.back() = 0.0;
+  dx_.back() = work->solution->x[2 * num_of_knots_ - 1];
+  ddx_.back() = work->solution->x[3 * num_of_knots_ - 1];
 
   // Cleanup
   osqp_cleanup(work);
@@ -257,16 +247,13 @@ bool Fem1dQpProblem::Optimize() {
   c_free(data->P);
   c_free(data);
   c_free(settings);
-  auto end_time4 = std::chrono::system_clock::now();
-  diff = end_time4 - end_time3;
-  ADEBUG << "Run OptimizeWithOsqp used time: " << diff.count() * 1000 << " ms.";
 
   return true;
 }
 
-void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
-                                     std::vector<c_int>* P_indices,
-                                     std::vector<c_int>* P_indptr) {
+void PiecewiseJerkProblem::CalculateKernel(std::vector<c_float>* P_data,
+                                           std::vector<c_int>* P_indices,
+                                           std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   const int kNumValue = kNumParam + (N - 1);
@@ -321,12 +308,9 @@ void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
     }
   }
   P_indptr->push_back(ind_p);
-  ADEBUG << "P_data.size()=" << P_data->size();
-  ADEBUG << "P_indices.size()=" << P_indices->size();
-  ADEBUG << "P_indptr.size()=" << P_indptr->size();
 }
 
-void Fem1dQpProblem::CalculateAffineConstraint(
+void PiecewiseJerkProblem::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
     std::vector<c_float>* upper_bounds) {
@@ -425,19 +409,22 @@ void Fem1dQpProblem::CalculateAffineConstraint(
   A_indptr->push_back(ind_p);
 }
 
-void Fem1dQpProblem::CalculateOffset(std::vector<c_float>* q) {
+void PiecewiseJerkProblem::CalculateOffset(std::vector<c_float>* q) {
   CHECK_NOTNULL(q);
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   q->resize(kNumParam);
   for (int i = 0; i < kNumParam; ++i) {
     if (i < N) {
-      q->at(i) = -2.0 * weight_.x_mid_line_w *
+      q->at(i) = -1.0 * weight_.x_mid_line_w *
                  (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
     } else {
       q->at(i) = 0.0;
     }
   }
+  q->at(N - 1) = -2.0 * weight_.x_w * x_end_[0];
+  q->at(N * 2 - 1) = -2.0 * weight_.x_derivative_w * x_end_[1];
+  q->at(N * 3 - 1) = -2.0 * weight_.x_second_order_derivative_w * x_end_[2];
 }
 
 }  // namespace planning

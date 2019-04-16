@@ -44,7 +44,12 @@ class SpeedProfileGenerator {
   static std::vector<common::SpeedPoint> GenerateSpeedHotStart(
       const common::TrajectoryPoint& planning_init_point);
 
+  static SpeedData GenerateFallbackSpeed(const double stop_distance = 0.0);
+
   static SpeedData GenerateFallbackSpeedProfile();
+
+  static SpeedData GenerateFallbackSpeedProfileWithStopDistance(
+      const double stop_distance);
 
   static SpeedData GenerateFixedDistanceCreepProfile(const double distance,
                                                      const double max_speed);
@@ -53,6 +58,14 @@ class SpeedProfileGenerator {
                                                   const double max_speed);
 
  private:
+  static SpeedData GenerateStopProfile(const double init_speed,
+                                       const double init_acc,
+                                       const double stop_distance);
+
+  static SpeedData GenerateStopProfileFromPolynomial(
+      const double init_speed, const double init_acc,
+      const double stop_distance);
+
   static SpeedData GenerateStopProfile(const double init_speed,
                                        const double init_acc);
 

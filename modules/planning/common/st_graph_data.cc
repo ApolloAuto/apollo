@@ -26,13 +26,16 @@ namespace planning {
 using apollo::common::TrajectoryPoint;
 
 void StGraphData::LoadData(const std::vector<const STBoundary*>& st_boundaries,
-                           const TrajectoryPoint& init_point,
+                           const double min_s_on_st_boundaries,
+                           const apollo::common::TrajectoryPoint& init_point,
                            const SpeedLimit& speed_limit,
                            const double path_data_length,
                            const double path_length_by_conf,
                            const double total_time_by_conf,
                            planning_internal::STGraphDebug* st_graph_debug) {
+  init_ = true;
   st_boundaries_ = st_boundaries;
+  min_s_on_st_boundaries_ = min_s_on_st_boundaries;
   init_point_ = init_point;
   speed_limit_ = speed_limit;
   path_data_length_ = path_data_length;
@@ -43,6 +46,10 @@ void StGraphData::LoadData(const std::vector<const STBoundary*>& st_boundaries,
 
 const std::vector<const STBoundary*>& StGraphData::st_boundaries() const {
   return st_boundaries_;
+}
+
+double StGraphData::min_s_on_st_boundaries() const {
+  return min_s_on_st_boundaries_;
 }
 
 const TrajectoryPoint& StGraphData::init_point() const { return init_point_; }

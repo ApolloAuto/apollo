@@ -25,7 +25,7 @@ class WeyVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::WEY);
+    parameter.set_brand(apollo::common::WEY);
     wey_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}
@@ -35,11 +35,11 @@ class WeyVehicleFactoryTest : public ::testing::Test {
 };
 
 TEST_F(WeyVehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(wey_factory_.CreateVehicleController() != nullptr);
+  EXPECT_NE(wey_factory_.CreateVehicleController(), nullptr);
 }
 
 TEST_F(WeyVehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(wey_factory_.CreateMessageManager() != nullptr);
+  EXPECT_NE(wey_factory_.CreateMessageManager(), nullptr);
 }
 
 }  // namespace canbus

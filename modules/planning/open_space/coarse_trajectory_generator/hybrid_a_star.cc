@@ -56,7 +56,7 @@ bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
       std::make_shared<ReedSheppPath>();
   if (!reed_shepp_generator_->ShortestRSP(current_node, end_node_,
                                           reeds_shepp_to_check)) {
-    AERROR << "ShortestRSP failed";
+    ADEBUG << "ShortestRSP failed";
     return false;
   }
 
@@ -64,7 +64,7 @@ bool HybridAStar::AnalyticExpansion(std::shared_ptr<Node3d> current_node) {
     return false;
   }
 
-  AINFO << "Reach the end configuration with Reed Sharp";
+  ADEBUG << "Reach the end configuration with Reed Sharp";
   // load the whole RSP as nodes and add to the close set
   final_node_ = LoadRSPinCS(reeds_shepp_to_check, current_node);
   return true;
@@ -346,17 +346,17 @@ bool HybridAStar::Plan(
   end_node_.reset(
       new Node3d({ex}, {ey}, {ephi}, XYbounds_, planner_open_space_config_));
   if (!ValidityCheck(start_node_)) {
-    AERROR << "start_node in collision with obstacles";
+    ADEBUG << "start_node in collision with obstacles";
     return false;
   }
   if (!ValidityCheck(end_node_)) {
-    AERROR << "end_node in collision with obstacles";
+    ADEBUG << "end_node in collision with obstacles";
     return false;
   }
   double map_time = Clock::NowInSeconds();
   grid_a_star_heuristic_generator_->GenerateDpMap(ex, ey, XYbounds_,
                                                   obstacles_linesegments_vec_);
-  AINFO << "map time " << Clock::NowInSeconds() - map_time;
+  ADEBUG << "map time " << Clock::NowInSeconds() - map_time;
   // load open set, pq
   open_set_.insert(std::make_pair(start_node_->GetIndex(), start_node_));
   open_pq_.push(
@@ -364,6 +364,7 @@ bool HybridAStar::Plan(
 
   // Hybrid A* begins
   size_t explored_node_num = 0;
+  double astar_start_time = Clock::NowInSeconds();
   double heuristic_time = 0.0;
   double rs_time = 0.0;
   double start_time = 0.0;
@@ -409,16 +410,18 @@ bool HybridAStar::Plan(
     }
   }
   if (final_node_ == nullptr) {
-    AERROR << "Hybrid A searching return null ptr(open_set ran out)";
+    ADEBUG << "Hybrid A searching return null ptr(open_set ran out)";
     return false;
   }
   if (!GetResult(result)) {
-    AERROR << "GetResult failed";
+    ADEBUG << "GetResult failed";
     return false;
   }
-  AINFO << "explored node num is " << explored_node_num;
-  AINFO << "heuristic time is " << heuristic_time;
-  AINFO << "rs time is " << rs_time;
+  ADEBUG << "explored node num is " << explored_node_num;
+  ADEBUG << "heuristic time is " << heuristic_time;
+  ADEBUG << "reed shepp time is " << rs_time;
+  ADEBUG << "hybrid astar total time is "
+         << Clock::NowInSeconds() - astar_start_time;
   return true;
 }
 }  // namespace planning

@@ -56,7 +56,7 @@ class OpenSpaceFallbackDecider : public Decider {
       const TrajGearPair& trajectory_pb,
       const std::vector<std::vector<common::math::Box2d>>&
           predicted_bounding_rectangles,
-      double* collision_distance);
+      size_t* current_idx, size_t* first_collision_idx);
 };
 
 }  // namespace planning

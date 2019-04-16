@@ -29,7 +29,6 @@
 #include "modules/map/hdmap/hdmap_common.h"
 #include "modules/planning/common/planning_context.h"
 
-
 namespace apollo {
 namespace planning {
 
@@ -120,15 +119,17 @@ Status KeepClear::ApplyRule(Frame* const frame,
                  << traffic_light_overlap->start_s << "]";
           pnc_junction_start_s = traffic_light_overlap->start_s;
         } else if (stop_sign_overlap != nullptr &&
-            std::abs(pnc_junction_start_s - stop_sign_overlap->start_s) <=
-                kPncJunctionStartSDiffBuffer) {
+                   std::abs(pnc_junction_start_s -
+                            stop_sign_overlap->start_s) <=
+                       kPncJunctionStartSDiffBuffer) {
           ADEBUG << "adjust pnc_junction_start_s[" << pnc_junction_start_s
                  << "] to stop_sign_start_s" << stop_sign_overlap->start_s
                  << "]";
           pnc_junction_start_s = stop_sign_overlap->start_s;
         } else if (crosswalk_overlap != nullptr &&
-            std::abs(pnc_junction_start_s - crosswalk_overlap->start_s) <=
-                kPncJunctionStartSDiffBuffer) {
+                   std::abs(pnc_junction_start_s -
+                            crosswalk_overlap->start_s) <=
+                       kPncJunctionStartSDiffBuffer) {
           ADEBUG << "adjust pnc_junction_start_s[" << pnc_junction_start_s
                  << "] to cross_walk_start_s" << crosswalk_overlap->start_s
                  << "]";
@@ -142,9 +143,9 @@ Status KeepClear::ApplyRule(Frame* const frame,
                                    pnc_junction_start_s,
                                    pnc_junction_overlap->end_s)) {
           ADEBUG << "KEEP_CLAER for junction["
-                 << pnc_junction_overlap->object_id
-                 << "] s[" << pnc_junction_start_s << ", "
-                 << pnc_junction_overlap->end_s << "] BUILD";
+                 << pnc_junction_overlap->object_id << "] s["
+                 << pnc_junction_start_s << ", " << pnc_junction_overlap->end_s
+                 << "] BUILD";
         }
       }
     }
