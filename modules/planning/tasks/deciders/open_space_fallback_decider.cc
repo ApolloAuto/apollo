@@ -30,6 +30,31 @@ using apollo::common::math::Vec2d;
 OpenSpaceFallbackDecider::OpenSpaceFallbackDecider(const TaskConfig& config)
     : Decider(config) {}
 
+bool OpenSpaceFallbackDecider::QuardraticFormulaLowerSolution(const double a,
+                                                              const double b,
+                                                              const double c,
+                                                              double* sol) {
+  // quardratic formula: ax^2 + bx + c = 0, return lower solution
+
+  // TODO(QiL): use const from common::math
+  const double epis = 1e-6;
+  *sol = 0.0;
+  if (std::abs(a) < epis) {
+    // AERROR << "not valid formula";
+    return false;
+  }
+
+  double tmp = b * b - 4 * a * c;
+  // AERROR << "tmp: " << tmp;
+  if (tmp < epis) {
+    // AERROR << "no real solution";
+    return false;
+  }
+
+  *sol = (-b + std::sqrt(tmp)) / (2.0 * a);
+  return true;
+}
+
 Status OpenSpaceFallbackDecider::Process(Frame* frame) {
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles;
   // double obstacle_to_vehicle_distance = 0.0;
@@ -53,34 +78,99 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
         frame->open_space_info().chosen_paritioned_trajectory();
     auto* ptr_fallback_trajectory_pair =
         frame_->mutable_open_space_info()->mutable_fallback_trajectory();
+
+    // Where is this fallback trajectory originally from
     const auto collision_point =
         ptr_fallback_trajectory_pair->first[first_collision_idx];
-    auto previous_point = ptr_fallback_trajectory_pair->first[current_idx];
-    double relative_collision_distance =
-        collision_point.path_point().s() - previous_point.path_point().s();
+    auto fallback_start_point =
+        ptr_fallback_trajectory_pair->first[current_idx];
+    double relative_collision_distance = collision_point.path_point().s() -
+                                         fallback_start_point.path_point().s();
+
+    // TODO(QiL): move this to configs
+    const double collision_buff_distance = 0.5;
+    if (relative_collision_distance > collision_buff_distance) {
+      relative_collision_distance -= collision_buff_distance;
+    }
     // the accelerate = -v0^2 / (2*s), where s is slowing down distance
-    size_t temp_horizon =
+    const size_t temp_horizon =
         frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
-    const double accelerate = -previous_point.v() * previous_point.v() /
+    const double accelerate = -fallback_start_point.v() *
+                              fallback_start_point.v() /
                               (2.0 * (relative_collision_distance + 1e-6));
-    const double relative_stopping_time = -previous_point.v() / accelerate;
+    const double v0 = fallback_start_point.v();
+    // const double relative_stopping_time = - fallback_start_point.v() /
+    // accelerate;
+    /*
+    AERROR << "aaa";
+    AERROR << "current idx: " << current_idx;
+    AERROR << "current rt: " << fallback_start_point.relative_time();
+    AERROR << "current s: " << fallback_start_point.path_point().s();
+    AERROR << "current v: " << fallback_start_point.v();
+    AERROR << "collision ids: " << first_collision_idx;
+    AERROR << "collision rt: " << collision_point.relative_time();
+    AERROR << "collision s: " << collision_point.path_point().s();
+    AERROR << "stopping time: " << relative_stopping_time;
+    AERROR << "fallback trajectory: ";
+    */
     for (size_t i = current_idx; i < temp_horizon; ++i) {
+      /*
       double temp_relative_time =
           ptr_fallback_trajectory_pair->first[i].relative_time() -
-          previous_point.relative_time();
-      double temp_v = previous_point.v() + accelerate * temp_relative_time;
+          fallback_start_point.relative_time();
+      double temp_v = fallback_start_point.v() + accelerate *
+      temp_relative_time;
 
       if (ptr_fallback_trajectory_pair->first[i].relative_time() >
           relative_stopping_time) {
         ptr_fallback_trajectory_pair->first[i].mutable_path_point()->CopyFrom(
-            previous_point.path_point());
+            fallback_start_point.path_point());
         ptr_fallback_trajectory_pair->first[i].set_v(0.0);
         ptr_fallback_trajectory_pair->first[i].set_a(0.0);
       } else {
         ptr_fallback_trajectory_pair->first[i].set_v(temp_v);
         ptr_fallback_trajectory_pair->first[i].set_a(accelerate);
-        previous_point = ptr_fallback_trajectory_pair->first[i];
+        fallback_start_point = ptr_fallback_trajectory_pair->first[i];
       }
+      */
+      // update relative time w.r.t accelerate and path_point.s
+      double temp_relative_time = 0.0;
+      double temp_v = 0.0;
+      double b = 2.0 * v0;
+      double c = -2.0 * ptr_fallback_trajectory_pair->first[i].path_point().s();
+      if (QuardraticFormulaLowerSolution(accelerate, b, c,
+                                         &temp_relative_time) &&
+          ptr_fallback_trajectory_pair->first[i].path_point().s() <
+              relative_collision_distance) {
+        temp_v = v0 + accelerate * temp_relative_time;
+        ptr_fallback_trajectory_pair->first[i].set_v(temp_v);
+        ptr_fallback_trajectory_pair->first[i].set_a(accelerate);
+        ptr_fallback_trajectory_pair->first[i].set_relative_time(
+            temp_relative_time);
+        // fallback_start_point = ptr_fallback_trajectory_pair->first[i];
+      } else {
+        temp_relative_time = 0.04 + fallback_start_point.relative_time();
+        ptr_fallback_trajectory_pair->first[i].mutable_path_point()->CopyFrom(
+            fallback_start_point.path_point());
+        ptr_fallback_trajectory_pair->first[i].set_v(0.0);
+        ptr_fallback_trajectory_pair->first[i].set_a(0.0);
+        ptr_fallback_trajectory_pair->first[i].set_relative_time(
+            temp_relative_time);
+      }
+      fallback_start_point = ptr_fallback_trajectory_pair->first[i];
+      /*
+      AERROR << "idx: " << i;
+      AERROR << "temp_relative_time: " << temp_relative_time;
+      AERROR << "temp_v: " << temp_v;
+      AERROR << "ptr v: " << ptr_fallback_trajectory_pair->first[i].v();
+      AERROR << "ptr a: " << ptr_fallback_trajectory_pair->first[i].a();
+      AERROR << "ptr s: " <<
+      ptr_fallback_trajectory_pair->first[i].path_point().s(); AERROR << "ptr x:
+      " <<
+      std::to_string(ptr_fallback_trajectory_pair->first[i].path_point().x());
+      AERROR << "ptr y: " <<
+      std::to_string(ptr_fallback_trajectory_pair->first[i].path_point().y());
+      */
     }
   } else {
     frame_->mutable_open_space_info()->set_fallback_flag(false);
@@ -146,6 +236,10 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
                            FLAGS_trajectory_time_resolution) <
               FLAGS_trajectory_time_resolution) {
             *first_collision_idx = i;
+            // AERROR << "collision time for obs: "
+            // << static_cast<double>(j) * FLAGS_trajectory_time_resolution;
+            // AERROR << "collision idx: " << j;
+            // AERROR << "collision ob position: " << ;
             return false;
           }
         }
