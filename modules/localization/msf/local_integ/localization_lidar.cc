@@ -174,7 +174,8 @@ int LocalizationLidar::Update(const unsigned int frame_idx,
 }
 
 void LocalizationLidar::GetResult(Eigen::Affine3d *location,
-                                  Eigen::Matrix3d *covariance) {
+                                  Eigen::Matrix3d *covariance,
+                                  double* location_score) {
   if (!location || !covariance) {
     return;
   }
@@ -197,6 +198,8 @@ void LocalizationLidar::GetResult(Eigen::Affine3d *location,
   int height = 0;
   const double* data = nullptr;
   lidar_locator_->GetLocationCovariance(&data, &width, &height);
+
+  *location_score = lidar_locator_->GetLocationScore();
 
   if (width >= 3 && height >= 3 && data != nullptr) {
     for (int row = 0; row < 3; ++row) {

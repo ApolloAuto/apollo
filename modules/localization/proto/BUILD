@@ -78,10 +78,23 @@ proto_library(
     srcs = ["localization.proto"],
     deps = [
         ":pose_proto_lib",
+        ":localization_status_proto_lib",
         "//modules/common/proto:common_proto_lib",
         "//modules/common/proto:header_proto_lib",
         "//modules/common/proto:pnc_point_proto_lib",
     ],
+)
+
+cc_proto_library(
+    name = "localization_status_proto",
+    deps = [
+        ":localization_status_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "localization_status_proto_lib",
+    srcs = ["localization_status.proto"],
 )
 
 cc_proto_library(

@@ -104,7 +104,8 @@ typedef apollo::localization::msf::LossyMapConfig2D LossyMapConfig;
   int Update(const unsigned int frame_idx, const Eigen::Affine3d& pose,
              const Eigen::Vector3d velocity, const LidarFrame& lidar_frame);
 
-  void GetResult(Eigen::Affine3d *location, Eigen::Matrix3d *covariance);
+  void GetResult(Eigen::Affine3d *location, Eigen::Matrix3d *covariance,
+                 double* location_score);
 
   void GetLocalizationDistribution(Eigen::MatrixXd *distribution);
 

@@ -142,3 +142,33 @@ DEFINE_double(imu_vehicle_qw, 1.0, "Vehicle imu quaternion qw");
 // visualization
 DEFINE_string(map_visual_dir, "data/map_visual",
               "The path of map_visual folder.");
+
+// Status
+DEFINE_double(imu_delay_time_threshold_1, 0.1,
+              "imu delay time is larger than 0.1s");
+DEFINE_double(imu_delay_time_threshold_2, 0.05,
+              "imu delay time is larger than 0.05s");
+DEFINE_double(imu_delay_time_threshold_3, 0.02,
+              "imu delay time is larger than 0.02s");
+
+DEFINE_double(imu_missing_time_threshold_1, 0.1,
+              "imu missing time is larger than 0.1s");
+DEFINE_double(imu_missing_time_threshold_2, 0.05,
+              "imu missing time is larger than 0.05s");
+DEFINE_double(imu_missing_time_threshold_3, 0.01,
+              "imu missing time is larger than 0.01s");
+
+DEFINE_double(bestgnsspose_loss_time_threshold, 2.0,
+              "threshold for time gap between imu and bestgnsspose time");
+DEFINE_double(lidar_loss_time_threshold, 2.0,
+              "threshold for time gap between imu and lidar pose time");
+
+DEFINE_double(localization_std_x_threshold_1, 0.15,
+              "threshold for lateral std of localization result");
+DEFINE_double(localization_std_y_threshold_1, 0.15,
+              "threshold for longitudinal std of localization result");
+
+DEFINE_double(localization_std_x_threshold_2, 0.3,
+              "threshold for lateral std of localization result");
+DEFINE_double(localization_std_y_threshold_2, 0.3,
+              "threshold for longitudinal std of localization result");

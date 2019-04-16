@@ -22,6 +22,7 @@ cc_library(
         "//modules/localization/proto:sins_pva_proto",
         "//modules/localization/proto:measure_proto",
         "//modules/localization/proto:localization_proto",
+        "//modules/localization/proto:localization_status_proto",
         "//modules/localization/proto:gnss_pnt_result_proto",
         "//modules/drivers/gnss/proto:gnss_raw_observation_proto",
         "//modules/drivers/gnss/proto:gnss_best_pose_proto",
