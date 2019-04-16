@@ -164,7 +164,7 @@ class PiecewiseJerkProblem {
     double x_derivative_w = 0.0;
     double x_second_order_derivative_w = 0.0;
     double x_third_order_derivative_w = 0.0;
-    double x_mid_line_w = 0.0;
+    double x_ref_w = 0.0;
   } weight_;
 
   double max_x_third_order_derivative_ = 0.0;
