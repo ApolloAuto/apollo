@@ -35,9 +35,9 @@ void Fem1dQpProblem::CalculateKernel(std::vector<c_float>* P_data,
   columns.resize(kNumParam);
   int value_index = 0;
 
-  // x(i)^2 * (w_x + w_mid_line)
+  // x(i)^2 * (w_x + w_ref)
   for (int i = 0; i < N; ++i) {
-    columns[i].emplace_back(i, (weight_.x_w + weight_.x_mid_line_w));
+    columns[i].emplace_back(i, (weight_.x_w + weight_.x_ref_w));
     ++value_index;
   }
 
@@ -91,7 +91,7 @@ void Fem1dQpProblem::CalculateOffset(std::vector<c_float>* q) {
   q->resize(kNumParam);
   for (int i = 0; i < kNumParam; ++i) {
     if (i < N) {
-      q->at(i) = -1.0 * weight_.x_mid_line_w *
+      q->at(i) = -1.0 * weight_.x_ref_w *
                  (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
     } else {
       q->at(i) = 0.0;
