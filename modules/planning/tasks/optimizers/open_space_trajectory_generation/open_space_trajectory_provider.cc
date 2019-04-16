@@ -53,7 +53,7 @@ OpenSpaceTrajectoryProvider::~OpenSpaceTrajectoryProvider() {
 
 void OpenSpaceTrajectoryProvider::Stop() {
   if (FLAGS_enable_open_space_planner_thread) {
-    is_stop_.store(true);
+    is_generation_thread_stop_.store(true);
     if (thread_init_flag_) {
       task_future_.get();
     }
@@ -66,11 +66,11 @@ void OpenSpaceTrajectoryProvider::Stop() {
 
 void OpenSpaceTrajectoryProvider::Restart() {
   if (FLAGS_enable_open_space_planner_thread) {
-    is_stop_.store(true);
+    is_generation_thread_stop_.store(true);
     if (thread_init_flag_) {
       task_future_.get();
     }
-    is_stop_.store(false);
+    is_generation_thread_stop_.store(false);
     thread_init_flag_ = false;
     trajectory_updated_.store(false);
     trajectory_error_.store(false);
@@ -122,7 +122,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
   if (FLAGS_enable_open_space_planner_thread) {
     ADEBUG << "Open space plan in multi-threads mode";
 
-    if (is_stop_) {
+    if (is_generation_thread_stop_) {
       GenerateStopTrajectory(trajectory_data);
       return Status(ErrorCode::OK, "Parking finished");
     }
@@ -147,7 +147,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
             vehicle_state, open_space_info.open_space_end_pose(),
             open_space_info.origin_heading(), open_space_info.origin_point())) {
       GenerateStopTrajectory(trajectory_data);
-      is_stop_.store(true);
+      is_generation_thread_stop_.store(true);
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
 
@@ -233,7 +233,7 @@ Status OpenSpaceTrajectoryProvider::Process() {
 }
 
 void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
-  while (!is_stop_) {
+  while (!is_generation_thread_stop_) {
     if (!trajectory_updated_ && data_ready_) {
       OpenSpaceTrajectoryThreadData thread_data;
       {
