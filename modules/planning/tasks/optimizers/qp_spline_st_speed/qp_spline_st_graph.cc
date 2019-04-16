@@ -94,12 +94,6 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
         (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
       speed_data->clear();
-      const double t_output_resolution = FLAGS_trajectory_time_min_interval;
-      double time = 0.0;
-      while (time < total_time_ + t_output_resolution) {
-        speed_data->AppendSpeedPoint(0.0, time, 0.0, 0.0, 0.0);
-        time += t_output_resolution;
-      }
       const std::string msg = "Collision found in QpSplineStGraph!";
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
