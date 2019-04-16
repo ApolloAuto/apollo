@@ -177,6 +177,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
   auto crid = GlobalData::GenerateHashId(name);
   return RemoveCRoutine(crid);
 }
+
 bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
