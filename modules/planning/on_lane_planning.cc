@@ -193,11 +193,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   Status status = VehicleStateProvider::Instance()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
 
-  VehicleState received_vehicle_state =
+  VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
-  DCHECK_GE(start_timestamp, received_vehicle_state.timestamp());
+  const double vehicle_state_timestamp = vehicle_state.timestamp();
+  DCHECK_GE(start_timestamp, vehicle_state_timestamp);
 
-  if (!status.ok() || !util::IsVehicleStateValid(received_vehicle_state)) {
+  if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
     std::string msg(
         "Update VehicleStateProvider failed "
         "or the vehicle state is out dated.");
@@ -214,8 +215,11 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  auto aligned_vehicle_state =
-      AlignTimeStamp(received_vehicle_state, start_timestamp);
+  if (FLAGS_estimate_current_vehicle_state &&
+      start_timestamp - vehicle_state_timestamp <
+          FLAGS_message_latency_threshold) {
+    vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
+  }
 
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
@@ -224,7 +228,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   }
 
   // Update reference line provider and reset pull over if necessary
-  reference_line_provider_->UpdateVehicleState(aligned_vehicle_state);
+  reference_line_provider_->UpdateVehicleState(vehicle_state);
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
@@ -234,14 +238,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   std::string replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-          aligned_vehicle_state, start_timestamp, planning_cycle_time,
+          vehicle_state, start_timestamp, planning_cycle_time,
           last_publishable_trajectory_.get(), &replan_reason);
 
-  EgoInfo::Instance()->Update(stitching_trajectory.back(),
-                              aligned_vehicle_state);
+  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
-  status =
-      InitFrame(frame_num, stitching_trajectory.back(), aligned_vehicle_state);
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
   if (status.ok()) {
     EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
