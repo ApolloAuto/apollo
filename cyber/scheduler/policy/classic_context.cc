@@ -29,10 +29,6 @@ using apollo::cyber::croutine::RoutineState;
 using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
-namespace {
-static constexpr auto MIN_SLEEP_INTERVAL = std::chrono::milliseconds(1);
-}
-
 GRP_WQ_MUTEX ClassicContext::mtx_wq_;
 GRP_WQ_CV ClassicContext::cv_wq_;
 RQ_LOCK_GROUP ClassicContext::rq_locks_;
