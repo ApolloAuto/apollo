@@ -33,6 +33,7 @@
 #include "modules/localization/msf/local_integ/localization_lidar.h"
 #include "modules/localization/msf/local_integ/localization_params.h"
 #include "modules/localization/proto/localization.pb.h"
+#include "modules/localization/proto/localization_status.pb.h"
 #include "modules/localization/proto/measure.pb.h"
 #include "modules/localization/proto/sins_pva.pb.h"
 #include "include/pose_forcast.h"
@@ -149,6 +150,11 @@ class LocalizationLidarProcess {
   // Information used to output.
   Matrix3D location_covariance_;
   LidarState lidar_status_;
+
+  LocalLidarStatus local_lidar_status_ =
+      LocalLidarStatus::MSF_LOCAL_LIDAR_UNDEFINED_STATUS;
+  LocalLidarQuality local_lidar_quality_ =
+      LocalLidarQuality::MSF_LOCAL_LIDAR_BAD;
 
   bool reinit_flag_;
 

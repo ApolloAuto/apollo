@@ -33,6 +33,7 @@
 #include "modules/localization/msf/local_integ/localization_lidar_process.h"
 #include "modules/localization/msf/local_integ/measure_republish_process.h"
 #include "modules/localization/msf/local_integ/localization_integ.h"
+#include "modules/localization/msf/local_integ/online_localization_expert.h"
 
 /**
  * @namespace apollo::localization
@@ -161,6 +162,7 @@ class LocalizationIntegImpl {
   bool enable_lidar_localization_;
 
   Eigen::Affine3d gnss_antenna_extrinsic_;
+  OnlineLocalizationExpert expert_;
 };
 
 }  // namespace msf

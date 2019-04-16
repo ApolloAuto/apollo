@@ -95,12 +95,12 @@ class MSFLocalization : public LocalizationBase {
  private:
   apollo::common::monitor::MonitorLogger monitor_logger_;
   msf::LocalizationInteg localization_integ_;
-  msf::LocalizationIntegParam localizaiton_param_;
+  msf::LocalizationIntegParam localization_param_;
   msf::LocalizationMeasureState localization_state_;
   uint64_t pcd_msg_index_;
 
-  MeasureState latest_lidar_localization_status_;
-  MeasureState latest_gnss_localization_status_;
+//  MeasureState latest_lidar_localization_status_;
+//  MeasureState latest_gnss_localization_status_;
 
   // FRIEND_TEST(MSFLocalizationTest, InitParams);
 

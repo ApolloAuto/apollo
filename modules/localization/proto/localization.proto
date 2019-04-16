@@ -22,6 +22,7 @@ import "modules/common/proto/header.proto";
 import "modules/localization/proto/pose.proto";
 import "modules/common/proto/geometry.proto";
 import "modules/common/proto/pnc_point.proto";
+import "modules/localization/proto/localization_status.proto";
 
 message Uncertainty {
   // Standard deviation of position, east/north/up in meters.
@@ -54,21 +55,28 @@ message LocalizationEstimate {
 
   // Future trajectory acturally driven by the drivers
   repeated apollo.common.TrajectoryPoint trajectory_point = 5;
+
+  // msf status
+  optional MsfStatus msf_status = 6;
+  // msf quality
+  optional MsfSensorMsgStatus sensor_status = 7;
 }
 
 enum MeasureState {
-  NOT_VALID = 0;
-  NOT_STABLE = 1;
-  OK = 2;
-  VALID = 3;
+  OK = 0;
+  WARNNING = 1;
+  ERROR = 2;
+  CRITICAL_ERROR = 3;
+  FATAL_ERROR = 4;
 }
 
 message LocalizationStatus {
   optional apollo.common.Header header = 1;
   optional MeasureState fusion_status = 2;
-  optional MeasureState gnss_status = 3;
-  optional MeasureState lidar_status = 4;
+  optional MeasureState gnss_status = 3 [deprecated = true];
+  optional MeasureState lidar_status = 4 [deprecated = true];
 
   // The time of pose measurement, seconds since the GPS epoch (Jan 6, 1980).
   optional double measurement_time = 5;  // In seconds.
+  optional string state_message = 6;
 }

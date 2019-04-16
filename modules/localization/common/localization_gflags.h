@@ -106,4 +106,22 @@ DECLARE_double(imu_vehicle_qw);
 // visualization
 DECLARE_string(map_visual_dir);
 
+// Status
+DECLARE_double(imu_delay_time_threshold_1);
+DECLARE_double(imu_delay_time_threshold_2);
+DECLARE_double(imu_delay_time_threshold_3);
+
+DECLARE_double(imu_missing_time_threshold_1);
+DECLARE_double(imu_missing_time_threshold_2);
+DECLARE_double(imu_missing_time_threshold_3);
+
+DECLARE_double(bestgnsspose_loss_time_threshold);
+DECLARE_double(lidar_loss_time_threshold);
+
+DECLARE_double(localization_std_x_threshold_1);
+DECLARE_double(localization_std_y_threshold_1);
+
+DECLARE_double(localization_std_x_threshold_2);
+DECLARE_double(localization_std_y_threshold_2);
+
 #endif  // MODULES_LOCALIZATION_COMMON_LOCALIZATION_GFLAGS_H_
