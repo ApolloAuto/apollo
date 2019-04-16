@@ -61,23 +61,19 @@ void MultiValueWarehouse::Remove(uint64_t key) {
 void MultiValueWarehouse::Remove(uint64_t key, const RolePtr& role) {
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);
   auto range = roles_.equal_range(key);
-  for (auto it = range.first; it != range.second;) {
+  for (auto it = range.first; it != range.second; ++it) {
     if (it->second->Match(role->attributes())) {
       it = roles_.erase(it);
-    } else {
-      ++it;
     }
   }
 }
 
 void MultiValueWarehouse::Remove(const RoleAttributes& target_attr) {
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);
-  for (auto it = roles_.begin(); it != roles_.end();) {
+  for (auto it = roles_.begin(); it != roles_.end(); ++it) {
     auto curr_role = it->second;
     if (curr_role->Match(target_attr)) {
       it = roles_.erase(it);
-    } else {
-      ++it;
     }
   }
 }

@@ -68,12 +68,10 @@ void SingleValueWarehouse::Remove(uint64_t key, const RolePtr& role) {
 
 void SingleValueWarehouse::Remove(const RoleAttributes& target_attr) {
   WriteLockGuard<AtomicRWLock> lock(rw_lock_);
-  for (auto it = roles_.begin(); it != roles_.end();) {
+  for (auto it = roles_.begin(); it != roles_.end(); ++it) {
     auto curr_role = it->second;
     if (curr_role->Match(target_attr)) {
       it = roles_.erase(it);
-    } else {
-      ++it;
     }
   }
 }
