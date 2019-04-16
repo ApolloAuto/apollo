@@ -25,10 +25,10 @@ namespace planning {
 
 void CopyTrajectory(const DiscretizedTrajectory trajectory_src,
                     apollo::common::Trajectory* trajectory_tgt_ptr) {
-  size_t horizon = trajectory_src.NumOfPoints();
+  const size_t horizon = trajectory_src.NumOfPoints();
   for (size_t i = 0; i < horizon; ++i) {
-    auto* added_pt = trajectory_tgt_ptr->add_trajectory_point();
-    added_pt->CopyFrom(trajectory_src.TrajectoryPointAt(i));
+    *trajectory_tgt_ptr->add_trajectory_point() =
+        trajectory_src.TrajectoryPointAt(i);
   }
 }
 
