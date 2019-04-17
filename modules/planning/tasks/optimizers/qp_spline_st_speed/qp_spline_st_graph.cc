@@ -88,17 +88,6 @@ Status QpSplineStGraph::Search(const StGraphData& st_graph_data,
                                const std::pair<double, double>& accel_bound,
                                const SpeedData& reference_speed_data,
                                SpeedData* const speed_data) {
-  constexpr double kBounadryEpsilon = 1e-2;
-  for (auto boundary : st_graph_data.st_boundaries()) {
-    if (boundary->IsPointInBoundary({0.0, 0.0}) ||
-        (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
-         std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
-      speed_data->clear();
-      const std::string msg = "Collision found in QpSplineStGraph!";
-      return Status(ErrorCode::PLANNING_ERROR, msg);
-    }
-  }
-
   cruise_.clear();
   reference_dp_speed_points_ = *speed_data;
 
