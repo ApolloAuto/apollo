@@ -664,15 +664,8 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
   }
 
   if (config_.open_space_roi_decider_config().enable_perception_obstacles()) {
-    perception_obstacles_num = obstacles_by_frame_->Items().size();
     if (perception_obstacles_num == 0) {
       ADEBUG << "no obstacle given by perception";
-    }
-
-    for (const auto &obstacle : obstacles_by_frame_->Items()) {
-      if (obstacle->IsVirtual()) {
-        --perception_obstacles_num;
-      }
     }
 
     // load vertices for perception obstacles(repeat the first vertice at the
@@ -680,9 +673,10 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
     const auto &origin_point = open_space_info.origin_point();
     const auto &origin_heading = open_space_info.origin_heading();
     for (const auto &obstacle : obstacles_by_frame_->Items()) {
-      if (obstacle->IsVirtual()) {
+      if (FilterOutObstacle(*frame, *obstacle)) {
         continue;
       }
+      ++perception_obstacles_num;
 
       Box2d original_box = obstacle->PerceptionBoundingBox();
       original_box.Shift(-1.0 * origin_point);
@@ -728,6 +722,40 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
   mutable_open_space_info->set_obstacles_num(parking_boundaries_num +
                                              perception_obstacles_num);
   return true;
+}
+
+bool OpenSpaceRoiDecider::FilterOutObstacle(const Frame &frame,
+                                            const Obstacle &obstacle) {
+  if (obstacle.IsVirtual()) {
+    return true;
+  }
+
+  // Translate the end pose back to world frame with endpose in x, y, phi, v
+  const auto &open_space_info = frame.open_space_info();
+  const auto &origin_point = open_space_info.origin_point();
+  const auto &origin_heading = open_space_info.origin_heading();
+  const auto &end_pose = open_space_info.open_space_end_pose();
+  Vec2d end_pose_x_y(end_pose[0], end_pose[1]);
+  end_pose_x_y.SelfRotate(origin_heading);
+  end_pose_x_y += origin_point;
+
+  // Get vehicle state
+  Vec2d vehicle_x_y(vehicle_state_.x(), vehicle_state_.y());
+
+  // Use vehicle position and end position to filter out obstacle
+  const auto &obstacle_box = obstacle.PerceptionBoundingBox();
+  const double vehicle_center_to_obstacle =
+      obstacle_box.DistanceTo(vehicle_x_y);
+  const double end_pose_center_to_obstacle =
+      obstacle_box.DistanceTo(end_pose_x_y);
+  const double filtering_distance =
+      config_.open_space_roi_decider_config()
+          .perception_obstacle_filtering_distance();
+  if (vehicle_center_to_obstacle > filtering_distance &&
+      end_pose_center_to_obstacle > filtering_distance) {
+    return true;
+  }
+  return false;
 }
 
 bool OpenSpaceRoiDecider::LoadObstacleInHyperPlanes(Frame *const frame) {
