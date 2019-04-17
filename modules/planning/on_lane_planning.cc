@@ -238,7 +238,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   std::string replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-          aligned_vehicle_state, start_timestamp, planning_cycle_time,
+          vehicle_state, start_timestamp, planning_cycle_time,
           FLAGS_trajectory_stitching_preserved_length,
           last_publishable_trajectory_.get(), &replan_reason);
 

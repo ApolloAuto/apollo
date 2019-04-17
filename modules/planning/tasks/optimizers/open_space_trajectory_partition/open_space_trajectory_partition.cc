@@ -183,8 +183,8 @@ Status OpenSpaceTrajectoryPartition::Process() {
         current_trajectory_index = closest_point_on_trajs.top().first.first;
         current_trajectory_point_index =
             closest_point_on_trajs.top().first.second;
-        if (CheckTrajTraversed(current_trajectory_index,
-                               trajectories_encodings)) {
+        if (CheckTrajTraversed(
+                trajectories_encodings[current_trajectory_index])) {
           closest_point_on_trajs.pop();
         } else {
           closest_and_not_repeated_traj_found = true;
@@ -308,21 +308,18 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
 }
 
 bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
-    const size_t trajectory_index,
-    const std::vector<std::string>& trajectories_encodings) {
+    const std::string& trajectory_encoding_to_check) const {
   const auto& index_history =
       PlanningContext::open_space_info().partitioned_trajectories_index_history;
   const size_t index_history_length = index_history.size();
   if (index_history_length <= 1) {
     return false;
   }
-
   for (size_t i = 0; i < index_history_length - 1; ++i) {
-    if (index_history[i] == trajectories_encodings[trajectory_index]) {
+    if (index_history[i] == trajectory_encoding_to_check) {
       return true;
     }
   }
-
   return false;
 }
 

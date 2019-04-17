@@ -54,8 +54,7 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
                         std::string* const encoding);
 
   bool CheckTrajTraversed(
-      const size_t trajectory_index,
-      const std::vector<std::string>& trajectories_encodings);
+      const std::string& trajectory_encoding_to_check) const;
 
   void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
 
