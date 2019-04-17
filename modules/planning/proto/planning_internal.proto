@@ -147,6 +147,7 @@ message OpenSpaceDebug {
   optional bool is_fallback_trajectory = 14;
   optional apollo.planning_internal.Trajectories fallback_trajectory = 15;
   optional apollo.common.TrajectoryPoint trajectory_stitching_point = 16;
+  optional apollo.common.TrajectoryPoint future_collision_point = 17;
 }
 
 message SmootherDebug {
