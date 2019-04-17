@@ -300,12 +300,20 @@ Status LonController::ComputeControlCommand(
         std::make_pair(chassis_->speed_mps(), acceleration_lookup));
   }
 
-  if (calibration_value >= 0) {
-    throttle_cmd = std::max(calibration_value, throttle_lowerbound);
+  if (acceleration_lookup >= 0) {
+    if (calibration_value >= 0) {
+      throttle_cmd = std::max(calibration_value, throttle_lowerbound);
+    } else {
+      throttle_cmd = throttle_lowerbound;
+    }
     brake_cmd = 0.0;
   } else {
     throttle_cmd = 0.0;
-    brake_cmd = std::max(-calibration_value, brake_lowerbound);
+    if (calibration_value >= 0) {
+      brake_cmd = brake_lowerbound;
+    } else {
+      brake_cmd = std::max(-calibration_value, brake_lowerbound);
+    }
   }
 
   debug->set_station_error_limited(station_error_limited);
