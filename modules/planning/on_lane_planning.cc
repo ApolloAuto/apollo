@@ -788,6 +788,23 @@ void OnLanePlanning::AddPartitionedTrajectory(
   (*stitching_properties)["fill"] = "true";
   (*stitching_properties)["showLine"] = "true";
 
+  // Draw potential collision_point (line with only one point)
+  auto* collision_line = chart->add_line();
+  collision_line->set_label("FutureCollisionPoint");
+  auto* future_collision_point = collision_line->add_point();
+  future_collision_point->set_x(
+      open_space_debug.future_collision_point().path_point().x());
+  future_collision_point->set_y(
+      open_space_debug.future_collision_point().path_point().y());
+  // Set chartJS's dataset properties
+  auto* collision_properties = collision_line->mutable_properties();
+  (*collision_properties)["borderWidth"] = "3";
+  (*collision_properties)["pointRadius"] = "8";
+  (*collision_properties)["lineTension"] = "0";
+  (*collision_properties)["fill"] = "true";
+  (*stitching_properties)["showLine"] = "true";
+  (*stitching_properties)["pointStyle"] = "cross";
+
   // Draw fallback trajectory compared with the partitioned
   if (open_space_debug.is_fallback_trajectory()) {
     const auto& fallback_trajectories =
