@@ -46,14 +46,14 @@ PyObject* cyber_new_PyTimer(PyObject* self, PyObject* args) {
   apollo::cyber::PyTimer* pytimer =
       new apollo::cyber::PyTimer(period, callback_fun, oneshot != 0);
   PyObject* pyobj_timer =
-      PyCapsule_New(pytimer, "apollo_cybertron_pytimer", NULL);
+      PyCapsule_New(pytimer, "apollo_cybertron_pytimer", nullptr);
   return pyobj_timer;
 }
 
 PyObject* cyber_new_PyTimer_noparam(PyObject* self, PyObject* args) {
   apollo::cyber::PyTimer* pytimer = new apollo::cyber::PyTimer();
   PyObject* pyobj_timer =
-      PyCapsule_New(pytimer, "apollo_cybertron_pytimer", NULL);
+      PyCapsule_New(pytimer, "apollo_cybertron_pytimer", nullptr);
   return pyobj_timer;
 }
 

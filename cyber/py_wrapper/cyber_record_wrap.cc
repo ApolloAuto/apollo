@@ -43,7 +43,7 @@ PyObject *cyber_new_PyRecordReader(PyObject *self, PyObject *args) {
   apollo::cyber::record::PyRecordReader *reader =
       new apollo::cyber::record::PyRecordReader(std::string(filepath, len));
   PyObject *pyobj_rec_reader =
-      PyCapsule_New(reader, "apollo_cyber_record_pyrecordfilereader", NULL);
+      PyCapsule_New(reader, "apollo_cyber_record_pyrecordfilereader", nullptr);
   return pyobj_rec_reader;
 }
 
@@ -246,7 +246,7 @@ PyObject *cyber_new_PyRecordWriter(PyObject *self, PyObject *args) {
   apollo::cyber::record::PyRecordWriter *writer =
       new apollo::cyber::record::PyRecordWriter();
   PyObject *pyobj_rec_writer =
-      PyCapsule_New(writer, "apollo_cyber_record_pyrecordfilewriter", NULL);
+      PyCapsule_New(writer, "apollo_cyber_record_pyrecordfilewriter", nullptr);
   return pyobj_rec_writer;
 }
 
