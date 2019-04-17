@@ -53,11 +53,13 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
         frame->open_space_info().chosen_paritioned_trajectory();
     auto* ptr_fallback_trajectory_pair =
         frame_->mutable_open_space_info()->mutable_fallback_trajectory();
-    const auto collision_point =
+    const auto future_collision_point =
         ptr_fallback_trajectory_pair->first[first_collision_idx];
     auto previous_point = ptr_fallback_trajectory_pair->first[current_idx];
     double relative_collision_distance =
-        collision_point.path_point().s() - previous_point.path_point().s();
+        future_collision_point.path_point().s() -
+        previous_point.path_point().s();
+
     // the accelerate = -v0^2 / (2*s), where s is slowing down distance
     size_t temp_horizon =
         frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
@@ -82,6 +84,9 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
         previous_point = ptr_fallback_trajectory_pair->first[i];
       }
     }
+    *(frame_->mutable_open_space_info()->mutable_future_collision_point()) =
+        future_collision_point;
+
   } else {
     frame_->mutable_open_space_info()->set_fallback_flag(false);
   }
