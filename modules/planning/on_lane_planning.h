@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/common/frame.h"
 #include "modules/planning/planner/on_lane_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
 #include "modules/planning/tasks/smoothers/smoother.h"
@@ -102,7 +101,6 @@ class OnLanePlanning : public PlanningBase {
 
  private:
   routing::RoutingResponse last_routing_;
-  std::unique_ptr<Frame> frame_;
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
   Smoother planning_smoother_;
 };
