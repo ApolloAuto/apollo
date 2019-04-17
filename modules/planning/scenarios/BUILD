@@ -24,9 +24,11 @@ cc_library(
     name = "stage",
     srcs = [
         "stage.cc",
+        "stage_intersection_cruise.cc",
     ],
     hdrs = [
         "stage.h",
+        "stage_intersection_cruise.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
