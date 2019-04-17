@@ -91,6 +91,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
 
   // Choose the one to follow based on the closest partitioned trajectory
   size_t trajectories_size = paritioned_trajectories->size();
+
   size_t current_trajectory_index = 0;
   size_t current_trajectory_point_index = 0;
   bool flag_change_to_next = false;
@@ -116,6 +117,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
 
   for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& gear = paritioned_trajectories->at(i).second;
+    const auto& trajectory = paritioned_trajectories->at(i).first;
     size_t trajectory_size = trajectory.size();
     CHECK_GT(trajectory_size, 0);
 
@@ -186,6 +188,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
           closest_point_on_trajs.pop();
         } else {
           closest_and_not_repeated_traj_found = true;
+          UpdateTrajHistory(trajectories_encodings[current_trajectory_index]);
           break;
         }
       }
@@ -204,8 +207,6 @@ Status OpenSpaceTrajectoryPartition::Process() {
       }
     }
   }
-
-  UpdateTrajHistory(trajectories_encodings[current_trajectory_index]);
 
   auto* chosen_paritioned_trajectory =
       open_space_info_ptr->mutable_chosen_paritioned_trajectory();
@@ -277,19 +278,21 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
     AERROR << "Fail to encode trajectory because it is empty";
     return false;
   }
+  constexpr double encoding_origin_x = 58700.0;
+  constexpr double encoding_origin_y = 4141000.0;
   const auto& init_path_point = trajectory.front().path_point();
   const auto& last_path_point = trajectory.back().path_point();
 
-  const std::string init_point_x_encoding =
-      std::to_string(static_cast<int>(init_path_point.x() * 1000.0));
-  const std::string init_point_y_encoding =
-      std::to_string(static_cast<int>(init_path_point.y() * 1000.0));
+  const std::string init_point_x_encoding = std::to_string(
+      static_cast<int>((init_path_point.x() - encoding_origin_x) * 1000.0));
+  const std::string init_point_y_encoding = std::to_string(
+      static_cast<int>((init_path_point.y() - encoding_origin_y) * 1000.0));
   const std::string init_point_heading_encoding =
       std::to_string(static_cast<int>(init_path_point.theta() * 10000.0));
-  const std::string last_point_x_encoding =
-      std::to_string(static_cast<int>(last_path_point.x() * 1000.0));
-  const std::string last_point_y_encoding =
-      std::to_string(static_cast<int>(last_path_point.y() * 1000.0));
+  const std::string last_point_x_encoding = std::to_string(
+      static_cast<int>((last_path_point.x() - encoding_origin_y) * 1000.0));
+  const std::string last_point_y_encoding = std::to_string(
+      static_cast<int>((last_path_point.y() - encoding_origin_y) * 1000.0));
   const std::string last_point_heading_encoding =
       std::to_string(static_cast<int>(last_path_point.theta() * 10000.0));
 
@@ -313,11 +316,13 @@ bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
   if (index_history_length <= 1) {
     return false;
   }
+
   for (size_t i = 0; i < index_history_length - 1; ++i) {
     if (index_history[i] == trajectories_encodings[trajectory_index]) {
       return true;
     }
   }
+
   return false;
 }
 
@@ -516,8 +521,8 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
                       pair_comp_>
       failsafe_closest_point_on_trajs;
   for (size_t i = 0; i < trajectories_size; ++i) {
-    size_t trajectory_size = paritioned_trajectories.size();
     const auto& trajectory = paritioned_trajectories.at(i).first;
+    size_t trajectory_size = trajectory.size();
     CHECK_GT(trajectory_size, 0);
     std::priority_queue<std::pair<size_t, double>,
                         std::vector<std::pair<size_t, double>>, comp_>
@@ -551,7 +556,6 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
     }
   }
   if (failsafe_closest_point_on_trajs.empty()) {
-    AERROR << "Fail to find nearest trajectory point to follow";
     return false;
   } else {
     *current_trajectory_index =
