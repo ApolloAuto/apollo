@@ -114,6 +114,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
 
     // backup plan: use piecewise_st_graph
     if (ret != Status::OK()) {
+      speed_data->clear();
       AERROR << "Spline QP speed solver Failed. "
              << "Using finite difference method.";
       QpPiecewiseStGraph piecewise_st_graph(qp_st_speed_config_,
@@ -127,6 +128,7 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
             Name(), ": Failed to search graph with quadratic programming!");
         AERROR << msg;
         RecordDebugInfo(*speed_data, st_graph_data.mutable_st_graph_debug());
+        speed_data->clear();
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
     }
