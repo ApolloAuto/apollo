@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "h265_decoder.h"
+#include "modules/tools/decode_video/h265_decoder.h"
 
 #include <iostream>
 

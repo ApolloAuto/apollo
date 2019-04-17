@@ -14,10 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/tools/decode_video/h265_decoder.h"
+
 #include <iostream>
 #include <memory>
-
-#include "h265_decoder.h"
 
 #include "gflags/gflags.h"
 
@@ -91,9 +91,9 @@ int stream_decoder_process_frame(const uint8_t* indata, const uint32_t insize,
     int jpeg_size = decoder->Process(nullptr, 0, jpeg_buffer, JPEG_BUF_SIZE);
     if (jpeg_size > 0) {
       write_jpg_file(jpeg_buffer, jpeg_size, output_dir, frame_num);
+      std::cout << "frame " << frame_num << ": read from buffer" << std::endl;
       frame_num++;
     }
-    std::cout << "frame " << frame_num << ": read from buffer" << std::endl;
   }
   std::cout << "total frames: " << frame_num << std::endl;
   delete[] jpeg_buffer;
