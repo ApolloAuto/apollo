@@ -16,6 +16,8 @@
 
 #include "modules/planning/common/planning_gflags.h"
 
+#include <limits>
+
 DEFINE_bool(planning_test_mode, false, "Enable planning test mode.");
 
 DEFINE_double(test_duration, -1.0,
@@ -454,6 +456,11 @@ DEFINE_bool(use_dual_variable_warm_start, true,
 DEFINE_bool(use_gear_shift_trajectory, false,
             "allow some time for the vehicle to shift gear");
 
+DEFINE_uint32(open_space_trajectory_stitching_preserved_length,
+              std::numeric_limits<uint32_t>::infinity(),
+              "preserved points number in trajectory stitching for open space "
+              "trajectory");
+
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
@@ -521,3 +528,6 @@ DEFINE_bool(enable_soft_speed_limit, false,
 DEFINE_double(message_latency_threshold, 0.02, "Threshold for message delay");
 DEFINE_bool(enable_lane_change_urgency_checking, false,
             "True to check the urgency of lane changing");
+
+DEFINE_uint32(trajectory_stitching_preserved_length, 20,
+              "preserved points number in trajectory stitching");

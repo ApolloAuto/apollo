@@ -231,6 +231,7 @@ DECLARE_bool(enable_open_space_planner_thread);
 DECLARE_bool(open_space_planner_switchable);
 DECLARE_bool(use_dual_variable_warm_start);
 DECLARE_bool(use_gear_shift_trajectory);
+DECLARE_uint32(open_space_trajectory_stitching_preserved_length);
 
 DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
@@ -270,3 +271,5 @@ DECLARE_bool(enable_soft_speed_limit);
 
 DECLARE_double(message_latency_threshold);
 DECLARE_bool(enable_lane_change_urgency_checking);
+
+DECLARE_uint32(trajectory_stitching_preserved_length);
