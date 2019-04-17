@@ -83,8 +83,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
            << distance_adc_pass_traffic_sign
            << "] traffic_sign_end_s[" << traffic_sign_overlap->end_s << "]";
 
-    return distance_adc_pass_traffic_sign >= kIntersectionPassDist ?
-        true : false;
+    return (distance_adc_pass_traffic_sign >= kIntersectionPassDist);
   }
 
   if (!planning::util::CheckInsidePnCJunction(reference_line_info)) {
