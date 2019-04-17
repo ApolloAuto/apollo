@@ -1,4 +1,3 @@
-
 /******************************************************************************
  * Copyright 2018 The Apollo Authors. All Rights Reserved.
  *
@@ -35,6 +34,7 @@
 #include "modules/planning/scenarios/side_pass/stage_detect_safety.h"
 #include "modules/planning/scenarios/side_pass/stage_generate_path.h"
 #include "modules/planning/scenarios/side_pass/stage_pass_obstacle.h"
+#include "modules/planning/scenarios/side_pass/stage_side_pass.h"
 #include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
 
 namespace apollo {
@@ -55,6 +55,11 @@ constexpr double kSidePassMaxDistance = 10.0;
 
 void SidePassScenario::RegisterStages() {
   s_stage_factory_.Clear();
+  s_stage_factory_.Register(
+      ScenarioConfig::SIDE_PASS_DEFAULT_STAGE,
+      [](const ScenarioConfig::StageConfig& config) -> Stage* {
+        return new StageSidePass(config);
+      });
   s_stage_factory_.Register(
       ScenarioConfig::SIDE_PASS_APPROACH_OBSTACLE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
