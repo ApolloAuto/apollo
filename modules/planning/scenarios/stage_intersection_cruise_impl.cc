@@ -18,13 +18,12 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/stage_intersection_cruise.h"
+#include "modules/planning/scenarios/stage_intersection_cruise_impl.h"
 
 #include <string>
 
 #include "cyber/common/log.h"
 #include "modules/map/pnc_map/path.h"
-#include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
@@ -33,27 +32,18 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
-using common::TrajectoryPoint;
-using hdmap::PathOverlap;
-
-Stage::StageStatus StageIntersectionCruise::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
-  ADEBUG << "scenario[" << ScenarioConfig::ScenarioType_Name(scenario_type_)
-         << "] stage: IntersectionCruise";
-  CHECK_NOTNULL(frame);
-
-  bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "StageIntersectionCruise plan error";
-  }
-
-  const auto& reference_line_info = frame->reference_line_info().front();
+bool StageIntersectionCruiseImpl::CheckDone(
+    const Frame& frame,
+    const ScenarioConfig::ScenarioType& scenario_type,
+    const ScenarioConfig::StageConfig& config,
+    const bool right_of_way_status) {
+  const auto& reference_line_info = frame.reference_line_info().front();
 
   // TODO(all): remove when pnc_junction completely available on map
   // get traffic sign overlap along reference line
-  PathOverlap* traffic_sign_overlap = nullptr;
-  if (scenario_type_ == ScenarioConfig::STOP_SIGN_PROTECTED ||
-      scenario_type_ == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
+  hdmap::PathOverlap* traffic_sign_overlap = nullptr;
+  if (scenario_type == ScenarioConfig::STOP_SIGN_PROTECTED ||
+      scenario_type == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
     const auto& stop_sign_status =
         PlanningContext::Planningstatus().stop_sign();
     const std::string traffic_sign_overlap_id =
@@ -62,9 +52,9 @@ Stage::StageStatus StageIntersectionCruise::Process(
         reference_line_info,
         traffic_sign_overlap_id,
         ReferenceLineInfo::STOP_SIGN);
-  } else if (scenario_type_ == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED ||
-      scenario_type_ == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN ||
-      scenario_type_ == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
+  } else if (scenario_type == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED ||
+      scenario_type == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN ||
+      scenario_type == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
     const auto& traffic_light_status =
         PlanningContext::Planningstatus().traffic_light();
     const std::string traffic_sign_overlap_id =
@@ -76,12 +66,12 @@ Stage::StageStatus StageIntersectionCruise::Process(
         ReferenceLineInfo::SIGNAL);
   }
   if (!traffic_sign_overlap) {
-    return FinishScenario();
+    return true;
   }
 
   // set right_of_way_status
   reference_line_info.SetJunctionRightOfWay(traffic_sign_overlap->start_s,
-                                            right_of_way_status_);
+                                            right_of_way_status);
 
   // check pass pnc_junction
   // TODO(all): remove when pnc_junction completely available on map
@@ -98,22 +88,15 @@ Stage::StageStatus StageIntersectionCruise::Process(
            << distance_adc_pass_traffic_sign
            << "] traffic_sign_end_s[" << traffic_sign_overlap->end_s << "]";
 
-    if (distance_adc_pass_traffic_sign >= kIntersectionPassDist) {
-      return FinishStage();
-    } else {
-      return Stage::RUNNING;
-    }
+    return distance_adc_pass_traffic_sign >= kIntersectionPassDist ?
+        true : false;
   }
 
   if (!planning::util::CheckInsidePnCJunction(reference_line_info)) {
-    return FinishStage();
+    return true;
   }
 
-  return Stage::RUNNING;
-}
-
-Stage::StageStatus StageIntersectionCruise::FinishStage() {
-  return FinishScenario();
+  return false;
 }
 
 }  // namespace scenario
