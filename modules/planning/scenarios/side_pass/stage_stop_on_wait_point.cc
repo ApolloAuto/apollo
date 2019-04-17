@@ -135,8 +135,10 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
     return Stage::RUNNING;
   }
 
+  // TODO(yifei) clean the code below
   // Proceed to the proper wait point, and stop there.
   //  1. call proceed with cautious
+  /*
   constexpr double kSidePassCreepSpeed = 2.33;  // m/s
   auto& rfl_info = frame->mutable_reference_line_info()->front();
   *(rfl_info.mutable_speed_data()) =
@@ -146,7 +148,9 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
   for (const auto& sd : *rfl_info.mutable_speed_data()) {
     ADEBUG << sd.ShortDebugString();
   }
+  */
   //  2. Combine path and speed.
+  /*
   *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
   rfl_info.set_trajectory_type(ADCTrajectory::NORMAL);
   DiscretizedTrajectory trajectory;
@@ -158,6 +162,16 @@ Stage::StageStatus StageStopOnWaitPoint::Process(
   }
   rfl_info.SetTrajectory(trajectory);
   rfl_info.SetDrivable(true);
+  */
+
+  auto& rfl_info = frame->mutable_reference_line_info()->front();
+  *(rfl_info.mutable_path_data()) = GetContext()->path_data_;
+  bool plan_ok = ExecuteTaskOnReferenceLine(planning_start_point, frame);
+  if (!plan_ok) {
+    AERROR << "Stage " << Name() << " error: "
+           << "planning on reference line failed.";
+    return Stage::ERROR;
+  }
 
   // If it arrives at the wait point, switch to SIDE_PASS_DETECT_SAFETY.
   constexpr double kBuffer = 0.3;
