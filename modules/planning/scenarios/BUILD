@@ -24,11 +24,9 @@ cc_library(
     name = "stage",
     srcs = [
         "stage.cc",
-        "stage_intersection_cruise.cc",
     ],
     hdrs = [
         "stage.h",
-        "stage_intersection_cruise.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
@@ -37,6 +35,23 @@ cc_library(
         "//modules/planning/common/util:util_lib",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks:task_factory",
+    ],
+)
+
+cc_library(
+    name = "stage_intersection_cruise_impl",
+    srcs = [
+        "stage_intersection_cruise_impl.cc",
+    ],
+    hdrs = [
+        "stage_intersection_cruise_impl.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        "//modules/common",
+        "//modules/planning/common:planning_common",
+        "//modules/planning/common/util:util_lib",
+        "//modules/planning/scenarios/util:scenario_util_lib",
     ],
 )
 
