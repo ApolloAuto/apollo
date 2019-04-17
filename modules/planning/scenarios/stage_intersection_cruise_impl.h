@@ -20,33 +20,20 @@
 
 #pragma once
 
-#include "modules/planning/scenarios/stage.h"
+#include "modules/planning/proto/planning_config.pb.h"
+
+#include "modules/planning/common/frame.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 
-class StageIntersectionCruise : public Stage {
+class StageIntersectionCruiseImpl {
  public:
-  explicit StageIntersectionCruise(
-      const ScenarioConfig::StageConfig& config,
-      const ScenarioConfig::ScenarioType& scenario_type,
-      const bool right_of_way_status)
-      : Stage(config),
-        scenario_type_(scenario_type),
-        right_of_way_status_(right_of_way_status) {}
-
- private:
-  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
-                             Frame* frame) override;
-
- private:
-  Stage::StageStatus FinishStage();
-
- private:
-  ScenarioStopSignUnprotectedConfig scenario_config_;
-  ScenarioConfig::ScenarioType scenario_type_;
-  bool right_of_way_status_;
+  bool CheckDone(const Frame& frame,
+                 const ScenarioConfig::ScenarioType& scenario_type,
+                 const ScenarioConfig::StageConfig& config,
+                 const bool right_of_way_status);
 };
 
 }  // namespace scenario
