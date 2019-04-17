@@ -48,7 +48,8 @@ bool OpenSpaceFallbackDecider::QuardraticFormulaLowerSolution(const double a,
     return false;
   }
 
-  *sol = (-b + std::sqrt(tmp)) / (2.0 * a);
+  *sol = std::min((-b + std::sqrt(tmp)) / (2.0 * a),
+                  (-b - std::sqrt(tmp)) / (2.0 * a));
   return true;
 }
 
@@ -94,6 +95,11 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
                               fallback_start_point.v() /
                               (2.0 * (relative_collision_distance + 1e-6));
     const double v0 = fallback_start_point.v();
+
+    for (size_t i = 0; i < current_idx; ++i) {
+      ptr_fallback_trajectory_pair->first[i].set_v(fallback_start_point.v());
+      ptr_fallback_trajectory_pair->first[i].set_a(fallback_start_point.a());
+    }
 
     for (size_t i = current_idx; i < temp_horizon; ++i) {
       double temp_relative_time = 0.0;
