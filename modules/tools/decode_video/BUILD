@@ -23,8 +23,9 @@ cc_library(
     ],
     linkstatic = True,
     deps = [
-        "@ffmpeg",
+        "//cyber/common:log",
         "//external:gflags",
+        "@ffmpeg",
     ],
 )
 
