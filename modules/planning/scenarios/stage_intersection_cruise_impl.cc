@@ -69,15 +69,10 @@ bool StageIntersectionCruiseImpl::CheckDone(
     return true;
   }
 
-  // set right_of_way_status
-  reference_line_info.SetJunctionRightOfWay(traffic_sign_overlap->start_s,
-                                            right_of_way_status);
-
-  // check pass pnc_junction
-  // TODO(all): remove when pnc_junction completely available on map
   const auto& pnc_junction_overlaps =
       reference_line_info.reference_line().map_path().pnc_junction_overlaps();
   if (pnc_junction_overlaps.empty()) {
+    // TODO(all): remove when pnc_junction completely available on map
     // pnc_junction not exist on map, use current traffic_sign's end_s
     constexpr double kIntersectionPassDist = 20.0;  // unit: m
     const double adc_back_edge_s =
@@ -95,6 +90,10 @@ bool StageIntersectionCruiseImpl::CheckDone(
   if (!planning::util::CheckInsidePnCJunction(reference_line_info)) {
     return true;
   }
+
+  // set right_of_way_status
+  reference_line_info.SetJunctionRightOfWay(traffic_sign_overlap->start_s,
+                                            right_of_way_status);
 
   return false;
 }
