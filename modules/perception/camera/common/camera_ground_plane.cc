@@ -230,7 +230,7 @@ bool CameraGroundPlaneDetector::DetetGround(float pitch, float camera_height,
     ground_is_valid_ = true;
     return true;
   }
-  bool success = false;
+
   float inlier_ratio = 0.0f;
   std::vector<float> ph(2, 0);
   if (CameraGroundPlaneDetector::DetectGroundFromSamples(vd, count_vd,
@@ -239,22 +239,18 @@ bool CameraGroundPlaneDetector::DetetGround(float pitch, float camera_height,
     ground3.assign(l_, l_ + 3);
     GetGroundPlanePitchHeight(baseline_, k_mat, ground3, &ph[0], &ph[1]);
     ADEBUG << "ph: " << ph[0] << ", " << ph[1];
-    success = fabs(ph[0]) < params_.max_tilt_angle &&
-              ph[1] < params_.max_camera_ground_height;
-    if (success) {
+    if (fabs(ph[0]) < params_.max_tilt_angle &&
+        ph[1] < params_.max_camera_ground_height) {
       ground_plane_tracker_->Push(ph, inlier_ratio);
       ground_plane_tracker_->GetGround(&ph[0], &ph[1]);
       GetGround3FromPitchHeight(k_mat, baseline_, ph[0], ph[1], &ground3);
       FillGroundModel(ground3);
       ADEBUG << "l tracked: " << l_[0] << ", " << l_[1] << ", " << l_[2];
       ADEBUG << "ph tracked: " << ph[0] << ", " << ph[1];
+      ADEBUG << "Succeed with inlier ratio: " << inlier_ratio;
+      ground_is_valid_ = true;
+      return true;
     }
-  }
-
-  if (success) {
-    ADEBUG << "succeed with inlier ratio: " << inlier_ratio;
-    ground_is_valid_ = true;
-    return true;
   }
 
   // Backup using last successful frame or given pitch & height
