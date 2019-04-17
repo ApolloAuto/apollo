@@ -205,10 +205,10 @@ double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
   // evaluate cost on the trajectory and add current cost
   double piecewise_cost = 0.0;
   if (next_node->GetDirec()) {
-    piecewise_cost += static_cast<double>(next_node->GetSize() - 1) *
+    piecewise_cost += static_cast<double>(next_node->GetStepSize() - 1) *
                       step_size_ * traj_forward_penalty_;
   } else {
-    piecewise_cost += static_cast<double>(next_node->GetSize() - 1) *
+    piecewise_cost += static_cast<double>(next_node->GetStepSize() - 1) *
                       step_size_ * traj_back_penalty_;
   }
   if (current_node->GetDirec() != next_node->GetDirec()) {
