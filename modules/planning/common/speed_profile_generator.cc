@@ -142,7 +142,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   // Start a PathTimeQpProblem
   std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
   path_time_qp->InitProblem(num_of_knots, delta_t, w,
-      FLAGS_longitudinal_jerk_bound, init_s, end_s);
+                            FLAGS_longitudinal_jerk_bound, init_s, end_s);
 
   path_time_qp->SetZeroOrderBounds(0.0, 100.0);
   path_time_qp->SetFirstOrderBounds(0.0, FLAGS_planning_upper_speed_limit);

@@ -40,7 +40,8 @@ PyObject* cyber_new_PyTime(PyObject* self, PyObject* args) {
   }
 
   apollo::cyber::PyTime* pytime = new apollo::cyber::PyTime(nanoseconds);
-  PyObject* pyobj_time = PyCapsule_New(pytime, "apollo_cybertron_pytime", NULL);
+  PyObject* pyobj_time =
+      PyCapsule_New(pytime, "apollo_cybertron_pytime", nullptr);
   return pyobj_time;
 }
 
@@ -141,7 +142,7 @@ PyObject* cyber_new_PyDuration(PyObject* self, PyObject* args) {
   apollo::cyber::PyDuration* pyduration =
       new apollo::cyber::PyDuration(nanoseconds);
   PyObject* pyobj_duration =
-      PyCapsule_New(pyduration, "apollo_cybertron_pyduration", NULL);
+      PyCapsule_New(pyduration, "apollo_cybertron_pyduration", nullptr);
   return pyobj_duration;
 }
 
@@ -189,7 +190,8 @@ PyObject* cyber_new_PyRate(PyObject* self, PyObject* args) {
   }
 
   apollo::cyber::PyRate* pyrate = new apollo::cyber::PyRate(nanoseconds);
-  PyObject* pyobj_rate = PyCapsule_New(pyrate, "apollo_cybertron_pyrate", NULL);
+  PyObject* pyobj_rate =
+      PyCapsule_New(pyrate, "apollo_cybertron_pyrate", nullptr);
   return pyobj_rate;
 }
 

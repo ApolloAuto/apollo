@@ -53,7 +53,8 @@ PyObject *cyber_new_PyWriter(PyObject *self, PyObject *args) {
   apollo::cyber::PyWriter *writer = new apollo::cyber::PyWriter(
       (std::string const &)*channel_name, (std::string const &)*data_type,
       qos_depth, node);
-  PyObject *pyobj_writer = PyCapsule_New(writer, "apollo_cyber_pywriter", NULL);
+  PyObject *pyobj_writer =
+      PyCapsule_New(writer, "apollo_cyber_pywriter", nullptr);
   return pyobj_writer;
 }
 
@@ -116,7 +117,8 @@ PyObject *cyber_new_PyReader(PyObject *self, PyObject *args) {
   apollo::cyber::PyReader *reader =
       new apollo::cyber::PyReader((std::string const &)*channel_name,
                                   (std::string const &)*data_type, node);
-  PyObject *pyobj_reader = PyCapsule_New(reader, "apollo_cyber_pyreader", NULL);
+  PyObject *pyobj_reader =
+      PyCapsule_New(reader, "apollo_cyber_pyreader", nullptr);
   return pyobj_reader;
 }
 
@@ -206,7 +208,8 @@ PyObject *cyber_new_PyClient(PyObject *self, PyObject *args) {
   apollo::cyber::PyClient *client =
       new apollo::cyber::PyClient((std::string const &)*channel_name,
                                   (std::string const &)*data_type, node);
-  PyObject *pyobj_client = PyCapsule_New(client, "apollo_cyber_pyclient", NULL);
+  PyObject *pyobj_client =
+      PyCapsule_New(client, "apollo_cyber_pyclient", nullptr);
   return pyobj_client;
 }
 
@@ -272,7 +275,7 @@ PyObject *cyber_new_PyService(PyObject *self, PyObject *args) {
       new apollo::cyber::PyService((std::string const &)*channel_name,
                                    (std::string const &)*data_type, node);
   PyObject *pyobj_service =
-      PyCapsule_New(service, "apollo_cyber_pyservice", NULL);
+      PyCapsule_New(service, "apollo_cyber_pyservice", nullptr);
   return pyobj_service;
 }
 
@@ -363,7 +366,7 @@ PyObject *cyber_new_PyNode(PyObject *self, PyObject *args) {
 
   apollo::cyber::PyNode *node =
       new apollo::cyber::PyNode((std::string const &)node_name);
-  PyObject *pyobj_node = PyCapsule_New(node, "apollo_cyber_pynode", NULL);
+  PyObject *pyobj_node = PyCapsule_New(node, "apollo_cyber_pynode", nullptr);
   return pyobj_node;
 }
 
@@ -408,7 +411,8 @@ PyObject *cyber_PyNode_create_writer(PyObject *self, PyObject *args) {
     AERROR << "cyber_PyNode_create_writer:writer is null!";
     return Py_None;
   }
-  PyObject *pyobj_writer = PyCapsule_New(writer, "apollo_cyber_pywriter", NULL);
+  PyObject *pyobj_writer =
+      PyCapsule_New(writer, "apollo_cyber_pywriter", nullptr);
   return pyobj_writer;
 }
 
@@ -434,7 +438,8 @@ PyObject *cyber_PyNode_create_reader(PyObject *self, PyObject *args) {
       (apollo::cyber::PyReader *)(node->create_reader(
           (std::string const &)channel_name, (std::string const &)type_name));
 
-  PyObject *pyobj_reader = PyCapsule_New(reader, "apollo_cyber_pyreader", NULL);
+  PyObject *pyobj_reader =
+      PyCapsule_New(reader, "apollo_cyber_pyreader", nullptr);
   return pyobj_reader;
 }
 
@@ -459,7 +464,8 @@ PyObject *cyber_PyNode_create_client(PyObject *self, PyObject *args) {
   apollo::cyber::PyClient *client =
       (apollo::cyber::PyClient *)(node->create_client(
           (std::string const &)channel_name, (std::string const &)type_name));
-  PyObject *pyobj_client = PyCapsule_New(client, "apollo_cyber_pyclient", NULL);
+  PyObject *pyobj_client =
+      PyCapsule_New(client, "apollo_cyber_pyclient", nullptr);
 
   return pyobj_client;
 }
@@ -487,7 +493,7 @@ PyObject *cyber_PyNode_create_service(PyObject *self, PyObject *args) {
       (apollo::cyber::PyService *)(node->create_service(
           (std::string const &)channel_name, (std::string const &)type_name));
   PyObject *pyobj_service =
-      PyCapsule_New(service, "apollo_cyber_pyservice", NULL);
+      PyCapsule_New(service, "apollo_cyber_pyservice", nullptr);
   return pyobj_service;
 }
 
@@ -578,7 +584,7 @@ PyObject *cyber_test1(PyObject *self, PyObject *args) {
 
   student *stu = cyber_student();
   // ptr->pyobj
-  PyObject *py_stu = PyCapsule_New(stu, "student", NULL);
+  PyObject *py_stu = PyCapsule_New(stu, "student", nullptr);
   AINFO << "capsule name->" << PyCapsule_GetName(py_stu);
 
   AINFO << "===========================";
@@ -586,7 +592,7 @@ PyObject *cyber_test1(PyObject *self, PyObject *args) {
   std::vector<std::string> *strPtrV = new std::vector<std::string>;
   strPtrV->push_back("ywf");
   strPtrV->push_back("lj");
-  PyObject *py_stu1 = PyCapsule_New(strPtrV, "studentptr", NULL);
+  PyObject *py_stu1 = PyCapsule_New(strPtrV, "studentptr", nullptr);
   AINFO << "capsule name->" << PyCapsule_GetName(py_stu1);
 
   std::vector<std::string> *stu1_ptr =

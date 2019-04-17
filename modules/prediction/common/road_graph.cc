@@ -32,8 +32,7 @@ using apollo::hdmap::LaneInfo;
 
 // Custom helper functions for sorting purpose.
 bool HeadingIsAtLeft(const std::vector<double>& heading1,
-                     const std::vector<double>& heading2,
-                     const size_t idx) {
+                     const std::vector<double>& heading2, const size_t idx) {
   if (idx >= heading1.size() || idx >= heading2.size()) {
     return true;
   }
