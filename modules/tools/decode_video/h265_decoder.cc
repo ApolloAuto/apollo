@@ -18,6 +18,8 @@
 
 #include <iostream>
 
+#include "cyber/common/log.h"
+
 // Using to-be-deprecated avcodec_decode_video2 for now until its replacement
 // gets stable
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -26,31 +28,31 @@ bool H265Decoder::Init() {
   avcodec_register_all();
   codec_h265_ = avcodec_find_decoder(AV_CODEC_ID_H265);
   if (codec_h265_ == nullptr) {
-    std::cerr << "error: codec not found" << std::endl;
+    AERROR << "error: codec not found";
     return false;
   }
   codec_ctx_h265_ = avcodec_alloc_context3(codec_h265_);
   if (codec_ctx_h265_ == nullptr) {
-    std::cerr << "error: codec context alloc fail" << std::endl;
+    AERROR << "error: codec context alloc fail";
     return false;
   }
   if (avcodec_open2(codec_ctx_h265_, codec_h265_, nullptr) < 0) {
-    std::cerr << "error: could not open codec" << std::endl;
+    AERROR << "error: could not open codec";
     return false;
   }
   yuv_frame_ = av_frame_alloc();
   if (yuv_frame_ == nullptr) {
-    std::cerr << "error: could not alloc yuv frame" << std::endl;
+    AERROR << "error: could not alloc yuv frame";
     return false;
   }
   codec_jpeg_ = avcodec_find_encoder(AV_CODEC_ID_MJPEG);
   if (codec_jpeg_ == nullptr) {
-    std::cerr << "error: jpeg Codec not found" << std::endl;
+    AERROR << "error: jpeg Codec not found";
     return false;
   }
   codec_ctx_jpeg_ = avcodec_alloc_context3(codec_jpeg_);
   if (codec_ctx_jpeg_ == nullptr) {
-    std::cerr << "error: jpeg ctx allco fail" << std::endl;
+    AERROR << "error: jpeg ctx allco fail";
     return false;
   }
   // Put sample parameters and open it
@@ -62,7 +64,7 @@ bool H265Decoder::Init() {
   codec_ctx_jpeg_->time_base = (AVRational){1, 15};
   codec_ctx_jpeg_->pix_fmt = AV_PIX_FMT_YUVJ422P;
   if (avcodec_open2(codec_ctx_jpeg_, codec_jpeg_, nullptr) < 0) {
-    std::cerr << "error: could not open jpeg context" << std::endl;
+    AERROR << "error: could not open jpeg context";
     return false;
   }
   return true;
@@ -98,29 +100,28 @@ int H265Decoder::Process(const char* indata, const int32_t insize,
   int ret =
       avcodec_decode_video2(codec_ctx_h265_, yuv_frame_, &got_picture, &apt);
   if (ret < 0) {
-    std::cerr << "error: decode failed: input_framesize = " << apt.size
-              << std::endl;
+    AERROR << "error: decode failed: input_framesize = " << apt.size;
     return ret;
   }
   if (!got_picture) {
     // Not an error, but just did not read pictures out
-    std::cout << "warn: failed to get yuv picture" << std::endl;
+    AWARN << "warn: failed to get yuv picture";
     return 0;
   }
   av_packet_unref(&apt);
   got_picture = 0;
   ret = avcodec_encode_video2(codec_ctx_jpeg_, &apt, yuv_frame_, &got_picture);
   if (ret < 0) {
-    std::cerr << "error: jpeg encode failed" << std::endl;
+    AERROR << "error: jpeg encode failed";
     return ret;
   }
   if (!got_picture) {
-    std::cerr << "error: failed to get jpeg picture" << std::endl;
+    AERROR << "error: failed to get jpeg picture";
     return -1;
   }
   if (apt.size > outsize) {
-    std::cerr << "error: output buffer is two small, alloc/framesize "
-              << outsize << "/" << apt.size << std::endl;
+    AERROR << "error: output buffer is two small, alloc/framesize " << outsize
+           << "/" << apt.size;
     return -1;
   }
   memcpy(outdata, apt.data, apt.size);
