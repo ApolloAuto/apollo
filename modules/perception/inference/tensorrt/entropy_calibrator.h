@@ -34,7 +34,7 @@ class ICaffePoolOutputDimensionsFormula : public IOutputDimensionsFormula {
  public:
   virtual DimsHW compute(DimsHW input_dims, DimsHW kernel_size, DimsHW stride,
                          DimsHW padding, DimsHW dilation,
-                         const char *layerName) {
+                         const char *layerName) const {
     const int kernel_extent_h = dilation.d[0] * (kernel_size.d[0] - 1) + 1;
     const int kernel_extent_w = dilation.d[1] * (kernel_size.d[1] - 1) + 1;
     auto &&h_temp = (input_dims.d[0] + 2 * padding.d[0] - kernel_extent_h) *
