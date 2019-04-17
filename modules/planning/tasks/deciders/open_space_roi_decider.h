@@ -89,6 +89,8 @@ class OpenSpaceRoiDecider : public Decider {
       const std::vector<std::vector<common::math::Vec2d>> &roi_parking_boundary,
       Frame *const frame);
 
+  bool FilterOutObstacle(const Frame &frame, const Obstacle &obstacle);
+
   // @brief Transform the vertice presentation of the obstacles into linear
   // inequality as Ax>b
   bool LoadObstacleInHyperPlanes(Frame *const frame);
