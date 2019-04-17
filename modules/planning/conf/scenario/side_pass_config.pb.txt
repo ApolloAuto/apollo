@@ -157,8 +157,6 @@ stage_config: {
 stage_config: {
   stage_type: SIDE_PASS_STOP_ON_WAITPOINT
   enabled: true
-  task_type: DP_POLY_PATH_OPTIMIZER
-  task_type: PATH_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
