@@ -76,6 +76,17 @@ Status QpSplineStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   }
   StGraphData& st_graph_data = *reference_line_info_->mutable_st_graph_data();
 
+  constexpr double kBounadryEpsilon = 1e-2;
+  for (auto boundary : st_graph_data.st_boundaries()) {
+    if (boundary->IsPointInBoundary({0.0, 0.0}) ||
+        (std::fabs(boundary->min_t()) < kBounadryEpsilon &&
+         std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
+      speed_data->clear();
+      const std::string msg = "Collision found in QpSplineStSpeedOptimizer!";
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+    }
+  }
+
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
