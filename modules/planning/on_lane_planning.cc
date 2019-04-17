@@ -770,6 +770,22 @@ void OnLanePlanning::AddPartitionedTrajectory(
     (*partition_properties)["showLine"] = "true";
   }
 
+  // Draw trajectory stitching point (line with only one point)
+  auto* stitching_line = chart->add_line();
+  stitching_line->set_label("TrajectoryStitchingPoint");
+  auto* trajectory_stitching_point = stitching_line->add_point();
+  trajectory_stitching_point->set_x(
+      open_space_debug.trajectory_stitching_point().path_point().x());
+  trajectory_stitching_point->set_y(
+      open_space_debug.trajectory_stitching_point().path_point().y());
+  // Set chartJS's dataset properties
+  auto* stitching_properties = stitching_line->mutable_properties();
+  (*stitching_properties)["borderWidth"] = "3";
+  (*stitching_properties)["pointRadius"] = "5";
+  (*stitching_properties)["lineTension"] = "0";
+  (*stitching_properties)["fill"] = "true";
+  (*stitching_properties)["showLine"] = "true";
+
   // Draw fallback trajectory compared with the partitioned
   if (open_space_debug.is_fallback_trajectory()) {
     const auto& fallback_trajectories =
