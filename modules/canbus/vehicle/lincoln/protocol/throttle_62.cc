@@ -29,7 +29,7 @@ using ::apollo::drivers::canbus::Byte;
 const int32_t Throttle62::ID = 0x62;
 
 uint32_t Throttle62::GetPeriod() const {
-  static const uint32_t PERIOD = 10 * 1000;
+  static const uint32_t PERIOD = 20 * 1000;
   return PERIOD;
 }
 

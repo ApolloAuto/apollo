@@ -29,7 +29,7 @@ class Brake60Test : public ::testing::Test {
 
 TEST_F(Brake60Test, simple) {
   Brake60 brake;
-  EXPECT_EQ(brake.GetPeriod(), 10 * 1000);
+  EXPECT_EQ(brake.GetPeriod(), 20 * 1000);
   uint8_t data[8] = {0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68};
   brake.UpdateData(data);
   EXPECT_EQ(data[0], 0b00000000);
