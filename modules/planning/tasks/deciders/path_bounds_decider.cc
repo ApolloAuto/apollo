@@ -53,14 +53,6 @@ using ObstacleEdge = std::tuple<int, double, double, double, std::string>;
 using LaneType = ReferenceLineInfo::LaneType;
 }  // namespace
 
-constexpr double kPathBoundsDeciderHorizon = 100.0;
-constexpr double kPathBoundsDeciderResolution = 0.5;
-constexpr double kDefaultLaneWidth = 5.0;
-constexpr double kDefaultRoadWidth = 20.0;
-constexpr double kObstacleStartSBuffer = 4.0;
-constexpr double kObstacleEndSBuffer = 2.0;
-constexpr double kObstacleLBuffer = 0.4;
-
 PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
     : Decider(config) {}
 
@@ -157,6 +149,9 @@ Status PathBoundsDecider::Process(
         blocking_obstacle_id);
   }
 
+  // Remove redundant boundaries
+  RemoveRedundantPathBoundaries(&candidate_path_boundaries);
+
   // Success
   reference_line_info->SetCandidatePathBoundaries(candidate_path_boundaries);
   ADEBUG << "Completed regular and fallback path boundaries generation.";
@@ -222,6 +217,7 @@ std::string PathBoundsDecider::GenerateRegularPathBound(
   // PathBoundsDebugString(*path_bound);
 
   // 3. Fine-tune the boundary based on static obstacles
+  PathBound temp_path_bound = *path_bound;
   if (!GetBoundaryFromStaticObstacles(reference_line_info.path_decision(),
                                       path_bound, blocking_obstacle_id)) {
     const std::string msg =
@@ -229,6 +225,14 @@ std::string PathBoundsDecider::GenerateRegularPathBound(
         "taking into consideration all static obstacles.";
     AERROR << msg;
     return msg;
+  }
+  // Append some extra path bound points to avoid zero-length path data.
+  int counter = 0;
+  while (!blocking_obstacle_id->empty() &&
+         path_bound->size() < temp_path_bound.size() &&
+         counter < kNumExtraTailBoundPoint) {
+    path_bound->push_back(temp_path_bound[path_bound->size()]);
+    counter ++;
   }
   // PathBoundsDebugString(*path_bound);
 
@@ -264,6 +268,12 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 
   ADEBUG << "Completed generating fallback path boundaries.";
   return "";
+}
+
+void PathBoundsDecider::RemoveRedundantPathBoundaries(
+    std::vector<PathBoundary>* const candidate_path_boundaries) {
+  // TODO(jiacheng): implement this.
+  return;
 }
 
 bool PathBoundsDecider::InitPathBoundary(const ReferenceLine& reference_line,
