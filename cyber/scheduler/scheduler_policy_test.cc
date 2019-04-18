@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 #include <gtest/gtest.h>
-
+#include <algorithm>
 #include "cyber/base/for_each.h"
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
@@ -114,6 +114,42 @@ TEST(SchedulerPolicyTest, sched_classic) {
   cr3->set_name("sched3");
   EXPECT_TRUE(sched3->DispatchTask(cr3));
   sched3->Shutdown();
+}
+
+TEST(SchedulerPolicyTest, sched_choreo) {
+  Scheduler* sched = new SchedulerChoreography();
+  std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
+  cr->set_id(GlobalData::RegisterTaskName("sched_choreo"));
+  cr->set_name("sched_choreo");
+  EXPECT_TRUE(sched->DispatchTask(cr));
+
+  std::shared_ptr<CRoutine> cr1 = std::make_shared<CRoutine>(func);
+  cr1->set_id(GlobalData::RegisterTaskName("sched_choreo1"));
+  cr1->set_name("sched_choreo1");
+  cr1->set_processor_id(0);
+  EXPECT_TRUE(sched->DispatchTask(cr1));
+
+  auto& croutines = ClassicContext::cr_group_[DEFAULT_GROUP_NAME]
+              .at(cr->priority());
+  std::vector<std::string> cr_names;
+  for (auto& croutine : croutines) {
+    cr_names.emplace_back(croutine->name());
+  }
+  auto itr = std::find(cr_names.begin(), cr_names.end(), cr->name());
+  EXPECT_TRUE(itr != cr_names.end());
+
+  itr = std::find(cr_names.begin(), cr_names.end(), cr1->name());
+  EXPECT_TRUE(itr == cr_names.end());
+
+  sched->RemoveTask(cr->name());
+  croutines = ClassicContext::cr_group_[DEFAULT_GROUP_NAME]
+              .at(cr->priority());
+  cr_names.clear();
+  for (auto& croutine : croutines) {
+    cr_names.emplace_back(croutine->name());
+  }
+  itr = std::find(cr_names.begin(), cr_names.end(), cr->name());
+  EXPECT_TRUE(itr == cr_names.end());
 }
 
 }  // namespace scheduler
