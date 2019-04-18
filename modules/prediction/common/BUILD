@@ -202,4 +202,15 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "prediction_thread_pool",
+    hdrs = ["prediction_thread_pool.h"],
+    linkopts = [
+        "-lboost_thread",
+    ],
+    deps = [
+        "//cyber/base:thread_pool",
+    ],
+)
+
 cpplint()
