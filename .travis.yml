@@ -23,6 +23,9 @@ jobs:
       script:
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20190307_1502
         - ./apollo_docker.sh ${JOB}
+      after_failure:
+        - find ${HOME}.cache/bazel/_bazel_${USER}/540135163923dd7d5820f3ee4b306b32/execroot/apollo/bazel-out/local-dbg/testlogs -name *.log | xargs cat
+      script:
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"
     - stage: stage-02
