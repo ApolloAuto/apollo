@@ -324,7 +324,7 @@ class Velodyne16Parser : public VelodyneParser {
   double get_timestamp(double base_time, float time_offset,
                        uint16_t laser_block_id);
   void unpack(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
-  void unpackVLP32C(const velodyne_msgs::VelodynePacket& pkt, VPointCloud &pc);
+  void unpackVLP32C(const velodyne_msgs::VelodynePacket &pkt, VPointCloud &pc);
   // Previous Velodyne packet time stamp. (offset to the top hour)
   double previous_packet_stamp_;
   uint64_t gps_base_usec_;  // full time
