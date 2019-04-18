@@ -65,13 +65,13 @@ class OpenSpaceRoiDecider : public Decider {
   // @brief search target parking spot on the path by vehicle location, if
   // no return a nullptr in target_parking_spot
   void SearchTargetParkingSpotOnPath(
-      std::shared_ptr<hdmap::Path> *nearby_path,
+      const hdmap::Path &nearby_path,
       hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
 
   // @brief if not close enough to parking spot, return false
   bool CheckDistanceToParkingSpot(
-      std::shared_ptr<hdmap::Path> *nearby_path,
-      hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
+      const hdmap::Path &nearby_path,
+      const hdmap::ParkingSpaceInfoConstPtr &target_parking_spot);
 
   // @brief Helper function for fuse line segments into convex vertices set
   bool FuseLineSegments(

@@ -27,6 +27,7 @@ using apollo::common::ErrorCode;
 using apollo::common::Status;
 using apollo::common::math::Box2d;
 using apollo::common::math::CrossProd;
+using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::LaneInfoConstPtr;
@@ -54,7 +55,7 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
   obstacles_by_frame_ = frame->GetObstacleList();
   const auto &routing_request = frame->local_view().routing->routing_request();
 
-  // TODO(Jinyun) support options on creating dead end boundary
+  // TODO(Jinyun): support options on creating dead end boundary
   if (routing_request.has_parking_space() &&
       routing_request.parking_space().has_id()) {
     target_parking_spot_id_ = routing_request.parking_space().id().id();
@@ -163,12 +164,12 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
     Vec2d left_lane_point = Vec2d(point_left_road_width * point_left_vec_cos,
                                   point_left_road_width * point_left_vec_sin);
     left_lane_point = left_lane_point + check_point;
-    right_lane_boundary.emplace_back(right_lane_point);
-    left_lane_boundary.emplace_back(left_lane_point);
-    center_lane_boundary.emplace_back(check_point);
+    right_lane_boundary.push_back(right_lane_point);
+    left_lane_boundary.push_back(left_lane_point);
+    center_lane_boundary.push_back(check_point);
     center_lane_s.push_back(check_point_s);
-    left_lane_road_width.emplace_back(point_left_road_width);
-    right_lane_road_width.emplace_back(point_right_road_width);
+    left_lane_road_width.push_back(point_left_road_width);
+    right_lane_road_width.push_back(point_right_road_width);
     if (check_point_s == end_s) {
       break;
     }
@@ -265,37 +266,37 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
     for (size_t i = 0; i < point_left_to_left_top_connor_index; i++) {
       std::vector<Vec2d> segment{right_lane_boundary[i],
                                  right_lane_boundary[i + 1]};
-      roi_parking_boundary->emplace_back(segment);
+      roi_parking_boundary->push_back(segment);
     }
 
     std::vector<Vec2d> left_stitching_segment{
         right_lane_boundary[point_left_to_left_top_connor_index], left_top};
-    roi_parking_boundary->emplace_back(left_stitching_segment);
+    roi_parking_boundary->push_back(left_stitching_segment);
 
     std::vector<Vec2d> left_parking_spot_segment{left_top, left_down};
     std::vector<Vec2d> down_parking_spot_segment{left_down, right_down};
     std::vector<Vec2d> right_parking_spot_segment{right_down, right_top};
-    roi_parking_boundary->emplace_back(left_parking_spot_segment);
-    roi_parking_boundary->emplace_back(down_parking_spot_segment);
-    roi_parking_boundary->emplace_back(right_parking_spot_segment);
+    roi_parking_boundary->push_back(left_parking_spot_segment);
+    roi_parking_boundary->push_back(down_parking_spot_segment);
+    roi_parking_boundary->push_back(right_parking_spot_segment);
 
     std::vector<Vec2d> right_stitching_segment{
         right_top, right_lane_boundary[point_right_to_right_top_connor_index]};
-    roi_parking_boundary->emplace_back(right_stitching_segment);
+    roi_parking_boundary->push_back(right_stitching_segment);
 
     size_t right_lane_boundary_last_index = right_lane_boundary.size() - 1;
     for (size_t i = point_right_to_right_top_connor_index;
          i < right_lane_boundary_last_index; i++) {
       std::vector<Vec2d> segment{right_lane_boundary[i],
                                  right_lane_boundary[i + 1]};
-      roi_parking_boundary->emplace_back(segment);
+      roi_parking_boundary->push_back(segment);
     }
 
     size_t left_lane_boundary_last_index = left_lane_boundary.size() - 1;
     for (size_t i = left_lane_boundary_last_index; i > 0; i--) {
       std::vector<Vec2d> segment{left_lane_boundary[i],
                                  left_lane_boundary[i - 1]};
-      roi_parking_boundary->emplace_back(segment);
+      roi_parking_boundary->push_back(segment);
     }
 
   } else {
@@ -354,7 +355,7 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
     for (size_t i = 0; i < right_lane_boundary_last_index; i++) {
       std::vector<Vec2d> segment{right_lane_boundary[i],
                                  right_lane_boundary[i + 1]};
-      roi_parking_boundary->emplace_back(segment);
+      roi_parking_boundary->push_back(segment);
     }
 
     size_t left_lane_boundary_last_index = left_lane_boundary.size() - 1;
@@ -362,28 +363,28 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
          i > point_left_to_left_top_connor_index; i--) {
       std::vector<Vec2d> segment{left_lane_boundary[i],
                                  left_lane_boundary[i - 1]};
-      roi_parking_boundary->emplace_back(segment);
+      roi_parking_boundary->push_back(segment);
     }
 
     std::vector<Vec2d> left_stitching_segment{
         left_lane_boundary[point_left_to_left_top_connor_index], left_top};
-    roi_parking_boundary->emplace_back(left_stitching_segment);
+    roi_parking_boundary->push_back(left_stitching_segment);
 
     std::vector<Vec2d> left_parking_spot_segment{left_top, left_down};
     std::vector<Vec2d> down_parking_spot_segment{left_down, right_down};
     std::vector<Vec2d> right_parking_spot_segment{right_down, right_top};
-    roi_parking_boundary->emplace_back(left_parking_spot_segment);
-    roi_parking_boundary->emplace_back(down_parking_spot_segment);
-    roi_parking_boundary->emplace_back(right_parking_spot_segment);
+    roi_parking_boundary->push_back(left_parking_spot_segment);
+    roi_parking_boundary->push_back(down_parking_spot_segment);
+    roi_parking_boundary->push_back(right_parking_spot_segment);
 
     std::vector<Vec2d> right_stitching_segment{
         right_top, left_lane_boundary[point_right_to_right_top_connor_index]};
-    roi_parking_boundary->emplace_back(right_stitching_segment);
+    roi_parking_boundary->push_back(right_stitching_segment);
 
     for (size_t i = point_right_to_right_top_connor_index; i > 0; --i) {
       std::vector<Vec2d> segment{left_lane_boundary[i],
                                  left_lane_boundary[i - 1]};
-      roi_parking_boundary->emplace_back(segment);
+      roi_parking_boundary->push_back(segment);
     }
   }
 
@@ -452,15 +453,15 @@ bool OpenSpaceRoiDecider::GetParkingBoundary(
 
   auto *end_pose =
       frame->mutable_open_space_info()->mutable_open_space_end_pose();
-  end_pose->emplace_back(end_x);
-  end_pose->emplace_back(end_y);
+  end_pose->push_back(end_x);
+  end_pose->push_back(end_y);
   if (config_.open_space_roi_decider_config().parking_inwards()) {
-    end_pose->emplace_back(parking_spot_heading);
+    end_pose->push_back(parking_spot_heading);
   } else {
-    end_pose->emplace_back(
+    end_pose->push_back(
         common::math::NormalizeAngle(parking_spot_heading + M_PI));
   }
-  end_pose->emplace_back(0.0);
+  end_pose->push_back(0.0);
 
   return true;
 }
@@ -516,9 +517,9 @@ bool OpenSpaceRoiDecider::GetParkingSpotFromMap(
       LaneSegment next_lanesegment =
           LaneSegment(next_lane, next_lane->accumulate_s().front(),
                       next_lane->accumulate_s().back());
-      segments_vector.emplace_back(next_lanesegment);
+      segments_vector.push_back(next_lanesegment);
       (*nearby_path).reset(new Path(segments_vector));
-      SearchTargetParkingSpotOnPath(nearby_path, target_parking_spot);
+      SearchTargetParkingSpotOnPath(**nearby_path, target_parking_spot);
       if (*target_parking_spot != nullptr) {
         break;
       }
@@ -526,7 +527,7 @@ bool OpenSpaceRoiDecider::GetParkingSpotFromMap(
   } else {
     segments_vector.push_back(nearest_lanesegment);
     (*nearby_path).reset(new Path(segments_vector));
-    SearchTargetParkingSpotOnPath(nearby_path, target_parking_spot);
+    SearchTargetParkingSpotOnPath(**nearby_path, target_parking_spot);
   }
 
   if (*target_parking_spot == nullptr) {
@@ -535,7 +536,7 @@ bool OpenSpaceRoiDecider::GetParkingSpotFromMap(
     return false;
   }
 
-  if (!CheckDistanceToParkingSpot(nearby_path, target_parking_spot)) {
+  if (!CheckDistanceToParkingSpot(**nearby_path, *target_parking_spot)) {
     AERROR << "target parking spot found, but too far, distance larger than "
               "pre-defined distance";
     return false;
@@ -545,9 +546,9 @@ bool OpenSpaceRoiDecider::GetParkingSpotFromMap(
 }
 
 void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
-    std::shared_ptr<Path> *nearby_path,
+    const hdmap::Path &nearby_path,
     ParkingSpaceInfoConstPtr *target_parking_spot) {
-  const auto &parking_space_overlaps = (*nearby_path)->parking_space_overlaps();
+  const auto &parking_space_overlaps = nearby_path.parking_space_overlaps();
   for (const auto &parking_overlap : parking_space_overlaps) {
     if (parking_overlap.object_id == target_parking_spot_id_) {
       hdmap::Id id;
@@ -558,25 +559,22 @@ void OpenSpaceRoiDecider::SearchTargetParkingSpotOnPath(
 }
 
 bool OpenSpaceRoiDecider::CheckDistanceToParkingSpot(
-    std::shared_ptr<Path> *nearby_path,
-    ParkingSpaceInfoConstPtr *target_parking_spot) {
-  Vec2d left_bottom_point = (*target_parking_spot)->polygon().points().at(0);
-  Vec2d right_bottom_point = (*target_parking_spot)->polygon().points().at(1);
+    const hdmap::Path &nearby_path,
+    const hdmap::ParkingSpaceInfoConstPtr &target_parking_spot) {
+  Vec2d left_bottom_point = target_parking_spot->polygon().points().at(0);
+  Vec2d right_bottom_point = target_parking_spot->polygon().points().at(1);
   double left_bottom_point_s = 0.0;
   double left_bottom_point_l = 0.0;
   double right_bottom_point_s = 0.0;
   double right_bottom_point_l = 0.0;
   double vehicle_point_s = 0.0;
   double vehicle_point_l = 0.0;
-  (*nearby_path)
-      ->GetNearestPoint(left_bottom_point, &left_bottom_point_s,
-                        &left_bottom_point_l);
-  (*nearby_path)
-      ->GetNearestPoint(right_bottom_point, &right_bottom_point_s,
-                        &right_bottom_point_l);
+  nearby_path.GetNearestPoint(left_bottom_point, &left_bottom_point_s,
+                              &left_bottom_point_l);
+  nearby_path.GetNearestPoint(right_bottom_point, &right_bottom_point_s,
+                              &right_bottom_point_l);
   Vec2d vehicle_vec(vehicle_state_.x(), vehicle_state_.y());
-  (*nearby_path)
-      ->GetNearestPoint(vehicle_vec, &vehicle_point_s, &vehicle_point_l);
+  nearby_path.GetNearestPoint(vehicle_vec, &vehicle_point_s, &vehicle_point_l);
   if (std::abs((left_bottom_point_s + right_bottom_point_s) / 2 -
                vehicle_point_s) <
       config_.open_space_roi_decider_config().parking_start_range()) {
@@ -652,7 +650,7 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
   size_t perception_obstacles_num = 0;
 
   for (size_t i = 0; i < parking_boundaries_num; ++i) {
-    obstacles_vertices_vec->emplace_back(roi_parking_boundary[i]);
+    obstacles_vertices_vec->push_back(roi_parking_boundary[i]);
   }
 
   Eigen::MatrixXi parking_boundaries_obstacles_edges_num(parking_boundaries_num,
@@ -680,21 +678,30 @@ bool OpenSpaceRoiDecider::LoadObstacleInVertices(
 
       Box2d original_box = obstacle->PerceptionBoundingBox();
       original_box.Shift(-1.0 * origin_point);
-      // TODO(Runxin): rotate from origin instead
+      original_box.LongitudinalExtend(
+          config_.open_space_roi_decider_config().perception_obstacle_buffer());
+      original_box.LateralExtend(
+          config_.open_space_roi_decider_config().perception_obstacle_buffer());
+
+      // TODO(Jinyun): Check correctness of ExpandByDistance() in polygon
+      // Polygon2d buffered_box(original_box);
+      // buffered_box = buffered_box.ExpandByDistance(
+      //     config_.open_space_roi_decider_config().perception_obstacle_buffer());
+      // TODO(Runxin): Rotate from origin instead
       // original_box.RotateFromCenter(-1.0 * origin_heading);
       std::vector<Vec2d> vertices_ccw = original_box.GetAllCorners();
       std::vector<Vec2d> vertices_cw;
       while (!vertices_ccw.empty()) {
         auto current_corner_pt = vertices_ccw.back();
         current_corner_pt.SelfRotate(-1.0 * origin_heading);
-        vertices_cw.emplace_back(current_corner_pt);
+        vertices_cw.push_back(current_corner_pt);
         vertices_ccw.pop_back();
       }
       // As the perception obstacle is a closed convex set, the first vertice is
       // repeated at the end of the vector to help transform all four edges to
       // inequality constraint
       vertices_cw.push_back(vertices_cw.front());
-      obstacles_vertices_vec->emplace_back(vertices_cw);
+      obstacles_vertices_vec->push_back(vertices_cw);
     }
 
     // obstacle boundary box is used, thus the edges are set to be 4
