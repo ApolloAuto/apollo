@@ -33,10 +33,8 @@ namespace planning {
 namespace scenario {
 
 bool StageIntersectionCruiseImpl::CheckDone(
-    const Frame& frame,
-    const ScenarioConfig::ScenarioType& scenario_type,
-    const ScenarioConfig::StageConfig& config,
-    const bool right_of_way_status) {
+    const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type,
+    const ScenarioConfig::StageConfig& config, const bool right_of_way_status) {
   const auto& reference_line_info = frame.reference_line_info().front();
 
   // TODO(all): remove when pnc_junction completely available on map
@@ -49,20 +47,21 @@ bool StageIntersectionCruiseImpl::CheckDone(
     const std::string traffic_sign_overlap_id =
         stop_sign_status.current_stop_sign_overlap_id();
     traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
-        reference_line_info,
-        traffic_sign_overlap_id,
+        reference_line_info, traffic_sign_overlap_id,
         ReferenceLineInfo::STOP_SIGN);
   } else if (scenario_type == ScenarioConfig::TRAFFIC_LIGHT_PROTECTED ||
-      scenario_type == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN ||
-      scenario_type == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
+             scenario_type ==
+                 ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN ||
+             scenario_type ==
+                 ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
     const auto& traffic_light_status =
         PlanningContext::Planningstatus().traffic_light();
     const std::string traffic_sign_overlap_id =
-        traffic_light_status.current_traffic_light_overlap_id_size() > 0 ?
-            traffic_light_status.current_traffic_light_overlap_id(0) : "";
+        traffic_light_status.current_traffic_light_overlap_id_size() > 0
+            ? traffic_light_status.current_traffic_light_overlap_id(0)
+            : "";
     traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
-        reference_line_info,
-        traffic_sign_overlap_id,
+        reference_line_info, traffic_sign_overlap_id,
         ReferenceLineInfo::SIGNAL);
   }
   if (!traffic_sign_overlap) {
@@ -80,8 +79,8 @@ bool StageIntersectionCruiseImpl::CheckDone(
     const double distance_adc_pass_traffic_sign =
         adc_back_edge_s - traffic_sign_overlap->end_s;
     ADEBUG << "distance_adc_pass_traffic_sign["
-           << distance_adc_pass_traffic_sign
-           << "] traffic_sign_end_s[" << traffic_sign_overlap->end_s << "]";
+           << distance_adc_pass_traffic_sign << "] traffic_sign_end_s["
+           << traffic_sign_overlap->end_s << "]";
 
     return (distance_adc_pass_traffic_sign >= kIntersectionPassDist);
   }
