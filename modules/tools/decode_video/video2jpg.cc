@@ -77,7 +77,7 @@ int stream_decoder_process_frame(const std::vector<uint8_t>& indata,
     AINFO << "frame " << frame_num << ": frame_len=" << frame_len
           << ". left_size=" << local_size;
     std::vector<uint8_t> jpeg_buffer = decoder->Process(apt.data, apt.size);
-    if (jpeg_buffer.size() > 0) {
+    if (!jpeg_buffer.empty()) {
       write_jpg_file(jpeg_buffer, output_dir, frame_num);
       frame_num++;
     } else {
@@ -89,7 +89,7 @@ int stream_decoder_process_frame(const std::vector<uint8_t>& indata,
   // Trying to decode the left over frames from buffer
   for (int i = error_frame_num; i >= 0; i--) {
     std::vector<uint8_t> jpeg_buffer = decoder->Process(nullptr, 0);
-    if (jpeg_buffer.size() > 0) {
+    if (!jpeg_buffer.empty()) {
       write_jpg_file(jpeg_buffer, output_dir, frame_num);
       AINFO << "frame " << frame_num << ": read from buffer";
       frame_num++;
@@ -105,7 +105,7 @@ int main(int argc, char** argv) {
   AINFO << "input video: " << FLAGS_input_video
         << ". output dir: " << FLAGS_output_dir;
   std::vector<uint8_t> video_file = read_video_file(FLAGS_input_video);
-  if (video_file.size() == 0) {
+  if (video_file.empty()) {
     AERROR << "invalid input video file: " << FLAGS_input_video;
     return -1;
   }
