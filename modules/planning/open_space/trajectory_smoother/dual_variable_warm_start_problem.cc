@@ -35,7 +35,7 @@ DualVariableWarmStartProblem::DualVariableWarmStartProblem(
 }
 
 bool DualVariableWarmStartProblem::Solve(
-    const size_t& horizon, const double& ts, const Eigen::MatrixXd& ego,
+    const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
     size_t obstacles_num, const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const Eigen::MatrixXd& xWS, Eigen::MatrixXd* l_warm_up,

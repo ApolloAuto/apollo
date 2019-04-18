@@ -65,7 +65,7 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
                                 double rotate_angle,
                                 const Vec2d& translate_origin);
 
-  bool IsVehicleStopDueToFallBack(const bool& is_on_fallback,
+  bool IsVehicleStopDueToFallBack(const bool is_on_fallback,
                                   const common::VehicleState& vehicle_state);
 
   void GenerateStopTrajectory(DiscretizedTrajectory* const trajectory_data);
