@@ -74,6 +74,11 @@ Stage::StageStatus StageSidePass::Process(
     }
   }
 
+  if (PlanningContext::able_to_use_self_lane_counter() >= 3) {
+    next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
+  }
+
   return Stage::StageStatus::RUNNING;
 }
 
