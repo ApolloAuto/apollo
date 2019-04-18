@@ -25,6 +25,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "gtest/gtest.h"
@@ -116,7 +117,7 @@ class PathBoundsDecider : public Decider {
   void RemoveRedundantPathBoundaries(
       std::vector<PathBoundary>* const candidate_path_boundaries);
 
-  bool IsContained (
+  bool IsContained(
       const std::vector<std::pair<double, double>>& lhs,
       const std::vector<std::pair<double, double>>& rhs);
 
