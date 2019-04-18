@@ -82,6 +82,7 @@ class PlanningContext {
 
   static PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
 
+  /////////////////////////////////////////////////////////////////////////////
   static void IncrementFrontStaticObstacleCycleCounter() {
     front_static_obstacle_cycle_counter_ =
         std::min(front_static_obstacle_cycle_counter_ + 1,
@@ -102,6 +103,16 @@ class PlanningContext {
     return front_static_obstacle_cycle_counter_;
   }
 
+  static void set_front_static_obstacle_id(
+      const std::string& front_static_obstacle_id) {
+    front_static_obstacle_id_ = front_static_obstacle_id;
+  }
+
+  static std::string front_static_obstacle_id() {
+    return front_static_obstacle_id_;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
   static void IncrementAbleToUseSelfLaneCounter() {
     able_to_use_self_lane_counter_ =
         std::min(able_to_use_self_lane_counter_ + 1,
@@ -122,6 +133,16 @@ class PlanningContext {
     return able_to_use_self_lane_counter_;
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  static void set_is_in_path_lane_borrow_scenario(
+      bool is_in_path_lane_borrow_scenario) {
+    is_in_path_lane_borrow_scenario_ = is_in_path_lane_borrow_scenario;
+  }
+
+  static bool is_in_path_lane_borrow_scenario() {
+    return is_in_path_lane_borrow_scenario_;
+  }
+
  private:
   static PlanningStatus planning_status_;
   static SidePassInfo side_pass_info_;
@@ -129,7 +150,10 @@ class PlanningContext {
   static OpenSpaceInfo open_space_info_;
 
   static int front_static_obstacle_cycle_counter_;
+  static std::string front_static_obstacle_id_;
   static int able_to_use_self_lane_counter_;
+
+  static bool is_in_path_lane_borrow_scenario_;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext)
