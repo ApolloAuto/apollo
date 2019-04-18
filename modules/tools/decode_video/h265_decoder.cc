@@ -16,6 +16,7 @@
 
 #include "modules/tools/decode_video/h265_decoder.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include "cyber/common/log.h"
@@ -87,43 +88,42 @@ void H265Decoder::Release() {
   codec_jpeg_ = nullptr;
 }
 
-int H265Decoder::Process(const char* indata, const int32_t insize,
-                         char* outdata, const int32_t outsize) {
+std::vector<uint8_t> H265Decoder::Process(const uint8_t* indata,
+                                          const int32_t insize) {
   AVPacket apt;
   av_init_packet(&apt);
   int got_picture = 0;
-  apt.data = (uint8_t*)indata;
+  apt.data = const_cast<uint8_t*>(indata);
   apt.size = insize;
-  if (insize == 0) {
+  if (apt.size == 0) {
     apt.data = nullptr;
   }
+  std::vector<uint8_t> outdata;
   int ret =
       avcodec_decode_video2(codec_ctx_h265_, yuv_frame_, &got_picture, &apt);
   if (ret < 0) {
-    AERROR << "error: decode failed: input_framesize = " << apt.size;
-    return ret;
+    AERROR << "error: decode failed: input_framesize = " << apt.size
+           << ". error code = " << ret;
+    return outdata;
   }
   if (!got_picture) {
     // Not an error, but just did not read pictures out
     AWARN << "warn: failed to get yuv picture";
-    return 0;
+    return outdata;
   }
   av_packet_unref(&apt);
   got_picture = 0;
   ret = avcodec_encode_video2(codec_ctx_jpeg_, &apt, yuv_frame_, &got_picture);
   if (ret < 0) {
-    AERROR << "error: jpeg encode failed";
-    return ret;
+    AERROR << "error: jpeg encode failed, error code = " << ret;
+    return outdata;
   }
   if (!got_picture) {
-    AERROR << "error: failed to get jpeg picture";
-    return -1;
+    AERROR << "error: failed to get jpeg picture from yuyv";
+    return outdata;
   }
-  if (apt.size > outsize) {
-    AERROR << "error: output buffer is two small, alloc/framesize " << outsize
-           << "/" << apt.size;
-    return -1;
-  }
-  memcpy(outdata, apt.data, apt.size);
-  return apt.size;
+  outdata.resize(apt.size);
+  std::copy(apt.data, apt.data + apt.size, outdata.begin());
+  AINFO << "copyed jpeg data";
+  return outdata;
 }
