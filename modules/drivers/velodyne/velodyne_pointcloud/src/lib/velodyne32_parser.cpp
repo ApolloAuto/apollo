@@ -28,7 +28,7 @@ Velodyne32Parser::Velodyne32Parser(Config config)
     : VelodyneParser(config), gps_base_usec_(0), previous_packet_stamp_(0) {
   inner_time_ = &velodyne::INNER_TIME_HDL32E;
   need_two_pt_correction_ = false;
-   if (config_.model() == "VLP32C") {
+   if (config_.model == "VLP32C") {
     inner_time_ = &velodyne::INNER_TIME_VLP32C;
   }
 }
@@ -43,8 +43,8 @@ void Velodyne32Parser::generate_pointcloud(
   out_msg->reserve(80000);
   gps_base_usec_ = scan_msg->basetime;
 
-  if (config_.model() == "VLP32C") {
-    for (size_t i = 0; i < packets_size; ++i) {
+  if (config_.model == "VLP32C") {
+    for (size_t i = 0; i < scan_msg->firing_pkts_size();; ++i) {
       unpackVLP32C(scan_msg->packets[i], *out_msg);
       last_time_stamp_ = out_msg->header.stamp;
     }
@@ -66,7 +66,7 @@ void Velodyne32Parser::generate_pointcloud(
 double Velodyne32Parser::get_timestamp(double base_time, float time_offset,
                                        uint16_t block_id) {
   double t = base_time - time_offset;
-  if (config_.model() == "VLP32C") {
+  if (config_.model == "VLP32C") {
     t = base_time + time_offset;
   }
   double timestamp = get_gps_stamp(t, previous_packet_stamp_, gps_base_usec_);
@@ -195,7 +195,7 @@ void Velodyne32Parser::unpackVLP32C(const velodyne_msgs::VelodynePacket& pkt,
 }
 
 void Velodyne32Parser::order(VPointCloud::Ptr& cloud) {
-  if (config_.model() == "VLP32C") {
+  if (config_.model == "VLP32C") {
     return;
   }
   int width = 32;
