@@ -44,7 +44,7 @@ void Velodyne32Parser::generate_pointcloud(
   gps_base_usec_ = scan_msg->basetime;
 
   if (config_.model == "VLP32C") {
-    for (size_t i = 0; i < scan_msg->firing_pkts_size();; ++i) {
+    for (size_t i = 0; i < scan_msg->packets.size(); ++i) {
       unpackVLP32C(scan_msg->packets[i], *out_msg);
       last_time_stamp_ = out_msg->header.stamp;
     }
