@@ -272,8 +272,62 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 
 void PathBoundsDecider::RemoveRedundantPathBoundaries(
     std::vector<PathBoundary>* const candidate_path_boundaries) {
-  // TODO(jiacheng): implement this.
+  // 1. Check to see if both "left" and "right" exist.
+  bool is_left_exist = false;
+  std::vector<std::pair<double, double>> left_boundary;
+  bool is_right_exist = false;
+  std::vector<std::pair<double, double>> right_boundary;
+  for (const auto& path_boundary : *candidate_path_boundaries) {
+    if (path_boundary.label().find("left") != std::string::npos) {
+      is_left_exist = true;
+      left_boundary = path_boundary.boundary();
+    }
+    if (path_boundary.label().find("right") != std::string::npos) {
+      is_right_exist = true;
+      right_boundary = path_boundary.boundary();
+    }
+  }
+  // 2. Check if "left" is contained by "right", and vice versa.
+  if (!is_left_exist || !is_right_exist) {
+    return;
+  }
+  bool is_left_redundant = false;
+  bool is_right_redundant = false;
+  if (IsContained(left_boundary, right_boundary)) {
+    is_left_redundant = true;
+  }
+  if (IsContained(right_boundary, left_boundary)) {
+    is_right_redundant = true;
+  }
+
+  // 3. If one contains the other, then remove the redundant one.
+  for (size_t i = 0; i < candidate_path_boundaries->size(); ++i) {
+    const auto& path_boundary = (*candidate_path_boundaries)[i];
+    if (path_boundary.label().find("right") != std::string::npos &&
+        is_right_redundant) {
+      (*candidate_path_boundaries)[i] = candidate_path_boundaries->back();
+      candidate_path_boundaries->pop_back();
+      break;
+    }
+    if (path_boundary.label().find("left") != std::string::npos &&
+        is_left_redundant) {
+      (*candidate_path_boundaries)[i] = candidate_path_boundaries->back();
+      candidate_path_boundaries->pop_back();
+      break;
+    }
+  }
   return;
+}
+
+bool PathBoundsDecider::IsContained (
+    const std::vector<std::pair<double, double>>& lhs,
+    const std::vector<std::pair<double, double>>& rhs) {
+  if (lhs.size() > rhs.size()) { return false; }
+  for (size_t i = 0; i < lhs.size(); ++i) {
+    if (lhs[i].first < rhs[i].first) { return false; }
+    if (lhs[i].second > rhs[i].second) { return false; }
+  }
+  return true;
 }
 
 bool PathBoundsDecider::InitPathBoundary(const ReferenceLine& reference_line,

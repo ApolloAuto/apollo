@@ -219,16 +219,45 @@ bool SidePassScenario::IsSidePassScenario(const Frame& frame,
 bool SidePassScenario::IsUnifiedSidePassScenario(const Frame& frame,
                                                  const ScenarioConfig& config) {
   return HasSingleReferenceLine(frame) && IsFarFromDestination(frame) &&
+         IsBlockingObstacleWithinDestination(frame) &&
          IsFarFromIntersection(frame) && IsWithinSidePassingSpeedADC(frame) &&
          IsSidePassableObstacle(frame, frame.reference_line_info().front(),
                                 frame.reference_line_info()
                                     .front()
-                                    .path_data()
-                                    .blocking_obstacle_id());
+                                    .GetBlockingObstacleId());
 }
 
 bool SidePassScenario::HasSingleReferenceLine(const Frame& frame) {
   return frame.reference_line_info().size() <= 1;
+}
+
+bool SidePassScenario::IsBlockingObstacleWithinDestination(
+    const Frame& frame) {
+  const auto& reference_line_info = frame.reference_line_info().front();
+  std::string blocking_obstacle_id =
+      reference_line_info.GetBlockingObstacleId();
+  if (blocking_obstacle_id.empty()) {
+    ADEBUG << "There is no blocking obstacle.";
+    return true;
+  }
+  const Obstacle* blocking_obstacle =
+      reference_line_info.path_decision().obstacles().Find(
+          blocking_obstacle_id);
+  double blocking_obstacle_s =
+      blocking_obstacle->PerceptionSLBoundary().start_s();
+  double adc_frenet_s =
+      reference_line_info.reference_line().GetFrenetPoint(
+          frame.PlanningStartPoint().path_point()).s();
+  ADEBUG << "Blocking obstacle is at s = " << blocking_obstacle_s;
+  ADEBUG << "ADC is at s = " << adc_frenet_s;
+  ADEBUG << "Destination is within: "
+         << reference_line_info.SDistanceToDestination();
+  if (blocking_obstacle_s - adc_frenet_s >
+      reference_line_info.SDistanceToDestination()
+      ) {
+    return false;
+  }
+  return true;
 }
 
 bool SidePassScenario::IsFarFromDestination(const Frame& frame) {
