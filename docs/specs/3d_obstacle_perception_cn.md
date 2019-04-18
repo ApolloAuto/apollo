@@ -40,7 +40,7 @@ Apollo采用网格显示查找表（LUT），将ROI量化为俯视图2D网格，
 <img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/specs/images/3d_obstacle_perception/roi_lookup_table.png">
 <div align=center>图 1 ROI显示查找表（LUT）</div>
 
-蓝色线条标出了高精地图ROI的边界，包含路表与路口。红色加粗点表示对应于激光雷达传感器位置的地方坐标系原始位置。2D网格由8*8个绿色正方形组成，在ROI中的单元格，为蓝色填充的正方形，而之外的是黄色填充的正方形。
+蓝色线条标出了高精地图ROI的边界，包含路标与路口。红色加粗点表示对应于激光雷达传感器位置的地方坐标系原始位置。2D网格由8*8个绿色正方形组成，在ROI中的单元格，为蓝色填充的正方形，而之外的是黄色填充的正方形。
 
 ### ROI LUT点查询
 
