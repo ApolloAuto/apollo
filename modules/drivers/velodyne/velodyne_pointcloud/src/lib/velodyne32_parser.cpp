@@ -122,7 +122,7 @@ void Velodyne32Parser::unpack(const velodyne_msgs::VelodynePacket& pkt,
   }
 }
 
-void Velodyne32Parser::unpackVLP32C(const VelodynePacket& pkt,
+void Velodyne32Parser::unpackVLP32C(const velodyne_msgs::VelodynePacket& pkt, 
                                     VPointCloud& pc) {
   const RawPacket* raw = (const RawPacket*)&pkt.data[0];
   // const RawPacket* raw = (const RawPacket*)pkt.data().c_str();
