@@ -116,6 +116,10 @@ class PathBoundsDecider : public Decider {
   void RemoveRedundantPathBoundaries(
       std::vector<PathBoundary>* const candidate_path_boundaries);
 
+  bool IsContained (
+      const std::vector<std::pair<double, double>>& lhs,
+      const std::vector<std::pair<double, double>>& rhs);
+
   /////////////////////////////////////////////////////////////////////////////
   // Below are functions called when generating path bounds.
   //  1. InitPathBoundary
