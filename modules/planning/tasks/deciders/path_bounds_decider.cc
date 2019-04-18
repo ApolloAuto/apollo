@@ -319,7 +319,7 @@ void PathBoundsDecider::RemoveRedundantPathBoundaries(
   return;
 }
 
-bool PathBoundsDecider::IsContained (
+bool PathBoundsDecider::IsContained(
     const std::vector<std::pair<double, double>>& lhs,
     const std::vector<std::pair<double, double>>& rhs) {
   if (lhs.size() > rhs.size()) { return false; }
