@@ -163,7 +163,7 @@ void Velodyne32Parser::unpackVLP32C(const velodyne_msgs::VelodynePacket& pkt,
 
       azimuth_corrected_f =
           azimuth + (azimuth_diff * (static_cast<float>(laser_id) / 2.0f) *
-                     CHANNEL_TDURATION / SEQ_TDURATION);
+                     VLP32_CHANNEL_TDURATION / VLP32_SEQ_TDURATION);
       azimuth_corrected =
           static_cast<int>(round(fmod(azimuth_corrected_f, 36000.0)));
 
@@ -175,7 +175,7 @@ void Velodyne32Parser::unpackVLP32C(const velodyne_msgs::VelodynePacket& pkt,
       // << distance;
       if (raw_distance.raw_distance == 0 ||
           !is_scan_valid(azimuth_corrected, distance)) {
-        if (config_.organized()) {
+        if (config_.organized {
           pc.points.emplace_back(get_nan_point(timestamp));
           ++pc.width;
         }
@@ -185,7 +185,7 @@ void Velodyne32Parser::unpackVLP32C(const velodyne_msgs::VelodynePacket& pkt,
       VPoint point;
       point.timestamp = timestamp;
       // Position Calculation, append this point to the cloud
-      compute_coords(real_distance, corrections,
+      compute_coords(raw_distance, corrections,
                     static_cast<uint16_t>(azimuth_corrected), point);
       point.intensity = raw->blocks[block].data[k + 2];
       pc.points.emplace_back(point);
