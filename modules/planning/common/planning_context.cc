@@ -38,7 +38,10 @@ void PlanningContext::Clear() {
 }
 
 int PlanningContext::front_static_obstacle_cycle_counter_ = 0;
+std::string PlanningContext::front_static_obstacle_id_ = "";
 int PlanningContext::able_to_use_self_lane_counter_ = 0;
+
+bool PlanningContext::is_in_path_lane_borrow_scenario_ = false;
 
 }  // namespace planning
 }  // namespace apollo
