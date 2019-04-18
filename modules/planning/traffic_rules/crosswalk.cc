@@ -192,7 +192,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       if (stop_deceleration >= config_.crosswalk().max_stop_deceleration()) {
         // warn only.  always STOP regardless of stop_deceleration
         AWARN << "crosswalk_id[" << crosswalk_id
-               << "] stop_deceleration[" << stop_deceleration << "]";
+              << "] stop_deceleration[" << stop_deceleration << "]";
       }
       crosswalks_to_stop.emplace_back(crosswalk_overlap, pedestrians);
       ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
