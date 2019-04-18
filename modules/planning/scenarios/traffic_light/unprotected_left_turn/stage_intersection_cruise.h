@@ -45,7 +45,6 @@ class TrafficLightUnprotectedLeftTurnStageIntersectionCruise : public Stage {
     return GetContextAs<TrafficLightUnprotectedLeftTurnContext>();
   }
 
- private:
   Stage::StageStatus FinishStage();
 
  private:
