@@ -194,7 +194,7 @@ void OpenSpacePlanner::LoadTrajectoryToFrame(Frame* frame) {
 
 bool OpenSpacePlanner::IsVehicleNearDestination(
     const common::VehicleState& vehicle_state,
-    const std::vector<double>& end_pose, const double& rotate_angle,
+    const std::vector<double>& end_pose, const double rotate_angle,
     const Vec2d& translate_origin) {
   CHECK_EQ(end_pose.size(), 4);
   Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);

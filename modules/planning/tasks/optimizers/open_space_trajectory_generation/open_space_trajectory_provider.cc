@@ -290,7 +290,7 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
 }
 
 bool OpenSpaceTrajectoryProvider::IsVehicleStopDueToFallBack(
-    const bool& is_on_fallback, const common::VehicleState& vehicle_state) {
+    const bool is_on_fallback, const common::VehicleState& vehicle_state) {
   if (!is_on_fallback) {
     return false;
   }

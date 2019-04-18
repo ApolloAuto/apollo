@@ -55,7 +55,7 @@ class TrajectoryPartitioner {
       const std::unique_ptr<PublishableTrajectory>& last_publishable_trajectory,
       std::vector<common::TrajectoryPoint>* zigzag_trajectory);
   bool InsertGearShiftTrajectory(
-      const bool& flag_change_to_next, const size_t& current_trajectory_index,
+      const bool flag_change_to_next, const size_t current_trajectory_index,
       const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions,
       const Frame* frame, ADCTrajectory* const ptr_trajectory_pb);
   void GenerateGearShiftTrajectory(
@@ -64,8 +64,8 @@ class TrajectoryPartitioner {
   void SetTrajectoryPb(
       const apollo::planning_internal::Trajectories& trajectory_partitioned,
       const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions,
-      const size_t& current_trajectory_index,
-      const int& closest_trajectory_point_index,
+      const size_t current_trajectory_index,
+      const int closest_trajectory_point_index,
       ADCTrajectory* const ptr_trajectory_pb);
 
  private:
