@@ -306,7 +306,7 @@ void TrajectoryPartitioner::InterpolateTrajectory(
 }
 
 bool TrajectoryPartitioner::InsertGearShiftTrajectory(
-    const bool& flag_change_to_next, const size_t& current_trajectory_index,
+    const bool flag_change_to_next, const size_t current_trajectory_index,
     const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions,
     const Frame* frame, ADCTrajectory* const ptr_trajectory_pb) {
   if (flag_change_to_next || !gear_shift_period_finished_) {
@@ -354,8 +354,8 @@ void TrajectoryPartitioner::GenerateGearShiftTrajectory(
 void TrajectoryPartitioner::SetTrajectoryPb(
     const apollo::planning_internal::Trajectories& trajectory_partitioned,
     const std::vector<apollo::canbus::Chassis::GearPosition>& gear_positions,
-    const size_t& current_trajectory_index,
-    const int& closest_trajectory_point_index,
+    const size_t current_trajectory_index,
+    const int closest_trajectory_point_index,
     ADCTrajectory* const ptr_trajectory_pb) {
   // reassign relative time and relative s to have the closest point as origin
   // point

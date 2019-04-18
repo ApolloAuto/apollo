@@ -44,11 +44,11 @@ class DistanceApproachProblem {
   virtual ~DistanceApproachProblem() = default;
 
   bool Solve(const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xF,
-             const Eigen::MatrixXd& last_time_u, const size_t& horizon,
-             const double& ts, const Eigen::MatrixXd& ego,
+             const Eigen::MatrixXd& last_time_u, const size_t horizon,
+             const double ts, const Eigen::MatrixXd& ego,
              const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
              const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
-             const std::vector<double>& XYbounds, const size_t& obstacles_num,
+             const std::vector<double>& XYbounds, const size_t obstacles_num,
              const Eigen::MatrixXi& obstacles_edges_num,
              const Eigen::MatrixXd& obstacles_A,
              const Eigen::MatrixXd& obstacles_b, Eigen::MatrixXd* state_result,

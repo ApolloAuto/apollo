@@ -72,7 +72,7 @@ class OpenSpaceTrajectoryGenerator {
   apollo::common::Status Plan(
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       const apollo::common::VehicleState& vehicle_state,
-      const std::vector<double>& XYbounds, const double& rotate_angle,
+      const std::vector<double>& XYbounds, const double rotate_angle,
       const apollo::common::math::Vec2d& translate_origin,
       const std::vector<double>& end_pose,
       const Eigen::MatrixXi& obstacles_edges_num,
@@ -99,7 +99,7 @@ class OpenSpaceTrajectoryGenerator {
   void Stop();
 
   void RecordDebugInfo(const Vec2d& translate_origin,
-                       const double& rotate_angle,
+                       const double rotate_angle,
                        const std::vector<double>& end_pose,
                        const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWs,
                        const Eigen::MatrixXd& l_warm_up,
@@ -116,7 +116,7 @@ class OpenSpaceTrajectoryGenerator {
  private:
   bool IsInitPointNearDestination(
       const common::TrajectoryPoint& planning_init_point,
-      const std::vector<double>& end_pose, const double& rotate_angle,
+      const std::vector<double>& end_pose, const double rotate_angle,
       const Vec2d& translate_origin);
 
   std::unique_ptr<HybridAStar> warm_start_;

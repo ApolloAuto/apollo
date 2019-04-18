@@ -212,7 +212,7 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
 
 void OpenSpaceTrajectoryOptimizer::RecordDebugInfo(
     const common::TrajectoryPoint& trajectory_stitching_point,
-    const Vec2d& translate_origin, const double& rotate_angle,
+    const Vec2d& translate_origin, const double rotate_angle,
     const std::vector<double>& end_pose, const Eigen::MatrixXd& xWS,
     const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
     const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& dual_l_result_ds,
