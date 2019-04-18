@@ -74,11 +74,8 @@ Edge& Edge::operator=(const Edge& rhs) {
 }
 
 bool Edge::operator==(const Edge& rhs) const {
-  if (this->src_ == rhs.src_ && this->dst_ == rhs.dst_ &&
-      this->value_ == rhs.value_) {
-    return true;
-  }
-  return false;
+  return this->src_ == rhs.src_ && this->dst_ == rhs.dst_ &&
+         this->value_ == rhs.value_;
 }
 
 bool Edge::IsValid() const {
