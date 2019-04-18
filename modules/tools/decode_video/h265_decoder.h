@@ -23,6 +23,8 @@ extern "C" {
 #include <libswscale/swscale.h>
 }
 
+#include <vector>
+
 /**
  * @class H265Decoder
  * @brief H265Decoder is a class to actually decode videos.
@@ -34,9 +36,8 @@ class H265Decoder {
   // Init decoder by acquiring resources
   bool Init();
 
-  // Process frames according to input data/size, and output converted data/size
-  int Process(const char* indata, const int32_t insize, char* outdata,
-              const int32_t outsize);
+  // Process frames according to input data, and output converted data
+  std::vector<uint8_t> Process(const uint8_t* indata, const int32_t insize);
 
   // Destructor, releasing the resources
   ~H265Decoder() { Release(); }
