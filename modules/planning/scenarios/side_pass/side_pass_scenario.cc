@@ -185,10 +185,11 @@ bool SidePassScenario::IsUnifiedTransferable(const Frame& frame,
                                              const Scenario& current_scenario) {
   if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     // Check side-pass exiting conditions.
-    ADEBUG << "Checking if it's needed to exit SIDE_PASS:";
-    ADEBUG << "Able to use self-lane counter = "
-           << PlanningContext::able_to_use_self_lane_counter();
-    return PlanningContext::able_to_use_self_lane_counter() < 3;
+    // ADEBUG << "Checking if it's needed to exit SIDE_PASS:";
+    // ADEBUG << "Able to use self-lane counter = "
+    //        << PlanningContext::able_to_use_self_lane_counter();
+    // return PlanningContext::able_to_use_self_lane_counter() < 3;
+    return true;
   } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
     // If in some other scenario, then don't try to switch to SIDE_PASS.
     ADEBUG << "Currently in some other scenario.";

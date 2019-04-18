@@ -232,7 +232,7 @@ std::string PathBoundsDecider::GenerateRegularPathBound(
          path_bound->size() < temp_path_bound.size() &&
          counter < kNumExtraTailBoundPoint) {
     path_bound->push_back(temp_path_bound[path_bound->size()]);
-    counter ++;
+    counter++;
   }
   // PathBoundsDebugString(*path_bound);
 
