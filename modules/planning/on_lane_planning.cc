@@ -63,7 +63,7 @@ OnLanePlanning::~OnLanePlanning() {
   }
   planner_->Stop();
   FrameHistory::Instance()->Clear();
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->MutablePlanningStatus()->Clear();
   last_routing_.Clear();
   EgoInfo::Instance()->Clear();
 }
@@ -87,7 +87,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->MutablePlanningStatus()->Clear();
 
   // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
@@ -223,7 +223,7 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
 
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
-    PlanningContext::MutablePlanningStatus()->Clear();
+    PlanningContext::Instance()->MutablePlanningStatus()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
   }
 

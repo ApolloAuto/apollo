@@ -99,7 +99,7 @@ SidePassScenario::SidePassScenario(const ScenarioConfig& config,
 
   // TODO(all): to be removed when SidePass obstacle decision impl is ready
   side_pass_context_.front_blocking_obstacle_id_ =
-      PlanningContext::Planningstatus()
+      PlanningContext::Instance()->Planningstatus()
           .side_pass()
           .front_blocking_obstacle_id();
 }
@@ -133,7 +133,7 @@ bool SidePassScenario::IsTransferable(const Frame& frame,
     return IsUnifiedTransferable(frame, config, current_scenario);
   }
 
-  std::string front_blocking_obstacle_id = PlanningContext::Planningstatus()
+  std::string front_blocking_obstacle_id = PlanningContext::Instance()->Planningstatus()
                                                .side_pass()
                                                .front_blocking_obstacle_id();
 
@@ -187,8 +187,8 @@ bool SidePassScenario::IsUnifiedTransferable(const Frame& frame,
     // Check side-pass exiting conditions.
     // ADEBUG << "Checking if it's needed to exit SIDE_PASS:";
     // ADEBUG << "Able to use self-lane counter = "
-    //        << PlanningContext::able_to_use_self_lane_counter();
-    // return PlanningContext::able_to_use_self_lane_counter() < 3;
+    //        << PlanningContext::Instance()->able_to_use_self_lane_counter();
+    // return PlanningContext::Instance()->able_to_use_self_lane_counter() < 3;
     return true;
   } else if (current_scenario.scenario_type() != ScenarioConfig::LANE_FOLLOW) {
     // If in some other scenario, then don't try to switch to SIDE_PASS.
@@ -206,7 +206,7 @@ bool SidePassScenario::IsUnifiedTransferable(const Frame& frame,
       ADEBUG << "   NO!";
     }
     return is_side_pass &&
-           PlanningContext::front_static_obstacle_cycle_counter() >= 1;
+           PlanningContext::Instance()->front_static_obstacle_cycle_counter() >= 1;
   }
 }
 
@@ -364,7 +364,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame,
             distance_between_adc_and_obstacle;
         // TODO(all): to be removed
         //            when SidePass obstacle decision impl is ready
-        PlanningContext::MutablePlanningStatus()
+        PlanningContext::Instance()->MutablePlanningStatus()
             ->mutable_side_pass()
             ->set_front_blocking_obstacle_id(obstacle->Id());
       }
@@ -374,7 +374,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame,
     return true;
   } else {
     // TODO(all): to be removed when SidePass obstacle decision impl is ready
-    PlanningContext::MutablePlanningStatus()
+    PlanningContext::Instance()->MutablePlanningStatus()
         ->mutable_side_pass()
         ->clear_front_blocking_obstacle_id();
     return false;
