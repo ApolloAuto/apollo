@@ -29,6 +29,7 @@
 #include "modules/planning/tasks/deciders/open_space_roi_decider.h"
 #include "modules/planning/tasks/deciders/path_assessment_decider.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider.h"
+#include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_path_decider.h"
 #include "modules/planning/tasks/deciders/side_pass_safety.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
@@ -59,6 +60,10 @@ std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
     TaskFactory::default_task_configs_;
 
 void TaskFactory::Init(const PlanningConfig& config) {
+  task_factory_.Register(TaskConfig::PATH_LANE_BORROW_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PathLaneBorrowDecider(config);
+                         });
   task_factory_.Register(TaskConfig::PATH_BOUNDS_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathBoundsDecider(config);

@@ -196,6 +196,8 @@ Status PathAssessmentDecider::Process(
     if (PlanningContext::front_static_obstacle_cycle_counter() < 0) {
       PlanningContext::ResetFrontStaticObstacleCycleCounter();
     }
+    PlanningContext::set_front_static_obstacle_id(
+        reference_line_info->GetBlockingObstacleId());
     PlanningContext::IncrementFrontStaticObstacleCycleCounter();
   } else {
     PlanningContext::ResetFrontStaticObstacleCycleCounter();

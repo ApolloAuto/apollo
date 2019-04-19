@@ -62,7 +62,7 @@ Status PathBoundsDecider::Process(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   std::vector<PathBoundary> candidate_path_boundaries;
-  const TaskConfig& config = Decider::config_;
+  // const TaskConfig& config = Decider::config_;
 
   // Initialization.
   InitPathBoundsDecider(*frame, *reference_line_info);
@@ -97,7 +97,7 @@ Status PathBoundsDecider::Process(
 
   // Generate regular path boundaries.
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
-  if (config.path_bounds_decider_config().is_lane_borrowing()) {
+  if (reference_line_info->is_path_lane_borrow()) {
     // Try borrowing from left and from right neighbor lane.
     lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
                              LaneBorrowInfo::RIGHT_BORROW,

@@ -61,8 +61,7 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
         IsBlockingObstacleFarFromIntersection(reference_line_info) &&
         IsLongTermBlockingObstacle() &&
         IsBlockingObstacleWithinDestination(frame, reference_line_info) &&
-        IsSidePassableObstacle(frame, reference_line_info,
-                               reference_line_info.GetBlockingObstacleId())) {
+        IsSidePassableObstacle(frame, reference_line_info)) {
       // Satisfying the above condition will it switch to lane-borrowing.
       PlanningContext::set_is_in_path_lane_borrow_scenario(true);
       AINFO << "Switch from SELF-LANE path to LANE-BORROW path.";
@@ -70,8 +69,6 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
   }
   return PlanningContext::is_in_path_lane_borrow_scenario();
 }
-
-// TODO(jiacheng): Implement the following several functions.
 
 // This function is to prevent lane-borrowing during lane-changing.
 // TODO(jiacheng): depending on our needs, may allow lane-borrowing during
@@ -90,18 +87,45 @@ bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
 
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
+  std::string blocking_obstacle_id =
+      PlanningContext::front_static_obstacle_id();
+  if (blocking_obstacle_id.empty()) {
+    ADEBUG << "There is no blocking obstacle.";
+    return true;
+  }
+  const Obstacle* blocking_obstacle =
+      reference_line_info.path_decision().obstacles().Find(
+          blocking_obstacle_id);
+  if (blocking_obstacle == nullptr) {
+    ADEBUG << "Blocking obstacle is no longer there.";
+    return true;
+  }
+
+  double blocking_obstacle_s =
+      blocking_obstacle->PerceptionSLBoundary().start_s();
+  // TODO(jiacheng): use adc actual s rather than plannign start point's s.
+  double adc_frenet_s =
+      reference_line_info.reference_line().GetFrenetPoint(
+          frame.PlanningStartPoint().path_point()).s();
+  ADEBUG << "Blocking obstacle is at s = " << blocking_obstacle_s;
+  ADEBUG << "ADC is at s = " << adc_frenet_s;
+  ADEBUG << "Destination is at s = "
+         << reference_line_info.SDistanceToDestination() + adc_frenet_s;
+  if (blocking_obstacle_s - adc_frenet_s >
+      reference_line_info.SDistanceToDestination()) {
+    return false;
+  }
   return true;
 }
 
+// TODO(jiacheng): Implement the following two functions.
 bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
     const ReferenceLineInfo& reference_line_info) {
-  return false;
+  return true;
 }
-
 bool PathLaneBorrowDecider::IsSidePassableObstacle(
-    const Frame& frame, const ReferenceLineInfo& reference_line_info,
-    const std::string& blocking_obstacle_id) {
-  return false;
+    const Frame& frame, const ReferenceLineInfo& reference_line_info) {
+  return true;
 }
 
 }  // namespace planning

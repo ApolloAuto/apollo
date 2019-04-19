@@ -61,6 +61,7 @@ message TaskConfig {
     OPEN_SPACE_TRAJECTORY_PARTITION = 23;
     OPEN_SPACE_FALLBACK_DECIDER = 24;
     PATH_ASSESSMENT_DECIDER = 25;
+    PATH_LANE_BORROW_DECIDER = 26;
   };
   optional TaskType task_type = 1;
   oneof task_config {
