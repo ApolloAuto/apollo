@@ -30,7 +30,7 @@ cc_library(
         "underlay_message",
         "underlay_message_type",
         "//cyber/service_discovery:role",
-        "//cyber/timer:timer_manager",
+        "//cyber/task:task",
         "@fastrtps",
     ],
 )

@@ -61,6 +61,7 @@ cc_library(
         "//cyber:state",
         "//cyber/logger:async_logger",
         "//cyber/node",
+        "//cyber/timer:timing_wheel",
     ],
 )
 
