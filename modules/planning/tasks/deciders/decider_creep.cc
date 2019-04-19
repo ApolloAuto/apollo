@@ -46,7 +46,7 @@ Status DeciderCreep::Process(Frame* frame,
   CHECK_NOTNULL(reference_line_info);
 
   double stop_line_s = 0.0;
-  const std::string stop_sign_overlap_id = PlanningContext::Planningstatus()
+  const std::string stop_sign_overlap_id = PlanningContext::Instance()->Planningstatus()
                                                .stop_sign()
                                                .current_stop_sign_overlap_id();
   if (!stop_sign_overlap_id.empty()) {
@@ -59,12 +59,12 @@ Status DeciderCreep::Process(Frame* frame,
       stop_line_s = current_stop_sign_overlap->end_s +
                     FindCreepDistance(*frame, *reference_line_info);
     }
-  } else if (PlanningContext::Planningstatus()
+  } else if (PlanningContext::Instance()->Planningstatus()
                  .traffic_light()
                  .current_traffic_light_overlap_id_size() > 0) {
     // get overlap along reference line
     const std::string current_traffic_light_overlap_id =
-        PlanningContext::Planningstatus()
+        PlanningContext::Instance()->Planningstatus()
             .traffic_light()
             .current_traffic_light_overlap_id(0);
     PathOverlap* current_traffic_light_overlap =

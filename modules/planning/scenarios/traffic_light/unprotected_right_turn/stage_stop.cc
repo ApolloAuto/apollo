@@ -126,7 +126,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
 }
 
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
-  PlanningContext::MutablePlanningStatus()->clear_traffic_light();
+  PlanningContext::Instance()->MutablePlanningStatus()->clear_traffic_light();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
@@ -141,13 +141,13 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
   } else {
     // creep
     // update PlanningContext
-    PlanningContext::MutablePlanningStatus()
+    PlanningContext::Instance()->MutablePlanningStatus()
         ->mutable_traffic_light()
         ->mutable_done_traffic_light_overlap_id()
         ->Clear();
     for (const auto& traffic_light_overlap_id :
          GetContext()->current_traffic_light_overlap_ids) {
-      PlanningContext::MutablePlanningStatus()
+      PlanningContext::Instance()->MutablePlanningStatus()
           ->mutable_traffic_light()
           ->add_done_traffic_light_overlap_id(traffic_light_overlap_id);
     }

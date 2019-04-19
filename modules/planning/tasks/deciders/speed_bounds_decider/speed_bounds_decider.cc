@@ -208,8 +208,8 @@ void SpeedBoundsDecider::StopOnSidePass(
   const PathData &path_data = reference_line_info->path_data();
   double stop_s_on_pathdata = 0.0;
   bool set_stop_fence = false;
-  const auto &side_pass_info = PlanningContext::side_pass_info();
-  auto *mutable_side_pass_info = PlanningContext::mutable_side_pass_info();
+  const auto &side_pass_info = PlanningContext::Instance()->side_pass_info();
+  auto *mutable_side_pass_info = PlanningContext::Instance()->mutable_side_pass_info();
 
   if (path_data.path_label().find("self") != std::string::npos) {
     mutable_side_pass_info->check_clear_flag = false;

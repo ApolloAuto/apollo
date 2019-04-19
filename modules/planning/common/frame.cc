@@ -122,11 +122,11 @@ bool Frame::Rerouting() {
     return false;
   }
 
-  PlanningContext::MutablePlanningStatus()
+  PlanningContext::Instance()->MutablePlanningStatus()
       ->mutable_rerouting()
       ->set_need_rerouting(true);
 
-  PlanningContext::MutablePlanningStatus()
+  PlanningContext::Instance()->MutablePlanningStatus()
       ->mutable_rerouting()
       ->mutable_routing_request()
       ->CopyFrom(request);

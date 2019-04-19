@@ -193,14 +193,14 @@ Status PathAssessmentDecider::Process(
   reference_line_info->SetCandidatePathData(new_candidate_path_data);
 
   if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
-    if (PlanningContext::front_static_obstacle_cycle_counter() < 0) {
-      PlanningContext::ResetFrontStaticObstacleCycleCounter();
+    if (PlanningContext::Instance()->front_static_obstacle_cycle_counter() < 0) {
+      PlanningContext::Instance()->ResetFrontStaticObstacleCycleCounter();
     }
-    PlanningContext::set_front_static_obstacle_id(
+    PlanningContext::Instance()->set_front_static_obstacle_id(
         reference_line_info->GetBlockingObstacleId());
-    PlanningContext::IncrementFrontStaticObstacleCycleCounter();
+    PlanningContext::Instance()->IncrementFrontStaticObstacleCycleCounter();
   } else {
-    PlanningContext::ResetFrontStaticObstacleCycleCounter();
+    PlanningContext::Instance()->ResetFrontStaticObstacleCycleCounter();
   }
 
   if (reference_line_info->path_data().path_label().find("self") !=
@@ -208,12 +208,12 @@ Status PathAssessmentDecider::Process(
       std::get<1>(reference_line_info->path_data()
                       .path_point_decision_guide()
                       .front()) == PathData::PathPointType::IN_LANE) {
-    if (PlanningContext::able_to_use_self_lane_counter() < 0) {
-      PlanningContext::ResetAbleToUseSelfLaneCounter();
+    if (PlanningContext::Instance()->able_to_use_self_lane_counter() < 0) {
+      PlanningContext::Instance()->ResetAbleToUseSelfLaneCounter();
     }
-    PlanningContext::IncrementAbleToUseSelfLaneCounter();
+    PlanningContext::Instance()->IncrementAbleToUseSelfLaneCounter();
   } else {
-    PlanningContext::ResetAbleToUseSelfLaneCounter();
+    PlanningContext::Instance()->ResetAbleToUseSelfLaneCounter();
   }
 
   // Plot the path in simulator for debug purpose.
