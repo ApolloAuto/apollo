@@ -32,7 +32,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 
 constexpr double kAdcDistanceThreshold = 35.0;  // unit: m
-constexpr double kObstaclesDistanceThreshold = 5.0;
+constexpr double kObstaclesDistanceThreshold = 15.0;
 
 bool IsNonmovableObstacle(const ReferenceLineInfo& reference_line_info,
                           const Obstacle& obstacle) {
