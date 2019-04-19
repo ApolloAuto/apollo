@@ -14,12 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/tools/decode_video/h265_decoder.h"
-
 #include <algorithm>
-#include <iostream>
 
 #include "cyber/common/log.h"
+#include "modules/drivers/video/tools/decode_video/h265_decoder.h"
+
+namespace apollo {
+namespace drivers {
+namespace video {
 
 // Using to-be-deprecated avcodec_decode_video2 for now until its replacement
 // gets stable
@@ -27,17 +29,17 @@
 
 bool H265Decoder::Init() {
   avcodec_register_all();
-  codec_h265_ = avcodec_find_decoder(AV_CODEC_ID_H265);
-  if (codec_h265_ == nullptr) {
+  AVCodec* codec_h265 = avcodec_find_decoder(AV_CODEC_ID_H265);
+  if (codec_h265 == nullptr) {
     AERROR << "error: codec not found";
     return false;
   }
-  codec_ctx_h265_ = avcodec_alloc_context3(codec_h265_);
+  codec_ctx_h265_ = avcodec_alloc_context3(codec_h265);
   if (codec_ctx_h265_ == nullptr) {
     AERROR << "error: codec context alloc fail";
     return false;
   }
-  if (avcodec_open2(codec_ctx_h265_, codec_h265_, nullptr) < 0) {
+  if (avcodec_open2(codec_ctx_h265_, codec_h265, nullptr) < 0) {
     AERROR << "error: could not open codec";
     return false;
   }
@@ -46,12 +48,12 @@ bool H265Decoder::Init() {
     AERROR << "error: could not alloc yuv frame";
     return false;
   }
-  codec_jpeg_ = avcodec_find_encoder(AV_CODEC_ID_MJPEG);
-  if (codec_jpeg_ == nullptr) {
+  AVCodec* codec_jpeg = avcodec_find_encoder(AV_CODEC_ID_MJPEG);
+  if (codec_jpeg == nullptr) {
     AERROR << "error: jpeg Codec not found";
     return false;
   }
-  codec_ctx_jpeg_ = avcodec_alloc_context3(codec_jpeg_);
+  codec_ctx_jpeg_ = avcodec_alloc_context3(codec_jpeg);
   if (codec_ctx_jpeg_ == nullptr) {
     AERROR << "error: jpeg ctx allco fail";
     return false;
@@ -64,7 +66,7 @@ bool H265Decoder::Init() {
   codec_ctx_jpeg_->height = 1080;
   codec_ctx_jpeg_->time_base = (AVRational){1, 15};
   codec_ctx_jpeg_->pix_fmt = AV_PIX_FMT_YUVJ422P;
-  if (avcodec_open2(codec_ctx_jpeg_, codec_jpeg_, nullptr) < 0) {
+  if (avcodec_open2(codec_ctx_jpeg_, codec_jpeg, nullptr) < 0) {
     AERROR << "error: could not open jpeg context";
     return false;
   }
@@ -84,12 +86,10 @@ void H265Decoder::Release() {
     avcodec_free_context(&codec_ctx_jpeg_);
     codec_ctx_jpeg_ = nullptr;
   }
-  codec_h265_ = nullptr;
-  codec_jpeg_ = nullptr;
 }
 
 std::vector<uint8_t> H265Decoder::Process(const uint8_t* indata,
-                                          const int32_t insize) {
+                                          const int32_t insize) const {
   AVPacket apt;
   av_init_packet(&apt);
   int got_picture = 0;
@@ -124,6 +124,9 @@ std::vector<uint8_t> H265Decoder::Process(const uint8_t* indata,
   }
   outdata.resize(apt.size);
   std::copy(apt.data, apt.data + apt.size, outdata.begin());
-  AINFO << "copyed jpeg data";
   return outdata;
 }
+
+}  // namespace video
+}  // namespace drivers
+}  // namespace apollo

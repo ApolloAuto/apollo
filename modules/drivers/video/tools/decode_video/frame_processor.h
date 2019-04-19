@@ -16,41 +16,38 @@
 
 #pragma once
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavutil/imgutils.h>
-#include <libswscale/swscale.h>
-}
-
+#include <string>
 #include <vector>
 
-/**
- * @class H265Decoder
- * @brief H265Decoder is a class to actually decode videos.
- */
-class H265Decoder {
- public:
-  H265Decoder() = default;
+namespace apollo {
+namespace drivers {
+namespace video {
 
-  // Init decoder by acquiring resources
-  bool Init();
+/**
+ * @class FrameProcessor
+ * @brief FrameProcessor is a class to process video streams.
+ */
+class FrameProcessor {
+ public:
+  // Constructor
+  FrameProcessor(const std::string& input_video_file,
+                 const std::string& output_jpg_dir);
 
   // Process frames according to input data, and output converted data
-  std::vector<uint8_t> Process(const uint8_t* indata, const int32_t insize);
+  bool ProcessStream() const;
 
-  // Destructor, releasing the resources
-  ~H265Decoder() { Release(); }
-
-  // Getter of codec_ctx_h265_
-  AVCodecContext* get_codec_ctx_h265() { return codec_ctx_h265_; }
+  // Destructor
+  ~FrameProcessor() = default;
 
  private:
-  void Release();
+  void WriteOutputJpgFile(const std::vector<uint8_t>& jpeg_buffer,
+                          const std::string& output_jpg_file) const;
+  const std::string GetOutputFile(const int frame_num) const;
 
-  AVCodec* codec_h265_ = nullptr;
-  AVCodecContext* codec_ctx_h265_ = nullptr;
-  AVCodec* codec_jpeg_ = nullptr;
-  AVCodecContext* codec_ctx_jpeg_ = nullptr;
-  AVFrame* yuv_frame_ = nullptr;
+  std::vector<uint8_t> input_video_buffer_;
+  const std::string output_jpg_dir_;
 };
+
+}  // namespace video
+}  // namespace drivers
+}  // namespace apollo
