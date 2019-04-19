@@ -40,6 +40,7 @@
 #include <malloc.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <unistd.h>
 
 #include <immintrin.h>
 #include <x86intrin.h>
@@ -76,7 +77,7 @@ using apollo::drivers::camera::config::IO_METHOD_USERPTR;
 using apollo::drivers::camera::config::RGB;
 using apollo::drivers::camera::config::YUYV;
 
-// camera raw image struct
+// Camera raw image struct
 struct CameraImage {
   int width;
   int height;
@@ -103,66 +104,67 @@ struct buffer {
 };
 
 class UsbCam {
- public:
-  UsbCam();
-  virtual ~UsbCam();
+  public:
+    UsbCam();
+    virtual ~UsbCam();
 
-  virtual bool init(const std::shared_ptr<Config>& camera_config);
-  // user use this function to get camera frame data
-  virtual bool poll(const CameraImagePtr& raw_image);
+    virtual bool init(const std::shared_ptr<Config>& camera_config);
+    // User use this function to get camera frame data
+    virtual bool poll(const CameraImagePtr& raw_image);
 
-  bool is_capturing();
-  bool wait_for_device(void);
+    bool is_capturing() const;
+    bool wait_for_device();
 
- private:
-  int xioctl(int fd, int request, void* arg);
-  bool init_device(void);
-  bool uninit_device(void);
+  private:
+    int xioctl(int fd, int request, void* arg);
+    bool init_device();
+    bool uninit_device();
 
-  void set_device_config();
-  // enables/disable auto focus
-  void set_auto_focus(int value);
-  // set video device parameters
-  void set_v4l_parameter(const std::string& param, int value);
-  void set_v4l_parameter(const std::string& param, const std::string& value);
+    void set_device_config();
+    // Enables/disable auto focus
+    void set_auto_focus(int value);
+    // Set video device parameters
+    void set_v4l_parameter(const std::string& param, int value);
+    void set_v4l_parameter(const std::string& param, const std::string& value);
 
-  int init_mjpeg_decoder(int image_width, int image_height);
-  void mjpeg2rgb(char* mjepg_buffer, int len, char* rgb_buffer, int pixels);
+    bool init_mjpeg_decoder(int image_width, int image_height);
+    void mjpeg2rgb(char* mjepg_buffer, int len, char* rgb_buffer, int pixels);
 
-  bool init_read(unsigned int buffer_size);
-  bool init_mmap(void);
-  bool init_userp(unsigned int buffer_size);
-  bool set_adv_trigger(void);
-  bool close_device(void);
-  bool open_device(void);
-  bool read_frame(CameraImagePtr raw_image);
-  bool process_image(const void* src, int len, CameraImagePtr dest);
-  bool start_capturing(void);
-  bool stop_capturing(void);
-  void reconnect();
-  void reset_device();
+    bool init_read(unsigned int buffer_size);
+    bool init_mmap();
+    bool init_userp(unsigned int buffer_size);
+    bool set_adv_trigger();
+    bool close_device();
+    bool open_device();
+    bool read_frame(CameraImagePtr raw_image);
+    bool process_image(const void* src, ssize_t len, CameraImagePtr dest);
+    bool start_capturing();
+    bool stop_capturing();
+    void reconnect();
+    void reset_device();
 
-  std::shared_ptr<Config> config_;
-  int pixel_format_;
-  int fd_;
-  buffer* buffers_;
-  unsigned int n_buffers_;
-  bool is_capturing_;
-  uint64_t image_seq_;
+  private:
+    std::shared_ptr<Config> config_;
+    int pixel_format_;
+    int fd_;
+    buffer* buffers_;
+    unsigned int n_buffers_;
+    bool is_capturing_;
+    uint64_t image_seq_;
 
-  AVFrame* avframe_camera_;
-  AVFrame* avframe_rgb_;
-  AVCodec* avcodec_;
-  AVDictionary* avoptions_;
-  AVCodecContext* avcodec_context_;
-  int avframe_camera_size_;
-  int avframe_rgb_size_;
-  struct SwsContext* video_sws_;
+    AVFrame* avframe_camera_;
+    AVFrame* avframe_rgb_;
+    AVCodec* avcodec_;
+    AVDictionary* avoptions_;
+    AVCodecContext* avcodec_context_;
+    int avframe_camera_size_;
+    int avframe_rgb_size_;
+    struct SwsContext* video_sws_;
 
-  float frame_warning_interval_ = 0.0;
-  float device_wait_sec_ = 0.0;
-  uint64_t last_nsec_ = 0;
-  float frame_drop_interval_ = 0.0;
+    float frame_warning_interval_ = 0.0;
+    float device_wait_sec_ = 0.0;
+    uint64_t last_nsec_ = 0;
+    float frame_drop_interval_ = 0.0;
 };
 }  // namespace camera
 }  // namespace drivers
