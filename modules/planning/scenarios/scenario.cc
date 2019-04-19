@@ -43,8 +43,8 @@ void Scenario::Init() {
   CHECK(!config_.stage_type().empty());
 
   // set scenario_type in PlanningContext
-  PlanningContext::MutablePlanningStatus()->mutable_scenario()->Clear();
-  PlanningContext::MutablePlanningStatus()
+  PlanningContext::Instance()->MutablePlanningStatus()->mutable_scenario()->Clear();
+  PlanningContext::Instance()->MutablePlanningStatus()
       ->mutable_scenario()
       ->set_scenario_type(scenario_type());
 

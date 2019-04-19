@@ -159,7 +159,7 @@ bool KeepClear::IsCreeping(const double pnc_junction_start_s,
   // check if in scenario creep stage
   // while creeping, no need create keep clear obstacle
   const auto& stage_type =
-      PlanningContext::Planningstatus().scenario().stage_type();
+      PlanningContext::Instance()->Planningstatus().scenario().stage_type();
   if (stage_type != ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP &&
       stage_type !=
           ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP) {

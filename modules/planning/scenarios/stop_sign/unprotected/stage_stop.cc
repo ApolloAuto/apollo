@@ -129,7 +129,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
   for (const auto& perception_obstacle_id : watch_vehicle_ids) {
-    PlanningContext::MutablePlanningStatus()
+    PlanningContext::Instance()->MutablePlanningStatus()
         ->mutable_stop_sign()
         ->add_wait_for_obstacle_id(perception_obstacle_id);
   }
@@ -228,7 +228,7 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
 }
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
-  PlanningContext::MutablePlanningStatus()->clear_stop_sign();
+  PlanningContext::Instance()->MutablePlanningStatus()->clear_stop_sign();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
@@ -236,11 +236,11 @@ Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   // update PlanningContext
-  PlanningContext::MutablePlanningStatus()
+  PlanningContext::Instance()->MutablePlanningStatus()
       ->mutable_stop_sign()
       ->set_done_stop_sign_overlap_id(
           GetContext()->current_stop_sign_overlap_id);
-  PlanningContext::MutablePlanningStatus()
+  PlanningContext::Instance()->MutablePlanningStatus()
       ->mutable_stop_sign()
       ->clear_wait_for_obstacle_id();
 

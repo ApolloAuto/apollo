@@ -83,7 +83,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  const auto& stop_sign_status = PlanningContext::Planningstatus().stop_sign();
+  const auto& stop_sign_status = PlanningContext::Instance()->Planningstatus().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -107,7 +107,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  const auto& stop_sign_status = PlanningContext::Planningstatus().stop_sign();
+  const auto& stop_sign_status = PlanningContext::Instance()->Planningstatus().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -132,7 +132,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  const auto& stop_sign_status = PlanningContext::Planningstatus().stop_sign();
+  const auto& stop_sign_status = PlanningContext::Instance()->Planningstatus().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -144,7 +144,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
 
   // check PlanningContext content
   const auto& stop_sign_status_2 =
-      PlanningContext::Planningstatus().stop_sign();
+      PlanningContext::Instance()->Planningstatus().stop_sign();
   EXPECT_EQ(stop_sign_status_2.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status_2.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status_2.wait_for_obstacle_id_size(), 0);
@@ -174,7 +174,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_04) {
   stop_sign_config->mutable_stop_sign()->mutable_creep()->set_enabled(false);
 
   auto* stop_sign_status =
-      PlanningContext::MutablePlanningStatus()->mutable_stop_sign();
+      PlanningContext::Instance()->MutablePlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_stop_sign_id("1017");
   stop_sign_status->set_status(StopSignStatus::STOP);
   double stop_duration = stop_sign_config->stop_sign().stop_duration();
@@ -228,7 +228,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_05) {
 
   // set PlanningStatus
   auto* stop_sign_status =
-      PlanningContext::MutablePlanningStatus()->mutable_stop_sign();
+      PlanningContext::Instance()->MutablePlanningStatus()->mutable_stop_sign();
   double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration + 1;
   double stop_start_time = Clock::NowInSeconds() - wait_time;
@@ -288,7 +288,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_06) {
 
   // set PlanningStatus
   auto* stop_sign_status =
-      PlanningContext::MutablePlanningStatus()->mutable_stop_sign();
+      PlanningContext::Instance()->MutablePlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_status(StopSignStatus::STOP);
   double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration + 0.5;
@@ -371,7 +371,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
 
   // check PlanningStatus value: DRIVE
   auto* stop_sign_status =
-      PlanningContext::MutablePlanningStatus()->mutable_stop_sign();
+      PlanningContext::Instance()->MutablePlanningStatus()->mutable_stop_sign();
   EXPECT_EQ("9762", stop_sign_status->stop_sign_id());
   EXPECT_EQ(stop_sign_status->status(), StopSignStatus::DRIVE);
   EXPECT_FALSE(stop_sign_status->has_stop_start_time());
@@ -393,7 +393,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_07) {
 
   // check PlanningStatus value: clear
   // to make sure everything is cleared for that stop sign
-  EXPECT_FALSE(PlanningContext::MutablePlanningStatus()->has_stop_sign());
+  EXPECT_FALSE(PlanningContext::Instance()->MutablePlanningStatus()->has_stop_sign());
 
   // step 3: 2nd round
 
@@ -442,7 +442,7 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_08) {
 
   // set PlanningStatus
   auto* stop_sign_status =
-      PlanningContext::MutablePlanningStatus()->mutable_stop_sign();
+      PlanningContext::Instance()->MutablePlanningStatus()->mutable_stop_sign();
   stop_sign_status->set_status(StopSignStatus::STOP);
   double stop_duration = stop_sign_config->stop_sign().stop_duration();
   double wait_time = stop_duration + 0.5;
@@ -577,7 +577,7 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
 
   // check PlanningStatus value
   auto* crosswalk_status =
-      PlanningContext::MutablePlanningStatus()->mutable_crosswalk();
+      PlanningContext::Instance()->MutablePlanningStatus()->mutable_crosswalk();
   EXPECT_EQ("2832", crosswalk_status->crosswalk_id());
   EXPECT_EQ(1, crosswalk_status->stop_time_size());
   EXPECT_EQ("11652", crosswalk_status->stop_time(0).obstacle_id());
@@ -689,7 +689,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: PULL OVER
-  auto* planning_status = PlanningContext::MutablePlanningStatus();
+  auto* planning_status = PlanningContext::Instance()->MutablePlanningStatus();
   EXPECT_TRUE(planning_status->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_status->pull_over().reason());
 
@@ -754,7 +754,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value: PULL OVER
-  auto* planning_status = PlanningContext::MutablePlanningStatus();
+  auto* planning_status = PlanningContext::Instance()->MutablePlanningStatus();
   EXPECT_TRUE(planning_status->pull_over().in_pull_over());
   EXPECT_EQ(PullOverStatus::DESTINATION, planning_status->pull_over().reason());
 
