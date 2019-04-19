@@ -359,7 +359,7 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
   // Go through all the four corner points at every path pt, check collision.
   for (size_t i = 0; i < path_data.discretized_path().size(); ++i) {
     if (path_data.frenet_frame_path().back().s() -
-        path_data.frenet_frame_path()[i].s() <
+            path_data.frenet_frame_path()[i].s() <
         kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
       break;
     }

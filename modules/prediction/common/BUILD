@@ -210,7 +210,7 @@ cc_library(
         "-lboost_thread",
     ],
     deps = [
-        "//cyber/common:common",
+        "//cyber/common",
     ],
 )
 
