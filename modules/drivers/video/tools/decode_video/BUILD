@@ -9,7 +9,6 @@ cc_binary(
     ],
     deps = [
         ":frame_processor_lib",
-        "//cyber/common:log",
         "//external:gflags",
     ],
 )
@@ -25,8 +24,6 @@ cc_library(
     linkstatic = True,
     deps = [
         ":h265_decoder_lib",
-        "//cyber/common:log",
-        "@ffmpeg",
     ],
 )
 
