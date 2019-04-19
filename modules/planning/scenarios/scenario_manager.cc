@@ -496,7 +496,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
         break;
       } else if (overlap.first == ReferenceLineInfo::PNC_JUNCTION) {
         pnc_junction_overlap = const_cast<hdmap::PathOverlap*>(&overlap.second);
-        break;
       }
     }
 
