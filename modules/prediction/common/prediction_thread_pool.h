@@ -24,9 +24,9 @@
 #include <future>
 #include <iterator>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
-#include <string>
 
 #include "boost/asio.hpp"
 #include "boost/thread.hpp"
@@ -38,7 +38,7 @@ namespace prediction {
 
 class PredictionThreadPool {
  public:
-  explicit PredictionThreadPool(int thread_num, int thread_pool_index);
+  PredictionThreadPool(int thread_num, int thread_pool_index);
 
   ~PredictionThreadPool() = default;
 
