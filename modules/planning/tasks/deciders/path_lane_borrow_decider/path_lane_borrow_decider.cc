@@ -16,6 +16,9 @@
 
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
 
+#include <string>
+
+#include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_context.h"
 
 namespace apollo {
@@ -25,6 +28,7 @@ using apollo::common::Status;
 
 constexpr double kLaneBorrowMaxSpeed = 5.0;
 constexpr double kIntersectionClearanceDist = 20.0;
+constexpr double kJunctionClearanceDist = 15.0;
 
 PathLaneBorrowDecider::PathLaneBorrowDecider(const TaskConfig& config)
     : Decider(config) {}
@@ -60,8 +64,8 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
         IsWithinSidePassingSpeedADC(frame) &&
         IsBlockingObstacleFarFromIntersection(reference_line_info) &&
         IsLongTermBlockingObstacle() &&
-        IsBlockingObstacleWithinDestination(frame, reference_line_info) &&
-        IsSidePassableObstacle(frame, reference_line_info)) {
+        IsBlockingObstacleWithinDestination(reference_line_info) &&
+        IsSidePassableObstacle(reference_line_info)) {
       // Satisfying the above condition will it switch to lane-borrowing.
       PlanningContext::set_is_in_path_lane_borrow_scenario(true);
       AINFO << "Switch from SELF-LANE path to LANE-BORROW path.";
@@ -86,7 +90,7 @@ bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
 }
 
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
-    const Frame& frame, const ReferenceLineInfo& reference_line_info) {
+    const ReferenceLineInfo& reference_line_info) {
   std::string blocking_obstacle_id =
       PlanningContext::front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {
@@ -103,29 +107,86 @@ bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
 
   double blocking_obstacle_s =
       blocking_obstacle->PerceptionSLBoundary().start_s();
-  // TODO(jiacheng): use adc actual s rather than plannign start point's s.
-  double adc_frenet_s =
-      reference_line_info.reference_line().GetFrenetPoint(
-          frame.PlanningStartPoint().path_point()).s();
+  double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
   ADEBUG << "Blocking obstacle is at s = " << blocking_obstacle_s;
-  ADEBUG << "ADC is at s = " << adc_frenet_s;
+  ADEBUG << "ADC is at s = " << adc_end_s;
   ADEBUG << "Destination is at s = "
-         << reference_line_info.SDistanceToDestination() + adc_frenet_s;
-  if (blocking_obstacle_s - adc_frenet_s >
+         << reference_line_info.SDistanceToDestination() + adc_end_s;
+  if (blocking_obstacle_s - adc_end_s >
       reference_line_info.SDistanceToDestination()) {
     return false;
   }
   return true;
 }
 
-// TODO(jiacheng): Implement the following two functions.
 bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
     const ReferenceLineInfo& reference_line_info) {
+  std::string blocking_obstacle_id =
+      PlanningContext::front_static_obstacle_id();
+  if (blocking_obstacle_id.empty()) {
+    ADEBUG << "There is no blocking obstacle.";
+    return true;
+  }
+  const Obstacle* blocking_obstacle =
+      reference_line_info.path_decision().obstacles().Find(
+          blocking_obstacle_id);
+  if (blocking_obstacle == nullptr) {
+    ADEBUG << "Blocking obstacle is no longer there.";
+    return true;
+  }
+
+  // Get blocking obstacle's s.
+  double blocking_obstacle_s =
+      blocking_obstacle->PerceptionSLBoundary().end_s();
+  // Get intersection's s and compare with threshold.
+  const auto& first_encountered_overlaps =
+      reference_line_info.FirstEncounteredOverlaps();
+  for (const auto& overlap : first_encountered_overlaps) {
+    ADEBUG << overlap.first << ", " << overlap.second.DebugString();
+    if (overlap.first != ReferenceLineInfo::CLEAR_AREA &&
+        overlap.first != ReferenceLineInfo::CROSSWALK &&
+        // overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
+        overlap.first != ReferenceLineInfo::SIGNAL &&
+        overlap.first != ReferenceLineInfo::STOP_SIGN) {
+      continue;
+    }
+
+    auto distance = overlap.second.start_s - blocking_obstacle_s;
+    if (overlap.first == ReferenceLineInfo::SIGNAL) {
+      if (distance < kIntersectionClearanceDist) {
+        ADEBUG << "Too close to signal intersection (" << distance
+               << "m); don't SIDE_PASS.";
+        return false;
+      }
+    } else {
+      if (distance < kJunctionClearanceDist) {
+        ADEBUG << "Too close to overlap_type[" << overlap.first << "] ("
+               << distance << "m); don't SIDE_PASS";
+        return false;
+      }
+    }
+  }
+
   return true;
 }
+
 bool PathLaneBorrowDecider::IsSidePassableObstacle(
-    const Frame& frame, const ReferenceLineInfo& reference_line_info) {
-  return true;
+    const ReferenceLineInfo& reference_line_info) {
+  std::string blocking_obstacle_id =
+      PlanningContext::front_static_obstacle_id();
+  if (blocking_obstacle_id.empty()) {
+    ADEBUG << "There is no blocking obstacle.";
+    return false;
+  }
+  const Obstacle* blocking_obstacle =
+      reference_line_info.path_decision().obstacles().Find(
+          blocking_obstacle_id);
+  if (blocking_obstacle == nullptr) {
+    ADEBUG << "Blocking obstacle is no longer there.";
+    return false;
+  }
+
+  return IsNonmovableObstacle(reference_line_info, *blocking_obstacle);
 }
 
 }  // namespace planning

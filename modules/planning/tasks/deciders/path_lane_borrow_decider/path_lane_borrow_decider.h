@@ -45,13 +45,13 @@ class PathLaneBorrowDecider : public Decider {
   bool IsLongTermBlockingObstacle();
 
   bool IsBlockingObstacleWithinDestination(
-      const Frame& frame, const ReferenceLineInfo& reference_line_info);
+      const ReferenceLineInfo& reference_line_info);
 
   bool IsBlockingObstacleFarFromIntersection(
       const ReferenceLineInfo& reference_line_info);
 
   bool IsSidePassableObstacle(
-      const Frame& frame, const ReferenceLineInfo& reference_line_info);
+      const ReferenceLineInfo& reference_line_info);
 };
 
 }  // namespace planning
