@@ -21,10 +21,17 @@
 namespace apollo {
 namespace prediction {
 
-PredictionThreadPool::PredictionThreadPool(int thread_num,
-                                           int thread_pool_index)
-    : work_(io_service_) {
-  // TODO(kechxu): implement
+thread_local int PredictionThreadPool::s_thread_pool_level = 0;
+std::vector<int> BaseThreadPool::THREAD_POOL_CAPACITY = {10, 10, 10};
+
+BaseThreadPool::BaseThreadPool(
+    int thread_num, int next_thread_pool_level) : work_(io_service_) {
+  for (int i = 0; i < thread_num; ++i) {
+    thread_group_.create_thread([this, next_thread_pool_level, i] {
+      PredictionThreadPool::s_thread_pool_level = next_thread_pool_level;
+      this->io_service_.run();
+    });
+  }
 }
 
 }  // namespace prediction
