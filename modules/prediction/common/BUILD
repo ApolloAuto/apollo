@@ -204,12 +204,13 @@ cc_library(
 
 cc_library(
     name = "prediction_thread_pool",
+    srcs = ["prediction_thread_pool.cc"],
     hdrs = ["prediction_thread_pool.h"],
     linkopts = [
         "-lboost_thread",
     ],
     deps = [
-        "//cyber/base:thread_pool",
+        "//cyber/common:common",
     ],
 )
 
