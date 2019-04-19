@@ -21,8 +21,9 @@
 namespace apollo {
 namespace prediction {
 
-PredictionThreadPool::PredictionThreadPool(
-    int thread_num, int thread_pool_index) : work_(io_service_) {
+PredictionThreadPool::PredictionThreadPool(int thread_num,
+                                           int thread_pool_index)
+    : work_(io_service_) {
   // TODO(kechxu): implement
 }
 

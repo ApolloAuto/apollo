@@ -42,14 +42,12 @@ class PredictionThreadPool {
 
   ~PredictionThreadPool() = default;
 
-  template<typename InputIter, typename F>
+  template <typename InputIter, typename F>
   void ForEach(InputIter begin, InputIter end, F f) {
     std::vector<std::future<void>> futures;
     for (auto iter = begin; iter != end; ++iter) {
       auto& elem = *iter;
-      futures.emplace_back(this->Post([&]{
-        f(elem);
-      }));
+      futures.emplace_back(this->Post([&] { f(elem); }));
     }
     for (auto& future : futures) {
       if (future.valid()) {
@@ -60,7 +58,7 @@ class PredictionThreadPool {
     }
   }
 
-  template<typename FuncType>
+  template <typename FuncType>
   std::future<typename std::result_of<FuncType()>::type> Post(FuncType&& func) {
     typedef typename std::result_of<FuncType()>::type ReturnType;
     typedef typename std::packaged_task<ReturnType()> TaskType;
@@ -72,9 +70,7 @@ class PredictionThreadPool {
     std::future<ReturnType> returned_future = task->get_future();
 
     // Note: variables eg. `task` must be copied here because of the lifetime
-    io_service_.post([=]{
-      (*task)();
-    });
+    io_service_.post([=] { (*task)(); });
     return returned_future;
   }
 

@@ -322,10 +322,16 @@ void PathBoundsDecider::RemoveRedundantPathBoundaries(
 bool PathBoundsDecider::IsContained(
     const std::vector<std::pair<double, double>>& lhs,
     const std::vector<std::pair<double, double>>& rhs) {
-  if (lhs.size() > rhs.size()) { return false; }
+  if (lhs.size() > rhs.size()) {
+    return false;
+  }
   for (size_t i = 0; i < lhs.size(); ++i) {
-    if (lhs[i].first < rhs[i].first) { return false; }
-    if (lhs[i].second > rhs[i].second) { return false; }
+    if (lhs[i].first < rhs[i].first) {
+      return false;
+    }
+    if (lhs[i].second > rhs[i].second) {
+      return false;
+    }
   }
   return true;
 }

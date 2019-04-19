@@ -165,7 +165,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
   for (int i = 1; i < num_of_knots; ++i) {
     // Avoid the very last points when already stopped
-    if (s[i] - s[i-1] <= 0.0 || ds[i] <= 0.0) {
+    if (s[i] - s[i - 1] <= 0.0 || ds[i] <= 0.0) {
       break;
     }
     speed_data.AppendSpeedPoint(s[i], delta_t * i, ds[i], dds[i],
@@ -181,7 +181,7 @@ void SpeedProfileGenerator::FillEnoughSpeedPoints(SpeedData* const speed_data) {
     return;
   }
   for (double t = last_point.t() + FLAGS_fallback_time_unit;
-      t < FLAGS_fallback_total_time; t += FLAGS_fallback_time_unit) {
+       t < FLAGS_fallback_total_time; t += FLAGS_fallback_time_unit) {
     speed_data->AppendSpeedPoint(last_point.s(), t, 0.0, 0.0, 0.0);
   }
 }

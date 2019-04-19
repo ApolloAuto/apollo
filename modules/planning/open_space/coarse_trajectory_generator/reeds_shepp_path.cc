@@ -896,8 +896,7 @@ void ReedShepp::LRSLR(const double x, const double y, const double phi,
   }
 }
 
-bool ReedShepp::SetRSP(const int size, const double* lengths,
-                       const char* types,
+bool ReedShepp::SetRSP(const int size, const double* lengths, const char* types,
                        std::vector<ReedSheppPath>* all_possible_paths) {
   ReedSheppPath path;
   std::vector<double> length_vec(lengths, lengths + size);

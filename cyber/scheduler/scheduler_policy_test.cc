@@ -129,27 +129,26 @@ TEST(SchedulerPolicyTest, sched_choreo) {
   cr1->set_processor_id(0);
   EXPECT_TRUE(sched->DispatchTask(cr1));
 
-  auto& croutines = ClassicContext::cr_group_[DEFAULT_GROUP_NAME]
-              .at(cr->priority());
+  auto& croutines =
+      ClassicContext::cr_group_[DEFAULT_GROUP_NAME].at(cr->priority());
   std::vector<std::string> cr_names;
   for (auto& croutine : croutines) {
     cr_names.emplace_back(croutine->name());
   }
   auto itr = std::find(cr_names.begin(), cr_names.end(), cr->name());
-  EXPECT_TRUE(itr != cr_names.end());
+  EXPECT_NE(itr, cr_names.end());
 
   itr = std::find(cr_names.begin(), cr_names.end(), cr1->name());
-  EXPECT_TRUE(itr == cr_names.end());
+  EXPECT_EQ(itr, cr_names.end());
 
   sched->RemoveTask(cr->name());
-  croutines = ClassicContext::cr_group_[DEFAULT_GROUP_NAME]
-              .at(cr->priority());
+  croutines = ClassicContext::cr_group_[DEFAULT_GROUP_NAME].at(cr->priority());
   cr_names.clear();
   for (auto& croutine : croutines) {
     cr_names.emplace_back(croutine->name());
   }
   itr = std::find(cr_names.begin(), cr_names.end(), cr->name());
-  EXPECT_TRUE(itr == cr_names.end());
+  EXPECT_EQ(itr, cr_names.end());
 }
 
 }  // namespace scheduler

@@ -112,14 +112,13 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
   /** @brief Remove redundant path bounds in the following manner:
-    *   - if "left" is contained by "right", remove "left"; vice versa.
-    */
+   *   - if "left" is contained by "right", remove "left"; vice versa.
+   */
   void RemoveRedundantPathBoundaries(
       std::vector<PathBoundary>* const candidate_path_boundaries);
 
-  bool IsContained(
-      const std::vector<std::pair<double, double>>& lhs,
-      const std::vector<std::pair<double, double>>& rhs);
+  bool IsContained(const std::vector<std::pair<double, double>>& lhs,
+                   const std::vector<std::pair<double, double>>& rhs);
 
   /////////////////////////////////////////////////////////////////////////////
   // Below are functions called when generating path bounds.
