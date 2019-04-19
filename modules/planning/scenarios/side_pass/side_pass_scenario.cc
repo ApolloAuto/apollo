@@ -129,6 +129,7 @@ bool SidePassScenario::IsTransferable(const Frame& frame,
   }
 
   if (config.stage_type(0) == ScenarioConfig::SIDE_PASS_DEFAULT_STAGE) {
+    return false;
     return IsUnifiedTransferable(frame, config, current_scenario);
   }
 
@@ -152,7 +153,6 @@ bool SidePassScenario::IsTransferable(const Frame& frame,
         front_blocking_obstacle->PerceptionSLBoundary().start_s() -
         adc_front_edge_s;
 
-    constexpr double kSidePassMaxDistance = 10.0;
     if (!front_blocking_obstacle->IsStatic() ||
         distance > kSidePassMaxDistance) {
       ADEBUG << "Obstacle " << front_blocking_obstacle_id
