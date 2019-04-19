@@ -36,11 +36,11 @@
 namespace apollo {
 namespace prediction {
 
-class PredictionThreadPool {
+class BaseThreadPool {
  public:
-  PredictionThreadPool(int thread_num, int thread_pool_index);
+  BaseThreadPool(int thread_num, int next_thread_pool_level);
 
-  ~PredictionThreadPool() = default;
+  ~BaseThreadPool() = default;
 
   template <typename InputIter, typename F>
   void ForEach(InputIter begin, InputIter end, F f) {
@@ -74,10 +74,39 @@ class PredictionThreadPool {
     return returned_future;
   }
 
+  static std::vector<int> THREAD_POOL_CAPACITY;
+
  private:
   boost::thread_group thread_group_;
   boost::asio::io_service io_service_;
   boost::asio::io_service::work work_;
+};
+
+template<int LEVEL>
+class LevelThreadPool : public BaseThreadPool {
+ public:
+  static LevelThreadPool* Instance() {
+    static LevelThreadPool<LEVEL> pool;
+    return &pool;
+  }
+
+ private:
+  LevelThreadPool() : BaseThreadPool(THREAD_POOL_CAPACITY[LEVEL], LEVEL + 1) {
+    ADEBUG << "Level = " << LEVEL << "; thread pool capacity = "
+           << THREAD_POOL_CAPACITY[LEVEL];
+  }
+};
+
+class PredictionThreadPool {
+ public:
+  static BaseThreadPool* Instance();
+
+  static thread_local int s_thread_pool_level;
+
+  template<typename InputIter, typename F>
+  static void ForEach(InputIter begin, InputIter end, F f) {
+    Instance()->ForEach(begin, end, f);
+  }
 };
 
 }  // namespace prediction
