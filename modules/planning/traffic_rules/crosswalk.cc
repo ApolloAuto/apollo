@@ -189,11 +189,13 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       // stop decision
       double stop_deceleration = util::GetADCStopDeceleration(
           adc_front_edge_s, crosswalk_overlap->start_s);
-      if (stop_deceleration < config_.crosswalk().max_stop_deceleration()) {
-        crosswalks_to_stop.push_back(
-            std::make_pair(crosswalk_overlap, pedestrians));
-        ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
+      if (stop_deceleration >= config_.crosswalk().max_stop_deceleration()) {
+        // warn only.  always STOP regardless of stop_deceleration
+        AWARN << "crosswalk_id[" << crosswalk_id
+              << "] stop_deceleration[" << stop_deceleration << "]";
       }
+      crosswalks_to_stop.emplace_back(crosswalk_overlap, pedestrians);
+      ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
     }
   }
 

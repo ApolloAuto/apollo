@@ -101,7 +101,7 @@ class OpenSpacePlanner : public Planner {
   void LoadTrajectoryToFrame(Frame* frame);
   bool IsVehicleNearDestination(const common::VehicleState& vehicle_state,
                                 const std::vector<double>& end_pose,
-                                const double& rotate_angle,
+                                const double rotate_angle,
                                 const Vec2d& translate_origin);
 
  private:

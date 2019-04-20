@@ -25,6 +25,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "gtest/gtest.h"
@@ -35,6 +36,15 @@
 
 namespace apollo {
 namespace planning {
+
+constexpr double kPathBoundsDeciderHorizon = 100.0;
+constexpr double kPathBoundsDeciderResolution = 0.5;
+constexpr double kDefaultLaneWidth = 5.0;
+constexpr double kDefaultRoadWidth = 20.0;
+constexpr double kObstacleStartSBuffer = 4.0;
+constexpr double kObstacleEndSBuffer = 2.0;
+constexpr double kObstacleLBuffer = 0.4;
+constexpr int kNumExtraTailBoundPoint = 10;
 
 class PathBoundsDecider : public Decider {
  public:
@@ -100,6 +110,15 @@ class PathBoundsDecider : public Decider {
   std::string GenerateFallbackPathBound(
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
+
+  /** @brief Remove redundant path bounds in the following manner:
+   *   - if "left" is contained by "right", remove "left"; vice versa.
+   */
+  void RemoveRedundantPathBoundaries(
+      std::vector<PathBoundary>* const candidate_path_boundaries);
+
+  bool IsContained(const std::vector<std::pair<double, double>>& lhs,
+                   const std::vector<std::pair<double, double>>& rhs);
 
   /////////////////////////////////////////////////////////////////////////////
   // Below are functions called when generating path bounds.

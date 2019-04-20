@@ -90,8 +90,8 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   // check on wait-time
   auto start_time = GetContext()->stop_start_time;
   const double wait_time = Clock::NowInSeconds() - start_time;
-  ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
-         << "]";
+  ADEBUG << "stop_start_time[" << start_time
+         << "] wait_time[" << wait_time << "]";
   if (wait_time < scenario_config_.stop_duration_sec()) {
     return Stage::RUNNING;
   }
@@ -116,6 +116,12 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
            << s << "]";
   }
+
+  // remove duplicates (caused when same vehicle on mutiple lanes)
+  watch_vehicle_ids.erase(
+      unique(watch_vehicle_ids.begin(), watch_vehicle_ids.end()),
+      watch_vehicle_ids.end());
+
   if (watch_vehicle_ids.empty()) {
     return FinishStage();
   }

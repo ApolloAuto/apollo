@@ -24,6 +24,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
 namespace apollo {
@@ -81,7 +82,6 @@ Status PathAssessmentDecider::Process(
     if (curr_path_data.path_label().find("fallback") != std::string::npos) {
       continue;
     }
-    ADEBUG << "Path length = " << curr_path_data.frenet_frame_path().size();
     SetPathInfo(*reference_line_info, &curr_path_data);
     // Trim all the lane-borrowing paths so that it ends with an in-lane
     // position.
@@ -90,7 +90,8 @@ Status PathAssessmentDecider::Process(
 
     // RecordDebugInfo(curr_path_data, curr_path_data.path_label(),
     //                 reference_line_info);
-    ADEBUG << "Path length = " << curr_path_data.frenet_frame_path().size();
+    ADEBUG << "For " << curr_path_data.path_label() << ", "
+           << "path length = " << curr_path_data.frenet_frame_path().size();
   }
   // If there is no valid path_data, exit.
   if (valid_path_data.empty()) {
@@ -356,7 +357,13 @@ bool PathAssessmentDecider::IsCollidingWithStaticObstacles(
   }
 
   // Go through all the four corner points at every path pt, check collision.
-  for (const auto& path_point : path_data.discretized_path()) {
+  for (size_t i = 0; i < path_data.discretized_path().size(); ++i) {
+    if (path_data.frenet_frame_path().back().s() -
+            path_data.frenet_frame_path()[i].s() <
+        kNumExtraTailBoundPoint * kPathBoundsDeciderResolution) {
+      break;
+    }
+    const auto& path_point = path_data.discretized_path()[i];
     // Get the four corner points ABCD of ADC at every path point.
     const auto& vehicle_box =
         common::VehicleConfigHelper::Instance()->GetBoundingBox(path_point);

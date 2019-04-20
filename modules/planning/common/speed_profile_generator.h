@@ -46,6 +46,8 @@ class SpeedProfileGenerator {
 
   static SpeedData GenerateFallbackSpeed(const double stop_distance = 0.0);
 
+  static void FillEnoughSpeedPoints(SpeedData* const speed_data);
+
   static SpeedData GenerateFallbackSpeedProfile();
 
   static SpeedData GenerateFallbackSpeedProfileWithStopDistance(
