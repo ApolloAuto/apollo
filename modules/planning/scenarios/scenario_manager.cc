@@ -735,7 +735,8 @@ void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
 void ScenarioManager::UpdatePlanningContextStopSignScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsStopSignScenario(scenario_type)) {
-    PlanningContext::Instance()->MutablePlanningStatus()->mutable_stop_sign()->Clear();
+    PlanningContext::Instance()->MutablePlanningStatus()->
+        mutable_stop_sign()->Clear();
     return;
   }
 
@@ -760,7 +761,8 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
 void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsTrafficLightScenario(scenario_type)) {
-    PlanningContext::Instance()->MutablePlanningStatus()->mutable_traffic_light()->Clear();
+    PlanningContext::Instance()->MutablePlanningStatus()->
+        mutable_traffic_light()->Clear();
     return;
   }
 
@@ -777,7 +779,8 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
   }
 
   if (current_traffic_light_overlap_id.empty()) {
-    PlanningContext::Instance()->MutablePlanningStatus()->mutable_traffic_light()->Clear();
+    PlanningContext::Instance()->MutablePlanningStatus()->
+        mutable_traffic_light()->Clear();
     return;
   }
 
@@ -791,7 +794,8 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
         return overlap.object_id == current_traffic_light_overlap_id;
       });
   if (traffic_light_overlap_itr == traffic_light_overlaps.end()) {
-    PlanningContext::Instance()->MutablePlanningStatus()->mutable_traffic_light()->Clear();
+    PlanningContext::Instance()->MutablePlanningStatus()->
+        mutable_traffic_light()->Clear();
     return;
   }
 

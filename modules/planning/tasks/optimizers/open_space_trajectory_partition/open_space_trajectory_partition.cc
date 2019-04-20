@@ -310,7 +310,8 @@ bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
 bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
     const std::string& trajectory_encoding_to_check) const {
   const auto& index_history =
-      PlanningContext::Instance()->open_space_info().partitioned_trajectories_index_history;
+      PlanningContext::Instance()->open_space_info()
+      .partitioned_trajectories_index_history;
   const size_t index_history_length = index_history.size();
   if (index_history_length <= 1) {
     return false;
@@ -325,8 +326,9 @@ bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
 
 void OpenSpaceTrajectoryPartition::UpdateTrajHistory(
     const std::string& chosen_trajectory_encoding) {
-  auto* trajectory_history = &(PlanningContext::Instance()->mutable_open_space_info()
-                                   ->partitioned_trajectories_index_history);
+  auto* trajectory_history = &(PlanningContext::Instance()->
+                               mutable_open_space_info()->
+                               partitioned_trajectories_index_history);
   if (trajectory_history->empty()) {
     trajectory_history->push_back(chosen_trajectory_encoding);
     return;
