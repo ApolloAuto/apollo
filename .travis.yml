@@ -26,7 +26,7 @@ jobs:
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
         - rm -rf "/apollo/data/core"
       after_script:
-        - find ${HOME}/.cache/bazel/_bazel_${USER}/540135163923dd7d5820f3ee4b306b32/execroot/apollo/bazel-out/local-dbg/testlogs -name *.log | xargs cat
+        - find ${HOME}/.cache/bazel/_bazel_${USER}/540135163923dd7d5820f3ee4b306b32/execroot/apollo/bazel-out/local-dbg/testlogs -name *.log | xargs grep -in 'Total errors found' | awk '{ if($4 > 0) { split($0, error_log, ":");print error_log[1]} }' | xargs cat
     - stage: stage-02
       if: branch = master
       env:
