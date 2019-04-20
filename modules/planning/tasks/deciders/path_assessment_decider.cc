@@ -193,7 +193,8 @@ Status PathAssessmentDecider::Process(
   reference_line_info->SetCandidatePathData(new_candidate_path_data);
 
   if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
-    if (PlanningContext::Instance()->front_static_obstacle_cycle_counter() < 0) {
+    if (PlanningContext::Instance()->front_static_obstacle_cycle_counter()
+        < 0) {
       PlanningContext::Instance()->ResetFrontStaticObstacleCycleCounter();
     }
     PlanningContext::Instance()->set_front_static_obstacle_id(

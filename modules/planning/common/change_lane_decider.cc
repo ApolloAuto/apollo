@@ -40,8 +40,8 @@ void ChangeLaneDecider::UpdateStatus(ChangeLaneStatus::Status status_code,
 void ChangeLaneDecider::UpdateStatus(double timestamp,
                                      ChangeLaneStatus::Status status_code,
                                      const std::string& path_id) {
-  auto* change_lane_status =
-      PlanningContext::Instance()->MutablePlanningStatus()->mutable_change_lane();
+  auto* change_lane_status = PlanningContext::Instance()->
+      MutablePlanningStatus()->mutable_change_lane();
   change_lane_status->set_timestamp(timestamp);
   change_lane_status->set_path_id(path_id);
   change_lane_status->set_status(status_code);
@@ -98,8 +98,8 @@ bool ChangeLaneDecider::Apply(
     return true;
   }
 
-  auto* prev_status =
-      PlanningContext::Instance()->MutablePlanningStatus()->mutable_change_lane();
+  auto* prev_status = PlanningContext::Instance()->
+      MutablePlanningStatus()->mutable_change_lane();
   double now = Clock::NowInSeconds();
 
   if (!prev_status->has_status()) {
