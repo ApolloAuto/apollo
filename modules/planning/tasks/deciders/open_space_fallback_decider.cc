@@ -19,6 +19,7 @@
  **/
 
 #include "modules/planning/tasks/deciders/open_space_fallback_decider.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
 namespace planning {
@@ -35,28 +36,32 @@ bool OpenSpaceFallbackDecider::QuardraticFormulaLowerSolution(const double a,
                                                               const double c,
                                                               double* sol) {
   // quardratic formula: ax^2 + bx + c = 0, return lower solution
-
   // TODO(QiL): use const from common::math
-  const double epis = 1e-6;
+  const double kEpsilon = 1e-6;
   *sol = 0.0;
-  if (std::abs(a) < epis) {
+  if (std::abs(a) < kEpsilon) {
     return false;
   }
 
   double tmp = b * b - 4 * a * c;
-  if (tmp < epis) {
+  if (tmp < kEpsilon) {
     return false;
   }
 
-  *sol = std::min((-b + std::sqrt(tmp)) / (2.0 * a),
-                  (-b - std::sqrt(tmp)) / (2.0 * a));
+  double sol1 = (-b + std::sqrt(tmp)) / (2.0 * a);
+  double sol2 = (-b - std::sqrt(tmp)) / (2.0 * a);
+
+  *sol = std::abs(std::min(sol1, sol2));
+  ADEBUG << "QuardraticFormulaLowerSolution finished with sol: " << *sol
+         << "sol1: " << sol1 << ", sol2: " << sol2 << "a: " << a << "b: " << b
+         << "c: " << c;
   return true;
 }
 
 Status OpenSpaceFallbackDecider::Process(Frame* frame) {
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles;
-  size_t first_collision_idx = 0;
-  size_t current_idx = 0;
+  size_t first_collision_index = 0;
+  size_t fallback_start_index = 0;
 
   BuildPredictedEnvironment(frame->obstacles(), predicted_bounding_rectangles);
   ADEBUG << "Numbers of obstsacles are: " << frame->obstacles().size();
@@ -65,70 +70,173 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
          << " and : " << predicted_bounding_rectangles.size();
   if (!IsCollisionFreeTrajectory(
           frame->open_space_info().chosen_paritioned_trajectory(),
-          predicted_bounding_rectangles, &current_idx, &first_collision_idx)) {
-    // change gflag
+          predicted_bounding_rectangles, &fallback_start_index,
+          &first_collision_index)) {
+    // change flag
     frame_->mutable_open_space_info()->set_fallback_flag(true);
 
     // generate fallback trajectory base on current partition trajectory
     // vehicle speed is decreased to zero inside safety distance
-    *(frame_->mutable_open_space_info()->mutable_fallback_trajectory()) =
+    TrajGearPair fallback_trajectory_pair_candidate =
         frame->open_space_info().chosen_paritioned_trajectory();
-    auto* ptr_fallback_trajectory_pair =
-        frame_->mutable_open_space_info()->mutable_fallback_trajectory();
+    // auto* ptr_fallback_trajectory_pair =
+    // frame_->mutable_open_space_info()->mutable_fallback_trajectory();
     const auto future_collision_point =
-        ptr_fallback_trajectory_pair->first[first_collision_idx];
+        fallback_trajectory_pair_candidate.first[first_collision_index];
+
+    // Fallback starts from current location but with vehicle velocity
     auto fallback_start_point =
-        ptr_fallback_trajectory_pair->first[current_idx];
-    double relative_collision_distance =
-        future_collision_point.path_point().s() -
-        fallback_start_point.path_point().s();
+        fallback_trajectory_pair_candidate.first[fallback_start_index];
+    const auto& vehicle_state =
+        apollo::common::VehicleStateProvider::Instance()->vehicle_state();
+    fallback_start_point.set_v(vehicle_state.linear_velocity());
 
-    // TODO(QiL): move this to configs
-    const double collision_buff_distance = 0.5;
-    if (relative_collision_distance > collision_buff_distance) {
-      relative_collision_distance -= collision_buff_distance;
-    }
-    // the accelerate = -v0^2 / (2*s), where s is slowing down distance
-    const size_t temp_horizon =
-        frame_->open_space_info().fallback_trajectory().first.NumOfPoints();
-    const double accelerate = -fallback_start_point.v() *
-                              fallback_start_point.v() /
-                              (2.0 * (relative_collision_distance + 1e-6));
-    const double v0 = fallback_start_point.v();
-
-    for (size_t i = 0; i < current_idx; ++i) {
-      ptr_fallback_trajectory_pair->first[i].set_v(fallback_start_point.v());
-      ptr_fallback_trajectory_pair->first[i].set_a(fallback_start_point.a());
-    }
-
-    for (size_t i = current_idx; i < temp_horizon; ++i) {
-      double temp_relative_time = 0.0;
-      double temp_v = 0.0;
-      double b = 2.0 * v0;
-      double c = -2.0 * ptr_fallback_trajectory_pair->first[i].path_point().s();
-      if (QuardraticFormulaLowerSolution(accelerate, b, c,
-                                         &temp_relative_time) &&
-          ptr_fallback_trajectory_pair->first[i].path_point().s() <
-              relative_collision_distance) {
-        temp_v = v0 + accelerate * temp_relative_time;
-        ptr_fallback_trajectory_pair->first[i].set_v(temp_v);
-        ptr_fallback_trajectory_pair->first[i].set_a(accelerate);
-        ptr_fallback_trajectory_pair->first[i].set_relative_time(
-            temp_relative_time);
-      } else {
-        temp_relative_time = 0.04 + fallback_start_point.relative_time();
-        ptr_fallback_trajectory_pair->first[i].mutable_path_point()->CopyFrom(
-            fallback_start_point.path_point());
-        ptr_fallback_trajectory_pair->first[i].set_v(0.0);
-        ptr_fallback_trajectory_pair->first[i].set_a(0.0);
-        ptr_fallback_trajectory_pair->first[i].set_relative_time(
-            temp_relative_time);
-      }
-      fallback_start_point = ptr_fallback_trajectory_pair->first[i];
-    }
     *(frame_->mutable_open_space_info()->mutable_future_collision_point()) =
         future_collision_point;
 
+    // TODO(QiL): move 1.0 to configs
+    const double stop_distance =
+        fallback_trajectory_pair_candidate.second == canbus::Chassis::GEAR_DRIVE
+            ? std::max(future_collision_point.path_point().s() -
+                           fallback_start_point.path_point().s() - 1.0,
+                       0.0)
+            : std::min(future_collision_point.path_point().s() -
+                           fallback_start_point.path_point().s() + 1.0,
+                       0.0);
+
+    ADEBUG << "stop distance : " << stop_distance;
+
+    const double stop_deceleration = -fallback_start_point.v() *
+                                     fallback_start_point.v() /
+                                     (2.0 * (stop_distance + 1e-6));
+    ADEBUG << "stop_deceleration: " << stop_deceleration;
+
+    // Search stop index in chosen trajectory by distance
+    size_t stop_index = fallback_start_index;
+
+    for (size_t i = fallback_start_index;
+         i < fallback_trajectory_pair_candidate.first.NumOfPoints(); ++i) {
+      if (std::abs(
+              fallback_trajectory_pair_candidate.first[i].path_point().s()) >=
+          std::abs(fallback_start_point.path_point().s() + stop_distance)) {
+        stop_index = i;
+        break;
+      }
+    }
+
+    AERROR << "stop index before is: " << stop_index;
+    AERROR << "fallback_start index before is: " << fallback_start_index;
+
+    for (size_t i = 0; i < fallback_start_index; ++i) {
+      fallback_trajectory_pair_candidate.first[i].set_v(
+          fallback_start_point.v());
+      fallback_trajectory_pair_candidate.first[i].set_a(0.0);
+    }
+
+    // TODO(QiL): refine the logic and remove redudant code, change 0.5 to from
+    // loading optimizer configs
+
+    // If stop_index == fallback_start_index;
+    if (fallback_start_index == stop_index) {
+      // 1. Set fallback start speed to 0, accleration to max accleration.
+      AINFO << "Stop distance within safety buffer, stop now!";
+      fallback_start_point.set_v(0.0);
+      fallback_start_point.set_a(0.0);
+
+      // 2. Trim all trajectory points after stop index
+      fallback_trajectory_pair_candidate.first.erase(
+          fallback_trajectory_pair_candidate.first.begin() + stop_index + 1,
+          fallback_trajectory_pair_candidate.first.end());
+
+      // 3. AppendTrajectoryPoint with same location but zero velocity
+      for (int i = 0; i < 20; ++i) {
+        common::TrajectoryPoint trajectory_point(
+            fallback_trajectory_pair_candidate.first[stop_index]);
+        trajectory_point.set_relative_time(
+            i * 0.5 + 0.5 +
+            fallback_trajectory_pair_candidate.first[stop_index]
+                .relative_time());
+        fallback_trajectory_pair_candidate.first.AppendTrajectoryPoint(
+            trajectory_point);
+      }
+
+      *(frame_->mutable_open_space_info()->mutable_fallback_trajectory()) =
+          fallback_trajectory_pair_candidate;
+
+      return Status::OK();
+    }
+
+    ADEBUG << "before change, size : "
+           << fallback_trajectory_pair_candidate.first.size()
+           << ", first index information : "
+           << fallback_trajectory_pair_candidate.first[0].DebugString()
+           << ", second index information : "
+           << fallback_trajectory_pair_candidate.first[1].DebugString();
+
+    // If stop_index > fallback_start_index
+
+    for (size_t i = fallback_start_index; i <= stop_index; ++i) {
+      double new_relative_time = 0.0;
+      double temp_v = 0.0;
+      double c =
+          -2.0 * fallback_trajectory_pair_candidate.first[i].path_point().s();
+      if (QuardraticFormulaLowerSolution(stop_deceleration,
+                                         2.0 * fallback_start_point.v(), c,
+                                         &new_relative_time) &&
+          std::abs(
+              fallback_trajectory_pair_candidate.first[i].path_point().s()) <=
+              std::abs(stop_distance)) {
+        temp_v =
+            fallback_start_point.v() + stop_deceleration * new_relative_time;
+        fallback_trajectory_pair_candidate.first[i].set_v(temp_v);
+        fallback_trajectory_pair_candidate.first[i].set_a(stop_deceleration);
+        fallback_trajectory_pair_candidate.first[i].set_relative_time(
+            new_relative_time);
+      } else {
+        AINFO << "QuardraticFormulaLowerSolution solving failed, stop "
+                 "immediately!";
+
+        if (i != 0) {
+          fallback_trajectory_pair_candidate.first[i]
+              .mutable_path_point()
+              ->CopyFrom(
+                  fallback_trajectory_pair_candidate.first[i - 1].path_point());
+          fallback_trajectory_pair_candidate.first[i].set_v(0.0);
+          fallback_trajectory_pair_candidate.first[i].set_a(0.0);
+          fallback_trajectory_pair_candidate.first[i].set_relative_time(
+              fallback_trajectory_pair_candidate.first[i - 1].relative_time() +
+              0.5);
+        } else {
+          fallback_trajectory_pair_candidate.first[i].set_v(0.0);
+          fallback_trajectory_pair_candidate.first[i].set_a(0.0);
+        }
+      }
+    }
+
+    ADEBUG << "fallback start point after changes: "
+           << fallback_start_point.DebugString();
+
+    AERROR << "stop index: " << stop_index;
+    AERROR << "fallback start index: " << fallback_start_index;
+
+    // 2. Erase afterwards
+    fallback_trajectory_pair_candidate.first.erase(
+        fallback_trajectory_pair_candidate.first.begin() + stop_index + 1,
+        fallback_trajectory_pair_candidate.first.end());
+
+    // 3. AppendTrajectoryPoint with same location but zero velocity
+    for (int i = 0; i < 20; ++i) {
+      common::TrajectoryPoint trajectory_point(
+          fallback_trajectory_pair_candidate.first[stop_index]);
+      trajectory_point.set_relative_time(
+          i * 0.5 + 0.5 +
+          fallback_trajectory_pair_candidate.first[stop_index].relative_time());
+      fallback_trajectory_pair_candidate.first.AppendTrajectoryPoint(
+          trajectory_point);
+    }
+
+    *(frame_->mutable_open_space_info()->mutable_fallback_trajectory()) =
+        fallback_trajectory_pair_candidate;
   } else {
     frame_->mutable_open_space_info()->set_fallback_flag(false);
   }
@@ -161,7 +269,7 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
     const TrajGearPair& trajectory_gear_pair,
     const std::vector<std::vector<common::math::Box2d>>&
         predicted_bounding_rectangles,
-    size_t* current_idx, size_t* first_collision_idx) {
+    size_t* current_index, size_t* first_collision_index) {
   // prediction time resolution: FLAGS_trajectory_time_resolution
   const auto& vehicle_config =
       common::VehicleConfigHelper::Instance()->GetConfig();
@@ -169,9 +277,9 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
   double ego_width = vehicle_config.vehicle_param().width();
   auto trajectory_pb = trajectory_gear_pair.first;
   const size_t point_size = trajectory_pb.NumOfPoints();
-  *current_idx = trajectory_pb.QueryLowerBoundPoint(0.0);
+  *current_index = trajectory_pb.QueryLowerBoundPoint(0.0);
 
-  for (size_t i = *current_idx; i < point_size; ++i) {
+  for (size_t i = *current_index; i < point_size; ++i) {
     const auto& trajectory_point = trajectory_pb.TrajectoryPointAt(i);
     double ego_theta = trajectory_point.path_point().theta();
     Box2d ego_box(
@@ -192,7 +300,7 @@ bool OpenSpaceFallbackDecider::IsCollisionFreeTrajectory(
                        static_cast<double>(j) *
                            FLAGS_trajectory_time_resolution) <
               FLAGS_trajectory_time_resolution) {
-            *first_collision_idx = i;
+            *first_collision_index = i;
             return false;
           }
         }
