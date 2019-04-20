@@ -83,7 +83,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_01) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  const auto& stop_sign_status = PlanningContext::Instance()->Planningstatus().stop_sign();
+  const auto& stop_sign_status = PlanningContext::Instance()->
+      Planningstatus().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -107,7 +108,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_02) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  const auto& stop_sign_status = PlanningContext::Instance()->Planningstatus().stop_sign();
+  const auto& stop_sign_status = PlanningContext::Instance()->
+      Planningstatus().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);
@@ -132,7 +134,8 @@ TEST_F(SunnyvaleBigLoopTest, stop_sign_03) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningContext content
-  const auto& stop_sign_status = PlanningContext::Instance()->Planningstatus().stop_sign();
+  const auto& stop_sign_status = PlanningContext::Instance()->
+      Planningstatus().stop_sign();
   EXPECT_EQ(stop_sign_status.current_stop_sign_overlap_id(), "1017");
   EXPECT_EQ(stop_sign_status.done_stop_sign_overlap_id(), "");
   EXPECT_EQ(stop_sign_status.wait_for_obstacle_id_size(), 0);

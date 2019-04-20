@@ -133,9 +133,9 @@ bool SidePassScenario::IsTransferable(const Frame& frame,
     return IsUnifiedTransferable(frame, config, current_scenario);
   }
 
-  std::string front_blocking_obstacle_id = PlanningContext::Instance()->Planningstatus()
-                                               .side_pass()
-                                               .front_blocking_obstacle_id();
+  std::string front_blocking_obstacle_id =
+      PlanningContext::Instance()->Planningstatus()
+      .side_pass().front_blocking_obstacle_id();
 
   if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     // Check if the blocking obstacle is still static.
@@ -205,8 +205,8 @@ bool SidePassScenario::IsUnifiedTransferable(const Frame& frame,
     } else {
       ADEBUG << "   NO!";
     }
-    return is_side_pass &&
-           PlanningContext::Instance()->front_static_obstacle_cycle_counter() >= 1;
+    return is_side_pass && PlanningContext::Instance()->
+                           front_static_obstacle_cycle_counter() >= 1;
   }
 }
 

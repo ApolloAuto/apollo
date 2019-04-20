@@ -493,8 +493,8 @@ bool PullOver::CheckPullOverComplete() {
   // no stop fence if ADC fully pass stop line
   double adc_end_edge_s = reference_line_info_->AdcSlBoundary().start_s();
   if (adc_end_edge_s > stop_point_sl.s()) {
-    PlanningContext::Instance()->MutablePlanningStatus()->mutable_pull_over()->set_status(
-        PullOverStatus::DONE);
+    PlanningContext::Instance()->MutablePlanningStatus()->
+        mutable_pull_over()->set_status(PullOverStatus::DONE);
 
     return true;
   }
@@ -639,7 +639,8 @@ int PullOver::BuildStopDecision(const std::string& vistual_obstacle_id_postfix,
 
   // create virtual stop wall
   const auto& pull_over_reason =
-      PlanningContext::Instance()->MutablePlanningStatus()->pull_over().reason();
+      PlanningContext::Instance()->MutablePlanningStatus()->
+      pull_over().reason();
   std::string virtual_obstacle_id =
       PULL_OVER_VO_ID_PREFIX + PullOverStatus_Reason_Name(pull_over_reason) +
       vistual_obstacle_id_postfix;

@@ -86,7 +86,8 @@ bool PathLaneBorrowDecider::IsWithinSidePassingSpeedADC(const Frame& frame) {
 }
 
 bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
-  return PlanningContext::Instance()->front_static_obstacle_cycle_counter() >= 3;
+  return PlanningContext::Instance()->front_static_obstacle_cycle_counter()
+         >= 3;
 }
 
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
