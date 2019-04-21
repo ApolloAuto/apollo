@@ -14,9 +14,9 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "boost/preprocessor/repeat.hpp"
-
 #include "modules/prediction/common/prediction_thread_pool.h"
+
+#include "boost/preprocessor/repeat.hpp"
 
 namespace apollo {
 namespace prediction {
@@ -32,6 +32,43 @@ BaseThreadPool::BaseThreadPool(
       this->io_service_.run();
     });
   }
+}
+
+void BaseThreadPool::Stop() {
+  io_service_.stop();
+  thread_group_.join_all();
+  stopped_ = true;
+}
+
+BaseThreadPool::~BaseThreadPool() {
+  if (!stopped_) {
+    try {
+      Stop();
+    } catch (std::exception& e) {
+      AERROR << "Stop thread pool failed. " << e.what();
+    }
+  }
+}
+
+BaseThreadPool* PredictionThreadPool::Instance() {
+  int pool_level = s_thread_pool_level;
+  int max_thread_pool_level = static_cast<int>(
+      BaseThreadPool::THREAD_POOL_CAPACITY.size());
+  CHECK_LT(pool_level, max_thread_pool_level);
+  int index = s_thread_pool_level;
+  switch (index) {
+    case 0: {
+      return LevelThreadPool<0>::Instance();
+    }
+    case 1: {
+      return LevelThreadPool<1>::Instance();
+    }
+    case 2: {
+      return LevelThreadPool<2>::Instance();
+    }
+  }
+  AERROR << "Should not hit here";
+  return LevelThreadPool<0>::Instance();
 }
 
 }  // namespace prediction

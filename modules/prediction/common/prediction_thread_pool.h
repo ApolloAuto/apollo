@@ -40,7 +40,9 @@ class BaseThreadPool {
  public:
   BaseThreadPool(int thread_num, int next_thread_pool_level);
 
-  ~BaseThreadPool() = default;
+  void Stop();
+
+  ~BaseThreadPool();
 
   template <typename InputIter, typename F>
   void ForEach(InputIter begin, InputIter end, F f) {
@@ -80,6 +82,7 @@ class BaseThreadPool {
   boost::thread_group thread_group_;
   boost::asio::io_service io_service_;
   boost::asio::io_service::work work_;
+  bool stopped_ = false;
 };
 
 template<int LEVEL>
