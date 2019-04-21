@@ -42,7 +42,7 @@ class FrameProcessor {
  private:
   void WriteOutputJpgFile(const std::vector<uint8_t>& jpeg_buffer,
                           const std::string& output_jpg_file) const;
-  const std::string GetOutputFile(const int frame_num) const;
+  std::string GetOutputFile(const int frame_num) const;
 
   std::vector<uint8_t> input_video_buffer_;
   const std::string output_jpg_dir_;
