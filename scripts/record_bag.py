@@ -192,10 +192,15 @@ class Recorder(object):
             print('Insufficient disk space, stop recording: {} with {}'.format(
                 disk_to_use, available_size))
             return
+
+        task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        # Record small bags all the time.
+        self.record_task(os.path.join(disk_to_use, 'data/small-bag', task_id),
+                         SMALL_TOPICS)
+        # Record large bags if requested.
         if record_all:
-            self.record_task(disk_to_use, SMALL_TOPICS + LARGE_TOPICS)
-        else:
-            self.record_task(disk_to_use, SMALL_TOPICS)
+            self.record_task(os.path.join(disk_to_use, 'data/bag', task_id),
+                             SMALL_TOPICS + LARGE_TOPICS)
 
     def stop(self):
         """Stop recording."""
@@ -203,13 +208,10 @@ class Recorder(object):
         shell_cmd('kill -INT $(pgrep -f "{}" | grep -v pgrep)'.format(
             Recorder.kEventCollector))
 
-    def record_task(self, disk, topics):
+    def record_task(self, task_dir, topics):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
-        task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        task_dir = os.path.join(disk, 'data/bag', task_id)
-        print('Recording bag to {}'.format(task_dir))
-
-        log_file = '/apollo/data/log/apollo_record.out'
+        print('Recording {} topics to {}'.format(len(topics), task_dir))
+        log_file = '/apollo/data/log/apollo_record_{}.out'.format(len(topics))
         topics_str = ' '.join(topics)
 
         os.makedirs(task_dir)
