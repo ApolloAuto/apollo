@@ -7,7 +7,7 @@ cc_library(
     srcs = ["timer.cc"],
     hdrs = ["timer.h"],
     deps = [
-        "timing_wheel",
+        ":timing_wheel",
         "//cyber/common:global_data",
     ],
 )
@@ -21,7 +21,7 @@ cc_library(
     name = "timer_bucket",
     hdrs = ["timer_bucket.h"],
     deps = [
-        "timer_task",
+        ":timer_task",
     ],
 )
 
@@ -30,7 +30,7 @@ cc_library(
     srcs = ["timing_wheel.cc"],
     hdrs = ["timing_wheel.h"],
     deps = [
-        "timer_bucket",
+        ":timer_bucket",
         "//cyber/task",
         "//cyber/time",
         "//cyber/time:duration",
