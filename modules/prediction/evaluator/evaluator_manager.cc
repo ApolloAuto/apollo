@@ -17,6 +17,7 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
 #include <algorithm>
+#include <map>
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -40,6 +41,8 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
+using PriorityObstacleMap = std::map<ObstaclePriority::Priority,
+                                     std::list<Obstacle*>>;
 
 namespace {
 
@@ -52,6 +55,23 @@ bool IsTrainable(const Feature& feature) {
     return false;
   }
   return true;
+}
+
+void GroupObstaclesByPriority(const int obstacle_id,
+    ObstaclesContainer* const obstacles_container,
+    PriorityObstacleMap* const priority_obstacle_map) {
+  Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+  if (obstacle_ptr == nullptr) {
+    AERROR << "Null obstacle [" << obstacle_id << "] found";
+    return;
+  }
+  const Feature& feature = obstacle_ptr->latest_feature();
+  const ObstaclePriority& priority = feature.priority();
+  if (priority.priority() == ObstaclePriority::IGNORE) {
+    ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
+    return;
+  }
+  (*priority_obstacle_map)[priority.priority()].push_back(obstacle_ptr);
 }
 
 }  // namespace
