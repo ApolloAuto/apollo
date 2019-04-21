@@ -21,11 +21,14 @@
 #include <sstream>
 
 #include "cyber/common/log.h"
+#include "modules/common/util/string_util.h"
 #include "modules/drivers/video/tools/decode_video/h265_decoder.h"
 
 namespace apollo {
 namespace drivers {
 namespace video {
+
+using apollo::common::util::StrCat;
 
 FrameProcessor::FrameProcessor(const std::string& input_video_file,
                                const std::string& output_jpg_dir)
@@ -93,20 +96,20 @@ bool FrameProcessor::ProcessStream() const {
   return true;
 }
 
-const std::string FrameProcessor::GetOutputFile(const int frame_num) const {
-  const int SUFFIX_LEN = 5;
+std::string FrameProcessor::GetOutputFile(const int frame_num) const {
+  constexpr int kSuffixLen = 5;
   std::stringstream jpg_suffix;
   jpg_suffix.fill('0');
-  jpg_suffix.width(SUFFIX_LEN);
+  jpg_suffix.width(kSuffixLen);
   jpg_suffix << std::to_string(frame_num);
-  return output_jpg_dir_ + "/" + jpg_suffix.str() + ".jpg";
+  return StrCat(output_jpg_dir_, "/", jpg_suffix.str(), ".jpg");
 }
 
 void FrameProcessor::WriteOutputJpgFile(
     const std::vector<uint8_t>& jpeg_buffer,
     const std::string& output_jpg_file) const {
   std::ofstream out(output_jpg_file, std::ios::binary);
-  for (auto&& current : jpeg_buffer) {
+  for (const uint8_t current : jpeg_buffer) {
     out << static_cast<char>(current);
   }
 }
