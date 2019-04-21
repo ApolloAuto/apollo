@@ -24,6 +24,7 @@
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/common/prediction_thread_pool.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -159,22 +160,38 @@ void EvaluatorManager::Run() {
   }
 
   std::vector<Obstacle*> dynamic_env;
-  for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
-    if (id < 0) {
-      ADEBUG << "The obstacle has invalid id [" << id << "].";
-      continue;
-    }
-    Obstacle* obstacle = obstacles_container->GetObstacle(id);
 
-    if (obstacle == nullptr) {
-      continue;
+  if (FLAGS_enable_multi_thread) {
+    PriorityObstacleMap priority_obstacle_map;
+    for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
+      GroupObstaclesByPriority(id, obstacles_container, &priority_obstacle_map);
     }
-    if (obstacle->IsStill()) {
-      ADEBUG << "Ignore still obstacle [" << id << "] in evaluator_manager";
-      continue;
-    }
+    PredictionThreadPool::ForEach(
+        priority_obstacle_map.begin(), priority_obstacle_map.end(),
+        [&](PriorityObstacleMap::iterator::value_type& obstacles_iter) {
+          // TODO(kechxu): parallelize this level
+          for (auto obstacle_ptr : obstacles_iter.second) {
+            EvaluateObstacle(obstacle_ptr, dynamic_env);
+          }
+        });
+  } else {
+    for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
+      if (id < 0) {
+        ADEBUG << "The obstacle has invalid id [" << id << "].";
+        continue;
+      }
+      Obstacle* obstacle = obstacles_container->GetObstacle(id);
 
-    EvaluateObstacle(obstacle, dynamic_env);
+      if (obstacle == nullptr) {
+        continue;
+      }
+      if (obstacle->IsStill()) {
+        ADEBUG << "Ignore still obstacle [" << id << "] in evaluator_manager";
+        continue;
+      }
+
+      EvaluateObstacle(obstacle, dynamic_env);
+    }
   }
 }
 
