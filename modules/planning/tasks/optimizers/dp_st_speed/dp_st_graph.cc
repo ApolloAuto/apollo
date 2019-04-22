@@ -167,7 +167,7 @@ Status DpStGraph::CalculateTotalCost() {
 
   for (size_t c = 0; c < cost_table_.size(); ++c) {
     size_t highest_row = 0;
-    auto lowest_row = cost_table_.back().size() - 1;
+    size_t lowest_row = cost_table_.back().size() - 1;
 
     int count = static_cast<int>(next_highest_row) -
                 static_cast<int>(next_lowest_row) + 1;
@@ -196,7 +196,7 @@ Status DpStGraph::CalculateTotalCost() {
         size_t l_r = 0;
         GetRowRange(cost_cr, &h_r, &l_r);
         highest_row = std::max(highest_row, h_r);
-        lowest_row = std::min(lowest_row, static_cast<size_t>(l_r));
+        lowest_row = std::min(lowest_row, l_r);
       }
     }
     next_highest_row = highest_row;
@@ -219,6 +219,8 @@ void DpStGraph::GetRowRange(const StGraphPoint& point, size_t* next_highest_row,
 
   const double speed_coeff = unit_t_ * unit_t_;
 
+  // TODO(Jinyun): Evaluate the upper bound correctness. Should be v0*t + 0.5*
+  // a*t^2
   const double delta_s_upper_bound =
       v0 * unit_t_ + vehicle_param_.max_acceleration() * speed_coeff;
   *next_highest_row =
