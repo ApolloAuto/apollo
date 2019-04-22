@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
+#include <algorithm>
 #include <limits>
 #include <utility>
 
@@ -191,29 +192,12 @@ Status LaneFollowStage::PlanOnReferenceLine(
 
   RecordObstacleDebugInfo(reference_line_info);
 
-  if (reference_line_info->path_data().Empty()) {
-    AERROR << "Path fallback.";
-    GenerateFallbackPathProfile(reference_line_info,
-                                reference_line_info->mutable_path_data());
-    reference_line_info->AddCost(kPathOptimizationFallbackCost);
-    reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
+  // check path and speed results for path or speed fallback
+  reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
+  if (!ret.ok()) {
+    PlanFallbackTrajectory(planning_start_point, frame, reference_line_info);
   }
 
-  if (!ret.ok() || reference_line_info->speed_data().empty()) {
-    AERROR << "Speed fallback.";
-
-    *reference_line_info->mutable_speed_data() =
-        SpeedProfileGenerator::GenerateFallbackSpeed();
-    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
-    reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
-  }
-
-  if (!(reference_line_info->trajectory_type() ==
-            ADCTrajectory::PATH_FALLBACK ||
-        reference_line_info->trajectory_type() ==
-            ADCTrajectory::SPEED_FALLBACK)) {
-    reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
-  }
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_start_point.relative_time(),
@@ -274,6 +258,49 @@ Status LaneFollowStage::PlanOnReferenceLine(
   reference_line_info->SetTrajectory(trajectory);
   reference_line_info->SetDrivable(true);
   return Status::OK();
+}
+
+void LaneFollowStage::PlanFallbackTrajectory(
+    const TrajectoryPoint& planning_start_point, Frame* frame,
+    ReferenceLineInfo* reference_line_info) {
+  // path and speed fall back
+  if (reference_line_info->path_data().Empty()) {
+    AERROR << "Path fallback due to algorithm failure";
+    GenerateFallbackPathProfile(reference_line_info,
+                                reference_line_info->mutable_path_data());
+    reference_line_info->AddCost(kPathOptimizationFallbackCost);
+    reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
+  }
+
+  // TODO(Jinyun): Use last successful path data to do speed fallback
+  if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
+    const auto& candidate_path_data =
+        reference_line_info->GetCandidatePathData();
+    for (const auto& path_data : candidate_path_data) {
+      if (path_data.path_label().find("self") != std::string::npos) {
+        *reference_line_info->mutable_path_data() = path_data;
+        break;
+      }
+    }
+    AERROR << "reference_line_info->path_data() "
+           << reference_line_info->path_data().path_label();
+  }
+
+  AERROR << "Speed fallback due to algorithm failure";
+  const double stop_path_distance =
+      reference_line_info->path_data().discretized_path().Length();
+  const double stop_speed_distance =
+      reference_line_info->st_graph_data().is_initialized()
+          ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
+          : std::numeric_limits<double>::infinity();
+  *reference_line_info->mutable_speed_data() =
+      SpeedProfileGenerator::GenerateFallbackSpeed(
+          std::min(stop_path_distance, stop_speed_distance));
+
+  if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
+    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
+    reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
+  }
 }
 
 void LaneFollowStage::GenerateFallbackPathProfile(
