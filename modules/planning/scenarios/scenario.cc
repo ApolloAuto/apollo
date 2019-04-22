@@ -44,7 +44,7 @@ void Scenario::Init() {
 
   // set scenario_type in PlanningContext
   auto* scenario = PlanningContext::Instance()
-      ->MutablePlanningStatus()
+      ->mutable_planning_status()
       ->mutable_scenario();
   scenario->Clear();
   scenario->set_scenario_type(scenario_type());
