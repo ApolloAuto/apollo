@@ -85,7 +85,7 @@ class BaseThreadPool {
   bool stopped_ = false;
 };
 
-template<int LEVEL>
+template <int LEVEL>
 class LevelThreadPool : public BaseThreadPool {
  public:
   static LevelThreadPool* Instance() {
@@ -95,8 +95,8 @@ class LevelThreadPool : public BaseThreadPool {
 
  private:
   LevelThreadPool() : BaseThreadPool(THREAD_POOL_CAPACITY[LEVEL], LEVEL + 1) {
-    ADEBUG << "Level = " << LEVEL << "; thread pool capacity = "
-           << THREAD_POOL_CAPACITY[LEVEL];
+    ADEBUG << "Level = " << LEVEL
+           << "; thread pool capacity = " << THREAD_POOL_CAPACITY[LEVEL];
   }
 };
 
@@ -106,7 +106,7 @@ class PredictionThreadPool {
 
   static thread_local int s_thread_pool_level;
 
-  template<typename InputIter, typename F>
+  template <typename InputIter, typename F>
   static void ForEach(InputIter begin, InputIter end, F f) {
     Instance()->ForEach(begin, end, f);
   }
