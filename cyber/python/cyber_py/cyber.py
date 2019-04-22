@@ -202,9 +202,13 @@ class Node(object):
         sub = self.subs[name]
         msg_str = _CYBER_NODE.PyReader_read(sub[0], False)
         if len(msg_str) > 0:
-            proto = sub[3]()
-            proto.ParseFromString(msg_str)
-            # response = None
+            if sub[3] != "RawData":
+                proto = sub[3]()
+                proto.ParseFromString(msg_str)
+            else:
+                # print "read rawdata-> ",sub[3]
+                proto = msg_str
+
             if sub[2] is None:
                 sub[1](proto)
             else:
@@ -246,6 +250,12 @@ class Node(object):
         _CYBER_NODE.PyReader_register_func(reader, f_ptr)
 
         return Reader(name, reader, data_type)
+
+    def create_rawdata_reader(self, name, callback, args=None):
+        """
+        Create RawData reader:listener RawMessage
+        """
+        return self.create_reader(name, "RawData", callback, args)
 
     def create_client(self, name, request_data_type, response_data_type):
         datatype = request_data_type.DESCRIPTOR.full_name
@@ -294,3 +304,42 @@ class Node(object):
         """
         while not _CYBER_INIT.py_is_shutdown():
             time.sleep(0.002)
+
+
+class ChannelUtils(object):
+
+    @staticmethod
+    def get_debugstring_rawmsgdata(msg_type, rawmsgdata):
+        """
+        Parse rawmsg from rawmsg data
+        Input: message type; rawmsg data
+        Output: a human readable form of this message.for debugging and other purposes.
+        """
+        return _CYBER_NODE.PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(msg_type, rawmsgdata)
+
+    @staticmethod
+    def get_msgtype(channel_name, sleep_s=2):
+        """
+        Parse rawmsg from rawmsg data
+        Input: channel name, wait for topo discovery
+        Output: the corresponding message type of this channel in topo.
+        """
+        return _CYBER_NODE.PyChannelUtils_get_msg_type(channel_name, sleep_s)
+
+    @staticmethod
+    def get_channels(sleep_s=2):
+        """
+        Get active channels name
+        Input: wait for topo discovery
+        Output: all active channels
+        """
+        return _CYBER_NODE.PyChannelUtils_get_active_channels(sleep_s)
+
+    @staticmethod
+    def get_channels_info(sleep_s=2):
+        """
+        Get active channel info
+        Input: wait for topo discovery
+        Output: {'channel1':[], 'channel2':[]} .channels info
+        """
+        return _CYBER_NODE.PyChannelUtils_get_channels_info(sleep_s)

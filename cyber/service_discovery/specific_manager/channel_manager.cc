@@ -71,6 +71,22 @@ void ChannelManager::GetProtoDesc(const std::string& channel_name,
   }
 }
 
+void ChannelManager::GetMsgType(const std::string& channel_name,
+                                std::string* msg_type) {
+  RETURN_IF_NULL(msg_type);
+  uint64_t key = common::GlobalData::RegisterChannel(channel_name);
+  RolePtr writer = nullptr;
+  if (!channel_writers_.Search(key, &writer)) {
+    AERROR << "cannot serarch writer of channel: " << channel_name
+           << " key: " << key;
+    return;
+  }
+
+  if (writer->attributes().has_message_type()) {
+    *msg_type = writer->attributes().message_type();
+  }
+}
+
 bool ChannelManager::HasWriter(const std::string& channel_name) {
   uint64_t key = common::GlobalData::RegisterChannel(channel_name);
   return channel_writers_.Search(key);
