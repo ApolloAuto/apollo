@@ -37,8 +37,8 @@ cc_library(
         "parameter_client.h",
     ],
     deps = [
-        "parameter",
-        "parameter_service_names",
+        ":parameter",
+        ":parameter_service_names",
         "//cyber/node",
         "//cyber/service:client",
         "@fastrtps",
@@ -66,8 +66,8 @@ cc_library(
         "parameter_server.h",
     ],
     deps = [
-        "parameter",
-        "parameter_service_names",
+        ":parameter",
+        ":parameter_service_names",
         "//cyber/node",
         "//cyber/service",
         "@fastrtps",
