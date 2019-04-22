@@ -34,10 +34,10 @@ FrameProcessor::FrameProcessor(const std::string& input_video_file,
                                const std::string& output_jpg_dir)
     : output_jpg_dir_(output_jpg_dir) {
   std::ifstream video_file(input_video_file, std::ios::binary);
-  std::vector<uint8_t> video_buffer(
-      (std::istreambuf_iterator<char>(video_file)),
-      std::istreambuf_iterator<char>());
-  input_video_buffer_ = video_buffer;
+  std::istreambuf_iterator<char> buf_begin(video_file), buf_end;
+  while (buf_begin != buf_end) {
+    input_video_buffer_.emplace_back(*buf_begin++);
+  }
 }
 
 bool FrameProcessor::ProcessStream() const {
