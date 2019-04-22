@@ -67,7 +67,7 @@ class PiecewiseJerkProblem {
    */
   virtual void InitProblem(
       const size_t num_var, const double delta_s,
-      const std::array<double, 5>& w, const double max_x_third_order_derivative,
+      const std::array<double, 5>& w,
       const std::array<double, 3>& x_init = {0.0, 0.0, 0.0},
       const std::array<double, 3>& x_end = {0.0, 0.0, 0.0});
 
@@ -93,6 +93,10 @@ class PiecewiseJerkProblem {
 
   void SetSecondOrderBounds(const double ddx_lower_bound,
                             const double ddx_upper_bound);
+
+  void SetThirdOrderBound(const double dddx_bound) {
+    max_x_third_order_derivative_ = dddx_bound;
+  }
 
   // x_bounds: tuple(s, lower_bounds, upper_bounds)
   // s doesn't need to be sorted
