@@ -390,15 +390,12 @@ void NaviObstacleDecider::GetUnsafeObstaclesInfo(
   PathPoint vehicle_projection_point =
       PathMatcher::MatchToPath(path_data_points, 0, 0);
   for (const auto& iter : obstacles) {
-    double obstacle_y = iter->Perception().position().y();
+    const double obstacle_y = iter->Perception().position().y();
     if ((obstacle_y > unsafe_range.first && obstacle_y < unsafe_range.second) ||
-        (iter->Perception().velocity().y() >
-         config_.lateral_velocity_value()) ||
-        (iter->Perception().velocity().y() <
-         -1.0 * config_.lateral_velocity_value())) {
+        std::abs(iter->Perception().velocity().y()) >
+            config_.lateral_velocity_value()) {
       auto projection_point = PathMatcher::MatchToPath(
-          path_data_points, iter->Perception().position().x(),
-          iter->Perception().position().y());
+          path_data_points, iter->Perception().position().x(), obstacle_y);
       if (vehicle_projection_point.s() >= projection_point.s()) {
         continue;
       }
