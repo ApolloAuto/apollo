@@ -123,7 +123,7 @@ bool Frame::Rerouting() {
   }
 
   auto* rerouting = PlanningContext::Instance()
-      ->MutablePlanningStatus()
+      ->mutable_planning_status()
       ->mutable_rerouting();
   rerouting->set_need_rerouting(true);
   *rerouting->mutable_routing_request() = request;

@@ -103,7 +103,7 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
 }
 
 Stage::StageStatus TrafficLightProtectedStageApproach::FinishScenario() {
-  PlanningContext::Instance()->MutablePlanningStatus()->clear_traffic_light();
+  PlanningContext::Instance()->mutable_planning_status()->clear_traffic_light();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
@@ -111,7 +111,7 @@ Stage::StageStatus TrafficLightProtectedStageApproach::FinishScenario() {
 
 Stage::StageStatus TrafficLightProtectedStageApproach::FinishStage() {
   auto* traffic_light = PlanningContext::Instance()
-      ->MutablePlanningStatus()
+      ->mutable_planning_status()
       ->mutable_traffic_light();
   traffic_light->clear_done_traffic_light_overlap_id();
   for (const auto& traffic_light_overlap_id :

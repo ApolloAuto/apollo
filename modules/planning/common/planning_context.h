@@ -78,9 +78,9 @@ class PlanningContext {
 
   void Init();
 
-  const PlanningStatus& Planningstatus() { return planning_status_; }
+  const PlanningStatus& planning_status() { return planning_status_; }
 
-  PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
+  PlanningStatus* mutable_planning_status() { return &planning_status_; }
 
   /////////////////////////////////////////////////////////////////////////////
   void IncrementFrontStaticObstacleCycleCounter() {

@@ -45,7 +45,7 @@ constexpr double kSpeedOptimizationFallbackCost = 2e4;
 Stage::Stage(const ScenarioConfig::StageConfig& config) : config_(config) {
   // set stage_type in PlanningContext
   PlanningContext::Instance()
-      ->MutablePlanningStatus()
+      ->mutable_planning_status()
       ->mutable_scenario()
       ->set_stage_type(stage_type());
 
