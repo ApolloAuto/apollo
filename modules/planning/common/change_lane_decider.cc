@@ -41,7 +41,7 @@ void ChangeLaneDecider::UpdateStatus(double timestamp,
                                      ChangeLaneStatus::Status status_code,
                                      const std::string& path_id) {
   auto* change_lane_status = PlanningContext::Instance()
-                                 ->MutablePlanningStatus()
+                                 ->mutable_planning_status()
                                  ->mutable_change_lane();
   change_lane_status->set_timestamp(timestamp);
   change_lane_status->set_path_id(path_id);
@@ -100,7 +100,7 @@ bool ChangeLaneDecider::Apply(
   }
 
   auto* prev_status = PlanningContext::Instance()
-                          ->MutablePlanningStatus()
+                          ->mutable_planning_status()
                           ->mutable_change_lane();
   double now = Clock::NowInSeconds();
 

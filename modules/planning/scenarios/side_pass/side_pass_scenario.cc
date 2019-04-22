@@ -100,7 +100,7 @@ SidePassScenario::SidePassScenario(const ScenarioConfig& config,
   // TODO(all): to be removed when SidePass obstacle decision impl is ready
   side_pass_context_.front_blocking_obstacle_id_ =
       PlanningContext::Instance()
-          ->Planningstatus()
+          ->planning_status()
           .side_pass()
           .front_blocking_obstacle_id();
 }
@@ -135,7 +135,7 @@ bool SidePassScenario::IsTransferable(const Frame& frame,
   }
 
   std::string front_blocking_obstacle_id = PlanningContext::Instance()
-                                               ->Planningstatus()
+                                               ->planning_status()
                                                .side_pass()
                                                .front_blocking_obstacle_id();
 
@@ -368,7 +368,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame,
         // TODO(all): to be removed
         //            when SidePass obstacle decision impl is ready
         PlanningContext::Instance()
-            ->MutablePlanningStatus()
+            ->mutable_planning_status()
             ->mutable_side_pass()
             ->set_front_blocking_obstacle_id(obstacle->Id());
       }
@@ -379,7 +379,7 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame,
   } else {
     // TODO(all): to be removed when SidePass obstacle decision impl is ready
     PlanningContext::Instance()
-        ->MutablePlanningStatus()
+        ->mutable_planning_status()
         ->mutable_side_pass()
         ->clear_front_blocking_obstacle_id();
     return false;
