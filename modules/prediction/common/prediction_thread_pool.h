@@ -28,9 +28,9 @@
 #include <utility>
 #include <vector>
 
-#include "boost/asio.hpp"
 #include "boost/thread.hpp"
 
+#include "cyber/base/bounded_queue.h"
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -72,17 +72,19 @@ class BaseThreadPool {
     std::future<ReturnType> returned_future = task->get_future();
 
     // Note: variables eg. `task` must be copied here because of the lifetime
-    io_service_.post([=] { (*task)(); });
+    if (stopped_) {
+      return std::future<ReturnType>();
+    }
+    task_queue_.Enqueue([task]() { (*task)(); });
     return returned_future;
   }
 
   static std::vector<int> THREAD_POOL_CAPACITY;
 
  private:
-  boost::thread_group thread_group_;
-  boost::asio::io_service io_service_;
-  boost::asio::io_service::work work_;
-  bool stopped_ = false;
+  std::vector<std::thread> workers_;
+  apollo::cyber::base::BoundedQueue<std::function<void()>> task_queue_;
+  std::atomic_bool stopped_;
 };
 
 template <int LEVEL>
