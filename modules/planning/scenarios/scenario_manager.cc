@@ -707,11 +707,11 @@ void ScenarioManager::UpdatePlanningContext(
 // update: bare_intersection status in PlanningContext
 void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
+  auto* bare_intersection = PlanningContext::Instance()
+      ->MutablePlanningStatus()
+      ->mutable_bare_intersection();
   if (!IsBareIntersectionScenario(scenario_type)) {
-    PlanningContext::Instance()
-        ->MutablePlanningStatus()
-        ->mutable_bare_intersection()
-        ->Clear();
+    bare_intersection->Clear();
     return;
   }
 
@@ -723,10 +723,8 @@ void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::PNC_JUNCTION);
   if (map_itr != first_encountered_overlap_map_.end()) {
-    PlanningContext::Instance()
-        ->MutablePlanningStatus()
-        ->mutable_bare_intersection()
-        ->set_current_pnc_junction_overlap_id(map_itr->second.object_id);
+    bare_intersection->set_current_pnc_junction_overlap_id(
+        map_itr->second.object_id);
     ADEBUG << "Update PlanningContext with first_encountered pnc_junction["
            << map_itr->second.object_id << "] start_s["
            << map_itr->second.start_s << "]";

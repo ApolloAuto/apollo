@@ -122,16 +122,11 @@ bool Frame::Rerouting() {
     return false;
   }
 
-  PlanningContext::Instance()
+  auto* rerouting = PlanningContext::Instance()
       ->MutablePlanningStatus()
-      ->mutable_rerouting()
-      ->set_need_rerouting(true);
-
-  PlanningContext::Instance()
-      ->MutablePlanningStatus()
-      ->mutable_rerouting()
-      ->mutable_routing_request()
-      ->CopyFrom(request);
+      ->mutable_rerouting();
+  rerouting->set_need_rerouting(true);
+  *rerouting->mutable_routing_request() = request;
 
   monitor_logger_buffer_.INFO("Planning send Rerouting request");
   return true;
