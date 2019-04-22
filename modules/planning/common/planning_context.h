@@ -108,9 +108,7 @@ class PlanningContext {
     front_static_obstacle_id_ = front_static_obstacle_id;
   }
 
-  std::string front_static_obstacle_id() {
-    return front_static_obstacle_id_;
-  }
+  std::string front_static_obstacle_id() { return front_static_obstacle_id_; }
 
   /////////////////////////////////////////////////////////////////////////////
   void IncrementAbleToUseSelfLaneCounter() {
@@ -125,13 +123,9 @@ class PlanningContext {
                  -kPathScenarioTransitionHysteresisFrame);
   }
 
-  void ResetAbleToUseSelfLaneCounter() {
-    able_to_use_self_lane_counter_ = 0;
-  }
+  void ResetAbleToUseSelfLaneCounter() { able_to_use_self_lane_counter_ = 0; }
 
-  int able_to_use_self_lane_counter() {
-    return able_to_use_self_lane_counter_;
-  }
+  int able_to_use_self_lane_counter() { return able_to_use_self_lane_counter_; }
 
   /////////////////////////////////////////////////////////////////////////////
   void set_is_in_path_lane_borrow_scenario(

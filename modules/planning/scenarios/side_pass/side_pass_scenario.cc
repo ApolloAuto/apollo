@@ -99,7 +99,8 @@ SidePassScenario::SidePassScenario(const ScenarioConfig& config,
 
   // TODO(all): to be removed when SidePass obstacle decision impl is ready
   side_pass_context_.front_blocking_obstacle_id_ =
-      PlanningContext::Instance()->Planningstatus()
+      PlanningContext::Instance()
+          ->Planningstatus()
           .side_pass()
           .front_blocking_obstacle_id();
 }
@@ -133,9 +134,10 @@ bool SidePassScenario::IsTransferable(const Frame& frame,
     return IsUnifiedTransferable(frame, config, current_scenario);
   }
 
-  std::string front_blocking_obstacle_id =
-      PlanningContext::Instance()->Planningstatus()
-      .side_pass().front_blocking_obstacle_id();
+  std::string front_blocking_obstacle_id = PlanningContext::Instance()
+                                               ->Planningstatus()
+                                               .side_pass()
+                                               .front_blocking_obstacle_id();
 
   if (current_scenario.scenario_type() == ScenarioConfig::SIDE_PASS) {
     // Check if the blocking obstacle is still static.
@@ -205,8 +207,9 @@ bool SidePassScenario::IsUnifiedTransferable(const Frame& frame,
     } else {
       ADEBUG << "   NO!";
     }
-    return is_side_pass && PlanningContext::Instance()->
-                           front_static_obstacle_cycle_counter() >= 1;
+    return is_side_pass &&
+           PlanningContext::Instance()->front_static_obstacle_cycle_counter() >=
+               1;
   }
 }
 
@@ -364,7 +367,8 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame,
             distance_between_adc_and_obstacle;
         // TODO(all): to be removed
         //            when SidePass obstacle decision impl is ready
-        PlanningContext::Instance()->MutablePlanningStatus()
+        PlanningContext::Instance()
+            ->MutablePlanningStatus()
             ->mutable_side_pass()
             ->set_front_blocking_obstacle_id(obstacle->Id());
       }
@@ -374,7 +378,8 @@ bool SidePassScenario::HasBlockingObstacle(const Frame& frame,
     return true;
   } else {
     // TODO(all): to be removed when SidePass obstacle decision impl is ready
-    PlanningContext::Instance()->MutablePlanningStatus()
+    PlanningContext::Instance()
+        ->MutablePlanningStatus()
         ->mutable_side_pass()
         ->clear_front_blocking_obstacle_id();
     return false;

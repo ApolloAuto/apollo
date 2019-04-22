@@ -145,8 +145,7 @@ bool PathExists(const std::string &path) {
 
 bool DirectoryExists(const std::string &directory_path) {
   struct stat info;
-  return stat(directory_path.c_str(), &info) == 0 &&
-         (info.st_mode & S_IFDIR);
+  return stat(directory_path.c_str(), &info) == 0 && (info.st_mode & S_IFDIR);
 }
 
 std::vector<std::string> Glob(const std::string &pattern) {

@@ -26,14 +26,12 @@ namespace prediction {
 TEST(PredictionThreadPoolTest, post_future) {
   BaseThreadPool pool(5, 0);
   int n = 1;
-  std::future<int> r1 = pool.Post([&]{
-      return n;
-  });
+  std::future<int> r1 = pool.Post([&] { return n; });
   std::this_thread::sleep_for(std::chrono::microseconds(1000));
 
   std::future<int> r2 = pool.Post([&] {
-      std::this_thread::sleep_for(std::chrono::microseconds(1000));
-      return n;
+    std::this_thread::sleep_for(std::chrono::microseconds(1000));
+    return n;
   });
 
   n = 2;
@@ -46,9 +44,7 @@ TEST(PredictionThreadPoolTest, for_each) {
   std::vector<int> expect = {1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<int> real = {1, 2, 3, 4, 5, 6, 7, 8};
 
-  auto incr = [](int& input) {
-    ++input;
-  };
+  auto incr = [](int& input) { ++input; };
 
   std::for_each(expect.begin(), expect.end(), incr);
   pool.ForEach(real.begin(), real.end(), incr);
@@ -60,9 +56,7 @@ TEST(PredictionThreadPoolTest, global_for_each) {
   std::vector<int> expect = {1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<int> real = {1, 2, 3, 4, 5, 6, 7, 8};
 
-  auto incr = [](int& input) {
-    ++input;
-  };
+  auto incr = [](int& input) { ++input; };
 
   std::for_each(expect.begin(), expect.end(), incr);
   PredictionThreadPool::ForEach(real.begin(), real.end(), incr);
@@ -75,21 +69,21 @@ TEST(PredictionThreadPoolTest, avoid_deadlock) {
   std::vector<int> real = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
   std::for_each(expect.begin(), expect.end(), [](int& input) {
-      std::vector<int> vec = {1, 2, 3, 4};
-      std::for_each(vec.begin(), vec.end(), [](int& v) { ++v; });
-      input = std::accumulate(vec.begin(), vec.end(), input);
+    std::vector<int> vec = {1, 2, 3, 4};
+    std::for_each(vec.begin(), vec.end(), [](int& v) { ++v; });
+    input = std::accumulate(vec.begin(), vec.end(), input);
   });
 
   EXPECT_EQ(0, PredictionThreadPool::s_thread_pool_level);
 
   PredictionThreadPool::ForEach(real.begin(), real.end(), [](int& input) {
-      EXPECT_EQ(1, PredictionThreadPool::s_thread_pool_level);
-      std::vector<int> vec = {1, 2, 3, 4};
-      PredictionThreadPool::ForEach(vec.begin(), vec.end(), [](int& v) {
-          ++v;
-          EXPECT_EQ(2, PredictionThreadPool::s_thread_pool_level);
-      });
-      input = std::accumulate(vec.begin(), vec.end(), input);
+    EXPECT_EQ(1, PredictionThreadPool::s_thread_pool_level);
+    std::vector<int> vec = {1, 2, 3, 4};
+    PredictionThreadPool::ForEach(vec.begin(), vec.end(), [](int& v) {
+      ++v;
+      EXPECT_EQ(2, PredictionThreadPool::s_thread_pool_level);
+    });
+    input = std::accumulate(vec.begin(), vec.end(), input);
   });
 
   EXPECT_EQ(expect, real);

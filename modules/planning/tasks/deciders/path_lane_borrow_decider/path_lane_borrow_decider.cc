@@ -60,8 +60,7 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
     }
   } else {
     // If originally not borrowing neighbor lane:
-    if (HasSingleReferenceLine(frame) &&
-        IsWithinSidePassingSpeedADC(frame) &&
+    if (HasSingleReferenceLine(frame) && IsWithinSidePassingSpeedADC(frame) &&
         IsBlockingObstacleFarFromIntersection(reference_line_info) &&
         IsLongTermBlockingObstacle() &&
         IsBlockingObstacleWithinDestination(reference_line_info) &&
@@ -86,8 +85,8 @@ bool PathLaneBorrowDecider::IsWithinSidePassingSpeedADC(const Frame& frame) {
 }
 
 bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
-  return PlanningContext::Instance()->front_static_obstacle_cycle_counter()
-         >= 3;
+  return PlanningContext::Instance()->front_static_obstacle_cycle_counter() >=
+         3;
 }
 
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
