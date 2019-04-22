@@ -32,23 +32,19 @@ bool CameraDriver::Poll(std::shared_ptr<CompressedImage> h265) {
 }
 
 bool CameraDriver::PollByFrame(std::shared_ptr<CompressedImage> h265Pb) {
-  while (true) {
-    int rc = input_->GetFramePacket(h265Pb);
-    if (rc == 0) {
-      h265Pb->set_frame_id(config_.frame_id());
-
-      uint64_t camera_timestamp = h265Pb->mutable_header()->camera_timestamp();
-      uint64_t current_time = cyber::Time().Now().ToNanosecond();
-      AINFO << "get frame from port " << config_.udp_port()
-            << "  size = " << h265Pb->data().size() << " ts: camera/host "
-            << camera_timestamp << "/" << current_time << " diff: "
-            << static_cast<double>(current_time - camera_timestamp) * 1e-6;
-
-      break;
-    } else {
-      return false;
-    }
+  int ret = input_->GetFramePacket(h265Pb);
+  if (ret < 0) {
+    return false;
   }
+
+  h265Pb->set_frame_id(config_.frame_id());
+  uint64_t camera_timestamp = h265Pb->mutable_header()->camera_timestamp();
+  uint64_t current_time = cyber::Time().Now().ToNanosecond();
+  AINFO << "Get frame from port: " << config_.udp_port()
+        << ", size: " << h265Pb->data().size() << ", ts: camera/host "
+        << camera_timestamp << "/" << current_time << ", diff: "
+        << static_cast<double>(current_time - camera_timestamp) * 1e-6;
+
   return true;
 }
 
