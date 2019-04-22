@@ -288,8 +288,9 @@ bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
 
 void ReferenceLineInfo::SetJunctionRightOfWay(const double junction_s,
                                               const bool is_protected) const {
-  auto* right_of_way = PlanningContext::Instance()->
-      MutablePlanningStatus()->mutable_right_of_way();
+  auto* right_of_way = PlanningContext::Instance()
+                           ->MutablePlanningStatus()
+                           ->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (WithinOverlap(overlap, junction_s)) {
@@ -299,8 +300,9 @@ void ReferenceLineInfo::SetJunctionRightOfWay(const double junction_s,
 }
 
 ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
-  auto* right_of_way = PlanningContext::Instance()->
-      MutablePlanningStatus()->mutable_right_of_way();
+  auto* right_of_way = PlanningContext::Instance()
+                           ->MutablePlanningStatus()
+                           ->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (overlap.end_s < sl_boundary_info_.adc_sl_boundary_.start_s()) {
@@ -718,7 +720,8 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
   if (ReachedDestination()) {
-    PlanningContext::Instance()->MutablePlanningStatus()
+    PlanningContext::Instance()
+        ->MutablePlanningStatus()
         ->mutable_destination()
         ->set_has_passed_destination(true);
   } else {
@@ -803,8 +806,9 @@ void ReferenceLineInfo::SetObjectDecisions(
 
 void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   constexpr double kMaxAngleDiff = M_PI / 6.0;
-  auto* prev_advice = PlanningContext::Instance()->
-      MutablePlanningStatus()->mutable_engage_advice();
+  auto* prev_advice = PlanningContext::Instance()
+                          ->MutablePlanningStatus()
+                          ->mutable_engage_advice();
   if (!prev_advice->has_advice()) {
     prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
   }

@@ -52,8 +52,8 @@ Status Destination::ApplyRule(Frame* frame,
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
   ref_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()}, &dest_sl);
   const auto& adc_sl = reference_line_info->AdcSlBoundary();
-  const auto& dest = PlanningContext::Instance()->
-                     MutablePlanningStatus()->destination();
+  const auto& dest =
+      PlanningContext::Instance()->MutablePlanningStatus()->destination();
   if (adc_sl.start_s() > dest_sl.s() && !dest.has_passed_destination()) {
     ADEBUG << "Destination at back, but we have not reached destination yet";
     return Status::OK();
@@ -78,8 +78,8 @@ int Destination::BuildStopDecision(
     return -1;
   }
 
-  const auto* planning_status = PlanningContext::Instance()->
-                                MutablePlanningStatus();
+  const auto* planning_status =
+      PlanningContext::Instance()->MutablePlanningStatus();
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
   double dest_lane_s =
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
@@ -220,8 +220,8 @@ bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
 
   // Disable pull-over for the rest route if ChangeLane and clost to dest
   if (change_lane) {
-    auto* planning_status = PlanningContext::Instance()->
-                            MutablePlanningStatus();
+    auto* planning_status =
+        PlanningContext::Instance()->MutablePlanningStatus();
     planning_status->clear_pull_over();
     auto* pull_over = planning_status->mutable_pull_over();
     pull_over->set_reason(PullOverStatus::DESTINATION);

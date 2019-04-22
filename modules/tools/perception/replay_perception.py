@@ -100,7 +100,7 @@ def load_descrptions(files):
                             print('same trace point found in obstacle: %s' % obstacle["id"])
                             return None
                     objects.append(obstacle)
-            else: # Default case. handles only one obstacle 
+            else: # Default case. handles only one obstacle
                 obstacle = obstacles
                 trace = obstacle.get('trace', [])
                 for i in range(1, len(trace)):

@@ -35,8 +35,8 @@ class PathLaneBorrowDecider : public Decider {
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
 
-  bool IsNecessaryToBorrowLane(
-      const Frame& frame, const ReferenceLineInfo& reference_line_info);
+  bool IsNecessaryToBorrowLane(const Frame& frame,
+                               const ReferenceLineInfo& reference_line_info);
 
   bool HasSingleReferenceLine(const Frame& frame);
 
@@ -50,8 +50,7 @@ class PathLaneBorrowDecider : public Decider {
   bool IsBlockingObstacleFarFromIntersection(
       const ReferenceLineInfo& reference_line_info);
 
-  bool IsSidePassableObstacle(
-      const ReferenceLineInfo& reference_line_info);
+  bool IsSidePassableObstacle(const ReferenceLineInfo& reference_line_info);
 };
 
 }  // namespace planning
