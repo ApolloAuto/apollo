@@ -393,8 +393,8 @@ ErrorCode LexusController::EnableSpeedOnlyMode() {
 
 // NEUTRAL, REVERSE, DRIVE
 void LexusController::Gear(Chassis::GearPosition gear_position) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) &&
-      !(driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "This drive mode no need to set gear.";
     return;
   }
@@ -443,8 +443,8 @@ void LexusController::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void LexusController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) &&
-      !(driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE) &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -454,8 +454,8 @@ void LexusController::Brake(double pedal) {
 // drive with old acceleration
 // gas:0.00~99.99 unit:
 void LexusController::Throttle(double pedal) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) &&
-      !(driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -465,8 +465,8 @@ void LexusController::Throttle(double pedal) {
 // drive with acceleration/deceleration
 // acc:-7.0 ~ 5.0, unit:m/s^2
 void LexusController::Acceleration(double acc) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) &&
-      !(driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -478,8 +478,8 @@ void LexusController::Acceleration(double acc) {
 // steering with old angle speed
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 void LexusController::Steer(double angle) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) &&
-      !(driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -495,8 +495,8 @@ void LexusController::Steer(double angle) {
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 // angle_spd:0.00~99.99, unit:deg/s
 void LexusController::Steer(double angle, double angle_spd) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) &&
-      !(driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
