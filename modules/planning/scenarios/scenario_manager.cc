@@ -708,7 +708,8 @@ void ScenarioManager::UpdatePlanningContext(
 void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsBareIntersectionScenario(scenario_type)) {
-    PlanningContext::Instance()->MutablePlanningStatus()
+    PlanningContext::Instance()
+        ->MutablePlanningStatus()
         ->mutable_bare_intersection()
         ->Clear();
     return;
@@ -722,7 +723,8 @@ void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::PNC_JUNCTION);
   if (map_itr != first_encountered_overlap_map_.end()) {
-    PlanningContext::Instance()->MutablePlanningStatus()
+    PlanningContext::Instance()
+        ->MutablePlanningStatus()
         ->mutable_bare_intersection()
         ->set_current_pnc_junction_overlap_id(map_itr->second.object_id);
     ADEBUG << "Update PlanningContext with first_encountered pnc_junction["
@@ -735,8 +737,10 @@ void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
 void ScenarioManager::UpdatePlanningContextStopSignScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsStopSignScenario(scenario_type)) {
-    PlanningContext::Instance()->MutablePlanningStatus()->
-        mutable_stop_sign()->Clear();
+    PlanningContext::Instance()
+        ->MutablePlanningStatus()
+        ->mutable_stop_sign()
+        ->Clear();
     return;
   }
 
@@ -748,7 +752,8 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
   const auto map_itr =
       first_encountered_overlap_map_.find(ReferenceLineInfo::STOP_SIGN);
   if (map_itr != first_encountered_overlap_map_.end()) {
-    PlanningContext::Instance()->MutablePlanningStatus()
+    PlanningContext::Instance()
+        ->MutablePlanningStatus()
         ->mutable_stop_sign()
         ->set_current_stop_sign_overlap_id(map_itr->second.object_id);
     ADEBUG << "Update PlanningContext with first_encountered stop sign["
@@ -761,8 +766,10 @@ void ScenarioManager::UpdatePlanningContextStopSignScenario(
 void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   if (!IsTrafficLightScenario(scenario_type)) {
-    PlanningContext::Instance()->MutablePlanningStatus()->
-        mutable_traffic_light()->Clear();
+    PlanningContext::Instance()
+        ->MutablePlanningStatus()
+        ->mutable_traffic_light()
+        ->Clear();
     return;
   }
 
@@ -779,8 +786,10 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
   }
 
   if (current_traffic_light_overlap_id.empty()) {
-    PlanningContext::Instance()->MutablePlanningStatus()->
-        mutable_traffic_light()->Clear();
+    PlanningContext::Instance()
+        ->MutablePlanningStatus()
+        ->mutable_traffic_light()
+        ->Clear();
     return;
   }
 
@@ -794,8 +803,10 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
         return overlap.object_id == current_traffic_light_overlap_id;
       });
   if (traffic_light_overlap_itr == traffic_light_overlaps.end()) {
-    PlanningContext::Instance()->MutablePlanningStatus()->
-        mutable_traffic_light()->Clear();
+    PlanningContext::Instance()
+        ->MutablePlanningStatus()
+        ->mutable_traffic_light()
+        ->Clear();
     return;
   }
 
@@ -806,7 +817,8 @@ void ScenarioManager::UpdatePlanningContextTrafficLightScenario(
     const double dist =
         traffic_light_overlap.start_s - current_traffic_light_overlap_start_s;
     if (fabs(dist) <= kTrafficLightGroupingMaxDist) {
-      PlanningContext::Instance()->MutablePlanningStatus()
+      PlanningContext::Instance()
+          ->MutablePlanningStatus()
           ->mutable_traffic_light()
           ->add_current_traffic_light_overlap_id(
               traffic_light_overlap.object_id);

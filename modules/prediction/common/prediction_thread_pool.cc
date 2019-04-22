@@ -24,8 +24,8 @@ namespace prediction {
 thread_local int PredictionThreadPool::s_thread_pool_level = 0;
 std::vector<int> BaseThreadPool::THREAD_POOL_CAPACITY = {10, 10, 10};
 
-BaseThreadPool::BaseThreadPool(
-    int thread_num, int next_thread_pool_level) : work_(io_service_) {
+BaseThreadPool::BaseThreadPool(int thread_num, int next_thread_pool_level)
+    : work_(io_service_) {
   for (int i = 0; i < thread_num; ++i) {
     thread_group_.create_thread([this, next_thread_pool_level, i] {
       PredictionThreadPool::s_thread_pool_level = next_thread_pool_level;
@@ -52,8 +52,8 @@ BaseThreadPool::~BaseThreadPool() {
 
 BaseThreadPool* PredictionThreadPool::Instance() {
   int pool_level = s_thread_pool_level;
-  int max_thread_pool_level = static_cast<int>(
-      BaseThreadPool::THREAD_POOL_CAPACITY.size());
+  int max_thread_pool_level =
+      static_cast<int>(BaseThreadPool::THREAD_POOL_CAPACITY.size());
   CHECK_LT(pool_level, max_thread_pool_level);
   int index = s_thread_pool_level;
   switch (index) {

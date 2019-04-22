@@ -59,8 +59,8 @@ double NaviObstacleDecider::GetMinLaneWidth(
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
   for (const auto& path_data_point : path_data_points) {
-    bool ret = reference_line.GetLaneWidth(
-        path_data_point.s(), &lane_left_width, &lane_right_width);
+    bool ret = reference_line.GetLaneWidth(path_data_point.s(),
+                                           &lane_left_width, &lane_right_width);
     if (ret) {
       double lane_width = lane_left_width + lane_right_width;
       if (lane_width < min_lane_width) {
@@ -349,7 +349,7 @@ void NaviObstacleDecider::KeepNudgePosition(const double nudge_dist,
     keep_nudge_flag_ = true;
   }
   if (keep_nudge_flag_) {
-    ++cycles_count_;;
+    ++cycles_count_;
     if (cycles_count_ > config_.max_keep_nudge_cycles()) {
       *lane_obstacles_num = 0;
       keep_nudge_flag_ = false;
@@ -391,8 +391,7 @@ void NaviObstacleDecider::GetUnsafeObstaclesInfo(
       PathMatcher::MatchToPath(path_data_points, 0, 0);
   for (const auto& iter : obstacles) {
     double obstacle_y = iter->Perception().position().y();
-    if ((obstacle_y > unsafe_range.first &&
-         obstacle_y < unsafe_range.second) ||
+    if ((obstacle_y > unsafe_range.first && obstacle_y < unsafe_range.second) ||
         (iter->Perception().velocity().y() >
          config_.lateral_velocity_value()) ||
         (iter->Perception().velocity().y() <
