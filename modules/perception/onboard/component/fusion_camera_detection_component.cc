@@ -282,7 +282,9 @@ void FusionCameraDetectionComponent::OnReceiveImage(
   if (InternalProc(message, camera_name, &error_code, prefused_message.get(),
                    out_message.get()) != cyber::SUCC) {
     AERROR << "InternalProc failed, error_code: " << error_code;
-    if (MakeProtobufMsg(msg_timestamp, seq_num_, std::vector<base::ObjectPtr>(),
+    if (MakeProtobufMsg(msg_timestamp, seq_num_,
+                        std::vector<base::ObjectPtr>(),
+                        std::vector<base::LaneLine>(),
                         error_code, out_message.get()) != cyber::SUCC) {
       AERROR << "MakeProtobufMsg failed";
       return;
@@ -706,7 +708,9 @@ int FusionCameraDetectionComponent::InternalProc(
 
   // process success, make pb msg
   if (output_final_obstacles_ &&
-      MakeProtobufMsg(msg_timestamp, seq_num_, camera_frame.tracked_objects,
+      MakeProtobufMsg(msg_timestamp, seq_num_,
+                      camera_frame.tracked_objects,
+                      camera_frame.lane_objects,
                       *error_code, out_message) != cyber::SUCC) {
     AERROR << "MakeProtobufMsg failed"
            << " ts: " << std::to_string(msg_timestamp);
@@ -776,6 +780,7 @@ int FusionCameraDetectionComponent::InternalProc(
 int FusionCameraDetectionComponent::MakeProtobufMsg(
     double msg_timestamp, int seq_num,
     const std::vector<base::ObjectPtr> &objects,
+    const std::vector<base::LaneLine> &lane_objects,
     const apollo::common::ErrorCode error_code,
     apollo::perception::PerceptionObstacles *obstacles) {
   double publish_time = apollo::cyber::Time::Now().ToSecond();
@@ -789,6 +794,7 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
   header->set_camera_timestamp(static_cast<uint64_t>(msg_timestamp * 1e9));
   // header->set_radar_timestamp(0);
 
+  // write out obstacles in world coordinates
   obstacles->set_error_code(error_code);
   for (const auto &obj : objects) {
     apollo::perception::PerceptionObstacle *obstacle =
@@ -798,6 +804,56 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
       return cyber::FAIL;
     }
   }
+
+  // write out lanes in ego coordinates
+  apollo::perception::LaneMarkers *lane_markers =
+      obstacles->mutable_lane_marker();
+  for (const auto &lane : lane_objects) {
+    base::LaneLineCubicCurve curve_coord = lane.curve_image_coord;
+    if (lane.curve_car_coord.a == NULL)
+      curve_coord = lane.curve_car_coord;
+
+    if (lane.pos_type == base::LaneLinePositionType::EGO_LEFT) {
+      apollo::perception::LaneMarker *lane_marker =
+          lane_markers->mutable_left_lane_marker();
+      lane_marker->set_c0_position(curve_coord.d);
+      lane_marker->set_c1_heading_angle(curve_coord.c);
+      lane_marker->set_c2_curvature(curve_coord.b);
+      lane_marker->set_c3_curvature_derivative(curve_coord.a);
+      lane_marker->set_longitude_start(curve_coord.x_start);
+      lane_marker->set_longitude_end(curve_coord.x_end);
+    } else if (lane.pos_type == base::LaneLinePositionType::EGO_RIGHT) {
+      apollo::perception::LaneMarker *lane_marker =
+          lane_markers->mutable_right_lane_marker();
+      lane_marker->set_c0_position(curve_coord.d);
+      lane_marker->set_c1_heading_angle(curve_coord.c);
+      lane_marker->set_c2_curvature(curve_coord.b);
+      lane_marker->set_c3_curvature_derivative(curve_coord.a);
+      lane_marker->set_longitude_start(curve_coord.x_start);
+      lane_marker->set_longitude_end(curve_coord.x_end);
+    } else if (lane.pos_type == base::LaneLinePositionType::ADJACENT_LEFT) {
+      apollo::perception::LaneMarker *lane_marker =
+          lane_markers->add_next_left_lane_marker();
+      lane_marker->set_c0_position(curve_coord.d);
+      lane_marker->set_c1_heading_angle(curve_coord.c);
+      lane_marker->set_c2_curvature(curve_coord.b);
+      lane_marker->set_c3_curvature_derivative(curve_coord.a);
+      lane_marker->set_longitude_start(curve_coord.x_start);
+      lane_marker->set_longitude_end(curve_coord.x_end);
+    } else if (lane.pos_type == base::LaneLinePositionType::ADJACENT_RIGHT) {
+      apollo::perception::LaneMarker *lane_marker =
+          lane_markers->add_next_right_lane_marker();
+      lane_marker->set_c0_position(curve_coord.d);
+      lane_marker->set_c1_heading_angle(curve_coord.c);
+      lane_marker->set_c2_curvature(curve_coord.b);
+      lane_marker->set_c3_curvature_derivative(curve_coord.a);
+      lane_marker->set_longitude_start(curve_coord.x_start);
+      lane_marker->set_longitude_end(curve_coord.x_end);
+    } else {
+      continue;
+    }
+  }
+
   return cyber::SUCC;
 }
 
