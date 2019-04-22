@@ -350,7 +350,6 @@ void NaviObstacleDecider::KeepNudgePosition(const double nudge_dist,
   }
   if (keep_nudge_flag_) {
     ++cycles_count_;
-    ;
     if (cycles_count_ > config_.max_keep_nudge_cycles()) {
       *lane_obstacles_num = 0;
       keep_nudge_flag_ = false;
