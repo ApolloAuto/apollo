@@ -36,5 +36,19 @@ function _cyber_recorder_complete() {
   esac
 }
 
+function _cyber_channel_complete() {
+  COMPREPLY=()
+  local word=${COMP_WORDS[COMP_CWORD]}
+  local cmd=${COMP_WORDS[COMP_CWORD-1]}
+  case $cmd in
+  'cyber_channel')
+    COMPREPLY=( $(compgen -W "echo list info hz bw type" -- ${word}) )
+    ;;
+  *)
+    ;;
+  esac
+}
+
 complete -F _cyber_launch_complete -o default cyber_launch
 complete -F _cyber_recorder_complete -o default cyber_recorder
+complete -F _cyber_channel_complete -o default cyber_channel

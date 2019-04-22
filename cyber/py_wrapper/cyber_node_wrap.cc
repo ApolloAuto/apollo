@@ -537,6 +537,91 @@ PyObject *cyber_PyNode_register_message(PyObject *self, PyObject *args) {
   return Py_None;
 }
 
+PyObject *cyber_PyChannelUtils_get_msg_type(PyObject *self, PyObject *args) {
+  char *channel_name = nullptr;
+  Py_ssize_t len = 0;
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(
+          args, const_cast<char *>("s#B:cyber_PyChannelUtils_get_msg_type"),
+          &channel_name, &len, &sleep_s)) {
+    AERROR << "cyber_PyChannelUtils_get_msg_type failed!";
+    return PyString_FromStringAndSize("", 0);
+  }
+  std::string channel(channel_name, len);
+  std::string msg_type =
+      apollo::cyber::PyChannelUtils::get_msgtype_by_channelname(channel,
+                                                                sleep_s);
+  return PyString_FromStringAndSize(msg_type.c_str(), msg_type.size());
+}
+
+PyObject *cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(
+    PyObject *self, PyObject *args) {
+  char *msgtype = nullptr;
+  char *rawdata = nullptr;
+  Py_ssize_t len = 0;
+  if (!PyArg_ParseTuple(
+          args,
+          const_cast<char *>(
+              "ss#:cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata"),
+          &msgtype, &rawdata, &len)) {
+    AERROR
+        << "cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata failed!";
+    return PyString_FromStringAndSize("", 0);
+  }
+  std::string raw_data(rawdata, len);
+  std::string debug_string =
+      apollo::cyber::PyChannelUtils::get_debugstring_by_msgtype_rawmsgdata(
+          msgtype, raw_data);
+  return PyString_FromStringAndSize(debug_string.c_str(), debug_string.size());
+}
+
+static PyObject *cyber_PyChannelUtils_get_active_channels(PyObject *self,
+                                                          PyObject *args) {
+  unsigned char sleep_s = 0;
+  if (!PyArg_ParseTuple(args, const_cast<char *>(
+                                  "B:cyber_PyChannelUtils_get_active_channels"),
+                        &sleep_s)) {
+    AERROR << "cyber_PyChannelUtils_get_active_channels failed!";
+    return Py_None;
+  }
+
+  std::vector<std::string> channel_list =
+      apollo::cyber::PyChannelUtils::get_active_channels(sleep_s);
+  PyObject *pyobj_list = PyList_New(channel_list.size());
+  size_t pos = 0;
+  for (const std::string &channel : channel_list) {
+    PyList_SetItem(pyobj_list, pos, Py_BuildValue("s", channel.c_str()));
+    pos++;
+  }
+
+  return pyobj_list;
+}
+
+// return dict value look like:
+// {  'channel1':[atrr1, atrr2, atrr3],
+//    'channel2':[atrr1, atrr2]
+// }
+static PyObject *cyber_PyChannelUtils_get_channels_info(PyObject *self,
+                                                        PyObject *args) {
+  auto channelsinfo = apollo::cyber::PyChannelUtils::get_channels_info();
+  PyObject *pyobj_channelinfo_dict = PyDict_New();
+  for (auto &channelinfo : channelsinfo) {
+    std::string channel_name = channelinfo.first;
+    PyObject *bld_name = Py_BuildValue("s", channel_name.c_str());
+    std::vector<std::string> &roleAttr_list = channelinfo.second;
+    PyObject *pyobj_list = PyList_New(roleAttr_list.size());
+
+    size_t pos = 0;
+    for (auto &attr : roleAttr_list) {
+      PyList_SetItem(pyobj_list, pos,
+                     Py_BuildValue("s#", attr.c_str(), attr.size()));
+      pos++;
+    }
+    PyDict_SetItem(pyobj_channelinfo_dict, bld_name, pyobj_list);
+    Py_DECREF(bld_name);
+  }
+  return pyobj_channelinfo_dict;
+}
 /////////////////////////////////////////////////////////////////////
 //// debug pyobject
 /////////////////////////////////////////////////////////////////////
@@ -639,6 +724,16 @@ static PyMethodDef _cyber_node_methods[] = {
     {"PyNode_create_reader", cyber_PyNode_create_reader, METH_VARARGS, ""},
     {"PyNode_create_client", cyber_PyNode_create_client, METH_VARARGS, ""},
     {"PyNode_create_service", cyber_PyNode_create_service, METH_VARARGS, ""},
+
+    {"PyChannelUtils_get_msg_type", cyber_PyChannelUtils_get_msg_type,
+     METH_VARARGS, ""},
+    {"PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata",
+     cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata, METH_VARARGS,
+     ""},
+    {"PyChannelUtils_get_active_channels",
+     cyber_PyChannelUtils_get_active_channels, METH_VARARGS, ""},
+    {"PyChannelUtils_get_channels_info", cyber_PyChannelUtils_get_channels_info,
+     METH_VARARGS, ""},
 
     // for test
     {"cyber_test0", cyber_test0, METH_VARARGS, "test parms input."},
