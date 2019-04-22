@@ -24,6 +24,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/proto/decision.pb.h"
 
@@ -108,7 +109,8 @@ bool PathDecider::MakeStaticObstacleDecision(
       continue;
     }
 
-    if (obstacle->Id() == blocking_obstacle_id) {
+    if (obstacle->Id() == blocking_obstacle_id &&
+        !PlanningContext::Instance()->is_in_path_lane_borrow_scenario()) {
       // Add stop decision
       ADEBUG << "Blocking obstacle = " << blocking_obstacle_id;
       ObjectDecisionType object_decision;
@@ -135,6 +137,10 @@ bool PathDecider::MakeStaticObstacleDecision(
                                              obstacle->Id(), object_decision);
       path_decision->AddLateralDecision("PathDecider/not-in-s", obstacle->Id(),
                                         object_decision);
+      continue;
+    }
+
+    if (PlanningContext::Instance()->is_in_path_lane_borrow_scenario()) {
       continue;
     }
 

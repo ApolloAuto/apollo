@@ -63,7 +63,7 @@ OnLanePlanning::~OnLanePlanning() {
   }
   planner_->Stop();
   FrameHistory::Instance()->Clear();
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->MutablePlanningStatus()->Clear();
   last_routing_.Clear();
   EgoInfo::Instance()->Clear();
 }
@@ -87,7 +87,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->MutablePlanningStatus()->Clear();
 
   // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
@@ -193,11 +193,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   Status status = VehicleStateProvider::Instance()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
 
-  VehicleState received_vehicle_state =
+  VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
-  DCHECK_GE(start_timestamp, received_vehicle_state.timestamp());
+  const double vehicle_state_timestamp = vehicle_state.timestamp();
+  DCHECK_GE(start_timestamp, vehicle_state_timestamp);
 
-  if (!status.ok() || !util::IsVehicleStateValid(received_vehicle_state)) {
+  if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
     std::string msg(
         "Update VehicleStateProvider failed "
         "or the vehicle state is out dated.");
@@ -214,17 +215,20 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  auto aligned_vehicle_state =
-      AlignTimeStamp(received_vehicle_state, start_timestamp);
+  if (FLAGS_estimate_current_vehicle_state &&
+      start_timestamp - vehicle_state_timestamp <
+          FLAGS_message_latency_threshold) {
+    vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
+  }
 
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
-    PlanningContext::MutablePlanningStatus()->Clear();
+    PlanningContext::Instance()->MutablePlanningStatus()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
   }
 
   // Update reference line provider and reset pull over if necessary
-  reference_line_provider_->UpdateVehicleState(aligned_vehicle_state);
+  reference_line_provider_->UpdateVehicleState(vehicle_state);
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
@@ -234,14 +238,13 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   std::string replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-          aligned_vehicle_state, start_timestamp, planning_cycle_time,
+          vehicle_state, start_timestamp, planning_cycle_time,
+          FLAGS_trajectory_stitching_preserved_length,
           last_publishable_trajectory_.get(), &replan_reason);
 
-  EgoInfo::Instance()->Update(stitching_trajectory.back(),
-                              aligned_vehicle_state);
+  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
-  status =
-      InitFrame(frame_num, stitching_trajectory.back(), aligned_vehicle_state);
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
   if (status.ok()) {
     EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
@@ -770,8 +773,41 @@ void OnLanePlanning::AddPartitionedTrajectory(
     (*partition_properties)["showLine"] = "true";
   }
 
-  // Draw fallback trajectory compared with the partitioned
+  // Draw trajectory stitching point (line with only one point)
+  auto* stitching_line = chart->add_line();
+  stitching_line->set_label("TrajectoryStitchingPoint");
+  auto* trajectory_stitching_point = stitching_line->add_point();
+  trajectory_stitching_point->set_x(
+      open_space_debug.trajectory_stitching_point().path_point().x());
+  trajectory_stitching_point->set_y(
+      open_space_debug.trajectory_stitching_point().path_point().y());
+  // Set chartJS's dataset properties
+  auto* stitching_properties = stitching_line->mutable_properties();
+  (*stitching_properties)["borderWidth"] = "3";
+  (*stitching_properties)["pointRadius"] = "5";
+  (*stitching_properties)["lineTension"] = "0";
+  (*stitching_properties)["fill"] = "true";
+  (*stitching_properties)["showLine"] = "true";
+
+  // Draw fallback trajectory compared with the partitioned and potential
+  // collision_point (line with only one point)
   if (open_space_debug.is_fallback_trajectory()) {
+    auto* collision_line = chart->add_line();
+    collision_line->set_label("FutureCollisionPoint");
+    auto* future_collision_point = collision_line->add_point();
+    future_collision_point->set_x(
+        open_space_debug.future_collision_point().path_point().x());
+    future_collision_point->set_y(
+        open_space_debug.future_collision_point().path_point().y());
+    // Set chartJS's dataset properties
+    auto* collision_properties = collision_line->mutable_properties();
+    (*collision_properties)["borderWidth"] = "3";
+    (*collision_properties)["pointRadius"] = "8";
+    (*collision_properties)["lineTension"] = "0";
+    (*collision_properties)["fill"] = "true";
+    (*stitching_properties)["showLine"] = "true";
+    (*stitching_properties)["pointStyle"] = "cross";
+
     const auto& fallback_trajectories =
         open_space_debug.fallback_trajectory().trajectory();
     if (fallback_trajectories.empty() ||

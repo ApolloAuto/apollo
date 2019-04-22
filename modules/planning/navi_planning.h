@@ -23,7 +23,6 @@
 
 #include "modules/planning/proto/pad_msg.pb.h"
 
-#include "modules/planning/common/frame.h"
 #include "modules/planning/planner/navi_planner_dispatcher.h"
 #include "modules/planning/planner/planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
@@ -129,11 +128,7 @@ class NaviPlanning : public PlanningBase {
   DrivingAction driving_action_;
   bool is_received_pad_msg_ = false;
 
-  std::unique_ptr<Frame> frame_;
-
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
-
-  std::unique_ptr<PlannerDispatcher> planner_dispatcher_;
 };
 
 }  // namespace planning

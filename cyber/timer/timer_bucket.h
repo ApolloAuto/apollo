@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,45 +14,34 @@
  * limitations under the License.
  *****************************************************************************/
 
-#ifndef CYBER_TIMER_TIMER_MANAGER_H_
-#define CYBER_TIMER_TIMER_MANAGER_H_
+#ifndef CYBER_TIMER_TIMER_BUCKET_H_
+#define CYBER_TIMER_TIMER_BUCKET_H_
 
-#include <fstream>
-#include <iostream>
 #include <list>
 #include <memory>
 #include <mutex>
-#include <string>
-#include <thread>
 
-#include "cyber/common/macros.h"
-#include "cyber/time/duration.h"
-#include "cyber/timer/timing_wheel.h"
+#include "cyber/timer/timer_task.h"
 
 namespace apollo {
 namespace cyber {
 
-class TimerManager {
+class TimerBucket {
  public:
-  virtual ~TimerManager();
-  void Start();
-  void Shutdown();
-  bool IsRunning();
-  uint64_t Add(uint64_t interval, std::function<void()> handler, bool oneshot);
-  void Remove(uint64_t timer_id);
+  void AddTask(const std::shared_ptr<TimerTask>& task) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    task_list_.push_back(task);
+  }
+
+  std::mutex& mutex() { return mutex_; }
+  std::list<std::weak_ptr<TimerTask>>& task_list() { return task_list_; }
 
  private:
-  TimingWheel timing_wheel_;
-  Duration time_gran_;
-  bool running_ = false;
-  mutable std::mutex running_mutex_;
-  std::thread scheduler_thread_;
-  void ThreadFuncImpl();
-
-  DECLARE_SINGLETON(TimerManager)
+  std::mutex mutex_;
+  std::list<std::weak_ptr<TimerTask>> task_list_;
 };
 
 }  // namespace cyber
 }  // namespace apollo
 
-#endif  // CYBER_TIMER_TIMER_MANAGER_H_
+#endif  // CYBER_TIMER_TIMER_BUCKET_H_

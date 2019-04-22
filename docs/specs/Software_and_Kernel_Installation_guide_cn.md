@@ -1,4 +1,4 @@
-### 工业级PC（IPC）软件安装指南
+# 工业级PC（IPC）软件安装指南
 
 本文档介绍下述软件的安装步骤：
 
@@ -8,7 +8,7 @@
 
 ![tip_icon](images/tip_icon.png)成功完成本文档中介绍的软件安装需要使用者有使用Linux系统的经验。
 
-#### 安装Unbuntu Linux
+## 安装Unbuntu Linux
 
 按照如下步骤执行：
 
@@ -40,11 +40,11 @@
    
    ![tip_icon](images/tip_icon.png)IPC必须有网络连接以更新和安装软件。确保IPC的以太网线接入了有互联网访问权限的网络。如果接入的网络没有使用动态主机配置协议（DHCP），使用者可能需要对IPC的网络进行配置。
 
-#### 安装Apollo内核
+## 安装Apollo内核
 
 Apollo在车辆上的运行需要[Apollo内核](https://github.com/ApolloAuto/apollo-kernel)。我们强烈推荐安装预先构建的内核版本。
 
-##### 使用预先构建的内核版本
+### 使用预先构建的内核版本
 
 使用者使用下述指令获取和安装预先构建的内核版本。
 
@@ -65,7 +65,7 @@ sudo bash install_kernel.sh
 3. 使用 `reboot` 指令重启系统
 4. 【可选步骤-如果使用者使用了CAN卡】参考CAN卡供应商提供的指令构建CAN卡驱动程序
 
-##### 构建个人的内核版本
+### 构建个人的内核版本
 
 如果使用者修改了内核，或者预先构建的版本对使用者的工作平台不是最好的选择，使用者可以使用下述指令构建个人的内核版本：
 
@@ -85,7 +85,7 @@ bash build.sh
 
 4. 参考上面章节中介绍的如何安装预先构建内核版本的步骤进行内核的安装
 
-#### 安装NVIDIA GPU驱动
+## 安装NVIDIA GPU驱动
 
 Apollo在车辆上的运行需要[NVIDIA GPU驱动](http://www.nvidia.com/download/driverResults.aspx/114708/en-us)。使用者必须使用指定的参数选项安装NVIDIA GPU驱动。
 
@@ -101,6 +101,6 @@ wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_
 sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s --no-kernel-module
 ```
 
-### 参考资料
+## 参考资料
 
 1. [Ubuntu官方网站](https://www.ubuntu.com/desktop)

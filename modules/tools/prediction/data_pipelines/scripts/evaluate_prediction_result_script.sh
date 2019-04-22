@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ###############################################################################
 # Copyright 2019 The Apollo Authors. All Rights Reserved.
 #
@@ -13,18 +15,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+#
+# Usage:
+# sudo bash /apollo/modules/tools/prediction/data_pipelines/scripts/evaluate_prediction_result_script.sh
+#     <results_dir> <labels_dir> <time_range>
+#
 
-import os
+RESULTS_DIR=$1
+LABELS_DIR=$2
+TIME_RANGE=$3
 
-def GetListOfFiles(dirpath):
-    list_of_files = os.listdir(dirpath)
-    all_files = []
+set -e
 
-    for file in list_of_files:
-        full_path = os.path.join(dirpath, file)
-        if os.path.isdir(full_path):
-            all_files = all_files + GetListOfFiles(full_path)
-        else:
-            all_files.append(full_path)
+source /apollo/scripts/apollo_base.sh
+source /apollo/cyber/setup.bash
 
-    return all_files
+python /apollo/modules/tools/prediction/data_pipelines/performance_evaluation/evaluate_prediction_result.py \
+    ${RESULTS_DIR} ${LABELS_DIR} ${TIME_RANGE}

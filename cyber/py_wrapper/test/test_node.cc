@@ -26,7 +26,7 @@
 using apollo::cyber::Time;
 using apollo::cyber::message::PyMessageWrap;
 
-apollo::cyber::PyReader *pr = NULL;
+apollo::cyber::PyReader *pr = nullptr;
 
 int cbfun(const char *channel_name) {
   AINFO << "recv->[ " << channel_name << " ]";

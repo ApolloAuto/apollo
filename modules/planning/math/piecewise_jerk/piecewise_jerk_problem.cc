@@ -43,7 +43,7 @@ void PiecewiseJerkProblem::InitProblem(
   weight_.x_derivative_w = w[1];
   weight_.x_second_order_derivative_w = w[2];
   weight_.x_third_order_derivative_w = w[3];
-  weight_.x_mid_line_w = w[4];
+  weight_.x_ref_w = w[4];
 
   max_x_third_order_derivative_ = max_x_third_order_derivative;
 
@@ -261,9 +261,9 @@ void PiecewiseJerkProblem::CalculateKernel(std::vector<c_float>* P_data,
   columns.resize(kNumParam);
   int value_index = 0;
 
-  // x(i)^2 * (w_x + w_mid_line)
+  // x(i)^2 * (w_x + w_ref)
   for (int i = 0; i < N; ++i) {
-    columns[i].emplace_back(i, (weight_.x_w + weight_.x_mid_line_w));
+    columns[i].emplace_back(i, (weight_.x_w + weight_.x_ref_w));
     ++value_index;
   }
 
@@ -416,7 +416,7 @@ void PiecewiseJerkProblem::CalculateOffset(std::vector<c_float>* q) {
   q->resize(kNumParam);
   for (int i = 0; i < kNumParam; ++i) {
     if (i < N) {
-      q->at(i) = -1.0 * weight_.x_mid_line_w *
+      q->at(i) = -1.0 * weight_.x_ref_w *
                  (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
     } else {
       q->at(i) = 0.0;

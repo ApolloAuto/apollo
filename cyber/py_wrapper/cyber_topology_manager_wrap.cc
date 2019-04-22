@@ -36,7 +36,7 @@ PyObject *cyber_new_Node_Manager(PyObject *self, PyObject *args) {
   PyNodeManager *pyobj_node_manager = new PyNodeManager();
   PyObject *py_node_manager;
   py_node_manager =
-      PyCapsule_New(pyobj_node_manager, "apollo_cyber_node_manager", NULL);
+      PyCapsule_New(pyobj_node_manager, "apollo_cyber_node_manager", nullptr);
   return py_node_manager;
 }
 
@@ -96,7 +96,7 @@ PyObject *cyber_new_Channel_Manager(PyObject *self, PyObject *args) {
   PyChannelManager *pyobj_channel_manager = new PyChannelManager();
   PyObject *py_channel_manager;
   py_channel_manager = PyCapsule_New(pyobj_channel_manager,
-                                     "apollo_cyber_channel_manager", NULL);
+                                     "apollo_cyber_channel_manager", nullptr);
   return py_channel_manager;
 }
 

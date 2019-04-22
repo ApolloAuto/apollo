@@ -53,74 +53,107 @@ class PlanningContext {
     common::PathPoint change_lane_stop_path_point;
     bool check_clear_flag = false;
   };
-  static const SidePassInfo& side_pass_info() { return side_pass_info_; }
-  static SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
+
+  const SidePassInfo& side_pass_info() { return side_pass_info_; }
+
+  SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
   struct FallBackInfo {
     std::string last_successful_path_label;
   };
 
-  static void Clear();
+  const FallBackInfo& fallback_info() { return fallback_info_; }
 
-  static void Init();
+  FallBackInfo* mutable_fallback_info() { return &fallback_info_; }
 
-  static const PlanningStatus& Planningstatus() { return planning_status_; }
+  struct OpenSpaceInfo {
+    std::vector<std::string> partitioned_trajectories_index_history;
+  };
 
-  static PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
+  const OpenSpaceInfo& open_space_info() { return open_space_info_; }
 
-  //  static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
+  OpenSpaceInfo* mutable_open_space_info() { return &open_space_info_; }
 
-  static const FallBackInfo& fallback_info() { return fallback_info_; }
+  void Clear();
 
-  static FallBackInfo* mutable_fallback_info() { return &fallback_info_; }
+  void Init();
 
-  static void IncrementFrontStaticObstacleCycleCounter() {
+  const PlanningStatus& Planningstatus() { return planning_status_; }
+
+  PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
+
+  /////////////////////////////////////////////////////////////////////////////
+  void IncrementFrontStaticObstacleCycleCounter() {
     front_static_obstacle_cycle_counter_ =
         std::min(front_static_obstacle_cycle_counter_ + 1,
                  kPathScenarioTransitionHysteresisFrame);
   }
 
-  static void DecrementFrontStaticObstacleCycleCounter() {
+  void DecrementFrontStaticObstacleCycleCounter() {
     front_static_obstacle_cycle_counter_ =
         std::max(front_static_obstacle_cycle_counter_ - 1,
                  -kPathScenarioTransitionHysteresisFrame);
   }
 
-  static void ResetFrontStaticObstacleCycleCounter() {
+  void ResetFrontStaticObstacleCycleCounter() {
     front_static_obstacle_cycle_counter_ = 0;
   }
 
-  static int front_static_obstacle_cycle_counter() {
+  int front_static_obstacle_cycle_counter() {
     return front_static_obstacle_cycle_counter_;
   }
 
-  static void IncrementAbleToUseSelfLaneCounter() {
+  void set_front_static_obstacle_id(
+      const std::string& front_static_obstacle_id) {
+    front_static_obstacle_id_ = front_static_obstacle_id;
+  }
+
+  std::string front_static_obstacle_id() {
+    return front_static_obstacle_id_;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  void IncrementAbleToUseSelfLaneCounter() {
     able_to_use_self_lane_counter_ =
         std::min(able_to_use_self_lane_counter_ + 1,
                  kPathScenarioTransitionHysteresisFrame);
   }
 
-  static void DecrementAbleToUseSelfLaneCounter() {
+  void DecrementAbleToUseSelfLaneCounter() {
     able_to_use_self_lane_counter_ =
         std::max(able_to_use_self_lane_counter_ - 1,
                  -kPathScenarioTransitionHysteresisFrame);
   }
 
-  static void ResetAbleToUseSelfLaneCounter() {
+  void ResetAbleToUseSelfLaneCounter() {
     able_to_use_self_lane_counter_ = 0;
   }
 
-  static int able_to_use_self_lane_counter() {
+  int able_to_use_self_lane_counter() {
     return able_to_use_self_lane_counter_;
   }
 
- private:
-  static PlanningStatus planning_status_;
-  static SidePassInfo side_pass_info_;
-  static FallBackInfo fallback_info_;
+  /////////////////////////////////////////////////////////////////////////////
+  void set_is_in_path_lane_borrow_scenario(
+      bool is_in_path_lane_borrow_scenario) {
+    is_in_path_lane_borrow_scenario_ = is_in_path_lane_borrow_scenario;
+  }
 
-  static int front_static_obstacle_cycle_counter_;
-  static int able_to_use_self_lane_counter_;
+  bool is_in_path_lane_borrow_scenario() {
+    return is_in_path_lane_borrow_scenario_;
+  }
+
+ private:
+  PlanningStatus planning_status_;
+  SidePassInfo side_pass_info_;
+  FallBackInfo fallback_info_;
+  OpenSpaceInfo open_space_info_;
+
+  int front_static_obstacle_cycle_counter_ = 0;
+  std::string front_static_obstacle_id_ = "";
+  int able_to_use_self_lane_counter_ = 0;
+
+  bool is_in_path_lane_borrow_scenario_ = false;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext)

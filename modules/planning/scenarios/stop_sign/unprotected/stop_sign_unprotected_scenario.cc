@@ -62,9 +62,9 @@ void StopSignUnprotectedScenario::Init() {
     return;
   }
 
-  const std::string stop_sign_overlap_id = PlanningContext::Planningstatus()
-                                               .stop_sign()
-                                               .current_stop_sign_overlap_id();
+  const std::string stop_sign_overlap_id =
+      PlanningContext::Instance()->Planningstatus()
+      .stop_sign().current_stop_sign_overlap_id();
   if (stop_sign_overlap_id.empty()) {
     AERROR << "Could not find stop sign";
     return;

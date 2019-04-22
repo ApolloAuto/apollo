@@ -21,29 +21,27 @@
 #include "modules/planning/scenarios/bare_intersection/unprotected/stage_intersection_cruise.h"
 
 #include "cyber/common/log.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace bare_intersection {
 
-using common::TrajectoryPoint;
-using hdmap::PathOverlap;
-
 Stage::StageStatus BareIntersectionUnprotectedStageIntersectionCruise::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "BareIntersectionUnprotectedStageIntersectionCruise plan error";
+    AERROR << "StopSignUnprotectedStageIntersectionCruise plan error";
   }
 
-  // TODO(all): to be implemented
-
+  bool stage_done = stage_impl_.CheckDone(
+      *frame, ScenarioConfig::BARE_INTERSECTION_UNPROTECTED, config_, false);
+  if (stage_done) {
+    return FinishStage();
+  }
   return Stage::RUNNING;
 }
 

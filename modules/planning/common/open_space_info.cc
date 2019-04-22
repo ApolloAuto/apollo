@@ -34,11 +34,8 @@ void CopyTrajectory(const DiscretizedTrajectory trajectory_src,
 
 // record more trajectory information to info debug
 void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
-  // 1, merge debug info into ptr_debug
-
-  ptr_debug->Clear();
-
-  ptr_debug->MergeFrom(debug_instance_);
+  // 1, Copy info into ptr_debug
+  *ptr_debug = debug_instance_;
 
   // 2, record partitioned trajectories into ptr_debug
   auto* ptr_partitioned_trajectories = ptr_debug->mutable_planning_data()
@@ -72,6 +69,10 @@ void OpenSpaceInfo::RecordDebug(apollo::planning_internal::Debug* ptr_debug) {
                                         ->add_trajectory();
     const auto& fallback_trajectory = fallback_trajectory_.first;
     CopyTrajectory(fallback_trajectory, ptr_fallback_trajectory);
+    ptr_debug->mutable_planning_data()
+        ->mutable_open_space()
+        ->mutable_future_collision_point()
+        ->CopyFrom(future_collision_point_);
   }
 }
 

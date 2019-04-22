@@ -53,14 +53,6 @@ using ObstacleEdge = std::tuple<int, double, double, double, std::string>;
 using LaneType = ReferenceLineInfo::LaneType;
 }  // namespace
 
-constexpr double kPathBoundsDeciderHorizon = 100.0;
-constexpr double kPathBoundsDeciderResolution = 0.5;
-constexpr double kDefaultLaneWidth = 5.0;
-constexpr double kDefaultRoadWidth = 20.0;
-constexpr double kObstacleStartSBuffer = 1.0;
-constexpr double kObstacleEndSBuffer = 1.0;
-constexpr double kObstacleLBuffer = 0.4;
-
 PathBoundsDecider::PathBoundsDecider(const TaskConfig& config)
     : Decider(config) {}
 
@@ -70,7 +62,7 @@ Status PathBoundsDecider::Process(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
   std::vector<PathBoundary> candidate_path_boundaries;
-  const TaskConfig& config = Decider::config_;
+  // const TaskConfig& config = Decider::config_;
 
   // Initialization.
   InitPathBoundsDecider(*frame, *reference_line_info);
@@ -105,7 +97,7 @@ Status PathBoundsDecider::Process(
 
   // Generate regular path boundaries.
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
-  if (config.path_bounds_decider_config().is_lane_borrowing()) {
+  if (reference_line_info->is_path_lane_borrow()) {
     // Try borrowing from left and from right neighbor lane.
     lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
                              LaneBorrowInfo::RIGHT_BORROW,
@@ -156,6 +148,9 @@ Status PathBoundsDecider::Process(
     candidate_path_boundaries.back().set_blocking_obstacle_id(
         blocking_obstacle_id);
   }
+
+  // Remove redundant boundaries
+  RemoveRedundantPathBoundaries(&candidate_path_boundaries);
 
   // Success
   reference_line_info->SetCandidatePathBoundaries(candidate_path_boundaries);
@@ -222,6 +217,7 @@ std::string PathBoundsDecider::GenerateRegularPathBound(
   // PathBoundsDebugString(*path_bound);
 
   // 3. Fine-tune the boundary based on static obstacles
+  PathBound temp_path_bound = *path_bound;
   if (!GetBoundaryFromStaticObstacles(reference_line_info.path_decision(),
                                       path_bound, blocking_obstacle_id)) {
     const std::string msg =
@@ -229,6 +225,14 @@ std::string PathBoundsDecider::GenerateRegularPathBound(
         "taking into consideration all static obstacles.";
     AERROR << msg;
     return msg;
+  }
+  // Append some extra path bound points to avoid zero-length path data.
+  int counter = 0;
+  while (!blocking_obstacle_id->empty() &&
+         path_bound->size() < temp_path_bound.size() &&
+         counter < kNumExtraTailBoundPoint) {
+    path_bound->push_back(temp_path_bound[path_bound->size()]);
+    counter++;
   }
   // PathBoundsDebugString(*path_bound);
 
@@ -264,6 +268,72 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 
   ADEBUG << "Completed generating fallback path boundaries.";
   return "";
+}
+
+void PathBoundsDecider::RemoveRedundantPathBoundaries(
+    std::vector<PathBoundary>* const candidate_path_boundaries) {
+  // 1. Check to see if both "left" and "right" exist.
+  bool is_left_exist = false;
+  std::vector<std::pair<double, double>> left_boundary;
+  bool is_right_exist = false;
+  std::vector<std::pair<double, double>> right_boundary;
+  for (const auto& path_boundary : *candidate_path_boundaries) {
+    if (path_boundary.label().find("left") != std::string::npos) {
+      is_left_exist = true;
+      left_boundary = path_boundary.boundary();
+    }
+    if (path_boundary.label().find("right") != std::string::npos) {
+      is_right_exist = true;
+      right_boundary = path_boundary.boundary();
+    }
+  }
+  // 2. Check if "left" is contained by "right", and vice versa.
+  if (!is_left_exist || !is_right_exist) {
+    return;
+  }
+  bool is_left_redundant = false;
+  bool is_right_redundant = false;
+  if (IsContained(left_boundary, right_boundary)) {
+    is_left_redundant = true;
+  }
+  if (IsContained(right_boundary, left_boundary)) {
+    is_right_redundant = true;
+  }
+
+  // 3. If one contains the other, then remove the redundant one.
+  for (size_t i = 0; i < candidate_path_boundaries->size(); ++i) {
+    const auto& path_boundary = (*candidate_path_boundaries)[i];
+    if (path_boundary.label().find("right") != std::string::npos &&
+        is_right_redundant) {
+      (*candidate_path_boundaries)[i] = candidate_path_boundaries->back();
+      candidate_path_boundaries->pop_back();
+      break;
+    }
+    if (path_boundary.label().find("left") != std::string::npos &&
+        is_left_redundant) {
+      (*candidate_path_boundaries)[i] = candidate_path_boundaries->back();
+      candidate_path_boundaries->pop_back();
+      break;
+    }
+  }
+  return;
+}
+
+bool PathBoundsDecider::IsContained(
+    const std::vector<std::pair<double, double>>& lhs,
+    const std::vector<std::pair<double, double>>& rhs) {
+  if (lhs.size() > rhs.size()) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs.size(); ++i) {
+    if (lhs[i].first < rhs[i].first) {
+      return false;
+    }
+    if (lhs[i].second > rhs[i].second) {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool PathBoundsDecider::InitPathBoundary(const ReferenceLine& reference_line,

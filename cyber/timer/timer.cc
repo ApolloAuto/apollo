@@ -21,14 +21,24 @@
 namespace apollo {
 namespace cyber {
 
-Timer::Timer() { tm_ = TimerManager::Instance(); }
+namespace {
+static std::atomic<uint64_t> global_timer_id = {0};
+static uint64_t GenerateTimerId() { return global_timer_id.fetch_add(1); }
+}  // namespace
+
+Timer::Timer() {
+  timing_wheel_ = TimingWheel::Instance();
+  timer_id_ = GenerateTimerId();
+}
 
 Timer::Timer(TimerOption opt) : timer_opt_(opt) {
-  tm_ = TimerManager::Instance();
+  timing_wheel_ = TimingWheel::Instance();
+  timer_id_ = GenerateTimerId();
 }
 
 Timer::Timer(uint32_t period, std::function<void()> callback, bool oneshot) {
-  tm_ = TimerManager::Instance();
+  timing_wheel_ = TimingWheel::Instance();
+  timer_id_ = GenerateTimerId();
   timer_opt_.period = period;
   timer_opt_.callback = callback;
   timer_opt_.oneshot = oneshot;
@@ -36,28 +46,68 @@ Timer::Timer(uint32_t period, std::function<void()> callback, bool oneshot) {
 
 void Timer::SetTimerOption(TimerOption opt) { timer_opt_ = opt; }
 
+bool Timer::InitTimerTask() {
+  if (timer_opt_.period == 0) {
+    AERROR << "Max interval must great than 0";
+    return false;
+  }
+
+  if (timer_opt_.period >= TIMER_MAX_INTERVAL_MS) {
+    AERROR << "Max interval must less than " << TIMER_MAX_INTERVAL_MS;
+    return false;
+  }
+
+  task_.reset(new TimerTask(timer_id_));
+  task_->interval_ms = timer_opt_.period;
+  task_->next_fire_duration_ms = task_->interval_ms;
+
+  if (timer_opt_.oneshot) {
+    task_->callback = timer_opt_.callback;
+  } else {
+    std::weak_ptr<TimerTask> task_wptr = this->task_;
+    task_->callback = [this, task_wptr]() {
+      auto start = std::chrono::steady_clock::now();
+      this->timer_opt_.callback();
+      auto end = std::chrono::steady_clock::now();
+      uint64_t execute_time_ms =
+          std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+              .count();
+      auto task = task_wptr.lock();
+      if (task) {
+        if (execute_time_ms >= task->interval_ms) {
+          task->next_fire_duration_ms = 1;
+        } else {
+          task->next_fire_duration_ms = task->interval_ms - execute_time_ms;
+        }
+        this->timing_wheel_->AddTask(task);
+      }
+    };
+  }
+  return true;
+}
+
 void Timer::Start() {
   if (!common::GlobalData::Instance()->IsRealityMode()) {
     return;
   }
 
   if (!started_.exchange(true)) {
-    timer_id_ =
-        tm_->Add(timer_opt_.period, timer_opt_.callback, timer_opt_.oneshot);
+    if (InitTimerTask()) {
+      timing_wheel_->AddTask(task_);
+    }
   }
 }
 
 void Timer::Stop() {
   if (started_.exchange(false)) {
-    ADEBUG << "stop timer " << timer_id_;
-    tm_->Remove(timer_id_);
-    timer_id_ = 0;
+    ADEBUG << "stop timer ";
+    task_.reset();
   }
 }
 
 Timer::~Timer() {
-  if (timer_id_ != 0) {
-    tm_->Remove(timer_id_);
+  if (task_) {
+    Stop();
   }
 }
 

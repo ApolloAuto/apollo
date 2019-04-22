@@ -56,7 +56,7 @@ struct Chunk {
     std::lock_guard<std::mutex> lock(mutex_);
     SingleMessage* p_message = body_.add_messages();
     *p_message = message;
-    if (0 == header_.begin_time()) {
+    if (header_.begin_time() == 0) {
       header_.set_begin_time(message.time());
     }
     if (header_.begin_time() > message.time()) {

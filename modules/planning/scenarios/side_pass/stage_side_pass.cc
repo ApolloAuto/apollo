@@ -74,6 +74,11 @@ Stage::StageStatus StageSidePass::Process(
     }
   }
 
+  if (PlanningContext::Instance()->able_to_use_self_lane_counter() >= 3) {
+    next_stage_ = ScenarioConfig::NO_STAGE;
+    return Stage::FINISHED;
+  }
+
   return Stage::StageStatus::RUNNING;
 }
 
@@ -112,7 +117,8 @@ Status StageSidePass::ExecuteTasks(const TrajectoryPoint& planning_start_point,
     return Status(common::ErrorCode::PLANNING_ERROR);
   }
   // TODO(Jinyun): Save last successful label across scenario
-  // PlanningContext::mutable_fallback_info()->last_successful_path_label =
+  // PlanningContext::Instance()->mutable_fallback_info()->
+  //     last_successful_path_label =
   // reference_line_info->path_data().path_label();
   reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
   DiscretizedTrajectory trajectory;

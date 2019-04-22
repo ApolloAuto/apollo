@@ -46,9 +46,9 @@ Status DeciderCreep::Process(Frame* frame,
   CHECK_NOTNULL(reference_line_info);
 
   double stop_line_s = 0.0;
-  const std::string stop_sign_overlap_id = PlanningContext::Planningstatus()
-                                               .stop_sign()
-                                               .current_stop_sign_overlap_id();
+  const std::string stop_sign_overlap_id =
+      PlanningContext::Instance()->Planningstatus()
+      .stop_sign().current_stop_sign_overlap_id();
   if (!stop_sign_overlap_id.empty()) {
     // get overlap along reference line
     PathOverlap* current_stop_sign_overlap =
@@ -56,14 +56,15 @@ Status DeciderCreep::Process(Frame* frame,
                                                   stop_sign_overlap_id,
                                                   ReferenceLineInfo::STOP_SIGN);
     if (current_stop_sign_overlap) {
-      stop_line_s = current_stop_sign_overlap->end_s;
+      stop_line_s = current_stop_sign_overlap->end_s +
+                    FindCreepDistance(*frame, *reference_line_info);
     }
-  } else if (PlanningContext::Planningstatus()
+  } else if (PlanningContext::Instance()->Planningstatus()
                  .traffic_light()
                  .current_traffic_light_overlap_id_size() > 0) {
     // get overlap along reference line
     const std::string current_traffic_light_overlap_id =
-        PlanningContext::Planningstatus()
+        PlanningContext::Instance()->Planningstatus()
             .traffic_light()
             .current_traffic_light_overlap_id(0);
     PathOverlap* current_traffic_light_overlap =
@@ -71,7 +72,8 @@ Status DeciderCreep::Process(Frame* frame,
             *reference_line_info, current_traffic_light_overlap_id,
             ReferenceLineInfo::SIGNAL);
     if (current_traffic_light_overlap) {
-      stop_line_s = current_traffic_light_overlap->end_s;
+      stop_line_s = current_traffic_light_overlap->end_s +
+                    FindCreepDistance(*frame, *reference_line_info);
     }
   }
   if (stop_line_s > 0.0) {
@@ -84,7 +86,7 @@ Status DeciderCreep::Process(Frame* frame,
 double DeciderCreep::FindCreepDistance(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
   // more delicate design of creep distance
-  return 0.5;
+  return 2.0;
 }
 
 // TODO(all): revisit & rewrite

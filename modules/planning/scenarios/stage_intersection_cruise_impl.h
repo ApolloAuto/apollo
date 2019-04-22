@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,28 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/timer/timer_task.h"
+/**
+ * @file
+ **/
 
-#include "cyber/task/task.h"
+#pragma once
+
+#include "modules/planning/proto/planning_config.pb.h"
+
+#include "modules/planning/common/frame.h"
 
 namespace apollo {
-namespace cyber {
+namespace planning {
+namespace scenario {
 
-void TimerTask::Fire(bool async) {
-  if (status_ != INIT) {
-    return;
-  }
-  if (oneshot_)  // not repeat. so always on ready
-    status_ = EXPIRED;
-  if (async) {
-    cyber::Async(handler_);
-  } else {
-    handler_();
-  }
-}
+class StageIntersectionCruiseImpl {
+ public:
+  bool CheckDone(const Frame& frame,
+                 const ScenarioConfig::ScenarioType& scenario_type,
+                 const ScenarioConfig::StageConfig& config,
+                 const bool right_of_way_status);
+};
 
-bool TimerTask::Cancel() {
-  if (State() != INIT) {
-    return false;
-  }
-  status_ = CANCELED;
-  return true;
-}
-}  // namespace cyber
+}  // namespace scenario
+}  // namespace planning
 }  // namespace apollo

@@ -1,4 +1,4 @@
-### IPC Software Installation Guide
+# Software and Kernel Installation Guide
 
 This section describes the steps to install the following:
 
@@ -8,7 +8,7 @@ This section describes the steps to install the following:
 
 ![tip_icon](images/tip_icon.png)It is assumed that you have experience working with Linux to successfully perform the software installation.
 
-#### Installing Ubuntu Linux
+## Installing Ubuntu Linux
 
 Follow these steps:
 
@@ -37,11 +37,11 @@ Follow these steps:
 
 ![tip_icon](images/tip_icon.png)The IPC must have Internet access to update and install software. Make sure that the Ethernet cable is connected to a network with Internet access. You might need to configure the network for the IPC if the network that it is connected to is not using the Dynamic Host Configuration Protocol (DHCP).
 
-#### Installing the Apollo Kernel
+## Installing the Apollo Kernel
 
 The Apollo runtime in the vehicle requires the [Apollo Kernel](https://github.com/ApolloAuto/apollo-kernel). It is strongly recommended to install the pre-built kernel.
 
-##### Use the pre-built Apollo Kernel.
+### Use the pre-built Apollo Kernel.
 
 You get access to and install the pre-built kernel using the following commands.
 
@@ -62,7 +62,7 @@ sudo bash install_kernel.sh
 3. Reboot your system using the `reboot` command.
 4. [Optional - if you are using CAN card for interface] Build the CAN driver source code, according to the vendor's instructions
 
-##### Build your own kernel.
+### Build your own kernel.
 
 If you have modified the kernel, or the pre-built kernel is not the best for your platform, you can build your own kernel using the following steps:
 
@@ -82,7 +82,7 @@ bash build.sh
 
 4. Install the kernel using the steps for a pre-built Apollo Kernel as described in the previous section.
 
-#### Installing NVIDIA GPU Driver
+## Installing NVIDIA GPU Driver
 
 The Apollo runtime in the vehicle requires the [NVIDIA GPU Driver](http://www.nvidia.com/download/driverResults.aspx/114708/en-us). You must install the NVIDIA GPU driver with specific options.
 
@@ -98,6 +98,6 @@ wget http://us.download.nvidia.com/XFree86/Linux-x86_64/375.39/NVIDIA-Linux-x86_
 sudo bash ./NVIDIA-Linux-x86_64-375.39.run --no-x-check -a -s --no-kernel-module
 ```
 
-### References
+## References
 
 1. Ubuntu official [website](https://www.ubuntu.com/desktop)

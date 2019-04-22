@@ -141,8 +141,9 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   int num_of_knots = static_cast<int>(total_time / delta_t) + 1;
   // Start a PathTimeQpProblem
   std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
-  path_time_qp->InitProblem(num_of_knots, delta_t, w, FLAGS_lateral_jerk_bound,
-                            init_s, end_s);
+  path_time_qp->InitProblem(num_of_knots, delta_t, w,
+                            FLAGS_longitudinal_jerk_bound, init_s, end_s);
+
   path_time_qp->SetZeroOrderBounds(0.0, 100.0);
   path_time_qp->SetFirstOrderBounds(0.0, FLAGS_planning_upper_speed_limit);
   path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
@@ -164,13 +165,25 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
   for (int i = 1; i < num_of_knots; ++i) {
     // Avoid the very last points when already stopped
-    if (ds[i] <= 0.0) {
+    if (s[i] - s[i - 1] <= 0.0 || ds[i] <= 0.0) {
       break;
     }
     speed_data.AppendSpeedPoint(s[i], delta_t * i, ds[i], dds[i],
                                 (dds[i] - dds[i - 1]) / delta_t);
   }
+  FillEnoughSpeedPoints(&speed_data);
   return speed_data;
+}
+
+void SpeedProfileGenerator::FillEnoughSpeedPoints(SpeedData* const speed_data) {
+  const SpeedPoint& last_point = speed_data->back();
+  if (last_point.t() >= FLAGS_fallback_total_time) {
+    return;
+  }
+  for (double t = last_point.t() + FLAGS_fallback_time_unit;
+       t < FLAGS_fallback_total_time; t += FLAGS_fallback_time_unit) {
+    speed_data->AppendSpeedPoint(last_point.s(), t, 0.0, 0.0, 0.0);
+  }
 }
 
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeedProfile() {
@@ -222,6 +235,7 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(const double init_speed,
     pre_s = s;
     pre_v = v;
   }
+  FillEnoughSpeedPoints(&speed_data);
   return speed_data;
 }
 
@@ -254,6 +268,7 @@ SpeedData SpeedProfileGenerator::GenerateStopProfile(
     pre_s = s;
     pre_v = v;
   }
+  FillEnoughSpeedPoints(&speed_data);
   return speed_data;
 }
 
@@ -280,6 +295,7 @@ SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
         speed_data.AppendSpeedPoint(curve_s, curve_t, curve_v, curve_a,
                                     curve_da);
       }
+      FillEnoughSpeedPoints(&speed_data);
       return speed_data;
     }
   }
@@ -308,6 +324,7 @@ SpeedData SpeedProfileGenerator::GenerateStopProfileFromPolynomial(
         speed_data.AppendSpeedPoint(curve_s, curve_t, curve_v, curve_a,
                                     curve_da);
       }
+      FillEnoughSpeedPoints(&speed_data);
       return speed_data;
     }
   }
