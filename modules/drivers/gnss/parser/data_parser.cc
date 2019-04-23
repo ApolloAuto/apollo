@@ -25,6 +25,7 @@
 #include "cyber/cyber.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/util/message_util.h"
+#include "modules/drivers/gnss/parser/newtonm2_parser.h"
 #include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
 #include "modules/drivers/gnss/proto/gnss_raw_observation.pb.h"
 #include "modules/drivers/gnss/proto/heading.pb.h"
@@ -56,6 +57,9 @@ Parser *CreateParser(config::Config config, bool is_base_station = false) {
   switch (config.data().format()) {
     case config::Stream::NOVATEL_BINARY:
       return Parser::CreateNovatel(config);
+
+    case config::Stream::NEWTONM2_BINARY:
+      return Parser::CreateNewtonM2(config);
 
     default:
       return nullptr;
