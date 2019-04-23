@@ -50,7 +50,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
         scenario_type == ScenarioConfig::STOP_SIGN_UNPROTECTED) {
       // stop_sign scenarios
       const auto& stop_sign_status =
-          PlanningContext::Instance()->Planningstatus().stop_sign();
+          PlanningContext::Instance()->planning_status().stop_sign();
       const std::string traffic_sign_overlap_id =
           stop_sign_status.current_stop_sign_overlap_id();
       traffic_sign_overlap = scenario::util::GetOverlapOnReferenceLine(
@@ -62,7 +62,7 @@ bool StageIntersectionCruiseImpl::CheckDone(
         scenario_type == ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN) {
       // traffic_light scenarios
       const auto& traffic_light_status =
-          PlanningContext::Instance()->Planningstatus().traffic_light();
+          PlanningContext::Instance()->planning_status().traffic_light();
       const std::string traffic_sign_overlap_id =
           traffic_light_status.current_traffic_light_overlap_id_size() > 0 ?
               traffic_light_status.current_traffic_light_overlap_id(0) : "";

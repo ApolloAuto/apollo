@@ -21,7 +21,7 @@ cc_test(
     name = "piecewise_jerk_problem_test",
     size = "small",
     srcs = [
-        "piecewise_jerk_problem.cc",
+        "piecewise_jerk_problem_test.cc",
     ],
     deps = [
         ":piecewise_jerk_problem",
