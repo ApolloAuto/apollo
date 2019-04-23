@@ -761,6 +761,12 @@ void DenselineLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     lane_objects[line_index].curve_camera_coord.d = camera_coeff(0, 0);
     lane_objects[line_index].curve_camera_coord.x_start = x_start;
     lane_objects[line_index].curve_camera_coord.x_end = x_end;
+    lane_objects[line_index].curve_car_coord.a = -camera_coeff(3, 0);
+    lane_objects[line_index].curve_car_coord.b = -camera_coeff(2, 0);
+    lane_objects[line_index].curve_car_coord.c = -camera_coeff(1, 0);
+    lane_objects[line_index].curve_car_coord.d = -camera_coeff(0, 0);
+    lane_objects[line_index].curve_car_coord.x_start = x_start;
+    lane_objects[line_index].curve_car_coord.x_end = x_end;
     lane_objects[line_index].use_type = base::LaneLineUseType::REAL;
   }
   return;

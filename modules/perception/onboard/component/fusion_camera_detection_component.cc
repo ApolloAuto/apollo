@@ -35,8 +35,8 @@ namespace onboard {
 
 using apollo::cyber::common::GetAbsolutePath;
 
-static void fill_lane_msg(apollo::perception::LaneMarker *lane_marker,
-                          const base::LaneLineCubicCurve &curve_coord) {
+static void fill_lane_msg(const base::LaneLineCubicCurve &curve_coord,
+                          apollo::perception::LaneMarker *lane_marker) {
   lane_marker->set_c0_position(curve_coord.d);
   lane_marker->set_c1_heading_angle(curve_coord.c);
   lane_marker->set_c2_curvature(curve_coord.b);
@@ -826,23 +826,20 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
       lane_markers->add_next_right_lane_marker();
 
   for (const auto &lane : lane_objects) {
-    base::LaneLineCubicCurve curve_coord = lane.curve_image_coord;
-    if (&lane.curve_car_coord.a != nullptr) {
-      curve_coord = lane.curve_car_coord;
-    }
+    base::LaneLineCubicCurve curve_coord = lane.curve_car_coord;
 
     switch (lane.pos_type) {
       case base::LaneLinePositionType::EGO_LEFT:
-        fill_lane_msg(lane_marker_l0, curve_coord);
+        fill_lane_msg(curve_coord, lane_marker_l0);
         break;
       case base::LaneLinePositionType::EGO_RIGHT:
-        fill_lane_msg(lane_marker_r0, curve_coord);
+        fill_lane_msg(curve_coord, lane_marker_r0);
         break;
       case base::LaneLinePositionType::ADJACENT_LEFT:
-        fill_lane_msg(lane_marker_l1, curve_coord);
+        fill_lane_msg(curve_coord, lane_marker_l1);
         break;
       case base::LaneLinePositionType::ADJACENT_RIGHT:
-        fill_lane_msg(lane_marker_r1, curve_coord);
+        fill_lane_msg(curve_coord, lane_marker_r1);
         break;
       default: break;
     }
