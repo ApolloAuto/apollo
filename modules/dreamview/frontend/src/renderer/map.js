@@ -30,14 +30,14 @@ const colorMapping = {
 };
 
 const TRAFFIC_LIGHT_SCALE = 0.006;
-const trafficLightScales = {
+export const trafficLightScales = {
     x: TRAFFIC_LIGHT_SCALE,
     y: TRAFFIC_LIGHT_SCALE,
     z: TRAFFIC_LIGHT_SCALE
 };
 
 const STOP_SIGN_SCALE = 0.01;
-const stopSignScales = {
+export const stopSignScales = {
     x: STOP_SIGN_SCALE,
     y: STOP_SIGN_SCALE,
     z: STOP_SIGN_SCALE
