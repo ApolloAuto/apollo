@@ -808,7 +808,6 @@ int FusionCameraDetectionComponent::InternalProc(
              out_image.total() * sizeof(uint8_t));
       visualize_.ShowResult_all_info_single_camera(output_image,
         camera_frame, motion_buffer_);
-
     }
   }
 
