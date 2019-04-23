@@ -66,6 +66,10 @@ void GroupObstaclesByPriority(
     AERROR << "Null obstacle [" << obstacle_id << "] found";
     return;
   }
+  if (obstacle_ptr->IsStill()) {
+    ADEBUG << "Ignore still obstacle [" << obstacle_id << "]";
+    return;
+  }
   const Feature& feature = obstacle_ptr->latest_feature();
   const ObstaclePriority& priority = feature.priority();
   if (priority.priority() == ObstaclePriority::IGNORE) {
