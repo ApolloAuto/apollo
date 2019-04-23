@@ -150,7 +150,8 @@ bool PlanningComponent::Proc(
 
 void PlanningComponent::CheckRerouting() {
   auto* rerouting =
-      PlanningContext::Instance()->MutablePlanningStatus()->mutable_rerouting();
+      PlanningContext::Instance()->mutable_planning_status()
+                                 ->mutable_rerouting();
   if (!rerouting->need_rerouting()) {
     return;
   }

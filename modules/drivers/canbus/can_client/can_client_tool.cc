@@ -269,16 +269,15 @@ int main(int32_t argc, char **argv) {
                                                &can_client_conf_a)) {
     AERROR << "Unable to load canbus conf file: "
            << FLAGS_can_client_conf_file_a;
-    return 1;
-  } else {
-    AINFO << "Conf file is loaded: " << FLAGS_can_client_conf_file_a;
+    return -1;
   }
+  AINFO << "Conf file is loaded: " << FLAGS_can_client_conf_file_a;
   AINFO << can_client_conf_a.ShortDebugString();
   auto client_a = can_client_factory->CreateObject(can_client_conf_a.brand());
   if (!client_a || !client_a->Init(can_client_conf_a) ||
       client_a->Start() != ErrorCode::OK) {
     AERROR << "Create can client a failed.";
-    return 1;
+    return -1;
   }
   param_ptr_a->can_client = client_a.get();
   param_ptr_a->is_first_agent = true;
@@ -291,16 +290,15 @@ int main(int32_t argc, char **argv) {
                                                  &can_client_conf_b)) {
       AERROR << "Unable to load canbus conf file: "
              << FLAGS_can_client_conf_file_b;
-      return 1;
-    } else {
-      AINFO << "Conf file is loaded: " << FLAGS_can_client_conf_file_b;
+      return -1;
     }
+    AINFO << "Conf file is loaded: " << FLAGS_can_client_conf_file_b;
     AINFO << can_client_conf_b.ShortDebugString();
     client_b = can_client_factory->CreateObject(can_client_conf_b.brand());
     if (!client_b || !client_b->Init(can_client_conf_b) ||
         client_b->Start() != ErrorCode::OK) {
       AERROR << "Create can client b failed.";
-      return 1;
+      return -1;
     }
     param_ptr_b->can_client = client_b.get();
     param_ptr_b->conf = can_client_conf_b;

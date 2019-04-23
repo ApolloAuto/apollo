@@ -35,13 +35,13 @@ using apollo::cyber::proto::ChoreographyTask;
 
 class SchedulerChoreography : public Scheduler {
  public:
-  SchedulerChoreography();
   bool RemoveCRoutine(uint64_t crid) override;
   bool RemoveTask(const std::string& name) override;
   bool DispatchTask(const std::shared_ptr<CRoutine>&) override;
 
  private:
   friend Scheduler* Instance();
+  SchedulerChoreography();
 
   void CreateProcessor();
   bool NotifyProcessor(uint64_t crid) override;
