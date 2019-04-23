@@ -6,20 +6,7 @@ import trafficLightMaterial from "assets/models/traffic_light.mtl";
 import trafficLightObject from "assets/models/traffic_light.obj";
 import stopSignMaterial from "assets/models/stop_sign.mtl";
 import stopSignObject from "assets/models/stop_sign.obj";
-
-const TRAFFIC_LIGHT_SCALE = 0.006;
-const trafficLightScales = {
-    x: TRAFFIC_LIGHT_SCALE,
-    y: TRAFFIC_LIGHT_SCALE,
-    z: TRAFFIC_LIGHT_SCALE
-};
-
-const STOP_SIGN_SCALE = 0.01;
-const stopSignScales = {
-    x: STOP_SIGN_SCALE,
-    y: STOP_SIGN_SCALE,
-    z: STOP_SIGN_SCALE
-};
+import { trafficLightScales, stopSignScales } from "renderer/map";
 
 function diffTiles(newTiles, currentTiles) {
     const difference = new Set(newTiles);
@@ -41,7 +28,7 @@ export default class TileGround {
         this.hash = -1;
         this.currentTiles = {};
         this.currentSignal = {};
-        this.currentStopsign = {};
+        this.currentStopSign = {};
         this.initialized = false;
 
         this.range = PARAMETERS.ground.defaults.tileRange;
@@ -64,8 +51,8 @@ export default class TileGround {
 
         this.mapId = metadata.mapid;
         this.mapUrlPrefix = `${this.metadata.imageUrl}/${this.mapId}`;
-        this.signalInfo = metadata.signal;
-        this.stopsignInfo = metadata.stopsign;
+        this.totalSignals = metadata.signal;
+        this.totalStopSigns = metadata.stopSign;
         this.initialized = true;
     }
 
@@ -83,9 +70,10 @@ export default class TileGround {
         delete items[key];
     }
 
-    appendItems(row, col, key, coordinates, scene, itemInfo, currentItems,
+    // append signal and stopSign within current range
+    appendItems(row, col, key, coordinates, scene, totalItemsInMap, currentItems,
         material, object, scales) {
-        itemInfo.forEach((item) => {
+        totalItemsInMap.forEach((item) => {
             if (isNaN(item.x) || isNaN(item.y) || isNaN(item.heading)) {
                 return;
             }
@@ -110,7 +98,7 @@ export default class TileGround {
                     mesh.matrixAutoUpdate = false;
                     mesh.updateMatrix();
 
-                    // a tile may have multiple signal or stopsign
+                    // a tile may have multiple signal or stopSign
                     currentItems[`${key}_${item.x}_${item.y}`] = mesh;
                     scene.add(mesh);
                 });
@@ -153,9 +141,9 @@ export default class TileGround {
             .forEach((signal) => {
                 this.removeDrewObject(signal, this.currentSignal, scene);
             });
-        Object.keys(this.currentStopsign).filter(stopsign => !newTiles.has(stopsign.split('_')[0]))
-            .forEach((stopsign) => {
-                this.removeDrewObject(stopsign, this.currentStopsign, scene);
+        Object.keys(this.currentStopSign).filter(stopSign => !newTiles.has(stopSign.split('_')[0]))
+            .forEach((stopSign) => {
+                this.removeDrewObject(stopSign, this.currentStopSign, scene);
             });
     }
 
@@ -176,14 +164,14 @@ export default class TileGround {
                         continue;
                     }
                     this.appendTiles(row, col, key, coordinates, scene);
-                    if (this.signalInfo) {
-                        this.appendItems(row, col, key, coordinates, scene, this.signalInfo,
+                    if (this.totalSignals) {
+                        this.appendItems(row, col, key, coordinates, scene, this.totalSignals,
                             this.currentSignal, trafficLightMaterial, trafficLightObject,
                             trafficLightScales);
                     }
-                    if (this.stopsignInfo) {
-                        this.appendItems(row, col, key, coordinates, scene, this.stopsignInfo,
-                            this.currentStopsign, stopSignMaterial, stopSignObject, stopSignScales);
+                    if (this.totalStopSigns) {
+                        this.appendItems(row, col, key, coordinates, scene, this.totalStopSigns,
+                            this.currentStopSign, stopSignMaterial, stopSignObject, stopSignScales);
                     }
                 }
             }
