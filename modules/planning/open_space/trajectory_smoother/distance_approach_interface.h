@@ -72,9 +72,6 @@ class DistanceApproachInterface : public Ipopt::TNLP {
   /** Method to return the gradient of the objective */
   virtual bool eval_grad_f(int n, const double* x, bool new_x,
                            double* grad_f) = 0;
-  // eval_grad_f by hand.
-  virtual bool eval_grad_f_hand(int n, const double* x, bool new_x,
-                                double* grad_f) = 0;
 
   /** Method to return the constraint residuals */
   virtual bool eval_g(int n, const double* x, bool new_x, int m, double* g) = 0;
@@ -91,10 +88,6 @@ class DistanceApproachInterface : public Ipopt::TNLP {
                           double* values) = 0;
   // sequential implementation to jac_g
   virtual bool eval_jac_g_ser(int n, const double* x, bool new_x, int m,
-                              int nele_jac, int* iRow, int* jCol,
-                              double* values) = 0;
-  // parallel implementation to jac_g
-  virtual bool eval_jac_g_par(int n, const double* x, bool new_x, int m,
                               int nele_jac, int* iRow, int* jCol,
                               double* values) = 0;
 
