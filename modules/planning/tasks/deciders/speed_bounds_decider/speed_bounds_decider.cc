@@ -98,31 +98,7 @@ Status SpeedBoundsDecider::Process(
     }
   }
 
-  // Set min_s_on_st_boundaries to guide speed fallback. Different stop distance
-  // is taken when there is an obstacle moving in opposite direction of ADV
-  constexpr double kEpsilon = 1.0e-6;
-  double min_s_non_reverse = std::numeric_limits<double>::infinity();
-  double min_s_reverse = std::numeric_limits<double>::infinity();
-  for (auto *obstacle : path_decision->obstacles().Items()) {
-    const auto &st_boundary = obstacle->st_boundary();
-    if (st_boundary.IsEmpty()) {
-      continue;
-    }
-    const auto &left_bottom_point = st_boundary.bottom_left_point();
-    const auto &right_bottom_point = st_boundary.bottom_right_point();
-    if (left_bottom_point.s() - right_bottom_point.s() > kEpsilon) {
-      if (min_s_reverse > left_bottom_point.s()) {
-        min_s_reverse = left_bottom_point.s();
-      }
-    } else if (min_s_non_reverse > left_bottom_point.s()) {
-      min_s_non_reverse = left_bottom_point.s();
-    }
-  }
-  min_s_reverse = std::max(min_s_reverse, 0.0);
-  min_s_non_reverse = std::max(min_s_non_reverse, 0.0);
-
-  const double min_s_on_st_boundaries =
-      min_s_non_reverse > min_s_reverse ? 0.0 : min_s_non_reverse;
+  const double min_s_on_st_boundaries = SetSpeedFallbackDistance(path_decision);
 
   // 3. Create speed limit along path
   SpeedLimitDecider speed_limit_decider(adc_sl_boundary, speed_bounds_config_,
@@ -207,6 +183,48 @@ void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
           frame, &reference_line_info);
     }
   }
+}
+
+double SpeedBoundsDecider::SetSpeedFallbackDistance(
+    PathDecision *const path_decision) {
+  // Set min_s_on_st_boundaries to guide speed fallback. Different stop distance
+  // is taken when there is an obstacle moving in opposite direction of ADV
+  constexpr double kEpsilon = 1.0e-6;
+  double min_s_non_reverse = std::numeric_limits<double>::infinity();
+  double min_s_reverse = std::numeric_limits<double>::infinity();
+  // TODO(Jinyun): tmp workaround for side pass capability because of doomed
+  // speed planning failure when side pass creeping
+  double side_pass_stop_s = std::numeric_limits<double>::infinity();
+
+  for (auto *obstacle : path_decision->obstacles().Items()) {
+    const auto &st_boundary = obstacle->st_boundary();
+    if (st_boundary.IsEmpty()) {
+      continue;
+    }
+    const auto &left_bottom_point = st_boundary.bottom_left_point();
+    const auto &right_bottom_point = st_boundary.bottom_right_point();
+    if (left_bottom_point.s() - right_bottom_point.s() > kEpsilon) {
+      if (min_s_reverse > right_bottom_point.s()) {
+        min_s_reverse = right_bottom_point.s();
+      }
+    } else if (min_s_non_reverse > right_bottom_point.s()) {
+      min_s_non_reverse = right_bottom_point.s();
+    }
+    if (obstacle->LongitudinalDecision().stop().reason_code() ==
+            StopReasonCode::STOP_REASON_SIDEPASS_SAFETY &&
+        side_pass_stop_s > right_bottom_point.s()) {
+      side_pass_stop_s = right_bottom_point.s();
+    }
+  }
+
+  min_s_reverse = std::max(min_s_reverse, 0.0);
+  min_s_non_reverse = std::max(min_s_non_reverse, 0.0);
+  side_pass_stop_s = std::max(side_pass_stop_s, 0.0);
+
+  if (!std::isinf(side_pass_stop_s)) {
+    return side_pass_stop_s;
+  }
+  return min_s_non_reverse > min_s_reverse ? 0.0 : min_s_non_reverse;
 }
 
 void SpeedBoundsDecider::StopOnSidePass(
