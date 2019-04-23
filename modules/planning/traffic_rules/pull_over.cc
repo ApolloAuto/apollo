@@ -526,9 +526,9 @@ int PullOver::BuildPullOverStop(const PointENU& stop_point) {
   BuildStopDecision("", stop_line_s, stop_point, stop_point_heading);
 
   // record in PlanningStatus
-  auto* pull_over_status =
-      PlanningContext::Instance()->mutable_planning_status()
-                                 ->mutable_pull_over();
+  auto* pull_over_status = PlanningContext::Instance()
+                               ->mutable_planning_status()
+                               ->mutable_pull_over();
 
   common::SLPoint start_point_sl;
   start_point_sl.set_s(stop_point_sl.s() -

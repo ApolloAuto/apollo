@@ -22,8 +22,8 @@ namespace prediction {
 thread_local int PredictionThreadPool::s_thread_pool_level = 0;
 std::vector<int> BaseThreadPool::THREAD_POOL_CAPACITY = {10, 10, 10};
 
-BaseThreadPool::BaseThreadPool(
-    int thread_num, int next_thread_pool_level) : stopped_(false) {
+BaseThreadPool::BaseThreadPool(int thread_num, int next_thread_pool_level)
+    : stopped_(false) {
   if (!task_queue_.Init(thread_num,
                         new apollo::cyber::base::BlockWaitStrategy())) {
     throw std::runtime_error("Task queue init failed.");

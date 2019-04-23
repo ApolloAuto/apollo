@@ -579,9 +579,9 @@ TEST_F(SunnyvaleBigLoopTest, crosswalk_02) {
   RUN_GOLDEN_TEST_DECISION(0);
 
   // check PlanningStatus value
-  auto* crosswalk_status =
-      PlanningContext::Instance()->mutable_planning_status()
-                                 ->mutable_crosswalk();
+  auto* crosswalk_status = PlanningContext::Instance()
+                               ->mutable_planning_status()
+                               ->mutable_crosswalk();
   EXPECT_EQ("2832", crosswalk_status->crosswalk_id());
   EXPECT_EQ(1, crosswalk_status->stop_time_size());
   EXPECT_EQ("11652", crosswalk_status->stop_time(0).obstacle_id());
