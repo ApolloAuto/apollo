@@ -128,9 +128,9 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
-        "//modules/common/vehicle_state:vehicle_state_provider",
     ],
 )
 

@@ -292,8 +292,8 @@ void FusionCameraDetectionComponent::OnReceiveImage(
   if (InternalProc(message, camera_name, &error_code, prefused_message.get(),
                    out_message.get()) != cyber::SUCC) {
     AERROR << "InternalProc failed, error_code: " << error_code;
-    if (MakeProtobufMsg(msg_timestamp, seq_num_, {}, {},
-                        error_code, out_message.get()) != cyber::SUCC) {
+    if (MakeProtobufMsg(msg_timestamp, seq_num_, {}, {}, error_code,
+                        out_message.get()) != cyber::SUCC) {
       AERROR << "MakeProtobufMsg failed";
       return;
     }
@@ -716,10 +716,9 @@ int FusionCameraDetectionComponent::InternalProc(
 
   // process success, make pb msg
   if (output_final_obstacles_ &&
-      MakeProtobufMsg(msg_timestamp, seq_num_,
-                      camera_frame.tracked_objects,
-                      camera_frame.lane_objects,
-                      *error_code, out_message) != cyber::SUCC) {
+      MakeProtobufMsg(msg_timestamp, seq_num_, camera_frame.tracked_objects,
+                      camera_frame.lane_objects, *error_code,
+                      out_message) != cyber::SUCC) {
     AERROR << "MakeProtobufMsg failed"
            << " ts: " << std::to_string(msg_timestamp);
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_UNKNOWN;
@@ -841,7 +840,8 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
       case base::LaneLinePositionType::ADJACENT_RIGHT:
         fill_lane_msg(curve_coord, lane_marker_r1);
         break;
-      default: break;
+      default:
+        break;
     }
   }
 

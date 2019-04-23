@@ -97,10 +97,10 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     }
 
     std::vector<double> feature_values;
-    feature_values.insert(feature_values.end(),
-        obstacle_feature_values.begin(), obstacle_feature_values.end());
-    feature_values.insert(feature_values.end(),
-        lane_feature_values.begin(), lane_feature_values.end());
+    feature_values.insert(feature_values.end(), obstacle_feature_values.begin(),
+                          obstacle_feature_values.end());
+    feature_values.insert(feature_values.end(), lane_feature_values.begin(),
+                          lane_feature_values.end());
 
     // Insert features to DataForLearning
     if (FLAGS_prediction_offline_mode == 2 && !obstacle_ptr->IsNearJunction()) {

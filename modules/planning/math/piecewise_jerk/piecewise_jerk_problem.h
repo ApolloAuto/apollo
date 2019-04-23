@@ -65,11 +65,12 @@ class PiecewiseJerkProblem {
    * -- w[4]: default reference line weight, (x_bounds[k].first +
    * x_bounds[k].second)/2
    */
-  virtual void InitProblem(
-      const size_t num_var, const double delta_s,
-      const std::array<double, 5>& w,
-      const std::array<double, 3>& x_init = {0.0, 0.0, 0.0},
-      const std::array<double, 3>& x_end = {0.0, 0.0, 0.0});
+  virtual void InitProblem(const size_t num_var, const double delta_s,
+                           const std::array<double, 5>& w,
+                           const std::array<double, 3>& x_init = {0.0, 0.0,
+                                                                  0.0},
+                           const std::array<double, 3>& x_end = {0.0, 0.0,
+                                                                 0.0});
 
   virtual void ResetInitConditions(const std::array<double, 3>& x_init) {
     x_init_ = x_init;

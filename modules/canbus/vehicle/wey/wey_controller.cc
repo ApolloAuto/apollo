@@ -337,7 +337,7 @@ Chassis WeyController::chassis() {
           common::VehicleSignal::TURN_LEFT);
     } else if (wey.status_310().has_rightturnlampsts() &&
                wey.status_310().rightturnlampsts() ==
-               Status_310::RIGHTTURNLAMPSTS_ON) {
+                   Status_310::RIGHTTURNLAMPSTS_ON) {
       chassis_.mutable_signal()->set_turn_signal(
           common::VehicleSignal::TURN_RIGHT);
     } else {

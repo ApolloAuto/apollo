@@ -218,7 +218,7 @@ bool SchedulerClassic::RemoveCRoutine(uint64_t crid) {
   WriteLockGuard<AtomicRWLock> lk(
       ClassicContext::rq_locks_[group_name].at(prio));
   for (auto it = ClassicContext::cr_group_[group_name].at(prio).begin();
-      it != ClassicContext::cr_group_[group_name].at(prio).end(); ++it) {
+       it != ClassicContext::cr_group_[group_name].at(prio).end(); ++it) {
     if ((*it)->id() == crid) {
       auto cr = *it;
 
