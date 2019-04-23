@@ -60,9 +60,9 @@ bool IsNonmovableObstacle(const ReferenceLineInfo& reference_line_info,
       continue;
     }
     if (other_obstacle->PerceptionSLBoundary().start_l() >
-        obstacle.PerceptionSLBoundary().end_l() ||
+            obstacle.PerceptionSLBoundary().end_l() ||
         other_obstacle->PerceptionSLBoundary().end_l() <
-        obstacle.PerceptionSLBoundary().start_l()) {
+            obstacle.PerceptionSLBoundary().start_l()) {
       // not blocking the backside vehicle
       continue;
     }
@@ -145,9 +145,9 @@ bool IsBlockingObstacleToSidePass(const Frame& frame, const Obstacle* obstacle,
         continue;
       }
       if (other_obstacle->PerceptionSLBoundary().start_l() >
-          obstacle->PerceptionSLBoundary().end_l() ||
+              obstacle->PerceptionSLBoundary().end_l() ||
           other_obstacle->PerceptionSLBoundary().end_l() <
-          obstacle->PerceptionSLBoundary().start_l()) {
+              obstacle->PerceptionSLBoundary().start_l()) {
         // not blocking the backside vehicle
         continue;
       }
@@ -186,7 +186,7 @@ bool IsBlockingDrivingPathObstacle(const ReferenceLine& reference_line,
   ADEBUG << " (driving width = " << driving_width
          << ", adc_width = " << adc_width << ")";
   if (driving_width > adc_width + FLAGS_static_decision_nudge_l_buffer +
-                      FLAGS_side_pass_driving_width_l_buffer) {
+                          FLAGS_side_pass_driving_width_l_buffer) {
     // TODO(jiacheng): make this a GFLAG:
     // side_pass_context_.scenario_config_.min_l_nudge_buffer()
     ADEBUG << "It is NOT blocking our path.";

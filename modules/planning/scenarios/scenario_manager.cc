@@ -708,8 +708,8 @@ void ScenarioManager::UpdatePlanningContext(
 void ScenarioManager::UpdatePlanningContextBareIntersectionScenario(
     const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type) {
   auto* bare_intersection = PlanningContext::Instance()
-      ->mutable_planning_status()
-      ->mutable_bare_intersection();
+                                ->mutable_planning_status()
+                                ->mutable_bare_intersection();
 
   if (!IsBareIntersectionScenario(scenario_type)) {
     bare_intersection->Clear();

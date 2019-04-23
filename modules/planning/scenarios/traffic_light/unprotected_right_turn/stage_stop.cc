@@ -132,12 +132,10 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
   return Stage::RUNNING;
 }
 
-bool
-TrafficLightUnprotectedRightTurnStageStop::CheckTrafficLightNoRightTurnOnRed(
-    const std::string& traffic_light_id) {
+bool TrafficLightUnprotectedRightTurnStageStop::
+    CheckTrafficLightNoRightTurnOnRed(const std::string& traffic_light_id) {
   hdmap::SignalInfoConstPtr traffic_light_ptr =
-      HDMapUtil::BaseMap().GetSignalById(
-          hdmap::MakeMapId(traffic_light_id));
+      HDMapUtil::BaseMap().GetSignalById(hdmap::MakeMapId(traffic_light_id));
   if (!traffic_light_ptr) {
     return false;
   }

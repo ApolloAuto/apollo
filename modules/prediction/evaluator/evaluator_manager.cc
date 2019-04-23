@@ -42,8 +42,8 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
-using PriorityObstacleMap = std::map<ObstaclePriority::Priority,
-                                     std::list<Obstacle*>>;
+using PriorityObstacleMap =
+    std::map<ObstaclePriority::Priority, std::list<Obstacle*>>;
 
 namespace {
 
@@ -58,8 +58,8 @@ bool IsTrainable(const Feature& feature) {
   return true;
 }
 
-void GroupObstaclesByPriority(const int obstacle_id,
-    ObstaclesContainer* const obstacles_container,
+void GroupObstaclesByPriority(
+    const int obstacle_id, ObstaclesContainer* const obstacles_container,
     PriorityObstacleMap* const priority_obstacle_map) {
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
   if (obstacle_ptr == nullptr) {
