@@ -103,7 +103,6 @@ class MLPEvaluator : public Evaluator {
                            const std::vector<double>& feature_values);
 
  private:
-  std::unordered_map<int, std::vector<double>> obstacle_feature_values_map_;
   static const size_t OBSTACLE_FEATURE_SIZE = 22;
   static const size_t LANE_FEATURE_SIZE = 40;
 
