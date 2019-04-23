@@ -139,7 +139,34 @@ bool DistanceApproachProblem::Solve(
     AINFO << "DistanceApproachProblem solving time in second : "
           << t_end - t_start;
   } else {
-    AINFO << "Solve not succeeding, return status: " << int(status);
+    // return detailed failure information,
+    // refence resource: Ipopt, ApplicationReturnStatus enumerate
+    std::vector<std::string> failure_status = {
+        "Solve_Succeeded",
+        "Solved_To_Acceptable_Level",
+        "Infeasible_Problem_Detected",
+        "Search_Direction_Becomes_Too_Small",
+        "Diverging_Iterates",
+        "User_Requested_Stop",
+        "Feasible_Point_Found",
+        "Maximum_Iterations_Exceeded",
+        "Restoration_Failed",
+        "Error_In_Step_Computation",
+        "Not_Enough_Degrees_Of_Freedom",
+        "Invalid_Problem_Definition",
+        "Invalid_Option",
+        "Invalid_Number_Detected",
+        "Unrecoverable_Exception",
+        "NonIpopt_Exception_Thrown"
+        "Insufficient_Memory",
+        "Internal_Error"};
+    if (static_cast<size_t>(status) >= failure_status.size()) {
+      AINFO << "Solver ends with unknow falure code: "
+          << static_cast<int>(status);
+    } else {
+      AINFO << "Solver failure case: "
+          << failure_status[static_cast<size_t>(status)];
+    }
   }
 
   ptop->get_optimization_results(state_result, control_result, time_result,
