@@ -443,7 +443,7 @@ void LexusController::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void LexusController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
-  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE) &&
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
       driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
