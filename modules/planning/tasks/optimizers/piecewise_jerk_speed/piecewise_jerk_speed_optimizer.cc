@@ -44,6 +44,7 @@ PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
   SetName("PiecewiseJerkSpeedOptimizer");
+  // TODO(Hongyi): Uncomment this check when config is ready
   // CHECK(config_.has_piecewise_jerk_speed_config());
 }
 
@@ -102,20 +103,23 @@ Status PiecewiseJerkSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       if (!boundary->GetUnblockSRange(curr_t, &s_upper, &s_lower)) {
         continue;
       }
-      if (boundary->boundary_type() == STBoundary::BoundaryType::STOP ||
-          boundary->boundary_type() == STBoundary::BoundaryType::YIELD) {
-        s_upper_bound = std::fmin(s_upper_bound, s_upper);
-      } else if (
-          boundary->boundary_type() == STBoundary::BoundaryType::FOLLOW) {
-        // TODO(Hongyi): unify follow buffer on decision side
-        s_upper_bound = std::fmin(s_upper_bound, s_upper - 8.0);
-      } else if (
-          boundary->boundary_type() == STBoundary::BoundaryType::OVERTAKE) {
-        s_lower_bound = std::fmax(s_lower_bound, s_lower);
+      switch (boundary->boundary_type()) {
+        case STBoundary::BoundaryType::STOP:
+        case STBoundary::BoundaryType::YIELD:
+          s_upper_bound = std::fmin(s_upper_bound, s_upper);
+          break;
+        case STBoundary::BoundaryType::FOLLOW:
+          // TODO(Hongyi): unify follow buffer on decision side
+          s_upper_bound = std::fmin(s_upper_bound, s_upper - 8.0);
+          break;
+        case STBoundary::BoundaryType::OVERTAKE:
+          s_lower_bound = std::fmax(s_lower_bound, s_lower);
+          break;
+        default:
+          break;
       }
     }
-    x_bounds.emplace_back(
-        std::make_tuple(curr_t, s_lower_bound, std::fmax(s_upper_bound, 0.0)));
+    x_bounds.emplace_back(curr_t, s_lower_bound, std::fmax(s_upper_bound, 0.0));
   }
   path_time_qp->SetVariableBounds(x_bounds);
 
@@ -127,12 +131,12 @@ Status PiecewiseJerkSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   }
 
   // Extract output
-  std::vector<double> s = path_time_qp->x();
-  std::vector<double> ds = path_time_qp->x_derivative();
-  std::vector<double> dds = path_time_qp->x_second_order_derivative();
+  const std::vector<double>& s = path_time_qp->x();
+  const std::vector<double>& ds = path_time_qp->x_derivative();
+  const std::vector<double>& dds = path_time_qp->x_second_order_derivative();
   for (int i = 0; i < num_of_knots; ++i) {
-    ADEBUG << "For t[" << i*delta_t << "], s = " << s[i]
-          << ", v = " << ds[i] << ", a = " << dds[i];
+    ADEBUG << "For t[" << i * delta_t << "], s = " << s[i]
+           << ", v = " << ds[i] << ", a = " << dds[i];
   }
   speed_data->clear();
   speed_data->AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
@@ -142,7 +146,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       break;
     }
     speed_data->AppendSpeedPoint(s[i], delta_t * i, ds[i], dds[i],
-                                (dds[i]-dds[i-1]) / delta_t);
+                                 (dds[i] - dds[i - 1]) / delta_t);
   }
   RecordDebugInfo(*speed_data, st_graph_data.mutable_st_graph_debug());
   return Status::OK();
