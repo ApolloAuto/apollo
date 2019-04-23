@@ -47,9 +47,9 @@ void BareIntersectionUnprotectedScenario::Init() {
     return;
   }
 
-  const std::string pnc_junction_overlap_id =
+  const std::string& pnc_junction_overlap_id =
       PlanningContext::Instance()
-          ->Planningstatus()
+          ->planning_status()
           .bare_intersection()
           .current_pnc_junction_overlap_id();
   if (pnc_junction_overlap_id.empty()) {

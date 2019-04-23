@@ -72,9 +72,6 @@ cc_library(
     hdrs = [
         "environment.h",
     ],
-    deps = [
-        #"//cyber/common:log",
-    ],
 )
 
 cc_library(

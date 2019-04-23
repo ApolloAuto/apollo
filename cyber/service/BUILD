@@ -8,7 +8,7 @@ cc_library(
         "client.h",
     ],
     deps = [
-        "client_base",
+        ":client_base",
     ],
 )
 
@@ -25,7 +25,7 @@ cc_library(
         "service.h",
     ],
     deps = [
-        "service_base",
+        ":service_base",
         "//cyber/scheduler",
     ],
 )

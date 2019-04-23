@@ -16,37 +16,46 @@
 
 #include "modules/prediction/common/prediction_thread_pool.h"
 
-#include "boost/preprocessor/repeat.hpp"
-
 namespace apollo {
 namespace prediction {
 
 thread_local int PredictionThreadPool::s_thread_pool_level = 0;
 std::vector<int> BaseThreadPool::THREAD_POOL_CAPACITY = {10, 10, 10};
 
-BaseThreadPool::BaseThreadPool(int thread_num, int next_thread_pool_level)
-    : work_(io_service_) {
+BaseThreadPool::BaseThreadPool(
+    int thread_num, int next_thread_pool_level) : stopped_(false) {
+  if (!task_queue_.Init(thread_num,
+                        new apollo::cyber::base::BlockWaitStrategy())) {
+    throw std::runtime_error("Task queue init failed.");
+  }
   for (int i = 0; i < thread_num; ++i) {
-    thread_group_.create_thread([this, next_thread_pool_level, i] {
+    workers_.emplace_back([this, next_thread_pool_level, i] {
       PredictionThreadPool::s_thread_pool_level = next_thread_pool_level;
-      this->io_service_.run();
+      while (!stopped_) {
+        std::function<void()> task;
+        if (task_queue_.WaitDequeue(&task)) {
+          task();
+        }
+      }
     });
   }
 }
 
 void BaseThreadPool::Stop() {
-  io_service_.stop();
-  thread_group_.join_all();
+  task_queue_.BreakAllWait();
+  for (std::thread& worker : workers_) {
+    worker.join();
+  }
   stopped_ = true;
 }
 
 BaseThreadPool::~BaseThreadPool() {
-  if (!stopped_) {
-    try {
-      Stop();
-    } catch (std::exception& e) {
-      AERROR << "Stop thread pool failed. " << e.what();
-    }
+  if (stopped_.exchange(true)) {
+    return;
+  }
+  task_queue_.BreakAllWait();
+  for (std::thread& worker : workers_) {
+    worker.join();
   }
 }
 

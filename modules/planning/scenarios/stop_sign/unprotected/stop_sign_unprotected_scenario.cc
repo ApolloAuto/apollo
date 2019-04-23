@@ -63,7 +63,7 @@ void StopSignUnprotectedScenario::Init() {
   }
 
   const std::string stop_sign_overlap_id = PlanningContext::Instance()
-                                               ->Planningstatus()
+                                               ->planning_status()
                                                .stop_sign()
                                                .current_stop_sign_overlap_id();
   if (stop_sign_overlap_id.empty()) {

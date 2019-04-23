@@ -6,7 +6,7 @@ cc_library(
     name = "task",
     hdrs = ["task.h"],
     deps = [
-        "task_manager",
+        ":task_manager",
     ],
 )
 

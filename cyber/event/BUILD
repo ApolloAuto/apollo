@@ -11,7 +11,7 @@ cc_library(
         "perf_event_cache.h",
     ],
     deps = [
-        "perf_event",
+        ":perf_event",
         "//cyber:state",
         "//cyber/base:bounded_queue",
         "//cyber/common:global_data",
