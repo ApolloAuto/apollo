@@ -182,6 +182,10 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
                              ADCTrajectory* const ptr_trajectory_pb) {
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
+  const double start_system_timestamp =
+      std::chrono::duration<double>(
+          std::chrono::system_clock::now().time_since_epoch())
+          .count();
 
   // localization
   ADEBUG << "Get localization:"
@@ -301,7 +305,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   for (const auto& p : ptr_trajectory_pb->trajectory_point()) {
     ADEBUG << p.DebugString();
   }
-  const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
+  const auto end_system_timestamp =
+      std::chrono::duration<double>(
+          std::chrono::system_clock::now().time_since_epoch())
+          .count();
+  const auto time_diff_ms =
+      (end_system_timestamp - start_system_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
   ptr_trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
