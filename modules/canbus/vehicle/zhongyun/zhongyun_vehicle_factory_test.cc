@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,43 +14,32 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/canbus/vehicle/vehicle_factory.h"
-
+#include "modules/canbus/vehicle/zhongyun/zhongyun_vehicle_factory.h"
 #include "gtest/gtest.h"
-
 #include "modules/canbus/proto/vehicle_parameter.pb.h"
 
 namespace apollo {
 namespace canbus {
 
-class VehicleFactoryTest : public ::testing::Test {
+class ZhongyunVehicleFactoryTest : public ::testing::Test {
  public:
-  VehicleFactoryTest() : factory_() {}
-
-  virtual void SetUp() { factory_.RegisterVehicleFactory(); }
+  virtual void SetUp() {
+    VehicleParameter parameter;
+    parameter.set_brand(apollo::common::ZHONGYUN);
+    zhongyun_factory_.SetVehicleParameter(parameter);
+  }
   virtual void TearDown() {}
 
  protected:
-  VehicleFactory factory_;
+  ZhongyunVehicleFactory zhongyun_factory_;
 };
 
-TEST_F(VehicleFactoryTest, CreateVehicle) {
-  VehicleParameter parameter;
+TEST_F(ZhongyunVehicleFactoryTest, InitVehicleController) {
+  EXPECT_TRUE(zhongyun_factory_.CreateVehicleController() != nullptr);
+}
 
-  parameter.set_brand(apollo::common::GEM);
-  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
-
-  parameter.set_brand(apollo::common::LINCOLN_MKZ);
-  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
-
-  parameter.set_brand(apollo::common::GE3);
-  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
-
-  parameter.set_brand(apollo::common::WEY);
-  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
-
-  parameter.set_brand(apollo::common::ZHONGYUN);
-  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
+TEST_F(ZhongyunVehicleFactoryTest, InitMessageManager) {
+  EXPECT_TRUE(zhongyun_factory_.CreateMessageManager() != nullptr);
 }
 
 }  // namespace canbus
