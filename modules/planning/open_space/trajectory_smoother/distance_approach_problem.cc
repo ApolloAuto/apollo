@@ -18,6 +18,7 @@
  * @file
  */
 
+#include <string>
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 
 namespace apollo {
@@ -140,7 +141,7 @@ bool DistanceApproachProblem::Solve(
           << t_end - t_start;
   } else {
     // return detailed failure information,
-    // refence resource: Ipopt, ApplicationReturnStatus enumerate
+    // reference resource: Ipopt::ApplicationReturnStatus
     std::vector<std::string> failure_status = {
         "Solve_Succeeded",
         "Solved_To_Acceptable_Level",
@@ -161,7 +162,7 @@ bool DistanceApproachProblem::Solve(
         "Insufficient_Memory",
         "Internal_Error"};
     if (static_cast<size_t>(status) >= failure_status.size()) {
-      AINFO << "Solver ends with unknow falure code: "
+      AINFO << "Solver ends with unknown failure code: "
           << static_cast<int>(status);
     } else {
       AINFO << "Solver failure case: "

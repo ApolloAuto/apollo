@@ -82,8 +82,6 @@ class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
 
   /** Method to return the gradient of the objective */
   bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f) override;
-  // eval_grad_f by hand.
-  bool eval_grad_f_hand(int n, const double* x, bool new_x, double* grad_f);
 
   /** Method to return the constraint residuals */
   bool eval_g(int n, const double* x, bool new_x, int m, double* g) override;
@@ -99,9 +97,6 @@ class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
                   int* iRow, int* jCol, double* values) override;
   // sequential implementation to jac_g
   bool eval_jac_g_ser(int n, const double* x, bool new_x, int m, int nele_jac,
-                      int* iRow, int* jCol, double* values) override;
-  // parallel implementation to jac_g
-  bool eval_jac_g_par(int n, const double* x, bool new_x, int m, int nele_jac,
                       int* iRow, int* jCol, double* values) override;
 
   /** Method to return:

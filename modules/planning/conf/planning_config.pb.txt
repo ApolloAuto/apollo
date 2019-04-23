@@ -265,8 +265,6 @@ default_task_config: {
             ipopt_mu_init: 0.1
           }
           enable_constraint_check: false
-          enable_hand_derivative: false
-          enable_derivative_check: false
           enable_initial_final_check: false
         }
         delta_t: 0.5
