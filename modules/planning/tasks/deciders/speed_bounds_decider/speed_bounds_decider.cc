@@ -203,9 +203,9 @@ double SpeedBoundsDecider::SetSpeedFallbackDistance(
       continue;
     }
 
-    const auto &left_bottom_point_s = st_boundary.bottom_left_point().s();
-    const auto &right_bottom_point_s = st_boundary.bottom_right_point().s();
-    const auto &lowest_s = std::min(left_bottom_point_s, right_bottom_point_s);
+    const auto left_bottom_point_s = st_boundary.bottom_left_point().s();
+    const auto right_bottom_point_s = st_boundary.bottom_right_point().s();
+    const auto lowest_s = std::min(left_bottom_point_s, right_bottom_point_s);
 
     if (left_bottom_point_s - right_bottom_point_s > kEpsilon) {
       if (min_s_reverse > lowest_s) {
