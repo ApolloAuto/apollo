@@ -39,6 +39,7 @@
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
+#include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 #include "modules/planning/tasks/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"
 #include "modules/planning/tasks/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
@@ -75,6 +76,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::PIECEWISE_JERK_PATH_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new PiecewiseJerkPathOptimizer(config);
+                         });
+  task_factory_.Register(TaskConfig::PIECEWISE_JERK_SPEED_OPTIMIZER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new PiecewiseJerkSpeedOptimizer(config);
                          });
   task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
