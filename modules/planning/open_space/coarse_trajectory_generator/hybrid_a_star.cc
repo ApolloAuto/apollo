@@ -205,10 +205,10 @@ double HybridAStar::TrajCost(std::shared_ptr<Node3d> current_node,
   // evaluate cost on the trajectory and add current cost
   double piecewise_cost = 0.0;
   if (next_node->GetDirec()) {
-    piecewise_cost += static_cast<double>(next_node->GetSize() - 1) *
+    piecewise_cost += static_cast<double>(next_node->GetStepSize() - 1) *
                       step_size_ * traj_forward_penalty_;
   } else {
-    piecewise_cost += static_cast<double>(next_node->GetSize() - 1) *
+    piecewise_cost += static_cast<double>(next_node->GetStepSize() - 1) *
                       step_size_ * traj_back_penalty_;
   }
   if (current_node->GetDirec() != next_node->GetDirec()) {
@@ -364,6 +364,7 @@ bool HybridAStar::Plan(
 
   // Hybrid A* begins
   size_t explored_node_num = 0;
+  double astar_start_time = Clock::NowInSeconds();
   double heuristic_time = 0.0;
   double rs_time = 0.0;
   double start_time = 0.0;
@@ -418,7 +419,9 @@ bool HybridAStar::Plan(
   }
   ADEBUG << "explored node num is " << explored_node_num;
   ADEBUG << "heuristic time is " << heuristic_time;
-  ADEBUG << "rs time is " << rs_time;
+  ADEBUG << "reed shepp time is " << rs_time;
+  ADEBUG << "hybrid astar total time is "
+         << Clock::NowInSeconds() - astar_start_time;
   return true;
 }
 }  // namespace planning

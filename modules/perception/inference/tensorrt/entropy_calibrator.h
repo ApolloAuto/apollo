@@ -34,7 +34,7 @@ class ICaffePoolOutputDimensionsFormula : public IOutputDimensionsFormula {
  public:
   virtual DimsHW compute(DimsHW input_dims, DimsHW kernel_size, DimsHW stride,
                          DimsHW padding, DimsHW dilation,
-                         const char *layerName) {
+                         const char *layer_name) {
     const int kernel_extent_h = dilation.d[0] * (kernel_size.d[0] - 1) + 1;
     const int kernel_extent_w = dilation.d[1] * (kernel_size.d[1] - 1) + 1;
     auto &&h_temp = (input_dims.d[0] + 2 * padding.d[0] - kernel_extent_h) *
@@ -42,13 +42,12 @@ class ICaffePoolOutputDimensionsFormula : public IOutputDimensionsFormula {
     auto &&w_temp = (input_dims.d[1] + 2 * padding.d[1] - kernel_extent_w) *
                     1.0 / stride.d[1];
 
-    std::string str_name(layerName);
+    std::string str_name(layer_name);
     if (str_name.find("as_conv") == std::string::npos) {
       return DimsHW(static_cast<int>(ceil(h_temp)) + 1,
                     static_cast<int>(ceil(w_temp)) + 1);
-    } else {
-      return DimsHW(static_cast<int>(h_temp) + 1, static_cast<int>(w_temp) + 1);
     }
+    return DimsHW(static_cast<int>(h_temp) + 1, static_cast<int>(w_temp) + 1);
   }
 
   ICaffePoolOutputDimensionsFormula() {}

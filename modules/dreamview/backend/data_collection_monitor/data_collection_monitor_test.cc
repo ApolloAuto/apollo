@@ -60,7 +60,7 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
 
   auto chassis = std::make_shared<Chassis>();
   chassis->set_speed_mps(10.0f);
-  chassis->set_throttle_percentage(31.0f);
+  chassis->set_throttle_percentage(31.1f);
   chassis->set_brake_percentage(30.0f);
   chassis->set_steering_percentage(-30.0f);
 
@@ -68,46 +68,53 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
     data_collection_monitor_->OnChassis(chassis);
     nlohmann::json progress = data_collection_monitor_->GetProgressAsJson();
 
-    float value;
+    std::string scenarioName = "Go Straight";
+    auto scenario = progress.find(scenarioName);
+    EXPECT_NE(scenario, progress.end());
+
+    double value;
     bool hasField;
 
-    hasField = JsonUtil::GetNumberFromJson(progress, "mps < 10", &value);
+    hasField = JsonUtil::GetNumberFromJson(*scenario, "mps < 10", &value);
     EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(0.0, value);
 
-    hasField = JsonUtil::GetNumberFromJson(progress, "mps >= 10", &value);
-    EXPECT_TRUE(hasField);
-    EXPECT_DOUBLE_EQ(50.0, value);
-
-    hasField = JsonUtil::GetNumberFromJson(progress, "Throttle == 30%", &value);
-    EXPECT_TRUE(hasField);
-    EXPECT_DOUBLE_EQ(0.0, value);
-
-    hasField = JsonUtil::GetNumberFromJson(progress, "Throttle != 30%", &value);
-    EXPECT_TRUE(hasField);
-    EXPECT_DOUBLE_EQ(25.0, value);
-
-    hasField = JsonUtil::GetNumberFromJson(progress, "Brake <= 30%", &value);
-    EXPECT_TRUE(hasField);
-    EXPECT_DOUBLE_EQ(50.0, value);
-
-    hasField = JsonUtil::GetNumberFromJson(progress, "Brake > 30%", &value);
+    hasField = JsonUtil::GetNumberFromJson(*scenario, "mps >= 10", &value);
     EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(0.0, value);
 
     hasField =
-        JsonUtil::GetNumberFromJson(progress, "Left steering < 20%", &value);
+        JsonUtil::GetNumberFromJson(*scenario, "Throttle == 30%", &value);
     EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(0.0, value);
 
-    hasField = JsonUtil::GetNumberFromJson(progress, "Right steering 20% ~ 40%",
+    hasField =
+        JsonUtil::GetNumberFromJson(*scenario, "Throttle != 30%", &value);
+    EXPECT_TRUE(hasField);
+    EXPECT_DOUBLE_EQ(0.0, value);
+
+    hasField = JsonUtil::GetNumberFromJson(*scenario, "Brake <= 30%", &value);
+    EXPECT_TRUE(hasField);
+    EXPECT_DOUBLE_EQ(0.0, value);
+
+    hasField = JsonUtil::GetNumberFromJson(*scenario, "Brake > 30%", &value);
+    EXPECT_TRUE(hasField);
+    EXPECT_DOUBLE_EQ(0.0, value);
+
+    hasField =
+        JsonUtil::GetNumberFromJson(*scenario, "Left steering < 20%", &value);
+    EXPECT_TRUE(hasField);
+    EXPECT_DOUBLE_EQ(0.0, value);
+
+    hasField = JsonUtil::GetNumberFromJson(*scenario,
+                                           "Right steering 20% ~ 40%", &value);
+    EXPECT_TRUE(hasField);
+    EXPECT_DOUBLE_EQ(0.0, value);
+
+    hasField = JsonUtil::GetNumberFromJson(*scenario, "Throttle deadzone ~ 35%",
                                            &value);
     EXPECT_TRUE(hasField);
-    EXPECT_DOUBLE_EQ(10.0, value);
-
-    hasField = JsonUtil::GetNumberFromJson(progress, "Overall", &value);
-    EXPECT_TRUE(hasField);
-    EXPECT_DOUBLE_EQ(10.0, value);
+    EXPECT_DOUBLE_EQ(0.0, value);
   }
 
   {
@@ -115,23 +122,29 @@ TEST_F(DataCollectionMonitorTest, UpdateCollectionProgress) {
     data_collection_monitor_->OnChassis(chassis);
     nlohmann::json progress = data_collection_monitor_->GetProgressAsJson();
 
+    std::string scenarioName = "Go Straight";
+    auto scenario = progress.find(scenarioName);
+    EXPECT_NE(scenario, progress.end());
+
     float value;
     bool hasField;
 
-    hasField = JsonUtil::GetNumberFromJson(progress, "Brake <= 30%", &value);
+    hasField = JsonUtil::GetNumberFromJson(*scenario, "Brake <= 30%", &value);
     EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(100.0, value);
 
-    hasField = JsonUtil::GetNumberFromJson(progress, "Throttle != 30%", &value);
+    hasField =
+        JsonUtil::GetNumberFromJson(*scenario, "Throttle != 30%", &value);
     EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(75.0, value);
 
-    hasField = JsonUtil::GetNumberFromJson(progress, "Right steering 20% ~ 40%",
-                                           &value);
+    hasField = JsonUtil::GetNumberFromJson(*scenario,
+                                           "Right steering 20% ~ 40%", &value);
     EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(30.0, value);
 
-    hasField = JsonUtil::GetNumberFromJson(progress, "Overall", &value);
+    hasField = JsonUtil::GetNumberFromJson(*scenario, "Throttle deadzone ~ 35%",
+                                           &value);
     EXPECT_TRUE(hasField);
     EXPECT_DOUBLE_EQ(30.0, value);
   }

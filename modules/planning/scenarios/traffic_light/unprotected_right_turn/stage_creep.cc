@@ -129,7 +129,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
 
 Stage::StageStatus
 TrafficLightUnprotectedRightTurnStageCreep::FinishScenario() {
-  PlanningContext::MutablePlanningStatus()->clear_traffic_light();
+  PlanningContext::Instance()->mutable_planning_status()->clear_traffic_light();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;

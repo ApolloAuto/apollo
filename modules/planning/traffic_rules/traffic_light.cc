@@ -60,7 +60,7 @@ void TrafficLight::MakeDecisions(Frame* const frame,
   }
 
   const auto& traffic_light_status =
-      PlanningContext::Planningstatus().traffic_light();
+      PlanningContext::Instance()->planning_status().traffic_light();
 
   const double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
   const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();

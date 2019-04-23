@@ -35,7 +35,7 @@ using apollo::planning_internal::STGraphDebug;
 PlanningBase::~PlanningBase() {}
 
 Status PlanningBase::Init(const PlanningConfig& config) {
-  PlanningContext::Instance()->Init();
+  PlanningContext::Instance()->Instance()->Init();
   TaskFactory::Init(config);
   return Status::OK();
 }

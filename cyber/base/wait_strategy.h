@@ -64,7 +64,7 @@ class SleepWaitStrategy : public WaitStrategy {
     return true;
   }
 
-  void SetSleepTimeMicroSecends(uint64_t sleep_time_us) {
+  void SetSleepTimeMicroSeconds(uint64_t sleep_time_us) {
     sleep_time_us_ = sleep_time_us;
   }
 

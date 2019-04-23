@@ -27,6 +27,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/reference_line/reference_line.h"

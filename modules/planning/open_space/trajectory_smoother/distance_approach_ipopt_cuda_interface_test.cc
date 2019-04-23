@@ -65,8 +65,8 @@ class DistanceApproachIPOPTCUDAInterfaceTest : public ::testing::Test {
   Eigen::MatrixXd obstacles_b_ = Eigen::MatrixXd::Ones(6, 1);
   bool use_fix_time_ = false;
   std::unique_ptr<DistanceApproachIPOPTCUDAInterface> ptop_ = nullptr;
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-  apollo::planning::DistanceApproachConfig distance_approach_config_;
+  PlannerOpenSpaceConfig planner_open_space_config_;
+  DistanceApproachConfig distance_approach_config_;
 };
 
 void DistanceApproachIPOPTCUDAInterfaceTest::ProblemSetup() {

@@ -57,8 +57,8 @@ void PrintUsage() {
             << "  rosbag_to_record input.bag output.record" << std::endl;
 }
 
-int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
-                       sensor_msgs::PointCloud2::ConstPtr rawdata) {
+bool convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
+                        sensor_msgs::PointCloud2::ConstPtr rawdata) {
   auto header = proto->mutable_header();
   header->set_timestamp_sec(rawdata->header.stamp.toSec());
   header->set_frame_id(rawdata->header.frame_id);
@@ -91,7 +91,7 @@ int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
       stamp_offset == -1 || intensity_offset == -1) {
     std::cerr << "Field not contains x, y, z, timestamp, instensity"
               << std::endl;
-    return 0;
+    return false;
   }
 
   int total = rawdata->width * rawdata->height;
@@ -108,12 +108,13 @@ int convert_PointCloud(std::shared_ptr<apollo::drivers::PointCloud> proto,
         *reinterpret_cast<double *>(&data[offset + stamp_offset]) * 1e9));
   }
 
-  return 1;
+  return true;
 }
+
 int main(int argc, char **argv) {
   if (argc != 3) {
     PrintUsage();
-    return -1;
+    return 0;
   }
 
   const std::string rosbag_file_name = argv[1];
@@ -148,7 +149,7 @@ int main(int argc, char **argv) {
     auto desc = channel_info->GetProtoDesc(channel_name);
     auto record_message_type = channel_info->GetMessageType(channel_name);
     if (desc == "" || record_message_type == "") {
-      AWARN << "can not find desc or message type for channel: " << channel_name
+      AWARN << "Cannot find desc or message type for channel: " << channel_name
             << "; desc:" << desc << ";type:" << record_message_type;
     }
 
@@ -159,7 +160,7 @@ int main(int argc, char **argv) {
     if (std::find(channel_write_flag.begin(), channel_write_flag.end(),
                   channel_name) == channel_write_flag.end() &&
         !record_writer->WriteChannel(channel_name, record_message_type, desc)) {
-      AERROR << "write channel info failed";
+      AERROR << "Failed to write channel info, channel: " << channel_name;
     } else {
       channel_write_flag.push_back(channel_name);
     }
@@ -292,17 +293,19 @@ int main(int argc, char **argv) {
                "/apollo/sensor/velodyne64/compensator/PointCloud2") {
       auto ros_msg = m.instantiate<sensor_msgs::PointCloud2>();
       auto pb_msg = std::make_shared<apollo::drivers::PointCloud>();
-      convert_PointCloud(pb_msg, ros_msg);
+      if (!convert_PointCloud(pb_msg, ros_msg)) {
+        AERROR << "Failed to convert PointCloud for channel: " << channel_name;
+      }
       pb_msg->SerializeToString(&serialized_str);
     } else {
-      AWARN << "not support channel:" << channel_name;
+      AWARN << "Unsupported channel: " << channel_name;
       continue;
     }
 
     auto raw_msg =
         std::make_shared<apollo::cyber::message::RawMessage>(serialized_str);
     if (!record_writer->WriteMessage(channel_name, raw_msg, nsec)) {
-      AERROR << "write single msg fail";
+      AERROR << "Failed to write single message for channel: " << channel_name;
     }
   }
 
@@ -310,9 +313,9 @@ int main(int argc, char **argv) {
   record_writer = nullptr;
   std::cout << "Info of record file" << std::endl;
   std::string command_line = "cyber_recorder info " + record_file_name;
-  int res = system(command_line.c_str());
+  int ret = system(command_line.c_str());
 
   std::cout << "Convertion finished! Took " << ros::Time::now() - start_time
             << " seconds in total." << std::endl;
-  return res;
+  return ret;
 }

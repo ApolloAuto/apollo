@@ -27,7 +27,7 @@ class GemVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::GEM);
+    parameter.set_brand(apollo::common::GEM);
     gem_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}

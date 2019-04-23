@@ -27,6 +27,7 @@
 
 #include "modules/common/math/polygon2d.h"
 #include "modules/common/status/status.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -90,6 +91,7 @@ Status OpenSpaceTrajectoryPartition::Process() {
 
   // Choose the one to follow based on the closest partitioned trajectory
   size_t trajectories_size = paritioned_trajectories->size();
+
   size_t current_trajectory_index = 0;
   size_t current_trajectory_point_index = 0;
   bool flag_change_to_next = false;
@@ -102,9 +104,20 @@ Status OpenSpaceTrajectoryPartition::Process() {
                       pair_comp_>
       closest_point_on_trajs;
 
+  std::vector<std::string> trajectories_encodings;
   for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& trajectory = paritioned_trajectories->at(i).first;
+    std::string trajectory_encoding;
+    if (!EncodeTrajectory(trajectory, &trajectory_encoding)) {
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Trajectory empty in trajectory partition");
+    }
+    trajectories_encodings.emplace_back(std::move(trajectory_encoding));
+  }
+
+  for (size_t i = 0; i < trajectories_size; ++i) {
     const auto& gear = paritioned_trajectories->at(i).second;
+    const auto& trajectory = paritioned_trajectories->at(i).first;
     size_t trajectory_size = trajectory.size();
     CHECK_GT(trajectory_size, 0);
 
@@ -161,7 +174,30 @@ Status OpenSpaceTrajectoryPartition::Process() {
   }
 
   if (!flag_change_to_next) {
+    bool use_fail_safe_search = false;
     if (closest_point_on_trajs.empty()) {
+      use_fail_safe_search = true;
+    } else {
+      bool closest_and_not_repeated_traj_found = false;
+      while (!closest_point_on_trajs.empty()) {
+        current_trajectory_index = closest_point_on_trajs.top().first.first;
+        current_trajectory_point_index =
+            closest_point_on_trajs.top().first.second;
+        if (CheckTrajTraversed(
+                trajectories_encodings[current_trajectory_index])) {
+          closest_point_on_trajs.pop();
+        } else {
+          closest_and_not_repeated_traj_found = true;
+          UpdateTrajHistory(trajectories_encodings[current_trajectory_index]);
+          break;
+        }
+      }
+      if (!closest_and_not_repeated_traj_found) {
+        use_fail_safe_search = true;
+      }
+    }
+
+    if (use_fail_safe_search) {
       if (!UseFailSafeSearch(*paritioned_trajectories,
                              &current_trajectory_index,
                              &current_trajectory_point_index)) {
@@ -169,10 +205,6 @@ Status OpenSpaceTrajectoryPartition::Process() {
         AERROR << msg;
         return Status(ErrorCode::PLANNING_ERROR, msg);
       }
-    } else {
-      current_trajectory_index = closest_point_on_trajs.top().first.first;
-      current_trajectory_point_index =
-          closest_point_on_trajs.top().first.second;
     }
   }
 
@@ -240,6 +272,73 @@ void OpenSpaceTrajectoryPartition::UpdateVehicleInfo() {
           : ego_theta_;
 }
 
+bool OpenSpaceTrajectoryPartition::EncodeTrajectory(
+    const DiscretizedTrajectory& trajectory, std::string* const encoding) {
+  if (trajectory.empty()) {
+    AERROR << "Fail to encode trajectory because it is empty";
+    return false;
+  }
+  constexpr double encoding_origin_x = 58700.0;
+  constexpr double encoding_origin_y = 4141000.0;
+  const auto& init_path_point = trajectory.front().path_point();
+  const auto& last_path_point = trajectory.back().path_point();
+
+  const std::string init_point_x_encoding = std::to_string(
+      static_cast<int>((init_path_point.x() - encoding_origin_x) * 1000.0));
+  const std::string init_point_y_encoding = std::to_string(
+      static_cast<int>((init_path_point.y() - encoding_origin_y) * 1000.0));
+  const std::string init_point_heading_encoding =
+      std::to_string(static_cast<int>(init_path_point.theta() * 10000.0));
+  const std::string last_point_x_encoding = std::to_string(
+      static_cast<int>((last_path_point.x() - encoding_origin_y) * 1000.0));
+  const std::string last_point_y_encoding = std::to_string(
+      static_cast<int>((last_path_point.y() - encoding_origin_y) * 1000.0));
+  const std::string last_point_heading_encoding =
+      std::to_string(static_cast<int>(last_path_point.theta() * 10000.0));
+
+  const std::string init_point_encoding = init_point_x_encoding + "_" +
+                                          init_point_y_encoding + "_" +
+                                          init_point_heading_encoding;
+  const std::string last_point_encoding = last_point_x_encoding + "_" +
+                                          last_point_y_encoding + "_" +
+                                          last_point_heading_encoding;
+
+  *encoding = init_point_encoding + "/" + last_point_encoding;
+  return true;
+}
+
+bool OpenSpaceTrajectoryPartition::CheckTrajTraversed(
+    const std::string& trajectory_encoding_to_check) const {
+  const auto& index_history = PlanningContext::Instance()
+                                  ->open_space_info()
+                                  .partitioned_trajectories_index_history;
+  const size_t index_history_length = index_history.size();
+  if (index_history_length <= 1) {
+    return false;
+  }
+  for (size_t i = 0; i < index_history_length - 1; ++i) {
+    if (index_history[i] == trajectory_encoding_to_check) {
+      return true;
+    }
+  }
+  return false;
+}
+
+void OpenSpaceTrajectoryPartition::UpdateTrajHistory(
+    const std::string& chosen_trajectory_encoding) {
+  auto* trajectory_history = &(PlanningContext::Instance()
+                                   ->mutable_open_space_info()
+                                   ->partitioned_trajectories_index_history);
+  if (trajectory_history->empty()) {
+    trajectory_history->push_back(chosen_trajectory_encoding);
+    return;
+  }
+  if (trajectory_history->back() == chosen_trajectory_encoding) {
+    return;
+  }
+  trajectory_history->push_back(chosen_trajectory_encoding);
+}
+
 void OpenSpaceTrajectoryPartition::PartitionTrajectory(
     DiscretizedTrajectory* interpolated_trajectory,
     std::vector<TrajGearPair>* paritioned_trajectories) {
@@ -303,7 +402,7 @@ void OpenSpaceTrajectoryPartition::PartitionTrajectory(
     }
   }
   // Partition trajectory points into each trajectory
-  constexpr double kGearShiftEpsilon = 0.5;
+  constexpr double kGearShiftEpsilon = 0.0;
   double distance_s = 0.0;
   for (size_t i = 0; i < horizon; ++i) {
     // shift from GEAR_DRIVE to GEAR_REVERSE if v < 0
@@ -421,8 +520,8 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
                       pair_comp_>
       failsafe_closest_point_on_trajs;
   for (size_t i = 0; i < trajectories_size; ++i) {
-    size_t trajectory_size = paritioned_trajectories.size();
     const auto& trajectory = paritioned_trajectories.at(i).first;
+    size_t trajectory_size = trajectory.size();
     CHECK_GT(trajectory_size, 0);
     std::priority_queue<std::pair<size_t, double>,
                         std::vector<std::pair<size_t, double>>, comp_>
@@ -456,7 +555,6 @@ bool OpenSpaceTrajectoryPartition::UseFailSafeSearch(
     }
   }
   if (failsafe_closest_point_on_trajs.empty()) {
-    AERROR << "Fail to find nearest trajectory point to follow";
     return false;
   } else {
     *current_trajectory_index =

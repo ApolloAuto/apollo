@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/common/frame.h"
 #include "modules/planning/open_space/trajectory_partition/trajectory_partitioner.h"
 #include "modules/planning/planner/on_lane_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
@@ -100,7 +99,6 @@ class OpenSpacePlanning : public PlanningBase {
 
  private:
   routing::RoutingResponse last_routing_;
-  std::unique_ptr<Frame> frame_;
   std::vector<std::vector<common::math::Box2d>> predicted_bounding_rectangles_;
   std::unique_ptr<PublishableTrajectory> last_trajectory_;
   std::vector<common::TrajectoryPoint> last_stitching_trajectory_;

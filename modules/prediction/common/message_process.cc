@@ -123,7 +123,7 @@ void MessageProcess::OnPerception(
   ptr_obstacles_container->Insert(perception_obstacles);
 
   // Ignore some obstacles
-  ObstaclesPrioritizer::AssignIgnoreLevel();
+  ObstaclesPrioritizer::Instance()->AssignIgnoreLevel();
 
   // Scenario analysis
   ScenarioManager::Instance()->Run();
@@ -139,7 +139,7 @@ void MessageProcess::OnPerception(
   ptr_obstacles_container->BuildLaneGraph();
 
   // Assign CautionLevel for obstacles
-  ObstaclesPrioritizer::AssignCautionLevel();
+  ObstaclesPrioritizer::Instance()->AssignCautionLevel();
 
   // Analyze RightOfWay for the caution obstacles
   RightOfWay::Analyze();

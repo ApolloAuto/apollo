@@ -40,8 +40,9 @@ void ChangeLaneDecider::UpdateStatus(ChangeLaneStatus::Status status_code,
 void ChangeLaneDecider::UpdateStatus(double timestamp,
                                      ChangeLaneStatus::Status status_code,
                                      const std::string& path_id) {
-  auto* change_lane_status =
-      PlanningContext::MutablePlanningStatus()->mutable_change_lane();
+  auto* change_lane_status = PlanningContext::Instance()
+                                 ->mutable_planning_status()
+                                 ->mutable_change_lane();
   change_lane_status->set_timestamp(timestamp);
   change_lane_status->set_path_id(path_id);
   change_lane_status->set_status(status_code);
@@ -98,8 +99,9 @@ bool ChangeLaneDecider::Apply(
     return true;
   }
 
-  auto* prev_status =
-      PlanningContext::MutablePlanningStatus()->mutable_change_lane();
+  auto* prev_status = PlanningContext::Instance()
+                          ->mutable_planning_status()
+                          ->mutable_change_lane();
   double now = Clock::NowInSeconds();
 
   if (!prev_status->has_status()) {
@@ -169,7 +171,7 @@ bool ChangeLaneDecider::IsClearToChangeLane(
   for (auto* obstacle :
        reference_line_info->path_decision()->obstacles().Items()) {
     if (obstacle->IsVirtual() || obstacle->IsStatic()) {
-      AERROR << "skip one virtual or static obstacle";
+      ADEBUG << "skip one virtual or static obstacle";
       continue;
     }
 
@@ -213,24 +215,28 @@ bool ChangeLaneDecider::IsClearToChangeLane(
     }
 
     // TODO(All) move to confs
-    constexpr double kSafeTime = 3.0;
+    constexpr double kSafeTimeOnSameDirection = 3.0;
+    constexpr double kSafeTimeOnOppositeDirection = 5.0;
     constexpr double kForwardMinSafeDistanceOnSameDirection = 6.0;
-    constexpr double kForwardMinSafeDistanceOnOppositeDirection = 12.0;
-    constexpr double kBackwardMinSafeDistance = 8.0;
+    constexpr double kBackwardMinSafeDistanceOnSameDirection = 8.0;
+    constexpr double kForwardMinSafeDistanceOnOppositeDirection = 50.0;
+    constexpr double kBackwardMinSafeDistanceOnOppositeDirection = 1.0;
     constexpr double kDistanceBuffer = 0.5;
 
     double kForwardSafeDistance = 0.0;
     double kBackwardSafeDistance = 0.0;
     if (same_direction) {
-      kForwardSafeDistance = std::fmax(kForwardMinSafeDistanceOnSameDirection,
-                                       (ego_v - obstacle->speed()) * kSafeTime);
-      kBackwardSafeDistance = std::fmax(
-          kBackwardMinSafeDistance, (obstacle->speed() - ego_v) * kSafeTime);
+      kForwardSafeDistance =
+          std::fmax(kForwardMinSafeDistanceOnSameDirection,
+                    (ego_v - obstacle->speed()) * kSafeTimeOnSameDirection);
+      kBackwardSafeDistance =
+          std::fmax(kBackwardMinSafeDistanceOnSameDirection,
+                    (obstacle->speed() - ego_v) * kSafeTimeOnSameDirection);
     } else {
       kForwardSafeDistance =
-          std::fmin(kForwardMinSafeDistanceOnOppositeDirection,
-                    (ego_v + obstacle->speed()) * kSafeTime);
-      kBackwardSafeDistance = kBackwardMinSafeDistance;
+          std::fmax(kForwardMinSafeDistanceOnOppositeDirection,
+                    (ego_v + obstacle->speed()) * kSafeTimeOnOppositeDirection);
+      kBackwardSafeDistance = kBackwardMinSafeDistanceOnOppositeDirection;
     }
 
     if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance,
@@ -240,7 +246,7 @@ bool ChangeLaneDecider::IsClearToChangeLane(
       reference_line_info->path_decision()
           ->Find(obstacle->Id())
           ->SetLaneChangeBlocking(true);
-      AERROR << "Lane Change is blocked by obstacle" << obstacle->Id();
+      ADEBUG << "Lane Change is blocked by obstacle" << obstacle->Id();
       return false;
     } else {
       reference_line_info->path_decision()

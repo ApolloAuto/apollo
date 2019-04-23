@@ -25,7 +25,7 @@ enum LocalLidarStatus {
   MSF_LOCAL_LIDAR_EXTRINSICS_MISSING = 2; // Missing extrinsic parameters
   MSF_LOCAL_LIDAR_MAP_LOADING_FAILED = 3; // Fail to load localization map
   MSF_LOCAL_LIDAR_NO_OUTPUT = 4; // No output (comparing to timestamp of imu msg)
-  MSF_LOCAL_LIDAR_OUT_OF_MAP = 5; // Coverage of online pointcloud and map is lower than threshold 
+  MSF_LOCAL_LIDAR_OUT_OF_MAP = 5; // Coverage of online pointcloud and map is lower than threshold
   MSF_LOCAL_LIDAR_NOT_GOOD = 6; // Localization result do not meet threshold
   MSF_LOCAL_LIDAR_UNDEFINED_STATUS = 7; // others
 }
@@ -56,7 +56,7 @@ enum GnssConsistency {
 enum GnssPositionType {
   NONE = 0; // No solution
   FIXEDPOS = 1; // Position has been fixed by the FIX POSITION command or by position averaging
-  FIXEDHEIGHT = 2; //Position has been fixed by the FIX HEIGHT, or FIX AUTO, command or by position averaging 
+  FIXEDHEIGHT = 2; //Position has been fixed by the FIX HEIGHT, or FIX AUTO, command or by position averaging
   FLOATCONV = 4; // Solution from floating point carrier phase anbiguities
   WIDELANE = 5; // Solution from wide-lane ambiguities
   NARROWLANE = 6; // Solution from narrow-lane ambiguities
@@ -152,7 +152,7 @@ message MsfSensorMsgStatus {
 }
 
 // The status of msf localization module
-message MsfStatus {    
+message MsfStatus {
   optional LocalLidarConsistency local_lidar_consistency = 1;
   optional GnssConsistency gnss_consistency = 2;
   optional LocalLidarStatus local_lidar_status = 3;

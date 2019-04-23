@@ -4,6 +4,7 @@ standard_planning_config {
   planner_public_road_config {
      scenario_type: LANE_FOLLOW
      scenario_type: SIDE_PASS
+     scenario_type: BARE_INTERSECTION_UNPROTECTED
      scenario_type: STOP_SIGN_UNPROTECTED
      scenario_type: TRAFFIC_LIGHT_PROTECTED
      scenario_type: TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN
@@ -149,7 +150,7 @@ default_task_config: {
     dl_weight: 10.0
     ddl_weight: 1000.0
     dddl_weight: 100.0
-    guiding_line_weight: 0.1
+    guiding_line_weight: 1.0
   }
 }
 default_task_config: {
@@ -169,6 +170,7 @@ default_task_config: {
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
     centri_jerk_speed_coeff: 1.0
+    max_valid_stop_distance: 0.25
   }
 }
 default_task_config: {
@@ -188,6 +190,7 @@ default_task_config: {
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
     centri_jerk_speed_coeff: 1.0
+    max_valid_stop_distance: 0.25
   }
 }
 default_task_config: {
@@ -224,7 +227,7 @@ default_task_config: {
             ipopt_recalc_y: "yes"
           }
           qp_format: OSQP
-          min_safety_distance: 0.0
+          min_safety_distance: 0.01
         }
         distance_approach_config {
           weight_steer: 0.3
@@ -234,12 +237,12 @@ default_task_config: {
           weight_x: 2.3
           weight_y: 0.7
           weight_phi: 1.5
-          weight_v: 3.75
+          weight_v: 0.0
           weight_steer_stitching: 1.75
           weight_a_stitching: 3.25
           weight_first_order_time: 4.25
           weight_second_order_time: 13.5
-          min_safety_distance: 0.0
+          min_safety_distance: 0.01
           max_speed_forward: 2.0
           max_speed_reverse: 1.0
           max_acceleration_forward: 2.0
@@ -297,6 +300,10 @@ default_task_config: {
     parking_inwards: false
     enable_perception_obstacles: true
     parking_depth_buffer: 0.2
+    roi_linesegment_min_angle: 0.15
+    roi_linesegment_length: 1.0
+    perception_obstacle_filtering_distance: 1000.0
+    perception_obstacle_buffer: 0.0
   }
 }
 default_task_config: {
@@ -305,5 +312,11 @@ default_task_config: {
     open_space_prediction_time_period: 5.0
     open_space_fall_back_collision_distance: 5.0
     open_space_fall_back_stop_distance: 2.0
+  }
+}
+default_task_config: {
+  task_type: PATH_BOUNDS_DECIDER
+  path_bounds_decider_config {
+    is_lane_borrowing: false
   }
 }

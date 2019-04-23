@@ -62,7 +62,7 @@ class ObstacleContainer {
     return true;
   }
 
-  bool ObsHRep(const size_t& obstacles_num,
+  bool ObsHRep(const size_t obstacles_num,
                const Eigen::MatrixXi& obstacles_edges_num,
                const std::vector<std::vector<Vec2d>>& obstacles_vertices_vec,
                Eigen::MatrixXd* A_all, Eigen::MatrixXd* b_all) {

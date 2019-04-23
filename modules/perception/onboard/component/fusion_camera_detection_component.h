@@ -79,6 +79,7 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
 
   int MakeProtobufMsg(double msg_timestamp, int seq_num,
                       const std::vector<base::ObjectPtr>& objects,
+                      const std::vector<base::LaneLine>& lane_objects,
                       const apollo::common::ErrorCode error_code,
                       apollo::perception::PerceptionObstacles* obstacles);
 

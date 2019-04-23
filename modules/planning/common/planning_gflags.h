@@ -95,10 +95,10 @@ DECLARE_double(speed_upper_bound);
 DECLARE_double(longitudinal_acceleration_lower_bound);
 DECLARE_double(longitudinal_acceleration_upper_bound);
 
-DECLARE_double(lateral_jerk_bound);
-
 DECLARE_double(longitudinal_jerk_lower_bound);
 DECLARE_double(longitudinal_jerk_upper_bound);
+DECLARE_double(longitudinal_jerk_bound);
+DECLARE_double(lateral_jerk_bound);
 
 DECLARE_double(dl_bound);
 DECLARE_double(kappa_bound);
@@ -212,6 +212,7 @@ DECLARE_double(nudge_buffer);
 DECLARE_bool(use_planning_fallback);
 DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
+DECLARE_double(fallback_distance_buffer);
 DECLARE_double(polynomial_speed_fallback_velocity);
 
 DECLARE_double(speed_bump_speed_limit);
@@ -230,6 +231,7 @@ DECLARE_bool(enable_open_space_planner_thread);
 DECLARE_bool(open_space_planner_switchable);
 DECLARE_bool(use_dual_variable_warm_start);
 DECLARE_bool(use_gear_shift_trajectory);
+DECLARE_uint32(open_space_trajectory_stitching_preserved_length);
 
 DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
@@ -242,6 +244,7 @@ DECLARE_double(default_front_clear_distance);
 DECLARE_double(max_trajectory_len);
 DECLARE_bool(enable_rss_fallback);
 DECLARE_bool(enable_rss_info);
+DECLARE_double(rss_max_front_obstacle_distance);
 
 DECLARE_bool(enable_planning_smoother);
 DECLARE_double(smoother_stop_distance);
@@ -265,3 +268,8 @@ DECLARE_bool(enable_cuda);
 
 DECLARE_bool(enable_nonscenario_side_pass);
 DECLARE_bool(enable_soft_speed_limit);
+
+DECLARE_double(message_latency_threshold);
+DECLARE_bool(enable_lane_change_urgency_checking);
+
+DECLARE_uint32(trajectory_stitching_preserved_length);

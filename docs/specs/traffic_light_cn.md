@@ -40,10 +40,10 @@ Apollo已经证明了仅仅使用一个固定视野的摄像头无法识别所�
 
 下述图片展示了使用远距摄像头（上图）和广角摄像头（下图）检测到信号灯的图片。
 
-![telephoto camera](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/traffic_light/long.jpg)
+![telephoto camera](images/traffic_light/long.jpg)
 
 
-![wide angle camera](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/traffic_light/short.jpg)
+![wide angle camera](images/traffic_light/short.jpg)
 
 
 # 数据管道
@@ -154,7 +154,7 @@ struct ImageLights {
 
 在下述图片中，蓝色的长方形表示被投射的信号灯的边界盒，实际上和信号灯的准确位置有一定的偏差。大的黄色长方形是ROI。
 
-![example](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/traffic_light/example.jpg)
+![example](images/traffic_light/example.jpg)
 
 信号灯检测是一个常规的卷积神经网络检测任务，它接收带有ROI信息的图像作为输入数据，顺序输出边界盒。输出结果中的信号灯数量可能多于输入数据。
 

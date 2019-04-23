@@ -64,7 +64,7 @@ Scheduler* Instance() {
           inner_thr_confs[thr.name()] = thr;
         }
       } else {
-        AWARN << "Pls make sure schedconf exist and which format is correct.\n";
+        AWARN << "No sched conf found, use default conf.";
       }
       if (!policy.compare("classic")) {
         obj = new SchedulerClassic();

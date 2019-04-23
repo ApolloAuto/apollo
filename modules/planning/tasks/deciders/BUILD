@@ -26,7 +26,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common:st_graph_data",
         "//modules/planning/common/util:util_lib",
-        "//modules/planning/math/finite_element_qp:fem_1d_qp_problem",
+        "//modules/planning/math/piecewise_jerk:fem_1d_qp_problem",
         "//modules/planning/scenarios/util:scenario_util_lib",
         "//modules/planning/tasks/deciders/speed_bounds_decider",
         "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
@@ -128,6 +128,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
     ],
@@ -182,6 +183,18 @@ cc_test(
     ],
     deps = [
         ":decider",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "path_bounds_decider_test",
+    size = "small",
+    srcs = [
+        "path_bounds_decider_test.cc",
+    ],
+    deps = [
+        "path_bounds_decider",
         "@gtest//:main",
     ],
 )

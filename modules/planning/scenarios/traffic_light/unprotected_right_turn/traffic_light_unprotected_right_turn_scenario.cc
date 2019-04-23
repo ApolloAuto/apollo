@@ -54,7 +54,7 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
   }
 
   const auto& traffic_light_status =
-      PlanningContext::Planningstatus().traffic_light();
+      PlanningContext::Instance()->planning_status().traffic_light();
 
   if (traffic_light_status.current_traffic_light_overlap_id_size() == 0) {
     AERROR << "Could not find traffic-light(s)";

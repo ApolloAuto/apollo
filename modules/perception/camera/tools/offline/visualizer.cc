@@ -18,6 +18,8 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+
+#include "cyber/common/file.h"
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -284,18 +286,13 @@ bool Visualizer::adjust_angles(const std::string &camera_name,
 }
 
 bool Visualizer::SetDirectory(const std::string &path) {
-  int is_success = 1;
-  std::string command;
-  command = "mkdir -p " + path;
-  is_success = system(command.c_str());
-  command = "rm " + path + "/*.jpg";
-  is_success = system(command.c_str());
-  path_ = path;
-  if (is_success > 0) {
-    return true;
-  } else {
+  if (!cyber::common::EnsureDirectory(path)) {
     return false;
   }
+  const std::string command = "rm " + path + "/*.jpg";
+  int ret = system(command.c_str());
+  path_ = path;
+  return ret == 0;
 }
 
 std::string Visualizer::type_to_string(
@@ -470,12 +467,10 @@ bool Visualizer::copy_backup_file(const std::string &filename) {
   std::string yaml_bak_file = filename + "__" + std::to_string(index);
   AINFO << "yaml_backup_file: " << yaml_bak_file;
 
-  std::string command = "cp " + filename + " " + yaml_bak_file;
-  int ret = system(command.c_str());
-  if (ret != 0) {
-    AINFO << "Cannot backup the file, " << filename;
+  if (!cyber::common::Copy(filename, yaml_bak_file)) {
+    AERROR << "Cannot backup the file: " << filename;
   } else {
-    AINFO << "Backup file, " << filename << " saved.";
+    AINFO << "Backup file: " << filename << " saved successfully.";
   }
 
   return true;

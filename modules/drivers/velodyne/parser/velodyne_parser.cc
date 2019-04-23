@@ -205,7 +205,7 @@ VelodyneParser *VelodyneParserFactory::CreateParser(Config source_config) {
   if (config.model() == VLP16) {
     config.set_calibration_online(false);
     return new Velodyne16Parser(config);
-  } else if (config.model() == HDL32E) {
+  } else if (config.model() == HDL32E || config.model() == VLP32C) {
     config.set_calibration_online(false);
     return new Velodyne32Parser(config);
   } else if (config.model() == HDL64E_S3S || config.model() == HDL64E_S3D ||

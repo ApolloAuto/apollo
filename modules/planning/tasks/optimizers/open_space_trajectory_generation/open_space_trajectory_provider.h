@@ -65,6 +65,9 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
                                 double rotate_angle,
                                 const Vec2d& translate_origin);
 
+  bool IsVehicleStopDueToFallBack(const bool is_on_fallback,
+                                  const common::VehicleState& vehicle_state);
+
   void GenerateStopTrajectory(DiscretizedTrajectory* const trajectory_data);
 
   void LoadResult(DiscretizedTrajectory* const trajectory_data);
@@ -84,7 +87,7 @@ class OpenSpaceTrajectoryProvider : public TrajectoryOptimizer {
 
   OpenSpaceTrajectoryThreadData thread_data_;
   std::future<void> task_future_;
-  std::atomic<bool> is_stop_{false};
+  std::atomic<bool> is_generation_thread_stop_{false};
   std::atomic<bool> trajectory_updated_{false};
   std::atomic<bool> data_ready_{false};
   std::atomic<bool> trajectory_error_{false};

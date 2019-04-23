@@ -23,6 +23,7 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
+        "//modules/planning/scenarios:stage_intersection_cruise_impl",
         "//modules/planning/scenarios/util:scenario_util_lib",
         "//modules/planning/tasks/deciders:decider",
         "@eigen",

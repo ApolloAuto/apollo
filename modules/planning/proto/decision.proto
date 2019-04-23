@@ -34,6 +34,7 @@ enum StopReasonCode {
   STOP_REASON_PULL_OVER = 108;      // pull over
   STOP_REASON_SIDEPASS_SAFETY = 109;
   STOP_REASON_PRE_OPEN_SPACE_STOP = 200;
+  STOP_REASON_LANE_CHANGE_URGENCY = 201;
 }
 
 message ObjectStop {

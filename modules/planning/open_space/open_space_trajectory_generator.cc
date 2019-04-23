@@ -60,7 +60,7 @@ Status OpenSpaceTrajectoryGenerator::Init(
 apollo::common::Status OpenSpaceTrajectoryGenerator::Plan(
     const std::vector<common::TrajectoryPoint>& stitching_trajectory,
     const VehicleState& vehicle_state, const std::vector<double>& XYbounds,
-    const double& rotate_angle, const Vec2d& translate_origin,
+    const double rotate_angle, const Vec2d& translate_origin,
     const std::vector<double>& end_pose,
     const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
@@ -255,7 +255,7 @@ void OpenSpaceTrajectoryGenerator::GetStitchingTrajectory(
 }
 
 void OpenSpaceTrajectoryGenerator::RecordDebugInfo(
-    const Vec2d& translate_origin, const double& rotate_angle,
+    const Vec2d& translate_origin, const double rotate_angle,
     const std::vector<double>& end_pose, const Eigen::MatrixXd& xWS,
     const Eigen::MatrixXd& uWS, const Eigen::MatrixXd& l_warm_up,
     const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& dual_l_result_ds,
@@ -400,7 +400,7 @@ void OpenSpaceTrajectoryGenerator::LoadTrajectory(
 
 bool OpenSpaceTrajectoryGenerator::IsInitPointNearDestination(
     const common::TrajectoryPoint& planning_init_point,
-    const std::vector<double>& end_pose, const double& rotate_angle,
+    const std::vector<double>& end_pose, const double rotate_angle,
     const Vec2d& translate_origin) {
   CHECK_EQ(end_pose.size(), 4);
   Vec2d end_pose_to_world_frame = Vec2d(end_pose[0], end_pose[1]);

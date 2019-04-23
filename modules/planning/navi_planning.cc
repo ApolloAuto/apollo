@@ -53,7 +53,7 @@ NaviPlanning::~NaviPlanning() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->mutable_planning_status()->Clear();
 }
 
 std::string NaviPlanning::Name() const { return "navi_planning"; }
@@ -75,7 +75,7 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->mutable_planning_status()->Clear();
 
   planner_ = planner_dispatcher_->DispatchPlanner();
   if (!planner_) {
@@ -191,6 +191,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   std::string replan_reason;
   stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
       vehicle_state, start_timestamp, planning_cycle_time,
+      FLAGS_trajectory_stitching_preserved_length,
       last_publishable_trajectory_.get(), &replan_reason);
 
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
@@ -576,7 +577,7 @@ Status NaviPlanning::Plan(
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
- PlanningContext::MutablePlanningStatus()->Clear();
+ PlanningContext::Instance()->mutable_planning_status()->Clear();
 }*/
 
 NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(

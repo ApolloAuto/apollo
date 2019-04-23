@@ -121,6 +121,18 @@ cc_library(
 )
 
 cc_library(
+    name = "path_boundary",
+    srcs = [
+        "path_boundary.cc",
+    ],
+    hdrs = [
+        "path_boundary.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "planning_context",
     srcs = [
         "planning_context.cc",
@@ -135,6 +147,7 @@ cc_library(
         ":planning_gflags",
         "//cyber/common:log",
         "//modules/map/pnc_map:path",
+        "//modules/planning/common/path:path_data",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",
@@ -188,6 +201,7 @@ cc_library(
     ],
     deps = [
         ":ego_info",
+        ":path_boundary",
         ":path_decision",
         ":planning_gflags",
         ":st_graph_data",
@@ -238,6 +252,7 @@ cc_library(
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
+        "//modules/planning/math/piecewise_jerk:path_time_qp_problem",
         "//modules/planning/proto:planning_config_proto",
     ],
 )

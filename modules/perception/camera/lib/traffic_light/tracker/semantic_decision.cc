@@ -88,7 +88,6 @@ base::TLColor SemanticReviser::ReviseBySemantic(
     SemanticTable semantic_table, std::vector<base::TrafficLightPtr> *lights) {
   std::vector<int> vote(static_cast<int>(base::TLColor::TL_TOTAL_COLOR_NUM), 0);
   std::vector<base::TrafficLightPtr> &lights_ref = *lights;
-  int max_color_num = 0;
   base::TLColor max_color = base::TLColor::TL_UNKNOWN_COLOR;
 
   for (size_t i = 0; i < semantic_table.light_ids.size(); ++i) {
@@ -98,9 +97,9 @@ base::TLColor SemanticReviser::ReviseBySemantic(
     vote.at(static_cast<int>(color))++;
   }
 
-  if (0 == vote.at(static_cast<size_t>(base::TLColor::TL_RED)) &&
-      0 == vote.at(static_cast<size_t>(base::TLColor::TL_GREEN)) &&
-      0 == vote.at(static_cast<size_t>(base::TLColor::TL_YELLOW))) {
+  if (vote.at(static_cast<size_t>(base::TLColor::TL_RED) == 0) &&
+      vote.at(static_cast<size_t>(base::TLColor::TL_GREEN) == 0) &&
+      vote.at(static_cast<size_t>(base::TLColor::TL_YELLOW)) == 0) {
     if (vote.at(static_cast<size_t>(base::TLColor::TL_BLACK)) > 0) {
       return base::TLColor::TL_BLACK;
     } else {
@@ -113,7 +112,7 @@ base::TLColor SemanticReviser::ReviseBySemantic(
 
   auto biggest = std::max_element(std::begin(vote), std::end(vote));
 
-  max_color_num = *biggest;
+  int max_color_num = *biggest;
   max_color = base::TLColor(std::distance(std::begin(vote), biggest));
 
   vote.erase(biggest);

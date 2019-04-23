@@ -10,6 +10,7 @@ cc_library(
         "//modules/common/configs:vehicle_config_helper",
         "//modules/prediction/common:feature_output",
         "//modules/prediction/common:prediction_gflags",
+        "//modules/prediction/common:prediction_thread_pool",
         "//modules/prediction/evaluator/cyclist:cyclist_keep_lane_evaluator",
         "//modules/prediction/evaluator/pedestrian:pedestrian_interaction_evaluator",
         "//modules/prediction/evaluator/vehicle:cost_evaluator",

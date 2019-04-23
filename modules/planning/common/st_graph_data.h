@@ -36,13 +36,18 @@ class StGraphData {
   StGraphData() = default;
 
   void LoadData(const std::vector<const STBoundary*>& st_boundaries,
+                const double min_s_on_st_boundaries,
                 const apollo::common::TrajectoryPoint& init_point,
                 const SpeedLimit& speed_limit, const double path_data_length,
                 const double path_length_by_conf,
                 const double total_time_by_conf,
                 planning_internal::STGraphDebug* st_graph_debug);
 
+  bool is_initialized() const { return init_; }
+
   const std::vector<const STBoundary*>& st_boundaries() const;
+
+  double min_s_on_st_boundaries() const;
 
   const apollo::common::TrajectoryPoint& init_point() const;
 
@@ -59,7 +64,9 @@ class StGraphData {
   planning_internal::STGraphDebug* mutable_st_graph_debug();
 
  private:
+  bool init_ = false;
   std::vector<const STBoundary*> st_boundaries_;
+  double min_s_on_st_boundaries_ = 0.0;
   apollo::common::TrajectoryPoint init_point_;
   SpeedLimit speed_limit_;
   double path_data_length_ = 0.0;

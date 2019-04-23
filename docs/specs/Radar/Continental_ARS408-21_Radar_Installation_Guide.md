@@ -13,7 +13,7 @@ especially for the stationary target detection and separation.
 
 The following diagram contains the range of the ARS-408-21 Radar:
 
-![radar_range](images/ARS-404-21-range.jpg)
+![radar_range](images/ars-404-21-range.jpg)
 
 ### Installation
 

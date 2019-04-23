@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/control/controller/lon_controller.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -279,8 +280,12 @@ Status LonController::ComputeControlCommand(
     debug->set_is_full_stop(true);
   }
 
-  double throttle_deadzone = vehicle_param_.throttle_deadzone();
-  double brake_deadzone = vehicle_param_.brake_deadzone();
+  double throttle_lowerbound =
+      std::max(vehicle_param_.throttle_deadzone(),
+               lon_controller_conf.throttle_minimum_action());
+  double brake_lowerbound =
+      std::max(vehicle_param_.brake_deadzone(),
+               lon_controller_conf.brake_minimum_action());
   double calibration_value = 0.0;
   double acceleration_lookup =
       (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
@@ -295,16 +300,20 @@ Status LonController::ComputeControlCommand(
         std::make_pair(chassis_->speed_mps(), acceleration_lookup));
   }
 
-  if (calibration_value >= 0) {
-    throttle_cmd = std::abs(calibration_value) > throttle_deadzone
-                       ? std::abs(calibration_value)
-                       : throttle_deadzone;
+  if (acceleration_lookup >= 0) {
+    if (calibration_value >= 0) {
+      throttle_cmd = std::max(calibration_value, throttle_lowerbound);
+    } else {
+      throttle_cmd = throttle_lowerbound;
+    }
     brake_cmd = 0.0;
   } else {
     throttle_cmd = 0.0;
-    brake_cmd = std::abs(calibration_value) > brake_deadzone
-                    ? std::abs(calibration_value)
-                    : brake_deadzone;
+    if (calibration_value >= 0) {
+      brake_cmd = brake_lowerbound;
+    } else {
+      brake_cmd = std::max(-calibration_value, brake_lowerbound);
+    }
   }
 
   debug->set_station_error_limited(station_error_limited);

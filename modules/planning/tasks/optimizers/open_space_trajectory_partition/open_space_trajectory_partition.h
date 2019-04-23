@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -48,6 +49,14 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
                              DiscretizedTrajectory* interpolated_trajectory);
 
   void UpdateVehicleInfo();
+
+  bool EncodeTrajectory(const DiscretizedTrajectory& trajectory,
+                        std::string* const encoding);
+
+  bool CheckTrajTraversed(
+      const std::string& trajectory_encoding_to_check) const;
+
+  void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
 
   void PartitionTrajectory(DiscretizedTrajectory* interpolated_trajectory,
                            std::vector<TrajGearPair>* paritioned_trajectories);

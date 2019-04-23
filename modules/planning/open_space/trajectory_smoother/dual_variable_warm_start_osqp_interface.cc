@@ -122,6 +122,7 @@ bool DualVariableWarmStartOSQPInterface::optimize() {
   settings->eps_rel = 1.0e-05;
   settings->max_iter = 5000;
   settings->polish = true;
+  settings->verbose = FLAGS_enable_osqp_debug;
 
   // Populate data
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
