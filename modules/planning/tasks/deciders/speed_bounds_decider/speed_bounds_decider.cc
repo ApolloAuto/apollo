@@ -16,6 +16,7 @@
 
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 
+#include <algorithm>
 #include <limits>
 #include <string>
 #include <tuple>
@@ -104,19 +105,24 @@ Status SpeedBoundsDecider::Process(
   double min_s_reverse = std::numeric_limits<double>::infinity();
   for (auto *obstacle : path_decision->obstacles().Items()) {
     const auto &st_boundary = obstacle->st_boundary();
-    if (!st_boundary.IsEmpty()) {
-      const auto &left_bottom_point = st_boundary.bottom_left_point();
-      const auto &right_bottom_point = st_boundary.bottom_right_point();
-      if (right_bottom_point.s() - left_bottom_point.s() > kEpsilon &&
-          min_s_reverse > left_bottom_point.s()) {
+    if (st_boundary.IsEmpty()) {
+      continue;
+    }
+    const auto &left_bottom_point = st_boundary.bottom_left_point();
+    const auto &right_bottom_point = st_boundary.bottom_right_point();
+    if (left_bottom_point.s() - right_bottom_point.s() > kEpsilon) {
+      if (min_s_reverse > left_bottom_point.s()) {
         min_s_reverse = left_bottom_point.s();
-      } else if (min_s_non_reverse > left_bottom_point.s()) {
-        min_s_non_reverse = left_bottom_point.s();
       }
+    } else if (min_s_non_reverse > left_bottom_point.s()) {
+      min_s_non_reverse = left_bottom_point.s();
     }
   }
+  min_s_reverse = std::max(min_s_reverse, 0.0);
+  min_s_non_reverse = std::max(min_s_non_reverse, 0.0);
+
   const double min_s_on_st_boundaries =
-      min_s_non_reverse > min_s_reverse ? kEpsilon : min_s_non_reverse;
+      min_s_non_reverse > min_s_reverse ? 0.0 : min_s_non_reverse;
 
   // 3. Create speed limit along path
   SpeedLimitDecider speed_limit_decider(adc_sl_boundary, speed_bounds_config_,
@@ -154,7 +160,7 @@ Status SpeedBoundsDecider::Process(
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
 
   return Status::OK();
-}
+}  // namespace planning
 
 void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
   for (auto &reference_line_info : *frame->mutable_reference_line_info()) {
