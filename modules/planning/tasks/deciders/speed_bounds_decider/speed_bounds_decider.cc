@@ -136,7 +136,7 @@ Status SpeedBoundsDecider::Process(
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
 
   return Status::OK();
-}  // namespace planning
+}
 
 void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
   for (auto &reference_line_info : *frame->mutable_reference_line_info()) {
@@ -198,22 +198,27 @@ double SpeedBoundsDecider::SetSpeedFallbackDistance(
 
   for (auto *obstacle : path_decision->obstacles().Items()) {
     const auto &st_boundary = obstacle->st_boundary();
+
     if (st_boundary.IsEmpty()) {
       continue;
     }
-    const auto &left_bottom_point = st_boundary.bottom_left_point();
-    const auto &right_bottom_point = st_boundary.bottom_right_point();
-    if (left_bottom_point.s() - right_bottom_point.s() > kEpsilon) {
-      if (min_s_reverse > right_bottom_point.s()) {
-        min_s_reverse = right_bottom_point.s();
+
+    const auto left_bottom_point_s = st_boundary.bottom_left_point().s();
+    const auto right_bottom_point_s = st_boundary.bottom_right_point().s();
+    const auto lowest_s = std::min(left_bottom_point_s, right_bottom_point_s);
+
+    if (left_bottom_point_s - right_bottom_point_s > kEpsilon) {
+      if (min_s_reverse > lowest_s) {
+        min_s_reverse = lowest_s;
       }
-    } else if (min_s_non_reverse > right_bottom_point.s()) {
-      min_s_non_reverse = right_bottom_point.s();
+    } else if (min_s_non_reverse > lowest_s) {
+      min_s_non_reverse = lowest_s;
     }
+
     if (obstacle->LongitudinalDecision().stop().reason_code() ==
             StopReasonCode::STOP_REASON_SIDEPASS_SAFETY &&
-        side_pass_stop_s > right_bottom_point.s()) {
-      side_pass_stop_s = right_bottom_point.s();
+        side_pass_stop_s > lowest_s) {
+      side_pass_stop_s = lowest_s;
     }
   }
 
