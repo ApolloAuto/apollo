@@ -67,10 +67,10 @@ class DataCollector(object):
             out = out + 'b'
         out = out + str(int(self.cmd[2])) + 'r'
         i = 0
-        self.outfile = out + str(i) + '.csv'
+        self.outfile = out + str(i) + '_recorded.csv'
         while os.path.exists(self.outfile):
             i += 1
-            self.outfile = out + str(i) + '.csv'
+            self.outfile = out + str(i) + '_recorded.csv'
         self.file = open(self.outfile, 'w')
         self.file.write(
             "time,io,ctlmode,ctlbrake,ctlthrottle,ctlgear_location,vehicle_speed,"

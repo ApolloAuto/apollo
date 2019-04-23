@@ -20,7 +20,7 @@
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")"&&pwd)"
 rm $DIR/result.csv
-for f in `ls ${1}/t*b*r*.csv`
+for f in `ls ${1}/*_recorded.csv`
 do
     echo "Processing $f"
     python -W ignore process_data.py $f
