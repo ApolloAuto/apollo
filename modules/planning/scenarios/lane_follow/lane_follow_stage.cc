@@ -332,6 +332,38 @@ void LaneFollowStage::GenerateFallbackPathProfile(
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }
 
+bool LaneFollowStage::RetrieveLastFramePathProfile(
+    const ReferenceLineInfo* reference_line_info, const Frame* frame,
+    PathData* path_data) {
+  const auto* ptr_last_frame = FrameHistory::Instance()->Latest();
+  if (ptr_last_frame == nullptr) {
+    AERROR
+        << "Last frame doesn't succeed, fail to retrieve last frame path data";
+    return false;
+  }
+  const auto last_frame_trajectory_pb =
+      ptr_last_frame->current_frame_planned_trajectory();
+
+  DiscretizedPath last_frame_discretized_path;
+  for (const auto& trajectory_point :
+       last_frame_trajectory_pb.trajectory_point()) {
+    last_frame_discretized_path.push_back(trajectory_point.path_point());
+  }
+
+  path_data->SetDiscretizedPath(last_frame_discretized_path);
+  const auto adc_frenet_frame_point_ =
+      reference_line_info->reference_line().GetFrenetPoint(
+          frame->PlanningStartPoint().path_point());
+
+  bool trim_success = path_data->LeftTrimWithRefS(adc_frenet_frame_point_);
+  if (!trim_success) {
+    AERROR << "Fail to trim path_data. adc_frenet_frame_point: "
+           << adc_frenet_frame_point_.ShortDebugString();
+    return false;
+  }
+  return true;
+}
+
 SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
                                    const ReferenceLine& reference_line) const {
   SLPoint sl_point;
