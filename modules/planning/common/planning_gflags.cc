@@ -34,10 +34,18 @@ DEFINE_string(scenario_bare_intersection_unprotected_config_file,
 DEFINE_string(scenario_lane_follow_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/lane_follow_config.pb.txt",
-              "The lane follow scenario configuration file");
+              "The lane_follow scenario configuration file");
+DEFINE_string(scenario_narrow_street_u_turn_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/narrow_street_u_turn_config.pb.txt",
+              "narrow_street_u_turn scenario config file");
+DEFINE_string(scenario_pull_over_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/pull_over_config.pb.txt",
+              "The pull_over scenario configuration file");
 DEFINE_string(scenario_side_pass_config_file,
               "/apollo/modules/planning/conf/scenario/side_pass_config.pb.txt",
-              "side pass scenario configuration file");
+              "side_pass scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/stop_sign_unprotected_config.pb.txt",
@@ -45,23 +53,25 @@ DEFINE_string(scenario_stop_sign_unprotected_config_file,
 DEFINE_string(scenario_traffic_light_protected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_protected_config.pb.txt",
-              "scenario_traffic_light_protected config file");
+              "traffic_light_protected scenarioconfig file");
 DEFINE_string(scenario_traffic_light_unprotected_left_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_unprotected_left_turn_config.pb.txt",
-              "scenario_traffic_light_unprotected_left_turn config file");
+              "traffic_light_unprotected_left_turn scenario config file");
 DEFINE_string(scenario_traffic_light_unprotected_right_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_unprotected_right_turn_config.pb.txt",
-              "scenario_traffic_light_unprotected_right_turn config file");
+              "traffic_light_unprotected_right_turn scenario config file");
 DEFINE_string(scenario_valet_parking_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/valet_parking_config.pb.txt",
-              "scenario_valet_parking config file");
-DEFINE_string(scenario_narrow_street_u_turn_config_file,
-              "/apollo/modules/planning/conf/"
-              "scenario/narrow_street_u_turn_config.pb.txt",
-              "scenario_narrow_street_u_turn config file");
+              "valet_parking scenario config file");
+
+DEFINE_bool(enable_scenario_bare_intersection, false,
+            "enable bare_intersection scenarios in planning");
+
+DEFINE_bool(enable_scenario_pull_over, false,
+            "enable side pass scenario in planning");
 
 DEFINE_bool(enable_scenario_side_pass, true,
             "enable side pass scenario in planning");
@@ -72,10 +82,9 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
             "enable ADC to side-pass multiple parked obstacles without"
             "worrying if the obstacles are blocked by others.");
 
-DEFINE_bool(enable_scenario_bare_intersection, false,
-            "enable bare_intersection scenarios in planning");
 DEFINE_bool(enable_scenario_stop_sign, true,
             "enable stop_sign scenarios in planning");
+
 DEFINE_bool(enable_scenario_traffic_light, true,
             "enable traffic_light scenarios in planning");
 
