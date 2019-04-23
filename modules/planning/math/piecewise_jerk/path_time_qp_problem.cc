@@ -30,10 +30,16 @@ void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                         std::vector<c_int>* P_indptr) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
-  const int kNumValue = 2 * N + 1;
+  const int kNumValue = 3 * N;
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
   columns.resize(kNumParam);
   int value_index = 0;
+
+  // x(i)'^2 * w_dx
+  for (int i = 0; i < N; ++i) {
+    columns[N + i].emplace_back(N + i, weight_.x_derivative_w);
+    ++value_index;
+  }
 
   // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
   columns[2 * N].emplace_back(
@@ -62,10 +68,6 @@ void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
   columns[N - 1].emplace_back(N - 1, weight_.x_w);
   ++value_index;
 
-  // x(n-1)'^2 * w_dx
-  columns[2 * N - 1].emplace_back(2 * N - 1, weight_.x_derivative_w);
-  ++value_index;
-
   CHECK_EQ(value_index, kNumValue);
 
   int ind_p = 0;
@@ -88,9 +90,12 @@ void PathTimeQpProblem::CalculateOffset(std::vector<c_float>* q) {
   for (int i = 0; i < kNumParam; ++i) {
     q->at(i) = 0.0;
   }
-  q->at(N - 1) = -2.0 * weight_.x_w * x_end_[0];
-  q->at(N * 2 - 1) = -2.0 * weight_.x_derivative_w * x_end_[1];
-  q->at(N * 3 - 1) = -2.0 * weight_.x_second_order_derivative_w * x_end_[2];
+  for (int i = 0; i < N; ++i) {
+    q->at(N + i) += -2.0 * weight_.x_derivative_w * x_derivative_desire;
+  }
+  q->at(N - 1) += -2.0 * weight_.x_w * x_end_[0];
+  q->at(N * 2 - 1) += -2.0 * weight_.x_derivative_w * x_end_[1];
+  q->at(N * 3 - 1) += -2.0 * weight_.x_second_order_derivative_w * x_end_[2];
 }
 
 }  // namespace planning
