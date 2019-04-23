@@ -136,7 +136,7 @@ Status SpeedBoundsDecider::Process(
   RecordSTGraphDebug(*st_graph_data, st_graph_debug);
 
   return Status::OK();
-}  // namespace planning
+}
 
 void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
   for (auto &reference_line_info : *frame->mutable_reference_line_info()) {
