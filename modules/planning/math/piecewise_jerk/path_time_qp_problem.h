@@ -52,6 +52,10 @@ class PathTimeQpProblem : public PiecewiseJerkProblem {
 
   virtual ~PathTimeQpProblem() = default;
 
+  void SetDesireDerivative(const double dx_desire = 0.0) {
+    x_derivative_desire = dx_desire;
+  }
+
  protected:
   // naming convention follows osqp solver.
   void CalculateKernel(std::vector<c_float>* P_data,
@@ -59,6 +63,8 @@ class PathTimeQpProblem : public PiecewiseJerkProblem {
                        std::vector<c_int>* P_indptr) override;
 
   void CalculateOffset(std::vector<c_float>* q) override;
+
+  double x_derivative_desire = 0.0;
 };
 
 }  // namespace planning
