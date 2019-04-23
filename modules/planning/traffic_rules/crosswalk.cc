@@ -61,7 +61,7 @@ Status Crosswalk::ApplyRule(Frame* const frame,
   CHECK_NOTNULL(reference_line_info);
 
   if (!FindCrosswalks(reference_line_info)) {
-    PlanningContext::Instance()->MutablePlanningStatus()->clear_crosswalk();
+    PlanningContext::Instance()->mutable_planning_status()->clear_crosswalk();
     return Status::OK();
   }
 
@@ -75,7 +75,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   CHECK_NOTNULL(reference_line_info);
 
   auto* mutable_crosswalk_status =
-      PlanningContext::Instance()->MutablePlanningStatus()->mutable_crosswalk();
+      PlanningContext::Instance()->mutable_planning_status()
+                                 ->mutable_crosswalk();
 
   auto* path_decision = reference_line_info->path_decision();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();

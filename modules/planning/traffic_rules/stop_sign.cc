@@ -48,7 +48,7 @@ void StopSign::MakeDecisions(Frame* const frame,
   }
 
   const auto& stop_sign_status =
-      PlanningContext::Instance()->Planningstatus().stop_sign();
+      PlanningContext::Instance()->planning_status().stop_sign();
   const double adc_back_edge_s = reference_line_info->AdcSlBoundary().start_s();
 
   const std::vector<PathOverlap>& stop_sign_overlaps =

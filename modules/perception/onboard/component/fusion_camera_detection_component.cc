@@ -35,6 +35,16 @@ namespace onboard {
 
 using apollo::cyber::common::GetAbsolutePath;
 
+static void fill_lane_msg(const base::LaneLineCubicCurve &curve_coord,
+                          apollo::perception::LaneMarker *lane_marker) {
+  lane_marker->set_c0_position(curve_coord.d);
+  lane_marker->set_c1_heading_angle(curve_coord.c);
+  lane_marker->set_c2_curvature(curve_coord.b);
+  lane_marker->set_c3_curvature_derivative(curve_coord.a);
+  lane_marker->set_longitude_start(curve_coord.x_start);
+  lane_marker->set_longitude_end(curve_coord.x_end);
+}
+
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
   std::string work_root = "";
@@ -282,7 +292,7 @@ void FusionCameraDetectionComponent::OnReceiveImage(
   if (InternalProc(message, camera_name, &error_code, prefused_message.get(),
                    out_message.get()) != cyber::SUCC) {
     AERROR << "InternalProc failed, error_code: " << error_code;
-    if (MakeProtobufMsg(msg_timestamp, seq_num_, std::vector<base::ObjectPtr>(),
+    if (MakeProtobufMsg(msg_timestamp, seq_num_, {}, {},
                         error_code, out_message.get()) != cyber::SUCC) {
       AERROR << "MakeProtobufMsg failed";
       return;
@@ -706,7 +716,9 @@ int FusionCameraDetectionComponent::InternalProc(
 
   // process success, make pb msg
   if (output_final_obstacles_ &&
-      MakeProtobufMsg(msg_timestamp, seq_num_, camera_frame.tracked_objects,
+      MakeProtobufMsg(msg_timestamp, seq_num_,
+                      camera_frame.tracked_objects,
+                      camera_frame.lane_objects,
                       *error_code, out_message) != cyber::SUCC) {
     AERROR << "MakeProtobufMsg failed"
            << " ts: " << std::to_string(msg_timestamp);
@@ -776,6 +788,7 @@ int FusionCameraDetectionComponent::InternalProc(
 int FusionCameraDetectionComponent::MakeProtobufMsg(
     double msg_timestamp, int seq_num,
     const std::vector<base::ObjectPtr> &objects,
+    const std::vector<base::LaneLine> &lane_objects,
     const apollo::common::ErrorCode error_code,
     apollo::perception::PerceptionObstacles *obstacles) {
   double publish_time = apollo::cyber::Time::Now().ToSecond();
@@ -789,6 +802,7 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
   header->set_camera_timestamp(static_cast<uint64_t>(msg_timestamp * 1e9));
   // header->set_radar_timestamp(0);
 
+  // write out obstacles in world coordinates
   obstacles->set_error_code(error_code);
   for (const auto &obj : objects) {
     apollo::perception::PerceptionObstacle *obstacle =
@@ -798,6 +812,39 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
       return cyber::FAIL;
     }
   }
+
+  // write out lanes in ego coordinates
+  apollo::perception::LaneMarkers *lane_markers =
+      obstacles->mutable_lane_marker();
+  apollo::perception::LaneMarker *lane_marker_l0 =
+      lane_markers->mutable_left_lane_marker();
+  apollo::perception::LaneMarker *lane_marker_r0 =
+      lane_markers->mutable_right_lane_marker();
+  apollo::perception::LaneMarker *lane_marker_l1 =
+      lane_markers->add_next_left_lane_marker();
+  apollo::perception::LaneMarker *lane_marker_r1 =
+      lane_markers->add_next_right_lane_marker();
+
+  for (const auto &lane : lane_objects) {
+    base::LaneLineCubicCurve curve_coord = lane.curve_car_coord;
+
+    switch (lane.pos_type) {
+      case base::LaneLinePositionType::EGO_LEFT:
+        fill_lane_msg(curve_coord, lane_marker_l0);
+        break;
+      case base::LaneLinePositionType::EGO_RIGHT:
+        fill_lane_msg(curve_coord, lane_marker_r0);
+        break;
+      case base::LaneLinePositionType::ADJACENT_LEFT:
+        fill_lane_msg(curve_coord, lane_marker_l1);
+        break;
+      case base::LaneLinePositionType::ADJACENT_RIGHT:
+        fill_lane_msg(curve_coord, lane_marker_r1);
+        break;
+      default: break;
+    }
+  }
+
   return cyber::SUCC;
 }
 

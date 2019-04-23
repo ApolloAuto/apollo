@@ -1,4 +1,5 @@
 /******************************************************************************
+<<<<<<< HEAD
  * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -148,11 +149,10 @@ ErrorCode %(car_type_cap)sController::EnableAutoMode() {
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-    AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
+  return ErrorCode::OK;
   */
 }
 
@@ -169,26 +169,24 @@ ErrorCode %(car_type_cap)sController::EnableSteeringOnlyMode() {
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
       driving_mode() == Chassis::AUTO_STEER_ONLY) {
     set_driving_mode(Chassis::AUTO_STEER_ONLY);
-    AINFO << "Already in AUTO_STEER_ONLY mode";
+    AINFO << "Already in AUTO_STEER_ONLY mode.";
     return ErrorCode::OK;
   }
-  return ErrorCode::OK;
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   brake_60_->set_disable();
   throttle_62_->set_disable();
   steering_64_->set_enable();
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_STEER_ONLY);
-    AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::AUTO_STEER_ONLY);
+  AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
+  return ErrorCode::OK;
   */
 }
 
@@ -199,34 +197,31 @@ ErrorCode %(car_type_cap)sController::EnableSpeedOnlyMode() {
     AINFO << "Already in AUTO_SPEED_ONLY mode";
     return ErrorCode::OK;
   }
-  return ErrorCode::OK;
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   brake_60_->set_enable();
   throttle_62_->set_enable();
   steering_64_->set_disable();
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_SPEED_ONLY);
-    AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::AUTO_SPEED_ONLY);
+  AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
+  return ErrorCode::OK;
   */
 }
 
 // NEUTRAL, REVERSE, DRIVE
 void %(car_type_cap)sController::Gear(Chassis::GearPosition gear_position) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
-    AINFO << "this drive mode no need to set gear.";
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+    AINFO << "This drive mode no need to set gear.";
     return;
   }
-  return;
   /* ADD YOUR OWN CAR CHASSIS OPERATION
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
@@ -274,8 +269,8 @@ void %(car_type_cap)sController::Gear(Chassis::GearPosition gear_position) {
 void %(car_type_cap)sController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
   // TODO(All) :  Update brake value based on mode
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set brake pedal.";
     return;
   }
@@ -287,8 +282,8 @@ void %(car_type_cap)sController::Brake(double pedal) {
 // drive with old acceleration
 // gas:0.00~99.99 unit:
 void %(car_type_cap)sController::Throttle(double pedal) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set throttle pedal.";
     return;
   }
@@ -301,8 +296,8 @@ void %(car_type_cap)sController::Throttle(double pedal) {
 // drive with acceleration/deceleration
 // acc:-7.0 ~ 5.0, unit:m/s^2
 void %(car_type_cap)sController::Acceleration(double acc) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE ||
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -315,8 +310,8 @@ void %(car_type_cap)sController::Acceleration(double acc) {
 // steering with old angle speed
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 void %(car_type_cap)sController::Steer(double angle) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -331,8 +326,8 @@ void %(car_type_cap)sController::Steer(double angle) {
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 // angle_spd:0.00~99.99, unit:deg/s
 void %(car_type_cap)sController::Steer(double angle, double angle_spd) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -401,7 +396,7 @@ void %(car_type_cap)sController::SecurityDogThreadFunc() {
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
-    AERROR << "Fail to run SecurityDogThreadFunc() because can_sender_ is "
+    AERROR << "Failed to run SecurityDogThreadFunc() because can_sender_ is "
               "nullptr.";
     return;
   }
@@ -434,7 +429,7 @@ void %(car_type_cap)sController::SecurityDogThreadFunc() {
     // 2. vertical control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_SPEED_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;

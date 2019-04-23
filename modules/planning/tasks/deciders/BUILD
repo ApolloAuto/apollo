@@ -130,6 +130,7 @@ cc_library(
         ":decider_base",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
+        "//modules/common/vehicle_state:vehicle_state_provider",
     ],
 )
 

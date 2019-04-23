@@ -102,10 +102,7 @@ if __name__ == "__main__":
         help="Specify the record file for analysis.")
 
     parser.add_argument(
-        "-s", "--simulation", action="store_const", const=True,
-        help="For simulation API call")
-    parser.add_argument(
-        "-sim", "--simulation2", action="store_const", const=True,
+        "-sim", "--simulation", action="store_const", const=True,
         help="For dreamland API call")
 
     parser.add_argument(
@@ -138,8 +135,6 @@ if __name__ == "__main__":
             args.planningrefpath, args.alldata)
 
     if args.simulation:
-        planning_analyzer.print_simulation_results()
-    elif args.simulation2:
         planning_analyzer.print_sim_results()
     elif args.planningpath or args.planningrefpath:
         plt.axis('equal')

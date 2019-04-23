@@ -126,7 +126,7 @@ std::vector<SpeedPoint> SpeedProfileGenerator::GenerateSpeedHotStart(
 
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
     const double stop_distance) {
-  AERROR << "Stopping by Fallback Speed!";
+  AERROR << "Fallback using piecewise jerk speed!";
   const double init_v = EgoInfo::Instance()->start_point().v();
   const double init_a = EgoInfo::Instance()->start_point().a();
   const auto& veh_param =
@@ -134,15 +134,16 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
 
   std::array<double, 3> init_s = {0.0, init_v, init_a};
   std::array<double, 3> end_s = {stop_distance, 0.0, 0.0};
-  // TODO(Hongyi): tunning the params and move to a config
+  // TODO(Hongyi): tune the params and move to a config
   std::array<double, 5> w = {10000.0, 0.0, 1.0, 0.01, 0.0};
+
+  // TODO(all): dt is too small;
   double delta_t = FLAGS_fallback_time_unit;
   double total_time = FLAGS_fallback_total_time;
   int num_of_knots = static_cast<int>(total_time / delta_t) + 1;
   // Start a PathTimeQpProblem
   std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
-  path_time_qp->InitProblem(num_of_knots, delta_t, w,
-                            FLAGS_longitudinal_jerk_bound, init_s, end_s);
+  path_time_qp->InitProblem(num_of_knots, delta_t, w, init_s, end_s);
 
   path_time_qp->SetZeroOrderBounds(0.0, 100.0);
   path_time_qp->SetFirstOrderBounds(0.0, FLAGS_planning_upper_speed_limit);
@@ -150,8 +151,9 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
                                      veh_param.max_acceleration());
   // TODO(Hongyi): Set back to vehicle_params when ready
   path_time_qp->SetSecondOrderBounds(-4.4, 2.0);
-  SpeedData speed_data;
-  // Sovle the problem
+  path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
+
+  // Solve the problem
   if (!path_time_qp->Optimize()) {
     AERROR << "Piecewise jerk fallback speed optimizer failed!";
     return GenerateStopProfile(init_v, init_a);
@@ -162,6 +164,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   std::vector<double> ds = path_time_qp->x_derivative();
   std::vector<double> dds = path_time_qp->x_second_order_derivative();
 
+  SpeedData speed_data;
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
   for (int i = 1; i < num_of_knots; ++i) {
     // Avoid the very last points when already stopped
