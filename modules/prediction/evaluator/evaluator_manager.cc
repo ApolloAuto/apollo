@@ -42,8 +42,7 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
-using PriorityObstacleMap =
-    std::map<ObstaclePriority::Priority, std::list<Obstacle*>>;
+using IdObstacleMap = std::map<int, std::list<Obstacle*>>;
 
 namespace {
 
@@ -58,9 +57,10 @@ bool IsTrainable(const Feature& feature) {
   return true;
 }
 
-void GroupObstaclesByPriority(
+void GroupObstaclesByObstacleId(
     const int obstacle_id, ObstaclesContainer* const obstacles_container,
-    PriorityObstacleMap* const priority_obstacle_map) {
+    IdObstacleMap* const id_obstacle_map) {
+  constexpr int kNumGroup = 8;
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
   if (obstacle_ptr == nullptr) {
     AERROR << "Null obstacle [" << obstacle_id << "] found";
@@ -71,12 +71,12 @@ void GroupObstaclesByPriority(
     return;
   }
   const Feature& feature = obstacle_ptr->latest_feature();
-  const ObstaclePriority& priority = feature.priority();
-  if (priority.priority() == ObstaclePriority::IGNORE) {
+  if (feature.priority().priority() == ObstaclePriority::IGNORE) {
     ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
     return;
   }
-  (*priority_obstacle_map)[priority.priority()].push_back(obstacle_ptr);
+  int id_mod = obstacle_id % kNumGroup;
+  (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
 }
 
 }  // namespace
@@ -166,13 +166,13 @@ void EvaluatorManager::Run() {
   std::vector<Obstacle*> dynamic_env;
 
   if (FLAGS_enable_multi_thread) {
-    PriorityObstacleMap priority_obstacle_map;
+    IdObstacleMap id_obstacle_map;
     for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
-      GroupObstaclesByPriority(id, obstacles_container, &priority_obstacle_map);
+      GroupObstaclesByObstacleId(id, obstacles_container, &id_obstacle_map);
     }
     PredictionThreadPool::ForEach(
-        priority_obstacle_map.begin(), priority_obstacle_map.end(),
-        [&](PriorityObstacleMap::iterator::value_type& obstacles_iter) {
+        id_obstacle_map.begin(), id_obstacle_map.end(),
+        [&](IdObstacleMap::iterator::value_type& obstacles_iter) {
           // TODO(kechxu): parallelize this level
           for (auto obstacle_ptr : obstacles_iter.second) {
             EvaluateObstacle(obstacle_ptr, dynamic_env);
