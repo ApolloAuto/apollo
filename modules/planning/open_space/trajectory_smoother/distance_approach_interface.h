@@ -77,7 +77,7 @@ class DistanceApproachInterface : public Ipopt::TNLP {
   virtual bool eval_g(int n, const double* x, bool new_x, int m, double* g) = 0;
 
   /** Check unfeasible constraints for futher study**/
-  virtual bool check_g(int n, const double* x, int m, double* g) = 0;
+  virtual bool check_g(int n, const double* x, int m, const double* g) = 0;
 
   /** Method to return:
    *   1) The structure of the jacobian (if "values" is nullptr)

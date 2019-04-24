@@ -2720,7 +2720,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
 }
 
 bool DistanceApproachIPOPTCUDAInterface::check_g(int n, const double* x, int m,
-                                                 double* g) {
+                                                 const double* g) {
   int kN = n;
   int kM = m;
   double x_u_tmp[kN];

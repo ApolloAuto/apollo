@@ -20,6 +20,7 @@
 
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 #include <string>
+#include <unordered_map>
 
 namespace apollo {
 namespace planning {
@@ -140,28 +141,32 @@ bool DistanceApproachProblem::Solve(
     AINFO << "DistanceApproachProblem solving time in second : "
           << t_end - t_start;
   } else {
-    // return detailed failure information,
-    // reference resource: Ipopt::ApplicationReturnStatus
-    std::vector<std::string> failure_status = {
-        "Solve_Succeeded",
-        "Solved_To_Acceptable_Level",
-        "Infeasible_Problem_Detected",
-        "Search_Direction_Becomes_Too_Small",
-        "Diverging_Iterates",
-        "User_Requested_Stop",
-        "Feasible_Point_Found",
-        "Maximum_Iterations_Exceeded",
-        "Restoration_Failed",
-        "Error_In_Step_Computation",
-        "Not_Enough_Degrees_Of_Freedom",
-        "Invalid_Problem_Definition",
-        "Invalid_Option",
-        "Invalid_Number_Detected",
-        "Unrecoverable_Exception",
-        "NonIpopt_Exception_Thrown"
-        "Insufficient_Memory",
-        "Internal_Error"};
-    if (static_cast<size_t>(status) >= failure_status.size()) {
+    /*
+      return detailed failure information,
+      reference resource: Ipopt::ApplicationReturnStatus, https://
+      www.coin-or.org/Doxygen/CoinAll/_ip_return_codes__inc_8h-source.html
+    */
+    std::unordered_map<int, std::string> failure_status = {
+        {0, "Solve_Succeeded"},
+        {1, "Solved_To_Acceptable_Level"},
+        {2, "Infeasible_Problem_Detected"},
+        {3, "Search_Direction_Becomes_Too_Small"},
+        {4, "Diverging_Iterates"},
+        {5, "User_Requested_Stop"},
+        {6, "Feasible_Point_Found"},
+        {-1, "Maximum_Iterations_Exceeded"},
+        {-2, "Restoration_Failed"},
+        {-3, "Error_In_Step_Computation"},
+        {-10, "Not_Enough_Degrees_Of_Freedom"},
+        {-11, "Invalid_Problem_Definition"},
+        {-12, "Invalid_Option"},
+        {-13, "Invalid_Number_Detected"},
+        {-100, "Unrecoverable_Exception"},
+        {-101, "NonIpopt_Exception_Thrown"},
+        {-102, "Insufficient_Memory"},
+        {-199, "Internal_Error"}};
+
+    if (!failure_status.count(static_cast<size_t>(status))) {
       AINFO << "Solver ends with unknown failure code: "
             << static_cast<int>(status);
     } else {
