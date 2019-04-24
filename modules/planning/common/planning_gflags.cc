@@ -53,7 +53,7 @@ DEFINE_string(scenario_stop_sign_unprotected_config_file,
 DEFINE_string(scenario_traffic_light_protected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_protected_config.pb.txt",
-              "traffic_light_protected scenarioconfig file");
+              "traffic_light_protected scenario config file");
 DEFINE_string(scenario_traffic_light_unprotected_left_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_unprotected_left_turn_config.pb.txt",
