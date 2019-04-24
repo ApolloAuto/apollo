@@ -54,6 +54,7 @@ cc_library(
     hdrs = ["py_record.h"],
     deps = [
         "//cyber/message:py_message",
+        "//cyber/common:log",
         "//cyber/record",
         "@python27",
     ],

@@ -64,7 +64,9 @@ struct RawMessage {
   }
 
   bool SerializeToString(std::string *str) const {
-    RETURN_VAL_IF_NULL(str, false);
+    if (str == nullptr) {
+      return false;
+    }
     *str = message;
     return true;
   }

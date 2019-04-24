@@ -44,7 +44,9 @@ class Identity {
   // getter and setter
   const char* data() const { return data_; }
   void set_data(const char* data) {
-    RETURN_IF_NULL(data);
+    if (data == nullptr) {
+      return;
+    }
     memset(data_, 0, sizeof(data_));
     memcpy(data_, data, sizeof(data_));
     Update();

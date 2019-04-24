@@ -11,6 +11,7 @@ cc_library(
         "blocker_manager.h",
     ],
     deps = [
+        "//cyber/common:log",
         ":blocker",
     ],
 )
