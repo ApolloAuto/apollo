@@ -33,7 +33,7 @@
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 #include "modules/planning/scenarios/util/util.h"
-#include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
+#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
 namespace planning {

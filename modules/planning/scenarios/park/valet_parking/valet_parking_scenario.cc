@@ -21,9 +21,9 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/scenarios/valet_parking/stage_approaching_parking_spot.h"
-#include "modules/planning/scenarios/valet_parking/stage_parking.h"
-#include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
+#include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
+#include "modules/planning/scenarios/park/valet_parking/stage_parking.h"
+#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
 namespace planning {

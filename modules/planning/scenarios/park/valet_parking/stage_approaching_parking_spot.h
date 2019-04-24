@@ -17,31 +17,36 @@
 /**
  * @file
  **/
-#include "modules/planning/scenarios/valet_parking/stage_parking.h"
 
-#include "gtest/gtest.h"
-#include "modules/planning/proto/planning_config.pb.h"
+#pragma once
+
+#include "modules/planning/scenarios/stage.h"
+#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace valet_parking {
 
-class StageParkingTest : public ::testing::Test {
+class StageApproachingParkingSpot : public Stage {
  public:
-  virtual void SetUp() {
-    config_.set_stage_type(ScenarioConfig::VALET_PARKING_PARKING);
+  explicit StageApproachingParkingSpot(
+      const ScenarioConfig::StageConfig& config)
+      : Stage(config) {}
+
+ private:
+  Stage::StageStatus Process(const common::TrajectoryPoint& planning_init_point,
+                             Frame* frame) override;
+
+  ValetParkingContext* GetContext() {
+    return GetContextAs<ValetParkingContext>();
   }
 
- protected:
-  ScenarioConfig::StageConfig config_;
-};
+  bool CheckADCStop(const Frame& frame);
 
-TEST_F(StageParkingTest, Init) {
-  StageParking stage_parking(config_);
-  EXPECT_EQ(stage_parking.Name(),
-            ScenarioConfig::StageType_Name(config_.stage_type()));
-}
+ private:
+  ScenarioValetParkingConfig scenario_config_;
+};
 
 }  // namespace valet_parking
 }  // namespace scenario

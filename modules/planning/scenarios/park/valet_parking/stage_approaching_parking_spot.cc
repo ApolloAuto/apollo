@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include "modules/planning/scenarios/valet_parking/stage_approaching_parking_spot.h"
+#include "modules/planning/scenarios/park/valet_parking/stage_approaching_parking_spot.h"
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
