@@ -1385,6 +1385,11 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   free(cind_L);
   free(hessval);
 
+  // debug only
+  if (enable_constraint_check_) {
+    ADEBUG << "final resolution constraint checking";
+    check_g(n, x, m, g);
+  }
   ADEBUG << "finalize_solution done!";
 }
 
