@@ -206,9 +206,6 @@ cc_library(
     name = "prediction_thread_pool",
     srcs = ["prediction_thread_pool.cc"],
     hdrs = ["prediction_thread_pool.h"],
-    linkopts = [
-        "-lboost_thread",
-    ],
     deps = [
         "//cyber/base",
         "//cyber/common",
@@ -219,9 +216,6 @@ cc_test(
     name = "prediction_thread_pool_test",
     size = "small",
     srcs = ["prediction_thread_pool_test.cc"],
-    linkopts = [
-        "-lboost_system",
-    ],
     deps = [
         ":prediction_thread_pool",
         "@gtest//:main",
