@@ -37,6 +37,7 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
+using apollo::common::SpeedPoint;
 using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 
@@ -87,7 +88,6 @@ Status PiecewiseJerkSpeedOptimizer::Process(
                                      veh_param.max_acceleration());
   path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
   // TODO(Hongyi): tune the params and move to a config
-  path_time_qp->SetFirstOrderBounds(0.0, 10.0);
   path_time_qp->SetSecondOrderBounds(-4.4, 2.0);
   path_time_qp->SetDesireDerivative(10.0);  // default speed to be 10.0
 
@@ -122,6 +122,24 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     x_bounds.emplace_back(curr_t, s_lower_bound, std::fmax(s_upper_bound, 0.0));
   }
   path_time_qp->SetVariableBounds(x_bounds);
+
+  // Update SpeedBoundary and ref_s
+  std::vector<double> x_ref;
+  std::vector<std::tuple<double, double, double>> dx_bounds;
+  const SpeedLimit& speed_limit = st_graph_data.speed_limit();
+  for (int i = 0; i < num_of_knots; ++i) {
+    double curr_t = i * delta_t;
+    double v_lower_bound = 0.0;
+    double v_upper_bound = FLAGS_planning_upper_speed_limit;
+    SpeedPoint sp;
+    reference_speed_data.EvaluateByTime(curr_t, &sp);
+    v_upper_bound = speed_limit.GetSpeedLimitByS(sp.s());
+    x_ref.emplace_back(sp.s());
+    dx_bounds.emplace_back(curr_t, v_lower_bound,
+                           std::fmax(v_upper_bound, 0.0));
+  }
+  path_time_qp->SetRefX(x_ref);
+  path_time_qp->SetVariableDerivativeBounds(dx_bounds);
 
   // Sovle the problem
   if (!path_time_qp->Optimize()) {
