@@ -428,14 +428,15 @@ void LonController::ComputeLongitudinalErrors(
   debug->set_acceleration_error(reference_point.a() -
                                 lon_acceleration / one_minus_kappa_lat_error);
   double jerk_reference =
-      (debug->acceleration_reference() - previous_acceleration_reference_) / ts;
-  double lon_jerk =
-      (debug->current_acceleration() - previous_acceleration_) / ts;
+      (debug->acceleration_reference() - pre_pre_acceleration_reference_) / 2 /
+      ts;
+  double lon_jerk = (debug->current_acceleration() - pre_acceleration_) / ts;
   debug->set_jerk_reference(jerk_reference);
   debug->set_current_jerk(lon_jerk);
   debug->set_jerk_error(jerk_reference - lon_jerk / one_minus_kappa_lat_error);
-  previous_acceleration_reference_ = debug->acceleration_reference();
-  previous_acceleration_ = debug->current_acceleration();
+  pre_pre_acceleration_reference_ = pre_acceleration_reference_;
+  pre_acceleration_reference_ = debug->acceleration_reference();
+  pre_acceleration_ = debug->current_acceleration();
 
   debug->set_preview_station_error(preview_point.path_point().s() - s_matched);
   debug->set_preview_speed_error(preview_point.v() - s_dot_matched);

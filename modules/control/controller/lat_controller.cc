@@ -623,8 +623,8 @@ void LatController::ComputeLateralErrors(
   debug->set_lateral_error_rate(lateral_error_dot);
   debug->set_lateral_acceleration(lateral_error_dot_dot);
   debug->set_lateral_jerk(
-      (debug->lateral_acceleration() - previous_lateral_acceleration_) / ts_);
-  previous_lateral_acceleration_ = debug->lateral_acceleration();
+      (debug->lateral_acceleration() - pre_lateral_acceleration_) / ts_);
+  pre_lateral_acceleration_ = debug->lateral_acceleration();
 
   debug->set_heading_rate(angular_v);
   debug->set_ref_heading_rate(target_point.path_point().kappa() *
@@ -632,24 +632,26 @@ void LatController::ComputeLateralErrors(
   debug->set_heading_error_rate(debug->heading_rate() -
                                 debug->ref_heading_rate());
 
-  debug->set_heading_acceleration(
-      (debug->heading_rate() - previous_heading_rate_) / ts_);
+  debug->set_heading_acceleration((debug->heading_rate() - pre_heading_rate_) /
+                                  ts_);
   debug->set_ref_heading_acceleration(
-      (debug->ref_heading_rate() - previous_ref_heading_rate_) / ts_);
+      (debug->ref_heading_rate() - pre_pre_ref_heading_rate_) / 2 / ts_);
   debug->set_heading_error_acceleration(debug->heading_acceleration() -
                                         debug->ref_heading_acceleration());
-  previous_heading_rate_ = debug->heading_rate();
-  previous_ref_heading_rate_ = debug->ref_heading_rate();
+  pre_heading_rate_ = debug->heading_rate();
+  pre_pre_ref_heading_rate_ = pre_ref_heading_rate_;
+  pre_ref_heading_rate_ = debug->ref_heading_rate();
 
   debug->set_heading_jerk(
-      (debug->heading_acceleration() - previous_heading_acceleration_) / ts_);
+      (debug->heading_acceleration() - pre_heading_acceleration_) / ts_);
   debug->set_ref_heading_jerk(
-      (debug->ref_heading_acceleration() - previous_ref_heading_acceleration_) /
-      ts_);
+      (debug->ref_heading_acceleration() - pre_pre_ref_heading_acceleration_) /
+      2 / ts_);
   debug->set_heading_error_jerk(debug->heading_jerk() -
                                 debug->ref_heading_jerk());
-  previous_heading_acceleration_ = debug->heading_acceleration();
-  previous_ref_heading_acceleration_ = debug->ref_heading_acceleration();
+  pre_heading_acceleration_ = debug->heading_acceleration();
+  pre_pre_ref_heading_acceleration_ = pre_ref_heading_acceleration_;
+  pre_ref_heading_acceleration_ = debug->ref_heading_acceleration();
 
   debug->set_curvature(target_point.path_point().kappa());
 }

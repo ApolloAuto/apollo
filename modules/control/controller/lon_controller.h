@@ -125,8 +125,9 @@ class LonController : public Controller {
   std::string name_;
   bool controller_initialized_ = false;
 
-  double previous_acceleration_ = 0.0;
-  double previous_acceleration_reference_ = 0.0;
+  double pre_acceleration_ = 0.0;
+  double pre_acceleration_reference_ = 0.0;
+  double pre_pre_acceleration_reference_ = 0.0;
 
   PIDController speed_pid_controller_;
   PIDController station_pid_controller_;

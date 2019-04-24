@@ -210,13 +210,15 @@ class LatController : public Controller {
   LeadlagController leadlag_controller_;
 
   // for compute the differential valute to estimate acceleration/lon_jerk
-  double previous_lateral_acceleration_ = 0.0;
+  double pre_lateral_acceleration_ = 0.0;
 
-  double previous_heading_rate_ = 0.0;
-  double previous_ref_heading_rate_ = 0.0;
+  double pre_heading_rate_ = 0.0;
+  double pre_ref_heading_rate_ = 0.0;
+  double pre_pre_ref_heading_rate_ = 0.0;
 
-  double previous_heading_acceleration_ = 0.0;
-  double previous_ref_heading_acceleration_ = 0.0;
+  double pre_heading_acceleration_ = 0.0;
+  double pre_ref_heading_acceleration_ = 0.0;
+  double pre_pre_ref_heading_acceleration_ = 0.0;
 
   // for logging purpose
   std::ofstream steer_log_file_;
