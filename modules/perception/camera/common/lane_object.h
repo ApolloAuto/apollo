@@ -16,7 +16,6 @@
 
 #pragma once
 
-
 #include <limits>
 #include <vector>
 
@@ -79,4 +78,3 @@ struct EgoLane {
 
 }  // namespace perception
 }  // namespace apollo
-

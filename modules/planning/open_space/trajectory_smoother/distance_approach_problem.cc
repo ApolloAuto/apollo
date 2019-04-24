@@ -18,8 +18,8 @@
  * @file
  */
 
-#include <string>
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
+#include <string>
 
 namespace apollo {
 namespace planning {
@@ -163,10 +163,10 @@ bool DistanceApproachProblem::Solve(
         "Internal_Error"};
     if (static_cast<size_t>(status) >= failure_status.size()) {
       AINFO << "Solver ends with unknown failure code: "
-          << static_cast<int>(status);
+            << static_cast<int>(status);
     } else {
       AINFO << "Solver failure case: "
-          << failure_status[static_cast<size_t>(status)];
+            << failure_status[static_cast<size_t>(status)];
     }
   }
 

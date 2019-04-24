@@ -57,9 +57,9 @@ bool IsTrainable(const Feature& feature) {
   return true;
 }
 
-void GroupObstaclesByObstacleId(
-    const int obstacle_id, ObstaclesContainer* const obstacles_container,
-    IdObstacleMap* const id_obstacle_map) {
+void GroupObstaclesByObstacleId(const int obstacle_id,
+                                ObstaclesContainer* const obstacles_container,
+                                IdObstacleMap* const id_obstacle_map) {
   constexpr int kNumGroup = 8;
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
   if (obstacle_ptr == nullptr) {

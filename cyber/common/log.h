@@ -106,4 +106,3 @@
     AWARN << #condition << " is not met."; \
     return val;                            \
   }
-

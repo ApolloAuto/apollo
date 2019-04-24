@@ -126,11 +126,11 @@ class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
   //***************    start ADOL-C part ***********************************
   /** Template to return the objective value */
   template <class T>
-  bool eval_obj(int n, const T* x, T* obj_value);
+  void eval_obj(int n, const T* x, T* obj_value);
 
   /** Template to compute constraints */
   template <class T>
-  bool eval_constraints(int n, const T* x, int m, T* g);
+  void eval_constraints(int n, const T* x, int m, T* g);
 
   /** Method to generate the required tapes by ADOL-C*/
   void generate_tapes(int n, int m, int* nnz_h_lag);

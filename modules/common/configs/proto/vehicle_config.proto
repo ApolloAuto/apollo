@@ -32,6 +32,7 @@ enum VehicleBrand {
   TRANSIT = 3;
   GE3 = 4;
   WEY = 5;
+  ZHONGYUN = 6;
 }
 
 message VehicleParam {

@@ -7,6 +7,7 @@ import "modules/canbus/proto/ge3.proto";
 import "modules/canbus/proto/lexus.proto";
 import "modules/canbus/proto/transit.proto";
 import "modules/canbus/proto/wey.proto";
+import "modules/canbus/proto/zhongyun.proto";
 
 message ChassisDetail {
   enum Type {
@@ -35,6 +36,7 @@ message ChassisDetail {
   optional Transit transit = 20;
   optional Ge3 ge3 = 21;
   optional Wey wey = 22;
+  optional Zhongyun zhongyun = 23;
 }
 
 // CheckResponseSignal

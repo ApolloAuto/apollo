@@ -389,16 +389,16 @@ int FusionCameraDetectionComponent::InitConfig() {
   write_visual_img_ = fusion_camera_detection_param.write_visual_img();
 
   min_laneline_length_for_cipv_ = static_cast<float>(
-    fusion_camera_detection_param.min_laneline_length_for_cipv());
+      fusion_camera_detection_param.min_laneline_length_for_cipv());
   average_lane_width_in_meter_ = static_cast<float>(
-    fusion_camera_detection_param.average_lane_width_in_meter());
+      fusion_camera_detection_param.average_lane_width_in_meter());
   max_vehicle_width_in_meter_ = static_cast<float>(
-    fusion_camera_detection_param.max_vehicle_width_in_meter());
-  average_frame_rate_ = static_cast<float>(
-    fusion_camera_detection_param.average_frame_rate());
+      fusion_camera_detection_param.max_vehicle_width_in_meter());
+  average_frame_rate_ =
+      static_cast<float>(fusion_camera_detection_param.average_frame_rate());
 
-  image_based_cipv_ = static_cast<float>(
-    fusion_camera_detection_param.image_based_cipv());
+  image_based_cipv_ =
+      static_cast<float>(fusion_camera_detection_param.image_based_cipv());
 
   debug_level_ = static_cast<int>(fusion_camera_detection_param.debug_level());
 
@@ -757,7 +757,7 @@ int FusionCameraDetectionComponent::InternalProc(
         prefused_message->frame_->camera_frame_supplement.image_blob.get());
   }
 
-//  Determine CIPV
+  //  Determine CIPV
   CipvOptions cipv_options;
   if (motion_buffer_ != nullptr) {
     if (motion_buffer_->size() == 0) {
@@ -769,9 +769,9 @@ int FusionCameraDetectionComponent::InternalProc(
       cipv_options.yaw_rate = motion_buffer_->back().yaw_rate;
     }
     ADEBUG << "[CIPV] velocity " << cipv_options.velocity
-          << ", yaw rate: " << cipv_options.yaw_rate;
+           << ", yaw rate: " << cipv_options.yaw_rate;
     cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options,
-      &camera_frame.tracked_objects);
+                        &camera_frame.tracked_objects);
 
     // TODO(techoe): Activate CollectDrops after test
     // // Get Drop points
@@ -806,8 +806,8 @@ int FusionCameraDetectionComponent::InternalProc(
       camera_frame.data_provider->GetImage(image_options, &out_image);
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image,
-        camera_frame, motion_buffer_);
+      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                   motion_buffer_);
     }
   }
 

@@ -777,7 +777,7 @@ cc_test(
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
         "@tensorrt",
-        "@yaml_cpp//:yaml", 
+        "@yaml_cpp//:yaml",
     ],
 )
 

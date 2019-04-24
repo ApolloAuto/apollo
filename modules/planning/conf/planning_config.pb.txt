@@ -38,6 +38,11 @@ default_task_config: {
   }
 }
 default_task_config: {
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
+  piecewise_jerk_speed_config {
+  }
+}
+default_task_config: {
   task_type: DP_POLY_PATH_OPTIMIZER
   dp_poly_path_config {
     waypoint_sampler_config {

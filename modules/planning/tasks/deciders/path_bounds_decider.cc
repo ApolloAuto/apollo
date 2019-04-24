@@ -492,21 +492,18 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
                               adc_frenet_ld_ * adc_frenet_ld_ /
                               kMaxLateralAccelerations / 2.0;
 
-    double curr_left_bound_lane =
-        curr_lane_left_width + (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW
-                                    ? curr_neighbor_lane_width
-                                    : 0.0);
+    double curr_left_bound_lane = curr_lane_left_width +
+        (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW ?
+         curr_neighbor_lane_width : 0.0);
     double curr_left_bound_adc =
         std::fmax(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) +
         GetBufferBetweenADCCenterAndEdge() + ADC_buffer;
     double curr_left_bound =
         std::fmax(curr_left_bound_lane, curr_left_bound_adc);
 
-    double curr_right_bound_lane =
-        -curr_lane_right_width -
-        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW
-             ? curr_neighbor_lane_width
-             : 0.0);
+    double curr_right_bound_lane = -curr_lane_right_width -
+        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW ?
+         curr_neighbor_lane_width : 0.0);
     double curr_right_bound_adc =
         std::fmin(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) -
         GetBufferBetweenADCCenterAndEdge() - ADC_buffer;
@@ -531,6 +528,40 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
   } else {
     *borrow_lane_type = borrowing_reverse_lane ? "reverse" : "forward";
   }
+
+  return true;
+}
+
+bool PathBoundsDecider::GetLaneInfoFromPoint(
+    double point_x, double point_y, double point_z, double point_theta,
+    hdmap::LaneInfoConstPtr* const lane) {
+  constexpr double kLaneSearchRadius = 1.0;
+  constexpr double kLaneSearchMaxThetaDiff = M_PI / 3.0;
+  double s = 0.0;
+  double l = 0.0;
+  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
+          common::util::MakePointENU(point_x, point_y, point_z),
+          kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff, lane, &s,
+          &l) != 0) {
+    AWARN << "Failed to find nearest lane from map at position: "
+          << "(x, y, z) = (" << point_x << ", " << point_y << ", " << point_z
+          << ")"
+          << ", heading = " << point_theta;
+    return false;
+  }
+  return true;
+}
+
+bool PathBoundsDecider::GetBoundaryFromRefLineOffset(
+    const ReferenceLine& reference_line, PathBound* const path_bound) {
+  // Sanity checks.
+  CHECK_NOTNULL(path_bound);
+  CHECK(!path_bound->empty());
+
+  // Go through every point on reference_line, and take care those that
+  // deviate from lane-center line considerably.
+  //  - Expand lane boundary on one side. (already done previously)
+  //  - Treat the other side as if there is an obstacle.
 
   return true;
 }
@@ -910,26 +941,6 @@ std::vector<std::vector<bool>> PathBoundsDecider::DecidePassDirections(
   // TODO(jiacheng): sort the decisions based on the feasibility.
 
   return decisions;
-}
-
-bool PathBoundsDecider::GetLaneInfoFromPoint(
-    double point_x, double point_y, double point_z, double point_theta,
-    hdmap::LaneInfoConstPtr* const lane) {
-  constexpr double kLaneSearchRadius = 1.0;
-  constexpr double kLaneSearchMaxThetaDiff = M_PI / 3.0;
-  double s = 0.0;
-  double l = 0.0;
-  if (HDMapUtil::BaseMapPtr()->GetNearestLaneWithHeading(
-          common::util::MakePointENU(point_x, point_y, point_z),
-          kLaneSearchRadius, point_theta, kLaneSearchMaxThetaDiff, lane, &s,
-          &l) != 0) {
-    AWARN << "Failed to find nearest lane from map at position: "
-          << "(x, y, z) = (" << point_x << ", " << point_y << ", " << point_z
-          << ")"
-          << ", heading = " << point_theta;
-    return false;
-  }
-  return true;
 }
 
 double PathBoundsDecider::GetBufferBetweenADCCenterAndEdge() {
