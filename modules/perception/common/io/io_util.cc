@@ -38,7 +38,7 @@ bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
 
   std::ifstream fin(filename.c_str());
   if (!fin.is_open()) {
-    AERROR << "Failed to open file " << filename;
+    AERROR << "Failed to open pose file: " << filename;
     return false;
   }
 
@@ -57,11 +57,7 @@ bool ReadPoseFile(const std::string &filename, Eigen::Affine3d *pose,
 
 bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
                               base::BrownCameraDistortionModel *model) {
-  if (model == nullptr) {
-    return false;
-  }
-
-  if (!PathExists(yaml_file)) {
+  if (!PathExists(yaml_file) || model == nullptr) {
     return false;
   }
 
@@ -98,11 +94,7 @@ bool LoadBrownCameraIntrinsic(const std::string &yaml_file,
 bool LoadOmnidirectionalCameraIntrinsics(
     const std::string &yaml_file,
     base::OmnidirectionalCameraDistortionModel *model) {
-  if (model == nullptr) {
-    return false;
-  }
-
-  if (!PathExists(yaml_file)) {
+  if (!PathExists(yaml_file) || model == nullptr) {
     return false;
   }
 
