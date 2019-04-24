@@ -1331,6 +1331,12 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   int time_index = time_start_index_;
   int dual_l_index = l_start_index_;
   int dual_n_index = n_start_index_;
+
+  // enable_constraint_check_: for debug only
+  if (enable_constraint_check_) {
+    ADEBUG << "final resolution constraint checking";
+    check_g(n, x, m, g);
+  }
   // 1. state variables, 4 * [0, horizon]
   // 2. control variables, 2 * [0, horizon_-1]
   // 3. sampling time variables, 1 * [0, horizon_]
@@ -1735,7 +1741,7 @@ void DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
 }
 
 bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
-                                             double* g) {
+                                             const double* g) {
   int kN = n;
   int kM = m;
   double x_u_tmp[kN];
