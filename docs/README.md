@@ -17,5 +17,5 @@ Apollo documents contain the following folders:
 - [**Cyber**](cyber/README.md) - All you need to know about Apollo Cyber RT
 ---
 
-- **[**FAQs**](FAQs/README.md)
+- [**FAQs**](FAQs/README.md)
 
