@@ -44,8 +44,7 @@ PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
   SetName("PiecewiseJerkSpeedOptimizer");
-  // TODO(Hongyi): Uncomment this check when config is ready
-  // CHECK(config_.has_piecewise_jerk_speed_config());
+  CHECK(config_.has_piecewise_jerk_speed_config());
 }
 
 Status PiecewiseJerkSpeedOptimizer::Process(
