@@ -28,8 +28,6 @@
 #include <utility>
 #include <vector>
 
-#include "boost/thread.hpp"
-
 #include "cyber/base/bounded_queue.h"
 #include "cyber/common/log.h"
 
