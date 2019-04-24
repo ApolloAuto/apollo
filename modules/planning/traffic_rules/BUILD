@@ -5,6 +5,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "traffic_rules",
     srcs = [
+        # TODO(all): Split to separate targets to gain better building cache.
         "backside_vehicle.cc",
         "change_lane.cc",
         "crosswalk.cc",
