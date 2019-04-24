@@ -138,7 +138,7 @@ cc_library(
         ":camera_ground_plane",
         ":data_provider",
         ":global_config",
-#        ":lane_object",
+        #        ":lane_object",
         ":math_functions",
         ":object_template_manager",
         ":timer",
@@ -147,6 +147,5 @@ cc_library(
         ":util",
     ],
 )
-
 
 cpplint()

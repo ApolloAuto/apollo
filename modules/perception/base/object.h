@@ -102,7 +102,7 @@ struct alignas(16) Object {
   // @brief motion state of the tracked object, required
   MotionState motion_state = MotionState::UNKNOWN;
   // // Tailgating (trajectory of objects)
-//  boost::circular_buffer<Eigen::Vector3d> drops;
+  //  boost::circular_buffer<Eigen::Vector3d> drops;
   // // CIPV
   bool b_cipv = false;
   // @brief brake light, left-turn light and right-turn light score, optional

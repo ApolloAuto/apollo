@@ -578,9 +578,10 @@ PyObject *cyber_PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(
 static PyObject *cyber_PyChannelUtils_get_active_channels(PyObject *self,
                                                           PyObject *args) {
   unsigned char sleep_s = 0;
-  if (!PyArg_ParseTuple(args, const_cast<char *>(
-                                  "B:cyber_PyChannelUtils_get_active_channels"),
-                        &sleep_s)) {
+  if (!PyArg_ParseTuple(
+          args,
+          const_cast<char *>("B:cyber_PyChannelUtils_get_active_channels"),
+          &sleep_s)) {
     AERROR << "cyber_PyChannelUtils_get_active_channels failed!";
     return Py_None;
   }

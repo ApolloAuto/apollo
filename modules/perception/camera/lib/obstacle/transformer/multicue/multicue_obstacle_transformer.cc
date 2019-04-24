@@ -194,7 +194,6 @@ void MultiCueObstacleTransformer::FillResults(
   obj->center_uncertainty(1) = static_cast<float>(pos_var(1));
   obj->center_uncertainty(2) = static_cast<float>(pos_var(2));
 
-
   float theta = rotation_y;
   Eigen::Vector3d dir = (camera2world_pose.matrix().block(0, 0, 3, 3) *
                          Eigen::Vector3d(cos(theta), 0, -sin(theta)));
@@ -203,7 +202,6 @@ void MultiCueObstacleTransformer::FillResults(
   obj->direction[2] = static_cast<float>(dir[2]);
   obj->theta = static_cast<float>(atan2(dir[1], dir[0]));
   obj->theta_variance = static_cast<float>((mapper_->get_orientation_var())(0));
-
 
   obj->camera_supplement.alpha = rotation_y - theta_ray;
 

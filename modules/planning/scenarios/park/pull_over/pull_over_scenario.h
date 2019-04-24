@@ -38,8 +38,7 @@ struct PullOverContext {
 
 class PullOverScenario : public Scenario {
  public:
-  PullOverScenario(const ScenarioConfig& config,
-                     const ScenarioContext* context)
+  PullOverScenario(const ScenarioConfig& config, const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;

@@ -20,14 +20,14 @@
 #include <unistd.h>
 
 #include <deque>
-#include <unordered_map>
-#include <vector>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"
@@ -193,8 +193,8 @@ class PyService {
         data_type_(data_type),
         func_(nullptr) {
     auto f = [this](
-        const std::shared_ptr<const message::PyMessageWrap>& request,
-        std::shared_ptr<message::PyMessageWrap>& response) {
+                 const std::shared_ptr<const message::PyMessageWrap>& request,
+                 std::shared_ptr<message::PyMessageWrap>& response) {
       response = this->cb(request);
     };
     service_ =
