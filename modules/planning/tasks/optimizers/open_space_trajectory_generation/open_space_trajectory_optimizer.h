@@ -62,19 +62,25 @@ class OpenSpaceTrajectoryOptimizer {
     *optimized_trajectory = optimized_trajectory_;
   }
 
-  void RecordDebugInfo(
+  void RecordWarmStartDebugInfo(
+      const size_t horizon,
       const common::TrajectoryPoint& trajectory_stitching_point,
       const Vec2d& translate_origin, const double rotate_angle,
       const std::vector<double>& end_pose, const Eigen::MatrixXd& xWS,
-      const Eigen::MatrixXd& uWs, const Eigen::MatrixXd& l_warm_up,
-      const Eigen::MatrixXd& n_warm_up, const Eigen::MatrixXd& dual_l_result_ds,
-      const Eigen::MatrixXd& dual_n_result_ds,
-      const Eigen::MatrixXd& state_result_ds,
-      const Eigen::MatrixXd& control_result_ds,
-      const Eigen::MatrixXd& time_result_ds,
-      const std::vector<double>& XYbounds,
+      const Eigen::MatrixXd& uWs, const std::vector<double>& XYbounds,
       const std::vector<std::vector<common::math::Vec2d>>&
           obstacles_vertices_vec);
+
+  void RecordDualVariableWarmStartDebugInfo(const size_t horizon,
+                                            const Eigen::MatrixXd& l_warm_up,
+                                            const Eigen::MatrixXd& n_warm_up);
+
+  void RecordSmootherDebugInfo(const size_t horizon,
+                               const Eigen::MatrixXd& dual_l_result_ds,
+                               const Eigen::MatrixXd& dual_n_result_ds,
+                               const Eigen::MatrixXd& state_result_ds,
+                               const Eigen::MatrixXd& control_result_ds,
+                               const Eigen::MatrixXd& time_result_ds);
 
   void UpdateDebugInfo(
       ::apollo::planning_internal::OpenSpaceDebug* open_space_debug);
