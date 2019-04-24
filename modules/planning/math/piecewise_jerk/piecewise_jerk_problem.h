@@ -160,6 +160,7 @@ class PiecewiseJerkProblem {
 
   std::array<double, 3> x_init_;
   std::array<double, 3> x_end_;
+  std::vector<double> x_ref_;
   std::vector<std::pair<double, double>> x_bounds_;
   std::vector<std::pair<double, double>> dx_bounds_;
   std::vector<std::pair<double, double>> ddx_bounds_;
