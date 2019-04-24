@@ -21,7 +21,7 @@ Note: Detailed information on each of these modules is included below.
 
 The interactions of these modules are illustrated in the picture below.
 
-![img](images/Apollo_3.0_SW.png)
+![img](images/Apollo_3_5_software_architecture.png)
 
 Every module is running as a separate CarOS-based ROS node. Each module node publishes and subscribes certain topics. The subscribed topics serve as data input while the published topics serve as data output. The detailed interactions are described in the following sections.
 
