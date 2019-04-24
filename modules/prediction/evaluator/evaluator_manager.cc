@@ -60,7 +60,6 @@ bool IsTrainable(const Feature& feature) {
 void GroupObstaclesByObstacleId(const int obstacle_id,
                                 ObstaclesContainer* const obstacles_container,
                                 IdObstacleMap* const id_obstacle_map) {
-  constexpr int kNumGroup = 8;
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
   if (obstacle_ptr == nullptr) {
     AERROR << "Null obstacle [" << obstacle_id << "] found";
@@ -75,7 +74,7 @@ void GroupObstaclesByObstacleId(const int obstacle_id,
     ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
     return;
   }
-  int id_mod = obstacle_id % kNumGroup;
+  int id_mod = obstacle_id % FLAGS_max_thread_num;
   (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
 }
 
