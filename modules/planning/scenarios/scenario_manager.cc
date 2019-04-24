@@ -28,6 +28,7 @@
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
+#include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
@@ -140,6 +141,60 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
   if (frame.reference_line_info().size() > 1) {
     // TODO(all): to be implemented
     return default_scenario_type_;
+  }
+
+  return default_scenario_type_;
+}
+
+ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
+    const Frame& frame) {
+  const auto& scenario_config =
+      config_map_[ScenarioConfig::PULL_OVER]
+          .pull_over_config();
+
+  const auto& routing = frame.local_view().routing;
+  const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
+
+  common::SLPoint dest_sl;
+  const auto& reference_line_info = frame.reference_line_info().front();
+  const auto& reference_line = reference_line_info.reference_line();
+  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
+                        &dest_sl);
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+
+  const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
+  ADEBUG << "adc_distance_to_dest[" << adc_distance_to_dest
+         << "] destination_s[" << dest_sl.s()
+         << "] adc_front_edge_s[" << adc_front_edge_s << "]";
+
+  const bool pull_over_scenario =
+      (adc_distance_to_dest > 0 &&
+          adc_distance_to_dest <=
+           scenario_config.start_pull_over_scenario_distance());
+
+  switch (current_scenario_->scenario_type()) {
+    case ScenarioConfig::LANE_FOLLOW:
+      if (pull_over_scenario) {
+        return ScenarioConfig::PULL_OVER;
+      }
+      break;
+    case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
+    case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::STOP_SIGN_PROTECTED:
+    case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+    case ScenarioConfig::YIELD_SIGN_UNPROTECTED:
+    case ScenarioConfig::VALET_PARKING:
+      if (current_scenario_->GetStatus() !=
+          Scenario::ScenarioStatus::STATUS_DONE) {
+        return current_scenario_->scenario_type();
+      }
+      break;
+    default:
+      break;
   }
 
   return default_scenario_type_;
@@ -474,6 +529,13 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       break;
     default:
       break;
+  }
+
+  // pull-over scenarion
+  if (scenario_type == default_scenario_type_) {
+    if (FLAGS_enable_scenario_pull_over) {
+      scenario_type = SelectPullOverScenario(frame);
+    }
   }
 
   ////////////////////////////////////////
