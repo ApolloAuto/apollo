@@ -125,15 +125,13 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
   miu_horizon_ = obstacles_num_ * 4 * (horizon_ + 1);
   ADEBUG << "miu_horizon_: " << miu_horizon_;
+
   // m1 : dynamics constatins
   int m1 = 4 * horizon_;
-
   // m2 : control rate constraints (only steering)
   int m2 = horizon_;
-
   // m3 : sampling time equality constraints
   int m3 = horizon_;
-
   // m4 : obstacle constraints
   int m4 = 4 * obstacles_num_ * (horizon_ + 1);
 
@@ -1407,7 +1405,6 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   }
 
   // 2. control variable initialization, 2 * horizon_
-  // CHECK_EQ(control_result_.cols(), uWS_.cols());
   CHECK_EQ(control_result_.rows(), uWS_.rows());
   double control_diff_max = 0.0;
   for (int i = 0; i < horizon_; ++i) {
@@ -1449,7 +1446,7 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
 
 //***************    start ADOL-C part ***********************************
 template <class T>
-bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
+void DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
   ADEBUG << "eval_obj";
   // Objective is :
   // min control inputs
@@ -1519,11 +1516,10 @@ bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
   }
 
   ADEBUG << "objective value after this iteration : " << *obj_value;
-  return true;
 }
 
 template <class T>
-bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
+void DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
                                                       T* g) {
   ADEBUG << "eval_constraints";
   // state start index
@@ -1736,8 +1732,6 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
     constraint_index++;
     n_index++;
   }
-
-  return true;
 }
 
 bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
@@ -1751,7 +1745,7 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
 
   get_bounds_info(n, x_l_tmp, x_u_tmp, m, g_l_tmp, g_u_tmp);
 
-  double delta_v = 1e-4;
+  const double delta_v = 1e-4;
   for (int idx = 0; idx < n; ++idx) {
     x_u_tmp[idx] = x_u_tmp[idx] + delta_v;
     x_l_tmp[idx] = x_l_tmp[idx] - delta_v;
@@ -1795,6 +1789,8 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
   // miu_horizon_
   int m11 = m10 + miu_horizon_;
 
+  CHECK_EQ(m11, num_of_constraints_);
+
   AINFO << "dynamics constatins to: " << m1;
   AINFO << "control rate constraints (only steering) to: " << m2;
   AINFO << "sampling time equality constraints to: " << m3;
@@ -1806,7 +1802,7 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
   AINFO << "time interval constraints to: " << m9;
   AINFO << "lambda constraints to: " << m10;
   AINFO << "miu constraints to: " << m11;
-  AINFO << "total variables: " << num_of_variables_;
+  AINFO << "total constraints: " << num_of_constraints_;
 
   for (int idx = 0; idx < m; ++idx) {
     if (g[idx] > g_u_tmp[idx] + delta_v || g[idx] < g_l_tmp[idx] - delta_v) {
