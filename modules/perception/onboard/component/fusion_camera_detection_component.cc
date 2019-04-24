@@ -242,6 +242,10 @@ bool FusionCameraDetectionComponent::Init() {
   homography_im2car_ = visualize_.homography_im2car();
   camera_obstacle_pipeline_->SetIm2CarHomography(homography_im2car_);
 
+  cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
+    average_lane_width_in_meter_, max_vehicle_width_in_meter_,
+    image_based_cipv_, debug_level_);
+
   if (enable_visualization_) {
     if (write_visual_img_) {
       visualize_.write_out_img_ = true;
@@ -383,6 +387,20 @@ int FusionCameraDetectionComponent::InitConfig() {
       fusion_camera_detection_param.camera_debug_channel_name();
   ts_diff_ = fusion_camera_detection_param.ts_diff();
   write_visual_img_ = fusion_camera_detection_param.write_visual_img();
+
+  min_laneline_length_for_cipv_ = static_cast<float>(
+    fusion_camera_detection_param.min_laneline_length_for_cipv());
+  average_lane_width_in_meter_ = static_cast<float>(
+    fusion_camera_detection_param.average_lane_width_in_meter());
+  max_vehicle_width_in_meter_ = static_cast<float>(
+    fusion_camera_detection_param.max_vehicle_width_in_meter());
+  average_frame_rate_ = static_cast<float>(
+    fusion_camera_detection_param.average_frame_rate());
+
+  image_based_cipv_ = static_cast<float>(
+    fusion_camera_detection_param.image_based_cipv());
+
+  debug_level_ = static_cast<int>(fusion_camera_detection_param.debug_level());
 
   std::string format_str = R"(
       FusionCameraDetectionComponent InitConfig success
@@ -582,10 +600,10 @@ int FusionCameraDetectionComponent::InitMotionService() {
   auto motion_service_reader =
       node_->CreateReader(channel_name_local, motion_service_callback);
   // initialize motion buffer
-  if (mot_buffer_ == nullptr) {
-    mot_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
+  if (motion_buffer_ == nullptr) {
+    motion_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
   } else {
-    mot_buffer_->set_capacity(motion_buffer_size_);
+    motion_buffer_->set_capacity(motion_buffer_size_);
   }
   return cyber::SUCC;
 }
@@ -626,8 +644,7 @@ void FusionCameraDetectionComponent::OnMotionService(
   motion_2d(3, 3) = message->vehicle_status()[0].motion().m33();
   vehicledata.motion = motion_2d;
 
-  mot_buffer_->push_back(vehicledata);
-
+  motion_buffer_->push_back(vehicledata);
   // TODO(@yg13): output motion in text file
 }
 
@@ -740,6 +757,32 @@ int FusionCameraDetectionComponent::InternalProc(
         prefused_message->frame_->camera_frame_supplement.image_blob.get());
   }
 
+//  Determine CIPV
+  CipvOptions cipv_options;
+  if (motion_buffer_ != nullptr) {
+    if (motion_buffer_->size() == 0) {
+      AWARN << "motion_buffer_ is empty";
+      cipv_options.velocity = 5.0f;
+      cipv_options.yaw_rate = 0.0f;
+    } else {
+      cipv_options.velocity = motion_buffer_->back().velocity;
+      cipv_options.yaw_rate = motion_buffer_->back().yaw_rate;
+    }
+    ADEBUG << "[CIPV] velocity " << cipv_options.velocity
+          << ", yaw rate: " << cipv_options.yaw_rate;
+    cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options,
+      &camera_frame.tracked_objects);
+
+    // TODO(techoe): Activate CollectDrops after test
+    // // Get Drop points
+    // // motion_buffer_ = motion_service_->GetMotionBuffer();
+    // if (motion_buffer_->size() > 0) {
+    //  cipv_.CollectDrops(motion_buffer_, &camera_frame.tracked_objects);
+    // } else {
+    //   AWARN << "motion_buffer is empty";
+    // }
+  }
+
   // Send msg for visualization
   if (enable_visualization_) {
     camera::DataProvider::ImageOptions image_options;
@@ -763,8 +806,8 @@ int FusionCameraDetectionComponent::InternalProc(
       camera_frame.data_provider->GetImage(image_options, &out_image);
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
-                                                   mot_buffer_);
+      visualize_.ShowResult_all_info_single_camera(output_image,
+        camera_frame, motion_buffer_);
     }
   }
 
