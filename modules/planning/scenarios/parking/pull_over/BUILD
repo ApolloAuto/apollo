@@ -26,19 +26,19 @@ cc_library(
     ],
 )
 
-# cc_test(
-#     name = "pull_over_scenario_test",
-#     size = "small",
-#     srcs = [
-#         "pull_over_scenario_test.cc",
-#     ],
-#     data = [
-#         "//modules/planning:planning_conf",
-#     ],
-#     deps = [
-#         ":pull_over_scenario",
-#         "@gtest//:main",
-#     ],
-# )
+cc_test(
+    name = "pull_over_scenario_test",
+    size = "small",
+    srcs = [
+        "pull_over_scenario_test.cc",
+    ],
+    data = [
+        "//modules/planning:planning_conf",
+    ],
+    deps = [
+        ":pull_over_scenario",
+        "@gtest//:main",
+    ],
+)
 
 cpplint()
