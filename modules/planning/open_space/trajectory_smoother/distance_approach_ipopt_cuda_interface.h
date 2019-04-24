@@ -89,7 +89,7 @@ class DistanceApproachIPOPTCUDAInterface : public DistanceApproachInterface {
   bool eval_g(int n, const double* x, bool new_x, int m, double* g) override;
 
   /** Check unfeasible constraints for futher study**/
-  bool check_g(int n, const double* x, int m, double* g);
+  bool check_g(int n, const double* x, int m, const double* g);
 
   /** Method to return:
    *   1) The structure of the jacobian (if "values" is nullptr)
