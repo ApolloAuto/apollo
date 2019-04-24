@@ -85,9 +85,7 @@ int Destination::BuildStopDecision(
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
                         config_.destination().stop_distance());
 
-  if (planning_status->has_pull_over() &&
-      planning_status->pull_over().has_status() &&
-      planning_status->pull_over().status() == PullOverStatus::DISABLED) {
+  if (planning_status->pull_over().status() == PullOverStatus::DISABLED) {
     Stop(frame, reference_line_info, routing_end.id(), dest_lane_s);
     ADEBUG << "destination: STOP at current lane. PULL-OVER disabled";
     return 0;
