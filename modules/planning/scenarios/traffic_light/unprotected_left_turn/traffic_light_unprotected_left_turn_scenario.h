@@ -59,12 +59,12 @@ class TrafficLightUnprotectedLeftTurnScenario : public Scenario {
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
+
+ private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
-
- private:
   bool init_ = false;
   TrafficLightUnprotectedLeftTurnContext context_;
 };
