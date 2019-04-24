@@ -39,7 +39,7 @@ bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
   std::string proto_path =
       cyber::common::GetAbsolutePath(options.root_dir, options.conf_file);
   if (!cyber::common::GetProtoFromFile(proto_path, &semantic_param_)) {
-    AINFO << "load proto param failed, root dir: " << options.root_dir;
+    AERROR << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }
 
@@ -50,9 +50,9 @@ bool SemanticReviser::Init(const TrafficLightTrackerInitOptions &options) {
   non_blink_threshold_s_ =
       blink_threshold_s_ * static_cast<float>(non_blink_coef);
 
-  AINFO << "revise_time_s_: " << revise_time_s_;
-  AINFO << "blink_threshold_s_: " << blink_threshold_s_;
-  AINFO << "hysteretic_threshold_: " << hysteretic_threshold_;
+  ADEBUG << "revise_time_s_: " << revise_time_s_;
+  ADEBUG << "blink_threshold_s_: " << blink_threshold_s_;
+  ADEBUG << "hysteretic_threshold_: " << hysteretic_threshold_;
 
   return true;
 }
@@ -68,14 +68,14 @@ void SemanticReviser::UpdateHistoryAndLights(
       (*history)->hystertic_window.hysteretic_color = cur.color;
       (*history)->hystertic_window.hysteretic_count = 1;
     }
-    AINFO << "Black lights hysteretic change to " << s_color_strs[cur.color]
-          << " count " << (*history)->hystertic_window.hysteretic_count
-          << " threshold " << hysteretic_threshold_;
+    ADEBUG << "Black lights hysteretic change to " << s_color_strs[cur.color]
+           << " count " << (*history)->hystertic_window.hysteretic_count
+           << " threshold " << hysteretic_threshold_;
 
     if ((*history)->hystertic_window.hysteretic_count > hysteretic_threshold_) {
       (*history)->color = cur.color;
       (*history)->hystertic_window.hysteretic_count = 0;
-      AINFO << "Black lights hysteretic change to " << s_color_strs[cur.color];
+      ADEBUG << "Black lights hysteretic change to " << s_color_strs[cur.color];
     } else {
       ReviseLights(lights, cur.light_ids, (*history)->color);
     }
@@ -119,7 +119,7 @@ base::TLColor SemanticReviser::ReviseBySemantic(
 
   auto second_biggest = std::max_element(std::begin(vote), std::end(vote));
 
-  AINFO << "color " << s_color_strs[max_color] << " is max " << max_color_num;
+  ADEBUG << "color " << s_color_strs[max_color] << " is max " << max_color_num;
 
   if (max_color_num == *second_biggest) {
     return base::TLColor::TL_UNKNOWN_COLOR;
@@ -135,22 +135,22 @@ void SemanticReviser::ReviseLights(std::vector<base::TrafficLightPtr> *lights,
     lights->at(index)->status.color = dst_color;
   }
 
-  AINFO << "revise " << light_ids.size() << " lights to "
-        << s_color_strs[dst_color];
+  ADEBUG << "revise " << light_ids.size() << " lights to "
+         << s_color_strs[dst_color];
 }
 
 void SemanticReviser::ReviseByTimeSeries(
     double time_stamp, SemanticTable semantic_table,
     std::vector<base::TrafficLightPtr> *lights) {
-  AINFO << "revise " << semantic_table.semantic
-        << ", lights number:" << semantic_table.light_ids.size();
+  ADEBUG << "revise " << semantic_table.semantic
+         << ", lights number:" << semantic_table.light_ids.size();
 
   std::vector<base::TrafficLightPtr> &lights_ref = *lights;
   base::TLColor cur_color = ReviseBySemantic(semantic_table, lights);
   base::TLColor pre_color = base::TLColor::TL_UNKNOWN_COLOR;
   semantic_table.color = cur_color;
   semantic_table.time_stamp = time_stamp;
-  AINFO << "revise same semantic lights";
+  ADEBUG << "revise same semantic lights";
   ReviseLights(lights, semantic_table.light_ids, cur_color);
 
   std::vector<SemanticTable>::iterator iter =
@@ -160,7 +160,7 @@ void SemanticReviser::ReviseByTimeSeries(
   if (iter != history_semantic_.end()) {
     pre_color = iter->color;
     if (time_stamp - iter->time_stamp < revise_time_s_) {
-      AINFO << "revise by time series";
+      ADEBUG << "revise by time series";
       switch (cur_color) {
         case base::TLColor::TL_YELLOW:
           if (iter->color == base::TLColor::TL_RED) {
@@ -169,7 +169,7 @@ void SemanticReviser::ReviseByTimeSeries(
             iter->hystertic_window.hysteretic_count = 0;
           } else {
             UpdateHistoryAndLights(semantic_table, lights, &iter);
-            AINFO << "High confidence color " << s_color_strs[cur_color];
+            ADEBUG << "High confidence color " << s_color_strs[cur_color];
           }
           break;
         case base::TLColor::TL_RED:
@@ -180,7 +180,7 @@ void SemanticReviser::ReviseByTimeSeries(
             iter->blink = true;
           }
           iter->last_bright_time_stamp = time_stamp;
-          AINFO << "High confidence color " << s_color_strs[cur_color];
+          ADEBUG << "High confidence color " << s_color_strs[cur_color];
           break;
         case base::TLColor::TL_BLACK:
           iter->last_dark_time_stamp = time_stamp;
@@ -214,12 +214,12 @@ void SemanticReviser::ReviseByTimeSeries(
       lights_ref[index]->status.blink =
           (iter->blink && iter->color == base::TLColor::TL_GREEN);
     }
-    AINFO << "semantic " << semantic_table.semantic << " color "
-          << s_color_strs[iter->color] << " blink " << iter->blink << " cur "
-          << s_color_strs[cur_color];
-    AINFO << "cur ts " << std::to_string(time_stamp);
-    AINFO << "bri ts " << std::to_string(iter->last_bright_time_stamp);
-    AINFO << "dar ts " << std::to_string(iter->last_dark_time_stamp);
+    ADEBUG << "semantic " << semantic_table.semantic << " color "
+           << s_color_strs[iter->color] << " blink " << iter->blink << " cur "
+           << s_color_strs[cur_color];
+    ADEBUG << "cur ts " << std::to_string(time_stamp);
+    ADEBUG << "bri ts " << std::to_string(iter->last_bright_time_stamp);
+    ADEBUG << "dar ts " << std::to_string(iter->last_dark_time_stamp);
   } else {
     semantic_table.last_dark_time_stamp = semantic_table.time_stamp;
     semantic_table.last_bright_time_stamp = semantic_table.time_stamp;
@@ -232,18 +232,18 @@ bool SemanticReviser::Track(const TrafficLightTrackerOptions &options,
   double time_stamp = frame->timestamp;
   std::vector<base::TrafficLightPtr> &lights_ref = frame->traffic_lights;
   std::vector<SemanticTable> semantic_table;
-  AINFO << "start revise ";
+  ADEBUG << "start revise ";
 
   if (lights_ref.size() <= 0) {
     history_semantic_.clear();
-    AINFO << "no lights to revise, return";
+    ADEBUG << "no lights to revise, return";
     return true;
   }
 
   for (size_t i = 0; i < lights_ref.size(); i++) {
     base::TrafficLightPtr light = lights_ref.at(i);
     int cur_semantic = light->semantic;
-    AINFO << "light " << light->id << " semantic " << cur_semantic;
+    ADEBUG << "light " << light->id << " semantic " << cur_semantic;
 
     SemanticTable tmp;
     std::stringstream ss;
