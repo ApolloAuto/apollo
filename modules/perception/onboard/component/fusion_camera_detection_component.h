@@ -25,6 +25,7 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
+#include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 #include "modules/perception/camera/app/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
@@ -37,7 +38,6 @@
 #include "modules/perception/proto/motion_service.pb.h"
 #include "modules/perception/proto/perception_camera.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/camera/app/cipv_camera.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;

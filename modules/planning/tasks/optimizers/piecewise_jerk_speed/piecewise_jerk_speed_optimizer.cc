@@ -48,10 +48,11 @@ PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
   // CHECK(config_.has_piecewise_jerk_speed_config());
 }
 
-Status PiecewiseJerkSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
-    const PathData& path_data, const TrajectoryPoint& init_point,
-    const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
-    PathDecision* const path_decision, SpeedData* const speed_data) {
+Status PiecewiseJerkSpeedOptimizer::Process(
+    const SLBoundary& adc_sl_boundary, const PathData& path_data,
+    const TrajectoryPoint& init_point, const ReferenceLine& reference_line,
+    const SpeedData& reference_speed_data, PathDecision* const path_decision,
+    SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
   }
@@ -71,7 +72,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
   std::array<double, 3> init_s = {0.0, st_graph_data.init_point().v(),
-                                       st_graph_data.init_point().a()};
+                                  st_graph_data.init_point().a()};
   double delta_t = 0.1;
   std::array<double, 5> w = {1.0, 100.0, 10.0, 30.0, 0.0};
   double total_length = st_graph_data.path_length_by_conf();
@@ -135,8 +136,8 @@ Status PiecewiseJerkSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
   const std::vector<double>& ds = path_time_qp->x_derivative();
   const std::vector<double>& dds = path_time_qp->x_second_order_derivative();
   for (int i = 0; i < num_of_knots; ++i) {
-    ADEBUG << "For t[" << i * delta_t << "], s = " << s[i]
-           << ", v = " << ds[i] << ", a = " << dds[i];
+    ADEBUG << "For t[" << i * delta_t << "], s = " << s[i] << ", v = " << ds[i]
+           << ", a = " << dds[i];
   }
   speed_data->clear();
   speed_data->AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);

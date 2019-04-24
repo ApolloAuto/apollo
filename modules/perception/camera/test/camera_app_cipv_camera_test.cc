@@ -31,9 +31,8 @@ TEST(CIPV, cipv_ground_test) {
   {
     // Two lane test
     Eigen::Matrix3d homography_im2car_;
-    homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375,
-                         -0.00050384,  2.48862e-05, 0.48999,
-                          2.7712e-06, 0.000317091, -0.191827;
+    homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375, -0.00050384,
+        2.48862e-05, 0.48999, 2.7712e-06, 0.000317091, -0.191827;
 
     float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
     float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
@@ -42,8 +41,8 @@ TEST(CIPV, cipv_ground_test) {
 
     Cipv cipv_;
     cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-      average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-      image_based_cipv_);
+               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
+               image_based_cipv_);
 
     CipvOptions cipv_options;
     cipv_options.velocity = 5.0f;
@@ -253,12 +252,11 @@ TEST(CIPV, cipv_ground_test) {
     right_lane_instance.pos_type = base::LaneLinePositionType::EGO_RIGHT;
     lane_objects.push_back(right_lane_instance);
 
-
     std::vector<std::shared_ptr<base::Object>> objects;
     base::ObjectPtr object1(new base::Object);
     object1->track_id = 0;
     object1->camera_supplement.box =
-      base::RectF(1163.0f, 486.73f, 15.0f, 39.6f);
+        base::RectF(1163.0f, 486.73f, 15.0f, 39.6f);
     object1->center(0) = 559664;
     object1->center(1) = 4.15741e+06;
     object1->center(2) = -14.9444;
@@ -278,7 +276,7 @@ TEST(CIPV, cipv_ground_test) {
     base::ObjectPtr object2(new base::Object);
     object2->track_id = 2;
     object2->camera_supplement.box =
-      base::RectF(852.067f, 537.943f, 345.337f, 267.294f);
+        base::RectF(852.067f, 537.943f, 345.337f, 267.294f);
     object2->center(0) = 559712;
     object2->center(1) = 4.15745e+06;
     object2->center(2) = -19.9879;
@@ -298,7 +296,7 @@ TEST(CIPV, cipv_ground_test) {
     base::ObjectPtr object3(new base::Object);
     object3->track_id = 3;
     object3->camera_supplement.box =
-      base::RectF(1343.66f, 563.465f, 341.659f, 272.38f);
+        base::RectF(1343.66f, 563.465f, 341.659f, 272.38f);
     object3->center(0) = 559711;
     object3->center(1) = 4.15745e+06;
     object3->center(2) = -19.7986;
@@ -316,7 +314,6 @@ TEST(CIPV, cipv_ground_test) {
     objects.push_back(object3);
 
     cipv_.DetermineCipv(lane_objects, cipv_options, &objects);
-
 
     EXPECT_FALSE(objects[0]->b_cipv);
     EXPECT_FALSE(objects[1]->b_cipv);
@@ -328,9 +325,8 @@ TEST(CIPV, cipv_image_test) {
   {
     // Two lane test
     Eigen::Matrix3d homography_im2car_;
-    homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375,
-                         -0.00050384,  2.48862e-05, 0.48999,
-                          2.7712e-06, 0.000317091, -0.191827;
+    homography_im2car_ << 1.79535e-06, 9.37775e-05, 0.942375, -0.00050384,
+        2.48862e-05, 0.48999, 2.7712e-06, 0.000317091, -0.191827;
 
     float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
     float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
@@ -339,8 +335,8 @@ TEST(CIPV, cipv_image_test) {
 
     Cipv cipv_;
     cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-      average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-      image_based_cipv_);
+               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
+               image_based_cipv_);
 
     CipvOptions cipv_options;
     cipv_options.velocity = 5.0f;
@@ -551,12 +547,11 @@ TEST(CIPV, cipv_image_test) {
     right_lane_instance.pos_type = base::LaneLinePositionType::EGO_RIGHT;
     lane_objects.push_back(right_lane_instance);
 
-
     std::vector<std::shared_ptr<base::Object>> objects;
     base::ObjectPtr object1(new base::Object);
     object1->track_id = 0;
     object1->camera_supplement.box =
-      base::RectF(1163.0f, 486.73f, 15.0f, 39.6f);
+        base::RectF(1163.0f, 486.73f, 15.0f, 39.6f);
     object1->center(0) = 559664;
     object1->center(1) = 4.15741e+06;
     object1->center(2) = -14.9444;
@@ -576,7 +571,7 @@ TEST(CIPV, cipv_image_test) {
     base::ObjectPtr object2(new base::Object);
     object2->track_id = 2;
     object2->camera_supplement.box =
-      base::RectF(852.067f, 537.943f, 345.337f, 267.294f);
+        base::RectF(852.067f, 537.943f, 345.337f, 267.294f);
     object2->center(0) = 559712;
     object2->center(1) = 4.15745e+06;
     object2->center(2) = -19.9879;
@@ -596,7 +591,7 @@ TEST(CIPV, cipv_image_test) {
     base::ObjectPtr object3(new base::Object);
     object3->track_id = 3;
     object3->camera_supplement.box =
-      base::RectF(1343.66f, 563.465f, 341.659f, 272.38f);
+        base::RectF(1343.66f, 563.465f, 341.659f, 272.38f);
     object3->center(0) = 559711;
     object3->center(1) = 4.15745e+06;
     object3->center(2) = -19.7986;
@@ -615,13 +610,11 @@ TEST(CIPV, cipv_image_test) {
 
     cipv_.DetermineCipv(lane_objects, cipv_options, &objects);
 
-
     EXPECT_FALSE(objects[0]->b_cipv);
     EXPECT_FALSE(objects[1]->b_cipv);
     EXPECT_TRUE(objects[2]->b_cipv);
   }
 }
-
 
 }  // namespace camera
 }  // namespace perception
