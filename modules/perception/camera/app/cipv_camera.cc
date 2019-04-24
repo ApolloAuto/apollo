@@ -315,7 +315,7 @@ bool Cipv::FindClosestEdgeOfObjectImage(
         y2 * cos_theta - x2 * sin_theta + center_y;
 
     // If a vehicle faces side way, extract the side edge of a vehicle
-  } else if (atan2(object->direction[1], object->direction[0]) >
+  } else if (atan2(object->direction(1), object->direction(0)) >
              k45DegreeInRadian) {
     // get left side of the vehicle
     closted_object_edge->start_point[0] =
@@ -327,7 +327,7 @@ bool Cipv::FindClosestEdgeOfObjectImage(
         x2 * cos_theta + y1 * sin_theta + center_x;
     closted_object_edge->end_point[1] =
         y1 * cos_theta - x2 * sin_theta + center_y;
-  } else if (atan2(object->direction[1], object->direction[0]) <
+  } else if (atan2(object->direction(1), object->direction(0)) <
              -k45DegreeInRadian) {
     // get right side of the vehicle
 

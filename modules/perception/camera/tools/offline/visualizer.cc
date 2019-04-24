@@ -794,26 +794,26 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     rotate << cos(yaw), -sin(yaw), sin(yaw), cos(yaw);
 
     Eigen::Vector3d pos;
-    pos << object->center[0], object->center[1], object->center[2];
+    pos << object->center(0), object->center(1), object->center(2);
     pos = world2lidar * pos;
     Eigen::Vector2d pos_2d;
     pos_2d << pos[0], pos[1];
     Eigen::Vector3d v;
-    v << object->velocity[0], object->velocity[1], object->velocity[2];
+    v << object->velocity(0), object->velocity(1), object->velocity(2);
     v = world2lidar.linear() * v;
     Eigen::Vector2d v_2d;
     v_2d << v[0] + pos_2d[0], v[1] + pos_2d[1];
     Eigen::Vector2d p1;
-    p1 << object->size[0] * 0.5, object->size[1] * 0.5;
+    p1 << object->size(0) * 0.5, object->size(1) * 0.5;
     p1 = rotate * p1 + pos_2d;
     Eigen::Vector2d p2;
-    p2 << -object->size[0] * 0.5, object->size[1] * 0.5;
+    p2 << -object->size(0) * 0.5, object->size(1) * 0.5;
     p2 = rotate * p2 + pos_2d;
     Eigen::Vector2d p3;
-    p3 << -object->size[0] * 0.5, -object->size[1] * 0.5;
+    p3 << -object->size(0) * 0.5, -object->size(1) * 0.5;
     p3 = rotate * p3 + pos_2d;
     Eigen::Vector2d p4;
-    p4 << object->size[0] * 0.5, -object->size[1] * 0.5;
+    p4 << object->size(0) * 0.5, -object->size(1) * 0.5;
     p4 = rotate * p4 + pos_2d;
 
     cv::line(world_image_, world_point_to_bigimg(p1), world_point_to_bigimg(p2),
@@ -959,30 +959,30 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
 
     // compute 8 vetices in camera coodinates
     Eigen::Vector3d pos;
-    pos << object->camera_supplement.local_center[0],
-        object->camera_supplement.local_center[1],
-        object->camera_supplement.local_center[2];
+    pos << object->camera_supplement.local_center(0),
+        object->camera_supplement.local_center(1),
+        object->camera_supplement.local_center(2);
     double theta_ray = atan2(pos[0], pos[2]);
     double theta = object->camera_supplement.alpha + theta_ray;
 
     Eigen::Matrix3d rotate_ry;
     rotate_ry << cos(theta), 0, sin(theta), 0, 1, 0, -sin(theta), 0, cos(theta);
     std::vector<Eigen::Vector3d> p(8);
-    p[0] << object->size[0] * 0.5, object->size[2] * 0.5, object->size[1] * 0.5;
-    p[1] << -object->size[0] * 0.5, object->size[2] * 0.5,
-        object->size[1] * 0.5;
-    p[2] << -object->size[0] * 0.5, object->size[2] * 0.5,
-        -object->size[1] * 0.5;
-    p[3] << object->size[0] * 0.5, object->size[2] * 0.5,
-        -object->size[1] * 0.5;
-    p[4] << object->size[0] * 0.5, -object->size[2] * 0.5,
-        object->size[1] * 0.5;
-    p[5] << -object->size[0] * 0.5, -object->size[2] * 0.5,
-        object->size[1] * 0.5;
-    p[6] << -object->size[0] * 0.5, -object->size[2] * 0.5,
-        -object->size[1] * 0.5;
-    p[7] << object->size[0] * 0.5, -object->size[2] * 0.5,
-        -object->size[1] * 0.5;
+    p[0] << object->size(0) * 0.5, object->size(2) * 0.5, object->size(1) * 0.5;
+    p[1] << -object->size(0) * 0.5, object->size(2) * 0.5,
+        object->size(1) * 0.5;
+    p[2] << -object->size(0) * 0.5, object->size(2) * 0.5,
+        -object->size(1) * 0.5;
+    p[3] << object->size(0) * 0.5, object->size(2) * 0.5,
+        -object->size(1) * 0.5;
+    p[4] << object->size(0) * 0.5, -object->size(2) * 0.5,
+        object->size(1) * 0.5;
+    p[5] << -object->size(0) * 0.5, -object->size(2) * 0.5,
+        object->size(1) * 0.5;
+    p[6] << -object->size(0) * 0.5, -object->size(2) * 0.5,
+        -object->size(1) * 0.5;
+    p[7] << object->size(0) * 0.5, -object->size(2) * 0.5,
+        -object->size(1) * 0.5;
     for (uint i = 0; i < p.size(); i++) p[i] = rotate_ry * p[i] + pos;
 
     // compute 4 bottom vetices in lidar coordinate
@@ -1010,16 +1010,16 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
     rotate_rz << cos(theta), sin(theta), -sin(theta), cos(theta);
     // plot obstacles on ground plane in lidar coordinates
     Eigen::Vector2d p1_l;
-    p1_l << object->size[0] * 0.5, object->size[1] * 0.5;
+    p1_l << object->size(0) * 0.5, object->size(1) * 0.5;
     p1_l = rotate_rz * p1_l + c_2D_l;
     Eigen::Vector2d p2_l;
-    p2_l << -object->size[0] * 0.5, object->size[1] * 0.5;
+    p2_l << -object->size(0) * 0.5, object->size(1) * 0.5;
     p2_l = rotate_rz * p2_l + c_2D_l;
     Eigen::Vector2d p3_l;
-    p3_l << -object->size[0] * 0.5, -object->size[1] * 0.5;
+    p3_l << -object->size(0) * 0.5, -object->size(1) * 0.5;
     p3_l = rotate_rz * p3_l + c_2D_l;
     Eigen::Vector2d p4_l;
-    p4_l << object->size[0] * 0.5, -object->size[1] * 0.5;
+    p4_l << object->size(0) * 0.5, -object->size(1) * 0.5;
     p4_l = rotate_rz * p4_l + c_2D_l;
     cv::line(world_image_, world_point_to_bigimg(p1_l),
              world_point_to_bigimg(p2_l), color, 2);
