@@ -20,7 +20,7 @@
 
 #define protected public
 #define private public
-#include "modules/planning/scenarios/valet_parking/valet_parking_scenario.h"
+#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 
 #include "gtest/gtest.h"
 
