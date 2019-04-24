@@ -57,7 +57,6 @@ class PullOverScenario : public Scenario {
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
-
   bool init_ = false;
   PullOverContext context_;
 };
