@@ -44,7 +44,8 @@ using apollo::common::TrajectoryPoint;
 PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
-  SetName("PiecewiseJerkSpeedOptimizer");
+  // TODO(Hongyi): recover this hacked task_name for dreamview
+  SetName("QpSplineStSpeedOptimizer");
   CHECK(config_.has_piecewise_jerk_speed_config());
 }
 
@@ -83,7 +84,9 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   path_time_qp->InitProblem(num_of_knots, delta_t, w, init_s);
 
   path_time_qp->SetZeroOrderBounds(0.0, total_length);
-  path_time_qp->SetFirstOrderBounds(0.0, FLAGS_planning_upper_speed_limit);
+  path_time_qp->SetFirstOrderBounds(0.0,
+      std::fmax(FLAGS_planning_upper_speed_limit,
+                st_graph_data.init_point().v()));
   path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
   path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
