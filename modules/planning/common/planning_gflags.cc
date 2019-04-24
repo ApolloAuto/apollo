@@ -469,6 +469,9 @@ DEFINE_uint32(open_space_trajectory_stitching_preserved_length,
               std::numeric_limits<uint32_t>::infinity(),
               "preserved points number in trajectory stitching for open space "
               "trajectory");
+DEFINE_bool(
+    enable_smoother_failsafe, false,
+    "whether to use warm start result as final output when smoother fails");
 
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
