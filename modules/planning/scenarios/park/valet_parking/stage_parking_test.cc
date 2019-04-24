@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-#include "modules/planning/scenarios/valet_parking/stage_approaching_parking_spot.h"
+#include "modules/planning/scenarios/park/valet_parking/stage_parking.h"
 
 #include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -26,21 +26,20 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace valet_parking {
-class StageApproachingParkingSpotTest : public ::testing::Test {
+
+class StageParkingTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_stage_type(
-        ScenarioConfig::VALET_PARKING_APPROACHING_PARKING_SPOT);
+    config_.set_stage_type(ScenarioConfig::VALET_PARKING_PARKING);
   }
 
  protected:
   ScenarioConfig::StageConfig config_;
-  struct ValetParkingContext;
 };
 
-TEST_F(StageApproachingParkingSpotTest, Init) {
-  StageApproachingParkingSpot stage_approaching_parking_spot(config_);
-  EXPECT_EQ(stage_approaching_parking_spot.Name(),
+TEST_F(StageParkingTest, Init) {
+  StageParking stage_parking(config_);
+  EXPECT_EQ(stage_parking.Name(),
             ScenarioConfig::StageType_Name(config_.stage_type()));
 }
 
