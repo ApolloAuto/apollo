@@ -19,7 +19,7 @@
  **/
 #define protected public
 #define private public
-#include "modules/planning/scenarios/parking/pull_over/pull_over_scenario.h"
+#include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 
 #include "gtest/gtest.h"
 
