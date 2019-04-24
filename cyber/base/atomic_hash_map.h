@@ -159,6 +159,7 @@ class AtomicHashMap {
           if (target->value_ptr.compare_exchange_strong(
                   old_val_ptr, new_value, std::memory_order_acq_rel,
                   std::memory_order_relaxed)) {
+            delete old_val_ptr;
             if (new_entry) {
               delete new_entry;
               new_entry = nullptr;
@@ -201,6 +202,7 @@ class AtomicHashMap {
           if (target->value_ptr.compare_exchange_strong(
                   old_val_ptr, new_value, std::memory_order_acq_rel,
                   std::memory_order_relaxed)) {
+            delete old_val_ptr;
             if (new_entry) {
               delete new_entry;
               new_entry = nullptr;
@@ -243,6 +245,7 @@ class AtomicHashMap {
           if (target->value_ptr.compare_exchange_strong(
                   old_val_ptr, new_value, std::memory_order_acq_rel,
                   std::memory_order_relaxed)) {
+            delete old_val_ptr;
             if (new_entry) {
               delete new_entry;
               new_entry = nullptr;
