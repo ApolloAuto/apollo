@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/scenarios/parking/pull_over/stage_approach.h"
+#include "modules/planning/scenarios/park/pull_over/stage_approach.h"
 
 #include "cyber/common/log.h"
 
