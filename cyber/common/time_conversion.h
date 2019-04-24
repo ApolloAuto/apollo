@@ -128,9 +128,7 @@ inline std::string UnixSecondsToString(
   std::time_t t = unix_seconds;
   struct tm ptm;
   struct tm* ret = localtime_r(&t, &ptm);
-  if (ret == nullptr) {
-    return std::string("");
-  }
+  RETURN_VAL_IF_NULL(ret, std::string(""));
   uint32_t length = 64;
   std::vector<char> buff(length, '\0');
   strftime(buff.data(), length, format_str.c_str(), ret);

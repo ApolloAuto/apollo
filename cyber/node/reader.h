@@ -286,9 +286,7 @@ bool Reader<MessageT>::HasWriter() {
 
 template <typename MessageT>
 void Reader<MessageT>::GetWriters(std::vector<proto::RoleAttributes>* writers) {
-  if (writers == nullptr) {
-    return;
-  }
+  RETURN_IF_NULL(writers);
 
   if (!init_.load()) {
     return;

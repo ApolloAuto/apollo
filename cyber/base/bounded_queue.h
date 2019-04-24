@@ -94,9 +94,7 @@ bool BoundedQueue<T>::Init(uint64_t size, WaitStrategy* strategy) {
   // Head and tail each occupy a space
   pool_size_ = size + 2;
   pool_ = reinterpret_cast<T*>(std::calloc(pool_size_, sizeof(T)));
-  if (pool_ == nullptr) {
-    return false;
-  }
+  RETURN_VAL_IF_NULL(pool_, false);
   for (uint64_t i = 0; i < pool_size_; ++i) {
     new (&(pool_[i])) T();
   }

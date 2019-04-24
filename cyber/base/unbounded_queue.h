@@ -71,9 +71,7 @@ class UnboundedQueue {
     do {
       head_next = old_head->next;
 
-      if (head_next == nullptr) {
-        return false;
-      }
+      RETURN_VAL_IF_NULL(head_next, false);
     } while (!head_.compare_exchange_strong(old_head, head_next));
     *element = head_next->data;
     size_.fetch_sub(1);

@@ -30,10 +30,7 @@ using apollo::cyber::proto::Chatter;
 using apollo::cyber::message::PyMessageWrap;
 apollo::cyber::PyService *server = nullptr;
 int service_callback(const char *channel_name) {
-  if (server == nullptr) {
-    AERROR << "server is null.";
-    return -1;
-  }
+  RETURN_VAL_IF_NULL(server, -1);
 
   AINFO << "server recv channelname ->[ " << channel_name << " ]";
 

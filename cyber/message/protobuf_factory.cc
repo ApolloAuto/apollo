@@ -130,9 +130,7 @@ void ProtobufFactory::GetDescriptorString(
 void ProtobufFactory::GetPythonDesc(const std::string& type,
                                     std::string* desc_str) {
   auto desc = pool_->FindMessageTypeByName(type);
-  if (desc == nullptr) {
-    return;
-  }
+  RETURN_IF_NULL(desc);
   google::protobuf::DescriptorProto dp;
   desc->CopyTo(&dp);
   dp.SerializeToString(desc_str);
@@ -146,9 +144,7 @@ void ProtobufFactory::GetDescriptorString(const std::string& type,
   }
 
   desc = pool_->FindMessageTypeByName(type);
-  if (desc == nullptr) {
-    return;
-  }
+  RETURN_IF_NULL(desc);
   return GetDescriptorString(desc, desc_str);
 }
 
@@ -181,17 +177,11 @@ google::protobuf::Message* ProtobufFactory::GetMessageByGeneratedType(
     const std::string& type) const {
   auto descriptor =
       DescriptorPool::generated_pool()->FindMessageTypeByName(type);
-  if (descriptor == nullptr) {
-    // LOG_WARN << "cannot find [" << type << "] descriptor";
-    return nullptr;
-  }
+  RETURN_VAL_IF_NULL(descriptor, nullptr);
 
   auto prototype =
       MessageFactory::generated_factory()->GetPrototype(descriptor);
-  if (prototype == nullptr) {
-    // AERROR << "cannot find [" << type << "] prototype";
-    return nullptr;
-  }
+  RETURN_VAL_IF_NULL(prototype, nullptr);
 
   return prototype->New();
 }

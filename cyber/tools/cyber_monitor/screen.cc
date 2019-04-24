@@ -89,7 +89,7 @@ inline bool Screen::IsInit(void) const { return (stdscr != nullptr); }
 
 void Screen::Init(void) {
   initscr();
-  if (stdscr == nullptr) return;
+  RETURN_IF_NULL(stdscr);
 
   nodelay(stdscr, true);
   keypad(stdscr, true);
@@ -194,7 +194,8 @@ int Screen::SwitchState(int ch) {
         clear();
       }
       break;
-    default: {}
+    default: {
+    }
   }
   return ch;
 }

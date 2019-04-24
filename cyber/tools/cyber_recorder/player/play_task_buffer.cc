@@ -37,9 +37,7 @@ bool PlayTaskBuffer::Empty() const {
 }
 
 void PlayTaskBuffer::Push(const TaskPtr& task) {
-  if (task == nullptr) {
-    return;
-  }
+  RETURN_IF_NULL(task);
   std::lock_guard<std::mutex> lck(mutex_);
   tasks_.insert(std::make_pair(task->msg_play_time_ns(), task));
 }

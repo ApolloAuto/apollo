@@ -48,9 +48,7 @@ Manager::Manager()
 Manager::~Manager() { Shutdown(); }
 
 bool Manager::StartDiscovery(RtpsParticipant* participant) {
-  if (participant == nullptr) {
-    return false;
-  }
+  RETURN_VAL_IF_NULL(participant, false);
   if (is_discovery_started_.exchange(true)) {
     return true;
   }

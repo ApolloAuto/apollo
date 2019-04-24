@@ -112,9 +112,7 @@ void History<MessageT>::Clear() {
 template <typename MessageT>
 void History<MessageT>::GetCachedMessage(
     std::vector<CachedMessage>* msgs) const {
-  if (msgs == nullptr) {
-    return;
-  }
+  RETURN_IF_NULL(msgs);
 
   std::lock_guard<std::mutex> lock(msgs_mutex_);
   msgs->reserve(msgs_.size());

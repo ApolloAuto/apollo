@@ -78,10 +78,7 @@ bool MulticastNotifier::Listen(int timeout_ms, ReadableInfo* info) {
     return false;
   }
 
-  if (info == nullptr) {
-    AERROR << "info nullptr.";
-    return false;
-  }
+  RETURN_VAL_IF_NULL(info, false);
 
   struct pollfd fds;
   fds.fd = listen_fd_;

@@ -80,9 +80,7 @@ template <typename T>
 bool BlockerManager::Publish(const std::string& channel_name,
                              const typename Blocker<T>::MessagePtr& msg) {
   auto blocker = GetOrCreateBlocker<T>(BlockerAttr(channel_name));
-  if (blocker == nullptr) {
-    return false;
-  }
+  RETURN_VAL_IF_NULL(blocker, false);
   blocker->Publish(msg);
   return true;
 }
@@ -91,9 +89,7 @@ template <typename T>
 bool BlockerManager::Publish(const std::string& channel_name,
                              const typename Blocker<T>::MessageType& msg) {
   auto blocker = GetOrCreateBlocker<T>(BlockerAttr(channel_name));
-  if (blocker == nullptr) {
-    return false;
-  }
+  RETURN_VAL_IF_NULL(blocker, false);
   blocker->Publish(msg);
   return true;
 }
@@ -103,9 +99,7 @@ bool BlockerManager::Subscribe(const std::string& channel_name, size_t capacity,
                                const std::string& callback_id,
                                const typename Blocker<T>::Callback& callback) {
   auto blocker = GetOrCreateBlocker<T>(BlockerAttr(capacity, channel_name));
-  if (blocker == nullptr) {
-    return false;
-  }
+  RETURN_VAL_IF_NULL(blocker, false);
   return blocker->Subscribe(callback_id, callback);
 }
 
@@ -113,9 +107,7 @@ template <typename T>
 bool BlockerManager::Unsubscribe(const std::string& channel_name,
                                  const std::string& callback_id) {
   auto blocker = GetBlocker<T>(channel_name);
-  if (blocker == nullptr) {
-    return false;
-  }
+  RETURN_VAL_IF_NULL(blocker, false);
   return blocker->Unsubscribe(callback_id);
 }
 

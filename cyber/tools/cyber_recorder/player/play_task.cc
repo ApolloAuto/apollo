@@ -32,10 +32,7 @@ PlayTask::PlayTask(const MessagePtr& msg, const WriterPtr& writer,
       msg_play_time_ns_(msg_play_time_ns) {}
 
 void PlayTask::Play() {
-  if (writer_ == nullptr) {
-    AERROR << "writer is nullptr, can't write message.";
-    return;
-  }
+  RETURN_IF_NULL(writer_);
 
   if (!writer_->Write(msg_)) {
     AERROR << "write message failed, played num: " << played_msg_num_.load()

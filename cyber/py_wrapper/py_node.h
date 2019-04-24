@@ -20,14 +20,14 @@
 #include <unistd.h>
 
 #include <deque>
-#include <unordered_map>
-#include <vector>
 #include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"
@@ -193,8 +193,8 @@ class PyService {
         data_type_(data_type),
         func_(nullptr) {
     auto f = [this](
-        const std::shared_ptr<const message::PyMessageWrap>& request,
-        std::shared_ptr<message::PyMessageWrap>& response) {
+                 const std::shared_ptr<const message::PyMessageWrap>& request,
+                 std::shared_ptr<message::PyMessageWrap>& response) {
       response = this->cb(request);
     };
     service_ =
@@ -269,10 +269,7 @@ class PyClient {
     m.reset(new message::PyMessageWrap(request, data_type_));
 
     auto response = client_->SendRequest(m);
-    if (response == nullptr) {
-      AINFO << "SendRequest:response is null";
-      return std::string("");
-    }
+    RETURN_VAL_IF_NULL(response, std::string(""));
     response->ParseFromString(response->data());
 
     return response->data();
@@ -345,24 +342,15 @@ class PyChannelUtils {
   // Used in cyber_channel echo command
   static std::string get_debugstring_by_msgtype_rawmsgdata(
       const std::string& msg_type, const std::string& rawmsgdata) {
-    if (msg_type.empty()) {
-      AERROR << "parse rawmessage the msg_type is null";
-      return "";
-    }
-    if (rawmsgdata.empty()) {
-      AERROR << "parse rawmessage the rawmsgdata is null";
-      return "";
-    }
+    RETURN_VAL_IF(msg_type.empty(), std::string(""));
+    RETURN_VAL_IF(rawmsgdata.empty(), std::string(""));
 
     if (raw_msg_class_ == nullptr) {
       auto rawFactory = apollo::cyber::message::ProtobufFactory::Instance();
       raw_msg_class_ = rawFactory->GenerateMessageByType(msg_type);
     }
 
-    if (raw_msg_class_ == nullptr) {
-      AERROR << "raw_msg_class_  is null";
-      return "";
-    }
+    RETURN_VAL_IF_NULL(raw_msg_class_, std::string(""));
 
     if (!raw_msg_class_->ParseFromString(rawmsgdata)) {
       AERROR << "Cannot parse the msg [ " << msg_type << " ]";
@@ -374,10 +362,7 @@ class PyChannelUtils {
 
   static std::string get_msgtype_by_channelname(const std::string& channel_name,
                                                 uint8_t sleep_s = 0) {
-    if (channel_name.empty()) {
-      AERROR << "channel_name is null";
-      return "";
-    }
+    RETURN_VAL_IF(channel_name.empty(), std::string(""));
     auto topology =
         apollo::cyber::service_discovery::TopologyManager::Instance();
     sleep(sleep_s);

@@ -69,10 +69,7 @@ bool ConditionNotifier::Notify(const ReadableInfo& info) {
 }
 
 bool ConditionNotifier::Listen(int timeout_ms, ReadableInfo* info) {
-  if (info == nullptr) {
-    AERROR << "info nullptr.";
-    return false;
-  }
+  RETURN_VAL_IF_NULL(info, false);
 
   if (is_shutdown_.load()) {
     ADEBUG << "notifier is shutdown.";

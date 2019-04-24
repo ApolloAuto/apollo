@@ -79,9 +79,7 @@ bool Writer<MessageT>::Init() {
     transmitter_ =
         transport::Transport::Instance()->CreateTransmitter<MessageT>(
             role_attr_);
-    if (transmitter_ == nullptr) {
-      return false;
-    }
+    RETURN_VAL_IF_NULL(transmitter_, false);
     init_ = true;
   }
   this->role_attr_.set_id(transmitter_->id().HashValue());
@@ -169,9 +167,7 @@ bool Writer<MessageT>::HasReader() {
 
 template <typename MessageT>
 void Writer<MessageT>::GetReaders(std::vector<proto::RoleAttributes>* readers) {
-  if (readers == nullptr) {
-    return;
-  }
+  RETURN_IF_NULL(readers);
 
   if (!WriterBase::IsInit()) {
     return;
