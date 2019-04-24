@@ -341,7 +341,7 @@ bool LaneFollowStage::RetrieveLastFramePathProfile(
         << "Last frame doesn't succeed, fail to retrieve last frame path data";
     return false;
   }
-  const auto last_frame_trajectory_pb =
+  const auto& last_frame_trajectory_pb =
       ptr_last_frame->current_frame_planned_trajectory();
 
   DiscretizedPath last_frame_discretized_path;
