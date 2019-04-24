@@ -29,20 +29,11 @@ namespace camera {
 std::vector<cv::Scalar> colorlistobj = {
     cv::Scalar(0, 0, 255),     cv::Scalar(0, 100, 255),
     cv::Scalar(0, 200, 255),   cv::Scalar(100, 255, 255),
-    cv::Scalar(200, 255, 255), cv::Scalar(255, 100, 255),
+    cv::Scalar(127, 255, 255), cv::Scalar(255, 100, 255),
     cv::Scalar(255, 0, 255),   cv::Scalar(255, 255, 100),
     cv::Scalar(255, 255, 0),   cv::Scalar(255, 0, 100),
     cv::Scalar(255, 0, 0),     cv::Scalar(0, 255, 0),
     cv::Scalar(100, 255, 100)};
-
-std::vector<cv::Vec3b> colorlistlane = {
-    cv::Vec3b(0, 0, 255),     cv::Vec3b(0, 100, 255),
-    cv::Vec3b(0, 200, 255),   cv::Vec3b(100, 255, 255),
-    cv::Vec3b(200, 255, 255), cv::Vec3b(255, 100, 255),
-    cv::Vec3b(255, 0, 255),   cv::Vec3b(255, 255, 100),
-    cv::Vec3b(255, 255, 0),   cv::Vec3b(255, 0, 100),
-    cv::Vec3b(255, 0, 0),     cv::Vec3b(0, 255, 0),
-    cv::Vec3b(100, 255, 100)};
 
 std::map<base::LaneLinePositionType, cv::Scalar> colormapline = {
     {base::LaneLinePositionType::UNKNOWN, cv::Scalar(0, 0, 255)},
@@ -103,6 +94,8 @@ bool Visualizer::Init(const std::vector<std::string> &camera_names,
         cv::Mat(small_h_, small_w_, CV_8UC3, cv::Scalar(0, 0, 0));
   }
   world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
+  color_cipv_ = cv::Scalar(255, 255, 255);
+
   return true;
 }
 
@@ -783,8 +776,13 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     base::RectF rect(object->camera_supplement.box);
     cv::Rect r(static_cast<int>(rect.x), static_cast<int>(rect.y),
                static_cast<int>(rect.width), static_cast<int>(rect.height));
-    cv::rectangle(image, r,
-                  colorlistobj[object->track_id % colorlistobj.size()], 2);
+    cv::Scalar color;
+    if (object->b_cipv) {
+      color = color_cipv_;
+    } else {
+      color = colorlistobj[object->track_id % colorlistobj.size()];
+    }
+    cv::rectangle(image, r, color, 2);
     cv::putText(image, std::to_string(object->track_id),
                 cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y)),
                 cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 255), 2);
@@ -819,16 +817,16 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     p4 = rotate * p4 + pos_2d;
 
     cv::line(world_image_, world_point_to_bigimg(p1), world_point_to_bigimg(p2),
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+             color, 2);
     cv::line(world_image_, world_point_to_bigimg(p2), world_point_to_bigimg(p3),
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+             color, 2);
     cv::line(world_image_, world_point_to_bigimg(p3), world_point_to_bigimg(p4),
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+             color, 2);
     cv::line(world_image_, world_point_to_bigimg(p4), world_point_to_bigimg(p1),
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+             color, 2);
     cv::line(world_image_, world_point_to_bigimg(pos_2d),
              world_point_to_bigimg(v_2d),
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+             color, 2);
   }
   last_timestamp_ = frame.timestamp;
   camera_image_[frame.data_provider->sensor_name()] = image;
@@ -941,8 +939,13 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
     base::RectF rect(object->camera_supplement.box);
     cv::Rect r(static_cast<int>(rect.x), static_cast<int>(rect.y),
                static_cast<int>(rect.width), static_cast<int>(rect.height));
-    cv::rectangle(image_2D, r,
-                  colorlistobj[object->track_id % colorlistobj.size()], 2);
+    cv::Scalar color;
+    if (object->b_cipv) {
+      color = color_cipv_;
+    } else {
+      color = colorlistobj[object->track_id % colorlistobj.size()];
+    }
+    cv::rectangle(image_2D, r, color, 2);
     cv::putText(image_2D, std::to_string(object->track_id),
                 cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y)),
                 cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(0, 0, 255), 2);
@@ -1019,17 +1022,13 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
     p4_l << object->size[0] * 0.5, -object->size[1] * 0.5;
     p4_l = rotate_rz * p4_l + c_2D_l;
     cv::line(world_image_, world_point_to_bigimg(p1_l),
-             world_point_to_bigimg(p2_l),
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+             world_point_to_bigimg(p2_l), color, 2);
     cv::line(world_image_, world_point_to_bigimg(p2_l),
-             world_point_to_bigimg(p3_l),
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+             world_point_to_bigimg(p3_l), color, 2);
     cv::line(world_image_, world_point_to_bigimg(p3_l),
-             world_point_to_bigimg(p4_l),
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+             world_point_to_bigimg(p4_l), color, 2);
     cv::line(world_image_, world_point_to_bigimg(p4_l),
-             world_point_to_bigimg(p1_l),
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+             world_point_to_bigimg(p1_l), color, 2);
 
     // plot projected 3D box on image_3D
     for (uint i = 0; i < p.size(); i++) p[i] = intrinsic * p[i];
@@ -1040,29 +1039,18 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
       p_proj[i].y = static_cast<int>(p[i][1] / p[i][2]);
     }
 
-    cv::line(image_3D, p_proj[0], p_proj[1],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[1], p_proj[2],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[2], p_proj[3],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[3], p_proj[0],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[4], p_proj[5],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[5], p_proj[6],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[6], p_proj[7],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[7], p_proj[4],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[0], p_proj[4], cv::Scalar(255, 255, 255), 2);
-    cv::line(image_3D, p_proj[1], p_proj[5],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[2], p_proj[6],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
-    cv::line(image_3D, p_proj[3], p_proj[7],
-             colorlistobj[object->track_id % colorlistobj.size()], 2);
+    cv::line(image_3D, p_proj[0], p_proj[1], color, 2);
+    cv::line(image_3D, p_proj[1], p_proj[2], color, 2);
+    cv::line(image_3D, p_proj[2], p_proj[3], color, 2);
+    cv::line(image_3D, p_proj[3], p_proj[0], color, 2);
+    cv::line(image_3D, p_proj[4], p_proj[5], color, 2);
+    cv::line(image_3D, p_proj[5], p_proj[6], color, 2);
+    cv::line(image_3D, p_proj[6], p_proj[7], color, 2);
+    cv::line(image_3D, p_proj[7], p_proj[4], color, 2);
+    cv::line(image_3D, p_proj[0], p_proj[4], color, 2);
+    cv::line(image_3D, p_proj[1], p_proj[5], color, 2);
+    cv::line(image_3D, p_proj[2], p_proj[6], color, 2);
+    cv::line(image_3D, p_proj[3], p_proj[7], color, 2);
   }
 
   AINFO << "Drew object";
@@ -1116,6 +1104,16 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
               "velocity: " + std::to_string(motion_buffer->back().velocity),
               cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
+
+  for (const auto &object : frame.tracked_objects) {
+    if (object->b_cipv) {
+      line_pos += 50;
+      cv::putText(image,
+                  "CIPV: " + std::to_string(object->track_id),
+                  cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+                  cv::Scalar(0, 0, 255), 3);
+    }
+  }
 
   if (intrinsic_map_.find(camera_name) != intrinsic_map_.end() &&
       extrinsic_map_.find(camera_name) != extrinsic_map_.end()) {
