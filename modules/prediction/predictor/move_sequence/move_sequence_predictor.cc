@@ -97,10 +97,9 @@ void MoveSequencePredictor::Predict(Obstacle* obstacle) {
 
     Trajectory trajectory = GenerateTrajectory(points);
     trajectory.set_probability(sequence.probability());
-    trajectories_.push_back(std::move(trajectory));
+    obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+        trajectory);
   }
-  ADEBUG << "Obstacle [" << obstacle->id() << "] has total "
-         << trajectories_.size() << " trajectories.";
 }
 
 /**

@@ -249,7 +249,8 @@ void PredictorManager::PredictObstacle(
       CHECK_NOTNULL(adc_trajectory_container);
       predictor->TrimTrajectories(obstacle, adc_trajectory_container);
     }
-    for (const auto& trajectory : predictor->trajectories()) {
+    for (const auto& trajectory :
+         obstacle->latest_feature().predicted_trajectory()) {
       prediction_obstacle->add_trajectory()->CopyFrom(trajectory);
     }
   }
