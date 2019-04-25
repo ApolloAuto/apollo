@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 
+#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/predictor/predictor.h"
 #include "modules/prediction/proto/prediction_conf.pb.h"
 
@@ -93,6 +94,14 @@ class PredictorManager {
    * @brief Register all predictors
    */
   void RegisterPredictors();
+
+  void PredictObstacles(
+      ObstaclesContainer* obstacles_container,
+      ADCTrajectoryContainer* adc_trajectory_container);
+
+  void PredictObstaclesInParallel(
+      ObstaclesContainer* obstacles_container,
+      ADCTrajectoryContainer* adc_trajectory_container);
 
  private:
   std::map<ObstacleConf::PredictorType, std::unique_ptr<Predictor>> predictors_;
