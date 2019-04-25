@@ -117,7 +117,7 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
                      &points);
       Trajectory trajectory = GenerateTrajectory(points);
       obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
-        trajectory);
+          trajectory);
     }
   } else {
     const LaneSequence& sequence = lane_graph->lane_sequence(best_seq_idx);

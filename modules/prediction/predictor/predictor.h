@@ -56,7 +56,7 @@ class Predictor {
    * @brief Get trajectory size
    * @return Size of trajectories
    */
-  int NumOfTrajectories(const Obstacle* obstacle);
+  int NumOfTrajectories(const Obstacle& obstacle);
 
   /**
    * @brief Clear all trajectories
@@ -69,7 +69,7 @@ class Predictor {
    * @param obstacle,
    */
   void TrimTrajectories(
-      const ADCTrajectoryContainer* adc_trajectory_container,
+      const ADCTrajectoryContainer& adc_trajectory_container,
       Obstacle* obstacle);
 
  protected:
@@ -99,7 +99,7 @@ class Predictor {
    * @return If the prediction trajectory is trimed
    */
   bool TrimTrajectory(
-      const ADCTrajectoryContainer* adc_trajectory_container,
+      const ADCTrajectoryContainer& adc_trajectory_container,
       Obstacle* obstacle, Trajectory* trajectory);
 
   /**
