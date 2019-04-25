@@ -4,7 +4,8 @@ package apollo.planning;
 
 message PiecewiseJerkSpeedConfig {
   optional double s_weight = 1 [default = 1.0];
-  optional double ds_weight = 2 [default = 100.0];
-  optional double dds_weight = 3 [default = 1000.0];
-  optional double ddds_weight = 4 [default = 10000.0];
+  optional double ds_weight = 2 [default = 10.0];
+  optional double dds_weight = 3 [default = 10.0];
+  optional double ddds_weight = 4 [default = 100.0];
+  optional double ref_weight = 5 [default = 100.0];
 }
