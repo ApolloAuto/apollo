@@ -227,8 +227,8 @@ bool SocketInput::InputAvailable(int timeout) {
     int ret = poll(fds, 1, POLL_TIMEOUT);
     if (ret < 0) {
       if (errno != EINTR) {
-        AERROR << "H265 camera port: " << port_ << "poll() error: "
-               << strerror(errno);
+        AERROR << "H265 camera port: " << port_
+               << "poll() error: " << strerror(errno);
       }
       return false;
     }

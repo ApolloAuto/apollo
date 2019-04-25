@@ -492,18 +492,21 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
                               adc_frenet_ld_ * adc_frenet_ld_ /
                               kMaxLateralAccelerations / 2.0;
 
-    double curr_left_bound_lane = curr_lane_left_width +
-        (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW ?
-         curr_neighbor_lane_width : 0.0);
+    double curr_left_bound_lane =
+        curr_lane_left_width + (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW
+                                    ? curr_neighbor_lane_width
+                                    : 0.0);
     double curr_left_bound_adc =
         std::fmax(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) +
         GetBufferBetweenADCCenterAndEdge() + ADC_buffer;
     double curr_left_bound =
         std::fmax(curr_left_bound_lane, curr_left_bound_adc);
 
-    double curr_right_bound_lane = -curr_lane_right_width -
-        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW ?
-         curr_neighbor_lane_width : 0.0);
+    double curr_right_bound_lane =
+        -curr_lane_right_width -
+        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW
+             ? curr_neighbor_lane_width
+             : 0.0);
     double curr_right_bound_adc =
         std::fmin(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) -
         GetBufferBetweenADCCenterAndEdge() - ADC_buffer;

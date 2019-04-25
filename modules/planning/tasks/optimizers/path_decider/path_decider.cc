@@ -175,7 +175,7 @@ bool PathDecider::MakeStaticObstacleDecision(
     } else if (FLAGS_enable_nudge_decision) {
       // 3. NUDGE if laterally very close.
       if (sl_boundary.end_l() < curr_l - min_nudge_l) {  // &&
-          // sl_boundary.end_l() > curr_l - min_nudge_l - 0.3) {
+        // sl_boundary.end_l() > curr_l - min_nudge_l - 0.3) {
         // LEFT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
@@ -183,7 +183,7 @@ bool PathDecider::MakeStaticObstacleDecision(
         path_decision->AddLateralDecision("PathDecider/left-nudge",
                                           obstacle->Id(), object_decision);
       } else if (sl_boundary.start_l() > curr_l + min_nudge_l) {  // &&
-                 // sl_boundary.start_l() < curr_l + min_nudge_l + 0.3) {
+        // sl_boundary.start_l() < curr_l + min_nudge_l + 0.3) {
         // RIGHT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);

@@ -35,11 +35,11 @@ class ZhongyunVehicleFactoryTest : public ::testing::Test {
 };
 
 TEST_F(ZhongyunVehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(zhongyun_factory_.CreateVehicleController() != nullptr);
+  EXPECT_NE(zhongyun_factory_.CreateVehicleController(), nullptr);
 }
 
 TEST_F(ZhongyunVehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(zhongyun_factory_.CreateMessageManager() != nullptr);
+  EXPECT_NE(zhongyun_factory_.CreateMessageManager(), nullptr);
 }
 
 }  // namespace canbus
