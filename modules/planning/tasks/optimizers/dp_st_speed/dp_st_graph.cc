@@ -109,7 +109,7 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
     for (int i = 0; i <= dp_st_speed_config_.matrix_dimension_t(); ++i) {
       SpeedPoint speed_point;
       speed_point.set_s(i * unit_t_ * v_default);
-      speed_point.set_t(unit_t_);
+      speed_point.set_t(i * unit_t_);
       speed_point.set_v(v_default);
       speed_point.set_a(0.0);
       speed_profile.emplace_back(std::move(speed_point));
