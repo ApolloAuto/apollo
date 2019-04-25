@@ -234,10 +234,8 @@ math::Vec2d VehicleStateProvider::EstimateFuturePosition(const double t) const {
 math::Vec2d VehicleStateProvider::ComputeCOMPosition(
     const double rear_to_com_distance) const {
   // set length as distance between rear wheel and center of mass.
-  // TODO(Yu): the vehicle state transformation will be synconized with
-  // the planning reference transformation
   Eigen::Vector3d v;
-  if (FLAGS_reverse_localization_transform &&
+  if (!FLAGS_coordinate_transform_to_com &&
       vehicle_state_.gear() == canbus::Chassis::GEAR_REVERSE) {
     v << 0.0, 0.0, 0.0;
   } else {

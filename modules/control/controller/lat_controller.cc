@@ -355,6 +355,10 @@ Status LatController::ComputeControlCommand(
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(&target_tracking_trajectory));
 
+  if ((vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE)) {
+    trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
+  }
+
   UpdateDrivingOrientation();
 
   SimpleLateralDebug *debug = cmd->mutable_debug()->mutable_simple_lat_debug();
@@ -484,7 +488,7 @@ Status LatController::ComputeControlCommand(
 
   ProcessLogs(debug, chassis);
   return Status::OK();
-}
+}  // namespace control
 
 Status LatController::Reset() { return Status::OK(); }
 
@@ -671,5 +675,6 @@ void LatController::UpdateDrivingOrientation() {
     }
   }
 }
+
 }  // namespace control
 }  // namespace apollo

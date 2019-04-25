@@ -16,10 +16,13 @@
 
 #include "modules/control/common/trajectory_analyzer.h"
 
+#include <cmath>
+
 #include "cyber/common/log.h"
 #include "gtest/gtest.h"
 #include "modules/common/time/time.h"
 
+namespace math = apollo::common::math;
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 using apollo::common::time::Clock;
