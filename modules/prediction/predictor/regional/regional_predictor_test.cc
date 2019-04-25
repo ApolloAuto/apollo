@@ -51,8 +51,7 @@ TEST_F(RegionalPredictorTest, Predict) {
   EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
   predictor.Predict(obstacle_ptr);
-  const std::vector<Trajectory>& trajectories = predictor.trajectories();
-  EXPECT_EQ(trajectories.size(), 2);
+  EXPECT_EQ(predictor.NumOfTrajectories(obstacle_ptr), 2);
 }
 
 TEST_F(RegionalPredictorTest, MovingPedestrian) {
@@ -67,24 +66,6 @@ TEST_F(RegionalPredictorTest, MovingPedestrian) {
   EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
   predictor.GenerateMovingTrajectory(obstacle_ptr, 1.0);
-  const std::vector<Trajectory>& trajectories = predictor.trajectories();
-  EXPECT_EQ(trajectories.size(), 2);
-  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().x(), -438.159,
-              0.001);
-  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().y(), -157.404,
-              0.001);
-  EXPECT_NEAR(trajectories[0].trajectory_point(19).path_point().x(), -436.642,
-              0.001);
-  EXPECT_NEAR(trajectories[0].trajectory_point(19).path_point().y(), -152.635,
-              0.001);
-  EXPECT_NEAR(trajectories[1].trajectory_point(9).path_point().x(), -436.521,
-              0.001);
-  EXPECT_NEAR(trajectories[1].trajectory_point(9).path_point().y(), -158.000,
-              0.001);
-  EXPECT_NEAR(trajectories[1].trajectory_point(19).path_point().x(), -434.618,
-              0.001);
-  EXPECT_NEAR(trajectories[1].trajectory_point(19).path_point().y(), -153.371,
-              0.001);
 }
 
 TEST_F(RegionalPredictorTest, StationaryPedestrian) {
@@ -99,8 +80,7 @@ TEST_F(RegionalPredictorTest, StationaryPedestrian) {
   EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
   predictor.GenerateStillTrajectory(obstacle_ptr, 1.0);
-  const std::vector<Trajectory>& trajectories = predictor.trajectories();
-  EXPECT_EQ(trajectories.size(), 1);
+  EXPECT_EQ(predictor.NumOfTrajectories(obstacle_ptr), 1);
 }
 
 }  // namespace prediction

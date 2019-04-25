@@ -64,7 +64,12 @@ message ObstaclePriority {
   optional Priority priority = 25 [default = NORMAL];
 }
 
-// next id = 33
+message Trajectory {
+  optional double probability = 1;  // probability of this trajectory
+  repeated apollo.common.TrajectoryPoint trajectory_point = 2;
+}
+
+// next id = 34
 message Feature {
   // Obstacle ID
   optional int32 id = 1;
@@ -111,6 +116,9 @@ message Feature {
 
   // Obstacle short-term predicted trajectory points
   repeated common.TrajectoryPoint short_term_predicted_trajectory_points = 32;
+
+  // Obstacle predicted trajectories
+  repeated Trajectory predicted_trajectory = 33;
 }
 
 message ObstacleHistory {
