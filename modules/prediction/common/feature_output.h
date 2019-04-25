@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "modules/prediction/proto/offline_features.pb.h"
+#include "modules/prediction/proto/prediction_obstacle.pb.h"
 
 namespace apollo {
 namespace prediction {

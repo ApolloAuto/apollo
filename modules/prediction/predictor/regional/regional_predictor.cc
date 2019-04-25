@@ -81,14 +81,14 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
     speed = feature.speed();
   }
   if (speed > FLAGS_still_speed) {
-    GenerateMovingTrajectory(obstacle, 1.0);
+    GenerateMovingTrajectory(1.0, obstacle);
   } else {
-    GenerateStillTrajectory(obstacle, 1.0);
+    GenerateStillTrajectory(1.0, obstacle);
   }
 }
 
-void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle,
-                                                double probability) {
+void RegionalPredictor::GenerateStillTrajectory(
+    double probability, Obstacle* obstacle) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
     return;
@@ -103,17 +103,18 @@ void RegionalPredictor::GenerateStillTrajectory(const Obstacle* obstacle,
   Eigen::Vector2d position(feature.position().x(), feature.position().y());
   double heading = feature.velocity_heading();
   const double total_time = FLAGS_prediction_trajectory_time_length;
-  size_t start_index = NumOfTrajectories();
+  int start_index = NumOfTrajectories(*obstacle);
 
   std::vector<TrajectoryPoint> points;
   DrawStillTrajectory(position, heading, 0.0, total_time, &points);
   Trajectory trajectory = GenerateTrajectory(points);
-  trajectories_.push_back(std::move(trajectory));
-  SetEqualProbability(probability, start_index);
+  obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+        trajectory);
+  SetEqualProbability(probability, start_index, obstacle);
 }
 
-void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
-                                                 double probability) {
+void RegionalPredictor::GenerateMovingTrajectory(
+    double probability, Obstacle* obstacle) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
     return;
@@ -137,13 +138,15 @@ void RegionalPredictor::GenerateMovingTrajectory(const Obstacle* obstacle,
   DrawMovingTrajectory(position, velocity, acc,
                        obstacle->kf_pedestrian_tracker(), total_time,
                        &left_points, &right_points);
-  size_t start_index = NumOfTrajectories();
+  int start_index = NumOfTrajectories(*obstacle);
 
   Trajectory left_trajectory = GenerateTrajectory(left_points);
   Trajectory right_trajectory = GenerateTrajectory(right_points);
-  trajectories_.push_back(std::move(left_trajectory));
-  trajectories_.push_back(std::move(right_trajectory));
-  SetEqualProbability(probability, start_index);
+  obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+      left_trajectory);
+  obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+      right_trajectory);
+  SetEqualProbability(probability, start_index, obstacle);
 }
 
 void RegionalPredictor::DrawStillTrajectory(

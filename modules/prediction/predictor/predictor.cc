@@ -26,11 +26,10 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
-const std::vector<Trajectory>& Predictor::trajectories() {
-  return trajectories_;
+int Predictor::NumOfTrajectories(const Obstacle& obstacle) {
+  CHECK_GT(obstacle.history_size(), 0);
+  return obstacle.latest_feature().predicted_trajectory_size();
 }
-
-size_t Predictor::NumOfTrajectories() { return trajectories_.size(); }
 
 Trajectory Predictor::GenerateTrajectory(
     const std::vector<TrajectoryPoint>& points) {
@@ -40,31 +39,34 @@ Trajectory Predictor::GenerateTrajectory(
 }
 
 void Predictor::SetEqualProbability(const double total_probability,
-                                    const size_t start_index) {
-  size_t num = NumOfTrajectories();
+                                    const int start_index,
+                                    Obstacle* obstacle_ptr) {
+  int num = NumOfTrajectories(*obstacle_ptr);
   CHECK(num > start_index);
 
   const auto prob = total_probability / static_cast<double>(num - start_index);
-  for (size_t i = start_index; i < num; ++i) {
-    trajectories_[i].set_probability(prob);
+  for (int i = start_index; i < num; ++i) {
+    obstacle_ptr->mutable_latest_feature()
+                ->mutable_predicted_trajectory(i)
+                ->set_probability(prob);
   }
 }
 
-void Predictor::Clear() { trajectories_.clear(); }
+void Predictor::Clear() {}
 
 void Predictor::TrimTrajectories(
-    const Obstacle* obstacle,
-    const ADCTrajectoryContainer* adc_trajectory_container) {
-  for (auto& trajectory : trajectories_) {
-    TrimTrajectory(obstacle, adc_trajectory_container, &trajectory);
+    const ADCTrajectoryContainer& adc_trajectory_container,
+    Obstacle* obstacle) {
+  for (auto& predicted_trajectory :
+       *obstacle->mutable_latest_feature()->mutable_predicted_trajectory()) {
+    TrimTrajectory(adc_trajectory_container, obstacle, &predicted_trajectory);
   }
 }
 
 bool Predictor::TrimTrajectory(
-    const Obstacle* obstacle,
-    const ADCTrajectoryContainer* adc_trajectory_container,
-    Trajectory* trajectory) {
-  if (!adc_trajectory_container->IsProtected()) {
+    const ADCTrajectoryContainer& adc_trajectory_container,
+    Obstacle* obstacle, Trajectory* trajectory) {
+  if (!adc_trajectory_container.IsProtected()) {
     ADEBUG << "Not in protection mode.";
     return false;
   }
@@ -90,11 +92,11 @@ bool Predictor::TrimTrajectory(
   front_point.set_x(front_x);
   front_point.set_y(front_y);
   bool front_in_junction =
-      adc_trajectory_container->IsPointInJunction(front_point);
+      adc_trajectory_container.IsPointInJunction(front_point);
 
   const PathPoint& start_point = trajectory->trajectory_point(0).path_point();
   bool start_in_junction =
-      adc_trajectory_container->IsPointInJunction(start_point);
+      adc_trajectory_container.IsPointInJunction(start_point);
 
   if (front_in_junction || start_in_junction) {
     return false;
@@ -103,7 +105,7 @@ bool Predictor::TrimTrajectory(
   int index = 0;
   while (index < num_of_point) {
     const PathPoint& point = trajectory->trajectory_point(index).path_point();
-    if (adc_trajectory_container->IsPointInJunction(point)) {
+    if (adc_trajectory_container.IsPointInJunction(point)) {
       break;
     }
     ++index;

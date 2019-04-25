@@ -116,7 +116,8 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
                      FLAGS_prediction_trajectory_time_resolution,
                      &points);
       Trajectory trajectory = GenerateTrajectory(points);
-      trajectories_.push_back(std::move(trajectory));
+      obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+          trajectory);
     }
   } else {
     const LaneSequence& sequence = lane_graph->lane_sequence(best_seq_idx);
@@ -133,7 +134,8 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
                    FLAGS_prediction_trajectory_time_resolution,
                    &points);
     Trajectory trajectory = GenerateTrajectory(points);
-    trajectories_.push_back(std::move(trajectory));
+    obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+        trajectory);
   }
 }
 
