@@ -49,7 +49,9 @@ common::Status PiecewiseJerkPathOptimizer::Process(
 
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
   std::array<double, 5> w = {piecewise_jerk_path_config.l_weight(),
-                             piecewise_jerk_path_config.dl_weight(),
+                             piecewise_jerk_path_config.dl_weight() *
+                             init_frenet_state.first[1] *
+                             init_frenet_state.first[1],
                              piecewise_jerk_path_config.ddl_weight(),
                              piecewise_jerk_path_config.dddl_weight(), 0.0};
 
