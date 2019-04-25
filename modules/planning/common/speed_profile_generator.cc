@@ -146,8 +146,8 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   path_time_qp->InitProblem(num_of_knots, delta_t, w, init_s, end_s);
 
   path_time_qp->SetZeroOrderBounds(0.0, std::fmax(stop_distance, 100.0));
-  path_time_qp->SetFirstOrderBounds(0.0,
-      std::fmax(FLAGS_planning_upper_speed_limit, init_v));
+  path_time_qp->SetFirstOrderBounds(
+      0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_v));
   path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
   // TODO(Hongyi): Set back to vehicle_params when ready

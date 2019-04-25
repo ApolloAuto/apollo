@@ -91,8 +91,8 @@ Status PiecewiseJerkSpeedOptimizer::Process(
 
   path_time_qp->SetZeroOrderBounds(0.0, total_length);
   path_time_qp->SetFirstOrderBounds(0.0,
-      std::fmax(FLAGS_planning_upper_speed_limit,
-                st_graph_data.init_point().v()));
+                                    std::fmax(FLAGS_planning_upper_speed_limit,
+                                              st_graph_data.init_point().v()));
   path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
   path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);

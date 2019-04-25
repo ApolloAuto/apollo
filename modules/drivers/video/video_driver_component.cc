@@ -82,7 +82,7 @@ void CompCameraH265Compressed::VideoPoll() {
       continue;
     }
     pb_image_->mutable_header()->set_timestamp_sec(
-          cyber::Time::Now().ToSecond());
+        cyber::Time::Now().ToSecond());
     AINFO << "Send compressed image.";
     writer_->Write(pb_image_);
 

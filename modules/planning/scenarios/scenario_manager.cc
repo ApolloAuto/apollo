@@ -27,8 +27,8 @@
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
-#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
+#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
@@ -157,8 +157,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
 ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
     const Frame& frame) {
   const auto& scenario_config =
-      config_map_[ScenarioConfig::PULL_OVER]
-          .pull_over_config();
+      config_map_[ScenarioConfig::PULL_OVER].pull_over_config();
 
   const auto& routing = frame.local_view().routing;
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
@@ -172,12 +171,12 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
 
   const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
   ADEBUG << "adc_distance_to_dest[" << adc_distance_to_dest
-         << "] destination_s[" << dest_sl.s()
-         << "] adc_front_edge_s[" << adc_front_edge_s << "]";
+         << "] destination_s[" << dest_sl.s() << "] adc_front_edge_s["
+         << adc_front_edge_s << "]";
 
   const bool pull_over_scenario =
       (adc_distance_to_dest > 0 &&
-          adc_distance_to_dest <=
+       adc_distance_to_dest <=
            scenario_config.start_pull_over_scenario_distance());
 
   switch (current_scenario_->scenario_type()) {

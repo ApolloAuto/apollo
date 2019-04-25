@@ -56,7 +56,7 @@ TEST_F(ZhongyunMessageManagerTest, GetSendProtocols) {
 TEST_F(ZhongyunMessageManagerTest, GetRecvProtocols) {
   EXPECT_TRUE(manager_.GetMutableProtocolDataById(Enablestatefeedbackc3::ID) !=
               nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Errorstatee1::ID) != nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Errorstatee1::ID), nullptr);
   EXPECT_TRUE(manager_.GetMutableProtocolDataById(
                   Vehiclestatefeedback2c4::ID) != nullptr);
   EXPECT_TRUE(manager_.GetMutableProtocolDataById(Vehiclestatefeedbackc1::ID) !=

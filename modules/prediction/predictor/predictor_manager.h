@@ -95,9 +95,8 @@ class PredictorManager {
    */
   void RegisterPredictors();
 
-  void PredictObstacles(
-      ObstaclesContainer* obstacles_container,
-      ADCTrajectoryContainer* adc_trajectory_container);
+  void PredictObstacles(ObstaclesContainer* obstacles_container,
+                        ADCTrajectoryContainer* adc_trajectory_container);
 
   void PredictObstaclesInParallel(
       ObstaclesContainer* obstacles_container,

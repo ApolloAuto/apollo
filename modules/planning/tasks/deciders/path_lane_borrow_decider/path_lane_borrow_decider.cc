@@ -144,8 +144,8 @@ bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
   for (const auto& overlap : first_encountered_overlaps) {
     ADEBUG << overlap.first << ", " << overlap.second.DebugString();
     // if (// overlap.first != ReferenceLineInfo::CLEAR_AREA &&
-        // overlap.first != ReferenceLineInfo::CROSSWALK &&
-        // overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
+    // overlap.first != ReferenceLineInfo::CROSSWALK &&
+    // overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
     if (overlap.first != ReferenceLineInfo::SIGNAL &&
         overlap.first != ReferenceLineInfo::STOP_SIGN) {
       continue;
