@@ -59,6 +59,8 @@ Status SpeedBoundsDecider::Process(
   const ReferenceLine &reference_line = reference_line_info->reference_line();
   PathDecision *const path_decision = reference_line_info->path_decision();
 
+  AddPathEndStop(frame, reference_line_info);
+
   // 1. Rule_based speed planning configurations for different traffic scenarios
   if (FLAGS_enable_nonscenario_side_pass) {
     StopOnSidePass(frame, reference_line_info);
@@ -183,6 +185,16 @@ void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
           frame, &reference_line_info);
     }
   }
+}
+
+void SpeedBoundsDecider::AddPathEndStop(
+    Frame* const frame, ReferenceLineInfo* const reference_line_info) {
+  const std::string stop_wall_id = "path_end_stop";
+  std::vector<std::string> wait_for_obstacles;
+  DeciderRuleBasedStop::BuildStopDecision(stop_wall_id,
+      reference_line_info->path_data().frenet_frame_path().back().s() - 5.0,
+      0.0, StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY, wait_for_obstacles,
+      frame, reference_line_info);
 }
 
 double SpeedBoundsDecider::SetSpeedFallbackDistance(

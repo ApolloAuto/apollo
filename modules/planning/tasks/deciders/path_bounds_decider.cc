@@ -461,6 +461,11 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
     double curr_right_bound =
         std::fmin(curr_right_bound_lane, curr_right_bound_adc) - offset_to_map;
 
+    ADEBUG << "At s = " << curr_s
+           << ", left_lane_bound = " << curr_lane_left_width
+           << ", right_lane_bound = " << curr_lane_right_width
+           << ", offset = " << offset_to_map;
+
     // 4. Update the boundary.
     double dummy = 0.0;
     if (!UpdatePathBoundaryAndCenterLine(i, curr_left_bound, curr_right_bound,
@@ -607,7 +612,6 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
             std::get<2>((*path_boundaries)[i])) {
           ADEBUG << "Path is blocked at s = " << curr_s;
           path_blocked_idx = static_cast<int>(i);
-          // Currently, no side-pass when blocked.
           break;
         } else {
           center_line = (std::get<1>((*path_boundaries)[i]) +
@@ -629,7 +633,9 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
           std::get<2>((*path_boundaries)[i])) {
         ADEBUG << "Path is blocked at s = " << curr_s;
         path_blocked_idx = static_cast<int>(i);
-        // Currently, no side-pass when blocked.
+        if (!obs_id_to_direction.empty()) {
+          *blocking_obstacle_id = obs_id_to_direction.begin()->first;
+        }
       } else {
         center_line = (std::get<1>((*path_boundaries)[i]) +
                        std::get<2>((*path_boundaries)[i])) /
