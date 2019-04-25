@@ -23,6 +23,7 @@ cc_library(
         "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
+        "//modules/prediction/proto:prediction_proto",
     ],
 )
 
