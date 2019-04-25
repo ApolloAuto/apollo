@@ -57,10 +57,9 @@ void Predictor::Clear() {}
 void Predictor::TrimTrajectories(
     const ADCTrajectoryContainer& adc_trajectory_container,
     Obstacle* obstacle) {
-  for (int i = 0; i < obstacle->latest_feature().predicted_trajectory_size();
-       ++i) {
-    TrimTrajectory(adc_trajectory_container, obstacle,
-        obstacle->mutable_latest_feature()->mutable_predicted_trajectory(i));
+  for (auto& predicted_trajectory :
+       *obstacle->mutable_latest_feature()->mutable_predicted_trajectory()) {
+    TrimTrajectory(adc_trajectory_container, obstacle, &predicted_trajectory);
   }
 }
 
