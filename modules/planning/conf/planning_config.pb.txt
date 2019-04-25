@@ -32,7 +32,7 @@ default_task_config: {
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
   piecewise_jerk_path_config {
     l_weight: 1.0
-    dl_weight: 50.0
+    dl_weight: 10.0
     ddl_weight: 1000.0
     dddl_weight: 10000.0
   }
