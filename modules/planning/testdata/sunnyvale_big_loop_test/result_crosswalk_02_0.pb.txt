@@ -27,11 +27,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.233675317
-            y: 4141284.4917570944
+            x: 586260.28669805115
+            y: 4141284.2730941377
             z: 0
           }
-          fence_heading: -1.3577543487779731
+          fence_heading: -1.3411720959052336
         }
       }
     }
@@ -90,6 +90,22 @@ decision {
             z: 0
           }
           stop_heading: -1.7940405570566935
+        }
+      }
+    }
+    decision {
+      id: "path_end_stop"
+      perception_id: -439803322
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_LANE_CHANGE_URGENCY
+          distance_s: -0
+          stop_point {
+            x: 586319.25083013822
+            y: 4141256.0151918083
+            z: 0
+          }
+          stop_heading: -0.26375000438314766
         }
       }
     }
