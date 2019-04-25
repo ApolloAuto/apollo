@@ -191,10 +191,12 @@ void SpeedBoundsDecider::AddPathEndStop(
     Frame* const frame, ReferenceLineInfo* const reference_line_info) {
   const std::string stop_wall_id = "path_end_stop";
   std::vector<std::string> wait_for_obstacles;
-  DeciderRuleBasedStop::BuildStopDecision(stop_wall_id,
-      reference_line_info->path_data().frenet_frame_path().back().s() - 5.0,
-      0.0, StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY, wait_for_obstacles,
-      frame, reference_line_info);
+  if (!reference_line_info->path_data().path_label().empty()) {
+    DeciderRuleBasedStop::BuildStopDecision(stop_wall_id,
+        reference_line_info->path_data().frenet_frame_path().back().s() - 5.0,
+        0.0, StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY,
+        wait_for_obstacles, frame, reference_line_info);
+  }
 }
 
 double SpeedBoundsDecider::SetSpeedFallbackDistance(
