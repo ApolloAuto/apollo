@@ -65,7 +65,7 @@ TEST_F(RegionalPredictorTest, MovingPedestrian) {
   Obstacle* obstacle_ptr = container.GetObstacle(101);
   EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
-  predictor.GenerateMovingTrajectory(obstacle_ptr, 1.0);
+  predictor.GenerateMovingTrajectory(1.0, obstacle_ptr);
 }
 
 TEST_F(RegionalPredictorTest, StationaryPedestrian) {
@@ -79,7 +79,7 @@ TEST_F(RegionalPredictorTest, StationaryPedestrian) {
   Obstacle* obstacle_ptr = container.GetObstacle(102);
   EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
-  predictor.GenerateStillTrajectory(obstacle_ptr, 1.0);
+  predictor.GenerateStillTrajectory(1.0, obstacle_ptr);
   EXPECT_EQ(predictor.NumOfTrajectories(obstacle_ptr), 1);
 }
 

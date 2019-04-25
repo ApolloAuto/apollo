@@ -55,19 +55,18 @@ void Predictor::SetEqualProbability(const double total_probability,
 void Predictor::Clear() {}
 
 void Predictor::TrimTrajectories(
-    Obstacle* obstacle,
-    const ADCTrajectoryContainer* adc_trajectory_container) {
+    const ADCTrajectoryContainer* adc_trajectory_container,
+    Obstacle* obstacle) {
   for (int i = 0; i < obstacle->latest_feature().predicted_trajectory_size();
        ++i) {
-    TrimTrajectory(obstacle, adc_trajectory_container,
+    TrimTrajectory(adc_trajectory_container, obstacle,
         obstacle->mutable_latest_feature()->mutable_predicted_trajectory(i));
   }
 }
 
 bool Predictor::TrimTrajectory(
-    Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container,
-    Trajectory* trajectory) {
+    Obstacle* obstacle, Trajectory* trajectory) {
   if (!adc_trajectory_container->IsProtected()) {
     ADEBUG << "Not in protection mode.";
     return false;
