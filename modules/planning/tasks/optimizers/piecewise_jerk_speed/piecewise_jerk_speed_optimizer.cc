@@ -92,7 +92,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
   // TODO(Hongyi): tune the params and move to a config
   path_time_qp->SetSecondOrderBounds(-4.4, 2.0);
-  path_time_qp->SetDesireDerivative(10.0);  // default speed to be 10.0
+  path_time_qp->SetDesireDerivative(FLAGS_default_cruise_speed);
 
   // Update STBoundary
   std::vector<std::tuple<double, double, double>> x_bounds;
