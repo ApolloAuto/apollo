@@ -20,7 +20,6 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
-#include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/predictor/extrapolation/extrapolation_predictor.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
 #include "modules/prediction/predictor/interaction/interaction_predictor.h"
@@ -142,6 +141,17 @@ void PredictorManager::Run() {
           AdapterConfig::PLANNING_TRAJECTORY);
 
   CHECK_NOTNULL(obstacles_container);
+
+  if (FLAGS_enable_multi_thread) {
+    PredictObstaclesInParallel(obstacles_container, adc_trajectory_container);
+  } else {
+    PredictObstacles(obstacles_container, adc_trajectory_container);
+  }
+}
+
+void PredictorManager::PredictObstacles(
+    ObstaclesContainer* obstacles_container,
+    ADCTrajectoryContainer* adc_trajectory_container) {
   for (const int id : obstacles_container->curr_frame_obstacle_ids()) {
     if (id < 0) {
       ADEBUG << "The obstacle has invalid id [" << id << "].";
@@ -170,6 +180,12 @@ void PredictorManager::Run() {
     prediction_obstacles_.add_prediction_obstacle()->CopyFrom(
         prediction_obstacle);
   }
+}
+
+void PredictorManager::PredictObstaclesInParallel(
+    ObstaclesContainer* obstacles_container,
+    ADCTrajectoryContainer* adc_trajectory_container) {
+  // TODO(kechxu) implement
 }
 
 void PredictorManager::PredictObstacle(
