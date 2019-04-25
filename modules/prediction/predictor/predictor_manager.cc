@@ -19,6 +19,7 @@
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/common/prediction_thread_pool.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/predictor/extrapolation/extrapolation_predictor.h"
 #include "modules/prediction/predictor/free_move/free_move_predictor.h"
@@ -34,6 +35,32 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
+using IdObstacleMap = std::map<int, std::list<Obstacle*>>;
+
+namespace {
+
+void GroupObstaclesByObstacleId(const int obstacle_id,
+                                ObstaclesContainer* const obstacles_container,
+                                IdObstacleMap* const id_obstacle_map) {
+  Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
+  if (obstacle_ptr == nullptr) {
+    AERROR << "Null obstacle [" << obstacle_id << "] found";
+    return;
+  }
+  if (obstacle_ptr->IsStill()) {
+    ADEBUG << "Ignore still obstacle [" << obstacle_id << "]";
+    return;
+  }
+  const Feature& feature = obstacle_ptr->latest_feature();
+  if (feature.priority().priority() == ObstaclePriority::IGNORE) {
+    ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
+    return;
+  }
+  int id_mod = obstacle_id % FLAGS_max_thread_num;
+  (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
+}
+
+}  // namespace
 
 PredictorManager::PredictorManager() { RegisterPredictors(); }
 
@@ -186,6 +213,23 @@ void PredictorManager::PredictObstaclesInParallel(
     ObstaclesContainer* obstacles_container,
     ADCTrajectoryContainer* adc_trajectory_container) {
   // TODO(kechxu) implement
+  IdObstacleMap id_obstacle_map;
+  for (int id : obstacles_container->curr_frame_obstacle_ids()) {
+    Obstacle* obstacle = obstacles_container->GetObstacle(id);
+    if (obstacle == nullptr) {
+      // TODO(kechxu) set is_static = true
+    } else {
+      GroupObstaclesByObstacleId(id, obstacles_container, &id_obstacle_map);
+    }
+  }
+  PredictionThreadPool::ForEach(id_obstacle_map.begin(), id_obstacle_map.end(),
+      [=](IdObstacleMap::iterator::value_type& obstacles_iter) {
+        for (auto obstacle_ptr : obstacles_iter.second) {
+          PredictionObstacle prediction_obstacle;
+          PredictObstacle(obstacle_ptr, &prediction_obstacle,
+                          adc_trajectory_container);
+        }
+      });
 }
 
 void PredictorManager::PredictObstacle(
