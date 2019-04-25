@@ -51,7 +51,7 @@ TEST_F(MoveSequencePredictorTest, OnLaneCase) {
   mlp_evaluator.Evaluate(obstacle_ptr);
   MoveSequencePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(obstacle_ptr), 1);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 
 TEST_F(MoveSequencePredictorTest, Polynomial) {

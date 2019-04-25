@@ -58,7 +58,7 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
 
   Trajectory trajectory = GenerateTrajectory(points);
   obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
-        trajectory);
+      trajectory);
   SetEqualProbability(1.0, 0, obstacle);
 }
 

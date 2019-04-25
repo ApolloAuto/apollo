@@ -35,7 +35,7 @@ void ExtrapolationPredictor::Predict(Obstacle* obstacle) {
   DrawShortTermTrajectory(feature, &trajectory_points);
   Trajectory trajectory = GenerateTrajectory(trajectory_points);
   obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
-        trajectory);
+      trajectory);
 }
 
 void ExtrapolationPredictor::DrawShortTermTrajectory(

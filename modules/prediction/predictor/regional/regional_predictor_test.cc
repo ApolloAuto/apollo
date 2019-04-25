@@ -51,7 +51,7 @@ TEST_F(RegionalPredictorTest, Predict) {
   EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(obstacle_ptr), 2);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 2);
 }
 
 TEST_F(RegionalPredictorTest, MovingPedestrian) {
@@ -80,7 +80,7 @@ TEST_F(RegionalPredictorTest, StationaryPedestrian) {
   EXPECT_NE(obstacle_ptr, nullptr);
   RegionalPredictor predictor;
   predictor.GenerateStillTrajectory(1.0, obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(obstacle_ptr), 1);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 
 }  // namespace prediction
