@@ -75,7 +75,13 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   std::array<double, 3> init_s = {0.0, st_graph_data.init_point().v(),
                                   st_graph_data.init_point().a()};
   double delta_t = 0.1;
-  std::array<double, 5> w = {1.0, 100.0, 10.0, 30.0, 0.0};
+  const auto& piecewise_jerk_speed_config =
+      config_.piecewise_jerk_speed_config();
+  std::array<double, 5> w = {piecewise_jerk_speed_config.s_weight(),
+                             piecewise_jerk_speed_config.ds_weight(),
+                             piecewise_jerk_speed_config.dds_weight(),
+                             piecewise_jerk_speed_config.ddds_weight(),
+                             piecewise_jerk_speed_config.ref_weight()};
   double total_length = st_graph_data.path_length_by_conf();
   double total_time = st_graph_data.total_time_by_conf();
   int num_of_knots = static_cast<int>(total_time / delta_t) + 1;
@@ -90,7 +96,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
   path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
-  // TODO(Hongyi): tune the params and move to a config
+  // TODO(Hongyi): delete this when ready to use vehicle_params
   path_time_qp->SetSecondOrderBounds(-4.4, 2.0);
   path_time_qp->SetDesireDerivative(FLAGS_default_cruise_speed);
 

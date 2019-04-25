@@ -40,6 +40,11 @@ default_task_config: {
 default_task_config: {
   task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   piecewise_jerk_speed_config {
+    s_weight: 1.0
+    ds_weight: 100.0
+    dds_weight: 10.0
+    ddds_weight: 30.0
+    ref_weight: 50.0
   }
 }
 default_task_config: {
