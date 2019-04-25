@@ -247,7 +247,7 @@ void PredictorManager::PredictObstacle(
     if (FLAGS_enable_trim_prediction_trajectory &&
         obstacle->type() == PerceptionObstacle::VEHICLE) {
       CHECK_NOTNULL(adc_trajectory_container);
-      predictor->TrimTrajectories(adc_trajectory_container, obstacle);
+      predictor->TrimTrajectories(*adc_trajectory_container, obstacle);
     }
     for (const auto& trajectory :
          obstacle->latest_feature().predicted_trajectory()) {

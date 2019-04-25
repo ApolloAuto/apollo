@@ -26,9 +26,9 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
-int Predictor::NumOfTrajectories(const Obstacle* obstacle) {
-  CHECK_GT(obstacle->history_size(), 0);
-  return obstacle->latest_feature().predicted_trajectory_size();
+int Predictor::NumOfTrajectories(const Obstacle& obstacle) {
+  CHECK_GT(obstacle.history_size(), 0);
+  return obstacle.latest_feature().predicted_trajectory_size();
 }
 
 Trajectory Predictor::GenerateTrajectory(
@@ -41,7 +41,7 @@ Trajectory Predictor::GenerateTrajectory(
 void Predictor::SetEqualProbability(const double total_probability,
                                     const int start_index,
                                     Obstacle* obstacle_ptr) {
-  int num = NumOfTrajectories(obstacle_ptr);
+  int num = NumOfTrajectories(*obstacle_ptr);
   CHECK(num > start_index);
 
   const auto prob = total_probability / static_cast<double>(num - start_index);
@@ -55,7 +55,7 @@ void Predictor::SetEqualProbability(const double total_probability,
 void Predictor::Clear() {}
 
 void Predictor::TrimTrajectories(
-    const ADCTrajectoryContainer* adc_trajectory_container,
+    const ADCTrajectoryContainer& adc_trajectory_container,
     Obstacle* obstacle) {
   for (int i = 0; i < obstacle->latest_feature().predicted_trajectory_size();
        ++i) {
@@ -65,9 +65,9 @@ void Predictor::TrimTrajectories(
 }
 
 bool Predictor::TrimTrajectory(
-    const ADCTrajectoryContainer* adc_trajectory_container,
+    const ADCTrajectoryContainer& adc_trajectory_container,
     Obstacle* obstacle, Trajectory* trajectory) {
-  if (!adc_trajectory_container->IsProtected()) {
+  if (!adc_trajectory_container.IsProtected()) {
     ADEBUG << "Not in protection mode.";
     return false;
   }
@@ -93,11 +93,11 @@ bool Predictor::TrimTrajectory(
   front_point.set_x(front_x);
   front_point.set_y(front_y);
   bool front_in_junction =
-      adc_trajectory_container->IsPointInJunction(front_point);
+      adc_trajectory_container.IsPointInJunction(front_point);
 
   const PathPoint& start_point = trajectory->trajectory_point(0).path_point();
   bool start_in_junction =
-      adc_trajectory_container->IsPointInJunction(start_point);
+      adc_trajectory_container.IsPointInJunction(start_point);
 
   if (front_in_junction || start_in_junction) {
     return false;
@@ -106,7 +106,7 @@ bool Predictor::TrimTrajectory(
   int index = 0;
   while (index < num_of_point) {
     const PathPoint& point = trajectory->trajectory_point(index).path_point();
-    if (adc_trajectory_container->IsPointInJunction(point)) {
+    if (adc_trajectory_container.IsPointInJunction(point)) {
       break;
     }
     ++index;
