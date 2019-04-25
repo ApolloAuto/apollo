@@ -26,11 +26,10 @@ namespace prediction {
 using apollo::common::PathPoint;
 using apollo::common::TrajectoryPoint;
 
-const std::vector<Trajectory>& Predictor::trajectories() {
-  return trajectories_;
+int Predictor::NumOfTrajectories(const Obstacle* obstacle) {
+  CHECK_GT(obstacle->history_size(), 0);
+  return obstacle->latest_feature().predicted_trajectory_size();
 }
-
-size_t Predictor::NumOfTrajectories() { return trajectories_.size(); }
 
 Trajectory Predictor::GenerateTrajectory(
     const std::vector<TrajectoryPoint>& points) {
@@ -40,28 +39,33 @@ Trajectory Predictor::GenerateTrajectory(
 }
 
 void Predictor::SetEqualProbability(const double total_probability,
-                                    const size_t start_index) {
-  size_t num = NumOfTrajectories();
+                                    const int start_index,
+                                    Obstacle* obstacle_ptr) {
+  int num = NumOfTrajectories(obstacle_ptr);
   CHECK(num > start_index);
 
   const auto prob = total_probability / static_cast<double>(num - start_index);
-  for (size_t i = start_index; i < num; ++i) {
-    trajectories_[i].set_probability(prob);
+  for (int i = start_index; i < num; ++i) {
+    obstacle_ptr->mutable_latest_feature()
+                ->mutable_predicted_trajectory(i)
+                ->set_probability(prob);
   }
 }
 
-void Predictor::Clear() { trajectories_.clear(); }
+void Predictor::Clear() {}
 
 void Predictor::TrimTrajectories(
-    const Obstacle* obstacle,
+    Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container) {
-  for (auto& trajectory : trajectories_) {
-    TrimTrajectory(obstacle, adc_trajectory_container, &trajectory);
+  for (int i = 0; i < obstacle->latest_feature().predicted_trajectory_size();
+       ++i) {
+    TrimTrajectory(obstacle, adc_trajectory_container,
+        obstacle->mutable_latest_feature()->mutable_predicted_trajectory(i));
   }
 }
 
 bool Predictor::TrimTrajectory(
-    const Obstacle* obstacle,
+    Obstacle* obstacle,
     const ADCTrajectoryContainer* adc_trajectory_container,
     Trajectory* trajectory) {
   if (!adc_trajectory_container->IsProtected()) {

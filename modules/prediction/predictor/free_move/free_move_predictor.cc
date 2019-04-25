@@ -57,10 +57,9 @@ void FreeMovePredictor::Predict(Obstacle* obstacle) {
       FLAGS_prediction_trajectory_time_resolution, &points);
 
   Trajectory trajectory = GenerateTrajectory(points);
-  trajectories_.push_back(std::move(trajectory));
-  SetEqualProbability(1.0, 0);
-  ADEBUG << "Obstacle [" << obstacle->id() << "] has " << trajectories_.size()
-         << " trajectories.";
+  obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+        trajectory);
+  SetEqualProbability(1.0, 0, obstacle);
 }
 
 void FreeMovePredictor::DrawFreeMoveTrajectoryPoints(

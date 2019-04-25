@@ -3,7 +3,6 @@ syntax = "proto2";
 package apollo.prediction;
 
 import "modules/prediction/proto/feature.proto";
-import "modules/prediction/proto/prediction_obstacle.proto";
 
 message CNNFeatures {
   optional uint32 dim0 = 1;
