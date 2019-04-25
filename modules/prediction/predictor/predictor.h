@@ -66,9 +66,11 @@ class Predictor {
   /**
    * @brief Trim prediction trajectories by adc trajectory
    * @param ADC trajectory container
+   * @param obstacle,
    */
-  void TrimTrajectories(Obstacle* obstacle,
-                        const ADCTrajectoryContainer* adc_trajectory_container);
+  void TrimTrajectories(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle);
 
  protected:
   /**
@@ -83,6 +85,7 @@ class Predictor {
    * @brief Set equal probability to prediction trajectories
    * @param probability total probability
    * @param start_index The start index to set equal probability
+   * @param obstacle
    */
   void SetEqualProbability(const double probability, const int start_index,
       Obstacle* obstacle_ptr);
@@ -91,12 +94,13 @@ class Predictor {
    * @brief Trim a single prediction trajectory,
    *        keep the portion that is not in junction.
    * @param adc_segments trajectory segments of ADC trajectory
+   * @param obstacle
    * @param trajectory The trimed prediction trajectory
    * @return If the prediction trajectory is trimed
    */
-  bool TrimTrajectory(Obstacle* obstacle,
-                      const ADCTrajectoryContainer* adc_trajectory_container,
-                      Trajectory* trajectory);
+  bool TrimTrajectory(
+      const ADCTrajectoryContainer* adc_trajectory_container,
+      Obstacle* obstacle, Trajectory* trajectory);
 
   /**
    * @brief Determine if an obstacle is supposed to stop within a distance

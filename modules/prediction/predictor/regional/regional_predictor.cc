@@ -81,14 +81,14 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
     speed = feature.speed();
   }
   if (speed > FLAGS_still_speed) {
-    GenerateMovingTrajectory(obstacle, 1.0);
+    GenerateMovingTrajectory(1.0, obstacle);
   } else {
-    GenerateStillTrajectory(obstacle, 1.0);
+    GenerateStillTrajectory(1.0, obstacle);
   }
 }
 
-void RegionalPredictor::GenerateStillTrajectory(Obstacle* obstacle,
-                                                double probability) {
+void RegionalPredictor::GenerateStillTrajectory(
+    double probability, Obstacle* obstacle) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
     return;
@@ -113,8 +113,8 @@ void RegionalPredictor::GenerateStillTrajectory(Obstacle* obstacle,
   SetEqualProbability(probability, start_index, obstacle);
 }
 
-void RegionalPredictor::GenerateMovingTrajectory(Obstacle* obstacle,
-                                                 double probability) {
+void RegionalPredictor::GenerateMovingTrajectory(
+    double probability, Obstacle* obstacle) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
     return;
