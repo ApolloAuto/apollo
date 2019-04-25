@@ -90,9 +90,9 @@ def main():
         mc.calculate(bag_file)
     print('Disengagements: %d' % mc.disengagements)
     print('Auto mileage:   %.3f km / %.3f miles' % \
-        mc.auto_mileage * 1.60934, mc.auto_mileage)
+        (mc.auto_mileage * 1.60934, mc.auto_mileage))
     print('Manual mileage: %.3f km / %.3f miles' % \
-        mc.manual_mileage * 1.60934, mc.manual_mileage)
+        (mc.manual_mileage * 1.60934, mc.manual_mileage))
 
 if __name__ == '__main__':
     main()

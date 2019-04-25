@@ -737,10 +737,24 @@ bool OpenSpaceRoiDecider::FilterOutObstacle(const Frame &frame,
     return true;
   }
 
-  // Translate the end pose back to world frame with endpose in x, y, phi, v
   const auto &open_space_info = frame.open_space_info();
   const auto &origin_point = open_space_info.origin_point();
   const auto &origin_heading = open_space_info.origin_heading();
+  const auto &obstacle_box = obstacle.PerceptionBoundingBox();
+  auto obstacle_center_xy = obstacle_box.center();
+
+  // xy_boundary in xmin, xmax, ymin, ymax.
+  const auto &roi_xy_boundary = open_space_info.ROI_xy_boundary();
+  obstacle_center_xy -= origin_point;
+  obstacle_center_xy.SelfRotate(-origin_heading);
+  if (obstacle_center_xy.x() < roi_xy_boundary[0] ||
+      obstacle_center_xy.x() > roi_xy_boundary[1] ||
+      obstacle_center_xy.y() < roi_xy_boundary[2] ||
+      obstacle_center_xy.y() > roi_xy_boundary[3]) {
+    return true;
+  }
+
+  // Translate the end pose back to world frame with endpose in x, y, phi, v
   const auto &end_pose = open_space_info.open_space_end_pose();
   Vec2d end_pose_x_y(end_pose[0], end_pose[1]);
   end_pose_x_y.SelfRotate(origin_heading);
@@ -750,7 +764,6 @@ bool OpenSpaceRoiDecider::FilterOutObstacle(const Frame &frame,
   Vec2d vehicle_x_y(vehicle_state_.x(), vehicle_state_.y());
 
   // Use vehicle position and end position to filter out obstacle
-  const auto &obstacle_box = obstacle.PerceptionBoundingBox();
   const double vehicle_center_to_obstacle =
       obstacle_box.DistanceTo(vehicle_x_y);
   const double end_pose_center_to_obstacle =

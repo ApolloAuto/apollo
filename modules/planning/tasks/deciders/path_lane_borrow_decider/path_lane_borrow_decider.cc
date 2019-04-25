@@ -60,6 +60,8 @@ bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
     }
   } else {
     // If originally not borrowing neighbor lane:
+    ADEBUG << "Blocking obstacle ID = "
+           << PlanningContext::Instance()->front_static_obstacle_id();
     if (HasSingleReferenceLine(frame) && IsWithinSidePassingSpeedADC(frame) &&
         IsBlockingObstacleFarFromIntersection(reference_line_info) &&
         IsLongTermBlockingObstacle() &&
@@ -85,8 +87,14 @@ bool PathLaneBorrowDecider::IsWithinSidePassingSpeedADC(const Frame& frame) {
 }
 
 bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
-  return PlanningContext::Instance()->front_static_obstacle_cycle_counter() >=
-         3;
+  if (PlanningContext::Instance()->
+          front_static_obstacle_cycle_counter() >= 3) {
+    ADEBUG << "The blocking obstacle is long-term existing.";
+    return true;
+  } else {
+    ADEBUG << "The blocking obstacle is not long-term existing.";
+    return false;
+  }
 }
 
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
@@ -144,8 +152,8 @@ bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
   for (const auto& overlap : first_encountered_overlaps) {
     ADEBUG << overlap.first << ", " << overlap.second.DebugString();
     // if (// overlap.first != ReferenceLineInfo::CLEAR_AREA &&
-        // overlap.first != ReferenceLineInfo::CROSSWALK &&
-        // overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
+    // overlap.first != ReferenceLineInfo::CROSSWALK &&
+    // overlap.first != ReferenceLineInfo::PNC_JUNCTION &&
     if (overlap.first != ReferenceLineInfo::SIGNAL &&
         overlap.first != ReferenceLineInfo::STOP_SIGN) {
       continue;

@@ -44,7 +44,8 @@ using apollo::common::TrajectoryPoint;
 PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
     const TaskConfig& config)
     : SpeedOptimizer(config) {
-  SetName("PiecewiseJerkSpeedOptimizer");
+  // TODO(Hongyi): recover this hacked task_name for dreamview
+  SetName("QpSplineStSpeedOptimizer");
   CHECK(config_.has_piecewise_jerk_speed_config());
 }
 
@@ -74,7 +75,13 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   std::array<double, 3> init_s = {0.0, st_graph_data.init_point().v(),
                                   st_graph_data.init_point().a()};
   double delta_t = 0.1;
-  std::array<double, 5> w = {1.0, 100.0, 10.0, 30.0, 0.0};
+  const auto& piecewise_jerk_speed_config =
+      config_.piecewise_jerk_speed_config();
+  std::array<double, 5> w = {piecewise_jerk_speed_config.s_weight(),
+                             piecewise_jerk_speed_config.ds_weight(),
+                             piecewise_jerk_speed_config.dds_weight(),
+                             piecewise_jerk_speed_config.ddds_weight(),
+                             piecewise_jerk_speed_config.ref_weight()};
   double total_length = st_graph_data.path_length_by_conf();
   double total_time = st_graph_data.total_time_by_conf();
   int num_of_knots = static_cast<int>(total_time / delta_t) + 1;
@@ -83,13 +90,15 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   path_time_qp->InitProblem(num_of_knots, delta_t, w, init_s);
 
   path_time_qp->SetZeroOrderBounds(0.0, total_length);
-  path_time_qp->SetFirstOrderBounds(0.0, FLAGS_planning_upper_speed_limit);
+  path_time_qp->SetFirstOrderBounds(0.0,
+                                    std::fmax(FLAGS_planning_upper_speed_limit,
+                                              st_graph_data.init_point().v()));
   path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
   path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
-  // TODO(Hongyi): tune the params and move to a config
+  // TODO(Hongyi): delete this when ready to use vehicle_params
   path_time_qp->SetSecondOrderBounds(-4.4, 2.0);
-  path_time_qp->SetDesireDerivative(10.0);  // default speed to be 10.0
+  path_time_qp->SetDesireDerivative(FLAGS_default_cruise_speed);
 
   // Update STBoundary
   std::vector<std::tuple<double, double, double>> x_bounds;

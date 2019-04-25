@@ -1593,6 +1593,22 @@ decision {
         }
       }
     }
+    decision {
+      id: "path_end_stop"
+      perception_id: -439803322
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_LANE_CHANGE_URGENCY
+          distance_s: -0
+          stop_point {
+            x: 587633.86703816464
+            y: 4141071.5134308948
+            z: 0
+          }
+          stop_heading: 1.3231479096582455
+        }
+      }
+    }
   }
   vehicle_signal {
     turn_signal: TURN_NONE

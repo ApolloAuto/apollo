@@ -86,20 +86,15 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   // read crosswalk_stop_timer from saved status
   CrosswalkStopTimer crosswalk_stop_timer;
   std::unordered_map<std::string, double> stop_times;
-  for (int i = 0; i < mutable_crosswalk_status->stop_time_size(); ++i) {
-    stop_times.insert(
-        {mutable_crosswalk_status->stop_time(i).obstacle_id(),
-         mutable_crosswalk_status->stop_time(i).obstacle_stop_timestamp()});
+  for (const auto& stop_time : mutable_crosswalk_status->stop_time()) {
+    stop_times.emplace(stop_time.obstacle_id(),
+                       stop_time.obstacle_stop_timestamp());
   }
-  crosswalk_stop_timer.insert(
-      {mutable_crosswalk_status->crosswalk_id(), stop_times});
+  crosswalk_stop_timer.emplace(mutable_crosswalk_status->crosswalk_id(),
+                               stop_times);
 
-  std::vector<std::string> finished_crosswalks;
-  for (int i = 0; i < mutable_crosswalk_status->finished_crosswalk_size();
-       i++) {
-    finished_crosswalks.push_back(
-        mutable_crosswalk_status->finished_crosswalk(i));
-  }
+  const auto& finished_crosswalks =
+      mutable_crosswalk_status->finished_crosswalk();
 
   const auto& reference_line = reference_line_info->reference_line();
   for (auto crosswalk_overlap : crosswalk_overlaps_) {

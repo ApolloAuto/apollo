@@ -105,15 +105,11 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
   if (st_graph_data_.st_boundaries().empty()) {
     ADEBUG << "No path obstacles, dp_st_graph output default speed profile.";
     std::vector<SpeedPoint> speed_profile;
-    double s = 0.0;
-    double t = 0.0;
-    for (int i = 0; i <= dp_st_speed_config_.matrix_dimension_t() &&
-                    i <= dp_st_speed_config_.matrix_dimension_s();
-         ++i, t += unit_t_, s += unit_s_) {
+    const double v_default = FLAGS_default_cruise_speed;
+    for (int i = 0; i <= dp_st_speed_config_.matrix_dimension_t(); ++i) {
       SpeedPoint speed_point;
-      speed_point.set_s(s);
-      speed_point.set_t(t);
-      const double v_default = unit_s_ / unit_t_;
+      speed_point.set_s(i * unit_t_ * v_default);
+      speed_point.set_t(i * unit_t_);
       speed_point.set_v(v_default);
       speed_point.set_a(0.0);
       speed_profile.emplace_back(std::move(speed_point));

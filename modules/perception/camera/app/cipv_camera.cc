@@ -84,54 +84,48 @@ bool Cipv::GetEgoLane(const std::vector<base::LaneLine> &lane_objects,
                       EgoLane *egolane_image, EgoLane *egolane_ground,
                       bool *b_left_valid, bool *b_right_valid) {
   for (size_t i = 0; i < lane_objects.size(); ++i) {
-    if (lane_objects[i].pos_type == base::LaneLinePositionType::EGO_LEFT) {
+    const auto &lane_object = lane_objects[i];
+    const size_t curve_image_point_size =
+        lane_object.curve_image_point_set.size();
+    if (lane_object.pos_type == base::LaneLinePositionType::EGO_LEFT) {
       if (debug_level_ >= 2) {
-        AINFO << "[GetEgoLane]LEFT_"
-              << "lane_objects[" << i << "].curve_image_point_set.size(): "
-              << lane_objects[i].curve_image_point_set.size();
+        AINFO << "[GetEgoLane]LEFT_lane_objects[" << i
+              << "].curve_image_point_set.size(): " << curve_image_point_size;
       }
-      if (lane_objects[i].curve_image_point_set.size() <
-          min_laneline_length_for_cipv_) {
+      if (curve_image_point_size < min_laneline_length_for_cipv_) {
         *b_left_valid = false;
       } else {
         *b_left_valid = true;
 
-        for (size_t j = 0; j < lane_objects[i].curve_image_point_set.size();
-             ++j) {
-          Eigen::Vector2f image_point(
-              lane_objects[i].curve_image_point_set[j].x,
-              lane_objects[i].curve_image_point_set[j].y);
-          egolane_image->left_line.line_point.push_back(image_point);
-
-          Eigen::Vector2f ground_point(
-              lane_objects[i].curve_car_coord_point_set[j].x,
-              lane_objects[i].curve_car_coord_point_set[j].y);
-          egolane_ground->left_line.line_point.push_back(ground_point);
+        for (size_t j = 0; j < curve_image_point_size; ++j) {
+          // image_point
+          egolane_image->left_line.line_point.emplace_back(
+              lane_object.curve_image_point_set[j].x,
+              lane_object.curve_image_point_set[j].y);
+          // ground_point
+          egolane_ground->left_line.line_point.emplace_back(
+              lane_object.curve_car_coord_point_set[j].x,
+              lane_object.curve_car_coord_point_set[j].y);
         }
       }
-    } else if (lane_objects[i].pos_type ==
-               base::LaneLinePositionType::EGO_RIGHT) {
+    } else if (lane_object.pos_type == base::LaneLinePositionType::EGO_RIGHT) {
       if (debug_level_ >= 2) {
-        AINFO << "[GetEgoLane]RIGHT_"
-              << "lane_objects[" << i << "].curve_image_point_set.size(): "
-              << lane_objects[i].curve_image_point_set.size();
+        AINFO << "[GetEgoLane]RIGHT_lane_objects[" << i
+              << "].curve_image_point_set.size(): " << curve_image_point_size;
       }
-      if (lane_objects[i].curve_image_point_set.size() <
-          min_laneline_length_for_cipv_) {
+      if (curve_image_point_size < min_laneline_length_for_cipv_) {
         *b_right_valid = false;
       } else {
         *b_right_valid = true;
-        for (size_t j = 0; j < lane_objects[i].curve_image_point_set.size();
-             ++j) {
-          Eigen::Vector2f image_point(
-              lane_objects[i].curve_image_point_set[j].x,
-              lane_objects[i].curve_image_point_set[j].y);
-          egolane_image->right_line.line_point.push_back(image_point);
-
-          Eigen::Vector2f ground_point(
-              lane_objects[i].curve_car_coord_point_set[j].x,
-              lane_objects[i].curve_car_coord_point_set[j].y);
-          egolane_ground->right_line.line_point.push_back(ground_point);
+        for (size_t j = 0; j < curve_image_point_size; ++j) {
+          // image_point
+          egolane_image->right_line.line_point.emplace_back(
+              lane_object.curve_image_point_set[j].x,
+              lane_object.curve_image_point_set[j].y);
+          // ground_point
+          egolane_ground->right_line.line_point.emplace_back(
+              lane_object.curve_car_coord_point_set[j].x,
+              lane_object.curve_car_coord_point_set[j].y);
         }
       }
     }

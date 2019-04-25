@@ -166,6 +166,7 @@ void PathBoundsDecider::InitPathBoundsDecider(
   // Reset variables.
   adc_frenet_s_ = 0.0;
   adc_frenet_l_ = 0.0;
+  adc_l_to_lane_center_ = 0.0;
   adc_lane_width_ = 0.0;
 
   // Initialize some private variables.
@@ -176,6 +177,9 @@ void PathBoundsDecider::InitPathBoundsDecider(
       reference_line.GetFrenetPoint(planning_start_point.path_point());
   adc_frenet_s_ = adc_frenet_position.s();
   adc_frenet_l_ = adc_frenet_position.l();
+  double offset_to_map = 0.0;
+  reference_line.GetOffsetToMap(adc_frenet_s_, &offset_to_map);
+  adc_l_to_lane_center_ = adc_frenet_l_ + offset_to_map;
   auto adc_sl_info = reference_line.ToFrenetFrame(planning_start_point);
   adc_frenet_sd_ = adc_sl_info.first[1];
   adc_frenet_ld_ = adc_sl_info.second[1] * adc_frenet_sd_;
@@ -424,91 +428,43 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
       }
     }
 
-    // TODO(jiacheng): retire the following chunk of code when ready.
-    /*
-    hdmap::Lane curr_lane;
-    hdmap::LaneInfoConstPtr lane_info_ptr;
-    if (lane_borrow_info != LaneBorrowInfo::NO_BORROW) {
-      if (!GetLaneInfoFromPoint(
-              reference_line.GetReferencePoint(curr_s).x(),
-              reference_line.GetReferencePoint(curr_s).y(), 0.0,
-              reference_line.GetReferencePoint(curr_s).heading(),
-              &lane_info_ptr)) {
-        // If cannot even find the current LaneInfo, use past results.
-        ADEBUG << "Cannot find the true current lane; therefore, use the "
-                  "planning starting point's lane as a substitute.";
-        curr_neighbor_lane_width = past_neighbor_lane_width;
-      } else {
-        // Otherwise:
-        curr_lane = lane_info_ptr->lane();
-        hdmap::LaneInfoConstPtr adjacent_lane = nullptr;
-        if (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW) {
-          // Borrowing left neighbor lane.
-          ADEBUG << "Borrowing the left lane.";
-          if (curr_lane.left_neighbor_forward_lane_id_size() > 0) {
-            adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-                curr_lane.left_neighbor_forward_lane_id(0));
-
-          } else if (curr_lane.left_neighbor_reverse_lane_id_size() > 0) {
-            adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-                curr_lane.left_neighbor_reverse_lane_id(0));
-          }
-        } else if (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW) {
-          // Borrowing right neighbor lane.
-          ADEBUG << "Borrowing the right lane.";
-          if (curr_lane.right_neighbor_forward_lane_id_size() > 0) {
-            adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-                curr_lane.right_neighbor_forward_lane_id(0));
-          } else if (curr_lane.right_neighbor_reverse_lane_id_size() > 0) {
-            adjacent_lane = HDMapUtil::BaseMapPtr()->GetLaneById(
-                curr_lane.right_neighbor_reverse_lane_id(0));
-          }
-        }
-        common::SLPoint sl_curr_s;
-        sl_curr_s.set_s(curr_s);
-        sl_curr_s.set_l(0.0);
-        common::math::Vec2d xy_curr_s;
-        reference_line.SLToXY(sl_curr_s, &xy_curr_s);
-        double adjacent_lane_s = 0.0;
-        double adjacent_lane_l = 0.0;
-        if (adjacent_lane == nullptr ||
-            !adjacent_lane->GetProjection(xy_curr_s,
-                                          &adjacent_lane_s,
-                                          &adjacent_lane_l)) {
-          ADEBUG << "Unable to get the neighbor lane's width.";
-          curr_neighbor_lane_width = past_neighbor_lane_width;
-        } else {
-          curr_neighbor_lane_width = adjacent_lane->GetWidth(adjacent_lane_s);
-          past_neighbor_lane_width = curr_neighbor_lane_width;
-        }
-      }
-    }
-    */
-
     // 3. Calculate the proper boundary based on lane-width, ADC's position,
     //    and ADC's velocity.
     constexpr double kMaxLateralAccelerations = 1.0;
+    double offset_to_map = 0.0;
+    reference_line.GetOffsetToMap(curr_s, &offset_to_map);
+
     double ADC_speed_buffer = (adc_frenet_ld_ > 0 ? 1.0 : -1.0) *
                               adc_frenet_ld_ * adc_frenet_ld_ /
                               kMaxLateralAccelerations / 2.0;
 
-    double curr_left_bound_lane = curr_lane_left_width +
-        (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW ?
-         curr_neighbor_lane_width : 0.0);
+    double curr_left_bound_lane =
+        curr_lane_left_width + (lane_borrow_info == LaneBorrowInfo::LEFT_BORROW
+                                    ? curr_neighbor_lane_width
+                                    : 0.0);
     double curr_left_bound_adc =
-        std::fmax(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) +
+        std::fmax(adc_l_to_lane_center_, adc_l_to_lane_center_ +
+                  ADC_speed_buffer) +
         GetBufferBetweenADCCenterAndEdge() + ADC_buffer;
     double curr_left_bound =
-        std::fmax(curr_left_bound_lane, curr_left_bound_adc);
+        std::fmax(curr_left_bound_lane, curr_left_bound_adc) - offset_to_map;
 
-    double curr_right_bound_lane = -curr_lane_right_width -
-        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW ?
-         curr_neighbor_lane_width : 0.0);
+    double curr_right_bound_lane =
+        -curr_lane_right_width -
+        (lane_borrow_info == LaneBorrowInfo::RIGHT_BORROW
+             ? curr_neighbor_lane_width
+             : 0.0);
     double curr_right_bound_adc =
-        std::fmin(adc_frenet_l_, adc_frenet_l_ + ADC_speed_buffer) -
+        std::fmin(adc_l_to_lane_center_, adc_l_to_lane_center_ +
+                  ADC_speed_buffer) -
         GetBufferBetweenADCCenterAndEdge() - ADC_buffer;
     double curr_right_bound =
-        std::fmin(curr_right_bound_lane, curr_right_bound_adc);
+        std::fmin(curr_right_bound_lane, curr_right_bound_adc) - offset_to_map;
+
+    ADEBUG << "At s = " << curr_s
+           << ", left_lane_bound = " << curr_lane_left_width
+           << ", right_lane_bound = " << curr_lane_right_width
+           << ", offset = " << offset_to_map;
 
     // 4. Update the boundary.
     double dummy = 0.0;
@@ -562,7 +518,12 @@ bool PathBoundsDecider::GetBoundaryFromRefLineOffset(
   // deviate from lane-center line considerably.
   //  - Expand lane boundary on one side. (already done previously)
   //  - Treat the other side as if there is an obstacle.
+  // for (size_t i = 1; i < path_bound->size(); ++i) {
+  //   double curr_s = std::get<0>((*path_bound)[i]);
+  //   double offset_to_map = 0.0;
+  //   reference_line.GetOffsetToMap(curr_s, &offset_to_map);
 
+  // }
   return true;
 }
 
@@ -651,7 +612,6 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
             std::get<2>((*path_boundaries)[i])) {
           ADEBUG << "Path is blocked at s = " << curr_s;
           path_blocked_idx = static_cast<int>(i);
-          // Currently, no side-pass when blocked.
           break;
         } else {
           center_line = (std::get<1>((*path_boundaries)[i]) +
@@ -673,7 +633,9 @@ bool PathBoundsDecider::GetBoundaryFromStaticObstacles(
           std::get<2>((*path_boundaries)[i])) {
         ADEBUG << "Path is blocked at s = " << curr_s;
         path_blocked_idx = static_cast<int>(i);
-        // Currently, no side-pass when blocked.
+        if (!obs_id_to_direction.empty()) {
+          *blocking_obstacle_id = obs_id_to_direction.begin()->first;
+        }
       } else {
         center_line = (std::get<1>((*path_boundaries)[i]) +
                        std::get<2>((*path_boundaries)[i])) /
@@ -995,7 +957,7 @@ void PathBoundsDecider::TrimPathBounds(const int path_blocked_idx,
 void PathBoundsDecider::PathBoundsDebugString(
     const PathBound& path_boundaries) {
   for (size_t i = 0; i < path_boundaries.size(); ++i) {
-    ADEBUG << "idx " << i << "; s = " << std::get<0>(path_boundaries[i])
+    AERROR << "idx " << i << "; s = " << std::get<0>(path_boundaries[i])
            << "; l_min = " << std::get<1>(path_boundaries[i])
            << "; l_max = " << std::get<2>(path_boundaries[i]);
   }

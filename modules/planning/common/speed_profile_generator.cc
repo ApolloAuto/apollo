@@ -145,8 +145,9 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
   path_time_qp->InitProblem(num_of_knots, delta_t, w, init_s, end_s);
 
-  path_time_qp->SetZeroOrderBounds(0.0, 100.0);
-  path_time_qp->SetFirstOrderBounds(0.0, FLAGS_planning_upper_speed_limit);
+  path_time_qp->SetZeroOrderBounds(0.0, std::fmax(stop_distance, 100.0));
+  path_time_qp->SetFirstOrderBounds(
+      0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_v));
   path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
   // TODO(Hongyi): Set back to vehicle_params when ready
@@ -160,9 +161,9 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   }
 
   // Extract output
-  std::vector<double> s = path_time_qp->x();
-  std::vector<double> ds = path_time_qp->x_derivative();
-  std::vector<double> dds = path_time_qp->x_second_order_derivative();
+  const std::vector<double>& s = path_time_qp->x();
+  const std::vector<double>& ds = path_time_qp->x_derivative();
+  const std::vector<double>& dds = path_time_qp->x_second_order_derivative();
 
   SpeedData speed_data;
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);

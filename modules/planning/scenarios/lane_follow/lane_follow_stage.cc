@@ -293,9 +293,12 @@ void LaneFollowStage::PlanFallbackTrajectory(
       reference_line_info->st_graph_data().is_initialized()
           ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
           : std::numeric_limits<double>::infinity();
+  const double curr_speed_distance = FLAGS_fallback_total_time *
+      std::min(FLAGS_default_cruise_speed,
+               reference_line_info->vehicle_state().linear_velocity());
   *reference_line_info->mutable_speed_data() =
-      SpeedProfileGenerator::GenerateFallbackSpeed(
-          std::min(stop_path_distance, stop_speed_distance));
+      SpeedProfileGenerator::GenerateFallbackSpeed(std::min({
+          curr_speed_distance, stop_path_distance, stop_speed_distance}));
 
   if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
     reference_line_info->AddCost(kSpeedOptimizationFallbackCost);

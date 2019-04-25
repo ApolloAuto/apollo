@@ -27,8 +27,8 @@
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
-#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
+#include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
 #include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
@@ -87,6 +87,10 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
           new scenario::traffic_light::TrafficLightUnprotectedRightTurnScenario(
               config_map_[scenario_type], &scenario_context_));
       break;
+    case ScenarioConfig::PULL_OVER:
+      ptr.reset(new scenario::pull_over::PullOverScenario(
+          config_map_[scenario_type], &scenario_context_));
+      break;
     case ScenarioConfig::VALET_PARKING:
       ptr.reset(new scenario::valet_parking::ValetParkingScenario(
           config_map_[scenario_type], &scenario_context_));
@@ -131,6 +135,10 @@ void ScenarioManager::RegisterScenarios() {
       FLAGS_scenario_traffic_light_unprotected_right_turn_config_file,
       &config_map_[ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN]));
 
+  // pull_over
+  CHECK(Scenario::LoadConfig(FLAGS_scenario_pull_over_config_file,
+                             &config_map_[ScenarioConfig::PULL_OVER]));
+
   // valet parking
   CHECK(Scenario::LoadConfig(FLAGS_scenario_valet_parking_config_file,
                              &config_map_[ScenarioConfig::VALET_PARKING]));
@@ -149,8 +157,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectChangeLaneScenario(
 ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
     const Frame& frame) {
   const auto& scenario_config =
-      config_map_[ScenarioConfig::PULL_OVER]
-          .pull_over_config();
+      config_map_[ScenarioConfig::PULL_OVER].pull_over_config();
 
   const auto& routing = frame.local_view().routing;
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
@@ -164,12 +171,12 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
 
   const double adc_distance_to_dest = dest_sl.s() - adc_front_edge_s;
   ADEBUG << "adc_distance_to_dest[" << adc_distance_to_dest
-         << "] destination_s[" << dest_sl.s()
-         << "] adc_front_edge_s[" << adc_front_edge_s << "]";
+         << "] destination_s[" << dest_sl.s() << "] adc_front_edge_s["
+         << adc_front_edge_s << "]";
 
   const bool pull_over_scenario =
       (adc_distance_to_dest > 0 &&
-          adc_distance_to_dest <=
+       adc_distance_to_dest <=
            scenario_config.start_pull_over_scenario_distance());
 
   switch (current_scenario_->scenario_type()) {
@@ -179,14 +186,15 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
       }
       break;
     case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
     case ScenarioConfig::YIELD_SIGN_UNPROTECTED:
+    case ScenarioConfig::PULL_OVER:
     case ScenarioConfig::VALET_PARKING:
       if (current_scenario_->GetStatus() !=
           Scenario::ScenarioStatus::STATUS_DONE) {
@@ -224,24 +232,25 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::PULL_OVER:
       if (stop_sign_scenario) {
         return stop_sign_all_way ? ScenarioConfig::STOP_SIGN_PROTECTED
                                  : ScenarioConfig::STOP_SIGN_UNPROTECTED;
       }
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
-      break;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
+    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+    case ScenarioConfig::YIELD_SIGN_UNPROTECTED:
+    case ScenarioConfig::VALET_PARKING:
       if (current_scenario_->GetStatus() !=
           Scenario::ScenarioStatus::STATUS_DONE) {
         return current_scenario_->scenario_type();
       }
       break;
-    case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
-    case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
-    case ScenarioConfig::YIELD_SIGN_UNPROTECTED:
     default:
       break;
   }
@@ -318,6 +327,7 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::PULL_OVER:
       if (traffic_light_scenario) {
         const auto& turn_type = reference_line_info.GetPathTurnType(
             first_encountered_traffic_light.start_s);
@@ -339,15 +349,17 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
-      break;
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+    case ScenarioConfig::YIELD_SIGN_UNPROTECTED:
+    case ScenarioConfig::VALET_PARKING:
       if (current_scenario_->GetStatus() !=
           Scenario::ScenarioStatus::STATUS_DONE) {
         return current_scenario_->scenario_type();
       }
       break;
+
     default:
       break;
   }
@@ -390,21 +402,24 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
     case ScenarioConfig::SIDE_PASS:
+    case ScenarioConfig::PULL_OVER:
       if (bare_junction_scenario) {
         return ScenarioConfig::BARE_INTERSECTION_UNPROTECTED;
       }
       break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
-      if (current_scenario_->GetStatus() !=
-          Scenario::ScenarioStatus::STATUS_DONE) {
-        return current_scenario_->scenario_type();
-      }
-      break;
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+    case ScenarioConfig::YIELD_SIGN_UNPROTECTED:
+    case ScenarioConfig::VALET_PARKING:
+      if (current_scenario_->GetStatus() !=
+          Scenario::ScenarioStatus::STATUS_DONE) {
+        return current_scenario_->scenario_type();
+      }
+      break;
     default:
       break;
   }
@@ -513,6 +528,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
+    case ScenarioConfig::PULL_OVER:
       break;
     case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
@@ -521,6 +537,7 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     case ScenarioConfig::TRAFFIC_LIGHT_PROTECTED:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN:
     case ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN:
+    case ScenarioConfig::VALET_PARKING:
       // must continue until finish
       if (current_scenario_->GetStatus() !=
           Scenario::ScenarioStatus::STATUS_DONE) {
@@ -529,13 +546,6 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
       break;
     default:
       break;
-  }
-
-  // pull-over scenarion
-  if (scenario_type == default_scenario_type_) {
-    if (FLAGS_enable_scenario_pull_over) {
-      scenario_type = SelectPullOverScenario(frame);
-    }
   }
 
   ////////////////////////////////////////
@@ -602,6 +612,14 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
   // SIDE_PASS scenario
   if (scenario_type == default_scenario_type_) {
     scenario_type = SelectSidePassScenario(frame);
+  }
+
+  ////////////////////////////////////////
+  // pull-over scenario
+  if (scenario_type == default_scenario_type_) {
+    if (FLAGS_enable_scenario_pull_over) {
+      scenario_type = SelectPullOverScenario(frame);
+    }
   }
 
   ////////////////////////////////////////

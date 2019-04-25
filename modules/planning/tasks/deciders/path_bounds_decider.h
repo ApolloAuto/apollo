@@ -148,9 +148,9 @@ class PathBoundsDecider : public Decider {
                             hdmap::LaneInfoConstPtr* const lane);
 
   /** @brief Due to reference line smoothing issue, it may deviate from the
-    *  road center. We need to take that into consideration to avoid ADC
-    *  getting off road.
-    */
+   *  road center. We need to take that into consideration to avoid ADC
+   *  getting off road.
+   */
   bool GetBoundaryFromRefLineOffset(
       const ReferenceLine& reference_line,
       std::vector<std::tuple<double, double, double>>* const path_bound);
@@ -221,6 +221,7 @@ class PathBoundsDecider : public Decider {
   double adc_frenet_sd_ = 0.0;
   double adc_frenet_l_ = 0.0;
   double adc_frenet_ld_ = 0.0;
+  double adc_l_to_lane_center_ = 0.0;
   double adc_lane_width_ = 0.0;
   hdmap::LaneInfoConstPtr adc_lane_info_;
 
