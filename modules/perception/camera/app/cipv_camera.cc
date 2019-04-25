@@ -67,10 +67,10 @@ bool Cipv::DistanceFromPointToLineSegment(const Point2Df &point,
                                           const Point2Df &line_seg_start_point,
                                           const Point2Df &line_seg_end_point,
                                           float *distance) {
-  common::math::Vec2d p = {point[0], point[1]};
+  common::math::Vec2d p = {point(0), point(1)};
   common::math::LineSegment2d line_seg(
-      {line_seg_start_point[0], line_seg_start_point[1]},
-      {line_seg_end_point[0], line_seg_end_point[1]});
+      {line_seg_start_point(0), line_seg_start_point(1)},
+      {line_seg_end_point(0), line_seg_end_point(1)});
   if (line_seg.length_sqr() <= kFloatEpsilon) {
     // line length = 0
     return false;
@@ -149,8 +149,8 @@ bool Cipv::MakeVirtualLane(const LaneLineSimple &ref_lane_line,
   if (b_image_based_cipv_ == false) {
     for (uint32_t i = 0; i < ref_lane_line.line_point.size(); ++i) {
       Eigen::Vector2f virtual_line_point(
-          ref_lane_line.line_point[i][0],
-          ref_lane_line.line_point[i][1] + offset_distance);
+          ref_lane_line.line_point[i](0),
+          ref_lane_line.line_point[i](1) + offset_distance);
       virtual_lane_line->line_point.push_back(virtual_line_point);
     }
   } else {
@@ -226,7 +226,7 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
   } else if (!b_left_valid && b_right_valid) {
     // Generate virtual left lane based on right lane
     offset_distance =
-        -static_cast<float>(fabs(egolane_ground->right_line.line_point[0][1]) +
+        -static_cast<float>(fabs(egolane_ground->right_line.line_point[0](1)) +
                             half_virtual_egolane_width_in_meter_);
     MakeVirtualLane(egolane_ground->right_line, yaw_rate, offset_distance,
                     &egolane_ground->left_line);
@@ -238,7 +238,7 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
   } else if (b_left_valid && !b_right_valid) {
     // Generate virtual right lane based on left lane
     offset_distance =
-        static_cast<float>(fabs(egolane_ground->left_line.line_point[0][1]) +
+        static_cast<float>(fabs(egolane_ground->left_line.line_point[0](1)) +
                            half_virtual_egolane_width_in_meter_);
     MakeVirtualLane(egolane_ground->left_line, yaw_rate, offset_distance,
                     &egolane_ground->right_line);
@@ -298,52 +298,52 @@ bool Cipv::FindClosestEdgeOfObjectImage(
   if (fabs(atan2(object->direction(1), object->direction(0))) <=
       k45DegreeInRadian) {
     // get back of the vehicle
-    closted_object_edge->start_point[0] =
+    closted_object_edge->start_point(0) =
         x2 * cos_theta + y1 * sin_theta + center_x;
-    closted_object_edge->start_point[1] =
+    closted_object_edge->start_point(1) =
         y1 * cos_theta - x2 * sin_theta + center_y;
 
-    closted_object_edge->end_point[0] =
+    closted_object_edge->end_point(0) =
         x2 * cos_theta + y2 * sin_theta + center_x;
-    closted_object_edge->end_point[1] =
+    closted_object_edge->end_point(1) =
         y2 * cos_theta - x2 * sin_theta + center_y;
 
     // If a vehicle faces side way, extract the side edge of a vehicle
   } else if (atan2(object->direction(1), object->direction(0)) >
              k45DegreeInRadian) {
     // get left side of the vehicle
-    closted_object_edge->start_point[0] =
+    closted_object_edge->start_point(0) =
         x2 * cos_theta + y1 * sin_theta + center_x;
-    closted_object_edge->start_point[1] =
+    closted_object_edge->start_point(1) =
         y1 * cos_theta - x2 * sin_theta + center_y;
 
-    closted_object_edge->end_point[0] =
+    closted_object_edge->end_point(0) =
         x2 * cos_theta + y1 * sin_theta + center_x;
-    closted_object_edge->end_point[1] =
+    closted_object_edge->end_point(1) =
         y1 * cos_theta - x2 * sin_theta + center_y;
   } else if (atan2(object->direction(1), object->direction(0)) <
              -k45DegreeInRadian) {
     // get right side of the vehicle
 
-    closted_object_edge->start_point[0] =
+    closted_object_edge->start_point(0) =
         x1 * cos_theta + y2 * sin_theta + center_x;
-    closted_object_edge->start_point[1] =
+    closted_object_edge->start_point(1) =
         y2 * cos_theta - x1 * sin_theta + center_y;
 
-    closted_object_edge->end_point[0] =
+    closted_object_edge->end_point(0) =
         x2 * cos_theta + y2 * sin_theta + center_x;
-    closted_object_edge->end_point[1] =
+    closted_object_edge->end_point(1) =
         y2 * cos_theta - x2 * sin_theta + center_y;
   } else {
     // don't get front of vehicle
-    closted_object_edge->start_point[0] =
+    closted_object_edge->start_point(0) =
         x1 * cos_theta + y1 * sin_theta + center_x;
-    closted_object_edge->start_point[1] =
+    closted_object_edge->start_point(1) =
         y1 * cos_theta - x1 * sin_theta + center_y;
 
-    closted_object_edge->end_point[0] =
+    closted_object_edge->end_point(0) =
         x1 * cos_theta + y2 * sin_theta + center_x;
-    closted_object_edge->end_point[1] =
+    closted_object_edge->end_point(1) =
         y2 * cos_theta - x1 * sin_theta + center_y;
   }
 
@@ -379,7 +379,7 @@ bool Cipv::FindClosestEdgeOfObjectGround(
   pos << object->camera_supplement.local_center(0),
       object->camera_supplement.local_center(1),
       object->camera_supplement.local_center(2);
-  double theta_ray = atan2(pos[0], pos[2]);
+  double theta_ray = atan2(pos(0), pos(2));
   double theta = object->camera_supplement.alpha + theta_ray;
   if (theta > M_PI_2) {
     theta = theta - M_PI_2;
@@ -408,10 +408,10 @@ bool Cipv::FindClosestEdgeOfObjectGround(
     AINFO << "object.size(0) = " << object->size(0) << ";";
     AINFO << "object.size(1) = " << object->size(1) << ";";
     AINFO << "object.size(2) = " << object->size(2) << ";";
-    AINFO << "object.camera_supplement.alpha = "
-          << object->camera_supplement.alpha << ";";
-    AINFO << "center_x = " << center_x;
-    AINFO << "center_y = " << center_y;
+    // AINFO << "object->camera_supplement.alpha = "
+    //       << object->camera_supplement.alpha << ";";
+    // AINFO << "center_x = " << center_x;
+    // AINFO << "center_y = " << center_y;
   }
   // TODO(techoe): handle 3D direction
   // float direction_x = object->direction(0);
@@ -430,23 +430,23 @@ bool Cipv::FindClosestEdgeOfObjectGround(
 
   Point2Df p[4];
 
-  p[0][0] = x2 * cos_theta + y1 * sin_theta + center_x;
-  p[0][1] = y1 * cos_theta - x2 * sin_theta + center_y;
+  p[0](0) = x2 * cos_theta + y1 * sin_theta + center_x;
+  p[0](1) = y1 * cos_theta - x2 * sin_theta + center_y;
 
-  p[1][0] = x2 * cos_theta + y2 * sin_theta + center_x;
-  p[1][1] = y2 * cos_theta - x2 * sin_theta + center_y;
+  p[1](0) = x2 * cos_theta + y2 * sin_theta + center_x;
+  p[1](1) = y2 * cos_theta - x2 * sin_theta + center_y;
 
-  p[2][0] = x1 * cos_theta + y1 * sin_theta + center_x;
-  p[2][1] = y1 * cos_theta - x1 * sin_theta + center_y;
+  p[2](0) = x1 * cos_theta + y1 * sin_theta + center_x;
+  p[2](1) = y1 * cos_theta - x1 * sin_theta + center_y;
 
-  p[3][0] = x1 * cos_theta + y2 * sin_theta + center_x;
-  p[3][1] = y2 * cos_theta - x1 * sin_theta + center_y;
+  p[3](0) = x1 * cos_theta + y2 * sin_theta + center_x;
+  p[3](1) = y2 * cos_theta - x1 * sin_theta + center_y;
 
   if (debug_level_ >= 2) {
-    AINFO << "P0(" << p[0][0] << ", " << p[0][1] << ")";
-    AINFO << "P1(" << p[1][0] << ", " << p[1][1] << ")";
-    AINFO << "P2(" << p[2][0] << ", " << p[2][1] << ")";
-    AINFO << "P3(" << p[3][0] << ", " << p[3][1] << ")";
+    AINFO << "P0(" << p[0](0) << ", " << p[0](1) << ")";
+    AINFO << "P1(" << p[1](0) << ", " << p[1](1) << ")";
+    AINFO << "P2(" << p[2](0) << ", " << p[2](1) << ")";
+    AINFO << "P3(" << p[3](0) << ", " << p[3](1) << ")";
   }
 
   float closest_x = kMaxFloat;
@@ -454,40 +454,40 @@ bool Cipv::FindClosestEdgeOfObjectGround(
   int32_t closest_index = -1;
   int32_t second_closest_index = -1;
   for (int32_t i = 0; i < 4; i++) {
-    if (p[i][0] <= closest_x) {
+    if (p[i](0) <= closest_x) {
       second_closest_index = closest_index;
       second_closest_x = closest_x;
       closest_index = i;
-      closest_x = p[i][0];
-    } else if (p[i][0] <= second_closest_x) {
+      closest_x = p[i](0);
+    } else if (p[i](0) <= second_closest_x) {
       second_closest_index = i;
-      second_closest_x = p[i][0];
+      second_closest_x = p[i](0);
     }
   }
-  if (p[closest_index][1] >= p[second_closest_index][1]) {
-    closted_object_edge->start_point[0] = p[closest_index][0];
-    closted_object_edge->start_point[1] = p[closest_index][1];
+  if (p[closest_index](1) >= p[second_closest_index](1)) {
+    closted_object_edge->start_point(0) = p[closest_index](0);
+    closted_object_edge->start_point(1) = p[closest_index](1);
 
-    closted_object_edge->end_point[0] = p[second_closest_index][0];
-    closted_object_edge->end_point[1] = p[second_closest_index][1];
+    closted_object_edge->end_point(0) = p[second_closest_index](0);
+    closted_object_edge->end_point(1) = p[second_closest_index](1);
   } else {
-    closted_object_edge->start_point[0] = p[second_closest_index][0];
-    closted_object_edge->start_point[1] = p[second_closest_index][1];
+    closted_object_edge->start_point(0) = p[second_closest_index](0);
+    closted_object_edge->start_point(1) = p[second_closest_index](1);
 
-    closted_object_edge->end_point[0] = p[closest_index][0];
-    closted_object_edge->end_point[1] = p[closest_index][1];
+    closted_object_edge->end_point(0) = p[closest_index](0);
+    closted_object_edge->end_point(1) = p[closest_index](1);
   }
 
   // Added filter to consider an object only in front of ego-car.
-  if (p[closest_index][0] < 0) {
+  if (p[closest_index](0) < 0) {
     return false;
   }
 
   if (debug_level_ >= 2) {
-    AINFO << "start(" << closted_object_edge->start_point[0] << ", "
-          << closted_object_edge->start_point[1] << ")->";
-    AINFO << "end(" << closted_object_edge->end_point[0] << ", "
-          << closted_object_edge->end_point[1] << ")";
+    AINFO << "start(" << closted_object_edge->start_point(0) << ", "
+          << closted_object_edge->start_point(1) << ")->";
+    AINFO << "end(" << closted_object_edge->end_point(0) << ", "
+          << closted_object_edge->end_point(1) << ")";
   }
   return true;
 }
@@ -554,26 +554,27 @@ bool Cipv::AreDistancesSane(const float distance_start_point_to_right_lane,
 bool Cipv::IsPointLeftOfLine(const Point2Df &point,
                              const Point2Df &line_seg_start_point,
                              const Point2Df &line_seg_end_point) {
-  float cross_product = ((line_seg_end_point[0] - line_seg_start_point[0]) *
-                         (point[1] - line_seg_start_point[1])) -
-                        ((line_seg_end_point[1] - line_seg_start_point[1]) *
-                         (point[0] - line_seg_start_point[0]));
+  float cross_product = ((line_seg_end_point(0) - line_seg_start_point(0)) *
+                         (point(1) - line_seg_start_point(1))) -
+                        ((line_seg_end_point(1) - line_seg_start_point(1)) *
+                         (point(0) - line_seg_start_point(0)));
 
   if (cross_product > 0.0f) {
     if (debug_level_ >= 2) {
-      AINFO << "point (" << point[0] << ", " << point[1]
-            << ") is left of line_segment (" << line_seg_start_point[0] << ", "
-            << line_seg_start_point[1] << ")->(" << line_seg_end_point[0]
-            << ", " << line_seg_end_point[1]
+      AINFO << "point (" << point(0) << ", " << point(1)
+            << ") is left of line_segment (" << line_seg_start_point(0) << ", "
+            << line_seg_start_point(1) << ")->(" << line_seg_end_point(0)
+            << ", " << line_seg_end_point(1)
             << "), cross_product: " << cross_product;
     }
     return true;
   } else {
     if (debug_level_ >= 2) {
-      AINFO << "point (" << point[0] << ", " << point[1]
-            << ") is right of line_segment (" << line_seg_start_point[0] << ", "
-            << line_seg_start_point[1] << ")->(" << line_seg_end_point[0]
-            << ", " << line_seg_end_point[1]
+      AINFO << "point (" << point(0) << ", " << point(1)
+            << ") is right of line_segment ("
+            << line_seg_start_point(0) << ", "
+            << line_seg_start_point(1) << ")->(" << line_seg_end_point(0)
+            << ", " << line_seg_end_point(1)
             << "), cross_product: " << cross_product;
     }
     return false;
@@ -763,10 +764,10 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
           (*objects)[i]->center(0) < (*objects)[cipv_index]->center(0)) {
         // cipv_index is not set or if objects[i] is closer than
         // objects[cipv_index] in ego-x coordinate
-        // AINFO << "objects[i]->center[0]: "
-        //            << objects[i]->center[0];
-        // AINFO << "objects[cipv_index]->center[0]: "
-        //            << objects[cipv_index]->center[0];
+        // AINFO << "objects[i]->center(0): "
+        //            << objects[i]->center(0);
+        // AINFO << "objects[cipv_index]->center(0): "
+        //            << objects[cipv_index]->center(0);
         cipv_index = i;
         cipv_track_id = (*objects)[i]->track_id;
       }
@@ -820,12 +821,12 @@ bool Cipv::TranformPoint(const Eigen::VectorXf &in,
                          Eigen::Vector3d *out) {
   CHECK(in.rows() == motion_matrix.cols());
   Eigen::VectorXf trans_pt = motion_matrix * in;
-  if (fabs(trans_pt[3]) < kFloatEpsilon) {
+  if (fabs(trans_pt(3)) < kFloatEpsilon) {
     return false;
   } else {
-    trans_pt /= trans_pt[3];
+    trans_pt /= trans_pt(3);
   }
-  *out << trans_pt[0], trans_pt[1], trans_pt[2];
+  *out << trans_pt(0), trans_pt(1), trans_pt(2);
   return true;
 }
 
@@ -863,7 +864,7 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
     object_id_skip_count_[cur_id] = 0;
 
     object_trackjectories_[cur_id].push_back(
-        std::make_pair(obj->center[0], obj->center[1]));
+        std::make_pair(obj->center(0), obj->center(1)));
 
     if (debug_level_ >= 2) {
       AINFO << "object_trackjectories_[" << cur_id
@@ -879,10 +880,10 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
       }
       Eigen::VectorXf pt =
           Eigen::VectorXf::Zero((*motion_buffer)[0].motion.cols());
-      pt[0] = object_trackjectories_[cur_id][it].first;
-      pt[1] = object_trackjectories_[cur_id][it].second;
-      pt[2] = 0.0f;
-      pt[3] = 1.0f;
+      pt(0) = object_trackjectories_[cur_id][it].first;
+      pt(1) = object_trackjectories_[cur_id][it].second;
+      pt(2) = 0.0f;
+      pt(3) = 1.0f;
 
       Eigen::Vector3d transformed_pt;
       TranformPoint(pt, (*motion_buffer)[motion_size - count - 1].motion,
@@ -937,12 +938,12 @@ bool Cipv::image2ground(const float image_x, const float image_y,
   p_homo << image_x, image_y, 1;
   Eigen::Vector3d p_ground;
   p_ground = homography_im2car_ * p_homo;
-  if (fabs(p_ground[2]) > std::numeric_limits<double>::min()) {
-    *ground_x = static_cast<float>(p_ground[0] / p_ground[2]);
-    *ground_y = static_cast<float>(p_ground[1] / p_ground[2]);
+  if (fabs(p_ground(2)) > std::numeric_limits<double>::min()) {
+    *ground_x = static_cast<float>(p_ground(0) / p_ground(2));
+    *ground_y = static_cast<float>(p_ground(1) / p_ground(2));
   } else {
     if (debug_level_ >= 1) {
-      AINFO << "p_ground[2] too small :" << p_ground[2];
+      AINFO << "p_ground(2) too small :" << p_ground(2);
     }
     return false;
   }
@@ -956,12 +957,12 @@ bool Cipv::ground2image(const float ground_x, const float ground_y,
   p_homo_ground << ground_x, ground_y, 1;
   Eigen::Vector3d p_image;
   p_image = homography_car2im_ * p_homo_ground;
-  if (fabs(p_image[2]) > std::numeric_limits<double>::min()) {
-    *image_x = static_cast<float>(p_image[0] / p_image[2]);
-    *image_y = static_cast<float>(p_image[1] / p_image[2]);
+  if (fabs(p_image(2)) > std::numeric_limits<double>::min()) {
+    *image_x = static_cast<float>(p_image(0) / p_image(2));
+    *image_y = static_cast<float>(p_image(1) / p_image(2));
   } else {
     if (debug_level_ >= 1) {
-      AINFO << "p_image[2] too small :" << p_image[2];
+      AINFO << "p_image(2) too small :" << p_image(2);
     }
     return false;
   }
