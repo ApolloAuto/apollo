@@ -66,10 +66,10 @@ common::Status PiecewiseJerkPathOptimizer::Process(
       continue;
     }
 
-    int max_iter = 4000;
+    int max_iter = 10000;
     // lower max_iter for regular/self/
     if (path_boundary.label().find("self") != std::string::npos) {
-      max_iter = 1000;
+      max_iter = 2000;
     }
 
     CHECK_GT(path_boundary.boundary().size(), 1);
