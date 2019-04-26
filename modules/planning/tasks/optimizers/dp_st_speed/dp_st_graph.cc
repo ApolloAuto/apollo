@@ -102,21 +102,22 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
     }
   }
 
-  if (st_graph_data_.st_boundaries().empty()) {
-    ADEBUG << "No path obstacles, dp_st_graph output default speed profile.";
-    std::vector<SpeedPoint> speed_profile;
-    const double v_default = FLAGS_default_cruise_speed;
-    for (int i = 0; i <= dp_st_speed_config_.matrix_dimension_t(); ++i) {
-      SpeedPoint speed_point;
-      speed_point.set_s(i * unit_t_ * v_default);
-      speed_point.set_t(i * unit_t_);
-      speed_point.set_v(v_default);
-      speed_point.set_a(0.0);
-      speed_profile.emplace_back(std::move(speed_point));
-    }
-    *speed_data = SpeedData(std::move(speed_profile));
-    return Status::OK();
-  }
+  // TODO(Hongyi): remove default speed and always search
+  // if (st_graph_data_.st_boundaries().empty()) {
+  //   ADEBUG << "No path obstacles, dp_st_graph output default speed profile.";
+  //   std::vector<SpeedPoint> speed_profile;
+  //   const double v_default = FLAGS_default_cruise_speed;
+  //   for (int i = 0; i <= dp_st_speed_config_.matrix_dimension_t(); ++i) {
+  //     SpeedPoint speed_point;
+  //     speed_point.set_s(i * unit_t_ * v_default);
+  //     speed_point.set_t(i * unit_t_);
+  //     speed_point.set_v(v_default);
+  //     speed_point.set_a(0.0);
+  //     speed_profile.emplace_back(std::move(speed_point));
+  //   }
+  //   *speed_data = SpeedData(std::move(speed_profile));
+  //   return Status::OK();
+  // }
 
   if (!InitCostTable().ok()) {
     const std::string msg = "Initialize cost table failed.";
