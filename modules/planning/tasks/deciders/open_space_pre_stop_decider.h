@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/proto/decider_config.pb.h"
 
 #include "cyber/common/macros.h"
@@ -34,15 +31,9 @@
 namespace apollo {
 namespace planning {
 
-class DeciderRuleBasedStop : public Decider {
+class OpenSpacePreStopDecider : public Decider {
  public:
-  explicit DeciderRuleBasedStop(const TaskConfig& config);
-
-  static bool BuildStopDecision(
-      const std::string& stop_wall_id, const double stop_line_s,
-      const double stop_distance, const StopReasonCode& stop_reason_code,
-      const std::vector<std::string>& wait_for_obstacles, Frame* const frame,
-      ReferenceLineInfo* const reference_line_info);
+  explicit OpenSpacePreStopDecider(const TaskConfig& config);
 
  private:
   apollo::common::Status Process(

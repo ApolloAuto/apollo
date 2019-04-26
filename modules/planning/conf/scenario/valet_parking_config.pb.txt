@@ -11,7 +11,7 @@ stage_type: VALET_PARKING_PARKING
 stage_config: {
     stage_type: VALET_PARKING_APPROACHING_PARKING_SPOT
     enabled: true
-    task_type: DECIDER_RULE_BASED_STOP
+    task_type: OPEN_SPACE_PRE_STOP_DECIDER
     task_type: DP_POLY_PATH_OPTIMIZER
     task_type: PATH_DECIDER
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
@@ -20,7 +20,7 @@ stage_config: {
     task_type: SPEED_BOUNDS_FINAL_DECIDER
     task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
     task_config: {
-        task_type: DECIDER_RULE_BASED_STOP
+        task_type: OPEN_SPACE_PRE_STOP_DECIDER
     }
     task_config: {
         task_type: DP_POLY_PATH_OPTIMIZER

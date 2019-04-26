@@ -13,11 +13,6 @@ standard_planning_config {
   }
 }
 default_task_config: {
-  task_type: DECIDER_RULE_BASED_STOP
-  decider_rule_based_stop_config: {
-  }
-}
-default_task_config: {
   task_type: QP_PIECEWISE_JERK_PATH_OPTIMIZER
   qp_piecewise_jerk_path_config {
     path_resolution: 1.0
