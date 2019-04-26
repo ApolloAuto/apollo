@@ -244,8 +244,8 @@ bool FusionCameraDetectionComponent::Init() {
 
   if (enable_cipv_) {
     cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-      average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-      average_frame_rate_, image_based_cipv_, debug_level_);
+               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
+               average_frame_rate_, image_based_cipv_, debug_level_);
   }
 
   if (enable_visualization_) {

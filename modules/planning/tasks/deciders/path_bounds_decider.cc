@@ -443,8 +443,8 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
                                     ? curr_neighbor_lane_width
                                     : 0.0);
     double curr_left_bound_adc =
-        std::fmax(adc_l_to_lane_center_, adc_l_to_lane_center_ +
-                  ADC_speed_buffer) +
+        std::fmax(adc_l_to_lane_center_,
+                  adc_l_to_lane_center_ + ADC_speed_buffer) +
         GetBufferBetweenADCCenterAndEdge() + ADC_buffer;
     double curr_left_bound =
         std::fmax(curr_left_bound_lane, curr_left_bound_adc) - offset_to_map;
@@ -455,8 +455,8 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
              ? curr_neighbor_lane_width
              : 0.0);
     double curr_right_bound_adc =
-        std::fmin(adc_l_to_lane_center_, adc_l_to_lane_center_ +
-                  ADC_speed_buffer) -
+        std::fmin(adc_l_to_lane_center_,
+                  adc_l_to_lane_center_ + ADC_speed_buffer) -
         GetBufferBetweenADCCenterAndEdge() - ADC_buffer;
     double curr_right_bound =
         std::fmin(curr_right_bound_lane, curr_right_bound_adc) - offset_to_map;

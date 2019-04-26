@@ -48,12 +48,13 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
-  std::array<double, 5> w = {piecewise_jerk_path_config.l_weight(),
-                             piecewise_jerk_path_config.dl_weight() *
-                             std::fmax(init_frenet_state.first[1] *
-                             init_frenet_state.first[1], 1.0),
-                             piecewise_jerk_path_config.ddl_weight(),
-                             piecewise_jerk_path_config.dddl_weight(), 0.0};
+  std::array<double, 5> w = {
+      piecewise_jerk_path_config.l_weight(),
+      piecewise_jerk_path_config.dl_weight() *
+          std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1],
+                    1.0),
+      piecewise_jerk_path_config.ddl_weight(),
+      piecewise_jerk_path_config.dddl_weight(), 0.0};
 
   const auto& path_boundaries =
       reference_line_info_->GetCandidatePathBoundaries();

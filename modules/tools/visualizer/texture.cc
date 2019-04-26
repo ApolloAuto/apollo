@@ -112,6 +112,6 @@ bool Texture::UpdateData(
 
   image_height_ = imgData->height();
   image_width_ = imgData->width();
-  
+
   return true;
 }
