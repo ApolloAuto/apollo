@@ -8,14 +8,7 @@ is_replan: true
 gear: GEAR_DRIVE
 decision {
   main_decision {
-    stop {
-      reason_code: STOP_REASON_LANE_CHANGE_URGENCY
-      reason: "stop by path_end_stop"
-      stop_point {
-        x: 586447.1479851125
-        y: 4140767.56420606
-      }
-      stop_heading: 1.3180947906500868
+    cruise {
       change_lane_type: FORWARD
     }
   }
@@ -32,22 +25,6 @@ decision {
             z: 0
           }
           fence_heading: 1.3183887244443382
-        }
-      }
-    }
-    decision {
-      id: "path_end_stop"
-      perception_id: -439803322
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_LANE_CHANGE_URGENCY
-          distance_s: -0
-          stop_point {
-            x: 586447.1479851125
-            y: 4140767.56420606
-            z: 0
-          }
-          stop_heading: 1.3180947906500868
         }
       }
     }
