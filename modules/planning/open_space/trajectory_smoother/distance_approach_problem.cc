@@ -48,7 +48,7 @@ bool DistanceApproachProblem::Solve(
 
   if (planner_open_space_config_.distance_approach_config()
           .distance_approach_mode() == DISTANCE_APPROACH_IPOPT) {
-    ptop = new DistanceApproachIPOPTInterface(
+    ptop = new DistanceApproachIPOPTFixedTsInterface(
         horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up, x0, xF, last_time_u,
         XYbounds, obstacles_edges_num, obstacles_num, obstacles_A, obstacles_b,
         planner_open_space_config_);
@@ -117,6 +117,9 @@ bool DistanceApproachProblem::Solve(
       "mu_init", planner_open_space_config_.distance_approach_config()
                      .ipopt_config()
                      .ipopt_mu_init());
+  // debug derivative only
+  //app->Options()->SetStringValue(
+  //    "derivative_test", "first-order");
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {

@@ -54,9 +54,9 @@ distance_approach_config {
   max_acceleration_reverse: 1.0
   min_time_sample_scaling: 0.8
   max_time_sample_scaling: 1.2
-  use_fix_time: false
+  use_fix_time: true
   ipopt_config {
-    ipopt_print_level: 0
+    ipopt_print_level: 3
     mumps_mem_percent: 6000
     mumps_pivtol: 1e-06
     ipopt_max_iter: 1000
