@@ -29,7 +29,7 @@ stage_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
     task_type: PATH_BOUNDS_DECIDER
     path_bounds_decider_config {
@@ -52,7 +52,7 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
@@ -70,7 +70,7 @@ stage_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
     task_type: DP_POLY_PATH_OPTIMIZER
   }
@@ -84,7 +84,7 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
@@ -102,7 +102,7 @@ stage_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
     task_type: DP_POLY_PATH_OPTIMIZER
   }
@@ -116,7 +116,7 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
@@ -133,7 +133,7 @@ stage_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
     task_type: SIDE_PASS_PATH_DECIDER
   }
@@ -144,7 +144,7 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
@@ -161,7 +161,7 @@ stage_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
     task_type: DP_POLY_PATH_OPTIMIZER
   }
@@ -175,7 +175,7 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
@@ -192,7 +192,7 @@ stage_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
     task_type: SIDE_PASS_SAFETY
     side_pass_safety_config {
@@ -206,7 +206,7 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
@@ -222,7 +222,7 @@ stage_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
     task_type: DP_ST_SPEED_OPTIMIZER
   }
@@ -230,7 +230,7 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
