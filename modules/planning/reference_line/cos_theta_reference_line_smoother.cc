@@ -126,7 +126,7 @@ bool CosThetaReferenceLineSmoother::CosThetaSmooth(
 
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
-  app->Options()->SetIntegerValue("print_level", 1);
+  app->Options()->SetIntegerValue("print_level", 3);
   app->Options()->SetIntegerValue("max_iter",
                                   static_cast<int>(num_of_iterations_));
   app->Options()->SetNumericValue("acceptable_tol", acceptable_tol_);
