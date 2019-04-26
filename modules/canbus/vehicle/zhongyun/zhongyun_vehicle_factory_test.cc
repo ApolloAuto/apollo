@@ -28,7 +28,6 @@ class ZhongyunVehicleFactoryTest : public ::testing::Test {
     parameter.set_brand(apollo::common::ZHONGYUN);
     zhongyun_factory_.SetVehicleParameter(parameter);
   }
-  virtual void TearDown() {}
 
  protected:
   ZhongyunVehicleFactory zhongyun_factory_;
