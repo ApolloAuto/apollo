@@ -1,4 +1,4 @@
-max_constraint_interval : 1.0
+max_constraint_interval : 0.05
 longitudinal_boundary_bound : 2.0
 lateral_boundary_bound : 0.25
 num_of_total_points : 500
