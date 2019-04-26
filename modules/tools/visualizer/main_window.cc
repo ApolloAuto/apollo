@@ -1144,8 +1144,7 @@ void MainWindow::AddNewWriter(
 
   QTreeWidgetItem* child = new QTreeWidgetItem();
   if (child == nullptr) {
-    QMessageBox::warning(this, tr("Error"),
-                         tr("No Enough for New Channel!!!"),
+    QMessageBox::warning(this, tr("Error"), tr("No Enough for New Channel!!!"),
                          QMessageBox::Ok);
     return;
   }

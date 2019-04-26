@@ -19,8 +19,7 @@
 namespace apollo {
 namespace prediction {
 
-void EmptyPredictor::Predict(Obstacle* obstacle) {
-}
+void EmptyPredictor::Predict(Obstacle* obstacle) {}
 
 }  // namespace prediction
 }  // namespace apollo

@@ -87,8 +87,7 @@ bool PathLaneBorrowDecider::IsWithinSidePassingSpeedADC(const Frame& frame) {
 }
 
 bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
-  if (PlanningContext::Instance()->
-          front_static_obstacle_cycle_counter() >= 3) {
+  if (PlanningContext::Instance()->front_static_obstacle_cycle_counter() >= 3) {
     ADEBUG << "The blocking obstacle is long-term existing.";
     return true;
   } else {

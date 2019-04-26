@@ -565,8 +565,7 @@ bool Cipv::IsPointLeftOfLine(const Point2Df &point,
   } else {
     if (debug_level_ >= 2) {
       AINFO << "point (" << point(0) << ", " << point(1)
-            << ") is right of line_segment ("
-            << line_seg_start_point(0) << ", "
+            << ") is right of line_segment (" << line_seg_start_point(0) << ", "
             << line_seg_start_point(1) << ")->(" << line_seg_end_point(0)
             << ", " << line_seg_end_point(1)
             << "), cross_product: " << cross_product;

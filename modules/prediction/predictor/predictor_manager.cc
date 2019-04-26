@@ -227,7 +227,8 @@ void PredictorManager::PredictObstaclesInParallel(
       GroupObstaclesByObstacleId(id, obstacles_container, &id_obstacle_map);
     }
   }
-  PredictionThreadPool::ForEach(id_obstacle_map.begin(), id_obstacle_map.end(),
+  PredictionThreadPool::ForEach(
+      id_obstacle_map.begin(), id_obstacle_map.end(),
       [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
         for (auto obstacle_ptr : obstacles_iter.second) {
           int id = obstacle_ptr->id();

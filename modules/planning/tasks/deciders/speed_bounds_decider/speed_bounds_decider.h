@@ -38,8 +38,8 @@ class SpeedBoundsDecider : public Decider {
       Frame* const frame,
       ReferenceLineInfo* const reference_line_info) override;
 
-  void AddPathEndStop(
-    Frame* const frame, ReferenceLineInfo* const reference_line_info);
+  void AddPathEndStop(Frame* const frame,
+                      ReferenceLineInfo* const reference_line_info);
 
   void CheckLaneChangeUrgency(Frame* const frame);
 
