@@ -152,22 +152,19 @@ Status OpenSpaceTrajectoryProvider::Process() {
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
 
-    // Record and update debug information regardless of trajectory update
-    // status
-    if (FLAGS_enable_record_debug) {
-      // call merge debug ptr, open_space_trajectory_optimizer_
-      auto* ptr_debug = frame_->mutable_open_space_info()->mutable_debug();
-      open_space_trajectory_optimizer_->UpdateDebugInfo(
-          ptr_debug->mutable_planning_data()->mutable_open_space());
-
-      // sync debug instance
-      frame_->mutable_open_space_info()->sync_debug_instance();
-    }
-
     // Check if trajectory updated
     if (trajectory_updated_) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       LoadResult(trajectory_data);
+      if (FLAGS_enable_record_debug) {
+        // call merge debug ptr, open_space_trajectory_optimizer_
+        auto* ptr_debug = frame_->mutable_open_space_info()->mutable_debug();
+        open_space_trajectory_optimizer_->UpdateDebugInfo(
+            ptr_debug->mutable_planning_data()->mutable_open_space());
+
+        // sync debug instance
+        frame_->mutable_open_space_info()->sync_debug_instance();
+      }
       trajectory_updated_.store(false);
       data_ready_.store(false);
       return Status::OK();
