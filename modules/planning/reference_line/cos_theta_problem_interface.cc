@@ -72,35 +72,13 @@ bool CosThetaProbleminterface::get_bounds_info(int n, double* x_l, double* x_u,
   // a. for x, y
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    double x_lower = 0.0;
-    double x_upper = 0.0;
-    double y_lower = 0.0;
-    double y_upper = 0.0;
-    double bound = std::min(lateral_bounds_[i], default_max_point_deviation_);
-
-    if (i == 0 && has_fixed_start_point_) {
-      x_lower = start_x_ - relax_;
-      x_upper = start_x_ + relax_;
-      y_lower = start_y_ - relax_;
-      y_upper = start_y_ + relax_;
-    } else if (i + 1 == num_of_points_ && has_fixed_end_point_) {
-      x_lower = end_x_ - relax_;
-      x_upper = end_x_ + relax_;
-      y_lower = end_y_ - relax_;
-      y_upper = end_y_ + relax_;
-    } else {
-      x_lower = init_points_[i].x() - bound;
-      x_upper = init_points_[i].x() + bound;
-      y_lower = init_points_[i].y() - bound;
-      y_upper = init_points_[i].y() + bound;
-    }
     // x
-    x_l[index] = x_lower;
-    x_u[index] = x_upper;
+    x_l[index] = -2e19;
+    x_u[index] = 2e19;
 
     // y
-    x_l[index + 1] = y_lower;
-    x_u[index + 1] = y_upper;
+    x_l[index + 1] = -2e19;
+    x_u[index + 1] = 2e19;
   }
 
   // constraints
