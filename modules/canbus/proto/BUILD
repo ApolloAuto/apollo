@@ -16,6 +16,7 @@ proto_library(
         "ge3.proto",
         "lexus.proto",
         "transit.proto",
+        "ch.proto",
         "vehicle_parameter.proto",
         "wey.proto",
         "zhongyun.proto",

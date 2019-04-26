@@ -23,6 +23,7 @@
 #include "modules/canbus/vehicle/transit/transit_vehicle_factory.h"
 #include "modules/canbus/vehicle/wey/wey_vehicle_factory.h"
 #include "modules/canbus/vehicle/zhongyun/zhongyun_vehicle_factory.h"
+#include "modules/canbus/vehicle/ch/ch_vehicle_factory.h"
 
 namespace apollo {
 namespace canbus {
@@ -48,6 +49,9 @@ void VehicleFactory::RegisterVehicleFactory() {
   });
   Register(apollo::common::ZHONGYUN, []() -> AbstractVehicleFactory * {
     return new ZhongyunVehicleFactory();
+  });
+  Register(apollo::common::CH, []() -> AbstractVehicleFactory * {
+    return new ChVehicleFactory();
   });
 }
 
