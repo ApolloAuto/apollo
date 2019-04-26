@@ -154,6 +154,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   if (!path_time_qp->Optimize()) {
     std::string msg("Piecewise jerk speed optimizer failed!");
     AERROR << msg;
+    speed_data->clear();
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
