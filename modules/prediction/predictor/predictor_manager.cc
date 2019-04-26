@@ -53,15 +53,6 @@ void GroupObstaclesByObstacleId(const int obstacle_id,
     AERROR << "Null obstacle [" << obstacle_id << "] found";
     return;
   }
-  if (obstacle_ptr->IsStill()) {
-    ADEBUG << "Ignore still obstacle [" << obstacle_id << "]";
-    return;
-  }
-  const Feature& feature = obstacle_ptr->latest_feature();
-  if (feature.priority().priority() == ObstaclePriority::IGNORE) {
-    ADEBUG << "Skip ignored obstacle [" << obstacle_id << "]";
-    return;
-  }
   int id_mod = obstacle_id % FLAGS_max_thread_num;
   (*id_obstacle_map)[id_mod].push_back(obstacle_ptr);
 }
