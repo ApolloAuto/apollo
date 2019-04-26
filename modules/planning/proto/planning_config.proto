@@ -48,7 +48,7 @@ message TaskConfig {
     NAVI_OBSTACLE_DECIDER = 9;
     QP_PIECEWISE_JERK_PATH_OPTIMIZER = 10;
     DECIDER_CREEP = 11;
-    DECIDER_RULE_BASED_STOP = 12;
+    OPEN_SPACE_PRE_STOP_DECIDER = 12;
     SIDE_PASS_PATH_DECIDER = 13;
     SIDE_PASS_SAFETY = 14;
     PROCEED_WITH_CAUTION_SPEED = 15;
@@ -75,7 +75,7 @@ message TaskConfig {
     ProceedWithCautionSpeedConfig proceed_with_caution_speed_config = 8;
     QpPiecewiseJerkPathConfig qp_piecewise_jerk_path_config = 9;
     DeciderCreepConfig decider_creep_config = 10;
-    DeciderRuleBasedStopConfig decider_rule_based_stop_config = 11;
+    OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config = 11;
     SidePassSafetyConfig side_pass_safety_config = 12;
     SidePassPathDeciderConfig side_pass_path_decider_config = 13;
     // PolyVTSpeedConfig poly_vt_speed_config = 14;
