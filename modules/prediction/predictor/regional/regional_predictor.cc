@@ -87,8 +87,8 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
   }
 }
 
-void RegionalPredictor::GenerateStillTrajectory(
-    double probability, Obstacle* obstacle) {
+void RegionalPredictor::GenerateStillTrajectory(double probability,
+                                                Obstacle* obstacle) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
     return;
@@ -109,12 +109,12 @@ void RegionalPredictor::GenerateStillTrajectory(
   DrawStillTrajectory(position, heading, 0.0, total_time, &points);
   Trajectory trajectory = GenerateTrajectory(points);
   obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
-        trajectory);
+      trajectory);
   SetEqualProbability(probability, start_index, obstacle);
 }
 
-void RegionalPredictor::GenerateMovingTrajectory(
-    double probability, Obstacle* obstacle) {
+void RegionalPredictor::GenerateMovingTrajectory(double probability,
+                                                 Obstacle* obstacle) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
     return;
