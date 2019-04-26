@@ -35,15 +35,15 @@ using ::apollo::control::ControlCommand;
 class ZhongyunControllerTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    std::string canbus_conf_file =
+    const std::string canbus_conf_file =
         "modules/canbus/testdata/conf/zhongyun_canbus_conf_test.pb.txt";
-    ::apollo::common::util::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
+    apollo::common::util::GetProtoFromFile(canbus_conf_file, &canbus_conf_);
     params_ = canbus_conf_.vehicle_parameter();
   }
 
  protected:
   ZhongyunController controller_;
-  CanSender<::apollo::canbus::ChassisDetail> sender_;
+  CanSender<ChassisDetail> sender_;
   CanbusConf canbus_conf_;
   VehicleParameter params_;
   ZhongyunMessageManager msg_manager_;
