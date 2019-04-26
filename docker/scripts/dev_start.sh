@@ -330,6 +330,10 @@ function main(){
         docker exec $APOLLO_DEV bash -c '/apollo/scripts/docker_adduser.sh'
     fi
 
+    # Make sure global_flagfile.txt exists
+    docker exec -u $USER $APOLLO_DEV bash -c 'touch /apollo/modules/common/data/global_flagfile.txt'
+
+
     ok "Finished setting up Apollo docker environment. Now you can enter with: \nbash docker/scripts/dev_into.sh"
     ok "Enjoy!"
 }

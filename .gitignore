@@ -84,3 +84,7 @@ docs/demo_guide/*.bag
 
 # Logs
 cyber/log/*
+
+# Local HMI configuration
+modules/common/data/global_flagfile.txt
+

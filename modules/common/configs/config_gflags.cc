@@ -16,7 +16,7 @@
 
 #include "modules/common/configs/config_gflags.h"
 
-DEFINE_string(map_dir, "/apollo/modules/map/data/demo",
+DEFINE_string(map_dir, "/apollo/modules/map/data/sunnyvale_with_two_offices",
               "Directory which contains a group of related maps.");
 DEFINE_int32(local_utm_zone_id, 10, "UTM zone id.");
 
