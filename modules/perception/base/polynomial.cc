@@ -71,13 +71,13 @@ double Polynomial::operator()(const double& x) {
 std::ostream& operator<<(std::ostream& o, const Polynomial& p) {
   const std::map<uint32_t, double>& coeff = p.getCoeff();
   size_t i = 0;
+  size_t coeff_num = coeff.size();
   for (auto it = coeff.rbegin(); it != coeff.rend(); ++it) {
     const uint32_t& order = it->first;
     const double& c = it->second;
 
-    o << "(" << c << ")"
-      << "*(t^" << order << ")";
-    if (i < coeff.size() - 1) {
+    o << "(" << c << ")" << "*(t^" << order << ")";
+    if (i < coeff_num - 1) {
       o << " + ";
     }
     ++i;
