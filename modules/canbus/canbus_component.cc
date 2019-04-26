@@ -166,6 +166,15 @@ bool CanbusComponent::Init() {
   return true;
 }
 
+void CanbusComponent::Clear() {
+  can_sender_.Stop();
+  can_receiver_.Stop();
+  can_client_->Stop();
+  vehicle_controller_->Stop();
+
+  AINFO << "Cleanup Canbus component";
+}
+
 void CanbusComponent::PublishChassis() {
   Chassis chassis = vehicle_controller_->chassis();
   common::util::FillHeader(node_->Name(), &chassis);
