@@ -17,7 +17,7 @@
 #include "modules/prediction/evaluator/evaluator_manager.h"
 
 #include <algorithm>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 #include "modules/common/configs/vehicle_config_helper.h"
@@ -42,7 +42,7 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
-using IdObstacleMap = std::map<int, std::list<Obstacle*>>;
+using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
 
 namespace {
 
@@ -59,7 +59,7 @@ bool IsTrainable(const Feature& feature) {
 
 void GroupObstaclesByObstacleId(const int obstacle_id,
                                 ObstaclesContainer* const obstacles_container,
-                                IdObstacleMap* const id_obstacle_map) {
+                                IdObstacleListMap* const id_obstacle_map) {
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
   if (obstacle_ptr == nullptr) {
     AERROR << "Null obstacle [" << obstacle_id << "] found";
@@ -165,13 +165,13 @@ void EvaluatorManager::Run() {
   std::vector<Obstacle*> dynamic_env;
 
   if (FLAGS_enable_multi_thread) {
-    IdObstacleMap id_obstacle_map;
+    IdObstacleListMap id_obstacle_map;
     for (int id : obstacles_container->curr_frame_considered_obstacle_ids()) {
       GroupObstaclesByObstacleId(id, obstacles_container, &id_obstacle_map);
     }
     PredictionThreadPool::ForEach(
         id_obstacle_map.begin(), id_obstacle_map.end(),
-        [&](IdObstacleMap::iterator::value_type& obstacles_iter) {
+        [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
           // TODO(kechxu): parallelize this level
           for (auto obstacle_ptr : obstacles_iter.second) {
             EvaluateObstacle(obstacle_ptr, dynamic_env);
