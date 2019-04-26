@@ -24,8 +24,7 @@ namespace radar {
 int RadarTrack::s_current_idx_ = 0;
 int RadarTrack::s_tracked_times_threshold_ = 3;
 bool RadarTrack::s_use_filter_ = false;
-std::string RadarTrack::s_chosen_filter_ =  // NOLINT
-    "AdaptiveKalmanFilter";
+std::string RadarTrack::s_chosen_filter_ = "AdaptiveKalmanFilter";
 
 RadarTrack::RadarTrack(const base::ObjectPtr& obs, const double timestamp) {
   s_current_idx_ %= MAX_RADAR_IDX;
