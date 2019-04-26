@@ -274,5 +274,6 @@ DECLARE_bool(enable_soft_speed_limit);
 
 DECLARE_double(message_latency_threshold);
 DECLARE_bool(enable_lane_change_urgency_checking);
+DECLARE_double(short_path_length_threshold);
 
 DECLARE_uint32(trajectory_stitching_preserved_length);
