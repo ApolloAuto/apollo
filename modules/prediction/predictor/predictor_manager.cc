@@ -16,6 +16,10 @@
 
 #include "modules/prediction/predictor/predictor_manager.h"
 
+#include <list>
+#include <memory>
+#include <unordered_map>
+
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
@@ -35,13 +39,15 @@ namespace prediction {
 
 using apollo::common::adapter::AdapterConfig;
 using apollo::perception::PerceptionObstacle;
-using IdObstacleMap = std::map<int, std::list<Obstacle*>>;
+using IdObstacleListMap = std::unordered_map<int, std::list<Obstacle*>>;
+using IdPredictionObstacleMap =
+    std::unordered_map<int, std::shared_ptr<PredictionObstacle>>;
 
 namespace {
 
 void GroupObstaclesByObstacleId(const int obstacle_id,
                                 ObstaclesContainer* const obstacles_container,
-                                IdObstacleMap* const id_obstacle_map) {
+                                IdObstacleListMap* const id_obstacle_map) {
   Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
   if (obstacle_ptr == nullptr) {
     AERROR << "Null obstacle [" << obstacle_id << "] found";
@@ -212,24 +218,44 @@ void PredictorManager::PredictObstacles(
 void PredictorManager::PredictObstaclesInParallel(
     ObstaclesContainer* obstacles_container,
     ADCTrajectoryContainer* adc_trajectory_container) {
-  // TODO(kechxu) implement
-  IdObstacleMap id_obstacle_map;
+  IdPredictionObstacleMap id_prediction_obstacle_map;
+  for (int id : obstacles_container->curr_frame_obstacle_ids()) {
+    id_prediction_obstacle_map[id] = std::make_shared<PredictionObstacle>();
+  }
+  IdObstacleListMap id_obstacle_map;
   for (int id : obstacles_container->curr_frame_obstacle_ids()) {
     Obstacle* obstacle = obstacles_container->GetObstacle(id);
+    const PerceptionObstacle& perception_obstacle =
+        obstacles_container->GetPerceptionObstacle(id);
     if (obstacle == nullptr) {
-      // TODO(kechxu) set is_static = true
+      std::shared_ptr<PredictionObstacle> prediction_obstacle_ptr =
+          id_prediction_obstacle_map[id];
+      prediction_obstacle_ptr->set_is_static(true);
+      prediction_obstacle_ptr->set_timestamp(perception_obstacle.timestamp());
     } else {
       GroupObstaclesByObstacleId(id, obstacles_container, &id_obstacle_map);
     }
   }
   PredictionThreadPool::ForEach(id_obstacle_map.begin(), id_obstacle_map.end(),
-      [=](IdObstacleMap::iterator::value_type& obstacles_iter) {
+      [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
         for (auto obstacle_ptr : obstacles_iter.second) {
-          PredictionObstacle prediction_obstacle;
-          PredictObstacle(obstacle_ptr, &prediction_obstacle,
+          int id = obstacle_ptr->id();
+          PredictObstacle(obstacle_ptr, id_prediction_obstacle_map[id].get(),
                           adc_trajectory_container);
         }
       });
+  for (auto& item : id_prediction_obstacle_map) {
+    int id = item.first;
+    auto prediction_obstacle_ptr = item.second;
+    const PerceptionObstacle& perception_obstacle =
+        obstacles_container->GetPerceptionObstacle(id);
+    prediction_obstacle_ptr->set_predicted_period(
+        FLAGS_prediction_trajectory_time_length);
+    prediction_obstacle_ptr->mutable_perception_obstacle()->CopyFrom(
+        perception_obstacle);
+    prediction_obstacles_.add_prediction_obstacle()->CopyFrom(
+        *prediction_obstacle_ptr);
+  }
 }
 
 void PredictorManager::PredictObstacle(
