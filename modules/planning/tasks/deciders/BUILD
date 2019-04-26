@@ -17,7 +17,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
-        ":decider_rule_based_stop",
+        ":open_space_pre_stop_decider",
         ":open_space_fallback_decider",
         ":open_space_roi_decider",
         "//modules/perception/proto:perception_proto",
@@ -34,20 +34,17 @@ cc_library(
 )
 
 cc_library(
-    name = "decider_rule_based_stop",
+    name = "open_space_pre_stop_decider",
     srcs = [
-        "decider_rule_based_stop.cc",
+        "open_space_pre_stop_decider.cc",
     ],
     hdrs = [
-        "decider_rule_based_stop.h",
+        "open_space_pre_stop_decider.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
-        "//modules/planning/common:planning_context",
-        "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
-        "//modules/planning/common/util:util_lib",
     ],
 )
 

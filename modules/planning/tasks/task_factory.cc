@@ -24,8 +24,8 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
-#include "modules/planning/tasks/deciders/decider_rule_based_stop.h"
 #include "modules/planning/tasks/deciders/open_space_fallback_decider.h"
+#include "modules/planning/tasks/deciders/open_space_pre_stop_decider.h"
 #include "modules/planning/tasks/deciders/open_space_roi_decider.h"
 #include "modules/planning/tasks/deciders/path_assessment_decider.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider.h"
@@ -122,9 +122,9 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new DeciderCreep(config);
                          });
-  task_factory_.Register(TaskConfig::DECIDER_RULE_BASED_STOP,
+  task_factory_.Register(TaskConfig::OPEN_SPACE_PRE_STOP_DECIDER,
                          [](const TaskConfig& config) -> Task* {
-                           return new DeciderRuleBasedStop(config);
+                           return new OpenSpacePreStopDecider(config);
                          });
   task_factory_.Register(TaskConfig::SIDE_PASS_SAFETY,
                          [](const TaskConfig& config) -> Task* {

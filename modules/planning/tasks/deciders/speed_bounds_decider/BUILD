@@ -19,7 +19,6 @@ cc_library(
         "//modules/planning/common:st_graph_data",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/deciders:decider_base",
-        "//modules/planning/tasks/deciders:decider_rule_based_stop",
     ],
 )
 
