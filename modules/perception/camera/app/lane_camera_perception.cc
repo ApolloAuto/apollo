@@ -42,7 +42,7 @@ using apollo::cyber::common::GetAbsolutePath;
 bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   std::string work_root = "";
   if (options.use_cyber_work_root) {
-    GetCyberWorkRoot(&work_root);
+    work_root = GetCyberWorkRoot();
   }
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);

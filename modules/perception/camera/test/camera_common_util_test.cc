@@ -322,27 +322,21 @@ TEST(UtilTest, GetCyberWorkRootTest) {
   unsetenv("MODULE_PATH");
   unsetenv("CYBER_PATH");
 
-  std::string work_root = "";
-  GetCyberWorkRoot(&work_root);
-  EXPECT_EQ(work_root, "");
+  EXPECT_EQ(GetCyberWorkRoot(), "");
 
   char cyber_path[] = "CYBER_PATH=/home/caros/cyber";
   putenv(cyber_path);
-  GetCyberWorkRoot(&work_root);
-  EXPECT_EQ(work_root, "/home/caros/cyber");
+  EXPECT_EQ(GetCyberWorkRoot(), "/home/caros/cyber");
 
   char module_path[] = "MODULE_PATH=/home/test/perception-camera";
   putenv(module_path);
-  GetCyberWorkRoot(&work_root);
-  EXPECT_EQ(work_root, "/home/test/perception-camera");
+  EXPECT_EQ(GetCyberWorkRoot(), "/home/test/perception-camera");
 
   unsetenv("MODULE_PATH");
-  GetCyberWorkRoot(&work_root);
-  EXPECT_EQ(work_root, "/home/caros/cyber");
+  EXPECT_EQ(GetCyberWorkRoot(), "/home/caros/cyber");
 
   unsetenv("CYBER_PATH");
-  GetCyberWorkRoot(&work_root);
-  EXPECT_EQ(work_root, "");
+  EXPECT_EQ(GetCyberWorkRoot(), "");
 }
 
 TEST(UtilTest, FillObjectPolygonFromBBox3DTest) {
