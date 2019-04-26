@@ -47,8 +47,7 @@ static void fill_lane_msg(const base::LaneLineCubicCurve &curve_coord,
 
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
-  std::string work_root = "";
-  camera::GetCyberWorkRoot(&work_root);
+  std::string work_root = camera::GetCyberWorkRoot();
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);

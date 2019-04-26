@@ -144,7 +144,7 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_gpu,
                std::shared_ptr<base::Blob<float>> dst, int stepwidth,
                int start_axis);
 
-void GetCyberWorkRoot(std::string *work_root);
+std::string GetCyberWorkRoot();
 void FillObjectPolygonFromBBox3D(base::Object *object_ptr);
 
 template <typename T>
