@@ -17,6 +17,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "Eigen/Dense"
@@ -43,21 +44,19 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
   void SetAnchorPoints(const std::vector<AnchorPoint>&) override;
 
  private:
-  bool Smooth(const std::vector<Eigen::Vector2d>& point2d,
-              const std::vector<double>& lateral_bounds,
-              std::vector<common::PathPoint>* ptr_smoothed_point2d);
+  bool CosThetaSmooth(const std::vector<Eigen::Vector2d>& point2d,
+                      const std::vector<double>& lateral_bounds,
+                      std::vector<Eigen::Vector2d>* ptr_smoothed_point2d);
 
-  common::PathPoint to_path_point(const double x, const double y,
-                                  const double x_derivative,
-                                  const double y_derivative) const;
+  void NormalizePoints(std::vector<Eigen::Vector2d>* xy_points);
 
-  std::unique_ptr<ReferenceLineSmoother> reopt_qp_smoother_;
+  void DeNormalizePoints(std::vector<Eigen::Vector2d>* xy_points);
+
+  bool GenerateRefPointProfile(const ReferenceLine& raw_reference_line,
+                               const std::vector<Eigen::Vector2d>& xy_points,
+                               std::vector<ReferencePoint>* reference_points);
 
   std::vector<AnchorPoint> anchor_points_;
-
-  std::vector<AnchorPoint> reopt_anchor_points_;
-
-  ReferenceLineSmootherConfig reopt_smoother_config_;
 
   double max_point_deviation_ = 0.1;
 
@@ -81,7 +80,25 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
   double zero_y_ = 0.0;
 
-  double reopt_qp_bound_ = 0.0;
+  std::vector<std::string> ipopt_failure_status_ = {
+      "Solve_Succeeded",
+      "Solved_To_Acceptable_Level",
+      "Infeasible_Problem_Detected",
+      "Search_Direction_Becomes_Too_Small",
+      "Diverging_Iterates",
+      "User_Requested_Stop",
+      "Feasible_Point_Found",
+      "Maximum_Iterations_Exceeded",
+      "Restoration_Failed",
+      "Error_In_Step_Computation",
+      "Not_Enough_Degrees_Of_Freedom",
+      "Invalid_Problem_Definition",
+      "Invalid_Option",
+      "Invalid_Number_Detected",
+      "Unrecoverable_Exception",
+      "NonIpopt_Exception_Thrown"
+      "Insufficient_Memory",
+      "Internal_Error"};
 };
 
 }  // namespace planning
