@@ -538,6 +538,8 @@ DEFINE_bool(enable_soft_speed_limit, false,
 DEFINE_double(message_latency_threshold, 0.02, "Threshold for message delay");
 DEFINE_bool(enable_lane_change_urgency_checking, false,
             "True to check the urgency of lane changing");
+DEFINE_double(short_path_length_threshold, 20.0,
+              "Threshold for too short path length");
 
 DEFINE_uint32(trajectory_stitching_preserved_length, 20,
               "preserved points number in trajectory stitching");
