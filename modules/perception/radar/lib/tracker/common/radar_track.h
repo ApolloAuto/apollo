@@ -47,7 +47,7 @@ class RadarTrack {
   bool IsDead() { return is_dead_; }
   void SetDead() { is_dead_ = true; }
   bool ConfirmTrack() {
-    return (tracked_times_ > s_tracked_times_threshold_) ? true : false;
+    return tracked_times_ > s_tracked_times_threshold_;
   }
   static void SetTrackedTimesThreshold(const int &threshold) {
     s_tracked_times_threshold_ = threshold;
