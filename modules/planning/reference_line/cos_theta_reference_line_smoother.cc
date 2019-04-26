@@ -9,13 +9,14 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF Any KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
 
 #include "modules/planning/reference_line/cos_theta_reference_line_smoother.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "IpIpoptApplication.hpp"
@@ -38,14 +39,6 @@ using apollo::common::time::Clock;
 CosThetaReferenceLineSmoother::CosThetaReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
-  CHECK(cyber::common::GetProtoFromFile(FLAGS_reopt_smoother_config_filename,
-                                        &reopt_smoother_config_))
-      << "Failed to load smoother config file "
-      << FLAGS_reopt_smoother_config_filename;
-
-  reopt_qp_smoother_.reset(
-      new QpSplineReferenceLineSmoother(reopt_smoother_config_));
-
   max_point_deviation_ = config.cos_theta().max_point_deviation();
 
   num_of_iterations_ = config.cos_theta().num_of_iteration();
@@ -55,16 +48,12 @@ CosThetaReferenceLineSmoother::CosThetaReferenceLineSmoother(
   acceptable_tol_ = config.cos_theta().acceptable_tol();
 
   relax_ = config.cos_theta().relax();
-
-  reopt_qp_bound_ = config.cos_theta().reopt_qp_bound();
 }
 
 bool CosThetaReferenceLineSmoother::Smooth(
     const ReferenceLine& raw_reference_line,
     ReferenceLine* const smoothed_reference_line) {
-  const double start_timestamp = Clock::NowInSeconds();
-
-  std::vector<common::PathPoint> smoothed_point2d;
+  std::vector<Eigen::Vector2d> smoothed_point2d;
   std::vector<Eigen::Vector2d> raw_point2d;
   std::vector<double> anchorpoints_lateralbound;
 
@@ -73,63 +62,50 @@ bool CosThetaReferenceLineSmoother::Smooth(
                              anchor_point.path_point.y());
     anchorpoints_lateralbound.emplace_back(anchor_point.lateral_bound);
   }
+
+  NormalizePoints(&raw_point2d);
+
   if (anchor_points_.front().enforced) {
     has_start_point_constraint_ = true;
-
-    start_x_derivative_ = anchor_points_.front().path_point.x_derivative();
-
-    start_y_derivative_ = anchor_points_.front().path_point.y_derivative();
   }
   if (anchor_points_.back().enforced) {
     has_end_point_constraint_ = true;
   }
 
-  Smooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
+  const double start_timestamp = Clock::NowInSeconds();
 
-  // load the results by cosTheta as anchor points and put it into qp_spline to
-  // do the interpolation
-  reopt_anchor_points_.clear();
+  bool status =
+      CosThetaSmooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
 
-  for (const auto& p : smoothed_point2d) {
-    common::SLPoint ref_sl_point;
-    if (!raw_reference_line.XYToSL({p.x(), p.y()}, &ref_sl_point)) {
-      return false;
-    }
-    if (ref_sl_point.s() < 0 ||
-        ref_sl_point.s() > raw_reference_line.Length()) {
-      continue;
-    }
-    double heading = p.theta();
-    double s = p.s();
-    AnchorPoint anchor;
-    anchor.longitudinal_bound = reopt_qp_bound_;
-    anchor.lateral_bound = reopt_qp_bound_;
-    anchor.path_point = apollo::common::util::MakePathPoint(
-        p.x(), p.y(), 0.0, heading, 0.0, 0.0, 0.0);
-    anchor.path_point.set_s(s);
-    reopt_anchor_points_.emplace_back(anchor);
-  }
-  reopt_qp_smoother_->SetAnchorPoints(reopt_anchor_points_);
-  if (!reopt_qp_smoother_->Smooth(raw_reference_line,
-                                  smoothed_reference_line)) {
-    AERROR << "Failed to reopt smooth reference line with anchor points by "
-              "cosTheta";
+  const double end_timestamp = Clock::NowInSeconds();
+  ADEBUG << "cos_theta reference line smoother time: "
+         << (end_timestamp - start_timestamp) * 1000.0 << " ms.";
+
+  if (!status) {
+    AERROR << "cos_theta reference line smoother fails";
     return false;
   }
 
-  const double end_timestamp = Clock::NowInSeconds();
-  AINFO << "cos_theta reference line smoother time: "
-        << (end_timestamp - start_timestamp) * 1000 << " ms.";
+  DeNormalizePoints(&smoothed_point2d);
+
+  std::vector<ReferencePoint> ref_points;
+  GenerateRefPointProfile(raw_reference_line, smoothed_point2d, &ref_points);
+
+  ReferencePoint::RemoveDuplicates(&ref_points);
+  if (ref_points.size() < 2) {
+    AERROR << "Fail to generate smoothed reference line.";
+    return false;
+  }
+  *smoothed_reference_line = ReferenceLine(ref_points);
   return true;
 }
 
-bool CosThetaReferenceLineSmoother::Smooth(
+bool CosThetaReferenceLineSmoother::CosThetaSmooth(
     const std::vector<Eigen::Vector2d>& scaled_point2d,
     const std::vector<double>& lateral_bounds,
-    std::vector<common::PathPoint>* ptr_smoothed_point2d) {
+    std::vector<Eigen::Vector2d>* ptr_smoothed_point2d) {
   std::vector<double> x;
   std::vector<double> y;
-
   CosThetaProbleminterface* ptop =
       new CosThetaProbleminterface(scaled_point2d, lateral_bounds);
 
@@ -157,7 +133,7 @@ bool CosThetaReferenceLineSmoother::Smooth(
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Ipopt::Solve_Succeeded) {
-    AINFO << "*** Error during initialization!";
+    AERROR << "*** Error during initialization!";
     return false;
   }
 
@@ -169,85 +145,170 @@ bool CosThetaReferenceLineSmoother::Smooth(
     Ipopt::Index iter_count = app->Statistics()->IterationCount();
     ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
   } else {
-    AINFO << "Return status: " << int(status);
+    // return detailed failure information,
+    // reference resource: Ipopt::ApplicationReturnStatus
+    if (static_cast<int>(status) >=
+            static_cast<int>(ipopt_failure_status_.size()) ||
+        static_cast<int>(status) < 0) {
+      AERROR << "Solver ends with unknown failure code: "
+             << static_cast<int>(status);
+    } else {
+      AERROR << "Solver failure case: "
+             << ipopt_failure_status_[static_cast<int>(status)];
+    }
+    return false;
   }
 
   ptop->get_optimization_results(&x, &y);
   // load the point position and estimated derivatives at each point
   if (x.size() < 2 || y.size() < 2) {
-    AINFO << "Return by IPOPT is wrong. Size smaller than 2 ";
+    AERROR << "Return by IPOPT is wrong. Size smaller than 2 ";
     return false;
   }
-  for (size_t i = 0; i < x.size(); ++i) {
-    // reverse back to the unscaled points
-    double start_x = x[i] + zero_x_;
-    double start_y = y[i] + zero_y_;
-    double x_derivative = 0.0;
-    double y_derivative = 0.0;
-    if (i == 0) {
-      x_derivative = (x[i + 1] - x[i]);
-      y_derivative = (y[i + 1] - y[i]);
-      if (has_start_point_constraint_) {
-        x_derivative = 0.5 * (start_x_derivative_ + x_derivative);
-        y_derivative = 0.5 * (start_y_derivative_ + y_derivative);
-      }
-    } else if (i == x.size() - 1) {
-      x_derivative = (x[i] - x[i - 1]);
-      y_derivative = (y[i] - y[i - 1]);
-    } else {
-      x_derivative = 0.5 * (x[i + 1] - x[i - 1]);
-      y_derivative = 0.5 * (y[i + 1] - y[i - 1]);
-    }
-    ptr_smoothed_point2d->emplace_back(
-        to_path_point(start_x, start_y, x_derivative, y_derivative));
-  }
-  // load the accumulated s at each point
-  ptr_smoothed_point2d->front().set_s(0.0);
-  double accumulated_s = 0.0;
-  double Fx = ptr_smoothed_point2d->front().x();
-  double Fy = ptr_smoothed_point2d->front().y();
-  double Nx = 0.0;
-  double Ny = 0.0;
-  for (size_t i = 1; i < ptr_smoothed_point2d->size(); i++) {
-    Nx = ptr_smoothed_point2d->at(i).x();
-    Ny = ptr_smoothed_point2d->at(i).y();
-    double end_segment_s =
-        std::sqrt((Fx - Nx) * (Fx - Nx) + (Fy - Ny) * (Fy - Ny));
-    ptr_smoothed_point2d->at(i).set_s(end_segment_s + accumulated_s);
-    accumulated_s += end_segment_s;
-    Fx = Nx;
-    Fy = Ny;
-  }
-  return status == Ipopt::Solve_Succeeded ||
-         status == Ipopt::Solved_To_Acceptable_Level;
-}
 
-common::PathPoint CosThetaReferenceLineSmoother::to_path_point(
-    const double x, const double y, const double x_derivative,
-    const double y_derivative) const {
-  common::PathPoint point;
-  point.set_x(x);
-  point.set_y(y);
-  point.set_x_derivative(x_derivative);
-  point.set_y_derivative(y_derivative);
-  return point;
+  for (size_t i = 0; i < x.size(); ++i) {
+    ptr_smoothed_point2d->emplace_back(x[i], y[i]);
+  }
+
+  return true;
 }
 
 void CosThetaReferenceLineSmoother::SetAnchorPoints(
     const std::vector<AnchorPoint>& anchor_points) {
-  anchor_points_ = std::move(anchor_points);
+  CHECK_GT(anchor_points.size(), 1);
+  anchor_points_ = anchor_points;
+}
 
-  CHECK_GT(anchor_points_.size(), 1);
-  zero_x_ = anchor_points_.front().path_point.x();
-  zero_y_ = anchor_points_.front().path_point.y();
+void CosThetaReferenceLineSmoother::NormalizePoints(
+    std::vector<Eigen::Vector2d>* xy_points) {
+  zero_x_ = xy_points->front().x();
+  zero_y_ = xy_points->front().y();
 
-  std::for_each(anchor_points_.begin(), anchor_points_.end(),
-                [this](AnchorPoint& p) {
-                  auto curr_x = p.path_point.x();
-                  auto curr_y = p.path_point.y();
-                  p.path_point.set_x(curr_x - zero_x_);
-                  p.path_point.set_y(curr_y - zero_y_);
+  std::for_each(xy_points->begin(), xy_points->end(),
+                [this](Eigen::Vector2d& p) {
+                  auto curr_x = p.x();
+                  auto curr_y = p.y();
+                  Eigen::Vector2d xy(curr_x - zero_x_, curr_y - zero_y_);
+                  p = xy;
                 });
 }
+
+void CosThetaReferenceLineSmoother::DeNormalizePoints(
+    std::vector<Eigen::Vector2d>* xy_points) {
+  std::for_each(xy_points->begin(), xy_points->end(),
+                [this](Eigen::Vector2d& p) {
+                  auto curr_x = p.x();
+                  auto curr_y = p.y();
+                  Eigen::Vector2d xy(curr_x + zero_x_, curr_y + zero_y_);
+                  p = xy;
+                });
+}
+
+bool CosThetaReferenceLineSmoother::GenerateRefPointProfile(
+    const ReferenceLine& raw_reference_line,
+    const std::vector<Eigen::Vector2d>& xy_points,
+    std::vector<ReferencePoint>* reference_points) {
+  std::vector<double> dxs;
+  std::vector<double> dys;
+  std::vector<double> headings;
+  std::vector<double> kappas;
+  std::vector<double> accumulated_s;
+  std::vector<double> dkappas;
+
+  // Get finite difference approximated dx and dy for heading and kappa
+  // calculation
+  size_t points_size = xy_points.size();
+  for (size_t i = 0; i < points_size; ++i) {
+    double x_derivative = 0.0;
+    double y_derivative = 0.0;
+    if (i == 0) {
+      x_derivative = (xy_points[i + 1].x() - xy_points[i].x());
+      y_derivative = (xy_points[i + 1].y() - xy_points[i].y());
+    } else if (i == points_size - 1) {
+      x_derivative = (xy_points[i].x() - xy_points[i - 1].x());
+      y_derivative = (xy_points[i].y() - xy_points[i - 1].y());
+    } else {
+      x_derivative = 0.5 * (xy_points[i + 1].x() - xy_points[i - 1].x());
+      y_derivative = 0.5 * (xy_points[i + 1].y() - xy_points[i - 1].y());
+    }
+    dxs.push_back(x_derivative);
+    dys.push_back(y_derivative);
+  }
+
+  // Heading calculation
+  for (size_t i = 0; i < points_size; ++i) {
+    headings.push_back(std::atan2(dys[i], dxs[i]));
+  }
+
+  // Kappa calculation
+  for (size_t i = 0; i < points_size; ++i) {
+    double dx = dxs[i];
+    double dy = dys[i];
+    double kappa = (dy / (dx * dx)) / (std::sqrt(1.0 + (dy / dx) * (dy / dx)) *
+                                       (1.0 + (dy / dx) * (dy / dx)));
+    kappas.push_back(kappa);
+  }
+
+  // Get linear interpolated s for dkappa calculation
+  double distance = 0.0;
+  accumulated_s.push_back(distance);
+  double fx = xy_points[0].x();
+  double fy = xy_points[0].y();
+  double nx = 0.0;
+  double ny = 0.0;
+  for (size_t i = 1; i < points_size; ++i) {
+    nx = xy_points[i].x();
+    ny = xy_points[i].y();
+    double end_segment_s =
+        std::sqrt((fx - nx) * (fx - nx) + (fy - ny) * (fy - ny));
+    accumulated_s.push_back(end_segment_s + distance);
+    distance += end_segment_s;
+    fx = nx;
+    fy = ny;
+  }
+
+  // Dkappa calculation
+  for (size_t i = 0; i < points_size; ++i) {
+    double dkappa = 0.0;
+    if (i == 0) {
+      dkappa = (kappas[i + 1] - kappas[i]) /
+               (accumulated_s[i + 1] - accumulated_s[i]);
+    } else if (i == points_size - 1) {
+      dkappa = (kappas[i] - kappas[i - 1]) /
+               (accumulated_s[i] - accumulated_s[i - 1]);
+    } else {
+      dkappa = (kappas[i + 1] - kappas[i - 1]) /
+               (accumulated_s[i + 1] - accumulated_s[i - 1]);
+    }
+    dkappas.push_back(dkappa);
+  }
+
+  // Load into ReferencePoints
+  for (size_t i = 0; i < points_size; ++i) {
+    common::SLPoint ref_sl_point;
+    if (!raw_reference_line.XYToSL({xy_points[i].x(), xy_points[i].y()},
+                                   &ref_sl_point)) {
+      return false;
+    }
+    const double kEpsilon = 1e-6;
+    if (ref_sl_point.s() < -kEpsilon ||
+        ref_sl_point.s() > raw_reference_line.Length()) {
+      continue;
+    }
+    ref_sl_point.set_s(std::max(ref_sl_point.s(), 0.0));
+    ReferencePoint rlp = raw_reference_line.GetReferencePoint(ref_sl_point.s());
+    auto new_lane_waypoints = rlp.lane_waypoints();
+    for (auto& lane_waypoint : new_lane_waypoints) {
+      lane_waypoint.l = ref_sl_point.l();
+    }
+    reference_points->emplace_back(ReferencePoint(
+        hdmap::MapPathPoint(
+            common::math::Vec2d(xy_points[i].x(), xy_points[i].y()),
+            headings[i], new_lane_waypoints),
+        kappas[i], dkappas[i]));
+  }
+  return true;
+}
+
 }  // namespace planning
 }  // namespace apollo
