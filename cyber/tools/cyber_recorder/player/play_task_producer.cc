@@ -189,7 +189,10 @@ bool PlayTaskProducer::UpdatePlayParam() {
 bool PlayTaskProducer::CreateWriters() {
   std::string node_name = "cyber_recorder_play_" + std::to_string(getpid());
   node_ = apollo::cyber::CreateNode(node_name);
-  RETURN_VAL_IF_NULL(node_, false);
+  if (node_ == nullptr) {
+    AERROR << "create node failed.";
+    return false;
+  }
 
   for (auto& item : msg_types_) {
     auto& channel_name = item.first;

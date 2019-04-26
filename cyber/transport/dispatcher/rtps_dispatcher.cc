@@ -40,7 +40,10 @@ void RtpsDispatcher::Shutdown() {
 }
 
 void RtpsDispatcher::AddSubscriber(const RoleAttributes& self_attr) {
-  RETURN_IF_NULL(participant_);
+  if (participant_ == nullptr) {
+    AWARN << "please set participant firstly.";
+    return;
+  }
 
   uint64_t channel_id = self_attr.channel_id();
   std::lock_guard<std::mutex> lock(subs_mutex_);

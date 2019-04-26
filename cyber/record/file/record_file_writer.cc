@@ -46,7 +46,10 @@ bool RecordFileWriter::Open(const std::string& path) {
   chunk_flush_.reset(new Chunk());
   is_writing_ = true;
   flush_thread_ = std::make_shared<std::thread>([this]() { this->Flush(); });
-  RETURN_VAL_IF_NULL(flush_thread_, false);
+  if (flush_thread_ == nullptr) {
+    AERROR << "Init flush thread error.";
+    return false;
+  }
   return true;
 }
 

@@ -362,7 +362,10 @@ class PyChannelUtils {
 
   static std::string get_msgtype_by_channelname(const std::string& channel_name,
                                                 uint8_t sleep_s = 0) {
-    RETURN_VAL_IF(channel_name.empty(), std::string(""));
+    if (channel_name.empty()) {
+      AERROR << "channel_name is null";
+      return "";
+    }
     auto topology =
         apollo::cyber::service_discovery::TopologyManager::Instance();
     sleep(sleep_s);

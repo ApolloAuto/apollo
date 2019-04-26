@@ -22,8 +22,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "cyber/common/log.h"
 #include "cyber/blocker/blocker.h"
+#include "cyber/common/log.h"
 
 namespace apollo {
 namespace cyber {

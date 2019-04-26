@@ -59,7 +59,10 @@ bool Recorder::Start() {
   is_started_ = true;
   display_thread_ =
       std::make_shared<std::thread>([this]() { this->ShowProgress(); });
-  RETURN_VAL_IF_NULL(display_thread_, false);
+  if (display_thread_ == nullptr) {
+    AERROR << "init display thread error.";
+    return false;
+  }
   return true;
 }
 
@@ -171,7 +174,10 @@ bool Recorder::InitReaderImpl(const std::string& channel_name,
     config.pending_queue_size =
         gflags::Int32FromEnv("CYBER_PENDING_QUEUE_SIZE", 50);
     reader = node_->CreateReader<RawMessage>(config, callback);
-    RETURN_VAL_IF_NULL(reader, false);
+    if (reader == nullptr) {
+      AERROR << "Create reader failed.";
+      return false;
+    }
     channel_reader_map_[channel_name] = reader;
     return true;
   } catch (const std::bad_weak_ptr& e) {
@@ -187,7 +193,10 @@ void Recorder::ReaderCallback(const std::shared_ptr<RawMessage>& message,
     return;
   }
 
-  RETURN_IF_NULL(message);
+  if (message == nullprt) {
+    AERROR << "message is nullptr, channel: " << channel_name;
+    return;
+  }
 
   message_time_ = Time::Now().ToNanosecond();
   if (!writer_->WriteMessage(channel_name, message, message_time_)) {
