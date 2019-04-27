@@ -52,3 +52,5 @@ wget -O v1.14.2.tar.gz \
     https://github.com/grpc/grpc/archive/v1.14.2.tar.gz
 wget -O v1.11.tar.gz \
     https://github.com/civetweb/civetweb/archive/v1.11.tar.gz
+wget -O plat-sw-3.0.0.1.zip \
+    https://github.com/ApolloAuto/apollo-contrib/releases/download/v3.0.0/plat-sw-3.0.0.1.zip
