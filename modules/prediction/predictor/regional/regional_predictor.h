@@ -46,9 +46,9 @@ class RegionalPredictor : public Predictor {
    */
   void Predict(Obstacle* obstacle) override;
 
-  void GenerateStillTrajectory(double probability, Obstacle* obstacle);
+  void GenerateStillTrajectory(const double probability, Obstacle* obstacle);
 
-  void GenerateMovingTrajectory(double probability, Obstacle* obstacle);
+  void GenerateMovingTrajectory(const double probability, Obstacle* obstacle);
 
  private:
   void DrawStillTrajectory(

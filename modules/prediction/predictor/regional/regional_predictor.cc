@@ -76,18 +76,14 @@ void RegionalPredictor::Predict(Obstacle* obstacle) {
     return;
   }
 
-  double speed = 0.0;
-  if (feature.has_speed()) {
-    speed = feature.speed();
-  }
-  if (speed > FLAGS_still_speed) {
+  if (feature.speed() > FLAGS_still_speed) {
     GenerateMovingTrajectory(1.0, obstacle);
   } else {
     GenerateStillTrajectory(1.0, obstacle);
   }
 }
 
-void RegionalPredictor::GenerateStillTrajectory(double probability,
+void RegionalPredictor::GenerateStillTrajectory(const double probability,
                                                 Obstacle* obstacle) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
@@ -100,20 +96,21 @@ void RegionalPredictor::GenerateStillTrajectory(double probability,
     return;
   }
 
-  Eigen::Vector2d position(feature.position().x(), feature.position().y());
-  double heading = feature.velocity_heading();
+  const Eigen::Vector2d position(feature.position().x(),
+                                 feature.position().y());
   const double total_time = FLAGS_prediction_trajectory_time_length;
-  int start_index = NumOfTrajectories(*obstacle);
+  const int start_index = NumOfTrajectories(*obstacle);
 
   std::vector<TrajectoryPoint> points;
-  DrawStillTrajectory(position, heading, 0.0, total_time, &points);
-  Trajectory trajectory = GenerateTrajectory(points);
+  DrawStillTrajectory(position, feature.velocity_heading(), 0.0, total_time,
+                      &points);
+  const Trajectory trajectory = GenerateTrajectory(points);
   obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
       trajectory);
   SetEqualProbability(probability, start_index, obstacle);
 }
 
-void RegionalPredictor::GenerateMovingTrajectory(double probability,
+void RegionalPredictor::GenerateMovingTrajectory(const double probability,
                                                  Obstacle* obstacle) {
   if (obstacle == nullptr) {
     AERROR << "Missing obstacle.";
