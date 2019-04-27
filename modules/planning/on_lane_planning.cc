@@ -666,9 +666,9 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   smoothed_line->set_label("Smooth");
   size_t adc_label = 0;
   for (const auto& point : smoothed_trajectory.vehicle_motion_point()) {
-    const auto& x = point.trajectory_point().path_point().x();
-    const auto& y = point.trajectory_point().path_point().y();
-    const auto& heading = point.trajectory_point().path_point().theta();
+    const auto x = point.trajectory_point().path_point().x();
+    const auto y = point.trajectory_point().path_point().y();
+    const auto heading = point.trajectory_point().path_point().theta();
 
     // Draw vehicle shape along the trajectory
     auto* adc_shape = chart->add_car();
