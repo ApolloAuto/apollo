@@ -162,17 +162,33 @@ class DreamviewStore {
                 ? this.dimension.height * mainViewHeightRatio : this.dimension.height;
     }
 
-    update(world) {
+    handleDrivingModeChange(wasAutoMode, isAutoMode) {
+        if (this.options.enableSimControl) {
+            return;
+        }
+
+        const hasDisengagement = wasAutoMode && !isAutoMode;
+        const hasAuto = !wasAutoMode && isAutoMode;
+
+        this.newDisengagementReminder = this.hmi.isCoDriver && hasDisengagement;
+        if (this.newDisengagementReminder && !this.options.showDataRecorder) {
+            this.handleOptionToggle('showDataRecorder');
+        }
+
+        if (hasAuto && !this.options.lockTaskPanel) {
+            this.handleOptionToggle('tasksPanelLocked');
+        } else if (hasDisengagement && this.options.lockTaskPanel) {
+            this.handleOptionToggle('tasksPanelLocked');
+        }
+    }
+
+    update(world, isNewMode) {
         this.updateTimestamp(world.timestamp);
         this.updateModuleDelay(world);
 
         const wasAutoMode = this.meters.isAutoMode;
         this.meters.update(world);
-        this.newDisengagementReminder =
-            this.hmi.isCoDriver && wasAutoMode && !this.meters.isAutoMode;
-        if (this.newDisengagementReminder && !this.options.showDataRecorder) {
-            this.handleOptionToggle("showDataRecorder");
-        }
+        this.handleDrivingModeChange(wasAutoMode, this.meters.isAutoMode);
 
         this.monitor.update(world);
         this.trafficSignal.update(world);

@@ -54,7 +54,7 @@ export default class RosWebSocketEndpoint {
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
-                    const updateCoordination = (this.currentMode !== STORE.hmi.currentMode);
+                    const isNewMode = (this.currentMode !== STORE.hmi.currentMode);
                     this.currentMode = STORE.hmi.currentMode;
                     if (STORE.hmi.inNavigationMode) {
                         // In navigation mode, the coordinate system is FLU and
@@ -74,11 +74,11 @@ export default class RosWebSocketEndpoint {
                         this.mapUpdatePeriodMs = 1000;
                     }
 
-                    STORE.update(message);
+                    STORE.update(message, isNewMode);
                     RENDERER.maybeInitializeOffest(
                         message.autoDrivingCar.positionX,
                         message.autoDrivingCar.positionY,
-                        updateCoordination);
+                        isNewMode);
                     RENDERER.updateWorld(message);
                     this.updateMapIndex(message);
                     if (this.routingTime !== message.routingTime) {
