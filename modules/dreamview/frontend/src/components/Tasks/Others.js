@@ -23,20 +23,19 @@ export default class Others extends React.Component {
                             onClick={() => {
                                 WS.dumpMessages();
                             }}>Dump Message</button>
+                    <CheckboxItem id={"panelLock"}
+                                  title={"Lock Task Panel"}
+                                  isChecked={options.tasksPanelLocked}
+                                  disabled={false}
+                                  onClick={() => {
+                                    this.props.store.handleOptionToggle('tasksPanelLocked');
+                                  }}/>
                     <CheckboxItem id={"showPNCMonitor"}
                                   title={"PNC Monitor"}
                                   isChecked={options.showPNCMonitor}
                                   disabled={disablePanel}
                                   onClick={() => {
                                       this.props.store.handleOptionToggle('showPNCMonitor');
-                                  }}/>
-                    <CheckboxItem id={"toggleSimControl"}
-                                  title={"SimControl"}
-                                  isChecked={options.simControlEnabled}
-                                  disabled={options.tasksPanelLocked}
-                                  onClick={() => {
-                                      WS.toggleSimControl(!options.simControlEnabled);
-                                      this.props.store.handleOptionToggle('simControlEnabled');
                                   }}/>
                     <CheckboxItem id={"showVideo"}
                                   title={"Camera Sensor"}
@@ -45,12 +44,13 @@ export default class Others extends React.Component {
                                   onClick={() => {
                                       this.props.store.handleOptionToggle('showVideo');
                                   }}/>
-                    <CheckboxItem id={"panelLock"}
-                                  title={"Lock Task Panel"}
-                                  isChecked={options.tasksPanelLocked}
-                                  disabled={false}
+                    <CheckboxItem id={"toggleSimControl"}
+                                  title={"SimControl"}
+                                  isChecked={options.simControlEnabled}
+                                  disabled={options.tasksPanelLocked}
                                   onClick={() => {
-                                    this.props.store.handleOptionToggle('tasksPanelLocked');
+                                      WS.toggleSimControl(!options.simControlEnabled);
+                                      this.props.store.handleOptionToggle('simControlEnabled');
                                   }}/>
                 </div>
             </div>
