@@ -199,6 +199,11 @@ default_task_config: {
   }
 }
 default_task_config: {
+  task_type: OPEN_SPACE_PRE_STOP_DECIDER
+  open_space_pre_stop_decider_config: {
+  }
+}
+default_task_config: {
   task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
   open_space_trajectory_provider_config {
     open_space_trajectory_optimizer_config {
