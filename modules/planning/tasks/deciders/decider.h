@@ -49,11 +49,12 @@ class Decider : public Task {
     return apollo::common::Status::OK();
   }
 
-  bool BuildStopDecision(
-      const std::string& stop_wall_id, const double stop_line_s,
-      const double stop_distance, const StopReasonCode& stop_reason_code,
-      const std::vector<std::string>& wait_for_obstacles, Frame* const frame,
-      ReferenceLineInfo* const reference_line_info);
+  bool BuildStopDecision(const std::string& stop_wall_id,
+                         const double stop_line_s, const double stop_distance,
+                         const StopReasonCode& stop_reason_code,
+                         const std::vector<std::string>& wait_for_obstacles,
+                         Frame* const frame,
+                         ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning
