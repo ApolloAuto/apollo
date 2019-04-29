@@ -85,6 +85,6 @@ docs/demo_guide/*.bag
 # Logs
 cyber/log/*
 
-# Local HMI configuration
+# Local cross-module configuration
 modules/common/data/global_flagfile.txt
 

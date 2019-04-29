@@ -53,7 +53,7 @@ const std::vector<std::string>& GetLoggingDirectories() {
     if (!FLAGS_log_dir.empty()) {
       logging_directories_list.emplace_back(FLAGS_log_dir.c_str());
     } else {
-      logging_directories_list.emplace_back("/apollo/log");
+      logging_directories_list.emplace_back("/apollo/data/log");
     }
   }
   return logging_directories_list;
