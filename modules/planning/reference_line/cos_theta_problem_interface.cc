@@ -48,16 +48,20 @@ bool CosThetaProbleminterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
   m = static_cast<int>(num_of_points_ << 1);
   num_of_constraints_ = m;
 
-  // number of nonzero constraint jacobian.
-  nnz_jac_g = static_cast<int>(num_of_points_ << 1);
-  nnz_jac_g_ = nnz_jac_g;
+  if (use_automatic_differentiation_) {
+    generate_tapes(n, m, nnz_jac_g, nnz_h_lag);
+  } else {
+    // number of nonzero constraint jacobian.
+    nnz_jac_g = static_cast<int>(num_of_points_ << 1);
+    nnz_jac_g_ = nnz_jac_g;
 
-  // number of nonzero hessian and lagrangian.
-  nnz_h_lag = static_cast<int>(num_of_points_ * 11 - 12);
-  nnz_h_lag_ = nnz_h_lag;
+    // number of nonzero hessian and lagrangian.
+    nnz_h_lag = static_cast<int>(num_of_points_ * 11 - 12);
+    nnz_h_lag_ = nnz_h_lag;
 
-  // load hessian structure
-  hessian_strcuture();
+    // load hessian structure
+    hessian_strcuture();
+  }
 
   index_style = IndexStyleEnum::C_STYLE;
   return true;
@@ -73,12 +77,12 @@ bool CosThetaProbleminterface::get_bounds_info(int n, double* x_l, double* x_u,
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
     // x
-    x_l[index] = -2e19;
-    x_u[index] = 2e19;
+    x_l[index] = -1e20;
+    x_u[index] = 1e20;
 
     // y
-    x_l[index + 1] = -2e19;
-    x_u[index + 1] = 2e19;
+    x_l[index + 1] = -1e20;
+    x_u[index + 1] = 1e20;
   }
 
   // constraints
@@ -141,6 +145,11 @@ bool CosThetaProbleminterface::get_starting_point(int n, bool init_x, double* x,
 bool CosThetaProbleminterface::eval_f(int n, const double* x, bool new_x,
                                       double& obj_value) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
+  if (use_automatic_differentiation_) {
+    eval_obj(n, x, obj_value);
+    return true;
+  }
+
   obj_value = 0.0;
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
@@ -170,8 +179,13 @@ bool CosThetaProbleminterface::eval_f(int n, const double* x, bool new_x,
 bool CosThetaProbleminterface::eval_grad_f(int n, const double* x, bool new_x,
                                            double* grad_f) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
-  std::fill(grad_f, grad_f + n, 0.0);
 
+  if (use_automatic_differentiation_) {
+    gradient(tag_f, n, x, grad_f);
+    return true;
+  }
+
+  std::fill(grad_f, grad_f + n, 0.0);
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
     grad_f[index] = x[index] * 2 - init_points_[i].x() * 2;
@@ -231,6 +245,11 @@ bool CosThetaProbleminterface::eval_g(int n, const double* x, bool new_x, int m,
                                       double* g) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<size_t>(m), num_of_constraints_);
+
+  if (use_automatic_differentiation_) {
+    eval_constraints(n, x, m, g);
+    return true;
+  }
   // fill in the positional deviation constraints
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
@@ -245,6 +264,25 @@ bool CosThetaProbleminterface::eval_jac_g(int n, const double* x, bool new_x,
                                           int* jCol, double* values) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<size_t>(m), num_of_constraints_);
+
+  if (use_automatic_differentiation_) {
+    if (values == nullptr) {
+      // return the structure of the jacobian
+      for (int idx = 0; idx < nnz_jac; idx++) {
+        iRow[idx] = rind_g[idx];
+        jCol[idx] = cind_g[idx];
+      }
+    } else {
+      // return the values of the jacobian of the constraints
+      sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval,
+                 options_g);
+      for (int idx = 0; idx < nnz_jac; idx++) {
+        values[idx] = jacval[idx];
+      }
+    }
+    return true;
+  }
+
   if (values == nullptr) {
     // positional deviation constraints
     for (int i = 0; i < static_cast<int>(num_of_variables_); ++i) {
@@ -266,6 +304,30 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
                                       const double* lambda, bool new_lambda,
                                       int nele_hess, int* iRow, int* jCol,
                                       double* values) {
+  if (use_automatic_differentiation_) {
+    if (values == nullptr) {
+      // return the structure. This is a symmetric matrix, fill the lower left
+      // triangle only.
+      for (int idx = 0; idx < nnz_L; idx++) {
+        iRow[idx] = rind_L[idx];
+        jCol[idx] = cind_L[idx];
+      }
+    } else {
+      // return the values. This is a symmetric matrix, fill the lower left
+      // triangle only
+      obj_lam[0] = obj_factor;
+      for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
+      set_param_vec(tag_L, m + 1, obj_lam);
+      sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
+                  &hessval, options_L);
+
+      for (int idx = 0; idx < nnz_L; idx++) {
+        values[idx] = hessval[idx];
+      }
+    }
+    return true;
+  }
+
   if (values == nullptr) {
     int index = 0;
     for (int i = 0; i < 6; ++i) {
@@ -476,6 +538,16 @@ void CosThetaProbleminterface::finalize_solution(
     opt_x_.emplace_back(x[index]);
     opt_y_.emplace_back(x[index + 1]);
   }
+
+  if (use_automatic_differentiation_) {
+    delete[] obj_lam;
+    free(rind_g);
+    free(cind_g);
+    free(rind_L);
+    free(cind_L);
+    free(jacval);
+    free(hessval);
+  }
 }
 
 void CosThetaProbleminterface::set_default_max_point_deviation(
@@ -485,6 +557,11 @@ void CosThetaProbleminterface::set_default_max_point_deviation(
 
 void CosThetaProbleminterface::set_relax_end_constraint(const double relax) {
   relax_ = relax;
+}
+
+void CosThetaProbleminterface::set_automatic_differentiation_flag(
+    const bool use_ad) {
+  use_automatic_differentiation_ = use_ad;
 }
 
 void CosThetaProbleminterface::set_start_point(const double x, const double y) {
@@ -533,5 +610,147 @@ void CosThetaProbleminterface::hessian_strcuture() {
     }
   }
 }
+
+//***************    start ADOL-C part ***********************************
+
+/** Template to return the objective value */
+template <class T>
+bool CosThetaProbleminterface::eval_obj(int n, const T* x, T& obj_value) {
+  obj_value = 0.0;
+  for (size_t i = 0; i < num_of_points_; ++i) {
+    size_t index = i << 1;
+    obj_value +=
+        (x[index] - init_points_[i].x()) * (x[index] - init_points_[i].x()) +
+        (x[index + 1] - init_points_[i].y()) *
+            (x[index + 1] - init_points_[i].y());
+  }
+  for (size_t i = 0; i < num_of_points_ - 2; ++i) {
+    size_t findex = i << 1;
+    size_t mindex = findex + 2;
+    size_t lindex = mindex + 2;
+    obj_value -=
+        weight_cos_included_angle_ *
+        (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+         ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex + 1]))) /
+        (sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
+              (x[mindex + 1] - x[findex + 1]) *
+                  (x[mindex + 1] - x[findex + 1])) *
+         sqrt((x[lindex] - x[mindex]) * (x[lindex] - x[mindex]) +
+              (x[lindex + 1] - x[mindex + 1]) *
+                  (x[lindex + 1] - x[mindex + 1])));
+
+    // obj_value +=
+    //     weight_cos_included_angle_ *
+    //     acos(
+    //         (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+    //          ((x[mindex + 1] - x[findex + 1]) *
+    //           (x[lindex + 1] - x[mindex + 1]))) /
+    //         (1e-8 + sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
+    //                      (x[mindex + 1] - x[findex + 1]) *
+    //                          (x[mindex + 1] - x[findex + 1])) *
+    //                     sqrt((x[lindex] - x[mindex]) * (x[lindex] -
+    //                     x[mindex]) +
+    //                          (x[lindex + 1] - x[mindex + 1]) *
+    //                              (x[lindex + 1] - x[mindex + 1]))));
+
+    // obj_value -=
+    //     weight_cos_included_angle_ *
+    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
+    //      1])));
+  }
+
+  // for (size_t i = 0; i < num_of_points_ - 1; ++i) {
+  //   size_t findex = i << 1;
+  //   size_t nindex = findex + 2;
+  //   obj_value +=
+  //       (x[findex] - x[nindex]) * (x[findex] - x[nindex]) +
+  //       (x[findex + 1] - x[nindex + 1]) * (x[findex + 1] - x[nindex + 1]);
+  // }
+  return true;
+}
+
+/** Template to compute contraints */
+template <class T>
+bool CosThetaProbleminterface::eval_constraints(int n, const T* x, int m,
+                                                T* g) {
+  // fill in the positional deviation constraints
+  for (size_t i = 0; i < num_of_points_; ++i) {
+    size_t index = i << 1;
+    g[index] = x[index];
+    g[index + 1] = x[index + 1];
+  }
+  return true;
+}
+
+/** Method to generate the required tapes */
+void CosThetaProbleminterface::generate_tapes(int n, int m, int& nnz_jac_g,
+                                              int& nnz_h_lag) {
+  Ipopt::Number* xp = new double[n];
+  Ipopt::Number* lamp = new double[m];
+  Ipopt::Number* zl = new double[m];
+  Ipopt::Number* zu = new double[m];
+  adouble* xa = new adouble[n];
+  adouble* g = new adouble[m];
+  double* lam = new double[m];
+  double sig;
+  adouble obj_value;
+
+  double dummy;
+  obj_lam = new double[m + 1];
+  get_starting_point(n, 1, xp, 0, zl, zu, m, 0, lamp);
+  trace_on(tag_f);
+
+  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  eval_obj(n, xa, obj_value);
+  obj_value >>= dummy;
+  trace_off();
+
+  trace_on(tag_g);
+
+  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  eval_constraints(n, xa, m, g);
+  for (int idx = 0; idx < m; idx++) g[idx] >>= dummy;
+  trace_off();
+  trace_on(tag_L);
+
+  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
+  for (int idx = 0; idx < m; idx++) lam[idx] = 1.0;
+  sig = 1.0;
+  eval_obj(n, xa, obj_value);
+  obj_value *= mkparam(sig);
+  eval_constraints(n, xa, m, g);
+
+  for (int idx = 0; idx < m; idx++) obj_value += g[idx] * mkparam(lam[idx]);
+  obj_value >>= dummy;
+  trace_off();
+  rind_g = NULL;
+  cind_g = NULL;
+  rind_L = NULL;
+  cind_L = NULL;
+  options_g[0] = 0; /* sparsity pattern by index domains (default) */
+  options_g[1] = 0; /*                         safe mode (default) */
+  options_g[2] = 0;
+  options_g[3] = 0; /*                column compression (default) */
+
+  jacval = NULL;
+  hessval = NULL;
+  sparse_jac(tag_g, m, n, 0, xp, &nnz_jac, &rind_g, &cind_g, &jacval,
+             options_g);
+  nnz_jac_g = nnz_jac;
+  options_L[0] = 0;
+  options_L[1] = 1;
+  sparse_hess(tag_L, n, 0, xp, &nnz_L, &rind_L, &cind_L, &hessval, options_L);
+  nnz_h_lag = nnz_L;
+  delete[] lam;
+  delete[] g;
+  delete[] xa;
+  delete[] zu;
+  delete[] zl;
+  delete[] lamp;
+  delete[] xp;
+}
+
+//***************    end   ADOL-C part ***********************************
 }  // namespace planning
 }  // namespace apollo

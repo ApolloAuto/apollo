@@ -58,9 +58,17 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
   std::vector<AnchorPoint> anchor_points_;
 
+  size_t print_level_ = 0;
+
   double max_point_deviation_ = 0.1;
 
-  size_t num_of_iterations_ = 3000;
+  size_t max_num_of_iterations_ = 500;
+
+  size_t acceptable_num_of_iterations_ = 15;
+
+  double tol_ = 1e-8;
+
+  double acceptable_tol_ = 1e-6;
 
   bool has_start_point_constraint_ = false;
 
@@ -72,33 +80,13 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
   double weight_cos_included_angle_ = 0.0;
 
-  double acceptable_tol_ = 1e-5;
-
   double relax_ = 0.2;
+
+  bool use_automatic_differentiation_ = false;
 
   double zero_x_ = 0.0;
 
   double zero_y_ = 0.0;
-
-  std::vector<std::string> ipopt_failure_status_ = {
-      "Solve_Succeeded",
-      "Solved_To_Acceptable_Level",
-      "Infeasible_Problem_Detected",
-      "Search_Direction_Becomes_Too_Small",
-      "Diverging_Iterates",
-      "User_Requested_Stop",
-      "Feasible_Point_Found",
-      "Maximum_Iterations_Exceeded",
-      "Restoration_Failed",
-      "Error_In_Step_Computation",
-      "Not_Enough_Degrees_Of_Freedom",
-      "Invalid_Problem_Definition",
-      "Invalid_Option",
-      "Invalid_Number_Detected",
-      "Unrecoverable_Exception",
-      "NonIpopt_Exception_Thrown"
-      "Insufficient_Memory",
-      "Internal_Error"};
 };
 
 }  // namespace planning
