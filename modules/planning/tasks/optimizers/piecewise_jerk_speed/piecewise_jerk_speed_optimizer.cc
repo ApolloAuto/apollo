@@ -128,7 +128,13 @@ Status PiecewiseJerkSpeedOptimizer::Process(
           break;
       }
     }
-    x_bounds.emplace_back(curr_t, s_lower_bound, std::fmax(s_upper_bound, 0.0));
+    if (s_lower_bound > s_upper_bound) {
+      std::string msg("s_lower_bound larger than s_upper_bound on STGraph!");
+      AERROR << msg;
+      speed_data->clear();
+      return Status(ErrorCode::PLANNING_ERROR, msg);
+  }
+    x_bounds.emplace_back(curr_t, s_lower_bound, s_upper_bound);
   }
   path_time_qp->SetVariableBounds(x_bounds);
 
