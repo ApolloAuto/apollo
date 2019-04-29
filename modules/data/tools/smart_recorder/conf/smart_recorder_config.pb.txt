@@ -1,0 +1,56 @@
+triggers {
+  trigger_name: "DriveEventTrigger"
+  enabled: true
+  backward_time: 10.0
+  forward_time: 5.0
+  wanted_channel_types {
+    key: "/apollo/drive_event"
+    value: "apollo.common.DriveEvent"
+  }
+  wanted_channel_types {
+    key: "/apollo/localization/pose"
+    value: "apollo.localization.LocalizationEstimate"
+  }
+  wanted_channel_types {
+    key: "/apollo/sensor/camera/front_6mm/image/compressed"
+    value: "apollo.drivers.CompressedImage"
+  }
+}
+
+triggers {
+  trigger_name: "EmergencyModeTrigger"
+  enabled: true
+  backward_time: 15.0
+  forward_time: 5.0
+  wanted_channel_types {
+    key: "/apollo/canbus/chassis"
+    value: "apollo.canbus.Chassis"
+  }
+  wanted_channel_types {
+    key: "/apollo/localization/pose"
+    value: "apollo.localization.LocalizationEstimate"
+  }
+  wanted_channel_types {
+    key: "/apollo/control"
+    value: "apollo.control.ControlCommand"
+  }
+}
+
+triggers {
+  trigger_name: "SmallTopicsTrigger"
+  enabled: true
+  backward_time: 0
+  forward_time: 0
+  wanted_channel_types {
+    key: "/tf"
+    value: "apollo.transform.TransformStampeds"
+  }
+  wanted_channel_types {
+    key: "/tf_static"
+    value: "apollo.transform.TransformStampeds"
+  }
+  wanted_channel_types {
+    key: "/apollo/sensor/gnss/best_pose"
+    value: "apollo.drivers.gnss.GnssBestPose"
+  }
+}
