@@ -38,6 +38,7 @@ namespace perception {
 namespace camera {
 
 using apollo::cyber::common::GetAbsolutePath;
+using cyber::common::EnsureDirectory;
 
 bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   std::string work_root = "";
@@ -121,18 +122,14 @@ void LaneCameraPerception::InitLane(
         perception_param_.debug_param().has_lane_out_dir()) {
       write_out_lane_file_ = true;
       out_lane_dir_ = perception_param_.debug_param().lane_out_dir();
-      std::string command;
-      command = "mkdir -p " + out_lane_dir_;
-      system(command.c_str());
+      EnsureDirectory(out_lane_dir_);
     }
 
     if (perception_param_.has_debug_param() &&
         perception_param_.debug_param().has_calibration_out_dir()) {
       write_out_calib_file_ = true;
       out_calib_dir_ = perception_param_.debug_param().calibration_out_dir();
-      std::string command;
-      command = "mkdir -p " + out_calib_dir_;
-      system(command.c_str());
+      EnsureDirectory(out_calib_dir_);
     }
   }
 }
@@ -210,7 +207,7 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
     PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
         frame->data_provider->sensor_name(), "LaneDetector");
 
-    if (!(lane_postprocessor_->Process2D(lane_postprocessor_options, frame))) {
+    if (!lane_postprocessor_->Process2D(lane_postprocessor_options, frame)) {
       AERROR << "Failed to postprocess lane 2D.";
       return false;
     }
