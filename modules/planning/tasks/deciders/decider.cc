@@ -40,7 +40,6 @@ apollo::common::Status Decider::Execute(Frame* frame) {
   return Process(frame);
 }
 
-
 bool Decider::BuildStopDecision(
     const std::string& stop_wall_id, const double stop_line_s,
     const double stop_distance, const StopReasonCode& stop_reason_code,

@@ -17,8 +17,8 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
-        ":open_space_pre_stop_decider",
         ":open_space_fallback_decider",
+        ":open_space_pre_stop_decider",
         ":open_space_roi_decider",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_context",
