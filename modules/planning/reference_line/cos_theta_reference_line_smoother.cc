@@ -31,6 +31,8 @@
 #include "modules/planning/reference_line/cos_theta_problem_interface.h"
 #include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
+#define ADEBUG AERROR
+
 namespace apollo {
 namespace planning {
 
@@ -39,15 +41,25 @@ using apollo::common::time::Clock;
 CosThetaReferenceLineSmoother::CosThetaReferenceLineSmoother(
     const ReferenceLineSmootherConfig& config)
     : ReferenceLineSmoother(config) {
+  print_level_ = config.cos_theta().print_level();
+
   max_point_deviation_ = config.cos_theta().max_point_deviation();
 
-  num_of_iterations_ = config.cos_theta().num_of_iteration();
+  max_num_of_iterations_ = config.cos_theta().max_num_of_iterations();
 
   weight_cos_included_angle_ = config.cos_theta().weight_cos_included_angle();
 
+  tol_ = config.cos_theta().tol();
+
   acceptable_tol_ = config.cos_theta().acceptable_tol();
 
+  acceptable_num_of_iterations_ =
+      config.cos_theta().acceptable_num_of_iterations();
+
   relax_ = config.cos_theta().relax();
+
+  use_automatic_differentiation_ =
+      config.cos_theta().use_automatic_differentiation();
 }
 
 bool CosThetaReferenceLineSmoother::Smooth(
@@ -72,14 +84,15 @@ bool CosThetaReferenceLineSmoother::Smooth(
     has_end_point_constraint_ = true;
   }
 
-  const double start_timestamp = Clock::NowInSeconds();
+  const auto start_timestamp = std::chrono::system_clock::now();
 
   bool status =
       CosThetaSmooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
 
-  const double end_timestamp = Clock::NowInSeconds();
+  const auto end_timestamp = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = end_timestamp - start_timestamp;
   ADEBUG << "cos_theta reference line smoother time: "
-         << (end_timestamp - start_timestamp) * 1000.0 << " ms.";
+         << diff.count() * 1000.0 << " ms.";
 
   if (!status) {
     AERROR << "cos_theta reference line smoother fails";
@@ -112,6 +125,7 @@ bool CosThetaReferenceLineSmoother::CosThetaSmooth(
   ptop->set_default_max_point_deviation(max_point_deviation_);
   ptop->set_weight_cos_included_angle(weight_cos_included_angle_);
   ptop->set_relax_end_constraint(relax_);
+  ptop->set_automatic_differentiation_flag(use_automatic_differentiation_);
 
   if (has_start_point_constraint_) {
     ptop->set_start_point(scaled_point2d.front().x(),
@@ -126,9 +140,13 @@ bool CosThetaReferenceLineSmoother::CosThetaSmooth(
 
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
-  app->Options()->SetIntegerValue("print_level", 3);
+  app->Options()->SetIntegerValue("print_level",
+                                  static_cast<int>(print_level_));
   app->Options()->SetIntegerValue("max_iter",
-                                  static_cast<int>(num_of_iterations_));
+                                  static_cast<int>(max_num_of_iterations_));
+  app->Options()->SetIntegerValue(
+      "acceptable_itr", static_cast<int>(acceptable_num_of_iterations_));
+  app->Options()->SetNumericValue("tol", tol_);
   app->Options()->SetNumericValue("acceptable_tol", acceptable_tol_);
 
   Ipopt::ApplicationReturnStatus status = app->Initialize();
@@ -145,17 +163,7 @@ bool CosThetaReferenceLineSmoother::CosThetaSmooth(
     Ipopt::Index iter_count = app->Statistics()->IterationCount();
     ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
   } else {
-    // return detailed failure information,
-    // reference resource: Ipopt::ApplicationReturnStatus
-    if (static_cast<int>(status) >=
-            static_cast<int>(ipopt_failure_status_.size()) ||
-        static_cast<int>(status) < 0) {
-      AERROR << "Solver ends with unknown failure code: "
-             << static_cast<int>(status);
-    } else {
-      AERROR << "Solver failure case: "
-             << ipopt_failure_status_[static_cast<int>(status)];
-    }
+    AERROR << "Solver fails with return code: " << static_cast<int>(status);
     return false;
   }
 
