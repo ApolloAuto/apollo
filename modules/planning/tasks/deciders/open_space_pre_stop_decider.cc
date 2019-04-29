@@ -41,8 +41,8 @@ OpenSpacePreStopDecider::OpenSpacePreStopDecider(const TaskConfig& config)
   SetName("OpenSpacePreStopDecider");
 }
 
-Status OpenSpacePreStopDecider::Process(Frame* frame,
-                                     ReferenceLineInfo* reference_line_info) {
+Status OpenSpacePreStopDecider::Process(
+    Frame* frame, ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
