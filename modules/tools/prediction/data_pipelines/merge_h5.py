@@ -60,30 +60,82 @@ if __name__ == '__main__':
             from a specified directory')
     parser.add_argument('directory', type=str,
                         help='directory contains feature files in .h5')
+    parser.add_argument('-n', '--npy', action='store_true',
+                        help='if is .npy rather than .h5, use this.')
     args = parser.parse_args()
     path = args.directory
 
-    print ("load h5 from directory: {}".format(path))
-    if os.path.isdir(path):
-        features = None
-        labels = None
+    if not args.npy:
+        print ("load h5 from directory: {}".format(path))
+        if os.path.isdir(path):
+            features = None
+            labels = None
 
-        h5_files = getListOfFiles(path)
-        print ("Total number of files:", len(h5_files))
-        for i, h5_file in enumerate(h5_files):
-            print ("Process File", i, ":", h5_file)
-            feature = load_hdf5(h5_file)
-            if np.any(np.isinf(feature)):
-                print ("inf data found")
-            features = np.concatenate((features, feature), axis=0) if features is not None \
-                else feature
+            h5_files = getListOfFiles(path)
+            print ("Total number of files:", len(h5_files))
+            for i, h5_file in enumerate(h5_files):
+                print ("Process File", i, ":", h5_file)
+                feature = load_hdf5(h5_file)
+                if np.any(np.isinf(feature)):
+                    print ("inf data found")
+                features = np.concatenate((features, feature), axis=0) if features is not None \
+                    else feature
+        else:
+            print ("Fail to find", path)
+            os._exit(-1)
+
+        date = datetime.datetime.now().strftime('%Y-%m-%d')
+        sample_file = path + '/merged' + date + '.h5'
+        print ("Save samples file to:", sample_file)
+        h5_file = h5py.File(sample_file, 'w')
+        h5_file.create_dataset('data', data=features)
+        h5_file.close()
     else:
-        print ("Fail to find", path)
-        os._exit(-1)
+        print ("load npy from directory: {}".format(path))
+        if os.path.isdir(path):
+            features_go = None
+            features_cutin = None
+            npy_files = getListOfFiles(path)
+            print ("Total number of files:", len(npy_files))
+            for i, npy_file in enumerate(npy_files):
+                print ("Process File", i, ":", npy_file)
+                temp_features = np.load(npy_file)
+                feature_go = np.zeros((temp_features.shape[0], 157))
+                feature_cutin = np.zeros((temp_features.shape[0], 157))
+                count_go = 0
+                count_cutin = 0
+                for j in range(temp_features.shape[0]):
+                    fea = np.asarray(temp_features[j])
+                    if fea.shape[0] != 157:
+                        continue
+                    if fea[-1] < -1 or fea[-1] > 4:
+                        continue
+                    fea = fea.reshape((1, 157))
+                    if fea[0, -1]%2 == 0:
+                        feature_go[count_go] = fea
+                        count_go += 1
+                    else:
+                        feature_cutin[count_cutin] = fea
+                        count_cutin += 1
 
-    date = datetime.datetime.now().strftime('%Y-%m-%d')
-    sample_file = path + '/merged' + date + '.h5'
-    print ("Save samples file to:", sample_file)
-    h5_file = h5py.File(sample_file, 'w')
-    h5_file.create_dataset('data', data=features)
-    h5_file.close()
+                feature_go = feature_go[:count_go]
+                feature_cutin = feature_cutin[:count_cutin]
+                features_go = np.concatenate((features_go, feature_go), axis=0) if features_go is not None \
+                    else feature_go
+                features_cutin = np.concatenate((features_cutin, feature_cutin), axis=0) if features_cutin is not None \
+                    else feature_cutin
+        else:
+            print ("Fail to find", path)
+            os._exit(-1)
+
+        print (features_go.shape)
+        print (features_cutin.shape)
+        date = datetime.datetime.now().strftime('%Y-%m-%d')
+        sample_file_go = path + '/merged_go_' + date + '.h5'
+        sample_file_cutin = path + '/merged_cutin_' + date + '.h5'
+        h5_file_go = h5py.File(sample_file_go, 'w')
+        h5_file_go.create_dataset('data', data=features_go)
+        h5_file_go.close()
+        h5_file_cutin = h5py.File(sample_file_cutin, 'w')
+        h5_file_cutin.create_dataset('data', data=features_cutin)
+        h5_file_cutin.close()
