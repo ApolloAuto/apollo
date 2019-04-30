@@ -21,6 +21,7 @@ cc_library(
         "//modules/common",
         "//modules/common/util",
         "//modules/common/util:factory",
+        "//modules/planning/common/util:common_lib",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
         "//modules/planning/scenarios:stage_intersection_cruise_impl",
