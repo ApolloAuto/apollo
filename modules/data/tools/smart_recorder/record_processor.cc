@@ -163,7 +163,7 @@ void RecordProcessor::RestoreMessage(const RecordMessage& msg) {
   writer_->WriteMessage(msg.channel_name, msg.content, msg.time);
 }
 
-const std::string RecordProcessor::GetDefaultOutputFile() const {
+std::string RecordProcessor::GetDefaultOutputFile() const {
   std::string src_file_name = source_record_files_.front();
   const std::string record_flag(".record");
   src_file_name.resize(src_file_name.size() - src_file_name.find(record_flag) +
