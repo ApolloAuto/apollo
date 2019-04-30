@@ -268,16 +268,19 @@ bool CosThetaProbleminterface::eval_jac_g(int n, const double* x, bool new_x,
   if (use_automatic_differentiation_) {
     if (values == nullptr) {
       // return the structure of the jacobian
-      for (int idx = 0; idx < nnz_jac; idx++) {
-        iRow[idx] = rind_g[idx];
-        jCol[idx] = cind_g[idx];
+      for (int idx = 0; idx < nnz_jac_; idx++) {
+        iRow[idx] = rind_g_[idx];
+        jCol[idx] = cind_g_[idx];
       }
     } else {
       // return the values of the jacobian of the constraints
-      sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval,
-                 options_g);
-      for (int idx = 0; idx < nnz_jac; idx++) {
-        values[idx] = jacval[idx];
+      // auto* rind_g = &rind_g_[0];
+      // auto* cind_g = &cind_g_[0];
+      // auto* jacval = &jacval_[0];
+      sparse_jac(tag_g, m, n, 1, x, &nnz_jac_, &rind_g_, &cind_g_, &jacval_,
+                 options_g_);
+      for (int idx = 0; idx < nnz_jac_; idx++) {
+        values[idx] = jacval_[idx];
       }
     }
     return true;
@@ -308,21 +311,26 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
     if (values == nullptr) {
       // return the structure. This is a symmetric matrix, fill the lower left
       // triangle only.
-      for (int idx = 0; idx < nnz_L; idx++) {
-        iRow[idx] = rind_L[idx];
-        jCol[idx] = cind_L[idx];
+      for (int idx = 0; idx < nnz_L_; idx++) {
+        iRow[idx] = rind_L_[idx];
+        jCol[idx] = cind_L_[idx];
       }
     } else {
       // return the values. This is a symmetric matrix, fill the lower left
       // triangle only
-      obj_lam[0] = obj_factor;
-      for (int idx = 0; idx < m; idx++) obj_lam[1 + idx] = lambda[idx];
-      set_param_vec(tag_L, m + 1, obj_lam);
-      sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L, &rind_L, &cind_L,
-                  &hessval, options_L);
+      obj_lam_[0] = obj_factor;
+      for (int idx = 0; idx < m; idx++) {
+        obj_lam_[1 + idx] = lambda[idx];
+      }
+      // auto* rind_L = &rind_L_[0];
+      // auto* cind_L = &cind_L_[0];
+      // auto* hessval = &hessval_[0];
+      set_param_vec(tag_L, m + 1, &obj_lam_[0]);
+      sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L_, &rind_L_,
+                  &cind_L_, &hessval_, options_L_);
 
-      for (int idx = 0; idx < nnz_L; idx++) {
-        values[idx] = hessval[idx];
+      for (int idx = 0; idx < nnz_L_; idx++) {
+        values[idx] = hessval_[idx];
       }
     }
     return true;
@@ -538,15 +546,13 @@ void CosThetaProbleminterface::finalize_solution(
     opt_x_.emplace_back(x[index]);
     opt_y_.emplace_back(x[index + 1]);
   }
-
   if (use_automatic_differentiation_) {
-    delete[] obj_lam;
-    free(rind_g);
-    free(cind_g);
-    free(rind_L);
-    free(cind_L);
-    free(jacval);
-    free(hessval);
+    free(rind_g_);
+    free(cind_g_);
+    free(rind_L_);
+    free(cind_L_);
+    free(jacval_);
+    free(hessval_);
   }
 }
 
@@ -744,69 +750,94 @@ bool CosThetaProbleminterface::eval_constraints(int n, const T* x, int m,
 /** Method to generate the required tapes */
 void CosThetaProbleminterface::generate_tapes(int n, int m, int* nnz_jac_g,
                                               int* nnz_h_lag) {
-  Ipopt::Number* xp = new double[n];
-  Ipopt::Number* lamp = new double[m];
-  Ipopt::Number* zl = new double[m];
-  Ipopt::Number* zu = new double[m];
-  adouble* xa = new adouble[n];
-  adouble* g = new adouble[m];
-  double* lam = new double[m];
+  std::vector<double> xp(n, 0.0);
+  std::vector<double> lamp(m, 0.0);
+  std::vector<double> zl(m, 0.0);
+  std::vector<double> zu(m, 0.0);
+  std::vector<adouble> xa(n, 0.0);
+  std::vector<adouble> g(m, 0.0);
+  std::vector<double> lam(m, 0.0);
+
   double sig;
   adouble obj_value;
 
   double dummy;
-  obj_lam = new double[m + 1];
-  get_starting_point(n, 1, xp, 0, zl, zu, m, 0, lamp);
+  obj_lam_.clear();
+  obj_lam_.resize(m + 1, 0.0);
+  get_starting_point(n, 1, &xp[0], 0, &zl[0], &zu[0], m, 0, &lamp[0]);
+
+  // Trace on Objectives
   trace_on(tag_f);
-
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
-  eval_obj(n, xa, &obj_value);
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  eval_obj(n, &xa[0], &obj_value);
   obj_value >>= dummy;
   trace_off();
 
+  // Trace on Jacobian
   trace_on(tag_g);
-
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
-  eval_constraints(n, xa, m, g);
-  for (int idx = 0; idx < m; idx++) g[idx] >>= dummy;
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  eval_constraints(n, &xa[0], m, &g[0]);
+  for (int idx = 0; idx < m; idx++) {
+    g[idx] >>= dummy;
+  }
   trace_off();
+
+  // Trace on Hessian
   trace_on(tag_L);
-
-  for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
-  for (int idx = 0; idx < m; idx++) lam[idx] = 1.0;
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  for (int idx = 0; idx < m; idx++) {
+    lam[idx] = 1.0;
+  }
   sig = 1.0;
-  eval_obj(n, xa, &obj_value);
+  eval_obj(n, &xa[0], &obj_value);
   obj_value *= mkparam(sig);
-  eval_constraints(n, xa, m, g);
-
-  for (int idx = 0; idx < m; idx++) obj_value += g[idx] * mkparam(lam[idx]);
+  eval_constraints(n, &xa[0], m, &g[0]);
+  for (int idx = 0; idx < m; idx++) {
+    obj_value += g[idx] * mkparam(lam[idx]);
+  }
   obj_value >>= dummy;
   trace_off();
-  rind_g = NULL;
-  cind_g = NULL;
-  rind_L = NULL;
-  cind_L = NULL;
-  options_g[0] = 0; /* sparsity pattern by index domains (default) */
-  options_g[1] = 0; /*                         safe mode (default) */
-  options_g[2] = 0;
-  options_g[3] = 0; /*                column compression (default) */
 
-  jacval = NULL;
-  hessval = NULL;
-  sparse_jac(tag_g, m, n, 0, xp, &nnz_jac, &rind_g, &cind_g, &jacval,
-             options_g);
-  *nnz_jac_g = nnz_jac;
-  options_L[0] = 0;
-  options_L[1] = 1;
-  sparse_hess(tag_L, n, 0, xp, &nnz_L, &rind_L, &cind_L, &hessval, options_L);
-  *nnz_h_lag = nnz_L;
-  delete[] lam;
-  delete[] g;
-  delete[] xa;
-  delete[] zu;
-  delete[] zl;
-  delete[] lamp;
-  delete[] xp;
+  // rind_g_.clear();
+  // cind_g_.clear();
+  // rind_L_.clear();
+  // cind_L_.clear();
+  rind_g_ = nullptr;
+  cind_g_ = nullptr;
+  rind_L_ = nullptr;
+  cind_L_ = nullptr;
+
+  options_g_[0] = 0; /* sparsity pattern by index domains (default) */
+  options_g_[1] = 0; /*                         safe mode (default) */
+  options_g_[2] = 0;
+  options_g_[3] = 0; /*                column compression (default) */
+
+  // jacval_.clear();
+  // hessval_.clear();
+  jacval_ = nullptr;
+  hessval_ = nullptr;
+
+  // auto* rind_g = &rind_g_[0];
+  // auto* cind_g = &cind_g_[0];
+  // auto* jacval = &jacval_[0];
+  // auto* rind_L = &rind_L_[0];
+  // auto* cind_L = &cind_L_[0];
+  // auto* hessval = &hessval_[0];
+
+  sparse_jac(tag_g, m, n, 0, &xp[0], &nnz_jac_, &rind_g_, &cind_g_, &jacval_,
+             options_g_);
+  *nnz_jac_g = nnz_jac_;
+  options_L_[0] = 0;
+  options_L_[1] = 1;
+  sparse_hess(tag_L, n, 0, &xp[0], &nnz_L_, &rind_L_, &cind_L_, &hessval_,
+              options_L_);
+  *nnz_h_lag = nnz_L_;
 }
 
 //***************    end   ADOL-C part ***********************************

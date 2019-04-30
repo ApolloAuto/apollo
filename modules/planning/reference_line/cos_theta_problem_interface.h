@@ -182,18 +182,29 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
   CosThetaProbleminterface(const CosThetaProbleminterface&);
   CosThetaProbleminterface& operator=(const CosThetaProbleminterface&);
 
-  double* obj_lam;
+  std::vector<double> obj_lam_;
+
+  // TODO(Jinyun): Not changed to std::vector yet, need further debug
   //** variables for sparsity exploitation
-  unsigned int* rind_g; /* row indices    */
-  unsigned int* cind_g; /* column indices */
-  double* jacval;       /* values         */
-  unsigned int* rind_L; /* row indices    */
-  unsigned int* cind_L; /* column indices */
-  double* hessval;      /* values */
-  int nnz_jac;
-  int nnz_L;
-  int options_g[4];
-  int options_L[4];
+  // std::vector<unsigned int> rind_g_; /* row indices    */
+  // std::vector<unsigned int> cind_g_; /* column indices */
+  // std::vector<double> jacval_;       /* values         */
+  // std::vector<unsigned int> rind_L_; /* row indices    */
+  // std::vector<unsigned int> cind_L_; /* column indices */
+  // std::vector<double> hessval_;      /* values */
+
+  //** variables for sparsity exploitation
+  unsigned int* rind_g_; /* row indices    */
+  unsigned int* cind_g_; /* column indices */
+  double* jacval_;       /* values         */
+  unsigned int* rind_L_; /* row indices    */
+  unsigned int* cind_L_; /* column indices */
+  double* hessval_;      /* values */
+
+  int nnz_jac_;
+  int nnz_L_;
+  int options_g_[4];
+  int options_L_[4];
 
   //***************    end   ADOL-C part ***********************************
 };
