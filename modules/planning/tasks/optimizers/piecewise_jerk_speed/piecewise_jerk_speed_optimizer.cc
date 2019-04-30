@@ -133,7 +133,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
       AERROR << msg;
       speed_data->clear();
       return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
+    }
     x_bounds.emplace_back(curr_t, s_lower_bound, s_upper_bound);
   }
   path_time_qp->SetVariableBounds(x_bounds);
