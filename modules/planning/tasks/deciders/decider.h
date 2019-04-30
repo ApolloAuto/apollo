@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "modules/common/status/status.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/tasks/task.h"
@@ -48,13 +45,6 @@ class Decider : public Task {
   virtual apollo::common::Status Process(Frame* frame) {
     return apollo::common::Status::OK();
   }
-
-  bool BuildStopDecision(const std::string& stop_wall_id,
-                         const double stop_line_s, const double stop_distance,
-                         const StopReasonCode& stop_reason_code,
-                         const std::vector<std::string>& wait_for_obstacles,
-                         Frame* const frame,
-                         ReferenceLineInfo* const reference_line_info);
 };
 
 }  // namespace planning

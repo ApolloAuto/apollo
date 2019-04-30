@@ -28,6 +28,7 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
+#include "modules/planning/common/util/common.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/st_boundary_mapper.h"
 
@@ -177,10 +178,13 @@ void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
       // TODO(Jiaxuan Xu): replace the stop fence to more intelligent actions
       const std::string stop_wall_id = "lane_change_stop";
       std::vector<std::string> wait_for_obstacles;
-      BuildStopDecision(stop_wall_id, sl_point.s(),
-                        speed_bounds_config_.urgent_distance_for_lane_change(),
-                        StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY,
-                        wait_for_obstacles, frame, &reference_line_info);
+      util::BuildStopDecision(
+          stop_wall_id, sl_point.s(),
+          speed_bounds_config_.urgent_distance_for_lane_change(),
+          StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY,
+          wait_for_obstacles,
+          "SpeedBoundsDecider",
+          frame, &reference_line_info);
     }
   }
 }
@@ -193,11 +197,14 @@ void SpeedBoundsDecider::AddPathEndStop(
       reference_line_info->path_data().frenet_frame_path().back().s() -
               reference_line_info->path_data().frenet_frame_path().front().s() <
           FLAGS_short_path_length_threshold) {
-    BuildStopDecision(
+    util::BuildStopDecision(
         stop_wall_id,
         reference_line_info->path_data().frenet_frame_path().back().s() - 5.0,
-        0.0, StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY,
-        wait_for_obstacles, frame, reference_line_info);
+        0.0,
+        StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY,
+        wait_for_obstacles,
+        "SpeedBoundsDecider",
+        frame, reference_line_info);
   }
 }
 
@@ -390,9 +397,12 @@ bool SpeedBoundsDecider::BuildSidePassStopFence(
 
   // TODO(Jinyun) move to confs
   constexpr double stop_buffer = 0.25;
-  BuildStopDecision(stop_wall_id, stop_point_s - stop_buffer, 0.0,
-                    StopReasonCode::STOP_REASON_SIDEPASS_SAFETY,
-                    wait_for_obstacles, frame, reference_line_info);
+  util::BuildStopDecision(
+      stop_wall_id, stop_point_s - stop_buffer, 0.0,
+      StopReasonCode::STOP_REASON_SIDEPASS_SAFETY,
+      wait_for_obstacles,
+      "SpeedBoundsDecider",
+      frame, reference_line_info);
 
   return true;
 }
