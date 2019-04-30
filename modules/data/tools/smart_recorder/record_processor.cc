@@ -155,7 +155,7 @@ void RecordProcessor::RestoreMessage(const RecordMessage& msg) {
   auto* raw_message = ProtobufFactory::Instance()->GenerateMessageByType(
       channels_types_map_[msg.channel_name]);
   CHECK(raw_message) << "Failed to do reflection from " << msg.channel_name;
-  std::string get_desc_str("");
+  std::string get_desc_str;
   ProtobufFactory::GetDescriptorString(*raw_message, &get_desc_str);
   writer_->WriteChannel(msg.channel_name,
                         raw_message->GetDescriptor()->full_name(),

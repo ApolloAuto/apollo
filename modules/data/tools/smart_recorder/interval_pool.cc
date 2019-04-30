@@ -85,9 +85,9 @@ void IntervalPool::Reset() {
 
 void IntervalPool::PrintIntervals() const {
   auto idx = 0;
-  for (const auto& iter : pool_) {
-    AINFO << ++idx << ": " << iter.begin_time << " - " << iter.end_time;
-    for (const std::string& channel : iter.channels) {
+  for (const auto& interval : pool_) {
+    AINFO << ++idx << ": " << interval.begin_time << " - " << interval.end_time;
+    for (const std::string& channel : interval.channels) {
       AINFO << channel;
     }
   }
