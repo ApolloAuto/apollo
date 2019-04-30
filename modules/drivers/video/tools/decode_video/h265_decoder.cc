@@ -88,9 +88,11 @@ void H265Decoder::Release() {
   }
 }
 
-std::vector<uint8_t> H265Decoder::Process(const uint8_t* indata,
-                                          const int32_t insize) const {
+H265Decoder::DecodingResult H265Decoder::Process(
+    const uint8_t* indata, const int32_t insize,
+    std::vector<uint8_t>* outdata) const {
   AVPacket apt;
+  outdata->clear();
   av_init_packet(&apt);
   int got_picture = 0;
   apt.data = const_cast<uint8_t*>(indata);
@@ -98,33 +100,32 @@ std::vector<uint8_t> H265Decoder::Process(const uint8_t* indata,
   if (apt.size == 0) {
     apt.data = nullptr;
   }
-  std::vector<uint8_t> outdata;
   int ret =
       avcodec_decode_video2(codec_ctx_h265_, yuv_frame_, &got_picture, &apt);
   if (ret < 0) {
     AERROR << "error: decode failed: input_framesize = " << apt.size
            << ". error code = " << ret;
-    return outdata;
+    return H265Decoder::DecodingResult::FATAL;
   }
   if (!got_picture) {
     // Not an error, but just did not read pictures out
     AWARN << "warn: failed to get yuv picture";
-    return outdata;
+    return H265Decoder::DecodingResult::WARN;
   }
   av_packet_unref(&apt);
   got_picture = 0;
   ret = avcodec_encode_video2(codec_ctx_jpeg_, &apt, yuv_frame_, &got_picture);
   if (ret < 0) {
     AERROR << "error: jpeg encode failed, error code = " << ret;
-    return outdata;
+    return H265Decoder::DecodingResult::FATAL;
   }
   if (!got_picture) {
     AERROR << "error: failed to get jpeg picture from yuyv";
-    return outdata;
+    return H265Decoder::DecodingResult::FATAL;
   }
-  outdata.resize(apt.size);
-  std::copy(apt.data, apt.data + apt.size, outdata.begin());
-  return outdata;
+  outdata->resize(apt.size);
+  std::copy(apt.data, apt.data + apt.size, outdata->begin());
+  return H265Decoder::DecodingResult::SUCCESS;
 }
 
 }  // namespace video

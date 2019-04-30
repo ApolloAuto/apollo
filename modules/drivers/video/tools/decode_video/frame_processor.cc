@@ -61,7 +61,8 @@ bool FrameProcessor::ProcessStream() const {
   uint8_t* local_data = const_cast<uint8_t*>(input_video_buffer_.data());
   AINFO << "decoding: video size = " << local_size;
   int frame_num = 0;
-  int error_frame_num = 0;
+  int warn_frame_num = 0;
+  std::vector<uint8_t> jpeg_buffer;
   while (local_size > 0) {
     int frame_len = av_parser_parse2(
         codec_parser, decoder->GetCodecCtxH265(), &(apt.data), &(apt.size),
@@ -72,24 +73,27 @@ bool FrameProcessor::ProcessStream() const {
     }
     AINFO << "frame " << frame_num << ": frame_len=" << frame_len
           << ". left_size=" << local_size;
-    std::vector<uint8_t> jpeg_buffer = decoder->Process(apt.data, apt.size);
-    if (!jpeg_buffer.empty()) {
+    const auto decoding_result =
+        decoder->Process(apt.data, apt.size, &jpeg_buffer);
+    if (decoding_result != H265Decoder::DecodingResult::WARN) {
+      // Write to output even if failed to convert, in order to
+      // maintain the order of frames
       WriteOutputJpgFile(jpeg_buffer, GetOutputFile(frame_num));
-      frame_num++;
+      ++frame_num;
     } else {
-      error_frame_num++;
+      // Retry later if returns warn, which indicates reading more from buffer
+      ++warn_frame_num;
     }
     local_data += frame_len;
     local_size -= frame_len;
   }
-  // Trying to decode the left over frames from buffer
-  for (int i = error_frame_num; i >= 0; i--) {
-    std::vector<uint8_t> jpeg_buffer = decoder->Process(nullptr, 0);
-    if (!jpeg_buffer.empty()) {
-      WriteOutputJpgFile(jpeg_buffer, GetOutputFile(frame_num));
-      AINFO << "frame " << frame_num << ": read from buffer";
-      frame_num++;
-    }
+  // Decode the left over frames from buffer exactly warning times
+  for (int i = warn_frame_num; i > 0; --i) {
+    // When retry to decode from buffer, we do not care if it succeeds or not
+    decoder->Process(nullptr, 0, &jpeg_buffer);
+    WriteOutputJpgFile(jpeg_buffer, GetOutputFile(frame_num));
+    AINFO << "frame " << frame_num << ": read from buffer";
+    ++frame_num;
   }
   AINFO << "total frames: " << frame_num;
   av_parser_close(codec_parser);
