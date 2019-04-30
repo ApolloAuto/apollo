@@ -26,6 +26,7 @@
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/planning/common/util/common.h"
 
 namespace apollo {
 namespace planning {
@@ -136,9 +137,11 @@ void OpenSpacePreStopDecider::CheckOpenSpacePreStop(
   std::vector<std::string> wait_for_obstacles;
   frame->mutable_open_space_info()->set_open_space_pre_stop_fence_s(
       stop_line_s);
-  BuildStopDecision(stop_wall_id, stop_line_s, 0.0,
-                    StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP,
-                    wait_for_obstacles, frame, reference_line_info);
+  util::BuildStopDecision(stop_wall_id, stop_line_s, 0.0,
+                          StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP,
+                          wait_for_obstacles,
+                          "OpenSpacePreStopDecider",
+                          frame, reference_line_info);
 }
 
 }  // namespace planning
