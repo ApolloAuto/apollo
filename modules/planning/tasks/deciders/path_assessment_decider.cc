@@ -119,6 +119,21 @@ Status PathAssessmentDecider::Process(
               if (lhs_is_regular != rhs_is_regular) {
                 return lhs_is_regular;
               }
+              // For two lane-borrow directions, based on ADC's position,
+              // select the more convenient one.
+              if ((lhs.path_label().find("left") != std::string::npos &&
+                   rhs.path_label().find("right") != std::string::npos) ||
+                  (lhs.path_label().find("right") != std::string::npos &&
+                   rhs.path_label().find("left") != std::string::npos)) {
+                double adc_l = lhs.frenet_frame_path().front().l();
+                if (adc_l < -1.0 || adc_l > 1.0) {
+                  if (adc_l < -1.0) {
+                    return lhs.path_label().find("right") != std::string::npos;
+                  } else {
+                    return lhs.path_label().find("left") != std::string::npos;
+                  }
+                }
+              }
               // Select longer path.
               // If roughly same length, then select self-lane path.
               bool lhs_on_selflane =
