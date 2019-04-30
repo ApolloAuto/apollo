@@ -146,20 +146,19 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   m = num_of_constraints_;
   ADEBUG << "num_of_constraints_ " << num_of_constraints_;
 
-  generate_tapes(n, m, &nnz_h_lag);
+  generate_tapes(n, m, &nnz_jac_g, &nnz_h_lag);
   // // number of nonzero in Jacobian.
-  int tmp = 0;
-  for (int i = 0; i < horizon_ + 1; ++i) {
-    for (int j = 0; j < obstacles_num_; ++j) {
-      int current_edges_num = obstacles_edges_num_(j, 0);
-      tmp += current_edges_num * 4 + 9 + 4;
-    }
-  }
-  nnz_jac_g = 24 * horizon_ + 3 * horizon_ + 2 * horizon_ + tmp - 1 +
-              (num_of_variables_ - (horizon_ + 1) + 2);
+  // int tmp = 0;
+  // for (int i = 0; i < horizon_ + 1; ++i) {
+  //   for (int j = 0; j < obstacles_num_; ++j) {
+  //     int current_edges_num = obstacles_edges_num_(j, 0);
+  //     tmp += current_edges_num * 4 + 9 + 4;
+  //   }
+  // }
+  // nnz_jac_g = 24 * horizon_ + 3 * horizon_ + 2 * horizon_ + tmp - 1 +
+  //             (num_of_variables_ - (horizon_ + 1) + 2);
 
   index_style = IndexStyleEnum::C_STYLE;
-  ADEBUG << "get_nlp_info out";
   return true;
 }
 
@@ -453,7 +452,22 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                                                 bool new_x, int m, int nele_jac,
                                                 int* iRow, int* jCol,
                                                 double* values) {
-  return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
+  if (values == nullptr) {
+    // return the structure of the jacobian
+    for (int idx = 0; idx < nnz_jac; idx++) {
+      iRow[idx] = rind_g[idx];
+      jCol[idx] = cind_g[idx];
+    }
+  } else {
+    // return the values of the jacobian of the constraints
+    sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval,
+               options_g);
+    for (int idx = 0; idx < nnz_jac; idx++) {
+      values[idx] = jacval[idx];
+    }
+  }
+  return true;
+  // return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
 }
 
 bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
@@ -1325,7 +1339,6 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  ADEBUG << "finalize_solution";
   int state_index = state_start_index_;
   int control_index = control_start_index_;
   int time_index = time_start_index_;
@@ -1381,11 +1394,12 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   }
   // memory deallocation of ADOL-C variables
   delete[] obj_lam;
+  free(rind_g);
+  free(cind_g);
   free(rind_L);
   free(cind_L);
+  free(jacval);
   free(hessval);
-
-  ADEBUG << "finalize_solution done!";
 }
 
 void DistanceApproachIPOPTInterface::get_optimization_results(
@@ -1453,7 +1467,6 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
 //***************    start ADOL-C part ***********************************
 template <class T>
 void DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
-  ADEBUG << "eval_obj";
   // Objective is :
   // min control inputs
   // min input rate
@@ -1520,14 +1533,11 @@ void DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
     *obj_value += first_order_penalty + second_order_penalty;
     time_index++;
   }
-
-  ADEBUG << "objective value after this iteration : " << *obj_value;
 }
 
 template <class T>
 void DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
                                                       T* g) {
-  ADEBUG << "eval_constraints";
   // state start index
   int state_index = state_start_index_;
 
@@ -1820,52 +1830,41 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
 }
 
 void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
+                                                    int* nnz_jac_g,
                                                     int* nnz_h_lag) {
   std::vector<double> xp(n);
   std::vector<double> lamp(m);
   std::vector<double> zl(m);
   std::vector<double> zu(m);
-
   std::vector<adouble> xa(n);
   std::vector<adouble> g(m);
   std::vector<double> lam(m);
+
   double sig;
   adouble obj_value;
-
   double dummy;
-
   obj_lam = new double[m + 1];
-
   get_starting_point(n, 1, &xp[0], 0, &zl[0], &zu[0], m, 0, &lamp[0]);
 
   trace_on(tag_f);
-
   for (int idx = 0; idx < n; idx++) {
     xa[idx] <<= xp[idx];
   }
-
   eval_obj(n, &xa[0], &obj_value);
-
   obj_value >>= dummy;
-
   trace_off();
 
   trace_on(tag_g);
-
   for (int idx = 0; idx < n; idx++) {
     xa[idx] <<= xp[idx];
   }
-
   eval_constraints(n, &xa[0], m, &g[0]);
-
   for (int idx = 0; idx < m; idx++) {
     g[idx] >>= dummy;
   }
-
   trace_off();
 
   trace_on(tag_L);
-
   for (int idx = 0; idx < n; idx++) {
     xa[idx] <<= xp[idx];
   }
@@ -1873,28 +1872,33 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
     lam[idx] = 1.0;
   }
   sig = 1.0;
-
   eval_obj(n, &xa[0], &obj_value);
-
   obj_value *= mkparam(sig);
   eval_constraints(n, &xa[0], m, &g[0]);
-
   for (int idx = 0; idx < m; idx++) {
     obj_value += g[idx] * mkparam(lam[idx]);
   }
-
   obj_value >>= dummy;
 
   trace_off();
 
+  rind_g = nullptr;
+  cind_g = nullptr;
   rind_L = nullptr;
   cind_L = nullptr;
-
+  jacval = nullptr;
   hessval = nullptr;
+
+  options_g[0] = 0; /* sparsity pattern by index domains (default) */
+  options_g[1] = 0; /*                         safe mode (default) */
+  options_g[2] = 0;
+  options_g[3] = 0; /*                column compression (default) */
+  sparse_jac(tag_g, m, n, 0, &xp[0], &nnz_jac, &rind_g, &cind_g, &jacval,
+             options_g);
+  *nnz_jac_g = nnz_jac;
 
   options_L[0] = 0;
   options_L[1] = 1;
-
   sparse_hess(tag_L, n, 0, &xp[0], &nnz_L, &rind_L, &cind_L, &hessval,
               options_L);
   *nnz_h_lag = nnz_L;
