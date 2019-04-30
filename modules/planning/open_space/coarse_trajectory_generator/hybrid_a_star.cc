@@ -303,7 +303,7 @@ bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
   for (size_t i = 0; i < x_size - 1; ++i) {
     double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
                             vehicle_param_.wheel_base() / step_size_;
-    if (result->v[i] > 0) {
+    if (result->v[i] > 0.0) {
       discrete_steer = std::atan(discrete_steer);
     } else {
       discrete_steer = std::atan(-discrete_steer);
