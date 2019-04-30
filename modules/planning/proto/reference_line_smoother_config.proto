@@ -52,20 +52,26 @@ message CosThetaSmootherConfig {
   // The weight of cosine of included angle between points
   optional double weight_cos_included_angle = 4 [default = 10000.0];
 
+  // The weight of cosine of included angle between points
+  optional double weight_anchor_points = 5 [default = 1.0];
+
+  // The weight of cosine of included angle between points
+  optional double weight_length = 6 [default = 1.0];
+
   // The terminating tolerance of optimization
-  optional double tol = 5 [default = 1e-8];
+  optional double tol = 7 [default = 1e-8];
 
   // The acceptable tolerance of optimization
-  optional double acceptable_tol = 6 [default = 1e-6];
+  optional double acceptable_tol = 8 [default = 1e-6];
 
   // The acceptable convergence tol for spiral opt
-  optional int32 acceptable_num_of_iterations = 7 [default = 15];
+  optional int32 acceptable_num_of_iterations = 9 [default = 15];
 
   // Relax constraint on end condition
-  optional double relax = 8 [default = 0.2];
+  optional double relax = 10 [default = 0.2];
 
   // Use third party package to do automatic differentiation
-  optional bool use_automatic_differentiation = 9 [default = false];
+  optional bool use_automatic_differentiation = 11 [default = false];
 }
 
 message ReferenceLineSmootherConfig {

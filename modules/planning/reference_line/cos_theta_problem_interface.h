@@ -56,6 +56,10 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
 
   void set_weight_cos_included_angle(const double weight_cos_included_angle);
 
+  void set_weight_anchor_points(const double weight_anchor_points);
+
+  void set_weight_length(const double weight_length);
+
   void set_relax_end_constraint(const double relax);
 
   void set_automatic_differentiation_flag(const bool use_ad);
@@ -114,14 +118,14 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
 
   /** Template to return the objective value */
   template <class T>
-  bool eval_obj(int n, const T* x, T& obj_value);
+  bool eval_obj(int n, const T* x, T* obj_value);
 
   /** Template to compute contraints */
   template <class T>
   bool eval_constraints(int n, const T* x, int m, T* g);
 
   /** Method to generate the required tapes */
-  virtual void generate_tapes(int n, int m, int& nnz_jac_g, int& nnz_h_lag);
+  virtual void generate_tapes(int n, int m, int* nnz_jac_g, int* nnz_h_lag);
 
   //***************    end   ADOL-C part ***********************************
 
@@ -164,7 +168,11 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
 
   double relax_ = 0.2;
 
-  double weight_cos_included_angle_ = 1.0;
+  double weight_cos_included_angle_ = 0.0;
+
+  double weight_anchor_points_ = 0.0;
+
+  double weight_length_ = 0.0;
 
   //***************    start ADOL-C part ***********************************
 

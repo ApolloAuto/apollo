@@ -1,4 +1,4 @@
-max_constraint_interval : 0.5
+max_constraint_interval : 0.25
 longitudinal_boundary_bound : 2.0
 lateral_boundary_bound : 0.25
 num_of_total_points : 500
@@ -8,13 +8,15 @@ wide_lane_threshold_factor : 2.0
 wide_lane_shift_remain_factor : 0.5
 
 cos_theta {
-  print_level: 5
+  print_level: 0
   max_point_deviation: 0.5
   tol: 1e-8
   max_num_of_iterations: 500
   acceptable_tol: 1e-1
   acceptable_num_of_iterations: 15
-  weight_cos_included_angle: 1e3
+  weight_cos_included_angle: 1e5
+  weight_anchor_points: 1.0
+  weight_length: 1.0
   relax: 0.25
   use_automatic_differentiation: true
 }
