@@ -21,36 +21,6 @@ decision {
   }
   object_decision {
     decision {
-      id: "11511_0"
-      perception_id: 11511
-      object_decision {
-        follow {
-          distance_s: -3
-          fence_point {
-            x: 586260.28669805115
-            y: 4141284.2730941377
-            z: 0
-          }
-          fence_heading: -1.3411720959052336
-        }
-      }
-    }
-    decision {
-      id: "11511_1"
-      perception_id: 11511
-      object_decision {
-        follow {
-          distance_s: -3
-          fence_point {
-            x: 586260.20623721776
-            y: 4141284.6137085222
-            z: 0
-          }
-          fence_heading: -1.3577543487779731
-        }
-      }
-    }
-    decision {
       id: "11652"
       perception_id: 11652
       object_decision {
@@ -134,5 +104,5 @@ lane_id {
 engage_advice {
   advice: READY_TO_ENGAGE
 }
-trajectory_type: NORMAL
+trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for no previous trajectory."
