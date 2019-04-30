@@ -26,6 +26,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/common.h"
 #include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
@@ -161,11 +162,14 @@ Stage::StageStatus BareIntersectionUnprotectedStageApproach::Process(
              << current_pnc_junction->start_s << "]";
       const std::string virtual_obstacle_id =
           "PNC_JUNCTION_" + current_pnc_junction->object_id;
-      scenario::util::BuildStopDecision(
-          virtual_obstacle_id, current_pnc_junction->start_s,
+      planning::util::BuildStopDecision(
+          virtual_obstacle_id,
+          current_pnc_junction->start_s,
           scenario_config_.stop_distance(),
-          StopReasonCode::STOP_REASON_STOP_SIGN, wait_for_obstacle_ids,
-          "bare intersection", frame,
+          StopReasonCode::STOP_REASON_STOP_SIGN,
+          wait_for_obstacle_ids,
+          "bare intersection",
+          frame,
           &(frame->mutable_reference_line_info()->front()));
     }
   } else if (distance_adc_to_pnc_junction <= 0) {
