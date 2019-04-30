@@ -23,6 +23,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/common.h"
 
 namespace apollo {
 namespace planning {
@@ -71,13 +72,13 @@ void StopSign::MakeDecisions(Frame* const frame,
     const std::vector<std::string> wait_for_obstacle_ids(
         stop_sign_status.wait_for_obstacle_id().begin(),
         stop_sign_status.wait_for_obstacle_id().end());
-    BuildStopDecision(
-        virtual_obstacle_id,
-        stop_sign_overlap.start_s,
-        config_.stop_sign().stop_distance(),
-        StopReasonCode::STOP_REASON_STOP_SIGN,
-        wait_for_obstacle_ids,
-        frame, reference_line_info);
+    util::BuildStopDecision(virtual_obstacle_id,
+                            stop_sign_overlap.start_s,
+                            config_.stop_sign().stop_distance(),
+                            StopReasonCode::STOP_REASON_STOP_SIGN,
+                            wait_for_obstacle_ids,
+                            TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                            frame, reference_line_info);
   }
 }
 

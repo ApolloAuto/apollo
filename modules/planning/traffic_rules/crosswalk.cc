@@ -34,6 +34,7 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/common.h"
 #include "modules/planning/common/util/util.h"
 #include "modules/planning/proto/planning_status.pb.h"
 
@@ -199,13 +200,13 @@ void Crosswalk::MakeDecisions(Frame* const frame,
            << "] start_s[" << crosswalk_overlap->start_s << "]";
     std::string virtual_obstacle_id =
         CROSSWALK_VO_ID_PREFIX + crosswalk_overlap->object_id;
-    BuildStopDecision(
-        virtual_obstacle_id,
-        crosswalk_overlap->start_s,
-        config_.crosswalk().stop_distance(),
-        StopReasonCode::STOP_REASON_CROSSWALK,
-        crosswalk_to_stop.second,
-        frame, reference_line_info);
+    util::BuildStopDecision(virtual_obstacle_id,
+                            crosswalk_overlap->start_s,
+                            config_.crosswalk().stop_distance(),
+                            StopReasonCode::STOP_REASON_CROSSWALK,
+                            crosswalk_to_stop.second,
+                            TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                            frame, reference_line_info);
 
     if (crosswalk_to_stop.first->start_s < min_s) {
       firsts_crosswalk_to_stop =
