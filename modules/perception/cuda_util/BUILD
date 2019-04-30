@@ -24,11 +24,11 @@ genrule(
         "util.cu",
     ],
     outs = ["cmake_build/libcuda_util.so"],
-    cmd = """mkdir -p modules/perception/cuda_util/cmake_build
-             cd modules/perception/cuda_util/cmake_build
+    cmd = """mkdir -p /apollo/modules/perception/cuda_util/cmake_build
+             cd /apollo/modules/perception/cuda_util/cmake_build
              cmake .. && make -j8
              cd -
-             cp modules/perception/cuda_util/cmake_build/libcuda_util.so $@
+             cp /apollo/modules/perception/cuda_util/cmake_build/libcuda_util.so $@
           """,
 )
 
