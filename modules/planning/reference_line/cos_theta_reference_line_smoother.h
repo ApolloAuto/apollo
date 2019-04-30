@@ -80,6 +80,10 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
   double weight_cos_included_angle_ = 0.0;
 
+  double weight_anchor_points_ = 0.0;
+
+  double weight_length_ = 0.0;
+
   double relax_ = 0.2;
 
   bool use_automatic_differentiation_ = false;
