@@ -30,6 +30,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/common.h"
 #include "modules/planning/common/util/util.h"
 
 namespace apollo {
@@ -153,12 +154,13 @@ void TrafficLight::MakeDecisions(Frame* const frame,
     std::string virtual_obstacle_id =
         TRAFFIC_LIGHT_VO_ID_PREFIX + traffic_light_overlap.object_id;
     const std::vector<std::string> wait_for_obstacles;
-    BuildStopDecision(virtual_obstacle_id,
-                      traffic_light_overlap.start_s,
-                      config_.traffic_light().stop_distance(),
-                      StopReasonCode::STOP_REASON_SIGNAL,
-                      wait_for_obstacles,
-                      frame, reference_line_info);
+    util::BuildStopDecision(virtual_obstacle_id,
+                            traffic_light_overlap.start_s,
+                            config_.traffic_light().stop_distance(),
+                            StopReasonCode::STOP_REASON_SIGNAL,
+                            wait_for_obstacles,
+                            TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                            frame, reference_line_info);
   }
 }
 
