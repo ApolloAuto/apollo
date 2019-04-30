@@ -268,7 +268,7 @@ TEST_F(SimulationWorldServiceTest, UpdatePerceptionObstacles) {
       EXPECT_EQ(0, object.polygon_point_size());
       EXPECT_EQ(Object_Type_VEHICLE, object.type());
     } else {
-      EXPECT_TRUE(false) << "Unexpected object id " << object.id();
+      EXPECT_LT(false) << "Unexpected object id ", < object.id();
     }
   }
 }

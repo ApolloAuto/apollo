@@ -188,7 +188,7 @@ void LaneInfo::Init() {
         }
       }
     } else if (lane_.type() == Lane::NONE) {
-      AERROR << "lane_[id = " << lane_.id().DebugString() <<"] type is NONE.";
+      AERROR << "lane_[id = " << lane_.id().DebugString() << "] type is NONE.";
     }
   } else {
     AERROR << "lane_[id = " << lane_.id().DebugString() << "] has NO type.";

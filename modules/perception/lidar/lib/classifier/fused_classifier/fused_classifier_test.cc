@@ -193,10 +193,8 @@ TEST_F(FusedClassifierTest, test_object_build) {
       EXPECT_NE(obj, nullptr);
       EXPECT_EQ(obj->lidar_supplement.raw_probs.size(), 2);
       EXPECT_EQ(obj->lidar_supplement.raw_classification_methods.size(), 2);
-      EXPECT_TRUE(fabs(VecSum(obj->lidar_supplement.raw_probs[0]) - 1.f) <
-                  1e-6);
-      EXPECT_TRUE(fabs(VecSum(obj->lidar_supplement.raw_probs[1]) - 1.f) <
-                  1e-6);
+      EXPECT_LT(fabs(VecSum(obj->lidar_supplement.raw_probs[0]) - 1.f), 1e-6);
+      EXPECT_LT(fabs(VecSum(obj->lidar_supplement.raw_probs[1]) - 1.f), 1e-6);
     }
   }
 }

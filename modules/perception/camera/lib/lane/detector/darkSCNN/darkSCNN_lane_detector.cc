@@ -183,10 +183,10 @@ bool DarkSCNNLaneDetector::Detect(const LaneDetectorOptions &options,
   ADEBUG << "input_blob: " << blob_channel << " " << blob_height << " "
          << blob_width << std::endl;
 
-  CHECK_EQ(blob_height, resize_height_) << "height is not equal" << blob_height
-                                        << " vs " << resize_height_;
-  CHECK_EQ(blob_width, resize_width_) << "width is not equal" << blob_width
-                                      << " vs " << resize_width_;
+  CHECK_EQ(blob_height, resize_height_)
+      << "height is not equal" << blob_height << " vs " << resize_height_;
+  CHECK_EQ(blob_width, resize_width_)
+      << "width is not equal" << blob_width << " vs " << resize_width_;
 
   ADEBUG << "image_blob: " << image_src_.blob()->shape_string();
   ADEBUG << "input_blob: " << input_blob->shape_string();
