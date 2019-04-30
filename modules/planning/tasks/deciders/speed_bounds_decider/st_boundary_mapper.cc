@@ -49,6 +49,7 @@ using apollo::common::math::Vec2d;
 using apollo::common::util::StrCat;
 
 namespace {
+// TODO(all): remove them; no buffer should be added here.
 constexpr double boundary_t_buffer = 0.1;
 constexpr double boundary_s_buffer = 1.0;
 }  // namespace
@@ -93,11 +94,10 @@ Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
   for (const auto* const_obstacle : obstacles.Items()) {
     auto* obstacle = path_decision->Find(const_obstacle->Id());
 
+    auto obstacle_type = obstacle->Perception().type();
     bool is_bycycle_or_pedestrain =
-        (obstacle->Perception().type() ==
-             perception::PerceptionObstacle::BICYCLE ||
-         obstacle->Perception().type() ==
-             perception::PerceptionObstacle::PEDESTRIAN);
+        (obstacle_type == perception::PerceptionObstacle::BICYCLE ||
+         obstacle_type == perception::PerceptionObstacle::PEDESTRIAN);
 
     const auto& lat_decision = obstacle->LateralDecision();
     if (!is_bycycle_or_pedestrain && obstacle->IsStatic() &&
@@ -215,7 +215,8 @@ Status StBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
 
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
                                 &upper_points, &lower_points)) {
-    return Status::OK();
+    return Status(ErrorCode::PLANNING_ERROR,
+        "STBoundaryMapper fails to compute boundary points");
   }
 
   auto boundary = STBoundary::CreateInstance(lower_points, upper_points)
@@ -260,7 +261,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
       if (curr_point_on_path.s() > planning_distance_) {
         break;
       }
-      const Box2d obs_box = obstacle.PerceptionBoundingBox();
+      const Box2d& obs_box = obstacle.PerceptionBoundingBox();
 
       if (CheckOverlap(curr_point_on_path, obs_box,
                        speed_bounds_config_.boundary_buffer())) {
@@ -430,10 +431,11 @@ Status StBoundaryMapper::MapWithDecision(
 bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
                                     const double buffer) const {
+  // TODO(all): the code makes no sense; remove it.
   double left_delta_l = 0.0;
   double right_delta_l = 0.0;
   if (is_change_lane_) {
-    if ((adc_sl_boundary_.start_l() + adc_sl_boundary_.end_l()) / 2.0 > 0.0) {
+    if (adc_sl_boundary_.start_l() + adc_sl_boundary_.end_l() > 0.0) {
       // change to right
       left_delta_l = 1.0;
     } else {
@@ -441,19 +443,21 @@ bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
       right_delta_l = 1.0;
     }
   }
-  Vec2d vec_to_center =
-      Vec2d((vehicle_param_.front_edge_to_center() -
-             vehicle_param_.back_edge_to_center()) /
-                2.0,
-            (vehicle_param_.left_edge_to_center() + left_delta_l -
-             vehicle_param_.right_edge_to_center() + right_delta_l) /
-                2.0)
-          .rotate(path_point.theta());
-  Vec2d center = Vec2d(path_point.x(), path_point.y()) + vec_to_center;
 
-  const Box2d adc_box =
-      Box2d(center, path_point.theta(), vehicle_param_.length() + 2 * buffer,
-            vehicle_param_.width() + 2 * buffer);
+  Vec2d ego_center_map_frame(
+      (vehicle_param_.front_edge_to_center()
+          - vehicle_param_.back_edge_to_center()) * 0.5,
+      (vehicle_param_.left_edge_to_center() + left_delta_l
+          - vehicle_param_.right_edge_to_center() + right_delta_l) * 0.5);
+
+  ego_center_map_frame.SelfRotate(path_point.theta());
+  ego_center_map_frame.set_x(ego_center_map_frame.x() + path_point.x());
+  ego_center_map_frame.set_y(ego_center_map_frame.y() + path_point.y());
+
+  // TODO(all): remove the buffer
+  Box2d adc_box(ego_center_map_frame, path_point.theta(),
+      vehicle_param_.length() + 2.0 * buffer,
+      vehicle_param_.width() + 2.0 * buffer);
   return obs_box.HasOverlap(adc_box);
 }
 
