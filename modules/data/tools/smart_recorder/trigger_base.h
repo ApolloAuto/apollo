@@ -50,7 +50,7 @@ class TriggerBase {
   const std::unordered_map<std::string, std::string>& GetChannelTypes() const {
     return channels_types_map_;
   }
-  const std::string GetTriggerName() const { return trigger_name_; }
+  const std::string& GetTriggerName() const { return trigger_name_; }
 
   void InsertChannelType(const std::string& channel, const std::string& type) {
     channels_types_map_.insert({channel, type});

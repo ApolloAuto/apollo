@@ -36,7 +36,8 @@ bool SmallTopicsTrigger::Init(const SmartRecordTrigger& trigger_conf) {
 }
 
 bool SmallTopicsTrigger::ShouldRestore(const RecordMessage& msg) const {
-  return GetChannelTypes().find(msg.channel_name) != GetChannelTypes().end();
+  return trigger_obj_->enabled() &&
+         GetChannelTypes().find(msg.channel_name) != GetChannelTypes().end();
 }
 
 }  // namespace data

@@ -33,7 +33,7 @@ class SmallTopicsTrigger : public TriggerBase {
   SmallTopicsTrigger();
 
   bool Init(const SmartRecordTrigger& trigger_conf) override;
-  void Pull(const RecordMessage& msg) override{};
+  void Pull(const RecordMessage& msg) override {};
   bool ShouldRestore(const RecordMessage& msg) const override;
 
   virtual ~SmallTopicsTrigger() = default;
