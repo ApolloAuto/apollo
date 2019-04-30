@@ -50,7 +50,7 @@ class RecordProcessor {
   void LoadSourceRecords();
   void CollectAllChannels(const SmartRecordTrigger& trigger_conf);
   void RestoreMessage(const RecordMessage& msg);
-  const std::string GetDefaultOutputFile() const;
+  std::string GetDefaultOutputFile() const;
   bool ShouldRestore(const RecordMessage& msg) const;
 
   const std::string source_record_dir_;
