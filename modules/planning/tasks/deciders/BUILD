@@ -25,6 +25,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common:st_graph_data",
+        "//modules/planning/common/util:common_lib",
         "//modules/planning/common/util:util_lib",
         "//modules/planning/math/piecewise_jerk:fem_1d_qp_problem",
         "//modules/planning/scenarios/util:scenario_util_lib",
@@ -44,6 +45,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
+        "//modules/planning/common/util:common_lib",
         "//modules/planning/common:reference_line_info",
     ],
 )
