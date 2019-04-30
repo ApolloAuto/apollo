@@ -285,9 +285,8 @@ message PlannerNaviConfig {
 enum PlannerType {
   RTK = 0;
   PUBLIC_ROAD = 1;  // public road planner
-  OPEN_SPACE = 2;   // open space planner
-  NAVI = 3;         // navigation planner
-  LATTICE = 4;      // lattice planner
+  NAVI = 2;         // navigation planner
+  LATTICE = 3;      // lattice planner
 }
 
 message RtkPlanningConfig {
@@ -304,17 +303,11 @@ message NavigationPlanningConfig {
   optional PlannerNaviConfig planner_navi_config = 4;
 }
 
-message OpenSpacePlanningConfig {
-  repeated PlannerType planner_type = 1;  // supported planners
-  optional PlannerOpenSpaceConfig planner_open_space_config = 2;
-}
-
 message PlanningConfig {
   oneof planning_config {
     RtkPlanningConfig rtk_planning_config = 1;
     StandardPlanningConfig standard_planning_config = 2;
     NavigationPlanningConfig navigation_planning_config = 3;
-    OpenSpacePlanningConfig open_space_planning_config = 4;
   }
 
   // default task config, it will be used if there is no scenario-specific
