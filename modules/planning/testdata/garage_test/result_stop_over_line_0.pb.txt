@@ -991,32 +991,17 @@ trajectory_point {
 decision {
   main_decision {
     stop {
-      reason_code: STOP_REASON_HEAD_VEHICLE
-      reason: "stop by 2352_0"
+      reason_code: STOP_REASON_STOP_SIGN
+      reason: "stop by SS_2"
       stop_point {
-        x: 586353.37680918071
-        y: 4140733.21346399
+        x: 586367.08466100844
+        y: 4140784.0102793546
       }
-      stop_heading: 1.3219597809209793
+      stop_heading: 1.2863090794017198
       change_lane_type: FORWARD
     }
   }
   object_decision {
-    decision {
-      id: "2352_0"
-      perception_id: 2352
-      object_decision {
-        stop {
-          distance_s: -6
-          stop_point {
-            x: 586353.37680918071
-            y: 4140733.21346399
-            z: 0
-          }
-          stop_heading: 1.3219597809209793
-        }
-      }
-    }
     decision {
       id: "DEST"
       perception_id: -2075886388
