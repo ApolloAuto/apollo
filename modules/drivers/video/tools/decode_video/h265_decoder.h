@@ -35,14 +35,21 @@ namespace video {
  */
 class H265Decoder {
  public:
+  enum class DecodingResult {
+    SUCCESS,
+    FATAL,
+    WARN,
+  };
+
+ public:
   H265Decoder() = default;
 
   // Init decoder by acquiring resources
   bool Init();
 
   // Process frames according to input data, and output converted data
-  std::vector<uint8_t> Process(const uint8_t* indata,
-                               const int32_t insize) const;
+  DecodingResult Process(const uint8_t* indata, const int32_t insize,
+                         std::vector<uint8_t>* outdata) const;
 
   // Destructor, releasing the resources
   ~H265Decoder() { Release(); }
