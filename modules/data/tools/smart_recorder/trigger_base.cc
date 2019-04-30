@@ -36,9 +36,9 @@ bool TriggerBase::Init(const SmartRecordTrigger& trigger_conf) {
 }
 
 void TriggerBase::LockTrigger(const SmartRecordTrigger& trigger_conf) {
-  for (const auto& iter : trigger_conf.triggers()) {
-    if (iter.trigger_name() == trigger_name_) {
-      trigger_obj_.reset(new Trigger(iter));
+  for (const auto& trigger : trigger_conf.triggers()) {
+    if (trigger.trigger_name() == trigger_name_) {
+      trigger_obj_.reset(new Trigger(trigger));
       break;
     }
   }
