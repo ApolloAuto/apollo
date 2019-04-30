@@ -49,7 +49,7 @@ bool CosThetaProbleminterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
   num_of_constraints_ = m;
 
   if (use_automatic_differentiation_) {
-    generate_tapes(n, m, nnz_jac_g, nnz_h_lag);
+    generate_tapes(n, m, &nnz_jac_g, &nnz_h_lag);
   } else {
     // number of nonzero constraint jacobian.
     nnz_jac_g = static_cast<int>(num_of_points_ << 1);
@@ -146,7 +146,7 @@ bool CosThetaProbleminterface::eval_f(int n, const double* x, bool new_x,
                                       double& obj_value) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   if (use_automatic_differentiation_) {
-    eval_obj(n, x, obj_value);
+    eval_obj(n, x, &obj_value);
     return true;
   }
 
@@ -581,6 +581,15 @@ void CosThetaProbleminterface::set_weight_cos_included_angle(
   weight_cos_included_angle_ = weight_cos_included_angle;
 }
 
+void CosThetaProbleminterface::set_weight_anchor_points(
+    const double weight_anchor_points) {
+  weight_anchor_points_ = weight_anchor_points;
+}
+
+void CosThetaProbleminterface::set_weight_length(const double weight_length) {
+  weight_length_ = weight_length;
+}
+
 void CosThetaProbleminterface::hessian_strcuture() {
   size_t index = 0;
   for (size_t i = 0; i < 6; ++i) {
@@ -615,37 +624,63 @@ void CosThetaProbleminterface::hessian_strcuture() {
 
 /** Template to return the objective value */
 template <class T>
-bool CosThetaProbleminterface::eval_obj(int n, const T* x, T& obj_value) {
-  obj_value = 0.0;
+bool CosThetaProbleminterface::eval_obj(int n, const T* x, T* obj_value) {
+  *obj_value = 0.0;
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    obj_value +=
-        (x[index] - init_points_[i].x()) * (x[index] - init_points_[i].x()) +
-        (x[index + 1] - init_points_[i].y()) *
-            (x[index + 1] - init_points_[i].y());
+    *obj_value +=
+        weight_anchor_points_ *
+        ((x[index] - init_points_[i].x()) * (x[index] - init_points_[i].x()) +
+         (x[index + 1] - init_points_[i].y()) *
+             (x[index + 1] - init_points_[i].y()));
   }
   for (size_t i = 0; i < num_of_points_ - 2; ++i) {
     size_t findex = i << 1;
     size_t mindex = findex + 2;
     size_t lindex = mindex + 2;
-    obj_value -=
-        weight_cos_included_angle_ *
-        (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
-         ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex + 1]))) /
-        (sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
-              (x[mindex + 1] - x[findex + 1]) *
-                  (x[mindex + 1] - x[findex + 1])) *
-         sqrt((x[lindex] - x[mindex]) * (x[lindex] - x[mindex]) +
-              (x[lindex + 1] - x[mindex + 1]) *
-                  (x[lindex + 1] - x[mindex + 1])));
 
-    // obj_value +=
+    // TODO(Jinyun): Numerically Evaluate the performance of different smoothing
+    // objectives
+
+    // Costheta term
+    // *obj_value -=
+    //     weight_cos_included_angle_ *
+    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
+    //      1])))
+    //      /
+    //     (sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
+    //           (x[mindex + 1] - x[findex + 1]) *
+    //               (x[mindex + 1] - x[findex + 1])) *
+    //      sqrt((x[lindex] - x[mindex]) * (x[lindex] - x[mindex]) +
+    //           (x[lindex + 1] - x[mindex + 1]) *
+    //               (x[lindex + 1] - x[mindex + 1])));
+
+    // Use last iteration in Denomiator of costheta term
+    // *obj_value -=
+    //     weight_cos_included_angle_ *
+    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
+    //      1])))
+    //      /
+    //     (sqrt((init_points_[i + 1].x() - init_points_[i].x()) *
+    //               (init_points_[i + 1].x() - init_points_[i].x()) +
+    //           (init_points_[i + 1].y() - init_points_[i].y()) *
+    //               (init_points_[i + 1].y() - init_points_[i].y())) *
+    //      sqrt((init_points_[i + 2].x() - init_points_[i + 1].x()) *
+    //               (init_points_[i + 2].x() - init_points_[i + 1].x()) +
+    //           (init_points_[i + 2].y() - init_points_[i + 1].y()) *
+    //               (init_points_[i + 2].y() - init_points_[i + 1].y())));
+
+    // Denominator numerically protected
+    // *obj_value +=
     //     weight_cos_included_angle_ *
     //     acos(
     //         (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
     //          ((x[mindex + 1] - x[findex + 1]) *
     //           (x[lindex + 1] - x[mindex + 1]))) /
-    //         (1e-8 + sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
+    //         (1e-8 + sqrt((x[mindex] - x[findex]) * (x[mindex] -
+    //         x[findex]) +
     //                      (x[mindex + 1] - x[findex + 1]) *
     //                          (x[mindex + 1] - x[findex + 1])) *
     //                     sqrt((x[lindex] - x[mindex]) * (x[lindex] -
@@ -653,20 +688,43 @@ bool CosThetaProbleminterface::eval_obj(int n, const T* x, T& obj_value) {
     //                          (x[lindex + 1] - x[mindex + 1]) *
     //                              (x[lindex + 1] - x[mindex + 1]))));
 
-    // obj_value -=
+    // InnerProd
+    // *obj_value -=
     //     weight_cos_included_angle_ *
     //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
     //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
     //      1])));
+
+    // CrossProd
+    // *obj_value += weight_cos_included_angle_ *
+    //              (((x[findex] - x[mindex]) * (x[lindex + 1] - x[mindex +
+    //              1]))
+    //              -
+    //               ((x[lindex] - x[mindex]) * (x[findex + 1] - x[mindex +
+    //               1]))) *
+    //              (((x[findex] - x[mindex]) * (x[lindex + 1] - x[mindex +
+    //              1]))
+    //              -
+    //               ((x[lindex] - x[mindex]) * (x[findex + 1] - x[mindex +
+    //               1])));
+
+    // Midpoint distance
+    *obj_value += weight_cos_included_angle_ *
+                  (((x[findex] + x[lindex]) / 2.0 - x[mindex]) *
+                       ((x[findex] + x[lindex]) / 2.0 - x[mindex]) +
+                   ((x[findex + 1] + x[lindex + 1]) / 2.0 - x[mindex + 1]) *
+                       ((x[findex + 1] + x[lindex + 1]) / 2.0 - x[mindex + 1]));
   }
 
-  // for (size_t i = 0; i < num_of_points_ - 1; ++i) {
-  //   size_t findex = i << 1;
-  //   size_t nindex = findex + 2;
-  //   obj_value +=
-  //       (x[findex] - x[nindex]) * (x[findex] - x[nindex]) +
-  //       (x[findex + 1] - x[nindex + 1]) * (x[findex + 1] - x[nindex + 1]);
-  // }
+  // Total length
+  for (size_t i = 0; i < num_of_points_ - 1; ++i) {
+    size_t findex = i << 1;
+    size_t nindex = findex + 2;
+    *obj_value +=
+        weight_length_ *
+        ((x[findex] - x[nindex]) * (x[findex] - x[nindex]) +
+         (x[findex + 1] - x[nindex + 1]) * (x[findex + 1] - x[nindex + 1]));
+  }
   return true;
 }
 
@@ -684,8 +742,8 @@ bool CosThetaProbleminterface::eval_constraints(int n, const T* x, int m,
 }
 
 /** Method to generate the required tapes */
-void CosThetaProbleminterface::generate_tapes(int n, int m, int& nnz_jac_g,
-                                              int& nnz_h_lag) {
+void CosThetaProbleminterface::generate_tapes(int n, int m, int* nnz_jac_g,
+                                              int* nnz_h_lag) {
   Ipopt::Number* xp = new double[n];
   Ipopt::Number* lamp = new double[m];
   Ipopt::Number* zl = new double[m];
@@ -702,7 +760,7 @@ void CosThetaProbleminterface::generate_tapes(int n, int m, int& nnz_jac_g,
   trace_on(tag_f);
 
   for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
-  eval_obj(n, xa, obj_value);
+  eval_obj(n, xa, &obj_value);
   obj_value >>= dummy;
   trace_off();
 
@@ -717,7 +775,7 @@ void CosThetaProbleminterface::generate_tapes(int n, int m, int& nnz_jac_g,
   for (int idx = 0; idx < n; idx++) xa[idx] <<= xp[idx];
   for (int idx = 0; idx < m; idx++) lam[idx] = 1.0;
   sig = 1.0;
-  eval_obj(n, xa, obj_value);
+  eval_obj(n, xa, &obj_value);
   obj_value *= mkparam(sig);
   eval_constraints(n, xa, m, g);
 
@@ -737,11 +795,11 @@ void CosThetaProbleminterface::generate_tapes(int n, int m, int& nnz_jac_g,
   hessval = NULL;
   sparse_jac(tag_g, m, n, 0, xp, &nnz_jac, &rind_g, &cind_g, &jacval,
              options_g);
-  nnz_jac_g = nnz_jac;
+  *nnz_jac_g = nnz_jac;
   options_L[0] = 0;
   options_L[1] = 1;
   sparse_hess(tag_L, n, 0, xp, &nnz_L, &rind_L, &cind_L, &hessval, options_L);
-  nnz_h_lag = nnz_L;
+  *nnz_h_lag = nnz_L;
   delete[] lam;
   delete[] g;
   delete[] xa;
