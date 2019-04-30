@@ -63,4 +63,3 @@ class IntervalPool {
 
 }  // namespace data
 }  // namespace apollo
-

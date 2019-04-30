@@ -40,8 +40,8 @@ int lane_postprocessor_eval() {
   init_options.conf_file = "config.pt";
   init_options.root_dir = "data/";
   base::BrownCameraDistortionModel model;
-  if (!common::LoadBrownCameraIntrinsic(
-      "params/front_6mm_intrinsics.yaml", &model)) {
+  if (!common::LoadBrownCameraIntrinsic("params/front_6mm_intrinsics.yaml",
+                                        &model)) {
     AERROR << "LoadBrownCameraIntrinsic Error!";
     return -1;
   }
@@ -207,8 +207,8 @@ int lane_postprocessor_eval() {
       show_lane_lines(img, frame.lane_objects, save_img_path);
     }
     if (FLAGS_lane_result_output) {
-      std::string save_path = StrCat(FLAGS_save_dir, "/", FLAGS_file_title,
-                                     ".txt");
+      std::string save_path =
+          StrCat(FLAGS_save_dir, "/", FLAGS_file_title, ".txt");
       output_laneline_to_json(frame.lane_objects, save_path);
     }
   }
