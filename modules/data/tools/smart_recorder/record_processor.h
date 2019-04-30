@@ -64,4 +64,3 @@ class RecordProcessor {
 
 }  // namespace data
 }  // namespace apollo
-
