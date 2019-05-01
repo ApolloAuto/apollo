@@ -86,9 +86,12 @@ Status DeciderCreep::Process(Frame* frame,
   }
   if (stop_line_s > 0.0) {
     std::string virtual_obstacle_id = CREEP_VO_ID_PREFIX + current_overlap_id;
+    const double creep_stop_s =
+        stop_line_s + FindCreepDistance(*frame, *reference_line_info);
     const std::vector<std::string> wait_for_obstacles;
     util::BuildStopDecision(virtual_obstacle_id,
-                            stop_line_s, 0.0,
+                            creep_stop_s,
+                            config_.decider_creep_config().stop_distance(),
                             StopReasonCode::STOP_REASON_CREEPER,
                             wait_for_obstacles,
                             "DeciderCreep",
