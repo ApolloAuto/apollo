@@ -93,7 +93,7 @@ size_t SppEngine::ProcessConnectedComponentCluster(
       continue;
     }
     // out of range
-    const int& id = data_.grid_indices[i];
+    const int id = data_.grid_indices[i];
     if (id < 0) {
       continue;
     }

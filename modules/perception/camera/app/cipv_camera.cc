@@ -149,7 +149,7 @@ bool Cipv::MakeVirtualLane(const LaneLineSimple &ref_lane_line,
   // TODO(techoe): Use union of lane line and yaw_rate path to define the
   // virtual lane
   virtual_lane_line->line_point.clear();
-  if (b_image_based_cipv_ == false) {
+  if (!b_image_based_cipv_) {
     for (uint32_t i = 0; i < ref_lane_line.line_point.size(); ++i) {
       Point2Df virtual_line_point(
           ref_lane_line.line_point[i](0),
@@ -173,7 +173,6 @@ float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
   // TODO(techoe): Apply bicycle model for vehicle dynamics (need wheel base)
   // float theta = time_unit_ * yaw_rate;
   // float displacement = time_unit_ * velocity;
-
 
   // Eigen::Rotation2Df rot2d(theta);
   // Eigen::Vector2f trans;
@@ -200,7 +199,7 @@ bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
   left_lane_line->line_point.clear();
   right_lane_line->line_point.clear();
 
-  if (b_image_based_cipv_ == false) {
+  if (!b_image_based_cipv_) {
     for (uint32_t i = 1; i < kMaxNumVirtualLanePoint; i += 1) {
       VehicleDynamics(i, yaw_rate, velocity, time_unit_, &x, &y);
       Point2Df left_point(x, y + offset_distance);
@@ -500,32 +499,28 @@ bool Cipv::AreDistancesSane(const float distance_start_point_to_right_lane,
   if (distance_start_point_to_right_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
       AINFO << "distance from start to right lane("
-            << distance_start_point_to_right_lane
-            << " m) is too long";
+            << distance_start_point_to_right_lane << " m) is too long";
     }
     return false;
   }
   if (distance_start_point_to_left_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
       AINFO << "distance from start to left lane("
-            << distance_start_point_to_left_lane
-            << " m) is too long";
+            << distance_start_point_to_left_lane << " m) is too long";
     }
     return false;
   }
   if (distance_end_point_to_right_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
       AINFO << "distance from end to right lane("
-            << distance_end_point_to_right_lane
-            << " m) is too long";
+            << distance_end_point_to_right_lane << " m) is too long";
     }
     return false;
   }
   if (distance_end_point_to_left_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
       AINFO << "distance from end to left lane("
-            << distance_end_point_to_left_lane
-            << " m) is too long";
+            << distance_end_point_to_left_lane << " m) is too long";
     }
     return false;
   }
@@ -641,7 +636,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
     if (DistanceFromPointToLineSegment(
             closted_object_edge.end_point,
             egolane_ground.left_line.line_point[i],
-            egolane_ground.left_line.line_point[i + 1], &distance) == true) {
+            egolane_ground.left_line.line_point[i + 1], &distance)) {
       if (distance < shortest_distance) {
         closest_index = static_cast<int>(i);
         shortest_distance = distance;
@@ -655,10 +650,10 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
       AINFO << "[Left] closest_index: " << closest_index
             << ", shortest_distance: " << shortest_distance;
     }
-    if (IsPointLeftOfLine(
+    if (!IsPointLeftOfLine(
             closted_object_edge.end_point,
             egolane_ground.left_line.line_point[closest_index],
-            egolane_ground.left_line.line_point[closest_index + 1]) == false) {
+            egolane_ground.left_line.line_point[closest_index + 1])) {
       b_left_lane_clear = true;
     }
   }
@@ -682,7 +677,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
     if (DistanceFromPointToLineSegment(
             closted_object_edge.start_point,
             egolane_ground.right_line.line_point[i],
-            egolane_ground.right_line.line_point[i + 1], &distance) == true) {
+            egolane_ground.right_line.line_point[i + 1], &distance)) {
       if (distance < shortest_distance) {
         closest_index = static_cast<int>(i);
         shortest_distance = distance;
@@ -699,7 +694,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
     if (IsPointLeftOfLine(
             closted_object_edge.start_point,
             egolane_ground.right_line.line_point[closest_index],
-            egolane_ground.right_line.line_point[closest_index + 1]) == true) {
+            egolane_ground.right_line.line_point[closest_index + 1])) {
       b_right_lane_clear = true;
     }
   }
@@ -724,9 +719,8 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
 // Check if the object is in the lane in ego-ground space
 bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                              const EgoLane &egolane_image,
-                             const EgoLane &egolane_ground,
-                             float *distance) {
-  if (b_image_based_cipv_ == true) {
+                             const EgoLane &egolane_ground, float *distance) {
+  if (b_image_based_cipv_) {
     return IsObjectInTheLaneImage(object, egolane_image, distance);
   } else {
     return IsObjectInTheLaneGround(object, egolane_ground, distance);
@@ -768,8 +762,8 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
     if (debug_level_ >= 2) {
       AINFO << "objects[" << i << "]->track_id: " << (*objects)[i]->track_id;
     }
-    if (IsObjectInTheLane(
-          (*objects)[i], egolane_image, egolane_ground, &distance) == true) {
+    if (IsObjectInTheLane((*objects)[i], egolane_image, egolane_ground,
+                          &distance)) {
       if (cipv_index < 0 || distance < min_distance) {
         cipv_index = i;
         cipv_track_id = (*objects)[i]->track_id;
@@ -900,7 +894,7 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
       }
     }
     // If object ID was not found erase it from map
-    if (b_found_id == false && object_trackjectories_[obj_id].size() > 0) {
+    if (!b_found_id && object_trackjectories_[obj_id].size() > 0) {
       //      object_id_skip_count_[obj_id].second++;
       object_id_skip_count_[obj_id]++;
       if (debug_level_ >= 2) {

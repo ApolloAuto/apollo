@@ -79,6 +79,57 @@ int BuildStopDecision(const std::string& stop_wall_id, const double stop_line_s,
   return 0;
 }
 
+int BuildStopDecision(const std::string& stop_wall_id,
+                      const std::string lane_id,
+                      const double lane_s,
+                      const double stop_distance,
+                      const StopReasonCode& stop_reason_code,
+                      const std::vector<std::string>& wait_for_obstacles,
+                      const std::string& decision_tag,
+                      Frame* const frame,
+                      ReferenceLineInfo* const reference_line_info) {
+  CHECK_NOTNULL(frame);
+  CHECK_NOTNULL(reference_line_info);
+
+  const auto& reference_line = reference_line_info->reference_line();
+
+  // create virtual stop wall
+  auto* obstacle = frame->CreateStopObstacle(stop_wall_id, lane_id, lane_s);
+  if (!obstacle) {
+    AERROR << "Failed to create obstacle [" << stop_wall_id << "]";
+    return -1;
+  }
+
+  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
+  if (!stop_wall) {
+    AERROR << "Failed to create obstacle for: " << stop_wall_id;
+    return -1;
+  }
+
+  // build stop decision
+  const auto stop_wall_box = stop_wall->PerceptionBoundingBox();
+  if (!reference_line.IsOnLane(stop_wall_box.center())) {
+    ADEBUG << "destination point is not on lane";
+    return 0;
+  }
+  auto stop_point = reference_line.GetReferencePoint(
+      stop_wall->PerceptionSLBoundary().start_s() - stop_distance);
+
+  ObjectDecisionType stop;
+  auto stop_decision = stop.mutable_stop();
+  stop_decision->set_reason_code(stop_reason_code);
+  stop_decision->set_distance_s(-stop_distance);
+  stop_decision->set_stop_heading(stop_point.heading());
+  stop_decision->mutable_stop_point()->set_x(stop_point.x());
+  stop_decision->mutable_stop_point()->set_y(stop_point.y());
+  stop_decision->mutable_stop_point()->set_z(0.0);
+
+  auto* path_decision = reference_line_info->path_decision();
+  path_decision->AddLongitudinalDecision(decision_tag, stop_wall->Id(), stop);
+
+  return 0;
+}
+
 }  // namespace util
 }  // namespace planning
 }  // namespace apollo

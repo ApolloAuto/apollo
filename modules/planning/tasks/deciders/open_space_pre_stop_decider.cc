@@ -139,9 +139,8 @@ void OpenSpacePreStopDecider::CheckOpenSpacePreStop(
       stop_line_s);
   util::BuildStopDecision(stop_wall_id, stop_line_s, 0.0,
                           StopReasonCode::STOP_REASON_PRE_OPEN_SPACE_STOP,
-                          wait_for_obstacles,
-                          "OpenSpacePreStopDecider",
-                          frame, reference_line_info);
+                          wait_for_obstacles, "OpenSpacePreStopDecider", frame,
+                          reference_line_info);
 }
 
 }  // namespace planning
