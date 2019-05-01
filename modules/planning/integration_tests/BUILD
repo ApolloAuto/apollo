@@ -29,52 +29,52 @@ cc_library(
     ],
 )
 
-# cc_test(
-#     name = "garage_test",
-#     size = "small",
-#     srcs = [
-#         "garage_test.cc",
-#     ],
-#     data = [
-#         "//modules/common/configs:config_gflags",
-#         "//modules/planning:planning_testdata",
-#     ],
-#     deps = [
-#         ":planning_test_base",
-#     ],
-# )
+cc_test(
+    name = "garage_test",
+    size = "small",
+    srcs = [
+        "garage_test.cc",
+    ],
+    data = [
+        "//modules/common/configs:config_gflags",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":planning_test_base",
+    ],
+)
 
-# cc_test(
-#     name = "sunnyvale_loop_test",
-#     size = "small",
-#     srcs = [
-#         "sunnyvale_loop_test.cc",
-#     ],
-#     data = [
-#         "//modules/common/configs:config_gflags",
-#         "//modules/map:map_data",
-#         "//modules/planning:planning_testdata",
-#     ],
-#     deps = [
-#         ":planning_test_base",
-#     ],
-# )
+cc_test(
+    name = "sunnyvale_loop_test",
+    size = "small",
+    srcs = [
+        "sunnyvale_loop_test.cc",
+    ],
+    data = [
+        "//modules/common/configs:config_gflags",
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":planning_test_base",
+    ],
+)
 
-# cc_test(
-#     name = "sunnyvale_big_loop_test",
-#     size = "small",
-#     srcs = [
-#         "sunnyvale_big_loop_test.cc",
-#     ],
-#     data = [
-#         "//modules/common/configs:config_gflags",
-#         "//modules/map:map_data",
-#         "//modules/planning:planning_testdata",
-#     ],
-#     deps = [
-#         ":planning_test_base",
-#     ],
-# )
+cc_test(
+    name = "sunnyvale_big_loop_test",
+    size = "small",
+    srcs = [
+        "sunnyvale_big_loop_test.cc",
+    ],
+    data = [
+        "//modules/common/configs:config_gflags",
+        "//modules/map:map_data",
+        "//modules/planning:planning_testdata",
+    ],
+    deps = [
+        ":planning_test_base",
+    ],
+)
 
 # cc_test(
 #     name = "navigation_mode_test",

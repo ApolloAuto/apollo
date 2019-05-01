@@ -30,5 +30,5 @@ lane_id {
 engage_advice {
   advice: KEEP_ENGAGED
 }
-trajectory_type: SPEED_FALLBACK
+trajectory_type: NORMAL
 replan_reason: "replan for no previous trajectory."
