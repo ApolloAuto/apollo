@@ -88,6 +88,7 @@ default_task_config: {
     default_speed_cost: 1.0e3
     exceed_speed_penalty: 10.0
     low_speed_penalty: 10.0
+    reference_speed_penalty: 5.0
     keep_clear_low_speed_penalty: 10.0
     accel_penalty: 1.0
     decel_penalty: 1.0
