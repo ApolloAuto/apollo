@@ -147,7 +147,8 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   ADEBUG << "num_of_constraints_ " << num_of_constraints_;
 
   generate_tapes(n, m, &nnz_jac_g, &nnz_h_lag);
-  // // number of nonzero in Jacobian.
+  // TODO(Jinyun): evaluate original problem formulation
+  // number of nonzero in Jacobian.
   // int tmp = 0;
   // for (int i = 0; i < horizon_ + 1; ++i) {
   //   for (int j = 0; j < obstacles_num_; ++j) {
@@ -1552,8 +1553,6 @@ void DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   // // 1. state constraints 4 * [0, horizons-1]
   for (int i = 0; i < horizon_; ++i) {
     // x1
-    // TODO(QiL) : optimize and remove redundant calculation in next
-    // iteration.
     g[constraint_index] =
         x[state_index + 4] -
         (x[state_index] +
@@ -1563,6 +1562,20 @@ void DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
              cos(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
                                           x[state_index + 3] *
                                           tan(x[control_index]) / wheelbase_));
+    // TODO(Jinyun): evaluate performance of different models
+    // g[constraint_index] =
+    //     x[state_index + 4] -
+    //     (x[state_index] +
+    //      ts_ * x[time_index] * x[state_index + 3] * cos(x[state_index + 2]));
+    // g[constraint_index] =
+    //     x[state_index + 4] -
+    //     ((xWS_(0, i) + ts_ * xWS_(3, i) * cos(xWS_(2, i))) +
+    //      (x[state_index] - xWS_(0, i)) +
+    //      (xWS_(3, i) * cos(xWS_(2, i))) * (ts_ * x[time_index] - ts_) +
+    //      (ts_ * cos(xWS_(2, i))) * (x[state_index + 3] - xWS_(3, i)) +
+    //      (-ts_ * xWS_(3, i) * sin(xWS_(2, i))) *
+    //          (x[state_index + 2] - xWS_(2, i)));
+
     // x2
     g[constraint_index + 1] =
         x[state_index + 5] -
@@ -1573,6 +1586,18 @@ void DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
              sin(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
                                           x[state_index + 3] *
                                           tan(x[control_index]) / wheelbase_));
+    // g[constraint_index + 1] =
+    //     x[state_index + 5] -
+    //     (x[state_index + 1] +
+    //      ts_ * x[time_index] * x[state_index + 3] * sin(x[state_index + 2]));
+    // g[constraint_index + 1] =
+    //     x[state_index + 5] -
+    //     ((xWS_(1, i) + ts_ * xWS_(3, i) * sin(xWS_(2, i))) +
+    //      (x[state_index + 1] - xWS_(1, i)) +
+    //      (xWS_(3, i) * sin(xWS_(2, i))) * (ts_ * x[time_index] - ts_) +
+    //      (ts_ * sin(xWS_(2, i))) * (x[state_index + 3] - xWS_(3, i)) +
+    //      (ts_ * xWS_(3, i) * cos(xWS_(2, i))) *
+    //          (x[state_index + 2] - xWS_(2, i)));
 
     // x3
     g[constraint_index + 2] =
@@ -1582,11 +1607,32 @@ void DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
              (x[state_index + 3] +
               ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
              tan(x[control_index]) / wheelbase_);
+    // g[constraint_index + 2] =
+    //     x[state_index + 6] -
+    //     (x[state_index + 2] + ts_ * x[time_index] * x[state_index + 3] *
+    //                               tan(x[control_index]) / wheelbase_);
+    // g[constraint_index + 2] =
+    //     x[state_index + 6] -
+    //     ((xWS_(2, i) + ts_ * xWS_(3, i) * tan(uWS_(0, i)) / wheelbase_) +
+    //      (x[state_index + 2] - xWS_(2, i)) +
+    //      (xWS_(3, i) * tan(uWS_(0, i)) / wheelbase_) *
+    //          (ts_ * x[time_index] - ts_) +
+    //      (ts_ * tan(uWS_(0, i)) / wheelbase_) *
+    //          (x[state_index + 3] - xWS_(3, i)) +
+    //      (ts_ * xWS_(3, i) / cos(uWS_(0, i)) / cos(uWS_(0, i)) / wheelbase_)
+    //      *
+    //          (x[control_index] - uWS_(0, i)));
 
     // x4
     g[constraint_index + 3] =
         x[state_index + 7] -
         (x[state_index + 3] + ts_ * x[time_index] * x[control_index + 1]);
+    // g[constraint_index + 3] =
+    //     x[state_index + 7] -
+    //     ((xWS_(3, i) + ts_ * uWS_(1, i)) + (x[state_index + 3] - xWS_(3, i))
+    //     +
+    //      uWS_(1, i) * (ts_ * x[time_index] - ts_) +
+    //      ts_ * (x[control_index + 1] - uWS_(1, i)));
 
     control_index += 2;
     constraint_index += 4;
