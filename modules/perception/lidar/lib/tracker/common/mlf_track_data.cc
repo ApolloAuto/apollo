@@ -91,7 +91,7 @@ bool MlfTrackData::ToObject(const Eigen::Vector3d& local_to_global_offset,
     return false;
   }
   auto latest_iter = history_objects_.rbegin();
-  const double& latest_time = latest_iter->first;
+  const double latest_time = latest_iter->first;
   const auto& latest_object = latest_iter->second;
   latest_object->ToObject(object);
   // predict object
@@ -132,7 +132,7 @@ void MlfTrackData::PredictState(double timestamp) const {
     return;
   }
   auto latest_iter = history_objects_.rbegin();
-  const double& latest_time = latest_iter->first;
+  const double latest_time = latest_iter->first;
   const auto& latest_object = latest_iter->second;
   double time_diff = timestamp - latest_time;
 
