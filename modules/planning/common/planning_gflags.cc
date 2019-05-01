@@ -531,6 +531,9 @@ DEFINE_bool(enable_nonscenario_side_pass, false,
 DEFINE_bool(enable_soft_speed_limit, false,
             "True to set soft speed limit guided by path optimization result");
 
+DEFINE_bool(enable_dp_reference_speed, false,
+            "True to penalize dp result towards default cruise speed");
+
 DEFINE_double(message_latency_threshold, 0.02, "Threshold for message delay");
 DEFINE_bool(enable_lane_change_urgency_checking, false,
             "True to check the urgency of lane changing");
