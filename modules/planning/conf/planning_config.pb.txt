@@ -327,3 +327,9 @@ default_task_config: {
     is_lane_borrowing: false
   }
 }
+default_task_config: {
+  task_type: PATH_LANE_BORROW_DECIDER
+  path_lane_borrow_decider_config {
+    allow_lane_borrowing: false
+  }
+}

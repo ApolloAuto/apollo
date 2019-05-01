@@ -11,6 +11,7 @@ import "modules/planning/proto/open_space_trajectory_provider_config.proto";
 import "modules/planning/proto/open_space_trajectory_partition_config.proto";
 import "modules/planning/proto/path_assessment_decider_config.proto";
 import "modules/planning/proto/path_bounds_decider_config.proto";
+import "modules/planning/proto/path_lane_borrow_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/piecewise_jerk_speed_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
@@ -88,6 +89,7 @@ message TaskConfig {
     OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config = 21;
     PathAssessmentDeciderConfig path_assessment_decider_config = 22;
     PiecewiseJerkSpeedConfig piecewise_jerk_speed_config = 23;
+    PathLaneBorrowDeciderConfig path_lane_borrow_decider_config = 24;
   }
 }
 
