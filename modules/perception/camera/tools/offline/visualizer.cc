@@ -103,12 +103,9 @@ bool Visualizer::Init_all_info_single_camera(
     const std::string &camera_name,
     const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
     const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
-    const Eigen::Matrix4d &ex_lidar2imu,
-    const double pitch_adj_degree,
-    const double yaw_adj_degree,
-    const double roll_adj_degree,
-    const int image_height,
-    const int image_width) {
+    const Eigen::Matrix4d &ex_lidar2imu, const double pitch_adj_degree,
+    const double yaw_adj_degree, const double roll_adj_degree,
+    const int image_height, const int image_width) {
   image_height_ = image_height;
   image_width_ = image_width;
   intrinsic_map_ = intrinsic_map;
@@ -150,9 +147,9 @@ bool Visualizer::Init_all_info_single_camera(
   // rotate 90 degree around z axis to make x point forward
   // double imu_height = 0;  // imu height should be considred later
   ex_imu2car_ << 0, 1, 0, 0,  // cos(90), sin(90), 0,
-                -1, 0, 0, 0,  // -sin(90),  cos(90), 0,
-                0, 0, 1, 0,  // 0,              0, 1
-                0, 0, 0, 1;
+      -1, 0, 0, 0,            // -sin(90),  cos(90), 0,
+      0, 0, 1, 0,             // 0,              0, 1
+      0, 0, 0, 1;
 
   // 3. transform camera->lidar->imu->car
   ex_camera2car_ = ex_imu2car_ * ex_camera2imu_;
@@ -227,20 +224,14 @@ bool Visualizer::adjust_angles(const std::string &camera_name,
   //  V
   //  Y
   Eigen::Matrix4d Rx;  // pitch
-  Rx << 1, 0, 0, 0,
-        0, cos(pitch_adj_radian), -sin(pitch_adj_radian), 0,
-        0, sin(pitch_adj_radian), cos(pitch_adj_radian), 0,
-        0, 0, 0, 1;
+  Rx << 1, 0, 0, 0, 0, cos(pitch_adj_radian), -sin(pitch_adj_radian), 0, 0,
+      sin(pitch_adj_radian), cos(pitch_adj_radian), 0, 0, 0, 0, 1;
   Eigen::Matrix4d Ry;  // yaw
-  Ry << cos(yaw_adj_radian), 0, sin(yaw_adj_radian), 0,
-        0, 1, 0, 0,
-        -sin(yaw_adj_radian), 0, cos(yaw_adj_radian), 0,
-        0, 0, 0, 1;
+  Ry << cos(yaw_adj_radian), 0, sin(yaw_adj_radian), 0, 0, 1, 0, 0,
+      -sin(yaw_adj_radian), 0, cos(yaw_adj_radian), 0, 0, 0, 0, 1;
   Eigen::Matrix4d Rz;  // roll
-  Rz << cos(roll_adj_radian), -sin(roll_adj_radian), 0, 0,
-        sin(roll_adj_radian), cos(roll_adj_radian), 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1;
+  Rz << cos(roll_adj_radian), -sin(roll_adj_radian), 0, 0, sin(roll_adj_radian),
+      cos(roll_adj_radian), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
 
   adjusted_camera2car_ = ex_camera2car_ * Rz * Ry * Rx;
   AWARN << "adjusted_camera2car_: " << adjusted_camera2car_;
@@ -408,17 +399,14 @@ bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quarternion,
 
   // Option 2. Rotation matrix to quaternion
   Eigen::Matrix3d Rx;  // pitch
-  Rx << 1, 0, 0,
-        0, cos(pitch_radian), -sin(pitch_radian),
-        0, sin(pitch_radian), cos(pitch_radian);
+  Rx << 1, 0, 0, 0, cos(pitch_radian), -sin(pitch_radian), 0, sin(pitch_radian),
+      cos(pitch_radian);
   Eigen::Matrix3d Ry;  // yaw
-  Ry << cos(yaw_radian), 0, sin(yaw_radian),
-        0, 1, 0,
-        -sin(yaw_radian), 0, cos(yaw_radian);
+  Ry << cos(yaw_radian), 0, sin(yaw_radian), 0, 1, 0, -sin(yaw_radian), 0,
+      cos(yaw_radian);
   Eigen::Matrix3d Rz;  // roll
-  Rz << cos(roll_radian), -sin(roll_radian), 0,
-        sin(roll_radian), cos(roll_radian), 0,
-        0, 0, 1;
+  Rz << cos(roll_radian), -sin(roll_radian), 0, sin(roll_radian),
+      cos(roll_radian), 0, 0, 0, 1;
   Eigen::Matrix3d R;
   R = Rz * Ry * Rx;
   AINFO << "Rotation matrix R: " << R;
@@ -427,11 +415,9 @@ bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quarternion,
     (*quarternion)(0) = 0.25 * (R(2, 1) - R(1, 2)) / qw;  // Q.x
     (*quarternion)(1) = 0.25 * (R(0, 2) - R(2, 0)) / qw;  // Q.y
     (*quarternion)(2) = 0.25 * (R(1, 0) - R(0, 1)) / qw;  // Q.z
-    (*quarternion)(3) = qw;  // Q.w
-    AINFO << "quarternion(x, y, z, w): ("
-          << (*quarternion)(0) << ", "
-          << (*quarternion)(1) << ", "
-          << (*quarternion)(2) << ", "
+    (*quarternion)(3) = qw;                               // Q.w
+    AINFO << "quarternion(x, y, z, w): (" << (*quarternion)(0) << ", "
+          << (*quarternion)(1) << ", " << (*quarternion)(2) << ", "
           << (*quarternion)(3) << ")";
   } else {
     double qx = 0.5 * sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
@@ -443,10 +429,8 @@ bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quarternion,
     (*quarternion)(1) = 0.25 * (R(0, 1) + R(1, 0)) / qx;  // Q.y
     (*quarternion)(2) = 0.25 * (R(0, 2) + R(2, 0)) / qx;  // Q.z
     (*quarternion)(3) = 0.25 * (R(2, 1) - R(1, 2)) / qx;  // Q.w
-    AINFO << "second quarternion(x, y, z, w): ("
-          << (*quarternion)(0) << ", "
-          << (*quarternion)(1) << ", "
-          << (*quarternion)(2) << ", "
+    AINFO << "second quarternion(x, y, z, w): (" << (*quarternion)(0) << ", "
+          << (*quarternion)(1) << ", " << (*quarternion)(2) << ", "
           << (*quarternion)(3) << ")";
   }
   return true;
@@ -614,52 +598,68 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     case 51:  // 3
       show_camera_box3d_ = !show_camera_box3d_;
       break;
-    case 65: case 97:  // 'A' 'a'
+    case 65:
+    case 97:  // 'A' 'a'
       capture_video_ = !capture_video_;
       break;
-    case 66: case 98:  // 'B' 'b'
+    case 66:
+    case 98:  // 'B' 'b'
       show_box_ = (show_box_ + 1) % 2;
       break;
-    case 67: case 99:  // 'C' 'd'
+    case 67:
+    case 99:  // 'C' 'd'
       use_class_color_ = !use_class_color_;
       break;
-    case 68: case 100:  // 'D' 'd'
+    case 68:
+    case 100:  // 'D' 'd'
       show_radar_pc_ = !show_radar_pc_;
       break;
-    case 69: case 101:  // 'E' 'e'
+    case 69:
+    case 101:  // 'E' 'e'
       draw_lane_objects_ = !draw_lane_objects_;
       break;
-    case 70: case 102:  // 'F' 'f'
+    case 70:
+    case 102:  // 'F' 'f'
       show_fusion_ = !show_fusion_;
       break;
-    case 71: case 103:  // 'G' 'g'
+    case 71:
+    case 103:  // 'G' 'g'
       show_vp_grid_ = !show_vp_grid_;
       break;
-    case 72: case 104:  // 'H' 'h'
+    case 72:
+    case 104:  // 'H' 'h'
       show_help_text_ = !show_help_text_;
       break;
-    case 73: case 105:  // 'I' 'i'
+    case 73:
+    case 105:  // 'I' 'i'
       show_type_id_label_ = !show_type_id_label_;
       break;
-    case 76: case 108:  // 'L' 'l'
+    case 76:
+    case 108:  // 'L' 'l'
       show_verbose_ = !show_verbose_;
       break;
-    case 79: case 111:  // 'O' 'o'
+    case 79:
+    case 111:  // 'O' 'o'
       show_camera_bdv_ = !show_camera_bdv_;
       break;
-    case 81: case 113:  // 'Q' 'q'
+    case 81:
+    case 113:  // 'Q' 'q'
       show_lane_ = !show_lane_;
       break;
-    case 82: case 114:  // 'R' 'r'
+    case 82:
+    case 114:  // 'R' 'r'
       reset_key();
       break;
-    case 83: case 115:  // 'S' 's'
+    case 83:
+    case 115:  // 'S' 's'
       capture_screen_ = true;
       break;
-    case 84: case 116:  // 'T' 't'
+    case 84:
+    case 116:  // 'T' 't'
       show_trajectory_ = !show_trajectory_;
       break;
-    case 86: case 118:  // 'V' 'v'
+    case 86:
+    case 118:  // 'V' 'v'
       show_velocity_ = (show_velocity_ + 1) % 2;
       break;
     case 65362:  // Up_Arrow
@@ -825,8 +825,7 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     cv::line(world_image_, world_point_to_bigimg(p4), world_point_to_bigimg(p1),
              color, 2);
     cv::line(world_image_, world_point_to_bigimg(pos_2d),
-             world_point_to_bigimg(v_2d),
-             color, 2);
+             world_point_to_bigimg(v_2d), color, 2);
   }
   last_timestamp_ = frame.timestamp;
   camera_image_[frame.data_provider->sensor_name()] = image;
@@ -1068,8 +1067,8 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
   AINFO << "Finished copy";
 }
 
-void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
-    const CameraFrame &frame,
+void Visualizer::ShowResult_all_info_single_camera(
+    const cv::Mat &img, const CameraFrame &frame,
     const base::MotionBufferPtr motion_buffer) {
   if (frame.timestamp - last_timestamp_ < 0.02) return;
 
@@ -1091,7 +1090,7 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
               cv::Scalar(0, 0, 255), 3);
   line_pos += 50;
   cv::putText(image,
-             "pitch rate: " + std::to_string(motion_buffer->back().pitch_rate),
+              "pitch rate: " + std::to_string(motion_buffer->back().pitch_rate),
               cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
   line_pos += 50;
@@ -1108,8 +1107,7 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   for (const auto &object : frame.tracked_objects) {
     if (object->b_cipv) {
       line_pos += 50;
-      cv::putText(image,
-                  "CIPV: " + std::to_string(object->track_id),
+      cv::putText(image, "CIPV: " + std::to_string(object->track_id),
                   cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
                   cv::Scalar(0, 0, 255), 3);
     }

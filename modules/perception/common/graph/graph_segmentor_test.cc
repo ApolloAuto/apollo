@@ -70,8 +70,8 @@ class GraphSegmentorTest : public testing::Test {
 
 TEST_F(GraphSegmentorTest, test_edge_comparison) {
   EXPECT_LT(edges_[1], edges_[0]);
-  EXPECT_FALSE(edges_[3] < edges_[4]);
-  EXPECT_FALSE(edges_[6] < edges_[7]);
+  EXPECT_GE(edges_[3], edges_[4]);
+  EXPECT_GE(edges_[6], edges_[7]);
 }
 
 TEST_F(GraphSegmentorTest, test_segment_graph) {

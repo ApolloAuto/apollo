@@ -130,10 +130,9 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new SidePassSafety(config);
                          });
-  task_factory_.Register(TaskConfig::DECIDER_RSS,
-                         [](const TaskConfig& config) -> Task* {
-                           return new RssDecider(config);
-                         });
+  task_factory_.Register(
+      TaskConfig::DECIDER_RSS,
+      [](const TaskConfig& config) -> Task* { return new RssDecider(config); });
   task_factory_.Register(TaskConfig::SPEED_BOUNDS_PRIORI_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new SpeedBoundsDecider(config);

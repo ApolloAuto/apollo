@@ -75,9 +75,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  auto* mutable_crosswalk_status =
-      PlanningContext::Instance()->mutable_planning_status()
-                                 ->mutable_crosswalk();
+  auto* mutable_crosswalk_status = PlanningContext::Instance()
+                                       ->mutable_planning_status()
+                                       ->mutable_crosswalk();
 
   auto* path_decision = reference_line_info->path_decision();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
@@ -133,8 +133,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
       const double stop_deceleration = util::GetADCStopDeceleration(
           adc_front_edge_s, crosswalk_overlap->start_s);
 
-      bool stop = CheckStopForObstacle(
-          reference_line_info, crosswalk_ptr, *obstacle, stop_deceleration);
+      bool stop = CheckStopForObstacle(reference_line_info, crosswalk_ptr,
+                                       *obstacle, stop_deceleration);
 
       const std::string& obstacle_id = obstacle->Id();
       const PerceptionObstacle& perception_obstacle = obstacle->Perception();
@@ -200,8 +200,7 @@ void Crosswalk::MakeDecisions(Frame* const frame,
            << "] start_s[" << crosswalk_overlap->start_s << "]";
     std::string virtual_obstacle_id =
         CROSSWALK_VO_ID_PREFIX + crosswalk_overlap->object_id;
-    util::BuildStopDecision(virtual_obstacle_id,
-                            crosswalk_overlap->start_s,
+    util::BuildStopDecision(virtual_obstacle_id, crosswalk_overlap->start_s,
                             config_.crosswalk().stop_distance(),
                             StopReasonCode::STOP_REASON_CROSSWALK,
                             crosswalk_to_stop.second,
@@ -256,8 +255,7 @@ bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
 
 bool Crosswalk::CheckStopForObstacle(
     ReferenceLineInfo* const reference_line_info,
-    const CrosswalkInfoConstPtr crosswalk_ptr,
-    const Obstacle& obstacle,
+    const CrosswalkInfoConstPtr crosswalk_ptr, const Obstacle& obstacle,
     const double stop_deceleration) {
   CHECK_NOTNULL(reference_line_info);
 
@@ -392,8 +390,8 @@ bool Crosswalk::CheckStopForObstacle(
         // SKIP when stop_deceleration is too big but safe to ignore
         stop = false;
       }
-      AWARN << "crosswalk_id[" << crosswalk_id
-            << "] stop_deceleration[" << stop_deceleration << "]";
+      AWARN << "crosswalk_id[" << crosswalk_id << "] stop_deceleration["
+            << stop_deceleration << "]";
     }
   }
 

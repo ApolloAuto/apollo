@@ -42,8 +42,8 @@ Status PathLaneBorrowDecider::Process(
   // By default, don't borrow any lane.
   reference_line_info->set_is_path_lane_borrow(false);
   // Check if lane-borrowing is needed, if so, borrow lane.
-  if (Decider::config_.path_lane_borrow_decider_config().
-          allow_lane_borrowing() &&
+  if (Decider::config_.path_lane_borrow_decider_config()
+          .allow_lane_borrowing() &&
       IsNecessaryToBorrowLane(*frame, *reference_line_info)) {
     reference_line_info->set_is_path_lane_borrow(true);
   }

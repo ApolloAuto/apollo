@@ -72,8 +72,7 @@ void StopSign::MakeDecisions(Frame* const frame,
     const std::vector<std::string> wait_for_obstacle_ids(
         stop_sign_status.wait_for_obstacle_id().begin(),
         stop_sign_status.wait_for_obstacle_id().end());
-    util::BuildStopDecision(virtual_obstacle_id,
-                            stop_sign_overlap.start_s,
+    util::BuildStopDecision(virtual_obstacle_id, stop_sign_overlap.start_s,
                             config_.stop_sign().stop_distance(),
                             StopReasonCode::STOP_REASON_STOP_SIGN,
                             wait_for_obstacle_ids,

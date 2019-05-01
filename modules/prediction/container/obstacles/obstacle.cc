@@ -1079,10 +1079,8 @@ void Obstacle::SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr) {
 }
 
 void Obstacle::GetNeighborLaneSegments(
-    std::shared_ptr<const LaneInfo> center_lane_info,
-    bool is_left,
-    int recursion_depth,
-    std::list<std::string>* const lane_ids_ordered,
+    std::shared_ptr<const LaneInfo> center_lane_info, bool is_left,
+    int recursion_depth, std::list<std::string>* const lane_ids_ordered,
     std::unordered_set<std::string>* const existing_lane_ids) {
   // Exit recursion if reached max num of allowed search depth.
   if (recursion_depth <= 0) {
@@ -1165,12 +1163,12 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
       PredictionMap::LaneById(feature->lane().lane_feature().lane_id());
   std::list<std::string> lane_ids_ordered_list;
   std::unordered_set<std::string> existing_lane_ids;
-  GetNeighborLaneSegments(
-      center_lane_info, true, 5, &lane_ids_ordered_list, &existing_lane_ids);
+  GetNeighborLaneSegments(center_lane_info, true, 5, &lane_ids_ordered_list,
+                          &existing_lane_ids);
   lane_ids_ordered_list.push_back(feature->lane().lane_feature().lane_id());
   existing_lane_ids.insert(feature->lane().lane_feature().lane_id());
-  GetNeighborLaneSegments(
-      center_lane_info, false, 5, &lane_ids_ordered_list, &existing_lane_ids);
+  GetNeighborLaneSegments(center_lane_info, false, 5, &lane_ids_ordered_list,
+                          &existing_lane_ids);
 
   const std::vector<std::string> lane_ids_ordered(lane_ids_ordered_list.begin(),
                                                   lane_ids_ordered_list.end());
@@ -1185,8 +1183,8 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
         PredictionMap::LaneById(lane_id);
     const LaneGraph& local_lane_graph =
         ObstacleClusters::GetLaneGraphWithoutMemorizing(
-            feature->lane().lane_feature().lane_s(),
-            road_graph_search_distance, true, curr_lane_info);
+            feature->lane().lane_feature().lane_s(), road_graph_search_distance,
+            true, curr_lane_info);
     // Update it into the Feature proto
     for (const auto& lane_seq : local_lane_graph.lane_sequence()) {
       LaneSequence* lane_seq_ptr = feature->mutable_lane()
