@@ -230,8 +230,7 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
     // When only left lane line is available
   } else if (!b_left_valid && b_right_valid) {
     // Generate virtual left lane based on right lane
-    offset_distance = egolane_ground->right_line.line_point[0](1)
-                    + single_virtual_egolane_width_in_meter_;
+    offset_distance = single_virtual_egolane_width_in_meter_;
     MakeVirtualLane(egolane_ground->right_line, yaw_rate, offset_distance,
                     &egolane_ground->left_line);
     if (debug_level_ >= 2) {
@@ -241,8 +240,7 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
     // When only right lane line is available
   } else if (b_left_valid && !b_right_valid) {
     // Generate virtual right lane based on left lane
-    offset_distance = egolane_ground->left_line.line_point[0](1)
-                    - single_virtual_egolane_width_in_meter_;
+    offset_distance = -single_virtual_egolane_width_in_meter_;
     MakeVirtualLane(egolane_ground->left_line, yaw_rate, offset_distance,
                     &egolane_ground->right_line);
     if (debug_level_ >= 2) {
