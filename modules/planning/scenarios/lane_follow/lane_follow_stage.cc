@@ -287,8 +287,9 @@ void LaneFollowStage::PlanFallbackTrajectory(
   }
 
   AERROR << "Speed fallback due to algorithm failure";
+  // TODO(Jiacheng): move this stop_path_threshold to a gflag
   const double stop_path_distance =
-      reference_line_info->path_data().discretized_path().Length();
+      reference_line_info->path_data().discretized_path().Length() - 5.0;
   const double stop_speed_distance =
       reference_line_info->st_graph_data().is_initialized()
           ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
