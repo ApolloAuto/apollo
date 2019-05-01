@@ -270,6 +270,7 @@ DECLARE_bool(enable_cuda);
 
 DECLARE_bool(enable_nonscenario_side_pass);
 DECLARE_bool(enable_soft_speed_limit);
+DECLARE_bool(enable_dp_reference_speed);
 
 DECLARE_double(message_latency_threshold);
 DECLARE_bool(enable_lane_change_urgency_checking);
