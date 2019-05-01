@@ -444,10 +444,12 @@ bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
   }
 
   Vec2d ego_center_map_frame(
-      (vehicle_param_.front_edge_to_center()
-          - vehicle_param_.back_edge_to_center()) * 0.5,
-      (vehicle_param_.left_edge_to_center() + left_delta_l
-          - vehicle_param_.right_edge_to_center() + right_delta_l) * 0.5);
+      (vehicle_param_.front_edge_to_center() -
+       vehicle_param_.back_edge_to_center()) *
+          0.5,
+      (vehicle_param_.left_edge_to_center() + left_delta_l -
+       vehicle_param_.right_edge_to_center() + right_delta_l) *
+          0.5);
 
   ego_center_map_frame.SelfRotate(path_point.theta());
   ego_center_map_frame.set_x(ego_center_map_frame.x() + path_point.x());
@@ -455,8 +457,8 @@ bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
 
   // TODO(all): remove the buffer
   Box2d adc_box(ego_center_map_frame, path_point.theta(),
-      vehicle_param_.length() + 2.0 * buffer,
-      vehicle_param_.width() + 2.0 * buffer);
+                vehicle_param_.length() + 2.0 * buffer,
+                vehicle_param_.width() + 2.0 * buffer);
   return obs_box.HasOverlap(adc_box);
 }
 
