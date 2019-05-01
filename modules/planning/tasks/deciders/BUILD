@@ -45,8 +45,8 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
-        "//modules/planning/common/util:common_lib",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/common/util:common_lib",
     ],
 )
 
