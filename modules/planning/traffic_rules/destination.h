@@ -43,8 +43,6 @@ class Destination : public TrafficRule {
  private:
   int BuildStopDecision(Frame* const frame,
                         ReferenceLineInfo* const reference_line_info);
-  int Stop(Frame* const frame, ReferenceLineInfo* const reference_line_info,
-           const std::string lane_id, const double lane_s);
   bool CheckPullOver(ReferenceLineInfo* const reference_line_info,
                      const std::string& dest_lane_id, const double dest_lane_s,
                      common::PointENU* dest_point);
