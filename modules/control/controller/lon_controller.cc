@@ -276,7 +276,7 @@ Status LonController::ComputeControlCommand(
             vehicle_param_.max_abs_speed_when_stopped()) ||
        std::abs(debug->path_remain()) < 0.3)) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
-    AINFO << "Stop location reached";
+    ADEBUG << "Stop location reached";
     debug->set_is_full_stop(true);
   }
 
@@ -479,9 +479,9 @@ void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
   if (stop_index == trajectory_message_->trajectory_point_size()) {
     --stop_index;
     if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 0.1) {
-      AINFO << "the last point is selected as parking point";
+      ADEBUG << "the last point is selected as parking point";
     } else {
-      AINFO << "the last point found in path and speed > speed_deadzone";
+      ADEBUG << "the last point found in path and speed > speed_deadzone";
       debug->set_path_remain(10000);
     }
   }
