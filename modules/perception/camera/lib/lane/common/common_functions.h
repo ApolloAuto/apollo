@@ -107,7 +107,8 @@ bool PolyEval(const Dtype& x, int order,
 
 // @brief: ransac fitting to estimate the coefficients of linear system
 template <typename Dtype>
-bool RansacFitting(std::vector<Eigen::Matrix<Dtype, 2, 1>>* pos_vec,
+bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>> &pos_vec,
+                   std::vector<Eigen::Matrix<Dtype, 2, 1>>* selected_points,
                    Eigen::Matrix<Dtype, 4, 1>* coeff, const int max_iters = 100,
                    const int N = 5, Dtype inlier_thres = 0.1) {
   if (coeff == nullptr) {
@@ -115,13 +116,15 @@ bool RansacFitting(std::vector<Eigen::Matrix<Dtype, 2, 1>>* pos_vec,
     return false;
   }
 
-  int n = static_cast<int>(pos_vec->size());
+  selected_points->clear();
+
+  int n = static_cast<int>(pos_vec.size());
   int q1 = static_cast<int>(n / 4);
   int q2 = static_cast<int>(n / 2);
   int q3 = static_cast<int>(n * 3 / 4);
   if (n < N) {
     AERROR << "The number of points should be larger than the order. #points = "
-           << pos_vec->size();
+           << pos_vec.size();
     return false;
   }
 
@@ -136,26 +139,26 @@ bool RansacFitting(std::vector<Eigen::Matrix<Dtype, 2, 1>>* pos_vec,
     index[2] = q3 + std::rand() % q1;
 
     Eigen::Matrix<Dtype, 3, 3> matA;
-    matA << (*pos_vec)[index[0]](0) * (*pos_vec)[index[0]](0),
-        (*pos_vec)[index[0]](0), 1,
-        (*pos_vec)[index[1]](0) * (*pos_vec)[index[1]](0),
-        (*pos_vec)[index[1]](0), 1,
-        (*pos_vec)[index[2]](0) * (*pos_vec)[index[2]](0),
-        (*pos_vec)[index[2]](0), 1;
+    matA << pos_vec[index[0]](0) * pos_vec[index[0]](0),
+        pos_vec[index[0]](0), 1,
+        pos_vec[index[1]](0) * pos_vec[index[1]](0),
+        pos_vec[index[1]](0), 1,
+        pos_vec[index[2]](0) * pos_vec[index[2]](0),
+        pos_vec[index[2]](0), 1;
 
     Eigen::Matrix<Dtype, 3, 1> matB;
-    matB << (*pos_vec)[index[0]](1), (*pos_vec)[index[1]](1),
-        (*pos_vec)[index[2]](1);
+    matB << pos_vec[index[0]](1), pos_vec[index[1]](1),
+        pos_vec[index[2]](1);
     Eigen::Matrix<Dtype, 3, 1> c = matA.colPivHouseholderQr().solve(matB);
 
     int num_inliers = 0;
     Dtype residual = 0;
     Dtype y = 0;
     for (int i = 0; i < n; ++i) {
-      y = (*pos_vec)[i](0) * (*pos_vec)[i](0) * c(0) + (*pos_vec)[i](0) * c(1) +
+      y = pos_vec[i](0) * pos_vec[i](0) * c(0) + pos_vec[i](0) * c(1) +
           c(2);
-      if (std::abs(y - (*pos_vec)[i](1)) <= inlier_thres) ++num_inliers;
-      residual += std::abs(y - (*pos_vec)[i](1));
+      if (std::abs(y - pos_vec[i](1)) <= inlier_thres) ++num_inliers;
+      residual += std::abs(y - pos_vec[i](1));
     }
 
     if (num_inliers > max_inliers ||
@@ -173,12 +176,14 @@ bool RansacFitting(std::vector<Eigen::Matrix<Dtype, 2, 1>>* pos_vec,
 
   if (static_cast<Dtype>(max_inliers) / n < good_lane_ratio) return false;
 
-  std::vector<Eigen::Matrix<Dtype, 2, 1>> tmp = *pos_vec;
-  pos_vec->clear();
+  // std::vector<Eigen::Matrix<Dtype, 2, 1>> tmp = *pos_vec;
+  // pos_vec.clear();
   for (int i = 0; i < n; ++i) {
-    Dtype y = tmp[i](0) * tmp[i](0) * (*coeff)(2) + tmp[i](0) * (*coeff)(1) +
-              (*coeff)(0);
-    if (std::abs(y - tmp[i](1)) <= inlier_thres) pos_vec->push_back(tmp[i]);
+    Dtype y = pos_vec[i](0) * pos_vec[i](0) * (*coeff)(2)
+            + pos_vec[i](0) * (*coeff)(1) + (*coeff)(0);
+    if (std::abs(y - pos_vec[i](1)) <= inlier_thres) {
+      selected_points->push_back(pos_vec[i]);
+    }
   }
   return true;
 }

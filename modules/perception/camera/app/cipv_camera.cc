@@ -16,6 +16,7 @@
 
 #include "modules/perception/camera/app/cipv_camera.h"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -36,15 +37,14 @@ bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
                 const float average_frame_rate, const bool image_based_cipv,
                 const int debug_devel) {
   b_image_based_cipv_ = image_based_cipv;
-  debug_level_ =
-      debug_devel;  // 0: no debug message
+  debug_level_ = debug_devel;  // 0: no debug message
                     // 1: minimal output
                     // 2: some important output
                     // 3: verbose message
                     // 4: visualization
                     // 5: all
                     // -x: specific debugging, where x is the specific number
-  time_unit_ = average_frame_rate;
+  time_unit_ = 1.0f / average_frame_rate;
   homography_im2car_ = homography_im2car;
   homography_car2im_ = homography_im2car.inverse();
 
@@ -53,8 +53,7 @@ bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
   max_vehicle_width_in_meter_ = max_vehicle_width_in_meter;
   margin_vehicle_to_lane_ =
       (average_lane_width_in_meter - max_vehicle_width_in_meter) * 0.5f;
-  single_virtual_egolane_width_in_meter_ =
-      max_vehicle_width_in_meter + margin_vehicle_to_lane_;
+  single_virtual_egolane_width_in_meter_ = max_vehicle_width_in_meter;
   half_vehicle_width_in_meter_ = max_vehicle_width_in_meter * 0.5f;
   half_virtual_egolane_width_in_meter_ =
       single_virtual_egolane_width_in_meter_ * 0.5f;
@@ -83,29 +82,37 @@ bool Cipv::DistanceFromPointToLineSegment(const Point2Df &point,
 bool Cipv::GetEgoLane(const std::vector<base::LaneLine> &lane_objects,
                       EgoLane *egolane_image, EgoLane *egolane_ground,
                       bool *b_left_valid, bool *b_right_valid) {
+  float x, y;
   for (size_t i = 0; i < lane_objects.size(); ++i) {
     const auto &lane_object = lane_objects[i];
     const size_t curve_image_point_size =
         lane_object.curve_image_point_set.size();
+    const size_t curve_car_coord_point_set_size =
+        lane_object.curve_car_coord_point_set.size();
     if (lane_object.pos_type == base::LaneLinePositionType::EGO_LEFT) {
       if (debug_level_ >= 2) {
         AINFO << "[GetEgoLane]LEFT_lane_objects[" << i
               << "].curve_image_point_set.size(): " << curve_image_point_size;
+        AINFO << "[GetEgoLane]LEFT_lane_objects[" << i
+              << "].curve_car_coord_point_set_size: "
+              << curve_car_coord_point_set_size;
       }
       if (curve_image_point_size < min_laneline_length_for_cipv_) {
         *b_left_valid = false;
       } else {
         *b_left_valid = true;
 
+        for (size_t j = 0; j < curve_car_coord_point_set_size; ++j) {
+          // ground_point
+          x = lane_object.curve_car_coord_point_set[j].x;
+          y = lane_object.curve_car_coord_point_set[j].y;
+          egolane_ground->left_line.line_point.emplace_back(x, y);
+        }
         for (size_t j = 0; j < curve_image_point_size; ++j) {
           // image_point
-          egolane_image->left_line.line_point.emplace_back(
-              lane_object.curve_image_point_set[j].x,
-              lane_object.curve_image_point_set[j].y);
-          // ground_point
-          egolane_ground->left_line.line_point.emplace_back(
-              lane_object.curve_car_coord_point_set[j].x,
-              lane_object.curve_car_coord_point_set[j].y);
+          x = lane_object.curve_image_point_set[j].x;
+          y = lane_object.curve_image_point_set[j].x;
+          egolane_image->left_line.line_point.emplace_back(x, y);
         }
       }
     } else if (lane_object.pos_type == base::LaneLinePositionType::EGO_RIGHT) {
@@ -117,15 +124,17 @@ bool Cipv::GetEgoLane(const std::vector<base::LaneLine> &lane_objects,
         *b_right_valid = false;
       } else {
         *b_right_valid = true;
+        for (size_t j = 0; j < curve_car_coord_point_set_size; ++j) {
+          // ground_point
+          x = lane_object.curve_car_coord_point_set[j].x;
+          y = lane_object.curve_car_coord_point_set[j].y;
+          egolane_ground->right_line.line_point.emplace_back(x, y);
+        }
         for (size_t j = 0; j < curve_image_point_size; ++j) {
           // image_point
-          egolane_image->right_line.line_point.emplace_back(
-              lane_object.curve_image_point_set[j].x,
-              lane_object.curve_image_point_set[j].y);
-          // ground_point
-          egolane_ground->right_line.line_point.emplace_back(
-              lane_object.curve_car_coord_point_set[j].x,
-              lane_object.curve_car_coord_point_set[j].y);
+          x = lane_object.curve_image_point_set[j].x;
+          y = lane_object.curve_image_point_set[j].y;
+          egolane_image->right_line.line_point.emplace_back(x, y);
         }
       }
     }
@@ -142,7 +151,7 @@ bool Cipv::MakeVirtualLane(const LaneLineSimple &ref_lane_line,
   virtual_lane_line->line_point.clear();
   if (b_image_based_cipv_ == false) {
     for (uint32_t i = 0; i < ref_lane_line.line_point.size(); ++i) {
-      Eigen::Vector2f virtual_line_point(
+      Point2Df virtual_line_point(
           ref_lane_line.line_point[i](0),
           ref_lane_line.line_point[i](1) + offset_distance);
       virtual_lane_line->line_point.push_back(virtual_line_point);
@@ -158,11 +167,13 @@ float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
                             const float velocity, const float time_unit,
                             float *x, float *y) {
   // straight model;
-  *x = time_unit * velocity;
+  *x = time_unit * velocity * static_cast<float>(tick);
   *y = 0.0f;
 
+  // TODO(techoe): Apply bicycle model for vehicle dynamics (need wheel base)
   // float theta = time_unit_ * yaw_rate;
   // float displacement = time_unit_ * velocity;
+
 
   // Eigen::Rotation2Df rot2d(theta);
   // Eigen::Vector2f trans;
@@ -190,12 +201,12 @@ bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
   right_lane_line->line_point.clear();
 
   if (b_image_based_cipv_ == false) {
-    for (uint32_t i = 0; i < 120; i += 5) {
+    for (uint32_t i = 1; i < kMaxNumVirtualLanePoint; i += 1) {
       VehicleDynamics(i, yaw_rate, velocity, time_unit_, &x, &y);
-      Eigen::Vector2f left_point(x, y + offset_distance);
-      left_lane_line->line_point.push_back(left_point);
-      Eigen::Vector2f right_point(x, y - offset_distance);
-      right_lane_line->line_point.push_back(right_point);
+      Point2Df left_point(x, y + offset_distance);
+      left_lane_line->line_point.emplace_back(left_point);
+      Point2Df right_point(x, y - offset_distance);
+      right_lane_line->line_point.emplace_back(right_point);
     }
   } else {
     // Image based extension requires to reproject virtual laneline points to
@@ -219,9 +230,8 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
     // When only left lane line is available
   } else if (!b_left_valid && b_right_valid) {
     // Generate virtual left lane based on right lane
-    offset_distance =
-        -static_cast<float>(fabs(egolane_ground->right_line.line_point[0](1)) +
-                            half_virtual_egolane_width_in_meter_);
+    offset_distance = egolane_ground->right_line.line_point[0](1)
+                    + single_virtual_egolane_width_in_meter_;
     MakeVirtualLane(egolane_ground->right_line, yaw_rate, offset_distance,
                     &egolane_ground->left_line);
     if (debug_level_ >= 2) {
@@ -231,9 +241,8 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
     // When only right lane line is available
   } else if (b_left_valid && !b_right_valid) {
     // Generate virtual right lane based on left lane
-    offset_distance =
-        static_cast<float>(fabs(egolane_ground->left_line.line_point[0](1)) +
-                           half_virtual_egolane_width_in_meter_);
+    offset_distance = egolane_ground->left_line.line_point[0](1)
+                    - single_virtual_egolane_width_in_meter_;
     MakeVirtualLane(egolane_ground->left_line, yaw_rate, offset_distance,
                     &egolane_ground->right_line);
     if (debug_level_ >= 2) {
@@ -375,9 +384,7 @@ bool Cipv::FindClosestEdgeOfObjectGround(
       object->camera_supplement.local_center(2);
   double theta_ray = atan2(pos(0), pos(2));
   double theta = object->camera_supplement.alpha + theta_ray;
-  if (theta > M_PI_2) {
-    theta = theta - M_PI_2;
-  }
+  theta = theta - M_PI_2;
 
   if (debug_level_ >= 3) {
     AINFO << "object->camera_supplement.box = base::RectF("
@@ -494,28 +501,32 @@ bool Cipv::AreDistancesSane(const float distance_start_point_to_right_lane,
   float distance = -1.0f;
   if (distance_start_point_to_right_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
-      AINFO << "distance from start to right lane(" << distance
+      AINFO << "distance from start to right lane("
+            << distance_start_point_to_right_lane
             << " m) is too long";
     }
     return false;
   }
   if (distance_start_point_to_left_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
-      AINFO << "distance from start to left lane(" << distance
+      AINFO << "distance from start to left lane("
+            << distance_start_point_to_left_lane
             << " m) is too long";
     }
     return false;
   }
   if (distance_end_point_to_right_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
-      AINFO << "distance from end to right lane(" << distance
+      AINFO << "distance from end to right lane("
+            << distance_end_point_to_right_lane
             << " m) is too long";
     }
     return false;
   }
   if (distance_end_point_to_left_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
-      AINFO << "distance from end to left lane(" << distance
+      AINFO << "distance from end to left lane("
+            << distance_end_point_to_left_lane
             << " m) is too long";
     }
     return false;
@@ -575,7 +586,8 @@ bool Cipv::IsPointLeftOfLine(const Point2Df &point,
 }
 // Check if the object is in the lane in image space
 bool Cipv::IsObjectInTheLaneImage(const std::shared_ptr<base::Object> &object,
-                                  const EgoLane &egolane_image) {
+                                  const EgoLane &egolane_image,
+                                  float *distance) {
   return true;
 }
 
@@ -588,7 +600,8 @@ bool Cipv::IsObjectInTheLaneImage(const std::shared_ptr<base::Object> &object,
 //  |           |
 // l_lane     r_lane
 bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
-                                   const EgoLane &egolane_ground) {
+                                   const EgoLane &egolane_ground,
+                                   float *object_distance) {
   LineSegment2Df closted_object_edge;
   bool b_left_lane_clear = false;
   bool b_right_lane_clear = false;
@@ -693,6 +706,9 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
     }
   }
 
+  *object_distance = std::min(closted_object_edge.start_point(0),
+                              closted_object_edge.end_point(0));
+
   // Check if the distance is sane
   if (AreDistancesSane(shortest_distance_start_point_to_right_lane,
                        shortest_distance_start_point_to_left_lane,
@@ -710,11 +726,12 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
 // Check if the object is in the lane in ego-ground space
 bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                              const EgoLane &egolane_image,
-                             const EgoLane &egolane_ground) {
+                             const EgoLane &egolane_ground,
+                             float *distance) {
   if (b_image_based_cipv_ == true) {
-    return IsObjectInTheLaneImage(object, egolane_image);
+    return IsObjectInTheLaneImage(object, egolane_image, distance);
   } else {
-    return IsObjectInTheLaneGround(object, egolane_ground);
+    return IsObjectInTheLaneGround(object, egolane_ground, distance);
   }
 }
 
@@ -733,13 +750,13 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
   int32_t cipv_index = -1;
   //    int32_t old_cipv_track_id = sensor_objects.cipv_track_id;
   int32_t cipv_track_id = -1;
-  // AINFO<<"static_cast<int32_t>(objects.size(): "
-  //           << static_cast<int32_t>(objects.size());
   bool b_left_valid = false;
   bool b_right_valid = false;
   static int32_t old_cipv_index = -2;  // need to be changed
   EgoLane egolane_image;
   EgoLane egolane_ground;
+  egolane_ground.left_line.line_point.clear();
+  egolane_ground.right_line.line_point.clear();
 
   // Get ego lanes (in both image and ground coordinate)
   GetEgoLane(lane_objects, &egolane_image, &egolane_ground, &b_left_valid,
@@ -747,22 +764,18 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
   ElongateEgoLane(lane_objects, b_left_valid, b_right_valid, yaw_rate, velocity,
                   &egolane_image, &egolane_ground);
 
+  float min_distance = std::numeric_limits<float>::max();
+  float distance;
   for (int32_t i = 0; i < static_cast<int32_t>(objects->size()); ++i) {
     if (debug_level_ >= 2) {
       AINFO << "objects[" << i << "]->track_id: " << (*objects)[i]->track_id;
     }
-    if (IsObjectInTheLane((*objects)[i], egolane_image, egolane_ground) ==
-        true) {
-      if (cipv_index < 0 ||
-          (*objects)[i]->center(0) < (*objects)[cipv_index]->center(0)) {
-        // cipv_index is not set or if objects[i] is closer than
-        // objects[cipv_index] in ego-x coordinate
-        // AINFO << "objects[i]->center(0): "
-        //            << objects[i]->center(0);
-        // AINFO << "objects[cipv_index]->center(0): "
-        //            << objects[cipv_index]->center(0);
+    if (IsObjectInTheLane(
+          (*objects)[i], egolane_image, egolane_ground, &distance) == true) {
+      if (cipv_index < 0 || distance < min_distance) {
         cipv_index = i;
         cipv_track_id = (*objects)[i]->track_id;
+        min_distance = distance;
       }
 
       if (debug_level_ >= 2) {
@@ -774,16 +787,7 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
     AINFO << "old_cipv_index: " << old_cipv_index;
   }
   if (cipv_index >= 0) {
-    //  if (old_cipv_index != cipv_index && cipv_index >= 0) {
-    // AINFO << "(*objects)[cipv_index]->b_cipv: "
-    //             << (*objects)[cipv_index]->b_cipv;
-    // AINFO << "sensor_objects.cipv_index: "
-    //            << sensor_objects.cipv_index;
-    // AINFO << "sensor_objects.cipv_track_id: "
-    //            << sensor_objects.cipv_track_id;
     if (old_cipv_index >= 0 && old_cipv_index != cipv_index) {
-      // AINFO << "(*objects)[old_cipv_index]->b_cipv: "
-      //             << (*objects)[old_cipv_index]->b_cipv;
       (*objects)[old_cipv_index]->b_cipv = false;
     }
     (*objects)[cipv_index]->b_cipv = true;
@@ -846,7 +850,7 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
       AINFO << "target ID: " << cur_id;
     }
     // for (auto point : tmp_object_trackjectories[cur_id]) {
-    //   object_trackjectories_[cur_id].push_back(point);
+    //   object_trackjectories_[cur_id].emplace_back(point);
     // }
 
     // If it is the first object, set capacity.
@@ -881,7 +885,7 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
       Eigen::Vector3d transformed_pt;
       TranformPoint(pt, (*motion_buffer)[motion_size - count - 1].motion,
                     &transformed_pt);
-      //      obj->drops.push_back(transformed_pt);
+      //      obj->drops.emplace_back(transformed_pt);
     }
   }
 

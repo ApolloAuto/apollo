@@ -316,8 +316,8 @@ TEST(CIPV, cipv_ground_test) {
     cipv_.DetermineCipv(lane_objects, cipv_options, &objects);
 
     EXPECT_FALSE(objects[0]->b_cipv);
-    EXPECT_FALSE(objects[1]->b_cipv);
-    EXPECT_TRUE(objects[2]->b_cipv);
+    EXPECT_TRUE(objects[1]->b_cipv);
+    EXPECT_FALSE(objects[2]->b_cipv);
   }
 }
 
@@ -611,8 +611,8 @@ TEST(CIPV, cipv_image_test) {
     cipv_.DetermineCipv(lane_objects, cipv_options, &objects);
 
     EXPECT_FALSE(objects[0]->b_cipv);
-    EXPECT_FALSE(objects[1]->b_cipv);
-    EXPECT_TRUE(objects[2]->b_cipv);
+    EXPECT_TRUE(objects[1]->b_cipv);
+    EXPECT_FALSE(objects[2]->b_cipv);
   }
 }
 

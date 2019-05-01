@@ -219,16 +219,20 @@ bool DarkSCNNLanePostprocessor::Process2D(
   // 2. Remove outliers and Do a ransac fitting
   std::vector<Eigen::Matrix<float, 4, 1>> coeffs;
   std::vector<Eigen::Matrix<float, 4, 1>> img_coeffs;
+  std::vector<Eigen::Matrix<float, 2, 1>> selected_xy_points;
   coeffs.resize(lane_type_num_);
   img_coeffs.resize(lane_type_num_);
   for (int i = 1; i < lane_type_num_; ++i) {
     if (xy_points[i].size() < minNumPoints_) continue;
     Eigen::Matrix<float, 4, 1> coeff;
     // Solve linear system to estimate polynomial coefficients
-    if (RansacFitting(&xy_points[i], &coeff, 200,
+    if (RansacFitting(xy_points[i], &selected_xy_points, &coeff, 200,
                       static_cast<int>(minNumPoints_), 0.1f)) {
       // if (PolyFit(xy_points[i], max_poly_order, &coeff, true)) {
       coeffs[i] = coeff;
+
+      xy_points[i].clear();
+      xy_points[i] = selected_xy_points;
     } else {
       xy_points[i].clear();
     }
@@ -331,6 +335,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
     // if (cur_object.curve_car_coord.x_end -
     //     cur_object.curve_car_coord.x_start < 5) continue;
     // cur_object.order = 2;
+    cur_object.curve_car_coord_point_set.clear();
     for (size_t j = 0; j < xy_points[i].size(); ++j) {
       base::Point2DF p_j;
       p_j.x = static_cast<float>(xy_points[i][j](0));
@@ -338,6 +343,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
       cur_object.curve_car_coord_point_set.push_back(p_j);
     }
 
+    cur_object.curve_image_point_set.clear();
     for (size_t j = 0; j < uv_points[i].size(); ++j) {
       base::Point2DF p_j;
       p_j.x = static_cast<float>(uv_points[i][j](0));

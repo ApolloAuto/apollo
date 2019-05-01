@@ -42,6 +42,7 @@ struct CipvOptions {
 };
 
 constexpr float kMaxDistObjectToLaneInMeter = 20.0f;
+constexpr uint32_t kMaxNumVirtualLanePoint = 25;
 const std::size_t kDropsHistorySize = 100;
 const std::size_t kMaxObjectNum = 100;
 const std::size_t kMaxAllowedSkipObject = 10;
@@ -109,7 +110,7 @@ class Cipv {
 
   // Check if the object is in the lane in image space
   bool IsObjectInTheLaneImage(const std::shared_ptr<base::Object> &object,
-                              const EgoLane &egolane_image);
+                              const EgoLane &egolane_image, float *distance);
   // Check if the object is in the lane in ego-ground space
   //  |           |
   //  | *------*  |
@@ -119,12 +120,12 @@ class Cipv {
   //  |           |
   // l_lane     r_lane
   bool IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
-                               const EgoLane &egolane_ground);
+                               const EgoLane &egolane_ground, float *distance);
 
   // Check if the object is in the lane in ego-ground space
   bool IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                          const EgoLane &egolane_image,
-                         const EgoLane &egolane_ground);
+                         const EgoLane &egolane_ground, float *distance);
 
   // Check if a point is left of a line segment
   bool IsPointLeftOfLine(const Point2Df &point,
