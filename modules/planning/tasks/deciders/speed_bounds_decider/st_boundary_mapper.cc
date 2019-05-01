@@ -215,8 +215,7 @@ Status StBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
 
   if (!GetOverlapBoundaryPoints(path_data_.discretized_path(), *obstacle,
                                 &upper_points, &lower_points)) {
-    return Status(ErrorCode::PLANNING_ERROR,
-        "STBoundaryMapper fails to compute boundary points");
+    return Status::OK();
   }
 
   auto boundary = STBoundary::CreateInstance(lower_points, upper_points)
