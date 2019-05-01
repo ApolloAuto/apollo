@@ -42,6 +42,7 @@ struct CipvOptions {
 };
 
 constexpr float kMaxDistObjectToLaneInMeter = 20.0f;
+constexpr uint32_t kMaxNumVirtualLanePoint = 25;
 const std::size_t kDropsHistorySize = 100;
 const std::size_t kMaxObjectNum = 100;
 const std::size_t kMaxAllowedSkipObject = 10;

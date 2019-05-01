@@ -53,8 +53,7 @@ bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
   max_vehicle_width_in_meter_ = max_vehicle_width_in_meter;
   margin_vehicle_to_lane_ =
       (average_lane_width_in_meter - max_vehicle_width_in_meter) * 0.5f;
-  single_virtual_egolane_width_in_meter_ =
-      max_vehicle_width_in_meter + 0.5f;
+  single_virtual_egolane_width_in_meter_ = max_vehicle_width_in_meter;
   half_vehicle_width_in_meter_ = max_vehicle_width_in_meter * 0.5f;
   half_virtual_egolane_width_in_meter_ =
       single_virtual_egolane_width_in_meter_ * 0.5f;
@@ -107,13 +106,13 @@ bool Cipv::GetEgoLane(const std::vector<base::LaneLine> &lane_objects,
           // ground_point
           x = lane_object.curve_car_coord_point_set[j].x;
           y = lane_object.curve_car_coord_point_set[j].y;
-          egolane_ground->left_line.line_point.emplace_back(Point2Df(x, y));
+          egolane_ground->left_line.line_point.emplace_back(x, y);
         }
         for (size_t j = 0; j < curve_image_point_size; ++j) {
           // image_point
           x = lane_object.curve_image_point_set[j].x;
           y = lane_object.curve_image_point_set[j].x;
-          egolane_image->left_line.line_point.emplace_back(Point2Df(x, y));
+          egolane_image->left_line.line_point.emplace_back(x, y);
         }
       }
     } else if (lane_object.pos_type == base::LaneLinePositionType::EGO_RIGHT) {
@@ -129,13 +128,13 @@ bool Cipv::GetEgoLane(const std::vector<base::LaneLine> &lane_objects,
           // ground_point
           x = lane_object.curve_car_coord_point_set[j].x;
           y = lane_object.curve_car_coord_point_set[j].y;
-          egolane_ground->right_line.line_point.emplace_back(Point2Df(x, y));
+          egolane_ground->right_line.line_point.emplace_back(x, y);
         }
         for (size_t j = 0; j < curve_image_point_size; ++j) {
           // image_point
           x = lane_object.curve_image_point_set[j].x;
           y = lane_object.curve_image_point_set[j].y;
-          egolane_image->right_line.line_point.emplace_back(Point2Df(x, y));
+          egolane_image->right_line.line_point.emplace_back(x, y);
         }
       }
     }
@@ -155,7 +154,7 @@ bool Cipv::MakeVirtualLane(const LaneLineSimple &ref_lane_line,
       Point2Df virtual_line_point(
           ref_lane_line.line_point[i](0),
           ref_lane_line.line_point[i](1) + offset_distance);
-      virtual_lane_line->line_point.emplace_back(virtual_line_point);
+      virtual_lane_line->line_point.push_back(virtual_line_point);
     }
   } else {
     // Image based extension requires to reproject virtual laneline points to
@@ -202,7 +201,7 @@ bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
   right_lane_line->line_point.clear();
 
   if (b_image_based_cipv_ == false) {
-    for (uint32_t i = 1; i < 25; i += 1) {
+    for (uint32_t i = 1; i < kMaxNumVirtualLanePoint; i += 1) {
       VehicleDynamics(i, yaw_rate, velocity, time_unit_, &x, &y);
       Point2Df left_point(x, y + offset_distance);
       left_lane_line->line_point.emplace_back(left_point);

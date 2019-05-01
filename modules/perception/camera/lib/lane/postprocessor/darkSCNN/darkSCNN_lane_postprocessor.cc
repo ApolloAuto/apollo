@@ -201,7 +201,7 @@ bool DarkSCNNLanePostprocessor::Process2D(
               std::fabs(xy_point(1) - xy_points[value].back()(1)) < 1.0f) {
             xy_points[value].push_back(xy_point);
             uv_points[value].push_back(uv_point);
-        }
+          }
         } else if (value >= lane_type_num_) {
           AWARN << "Lane line value shouldn't be equal or more than: "
                 << lane_type_num_;
