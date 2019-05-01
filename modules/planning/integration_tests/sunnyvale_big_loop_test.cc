@@ -59,7 +59,6 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
     ENABLE_RULE(TrafficRuleConfig::DESTINATION, false);
     ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
-    ENABLE_RULE(TrafficRuleConfig::PULL_OVER, false);
     ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
   }
 };
@@ -642,7 +641,6 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
   ENABLE_RULE(TrafficRuleConfig::KEEP_CLEAR, false);
-  ENABLE_RULE(TrafficRuleConfig::PULL_OVER, true);
   ENABLE_RULE(TrafficRuleConfig::TRAFFIC_LIGHT, false);
 
   std::string seq_num = "600";
@@ -652,11 +650,6 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
   FLAGS_test_prediction_file = seq_num + "_prediction.pb.txt";
   PlanningTestBase::SetUp();
 
-  // set config
-  auto* destination_config =
-      PlanningTestBase::GetTrafficRuleConfig(TrafficRuleConfig::DESTINATION);
-  destination_config->mutable_destination()->set_enable_pull_over(false);
-
   RUN_GOLDEN_TEST_DECISION(0);
 }
 
@@ -665,6 +658,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_stop_01) {
  * bag: 2018-05-16-10-00-32/2018-05-16-10-00-32_10.bag
  * decision: STOP
  */
+/* TODO(all): rewrite
 TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
@@ -724,12 +718,14 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_01) {
   EXPECT_DOUBLE_EQ(stop_point_heading_0, stop_point_heading_1);
   EXPECT_DOUBLE_EQ(status_set_time_0, status_set_time_1);
 }
+*/
 
 /*
  * destination: stop inlane while pull over fails
  * bag: 2018-05-16-10-00-32/2018-05-16-10-00-32_10.bag
  * decision: STOP
  */
+/* TODO(all): rewrite
 TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   ENABLE_RULE(TrafficRuleConfig::CROSSWALK, false);
   ENABLE_RULE(TrafficRuleConfig::DESTINATION, true);
@@ -787,6 +783,7 @@ TEST_F(SunnyvaleBigLoopTest, destination_pull_over_02) {
   // check PlanningStatus value: PULL OVER  cleared
   EXPECT_FALSE(planning_status->has_pull_over());
 }
+*/
 
 /*
 // TODO(all): this test need rewrite

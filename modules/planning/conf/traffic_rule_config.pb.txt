@@ -38,9 +38,7 @@ config: {
   rule_id: DESTINATION
   enabled: true
   destination {
-    enable_pull_over: false
     stop_distance: 0.5
-    pull_over_plan_distance: 55.00
   }
 }
 
@@ -51,23 +49,6 @@ config: {
     enable_keep_clear_zone: true
     enable_junction: true
     min_pass_s_distance: 2.0
-  }
-}
-
-config: {
-  rule_id: PULL_OVER
-  enabled: true
-  pull_over {
-    stop_distance: 0.5
-    max_stop_speed: 0.2
-    max_valid_stop_distance: 3.0
-    max_stop_deceleration: 2.5
-    min_pass_s_distance: 1.0
-    buffer_to_boundary: 0.5
-    plan_distance: 55.0
-    operation_length: 50.0
-    max_check_distance: 60.0
-    max_failure_count: 10
   }
 }
 

@@ -22,7 +22,6 @@
 
 #include "modules/planning/traffic_rules/destination.h"
 
-#include "modules/common/time/time.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
@@ -32,7 +31,6 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 
 Destination::Destination(const TrafficRuleConfig& config)
@@ -61,7 +59,7 @@ Status Destination::ApplyRule(Frame* frame,
     return Status::OK();
   }
 
-  BuildStopDecision(frame, reference_line_info);
+  MakeDecisions(frame, reference_line_info);
 
   return Status::OK();
 }
@@ -69,7 +67,7 @@ Status Destination::ApplyRule(Frame* frame,
 /**
  * @brief: build stop decision
  */
-int Destination::BuildStopDecision(
+int Destination::MakeDecisions(
     Frame* frame, ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -80,13 +78,14 @@ int Destination::BuildStopDecision(
     return -1;
   }
 
-  const auto* planning_status =
-      PlanningContext::Instance()->mutable_planning_status();
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
   double dest_lane_s =
       std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
                         config_.destination().stop_distance());
 
+  /* TODO(all): remove once new impl of pull-over is done
+  const auto* planning_status =
+      PlanningContext::Instance()->mutable_planning_status();
   if (planning_status->pull_over().status() == PullOverStatus::DISABLED) {
     // build stop decision
     ADEBUG << "BuildStopDecision: destination";
@@ -130,6 +129,20 @@ int Destination::BuildStopDecision(
                             frame, reference_line_info);
     ADEBUG << "destination: STOP at current lane";
   }
+  */
+
+  // build stop decision
+  ADEBUG << "BuildStopDecision: destination";
+  std::string stop_wall_id = FLAGS_destination_obstacle_id;
+  const std::vector<std::string> wait_for_obstacle_ids;
+  util::BuildStopDecision(stop_wall_id,
+                          routing_end.id(),
+                          dest_lane_s,
+                          config_.destination().stop_distance(),
+                          StopReasonCode::STOP_REASON_DESTINATION,
+                          wait_for_obstacle_ids,
+                          TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                          frame, reference_line_info);
 
   return 0;
 }
@@ -137,6 +150,7 @@ int Destination::BuildStopDecision(
 /**
  * @brief: check if adc will pull-over upon arriving destination
  */
+/* TODO(all): remove once new impl of pull-over is done
 bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
                                 const std::string& dest_lane_id,
                                 const double dest_lane_s,
@@ -204,10 +218,12 @@ bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
 
   return true;
 }
+*/
 
 /**
  * @brief: build pull-over decision upon arriving at destination
  */
+/* TODO(all): remove once new impl of pull-over is done
 int Destination::PullOver(common::PointENU* const dest_point) {
   auto* planning_status =
       PlanningContext::Instance()->mutable_planning_status();
@@ -227,6 +243,7 @@ int Destination::PullOver(common::PointENU* const dest_point) {
 
   return 0;
 }
+*/
 
 }  // namespace planning
 }  // namespace apollo
