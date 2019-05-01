@@ -11,6 +11,7 @@ bare_intersection_unprotected_config: {
 stage_type: BARE_INTERSECTION_UNPROTECTED_APPROACH
 stage_type: BARE_INTERSECTION_UNPROTECTED_CREEP
 stage_type: BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE
+
 stage_config: {
   stage_type: BARE_INTERSECTION_UNPROTECTED_APPROACH
   enabled: true
