@@ -17,6 +17,9 @@ stage_config: {
 
   task_config: {
     task_type: PATH_LANE_BORROW_DECIDER
+    path_lane_borrow_decider_config {
+      allow_lane_borrowing: true
+    }
   }
   task_config: {
     task_type: PATH_BOUNDS_DECIDER
