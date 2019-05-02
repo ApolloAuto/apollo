@@ -30,6 +30,11 @@ void PathTimeQpProblem::SetRefX(std::vector<double> x_ref) {
   x_ref_ = std::move(x_ref);
 }
 
+void PathTimeQpProblem::SetDirivativePenalty(std::vector<double> penalty_dx) {
+  CHECK_EQ(penalty_dx.size(), num_of_knots_);
+  penalty_dx_ = std::move(penalty_dx);
+}
+
 void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
                                         std::vector<c_int>* P_indices,
                                         std::vector<c_int>* P_indptr) {
@@ -51,24 +56,25 @@ void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
 
   // x(i)'^2 * w_dx
   for (int i = 0; i < N; ++i) {
-    columns[N + i].emplace_back(N + i, weight_.x_derivative_w);
+    columns[N + i].emplace_back(N + i, weight_.x_derivative_w *
+                                       (1.0 + penalty_dx_[i]));
     ++value_index;
   }
 
   // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
   columns[2 * N].emplace_back(
       2 * N, weight_.x_second_order_derivative_w +
-                 weight_.x_third_order_derivative_w / delta_s_sq_);
+             weight_.x_third_order_derivative_w / delta_s_sq_);
   ++value_index;
   for (int i = 1; i < N - 1; ++i) {
     columns[2 * N + i].emplace_back(
         2 * N + i, weight_.x_second_order_derivative_w +
-                       2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
+                   2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
     ++value_index;
   }
   columns[3 * N - 1].emplace_back(
       3 * N - 1, weight_.x_second_order_derivative_w +
-                     weight_.x_third_order_derivative_w / delta_s_sq_);
+                 weight_.x_third_order_derivative_w / delta_s_sq_);
   ++value_index;
 
   // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
