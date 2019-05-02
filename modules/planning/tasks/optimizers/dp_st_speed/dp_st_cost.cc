@@ -203,7 +203,7 @@ double DpStCost::GetSpeedCost(const STPoint& first, const STPoint& second,
   if (FLAGS_enable_dp_reference_speed) {
     double diff_speed = speed - FLAGS_default_cruise_speed;
     cost += config_.reference_speed_penalty() * config_.default_speed_cost() *
-            fabs(diff_speed * diff_speed) * unit_t_;
+            fabs(diff_speed) * unit_t_;
   }
 
   return cost;
