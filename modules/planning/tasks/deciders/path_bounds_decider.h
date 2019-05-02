@@ -37,7 +37,7 @@
 namespace apollo {
 namespace planning {
 
-constexpr double kPathBoundsDeciderHorizon = 100.0;
+constexpr double kPathBoundsDeciderHorizon = 150.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
