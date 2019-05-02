@@ -300,12 +300,20 @@ bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
   }
   const size_t x_size = result->x.size();
   // load velocity from position
-  for (size_t i = 0; i + 1 < x_size; ++i) {
-    const double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
-                                  std::cos(result->phi[i]) +
-                              ((result->y[i + 1] - result->y[i]) / delta_t_) *
-                                  std::sin(result->phi[i]);
-    result->v.push_back(discrete_v);
+  // initial and end speed are set to be zeros
+  result->v.emplace_back(0.0);
+  for (size_t i = 1; i < x_size - 1; ++i) {
+    double discrete_v = (((result->x[i + 1] - result->x[i]) / delta_t_) *
+                             std::cos(result->phi[i]) +
+                         ((result->x[i] - result->x[i - 1]) / delta_t_) *
+                             std::cos(result->phi[i])) /
+                            2.0 +
+                        (((result->y[i + 1] - result->y[i]) / delta_t_) *
+                             std::sin(result->phi[i]) +
+                         ((result->y[i] - result->y[i - 1]) / delta_t_) *
+                             std::sin(result->phi[i])) /
+                            2.0;
+    result->v.emplace_back(discrete_v);
   }
   result->v.push_back(0.0);
   // load acceleration from velocity
