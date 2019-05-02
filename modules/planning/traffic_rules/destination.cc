@@ -48,14 +48,20 @@ Status Destination::ApplyRule(Frame* frame,
   const auto& routing = frame->local_view().routing;
 
   common::SLPoint dest_sl;
-  const auto& ref_line = reference_line_info->reference_line();
+  const auto& reference_line = reference_line_info->reference_line();
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
-  ref_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()}, &dest_sl);
+  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
+                        &dest_sl);
   const auto& adc_sl = reference_line_info->AdcSlBoundary();
   const auto& dest =
       PlanningContext::Instance()->mutable_planning_status()->destination();
   if (adc_sl.start_s() > dest_sl.s() && !dest.has_passed_destination()) {
     ADEBUG << "Destination at back, but we have not reached destination yet";
+    return Status::OK();
+  }
+
+  if (!reference_line.IsOnLane(dest_sl)) {
+    ADEBUG << "destination point is not on lane";
     return Status::OK();
   }
 
