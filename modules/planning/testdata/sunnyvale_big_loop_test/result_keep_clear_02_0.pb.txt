@@ -8,14 +8,7 @@ is_replan: true
 gear: GEAR_DRIVE
 decision {
   main_decision {
-    stop {
-      reason_code: STOP_REASON_CLEAR_ZONE
-      reason: "stop by KC_1254"
-      stop_point {
-        x: 586425.56804467563
-        y: 4140681.7662001164
-      }
-      stop_heading: 1.3317312203874221
+    cruise {
       change_lane_type: FORWARD
     }
   }
@@ -32,22 +25,6 @@ decision {
             z: 0
           }
           fence_heading: 1.3422560695149219
-        }
-      }
-    }
-    decision {
-      id: "KC_1254"
-      perception_id: -1540021536
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_CLEAR_ZONE
-          distance_s: 0
-          stop_point {
-            x: 586425.56804467563
-            y: 4140681.7662001164
-            z: 0
-          }
-          stop_heading: 1.3317312203874221
         }
       }
     }
