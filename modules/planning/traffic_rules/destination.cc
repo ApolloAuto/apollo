@@ -73,8 +73,8 @@ Status Destination::ApplyRule(Frame* frame,
 /**
  * @brief: build stop decision
  */
-int Destination::MakeDecisions(
-    Frame* frame, ReferenceLineInfo* const reference_line_info) {
+int Destination::MakeDecisions(Frame* frame,
+                               ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -141,9 +141,7 @@ int Destination::MakeDecisions(
   ADEBUG << "BuildStopDecision: destination";
   std::string stop_wall_id = FLAGS_destination_obstacle_id;
   const std::vector<std::string> wait_for_obstacle_ids;
-  util::BuildStopDecision(stop_wall_id,
-                          routing_end.id(),
-                          dest_lane_s,
+  util::BuildStopDecision(stop_wall_id, routing_end.id(), dest_lane_s,
                           config_.destination().stop_distance(),
                           StopReasonCode::STOP_REASON_DESTINATION,
                           wait_for_obstacle_ids,

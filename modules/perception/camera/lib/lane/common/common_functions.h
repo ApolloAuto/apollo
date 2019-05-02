@@ -139,12 +139,9 @@ bool RansacFitting(const std::vector<Eigen::Matrix<Dtype, 2, 1>>& pos_vec,
     index[2] = q3 + std::rand() % q1;
 
     Eigen::Matrix<Dtype, 3, 3> matA;
-    matA << pos_vec[index[0]](0) * pos_vec[index[0]](0),
-        pos_vec[index[0]](0), 1,
-        pos_vec[index[1]](0) * pos_vec[index[1]](0),
-        pos_vec[index[1]](0), 1,
-        pos_vec[index[2]](0) * pos_vec[index[2]](0),
-        pos_vec[index[2]](0), 1;
+    matA << pos_vec[index[0]](0) * pos_vec[index[0]](0), pos_vec[index[0]](0),
+        1, pos_vec[index[1]](0) * pos_vec[index[1]](0), pos_vec[index[1]](0), 1,
+        pos_vec[index[2]](0) * pos_vec[index[2]](0), pos_vec[index[2]](0), 1;
 
     Eigen::Matrix<Dtype, 3, 1> matB;
     matB << pos_vec[index[0]](1), pos_vec[index[1]](1), pos_vec[index[2]](1);
