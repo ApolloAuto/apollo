@@ -165,8 +165,8 @@ default_task_config: {
     total_path_length: 149
     total_time: 7.0
     boundary_buffer: 0.25
-    high_speed_centric_acceleration_limit: 1.5
-    low_speed_centric_acceleration_limit: 1.5
+    high_speed_centric_acceleration_limit: 2.0
+    low_speed_centric_acceleration_limit: 2.0
     high_speed_threshold: 12.58
     low_speed_threshold: 7.5
     minimal_kappa: 0.00001
@@ -185,8 +185,8 @@ default_task_config: {
     total_path_length: 250
     total_time: 7.0
     boundary_buffer: 0.1
-    high_speed_centric_acceleration_limit: 1.5
-    low_speed_centric_acceleration_limit: 1.5
+    high_speed_centric_acceleration_limit: 2.0
+    low_speed_centric_acceleration_limit: 2.0
     high_speed_threshold: 12.58
     low_speed_threshold: 7.5
     minimal_kappa: 0.00001
