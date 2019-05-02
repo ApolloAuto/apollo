@@ -6,9 +6,9 @@ cc_library(
     name = "gnss_parser",
     deps = [
         ":data_parser",
+        ":newtonm2_parser",
         ":novatel_parser",
         ":rtcm_parsers",
-        ":newtonm2_parser",
     ],
 )
 
@@ -20,8 +20,8 @@ cc_library(
         "parser.h",
     ],
     deps = [
-        ":novatel_parser",
         ":newtonm2_parser",
+        ":novatel_parser",
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/util:message_util",
@@ -56,9 +56,9 @@ cc_library(
     name = "newtonm2_parser",
     srcs = ["newtonm2_parser.cc"],
     hdrs = [
+        "newtonm2_parser.h",
         "novatel_messages.h",
         "parser.h",
-        "newtonm2_parser.h",
         "rtcm_decode.h",
     ],
     deps = [
