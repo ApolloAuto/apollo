@@ -41,30 +41,6 @@ Status Destination::ApplyRule(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!frame->is_near_destination()) {
-    return Status::OK();
-  }
-
-  const auto& routing = frame->local_view().routing;
-
-  common::SLPoint dest_sl;
-  const auto& reference_line = reference_line_info->reference_line();
-  const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
-  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
-                        &dest_sl);
-  const auto& adc_sl = reference_line_info->AdcSlBoundary();
-  const auto& dest =
-      PlanningContext::Instance()->mutable_planning_status()->destination();
-  if (adc_sl.start_s() > dest_sl.s() && !dest.has_passed_destination()) {
-    ADEBUG << "Destination at back, but we have not reached destination yet";
-    return Status::OK();
-  }
-
-  if (!reference_line.IsOnLane(dest_sl)) {
-    ADEBUG << "destination point is not on lane";
-    return Status::OK();
-  }
-
   MakeDecisions(frame, reference_line_info);
 
   return Status::OK();
@@ -78,16 +54,32 @@ int Destination::MakeDecisions(
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
+  if (!frame->is_near_destination()) {
+    return 0;
+  }
+
   const auto& routing = frame->local_view().routing;
   if (routing->routing_request().waypoint_size() < 2) {
     AERROR << "routing_request has no end";
     return -1;
   }
 
+  common::SLPoint dest_sl;
+  const auto& reference_line = reference_line_info->reference_line();
   const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
-  double dest_lane_s =
-      std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
-                        config_.destination().stop_distance());
+  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
+                        &dest_sl);
+  const auto& adc_sl = reference_line_info->AdcSlBoundary();
+  const auto& dest =
+      PlanningContext::Instance()->mutable_planning_status()->destination();
+  if (adc_sl.start_s() > dest_sl.s() && !dest.has_passed_destination()) {
+    ADEBUG << "Destination at back, but we have not reached destination yet";
+    return 0;
+  }
+
+  double dest_lane_s = std::fmax(
+      0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
+          config_.destination().stop_distance());
 
   /* TODO(all): remove once new impl of pull-over is done
   const auto* planning_status =
