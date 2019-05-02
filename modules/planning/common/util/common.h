@@ -36,7 +36,7 @@ int BuildStopDecision(const std::string& stop_wall_id,
                       ReferenceLineInfo* const reference_line_info);
 
 int BuildStopDecision(const std::string& stop_wall_id,
-                      const std::string lane_id,
+                      const std::string& lane_id,
                       const double lane_s,
                       const double stop_distance,
                       const StopReasonCode& stop_reason_code,

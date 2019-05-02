@@ -112,7 +112,8 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
   for (const auto& perception_obstacle_id : watch_vehicle_ids) {
-    PlanningContext::Instance()->mutable_planning_status()
+    PlanningContext::Instance()
+        ->mutable_planning_status()
         ->mutable_stop_sign()
         ->add_wait_for_obstacle_id(perception_obstacle_id);
   }
