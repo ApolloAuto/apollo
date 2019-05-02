@@ -108,6 +108,12 @@ int BuildStopDecision(const std::string& stop_wall_id,
     return -1;
   }
 
+  const auto& stop_wall_box = stop_wall->PerceptionBoundingBox();
+  if (!reference_line.IsOnLane(stop_wall_box.center())) {
+    ADEBUG << "stop point is not on lane. SKIP STOP decision";
+    return 0;
+  }
+
   // build stop decision
   auto stop_point = reference_line.GetReferencePoint(
       stop_wall->PerceptionSLBoundary().start_s() - stop_distance);
