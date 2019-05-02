@@ -26,13 +26,15 @@ namespace apollo {
 namespace planning {
 
 void PathTimeQpProblem::SetRefX(std::vector<double> x_ref) {
-  CHECK_EQ(x_ref.size(), num_of_knots_);
-  x_ref_ = std::move(x_ref);
+  if (x_ref.size() == num_of_knots_) {
+    x_ref_ = std::move(x_ref);
+  }
 }
 
 void PathTimeQpProblem::SetDirivativePenalty(std::vector<double> penalty_dx) {
-  CHECK_EQ(penalty_dx.size(), num_of_knots_);
-  penalty_dx_ = std::move(penalty_dx);
+  if (penalty_dx.size(), num_of_knots_) {
+    penalty_dx_ = std::move(penalty_dx);
+  }
 }
 
 void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
