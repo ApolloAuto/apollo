@@ -59,6 +59,7 @@ void PiecewiseJerkProblem::InitProblem(const size_t num_of_knots,
                      std::make_pair(-kMaxVariableRange, kMaxVariableRange));
 
   x_ref_.resize(num_of_knots_, 0.0);
+  penalty_dx_.resize(num_of_knots_, 0.0);
 }
 
 bool PiecewiseJerkProblem::OptimizeWithOsqp(
