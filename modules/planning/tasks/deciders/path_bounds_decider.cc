@@ -275,8 +275,69 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 }
 
 bool PathBoundsDecider::SearchPullOverPosition(
+    const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
     std::tuple<double, double, double>* const pull_over_position) {
+  double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
+  double destination_s =
+      reference_line_info.SDistanceToDestination() + adc_end_s;
+  // Check if destination is some distance away from ADC.
+  double destination_to_adc_buffer = 10.0;
+  if (destination_s - adc_end_s < destination_to_adc_buffer) {
+    AWARN << "Destination is too close to ADC.";
+    return false;
+  }
+  // Check if destination is within path-bounds searching scope.
+  double destination_to_pathend_buffer = 10.0;
+  if (destination_s + destination_to_pathend_buffer >=
+      std::get<0>(path_bound.back())) {
+    AWARN << "Destination is not within path-bounds searching scope.";
+    return false;
+  }
+
+  // Search for a feasible location for pull-over.
+  double road_edge_buffer = 0.15;
+  double pull_over_space_length =
+      VehicleConfigHelper::GetConfig().vehicle_param().length() * 2;
+  int i = static_cast<int>(path_bound.size()) - 1
+  // 1. Locate the first point before destination.
+  while (i >= 0 && std::get<0>(path_bound[i]) > destination_s) { --i; }
+  // 2. Find a window that is close to road-edge.
+  bool has_a_feasible_window = false;
+  while (i >= 0 && std::get<0>(path_bound[i]) -
+         std::get<0>(path_bound.front() > pull_over_space_length)) {
+    int j = i;
+    bool is_feasible_window = true;
+    while (j >= 0 && std::get<0>(path_bound[i]) -
+           std::get<0>(path_bound[j]) < pull_over_space_length) {
+      double curr_s = std::get<0>(path_bound[j])
+      double curr_right_bound = std::fabs(std::get<1>(path_bound[j]));
+      double curr_lane_left_width = 0;
+      double curr_lane_right_width = 0;
+      reference_line_info.reference_line().GetLaneWidth(
+          curr_s, &curr_lane_left_width, &curr_lane_right_width);
+      if (std::fabs(curr_right_bound - curr_lane_right_width) >
+          road_edge_buffer) {
+        is_feasible_window = false;
+        break;
+      }
+      double curr_neighbor_lane_width = 0.0;
+      hdmap::Id neighbor_lane_id;
+      if (reference_line_info.GetNeighborLaneInfo(LaneType::RightForward,
+              curr_s, &neighbor_lane_id, &curr_neighbor_lane_width) ||
+          reference_line_info.GetNeighborLaneInfo(LaneType::RightReverse,
+              curr_s, &neighbor_lane_id, &curr_neighbor_lane_width)) {
+        is_feasible_window = false;
+        break;
+      }
+    }
+    if (is_feasible_window) {
+      has_a_feasible_window = true;
+      // TODO(jiacheng): update the pull-over position into the frame.
+      break;
+    }
+  }
+
   return true;
 }
 
