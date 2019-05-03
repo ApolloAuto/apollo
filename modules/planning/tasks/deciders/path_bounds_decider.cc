@@ -299,18 +299,18 @@ bool PathBoundsDecider::SearchPullOverPosition(
   double road_edge_buffer = 0.15;
   double pull_over_space_length =
       VehicleConfigHelper::GetConfig().vehicle_param().length() * 2;
-  int i = static_cast<int>(path_bound.size()) - 1
+  int i = static_cast<int>(path_bound.size()) - 1;
   // 1. Locate the first point before destination.
   while (i >= 0 && std::get<0>(path_bound[i]) > destination_s) { --i; }
   // 2. Find a window that is close to road-edge.
-  bool has_a_feasible_window = false;
+  // bool has_a_feasible_window = false;
   while (i >= 0 && std::get<0>(path_bound[i]) -
-         std::get<0>(path_bound.front() > pull_over_space_length)) {
+         std::get<0>(path_bound.front()) > pull_over_space_length) {
     int j = i;
     bool is_feasible_window = true;
     while (j >= 0 && std::get<0>(path_bound[i]) -
            std::get<0>(path_bound[j]) < pull_over_space_length) {
-      double curr_s = std::get<0>(path_bound[j])
+      double curr_s = std::get<0>(path_bound[j]);
       double curr_right_bound = std::fabs(std::get<1>(path_bound[j]));
       double curr_lane_left_width = 0;
       double curr_lane_right_width = 0;
@@ -332,7 +332,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
       }
     }
     if (is_feasible_window) {
-      has_a_feasible_window = true;
+      // has_a_feasible_window = true;
       // TODO(jiacheng): update the pull-over position into the frame.
       break;
     }
@@ -458,6 +458,10 @@ bool PathBoundsDecider::GetBoundaryFromLanesAndADC(
       curr_lane_left_width = past_lane_left_width;
       curr_lane_right_width = past_lane_right_width;
     } else {
+      double offset_to_lane_center = 0.0;
+      reference_line.GetOffsetToMap(curr_s, &offset_to_lane_center);
+      curr_lane_left_width += offset_to_lane_center;
+      curr_lane_right_width -= offset_to_lane_center;
       past_lane_left_width = curr_lane_left_width;
       past_lane_right_width = curr_lane_right_width;
     }
