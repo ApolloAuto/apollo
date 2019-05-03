@@ -229,7 +229,7 @@ DEFINE_bool(enable_nudge_slowdown, true,
 
 DEFINE_bool(enable_side_radar, false,
             "If there is no radar on the side,ignore it");
-DEFINE_double(static_decision_nudge_l_buffer, 0.3, "l buffer for nudge");
+DEFINE_double(static_decision_nudge_l_buffer, 0.8, "l buffer for nudge");
 DEFINE_double(lateral_ignore_buffer, 3.0,
               "If an obstacle's lateral distance is further away than this "
               "distance, ignore it");
@@ -492,7 +492,7 @@ DEFINE_double(rss_max_front_obstacle_distance, 3000.0,
               "(unit: meter) for max front obstacle distance.");
 
 DEFINE_bool(
-    enable_planning_smoother, true,
+    enable_planning_smoother, false,
     "True to enable planning smoother among different planning cycles.");
 DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
@@ -535,7 +535,7 @@ DEFINE_bool(enable_dp_reference_speed, true,
             "True to penalize dp result towards default cruise speed");
 
 DEFINE_double(message_latency_threshold, 0.02, "Threshold for message delay");
-DEFINE_bool(enable_lane_change_urgency_checking, false,
+DEFINE_bool(enable_lane_change_urgency_checking, true,
             "True to check the urgency of lane changing");
 DEFINE_double(short_path_length_threshold, 20.0,
               "Threshold for too short path length");
