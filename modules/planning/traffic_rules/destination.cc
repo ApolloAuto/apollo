@@ -49,8 +49,8 @@ Status Destination::ApplyRule(Frame* frame,
 /**
  * @brief: build stop decision
  */
-int Destination::MakeDecisions(
-    Frame* frame, ReferenceLineInfo* const reference_line_info) {
+int Destination::MakeDecisions(Frame* frame,
+                               ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
@@ -77,9 +77,9 @@ int Destination::MakeDecisions(
     return 0;
   }
 
-  double dest_lane_s = std::fmax(
-      0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
-          config_.destination().stop_distance());
+  double dest_lane_s =
+      std::fmax(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
+                         config_.destination().stop_distance());
 
   /* TODO(all): remove once new impl of pull-over is done
   const auto* planning_status =
@@ -133,9 +133,7 @@ int Destination::MakeDecisions(
   ADEBUG << "BuildStopDecision: destination";
   std::string stop_wall_id = FLAGS_destination_obstacle_id;
   const std::vector<std::string> wait_for_obstacle_ids;
-  util::BuildStopDecision(stop_wall_id,
-                          routing_end.id(),
-                          dest_lane_s,
+  util::BuildStopDecision(stop_wall_id, routing_end.id(), dest_lane_s,
                           config_.destination().stop_distance(),
                           StopReasonCode::STOP_REASON_DESTINATION,
                           wait_for_obstacle_ids,

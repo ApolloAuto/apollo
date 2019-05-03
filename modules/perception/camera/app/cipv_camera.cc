@@ -37,7 +37,8 @@ bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
                 const float average_frame_rate, const bool image_based_cipv,
                 const int debug_devel) {
   b_image_based_cipv_ = image_based_cipv;
-  debug_level_ = debug_devel;  // 0: no debug message
+  debug_level_ =
+      debug_devel;  // 0: no debug message
                     // 1: minimal output
                     // 2: some important output
                     // 3: verbose message
