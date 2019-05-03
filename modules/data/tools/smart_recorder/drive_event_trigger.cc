@@ -17,6 +17,7 @@
 #include "modules/data/tools/smart_recorder/drive_event_trigger.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/common/proto/drive_event.pb.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/localization/proto/localization.pb.h"
@@ -42,7 +43,7 @@ void DriveEventTrigger::Pull(const RecordMessage& msg) {
     return;
   }
   // Simply check the channel
-  if (msg.channel_name == "/apollo/drive_event") {
+  if (msg.channel_name == FLAGS_drive_event_topic) {
     DriveEvent drive_event_msg;
     drive_event_msg.ParseFromString(msg.content);
     const uint64_t header_time = static_cast<uint64_t>(

@@ -42,6 +42,7 @@ cc_library(
     hdrs = ["drive_event_trigger.h"],
     deps = [
         ":trigger_base",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/proto:drive_event_proto",
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
@@ -55,6 +56,7 @@ cc_library(
     deps = [
         ":trigger_base",
         "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/control/proto:control_proto",
         "//modules/localization/proto:localization_proto",
     ],
