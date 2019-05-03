@@ -274,6 +274,12 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
   return "";
 }
 
+bool PathBoundsDecider::SearchPullOverPosition(
+    const std::vector<std::tuple<double, double, double>>& path_bound,
+    std::tuple<double, double, double>* const pull_over_position) {
+  return true;
+}
+
 void PathBoundsDecider::RemoveRedundantPathBoundaries(
     std::vector<PathBoundary>* const candidate_path_boundaries) {
   // 1. Check to see if both "left" and "right" exist.

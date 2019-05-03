@@ -111,6 +111,10 @@ class PathBoundsDecider : public Decider {
       const ReferenceLineInfo& reference_line_info,
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
+  bool SearchPullOverPosition(
+      const std::vector<std::tuple<double, double, double>>& path_bound,
+      std::tuple<double, double, double>* const pull_over_position);
+
   /** @brief Remove redundant path bounds in the following manner:
    *   - if "left" is contained by "right", remove "left"; vice versa.
    */
