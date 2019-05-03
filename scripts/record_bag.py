@@ -91,7 +91,7 @@ LARGE_TOPICS = [
 ]
 
 
-MIN_DISK_SIZE = 2**35  # 32GB
+MIN_DISK_SIZE = 600 * (2**30)  # 600GB, could handle (6GB/min * 1.5h).
 
 
 def shell_cmd(cmd, alert_on_failure=True):
