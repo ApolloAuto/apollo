@@ -14,6 +14,12 @@ cc_library(
         "ndt_localization.h",
         "ndt_localization_component.h",
     ],
+    linkopts = [
+	"-lboost_filesystem",
+	"-lboost_system",
+	"-lboost_program_options"
+    ],
+
     copts = ["-DMODULE_NAME=\\\"NDTlocalization\\\""],
     deps = [
         "//cyber",
