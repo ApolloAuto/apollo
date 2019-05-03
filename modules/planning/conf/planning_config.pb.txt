@@ -26,7 +26,7 @@ default_task_config: {
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
   piecewise_jerk_path_config {
     l_weight: 1.0
-    dl_weight: 10.0
+    dl_weight: 20.0
     ddl_weight: 1000.0
     dddl_weight: 50000.0
   }
@@ -38,8 +38,8 @@ default_task_config: {
     velocity_weight: 100.0
     acc_weight: 10.0
     jerk_weight: 30.0
-    ref_weight: 50.0
-    kappa_penalty_weight: 1000.0
+    ref_weight: 100.0
+    kappa_penalty_weight: 200.0
   }
 }
 default_task_config: {
@@ -176,7 +176,7 @@ default_task_config: {
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
     centri_jerk_speed_coeff: 1.0
-    max_valid_stop_distance: 0.25
+    max_valid_stop_distance: 0.5
   }
 }
 default_task_config: {
