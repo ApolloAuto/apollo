@@ -327,6 +327,7 @@ default_task_config: {
   task_type: PATH_BOUNDS_DECIDER
   path_bounds_decider_config {
     is_lane_borrowing: false
+    is_pull_over: false
   }
 }
 default_task_config: {
