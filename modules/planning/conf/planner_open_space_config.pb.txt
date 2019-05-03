@@ -15,6 +15,14 @@ warm_start_config {
   traj_steer_change_penalty: 0.0
   grid_a_star_xy_resolution: 0.5
   node_radius: 0.5
+  s_curve_config {
+    s_weight: 1
+    velocity_weight: 0.0
+    acc_weight: 1.0
+    jerk_weight: 0.0
+    ref_weight: 0.1
+    kappa_penalty_weight: 100.0
+  }
 }
 dual_variable_warm_start_config {
   weight_d: 1.0

@@ -463,6 +463,9 @@ proto_library(
     srcs = [
         "planner_open_space_config.proto",
     ],
+    deps = [
+        ":piecewise_jerk_speed_config_proto_lib",
+    ],
 )
 
 cc_proto_library(

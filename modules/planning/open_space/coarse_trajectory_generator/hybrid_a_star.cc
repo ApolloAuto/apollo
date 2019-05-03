@@ -261,7 +261,7 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
   (*result).y = hybrid_a_y;
   (*result).phi = hybrid_a_phi;
 
-  if (FLAGS_use_s_curve_smooth) {
+  if (FLAGS_use_s_curve_speed_smooth) {
     if (!GenerateSCurveSpeedAcceleration(result)) {
       AERROR << "GenerateSCurveSpeedAcceleration fail";
       return false;
@@ -355,7 +355,12 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
                            discrete_v + 10);
   }
 
-  std::array<double, 5> w = {1, 0.0, 1, 1, 0.0};
+  std::array<double, 5> w = {
+      planner_open_space_config_.s_curve_config().s_weight(),
+      planner_open_space_config_.s_curve_config().velocity_weight(),
+      planner_open_space_config_.s_curve_config().acc_weight(),
+      planner_open_space_config_.s_curve_config().jerk_weight(),
+      planner_open_space_config_.s_curve_config().ref_weight()};
 
   std::array<double, 3> init_s = {0.0, 0.0, 0.01};
 
