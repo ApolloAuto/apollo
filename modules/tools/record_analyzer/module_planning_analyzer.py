@@ -376,7 +376,7 @@ class PlannigAnalyzer:
         v2_results["lat_accel"]["medium_cnt"] = self.lat_accel_medium_cnt
         v2_results["lat_accel"]["high_cnt"] = self.lat_accel_high_cnt
 
-        # lantency
+        # latency
         if len(self.latency_list) > 0:
             v2_results["planning_latency"] = {
                 "max" : max(self.latency_list),
