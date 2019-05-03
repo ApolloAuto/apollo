@@ -109,6 +109,10 @@ message ReferenceLineDebug {
   optional bool is_change_lane_path = 4;
   optional bool is_drivable = 5;
   optional bool is_protected = 6;
+  optional bool is_offroad = 7;
+  optional double minimum_boundary = 8;
+  optional double average_kappa = 9;
+  optional double average_dkappa = 10;
 }
 
 message SampleLayerDebug {

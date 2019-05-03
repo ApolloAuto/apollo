@@ -16,6 +16,7 @@
 
 #include "modules/planning/on_lane_planning.h"
 
+#include <limits>
 #include <list>
 #include <utility>
 
@@ -375,6 +376,47 @@ void OnLanePlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
     rl_debug->set_is_drivable(reference_line_info.IsDrivable());
     rl_debug->set_is_protected(reference_line_info.GetRightOfWayStatus() ==
                                ADCTrajectory::PROTECTED);
+
+    // average kappa and dkappa for performance evaluation
+    const auto& reference_points =
+        reference_line_info.reference_line().reference_points();
+    double total_kappa = 0.0;
+    double total_dkappa = 0.0;
+    size_t reference_points_size = reference_points.size();
+    for (const auto& reference_point : reference_points) {
+      total_kappa += reference_point.kappa();
+      total_dkappa += reference_point.dkappa();
+    }
+    rl_debug->set_average_kappa(total_kappa /
+                                static_cast<double>(reference_points_size));
+    rl_debug->set_average_dkappa(total_dkappa /
+                                 static_cast<double>(reference_points_size));
+
+    bool is_off_road = false;
+    double minimum_boundary = std::numeric_limits<double>::infinity();
+
+    const double adc_half_width =
+        common::VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
+    const auto& reference_line_path =
+        reference_line_info.reference_line().GetMapPath();
+    const auto sample_s = 0.1;
+    const auto reference_line_length =
+        reference_line_info.reference_line().Length();
+    for (double s = 0.0; s < reference_line_length; s += sample_s) {
+      double left_width = reference_line_path.GetLaneLeftWidth(s);
+      double right_width = reference_line_path.GetLaneRightWidth(s);
+      if (left_width < adc_half_width || right_width < adc_half_width) {
+        is_off_road = true;
+      }
+      if (left_width < minimum_boundary) {
+        minimum_boundary = left_width;
+      }
+      if (right_width < minimum_boundary) {
+        minimum_boundary = right_width;
+      }
+    }
+    rl_debug->set_is_offroad(is_off_road);
+    rl_debug->set_minimum_boundary(minimum_boundary);
   }
 }
 
