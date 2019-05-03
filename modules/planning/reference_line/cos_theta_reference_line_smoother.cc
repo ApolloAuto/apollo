@@ -336,8 +336,9 @@ bool CosThetaReferenceLineSmoother::GenerateRefPointProfile(
     double yds = y_over_s_first_derivatives[i];
     double xdds = x_over_s_second_derivatives[i];
     double ydds = y_over_s_second_derivatives[i];
-    double kappa = (xds * ydds - yds * xdds) /
-                   (std::sqrt(xds * xds + yds * yds) * (xds * xds + yds * yds));
+    double kappa =
+        (xds * ydds - yds * xdds) /
+        (std::sqrt(xds * xds + yds * yds) * (xds * xds + yds * yds) + 1e-6);
     kappas.push_back(kappa);
   }
 
