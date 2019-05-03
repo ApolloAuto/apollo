@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <iterator>
 #include <memory>
 #include <queue>
 #include <string>
@@ -54,6 +56,7 @@ struct HybridAStartResult {
   std::vector<double> v;
   std::vector<double> a;
   std::vector<double> steer;
+  std::vector<double> accumulated_s;  // accumulated_s, total_length (always>0)
 };
 
 class HybridAStar {
@@ -85,6 +88,7 @@ class HybridAStar {
   double HoloObstacleHeuristic(std::shared_ptr<Node3d> next_node);
   bool GetResult(HybridAStartResult* result);
   bool GenerateSpeedAcceleration(HybridAStartResult* result);
+  bool GenerateSCurveSpeedAcceleration(HybridAStartResult* result);
 
  private:
   PlannerOpenSpaceConfig planner_open_space_config_;
