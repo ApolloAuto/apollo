@@ -17,6 +17,7 @@
 #include "modules/data/tools/smart_recorder/emergency_mode_trigger.h"
 
 #include "cyber/common/log.h"
+#include "modules/common/adapters/adapter_gflags.h"
 #include "modules/control/proto/control_cmd.pb.h"
 #include "modules/localization/proto/localization.pb.h"
 
@@ -42,7 +43,7 @@ void EmergencyModeTrigger::Pull(const RecordMessage& msg) {
   if (!trigger_obj_->enabled()) {
     return;
   }
-  if (msg.channel_name == "/apollo/canbus/chassis") {
+  if (msg.channel_name == FLAGS_chassis_topic) {
     apollo::canbus::Chassis chassis_msg;
     chassis_msg.ParseFromString(msg.content);
     if (cur_driving_mode_ == Chassis::COMPLETE_AUTO_DRIVE &&
