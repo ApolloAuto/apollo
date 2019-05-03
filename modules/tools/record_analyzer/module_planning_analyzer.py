@@ -377,11 +377,12 @@ class PlannigAnalyzer:
         v2_results["lat_accel"]["high_cnt"] = self.lat_accel_high_cnt
 
         # lantency
-        v2_results["planning_latency"] = {
-            "max" : max(self.latency_list),
-            "min" : min(self.latency_list),
-            "avg" : np.average(self.latency_list)
-        }
+        if len(self.latency_list) > 0:
+            v2_results["planning_latency"] = {
+                "max" : max(self.latency_list),
+                "min" : min(self.latency_list),
+                "avg" : np.average(self.latency_list)
+            }
 
         print json.dumps(v2_results)
 
