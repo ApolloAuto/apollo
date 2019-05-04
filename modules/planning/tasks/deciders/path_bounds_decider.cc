@@ -298,12 +298,14 @@ bool PathBoundsDecider::SearchPullOverPosition(
   // Search for a feasible location for pull-over.
   double road_edge_buffer = 0.15;
   double pull_over_space_length =
-      VehicleConfigHelper::GetConfig().vehicle_param().length() * 2;
+      VehicleConfigHelper::GetConfig().vehicle_param().length() * 2.0;
+  double adc_half_width =
+      VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   int i = static_cast<int>(path_bound.size()) - 1;
   // 1. Locate the first point before destination.
   while (i >= 0 && std::get<0>(path_bound[i]) > destination_s) { --i; }
   // 2. Find a window that is close to road-edge.
-  // bool has_a_feasible_window = false;
+  bool has_a_feasible_window = false;
   while (i >= 0 && std::get<0>(path_bound[i]) -
          std::get<0>(path_bound.front()) > pull_over_space_length) {
     int j = i;
@@ -316,8 +318,10 @@ bool PathBoundsDecider::SearchPullOverPosition(
       double curr_lane_right_width = 0;
       reference_line_info.reference_line().GetLaneWidth(
           curr_s, &curr_lane_left_width, &curr_lane_right_width);
-      if (std::fabs(curr_right_bound - curr_lane_right_width) >
-          road_edge_buffer) {
+      if (std::fabs(curr_right_bound + adc_half_width -
+              curr_lane_right_width) > road_edge_buffer) {
+        ADEBUG << "Not close enough to lane-edge -> "
+               << "Not feasible for pull-over.";
         is_feasible_window = false;
         break;
       }
@@ -327,18 +331,41 @@ bool PathBoundsDecider::SearchPullOverPosition(
               curr_s, &neighbor_lane_id, &curr_neighbor_lane_width) ||
           reference_line_info.GetNeighborLaneInfo(LaneType::RightReverse,
               curr_s, &neighbor_lane_id, &curr_neighbor_lane_width)) {
+        ADEBUG << "Not the rightmost lane -> Not feasible for pull-over.";
         is_feasible_window = false;
         break;
       }
     }
+    if (j < 0) {
+      return false;
+    }
     if (is_feasible_window) {
-      // has_a_feasible_window = true;
-      // TODO(jiacheng): update the pull-over position into the frame.
+      has_a_feasible_window = true;
+      const auto& reference_line = reference_line_info.reference_line();
+
+      double pull_over_s = std::get<0>(path_bound[(i+j)/2]);
+      double pull_over_l = std::get<1>(path_bound[(i+j)/2]);
+      common::SLPoint pull_over_sl_point;
+      pull_over_sl_point.set_s(pull_over_s);
+      pull_over_sl_point.set_l(pull_over_l);
+
+      common::math::Vec2d pull_over_xy_point;
+      reference_line.SLToXY(pull_over_sl_point, &pull_over_xy_point);
+      double pull_over_x = pull_over_xy_point.x();
+      double pull_over_y = pull_over_xy_point.y();
+
+      const auto& reference_point =
+          reference_line.GetReferencePoint(pull_over_s);
+      double pull_over_phi = reference_point.heading();
+
+      std::get<0>(*pull_over_position) = pull_over_x;
+      std::get<1>(*pull_over_position) = pull_over_y;
+      std::get<2>(*pull_over_position) = pull_over_phi;
       break;
     }
   }
 
-  return true;
+  return has_a_feasible_window;
 }
 
 void PathBoundsDecider::RemoveRedundantPathBoundaries(
