@@ -117,8 +117,8 @@ double TrajectoryEvaluator::Evaluate(
     std::vector<double>* cost_components) const {
   // Costs:
   // 1. Cost of missing the objective, e.g., cruise, stop, etc.
-  // 2. Cost of logitudinal jerk
-  // 3. Cost of logitudinal collision
+  // 2. Cost of longitudinal jerk
+  // 3. Cost of longitudinal collision
   // 4. Cost of lateral offsets
   // 5. Cost of lateral comfort
 
