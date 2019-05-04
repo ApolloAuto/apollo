@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -169,6 +170,13 @@ class Frame {
 
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
+  std::tuple<bool, double, double, double> pull_over_info() {
+    return pull_over_info_;
+  }
+
+  void set_pull_over_info(const std::tuple<bool, double, double, double>&
+      pull_over_info) { pull_over_info_ = pull_over_info; }
+
  private:
   common::Status InitFrameData();
 
@@ -227,6 +235,8 @@ class Frame {
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
+
+  std::tuple<bool, double, double, double> pull_over_info_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {
