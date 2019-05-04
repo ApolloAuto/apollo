@@ -429,7 +429,7 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     ADEBUG << "obstacle [" << obstacle->Id() << "] is NOT lane blocking.";
   }
 
-  if (IsUnrelaventObstacle(mutable_obstacle)) {
+  if (IsIrrelevantObstacle(mutable_obstacle)) {
     ObjectDecisionType ignore;
     ignore.mutable_ignore();
     path_decision_.AddLateralDecision("reference_line_filter", obstacle->Id(),
@@ -477,7 +477,7 @@ bool ReferenceLineInfo::AddObstacles(
   return true;
 }
 
-bool ReferenceLineInfo::IsUnrelaventObstacle(const Obstacle* obstacle) {
+bool ReferenceLineInfo::IsIrrelevantObstacle(const Obstacle* obstacle) {
   if (obstacle->IsCautionLevelObstacle()) {
     return false;
   }
