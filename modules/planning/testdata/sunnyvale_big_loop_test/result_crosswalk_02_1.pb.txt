@@ -9,11 +9,11 @@ gear: GEAR_DRIVE
 decision {
   main_decision {
     stop {
-      reason_code: STOP_REASON_CROSSWALK
-      reason: "stop by CW_2832"
+      reason_code: STOP_REASON_SIGNAL
+      reason: "stop by TL_2516"
       stop_point {
-        x: 586261.36096295482
-        y: 4141304.5596587714
+        x: 586261.34696462157
+        y: 4141304.4974646466
       }
       stop_heading: -1.7940405570566935
       change_lane_type: FORWARD
@@ -57,23 +57,6 @@ decision {
         nudge {
           type: RIGHT_NUDGE
           distance_l: -0.3
-        }
-      }
-    }
-    decision {
-      id: "CW_2832"
-      perception_id: -1198750198
-      object_decision {
-        stop {
-          reason_code: STOP_REASON_CROSSWALK
-          distance_s: -1
-          stop_point {
-            x: 586261.36096295482
-            y: 4141304.5596587714
-            z: 0
-          }
-          stop_heading: -1.7940405570566935
-          wait_for_obstacle: "11652"
         }
       }
     }
@@ -134,5 +117,5 @@ lane_id {
 engage_advice {
   advice: READY_TO_ENGAGE
 }
-trajectory_type: NORMAL
-replan_reason: "replan for no previous trajectory."
+trajectory_type: SPEED_FALLBACK
+replan_reason: "replan for manual mode."
