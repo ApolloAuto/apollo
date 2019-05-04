@@ -133,7 +133,7 @@ Status OpenSpaceFallbackDecider::Process(Frame* frame) {
       fallback_trajectory_pair_candidate.first[i].set_a(0.0);
     }
 
-    // TODO(QiL): refine the logic and remove redudant code, change 0.5 to from
+    // TODO(QiL): refine the logic and remove redundant code, change 0.5 to from
     // loading optimizer configs
 
     // If stop_index == fallback_start_index;

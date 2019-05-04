@@ -302,14 +302,14 @@ class NormalDistributionsTransform {
                                double f_u, double g_u, double a_t, double f_t,
                                double g_t);
 
-  /**@brief Auxilary function used to determin endpoints of More-Thuente
+  /**@brief Auxilary function used to determine endpoints of More-Thuente
    * interval. */
   inline double AuxilaryFunctionPsimt(double a, double f_a, double f_0,
                                       double g_0, double mu = 1.e-4) {
     return (f_a - f_0 - mu * g_0 * a);
   }
 
-  /**@brief Auxilary function derivative used to determin endpoints of
+  /**@brief Auxilary function derivative used to determine endpoints of
    * More-Thuente interval. */
   inline double AuxilaryFunctionDpsimt(double g_a, double g_0,
                                        double mu = 1.e-4) {

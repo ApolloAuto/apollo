@@ -166,7 +166,7 @@ class FeatureXYPlane {
     // get plane's normal (which is normalized)
     Eigen::VectorXf coeff;
     ransac.getModelCoefficients(coeff);
-    // determin the plane type
+    // determine the plane type
     double tan_theta = 0;
     double tan_refer_theta = std::tan(plane_type_degree_ / 180.0 * M_PI);
     if ((std::abs(coeff(2)) > std::abs(coeff(0))) &&
