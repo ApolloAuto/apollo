@@ -272,18 +272,21 @@ void LaneFollowStage::PlanFallbackTrajectory(
     reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
   }
 
-  // TODO(Jinyun): Use last successful path data to do speed fallback
   if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
-    const auto& candidate_path_data =
-        reference_line_info->GetCandidatePathData();
-    for (const auto& path_data : candidate_path_data) {
-      if (path_data.path_label().find("self") != std::string::npos) {
-        *reference_line_info->mutable_path_data() = path_data;
-        break;
+    if (!RetrieveLastFramePathProfile(
+            reference_line_info, frame,
+            reference_line_info->mutable_path_data())) {
+      const auto& candidate_path_data =
+          reference_line_info->GetCandidatePathData();
+      for (const auto& path_data : candidate_path_data) {
+        if (path_data.path_label().find("self") != std::string::npos) {
+          *reference_line_info->mutable_path_data() = path_data;
+          break;
+        }
       }
+      AERROR << "Use current frame self lane path as fallback ";
     }
-    AERROR << "reference_line_info->path_data() "
-           << reference_line_info->path_data().path_label();
+    AERROR << "Use last frame good path to do speed fallback";
   }
 
   AERROR << "Speed fallback due to algorithm failure";
