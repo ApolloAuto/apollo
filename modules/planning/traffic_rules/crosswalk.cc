@@ -329,9 +329,9 @@ bool Crosswalk::CheckStopForObstacle(
              << obstacle_type_name << "] crosswalk_id[" << crosswalk_id << "]";
     }
   } else if (obstacle_l_distance <=
-             config_.crosswalk().stop_strick_l_distance()) {
+             config_.crosswalk().stop_strict_l_distance()) {
     if (is_on_road) {
-      // (2) when l_distance <= strick_l_distance + on_road
+      // (2) when l_distance <= strict_l_distance + on_road
       //     always STOP
       if (obstacle_sl_point.s() > adc_end_edge_s) {
         stop = true;
@@ -341,7 +341,7 @@ bool Crosswalk::CheckStopForObstacle(
                << crosswalk_id << "] ON_ROAD";
       }
     } else {
-      // (3) when l_distance <= strick_l_distance
+      // (3) when l_distance <= strict_l_distance
       //     + NOT on_road(i.e. on crosswalk/median etc)
       //     STOP if paths cross
       if (is_path_cross) {
@@ -350,7 +350,7 @@ bool Crosswalk::CheckStopForObstacle(
                << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
                << "] PATH_CRSOSS";
       } else {
-        // (4) when l_distance <= strick_l_distance
+        // (4) when l_distance <= strict_l_distance
         //     + NOT on_road(i.e. on crosswalk/median etc)
         //     STOP if he pedestrian is moving toward the ego vehicle
         const auto obstacle_v = Vec2d(perception_obstacle.velocity().x(),
@@ -372,7 +372,7 @@ bool Crosswalk::CheckStopForObstacle(
       }
     }
   } else {
-    // (4) when l_distance is between loose_l and strick_l
+    // (4) when l_distance is between loose_l and strict_l
     //     use history decision of this crosswalk to smooth unsteadiness
 
     // TODO(all): replace this temp implementation
@@ -388,7 +388,7 @@ bool Crosswalk::CheckStopForObstacle(
   // check stop_deceleration
   if (stop) {
     if (stop_deceleration >= config_.crosswalk().max_stop_deceleration()) {
-      if (obstacle_l_distance > config_.crosswalk().stop_strick_l_distance()) {
+      if (obstacle_l_distance > config_.crosswalk().stop_strict_l_distance()) {
         // SKIP when stop_deceleration is too big but safe to ignore
         stop = false;
       }

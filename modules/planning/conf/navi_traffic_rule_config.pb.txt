@@ -28,7 +28,7 @@ config: {
     max_stop_speed: 0.3
     max_valid_stop_distance: 3.5
     expand_s_distance: 2.0
-    stop_strick_l_distance: 6.0
+    stop_strict_l_distance: 6.0
     stop_loose_l_distance: 8.0
     stop_timeout: 4.0
   }

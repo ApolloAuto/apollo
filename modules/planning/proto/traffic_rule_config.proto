@@ -45,8 +45,8 @@ message CrosswalkConfig {
   optional double max_valid_stop_distance = 5 [default = 3.0];  // meter
   // expand s_distance for pedestrian/bicycle detection
   optional double expand_s_distance = 6 [default = 2.0];  // meter
-  // strick stop rule within this l_distance
-  optional double stop_strick_l_distance = 7 [default = 4.0];  // meter
+  // strict stop rule within this l_distance
+  optional double stop_strict_l_distance = 7 [default = 4.0];  // meter
   // loose stop rule beyond this l_distance
   optional double stop_loose_l_distance = 8 [default = 5.0];  // meter
   // stop timeout for bicycles/pedestrians which are not moving
