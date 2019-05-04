@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
       boost_args["resolution_type"].as<std::string>();
   if (strcasecmp(resolution_type.c_str(), "single") != 0 &&
       strcasecmp(resolution_type.c_str(), "multi") != 0) {
-    std::cerr << "map resolution type invalide. (single or multi)" << std::endl;
+    std::cerr << "map resolution type invalid. (single or multi)" << std::endl;
     return -1;
   }
 

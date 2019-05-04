@@ -128,14 +128,14 @@ int main(int argc, char** argv) {
       boost_args["coordinate_type"].as<std::string>();
   if (strcasecmp(coordinate_type.c_str(), "UTM") != 0 &&
       strcasecmp(coordinate_type.c_str(), "LTM") != 0) {
-    std::cerr << "Coordinate type invalide. (UTM or LTM)" << std::endl;
+    std::cerr << "Coordinate type invalid. (UTM or LTM)" << std::endl;
     return -1;
   }
   const std::string map_resolution_type =
       boost_args["map_resolution_type"].as<std::string>();
   if (strcasecmp(map_resolution_type.c_str(), "single") != 0 &&
       strcasecmp(map_resolution_type.c_str(), "multi") != 0) {
-    std::cerr << "Map resolution type invalide. (single or multi)" << std::endl;
+    std::cerr << "Map resolution type invalid. (single or multi)" << std::endl;
     return -1;
   }
 

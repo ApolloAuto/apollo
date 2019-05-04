@@ -355,7 +355,7 @@ DEFINE_uint32(num_sample_follow_per_timestamp, 3,
 DEFINE_double(weight_lon_objective, 10.0, "Weight of longitudinal travel cost");
 DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 5.0,
-              "Weight of logitudinal collision cost");
+              "Weight of longitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
 DEFINE_double(weight_centripetal_acceleration, 1.5,
@@ -374,7 +374,7 @@ DEFINE_double(lon_collision_yield_buffer, 1.0,
 DEFINE_double(lon_collision_overtake_buffer, 5.0,
               "Longitudinal collision buffer for overtake");
 DEFINE_double(lon_collision_cost_std, 0.5,
-              "The standard deviation of logitudinal collision cost function");
+              "The standard deviation of longitudinal collision cost function");
 DEFINE_double(default_lon_buffer, 5.0,
               "Default longitudinal buffer to sample path-time points.");
 DEFINE_double(time_min_density, 1.0,

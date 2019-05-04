@@ -329,7 +329,7 @@ Status Frame::Init(
     const std::list<ReferenceLine> &reference_lines,
     const std::list<hdmap::RouteSegments> &segments,
     const std::vector<routing::LaneWaypoint> &future_route_waypoints) {
-  // TODO(QiL): refactor this to avoid redudant nullptr checks in scenarios.
+  // TODO(QiL): refactor this to avoid redundant nullptr checks in scenarios.
   auto status = InitFrameData();
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
