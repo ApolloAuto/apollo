@@ -55,6 +55,9 @@ class TimingWheel {
 
   void AddTask(const std::shared_ptr<TimerTask>& task);
 
+  void AddTask(const std::shared_ptr<TimerTask>& task,
+               const uint64_t current_work_wheel_index);
+
   void Cascade(const uint64_t assistant_wheel_index);
 
   void TickFunc();
