@@ -25,6 +25,7 @@
 #include <memory>
 #include <queue>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -56,7 +57,7 @@ struct HybridAStartResult {
   std::vector<double> v;
   std::vector<double> a;
   std::vector<double> steer;
-  std::vector<double> accumulated_s;  // accumulated_s, total_length (always>0)
+  std::vector<double> accumulated_s;
 };
 
 class HybridAStar {

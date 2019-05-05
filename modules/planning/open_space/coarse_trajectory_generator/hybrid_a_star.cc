@@ -298,7 +298,7 @@ bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
     AERROR << "result size check when generating speed and acceleration fail";
     return false;
   }
-  size_t x_size = result->x.size();
+  const size_t x_size = result->x.size();
   // load velocity from position
   for (size_t i = 0; i < x_size - 1; ++i) {
     double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
@@ -333,17 +333,17 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
     return false;
   }
 
-  size_t x_size = result->x.size();
+  const size_t x_size = result->x.size();
 
   double accumulated_s = 0.0;
   std::vector<std::tuple<double, double, double>> s_bounds;
   std::vector<std::tuple<double, double, double>> ds_bounds;
 
   for (size_t i = 0; i < x_size - 1; ++i) {
-    double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
-                            std::cos(result->phi[i]) +
-                        ((result->y[i + 1] - result->y[i]) / delta_t_) *
-                            std::sin(result->phi[i]);
+    const double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
+                                  std::cos(result->phi[i]) +
+                              ((result->y[i + 1] - result->y[i]) / delta_t_) *
+                                  std::sin(result->phi[i]);
 
     accumulated_s += discrete_v * delta_t_;
 
@@ -355,14 +355,24 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
                            discrete_v + 10);
   }
 
-  std::array<double, 5> w = {
-      planner_open_space_config_.s_curve_config().s_weight(),
-      planner_open_space_config_.s_curve_config().velocity_weight(),
-      planner_open_space_config_.s_curve_config().acc_weight(),
-      planner_open_space_config_.s_curve_config().jerk_weight(),
-      planner_open_space_config_.s_curve_config().ref_weight()};
+  std::array<double, 5> w = {planner_open_space_config_.warm_start_config()
+                                 .s_curve_config()
+                                 .s_weight(),
+                             planner_open_space_config_.warm_start_config()
+                                 .s_curve_config()
+                                 .velocity_weight(),
+                             planner_open_space_config_.warm_start_config()
+                                 .s_curve_config()
+                                 .acc_weight(),
+                             planner_open_space_config_.warm_start_config()
+                                 .s_curve_config()
+                                 .jerk_weight(),
+                             planner_open_space_config_.warm_start_config()
+                                 .s_curve_config()
+                                 .ref_weight()};
 
-  std::array<double, 3> init_s = {0.0, 0.0, 0.01};
+  std::array<double, 3> init_s = {result->accumulated_s[0], result->v[0],
+                                  (result->v[1] - result->v[0]) / delta_t_};
 
   const size_t num_of_knots = static_cast<int>(x_size) - 1;
   // Start a PathTimeQpProblem
@@ -389,7 +399,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   // Sovle the problem
   if (!path_time_qp->Optimize()) {
     std::string msg("Piecewise jerk speed optimizer failed!");
-    AFATAL << msg;
+    AERROR << msg;
     return false;
   }
 
