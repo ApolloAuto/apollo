@@ -53,7 +53,7 @@ void TimingWheel::Tick() {
         auto callback = task->callback;
         cyber::Async([this, callback] {
           if (this->running_) {
-            callback();
+            callback(current_work_wheel_index_);
           }
         });
       }
@@ -69,12 +69,17 @@ void TimingWheel::Tick() {
 }
 
 void TimingWheel::AddTask(const std::shared_ptr<TimerTask>& task) {
+  AddTask(task, current_work_wheel_index_);
+}
+
+void TimingWheel::AddTask(const std::shared_ptr<TimerTask>& task,
+                          const uint64_t current_work_wheel_index) {
   if (!running_) {
     Start();
   }
 
   auto work_wheel_index =
-      current_work_wheel_index_ + task->next_fire_duration_ms;
+      current_work_wheel_index + task->next_fire_duration_ms;
   if (work_wheel_index >= WORK_WHEEL_SIZE) {
     auto real_work_wheel_index = GetWorkWheelIndex(work_wheel_index);
     task->remainder_interval_ms = real_work_wheel_index;
