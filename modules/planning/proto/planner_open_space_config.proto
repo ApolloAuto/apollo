@@ -31,7 +31,6 @@ message PlannerOpenSpaceConfig {
   optional double max_position_error_to_end_point = 7 [default = 0.5];
   optional double max_theta_error_to_end_point = 8 [default = 0.2];
   optional double is_near_destination_threshold = 9 [default = 0.001];
-  optional PiecewiseJerkSpeedConfig s_curve_config = 10;
 }
 
 message ROIConfig {
@@ -57,6 +56,7 @@ message WarmStartConfig {
   // Grid a star for heuristic
   optional double grid_a_star_xy_resolution = 15 [default = 0.1];
   optional double node_radius = 16 [default = 0.5];
+  optional PiecewiseJerkSpeedConfig s_curve_config = 17;
 }
 
 message DualVariableWarmStartConfig {
