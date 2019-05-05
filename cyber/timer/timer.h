@@ -83,6 +83,7 @@ class Timer {
   TimingWheel* timing_wheel_ = nullptr;
   std::shared_ptr<TimerTask> task_;
   std::atomic<bool> started_ = {false};
+  int64_t accumulated_error_ns_ = 0;
 };
 
 }  // namespace cyber
