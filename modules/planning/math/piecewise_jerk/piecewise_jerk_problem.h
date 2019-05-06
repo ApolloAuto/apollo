@@ -80,6 +80,10 @@ class PiecewiseJerkProblem {
     x_end_ = x_end;
   }
 
+  void SetRefX(std::vector<double> x_ref);
+
+  void SetDirivativePenalty(std::vector<double> penalty_dx);
+
   void SetZeroOrderBounds(std::vector<std::pair<double, double>> x_bounds);
 
   void SetFirstOrderBounds(std::vector<std::pair<double, double>> dx_bounds);
