@@ -56,10 +56,6 @@ cc_library(
     hdrs = [
         "tl_preprocessor.h",
     ],
-    linkopts = [
-        "-lboost_thread",
-        "-lboost_system",
-    ],
     deps = [
         ":multi_camera_projection",
         "//cyber",
@@ -70,6 +66,7 @@ cc_library(
         "//modules/perception/camera/lib/interface:base_init_options",
         "//modules/perception/lib/config_manager",
         "//modules/perception/lib/utils",
+        "@boost",
         "@eigen",
     ],
 )

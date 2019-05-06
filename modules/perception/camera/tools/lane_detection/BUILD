@@ -22,11 +22,6 @@ cc_binary(
     srcs = [
         "lane_denseline_eval.cc",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     deps = [
         ":lane_common",
         "//cyber",
@@ -38,6 +33,7 @@ cc_binary(
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/common/io:io_util",
+        "@opencv",
     ],
 )
 

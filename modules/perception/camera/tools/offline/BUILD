@@ -10,14 +10,10 @@ cc_library(
     hdrs = [
         "visualizer.h",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     deps = [
         ":transform_server",
         "//modules/perception/camera/common",
+        "@opencv",
     ],
 )
 
@@ -43,12 +39,6 @@ cc_binary(
     srcs = [
         "offline_obstacle_pipeline.cc",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-        "-lboost_system",
-    ],
     deps = [
         ":transform_server",
         ":visualizer",
@@ -58,6 +48,8 @@ cc_binary(
         "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/lib/utils",
+        "@boost",
+        "@opencv",
     ],
 )
 
