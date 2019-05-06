@@ -31,6 +31,7 @@
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path_boundary.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
 namespace apollo {
@@ -149,7 +150,7 @@ Status PathBoundsDecider::Process(
         blocking_obstacle_id);
   }
 
-  // Remove redundant boundaries
+  // Remove redundant boundaries.
   RemoveRedundantPathBoundaries(&candidate_path_boundaries);
 
   // Success
@@ -277,29 +278,26 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 bool PathBoundsDecider::SearchPullOverPosition(
     const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
-    std::tuple<double, double, double>* const pull_over_position) {
+    std::tuple<double, double, double>* const pull_over_configuration) {
   double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
   double destination_s =
       reference_line_info.SDistanceToDestination() + adc_end_s;
   // Check if destination is some distance away from ADC.
-  double destination_to_adc_buffer = 10.0;
-  if (destination_s - adc_end_s < destination_to_adc_buffer) {
+  if (destination_s - adc_end_s < FLAGS_destination_to_adc_buffer) {
     AWARN << "Destination is too close to ADC.";
     return false;
   }
   // Check if destination is within path-bounds searching scope.
-  double destination_to_pathend_buffer = 10.0;
-  if (destination_s + destination_to_pathend_buffer >=
+  if (destination_s + FLAGS_destination_to_pathend_buffer >=
       std::get<0>(path_bound.back())) {
     AWARN << "Destination is not within path-bounds searching scope.";
     return false;
   }
 
   // Search for a feasible location for pull-over.
-  double road_edge_buffer = 0.15;
-  double pull_over_space_length =
+  const double pull_over_space_length =
       VehicleConfigHelper::GetConfig().vehicle_param().length() * 2.0;
-  double adc_half_width =
+  const double adc_half_width =
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   int i = static_cast<int>(path_bound.size()) - 1;
   // 1. Locate the first point before destination.
@@ -319,7 +317,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
       reference_line_info.reference_line().GetLaneWidth(
           curr_s, &curr_lane_left_width, &curr_lane_right_width);
       if (std::fabs(curr_right_bound + adc_half_width -
-              curr_lane_right_width) > road_edge_buffer) {
+              curr_lane_right_width) > FLAGS_pull_over_road_edge_buffer) {
         ADEBUG << "Not close enough to lane-edge -> "
                << "Not feasible for pull-over.";
         is_feasible_window = false;
@@ -356,13 +354,14 @@ bool PathBoundsDecider::SearchPullOverPosition(
 
       const auto& reference_point =
           reference_line.GetReferencePoint(pull_over_s);
-      double pull_over_phi = reference_point.heading();
+      double pull_over_theta = reference_point.heading();
 
-      std::get<0>(*pull_over_position) = pull_over_x;
-      std::get<1>(*pull_over_position) = pull_over_y;
-      std::get<2>(*pull_over_position) = pull_over_phi;
+      std::get<0>(*pull_over_configuration) = pull_over_x;
+      std::get<1>(*pull_over_configuration) = pull_over_y;
+      std::get<2>(*pull_over_configuration) = pull_over_theta;
       break;
     }
+    --i;
   }
 
   return has_a_feasible_window;
