@@ -6,13 +6,9 @@ cc_library(
     name = "decider",
     srcs = [
         "decider_creep.cc",
-        "side_pass_path_decider.cc",
-        "side_pass_safety.cc",
     ],
     hdrs = [
         "decider_creep.h",
-        "side_pass_path_decider.h",
-        "side_pass_safety.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
@@ -169,19 +165,6 @@ cc_test(
     ],
     deps = [
         ":open_space_roi_decider",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "side_pass_decider_test",
-    size = "small",
-    srcs = [
-        "side_pass_path_decider_test.cc",
-        "side_pass_safety_test.cc",
-    ],
-    deps = [
-        ":decider",
         "@gtest//:main",
     ],
 )

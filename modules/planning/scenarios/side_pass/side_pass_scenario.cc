@@ -29,13 +29,7 @@
 #include "modules/planning/common/obstacle_blocking_analyzer.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/scenarios/side_pass/stage_approach_obstacle.h"
-#include "modules/planning/scenarios/side_pass/stage_backup.h"
-#include "modules/planning/scenarios/side_pass/stage_detect_safety.h"
-#include "modules/planning/scenarios/side_pass/stage_generate_path.h"
-#include "modules/planning/scenarios/side_pass/stage_pass_obstacle.h"
 #include "modules/planning/scenarios/side_pass/stage_side_pass.h"
-#include "modules/planning/scenarios/side_pass/stage_stop_on_wait_point.h"
 
 namespace apollo {
 namespace planning {
@@ -59,36 +53,6 @@ void SidePassScenario::RegisterStages() {
       ScenarioConfig::SIDE_PASS_DEFAULT_STAGE,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
         return new StageSidePass(config);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::SIDE_PASS_APPROACH_OBSTACLE,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageApproachObstacle(config);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::SIDE_PASS_DETECT_SAFETY,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageDetectSafety(config);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::SIDE_PASS_GENERATE_PATH,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageGeneratePath(config);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::SIDE_PASS_STOP_ON_WAITPOINT,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageStopOnWaitPoint(config);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::SIDE_PASS_PASS_OBSTACLE,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StagePassObstacle(config);
-      });
-  s_stage_factory_.Register(
-      ScenarioConfig::SIDE_PASS_BACKUP,
-      [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new StageBackup(config);
       });
 }
 
