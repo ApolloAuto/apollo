@@ -89,13 +89,8 @@ void Fem1dQpProblem::CalculateOffset(std::vector<c_float>* q) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   q->resize(kNumParam);
-  for (int i = 0; i < kNumParam; ++i) {
-    if (i < N) {
-      q->at(i) = -1.0 * weight_.x_ref_w *
-                 (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
-    } else {
-      q->at(i) = 0.0;
-    }
+  for (int i = 0; i < N; ++i) {
+    q->at(i) += -2.0 * weight_.x_ref_w * x_ref_[i];
   }
 }
 
