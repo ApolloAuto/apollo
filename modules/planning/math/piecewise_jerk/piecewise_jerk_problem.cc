@@ -429,17 +429,12 @@ void PiecewiseJerkProblem::CalculateOffset(std::vector<c_float>* q) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   q->resize(kNumParam);
-  for (int i = 0; i < kNumParam; ++i) {
-    if (i < N) {
-      q->at(i) = -1.0 * weight_.x_ref_w *
-                 (std::get<0>(x_bounds_[i]) + std::get<1>(x_bounds_[i]));
-    } else {
-      q->at(i) = 0.0;
-    }
+  for (int i = 0; i < N; ++i) {
+    q->at(i) += -2.0 * weight_.x_ref_w * x_ref_[i];
   }
-  q->at(N - 1) = -2.0 * weight_.x_w * x_end_[0];
-  q->at(N * 2 - 1) = -2.0 * weight_.x_derivative_w * x_end_[1];
-  q->at(N * 3 - 1) = -2.0 * weight_.x_second_order_derivative_w * x_end_[2];
+  q->at(N - 1) += -2.0 * weight_.x_w * x_end_[0];
+  q->at(N * 2 - 1) += -2.0 * weight_.x_derivative_w * x_end_[1];
+  q->at(N * 3 - 1) += -2.0 * weight_.x_second_order_derivative_w * x_end_[2];
 }
 
 }  // namespace planning
