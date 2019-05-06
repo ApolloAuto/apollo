@@ -181,12 +181,9 @@ cc_library(
     hdrs = [
         "file.h",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
     deps = [
         "//cyber/common:file",
+        "@boost",
     ],
 )
 

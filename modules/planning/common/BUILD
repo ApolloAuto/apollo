@@ -10,11 +10,9 @@ cc_library(
     copts = [
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
-    linkopts = [
-        "-lboost_thread",
-    ],
     deps = [
         "//modules/common/util:map_util",
+        "@boost",
     ],
 )
 
