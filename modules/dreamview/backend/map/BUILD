@@ -10,15 +10,13 @@ cc_library(
     hdrs = [
         "map_service.h",
     ],
-    linkopts = [
-        "-lboost_thread",
-    ],
     deps = [
         "//modules/common/util:json_util",
         "//modules/dreamview/proto:simulation_world_proto",
         "//modules/map/hdmap:hdmap_util",
         "//modules/map/pnc_map",
         "//third_party/json",
+        "@boost",
         "@glog",
     ],
 )
