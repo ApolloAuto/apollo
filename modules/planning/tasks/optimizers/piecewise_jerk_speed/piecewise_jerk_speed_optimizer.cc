@@ -163,8 +163,8 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     dx_bounds.emplace_back(curr_t, v_lower_bound,
                            std::fmax(v_upper_bound, 0.0));
   }
-  path_time_qp->SetRefX(x_ref);
-  path_time_qp->SetDirivativePenalty(penalty_dx);
+  path_time_qp->SetZeroOrderReference(x_ref);
+  path_time_qp->SetFirstOrderPenalty(penalty_dx);
   path_time_qp->SetVariableDerivativeBounds(dx_bounds);
 
   // Sovle the problem
