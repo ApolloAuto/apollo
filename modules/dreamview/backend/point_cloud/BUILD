@@ -10,9 +10,6 @@ cc_library(
     hdrs = [
         "point_cloud_updater.h",
     ],
-    linkopts = [
-        "-lboost_thread",
-    ],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -22,6 +19,7 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/localization/proto:localization_proto",
         "//third_party/json",
+        "@boost",
         "@com_google_protobuf//:protobuf",
         "@pcl",
         "@yaml_cpp//:yaml",

@@ -63,9 +63,6 @@ cc_library(
         "simulation_world_updater.h",
     ],
     copts = ['-DMODULE_NAME=\\"dreamview\\"'],
-    linkopts = [
-        "-lboost_thread",
-    ],
     deps = [
         ":simulation_world_service",
         "//modules/common/util:map_util",
@@ -74,6 +71,7 @@ cc_library(
         "//modules/dreamview/backend/handlers:websocket_handler",
         "//modules/dreamview/backend/map:map_service",
         "//modules/dreamview/backend/sim_control",
+        "@boost",
     ],
 )
 
