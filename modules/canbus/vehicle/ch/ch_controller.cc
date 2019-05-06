@@ -14,6 +14,7 @@ limitations under the License.
 ==============================================================================*/
 
 #include "modules/canbus/vehicle/ch/ch_controller.h"
+
 #include "cyber/common/log.h"
 #include "modules/canbus/vehicle/ch/ch_message_manager.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
@@ -361,8 +362,8 @@ void ChController::Brake(double pedal) {
 // drive with old acceleration
 // gas:0.00~99.99 unit:
 void ChController::Throttle(double pedal) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -402,31 +403,11 @@ void ChController::Steer(double angle, double angle_spd) {
   steer_command_112_->set_steer_angle_cmd(real_angle);
 }
 
-void ChController::SetEpbBreak(const ControlCommand& command) {
-  if (command.parking_brake()) {
-    // None
-  } else {
-    // None
-  }
-}
+void ChController::SetEpbBreak(const ControlCommand& command) {}
 
-void ChController::SetBeam(const ControlCommand& command) {
-  if (command.signal().high_beam()) {
-    // None
-  } else if (command.signal().low_beam()) {
-    // None
-  } else {
-    // None
-  }
-}
+void ChController::SetBeam(const ControlCommand& command) {}
 
-void ChController::SetHorn(const ControlCommand& command) {
-  if (command.signal().horn()) {
-    // None
-  } else {
-    // None
-  }
-}
+void ChController::SetHorn(const ControlCommand& command) {}
 
 void ChController::SetTurningSignal(const ControlCommand& command) {}
 
