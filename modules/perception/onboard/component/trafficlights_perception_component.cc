@@ -16,6 +16,7 @@
 #include "modules/perception/onboard/component/trafficlights_perception_component.h"
 
 #include <boost/algorithm/string.hpp>
+#include <opencv2/core/cvstd.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -953,7 +954,7 @@ void TrafficLightsPerceptionComponent::Visualize(
     const camera::CameraFrame& frame,
     const std::vector<base::TrafficLightPtr>& lights) const {
   char str[100];
-  cv::string tl_string;
+  std::string tl_string;
   cv::Scalar tl_color;
 
   if (lights.empty()) {
