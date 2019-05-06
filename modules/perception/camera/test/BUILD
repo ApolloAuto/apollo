@@ -9,10 +9,7 @@ cc_test(
         "camera_app_obstacle_camera_perception_test.cc",
     ],
     linkopts = [
-        "-lopencv_core",
         "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//modules/perception/camera/app:obstacle_camera_perception",
@@ -22,6 +19,7 @@ cc_test(
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
+        "@opencv",
         "@tensorrt",
         "@yaml_cpp//:yaml",
     ],
@@ -33,10 +31,7 @@ cc_test(
 #        "camera_app_traffic_light_camera_perception_test.cc",
 #    ],
 #    linkopts = [
-#        "-lopencv_core",
 #        "-lnvinfer_plugin",
-#        "-lopencv_imgproc",
-#        "-lopencv_highgui",
 #    ],
 #    deps = [
 #        "//modules/perception/camera/app:traffic_light_camera_perception",
@@ -44,6 +39,7 @@ cc_test(
 #        "//modules/perception/inference/operators:perception_inference_operators",
 #        "@caffe",
 #        "@com_google_protobuf//:protobuf",
+#        "@opencv",
 #        "@tensorrt",
 #        "@gtest//:main",
 #        "@yaml_cpp//:yaml",
@@ -78,10 +74,7 @@ cc_test(
         "camera_common_data_provider_test.cc",
     ],
     linkopts = [
-        "-lopencv_core",
         "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         ":camera_common_io_util",
@@ -92,6 +85,7 @@ cc_test(
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
+        "@opencv",
         "@tensorrt",
         "@yaml_cpp//:yaml",
     ],
@@ -104,10 +98,7 @@ cc_test(
         "camera_common_twod_threed_util_test.cc",
     ],
     linkopts = [
-        "-lopencv_core",
         "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//modules/perception/camera/common:twod_threed_util",
@@ -117,6 +108,7 @@ cc_test(
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
+        "@opencv",
         "@tensorrt",
         "@yaml_cpp//:yaml",
     ],
@@ -130,14 +122,10 @@ cc_library(
     hdrs = [
         "camera_common_undistortion.h",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//modules/perception/base",
+        "@boost",
+        "@opencv",
         "@yaml_cpp//:yaml",
     ],
 )
@@ -148,10 +136,7 @@ cc_library(
 #        "camera_common_undistortion_handler_test.cc",
 #    ],
 #    linkopts = [
-#        "-lopencv_core",
 #        "-lnvinfer_plugin",
-#        "-lopencv_imgproc",
-#        "-lopencv_highgui",
 #    ],
 #    deps = [
 #        "//modules/perception/camera/common:undistortion_handler",
@@ -160,6 +145,7 @@ cc_library(
 #        "//modules/perception/lib/utils:utils",
 #        "@caffe",
 #        "@com_google_protobuf//:protobuf",
+#        "@opencv",
 #        "@tensorrt",
 #        "@gtest//:main",
 #        "@yaml_cpp//:yaml",
@@ -174,10 +160,7 @@ cc_test(
         "camera_common_util_test.cc",
     ],
     linkopts = [
-        "-lopencv_core",
         "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         ":camera_common_io_util",
@@ -190,6 +173,7 @@ cc_test(
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
+        "@opencv",
         "@tensorrt",
         "@yaml_cpp//:yaml",
     ],
@@ -202,10 +186,7 @@ cc_test(
         "camera_common_veh_template_test.cc",
     ],
     linkopts = [
-        "-lopencv_core",
         "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//modules/perception/camera/common:object_template_manager",
@@ -214,6 +195,7 @@ cc_test(
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
+        "@opencv",
         "@tensorrt",
         "@yaml_cpp//:yaml",
     ],
@@ -256,13 +238,11 @@ cc_library(
     hdrs = [
         "camera_lib_calibrator_laneline_app_util.h",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
+        "@boost",
+        "@opencv",
     ],
 )
 
@@ -274,15 +254,11 @@ cc_library(
     hdrs = [
         "camera_lib_calibrator_laneline_lane_calibrator_util.h",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//modules/perception/common/i_lib/core",
         "//modules/perception/common/i_lib/geometry:i_plane",
         "@eigen",
+        "@opencv",
     ],
 )
 
@@ -307,17 +283,13 @@ cc_library(
 #     srcs = [
 #         "camera_lib_calibrator_laneline_laneline_calibrator_test.cc",
 #     ],
-#     linkopts = [
-#         "-lopencv_core",
-#         "-lopencv_imgproc",
-#         "-lopencv_highgui",
-#     ],
 #     deps = [
 #         ":camera_lib_calibrator_laneline_app_util",
 #         ":camera_lib_calibrator_laneline_lane_calibrator_util",
 #         ":camera_lib_calibrator_laneline_lane_io",
 #         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
 #         "@gtest//:main",
+#         "@opencv",
 #     ]
 # )
 
@@ -368,17 +340,13 @@ cc_test(
     srcs = [
         "camera_lib_lane_common_functions_test.cc",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/lib/lane/common:common_functions",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
+        "@opencv",
         "@yaml_cpp//:yaml",
     ],
 )
@@ -389,17 +357,13 @@ cc_test(
     srcs = [
         "camera_lib_lane_detector_denseline_lane_detector_test.cc",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
+        "@opencv",
     ],
 )
 
@@ -408,11 +372,6 @@ cc_test(
     size = "small",
     srcs = [
         "camera_lib_lane_postprocessor_denseline_lane_postprocessor_test.cc",
-    ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//cyber",
@@ -424,6 +383,7 @@ cc_test(
         "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
+        "@opencv",
     ],
 )
 
@@ -433,17 +393,13 @@ cc_test(
     srcs = [
         "camera_lib_lane_detector_darkscnn_lane_detector_test.cc",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//cyber",
         "//modules/perception/base",
         "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
+        "@opencv",
     ],
 )
 
@@ -452,11 +408,6 @@ cc_test(
     size = "medium",
     srcs = [
         "camera_lib_lane_postprocessor_darkscnn_lane_postprocessor_test.cc",
-    ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//cyber",
@@ -469,6 +420,7 @@ cc_test(
         "//modules/perception/camera/tools/offline:visualizer",
         "//modules/perception/common/io:io_util",
         "@gtest//:main",
+        "@opencv",
     ],
 )
 
@@ -494,17 +446,13 @@ cc_test(
     srcs = [
         "camera_lib_obstacle_detector_yolo_yolo_obstacle_detector_test.cc",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
         "//modules/perception/common/io:io_util",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "@gtest//:main",
+        "@opencv",
         "@yaml_cpp//:yaml",
     ],
 )
@@ -563,11 +511,6 @@ cc_test(
 #     srcs = [
 #         "camera_lib_obstacle_tracker_omt_omt_obstacle_tracker_test.cc",
 #     ],
-#     linkopts = [
-#         "-lopencv_core",
-#         "-lopencv_imgproc",
-#         "-lopencv_highgui",
-#     ],
 #     deps = [
 #         "//cyber",
 #         "//modules/perception/base:base",
@@ -576,6 +519,7 @@ cc_test(
 #         "//modules/perception/common/geometry:common",
 #         "//modules/perception/common/io:io_util",
 #         "@gtest//:main",
+#         "@opencv",
 #         "@yaml_cpp//:yaml",
 #     ]
 # )
@@ -621,11 +565,6 @@ cc_test(
     srcs = [
         "camera_lib_obstacle_transformer_multicue_multicue_obstacle_transformer_test.cc",
     ],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
-    ],
     deps = [
         "//modules/perception/base",
         "//modules/perception/camera/lib/obstacle/detector/yolo:yolo_obstacle_detector",
@@ -635,6 +574,7 @@ cc_test(
         "//modules/perception/inference/utils:inference_resize_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "@gtest//:main",
+        "@opencv",
     ],
 )
 
@@ -645,16 +585,14 @@ cc_test(
         "camera_lib_traffic_light_detector_crop_test.cc",
     ],
     linkopts = [
-        "-lopencv_core",
         "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//modules/perception/camera/lib/traffic_light/detector/detection:cropbox",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
+        "@opencv",
         "@tensorrt",
         "@yaml_cpp//:yaml",
     ],
@@ -666,10 +604,7 @@ cc_test(
 #         "camera_lib_traffic_light_detector_detection_test.cc",
 #     ],
 #     linkopts = [
-#         "-lopencv_core",
 #         "-lnvinfer_plugin",
-#         "-lopencv_imgproc",
-#         "-lopencv_highgui",
 #     ],
 #     deps = [
 #         "//modules/perception/camera/lib/traffic_light/detector/detection:detection",
@@ -677,6 +612,7 @@ cc_test(
 #         "//modules/perception/inference/operators:perception_inference_operators",
 #         "@caffe",
 #         "@com_google_protobuf//:protobuf",
+#         "@opencv",
 #         "@tensorrt",
 #         "@gtest//:main",
 #         "@yaml_cpp//:yaml",
@@ -689,10 +625,7 @@ cc_test(
 #        "camera_lib_traffic_light_detector_recognition_test.cc",
 #    ],
 #    linkopts = [
-#        "-lopencv_core",
 #        "-lnvinfer_plugin",
-#        "-lopencv_imgproc",
-#        "-lopencv_highgui",
 #    ],
 #    deps = [
 #        "//modules/perception/camera/lib/traffic_light/detector/recognition:recognition",
@@ -700,6 +633,7 @@ cc_test(
 #        "//modules/perception/inference/operators:perception_inference_operators",
 #        "@caffe",
 #        "@com_google_protobuf//:protobuf",
+#        "@opencv",
 #        "@tensorrt",
 #        "@gtest//:main",
 #        "@yaml_cpp//:yaml",
@@ -712,10 +646,7 @@ cc_test(
         "camera_lib_traffic_light_detector_select_test.cc",
     ],
     linkopts = [
-        "-lopencv_core",
         "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//modules/perception/camera/lib/traffic_light/detector/detection:select",
@@ -724,6 +655,7 @@ cc_test(
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
+        "@opencv",
         "@tensorrt",
         "@yaml_cpp//:yaml",
     ],
@@ -736,10 +668,7 @@ cc_test(
 #        "camera_lib_traffic_light_preprocessor_test.cc",
 #    ],
 #    linkopts = [
-#        "-lopencv_core",
 #        "-lnvinfer_plugin",
-#        "-lopencv_imgproc",
-#        "-lopencv_highgui",
 #    ],
 #    deps = [
 #        "//modules/perception/camera/lib/traffic_light/preprocessor:tl_preprocessor",
@@ -748,8 +677,9 @@ cc_test(
 #        "//modules/perception/inference/operators:perception_inference_operators",
 #        "@caffe",
 #        "@com_google_protobuf//:protobuf",
-#        "@tensorrt",
 #        "@gtest//:main",
+#        "@opencv",
+#        "@tensorrt",
 #        "@yaml_cpp//:yaml",
 #    ]
 #)
@@ -761,10 +691,7 @@ cc_test(
         "camera_lib_traffic_light_tracker_test.cc",
     ],
     linkopts = [
-        "-lopencv_core",
         "-lnvinfer_plugin",
-        "-lopencv_imgproc",
-        "-lopencv_highgui",
     ],
     deps = [
         "//cyber",
@@ -776,6 +703,7 @@ cc_test(
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@gtest//:main",
+        "@opencv",
         "@tensorrt",
         "@yaml_cpp//:yaml",
     ],

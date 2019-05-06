@@ -62,7 +62,7 @@ cc_library(
         "entropy_calibrator.h",
         "rt_net.h",
     ],
-    linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
+    linkopts = ["-lnvinfer_plugin"],
     deps = [
         ":batch_stream",
         ":entropy_calibrator",
@@ -75,6 +75,7 @@ cc_library(
         "//modules/perception/proto:rt_proto",
         "@caffe",
         "@com_google_protobuf//:protobuf",
+        "@opencv",
         "@tensorrt",
     ],
 )
@@ -98,13 +99,14 @@ cc_library(
     hdrs = [
         "entropy_calibrator.h",
     ],
-    linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
+    linkopts = ["-lnvinfer_plugin"],
     deps = [
         ":batch_stream",
         ":rt_utils",
         "@caffe",
         "@com_google_protobuf//:protobuf",
         "@cuda",
+        "@opencv",
         "@tensorrt",
     ],
 )
@@ -130,12 +132,13 @@ cc_library(
     hdrs = [
         "batch_stream.h",
     ],
-    linkopts = ["-lopencv_core -lnvinfer_plugin -lopencv_imgproc -lopencv_highgui"],
+    linkopts = ["-lnvinfer_plugin"],
     deps = [
         "//cyber",
         "//modules/perception/proto:rt_proto",
         "@caffe",
         "@com_google_protobuf//:protobuf",
+        "@opencv",
         "@tensorrt",
     ],
 )
