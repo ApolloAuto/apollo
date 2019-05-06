@@ -28,7 +28,6 @@
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_node.h"
 #include "modules/localization/msf/local_map/ndt_map/ndt_map_pool.h"
 
-
 namespace apollo {
 namespace localization {
 namespace ndt {
