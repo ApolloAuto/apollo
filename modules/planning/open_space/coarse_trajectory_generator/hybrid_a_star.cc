@@ -232,12 +232,17 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
   std::vector<double> hybrid_a_x;
   std::vector<double> hybrid_a_y;
   std::vector<double> hybrid_a_phi;
+  std::vector<bool> hybrid_a_gear;
   while (current_node->GetPreNode() != nullptr) {
     std::vector<double> x = current_node->GetXs();
     std::vector<double> y = current_node->GetYs();
     std::vector<double> phi = current_node->GetPhis();
     if (x.empty() || y.empty() || phi.empty()) {
       AERROR << "result size check failed";
+      return false;
+    }
+    if (x.size() != y.size() || x.size() != phi.size()) {
+      AERROR << "states sizes are not equal";
       return false;
     }
     std::reverse(x.begin(), x.end());
@@ -249,17 +254,25 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
     hybrid_a_x.insert(hybrid_a_x.end(), x.begin(), x.end());
     hybrid_a_y.insert(hybrid_a_y.end(), y.begin(), y.end());
     hybrid_a_phi.insert(hybrid_a_phi.end(), phi.begin(), phi.end());
+
+    size_t node_step_size = x.size();
+    for (size_t i = 0; i < node_step_size; ++i) {
+      hybrid_a_gear.push_back(current_node->GetDirec());
+    }
     current_node = current_node->GetPreNode();
   }
   hybrid_a_x.push_back(current_node->GetX());
   hybrid_a_y.push_back(current_node->GetY());
   hybrid_a_phi.push_back(current_node->GetPhi());
+  hybrid_a_gear.push_back(current_node->GetDirec());
   std::reverse(hybrid_a_x.begin(), hybrid_a_x.end());
   std::reverse(hybrid_a_y.begin(), hybrid_a_y.end());
   std::reverse(hybrid_a_phi.begin(), hybrid_a_phi.end());
+  std::reverse(hybrid_a_gear.begin(), hybrid_a_gear.end());
   (*result).x = hybrid_a_x;
   (*result).y = hybrid_a_y;
   (*result).phi = hybrid_a_phi;
+  (*result).gear = hybrid_a_gear;
 
   if (FLAGS_use_s_curve_speed_smooth) {
     if (!GenerateSCurveSpeedAcceleration(result)) {
