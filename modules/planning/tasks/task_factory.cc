@@ -30,8 +30,6 @@
 #include "modules/planning/tasks/deciders/path_assessment_decider.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
-#include "modules/planning/tasks/deciders/side_pass_path_decider.h"
-#include "modules/planning/tasks/deciders/side_pass_safety.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
@@ -89,10 +87,6 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new QpSplinePathOptimizer(config);
                          });
-  task_factory_.Register(TaskConfig::SIDE_PASS_PATH_DECIDER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new SidePassPathDecider(config);
-                         });
   task_factory_.Register(TaskConfig::DP_POLY_PATH_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new DpPolyPathOptimizer(config);
@@ -113,7 +107,6 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new QpPiecewiseJerkPathOptimizer(config);
                          });
-
   task_factory_.Register(TaskConfig::PROCEED_WITH_CAUTION_SPEED,
                          [](const TaskConfig& config) -> Task* {
                            return new ProceedWithCautionSpeedGenerator(config);
@@ -125,10 +118,6 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::OPEN_SPACE_PRE_STOP_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new OpenSpacePreStopDecider(config);
-                         });
-  task_factory_.Register(TaskConfig::SIDE_PASS_SAFETY,
-                         [](const TaskConfig& config) -> Task* {
-                           return new SidePassSafety(config);
                          });
   task_factory_.Register(TaskConfig::DECIDER_RSS,
                          [](const TaskConfig& config) -> Task* {
