@@ -154,7 +154,12 @@ void MessageProcess::OnPerception(
         continue;
       } else if (!obstacle_ptr->latest_feature().IsInitialized()) {
         AERROR << "Obstacle [" << id << "] has no latest feature.";
-        return;
+        continue;
+      }
+      for (const auto& adc_trajectory_point :
+           ptr_ego_trajectory_container->adc_trajectory().trajectory_point()) {
+        obstacle_ptr->mutable_latest_feature()->add_adc_trajectory_point()
+                    ->CopyFrom(adc_trajectory_point);
       }
       FeatureOutput::InsertFeatureProto(obstacle_ptr->latest_feature());
       ADEBUG << "Insert feature into feature output";
