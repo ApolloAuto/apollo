@@ -39,17 +39,13 @@ cc_test(
     data = [
         ":localization_msf_local_map_test_data",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-        "-lboost_program_options",
-    ],
     deps = [
         "//cyber",
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "//modules/localization/msf/local_map/lossless_map:localization_msf_lossless_map",
         "//modules/localization/msf/local_map/lossy_map:localization_msf_lossy_map",
+        "@boost",
         "@gtest//:main",
     ],
 )
