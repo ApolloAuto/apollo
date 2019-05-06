@@ -104,6 +104,19 @@ bool PiecewiseJerkProblem::OptimizeWithOsqp(
   return true;
 }
 
+void PiecewiseJerkProblem::SetRefX(std::vector<double> x_ref) {
+  if (x_ref.size() == num_of_knots_) {
+    x_ref_ = std::move(x_ref);
+  }
+}
+
+void PiecewiseJerkProblem::SetDirivativePenalty(
+    std::vector<double> penalty_dx) {
+  if (penalty_dx.size() == num_of_knots_) {
+    penalty_dx_ = std::move(penalty_dx);
+  }
+}
+
 void PiecewiseJerkProblem::SetZeroOrderBounds(
     std::vector<std::pair<double, double>> x_bounds) {
   CHECK_EQ(x_bounds.size(), num_of_knots_);
