@@ -473,6 +473,21 @@ DEFINE_bool(use_s_curve_speed_smooth, false,
             "Whether use s-curve (piecewise_jerk) for smoothing Hybrid Astar "
             "speed/acceleration.");
 
+// pull-over
+DEFINE_double(destination_to_adc_buffer, 10.0,
+              "If the destination is within this distance from ADC, "
+              "then don't search for pull-over position.");
+
+DEFINE_double(destination_to_pathend_buffer, 10.0,
+              "If the destination is within this distance to path-end, "
+              "then don't search for pull-over position. Wait until "
+              "destination gets closer.");
+
+DEFINE_double(pull_over_road_edge_buffer, 0.15,
+              "If the available path boundary's edge is not within this "
+              "distance from the road edge, then this position is not "
+              "qualified for being a pull-over position.");
+
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
