@@ -2,7 +2,7 @@ licenses(["notice"])
 
 package(default_visibility = ["//visibility:public"])
 
-# This assumes you have pcl 1.7 pre-installed in your system.
+# This assumes you have pcl 1.9 pre-installed in your system.
 cc_library(
     name = "pcl",
     defines = ["PCL_NO_PRECOMPILE"],

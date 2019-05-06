@@ -78,13 +78,13 @@ new_local_repository(
     path = "/home/tmp/ros",
 )
 
-# PCL 1.7
+# PCL 1.9
 # =======
 # This requires libpcl-dev to be installed in your Ubuntu/Debian.
 new_local_repository(
     name = "pcl",
     build_file = "third_party/pcl.BUILD",
-    path = "/usr/local/include/pcl-1.7",
+    path = "/usr/local/include/pcl-1.9",
 )
 
 new_local_repository(
