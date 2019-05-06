@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+import sys
 import json
 import numpy as np
 from shapely.geometry import LineString, Point
@@ -117,6 +118,11 @@ class PlannigAnalyzer:
         self.bag_start_time_t = None
         self.print_acc = arguments.showacc
 
+        self.rl_is_offroad_cnt = 0
+        self.rl_minimum_boundary = sys.float_info.max
+        self.rl_avg_kappa_list = []
+        self.rl_avg_dkappa_list = []
+
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
         if not self.is_sim:
@@ -139,6 +145,17 @@ class PlannigAnalyzer:
 
         if self.is_sim:
             self.latency_list.append(adc_trajectory.latency_stats.total_time_ms)
+
+            for ref_line_debug in adc_trajectory.debug.planning_data.reference_line:
+                if ref_line_debug.HasField("is_offroad") and ref_line_debug.is_offroad:
+                    self.rl_is_offroad_cnt += 1
+                if ref_line_debug.HasField("minimum_boundary") and \
+                    ref_line_debug.minimum_boundary < self.rl_minimum_boundary:
+                    self.rl_minimum_boundary = ref_line_debug.minimum_boundary
+                if ref_line_debug.HasField("average_kappa"):
+                    self.rl_avg_kappa_list.append(abs(ref_line_debug.average_kappa))
+                if ref_line_debug.HasField("average_dkappa"):
+                    self.rl_avg_dkappa_list.append(abs(ref_line_debug.average_dkappa))
 
             if not adc_trajectory.debug.planning_data.HasField('init_point'):
                 return
@@ -384,6 +401,23 @@ class PlannigAnalyzer:
                 "avg" : np.average(self.latency_list)
             }
 
+        # reference line
+        average_kappa = 0
+        if len(self.rl_avg_kappa_list) > 0:
+            average_kappa = np.average(self.rl_avg_kappa_list)
+        average_dkappa = 0
+        if len(self.rl_avg_dkappa_list) > 0:
+            average_dkappa = np.average(self.rl_avg_dkappa_list)
+        if self.rl_minimum_boundary > 999:
+            self.rl_minimum_boundary = 0
+        v2_results["reference_line"] = {
+            "is_offroad" : self.rl_is_offroad_cnt,
+            "minimum_boundary" : self.rl_minimum_boundary,
+            "average_kappa" : average_kappa,
+            "average_dkappa" : average_dkappa
+        }
+
+        # output final reuslts
         print json.dumps(v2_results)
 
     def plot_path(self, plt, adc_trajectory):
