@@ -237,6 +237,11 @@ DECLARE_uint32(open_space_trajectory_stitching_preserved_length);
 DECLARE_bool(enable_smoother_failsafe);
 DECLARE_bool(use_s_curve_speed_smooth);
 
+// pull-over
+DECLARE_double(destination_to_adc_buffer);
+DECLARE_double(destination_to_pathend_buffer);
+DECLARE_double(pull_over_road_edge_buffer);
+
 DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
