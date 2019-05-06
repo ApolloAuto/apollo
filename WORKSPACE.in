@@ -257,3 +257,10 @@ new_local_repository(
     build_file = "third_party/pytorch_gpu.BUILD",
     path = "/usr/local/apollo/libtorch_gpu",
 )
+
+# boost
+new_local_repository(
+    name = "boost",
+    build_file = "third_party/boost.BUILD",
+    path = "/usr/local/apollo/boost/include",
+)
