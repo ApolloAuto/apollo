@@ -6,12 +6,9 @@ cc_library(
     name = "localization_msf_common_util_compression",
     srcs = ["compression.cc"],
     hdrs = ["compression.h"],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
     deps = [
         "//cyber",
+        "@boost",
         "@eigen",
     ],
 )
@@ -20,12 +17,9 @@ cc_library(
     name = "localization_msf_common_util_system_utility",
     srcs = ["system_utility.cc"],
     hdrs = ["system_utility.h"],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
     deps = [
         "//cyber",
+        "@boost",
         "@eigen",
     ],
 )
@@ -50,12 +44,9 @@ cc_library(
         "time_conversion.h",
         "voxel_grid_covariance_hdmap.h",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-    ],
     deps = [
         "//cyber",
+        "@boost",
         "@eigen",
     ],
 )

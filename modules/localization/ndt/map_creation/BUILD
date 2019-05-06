@@ -8,9 +8,10 @@ cc_binary(
         "ndt_map_creator.cc",
     ],
     linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-        "-lboost_program_options",
+        "-lopencv_core",
+        "-lopencv_highgui",
+        "-lopencv_imgproc",
+	"-lopencv_imgcodecs"
     ],
     linkstatic = 0,
     deps = [
@@ -19,6 +20,7 @@ cc_binary(
         "//modules/localization/msf/common/util:localization_msf_common_util",
         "//modules/localization/msf/local_map/base_map:localization_msf_base_map",
         "//modules/localization/msf/local_map/ndt_map:localization_msf_ndt_map",
+        "@boost",
         "@eigen",
         "@pcl",
     ],

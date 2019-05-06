@@ -14,11 +14,6 @@ cc_library(
         "-O2",
         "-DMODULE_NAME=\\\"localization_visualizer\\\"",
     ],
-    linkopts = [
-        "-lboost_filesystem",
-        "-lboost_system",
-        "-lboost_program_options",
-    ],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
@@ -33,6 +28,7 @@ cc_library(
         "//modules/localization/msf/local_tool/local_visualization/engine",
         "//modules/localization/proto:localization_config_proto",
         "//modules/localization/proto:localization_proto",
+        "@boost",
         "@eigen",
         "@pcl",
     ],

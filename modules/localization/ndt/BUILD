@@ -33,6 +33,7 @@ cc_library(
         "//modules/localization/proto:localization_proto",
         "//modules/transform:tf2_buffer_lib",
         "//modules/transform:transform_broadcaster_lib",
+        "@boost",
         "@eigen",
         "@glog",
         "@yaml_cpp//:yaml",
