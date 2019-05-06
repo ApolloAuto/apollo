@@ -93,9 +93,6 @@ void PathTimeQpProblem::CalculateOffset(std::vector<c_float>* q) {
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   q->resize(kNumParam);
-  for (int i = 0; i < kNumParam; ++i) {
-    q->at(i) = 0.0;
-  }
   for (int i = 0; i < N; ++i) {
     q->at(i) += -2.0 * weight_.x_ref_w * x_ref_[i];
     q->at(N + i) += -2.0 * weight_.x_derivative_w * x_derivative_desire;
