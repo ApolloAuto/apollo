@@ -394,7 +394,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
   path_time_qp->SetDesireDerivative(0.0);
 
-  path_time_qp->SetRefX(result->accumulated_s);
+  path_time_qp->SetZeroOrderReference(result->accumulated_s);
 
   // Sovle the problem
   if (!path_time_qp->Optimize()) {
