@@ -160,18 +160,18 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
   double last_x = current_node->GetX();
   double last_y = current_node->GetY();
   double last_phi = current_node->GetPhi();
-  intermediate_x.emplace_back(last_x);
-  intermediate_y.emplace_back(last_y);
-  intermediate_phi.emplace_back(last_phi);
+  intermediate_x.push_back(last_x);
+  intermediate_y.push_back(last_y);
+  intermediate_phi.push_back(last_phi);
   for (size_t i = 0; i < arc / step_size_; ++i) {
-    double next_x = last_x + traveled_distance * std::cos(last_phi);
-    double next_y = last_y + traveled_distance * std::sin(last_phi);
-    double next_phi = common::math::NormalizeAngle(
+    const double next_x = last_x + traveled_distance * std::cos(last_phi);
+    const double next_y = last_y + traveled_distance * std::sin(last_phi);
+    const double next_phi = common::math::NormalizeAngle(
         last_phi +
         traveled_distance / vehicle_param_.wheel_base() * std::tan(steering));
-    intermediate_x.emplace_back(next_x);
-    intermediate_y.emplace_back(next_y);
-    intermediate_phi.emplace_back(next_phi);
+    intermediate_x.push_back(next_x);
+    intermediate_y.push_back(next_y);
+    intermediate_phi.push_back(next_phi);
     last_x = next_x;
     last_y = next_y;
     last_phi = next_phi;
@@ -300,21 +300,21 @@ bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
   }
   const size_t x_size = result->x.size();
   // load velocity from position
-  for (size_t i = 0; i < x_size - 1; ++i) {
-    double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
-                            std::cos(result->phi[i]) +
-                        ((result->y[i + 1] - result->y[i]) / delta_t_) *
-                            std::sin(result->phi[i]);
-    result->v.emplace_back(discrete_v);
+  for (size_t i = 0; i + 1 < x_size; ++i) {
+    const double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
+                                  std::cos(result->phi[i]) +
+                              ((result->y[i + 1] - result->y[i]) / delta_t_) *
+                                  std::sin(result->phi[i]);
+    result->v.push_back(discrete_v);
   }
-  result->v.emplace_back(0.0);
+  result->v.push_back(0.0);
   // load acceleration from velocity
-  for (size_t i = 0; i < x_size - 1; ++i) {
-    double discrete_a = (result->v[i + 1] - result->v[i]) / delta_t_;
-    result->a.emplace_back(discrete_a);
+  for (size_t i = 0; i + 1 < x_size; ++i) {
+    const double discrete_a = (result->v[i + 1] - result->v[i]) / delta_t_;
+    result->a.push_back(discrete_a);
   }
   // load steering from phi
-  for (size_t i = 0; i < x_size - 1; ++i) {
+  for (size_t i = 0; i + 1 < x_size; ++i) {
     double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
                             vehicle_param_.wheel_base() / step_size_;
     if (result->v[i] > 0.0) {
@@ -322,7 +322,7 @@ bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
     } else {
       discrete_steer = std::atan(-discrete_steer);
     }
-    result->steer.emplace_back(discrete_steer);
+    result->steer.push_back(discrete_steer);
   }
   return true;
 }
@@ -339,7 +339,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   std::vector<std::tuple<double, double, double>> s_bounds;
   std::vector<std::tuple<double, double, double>> ds_bounds;
 
-  for (size_t i = 0; i < x_size - 1; ++i) {
+  for (size_t i = 0; i + 1 < x_size; ++i) {
     const double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
                                   std::cos(result->phi[i]) +
                               ((result->y[i + 1] - result->y[i]) / delta_t_) *
@@ -347,8 +347,8 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
     accumulated_s += discrete_v * delta_t_;
 
-    result->v.emplace_back(discrete_v);
-    result->accumulated_s.emplace_back(accumulated_s);
+    result->v.push_back(discrete_v);
+    result->accumulated_s.push_back(accumulated_s);
     s_bounds.emplace_back(static_cast<double>(i) * delta_t_, accumulated_s - 10,
                           accumulated_s + 10);
     ds_bounds.emplace_back(static_cast<double>(i) * delta_t_, discrete_v - 10,
@@ -374,7 +374,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   std::array<double, 3> init_s = {result->accumulated_s[0], result->v[0],
                                   (result->v[1] - result->v[0]) / delta_t_};
 
-  const size_t num_of_knots = static_cast<int>(x_size) - 1;
+  const size_t num_of_knots = x_size - 1;
   // Start a PathTimeQpProblem
   std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
   path_time_qp->InitProblem(num_of_knots, delta_t_, w, init_s);
@@ -408,11 +408,11 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   result->accumulated_s.clear();
   result->accumulated_s = path_time_qp->x();
   result->v = path_time_qp->x_derivative();
-  result->v.emplace_back(0.0);
+  result->v.push_back(0.0);
   result->a = path_time_qp->x_second_order_derivative();
 
   // load steering from phi
-  for (size_t i = 0; i < x_size - 1; ++i) {
+  for (size_t i = 0; i + 1 < x_size; ++i) {
     double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
                             vehicle_param_.wheel_base() / step_size_;
     if (result->v[i] > 0.0) {
@@ -420,7 +420,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
     } else {
       discrete_steer = std::atan(-discrete_steer);
     }
-    result->steer.emplace_back(discrete_steer);
+    result->steer.push_back(discrete_steer);
   }
 
   return true;
