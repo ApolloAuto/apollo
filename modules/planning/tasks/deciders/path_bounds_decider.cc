@@ -108,6 +108,8 @@ Status PathBoundsDecider::Process(
     lane_borrow_info_list = {LaneBorrowInfo::NO_BORROW};
   }
   // Try every possible lane-borrow option:
+  PathBound regular_self_path_bound;
+  bool exist_self_path_bound = false;
   for (const auto& lane_borrow_info : lane_borrow_info_list) {
     PathBound regular_path_bound;
     std::string blocking_obstacle_id = "";
@@ -142,6 +144,8 @@ Status PathBoundsDecider::Process(
         break;
       default:
         path_label = "self";
+        exist_self_path_bound = true;
+        regular_self_path_bound = regular_path_bound;
         break;
     }
     candidate_path_boundaries.back().set_label(
@@ -152,6 +156,24 @@ Status PathBoundsDecider::Process(
 
   // Remove redundant boundaries.
   RemoveRedundantPathBoundaries(&candidate_path_boundaries);
+
+  // If needed, search for pull-over position.
+  if (Decider::config_.path_bounds_decider_config().is_pull_over()) {
+    if (!exist_self_path_bound) {
+      frame->set_pull_over_info(std::make_tuple(false, 0.0, 0.0, 0.0));
+    } else {
+      std::tuple<double, double, double> pull_over_configuration;
+      if (!SearchPullOverPosition(*reference_line_info,
+              regular_self_path_bound, &pull_over_configuration)) {
+        frame->set_pull_over_info(std::make_tuple(false, 0.0, 0.0, 0.0));
+      } else {
+        frame->set_pull_over_info(
+            std::make_tuple(true, std::get<0>(pull_over_configuration),
+                            std::get<1>(pull_over_configuration),
+                            std::get<2>(pull_over_configuration)));
+      }
+    }
+  }
 
   // Success
   reference_line_info->SetCandidatePathBoundaries(candidate_path_boundaries);
@@ -333,6 +355,7 @@ bool PathBoundsDecider::SearchPullOverPosition(
         is_feasible_window = false;
         break;
       }
+      --j;
     }
     if (j < 0) {
       return false;
