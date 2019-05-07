@@ -192,6 +192,7 @@ cc_library(
         "message_process.h",
     ],
     deps = [
+        ":semantic_map",
         "//cyber/common:file",
         "//modules/common/adapters:adapter_gflags",
         "//modules/prediction/evaluator:evaluator_manager",
@@ -219,6 +220,25 @@ cc_test(
     deps = [
         ":prediction_thread_pool",
         "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "semantic_map",
+    srcs = ["semantic_map.cc"],
+    hdrs = ["semantic_map.h"],
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_highgui",
+    ],
+    deps = [
+        ":prediction_gflags",
+        "//cyber/common",
+        "//modules/common/configs:config_gflags",
+        "//modules/common/util",
+        "//modules/prediction/container:container_manager",
+        "//modules/prediction/container/pose:pose_container",
+        "//modules/prediction/proto:feature_proto",
     ],
 )
 
