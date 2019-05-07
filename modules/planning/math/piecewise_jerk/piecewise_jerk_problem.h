@@ -65,18 +65,15 @@ class PiecewiseJerkProblem {
    * -- w[4]: default reference line weight, (x_bounds[k].first +
    * x_bounds[k].second)/2
    */
-  virtual void InitProblem(const size_t num_var, const double delta_s,
-                           const std::array<double, 5>& w,
-                           const std::array<double, 3>& x_init = {0.0, 0.0,
-                                                                  0.0},
-                           const std::array<double, 3>& x_end = {0.0, 0.0,
-                                                                 0.0});
+  virtual void InitProblem(const size_t num_of_knots, const double delta_s,
+                           const std::array<double, 3>& x_init,
+                           const std::array<double, 3>& x_end);
 
-  virtual void ResetInitConditions(const std::array<double, 3>& x_init) {
+  virtual void SetInitCondition(const std::array<double, 3>& x_init) {
     x_init_ = x_init;
   }
 
-  virtual void ResetEndConditions(const std::array<double, 3>& x_end) {
+  virtual void SetEndCondition(const std::array<double, 3>& x_end) {
     x_end_ = x_end;
   }
 
@@ -84,39 +81,46 @@ class PiecewiseJerkProblem {
 
   void SetFirstOrderPenalty(std::vector<double> penalty_dx);
 
+
   void SetZeroOrderBounds(std::vector<std::pair<double, double>> x_bounds);
-
-  void SetFirstOrderBounds(std::vector<std::pair<double, double>> dx_bounds);
-
-  void SetSecondOrderBounds(std::vector<std::pair<double, double>> d2x_bounds);
 
   void SetZeroOrderBounds(const double x_lower_bound,
                           const double x_upper_bound);
 
+  void SetFirstOrderBounds(std::vector<std::pair<double, double>> dx_bounds);
+
   void SetFirstOrderBounds(const double dx_lower_bound,
                            const double dx_upper_bound);
+
+
+  void SetSecondOrderBounds(std::vector<std::pair<double, double>> d2x_bounds);
 
   void SetSecondOrderBounds(const double ddx_lower_bound,
                             const double ddx_upper_bound);
 
   void SetThirdOrderBound(const double dddx_bound) {
-    max_x_third_order_derivative_ = dddx_bound;
+    dddx_bound_ = dddx_bound;
   }
 
-  // x_bounds: tuple(s, lower_bounds, upper_bounds)
-  // s doesn't need to be sorted
-  virtual void SetVariableBounds(
-      const std::vector<std::tuple<double, double, double>>& x_bounds);
+  void set_weight_x(const double weight_x) {
+    weight_x_ = weight_x;
+  }
 
-  // dx_bounds: tuple(s, lower_bounds, upper_bounds)
-  // s doesn't need to be sorted
-  virtual void SetVariableDerivativeBounds(
-      const std::vector<std::tuple<double, double, double>>& dx_bounds);
+  void set_weight_dx(const double weight_dx) {
+    weight_dx_ = weight_dx;
+  }
 
-  // ddx_bounds: tuple(s, lower_bounds, upper_bounds)
-  // s doesn't need to be sorted
-  virtual void SetVariableSecondOrderDerivativeBounds(
-      const std::vector<std::tuple<double, double, double>>& ddx_bounds);
+  void set_weight_ddx(const double weight_ddx) {
+    weight_ddx_ = weight_ddx;
+  }
+
+  void set_weight_dddx(const double weight_dddx) {
+    weight_dddx_ = weight_dddx;
+  }
+
+  void set_weight_x_reference(const double weight_x_reference) {
+    weight_x_reference_ = weight_x_reference;
+  }
 
   virtual bool Optimize(const int max_iter = 4000);
 
@@ -150,10 +154,6 @@ class PiecewiseJerkProblem {
       std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
       OSQPSettings* settings);
 
-  virtual void ProcessBound(
-      const std::vector<std::tuple<double, double, double>>& src,
-      std::vector<std::pair<double, double>>* dst);
-
  protected:
   size_t num_of_knots_ = 0;
 
@@ -166,22 +166,23 @@ class PiecewiseJerkProblem {
   std::array<double, 3> x_end_;
   std::vector<double> x_ref_;
   std::vector<double> penalty_dx_;
+
   std::vector<std::pair<double, double>> x_bounds_;
   std::vector<std::pair<double, double>> dx_bounds_;
   std::vector<std::pair<double, double>> ddx_bounds_;
+  double dddx_bound_ = 0.0;
 
-  struct {
-    double x_w = 0.0;
-    double x_derivative_w = 0.0;
-    double x_second_order_derivative_w = 0.0;
-    double x_third_order_derivative_w = 0.0;
-    double x_ref_w = 0.0;
-  } weight_;
+  double weight_x_ = 0.0;
 
-  double max_x_third_order_derivative_ = 0.0;
+  double weight_dx_ = 0.0;
+
+  double weight_ddx_ = 0.0;
+
+  double weight_dddx_ = 0.0;
+
+  double weight_x_reference_ = 0.0;
 
   double delta_s_ = 1.0;
-  double delta_s_sq_ = 1.0;
 };
 
 }  // namespace planning
