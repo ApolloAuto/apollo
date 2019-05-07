@@ -25,6 +25,7 @@
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_thread_pool.h"
+#include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/container/pose/pose_container.h"
@@ -160,6 +161,7 @@ void EvaluatorManager::Run() {
 
   if (FLAGS_enable_build_current_frame_env) {
     BuildCurrentFrameEnv();
+    SemanticMap::Instance()->RunCurrFrame(curr_frame_env_);
   }
 
   std::vector<Obstacle*> dynamic_env;
@@ -254,6 +256,7 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle) {
 }
 
 void EvaluatorManager::BuildCurrentFrameEnv() {
+  curr_frame_env_.Clear();
   auto obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
@@ -262,8 +265,7 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
       ContainerManager::Instance()->GetContainer<PoseContainer>(
           AdapterConfig::LOCALIZATION);
   CHECK_NOTNULL(ego_pose_container);
-  FrameEnv curr_frame_env;
-  curr_frame_env.set_timestamp(obstacles_container->timestamp());
+  curr_frame_env_.set_timestamp(obstacles_container->timestamp());
   std::vector<int> obstacle_ids =
       obstacles_container->curr_frame_movable_obstacle_ids();
   obstacle_ids.push_back(-1);
@@ -297,13 +299,13 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
     }
     obstacle_history.set_is_trainable(IsTrainable(obstacle->latest_feature()));
     if (obstacle->id() != -1) {
-      curr_frame_env.add_obstacles_history()->CopyFrom(obstacle_history);
+      curr_frame_env_.add_obstacles_history()->CopyFrom(obstacle_history);
     } else {
-      curr_frame_env.mutable_ego_history()->CopyFrom(obstacle_history);
+      curr_frame_env_.mutable_ego_history()->CopyFrom(obstacle_history);
     }
   }
   if (FLAGS_prediction_offline_mode == 4) {
-    FeatureOutput::InsertFrameEnv(curr_frame_env);
+    FeatureOutput::InsertFrameEnv(curr_frame_env_);
   }
 }
 
