@@ -127,9 +127,8 @@ void FeatureOutput::InsertDataForTuning(
       list_data_for_tuning_.add_data_for_tuning();
   data_for_tuning->set_id(feature.id());
   data_for_tuning->set_timestamp(feature.timestamp());
-  for (size_t i = 0; i < feature_values.size(); ++i) {
-    data_for_tuning->add_values_for_tuning(feature_values[i]);
-  }
+  *data_for_tuning->mutable_values_for_tuning() =
+      {feature_values.begin(), feature_values.end()};
   data_for_tuning->set_category(category);
   ADEBUG << "Insert [" << category
          << "] data for tuning with size = " << feature_values.size();
