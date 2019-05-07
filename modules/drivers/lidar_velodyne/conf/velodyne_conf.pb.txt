@@ -8,7 +8,7 @@ conf {
   rpm: 600.0
   model: V64E_S3D_STRONGEST
   calibration_file: "modules/drivers/lidar_velodyne/data/params/64E_S3_calibration_example.yaml"
-  min_range: 0.9
+  min_range: 1.6
   max_range: 70
   organized: false
   cache_size: 1
