@@ -40,7 +40,6 @@ cc_library(
         "//modules/planning/tasks/deciders:path_assessment_decider",
         "//modules/planning/tasks/deciders:path_bounds_decider",
         "//modules/planning/tasks/deciders/path_lane_borrow_decider",
-        "//modules/planning/tasks/optimizers/dp_poly_path:dp_poly_path_optimizer",
         "//modules/planning/tasks/optimizers/dp_st_speed:dp_st_speed_optimizer",
         "//modules/planning/tasks/optimizers/open_space_trajectory_generation:open_space_trajectory_provider",
         "//modules/planning/tasks/optimizers/open_space_trajectory_partition",
