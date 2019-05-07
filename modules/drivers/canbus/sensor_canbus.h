@@ -31,14 +31,9 @@
 #include "cyber/common/file.h"
 #include "cyber/component/component.h"
 
-#include "modules/common/adapters/adapter_manager.h"
-#include "modules/common/adapters/proto/adapter_config.pb.h"
-#include "modules/common/apollo_app.h"
-#include "modules/common/macro.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
-#include "modules/control/proto/control_cmd.pb.h"
 #include "modules/drivers/canbus/can_client/can_client.h"
 #include "modules/drivers/canbus/can_client/can_client_factory.h"
 #include "modules/drivers/canbus/can_comm/can_receiver.h"
@@ -61,28 +56,31 @@ namespace drivers {
  */
 
 using apollo::common::ErrorCode;
-using apollo::common::Status;
+// using apollo::common::Status;
 using apollo::common::monitor::MonitorMessageItem;
 using apollo::common::time::Clock;
 using apollo::drivers::canbus::CanClient;
 using apollo::drivers::canbus::CanClientFactory;
 using apollo::drivers::canbus::CanReceiver;
 using apollo::drivers::canbus::SensorCanbusConf;
+template <typename T>
+using Writer = apollo::cyber::Writer<T>;
 
 template <typename SensorType>
-class SensorCanbus : public apollo::cyber::Component {
+class SensorCanbus : public apollo::cyber::Component<> {
  public:
   // TODO(lizh): check whether we need a new msg item, say
   // MonitorMessageItem::SENSORCANBUS
   SensorCanbus()
-      : monitor_logger_(apollo::common::monitor::MonitorMessageItem::CANBUS) {}
+      : monitor_logger_buffer_(
+            apollo::common::monitor::MonitorMessageItem::CANBUS) {}
   ~SensorCanbus();
 
   /**
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init() override;
+  bool Init() override;
 
  private:
   bool Start();
@@ -99,10 +97,11 @@ class SensorCanbus : public apollo::cyber::Component {
   std::unique_ptr<std::thread> thread_;
 
   int64_t last_timestamp_ = 0;
-  ros::Timer timer_;
-  common::monitor::MonitorLogger monitor_logger_;
+  std::unique_ptr<cyber::Timer> timer_;
+  common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   std::mutex mutex_;
   volatile bool data_trigger_running_ = false;
+  std::shared_ptr<Writer<SensorType>> sensor_writer_;
 };
 
 // method implementations
@@ -110,12 +109,12 @@ class SensorCanbus : public apollo::cyber::Component {
 template <typename SensorType>
 bool SensorCanbus<SensorType>::Init() {
   // load conf
-  if (!cyber::common::GetProtoFromFile(FLAGS_sensor_conf_file, &canbus_conf_)) {
+  if (!cyber::common::GetProtoFromFile(config_file_path_, &canbus_conf_)) {
     return OnError("Unable to load canbus conf file: " +
-                   FLAGS_sensor_conf_file);
+                   config_file_path_);
   }
 
-  AINFO << "The canbus conf file is loaded: " << FLAGS_sensor_conf_file;
+  AINFO << "The canbus conf file is loaded: " << config_file_path_;
   ADEBUG << "Canbus_conf:" << canbus_conf_.ShortDebugString();
 
   // Init can client
@@ -138,7 +137,7 @@ bool SensorCanbus<SensorType>::Init() {
     return OnError("Failed to init can receiver.");
   }
   AINFO << "The can receiver is successfully initialized.";
-
+  sensor_writer_ = node_->CreateWriter<SensorType>(FLAGS_sensor_node_name);
   return Start();
 }
 
@@ -160,10 +159,10 @@ bool SensorCanbus<SensorType>::Start() {
   // if sensor_freq == 0, then it is event-triggered publishment.
   // no need for timer.
   if (FLAGS_sensor_freq > 0) {
-    const double duration_ms = 1000.0 / FLAGS_sensor_freq;
-    timer_ = cyber::Timer(duration_ms, &SensorCanbus<SensorType>::OnTimer, this,
-                          false);
-    timer_.Start();
+    double duration_ms = 1000.0 / FLAGS_sensor_freq;
+    timer_.reset(new cyber::Timer(static_cast<uint32_t>(duration_ms),
+                                  [this]() { this->OnTimer(); }, false));
+    timer_->Start();
   } else {
     data_trigger_running_ = true;
     thread_.reset(new std::thread([this] { DataTrigger(); }));
@@ -174,8 +173,7 @@ bool SensorCanbus<SensorType>::Start() {
   }
 
   // last step: publish monitor messages
-  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  buffer.INFO("Canbus is started.");
+  monitor_logger_buffer_.INFO("Canbus is started.");
 
   return true;
 }
@@ -197,9 +195,9 @@ void SensorCanbus<SensorType>::DataTrigger() {
 }
 
 template <typename SensorType>
-void SensorCanbus<SensorType>::~SensorCanbus() {
+SensorCanbus<SensorType>::~SensorCanbus() {
   if (FLAGS_sensor_freq > 0) {
-    timer_.stop();
+    timer_->Stop();
   }
 
   can_receiver_.Stop();
@@ -219,8 +217,7 @@ void SensorCanbus<SensorType>::~SensorCanbus() {
 // Send the error to monitor and return it
 template <typename SensorType>
 bool SensorCanbus<SensorType>::OnError(const std::string &error_msg) {
-  common::monitor::MonitorLogBuffer buffer(&monitor_logger_);
-  buffer.ERROR(error_msg);
+  monitor_logger_buffer_.ERROR(error_msg);
   return false;
 }
 
