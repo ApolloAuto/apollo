@@ -95,12 +95,11 @@ bool PiecewiseJerkProblem::OptimizeWithOsqp(
     return false;
   }
 
-  /**
   if (status != 1 && status != 2) {
     AERROR << "failed optimization status:\t" << (*work)->info->status;
     return false;
   }
-  **/
+
   return true;
 }
 
