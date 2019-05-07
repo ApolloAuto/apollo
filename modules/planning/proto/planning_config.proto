@@ -3,7 +3,6 @@ syntax = "proto2";
 package apollo.planning;
 
 import "modules/planning/proto/decider_config.proto";
-import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
 import "modules/planning/proto/open_space_fallback_decider_config.proto";
 import "modules/planning/proto/open_space_roi_decider_config.proto";
@@ -16,12 +15,7 @@ import "modules/planning/proto/piecewise_jerk_path_config.proto";
 import "modules/planning/proto/piecewise_jerk_speed_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
 import "modules/planning/proto/planner_open_space_config.proto";
-// import "modules/planning/proto/poly_vt_speed_config.proto";
-import "modules/planning/proto/qp_piecewise_jerk_path_config.proto";
-import "modules/planning/proto/qp_spline_path_config.proto";
-import "modules/planning/proto/qp_st_speed_config.proto";
 import "modules/planning/proto/speed_bounds_decider_config.proto";
-import "modules/planning/proto/side_pass_path_decider_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
@@ -37,21 +31,14 @@ message PathDeciderConfig {
 // tasks are shared among all scenarios and stages.
 message TaskConfig {
   enum TaskType {
-    DP_POLY_PATH_OPTIMIZER = 0;
     DP_ST_SPEED_OPTIMIZER = 1;
-    QP_SPLINE_PATH_OPTIMIZER = 2;
-    QP_SPLINE_ST_SPEED_OPTIMIZER = 3;
     PATH_DECIDER = 4;
     SPEED_DECIDER = 5;
-    POLY_ST_SPEED_OPTIMIZER = 6;
     NAVI_PATH_DECIDER = 7;
     NAVI_SPEED_DECIDER = 8;
     NAVI_OBSTACLE_DECIDER = 9;
-    QP_PIECEWISE_JERK_PATH_OPTIMIZER = 10;
     DECIDER_CREEP = 11;
     OPEN_SPACE_PRE_STOP_DECIDER = 12;
-    SIDE_PASS_PATH_DECIDER = 13;
-    SIDE_PASS_SAFETY = 14;
     PROCEED_WITH_CAUTION_SPEED = 15;
     DECIDER_RSS = 16;
     SPEED_BOUNDS_PRIORI_DECIDER = 17;
@@ -68,18 +55,11 @@ message TaskConfig {
   };
   optional TaskType task_type = 1;
   oneof task_config {
-    DpPolyPathConfig dp_poly_path_config = 2;
     DpStSpeedConfig dp_st_speed_config = 3;
-    QpSplinePathConfig qp_spline_path_config = 4;
-    QpStSpeedConfig qp_st_speed_config = 5;
     PathDeciderConfig path_decider_config = 7;
     ProceedWithCautionSpeedConfig proceed_with_caution_speed_config = 8;
-    QpPiecewiseJerkPathConfig qp_piecewise_jerk_path_config = 9;
     DeciderCreepConfig decider_creep_config = 10;
     OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config = 11;
-    SidePassSafetyConfig side_pass_safety_config = 12;
-    SidePassPathDeciderConfig side_pass_path_decider_config = 13;
-    // PolyVTSpeedConfig poly_vt_speed_config = 14;
     SpeedBoundsDeciderConfig speed_bounds_decider_config = 15;
     PiecewiseJerkPathConfig piecewise_jerk_path_config = 16;
     PathBoundsDeciderConfig path_bounds_decider_config = 17;

@@ -1,11 +1,5 @@
 scenario_type: SIDE_PASS
 stage_type: SIDE_PASS_DEFAULT_STAGE
-stage_type: SIDE_PASS_APPROACH_OBSTACLE
-stage_type: SIDE_PASS_GENERATE_PATH
-stage_type: SIDE_PASS_STOP_ON_WAITPOINT
-stage_type: SIDE_PASS_DETECT_SAFETY
-stage_type: SIDE_PASS_PASS_OBSTACLE
-stage_type: SIDE_PASS_BACKUP
 side_pass_config: {
   side_pass_exit_distance: 5.0
   approach_obstacle_max_stop_speed: 1.0e-2
@@ -29,7 +23,7 @@ stage_config: {
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
     task_type: PATH_BOUNDS_DECIDER
     path_bounds_decider_config {
@@ -52,185 +46,7 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_FINAL_DECIDER
-  }
-}
-stage_config: {
-  stage_type: SIDE_PASS_APPROACH_OBSTACLE
-  enabled: true
-  task_type: DP_POLY_PATH_OPTIMIZER
-  task_type: PATH_DECIDER
-  task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  task_type: DP_ST_SPEED_OPTIMIZER
-  task_type: SPEED_DECIDER
-  task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  task_config: {
-    task_type: DP_POLY_PATH_OPTIMIZER
-  }
-  task_config: {
-    task_type: PATH_DECIDER
-  }
-  task_config: {
-    task_type: DP_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_DECIDER
-  }
-  task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_FINAL_DECIDER
-  }
-}
-stage_config: {
-  stage_type: SIDE_PASS_BACKUP
-  enabled: true
-  task_type: DP_POLY_PATH_OPTIMIZER
-  task_type: PATH_DECIDER
-  task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  task_type: DP_ST_SPEED_OPTIMIZER
-  task_type: SPEED_DECIDER
-  task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  task_config: {
-    task_type: DP_POLY_PATH_OPTIMIZER
-  }
-  task_config: {
-    task_type: PATH_DECIDER
-  }
-  task_config: {
-    task_type: DP_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_DECIDER
-  }
-  task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_FINAL_DECIDER
-  }
-}
-stage_config: {
-  stage_type: SIDE_PASS_GENERATE_PATH
-  enabled: true
-  task_type: SIDE_PASS_PATH_DECIDER
-  task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  task_type: DP_ST_SPEED_OPTIMIZER
-  task_type: SPEED_DECIDER
-  task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  task_config: {
-    task_type: SIDE_PASS_PATH_DECIDER
-  }
-  task_config: {
-    task_type: DP_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_DECIDER
-  }
-  task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_FINAL_DECIDER
-  }
-}
-
-stage_config: {
-  stage_type: SIDE_PASS_STOP_ON_WAITPOINT
-  enabled: true
-  task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  task_type: DP_ST_SPEED_OPTIMIZER
-  task_type: SPEED_DECIDER
-  task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  task_config: {
-    task_type: DP_POLY_PATH_OPTIMIZER
-  }
-  task_config: {
-    task_type: PATH_DECIDER
-  }
-  task_config: {
-    task_type: DP_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_DECIDER
-  }
-  task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_FINAL_DECIDER
-  }
-}
-stage_config: {
-  stage_type: SIDE_PASS_DETECT_SAFETY
-  enabled: true
-  task_type: SIDE_PASS_SAFETY
-  task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  task_type: DP_ST_SPEED_OPTIMIZER
-  task_type: SPEED_DECIDER
-  task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  task_config: {
-    task_type: SIDE_PASS_SAFETY
-    side_pass_safety_config {
-      min_obstacle_lateral_distance: 1.0
-    }
-  }
-  task_config: {
-    task_type: DP_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_DECIDER
-  }
-  task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  }
-  task_config: {
-    task_type: SPEED_BOUNDS_FINAL_DECIDER
-  }
-}
-stage_config: {
-  stage_type: SIDE_PASS_PASS_OBSTACLE
-  enabled: true
-  task_type: SPEED_BOUNDS_PRIORI_DECIDER
-  task_type: DP_ST_SPEED_OPTIMIZER
-  task_type: SPEED_DECIDER
-  task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
-  task_config: {
-    task_type: DP_ST_SPEED_OPTIMIZER
-  }
-  task_config: {
-    task_type: SPEED_DECIDER
-  }
-  task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_BOUNDS_PRIORI_DECIDER
