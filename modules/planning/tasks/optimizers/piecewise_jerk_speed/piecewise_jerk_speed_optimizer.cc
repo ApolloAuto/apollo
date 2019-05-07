@@ -97,12 +97,13 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
   path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
+
   // TODO(Hongyi): delete this when ready to use vehicle_params
   path_time_qp->SetSecondOrderBounds(-4.4, 2.0);
   path_time_qp->SetDesireDerivative(FLAGS_default_cruise_speed);
 
   // Update STBoundary
-  std::vector<std::tuple<double, double, double>> x_bounds;
+  std::vector<std::pair<double, double>> s_bounds;
   for (int i = 0; i < num_of_knots; ++i) {
     double curr_t = i * delta_t;
     double s_lower_bound = 0.0;
@@ -135,14 +136,14 @@ Status PiecewiseJerkSpeedOptimizer::Process(
       speed_data->clear();
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
-    x_bounds.emplace_back(curr_t, s_lower_bound, s_upper_bound);
+    s_bounds.emplace_back(s_lower_bound, s_upper_bound);
   }
-  path_time_qp->SetVariableBounds(x_bounds);
+  path_time_qp->SetZeroOrderBounds(std::move(s_bounds));
 
   // Update SpeedBoundary and ref_s
   std::vector<double> x_ref;
   std::vector<double> penalty_dx;
-  std::vector<std::tuple<double, double, double>> dx_bounds;
+  std::vector<std::pair<double, double>> s_dot_bounds;
   const SpeedLimit& speed_limit = st_graph_data.speed_limit();
   for (int i = 0; i < num_of_knots; ++i) {
     double curr_t = i * delta_t;
@@ -154,18 +155,17 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     // get curvature
     PathPoint path_point;
     path_data.GetPathPointWithPathS(path_s, &path_point);
-    penalty_dx.emplace_back(fabs(path_point.kappa()) *
+    penalty_dx.emplace_back(std::fabs(path_point.kappa()) *
                             piecewise_jerk_speed_config.kappa_penalty_weight());
     // get v_upper_bound
     const double v_lower_bound = 0.0;
     double v_upper_bound = FLAGS_planning_upper_speed_limit;
     v_upper_bound = speed_limit.GetSpeedLimitByS(path_s);
-    dx_bounds.emplace_back(curr_t, v_lower_bound,
-                           std::fmax(v_upper_bound, 0.0));
+    s_dot_bounds.emplace_back(v_lower_bound, std::fmax(v_upper_bound, 0.0));
   }
   path_time_qp->SetZeroOrderReference(x_ref);
   path_time_qp->SetFirstOrderPenalty(penalty_dx);
-  path_time_qp->SetVariableDerivativeBounds(dx_bounds);
+  path_time_qp->SetFirstOrderBounds(s_dot_bounds);
 
   // Sovle the problem
   if (!path_time_qp->Optimize()) {
