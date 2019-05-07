@@ -31,7 +31,6 @@
 #include "modules/planning/tasks/deciders/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
-#include "modules/planning/tasks/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
@@ -79,10 +78,6 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
                            return new DpStSpeedOptimizer(config);
-                         });
-  task_factory_.Register(TaskConfig::DP_POLY_PATH_OPTIMIZER,
-                         [](const TaskConfig& config) -> Task* {
-                           return new DpPolyPathOptimizer(config);
                          });
   task_factory_.Register(TaskConfig::PATH_DECIDER,
                          [](const TaskConfig& config) -> Task* {
