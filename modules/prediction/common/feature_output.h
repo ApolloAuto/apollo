@@ -71,7 +71,19 @@ class FeatureOutput {
   static void InsertPredictionResult(
       const int obstacle_id, const PredictionObstacle& prediction_obstacle);
 
+  /**
+   * @brief Insert a frame env
+   * @param frame env
+   */
   static void InsertFrameEnv(const FrameEnv& frame_env);
+
+  /**
+   * @brief Insert a data_for_tuning
+   * @param A feature in proto
+   */
+  static void InsertDataForTuning(const Feature& feature,
+                                  const std::vector<double>& feature_values,
+                                  const std::string& category);
 
   /**
    * @brief Write features to a file
@@ -88,7 +100,15 @@ class FeatureOutput {
    */
   static void WritePredictionResult();
 
+  /**
+   * @brief Write frame env to a file
+   */
   static void WriteFrameEnv();
+
+  /**
+   * @brief Write DataForTuning features to a file
+   */
+  static void WriteDataForTuning();
 
   /**
    * @brief Get feature size
@@ -108,7 +128,17 @@ class FeatureOutput {
    */
   static int SizeOfPredictionResult();
 
+  /**
+   * @brief Get the size of frame env.
+   * @return The size of frame env.
+   */
   static int SizeOfFrameEnv();
+
+  /**
+   * @brief Get the size of data for tuning.
+   * @return The size of data for tuning.
+   */
+  static int SizeOfDataForTuning();
 
  private:
   static Features features_;
@@ -119,6 +149,8 @@ class FeatureOutput {
   static std::size_t idx_prediction_result_;
   static ListFrameEnv list_frame_env_;
   static std::size_t idx_frame_env_;
+  static ListDataForTuning list_data_for_tuning_;
+  static std::size_t idx_tuning_;
 };
 
 }  // namespace prediction

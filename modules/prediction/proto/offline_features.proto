@@ -45,6 +45,20 @@ message ListFrameEnv {
   repeated FrameEnv frame_env = 1;
 }
 
+message DataForTuning {
+  // The task category of the cost values
+  optional string category = 1;
+  // The info. needed for identifying a unique data point:
+  optional int32 id = 2;
+  optional double timestamp = 3;
+  // The cost values whose coefficients to be tuned
+  repeated double values_for_tuning = 4;
+}
+
+message ListDataForTuning {
+  repeated DataForTuning data_for_tuning = 1;
+}
+
 message Features {
   repeated Feature feature = 1;
 }
