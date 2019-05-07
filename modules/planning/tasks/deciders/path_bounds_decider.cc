@@ -31,6 +31,7 @@
 #include "modules/common/util/util.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/path_boundary.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
@@ -157,20 +158,29 @@ Status PathBoundsDecider::Process(
   // Remove redundant boundaries.
   RemoveRedundantPathBoundaries(&candidate_path_boundaries);
 
+  auto* pull_over_info = PlanningContext::Instance()
+                             ->mutable_planning_status()
+                             ->mutable_pull_over();
   // If needed, search for pull-over position.
   if (Decider::config_.path_bounds_decider_config().is_pull_over()) {
     if (!exist_self_path_bound) {
-      frame->set_pull_over_info(std::make_tuple(false, 0.0, 0.0, 0.0));
+      pull_over_info->set_exist_pull_over_position(false);
     } else {
-      std::tuple<double, double, double> pull_over_configuration;
-      if (!SearchPullOverPosition(*reference_line_info,
-              regular_self_path_bound, &pull_over_configuration)) {
-        frame->set_pull_over_info(std::make_tuple(false, 0.0, 0.0, 0.0));
+      // TODO(QiL, Jiacheng): simplify the interface for
+      // 'SearchPullOverPosition' and use proto directly
+      std::tuple<double, double, double, double, double>
+          pull_over_configuration;
+      if (!SearchPullOverPosition(*reference_line_info, regular_self_path_bound,
+                                  &pull_over_configuration)) {
+        pull_over_info->set_exist_pull_over_position(false);
       } else {
-        frame->set_pull_over_info(
-            std::make_tuple(true, std::get<0>(pull_over_configuration),
-                            std::get<1>(pull_over_configuration),
-                            std::get<2>(pull_over_configuration)));
+        pull_over_info->set_exist_pull_over_position(true);
+        pull_over_info->set_pull_over_s(std::get<0>(pull_over_configuration));
+        pull_over_info->set_pull_over_l(std::get<1>(pull_over_configuration));
+        pull_over_info->set_pull_over_x(std::get<2>(pull_over_configuration));
+        pull_over_info->set_pull_over_y(std::get<3>(pull_over_configuration));
+        pull_over_info->set_pull_over_theta(
+            std::get<4>(pull_over_configuration));
       }
     }
   }
@@ -300,7 +310,8 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 bool PathBoundsDecider::SearchPullOverPosition(
     const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
-    std::tuple<double, double, double>* const pull_over_configuration) {
+    std::tuple<double, double, double, double, double>* const
+        pull_over_configuration) {
   double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
   double destination_s =
       reference_line_info.SDistanceToDestination() + adc_end_s;
@@ -323,23 +334,26 @@ bool PathBoundsDecider::SearchPullOverPosition(
       VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
   int i = static_cast<int>(path_bound.size()) - 1;
   // 1. Locate the first point before destination.
-  while (i >= 0 && std::get<0>(path_bound[i]) > destination_s) { --i; }
+  while (i >= 0 && std::get<0>(path_bound[i]) > destination_s) {
+    --i;
+  }
   // 2. Find a window that is close to road-edge.
   bool has_a_feasible_window = false;
-  while (i >= 0 && std::get<0>(path_bound[i]) -
-         std::get<0>(path_bound.front()) > pull_over_space_length) {
+  while (i >= 0 &&
+         std::get<0>(path_bound[i]) - std::get<0>(path_bound.front()) >
+             pull_over_space_length) {
     int j = i;
     bool is_feasible_window = true;
-    while (j >= 0 && std::get<0>(path_bound[i]) -
-           std::get<0>(path_bound[j]) < pull_over_space_length) {
+    while (j >= 0 && std::get<0>(path_bound[i]) - std::get<0>(path_bound[j]) <
+                         pull_over_space_length) {
       double curr_s = std::get<0>(path_bound[j]);
       double curr_right_bound = std::fabs(std::get<1>(path_bound[j]));
       double curr_lane_left_width = 0;
       double curr_lane_right_width = 0;
       reference_line_info.reference_line().GetLaneWidth(
           curr_s, &curr_lane_left_width, &curr_lane_right_width);
-      if (std::fabs(curr_right_bound + adc_half_width -
-              curr_lane_right_width) > FLAGS_pull_over_road_edge_buffer) {
+      if (std::fabs(curr_right_bound + adc_half_width - curr_lane_right_width) >
+          FLAGS_pull_over_road_edge_buffer) {
         ADEBUG << "Not close enough to lane-edge -> "
                << "Not feasible for pull-over.";
         is_feasible_window = false;
@@ -348,9 +362,11 @@ bool PathBoundsDecider::SearchPullOverPosition(
       double curr_neighbor_lane_width = 0.0;
       hdmap::Id neighbor_lane_id;
       if (reference_line_info.GetNeighborLaneInfo(LaneType::RightForward,
-              curr_s, &neighbor_lane_id, &curr_neighbor_lane_width) ||
+                                                  curr_s, &neighbor_lane_id,
+                                                  &curr_neighbor_lane_width) ||
           reference_line_info.GetNeighborLaneInfo(LaneType::RightReverse,
-              curr_s, &neighbor_lane_id, &curr_neighbor_lane_width)) {
+                                                  curr_s, &neighbor_lane_id,
+                                                  &curr_neighbor_lane_width)) {
         ADEBUG << "Not the rightmost lane -> Not feasible for pull-over.";
         is_feasible_window = false;
         break;
@@ -363,9 +379,9 @@ bool PathBoundsDecider::SearchPullOverPosition(
     if (is_feasible_window) {
       has_a_feasible_window = true;
       const auto& reference_line = reference_line_info.reference_line();
-
-      double pull_over_s = std::get<0>(path_bound[(i+j)/2]);
-      double pull_over_l = std::get<1>(path_bound[(i+j)/2]);
+      const auto& pull_over_bound = path_bound[(i + j) / 2];
+      const double pull_over_s = std::get<0>(pull_over_bound);
+      const double pull_over_l = std::get<1>(pull_over_bound);
       common::SLPoint pull_over_sl_point;
       pull_over_sl_point.set_s(pull_over_s);
       pull_over_sl_point.set_l(pull_over_l);
@@ -379,9 +395,11 @@ bool PathBoundsDecider::SearchPullOverPosition(
           reference_line.GetReferencePoint(pull_over_s);
       double pull_over_theta = reference_point.heading();
 
-      std::get<0>(*pull_over_configuration) = pull_over_x;
-      std::get<1>(*pull_over_configuration) = pull_over_y;
-      std::get<2>(*pull_over_configuration) = pull_over_theta;
+      std::get<0>(*pull_over_configuration) = pull_over_s;
+      std::get<1>(*pull_over_configuration) = pull_over_l;
+      std::get<2>(*pull_over_configuration) = pull_over_x;
+      std::get<3>(*pull_over_configuration) = pull_over_y;
+      std::get<4>(*pull_over_configuration) = pull_over_theta;
       break;
     }
     --i;
