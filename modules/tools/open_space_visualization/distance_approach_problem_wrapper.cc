@@ -19,6 +19,7 @@
  **/
 
 #include "cyber/common/file.h"
+#include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_problem.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_problem.h"
@@ -143,13 +144,15 @@ class ObstacleContainer {
     }
   }
 
-  const std::vector<std::vector<Vec2d>>& GetObstacleVec() {
+  const std::vector<std::vector<Vec2d>>& GetObstacleVec() const {
     return obstacles_vertices_vec_;
   }
-  Eigen::MatrixXd GetAMatrix() { return obstacles_A_; }
-  Eigen::MatrixXd GetbMatrix() { return obstacles_b_; }
-  size_t GetObstaclesNum() { return obstacles_num_; }
-  Eigen::MatrixXi GetObstaclesEdgesNum() { return obstacles_edges_num_; }
+  const Eigen::MatrixXd& GetAMatrix() const { return obstacles_A_; }
+  const Eigen::MatrixXd& GetbMatrix() const { return obstacles_b_; }
+  size_t GetObstaclesNum() const { return obstacles_num_; }
+  const Eigen::MatrixXi& GetObstaclesEdgesNum() const {
+    return obstacles_edges_num_;
+  }
 
  private:
   size_t obstacles_num_ = 0;
@@ -216,38 +219,30 @@ void AddObstacle(ObstacleContainer* obstacles_ptr,
                  const double* ROI_distance_approach_parking_boundary) {
   obstacles_ptr->AddObstacle(ROI_distance_approach_parking_boundary);
 }
-bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
-                  ResultContainer* result_ptr, double sx, double sy,
-                  double sphi, double ex, double ey, double ephi,
-                  double* XYbounds) {
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
-  CHECK(apollo::cyber::common::GetProtoFromFile(
-      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
-      << "Failed to load open space config file "
-      << FLAGS_planner_open_space_config_filename;
-  std::vector<double> XYbounds_(XYbounds, XYbounds + 4);
-  if (!hybridA_ptr->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
-                         obstacles_ptr->GetObstacleVec(),
-                         result_ptr->PrepareHybridAResult())) {
-    AINFO << "Hybrid A fail";
-    return false;
-  }
+
+bool DistanceSmoothing(
+    const apollo::planning::PlannerOpenSpaceConfig& planner_open_space_config,
+    const ObstacleContainer& obstacles, double sx, double sy, double sphi,
+    double ex, double ey, double ephi, const std::vector<double>& XYbounds,
+    HybridAStartResult* hybrid_a_star_result, Eigen::MatrixXd* state_result_ds_,
+    Eigen::MatrixXd* control_result_ds_, Eigen::MatrixXd* time_result_ds_,
+    Eigen::MatrixXd* dual_l_result_ds_, Eigen::MatrixXd* dual_n_result_ds_) {
   // load Warm Start result(horizon is the "N", not the size of step points)
-  size_t horizon_ = result_ptr->PrepareHybridAResult()->x.size() - 1;
+  size_t horizon_ = hybrid_a_star_result->x.size() - 1;
   Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, horizon_ + 1);
   Eigen::MatrixXd uWS = Eigen::MatrixXd::Zero(2, horizon_);
   Eigen::VectorXd x = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      result_ptr->PrepareHybridAResult()->x.data(), horizon_ + 1);
+      hybrid_a_star_result->x.data(), horizon_ + 1);
   Eigen::VectorXd y = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      result_ptr->PrepareHybridAResult()->y.data(), horizon_ + 1);
+      hybrid_a_star_result->y.data(), horizon_ + 1);
   Eigen::VectorXd phi = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      result_ptr->PrepareHybridAResult()->phi.data(), horizon_ + 1);
+      hybrid_a_star_result->phi.data(), horizon_ + 1);
   Eigen::VectorXd v = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      result_ptr->PrepareHybridAResult()->v.data(), horizon_ + 1);
+      hybrid_a_star_result->v.data(), horizon_ + 1);
   Eigen::VectorXd steer = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      result_ptr->PrepareHybridAResult()->steer.data(), horizon_);
+      hybrid_a_star_result->steer.data(), horizon_);
   Eigen::VectorXd a = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(
-      result_ptr->PrepareHybridAResult()->a.data(), horizon_);
+      hybrid_a_star_result->a.data(), horizon_);
   xWS.row(0) = x;
   xWS.row(1) = y;
   xWS.row(2) = phi;
@@ -268,7 +263,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
   // nominal sampling time
-  float ts_ = planner_open_space_config_.delta_t();
+  float ts_ = planner_open_space_config.delta_t();
 
   // load vehicle configuration
   Eigen::MatrixXd ego_(4, 1);
@@ -283,13 +278,13 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
   Eigen::MatrixXd n_warm_up;
 
   DualVariableWarmStartProblem* dual_variable_warm_start_ptr =
-      new DualVariableWarmStartProblem(planner_open_space_config_);
+      new DualVariableWarmStartProblem(planner_open_space_config);
 
   if (FLAGS_use_dual_variable_warm_start) {
     bool dual_variable_warm_start_status = dual_variable_warm_start_ptr->Solve(
-        horizon_, ts_, ego_, obstacles_ptr->GetObstaclesNum(),
-        obstacles_ptr->GetObstaclesEdgesNum(), obstacles_ptr->GetAMatrix(),
-        obstacles_ptr->GetbMatrix(), xWS, &l_warm_up, &n_warm_up);
+        horizon_, ts_, ego_, obstacles.GetObstaclesNum(),
+        obstacles.GetObstaclesEdgesNum(), obstacles.GetAMatrix(),
+        obstacles.GetbMatrix(), xWS, &l_warm_up, &n_warm_up);
 
     if (dual_variable_warm_start_status) {
       AINFO << "Dual variable problem solved successfully!";
@@ -298,29 +293,130 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
       return false;
     }
   } else {
-    l_warm_up =
-        0.5 * Eigen::MatrixXd::Ones(obstacles_ptr->GetObstaclesEdgesNum().sum(),
-                                    horizon_ + 1);
-    n_warm_up = 0.5 * Eigen::MatrixXd::Ones(
-                          4 * obstacles_ptr->GetObstaclesNum(), horizon_ + 1);
+    l_warm_up = 0.5 * Eigen::MatrixXd::Ones(
+                          obstacles.GetObstaclesEdgesNum().sum(), horizon_ + 1);
+    n_warm_up = 0.5 * Eigen::MatrixXd::Ones(4 * obstacles.GetObstaclesNum(),
+                                            horizon_ + 1);
   }
 
   DistanceApproachProblem* distance_approach_ptr =
-      new DistanceApproachProblem(planner_open_space_config_);
+      new DistanceApproachProblem(planner_open_space_config);
 
   bool status = distance_approach_ptr->Solve(
       x0, xF, last_time_u, horizon_, ts_, ego_, xWS, uWS, l_warm_up, n_warm_up,
-      XYbounds_, obstacles_ptr->GetObstaclesNum(),
-      obstacles_ptr->GetObstaclesEdgesNum(), obstacles_ptr->GetAMatrix(),
-      obstacles_ptr->GetbMatrix(), result_ptr->PrepareStateResult(),
-      result_ptr->PrepareControlResult(), result_ptr->PrepareTimeResult(),
-      result_ptr->PrepareLResult(), result_ptr->PrepareNResult());
+      XYbounds, obstacles.GetObstaclesNum(), obstacles.GetObstaclesEdgesNum(),
+      obstacles.GetAMatrix(), obstacles.GetbMatrix(), state_result_ds_,
+      control_result_ds_, time_result_ds_, dual_l_result_ds_,
+      dual_n_result_ds_);
+
   if (!status) {
-    AINFO << "Distance fail";
+    AERROR << "Distance fail";
     return false;
   }
   return true;
 }
+
+bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
+                  ResultContainer* result_ptr, double sx, double sy,
+                  double sphi, double ex, double ey, double ephi,
+                  double* XYbounds) {
+  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  CHECK(apollo::cyber::common::GetProtoFromFile(
+      FLAGS_planner_open_space_config_filename, &planner_open_space_config_))
+      << "Failed to load open space config file "
+      << FLAGS_planner_open_space_config_filename;
+
+  HybridAStartResult hybrid_astar_result;
+  std::vector<double> XYbounds_(XYbounds, XYbounds + 4);
+  if (!hybridA_ptr->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
+                         obstacles_ptr->GetObstacleVec(),
+                         &hybrid_astar_result)) {
+    AINFO << "Hybrid A Star fails";
+    return false;
+  }
+
+  if (FLAGS_enable_parallel_trajectory_smoothing) {
+    std::vector<HybridAStartResult> partition_trajectories;
+    if (!hybridA_ptr->TrajectoryPartition(hybrid_astar_result,
+                                          &partition_trajectories)) {
+      return false;
+    }
+    size_t size = partition_trajectories.size();
+    std::vector<Eigen::MatrixXd> state_result_ds_vec;
+    std::vector<Eigen::MatrixXd> control_result_ds_vec;
+    std::vector<Eigen::MatrixXd> time_result_ds_vec;
+    std::vector<Eigen::MatrixXd> dual_l_result_ds_vec;
+    std::vector<Eigen::MatrixXd> dual_n_result_ds_vec;
+    state_result_ds_vec.resize(size);
+    control_result_ds_vec.resize(size);
+    time_result_ds_vec.resize(size);
+    dual_l_result_ds_vec.resize(size);
+    dual_n_result_ds_vec.resize(size);
+    for (size_t i = 0; i < size; ++i) {
+      if (!DistanceSmoothing(planner_open_space_config_, *obstacles_ptr, sx, sy,
+                             sphi, ex, ey, ephi, XYbounds_,
+                             &partition_trajectories[i],
+                             &state_result_ds_vec[i], &control_result_ds_vec[i],
+                             &time_result_ds_vec[i], &dual_l_result_ds_vec[i],
+                             &dual_n_result_ds_vec[i])) {
+        return false;
+      }
+    }
+    // Retrieve result in one single trajectory
+    // size_t trajectory_point_size = 0;
+    // for (size_t i = 0; i < size; ++i) {
+    //   trajectory_point_size +=
+    //       static_cast<size_t>(state_result_ds_vec[i].cols()) - 1;
+    // }
+    // ++trajectory_point_size;
+    // Eigen::MatrixXd state_result_ds;
+    // state_result_ds.resize(state_result_ds_vec.front().rows(),
+    //                        trajectory_point_size);
+    // Eigen::MatrixXd control_result_ds;
+    // control_result_ds.resize(control_result_ds_vec.front().rows(),
+    //                          trajectory_point_size - 1);
+    // int k = 0;
+    // for (size_t i = 0; i < size; ++i) {
+    //   int state_col_num = state_result_ds_vec[i].cols() - 1;
+    //   for (int j = 0; j < state_col_num; ++j) {
+    //     state_result_ds.block<state_result_ds.rows(), 1>(0, k) =
+    //         state_result_ds_vec[i].block<state_result_ds_vec[i].rows(), 1>(0,
+    //                                                                        j);
+    //     state_result_ds_vec[i].col(j);
+    //     control_result_ds << control_result_ds_vec[i].col(j);
+    //     ++k;
+    //   }
+    // }
+    // state_result_ds << state_result_ds_vec.back().col(
+    //     state_result_ds_vec.back().cols() - 1);
+
+    *(result_ptr->PrepareHybridAResult()) = hybrid_astar_result;
+    *(result_ptr->PrepareStateResult()) = state_result_ds_vec[0];
+    *(result_ptr->PrepareControlResult()) = control_result_ds_vec[0];
+
+  } else {
+    Eigen::MatrixXd state_result_ds;
+    Eigen::MatrixXd control_result_ds;
+    Eigen::MatrixXd time_result_ds;
+    Eigen::MatrixXd dual_l_result_ds;
+    Eigen::MatrixXd dual_n_result_ds;
+    if (!DistanceSmoothing(planner_open_space_config_, *obstacles_ptr, sx, sy,
+                           sphi, ex, ey, ephi, XYbounds_, &hybrid_astar_result,
+                           &state_result_ds, &control_result_ds,
+                           &time_result_ds, &dual_l_result_ds,
+                           &dual_n_result_ds)) {
+      return false;
+    }
+    *(result_ptr->PrepareHybridAResult()) = hybrid_astar_result;
+    *(result_ptr->PrepareStateResult()) = state_result_ds;
+    *(result_ptr->PrepareControlResult()) = control_result_ds;
+    *(result_ptr->PrepareTimeResult()) = time_result_ds;
+    *(result_ptr->PrepareLResult()) = dual_l_result_ds;
+    *(result_ptr->PrepareNResult()) = dual_n_result_ds;
+  }
+  return true;
+}
+
 void DistanceGetResult(ResultContainer* result_ptr,
                        ObstacleContainer* obstacles_ptr, double* x, double* y,
                        double* phi, double* v, double* a, double* steer,
@@ -354,17 +450,22 @@ void DistanceGetResult(ResultContainer* result_ptr,
     opt_y[i] = (*(result_ptr->PrepareStateResult()))(1, i);
     opt_phi[i] = (*(result_ptr->PrepareStateResult()))(2, i);
     opt_v[i] = (*(result_ptr->PrepareStateResult()))(3, i);
-    opt_time[i] = (*(result_ptr->PrepareTimeResult()))(0, i);
-    for (size_t j = 0; j < obstacles_edges_sum; j++) {
-      opt_dual_l[i * obstacles_edges_sum + j] =
-          (*(result_ptr->PrepareLResult()))(j, i);
-    }
-    for (size_t k = 0; k < obstacles_num_to_car; k++) {
-      opt_dual_n[i * obstacles_num_to_car + k] =
-          (*(result_ptr->PrepareNResult()))(k, i);
+  }
+  if (result_ptr->PrepareLResult()->cols() != 0 &&
+      result_ptr->PrepareTimeResult() != 0 &&
+      result_ptr->PrepareNResult() != 0) {
+    for (size_t i = 0; i < size_by_distance; i++) {
+      opt_time[i] = (*(result_ptr->PrepareTimeResult()))(0, i);
+      for (size_t j = 0; j < obstacles_edges_sum; j++) {
+        opt_dual_l[i * obstacles_edges_sum + j] =
+            (*(result_ptr->PrepareLResult()))(j, i);
+      }
+      for (size_t k = 0; k < obstacles_num_to_car; k++) {
+        opt_dual_n[i * obstacles_num_to_car + k] =
+            (*(result_ptr->PrepareNResult()))(k, i);
+      }
     }
   }
-
   for (size_t i = 0; i < size_by_distance - 1; i++) {
     opt_a[i] = (*(result_ptr->PrepareControlResult()))(0, i);
     opt_steer[i] = (*(result_ptr->PrepareControlResult()))(1, i);

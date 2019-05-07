@@ -70,6 +70,8 @@ class HybridAStar {
             const std::vector<std::vector<common::math::Vec2d>>&
                 obstacles_vertices_vec,
             HybridAStartResult* result);
+  bool TrajectoryPartition(const HybridAStartResult& result,
+                           std::vector<HybridAStartResult>* partitioned_result);
 
  private:
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node);

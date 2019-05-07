@@ -489,6 +489,9 @@ DEFINE_double(pull_over_road_edge_buffer, 0.15,
               "If the available path boundary's edge is not within this "
               "distance from the road edge, then this position is not "
               "qualified for being a pull-over position.");
+DEFINE_bool(
+    enable_parallel_trajectory_smoothing, false,
+    "Whether to partition the trajectory first and do smoothing in parallel");
 
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
