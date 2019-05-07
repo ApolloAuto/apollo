@@ -26,6 +26,7 @@ cc_library(
         "//modules/planning/common/path:discretized_path",
         "//modules/planning/common/path:frenet_frame_path",
         "//modules/planning/common/path:path_data",
+        "//modules/planning/common:planning_context",
         "//modules/planning/common/speed:speed_data",
         "//modules/planning/lattice/trajectory_generation:trajectory1d_generator",
         "//modules/planning/math:polynomial_xd",
