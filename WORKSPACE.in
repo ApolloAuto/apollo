@@ -48,8 +48,8 @@ new_local_repository(
 new_http_archive(
     name = "eigen",
     build_file = "third_party/eigen.BUILD",
-    sha256 = "04f8a4fa4afedaae721c1a1c756afeea20d3cdef0ce3293982cf1c518f178502",
-    strip_prefix = "eigen-eigen-b9cd8366d4e8",
+    sha256 = "ba4f95f9082ce99012d5ff320472a0e9fd0be921a20f11912f0bf7e6ca93f240",
+    strip_prefix = "eigen-git-mirror-3.2.10",
     url = "file:///home/tmp/eigen-3.2.10.tar.gz",
 )
 
