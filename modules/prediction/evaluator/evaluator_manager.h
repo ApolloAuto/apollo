@@ -102,6 +102,8 @@ class EvaluatorManager {
   ObstacleConf::EvaluatorType default_on_lane_evaluator_ =
       ObstacleConf::MLP_EVALUATOR;
 
+  FrameEnv curr_frame_env_;
+
   DECLARE_SINGLETON(EvaluatorManager)
 };
 
