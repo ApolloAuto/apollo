@@ -187,7 +187,7 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
       new Node3d(intermediate_x, intermediate_y, intermediate_phi, XYbounds_,
                  planner_open_space_config_));
   next_node->SetPre(current_node);
-  next_node->SetDirec(traveled_distance > 0);
+  next_node->SetDirec(traveled_distance > 0.0);
   next_node->SetSteer(steering);
   return next_node;
 }
@@ -465,6 +465,59 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
     result->steer.push_back(discrete_steer);
   }
 
+  return true;
+}
+
+bool HybridAStar::TrajectoryPartition(
+    const HybridAStartResult& result,
+    std::vector<HybridAStartResult>* partitioned_result) {
+  const auto& x = result.x;
+  const auto& y = result.y;
+  const auto& phi = result.phi;
+  const auto& gear = result.gear;
+  if (x.size() != y.size() || x.size() != phi.size()) {
+    AERROR << "states sizes are not equal when do trajectory partitioning of "
+              "Hybrid A Star result";
+    return false;
+  }
+  size_t horizon = x.size();
+
+  partitioned_result->clear();
+  partitioned_result->emplace_back();
+  auto* current_traj = &(partitioned_result->back());
+  bool current_gear = gear.front();
+  for (size_t i = 0; i < horizon; ++i) {
+    if (gear[i] != current_gear) {
+      partitioned_result->emplace_back();
+      current_traj = &(partitioned_result->back());
+      current_gear = gear[i];
+      // Use last trajectory point as the start of next trajectory
+      current_traj->x.push_back(x[i - 1]);
+      current_traj->y.push_back(y[i - 1]);
+      current_traj->phi.push_back(phi[i - 1]);
+      current_traj->gear.push_back(!gear[i - 1]);
+    }
+    current_traj->x.push_back(x[i]);
+    current_traj->y.push_back(y[i]);
+    current_traj->phi.push_back(phi[i]);
+    current_traj->gear.push_back(gear[i]);
+  }
+
+  // Retrieve v, a and steer from path
+  size_t traj_size = partitioned_result->size();
+  for (size_t i = 0; i < traj_size; ++i) {
+    if (FLAGS_use_s_curve_speed_smooth) {
+      if (!GenerateSCurveSpeedAcceleration(&(partitioned_result->at(i)))) {
+        AERROR << "GenerateSCurveSpeedAcceleration fail";
+        return false;
+      }
+    } else {
+      if (!GenerateSpeedAcceleration(&(partitioned_result->at(i)))) {
+        AERROR << "GenerateSpeedAcceleration fail";
+        return false;
+      }
+    }
+  }
   return true;
 }
 
