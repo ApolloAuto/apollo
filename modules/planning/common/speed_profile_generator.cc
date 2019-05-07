@@ -132,6 +132,15 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   const auto& veh_param =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 
+  // if already stopped
+  if (init_v <= 0.0 && init_a <= 0.0) {
+    AWARN << "Already stopped! Nothing to do in GenerateFallbackSpeed()";
+    SpeedData speed_data;
+    speed_data.AppendSpeedPoint(0.0, 0.0, 0.0, 0.0, 0.0);
+    FillEnoughSpeedPoints(&speed_data);
+    return speed_data;
+  }
+
   std::array<double, 3> init_s = {0.0, init_v, init_a};
   std::array<double, 3> end_s = {stop_distance, 0.0, 0.0};
   // TODO(Hongyi): tune the params and move to a config
