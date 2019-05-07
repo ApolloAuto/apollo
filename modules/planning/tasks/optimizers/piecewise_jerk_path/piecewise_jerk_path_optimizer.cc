@@ -25,6 +25,7 @@
 #include <utility>
 #include <vector>
 
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
 #include "modules/planning/math/piecewise_jerk/fem_1d_qp_problem.h"
@@ -80,9 +81,20 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     std::vector<double> opt_l;
     std::vector<double> opt_dl;
     std::vector<double> opt_ddl;
-    bool res_opt = OptimizePath(init_frenet_state, path_boundary.delta_s(),
-                                path_boundary.boundary(), w, &opt_l, &opt_dl,
-                                &opt_ddl, max_iter);
+
+    const auto& pull_over_info =
+        PlanningContext::Instance()->planning_status().pull_over();
+
+    std::array<double, 3> end_state = {0.0, 0.0, 0.0};
+    // Set end lateral to be at the desired pull over destination if enter into
+    // pull over scenario.
+    if (pull_over_info.exist_pull_over_position()) {
+      end_state[0] = pull_over_info.pull_over_l();
+    }
+
+    bool res_opt = OptimizePath(
+        init_frenet_state, end_state, path_boundary.delta_s(),
+        path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
       auto frenet_frame_path =
@@ -107,15 +119,18 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   return Status::OK();
 }
 
+// TODO(Hongyi): deprecate "AdjustLateralDerivativeBounds" and change interface
+// of init_state to array of double
 bool PiecewiseJerkPathOptimizer::OptimizePath(
     const std::pair<const std::array<double, 3>, const std::array<double, 3>>&
         init_state,
-    const double delta_s,
+    const std::array<double, 3>& end_state, const double delta_s,
     const std::vector<std::pair<double, double>>& lat_boundaries,
     const std::array<double, 5>& w, std::vector<double>* x,
     std::vector<double>* dx, std::vector<double>* ddx, const int max_iter) {
   std::unique_ptr<Fem1dQpProblem> fem_1d_qp(new Fem1dQpProblem());
-  fem_1d_qp->InitProblem(lat_boundaries.size(), delta_s, w, init_state.second);
+  fem_1d_qp->InitProblem(lat_boundaries.size(), delta_s, w, init_state.second,
+                         end_state);
   fem_1d_qp->SetThirdOrderBound(FLAGS_lateral_jerk_bound);
 
   auto start_time = std::chrono::system_clock::now();
