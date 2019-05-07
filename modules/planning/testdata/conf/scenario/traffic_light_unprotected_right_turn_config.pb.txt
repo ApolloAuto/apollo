@@ -15,15 +15,27 @@ stage_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE
 stage_config: {
   stage_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP
   enabled: true
-  task_type: DP_POLY_PATH_OPTIMIZER
+  task_type: PATH_LANE_BORROW_DECIDER
+  task_type: PATH_BOUNDS_DECIDER
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
-    task_type: DP_POLY_PATH_OPTIMIZER
+    task_type: PATH_LANE_BORROW_DECIDER
+  }
+  task_config: {
+    task_type: PATH_BOUNDS_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_ASSESSMENT_DECIDER
   }
   task_config: {
     task_type: PATH_DECIDER
@@ -38,7 +50,7 @@ stage_config: {
     task_type: SPEED_BOUNDS_FINAL_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_DECIDER
@@ -49,13 +61,16 @@ stage_config: {
   stage_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP
   enabled: true
   task_type: DECIDER_CREEP
-  task_type: DP_POLY_PATH_OPTIMIZER
+  task_type: PATH_LANE_BORROW_DECIDER
+  task_type: PATH_BOUNDS_DECIDER
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   # task_type: PROCEED_WITH_CAUTION_SPEED
   task_config: {
     task_type: DECIDER_CREEP
@@ -69,7 +84,16 @@ stage_config: {
     }
   }
   task_config: {
-    task_type: DP_POLY_PATH_OPTIMIZER
+    task_type: PATH_LANE_BORROW_DECIDER
+  }
+  task_config: {
+    task_type: PATH_BOUNDS_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_ASSESSMENT_DECIDER
   }
   task_config: {
     task_type: PATH_DECIDER
@@ -93,22 +117,37 @@ stage_config: {
     task_type: SPEED_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
 }
 
 stage_config: {
   stage_type: TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE
   enabled: true
-  task_type: DP_POLY_PATH_OPTIMIZER
+  task_type: PATH_LANE_BORROW_DECIDER
+  task_type: PATH_BOUNDS_DECIDER
+  task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  task_type: PATH_ASSESSMENT_DECIDER
   task_type: PATH_DECIDER
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   task_type: DP_ST_SPEED_OPTIMIZER
   task_type: SPEED_DECIDER
   task_type: SPEED_BOUNDS_FINAL_DECIDER
-  task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+  task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   task_config: {
-    task_type: DP_POLY_PATH_OPTIMIZER
+    task_type: PATH_LANE_BORROW_DECIDER
+    path_lane_borrow_decider_config {
+      allow_lane_borrowing: true
+    }
+  }
+  task_config: {
+    task_type: PATH_BOUNDS_DECIDER
+  }
+  task_config: {
+    task_type: PIECEWISE_JERK_PATH_OPTIMIZER
+  }
+  task_config: {
+    task_type: PATH_ASSESSMENT_DECIDER
   }
   task_config: {
     task_type: PATH_DECIDER
@@ -123,7 +162,7 @@ stage_config: {
     task_type: SPEED_BOUNDS_FINAL_DECIDER
   }
   task_config: {
-    task_type: QP_SPLINE_ST_SPEED_OPTIMIZER
+    task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   }
   task_config: {
     task_type: SPEED_DECIDER
