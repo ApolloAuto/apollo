@@ -232,7 +232,6 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
   std::vector<double> hybrid_a_x;
   std::vector<double> hybrid_a_y;
   std::vector<double> hybrid_a_phi;
-  std::vector<bool> hybrid_a_gear;
   while (current_node->GetPreNode() != nullptr) {
     std::vector<double> x = current_node->GetXs();
     std::vector<double> y = current_node->GetYs();
@@ -254,25 +253,17 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
     hybrid_a_x.insert(hybrid_a_x.end(), x.begin(), x.end());
     hybrid_a_y.insert(hybrid_a_y.end(), y.begin(), y.end());
     hybrid_a_phi.insert(hybrid_a_phi.end(), phi.begin(), phi.end());
-
-    size_t node_step_size = x.size();
-    for (size_t i = 0; i < node_step_size; ++i) {
-      hybrid_a_gear.push_back(current_node->GetDirec());
-    }
     current_node = current_node->GetPreNode();
   }
   hybrid_a_x.push_back(current_node->GetX());
   hybrid_a_y.push_back(current_node->GetY());
   hybrid_a_phi.push_back(current_node->GetPhi());
-  hybrid_a_gear.push_back(current_node->GetDirec());
   std::reverse(hybrid_a_x.begin(), hybrid_a_x.end());
   std::reverse(hybrid_a_y.begin(), hybrid_a_y.end());
   std::reverse(hybrid_a_phi.begin(), hybrid_a_phi.end());
-  std::reverse(hybrid_a_gear.begin(), hybrid_a_gear.end());
   (*result).x = hybrid_a_x;
   (*result).y = hybrid_a_y;
   (*result).phi = hybrid_a_phi;
-  (*result).gear = hybrid_a_gear;
 
   if (FLAGS_use_s_curve_speed_smooth) {
     if (!GenerateSCurveSpeedAcceleration(result)) {
@@ -474,34 +465,44 @@ bool HybridAStar::TrajectoryPartition(
   const auto& x = result.x;
   const auto& y = result.y;
   const auto& phi = result.phi;
-  const auto& gear = result.gear;
   if (x.size() != y.size() || x.size() != phi.size()) {
     AERROR << "states sizes are not equal when do trajectory partitioning of "
               "Hybrid A Star result";
     return false;
   }
-  size_t horizon = x.size();
 
+  size_t horizon = x.size();
   partitioned_result->clear();
   partitioned_result->emplace_back();
   auto* current_traj = &(partitioned_result->back());
-  bool current_gear = gear.front();
-  for (size_t i = 0; i < horizon; ++i) {
-    if (gear[i] != current_gear) {
+  double heading_angle = phi.front();
+  const Vec2d init_tracking_vector(x[1] - x[0], y[1] - y[0]);
+  double tracking_angle = init_tracking_vector.Angle();
+  bool current_gear =
+      std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
+      (M_PI / 2.0);
+  for (size_t i = 0; i < horizon - 1; ++i) {
+    heading_angle = phi[i];
+    const Vec2d tracking_vector(x[i + 1] - x[i], y[i + 1] - y[i]);
+    tracking_angle = tracking_vector.Angle();
+    bool gear =
+        std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
+        (M_PI / 2.0);
+    if (gear != current_gear) {
+      current_traj->x.push_back(x[i]);
+      current_traj->y.push_back(y[i]);
+      current_traj->phi.push_back(phi[i]);
       partitioned_result->emplace_back();
       current_traj = &(partitioned_result->back());
-      current_gear = gear[i];
-      // Use last trajectory point as the start of next trajectory
-      current_traj->x.push_back(x[i - 1]);
-      current_traj->y.push_back(y[i - 1]);
-      current_traj->phi.push_back(phi[i - 1]);
-      current_traj->gear.push_back(!gear[i - 1]);
+      current_gear = gear;
     }
     current_traj->x.push_back(x[i]);
     current_traj->y.push_back(y[i]);
     current_traj->phi.push_back(phi[i]);
-    current_traj->gear.push_back(gear[i]);
   }
+  current_traj->x.push_back(x.back());
+  current_traj->y.push_back(y.back());
+  current_traj->phi.push_back(phi.back());
 
   // Retrieve v, a and steer from path
   size_t traj_size = partitioned_result->size();
