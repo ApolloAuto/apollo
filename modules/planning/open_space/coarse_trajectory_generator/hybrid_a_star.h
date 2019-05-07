@@ -58,7 +58,6 @@ struct HybridAStartResult {
   std::vector<double> a;
   std::vector<double> steer;
   std::vector<double> accumulated_s;
-  std::vector<bool> gear;
 };
 
 class HybridAStar {

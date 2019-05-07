@@ -326,6 +326,9 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
       << "Failed to load open space config file "
       << FLAGS_planner_open_space_config_filename;
 
+  std::string flag_file_path = "/apollo/modules/planning/conf/planning.conf";
+  google::SetCommandLineOption("flagfile", flag_file_path.c_str());
+
   HybridAStartResult hybrid_astar_result;
   std::vector<double> XYbounds_(XYbounds, XYbounds + 4);
   if (!hybridA_ptr->Plan(sx, sy, sphi, ex, ey, ephi, XYbounds_,
@@ -352,47 +355,97 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     time_result_ds_vec.resize(size);
     dual_l_result_ds_vec.resize(size);
     dual_n_result_ds_vec.resize(size);
+    std::vector<std::future<bool>> results;
+
+    // In parallel
+    // TODO(Jinyun): fix memory issue
+    // for (size_t i = 0; i < size; ++i) {
+    //   double piece_wise_sx = partition_trajectories[i].x.front();
+    //   double piece_wise_sy = partition_trajectories[i].y.front();
+    //   double piece_wise_sphi = partition_trajectories[i].phi.front();
+    //   double piece_wise_ex = partition_trajectories[i].x.back();
+    //   double piece_wise_ey = partition_trajectories[i].y.back();
+    //   double piece_wise_ephi = partition_trajectories[i].phi.back();
+    //   auto* ith_trajectories = &partition_trajectories[i];
+    //   auto* ith_state_result = &state_result_ds_vec[i];
+    //   auto* ith_control_result = &control_result_ds_vec[i];
+    //   auto* ith_time_result = &time_result_ds_vec[i];
+    //   auto* ith_dual_l_result = &dual_l_result_ds_vec[i];
+    //   auto* ith_dual_n_result = &dual_n_result_ds_vec[i];
+    //   results.push_back(
+    //       cyber::Async(&DistanceSmoothing,
+    //       std::ref(planner_open_space_config_),
+    //                    std::ref(*obstacles_ptr), piece_wise_sx,
+    //                    piece_wise_sy, piece_wise_sphi, piece_wise_ex,
+    //                    piece_wise_ey, piece_wise_ephi, std::ref(XYbounds_),
+    //                    ith_trajectories, ith_state_result,
+    //                    ith_control_result, ith_time_result,
+    //                    ith_dual_l_result, ith_dual_n_result));
+    // }
+    // for (auto& result : results) {
+    //   if (!result.get()) {
+    //     AERROR << "Failure in a piece of trajectory.";
+    //     return false;
+    //   }
+    // }
+    // In for loop
     for (size_t i = 0; i < size; ++i) {
-      if (!DistanceSmoothing(planner_open_space_config_, *obstacles_ptr, sx, sy,
-                             sphi, ex, ey, ephi, XYbounds_,
-                             &partition_trajectories[i],
+      double piece_wise_sx = partition_trajectories[i].x.front();
+      double piece_wise_sy = partition_trajectories[i].y.front();
+      double piece_wise_sphi = partition_trajectories[i].phi.front();
+      double piece_wise_ex = partition_trajectories[i].x.back();
+      double piece_wise_ey = partition_trajectories[i].y.back();
+      double piece_wise_ephi = partition_trajectories[i].phi.back();
+      if (!DistanceSmoothing(planner_open_space_config_, *obstacles_ptr,
+                             piece_wise_sx, piece_wise_sy, piece_wise_sphi,
+                             piece_wise_ex, piece_wise_ey, piece_wise_ephi,
+                             XYbounds_, &partition_trajectories[i],
                              &state_result_ds_vec[i], &control_result_ds_vec[i],
                              &time_result_ds_vec[i], &dual_l_result_ds_vec[i],
                              &dual_n_result_ds_vec[i])) {
         return false;
       }
     }
+
     // Retrieve result in one single trajectory
-    // size_t trajectory_point_size = 0;
-    // for (size_t i = 0; i < size; ++i) {
-    //   trajectory_point_size +=
-    //       static_cast<size_t>(state_result_ds_vec[i].cols()) - 1;
-    // }
-    // ++trajectory_point_size;
-    // Eigen::MatrixXd state_result_ds;
-    // state_result_ds.resize(state_result_ds_vec.front().rows(),
-    //                        trajectory_point_size);
-    // Eigen::MatrixXd control_result_ds;
-    // control_result_ds.resize(control_result_ds_vec.front().rows(),
-    //                          trajectory_point_size - 1);
-    // int k = 0;
-    // for (size_t i = 0; i < size; ++i) {
-    //   int state_col_num = state_result_ds_vec[i].cols() - 1;
-    //   for (int j = 0; j < state_col_num; ++j) {
-    //     state_result_ds.block<state_result_ds.rows(), 1>(0, k) =
-    //         state_result_ds_vec[i].block<state_result_ds_vec[i].rows(), 1>(0,
-    //                                                                        j);
-    //     state_result_ds_vec[i].col(j);
-    //     control_result_ds << control_result_ds_vec[i].col(j);
-    //     ++k;
-    //   }
-    // }
-    // state_result_ds << state_result_ds_vec.back().col(
-    //     state_result_ds_vec.back().cols() - 1);
+    size_t trajectory_point_size = 0;
+    for (size_t i = 0; i < size; ++i) {
+      trajectory_point_size +=
+          static_cast<size_t>(state_result_ds_vec[i].cols()) - 1;
+    }
+    ++trajectory_point_size;
+
+    const long int state_dimension = state_result_ds_vec.front().rows();
+    Eigen::MatrixXd state_result_ds;
+    state_result_ds.resize(state_dimension, trajectory_point_size);
+    long int k = 0;
+    for (size_t i = 0; i < size; ++i) {
+      // leave out the last repeated point so set column minus one
+      long int state_col_num = state_result_ds_vec[i].cols() - 1;
+      for (long int j = 0; j < state_col_num; ++j) {
+        state_result_ds.col(k) = state_result_ds_vec[i].col(j);
+        ++k;
+      }
+    }
+    state_result_ds.col(k) =
+        state_result_ds_vec.back().col(state_result_ds_vec.back().cols() - 1);
+
+    const long int control_dimension = control_result_ds_vec.front().rows();
+    Eigen::MatrixXd control_result_ds;
+    control_result_ds.resize(control_dimension, trajectory_point_size - 1);
+    k = 0;
+
+    for (size_t i = 0; i < size; ++i) {
+      long int control_col_num = control_result_ds_vec[i].cols() - 1;
+      for (long int j = 0; j < control_col_num; ++j) {
+        control_result_ds.col(k) = control_result_ds_vec[i].col(j);
+        ++k;
+      }
+    }
 
     *(result_ptr->PrepareHybridAResult()) = hybrid_astar_result;
-    *(result_ptr->PrepareStateResult()) = state_result_ds_vec[0];
-    *(result_ptr->PrepareControlResult()) = control_result_ds_vec[0];
+    *(result_ptr->PrepareStateResult()) = state_result_ds;
+    *(result_ptr->PrepareControlResult()) = control_result_ds;
 
   } else {
     Eigen::MatrixXd state_result_ds;
@@ -428,9 +481,8 @@ void DistanceGetResult(ResultContainer* result_ptr,
   size_t size = result_ptr->GetX()->size();
   size_t size_by_distance = result_ptr->PrepareStateResult()->cols();
   if (size != size_by_distance) {
-    AINFO << "sizes by hybrid A and distance approach not consistent";
+    AERROR << "sizes by hybrid A and distance approach not consistent";
   }
-  std::cout << "return size is " << size << std::endl;
   for (size_t i = 0; i < size; i++) {
     x[i] = result_ptr->GetX()->at(i);
     y[i] = result_ptr->GetY()->at(i);
