@@ -152,7 +152,8 @@ void MessageProcess::OnPerception(
       if (obstacle_ptr == nullptr) {
         AERROR << "Null obstacle found.";
         continue;
-      } else if (!obstacle_ptr->latest_feature().IsInitialized()) {
+      }
+      if (!obstacle_ptr->latest_feature().IsInitialized()) {
         AERROR << "Obstacle [" << id << "] has no latest feature.";
         continue;
       }
