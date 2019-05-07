@@ -285,9 +285,9 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
   if (result->a.size() != result->steer.size() ||
       result->x.size() - result->a.size() != 1) {
     AERROR << "control sizes not equal or not right";
-    AERROR << result->a.size();
-    AERROR << result->steer.size();
-    AERROR << result->x.size();
+    AERROR << " acceleration size: " << result->a.size();
+    AERROR << " steer size: " << result->steer.size();
+    AERROR << " x size: " << result->x.size();
     return false;
   }
   return true;
@@ -335,9 +335,19 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   const size_t x_size = result->x.size();
 
+  ADEBUG << "x_size is: " << x_size;
+
   double accumulated_s = 0.0;
   std::vector<std::tuple<double, double, double>> s_bounds;
   std::vector<std::tuple<double, double, double>> ds_bounds;
+
+  // Setup for initial point.
+  result->accumulated_s.push_back(0.0);
+  result->v.push_back(0.0);
+  s_bounds.emplace_back(0.0, -10.0, 10.0);
+  ds_bounds.emplace_back(0.0, -10.0, 10.0);
+
+  ADEBUG << "Initial accumulated_s: " << 0.0 << " initial discrete_v: " << 0.0;
 
   for (size_t i = 0; i + 1 < x_size; ++i) {
     const double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
@@ -353,7 +363,12 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
                           accumulated_s + 10);
     ds_bounds.emplace_back(static_cast<double>(i) * delta_t_, discrete_v - 10,
                            discrete_v + 10);
+
+    ADEBUG << "Initial accumulated_s: " << accumulated_s
+           << " initial discrete_v: " << discrete_v;
   }
+
+  result->v[x_size - 1] = 0.0;
 
   std::array<double, 5> w = {planner_open_space_config_.warm_start_config()
                                  .s_curve_config()
@@ -374,10 +389,16 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   std::array<double, 3> init_s = {result->accumulated_s[0], result->v[0],
                                   (result->v[1] - result->v[0]) / delta_t_};
 
-  const size_t num_of_knots = x_size - 1;
+  ADEBUG << "init_s: " << result->accumulated_s[0] << " " << result->v[0] << " "
+         << (result->v[1] - result->v[0]) / delta_t_;
+
   // Start a PathTimeQpProblem
+  std::array<double, 3> end_s = {result->accumulated_s[x_size - 1], 0.0, 0.0};
+
+  ADEBUG << "end_s: " << result->accumulated_s[x_size - 1] << " " << 0.0 << " "
+         << 0.0;
   std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
-  path_time_qp->InitProblem(num_of_knots, delta_t_, w, init_s);
+  path_time_qp->InitProblem(x_size, delta_t_, w, init_s, end_s);
 
   path_time_qp->SetZeroOrderBounds(
       *(std::min_element(std::begin(result->accumulated_s),
@@ -408,8 +429,8 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   result->accumulated_s.clear();
   result->accumulated_s = path_time_qp->x();
   result->v = path_time_qp->x_derivative();
-  result->v.push_back(0.0);
   result->a = path_time_qp->x_second_order_derivative();
+  result->a.pop_back();
 
   // load steering from phi
   for (size_t i = 0; i + 1 < x_size; ++i) {
