@@ -31,10 +31,6 @@ message ChangeLaneStatus {
   optional double timestamp = 3;
 }
 
-message DestinationStatus {
-  optional bool has_passed_destination = 1 [default = false];
-}
-
 message StopTime {
   optional string obstacle_id = 1;
   // the timestamp when start stopping for the crosswalk
@@ -46,6 +42,14 @@ message CrosswalkStatus {
   // the timestamp when start stopping for the crosswalk
   repeated StopTime stop_time = 2;
   repeated string finished_crosswalk = 3;
+}
+
+message DestinationStatus {
+  optional bool has_passed_destination = 1 [default = false];
+}
+
+message PedestrianStatus {
+  repeated StopTime stop_time = 1;
 }
 
 message PullOverStatus {
@@ -95,12 +99,12 @@ message PlanningStatus {
   optional CrosswalkStatus crosswalk = 3;
   optional DestinationStatus destination = 4;
   optional apollo.common.EngageAdvice engage_advice = 5;
-  optional PullOverStatus pull_over = 6;
-  optional ReroutingStatus rerouting = 7;
-  optional RightOfWayStatus right_of_way = 8;
-  optional ScenarioStatus scenario = 9;
-  optional SidePassStatus side_pass = 10;
-  optional StopSignStatus stop_sign = 11;
-  optional TrafficLightStatus traffic_light = 12;
-
+  optional PedestrianStatus pedestrian = 6;
+  optional PullOverStatus pull_over = 7;
+  optional ReroutingStatus rerouting = 8;
+  optional RightOfWayStatus right_of_way = 9;
+  optional ScenarioStatus scenario = 10;
+  optional SidePassStatus side_pass = 11;
+  optional StopSignStatus stop_sign = 12;
+  optional TrafficLightStatus traffic_light = 13;
 }
