@@ -170,13 +170,6 @@ class Frame {
 
   perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
-  // tuple<exist_pull_over_position, x, y, theta>
-  const std::tuple<bool, double, double, double>& pull_over_info() {
-    return pull_over_info_;
-  }
-  void set_pull_over_info(const std::tuple<bool, double, double, double>&
-      pull_over_info) { pull_over_info_ = pull_over_info; }
-
  private:
   common::Status InitFrameData();
 

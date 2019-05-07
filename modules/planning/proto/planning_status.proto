@@ -50,11 +50,11 @@ message CrosswalkStatus {
 
 message PullOverStatus {
   optional bool exist_pull_over_position = 1 [default = false];
-  optional double pull_over_s = 2;
-  optional double pull_over_l = 3;
-  optional double pull_over_x = 4;
-  optional double pull_over_y = 5;
-  optional double pull_over_theta = 6;
+  optional double pull_over_s = 2 [default = 0.0];
+  optional double pull_over_l = 3 [default = 0.0];
+  optional double pull_over_x = 4 [default = 0.0];
+  optional double pull_over_y = 5 [default = 0.0];
+  optional double pull_over_theta = 6 [default = 0.0];
 }
 
 message ReroutingStatus {
