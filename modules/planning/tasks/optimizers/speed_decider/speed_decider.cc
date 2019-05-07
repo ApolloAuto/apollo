@@ -204,6 +204,17 @@ Status SpeedDecider::MakeObjectDecision(
       continue;
     }
 
+    // always STOP for pedestrian
+    if (CheckStopForPedestrian(*mutable_obstacle)) {
+      ObjectDecisionType stop_decision;
+      if (CreateStopDecision(*mutable_obstacle, &stop_decision,
+                             -FLAGS_min_stop_distance_obstacle)) {
+        mutable_obstacle->AddLongitudinalDecision("dp_st_graph/pedestrian",
+                                                  stop_decision);
+      }
+      continue;
+    }
+
     auto position = GetStPosition(path_decision, speed_profile, boundary);
     if (boundary.boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       if (CheckKeepClearBlocked(path_decision, *obstacle)) {
@@ -477,6 +488,20 @@ bool SpeedDecider::CheckIsFollowByT(const STBoundary& boundary) const {
   }
   return true;
 }
+
+bool SpeedDecider::CheckStopForPedestrian(const Obstacle& obstacle) const {
+  if (!FLAGS_enable_alwasy_stop_for_pedestrian) {
+    return false;
+  }
+
+  const auto& perception_obstacle = obstacle.Perception();
+  if (perception_obstacle.type() != PerceptionObstacle::PEDESTRIAN) {
+    return false;
+  }
+
+  return true;
+}
+
 
 }  // namespace planning
 }  // namespace apollo

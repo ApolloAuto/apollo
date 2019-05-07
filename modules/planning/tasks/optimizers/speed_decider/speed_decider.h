@@ -61,6 +61,8 @@ class SpeedDecider : public Task {
    **/
   bool CheckIsFollowByT(const STBoundary& boundary) const;
 
+  bool CheckStopForPedestrian(const Obstacle& obstacle) const;
+
   bool CreateStopDecision(const Obstacle& obstacle,
                           ObjectDecisionType* const stop_decision,
                           double stop_distance) const;

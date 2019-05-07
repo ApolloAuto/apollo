@@ -226,6 +226,8 @@ DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
+DEFINE_bool(enable_alwasy_stop_for_pedestrian, true,
+            "True to always STOP for pedestrian when path cross");
 
 DEFINE_bool(enable_side_radar, false,
             "If there is no radar on the side,ignore it");
