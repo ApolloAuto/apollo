@@ -280,12 +280,11 @@ void LaneFollowStage::PlanFallbackTrajectory(
       for (const auto& path_data : candidate_path_data) {
         if (path_data.path_label().find("self") != std::string::npos) {
           *reference_line_info->mutable_path_data() = path_data;
+          AERROR << "Use current frame self lane path as fallback ";
           break;
         }
       }
-      AERROR << "Use current frame self lane path as fallback ";
     }
-    AERROR << "Use last frame good path to do speed fallback";
   }
 
   AERROR << "Speed fallback due to algorithm failure";
@@ -368,6 +367,7 @@ bool LaneFollowStage::RetrieveLastFramePathProfile(
            << adc_frenet_frame_point_.ShortDebugString();
     return false;
   }
+  AERROR << "Use last frame good path to do speed fallback";
   return true;
 }
 
