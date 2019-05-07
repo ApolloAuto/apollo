@@ -99,6 +99,13 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
       }
       break;
     }
+    case 5: {
+      if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+          FeatureOutput::SizeOfFrameEnv() > FLAGS_max_num_dump_feature) {
+        FeatureOutput::WriteDataForTuning();
+      }
+      break;
+    }
     default: {
       // No data dump
       break;
