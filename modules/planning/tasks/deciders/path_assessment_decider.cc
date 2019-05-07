@@ -499,12 +499,26 @@ void PathAssessmentDecider::SetPathPointType(
           std::get<1>((*path_point_decision)[i]) =
               PathData::PathPointType::UNKNOWN;
         }
-        is_prev_point_out_lane = true;
+
+        if (!is_prev_point_out_lane) {
+          if (ego_sl_boundary.end_l() >
+              lane_left_width + back_to_inlane_extra_buffer ||
+              ego_sl_boundary.start_l() <
+              -lane_right_width - back_to_inlane_extra_buffer) {
+            is_prev_point_out_lane = true;
+          }
+        }
       } else {
         // The path point is within the reference_line's lane.
         std::get<1>((*path_point_decision)[i]) =
             PathData::PathPointType::IN_LANE;
-        is_prev_point_out_lane = false;
+
+        if (is_prev_point_out_lane) {
+          if (ego_sl_boundary.end_l() > lane_left_width ||
+              ego_sl_boundary.start_l() < -lane_right_width) {
+            is_prev_point_out_lane = false;
+          }
+        }
       }
     } else {
       AERROR << "reference line not ready when setting path point guide";
