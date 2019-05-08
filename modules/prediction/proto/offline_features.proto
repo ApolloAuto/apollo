@@ -53,6 +53,10 @@ message DataForTuning {
   optional double timestamp = 3;
   // The cost values whose coefficients to be tuned
   repeated double values_for_tuning = 4;
+  // The cost values of the real future trajectory
+  repeated double real_cost_value = 5;
+  // The lane sequence id if associated with a lane
+  optional int32 lane_sequence_id = 6;
 }
 
 message ListDataForTuning {
