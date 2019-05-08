@@ -48,39 +48,10 @@ namespace planning {
 
 class PiecewiseJerkProblem {
  public:
-  PiecewiseJerkProblem() = default;
+  PiecewiseJerkProblem(const size_t num_of_knots, const double delta_s,
+      const std::array<double, 3>& x_init);
 
   virtual ~PiecewiseJerkProblem() = default;
-
-  /*
-   * @param
-   * x_init: the init status of x, x', x''
-   * delta_s: s(k) - s(k-1)
-   * x_bounds: x_bounds[i].first < x(i) < x_bounds[i].second
-   * w: weight array
-   * -- w[0]: x^2 term weight
-   * -- w[1]: (x')^2 term weight
-   * -- w[2]: (x'')^2 term weight
-   * -- w[3]: (x''')^2 term weight
-   * -- w[4]: default reference line weight, (x_bounds[k].first +
-   * x_bounds[k].second)/2
-   */
-  virtual void InitProblem(const size_t num_of_knots, const double delta_s,
-                           const std::array<double, 3>& x_init,
-                           const std::array<double, 3>& x_end);
-
-  virtual void SetInitCondition(const std::array<double, 3>& x_init) {
-    x_init_ = x_init;
-  }
-
-  virtual void SetEndCondition(const std::array<double, 3>& x_end) {
-    x_end_ = x_end;
-  }
-
-  void SetZeroOrderReference(std::vector<double> x_ref);
-
-  void SetFirstOrderPenalty(std::vector<double> penalty_dx);
-
 
   void SetZeroOrderBounds(std::vector<std::pair<double, double>> x_bounds);
 
@@ -118,10 +89,6 @@ class PiecewiseJerkProblem {
     weight_dddx_ = weight_dddx;
   }
 
-  void set_weight_x_reference(const double weight_x_reference) {
-    weight_x_reference_ = weight_x_reference;
-  }
-
   virtual bool Optimize(const int max_iter = 4000);
 
   const std::vector<double>& x() const { return x_; }
@@ -134,9 +101,9 @@ class PiecewiseJerkProblem {
   // naming convention follows osqp solver.
   virtual void CalculateKernel(std::vector<c_float>* P_data,
                                std::vector<c_int>* P_indices,
-                               std::vector<c_int>* P_indptr);
+                               std::vector<c_int>* P_indptr) = 0;
 
-  virtual void CalculateOffset(std::vector<c_float>* q);
+  virtual void CalculateOffset(std::vector<c_float>* q) = 0;
 
   virtual void CalculateAffineConstraint(std::vector<c_float>* A_data,
                                          std::vector<c_int>* A_indices,
@@ -163,9 +130,6 @@ class PiecewiseJerkProblem {
   std::vector<double> ddx_;
 
   std::array<double, 3> x_init_;
-  std::array<double, 3> x_end_;
-  std::vector<double> x_ref_;
-  std::vector<double> penalty_dx_;
 
   std::vector<std::pair<double, double>> x_bounds_;
   std::vector<std::pair<double, double>> dx_bounds_;
@@ -179,8 +143,6 @@ class PiecewiseJerkProblem {
   double weight_ddx_ = 0.0;
 
   double weight_dddx_ = 0.0;
-
-  double weight_x_reference_ = 0.0;
 
   double delta_s_ = 1.0;
 };

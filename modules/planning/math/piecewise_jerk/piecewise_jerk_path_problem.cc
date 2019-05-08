@@ -14,63 +14,68 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/math/piecewise_jerk/path_time_qp_problem.h"
-
 #include <algorithm>
 
 #include "cyber/common/log.h"
 
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 
 namespace apollo {
 namespace planning {
 
-void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
-                                        std::vector<c_int>* P_indices,
-                                        std::vector<c_int>* P_indptr) {
-  const int N = static_cast<int>(num_of_knots_);
-  const int kNumParam = 3 * N;
-  const int kNumValue = 4 * N - 1;
+PiecewiseJerkPathProblem::PiecewiseJerkPathProblem(const size_t num_of_knots,
+    const double delta_s, const std::array<double, 3>& x_init) :
+        PiecewiseJerkProblem(num_of_knots, delta_s, x_init) {}
+
+void PiecewiseJerkPathProblem::SetZeroOrderReference(std::vector<double> x_ref) {
+  CHECK_EQ(x_ref.size(), num_of_knots_);
+  x_ref_ = std::move(x_ref);
+}
+
+void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
+                                     std::vector<c_int>* P_indices,
+                                     std::vector<c_int>* P_indptr) {
+  const int n = static_cast<int>(num_of_knots_);
+  const int kNumParam = 3 * n;
+  const int kNumValue = kNumParam + (n - 1);
   std::vector<std::vector<std::pair<c_int, c_float>>> columns;
   columns.resize(kNumParam);
   int value_index = 0;
 
-  // x(i)^2 * w_ref
-  for (int i = 0; i < N - 1; ++i) {
-    columns[i].emplace_back(i, weight_.x_ref_w);
+  // x(i)^2 * (w_x + w_ref)
+  for (int i = 0; i < n; ++i) {
+    columns[i].emplace_back(i, (weight_x_ + weight_x_reference_));
     ++value_index;
   }
-  // x(n-1)^2 * (w_ref + w_x)
-  columns[N - 1].emplace_back(N - 1, weight_.x_ref_w + weight_.x_w);
-  ++value_index;
 
   // x(i)'^2 * w_dx
-  for (int i = 0; i < N; ++i) {
-    columns[N + i].emplace_back(
-        N + i, weight_.x_derivative_w * (1.0 + penalty_dx_[i]));
+  for (int i = 0; i < n; ++i) {
+    columns[n + i].emplace_back(n + i, weight_dx_);
     ++value_index;
   }
 
+  auto delta_s_square = delta_s_ * delta_s_;
   // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
-  columns[2 * N].emplace_back(
-      2 * N, weight_.x_second_order_derivative_w +
-                 weight_.x_third_order_derivative_w / delta_s_sq_);
+  columns[2 * n].emplace_back(
+      2 * n, weight_ddx_ +
+                 weight_dddx_ / delta_s_square);
   ++value_index;
-  for (int i = 1; i < N - 1; ++i) {
-    columns[2 * N + i].emplace_back(
-        2 * N + i, weight_.x_second_order_derivative_w +
-                       2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
+  for (int i = 1; i < n - 1; ++i) {
+    columns[2 * n + i].emplace_back(
+        2 * n + i, weight_ddx_ +
+                       2.0 * weight_dddx_ / delta_s_square);
     ++value_index;
   }
-  columns[3 * N - 1].emplace_back(
-      3 * N - 1, weight_.x_second_order_derivative_w +
-                     weight_.x_third_order_derivative_w / delta_s_sq_);
+  columns[3 * n - 1].emplace_back(
+      3 * n - 1, weight_ddx_ +
+                     weight_dddx_ / delta_s_square);
   ++value_index;
 
   // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
-  for (int i = 0; i < N - 1; ++i) {
-    columns[2 * N + i].emplace_back(
-        2 * N + i + 1, -2.0 * weight_.x_third_order_derivative_w / delta_s_sq_);
+  for (int i = 0; i < n - 1; ++i) {
+    columns[2 * n + i].emplace_back(
+        2 * n + i + 1, -2.0 * weight_dddx_ / delta_s_square);
     ++value_index;
   }
 
@@ -88,18 +93,14 @@ void PathTimeQpProblem::CalculateKernel(std::vector<c_float>* P_data,
   P_indptr->push_back(ind_p);
 }
 
-void PathTimeQpProblem::CalculateOffset(std::vector<c_float>* q) {
+void PiecewiseJerkPathProblem::CalculateOffset(std::vector<c_float>* q) {
   CHECK_NOTNULL(q);
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
   q->resize(kNumParam);
   for (int i = 0; i < N; ++i) {
-    q->at(i) += -2.0 * weight_.x_ref_w * x_ref_[i];
-    q->at(N + i) += -2.0 * weight_.x_derivative_w * x_derivative_desire;
+    q->at(i) += -2.0 * weight_x_reference_ * x_ref_[i];
   }
-  q->at(N - 1) += -2.0 * weight_.x_w * x_end_[0];
-  q->at(2 * N - 1) += -2.0 * weight_.x_derivative_w * x_end_[1];
-  q->at(3 * N - 1) += -2.0 * weight_.x_second_order_derivative_w * x_end_[2];
 }
 
 }  // namespace planning
