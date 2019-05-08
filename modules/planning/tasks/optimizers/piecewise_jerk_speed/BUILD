@@ -15,7 +15,7 @@ cc_library(
         "//modules/common/proto:error_code_proto",
         "//modules/common/proto:pnc_point_proto",
         "//modules/planning/common:st_graph_data",
-        "//modules/planning/math/piecewise_jerk:path_time_qp_problem",
+        "//modules/planning/math/piecewise_jerk:piecewise_jerk_speed_problem",
         "//modules/planning/tasks/optimizers:speed_optimizer",
     ],
 )

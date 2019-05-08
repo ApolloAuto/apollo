@@ -46,14 +46,23 @@ namespace planning {
  * which makes the line P(start), P0, P(1) ... P(k-1) "smooth".
  */
 
-class PathTimeQpProblem : public PiecewiseJerkProblem {
+class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
  public:
-  PathTimeQpProblem() = default;
+  PiecewiseJerkSpeedProblem(const size_t num_of_knots, const double delta_s,
+      const std::array<double, 3>& x_init, const std::array<double, 3>& x_end);
 
-  virtual ~PathTimeQpProblem() = default;
+  virtual ~PiecewiseJerkSpeedProblem() = default;
 
-  void SetDesireDerivative(const double dx_desire = 0.0) {
-    x_derivative_desire = dx_desire;
+  void SetZeroOrderReference(std::vector<double> x_ref);
+
+  void SetFirstOrderReference(const double dx_desire = 0.0) {
+    dx_reference_ = dx_desire;
+  }
+
+  void SetFirstOrderPenalty(std::vector<double> penalty_dx);
+
+  void set_weight_x_reference(const double weight_x_reference) {
+    weight_x_reference_ = weight_x_reference;
   }
 
  protected:
@@ -64,7 +73,21 @@ class PathTimeQpProblem : public PiecewiseJerkProblem {
 
   void CalculateOffset(std::vector<c_float>* q) override;
 
-  double x_derivative_desire = 0.0;
+  double dx_reference_ = 0.0;
+
+  double weight_x_reference_ = 0.0;
+
+  std::vector<double> penalty_dx_;
+
+  std::vector<double> x_reference_;
+
+  std::array<double, 3> end_state_target_;
+
+  double weight_end_x_ = 0.0;
+
+  double weight_end_dx_ = 0.0;
+
+  double weight_end_ddx_ = 0.0;
 };
 
 }  // namespace planning

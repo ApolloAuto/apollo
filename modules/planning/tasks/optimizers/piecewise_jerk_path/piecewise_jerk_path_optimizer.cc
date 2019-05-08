@@ -25,10 +25,10 @@
 #include <utility>
 #include <vector>
 
+#include "../../../math/piecewise_jerk/piecewise_jerk_path_problem.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
-#include "modules/planning/math/piecewise_jerk/fem_1d_qp_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -128,14 +128,21 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     const std::vector<std::pair<double, double>>& lat_boundaries,
     const std::array<double, 5>& w, std::vector<double>* x,
     std::vector<double>* dx, std::vector<double>* ddx, const int max_iter) {
-  std::unique_ptr<Fem1dQpProblem> fem_1d_qp(new Fem1dQpProblem());
-  fem_1d_qp->InitProblem(lat_boundaries.size(), delta_s, w, init_state.second,
-                         end_state);
-  fem_1d_qp->SetThirdOrderBound(FLAGS_lateral_jerk_bound);
+  PiecewiseJerkPathProblem piecewise_jerk_problem(
+      lat_boundaries.size(), delta_s, init_state.second);
+
+  piecewise_jerk_problem.set_weight_x(w[0]);
+  piecewise_jerk_problem.set_weight_dx(w[1]);
+  piecewise_jerk_problem.set_weight_ddx(w[2]);
+  piecewise_jerk_problem.set_weight_dddx(w[3]);
+  // TODO(all): fillin the correct weight
+  piecewise_jerk_problem.set_weight_x_reference(w[4]);
+
+  piecewise_jerk_problem.SetThirdOrderBound(FLAGS_lateral_jerk_bound);
 
   auto start_time = std::chrono::system_clock::now();
 
-  fem_1d_qp->SetZeroOrderBounds(lat_boundaries);
+  piecewise_jerk_problem.SetZeroOrderBounds(lat_boundaries);
 
   double first_order_bounds = AdjustLateralDerivativeBounds(
       init_state.first[1], init_state.second[1], init_state.second[2],
@@ -145,12 +152,12 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
          << first_order_bounds;
   // TODO(all): temp. disable AdjustLateralDerivativeBounds, enable later
   // fem_1d_qp->SetFirstOrderBounds(-first_order_bounds, first_order_bounds);
-  fem_1d_qp->SetFirstOrderBounds(-FLAGS_lateral_derivative_bound_default,
+  piecewise_jerk_problem.SetFirstOrderBounds(-FLAGS_lateral_derivative_bound_default,
                                  FLAGS_lateral_derivative_bound_default);
-  fem_1d_qp->SetSecondOrderBounds(-FLAGS_lateral_derivative_bound_default,
+  piecewise_jerk_problem.SetSecondOrderBounds(-FLAGS_lateral_derivative_bound_default,
                                   FLAGS_lateral_derivative_bound_default);
 
-  bool success = fem_1d_qp->Optimize(max_iter);
+  bool success = piecewise_jerk_problem.Optimize(max_iter);
 
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
@@ -161,9 +168,9 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     return false;
   }
 
-  *x = fem_1d_qp->x();
-  *dx = fem_1d_qp->x_derivative();
-  *ddx = fem_1d_qp->x_second_order_derivative();
+  *x = piecewise_jerk_problem.x();
+  *dx = piecewise_jerk_problem.x_derivative();
+  *ddx = piecewise_jerk_problem.x_second_order_derivative();
 
   return true;
 }

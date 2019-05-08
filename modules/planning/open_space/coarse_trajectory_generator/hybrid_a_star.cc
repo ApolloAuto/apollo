@@ -20,7 +20,7 @@
 
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
-#include "modules/planning/math/piecewise_jerk/path_time_qp_problem.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -406,28 +406,35 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   ADEBUG << "end_s: " << result->accumulated_s[x_size - 1] << " " << 0.0 << " "
          << 0.0;
-  std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
-  path_time_qp->InitProblem(x_size, delta_t_, w, init_s, end_s);
 
-  path_time_qp->SetZeroOrderBounds(
+  const size_t num_of_knots = x_size - 1;
+
+  PiecewiseJerkSpeedProblem path_time_qp(num_of_knots, delta_t_, init_s, end_s);
+  path_time_qp.set_weight_x(w[0]);
+  path_time_qp.set_weight_dx(w[1]);
+  path_time_qp.set_weight_ddx(w[2]);
+  path_time_qp.set_weight_dddx(w[3]);
+  path_time_qp.set_weight_x_reference(w[4]);
+
+  path_time_qp.SetZeroOrderBounds(
       *(std::min_element(std::begin(result->accumulated_s),
                          std::end(result->accumulated_s))) -
           10,
       *(std::max_element(std::begin(result->accumulated_s),
                          std::end(result->accumulated_s))) +
           10);
-  path_time_qp->SetFirstOrderBounds(
+  path_time_qp.SetFirstOrderBounds(
       *(std::min_element(std::begin(result->v), std::end(result->v)) - 10),
       *(std::max_element(std::begin(result->v), std::end(result->v))) + 10);
   // TODO(QiL): load this from configs
-  path_time_qp->SetSecondOrderBounds(-4.4, 10.0);
-  path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
-  path_time_qp->SetDesireDerivative(0.0);
+  path_time_qp.SetSecondOrderBounds(-4.4, 10.0);
+  path_time_qp.SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
+  path_time_qp.SetFirstOrderReference(0.0);
 
-  path_time_qp->SetZeroOrderReference(result->accumulated_s);
+  path_time_qp.SetZeroOrderReference(result->accumulated_s);
 
-  // Sovle the problem
-  if (!path_time_qp->Optimize()) {
+  // Solve the problem
+  if (!path_time_qp.Optimize()) {
     std::string msg("Piecewise jerk speed optimizer failed!");
     AERROR << msg;
     return false;
@@ -436,9 +443,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   // Extract output
   result->v.clear();
   result->accumulated_s.clear();
-  result->accumulated_s = path_time_qp->x();
-  result->v = path_time_qp->x_derivative();
-  result->a = path_time_qp->x_second_order_derivative();
+  result->accumulated_s = path_time_qp.x();
+  result->v = path_time_qp.x_derivative();
+  result->a = path_time_qp.x_second_order_derivative();
   result->a.pop_back();
 
   // load steering from phi
