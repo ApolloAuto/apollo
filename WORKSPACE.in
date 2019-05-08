@@ -191,7 +191,7 @@ new_http_archive(
     url = "file:///home/tmp/tinyxml2-5.0.1.zip",
 )
 
-#protobuf 3.3
+#protobuf 3.3.0
 http_archive(
     name = "com_google_protobuf",
     strip_prefix = "protobuf-3.3.0",
