@@ -562,6 +562,5 @@ bool SpeedDecider::CheckStopForPedestrian(
   return true;
 }
 
-
 }  // namespace planning
 }  // namespace apollo
