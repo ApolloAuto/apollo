@@ -17,26 +17,13 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "piecewise_jerk_problem_test",
-    size = "small",
-    srcs = [
-        "piecewise_jerk_problem_test.cc",
-    ],
-    deps = [
-        ":piecewise_jerk_problem",
-        "//cyber/common:log",
-        "@gtest//:main",
-    ],
-)
-
 cc_library(
-    name = "fem_1d_qp_problem",
+    name = "piecewise_jerk_path_problem",
     srcs = [
-        "fem_1d_qp_problem.cc",
+        "piecewise_jerk_path_problem.cc",
     ],
     hdrs = [
-        "fem_1d_qp_problem.h",
+        "piecewise_jerk_path_problem.h",
     ],
     deps = [
         ":piecewise_jerk_problem",
@@ -44,12 +31,12 @@ cc_library(
 )
 
 cc_library(
-    name = "path_time_qp_problem",
+    name = "piecewise_jerk_speed_problem",
     srcs = [
-        "path_time_qp_problem.cc",
+        "piecewise_jerk_speed_problem.cc",
     ],
     hdrs = [
-        "path_time_qp_problem.h",
+        "piecewise_jerk_speed_problem.h",
     ],
     deps = [
         ":piecewise_jerk_problem",

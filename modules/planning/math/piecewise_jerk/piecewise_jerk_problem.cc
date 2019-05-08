@@ -29,15 +29,12 @@ namespace {
 constexpr double kMaxVariableRange = 1.0e10;
 }  // namespace
 
-void PiecewiseJerkProblem::InitProblem(const size_t num_of_knots,
-                                       const double delta_s,
-                                       const std::array<double, 3>& x_init,
-                                       const std::array<double, 3>& x_end) {
+PiecewiseJerkProblem::PiecewiseJerkProblem(const size_t num_of_knots, const double delta_s,
+    const std::array<double, 3>& x_init) {
   CHECK_GE(num_of_knots, 2);
   num_of_knots_ = num_of_knots;
 
   x_init_ = x_init;
-  x_end_ = x_end;
 
   delta_s_ = delta_s;
 
@@ -60,6 +57,8 @@ bool PiecewiseJerkProblem::OptimizeWithOsqp(
     std::vector<c_float>& upper_bounds,                             // NOLINT
     std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
     OSQPSettings* settings) {
+  CHECK_EQ(lower_bounds.size(), upper_bounds.size());
+
   data->n = kernel_dim;
   data->m = num_affine_constraint;
   data->P = csc_matrix(data->n, data->n, P_data.size(), P_data.data(),
@@ -69,8 +68,6 @@ bool PiecewiseJerkProblem::OptimizeWithOsqp(
                        A_indices.data(), A_indptr.data());
   data->l = lower_bounds.data();
   data->u = upper_bounds.data();
-
-  CHECK_EQ(lower_bounds.size(), upper_bounds.size());
 
   *work = osqp_setup(data, settings);
 
@@ -90,17 +87,6 @@ bool PiecewiseJerkProblem::OptimizeWithOsqp(
   }
 
   return true;
-}
-
-void PiecewiseJerkProblem::SetZeroOrderReference(std::vector<double> x_ref) {
-  CHECK_EQ(x_ref.size(), num_of_knots_);
-  x_ref_ = std::move(x_ref);
-}
-
-void PiecewiseJerkProblem::SetFirstOrderPenalty(
-    std::vector<double> penalty_dx) {
-  CHECK_EQ(penalty_dx.size(), num_of_knots_);
-  penalty_dx_ = std::move(penalty_dx);
 }
 
 void PiecewiseJerkProblem::SetZeroOrderBounds(
@@ -202,8 +188,6 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
     dx_.at(i) = work->solution->x[i + num_of_knots_];
     ddx_.at(i) = work->solution->x[i + 2 * num_of_knots_];
   }
-  dx_.back() = work->solution->x[2 * num_of_knots_ - 1];
-  ddx_.back() = work->solution->x[3 * num_of_knots_ - 1];
 
   // Cleanup
   osqp_cleanup(work);
@@ -215,63 +199,61 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   return true;
 }
 
-void PiecewiseJerkProblem::CalculateKernel(std::vector<c_float>* P_data,
-                                           std::vector<c_int>* P_indices,
-                                           std::vector<c_int>* P_indptr) {
-  const int N = static_cast<int>(num_of_knots_);
-  const int kNumParam = 3 * N;
-  const int kNumValue = kNumParam + (N - 1);
-  std::vector<std::vector<std::pair<c_int, c_float>>> columns;
-  columns.resize(kNumParam);
-  int value_index = 0;
-
-  // x(i)^2 * (w_x + w_ref)
-  for (int i = 0; i < N; ++i) {
-    columns[i].emplace_back(i, (weight_x_ + weight_x_reference_));
-    ++value_index;
-  }
-
-  // x(i)'^2 * w_dx
-  for (int i = 0; i < N; ++i) {
-    columns[N + i].emplace_back(N + i, weight_dx_);
-    ++value_index;
-  }
-
-  auto delta_s_sq_ = delta_s_ * delta_s_;
-  // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
-  columns[2 * N].emplace_back(
-      2 * N, weight_ddx_ + weight_dddx_ / delta_s_sq_);
-
-  ++value_index;
-  for (int i = 1; i < N - 1; ++i) {
-    columns[2 * N + i].emplace_back(
-        2 * N + i, weight_ddx_ + 2.0 * weight_dddx_ / delta_s_sq_);
-    ++value_index;
-  }
-  columns[3 * N - 1].emplace_back(
-      3 * N - 1, weight_ddx_ + weight_dddx_ / delta_s_sq_);
-  ++value_index;
-
-  // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
-  for (int i = 0; i < N - 1; ++i) {
-    columns[2 * N + i].emplace_back(
-        2 * N + i + 1, -2.0 * weight_dddx_ / delta_s_sq_);
-    ++value_index;
-  }
-
-  CHECK_EQ(value_index, kNumValue);
-
-  int ind_p = 0;
-  for (int i = 0; i < kNumParam; ++i) {
-    P_indptr->push_back(ind_p);
-    for (const auto& row_data_pair : columns[i]) {
-      P_data->push_back(row_data_pair.second * 2.0);
-      P_indices->push_back(row_data_pair.first);
-      ++ind_p;
-    }
-  }
-  P_indptr->push_back(ind_p);
-}
+//void PiecewiseJerkProblem::CalculateKernel(std::vector<c_float>* P_data,
+//                                           std::vector<c_int>* P_indices,
+//                                           std::vector<c_int>* P_indptr) {
+//  const size_t n = num_of_knots_;
+//  const size_t num_of_variables = 3 * n;
+//  std::vector<std::vector<std::pair<c_int, c_float>>> columns;
+//  columns.resize(num_of_variables);
+//  size_t value_index = 0;
+//
+//  // x(i)^2 * (w_x + w_ref)
+//  for (size_t i = 0; i < n; ++i) {
+//    columns[i].emplace_back(i, weight_x_ + weight_x_reference_);
+//    ++value_index;
+//  }
+//
+//  // x(i)'^2 * w_dx
+//  for (size_t i = 0; i < n; ++i) {
+//    columns[n + i].emplace_back(n + i, weight_dx_);
+//    ++value_index;
+//  }
+//
+//  auto delta_s_square = delta_s_ * delta_s_;
+//  // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
+//  columns[2 * n].emplace_back(
+//      2 * n, weight_ddx_ + weight_dddx_ / delta_s_square);
+//  ++value_index;
+//  for (size_t i = 1; i + 1 < n; ++i) {
+//    columns[2 * n + i].emplace_back(
+//        2 * n + i, weight_ddx_ + 2.0 * weight_dddx_ / delta_s_square);
+//    ++value_index;
+//  }
+//  columns[3 * n - 1].emplace_back(
+//      3 * n - 1, weight_ddx_ + weight_dddx_ / delta_s_square);
+//  ++value_index;
+//
+//  // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
+//  for (size_t i = 0; i + 1 < n; ++i) {
+//    columns[2 * n + i].emplace_back(
+//        2 * n + i + 1, -2.0 * weight_dddx_ / delta_s_square);
+//    ++value_index;
+//  }
+//
+//  CHECK_EQ(value_index, num_of_variables + n - 1);
+//
+//  size_t ind_p = 0;
+//  for (size_t i = 0; i < num_of_variables; ++i) {
+//    P_indptr->push_back(ind_p);
+//    for (const auto& row_data_pair : columns[i]) {
+//      P_indices->push_back(row_data_pair.first);
+//      P_data->push_back(row_data_pair.second * 2.0);
+//      ++ind_p;
+//    }
+//  }
+//  P_indptr->push_back(ind_p);
+//}
 
 void PiecewiseJerkProblem::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
@@ -371,18 +353,18 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
   A_indptr->push_back(ind_p);
 }
 
-void PiecewiseJerkProblem::CalculateOffset(std::vector<c_float>* q) {
-  CHECK_NOTNULL(q);
-  const int N = static_cast<int>(num_of_knots_);
-  const int kNumParam = 3 * N;
-  q->resize(kNumParam);
-  for (int i = 0; i < N; ++i) {
-    q->at(i) += -2.0 * weight_x_reference_ * x_ref_[i];
-  }
-  q->at(N - 1) += -2.0 * weight_x_ * x_end_[0];
-  q->at(N * 2 - 1) += -2.0 * weight_dx_ * x_end_[1];
-  q->at(N * 3 - 1) += -2.0 * weight_ddx_ * x_end_[2];
-}
+//void PiecewiseJerkProblem::CalculateOffset(std::vector<c_float>* q) {
+//  CHECK_NOTNULL(q);
+//  const size_t N = num_of_knots_;
+//  q->resize(3 * N, 0.0);
+//
+//  for (size_t i = 0; i < N; ++i) {
+//    q->at(i) += -2.0 * weight_x_reference_ * x_ref_[i];
+//  }
+////  q->at(N - 1) += -2.0 * weight_x_ * x_end_[0];
+////  q->at(N * 2 - 1) += -2.0 * weight_dx_ * x_end_[1];
+////  q->at(N * 3 - 1) += -2.0 * weight_ddx_ * x_end_[2];
+//}
 
 }  // namespace planning
 }  // namespace apollo
