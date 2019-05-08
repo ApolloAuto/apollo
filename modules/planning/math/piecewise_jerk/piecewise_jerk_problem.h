@@ -53,23 +53,23 @@ class PiecewiseJerkProblem {
 
   virtual ~PiecewiseJerkProblem() = default;
 
-  void SetZeroOrderBounds(std::vector<std::pair<double, double>> x_bounds);
+  void set_x_bounds(std::vector<std::pair<double, double>> x_bounds);
 
-  void SetZeroOrderBounds(const double x_lower_bound,
+  void set_x_bounds(const double x_lower_bound,
                           const double x_upper_bound);
 
-  void SetFirstOrderBounds(std::vector<std::pair<double, double>> dx_bounds);
+  void set_dx_bounds(std::vector<std::pair<double, double>> dx_bounds);
 
-  void SetFirstOrderBounds(const double dx_lower_bound,
-                           const double dx_upper_bound);
+  void set_dx_bounds(const double dx_lower_bound,
+                     const double dx_upper_bound);
 
 
-  void SetSecondOrderBounds(std::vector<std::pair<double, double>> d2x_bounds);
+  void set_ddx_bounds(std::vector<std::pair<double, double>> d2x_bounds);
 
-  void SetSecondOrderBounds(const double ddx_lower_bound,
-                            const double ddx_upper_bound);
+  void set_ddx_bounds(const double ddx_lower_bound,
+                      const double ddx_upper_bound);
 
-  void SetThirdOrderBound(const double dddx_bound) {
+  void set_dddx_bound(const double dddx_bound) {
     dddx_bound_ = dddx_bound;
   }
 
@@ -91,11 +91,11 @@ class PiecewiseJerkProblem {
 
   virtual bool Optimize(const int max_iter = 4000);
 
-  const std::vector<double>& x() const { return x_; }
+  const std::vector<double>& opt_x() const { return x_; }
 
-  const std::vector<double>& x_derivative() const { return dx_; }
+  const std::vector<double>& opt_dx() const { return dx_; }
 
-  const std::vector<double>& x_second_order_derivative() const { return ddx_; }
+  const std::vector<double>& opt_ddx() const { return ddx_; }
 
  protected:
   // naming convention follows osqp solver.
