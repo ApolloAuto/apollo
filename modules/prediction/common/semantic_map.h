@@ -34,7 +34,16 @@ class SemanticMap {
   void RunCurrFrame(const FrameEnv& curr_frame_env);
 
  private:
-  void GetTransPoint();
+  cv::Point2i GetTransPoint(double x, double y) {
+    return cv::Point2i(static_cast<int>((x - curr_base_x_) / 0.1),
+                       static_cast<int>(2000 - (y - curr_base_y_) / 0.1));
+  }
+
+  void DrawRect(const Feature& feature,
+                const cv::Scalar& color = cv::Scalar(0, 255, 255));
+
+  void DrawPoly(const Feature& feature,
+                const cv::Scalar& color = cv::Scalar(0, 255, 255));
 
  private:
   cv::Mat base_img_;

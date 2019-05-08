@@ -17,6 +17,7 @@
 #include "modules/prediction/common/semantic_map.h"
 
 #include <string>
+#include <vector>
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
@@ -41,15 +42,52 @@ void SemanticMap::Init() {
 
 void SemanticMap::RunCurrFrame(const FrameEnv& curr_frame_env) {
   // TODO(Hongyi): moving all these magic numbers to conf
-  curr_base_x_ = curr_frame_env.ego_history().feature(0).position().x() - 50.0;
-  curr_base_y_ = curr_frame_env.ego_history().feature(0).position().y() - 50.0;
+  curr_base_x_ = curr_frame_env.ego_history().feature(0).position().x() - 100.0;
+  curr_base_y_ = curr_frame_env.ego_history().feature(0).position().y() - 100.0;
   cv::Rect rect(static_cast<int>((curr_base_x_ - 585950.0) / 0.1),
-            static_cast<int>(18000 - (curr_base_y_ - 4140000.0) / 0.1) - 1000,
-            1000, 1000);
-  curr_img_ = base_img_(rect);
-  cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);
+            static_cast<int>(18000 - (curr_base_y_ - 4140000.0) / 0.1) - 2000,
+            2000, 2000);
+  base_img_(rect).copyTo(curr_img_);
+  // double curr_timestamp = curr_frame_env.timestamp();
+
+  // For disaplay
+  cv::namedWindow("Display window", cv::WINDOW_NORMAL);
   cv::imshow("Display window", curr_img_);
   cv::waitKey(0);
+}
+
+void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color) {
+  double obs_l = feature.length();
+  double obs_w = feature.width();
+  double obs_x = feature.position().x();
+  double obs_y = feature.position().y();
+  double theta = feature.theta();
+  std::vector<cv::Point> polygon;
+  // point 1 (head-right point)
+  polygon.push_back(
+      GetTransPoint(obs_x + (cos(theta) * obs_l - sin(theta) * obs_w) / 2,
+                    obs_y + (sin(theta) * obs_l + cos(theta) * obs_w) / 2));
+  // point 2 (head-left point)
+  polygon.push_back(
+      GetTransPoint(obs_x + (cos(theta) * -obs_l - sin(theta) * obs_w) / 2,
+                    obs_y + (sin(theta) * -obs_l + cos(theta) * obs_w) / 2));
+  // point 3 (head-left point)
+  polygon.push_back(
+      GetTransPoint(obs_x + (cos(theta) * -obs_l - sin(theta) * -obs_w) / 2,
+                    obs_y + (sin(theta) * -obs_l + cos(theta) * -obs_w) / 2));
+  // point 4 (head-left point)
+  polygon.push_back(
+      GetTransPoint(obs_x + (cos(theta) * obs_l - sin(theta) * -obs_w) / 2,
+                    obs_y + (sin(theta) * obs_l + cos(theta) * -obs_w) / 2));
+  cv::fillConvexPoly(curr_img_, polygon, color);
+}
+
+void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color) {
+  std::vector<cv::Point> polygon;
+  for (auto& polygon_point : feature.polygon_point()) {
+    polygon.push_back(GetTransPoint(polygon_point.x(), polygon_point.y()));
+  }
+  cv::fillConvexPoly(curr_img_, polygon, color);
 }
 
 }  // namespace prediction
