@@ -29,11 +29,15 @@ PiecewiseJerkSpeedProblem::PiecewiseJerkSpeedProblem(
     const std::array<double, 3>& x_init, const std::array<double, 3>& x_end) :
         PiecewiseJerkProblem(num_of_knots, delta_s, x_init) {
   end_state_target_ = x_end;
+  penalty_dx_.resize(num_of_knots_, 0.0);
 }
 
-void PiecewiseJerkSpeedProblem::SetZeroOrderReference(std::vector<double> x_ref) {
+void PiecewiseJerkSpeedProblem::set_x_reference(
+    const double weight_x_reference, std::vector<double> x_ref) {
   CHECK_EQ(x_ref.size(), num_of_knots_);
   x_reference_ = std::move(x_ref);
+  weight_x_reference_ = weight_x_reference;
+  has_x_reference_ = true;
 }
 
 void PiecewiseJerkSpeedProblem::SetFirstOrderPenalty(
@@ -111,8 +115,12 @@ void PiecewiseJerkSpeedProblem::CalculateOffset(std::vector<c_float>* q) {
   const int kNumParam = 3 * n;
   q->resize(kNumParam);
   for (int i = 0; i < n; ++i) {
-    q->at(i) += -2.0 * weight_x_reference_ * x_reference_[i];
-    q->at(n + i) += -2.0 * weight_dx_ * dx_reference_;
+    if (has_x_reference_) {
+      q->at(i) += -2.0 * weight_x_reference_ * x_reference_[i];
+    }
+    if (has_dx_reference_) {
+      q->at(n + i) += -2.0 * weight_dx_reference_ * dx_reference_;
+    }
   }
 
   q->at(n - 1) += -2.0 * weight_end_x_ * end_state_target_[0];

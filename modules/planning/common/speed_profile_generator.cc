@@ -158,16 +158,16 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   piecewise_jerk_problem.set_weight_dx(w[1]);
   piecewise_jerk_problem.set_weight_ddx(w[2]);
   piecewise_jerk_problem.set_weight_dddx(w[3]);
-  piecewise_jerk_problem.set_weight_x_reference(w[4]);
+//  piecewise_jerk_problem.set_weight_x_reference(w[4]);
 
-  piecewise_jerk_problem.SetZeroOrderBounds(0.0, std::fmax(stop_distance, 100.0));
-  piecewise_jerk_problem.SetFirstOrderBounds(
+  piecewise_jerk_problem.set_x_bounds(0.0, std::fmax(stop_distance, 100.0));
+  piecewise_jerk_problem.set_dx_bounds(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_v));
-  piecewise_jerk_problem.SetSecondOrderBounds(veh_param.max_deceleration(),
+  piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
   // TODO(Hongyi): Set back to vehicle_params when ready
-  piecewise_jerk_problem.SetSecondOrderBounds(-4.4, 2.0);
-  piecewise_jerk_problem.SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
+  piecewise_jerk_problem.set_ddx_bounds(-4.4, 2.0);
+  piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
   // Solve the problem
   if (!piecewise_jerk_problem.Optimize()) {
@@ -176,9 +176,9 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   }
 
   // Extract output
-  const std::vector<double>& s = piecewise_jerk_problem.x();
-  const std::vector<double>& ds = piecewise_jerk_problem.x_derivative();
-  const std::vector<double>& dds = piecewise_jerk_problem.x_second_order_derivative();
+  const std::vector<double>& s = piecewise_jerk_problem.opt_x();
+  const std::vector<double>& ds = piecewise_jerk_problem.opt_dx();
+  const std::vector<double>& dds = piecewise_jerk_problem.opt_ddx();
 
   SpeedData speed_data;
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);

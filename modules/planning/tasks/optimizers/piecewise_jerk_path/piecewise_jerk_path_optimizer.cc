@@ -48,8 +48,6 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     PathData* const final_path_data) {
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
-  AERROR << "Piecewise jerk path";
-
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
   std::array<double, 5> w = {
       piecewise_jerk_path_config.l_weight(),
@@ -118,8 +116,6 @@ common::Status PiecewiseJerkPathOptimizer::Process(
                   "Path Optimizer failed to generate path");
   }
   reference_line_info_->SetCandidatePathData(std::move(candidate_path_data));
-
-  AERROR << "Piecewise jerk path done";
   return Status::OK();
 }
 
@@ -139,27 +135,24 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   piecewise_jerk_problem.set_weight_dx(w[1]);
   piecewise_jerk_problem.set_weight_ddx(w[2]);
   piecewise_jerk_problem.set_weight_dddx(w[3]);
-  // TODO(all): fillin the correct weight
-  piecewise_jerk_problem.set_weight_x_reference(w[4]);
-
-  piecewise_jerk_problem.SetThirdOrderBound(FLAGS_lateral_jerk_bound);
 
   auto start_time = std::chrono::system_clock::now();
 
-  piecewise_jerk_problem.SetZeroOrderBounds(lat_boundaries);
+  piecewise_jerk_problem.set_x_bounds(lat_boundaries);
 
-  double first_order_bounds = AdjustLateralDerivativeBounds(
+  double dx_bounds = AdjustLateralDerivativeBounds(
       init_state.first[1], init_state.second[1], init_state.second[2],
       FLAGS_lateral_derivative_bound_default);
   ADEBUG << "adjusted lateral derivative bound from \t"
          << FLAGS_lateral_derivative_bound_default << "\t"
-         << first_order_bounds;
+         << dx_bounds;
   // TODO(all): temp. disable AdjustLateralDerivativeBounds, enable later
   // fem_1d_qp->SetFirstOrderBounds(-first_order_bounds, first_order_bounds);
-  piecewise_jerk_problem.SetFirstOrderBounds(-FLAGS_lateral_derivative_bound_default,
-                                 FLAGS_lateral_derivative_bound_default);
-  piecewise_jerk_problem.SetSecondOrderBounds(-FLAGS_lateral_derivative_bound_default,
-                                  FLAGS_lateral_derivative_bound_default);
+  piecewise_jerk_problem.set_dx_bounds(-FLAGS_lateral_derivative_bound_default,
+                                        FLAGS_lateral_derivative_bound_default);
+  piecewise_jerk_problem.set_ddx_bounds(-FLAGS_lateral_derivative_bound_default,
+                                         FLAGS_lateral_derivative_bound_default);
+  piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
   bool success = piecewise_jerk_problem.Optimize(max_iter);
 
@@ -172,9 +165,9 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     return false;
   }
 
-  *x = piecewise_jerk_problem.x();
-  *dx = piecewise_jerk_problem.x_derivative();
-  *ddx = piecewise_jerk_problem.x_second_order_derivative();
+  *x = piecewise_jerk_problem.opt_x();
+  *dx = piecewise_jerk_problem.opt_dx();
+  *ddx = piecewise_jerk_problem.opt_ddx();
   return true;
 }
 
