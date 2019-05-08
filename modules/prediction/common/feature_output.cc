@@ -122,7 +122,7 @@ void FeatureOutput::InsertFrameEnv(const FrameEnv& frame_env) {
 
 void FeatureOutput::InsertDataForTuning(
     const Feature& feature, const std::vector<double>& feature_values,
-    const std::string& category) {
+    const std::string& category, const LaneSequence& lane_sequence) {
   DataForTuning* data_for_tuning = list_data_for_tuning_.add_data_for_tuning();
   data_for_tuning->set_id(feature.id());
   data_for_tuning->set_timestamp(feature.timestamp());
@@ -131,6 +131,7 @@ void FeatureOutput::InsertDataForTuning(
   data_for_tuning->set_category(category);
   ADEBUG << "Insert [" << category
          << "] data for tuning with size = " << feature_values.size();
+  data_for_tuning->set_lane_sequence_id(lane_sequence.lane_sequence_id());
 }
 
 void FeatureOutput::WriteFeatureProto() {
