@@ -41,3 +41,6 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j8
 
 sudo make install
+
+# Clean up.
+rm -fr pcl-1.9.1.tar.gz pcl-pcl-1.9.1/
