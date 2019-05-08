@@ -79,11 +79,11 @@ void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color) {
   polygon.push_back(
       GetTransPoint(obs_x + (cos(theta) * -obs_l - sin(theta) * obs_w) / 2,
                     obs_y + (sin(theta) * -obs_l + cos(theta) * obs_w) / 2));
-  // point 3 (head-left point)
+  // point 3 (back-left point)
   polygon.push_back(
       GetTransPoint(obs_x + (cos(theta) * -obs_l - sin(theta) * -obs_w) / 2,
                     obs_y + (sin(theta) * -obs_l + cos(theta) * -obs_w) / 2));
-  // point 4 (head-left point)
+  // point 4 (back-right point)
   polygon.push_back(
       GetTransPoint(obs_x + (cos(theta) * obs_l - sin(theta) * -obs_w) / 2,
                     obs_y + (sin(theta) * obs_l + cos(theta) * -obs_w) / 2));
