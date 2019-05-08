@@ -502,6 +502,5 @@ bool SpeedDecider::CheckStopForPedestrian(const Obstacle& obstacle) const {
   return true;
 }
 
-
 }  // namespace planning
 }  // namespace apollo

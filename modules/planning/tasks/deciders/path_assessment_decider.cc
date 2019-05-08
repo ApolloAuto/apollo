@@ -104,8 +104,8 @@ Status PathAssessmentDecider::Process(
   // 3. Pick the optimal path.
   std::sort(valid_path_data.begin(), valid_path_data.end(),
             [](const PathData& lhs, const PathData& rhs) {
-              ADEBUG << "Comparing " << lhs.path_label()
-                    << " and " << rhs.path_label();
+              ADEBUG << "Comparing " << lhs.path_label() << " and "
+                     << rhs.path_label();
               // Empty path_data is never the larger one.
               if (lhs.Empty()) {
                 ADEBUG << "LHS is empty.";
@@ -323,7 +323,7 @@ void PathAssessmentDecider::TrimTailingOutLanePoints(
                PathData::PathPointType::OUT_ON_REVERSE_LANE) {
       ADEBUG << "Trimming out reverse lane point";
     } else {
-       ADEBUG << "Trimming unknown lane point";
+      ADEBUG << "Trimming unknown lane point";
     }
     frenet_path.pop_back();
     path_point_decision.pop_back();
@@ -485,9 +485,9 @@ void PathAssessmentDecider::SetPathPointType(
       double in_and_out_lane_hysteresis_buffer =
           is_prev_point_out_lane ? back_to_inlane_extra_buffer : 0.0;
       if (ego_sl_boundary.end_l() >
-          lane_left_width + in_and_out_lane_hysteresis_buffer ||
+              lane_left_width + in_and_out_lane_hysteresis_buffer ||
           ego_sl_boundary.start_l() <
-          -lane_right_width - in_and_out_lane_hysteresis_buffer) {
+              -lane_right_width - in_and_out_lane_hysteresis_buffer) {
         if (path_data.path_label().find("reverse") != std::string::npos) {
           std::get<1>((*path_point_decision)[i]) =
               PathData::PathPointType::OUT_ON_REVERSE_LANE;
@@ -502,9 +502,9 @@ void PathAssessmentDecider::SetPathPointType(
 
         if (!is_prev_point_out_lane) {
           if (ego_sl_boundary.end_l() >
-              lane_left_width + back_to_inlane_extra_buffer ||
+                  lane_left_width + back_to_inlane_extra_buffer ||
               ego_sl_boundary.start_l() <
-              -lane_right_width - back_to_inlane_extra_buffer) {
+                  -lane_right_width - back_to_inlane_extra_buffer) {
             is_prev_point_out_lane = true;
           }
         }
