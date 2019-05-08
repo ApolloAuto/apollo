@@ -110,7 +110,9 @@ function generate_build_targets() {
     BUILD_TARGETS=`bazel query //modules/... except //modules/perception/... union //cyber/...`
     ;;
   *)
-    BUILD_TARGETS=`bazel query //modules/... union //cyber/...`
+    # BUILD_TARGETS=`bazel query //modules/... union //cyber/... `
+    # FIXME(all): temporarily disable modules doesn't compile in 18.04
+    BUILD_TARGETS=`bazel query //modules/... union //cyber/... except //modules/tools/visualizer/... except //modules/data/tools/rosbag_to_record/...  except //modules/drivers/... except //modules/v2x/...`
   esac
 
   if [ $? -ne 0 ]; then
