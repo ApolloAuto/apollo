@@ -202,6 +202,8 @@ Status PathAssessmentDecider::Process(
   if (valid_path_data.front().path_label().find("fallback") !=
       std::string::npos) {
     FLAGS_static_decision_nudge_l_buffer = 0.8;
+  } else {
+    FLAGS_static_decision_nudge_l_buffer = 0.3;
   }
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
   reference_line_info->SetBlockingObstacleId(
