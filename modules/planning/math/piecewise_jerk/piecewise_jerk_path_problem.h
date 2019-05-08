@@ -47,19 +47,29 @@ namespace planning {
  * which makes the line P(start), P0, P(1) ... P(k-1) "smooth".
  */
 
-class Fem1dQpProblem : public PiecewiseJerkProblem {
+class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
  public:
-  Fem1dQpProblem() = default;
+  PiecewiseJerkPathProblem(const size_t num_of_knots, const double delta_s,
+      const std::array<double, 3>& x_init);
 
-  virtual ~Fem1dQpProblem() = default;
+  virtual ~PiecewiseJerkPathProblem() = default;
+
+  void SetZeroOrderReference(std::vector<double> x_ref);
+
+  void set_weight_x_reference(const double weight_x_reference) {
+    weight_x_reference_ = weight_x_reference;
+  }
 
  protected:
-  // naming convention follows osqp solver.
-  void CalculateKernel(std::vector<c_float>* P_data,
+  virtual void CalculateKernel(std::vector<c_float>* P_data,
                        std::vector<c_int>* P_indices,
                        std::vector<c_int>* P_indptr) override;
 
-  void CalculateOffset(std::vector<c_float>* q) override;
+  virtual void CalculateOffset(std::vector<c_float>* q) override;
+
+  double weight_x_reference_ = 0.0;
+
+  std::vector<double> x_ref_;
 };
 
 }  // namespace planning

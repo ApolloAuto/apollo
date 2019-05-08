@@ -24,11 +24,11 @@
 #include <limits>
 #include <memory>
 
+#include "../math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "cyber/common/log.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/math/piecewise_jerk/path_time_qp_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -149,39 +149,45 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   // TODO(all): dt is too small;
   double delta_t = FLAGS_fallback_time_unit;
   double total_time = FLAGS_fallback_total_time;
-  int num_of_knots = static_cast<int>(total_time / delta_t) + 1;
-  // Start a PathTimeQpProblem
-  std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
-  path_time_qp->InitProblem(num_of_knots, delta_t, w, init_s, end_s);
+  size_t num_of_knots = static_cast<size_t>(total_time / delta_t) + 1;
 
-  path_time_qp->SetZeroOrderBounds(0.0, std::fmax(stop_distance, 100.0));
-  path_time_qp->SetFirstOrderBounds(
+  PiecewiseJerkSpeedProblem piecewise_jerk_problem(
+      num_of_knots, delta_t, init_s, end_s);
+
+  piecewise_jerk_problem.set_weight_x(w[0]);
+  piecewise_jerk_problem.set_weight_dx(w[1]);
+  piecewise_jerk_problem.set_weight_ddx(w[2]);
+  piecewise_jerk_problem.set_weight_dddx(w[3]);
+  piecewise_jerk_problem.set_weight_x_reference(w[4]);
+
+  piecewise_jerk_problem.SetZeroOrderBounds(0.0, std::fmax(stop_distance, 100.0));
+  piecewise_jerk_problem.SetFirstOrderBounds(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_v));
-  path_time_qp->SetSecondOrderBounds(veh_param.max_deceleration(),
+  piecewise_jerk_problem.SetSecondOrderBounds(veh_param.max_deceleration(),
                                      veh_param.max_acceleration());
   // TODO(Hongyi): Set back to vehicle_params when ready
-  path_time_qp->SetSecondOrderBounds(-4.4, 2.0);
-  path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
+  piecewise_jerk_problem.SetSecondOrderBounds(-4.4, 2.0);
+  piecewise_jerk_problem.SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
 
   // Solve the problem
-  if (!path_time_qp->Optimize()) {
+  if (!piecewise_jerk_problem.Optimize()) {
     AERROR << "Piecewise jerk fallback speed optimizer failed!";
     return GenerateStopProfile(init_v, init_a);
   }
 
   // Extract output
-  const std::vector<double>& s = path_time_qp->x();
-  const std::vector<double>& ds = path_time_qp->x_derivative();
-  const std::vector<double>& dds = path_time_qp->x_second_order_derivative();
+  const std::vector<double>& s = piecewise_jerk_problem.x();
+  const std::vector<double>& ds = piecewise_jerk_problem.x_derivative();
+  const std::vector<double>& dds = piecewise_jerk_problem.x_second_order_derivative();
 
   SpeedData speed_data;
   speed_data.AppendSpeedPoint(s[0], 0.0, ds[0], dds[0], 0.0);
-  for (int i = 1; i < num_of_knots; ++i) {
+  for (size_t i = 1; i < num_of_knots; ++i) {
     // Avoid the very last points when already stopped
     if (s[i] - s[i - 1] <= 0.0 || ds[i] <= 0.0) {
       break;
     }
-    speed_data.AppendSpeedPoint(s[i], delta_t * i, ds[i], dds[i],
+    speed_data.AppendSpeedPoint(s[i], delta_t * static_cast<double>(i), ds[i], dds[i],
                                 (dds[i] - dds[i - 1]) / delta_t);
   }
   FillEnoughSpeedPoints(&speed_data);
