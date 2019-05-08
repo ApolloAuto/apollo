@@ -89,42 +89,42 @@ bool PiecewiseJerkProblem::OptimizeWithOsqp(
   return true;
 }
 
-void PiecewiseJerkProblem::SetZeroOrderBounds(
+void PiecewiseJerkProblem::set_x_bounds(
     std::vector<std::pair<double, double>> x_bounds) {
   CHECK_EQ(x_bounds.size(), num_of_knots_);
   x_bounds_ = std::move(x_bounds);
 }
 
-void PiecewiseJerkProblem::SetFirstOrderBounds(
+void PiecewiseJerkProblem::set_dx_bounds(
     std::vector<std::pair<double, double>> dx_bounds) {
   CHECK_EQ(dx_bounds.size(), num_of_knots_);
   dx_bounds_ = std::move(dx_bounds);
 }
 
-void PiecewiseJerkProblem::SetSecondOrderBounds(
+void PiecewiseJerkProblem::set_ddx_bounds(
     std::vector<std::pair<double, double>> ddx_bounds) {
   CHECK_EQ(ddx_bounds.size(), num_of_knots_);
   ddx_bounds_ = std::move(ddx_bounds);
 }
 
-void PiecewiseJerkProblem::SetZeroOrderBounds(const double x_lower_bound,
-                                              const double x_upper_bound) {
+void PiecewiseJerkProblem::set_x_bounds(const double x_lower_bound,
+                                        const double x_upper_bound) {
   for (auto& x : x_bounds_) {
     x.first = x_lower_bound;
     x.second = x_upper_bound;
   }
 }
 
-void PiecewiseJerkProblem::SetFirstOrderBounds(const double dx_lower_bound,
-                                               const double dx_upper_bound) {
+void PiecewiseJerkProblem::set_dx_bounds(const double dx_lower_bound,
+                                         const double dx_upper_bound) {
   for (auto& x : dx_bounds_) {
     x.first = dx_lower_bound;
     x.second = dx_upper_bound;
   }
 }
 
-void PiecewiseJerkProblem::SetSecondOrderBounds(const double ddx_lower_bound,
-                                                const double ddx_upper_bound) {
+void PiecewiseJerkProblem::set_ddx_bounds(const double ddx_lower_bound,
+                                          const double ddx_upper_bound) {
   for (auto& x : ddx_bounds_) {
     x.first = ddx_lower_bound;
     x.second = ddx_upper_bound;
