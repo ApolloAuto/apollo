@@ -107,8 +107,8 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
   }
 
   avcodec_context_ = avcodec_alloc_context3(avcodec_);
-  avframe_camera_ = avcodec_alloc_frame();
-  avframe_rgb_ = avcodec_alloc_frame();
+  avframe_camera_ = av_frame_alloc();
+  avframe_rgb_ = av_frame_alloc();
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54,28,1)
   avpicture_alloc(reinterpret_cast<AVPicture*>(avframe_rgb_), AV_PIX_FMT_RGB24,
