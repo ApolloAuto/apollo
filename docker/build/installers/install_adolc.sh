@@ -21,7 +21,8 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-sudo apt-get install autoconf automake libtool
+sudo apt-get update
+sudo apt-get install -y autoconf automake libtool
 
 echo "Build and install ColPack"
 
@@ -31,18 +32,18 @@ git clone https://github.com/CSCsw/ColPack.git
 pushd ColPack
 pushd build/automake      # automake folder
 sudo autoreconf -vif        # generate configure files based on the machince
-sudo mkdir mywork           
+sudo mkdir -p mywork
 pushd mywork
 fullpath=$(pwd)        # modify fullpath to your destination folder if need
 sudo ../configure --prefix=${fullpath}
 sudo make -j 4              # Where "4" is the number of cores on your machine
 sudo make install           # install lib and include/ColPack to destination
 
-mkdir -p /usr/local/colpack
+sudo mkdir -p /usr/local/colpack
 sudo cp -r include /usr/local/colpack/ && sudo cp -r lib /usr/local/colpack/
 popd
 popd
-cp LICENSE /usr/local/colpack/
+sudo cp LICENSE /usr/local/colpack/
 popd
 
 echo "colpack done."
@@ -65,7 +66,7 @@ sudo cp -r include /usr/local/adolc/ && sudo cp -r lib64 /usr/local/adolc/
 sudo cp LICENSE /usr/local/adolc/
 popd
 
-export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH 
+export LD_LIBRARY_PATH=/usr/local/adolc/lib64:$LD_LIBRARY_PATH
 
 # Clean up.
 sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
