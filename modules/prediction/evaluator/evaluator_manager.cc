@@ -91,6 +91,7 @@ void EvaluatorManager::RegisterEvaluators() {
   RegisterEvaluator(ObstacleConf::JUNCTION_MLP_EVALUATOR);
   RegisterEvaluator(ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR);
   RegisterEvaluator(ObstacleConf::LANE_SCANNING_EVALUATOR);
+  RegisterEvaluator(ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR);
 }
 
 void EvaluatorManager::Init(const PredictionConf& config) {
@@ -108,33 +109,34 @@ void EvaluatorManager::Init(const PredictionConf& config) {
     }
 
     if (obstacle_conf.has_obstacle_status()) {
-      if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
-        switch (obstacle_conf.obstacle_type()) {
-          case PerceptionObstacle::VEHICLE: {
+      switch (obstacle_conf.obstacle_type()) {
+        case PerceptionObstacle::VEHICLE: {
+          if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
             vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
-            break;
           }
-          case PerceptionObstacle::BICYCLE: {
-            cyclist_on_lane_evaluator_ = obstacle_conf.evaluator_type();
-            break;
-          }
-          case PerceptionObstacle::PEDESTRIAN: {
-            break;
-          }
-          case PerceptionObstacle::UNKNOWN: {
-            default_on_lane_evaluator_ = obstacle_conf.evaluator_type();
-            break;
-          }
-          default: { break; }
-        }
-      } else if (obstacle_conf.obstacle_status() == ObstacleConf::IN_JUNCTION) {
-        switch (obstacle_conf.obstacle_type()) {
-          case PerceptionObstacle::VEHICLE: {
+          if (obstacle_conf.obstacle_status() == ObstacleConf::IN_JUNCTION) {
             vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
-            break;
           }
-          default: { break; }
+          break;
         }
+        case PerceptionObstacle::BICYCLE: {
+          if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
+            cyclist_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+          }
+          break;
+        }
+        case PerceptionObstacle::PEDESTRIAN: {
+          pedestrian_evaluator_ =
+              ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR;
+          break;
+        }
+        case PerceptionObstacle::UNKNOWN: {
+          if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
+            default_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+          }
+          break;
+        }
+        default: { break; }
       }
     }
   }
@@ -227,6 +229,8 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle,
       break;
     }
     case PerceptionObstacle::PEDESTRIAN: {
+      evaluator = GetEvaluator(pedestrian_evaluator_);
+      CHECK_NOTNULL(evaluator);
       break;
     }
     default: {
@@ -339,6 +343,10 @@ std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
     }
     case ObstacleConf::LANE_SCANNING_EVALUATOR: {
       evaluator_ptr.reset(new LaneScanningEvaluator());
+      break;
+    }
+    case ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR: {
+      evaluator_ptr.reset(new PedestrianInteractionEvaluator());
       break;
     }
     default: { break; }
