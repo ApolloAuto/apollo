@@ -265,16 +265,9 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
   (*result).y = hybrid_a_y;
   (*result).phi = hybrid_a_phi;
 
-  if (FLAGS_use_s_curve_speed_smooth) {
-    if (!GenerateSCurveSpeedAcceleration(result)) {
-      AERROR << "GenerateSCurveSpeedAcceleration fail";
-      return false;
-    }
-  } else {
-    if (!GenerateSpeedAcceleration(result)) {
-      AERROR << "GenerateSpeedAcceleration fail";
-      return false;
-    }
+  if (!GetTemporalProfile(result)) {
+    AERROR << "GetSpeedProfile from Hybrid Astar path fails";
+    return false;
   }
 
   if (result->x.size() != result->y.size() ||
@@ -298,15 +291,17 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
 }
 
 bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
+  // Sanity Check
   if (result->x.size() < 2 || result->y.size() < 2 || result->phi.size() < 2) {
     AERROR << "result size check when generating speed and acceleration fail";
     return false;
   }
   const size_t x_size = result->x.size();
+
   // load velocity from position
   // initial and end speed are set to be zeros
-  result->v.emplace_back(0.0);
-  for (size_t i = 1; i < x_size - 1; ++i) {
+  result->v.push_back(0.0);
+  for (size_t i = 1; i + 1 < x_size; ++i) {
     double discrete_v = (((result->x[i + 1] - result->x[i]) / delta_t_) *
                              std::cos(result->phi[i]) +
                          ((result->x[i] - result->x[i - 1]) / delta_t_) *
@@ -317,14 +312,16 @@ bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
                          ((result->y[i] - result->y[i - 1]) / delta_t_) *
                              std::sin(result->phi[i])) /
                             2.0;
-    result->v.emplace_back(discrete_v);
+    result->v.push_back(discrete_v);
   }
   result->v.push_back(0.0);
+
   // load acceleration from velocity
   for (size_t i = 0; i + 1 < x_size; ++i) {
     const double discrete_a = (result->v[i + 1] - result->v[i]) / delta_t_;
     result->a.push_back(discrete_a);
   }
+
   // load steering from phi
   for (size_t i = 0; i + 1 < x_size; ++i) {
     double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
@@ -480,14 +477,14 @@ bool HybridAStar::TrajectoryPartition(
   double tracking_angle = init_tracking_vector.Angle();
   bool current_gear =
       std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
-      (M_PI / 2.0);
+      (M_PI_2);
   for (size_t i = 0; i < horizon - 1; ++i) {
     heading_angle = phi[i];
     const Vec2d tracking_vector(x[i + 1] - x[i], y[i + 1] - y[i]);
     tracking_angle = tracking_vector.Angle();
     bool gear =
         std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
-        (M_PI / 2.0);
+        (M_PI_2);
     if (gear != current_gear) {
       current_traj->x.push_back(x[i]);
       current_traj->y.push_back(y[i]);
@@ -505,20 +502,48 @@ bool HybridAStar::TrajectoryPartition(
   current_traj->phi.push_back(phi.back());
 
   // Retrieve v, a and steer from path
-  size_t traj_size = partitioned_result->size();
-  for (size_t i = 0; i < traj_size; ++i) {
+  for (auto& result : partitioned_result) {
     if (FLAGS_use_s_curve_speed_smooth) {
-      if (!GenerateSCurveSpeedAcceleration(&(partitioned_result->at(i)))) {
+      if (!GenerateSCurveSpeedAcceleration(&result)) {
         AERROR << "GenerateSCurveSpeedAcceleration fail";
         return false;
       }
     } else {
-      if (!GenerateSpeedAcceleration(&(partitioned_result->at(i)))) {
+      if (!GenerateSpeedAcceleration(&result)) {
         AERROR << "GenerateSpeedAcceleration fail";
         return false;
       }
     }
   }
+  return true;
+}
+
+bool HybridAStar::GetTemporalProfile(HybridAStartResult* result) {
+  std::vector<HybridAStartResult> partitioned_results;
+  if (!TrajectoryPartition(*result, &partitioned_results)) {
+    AERROR << "TrajectoryPartition fail";
+    return false;
+  }
+  HybridAStartResult stitched_result;
+  for (const auto& result : partitioned_results) {
+    std::copy(result.x.begin(), result.x.end() - 1,
+              std::back_inserter(stitched_result.x));
+    std::copy(result.y.begin(), result.y.end() - 1,
+              std::back_inserter(stitched_result.y));
+    std::copy(result.phi.begin(), result.phi.end() - 1,
+              std::back_inserter(stitched_result.phi));
+    std::copy(result.v.begin(), result.v.end() - 1,
+              std::back_inserter(stitched_result.v));
+    std::copy(result.a.begin(), result.a.end(),
+              std::back_inserter(stitched_result.a));
+    std::copy(result.steer.begin(), result.steer.end(),
+              std::back_inserter(stitched_result.steer));
+  }
+  stitched_result.x.push_back(partitioned_results.back().x.back());
+  stitched_result.y.push_back(partitioned_results.back().y.back());
+  stitched_result.phi.push_back(partitioned_results.back().phi.back());
+  stitched_result.v.push_back(partitioned_results.back().v.back());
+  *result = stitched_result;
   return true;
 }
 
