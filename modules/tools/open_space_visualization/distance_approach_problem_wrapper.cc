@@ -485,9 +485,8 @@ void DistanceGetResult(ResultContainer* result_ptr,
   result_ptr->LoadHybridAResult();
   size_t size = result_ptr->GetX()->size();
   size_t size_by_distance = result_ptr->PrepareStateResult()->cols();
-  if (size != size_by_distance) {
-    AERROR << "sizes by hybrid A and distance approach not consistent";
-  }
+  AERROR_IF(size != size_by_distance)
+     << "sizes by hybrid A and distance approach not consistent";
   for (size_t i = 0; i < size; i++) {
     x[i] = result_ptr->GetX()->at(i);
     y[i] = result_ptr->GetY()->at(i);
