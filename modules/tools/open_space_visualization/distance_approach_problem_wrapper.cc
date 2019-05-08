@@ -408,21 +408,26 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     }
 
     // Retrieve result in one single trajectory
+
     size_t trajectory_point_size = 0;
     for (size_t i = 0; i < size; ++i) {
+      if (state_result_ds_vec[i].cols() < 2) {
+        AERROR << "state horizon smaller than 2";
+        return false;
+      }
       trajectory_point_size +=
           static_cast<size_t>(state_result_ds_vec[i].cols()) - 1;
     }
     ++trajectory_point_size;
 
-    const long int state_dimension = state_result_ds_vec.front().rows();
+    const uint64_t state_dimension = state_result_ds_vec.front().rows();
     Eigen::MatrixXd state_result_ds;
     state_result_ds.resize(state_dimension, trajectory_point_size);
-    long int k = 0;
+    uint64_t k = 0;
     for (size_t i = 0; i < size; ++i) {
       // leave out the last repeated point so set column minus one
-      long int state_col_num = state_result_ds_vec[i].cols() - 1;
-      for (long int j = 0; j < state_col_num; ++j) {
+      uint64_t state_col_num = state_result_ds_vec[i].cols() - 1;
+      for (uint64_t j = 0; j < state_col_num; ++j) {
         state_result_ds.col(k) = state_result_ds_vec[i].col(j);
         ++k;
       }
@@ -430,14 +435,14 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     state_result_ds.col(k) =
         state_result_ds_vec.back().col(state_result_ds_vec.back().cols() - 1);
 
-    const long int control_dimension = control_result_ds_vec.front().rows();
+    const uint64_t control_dimension = control_result_ds_vec.front().rows();
     Eigen::MatrixXd control_result_ds;
     control_result_ds.resize(control_dimension, trajectory_point_size - 1);
     k = 0;
 
     for (size_t i = 0; i < size; ++i) {
-      long int control_col_num = control_result_ds_vec[i].cols() - 1;
-      for (long int j = 0; j < control_col_num; ++j) {
+      uint64_t control_col_num = control_result_ds_vec[i].cols() - 1;
+      for (uint64_t j = 0; j < control_col_num; ++j) {
         control_result_ds.col(k) = control_result_ds_vec[i].col(j);
         ++k;
       }
