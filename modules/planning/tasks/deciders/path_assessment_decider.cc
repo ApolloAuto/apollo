@@ -199,6 +199,10 @@ Status PathAssessmentDecider::Process(
             });
   ADEBUG << "There are " << valid_path_data.size() << " path(s).";
   ADEBUG << "Using " << valid_path_data.front().path_label() << " path.";
+  if (valid_path_data.front().path_label().find("fallback") !=
+      std::string::npos) {
+    FLAGS_static_decision_nudge_l_buffer = 0.8;
+  }
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
