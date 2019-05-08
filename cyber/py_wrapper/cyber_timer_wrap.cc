@@ -38,6 +38,7 @@ PyObject* cyber_new_PyTimer(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, const_cast<char*>("kOI:cyber_new_PyTimer"),
                         &period, &pyobj_regist_fun, &oneshot)) {
     AERROR << "cyber_new_PyTimer parsetuple failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -61,6 +62,7 @@ PyObject* cyber_delete_PyTimer(PyObject* self, PyObject* args) {
   PyObject* pyobj_timer = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char*>("O:cyber_delete_PyTimer"),
                         &pyobj_timer)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -68,9 +70,11 @@ PyObject* cyber_delete_PyTimer(PyObject* self, PyObject* args) {
       pyobj_timer, "apollo_cybertron_pytimer");
   if (nullptr == pytimer) {
     AINFO << "cyber_delete_PyTimer:timer ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   delete pytimer;
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -78,6 +82,7 @@ PyObject* cyber_PyTimer_start(PyObject* self, PyObject* args) {
   PyObject* pyobj_timer = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char*>("O:cyber_delete_PyTimer"),
                         &pyobj_timer)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -85,9 +90,11 @@ PyObject* cyber_PyTimer_start(PyObject* self, PyObject* args) {
       pyobj_timer, "apollo_cybertron_pytimer");
   if (nullptr == pytimer) {
     AINFO << "cyber_delete_PyTimer:timer ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   pytimer->start();
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -95,16 +102,19 @@ PyObject* cyber_PyTimer_stop(PyObject* self, PyObject* args) {
   PyObject* pyobj_timer = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char*>("O:cyber_delete_PyTimer"),
                         &pyobj_timer)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
   auto pytimer = (apollo::cyber::PyTimer*)PyCapsule_GetPointer(
       pyobj_timer, "apollo_cybertron_pytimer");
   if (nullptr == pytimer) {
-    AINFO << "cyber_delete_PyTimer:timer ptr is null!";
+    AERROR << "cyber_delete_PyTimer:timer ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   pytimer->stop();
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -119,6 +129,7 @@ PyObject* cyber_PyTimer_set_option(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args,
                         const_cast<char*>("OkOI:cyber_PyTimer_set_option"),
                         &pyobj_timer, &period, &pyobj_regist_fun, &oneshot)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -126,12 +137,14 @@ PyObject* cyber_PyTimer_set_option(PyObject* self, PyObject* args) {
       pyobj_timer, "apollo_cybertron_pytimer");
   callback_fun = (void (*)())PyInt_AsLong(pyobj_regist_fun);
   if (nullptr == pytimer) {
-    AINFO << "cyber_PyTimer_set_option ptr is null!";
+    AERROR << "cyber_PyTimer_set_option ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
   pytimer->set_option(period, callback_fun, oneshot != 0);
 
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
