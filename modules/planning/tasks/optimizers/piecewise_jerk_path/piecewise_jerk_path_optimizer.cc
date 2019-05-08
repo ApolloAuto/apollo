@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-#include "../../../math/piecewise_jerk/piecewise_jerk_path_problem.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
@@ -47,6 +47,8 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     const common::TrajectoryPoint& init_point,
     PathData* const final_path_data) {
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
+
+  AERROR << "Piecewise jerk path";
 
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
   std::array<double, 5> w = {
@@ -116,6 +118,8 @@ common::Status PiecewiseJerkPathOptimizer::Process(
                   "Path Optimizer failed to generate path");
   }
   reference_line_info_->SetCandidatePathData(std::move(candidate_path_data));
+
+  AERROR << "Piecewise jerk path done";
   return Status::OK();
 }
 
@@ -171,7 +175,6 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   *x = piecewise_jerk_problem.x();
   *dx = piecewise_jerk_problem.x_derivative();
   *ddx = piecewise_jerk_problem.x_second_order_derivative();
-
   return true;
 }
 
