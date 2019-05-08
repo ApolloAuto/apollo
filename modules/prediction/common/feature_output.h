@@ -80,10 +80,14 @@ class FeatureOutput {
   /**
    * @brief Insert a data_for_tuning
    * @param A feature in proto
+   * @param values for tuning
+   * @param category of the data
+   * @param lane sequence
    */
   static void InsertDataForTuning(const Feature& feature,
                                   const std::vector<double>& feature_values,
-                                  const std::string& category);
+                                  const std::string& category,
+                                  const LaneSequence& lane_sequence);
 
   /**
    * @brief Write features to a file
