@@ -48,7 +48,7 @@ namespace planning {
 
 class PiecewiseJerkProblem {
  public:
-  PiecewiseJerkProblem(const size_t num_of_knots, const double delta_s,
+  PiecewiseJerkProblem(const size_t num_of_knots, const double delta_x,
       const std::array<double, 3>& x_init);
 
   virtual ~PiecewiseJerkProblem() = default;
@@ -64,7 +64,7 @@ class PiecewiseJerkProblem {
                            const double dx_upper_bound);
 
 
-  void SetSecondOrderBounds(std::vector<std::pair<double, double>> d2x_bounds);
+  void SetSecondOrderBounds(std::vector<std::pair<double, double>> ddx_bounds);
 
   void SetSecondOrderBounds(const double ddx_lower_bound,
                             const double ddx_upper_bound);
@@ -144,7 +144,7 @@ class PiecewiseJerkProblem {
 
   double weight_dddx_ = 0.0;
 
-  double delta_s_ = 1.0;
+  double delta_x_ = 1.0;
 };
 
 }  // namespace planning

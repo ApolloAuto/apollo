@@ -25,9 +25,9 @@ namespace apollo {
 namespace planning {
 
 PiecewiseJerkSpeedProblem::PiecewiseJerkSpeedProblem(
-    const size_t num_of_knots, const double delta_s,
+    const size_t num_of_knots, const double delta_x,
     const std::array<double, 3>& x_init, const std::array<double, 3>& x_end) :
-        PiecewiseJerkProblem(num_of_knots, delta_s, x_init) {
+        PiecewiseJerkProblem(num_of_knots, delta_x, x_init) {
   end_state_target_ = x_end;
 }
 
@@ -68,26 +68,26 @@ void PiecewiseJerkSpeedProblem::CalculateKernel(std::vector<c_float>* P_data,
     ++value_index;
   }
 
-  auto delta_s_square = delta_s_ * delta_s_;
-  // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
+  auto delta_x_square = delta_x_ * delta_x_;
+  // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_x^2)
   columns[2 * n].emplace_back(
-      2 * n, weight_ddx_ + weight_dddx_ / delta_s_square);
+      2 * n, weight_ddx_ + weight_dddx_ / delta_x_square);
   ++value_index;
 
   for (int i = 1; i < n - 1; ++i) {
     columns[2 * n + i].emplace_back(
-        2 * n + i, weight_ddx_ + 2.0 * weight_dddx_ / delta_s_square);
+        2 * n + i, weight_ddx_ + 2.0 * weight_dddx_ / delta_x_square);
     ++value_index;
   }
 
   columns[3 * n - 1].emplace_back(
-      3 * n - 1, weight_ddx_ + weight_dddx_ / delta_s_square);
+      3 * n - 1, weight_ddx_ + weight_dddx_ / delta_x_square);
   ++value_index;
 
-  // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
+  // -2 * w_dddx / delta_x^2 * x(i)'' * x(i + 1)''
   for (int i = 0; i < n - 1; ++i) {
     columns[2 * n + i].emplace_back(
-        2 * n + i + 1, -2.0 * weight_dddx_ / delta_s_square);
+        2 * n + i + 1, -2.0 * weight_dddx_ / delta_x_square);
     ++value_index;
   }
 

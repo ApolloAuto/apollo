@@ -48,15 +48,15 @@ namespace planning {
 
 class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
  public:
-  PiecewiseJerkSpeedProblem(const size_t num_of_knots, const double delta_s,
+  PiecewiseJerkSpeedProblem(const size_t num_of_knots, const double delta_x,
       const std::array<double, 3>& x_init, const std::array<double, 3>& x_end);
 
   virtual ~PiecewiseJerkSpeedProblem() = default;
 
   void SetZeroOrderReference(std::vector<double> x_ref);
 
-  void SetFirstOrderReference(const double dx_desire = 0.0) {
-    dx_reference_ = dx_desire;
+  void SetFirstOrderReference(const double dx_ref = 0.0) {
+    dx_reference_ = dx_ref;
   }
 
   void SetFirstOrderPenalty(std::vector<double> penalty_dx);
