@@ -42,18 +42,26 @@ void SemanticMap::Init() {
 
 void SemanticMap::RunCurrFrame(const FrameEnv& curr_frame_env) {
   // TODO(Hongyi): moving all these magic numbers to conf
+  curr_timestamp_ = curr_frame_env.timestamp();
   curr_base_x_ = curr_frame_env.ego_history().feature(0).position().x() - 100.0;
   curr_base_y_ = curr_frame_env.ego_history().feature(0).position().y() - 100.0;
   cv::Rect rect(static_cast<int>((curr_base_x_ - 585950.0) / 0.1),
             static_cast<int>(18000 - (curr_base_y_ - 4140000.0) / 0.1) - 2000,
             2000, 2000);
   base_img_(rect).copyTo(curr_img_);
-  // double curr_timestamp = curr_frame_env.timestamp();
+
+  // Draw ego_vehicle_history
+  DrawHistory(curr_frame_env.ego_history(), cv::Scalar(0, 255, 255));
+
+  // Draw obstacles_history
+  for (auto& history : curr_frame_env.obstacles_history()) {
+    DrawHistory(history);
+  }
 
   // For disaplay
   cv::namedWindow("Display window", cv::WINDOW_NORMAL);
   cv::imshow("Display window", curr_img_);
-  cv::waitKey(0);
+  cv::waitKey();
 }
 
 void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color) {
@@ -79,7 +87,8 @@ void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color) {
   polygon.push_back(
       GetTransPoint(obs_x + (cos(theta) * obs_l - sin(theta) * -obs_w) / 2,
                     obs_y + (sin(theta) * obs_l + cos(theta) * -obs_w) / 2));
-  cv::fillConvexPoly(curr_img_, polygon, color);
+  cv::fillPoly(curr_img_, std::vector<std::vector<cv::Point>>({polygon}),
+               color);
 }
 
 void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color) {
@@ -87,7 +96,22 @@ void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color) {
   for (auto& polygon_point : feature.polygon_point()) {
     polygon.push_back(GetTransPoint(polygon_point.x(), polygon_point.y()));
   }
-  cv::fillConvexPoly(curr_img_, polygon, color);
+  cv::fillPoly(curr_img_, std::vector<std::vector<cv::Point>>({polygon}),
+               color);
+}
+
+void SemanticMap::DrawHistory(const ObstacleHistory& history,
+                              const cv::Scalar& color) {
+  for (int i = history.feature_size() - 1; i >= 0; --i) {
+    const Feature& feature = history.feature(i);
+    double time_decay = 1.0 - curr_timestamp_ + feature.timestamp();
+    cv::Scalar decay_color = color * time_decay;
+    if (feature.id() == -1) {
+      DrawRect(feature, decay_color);
+    } else {
+      DrawPoly(feature, decay_color);
+    }
+  }
 }
 
 }  // namespace prediction

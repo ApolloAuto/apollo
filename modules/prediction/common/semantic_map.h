@@ -45,11 +45,15 @@ class SemanticMap {
   void DrawPoly(const Feature& feature,
                 const cv::Scalar& color = cv::Scalar(0, 255, 255));
 
+  void DrawHistory(const ObstacleHistory& history,
+                   const cv::Scalar& color = cv::Scalar(0, 255, 255));
+
  private:
   cv::Mat base_img_;
   cv::Mat curr_img_;
   double curr_base_x_ = 0.0;
   double curr_base_y_ = 0.0;
+  double curr_timestamp_ = 0.0;
 
   DECLARE_SINGLETON(SemanticMap)
 };
