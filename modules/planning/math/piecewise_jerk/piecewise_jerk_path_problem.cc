@@ -45,7 +45,7 @@ void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
 
   // x(i)^2 * (w_x + w_ref)
   for (int i = 0; i < n; ++i) {
-    columns[i].emplace_back(i, (weight_x_ + weight_x_reference_));
+    columns[i].emplace_back(i, weight_x_ + weight_x_reference_);
     ++value_index;
   }
 
@@ -97,9 +97,13 @@ void PiecewiseJerkPathProblem::CalculateOffset(std::vector<c_float>* q) {
   CHECK_NOTNULL(q);
   const int N = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * N;
-  q->resize(kNumParam);
-  for (int i = 0; i < N; ++i) {
-    q->at(i) += -2.0 * weight_x_reference_ * x_ref_[i];
+  q->resize(kNumParam, 0.0);
+
+  if (!x_ref_.empty()) {
+    CHECK_EQ(x_ref_.size(), num_of_knots_);
+    for (int i = 0; i < N; ++i) {
+      q->at(i) += -2.0 * weight_x_reference_ * x_ref_[i];
+    }
   }
 }
 

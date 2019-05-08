@@ -62,7 +62,7 @@ void PiecewiseJerkSpeedProblem::CalculateKernel(std::vector<c_float>* P_data,
   ++value_index;
 
   // x(i)'^2 * w_dx
-  for (int i = 0; i < n - 1; ++i) {
+  for (int i = 0; i < n; ++i) {
     columns[n + i].emplace_back(
         n + i, weight_dx_ * (1.0 + penalty_dx_[i]));
     ++value_index;
