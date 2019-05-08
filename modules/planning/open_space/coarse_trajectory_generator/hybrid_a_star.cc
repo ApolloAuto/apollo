@@ -372,6 +372,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
                           accumulated_s + 10);
     ds_bounds.emplace_back(static_cast<double>(i) * delta_t_, discrete_v - 10,
                            discrete_v + 10);
+    //  piecewise_jerk_problem.set_weight_x_reference(w[4]);
 
     ADEBUG << "Initial accumulated_s: " << accumulated_s
            << " initial discrete_v: " << discrete_v;
@@ -414,24 +415,24 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   path_time_qp.set_weight_dx(w[1]);
   path_time_qp.set_weight_ddx(w[2]);
   path_time_qp.set_weight_dddx(w[3]);
-  path_time_qp.set_weight_x_reference(w[4]);
 
-  path_time_qp.SetZeroOrderBounds(
+  path_time_qp.set_x_bounds(
       *(std::min_element(std::begin(result->accumulated_s),
                          std::end(result->accumulated_s))) -
           10,
       *(std::max_element(std::begin(result->accumulated_s),
                          std::end(result->accumulated_s))) +
           10);
-  path_time_qp.SetFirstOrderBounds(
+  path_time_qp.set_dx_bounds(
       *(std::min_element(std::begin(result->v), std::end(result->v)) - 10),
       *(std::max_element(std::begin(result->v), std::end(result->v))) + 10);
   // TODO(QiL): load this from configs
-  path_time_qp.SetSecondOrderBounds(-4.4, 10.0);
-  path_time_qp.SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
-  path_time_qp.SetFirstOrderReference(0.0);
+  path_time_qp.set_ddx_bounds(-4.4, 10.0);
+  path_time_qp.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
-  path_time_qp.SetZeroOrderReference(result->accumulated_s);
+  // TODO(all): this is not correct; fix it!
+  path_time_qp.set_x_reference(w[4], result->accumulated_s);
+  path_time_qp.set_dx_reference(w[1], 0.0);
 
   // Solve the problem
   if (!path_time_qp.Optimize()) {
@@ -443,9 +444,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   // Extract output
   result->v.clear();
   result->accumulated_s.clear();
-  result->accumulated_s = path_time_qp.x();
-  result->v = path_time_qp.x_derivative();
-  result->a = path_time_qp.x_second_order_derivative();
+  result->accumulated_s = path_time_qp.opt_x();
+  result->v = path_time_qp.opt_dx();
+  result->a = path_time_qp.opt_ddx();
   result->a.pop_back();
 
   // load steering from phi

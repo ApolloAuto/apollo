@@ -54,11 +54,7 @@ class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
 
   virtual ~PiecewiseJerkPathProblem() = default;
 
-  void SetZeroOrderReference(std::vector<double> x_ref);
-
-  void set_weight_x_reference(const double weight_x_reference) {
-    weight_x_reference_ = weight_x_reference;
-  }
+  void set_x_reference(const double weight_x_reference, std::vector<double> x_ref);
 
  protected:
   virtual void CalculateKernel(std::vector<c_float>* P_data,
@@ -66,6 +62,8 @@ class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
                        std::vector<c_int>* P_indptr) override;
 
   virtual void CalculateOffset(std::vector<c_float>* q) override;
+
+  bool has_x_reference_ = false;
 
   double weight_x_reference_ = 0.0;
 
