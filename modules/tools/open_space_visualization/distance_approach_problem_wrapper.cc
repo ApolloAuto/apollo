@@ -388,6 +388,7 @@ bool DistancePlan(HybridAStar* hybridA_ptr, ObstacleContainer* obstacles_ptr,
     //     return false;
     //   }
     // }
+
     // In for loop
     for (size_t i = 0; i < size; ++i) {
       double piece_wise_sx = partition_trajectories[i].x.front();

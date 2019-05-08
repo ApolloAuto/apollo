@@ -502,7 +502,7 @@ bool HybridAStar::TrajectoryPartition(
   current_traj->phi.push_back(phi.back());
 
   // Retrieve v, a and steer from path
-  for (auto& result : partitioned_result) {
+  for (auto& result : *partitioned_result) {
     if (FLAGS_use_s_curve_speed_smooth) {
       if (!GenerateSCurveSpeedAcceleration(&result)) {
         AERROR << "GenerateSCurveSpeedAcceleration fail";
