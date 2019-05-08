@@ -94,12 +94,11 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
       break;
     }
 
-    traffic_light_no_right_turn_on_red =
-        CheckTrafficLightNoRightTurnOnRed(traffic_light_overlap_id);
-
     // check on traffic light color
     if (signal_color != TrafficLight::GREEN) {
       traffic_light_all_green = false;
+      traffic_light_no_right_turn_on_red =
+          CheckTrafficLightNoRightTurnOnRed(traffic_light_overlap_id);
       break;
     }
   }
