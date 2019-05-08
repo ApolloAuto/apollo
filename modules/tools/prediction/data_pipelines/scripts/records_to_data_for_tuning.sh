@@ -37,4 +37,5 @@ fi
     --map_dir=/apollo/modules/map/data/${MAP_DIR} \
     --prediction_offline_mode=5 \
     --prediction_offline_bags=${SRC_DIR} \
-    --prediction_data_dir=${TARGET_DIR}
+    --prediction_data_dir=${TARGET_DIR} \
+    --noenable_multi_thread
