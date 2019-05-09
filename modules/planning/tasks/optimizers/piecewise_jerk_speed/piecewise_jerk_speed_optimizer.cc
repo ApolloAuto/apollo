@@ -81,14 +81,10 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   int num_of_knots = static_cast<int>(total_time / delta_t) + 1;
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
-      num_of_knots, delta_t, init_s, {0.0, 0.0, 0.0});
+      num_of_knots, delta_t, init_s);
 
   const auto& piecewise_jerk_speed_config =
       config_.piecewise_jerk_speed_config();
-  piecewise_jerk_problem.set_weight_x(
-      piecewise_jerk_speed_config.s_weight());
-  piecewise_jerk_problem.set_weight_dx(
-      piecewise_jerk_speed_config.velocity_weight());
   piecewise_jerk_problem.set_weight_ddx(
       piecewise_jerk_speed_config.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(

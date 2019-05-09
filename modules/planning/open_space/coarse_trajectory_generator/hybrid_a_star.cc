@@ -410,7 +410,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   const size_t num_of_knots = x_size - 1;
 
-  PiecewiseJerkSpeedProblem path_time_qp(num_of_knots, delta_t_, init_s, end_s);
+  PiecewiseJerkSpeedProblem path_time_qp(num_of_knots, delta_t_, init_s);
   path_time_qp.set_weight_x(w[0]);
   path_time_qp.set_weight_dx(w[1]);
   path_time_qp.set_weight_ddx(w[2]);
@@ -418,11 +418,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   path_time_qp.set_x_bounds(
       *(std::min_element(std::begin(result->accumulated_s),
-                         std::end(result->accumulated_s))) -
-          10,
+                         std::end(result->accumulated_s))) - 10,
       *(std::max_element(std::begin(result->accumulated_s),
-                         std::end(result->accumulated_s))) +
-          10);
+                         std::end(result->accumulated_s))) + 10);
   path_time_qp.set_dx_bounds(
       *(std::min_element(std::begin(result->v), std::end(result->v)) - 10),
       *(std::max_element(std::begin(result->v), std::end(result->v))) + 10);
@@ -433,6 +431,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   // TODO(all): this is not correct; fix it!
   path_time_qp.set_x_ref(w[4], result->accumulated_s);
   path_time_qp.set_dx_ref(w[1], 0.0);
+  path_time_qp.set_end_state_ref({0.0, 0.0, 0.0}, end_s);
 
   // Solve the problem
   if (!path_time_qp.Optimize()) {

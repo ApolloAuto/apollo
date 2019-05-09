@@ -49,7 +49,7 @@ namespace planning {
 class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
  public:
   PiecewiseJerkSpeedProblem(const size_t num_of_knots, const double delta_s,
-      const std::array<double, 3>& x_init, const std::array<double, 3>& x_end);
+      const std::array<double, 3>& x_init);
 
   virtual ~PiecewiseJerkSpeedProblem() = default;
 
@@ -59,9 +59,8 @@ class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
 
   void set_penalty_dx(std::vector<double> penalty_dx);
 
-  void set_weight_x_end(const double weight_x_end) {
-    weight_end_x_ = weight_x_end;
-  }
+  void set_end_state_ref(const std::array<double, 3>& weight_end_state,
+                         const std::array<double, 3>& end_state_ref);
 
  protected:
   // naming convention follows osqp solver.
@@ -81,12 +80,9 @@ class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
 
   std::vector<double> penalty_dx_;
 
-  bool has_end_state_target_ = false;
-  std::array<double, 3> end_state_target_;
-
-  double weight_end_x_ = 0.0;
-  double weight_end_dx_ = 0.0;
-  double weight_end_ddx_ = 0.0;
+  bool has_end_state_ref_ = false;
+  std::array<double, 3> weight_end_state_ = {{0.0, 0.0, 0.0}};
+  std::array<double, 3> end_state_ref_;
 };
 
 }  // namespace planning
