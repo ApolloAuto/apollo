@@ -57,7 +57,7 @@ struct TrackedObject {
   void ToObject(base::ObjectPtr obj_ptr) const;
 
   // ***************************************************
-  // self infomation from match
+  // self information from match
   // ***************************************************
   std::vector<float> shape_features;
   std::vector<float> shape_features_full;
@@ -67,19 +67,19 @@ struct TrackedObject {
   float association_score = 0.0f;
 
   // ***************************************************
-  // self infomation from track
+  // self information from track
   // ***************************************************
   bool is_fake = false;
   int track_id = -1;
   double tracking_time = 0.0;
 
   // ***************************************************
-  // infomation from main car
+  // information from main car
   // ***************************************************
   Eigen::Affine3d sensor_to_local_pose;
 
   // ***************************************************
-  // measurement correlative infomation from object_ptr
+  // measurement correlative information from object_ptr
   // ***************************************************
   base::ObjectPtr object_ptr;
   // corners always store follow const order based on object direction
@@ -97,7 +97,7 @@ struct TrackedObject {
   bool is_background = false;
 
   // ***************************************************
-  // measurement correlative infomation from measurement computer
+  // measurement correlative information from measurement computer
   // ***************************************************
   Eigen::Vector3d measured_barycenter_velocity;
   Eigen::Vector3d measured_center_velocity;
@@ -105,7 +105,7 @@ struct TrackedObject {
   Eigen::Vector3d measured_corners_velocity[4];
 
   // ***************************************************
-  // filter correlative infomation
+  // filter correlative information
   // ***************************************************
   // states
   int boostup_need_history_size = 0;
@@ -138,7 +138,7 @@ struct TrackedObject {
   Eigen::Vector3d motion_score;
 
   // ***************************************************
-  // postprocess correlative infomation
+  // postprocess correlative information
   // ***************************************************
   Eigen::Vector3d output_velocity;
   Eigen::Matrix3d output_velocity_uncertainty;

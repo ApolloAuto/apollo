@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include "opencv2/opencv.hpp"
 #include "opencv2/highgui/highgui.hpp"
+#include "opencv2/opencv.hpp"
 
 #include "cyber/common/macros.h"
 #include "modules/prediction/proto/feature.pb.h"

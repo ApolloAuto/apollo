@@ -323,7 +323,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
     }
   }
 
-
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
