@@ -56,6 +56,9 @@ class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
 
   void set_x_ref(const double weight_x_ref, std::vector<double> x_ref);
 
+  void set_end_state_ref(const std::array<double, 3>& weight_end_state,
+                         const std::array<double, 3>& end_state_ref);
+
  protected:
   void CalculateKernel(std::vector<c_float>* P_data,
                        std::vector<c_int>* P_indices,
@@ -66,6 +69,10 @@ class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
   bool has_x_ref_ = false;
   double weight_x_ref_ = 0.0;
   std::vector<double> x_ref_;
+
+  bool has_end_state_ref_ = false;
+  std::array<double, 3> weight_end_state_ = {{0.0, 0.0, 0.0}};
+  std::array<double, 3> end_state_ref_;
 };
 
 }  // namespace planning
