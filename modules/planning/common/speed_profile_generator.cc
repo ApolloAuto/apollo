@@ -143,8 +143,6 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
 
   std::array<double, 3> init_s = {0.0, init_v, init_a};
   std::array<double, 3> end_s = {stop_distance, 0.0, 0.0};
-  // TODO(Hongyi): tune the params and move to a config
-  std::array<double, 5> w = {10000.0, 0.0, 1.0, 0.01, 0.0};
 
   // TODO(all): dt is too small;
   double delta_t = FLAGS_fallback_time_unit;
@@ -154,17 +152,18 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
       num_of_knots, delta_t, init_s, end_s);
 
-  piecewise_jerk_problem.set_weight_x(w[0]);
-  piecewise_jerk_problem.set_weight_dx(w[1]);
-  piecewise_jerk_problem.set_weight_ddx(w[2]);
-  piecewise_jerk_problem.set_weight_dddx(w[3]);
-  piecewise_jerk_problem.set_weight_x_end(w[0]);
+  // TODO(Hongyi): tune the params and move to a config
+  piecewise_jerk_problem.set_weight_x(0.0);
+  piecewise_jerk_problem.set_weight_dx(0.0);
+  piecewise_jerk_problem.set_weight_ddx(1.0);
+  piecewise_jerk_problem.set_weight_dddx(0.01);
+  piecewise_jerk_problem.set_weight_x_end(10000.0);
 
   piecewise_jerk_problem.set_x_bounds(0.0, std::fmax(stop_distance, 100.0));
   piecewise_jerk_problem.set_dx_bounds(
       0.0, std::fmax(FLAGS_planning_upper_speed_limit, init_v));
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(),
-                                     veh_param.max_acceleration());
+                                        veh_param.max_acceleration());
   // TODO(Hongyi): Set back to vehicle_params when ready
   piecewise_jerk_problem.set_ddx_bounds(-4.4, 2.0);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
@@ -187,8 +186,8 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
     if (s[i] - s[i - 1] <= 0.0 || ds[i] <= 0.0) {
       break;
     }
-    speed_data.AppendSpeedPoint(s[i], delta_t * static_cast<double>(i), ds[i], dds[i],
-                                (dds[i] - dds[i - 1]) / delta_t);
+    speed_data.AppendSpeedPoint(s[i], delta_t * static_cast<double>(i),
+        ds[i], dds[i], (dds[i] - dds[i - 1]) / delta_t);
   }
   FillEnoughSpeedPoints(&speed_data);
   return speed_data;

@@ -431,8 +431,8 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   path_time_qp.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
   // TODO(all): this is not correct; fix it!
-  path_time_qp.set_x_reference(w[4], result->accumulated_s);
-  path_time_qp.set_dx_reference(w[1], 0.0);
+  path_time_qp.set_x_ref(w[4], result->accumulated_s);
+  path_time_qp.set_dx_ref(w[1], 0.0);
 
   // Solve the problem
   if (!path_time_qp.Optimize()) {

@@ -26,16 +26,14 @@ namespace planning {
 
 PiecewiseJerkPathProblem::PiecewiseJerkPathProblem(const size_t num_of_knots,
     const double delta_s, const std::array<double, 3>& x_init) :
-        PiecewiseJerkProblem(num_of_knots, delta_s, x_init) {
-  x_ref_.resize(num_of_knots_, 0.0);
-}
+        PiecewiseJerkProblem(num_of_knots, delta_s, x_init) {}
 
-void PiecewiseJerkPathProblem::set_x_reference(
+void PiecewiseJerkPathProblem::set_x_ref(
     const double weight_x_ref, std::vector<double> x_ref) {
   CHECK_EQ(x_ref.size(), num_of_knots_);
-  weight_x_reference_ = weight_x_ref;
+  weight_x_ref_ = weight_x_ref;
   x_ref_ = std::move(x_ref);
-  has_x_reference_ = true;
+  has_x_ref_ = true;
 }
 
 void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
@@ -50,7 +48,7 @@ void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
 
   // x(i)^2 * (w_x + w_ref)
   for (int i = 0; i < n; ++i) {
-    columns[i].emplace_back(i, weight_x_ + weight_x_reference_);
+    columns[i].emplace_back(i, weight_x_ + weight_x_ref_);
     ++value_index;
   }
 
@@ -101,9 +99,9 @@ void PiecewiseJerkPathProblem::CalculateOffset(std::vector<c_float>* q) {
   const int kNumParam = 3 * N;
   q->resize(kNumParam, 0.0);
 
-  if (has_x_reference_) {
+  if (has_x_ref_) {
     for (int i = 0; i < N; ++i) {
-      q->at(i) += -2.0 * weight_x_reference_ * x_ref_[i];
+      q->at(i) += -2.0 * weight_x_ref_ * x_ref_[i];
     }
   }
 }
