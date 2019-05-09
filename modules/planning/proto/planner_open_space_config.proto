@@ -14,6 +14,7 @@ enum DualWarmUpMode {
 enum DistanceApproachMode {
   DISTANCE_APPROACH_IPOPT = 0;
   DISTANCE_APPROACH_IPOPT_CUDA = 1;
+  DISTANCE_APPROACH_IPOPT_FIXED_TS = 2;
 }
 
 message PlannerOpenSpaceConfig {

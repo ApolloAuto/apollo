@@ -30,6 +30,7 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_cuda_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_interface.h"
+#include "modules/planning/open_space/trajectory_smoother/distance_approach_ipopt_fixed_ts_interface.h"
 #include "modules/planning/proto/planning.pb.h"
 
 namespace apollo {
