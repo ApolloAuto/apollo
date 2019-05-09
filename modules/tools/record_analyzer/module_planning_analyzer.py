@@ -120,8 +120,11 @@ class PlannigAnalyzer:
 
         self.rl_is_offroad_cnt = 0
         self.rl_minimum_boundary = sys.float_info.max
-        self.rl_avg_kappa_list = []
-        self.rl_avg_dkappa_list = []
+        self.rl_kappa_rms_list = []
+        self.rl_dkappa_rms_list = []
+        self.rl_kappa_max_abs_list = []
+        self.rl_dkappa_max_abs_list = []
+        
 
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
@@ -152,10 +155,14 @@ class PlannigAnalyzer:
                 if ref_line_debug.HasField("minimum_boundary") and \
                     ref_line_debug.minimum_boundary < self.rl_minimum_boundary:
                     self.rl_minimum_boundary = ref_line_debug.minimum_boundary
-                if ref_line_debug.HasField("average_kappa"):
-                    self.rl_avg_kappa_list.append(abs(ref_line_debug.average_kappa))
-                if ref_line_debug.HasField("average_dkappa"):
-                    self.rl_avg_dkappa_list.append(abs(ref_line_debug.average_dkappa))
+                if ref_line_debug.HasField("kappa_rms"):
+                    self.rl_kappa_rms_list.append(ref_line_debug.kappa_rms)
+                if ref_line_debug.HasField("dkappa_rms"):
+                    self.rl_dkappa_rms_list.append(ref_line_debug.dkappa_rms)
+                if ref_line_debug.HasField("kappa_max_abs"):
+                    self.rl_kappa_max_abs_list.append(ref_line_debug.kappa_max_abs)
+                if ref_line_debug.HasField("dkappa_max_abs"):
+                    self.rl_dkappa_max_abs_list.append(ref_line_debug.dkappa_max_abs)
 
             if not adc_trajectory.debug.planning_data.HasField('init_point'):
                 return
@@ -402,19 +409,32 @@ class PlannigAnalyzer:
             }
 
         # reference line
-        average_kappa = 0
-        if len(self.rl_avg_kappa_list) > 0:
-            average_kappa = np.average(self.rl_avg_kappa_list)
-        average_dkappa = 0
-        if len(self.rl_avg_dkappa_list) > 0:
-            average_dkappa = np.average(self.rl_avg_dkappa_list)
+        kappa_rms = 0
+        if len(self.rl_kappa_rms_list) > 0:
+            kappa_rms = np.average(self.rl_kappa_rms_list)
+
+        dkappa_rms = 0
+        if len(self.rl_dkappa_rms_list) > 0:
+            dkappa_rms = np.average(self.rl_dkappa_rms_list)
+
         if self.rl_minimum_boundary > 999:
             self.rl_minimum_boundary = 0
+
+        kappa_max_abs = 0
+        if len(self.rl_kappa_max_abs_list) > 0:
+            kappa_max_abs = max(self.rl_kappa_max_abs_list)
+
+        dkappa_max_abs = 0
+        if len(self.rl_dkappa_max_abs_list) > 0:
+            dkappa_max_abs = max(self.rl_dkappa_max_abs_list)
+
         v2_results["reference_line"] = {
             "is_offroad" : self.rl_is_offroad_cnt,
             "minimum_boundary" : self.rl_minimum_boundary,
-            "average_kappa" : average_kappa,
-            "average_dkappa" : average_dkappa
+            "kappa_rms" : kappa_rms,
+            "dkappa_rms" : dkappa_rms,
+            "kappa_max_abs" : kappa_max_abs,
+            "dkappa_max_abs" : dkappa_max_abs
         }
 
         # output final reuslts
