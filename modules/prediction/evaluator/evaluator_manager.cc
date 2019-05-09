@@ -162,7 +162,10 @@ void EvaluatorManager::Run() {
   CHECK_NOTNULL(obstacles_container);
 
   if (FLAGS_enable_build_current_frame_env) {
-    BuildCurrentFrameEnv();
+    BuildObstacleIdHistoryMap();
+    if (FLAGS_prediction_offline_mode == 4) {
+      DumpCurrentFrameEnv();
+    }
     SemanticMap::Instance()->RunCurrFrame(curr_frame_env_);
   }
 
@@ -176,7 +179,6 @@ void EvaluatorManager::Run() {
     PredictionThreadPool::ForEach(
         id_obstacle_map.begin(), id_obstacle_map.end(),
         [&](IdObstacleListMap::iterator::value_type& obstacles_iter) {
-          // TODO(kechxu): parallelize this level
           for (auto obstacle_ptr : obstacles_iter.second) {
             EvaluateObstacle(obstacle_ptr, dynamic_env);
           }
@@ -259,8 +261,8 @@ void EvaluatorManager::EvaluateObstacle(Obstacle* obstacle) {
   EvaluateObstacle(obstacle, dummy_dynamic_env);
 }
 
-void EvaluatorManager::BuildCurrentFrameEnv() {
-  curr_frame_env_.Clear();
+void EvaluatorManager::BuildObstacleIdHistoryMap() {
+  obstacle_id_history_map_.clear();
   auto obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
@@ -269,7 +271,6 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
       ContainerManager::Instance()->GetContainer<PoseContainer>(
           AdapterConfig::LOCALIZATION);
   CHECK_NOTNULL(ego_pose_container);
-  curr_frame_env_.set_timestamp(obstacles_container->timestamp());
   std::vector<int> obstacle_ids =
       obstacles_container->curr_frame_movable_obstacle_ids();
   obstacle_ids.push_back(-1);
@@ -280,7 +281,6 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
     }
     size_t num_frames =
         std::min(static_cast<size_t>(10), obstacle->history_size());
-    ObstacleHistory obstacle_history;
     for (size_t i = 0; i < num_frames; ++i) {
       const Feature& obstacle_feature = obstacle->feature(i);
       Feature feature;
@@ -299,18 +299,27 @@ void EvaluatorManager::BuildCurrentFrameEnv() {
         feature.set_length(vehicle_config.vehicle_param().length());
         feature.set_width(vehicle_config.vehicle_param().width());
       }
-      obstacle_history.add_feature()->CopyFrom(feature);
+      obstacle_id_history_map_[id].add_feature()->CopyFrom(feature);
     }
-    obstacle_history.set_is_trainable(IsTrainable(obstacle->latest_feature()));
-    if (obstacle->id() != -1) {
-      curr_frame_env_.add_obstacles_history()->CopyFrom(obstacle_history);
+    obstacle_id_history_map_[id].set_is_trainable(
+        IsTrainable(obstacle->latest_feature()));
+  }
+}
+
+void EvaluatorManager::DumpCurrentFrameEnv() {
+  curr_frame_env_.Clear();
+  for (const auto obstacle_id_history_pair :
+       obstacle_id_history_map_) {
+    int id = obstacle_id_history_pair.first;
+    if (id != -1) {
+      curr_frame_env_.add_obstacles_history()->CopyFrom(
+          obstacle_id_history_pair.second);
     } else {
-      curr_frame_env_.mutable_ego_history()->CopyFrom(obstacle_history);
+      curr_frame_env_.mutable_ego_history()->CopyFrom(
+          obstacle_id_history_pair.second);
     }
   }
-  if (FLAGS_prediction_offline_mode == 4) {
-    FeatureOutput::InsertFrameEnv(curr_frame_env_);
-  }
+  FeatureOutput::InsertFrameEnv(curr_frame_env_);
 }
 
 std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
