@@ -344,14 +344,9 @@ bool LaneFollowStage::RetrieveLastFramePathProfile(
         << "Last frame doesn't succeed, fail to retrieve last frame path data";
     return false;
   }
-  const auto& last_frame_trajectory_pb =
-      ptr_last_frame->current_frame_planned_trajectory();
 
-  DiscretizedPath last_frame_discretized_path;
-  for (const auto& trajectory_point :
-       last_frame_trajectory_pb.trajectory_point()) {
-    last_frame_discretized_path.push_back(trajectory_point.path_point());
-  }
+  const auto& last_frame_discretized_path =
+      ptr_last_frame->current_frame_planned_path();
 
   path_data->SetDiscretizedPath(last_frame_discretized_path);
   const auto adc_frenet_frame_point_ =
