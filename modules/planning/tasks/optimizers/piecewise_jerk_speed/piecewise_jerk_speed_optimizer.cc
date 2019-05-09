@@ -80,29 +80,34 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   double total_time = st_graph_data.total_time_by_conf();
   int num_of_knots = static_cast<int>(total_time / delta_t) + 1;
 
-  PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t, init_s, {0.0, 0.0, 0.0});
+  PiecewiseJerkSpeedProblem piecewise_jerk_problem(
+      num_of_knots, delta_t, init_s, {0.0, 0.0, 0.0});
 
   const auto& piecewise_jerk_speed_config =
       config_.piecewise_jerk_speed_config();
-  piecewise_jerk_problem.set_weight_x(piecewise_jerk_speed_config.s_weight());
-  piecewise_jerk_problem.set_weight_dx(piecewise_jerk_speed_config.velocity_weight());
-  piecewise_jerk_problem.set_weight_ddx(piecewise_jerk_speed_config.acc_weight());
-  piecewise_jerk_problem.set_weight_dddx(piecewise_jerk_speed_config.jerk_weight());
+  piecewise_jerk_problem.set_weight_x(
+      piecewise_jerk_speed_config.s_weight());
+  piecewise_jerk_problem.set_weight_dx(
+      piecewise_jerk_speed_config.velocity_weight());
+  piecewise_jerk_problem.set_weight_ddx(
+      piecewise_jerk_speed_config.acc_weight());
+  piecewise_jerk_problem.set_weight_dddx(
+      piecewise_jerk_speed_config.jerk_weight());
 
   piecewise_jerk_problem.set_x_bounds(0.0, total_length);
   piecewise_jerk_problem.set_dx_bounds(0.0,
-                                    std::fmax(FLAGS_planning_upper_speed_limit,
-                                              st_graph_data.init_point().v()));
+      std::fmax(FLAGS_planning_upper_speed_limit,
+                st_graph_data.init_point().v()));
   piecewise_jerk_problem.set_ddx_bounds(veh_param.max_deceleration(),
-                                     veh_param.max_acceleration());
+                                        veh_param.max_acceleration());
   piecewise_jerk_problem.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
   // TODO(Hongyi): delete this when ready to use vehicle_params
   piecewise_jerk_problem.set_ddx_bounds(-4.4, 2.0);
 
-  // TODO(all): this is not correct; fix it!
-  piecewise_jerk_problem.set_dx_reference(
-      piecewise_jerk_speed_config.velocity_weight(), FLAGS_default_cruise_speed);
+  piecewise_jerk_problem.set_dx_ref(
+      piecewise_jerk_speed_config.velocity_weight(),
+      FLAGS_default_cruise_speed);
 
   // Update STBoundary
   std::vector<std::pair<double, double>> s_bounds;
@@ -165,9 +170,10 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     v_upper_bound = speed_limit.GetSpeedLimitByS(path_s);
     s_dot_bounds.emplace_back(v_lower_bound, std::fmax(v_upper_bound, 0.0));
   }
-  piecewise_jerk_problem.set_x_reference(piecewise_jerk_speed_config.ref_weight(), x_ref);
-  piecewise_jerk_problem.SetFirstOrderPenalty(penalty_dx);
-  piecewise_jerk_problem.set_dx_bounds(s_dot_bounds);
+  piecewise_jerk_problem.set_x_ref(
+      piecewise_jerk_speed_config.ref_weight(), x_ref);
+  piecewise_jerk_problem.set_penalty_dx(penalty_dx);
+  piecewise_jerk_problem.set_dx_bounds(std::move(s_dot_bounds));
 
   // Solve the problem
   if (!piecewise_jerk_problem.Optimize()) {

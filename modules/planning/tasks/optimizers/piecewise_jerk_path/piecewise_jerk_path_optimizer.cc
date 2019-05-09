@@ -149,9 +149,9 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   // TODO(all): temp. disable AdjustLateralDerivativeBounds, enable later
   // fem_1d_qp->SetFirstOrderBounds(-first_order_bounds, first_order_bounds);
   piecewise_jerk_problem.set_dx_bounds(-FLAGS_lateral_derivative_bound_default,
-                                        FLAGS_lateral_derivative_bound_default);
+                                       FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_ddx_bounds(-FLAGS_lateral_derivative_bound_default,
-                                         FLAGS_lateral_derivative_bound_default);
+                                        FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
   bool success = piecewise_jerk_problem.Optimize(max_iter);
