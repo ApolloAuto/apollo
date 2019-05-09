@@ -48,12 +48,6 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::util::StrCat;
 
-namespace {
-// TODO(all): remove them; no buffer should be added here.
-constexpr double boundary_t_buffer = 0.1;
-constexpr double boundary_s_buffer = 1.0;
-}  // namespace
-
 StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
                                    const SpeedBoundsDeciderConfig& config,
                                    const ReferenceLine& reference_line,
@@ -218,9 +212,8 @@ Status StBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
     return Status::OK();
   }
 
-  auto boundary = STBoundary::CreateInstance(lower_points, upper_points)
-                      .ExpandByS(boundary_s_buffer)
-                      .ExpandByT(boundary_t_buffer);
+  auto boundary = STBoundary::CreateInstance(lower_points, upper_points);
+
   boundary.set_id(obstacle->Id());
   const auto& prev_st_boundary = obstacle->st_boundary();
   const auto& ref_line_st_boundary = obstacle->reference_line_st_boundary();
@@ -397,9 +390,7 @@ Status StBoundaryMapper::MapWithDecision(
     lower_points.emplace_back(extend_lower_s, planning_time_);
   }
 
-  auto boundary = STBoundary::CreateInstance(lower_points, upper_points)
-                      .ExpandByS(boundary_s_buffer)
-                      .ExpandByT(boundary_t_buffer);
+  auto boundary = STBoundary::CreateInstance(lower_points, upper_points);
 
   // get characteristic_length and boundary_type.
   STBoundary::BoundaryType b_type = STBoundary::BoundaryType::UNKNOWN;
@@ -430,35 +421,21 @@ Status StBoundaryMapper::MapWithDecision(
 bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
                                     const double buffer) const {
-  // TODO(all): the code makes no sense; remove it.
-  double left_delta_l = 0.0;
-  double right_delta_l = 0.0;
-  if (is_change_lane_) {
-    if (adc_sl_boundary_.start_l() + adc_sl_boundary_.end_l() > 0.0) {
-      // change to right
-      left_delta_l = 1.0;
-    } else {
-      // change to left
-      right_delta_l = 1.0;
-    }
-  }
-
   Vec2d ego_center_map_frame(
       (vehicle_param_.front_edge_to_center() -
        vehicle_param_.back_edge_to_center()) *
           0.5,
-      (vehicle_param_.left_edge_to_center() + left_delta_l -
-       vehicle_param_.right_edge_to_center() + right_delta_l) *
+      (vehicle_param_.left_edge_to_center() -
+       vehicle_param_.right_edge_to_center()) *
           0.5);
 
   ego_center_map_frame.SelfRotate(path_point.theta());
   ego_center_map_frame.set_x(ego_center_map_frame.x() + path_point.x());
   ego_center_map_frame.set_y(ego_center_map_frame.y() + path_point.y());
 
-  // TODO(all): remove the buffer
   Box2d adc_box(ego_center_map_frame, path_point.theta(),
-                vehicle_param_.length() + 2.0 * buffer,
-                vehicle_param_.width() + 2.0 * buffer);
+                vehicle_param_.length(),
+                vehicle_param_.width());
   return obs_box.HasOverlap(adc_box);
 }
 
