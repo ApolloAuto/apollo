@@ -270,25 +270,6 @@ cc_test(
 )
 
 cc_library(
-    name = "change_lane_decider",
-    srcs = [
-        "change_lane_decider.cc",
-    ],
-    hdrs = [
-        "change_lane_decider.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        ":planning_gflags",
-        ":reference_line_info",
-        "//modules/map/pnc_map:route_segments",
-        "//modules/planning/proto:planning_proto",
-    ],
-)
-
-cc_library(
     name = "local_view",
     hdrs = [
         "local_view.h",
@@ -319,7 +300,6 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        ":change_lane_decider",
         ":indexed_queue",
         ":local_view",
         ":obstacle",

@@ -23,12 +23,12 @@
 #include <vector>
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/common/util/common.h"
+#include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/st_boundary_mapper.h"
 
@@ -144,7 +144,7 @@ void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
     // Check if the target lane is blocked or not
     if (reference_line_info.IsChangeLanePath()) {
       is_clear_to_change_lane_ =
-          ChangeLaneDecider::IsClearToChangeLane(&reference_line_info);
+          LaneChangeDecider::IsClearToChangeLane(&reference_line_info);
       continue;
     }
     // If it's not in lane-change scenario or target lane is not blocked, skip
@@ -271,7 +271,7 @@ void SpeedBoundsDecider::StopOnSidePass(
     if (CheckADCStop(*reference_line_info,
                      side_pass_info.change_lane_stop_path_point)) {
       ADEBUG << "ADV Stopped due to change lane in side pass";
-      if (ChangeLaneDecider::IsClearToChangeLane(reference_line_info)) {
+      if (LaneChangeDecider::IsClearToChangeLane(reference_line_info)) {
         ADEBUG << "Environment clear for ADC to change lane in side pass";
         mutable_side_pass_info->check_clear_flag = true;
       } else {
