@@ -88,7 +88,6 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   piecewise_jerk_problem.set_weight_dx(piecewise_jerk_speed_config.velocity_weight());
   piecewise_jerk_problem.set_weight_ddx(piecewise_jerk_speed_config.acc_weight());
   piecewise_jerk_problem.set_weight_dddx(piecewise_jerk_speed_config.jerk_weight());
-//  piecewise_jerk_problem.set_weight_x_reference(piecewise_jerk_speed_config.ref_weight());
 
   piecewise_jerk_problem.set_x_bounds(0.0, total_length);
   piecewise_jerk_problem.set_dx_bounds(0.0,
@@ -166,8 +165,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     v_upper_bound = speed_limit.GetSpeedLimitByS(path_s);
     s_dot_bounds.emplace_back(v_lower_bound, std::fmax(v_upper_bound, 0.0));
   }
-  // TODO(all): this is not correct; fix it!
-  piecewise_jerk_problem.set_x_reference(piecewise_jerk_speed_config.s_weight(), x_ref);
+  piecewise_jerk_problem.set_x_reference(piecewise_jerk_speed_config.ref_weight(), x_ref);
   piecewise_jerk_problem.SetFirstOrderPenalty(penalty_dx);
   piecewise_jerk_problem.set_dx_bounds(s_dot_bounds);
 

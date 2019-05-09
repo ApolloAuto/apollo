@@ -62,6 +62,10 @@ class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
   }
 
   void SetFirstOrderPenalty(std::vector<double> penalty_dx);
+
+  void set_weight_x_end(const double weight_x_end) {
+    weight_end_x_ = weight_x_end;
+  }
  protected:
   // naming convention follows osqp solver.
   void CalculateKernel(std::vector<c_float>* P_data,
