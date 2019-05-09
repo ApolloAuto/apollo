@@ -9,13 +9,13 @@ import "modules/prediction/proto/lane_graph.proto";
 import "modules/prediction/proto/prediction_point.proto";
 
 message Lane {
-  // Features of all possible current lanes
+  // Features of all possible current lanes.
   repeated LaneFeature current_lane_feature = 1;
 
-  // Features of the most possible current lane
+  // Features of the most possible current lane.
   optional LaneFeature lane_feature = 2;
 
-  // Features of all nearby lanes
+  // Features of all nearby lanes.
   repeated LaneFeature nearby_lane_feature = 3;
 
   // Lane graph

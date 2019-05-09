@@ -89,6 +89,7 @@ cc_library(
     hdrs = ["road_graph.h"],
     deps = [
         ":prediction_map",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:lane_graph_proto",
     ],
 )
