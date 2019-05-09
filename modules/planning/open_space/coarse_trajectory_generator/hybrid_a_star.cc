@@ -394,16 +394,18 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   const size_t num_of_knots = x_size - 1;
 
   PiecewiseJerkSpeedProblem path_time_qp(num_of_knots, delta_t_, init_s);
-  auto s_curve_config = planner_open_space_config_.warm_start_config()
-                        .s_curve_config();
+  auto s_curve_config =
+      planner_open_space_config_.warm_start_config().s_curve_config();
   path_time_qp.set_weight_ddx(s_curve_config.acc_weight());
   path_time_qp.set_weight_dddx(s_curve_config.jerk_weight());
 
   path_time_qp.set_x_bounds(
       *(std::min_element(std::begin(result->accumulated_s),
-                         std::end(result->accumulated_s))) - 10,
+                         std::end(result->accumulated_s))) -
+          10,
       *(std::max_element(std::begin(result->accumulated_s),
-                         std::end(result->accumulated_s))) + 10);
+                         std::end(result->accumulated_s))) +
+          10);
   path_time_qp.set_dx_bounds(
       *(std::min_element(std::begin(result->v), std::end(result->v)) - 10),
       *(std::max_element(std::begin(result->v), std::end(result->v))) + 10);
@@ -411,11 +413,8 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   path_time_qp.set_ddx_bounds(-4.4, 10.0);
   path_time_qp.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
-  // TODO(all): this is not correct; fix it!
-  path_time_qp.set_x_ref(s_curve_config.ref_s_weight(),
-                         result->accumulated_s);
-  path_time_qp.set_dx_ref(s_curve_config.ref_v_weight(), 0.0);
-  path_time_qp.set_end_state_ref({0.0, 0.0, 0.0}, end_s);
+  path_time_qp.set_x_ref(s_curve_config.ref_s_weight(), result->accumulated_s);
+  path_time_qp.set_end_state_ref({1.0, 1.0, 0.0}, end_s);
 
   // Solve the problem
   if (!path_time_qp.Optimize()) {
