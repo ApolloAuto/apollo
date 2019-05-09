@@ -16,6 +16,7 @@
 
 #include "modules/planning/on_lane_planning.h"
 
+#include <algorithm>
 #include <limits>
 #include <list>
 #include <utility>
@@ -486,6 +487,17 @@ Status OnLanePlanning::Plan(
       }
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    // Store current frame stitched path for possible speed fallback in next
+    // frames
+    DiscretizedPath current_frame_planned_path;
+    for (const auto& trajectory_point : stitching_trajectory) {
+      current_frame_planned_path.push_back(trajectory_point.path_point());
+    }
+    const auto& best_ref_path = best_ref_info->path_data().discretized_path();
+    std::copy(best_ref_path.begin() + 1, best_ref_path.end(),
+              std::back_inserter(current_frame_planned_path));
+    frame_->set_current_frame_planned_path(current_frame_planned_path);
+
     if (FLAGS_export_chart) {
       ExportOnLaneChart(best_ref_info->debug(), ptr_debug);
     } else {
