@@ -16,9 +16,12 @@
 
 #include "modules/data/tools/smart_recorder/small_topics_trigger.h"
 
+#include <set>
+#include <string>
+
 #include "cyber/common/log.h"
-#include "modules/drivers/gnss/proto/gnss_best_pose.pb.h"
-#include "modules/transform/proto/transform.pb.h"
+
+#include "modules/data/tools/smart_recorder/channel_pool.h"
 
 namespace apollo {
 namespace data {
@@ -27,17 +30,11 @@ SmallTopicsTrigger::SmallTopicsTrigger() {
   trigger_name_ = "SmallTopicsTrigger";
 }
 
-bool SmallTopicsTrigger::Init(const SmartRecordTrigger& trigger_conf) {
-  // Have to instantiate the wanted classes here that do nothing but
-  // register themselves to global factory which then provides reflections later
-  apollo::transform::TransformStampeds tf_instance;
-  apollo::drivers::gnss::GnssBestPose gnss_instance;
-  return TriggerBase::Init(trigger_conf);
-}
-
 bool SmallTopicsTrigger::ShouldRestore(const RecordMessage& msg) const {
+  const std::set<std::string>& small_channels =
+      ChannelPool::Instance()->GetSmallChannels();
   return trigger_obj_->enabled() &&
-         GetChannelTypes().find(msg.channel_name) != GetChannelTypes().end();
+         small_channels.find(msg.channel_name) != small_channels.end();
 }
 
 }  // namespace data

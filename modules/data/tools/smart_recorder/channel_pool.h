@@ -16,24 +16,31 @@
 
 #pragma once
 
-#include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
-#include "modules/data/tools/smart_recorder/trigger_base.h"
+#include <set>
+#include <string>
+
+#include "cyber/common/macros.h"
 
 namespace apollo {
 namespace data {
 
 /**
- * @class DriveEventTrigger
- * @brief DriveEvent trigger that records drive events
+ * @class ChannelPool
+ * @brief Provides helper functions to offer different channels
  */
-class DriveEventTrigger : public TriggerBase {
+class ChannelPool {
  public:
-  DriveEventTrigger();
+  // Getters
+  const std::set<std::string>& GetSmallChannels() { return small_channels_; }
+  const std::set<std::string>& GetLargeChannels() { return large_channels_; }
+  const std::set<std::string>& GetAllChannels() { return all_channels_; }
 
-  void Pull(const RecordMessage& msg) override;
-  bool ShouldRestore(const RecordMessage& msg) const override { return false; };
+ private:
+  std::set<std::string> small_channels_;
+  std::set<std::string> large_channels_;
+  std::set<std::string> all_channels_;
 
-  virtual ~DriveEventTrigger() = default;
+  DECLARE_SINGLETON(ChannelPool)
 };
 
 }  // namespace data
