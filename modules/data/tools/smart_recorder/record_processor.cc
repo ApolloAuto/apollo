@@ -27,6 +27,7 @@
 #include "cyber/record/record_viewer.h"
 #include "modules/common/util/string_util.h"
 
+#include "modules/data/tools/smart_recorder/channel_pool.h"
 #include "modules/data/tools/smart_recorder/drive_event_trigger.h"
 #include "modules/data/tools/smart_recorder/emergency_mode_trigger.h"
 #include "modules/data/tools/smart_recorder/interval_pool.h"
@@ -62,14 +63,13 @@ bool RecordProcessor::Init(const SmartRecordTrigger& trigger_conf) {
            << source_record_dir_;
     return false;
   }
-  EnsureDirectory(restored_output_dir_);
-  // Init triggers, along with their wanted channels
-  triggers_.push_back(std::unique_ptr<TriggerBase>(new DriveEventTrigger));
-  triggers_.push_back(std::unique_ptr<TriggerBase>(new EmergencyModeTrigger));
-  triggers_.push_back(std::unique_ptr<TriggerBase>(new SmallTopicsTrigger));
-  CollectAllChannels(trigger_conf);
-  if (channels_types_map_.empty() || all_channels_.empty()) {
-    AERROR << "no channels are defined in triggers";
+  if (!EnsureDirectory(restored_output_dir_)) {
+    AERROR << "unable to open output dir: " << restored_output_dir_;
+    return false;
+  }
+  // Init triggers
+  if (!InitTriggers(trigger_conf)) {
+    AERROR << "unable to init triggers";
     return false;
   }
   // Init writer
@@ -94,7 +94,8 @@ bool RecordProcessor::Process() {
   for (const std::string& record : source_record_files_) {
     const auto reader =
         std::make_shared<RecordReader>(StrCat(source_record_dir_, "/", record));
-    RecordViewer viewer(reader, 0, UINT64_MAX, all_channels_);
+    RecordViewer viewer(reader, 0, UINT64_MAX,
+                        ChannelPool::Instance()->GetAllChannels());
     AINFO << record << ":" << viewer.begin_time() << " - " << viewer.end_time();
     for (const auto& msg : viewer) {
       for (const auto& trigger : triggers_) {
@@ -108,14 +109,17 @@ bool RecordProcessor::Process() {
   for (const std::string& record : source_record_files_) {
     const auto reader =
         std::make_shared<RecordReader>(StrCat(source_record_dir_, "/", record));
-    RecordViewer viewer(reader, 0, UINT64_MAX, all_channels_);
+    RecordViewer viewer(reader, 0, UINT64_MAX,
+                        ChannelPool::Instance()->GetAllChannels());
     for (const auto& msg : viewer) {
       // If the message fall into generated intervals,
       // or required by any triggers, restore it
-      if (IntervalPool::Instance()->MessageFallIntoRange(msg.channel_name,
-                                                         msg.time) ||
+      if (IntervalPool::Instance()->MessageFallIntoRange(msg.time) ||
           ShouldRestore(msg)) {
-        RestoreMessage(msg);
+        writer_->WriteChannel(msg.channel_name,
+                              reader->GetMessageType(msg.channel_name),
+                              reader->GetProtoDesc(msg.channel_name));
+        writer_->WriteMessage(msg.channel_name, msg.content, msg.time);
       }
     }
   }
@@ -135,32 +139,17 @@ void RecordProcessor::LoadSourceRecords() {
   std::sort(source_record_files_.begin(), source_record_files_.end());
 }
 
-void RecordProcessor::CollectAllChannels(
-    const SmartRecordTrigger& trigger_conf) {
-  // Collect all channels from config file, for reading records effectively
+bool RecordProcessor::InitTriggers(const SmartRecordTrigger& trigger_conf) {
+  triggers_.push_back(std::unique_ptr<TriggerBase>(new DriveEventTrigger));
+  triggers_.push_back(std::unique_ptr<TriggerBase>(new EmergencyModeTrigger));
+  triggers_.push_back(std::unique_ptr<TriggerBase>(new SmallTopicsTrigger));
   for (const auto& trigger : triggers_) {
     if (!trigger->Init(trigger_conf)) {
       AERROR << "unable to initiate trigger and collect channels";
-      return;
+      return false;
     }
-    const auto channels_types = trigger->GetChannelTypes();
-    channels_types_map_.insert(channels_types.begin(), channels_types.end());
   }
-  for (const auto& iter : channels_types_map_) {
-    all_channels_.insert(iter.first);
-  }
-}
-
-void RecordProcessor::RestoreMessage(const RecordMessage& msg) {
-  auto* raw_message = ProtobufFactory::Instance()->GenerateMessageByType(
-      channels_types_map_[msg.channel_name]);
-  CHECK(raw_message) << "Failed to do reflection from " << msg.channel_name;
-  std::string get_desc_str;
-  ProtobufFactory::GetDescriptorString(*raw_message, &get_desc_str);
-  writer_->WriteChannel(msg.channel_name,
-                        raw_message->GetDescriptor()->full_name(),
-                        get_desc_str);
-  writer_->WriteMessage(msg.channel_name, msg.content, msg.time);
+  return true;
 }
 
 std::string RecordProcessor::GetDefaultOutputFile() const {
