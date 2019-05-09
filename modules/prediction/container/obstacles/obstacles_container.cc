@@ -344,10 +344,14 @@ void ObstaclesContainer::BuildLaneGraph() {
       AERROR << "Null obstacle found.";
       continue;
     }
-    ADEBUG << "Building Lane Graph.";
-    obstacle_ptr->BuildLaneGraph();
-    ADEBUG << "Building ordered Lane Graph.";
-    // obstacle_ptr->BuildLaneGraphFromLeftToRight();
+    if (FLAGS_prediction_offline_mode != 1 &&
+        FLAGS_prediction_offline_mode != 2) {
+      ADEBUG << "Building Lane Graph.";
+      obstacle_ptr->BuildLaneGraph();
+    } else {
+      ADEBUG << "Building ordered Lane Graph.";
+      obstacle_ptr->BuildLaneGraphFromLeftToRight();
+    }
     obstacle_ptr->SetNearbyObstacles();
   }
 
