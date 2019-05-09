@@ -377,20 +377,30 @@ void OnLanePlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
     rl_debug->set_is_protected(reference_line_info.GetRightOfWayStatus() ==
                                ADCTrajectory::PROTECTED);
 
-    // average kappa and dkappa for performance evaluation
+    // store kappa and dkappa for performance evaluation
     const auto& reference_points =
         reference_line_info.reference_line().reference_points();
-    double total_kappa = 0.0;
-    double total_dkappa = 0.0;
-    size_t reference_points_size = reference_points.size();
+    double kappa_rms = 0.0;
+    double dkappa_rms = 0.0;
+    double kappa_max_abs = std::numeric_limits<double>::lowest();
+    double dkappa_max_abs = std::numeric_limits<double>::lowest();
     for (const auto& reference_point : reference_points) {
-      total_kappa += reference_point.kappa();
-      total_dkappa += reference_point.dkappa();
+      double kappa_sq = reference_point.kappa() * reference_point.kappa();
+      double dkappa_sq = reference_point.dkappa() * reference_point.dkappa();
+      kappa_rms += kappa_sq;
+      dkappa_rms += dkappa_sq;
+      kappa_max_abs = kappa_max_abs < kappa_sq ? kappa_sq : kappa_max_abs;
+      dkappa_max_abs = dkappa_max_abs < dkappa_sq ? dkappa_sq : dkappa_max_abs;
     }
-    rl_debug->set_average_kappa(total_kappa /
-                                static_cast<double>(reference_points_size));
-    rl_debug->set_average_dkappa(total_dkappa /
-                                 static_cast<double>(reference_points_size));
+    double reference_points_size = static_cast<double>(reference_points.size());
+    kappa_rms /= reference_points_size;
+    dkappa_rms /= reference_points_size;
+    kappa_rms = std::sqrt(kappa_rms);
+    dkappa_rms = std::sqrt(dkappa_rms);
+    rl_debug->set_kappa_rms(kappa_rms);
+    rl_debug->set_dkappa_rms(dkappa_rms);
+    rl_debug->set_kappa_max_abs(kappa_max_abs);
+    rl_debug->set_dkappa_max_abs(dkappa_max_abs);
 
     bool is_off_road = false;
     double minimum_boundary = std::numeric_limits<double>::infinity();
