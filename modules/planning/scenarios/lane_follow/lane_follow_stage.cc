@@ -156,16 +156,6 @@ Status LaneFollowStage::PlanOnReferenceLine(
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
-  auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
-  auto speed_profile = SpeedProfileGenerator::GenerateInitSpeedProfile(
-      planning_start_point, reference_line_info);
-  if (speed_profile.empty()) {
-    speed_profile =
-        SpeedProfileGenerator::GenerateSpeedHotStart(planning_start_point);
-    ADEBUG << "Using dummy hot start for speed vector";
-  }
-  *heuristic_speed_data = SpeedData(speed_profile);
-
   auto ret = Status::OK();
 
   for (auto* optimizer : task_list_) {
