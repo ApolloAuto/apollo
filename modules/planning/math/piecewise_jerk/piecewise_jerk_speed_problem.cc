@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
+
 #include <algorithm>
 
 #include "cyber/common/log.h"
 
 #include "modules/planning/common/planning_gflags.h"
-#include "piecewise_jerk_speed_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -32,15 +33,22 @@ PiecewiseJerkSpeedProblem::PiecewiseJerkSpeedProblem(
   penalty_dx_.resize(num_of_knots_, 0.0);
 }
 
-void PiecewiseJerkSpeedProblem::set_x_reference(
-    const double weight_x_reference, std::vector<double> x_ref) {
+void PiecewiseJerkSpeedProblem::set_x_ref(
+    const double weight_x_ref, std::vector<double> x_ref) {
   CHECK_EQ(x_ref.size(), num_of_knots_);
-  x_reference_ = std::move(x_ref);
-  weight_x_reference_ = weight_x_reference;
-  has_x_reference_ = true;
+  x_ref_ = std::move(x_ref);
+  weight_x_ref_ = weight_x_ref;
+  has_x_ref_ = true;
 }
 
-void PiecewiseJerkSpeedProblem::SetFirstOrderPenalty(
+void PiecewiseJerkSpeedProblem::set_dx_ref(
+    const double weight_dx_ref, const double dx_ref) {
+  weight_dx_ref_ = weight_dx_ref;
+  dx_ref_ = dx_ref;
+  has_dx_ref_ = true;
+}
+
+void PiecewiseJerkSpeedProblem::set_penalty_dx(
     std::vector<double> penalty_dx) {
   CHECK_EQ(penalty_dx.size(), num_of_knots_);
   penalty_dx_ = std::move(penalty_dx);
@@ -56,24 +64,24 @@ void PiecewiseJerkSpeedProblem::CalculateKernel(std::vector<c_float>* P_data,
   columns.resize(kNumParam);
   int value_index = 0;
 
-  // x(i)^2 * w_ref
+  // x(i)^2 * w_x_ref
   for (int i = 0; i < n - 1; ++i) {
-    columns[i].emplace_back(i, weight_x_reference_);
+    columns[i].emplace_back(i, weight_x_ref_);
     ++value_index;
   }
-  // x(n-1)^2 * (w_ref + w_end_x)
-  columns[n - 1].emplace_back(n - 1, weight_x_reference_ + weight_end_x_);
+  // x(n-1)^2 * (w_x_ref + w_end_x)
+  columns[n - 1].emplace_back(n - 1, weight_x_ref_ + weight_end_x_);
   ++value_index;
 
-  // x(i)'^2 * (w_dx + penalty_dx)
+  // x(i)'^2 * (w_dx_ref + penalty_dx)
   for (int i = 0; i < n - 1; ++i) {
     columns[n + i].emplace_back(
-        n + i, weight_dx_ * (1.0 + penalty_dx_[i]));
+        n + i, weight_dx_ref_ + penalty_dx_[i]);
     ++value_index;
   }
-  // x(n-1)'^2 * (w_dx + penalty_dx + w_end_dx)
+  // x(n-1)'^2 * (w_dx_ref + penalty_dx + w_end_dx)
   columns[2 * n - 1].emplace_back(
-        2 * n - 1, weight_dx_ * (1.0 + penalty_dx_[n - 1]) + weight_end_dx_);
+        2 * n - 1, weight_dx_ref_ + penalty_dx_[n - 1] + weight_end_dx_);
   ++value_index;
 
   auto delta_s_square = delta_s_ * delta_s_;
@@ -119,11 +127,11 @@ void PiecewiseJerkSpeedProblem::CalculateOffset(std::vector<c_float>* q) {
   const int kNumParam = 3 * n;
   q->resize(kNumParam);
   for (int i = 0; i < n; ++i) {
-    if (has_x_reference_) {
-      q->at(i) += -2.0 * weight_x_reference_ * x_reference_[i];
+    if (has_x_ref_) {
+      q->at(i) += -2.0 * weight_x_ref_ * x_ref_[i];
     }
-    if (has_dx_reference_) {
-      q->at(n + i) += -2.0 * weight_dx_reference_ * dx_reference_;
+    if (has_dx_ref_) {
+      q->at(n + i) += -2.0 * weight_dx_ref_ * dx_ref_;
     }
   }
 

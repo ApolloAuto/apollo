@@ -53,19 +53,16 @@ class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
 
   virtual ~PiecewiseJerkSpeedProblem() = default;
 
-  void set_x_reference(const double weight_x_reference, std::vector<double> x_ref);
+  void set_x_ref(const double weight_x_ref, std::vector<double> x_ref);
 
-  void set_dx_reference(const double weight_dx_reference, const double dx_ref) {
-    weight_dx_reference_ = weight_dx_reference;
-    dx_reference_ = dx_ref;
-    has_dx_reference_ = true;
-  }
+  void set_dx_ref(const double weight_dx_ref, const double dx_ref);
 
-  void SetFirstOrderPenalty(std::vector<double> penalty_dx);
+  void set_penalty_dx(std::vector<double> penalty_dx);
 
   void set_weight_x_end(const double weight_x_end) {
     weight_end_x_ = weight_x_end;
   }
+
  protected:
   // naming convention follows osqp solver.
   void CalculateKernel(std::vector<c_float>* P_data,
@@ -74,26 +71,21 @@ class PiecewiseJerkSpeedProblem : public PiecewiseJerkProblem {
 
   void CalculateOffset(std::vector<c_float>* q) override;
 
-  bool has_x_reference_ = false;
+  bool has_x_ref_ = false;
+  double weight_x_ref_ = 0.0;
+  std::vector<double> x_ref_;
 
-  double weight_x_reference_ = 0.0;
-
-  std::vector<double> x_reference_;
-
-  bool has_dx_reference_ = false;
-
-  double weight_dx_reference_ = 0.0;
-
-  double dx_reference_ = 0.0;
+  bool has_dx_ref_ = false;
+  double weight_dx_ref_ = 0.0;
+  double dx_ref_ = 0.0;
 
   std::vector<double> penalty_dx_;
 
+  bool has_end_state_target_ = false;
   std::array<double, 3> end_state_target_;
 
   double weight_end_x_ = 0.0;
-
   double weight_end_dx_ = 0.0;
-
   double weight_end_ddx_ = 0.0;
 };
 
