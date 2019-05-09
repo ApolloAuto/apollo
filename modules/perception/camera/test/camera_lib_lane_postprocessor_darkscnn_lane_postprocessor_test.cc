@@ -233,7 +233,9 @@ TEST(darkSCNNLanePostprocessor, camera_lane_postprocessor_point_test) {
     if (enable_visualization_) {
       frame.frame_id = i;
       frame.timestamp = static_cast<double>(i);
-      visualize_.ShowResult_all_info_single_camera(img, frame, motion_buffer);
+      Eigen::Affine3d world2camera = Eigen::Affine3d::Identity();
+      visualize_.ShowResult_all_info_single_camera(img, frame, motion_buffer,
+        world2camera);
     }
 
     // delete detector;

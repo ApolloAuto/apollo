@@ -252,14 +252,16 @@ TEST(CIPV, cipv_ground_test) {
     right_lane_instance.pos_type = base::LaneLinePositionType::EGO_RIGHT;
     lane_objects.push_back(right_lane_instance);
 
+    Eigen::Affine3d world2camera = Eigen::Affine3d::Identity();
+
     std::vector<std::shared_ptr<base::Object>> objects;
     base::ObjectPtr object1(new base::Object);
     object1->track_id = 0;
     object1->camera_supplement.box =
         base::RectF(1163.0f, 486.73f, 15.0f, 39.6f);
-    object1->center(0) = 559664;
-    object1->center(1) = 4.15741e+06;
-    object1->center(2) = -14.9444;
+    object1->center(0) = 6.0;
+    object1->center(1) = 5.0;
+    object1->center(2) = 0.0;
     object1->anchor_point(0) = 559664;
     object1->anchor_point(1) = 4.15741e+06;
     object1->anchor_point(2) = -14.9444;
@@ -277,9 +279,9 @@ TEST(CIPV, cipv_ground_test) {
     object2->track_id = 2;
     object2->camera_supplement.box =
         base::RectF(852.067f, 537.943f, 345.337f, 267.294f);
-    object2->center(0) = 559712;
-    object2->center(1) = 4.15745e+06;
-    object2->center(2) = -19.9879;
+    object2->center(0) = 10.0;
+    object2->center(1) = 0.1;
+    object2->center(2) = 0.0;
     object2->anchor_point(0) = 559712;
     object2->anchor_point(1) = 4.15745e+06;
     object2->anchor_point(2) = -19.9879;
@@ -297,9 +299,9 @@ TEST(CIPV, cipv_ground_test) {
     object3->track_id = 3;
     object3->camera_supplement.box =
         base::RectF(1343.66f, 563.465f, 341.659f, 272.38f);
-    object3->center(0) = 559711;
-    object3->center(1) = 4.15745e+06;
-    object3->center(2) = -19.7986;
+    object3->center(0) = 5.0;
+    object3->center(1) = -4.5;
+    object3->center(2) = 0.0;
     object3->anchor_point(0) = 559711;
     object3->anchor_point(1) = 4.15745e+06;
     object3->anchor_point(2) = -19.7986;
@@ -313,7 +315,7 @@ TEST(CIPV, cipv_ground_test) {
 
     objects.push_back(object3);
 
-    cipv_.DetermineCipv(lane_objects, cipv_options, &objects);
+    cipv_.DetermineCipv(lane_objects, cipv_options, world2camera, &objects);
 
     EXPECT_FALSE(objects[0]->b_cipv);
     EXPECT_TRUE(objects[1]->b_cipv);
@@ -547,14 +549,16 @@ TEST(CIPV, cipv_image_test) {
     right_lane_instance.pos_type = base::LaneLinePositionType::EGO_RIGHT;
     lane_objects.push_back(right_lane_instance);
 
+    Eigen::Affine3d world2camera = Eigen::Affine3d::Identity();
+
     std::vector<std::shared_ptr<base::Object>> objects;
     base::ObjectPtr object1(new base::Object);
     object1->track_id = 0;
     object1->camera_supplement.box =
         base::RectF(1163.0f, 486.73f, 15.0f, 39.6f);
-    object1->center(0) = 559664;
-    object1->center(1) = 4.15741e+06;
-    object1->center(2) = -14.9444;
+    object1->center(0) = 6.0;
+    object1->center(1) = 5.0;
+    object1->center(2) = 0.0;
     object1->anchor_point(0) = 559664;
     object1->anchor_point(1) = 4.15741e+06;
     object1->anchor_point(2) = -14.9444;
@@ -572,9 +576,9 @@ TEST(CIPV, cipv_image_test) {
     object2->track_id = 2;
     object2->camera_supplement.box =
         base::RectF(852.067f, 537.943f, 345.337f, 267.294f);
-    object2->center(0) = 559712;
-    object2->center(1) = 4.15745e+06;
-    object2->center(2) = -19.9879;
+    object2->center(0) = 10.0;
+    object2->center(1) = 0.1;
+    object2->center(2) = 0.0;
     object2->anchor_point(0) = 559712;
     object2->anchor_point(1) = 4.15745e+06;
     object2->anchor_point(2) = -19.9879;
@@ -592,9 +596,9 @@ TEST(CIPV, cipv_image_test) {
     object3->track_id = 3;
     object3->camera_supplement.box =
         base::RectF(1343.66f, 563.465f, 341.659f, 272.38f);
-    object3->center(0) = 559711;
-    object3->center(1) = 4.15745e+06;
-    object3->center(2) = -19.7986;
+    object3->center(0) = 5.0;
+    object3->center(1) = -4.5;
+    object3->center(2) = 0.0;
     object3->anchor_point(0) = 559711;
     object3->anchor_point(1) = 4.15745e+06;
     object3->anchor_point(2) = -19.7986;
@@ -608,7 +612,7 @@ TEST(CIPV, cipv_image_test) {
 
     objects.push_back(object3);
 
-    cipv_.DetermineCipv(lane_objects, cipv_options, &objects);
+    cipv_.DetermineCipv(lane_objects, cipv_options, world2camera, &objects);
 
     EXPECT_FALSE(objects[0]->b_cipv);
     EXPECT_TRUE(objects[1]->b_cipv);

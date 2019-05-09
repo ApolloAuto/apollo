@@ -57,6 +57,7 @@ bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
   half_vehicle_width_in_meter_ = max_vehicle_width_in_meter * 0.5f;
   half_virtual_egolane_width_in_meter_ =
       single_virtual_egolane_width_in_meter_ * 0.5f;
+  old_cipv_track_id_ = -2;
 
   return true;
 }
@@ -149,12 +150,14 @@ bool Cipv::MakeVirtualLane(const LaneLineSimple &ref_lane_line,
   // TODO(techoe): Use union of lane line and yaw_rate path to define the
   // virtual lane
   virtual_lane_line->line_point.clear();
-  if (b_image_based_cipv_ == false) {
+  if (!b_image_based_cipv_) {
     for (uint32_t i = 0; i < ref_lane_line.line_point.size(); ++i) {
-      Point2Df virtual_line_point(
-          ref_lane_line.line_point[i](0),
-          ref_lane_line.line_point[i](1) + offset_distance);
-      virtual_lane_line->line_point.push_back(virtual_line_point);
+      // Point2Df virtual_line_point(
+      //     ref_lane_line.line_point[i](0),
+      //     ref_lane_line.line_point[i](1) + offset_distance);
+      virtual_lane_line->line_point.emplace_back(
+        ref_lane_line.line_point[i](0),
+        ref_lane_line.line_point[i](1) + offset_distance);
     }
   } else {
     // Image based extension requires to reproject virtual laneline points to
@@ -200,7 +203,7 @@ bool Cipv::MakeVirtualEgoLaneFromYawRate(const float yaw_rate,
   left_lane_line->line_point.clear();
   right_lane_line->line_point.clear();
 
-  if (b_image_based_cipv_ == false) {
+  if (!b_image_based_cipv_) {
     for (uint32_t i = 1; i < kMaxNumVirtualLanePoint; i += 1) {
       VehicleDynamics(i, yaw_rate, velocity, time_unit_, &x, &y);
       Point2Df left_point(x, y + offset_distance);
@@ -355,6 +358,7 @@ bool Cipv::FindClosestEdgeOfObjectImage(
 // to decide CIPV.
 bool Cipv::FindClosestEdgeOfObjectGround(
     const std::shared_ptr<base::Object> &object, const EgoLane &egolane_ground,
+    const Eigen::Affine3d world2camera,
     LineSegment2Df *closted_object_edge) {
   if (debug_level_ >= 2) {
     AINFO << "object->track_id = " << object->track_id;
@@ -368,18 +372,19 @@ bool Cipv::FindClosestEdgeOfObjectGround(
     // size_z = 0.1;
     return false;
   }
+  // Option 1. Get position from center
+  auto pos = world2camera * object->center;
+  float center_x = static_cast<float>(pos(2));
+  float center_y = static_cast<float>(-pos(0));
 
-  base::RectF rect(object->camera_supplement.box);
-  float footprint_x = static_cast<float>(rect.x + rect.width * 0.5);
-  float footprint_y = static_cast<float>(rect.y + rect.height);
-  float center_x;
-  float center_y;
-  image2ground(footprint_x, footprint_y, &center_x, &center_y);
+  // Option 2. Homography based 3D inference
+  // base::RectF rect(object->camera_supplement.box);
+  // float footprint_x = static_cast<float>(rect.x + rect.width * 0.5);
+  // float footprint_y = static_cast<float>(rect.y + rect.height);
+  // float center_x;
+  // float center_y;
+  // image2ground(footprint_x, footprint_y, &center_x, &center_y);
 
-  Eigen::Vector3d pos;
-  pos << object->camera_supplement.local_center(0),
-      object->camera_supplement.local_center(1),
-      object->camera_supplement.local_center(2);
   double theta_ray = atan2(pos(0), pos(2));
   double theta = object->camera_supplement.alpha + theta_ray;
   theta = theta - M_PI_2;
@@ -389,15 +394,27 @@ bool Cipv::FindClosestEdgeOfObjectGround(
           << object->camera_supplement.box.xmin << ", "
           << object->camera_supplement.box.ymin << ", "
           << object->camera_supplement.box.xmax -
-                 object->camera_supplement.box.xmin
-          << ", "
+             object->camera_supplement.box.xmin << ", "
           << object->camera_supplement.box.ymax -
-                 object->camera_supplement.box.ymin
-          << ");";
+             object->camera_supplement.box.ymin << ");";
 
     AINFO << "object.center(0) = " << object->center(0) << ";";
     AINFO << "object.center(1) = " << object->center(1) << ";";
     AINFO << "object.center(2) = " << object->center(2) << ";";
+    AINFO << "pos(0) = " << pos(0) << ";";
+    AINFO << "pos(1) = " << pos(1) << ";";
+    AINFO << "pos(2) = " << pos(2) << ";";
+    AINFO << "object->camera_supplement.local_center(0) = "
+          << object->camera_supplement.local_center(0) << ";";
+    AINFO << "object->camera_supplement.local_center(1) = "
+          << object->camera_supplement.local_center(1) << ";";
+    AINFO << "object->camera_supplement.local_center(2) = "
+          << object->camera_supplement.local_center(2) << ";";
+    AINFO << "theta_ray = " << theta_ray << ";";
+    AINFO << "object->camera_supplement.alpha = "
+          << object->camera_supplement.alpha << ";";
+    AINFO << "theta = "
+          << theta << ";";
     AINFO << "object.anchor_point(0) = " << object->anchor_point(0) << ";";
     AINFO << "object.anchor_point(1) = " << object->anchor_point(1) << ";";
     AINFO << "object.anchor_point(2) = " << object->anchor_point(2) << ";";
@@ -407,23 +424,11 @@ bool Cipv::FindClosestEdgeOfObjectGround(
     AINFO << "object.size(0) = " << object->size(0) << ";";
     AINFO << "object.size(1) = " << object->size(1) << ";";
     AINFO << "object.size(2) = " << object->size(2) << ";";
-    // AINFO << "object->camera_supplement.alpha = "
-    //       << object->camera_supplement.alpha << ";";
-    // AINFO << "center_x = " << center_x;
-    // AINFO << "center_y = " << center_y;
   }
-  // TODO(techoe): handle 3D direction
-  // float direction_x = object->direction(0);
-  // float direction_y = object->direction(1);
   float x1 = size_x * 0.5f;
   float x2 = -x1;
   float y1 = size_y * 0.5f;
   float y2 = -y1;
-  // float len = static_cast<float>(
-  //             sqrt(direction_x * direction_x + direction_y * direction_y));
-  // if (len < kFloatEpsilon) {
-  //   return false;
-  // }
   float cos_theta = static_cast<float>(cos(theta));  // direction_x / len;
   float sin_theta = static_cast<float>(sin(theta));  // -direction_y / len;
 
@@ -463,6 +468,10 @@ bool Cipv::FindClosestEdgeOfObjectGround(
       second_closest_x = p[i](0);
     }
   }
+  if (closest_index < 0 || second_closest_index < 0) {
+    return false;
+  }
+
   if (p[closest_index](1) >= p[second_closest_index](1)) {
     closted_object_edge->start_point(0) = p[closest_index](0);
     closted_object_edge->start_point(1) = p[closest_index](1);
@@ -599,21 +608,18 @@ bool Cipv::IsObjectInTheLaneImage(const std::shared_ptr<base::Object> &object,
 // l_lane     r_lane
 bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
                                    const EgoLane &egolane_ground,
+                                   const Eigen::Affine3d world2camera,
                                    float *object_distance) {
   LineSegment2Df closted_object_edge;
   bool b_left_lane_clear = false;
   bool b_right_lane_clear = false;
   float shortest_distance = 0.0f;
   float distance = 0.0f;
-  float shortest_distance_start_point_to_right_lane = 0.0f;
-  float shortest_distance_start_point_to_left_lane = 0.0f;
-  float shortest_distance_end_point_to_right_lane = 0.0f;
-  float shortest_distance_end_point_to_left_lane = 0.0f;
 
   int closest_index = -1;
   // Find closest edge of a given object bounding box
-  float b_valid_object = FindClosestEdgeOfObjectGround(object, egolane_ground,
-                                                       &closted_object_edge);
+  float b_valid_object = FindClosestEdgeOfObjectGround(
+          object, egolane_ground, world2camera, &closted_object_edge);
   if (!b_valid_object) {
     if (debug_level_ >= 1) {
       ADEBUG << "The closest edge of an object is not available";
@@ -641,13 +647,14 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
     if (DistanceFromPointToLineSegment(
             closted_object_edge.end_point,
             egolane_ground.left_line.line_point[i],
-            egolane_ground.left_line.line_point[i + 1], &distance) == true) {
+            egolane_ground.left_line.line_point[i + 1], &distance)) {
       if (distance < shortest_distance) {
         closest_index = static_cast<int>(i);
         shortest_distance = distance;
       }
     }
   }
+
   // When the closest line segment was found
   if (closest_index >= 0) {
     // Check if the end point is on the right of the line segment
@@ -682,7 +689,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
     if (DistanceFromPointToLineSegment(
             closted_object_edge.start_point,
             egolane_ground.right_line.line_point[i],
-            egolane_ground.right_line.line_point[i + 1], &distance) == true) {
+            egolane_ground.right_line.line_point[i + 1], &distance)) {
       if (distance < shortest_distance) {
         closest_index = static_cast<int>(i);
         shortest_distance = distance;
@@ -699,7 +706,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
     if (IsPointLeftOfLine(
             closted_object_edge.start_point,
             egolane_ground.right_line.line_point[closest_index],
-            egolane_ground.right_line.line_point[closest_index + 1]) == true) {
+            egolane_ground.right_line.line_point[closest_index + 1])) {
       b_right_lane_clear = true;
     }
   }
@@ -707,29 +714,20 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
   *object_distance = std::min(closted_object_edge.start_point(0),
                               closted_object_edge.end_point(0));
 
-  // Check if the distance is sane
-  if (AreDistancesSane(shortest_distance_start_point_to_right_lane,
-                       shortest_distance_start_point_to_left_lane,
-                       shortest_distance_end_point_to_right_lane,
-                       shortest_distance_end_point_to_left_lane)) {
-    return (b_left_lane_clear && b_right_lane_clear);
-
-  } else {
-    return false;
-  }
-
-  return true;
+  return (b_left_lane_clear && b_right_lane_clear);
 }
 
 // Check if the object is in the lane in ego-ground space
 bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                              const EgoLane &egolane_image,
                              const EgoLane &egolane_ground,
+                             const Eigen::Affine3d world2camera,
                              float *distance) {
-  if (b_image_based_cipv_ == true) {
+  if (b_image_based_cipv_) {
     return IsObjectInTheLaneImage(object, egolane_image, distance);
   } else {
-    return IsObjectInTheLaneGround(object, egolane_ground, distance);
+    return IsObjectInTheLaneGround(object, egolane_ground,
+                                   world2camera, distance);
   }
 }
 
@@ -737,20 +735,21 @@ bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
 // Decide CIPV among multiple objects
 bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
                          const CipvOptions &options,
+                         const Eigen::Affine3d &world2camera,
                          std::vector<std::shared_ptr<base::Object>> *objects) {
   if (debug_level_ >= 3) {
     AINFO << "Cipv Got SensorObjects with size of " << objects->size();
     AINFO << "Cipv Got lane object with size of" << lane_objects.size();
   }
 
-  float yaw_rate = options.yaw_rate;
-  float velocity = options.velocity;
+  // float yaw_rate = options.yaw_rate;
+  // float velocity = options.velocity;
   int32_t cipv_index = -1;
   //    int32_t old_cipv_track_id = sensor_objects.cipv_track_id;
   int32_t cipv_track_id = -1;
   bool b_left_valid = false;
   bool b_right_valid = false;
-  static int32_t old_cipv_index = -2;  // need to be changed
+  int32_t old_cipv_index = -1;
   EgoLane egolane_image;
   EgoLane egolane_ground;
   egolane_ground.left_line.line_point.clear();
@@ -759,8 +758,8 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
   // Get ego lanes (in both image and ground coordinate)
   GetEgoLane(lane_objects, &egolane_image, &egolane_ground, &b_left_valid,
              &b_right_valid);
-  ElongateEgoLane(lane_objects, b_left_valid, b_right_valid, yaw_rate, velocity,
-                  &egolane_image, &egolane_ground);
+  ElongateEgoLane(lane_objects, b_left_valid, b_right_valid,
+    options.yaw_rate, options.velocity, &egolane_image, &egolane_ground);
 
   float min_distance = std::numeric_limits<float>::max();
   float distance;
@@ -768,8 +767,8 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
     if (debug_level_ >= 2) {
       AINFO << "objects[" << i << "]->track_id: " << (*objects)[i]->track_id;
     }
-    if (IsObjectInTheLane(
-          (*objects)[i], egolane_image, egolane_ground, &distance) == true) {
+    if (IsObjectInTheLane((*objects)[i], egolane_image, egolane_ground,
+                          world2camera, &distance)) {
       if (cipv_index < 0 || distance < min_distance) {
         cipv_index = i;
         cipv_track_id = (*objects)[i]->track_id;
@@ -780,15 +779,21 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
         AINFO << "current cipv_index: " << cipv_index;
       }
     }
+    if ((*objects)[i]->track_id == old_cipv_track_id_) {
+      old_cipv_index = cipv_index;
+    }
   }
   if (debug_level_ >= 1) {
     AINFO << "old_cipv_index: " << old_cipv_index;
+    AINFO << "old_cipv_track_id_: " << old_cipv_track_id_;
   }
   if (cipv_index >= 0) {
-    if (old_cipv_index >= 0 && old_cipv_index != cipv_index) {
+    if (old_cipv_index >= 0 && old_cipv_index != cipv_index &&
+        old_cipv_index < static_cast<int32_t>(objects->size())) {
       (*objects)[old_cipv_index]->b_cipv = false;
     }
     (*objects)[cipv_index]->b_cipv = true;
+    old_cipv_track_id_ = cipv_track_id;
     // sensor_objects.cipv_index = cipv_index;
     // sensor_objects.cipv_track_id = cipv_track_id;
     if (debug_level_ >= 1) {
@@ -806,7 +811,6 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
       AINFO << "No cipv";
     }
   }
-  old_cipv_index = cipv_index;
 
   return true;
 }
@@ -900,7 +904,7 @@ bool Cipv::CollectDrops(const base::MotionBufferPtr &motion_buffer,
       }
     }
     // If object ID was not found erase it from map
-    if (b_found_id == false && object_trackjectories_[obj_id].size() > 0) {
+    if (!b_found_id && object_trackjectories_[obj_id].size() > 0) {
       //      object_id_skip_count_[obj_id].second++;
       object_id_skip_count_[obj_id]++;
       if (debug_level_ >= 2) {

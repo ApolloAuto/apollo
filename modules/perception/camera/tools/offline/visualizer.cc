@@ -870,10 +870,13 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
   Draw2Dand3D(image, frame);
 }
 
-void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
-                                                    const CameraFrame &frame,
-                                                    Eigen::Matrix3d intrinsic,
-                                                    Eigen::Matrix4d extrinsic) {
+void Visualizer::Draw2Dand3D_all_info_single_camera(
+    const cv::Mat &img,
+    const CameraFrame &frame,
+    const Eigen::Matrix3d intrinsic,
+    const Eigen::Matrix4d extrinsic,
+    const Eigen::Affine3d &world2camera) {
+
   cv::Mat image_2D = img.clone();  // All clone should be replaced with global
   cv::Mat image_3D = img.clone();  // variable and allocated at Init..
 
@@ -932,8 +935,7 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
     }
   }
 
-  AINFO << "Drew lane line";
-
+  // Draw objects
   for (const auto &object : frame.tracked_objects) {
     // plot 2D box on image_2D
     base::RectF rect(object->camera_supplement.box);
@@ -959,101 +961,123 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
 
     // compute 8 vetices in camera coodinates
     Eigen::Vector3d pos;
-    pos << object->camera_supplement.local_center(0),
-        object->camera_supplement.local_center(1),
-        object->camera_supplement.local_center(2);
-    double theta_ray = atan2(pos(0), pos(2));
-    double theta = object->camera_supplement.alpha + theta_ray;
 
-    Eigen::Matrix3d rotate_ry;
-    rotate_ry << cos(theta), 0, sin(theta), 0, 1, 0, -sin(theta), 0, cos(theta);
-    std::vector<Eigen::Vector3d> p(8);
-    p[0] << object->size(0) * 0.5, object->size(2) * 0.5, object->size(1) * 0.5;
-    p[1] << -object->size(0) * 0.5, object->size(2) * 0.5,
-        object->size(1) * 0.5;
-    p[2] << -object->size(0) * 0.5, object->size(2) * 0.5,
-        -object->size(1) * 0.5;
-    p[3] << object->size(0) * 0.5, object->size(2) * 0.5,
-        -object->size(1) * 0.5;
-    p[4] << object->size(0) * 0.5, -object->size(2) * 0.5,
-        object->size(1) * 0.5;
-    p[5] << -object->size(0) * 0.5, -object->size(2) * 0.5,
-        object->size(1) * 0.5;
-    p[6] << -object->size(0) * 0.5, -object->size(2) * 0.5,
-        -object->size(1) * 0.5;
-    p[7] << object->size(0) * 0.5, -object->size(2) * 0.5,
-        -object->size(1) * 0.5;
-    for (uint i = 0; i < p.size(); i++) p[i] = rotate_ry * p[i] + pos;
+    ADEBUG << "object->track_id: " << object->track_id;
+    int line_thickness = 2;
+    // Draw camera and lidar
+    for (int method = GROUND; method <= GROUND; method++) {
+      double theta_ray;
+      double theta;
+      cv::Point c_2D;
+      Eigen::Vector2d c_2D_l;
+      if (method == GROUND) {
+        pos = world2camera * object->center;
+        theta_ray = atan2(pos(0), pos(2));
+        theta = object->camera_supplement.alpha + theta_ray;
+        ADEBUG << "Lidar pos: ("
+              << pos(0) << ", " << pos(1) << ", " << pos(2) <<")";
 
-    // compute 4 bottom vetices in lidar coordinate
-    // Eigen::Vector3d p1_l_3d = extrinsic.block(0,0,3,3) * p1 +
-    //                           extrinsic.block(0,3,3,1);
-    // Eigen::Vector3d p2_l_3d = extrinsic.block(0,0,3,3) * p2 +
-    //                           extrinsic.block(0,3,3,1);
-    // Eigen::Vector3d p3_l_3d = extrinsic.block(0,0,3,3) * p3 +
-    //                           extrinsic.block(0,3,3,1);
-    // Eigen::Vector3d p4_l_3d = extrinsic.block(0,0,3,3) * p4 +
-    //                           extrinsic.block(0,3,3,1);
+        // compute obstacle center in lidar ground
+        c_2D_l(0) = pos(2);
+        c_2D_l(1) = -pos(0);
+        ADEBUG << "Lidar center position: ("
+              << c_2D_l(0) << ", " << c_2D_l(1) << ")";
+      } else {  // if (method == HOMOGRAPHY)
+        pos << object->camera_supplement.local_center(0),
+               object->camera_supplement.local_center(1),
+               object->camera_supplement.local_center(2);
+        ADEBUG << "Camera pos: ("
+              << pos(0) << ", " << pos(1) << ", " << pos(2) <<")";
+        line_thickness = 1;
+        theta_ray = atan2(pos(0), pos(2));
+        theta = object->camera_supplement.alpha + theta_ray;
+        // compute obstacle center in lidar ground
+        c_2D.x = static_cast<int>(rect.x + rect.width / 2);
+        c_2D.y = static_cast<int>(rect.y + rect.height);
+        ADEBUG << "Image Footprint c_2D: (" << c_2D.x << ", " << c_2D.y << ")";
+        c_2D_l = image2ground(c_2D);
+        ADEBUG << "Image Footprint position: ("
+              << c_2D_l(0) << ", " << c_2D_l(1) << ")";
+      }
+      ADEBUG << "theta_ray: " << theta_ray * 180 / M_PI << " degree";
+      ADEBUG << "object->camera_supplement.alpha: "
+            << object->camera_supplement.alpha * 180 / M_PI << " degree";
+      ADEBUG << "theta: " << theta * 180 / M_PI << " = "
+            << object->camera_supplement.alpha * 180 / M_PI << " + "
+            << theta_ray * 180 / M_PI;
 
-    // Eigen::Vector2d p1_l = p1_l_3d.block(0, 0, 2, 1);
-    // Eigen::Vector2d p2_l = p2_l_3d.block(0, 0, 2, 1);
-    // Eigen::Vector2d p3_l = p3_l_3d.block(0, 0, 2, 1);
-    // Eigen::Vector2d p4_l = p4_l_3d.block(0, 0, 2, 1);
+      // plot projected 3D box on image_3D
+      Eigen::Matrix3d rotate_ry;
+      rotate_ry << cos(theta), 0, sin(theta),
+                   0, 1, 0,
+                   -sin(theta), 0, cos(theta);
+      std::vector<Eigen::Vector3d> p(8);
+      std::vector<Eigen::Vector3d> proj(8);
+      std::vector<cv::Point> p_proj(8);
+      p[0] << object->size(0) * 0.5, object->size(2) * 0.5,
+              object->size(1) * 0.5;
+      p[1] << -object->size(0) * 0.5, object->size(2) * 0.5,
+              object->size(1) * 0.5;
+      p[2] << -object->size(0) * 0.5, object->size(2) * 0.5,
+              -object->size(1) * 0.5;
+      p[3] << object->size(0) * 0.5, object->size(2) * 0.5,
+             -object->size(1) * 0.5;
+      p[4] << object->size(0) * 0.5, -object->size(2) * 0.5,
+              object->size(1) * 0.5;
+      p[5] << -object->size(0) * 0.5, -object->size(2) * 0.5,
+               object->size(1) * 0.5;
+      p[6] << -object->size(0) * 0.5, -object->size(2) * 0.5,
+              -object->size(1) * 0.5;
+      p[7] << object->size(0) * 0.5, -object->size(2) * 0.5,
+             -object->size(1) * 0.5;
 
-    // compute obstacle center in lidar ground
-    cv::Point c_2D;
-    c_2D.x = static_cast<int>(rect.x + rect.width / 2);
-    c_2D.y = static_cast<int>(rect.y + rect.height);
-    Eigen::Vector2d c_2D_l = image2ground(c_2D);
-    Eigen::Matrix2d rotate_rz;
-    theta = theta - M_PI_2;
-    rotate_rz << cos(theta), sin(theta), -sin(theta), cos(theta);
-    // plot obstacles on ground plane in lidar coordinates
-    Eigen::Vector2d p1_l;
-    p1_l << object->size(0) * 0.5, object->size(1) * 0.5;
-    p1_l = rotate_rz * p1_l + c_2D_l;
-    Eigen::Vector2d p2_l;
-    p2_l << -object->size(0) * 0.5, object->size(1) * 0.5;
-    p2_l = rotate_rz * p2_l + c_2D_l;
-    Eigen::Vector2d p3_l;
-    p3_l << -object->size(0) * 0.5, -object->size(1) * 0.5;
-    p3_l = rotate_rz * p3_l + c_2D_l;
-    Eigen::Vector2d p4_l;
-    p4_l << object->size(0) * 0.5, -object->size(1) * 0.5;
-    p4_l = rotate_rz * p4_l + c_2D_l;
-    cv::line(world_image_, world_point_to_bigimg(p1_l),
-             world_point_to_bigimg(p2_l), color, 2);
-    cv::line(world_image_, world_point_to_bigimg(p2_l),
-             world_point_to_bigimg(p3_l), color, 2);
-    cv::line(world_image_, world_point_to_bigimg(p3_l),
-             world_point_to_bigimg(p4_l), color, 2);
-    cv::line(world_image_, world_point_to_bigimg(p4_l),
-             world_point_to_bigimg(p1_l), color, 2);
+      for (uint i = 0; i < p.size(); i++) {
+        proj[i] = intrinsic * (rotate_ry * p[i] + pos);
+        if (fabs(p[i](2)) > std::numeric_limits<double>::min()) {
+          p_proj[i].x = static_cast<int>(proj[i](0) / proj[i](2));
+          p_proj[i].y = static_cast<int>(proj[i](1) / proj[i](2));
+        }
+      }
 
-    // plot projected 3D box on image_3D
-    for (uint i = 0; i < p.size(); i++) p[i] = intrinsic * p[i];
+      cv::line(image_3D, p_proj[0], p_proj[1], color, line_thickness);
+      cv::line(image_3D, p_proj[1], p_proj[2], color, line_thickness);
+      cv::line(image_3D, p_proj[2], p_proj[3], color, line_thickness);
+      cv::line(image_3D, p_proj[3], p_proj[0], color, line_thickness);
+      cv::line(image_3D, p_proj[4], p_proj[5], color, line_thickness);
+      cv::line(image_3D, p_proj[5], p_proj[6], color, line_thickness);
+      cv::line(image_3D, p_proj[6], p_proj[7], color, line_thickness);
+      cv::line(image_3D, p_proj[7], p_proj[4], color, line_thickness);
+      cv::line(image_3D, p_proj[0], p_proj[4], color, line_thickness);
+      cv::line(image_3D, p_proj[1], p_proj[5], color, line_thickness);
+      cv::line(image_3D, p_proj[2], p_proj[6], color, line_thickness);
+      cv::line(image_3D, p_proj[3], p_proj[7], color, line_thickness);
 
-    std::vector<cv::Point> p_proj(8);
-    for (uint i = 0; i < p_proj.size(); i++) {
-      p_proj[i].x = static_cast<int>(p[i](0) / p[i](2));
-      p_proj[i].y = static_cast<int>(p[i](1) / p[i](2));
+      // plot obstacles on ground plane in lidar coordinates
+      Eigen::Matrix2d rotate_rz;
+      theta = theta - M_PI_2;
+      rotate_rz << cos(theta), sin(theta), -sin(theta), cos(theta);
+      Eigen::Vector2d p1_l;
+      p1_l << object->size(0) * 0.5, object->size(1) * 0.5;
+      p1_l = rotate_rz * p1_l + c_2D_l;
+      Eigen::Vector2d p2_l;
+      p2_l << -object->size(0) * 0.5, object->size(1) * 0.5;
+      p2_l = rotate_rz * p2_l + c_2D_l;
+      Eigen::Vector2d p3_l;
+      p3_l << -object->size(0) * 0.5, -object->size(1) * 0.5;
+      p3_l = rotate_rz * p3_l + c_2D_l;
+      Eigen::Vector2d p4_l;
+      p4_l << object->size(0) * 0.5, -object->size(1) * 0.5;
+      p4_l = rotate_rz * p4_l + c_2D_l;
+      cv::line(world_image_, world_point_to_bigimg(p1_l),
+               world_point_to_bigimg(p2_l), color, line_thickness);
+      cv::line(world_image_, world_point_to_bigimg(p2_l),
+               world_point_to_bigimg(p3_l), color, line_thickness);
+      cv::line(world_image_, world_point_to_bigimg(p3_l),
+               world_point_to_bigimg(p4_l), color, line_thickness);
+      cv::line(world_image_, world_point_to_bigimg(p4_l),
+               world_point_to_bigimg(p1_l), color, line_thickness);
     }
-
-    cv::line(image_3D, p_proj[0], p_proj[1], color, 2);
-    cv::line(image_3D, p_proj[1], p_proj[2], color, 2);
-    cv::line(image_3D, p_proj[2], p_proj[3], color, 2);
-    cv::line(image_3D, p_proj[3], p_proj[0], color, 2);
-    cv::line(image_3D, p_proj[4], p_proj[5], color, 2);
-    cv::line(image_3D, p_proj[5], p_proj[6], color, 2);
-    cv::line(image_3D, p_proj[6], p_proj[7], color, 2);
-    cv::line(image_3D, p_proj[7], p_proj[4], color, 2);
-    cv::line(image_3D, p_proj[0], p_proj[4], color, 2);
-    cv::line(image_3D, p_proj[1], p_proj[5], color, 2);
-    cv::line(image_3D, p_proj[2], p_proj[6], color, 2);
-    cv::line(image_3D, p_proj[3], p_proj[7], color, 2);
   }
-
-  AINFO << "Drew object";
 
   last_timestamp_ = frame.timestamp;
   camera_image_[frame.data_provider->sensor_name() + "_2D"] = image_2D;
@@ -1064,13 +1088,12 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
   cv::resize(image_3D,
              camera_image_[frame.data_provider->sensor_name() + "_3D"],
              cv::Size(small_w_, small_h_));
-
-  AINFO << "Finished copy";
 }
 
 void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
     const CameraFrame &frame,
-    const base::MotionBufferPtr motion_buffer) {
+    const base::MotionBufferPtr motion_buffer,
+    const Eigen::Affine3d &world2camera) {
   if (frame.timestamp - last_timestamp_ < 0.02) return;
 
   // draw results on visulization panel
@@ -1119,7 +1142,7 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
       extrinsic_map_.find(camera_name) != extrinsic_map_.end()) {
     Draw2Dand3D_all_info_single_camera(
         image, frame, intrinsic_map_.at(camera_name).cast<double>(),
-        extrinsic_map_.at(camera_name));
+        extrinsic_map_.at(camera_name), world2camera);
   } else {
     AERROR << "Failed to find necessuary intrinsic or extrinsic params.";
   }
@@ -1149,7 +1172,6 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   // re-initialize empty world_image_
   world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
   draw_range_circle();
-  AINFO << "Finished ShowResult_all_info_single_camera";
 }
 
 void Visualizer::draw_range_circle() {
@@ -1184,7 +1206,7 @@ Eigen::Vector2d Visualizer::image2ground(cv::Point p_img) {
     p_ground(0) = p_ground(0) / p_ground(2);
     p_ground(1) = p_ground(1) / p_ground(2);
   } else {
-    AINFO << "p_ground(2) too small :" << p_ground(2);
+    AWARN << "p_ground(2) too small :" << p_ground(2);
   }
   return p_ground.block(0, 0, 2, 1);
 }

@@ -30,6 +30,11 @@ namespace apollo {
 namespace perception {
 namespace camera {
 
+enum PositioningMethod {
+  GROUND = 0,
+  HOMOGRAPHY = 1,
+};
+
 class Visualizer {
  public:
   bool Init(const std::vector<std::string> &camera_names,
@@ -52,13 +57,16 @@ class Visualizer {
   bool SetDirectory(const std::string &path);
   void ShowResult(const cv::Mat &img, const CameraFrame &frame);
   void Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame);
-  void ShowResult_all_info_single_camera(const cv::Mat &img,
-                                     const CameraFrame &frame,
-                                     const base::MotionBufferPtr motion_buffer);
+  void ShowResult_all_info_single_camera(
+      const cv::Mat &img,
+      const CameraFrame &frame,
+      const base::MotionBufferPtr motion_buffer,
+      const Eigen::Affine3d &world2camera);
   void Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
                                           const CameraFrame &frame,
-                                          Eigen::Matrix3d intrinsic,
-                                          Eigen::Matrix4d extrinsic);
+                                          const Eigen::Matrix3d intrinsic,
+                                          const Eigen::Matrix4d extrinsic,
+                                          const Eigen::Affine3d &world2camera);
   cv::Point world_point_to_bigimg(const Eigen::Vector2d &p);
   Eigen::Vector2d image2ground(cv::Point p_img);
   cv::Point ground2image(Eigen::Vector2d p_ground);
