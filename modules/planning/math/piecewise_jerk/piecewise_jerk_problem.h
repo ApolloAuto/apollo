@@ -64,7 +64,7 @@ class PiecewiseJerkProblem {
                      const double dx_upper_bound);
 
 
-  void set_ddx_bounds(std::vector<std::pair<double, double>> d2x_bounds);
+  void set_ddx_bounds(std::vector<std::pair<double, double>> ddx_bounds);
 
   void set_ddx_bounds(const double ddx_lower_bound,
                       const double ddx_upper_bound);
