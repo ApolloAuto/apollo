@@ -102,8 +102,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
   piecewise_jerk_problem.set_ddx_bounds(-4.4, 2.0);
 
   piecewise_jerk_problem.set_dx_ref(
-      piecewise_jerk_speed_config.velocity_weight(),
-      FLAGS_default_cruise_speed);
+      piecewise_jerk_speed_config.ref_v_weight(), FLAGS_default_cruise_speed);
 
   // Update STBoundary
   std::vector<std::pair<double, double>> s_bounds;
@@ -167,7 +166,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     s_dot_bounds.emplace_back(v_lower_bound, std::fmax(v_upper_bound, 0.0));
   }
   piecewise_jerk_problem.set_x_ref(
-      piecewise_jerk_speed_config.ref_weight(), x_ref);
+      piecewise_jerk_speed_config.ref_s_weight(), x_ref);
   piecewise_jerk_problem.set_penalty_dx(penalty_dx);
   piecewise_jerk_problem.set_dx_bounds(std::move(s_dot_bounds));
 

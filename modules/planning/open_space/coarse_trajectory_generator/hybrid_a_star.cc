@@ -372,29 +372,12 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
                           accumulated_s + 10);
     ds_bounds.emplace_back(static_cast<double>(i) * delta_t_, discrete_v - 10,
                            discrete_v + 10);
-    //  piecewise_jerk_problem.set_weight_x_reference(w[4]);
 
     ADEBUG << "Initial accumulated_s: " << accumulated_s
            << " initial discrete_v: " << discrete_v;
   }
 
   result->v[x_size - 1] = 0.0;
-
-  std::array<double, 5> w = {planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .s_weight(),
-                             planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .velocity_weight(),
-                             planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .acc_weight(),
-                             planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .jerk_weight(),
-                             planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .ref_weight()};
 
   std::array<double, 3> init_s = {result->accumulated_s[0], result->v[0],
                                   (result->v[1] - result->v[0]) / delta_t_};
@@ -411,10 +394,10 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   const size_t num_of_knots = x_size - 1;
 
   PiecewiseJerkSpeedProblem path_time_qp(num_of_knots, delta_t_, init_s);
-  path_time_qp.set_weight_x(w[0]);
-  path_time_qp.set_weight_dx(w[1]);
-  path_time_qp.set_weight_ddx(w[2]);
-  path_time_qp.set_weight_dddx(w[3]);
+  auto s_curve_config = planner_open_space_config_.warm_start_config()
+                        .s_curve_config();
+  path_time_qp.set_weight_ddx(s_curve_config.acc_weight());
+  path_time_qp.set_weight_dddx(s_curve_config.jerk_weight());
 
   path_time_qp.set_x_bounds(
       *(std::min_element(std::begin(result->accumulated_s),
@@ -429,8 +412,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   path_time_qp.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
   // TODO(all): this is not correct; fix it!
-  path_time_qp.set_x_ref(w[4], result->accumulated_s);
-  path_time_qp.set_dx_ref(w[1], 0.0);
+  path_time_qp.set_x_ref(s_curve_config.ref_s_weight(),
+                         result->accumulated_s);
+  path_time_qp.set_dx_ref(s_curve_config.ref_v_weight(), 0.0);
   path_time_qp.set_end_state_ref({0.0, 0.0, 0.0}, end_s);
 
   // Solve the problem
