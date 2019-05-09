@@ -40,23 +40,22 @@ void SemanticMap::Init() {
   curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
 }
 
-void SemanticMap::RunCurrFrame(const FrameEnv& curr_frame_env) {
+void SemanticMap::RunCurrFrame(
+    const std::unordered_map<int, ObstacleHistory>& obstacle_id_history_map) {
   // TODO(Hongyi): moving all these magic numbers to conf
-  curr_timestamp_ = curr_frame_env.timestamp();
-  curr_base_x_ = curr_frame_env.ego_history().feature(0).position().x() - 100.0;
-  curr_base_y_ = curr_frame_env.ego_history().feature(0).position().y() - 100.0;
+  const Feature& ego_feature = obstacle_id_history_map.at(-1).feature(0);
+  curr_timestamp_ = ego_feature.timestamp();
+  curr_base_x_ = ego_feature.position().x() - 100.0;
+  curr_base_y_ = ego_feature.position().y() - 100.0;
   cv::Rect rect(
       static_cast<int>((curr_base_x_ - 585950.0) / 0.1),
       static_cast<int>(18000 - (curr_base_y_ - 4140000.0) / 0.1) - 2000, 2000,
       2000);
   base_img_(rect).copyTo(curr_img_);
 
-  // Draw ego_vehicle_history
-  DrawHistory(curr_frame_env.ego_history(), cv::Scalar(0, 255, 255));
-
-  // Draw obstacles_history
-  for (auto& history : curr_frame_env.obstacles_history()) {
-    DrawHistory(history);
+  // Draw all obstacles_history
+  for (const auto obstacle_id_history_pair : obstacle_id_history_map) {
+    DrawHistory(obstacle_id_history_pair.second, cv::Scalar(0, 255, 255));
   }
 
   // For disaplay

@@ -110,8 +110,6 @@ class EvaluatorManager {
 
   std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
 
-  FrameEnv curr_frame_env_;
-
   DECLARE_SINGLETON(EvaluatorManager)
 };
 
