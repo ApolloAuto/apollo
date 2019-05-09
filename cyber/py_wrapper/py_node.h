@@ -74,7 +74,7 @@ class PyWriter {
     message::ProtobufFactory::Instance()->GetDescriptorString(type,
                                                               &proto_desc);
     if (proto_desc.empty()) {
-      AWARN << "cpp cann't find proto_desc msgtyp->" << data_type_;
+      AWARN << "cpp can't find proto_desc msgtyp->" << data_type_;
       return;
     }
     proto::RoleAttributes role_attr;
