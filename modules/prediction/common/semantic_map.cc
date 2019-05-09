@@ -45,9 +45,10 @@ void SemanticMap::RunCurrFrame(const FrameEnv& curr_frame_env) {
   curr_timestamp_ = curr_frame_env.timestamp();
   curr_base_x_ = curr_frame_env.ego_history().feature(0).position().x() - 100.0;
   curr_base_y_ = curr_frame_env.ego_history().feature(0).position().y() - 100.0;
-  cv::Rect rect(static_cast<int>((curr_base_x_ - 585950.0) / 0.1),
-            static_cast<int>(18000 - (curr_base_y_ - 4140000.0) / 0.1) - 2000,
-            2000, 2000);
+  cv::Rect rect(
+      static_cast<int>((curr_base_x_ - 585950.0) / 0.1),
+      static_cast<int>(18000 - (curr_base_y_ - 4140000.0) / 0.1) - 2000, 2000,
+      2000);
   base_img_(rect).copyTo(curr_img_);
 
   // Draw ego_vehicle_history
