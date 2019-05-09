@@ -48,8 +48,7 @@ class RecordProcessor {
 
  private:
   void LoadSourceRecords();
-  void CollectAllChannels(const SmartRecordTrigger& trigger_conf);
-  void RestoreMessage(const RecordMessage& msg);
+  bool InitTriggers(const SmartRecordTrigger& trigger_conf);
   std::string GetDefaultOutputFile() const;
   bool ShouldRestore(const RecordMessage& msg) const;
 
@@ -58,8 +57,6 @@ class RecordProcessor {
   std::vector<std::string> source_record_files_;
   std::vector<std::unique_ptr<TriggerBase>> triggers_;
   std::unique_ptr<RecordWriter> writer_ = nullptr;
-  std::unordered_map<std::string, std::string> channels_types_map_;
-  std::set<std::string> all_channels_;
 };
 
 }  // namespace data
