@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/opencv.hpp"
 
@@ -31,7 +33,8 @@ class SemanticMap {
 
   void Init();
 
-  void RunCurrFrame(const FrameEnv& curr_frame_env);
+  void RunCurrFrame(
+      const std::unordered_map<int, ObstacleHistory>& obstacle_id_history_map);
 
  private:
   cv::Point2i GetTransPoint(double x, double y) {
