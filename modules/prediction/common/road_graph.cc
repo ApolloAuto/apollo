@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <utility>
 
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 
@@ -188,8 +189,10 @@ void RoadGraph::ComputeLaneSequence(
           // Run recursion function to perform DFS.
           for (const auto& successor_lane : successor_lanes) {
             bool consider_divide_further = false;
-            if (FLAGS_prediction_offline_mode == 1 ||
-                FLAGS_prediction_offline_mode == 2) {
+            if (FLAGS_prediction_offline_mode ==
+                    PredictionConstants::kDumpFeatureProto ||
+                FLAGS_prediction_offline_mode ==
+                    PredictionConstants::kDumpDataForLearning) {
               consider_divide_further = true;
             }
             ComputeLaneSequence(successor_accumulated_s, 0.0,
