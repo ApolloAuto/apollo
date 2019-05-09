@@ -57,19 +57,19 @@ Eigen::Matrix3d Camera2CarHomograph(Eigen::Matrix3d intrinsic,
   AINFO << "intrinsic parameter of camera: " << intrinsic;
   AINFO << "extrinsic parameter of camera to lidar: " << extrinsic_camera2lidar;
   AINFO << "extrinsic parameter of lidar to imu: " << extrinsic_lidar2imu;
-  // rotate 90 degree around z axis to make x point forward
+  // Rotate 90 degree around z axis to make x point forward
   Eigen::Matrix4d Rz;
   Rz << 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1;
   Eigen::Matrix4d extrinsic_camera2car;
   extrinsic_camera2car = extrinsic_camera2lidar * extrinsic_lidar2imu * Rz;
-  // adjust pitch in camera coords
+  // Adjust pitch in camera coords
   Eigen::Matrix4d Rx;
   Rx << 1, 0, 0, 0, 0, cos(pitch_adj), -sin(pitch_adj), 0, 0, sin(pitch_adj),
       cos(pitch_adj), 0, 0, 0, 0, 1;
   extrinsic_camera2car = extrinsic_camera2car * Rx;
-  AINFO << "extrinsic parameter from camera to car: " << extrinsic_camera2car;
+  AINFO << "Extrinsic parameter from camera to car: " << extrinsic_camera2car;
 
-  // compute the homography matrix, such that H [u, v, 1]' ~ [X_l, Y_l, 1]
+  // Compute the homography matrix, such that H [u, v, 1]' ~ [X_l, Y_l, 1]
   Eigen::Matrix3d K = intrinsic;
   Eigen::Matrix3d R = extrinsic_camera2car.block(0, 0, 3, 3);
   Eigen::Vector3d T = extrinsic_camera2car.block(0, 3, 3, 1);
@@ -131,19 +131,19 @@ bool Visualizer::Init_all_info_single_camera(
   world_image_ = cv::Mat(world_h_, wide_pixel_, CV_8UC3, cv::Scalar(0, 0, 0));
   draw_range_circle();
 
-  // 1. transform camera_>lidar
+  // 1. Transform camera_>lidar
   ex_camera2lidar_ = extrinsic_map_.at(camera_name);
   AINFO << "ex_camera2lidar_ = " << extrinsic_map_.at(camera_name);
 
-  AINFO << "ex_lidar2imu_ =" << ex_lidar2imu_;
+  AINFO << "ex_lidar2imu_ = " << ex_lidar2imu_;
 
-  // 2. transform camera->lidar->imu
+  // 2. Transform camera->lidar->imu
   ex_camera2imu_ = ex_lidar2imu_ * ex_camera2lidar_;
-  AINFO << "ex_camera2imu_ =" << ex_camera2imu_;
+  AINFO << "ex_camera2imu_ = " << ex_camera2imu_;
 
-  // intrinsic camera parameter
+  // Intrinsic camera parameter
   K_ = intrinsic_map_.at(camera_name).cast<double>();
-  AINFO << "intrinsic K_ =" << K_;
+  AINFO << "Intrinsic K_ =" << K_;
   // homography_ground2image_.setIdentity();
   // homography_image2ground_.setIdentity();
 
@@ -154,7 +154,7 @@ bool Visualizer::Init_all_info_single_camera(
                 0, 0, 1, 0,  // 0,              0, 1
                 0, 0, 0, 1;
 
-  // 3. transform camera->lidar->imu->car
+  // 3. Transform camera->lidar->imu->car
   ex_camera2car_ = ex_imu2car_ * ex_camera2imu_;
 
   AINFO << "ex_camera2car_ =" << ex_camera2car_;
@@ -162,11 +162,11 @@ bool Visualizer::Init_all_info_single_camera(
   // Adjust angle
   adjust_angles(camera_name, pitch_adj_degree, yaw_adj_degree, roll_adj_degree);
 
-  AINFO << "homography_image2ground_ =" << homography_image2ground_;
+  AINFO << "homography_image2ground_ = " << homography_image2ground_;
 
-  AINFO << "homography_ground2image_ =" << homography_ground2image_;
+  AINFO << "homography_ground2image_ = " << homography_ground2image_;
 
-  // compute FOV points
+  // Compute FOV points
   p_fov_1_.x = 0;
   p_fov_1_.y = static_cast<int>(image_height_ * fov_cut_ratio_);
 
@@ -197,8 +197,8 @@ bool Visualizer::Init_all_info_single_camera(
   vp2_(0) = vp1_(0);
   vp2_(1) = -vp1_(1);
 
-  AINFO << "vanishing point 1:" << vp1_;
-  AINFO << "vanishing point 2:" << vp2_;
+  AINFO << "Vanishing point 1: " << vp1_;
+  AINFO << "Vanishing point 2: " << vp2_;
 
   pitch_adj_degree_ = pitch_adj_degree;
   yaw_adj_degree_ = yaw_adj_degree;
@@ -249,7 +249,7 @@ bool Visualizer::adjust_angles(const std::string &camera_name,
   // ====
   // Version 1. Direct
 
-  // compute the homography matrix, such that H [u, v, 1]' ~ [X_l, Y_l, 1]
+  // Compute the homography matrix, such that H [u, v, 1]' ~ [X_l, Y_l, 1]
   Eigen::Matrix3d R = adjusted_camera2car_.block(0, 0, 3, 3);
   Eigen::Vector3d T = adjusted_camera2car_.block(0, 3, 3, 1);
   Eigen::Matrix3d H;
@@ -378,8 +378,9 @@ double Visualizer::regularize_angle(const double radian_angle) {
     return radian_angle + M_PI * 2.0;
   } else if (radian_angle > M_PI) {
     return radian_angle - M_PI * 2.0;
+  } else {
+    return radian_angle;
   }
-  return radian_angle;
 }
 
 // ZYX Euler angles to quaternion
@@ -436,14 +437,14 @@ bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quarternion,
   } else {
     double qx = 0.5 * sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
     if (fabs(qx) < 1.0e-6) {
-      AWARN << "quarternion is degenerate qw: " << qw << "qx: " << qx;
+      AWARN << "Quarternion is degenerate qw: " << qw << "qx: " << qx;
       return false;
     }
     (*quarternion)(0) = qx;                               // Q.x
     (*quarternion)(1) = 0.25 * (R(0, 1) + R(1, 0)) / qx;  // Q.y
     (*quarternion)(2) = 0.25 * (R(0, 2) + R(2, 0)) / qx;  // Q.z
     (*quarternion)(3) = 0.25 * (R(2, 1) - R(1, 2)) / qx;  // Q.w
-    AINFO << "second quarternion(x, y, z, w): ("
+    AINFO << "Second quarternion(x, y, z, w): ("
           << (*quarternion)(0) << ", "
           << (*quarternion)(1) << ", "
           << (*quarternion)(2) << ", "
@@ -468,11 +469,10 @@ bool Visualizer::copy_backup_file(const std::string &filename) {
   AINFO << "yaml_backup_file: " << yaml_bak_file;
 
   if (!cyber::common::Copy(filename, yaml_bak_file)) {
-    AERROR << "Cannot backup the file: " << filename;
-  } else {
-    AINFO << "Backup file: " << filename << " saved successfully.";
+    return false;
   }
 
+  AINFO << "File: " << filename << " is saved successfully.";
   return true;
 }
 
@@ -484,10 +484,11 @@ bool Visualizer::save_extrinsic_in_yaml(const std::string &camera_name,
                                         const double roll_radian) {
   std::string yaml_file =
       FLAGS_obs_sensor_intrinsic_path + "/" + camera_name + "_extrinsics.yaml";
+  if (!copy_backup_file(yaml_file)) {
+    AERROR << "Failed to backup extrinsics file: " << yaml_file;
+  }
 
-  copy_backup_file(yaml_file);
-
-  AINFO << "extrinsic: " << extrinsic;
+  AINFO << "Extrinsic: " << extrinsic;
 
   // Save data
   // Option 1. Save using streaming
@@ -712,37 +713,67 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
   if (show_help_text_) {
     help_str_ += " (ON)";
     help_str_ += "\nR: reset matrxi\nB: show box";
-    if (show_box_) help_str_ += "(ON)";
+    if (show_box_) {
+      help_str_ += "(ON)";
+    }
     help_str_ += "\nV: show velocity";
-    if (show_velocity_) help_str_ += " (ON)";
+    if (show_velocity_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nC: use class color";
-    if (use_class_color_) help_str_ += " (ON)";
+    if (use_class_color_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nS: capture screen";
     help_str_ += "\nA: capture video";
     help_str_ += "\nI: show type id label";
-    if (show_type_id_label_) help_str_ += " (ON)";
+    if (show_type_id_label_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nQ: show lane";
-    if (show_lane_) help_str_ += " (ON)";
+    if (show_lane_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nE: draw lane objects";
-    if (draw_lane_objects_) help_str_ += " (ON)";
+    if (draw_lane_objects_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nF: show fusion";
-    if (show_fusion_) help_str_ += " (ON)";
+    if (show_fusion_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nD: show radar pc";
-    if (show_radar_pc_) help_str_ += " (ON)";
+    if (show_radar_pc_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nT: show trajectory";
-    if (show_trajectory_) help_str_ += " (ON)";
+    if (show_trajectory_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nO: show camera bdv";
-    if (show_camera_bdv_) help_str_ += " (ON)";
+    if (show_camera_bdv_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\n2: show camera box2d";
-    if (show_camera_box2d_) help_str_ += " (ON)";
+    if (show_camera_box2d_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\n3: show camera box3d";
-    if (show_camera_box3d_) help_str_ += " (ON)";
+    if (show_camera_box3d_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\n0: show associate color";
-    if (show_associate_color_) help_str_ += " (ON)";
+    if (show_associate_color_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nG: show vanishing point and ground plane grid";
-    if (show_vp_grid_) help_str_ += " (ON)";
+    if (show_vp_grid_) {
+      help_str_ += " (ON)";
+    }
     help_str_ += "\nT: show verbose";
-    if (show_verbose_) help_str_ += " (ON)";
+    if (show_verbose_) {
+      help_str_ += " (ON)";
+    }
   }
   switch (key) {
     case 65362:   // Up_Arrow
@@ -848,7 +879,7 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
       char path[1000];
       snprintf(path, sizeof(path), "%s/%06d.jpg", path_.c_str(),
                frame.frame_id);
-      AINFO << "A snapshot of visualizer saved at " << path;
+      AINFO << "A snapshot of visualizer is saved at: " << path;
       cv::imwrite(path, bigimg);
     }
 
@@ -934,7 +965,7 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
   AINFO << "Drew lane line";
 
   for (const auto &object : frame.tracked_objects) {
-    // plot 2D box on image_2D
+    // Plot 2D box on image_2D
     base::RectF rect(object->camera_supplement.box);
     cv::Rect r(static_cast<int>(rect.x), static_cast<int>(rect.y),
                static_cast<int>(rect.width), static_cast<int>(rect.height));
@@ -956,7 +987,7 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
         cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y) + 30),
         cv::FONT_HERSHEY_DUPLEX, 1, cv::Scalar(255, 0, 0), 1);
 
-    // compute 8 vetices in camera coodinates
+    // Compute 8 vetices in camera coodinates
     Eigen::Vector3d pos;
     pos << object->camera_supplement.local_center(0),
         object->camera_supplement.local_center(1),
@@ -999,15 +1030,15 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
     // Eigen::Vector2d p3_l = p3_l_3d.block(0, 0, 2, 1);
     // Eigen::Vector2d p4_l = p4_l_3d.block(0, 0, 2, 1);
 
-    // compute obstacle center in lidar ground
+    // Compute obstacle center in lidar ground
     cv::Point c_2D;
     c_2D.x = static_cast<int>(rect.x + rect.width / 2);
     c_2D.y = static_cast<int>(rect.y + rect.height);
     Eigen::Vector2d c_2D_l = image2ground(c_2D);
     Eigen::Matrix2d rotate_rz;
-    theta = theta - M_PI_2;
+    theta -= M_PI_2;
     rotate_rz << cos(theta), sin(theta), -sin(theta), cos(theta);
-    // plot obstacles on ground plane in lidar coordinates
+    // Plot obstacles on ground plane in lidar coordinates
     Eigen::Vector2d p1_l;
     p1_l << object->size(0) * 0.5, object->size(1) * 0.5;
     p1_l = rotate_rz * p1_l + c_2D_l;
@@ -1029,8 +1060,10 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
     cv::line(world_image_, world_point_to_bigimg(p4_l),
              world_point_to_bigimg(p1_l), color, 2);
 
-    // plot projected 3D box on image_3D
-    for (uint i = 0; i < p.size(); i++) p[i] = intrinsic * p[i];
+    // Plot projected 3D box on image_3D
+    for (uint i = 0; i < p.size(); i++) {
+      p[i] = intrinsic * p[i];
+    }
 
     std::vector<cv::Point> p_proj(8);
     for (uint i = 0; i < p_proj.size(); i++) {
@@ -1070,9 +1103,11 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
 void Visualizer::ShowResult_all_info_single_camera(
     const cv::Mat &img, const CameraFrame &frame,
     const base::MotionBufferPtr motion_buffer) {
-  if (frame.timestamp - last_timestamp_ < 0.02) return;
+  if (frame.timestamp - last_timestamp_ < 0.02) {
+    return;
+  }
 
-  // draw results on visulization panel
+  // Draw results on visulization panel
   int line_pos = 0;
   cv::Mat image = img.clone();
   std::string camera_name = frame.data_provider->sensor_name();
@@ -1122,7 +1157,7 @@ void Visualizer::ShowResult_all_info_single_camera(
     AERROR << "Failed to find necessuary intrinsic or extrinsic params.";
   }
 
-  // copy visual results into visualization panel
+  // Copy visual results into visualization panel
   cv::Mat bigimg(world_h_, small_w_ + wide_pixel_, CV_8UC3);
   camera_image_[camera_name + "_2D"].copyTo(
       bigimg(cv::Rect(0, 0, small_w_, small_h_)));
@@ -1186,6 +1221,7 @@ Eigen::Vector2d Visualizer::image2ground(cv::Point p_img) {
   }
   return p_ground.block(0, 0, 2, 1);
 }
+
 cv::Point Visualizer::ground2image(Eigen::Vector2d p_ground) {
   Eigen::Vector3d p_homo;
 
