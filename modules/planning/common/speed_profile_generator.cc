@@ -24,11 +24,11 @@
 #include <limits>
 #include <memory>
 
-#include "../math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 #include "cyber/common/log.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -147,7 +147,7 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   // TODO(all): dt is too small;
   double delta_t = FLAGS_fallback_time_unit;
   double total_time = FLAGS_fallback_total_time;
-  size_t num_of_knots = static_cast<size_t>(total_time / delta_t) + 1;
+  const size_t num_of_knots = static_cast<size_t>(total_time / delta_t) + 1;
 
   PiecewiseJerkSpeedProblem piecewise_jerk_problem(
       num_of_knots, delta_t, init_s);
