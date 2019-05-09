@@ -93,7 +93,7 @@ common::Status PiecewiseJerkPathOptimizer::Process(
     }
 
     bool res_opt = OptimizePath(
-        init_frenet_state, end_state, path_boundary.delta_s(),
+        init_frenet_state.second, end_state, path_boundary.delta_s(),
         path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
@@ -119,17 +119,16 @@ common::Status PiecewiseJerkPathOptimizer::Process(
   return Status::OK();
 }
 
-// TODO(Hongyi): deprecate "AdjustLateralDerivativeBounds" and change interface
-// of init_state to array of double
 bool PiecewiseJerkPathOptimizer::OptimizePath(
-    const std::pair<const std::array<double, 3>, const std::array<double, 3>>&
-        init_state,
+    const std::array<double, 3>& init_state,
     const std::array<double, 3>& end_state, const double delta_s,
     const std::vector<std::pair<double, double>>& lat_boundaries,
     const std::array<double, 5>& w, std::vector<double>* x,
     std::vector<double>* dx, std::vector<double>* ddx, const int max_iter) {
   PiecewiseJerkPathProblem piecewise_jerk_problem(
-      lat_boundaries.size(), delta_s, init_state.second);
+      lat_boundaries.size(), delta_s, init_state);
+
+  piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_state);
 
   piecewise_jerk_problem.set_weight_x(w[0]);
   piecewise_jerk_problem.set_weight_dx(w[1]);
@@ -139,15 +138,6 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   auto start_time = std::chrono::system_clock::now();
 
   piecewise_jerk_problem.set_x_bounds(lat_boundaries);
-
-  double dx_bounds = AdjustLateralDerivativeBounds(
-      init_state.first[1], init_state.second[1], init_state.second[2],
-      FLAGS_lateral_derivative_bound_default);
-  ADEBUG << "adjusted lateral derivative bound from \t"
-         << FLAGS_lateral_derivative_bound_default << "\t"
-         << dx_bounds;
-  // TODO(all): temp. disable AdjustLateralDerivativeBounds, enable later
-  // fem_1d_qp->SetFirstOrderBounds(-first_order_bounds, first_order_bounds);
   piecewise_jerk_problem.set_dx_bounds(-FLAGS_lateral_derivative_bound_default,
                                        FLAGS_lateral_derivative_bound_default);
   piecewise_jerk_problem.set_ddx_bounds(-FLAGS_lateral_derivative_bound_default,
@@ -205,17 +195,6 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
   }
 
   return FrenetFramePath(frenet_frame_path);
-}
-
-double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
-    const double s_dot, const double dl, const double ddl,
-    const double l_dot_bounds) const {
-  double s = std::fmax(FLAGS_vehicle_low_speed_threshold, s_dot);
-  double l_prime_adjusted = l_dot_bounds / s;
-  if (l_prime_adjusted < std::fabs(dl)) {
-    l_prime_adjusted = std::fabs(dl) + 0.1;
-  }
-  return l_prime_adjusted;
 }
 
 }  // namespace planning
