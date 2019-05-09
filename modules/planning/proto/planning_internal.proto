@@ -111,8 +111,10 @@ message ReferenceLineDebug {
   optional bool is_protected = 6;
   optional bool is_offroad = 7;
   optional double minimum_boundary = 8;
-  optional double average_kappa = 9;
-  optional double average_dkappa = 10;
+  optional double kappa_rms = 9;
+  optional double dkappa_rms = 10;
+  optional double kappa_max_abs = 11;
+  optional double dkappa_max_abs = 12;
 }
 
 message SampleLayerDebug {
