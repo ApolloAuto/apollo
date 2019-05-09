@@ -23,10 +23,7 @@ usage:
 """
 
 import argparse
-import os
-import shutil
 from cyber_py.record import RecordReader
-from datetime import datetime
 from modules.transform.proto import transform_pb2
 
 g_args = None
@@ -46,10 +43,10 @@ def tf_stats(in_bag):
         for transform in tf_pb.transforms:
             key = transform.header.frame_id + "=>" + transform.child_frame_id
             if key in stats.keys():
-                stats[key] = stats[key] + 1
+                stats[key] += 1
             else:
                 stats[key] = 1
-    print "tf stats:", stats
+    print 'tf stats: {}'.format(stats)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
