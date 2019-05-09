@@ -46,7 +46,7 @@ bool CompCameraH265Compressed::Init() {
     struct stat st;
     if (stat(record_folder_.c_str(), &st) < 0) {
       bool ret = EnsureDirectory(record_folder_);
-      AINFO_IF(ret == true) << "Record folder is created successfully.";
+      AINFO_IF(ret) << "Record folder is created successfully.";
     }
   }
   pb_image_.reset(new CompressedImage);
