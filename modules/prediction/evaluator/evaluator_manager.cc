@@ -163,10 +163,10 @@ void EvaluatorManager::Run() {
 
   if (FLAGS_enable_build_current_frame_env) {
     BuildObstacleIdHistoryMap();
+    SemanticMap::Instance()->RunCurrFrame(obstacle_id_history_map_);
     if (FLAGS_prediction_offline_mode == 4) {
       DumpCurrentFrameEnv();
     }
-    SemanticMap::Instance()->RunCurrFrame(curr_frame_env_);
   }
 
   std::vector<Obstacle*> dynamic_env;
@@ -307,19 +307,19 @@ void EvaluatorManager::BuildObstacleIdHistoryMap() {
 }
 
 void EvaluatorManager::DumpCurrentFrameEnv() {
-  curr_frame_env_.Clear();
+  FrameEnv curr_frame_env;
   for (const auto obstacle_id_history_pair :
        obstacle_id_history_map_) {
     int id = obstacle_id_history_pair.first;
     if (id != -1) {
-      curr_frame_env_.add_obstacles_history()->CopyFrom(
+      curr_frame_env.add_obstacles_history()->CopyFrom(
           obstacle_id_history_pair.second);
     } else {
-      curr_frame_env_.mutable_ego_history()->CopyFrom(
+      curr_frame_env.mutable_ego_history()->CopyFrom(
           obstacle_id_history_pair.second);
     }
   }
-  FeatureOutput::InsertFrameEnv(curr_frame_env_);
+  FeatureOutput::InsertFrameEnv(curr_frame_env);
 }
 
 std::unique_ptr<Evaluator> EvaluatorManager::CreateEvaluator(
