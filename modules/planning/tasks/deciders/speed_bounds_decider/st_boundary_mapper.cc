@@ -48,23 +48,21 @@ using apollo::common::math::Box2d;
 using apollo::common::math::Vec2d;
 using apollo::common::util::StrCat;
 
-StBoundaryMapper::StBoundaryMapper(const SLBoundary& adc_sl_boundary,
+STBoundaryMapper::STBoundaryMapper(const SLBoundary& adc_sl_boundary,
                                    const SpeedBoundsDeciderConfig& config,
                                    const ReferenceLine& reference_line,
                                    const PathData& path_data,
                                    const double planning_distance,
-                                   const double planning_time,
-                                   bool is_change_lane)
+                                   const double planning_time)
     : adc_sl_boundary_(adc_sl_boundary),
       speed_bounds_config_(config),
       reference_line_(reference_line),
       path_data_(path_data),
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()),
       planning_distance_(planning_distance),
-      planning_time_(planning_time),
-      is_change_lane_(is_change_lane) {}
+      planning_time_(planning_time) {}
 
-Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
+Status STBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
   const auto& obstacles = path_decision->obstacles();
 
   if (planning_time_ < 0.0) {
@@ -155,7 +153,7 @@ Status StBoundaryMapper::CreateStBoundary(PathDecision* path_decision) const {
   return Status::OK();
 }
 
-bool StBoundaryMapper::MapStopDecision(
+bool STBoundaryMapper::MapStopDecision(
     Obstacle* stop_obstacle, const ObjectDecisionType& stop_decision) const {
   DCHECK(stop_decision.has_stop()) << "Must have stop decision";
 
@@ -203,7 +201,7 @@ bool StBoundaryMapper::MapStopDecision(
   return true;
 }
 
-Status StBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
+Status STBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
   std::vector<STPoint> lower_points;
   std::vector<STPoint> upper_points;
 
@@ -227,7 +225,7 @@ Status StBoundaryMapper::MapWithoutDecision(Obstacle* obstacle) const {
   return Status::OK();
 }
 
-bool StBoundaryMapper::GetOverlapBoundaryPoints(
+bool STBoundaryMapper::GetOverlapBoundaryPoints(
     const std::vector<PathPoint>& path_points, const Obstacle& obstacle,
     std::vector<STPoint>* upper_points,
     std::vector<STPoint>* lower_points) const {
@@ -362,7 +360,7 @@ bool StBoundaryMapper::GetOverlapBoundaryPoints(
   return (lower_points->size() > 1 && upper_points->size() > 1);
 }
 
-Status StBoundaryMapper::MapWithDecision(
+Status STBoundaryMapper::MapWithDecision(
     Obstacle* obstacle, const ObjectDecisionType& decision) const {
   DCHECK(decision.has_follow() || decision.has_yield() ||
          decision.has_overtake())
@@ -418,7 +416,7 @@ Status StBoundaryMapper::MapWithDecision(
   return Status::OK();
 }
 
-bool StBoundaryMapper::CheckOverlap(const PathPoint& path_point,
+bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
                                     const double buffer) const {
   Vec2d ego_center_map_frame(

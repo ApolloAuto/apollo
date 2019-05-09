@@ -72,11 +72,10 @@ Status SpeedBoundsDecider::Process(
   }
 
   // 2. Map obstacles into st graph
-  StBoundaryMapper boundary_mapper(adc_sl_boundary, speed_bounds_config_,
+  STBoundaryMapper boundary_mapper(adc_sl_boundary, speed_bounds_config_,
                                    reference_line, path_data,
                                    speed_bounds_config_.total_path_length(),
-                                   speed_bounds_config_.total_time(),
-                                   reference_line_info_->IsChangeLanePath());
+                                   speed_bounds_config_.total_time());
 
   path_decision->EraseStBoundaries();
   if (boundary_mapper.CreateStBoundary(path_decision).code() ==
