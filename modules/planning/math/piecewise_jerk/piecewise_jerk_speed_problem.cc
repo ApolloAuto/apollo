@@ -61,16 +61,20 @@ void PiecewiseJerkSpeedProblem::CalculateKernel(std::vector<c_float>* P_data,
     columns[i].emplace_back(i, weight_x_reference_);
     ++value_index;
   }
-  // x(n-1)^2 * (w_ref + w_x)
+  // x(n-1)^2 * (w_ref + w_end_x)
   columns[n - 1].emplace_back(n - 1, weight_x_reference_ + weight_end_x_);
   ++value_index;
 
-  // x(i)'^2 * w_dx
-  for (int i = 0; i < n; ++i) {
+  // x(i)'^2 * (w_dx + penalty_dx)
+  for (int i = 0; i < n - 1; ++i) {
     columns[n + i].emplace_back(
         n + i, weight_dx_ * (1.0 + penalty_dx_[i]));
     ++value_index;
   }
+  // x(n-1)'^2 * (w_dx + penalty_dx + w_end_dx)
+  columns[2 * n - 1].emplace_back(
+        2 * n - 1, weight_dx_ * (1.0 + penalty_dx_[n - 1]) + weight_end_dx_);
+  ++value_index;
 
   auto delta_s_square = delta_s_ * delta_s_;
   // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
@@ -85,7 +89,7 @@ void PiecewiseJerkSpeedProblem::CalculateKernel(std::vector<c_float>* P_data,
   }
 
   columns[3 * n - 1].emplace_back(
-      3 * n - 1, weight_ddx_ + weight_dddx_ / delta_s_square);
+      3 * n - 1, weight_ddx_ + weight_dddx_ / delta_s_square + weight_end_ddx_);
   ++value_index;
 
   // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
