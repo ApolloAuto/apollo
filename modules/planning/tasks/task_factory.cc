@@ -24,6 +24,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
+#include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/deciders/open_space_fallback_decider.h"
 #include "modules/planning/tasks/deciders/open_space_pre_stop_decider.h"
 #include "modules/planning/tasks/deciders/open_space_roi_decider.h"
@@ -55,6 +56,10 @@ std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
     TaskFactory::default_task_configs_;
 
 void TaskFactory::Init(const PlanningConfig& config) {
+  task_factory_.Register(TaskConfig::LANE_CHANGE_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new LaneChangeDecider(config);
+                         });
   task_factory_.Register(TaskConfig::PATH_LANE_BORROW_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathLaneBorrowDecider(config);

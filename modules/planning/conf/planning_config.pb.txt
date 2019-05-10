@@ -241,3 +241,9 @@ default_task_config: {
     allow_lane_borrowing: false
   }
 }
+default_task_config: {
+  task_type: LANE_CHANGE_DECIDER
+  lane_change_decider_config {
+    enable_lane_change_urgency_check: false
+  }
+}
