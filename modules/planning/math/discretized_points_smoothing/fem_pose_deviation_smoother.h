@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "osqp/include/osqp.h"
