@@ -29,7 +29,7 @@
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 #include "modules/planning/scenarios/park/pull_over/pull_over_scenario.h"
 #include "modules/planning/scenarios/park/valet_parking/valet_parking_scenario.h"
-#include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
+//#include "modules/planning/scenarios/side_pass/side_pass_scenario.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
@@ -60,10 +60,10 @@ std::unique_ptr<Scenario> ScenarioManager::CreateScenario(
       ptr.reset(new lane_follow::LaneFollowScenario(config_map_[scenario_type],
                                                     &scenario_context_));
       break;
-    case ScenarioConfig::SIDE_PASS:
-      ptr.reset(new scenario::side_pass::SidePassScenario(
-          config_map_[scenario_type], &scenario_context_));
-      break;
+//    case ScenarioConfig::SIDE_PASS:
+//      ptr.reset(new scenario::side_pass::SidePassScenario(
+//          config_map_[scenario_type], &scenario_context_));
+//      break;
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
       ptr.reset(
           new scenario::bare_intersection::BareIntersectionUnprotectedScenario(
@@ -427,17 +427,17 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
   return default_scenario_type_;
 }
 
-ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
-    const Frame& frame) {
-  // TODO(all): to be updated when SIDE_PASS obstacle decisions
-  //            from ReferenceLine is ready
-  if (scenario::side_pass::SidePassScenario::IsTransferable(
-          frame, config_map_[ScenarioConfig::SIDE_PASS], *current_scenario_)) {
-    return ScenarioConfig::SIDE_PASS;
-  }
-
-  return default_scenario_type_;
-}
+//ScenarioConfig::ScenarioType ScenarioManager::SelectSidePassScenario(
+//    const Frame& frame) {
+//  // TODO(all): to be updated when SIDE_PASS obstacle decisions
+//  //            from ReferenceLine is ready
+//  if (scenario::side_pass::SidePassScenario::IsTransferable(
+//          frame, config_map_[ScenarioConfig::SIDE_PASS], *current_scenario_)) {
+//    return ScenarioConfig::SIDE_PASS;
+//  }
+//
+//  return default_scenario_type_;
+//}
 
 ScenarioConfig::ScenarioType ScenarioManager::SelectValetParkingScenario(
     const Frame& frame) {
@@ -608,11 +608,11 @@ void ScenarioManager::ScenarioDispatch(const common::TrajectoryPoint& ego_point,
     scenario_type = SelectChangeLaneScenario(frame);
   }
 
-  ////////////////////////////////////////
-  // SIDE_PASS scenario
-  if (scenario_type == default_scenario_type_) {
-    scenario_type = SelectSidePassScenario(frame);
-  }
+//  ////////////////////////////////////////
+//  // SIDE_PASS scenario
+//  if (scenario_type == default_scenario_type_) {
+//    scenario_type = SelectSidePassScenario(frame);
+//  }
 
   ////////////////////////////////////////
   // pull-over scenario
