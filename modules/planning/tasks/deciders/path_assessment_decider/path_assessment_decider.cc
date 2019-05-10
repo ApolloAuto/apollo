@@ -209,6 +209,7 @@ Status PathAssessmentDecider::Process(
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
 
+  // TODO(jiacheng): retire the following code.
   std::vector<PathData> new_candidate_path_data;
   for (const auto& curr_path_data : valid_path_data) {
     if (!curr_path_data.Empty()) {
@@ -217,6 +218,8 @@ Status PathAssessmentDecider::Process(
   }
   reference_line_info->SetCandidatePathData(new_candidate_path_data);
 
+  // 4. Update necessary info for lane-borrow decider's future uses.
+  // Update front static obstacle's info.
   if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
     if (PlanningContext::Instance()->path_decider_info().
             front_static_obstacle_cycle_counter() < 0) {
@@ -234,7 +237,7 @@ Status PathAssessmentDecider::Process(
     PlanningContext::Instance()->mutable_path_decider_info()->
         set_front_static_obstacle_cycle_counter(0);
   }
-
+  // Update self-lane usage info.
   if (reference_line_info->path_data().path_label().find("self") !=
           std::string::npos &&
       std::get<1>(reference_line_info->path_data()
