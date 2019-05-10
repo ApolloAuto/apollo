@@ -50,7 +50,7 @@ namespace planning {
 class PiecewiseJerkPathProblem : public PiecewiseJerkProblem {
  public:
   PiecewiseJerkPathProblem(const size_t num_of_knots, const double delta_s,
-      const std::array<double, 3>& x_init);
+                           const std::array<double, 3>& x_init);
 
   virtual ~PiecewiseJerkPathProblem() = default;
 

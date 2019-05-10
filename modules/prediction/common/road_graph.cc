@@ -195,8 +195,8 @@ void RoadGraph::ComputeLaneSequence(
                     PredictionConstants::kDumpDataForLearning) {
               consider_divide_further = true;
             }
-            ComputeLaneSequence(successor_accumulated_s, 0.0,
-                                successor_lane, graph_search_horizon - 1,
+            ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
+                                graph_search_horizon - 1,
                                 consider_divide_further, lane_segments,
                                 lane_graph_ptr);
           }

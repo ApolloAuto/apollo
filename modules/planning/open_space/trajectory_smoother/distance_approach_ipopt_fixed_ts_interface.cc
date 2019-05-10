@@ -104,10 +104,9 @@ DistanceApproachIPOPTFixedTsInterface::DistanceApproachIPOPTFixedTsInterface(
       distance_approach_config_.enable_constraint_check();
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::get_nlp_info(int& n, int& m,
-                                                  int& nnz_jac_g,
-                                                  int& nnz_h_lag,
-                                                  IndexStyleEnum& index_style) {
+bool DistanceApproachIPOPTFixedTsInterface::get_nlp_info(
+    int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
+    IndexStyleEnum& index_style) {
   ADEBUG << "get_nlp_info";
   // n1 : states variables, 4 * (N+1)
   int n1 = 4 * (horizon_ + 1);
@@ -133,8 +132,7 @@ bool DistanceApproachIPOPTFixedTsInterface::get_nlp_info(int& n, int& m,
   ADEBUG << "m4: " << m4;
 
   num_of_variables_ = n1 + n2 + lambda_horizon_ + miu_horizon_;
-  num_of_constraints_ =
-      m1 + m2 + m4 + (num_of_variables_ - (horizon_ + 1) + 2);
+  num_of_constraints_ = m1 + m2 + m4 + (num_of_variables_ - (horizon_ + 1) + 2);
 
   // number of variables
   n = num_of_variables_;
@@ -150,8 +148,9 @@ bool DistanceApproachIPOPTFixedTsInterface::get_nlp_info(int& n, int& m,
 }
 
 bool DistanceApproachIPOPTFixedTsInterface::get_bounds_info(int n, double* x_l,
-                                                     double* x_u, int m,
-                                                     double* g_l, double* g_u) {
+                                                            double* x_u, int m,
+                                                            double* g_l,
+                                                            double* g_u) {
   ADEBUG << "get_bounds_info";
   CHECK(XYbounds_.size() == 4)
       << "XYbounds_ size is not 4, but" << XYbounds_.size();
@@ -391,28 +390,33 @@ bool DistanceApproachIPOPTFixedTsInterface::get_starting_point(
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::eval_f(
-    int n, const double* x, bool new_x, double& obj_value) {
+bool DistanceApproachIPOPTFixedTsInterface::eval_f(int n, const double* x,
+                                                   bool new_x,
+                                                   double& obj_value) {
   eval_obj(n, x, &obj_value);
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::eval_grad_f(
-    int n, const double* x, bool new_x, double* grad_f) {
+bool DistanceApproachIPOPTFixedTsInterface::eval_grad_f(int n, const double* x,
+                                                        bool new_x,
+                                                        double* grad_f) {
   gradient(tag_f, n, x, grad_f);
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::eval_g(
-    int n, const double* x, bool new_x, int m, double* g) {
+bool DistanceApproachIPOPTFixedTsInterface::eval_g(int n, const double* x,
+                                                   bool new_x, int m,
+                                                   double* g) {
   eval_constraints(n, x, m, g);
   if (enable_constraint_check_) check_g(n, x, m, g);
   return true;
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::eval_jac_g(
-    int n, const double* x, bool new_x, int m, int nele_jac,
-    int* iRow, int* jCol, double* values) {
+bool DistanceApproachIPOPTFixedTsInterface::eval_jac_g(int n, const double* x,
+                                                       bool new_x, int m,
+                                                       int nele_jac, int* iRow,
+                                                       int* jCol,
+                                                       double* values) {
   if (values == nullptr) {
     // return the structure of the jacobian
     for (int idx = 0; idx < nnz_jac; idx++) {
@@ -432,16 +436,16 @@ bool DistanceApproachIPOPTFixedTsInterface::eval_jac_g(
 }
 
 bool DistanceApproachIPOPTFixedTsInterface::eval_jac_g_ser(
-    int n, const double* x, bool new_x, int m,
-    int nele_jac, int* iRow, int* jCol, double* values) {
+    int n, const double* x, bool new_x, int m, int nele_jac, int* iRow,
+    int* jCol, double* values) {
   AERROR << "NOT VALID NOW";
   return false;
 }  // NOLINT
 
 bool DistanceApproachIPOPTFixedTsInterface::eval_h(
     int n, const double* x, bool new_x, double obj_factor, int m,
-    const double* lambda, bool new_lambda, int nele_hess,
-    int* iRow, int* jCol, double* values) {
+    const double* lambda, bool new_lambda, int nele_hess, int* iRow, int* jCol,
+    double* values) {
   if (values == nullptr) {
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
@@ -602,8 +606,8 @@ void DistanceApproachIPOPTFixedTsInterface::get_optimization_results(
 
 //***************    start ADOL-C part ***********************************
 template <class T>
-void DistanceApproachIPOPTFixedTsInterface::eval_obj(
-    int n, const T* x, T* obj_value) {
+void DistanceApproachIPOPTFixedTsInterface::eval_obj(int n, const T* x,
+                                                     T* obj_value) {
   // Objective is :
   // min control inputs
   // min input rate
@@ -640,10 +644,8 @@ void DistanceApproachIPOPTFixedTsInterface::eval_obj(
 
   // 3. objective to minimize input change rate for first horizon
   control_index = control_start_index_;
-  T last_time_steer_rate =
-      (x[control_index] - last_time_u_(0, 0)) / ts_;
-  T last_time_a_rate =
-      (x[control_index + 1] - last_time_u_(1, 0)) / ts_;
+  T last_time_steer_rate = (x[control_index] - last_time_u_(0, 0)) / ts_;
+  T last_time_a_rate = (x[control_index + 1] - last_time_u_(1, 0)) / ts_;
 
   *obj_value +=
       weight_stitching_steer_ * last_time_steer_rate * last_time_steer_rate +
@@ -651,10 +653,8 @@ void DistanceApproachIPOPTFixedTsInterface::eval_obj(
 
   // 4. objective to minimize input change rates, [0- horizon_ -2]
   for (int i = 0; i < horizon_ - 1; ++i) {
-    T steering_rate =
-        (x[control_index + 2] - x[control_index]) / ts_;
-    T a_rate =
-        (x[control_index + 3] - x[control_index + 1]) / ts_;
+    T steering_rate = (x[control_index + 2] - x[control_index]) / ts_;
+    T a_rate = (x[control_index + 3] - x[control_index + 1]) / ts_;
     *obj_value += weight_rate_steer_ * steering_rate * steering_rate +
                   weight_rate_a_ * a_rate * a_rate;
     control_index += 2;
@@ -662,8 +662,8 @@ void DistanceApproachIPOPTFixedTsInterface::eval_obj(
 }
 
 template <class T>
-void DistanceApproachIPOPTFixedTsInterface::eval_constraints(
-    int n, const T* x, int m, T* g) {
+void DistanceApproachIPOPTFixedTsInterface::eval_constraints(int n, const T* x,
+                                                             int m, T* g) {
   // state start index
   int state_index = state_start_index_;
 
@@ -691,8 +691,7 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(
 
     g[constraint_index] =
         x[state_index + 4] -
-        (x[state_index] +
-         ts_ * x[state_index + 3] * cos(x[state_index + 2]));
+        (x[state_index] + ts_ * x[state_index + 3] * cos(x[state_index + 2]));
 
     // x2
     /*
@@ -702,13 +701,12 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(
          (x[state_index + 1] - xWS_(1, i)) +
          (ts_ * sin(xWS_(2, i))) * (x[state_index + 3] - xWS_(3, i)) +
          (ts_ * xWS_(3, i) * cos(xWS_(2, i))) *
-             (x[state_index + 2] - xWS_(2, i)));    
+             (x[state_index + 2] - xWS_(2, i)));
     */
 
     g[constraint_index + 1] =
-        x[state_index + 5] -
-         (x[state_index + 1] +
-          ts_ * x[state_index + 3] * sin(x[state_index + 2]));
+        x[state_index + 5] - (x[state_index + 1] + ts_ * x[state_index + 3] *
+                                                       sin(x[state_index + 2]));
 
     // x3
     /*
@@ -725,8 +723,8 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(
 
     g[constraint_index + 2] =
         x[state_index + 6] -
-        (x[state_index + 2] + ts_ * x[state_index + 3] *
-                                  tan(x[control_index]) / wheelbase_);
+        (x[state_index + 2] +
+         ts_ * x[state_index + 3] * tan(x[control_index]) / wheelbase_);
 
     // x4
     /*
@@ -735,8 +733,7 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(
                               (ts_ * (x[control_index + 1] - uWS_(1, i))));
     */
     g[constraint_index + 3] =
-        x[state_index + 7] -
-        (x[state_index + 3] + ts_ * x[control_index + 1]);
+        x[state_index + 7] - (x[state_index + 3] + ts_ * x[control_index + 1]);
 
     control_index += 2;
     constraint_index += 4;
@@ -752,14 +749,12 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(
   control_index = control_start_index_;
 
   // First rate is compare first with stitch point
-  g[constraint_index] =
-      (x[control_index] - last_time_u_(0, 0)) / ts_;
+  g[constraint_index] = (x[control_index] - last_time_u_(0, 0)) / ts_;
   control_index += 2;
   constraint_index++;
 
   for (int i = 1; i < horizon_; ++i) {
-    g[constraint_index] =
-        (x[control_index] - x[control_index - 2]) / ts_;
+    g[constraint_index] = (x[control_index] - x[control_index - 2]) / ts_;
     constraint_index++;
     control_index += 2;
   }
@@ -878,8 +873,8 @@ void DistanceApproachIPOPTFixedTsInterface::eval_constraints(
   }
 }
 
-bool DistanceApproachIPOPTFixedTsInterface::check_g(
-    int n, const double* x, int m, const double* g) {
+bool DistanceApproachIPOPTFixedTsInterface::check_g(int n, const double* x,
+                                                    int m, const double* g) {
   int kN = n;
   int kM = m;
   double x_u_tmp[kN];
@@ -958,8 +953,8 @@ bool DistanceApproachIPOPTFixedTsInterface::check_g(
 }
 
 void DistanceApproachIPOPTFixedTsInterface::generate_tapes(int n, int m,
-                                                    int* nnz_jac_g,
-                                                    int* nnz_h_lag) {
+                                                           int* nnz_jac_g,
+                                                           int* nnz_h_lag) {
   std::vector<double> xp(n);
   std::vector<double> lamp(m);
   std::vector<double> zl(m);

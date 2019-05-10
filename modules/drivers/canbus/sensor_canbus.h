@@ -110,8 +110,7 @@ template <typename SensorType>
 bool SensorCanbus<SensorType>::Init() {
   // load conf
   if (!cyber::common::GetProtoFromFile(config_file_path_, &canbus_conf_)) {
-    return OnError("Unable to load canbus conf file: " +
-                   config_file_path_);
+    return OnError("Unable to load canbus conf file: " + config_file_path_);
   }
 
   AINFO << "The canbus conf file is loaded: " << config_file_path_;

@@ -308,8 +308,7 @@ void EvaluatorManager::BuildObstacleIdHistoryMap() {
 
 void EvaluatorManager::DumpCurrentFrameEnv() {
   FrameEnv curr_frame_env;
-  for (const auto obstacle_id_history_pair :
-       obstacle_id_history_map_) {
+  for (const auto obstacle_id_history_pair : obstacle_id_history_map_) {
     int id = obstacle_id_history_pair.first;
     if (id != -1) {
       curr_frame_env.add_obstacles_history()->CopyFrom(
