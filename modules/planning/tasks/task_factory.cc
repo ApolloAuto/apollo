@@ -35,13 +35,13 @@
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 #include "modules/planning/tasks/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"
 #include "modules/planning/tasks/optimizers/speed_decider/speed_decider.h"
 #include "modules/planning/tasks/rss/decider_rss.h"
 #include "modules/planning/tasks/task.h"
-#include "optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 
 namespace apollo {
 namespace planning {
