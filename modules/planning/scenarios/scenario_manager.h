@@ -54,7 +54,7 @@ class ScenarioManager final {
 
   ScenarioConfig::ScenarioType SelectPullOverScenario(const Frame& frame);
 
-  ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
+//  ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
 
   ScenarioConfig::ScenarioType SelectStopSignScenario(
       const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap);
