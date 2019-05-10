@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message PathDeciderInfo {
+  optional int32 front_static_obstacle_cycle_counter = 1 [default = 0];
+  optional int32 able_to_use_self_lane_counter = 2 [default = 0];
+  optional bool is_in_path_lane_borrow_scenario = 3 [default = false];
+  optional string front_static_obstacle_id = 4 [default = ""];
+}
