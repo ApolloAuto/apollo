@@ -47,25 +47,6 @@ cc_library(
 )
 
 cc_library(
-    name = "path_assessment_decider",
-    srcs = [
-        "path_assessment_decider.cc",
-    ],
-    hdrs = [
-        "path_assessment_decider.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        ":decider_base",
-        ":path_decider_obstacle_utils",
-        "//modules/planning/common:planning_context",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/common:reference_line_info",
-        "//modules/planning/tasks/deciders/path_bounds_decider:path_bounds_decider"
-    ],
-)
-
-cc_library(
     name = "path_decider_obstacle_utils",
     srcs = [
         "path_decider_obstacle_utils.cc",
