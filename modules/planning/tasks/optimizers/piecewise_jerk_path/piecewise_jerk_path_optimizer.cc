@@ -25,10 +25,10 @@
 #include <utility>
 #include <vector>
 
-#include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -125,8 +125,8 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     const std::vector<std::pair<double, double>>& lat_boundaries,
     const std::array<double, 5>& w, std::vector<double>* x,
     std::vector<double>* dx, std::vector<double>* ddx, const int max_iter) {
-  PiecewiseJerkPathProblem piecewise_jerk_problem(
-      lat_boundaries.size(), delta_s, init_state);
+  PiecewiseJerkPathProblem piecewise_jerk_problem(lat_boundaries.size(),
+                                                  delta_s, init_state);
 
   piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_state);
 

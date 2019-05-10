@@ -67,7 +67,7 @@ void RecordFileWriter::Close() {
       flush_cv_.notify_one();
     }
 
-    // wait for the last flush opertation
+    // wait for the last flush operation
     while (!chunk_flush_->empty()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }

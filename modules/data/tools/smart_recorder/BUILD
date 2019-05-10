@@ -54,8 +54,8 @@ cc_library(
     hdrs = ["emergency_mode_trigger.h"],
     deps = [
         ":trigger_base",
-        "//modules/common/adapters:adapter_gflags",
         "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_gflags",
         "//modules/control/proto:control_proto",
     ],
 )

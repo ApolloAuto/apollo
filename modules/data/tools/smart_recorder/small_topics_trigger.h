@@ -32,7 +32,7 @@ class SmallTopicsTrigger : public TriggerBase {
  public:
   SmallTopicsTrigger();
 
-  void Pull(const RecordMessage& msg) override {};
+  void Pull(const RecordMessage& msg) override{};
   bool ShouldRestore(const RecordMessage& msg) const override;
 
   virtual ~SmallTopicsTrigger() = default;

@@ -24,12 +24,13 @@
 namespace apollo {
 namespace planning {
 
-PiecewiseJerkPathProblem::PiecewiseJerkPathProblem(const size_t num_of_knots,
-    const double delta_s, const std::array<double, 3>& x_init) :
-        PiecewiseJerkProblem(num_of_knots, delta_s, x_init) {}
+PiecewiseJerkPathProblem::PiecewiseJerkPathProblem(
+    const size_t num_of_knots, const double delta_s,
+    const std::array<double, 3>& x_init)
+    : PiecewiseJerkProblem(num_of_knots, delta_s, x_init) {}
 
-void PiecewiseJerkPathProblem::set_x_ref(
-    const double weight_x_ref, std::vector<double> x_ref) {
+void PiecewiseJerkPathProblem::set_x_ref(const double weight_x_ref,
+                                         std::vector<double> x_ref) {
   CHECK_EQ(x_ref.size(), num_of_knots_);
   weight_x_ref_ = weight_x_ref;
   x_ref_ = std::move(x_ref);
@@ -45,8 +46,8 @@ void PiecewiseJerkPathProblem::set_end_state_ref(
 }
 
 void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
-                                     std::vector<c_int>* P_indices,
-                                     std::vector<c_int>* P_indptr) {
+                                               std::vector<c_int>* P_indices,
+                                               std::vector<c_int>* P_indptr) {
   const int n = static_cast<int>(num_of_knots_);
   const int kNumParam = 3 * n;
   const int kNumValue = kNumParam + (n - 1);
@@ -60,8 +61,8 @@ void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
     ++value_index;
   }
   // x(n-1)^2 * (w_x + w_x_ref + w_end_x)
-  columns[n - 1].emplace_back(
-      n - 1, weight_x_ + weight_x_ref_ + weight_end_state_[0]);
+  columns[n - 1].emplace_back(n - 1,
+                              weight_x_ + weight_x_ref_ + weight_end_state_[0]);
   ++value_index;
 
   // x(i)'^2 * w_dx
@@ -70,14 +71,13 @@ void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
     ++value_index;
   }
   // x(n-1)'^2 * (w_dx + w_end_dx)
-  columns[2 * n - 1].emplace_back(
-      2 * n - 1, weight_dx_ + weight_end_state_[1]);
+  columns[2 * n - 1].emplace_back(2 * n - 1, weight_dx_ + weight_end_state_[1]);
   ++value_index;
 
   auto delta_s_square = delta_s_ * delta_s_;
   // x(i)''^2 * (w_ddx + 2 * w_dddx / delta_s^2)
-  columns[2 * n].emplace_back(
-      2 * n, weight_ddx_ + weight_dddx_ / delta_s_square);
+  columns[2 * n].emplace_back(2 * n,
+                              weight_ddx_ + weight_dddx_ / delta_s_square);
   ++value_index;
   for (int i = 1; i < n - 1; ++i) {
     columns[2 * n + i].emplace_back(
@@ -85,14 +85,14 @@ void PiecewiseJerkPathProblem::CalculateKernel(std::vector<c_float>* P_data,
     ++value_index;
   }
   columns[3 * n - 1].emplace_back(
-      3 * n - 1, weight_ddx_ + weight_dddx_ / delta_s_square +
-                 weight_end_state_[2]);
+      3 * n - 1,
+      weight_ddx_ + weight_dddx_ / delta_s_square + weight_end_state_[2]);
   ++value_index;
 
   // -2 * w_dddx / delta_s^2 * x(i)'' * x(i + 1)''
   for (int i = 0; i < n - 1; ++i) {
-    columns[2 * n + i].emplace_back(
-        2 * n + i + 1, -2.0 * weight_dddx_ / delta_s_square);
+    columns[2 * n + i].emplace_back(2 * n + i + 1,
+                                    -2.0 * weight_dddx_ / delta_s_square);
     ++value_index;
   }
 

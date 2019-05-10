@@ -37,7 +37,7 @@ class LaneChangeDecider : public Decider {
  public:
   explicit LaneChangeDecider(const TaskConfig& config);
 
-   /**
+  /**
    * @brief static function to check if the ChangeLanePath type of reference
    * line is safe or if current reference line is safe to deviate away and come
    * back

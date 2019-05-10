@@ -131,7 +131,7 @@ bool PathExists(const std::string &path);
 bool DirectoryExists(const std::string &directory_path);
 
 /**
- * @brief Expand path pattern to matched pathes.
+ * @brief Expand path pattern to matched paths.
  * @param pattern Path pattern, which may contain wildcards [?*].
  * @return Matched path list.
  */
