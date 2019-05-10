@@ -218,15 +218,21 @@ Status PathAssessmentDecider::Process(
   reference_line_info->SetCandidatePathData(new_candidate_path_data);
 
   if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
-    if (PlanningContext::Instance()->front_static_obstacle_cycle_counter() <
-        0) {
-      PlanningContext::Instance()->ResetFrontStaticObstacleCycleCounter();
+    if (PlanningContext::Instance()->path_decider_info().
+            front_static_obstacle_cycle_counter() < 0) {
+      PlanningContext::Instance()->mutable_path_decider_info()->
+          set_front_static_obstacle_cycle_counter(0);
     }
-    PlanningContext::Instance()->set_front_static_obstacle_id(
-        reference_line_info->GetBlockingObstacleId());
-    PlanningContext::Instance()->IncrementFrontStaticObstacleCycleCounter();
+    PlanningContext::Instance()->mutable_path_decider_info()->
+        set_front_static_obstacle_id(
+            reference_line_info->GetBlockingObstacleId());
+    PlanningContext::Instance()->mutable_path_decider_info()->
+          set_front_static_obstacle_cycle_counter(
+              PlanningContext::Instance()->path_decider_info().
+                  front_static_obstacle_cycle_counter() + 1);
   } else {
-    PlanningContext::Instance()->ResetFrontStaticObstacleCycleCounter();
+    PlanningContext::Instance()->mutable_path_decider_info()->
+        set_front_static_obstacle_cycle_counter(0);
   }
 
   if (reference_line_info->path_data().path_label().find("self") !=
@@ -234,12 +240,18 @@ Status PathAssessmentDecider::Process(
       std::get<1>(reference_line_info->path_data()
                       .path_point_decision_guide()
                       .front()) == PathData::PathPointType::IN_LANE) {
-    if (PlanningContext::Instance()->able_to_use_self_lane_counter() < 0) {
-      PlanningContext::Instance()->ResetAbleToUseSelfLaneCounter();
+    if (PlanningContext::Instance()->path_decider_info().
+            able_to_use_self_lane_counter() < 0) {
+      PlanningContext::Instance()->mutable_path_decider_info()->
+          set_able_to_use_self_lane_counter(0);
     }
-    PlanningContext::Instance()->IncrementAbleToUseSelfLaneCounter();
+    PlanningContext::Instance()->mutable_path_decider_info()->
+        set_able_to_use_self_lane_counter(
+            PlanningContext::Instance()->path_decider_info().
+                able_to_use_self_lane_counter() + 1);
   } else {
-    PlanningContext::Instance()->ResetAbleToUseSelfLaneCounter();
+    PlanningContext::Instance()->mutable_path_decider_info()->
+        set_able_to_use_self_lane_counter(0);
   }
 
   // Plot the path in simulator for debug purpose.

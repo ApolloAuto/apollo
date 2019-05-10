@@ -41,8 +41,6 @@
 namespace apollo {
 namespace planning {
 
-constexpr int kPathScenarioTransitionHysteresisFrame = 5;
-
 class PlanningContext {
  public:
   // TODO(jinyun): to be removed/cleaned up.
@@ -87,73 +85,12 @@ class PlanningContext {
 
   PathDeciderInfo* mutable_path_decider_info() { return &path_decider_info_; }
 
-  /////////////////////////////////////////////////////////////////////////////
-  void IncrementFrontStaticObstacleCycleCounter() {
-    front_static_obstacle_cycle_counter_ =
-        std::min(front_static_obstacle_cycle_counter_ + 1,
-                 kPathScenarioTransitionHysteresisFrame);
-  }
-
-  void DecrementFrontStaticObstacleCycleCounter() {
-    front_static_obstacle_cycle_counter_ =
-        std::max(front_static_obstacle_cycle_counter_ - 1,
-                 -kPathScenarioTransitionHysteresisFrame);
-  }
-
-  void ResetFrontStaticObstacleCycleCounter() {
-    front_static_obstacle_cycle_counter_ = 0;
-  }
-
-  int front_static_obstacle_cycle_counter() {
-    return front_static_obstacle_cycle_counter_;
-  }
-
-  void set_front_static_obstacle_id(
-      const std::string& front_static_obstacle_id) {
-    front_static_obstacle_id_ = front_static_obstacle_id;
-  }
-
-  std::string front_static_obstacle_id() { return front_static_obstacle_id_; }
-
-  /////////////////////////////////////////////////////////////////////////////
-  void IncrementAbleToUseSelfLaneCounter() {
-    able_to_use_self_lane_counter_ =
-        std::min(able_to_use_self_lane_counter_ + 1,
-                 kPathScenarioTransitionHysteresisFrame);
-  }
-
-  void DecrementAbleToUseSelfLaneCounter() {
-    able_to_use_self_lane_counter_ =
-        std::max(able_to_use_self_lane_counter_ - 1,
-                 -kPathScenarioTransitionHysteresisFrame);
-  }
-
-  void ResetAbleToUseSelfLaneCounter() { able_to_use_self_lane_counter_ = 0; }
-
-  int able_to_use_self_lane_counter() { return able_to_use_self_lane_counter_; }
-
-  /////////////////////////////////////////////////////////////////////////////
-  void set_is_in_path_lane_borrow_scenario(
-      bool is_in_path_lane_borrow_scenario) {
-    is_in_path_lane_borrow_scenario_ = is_in_path_lane_borrow_scenario;
-  }
-
-  bool is_in_path_lane_borrow_scenario() {
-    return is_in_path_lane_borrow_scenario_;
-  }
-
  private:
   PlanningStatus planning_status_;
   SidePassInfo side_pass_info_;
   FallBackInfo fallback_info_;
   OpenSpaceInfo open_space_info_;
   PathDeciderInfo path_decider_info_;
-
-  int front_static_obstacle_cycle_counter_ = 0;
-  std::string front_static_obstacle_id_ = "";
-  int able_to_use_self_lane_counter_ = 0;
-
-  bool is_in_path_lane_borrow_scenario_ = false;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext)
