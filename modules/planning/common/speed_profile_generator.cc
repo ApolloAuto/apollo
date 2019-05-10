@@ -38,92 +38,6 @@ using common::SpeedPoint;
 using common::TrajectoryPoint;
 using common::math::Vec2d;
 
-std::vector<SpeedPoint> SpeedProfileGenerator::GenerateInitSpeedProfile(
-    const TrajectoryPoint& planning_init_point,
-    const ReferenceLineInfo* reference_line_info) {
-  std::vector<SpeedPoint> speed_profile;
-  const auto* last_frame = FrameHistory::Instance()->Latest();
-  if (!last_frame) {
-    AWARN << "last frame is empty";
-    return speed_profile;
-  }
-  const ReferenceLineInfo* last_reference_line_info =
-      last_frame->DriveReferenceLineInfo();
-  if (!last_reference_line_info) {
-    ADEBUG << "last reference line info is empty";
-    return speed_profile;
-  }
-  if (!reference_line_info->IsStartFrom(*last_reference_line_info)) {
-    ADEBUG << "Current reference line is not started previous drived line";
-    return speed_profile;
-  }
-  const auto& last_speed_data = last_reference_line_info->speed_data();
-
-  if (!last_speed_data.empty()) {
-    const auto& last_init_point = last_frame->PlanningStartPoint().path_point();
-    Vec2d last_xy_point(last_init_point.x(), last_init_point.y());
-    SLPoint last_sl_point;
-    if (!last_reference_line_info->reference_line().XYToSL(last_xy_point,
-                                                           &last_sl_point)) {
-      AERROR << "Fail to transfer xy to sl when init speed profile";
-    }
-
-    Vec2d xy_point(planning_init_point.path_point().x(),
-                   planning_init_point.path_point().y());
-    SLPoint sl_point;
-    if (!last_reference_line_info->reference_line().XYToSL(xy_point,
-                                                           &sl_point)) {
-      AERROR << "Fail to transfer xy to sl when init speed profile";
-    }
-
-    double s_diff = sl_point.s() - last_sl_point.s();
-    double start_time = 0.0;
-    double start_s = 0.0;
-    bool is_updated_start = false;
-    for (const auto& speed_point : last_speed_data) {
-      if (speed_point.s() < s_diff) {
-        continue;
-      }
-      if (!is_updated_start) {
-        start_time = speed_point.t();
-        start_s = speed_point.s();
-        is_updated_start = true;
-      }
-      SpeedPoint refined_speed_point;
-      refined_speed_point.set_s(speed_point.s() - start_s);
-      refined_speed_point.set_t(speed_point.t() - start_time);
-      refined_speed_point.set_v(speed_point.v());
-      refined_speed_point.set_a(speed_point.a());
-      refined_speed_point.set_da(speed_point.da());
-      speed_profile.push_back(std::move(refined_speed_point));
-    }
-  }
-  return speed_profile;
-}
-
-// a dummy simple hot start
-// TODO(All): refine the hotstart speed profile
-std::vector<SpeedPoint> SpeedProfileGenerator::GenerateSpeedHotStart(
-    const TrajectoryPoint& planning_init_point) {
-  std::vector<SpeedPoint> hot_start_speed_profile;
-  double s = 0.0;
-  double t = 0.0;
-  double v = common::math::Clamp(planning_init_point.v(), 5.0,
-                                 FLAGS_planning_upper_speed_limit);
-  while (t < FLAGS_trajectory_time_length) {
-    SpeedPoint speed_point;
-    speed_point.set_s(s);
-    speed_point.set_t(t);
-    speed_point.set_v(v);
-
-    hot_start_speed_profile.push_back(std::move(speed_point));
-
-    t += FLAGS_trajectory_time_min_interval;
-    s += v * FLAGS_trajectory_time_min_interval;
-  }
-  return hot_start_speed_profile;
-}
-
 SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
     const double stop_distance) {
   AERROR << "Fallback using piecewise jerk speed!";
@@ -395,20 +309,6 @@ SpeedData SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(
     }
   }
 
-  return speed_data;
-}
-
-SpeedData SpeedProfileGenerator::GenerateFixedSpeedCreepProfile(
-    const double distance, const double max_speed) {
-  constexpr double kProceedingSpeed = 2.23;  // (5mph proceeding speed)
-  const double proceeding_speed = std::min(max_speed, kProceedingSpeed);
-
-  constexpr double kDeltaS = 0.1;
-  SpeedData speed_data;
-  for (double s = 0.0; s < distance; s += kDeltaS) {
-    speed_data.AppendSpeedPoint(s, s / proceeding_speed, proceeding_speed, 0.0,
-                                0.0);
-  }
   return speed_data;
 }
 
