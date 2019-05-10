@@ -232,6 +232,7 @@ cc_library(
     linkopts = [
         "-lopencv_core",
         "-lopencv_highgui",
+        "-lopencv_imgproc",
     ],
     deps = [
         ":prediction_gflags",
