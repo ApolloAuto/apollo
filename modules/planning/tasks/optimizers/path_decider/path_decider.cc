@@ -113,7 +113,8 @@ bool PathDecider::MakeStaticObstacleDecision(
     }
     // - add STOP decision for blocking obstacles.
     if (obstacle->Id() == blocking_obstacle_id &&
-        !PlanningContext::Instance()->is_in_path_lane_borrow_scenario()) {
+        !PlanningContext::Instance()->path_decider_info().
+            is_in_path_lane_borrow_scenario()) {
       // Add stop decision
       ADEBUG << "Blocking obstacle = " << blocking_obstacle_id;
       ObjectDecisionType object_decision;
@@ -140,10 +141,6 @@ bool PathDecider::MakeStaticObstacleDecision(
                                         object_decision);
       continue;
     }
-
-    // if (PlanningContext::Instance()->is_in_path_lane_borrow_scenario()) {
-    //  continue;
-    // }
 
     const auto frenet_point = frenet_path.GetNearestPoint(sl_boundary);
     const double curr_l = frenet_point.l();
