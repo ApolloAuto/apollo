@@ -1,17 +1,18 @@
-/* Copyright 2019 The Apollo Authors. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
+/******************************************************************************
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/canbus/vehicle/ch/ch_controller.h"
 
@@ -217,7 +218,6 @@ Chassis ChController::chassis() {
   // 11 steering
   if (chassis_detail.ch().has_steer_status__512() &&
       chassis_detail.ch().steer_status__512().has_steer_angle_sts()) {
-    // * 100.0 /vehicle_params_.max_steer_angle()*M_PI / 180);
     chassis_.set_steering_percentage(static_cast<float>(
         chassis_detail.ch().steer_status__512().steer_angle_sts() * 100.0 /
         vehicle_params_.max_steer_angle()));
@@ -229,8 +229,6 @@ Chassis ChController::chassis() {
   if (chassis_error_mask_) {
     chassis_.set_chassis_error_mask(chassis_error_mask_);
   }
-  // 6d, 6e, 6f, if gps valid is availiable, assume all gps related field
-  // available
 
   if (chassis_detail.has_surround()) {
     chassis_.mutable_surround()->CopyFrom(chassis_detail.surround());
@@ -260,8 +258,6 @@ ErrorCode ChController::EnableAutoMode() {
     AINFO << "already in COMPLETE_AUTO_DRIVE mode";
     return ErrorCode::OK;
   }
-  // ADD YOUR OWN CAR CHASSIS OPERATION
-  // control_command_115_->set_ctrl_cmd(Control_command_115::CTRL_CMD_UNDER_CONTROL);
 
   brake_command_111_->set_brake_pedal_en_ctrl(
       Brake_command_111::BRAKE_PEDAL_EN_CTRL_ENABLE);
@@ -373,7 +369,7 @@ void ChController::Throttle(double pedal) {
 
 void ChController::Acceleration(double acc) {}
 
-// ch default, -470 ~ 470, left:+, right:-
+// ch default, -23 ~ 23, left:+, right:-
 // need to be compatible with control module, so reverse
 // steering with old angle speed
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
