@@ -148,6 +148,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/map/pnc_map:path",
         "//modules/planning/common/path:path_data",
+        "//modules/planning/proto:path_decider_info_proto",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",

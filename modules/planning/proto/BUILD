@@ -536,4 +536,18 @@ cc_proto_library(
     ],
 )
 
+cc_proto_library(
+    name = "path_decider_info_proto",
+    deps = [
+        ":path_decider_info_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "path_decider_info_proto_lib",
+    srcs = [
+        "path_decider_info.proto",
+    ],
+)
+
 cpplint()

@@ -47,43 +47,6 @@ cc_library(
 )
 
 cc_library(
-    name = "path_assessment_decider",
-    srcs = [
-        "path_assessment_decider.cc",
-    ],
-    hdrs = [
-        "path_assessment_decider.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        ":decider_base",
-        ":path_bounds_decider",
-        ":path_decider_obstacle_utils",
-        "//modules/planning/common:planning_context",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/common:reference_line_info",
-    ],
-)
-
-cc_library(
-    name = "path_bounds_decider",
-    srcs = [
-        "path_bounds_decider.cc",
-    ],
-    hdrs = [
-        "path_bounds_decider.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        ":decider_base",
-        ":path_decider_obstacle_utils",
-        "//modules/planning/common:planning_context",
-        "//modules/planning/common:planning_gflags",
-        "//modules/planning/common:reference_line_info",
-    ],
-)
-
-cc_library(
     name = "path_decider_obstacle_utils",
     srcs = [
         "path_decider_obstacle_utils.cc",
@@ -165,18 +128,6 @@ cc_test(
     ],
     deps = [
         ":open_space_roi_decider",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "path_bounds_decider_test",
-    size = "small",
-    srcs = [
-        "path_bounds_decider_test.cc",
-    ],
-    deps = [
-        "path_bounds_decider",
         "@gtest//:main",
     ],
 )

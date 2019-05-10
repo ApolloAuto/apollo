@@ -31,6 +31,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
 #include "modules/planning/common/path/path_data.h"
+#include "modules/planning/proto/path_decider_info.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
 
 /**
@@ -81,6 +82,10 @@ class PlanningContext {
   const PlanningStatus& planning_status() { return planning_status_; }
 
   PlanningStatus* mutable_planning_status() { return &planning_status_; }
+
+  const PathDeciderInfo& path_decider_info() { return path_decider_info_; }
+
+  PathDeciderInfo* mutable_path_decider_info() { return &path_decider_info_; }
 
   /////////////////////////////////////////////////////////////////////////////
   void IncrementFrontStaticObstacleCycleCounter() {
@@ -142,6 +147,7 @@ class PlanningContext {
   SidePassInfo side_pass_info_;
   FallBackInfo fallback_info_;
   OpenSpaceInfo open_space_info_;
+  PathDeciderInfo path_decider_info_;
 
   int front_static_obstacle_cycle_counter_ = 0;
   std::string front_static_obstacle_id_ = "";

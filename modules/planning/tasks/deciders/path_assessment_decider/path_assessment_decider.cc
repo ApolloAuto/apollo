@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/tasks/deciders/path_assessment_decider.h"
+#include "modules/planning/tasks/deciders/path_assessment_decider/path_assessment_decider.h"
 
 #include <algorithm>
 #include <cmath>
@@ -24,7 +24,7 @@
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/hdmap/hdmap_util.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/tasks/deciders/path_bounds_decider.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/path_decider_obstacle_utils.h"
 
 namespace apollo {
