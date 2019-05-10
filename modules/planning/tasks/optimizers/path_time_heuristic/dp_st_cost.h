@@ -31,7 +31,7 @@
 #include "modules/planning/common/obstacle.h"
 #include "modules/planning/common/speed/st_boundary.h"
 #include "modules/planning/common/speed/st_point.h"
-#include "modules/planning/tasks/optimizers/dp_st_speed/st_graph_point.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/st_graph_point.h"
 
 namespace apollo {
 namespace planning {

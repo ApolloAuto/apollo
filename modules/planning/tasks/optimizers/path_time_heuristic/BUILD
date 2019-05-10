@@ -64,12 +64,12 @@ cc_library(
 )
 
 cc_library(
-    name = "dp_st_speed_optimizer",
+    name = "path_time_heuristic_optimizer",
     srcs = [
-        "dp_st_speed_optimizer.cc",
+        "path_time_heuristic_optimizer.cc",
     ],
     hdrs = [
-        "dp_st_speed_optimizer.h",
+        "path_time_heuristic_optimizer.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [

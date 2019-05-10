@@ -17,8 +17,7 @@
 /**
  * @file
  **/
-
-#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_cost.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/dp_st_cost.h"
 
 #include <algorithm>
 #include <limits>

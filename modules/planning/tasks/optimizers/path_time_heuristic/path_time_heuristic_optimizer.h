@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_speed_optimizer.h
+ * @file path_time_heuristic_optimizer.h
  **/
 
 #pragma once
@@ -31,22 +31,22 @@ namespace apollo {
 namespace planning {
 
 /**
- * @class DpStSpeedOptimizer
- * @brief DpStSpeedOptimizer does ST graph speed planning with dynamic
+ * @class PathTimeHeuristicOptimizer
+ * @brief PathTimeHeuristicOptimizer does ST graph speed planning with dynamic
  * programming algorithm.
  */
-class DpStSpeedOptimizer : public SpeedOptimizer {
+class PathTimeHeuristicOptimizer : public SpeedOptimizer {
  public:
-  explicit DpStSpeedOptimizer(const TaskConfig& config);
+  explicit PathTimeHeuristicOptimizer(const TaskConfig& config);
 
  private:
-  apollo::common::Status Process(const SLBoundary& adc_sl_boundary,
-                                 const PathData& path_data,
-                                 const common::TrajectoryPoint& init_point,
-                                 const ReferenceLine& reference_line,
-                                 const SpeedData& reference_speed_data,
-                                 PathDecision* const path_decision,
-                                 SpeedData* const speed_data) override;
+  common::Status Process(const SLBoundary& adc_sl_boundary,
+                         const PathData& path_data,
+                         const common::TrajectoryPoint& init_point,
+                         const ReferenceLine& reference_line,
+                         const SpeedData& reference_speed_data,
+                         PathDecision* const path_decision,
+                         SpeedData* const speed_data) override;
 
   bool SearchStGraph(SpeedData* speed_data) const;
 
