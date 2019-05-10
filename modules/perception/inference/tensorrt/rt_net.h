@@ -47,10 +47,17 @@ const std::map<std::string, nvinfer1::ActivationType> active_map{
     {"Sigmoid", nvinfer1::ActivationType::kSIGMOID},
     {"TanH", nvinfer1::ActivationType::kTANH},
     {"ReLU", nvinfer1::ActivationType::kRELU}};
-const std::vector<std::string> _gpu_checklist{
-    "GeForce GTX 1080",    "GeForce GTX 1080 Ti", "Tesla P4",
-    "Tesla P40",           "GeForce GTX 1070",    "GeForce GTX 1060",
-    "Tesla V100-SXM2-16GB"};
+const std::vector<std::string> _gpu_checklist{"GeForce GTX 1080",
+                                              "GeForce GTX 1080 Ti",
+                                              "Tesla P4",
+                                              "Tesla P40",
+                                              "GeForce GTX 1070",
+                                              "GeForce GTX 1060",
+                                              "Tesla V100-SXM2-16GB",
+                                              "GeForce RTX 2080 Ti",
+                                              "GeForce RTX 2080",
+                                              "GeForce RTX 2070",
+                                              "GeForce RTX 2060"};
 
 class RTNet : public Inference {
  public:
