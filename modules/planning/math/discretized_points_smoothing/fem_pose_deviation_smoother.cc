@@ -20,6 +20,8 @@
 
 #include "modules/planning/math/discretized_points_smoothing/fem_pose_deviation_smoother.h"
 
+#include <limits>
+
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -37,8 +39,18 @@ bool FemPoseDeviationSmoother::Optimize(const OsqpSettings& solver_settings) {
     return false;
   }
 
+  if (ref_points_.size() < 3) {
+    AERROR << "ref_points size smaller than 3, smoother early terminates";
+    return false;
+  }
+
   // Calculate optimization states definitions
-  num_of_points_ = ref_points_.size();
+  if (ref_points_.size() > std::numeric_limits<int>::max()) {
+    AERROR << "ref_points size too large, smoother early terminates";
+    return false;
+  }
+
+  num_of_points_ = static_cast<int>(ref_points_.size());
   num_of_variables_ = num_of_variables_ * 2;
   num_of_constraints_ = num_of_variables_;
 
@@ -61,6 +73,10 @@ bool FemPoseDeviationSmoother::Optimize(const OsqpSettings& solver_settings) {
   std::vector<c_float> q;
   CalculateOffset(&q);
 
+  // Set primal warm start
+  std::vector<c_float> primal_warm_start;
+  SetPrimalWarmStart(&primal_warm_start);
+
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
   OSQPSettings* settings =
       reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
@@ -75,10 +91,10 @@ bool FemPoseDeviationSmoother::Optimize(const OsqpSettings& solver_settings) {
 
   OSQPWorkspace* work = nullptr;
 
-  bool res =
-      OptimizeWithOsqp(num_of_variables_, lower_bounds.size(), P_data,
-                       P_indices, P_indptr, A_data, A_indices, A_indptr,
-                       lower_bounds, upper_bounds, q, data, &work, settings);
+  bool res = OptimizeWithOsqp(num_of_variables_, lower_bounds.size(), P_data,
+                              P_indices, P_indptr, A_data, A_indices, A_indptr,
+                              lower_bounds, upper_bounds, q, primal_warm_start,
+                              data, &work, settings);
   if (res == false || work == nullptr || work->solution == nullptr) {
     AERROR << "Failed to find solution.";
     // Cleanup
@@ -94,8 +110,8 @@ bool FemPoseDeviationSmoother::Optimize(const OsqpSettings& solver_settings) {
   // Extract primal results
   x_.resize(num_of_points_);
   y_.resize(num_of_points_);
-  for (size_t i = 0; i < num_of_points_; ++i) {
-    size_t index = i << 1;
+  for (int i = 0; i < num_of_points_; ++i) {
+    int index = i << 1;
     x_.at(i) = work->solution->x[index];
     y_.at(i) = work->solution->x[index + 1];
   }
@@ -112,24 +128,129 @@ bool FemPoseDeviationSmoother::Optimize(const OsqpSettings& solver_settings) {
 
 void FemPoseDeviationSmoother::CalculateKernel(std::vector<c_float>* P_data,
                                                std::vector<c_int>* P_indices,
-                                               std::vector<c_int>* P_indptr) {}
+                                               std::vector<c_int>* P_indptr) {
+  CHECK_GT(num_of_variables_, 4);
+  // Only upper triangle is filled
+  std::vector<std::vector<std::pair<c_int, c_float>>> columns;
+  columns.resize(num_of_variables_);
+  int col_num = 0;
 
-void FemPoseDeviationSmoother::CalculateOffset(std::vector<c_float>* q) {}
+  for (int col = 0; col < 2; ++col) {
+    columns[col].emplace_back(col, weight_fem_pose_deviation_ +
+                                       weight_path_length_ +
+                                       weight_ref_deviation_);
+    ++col_num;
+  }
+
+  for (int col = 2; col < 4; ++col) {
+    columns[col].emplace_back(
+        col - 2, -2.0 * weight_fem_pose_deviation_ - weight_path_length_);
+    columns[col].emplace_back(col, 5.0 * weight_fem_pose_deviation_ +
+                                       2.0 * weight_path_length_ +
+                                       weight_ref_deviation_);
+    ++col_num;
+  }
+
+  int second_point_from_last_index = num_of_points_ - 2;
+  for (int point_index = 2; point_index < second_point_from_last_index;
+       ++point_index) {
+    int col_index = point_index << 1;
+    for (int col = 0; col < 2; ++col) {
+      col_index += col;
+      columns[col_index].emplace_back(col_index - 4,
+                                      weight_fem_pose_deviation_);
+      columns[col_index].emplace_back(
+          col_index - 2,
+          -4.0 * weight_fem_pose_deviation_ - weight_path_length_);
+      columns[col_index].emplace_back(
+          col_index, 6.0 * weight_fem_pose_deviation_ +
+                         2.0 * weight_path_length_ + weight_ref_deviation_);
+      ++col_num;
+    }
+  }
+
+  int second_point_col_from_last_col = num_of_variables_ - 4;
+  int last_point_col_from_last_col = num_of_variables_ - 2;
+  for (int col = second_point_col_from_last_col;
+       col < last_point_col_from_last_col; ++col) {
+    columns[col].emplace_back(col - 4, weight_fem_pose_deviation_);
+    columns[col].emplace_back(
+        col - 2, -4.0 * weight_fem_pose_deviation_ - weight_path_length_);
+    columns[col].emplace_back(col, 5.0 * weight_fem_pose_deviation_ +
+                                       2.0 * weight_path_length_ +
+                                       weight_ref_deviation_);
+    ++col_num;
+  }
+
+  for (int col = last_point_col_from_last_col; col < num_of_variables_; ++col) {
+    columns[col].emplace_back(col - 4, weight_fem_pose_deviation_);
+    columns[col].emplace_back(
+        col - 2, -2.0 * weight_fem_pose_deviation_ - weight_path_length_);
+    columns[col].emplace_back(col, weight_fem_pose_deviation_ +
+                                       weight_path_length_ +
+                                       weight_ref_deviation_);
+    ++col_num;
+  }
+
+  CHECK_EQ(col_num, num_of_variables_);
+
+  int ind_p = 0;
+  for (int i = 0; i < col_num; ++i) {
+    P_indptr->push_back(ind_p);
+    for (const auto& row_data_pair : columns[i]) {
+      P_data->push_back(row_data_pair.second * 2.0);
+      P_indices->push_back(row_data_pair.first);
+      ++ind_p;
+    }
+  }
+  P_indptr->push_back(ind_p);
+}
+
+void FemPoseDeviationSmoother::CalculateOffset(std::vector<c_float>* q) {
+  for (int i = 0; i < num_of_variables_; ++i) {
+    q->push_back(-2.0 * weight_ref_deviation_);
+  }
+}
 
 void FemPoseDeviationSmoother::CalculateAffineConstraint(
     std::vector<c_float>* A_data, std::vector<c_int>* A_indices,
     std::vector<c_int>* A_indptr, std::vector<c_float>* lower_bounds,
-    std::vector<c_float>* upper_bounds) {}
+    std::vector<c_float>* upper_bounds) {
+  int ind_A = 0;
+  for (int i = 0; i < num_of_variables_; ++i) {
+    A_data->push_back(1.0);
+    A_indices->push_back(i);
+    A_indptr->push_back(ind_A);
+    ++ind_A;
+  }
+  A_indptr->push_back(ind_A);
+
+  for (int i = 0; i < num_of_points_; ++i) {
+    const auto& ref_point_xy = ref_points_[i];
+    upper_bounds->push_back(ref_point_xy.first + x_bounds_around_refs_[i]);
+    upper_bounds->push_back(ref_point_xy.second + y_bounds_around_refs_[i]);
+    lower_bounds->push_back(ref_point_xy.first - x_bounds_around_refs_[i]);
+    lower_bounds->push_back(ref_point_xy.second - y_bounds_around_refs_[i]);
+  }
+}
+
+void FemPoseDeviationSmoother::SetPrimalWarmStart(
+    std::vector<c_float>* primal_warm_start) {
+  CHECK_EQ(ref_points_.size(), num_of_points_);
+  for (const auto& ref_point_xy : ref_points_) {
+    primal_warm_start->push_back(ref_point_xy.first);
+    primal_warm_start->push_back(ref_point_xy.second);
+  }
+}
 
 bool FemPoseDeviationSmoother::OptimizeWithOsqp(
-    const size_t kernel_dim, const size_t num_affine_constraint,
-    std::vector<c_float>& P_data, std::vector<c_int>& P_indices,    // NOLINT
-    std::vector<c_int>& P_indptr, std::vector<c_float>& A_data,     // NOLINT
-    std::vector<c_int>& A_indices, std::vector<c_int>& A_indptr,    // NOLINT
-    std::vector<c_float>& lower_bounds,                             // NOLINT
-    std::vector<c_float>& upper_bounds,                             // NOLINT
-    std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
-    OSQPSettings* settings) {
+    const size_t kernel_dim, const size_t num_affine_constraint,             // NOLINT
+    std::vector<c_float>& P_data, std::vector<c_int>& P_indices,             // NOLINT
+    std::vector<c_int>& P_indptr, std::vector<c_float>& A_data,              // NOLINT
+    std::vector<c_int>& A_indices, std::vector<c_int>& A_indptr,             // NOLINT
+    std::vector<c_float>& lower_bounds, std::vector<c_float>& upper_bounds,  // NOLINT
+    std::vector<c_float>& q, std::vector<c_float>& primal_warm_start,        // NOLINT
+    OSQPData* data, OSQPWorkspace** work, OSQPSettings* settings) {          // NOLINT
   CHECK_EQ(lower_bounds.size(), upper_bounds.size());
 
   data->n = kernel_dim;
@@ -143,6 +264,8 @@ bool FemPoseDeviationSmoother::OptimizeWithOsqp(
   data->u = upper_bounds.data();
 
   *work = osqp_setup(data, settings);
+
+  osqp_warm_start_x(*work, primal_warm_start.data());
 
   // Solve Problem
   osqp_solve(*work);
