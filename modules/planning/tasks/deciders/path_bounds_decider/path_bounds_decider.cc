@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/tasks/deciders/path_bounds_decider.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 
 #include <algorithm>
 #include <functional>
