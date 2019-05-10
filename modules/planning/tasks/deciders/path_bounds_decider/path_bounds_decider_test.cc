@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/deciders/path_bounds_decider.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 
 #include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
