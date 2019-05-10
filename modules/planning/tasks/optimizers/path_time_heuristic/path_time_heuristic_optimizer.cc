@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_speed_optimizer.cc
+ * @file path_time_heuristic_optimizer.cc
  **/
 
-#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 
 #include <vector>
 
@@ -28,7 +28,7 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
-#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_graph.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/dp_st_graph.h"
 
 namespace apollo {
 namespace planning {
@@ -38,14 +38,15 @@ using apollo::common::Status;
 using apollo::common::TrajectoryPoint;
 using apollo::planning_internal::STGraphDebug;
 
-DpStSpeedOptimizer::DpStSpeedOptimizer(const TaskConfig& config)
+PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
     : SpeedOptimizer(config) {
   CHECK(config.has_dp_st_speed_config());
   dp_st_speed_config_ = config.dp_st_speed_config();
+  // TODO(all): fix the name
   SetName("DpStSpeedOptimizer");
 }
 
-bool DpStSpeedOptimizer::SearchStGraph(SpeedData* speed_data) const {
+bool PathTimeHeuristicOptimizer::SearchStGraph(SpeedData* speed_data) const {
   DpStGraph st_graph(reference_line_info_->st_graph_data(), dp_st_speed_config_,
                      reference_line_info_->path_decision()->obstacles().Items(),
                      init_point_, adc_sl_boundary_);
@@ -57,7 +58,7 @@ bool DpStSpeedOptimizer::SearchStGraph(SpeedData* speed_data) const {
   return true;
 }
 
-Status DpStSpeedOptimizer::Process(const SLBoundary& adc_sl_boundary,
+Status PathTimeHeuristicOptimizer::Process(const SLBoundary& adc_sl_boundary,
                                    const PathData& path_data,
                                    const common::TrajectoryPoint& init_point,
                                    const ReferenceLine& reference_line,
