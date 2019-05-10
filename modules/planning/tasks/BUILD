@@ -37,7 +37,7 @@ cc_library(
         ":task",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/tasks/deciders:decider",
-        "//modules/planning/tasks/deciders:path_assessment_decider",
+        "//modules/planning/tasks/deciders/path_assessment_decider:path_assessment_decider",
         "//modules/planning/tasks/deciders/path_bounds_decider:path_bounds_decider",
         "//modules/planning/tasks/deciders/path_lane_borrow_decider",
         "//modules/planning/tasks/optimizers/dp_st_speed:dp_st_speed_optimizer",

@@ -14,7 +14,7 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/tasks/deciders/path_assessment_decider.h"
+#include "modules/planning/tasks/deciders/path_assessment_decider/path_assessment_decider.h"
 
 #include <algorithm>
 #include <cmath>
