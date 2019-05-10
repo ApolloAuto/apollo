@@ -41,7 +41,6 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
-#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
@@ -201,8 +200,6 @@ class Frame {
   ThreadSafeIndexedObstacles obstacles_;
   std::unordered_map<std::string, const perception::TrafficLight *>
       traffic_lights_;
-
-  ChangeLaneDecider change_lane_decider_;
 
   // current frame published trajectory
   ADCTrajectory current_frame_planned_trajectory_;

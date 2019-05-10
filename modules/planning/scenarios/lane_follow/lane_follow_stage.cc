@@ -32,11 +32,11 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
+#include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
 #include "modules/planning/tasks/optimizers/speed_decider/speed_decider.h"
@@ -128,7 +128,7 @@ Stage::StageStatus LaneFollowStage::Process(
       if (reference_line_info.IsChangeLanePath()) {
         ADEBUG << "reference line is lane change ref.";
         if (reference_line_info.Cost() < kStraightForwardLineCost &&
-            ChangeLaneDecider::IsClearToChangeLane(&reference_line_info)) {
+            LaneChangeDecider::IsClearToChangeLane(&reference_line_info)) {
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
           AERROR << "\tclear for lane change";
