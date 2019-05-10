@@ -30,6 +30,7 @@
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 
@@ -196,6 +197,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     speed_data->AppendSpeedPoint(s[i], delta_t * i, ds[i], dds[i],
                                  (dds[i] - dds[i - 1]) / delta_t);
   }
+  SpeedProfileGenerator::FillEnoughSpeedPoints(speed_data);
   RecordDebugInfo(*speed_data, st_graph_data.mutable_st_graph_debug());
   return Status::OK();
 }
