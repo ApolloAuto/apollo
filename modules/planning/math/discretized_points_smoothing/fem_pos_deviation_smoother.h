@@ -36,11 +36,27 @@ struct OsqpSettings {
   bool warm_start = true;
 };
 
-class FemPoseDeviationSmoother {
- public:
-  FemPoseDeviationSmoother();
+/*
+ * @brief:
+ * This class solve an optimization problem:
+ * Y
+ * |
+ * |                       P(x1, y1)  P(x2, y2)
+ * |            P(x0, y0)                       ... P(x(k-1), y(k-1))
+ * |P(start)
+ * |
+ * |________________________________________________________ X
+ *
+ *
+ * Given an initial set of points from 0 to k-1,  The goal is to find a set of points
+ * which makes the line P(start), P0, P(1) ... P(k-1) "smooth".
+ */
 
-  virtual ~FemPoseDeviationSmoother() = default;
+class FemPosDeviationSmoother {
+ public:
+  FemPosDeviationSmoother();
+
+  virtual ~FemPosDeviationSmoother() = default;
 
   void set_ref_points(
       const std::vector<std::pair<double, double>>& ref_points) {
@@ -91,13 +107,13 @@ class FemPoseDeviationSmoother {
   void SetPrimalWarmStart(std::vector<c_float>* primal_warm_start);
 
   bool OptimizeWithOsqp(
-      const size_t kernel_dim, const size_t num_affine_constraint,              // NOLINT
-      std::vector<c_float>& P_data, std::vector<c_int>& P_indices,              // NOLINT
-      std::vector<c_int>& P_indptr, std::vector<c_float>& A_data,               // NOLINT
-      std::vector<c_int>& A_indices, std::vector<c_int>& A_indptr,              // NOLINT
-      std::vector<c_float>& lower_bounds, std::vector<c_float>& upper_bounds,   // NOLINT
-      std::vector<c_float>& q, std::vector<c_float>& primal_warm_start,         // NOLINT
-      OSQPData* data, OSQPWorkspace** work, OSQPSettings* settings);            // NOLINT
+      const size_t kernel_dim, const size_t num_affine_constraint,
+      std::vector<c_float>* P_data, std::vector<c_int>* P_indices,
+      std::vector<c_int>* P_indptr, std::vector<c_float>* A_data,
+      std::vector<c_int>* A_indices, std::vector<c_int>* A_indptr,
+      std::vector<c_float>* lower_bounds, std::vector<c_float>* upper_bounds,
+      std::vector<c_float>* q, std::vector<c_float>* primal_warm_start,
+      OSQPData* data, OSQPWorkspace** work, OSQPSettings* settings);
 
  private:
   // Reference points and deviation bounds
