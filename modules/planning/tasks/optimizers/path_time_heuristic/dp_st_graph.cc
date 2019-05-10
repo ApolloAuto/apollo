@@ -18,7 +18,7 @@
  * @file dp_st_graph.cc
  **/
 
-#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_graph.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/dp_st_graph.h"
 
 #include <algorithm>
 #include <limits>
