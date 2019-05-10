@@ -124,7 +124,7 @@ class PlannigAnalyzer:
         self.rl_dkappa_rms_list = []
         self.rl_kappa_max_abs_list = []
         self.rl_dkappa_max_abs_list = []
-        
+
 
     def put(self, adc_trajectory):
         self.total_cycle_num += 1

@@ -70,7 +70,7 @@ class STBoundaryMapper {
                        const ObjectDecisionType& decision) const;
 
   common::Status MapWithDecision(Obstacle* obstacle,
-      const ObjectDecisionType& decision) const;
+                                 const ObjectDecisionType& decision) const;
 
  private:
   const SLBoundary& adc_sl_boundary_;

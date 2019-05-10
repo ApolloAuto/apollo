@@ -29,8 +29,9 @@ namespace {
 constexpr double kMaxVariableRange = 1.0e10;
 }  // namespace
 
-PiecewiseJerkProblem::PiecewiseJerkProblem(const size_t num_of_knots,
-    const double delta_s, const std::array<double, 3>& x_init) {
+PiecewiseJerkProblem::PiecewiseJerkProblem(
+    const size_t num_of_knots, const double delta_s,
+    const std::array<double, 3>& x_init) {
   CHECK_GE(num_of_knots, 2);
   num_of_knots_ = num_of_knots;
 

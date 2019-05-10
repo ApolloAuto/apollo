@@ -49,45 +49,32 @@ namespace planning {
 class PiecewiseJerkProblem {
  public:
   PiecewiseJerkProblem(const size_t num_of_knots, const double delta_s,
-      const std::array<double, 3>& x_init);
+                       const std::array<double, 3>& x_init);
 
   virtual ~PiecewiseJerkProblem() = default;
 
   void set_x_bounds(std::vector<std::pair<double, double>> x_bounds);
 
-  void set_x_bounds(const double x_lower_bound,
-                    const double x_upper_bound);
+  void set_x_bounds(const double x_lower_bound, const double x_upper_bound);
 
   void set_dx_bounds(std::vector<std::pair<double, double>> dx_bounds);
 
-  void set_dx_bounds(const double dx_lower_bound,
-                     const double dx_upper_bound);
-
+  void set_dx_bounds(const double dx_lower_bound, const double dx_upper_bound);
 
   void set_ddx_bounds(std::vector<std::pair<double, double>> ddx_bounds);
 
   void set_ddx_bounds(const double ddx_lower_bound,
                       const double ddx_upper_bound);
 
-  void set_dddx_bound(const double dddx_bound) {
-    dddx_bound_ = dddx_bound;
-  }
+  void set_dddx_bound(const double dddx_bound) { dddx_bound_ = dddx_bound; }
 
-  void set_weight_x(const double weight_x) {
-    weight_x_ = weight_x;
-  }
+  void set_weight_x(const double weight_x) { weight_x_ = weight_x; }
 
-  void set_weight_dx(const double weight_dx) {
-    weight_dx_ = weight_dx;
-  }
+  void set_weight_dx(const double weight_dx) { weight_dx_ = weight_dx; }
 
-  void set_weight_ddx(const double weight_ddx) {
-    weight_ddx_ = weight_ddx;
-  }
+  void set_weight_ddx(const double weight_ddx) { weight_ddx_ = weight_ddx; }
 
-  void set_weight_dddx(const double weight_dddx) {
-    weight_dddx_ = weight_dddx;
-  }
+  void set_weight_dddx(const double weight_dddx) { weight_dddx_ = weight_dddx; }
 
   virtual bool Optimize(const int max_iter = 4000);
 

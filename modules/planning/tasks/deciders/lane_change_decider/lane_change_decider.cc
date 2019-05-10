@@ -26,8 +26,8 @@ namespace apollo {
 namespace planning {
 
 using apollo::common::ErrorCode;
-using apollo::common::Status;
 using apollo::common::SLPoint;
+using apollo::common::Status;
 using apollo::common::time::Clock;
 using apollo::common::util::StrCat;
 
@@ -37,7 +37,7 @@ LaneChangeDecider::LaneChangeDecider(const TaskConfig& config)
 Status LaneChangeDecider::Process(Frame* frame) {
   // Sanity checks.
   CHECK_NOTNULL(frame);
-  std::list<ReferenceLineInfo> *reference_line_info =
+  std::list<ReferenceLineInfo>* reference_line_info =
       frame->mutable_reference_line_info();
   if (reference_line_info->empty()) {
     const std::string msg = "Reference lines empty.";
@@ -69,8 +69,8 @@ Status LaneChangeDecider::Process(Frame* frame) {
       UpdateStatus(now, ChangeLaneStatus::CHANGE_LANE_SUCCESS, path_id);
     } else if (prev_status->status() == ChangeLaneStatus::CHANGE_LANE_FAILED) {
     } else {
-      const std::string msg = StrCat("Unknown state: ",
-                                     prev_status->ShortDebugString());
+      const std::string msg =
+          StrCat("Unknown state: ", prev_status->ShortDebugString());
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
@@ -107,8 +107,8 @@ Status LaneChangeDecider::Process(Frame* frame) {
         UpdateStatus(now, ChangeLaneStatus::IN_CHANGE_LANE, current_path_id);
       }
     } else {
-      const std::string msg = StrCat("Unknown state: ",
-                                     prev_status->ShortDebugString());
+      const std::string msg =
+          StrCat("Unknown state: ", prev_status->ShortDebugString());
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
