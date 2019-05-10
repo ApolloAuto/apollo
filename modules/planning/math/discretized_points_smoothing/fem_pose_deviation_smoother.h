@@ -88,15 +88,16 @@ class FemPoseDeviationSmoother {
                                  std::vector<c_float>* lower_bounds,
                                  std::vector<c_float>* upper_bounds);
 
+  void SetPrimalWarmStart(std::vector<c_float>* primal_warm_start);
+
   bool OptimizeWithOsqp(
-      const size_t kernel_dim, const size_t num_affine_constraint,
-      std::vector<c_float>& P_data, std::vector<c_int>& P_indices,    // NOLINT
-      std::vector<c_int>& P_indptr, std::vector<c_float>& A_data,     // NOLINT
-      std::vector<c_int>& A_indices, std::vector<c_int>& A_indptr,    // NOLINT
-      std::vector<c_float>& lower_bounds,                             // NOLINT
-      std::vector<c_float>& upper_bounds,                             // NOLINT
-      std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
-      OSQPSettings* settings);
+      const size_t kernel_dim, const size_t num_affine_constraint,              // NOLINT
+      std::vector<c_float>& P_data, std::vector<c_int>& P_indices,              // NOLINT
+      std::vector<c_int>& P_indptr, std::vector<c_float>& A_data,               // NOLINT
+      std::vector<c_int>& A_indices, std::vector<c_int>& A_indptr,              // NOLINT
+      std::vector<c_float>& lower_bounds, std::vector<c_float>& upper_bounds,   // NOLINT
+      std::vector<c_float>& q, std::vector<c_float>& primal_warm_start,         // NOLINT
+      OSQPData* data, OSQPWorkspace** work, OSQPSettings* settings);            // NOLINT
 
  private:
   // Reference points and deviation bounds
@@ -110,9 +111,9 @@ class FemPoseDeviationSmoother {
   double weight_ref_deviation_ = 0.0;
 
   // Optimization problem definitions
-  size_t num_of_points_ = 0;
-  size_t num_of_variables_ = 0;
-  size_t num_of_constraints_ = 0;
+  int num_of_points_ = 0;
+  int num_of_variables_ = 0;
+  int num_of_constraints_ = 0;
 
   // Optimized_result
   std::vector<double> x_;
