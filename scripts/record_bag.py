@@ -219,16 +219,17 @@ class Recorder(object):
         """Record tasks into the <disk>/data/bag/<task_id> directory."""
         task_id = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         if is_small_topic:
-            task_id = task_id + "_s"
+            task_id += "_s"
         task_dir = os.path.join(disk, 'data/bag', task_id)
         print('Recording bag to {}'.format(task_dir))
 
         log_file = '/apollo/data/log/apollo_record.out'
         if is_small_topic:
-            log_file = log_file + "_s"
+            log_file += "_s"
         topics_str = ' -c '.join(topics)
 
-        os.makedirs(task_dir)
+        if not os.path.exists(task_dir):
+            os.makedirs(task_dir)
         cmd = '''
             cd "{}"
             source /apollo/scripts/apollo_base.sh
