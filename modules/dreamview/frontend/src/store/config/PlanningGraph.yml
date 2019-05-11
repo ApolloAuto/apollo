@@ -218,12 +218,6 @@ kappaGraph:
                 pointRadius: 0
                 fill: false
                 showLine: true
-            PiecewiseJerkSpeedOptimizer:
-                color: 'rgba(54, 162, 235, 1)' # blue
-                borderWidth: 5
-                pointRadius: 0
-                fill: false
-                showLine: true
 dkappaGraph:
     title: 'Planning Dkappa'
     options:
