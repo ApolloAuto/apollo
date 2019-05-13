@@ -18,7 +18,6 @@
 
 #include <unordered_map>
 
-#include "opencv2/highgui/highgui.hpp"
 #include "opencv2/opencv.hpp"
 
 #include "cyber/common/macros.h"
@@ -42,14 +41,18 @@ class SemanticMap {
                        static_cast<int>(2000 - (y - curr_base_y_) / 0.1));
   }
 
-  void DrawRect(const Feature& feature,
-                const cv::Scalar& color = cv::Scalar(0, 255, 255));
+  void DrawRect(const Feature& feature, const cv::Scalar& color, cv::Mat* img);
 
-  void DrawPoly(const Feature& feature,
-                const cv::Scalar& color = cv::Scalar(0, 255, 255));
+  void DrawPoly(const Feature& feature, const cv::Scalar& color, cv::Mat* img);
 
-  void DrawHistory(const ObstacleHistory& history,
-                   const cv::Scalar& color = cv::Scalar(0, 255, 255));
+  void DrawHistory(const ObstacleHistory& history, const cv::Scalar& color,
+                   cv::Mat* img);
+
+  cv::Mat CropArea(const cv::Mat& input_img, const cv::Point2i& center_point,
+                   const double heading);
+
+  cv::Mat CropByHistory(const ObstacleHistory& history,
+                        const cv::Scalar& color);
 
  private:
   cv::Mat base_img_;

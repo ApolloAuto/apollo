@@ -37,8 +37,8 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
 #include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
-#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 #include "modules/planning/tasks/optimizers/speed_decider/speed_decider.h"
 
 namespace apollo {

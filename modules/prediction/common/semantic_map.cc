@@ -55,16 +55,20 @@ void SemanticMap::RunCurrFrame(
 
   // Draw all obstacles_history
   for (const auto obstacle_id_history_pair : obstacle_id_history_map) {
-    DrawHistory(obstacle_id_history_pair.second, cv::Scalar(0, 255, 255));
+    DrawHistory(obstacle_id_history_pair.second, cv::Scalar(0, 255, 255),
+                &curr_img_);
   }
 
-  // For disaplay
-  cv::namedWindow("Display window", cv::WINDOW_NORMAL);
-  cv::imshow("Display window", curr_img_);
+  // Crop ego_vehicle for demo
+  cv::Mat output_img =
+      CropByHistory(obstacle_id_history_map.at(-1), cv::Scalar(0, 0, 255));
+  cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
+  cv::imshow("Demo window", output_img);
   cv::waitKey();
 }
 
-void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color) {
+void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color,
+                           cv::Mat* img) {
   double obs_l = feature.length();
   double obs_w = feature.width();
   double obs_x = feature.position().x();
@@ -87,31 +91,53 @@ void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color) {
   polygon.push_back(
       GetTransPoint(obs_x + (cos(theta) * obs_l - sin(theta) * -obs_w) / 2,
                     obs_y + (sin(theta) * obs_l + cos(theta) * -obs_w) / 2));
-  cv::fillPoly(curr_img_, std::vector<std::vector<cv::Point>>({polygon}),
-               color);
+  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>({polygon}), color);
 }
 
-void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color) {
+void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color,
+                           cv::Mat* img) {
   std::vector<cv::Point> polygon;
   for (auto& polygon_point : feature.polygon_point()) {
     polygon.push_back(GetTransPoint(polygon_point.x(), polygon_point.y()));
   }
-  cv::fillPoly(curr_img_, std::vector<std::vector<cv::Point>>({polygon}),
-               color);
+  cv::fillPoly(*img, std::vector<std::vector<cv::Point>>({polygon}), color);
 }
 
 void SemanticMap::DrawHistory(const ObstacleHistory& history,
-                              const cv::Scalar& color) {
+                              const cv::Scalar& color, cv::Mat* img) {
   for (int i = history.feature_size() - 1; i >= 0; --i) {
     const Feature& feature = history.feature(i);
     double time_decay = 1.0 - curr_timestamp_ + feature.timestamp();
     cv::Scalar decay_color = color * time_decay;
     if (feature.id() == -1) {
-      DrawRect(feature, decay_color);
+      DrawRect(feature, decay_color, img);
     } else {
-      DrawPoly(feature, decay_color);
+      DrawPoly(feature, decay_color, img);
     }
   }
+}
+
+cv::Mat SemanticMap::CropArea(const cv::Mat& input_img,
+                              const cv::Point2i& center_point,
+                              const double heading) {
+  cv::Mat rotation_mat =
+      cv::getRotationMatrix2D(center_point, 90.0 - heading * 180.0 / M_PI, 1.0);
+  cv::Mat rotated_mat;
+  cv::warpAffine(input_img, rotated_mat, rotation_mat, input_img.size());
+  cv::Rect rect(center_point.x - 200, center_point.y - 300, 400, 400);
+  cv::Mat output_img;
+  cv::resize(rotated_mat(rect), output_img, cv::Size(224, 224));
+  return output_img;
+}
+
+cv::Mat SemanticMap::CropByHistory(const ObstacleHistory& history,
+                                   const cv::Scalar& color) {
+  cv::Mat feature_map = curr_img_.clone();
+  DrawHistory(history, color, &feature_map);
+  const Feature& curr_feature = history.feature(0);
+  cv::Point2i center_point =
+      GetTransPoint(curr_feature.position().x(), curr_feature.position().y());
+  return CropArea(feature_map, center_point, curr_feature.theta());
 }
 
 }  // namespace prediction

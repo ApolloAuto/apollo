@@ -15,3 +15,5 @@ cc_library(
         "@osqp",
     ],
 )
+
+cpplint()

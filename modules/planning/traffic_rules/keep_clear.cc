@@ -109,27 +109,28 @@ Status KeepClear::ApplyRule(Frame* const frame,
         // adjust pnc_junction start_s to align with
         // the start_s of other "stop type" overlaps
         double pnc_junction_start_s = pnc_junction_overlap->start_s;
-        const double kPncJunctionStartSDiffBuffer = 3.0;
         // traffic_light, stop_sign, and then crosswalk if neither
         if (traffic_light_overlap != nullptr &&
-            std::abs(pnc_junction_start_s - traffic_light_overlap->start_s) <=
-                kPncJunctionStartSDiffBuffer) {
+            std::fabs(pnc_junction_start_s - traffic_light_overlap->start_s) <=
+                config_.keep_clear().align_with_traffic_sign_tolerance()) {
           ADEBUG << "adjust pnc_junction_start_s[" << pnc_junction_start_s
                  << "] to traffic_light_start_s"
                  << traffic_light_overlap->start_s << "]";
           pnc_junction_start_s = traffic_light_overlap->start_s;
         } else if (stop_sign_overlap != nullptr &&
-                   std::abs(pnc_junction_start_s -
-                            stop_sign_overlap->start_s) <=
-                       kPncJunctionStartSDiffBuffer) {
+                   std::fabs(pnc_junction_start_s -
+                             stop_sign_overlap->start_s) <=
+                       config_.keep_clear()
+                           .align_with_traffic_sign_tolerance()) {
           ADEBUG << "adjust pnc_junction_start_s[" << pnc_junction_start_s
                  << "] to stop_sign_start_s" << stop_sign_overlap->start_s
                  << "]";
           pnc_junction_start_s = stop_sign_overlap->start_s;
         } else if (crosswalk_overlap != nullptr &&
-                   std::abs(pnc_junction_start_s -
-                            crosswalk_overlap->start_s) <=
-                       kPncJunctionStartSDiffBuffer) {
+                   std::fabs(pnc_junction_start_s -
+                             crosswalk_overlap->start_s) <=
+                       config_.keep_clear()
+                           .align_with_traffic_sign_tolerance()) {
           ADEBUG << "adjust pnc_junction_start_s[" << pnc_junction_start_s
                  << "] to cross_walk_start_s" << crosswalk_overlap->start_s
                  << "]";

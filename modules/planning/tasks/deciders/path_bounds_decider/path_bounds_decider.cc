@@ -101,9 +101,25 @@ Status PathBoundsDecider::Process(
   std::vector<LaneBorrowInfo> lane_borrow_info_list;
   if (reference_line_info->is_path_lane_borrow()) {
     // Try borrowing from left and from right neighbor lane.
-    lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
-                             LaneBorrowInfo::RIGHT_BORROW,
-                             LaneBorrowInfo::NO_BORROW};
+    switch (PlanningContext::Instance()
+                ->path_decider_info()
+                .decided_side_pass_direction()) {
+      case 0:
+        lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
+                                 LaneBorrowInfo::RIGHT_BORROW,
+                                 LaneBorrowInfo::NO_BORROW};
+        break;
+
+      case -1:
+        lane_borrow_info_list = {LaneBorrowInfo::RIGHT_BORROW,
+                                 LaneBorrowInfo::NO_BORROW};
+        break;
+
+      case 1:
+        lane_borrow_info_list = {LaneBorrowInfo::LEFT_BORROW,
+                                 LaneBorrowInfo::NO_BORROW};
+        break;
+    }
   } else {
     // Only use self-lane with no lane borrowing
     lane_borrow_info_list = {LaneBorrowInfo::NO_BORROW};
@@ -643,25 +659,6 @@ bool PathBoundsDecider::GetLaneInfoFromPoint(
           << ", heading = " << point_theta;
     return false;
   }
-  return true;
-}
-
-bool PathBoundsDecider::GetBoundaryFromRefLineOffset(
-    const ReferenceLine& reference_line, PathBound* const path_bound) {
-  // Sanity checks.
-  CHECK_NOTNULL(path_bound);
-  CHECK(!path_bound->empty());
-
-  // Go through every point on reference_line, and take care those that
-  // deviate from lane-center line considerably.
-  //  - Expand lane boundary on one side. (already done previously)
-  //  - Treat the other side as if there is an obstacle.
-  // for (size_t i = 1; i < path_bound->size(); ++i) {
-  //   double curr_s = std::get<0>((*path_bound)[i]);
-  //   double offset_to_map = 0.0;
-  //   reference_line.GetOffsetToMap(curr_s, &offset_to_map);
-
-  // }
   return true;
 }
 

@@ -209,6 +209,7 @@ Status PathAssessmentDecider::Process(
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
 
+  // TODO(jiacheng): retire the following code.
   std::vector<PathData> new_candidate_path_data;
   for (const auto& curr_path_data : valid_path_data) {
     if (!curr_path_data.Empty()) {
@@ -217,29 +218,77 @@ Status PathAssessmentDecider::Process(
   }
   reference_line_info->SetCandidatePathData(new_candidate_path_data);
 
+  // 4. Update necessary info for lane-borrow decider's future uses.
+  // Update front static obstacle's info.
   if (!(reference_line_info->GetBlockingObstacleId()).empty()) {
-    if (PlanningContext::Instance()->front_static_obstacle_cycle_counter() <
-        0) {
-      PlanningContext::Instance()->ResetFrontStaticObstacleCycleCounter();
+    if (PlanningContext::Instance()
+            ->path_decider_info()
+            .front_static_obstacle_cycle_counter() < 0) {
+      PlanningContext::Instance()
+          ->mutable_path_decider_info()
+          ->set_front_static_obstacle_cycle_counter(0);
     }
-    PlanningContext::Instance()->set_front_static_obstacle_id(
-        reference_line_info->GetBlockingObstacleId());
-    PlanningContext::Instance()->IncrementFrontStaticObstacleCycleCounter();
+    PlanningContext::Instance()
+        ->mutable_path_decider_info()
+        ->set_front_static_obstacle_id(
+            reference_line_info->GetBlockingObstacleId());
+    PlanningContext::Instance()
+        ->mutable_path_decider_info()
+        ->set_front_static_obstacle_cycle_counter(
+            std::min(PlanningContext::Instance()
+                             ->path_decider_info()
+                             .front_static_obstacle_cycle_counter() +
+                         1,
+                     10));
   } else {
-    PlanningContext::Instance()->ResetFrontStaticObstacleCycleCounter();
+    PlanningContext::Instance()
+        ->mutable_path_decider_info()
+        ->set_front_static_obstacle_cycle_counter(0);
   }
-
+  // Update self-lane usage info.
   if (reference_line_info->path_data().path_label().find("self") !=
-          std::string::npos &&
-      std::get<1>(reference_line_info->path_data()
-                      .path_point_decision_guide()
-                      .front()) == PathData::PathPointType::IN_LANE) {
-    if (PlanningContext::Instance()->able_to_use_self_lane_counter() < 0) {
-      PlanningContext::Instance()->ResetAbleToUseSelfLaneCounter();
+      std::string::npos) {
+    // && std::get<1>(reference_line_info->path_data()
+    //                 .path_point_decision_guide()
+    //                 .front()) == PathData::PathPointType::IN_LANE) {
+    if (PlanningContext::Instance()
+            ->path_decider_info()
+            .able_to_use_self_lane_counter() < 0) {
+      PlanningContext::Instance()
+          ->mutable_path_decider_info()
+          ->set_able_to_use_self_lane_counter(0);
     }
-    PlanningContext::Instance()->IncrementAbleToUseSelfLaneCounter();
+    PlanningContext::Instance()
+        ->mutable_path_decider_info()
+        ->set_able_to_use_self_lane_counter(
+            std::min(PlanningContext::Instance()
+                             ->path_decider_info()
+                             .able_to_use_self_lane_counter() +
+                         1,
+                     10));
   } else {
-    PlanningContext::Instance()->ResetAbleToUseSelfLaneCounter();
+    PlanningContext::Instance()
+        ->mutable_path_decider_info()
+        ->set_able_to_use_self_lane_counter(0);
+  }
+  // Update side-pass direction.
+  if (PlanningContext::Instance()
+          ->path_decider_info()
+          .is_in_path_lane_borrow_scenario() &&
+      PlanningContext::Instance()
+              ->path_decider_info()
+              .decided_side_pass_direction() == 0) {
+    if (reference_line_info->path_data().path_label().find("left") !=
+        std::string::npos) {
+      PlanningContext::Instance()
+          ->mutable_path_decider_info()
+          ->set_decided_side_pass_direction(1);
+    } else if (reference_line_info->path_data().path_label().find("right") !=
+               std::string::npos) {
+      PlanningContext::Instance()
+          ->mutable_path_decider_info()
+          ->set_decided_side_pass_direction(-1);
+    }
   }
 
   // Plot the path in simulator for debug purpose.
