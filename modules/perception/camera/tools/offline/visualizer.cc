@@ -370,6 +370,7 @@ bool Visualizer::reset_key() {
   show_polygon_ = true;
   show_text_ = false;
   show_help_text_ = false;
+  manual_calibration_mode_ = false;
   return true;
 }
 
@@ -662,48 +663,59 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     case 86: case 118:  // 'V' 'v'
       show_velocity_ = (show_velocity_ + 1) % 2;
       break;
-    case 65362:  // Up_Arrow
-      if (pitch_adj_degree_ + 0.05 <= max_pitch_degree_) {
+    case 1113938:  // 65362:  // Up_Arrow
+      if (manual_calibration_mode_ &&
+          pitch_adj_degree_ + 0.05 <= max_pitch_degree_) {
         pitch_adj_degree_ -= 0.05;
       }
       AINFO << "Current pitch: " << pitch_adj_degree_;
       break;
-    case 65364:  // Down_Arrow
-      if (pitch_adj_degree_ - 0.05 >= min_pitch_degree_) {
+    case 1113940:  // 65364:  // Down_Arrow
+      if (manual_calibration_mode_ &&
+          pitch_adj_degree_ - 0.05 >= min_pitch_degree_) {
         pitch_adj_degree_ += 0.05;
       }
       AINFO << "Current pitch: " << pitch_adj_degree_;
       break;
-    case 65363:  // Right_Arrow
-      if (yaw_adj_degree_ + 0.05 <= max_yaw_degree_) {
+    case 1113939:  // 65363:  // Right_Arrow
+      if (manual_calibration_mode_ &&
+          yaw_adj_degree_ + 0.05 <= max_yaw_degree_) {
         yaw_adj_degree_ -= 0.05;
       }
       AINFO << "Current yaw: " << yaw_adj_degree_;
       break;
-    case 65361:  // Left_Arrow
-      if (yaw_adj_degree_ - 0.05 >= min_yaw_degree_) {
+    case 1113937:  // Left_Arrow
+      if (manual_calibration_mode_ &&
+          yaw_adj_degree_ - 0.05 >= min_yaw_degree_) {
         yaw_adj_degree_ += 0.05;
       }
       AINFO << "Current yaw: " << yaw_adj_degree_;
       break;
-    case 130899:  // SHIFT + Right_Arrow
-      if (roll_adj_degree_ + 0.05 <= max_roll_degree_) {
+    case 1179475:  // 130899:  // SHIFT + Right_Arrow
+      if (manual_calibration_mode_ &&
+          roll_adj_degree_ + 0.05 <= max_roll_degree_) {
         roll_adj_degree_ -= 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_;
       break;
-    case 130897:  // SHIFT + Left_Arrow
-      if (roll_adj_degree_ - 0.05 >= min_roll_degree_) {
+    case 1179473:  // 130897:  // SHIFT + Left_Arrow
+      if (manual_calibration_mode_ &&
+          roll_adj_degree_ - 0.05 >= min_roll_degree_) {
         roll_adj_degree_ += 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_;
       break;
-    case 262259:  // CTRL + S
-      save_manual_calibration_parameter(camera_name, pitch_adj_degree_,
-                                        yaw_adj_degree_, roll_adj_degree_);
-      AINFO << "Saved calibration parameters(pyr): (" << pitch_adj_degree_
-            << ", " << yaw_adj_degree_ << ", " << roll_adj_degree_ << ")";
+    case 1310835:  // 262259:  // CTRL + S
+      if (manual_calibration_mode_) {
+        save_manual_calibration_parameter(camera_name, pitch_adj_degree_,
+                                          yaw_adj_degree_, roll_adj_degree_);
+        AINFO << "Saved calibration parameters(pyr): (" << pitch_adj_degree_
+              << ", " << yaw_adj_degree_ << ", " << roll_adj_degree_ << ")";
+      }
       break;
+    case 1572963:  // ALT + C
+      manual_calibration_mode_ = !manual_calibration_mode_;
+
     default:
       break;
   }
@@ -745,18 +757,27 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     if (show_verbose_) help_str_ += " (ON)";
   }
   switch (key) {
+    case 1113938:  // 65362:  // Up_Arrow
+    case 1113940:  // 65364:  // Down_Arrow
+    case 1113939:  // 65363:  // Right_Arrow
+    case 1113937:  // Left_Arrow
+    case 1179475:  // 130899:  // SHIFT + Right_Arrow
+    case 1179473:  // 130897:  // SHIFT + Left_Arrow
+    case 1310835:  // 262259:  // CTRL + S
     case 65362:   // Up_Arrow
     case 65361:   // Left_Arrow
     case 65363:   // Right_Arrow
     case 65364:   // Down_Arrow
     case 130897:  // ALT + Left_Arrow
     case 130899:  // ALT + Right_Arrow
-      adjust_angles(camera_name, pitch_adj_degree_, yaw_adj_degree_,
-                    roll_adj_degree_);
-      if (show_help_text_) {
-        help_str_ += "\nAdjusted Pitch: " + std::to_string(pitch_adj_degree_);
-        help_str_ += "\nAdjusted Yaw: " + std::to_string(yaw_adj_degree_);
-        help_str_ += "\nAdjusted Roll: " + std::to_string(roll_adj_degree_);
+      if (manual_calibration_mode_) {
+        adjust_angles(camera_name, pitch_adj_degree_, yaw_adj_degree_,
+                      roll_adj_degree_);
+        if (show_help_text_) {
+          help_str_ += "\nAdjusted Pitch: " + std::to_string(pitch_adj_degree_);
+          help_str_ += "\nAdjusted Yaw: " + std::to_string(yaw_adj_degree_);
+          help_str_ += "\nAdjusted Roll: " + std::to_string(roll_adj_degree_);
+        }
       }
   }
   return true;
@@ -1076,6 +1097,14 @@ void Visualizer::ShowResult_all_info_single_camera(
   int line_pos = 0;
   cv::Mat image = img.clone();
   std::string camera_name = frame.data_provider->sensor_name();
+  if (manual_calibration_mode_) {
+    line_pos += 50;
+    cv::putText(
+      image,
+      "Manual Calibration: Pitch(up/down) Yaw(left/right) Roll(SH+left/right)",
+      cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+      cv::Scalar(0, 0, 255), 3);
+  }
   line_pos += 50;
   cv::putText(image, camera_name, cv::Point(10, line_pos),
               cv::FONT_HERSHEY_DUPLEX, 1.3, cv::Scalar(0, 0, 255), 3);
