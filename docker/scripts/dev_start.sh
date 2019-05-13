@@ -212,7 +212,6 @@ function local_volumes() {
         Linux)
             case "$(lsb_release -r | cut -f2)" in
                 14.04)
-                    echo "Ubuntu-14.04 env"
                     volumes="${volumes} "
                     ;;
                 *)
