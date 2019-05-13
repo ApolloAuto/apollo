@@ -18,7 +18,7 @@
  * @file: st_graph_point.cc
  **/
 
-#include "modules/planning/tasks/optimizers/dp_st_speed/st_graph_point.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/st_graph_point.h"
 
 #include "modules/planning/common/planning_gflags.h"
 

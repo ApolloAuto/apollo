@@ -171,6 +171,9 @@ void MessageProcess::OnPerception(
   // Make evaluations
   EvaluatorManager::Instance()->Run();
 
+  if (FLAGS_prediction_offline_mode == 2) {
+    return;
+  }
   // Make predictions
   PredictorManager::Instance()->Run();
 

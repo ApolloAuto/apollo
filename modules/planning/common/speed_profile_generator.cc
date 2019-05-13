@@ -63,8 +63,8 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
   double total_time = FLAGS_fallback_total_time;
   const size_t num_of_knots = static_cast<size_t>(total_time / delta_t) + 1;
 
-  PiecewiseJerkSpeedProblem piecewise_jerk_problem(
-      num_of_knots, delta_t, init_s);
+  PiecewiseJerkSpeedProblem piecewise_jerk_problem(num_of_knots, delta_t,
+                                                   init_s);
 
   piecewise_jerk_problem.set_end_state_ref({10000.0, 0.0, 0.0}, end_s);
 
@@ -99,8 +99,8 @@ SpeedData SpeedProfileGenerator::GenerateFallbackSpeed(
     if (s[i] - s[i - 1] <= 0.0 || ds[i] <= 0.0) {
       break;
     }
-    speed_data.AppendSpeedPoint(s[i], delta_t * static_cast<double>(i),
-        ds[i], dds[i], (dds[i] - dds[i - 1]) / delta_t);
+    speed_data.AppendSpeedPoint(s[i], delta_t * static_cast<double>(i), ds[i],
+                                dds[i], (dds[i] - dds[i - 1]) / delta_t);
   }
   FillEnoughSpeedPoints(&speed_data);
   return speed_data;

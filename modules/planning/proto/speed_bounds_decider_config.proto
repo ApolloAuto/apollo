@@ -21,6 +21,6 @@ message SpeedBoundsDeciderConfig {
   //Rule based side pass stop
   optional double max_adc_stop_speed = 16 [default = 0.3];
   optional double max_valid_stop_distance = 17 [default = 0.5];
-  optional double approach_distance_for_lane_change = 18 [default = 50.0];
-  optional double urgent_distance_for_lane_change = 19 [default = 30.0];
+  optional double approach_distance_for_lane_change = 18 [default = 80.0];
+  optional double urgent_distance_for_lane_change = 19 [default = 50.0];
 }

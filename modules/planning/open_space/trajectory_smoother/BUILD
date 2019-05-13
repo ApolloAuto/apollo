@@ -98,8 +98,8 @@ cc_library(
     ],
     deps = [
         ":distance_approach_ipopt_cuda_interface",
-        ":distance_approach_ipopt_interface",
         ":distance_approach_ipopt_fixed_ts_interface",
+        ":distance_approach_ipopt_interface",
         "//cyber/common:log",
         "//modules/common/util",
         "//modules/planning/common:planning_gflags",

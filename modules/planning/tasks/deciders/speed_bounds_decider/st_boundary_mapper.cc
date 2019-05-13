@@ -419,21 +419,19 @@ Status STBoundaryMapper::MapWithDecision(
 bool STBoundaryMapper::CheckOverlap(const PathPoint& path_point,
                                     const Box2d& obs_box,
                                     const double buffer) const {
-  Vec2d ego_center_map_frame(
-      (vehicle_param_.front_edge_to_center() -
-       vehicle_param_.back_edge_to_center()) *
-          0.5,
-      (vehicle_param_.left_edge_to_center() -
-       vehicle_param_.right_edge_to_center()) *
-          0.5);
+  Vec2d ego_center_map_frame((vehicle_param_.front_edge_to_center() -
+                              vehicle_param_.back_edge_to_center()) *
+                                 0.5,
+                             (vehicle_param_.left_edge_to_center() -
+                              vehicle_param_.right_edge_to_center()) *
+                                 0.5);
 
   ego_center_map_frame.SelfRotate(path_point.theta());
   ego_center_map_frame.set_x(ego_center_map_frame.x() + path_point.x());
   ego_center_map_frame.set_y(ego_center_map_frame.y() + path_point.y());
 
   Box2d adc_box(ego_center_map_frame, path_point.theta(),
-                vehicle_param_.length(),
-                vehicle_param_.width());
+                vehicle_param_.length(), vehicle_param_.width());
   return obs_box.HasOverlap(adc_box);
 }
 
