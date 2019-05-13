@@ -23,12 +23,12 @@
 #include <vector>
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/path/path_data.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/common/util/common.h"
+#include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_limit_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/st_boundary_mapper.h"
 
@@ -72,11 +72,10 @@ Status SpeedBoundsDecider::Process(
   }
 
   // 2. Map obstacles into st graph
-  StBoundaryMapper boundary_mapper(adc_sl_boundary, speed_bounds_config_,
+  STBoundaryMapper boundary_mapper(adc_sl_boundary, speed_bounds_config_,
                                    reference_line, path_data,
                                    speed_bounds_config_.total_path_length(),
-                                   speed_bounds_config_.total_time(),
-                                   reference_line_info_->IsChangeLanePath());
+                                   speed_bounds_config_.total_time());
 
   path_decision->EraseStBoundaries();
   if (boundary_mapper.CreateStBoundary(path_decision).code() ==
@@ -145,7 +144,7 @@ void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
     // Check if the target lane is blocked or not
     if (reference_line_info.IsChangeLanePath()) {
       is_clear_to_change_lane_ =
-          ChangeLaneDecider::IsClearToChangeLane(&reference_line_info);
+          LaneChangeDecider::IsClearToChangeLane(&reference_line_info);
       continue;
     }
     // If it's not in lane-change scenario or target lane is not blocked, skip
@@ -181,10 +180,8 @@ void SpeedBoundsDecider::CheckLaneChangeUrgency(Frame *const frame) {
       util::BuildStopDecision(
           stop_wall_id, sl_point.s(),
           speed_bounds_config_.urgent_distance_for_lane_change(),
-          StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY,
-          wait_for_obstacles,
-          "SpeedBoundsDecider",
-          frame, &reference_line_info);
+          StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY, wait_for_obstacles,
+          "SpeedBoundsDecider", frame, &reference_line_info);
     }
   }
 }
@@ -200,11 +197,8 @@ void SpeedBoundsDecider::AddPathEndStop(
     util::BuildStopDecision(
         stop_wall_id,
         reference_line_info->path_data().frenet_frame_path().back().s() - 5.0,
-        0.0,
-        StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY,
-        wait_for_obstacles,
-        "SpeedBoundsDecider",
-        frame, reference_line_info);
+        0.0, StopReasonCode::STOP_REASON_LANE_CHANGE_URGENCY,
+        wait_for_obstacles, "SpeedBoundsDecider", frame, reference_line_info);
   }
 }
 
@@ -277,7 +271,7 @@ void SpeedBoundsDecider::StopOnSidePass(
     if (CheckADCStop(*reference_line_info,
                      side_pass_info.change_lane_stop_path_point)) {
       ADEBUG << "ADV Stopped due to change lane in side pass";
-      if (ChangeLaneDecider::IsClearToChangeLane(reference_line_info)) {
+      if (LaneChangeDecider::IsClearToChangeLane(reference_line_info)) {
         ADEBUG << "Environment clear for ADC to change lane in side pass";
         mutable_side_pass_info->check_clear_flag = true;
       } else {
@@ -397,12 +391,10 @@ bool SpeedBoundsDecider::BuildSidePassStopFence(
 
   // TODO(Jinyun) move to confs
   constexpr double stop_buffer = 0.25;
-  util::BuildStopDecision(
-      stop_wall_id, stop_point_s - stop_buffer, 0.0,
-      StopReasonCode::STOP_REASON_SIDEPASS_SAFETY,
-      wait_for_obstacles,
-      "SpeedBoundsDecider",
-      frame, reference_line_info);
+  util::BuildStopDecision(stop_wall_id, stop_point_s - stop_buffer, 0.0,
+                          StopReasonCode::STOP_REASON_SIDEPASS_SAFETY,
+                          wait_for_obstacles, "SpeedBoundsDecider", frame,
+                          reference_line_info);
 
   return true;
 }

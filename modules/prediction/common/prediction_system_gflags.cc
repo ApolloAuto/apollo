@@ -49,10 +49,12 @@ DEFINE_string(
     "will use the listen to published ros topic mode.");
 DEFINE_int32(prediction_offline_mode, 0,
              "0: online mode, no dump file"
-             "1: dump feature proto to feature.x.bin"
-             "2: dump data for learning to datalearn.x.bin"
-             "3: dump predicted trajectory to predict_result.x.bin");
-DEFINE_bool(enable_multi_thread, false, "If enable multi-thread.");
+             "1: dump feature proto to feature.*.bin"
+             "2: dump data for learning to datalearn.*.bin"
+             "3: dump predicted trajectory to predict_result.*.bin"
+             "4: dump frame environment info to frame_env.*.bin"
+             "5: dump data for tuning to datatuning.*.bin");
+DEFINE_bool(enable_multi_thread, true, "If enable multi-thread.");
 DEFINE_int32(max_thread_num, 8, "Maximal number of threads.");
 
 // Bag replay timestamp gap

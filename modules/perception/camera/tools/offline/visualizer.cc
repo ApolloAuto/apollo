@@ -825,8 +825,7 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     cv::line(world_image_, world_point_to_bigimg(p4), world_point_to_bigimg(p1),
              color, 2);
     cv::line(world_image_, world_point_to_bigimg(pos_2d),
-             world_point_to_bigimg(v_2d),
-             color, 2);
+             world_point_to_bigimg(v_2d), color, 2);
   }
   last_timestamp_ = frame.timestamp;
   camera_image_[frame.data_provider->sensor_name()] = image;
@@ -1114,7 +1113,7 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
               cv::Scalar(0, 0, 255), 3);
   line_pos += 50;
   cv::putText(image,
-             "pitch rate: " + std::to_string(motion_buffer->back().pitch_rate),
+              "pitch rate: " + std::to_string(motion_buffer->back().pitch_rate),
               cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
               cv::Scalar(0, 0, 255), 3);
   line_pos += 50;
@@ -1131,8 +1130,7 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   for (const auto &object : frame.tracked_objects) {
     if (object->b_cipv) {
       line_pos += 50;
-      cv::putText(image,
-                  "CIPV: " + std::to_string(object->track_id),
+      cv::putText(image, "CIPV: " + std::to_string(object->track_id),
                   cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
                   cv::Scalar(0, 0, 255), 3);
     }

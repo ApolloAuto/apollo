@@ -29,9 +29,6 @@ bool TriggerBase::Init(const SmartRecordTrigger& trigger_conf) {
     AERROR << "failed to lock trigger " << GetTriggerName();
     return false;
   }
-  for (const auto& iter : trigger_obj_->wanted_channel_types()) {
-    InsertChannelType(iter.first, iter.second);
-  }
   return true;
 }
 
@@ -45,18 +42,23 @@ void TriggerBase::LockTrigger(const SmartRecordTrigger& trigger_conf) {
 }
 
 void TriggerBase::TriggerIt(const uint64_t msg_time) const {
-  const uint64_t backword_time =
-      trigger_obj_->backward_time() < 0 || trigger_obj_->backward_time() > 60
-          ? 0
-          : static_cast<uint64_t>(trigger_obj_->backward_time() * 1000000000UL);
-  const uint64_t forward_time =
-      trigger_obj_->forward_time() < 0 || trigger_obj_->forward_time() > 60
-          ? 0
-          : static_cast<uint64_t>(trigger_obj_->forward_time() * 1000000000UL);
-  const uint64_t begin_time = msg_time - backword_time;
-  const uint64_t end_time = msg_time + forward_time;
-  IntervalPool::Instance()->AddInterval(begin_time, end_time,
-                                        channels_types_map_);
+  constexpr float kMaxBackwardTime = 30.0, kMaxForwardTime = 10.0;
+  const uint64_t backword_time = static_cast<uint64_t>(
+      (trigger_obj_->backward_time() < 0.0
+           ? 0.0
+           : trigger_obj_->backward_time() > kMaxBackwardTime
+                 ? kMaxBackwardTime
+                 : trigger_obj_->backward_time()) *
+      1000000000UL);
+  const uint64_t forward_time = static_cast<uint64_t>(
+      (trigger_obj_->forward_time() < 0.0
+           ? 0.0
+           : trigger_obj_->forward_time() > kMaxForwardTime
+                 ? kMaxForwardTime
+                 : trigger_obj_->forward_time()) *
+      1000000000UL);
+  IntervalPool::Instance()->AddInterval(msg_time - backword_time,
+                                        msg_time + forward_time);
 }
 
 }  // namespace data

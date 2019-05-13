@@ -325,7 +325,7 @@ void CNNSegmentation::GetObjectsFromSppEngine(
   AINFO << "Use origin cloud and copy height";
   for (std::size_t i = 0; i < lidar_frame_ref_->roi_indices.indices.size();
        ++i) {
-    const int& roi_id = lidar_frame_ref_->roi_indices.indices[i];
+    const int roi_id = lidar_frame_ref_->roi_indices.indices[i];
     original_cloud_->mutable_points_height()->at(roi_id) =
         roi_cloud_->points_height(i);
     if (roi_cloud_->mutable_points_label()->at(i) ==

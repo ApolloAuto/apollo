@@ -55,7 +55,7 @@ bool LaneCameraPerception::Init(const CameraPerceptionInitOptions &options) {
   lane_calibration_working_sensor_name_ =
       options.lane_calibration_working_sensor_name;
 
-  // InitLane
+  // Init lane
   base::BaseCameraModelPtr model;
   InitLane(work_root, model, perception_param_);
 
@@ -71,7 +71,7 @@ void LaneCameraPerception::InitLane(
   // Init lane
   CHECK(perception_param.has_lane_param()) << "Failed to include lane_param";
   {
-    //  initialize lane detector
+    // Initialize lane detector
     auto lane_param = perception_param.lane_param();
     CHECK(lane_param.has_lane_detector_param())
         << "Failed to include lane_detector_param";
@@ -89,13 +89,13 @@ void LaneCameraPerception::InitLane(
     name_intrinsic_map_.insert(std::pair<std::string, Eigen::Matrix3f>(
         lane_detector_param.camera_name(), pinhole->get_intrinsic_params()));
     lane_detector_init_options.base_camera_model = model;
-    AINFO << "lane_detector_name: " << lane_detector_plugin_param.name();
+    AINFO << "lane detector name: " << lane_detector_plugin_param.name();
     lane_detector_.reset(BaseLaneDetectorRegisterer::GetInstanceByName(
         lane_detector_plugin_param.name()));
     CHECK(lane_detector_ != nullptr);
     CHECK(lane_detector_->Init(lane_detector_init_options))
         << "Failed to init " << lane_detector_plugin_param.name();
-    AINFO << "detector: " << lane_detector_->Name();
+    AINFO << "Detector: " << lane_detector_->Name();
 
     //  initialize lane postprocessor
     auto lane_postprocessor_param =
@@ -115,7 +115,7 @@ void LaneCameraPerception::InitLane(
     CHECK(lane_postprocessor_ != nullptr);
     CHECK(lane_postprocessor_->Init(postprocessor_init_options))
         << "Failed to init " << lane_postprocessor_param.name();
-    AINFO << "lane_postprocessor: " << lane_postprocessor_->Name();
+    AINFO << "Lane postprocessor: " << lane_postprocessor_->Name();
 
     // Init output file folder
     if (perception_param_.has_debug_param() &&
@@ -159,7 +159,7 @@ void LaneCameraPerception::InitCalibrationService(
     CHECK(calibration_service_ != nullptr);
     CHECK(calibration_service_->Init(calibration_service_init_options))
         << "Failed to init " << calibration_service_param.plugin_param().name();
-    AINFO << "calibration_service:: " << calibration_service_->Name();
+    AINFO << "Calibration service: " << calibration_service_->Name();
   }
 }
 
@@ -193,7 +193,7 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
 
   CHECK(frame->calibration_service != nullptr);
 
-  //  lane detector and postprocessor: work on front_6mm only
+  // Lane detector and postprocessor: work on front_6mm only
   if (lane_calibration_working_sensor_name_ ==
       frame->data_provider->sensor_name()) {
     frame->camera_k_matrix =
@@ -214,12 +214,12 @@ bool LaneCameraPerception::Perception(const CameraPerceptionOptions &options,
     PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
         frame->data_provider->sensor_name(), "LanePostprocessor2D");
 
-    // calibration service
+    // Calibration service
     frame->calibration_service->Update(frame);
     PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(
         frame->data_provider->sensor_name(), "CalibrationService");
 
-    if (!(lane_postprocessor_->Process3D(lane_postprocessor_options, frame))) {
+    if (!lane_postprocessor_->Process3D(lane_postprocessor_options, frame)) {
       AERROR << "Failed to postprocess lane 3D.";
       return false;
     }

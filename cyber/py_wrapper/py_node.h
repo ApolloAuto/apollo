@@ -70,11 +70,11 @@ class PyWriter {
         data_type_(type),
         qos_depth_(qos_depth),
         node_(node) {
-    std::string proto_desc("");
+    std::string proto_desc;
     message::ProtobufFactory::Instance()->GetDescriptorString(type,
                                                               &proto_desc);
     if (proto_desc.empty()) {
-      AWARN << "cpp cann't find proto_desc msgtyp->" << data_type_;
+      AWARN << "cpp can't find proto_desc msgtype->" << data_type_;
       return;
     }
     proto::RoleAttributes role_attr;

@@ -21,9 +21,15 @@
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/container/container_manager.h"
+#include "modules/prediction/container/pose/pose_container.h"
 
 namespace apollo {
 namespace prediction {
+
+using apollo::common::adapter::AdapterConfig;
+using apollo::perception::PerceptionObstacle;
+using apollo::perception::PerceptionObstacles;
 
 void PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
@@ -44,7 +50,7 @@ void PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   if (FLAGS_prediction_offline_mode == 2) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
                                          "pedestrian", nullptr);
-    ADEBUG << "Save extracted features for learning locally.";
+    ADEBUG << "Saving extracted features for learning locally.";
     return;
   }
   // TODO(jiacheng): once the model is trained, implement this online part.
@@ -54,10 +60,30 @@ bool PedestrianInteractionEvaluator::ExtractFeatures(
     const Obstacle* obstacle_ptr, std::vector<double>* feature_values) {
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
-  // int id = obstacle_ptr->id();
+  CHECK_NOTNULL(feature_values);
 
   // Extract obstacle related features.
-  // TODO(all): implement this.
+  double timestamp = obstacle_ptr->latest_feature().timestamp();
+  int id = obstacle_ptr->latest_feature().id();
+  double pos_x = obstacle_ptr->latest_feature().position().x();
+  double pos_y = obstacle_ptr->latest_feature().position().y();
+  auto ptr_ego_pose_container =
+      ContainerManager::Instance()->GetContainer<PoseContainer>(
+          AdapterConfig::LOCALIZATION);
+  CHECK_NOTNULL(ptr_ego_pose_container);
+  const PerceptionObstacle* ptr_ego_vehicle =
+      ptr_ego_pose_container->ToPerceptionObstacle();
+  double adc_x = ptr_ego_vehicle->position().x();
+  double adc_y = ptr_ego_vehicle->position().y();
+
+  // Insert it into the feature_values.
+  feature_values->push_back(timestamp);
+  feature_values->push_back(id * 1.0);
+  feature_values->push_back(pos_x);
+  feature_values->push_back(pos_y);
+  feature_values->push_back(adc_x);
+  feature_values->push_back(adc_y);
+
   return true;
 }
 

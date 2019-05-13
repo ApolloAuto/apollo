@@ -20,9 +20,12 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/container_manager.h"
@@ -239,16 +242,28 @@ double InteractionPredictor::ComputeTrajectoryCost(const Obstacle& obstacle,
   CHECK_GT(obstacle.history_size(), 0);
   double speed = obstacle.latest_feature().speed();
   double total_cost = 0.0;
+
   double lon_acc_cost = LongitudinalAccelerationCost(acceleration);
   total_cost += FLAGS_longitudinal_acceleration_cost_weight * lon_acc_cost;
+
   double centri_acc_cost =
       CentripetalAccelerationCost(lane_sequence, speed, acceleration);
   total_cost += FLAGS_centripedal_acceleration_cost_weight * centri_acc_cost;
+
+  double collision_cost = 0.0;
   if (LowerRightOfWayThanEgo(obstacle, lane_sequence)) {
-    double collision_cost =
+    collision_cost =
         CollisionWithEgoVehicleCost(lane_sequence, speed, acceleration);
-    total_cost += FLAGS_collision_cost_weight * collision_cost;
   }
+  total_cost += FLAGS_collision_cost_weight * collision_cost;
+
+  if (FLAGS_prediction_offline_mode == 5) {
+    std::vector<double> cost_values = {lon_acc_cost, centri_acc_cost,
+                                       collision_cost};
+    FeatureOutput::InsertDataForTuning(
+        obstacle.latest_feature(), cost_values, "interaction", lane_sequence);
+  }
+
   return total_cost;
 }
 

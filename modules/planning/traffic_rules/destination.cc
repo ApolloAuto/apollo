@@ -18,19 +18,19 @@
  * @file
  **/
 #include <algorithm>
+#include <vector>
 
 #include "modules/planning/traffic_rules/destination.h"
 
-#include "modules/common/time/time.h"
 #include "modules/map/proto/map_lane.pb.h"
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/common/util/common.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::Status;
-using apollo::common::time::Clock;
 using apollo::hdmap::HDMapUtil;
 
 Destination::Destination(const TrafficRuleConfig& config)
@@ -41,25 +41,7 @@ Status Destination::ApplyRule(Frame* frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!frame->is_near_destination()) {
-    return Status::OK();
-  }
-
-  const auto& routing = frame->local_view().routing;
-
-  common::SLPoint dest_sl;
-  const auto& ref_line = reference_line_info->reference_line();
-  const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
-  ref_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()}, &dest_sl);
-  const auto& adc_sl = reference_line_info->AdcSlBoundary();
-  const auto& dest =
-      PlanningContext::Instance()->mutable_planning_status()->destination();
-  if (adc_sl.start_s() > dest_sl.s() && !dest.has_passed_destination()) {
-    ADEBUG << "Destination at back, but we have not reached destination yet";
-    return Status::OK();
-  }
-
-  BuildStopDecision(frame, reference_line_info);
+  MakeDecisions(frame, reference_line_info);
 
   return Status::OK();
 }
@@ -67,10 +49,14 @@ Status Destination::ApplyRule(Frame* frame,
 /**
  * @brief: build stop decision
  */
-int Destination::BuildStopDecision(
-    Frame* frame, ReferenceLineInfo* const reference_line_info) {
+int Destination::MakeDecisions(Frame* frame,
+                               ReferenceLineInfo* const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
+
+  if (!frame->is_near_destination()) {
+    return 0;
+  }
 
   const auto& routing = frame->local_view().routing;
   if (routing->routing_request().waypoint_size() < 2) {
@@ -78,15 +64,39 @@ int Destination::BuildStopDecision(
     return -1;
   }
 
+  common::SLPoint dest_sl;
+  const auto& reference_line = reference_line_info->reference_line();
+  const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
+  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
+                        &dest_sl);
+  const auto& adc_sl = reference_line_info->AdcSlBoundary();
+  const auto& dest =
+      PlanningContext::Instance()->mutable_planning_status()->destination();
+  if (adc_sl.start_s() > dest_sl.s() && !dest.has_passed_destination()) {
+    ADEBUG << "Destination at back, but we have not reached destination yet";
+    return 0;
+  }
+
+  double dest_lane_s =
+      std::fmax(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
+                         config_.destination().stop_distance());
+
+  /* TODO(all): remove once new impl of pull-over is done
   const auto* planning_status =
       PlanningContext::Instance()->mutable_planning_status();
-  const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
-  double dest_lane_s =
-      std::max(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
-                        config_.destination().stop_distance());
-
   if (planning_status->pull_over().status() == PullOverStatus::DISABLED) {
-    Stop(frame, reference_line_info, routing_end.id(), dest_lane_s);
+    // build stop decision
+    ADEBUG << "BuildStopDecision: destination";
+    std::string stop_wall_id = FLAGS_destination_obstacle_id;
+    const std::vector<std::string> wait_for_obstacle_ids;
+    util::BuildStopDecision(stop_wall_id,
+                            routing_end.id(),
+                            dest_lane_s,
+                            config_.destination().stop_distance(),
+                            StopReasonCode::STOP_REASON_DESTINATION,
+                            wait_for_obstacle_ids,
+                            TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                            frame, reference_line_info);
     ADEBUG << "destination: STOP at current lane. PULL-OVER disabled";
     return 0;
   }
@@ -103,60 +113,32 @@ int Destination::BuildStopDecision(
       ADEBUG << "destination: PULL OVER";
     }
   } else {
-    Stop(frame, reference_line_info, routing_end.id(), dest_lane_s);
+    // build stop decision
+    ADEBUG << "BuildStopDecision: destination";
+    std::string stop_wall_id = FLAGS_destination_obstacle_id;
+    const std::vector<std::string> wait_for_obstacle_ids;
+    util::BuildStopDecision(stop_wall_id,
+                            routing_end.id(),
+                            dest_lane_s,
+                            config_.destination().stop_distance(),
+                            StopReasonCode::STOP_REASON_DESTINATION,
+                            wait_for_obstacle_ids,
+                            TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                            frame, reference_line_info);
     ADEBUG << "destination: STOP at current lane";
   }
-
-  return 0;
-}
-
-/**
- * @brief: build on-lane stop decision upon arriving at destination
- */
-int Destination::Stop(Frame* const frame,
-                      ReferenceLineInfo* const reference_line_info,
-                      const std::string lane_id, const double lane_s) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-
-  const auto& reference_line = reference_line_info->reference_line();
-
-  // create virtual stop wall
-  std::string stop_wall_id = FLAGS_destination_obstacle_id;
-  auto* obstacle = frame->CreateStopObstacle(stop_wall_id, lane_id, lane_s);
-  if (!obstacle) {
-    AERROR << "Failed to create obstacle [" << stop_wall_id << "]";
-    return -1;
-  }
-
-  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
-  if (!stop_wall) {
-    AERROR << "Failed to create obstacle for: " << stop_wall_id;
-    return -1;
-  }
+  */
 
   // build stop decision
-  const auto stop_wall_box = stop_wall->PerceptionBoundingBox();
-  if (!reference_line.IsOnLane(stop_wall_box.center())) {
-    ADEBUG << "destination point is not on lane";
-    return 0;
-  }
-  auto stop_point = reference_line.GetReferencePoint(
-      stop_wall->PerceptionSLBoundary().start_s() -
-      config_.destination().stop_distance());
-
-  ObjectDecisionType stop;
-  auto stop_decision = stop.mutable_stop();
-  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_DESTINATION);
-  stop_decision->set_distance_s(-config_.destination().stop_distance());
-  stop_decision->set_stop_heading(stop_point.heading());
-  stop_decision->mutable_stop_point()->set_x(stop_point.x());
-  stop_decision->mutable_stop_point()->set_y(stop_point.y());
-  stop_decision->mutable_stop_point()->set_z(0.0);
-
-  auto* path_decision = reference_line_info->path_decision();
-  path_decision->AddLongitudinalDecision(
-      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
+  ADEBUG << "BuildStopDecision: destination";
+  std::string stop_wall_id = FLAGS_destination_obstacle_id;
+  const std::vector<std::string> wait_for_obstacle_ids;
+  util::BuildStopDecision(stop_wall_id, routing_end.id(), dest_lane_s,
+                          config_.destination().stop_distance(),
+                          StopReasonCode::STOP_REASON_DESTINATION,
+                          wait_for_obstacle_ids,
+                          TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                          frame, reference_line_info);
 
   return 0;
 }
@@ -164,6 +146,7 @@ int Destination::Stop(Frame* const frame,
 /**
  * @brief: check if adc will pull-over upon arriving destination
  */
+/* TODO(all): remove once new impl of pull-over is done
 bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
                                 const std::string& dest_lane_id,
                                 const double dest_lane_s,
@@ -231,10 +214,12 @@ bool Destination::CheckPullOver(ReferenceLineInfo* const reference_line_info,
 
   return true;
 }
+*/
 
 /**
  * @brief: build pull-over decision upon arriving at destination
  */
+/* TODO(all): remove once new impl of pull-over is done
 int Destination::PullOver(common::PointENU* const dest_point) {
   auto* planning_status =
       PlanningContext::Instance()->mutable_planning_status();
@@ -254,6 +239,7 @@ int Destination::PullOver(common::PointENU* const dest_point) {
 
   return 0;
 }
+*/
 
 }  // namespace planning
 }  // namespace apollo

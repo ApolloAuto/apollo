@@ -76,7 +76,7 @@ class DistanceApproachInterface : public Ipopt::TNLP {
   /** Method to return the constraint residuals */
   virtual bool eval_g(int n, const double* x, bool new_x, int m, double* g) = 0;
 
-  /** Check unfeasible constraints for futher study**/
+  /** Check unfeasible constraints for further study**/
   virtual bool check_g(int n, const double* x, int m, const double* g) = 0;
 
   /** Method to return:

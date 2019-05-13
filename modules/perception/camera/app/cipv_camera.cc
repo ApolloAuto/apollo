@@ -37,7 +37,8 @@ bool Cipv::Init(const Eigen::Matrix3d &homography_im2car,
                 const float average_frame_rate, const bool image_based_cipv,
                 const int debug_devel) {
   b_image_based_cipv_ = image_based_cipv;
-  debug_level_ = debug_devel;  // 0: no debug message
+  debug_level_ =
+      debug_devel;  // 0: no debug message
                     // 1: minimal output
                     // 2: some important output
                     // 3: verbose message
@@ -176,7 +177,6 @@ float Cipv::VehicleDynamics(const uint32_t tick, const float yaw_rate,
   // TODO(techoe): Apply bicycle model for vehicle dynamics (need wheel base)
   // float theta = time_unit_ * yaw_rate;
   // float displacement = time_unit_ * velocity;
-
 
   // Eigen::Rotation2Df rot2d(theta);
   // Eigen::Vector2f trans;
@@ -509,32 +509,28 @@ bool Cipv::AreDistancesSane(const float distance_start_point_to_right_lane,
   if (distance_start_point_to_right_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
       AINFO << "distance from start to right lane("
-            << distance_start_point_to_right_lane
-            << " m) is too long";
+            << distance_start_point_to_right_lane << " m) is too long";
     }
     return false;
   }
   if (distance_start_point_to_left_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
       AINFO << "distance from start to left lane("
-            << distance_start_point_to_left_lane
-            << " m) is too long";
+            << distance_start_point_to_left_lane << " m) is too long";
     }
     return false;
   }
   if (distance_end_point_to_right_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
       AINFO << "distance from end to right lane("
-            << distance_end_point_to_right_lane
-            << " m) is too long";
+            << distance_end_point_to_right_lane << " m) is too long";
     }
     return false;
   }
   if (distance_end_point_to_left_lane > kMaxDistObjectToLaneInMeter) {
     if (debug_level_ >= 1) {
       AINFO << "distance from end to left lane("
-            << distance_end_point_to_left_lane
-            << " m) is too long";
+            << distance_end_point_to_left_lane << " m) is too long";
     }
     return false;
   }
@@ -662,10 +658,10 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
       AINFO << "[Left] closest_index: " << closest_index
             << ", shortest_distance: " << shortest_distance;
     }
-    if (IsPointLeftOfLine(
+    if (!IsPointLeftOfLine(
             closted_object_edge.end_point,
             egolane_ground.left_line.line_point[closest_index],
-            egolane_ground.left_line.line_point[closest_index + 1]) == false) {
+            egolane_ground.left_line.line_point[closest_index + 1])) {
       b_left_lane_clear = true;
     }
   }

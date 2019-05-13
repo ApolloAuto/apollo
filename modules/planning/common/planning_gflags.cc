@@ -226,6 +226,8 @@ DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
+DEFINE_bool(enable_alwasy_stop_for_pedestrian, true,
+            "True to always STOP for pedestrian when path cross");
 
 DEFINE_bool(enable_side_radar, false,
             "If there is no radar on the side,ignore it");
@@ -355,7 +357,7 @@ DEFINE_uint32(num_sample_follow_per_timestamp, 3,
 DEFINE_double(weight_lon_objective, 10.0, "Weight of longitudinal travel cost");
 DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 5.0,
-              "Weight of logitudinal collision cost");
+              "Weight of longitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
 DEFINE_double(weight_centripetal_acceleration, 1.5,
@@ -374,7 +376,7 @@ DEFINE_double(lon_collision_yield_buffer, 1.0,
 DEFINE_double(lon_collision_overtake_buffer, 5.0,
               "Longitudinal collision buffer for overtake");
 DEFINE_double(lon_collision_cost_std, 0.5,
-              "The standard deviation of logitudinal collision cost function");
+              "The standard deviation of longitudinal collision cost function");
 DEFINE_double(default_lon_buffer, 5.0,
               "Default longitudinal buffer to sample path-time points.");
 DEFINE_double(time_min_density, 1.0,
@@ -469,6 +471,28 @@ DEFINE_bool(
     enable_smoother_failsafe, false,
     "whether to use warm start result as final output when smoother fails");
 
+DEFINE_bool(use_s_curve_speed_smooth, false,
+            "Whether use s-curve (piecewise_jerk) for smoothing Hybrid Astar "
+            "speed/acceleration.");
+
+// pull-over
+DEFINE_double(destination_to_adc_buffer, 10.0,
+              "If the destination is within this distance from ADC, "
+              "then don't search for pull-over position.");
+
+DEFINE_double(destination_to_pathend_buffer, 10.0,
+              "If the destination is within this distance to path-end, "
+              "then don't search for pull-over position. Wait until "
+              "destination gets closer.");
+
+DEFINE_double(pull_over_road_edge_buffer, 0.15,
+              "If the available path boundary's edge is not within this "
+              "distance from the road edge, then this position is not "
+              "qualified for being a pull-over position.");
+DEFINE_bool(
+    enable_parallel_trajectory_smoothing, false,
+    "Whether to partition the trajectory first and do smoothing in parallel");
+
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
@@ -492,7 +516,7 @@ DEFINE_double(rss_max_front_obstacle_distance, 3000.0,
               "(unit: meter) for max front obstacle distance.");
 
 DEFINE_bool(
-    enable_planning_smoother, true,
+    enable_planning_smoother, false,
     "True to enable planning smoother among different planning cycles.");
 DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
@@ -531,11 +555,11 @@ DEFINE_bool(enable_nonscenario_side_pass, false,
 DEFINE_bool(enable_soft_speed_limit, false,
             "True to set soft speed limit guided by path optimization result");
 
-DEFINE_bool(enable_dp_reference_speed, false,
+DEFINE_bool(enable_dp_reference_speed, true,
             "True to penalize dp result towards default cruise speed");
 
 DEFINE_double(message_latency_threshold, 0.02, "Threshold for message delay");
-DEFINE_bool(enable_lane_change_urgency_checking, false,
+DEFINE_bool(enable_lane_change_urgency_checking, true,
             "True to check the urgency of lane changing");
 DEFINE_double(short_path_length_threshold, 20.0,
               "Threshold for too short path length");

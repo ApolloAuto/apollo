@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/prediction/common:environment_features",
         "//modules/prediction/common:feature_output",
+        "//modules/prediction/common:prediction_constants",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
     ],

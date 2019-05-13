@@ -249,7 +249,6 @@ bool CosThetaReferenceLineSmoother::GenerateRefPointProfile(
     }
     dxs.push_back(x_delta);
     dys.push_back(y_delta);
-    // y_over_x_first_derivatives.push_back(y_delta / x_delta);
   }
 
   // Heading calculation
@@ -282,19 +281,19 @@ bool CosThetaReferenceLineSmoother::GenerateRefPointProfile(
     double yds = 0.0;
     if (i == 0) {
       xds = (xy_points[i + 1].x() - xy_points[i].x()) /
-            (accumulated_s[i + 1] / accumulated_s[i]);
+            (accumulated_s[i + 1] - accumulated_s[i]);
       yds = (xy_points[i + 1].y() - xy_points[i].y()) /
-            (accumulated_s[i + 1] / accumulated_s[i]);
+            (accumulated_s[i + 1] - accumulated_s[i]);
     } else if (i == points_size - 1) {
       xds = (xy_points[i].x() - xy_points[i - 1].x()) /
-            (accumulated_s[i] / accumulated_s[i - 1]);
+            (accumulated_s[i] - accumulated_s[i - 1]);
       yds = (xy_points[i].y() - xy_points[i - 1].y()) /
-            (accumulated_s[i] / accumulated_s[i - 1]);
+            (accumulated_s[i] - accumulated_s[i - 1]);
     } else {
       xds = (xy_points[i + 1].x() - xy_points[i - 1].x()) /
-            (accumulated_s[i + 1] / accumulated_s[i - 1]);
+            (accumulated_s[i + 1] - accumulated_s[i - 1]);
       yds = (xy_points[i + 1].y() - xy_points[i - 1].y()) /
-            (accumulated_s[i + 1] / accumulated_s[i - 1]);
+            (accumulated_s[i + 1] - accumulated_s[i - 1]);
     }
     x_over_s_first_derivatives.push_back(xds);
     y_over_s_first_derivatives.push_back(yds);
@@ -308,24 +307,24 @@ bool CosThetaReferenceLineSmoother::GenerateRefPointProfile(
     if (i == 0) {
       xdds =
           (x_over_s_first_derivatives[i + 1] - x_over_s_first_derivatives[i]) /
-          (accumulated_s[i + 1] / accumulated_s[i]);
+          (accumulated_s[i + 1] - accumulated_s[i]);
       ydds =
           (y_over_s_first_derivatives[i + 1] - y_over_s_first_derivatives[i]) /
-          (accumulated_s[i + 1] / accumulated_s[i]);
+          (accumulated_s[i + 1] - accumulated_s[i]);
     } else if (i == points_size - 1) {
       xdds =
           (x_over_s_first_derivatives[i] - x_over_s_first_derivatives[i - 1]) /
-          (accumulated_s[i] / accumulated_s[i - 1]);
+          (accumulated_s[i] - accumulated_s[i - 1]);
       ydds =
           (y_over_s_first_derivatives[i] - y_over_s_first_derivatives[i - 1]) /
-          (accumulated_s[i] / accumulated_s[i - 1]);
+          (accumulated_s[i] - accumulated_s[i - 1]);
     } else {
       xdds = (x_over_s_first_derivatives[i + 1] -
               x_over_s_first_derivatives[i - 1]) /
-             (accumulated_s[i + 1] / accumulated_s[i - 1]);
+             (accumulated_s[i + 1] - accumulated_s[i - 1]);
       ydds = (y_over_s_first_derivatives[i + 1] -
               y_over_s_first_derivatives[i - 1]) /
-             (accumulated_s[i + 1] / accumulated_s[i - 1]);
+             (accumulated_s[i + 1] - accumulated_s[i - 1]);
     }
     x_over_s_second_derivatives.push_back(xdds);
     y_over_s_second_derivatives.push_back(ydds);
@@ -336,8 +335,9 @@ bool CosThetaReferenceLineSmoother::GenerateRefPointProfile(
     double yds = y_over_s_first_derivatives[i];
     double xdds = x_over_s_second_derivatives[i];
     double ydds = y_over_s_second_derivatives[i];
-    double kappa = (xds * ydds - yds * xdds) /
-                   (std::sqrt(xds * xds + yds * yds) * (xds * xds + yds * yds));
+    double kappa =
+        (xds * ydds - yds * xdds) /
+        (std::sqrt(xds * xds + yds * yds) * (xds * xds + yds * yds) + 1e-6);
     kappas.push_back(kappa);
   }
 

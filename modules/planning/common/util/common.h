@@ -26,16 +26,20 @@ namespace apollo {
 namespace planning {
 namespace util {
 
-
-int BuildStopDecision(const std::string& stop_wall_id,
-                      const double stop_line_s,
+int BuildStopDecision(const std::string& stop_wall_id, const double stop_line_s,
                       const double stop_distance,
                       const StopReasonCode& stop_reason_code,
                       const std::vector<std::string>& wait_for_obstacles,
-                      const std::string& decision_tag,
-                      Frame* const frame,
+                      const std::string& decision_tag, Frame* const frame,
                       ReferenceLineInfo* const reference_line_info);
 
+int BuildStopDecision(const std::string& stop_wall_id,
+                      const std::string& lane_id, const double lane_s,
+                      const double stop_distance,
+                      const StopReasonCode& stop_reason_code,
+                      const std::vector<std::string>& wait_for_obstacles,
+                      const std::string& decision_tag, Frame* const frame,
+                      ReferenceLineInfo* const reference_line_info);
 }  // namespace util
 }  // namespace planning
 }  // namespace apollo

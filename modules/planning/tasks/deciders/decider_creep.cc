@@ -89,13 +89,11 @@ Status DeciderCreep::Process(Frame* frame,
     const double creep_stop_s =
         stop_line_s + FindCreepDistance(*frame, *reference_line_info);
     const std::vector<std::string> wait_for_obstacles;
-    util::BuildStopDecision(virtual_obstacle_id,
-                            creep_stop_s,
+    util::BuildStopDecision(virtual_obstacle_id, creep_stop_s,
                             config_.decider_creep_config().stop_distance(),
                             StopReasonCode::STOP_REASON_CREEPER,
-                            wait_for_obstacles,
-                            "DeciderCreep",
-                            frame, reference_line_info);
+                            wait_for_obstacles, "DeciderCreep", frame,
+                            reference_line_info);
   }
 
   return Status::OK();
