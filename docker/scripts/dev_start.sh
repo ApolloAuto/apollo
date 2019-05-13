@@ -210,8 +210,16 @@ function local_volumes() {
              -v $HOME/.cache:${DOCKER_HOME}/.cache"
     case "$(uname -s)" in
         Linux)
-            volumes="${volumes} -v /dev:/dev \
-                                -v /media:/media \
+            case "$(lsb_release -r | cut -f2)" in
+                14.04)
+                    echo "Ubuntu-14.04 env"
+                    volumes="${volumes} "
+                    ;;
+                *)
+                    volumes="${volumes} -v /dev:/dev "
+                    ;;
+            esac
+            volumes="${volumes} -v /media:/media \
                                 -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
                                 -v /etc/localtime:/etc/localtime:ro \
                                 -v /usr/src:/usr/src \
