@@ -41,17 +41,15 @@ class SemanticMap {
                        static_cast<int>(2000 - (y - curr_base_y_) / 0.1));
   }
 
-  void DrawRect(const Feature& feature,
-                const cv::Scalar& color, cv::Mat* img);
+  void DrawRect(const Feature& feature, const cv::Scalar& color, cv::Mat* img);
 
-  void DrawPoly(const Feature& feature,
-                const cv::Scalar& color, cv::Mat* img);
+  void DrawPoly(const Feature& feature, const cv::Scalar& color, cv::Mat* img);
 
-  void DrawHistory(const ObstacleHistory& history,
-                   const cv::Scalar& color, cv::Mat* img);
+  void DrawHistory(const ObstacleHistory& history, const cv::Scalar& color,
+                   cv::Mat* img);
 
-  cv::Mat CropArea(const cv::Mat& input_img,
-                   const cv::Point2i& center_point, const double heading);
+  cv::Mat CropArea(const cv::Mat& input_img, const cv::Point2i& center_point,
+                   const double heading);
 
   cv::Mat CropByHistory(const ObstacleHistory& history,
                         const cv::Scalar& color);

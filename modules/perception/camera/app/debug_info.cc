@@ -295,7 +295,7 @@ int WriteCalibrationOutput(bool enabled, const std::string &out_path,
   float pitch_angle = 0.f;
   float camera_ground_height = 0.f;
   if (!frame->calibration_service->QueryCameraToGroundHeightAndPitchAngle(
-      &camera_ground_height, &pitch_angle)) {
+          &camera_ground_height, &pitch_angle)) {
     AERROR << "Failed to query camera to ground height and pitch.";
     return -1;
   }

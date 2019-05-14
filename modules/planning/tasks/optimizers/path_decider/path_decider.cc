@@ -113,8 +113,9 @@ bool PathDecider::MakeStaticObstacleDecision(
     }
     // - add STOP decision for blocking obstacles.
     if (obstacle->Id() == blocking_obstacle_id &&
-        !PlanningContext::Instance()->path_decider_info().
-            is_in_path_lane_borrow_scenario()) {
+        !PlanningContext::Instance()
+             ->path_decider_info()
+             .is_in_path_lane_borrow_scenario()) {
       // Add stop decision
       ADEBUG << "Blocking obstacle = " << blocking_obstacle_id;
       ObjectDecisionType object_decision;
