@@ -147,6 +147,11 @@ void EvaluatorManager::Init(const PredictionConf& config) {
         << cyclist_on_lane_evaluator_ << "]";
   AINFO << "Defined default on lane obstacle evaluator ["
         << default_on_lane_evaluator_ << "]";
+
+  if (FLAGS_enable_semantic_map) {
+    SemanticMap::Instance()->Init();
+    AINFO << "Init SemanticMap instance.";
+  }
 }
 
 Evaluator* EvaluatorManager::GetEvaluator(
@@ -161,7 +166,7 @@ void EvaluatorManager::Run() {
           AdapterConfig::PERCEPTION_OBSTACLES);
   CHECK_NOTNULL(obstacles_container);
 
-  if (FLAGS_enable_build_current_frame_env) {
+  if (FLAGS_enable_semantic_map) {
     BuildObstacleIdHistoryMap();
     SemanticMap::Instance()->RunCurrFrame(obstacle_id_history_map_);
     if (FLAGS_prediction_offline_mode == 4) {
