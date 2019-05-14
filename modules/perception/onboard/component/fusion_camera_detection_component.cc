@@ -243,8 +243,8 @@ bool FusionCameraDetectionComponent::Init() {
 
   if (enable_cipv_) {
     cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-               average_frame_rate_, image_based_cipv_, debug_level_);
+      average_lane_width_in_meter_, max_vehicle_width_in_meter_,
+      average_frame_rate_, image_based_cipv_, debug_level_);
   }
 
   if (enable_visualization_) {
@@ -686,6 +686,8 @@ int FusionCameraDetectionComponent::InternalProc(
     prefused_message->error_code_ = *error_code;
     return cyber::FAIL;
   }
+  Eigen::Affine3d world2camera = camera2world_trans.inverse();
+
   prefused_message->frame_->sensor2world_pose = camera2world_trans;
 
   // Fill camera frame
@@ -773,7 +775,7 @@ int FusionCameraDetectionComponent::InternalProc(
       }
       ADEBUG << "[CIPV] velocity " << cipv_options.velocity
              << ", yaw rate: " << cipv_options.yaw_rate;
-      cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options,
+      cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options, world2camera,
                           &camera_frame.tracked_objects);
 
       // TODO(techoe): Activate CollectDrops after test
@@ -811,7 +813,7 @@ int FusionCameraDetectionComponent::InternalProc(
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
       visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
-                                                   motion_buffer_);
+                                                 motion_buffer_, world2camera);
     }
   }
 
