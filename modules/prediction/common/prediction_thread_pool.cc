@@ -20,7 +20,7 @@ namespace apollo {
 namespace prediction {
 
 thread_local int PredictionThreadPool::s_thread_pool_level = 0;
-std::vector<int> BaseThreadPool::THREAD_POOL_CAPACITY = {10, 10, 10};
+std::vector<int> BaseThreadPool::THREAD_POOL_CAPACITY = {20, 20, 20};
 
 BaseThreadPool::BaseThreadPool(int thread_num, int next_thread_pool_level)
     : stopped_(false) {

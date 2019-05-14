@@ -172,12 +172,6 @@ bool Frame::CreateReferenceLineInfo(
     ++segments_iter;
   }
 
-  if (FLAGS_enable_change_lane_decider &&
-      !change_lane_decider_.Apply(&reference_line_info_)) {
-    AERROR << "Failed to apply change lane decider";
-    return false;
-  }
-
   if (reference_line_info_.size() == 2) {
     common::math::Vec2d xy_point(vehicle_state_.x(), vehicle_state_.y());
     common::SLPoint first_sl;
@@ -329,7 +323,7 @@ Status Frame::Init(
     const std::list<ReferenceLine> &reference_lines,
     const std::list<hdmap::RouteSegments> &segments,
     const std::vector<routing::LaneWaypoint> &future_route_waypoints) {
-  // TODO(QiL): refactor this to avoid redudant nullptr checks in scenarios.
+  // TODO(QiL): refactor this to avoid redundant nullptr checks in scenarios.
   auto status = InitFrameData();
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();

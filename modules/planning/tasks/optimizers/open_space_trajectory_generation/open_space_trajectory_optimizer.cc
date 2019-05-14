@@ -185,8 +185,14 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
     ADEBUG << "Distance approach problem solved successfully!";
   } else {
     ADEBUG << "Distance approach problem failed to solve";
-    return Status(ErrorCode::PLANNING_ERROR,
-                  "Distance approach problem failed to solve");
+    if (FLAGS_enable_smoother_failsafe) {
+      UseWarmStartAsResult(xWS, uWS, l_warm_up, n_warm_up, &state_result_ds,
+                           &control_result_ds, &time_result_ds,
+                           &dual_l_result_ds, &dual_n_result_ds);
+    } else {
+      return Status(ErrorCode::PLANNING_ERROR,
+                    "Distance approach problem failed to solve");
+    }
   }
 
   // record debug info
@@ -426,6 +432,28 @@ void OpenSpaceTrajectoryOptimizer::LoadTrajectory(
     optimized_trajectory_.emplace_back(point);
     last_path_point = cur_path_point;
   }
+}
+
+void OpenSpaceTrajectoryOptimizer::UseWarmStartAsResult(
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+    Eigen::MatrixXd* state_result_ds, Eigen::MatrixXd* control_result_ds,
+    Eigen::MatrixXd* time_result_ds, Eigen::MatrixXd* dual_l_result_ds,
+    Eigen::MatrixXd* dual_n_result_ds) {
+  AERROR << "Use warm start as trajectory output";
+
+  *state_result_ds = xWS;
+  *control_result_ds = uWS;
+  *dual_l_result_ds = l_warm_up;
+  *dual_n_result_ds = n_warm_up;
+
+  control_result_ds->conservativeResize(control_result_ds->rows(),
+                                        control_result_ds->cols() + 1);
+  control_result_ds->col(control_result_ds->cols() - 1) << 0.0, 0.0;
+
+  size_t time_result_horizon = xWS.cols();
+  *time_result_ds = Eigen::MatrixXd::Constant(
+      1, time_result_horizon, config_.planner_open_space_config().delta_t());
 }
 
 }  // namespace planning

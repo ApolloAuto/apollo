@@ -90,8 +90,8 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   // check on wait-time
   auto start_time = GetContext()->stop_start_time;
   const double wait_time = Clock::NowInSeconds() - start_time;
-  ADEBUG << "stop_start_time[" << start_time
-         << "] wait_time[" << wait_time << "]";
+  ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
+         << "]";
   if (wait_time < scenario_config_.stop_duration_sec()) {
     return Stage::RUNNING;
   }
@@ -129,7 +129,8 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
   for (const auto& perception_obstacle_id : watch_vehicle_ids) {
-    PlanningContext::Instance()->mutable_planning_status()
+    PlanningContext::Instance()
+        ->mutable_planning_status()
         ->mutable_stop_sign()
         ->add_wait_for_obstacle_id(perception_obstacle_id);
   }
@@ -191,8 +192,8 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
       const PerceptionObstacle* perception_obstacle =
           path_decision.FindPerceptionObstacle(perception_obstacle_id);
       if (!perception_obstacle) {
-        ADEBUG << "mark ERASE obstacle_id["
-               << perception_obstacle_id << "] not exist";
+        ADEBUG << "mark ERASE obstacle_id[" << perception_obstacle_id
+               << "] not exist";
         remove_vehicles.push_back(perception_obstacle_id);
         continue;
       }
@@ -236,11 +237,13 @@ Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   // update PlanningContext
-  PlanningContext::Instance()->mutable_planning_status()
+  PlanningContext::Instance()
+      ->mutable_planning_status()
       ->mutable_stop_sign()
       ->set_done_stop_sign_overlap_id(
           GetContext()->current_stop_sign_overlap_id);
-  PlanningContext::Instance()->mutable_planning_status()
+  PlanningContext::Instance()
+      ->mutable_planning_status()
       ->mutable_stop_sign()
       ->clear_wait_for_obstacle_id();
 

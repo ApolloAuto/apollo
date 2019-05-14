@@ -62,8 +62,7 @@ std::map<base::TLColor, TLInfo> s_tl_infos = {
 static int GetGpuId(
     const apollo::perception::camera::CameraPerceptionInitOptions& options) {
   apollo::perception::camera::app::TrafficLightParam trafficlight_param;
-  std::string work_root = "";
-  apollo::perception::camera::GetCyberWorkRoot(&work_root);
+  std::string work_root = apollo::perception::camera::GetCyberWorkRoot();
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);

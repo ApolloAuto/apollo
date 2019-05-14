@@ -25,6 +25,7 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
+#include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 #include "modules/perception/camera/app/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
@@ -37,7 +38,6 @@
 #include "modules/perception/proto/motion_service.pb.h"
 #include "modules/perception/proto/perception_camera.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
-#include "modules/perception/camera/app/cipv_camera.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
@@ -195,6 +195,7 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
   const int motion_buffer_size_ = 100;
 
   // // variables for CIPV
+  bool enable_cipv_ = false;
   Cipv cipv_;
   float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
   float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;

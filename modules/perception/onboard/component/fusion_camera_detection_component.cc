@@ -47,8 +47,7 @@ static void fill_lane_msg(const base::LaneLineCubicCurve &curve_coord,
 
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
-  std::string work_root = "";
-  camera::GetCyberWorkRoot(&work_root);
+  std::string work_root = camera::GetCyberWorkRoot();
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
@@ -242,9 +241,11 @@ bool FusionCameraDetectionComponent::Init() {
   homography_im2car_ = visualize_.homography_im2car();
   camera_obstacle_pipeline_->SetIm2CarHomography(homography_im2car_);
 
-  cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
-    average_lane_width_in_meter_, max_vehicle_width_in_meter_,
-    image_based_cipv_, debug_level_);
+  if (enable_cipv_) {
+    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
+               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
+               average_frame_rate_, image_based_cipv_, debug_level_);
+  }
 
   if (enable_visualization_) {
     if (write_visual_img_) {
@@ -389,18 +390,19 @@ int FusionCameraDetectionComponent::InitConfig() {
   write_visual_img_ = fusion_camera_detection_param.write_visual_img();
 
   min_laneline_length_for_cipv_ = static_cast<float>(
-    fusion_camera_detection_param.min_laneline_length_for_cipv());
+      fusion_camera_detection_param.min_laneline_length_for_cipv());
   average_lane_width_in_meter_ = static_cast<float>(
-    fusion_camera_detection_param.average_lane_width_in_meter());
+      fusion_camera_detection_param.average_lane_width_in_meter());
   max_vehicle_width_in_meter_ = static_cast<float>(
-    fusion_camera_detection_param.max_vehicle_width_in_meter());
-  average_frame_rate_ = static_cast<float>(
-    fusion_camera_detection_param.average_frame_rate());
+      fusion_camera_detection_param.max_vehicle_width_in_meter());
+  average_frame_rate_ =
+      static_cast<float>(fusion_camera_detection_param.average_frame_rate());
 
-  image_based_cipv_ = static_cast<float>(
-    fusion_camera_detection_param.image_based_cipv());
+  image_based_cipv_ =
+      static_cast<float>(fusion_camera_detection_param.image_based_cipv());
 
   debug_level_ = static_cast<int>(fusion_camera_detection_param.debug_level());
+  enable_cipv_ = fusion_camera_detection_param.enable_cipv();
 
   std::string format_str = R"(
       FusionCameraDetectionComponent InitConfig success
@@ -757,30 +759,32 @@ int FusionCameraDetectionComponent::InternalProc(
         prefused_message->frame_->camera_frame_supplement.image_blob.get());
   }
 
-//  Determine CIPV
-  CipvOptions cipv_options;
-  if (motion_buffer_ != nullptr) {
-    if (motion_buffer_->size() == 0) {
-      AWARN << "motion_buffer_ is empty";
-      cipv_options.velocity = 5.0f;
-      cipv_options.yaw_rate = 0.0f;
-    } else {
-      cipv_options.velocity = motion_buffer_->back().velocity;
-      cipv_options.yaw_rate = motion_buffer_->back().yaw_rate;
-    }
-    ADEBUG << "[CIPV] velocity " << cipv_options.velocity
-          << ", yaw rate: " << cipv_options.yaw_rate;
-    cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options,
-      &camera_frame.tracked_objects);
+  //  Determine CIPV
+  if (enable_cipv_) {
+    CipvOptions cipv_options;
+    if (motion_buffer_ != nullptr) {
+      if (motion_buffer_->size() == 0) {
+        AWARN << "motion_buffer_ is empty";
+        cipv_options.velocity = 5.0f;
+        cipv_options.yaw_rate = 0.0f;
+      } else {
+        cipv_options.velocity = motion_buffer_->back().velocity;
+        cipv_options.yaw_rate = motion_buffer_->back().yaw_rate;
+      }
+      ADEBUG << "[CIPV] velocity " << cipv_options.velocity
+             << ", yaw rate: " << cipv_options.yaw_rate;
+      cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options,
+                          &camera_frame.tracked_objects);
 
-    // TODO(techoe): Activate CollectDrops after test
-    // // Get Drop points
-    // // motion_buffer_ = motion_service_->GetMotionBuffer();
-    // if (motion_buffer_->size() > 0) {
-    //  cipv_.CollectDrops(motion_buffer_, &camera_frame.tracked_objects);
-    // } else {
-    //   AWARN << "motion_buffer is empty";
-    // }
+      // TODO(techoe): Activate CollectDrops after test
+      // // Get Drop points
+      // // motion_buffer_ = motion_service_->GetMotionBuffer();
+      // if (motion_buffer_->size() > 0) {
+      //  cipv_.CollectDrops(motion_buffer_, &camera_frame.tracked_objects);
+      // } else {
+      //   AWARN << "motion_buffer is empty";
+      // }
+    }
   }
 
   // Send msg for visualization
@@ -806,8 +810,8 @@ int FusionCameraDetectionComponent::InternalProc(
       camera_frame.data_provider->GetImage(image_options, &out_image);
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image,
-        camera_frame, motion_buffer_);
+      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                   motion_buffer_);
     }
   }
 

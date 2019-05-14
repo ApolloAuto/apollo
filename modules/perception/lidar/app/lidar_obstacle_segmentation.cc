@@ -91,10 +91,9 @@ LidarProcessResult LidarObstacleSegmentation::Process(
       options.sensor2novatel_extrinsics;
   if (cloud_preprocessor_.Preprocess(preprocessor_options, frame)) {
     return ProcessCommon(options, frame);
-  } else {
-    return LidarProcessResult(LidarErrorCode::PointCloudPreprocessorError,
-                              "Failed to preprocess point cloud.");
   }
+  return LidarProcessResult(LidarErrorCode::PointCloudPreprocessorError,
+                            "Failed to preprocess point cloud.");
 }
 
 LidarProcessResult LidarObstacleSegmentation::Process(
@@ -109,14 +108,12 @@ LidarProcessResult LidarObstacleSegmentation::Process(
   PointCloudPreprocessorOptions preprocessor_options;
   preprocessor_options.sensor2novatel_extrinsics =
       options.sensor2novatel_extrinsics;
+  PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "preprocess");
   if (cloud_preprocessor_.Preprocess(preprocessor_options, message, frame)) {
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "preprocess");
     return ProcessCommon(options, frame);
-  } else {
-    PERCEPTION_PERF_BLOCK_END_WITH_INDICATOR(sensor_name, "preprocess");
-    return LidarProcessResult(LidarErrorCode::PointCloudPreprocessorError,
-                              "Failed to preprocess point cloud.");
   }
+  return LidarProcessResult(LidarErrorCode::PointCloudPreprocessorError,
+                            "Failed to preprocess point cloud.");
 }
 
 LidarProcessResult LidarObstacleSegmentation::ProcessCommon(

@@ -429,7 +429,7 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     ADEBUG << "obstacle [" << obstacle->Id() << "] is NOT lane blocking.";
   }
 
-  if (IsUnrelaventObstacle(mutable_obstacle)) {
+  if (IsIrrelevantObstacle(*mutable_obstacle)) {
     ObjectDecisionType ignore;
     ignore.mutable_ignore();
     path_decision_.AddLateralDecision("reference_line_filter", obstacle->Id(),
@@ -477,18 +477,18 @@ bool ReferenceLineInfo::AddObstacles(
   return true;
 }
 
-bool ReferenceLineInfo::IsUnrelaventObstacle(const Obstacle* obstacle) {
-  if (obstacle->IsCautionLevelObstacle()) {
+bool ReferenceLineInfo::IsIrrelevantObstacle(const Obstacle& obstacle) {
+  if (obstacle.IsCautionLevelObstacle()) {
     return false;
   }
   // if adc is on the road, and obstacle behind adc, ignore
-  if (obstacle->PerceptionSLBoundary().end_s() > reference_line_.Length()) {
+  const auto& obstacle_boundary = obstacle.PerceptionSLBoundary();
+  if (obstacle_boundary.end_s() > reference_line_.Length()) {
     return true;
   }
   if (is_on_reference_line_ &&
-      obstacle->PerceptionSLBoundary().end_s() <
-          sl_boundary_info_.adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnLane(obstacle->PerceptionSLBoundary())) {
+      obstacle_boundary.end_s() < sl_boundary_info_.adc_sl_boundary_.end_s() &&
+      reference_line_.IsOnLane(obstacle_boundary)) {
     return true;
   }
   return false;

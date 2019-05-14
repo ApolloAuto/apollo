@@ -241,7 +241,7 @@ class OfflineLidarObstaclePerception {
         type = "nonMot";
       }
 
-      double yaw = atan2(object->direction[1], object->direction[0]);
+      double yaw = atan2(object->direction(1), object->direction(0));
       auto& object_cloud = object->lidar_supplement.cloud;
 
       fout << type << " " << object->center(0) << " " << object->center(1)

@@ -118,6 +118,7 @@ cc_library(
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math:curve_math",
         "//modules/planning/proto:planning_proto",
+        "@adolc",
         "@eigen",
         "@ipopt",
     ],

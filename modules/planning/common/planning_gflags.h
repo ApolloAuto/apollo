@@ -114,6 +114,7 @@ DECLARE_double(st_max_t);
 // Decision Part
 DECLARE_bool(enable_nudge_decision);
 DECLARE_bool(enable_nudge_slowdown);
+DECLARE_bool(enable_alwasy_stop_for_pedestrian);
 DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(min_stop_distance_obstacle);
@@ -231,10 +232,17 @@ DECLARE_double(open_space_planning_period);
 DECLARE_double(open_space_prediction_time_horizon);
 DECLARE_bool(enable_perception_obstacles);
 DECLARE_bool(enable_open_space_planner_thread);
-DECLARE_bool(open_space_planner_switchable);
 DECLARE_bool(use_dual_variable_warm_start);
 DECLARE_bool(use_gear_shift_trajectory);
 DECLARE_uint32(open_space_trajectory_stitching_preserved_length);
+DECLARE_bool(enable_smoother_failsafe);
+DECLARE_bool(use_s_curve_speed_smooth);
+DECLARE_bool(enable_parallel_trajectory_smoothing);
+
+// pull-over
+DECLARE_double(destination_to_adc_buffer);
+DECLARE_double(destination_to_pathend_buffer);
+DECLARE_double(pull_over_road_edge_buffer);
 
 DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
@@ -270,8 +278,10 @@ DECLARE_bool(enable_cuda);
 
 DECLARE_bool(enable_nonscenario_side_pass);
 DECLARE_bool(enable_soft_speed_limit);
+DECLARE_bool(enable_dp_reference_speed);
 
 DECLARE_double(message_latency_threshold);
 DECLARE_bool(enable_lane_change_urgency_checking);
+DECLARE_double(short_path_length_threshold);
 
 DECLARE_uint32(trajectory_stitching_preserved_length);

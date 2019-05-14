@@ -66,12 +66,12 @@ class StopSignUnprotectedScenario : public Scenario {
   static void RegisterStages();
   bool GetScenarioConfig();
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
+
+ private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
-
- private:
   bool init_ = false;
   StopSignUnprotectedContext context_;
 };

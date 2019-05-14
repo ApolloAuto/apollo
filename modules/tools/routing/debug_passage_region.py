@@ -51,7 +51,7 @@ def plot_region(region, color):
 
 
 def plot_lane_change(lane_change, passage_regions):
-    """Plot lane change infomation"""
+    """Plot lane change information"""
     st_idx = lane_change.start_passage_region_index
     ed_idx = lane_change.end_passage_region_index
     from_pt = get_center_of_passage_region(passage_regions[st_idx])

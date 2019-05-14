@@ -125,15 +125,13 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   // n5 : dual multipier associated with car shape, obstacles_num*4 * (N+1)
   miu_horizon_ = obstacles_num_ * 4 * (horizon_ + 1);
   ADEBUG << "miu_horizon_: " << miu_horizon_;
+
   // m1 : dynamics constatins
   int m1 = 4 * horizon_;
-
   // m2 : control rate constraints (only steering)
   int m2 = horizon_;
-
   // m3 : sampling time equality constraints
   int m3 = horizon_;
-
   // m4 : obstacle constraints
   int m4 = 4 * obstacles_num_ * (horizon_ + 1);
 
@@ -148,20 +146,20 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   m = num_of_constraints_;
   ADEBUG << "num_of_constraints_ " << num_of_constraints_;
 
-  generate_tapes(n, m, &nnz_h_lag);
-  // // number of nonzero in Jacobian.
-  int tmp = 0;
-  for (int i = 0; i < horizon_ + 1; ++i) {
-    for (int j = 0; j < obstacles_num_; ++j) {
-      int current_edges_num = obstacles_edges_num_(j, 0);
-      tmp += current_edges_num * 4 + 9 + 4;
-    }
-  }
-  nnz_jac_g = 24 * horizon_ + 3 * horizon_ + 2 * horizon_ + tmp - 1 +
-              (num_of_variables_ - (horizon_ + 1) + 2);
+  generate_tapes(n, m, &nnz_jac_g, &nnz_h_lag);
+  // TODO(Jinyun): evaluate original problem formulation
+  // number of nonzero in Jacobian.
+  // int tmp = 0;
+  // for (int i = 0; i < horizon_ + 1; ++i) {
+  //   for (int j = 0; j < obstacles_num_; ++j) {
+  //     int current_edges_num = obstacles_edges_num_(j, 0);
+  //     tmp += current_edges_num * 4 + 9 + 4;
+  //   }
+  // }
+  // nnz_jac_g = 24 * horizon_ + 3 * horizon_ + 2 * horizon_ + tmp - 1 +
+  //             (num_of_variables_ - (horizon_ + 1) + 2);
 
   index_style = IndexStyleEnum::C_STYLE;
-  ADEBUG << "get_nlp_info out";
   return true;
 }
 
@@ -455,7 +453,22 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                                                 bool new_x, int m, int nele_jac,
                                                 int* iRow, int* jCol,
                                                 double* values) {
-  return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
+  if (values == nullptr) {
+    // return the structure of the jacobian
+    for (int idx = 0; idx < nnz_jac; idx++) {
+      iRow[idx] = rind_g[idx];
+      jCol[idx] = cind_g[idx];
+    }
+  } else {
+    // return the values of the jacobian of the constraints
+    sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval,
+               options_g);
+    for (int idx = 0; idx < nnz_jac; idx++) {
+      values[idx] = jacval[idx];
+    }
+  }
+  return true;
+  // return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
 }
 
 bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
@@ -1115,7 +1128,7 @@ bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
         Eigen::MatrixXd bj =
             obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
-        // TODO(QiL) : Remove redudant calculation
+        // TODO(QiL) : Remove redundant calculation
         double tmp1 = 0;
         double tmp2 = 0;
         for (int k = 0; k < current_edges_num; ++k) {
@@ -1327,12 +1340,17 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
     Ipopt::IpoptCalculatedQuantities* ip_cq) {
-  ADEBUG << "finalize_solution";
   int state_index = state_start_index_;
   int control_index = control_start_index_;
   int time_index = time_start_index_;
   int dual_l_index = l_start_index_;
   int dual_n_index = n_start_index_;
+
+  // enable_constraint_check_: for debug only
+  if (enable_constraint_check_) {
+    ADEBUG << "final resolution constraint checking";
+    check_g(n, x, m, g);
+  }
   // 1. state variables, 4 * [0, horizon]
   // 2. control variables, 2 * [0, horizon_-1]
   // 3. sampling time variables, 1 * [0, horizon_]
@@ -1377,11 +1395,12 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   }
   // memory deallocation of ADOL-C variables
   delete[] obj_lam;
+  free(rind_g);
+  free(cind_g);
   free(rind_L);
   free(cind_L);
+  free(jacval);
   free(hessval);
-
-  ADEBUG << "finalize_solution done!";
 }
 
 void DistanceApproachIPOPTInterface::get_optimization_results(
@@ -1407,7 +1426,6 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   }
 
   // 2. control variable initialization, 2 * horizon_
-  // CHECK_EQ(control_result_.cols(), uWS_.cols());
   CHECK_EQ(control_result_.rows(), uWS_.rows());
   double control_diff_max = 0.0;
   for (int i = 0; i < horizon_; ++i) {
@@ -1449,8 +1467,7 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
 
 //***************    start ADOL-C part ***********************************
 template <class T>
-bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
-  ADEBUG << "eval_obj";
+void DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
   // Objective is :
   // min control inputs
   // min input rate
@@ -1517,15 +1534,11 @@ bool DistanceApproachIPOPTInterface::eval_obj(int n, const T* x, T* obj_value) {
     *obj_value += first_order_penalty + second_order_penalty;
     time_index++;
   }
-
-  ADEBUG << "objective value after this iteration : " << *obj_value;
-  return true;
 }
 
 template <class T>
-bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
+void DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
                                                       T* g) {
-  ADEBUG << "eval_constraints";
   // state start index
   int state_index = state_start_index_;
 
@@ -1540,8 +1553,6 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
   // // 1. state constraints 4 * [0, horizons-1]
   for (int i = 0; i < horizon_; ++i) {
     // x1
-    // TODO(QiL) : optimize and remove redundant calculation in next
-    // iteration.
     g[constraint_index] =
         x[state_index + 4] -
         (x[state_index] +
@@ -1551,6 +1562,20 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
              cos(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
                                           x[state_index + 3] *
                                           tan(x[control_index]) / wheelbase_));
+    // TODO(Jinyun): evaluate performance of different models
+    // g[constraint_index] =
+    //     x[state_index + 4] -
+    //     (x[state_index] +
+    //      ts_ * x[time_index] * x[state_index + 3] * cos(x[state_index + 2]));
+    // g[constraint_index] =
+    //     x[state_index + 4] -
+    //     ((xWS_(0, i) + ts_ * xWS_(3, i) * cos(xWS_(2, i))) +
+    //      (x[state_index] - xWS_(0, i)) +
+    //      (xWS_(3, i) * cos(xWS_(2, i))) * (ts_ * x[time_index] - ts_) +
+    //      (ts_ * cos(xWS_(2, i))) * (x[state_index + 3] - xWS_(3, i)) +
+    //      (-ts_ * xWS_(3, i) * sin(xWS_(2, i))) *
+    //          (x[state_index + 2] - xWS_(2, i)));
+
     // x2
     g[constraint_index + 1] =
         x[state_index + 5] -
@@ -1561,6 +1586,18 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
              sin(x[state_index + 2] + ts_ * x[time_index] * 0.5 *
                                           x[state_index + 3] *
                                           tan(x[control_index]) / wheelbase_));
+    // g[constraint_index + 1] =
+    //     x[state_index + 5] -
+    //     (x[state_index + 1] +
+    //      ts_ * x[time_index] * x[state_index + 3] * sin(x[state_index + 2]));
+    // g[constraint_index + 1] =
+    //     x[state_index + 5] -
+    //     ((xWS_(1, i) + ts_ * xWS_(3, i) * sin(xWS_(2, i))) +
+    //      (x[state_index + 1] - xWS_(1, i)) +
+    //      (xWS_(3, i) * sin(xWS_(2, i))) * (ts_ * x[time_index] - ts_) +
+    //      (ts_ * sin(xWS_(2, i))) * (x[state_index + 3] - xWS_(3, i)) +
+    //      (ts_ * xWS_(3, i) * cos(xWS_(2, i))) *
+    //          (x[state_index + 2] - xWS_(2, i)));
 
     // x3
     g[constraint_index + 2] =
@@ -1570,11 +1607,32 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
              (x[state_index + 3] +
               ts_ * x[time_index] * 0.5 * x[control_index + 1]) *
              tan(x[control_index]) / wheelbase_);
+    // g[constraint_index + 2] =
+    //     x[state_index + 6] -
+    //     (x[state_index + 2] + ts_ * x[time_index] * x[state_index + 3] *
+    //                               tan(x[control_index]) / wheelbase_);
+    // g[constraint_index + 2] =
+    //     x[state_index + 6] -
+    //     ((xWS_(2, i) + ts_ * xWS_(3, i) * tan(uWS_(0, i)) / wheelbase_) +
+    //      (x[state_index + 2] - xWS_(2, i)) +
+    //      (xWS_(3, i) * tan(uWS_(0, i)) / wheelbase_) *
+    //          (ts_ * x[time_index] - ts_) +
+    //      (ts_ * tan(uWS_(0, i)) / wheelbase_) *
+    //          (x[state_index + 3] - xWS_(3, i)) +
+    //      (ts_ * xWS_(3, i) / cos(uWS_(0, i)) / cos(uWS_(0, i)) / wheelbase_)
+    //      *
+    //          (x[control_index] - uWS_(0, i)));
 
     // x4
     g[constraint_index + 3] =
         x[state_index + 7] -
         (x[state_index + 3] + ts_ * x[time_index] * x[control_index + 1]);
+    // g[constraint_index + 3] =
+    //     x[state_index + 7] -
+    //     ((xWS_(3, i) + ts_ * uWS_(1, i)) + (x[state_index + 3] - xWS_(3, i))
+    //     +
+    //      uWS_(1, i) * (ts_ * x[time_index] - ts_) +
+    //      ts_ * (x[control_index + 1] - uWS_(1, i)));
 
     control_index += 2;
     constraint_index += 4;
@@ -1736,12 +1794,10 @@ bool DistanceApproachIPOPTInterface::eval_constraints(int n, const T* x, int m,
     constraint_index++;
     n_index++;
   }
-
-  return true;
 }
 
 bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
-                                             double* g) {
+                                             const double* g) {
   int kN = n;
   int kM = m;
   double x_u_tmp[kN];
@@ -1751,7 +1807,7 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
 
   get_bounds_info(n, x_l_tmp, x_u_tmp, m, g_l_tmp, g_u_tmp);
 
-  double delta_v = 1e-4;
+  const double delta_v = 1e-4;
   for (int idx = 0; idx < n; ++idx) {
     x_u_tmp[idx] = x_u_tmp[idx] + delta_v;
     x_l_tmp[idx] = x_l_tmp[idx] - delta_v;
@@ -1795,6 +1851,8 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
   // miu_horizon_
   int m11 = m10 + miu_horizon_;
 
+  CHECK_EQ(m11, num_of_constraints_);
+
   AINFO << "dynamics constatins to: " << m1;
   AINFO << "control rate constraints (only steering) to: " << m2;
   AINFO << "sampling time equality constraints to: " << m3;
@@ -1806,7 +1864,7 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
   AINFO << "time interval constraints to: " << m9;
   AINFO << "lambda constraints to: " << m10;
   AINFO << "miu constraints to: " << m11;
-  AINFO << "total variables: " << num_of_variables_;
+  AINFO << "total constraints: " << num_of_constraints_;
 
   for (int idx = 0; idx < m; ++idx) {
     if (g[idx] > g_u_tmp[idx] + delta_v || g[idx] < g_l_tmp[idx] - delta_v) {
@@ -1818,52 +1876,41 @@ bool DistanceApproachIPOPTInterface::check_g(int n, const double* x, int m,
 }
 
 void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
+                                                    int* nnz_jac_g,
                                                     int* nnz_h_lag) {
   std::vector<double> xp(n);
   std::vector<double> lamp(m);
   std::vector<double> zl(m);
   std::vector<double> zu(m);
-
   std::vector<adouble> xa(n);
   std::vector<adouble> g(m);
   std::vector<double> lam(m);
+
   double sig;
   adouble obj_value;
-
   double dummy;
-
   obj_lam = new double[m + 1];
-
   get_starting_point(n, 1, &xp[0], 0, &zl[0], &zu[0], m, 0, &lamp[0]);
 
   trace_on(tag_f);
-
   for (int idx = 0; idx < n; idx++) {
     xa[idx] <<= xp[idx];
   }
-
   eval_obj(n, &xa[0], &obj_value);
-
   obj_value >>= dummy;
-
   trace_off();
 
   trace_on(tag_g);
-
   for (int idx = 0; idx < n; idx++) {
     xa[idx] <<= xp[idx];
   }
-
   eval_constraints(n, &xa[0], m, &g[0]);
-
   for (int idx = 0; idx < m; idx++) {
     g[idx] >>= dummy;
   }
-
   trace_off();
 
   trace_on(tag_L);
-
   for (int idx = 0; idx < n; idx++) {
     xa[idx] <<= xp[idx];
   }
@@ -1871,28 +1918,33 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
     lam[idx] = 1.0;
   }
   sig = 1.0;
-
   eval_obj(n, &xa[0], &obj_value);
-
   obj_value *= mkparam(sig);
   eval_constraints(n, &xa[0], m, &g[0]);
-
   for (int idx = 0; idx < m; idx++) {
     obj_value += g[idx] * mkparam(lam[idx]);
   }
-
   obj_value >>= dummy;
 
   trace_off();
 
+  rind_g = nullptr;
+  cind_g = nullptr;
   rind_L = nullptr;
   cind_L = nullptr;
-
+  jacval = nullptr;
   hessval = nullptr;
+
+  options_g[0] = 0; /* sparsity pattern by index domains (default) */
+  options_g[1] = 0; /*                         safe mode (default) */
+  options_g[2] = 0;
+  options_g[3] = 0; /*                column compression (default) */
+  sparse_jac(tag_g, m, n, 0, &xp[0], &nnz_jac, &rind_g, &cind_g, &jacval,
+             options_g);
+  *nnz_jac_g = nnz_jac;
 
   options_L[0] = 0;
   options_L[1] = 1;
-
   sparse_hess(tag_L, n, 0, &xp[0], &nnz_L, &rind_L, &cind_L, &hessval,
               options_L);
   *nnz_h_lag = nnz_L;

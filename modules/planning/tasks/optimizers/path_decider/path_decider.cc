@@ -71,32 +71,35 @@ bool PathDecider::MakeObjectDecision(const PathData &path_data,
   return true;
 }
 
+// TODO(jiacheng): eventually this entire "path_decider" should be retired.
+// Before it gets retired, its logics are slightly modified so that everything
+// still works well for now.
 bool PathDecider::MakeStaticObstacleDecision(
     const PathData &path_data, const std::string &blocking_obstacle_id,
     PathDecision *const path_decision) {
+  // Sanity checks and get important values.
   DCHECK_NOTNULL(path_decision);
   const auto &frenet_path = path_data.frenet_frame_path();
   if (frenet_path.empty()) {
     AERROR << "Path is empty.";
     return false;
   }
-
   const double half_width =
       common::VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
-
   const double lateral_radius = half_width + FLAGS_lateral_ignore_buffer;
 
+  // Go through every obstalce and make decisions.
   for (const auto *obstacle : path_decision->obstacles().Items()) {
+    // - skip decision making for moving vehicles or unknowns.
     bool is_bycycle_or_pedestrain =
         (obstacle->Perception().type() ==
              perception::PerceptionObstacle::BICYCLE ||
          obstacle->Perception().type() ==
              perception::PerceptionObstacle::PEDESTRIAN);
-
     if (!is_bycycle_or_pedestrain && !obstacle->IsStatic()) {
       continue;
     }
-
+    // - skip decision making for obstacles with IGNORE/STOP decisions already.
     if (obstacle->HasLongitudinalDecision() &&
         obstacle->LongitudinalDecision().has_ignore() &&
         obstacle->HasLateralDecision() &&
@@ -108,9 +111,10 @@ bool PathDecider::MakeStaticObstacleDecision(
       // STOP decision
       continue;
     }
-
+    // - add STOP decision for blocking obstacles.
     if (obstacle->Id() == blocking_obstacle_id &&
-        !PlanningContext::Instance()->is_in_path_lane_borrow_scenario()) {
+        !PlanningContext::Instance()->path_decider_info().
+            is_in_path_lane_borrow_scenario()) {
       // Add stop decision
       ADEBUG << "Blocking obstacle = " << blocking_obstacle_id;
       ObjectDecisionType object_decision;
@@ -119,28 +123,22 @@ bool PathDecider::MakeStaticObstacleDecision(
                                              obstacle->Id(), object_decision);
       continue;
     }
-
+    // - skip decision making for clear-zone obstacles.
     if (obstacle->reference_line_st_boundary().boundary_type() ==
         STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
 
-    // IGNORE by default
+    // 0. IGNORE by default and if obstacle is not in path s at all.
     ObjectDecisionType object_decision;
     object_decision.mutable_ignore();
-
     const auto &sl_boundary = obstacle->PerceptionSLBoundary();
-
     if (sl_boundary.end_s() < frenet_path.front().s() ||
         sl_boundary.start_s() > frenet_path.back().s()) {
       path_decision->AddLongitudinalDecision("PathDecider/not-in-s",
                                              obstacle->Id(), object_decision);
       path_decision->AddLateralDecision("PathDecider/not-in-s", obstacle->Id(),
                                         object_decision);
-      continue;
-    }
-
-    if (PlanningContext::Instance()->is_in_path_lane_borrow_scenario()) {
       continue;
     }
 
@@ -151,13 +149,12 @@ bool PathDecider::MakeStaticObstacleDecision(
 
     if (curr_l - lateral_radius > sl_boundary.end_l() ||
         curr_l + lateral_radius < sl_boundary.start_l()) {
-      // ignore
+      // 1. IGNORE if laterally too far away.
       path_decision->AddLateralDecision("PathDecider/not-in-l", obstacle->Id(),
                                         object_decision);
-    } else if (obstacle->IsLaneBlocking() ||
-               (curr_l - sl_boundary.end_l() < min_nudge_l &&
-                curr_l - sl_boundary.start_l() > min_nudge_l)) {
-      // stop
+    } else if (sl_boundary.end_l() >= curr_l - min_nudge_l &&
+               sl_boundary.start_l() <= curr_l + min_nudge_l) {
+      // 2. STOP if laterally too overlapping.
       *object_decision.mutable_stop() = GenerateObjectStopDecision(*obstacle);
 
       if (path_decision->MergeWithMainStop(
@@ -173,15 +170,17 @@ bool PathDecider::MakeStaticObstacleDecision(
                                                obstacle->Id(), object_decision);
       }
     } else if (FLAGS_enable_nudge_decision) {
-      // nudge
-      if (curr_l > sl_boundary.end_l()) {
+      // 3. NUDGE if laterally very close.
+      if (sl_boundary.end_l() < curr_l - min_nudge_l) {  // &&
+        // sl_boundary.end_l() > curr_l - min_nudge_l - 0.3) {
         // LEFT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::LEFT_NUDGE);
         object_nudge_ptr->set_distance_l(FLAGS_nudge_distance_obstacle);
         path_decision->AddLateralDecision("PathDecider/left-nudge",
                                           obstacle->Id(), object_decision);
-      } else if (curr_l < sl_boundary.start_l()) {
+      } else if (sl_boundary.start_l() > curr_l + min_nudge_l) {  // &&
+        // sl_boundary.start_l() < curr_l + min_nudge_l + 0.3) {
         // RIGHT_NUDGE
         ObjectNudge *object_nudge_ptr = object_decision.mutable_nudge();
         object_nudge_ptr->set_type(ObjectNudge::RIGHT_NUDGE);

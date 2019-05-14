@@ -38,8 +38,7 @@ struct PullOverContext {
 
 class PullOverScenario : public Scenario {
  public:
-  PullOverScenario(const ScenarioConfig& config,
-                     const ScenarioContext* context)
+  PullOverScenario(const ScenarioConfig& config, const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;
@@ -58,7 +57,6 @@ class PullOverScenario : public Scenario {
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
-
   bool init_ = false;
   PullOverContext context_;
 };

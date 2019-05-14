@@ -48,6 +48,7 @@ static PyObject *cyber_Py_HasNode(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_Py_HasNode"),
                         &py_node_manager_obj, &node_name, &len)) {
     AERROR << "cyber_Py_HasNode:cyber_Py_HasNode failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   std::string data_str(node_name, len);
@@ -67,6 +68,7 @@ static PyObject *cyber_Py_GetNodeList(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:cyber_Py_GetNodeList"),
                         &py_node_manager_obj)) {
     AERROR << "cyber_Py_GetNodeList:cyber_Py_GetNodeList failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   py_node_manager = reinterpret_cast<PyNodeManager *>(
@@ -83,6 +85,7 @@ static PyObject *cyber_Py_ShowNodeInfo(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_Py_ShowNodeInfo"),
                         &py_node_manager_obj, &node_name, &len)) {
     AERROR << "cyber_Py_ShowNodeInfo:cyber_Py_ShowNodeInfo failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   std::string data_str(node_name, len);
@@ -106,6 +109,7 @@ static PyObject *cyber_Py_GetChannelList(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:cyber_Py_GetChannelList"),
                         &py_channel_manager_obj)) {
     AERROR << "cyber_Py_GetChannelList:cyber_Py_GetChannelList failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   py_channel_manager =
@@ -121,6 +125,7 @@ static PyObject *cyber_Py_GetReaderList(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:cyber_Py_GetReaderList"),
                         &py_channel_manager_obj)) {
     AERROR << "cyber_Py_GetReaderList:cyber_Py_GetReaderList failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   py_channel_manager =
@@ -136,6 +141,7 @@ static PyObject *cyber_Py_GetWriterList(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:cyber_Py_GetWriterList"),
                         &py_channel_manager_obj)) {
     AERROR << "cyber_Py_GetWriterList:cyber_Py_GetWriterList failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   py_channel_manager =
@@ -153,6 +159,7 @@ static PyObject *cyber_Py_GetWritersOfNode(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_Py_GetChannelList"),
                         &py_channel_manager_obj, &node_name, &len)) {
     AERROR << "cyber_Py_GetNodeWriters:cyber_Py_GetNodeWriters failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   std::string data_str(node_name, len);
@@ -171,6 +178,7 @@ static PyObject *cyber_Py_GetReadersOfNode(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, const_cast<char *>("Os#:cyber_Py_GetChannelList"),
                         &py_channel_manager_obj, &node_name, &len)) {
     AERROR << "cyber_Py_GetNodeReaders:cyber_Py_GetNodeReaders failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   std::string data_str(node_name, len);
@@ -190,6 +198,7 @@ static PyObject *cyber_Py_ShowChannelInfo(PyObject *self, PyObject *args) {
                         const_cast<char *>("Os#:cyber_Py_ShowChannelInfo"),
                         &py_channel_manager_obj, &channel_name, &len)) {
     AERROR << "cyber_Py_ShowChannelInfo:cyber_Py_ShowChannelInfo failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   std::string data_str(channel_name, len);

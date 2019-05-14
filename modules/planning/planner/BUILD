@@ -40,7 +40,6 @@ cc_library(
         "//modules/common/util",
         "//modules/planning/planner/lattice:lattice_planner",
         "//modules/planning/planner/navi:navi_planner",
-        "//modules/planning/planner/open_space:open_space_planner",
         "//modules/planning/planner/public_road:public_road_planner",
         "//modules/planning/planner/rtk:rtk_planner",
         "//modules/planning/proto:planning_proto",

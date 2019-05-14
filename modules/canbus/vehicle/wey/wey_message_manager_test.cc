@@ -50,8 +50,7 @@ TEST_F(WeyMessageManagerTest, GetSendProtocols) {
   EXPECT_NE(manager_.GetMutableProtocolDataById(Ads338e::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Adseps113::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Adsreqvin390::ID), nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Adsshifter115::ID) !=
-              nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Adsshifter115::ID), nullptr);
 }
 
 TEST_F(WeyMessageManagerTest, GetRecvProtocols) {

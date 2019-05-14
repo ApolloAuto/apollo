@@ -34,7 +34,8 @@ void ExtrapolationPredictor::Predict(Obstacle* obstacle) {
   std::vector<apollo::common::TrajectoryPoint> trajectory_points;
   DrawShortTermTrajectory(feature, &trajectory_points);
   Trajectory trajectory = GenerateTrajectory(trajectory_points);
-  trajectories_.push_back(std::move(trajectory));
+  obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+      trajectory);
 }
 
 void ExtrapolationPredictor::DrawShortTermTrajectory(

@@ -86,8 +86,8 @@ class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
   /** Method to return the constraint residuals */
   bool eval_g(int n, const double* x, bool new_x, int m, double* g) override;
 
-  /** Check unfeasible constraints for futher study**/
-  bool check_g(int n, const double* x, int m, double* g) override;
+  /** Check unfeasible constraints for further study**/
+  bool check_g(int n, const double* x, int m, const double* g);
 
   /** Method to return:
    *   1) The structure of the jacobian (if "values" is nullptr)
@@ -95,6 +95,7 @@ class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
    */
   bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
                   int* iRow, int* jCol, double* values) override;
+
   // sequential implementation to jac_g
   bool eval_jac_g_ser(int n, const double* x, bool new_x, int m, int nele_jac,
                       int* iRow, int* jCol, double* values) override;
@@ -126,14 +127,14 @@ class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
   //***************    start ADOL-C part ***********************************
   /** Template to return the objective value */
   template <class T>
-  bool eval_obj(int n, const T* x, T* obj_value);
+  void eval_obj(int n, const T* x, T* obj_value);
 
   /** Template to compute constraints */
   template <class T>
-  bool eval_constraints(int n, const T* x, int m, T* g);
+  void eval_constraints(int n, const T* x, int m, T* g);
 
   /** Method to generate the required tapes by ADOL-C*/
-  void generate_tapes(int n, int m, int* nnz_h_lag);
+  void generate_tapes(int n, int m, int* nnz_jac_g, int* nnz_h_lag);
   //***************    end   ADOL-C part ***********************************
 
  private:
@@ -242,10 +243,16 @@ class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
  private:
   //***************    start ADOL-C part ***********************************
   double* obj_lam;
+  //** variables for sparsity exploitation
+  unsigned int* rind_g; /* row indices    */
+  unsigned int* cind_g; /* column indices */
+  double* jacval;       /* values         */
   unsigned int* rind_L; /* row indices    */
   unsigned int* cind_L; /* column indices */
   double* hessval;      /* values */
-  int nnz_L = 0;
+  int nnz_jac;
+  int nnz_L;
+  int options_g[4];
   int options_L[4];
   //***************    end   ADOL-C part ***********************************
 };

@@ -237,7 +237,7 @@ class ReferenceLineInfo {
 
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
-  bool IsUnrelaventObstacle(const Obstacle* obstacle);
+  bool IsIrrelevantObstacle(const Obstacle& obstacle);
 
   void MakeDecision(DecisionResult* decision_result) const;
 

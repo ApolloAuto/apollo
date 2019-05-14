@@ -63,14 +63,14 @@ TEST_F(ADCTrajectoryTest, InsertionWithProtection) {
   PathPoint path_point;
   path_point.set_x(-438.537);
   path_point.set_y(-160.991);
-  EXPECT_TRUE(!container_.IsPointInJunction(path_point));
+  EXPECT_FALSE(container_.IsPointInJunction(path_point));
   EXPECT_EQ(container_.ADCJunction(), nullptr);
 
   LaneSequence non_overlap_lane_sequence;
   LaneSegment lane_segment;
   lane_segment.set_lane_id("l22");
   non_overlap_lane_sequence.add_lane_segment()->CopyFrom(lane_segment);
-  EXPECT_TRUE(!container_.HasOverlap(non_overlap_lane_sequence));
+  EXPECT_FALSE(container_.HasOverlap(non_overlap_lane_sequence));
 
   LaneSequence overlap_lane_sequence;
   lane_segment.set_lane_id("l164");
@@ -81,7 +81,7 @@ TEST_F(ADCTrajectoryTest, InsertionWithProtection) {
 TEST_F(ADCTrajectoryTest, InsertionWithoutProtection) {
   trajectory_.set_right_of_way_status(ADCTrajectory::UNPROTECTED);
   container_.Insert(trajectory_);
-  EXPECT_TRUE(!container_.IsProtected());
+  EXPECT_FALSE(container_.IsProtected());
 }
 
 }  // namespace prediction
