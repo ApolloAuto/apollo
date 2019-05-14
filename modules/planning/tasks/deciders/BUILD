@@ -13,9 +13,6 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
-        ":open_space_fallback_decider",
-        ":open_space_pre_stop_decider",
-        ":open_space_roi_decider",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
@@ -27,22 +24,6 @@ cc_library(
         "//modules/planning/scenarios/util:scenario_util_lib",
         "//modules/planning/tasks/deciders/speed_bounds_decider",
         "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
-    ],
-)
-
-cc_library(
-    name = "open_space_pre_stop_decider",
-    srcs = [
-        "open_space_pre_stop_decider.cc",
-    ],
-    hdrs = [
-        "open_space_pre_stop_decider.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        ":decider_base",
-        "//modules/planning/common:reference_line_info",
-        "//modules/planning/common/util:common_lib",
     ],
 )
 
@@ -72,63 +53,6 @@ cc_library(
         "//modules/common/status",
         "//modules/planning/common:frame",
         "//modules/planning/tasks:task",
-    ],
-)
-
-cc_library(
-    name = "open_space_fallback_decider",
-    srcs = [
-        "open_space_fallback_decider.cc",
-    ],
-    hdrs = [
-        "open_space_fallback_decider.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        ":decider_base",
-        "//modules/common/vehicle_state:vehicle_state_provider",
-        "//modules/planning/common:planning_context",
-        "//modules/planning/common:planning_gflags",
-    ],
-)
-
-cc_library(
-    name = "open_space_roi_decider",
-    srcs = [
-        "open_space_roi_decider.cc",
-    ],
-    hdrs = [
-        "open_space_roi_decider.h",
-    ],
-    copts = ["-DMODULE_NAME=\\\"planning\\\""],
-    deps = [
-        ":decider_base",
-        "//modules/planning/common:planning_context",
-        "//modules/planning/common:planning_gflags",
-    ],
-)
-
-cc_test(
-    name = "open_space_fallback_decider_test",
-    size = "small",
-    srcs = [
-        "open_space_fallback_decider_test.cc",
-    ],
-    deps = [
-        ":open_space_fallback_decider",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "open_space_roi_decider_test",
-    size = "small",
-    srcs = [
-        "open_space_roi_decider_test.cc",
-    ],
-    deps = [
-        ":open_space_roi_decider",
-        "@gtest//:main",
     ],
 )
 

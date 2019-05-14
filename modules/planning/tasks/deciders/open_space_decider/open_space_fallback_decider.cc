@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/deciders/open_space_fallback_decider.h"
+#include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
 namespace apollo {
