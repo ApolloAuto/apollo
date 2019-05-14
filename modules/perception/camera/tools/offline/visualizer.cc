@@ -663,49 +663,49 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     case 86: case 118:  // 'V' 'v'
       show_velocity_ = (show_velocity_ + 1) % 2;
       break;
-    case 1113938:  // 65362:  // Up_Arrow
+    case 1113938: case 65362:  // Up_Arrow (Num Lock on/off)
       if (manual_calibration_mode_ &&
           pitch_adj_degree_ + 0.05 <= max_pitch_degree_) {
         pitch_adj_degree_ -= 0.05;
       }
       AINFO << "Current pitch: " << pitch_adj_degree_;
       break;
-    case 1113940:  // 65364:  // Down_Arrow
+    case 1113940: case 65364:  // Down_Arrow
       if (manual_calibration_mode_ &&
           pitch_adj_degree_ - 0.05 >= min_pitch_degree_) {
         pitch_adj_degree_ += 0.05;
       }
       AINFO << "Current pitch: " << pitch_adj_degree_;
       break;
-    case 1113939:  // 65363:  // Right_Arrow
+    case 1113939: case 65363:  // Right_Arrow
       if (manual_calibration_mode_ &&
           yaw_adj_degree_ + 0.05 <= max_yaw_degree_) {
         yaw_adj_degree_ -= 0.05;
       }
       AINFO << "Current yaw: " << yaw_adj_degree_;
       break;
-    case 1113937:  // Left_Arrow
+    case 1113937: case 65361:  // Left_Arrow
       if (manual_calibration_mode_ &&
           yaw_adj_degree_ - 0.05 >= min_yaw_degree_) {
         yaw_adj_degree_ += 0.05;
       }
       AINFO << "Current yaw: " << yaw_adj_degree_;
       break;
-    case 1179475:  // 130899:  // SHIFT + Right_Arrow
+    case 1179475: case 130899:  // SHIFT + Right_Arrow
       if (manual_calibration_mode_ &&
           roll_adj_degree_ + 0.05 <= max_roll_degree_) {
         roll_adj_degree_ -= 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_;
       break;
-    case 1179473:  // 130897:  // SHIFT + Left_Arrow
+    case 1179473: case 130897:  // SHIFT + Left_Arrow
       if (manual_calibration_mode_ &&
           roll_adj_degree_ - 0.05 >= min_roll_degree_) {
         roll_adj_degree_ += 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_;
       break;
-    case 1310835:  // 262259:  // CTRL + S
+    case 1310835: case 262259:  // CTRL + S
       if (manual_calibration_mode_) {
         save_manual_calibration_parameter(camera_name, pitch_adj_degree_,
                                           yaw_adj_degree_, roll_adj_degree_);
@@ -713,7 +713,7 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
               << ", " << yaw_adj_degree_ << ", " << roll_adj_degree_ << ")";
       }
       break;
-    case 1572963:  // ALT + C
+    case 1572963: case 524387:  // ALT + C
       manual_calibration_mode_ = !manual_calibration_mode_;
 
     default:
@@ -757,19 +757,19 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     if (show_verbose_) help_str_ += " (ON)";
   }
   switch (key) {
-    case 1113938:  // 65362:  // Up_Arrow
-    case 1113940:  // 65364:  // Down_Arrow
-    case 1113939:  // 65363:  // Right_Arrow
-    case 1113937:  // Left_Arrow
-    case 1179475:  // 130899:  // SHIFT + Right_Arrow
-    case 1179473:  // 130897:  // SHIFT + Left_Arrow
-    case 1310835:  // 262259:  // CTRL + S
-    case 65362:   // Up_Arrow
-    case 65361:   // Left_Arrow
-    case 65363:   // Right_Arrow
-    case 65364:   // Down_Arrow
-    case 130897:  // ALT + Left_Arrow
-    case 130899:  // ALT + Right_Arrow
+    case 1113938:  // 65362:  // Up_Arrow with Num Lock On
+    case 1113940:  // 65364:  // Down_Arrow with Num Lock On
+    case 1113939:  // 65363:  // Right_Arrow with Num Lock On
+    case 1113937:  // Left_Arrow with Num Lock On
+    case 1179475:  // 130899:  // SHIFT + Right_Arrow with Num Lock On
+    case 1179473:  // 130897:  // SHIFT + Left_Arrow with Num Lock On
+    case 1310835:  // 262259:  // CTRL + S with Num Lock On
+    case 65362:   // Up_Arrow with Num Lock Off
+    case 65361:   // Left_Arrow with Num Lock Off
+    case 65363:   // Right_Arrow with Num Lock Off
+    case 65364:   // Down_Arrow with Num Lock Off
+    case 130897:  // SHIFT + Left_Arrow with Num Lock Off
+    case 130899:  // SHIFT + Right_Arrow with Num Lock Off
       if (manual_calibration_mode_) {
         adjust_angles(camera_name, pitch_adj_degree_, yaw_adj_degree_,
                       roll_adj_degree_);
