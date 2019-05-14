@@ -22,6 +22,7 @@
 
 #include "cyber/common/macros.h"
 #include "modules/prediction/proto/feature.pb.h"
+#include "modules/prediction/proto/semantic_map_config.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -56,6 +57,7 @@ class SemanticMap {
 
  private:
   cv::Mat base_img_;
+  SemanticMapConfig config_;
   cv::Mat curr_img_;
   double curr_base_x_ = 0.0;
   double curr_base_y_ = 0.0;
