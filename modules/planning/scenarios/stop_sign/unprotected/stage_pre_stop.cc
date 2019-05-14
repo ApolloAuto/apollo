@@ -31,6 +31,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
@@ -44,6 +45,7 @@ using common::time::Clock;
 using hdmap::HDMapUtil;
 using hdmap::LaneInfoConstPtr;
 using hdmap::OverlapInfoConstPtr;
+using hdmap::PathOverlap;
 using perception::PerceptionObstacle;
 
 using StopSignLaneVehicles =
@@ -63,21 +65,24 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the stop_sign is still along reference_line
-  std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
-  if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
+  std::string stop_sign_overlap_id = GetContext()->current_stop_sign_overlap_id;
+
+  // get overlap along reference line
+  PathOverlap* current_stop_sign_overlap =
+      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                stop_sign_overlap_id,
+                                                ReferenceLineInfo::STOP_SIGN);
+  if (!current_stop_sign_overlap) {
     return FinishScenario();
   }
 
   constexpr double kPassStopLineBuffer = 0.3;  // unit: m
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const double distance_adc_pass_stop_sign =
-      adc_front_edge_s -
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
+      adc_front_edge_s - current_stop_sign_overlap->start_s;
   if (distance_adc_pass_stop_sign <= kPassStopLineBuffer) {
     // not passed stop line, check valid stop
-    if (CheckADCStop(reference_line_info)) {
+    if (CheckADCStop(adc_front_edge_s, current_stop_sign_overlap->start_s)) {
       return FinishStage();
     }
   } else {
@@ -90,15 +95,14 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
   auto& watch_vehicles = GetContext()->watch_vehicles;
 
   std::vector<std::string> watch_vehicle_ids;
-  for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {
-    std::copy(it->second.begin(), it->second.end(),
+  for (const auto& vehicle : watch_vehicles) {
+    std::copy(vehicle.second.begin(), vehicle.second.end(),
               std::back_inserter(watch_vehicle_ids));
 
     // for debug string
-    std::string associated_lane_id = it->first;
+    std::string associated_lane_id = vehicle.first;
     std::string s;
-    for (size_t i = 0; i < it->second.size(); ++i) {
-      std::string vehicle_id = (it->second)[i];
+    for (const std::string& vehicle_id : vehicle.second) {
       s = s.empty() ? vehicle_id : s + "," + vehicle_id;
     }
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
@@ -107,11 +111,12 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
 
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
-  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
-  std::copy(
-      watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
-      std::back_inserter(
-          PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
+  for (const auto& perception_obstacle_id : watch_vehicle_ids) {
+    PlanningContext::Instance()
+        ->mutable_planning_status()
+        ->mutable_stop_sign()
+        ->add_wait_for_obstacle_id(perception_obstacle_id);
+  }
 
   for (const auto* obstacle : path_decision.obstacles().Items()) {
     // add to watch_vehicles if adc is still proceeding to stop sign
@@ -129,7 +134,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   CHECK_NOTNULL(watch_vehicles);
 
   const PerceptionObstacle& perception_obstacle = obstacle.Perception();
-  const std::string& obstacle_id = std::to_string(perception_obstacle.id());
+  const std::string& perception_obstacle_id =
+      std::to_string(perception_obstacle.id());
   PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
   std::string obstacle_type_name = PerceptionObstacle_Type_Name(obstacle_type);
 
@@ -138,8 +144,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
       obstacle_type != PerceptionObstacle::UNKNOWN_MOVABLE &&
       obstacle_type != PerceptionObstacle::BICYCLE &&
       obstacle_type != PerceptionObstacle::VEHICLE) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
-           << "]. skip";
+    ADEBUG << "obstacle_id[" << perception_obstacle_id
+           << "] type[" << obstacle_type_name << "]. skip";
     return 0;
   }
 
@@ -152,10 +158,11 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   if (HDMapUtil::BaseMap().GetNearestLaneWithHeading(
           point, 5.0, perception_obstacle.theta(), M_PI / 3.0, &obstacle_lane,
           &obstacle_s, &obstacle_l) != 0) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+    ADEBUG << "obstacle_id[" << perception_obstacle_id
+           << "] type[" << obstacle_type_name
            << "]: Failed to find nearest lane from map for position: "
            << point.DebugString()
-           << "; heading:" << perception_obstacle.theta();
+           << "; heading[" << perception_obstacle.theta() << "]";
     return -1;
   }
 
@@ -169,7 +176,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
         return assc_lane.first.get()->id().id() == obstable_lane_id;
       });
   if (assoc_lane_it == GetContext()->associated_lanes.end()) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+    ADEBUG << "obstacle_id[" << perception_obstacle_id
+           << "] type[" << obstacle_type_name
            << "] lane_id[" << obstable_lane_id
            << "] not associated with current stop_sign. skip";
     return -1;
@@ -186,24 +194,25 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
   const double obstacle_end_s = obstacle_s + perception_obstacle.length() / 2;
   const double distance_to_stop_line = stop_line_s - obstacle_end_s;
 
-  if (distance_to_stop_line < 0 ||
+  if (distance_to_stop_line >
       scenario_config_.watch_vehicle_max_valid_stop_distance()) {
-    ADEBUG << "obstacle_id[" << obstacle_id << "] type[" << obstacle_type_name
+    ADEBUG << "obstacle_id[" << perception_obstacle_id
+           << "] type[" << obstacle_type_name
            << "] distance_to_stop_line[" << distance_to_stop_line
            << "]; stop_line_s" << stop_line_s << "]; obstacle_end_s["
-           << obstacle_end_s
-           << "] too far from stop line or pass stop line. skip";
+           << obstacle_end_s << "] too far from stop line. skip";
     return -1;
   }
 
   // use a vector since motocycles/bicycles can be more than one
   std::vector<std::string> vehicles =
       (*watch_vehicles)[obstacle_lane->id().id()];
-  if (std::find(vehicles.begin(), vehicles.end(), obstacle_id) ==
+  if (std::find(vehicles.begin(), vehicles.end(), perception_obstacle_id) ==
       vehicles.end()) {
     ADEBUG << "AddWatchVehicle: lane[" << obstacle_lane->id().id()
-           << "] obstacle_id[" << obstacle_id << "]";
-    (*watch_vehicles)[obstacle_lane->id().id()].push_back(obstacle_id);
+           << "] obstacle_id[" << perception_obstacle_id << "]";
+    (*watch_vehicles)[obstacle_lane->id().id()].push_back(
+        perception_obstacle_id);
   }
 
   return 0;
@@ -213,7 +222,7 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
  * @brief: check valid stop_sign stop
  */
 bool StopSignUnprotectedStagePreStop::CheckADCStop(
-    const ReferenceLineInfo& reference_line_info) {
+    const double adc_front_edge_s, const double stop_line_s) {
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > scenario_config_.max_adc_stop_speed()) {
@@ -222,17 +231,10 @@ bool StopSignUnprotectedStagePreStop::CheckADCStop(
   }
 
   // check stop close enough to stop line of the stop_sign
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const double stop_line_start_s =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
   const double distance_stop_line_to_adc_front_edge =
-      stop_line_start_s - adc_front_edge_s;
+      stop_line_s - adc_front_edge_s;
   ADEBUG << "distance_stop_line_to_adc_front_edge["
-      << distance_stop_line_to_adc_front_edge
-      << "] stop_sign["
-      << PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id
-      << "] stop_line_start_s[" << stop_line_start_s
-      << "] adc_front_edge_s[" << adc_front_edge_s << "]";
+         << distance_stop_line_to_adc_front_edge << "]";
 
   if (distance_stop_line_to_adc_front_edge >
       scenario_config_.max_valid_stop_distance()) {

@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "cyber/component/component.h"
+#include "modules/common/util/util.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
@@ -51,6 +52,8 @@ namespace onboard {
 
 typedef Eigen::Matrix4d MotionType;
 
+class LaneDetectionComponent;
+typedef FunctionInfo<LaneDetectionComponent> FunInfoType;
 class LaneDetectionComponent : public apollo::cyber::Component<> {
  public:
   LaneDetectionComponent() : seq_num_(0) {}
@@ -60,6 +63,9 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
   LaneDetectionComponent& operator=(const LaneDetectionComponent&) = delete;
 
   bool Init() override;
+
+  template <typename T>
+  friend class FunctionInfo;
 
  private:
   void OnReceiveImage(const std::shared_ptr<apollo::drivers::Image>& in_message,
@@ -165,6 +171,7 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
 
   camera::Visualizer visualize_;
   bool write_visual_img_;
+  static FunInfoType init_func_arry_[];
 };
 
 CYBER_REGISTER_COMPONENT(LaneDetectionComponent);

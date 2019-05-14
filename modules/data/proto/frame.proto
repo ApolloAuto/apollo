@@ -26,7 +26,7 @@ message GPSPose {
   optional double lon = 2;
   optional double bearing = 3;
   optional double x = 4;
-  optional double y = 5; 
+  optional double y = 5;
   optional double z = 6;
   optional double qw = 7;
   optional double qx = 8;

@@ -89,7 +89,7 @@ TEST(ImageCoreTest, operator_test) {
   {
     Rect<int> rect1(1, 2, 3, 4);
     Rect<int> rect2(2, 2, 3, 4);
-    EXPECT_TRUE(rect1 != rect2);
+    EXPECT_NE(rect1, rect2);
     EXPECT_EQ(rect1.ToStr(), "[ 3 x 4 ] from ( 1 , 2 )");
   }
 }

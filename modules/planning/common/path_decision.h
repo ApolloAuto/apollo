@@ -52,6 +52,9 @@ class PathDecision {
 
   const Obstacle *Find(const std::string &object_id) const;
 
+  const perception::PerceptionObstacle *FindPerceptionObstacle(
+      const std::string &perception_obstacle_id) const;
+
   Obstacle *Find(const std::string &object_id);
 
   void SetSTBoundary(const std::string &id, const STBoundary &boundary);

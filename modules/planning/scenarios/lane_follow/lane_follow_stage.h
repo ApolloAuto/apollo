@@ -53,8 +53,16 @@ class LaneFollowStage : public Stage {
       const common::TrajectoryPoint& planning_start_point, Frame* frame,
       ReferenceLineInfo* reference_line_info);
 
+  void PlanFallbackTrajectory(
+      const common::TrajectoryPoint& planning_start_point, Frame* frame,
+      ReferenceLineInfo* reference_line_info);
+
   void GenerateFallbackPathProfile(const ReferenceLineInfo* reference_line_info,
                                    PathData* path_data);
+
+  bool RetrieveLastFramePathProfile(
+      const ReferenceLineInfo* reference_line_info, const Frame* frame,
+      PathData* path_data);
 
   common::SLPoint GetStopSL(const ObjectStop& stop_decision,
                             const ReferenceLine& reference_line) const;
@@ -63,14 +71,6 @@ class LaneFollowStage : public Stage {
 
   void RecordDebugInfo(ReferenceLineInfo* reference_line_info,
                        const std::string& name, const double time_diff_ms);
-
-  bool HysteresisFilter(const double obstacle_distance,
-                        const double safe_distance,
-                        const double distance_buffer,
-                        const bool is_obstacle_blocking);
-
-  bool IsClearToChangeLane(ReferenceLineInfo* reference_line_info,
-                           Frame* frame, const double ego_v);
 
  private:
   ScenarioConfig config_;

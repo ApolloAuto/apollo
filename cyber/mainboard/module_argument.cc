@@ -25,14 +25,10 @@ namespace apollo {
 namespace cyber {
 namespace mainboard {
 
-ModuleArgument::ModuleArgument() {}
-
-ModuleArgument::~ModuleArgument() {}
-
 void ModuleArgument::DisplayUsage() {
   AINFO << "Usage: \n    " << binary_name_ << " [OPTION]...\n"
         << "Description: \n"
-        << "    -h, --help : help infomation \n"
+        << "    -h, --help : help information \n"
         << "    -d, --dag_conf=CONFIG_FILE : module dag config file\n"
         << "    -p, --process_group=process_group: the process "
            "namespace for running this module, default in manager process\n"

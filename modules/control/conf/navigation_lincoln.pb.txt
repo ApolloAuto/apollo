@@ -90,8 +90,8 @@ lat_controller_conf {
 }
 lon_controller_conf {
   ts: 0.01
-  brake_deadzone: 15.5
-  throttle_deadzone: 18.0
+  brake_minimum_action: 0.0
+  throttle_minimum_action: 0.0
   speed_controller_input_limit: 2.0
   station_error_limit: 2.0
   preview_window: 20.0

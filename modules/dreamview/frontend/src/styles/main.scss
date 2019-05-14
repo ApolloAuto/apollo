@@ -73,6 +73,10 @@ body {
     }
 }
 
+.no-data {
+    padding: 20px;
+    color: #B43131;
+}
 
 
 /* Adjust the scrollbar style. */
@@ -294,6 +298,7 @@ body {
 
         .monitor {
             height: 100%;
+            width: 100%;
             border: 1px solid #000000;
             box-sizing: border-box;
         
@@ -349,35 +354,71 @@ body {
         }
 
         .data-collection-monitor {
-            .no-data {
-                padding: 20px;
-                color: #B43131;
+            position: relative;
+            width: 100%;
+
+            .scenario-container {
+                position: absolute;
+            }
+
+            .section-divider-on-top {
+                border-top: 2px solid #080A0C;
+            }
+
+            .category-container {
+                position: relative;
+                width: 100%;
+                margin-bottom: 15px;
+
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .dummy-category {
+                flex: 1 0 50%;
+                align-self: flex-end;
+                min-width: 130px;
+                overflow: hidden;
+                position: relative;
             }
 
             .category {
+                flex: 1 0 50%;
+                align-self: flex-end;
+                min-width: 130px;
+                overflow: hidden;
                 position: relative;
-                height: 30px;
-                margin: 10px;
-                border: 1px solid #999999;
-
-                background-color: rgba(0, 0, 0, 0.5);
-                text-align: left;
-                line-height: 30px;
-
-                .category-progress {
-                    position: absolute;
-                    height: 100%;
-                    background: linear-gradient(to right, #2D3B50 0%, #006AFF 100%);;
-                }
 
                 .category-description {
-                    position: absolute;
-                    left: 10px;
+                    position: relative;
+                    margin: 15px 0px 0px 10px;
+                    font-size: 12px;
+
+                    color: #888888;
+                }
+                .category-updated {
+                    color: #FFFFFF;
                 }
 
-                .category-percentage {
-                    position: absolute;
-                    right: 10px;
+                .category-progress-background {
+                    position: relative;
+                    height: 6px;
+                    margin: 5px 10px;
+                    background-color: #333639;
+
+                    .category-in-progress {
+                        position: absolute;
+                        height: 100%;
+                        background: #006AFF;
+                    }
+
+                    .category-completed {
+                        position: absolute;
+                        height: 100%;
+                        background: #113B73;
+                    }
                 }
             }
         }
@@ -897,6 +938,14 @@ body {
             .meter-label {
                 font-size: 13px;
                 color: #ffffff;
+
+                .meter-value {
+                    position: absolute;
+                    top: 2px;
+                    right: 10px;
+
+                    font-size: 10px;
+                }
             }
 
             .meter-head {
@@ -1130,7 +1179,7 @@ body {
     }
 
     .delay {
-        min-width: 240px;
+        min-width: 260px;
         line-height: 26px;
 
         @include small-screen {
@@ -1404,7 +1453,7 @@ body {
         }
 
         .drive-event-row {
-            span {
+            .event-time {
                 position: relative;
                 padding: 10px 5px 10px 10px;
                 background: #101315;
@@ -1479,6 +1528,16 @@ body {
         .submit-button:active {
             @extend %drive-event-button;
             background: #383838;
+        }
+
+        .multiple-items {
+            display: flex;
+            justify-content: flex-start;
+            justify-content: space-between;
+
+            padding: 0px;
+            border: none;
+            background: #1D2226;
         }
     }
 }

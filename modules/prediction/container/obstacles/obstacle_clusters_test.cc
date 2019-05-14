@@ -30,7 +30,7 @@ TEST_F(ObstacleClustersTest, ObstacleClusters) {
   double length = 100.0;
 
   const LaneGraph &lane_graph =
-      ObstacleClusters::GetLaneGraph(start_s, length, lane);
+      ObstacleClusters::GetLaneGraph(start_s, length, true, lane);
   EXPECT_EQ(1, lane_graph.lane_sequence_size());
   EXPECT_EQ(3, lane_graph.lane_sequence(0).lane_segment_size());
   EXPECT_EQ("l9", lane_graph.lane_sequence(0).lane_segment(0).lane_id());
@@ -39,7 +39,7 @@ TEST_F(ObstacleClustersTest, ObstacleClusters) {
 
   double length_2 = 50.0;
   const LaneGraph &lane_graph_2 =
-      ObstacleClusters::GetLaneGraph(start_s, length_2, lane);
+      ObstacleClusters::GetLaneGraph(start_s, length_2, true, lane);
   EXPECT_EQ(1, lane_graph_2.lane_sequence_size());
   EXPECT_EQ(3, lane_graph_2.lane_sequence(0).lane_segment_size());
   EXPECT_EQ("l9", lane_graph_2.lane_sequence(0).lane_segment(0).lane_id());

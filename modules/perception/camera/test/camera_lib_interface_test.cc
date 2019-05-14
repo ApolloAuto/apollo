@@ -59,7 +59,7 @@ REGISTER_INFERENCE_ENGINE(MyInferenceEngine);
 TEST(ObstacleInterfaceTest, test_inference_engine) {
   BaseInferenceEngine* inference_engine =
       BaseInferenceEngineRegisterer::GetInstanceByName("MyInferenceEngine");
-  EXPECT_TRUE(inference_engine != NULL);
+  EXPECT_NE(inference_engine, nullptr);
   EXPECT_EQ(inference_engine->Name(), "MyInferenceEngine");
 }
 
@@ -86,7 +86,7 @@ REGISTER_OBSTACLE_DETECTOR(MyObstacleDetector);
 TEST(ObstacleInterfaceTest, test_camera_detector) {
   BaseObstacleDetector* camera_detector =
       BaseObstacleDetectorRegisterer::GetInstanceByName("MyObstacleDetector");
-  EXPECT_TRUE(camera_detector != NULL);
+  EXPECT_NE(camera_detector, nullptr);
   EXPECT_EQ(camera_detector->Name(), "MyObstacleDetector");
 }
 
@@ -125,7 +125,7 @@ REGISTER_OBSTACLE_TRACKER(MyObstacleTracker);
 TEST(ObstacleInterfaceTest, test_camera_tracker) {
   BaseObstacleTracker* camera_tracker =
       BaseObstacleTrackerRegisterer::GetInstanceByName("MyObstacleTracker");
-  EXPECT_TRUE(camera_tracker != NULL);
+  EXPECT_NE(camera_tracker, nullptr);
   EXPECT_EQ(camera_tracker->Name(), "MyObstacleTracker");
 }
 
@@ -152,7 +152,7 @@ TEST(ObstacleInterfaceTest, test_camera_transformer) {
   BaseObstacleTransformer* camera_transformer =
       BaseObstacleTransformerRegisterer::GetInstanceByName(
           "MyObstacleTransformer");
-  EXPECT_TRUE(camera_transformer != NULL);
+  EXPECT_NE(camera_transformer, nullptr);
   EXPECT_EQ(camera_transformer->Name(), "MyObstacleTransformer");
 }
 
@@ -180,7 +180,7 @@ TEST(ObstacleInterfaceTest, test_camera_postprocessor) {
   BaseObstaclePostprocessor* camera_postprocessor =
       BaseObstaclePostprocessorRegisterer::GetInstanceByName(
           "MyObstaclePostprocessor");
-  EXPECT_TRUE(camera_postprocessor != NULL);
+  EXPECT_NE(camera_postprocessor, nullptr);
   EXPECT_EQ(camera_postprocessor->Name(), "MyObstaclePostprocessor");
 }
 
@@ -208,7 +208,7 @@ TEST(TrafficLightInterfaceTest, test_traffic_light_detector) {
   BaseTrafficLightDetector* traffic_light_detector =
       BaseTrafficLightDetectorRegisterer::GetInstanceByName(
           "MyTrafficLightDetector");
-  EXPECT_TRUE(traffic_light_detector != NULL);
+  EXPECT_NE(traffic_light_detector, nullptr);
   EXPECT_EQ(traffic_light_detector->Name(), "MyTrafficLightDetector");
 }
 
@@ -236,7 +236,7 @@ TEST(TrafficLightInterfaceTest, test_traffic_light_tracker) {
   BaseTrafficLightTracker* traffic_light_tracker =
       BaseTrafficLightTrackerRegisterer::GetInstanceByName(
           "MyTrafficLightTracker");
-  EXPECT_TRUE(traffic_light_tracker != NULL);
+  EXPECT_NE(traffic_light_tracker, nullptr);
   EXPECT_EQ(traffic_light_tracker->Name(), "MyTrafficLightTracker");
 }
 
@@ -263,7 +263,7 @@ REGISTER_LANDMARK_DETECTOR(MyLandmarkDetector);
 TEST(LandmarkDetectorInterfaceTest, test_landmark_detector) {
   BaseLandmarkDetector* landmark_detector =
       BaseLandmarkDetectorRegisterer::GetInstanceByName("MyLandmarkDetector");
-  EXPECT_TRUE(landmark_detector != NULL);
+  EXPECT_NE(landmark_detector, nullptr);
   EXPECT_EQ(landmark_detector->Name(), "MyLandmarkDetector");
 }
 
@@ -287,7 +287,7 @@ REGISTER_LANE_DETECTOR(MyLaneDetector);
 TEST(LaneInterfaceTest, test_lane_detector) {
   BaseLaneDetector* lane_detector =
       BaseLaneDetectorRegisterer::GetInstanceByName("MyLaneDetector");
-  EXPECT_TRUE(lane_detector != NULL);
+  EXPECT_NE(lane_detector, nullptr);
   EXPECT_EQ(lane_detector->Name(), "MyLaneDetector");
 }
 
@@ -311,7 +311,7 @@ REGISTER_LANE_TRACKER(MyLaneTracker);
 TEST(LaneInterfaceTest, test_lane_tracker) {
   BaseLaneTracker* lane_tracker =
       BaseLaneTrackerRegisterer::GetInstanceByName("MyLaneTracker");
-  EXPECT_TRUE(lane_tracker != NULL);
+  EXPECT_NE(lane_tracker, nullptr);
   EXPECT_EQ(lane_tracker->Name(), "MyLaneTracker");
 }
 
@@ -342,7 +342,7 @@ REGISTER_LANE_POSTPROCESSOR(MyLanePostprocessor);
 TEST(LaneInterfaceTest, test_lane_postprocessor) {
   BaseLanePostprocessor* lane_postprocessor =
       BaseLanePostprocessorRegisterer::GetInstanceByName("MyLanePostprocessor");
-  EXPECT_TRUE(lane_postprocessor != NULL);
+  EXPECT_NE(lane_postprocessor, nullptr);
   EXPECT_EQ(lane_postprocessor->Name(), "MyLanePostprocessor");
 }
 
@@ -369,7 +369,7 @@ REGISTER_FEATURE_EXTRACTOR(MyFeatureExtractor);
 TEST(FeatureExtractorInterfaceTest, test_feature_extractor) {
   BaseFeatureExtractor* feature_extractor =
       BaseFeatureExtractorRegisterer::GetInstanceByName("MyFeatureExtractor");
-  EXPECT_TRUE(feature_extractor != NULL);
+  EXPECT_NE(feature_extractor, nullptr);
   EXPECT_EQ(feature_extractor->Name(), "MyFeatureExtractor");
 
   const int image_width = 200;
@@ -419,7 +419,7 @@ REGISTER_SCENE_PARSER(MySceneParser);
 TEST(SceneInterfaceTest, test_scene_parser) {
   BaseSceneParser* scene_parser =
       BaseSceneParserRegisterer::GetInstanceByName("MySceneParser");
-  EXPECT_TRUE(scene_parser != NULL);
+  EXPECT_NE(scene_parser, nullptr);
   EXPECT_EQ(scene_parser->Name(), "MySceneParser");
 }
 
@@ -444,7 +444,7 @@ REGISTER_CALIBRATOR(MyCalibrator);
 TEST(CalibratorInterfaceTest, test_calibrator) {
   BaseCalibrator* calibrator =
       BaseCalibratorRegisterer::GetInstanceByName("MyCalibrator");
-  EXPECT_TRUE(calibrator != NULL);
+  EXPECT_NE(calibrator, nullptr);
   EXPECT_EQ(calibrator->Name(), "MyCalibrator");
 }
 
@@ -469,7 +469,7 @@ TEST(CalibrationServiceInterfaceTest, test_calibrator) {
   BaseCalibrationService* calibrator =
       BaseCalibrationServiceRegisterer::GetInstanceByName(
           "MyCalibrationService");
-  EXPECT_TRUE(calibrator != NULL);
+  EXPECT_NE(calibrator, nullptr);
   EXPECT_EQ(calibrator->Name(), "MyCalibrationService");
 }
 
@@ -494,7 +494,7 @@ PERCEPTION_REGISTER_CAMERA_PERCEPTION(MyCameraPerception);
 TEST(CameraPerceptionInterfaceTest, test_camera_perception) {
   BaseCameraPerception* camera_perception =
       BaseCameraPerceptionRegisterer::GetInstanceByName("MyCameraPerception");
-  EXPECT_TRUE(camera_perception != NULL);
+  EXPECT_NE(camera_perception, nullptr);
   EXPECT_EQ(camera_perception->Name(), "MyCameraPerception");
 }
 

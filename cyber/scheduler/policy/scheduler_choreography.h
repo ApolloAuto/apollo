@@ -32,12 +32,9 @@ namespace scheduler {
 
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::proto::ChoreographyTask;
-using apollo::cyber::proto::InnerThread;
 
 class SchedulerChoreography : public Scheduler {
  public:
-  void SetInnerThreadAttr(const std::string& name, std::thread* thr) override;
-
   bool RemoveCRoutine(uint64_t crid) override;
   bool RemoveTask(const std::string& name) override;
   bool DispatchTask(const std::shared_ptr<CRoutine>&) override;
@@ -50,7 +47,6 @@ class SchedulerChoreography : public Scheduler {
   bool NotifyProcessor(uint64_t crid) override;
 
   std::unordered_map<std::string, ChoreographyTask> cr_confs_;
-  std::unordered_map<std::string, InnerThread> inner_thr_confs_;
 
   int32_t choreography_processor_prio_;
   int32_t pool_processor_prio_;

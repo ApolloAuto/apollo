@@ -120,7 +120,8 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
     matrix_cc.block(i * matrix_c.rows(), 0, matrix_c.rows(), 1) =
         matrix_cc.block((i - 1) * matrix_c.rows(), 0, matrix_c.rows(), 1) +
         matrix_aa.block((i - 1) * matrix_a.rows(), 0, matrix_a.rows(),
-                        matrix_a.cols()) * matrix_c;
+                        matrix_a.cols()) *
+            matrix_c;
   }
 
   // Update matrix_m1, matrix_m2, convert MPC problem to QP problem
@@ -177,16 +178,14 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
   }
 
   for (size_t i = 0; i < horizon; ++i) {
-    (*control_gain)[i] =
-        matrix_ctrl_gain.block(i * (*control_gain)[0].rows(), 0,
-                               (*control_gain)[0].rows(),
-                               (*control_gain)[0].cols());
+    (*control_gain)[i] = matrix_ctrl_gain.block(i * (*control_gain)[0].rows(),
+                                                0, (*control_gain)[0].rows(),
+                                                (*control_gain)[0].cols());
   }
 
   for (size_t i = 0; i < horizon; ++i) {
-    (*addition_gain)[i] =
-        matrix_add_gain.block(i * (*addition_gain)[0].rows(), 0,
-                              (*addition_gain)[0].rows(), 1);
+    (*addition_gain)[i] = matrix_add_gain.block(
+        i * (*addition_gain)[0].rows(), 0, (*addition_gain)[0].rows(), 1);
   }
 
   return true;

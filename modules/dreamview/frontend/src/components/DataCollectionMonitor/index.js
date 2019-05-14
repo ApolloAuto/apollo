@@ -1,31 +1,38 @@
 import React from "react";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { observer } from "mobx-react";
+
+import ScenarioCollectionMonitor from "components/DataCollectionMonitor/ScenarioCollectionMonitor";
 
 @observer
 export default class DataCollectionMonitor extends React.Component {
     render() {
-        const { dataCollectionProgress } = this.props;
+        const { dataCollectionUpdateStatus, dataCollectionProgress } = this.props;
 
-        const categoryElements = [];
-        dataCollectionProgress.forEach((progressInPercentage, description) => {
-            categoryElements.push(
-                <div key={description} className="category">
-                    <span className="category-progress"
-                          style={{ width: progressInPercentage + "%" }} />
-                    <span className="category-description">{description}</span>
-                    <span className="category-percentage">
-                        {`${progressInPercentage.toFixed(2)} %`}
-                    </span>
-                </div>
+        if (!dataCollectionProgress || dataCollectionUpdateStatus.size === 0) {
+            return <div className="no-data">No Data Found</div>;
+        }
+
+        const tabs = [];
+        const tabPanels = [];
+        dataCollectionProgress.entries().forEach(([scenarioName, categories]) => {
+            tabs.push(<Tab key={scenarioName}>{scenarioName}</Tab>);
+
+            tabPanels.push(
+                <TabPanel key={scenarioName}>
+                    <ScenarioCollectionMonitor
+                        statusMap={dataCollectionUpdateStatus.get(scenarioName)}
+                        progressMap={categories} />
+                </TabPanel>
             );
         });
 
         return (
             <div className="monitor data-collection-monitor">
-                {categoryElements.length !== 0
-                    ? categoryElements
-                    : <div className="no-data">No Data Found</div>
-                }
+                <Tabs>
+                    <TabList>{tabs}</TabList>
+                    {tabPanels}
+                </Tabs>
             </div>
         );
     }

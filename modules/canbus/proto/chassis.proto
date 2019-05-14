@@ -27,6 +27,12 @@ message Chassis {
     // car chassis report error, like steer, brake, throttle, gear fault
     CHASSIS_ERROR = 2;
 
+    // classify the types of the car chassis errors
+    CHASSIS_ERROR_ON_STEER = 6;
+    CHASSIS_ERROR_ON_BRAKE = 7;
+    CHASSIS_ERROR_ON_THROTTLE = 8;
+    CHASSIS_ERROR_ON_GEAR = 9;
+
     MANUAL_INTERVENTION = 3;  // human manual intervention
 
     // receive car chassis can frame not in period

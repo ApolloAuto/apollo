@@ -24,10 +24,12 @@ def write_pb_to_text_file(topic_pb, file_path):
     with open(file_path, 'w') as f:
         f.write(str(topic_pb))
 
+
 def get_pb_from_text_file(filename, pb_value):
     """Get a proto from given text file."""
     with open(filename, 'r') as file_in:
         return text_format.Merge(file_in.read(), pb_value)
+
 
 def get_pb_from_bin_file(filename, pb_value):
     """Get a proto from given binary file."""
@@ -45,7 +47,6 @@ def get_pb_from_file(filename, pb_value):
             return get_pb_from_text_file(filename, pb_value)
         except:
             print 'Error: Cannot parse %s as binary or text proto' % filename
-
     return None
 
 
@@ -87,7 +88,7 @@ def flatten(pb_value, selectors):
         return val
 
     # Return the single result for single selector.
-    if type(selectors) is str:
+    if isinstance(selectors, str):
         return __select(pb_value, selectors)
     # Return tuple result for multiple selectors.
     return tuple((__select(pb_value, selector) for selector in selectors))

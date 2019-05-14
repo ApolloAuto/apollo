@@ -90,7 +90,7 @@ TEST(OnlineCalibrationServiceTest, online_calibration_service_test) {
 
     double depth = 0.0;
     EXPECT_TRUE(online_calib_service->QueryDepthOnGroundPlane(x, y, &depth));
-    EXPECT_TRUE(depth > 0.0);
+    EXPECT_GT(depth, 0.0);
     AINFO << "Query depth: " << depth;
 
     name_camera_ground_height_map["onsemi_obstacle"] = 100;

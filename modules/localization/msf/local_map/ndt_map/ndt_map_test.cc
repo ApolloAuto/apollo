@@ -99,9 +99,9 @@ TEST(MapNdtTestSuite, matrix) {
         Eigen::Vector2d left_top_corner = ndt_map_node->GetLeftTopCorner();
         const float resolution = ndt_map_node->GetMapResolution();
         NdtMapCells& ndt_map_cells = ndt_map_matrix.GetMapCell(y, x);
-        int altitude_index = ndt_map_cells.CalAltitudeIndex(
-            map_config.map_resolutions_z_[res],
-            static_cast<float>(pt3d_global[2]));
+        int altitude_index =
+            ndt_map_cells.CalAltitudeIndex(map_config.map_resolutions_z_[res],
+                                           static_cast<float>(pt3d_global[2]));
         const Eigen::Vector3f centroid(
             static_cast<float>(coord2d[0]) -
                 static_cast<float>(left_top_corner[0]) -

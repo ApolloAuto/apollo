@@ -30,12 +30,7 @@ std::unique_ptr<Frame> FrameManager::CreateFrame(
 }
 
 Frame* FrameManager::GetFrame(const uint32_t sequence_num) {
-  std::unordered_map<uint32_t, std::unique_ptr<Frame>>::const_iterator it =
-      frames_.find(sequence_num);
-  if (it != frames_.end()) {
-    return it->second.get();
-  }
-  return nullptr;
+  return apollo::common::util::FindLinkedPtrOrNull(frames_, sequence_num);
 }
 
 Frame* FrameManager::GetLastFrame() {

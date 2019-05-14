@@ -114,7 +114,6 @@ cc_library(
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
-        "//modules/prediction/proto:fnn_vehicle_model_proto",
     ] + select({
         "//tools/platforms:use_gpu": [
             "@pytorch",
@@ -155,7 +154,6 @@ cc_library(
         "//modules/prediction/common:prediction_util",
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
-        "//modules/prediction/network/cruise_model",
     ] + select({
         "//tools/platforms:use_gpu": [
             "@pytorch",
@@ -193,7 +191,14 @@ cc_library(
     deps = [
         "//modules/prediction/container:container_manager",
         "//modules/prediction/evaluator",
-    ],
+    ] + select({
+        "//tools/platforms:use_gpu": [
+            "@pytorch",
+        ],
+        "//conditions:default": [
+            "@pytorch",
+        ],
+    }),
 )
 
 cpplint()

@@ -28,7 +28,7 @@ config: {
     max_stop_speed: 0.3
     max_valid_stop_distance: 3.5
     expand_s_distance: 2.0
-    stop_strick_l_distance: 6.0
+    stop_strict_l_distance: 6.0
     stop_loose_l_distance: 8.0
     stop_timeout: 4.0
   }
@@ -38,9 +38,7 @@ config: {
   rule_id: DESTINATION
   enabled: true
   destination {
-    enable_pull_over: false
     stop_distance: 0.5
-    pull_over_plan_distance: 55.00
   }
 }
 
@@ -51,23 +49,7 @@ config: {
     enable_keep_clear_zone: true
     enable_junction: true
     min_pass_s_distance: 2.0
-  }
-}
-
-config: {
-  rule_id: PULL_OVER
-  enabled: true
-  pull_over {
-    stop_distance: 0.5
-    max_stop_speed: 0.2
-    max_valid_stop_distance: 3.0
-    max_stop_deceleration: 2.5
-    min_pass_s_distance: 1.0
-    buffer_to_boundary: 0.5
-    plan_distance: 55.0
-    operation_length: 50.0
-    max_check_distance: 60.0
-    max_failure_count: 10
+    align_with_traffic_sign_tolerance: 4.5
   }
 }
 
@@ -90,20 +72,18 @@ config: {
 }
 
 config: {
-  rule_id: SIGNAL_LIGHT
+  rule_id: STOP_SIGN
   enabled: true
-  signal_light {
+  stop_sign: {
+    stop_distance: 1.0
+  }
+}
+
+config: {
+  rule_id: TRAFFIC_LIGHT
+  enabled: true
+  traffic_light {
     stop_distance: 1.0
     max_stop_deceleration: 6.0
-    min_pass_s_distance: 4.0
-    max_stop_deceleration_yellow_light: 3.0
-    signal_expire_time_sec: 5.0
-    max_monitor_forward_distance: 135.0
-    righ_turn_creep {
-      enabled: false
-      min_boundary_t: 6.0
-      stop_distance: 0.5
-      speed_limit: 1.0
-    }
   }
 }

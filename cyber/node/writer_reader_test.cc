@@ -263,8 +263,8 @@ TEST(WriterReaderTest, user_defined_message) {
   attr.set_channel_id(channel_id);
   attr.mutable_qos_profile()->set_depth(10);
 
-  EXPECT_EQ(false, message::HasSerializer<Message>::value);
-  EXPECT_EQ(false, message::HasType<Message>::value);
+  EXPECT_FALSE(message::HasSerializer<Message>::value);
+  EXPECT_FALSE(message::HasType<Message>::value);
 
   auto node = CreateNode("node");
   ASSERT_TRUE(node);

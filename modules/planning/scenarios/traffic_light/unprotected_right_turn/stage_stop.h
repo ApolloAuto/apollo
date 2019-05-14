@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "modules/planning/scenarios/stage.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_right_turn/traffic_light_unprotected_right_turn_scenario.h"
 
@@ -43,7 +45,8 @@ class TrafficLightUnprotectedRightTurnStageStop : public Stage {
     return GetContextAs<TrafficLightUnprotectedRightTurnContext>();
   }
 
- private:
+  bool CheckTrafficLightNoRightTurnOnRed(const std::string& traffic_light_id);
+
   Stage::StageStatus FinishScenario() override;
   Stage::StageStatus FinishStage(const bool protected_mode);
 

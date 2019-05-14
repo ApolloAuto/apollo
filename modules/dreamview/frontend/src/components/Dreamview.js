@@ -96,6 +96,7 @@ export default class Dreamview extends React.Component {
                             {options.showPNCMonitor && <PNCMonitor options={options} />}
                             {options.showDataCollectionMonitor &&
                                 <DataCollectionMonitor
+                                    dataCollectionUpdateStatus={hmi.dataCollectionUpdateStatus}
                                     dataCollectionProgress={hmi.dataCollectionProgress}
                                 />
                             }

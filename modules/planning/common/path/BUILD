@@ -17,7 +17,6 @@ cc_library(
         "//modules/common",
         "//modules/common/math:linear_interpolation",
         "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/common:planning_context",
     ],
 )
 
@@ -47,8 +46,7 @@ cc_library(
     ],
     deps = [
         "//modules/common/math:linear_interpolation",
-        "//modules/common/proto:pnc_point_proto",
-        "//modules/planning/common:planning_context",
+        "//modules/planning/proto:planning_proto",
     ],
 )
 

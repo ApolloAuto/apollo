@@ -31,15 +31,12 @@ namespace narrow_street_u_turn {
 
 class NarrowStreetUTurnScenario : public Scenario {
  public:
-  explicit NarrowStreetUTurnScenario(const ScenarioConfig& config,
-                                     const ScenarioContext* context)
+  NarrowStreetUTurnScenario(const ScenarioConfig& config,
+                            const ScenarioContext* context)
       : Scenario(config, context) {}
 
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
-
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
 };
 
 }  // namespace narrow_street_u_turn

@@ -61,7 +61,7 @@ bool RecordFileReader::Reset() {
 bool RecordFileReader::ReadHeader() {
   Section section;
   if (!ReadSection(&section)) {
-    AERROR << "Read header section fail, file is broken of it is not a record "
+    AERROR << "Read header section fail, file is broken or it is not a record "
               "file.";
     return false;
   }
@@ -94,8 +94,7 @@ bool RecordFileReader::ReadIndex() {
   }
   Section section;
   if (!ReadSection(&section)) {
-    AERROR << "Read index section fail, maybe file is broken."
-              "file.";
+    AERROR << "Read index section fail, maybe file is broken.";
     return false;
   }
   if (section.type != SectionType::SECTION_INDEX) {

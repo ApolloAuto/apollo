@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
+#include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
+
+#include <omp.h>
 
 #include <limits>
 #include <utility>
@@ -24,7 +27,6 @@
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/container_manager.h"
 #include "modules/prediction/container/obstacles/obstacles_container.h"
-#include "modules/prediction/evaluator/vehicle/cruise_mlp_evaluator.h"
 
 namespace apollo {
 namespace prediction {
@@ -52,6 +54,7 @@ void CruiseMLPEvaluator::Clear() {}
 
 void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
+  omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
@@ -93,8 +96,22 @@ void CruiseMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
 
     // Insert features to DataForLearning
     if (FLAGS_prediction_offline_mode == 2) {
+      std::vector<double> interaction_feature_values;
+      SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
+                                  &interaction_feature_values);
+      if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
+        ADEBUG << "Obstacle [" << id << "] has fewer than "
+               << "expected lane feature_values"
+               << interaction_feature_values.size() << ".";
+        return;
+      }
+      ADEBUG << "Interaction feature size = "
+             << interaction_feature_values.size();
+      feature_values.insert(feature_values.end(),
+                            interaction_feature_values.begin(),
+                            interaction_feature_values.end());
       FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                           "junction");
+                                           "lane_scanning", lane_sequence_ptr);
       ADEBUG << "Save extracted features for learning locally.";
       return;  // Skip Compute probability for offline mode
     }
@@ -135,23 +152,6 @@ void CruiseMLPEvaluator::ExtractFeatureValues(
   ADEBUG << "Obstacle feature size = " << obstacle_feature_values.size();
   feature_values->insert(feature_values->end(), obstacle_feature_values.begin(),
                          obstacle_feature_values.end());
-
-  /*
-  Extract interaction features.
-  std::vector<double> interaction_feature_values;
-  SetInteractionFeatureValues(obstacle_ptr, lane_sequence_ptr,
-                              &interaction_feature_values);
-  if (interaction_feature_values.size() != INTERACTION_FEATURE_SIZE) {
-    ADEBUG << "Obstacle [" << id << "] has fewer than "
-           << "expected lane feature_values"
-           << interaction_feature_values.size() << ".";
-    return;
-  }
-  ADEBUG << "Interaction feature size = " << interaction_feature_values.size();
-  feature_values->insert(feature_values->end(),
-                         interaction_feature_values.begin(),
-                         interaction_feature_values.end());
-  */
 
   // Extract lane related features.
   std::vector<double> lane_feature_values;
@@ -532,6 +532,7 @@ void CruiseMLPEvaluator::LoadModels() {
   //   ADEBUG << "CUDA is available";
   //   device_ = torch::Device(torch::kCUDA);
   // }
+  torch::set_num_threads(1);
   torch_go_model_ptr_ =
       torch::jit::load(FLAGS_torch_vehicle_cruise_go_file, device_);
   torch_cutin_model_ptr_ =

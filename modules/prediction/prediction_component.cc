@@ -96,7 +96,6 @@ bool PredictionComponent::Proc(
   }
 
   // Update relative map if needed
-  // AdapterManager::Observe();
   if (FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Relative map is empty.";
     return false;
@@ -169,6 +168,10 @@ bool PredictionComponent::Proc(
       }
     }
   }
+
+  auto end_time5 = std::chrono::system_clock::now();
+  diff = end_time5 - end_time1;
+  ADEBUG << "End to end time elapsed: " << diff.count() * 1000 << " msec.";
 
   // Publish output
   common::util::FillHeader(node_->Name(), &prediction_obstacles);

@@ -82,7 +82,7 @@ TEST(TrafficLightCameraPerceptionTest, normal) {
   AINFO << "lights num " << frame.traffic_lights.size();
 
   EXPECT_TRUE(traffic_light_perception.Perception(options, &frame));
-  EXPECT_TRUE(base::TLColor::TL_RED == frame.traffic_lights[0]->status.color);
+  EXPECT_EQ(base::TLColor::TL_RED, frame.traffic_lights[0]->status.color);
 }
 
 TEST(TrafficLightCameraPerceptionTest, bad_proto) {

@@ -46,10 +46,10 @@ TaskManager::TaskManager()
     }
   };
 
-  auto pool_size = scheduler::Instance()->TaskPoolSize();
+  num_threads_ = scheduler::Instance()->TaskPoolSize();
   auto factory = croutine::CreateRoutineFactory(std::move(func));
-  tasks_.reserve(pool_size);
-  for (uint32_t i = 0; i < pool_size; i++) {
+  tasks_.reserve(num_threads_);
+  for (uint32_t i = 0; i < num_threads_; i++) {
     auto task_name = task_prefix + std::to_string(i);
     tasks_.push_back(common::GlobalData::RegisterTaskName(task_name));
     scheduler::Instance()->CreateTask(factory, task_name);

@@ -23,6 +23,7 @@ sys.path.append("../")
 from cyber_py import cyber
 from cyber_py import record
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
+from cyber.proto import record_pb2
 
 TEST_RECORD_FILE = "test02.record"
 CHAN_1 = "channel/chatter"
@@ -32,10 +33,13 @@ STR_10B = "1234567890"
 TEST_FILE = "test.record"
 TIME = 999
 
+
 class TestRecord(unittest.TestCase):
+
     """
     Class for record unit test.
     """
+
     def test_record_writer_read(self):
         """
         unit test of record.
@@ -44,8 +48,8 @@ class TestRecord(unittest.TestCase):
 
         # writer
         fwriter = record.RecordWriter()
-        fwriter.set_size_fileseg(200)
-        fwriter.set_intervaltime_fileseg(10)
+        fwriter.set_size_fileseg(0)
+        fwriter.set_intervaltime_fileseg(0)
 
         self.assertTrue(fwriter.open(TEST_RECORD_FILE))
         fwriter.write_channel(CHAN_1, MSG_TYPE, STR_10B)

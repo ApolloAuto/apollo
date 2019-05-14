@@ -166,18 +166,72 @@ Main view that reflects the point of view chosen from **Layer Menu**:
 
 
 
-## Features introduced in Apollo 3.5
+## PnC Monitor
+
+To view the monitor:
+1. Build Apollo and run Dreamview on your web browser
+2. Turn on the "PNC Monitor" from the 'Others' panel.
+3. On the right-hand side, you should be able to view the Planning, Control, Latency graphs as seen below
+![](images/Dreamview_landing.png)
+
+### Planning/Control Graphs
+
+The Planning/Control tab from the monitor plots various graphs to reflect the internal states of its modules.
+
+#### Customizable Graphs for Planning Module
+[planning_internal.proto](https://github.com/ApolloAuto/apollo2/blob/master/modules/planning/proto/planning_internal.proto#L180) is a protobuf that stores debugging information, which is processed by dreamview server and send to dreamview client to help engineers debug. For users who want to plot their own graphs for new planning algorithms:
+1. Fill in the information of your "chart" defined in planning_internal.proto.
+2. X/Y axis: [**chart.proto** ](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/proto/chart.proto) has "Options" that you could set for axis which include 
+    * min/max: minimum/maximum number for the scale
+    * label_string: axis label
+    * legend_display: to show or hide a chart legend.
+        <img src="images/dreamview_usage_table/pncmonitor_options.png" width="600" height="300" />
+3. Dataset: 
+    * Type: each graph can have multiple lines, polygons, and/or car markers defined in [**chart.proto**](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/proto/chart.proto): 
+        * Line:
+
+            <img src="images/dreamview_usage_table/pncmonitor_line.png" width="600" height="300" />
+        * Polygon:
+
+            <img src="images/dreamview_usage_table/pncmonitor_polygon.png" width="600" height="300" />
+        * Car:
+
+            <img src="images/dreamview_usage_table/pncmonitor_car.png" width="600" height="300" />
+    
+    * Label: each dataset must have a unique "Label" to each chart in order to help dreamview identify which dataset to update.
+    * Properties: for polygon and line, you can set styles. Dreamview uses **Chartjs.org** for graphs. Below are common ones:
+
+        | Name        | Description                             | Example                 | 
+        | ----------- | --------------------------------------- | ----------------------- |
+        | color       | The line color                          | rgba(27, 249, 105, 0.5) |
+        | borderWidth | The line width                          | 2                       |
+        | pointRadius | The radius of the point shape           | 1                       |
+        | fill        | Whether to fill the area under the line | false                   |
+        | showLine    | Whether to draw the line                | true                    |
+
+    Refer to https://www.chartjs.org/docs/latest/charts/line.html for more properties.
+4. Sample: You could look into [on_lane_planning.cc](https://github.com/ApolloAuto/apollo/blob/master/modules/planning/on_lane_planning.cc#L562) for a code sample.
+
+#### Additional Planning Paths
+For users who want to render additional paths on dreamview 3D scene, add the desired paths to the "path" field in [planning_internal.proto](https://github.com/ApolloAuto/apollo2/blob/master/modules/planning/proto/planning_internal.proto#L164). These paths will be rendered when PnC Monitor is on:
+![](images/dreamview_usage_table/pncmonitor_paths.png)
+
+Dreamview has predefined styles for the first four paths:
+
+| Properties | Path 1   | Path 2   | Path 3    | Path 4   |
+| ---------- | -------- | -------- | --------- | -------- |
+| width      | 0.8      | 0.15     | 0.4       | 0.65     |
+| color      | 0x01D1C1 | 0x36A2EB | 0x8DFCB4  | 0xD85656 |
+| opacity    | 0.65     | 1        | 0.7       | 0.8      |
+| zOffset    | 4        | 7        | 6         | 5        |
+
+If you have more than four paths to render or want to change the styles, edit the planning.pathProperties value in [dreamview/frtonend/dist/parameters.json](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/frontend/dist/parameters.json)
+.
 
 ### Latency graph
 
-The Simulation team is proud to introduce the Latency graph tab in Dreamview which is included to display the difference in time when the module receives sensor input data to when it will publish this data.
-To view this tab:
-1. Build Apollo and run Dreamview on your web browser
-2. On the right-hand side, you should be able to view the Planning, Control, Latency graphs as seen below
-![](images/dreamview_landing.png)
+The graph displays the difference in time when the module receives sensor input data to when it will publish this data.
+![](images/Dreamview_landing2.png)
 
-3. Click on the "Latency" tab to view the latency graph
-![](images/dreamview_landing2.png)
-
-4. The Latency Graph can be used to track the latency each individual faces. The graphs are coloured differently to help distinguish the modules and a key is included for better understanding. The graph is plotted as Latency measured in ms vs Timestamp measure in seconds as seen in the image below.
+The Latency Graph can be used to track the latency each individual faces. The graphs are coloured differently to help distinguish the modules and a key is included for better understanding. The graph is plotted as Latency measured in ms vs Timestamp measure in seconds as seen in the image below.
 ![](images/Latency.png)

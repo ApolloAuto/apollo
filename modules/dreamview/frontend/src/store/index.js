@@ -185,6 +185,10 @@ class DreamviewStore {
     }
 
     handleDrivingModeChange(wasAutoMode, isAutoMode) {
+        if (this.options.enableSimControl) {
+            return;
+        }
+
         const hasDisengagement = wasAutoMode && !isAutoMode;
         const hasAuto = !wasAutoMode && isAutoMode;
 

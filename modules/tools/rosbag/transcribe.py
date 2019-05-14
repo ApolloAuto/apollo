@@ -33,17 +33,28 @@ from common.message_manager import PbMessageManager
 g_message_manager = PbMessageManager()
 g_args = None
 
-
 def transcribe(proto_msg):
     header = proto_msg.header
     seq = "%05d" % header.sequence_num
     name = header.module_name
     file_path = os.path.join(g_args.out_dir, seq + "_" + name + ".pb.txt")
-    print file_path
+    print('Write proto buffer message to file: %s' % file_path)
     proto_utils.write_pb_to_text_file(proto_msg, file_path)
 
+def main(args):
+    if not os.path.exists(args.out_dir):
+        os.makedirs(args.out_dir)
+    meta_msg = g_message_manager.get_msg_meta_by_topic(args.topic)
+    if not meta_msg:
+        print('Unknown topic name: %s' % args.topic)
+        sys.exit(1)
+    cyber.init()
+    node = cyber.Node("transcribe_node")
+    node.create_reader(args.topic, meta_msg.msg_type, transcribe)
+    while not cyber.is_shutdown():
+        time.sleep(0.005)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="A tool to transcribe received protobuf messages into text files")
     parser.add_argument(
@@ -55,14 +66,4 @@ if __name__ == "__main__":
         help="the output directory for the dumped file, the default value is current directory"
     )
     g_args = parser.parse_args()
-    if not os.path.exists(g_args.out_dir):
-        os.makedirs(g_args.out_dir)
-    meta_msg = g_message_manager.get_msg_meta_by_topic(g_args.topic)
-    if not meta_msg:
-        print "Unknown topic name: %s" % (g_args.topic)
-        sys.exit(0)
-    cyber.init()
-    node = cyber.Node("transcribe_node")
-    node.create_reader(g_args.topic, meta_msg.msg_type, transcribe)
-    while not cyber.is_shutdown():
-        time.sleep(0.005)
+    main(g_args)

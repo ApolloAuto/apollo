@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+import "modules/planning/proto/piecewise_jerk_speed_config.proto";
+
 package apollo.planning;
 
 enum DualWarmUpMode {
@@ -12,6 +14,7 @@ enum DualWarmUpMode {
 enum DistanceApproachMode {
   DISTANCE_APPROACH_IPOPT = 0;
   DISTANCE_APPROACH_IPOPT_CUDA = 1;
+  DISTANCE_APPROACH_IPOPT_FIXED_TS = 2;
 }
 
 message PlannerOpenSpaceConfig {
@@ -54,6 +57,7 @@ message WarmStartConfig {
   // Grid a star for heuristic
   optional double grid_a_star_xy_resolution = 15 [default = 0.1];
   optional double node_radius = 16 [default = 0.5];
+  optional PiecewiseJerkSpeedConfig s_curve_config = 17;
 }
 
 message DualVariableWarmStartConfig {
@@ -94,6 +98,7 @@ message DistanceApproachConfig {
   // True to enable derivative check inside open space planner
   optional bool enable_initial_final_check = 25 [default = false];
   optional DistanceApproachMode distance_approach_mode = 26;
+  optional bool enable_jacobian_ad = 27 [default = false];
 }
 
 message IpoptConfig {

@@ -1,0 +1,30 @@
+
+udp_port: 2007
+frame_id: "video_right_rear"
+pixel_format: "yuyv"
+trigger_param: "f2ff"
+metric_error_code: 31
+record:0
+width: 1920
+height: 1080
+frame_rate: 5
+monochrome: false
+brightness: -1
+contrast: -1
+saturation: -1
+sharpness: -1
+gain: -1
+auto_focus: false
+focus: -1
+auto_exposure: true
+exposure: 100
+auto_white_balance: true
+white_balance: 4000
+bytes_per_pixel: 3
+fpga_dev_number: 0
+camera_seq_number: 5
+
+compress_conf {
+    output_channel: "/apollo/sensor/camera/right_rear/image/compressed"
+    image_pool_size: 100
+}

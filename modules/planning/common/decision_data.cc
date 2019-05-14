@@ -83,11 +83,7 @@ DecisionData::DecisionData(
 
 Obstacle* DecisionData::GetObstacleById(const std::string& id) {
   std::lock_guard<std::mutex> lock(mutex_);
-  const auto it = obstacle_map_.find(id);
-  if (it == obstacle_map_.end()) {
-    return nullptr;
-  }
-  return it->second;
+  return common::util::FindPtrOrNull(obstacle_map_, id);
 }
 
 std::vector<Obstacle*> DecisionData::GetObstacleByType(
@@ -113,11 +109,7 @@ std::vector<Obstacle*> DecisionData::GetObstacleByType(
 std::unordered_set<std::string> DecisionData::GetObstacleIdByType(
     const VirtualObjectType& type) {
   std::lock_guard<std::mutex> lock(mutex_);
-  const auto it = virtual_obstacle_id_map_.find(type);
-  if (it == virtual_obstacle_id_map_.end()) {
-    return std::unordered_set<std::string>();
-  }
-  return it->second;
+  return common::util::FindWithDefault(virtual_obstacle_id_map_, type, {});
 }
 
 const std::vector<Obstacle*>& DecisionData::GetStaticObstacle() const {

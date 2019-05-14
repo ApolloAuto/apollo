@@ -15,6 +15,7 @@
  *****************************************************************************/
 #pragma once
 
+#include <boost/circular_buffer.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -35,7 +36,7 @@ struct alignas(16) Object {
   std::string ToString() const;
   void Reset();
 
-  // @breif object id per frame, required
+  // @brief object id per frame, required
   int id = -1;
 
   // @brief convex hull of the object, required
@@ -100,7 +101,10 @@ struct alignas(16) Object {
 
   // @brief motion state of the tracked object, required
   MotionState motion_state = MotionState::UNKNOWN;
-
+  // // Tailgating (trajectory of objects)
+  //  boost::circular_buffer<Eigen::Vector3d> drops;
+  // // CIPV
+  bool b_cipv = false;
   // @brief brake light, left-turn light and right-turn light score, optional
   CarLight car_light;
   // @brief sensor-specific object supplements, optional

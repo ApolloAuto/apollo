@@ -103,4 +103,5 @@ int main(int argc, char* argv[]) {
       "echo_client");
 
   apollo::cyber::WaitForShutdown();
+  return 0;
 }

@@ -47,6 +47,7 @@ static PyObject *cyber_py_ok(PyObject *self, PyObject *args) {
 
 static PyObject *cyber_py_shutdown(PyObject *self, PyObject *args) {
   apollo::cyber::py_shutdown();
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -61,6 +62,7 @@ static PyObject *cyber_py_is_shutdown(PyObject *self, PyObject *args) {
 
 static PyObject *cyber_py_waitforshutdown(PyObject *self, PyObject *args) {
   apollo::cyber::py_waitforshutdown();
+  Py_INCREF(Py_None);
   return Py_None;
 }
 

@@ -38,13 +38,11 @@ cc_library(
     srcs = [
         "navi_planning.cc",
         "on_lane_planning.cc",
-        "open_space_planning.cc",
         "planning_base.cc",
     ],
     hdrs = [
         "navi_planning.h",
         "on_lane_planning.h",
-        "open_space_planning.h",
         "planning_base.h",
     ],
     copts = [
@@ -64,6 +62,7 @@ cc_library(
         "//modules/planning/common:planning_common",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:trajectory_stitcher",
+        "//modules/planning/common/util:util_lib",
         "//modules/planning/planner",
         "//modules/planning/planner:planner_dispatcher",
         "//modules/planning/proto:planning_config_proto",
@@ -72,7 +71,6 @@ cc_library(
         "//modules/planning/tasks:task_factory",
         "//modules/planning/tasks/smoothers:smoother",
         "//modules/planning/traffic_rules:traffic_decider",
-        "//modules/planning/util:util_lib",
         "//modules/prediction/proto:prediction_proto",
     ],
 )

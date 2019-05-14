@@ -31,10 +31,12 @@ Features FeatureOutput::features_;
 ListDataForLearning FeatureOutput::list_data_for_learning_;
 ListPredictionResult FeatureOutput::list_prediction_result_;
 ListFrameEnv FeatureOutput::list_frame_env_;
+ListDataForTuning FeatureOutput::list_data_for_tuning_;
 std::size_t FeatureOutput::idx_feature_ = 0;
 std::size_t FeatureOutput::idx_learning_ = 0;
 std::size_t FeatureOutput::idx_prediction_result_ = 0;
 std::size_t FeatureOutput::idx_frame_env_ = 0;
+std::size_t FeatureOutput::idx_tuning_ = 0;
 
 void FeatureOutput::Close() {
   ADEBUG << "Close feature output";
@@ -53,6 +55,10 @@ void FeatureOutput::Close() {
     }
     case 4: {
       WriteFrameEnv();
+      break;
+    }
+    case 5: {
+      WriteDataForTuning();
       break;
     }
     default: {
@@ -81,7 +87,7 @@ void FeatureOutput::InsertFeatureProto(const Feature& feature) {
 
 void FeatureOutput::InsertDataForLearning(
     const Feature& feature, const std::vector<double>& feature_values,
-    const std::string& category) {
+    const std::string& category, const LaneSequence* lane_sequence_ptr) {
   DataForLearning* data_for_learning =
       list_data_for_learning_.add_data_for_learning();
   data_for_learning->set_id(feature.id());
@@ -92,6 +98,10 @@ void FeatureOutput::InsertDataForLearning(
   data_for_learning->set_category(category);
   ADEBUG << "Insert [" << category
          << "] data for learning with size = " << feature_values.size();
+  if (lane_sequence_ptr != nullptr) {
+    data_for_learning->set_lane_sequence_id(
+        lane_sequence_ptr->lane_sequence_id());
+  }
 }
 
 void FeatureOutput::InsertPredictionResult(
@@ -108,6 +118,20 @@ void FeatureOutput::InsertPredictionResult(
 
 void FeatureOutput::InsertFrameEnv(const FrameEnv& frame_env) {
   list_frame_env_.add_frame_env()->CopyFrom(frame_env);
+}
+
+void FeatureOutput::InsertDataForTuning(
+    const Feature& feature, const std::vector<double>& feature_values,
+    const std::string& category, const LaneSequence& lane_sequence) {
+  DataForTuning* data_for_tuning = list_data_for_tuning_.add_data_for_tuning();
+  data_for_tuning->set_id(feature.id());
+  data_for_tuning->set_timestamp(feature.timestamp());
+  *data_for_tuning->mutable_values_for_tuning() = {feature_values.begin(),
+                                                   feature_values.end()};
+  data_for_tuning->set_category(category);
+  ADEBUG << "Insert [" << category
+         << "] data for tuning with size = " << feature_values.size();
+  data_for_tuning->set_lane_sequence_id(lane_sequence.lane_sequence_id());
 }
 
 void FeatureOutput::WriteFeatureProto() {
@@ -161,6 +185,19 @@ void FeatureOutput::WriteFrameEnv() {
   }
 }
 
+void FeatureOutput::WriteDataForTuning() {
+  if (list_data_for_tuning_.data_for_tuning().empty()) {
+    ADEBUG << "Skip writing empty data_for_tuning.";
+    return;
+  }
+  const std::string file_name =
+      StrCat(FLAGS_prediction_data_dir, "/datatuning.",
+             std::to_string(idx_tuning_), ".bin");
+  cyber::common::SetProtoToBinaryFile(list_data_for_tuning_, file_name);
+  list_data_for_tuning_.Clear();
+  ++idx_tuning_;
+}
+
 int FeatureOutput::Size() { return features_.feature_size(); }
 
 int FeatureOutput::SizeOfDataForLearning() {
@@ -172,6 +209,10 @@ int FeatureOutput::SizeOfPredictionResult() {
 }
 
 int FeatureOutput::SizeOfFrameEnv() { return list_frame_env_.frame_env_size(); }
+
+int FeatureOutput::SizeOfDataForTuning() {
+  return list_data_for_tuning_.data_for_tuning_size();
+}
 
 }  // namespace prediction
 }  // namespace apollo

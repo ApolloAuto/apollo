@@ -44,6 +44,15 @@ new_local_repository(
     path = "/home/tmp/google_styleguide",
 )
 
+#ad-rss-lib
+new_git_repository(
+    name = "ad_rss_lib",
+    build_file = "third_party/rss_lib.BUILD",
+    tag = "v1.1.0",
+    remote = "https://github.com/intel/ad-rss-lib",
+)
+
+
 # eigen
 new_http_archive(
     name = "eigen",
@@ -76,14 +85,6 @@ new_local_repository(
     name = "ros",
     build_file = "third_party/ros.BUILD",
     path = "/home/tmp/ros",
-)
-
-# OpenCV 2.4.13.2
-new_http_archive(
-    name = "opencv2",
-    build_file = "third_party/opencv2.BUILD",
-    strip_prefix = "opencv-2.4.13.2",
-    url = "file:///home/tmp/opencv-2.4.13.2.zip",
 )
 
 # PCL 1.7
@@ -264,4 +265,11 @@ new_local_repository(
     name = "pytorch_gpu",
     build_file = "third_party/pytorch_gpu.BUILD",
     path = "/usr/local/apollo/libtorch_gpu",
+)
+
+# ffmpeg
+new_local_repository(
+    name = "ffmpeg",
+    build_file = "third_party/ffmpeg.BUILD",
+    path = "/usr/local/apollo/ffmpeg",
 )

@@ -11,11 +11,11 @@ message YoloParam {
 message ModelParam {
     optional string model_name = 1 [default = "yolo-2d"];
     optional string proto_file = 2 [default = "caffe.pt"];
-    optional string weight_file = 3 [default = "caffe.md"];
+    optional string weight_file = 3 [default = "caffe.model"];
     optional string stage1_pt = 21 [default = "caffe.pt"];
-    optional string stage1_md = 22 [default = "caffe.md"];
+    optional string stage1_md = 22 [default = "caffe.model"];
     optional string stage2_pt = 23 [default = "caffe.pt"];
-    optional string stage2_md = 24 [default = "caffe.md"];
+    optional string stage2_md = 24 [default = "caffe.model"];
     optional string anchors_file = 4 [default = "anchors.txt"];
     optional string types_file = 5 [default = "types.txt"];
     optional string feature_file = 6 [default = "feature.pt"];

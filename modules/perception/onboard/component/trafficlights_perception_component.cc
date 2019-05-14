@@ -20,6 +20,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <limits>
+#include <map>
 #include <utility>
 
 #include "cyber/common/file.h"
@@ -41,11 +42,27 @@ using TLCamID = apollo::perception::TrafficLightDetection::CameraID;
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::perception::common::SensorManager;
 
+class TLInfo {
+ public:
+  cv::Scalar tl_color_;
+  std::string tl_string_;
+  std::string tl_string_ex_;
+};
+
+std::map<base::TLColor, TLInfo> s_tl_infos = {
+    {base::TLColor::TL_UNKNOWN_COLOR,
+     {cv::Scalar(255, 255, 255), "UNKNOWN", "UNKNOWN traffic light"}},
+    {base::TLColor::TL_RED,
+     {cv::Scalar(0, 0, 255), "RED", "RED traffic light"}},
+    {base::TLColor::TL_GREEN,
+     {cv::Scalar(0, 255, 0), "GREEN", "GREEN traffic light"}},
+    {base::TLColor::TL_YELLOW,
+     {cv::Scalar(0, 255, 255), "YELLOW", "YELLOW traffic light"}}};
+
 static int GetGpuId(
     const apollo::perception::camera::CameraPerceptionInitOptions& options) {
   apollo::perception::camera::app::TrafficLightParam trafficlight_param;
-  std::string work_root = "";
-  apollo::perception::camera::GetCyberWorkRoot(&work_root);
+  std::string work_root = apollo::perception::camera::GetCyberWorkRoot();
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
@@ -107,7 +124,7 @@ int TrafficLightsPerceptionComponent::InitConfig() {
   apollo::perception::onboard::TrafficLight traffic_light_param;
   if (!GetProtoConfig(&traffic_light_param)) {
     AINFO << "load trafficlights perception component proto param failed";
-    return false;
+    return cyber::FAIL;
   }
 
   tf2_frame_id_ = traffic_light_param.tl_tf2_frame_id();
@@ -989,23 +1006,14 @@ void TrafficLightsPerceptionComponent::Visualize(
     const cv::Rect rectified_rect(rectified_roi.x, rectified_roi.y,
                                   rectified_roi.width, rectified_roi.height);
     cv::Scalar tl_color;
-    switch (light->status.color) {
-      case base::TLColor::TL_RED:
-        tl_color = cv::Scalar(0, 0, 255);
-        tl_string = "RED";
-        break;
-      case base::TLColor::TL_GREEN:
-        tl_color = cv::Scalar(0, 255, 0);
-        tl_string = "GREEN";
-        break;
-      case base::TLColor::TL_YELLOW:
-        tl_color = cv::Scalar(0, 255, 255);
-        tl_string = "YELLOW";
-        break;
-      default:
-        tl_color = cv::Scalar(255, 255, 255);
-        tl_string = "UNKNOWN";
-        break;
+    std::map<base::TLColor, TLInfo>::iterator itor =
+        s_tl_infos.find(light->status.color);
+    if (itor != s_tl_infos.end()) {
+      tl_color = itor->second.tl_color_;
+      tl_string = itor->second.tl_string_;
+    } else {
+      tl_color = cv::Scalar(255, 255, 255);
+      tl_string = "UNKNOWN";
     }
     snprintf(str, sizeof(str), "ID:%s C:%.3lf", light->id.c_str(),
              light->status.confidence);
@@ -1017,23 +1025,14 @@ void TrafficLightsPerceptionComponent::Visualize(
   }
 
   // Show text of voting results
-  switch (detected_trafficlight_color_) {
-    case base::TLColor::TL_RED:
-      tl_string = "RED traffic light";
-      tl_color = cv::Scalar(0, 0, 255);
-      break;
-    case base::TLColor::TL_GREEN:
-      tl_string = "GREEN traffic light";
-      tl_color = cv::Scalar(0, 255, 0);
-      break;
-    case base::TLColor::TL_YELLOW:
-      tl_string = "YELLOW traffic light";
-      tl_color = cv::Scalar(0, 255, 255);
-      break;
-    default:
-      tl_string = "UNKNOWN traffic light";
-      tl_color = cv::Scalar(255, 255, 255);
-      break;
+  std::map<base::TLColor, TLInfo>::iterator itor =
+      s_tl_infos.find(detected_trafficlight_color_);
+  if (itor != s_tl_infos.end()) {
+    tl_color = itor->second.tl_color_;
+    tl_string = itor->second.tl_string_ex_;
+  } else {
+    tl_color = cv::Scalar(255, 255, 255);
+    tl_string = "UNKNOWN traffic light";
   }
   double all = cnt_r_ + cnt_g_ + cnt_y_ + cnt_u_;
   if (all < 0.0001) {

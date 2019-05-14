@@ -8,5 +8,5 @@ message OpenSpaceFallBackDeciderConfig {
   // fallback collision check distance
   optional double open_space_fall_back_collision_distance = 2 [default = 5.0];
   // fallback stop trajectory safety gap to obstacles
-  optional double open_space_fall_back_stop_safety_gap = 3 [default = 1.0];
+  optional double open_space_fall_back_stop_distance = 3 [default = 2.0];
 }

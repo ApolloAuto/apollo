@@ -117,11 +117,97 @@ bool ReferenceLineInfo::Init(const std::vector<const Obstacle*>& obstacles) {
   // set lattice planning target speed limit;
   SetCruiseSpeed(FLAGS_default_cruise_speed);
 
-  // set path_turn_type
-  SetPathTurnType();
-
   is_safe_to_change_lane_ = CheckChangeLane();
-  is_inited_ = true;
+  return true;
+}
+
+const std::vector<PathData>& ReferenceLineInfo::GetCandidatePathData() const {
+  return candidate_path_data_;
+}
+
+void ReferenceLineInfo::SetCandidatePathData(
+    std::vector<PathData> candidate_path_data) {
+  candidate_path_data_ = std::move(candidate_path_data);
+}
+
+const std::vector<PathBoundary>& ReferenceLineInfo::GetCandidatePathBoundaries()
+    const {
+  return candidate_path_boundaries_;
+}
+
+void ReferenceLineInfo::SetCandidatePathBoundaries(
+    std::vector<PathBoundary> path_boundaries) {
+  candidate_path_boundaries_ = std::move(path_boundaries);
+}
+
+hdmap::LaneInfoConstPtr ReferenceLineInfo::LocateLaneInfo(
+    const double s) const {
+  std::vector<hdmap::LaneInfoConstPtr> lanes;
+  reference_line_.GetLaneFromS(s, &lanes);
+  if (lanes.empty()) {
+    AWARN << "cannot get any lane using s";
+    return nullptr;
+  }
+
+  return lanes.front();
+}
+
+bool ReferenceLineInfo::GetNeighborLaneInfo(
+    const ReferenceLineInfo::LaneType lane_type, const double s,
+    hdmap::Id* ptr_lane_id, double* ptr_lane_width) const {
+  auto ptr_lane_info = LocateLaneInfo(s);
+  if (ptr_lane_info == nullptr) {
+    return false;
+  }
+
+  switch (lane_type) {
+    case LaneType::LeftForward: {
+      if (ptr_lane_info->lane().left_neighbor_forward_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().left_neighbor_forward_lane_id(0);
+      break;
+    }
+    case LaneType::LeftReverse: {
+      if (ptr_lane_info->lane().left_neighbor_reverse_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().left_neighbor_reverse_lane_id(0);
+      break;
+    }
+    case LaneType::RightForward: {
+      if (ptr_lane_info->lane().right_neighbor_forward_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().right_neighbor_forward_lane_id(0);
+      break;
+    }
+    case LaneType::RightReverse: {
+      if (ptr_lane_info->lane().right_neighbor_reverse_lane_id_size() == 0) {
+        return false;
+      }
+      *ptr_lane_id = ptr_lane_info->lane().right_neighbor_reverse_lane_id(0);
+      break;
+    }
+    default:
+      CHECK(false);
+  }
+  auto ptr_neighbor_lane =
+      hdmap::HDMapUtil::BaseMapPtr()->GetLaneById(*ptr_lane_id);
+  if (ptr_neighbor_lane == nullptr) {
+    return false;
+  }
+
+  auto ref_point = reference_line_.GetReferencePoint(s);
+
+  double neighbor_s = 0.0;
+  double neighbor_l = 0.0;
+  if (!ptr_neighbor_lane->GetProjection({ref_point.x(), ref_point.y()},
+                                        &neighbor_s, &neighbor_l)) {
+    return false;
+  }
+
+  *ptr_lane_width = ptr_neighbor_lane->GetWidth(neighbor_s);
   return true;
 }
 
@@ -147,36 +233,41 @@ bool ReferenceLineInfo::GetFirstOverlap(
 
 void ReferenceLineInfo::InitFirstOverlaps() {
   const auto& map_path = reference_line_.map_path();
+  // clear_zone
+  hdmap::PathOverlap clear_area_overlap;
+  if (GetFirstOverlap(map_path.clear_area_overlaps(), &clear_area_overlap)) {
+    first_encounter_overlaps_.emplace_back(CLEAR_AREA, clear_area_overlap);
+  }
 
   // crosswalk
   hdmap::PathOverlap crosswalk_overlap;
   if (GetFirstOverlap(map_path.crosswalk_overlaps(), &crosswalk_overlap)) {
-    first_encounter_overlaps_.push_back({CROSSWALK, crosswalk_overlap});
-  }
-
-  // signal
-  hdmap::PathOverlap signal_overlap;
-  if (GetFirstOverlap(map_path.signal_overlaps(), &signal_overlap)) {
-    first_encounter_overlaps_.push_back({SIGNAL, signal_overlap});
-  }
-
-  // stop_sign
-  hdmap::PathOverlap stop_sign_overlap;
-  if (GetFirstOverlap(map_path.stop_sign_overlaps(), &stop_sign_overlap)) {
-    first_encounter_overlaps_.push_back({STOP_SIGN, stop_sign_overlap});
-  }
-
-  // clear_zone
-  hdmap::PathOverlap clear_area_overlap;
-  if (GetFirstOverlap(map_path.clear_area_overlaps(), &clear_area_overlap)) {
-    first_encounter_overlaps_.push_back({CLEAR_AREA, clear_area_overlap});
+    first_encounter_overlaps_.emplace_back(CROSSWALK, crosswalk_overlap);
   }
 
   // pnc_junction
   hdmap::PathOverlap pnc_junction_overlap;
   if (GetFirstOverlap(map_path.pnc_junction_overlaps(),
                       &pnc_junction_overlap)) {
-    first_encounter_overlaps_.push_back({PNC_JUNCTION, pnc_junction_overlap});
+    first_encounter_overlaps_.emplace_back(PNC_JUNCTION, pnc_junction_overlap);
+  }
+
+  // signal
+  hdmap::PathOverlap signal_overlap;
+  if (GetFirstOverlap(map_path.signal_overlaps(), &signal_overlap)) {
+    first_encounter_overlaps_.emplace_back(SIGNAL, signal_overlap);
+  }
+
+  // stop_sign
+  hdmap::PathOverlap stop_sign_overlap;
+  if (GetFirstOverlap(map_path.stop_sign_overlaps(), &stop_sign_overlap)) {
+    first_encounter_overlaps_.emplace_back(STOP_SIGN, stop_sign_overlap);
+  }
+
+  // yield_sign
+  hdmap::PathOverlap yield_sign_overlap;
+  if (GetFirstOverlap(map_path.yield_sign_overlaps(), &yield_sign_overlap)) {
+    first_encounter_overlaps_.emplace_back(YIELD_SIGN, yield_sign_overlap);
   }
 
   // sort by start_s
@@ -190,8 +281,6 @@ void ReferenceLineInfo::InitFirstOverlaps() {
   }
 }
 
-bool ReferenceLineInfo::IsInited() const { return is_inited_; }
-
 bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
   constexpr double kEpsilon = 1e-2;
   return overlap.start_s - kEpsilon <= s && s <= overlap.end_s + kEpsilon;
@@ -199,8 +288,9 @@ bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
 
 void ReferenceLineInfo::SetJunctionRightOfWay(const double junction_s,
                                               const bool is_protected) const {
-  auto* right_of_way =
-      PlanningContext::MutablePlanningStatus()->mutable_right_of_way();
+  auto* right_of_way = PlanningContext::Instance()
+                           ->mutable_planning_status()
+                           ->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (WithinOverlap(overlap, junction_s)) {
@@ -210,8 +300,9 @@ void ReferenceLineInfo::SetJunctionRightOfWay(const double junction_s,
 }
 
 ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
-  auto* right_of_way =
-      PlanningContext::MutablePlanningStatus()->mutable_right_of_way();
+  auto* right_of_way = PlanningContext::Instance()
+                           ->mutable_planning_status()
+                           ->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (overlap.end_s < sl_boundary_info_.adc_sl_boundary_.start_s()) {
@@ -225,10 +316,6 @@ ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
     }
   }
   return ADCTrajectory::UNPROTECTED;
-}
-
-const hdmap::Lane::LaneTurn& ReferenceLineInfo::GetPathTurnType() const {
-  return path_turn_type_;
 }
 
 bool ReferenceLineInfo::CheckChangeLane() const {
@@ -303,6 +390,10 @@ const ReferenceLine& ReferenceLineInfo::reference_line() const {
   return reference_line_;
 }
 
+ReferenceLine* ReferenceLineInfo::mutable_reference_line() {
+  return &reference_line_;
+}
+
 void ReferenceLineInfo::SetTrajectory(const DiscretizedTrajectory& trajectory) {
   discretized_trajectory_ = trajectory;
 }
@@ -338,7 +429,7 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     ADEBUG << "obstacle [" << obstacle->Id() << "] is NOT lane blocking.";
   }
 
-  if (IsUnrelaventObstacle(mutable_obstacle)) {
+  if (IsIrrelevantObstacle(*mutable_obstacle)) {
     ObjectDecisionType ignore;
     ignore.mutable_ignore();
     path_decision_.AddLateralDecision("reference_line_filter", obstacle->Id(),
@@ -386,15 +477,18 @@ bool ReferenceLineInfo::AddObstacles(
   return true;
 }
 
-bool ReferenceLineInfo::IsUnrelaventObstacle(const Obstacle* obstacle) {
+bool ReferenceLineInfo::IsIrrelevantObstacle(const Obstacle& obstacle) {
+  if (obstacle.IsCautionLevelObstacle()) {
+    return false;
+  }
   // if adc is on the road, and obstacle behind adc, ignore
-  if (obstacle->PerceptionSLBoundary().end_s() > reference_line_.Length()) {
+  const auto& obstacle_boundary = obstacle.PerceptionSLBoundary();
+  if (obstacle_boundary.end_s() > reference_line_.Length()) {
     return true;
   }
   if (is_on_reference_line_ &&
-      obstacle->PerceptionSLBoundary().end_s() <
-          sl_boundary_info_.adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnLane(obstacle->PerceptionSLBoundary())) {
+      obstacle_boundary.end_s() < sl_boundary_info_.adc_sl_boundary_.end_s() &&
+      reference_line_.IsOnLane(obstacle_boundary)) {
     return true;
   }
   return false;
@@ -402,13 +496,6 @@ bool ReferenceLineInfo::IsUnrelaventObstacle(const Obstacle* obstacle) {
 
 const DiscretizedTrajectory& ReferenceLineInfo::trajectory() const {
   return discretized_trajectory_;
-}
-
-double ReferenceLineInfo::TrajectoryLength() const {
-  if (discretized_trajectory_.empty()) {
-    return 0.0;
-  }
-  return discretized_trajectory_.back().path_point().s();
 }
 
 void ReferenceLineInfo::SetStopPoint(const StopPoint& stop_point) {
@@ -434,9 +521,17 @@ bool ReferenceLineInfo::IsStartFrom(
 
 const PathData& ReferenceLineInfo::path_data() const { return path_data_; }
 
+const PathData& ReferenceLineInfo::fallback_path_data() const {
+  return fallback_path_data_;
+}
+
 const SpeedData& ReferenceLineInfo::speed_data() const { return speed_data_; }
 
 PathData* ReferenceLineInfo::mutable_path_data() { return &path_data_; }
+
+PathData* ReferenceLineInfo::mutable_fallback_path_data() {
+  return &fallback_path_data_;
+}
 
 SpeedData* ReferenceLineInfo::mutable_speed_data() { return &speed_data_; }
 
@@ -625,7 +720,8 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
   if (ReachedDestination()) {
-    PlanningContext::MutablePlanningStatus()
+    PlanningContext::Instance()
+        ->mutable_planning_status()
         ->mutable_destination()
         ->set_has_passed_destination(true);
   } else {
@@ -710,8 +806,9 @@ void ReferenceLineInfo::SetObjectDecisions(
 
 void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   constexpr double kMaxAngleDiff = M_PI / 6.0;
-  auto* prev_advice =
-      PlanningContext::MutablePlanningStatus()->mutable_engage_advice();
+  auto* prev_advice = PlanningContext::Instance()
+                          ->mutable_planning_status()
+                          ->mutable_engage_advice();
   if (!prev_advice->has_advice()) {
     prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
   }
@@ -775,29 +872,37 @@ void ReferenceLineInfo::MakeEStopDecision(
   }
 }
 
-void ReferenceLineInfo::SetPathTurnType() {
+const hdmap::Lane::LaneTurn& ReferenceLineInfo::GetPathTurnType(
+    const double s) const {
   const double forward_buffer = 20.0;
   double route_s = 0.0;
-  const double adc_s = sl_boundary_info_.adc_sl_boundary_.end_s();
   for (const auto& seg : Lanes()) {
-    if (route_s > adc_s + forward_buffer) {
+    if (route_s > s + forward_buffer) {
       break;
     }
     route_s += seg.end_s - seg.start_s;
-    if (route_s < adc_s) {
+    if (route_s < s) {
       continue;
     }
     const auto& turn_type = seg.lane->lane().turn();
     if (turn_type == hdmap::Lane::LEFT_TURN ||
         turn_type == hdmap::Lane::RIGHT_TURN ||
         turn_type == hdmap::Lane::U_TURN) {
-      path_turn_type_ = turn_type;
-      return;
+      return turn_type;
     }
   }
 
-  path_turn_type_ = hdmap::Lane::NO_TURN;
-  return;
+  return hdmap::Lane::NO_TURN;
+}
+
+const bool ReferenceLineInfo::GetIntersectionRightofWayStatus(
+    const hdmap::PathOverlap& pnc_junction_overlap) const {
+  if (GetPathTurnType(pnc_junction_overlap.start_s) != hdmap::Lane::NO_TURN) {
+    return false;
+  }
+
+  // TODO(all): iterate exits of intersection to check/compare speed-limit
+  return true;
 }
 
 int ReferenceLineInfo::GetPnCJunction(

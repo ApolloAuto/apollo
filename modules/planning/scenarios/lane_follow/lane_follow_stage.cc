@@ -20,6 +20,7 @@
 
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
+#include <algorithm>
 #include <limits>
 #include <utility>
 
@@ -35,12 +36,9 @@
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/tasks/optimizers/dp_poly_path/dp_poly_path_optimizer.h"
-#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
+#include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
-#include "modules/planning/tasks/optimizers/qp_piecewise_jerk_path/qp_piecewise_jerk_path_optimizer.h"
-#include "modules/planning/tasks/optimizers/qp_spline_path/qp_spline_path_optimizer.h"
-#include "modules/planning/tasks/optimizers/qp_spline_st_speed/qp_spline_st_speed_optimizer.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 #include "modules/planning/tasks/optimizers/speed_decider/speed_decider.h"
 
 namespace apollo {
@@ -115,7 +113,7 @@ Stage::StageStatus LaneFollowStage::Process(
   bool has_drivable_reference_line = false;
 
   ADEBUG << "Number of reference lines:\t"
-      << frame->mutable_reference_line_info()->size();
+         << frame->mutable_reference_line_info()->size();
 
   for (auto& reference_line_info : *frame->mutable_reference_line_info()) {
     if (has_drivable_reference_line) {
@@ -128,10 +126,9 @@ Stage::StageStatus LaneFollowStage::Process(
 
     if (cur_status.ok()) {
       if (reference_line_info.IsChangeLanePath()) {
-        AERROR << "reference line is lane change ref.";
+        ADEBUG << "reference line is lane change ref.";
         if (reference_line_info.Cost() < kStraightForwardLineCost &&
-            IsClearToChangeLane(&reference_line_info, frame,
-                                planning_start_point.v())) {
+            LaneChangeDecider::IsClearToChangeLane(&reference_line_info)) {
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
           AERROR << "\tclear for lane change";
@@ -140,7 +137,7 @@ Stage::StageStatus LaneFollowStage::Process(
           AERROR << "\tlane change failed";
         }
       } else {
-        AERROR << "reference line is NOT lane change ref.";
+        ADEBUG << "reference line is NOT lane change ref.";
         has_drivable_reference_line = true;
       }
     } else {
@@ -159,18 +156,8 @@ Status LaneFollowStage::PlanOnReferenceLine(
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
-  auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
-  auto speed_profile = SpeedProfileGenerator::GenerateInitSpeedProfile(
-      planning_start_point, reference_line_info);
-  if (speed_profile.empty()) {
-    speed_profile =
-        SpeedProfileGenerator::GenerateSpeedHotStart(planning_start_point);
-    ADEBUG << "Using dummy hot start for speed vector";
-  }
-  *heuristic_speed_data = SpeedData(speed_profile);
 
   auto ret = Status::OK();
-
   for (auto* optimizer : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
     ret = optimizer->Execute(frame, reference_line_info);
@@ -183,7 +170,7 @@ Status LaneFollowStage::PlanOnReferenceLine(
     const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
 
     ADEBUG << "after optimizer " << optimizer->Name() << ":"
-           << reference_line_info->PathSpeedDebugString() << std::endl;
+           << reference_line_info->PathSpeedDebugString();
     ADEBUG << optimizer->Name() << " time spend: " << time_diff_ms << " ms.";
 
     RecordDebugInfo(reference_line_info, optimizer->Name(), time_diff_ms);
@@ -191,29 +178,12 @@ Status LaneFollowStage::PlanOnReferenceLine(
 
   RecordObstacleDebugInfo(reference_line_info);
 
-  if (reference_line_info->path_data().Empty()) {
-    AERROR << "Path fallback.";
-    GenerateFallbackPathProfile(reference_line_info,
-                                reference_line_info->mutable_path_data());
-    reference_line_info->AddCost(kPathOptimizationFallbackCost);
-    reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
+  // check path and speed results for path or speed fallback
+  reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
+  if (!ret.ok()) {
+    PlanFallbackTrajectory(planning_start_point, frame, reference_line_info);
   }
 
-  if (!ret.ok() || reference_line_info->speed_data().empty()) {
-    AERROR << "Speed fallback.";
-
-    *reference_line_info->mutable_speed_data() =
-        SpeedProfileGenerator::GenerateFallbackSpeedProfile();
-    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
-    reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
-  }
-
-  if (!(reference_line_info->trajectory_type() ==
-            ADCTrajectory::PATH_FALLBACK ||
-        reference_line_info->trajectory_type() ==
-            ADCTrajectory::SPEED_FALLBACK)) {
-    reference_line_info->set_trajectory_type(ADCTrajectory::NORMAL);
-  }
   DiscretizedTrajectory trajectory;
   if (!reference_line_info->CombinePathAndSpeedProfile(
           planning_start_point.relative_time(),
@@ -276,6 +246,56 @@ Status LaneFollowStage::PlanOnReferenceLine(
   return Status::OK();
 }
 
+void LaneFollowStage::PlanFallbackTrajectory(
+    const TrajectoryPoint& planning_start_point, Frame* frame,
+    ReferenceLineInfo* reference_line_info) {
+  // path and speed fall back
+  if (reference_line_info->path_data().Empty()) {
+    AERROR << "Path fallback due to algorithm failure";
+    GenerateFallbackPathProfile(reference_line_info,
+                                reference_line_info->mutable_path_data());
+    reference_line_info->AddCost(kPathOptimizationFallbackCost);
+    reference_line_info->set_trajectory_type(ADCTrajectory::PATH_FALLBACK);
+  }
+
+  if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
+    if (!RetrieveLastFramePathProfile(
+            reference_line_info, frame,
+            reference_line_info->mutable_path_data())) {
+      const auto& candidate_path_data =
+          reference_line_info->GetCandidatePathData();
+      for (const auto& path_data : candidate_path_data) {
+        if (path_data.path_label().find("self") != std::string::npos) {
+          *reference_line_info->mutable_path_data() = path_data;
+          AERROR << "Use current frame self lane path as fallback ";
+          break;
+        }
+      }
+    }
+  }
+
+  AERROR << "Speed fallback due to algorithm failure";
+  // TODO(Jiacheng): move this stop_path_threshold to a gflag
+  const double stop_path_distance =
+      reference_line_info->path_data().discretized_path().Length() - 5.0;
+  const double stop_speed_distance =
+      reference_line_info->st_graph_data().is_initialized()
+          ? reference_line_info->st_graph_data().min_s_on_st_boundaries()
+          : std::numeric_limits<double>::infinity();
+  const double curr_speed_distance =
+      FLAGS_fallback_total_time *
+      std::min(FLAGS_default_cruise_speed,
+               reference_line_info->vehicle_state().linear_velocity());
+  *reference_line_info->mutable_speed_data() =
+      SpeedProfileGenerator::GenerateFallbackSpeed(std::min(
+          {curr_speed_distance, stop_path_distance, stop_speed_distance}));
+
+  if (reference_line_info->trajectory_type() != ADCTrajectory::PATH_FALLBACK) {
+    reference_line_info->AddCost(kSpeedOptimizationFallbackCost);
+    reference_line_info->set_trajectory_type(ADCTrajectory::SPEED_FALLBACK);
+  }
+}
+
 void LaneFollowStage::GenerateFallbackPathProfile(
     const ReferenceLineInfo* reference_line_info, PathData* path_data) {
   auto adc_point = EgoInfo::Instance()->start_point();
@@ -305,6 +325,34 @@ void LaneFollowStage::GenerateFallbackPathProfile(
   path_data->SetDiscretizedPath(DiscretizedPath(std::move(path_points)));
 }
 
+bool LaneFollowStage::RetrieveLastFramePathProfile(
+    const ReferenceLineInfo* reference_line_info, const Frame* frame,
+    PathData* path_data) {
+  const auto* ptr_last_frame = FrameHistory::Instance()->Latest();
+  if (ptr_last_frame == nullptr) {
+    AERROR
+        << "Last frame doesn't succeed, fail to retrieve last frame path data";
+    return false;
+  }
+
+  const auto& last_frame_discretized_path =
+      ptr_last_frame->current_frame_planned_path();
+
+  path_data->SetDiscretizedPath(last_frame_discretized_path);
+  const auto adc_frenet_frame_point_ =
+      reference_line_info->reference_line().GetFrenetPoint(
+          frame->PlanningStartPoint().path_point());
+
+  bool trim_success = path_data->LeftTrimWithRefS(adc_frenet_frame_point_);
+  if (!trim_success) {
+    AERROR << "Fail to trim path_data. adc_frenet_frame_point: "
+           << adc_frenet_frame_point_.ShortDebugString();
+    return false;
+  }
+  AERROR << "Use last frame good path to do speed fallback";
+  return true;
+}
+
 SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
                                    const ReferenceLine& reference_line) const {
   SLPoint sl_point;
@@ -312,87 +360,6 @@ SLPoint LaneFollowStage::GetStopSL(const ObjectStop& stop_decision,
       {stop_decision.stop_point().x(), stop_decision.stop_point().y()},
       &sl_point);
   return sl_point;
-}
-
-// a hysteresis filter used to improve decision consistency in lane change
-bool LaneFollowStage::HysteresisFilter(const double obstacle_distance,
-                                       const double safe_distance,
-                                       const double distance_buffer,
-                                       const bool is_obstacle_blocking) {
-  if (is_obstacle_blocking) {
-    return obstacle_distance < safe_distance + distance_buffer;
-  } else {
-    return obstacle_distance < safe_distance - distance_buffer;
-  }
-}
-
-bool LaneFollowStage::IsClearToChangeLane(
-    ReferenceLineInfo* reference_line_info, Frame* frame, const double ego_v) {
-  CHECK(reference_line_info->IsChangeLanePath());
-
-  double ego_start_s = reference_line_info->AdcSlBoundary().start_s();
-  double ego_end_s = reference_line_info->AdcSlBoundary().end_s();
-
-  for (auto* obstacle :
-       reference_line_info->path_decision()->obstacles().Items()) {
-    if (obstacle->IsVirtual() || obstacle->IsStatic()) {
-      AERROR << "skip one virtual or static obstacle";
-      continue;
-    }
-
-    double start_s = std::numeric_limits<double>::max();
-    double end_s = -std::numeric_limits<double>::max();
-    double start_l = std::numeric_limits<double>::max();
-    double end_l = -std::numeric_limits<double>::max();
-
-    for (const auto& p : obstacle->PerceptionPolygon().points()) {
-      SLPoint sl_point;
-      reference_line_info->reference_line().XYToSL({p.x(), p.y()}, &sl_point);
-      start_s = std::fmin(start_s, sl_point.s());
-      end_s = std::fmax(end_s, sl_point.s());
-
-      start_l = std::fmin(start_l, sl_point.l());
-      end_l = std::fmax(end_l, sl_point.l());
-    }
-
-    /**
-    AERROR << "has dynamic obstacle";
-    AERROR << "obs start_s:\t" << start_s;
-    AERROR << "obs end_s:\t" << end_s;
-    AERROR << "obs start_l:\t" << start_l;
-    AERROR << "obs end_l:\t" << end_l;
-    AERROR << "obs v:\t" << obstacle->speed();
-    **/
-
-    constexpr double kLateralShift = 2.5;
-    if (end_l < -kLateralShift || start_l > kLateralShift) {
-      continue;
-    }
-    constexpr double kSafeTime = 3.0;
-    constexpr double kForwardMinSafeDistance = 6.0;
-    constexpr double kBackwardMinSafeDistance = 8.0;
-    constexpr double kDistanceBuffer = 0.5;
-
-    const auto kForwardSafeDistance = std::fmax(
-        kForwardMinSafeDistance, (ego_v - obstacle->speed()) * kSafeTime);
-    const auto kBackwardSafeDistance = std::fmax(
-        kBackwardMinSafeDistance, (obstacle->speed() - ego_v) * kSafeTime);
-    if (HysteresisFilter(ego_start_s - end_s, kBackwardSafeDistance,
-                         kDistanceBuffer, obstacle->IsLaneChangeBlocking()) &&
-        HysteresisFilter(start_s - ego_end_s, kForwardSafeDistance,
-                         kDistanceBuffer, obstacle->IsLaneChangeBlocking())) {
-      reference_line_info->path_decision()
-          ->Find(obstacle->Id())
-          ->SetLaneChangeBlocking(true);
-      AERROR << "Lane Change is blocked by obstacle" << obstacle->Id();
-      return false;
-    } else {
-      reference_line_info->path_decision()
-          ->Find(obstacle->Id())
-          ->SetLaneChangeBlocking(false);
-    }
-  }
-  return true;
 }
 
 }  // namespace lane_follow

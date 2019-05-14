@@ -41,9 +41,11 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
+using apollo::planning_internal::Debug;
 
 typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
     TrajGearPair;
@@ -60,7 +62,7 @@ struct GearSwitchStates {
 
 class OpenSpaceInfo {
  public:
-  OpenSpaceInfo();
+  OpenSpaceInfo() = default;
   ~OpenSpaceInfo() = default;
 
   bool open_space_pre_stop_finished() const {
@@ -85,6 +87,14 @@ class OpenSpaceInfo {
 
   hdmap::ParkingSpaceInfoConstPtr *mutable_target_parking_spot() {
     return &target_parking_spot_;
+  }
+
+  const hdmap::LaneInfoConstPtr target_parking_lane() const {
+    return target_parking_lane_;
+  }
+
+  void set_target_parking_lane(hdmap::LaneInfoConstPtr lane_info_const_ptr) {
+    target_parking_lane_ = lane_info_const_ptr;
   }
 
   double open_space_pre_stop_fence_s() const {
@@ -219,6 +229,7 @@ class OpenSpaceInfo {
   }
 
   const std::vector<TrajGearPair> &paritioned_trajectories() const {
+    // TODO(Runxin): export to chart
     return paritioned_trajectories_;
   }
 
@@ -235,6 +246,7 @@ class OpenSpaceInfo {
   }
 
   const TrajGearPair &chosen_paritioned_trajectory() const {
+    // TODO(Runxin): export to chart
     return chosen_paritioned_trajectory_;
   }
 
@@ -266,6 +278,35 @@ class OpenSpaceInfo {
     return publishable_trajectory_data_;
   }
 
+  // TODO(QiL, Jinyun) refactor and merge this with debug
+  common::TrajectoryPoint *mutable_future_collision_point() {
+    return &future_collision_point_;
+  }
+
+  const common::TrajectoryPoint &future_collision_point() const {
+    return future_collision_point_;
+  }
+
+  // TODO(QiL, Jinyun): refactor open_space_info vs debug
+
+  apollo::planning_internal::Debug *mutable_debug() { return debug_; }
+
+  void set_debug(apollo::planning_internal::Debug *debug) { debug_ = debug; }
+
+  const apollo::planning_internal::Debug &debug() const { return *debug_; }
+
+  const apollo::planning_internal::Debug debug_instance() const {
+    return debug_instance_;
+  }
+
+  apollo::planning_internal::Debug *mutable_debug_instance() {
+    return &debug_instance_;
+  }
+
+  void sync_debug_instance() { debug_instance_ = *debug_; }
+
+  void RecordDebug(apollo::planning_internal::Debug *ptr_debug);
+
  private:
   // @brief vehicle needs to stop first in open space related scenarios
   bool open_space_pre_stop_finished_ = true;
@@ -273,6 +314,8 @@ class OpenSpaceInfo {
   std::string target_parking_spot_id_;
 
   hdmap::ParkingSpaceInfoConstPtr target_parking_spot_ = nullptr;
+
+  hdmap::LaneInfoConstPtr target_parking_lane_ = nullptr;
 
   double open_space_pre_stop_fence_s_ = 0.0;
 
@@ -332,8 +375,17 @@ class OpenSpaceInfo {
 
   TrajGearPair fallback_trajectory_;
 
+  common::TrajectoryPoint future_collision_point_;
+
   std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
       publishable_trajectory_data_;
+
+  // the pointer from ADCtrajectory
+  apollo::planning_internal::Debug *debug_;
+
+  // the instance inside debug,
+  // if ADCtrajectory is NULL, blank; else same to ADCtrajectory
+  apollo::planning_internal::Debug debug_instance_;
 };
 
 }  // namespace planning

@@ -38,10 +38,12 @@ class VehicleModelTest : public ::testing::Test {
         "modules/common/testdata/localization_post.pb.txt";
     CHECK(cyber::common::GetProtoFromFile(localization_post_file,
                                           &localization_post_));
-    std::string chasis_pre_file = "modules/common/testdata/chasis_pre.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(chasis_pre_file, &chassis_pre_));
-    std::string chasis_post_file = "modules/common/testdata/chasis_post.pb.txt";
-    CHECK(cyber::common::GetProtoFromFile(chasis_post_file, &chassis_post_));
+    const std::string chassis_pre_file =
+        "modules/common/testdata/chassis_pre.pb.txt";
+    CHECK(cyber::common::GetProtoFromFile(chassis_pre_file, &chassis_pre_));
+    const std::string chassis_post_file =
+        "modules/common/testdata/chassis_post.pb.txt";
+    CHECK(cyber::common::GetProtoFromFile(chassis_post_file, &chassis_post_));
   }
 
  protected:

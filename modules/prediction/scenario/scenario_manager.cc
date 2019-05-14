@@ -19,7 +19,6 @@
 #include <algorithm>
 
 #include "modules/prediction/common/prediction_gflags.h"
-#include "modules/prediction/scenario/prioritization/obstacles_prioritizer.h"
 
 namespace apollo {
 namespace prediction {
@@ -38,10 +37,6 @@ void ScenarioManager::Run() {
 
   current_scenario_ = ptr_scenario_features->scenario();
 
-  if (FLAGS_enable_prioritize_obstacles) {
-    ObstaclesPrioritizer::PrioritizeObstacles(environment_features,
-                                              ptr_scenario_features);
-  }
   // TODO(all) other functionalities including lane, junction filters
 }
 

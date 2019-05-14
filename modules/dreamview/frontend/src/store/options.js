@@ -37,6 +37,9 @@ export default class Options {
             if (OFFLINE_PLAYBACK && name === "showTasks") {
                 defaultValue = false;
             }
+            if (OFFLINE_PLAYBACK && name === "showPositionShadow") {
+                defaultValue = true;
+            }
             options[name] = defaultValue;
         }
         extendObservable(this, options);

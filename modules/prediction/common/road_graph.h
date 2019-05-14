@@ -17,12 +17,12 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
-
-#include "modules/prediction/proto/lane_graph.pb.h"
 
 #include "modules/common/status/status.h"
 #include "modules/prediction/common/prediction_map.h"
+#include "modules/prediction/proto/lane_graph.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -33,9 +33,11 @@ class RoadGraph {
    * @brief Constructor
    * @param start_s The starting longitudinal s value.
    * @param length The length to build the road graph.
+   * @param If consider all successor lanes after dividing.
    * @param lane_info_ptr The starting lane.
    */
   RoadGraph(const double start_s, const double length,
+            const bool consider_divide,
             std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
 
   /**
@@ -65,14 +67,34 @@ class RoadGraph {
    * @param The LaneInfo the current lane segment we are looking at.
    * @param The max. number of recursive calls (so that it won't recurse
    *        for too many times when given unreasonable speed info. etc.)
+   * @param If we consider all successor lanes after dividing
    * @param The vector of lane_segments visited (DFS).
    * @param The LaneGraph that we need to write in.
    */
   void ComputeLaneSequence(const double accumulated_s, const double start_s,
                            std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
                            const int graph_search_horizon,
+                           const bool consider_divide,
                            std::vector<LaneSegment>* const lane_segments,
                            LaneGraph* const lane_graph_ptr) const;
+
+  /**
+   * @brief Get the pointer to the lane with the smallest average curvature
+   * @param The vector of lane infos
+   * @return The pointer to the lane with the smallest average curvature
+   */
+  std::shared_ptr<const hdmap::LaneInfo> LaneWithSmallestAverageCurvature(
+      const std::vector<std::shared_ptr<const hdmap::LaneInfo>>& lane_infos)
+      const;
+
+  /**
+   * @brief Get the average curvature along a lane with the ID lane_id
+   * @param The ID of the lane
+   * @param The size of samples alone the lane to compute the average curvature
+   * @return The average curvature
+   */
+  double AverageCurvature(const std::string& lane_id,
+                          const size_t sample_size) const;
 
  private:
   // The s of the obstacle on its own lane_segment.
@@ -80,6 +102,9 @@ class RoadGraph {
 
   // The total length to search for lane_graph.
   double length_ = -1.0;
+
+  // If we consider all successor lanes after dividing
+  bool consider_divide_ = false;
 
   // The lane_info of the lane_segment where the obstacle is on.
   std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr_ = nullptr;

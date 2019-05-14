@@ -4,8 +4,8 @@
 velodyne check
 """
 
-import rospy
 import time
+from cyber_py import cyber_time
 from sensor_msgs.msg import PointCloud2
 
 prev_stamp = 0
@@ -13,8 +13,10 @@ count = 0
 LOG_FILE = None
 EXCEPT_LOG_FILE = None
 
+
 def create_log_file():
-    data_time = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))
+    data_time = time.strftime(
+        '%Y-%m-%d-%H-%M-%S', time.localtime(cyber_time.Time.now().to_sec()))
     file_name = '/apollo/data/log/velodyne_hz.' + data_time + '.log'
     except_file_name = '/apollo/data/log/velodyne_hz.' + data_time + '.log.err'
     global LOG_FILE
@@ -22,8 +24,10 @@ def create_log_file():
     LOG_FILE = open(file_name, 'a+')
     EXCEPT_LOG_FILE = open(except_file_name, 'a+')
 
+
 def log_latency(log_file, frequence):
     pass
+
 
 def callback(pointcloud):
     global count
@@ -41,12 +45,14 @@ def callback(pointcloud):
         EXCEPT_LOG_FILE.write(log_info)
     prev_stamp = stamp
 
+
 def listener():
     node_name = 'velodyne_check'
     topic = '/apollo/sensor/velodyne64/compensator/PointCloud2'
     rospy.init_node(node_name)
     rospy.Subscriber(topic, PointCloud2, callback)
     rospy.spin()
+
 
 if __name__ == "__main__":
     create_log_file()

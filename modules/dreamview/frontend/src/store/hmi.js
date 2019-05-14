@@ -40,6 +40,7 @@ export default class HMI {
     utmZoneId = 10;
 
     @observable isCalibrationMode = false;
+    @observable dataCollectionUpdateStatus = observable.map();
     @observable dataCollectionProgress = observable.map();
 
     @action toggleCoDriverFlag() {
@@ -65,6 +66,7 @@ export default class HMI {
         if (newStatus.currentMode) {
             this.isCalibrationMode = (newStatus.currentMode.toLowerCase().includes('calibration'));
             if (this.currentMode !== newStatus.currentMode) {
+                this.dataCollectionUpdateStatus.clear();
                 this.dataCollectionProgress.clear();
             }
             this.currentMode = newStatus.currentMode;
@@ -133,17 +135,45 @@ export default class HMI {
     }
 
     @action updateDataCollectionProgress(data) {
-        const overallKeyName = 'Overall';
-        Object.keys(data).sort((category1, category2) => {
-            if (category1 === overallKeyName) {
-                return -1;
+        Object.keys(data).sort().forEach((scenarioName) => {
+            if (!this.dataCollectionProgress.has(scenarioName)) {
+                this.dataCollectionProgress.set(scenarioName, observable.map());
+                this.dataCollectionUpdateStatus.set(scenarioName, observable.map());
             }
-            if (category2 === overallKeyName) {
-                return 1;
-            }
-            return category1.localeCompare(category2);
-        }).forEach((category) => {
-            this.dataCollectionProgress.set(category, data[category]);
+            const categoryProgress = this.dataCollectionProgress.get(scenarioName);
+            const categoryStatus =  this.dataCollectionUpdateStatus.get(scenarioName);
+            const scenario = data[scenarioName];
+            Object.keys(scenario).sort().forEach((categoryName) => {
+                const isUpdated = categoryProgress.get(categoryName) !== scenario[categoryName];
+                categoryProgress.set(categoryName, scenario[categoryName]);
+                categoryStatus.set(categoryName, isUpdated);
+            });
         });
+    }
+
+    rotate2DPoint({ x, y }, rotationInRad) {
+        return {
+            x: x * Math.cos(rotationInRad) - y * Math.sin(rotationInRad),
+            y: x * Math.sin(rotationInRad) + y * Math.cos(rotationInRad),
+        };
+    }
+
+    calculateCarPolygonPoints(positionX, positionY, headingInRad) {
+        const config = this.vehicleParam;
+        const polygonPoints = [
+            { y: -config.leftEdgeToCenter, x: config.frontEdgeToCenter },
+            { y: config.rightEdgeToCenter, x: config.frontEdgeToCenter },
+            { y: config.rightEdgeToCenter, x: -config.backEdgeToCenter },
+            { y: -config.leftEdgeToCenter, x: -config.backEdgeToCenter },
+            { y: -config.leftEdgeToCenter, x: config.frontEdgeToCenter },
+        ];
+
+        polygonPoints.forEach((point) => {
+            const newPoint = this.rotate2DPoint(point, headingInRad);
+            point.x = positionX + newPoint.x;
+            point.y = positionY + newPoint.y;
+        });
+
+        return polygonPoints;
     }
 }

@@ -30,6 +30,8 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/speed_profile_generator.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
@@ -60,38 +62,52 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the stop_sign is still along reference_line
-  std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
-  if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
+  std::string stop_sign_overlap_id = GetContext()->current_stop_sign_overlap_id;
+
+  // get overlap along reference line
+  PathOverlap* current_stop_sign_overlap =
+      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                stop_sign_overlap_id,
+                                                ReferenceLineInfo::STOP_SIGN);
+  if (!current_stop_sign_overlap) {
     return FinishScenario();
   }
 
   // set right_of_way_status
-  const double stop_sign_start_s =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
+  const double stop_sign_start_s = current_stop_sign_overlap->start_s;
   reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
 
-  const double stop_sign_end_s =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.end_s;
+  const double stop_sign_end_s = current_stop_sign_overlap->end_s;
   const double wait_time =
       Clock::NowInSeconds() - GetContext()->creep_start_time;
-  const double timeout = scenario_config_.creep_timeout();
+  const double timeout_sec = scenario_config_.creep_timeout_sec();
   auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
-  if (task && task->CheckCreepDone(*frame, reference_line_info, stop_sign_end_s,
-                                   wait_time, timeout)) {
+
+  if (task == nullptr) {
+    AERROR << "task is nullptr";
+    return FinishStage();
+  }
+
+  double creep_stop_s =
+      stop_sign_end_s + task->FindCreepDistance(*frame, reference_line_info);
+  const double distance =
+      creep_stop_s - reference_line_info.AdcSlBoundary().end_s();
+  if (distance <= 0.0) {
+    auto& rfl_info = frame->mutable_reference_line_info()->front();
+    *(rfl_info.mutable_speed_data()) =
+        SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(0.0, 0);
+  }
+
+  if (task->CheckCreepDone(*frame, reference_line_info, stop_sign_end_s,
+                           wait_time, timeout_sec)) {
     return FinishStage();
   }
 
   // set param for PROCEED_WITH_CAUTION_SPEED
-  dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
-      ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
-                                        stop_sign_end_s);
+  // dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP))
+  //    ->SetProceedWithCautionSpeedParam(*frame, reference_line_info,
+  //                                      stop_sign_end_s);
 
-  plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
-  if (!plan_ok) {
-    AERROR << "StopSignUnprotectedStageCreep planning error";
-  }
   return Stage::RUNNING;
 }
 

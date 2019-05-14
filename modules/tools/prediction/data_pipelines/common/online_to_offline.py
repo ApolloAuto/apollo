@@ -154,7 +154,7 @@ class LabelGenerator(object):
     @input idx_curr: The index of the current Feature to be labelled.
                      We will look at the subsequent Features following this
                      one to complete labeling.
-    @output: All saved as class variables in observation_dict, 
+    @output: All saved as class variables in observation_dict,
              including: its trajectory info and its lane changing info.
     '''
     def ObserveFeatureSequence(self, feature_sequence, idx_curr):
@@ -384,7 +384,7 @@ class LabelGenerator(object):
                                 lane_sequence.label = -1
                                 lane_sequence.time_to_lane_edge = -1.0
                                 lane_sequence.time_to_lane_center = -1.0
-                
+
                 for lane_sequence in feature.lane.lane_graph.lane_sequence:
                     lane_sequence_dict[lane_sequence.lane_sequence_id] = [lane_sequence.label, \
                    lane_sequence.time_to_lane_center, lane_sequence.time_to_lane_edge]
@@ -449,7 +449,7 @@ class LabelGenerator(object):
                         exit_pos_dict[junction_exit.exit_lane_id] = exit_pos
                         delta_pos = exit_pos - curr_pos
                         angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
-                        d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
+                        d_idx = int((angle / (2.0 * np.pi) + 1.0 / 24) * 12 % 12)
                         mask[d_idx] = 1
 
                 # Searching for up to 100 frames (10 seconds)
@@ -466,7 +466,7 @@ class LabelGenerator(object):
                             delta_pos = exit_pos - curr_pos
                             angle = math.atan2(
                                 delta_pos[1], delta_pos[0]) - heading
-                            d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
+                            d_idx = int((angle / (2.0 * np.pi) + 1.0 / 24) * 12 % 12)
                             label = [0] * 12
                             label[d_idx] = 1
                             fea.junction_feature.junction_mlp_label.extend(label)

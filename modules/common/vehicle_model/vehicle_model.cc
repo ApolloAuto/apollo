@@ -91,8 +91,8 @@ VehicleState VehicleModel::Predict(const double predicted_time_horizon,
   const VehicleParam& vehicle_param =
       VehicleConfigHelper::GetConfig().vehicle_param();
 
-  CHECK(cyber::common::GetProtoFromFile(
-      FLAGS_vehicle_model_config_filename, &vehicle_model_config))
+  CHECK(cyber::common::GetProtoFromFile(FLAGS_vehicle_model_config_filename,
+                                        &vehicle_model_config))
       << "Failed to load vehicle model config file "
       << FLAGS_vehicle_model_config_filename;
 

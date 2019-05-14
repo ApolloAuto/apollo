@@ -25,7 +25,7 @@ bool InitialCuda() {
   CUDA_CHECK(cudaGetDeviceProperties(&deviceProp, dev));
   printf("Using device %d: %s\n", dev, deviceProp.name);
   CUDA_CHECK(cudaSetDevice(dev));
-  return false;
+  return true;
 }
 
 __global__ void fill_lower_left_gpu(int *iRow, int *jCol,

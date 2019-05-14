@@ -22,14 +22,15 @@
 
 namespace apollo {
 namespace planning {
+
 GridSearch::GridSearch(const PlannerOpenSpaceConfig& open_space_conf) {
   xy_grid_resolution_ =
       open_space_conf.warm_start_config().grid_a_star_xy_resolution();
   node_radius_ = open_space_conf.warm_start_config().node_radius();
 }
 
-double GridSearch::EuclidDistance(const double& x1, const double& y1,
-                                  const double& x2, const double& y2) {
+double GridSearch::EuclidDistance(const double x1, const double y1,
+                                  const double x2, const double y2) {
   return std::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
@@ -99,16 +100,16 @@ std::vector<std::shared_ptr<Node2d>> GridSearch::GenerateNextNodes(
 }
 
 bool GridSearch::GenerateAStarPath(
-    const double& sx, const double& sy, const double& ex, const double& ey,
+    const double sx, const double sy, const double ex, const double ey,
     const std::vector<double>& XYbounds,
     const std::vector<std::vector<common::math::LineSegment2d>>&
         obstacles_linesegments_vec,
     GridAStartResult* result) {
-  std::priority_queue<std::pair<double, double>,
-                      std::vector<std::pair<double, double>>, cmp>
+  std::priority_queue<std::pair<std::string, double>,
+                      std::vector<std::pair<std::string, double>>, cmp>
       open_pq;
-  std::unordered_map<double, std::shared_ptr<Node2d>> open_set;
-  std::unordered_map<double, std::shared_ptr<Node2d>> close_set;
+  std::unordered_map<std::string, std::shared_ptr<Node2d>> open_set;
+  std::unordered_map<std::string, std::shared_ptr<Node2d>> close_set;
   XYbounds_ = XYbounds;
   std::shared_ptr<Node2d> start_node =
       std::make_shared<Node2d>(sx, sy, xy_grid_resolution_, XYbounds_);
@@ -122,7 +123,7 @@ bool GridSearch::GenerateAStarPath(
   // Grid a star begins
   size_t explored_node_num = 0;
   while (!open_pq.empty()) {
-    double current_id = open_pq.top().first;
+    std::string current_id = open_pq.top().first;
     open_pq.pop();
     std::shared_ptr<Node2d> current_node = open_set[current_id];
     // Check destination
@@ -130,7 +131,7 @@ bool GridSearch::GenerateAStarPath(
       final_node_ = current_node;
       break;
     }
-    close_set.insert(std::make_pair(current_node->GetIndex(), current_node));
+    close_set.emplace(current_node->GetIndex(), current_node);
     std::vector<std::shared_ptr<Node2d>> next_nodes =
         std::move(GenerateNextNodes(current_node));
     for (auto& next_node : next_nodes) {
@@ -163,13 +164,13 @@ bool GridSearch::GenerateAStarPath(
 }
 
 bool GridSearch::GenerateDpMap(
-    const double& ex, const double& ey, const std::vector<double>& XYbounds,
+    const double ex, const double ey, const std::vector<double>& XYbounds,
     const std::vector<std::vector<common::math::LineSegment2d>>&
         obstacles_linesegments_vec) {
-  std::priority_queue<std::pair<double, double>,
-                      std::vector<std::pair<double, double>>, cmp>
+  std::priority_queue<std::pair<std::string, double>,
+                      std::vector<std::pair<std::string, double>>, cmp>
       open_pq;
-  std::unordered_map<double, std::shared_ptr<Node2d>> open_set;
+  std::unordered_map<std::string, std::shared_ptr<Node2d>> open_set;
   dp_map_ = decltype(dp_map_)();
   XYbounds_ = XYbounds;
   // XYbounds with xmin, xmax, ymin, ymax
@@ -184,7 +185,7 @@ bool GridSearch::GenerateDpMap(
   // Grid a star begins
   size_t explored_node_num = 0;
   while (!open_pq.empty()) {
-    double current_id = open_pq.top().first;
+    const std::string current_id = open_pq.top().first;
     open_pq.pop();
     std::shared_ptr<Node2d> current_node = open_set[current_id];
     dp_map_.insert(std::make_pair(current_node->GetIndex(), current_node));
@@ -215,8 +216,8 @@ bool GridSearch::GenerateDpMap(
   return true;
 }
 
-double GridSearch::CheckDpMap(const double& sx, const double& sy) {
-  double index = Node2d::CalcIndex(sx, sy, xy_grid_resolution_, XYbounds_);
+double GridSearch::CheckDpMap(const double sx, const double sy) {
+  std::string index = Node2d::CalcIndex(sx, sy, xy_grid_resolution_, XYbounds_);
   if (dp_map_.find(index) != dp_map_.end()) {
     return dp_map_[index]->GetCost() * xy_grid_resolution_;
   } else {

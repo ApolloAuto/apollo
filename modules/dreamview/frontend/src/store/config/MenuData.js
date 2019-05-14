@@ -75,6 +75,7 @@ export default [
         data: {
             positionLocalization: 'Localization',
             positionGps: 'GPS',
+            positionShadow: 'Shadow',
         },
         supportInOfflineView: true,
     }, {

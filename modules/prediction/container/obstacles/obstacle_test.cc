@@ -51,7 +51,7 @@ class ObstacleTest : public KMLMapBasedTest {
 
 TEST_F(ObstacleTest, VehicleBasic) {
   Obstacle* obstacle_ptr = container_.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   EXPECT_EQ(obstacle_ptr->id(), 1);
   EXPECT_EQ(obstacle_ptr->type(), perception::PerceptionObstacle::VEHICLE);
   EXPECT_TRUE(obstacle_ptr->IsOnLane());
@@ -130,7 +130,7 @@ TEST_F(ObstacleTest, VehicleLaneGraph) {
 
 TEST_F(ObstacleTest, PedestrianBasic) {
   Obstacle* obstacle_ptr = container_.GetObstacle(101);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   EXPECT_EQ(obstacle_ptr->id(), 101);
   EXPECT_EQ(obstacle_ptr->type(), perception::PerceptionObstacle::PEDESTRIAN);
   EXPECT_EQ(obstacle_ptr->history_size(), 3);

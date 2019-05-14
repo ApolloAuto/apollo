@@ -16,6 +16,8 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
+#include <omp.h>
+
 #include <algorithm>
 #include <unordered_map>
 #include <utility>
@@ -60,6 +62,7 @@ void JunctionMLPEvaluator::Clear() {}
 
 void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
+  omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
@@ -83,7 +86,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Insert features to DataForLearning
   if (FLAGS_prediction_offline_mode == 2) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         "junction");
+                                         "junction", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
     return;  // Skip Compute probability for offline mode
   }
@@ -95,9 +98,6 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     torch_input[0][i] = static_cast<float>(feature_values[i]);
   }
   torch_inputs.push_back(torch_input.to(device_));
-  std::shared_ptr<torch::jit::script::Module> torch_module =
-      torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
-
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
     CHECK_NOTNULL(torch_model_ptr_);
@@ -136,7 +136,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     double angle =
         std::atan2(y, x) - std::atan2(latest_feature_ptr->raw_velocity().y(),
                                       latest_feature_ptr->raw_velocity().x());
-    double d_idx = (angle / (2.0 * M_PI)) * 12.0;
+    double d_idx = (angle / (2.0 * M_PI) + 1.0 / 24.0) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
     int prev_idx = idx == 0 ? 11 : idx - 1;
     int post_idx = idx == 11 ? 0 : idx + 1;
@@ -319,7 +319,7 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     double diff_heading =
         apollo::common::math::AngleDiff(heading, junction_exit.exit_heading());
     double angle = std::atan2(diff_y, diff_x);
-    double d_idx = (angle / (2.0 * M_PI)) * 12.0;
+    double d_idx = (angle / (2.0 * M_PI) + 1.0 / 24.0) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
     double speed = std::max(0.1, feature_ptr->speed());
     double exit_time = std::hypot(diff_x, diff_y) / speed;
@@ -361,6 +361,7 @@ void JunctionMLPEvaluator::LoadModel() {
   //   ADEBUG << "CUDA is available";
   //   device_ = torch::Device(torch::kCUDA);
   // }
+  torch::set_num_threads(1);
   torch_model_ptr_ =
       torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
 }

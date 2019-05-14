@@ -61,6 +61,7 @@ using PbSubSignalType = apollo::hdmap::Subsignal_Type;
 using PbStopSignType = apollo::hdmap::StopSign_StopType;
 using PbBoundaryEdgeType = apollo::hdmap::BoundaryEdge_Type;
 using PbRoadType = apollo::hdmap::Road_Type;
+using PbSignInfoType = apollo::hdmap::SignInfo::Type;
 
 struct StopLineInternal {
   std::string id;

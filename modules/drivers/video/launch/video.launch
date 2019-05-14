@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>video</name>
+        <dag_conf>/apollo/modules/drivers/video/dag/video.dag</dag_conf>
+        <process_name>h265_video</process_name>
+    </module>
+</cyber>

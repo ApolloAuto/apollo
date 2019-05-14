@@ -72,8 +72,7 @@ Purpose of sim control: drive the car based on the planning trajectory. Good for
     bash scripts/bootstrap.sh start
 ```
  
-**Please note**, planning and routing modules (see image below) should be ON while using SimControl. To navigate the ego-car, select either “route editing” or “default routing” from the side bar to define a route.
-
+**Please note**, planning and routing modules (see image below) should be ON while using SimControl. To navigate the ego-car, select either “route editing” or “default routing” from the side bar to define a route. You can turn the sim_control on and off from the toggle. However, a new routing request is needed each time the sim_control is restarted.
 ![](images/sim_control_2.0.png)
 
 ---
@@ -207,12 +206,7 @@ And finally restart Dreamview using
 
 ## I want to plot my own graphs for my algorithms, where should I go?
 
-1. [**Dreamview/proto/chart.proto**](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/proto/chart.proto) - In this file, there are three types of predefined data types: Line, Polygon and Car. 
-2. In the Chart, there are "Options" that you could set for axis which include minimum, maximum x, y, label_string. 
-3. You would need to change the Label for each data set type as it is unique to each chart
-4. Dreamview uses **Chartjs.org** for graphs graphs. To select properties, you could refer to “https://www.chartjs.org/docs/latest/charts/line.html”.
-5. You could look into planning_base.cc for a code sample.
-Remember to fill in the information of your chart in https://github.com/ApolloAuto/apollo2/blob/master/modules/planning/proto/planning_internal.proto#L169. But note, this is specifically for planning module.
+See PnC Monitor section in [Dreamview Doc](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/dreamview_usage_table.md).
 
 ---
 **More DreamView FAQs to follow.**

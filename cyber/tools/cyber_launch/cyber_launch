@@ -20,7 +20,6 @@ import sys
 import logging
 import os
 import os.path
-import shlex
 import subprocess
 import time
 import atexit
@@ -54,7 +53,9 @@ COLORS = {
     'CRITICAL': YELLOW
 }
 
+
 class ColoredFormatter(logging.Formatter):
+
     def __init__(self, msg):
         logging.Formatter.__init__(self, msg)
 
@@ -62,11 +63,15 @@ class ColoredFormatter(logging.Formatter):
         levelname = record.levelname
         if levelname in COLORS:
             if levelname == 'DEBUG':
-                record.levelname = COLOR_SEQ % (30 + COLORS[levelname]) + record.msg.split('#')[0] + RESET_SEQ
-                record.msg = COLOR_SEQ % (30 + COLORS[levelname]) + record.msg.split('#')[-1] + RESET_SEQ
+                record.levelname = COLOR_SEQ % (30 + COLORS[levelname]) + \
+                    record.msg.split('#')[0] + RESET_SEQ
+                record.msg = COLOR_SEQ % (30 + COLORS[levelname]) + \
+                    record.msg.split('#')[-1] + RESET_SEQ
             else:
-                record.levelname = COLOR_SEQ % (30 + COLORS[levelname]) + g_process_name + RESET_SEQ
-                record.msg = COLOR_SEQ % (30 + COLORS[levelname]) + levelname + " "  + record.msg.split('#')[-1] + RESET_SEQ
+                record.levelname = COLOR_SEQ % (30 + COLORS[levelname]) + \
+                    g_process_name + RESET_SEQ
+                record.msg = COLOR_SEQ % (30 + COLORS[levelname]) + levelname + \
+                    " " + record.msg.split('#')[-1] + RESET_SEQ
         return logging.Formatter.format(self, record)
 
 color_formatter = ColoredFormatter("[%(levelname)-18s] %(message)s")
@@ -75,6 +80,7 @@ console.setFormatter(color_formatter)
 logger = logging.Logger(__name__)
 logger.addHandler(console)
 
+
 def exit_handler():
     stop()
     os.chdir(g_pwd)
@@ -82,24 +88,30 @@ def exit_handler():
 
 atexit.register(exit_handler)
 
+
 def singleton(cls):
     instances = {}
+
     def getinstance(*args, **kwargs):
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
     return getinstance
 
+
 def module_monitor(mod):
-    while(True):
+    while True:
         line = mod.popen.stdout.readline()
         if line:
-            logger.debug("%s# %s" % (mod.name, line.strip('\n')));
+            logger.debug('%s# %s' % (mod.name, line.strip('\n')))
             continue
         time.sleep(0.01)
 
+
 class ProcessWrapper(object):
-    def __init__(self, binary_path, dag_num, dag_list, process_name, process_type, sched_name, exception_handler=''):
+
+    def __init__(self, binary_path, dag_num, dag_list, process_name,
+                 process_type, sched_name, exception_handler=''):
         self.time_of_death = None
         self.started = False
         self.binary_path = binary_path
@@ -120,7 +132,7 @@ class ProcessWrapper(object):
 
     def start(self):
         """
-        start a manager in process name
+        Start a manager in process name
         """
         if self.process_type == 'binary':
             args_list = self.name.split()
@@ -136,9 +148,10 @@ class ProcessWrapper(object):
         self.args = args_list
 
         try:
-            self.popen = subprocess.Popen(args_list, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        except Exception, e:
-            logger.error('Subprocess Popen exception: ' + str(e))
+            self.popen = subprocess.Popen(args_list, stdout=subprocess.PIPE,
+                                          stderr=subprocess.STDOUT)
+        except Exception as err:
+            logger.error('Subprocess Popen exception: ' + str(err))
             return 2
         else:
             if self.popen.pid == 0 or self.popen.returncode is not None:
@@ -150,13 +163,14 @@ class ProcessWrapper(object):
         th.start()
         self.started = True
         self.pid = self.popen.pid
-        logger.info('Start process [%s] successfully. pid: %d' % (self.name, self.popen.pid))
+        logger.info('Start process [%s] successfully. pid: %d' %
+                    (self.name, self.popen.pid))
         logger.info('-' * 120)
         return 0
 
     def is_alive(self):
         """
-        check the process if is still running
+        Check the process if is still running
         @return: True if process is still running
         @rtype: bool
         """
@@ -183,14 +197,18 @@ class ProcessWrapper(object):
         if self.popen.returncode is None:
             pass
         elif self.popen.returncode != 0:
-            output = 'Process [%s] has died [pid %s, exit code %s, cmd %s].'%(self.name, self.pid, self.exit_code, ' '.join(self.args))
+            output = 'Process [%s] has died [pid %s, exit code %s, cmd %s].' % \
+                     (self.name, self.pid, self.exit_code, ' '.join(self.args))
             logger.error(output)
         else:
-            output = 'Process [%s] has finished. [pid %s, cmd %s].'%(self.name, self.pid, ' '.join(self.args))
+            output = 'Process [%s] has finished. [pid %s, cmd %s].' % \
+                     (self.name, self.pid, ' '.join(self.args))
             logger.error(output)
+
 
 @singleton
 class ProcessMonitor(object):
+
     def __init__(self):
         self.procs = []
         self.dead_cnt = 0
@@ -204,9 +222,11 @@ class ProcessMonitor(object):
         @type  p: L{Process}
         """
         if self.has_process(p.name):
-            logger.error("Cannot add process due to duplicate name '%s'" % p.name)
+            logger.error(
+                'Cannot add process due to duplicate name "%s".' % p.name)
         elif self.is_shutdown:
-            logger.error("Cannot add process [%s] due to monitor has been stopped" % p.name)
+            logger.error(
+                'Cannot add process [%s] due to monitor has been stopped.' % p.name)
         else:
             self.procs.append(p)
 
@@ -231,17 +251,20 @@ class ProcessMonitor(object):
             try:
                 if not pw.is_alive():
                     if pw.exception_handler == "respawn":
-                        logger.warn('child process [%s][%d] exit, respawn!' % (pw.name, pw.pid))
+                        logger.warn(
+                            'child process [%s][%d] exit, respawn!' % (pw.name, pw.pid))
                         result = pw.start()
                         if result != 0:
-                            logger.error('respawn process [%s] failed, stop all!' % (pw.name))
+                            logger.error(
+                                'respawn process [%s] failed, stop all!' % (pw.name))
                             stop()
                     elif pw.exception_handler == "exit":
-                        logger.warn('child process [%s][%d] exit, stop all' % (pw.name, pw.pid))
+                        logger.warn(
+                            'child process [%s][%d] exit, stop all' % (pw.name, pw.pid))
                         stop()
                     dead_cnt += 1
-            except Exception as e:
-                dead_cnt = dead_cnt + 1
+            except Exception:
+                dead_cnt += 1
                 traceback.print_exc()
         if dead_cnt > 0:
             self.dead_cnt = dead_cnt
@@ -260,8 +283,7 @@ class ProcessMonitor(object):
         if self.dead_cnt == len(self.procs):
             logger.info("All processes has died.")
             return True
-        else:
-            return False
+        return False
 
     def stop(self, signal):
         """
@@ -269,23 +291,25 @@ class ProcessMonitor(object):
         """
         for p in self.procs:
             if p.is_alive():
-               p.popen.send_signal(signal)
+                p.popen.send_signal(signal)
 
         for p in self.procs:
             if p.is_alive():
-               logger.warn("Waiting for [%s][%s] exit." % (p.name, p.pid))
-               p.wait()
-               logger.info("Process [%s] has been stopped. dag_file: %s" % (p.name, p.dag_list))
-        # reset members
+                logger.warn('Waiting for [%s][%s] exit.' % (p.name, p.pid))
+                p.wait()
+                logger.info(
+                    'Process [%s] has been stopped. dag_file: %s' % (p.name, p.dag_list))
+        # Reset members
         self.procs = []
         self.dead_cnt = 0
 
-def start(launch_file = ''):
+
+def start(launch_file=''):
     """
-    start all modules in xml config
+    Start all modules in xml config
     """
     pmon = ProcessMonitor()
-    # find launch file
+    # Find launch file
     if launch_file[0] == '/':
         launch_file = launch_file
     elif launch_file == os.path.basename(launch_file):
@@ -294,12 +318,10 @@ def start(launch_file = ''):
         if os.path.exists(os.path.join(g_pwd, launch_file)):
             launch_file = os.path.join(g_pwd, launch_file)
         else:
-            logger.error("can't find %s " % launch_file)
+            logger.error('Cannot find launch file: %s ' % launch_file)
             sys.exit(1)
-    logger.info('Launch file   [%s] ' % launch_file)
-    logger.info("=" * 120)
-
-    binary_path = g_binary_name
+    logger.info('Launch file [%s]' % launch_file)
+    logger.info('=' * 120)
 
     if not os.path.isfile(launch_file):
         logger.error('Launch xml file %s does not exist' % launch_file)
@@ -307,10 +329,10 @@ def start(launch_file = ''):
 
     try:
         tree = ET.parse(launch_file)
-    except:
+    except Exception:
         logger.error('Parse xml failed. illegal xml!')
         sys.exit(1)
-    total_dag_num =0
+    total_dag_num = 0
     dictionary = {}
     dag_dict = {}
     root1 = tree.getroot()
@@ -330,7 +352,7 @@ def start(launch_file = ''):
                 logger.error('Library dag conf is null')
                 continue
             if process_name is None:
-                process_name='mainboard_default_' + str(os.getpid())
+                process_name = 'mainboard_default_' + str(os.getpid())
             process_name = process_name.strip()
             if dictionary.has_key(str(process_name)):
                 dictionary[str(process_name)] += 1
@@ -341,7 +363,7 @@ def start(launch_file = ''):
             else:
                 dag_dict[str(process_name)].append(str(dag_conf))
             if dag_conf is not None:
-                total_dag_num +=1
+                total_dag_num += 1
 
     process_list = []
     root = tree.getroot()
@@ -366,11 +388,11 @@ def start(launch_file = ''):
             sched_name = sched_name.text
 
         if process_name is None:
-            process_name='mainboard_default_' + str(os.getpid())
+            process_name = 'mainboard_default_' + str(os.getpid())
         if dag_conf is None:
-            dag_conf =''
+            dag_conf = ''
         if module_name is None:
-            module_name =''
+            module_name = ''
         if exception_handler is None:
             exception_handler = ''
         else:
@@ -381,26 +403,35 @@ def start(launch_file = ''):
         sched_name = sched_name.strip()
         exception_handler = exception_handler.strip()
 
-        logger.info('Load module [%s] %s: [%s] [%s] conf: [%s] exception_handler: [%s]' % \
-                (module_name, process_type, process_name, sched_name, dag_conf, exception_handler))
+        logger.info('Load module [%s] %s: [%s] [%s] conf: [%s] exception_handler: [%s]' %
+                    (module_name, process_type, process_name, sched_name, dag_conf,
+                     exception_handler))
 
         if process_name not in process_list:
             if process_type == 'binary':
                 if len(process_name) == 0:
-                   logger.error('Start binary failed. Binary process_name is null')
-                   continue
-                pw = ProcessWrapper(process_name.split()[0], 0, [""], process_name, process_type, exception_handler)
-            # default is library
+                    logger.error(
+                        'Start binary failed. Binary process_name is null.')
+                    continue
+                pw = ProcessWrapper(
+                    process_name.split()[0], 0, [
+                        ""], process_name, process_type,
+                    exception_handler)
+            # Default is library
             else:
-                pw = ProcessWrapper(g_binary_name, 0, dag_dict[str(process_name)], process_name, process_type, sched_name, exception_handler)
+                pw = ProcessWrapper(
+                    g_binary_name, 0, dag_dict[
+                        str(process_name)], process_name,
+                    process_type, sched_name, exception_handler)
             result = pw.start()
             if result != 0:
-                logger.error('Start manager [%s] failed. Stop all!' % process_name)
+                logger.error(
+                    'Start manager [%s] failed. Stop all!' % process_name)
                 stop()
             pmon.register(pw)
             process_list.append(process_name)
 
-    # no module in xml
+    # No module in xml
     if not process_list:
         logger.error("No module was found in xml config.")
         return
@@ -410,7 +441,8 @@ def start(launch_file = ''):
         stop()
     logger.info("Cyber exit.")
 
-def stop(sig = signal.SIGINT):
+
+def stop(sig=signal.SIGINT):
     """
     stop all modules
     """
@@ -422,42 +454,52 @@ def stop(sig = signal.SIGINT):
     logger.info('All processes have been stopped.')
     sys.exit(0)
 
+
 def stop_launch(launch_file):
     """
-    stop the launch file
+    Stop the launch file
     """
     if not launch_file:
         cmd = 'pkill -INT cyber_launch'
     else:
         cmd = 'pkill -INT -f ' + launch_file
 
-    retcode = os.system(cmd)
+    os.system(cmd)
     time.sleep(3)
     logger.info('Stop cyber launch finished.')
     sys.exit(0)
+
 
 def signal_handler(sig, frame):
     logger.info('Keyboard interrupt received. Stop all processes.')
     stop(sig)
 
+
 def main():
-    """ main function """
-    cyber_path = os.getenv('CYBER_PATH')
-    if cyber_path == None:
-        logger.error('Error: environment variable CYBER_PATH not found, set environment first.')
+    """
+    Main function
+    """
+    if cyber_path is None:
+        logger.error(
+            'Error: environment variable CYBER_PATH not found, set environment first.')
         sys.exit(1)
     os.chdir(cyber_path)
     parser = argparse.ArgumentParser(description='cyber launcher')
     subparsers = parser.add_subparsers(help='sub-command help')
 
-    start_parser = subparsers.add_parser('start', help='launch/benchmark.launch')
-    start_parser.add_argument('file', nargs='?', action='store', help='launch file, default is cyber.launch')
+    start_parser = subparsers.add_parser(
+        'start', help='launch/benchmark.launch')
+    start_parser.add_argument('file', nargs='?', action='store',
+                              help='launch file, default is cyber.launch')
 
-    stop_parser = subparsers.add_parser('stop', help='stop all the module in launch file')
-    stop_parser.add_argument('file', nargs='?', action='store', help='launch file, default stop all the launcher')
+    stop_parser = subparsers.add_parser(
+        'stop', help='stop all the module in launch file')
+    stop_parser.add_argument('file', nargs='?', action='store',
+                             help='launch file, default stop all the launcher')
 
-    #restart_parser = subparsers.add_parser('restart', help='restart the module')
-    #restart_parser.add_argument('file', nargs='?', action='store', help='launch file, default is cyber.launch')
+    # restart_parser = subparsers.add_parser('restart', help='restart the module')
+    # restart_parser.add_argument('file', nargs='?', action='store', help='launch file,
+    #                            default is cyber.launch')
 
     params = parser.parse_args(sys.argv[1:])
 
@@ -466,7 +508,7 @@ def main():
         start(params.file)
     elif command == 'stop':
         stop_launch(params.file)
-    #elif command == 'restart':
+    # elif command == 'restart':
     #    restart(params.file)
     else:
         logger.error('Invalid command %s' % command)
@@ -477,4 +519,3 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, signal_handler)
     signal.signal(signal.SIGCHLD, signal.SIG_IGN)
     main()
-

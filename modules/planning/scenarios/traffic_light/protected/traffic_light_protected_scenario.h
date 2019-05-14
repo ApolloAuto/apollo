@@ -22,6 +22,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
 
@@ -36,12 +37,13 @@ namespace traffic_light {
 // stage context
 struct TrafficLightProtectedContext {
   ScenarioTrafficLightProtectedConfig scenario_config;
+  std::vector<std::string> current_traffic_light_overlap_ids;
 };
 
 class TrafficLightProtectedScenario : public Scenario {
  public:
-  explicit TrafficLightProtectedScenario(const ScenarioConfig& config,
-                                         const ScenarioContext* context)
+  TrafficLightProtectedScenario(const ScenarioConfig& config,
+                                const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;
@@ -49,20 +51,17 @@ class TrafficLightProtectedScenario : public Scenario {
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config);
 
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
-
   TrafficLightProtectedContext* GetContext() { return &context_; }
 
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
+
+ private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
-
- private:
   bool init_ = false;
   TrafficLightProtectedContext context_;
 };

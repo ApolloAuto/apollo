@@ -33,6 +33,8 @@ def draw(map):
         map.draw_stop_signs(plt)
     if args.showjunctions:
         map.draw_pnc_junctions(plt)
+    if args.showcrosswalks:
+        map.draw_crosswalks(plt)
 
 if __name__ == "__main__":
 
@@ -65,8 +67,15 @@ if __name__ == "__main__":
         "-junction", "--showjunctions", action="store_const", const=True,
         help="Show all pnc-junctions with ids in map")
     parser.add_argument(
+        "-crosswalk", "--showcrosswalks", action="store_const", const=True,
+        help="Show all crosswalks with ids in map")
+    parser.add_argument(
         "--loc", action="store", type=str, required=False,
         help="Specify the localization pb file in txt format")
+    parser.add_argument(
+        "--position", action="store", type=str, required=False,
+        help="Plot the x,y coordination in string format, e.g., 343.02,332.01")
+
     # driving path data files are text files with data format of
     # t,x,y,heading,speed
     parser.add_argument(
@@ -82,7 +91,7 @@ if __name__ == "__main__":
     if args.map2 is not None:
         map2 = Map()
         map2.load(args.map2)
-        draw(map2)    
+        draw(map2)
 
     if args.drivingpath is not None:
         path = Path(args.drivingpath)
@@ -93,5 +102,9 @@ if __name__ == "__main__":
         localization.load(args.loc)
         localization.plot_vehicle(plt)
 
+    if args.position is not None:
+        x, y = args.position.split(",")
+        x, y = float(x), float(y)
+        plt.plot([x], [y], 'bo')
     plt.axis('equal')
     plt.show()

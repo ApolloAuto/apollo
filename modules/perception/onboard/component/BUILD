@@ -36,6 +36,7 @@ cc_library(
         "//modules/drivers/proto:sensor_proto",
         "//modules/map/proto:map_proto",
         "//modules/perception/base",
+        "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/app:lane_camera_perception",
         "//modules/perception/camera/app:obstacle_camera_perception",
         "//modules/perception/camera/app:traffic_light_camera_perception",

@@ -66,11 +66,11 @@ TEST(SensorTest, test) {
 
   sensor_ptr->latest_query_timestamp_ = 0;
   query_timestamp = 7013;
-  EXPECT_TRUE(sensor_ptr->QueryLatestFrame(query_timestamp) != nullptr);
+  EXPECT_NE(sensor_ptr->QueryLatestFrame(query_timestamp), nullptr);
   query_timestamp = 9013;
-  EXPECT_TRUE(sensor_ptr->QueryLatestFrame(query_timestamp) != nullptr);
+  EXPECT_NE(sensor_ptr->QueryLatestFrame(query_timestamp), nullptr);
   query_timestamp = 7013;
-  EXPECT_TRUE(sensor_ptr->QueryLatestFrame(query_timestamp) == nullptr);
+  EXPECT_EQ(sensor_ptr->QueryLatestFrame(query_timestamp), nullptr);
 
   Eigen::Affine3d pose;
   query_timestamp = 7012;

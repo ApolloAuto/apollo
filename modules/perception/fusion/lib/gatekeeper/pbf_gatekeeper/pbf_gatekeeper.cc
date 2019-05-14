@@ -72,9 +72,8 @@ bool PbfGatekeeper::AbleToPublish(const TrackPtr &track) {
   if (invisible_in_lidar && invisible_in_radar &&
       (!params_.use_camera_3d || invisible_in_camera)) {
     auto sensor_obj = track->GetFusedObject();
-    if (sensor_obj != nullptr &&
-        sensor_obj->GetBaseObject()->sub_type !=
-            base::ObjectSubType::TRAFFICCONE) {
+    if (sensor_obj != nullptr && sensor_obj->GetBaseObject()->sub_type !=
+                                     base::ObjectSubType::TRAFFICCONE) {
       return false;
     }
   }
@@ -183,10 +182,13 @@ bool PbfGatekeeper::CameraAbleToPublish(const TrackPtr &track, bool is_night) {
     SensorObjectConstPtr camera_object = iter->second;
     double range =
         camera_object->GetBaseObject()->camera_supplement.local_center.norm();
-    if (range >= params_.min_camera_publish_distance ||
-        (camera_object->GetBaseObject()->type ==
-             base::ObjectType::UNKNOWN_UNMOVABLE &&
-         range >= 50)) {
+    // If sub_type of object is traffic cone publish it regardless of range
+    if ((camera_object->GetBaseObject()->sub_type ==
+         base::ObjectSubType::TRAFFICCONE) ||
+        (range >= params_.min_camera_publish_distance ||
+         ((camera_object->GetBaseObject()->type ==
+           base::ObjectType::UNKNOWN_UNMOVABLE) &&
+          (range >= params_.min_camera_publish_distance)))) {
       double exist_prob = track->GetExistanceProb();
       if (exist_prob > params_.existance_threshold) {
         static int cnt_cam = 1;

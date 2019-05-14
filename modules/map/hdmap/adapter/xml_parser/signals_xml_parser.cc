@@ -51,6 +51,27 @@ Status SignalsXmlParser::ParseTrafficLights(
       ToPbSignalType(layout_type, &signal_layout_type);
       traffic_light.set_type(signal_layout_type);
 
+      auto sign_infos_node = signal_node->FirstChildElement("signInfos");
+      if (sign_infos_node != nullptr) {
+        auto sign_info_node = sign_infos_node->FirstChildElement("signInfo");
+        while (sign_info_node != nullptr) {
+          std::string sign_info_type;
+          checker = UtilXmlParser::QueryStringAttribute(*sign_info_node, "type",
+                                                        &sign_info_type);
+          if (checker != tinyxml2::XML_SUCCESS) {
+            std::string err_msg = "Error parse sign info type.";
+            return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+          }
+
+          auto sign_info = traffic_light.add_sign_info();
+          PbSignInfoType pb_sign_info_type;
+          to_pb_sign_info_type(sign_info_type, &pb_sign_info_type);
+          sign_info->set_type(pb_sign_info_type);
+
+          sign_info_node = sign_info_node->NextSiblingElement("signInfo");
+        }
+      }
+
       PbPolygon* polygon = traffic_light.mutable_boundary();
       auto outline_node = signal_node->FirstChildElement("outline");
       if (outline_node == nullptr) {
@@ -160,6 +181,21 @@ Status SignalsXmlParser::ToPbSubSignalType(const std::string& xml_type,
     *sub_signal_type = hdmap::Subsignal::ARROW_U_TURN;
   } else {
     std::string err_msg = "Error or unsupport sub signal type";
+    return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+  }
+  return Status::OK();
+}
+
+Status SignalsXmlParser::to_pb_sign_info_type(const std::string& xml_type,
+                                              PbSignInfoType* sign_info_type) {
+  CHECK_NOTNULL(sign_info_type);
+
+  std::string upper_str = UtilXmlParser::ToUpper(xml_type);
+
+  if (upper_str == "NORIGHTTURNONRED") {
+    *sign_info_type = hdmap::SignInfo::NO_RIGHT_TURN_ON_RED;
+  } else {
+    std::string err_msg = "Error or unsupport stop sign type";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
   return Status::OK();

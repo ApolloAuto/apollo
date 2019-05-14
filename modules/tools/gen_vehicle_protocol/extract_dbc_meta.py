@@ -21,7 +21,7 @@ import yaml
 import shlex
 import re
 
-MAX_CAN_ID = 2048
+MAX_CAN_ID = 4096000000  # 2048
 
 
 def extract_var_info(items):
@@ -98,7 +98,7 @@ def extract_dbc_meta(dbc_file, out_file, car_type, black_list, sender_list,
                 if len(items) > 3 and items[0] == "SG_":
                     if items[2] == ":":
                         var_info = extract_var_info(items)
-                        # current we cann't process than 4 byte value
+                        # current we can't process than 4 byte value
                         if var_info["len"] <= 32:
                             protocol["vars"].append(var_info)
                 else:

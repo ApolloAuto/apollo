@@ -8,7 +8,14 @@ is_replan: true
 gear: GEAR_DRIVE
 decision {
   main_decision {
-    cruise {
+    stop {
+      reason_code: STOP_REASON_SIGNAL
+      reason: "stop by TL_2516"
+      stop_point {
+        x: 586261.34696462157
+        y: 4141304.4974646466
+      }
+      stop_heading: -1.7940405570566935
       change_lane_type: FORWARD
     }
   }
@@ -20,11 +27,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.18715111178
-            y: 4141284.3878496005
+            x: 586260.58647816256
+            y: 4141283.163007583
             z: 0
           }
-          fence_heading: -1.3350939032979112
+          fence_heading: -1.2899817911884237
         }
       }
     }
@@ -35,11 +42,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.15192675858
-            y: 4141284.5336506325
+            x: 586260.5296822344
+            y: 4141283.3547710115
             z: 0
           }
-          fence_heading: -1.3504537501621541
+          fence_heading: -1.307273239870101
         }
       }
     }
@@ -50,6 +57,22 @@ decision {
         nudge {
           type: RIGHT_NUDGE
           distance_l: -0.3
+        }
+      }
+    }
+    decision {
+      id: "TL_2516"
+      perception_id: -191858794
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_SIGNAL
+          distance_s: -1
+          stop_point {
+            x: 586261.34696462157
+            y: 4141304.4974646466
+            z: 0
+          }
+          stop_heading: -1.7940405570566935
         }
       }
     }
@@ -64,6 +87,9 @@ routing_header {
   sequence_num: 3
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "188_1_-1"
+}
 lane_id {
   id: "2726_1_-1"
 }
@@ -91,5 +117,5 @@ lane_id {
 engage_advice {
   advice: READY_TO_ENGAGE
 }
-trajectory_type: NORMAL
+trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for manual mode."

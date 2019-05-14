@@ -43,8 +43,8 @@ namespace gnss {
 class DataParser {
  public:
   using MessagePtr = ::google::protobuf::Message *;
-  explicit DataParser(const config::Config &config,
-                      const std::shared_ptr<apollo::cyber::Node> &node);
+  DataParser(const config::Config &config,
+             const std::shared_ptr<apollo::cyber::Node> &node);
   ~DataParser() {}
   bool Init();
   void ParseRawData(const std::string &msg);

@@ -28,13 +28,17 @@ cc_library(
     hdrs = [
         "image_handler.h",
     ],
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_highgui",
+        "-lopencv_imgproc",
+    ],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/configs:config_gflags",
         "//modules/drivers/proto:sensor_proto",
         "@civetweb//:civetweb++",
-        "@opencv2//:highgui",
     ],
 )
 

@@ -46,8 +46,7 @@ class Scenario {
     STATUS_DONE = 2,
   };
 
-  explicit Scenario(const ScenarioConfig& config,
-                    const ScenarioContext* context);
+  Scenario(const ScenarioConfig& config, const ScenarioContext* context);
 
   static bool LoadConfig(const std::string& config_file,
                          ScenarioConfig* config);
@@ -70,7 +69,9 @@ class Scenario {
   // Each scenario should define its own transfer condition, i.e., when it
   // should allow to transfer from other scenario to itself.
   virtual bool IsTransferable(const Scenario& other_scenario,
-                              const Frame& frame) = 0;
+                              const Frame& frame) {
+    return true;
+  }
 
   ScenarioStatus Process(const common::TrajectoryPoint& planning_init_point,
                          Frame* frame);

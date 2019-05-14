@@ -62,12 +62,12 @@ bool RadarDetectionComponent::Proc(const std::shared_ptr<ContiRadar>& message) {
         << " current timestamp " << lib::TimeUtil::GetCurrentTime();
   std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow)
                                                       SensorFrameMessage);
-  int status = InternalProc(message, out_message);
-  if (status) {
-    writer_->Write(out_message);
-    AINFO << "Send radar processing output message.";
+  if (!InternalProc(message, out_message)) {
+    return false;
   }
-  return status;
+  writer_->Write(out_message);
+  AINFO << "Send radar processing output message.";
+  return true;
 }
 
 bool RadarDetectionComponent::InitAlgorithmPlugin() {

@@ -160,7 +160,7 @@ void OnlineLocalizationExpert::CheckImuMissingStatus(
 
 void OnlineLocalizationExpert::CheckGnssLidarMsfStatus(
     const double &cur_imu_time) {
-  msf_status_mutex_.lock();
+  std::lock_guard<std::mutex> lock(msf_status_mutex_);
   latest_gnsspos_timestamp_mutex_.lock();
   if (cur_imu_time - latest_gnsspos_timestamp_ >
       bestgnsspose_loss_time_threshold_) {
@@ -182,14 +182,12 @@ void OnlineLocalizationExpert::CheckGnssLidarMsfStatus(
     msf_status_.set_local_lidar_quality(LocalLidarQuality::MSF_LOCAL_LIDAR_BAD);
   }
   latest_lidar_timestamp_mutex_.unlock();
-  msf_status_mutex_.unlock();
-  return;
 }
 
 void OnlineLocalizationExpert::SetLocalizationStatus(
     const LocalizationEstimate &data) {
   apollo::common::Point3D position_std = data.uncertainty().position_std_dev();
-  msf_status_mutex_.lock();
+  std::lock_guard<std::mutex> lock(msf_status_mutex_);
   if (position_std.x() < localization_std_x_threshold_1_ &&
       position_std.y() < localization_std_y_threshold_1_) {
     switch (msf_status_.gnsspos_position_type()) {
@@ -207,7 +205,7 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_SOL_X_GNSS);
           integ_status_.integ_state = LocalizationIntegState::WARNNING;
           integ_status_.state_message =
-              "Warnning: Lidar Localization Is Abnormal";
+              "Warning: Lidar Localization Is Abnormal";
         }
         break;
       case apollo::localization::FLOATCONV:
@@ -222,7 +220,7 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_SOL_LIDAR_X);
           integ_status_.integ_state = LocalizationIntegState::WARNNING;
           integ_status_.state_message =
-              "Warnning: GNSS Localization Is Unstable";
+              "Warning: GNSS Localization Is Unstable";
         } else {
           msf_status_.set_msf_running_status(apollo::localization::MSF_SOL_X_X);
           integ_status_.integ_state = LocalizationIntegState::ERROR;
@@ -238,7 +236,7 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_SOL_LIDAR_XX);
           integ_status_.integ_state = LocalizationIntegState::WARNNING;
           integ_status_.state_message =
-              "Warnning: GNSS Localization Is Abnormal";
+              "Warning: GNSS Localization Is Abnormal";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_SOL_X_XX);
@@ -359,13 +357,13 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_NOSOL_LIDAR_GNSS);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable";
+              "FATAL_ERROR: Current Localization Is NOT Available";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_NOSOL_X_GNSS);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "Lidar Localization Is Abnormal";
         }
         break;
@@ -381,14 +379,14 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_NOSOL_LIDAR_X);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "GNSS Localization Is Unstable";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_NOSOL_X_X);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "Both GNSS And Lidar Localization Is Unstable";
         }
         break;
@@ -400,14 +398,14 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_NOSOL_LIDAR_XX);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "GNSS Localization Is Abnormal";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_NOSOL_X_XX);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "Both GNSS And Lidar Localization Is Abnormal";
         }
         break;
@@ -418,48 +416,45 @@ void OnlineLocalizationExpert::SetLocalizationStatus(
               apollo::localization::MSF_NOSOL_LIDAR_XXX);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "GNSS Localization Is Invalid";
         } else {
           msf_status_.set_msf_running_status(
               apollo::localization::MSF_NOSOL_X_XXX);
           integ_status_.integ_state = LocalizationIntegState::FATAL_ERROR;
           integ_status_.state_message =
-              "FATAL_ERROR: Current Localization Is NOT Avaliable, "
+              "FATAL_ERROR: Current Localization Is NOT Available, "
               "Both GNSS And Lidar Localization Is Invalid";
         }
         break;
     }
   }
-  msf_status_mutex_.unlock();
-  return;
 }
 
 void OnlineLocalizationExpert::GetFusionStatus(
     MsfStatus *msf_status, MsfSensorMsgStatus *sensor_status,
     LocalizationIntegStatus *integ_status) {
-  msf_status_mutex_.lock();
-  msf_status->set_local_lidar_consistency(
-      msf_status_.local_lidar_consistency());
-  msf_status->set_gnss_consistency(msf_status_.gnss_consistency());
-  msf_status->set_local_lidar_status(msf_status_.local_lidar_status());
-  msf_status->set_gnsspos_position_type(msf_status_.gnsspos_position_type());
-  msf_status->set_msf_running_status(msf_status_.msf_running_status());
-  msf_status->set_local_lidar_quality(msf_status_.local_lidar_quality());
-  msf_status_mutex_.unlock();
+  {
+    std::unique_lock<std::mutex> lock(msf_status_mutex_);
+    msf_status->set_local_lidar_consistency(
+        msf_status_.local_lidar_consistency());
+    msf_status->set_gnss_consistency(msf_status_.gnss_consistency());
+    msf_status->set_local_lidar_status(msf_status_.local_lidar_status());
+    msf_status->set_gnsspos_position_type(msf_status_.gnsspos_position_type());
+    msf_status->set_msf_running_status(msf_status_.msf_running_status());
+    msf_status->set_local_lidar_quality(msf_status_.local_lidar_quality());
+  }
 
   sensor_status->set_imu_delay_status(sensor_status_.imu_delay_status());
   sensor_status->set_imu_missing_status(sensor_status_.imu_missing_status());
   sensor_status->set_imu_data_status(sensor_status_.imu_data_status());
 
   *integ_status = integ_status_;
-  return;
 }
 
 void OnlineLocalizationExpert::GetGnssStatus(MsfStatus *msf_status) {
   std::unique_lock<std::mutex> lock(msf_status_mutex_);
   msf_status->set_gnsspos_position_type(msf_status_.gnsspos_position_type());
-  return;
 }
 
 }  // namespace msf

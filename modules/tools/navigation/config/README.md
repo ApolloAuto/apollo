@@ -28,9 +28,9 @@ planner_type = EM
 speed_limit = 5
 ```
 
-In **PerceptionConf** section, the *perception* parameter is to specify the perception  solution. Currently there are three supported in Apollo Navigation Mode: mobileye based, camera based and lidar based. 
+In **PerceptionConf** section, the *perception* parameter is to specify the perception  solution. Currently there are three supported in Apollo Navigation Mode: mobileye based, camera based and lidar based.
 
-In the **LocalizationConf** section, utm_zone need to be specified based on  location of the road test. 
+In the **LocalizationConf** section, utm_zone need to be specified based on  location of the road test.
 
 In the **PlanningConf** section,   three planner are supported: EM, Lattice, and Navi. Select one for the planner_type parameter. speed_limt, which is the planner upper speed limit, is also configurable in this seciton, which unit is meter per second.
 

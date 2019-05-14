@@ -7,8 +7,8 @@ cc_library(
     srcs = ["node.cc"],
     hdrs = ["node.h"],
     deps = [
-        "node_channel_impl",
-        "node_service_impl",
+        ":node_channel_impl",
+        ":node_service_impl",
     ],
 )
 
@@ -16,8 +16,8 @@ cc_library(
     name = "node_channel_impl",
     hdrs = ["node_channel_impl.h"],
     deps = [
-        "reader",
-        "writer",
+        ":reader",
+        ":writer",
         "//cyber/blocker:intra_reader",
         "//cyber/blocker:intra_writer",
         "//cyber/common:global_data",
@@ -30,8 +30,8 @@ cc_library(
     name = "node_service_impl",
     hdrs = ["node_service_impl.h"],
     deps = [
-        "reader",
-        "writer",
+        ":reader",
+        ":writer",
         "//cyber/common:global_data",
         "//cyber/service",
         "//cyber/service:client",
@@ -56,7 +56,7 @@ cc_library(
     name = "reader",
     hdrs = ["reader.h"],
     deps = [
-        "reader_base",
+        ":reader_base",
         "//cyber/blocker",
         "//cyber/common:global_data",
         "//cyber/croutine:routine_factory",
@@ -82,7 +82,7 @@ cc_library(
     name = "writer",
     hdrs = ["writer.h"],
     deps = [
-        "writer_base",
+        ":writer_base",
         "//cyber/common:log",
         "//cyber/proto:topology_change_cc_proto",
         "//cyber/service_discovery:topology_manager",

@@ -27,10 +27,13 @@
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/common/validation_checker.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
 #include "modules/prediction/proto/offline_features.pb.h"
+#include "modules/prediction/scenario/prioritization/obstacles_prioritizer.h"
+#include "modules/prediction/scenario/right_of_way/right_of_way.h"
 #include "modules/prediction/scenario/scenario_manager.h"
 #include "modules/prediction/util/data_extraction.h"
 
@@ -71,6 +74,7 @@ bool MessageProcess::Init() {
   ContainerManager::Instance()->Init(adapter_conf);
   EvaluatorManager::Instance()->Init(prediction_conf);
   PredictorManager::Instance()->Init(prediction_conf);
+  SemanticMap::Instance()->Init();
 
   if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Map cannot be loaded.";
@@ -83,22 +87,28 @@ bool MessageProcess::Init() {
 void MessageProcess::OnPerception(
     const perception::PerceptionObstacles& perception_obstacles,
     PredictionObstacles* const prediction_obstacles) {
-  // Insert obstacle
-  auto end_time1 = std::chrono::system_clock::now();
+  ADEBUG << "Received a perception message ["
+         << perception_obstacles.ShortDebugString() << "].";
+
+  // Get obstacles_container
   auto ptr_obstacles_container =
       ContainerManager::Instance()->GetContainer<ObstaclesContainer>(
           AdapterConfig::PERCEPTION_OBSTACLES);
-  CHECK(ptr_obstacles_container != nullptr);
+  CHECK_NOTNULL(ptr_obstacles_container);
 
-  // Insert ADC into the obstacle_container.
+  // Get pose_container
   auto ptr_ego_pose_container =
       ContainerManager::Instance()->GetContainer<PoseContainer>(
           AdapterConfig::LOCALIZATION);
+  CHECK_NOTNULL(ptr_ego_pose_container);
+
+  // Get adc_trajectory_container
   auto ptr_ego_trajectory_container =
       ContainerManager::Instance()->GetContainer<ADCTrajectoryContainer>(
           AdapterConfig::PLANNING_TRAJECTORY);
-  CHECK(ptr_ego_pose_container != nullptr &&
-        ptr_ego_trajectory_container != nullptr);
+  CHECK_NOTNULL(ptr_ego_trajectory_container);
+
+  // Insert ADC into the obstacle_container.
   const PerceptionObstacle* ptr_ego_vehicle =
       ptr_ego_pose_container->ToPerceptionObstacle();
   if (ptr_ego_vehicle != nullptr) {
@@ -110,54 +120,47 @@ void MessageProcess::OnPerception(
            << ", " << std::fixed << std::setprecision(6) << y << "].";
     ptr_ego_trajectory_container->SetPosition({x, y});
   }
-  auto end_time2 = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff = end_time2 - end_time1;
-  ADEBUG << "Time to insert ADC: " << diff.count() * 1000 << " msec.";
 
   // Insert perception_obstacles
   ptr_obstacles_container->Insert(perception_obstacles);
-  auto end_time3 = std::chrono::system_clock::now();
-  diff = end_time3 - end_time2;
-  ADEBUG << "Time to insert obstacles: " << diff.count() * 1000 << " msec.";
+
+  // Ignore some obstacles
+  ObstaclesPrioritizer::Instance()->AssignIgnoreLevel();
 
   // Scenario analysis
   ScenarioManager::Instance()->Run();
-  auto end_time4 = std::chrono::system_clock::now();
-  diff = end_time4 - end_time3;
-  ADEBUG << "Time for scenario_manager: " << diff.count() * 1000 << " msec.";
 
-  // If in junction, BuildJunctionFeature();
-  // If not, BuildLaneGraph().
+  // Build junction feature for the obstacles in junction
   const Scenario& scenario = ScenarioManager::Instance()->scenario();
-  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id() &&
-      FLAGS_enable_junction_feature) {
+  if (scenario.type() == Scenario::JUNCTION && scenario.has_junction_id()) {
     JunctionAnalyzer::Init(scenario.junction_id());
     ptr_obstacles_container->BuildJunctionFeature();
   }
-  auto end_time5 = std::chrono::system_clock::now();
-  diff = end_time5 - end_time4;
-  ADEBUG << "Time to build junction features: " << diff.count() * 1000
-         << " msec.";
+
+  // Build lane graph
   ptr_obstacles_container->BuildLaneGraph();
-  auto end_time6 = std::chrono::system_clock::now();
-  diff = end_time6 - end_time5;
-  ADEBUG << "Time to build cruise features: " << diff.count() * 1000
-         << " msec.";
-  ADEBUG << "Received a perception message ["
-         << perception_obstacles.ShortDebugString() << "].";
+
+  // Assign CautionLevel for obstacles
+  ObstaclesPrioritizer::Instance()->AssignCautionLevel();
+
+  // Analyze RightOfWay for the caution obstacles
+  RightOfWay::Analyze();
 
   // Insert features to FeatureOutput for offline_mode
   if (FLAGS_prediction_offline_mode == 1) {
     for (const int id :
-         ptr_obstacles_container->curr_frame_predictable_obstacle_ids()) {
+         ptr_obstacles_container->curr_frame_movable_obstacle_ids()) {
       Obstacle* obstacle_ptr = ptr_obstacles_container->GetObstacle(id);
       if (obstacle_ptr == nullptr) {
         AERROR << "Null obstacle found.";
         continue;
-      } else if (!obstacle_ptr->latest_feature().IsInitialized()) {
-        AERROR << "Obstacle [" << id << "] has no latest feature.";
-        return;
       }
+      if (!obstacle_ptr->latest_feature().IsInitialized()) {
+        AERROR << "Obstacle [" << id << "] has no latest feature.";
+        continue;
+      }
+      *obstacle_ptr->mutable_latest_feature()->mutable_adc_trajectory_point() =
+          ptr_ego_trajectory_container->adc_trajectory().trajectory_point();
       FeatureOutput::InsertFeatureProto(obstacle_ptr->latest_feature());
       ADEBUG << "Insert feature into feature output";
     }
@@ -167,15 +170,12 @@ void MessageProcess::OnPerception(
 
   // Make evaluations
   EvaluatorManager::Instance()->Run();
-  auto end_time7 = std::chrono::system_clock::now();
-  diff = end_time7 - end_time6;
-  ADEBUG << "Time to evaluate: " << diff.count() * 1000 << " msec.";
 
+  if (FLAGS_prediction_offline_mode == 2) {
+    return;
+  }
   // Make predictions
   PredictorManager::Instance()->Run();
-  auto end_time8 = std::chrono::system_clock::now();
-  diff = end_time8 - end_time7;
-  ADEBUG << "Time to predict: " << diff.count() * 1000 << " msec.";
 
   // Get predicted obstacles
   *prediction_obstacles = PredictorManager::Instance()->prediction_obstacles();

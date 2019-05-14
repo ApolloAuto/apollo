@@ -37,8 +37,8 @@ namespace gnss {
 
 class RawStream {
  public:
-  explicit RawStream(const config::Config& config,
-                     const std::shared_ptr<apollo::cyber::Node>& node);
+  RawStream(const config::Config& config,
+            const std::shared_ptr<apollo::cyber::Node>& node);
   ~RawStream();
   bool Init();
 

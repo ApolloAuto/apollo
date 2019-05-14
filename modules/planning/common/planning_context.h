@@ -20,18 +20,19 @@
 
 #pragma once
 
+#include <algorithm>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 #include "cyber/common/macros.h"
 
-#include "modules/common/proto/drive_state.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/map/pnc_map/path.h"
 #include "modules/perception/proto/traffic_light_detection.pb.h"
+#include "modules/planning/common/path/path_data.h"
+#include "modules/planning/proto/path_decider_info.pb.h"
 #include "modules/planning/proto/planning_status.pb.h"
-#include "modules/routing/proto/routing.pb.h"
 
 /**
  * @brief PlanningContext is the runtime context in planning. It is
@@ -42,50 +43,54 @@ namespace planning {
 
 class PlanningContext {
  public:
-  struct ProceedWithCautionSpeedParam {
-    bool is_fixed_distance = false;
-    double distance = 5.0;  // m
+  // TODO(jinyun): to be removed/cleaned up.
+  //               put all of them inside Planningstatus
+  // @brief a container logging the data required for non-scenario side pass
+  // functionality
+  struct SidePassInfo {
+    bool change_lane_stop_flag = false;
+    common::PathPoint change_lane_stop_path_point;
+    bool check_clear_flag = false;
   };
 
-  // scenario context
-  struct ScenarioInfo {
-    /////////////////////////
-    // general info, set up by ScenarioManager::Observe()
-    // all traffic lights ahead, with signal info
-    std::unordered_map<std::string, const apollo::perception::TrafficLight*>
-        traffic_lights;
+  const SidePassInfo& side_pass_info() { return side_pass_info_; }
 
-    /////////////////////////
-    // scenario specific info, set up by ScenarioManager::ScenarioDispatch()
-    // current stop sign
-    apollo::hdmap::PathOverlap current_stop_sign_overlap;
-    // current traffic light (vector)
-    std::vector<apollo::hdmap::PathOverlap> current_traffic_light_overlaps;
+  SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
 
-    // still in the scenario for this overlap, but stop already done
-    // => no stop fence from decider_rule_based_stop task
-    std::vector<std::string> stop_done_overlap_ids;
-
-    ProceedWithCautionSpeedParam proceed_with_caution_speed;
-    std::vector<std::string> stop_sign_wait_for_obstacles;
-
-    // TODO(all): to be removed when SidePass obstacle decision impl is done
-    std::string side_pass_front_blocking_obstacle_id;
+  struct FallBackInfo {
+    std::string last_successful_path_label;
   };
 
-  static void Clear();
+  const FallBackInfo& fallback_info() { return fallback_info_; }
 
-  static void Init();
+  FallBackInfo* mutable_fallback_info() { return &fallback_info_; }
 
-  static const PlanningStatus& Planningstatus() { return planning_status_; }
+  struct OpenSpaceInfo {
+    std::vector<std::string> partitioned_trajectories_index_history;
+  };
 
-  static PlanningStatus* MutablePlanningStatus() { return &planning_status_; }
+  const OpenSpaceInfo& open_space_info() { return open_space_info_; }
 
-  static ScenarioInfo* GetScenarioInfo() { return &scenario_info_; }
+  OpenSpaceInfo* mutable_open_space_info() { return &open_space_info_; }
+
+  void Clear();
+
+  void Init();
+
+  const PlanningStatus& planning_status() { return planning_status_; }
+
+  PlanningStatus* mutable_planning_status() { return &planning_status_; }
+
+  const PathDeciderInfo& path_decider_info() { return path_decider_info_; }
+
+  PathDeciderInfo* mutable_path_decider_info() { return &path_decider_info_; }
 
  private:
-  static PlanningStatus planning_status_;
-  static ScenarioInfo scenario_info_;
+  PlanningStatus planning_status_;
+  SidePassInfo side_pass_info_;
+  FallBackInfo fallback_info_;
+  OpenSpaceInfo open_space_info_;
+  PathDeciderInfo path_decider_info_;
 
   // this is a singleton class
   DECLARE_SINGLETON(PlanningContext)

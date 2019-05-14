@@ -9,6 +9,9 @@ cc_library(
     hdrs = [
         "data_extraction.h",
     ],
+    linkopts = [
+        "-lboost_filesystem",
+    ],
     deps = [
         "//cyber",
     ],

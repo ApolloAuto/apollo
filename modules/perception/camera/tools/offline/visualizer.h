@@ -24,6 +24,7 @@
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
+#include "modules/perception/proto/motion_service.pb.h"
 
 namespace apollo {
 namespace perception {
@@ -38,21 +39,19 @@ class Visualizer {
       const std::map<std::string, Eigen::Matrix3f> &intrinsic_map,
       const std::map<std::string, Eigen::Matrix4d> &extrinsic_map,
       const Eigen::Matrix4d &ex_lidar2imu,
-      const double &pitch_adj,
-      const double &yaw_adj,
-      const double &roll_adj,
+      const double pitch_adj,
+      const double yaw_adj,
+      const double roll_adj,
       const int image_height,
       const int image_width);
-  bool adjust_angles(
-      const std::string &camera_name,
-      const double &pitch_adj,
-      const double &yaw_adj,
-      const double &roll_adj);
+  bool adjust_angles(const std::string &camera_name, const double pitch_adj,
+                     const double yaw_adj, const double roll_adj);
   bool SetDirectory(const std::string &path);
   void ShowResult(const cv::Mat &img, const CameraFrame &frame);
   void Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame);
-  void ShowResult_all_info_single_camera(const cv::Mat &img,
-                                         const CameraFrame &frame);
+  void ShowResult_all_info_single_camera(
+      const cv::Mat &img, const CameraFrame &frame,
+      const base::MotionBufferPtr motion_buffer);
   void Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
                                           const CameraFrame &frame,
                                           Eigen::Matrix3d intrinsic,
@@ -69,6 +68,21 @@ class Visualizer {
     roi_height_ = crop_height;
     roi_width_ = crop_width;
   }
+  bool euler_to_quaternion(Eigen::Vector4d *quarternion,
+                           const double pitch_radian, const double yaw_radian,
+                           const double roll_radian);
+  bool save_manual_calibration_parameter(const std::string &camera_name,
+                                         const double pitch_adj_degree,
+                                         const double yaw_adj_degree,
+                                         const double roll_adj_degree);
+  bool save_extrinsic_in_yaml(const std::string &camera_name,
+                              const Eigen::Matrix4d &extrinsic,
+                              const Eigen::Vector4d &quarternion,
+                              const double pitch_radian,
+                              const double yaw_radian,
+                              const double roll_radian);
+  double regularize_angle(const double angle);
+  bool copy_backup_file(const std::string &filename);
   bool key_handler(const std::string &camera_name, const int key);
   bool reset_key();
 
@@ -93,7 +107,9 @@ class Visualizer {
   int world_h_ = 0;
   int m2pixel_ = 15;  // 6;
   double fov_cut_ratio_ = 0.55;
-  double degree_to_radian_factor = M_PI / 180.0;
+  double degree_to_radian_factor_ = M_PI / 180.0;
+  double radian_to_degree_factor_ = 180.0 / M_PI;
+
   double pitch_adj_degree_ = 0;
   double yaw_adj_degree_ = 0;
   double roll_adj_degree_ = 0;
@@ -155,6 +171,8 @@ class Visualizer {
   bool show_text_ = false;
   bool show_help_text_ = false;
   std::string help_str_;
+  // color
+  cv::Scalar color_cipv_ = cv::Scalar(255, 255, 255);
 };
 
 }  // namespace camera

@@ -55,7 +55,7 @@ void DisplayUsage(const std::string& binary, const std::string& command,
 void DisplayUsage(const std::string& binary) {
   std::cout << "usage: " << binary << " <command> [<args>]\n"
             << "The " << binary << " commands are:\n"
-            << "\tinfo\tShow infomation of an exist record.\n"
+            << "\tinfo\tShow information of an exist record.\n"
             << "\tplay\tPlay an exist record.\n"
             << "\trecord\tRecord same topic.\n"
             << "\tsplit\tSplit an exist record.\n"
@@ -389,10 +389,8 @@ int main(int argc, char** argv) {
       return -1;
     }
     ::apollo::cyber::Init(argv[0]);
-    bool play_result = true;
     PlayParam play_param;
-    play_param.is_play_all_channels = opt_all ?
-                                      opt_all : opt_white_channels.empty();
+    play_param.is_play_all_channels = opt_all || opt_white_channels.empty();
     play_param.is_loop_playback = opt_loop;
     play_param.play_rate = opt_rate;
     play_param.begin_time_ns = opt_begin;
@@ -406,8 +404,7 @@ int main(int argc, char** argv) {
     play_param.channels_to_play.insert(opt_white_channels.begin(),
                                        opt_white_channels.end());
     Player player(play_param);
-    play_result = play_result && player.Init() ? true : false;
-    play_result = play_result && player.Start() ? true : false;
+    const bool play_result = player.Init() && player.Start();
     return play_result ? 0 : -1;
   } else if (command == "record") {
     if (opt_white_channels.empty() && !opt_all) {
@@ -425,25 +422,24 @@ int main(int argc, char** argv) {
           UnixSecondsToString(time(nullptr), "%Y%m%d%H%M%S") + ".record";
       opt_output_vec.push_back(default_output_file);
     }
-    bool record_result = true;
     ::apollo::cyber::Init(argv[0]);
     auto recorder = std::make_shared<Recorder>(opt_output_vec[0], opt_all,
                                                opt_white_channels, opt_header);
-    record_result = record_result && recorder->Start() ? true : false;
+    bool record_result = recorder->Start();
     if (record_result) {
       while (!::apollo::cyber::IsShutdown()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
       }
-      record_result = record_result && recorder->Stop() ? true : false;
+      record_result = recorder->Stop();
     }
     return record_result ? 0 : -1;
   } else if (command == "split") {
     if (opt_file_vec.empty()) {
-      std::cout << "MUST specify file option (-f)." << std::endl;
+      std::cout << "Must specify file option (-f)." << std::endl;
       return -1;
     }
     if (opt_file_vec.size() > 1 || opt_output_vec.size() > 1) {
-      std::cout << "TOO many input/output file option (-f/-o)." << std::endl;
+      std::cout << "Too many input/output file option (-f/-o)." << std::endl;
       return -1;
     }
     if (opt_output_vec.empty()) {

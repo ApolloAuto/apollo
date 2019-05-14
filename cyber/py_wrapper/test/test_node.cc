@@ -26,7 +26,7 @@
 using apollo::cyber::Time;
 using apollo::cyber::message::PyMessageWrap;
 
-apollo::cyber::PyReader *pr = NULL;
+apollo::cyber::PyReader *pr = nullptr;
 
 int cbfun(const char *channel_name) {
   AINFO << "recv->[ " << channel_name << " ]";
@@ -39,7 +39,7 @@ TEST(CyberNodeTest, create_reader) {
   apollo::cyber::PyNode node("listener");
   pr = node.create_reader("channel/chatter", chat.GetTypeName());
   EXPECT_EQ("apollo.cyber.proto.Chatter", chat.GetTypeName());
-  EXPECT_TRUE(pr != nullptr);
+  EXPECT_NE(pr, nullptr);
   pr->register_func(cbfun);
   delete pr;
   pr = nullptr;
@@ -51,7 +51,7 @@ TEST(CyberNodeTest, create_writer) {
   apollo::cyber::PyNode node("talker");
   apollo::cyber::PyWriter *pw =
       node.create_writer("channel/chatter", msgChat->GetTypeName(), 10);
-  EXPECT_TRUE(pw != nullptr);
+  EXPECT_NE(pw, nullptr);
 
   EXPECT_TRUE(apollo::cyber::OK());
   uint64_t seq = 5;

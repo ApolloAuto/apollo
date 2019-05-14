@@ -34,6 +34,7 @@ enum StopReasonCode {
   STOP_REASON_PULL_OVER = 108;      // pull over
   STOP_REASON_SIDEPASS_SAFETY = 109;
   STOP_REASON_PRE_OPEN_SPACE_STOP = 200;
+  STOP_REASON_LANE_CHANGE_URGENCY = 201;
 }
 
 message ObjectStop {
@@ -180,6 +181,11 @@ message MainNotReady {
 }
 
 message MainParking {
+  enum ParkingStatus {
+  // TODO(QiL): implement and expand to more enums
+     IN_PARKING = 1;
+  }
+  optional ParkingStatus status = 1;
 }
 
 message MainDecision {

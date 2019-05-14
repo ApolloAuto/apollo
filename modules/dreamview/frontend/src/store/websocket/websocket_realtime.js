@@ -51,7 +51,8 @@ export default class RealtimeWebSocketEndpoint {
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
-                    const isNewMode = (this.currentMode !== STORE.hmi.currentMode);
+                    const isNewMode = (this.currentMode &&
+                                       this.currentMode !== STORE.hmi.currentMode);
                     this.currentMode = STORE.hmi.currentMode;
                     if (STORE.hmi.inNavigationMode) {
                         // In navigation mode, the coordinate system is FLU and

@@ -1,5 +1,10 @@
 ## Apollo LiDAR - IMU Calibration Service
 
+```
+Note:
+This guide cannot be used for version Apollo 3.5
+```
+
 Welcome to the Apollo sensor calibration service. This document describes the process of the extrinsic calibration service between 64-beam Light Detection And Ranging (LiDAR) and Inertial Navigation System (INS).
 
 ## Apollo Sensor Calibration Catalog

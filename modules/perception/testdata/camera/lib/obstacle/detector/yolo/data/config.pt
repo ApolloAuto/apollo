@@ -1,7 +1,7 @@
 model_param {
   model_name: "./ut"
   proto_file: "caffe.pt"
-  weight_file: "caffe.md"
+  weight_file: "caffe.model"
   anchors_file: "anchors.txt"
   types_file: "types.txt"
   feature_file: "feature.pt"

@@ -4,7 +4,7 @@ package apollo.common;
 
 // Error codes enum for API's categorized by modules.
 enum ErrorCode {
-  // No error, reutrns on success.
+  // No error, returns on success.
   OK = 0;
 
   // Control module error codes start from here.

@@ -31,6 +31,8 @@ void test_write(const std::string &writefile) {
   apollo::cyber::record::PyRecordWriter rec_writer;
   AINFO << "++++ begin writer";
   rec_writer.Open(writefile);
+  rec_writer.SetSizeOfFileSegmentation(0);
+  rec_writer.SetIntervalOfFileSegmentation(0);
   rec_writer.WriteChannel(CHAN_1, MSG_TYPE, STR_10B);
   rec_writer.WriteMessage(CHAN_1, STR_10B, 1000);
   rec_writer.Close();
@@ -60,8 +62,16 @@ void test_read(const std::string &readfile) {
   AINFO << "reader msg count = " << count;
 }
 
+// ./py_record readfile1. only read readfile1
+// other write & read
 int main(int argc, char *argv[]) {
   apollo::cyber::Init("cyber_python");
+  if (argc == 2) {
+    std::string readfile(argv[1]);
+    AINFO << "beging to read: " << readfile;
+    test_read(readfile);
+    return 1;
+  }
   test_write(TEST_RECORD_FILE);
   sleep(1);
   test_read(TEST_RECORD_FILE);

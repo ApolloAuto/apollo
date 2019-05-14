@@ -30,6 +30,7 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
@@ -42,6 +43,7 @@ using common::time::Clock;
 using hdmap::HDMapUtil;
 using hdmap::LaneInfoConstPtr;
 using hdmap::OverlapInfoConstPtr;
+using hdmap::PathOverlap;
 using perception::PerceptionObstacle;
 
 using StopSignLaneVehicles =
@@ -61,16 +63,19 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
 
-  // check if the stop_sign is still along reference_line
-  std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
-  if (scenario::CheckStopSignDone(reference_line_info, stop_sign_overlap_id)) {
+  std::string stop_sign_overlap_id = GetContext()->current_stop_sign_overlap_id;
+
+  // refresh overlap along reference line
+  PathOverlap* current_stop_sign_overlap =
+      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                stop_sign_overlap_id,
+                                                ReferenceLineInfo::STOP_SIGN);
+  if (!current_stop_sign_overlap) {
     return FinishScenario();
   }
 
   // set right_of_way_status
-  const double stop_sign_start_s =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.start_s;
+  const double stop_sign_start_s = current_stop_sign_overlap->start_s;
   reference_line_info.SetJunctionRightOfWay(stop_sign_start_s, false);
 
   constexpr double kPassStopLineBuffer = 1.0;  // unit: m
@@ -87,7 +92,7 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   const double wait_time = Clock::NowInSeconds() - start_time;
   ADEBUG << "stop_start_time[" << start_time << "] wait_time[" << wait_time
          << "]";
-  if (wait_time < scenario_config_.stop_duration()) {
+  if (wait_time < scenario_config_.stop_duration_sec()) {
     return Stage::RUNNING;
   }
 
@@ -99,33 +104,39 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
 
   // get all vehicles currently watched
   std::vector<std::string> watch_vehicle_ids;
-  for (auto it = watch_vehicles.begin(); it != watch_vehicles.end(); ++it) {
-    std::copy(it->second.begin(), it->second.end(),
+  for (const auto& watch_vehicle : watch_vehicles) {
+    std::copy(watch_vehicle.second.begin(), watch_vehicle.second.end(),
               std::back_inserter(watch_vehicle_ids));
     // for debug
-    std::string associated_lane_id = it->first;
     std::string s;
-    for (size_t i = 0; i < watch_vehicle_ids.size(); ++i) {
-      std::string vehicle = watch_vehicle_ids[i];
+    for (const std::string& vehicle : watch_vehicle.second) {
       s = s.empty() ? vehicle : s + "," + vehicle;
     }
+    const std::string& associated_lane_id = watch_vehicle.first;
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
            << s << "]";
   }
+
+  // remove duplicates (caused when same vehicle on mutiple lanes)
+  watch_vehicle_ids.erase(
+      unique(watch_vehicle_ids.begin(), watch_vehicle_ids.end()),
+      watch_vehicle_ids.end());
+
   if (watch_vehicle_ids.empty()) {
     return FinishStage();
   }
 
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
-  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
-  std::copy(
-      watch_vehicle_ids.begin(), watch_vehicle_ids.end(),
-      std::back_inserter(
-          PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles));
+  for (const auto& perception_obstacle_id : watch_vehicle_ids) {
+    PlanningContext::Instance()
+        ->mutable_planning_status()
+        ->mutable_stop_sign()
+        ->add_wait_for_obstacle_id(perception_obstacle_id);
+  }
 
   // check timeout while waiting for only one vehicle
-  if (wait_time > scenario_config_.stop_timeout() &&
+  if (wait_time > scenario_config_.stop_timeout_sec() &&
       watch_vehicle_ids.size() <= 1) {
     return FinishStage();
   }
@@ -143,9 +154,9 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     const PathDecision& path_decision, StopSignLaneVehicles* watch_vehicles) {
   CHECK_NOTNULL(watch_vehicles);
 
-  for (auto it = watch_vehicles->begin(); it != watch_vehicles->end(); ++it) {
+  for (auto& vehicle : *watch_vehicles) {
     // associated_lane/stop_sign info
-    std::string associated_lane_id = it->first;
+    std::string associated_lane_id = vehicle.first;
     auto assoc_lane_it = std::find_if(
         GetContext()->associated_lanes.begin(),
         GetContext()->associated_lanes.end(),
@@ -175,40 +186,42 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
     auto stop_sign_point = lane.get()->GetSmoothPoint(stop_line_end_s);
 
     std::vector<std::string> remove_vehicles;
-    for (auto obstacle_id : it->second) {
+    auto& vehicles = vehicle.second;
+    for (const auto& perception_obstacle_id : vehicles) {
       // watched-vehicle info
-      auto* obstacle = path_decision.Find(obstacle_id);
-      if (!obstacle) {
-        ADEBUG << "mark ERASE obstacle_id[" << obstacle_id << "] not exist";
-        remove_vehicles.push_back(obstacle_id);
+      const PerceptionObstacle* perception_obstacle =
+          path_decision.FindPerceptionObstacle(perception_obstacle_id);
+      if (!perception_obstacle) {
+        ADEBUG << "mark ERASE obstacle_id[" << perception_obstacle_id
+               << "] not exist";
+        remove_vehicles.push_back(perception_obstacle_id);
         continue;
       }
 
-      const PerceptionObstacle& perception_obstacle = obstacle->Perception();
-      PerceptionObstacle::Type obstacle_type = perception_obstacle.type();
+      PerceptionObstacle::Type obstacle_type = perception_obstacle->type();
       std::string obstacle_type_name =
           PerceptionObstacle_Type_Name(obstacle_type);
       auto obstacle_point =
-          common::util::MakePointENU(perception_obstacle.position().x(),
-                                     perception_obstacle.position().y(),
-                                     perception_obstacle.position().z());
+          common::util::MakePointENU(perception_obstacle->position().x(),
+                                     perception_obstacle->position().y(),
+                                     perception_obstacle->position().z());
 
       double distance =
           common::util::DistanceXY(stop_sign_point, obstacle_point);
-      ADEBUG << "obstacle_id[" << obstacle_id << "] distance[" << distance
-             << "]";
+      ADEBUG << "obstacle_id[" << perception_obstacle_id
+             << "] distance[" << distance << "]";
 
       // TODO(all): move 10.0 to conf
       if (distance > 10.0) {
-        ADEBUG << "mark ERASE obstacle_id[" << obstacle_id << "]";
-        remove_vehicles.push_back(obstacle_id);
+        ADEBUG << "mark ERASE obstacle_id[" << perception_obstacle_id << "]";
+        remove_vehicles.push_back(perception_obstacle_id);
       }
     }
-    for (auto obstacle_id : remove_vehicles) {
-      ADEBUG << "ERASE obstacle_id[" << obstacle_id << "]";
-      it->second.erase(
-          std::remove(it->second.begin(), it->second.end(), obstacle_id),
-          it->second.end());
+    for (const auto& perception_obstacle_id : remove_vehicles) {
+      ADEBUG << "ERASE obstacle_id[" << perception_obstacle_id << "]";
+      vehicles.erase(
+          std::remove(vehicles.begin(), vehicles.end(), perception_obstacle_id),
+          vehicles.end());
     }
   }
 
@@ -216,8 +229,7 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
 }
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
-  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
+  PlanningContext::Instance()->mutable_planning_status()->clear_stop_sign();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
@@ -225,11 +237,16 @@ Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   // update PlanningContext
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.clear();
-  PlanningContext::GetScenarioInfo()->stop_done_overlap_ids.push_back(
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id);
+  PlanningContext::Instance()
+      ->mutable_planning_status()
+      ->mutable_stop_sign()
+      ->set_done_stop_sign_overlap_id(
+          GetContext()->current_stop_sign_overlap_id);
+  PlanningContext::Instance()
+      ->mutable_planning_status()
+      ->mutable_stop_sign()
+      ->clear_wait_for_obstacle_id();
 
-  PlanningContext::GetScenarioInfo()->stop_sign_wait_for_obstacles.clear();
   GetContext()->creep_start_time = Clock::NowInSeconds();
 
   next_stage_ = ScenarioConfig::STOP_SIGN_UNPROTECTED_CREEP;

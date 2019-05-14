@@ -34,12 +34,12 @@ class LocalizationPoseBuffer {
  public:
   LocalizationPoseBuffer();
   ~LocalizationPoseBuffer();
-  /**@breif receive a pair of lidar pose and
+  /**@brief receive a pair of lidar pose and
    * odometry pose which almost have the same timestame
    * */
   void UpdateLidarPose(double timestamp, const Eigen::Affine3d& locator_pose,
                        const Eigen::Affine3d& novatel_pose);
-  /**@breif receive an odometry pose and
+  /**@brief receive an odometry pose and
    * estimate the output pose according to last lidar pose recorded.
    * */
   Eigen::Affine3d UpdateOdometryPose(double timestamp,

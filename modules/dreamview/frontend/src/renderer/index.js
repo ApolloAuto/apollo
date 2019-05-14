@@ -49,6 +49,9 @@ class Renderer {
         // The car that projects the starting point of the planning trajectory
         this.planningAdc = OFFLINE_PLAYBACK ? null : new AutoDrivingCar('planningAdc', this.scene);
 
+        // The shadow localization
+        this.shadowAdc = new AutoDrivingCar('shadowAdc', this.scene);
+
         // The planning trajectory.
         this.planningTrajectory = new PlanningTrajectory();
 
@@ -346,7 +349,13 @@ class Renderer {
     }
 
     updateWorld(world) {
-        this.adc.update(this.coordinates, world.autoDrivingCar);
+        const adcPose = world.autoDrivingCar;
+        this.adc.update(this.coordinates, adcPose);
+        if (!_.isNumber(adcPose.positionX) || !_.isNumber(adcPose.positionY)) {
+            console.error(`Invalid ego car position: ${adcPose.positionX}, ${adcPose.positionY}!`);
+            return;
+        }
+
         this.adc.updateRssMarker(world.isRssSafe);
         this.ground.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, world.planningData, this.coordinates, this.scene);
@@ -366,6 +375,16 @@ class Renderer {
                 heading: planningAdcPose.theta,
             };
             this.planningAdc.update(this.coordinates, pose);
+        }
+
+        const shadowLocalizationPose = world.shadowLocalization;
+        if (shadowLocalizationPose) {
+            const shadowAdcPose = {
+                positionX: shadowLocalizationPose.positionX,
+                positionY: shadowLocalizationPose.positionY,
+                heading: shadowLocalizationPose.heading,
+            };
+            this.shadowAdc.update(this.coordinates, shadowAdcPose);
         }
     }
 

@@ -34,6 +34,7 @@
 #include "cyber/common/types.h"
 #include "cyber/croutine/croutine.h"
 #include "cyber/croutine/routine_factory.h"
+#include "cyber/proto/choreography_conf.pb.h"
 #include "cyber/scheduler/common/mutex_wrapper.h"
 
 namespace apollo {
@@ -46,6 +47,7 @@ using apollo::cyber::base::ReadLockGuard;
 using apollo::cyber::croutine::CRoutine;
 using apollo::cyber::croutine::RoutineFactory;
 using apollo::cyber::data::DataVisitorBase;
+using apollo::cyber::proto::InnerThread;
 
 class Processor;
 class ProcessorContext;
@@ -64,11 +66,16 @@ class Scheduler {
   uint32_t TaskPoolSize() { return task_pool_size_; }
 
   virtual bool RemoveTask(const std::string& name) = 0;
-  virtual void SetInnerThreadAttr(const std::string& name, std::thread* thr) {}
+  void SetInnerThreadAttr(const std::string& name, std::thread* thr);
 
   virtual bool DispatchTask(const std::shared_ptr<CRoutine>&) = 0;
   virtual bool NotifyProcessor(uint64_t crid) = 0;
   virtual bool RemoveCRoutine(uint64_t crid) = 0;
+
+  void SetInnerThreadConfs(
+      const std::unordered_map<std::string, InnerThread>& confs) {
+    inner_thr_confs_ = confs;
+  }
 
  protected:
   Scheduler() : stop_(false) {}
@@ -81,6 +88,8 @@ class Scheduler {
   std::unordered_map<uint64_t, std::shared_ptr<CRoutine>> id_cr_;
   std::vector<std::shared_ptr<ProcessorContext>> pctxs_;
   std::vector<std::shared_ptr<Processor>> processors_;
+
+  std::unordered_map<std::string, InnerThread> inner_thr_confs_;
 
   uint32_t proc_num_ = 0;
   uint32_t task_pool_size_ = 0;

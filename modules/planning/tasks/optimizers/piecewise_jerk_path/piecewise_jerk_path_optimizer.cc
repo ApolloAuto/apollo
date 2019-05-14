@@ -21,12 +21,14 @@
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
 
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory1d/piecewise_jerk_trajectory1d.h"
-#include "modules/planning/math/finite_element_qp/fem_1d_qp_problem.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_path_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -42,101 +44,107 @@ PiecewiseJerkPathOptimizer::PiecewiseJerkPathOptimizer(const TaskConfig& config)
 
 common::Status PiecewiseJerkPathOptimizer::Process(
     const SpeedData& speed_data, const ReferenceLine& reference_line,
-    const common::TrajectoryPoint& init_point, PathData* const path_data) {
+    const common::TrajectoryPoint& init_point,
+    PathData* const final_path_data) {
   const auto init_frenet_state = reference_line.ToFrenetFrame(init_point);
 
   const auto& piecewise_jerk_path_config = config_.piecewise_jerk_path_config();
   std::array<double, 5> w = {
       piecewise_jerk_path_config.l_weight(),
-      piecewise_jerk_path_config.dl_weight(),
+      piecewise_jerk_path_config.dl_weight() *
+          std::fmax(init_frenet_state.first[1] * init_frenet_state.first[1],
+                    1.0),
       piecewise_jerk_path_config.ddl_weight(),
-      piecewise_jerk_path_config.dddl_weight(),
-      0.0
-  };
+      piecewise_jerk_path_config.dddl_weight(), 0.0};
 
-  {
-    std::vector<std::pair<double, double>> lat_boundaries;
-    double start_s = 0.0;
-    double delta_s = 0.0;
-    reference_line_info_->GetPathBoundaries(
-        &lat_boundaries, &start_s, &delta_s);
-    if (lat_boundaries.size() >= 2) {
-      std::vector<double> opt_l;
-      std::vector<double> opt_dl;
-      std::vector<double> opt_ddl;
+  const auto& path_boundaries =
+      reference_line_info_->GetCandidatePathBoundaries();
+  ADEBUG << "There are " << path_boundaries.size() << " path boundaries.";
 
-      bool res_opt = OptimizePath(init_frenet_state, delta_s, lat_boundaries, w,
-          &opt_l, &opt_dl, &opt_ddl);
-
-      if (res_opt) {
-        auto frenet_frame_path = ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
-            delta_s, start_s);
-
-        path_data->SetReferenceLine(&reference_line);
-        path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
-        return Status::OK();
-      }
+  std::vector<PathData> candidate_path_data;
+  for (const auto& path_boundary : path_boundaries) {
+    // if the path_boundary is normal, it is possible to have less than 2 points
+    // skip path boundary of this kind
+    if (path_boundary.label().find("regular") != std::string::npos &&
+        path_boundary.boundary().size() < 2) {
+      continue;
     }
-  }
 
-  {
-    std::vector<std::pair<double, double>> lat_boundaries;
-    double start_s = 0.0;
-    double delta_s = 0.0;
-    reference_line_info_->GetFallbackPathBoundaries(
-        &lat_boundaries, &start_s, &delta_s);
-    CHECK_GT(lat_boundaries.size(), 1);
+    int max_iter = 4000;
+    // lower max_iter for regular/self/
+    if (path_boundary.label().find("self") != std::string::npos) {
+      max_iter = 4000;
+    }
+
+    CHECK_GT(path_boundary.boundary().size(), 1);
 
     std::vector<double> opt_l;
     std::vector<double> opt_dl;
     std::vector<double> opt_ddl;
 
-    bool res_opt = OptimizePath(init_frenet_state, delta_s, lat_boundaries, w,
-        &opt_l, &opt_dl, &opt_ddl);
+    const auto& pull_over_info =
+        PlanningContext::Instance()->planning_status().pull_over();
+
+    std::array<double, 3> end_state = {0.0, 0.0, 0.0};
+    // Set end lateral to be at the desired pull over destination if enter into
+    // pull over scenario.
+    if (pull_over_info.exist_pull_over_position()) {
+      end_state[0] = pull_over_info.pull_over_l();
+    }
+
+    bool res_opt = OptimizePath(
+        init_frenet_state.second, end_state, path_boundary.delta_s(),
+        path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
-      auto frenet_frame_path = ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl,
-          delta_s, start_s);
+      auto frenet_frame_path =
+          ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, path_boundary.delta_s(),
+                              path_boundary.start_s());
 
-      path_data->SetReferenceLine(&reference_line);
-      path_data->SetFrenetPath(FrenetFramePath(frenet_frame_path));
-      return Status::OK();
+      // TODO(all): double-check this;
+      // final_path_data might carry info from upper stream
+      PathData path_data = *final_path_data;
+      path_data.SetReferenceLine(&reference_line);
+      path_data.SetFrenetPath(FrenetFramePath(frenet_frame_path));
+      path_data.set_path_label(path_boundary.label());
+      path_data.set_blocking_obstacle_id(path_boundary.blocking_obstacle_id());
+      candidate_path_data.push_back(std::move(path_data));
     }
   }
-  return Status(ErrorCode::PLANNING_ERROR,
-      "Path Optimizer failed to generate path");
+  if (candidate_path_data.empty()) {
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "Path Optimizer failed to generate path");
+  }
+  reference_line_info_->SetCandidatePathData(std::move(candidate_path_data));
+  return Status::OK();
 }
 
 bool PiecewiseJerkPathOptimizer::OptimizePath(
-    const std::pair<const std::array<double, 3>,
-    const std::array<double, 3>>& init_state,
-    const double delta_s,
+    const std::array<double, 3>& init_state,
+    const std::array<double, 3>& end_state, const double delta_s,
     const std::vector<std::pair<double, double>>& lat_boundaries,
-    const std::array<double, 5>& w,
-    std::vector<double>* x,
-    std::vector<double>* dx,
-    std::vector<double>* ddx) {
+    const std::array<double, 5>& w, std::vector<double>* x,
+    std::vector<double>* dx, std::vector<double>* ddx, const int max_iter) {
+  PiecewiseJerkPathProblem piecewise_jerk_problem(lat_boundaries.size(),
+                                                  delta_s, init_state);
 
-  std::unique_ptr<Fem1dQpProblem> fem_1d_qp(
-      new Fem1dQpProblem(lat_boundaries.size(), init_state.second, delta_s, w,
-          FLAGS_lateral_jerk_bound));
+  piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_state);
+
+  piecewise_jerk_problem.set_weight_x(w[0]);
+  piecewise_jerk_problem.set_weight_dx(w[1]);
+  piecewise_jerk_problem.set_weight_ddx(w[2]);
+  piecewise_jerk_problem.set_weight_dddx(w[3]);
 
   auto start_time = std::chrono::system_clock::now();
 
-  fem_1d_qp->SetZeroOrderBounds(lat_boundaries);
+  piecewise_jerk_problem.set_x_bounds(lat_boundaries);
+  piecewise_jerk_problem.set_dx_bounds(-FLAGS_lateral_derivative_bound_default,
+                                       FLAGS_lateral_derivative_bound_default);
+  piecewise_jerk_problem.set_ddx_bounds(-FLAGS_lateral_derivative_bound_default,
+                                        FLAGS_lateral_derivative_bound_default);
+  piecewise_jerk_problem.set_dddx_bound(FLAGS_lateral_jerk_bound);
 
-  double first_order_bounds = AdjustLateralDerivativeBounds(
-      init_state.first[1],
-      init_state.second[1], init_state.second[2],
-      FLAGS_lateral_derivative_bound_default);
-  AERROR << "adjusted lateral derivative bound from \t"
-      << FLAGS_lateral_derivative_bound_default << "\t" << first_order_bounds;
-  // TODO(all): temp. disable AdjustLateralDerivativeBounds, enable later
-  // fem_1d_qp->SetFirstOrderBounds(first_order_bounds);
-  fem_1d_qp->SetFirstOrderBounds(FLAGS_lateral_derivative_bound_default);
-  fem_1d_qp->SetSecondOrderBounds(FLAGS_lateral_derivative_bound_default);
-
-  bool success = fem_1d_qp->Optimize();
+  bool success = piecewise_jerk_problem.Optimize(max_iter);
 
   auto end_time = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time - start_time;
@@ -147,10 +155,9 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
     return false;
   }
 
-  *x = fem_1d_qp->x();
-  *dx = fem_1d_qp->x_derivative();
-  *ddx = fem_1d_qp->x_second_order_derivative();
-
+  *x = piecewise_jerk_problem.opt_x();
+  *dx = piecewise_jerk_problem.opt_dx();
+  *ddx = piecewise_jerk_problem.opt_ddx();
   return true;
 }
 
@@ -158,13 +165,12 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
     const std::vector<double>& x, const std::vector<double>& dx,
     const std::vector<double>& ddx, const double delta_s,
     const double start_s) const {
-
   CHECK(!x.empty());
   CHECK(!dx.empty());
   CHECK(!ddx.empty());
 
-  PiecewiseJerkTrajectory1d piecewise_jerk_traj(x.front(),
-      dx.front(), ddx.front());
+  PiecewiseJerkTrajectory1d piecewise_jerk_traj(x.front(), dx.front(),
+                                                ddx.front());
 
   for (std::size_t i = 1; i < x.size(); ++i) {
     const auto dddl = (ddx[i] - ddx[i - 1]) / delta_s;
@@ -189,17 +195,6 @@ FrenetFramePath PiecewiseJerkPathOptimizer::ToPiecewiseJerkPath(
   }
 
   return FrenetFramePath(frenet_frame_path);
-}
-
-double PiecewiseJerkPathOptimizer::AdjustLateralDerivativeBounds(
-    const double s_dot, const double dl, const double ddl,
-    const double l_dot_bounds) const {
-  double s = std::fmax(FLAGS_vehicle_low_speed_threshold, s_dot);
-  double l_prime_adjusted = l_dot_bounds / s;
-  if (l_prime_adjusted < std::fabs(dl)) {
-    l_prime_adjusted = std::fabs(dl) + 0.1;
-  }
-  return l_prime_adjusted;
 }
 
 }  // namespace planning

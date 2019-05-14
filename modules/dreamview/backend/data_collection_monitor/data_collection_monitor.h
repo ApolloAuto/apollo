@@ -73,7 +73,9 @@ class DataCollectionMonitor {
   void InitReaders();
   void LoadConfiguration(const std::string& data_collection_config_path);
   void OnChassis(const std::shared_ptr<apollo::canbus::Chassis>& chassis);
-  void UpdateProgressInJson();
+  bool IsCompliedWithCriteria(
+      const std::shared_ptr<apollo::canbus::Chassis>& chassis,
+      const Category& category);
 
   std::unique_ptr<cyber::Node> node_;
 
@@ -83,11 +85,14 @@ class DataCollectionMonitor {
   // The table defines data collection requirements for calibration
   DataCollectionTable data_collection_table_;
 
-  // Number of frames that has been collected for each category
-  std::unordered_map<std::string, size_t> category_frame_count_;
+  // Number of frames that has been collected for each (scenario, category)
+  std::unordered_map<std::string, std::unordered_map<std::string, size_t>>
+      category_frame_count_;
 
-  // Total number of frames that has been collected
-  size_t current_frame_count_ = 0.0;
+  // Number of consecutive frames that has been collected for each (scenario,
+  // category).
+  std::unordered_map<std::string, std::unordered_map<std::string, size_t>>
+      category_consecutive_frame_count_;
 
   // Store overall and each category progress in percentage
   nlohmann::json current_progress_json_;

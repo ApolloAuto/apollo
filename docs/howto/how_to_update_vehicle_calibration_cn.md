@@ -23,7 +23,7 @@
 
 ## 更新车辆标定
 
-以上准备工作完成后, 在`modules/tools/calibration`中按顺序完成如下工作
+以上准备工作完成后, 在`modules/tools/vehicle_calibration`中按顺序完成如下工作
 
 - 采集数据
 - 处理数据
@@ -31,7 +31,7 @@
 - 转换结果为`protobuf`格式
 
 ### 采集数据
-1. 运行 `python data_collector.py`,参数如 x y z, x 代表了加速的控制指令, y 代表了限制速度(mps), z 是减速指令,正值标识油门量，负值标识刹车量.且每条命令运行多次，其中 `data_collector.py`在modules/tools/calibration/
+1. 运行 `python data_collector.py`,参数如 x y z, x 代表了加速的控制指令, y 代表了限制速度(mps), z 是减速指令,正值标识油门量，负值标识刹车量.且每条命令运行多次，其中 `data_collector.py`在modules/tools/vehicle_calibration/
 2. 根据车辆反应情况，调整命令脚本
 3. 运行 `python plot_data.py ` 使采集到的数据可视化
 

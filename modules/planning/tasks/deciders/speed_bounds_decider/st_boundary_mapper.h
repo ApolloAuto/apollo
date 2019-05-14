@@ -36,22 +36,22 @@
 namespace apollo {
 namespace planning {
 
-class StBoundaryMapper {
+class STBoundaryMapper {
  public:
-  StBoundaryMapper(const SLBoundary& adc_sl_boundary,
+  STBoundaryMapper(const SLBoundary& adc_sl_boundary,
                    const SpeedBoundsDeciderConfig& config,
                    const ReferenceLine& reference_line,
                    const PathData& path_data, const double planning_distance,
-                   const double planning_time, const bool is_change_lane);
+                   const double planning_time);
 
-  virtual ~StBoundaryMapper() = default;
+  virtual ~STBoundaryMapper() = default;
 
-  apollo::common::Status CreateStBoundary(PathDecision* path_decision) const;
+  common::Status CreateStBoundary(PathDecision* path_decision) const;
 
  private:
   FRIEND_TEST(StBoundaryMapperTest, check_overlap_test);
-  bool CheckOverlap(const apollo::common::PathPoint& path_point,
-                    const apollo::common::math::Box2d& obs_box,
+  bool CheckOverlap(const common::PathPoint& path_point,
+                    const common::math::Box2d& obs_box,
                     const double buffer) const;
 
   /**
@@ -60,27 +60,26 @@ class StBoundaryMapper {
    * upper_points.size() = lower_points.size()
    */
   bool GetOverlapBoundaryPoints(
-      const std::vector<apollo::common::PathPoint>& path_points,
+      const std::vector<common::PathPoint>& path_points,
       const Obstacle& obstacle, std::vector<STPoint>* upper_points,
       std::vector<STPoint>* lower_points) const;
 
-  apollo::common::Status MapWithoutDecision(Obstacle* obstacle) const;
+  common::Status MapWithoutDecision(Obstacle* obstacle) const;
 
   bool MapStopDecision(Obstacle* stop_obstacle,
                        const ObjectDecisionType& decision) const;
 
-  apollo::common::Status MapWithDecision(
-      Obstacle* obstacle, const ObjectDecisionType& decision) const;
+  common::Status MapWithDecision(Obstacle* obstacle,
+                                 const ObjectDecisionType& decision) const;
 
  private:
   const SLBoundary& adc_sl_boundary_;
   const SpeedBoundsDeciderConfig& speed_bounds_config_;
   const ReferenceLine& reference_line_;
   const PathData& path_data_;
-  const apollo::common::VehicleParam& vehicle_param_;
+  const common::VehicleParam& vehicle_param_;
   const double planning_distance_;
   const double planning_time_;
-  bool is_change_lane_ = false;
 };
 
 }  // namespace planning

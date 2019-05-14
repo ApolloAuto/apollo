@@ -47,11 +47,11 @@ TEST_F(LaneSequencePredictorTest, OnLaneCase) {
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr);
   LaneSequencePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(), 1);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 
 }  // namespace prediction
