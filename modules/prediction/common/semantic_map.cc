@@ -60,15 +60,15 @@ void SemanticMap::RunCurrFrame(
   }
 
   // Crop ego_vehicle for demo
-  cv::Mat output_img = CropByHistory(obstacle_id_history_map.at(-1),
-                                     cv::Scalar(0, 0, 255));
+  cv::Mat output_img =
+      CropByHistory(obstacle_id_history_map.at(-1), cv::Scalar(0, 0, 255));
   cv::namedWindow("Demo window", cv::WINDOW_NORMAL);
   cv::imshow("Demo window", output_img);
   cv::waitKey();
 }
 
-void SemanticMap::DrawRect(const Feature& feature,
-                           const cv::Scalar& color, cv::Mat* img) {
+void SemanticMap::DrawRect(const Feature& feature, const cv::Scalar& color,
+                           cv::Mat* img) {
   double obs_l = feature.length();
   double obs_w = feature.width();
   double obs_x = feature.position().x();
@@ -94,8 +94,8 @@ void SemanticMap::DrawRect(const Feature& feature,
   cv::fillPoly(*img, std::vector<std::vector<cv::Point>>({polygon}), color);
 }
 
-void SemanticMap::DrawPoly(const Feature& feature,
-                           const cv::Scalar& color, cv::Mat* img) {
+void SemanticMap::DrawPoly(const Feature& feature, const cv::Scalar& color,
+                           cv::Mat* img) {
   std::vector<cv::Point> polygon;
   for (auto& polygon_point : feature.polygon_point()) {
     polygon.push_back(GetTransPoint(polygon_point.x(), polygon_point.y()));
@@ -118,9 +118,10 @@ void SemanticMap::DrawHistory(const ObstacleHistory& history,
 }
 
 cv::Mat SemanticMap::CropArea(const cv::Mat& input_img,
-    const cv::Point2i& center_point, const double heading) {
-  cv::Mat rotation_mat = cv::getRotationMatrix2D(
-      center_point, 90.0 - heading * 180.0 / M_PI, 1.0);
+                              const cv::Point2i& center_point,
+                              const double heading) {
+  cv::Mat rotation_mat =
+      cv::getRotationMatrix2D(center_point, 90.0 - heading * 180.0 / M_PI, 1.0);
   cv::Mat rotated_mat;
   cv::warpAffine(input_img, rotated_mat, rotation_mat, input_img.size());
   cv::Rect rect(center_point.x - 200, center_point.y - 300, 400, 400);
@@ -134,8 +135,8 @@ cv::Mat SemanticMap::CropByHistory(const ObstacleHistory& history,
   cv::Mat feature_map = curr_img_.clone();
   DrawHistory(history, color, &feature_map);
   const Feature& curr_feature = history.feature(0);
-  cv::Point2i center_point = GetTransPoint(curr_feature.position().x(),
-                                           curr_feature.position().y());
+  cv::Point2i center_point =
+      GetTransPoint(curr_feature.position().x(), curr_feature.position().y());
   return CropArea(feature_map, center_point, curr_feature.theta());
 }
 

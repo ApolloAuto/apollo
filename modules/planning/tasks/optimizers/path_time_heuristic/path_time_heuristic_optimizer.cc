@@ -58,13 +58,11 @@ bool PathTimeHeuristicOptimizer::SearchStGraph(SpeedData* speed_data) const {
   return true;
 }
 
-Status PathTimeHeuristicOptimizer::Process(const SLBoundary& adc_sl_boundary,
-                                   const PathData& path_data,
-                                   const common::TrajectoryPoint& init_point,
-                                   const ReferenceLine& reference_line,
-                                   const SpeedData& reference_speed_data,
-                                   PathDecision* const path_decision,
-                                   SpeedData* const speed_data) {
+Status PathTimeHeuristicOptimizer::Process(
+    const SLBoundary& adc_sl_boundary, const PathData& path_data,
+    const common::TrajectoryPoint& init_point,
+    const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
+    PathDecision* const path_decision, SpeedData* const speed_data) {
   init_point_ = init_point;
   adc_sl_boundary_ = adc_sl_boundary;
 
