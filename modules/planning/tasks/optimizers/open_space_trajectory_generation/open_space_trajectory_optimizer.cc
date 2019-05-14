@@ -81,36 +81,33 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
   double init_y = trajectory_stitching_point.path_point().y();
   double init_phi = trajectory_stitching_point.path_point().theta();
 
-  const double init_v = trajectory_stitching_point.v();
-  const double init_steer = trajectory_stitching_point.steer();
-  const double init_a = trajectory_stitching_point.a();
-
   // Rotate and scale the state
   PathPointNormalizing(rotate_angle, translate_origin, &init_x, &init_y,
                        &init_phi);
-
-  Eigen::MatrixXd x0(4, 1);
-  x0 << init_x, init_y, init_phi, init_v;
-
-  Eigen::MatrixXd last_time_u(2, 1);
-  last_time_u << init_steer, init_a;
-
-  // Get final state
-  Eigen::MatrixXd xF(4, 1);
-  xF << end_pose[0], end_pose[1], end_pose[2], end_pose[3];
 
   // Result container for warm start (initial velocity is assumed to be 0 for
   // now)
   HybridAStartResult result;
 
-  if (warm_start_->Plan(x0(0, 0), x0(1, 0), x0(2, 0), xF(0, 0), xF(1, 0),
-                        xF(2, 0), XYbounds, obstacles_vertices_vec, &result)) {
+  if (warm_start_->Plan(init_x, init_y, init_phi, end_pose[0], end_pose[1],
+                        end_pose[2], XYbounds, obstacles_vertices_vec,
+                        &result)) {
     ADEBUG << "State warm start problem solved successfully!";
   } else {
     ADEBUG << "State warm start problem failed to solve";
     return Status(ErrorCode::PLANNING_ERROR,
                   "State warm start problem failed to solve");
   }
+
+  // Result Containers for distance approach trajectory smoothing problem
+  Eigen::MatrixXd state_result_ds;
+  Eigen::MatrixXd control_result_ds;
+  Eigen::MatrixXd time_result_ds;
+  Eigen::MatrixXd l_warm_up;
+  Eigen::MatrixXd n_warm_up;
+  Eigen::MatrixXd dual_l_result_ds;
+  Eigen::MatrixXd dual_n_result_ds;
+
   // load Warm Start result(horizon is timestep number minus one)
   size_t horizon = result.x.size() - 1;
   Eigen::MatrixXd xWS = Eigen::MatrixXd::Zero(4, horizon + 1);
@@ -134,65 +131,20 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
   uWS.row(0) = steer;
   uWS.row(1) = a;
 
-  // Result container for distance approach problem
-  Eigen::MatrixXd l_warm_up;
-  Eigen::MatrixXd n_warm_up;
+  const double init_steer = trajectory_stitching_point.steer();
+  const double init_a = trajectory_stitching_point.a();
+  Eigen::MatrixXd last_time_u(2, 1);
+  last_time_u << init_steer, init_a;
 
-  // load vehicle configuration
-  const common::VehicleParam& vehicle_param_ =
-      common::VehicleConfigHelper::GetConfig().vehicle_param();
-  double front_to_center = vehicle_param_.front_edge_to_center();
-  double back_to_center = vehicle_param_.back_edge_to_center();
-  double left_to_center = vehicle_param_.left_edge_to_center();
-  double right_to_center = vehicle_param_.right_edge_to_center();
-  Eigen::MatrixXd ego(4, 1);
-  ego << front_to_center, right_to_center, back_to_center, left_to_center;
+  const double init_v = trajectory_stitching_point.v();
 
-  // Get obstacle num
-  size_t obstacles_num = obstacles_vertices_vec.size();
-
-  // Get timestep delta t
-  double ts = config_.planner_open_space_config().delta_t();
-
-  if (FLAGS_use_dual_variable_warm_start) {
-    if (dual_variable_warm_start_->Solve(
-            horizon, ts, ego, obstacles_num, obstacles_edges_num, obstacles_A,
-            obstacles_b, xWS, &l_warm_up, &n_warm_up)) {
-      ADEBUG << "Dual variable problem solved successfully!";
-    } else {
-      ADEBUG << "Dual variable problem failed to solve";
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "Dual variable problem failed to solve");
-    }
-  } else {
-    l_warm_up =
-        0.5 * Eigen::MatrixXd::Ones(obstacles_edges_num.sum(), horizon + 1);
-    n_warm_up = 0.5 * Eigen::MatrixXd::Ones(4 * obstacles_num, horizon + 1);
-  }
-
-  // Result Containers for distance approach trajectory smoothing problem
-  Eigen::MatrixXd state_result_ds;
-  Eigen::MatrixXd control_result_ds;
-  Eigen::MatrixXd time_result_ds;
-  Eigen::MatrixXd dual_l_result_ds;
-  Eigen::MatrixXd dual_n_result_ds;
-
-  if (distance_approach_->Solve(
-          x0, xF, last_time_u, horizon, ts, ego, xWS, uWS, l_warm_up, n_warm_up,
-          XYbounds, obstacles_num, obstacles_edges_num, obstacles_A,
-          obstacles_b, &state_result_ds, &control_result_ds, &time_result_ds,
+  if (!GenerateDistanceApproachTraj(
+          xWS, uWS, XYbounds, obstacles_edges_num, obstacles_A, obstacles_b,
+          obstacles_vertices_vec, last_time_u, init_v, &state_result_ds,
+          &control_result_ds, &time_result_ds, &l_warm_up, &n_warm_up,
           &dual_l_result_ds, &dual_n_result_ds)) {
-    ADEBUG << "Distance approach problem solved successfully!";
-  } else {
-    ADEBUG << "Distance approach problem failed to solve";
-    if (FLAGS_enable_smoother_failsafe) {
-      UseWarmStartAsResult(xWS, uWS, l_warm_up, n_warm_up, &state_result_ds,
-                           &control_result_ds, &time_result_ds,
-                           &dual_l_result_ds, &dual_n_result_ds);
-    } else {
-      return Status(ErrorCode::PLANNING_ERROR,
-                    "Distance approach problem failed to solve");
-    }
+    return Status(ErrorCode::PLANNING_ERROR,
+                  "distance approach smoothing problem failed to solve");
   }
 
   // record debug info
@@ -454,6 +406,76 @@ void OpenSpaceTrajectoryOptimizer::UseWarmStartAsResult(
   size_t time_result_horizon = xWS.cols();
   *time_result_ds = Eigen::MatrixXd::Constant(
       1, time_result_horizon, config_.planner_open_space_config().delta_t());
+}
+
+bool OpenSpaceTrajectoryOptimizer::GenerateDistanceApproachTraj(
+    const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const std::vector<double>& XYbounds,
+    const Eigen::MatrixXi& obstacles_edges_num,
+    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+    const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
+    const Eigen::MatrixXd& last_time_u, const double init_v,
+    Eigen::MatrixXd* state_result_ds, Eigen::MatrixXd* control_result_ds,
+    Eigen::MatrixXd* time_result_ds, Eigen::MatrixXd* l_warm_up,
+    Eigen::MatrixXd* n_warm_up, Eigen::MatrixXd* dual_l_result_ds,
+    Eigen::MatrixXd* dual_n_result_ds) {
+  size_t horizon = xWS.cols() - 1;
+  Eigen::MatrixXd x0(4, 1);
+  x0 << xWS(0, 0), xWS(1, 0), xWS(2, 0), init_v;
+
+  Eigen::MatrixXd xF(4, 1);
+  xF << xWS(0, horizon), xWS(1, horizon), xWS(2, horizon), xWS(3, horizon);
+
+  // load vehicle configuration
+  const common::VehicleParam& vehicle_param_ =
+      common::VehicleConfigHelper::GetConfig().vehicle_param();
+  double front_to_center = vehicle_param_.front_edge_to_center();
+  double back_to_center = vehicle_param_.back_edge_to_center();
+  double left_to_center = vehicle_param_.left_edge_to_center();
+  double right_to_center = vehicle_param_.right_edge_to_center();
+  Eigen::MatrixXd ego(4, 1);
+  ego << front_to_center, right_to_center, back_to_center, left_to_center;
+
+  // Get obstacle num
+  size_t obstacles_num = obstacles_vertices_vec.size();
+
+  // Get timestep delta t
+  double ts = config_.planner_open_space_config().delta_t();
+
+  // Dual variable warm start for distance approach problem
+  if (FLAGS_use_dual_variable_warm_start) {
+    if (dual_variable_warm_start_->Solve(
+            horizon, ts, ego, obstacles_num, obstacles_edges_num, obstacles_A,
+            obstacles_b, xWS, l_warm_up, n_warm_up)) {
+      ADEBUG << "Dual variable problem solved successfully!";
+    } else {
+      ADEBUG << "Dual variable problem failed to solve";
+      return false;
+    }
+  } else {
+    *l_warm_up =
+        0.5 * Eigen::MatrixXd::Ones(obstacles_edges_num.sum(), horizon + 1);
+    *n_warm_up = 0.5 * Eigen::MatrixXd::Ones(4 * obstacles_num, horizon + 1);
+  }
+
+  // Distance approach trajectory smoothing
+  if (distance_approach_->Solve(
+          x0, xF, last_time_u, horizon, ts, ego, xWS, uWS, *l_warm_up,
+          *n_warm_up, XYbounds, obstacles_num, obstacles_edges_num, obstacles_A,
+          obstacles_b, state_result_ds, control_result_ds, time_result_ds,
+          dual_l_result_ds, dual_n_result_ds)) {
+    ADEBUG << "Distance approach problem solved successfully!";
+  } else {
+    ADEBUG << "Distance approach problem failed to solve";
+    if (FLAGS_enable_smoother_failsafe) {
+      UseWarmStartAsResult(xWS, uWS, *l_warm_up, *n_warm_up, state_result_ds,
+                           control_result_ds, time_result_ds, dual_l_result_ds,
+                           dual_n_result_ds);
+    } else {
+      return false;
+    }
+  }
+  return true;
 }
 
 }  // namespace planning
