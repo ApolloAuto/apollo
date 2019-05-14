@@ -12,12 +12,9 @@ os: linux
 cache:
   directories:
   - $HOME/.cache/bazel
-  - .git/lfs
 install: skip
 before_script:
     - cp scripts/AGREEMENT.txt ${HOME}/.apollo_agreement.txt
-git:
-  lfs_skip_smudge: true
 
 jobs:
   include:
