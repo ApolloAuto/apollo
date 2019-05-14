@@ -120,7 +120,7 @@ DECLARE_double(distance_to_slow_down_at_stop_sign);
 DECLARE_double(time_to_center_if_not_reach);
 DECLARE_double(default_s_if_no_obstacle_in_lane_sequence);
 DECLARE_double(default_l_if_no_obstacle_in_lane_sequence);
-DECLARE_bool(enable_build_current_frame_env);
+DECLARE_bool(enable_semantic_map);
 
 // Obstacle trajectory
 DECLARE_bool(enable_cruise_regression);
