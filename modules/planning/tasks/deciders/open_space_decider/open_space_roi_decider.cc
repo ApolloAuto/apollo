@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/deciders/open_space_roi_decider.h"
+#include "modules/planning/tasks/deciders/open_space_decider/open_space_roi_decider.h"
 
 namespace apollo {
 namespace planning {

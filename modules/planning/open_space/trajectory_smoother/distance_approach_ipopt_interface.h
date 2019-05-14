@@ -234,9 +234,10 @@ class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
 
   double max_miu_ = 0.0;
 
+  bool enable_jacobian_ad_ = false;
+
  private:
   DistanceApproachConfig distance_approach_config_;
-  PlannerOpenSpaceConfig planner_open_space_config_;
   const common::VehicleParam vehicle_param_ =
       common::VehicleConfigHelper::GetConfig().vehicle_param();
 

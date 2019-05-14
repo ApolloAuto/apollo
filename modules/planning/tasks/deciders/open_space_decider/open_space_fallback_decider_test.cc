@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-#include "modules/planning/tasks/deciders/open_space_roi_decider.h"
+#include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"
 
 #include "gtest/gtest.h"
 #include "modules/planning/proto/planning_config.pb.h"
@@ -25,19 +25,19 @@
 namespace apollo {
 namespace planning {
 
-class OpenSpaceRoiDeciderTest : public ::testing::Test {
+class OpenSpaceFallbackDeciderTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    config_.set_task_type(TaskConfig::OPEN_SPACE_ROI_DECIDER);
+    config_.set_task_type(TaskConfig::OPEN_SPACE_FALLBACK_DECIDER);
   }
 
  protected:
   TaskConfig config_;
 };
 
-TEST_F(OpenSpaceRoiDeciderTest, Init) {
-  OpenSpaceRoiDecider open_space_roi_decider(config_);
-  EXPECT_EQ(open_space_roi_decider.Name(),
+TEST_F(OpenSpaceFallbackDeciderTest, Init) {
+  OpenSpaceFallbackDecider open_space_fallback_decider(config_);
+  EXPECT_EQ(open_space_fallback_decider.Name(),
             TaskConfig::TaskType_Name(config_.task_type()));
 }
 
