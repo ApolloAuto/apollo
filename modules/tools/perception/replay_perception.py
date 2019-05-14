@@ -92,7 +92,8 @@ def load_descrptions(files):
     for file in files:
         with open(file, 'r') as fp:
             obstacles = simplejson.loads(fp.read())
-            if type(obstacles) is list: # Multiple obstacle in one file saves as a list[obstacles]
+            # Multiple obstacle in one file saves as a list[obstacles]
+            if isinstance(obstacles, list):
                 for obstacle in obstacles:
                     trace = obstacle.get('trace', [])
                     for i in range(1, len(trace)):
@@ -139,7 +140,9 @@ def init_perception(description):
     perception.width = description["width"]
     perception.height = description["height"]
     perception.polygon_point.extend(generate_polygon(perception.position,
-                                                     perception.theta, perception.length, perception.width))
+                                                     perception.theta,
+                                                     perception.length,
+                                                     perception.width))
     perception.tracking_time = description["tracking_time"]
     perception.type = PerceptionObstacle.Type.Value(description["type"])
     perception.timestamp = cyber_time.Time.now().to_sec()
