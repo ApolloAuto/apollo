@@ -189,3 +189,20 @@ proto_library(
     deps = [
     ],
 )
+
+cc_proto_library(
+    name = "semantic_map_config_proto",
+    deps = [
+        ":semantic_map_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "semantic_map_config_proto_lib",
+    srcs = [
+        "semantic_map_config.proto",
+    ],
+    deps = [
+        "//modules/common/proto:geometry_proto_lib",
+    ],
+)
