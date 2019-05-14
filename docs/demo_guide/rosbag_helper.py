@@ -25,6 +25,7 @@ URL_LIST = [
     "https://github.com/ApolloAuto/apollo/releases/download/v2.0.0/apollo_2.0_camera_sample.bag",
     "https://github.com/ApolloAuto/apollo/releases/download/v2.5.0/demo_2.5.bag",
     "https://github.com/ApolloAuto/apollo/releases/download/v1.0.0/demo_1.0.bag",
+    "https://github.com/ApolloAuto/apollo/releases/download/v3.5.0/demo_3.5.record",
 ]
 
 URL_DICT = {}

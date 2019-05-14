@@ -18,7 +18,28 @@ Apollo演示的安装步骤：
     bash docker/scripts/dev_into.sh
     ```
 
-3. 运行如下命令回放record:
+3. 在Docker中编译Apollo:
+    ```
+    bash apollo.sh build
+    ```
+    `Note:` 如果没有GPU，请使用下面的命令
+
+    ```
+    bash apollo.sh build_cpu
+    ```
+
+4. 启动DreamView
+    ```
+    bash scripts/bootstrap.sh
+    ```
+
+5. 下载demo record:
+    ```
+    cd docs/demo_guide/
+    python rosbag_helper.py demo_3.5.record
+    ```
+
+6. 运行如下命令回放record:
 
     ```
     cyber_recorder play -f docs/demo_guide/demo_3.5.record --loop
@@ -26,7 +47,7 @@ Apollo演示的安装步骤：
 
     选项 `--loop` 用于设置循环回放模式.
 
-4. 打开Chrome浏览器，在地址栏输入**localhost:8888**即可访问Apollo Dreamview，如下图所示：
+7. 打开Chrome浏览器，在地址栏输入**localhost:8888**即可访问Apollo Dreamview，如下图所示：
     ![](images/dv_trajectory.png)
    现在你能看到有一辆汽车在模拟器里移动!
 

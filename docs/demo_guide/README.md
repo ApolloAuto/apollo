@@ -32,21 +32,27 @@ Setup steps:
     ```
     bash apollo.sh build_cpu
     ```
+
 4. Bootstrap to start ros call and Monitor module and Dreamview
     ```
     bash scripts/bootstrap.sh
     ```
 
-5. Now you can play the record:
+5. Download demo record:
+    ```
+    cd docs/demo_guide/
+    python rosbag_helper.py demo_3.5.record
+    ```
+
+6. Now you can play the record:
 
     ```
     cyber_recorder play -f docs/demo_guide/demo_3.5.record --loop
     ```
 
-    The `--loop` option enables record to keep playing the bag in a loop
-    playback mode.
+    The `--loop` option enables record to keep playing the bag in a loop playback mode.
 
-6. Open Chrome and go to **localhost:8888** to access Apollo Dreamview, which
+7. Open Chrome and go to **localhost:8888** to access Apollo Dreamview, which
    opens the screen below.
     ![](images/dv_trajectory.png)
    The car in Dreamview is happy to move around!
