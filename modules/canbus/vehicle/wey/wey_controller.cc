@@ -1,17 +1,18 @@
-/* Copyright 2019 The Apollo Authors. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
+/******************************************************************************
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/canbus/vehicle/wey/wey_controller.h"
 #include "modules/canbus/vehicle/vehicle_controller.h"
@@ -42,7 +43,7 @@ ErrorCode WeyController::Init(
     CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
     MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
-    AINFO << "WeyController has already been initiated.";
+    AINFO << "WeyController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
   }
   vehicle_params_.CopyFrom(
@@ -59,7 +60,7 @@ ErrorCode WeyController::Init(
   can_sender_ = can_sender;
 
   if (message_manager == nullptr) {
-    AERROR << "protocol manager is null.";
+    AERROR << "Protocol manager is null.";
     return ErrorCode::CANBUS_ERROR;
   }
   message_manager_ = message_manager;
@@ -106,7 +107,7 @@ ErrorCode WeyController::Init(
   can_sender_->AddMessage(Adsreqvin390::ID, ads_req_vin_390_, false);
   can_sender_->AddMessage(Adsshifter115::ID, ads_shifter_115_, false);
 
-  // need sleep to ensure all messages received
+  // Need to sleep to ensure all messages received
   AINFO << "WeyController is initialized.";
 
   is_initialized_ = true;
@@ -117,7 +118,7 @@ WeyController::~WeyController() {}
 
 bool WeyController::Start() {
   if (!is_initialized_) {
-    AERROR << "WeyController has NOT been initiated.";
+    AERROR << "WeyController has NOT been initialized.";
     return false;
   }
   const auto& update_func = [this] { SecurityDogThreadFunc(); };
@@ -380,12 +381,11 @@ Chassis WeyController::chassis() {
       n[14] = vin_resp2_392.vin09();
       n[15] = vin_resp2_392.vin08();
       n[16] = vin_resp3_393.vin16();
-      char ch[18];
-      memset(&ch, 0, sizeof(ch));
+      char ch[17];
+      memset(&ch, '\0', sizeof(ch));
       for (int i = 0; i < 17; i++) {
         ch[i] = static_cast<char>(n[i]);
       }
-      ch[17] = '\0';
       chassis_.mutable_license()->set_vin(ch);
     }
   }
@@ -393,7 +393,7 @@ Chassis WeyController::chassis() {
   if (chassis_error_mask_) {
     chassis_.set_chassis_error_mask(chassis_error_mask_);
   }
-  // give engage_advice based on error_code and canbus feedback
+  // Give engage_advice based on error_code and canbus feedback
   if (!chassis_error_mask_ && !chassis_.parking_brake()) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::READY_TO_ENGAGE);
@@ -413,7 +413,7 @@ void WeyController::Emergency() {
 
 ErrorCode WeyController::EnableAutoMode() {
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) {
-    AINFO << "already in COMPLETE_AUTO_DRIVE mode";
+    AINFO << "Already in COMPLETE_AUTO_DRIVE mode.";
     return ErrorCode::OK;
   }
   ads1_111_->set_ads_mode(Ads1_111::ADS_MODE_ACTIVE_MODE);
@@ -438,11 +438,10 @@ ErrorCode WeyController::EnableAutoMode() {
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-    AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
+  return ErrorCode::OK;
 }
 
 ErrorCode WeyController::DisableAutoMode() {
@@ -476,11 +475,10 @@ ErrorCode WeyController::EnableSteeringOnlyMode() {
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_STEER_ONLY);
-    AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::AUTO_STEER_ONLY);
+  AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
+  return ErrorCode::OK;
 }
 
 ErrorCode WeyController::EnableSpeedOnlyMode() {
@@ -503,20 +501,20 @@ ErrorCode WeyController::EnableSpeedOnlyMode() {
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_SPEED_ONLY);
-    AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::AUTO_SPEED_ONLY);
+  AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
+  return ErrorCode::OK;
 }
 
 // NEUTRAL, REVERSE, DRIVE, PARK
 void WeyController::Gear(Chassis::GearPosition gear_position) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
-    AINFO << "this drive mode no need to set gear.";
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+    AINFO << "This drive mode no need to set gear.";
     return;
   }
+
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
       ads_shifter_115_->set_ads_targetgear(Ads_shifter_115::ADS_TARGETGEAR_N);
@@ -557,8 +555,8 @@ void WeyController::Gear(Chassis::GearPosition gear_position) {
 // brake with pedal
 // acceleration:-7.0 ~ 5.0, unit:m/s^2
 void WeyController::Brake(double pedal) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -568,8 +566,8 @@ void WeyController::Brake(double pedal) {
 // drive with pedal
 // acceleration:-7.0 ~ 5.0, unit:m/s^2
 void WeyController::Throttle(double pedal) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -580,8 +578,8 @@ void WeyController::Throttle(double pedal) {
 // drive with acceleration/deceleration
 // acc:-7.0 ~ 5.0, unit:m/s^2
 void WeyController::Acceleration(double acc) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -598,8 +596,8 @@ void WeyController::Acceleration(double acc) {
 // wey default, -500 ~ 500, left:+, right:-
 // angle:-99.99~0.00~99.99, unit:, left:+, right:-
 void WeyController::Steer(double angle) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -611,8 +609,8 @@ void WeyController::Steer(double angle) {
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 // wey has no angle_spd
 void WeyController::Steer(double angle, double angle_spd) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -709,7 +707,7 @@ void WeyController::SecurityDogThreadFunc() {
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
-    AERROR << "Fail to run SecurityDogThreadFunc() because can_sender_ is "
+    AERROR << "Failed to run SecurityDogThreadFunc() because can_sender_ is "
               "nullptr.";
     return;
   }
@@ -726,10 +724,10 @@ void WeyController::SecurityDogThreadFunc() {
     const Chassis::DrivingMode mode = driving_mode();
     bool emergency_mode = false;
 
-    // 1. horizontal control check
+    // 1. Horizontal control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_STEER_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -739,10 +737,10 @@ void WeyController::SecurityDogThreadFunc() {
       horizontal_ctrl_fail = 0;
     }
 
-    // 2. vertical control check
+    // 2. Vertical control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_SPEED_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -773,15 +771,15 @@ void WeyController::SecurityDogThreadFunc() {
 }
 
 bool WeyController::CheckResponse(const int32_t flags, bool need_wait) {
-  int32_t retry_num = 20;
   ChassisDetail chassis_detail;
   bool is_eps_online = false;
   bool is_vcu_online = false;
   bool is_esp_online = false;
+  int retry_num = 20;
 
   do {
     if (message_manager_->GetSensorData(&chassis_detail) != ErrorCode::OK) {
-      AERROR_EVERY(100) << "get chassis detail failed.";
+      AERROR_EVERY(100) << "Get chassis detail failed.";
       return false;
     }
     bool check_ok = true;
@@ -808,14 +806,13 @@ bool WeyController::CheckResponse(const int32_t flags, bool need_wait) {
     }
     if (check_ok) {
       return true;
-    } else {
-      AINFO << "Need to check response again.";
     }
+    AINFO << "Need to check response again.";
   } while (need_wait && retry_num);
 
-  AINFO << "check_response fail: is_eps_online:" << is_eps_online
-        << ", is_vcu_online:" << is_vcu_online
-        << ", is_esp_online:" << is_esp_online;
+  AINFO << "check_response fail: is_eps_online: " << is_eps_online
+        << ", is_vcu_online: " << is_vcu_online
+        << ", is_esp_online: " << is_esp_online;
   return false;
 }
 

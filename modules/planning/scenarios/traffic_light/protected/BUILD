@@ -5,13 +5,13 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "traffic_light_protected_scenario",
     srcs = [
+        "stage_approach.cc",
         "stage_intersection_cruise.cc",
-        "stage_stop.cc",
         "traffic_light_protected_scenario.cc",
     ],
     hdrs = [
+        "stage_approach.h",
         "stage_intersection_cruise.h",
-        "stage_stop.h",
         "traffic_light_protected_scenario.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
@@ -23,6 +23,8 @@ cc_library(
         "//modules/common/util:factory",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/scenarios:scenario",
+        "//modules/planning/scenarios:stage_intersection_cruise_impl",
+        "//modules/planning/scenarios/util:scenario_util_lib",
         "//modules/planning/tasks/deciders:decider",
         "@eigen",
     ],

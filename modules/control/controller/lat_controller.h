@@ -115,6 +115,7 @@ class LatController : public Controller {
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
+                            const double linear_a,
                             const TrajectoryAnalyzer &trajectory_analyzer,
                             SimpleLateralDebug *debug);
   bool LoadControlConf(const ControlConf *control_conf);
@@ -207,6 +208,15 @@ class LatController : public Controller {
 
   // Lead/Lag controller
   LeadlagController leadlag_controller_;
+
+  // for compute the differential valute to estimate acceleration/lon_jerk
+  double previous_lateral_acceleration_ = 0.0;
+
+  double previous_heading_rate_ = 0.0;
+  double previous_ref_heading_rate_ = 0.0;
+
+  double previous_heading_acceleration_ = 0.0;
+  double previous_ref_heading_acceleration_ = 0.0;
 
   // for logging purpose
   std::ofstream steer_log_file_;

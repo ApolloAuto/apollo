@@ -71,6 +71,7 @@ Obstacle::Obstacle(const std::string& id,
                                perception_obstacle_.theta(),
                                perception_obstacle_.length(),
                                perception_obstacle_.width()) {
+  is_caution_level_obstacle_ = (obstacle_priority == ObstaclePriority::CAUTION);
   std::vector<common::math::Vec2d> polygon_points;
   if (FLAGS_use_navigation_mode ||
       perception_obstacle.polygon_point_size() <= 2) {
@@ -99,6 +100,7 @@ Obstacle::Obstacle(const std::string& id,
                    const ObstaclePriority::Priority& obstacle_priority,
                    const bool is_static)
     : Obstacle(id, perception_obstacle, obstacle_priority, is_static) {
+  is_caution_level_obstacle_ = (obstacle_priority == ObstaclePriority::CAUTION);
   trajectory_ = trajectory;
   auto& trajectory_points = *trajectory_.mutable_trajectory_point();
   double cumulative_s = 0.0;
@@ -423,14 +425,16 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
             kSkipLDistanceFactor +
         adc_width / 2.0;
 
-    if (std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
-            skip_l_distance ||
-        std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
-            -skip_l_distance) {
+    if (!IsCautionLevelObstacle() &&
+        (std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
+             skip_l_distance ||
+         std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
+             -skip_l_distance)) {
       continue;
     }
 
-    if (object_boundary.end_s() < 0) {  // skip if behind reference line
+    if (!IsCautionLevelObstacle() && object_boundary.end_s() < 0) {
+      // skip if behind reference line
       continue;
     }
     constexpr double kSparseMappingS = 20.0;
@@ -746,6 +750,10 @@ void Obstacle::CheckLaneBlocking(const ReferenceLine& reference_line) {
   }
 
   is_lane_blocking_ = false;
+}
+
+void Obstacle::SetLaneChangeBlocking(const bool is_distance_clear) {
+  is_lane_change_blocking_ = is_distance_clear;
 }
 
 }  // namespace planning

@@ -87,6 +87,7 @@ void HMI::RegisterMessageHandlers() {
         HMIAction hmi_action;
         if (!HMIAction_Parse(action, &hmi_action)) {
           AERROR << "Invalid HMIAction string: " << action;
+          return;
         }
         std::string value;
         if (JsonUtil::GetStringFromJson(json, "value", &value)) {
@@ -105,7 +106,7 @@ void HMI::RegisterMessageHandlers() {
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
         } else if (hmi_action == HMIAction::CHANGE_MODE) {
-          static constexpr char kCalibrationMode[] = "Mkz Calibration";
+          static constexpr char kCalibrationMode[] = "Vehicle Calibration";
           if (value == kCalibrationMode) {
             data_collection_monitor_->Start();
           } else {

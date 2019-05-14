@@ -1,0 +1,98 @@
+engine_started: true
+engine_rpm: 0
+speed_mps: 1.6138889
+odometer_m: 0
+fuel_range_m: 0
+throttle_percentage: 15.178149
+brake_percentage: 20.117495
+steering_percentage: -54.957447
+steering_torque_nm: -0.5
+parking_brake: false
+driving_mode: COMPLETE_AUTO_DRIVE
+error_code: NO_ERROR
+gear_location: GEAR_DRIVE
+header {
+  timestamp_sec: 1548201255.8666761
+  module_name: "canbus"
+  sequence_num: 391603
+}
+signal {
+  turn_signal: TURN_NONE
+  high_beam: false
+  horn: false
+}
+chassis_gps {
+  latitude: 37.415476666666663
+  longitude: -122.01455333333332
+  gps_valid: true
+  year: 19
+  month: 1
+  day: 22
+  hours: 23
+  minutes: 54
+  seconds: 15
+  compass_direction: 135
+  pdop: 0
+  is_gps_fault: false
+  is_inferred: false
+  altitude: -42.5
+  heading: 116.31
+  hdop: 0.8
+  vdop: 1.4000000000000001
+  quality: FIX_3D
+  num_satellites: 10
+  gps_speed: 1.78816
+}
+engage_advice {
+  advice: READY_TO_ENGAGE
+}
+wheel_speed {
+  is_wheel_spd_rr_valid: true
+  wheel_direction_rr: FORWARD
+  wheel_spd_rr: 4.2700000000000005
+  is_wheel_spd_rl_valid: true
+  wheel_direction_rl: FORWARD
+  wheel_spd_rl: 5.04
+  is_wheel_spd_fr_valid: true
+  wheel_direction_fr: FORWARD
+  wheel_spd_fr: 4.5
+  is_wheel_spd_fl_valid: true
+  wheel_direction_fl: FORWARD
+  wheel_spd_fl: 5.24
+}
+surround {
+  cross_traffic_alert_left: false
+  cross_traffic_alert_left_enabled: false
+  blind_spot_left_alert: false
+  blind_spot_left_alert_enabled: false
+  cross_traffic_alert_right: false
+  blind_spot_right_alert: false
+  blind_spot_right_alert_enabled: false
+  sonar00: 100
+  sonar01: 100
+  sonar02: 100
+  sonar03: 100
+  sonar04: 100
+  sonar05: 100
+  sonar06: 100
+  sonar07: 100
+  sonar08: 100
+  sonar09: 100
+  sonar10: 100
+  sonar11: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+  sonar_range: 100
+}
+license {
+  vin: "3LN6L2LU5GR607996"
+}

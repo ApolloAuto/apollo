@@ -21,11 +21,12 @@ import numpy
 import math
 import os
 
-
 def get_stat2_from_data(data):
-    """find the max number of continuous frames when position error is lager than 30cm, 20cm and 10cm
-    Args:
-        data: error array 
+    """Find the max number of continuous frames when position error is lager
+       than 30cm, 20cm and 10cm
+
+    Arguments:
+        data: error array
     Returns:
         stat: array of max number of continuous frames
     """
@@ -60,11 +61,12 @@ def get_stat2_from_data(data):
     stat = [max_con_frame_num_10, max_con_frame_num_20, max_con_frame_num_30]
     return stat
 
-
 def get_angle_stat2_from_data(data):
-    """find the max number of continuous frames when yaw error is lager than 1.0d, 0.6d and 0.3d
-    Args:
-        data: error array 
+    """Find the max number of continuous frames when yaw error is lager
+       than 1.0d, 0.6d and 0.3d
+
+    Arguments:
+        data: error array
     Returns:
         stat: array of max number of continuous frames
     """
@@ -99,7 +101,6 @@ def get_angle_stat2_from_data(data):
     stat = [max_con_frame_num_1_0, max_con_frame_num_0_6, max_con_frame_num_0_3]
     return stat
 
-
 def get_stat_from_data(data):
     num_data = numpy.array(data)
     sum1 = num_data.sum()
@@ -123,7 +124,6 @@ def get_stat_from_data(data):
     stat = [mean, std, mx, count_less_than_30,
             count_less_than_20, count_less_than_10]
     return stat
-
 
 def get_angle_stat_from_data(data):
     num_data = numpy.array(data)
@@ -149,11 +149,10 @@ def get_angle_stat_from_data(data):
             count_less_than_06, count_less_than_03]
     return stat
 
-
 def parse_file(filename, type):
-    file = open(filename, "r")
-    lines = file.readlines()
-    print "%d frames" % len(lines)
+    with open(filename, 'r') as fp:
+        lines = fp.readlines()
+    print('%d frames' % len(lines))
     error = []
     error_lon = []
     error_lat = []
@@ -176,7 +175,6 @@ def parse_file(filename, type):
             y = float(s[3])
             error.append(math.sqrt(x * x + y * y))
             #print "%f %f %f" % (error[-1], error_lon[-1], error_lat[-1])
-    file.close()
     if type == "all":
         print_distance_error(error, error_lon, error_lat, error_alt)
         print_angle_error(error_roll, error_pitch, error_yaw)
@@ -190,31 +188,30 @@ def parse_file(filename, type):
 
 
 def print_distance_error(error, error_lon, error_lat, error_alt):
-    print "criteria : mean     std      max      < 30cm   < 20cm   < 10cm  con_frames(>30cm)"
+    print('criteria : mean     std      max      < 30cm   < 20cm   < 10cm  con_frames(>30cm)')
     result = get_stat_from_data(error)
     res = get_stat2_from_data(error)
-    print "error    : %06f %06f %06f %06f %06f %06f %06d" % \
+    print('error    : %06f %06f %06f %06f %06f %06f %06d' % \
         (result[0], result[1], result[2],
          result[3], result[4], result[5], res[2])
     result = get_stat_from_data(error_lon)
     res = get_stat2_from_data(error_lon)
-    print "error lon: %06f %06f %06f %06f %06f %06f %06d" % \
+    print('error lon: %06f %06f %06f %06f %06f %06f %06d' % \
         (result[0], result[1], result[2],
          result[3], result[4], result[5], res[2])
     result = get_stat_from_data(error_lat)
     res = get_stat2_from_data(error_lat)
-    print "error lat: %06f %06f %06f %06f %06f %06f %06d" % \
+    print('error lat: %06f %06f %06f %06f %06f %06f %06d' % \
         (result[0], result[1], result[2],
          result[3], result[4], result[5], res[2])
     result = get_stat_from_data(error_alt)
     res = get_stat2_from_data(error_alt)
-    print "error alt: %06f %06f %06f %06f %06f %06f %06d" % \
+    print('error alt: %06f %06f %06f %06f %06f %06f %06d' % \
         (result[0], result[1], result[2],
          result[3], result[4], result[5], res[2])
 
-
 def print_angle_error(error_roll, error_pitch, error_yaw):
-    print "criteria : mean     std      max      < 1.0d   < 0.6d   < 0.3d  con_frames(>1.0d)"
+    print('criteria : mean     std      max      < 1.0d   < 0.6d   < 0.3d  con_frames(>1.0d)')
     result = get_angle_stat_from_data(error_roll)
     res = get_angle_stat2_from_data(error_roll)
     print "error rol: %06f %06f %06f %06f %06f %06f %06d" % \
@@ -231,13 +228,13 @@ def print_angle_error(error_roll, error_pitch, error_yaw):
         (result[0], result[1], result[2],
          result[3], result[4], result[5], res[0])
 
-
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print "python evaluation.py [evaluation file] [evaluation type]"
+        print('Usage: %s [evaluation file] [evaluation type]' % argv[0])
+        sys.exit(1)
     elif not os.path.isfile(sys.argv[1]):
-        print "file not exist"
+        print('File does not exist')
     elif len(sys.argv) < 3:
-        parse_file(sys.argv[1], "all")
+        parse_file(sys.argv[1], 'all')
     else:
         parse_file(sys.argv[1], sys.argv[2])

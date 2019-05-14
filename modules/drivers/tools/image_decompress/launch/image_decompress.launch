@@ -1,0 +1,7 @@
+<cyber>
+    <module>
+        <name>image_decompress</name>
+        <dag_conf>/apollo/modules/drivers/tools/image_decompress/dag/image_decompress.dag</dag_conf>
+        <process_name></process_name>
+    </module>
+</cyber>

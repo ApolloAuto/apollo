@@ -39,6 +39,7 @@
 #include "modules/common/math/math_utils.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
+#include "modules/planning/open_space/trajectory_smoother/distance_approach_interface.h"
 #include "modules/planning/proto/planner_open_space_config.pb.h"
 
 #define tag_f 1
@@ -49,10 +50,10 @@
 namespace apollo {
 namespace planning {
 
-class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
+class DistanceApproachIPOPTInterface : public DistanceApproachInterface {
  public:
   explicit DistanceApproachIPOPTInterface(
-      size_t horizon, double ts, Eigen::MatrixXd ego,
+      const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
       const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
       const Eigen::MatrixXd& x0, const Eigen::MatrixXd& xf,
@@ -64,8 +65,8 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
   virtual ~DistanceApproachIPOPTInterface() = default;
 
   /** Method to return some info about the nlp */
-  bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
-                    IndexStyleEnum& index_style) override;
+  bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,  // NOLINT
+                    IndexStyleEnum& index_style) override;           // NOLINT
 
   /** Method to return the bounds for my problem */
   bool get_bounds_info(int n, double* x_l, double* x_u, int m, double* g_l,
@@ -81,14 +82,12 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
 
   /** Method to return the gradient of the objective */
   bool eval_grad_f(int n, const double* x, bool new_x, double* grad_f) override;
-  // eval_grad_f by hand.
-  bool eval_grad_f_hand(int n, const double* x, bool new_x, double* grad_f);
 
   /** Method to return the constraint residuals */
   bool eval_g(int n, const double* x, bool new_x, int m, double* g) override;
 
-  /** Check unfeasible constraints for futher study**/
-  bool check_g(int n, const double* x, int m, double* g);
+  /** Check unfeasible constraints for further study**/
+  bool check_g(int n, const double* x, int m, const double* g);
 
   /** Method to return:
    *   1) The structure of the jacobian (if "values" is nullptr)
@@ -96,12 +95,10 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
    */
   bool eval_jac_g(int n, const double* x, bool new_x, int m, int nele_jac,
                   int* iRow, int* jCol, double* values) override;
+
   // sequential implementation to jac_g
   bool eval_jac_g_ser(int n, const double* x, bool new_x, int m, int nele_jac,
-                      int* iRow, int* jCol, double* values);
-  // parallel implementation to jac_g
-  bool eval_jac_g_par(int n, const double* x, bool new_x, int m, int nele_jac,
-                      int* iRow, int* jCol, double* values);
+                      int* iRow, int* jCol, double* values) override;
 
   /** Method to return:
    *   1) The structure of the hessian of the lagrangian (if "values" is
@@ -125,19 +122,19 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
                                 Eigen::MatrixXd* control_result,
                                 Eigen::MatrixXd* time_result,
                                 Eigen::MatrixXd* dual_l_result,
-                                Eigen::MatrixXd* dual_n_result) const;
+                                Eigen::MatrixXd* dual_n_result) const override;
 
   //***************    start ADOL-C part ***********************************
   /** Template to return the objective value */
   template <class T>
-  bool eval_obj(int n, const T* x, T* obj_value);
+  void eval_obj(int n, const T* x, T* obj_value);
 
-  /** Template to compute contraints */
+  /** Template to compute constraints */
   template <class T>
-  bool eval_constraints(int n, const T* x, int m, T* g);
+  void eval_constraints(int n, const T* x, int m, T* g);
 
   /** Method to generate the required tapes by ADOL-C*/
-  void generate_tapes(int n, int m, int* nnz_h_lag);
+  void generate_tapes(int n, int m, int* nnz_jac_g, int* nnz_h_lag);
   //***************    end   ADOL-C part ***********************************
 
  private:
@@ -246,10 +243,16 @@ class DistanceApproachIPOPTInterface : public Ipopt::TNLP {
  private:
   //***************    start ADOL-C part ***********************************
   double* obj_lam;
+  //** variables for sparsity exploitation
+  unsigned int* rind_g; /* row indices    */
+  unsigned int* cind_g; /* column indices */
+  double* jacval;       /* values         */
   unsigned int* rind_L; /* row indices    */
   unsigned int* cind_L; /* column indices */
   double* hessval;      /* values */
-  int nnz_L = 0;
+  int nnz_jac;
+  int nnz_L;
+  int options_g[4];
   int options_L[4];
   //***************    end   ADOL-C part ***********************************
 };

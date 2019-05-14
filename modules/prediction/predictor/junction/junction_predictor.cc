@@ -47,7 +47,8 @@ void JunctionPredictor::Predict(Obstacle* obstacle) {
         latest_feature, junction_exit, FLAGS_prediction_trajectory_time_length,
         FLAGS_prediction_trajectory_time_resolution, &trajectory_points);
     Trajectory trajectory = GenerateTrajectory(trajectory_points);
-    trajectories_.push_back(std::move(trajectory));
+    obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+        trajectory);
   }
 }
 

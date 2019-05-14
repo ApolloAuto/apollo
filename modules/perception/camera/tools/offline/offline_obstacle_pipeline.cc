@@ -15,29 +15,30 @@
  *****************************************************************************/
 
 #include <opencv2/opencv.hpp>
-#include <iomanip>
+
 #include <fstream>
+#include <iomanip>
 
 #include "cyber/common/file.h"
 #include "modules/common/util/string_util.h"
 #include "modules/perception/base/distortion_model.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
+#include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
+#include "modules/perception/camera/lib/calibrator/laneline/laneline_calibrator.h"
+#include "modules/perception/camera/lib/feature_extractor/tfe/external_feature_extractor.h"
+#include "modules/perception/camera/lib/feature_extractor/tfe/project_feature.h"
+#include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
+#include "modules/perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.h"
+#include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
+#include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/darkSCNN_lane_postprocessor.h"
+#include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
+#include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
+#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
+#include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
+#include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
 #include "modules/perception/camera/tools/offline/visualizer.h"
 #include "modules/perception/common/io/io_util.h"
-#include "modules/perception/camera/lib/obstacle/tracker/omt/omt_obstacle_tracker.h"
-#include "modules/perception/camera/lib/feature_extractor/tfe/tracking_feat_extractor.h"
-#include "modules/perception/camera/lib/obstacle/detector/yolo/yolo_obstacle_detector.h"
-#include "modules/perception/camera/lib/obstacle/transformer/multicue/multicue_obstacle_transformer.h"
-#include "modules/perception/camera/lib/obstacle/postprocessor/location_refiner/location_refiner_obstacle_postprocessor.h"
-#include "modules/perception/camera/lib/feature_extractor/tfe/project_feature.h"
-#include "modules/perception/camera/lib/feature_extractor/tfe/external_feature_extractor.h"
-#include "modules/perception/camera/lib/lane/postprocessor/denseline/denseline_lane_postprocessor.h"
-#include "modules/perception/camera/lib/lane/detector/denseline/denseline_lane_detector.h"
-#include "modules/perception/camera/lib/calibrator/laneline/laneline_calibrator.h"
-#include "modules/perception/camera/lib/calibration_service/online_calibration_service/online_calibration_service.h"
-#include "modules/perception/camera/lib/lane/detector/darkSCNN/darkSCNN_lane_detector.h"
-#include "modules/perception/camera/lib/lane/postprocessor/darkSCNN/darkSCNN_lane_postprocessor.h"
 
 DEFINE_string(test_list,
               "/apollo/modules/perception/testdata/camera/lib/obstacle/"
@@ -228,8 +229,7 @@ int work() {
     image_name = temp_strs[1];
 
     AINFO << "image: " << image_name << ", camera_name: " << camera_name;
-    std::string image_path = FLAGS_image_root +
-                             image_name + FLAGS_image_ext;
+    std::string image_path = FLAGS_image_root + image_name + FLAGS_image_ext;
     cv::Mat image;
     if (FLAGS_image_color == "gray") {
       image = cv::imread(image_path, CV_LOAD_IMAGE_GRAYSCALE);
@@ -322,21 +322,19 @@ int work() {
                << static_cast<int>(box.ymin) << " "
                << static_cast<int>(box.xmax) << " "
                << static_cast<int>(box.ymax) << " "
-               << obj->sub_type_probs[static_cast<int>(obj->sub_type)]
-               << "\n";
-        cv::rectangle(image,
-                      cv::Point(static_cast<int>(box.xmin),
-                      static_cast<int>(box.ymin)),
-                      cv::Point(static_cast<int>(box.xmax),
-                                static_cast<int>(box.ymax)),
-                      cv::Scalar(0, 255, 0), 2);
+               << obj->sub_type_probs[static_cast<int>(obj->sub_type)] << "\n";
+        cv::rectangle(
+            image,
+            cv::Point(static_cast<int>(box.xmin), static_cast<int>(box.ymin)),
+            cv::Point(static_cast<int>(box.xmax), static_cast<int>(box.ymax)),
+            cv::Scalar(0, 255, 0), 2);
         std::stringstream text;
-        text << base::kSubType2NameMap.at(obj->sub_type)
-             << " - " << obj->sub_type_probs[static_cast<int>(obj->sub_type)];
-        cv::putText(image, text.str(),
-                    cv::Point(static_cast<int>(box.xmin),
-                    static_cast<int>(box.ymin)),
-                    cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(255, 127, 0), 2);
+        text << base::kSubType2NameMap.at(obj->sub_type) << " - "
+             << obj->sub_type_probs[static_cast<int>(obj->sub_type)];
+        cv::putText(
+            image, text.str(),
+            cv::Point(static_cast<int>(box.xmin), static_cast<int>(box.ymin)),
+            cv::FONT_HERSHEY_PLAIN, 2, cv::Scalar(255, 127, 0), 2);
       }
       cv::imwrite(save_dir + "/" + image_name + FLAGS_image_ext, image);
       AINFO << "Result saved to : "

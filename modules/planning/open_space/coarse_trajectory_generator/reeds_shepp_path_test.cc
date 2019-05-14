@@ -85,7 +85,7 @@ TEST_F(reeds_shepp, test_set_1) {
   std::shared_ptr<ReedSheppPath> optimal_path =
       std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
   if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
-    AINFO << "generating short RSP not successful";
+    ADEBUG << "generating short RSP not successful";
   }
   check(start_node, end_node, optimal_path);
 }
@@ -97,7 +97,7 @@ TEST_F(reeds_shepp, test_set_2) {
   std::shared_ptr<ReedSheppPath> optimal_path =
       std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
   if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
-    AINFO << "generating short RSP not successful";
+    ADEBUG << "generating short RSP not successful";
   }
   check(start_node, end_node, optimal_path);
 }
@@ -109,7 +109,7 @@ TEST_F(reeds_shepp, test_set_3) {
   std::shared_ptr<ReedSheppPath> optimal_path =
       std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
   if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
-    AINFO << "generating short RSP not successful";
+    ADEBUG << "generating short RSP not successful";
   }
   check(start_node, end_node, optimal_path);
 }
@@ -121,7 +121,7 @@ TEST_F(reeds_shepp, test_set_4) {
   std::shared_ptr<ReedSheppPath> optimal_path =
       std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
   if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
-    AINFO << "generating short RSP not successful";
+    ADEBUG << "generating short RSP not successful";
   }
   check(start_node, end_node, optimal_path);
 }
@@ -133,7 +133,7 @@ TEST_F(reeds_shepp, test_set_5) {
   std::shared_ptr<ReedSheppPath> optimal_path =
       std::shared_ptr<ReedSheppPath>(new ReedSheppPath());
   if (!reedshepp_test->ShortestRSP(start_node, end_node, optimal_path)) {
-    AINFO << "generating short RSP not successful";
+    ADEBUG << "generating short RSP not successful";
   }
   check(start_node, end_node, optimal_path);
 }

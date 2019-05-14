@@ -20,10 +20,9 @@
 #include <string>
 #include <vector>
 
-#include "modules/planning/common/frame.h"
+#include "modules/planning/planner/on_lane_planner_dispatcher.h"
 #include "modules/planning/planning_base.h"
 #include "modules/planning/tasks/smoothers/smoother.h"
-#include "planner/on_lane_planner_dispatcher.h"
 
 /**
  * @namespace apollo::planning
@@ -54,16 +53,16 @@ class OnLanePlanning : public PlanningBase {
    * @brief module initialization function
    * @return initialization status
    */
-  apollo::common::Status Init(const PlanningConfig& config) override;
+  common::Status Init(const PlanningConfig& config) override;
 
   /**
    * @brief main logic of the planning module, runs periodically triggered by
    * timer.
    */
   void RunOnce(const LocalView& local_view,
-               ADCTrajectory* const trajectory_pb) override;
+               ADCTrajectory* const ptr_trajectory_pb) override;
 
-  apollo::common::Status Plan(
+  common::Status Plan(
       const double current_time_stamp,
       const std::vector<common::TrajectoryPoint>& stitching_trajectory,
       ADCTrajectory* const trajectory) override;
@@ -73,13 +72,35 @@ class OnLanePlanning : public PlanningBase {
                            const common::TrajectoryPoint& planning_start_point,
                            const common::VehicleState& vehicle_state);
 
+  common::VehicleState AlignTimeStamp(const common::VehicleState& vehicle_state,
+                                      const double curr_timestamp) const;
+
   void ExportReferenceLineDebug(planning_internal::Debug* debug);
   bool CheckPlanningConfig(const PlanningConfig& config);
-  void GenerateStopTrajectory(ADCTrajectory* trajectory_pb);
+  void GenerateStopTrajectory(ADCTrajectory* ptr_trajectory_pb);
+  void ExportOnLaneChart(const planning_internal::Debug& debug_info,
+                         planning_internal::Debug* debug_chart);
+  void ExportOpenSpaceChart(const planning_internal::Debug& debug_info,
+                            const ADCTrajectory& trajectory_pb,
+                            planning_internal::Debug* debug_chart);
+  void AddOpenSpaceOptimizerResult(const planning_internal::Debug& debug_info,
+                                   planning_internal::Debug* debug_chart);
+  void AddPartitionedTrajectory(const planning_internal::Debug& debug_info,
+                                planning_internal::Debug* debug_chart);
+
+  void AddStitchSpeedProfile(planning_internal::Debug* debug_chart);
+
+  void AddPublishedSpeed(const ADCTrajectory& trajectory_pb,
+                         planning_internal::Debug* debug_chart);
+
+  void AddPublishedAcceleration(const ADCTrajectory& trajectory_pb,
+                                planning_internal::Debug* debug);
+
+  void AddFallbackTrajectory(const planning_internal::Debug& debug_info,
+                             planning_internal::Debug* debug_chart);
 
  private:
   routing::RoutingResponse last_routing_;
-  std::unique_ptr<Frame> frame_;
   std::unique_ptr<ReferenceLineProvider> reference_line_provider_;
   Smoother planning_smoother_;
 };

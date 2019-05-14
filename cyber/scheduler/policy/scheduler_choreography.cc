@@ -16,7 +16,6 @@
 
 #include "cyber/scheduler/policy/scheduler_choreography.h"
 
-#include <sched.h>
 #include <memory>
 #include <string>
 #include <utility>
@@ -44,45 +43,34 @@ using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
 SchedulerChoreography::SchedulerChoreography() {
-  // get sched config
   std::string conf("conf/");
   conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
   auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
 
   apollo::cyber::proto::CyberConfig cfg;
   if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
-    proc_num_ =
-        cfg.scheduler_conf().choreography_conf().choreography_processor_num();
-    choreography_affinity_ =
-        cfg.scheduler_conf().choreography_conf().choreography_affinity();
-    choreography_processor_policy_ = cfg.scheduler_conf()
-                                         .choreography_conf()
-                                         .choreography_processor_policy();
+    const apollo::cyber::proto::ChoreographyConf& choreography_conf =
+        cfg.scheduler_conf().choreography_conf();
+    proc_num_ = choreography_conf.choreography_processor_num();
+    choreography_affinity_ = choreography_conf.choreography_affinity();
+    choreography_processor_policy_ =
+        choreography_conf.choreography_processor_policy();
+
     choreography_processor_prio_ =
-        cfg.scheduler_conf().choreography_conf().choreography_processor_prio();
-    ParseCpuset(cfg.scheduler_conf().choreography_conf().choreography_cpuset(),
-                &choreography_cpuset_);
+        choreography_conf.choreography_processor_prio();
+    ParseCpuset(choreography_conf.choreography_cpuset(), &choreography_cpuset_);
 
-    task_pool_size_ =
-        cfg.scheduler_conf().choreography_conf().pool_processor_num();
-    pool_affinity_ = cfg.scheduler_conf().choreography_conf().pool_affinity();
-    pool_processor_policy_ =
-        cfg.scheduler_conf().choreography_conf().pool_processor_policy();
-    pool_processor_prio_ =
-        cfg.scheduler_conf().choreography_conf().pool_processor_prio();
-    ParseCpuset(cfg.scheduler_conf().choreography_conf().pool_cpuset(),
-                &pool_cpuset_);
+    task_pool_size_ = choreography_conf.pool_processor_num();
+    pool_affinity_ = choreography_conf.pool_affinity();
+    pool_processor_policy_ = choreography_conf.pool_processor_policy();
+    pool_processor_prio_ = choreography_conf.pool_processor_prio();
+    ParseCpuset(choreography_conf.pool_cpuset(), &pool_cpuset_);
 
-    for (auto& thr : cfg.scheduler_conf().choreography_conf().threads()) {
-      inner_thr_confs_[thr.name()] = thr;
-    }
-
-    for (auto& task : cfg.scheduler_conf().choreography_conf().tasks()) {
+    for (const auto& task : choreography_conf.tasks()) {
       cr_confs_[task.name()] = task;
     }
   }
 
-  // default val for case w/o config:
   if (proc_num_ == 0) {
     auto& global_conf = GlobalData::Instance()->Config();
     if (global_conf.has_scheduler_conf() &&
@@ -110,11 +98,10 @@ void SchedulerChoreography::CreateProcessor() {
     processors_.emplace_back(proc);
   }
 
-  // Put tasks w/o processor assigned into a classic pool.
   for (uint32_t i = 0; i < task_pool_size_; i++) {
+    auto proc = std::make_shared<Processor>();
     auto ctx = std::make_shared<ClassicContext>();
 
-    auto proc = std::make_shared<Processor>();
     proc->BindContext(ctx);
     proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
     proc->SetSchedPolicy(pool_processor_policy_, pool_processor_prio_);
@@ -148,7 +135,6 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
     }
   }
 
-  // Create CRoutine context;
   {
     WriteLockGuard<AtomicRWLock> lk(id_cr_lock_);
     if (id_cr_.find(cr->id()) != id_cr_.end()) {
@@ -163,8 +149,6 @@ bool SchedulerChoreography::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
     // Enqueue task to Choreo Policy.
     static_cast<ChoreographyContext*>(pctxs_[pid].get())->Enqueue(cr);
   } else {
-    // fallback for tasks w/o processor assigned.
-
     // Check if task prio is reasonable.
     if (cr->priority() >= MAX_PRIO) {
       AWARN << cr->name() << " prio great than MAX_PRIO.";
@@ -193,6 +177,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
   auto crid = GlobalData::GenerateHashId(name);
   return RemoveCRoutine(crid);
 }
+
 bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
@@ -220,6 +205,7 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
       auto cr = p->second;
       prio = cr->priority();
       pid = cr->processor_id();
+      group_name = cr->group_name();
       id_cr_[crid]->Stop();
       id_cr_.erase(crid);
     } else {
@@ -231,13 +217,13 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   if (pid == -1) {
     WriteLockGuard<AtomicRWLock> lk(
         ClassicContext::rq_locks_[group_name].at(prio));
-    for (auto it = ClassicContext::cr_group_[group_name].at(prio).begin();
-         it != ClassicContext::cr_group_[group_name].at(prio).end(); ++it) {
+    auto& croutines = ClassicContext::cr_group_[group_name].at(prio);
+    for (auto it = croutines.begin(); it != croutines.end(); ++it) {
       if ((*it)->id() == crid) {
         auto cr = *it;
 
         cr->Stop();
-        ClassicContext::cr_group_[group_name].at(prio).erase(it);
+        croutines.erase(it);
         cr->Release();
         return true;
       }
@@ -275,50 +261,15 @@ bool SchedulerChoreography::NotifyProcessor(uint64_t crid) {
                                             cr->processor_id());
 
   if (cr->processor_id() != -1) {
-    // Notify processor in choreo context.
     auto pid = cr->processor_id();
     static_cast<ChoreographyContext*>(pctxs_[pid].get())->Notify();
   } else {
-    // Notify processor in pool.
     ClassicContext::Notify(cr->group_name());
   }
 
   return true;
 }
 
-void SchedulerChoreography::SetInnerThreadAttr(const std::string& name,
-                                               std::thread* thr) {
-  if (thr != nullptr && inner_thr_confs_.find(name) != inner_thr_confs_.end()) {
-    auto th_conf = inner_thr_confs_[name];
-    auto cpuset = th_conf.cpuset();
-
-    std::vector<int> cpus;
-    ParseCpuset(cpuset, &cpus);
-    cpu_set_t set;
-    CPU_ZERO(&set);
-    for (const auto cpu : cpus) {
-      CPU_SET(cpu, &set);
-    }
-    pthread_setaffinity_np(thr->native_handle(), sizeof(set), &set);
-
-    auto policy = th_conf.policy();
-    auto prio = th_conf.prio();
-    int p;
-    if (!policy.compare("SCHED_FIFO")) {
-      p = SCHED_FIFO;
-    } else if (!policy.compare("SCHED_RR")) {
-      p = SCHED_RR;
-    } else {
-      return;
-    }
-
-    struct sched_param sp;
-    memset(static_cast<void*>(&sp), 0, sizeof(sp));
-    sp.sched_priority = prio;
-    pthread_setschedparam(thr->native_handle(), p, &sp);
-  }
-  return;
-}
 }  // namespace scheduler
 }  // namespace cyber
 }  // namespace apollo

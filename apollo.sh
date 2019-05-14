@@ -417,21 +417,18 @@ function gen_coverage() {
 
   COV_DIR=data/cov
   rm -rf $COV_DIR
-  files=$(find bazel-out/local-dbg/bin/modules/ -iname "*.gcda" -o -iname "*.gcno" | grep -v external)
+  files=$(find bazel-out/local-dbg/bin/ -iname "*.gcda" -o -iname "*.gcno" | grep -v external | grep -v third_party)
   for f in $files; do
-    target="$COV_DIR/objs/modules/${f##*modules}"
+    if [ "$f" != "${f##*cyber}" ]; then
+      target="$COV_DIR/objs/cyber${f##*cyber}"
+    else
+      target="$COV_DIR/objs/modules${f##*modules}"
+    fi
     mkdir -p "$(dirname "$target")"
     cp "$f" "$target"
   done
 
-  files=$(find bazel-out/local-opt/bin/modules/ -iname "*.gcda" -o -iname "*.gcno" | grep -v external)
-  for f in $files; do
-    target="$COV_DIR/objs/modules/${f##*modules}"
-    mkdir -p "$(dirname "$target")"
-    cp "$f" "$target"
-  done
-
-  lcov --rc lcov_branch_coverage=1 --capture --directory "$COV_DIR/objs" --output-file "$COV_DIR/conv.info"
+  lcov --rc lcov_branch_coverage=1 --base-directory "/apollo/bazel-apollo" --capture --directory "$COV_DIR/objs" --output-file "$COV_DIR/conv.info"
   if [ $? -ne 0 ]; then
     fail 'lcov failed!'
   fi
@@ -651,8 +648,11 @@ function config() {
 }
 
 function set_use_gpu() {
-  DEFINES="${DEFINES} --define USE_GPU=true"
-  USE_GPU="1"
+  if [ "${USE_GPU}" = "1" ] ; then
+    DEFINES="${DEFINES} --define USE_GPU=true"
+  else
+    DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
+  fi
 }
 
 function print_usage() {
@@ -698,6 +698,8 @@ function main() {
   check_esd_files
 
   DEFINES="--define ARCH=${MACHINE_ARCH} --define CAN_CARD=${CAN_CARD} --cxxopt=-DUSE_ESD_CAN=${USE_ESD_CAN}"
+  # Enable bazel's feature to compute md5 checksums in parallel
+  DEFINES="${DEFINES} --experimental_multi_threaded_digest"
 
   if [ ${MACHINE_ARCH} == "x86_64" ]; then
     DEFINES="${DEFINES} --copt=-mavx2"

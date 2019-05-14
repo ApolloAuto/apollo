@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <bitset>
 
+#include "modules/drivers/canbus/sensor_gflags.h"
+
 namespace apollo {
 namespace drivers {
 namespace canbus {
@@ -45,9 +47,20 @@ std::string Byte::byte_to_hex(const uint8_t value) {
 }
 
 std::string Byte::byte_to_hex(const uint32_t value) {
-  uint8_t high = (value >> 8) & 0xFF;
-  uint8_t low = value & 0xFF;
-  return byte_to_hex(high) + byte_to_hex(low);
+  uint8_t high;
+  uint8_t low;
+  std::string result = "";
+  if (FLAGS_esd_can_extended_frame && value >= 65536) {
+    high = static_cast<uint8_t>((value >> 24) & 0xFF);
+    low = static_cast<uint8_t>((value >> 16) & 0xFF);
+    result += byte_to_hex(high);
+    result += byte_to_hex(low);
+  }
+  high = static_cast<uint8_t>((value >> 8) & 0xFF);
+  low = static_cast<uint8_t>(value & 0xFF);
+  result += byte_to_hex(high);
+  result += byte_to_hex(low);
+  return result;
 }
 
 std::string Byte::byte_to_binary(const uint8_t value) {

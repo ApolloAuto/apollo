@@ -49,9 +49,9 @@ bool DstManager::AddApp(const std::string &app_name,
   }
   dst_data.init_ = true;
   BuildNamesMap(fod_subset_names, &dst_data);
-  map_mutex_.lock();
+
+  std::lock_guard<std::mutex> lock(map_mutex_);
   dst_common_data_[app_name] = dst_data;
-  map_mutex_.unlock();
   return true;
 }
 

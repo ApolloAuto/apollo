@@ -29,11 +29,11 @@ class PredictionMapTest : public KMLMapBasedTest {};
 
 TEST_F(PredictionMapTest, get_lane_info) {
   std::shared_ptr<const LaneInfo> lane_info = PredictionMap::LaneById("l20");
-  EXPECT_TRUE(lane_info != nullptr);
+  EXPECT_NE(nullptr, lane_info);
   EXPECT_EQ("l20", lane_info->id().id());
 
   lane_info = PredictionMap::LaneById("l500");
-  EXPECT_TRUE(lane_info == nullptr);
+  EXPECT_EQ(nullptr, lane_info);
 }
 
 TEST_F(PredictionMapTest, get_position_on_lane) {
@@ -139,7 +139,7 @@ TEST_F(PredictionMapTest, on_lane) {
   PredictionMap::OnLane(prev_lanes, point, heading, radius, true,
                         FLAGS_max_num_current_lane, FLAGS_max_lane_angle_diff,
                         &curr_lanes);
-  EXPECT_EQ(0, curr_lanes.size());
+  EXPECT_TRUE(curr_lanes.empty());
 }
 
 TEST_F(PredictionMapTest, get_path_heading) {

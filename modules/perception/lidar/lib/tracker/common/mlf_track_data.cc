@@ -87,11 +87,11 @@ void MlfTrackData::PushTrackedObjectToCache(TrackedObjectPtr obj) {
 
 bool MlfTrackData::ToObject(const Eigen::Vector3d& local_to_global_offset,
                             double timestamp, base::ObjectPtr object) const {
-  if (history_objects_.size() == 0) {
+  if (history_objects_.empty()) {
     return false;
   }
   auto latest_iter = history_objects_.rbegin();
-  const double& latest_time = latest_iter->first;
+  const double latest_time = latest_iter->first;
   const auto& latest_object = latest_iter->second;
   latest_object->ToObject(object);
   // predict object
@@ -128,11 +128,11 @@ bool MlfTrackData::ToObject(const Eigen::Vector3d& local_to_global_offset,
 }
 
 void MlfTrackData::PredictState(double timestamp) const {
-  if (history_objects_.size() == 0) {
+  if (history_objects_.empty()) {
     return;
   }
   auto latest_iter = history_objects_.rbegin();
-  const double& latest_time = latest_iter->first;
+  const double latest_time = latest_iter->first;
   const auto& latest_object = latest_iter->second;
   double time_diff = timestamp - latest_time;
 

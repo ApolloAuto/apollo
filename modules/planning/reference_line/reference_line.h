@@ -83,6 +83,9 @@ class ReferenceLine {
   common::FrenetFramePoint GetFrenetPoint(
       const common::PathPoint& path_point) const;
 
+  std::pair<std::array<double, 3>, std::array<double, 3>> ToFrenetFrame(
+      const common::TrajectoryPoint& traj_point) const;
+
   std::vector<ReferencePoint> GetReferencePoints(double start_s,
                                                  double end_s) const;
 
@@ -116,6 +119,8 @@ class ReferenceLine {
 
   bool GetLaneWidth(const double s, double* const lane_left_width,
                     double* const lane_right_width) const;
+
+  bool GetOffsetToMap(const double s, double* l_offset) const;
 
   bool GetRoadWidth(const double s, double* const road_left_width,
                     double* const road_right_width) const;

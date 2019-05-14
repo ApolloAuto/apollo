@@ -43,10 +43,17 @@ namespace onboard {
 using apollo::cyber::common::GetAbsolutePath;
 using apollo::localization::LocalizationEstimate;
 
+FunInfoType LaneDetectionComponent::init_func_arry_[] = {
+    {&LaneDetectionComponent::InitSensorInfo, "InitSensorInfo"},
+    {&LaneDetectionComponent::InitAlgorithmPlugin, "InitAlgorithmPlugin"},
+    {&LaneDetectionComponent::InitCameraFrames, "InitCameraFrames"},
+    {&LaneDetectionComponent::InitProjectMatrix, "InitProjectMatrix"},
+    {&LaneDetectionComponent::InitMotionService, "InitMotionService"},
+    {&LaneDetectionComponent::InitCameraListeners, "InitCameraListeners"}};
+
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
-  std::string work_root = "";
-  camera::GetCyberWorkRoot(&work_root);
+  std::string work_root = camera::GetCyberWorkRoot();
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
@@ -181,29 +188,8 @@ bool LaneDetectionComponent::Init() {
   }
 
   writer_ = node_->CreateWriter<PerceptionLanes>(output_lanes_channel_name_);
-
-  if (InitSensorInfo() != cyber::SUCC) {
-    AERROR << "InitSensorInfo() failed.";
-    return false;
-  }
-  if (InitAlgorithmPlugin() != cyber::SUCC) {
-    AERROR << "InitAlgorithmPlugin() failed.";
-    return false;
-  }
-  if (InitCameraFrames() != cyber::SUCC) {
-    AERROR << "InitCameraFrames() failed.";
-    return false;
-  }
-  if (InitProjectMatrix() != cyber::SUCC) {
-    AERROR << "InitProjectMatrix() failed.";
-    return false;
-  }
-  if (InitMotionService() != cyber::SUCC) {
-    AERROR << "InitMotionService() failed.";
-    return false;
-  }
-  if (InitCameraListeners() != cyber::SUCC) {
-    AERROR << "InitCameraListeners() failed.";
+  if (!EXEC_ALL_FUNS(LaneDetectionComponent, this,
+                     LaneDetectionComponent::init_func_arry_)) {
     return false;
   }
   SetCameraHeightAndPitch();
@@ -213,7 +199,9 @@ bool LaneDetectionComponent::Init() {
   // computed from camera height and pitch.
   // Apply online calibration to adjust pitch/height automatically
   // Temporary code is used here for testing
-  double pitch_adj = -0.1;
+  double pitch_adj_degree = 0.0;
+  double yaw_adj_degree = 0.0;
+  double roll_adj_degree = 0.0;
   // load in lidar to imu extrinsic
   Eigen::Matrix4d ex_lidar2imu;
   LoadExtrinsics(FLAGS_obs_sensor_intrinsic_path + "/" +
@@ -222,10 +210,11 @@ bool LaneDetectionComponent::Init() {
   AINFO << "velodyne128_novatel_extrinsics: " << ex_lidar2imu;
 
   CHECK(visualize_.Init_all_info_single_camera(
-      visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu, pitch_adj,
-      image_height_, image_width_));
-  homography_im2car_ = visualize_.homography_im2car();
-  camera_lane_pipeline_->SetIm2CarHomography(homography_im2car_);
+      visual_camera_, intrinsic_map_, extrinsic_map_, ex_lidar2imu,
+      pitch_adj_degree, yaw_adj_degree, roll_adj_degree, image_height_,
+      image_width_));
+  homography_image2ground_ = visualize_.homography_im2car();
+  camera_lane_pipeline_->SetIm2CarHomography(homography_image2ground_);
 
   if (enable_visualization_) {
     if (write_visual_img_) {
@@ -233,7 +222,6 @@ bool LaneDetectionComponent::Init() {
       visualize_.SetDirectory(visual_debug_folder_);
     }
   }
-
   AINFO << "Init processes all succeed";
   return true;
 }
@@ -474,7 +462,7 @@ int LaneDetectionComponent::InitCameraFrames() {
   }
   // fixed size
   camera_frames_.resize(frame_capacity_);
-  if (camera_frames_.size() == 0) {
+  if (camera_frames_.empty()) {
     AERROR << "frame_capacity_ must > 0";
     return cyber::FAIL;
   }
@@ -686,7 +674,8 @@ int LaneDetectionComponent::InternalProc(
       camera_frame.data_provider->GetImage(image_options, &out_image);
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame);
+      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                   mot_buffer_);
     }
   }
 

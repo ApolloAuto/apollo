@@ -22,17 +22,16 @@
 namespace apollo {
 namespace planning {
 
-#define BLOCK_WIDTH     16
-#define BLOCK_HEIGHT    16
+#define BLOCK_WIDTH 16
+#define BLOCK_HEIGHT 16
 
-#define BLOCK_1        256
+#define BLOCK_1 256
 
-#define TEMPLATE_ROUTINE_INSTANCE(ret, routine) \
-template ret routine
+#define TEMPLATE_ROUTINE_INSTANCE(ret, routine) template ret routine
 
-#define DATA_TRANSFER_INST(type)                            \
-TEMPLATE_ROUTINE_INSTANCE(bool, data_transfer(type *dst,    \
-    const type *src, const int size))
+#define DATA_TRANSFER_INST(type) \
+  TEMPLATE_ROUTINE_INSTANCE(     \
+      bool, data_transfer(type *dst, const type *src, const int size))
 
 #define CUDA_CHECK(call)                                                   \
   {                                                                        \
@@ -46,16 +45,15 @@ TEMPLATE_ROUTINE_INSTANCE(bool, data_transfer(type *dst,    \
 
 bool InitialCuda();
 
-__global__ void fill_lower_left_gpu(int *iRow, int *jCol,
-    unsigned int *rind_L, unsigned int *cind_L, const int nnz_L);
+__global__ void fill_lower_left_gpu(int *iRow, int *jCol, unsigned int *rind_L,
+                                    unsigned int *cind_L, const int nnz_L);
 
-template<typename T>
-__global__ void data_transfer_gpu(T *dst, const T *src,
-    const int size);
+template <typename T>
+__global__ void data_transfer_gpu(T *dst, const T *src, const int size);
 
-bool fill_lower_left(int *iRow, int *jCol,
-    unsigned int *rind_L, unsigned int *cind_L, const int nnz_L);
-template<typename T>
+bool fill_lower_left(int *iRow, int *jCol, unsigned int *rind_L,
+                     unsigned int *cind_L, const int nnz_L);
+template <typename T>
 bool data_transfer(T *dst, const T *src, const int size);
 
 }  // namespace planning

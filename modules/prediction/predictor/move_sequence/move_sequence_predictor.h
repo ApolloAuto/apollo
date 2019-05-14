@@ -52,24 +52,10 @@ class MoveSequencePredictor : public SequencePredictor {
   FRIEND_TEST(MoveSequencePredictorTest, Utils);
 
  private:
-  bool DrawMoveSequenceTrajectoryPointsUsingBestTrajectorySelection(
-      const Obstacle& obstacle, const LaneSequence& lane_sequence,
-      const double total_time, const double period,
-      std::vector<apollo::common::TrajectoryPoint>* points);
   bool DrawMoveSequenceTrajectoryPoints(
       const Obstacle& obstacle, const LaneSequence& lane_sequence,
       const double total_time, const double period,
       std::vector<apollo::common::TrajectoryPoint>* points);
-
-  bool GetLongitudinalPolynomial(const Obstacle& obstacle,
-                                 const LaneSequence& lane_sequence,
-                                 const std::pair<double, double>& lon_end_state,
-                                 std::array<double, 5>* coefficients);
-
-  bool GetLateralPolynomial(const Obstacle& obstacle,
-                            const LaneSequence& lane_sequence,
-                            const double time_to_end_state,
-                            std::array<double, 6>* coefficients);
 
   std::pair<double, double> ComputeLonEndState(
       const std::array<double, 3>& init_s, const LaneSequence& lane_sequence);

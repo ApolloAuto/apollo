@@ -42,8 +42,8 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
   ReadLockGuard<AtomicRWLock> lock(rq_lk_);
   for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
-    // FIXME: Remove Acquire() and Release() if there is no race condtion.
     if (!cr->Acquire()) {
+      ++it;
       continue;
     }
 
@@ -91,8 +91,6 @@ void ChoreographyContext::RemoveCRoutine(uint64_t crid) {
       cr->Release();
       return;
     }
-
-    cr->Release();
     ++it;
   }
 }

@@ -23,7 +23,10 @@ routing_header {
   module_name: "routing"
   sequence_num: 1578
 }
-right_of_way_status: PROTECTED
+right_of_way_status: UNPROTECTED
+lane_id {
+  id: "150_1_-1"
+}
 lane_id {
   id: "149_1_-1"
 }

@@ -14,6 +14,9 @@ message Stream {
 
     UBLOX_TEXT = 20;
     UBLOX_BINARY = 21;
+
+    NEWTONM2_TEXT = 30;
+    NEWTONM2_BINARY = 31;
   }
   optional Format format = 1;
 
@@ -58,6 +61,10 @@ message NovatelConfig {
   optional int32 imu_orientation = 1 [default = 5];
 }
 
+message NewtonM2Config {
+  optional int32 imu_orientation = 1 [default = 5];
+}
+
 message UbloxConfig {
 }
 
@@ -71,8 +78,8 @@ enum ImuType {
   ISA100 = 34;         // Northrop Grumman Litef ISA-100
   ISA100_400HZ = 38;   // Northrop Grumman Litef ISA-100
   ISA100C_400HZ = 39;  // Northrop Grumman Litef ISA-100
-  G320N = 40;          // EPSON G320N
-  CPT_XW5651 = 41;     // IMU@SPAN-CPT, and XingWangYuda 5651
+  CPT_XW5651 = 40;     // IMU@SPAN-CPT, and XingWangYuda 5651
+  G320N = 41;          // EPSON G320N
   UM442 = 42;          // UM442
   IAM20680 = 57;       // InvenSense-IAM20680
 }
@@ -106,6 +113,7 @@ message Config {
   oneof device_config {
     NovatelConfig novatel_config = 7;
     UbloxConfig ublox_config = 8;
+    NewtonM2Config newtonm2_config = 15;
   }
 
   enum RtkSolutionType {

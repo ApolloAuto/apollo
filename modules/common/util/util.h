@@ -35,6 +35,8 @@
 #include "modules/common/proto/geometry.pb.h"
 #include "modules/common/proto/pnc_point.pb.h"
 
+#include "cyber/common/log.h"
+#include "cyber/common/types.h"
 #include "modules/common/math/vec2d.h"
 
 // The helper function "std::make_unique()" is defined since C++14.
@@ -267,6 +269,28 @@ IsFloatEqual(T x, T y, int ulp = 2) {
 }  // namespace util
 }  // namespace common
 }  // namespace apollo
+
+template <typename T>
+class FunctionInfo {
+ public:
+  typedef int (T::*Function)();
+  Function function_;
+  std::string fun_name_;
+};
+
+template <typename T, size_t count>
+bool ExcuteAllFunctions(T* obj, FunctionInfo<T> fun_list[]) {
+  for (size_t i = 0; i < count; i++) {
+    if ((obj->*(fun_list[i].function_))() != apollo::cyber::SUCC) {
+      AERROR << fun_list[i].fun_name_ << " failed.";
+      return false;
+    }
+  }
+  return true;
+}
+
+#define EXEC_ALL_FUNS(type, obj, list) \
+  ExcuteAllFunctions<type, sizeof(list) / sizeof(FunctionInfo<type>)>(obj, list)
 
 template <typename A, typename B>
 std::ostream& operator<<(std::ostream& os, std::pair<A, B>& p) {

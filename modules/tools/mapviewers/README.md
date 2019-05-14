@@ -1,6 +1,6 @@
 # MapViewers
 
-MapViewers folder contains a set of tools for plotting map related data.  
+MapViewers folder contains a set of tools for plotting map related data.
 
 ### gmapviewer.py
 
@@ -9,7 +9,7 @@ Gmapviewer is a tool to display HDMap on Google map through Google map javascrip
 You need to install yattag before running the script
 
 ```
-pip install yattag 
+pip install yattag
 ```
 
 Inside docker, run the following command from your Apollo root dir:
@@ -45,7 +45,7 @@ Inside docker, run the following command from Apollo root dir:
 python modules/tools/mapviewer/hdmapviwer.py -m map_path_and_file
 ```
 
-An output file 
+An output file
 
 ```
 hdmap.html

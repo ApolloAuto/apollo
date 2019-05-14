@@ -35,7 +35,7 @@ enum class MotionState {
 class TrackData {
  public:
   TrackData();
-  explicit TrackData(TrackedObjectPtr obj, int track_id);
+  TrackData(TrackedObjectPtr obj, int track_id);
   virtual ~TrackData();
   std::pair<double, TrackedObjectPtr> GetLatestObject() {
     if (history_objects_.size() != 0) {

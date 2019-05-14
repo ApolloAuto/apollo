@@ -51,7 +51,8 @@ export default class RealtimeWebSocketEndpoint {
                 case "SimWorldUpdate":
                     this.checkMessage(message);
 
-                    const updateCoordination = (this.currentMode !== STORE.hmi.currentMode);
+                    const isNewMode = (this.currentMode &&
+                                       this.currentMode !== STORE.hmi.currentMode);
                     this.currentMode = STORE.hmi.currentMode;
                     if (STORE.hmi.inNavigationMode) {
                         // In navigation mode, the coordinate system is FLU and
@@ -71,11 +72,11 @@ export default class RealtimeWebSocketEndpoint {
                         this.mapUpdatePeriodMs = 1000;
                     }
 
-                    STORE.update(message);
+                    STORE.update(message, isNewMode);
                     RENDERER.maybeInitializeOffest(
                         message.autoDrivingCar.positionX,
                         message.autoDrivingCar.positionY,
-                        updateCoordination);
+                        isNewMode);
                     RENDERER.updateWorld(message);
                     this.updateMapIndex(message);
                     if (this.routingTime !== message.routingTime) {
@@ -101,7 +102,7 @@ export default class RealtimeWebSocketEndpoint {
                     break;
                 case "DataCollectionProgress":
                     if (message) {
-                        console.log("collection progress:", message);
+                        STORE.hmi.updateDataCollectionProgress(message.data);
                     }
                     break;
             }
@@ -136,8 +137,9 @@ export default class RealtimeWebSocketEndpoint {
                 }
 
                 this.requestSimulationWorld(STORE.options.showPNCMonitor);
-                // TODO: request in calibration mode only
-                // this.requestDataCollectionProgress();
+                if (STORE.hmi.isCalibrationMode) {
+                    this.requestDataCollectionProgress();
+                }
             }
         }, this.simWorldUpdatePeriodMs);
     }

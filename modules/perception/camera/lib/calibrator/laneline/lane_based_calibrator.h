@@ -85,8 +85,8 @@ class LaneBasedCalibrator {
 
   void ClearUp();
 
-  // main function, process every frame, return true if get valid estimation
-  // suppose the points in lane are already sorted
+  // Main function. process every frame, return true if get valid
+  // estimation. suppose the points in lane are already sorted.
   bool Process(const EgoLane &lane, const float &velocity,
                const float &yaw_rate, const float &time_diff);
 
@@ -144,7 +144,7 @@ class LaneBasedCalibrator {
   float vanishing_row_ = 0.0f;
   float accumulated_straight_driving_in_meter_ = 0.0f;
 
-  //  EgoLane lane_;
+  // EgoLane lane_;
   HistogramEstimator pitch_histogram_;
   std::deque<VanishingPoint> vp_buffer_;
   CalibratorParams params_;

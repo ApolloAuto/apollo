@@ -16,6 +16,8 @@
 
 #include "modules/prediction/evaluator/vehicle/junction_mlp_evaluator.h"
 
+#include <omp.h>
+
 #include <algorithm>
 #include <unordered_map>
 #include <utility>
@@ -52,14 +54,15 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 
 }  // namespace
 
-JunctionMLPEvaluator::JunctionMLPEvaluator() {
-  LoadModel(FLAGS_evaluator_vehicle_junction_mlp_file);
+JunctionMLPEvaluator::JunctionMLPEvaluator() : device_(torch::kCPU) {
+  LoadModel();
 }
 
 void JunctionMLPEvaluator::Clear() {}
 
 void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Sanity checks.
+  omp_set_num_threads(1);
   Clear();
   CHECK_NOTNULL(obstacle_ptr);
   int id = obstacle_ptr->id();
@@ -83,13 +86,27 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   // Insert features to DataForLearning
   if (FLAGS_prediction_offline_mode == 2) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         "junction");
+                                         "junction", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
     return;  // Skip Compute probability for offline mode
   }
+  std::vector<torch::jit::IValue> torch_inputs;
+  int input_dim = static_cast<int>(
+      OBSTACLE_FEATURE_SIZE + EGO_VEHICLE_FEATURE_SIZE + JUNCTION_FEATURE_SIZE);
+  torch::Tensor torch_input = torch::zeros({1, input_dim});
+  for (size_t i = 0; i < feature_values.size(); ++i) {
+    torch_input[0][i] = static_cast<float>(feature_values[i]);
+  }
+  torch_inputs.push_back(torch_input.to(device_));
   std::vector<double> probability;
   if (latest_feature_ptr->junction_feature().junction_exit_size() > 1) {
-    probability = ComputeProbability(feature_values);
+    CHECK_NOTNULL(torch_model_ptr_);
+    at::Tensor torch_output_tensor =
+        torch_model_ptr_->forward(torch_inputs).toTensor();
+    auto torch_output = torch_output_tensor.accessor<float, 2>();
+    for (int i = 0; i < torch_output.size(1); ++i) {
+      probability.push_back(static_cast<double>(torch_output[0][i]));
+    }
   } else {
     for (int i = 0; i < 12; ++i) {
       probability.push_back(feature_values[OBSTACLE_FEATURE_SIZE +
@@ -119,7 +136,7 @@ void JunctionMLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     double angle =
         std::atan2(y, x) - std::atan2(latest_feature_ptr->raw_velocity().y(),
                                       latest_feature_ptr->raw_velocity().x());
-    double d_idx = (angle / (2.0 * M_PI)) * 12.0;
+    double d_idx = (angle / (2.0 * M_PI) + 1.0 / 24.0) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
     int prev_idx = idx == 0 ? 11 : idx - 1;
     int post_idx = idx == 11 ? 0 : idx + 1;
@@ -302,7 +319,7 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
     double diff_heading =
         apollo::common::math::AngleDiff(heading, junction_exit.exit_heading());
     double angle = std::atan2(diff_y, diff_x);
-    double d_idx = (angle / (2.0 * M_PI)) * 12.0;
+    double d_idx = (angle / (2.0 * M_PI) + 1.0 / 24.0) * 12.0;
     int idx = static_cast<int>(floor(d_idx >= 0 ? d_idx : d_idx + 12));
     double speed = std::max(0.1, feature_ptr->speed());
     double exit_time = std::hypot(diff_x, diff_y) / speed;
@@ -338,55 +355,15 @@ void JunctionMLPEvaluator::SetJunctionFeatureValues(
   }
 }
 
-void JunctionMLPEvaluator::LoadModel(const std::string& model_file) {
-  model_ptr_.reset(new FnnVehicleModel());
-  CHECK(model_ptr_ != nullptr);
-  CHECK(cyber::common::GetProtoFromFile(model_file, model_ptr_.get()))
-      << "Unable to load model file: " << model_file << ".";
-
-  AINFO << "Succeeded in loading the model file: " << model_file << ".";
-}
-
-std::vector<double> JunctionMLPEvaluator::ComputeProbability(
-    const std::vector<double>& feature_values) {
-  CHECK_NOTNULL(model_ptr_.get());
-  if (model_ptr_->dim_input() != static_cast<int>(feature_values.size())) {
-    ADEBUG << "Model feature size not consistent with model proto definition. "
-           << "model input dim = " << model_ptr_->dim_input()
-           << "; feature value size = " << feature_values.size();
-    return {};
-  }
-  std::vector<double> layer_input;
-  layer_input.reserve(model_ptr_->dim_input());
-  std::vector<double> layer_output;
-  for (int i = 0; i < model_ptr_->num_layer(); ++i) {
-    if (i > 0) {
-      layer_input.swap(layer_output);
-      layer_output.clear();
-    }
-    const Layer& layer = model_ptr_->layer(i);
-    for (int col = 0; col < layer.layer_input_weight().rows(0).columns_size();
-         ++col) {
-      double neuron_output = layer.layer_bias().columns(col);
-      for (int row = 0; row < layer.layer_input_weight().rows_size(); ++row) {
-        double weight = layer.layer_input_weight().rows(row).columns(col);
-        neuron_output += (layer_input[row] * weight);
-      }
-      if (layer.layer_activation_func() == Layer::RELU) {
-        neuron_output = apollo::prediction::math_util::Relu(neuron_output);
-      } else if (layer.layer_activation_func() == Layer::SIGMOID) {
-        neuron_output = apollo::prediction::math_util::Sigmoid(neuron_output);
-      } else if (layer.layer_activation_func() == Layer::TANH) {
-        neuron_output = std::tanh(neuron_output);
-      }
-      layer_output.push_back(neuron_output);
-    }
-    if (layer.layer_activation_func() == Layer::SOFTMAX) {
-      layer_output =
-          apollo::prediction::math_util::Softmax(layer_output, false);
-    }
-  }
-  return layer_output;
+void JunctionMLPEvaluator::LoadModel() {
+  // TODO(all) uncomment the following when cuda issue is resolved
+  // if (torch::cuda::is_available()) {
+  //   ADEBUG << "CUDA is available";
+  //   device_ = torch::Device(torch::kCUDA);
+  // }
+  torch::set_num_threads(1);
+  torch_model_ptr_ =
+      torch::jit::load(FLAGS_torch_vehicle_junction_mlp_file, device_);
 }
 
 }  // namespace prediction

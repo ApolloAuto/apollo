@@ -33,6 +33,7 @@ DECLARE_string(speed_control_filename);
 DECLARE_double(look_forward_time_sec);
 
 DECLARE_string(vehicle_config_path);
+DECLARE_string(vehicle_model_config_filename);
 
 DECLARE_bool(use_cyber_time);
 
@@ -44,3 +45,4 @@ DECLARE_string(navigation_mode_end_way_point_file);
 DECLARE_bool(use_sim_time);
 
 DECLARE_bool(reverse_heading_vehicle_state);
+DECLARE_bool(coordinate_transform_to_com);

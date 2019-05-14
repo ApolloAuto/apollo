@@ -46,24 +46,24 @@ void GetYawVelocityInfo(const float &time_diff, const double cam_coord_cur[3],
 }
 
 void CalibratorParams::Init() {
-  // general
+  // General
   min_nr_pts_laneline = 20;
   sampling_lane_point_rate = 0.05f;  // 0.05f
   max_allowed_yaw_angle_in_radian = common::IDegreeToRadians(3.0f);
 
-  // slow set-up
+  // Slow set-up
   // min_distance_to_update_calibration_in_meter = 1600.0f;
   // min_required_straight_driving_distance_in_meter = 40.0f;
 
-  // fast set-up
+  // Fast set-up
   min_distance_to_update_calibration_in_meter = 100.0f;
   min_required_straight_driving_distance_in_meter = 20.0f;
 
-  // histogram params
+  // Histogram params
   hist_estimator_params.nr_bins_in_histogram = 400;
   hist_estimator_params.data_sp = -common::IDegreeToRadians(10.0f);
-  hist_estimator_params.data_ep =
-      -hist_estimator_params.data_sp;  // -10 ~ 10 degree
+  // -10 ~ 10 degree
+  hist_estimator_params.data_ep = -hist_estimator_params.data_sp;
 
   hist_estimator_params.step_bin =
       (hist_estimator_params.data_ep - hist_estimator_params.data_sp);
@@ -85,8 +85,8 @@ void CalibratorParams::Init() {
   hist_estimator_params.hat_std_allowed = 6.25f;
   // hist_estimator_params.histogram_mass_limit = 500;
   hist_estimator_params.histogram_mass_limit = 50;
-  hist_estimator_params.decay_factor =
-      0.8908987f;  // decay 6-times to half value
+  // Decay 6-times to half value
+  hist_estimator_params.decay_factor = 0.8908987f;
 }
 
 void LaneBasedCalibrator::Init(const LocalCalibratorInitOptions &options,
@@ -131,7 +131,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane, const float &velocity,
 
   // TODO(Xun): Change cout or cerr to log.
 
-  // check for driving straight
+  // Check for driving straight
   if (!IsTravelingStraight(vehicle_yaw_changed)) {
     AINFO << "Do not calibate if not moving straight: "
           << "yaw angle changed " << vehicle_yaw_changed;
@@ -142,7 +142,7 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane, const float &velocity,
   VanishingPoint vp_cur;
   VanishingPoint vp_work;
 
-  // get the current estimation on vanishing point from lane
+  // Get the current estimation on vanishing point from lane
   if (!GetVanishingPoint(lane, &vp_cur)) {
     AINFO << "Lane is not valid for calibration.";
     return false;
@@ -150,23 +150,23 @@ bool LaneBasedCalibrator::Process(const EgoLane &lane, const float &velocity,
   vp_cur.distance_traveled = distance_traveled_in_meter;
   //  std::cout << "#current v-row: " << vp_cur.pixel_pos[1] << std::endl;
 
-  // push vanishing point into buffer
+  // Push vanishing point into buffer
   PushVanishingPoint(vp_cur);
   if (!PopVanishingPoint(&vp_work)) {
     AINFO << "Driving distance is not long enough";
     return false;
   }
 
-  // get current estimation on pitch
+  // Get current estimation on pitch
   pitch_cur_ = 0.0f;
   if (!GetPitchFromVanishingPoint(vp_work, &pitch_cur_)) {
-    AINFO << "Fail to estimate pitch from vanishing point.";
+    AINFO << "Failed to estimate pitch from vanishing point.";
     return false;
   }
   //  std::cout << "#current pitch: " << pitch_cur_ << std::endl;
   vanishing_row_ = vp_work.pixel_pos[1];
 
-  // get the filtered output using histogram
+  // Get the filtered output using histogram
   if (!AddPitchToHistogram(pitch_cur_)) {
     AINFO << "Calculated pitch is out-of-range.";
     return false;
@@ -199,7 +199,7 @@ void LaneBasedCalibrator::PushVanishingPoint(const VanishingPoint &v_point) {
 
 bool LaneBasedCalibrator::PopVanishingPoint(VanishingPoint *v_point) {
   float accumulated_distance = 0.0f;
-  for (auto &vp : vp_buffer_) {
+  for (const auto &vp : vp_buffer_) {
     accumulated_distance += vp.distance_traveled;
   }
   if (accumulated_distance <
@@ -236,25 +236,23 @@ bool LaneBasedCalibrator::GetVanishingPoint(const EgoLane &lane,
   float line_seg_l[4] = {0};
   float line_seg_r[4] = {0};
 
-  // get line seg
+  // Get line segment
   bool get_line_seg_left =
       SelectTwoPointsFromLineForVanishingPoint(lane.left_line, line_seg_l);
   if (!get_line_seg_left) {
-    AINFO << "left lane is too short.";
+    AINFO << "Left lane is too short.";
     return false;
   }
 
   bool get_line_seg_right =
       SelectTwoPointsFromLineForVanishingPoint(lane.right_line, line_seg_r);
   if (!get_line_seg_right) {
-    AINFO << "right lane is too short.";
+    AINFO << "Right lane is too short.";
     return false;
   }
 
-  // get vanishing point by line segments intersection
-  bool get_vp_success =
-      GetIntersectionFromTwoLineSegments(line_seg_l, line_seg_r, v_point);
-  return get_vp_success;
+  // Get vanishing point by line segments intersection
+  return GetIntersectionFromTwoLineSegments(line_seg_l, line_seg_r, v_point);
 }
 
 int LaneBasedCalibrator::GetCenterIndex(const Eigen::Vector2f *points,
@@ -312,7 +310,7 @@ bool LaneBasedCalibrator::SelectTwoPointsFromLineForVanishingPoint(
     line_seg[3] = line.lane_point.back()(1);
   }
 
-  // ensure start is lower than end
+  // Ensure start is lower than end
   if (line_seg[3] > line_seg[1]) {
     std::swap(line_seg[0], line_seg[2]);
     std::swap(line_seg[1], line_seg[3]);
@@ -358,7 +356,7 @@ bool LaneBasedCalibrator::GetIntersectionFromTwoLineSegments(
   float v32[2] = {right_end_x - right_start_x, right_end_y - right_start_y};
   float dn = v10[0] * v32[1] - v10[1] * v32[0];
 
-  // colinear
+  // Colinear
   if (fabs(dn) < 1e-5) {
     return false;
   }

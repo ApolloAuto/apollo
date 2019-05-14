@@ -1,17 +1,18 @@
-/* Copyright 2018 The Apollo Authors. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/canbus/vehicle/lexus/lexus_controller.h"
 
@@ -36,6 +37,7 @@ namespace {
 const int32_t kMaxFailAttempt = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
+
 }  // namespace
 
 ErrorCode LexusController::Init(
@@ -60,12 +62,12 @@ ErrorCode LexusController::Init(
   can_sender_ = can_sender;
 
   if (message_manager == nullptr) {
-    AERROR << "protocol manager is null.";
+    AERROR << "Protocol manager is null.";
     return ErrorCode::CANBUS_ERROR;
   }
   message_manager_ = message_manager;
 
-  // sender part
+  // Sender part
   accel_cmd_100_ = dynamic_cast<Accelcmd100*>(
       message_manager_->GetMutableProtocolDataById(Accelcmd100::ID));
   if (accel_cmd_100_ == nullptr) {
@@ -107,7 +109,7 @@ ErrorCode LexusController::Init(
   can_sender_->AddMessage(Steeringcmd12c::ID, steering_cmd_12c_, false);
   can_sender_->AddMessage(Turncmd130::ID, turn_cmd_130_, false);
 
-  // need sleep to ensure all messages received
+  // Need to sleep to ensure all messages were received
   AINFO << "LexusController is initialized.";
 
   is_initialized_ = true;
@@ -303,10 +305,9 @@ void LexusController::Emergency() {
 
 ErrorCode LexusController::EnableAutoMode() {
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) {
-    AINFO << "already in COMPLETE_AUTO_DRIVE mode";
+    AINFO << "Already in COMPLETE_AUTO_DRIVE mode";
     return ErrorCode::OK;
   }
-  return ErrorCode::OK;
 
   accel_cmd_100_->set_enable(true);
   accel_cmd_100_->set_clear_override(true);
@@ -325,11 +326,10 @@ ErrorCode LexusController::EnableAutoMode() {
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-    AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
+  return ErrorCode::OK;
 }
 
 ErrorCode LexusController::DisableAutoMode() {
@@ -348,7 +348,6 @@ ErrorCode LexusController::EnableSteeringOnlyMode() {
     AINFO << "Already in AUTO_STEER_ONLY mode";
     return ErrorCode::OK;
   }
-  return ErrorCode::OK;
 
   accel_cmd_100_->set_enable(false);
   brake_cmd_104_->set_enable(false);
@@ -356,52 +355,50 @@ ErrorCode LexusController::EnableSteeringOnlyMode() {
   shift_cmd_128_->set_enable(false);
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_STEER_ONLY);
-    AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::AUTO_STEER_ONLY);
+  AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
+  return ErrorCode::OK;
 }
 
 ErrorCode LexusController::EnableSpeedOnlyMode() {
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
       driving_mode() == Chassis::AUTO_SPEED_ONLY) {
     set_driving_mode(Chassis::AUTO_SPEED_ONLY);
-    AINFO << "Already in AUTO_SPEED_ONLY mode";
+    AINFO << "Already in AUTO_SPEED_ONLY mode.";
     return ErrorCode::OK;
   }
-  return ErrorCode::OK;
+
   accel_cmd_100_->set_enable(false);
   brake_cmd_104_->set_enable(false);
   steering_cmd_12c_->set_enable(false);
   shift_cmd_128_->set_enable(false);
 
   can_sender_->Update();
-  if (CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true) == false) {
+  if (!CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, true)) {
     AERROR << "Failed to switch to AUTO_STEER_ONLY mode.";
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_SPEED_ONLY);
-    AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::AUTO_SPEED_ONLY);
+  AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
+  return ErrorCode::OK;
 }
 
 // NEUTRAL, REVERSE, DRIVE
 void LexusController::Gear(Chassis::GearPosition gear_position) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
-    AINFO << "this drive mode no need to set gear.";
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+    AINFO << "This drive mode no need to set gear.";
     return;
   }
-  return;
+
   switch (gear_position) {
     case Chassis::GEAR_NEUTRAL: {
       shift_cmd_128_->set_shift_cmd(Shift_cmd_128::SHIFT_CMD_NEUTRAL);
@@ -446,8 +443,8 @@ void LexusController::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void LexusController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -457,8 +454,8 @@ void LexusController::Brake(double pedal) {
 // drive with old acceleration
 // gas:0.00~99.99 unit:
 void LexusController::Throttle(double pedal) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -468,8 +465,8 @@ void LexusController::Throttle(double pedal) {
 // drive with acceleration/deceleration
 // acc:-7.0 ~ 5.0, unit:m/s^2
 void LexusController::Acceleration(double acc) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -481,8 +478,8 @@ void LexusController::Acceleration(double acc) {
 // steering with old angle speed
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 void LexusController::Steer(double angle) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -498,8 +495,8 @@ void LexusController::Steer(double angle) {
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 // angle_spd:0.00~99.99, unit:deg/s
 void LexusController::Steer(double angle, double angle_spd) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -567,7 +564,7 @@ void LexusController::SecurityDogThreadFunc() {
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
-    AERROR << "Fail to run SecurityDogThreadFunc() because can_sender_ is "
+    AERROR << "Failed to run SecurityDogThreadFunc() because can_sender_ is "
               "nullptr.";
     return;
   }
@@ -587,7 +584,7 @@ void LexusController::SecurityDogThreadFunc() {
     // 1. horizontal control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_STEER_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -600,7 +597,7 @@ void LexusController::SecurityDogThreadFunc() {
     // 2. vertical control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_SPEED_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;

@@ -86,20 +86,15 @@ void StaticTransformComponent::SendTransform(
     const std::vector<TransformStamped>& msgtf) {
   for (auto it_in = msgtf.begin(); it_in != msgtf.end(); ++it_in) {
     bool match_found = false;
-    int size = transform_stampeds_.transforms_size();
-
-    for (int i = 0; i < size; ++i) {
-      if (it_in->child_frame_id() ==
-          transform_stampeds_.mutable_transforms(i)->child_frame_id()) {
-        auto it_msg = transform_stampeds_.mutable_transforms(i);
-        *it_msg = *it_in;
+    for (auto& it_msg : *transform_stampeds_.mutable_transforms()) {
+      if (it_in->child_frame_id() == it_msg.child_frame_id()) {
+        it_msg = *it_in;
         match_found = true;
         break;
       }
     }
     if (!match_found) {
-      auto ts = transform_stampeds_.add_transforms();
-      *ts = *it_in;
+      *transform_stampeds_.add_transforms() = *it_in;
     }
   }
   writer_->Write(std::make_shared<TransformStampeds>(transform_stampeds_));

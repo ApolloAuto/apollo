@@ -84,7 +84,7 @@ void ObjectSequence::RemoveStaleTracks(TimeStampKey current_stamp) {
         break;
       }
     }
-    if (track.size() == 0) {  // all element removed
+    if (track.empty()) {  // all element removed
       sequence_.erase(outer_iter++);
     } else {
       ++outer_iter;

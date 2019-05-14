@@ -42,7 +42,6 @@ using apollo::cyber::event::PerfEventCache;
 using apollo::cyber::event::SchedPerf;
 
 SchedulerClassic::SchedulerClassic() {
-  // get sched config
   std::string conf("conf/");
   conf.append(GlobalData::Instance()->ProcessGroup()).append(".conf");
   auto cfg_file = GetAbsolutePath(WorkRoot(), conf);
@@ -135,7 +134,6 @@ bool SchedulerClassic::DispatchTask(const std::shared_ptr<CRoutine>& cr) {
     cr->set_group_name(classic_conf_.groups(0).name());
   }
 
-  // Check if task prio is reasonable.
   if (cr->priority() >= MAX_PRIO) {
     AWARN << cr->name() << " prio is greater than MAX_PRIO[ << " << MAX_PRIO
           << "].";

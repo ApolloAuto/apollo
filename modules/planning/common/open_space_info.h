@@ -41,9 +41,11 @@
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
 #include "modules/planning/common/trajectory/publishable_trajectory.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
+using apollo::planning_internal::Debug;
 
 typedef std::pair<DiscretizedTrajectory, canbus::Chassis::GearPosition>
     TrajGearPair;
@@ -60,18 +62,74 @@ struct GearSwitchStates {
 
 class OpenSpaceInfo {
  public:
-  OpenSpaceInfo();
+  OpenSpaceInfo() = default;
   ~OpenSpaceInfo() = default;
 
-  const bool is_in_open_space() const { return is_in_open_space_; }
+  bool open_space_pre_stop_finished() const {
+    return open_space_pre_stop_finished_;
+  }
 
-  bool *is_in_open_space() { return &is_in_open_space_; }
+  void set_open_space_pre_stop_finished(const bool flag) {
+    open_space_pre_stop_finished_ = flag;
+  }
 
-  const size_t obstacles_num() const { return obstacles_num_; }
+  const std::string target_parking_spot_id() const {
+    return target_parking_spot_id_;
+  }
 
-  size_t *mutable_obstacles_num() { return &obstacles_num_; }
+  std::string *mutable_target_parking_spot_id() {
+    return &target_parking_spot_id_;
+  }
 
-  void set_obstacles_num(size_t obstacles_num) {
+  const hdmap::ParkingSpaceInfoConstPtr target_parking_spot() const {
+    return target_parking_spot_;
+  }
+
+  hdmap::ParkingSpaceInfoConstPtr *mutable_target_parking_spot() {
+    return &target_parking_spot_;
+  }
+
+  const hdmap::LaneInfoConstPtr target_parking_lane() const {
+    return target_parking_lane_;
+  }
+
+  void set_target_parking_lane(hdmap::LaneInfoConstPtr lane_info_const_ptr) {
+    target_parking_lane_ = lane_info_const_ptr;
+  }
+
+  double open_space_pre_stop_fence_s() const {
+    return open_space_pre_stop_fence_s_;
+  }
+
+  void set_open_space_pre_stop_fence_s(const double s) {
+    open_space_pre_stop_fence_s_ = s;
+  }
+
+  bool pre_stop_rightaway_flag() const { return pre_stop_rightaway_flag_; }
+
+  void set_pre_stop_rightaway_flag(const bool flag) {
+    pre_stop_rightaway_flag_ = flag;
+  }
+
+  const hdmap::MapPathPoint &pre_stop_rightaway_point() const {
+    return pre_stop_rightaway_point_;
+  }
+
+  hdmap::MapPathPoint *mutable_pre_stop_rightaway_point() {
+    return &pre_stop_rightaway_point_;
+  }
+
+  bool is_on_open_space_trajectory() const {
+    return is_on_open_space_trajectory_;
+  }
+
+  void set_is_on_open_space_trajectory(const bool flag) {
+    is_on_open_space_trajectory_ = flag;
+  }
+
+  size_t obstacles_num() const { return obstacles_num_; }
+
+  void set_obstacles_num(const size_t obstacles_num) {
     obstacles_num_ = obstacles_num;
   }
 
@@ -101,9 +159,11 @@ class OpenSpaceInfo {
 
   Eigen::MatrixXd *mutable_obstacles_b() { return &obstacles_b_; }
 
-  const double origin_heading() const { return origin_heading_; }
+  double origin_heading() const { return origin_heading_; }
 
-  double *mutable_origin_heading() { return &origin_heading_; }
+  void set_origin_heading(const double original_heading) {
+    origin_heading_ = original_heading;
+  }
 
   const common::math::Vec2d &origin_point() const { return origin_point_; }
 
@@ -148,17 +208,17 @@ class OpenSpaceInfo {
     return &stitched_trajectory_result_;
   }
 
-  const bool &open_space_provider_success() const {
+  bool open_space_provider_success() const {
     return open_space_provider_success_;
   }
 
-  bool *mutable_open_space_provider_success() {
-    return &open_space_provider_success_;
+  void set_open_space_provider_success(const bool flag) {
+    open_space_provider_success_ = flag;
   }
 
-  const bool &destination_reached() const { return destination_reached_; }
+  bool destination_reached() const { return destination_reached_; }
 
-  bool *mutable_destination_reached() { return &destination_reached_; }
+  void set_destination_reached(const bool flag) { destination_reached_ = flag; }
 
   const DiscretizedTrajectory &interpolated_trajectory_result() const {
     return interpolated_trajectory_result_;
@@ -169,6 +229,7 @@ class OpenSpaceInfo {
   }
 
   const std::vector<TrajGearPair> &paritioned_trajectories() const {
+    // TODO(Runxin): export to chart
     return paritioned_trajectories_;
   }
 
@@ -185,6 +246,7 @@ class OpenSpaceInfo {
   }
 
   const TrajGearPair &chosen_paritioned_trajectory() const {
+    // TODO(Runxin): export to chart
     return chosen_paritioned_trajectory_;
   }
 
@@ -192,9 +254,9 @@ class OpenSpaceInfo {
     return &chosen_paritioned_trajectory_;
   }
 
-  const bool &fallback_flag() const { return fallback_flag_; }
+  bool fallback_flag() const { return fallback_flag_; }
 
-  void set_fallback_flag(bool flag) { fallback_flag_ = flag; }
+  void set_fallback_flag(const bool flag) { fallback_flag_ = flag; }
 
   TrajGearPair *mutable_fallback_trajectory() { return &fallback_trajectory_; }
 
@@ -202,7 +264,7 @@ class OpenSpaceInfo {
     return fallback_trajectory_;
   }
 
-  void set_fallback_trajectory(const TrajGearPair& traj_gear_pair) {
+  void set_fallback_trajectory(const TrajGearPair &traj_gear_pair) {
     fallback_trajectory_ = traj_gear_pair;
   }
 
@@ -216,8 +278,52 @@ class OpenSpaceInfo {
     return publishable_trajectory_data_;
   }
 
+  // TODO(QiL, Jinyun) refactor and merge this with debug
+  common::TrajectoryPoint *mutable_future_collision_point() {
+    return &future_collision_point_;
+  }
+
+  const common::TrajectoryPoint &future_collision_point() const {
+    return future_collision_point_;
+  }
+
+  // TODO(QiL, Jinyun): refactor open_space_info vs debug
+
+  apollo::planning_internal::Debug *mutable_debug() { return debug_; }
+
+  void set_debug(apollo::planning_internal::Debug *debug) { debug_ = debug; }
+
+  const apollo::planning_internal::Debug &debug() const { return *debug_; }
+
+  const apollo::planning_internal::Debug debug_instance() const {
+    return debug_instance_;
+  }
+
+  apollo::planning_internal::Debug *mutable_debug_instance() {
+    return &debug_instance_;
+  }
+
+  void sync_debug_instance() { debug_instance_ = *debug_; }
+
+  void RecordDebug(apollo::planning_internal::Debug *ptr_debug);
+
  private:
-  bool is_in_open_space_ = false;
+  // @brief vehicle needs to stop first in open space related scenarios
+  bool open_space_pre_stop_finished_ = true;
+
+  std::string target_parking_spot_id_;
+
+  hdmap::ParkingSpaceInfoConstPtr target_parking_spot_ = nullptr;
+
+  hdmap::LaneInfoConstPtr target_parking_lane_ = nullptr;
+
+  double open_space_pre_stop_fence_s_ = 0.0;
+
+  bool pre_stop_rightaway_flag_ = false;
+
+  hdmap::MapPathPoint pre_stop_rightaway_point_;
+
+  bool is_on_open_space_trajectory_ = false;
   // @brief obstacles total num including perception obstacles and parking space
   // boundary
   size_t obstacles_num_ = 0;
@@ -269,8 +375,18 @@ class OpenSpaceInfo {
 
   TrajGearPair fallback_trajectory_;
 
+  common::TrajectoryPoint future_collision_point_;
+
   std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
       publishable_trajectory_data_;
+
+  // the pointer from ADCtrajectory
+  apollo::planning_internal::Debug *debug_;
+
+  // the instance inside debug,
+  // if ADCtrajectory is NULL, blank; else same to ADCtrajectory
+  apollo::planning_internal::Debug debug_instance_;
 };
+
 }  // namespace planning
 }  // namespace apollo

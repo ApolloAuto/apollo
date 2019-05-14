@@ -124,6 +124,10 @@ class Obstacle {
 
   static bool IsValidTrajectoryPoint(const common::TrajectoryPoint& point);
 
+  inline bool IsCautionLevelObstacle() const {
+    return is_caution_level_obstacle_;
+  }
+
   // const Obstacle* obstacle() const;
 
   /**
@@ -212,6 +216,8 @@ class Obstacle {
    */
   bool IsLaneBlocking() const { return is_lane_blocking_; }
   void CheckLaneBlocking(const ReferenceLine& reference_line);
+  bool IsLaneChangeBlocking() const { return is_lane_change_blocking_; }
+  void SetLaneChangeBlocking(const bool is_distance_clear);
 
  private:
   FRIEND_TEST(MergeLongitudinalDecision, AllDecisions);
@@ -253,6 +259,10 @@ class Obstacle {
   bool is_blocking_obstacle_ = false;
 
   bool is_lane_blocking_ = false;
+
+  bool is_lane_change_blocking_ = false;
+
+  bool is_caution_level_obstacle_ = false;
 
   double min_radius_stop_distance_ = -1.0;
 

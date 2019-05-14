@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,55 +17,20 @@
 #ifndef CYBER_TIMER_TIMER_TASK_H_
 #define CYBER_TIMER_TIMER_TASK_H_
 
-#include <algorithm>
-#include <iostream>
-#include <list>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <thread>
-#include <unordered_map>
-#include <utility>
-#include <vector>
-
-#include "cyber/base/bounded_queue.h"
+#include <functional>
 
 namespace apollo {
 namespace cyber {
 
-using CallHandler = std::function<void()>;
+class TimerBucket;
 
-class TimerTask {
- public:
-  TimerTask(uint64_t id, uint64_t it, uint64_t ivl, CallHandler h, bool ons)
-      : tid_(id), init_time_(it), interval_(ivl), handler_(h), oneshot_(ons) {}
-  TimerTask() = default;
-
- private:
-  enum STATS { INIT = 0, CANCELED, EXPIRED };
-  STATS State() { return status_; }
-  volatile STATS status_ = INIT;
-  uint64_t tid_ = 0;
-
- public:
-  uint64_t init_time_ = 0;
-  uint64_t deadline_ = 0;
-  uint64_t interval_ = 0;
-  CallHandler handler_;
-  uint64_t rest_rounds_ = 0;
-  bool oneshot_ = true;
-  uint64_t fire_count_ = 0;
-
- public:
-  uint64_t Id() { return tid_; }
-
-  void Fire(bool async);
-
-  bool Cancel();
-
-  bool IsCanceled() { return State() == CANCELED; }
-
-  bool IsExpired() { return State() == EXPIRED; }
+struct TimerTask {
+  explicit TimerTask(uint64_t timer_id) : timer_id_(timer_id) {}
+  uint64_t timer_id_ = 0;
+  std::function<void(const uint64_t)> callback;
+  uint64_t interval_ms = 0;
+  uint64_t remainder_interval_ms = 0;
+  uint64_t next_fire_duration_ms = 0;
 };
 
 }  // namespace cyber

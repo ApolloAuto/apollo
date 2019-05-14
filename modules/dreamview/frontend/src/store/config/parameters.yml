@@ -78,6 +78,8 @@ options:
   # task panel options
   showPNCMonitor:
     default: false
+  showDataCollectionMonitor:
+    default: false
   enableSimControl:
     default: false
   lockTaskPanel:
@@ -163,6 +165,9 @@ options:
   showPositionLocalization:
     default: true
     menuId: positionLocalization
+  showPositionShadow:
+    default: false
+    menuId: positionShadow
   showMapCrosswalk:
     default: true
     menuId: mapCrosswalk

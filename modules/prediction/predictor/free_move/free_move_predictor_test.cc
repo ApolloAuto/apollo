@@ -48,16 +48,10 @@ TEST_F(FreeMovePredictorTest, General) {
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(15);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   FreeMovePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  const std::vector<Trajectory>& trajectories = predictor.trajectories();
-  EXPECT_EQ(trajectories.size(), 1);
-  EXPECT_EQ(trajectories[0].trajectory_point_size(), 80);
-  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().x(), -432.459,
-              0.001);
-  EXPECT_NEAR(trajectories[0].trajectory_point(9).path_point().y(), -156.451,
-              0.001);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 
 TEST_F(FreeMovePredictorTest, Pedestrian) {
@@ -70,9 +64,7 @@ TEST_F(FreeMovePredictorTest, Pedestrian) {
   Obstacle* obstacle_ptr = container.GetObstacle(15);
   FreeMovePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  const std::vector<Trajectory>& trajectories = predictor.trajectories();
-  EXPECT_EQ(trajectories.size(), 1);
-  EXPECT_EQ(trajectories[0].trajectory_point_size(), 80);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 1);
 }
 
 }  // namespace prediction

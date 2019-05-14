@@ -23,15 +23,12 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 namespace narrow_street_u_turn {
+
 std::unique_ptr<Stage> NarrowStreetUTurnScenario::CreateStage(
     const ScenarioConfig::StageConfig& stage_config) {
   return nullptr;
 }
 
-bool NarrowStreetUTurnScenario::IsTransferable(const Scenario& current_scenario,
-                                               const Frame& frame) {
-  return true;
-}
 }  // namespace narrow_street_u_turn
 }  // namespace scenario
 }  // namespace planning

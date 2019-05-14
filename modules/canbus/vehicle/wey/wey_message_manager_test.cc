@@ -46,24 +46,23 @@ class WeyMessageManagerTest : public ::testing::Test {
 };
 
 TEST_F(WeyMessageManagerTest, GetSendProtocols) {
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Ads1111::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Ads338e::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Adseps113::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Adsreqvin390::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Adsshifter115::ID) !=
-              nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Ads1111::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Ads338e::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Adseps113::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Adsreqvin390::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Adsshifter115::ID), nullptr);
 }
 
 TEST_F(WeyMessageManagerTest, GetRecvProtocols) {
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Fail241::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Fbs1243::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Fbs2240::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Fbs3237::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Fbs4235::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Status310::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Vinresp1391::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Vinresp2392::ID) != nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Vinresp3393::ID) != nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Fail241::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Fbs1243::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Fbs2240::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Fbs3237::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Fbs4235::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Status310::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Vinresp1391::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Vinresp2392::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Vinresp3393::ID), nullptr);
 }
 
 }  // namespace wey

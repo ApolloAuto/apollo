@@ -24,13 +24,17 @@ limitations under the License.
 namespace apollo {
 namespace canbus {
 namespace ge3 {
+
 using ::apollo::common::ErrorCode;
 using ::apollo::control::ControlCommand;
 using ::apollo::drivers::canbus::ProtocolData;
+
 namespace {
+
 const int32_t kMaxFailAttempt = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
+
 }  // namespace
 
 ErrorCode Ge3Controller::Init(
@@ -102,7 +106,7 @@ ErrorCode Ge3Controller::Init(
   can_sender_->AddMessage(Pceps204::ID, pc_eps_204_, false);
   can_sender_->AddMessage(Pcvcu205::ID, pc_vcu_205_, false);
 
-  // need sleep to ensure all messages received
+  // Need to sleep to ensure all messages received
   AINFO << "Ge3Controller is initialized.";
 
   is_initialized_ = true;
@@ -113,7 +117,7 @@ Ge3Controller::~Ge3Controller() {}
 
 bool Ge3Controller::Start() {
   if (!is_initialized_) {
-    AERROR << "Ge3Controller has NOT been initiated.";
+    AERROR << "Ge3Controller has NOT been initialized.";
     return false;
   }
   const auto& update_func = [this] { SecurityDogThreadFunc(); };
@@ -350,12 +354,11 @@ Chassis Ge3Controller::chassis() {
       n[15] = scu_3_303.vin15();
       n[16] = scu_1_301.vin16();
 
-      char ch[18];
-      memset(&ch, 0, sizeof(ch));
+      char ch[17];
+      memset(&ch, '\0', sizeof(ch));
       for (int i = 0; i < 17; i++) {
         ch[i] = static_cast<char>(n[i]);
       }
-      ch[17] = '\0';
       if (chassis_.has_license()) {
         chassis_.mutable_license()->set_vin(ch);
       }
@@ -413,13 +416,12 @@ ErrorCode Ge3Controller::EnableAutoMode() {
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-    // if the auto mode can be set normally, the harzad lamp should be off.
-    pc_bcm_201_->set_pc_hazardlampreq(Pc_bcm_201::PC_HAZARDLAMPREQ_NOREQ);
-    AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  // If the auto mode can be set normally, the harzad lamp should be off.
+  pc_bcm_201_->set_pc_hazardlampreq(Pc_bcm_201::PC_HAZARDLAMPREQ_NOREQ);
+  AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
+  return ErrorCode::OK;
 }
 
 ErrorCode Ge3Controller::DisableAutoMode() {
@@ -450,13 +452,12 @@ ErrorCode Ge3Controller::EnableSteeringOnlyMode() {
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_STEER_ONLY);
-    // if the auto mode can be set normally, the harzad lamp should be off.
-    pc_bcm_201_->set_pc_hazardlampreq(Pc_bcm_201::PC_HAZARDLAMPREQ_NOREQ);
-    AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::AUTO_STEER_ONLY);
+  // If the auto mode can be set normally, the harzad lamp should be off.
+  pc_bcm_201_->set_pc_hazardlampreq(Pc_bcm_201::PC_HAZARDLAMPREQ_NOREQ);
+  AINFO << "Switch to AUTO_STEER_ONLY mode ok.";
+  return ErrorCode::OK;
 }
 
 ErrorCode Ge3Controller::EnableSpeedOnlyMode() {
@@ -478,20 +479,19 @@ ErrorCode Ge3Controller::EnableSpeedOnlyMode() {
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::AUTO_SPEED_ONLY);
-    // if the auto mode can be set normally, the harzad lamp should be off.
-    pc_bcm_201_->set_pc_hazardlampreq(Pc_bcm_201::PC_HAZARDLAMPREQ_NOREQ);
-    AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::AUTO_SPEED_ONLY);
+  // If the auto mode can be set normally, the harzad lamp should be off.
+  pc_bcm_201_->set_pc_hazardlampreq(Pc_bcm_201::PC_HAZARDLAMPREQ_NOREQ);
+  AINFO << "Switch to AUTO_SPEED_ONLY mode ok.";
+  return ErrorCode::OK;
 }
 
 // NEUTRAL, REVERSE, DRIVE
 void Ge3Controller::Gear(Chassis::GearPosition gear_position) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
-    AINFO << "this drive mode no need to set gear.";
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+    AINFO << "This drive mode no need to set gear.";
     return;
   }
   switch (gear_position) {
@@ -538,8 +538,8 @@ void Ge3Controller::Gear(Chassis::GearPosition gear_position) {
 // -> pedal
 void Ge3Controller::Brake(double pedal) {
   // Update brake value based on mode
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -549,8 +549,8 @@ void Ge3Controller::Brake(double pedal) {
 // drive with old acceleration
 // gas:0.00~99.99 unit:
 void Ge3Controller::Throttle(double pedal) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -575,8 +575,8 @@ void Ge3Controller::Steer(double angle) {
 // drive with acceleration/deceleration
 // acc:-7.0 ~ 5.0, unit:m/s^2
 void Ge3Controller::Acceleration(double acc) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -587,8 +587,8 @@ void Ge3Controller::Acceleration(double acc) {
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 // angle_spd:0.00~99.99, unit:deg/s
 void Ge3Controller::Steer(double angle, double angle_spd) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -708,7 +708,7 @@ void Ge3Controller::SecurityDogThreadFunc() {
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
-    AERROR << "Fail to run SecurityDogThreadFunc() because can_sender_ is "
+    AERROR << "Failed to run SecurityDogThreadFunc() because can_sender_ is "
               "nullptr.";
     return;
   }
@@ -728,7 +728,7 @@ void Ge3Controller::SecurityDogThreadFunc() {
     // 1. horizontal control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_STEER_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -741,7 +741,7 @@ void Ge3Controller::SecurityDogThreadFunc() {
     // 2. vertical control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_SPEED_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -802,9 +802,8 @@ bool Ge3Controller::CheckResponse(const int32_t flags, bool need_wait) {
     }
     if (check_ok) {
       return true;
-    } else {
-      AINFO << "Need to check response again.";
     }
+    AINFO << "Need to check response again.";
     if (need_wait) {
       --retry_num;
       std::this_thread::sleep_for(

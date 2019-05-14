@@ -32,9 +32,10 @@ else
     MAP_DIR=$3
 fi
 
-./bazel-bin/modules/prediction/pipeline/records_to_offline_data \
+/apollo/bazel-bin/modules/prediction/pipeline/records_to_offline_data \
     --flagfile=/apollo/modules/prediction/conf/prediction.conf \
     --map_dir=/apollo/modules/map/data/${MAP_DIR} \
     --prediction_offline_mode=2 \
     --prediction_offline_bags=${SRC_DIR} \
-    --prediction_data_dir=${TARGET_DIR}
+    --prediction_data_dir=${TARGET_DIR} \
+    --noenable_multi_thread

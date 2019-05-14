@@ -17,6 +17,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "Eigen/Dense"
@@ -43,25 +44,31 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
   void SetAnchorPoints(const std::vector<AnchorPoint>&) override;
 
  private:
-  bool Smooth(const std::vector<Eigen::Vector2d>& point2d,
-              const std::vector<double>& lateral_bounds,
-              std::vector<common::PathPoint>* ptr_smoothed_point2d);
+  bool CosThetaSmooth(const std::vector<Eigen::Vector2d>& point2d,
+                      const std::vector<double>& lateral_bounds,
+                      std::vector<Eigen::Vector2d>* ptr_smoothed_point2d);
 
-  common::PathPoint to_path_point(const double x, const double y,
-                                  const double x_derivative,
-                                  const double y_derivative) const;
+  void NormalizePoints(std::vector<Eigen::Vector2d>* xy_points);
 
-  std::unique_ptr<ReferenceLineSmoother> reopt_qp_smoother_;
+  void DeNormalizePoints(std::vector<Eigen::Vector2d>* xy_points);
+
+  bool GenerateRefPointProfile(const ReferenceLine& raw_reference_line,
+                               const std::vector<Eigen::Vector2d>& xy_points,
+                               std::vector<ReferencePoint>* reference_points);
 
   std::vector<AnchorPoint> anchor_points_;
 
-  std::vector<AnchorPoint> reopt_anchor_points_;
-
-  ReferenceLineSmootherConfig reopt_smoother_config_;
+  size_t print_level_ = 0;
 
   double max_point_deviation_ = 0.1;
 
-  size_t num_of_iterations_ = 3000;
+  size_t max_num_of_iterations_ = 500;
+
+  size_t acceptable_num_of_iterations_ = 15;
+
+  double tol_ = 1e-8;
+
+  double acceptable_tol_ = 1e-6;
 
   bool has_start_point_constraint_ = false;
 
@@ -73,15 +80,17 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
   double weight_cos_included_angle_ = 0.0;
 
-  double acceptable_tol_ = 1e-5;
+  double weight_anchor_points_ = 0.0;
+
+  double weight_length_ = 0.0;
 
   double relax_ = 0.2;
+
+  bool use_automatic_differentiation_ = false;
 
   double zero_x_ = 0.0;
 
   double zero_y_ = 0.0;
-
-  double reopt_qp_bound_ = 0.0;
 };
 
 }  // namespace planning

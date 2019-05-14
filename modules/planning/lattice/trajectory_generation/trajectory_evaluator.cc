@@ -100,7 +100,7 @@ size_t TrajectoryEvaluator::num_of_trajectory_pairs() const {
 
 std::pair<PtrTrajectory1d, PtrTrajectory1d>
 TrajectoryEvaluator::next_top_trajectory_pair() {
-  CHECK(has_more_trajectory_pairs() == true);
+  CHECK(has_more_trajectory_pairs());
   auto top = cost_queue_.top();
   cost_queue_.pop();
   return top.first;
@@ -117,8 +117,8 @@ double TrajectoryEvaluator::Evaluate(
     std::vector<double>* cost_components) const {
   // Costs:
   // 1. Cost of missing the objective, e.g., cruise, stop, etc.
-  // 2. Cost of logitudinal jerk
-  // 3. Cost of logitudinal collision
+  // 2. Cost of longitudinal jerk
+  // 3. Cost of longitudinal collision
   // 4. Cost of lateral offsets
   // 5. Cost of lateral comfort
 

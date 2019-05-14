@@ -135,19 +135,19 @@ int ImageGpuPreprocessHandler::handle(uint8_t *src, uint8_t *dst) {
 int ImageGpuPreprocessHandler::release(void) {
   if (_d_mapy) {
     BASE_CUDA_CHECK(cudaFree(_d_mapy));
-    _d_mapy = NULL;
+    _d_mapy = nullptr;
   }
   if (_d_mapx) {
     BASE_CUDA_CHECK(cudaFree(_d_mapx));
-    _d_mapx = NULL;
+    _d_mapx = nullptr;
   }
   if (_d_dst) {
     BASE_CUDA_CHECK(cudaFree(_d_dst));
-    _d_dst = NULL;
+    _d_dst = nullptr;
   }
   if (_d_rgb) {
     BASE_CUDA_CHECK(cudaFree(_d_rgb));
-    _d_rgb = NULL;
+    _d_rgb = nullptr;
   }
   _inited = false;
   return 0;

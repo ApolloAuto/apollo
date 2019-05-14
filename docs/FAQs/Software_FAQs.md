@@ -80,4 +80,16 @@ git lfs fetch --all
 Additional material on Git LFS: https://git-lfs.github.com/
 
 ---
+## Bootstrap error: unix:///tmp/supervisor.sock refused connection
+
+There could be a number of reasons why this error occurs. 
+Please follow the steps recommended in the [following thread](https://github.com/ApolloAuto/apollo/issues/5344). There are quite a few suggestions. If it still does not work for you, comment on the thread mentioned above.
+
+---
+## My OS keeps freezing when building Apollo 3.5?
+
+If you see an error like this, you do not have enough memory to build Apollo. Please ensure that you have at least **16GB** memory available before building Apollo.
+You could also find `--jobs=$(nproc)` in apollo.sh file and replace it with `--jobs=2`. This will make build process to use only 2 cores. Building will be longer, but will use less memory.
+
+---
 **More Software FAQs to follow.**

@@ -22,7 +22,7 @@
 TARGET=$1
 
 # Check tool.
-if ! [ -x "$(command -v clang-format)" ]; then
+if [ ! -x "$(command -v clang-format)" ]; then
   echo "Installing clang-format..."
   sudo apt-get install -y clang-format
 fi

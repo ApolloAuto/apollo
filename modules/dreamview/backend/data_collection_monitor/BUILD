@@ -12,12 +12,29 @@ cc_library(
     ],
     deps = [
         "//cyber",
-        "//modules/common/adapters:adapter_gflags",
-        "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/canbus/proto:canbus_proto",
+        "//modules/common/adapters:adapter_gflags",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/dreamview/backend/common:dreamview_gflags",
         "//modules/dreamview/proto:data_collection_table_proto",
         "//third_party/json",
         "@gtest",
+    ],
+)
+
+cc_test(
+    name = "data_collection_monitor_test",
+    size = "small",
+    srcs = [
+        "data_collection_monitor_test.cc",
+    ],
+    data = [
+        "//modules/dreamview/backend/testdata",
+    ],
+    deps = [
+        ":data_collection_monitor",
+        "//modules/common/util:json_util",
+        "@gtest//:main",
     ],
 )
 

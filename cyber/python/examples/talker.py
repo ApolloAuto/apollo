@@ -14,8 +14,8 @@
 # limitations under the License.
 # ****************************************************************************
 # -*- coding: utf-8 -*-
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
 from cyber_py import cyber
+from cyber.proto.unit_test_pb2 import ChatterBenchmark
 """Module for example of talker."""
 
 import time
@@ -23,24 +23,27 @@ import sys
 
 sys.path.append("../")
 
+
 def test_talker_class():
     """
-    test talker.
+    Test talker.
     """
-    msg = SimpleMessage()
-    msg.text = "talker:send Alex!"
-    msg.integer = 0
-
+    msg = ChatterBenchmark()
+    msg.content = "py:talker:send Alex!"
+    msg.stamp = 9999
+    msg.seq = 0
+    print msg
     test_node = cyber.Node("node_name1")
     g_count = 1
 
     writer = test_node.create_writer("channel/chatter",
-                                     SimpleMessage, 6)
+                                     ChatterBenchmark, 6)
     while not cyber.is_shutdown():
         time.sleep(1)
         g_count = g_count + 1
-        msg.integer = g_count
-        print "="*80
+        msg.seq = g_count
+        msg.content = "I am python talker."
+        print "=" * 80
         print "write msg -> %s" % msg
         writer.write(msg)
 

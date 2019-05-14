@@ -142,9 +142,7 @@ int main(int argc, char **argv) {
 
   Eigen::Vector3d imu_ant_offset = Eigen::Vector3d::Zero();
   if (imu_to_ant_offset_file != "") {
-    bool suc =
-        LoadGnssAntennaExtrinsic(imu_to_ant_offset_file, &imu_ant_offset);
-    if (suc == false) {
+    if (!LoadGnssAntennaExtrinsic(imu_to_ant_offset_file, &imu_ant_offset)) {
       return 0;
     }
   }
@@ -154,7 +152,7 @@ int main(int argc, char **argv) {
   std::vector<double> timestamps_a;
   apollo::localization::msf::velodyne::LoadPosesAndStds(loc_file_a, &poses_a,
                                                         &stds_a, &timestamps_a);
-  if (poses_a.size() == 0) {
+  if (poses_a.empty()) {
     return 0;
   }
 
@@ -163,7 +161,7 @@ int main(int argc, char **argv) {
   std::vector<double> timestamps_b;
   apollo::localization::msf::velodyne::LoadPosesAndStds(loc_file_b, &poses_b,
                                                         &stds_b, &timestamps_b);
-  if (poses_b.size() == 0) {
+  if (poses_b.empty()) {
     return 0;
   }
 
@@ -178,7 +176,7 @@ int main(int argc, char **argv) {
   PoseAndStdInterpolationByTime(poses_a, stds_a, timestamps_a, timestamps_a,
                                 &out_poses_a, &out_stds_a);
 
-  if (out_poses_a.size() == 0 || out_poses_b.size() == 0) {
+  if (out_poses_a.empty() || out_poses_b.empty()) {
     return 0;
   }
 
@@ -242,7 +240,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  if (vec_idx.size() == 0) {
+  if (vec_idx.empty()) {
     return 0;
   }
 

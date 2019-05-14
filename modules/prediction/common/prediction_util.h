@@ -22,6 +22,7 @@
 
 #include "Eigen/Dense"
 #include "modules/common/proto/pnc_point.pb.h"
+#include "modules/prediction/common/prediction_gflags.h"
 
 namespace apollo {
 namespace prediction {
@@ -121,6 +122,9 @@ inline std::array<double, 4> ComputePolynomial<3>(
   coefs[2] = (m1 - 3.0 * coefs[3] * param * param) / param * 0.5;
   return coefs;
 }
+
+double GetSByConstantAcceleration(const double v0, const double acceleration,
+                                  const double t);
 
 }  // namespace math_util
 

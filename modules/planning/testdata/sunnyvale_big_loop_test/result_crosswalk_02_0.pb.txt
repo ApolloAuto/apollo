@@ -12,10 +12,10 @@ decision {
       reason_code: STOP_REASON_CROSSWALK
       reason: "stop by CW_2832"
       stop_point {
-        x: 586261.36216091621
-        y: 4141304.5615979889
+        x: 586261.36096295482
+        y: 4141304.5596587714
       }
-      stop_heading: -1.8003766604196254
+      stop_heading: -1.7940405570566935
       change_lane_type: FORWARD
     }
   }
@@ -27,11 +27,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.18772445153
-            y: 4141284.3855413129
+            x: 586260.58647816256
+            y: 4141283.163007583
             z: 0
           }
-          fence_heading: -1.3350939032979112
+          fence_heading: -1.2899817911884237
         }
       }
     }
@@ -42,11 +42,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586260.15246436
-            y: 4141284.5313337604
+            x: 586260.5296822344
+            y: 4141283.3547710115
             z: 0
           }
-          fence_heading: -1.3504537501621541
+          fence_heading: -1.307273239870101
         }
       }
     }
@@ -68,12 +68,28 @@ decision {
           reason_code: STOP_REASON_CROSSWALK
           distance_s: -1
           stop_point {
-            x: 586261.36216091621
-            y: 4141304.5615979889
+            x: 586261.36096295482
+            y: 4141304.5596587714
             z: 0
           }
-          stop_heading: -1.8003766604196254
+          stop_heading: -1.7940405570566935
           wait_for_obstacle: "11652"
+        }
+      }
+    }
+    decision {
+      id: "TL_2516"
+      perception_id: -191858794
+      object_decision {
+        stop {
+          reason_code: STOP_REASON_SIGNAL
+          distance_s: -1
+          stop_point {
+            x: 586261.34696462157
+            y: 4141304.4974646466
+            z: 0
+          }
+          stop_heading: -1.7940405570566935
         }
       }
     }
@@ -88,6 +104,9 @@ routing_header {
   sequence_num: 3
 }
 right_of_way_status: UNPROTECTED
+lane_id {
+  id: "188_1_-1"
+}
 lane_id {
   id: "2726_1_-1"
 }
@@ -115,5 +134,5 @@ lane_id {
 engage_advice {
   advice: READY_TO_ENGAGE
 }
-trajectory_type: NORMAL
+trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for no previous trajectory."

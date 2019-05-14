@@ -154,7 +154,7 @@ TEST_F(NaviPathDeciderTest, KeepLane) {
   // reference points
   const common::TrajectoryPoint plan_start_point;
   const common::VehicleState vehicle_state;
-  apollo::planning::ReferenceLine ref_line;
+  ReferenceLine ref_line;
   apollo::hdmap::RouteSegments route_segments;
   navi_path_decider.reference_line_info_ = new ReferenceLineInfo(
       vehicle_state, plan_start_point, ref_line, route_segments);

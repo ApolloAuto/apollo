@@ -1,7 +1,7 @@
 model_param {
   model_name: "./3d-r4-half"
   model_type: "RTNetInt8"
-  weight_file: "deploy.md"
+  weight_file: "deploy.model"
   proto_file: "deploy.pt"
   anchors_file: "anchors.txt"
   types_file: "types.txt"

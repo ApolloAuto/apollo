@@ -37,13 +37,14 @@ PyObject *cyber_new_PyRecordReader(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, const_cast<char *>("s#:new_PyRecordReader"),
                         &filepath, &len)) {
     AERROR << "cyber_new_PyRecordReader parsetuple failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
   apollo::cyber::record::PyRecordReader *reader =
       new apollo::cyber::record::PyRecordReader(std::string(filepath, len));
   PyObject *pyobj_rec_reader =
-      PyCapsule_New(reader, "apollo_cyber_record_pyrecordfilereader", NULL);
+      PyCapsule_New(reader, "apollo_cyber_record_pyrecordfilereader", nullptr);
   return pyobj_rec_reader;
 }
 
@@ -51,6 +52,7 @@ PyObject *cyber_delete_PyRecordReader(PyObject *self, PyObject *args) {
   PyObject *pyobj_rec_reader = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyRecordReader"),
                         &pyobj_rec_reader)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -58,9 +60,11 @@ PyObject *cyber_delete_PyRecordReader(PyObject *self, PyObject *args) {
       pyobj_rec_reader, "apollo_cyber_record_pyrecordfilereader");
   if (nullptr == reader) {
     AINFO << "delete_PyRecordReader:reader ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   delete reader;
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -201,6 +205,7 @@ PyObject *cyber_PyRecordReader_Reset(PyObject *self, PyObject *args) {
                         const_cast<char *>("O:cyber_PyRecordReader_Reset"),
                         &pyobj_reader)) {
     AERROR << "cyber_PyRecordReader_Reset:PyArg_ParseTuple failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -208,10 +213,12 @@ PyObject *cyber_PyRecordReader_Reset(PyObject *self, PyObject *args) {
       pyobj_reader, "apollo_cyber_record_pyrecordfilereader");
   if (nullptr == reader) {
     AERROR << "PyRecordReader_Reset reader is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
   reader->Reset();
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -221,6 +228,7 @@ PyObject *cyber_PyRecordReader_GetChannelList(PyObject *self, PyObject *args) {
           args, const_cast<char *>("O:cyber_PyRecordReader_GetChannelList"),
           &pyobj_reader)) {
     AERROR << "cyber_PyRecordReader_GetChannelList:PyArg_ParseTuple failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -228,6 +236,7 @@ PyObject *cyber_PyRecordReader_GetChannelList(PyObject *self, PyObject *args) {
       pyobj_reader, "apollo_cyber_record_pyrecordfilereader");
   if (nullptr == reader) {
     AERROR << "PyRecordReader_GetChannelList reader is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -246,7 +255,7 @@ PyObject *cyber_new_PyRecordWriter(PyObject *self, PyObject *args) {
   apollo::cyber::record::PyRecordWriter *writer =
       new apollo::cyber::record::PyRecordWriter();
   PyObject *pyobj_rec_writer =
-      PyCapsule_New(writer, "apollo_cyber_record_pyrecordfilewriter", NULL);
+      PyCapsule_New(writer, "apollo_cyber_record_pyrecordfilewriter", nullptr);
   return pyobj_rec_writer;
 }
 
@@ -254,6 +263,7 @@ PyObject *cyber_delete_PyRecordWriter(PyObject *self, PyObject *args) {
   PyObject *pyobj_rec_writer = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyRecordWriter"),
                         &pyobj_rec_writer)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -261,9 +271,11 @@ PyObject *cyber_delete_PyRecordWriter(PyObject *self, PyObject *args) {
       pyobj_rec_writer, "apollo_cyber_record_pyrecordfilewriter");
   if (nullptr == writer) {
     AERROR << "delete_PyRecordWriter:writer is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   delete writer;
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -298,6 +310,7 @@ PyObject *cyber_PyRecordWriter_Close(PyObject *self, PyObject *args) {
   PyObject *pyobj_rec_writer = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char *>("O:delete_PyRecordWriter"),
                         &pyobj_rec_writer)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -305,9 +318,11 @@ PyObject *cyber_PyRecordWriter_Close(PyObject *self, PyObject *args) {
       pyobj_rec_writer, "apollo_cyber_record_pyrecordfilewriter");
   if (nullptr == writer) {
     AERROR << "cyber_PyRecordWriterer_Close: writer is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   writer->Close();
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -379,8 +394,9 @@ PyObject *cyber_PyRecordWriter_SetSizeOfFileSegmentation(PyObject *self,
   uint64_t size_kilobytes = 0;
 
   if (!PyArg_ParseTuple(
-          args, const_cast<char *>(
-                    "OK:cyber_PyRecordWriter_SetSizeOfFileSegmentation"),
+          args,
+          const_cast<char *>(
+              "OK:cyber_PyRecordWriter_SetSizeOfFileSegmentation"),
           &pyobj_rec_writer, &size_kilobytes)) {
     AERROR
         << "cyber_PyRecordWriter_SetSizeOfFileSegmentation parsetuple failed!";
@@ -409,8 +425,9 @@ PyObject *cyber_PyRecordWriter_SetIntervalOfFileSegmentation(PyObject *self,
   uint64_t time_sec = 0;
 
   if (!PyArg_ParseTuple(
-          args, const_cast<char *>(
-                    "OK:cyber_PyRecordWriter_SetIntervalOfFileSegmentation"),
+          args,
+          const_cast<char *>(
+              "OK:cyber_PyRecordWriter_SetIntervalOfFileSegmentation"),
           &pyobj_rec_writer, &time_sec)) {
     AERROR << "cyber_PyRecordWriter_SetIntervalOfFileSegmentation parsetuple "
               "failed!";

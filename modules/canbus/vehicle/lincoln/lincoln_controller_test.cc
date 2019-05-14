@@ -81,6 +81,7 @@ TEST_F(LincolnControllerTest, Status) {
   controller_.SetBeam(control_cmd_);
   controller_.SetTurningSignal(control_cmd_);
   EXPECT_FALSE(controller_.CheckChassisError());
+  EXPECT_EQ(controller_.chassis_error_code(), Chassis::NO_ERROR);
 }
 
 TEST_F(LincolnControllerTest, UpdateDrivingMode) {

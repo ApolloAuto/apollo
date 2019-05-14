@@ -395,10 +395,12 @@ Status LanesXmlParser::ParseSampleAssociates(
   return Status::OK();
 }
 
-Status LanesXmlParser::ParseRoadSampleAssociates(
-    const tinyxml2::XMLElement& xml_node, PbLane* lane) {
+Status LanesXmlParser::ParseSingleSideRoadSampleAssociates(
+    const tinyxml2::XMLElement& xml_node, bool bleft, PbLane* lane) {
   CHECK_NOTNULL(lane);
-  auto sub_node = xml_node.FirstChildElement("roadSampleAssociations");
+
+  auto sub_node = xml_node.FirstChildElement(
+      bleft ? "leftRoadSampleAssociations" : "rightRoadSampleAssociations");
   if (sub_node == nullptr) {
     std::string err_msg = "Error parse road sample associations";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
@@ -408,28 +410,77 @@ Status LanesXmlParser::ParseRoadSampleAssociates(
     std::string err_msg = "Error parse road sample association";
     return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
   }
-
   while (sub_node) {
-    double left_width = 0.0;
-    double right_width = 0.0;
+    double width = 0.0;
     double s = 0.0;
     int checker = sub_node->QueryDoubleAttribute("sOffset", &s);
-    checker += sub_node->QueryDoubleAttribute("leftWidth", &left_width);
-    checker += sub_node->QueryDoubleAttribute("rightWidth", &right_width);
+    checker += sub_node->QueryDoubleAttribute("width", &width);
     if (checker != tinyxml2::XML_SUCCESS) {
       std::string err_msg = "Error parse road sample association attribute";
       return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
     }
 
-    auto left_road_sample = lane->add_left_road_sample();
-    left_road_sample->set_s(s);
-    left_road_sample->set_width(left_width);
-
-    auto right_road_sample = lane->add_right_road_sample();
-    right_road_sample->set_s(s);
-    right_road_sample->set_width(right_width);
+    auto road_sample =
+        bleft ? lane->add_left_road_sample() : lane->add_right_road_sample();
+    road_sample->set_s(s);
+    road_sample->set_width(width);
 
     sub_node = sub_node->NextSiblingElement("sampleAssociation");
+  }
+  return Status::OK();
+}
+
+Status LanesXmlParser::ParseLeftRoadSampleAssociates(
+    const tinyxml2::XMLElement& xml_node, PbLane* lane) {
+  CHECK_NOTNULL(lane);
+
+  return ParseSingleSideRoadSampleAssociates(xml_node, true, lane);
+}
+
+Status LanesXmlParser::ParseRightRoadSampleAssociates(
+    const tinyxml2::XMLElement& xml_node, PbLane* lane) {
+  CHECK_NOTNULL(lane);
+
+  return ParseSingleSideRoadSampleAssociates(xml_node, false, lane);
+}
+
+Status LanesXmlParser::ParseRoadSampleAssociates(
+    const tinyxml2::XMLElement& xml_node, PbLane* lane) {
+  CHECK_NOTNULL(lane);
+
+  auto sub_node = xml_node.FirstChildElement("roadSampleAssociations");
+  if (sub_node == nullptr) {
+    RETURN_IF_ERROR(ParseLeftRoadSampleAssociates(xml_node, lane));
+    RETURN_IF_ERROR(ParseRightRoadSampleAssociates(xml_node, lane));
+  } else {
+    sub_node = sub_node->FirstChildElement("sampleAssociation");
+    if (sub_node == nullptr) {
+      std::string err_msg = "Error parse road sample association";
+      return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+    }
+
+    while (sub_node) {
+      double left_width = 0.0;
+      double right_width = 0.0;
+      double s = 0.0;
+      int checker = sub_node->QueryDoubleAttribute("sOffset", &s);
+      checker += sub_node->QueryDoubleAttribute("leftWidth", &left_width);
+      checker += sub_node->QueryDoubleAttribute("rightWidth", &right_width);
+      if (checker != tinyxml2::XML_SUCCESS) {
+        std::string err_msg = "Error parse road sample association attribute";
+        return Status(apollo::common::ErrorCode::HDMAP_DATA_ERROR, err_msg);
+      }
+
+      auto left_road_sample = lane->add_left_road_sample();
+      left_road_sample->set_s(s);
+      left_road_sample->set_width(left_width);
+
+      auto right_road_sample = lane->add_right_road_sample();
+      right_road_sample->set_s(s);
+      right_road_sample->set_width(right_width);
+
+      sub_node = sub_node->NextSiblingElement("sampleAssociation");
+    }
   }
 
   return Status::OK();

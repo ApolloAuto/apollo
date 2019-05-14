@@ -89,4 +89,5 @@ int main(int argc, char* argv[]) {
       "echo_server");
 
   apollo::cyber::WaitForShutdown();
+  return 0;
 }

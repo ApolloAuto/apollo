@@ -39,8 +39,8 @@ TEST(ImageTest, image8u_test) {
 
     {
       Image8U image(5, 5, Color::RGB, blob);
-      EXPECT_TRUE(image.cpu_ptr() == blob->cpu_data());
-      EXPECT_TRUE(image.gpu_ptr() == blob->gpu_data());
+      EXPECT_EQ(image.cpu_ptr(), blob->cpu_data());
+      EXPECT_EQ(image.gpu_ptr(), blob->gpu_data());
 
       EXPECT_EQ(image.rows(), 5);
       EXPECT_EQ(image.cols(), 5);
@@ -79,8 +79,8 @@ TEST(ImageTest, image8u_test) {
     for (int i = 0; i < blob->count(); ++i) {
       blob->mutable_cpu_data()[i] = i;
     }
-    EXPECT_TRUE(image.cpu_ptr() == blob->cpu_data());
-    EXPECT_TRUE(image.gpu_ptr() == blob->gpu_data());
+    EXPECT_EQ(image.cpu_ptr(), blob->cpu_data());
+    EXPECT_EQ(image.gpu_ptr(), blob->gpu_data());
 
     // copy and assign
     Image8U image_shared(image);

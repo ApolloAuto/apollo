@@ -24,15 +24,3 @@ apollo::monitor::TopicConf proto.
 ### Summary Monitor
 It summarizes all other specific monitor's results to a simple conclusion such
 as OK, WARN, ERROR or FATAL.
-
-## Reporters
-
-### Static Information Reporter
-It publishes the static information (apollo::data::StaticInfo) in very low
-frequency, so you can get things like vehicle metadata or user information from
-"rostopic echo" or a recorded rosbag.
-
-### Vehicle State Reporter
-It reports critical vehicle state (apollo::common::VehicleState) to a remote
-endpoint, so you can monitor your running vehicles from the server. Note that
-it's an advanced feature and disabled by default.

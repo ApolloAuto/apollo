@@ -33,18 +33,18 @@ g_message_manager = PbMessageManager()
 
 
 def write_to_file(file_path, topic_pb):
-    """write pb message to file"""
-    f = file(file_path, 'w')
-    f.write(str(topic_pb))
-    f.close()
-
+    """
+    write pb message to file
+    """
+    with open(file_path, 'w') as fp:
+        fp.write(str(topic_pb))
 
 def extract_record(in_record, output):
     freader = record.RecordReader(in_record)
-    print "begin to extract from record {}".format(in_record)
+    print("begin to extract from record {}".format(in_record))
     time.sleep(1)
     seq = 0
-    localization_topic = "/apollo/localization/pose"
+    localization_topic = '/apollo/localization/pose'
     meta_msg = g_message_manager.get_msg_meta_by_topic(localization_topic)
     localization_type = meta_msg.msg_type
     for channelname, msg_data, datatype, timestamp in freader.read_messages():
@@ -59,10 +59,15 @@ def extract_record(in_record, output):
                       pose.position.z, pose.orientation.qx,
                       pose.orientation.qy, pose.orientation.qz,
                       pose.orientation.qw))
-    print "finished extracting from record {}".format(in_record)
+    print("Finished extracting from record {}".format(in_record))
 
+def main(args):
+    out = open(args.output, 'w') if args.output or sys.stdout
+    for record_file in args.in_record:
+        extract_record(record_file, out)
+    out.close()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="A tool to dump the localization messages for map team"
                     "Usage: python extract_trajectory.py bag1 bag2 --output output.txt")
@@ -78,12 +83,4 @@ if __name__ == "__main__":
         type=str,
         help="the output file, default is stdout")
     args = parser.parse_args()
-
-    if (args.output):
-        out = file(args.output, 'w')
-    else:
-        out = sys.stdout
-    for record_file in args.in_record:
-        extract_record(record_file, out)
-    out.close()
-    cyber.shutdown()
+    main(args)

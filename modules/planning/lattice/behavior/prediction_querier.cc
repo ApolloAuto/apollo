@@ -31,8 +31,8 @@ PredictionQuerier::PredictionQuerier(
     const std::shared_ptr<std::vector<common::PathPoint>>& ptr_reference_line)
     : ptr_reference_line_(ptr_reference_line) {
   for (const auto ptr_obstacle : obstacles) {
-    if (id_obstacle_map_.find(ptr_obstacle->Id()) == id_obstacle_map_.end()) {
-      id_obstacle_map_[ptr_obstacle->Id()] = ptr_obstacle;
+    if (common::util::InsertIfNotPresent(&id_obstacle_map_, ptr_obstacle->Id(),
+                                         ptr_obstacle)) {
       obstacles_.push_back(ptr_obstacle);
     } else {
       AWARN << "Duplicated obstacle found [" << ptr_obstacle->Id() << "]";

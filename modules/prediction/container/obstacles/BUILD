@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//modules/prediction/common:environment_features",
         "//modules/prediction/common:feature_output",
+        "//modules/prediction/common:prediction_constants",
         "//modules/prediction/container",
         "//modules/prediction/container/obstacles:obstacle",
     ],
@@ -23,6 +24,7 @@ cc_library(
         "//modules/prediction/common:junction_analyzer",
         "//modules/prediction/container/obstacles:obstacle_clusters",
         "//modules/prediction/network/rnn_model",
+        "//modules/prediction/proto:prediction_proto",
     ],
 )
 

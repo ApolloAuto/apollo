@@ -20,6 +20,9 @@
 
 #pragma once
 
+#include <utility>
+#include <vector>
+
 #include "modules/planning/tasks/optimizers/path_optimizer.h"
 
 namespace apollo {
@@ -36,6 +39,20 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
                          const ReferenceLine& reference_line,
                          const common::TrajectoryPoint& init_point,
                          PathData* const path_data) override;
+
+  bool OptimizePath(
+      const std::array<double, 3>& init_state,
+      const std::array<double, 3>& end_state, const double delta_s,
+      const std::vector<std::pair<double, double>>& lat_boundaries,
+      const std::array<double, 5>& w, std::vector<double>* ptr_x,
+      std::vector<double>* ptr_dx, std::vector<double>* ptr_ddx,
+      const int max_iter);
+
+  FrenetFramePath ToPiecewiseJerkPath(const std::vector<double>& l,
+                                      const std::vector<double>& dl,
+                                      const std::vector<double>& ddl,
+                                      const double delta_s,
+                                      const double start_s) const;
 };
 
 }  // namespace planning

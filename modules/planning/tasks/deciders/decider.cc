@@ -28,15 +28,12 @@ Decider::Decider(const TaskConfig& config) : Task(config) {}
 apollo::common::Status Decider::Execute(
     Frame* frame, ReferenceLineInfo* reference_line_info) {
   Task::Execute(frame, reference_line_info);
-
-  auto ret = Process(frame, reference_line_info);
-
-  return ret;
+  return Process(frame, reference_line_info);
 }
 
 apollo::common::Status Decider::Execute(Frame* frame) {
   Task::Execute(frame);
-  return apollo::common::Status::OK();
+  return Process(frame);
 }
 
 }  // namespace planning

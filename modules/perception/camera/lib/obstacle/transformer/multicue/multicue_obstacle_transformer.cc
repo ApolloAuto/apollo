@@ -169,6 +169,9 @@ int MultiCueObstacleTransformer::MatchTemplates(base::ObjectSubType sub_type,
 void MultiCueObstacleTransformer::FillResults(
     float object_center[3], float dimension_hwl[3], float rotation_y,
     Eigen::Affine3d camera2world_pose, float theta_ray, base::ObjectPtr obj) {
+  if (obj == nullptr) {
+    return;
+  }
   object_center[1] -= dimension_hwl[0] / 2;
   obj->camera_supplement.local_center(0) = object_center[0];
   obj->camera_supplement.local_center(1) = object_center[1];
@@ -177,9 +180,6 @@ void MultiCueObstacleTransformer::FillResults(
   ADEBUG << "Obj type: " << static_cast<int>(obj->sub_type);
   ADEBUG << "Obj ori dimension: " << obj->size[2] << ", " << obj->size[1]
          << ", " << obj->size[0];
-  AINFO << "Obj local center[0] from transformer: " << object_center[0] << " "
-        << object_center[1] << " " << object_center[2];
-
   obj->center(0) = static_cast<double>(object_center[0]);
   obj->center(1) = static_cast<double>(object_center[1]);
   obj->center(2) = static_cast<double>(object_center[2]);
@@ -209,12 +209,12 @@ void MultiCueObstacleTransformer::FillResults(
          << ", " << dimension_hwl[2];
   ADEBUG << "Obj ry:" << rotation_y;
   ADEBUG << "Obj theta: " << obj->theta;
-  AINFO << "Obj center from transformer: " << obj->center.transpose();
+  ADEBUG << "Obj center from transformer: " << obj->center.transpose();
 }
 
 bool MultiCueObstacleTransformer::Transform(
     const ObstacleTransformerOptions &options, CameraFrame *frame) {
-  if (frame->detected_objects.size() == 0) {
+  if (frame->detected_objects.empty()) {
     ADEBUG << "No object input to transformer.";
     return true;
   }

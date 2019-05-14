@@ -18,15 +18,7 @@ export default class Options {
         this.secondarySideBarOptions = ["showPOI", "enableAudioCapture"];
 
         // Set options and their default values from PARAMETERS.options
-        const options = {};
-        for (const name in PARAMETERS.options) {
-            let defaultValue = PARAMETERS.options[name].default;
-            if (OFFLINE_PLAYBACK && name === "showTasks") {
-                defaultValue = false;
-            }
-            options[name] = defaultValue;
-        }
-        extendObservable(this, options);
+        this.resetOptions();
 
         // Define toggles to hide in layer menu. These include PncMonitor
         // toggles, which are visible only when PNC Monitor is on.
@@ -36,6 +28,21 @@ export default class Options {
             planningCar: OFFLINE_PLAYBACK,
         };
         this.togglesToHide = observable(togglesToHide);
+    }
+
+    @action resetOptions() {
+        const options = {};
+        for (const name in PARAMETERS.options) {
+            let defaultValue = PARAMETERS.options[name].default;
+            if (OFFLINE_PLAYBACK && name === "showTasks") {
+                defaultValue = false;
+            }
+            if (OFFLINE_PLAYBACK && name === "showPositionShadow") {
+                defaultValue = true;
+            }
+            options[name] = defaultValue;
+        }
+        extendObservable(this, options);
     }
 
     @computed get showTools() {
@@ -51,6 +58,10 @@ export default class Options {
                this.cameraAngle === 'Map' ||
                this.cameraAngle === 'Overhead' ||
                this.cameraAngle === 'Monitor';
+    }
+
+    @computed get showMonitor() {
+        return this.showPNCMonitor || this.showDataCollectionMonitor;
     }
 
     @action toggle(option, isCustomized) {

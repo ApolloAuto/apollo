@@ -35,7 +35,7 @@ DualVariableWarmStartProblem::DualVariableWarmStartProblem(
 }
 
 bool DualVariableWarmStartProblem::Solve(
-    const size_t& horizon, const double& ts, const Eigen::MatrixXd& ego,
+    const size_t horizon, const double ts, const Eigen::MatrixXd& ego,
     size_t obstacles_num, const Eigen::MatrixXi& obstacles_edges_num,
     const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
     const Eigen::MatrixXd& xWS, Eigen::MatrixXd* l_warm_up,
@@ -51,12 +51,12 @@ bool DualVariableWarmStartProblem::Solve(
     bool succ = ptop->optimize();
 
     if (succ) {
-      AINFO << "dual warm up done.";
+      ADEBUG << "dual warm up done.";
       ptop->get_optimization_results(l_warm_up, n_warm_up);
 
       auto t_end = cyber::Time::Now().ToSecond();
-      AINFO << "Dual vairable warm start solving time in second : "
-            << t_end - t_start;
+      ADEBUG << "Dual variable warm start solving time in second : "
+             << t_end - t_start;
       return true;
     }
 
@@ -142,17 +142,17 @@ bool DualVariableWarmStartProblem::Solve(
         status == Ipopt::Solved_To_Acceptable_Level) {
       // Retrieve some statistics about the solve
       Ipopt::Index iter_count = app->Statistics()->IterationCount();
-      AINFO << "*** The problem solved in " << iter_count << " iterations!";
+      ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
 
       Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-      AINFO << "*** The final value of the objective function is " << final_obj
-            << '.';
+      ADEBUG << "*** The final value of the objective function is " << final_obj
+             << '.';
       auto t_end = cyber::Time::Now().ToSecond();
 
-      AINFO << "Dual vairable warm start solving time in second : "
-            << t_end - t_start;
+      ADEBUG << "Dual variable warm start solving time in second : "
+             << t_end - t_start;
     } else {
-      AINFO << "Solve not succeeding, return status: " << int(status);
+      ADEBUG << "Solve not succeeding, return status: " << int(status);
     }
 
     ptop->get_optimization_results(l_warm_up, n_warm_up);
@@ -235,17 +235,17 @@ bool DualVariableWarmStartProblem::Solve(
         status == Ipopt::Solved_To_Acceptable_Level) {
       // Retrieve some statistics about the solve
       Ipopt::Index iter_count = app->Statistics()->IterationCount();
-      AINFO << "*** The problem solved in " << iter_count << " iterations!";
+      ADEBUG << "*** The problem solved in " << iter_count << " iterations!";
 
       Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-      AINFO << "*** The final value of the objective function is " << final_obj
-            << '.';
+      ADEBUG << "*** The final value of the objective function is " << final_obj
+             << '.';
       auto t_end = cyber::Time::Now().ToSecond();
 
-      AINFO << "Dual vairable warm start solving time in second : "
-            << t_end - t_start;
+      ADEBUG << "Dual variable warm start solving time in second : "
+             << t_end - t_start;
     } else {
-      AINFO << "Solve not succeeding, return status: " << int(status);
+      ADEBUG << "Solve not succeeding, return status: " << int(status);
     }
 
     ptop->get_optimization_results(l_warm_up, n_warm_up);
@@ -264,12 +264,12 @@ bool DualVariableWarmStartProblem::Solve(
       ptop_osqp->get_optimization_results(l_warm_up, n_warm_up);
     }
 
-    AINFO << "dual warm up done.";
+    ADEBUG << "dual warm up done.";
     ptop_osqp->get_optimization_results(l_warm_up, n_warm_up);
 
     auto t_end = cyber::Time::Now().ToSecond();
-    AINFO << "Dual vairable warm start solving time in second : "
-          << t_end - t_start;
+    ADEBUG << "Dual variable warm start solving time in second : "
+           << t_end - t_start;
 
     // ipoptqp result
     Eigen::MatrixXd l_warm_up_ipoptqp(l_warm_up->rows(), l_warm_up->cols());
@@ -352,13 +352,13 @@ bool DualVariableWarmStartProblem::Solve(
         status == Ipopt::Solved_To_Acceptable_Level) {
       // Retrieve some statistics about the solve
       Ipopt::Index iter_count = app->Statistics()->IterationCount();
-      AINFO << "*** IPOPTQP: The problem solved in " << iter_count
-            << " iterations!";
+      ADEBUG << "*** IPOPTQP: The problem solved in " << iter_count
+             << " iterations!";
       Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-      AINFO << "*** IPOPTQP: The final value of the objective function is "
-            << final_obj << '.';
+      ADEBUG << "*** IPOPTQP: The final value of the objective function is "
+             << final_obj << '.';
     } else {
-      AINFO << "Solve not succeeding, return status: " << int(status);
+      ADEBUG << "Solve not succeeding, return status: " << int(status);
     }
 
     ptop_ipoptqp->get_optimization_results(&l_warm_up_ipoptqp,
@@ -388,13 +388,13 @@ bool DualVariableWarmStartProblem::Solve(
         status == Ipopt::Solved_To_Acceptable_Level) {
       // Retrieve some statistics about the solve
       Ipopt::Index iter_count = app->Statistics()->IterationCount();
-      AINFO << "*** IPOPT: The problem solved in " << iter_count
-            << " iterations!";
+      ADEBUG << "*** IPOPT: The problem solved in " << iter_count
+             << " iterations!";
       Ipopt::Number final_obj = app->Statistics()->FinalObjective();
-      AINFO << "*** IPOPT: The final value of the objective function is "
-            << final_obj << '.';
+      ADEBUG << "*** IPOPT: The final value of the objective function is "
+             << final_obj << '.';
     } else {
-      AINFO << "Solve not succeeding, return status: " << int(status);
+      ADEBUG << "Solve not succeeding, return status: " << int(status);
     }
 
     ptop_ipopt->get_optimization_results(&l_warm_up_ipopt, &n_warm_up_ipopt);
@@ -413,9 +413,9 @@ bool DualVariableWarmStartProblem::Solve(
                                                      l_warm_up_ipopt(r, c)));
       }
     }
-    AINFO << "max l warm up diff between osqp & ipopt: " << l_max_diff1;
-    AINFO << "max l warm up diff between osqp & ipoptqp: " << l_max_diff2;
-    AINFO << "max l warm up diff between ipopt & ipoptqp: " << l_max_diff3;
+    ADEBUG << "max l warm up diff between osqp & ipopt: " << l_max_diff1;
+    ADEBUG << "max l warm up diff between osqp & ipoptqp: " << l_max_diff2;
+    ADEBUG << "max l warm up diff between ipopt & ipoptqp: " << l_max_diff3;
 
     double n_max_diff1 = 0.0;
     double n_max_diff2 = 0.0;
@@ -430,9 +430,9 @@ bool DualVariableWarmStartProblem::Solve(
                                                      n_warm_up_ipopt(r, c)));
       }
     }
-    AINFO << "max n warm up diff between osqp & ipopt: " << n_max_diff1;
-    AINFO << "max n warm up diff between osqp & ipoptqp: " << n_max_diff2;
-    AINFO << "max n warm up diff between ipopt & ipoptqp: " << n_max_diff3;
+    ADEBUG << "max n warm up diff between osqp & ipopt: " << n_max_diff1;
+    ADEBUG << "max n warm up diff between osqp & ipoptqp: " << n_max_diff2;
+    ADEBUG << "max n warm up diff between ipopt & ipoptqp: " << n_max_diff3;
 
     return true;
   }

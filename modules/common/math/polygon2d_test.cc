@@ -377,6 +377,24 @@ TEST(Polygon2dTest, Overlap) {
   EXPECT_TRUE(poly4.ComputeOverlap(poly3, &overlap_polygon));
   EXPECT_NEAR(overlap_polygon.area(), 0.5, 1e-5);
 
+  EXPECT_NEAR(poly1.ComputeIoU(poly2), 0.1428, 1e-4);
+  EXPECT_NEAR(poly2.ComputeIoU(poly1), 0.1428, 1e-4);
+
+  EXPECT_NEAR(poly1.ComputeIoU(poly3), 0.0, 1e-4);
+  EXPECT_NEAR(poly3.ComputeIoU(poly1), 0.0, 1e-4);
+
+  EXPECT_NEAR(poly1.ComputeIoU(poly4), 0.0909, 1e-4);
+  EXPECT_NEAR(poly4.ComputeIoU(poly1), 0.0909, 1e-4);
+
+  EXPECT_NEAR(poly2.ComputeIoU(poly3), 0.1428, 1e-4);
+  EXPECT_NEAR(poly3.ComputeIoU(poly2), 0.1428, 1e-4);
+
+  EXPECT_NEAR(poly2.ComputeIoU(poly4), 0.5, 1e-4);
+  EXPECT_NEAR(poly4.ComputeIoU(poly2), 0.5, 1e-4);
+
+  EXPECT_NEAR(poly3.ComputeIoU(poly4), 0.0909, 1e-4);
+  EXPECT_NEAR(poly4.ComputeIoU(poly3), 0.0909, 1e-4);
+
   Vec2d first_intersect;
   Vec2d last_intersect;
   EXPECT_FALSE(poly1.GetOverlap(LineSegment2d({-1, 0}, {-1, 2}),

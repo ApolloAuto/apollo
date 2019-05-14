@@ -1,4 +1,5 @@
 vehicle_param {
+  brand: LINCOLN_MKZ
   front_edge_to_center: 3.89
   back_edge_to_center: 1.043
   left_edge_to_center: 1.055
@@ -17,4 +18,7 @@ vehicle_param {
   wheel_base: 2.8448
   wheel_rolling_radius: 0.335
   max_abs_speed_when_stopped: 0.2
+
+  brake_deadzone: 15.5
+  throttle_deadzone: 18.0
 }

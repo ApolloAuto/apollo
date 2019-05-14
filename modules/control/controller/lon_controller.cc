@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/control/controller/lon_controller.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "cyber/common/log.h"
@@ -189,7 +190,8 @@ Status LonController::ComputeControlCommand(
     AERROR << error_msg;
     return Status(ErrorCode::CONTROL_COMPUTE_ERROR, error_msg);
   }
-  ComputeLongitudinalErrors(trajectory_analyzer_.get(), preview_time, debug);
+  ComputeLongitudinalErrors(trajectory_analyzer_.get(), preview_time, ts,
+                            debug);
 
   double station_error_limit = lon_controller_conf.station_error_limit();
   double station_error_limited = 0.0;
@@ -254,7 +256,7 @@ Status LonController::ComputeControlCommand(
   double slope_offset_compenstaion = digital_filter_pitch_angle_.Filter(
       GRA_ACC * std::sin(VehicleStateProvider::Instance()->pitch()));
 
-  if (isnan(slope_offset_compenstaion)) {
+  if (std::isnan(slope_offset_compenstaion)) {
     slope_offset_compenstaion = 0;
   }
 
@@ -274,12 +276,16 @@ Status LonController::ComputeControlCommand(
             vehicle_param_.max_abs_speed_when_stopped()) ||
        std::abs(debug->path_remain()) < 0.3)) {
     acceleration_cmd = lon_controller_conf.standstill_acceleration();
-    AINFO << "Stop location reached";
+    ADEBUG << "Stop location reached";
     debug->set_is_full_stop(true);
   }
 
-  double throttle_deadzone = lon_controller_conf.throttle_deadzone();
-  double brake_deadzone = lon_controller_conf.brake_deadzone();
+  double throttle_lowerbound =
+      std::max(vehicle_param_.throttle_deadzone(),
+               lon_controller_conf.throttle_minimum_action());
+  double brake_lowerbound =
+      std::max(vehicle_param_.brake_deadzone(),
+               lon_controller_conf.brake_minimum_action());
   double calibration_value = 0.0;
   double acceleration_lookup =
       (chassis->gear_location() == canbus::Chassis::GEAR_REVERSE)
@@ -294,19 +300,24 @@ Status LonController::ComputeControlCommand(
         std::make_pair(chassis_->speed_mps(), acceleration_lookup));
   }
 
-  if (calibration_value >= 0) {
-    throttle_cmd = std::abs(calibration_value) > throttle_deadzone
-                       ? std::abs(calibration_value)
-                       : throttle_deadzone;
+  if (acceleration_lookup >= 0) {
+    if (calibration_value >= 0) {
+      throttle_cmd = std::max(calibration_value, throttle_lowerbound);
+    } else {
+      throttle_cmd = throttle_lowerbound;
+    }
     brake_cmd = 0.0;
   } else {
     throttle_cmd = 0.0;
-    brake_cmd = std::abs(calibration_value) > brake_deadzone
-                    ? std::abs(calibration_value)
-                    : brake_deadzone;
+    if (calibration_value >= 0) {
+      brake_cmd = brake_lowerbound;
+    } else {
+      brake_cmd = std::max(-calibration_value, brake_lowerbound);
+    }
   }
 
   debug->set_station_error_limited(station_error_limited);
+  debug->set_speed_offset(speed_offset);
   debug->set_speed_controller_input_limited(speed_controller_input_limited);
   debug->set_acceleration_cmd(acceleration_cmd);
   debug->set_throttle_cmd(throttle_cmd);
@@ -358,7 +369,7 @@ std::string LonController::Name() const { return name_; }
 
 void LonController::ComputeLongitudinalErrors(
     const TrajectoryAnalyzer *trajectory_analyzer, const double preview_time,
-    SimpleLongitudinalDebug *debug) {
+    const double ts, SimpleLongitudinalDebug *debug) {
   // the decomposed vehicle motion onto Frenet frame
   // s: longitudinal accumulated distance along reference trajectory
   // s_dot: longitudinal velocity along reference trajectory
@@ -393,16 +404,43 @@ void LonController::ComputeLongitudinalErrors(
   ADEBUG << "matched point:" << matched_point.DebugString();
   ADEBUG << "reference point:" << reference_point.DebugString();
   ADEBUG << "preview point:" << preview_point.DebugString();
-  debug->set_station_error(reference_point.path_point().s() - s_matched);
-  debug->set_speed_error(reference_point.v() - s_dot_matched);
+
+  double heading_error = common::math::NormalizeAngle(
+      VehicleStateProvider::Instance()->heading() - matched_point.theta());
+  double lon_speed = VehicleStateProvider::Instance()->linear_velocity() *
+                     std::cos(heading_error);
+  double lon_acceleration =
+      VehicleStateProvider::Instance()->linear_acceleration() *
+      std::cos(heading_error);
+  double one_minus_kappa_lat_error =
+      1 - reference_point.path_point().kappa() *
+              VehicleStateProvider::Instance()->linear_velocity() *
+              std::sin(heading_error);
 
   debug->set_station_reference(reference_point.path_point().s());
+  debug->set_current_station(s_matched);
+  debug->set_station_error(reference_point.path_point().s() - s_matched);
   debug->set_speed_reference(reference_point.v());
+  debug->set_current_speed(lon_speed);
+  debug->set_speed_error(reference_point.v() - s_dot_matched);
+  debug->set_acceleration_reference(reference_point.a());
+  debug->set_current_acceleration(lon_acceleration);
+  debug->set_acceleration_error(reference_point.a() -
+                                lon_acceleration / one_minus_kappa_lat_error);
+  double jerk_reference =
+      (debug->acceleration_reference() - previous_acceleration_reference_) / ts;
+  double lon_jerk =
+      (debug->current_acceleration() - previous_acceleration_) / ts;
+  debug->set_jerk_reference(jerk_reference);
+  debug->set_current_jerk(lon_jerk);
+  debug->set_jerk_error(jerk_reference - lon_jerk / one_minus_kappa_lat_error);
+  previous_acceleration_reference_ = debug->acceleration_reference();
+  previous_acceleration_ = debug->current_acceleration();
+
   debug->set_preview_station_error(preview_point.path_point().s() - s_matched);
   debug->set_preview_speed_error(preview_point.v() - s_dot_matched);
   debug->set_preview_speed_reference(preview_point.v());
   debug->set_preview_acceleration_reference(preview_point.a());
-  debug->set_current_station(s_matched);
 }
 
 void LonController::SetDigitalFilter(double ts, double cutoff_freq,
@@ -441,9 +479,9 @@ void LonController::GetPathRemain(SimpleLongitudinalDebug *debug) {
   if (stop_index == trajectory_message_->trajectory_point_size()) {
     --stop_index;
     if (fabs(trajectory_message_->trajectory_point(stop_index).v()) < 0.1) {
-      AINFO << "the last point is selected as parking point";
+      ADEBUG << "the last point is selected as parking point";
     } else {
-      AINFO << "the last point found in path and speed > speed_deadzone";
+      ADEBUG << "the last point found in path and speed > speed_deadzone";
       debug->set_path_remain(10000);
     }
   }

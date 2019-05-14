@@ -31,7 +31,7 @@
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/task/task.h"
-#include "cyber/timer/timer_manager.h"
+#include "cyber/timer/timing_wheel.h"
 #include "cyber/transport/transport.h"
 
 namespace apollo {
@@ -41,12 +41,10 @@ using apollo::cyber::scheduler::Scheduler;
 using apollo::cyber::service_discovery::TopologyManager;
 
 namespace {
+
 bool g_atexit_registered = false;
 std::mutex g_mutex;
 logger::AsyncLogger* async_logger = nullptr;
-}  // namespace
-
-namespace {
 
 void InitLogger(const char* binary_name) {
   const char* slash = strrchr(binary_name, '/');
@@ -75,6 +73,7 @@ void StopLogger() {
     async_logger->Stop();
   }
 }
+
 }  // namespace
 
 void OnShutdown(int sig) {
@@ -115,7 +114,7 @@ void Clear() {
     return;
   }
   TaskManager::CleanUp();
-  TimerManager::CleanUp();
+  TimingWheel::CleanUp();
   scheduler::CleanUp();
   service_discovery::TopologyManager::CleanUp();
   transport::Transport::CleanUp();

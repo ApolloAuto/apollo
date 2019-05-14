@@ -68,7 +68,7 @@ class DreamviewStore {
         this.sceneDimension.widthRatio = newRatio;
     }
 
-    @action setInitializationStatus(status){
+    @action setInitializationStatus(status) {
         this.isInitialized = status;
     }
 
@@ -80,11 +80,11 @@ class DreamviewStore {
         this.geolocation = newGeolocation;
     }
 
-    @action enablePNCMonitor() {
+    @action enableMonitor() {
         this.updateWidthInPercentage(0.7);
     }
 
-    @action disablePNCMonitor() {
+    @action disableMonitor() {
         this.updateWidthInPercentage(1.0);
     }
 
@@ -93,11 +93,11 @@ class DreamviewStore {
     }
 
     @action updateModuleDelay(world) {
-        if(world && world.delay) {
-            for(module in world.delay) {
+        if (world && world.delay) {
+            for (module in world.delay) {
                 const hasNotUpdated = (world.delay[module] < 0);
                 const delay = hasNotUpdated ? '-' : world.delay[module].toFixed(2);
-                if (this.moduleDelay.has(module)){
+                if (this.moduleDelay.has(module)) {
                     this.moduleDelay.get(module).delay = delay;
                 } else {
                     this.moduleDelay.set(module, {
@@ -110,14 +110,17 @@ class DreamviewStore {
     }
 
     handleOptionToggle(option) {
-        const oldShowPNCMonitor = this.options.showPNCMonitor;
+        const oldShowMonitor =
+            this.options.showPNCMonitor || this.options.showDataCollectionMonitor;
         const oldShowRouteEditingBar = this.options.showRouteEditingBar;
 
         this.options.toggle(option);
 
         // disable tools turned off after toggling
-        if (oldShowPNCMonitor && !this.options.showPNCMonitor) {
-            this.disablePNCMonitor();
+        if (oldShowMonitor &&
+            !this.options.showPNCMonitor &&
+            !this.options.showDataCollectionMonitor) {
+            this.disableMonitor();
         }
         if (oldShowRouteEditingBar && !this.options.showRouteEditingBar) {
             this.routeEditingManager.disableRouteEditing();
@@ -125,9 +128,14 @@ class DreamviewStore {
 
         // enable selected tool
         if (this.options[option]) {
-            switch(option) {
+            switch (option) {
                 case "showPNCMonitor":
-                    this.enablePNCMonitor();
+                    this.options.showDataCollectionMonitor = false;
+                    this.enableMonitor();
+                    break;
+                case 'showDataCollectionMonitor':
+                    this.options.showPNCMonitor = false;
+                    this.enableMonitor();
                     break;
                 case 'showRouteEditingBar':
                     this.options.showPOI = false;
@@ -177,6 +185,10 @@ class DreamviewStore {
     }
 
     handleDrivingModeChange(wasAutoMode, isAutoMode) {
+        if (this.options.enableSimControl) {
+            return;
+        }
+
         const hasDisengagement = wasAutoMode && !isAutoMode;
         const hasAuto = !wasAutoMode && isAutoMode;
 
@@ -192,7 +204,13 @@ class DreamviewStore {
         }
     }
 
-    update(world) {
+    update(world, isNewMode) {
+        if (isNewMode) {
+            this.options.resetOptions();
+            this.disableMonitor();
+            this.routeEditingManager.disableRouteEditing();
+        }
+
         this.updateTimestamp(world.timestamp);
         this.updateModuleDelay(world);
 

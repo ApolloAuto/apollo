@@ -20,9 +20,8 @@
 
 #pragma once
 
-#include "modules/planning/proto/planning_config.pb.h"
-
 #include "modules/planning/scenarios/stage.h"
+#include "modules/planning/scenarios/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/traffic_light_unprotected_left_turn_scenario.h"
 
 namespace apollo {
@@ -46,11 +45,11 @@ class TrafficLightUnprotectedLeftTurnStageIntersectionCruise : public Stage {
     return GetContextAs<TrafficLightUnprotectedLeftTurnContext>();
   }
 
- private:
   Stage::StageStatus FinishStage();
 
  private:
   ScenarioTrafficLightUnprotectedLeftTurnConfig scenario_config_;
+  StageIntersectionCruiseImpl stage_impl_;
 };
 
 }  // namespace traffic_light

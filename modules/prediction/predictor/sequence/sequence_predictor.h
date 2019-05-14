@@ -22,6 +22,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "gtest/gtest.h"
@@ -61,6 +62,15 @@ class SequencePredictor : public Predictor {
   FRIEND_TEST(SequencePredictorTest, General);
 
  protected:
+  bool GetLongitudinalPolynomial(const Obstacle& obstacle,
+                                 const LaneSequence& lane_sequence,
+                                 const std::pair<double, double>& lon_end_state,
+                                 std::array<double, 5>* coefficients);
+
+  bool GetLateralPolynomial(const Obstacle& obstacle,
+                            const LaneSequence& lane_sequence,
+                            const double time_to_end_state,
+                            std::array<double, 4>* coefficients);
   /**
    * @brief Filter lane sequences
    * @param Lane graph
@@ -99,6 +109,15 @@ class SequencePredictor : public Predictor {
       const Obstacle& obstacle, const LaneSequence& lane_sequence,
       const double total_time, const double period, const double acceleration,
       std::vector<apollo::common::TrajectoryPoint>* points);
+
+  /**
+   * @brief Get lane sequence curvature by s
+   * @param lane sequence
+   * @param s
+   * @return the curvature
+   */
+  double GetLaneSequenceCurvatureByS(const LaneSequence& lane_sequence,
+                                     const double s);
 
   /**
    * @brief Clear private members

@@ -32,37 +32,42 @@ kEventTopic = '/apollo/drive_event'
 
 
 class EventDumper(object):
-    """Dump event."""
+    """
+    Dump event
+    """
 
     def __init__(self):
-        """Init."""
+        """
+        Init
+        """
 
     def calculate(self, bag_file):
-        """Calculate mileage."""
+        """
+        Calculate mileage
+        """
         try:
 	    drive_event = drive_event_pb2.DriveEvent()
             reader = RecordReader(bag_file)
-        except:
-            print("can't open bag")
+        except Exception:
+            print('Cannot open bag file %s' % bag_file)
         else:
-            f = file('/apollo/test.txt', 'a')
-            for msg in reader.read_messages():
-                if msg.topic == kEventTopic:
-                    drive_event.ParseFromString(msg.message)
-                    msg_time = time.localtime(drive_event.header.timestamp_sec)
-                    f.write(time.strftime("%Y-%m-%d %H:%M:%S", msg_time))
-                    f.write(str(drive_event.type)+":")
-                    f.write(drive_event.event.encode('utf-8')+'\n')
-            f.close()
-
+            with open('/apollo/test.txt', 'a') as fp:
+                for msg in reader.read_messages():
+                    if msg.topic == kEventTopic:
+                        drive_event.ParseFromString(msg.message)
+                        msg_time = time.localtime(drive_event.header.timestamp_sec)
+                        fp.write(time.strftime("%Y-%m-%d %H:%M:%S", msg_time))
+                        fp.write(str(drive_event.type) + ':')
+                        fp.write(drive_event.event.encode('utf-8') + '\n')
 
 def main():
-    """Main function."""
+    if len(sys.argv) < 2:
+        print('Usage: %s <bag_file1> <bag_file2> ...' % sys.argv[0])
+        sys.exit(0)
 
     ed = EventDumper()
     for bag_file in sys.argv[1:]:
         ed.calculate(bag_file)
-
 
 if __name__ == '__main__':
     main()

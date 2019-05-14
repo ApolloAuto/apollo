@@ -18,7 +18,7 @@ cc_library(
         "//modules/planning/common:reference_line_info",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/tasks:task",
-        "//third_party/rss",
+        "@ad_rss_lib//:ad_rss",
     ],
 )
 
@@ -30,7 +30,7 @@ cc_test(
     ],
     deps = [
         ":decider_rss",
-        "//third_party/rss",
+        "@ad_rss_lib//:ad_rss",
         "@gtest//:main",
     ],
 )

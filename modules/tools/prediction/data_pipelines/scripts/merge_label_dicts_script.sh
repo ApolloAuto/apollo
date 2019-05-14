@@ -26,6 +26,6 @@ SRC_FILE=$1
 set -e
 
 source /apollo/scripts/apollo_base.sh
-source /apollo/cyber/setup.bash 
+source /apollo/cyber/setup.bash
 
 python modules/tools/prediction/data_pipelines/data_preprocessing/merge_label_dicts.py ${SRC_FILE}

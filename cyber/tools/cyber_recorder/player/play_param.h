@@ -36,6 +36,7 @@ struct PlayParam {
   uint32_t preload_time_s = 3;
   std::set<std::string> files_to_play;
   std::set<std::string> channels_to_play;
+  std::set<std::string> black_channels;
 };
 
 }  // namespace record

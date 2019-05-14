@@ -111,7 +111,7 @@ void MlfMotionFilter::InitializeTrackState(TrackedObjectPtr new_object) {
   new_object->boostup_need_history_size =
       static_cast<int>(boostup_history_size_minimum_);
   new_object->convergence_confidence = use_convergence_boostup_ ? 0.0 : 1.0;
-  new_object->converged = use_convergence_boostup_ ? false : true;
+  new_object->converged = !use_convergence_boostup_;
   new_object->update_quality = 1.0;
   new_object->selected_measured_velocity = Eigen::Vector3d::Zero();
   new_object->selected_measured_acceleration = Eigen::Vector3d::Zero();

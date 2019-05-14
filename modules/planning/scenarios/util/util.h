@@ -23,17 +23,13 @@
 namespace apollo {
 namespace planning {
 namespace scenario {
+namespace util {
 
-bool CheckStopSignDone(const ReferenceLineInfo& reference_line_info,
-                       const std::string& stop_sign_overlap_id);
+hdmap::PathOverlap* GetOverlapOnReferenceLine(
+    const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
+    const ReferenceLineInfo::OverlapType& overlap_type);
 
-bool CheckTrafficLightDone(const ReferenceLineInfo& reference_line_info,
-                           const std::string& traffic_light_overlap_id);
-
-perception::TrafficLight GetSignal(const std::string& signal_id);
-
-bool CheckInsidePnCJunction(const ReferenceLineInfo& reference_line_info);
-
+}  // namespace util
 }  // namespace scenario
 }  // namespace planning
 }  // namespace apollo

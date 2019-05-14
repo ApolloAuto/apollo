@@ -49,7 +49,7 @@ void PbfShapeFusion::UpdateWithMeasurement(const SensorObjectPtr measurement,
     } else {
       // nothing to do
     }
-  } else if (IsCamera(measurement) && (s_use_camera_3d_ == true)) {
+  } else if (IsCamera(measurement) && s_use_camera_3d_) {
     if (latest_lidar == nullptr) {
       UpdateState(measurement);
     } else {

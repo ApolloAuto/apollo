@@ -3,7 +3,6 @@ dependencies:
   - python=2.7
   - numpy=1.8.2 # required by adu/ros-base
   - h5py=2.3.0 # latest version compatible with numpy 1.8.2; can also use 2.5.0 with pip
-  - pymongo
   - pip:
     - astropy==1.2.2 # anaconda says 0.4.1 is the latest version compatible with numpy 1.8.2, but not mature enough
     - glog

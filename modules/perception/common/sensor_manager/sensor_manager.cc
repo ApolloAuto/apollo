@@ -73,8 +73,7 @@ bool SensorManager::Init() {
       std::shared_ptr<BrownCameraDistortionModel> distort_model(
           new BrownCameraDistortionModel());
       auto intrinsic_file = IntrinsicPath(sensor_info.frame_id);
-      if (!LoadBrownCameraIntrinsic(intrinsic_file,
-                                    distort_model.get())) {
+      if (!LoadBrownCameraIntrinsic(intrinsic_file, distort_model.get())) {
         AERROR << "Failed to load camera intrinsic:" << intrinsic_file;
         return false;
       }
@@ -100,9 +99,7 @@ bool SensorManager::Init() {
 }
 
 bool SensorManager::IsSensorExist(const std::string& name) const {
-  const auto& itr = sensor_info_map_.find(name);
-
-  return itr == sensor_info_map_.end() ? false : true;
+  return sensor_info_map_.find(name) != sensor_info_map_.end();
 }
 
 bool SensorManager::GetSensorInfo(const std::string& name,

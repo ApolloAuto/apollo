@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package apollo.common;
+
+message VehicleModelConfig {
+    enum ModelType {
+        REAR_CENTERED_KINEMATIC_BICYCLE_MODEL = 0;
+        COM_CENTERED_DYNAMIC_BICYCLE_MODEL = 1;
+        MLP_MODEL = 2;
+    }
+    optional ModelType model_type = 1;
+    optional RearCenteredKinematicBicycleModelConfig rc_kinematic_bicycle_model = 2;
+    optional ComCenteredDynamicBicycleModelConfig comc_dynamic_bicycle_model = 3;
+    optional MlpModelConfig mlp_model = 4;
+}
+
+message RearCenteredKinematicBicycleModelConfig {
+    optional double dt = 1;
+}
+
+message ComCenteredDynamicBicycleModelConfig {
+    optional double dt = 1;
+}
+
+message MlpModelConfig {
+    optional double dt = 1;
+}

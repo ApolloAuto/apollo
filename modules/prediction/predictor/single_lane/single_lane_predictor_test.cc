@@ -27,7 +27,7 @@ namespace prediction {
 class SingleLanePredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    std::string file =
+    const std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     cyber::common::GetProtoFromFile(file, &perception_obstacles_);
   }
@@ -47,11 +47,11 @@ TEST_F(SingleLanePredictorTest, OnLaneCase) {
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   cost_evaluator.Evaluate(obstacle_ptr);
   SingleLanePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(), 2);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 2);
 }
 
 }  // namespace prediction

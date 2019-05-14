@@ -101,6 +101,9 @@
 		"showPNCMonitor": {
 			"default": false
 		},
+		"showDataCollectionMonitor": {
+			"default": false
+		},
 		"enableSimControl": {
 			"default": false
 		},
@@ -212,6 +215,10 @@
 		"showPositionLocalization": {
 			"default": true,
 			"menuId": "positionLocalization"
+		},
+		"showPositionShadow": {
+			"default": false,
+			"menuId": "positionShadow"
 		},
 		"showMapCrosswalk": {
 			"default": true,

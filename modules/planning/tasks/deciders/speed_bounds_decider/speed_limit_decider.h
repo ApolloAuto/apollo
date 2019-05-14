@@ -47,8 +47,6 @@ class SpeedLimitDecider {
 
   virtual apollo::common::Status GetSpeedLimits(
       const IndexedList<std::string, Obstacle>& obstacles,
-      const std::vector<std::tuple<double, double, double>>&
-          path_point_decision_guide,
       SpeedLimit* const speed_limit_data) const;
 
  private:

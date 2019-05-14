@@ -15,10 +15,10 @@
   * Localization result defined by Protobuf message `LocalizationEstimate`, which can be found in file `localization/proto/localization.proto`. ( `/apollo/localization/pose`)
 
 ### NDT Localization Setting
-under some circumstance, we need to balance the speed and accuracy of the algorithm. So we expose some parameters of NDT matching process, It includes `online_resolution` for online pointcloud, `ndt_max_iterations` for iterative optimization of NDT matching, `ndt_target_resolution` for target resolution, `ndt_line_search_step_size` for searching step size of iteration and `ndt_transformation_epsilon` for convergence condition. 
+under some circumstance, we need to balance the speed and accuracy of the algorithm. So we expose some parameters of NDT matching process, It includes `online_resolution` for online pointcloud, `ndt_max_iterations` for iterative optimization of NDT matching, `ndt_target_resolution` for target resolution, `ndt_line_search_step_size` for searching step size of iteration and `ndt_transformation_epsilon` for convergence condition.
 
 ## Generate NDT Localization Map
-  NDT Localization map is used for NDT-based localization, which is a voxel-grid representation of the environment. Each cell stores the centroid and releative covariance of the points in the cell. The map is organized as a group of map nodes. For more information, please refer to `apollo/modules/localization/msf/local_map/ndt_map`.
+  NDT Localization map is used for NDT-based localization, which is a voxel-grid representation of the environment. Each cell stores the centroid and relative covariance of the points in the cell. The map is organized as a group of map nodes. For more information, please refer to `apollo/modules/localization/msf/local_map/ndt_map`.
 
   We provide a script (`apollo/scripts/ndt_local_map_creator.sh`) to generate NDT localization map. You need to provide a group of point cloud frames (as .pcd file), corresponding poses file, and UTM zone id. The format of the poses file is `pcd_number timestamp x y z qx qy qz qw`.
 

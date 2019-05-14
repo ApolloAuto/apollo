@@ -202,8 +202,10 @@ class OfflineLidarObstaclePerception {
           filtered_objects.push_back(object);
         }
       }
-      if (!WriteObjectsForNewBenchmark(i, filtered_objects,
-          apollo::common::util::StrCat(output_path, "/", file_name, ".pcd"))) {
+      if (!WriteObjectsForNewBenchmark(
+              i, filtered_objects,
+              apollo::common::util::StrCat(output_path, "/", file_name,
+                                           ".pcd"))) {
         return false;
       }
     }
@@ -239,7 +241,7 @@ class OfflineLidarObstaclePerception {
         type = "nonMot";
       }
 
-      double yaw = atan2(object->direction[1], object->direction[0]);
+      double yaw = atan2(object->direction(1), object->direction(0));
       auto& object_cloud = object->lidar_supplement.cloud;
 
       fout << type << " " << object->center(0) << " " << object->center(1)

@@ -108,11 +108,11 @@ int main(int argc, char** argv) {
     return -1;
   }
 
-  const std::vector<std::string> pcd_folder_pathes =
+  const std::vector<std::string> pcd_folder_paths =
       boost_args["pcd_folders"].as<std::vector<std::string>>();
   const std::vector<std::string> pose_files =
       boost_args["pose_files"].as<std::vector<std::string>>();
-  if (pcd_folder_pathes.size() != pose_files.size()) {
+  if (pcd_folder_paths.size() != pose_files.size()) {
     std::cerr << "The count of pcd folders is not equal pose files"
               << std::endl;
     return -1;
@@ -128,14 +128,14 @@ int main(int argc, char** argv) {
       boost_args["coordinate_type"].as<std::string>();
   if (strcasecmp(coordinate_type.c_str(), "UTM") != 0 &&
       strcasecmp(coordinate_type.c_str(), "LTM") != 0) {
-    std::cerr << "Coordinate type invalide. (UTM or LTM)" << std::endl;
+    std::cerr << "Coordinate type invalid. (UTM or LTM)" << std::endl;
     return -1;
   }
   const std::string map_resolution_type =
       boost_args["map_resolution_type"].as<std::string>();
   if (strcasecmp(map_resolution_type.c_str(), "single") != 0 &&
       strcasecmp(map_resolution_type.c_str(), "multi") != 0) {
-    std::cerr << "Map resolution type invalide. (single or multi)" << std::endl;
+    std::cerr << "Map resolution type invalid. (single or multi)" << std::endl;
     return -1;
   }
 
@@ -155,12 +155,12 @@ int main(int argc, char** argv) {
               << "4.0, 8.0 or 16.0." << std::endl;
   }
 
-  const size_t num_trials = pcd_folder_pathes.size();
+  const size_t num_trials = pcd_folder_paths.size();
 
   // load all poses
   std::cerr << "Pcd folders are as follows:" << std::endl;
   for (size_t i = 0; i < num_trials; ++i) {
-    std::cerr << pcd_folder_pathes[i] << std::endl;
+    std::cerr << pcd_folder_paths[i] << std::endl;
   }
   std::vector<std::vector<Eigen::Affine3d>> ieout_poses(num_trials);
   std::vector<std::vector<double>> time_stamps(num_trials);
@@ -179,8 +179,8 @@ int main(int argc, char** argv) {
     apollo::localization::msf::system::CreateDirectory(map_folder_path);
   }
   map.SetMapFolderPath(map_folder_path);
-  for (size_t i = 0; i < pcd_folder_pathes.size(); ++i) {
-    map.AddDataset(pcd_folder_pathes[i]);
+  for (size_t i = 0; i < pcd_folder_paths.size(); ++i) {
+    map.AddDataset(pcd_folder_paths[i]);
   }
   if (strcasecmp(map_resolution_type.c_str(), "single") == 0) {
     loss_less_config.SetSingleResolutions(single_resolution_map);
@@ -242,7 +242,7 @@ int main(int argc, char** argv) {
             loss_less_config.max_intensity_var_value_);
     fprintf(file, "PCD folders: \n");
     for (unsigned int trial = 0; trial < num_trials; ++trial) {
-      fprintf(file, "%s\n", pcd_folder_pathes[trial].c_str());
+      fprintf(file, "%s\n", pcd_folder_paths[trial].c_str());
     }
     fclose(file);
   } else {
@@ -264,7 +264,7 @@ int main(int argc, char** argv) {
       std::string pcd_file_path;
       std::ostringstream ss;
       ss << pcd_indices[trial][frame_idx];
-      pcd_file_path = pcd_folder_pathes[trial] + "/" + ss.str() + ".pcd";
+      pcd_file_path = pcd_folder_paths[trial] + "/" + ss.str() + ".pcd";
       const Eigen::Affine3d& pcd_pose = poses[trial_frame_idx];
       apollo::localization::msf::velodyne::LoadPcds(
           pcd_file_path, trial_frame_idx, pcd_pose, &velodyne_frame, false);
@@ -322,7 +322,7 @@ int main(int argc, char** argv) {
         unsigned int layer_id = 0;
         std::vector<unsigned int> layer_counts;
         map.GetCountSafe(pt3d, zone_id, resolution_id, &layer_counts);
-        if (layer_counts.size() == 0) {
+        if (layer_counts.empty()) {
           AERROR << "No ground layer, skip.";
           continue;
         }

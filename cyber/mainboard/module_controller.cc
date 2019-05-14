@@ -26,12 +26,6 @@ namespace apollo {
 namespace cyber {
 namespace mainboard {
 
-ModuleController::ModuleController(const ModuleArgument& args) { args_ = args; }
-
-ModuleController::~ModuleController() {}
-
-bool ModuleController::Init() { return LoadAll(); }
-
 void ModuleController::Clear() {
   for (auto& component : component_list_) {
     component->Shutdown();
@@ -82,7 +76,7 @@ bool ModuleController::LoadModule(const DagConfig& dag_config) {
     }
 
     if (!common::PathExists(load_path)) {
-      AERROR << "Path not exist: " << load_path;
+      AERROR << "Path does not exist: " << load_path;
       return false;
     }
 
@@ -92,11 +86,7 @@ bool ModuleController::LoadModule(const DagConfig& dag_config) {
       const std::string& class_name = component.class_name();
       std::shared_ptr<ComponentBase> base =
           class_loader_manager_.CreateClassObj<ComponentBase>(class_name);
-      if (base == nullptr) {
-        return false;
-      }
-
-      if (!base->Initialize(component.config())) {
+      if (base == nullptr || !base->Initialize(component.config())) {
         return false;
       }
       component_list_.emplace_back(std::move(base));
@@ -106,11 +96,7 @@ bool ModuleController::LoadModule(const DagConfig& dag_config) {
       const std::string& class_name = component.class_name();
       std::shared_ptr<ComponentBase> base =
           class_loader_manager_.CreateClassObj<ComponentBase>(class_name);
-      if (base == nullptr) {
-        return false;
-      }
-
-      if (!base->Initialize(component.config())) {
+      if (base == nullptr || !base->Initialize(component.config())) {
         return false;
       }
       component_list_.emplace_back(std::move(base));

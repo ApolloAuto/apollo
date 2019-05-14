@@ -23,16 +23,19 @@ sys.path.append("../")
 from cyber_py import cyber
 from modules.common.util.testdata.simple_pb2 import SimpleMessage
 
+
 def callback(data):
     """
-    reader callback.
+    Reader callback.
     """
-    print "="*80
+    print "=" * 80
     print "py:reader callback msg->:"
     print data
-    print "="*80
+    print "=" * 80
+
 
 class TestNode(unittest.TestCase):
+
     """
     Class for node unit test.
     """
@@ -46,7 +49,7 @@ class TestNode(unittest.TestCase):
 
     def test_writer(self):
         """
-        unit test of writer.
+        Unit test of writer.
         """
         msg = SimpleMessage()
         msg.text = "talker:send Alex!"
@@ -56,21 +59,22 @@ class TestNode(unittest.TestCase):
         test_node = cyber.Node("node_name1")
         writer = test_node.create_writer("channel/chatter", SimpleMessage, 7)
         self.assertEqual(writer.name, "channel/chatter")
-        self.assertEqual(writer.data_type, "apollo.common.util.test.SimpleMessage")
+        self.assertEqual(
+            writer.data_type, "apollo.common.util.test.SimpleMessage")
         self.assertTrue(writer.write(msg))
 
     def test_reader(self):
         """
-        unit test of reader.
+        Unit test of reader.
         """
         self.assertTrue(cyber.ok())
         test_node = cyber.Node("listener")
         reader = test_node.create_reader("channel/chatter",
-                SimpleMessage, callback)
+                                         SimpleMessage, callback)
         self.assertEqual(reader.name, "channel/chatter")
         self.assertEqual(reader.data_type, SimpleMessage)
         self.assertEqual(SimpleMessage.DESCRIPTOR.full_name,
-                "apollo.common.util.test.SimpleMessage")
+                         "apollo.common.util.test.SimpleMessage")
 
 if __name__ == '__main__':
     unittest.main()

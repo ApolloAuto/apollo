@@ -122,7 +122,7 @@ TEST(DstTypeFusionTest, test_update_without_measurement) {
       "fusion/dst_type_fusion/params";
   FLAGS_obs_sensor_meta_path = "./conf/sensor_meta.config";
   common::SensorManager *sensor_manager = common::SensorManager::Instance();
-  EXPECT_TRUE(sensor_manager != nullptr);
+  EXPECT_NE(sensor_manager, nullptr);
 
   EXPECT_TRUE(sensor_manager->Init());
 

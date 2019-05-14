@@ -141,9 +141,9 @@ bool TransformWrapper::GetSensor2worldTrans(
 
   if (sensor2novatel_extrinsics_ == nullptr) {
     StampedTransform trans_sensor2novatel;
-    if (QueryTrans(timestamp, &trans_sensor2novatel,
-                   sensor2novatel_tf2_frame_id_,
-                   sensor2novatel_tf2_child_frame_id_) != true) {
+    if (!QueryTrans(timestamp, &trans_sensor2novatel,
+                    sensor2novatel_tf2_frame_id_,
+                    sensor2novatel_tf2_child_frame_id_)) {
       return false;
     }
     sensor2novatel_extrinsics_.reset(new Eigen::Affine3d);
@@ -156,8 +156,8 @@ bool TransformWrapper::GetSensor2worldTrans(
   trans_novatel2world.timestamp = timestamp;
   Eigen::Affine3d novatel2world;
 
-  if (QueryTrans(timestamp, &trans_novatel2world, novatel2world_tf2_frame_id_,
-                 novatel2world_tf2_child_frame_id_) != true) {
+  if (!QueryTrans(timestamp, &trans_novatel2world, novatel2world_tf2_frame_id_,
+                  novatel2world_tf2_child_frame_id_)) {
     if (FLAGS_obs_enable_local_pose_extrapolation) {
       if (!transform_cache_.QueryTransform(
               timestamp, &trans_novatel2world,
@@ -262,7 +262,7 @@ bool TransformWrapper::GetExtrinsicsBySensorId(
 
   StampedTransform transform;
   bool status = QueryTrans(0.0, &transform, frame_id, child_frame_id);
-  if (status == true) {
+  if (status) {
     *trans = transform.translation * transform.rotation;
   }
   return status;

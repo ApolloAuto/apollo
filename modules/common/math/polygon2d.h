@@ -256,6 +256,18 @@ class Polygon2d {
   bool ComputeOverlap(const Polygon2d &other_polygon,
                       Polygon2d *const overlap_polygon) const;
 
+  // Only compute intersection over union ratio between two convex polygons.
+  /**
+   * @brief Compute intersection over union ratio of this polygon and the other
+   * polygon. Note: this function only works for computing overlap
+   * between two convex polygons.
+   * @param other_polygon The target polygon. To compute its overlap with
+   *        this polygon.
+   * @return A value between 0.0 to 1.0, meaning no intersection to fully
+   * overlaping
+   */
+  double ComputeIoU(const Polygon2d &other_polygon) const;
+
   /**
    * @brief Get the axis-aligned bound box of the polygon.
    * @return The axis-aligned bound box of the polygon.

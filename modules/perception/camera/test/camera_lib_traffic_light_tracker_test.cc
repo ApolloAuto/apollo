@@ -38,7 +38,7 @@ void do_test(std::shared_ptr<SemanticReviser> _reviser,
     frame.traffic_lights = light;
     _reviser->Track(option, &frame);
     frame.timestamp += 0.1;
-    EXPECT_TRUE(light[0]->status.color == color);
+    EXPECT_EQ(light[0]->status.color, color);
   }
 }
 
@@ -103,8 +103,8 @@ TEST(SemanticReviser, mix) {
     frame.traffic_lights = light;
     reviser->Track(option, &frame);
     frame.timestamp += 0.1;
-    EXPECT_TRUE(frame.traffic_lights.at(0)->status.color ==
-                base::TLColor(gt_list[i]));
+    EXPECT_EQ(frame.traffic_lights.at(0)->status.color,
+              base::TLColor(gt_list[i]));
   }
 }
 
@@ -130,8 +130,8 @@ TEST(SemanticReviser, mix_yellow) {
     frame.traffic_lights = light;
     reviser->Track(option, &frame);
     frame.timestamp += 0.1;
-    EXPECT_TRUE(frame.traffic_lights.at(0)->status.color ==
-                base::TLColor(gt_list[i]));
+    EXPECT_EQ(frame.traffic_lights.at(0)->status.color,
+              base::TLColor(gt_list[i]));
   }
 }
 
@@ -157,8 +157,8 @@ TEST(SemanticReviser, mix_black) {
     frame.traffic_lights = light;
     reviser->Track(option, &frame);
     frame.timestamp += 0.1;
-    EXPECT_TRUE(frame.traffic_lights.at(0)->status.color ==
-                base::TLColor(gt_list[i]));
+    EXPECT_EQ(frame.traffic_lights.at(0)->status.color,
+              base::TLColor(gt_list[i]));
   }
 }
 
@@ -184,8 +184,8 @@ TEST(SemanticReviser, unknown_to_black) {
     frame.traffic_lights = light;
     reviser->Track(option, &frame);
     frame.timestamp += 0.1;
-    EXPECT_TRUE(frame.traffic_lights.at(0)->status.color ==
-                base::TLColor(gt_list[i]));
+    EXPECT_EQ(frame.traffic_lights.at(0)->status.color,
+              base::TLColor(gt_list[i]));
   }
 }
 
@@ -211,8 +211,8 @@ TEST(SemanticReviser, black_to_unknown) {
     frame.traffic_lights = light;
     reviser->Track(option, &frame);
     frame.timestamp += 0.1;
-    EXPECT_TRUE(frame.traffic_lights.at(0)->status.color ==
-                base::TLColor(gt_list[i]));
+    EXPECT_EQ(frame.traffic_lights.at(0)->status.color,
+              base::TLColor(gt_list[i]));
   }
 }
 
@@ -274,11 +274,11 @@ TEST(SemanticReviser, mix_yellow_red_flash) {
     frame.timestamp = ts_list[i];
     reviser->Track(option, &frame);
     AINFO << "cur index " << i;
-    EXPECT_TRUE(frame.traffic_lights.at(0)->status.color ==
-                base::TLColor(gt_list[i]));
-    EXPECT_TRUE(frame.traffic_lights.at(1)->status.color ==
-                base::TLColor(gt_list[i]));
-    EXPECT_TRUE(frame.traffic_lights.at(2)->status.color == base::TLColor(0));
+    EXPECT_EQ(frame.traffic_lights.at(0)->status.color,
+              base::TLColor(gt_list[i]));
+    EXPECT_EQ(frame.traffic_lights.at(1)->status.color,
+              base::TLColor(gt_list[i]));
+    EXPECT_EQ(frame.traffic_lights.at(2)->status.color, base::TLColor(0));
   }
 }
 
@@ -316,10 +316,10 @@ TEST(SemanticReviser, green_blink) {
     frame.traffic_lights = light;
     reviser->Track(option, &frame);
     frame.timestamp += 0.125;
-    EXPECT_TRUE(frame.traffic_lights.at(0)->status.color ==
-                base::TLColor(gt_list[i]));
-    EXPECT_TRUE(frame.traffic_lights.at(0)->status.blink ==
-                static_cast<bool>(blink_gt_list[i]));
+    EXPECT_EQ(frame.traffic_lights.at(0)->status.color,
+              base::TLColor(gt_list[i]));
+    EXPECT_EQ(frame.traffic_lights.at(0)->status.blink,
+              static_cast<bool>(blink_gt_list[i]));
   }
 }
 

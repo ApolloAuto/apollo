@@ -258,7 +258,7 @@ void SimulationWorldUpdater::RegisterMessageHandlers() {
 
         Json response;
         response["type"] = "DataCollectionProgress";
-        response["data"] = data_collection_monitor_->GetProgressString();
+        response["data"] = data_collection_monitor_->GetProgressAsJson();
         websocket_->SendData(conn, response.dump());
       });
 }

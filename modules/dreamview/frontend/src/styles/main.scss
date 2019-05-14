@@ -31,8 +31,13 @@
         padding-left: 5px;
 
         line-height: 150%;
-        font-size: 12px;
+        font-size: 14px;
         word-wrap: break-word;
+        white-space: pre-wrap;
+
+        @include small-screen {
+            font-size: 12px;
+        }
     }
 
     .time {
@@ -68,6 +73,10 @@ body {
     }
 }
 
+.no-data {
+    padding: 20px;
+    color: #B43131;
+}
 
 
 /* Adjust the scrollbar style. */
@@ -287,14 +296,17 @@ body {
             }
         }
 
-        .pnc-monitor {
+        .monitor {
             height: 100%;
+            width: 100%;
             border: 1px solid #000000;
             box-sizing: border-box;
         
             background-color: #1D2226;
             overflow: auto;
-        
+        }
+
+        .pnc-monitor {
             .scatter-graph {
                 margin: 0px;
                 border: 1px #000000;
@@ -336,6 +348,76 @@ body {
                         .time {
                             text-align: center;
                         }
+                    }
+                }
+            }
+        }
+
+        .data-collection-monitor {
+            position: relative;
+            width: 100%;
+
+            .scenario-container {
+                position: absolute;
+            }
+
+            .section-divider-on-top {
+                border-top: 2px solid #080A0C;
+            }
+
+            .category-container {
+                position: relative;
+                width: 100%;
+                margin-bottom: 15px;
+
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .dummy-category {
+                flex: 1 0 50%;
+                align-self: flex-end;
+                min-width: 130px;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .category {
+                flex: 1 0 50%;
+                align-self: flex-end;
+                min-width: 130px;
+                overflow: hidden;
+                position: relative;
+
+                .category-description {
+                    position: relative;
+                    margin: 15px 0px 0px 10px;
+                    font-size: 12px;
+
+                    color: #888888;
+                }
+                .category-updated {
+                    color: #FFFFFF;
+                }
+
+                .category-progress-background {
+                    position: relative;
+                    height: 6px;
+                    margin: 5px 10px;
+                    background-color: #333639;
+
+                    .category-in-progress {
+                        position: absolute;
+                        height: 100%;
+                        background: #006AFF;
+                    }
+
+                    .category-completed {
+                        position: absolute;
+                        height: 100%;
+                        background: #113B73;
                     }
                 }
             }
@@ -492,6 +574,7 @@ body {
 
         li {
             line-height: 40px;
+            white-space: nowrap;
 
             span {
                 margin-left: 15px;
@@ -642,7 +725,7 @@ body {
         overflow: hidden;
 
         .monitor-item {
-            @include monitor-item-common-properties(calc(100% - 80px));
+            @include monitor-item-common-properties(calc(100% - 82px));
         }
     }
 
@@ -855,6 +938,14 @@ body {
             .meter-label {
                 font-size: 13px;
                 color: #ffffff;
+
+                .meter-value {
+                    position: absolute;
+                    top: 2px;
+                    right: 10px;
+
+                    font-size: 10px;
+                }
             }
 
             .meter-head {
@@ -1076,12 +1167,10 @@ body {
     }
 
     .others {
-        min-width: 200px;
-        max-width: 280px;
+        min-width: 245px;
 
         @include small-screen {
-            min-width: 180px;
-            max-width: 260px;
+            min-width: 225px;
         }
 
         .others-checkbox {
@@ -1090,8 +1179,12 @@ body {
     }
 
     .delay {
-        min-width: 265px;
+        min-width: 260px;
         line-height: 26px;
+
+        @include small-screen {
+            min-width: 230px;
+        }
 
         .delay-item {
             position: relative;
@@ -1360,7 +1453,7 @@ body {
         }
 
         .drive-event-row {
-            span {
+            .event-time {
                 position: relative;
                 padding: 10px 5px 10px 10px;
                 background: #101315;
@@ -1435,6 +1528,16 @@ body {
         .submit-button:active {
             @extend %drive-event-button;
             background: #383838;
+        }
+
+        .multiple-items {
+            display: flex;
+            justify-content: flex-start;
+            justify-content: space-between;
+
+            padding: 0px;
+            border: none;
+            background: #1D2226;
         }
     }
 }

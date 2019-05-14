@@ -62,7 +62,7 @@ TEST(RTKReplayPlannerTest, ComputeTrajectory) {
 
   const auto& trajectory = info.trajectory();
   EXPECT_TRUE(status.ok());
-  EXPECT_TRUE(!trajectory.empty());
+  EXPECT_FALSE(trajectory.empty());
   EXPECT_EQ(trajectory.size(), FLAGS_rtk_trajectory_forward);
 
   auto first_point = trajectory.begin();

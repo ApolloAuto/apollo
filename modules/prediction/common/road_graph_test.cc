@@ -25,11 +25,11 @@ class RoadGraphTest : public KMLMapBasedTest {};
 
 TEST_F(RoadGraphTest, General) {
   auto lane = PredictionMap::LaneById("l9");
-  EXPECT_TRUE(lane != nullptr);
+  EXPECT_NE(lane, nullptr);
 
   double start_s = 99.0;
   double length = 100.0;
-  RoadGraph road_graph(start_s, length, lane);
+  RoadGraph road_graph(start_s, length, true, lane);
 
   LaneGraph lane_graph;
   EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
@@ -59,11 +59,11 @@ TEST_F(RoadGraphTest, General) {
 
 TEST_F(RoadGraphTest, NegativeStartS) {
   auto lane = PredictionMap::LaneById("l9");
-  EXPECT_TRUE(lane != nullptr);
+  EXPECT_NE(lane, nullptr);
 
   double start_s = -10.0;
   double length = 50.0;
-  RoadGraph road_graph(start_s, length, lane);
+  RoadGraph road_graph(start_s, length, true, lane);
 
   LaneGraph lane_graph;
   EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
@@ -82,11 +82,11 @@ TEST_F(RoadGraphTest, NegativeStartS) {
 
 TEST_F(RoadGraphTest, LengthLongerThanEnd) {
   auto lane = PredictionMap::LaneById("l22");
-  EXPECT_TRUE(lane != nullptr);
+  EXPECT_NE(lane, nullptr);
 
   double start_s = 200.0;
   double length = 200.0;
-  RoadGraph road_graph(start_s, length, lane);
+  RoadGraph road_graph(start_s, length, true, lane);
 
   LaneGraph lane_graph;
   EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());
@@ -107,11 +107,11 @@ TEST_F(RoadGraphTest, LengthLongerThanEnd) {
 
 TEST_F(RoadGraphTest, MultipleLaneSequence) {
   auto lane = PredictionMap::LaneById("l20");
-  EXPECT_TRUE(lane != nullptr);
+  EXPECT_NE(lane, nullptr);
 
   double start_s = 200.0;
   double length = 200.0;
-  RoadGraph road_graph(start_s, length, lane);
+  RoadGraph road_graph(start_s, length, true, lane);
 
   LaneGraph lane_graph;
   EXPECT_TRUE(road_graph.BuildLaneGraph(&lane_graph).ok());

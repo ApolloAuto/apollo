@@ -34,8 +34,9 @@
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/common/util/common.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/proto/planning_status.pb.h"
-#include "modules/planning/traffic_rules/util.h"
 
 namespace apollo {
 namespace planning {
@@ -44,7 +45,6 @@ using apollo::common::Status;
 using apollo::common::math::Polygon2d;
 using apollo::common::math::Vec2d;
 using apollo::common::time::Clock;
-using apollo::common::util::WithinBound;
 using apollo::hdmap::CrosswalkInfoConstPtr;
 using apollo::hdmap::HDMapUtil;
 using apollo::hdmap::PathOverlap;
@@ -62,7 +62,7 @@ Status Crosswalk::ApplyRule(Frame* const frame,
   CHECK_NOTNULL(reference_line_info);
 
   if (!FindCrosswalks(reference_line_info)) {
-    PlanningContext::MutablePlanningStatus()->clear_crosswalk();
+    PlanningContext::Instance()->mutable_planning_status()->clear_crosswalk();
     return Status::OK();
   }
 
@@ -75,8 +75,9 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  auto* mutable_crosswalk_status =
-      PlanningContext::MutablePlanningStatus()->mutable_crosswalk();
+  auto* mutable_crosswalk_status = PlanningContext::Instance()
+                                       ->mutable_planning_status()
+                                       ->mutable_crosswalk();
 
   auto* path_decision = reference_line_info->path_decision();
   double adc_front_edge_s = reference_line_info->AdcSlBoundary().end_s();
@@ -86,20 +87,15 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   // read crosswalk_stop_timer from saved status
   CrosswalkStopTimer crosswalk_stop_timer;
   std::unordered_map<std::string, double> stop_times;
-  for (int i = 0; i < mutable_crosswalk_status->stop_time_size(); ++i) {
-    stop_times.insert(
-        {mutable_crosswalk_status->stop_time(i).obstacle_id(),
-         mutable_crosswalk_status->stop_time(i).obstacle_stop_timestamp()});
+  for (const auto& stop_time : mutable_crosswalk_status->stop_time()) {
+    stop_times.emplace(stop_time.obstacle_id(),
+                       stop_time.obstacle_stop_timestamp());
   }
-  crosswalk_stop_timer.insert(
-      {mutable_crosswalk_status->crosswalk_id(), stop_times});
+  crosswalk_stop_timer.emplace(mutable_crosswalk_status->crosswalk_id(),
+                               stop_times);
 
-  std::vector<std::string> finished_crosswalks;
-  for (int i = 0; i < mutable_crosswalk_status->finished_crosswalk_size();
-       i++) {
-    finished_crosswalks.push_back(
-        mutable_crosswalk_status->finished_crosswalk(i));
-  }
+  const auto& finished_crosswalks =
+      mutable_crosswalk_status->finished_crosswalk();
 
   const auto& reference_line = reference_line_info->reference_line();
   for (auto crosswalk_overlap : crosswalk_overlaps_) {
@@ -134,8 +130,11 @@ void Crosswalk::MakeDecisions(Frame* const frame,
 
     std::vector<std::string> pedestrians;
     for (const auto* obstacle : path_decision->obstacles().Items()) {
-      bool stop =
-          CheckStopForObstacle(reference_line_info, crosswalk_ptr, *obstacle);
+      const double stop_deceleration = util::GetADCStopDeceleration(
+          adc_front_edge_s, crosswalk_overlap->start_s);
+
+      bool stop = CheckStopForObstacle(reference_line_info, crosswalk_ptr,
+                                       *obstacle, stop_deceleration);
 
       const std::string& obstacle_id = obstacle->Id();
       const PerceptionObstacle& perception_obstacle = obstacle->Perception();
@@ -187,15 +186,8 @@ void Crosswalk::MakeDecisions(Frame* const frame,
     }
 
     if (!pedestrians.empty()) {
-      // stop decision
-      double stop_deceleration = util::GetADCStopDeceleration(
-          reference_line_info, crosswalk_overlap->start_s,
-          config_.crosswalk().min_pass_s_distance());
-      if (stop_deceleration < config_.crosswalk().max_stop_deceleration()) {
-        crosswalks_to_stop.push_back(
-            std::make_pair(crosswalk_overlap, pedestrians));
-        ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
-      }
+      crosswalks_to_stop.emplace_back(crosswalk_overlap, pedestrians);
+      ADEBUG << "crosswalk_id[" << crosswalk_id << "] STOP";
     }
   }
 
@@ -203,9 +195,18 @@ void Crosswalk::MakeDecisions(Frame* const frame,
   hdmap::PathOverlap* firsts_crosswalk_to_stop = nullptr;
   for (auto crosswalk_to_stop : crosswalks_to_stop) {
     // build stop decision
-    BuildStopDecision(frame, reference_line_info,
-                      const_cast<hdmap::PathOverlap*>(crosswalk_to_stop.first),
-                      crosswalk_to_stop.second);
+    const auto* crosswalk_overlap = crosswalk_to_stop.first;
+    ADEBUG << "BuildStopDecision: crosswalk[" << crosswalk_overlap->object_id
+           << "] start_s[" << crosswalk_overlap->start_s << "]";
+    std::string virtual_obstacle_id =
+        CROSSWALK_VO_ID_PREFIX + crosswalk_overlap->object_id;
+    util::BuildStopDecision(virtual_obstacle_id,
+                            crosswalk_overlap->start_s,
+                            config_.crosswalk().stop_distance(),
+                            StopReasonCode::STOP_REASON_CROSSWALK,
+                            crosswalk_to_stop.second,
+                            TrafficRuleConfig::RuleId_Name(config_.rule_id()),
+                            frame, reference_line_info);
 
     if (crosswalk_to_stop.first->start_s < min_s) {
       firsts_crosswalk_to_stop =
@@ -219,13 +220,12 @@ void Crosswalk::MakeDecisions(Frame* const frame,
     std::string crosswalk = firsts_crosswalk_to_stop->object_id;
     mutable_crosswalk_status->set_crosswalk_id(crosswalk);
     mutable_crosswalk_status->clear_stop_time();
-    for (auto it = crosswalk_stop_timer[crosswalk].begin();
-         it != crosswalk_stop_timer[crosswalk].end(); ++it) {
+    for (const auto& timer : crosswalk_stop_timer[crosswalk]) {
       auto* stop_time = mutable_crosswalk_status->add_stop_time();
-      stop_time->set_obstacle_id(it->first);
-      stop_time->set_obstacle_stop_timestamp(it->second);
+      stop_time->set_obstacle_id(timer.first);
+      stop_time->set_obstacle_stop_timestamp(timer.second);
       ADEBUG << "UPDATE stop_time: id[" << crosswalk << "] obstacle_id["
-             << it->first << "] stop_timestamp[" << it->second << "]";
+             << timer.first << "] stop_timestamp[" << timer.second << "]";
     }
 
     // update CrosswalkStatus.finished_crosswalk
@@ -256,7 +256,9 @@ bool Crosswalk::FindCrosswalks(ReferenceLineInfo* const reference_line_info) {
 
 bool Crosswalk::CheckStopForObstacle(
     ReferenceLineInfo* const reference_line_info,
-    const CrosswalkInfoConstPtr crosswalk_ptr, const Obstacle& obstacle) {
+    const CrosswalkInfoConstPtr crosswalk_ptr,
+    const Obstacle& obstacle,
+    const double stop_deceleration) {
   CHECK_NOTNULL(reference_line_info);
 
   std::string crosswalk_id = crosswalk_ptr->id().id();
@@ -327,9 +329,9 @@ bool Crosswalk::CheckStopForObstacle(
              << obstacle_type_name << "] crosswalk_id[" << crosswalk_id << "]";
     }
   } else if (obstacle_l_distance <=
-             config_.crosswalk().stop_strick_l_distance()) {
+             config_.crosswalk().stop_strict_l_distance()) {
     if (is_on_road) {
-      // (2) when l_distance <= strick_l_distance + on_road
+      // (2) when l_distance <= strict_l_distance + on_road
       //     always STOP
       if (obstacle_sl_point.s() > adc_end_edge_s) {
         stop = true;
@@ -339,7 +341,7 @@ bool Crosswalk::CheckStopForObstacle(
                << crosswalk_id << "] ON_ROAD";
       }
     } else {
-      // (3) when l_distance <= strick_l_distance
+      // (3) when l_distance <= strict_l_distance
       //     + NOT on_road(i.e. on crosswalk/median etc)
       //     STOP if paths cross
       if (is_path_cross) {
@@ -348,7 +350,7 @@ bool Crosswalk::CheckStopForObstacle(
                << obstacle_type_name << "] crosswalk_id[" << crosswalk_id
                << "] PATH_CRSOSS";
       } else {
-        // (4) when l_distance <= strick_l_distance
+        // (4) when l_distance <= strict_l_distance
         //     + NOT on_road(i.e. on crosswalk/median etc)
         //     STOP if he pedestrian is moving toward the ego vehicle
         const auto obstacle_v = Vec2d(perception_obstacle.velocity().x(),
@@ -370,7 +372,7 @@ bool Crosswalk::CheckStopForObstacle(
       }
     }
   } else {
-    // (4) when l_distance is between loose_l and strick_l
+    // (4) when l_distance is between loose_l and strict_l
     //     use history decision of this crosswalk to smooth unsteadiness
 
     // TODO(all): replace this temp implementation
@@ -383,64 +385,19 @@ bool Crosswalk::CheckStopForObstacle(
            << "] USE_PREVIOUS_DECISION";
   }
 
+  // check stop_deceleration
+  if (stop) {
+    if (stop_deceleration >= config_.crosswalk().max_stop_deceleration()) {
+      if (obstacle_l_distance > config_.crosswalk().stop_strict_l_distance()) {
+        // SKIP when stop_deceleration is too big but safe to ignore
+        stop = false;
+      }
+      AWARN << "crosswalk_id[" << crosswalk_id
+            << "] stop_deceleration[" << stop_deceleration << "]";
+    }
+  }
+
   return stop;
-}
-
-int Crosswalk::BuildStopDecision(Frame* const frame,
-                                 ReferenceLineInfo* const reference_line_info,
-                                 hdmap::PathOverlap* const crosswalk_overlap,
-                                 std::vector<std::string> pedestrians) {
-  CHECK_NOTNULL(frame);
-  CHECK_NOTNULL(reference_line_info);
-  CHECK_NOTNULL(crosswalk_overlap);
-
-  // check
-  const auto& reference_line = reference_line_info->reference_line();
-  if (!WithinBound(0.0, reference_line.Length(), crosswalk_overlap->start_s)) {
-    ADEBUG << "crosswalk [" << crosswalk_overlap->object_id
-           << "] is not on reference line";
-    return 0;
-  }
-
-  // create virtual stop wall
-  std::string virtual_obstacle_id =
-      CROSSWALK_VO_ID_PREFIX + crosswalk_overlap->object_id;
-  auto* obstacle = frame->CreateStopObstacle(
-      reference_line_info, virtual_obstacle_id, crosswalk_overlap->start_s);
-  if (!obstacle) {
-    AERROR << "Failed to create obstacle[" << virtual_obstacle_id << "]";
-    return -1;
-  }
-  Obstacle* stop_wall = reference_line_info->AddObstacle(obstacle);
-  if (!stop_wall) {
-    AERROR << "Failed to create obstacle for: " << virtual_obstacle_id;
-    return -1;
-  }
-
-  // build stop decision
-  const double stop_s =
-      crosswalk_overlap->start_s - config_.crosswalk().stop_distance();
-  auto stop_point = reference_line.GetReferencePoint(stop_s);
-  double stop_heading = reference_line.GetReferencePoint(stop_s).heading();
-
-  ObjectDecisionType stop;
-  auto stop_decision = stop.mutable_stop();
-  stop_decision->set_reason_code(StopReasonCode::STOP_REASON_CROSSWALK);
-  stop_decision->set_distance_s(-config_.crosswalk().stop_distance());
-  stop_decision->set_stop_heading(stop_heading);
-  stop_decision->mutable_stop_point()->set_x(stop_point.x());
-  stop_decision->mutable_stop_point()->set_y(stop_point.y());
-  stop_decision->mutable_stop_point()->set_z(0.0);
-
-  for (auto pedestrian : pedestrians) {
-    stop_decision->add_wait_for_obstacle(pedestrian);
-  }
-
-  auto* path_decision = reference_line_info->path_decision();
-  path_decision->AddLongitudinalDecision(
-      TrafficRuleConfig::RuleId_Name(config_.rule_id()), stop_wall->Id(), stop);
-
-  return 0;
 }
 
 }  // namespace planning

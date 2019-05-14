@@ -389,7 +389,7 @@ void TrafficLightDetection::ApplyNMS(std::vector<base::TrafficLightPtr> *lights,
       });
 
   std::vector<int> kept_indices;
-  while (score_index_vec.size() != 0) {
+  while (!score_index_vec.empty()) {
     const int idx = score_index_vec.back().second;
     bool keep = true;
     for (size_t k = 0; k < kept_indices.size(); ++k) {

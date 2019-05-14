@@ -65,7 +65,7 @@ bool ProjectFeature::Extract(const FeatureExtractorOptions &options,
                              CameraFrame *frame) {
   auto input_blob = inference_->get_blob(param_.input_blob());
   auto output_blob = inference_->get_blob(param_.feat_blob());
-  if (frame->detected_objects.size() == 0) {
+  if (frame->detected_objects.empty()) {
     return true;
   }
   input_blob->Reshape(frame->track_feature_blob->shape());

@@ -153,7 +153,7 @@ void RTKLocalization::RunWatchDog(double gps_timestamp) {
   if (imu_delay_cycle_cnt > report_threshold_err_num_) {
     msg_delay = true;
     std::stringstream ss;
-    ss << "Raw GPS Message Delay. IMU message is " << imu_delay_cycle_cnt
+    ss << "Raw IMU Message Delay. IMU message is " << imu_delay_cycle_cnt
        << " cycle " << imu_delay_sec << " sec behind current time.";
     monitor_logger_.ERROR(ss.str());
   }
@@ -221,7 +221,7 @@ void RTKLocalization::FillLocalizationStatusMsg(
     case drivers::gnss::SolutionType::INS_RTKFLOAT:
       localization_status->set_fusion_status(MeasureState::WARNNING);
       localization_status->set_state_message(
-          "Warnning: Current Localization Is Unstable.");
+          "Warning: Current Localization Is Unstable.");
       break;
     default:
       localization_status->set_fusion_status(MeasureState::ERROR);

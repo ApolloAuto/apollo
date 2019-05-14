@@ -9,13 +9,13 @@ gear: GEAR_DRIVE
 decision {
   main_decision {
     cruise {
-      change_lane_type: LEFT
+      change_lane_type: FORWARD
     }
   }
   object_decision {
   }
   vehicle_signal {
-    turn_signal: TURN_LEFT
+    turn_signal: TURN_NONE
   }
 }
 routing_header {
@@ -25,10 +25,10 @@ routing_header {
 }
 right_of_way_status: UNPROTECTED
 lane_id {
-  id: "3143_1_-1"
+  id: "3143_1_-2"
 }
 engage_advice {
   advice: KEEP_ENGAGED
 }
-trajectory_type: NORMAL
+trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for no previous trajectory."

@@ -47,7 +47,7 @@ bool RadarDetectionComponent::Init() {
       comp_config.output_channel_name());
 
   // Init algorithm plugin
-  CHECK(InitAlgorithmPlugin() == true) << "Failed to init algorithm plugin.";
+  CHECK(InitAlgorithmPlugin()) << "Failed to init algorithm plugin.";
   radar2world_trans_.Init(tf_child_frame_id_);
   radar2novatel_trans_.Init(tf_child_frame_id_);
   localization_subscriber_.Init(
@@ -62,12 +62,12 @@ bool RadarDetectionComponent::Proc(const std::shared_ptr<ContiRadar>& message) {
         << " current timestamp " << lib::TimeUtil::GetCurrentTime();
   std::shared_ptr<SensorFrameMessage> out_message(new (std::nothrow)
                                                       SensorFrameMessage);
-  int status = InternalProc(message, out_message);
-  if (status) {
-    writer_->Write(out_message);
-    AINFO << "Send radar processing output message.";
+  if (!InternalProc(message, out_message)) {
+    return false;
   }
-  return status;
+  writer_->Write(out_message);
+  AINFO << "Send radar processing output message.";
+  return true;
 }
 
 bool RadarDetectionComponent::InitAlgorithmPlugin() {

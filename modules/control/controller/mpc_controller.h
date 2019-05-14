@@ -47,7 +47,7 @@ namespace control {
 /**
  * @class MPCController
  *
- * @brief MPCController, combined lateral and logitudinal controllers
+ * @brief MPCController, combined lateral and longitudinal controllers
  */
 class MPCController : public Controller {
  public:
@@ -108,6 +108,7 @@ class MPCController : public Controller {
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
+                            const double linear_a,
                             const TrajectoryAnalyzer &trajectory_analyzer,
                             SimpleMPCDebug *debug);
 
@@ -209,6 +210,21 @@ class MPCController : public Controller {
   // lateral distance to reference trajectory of last control cycle
   double previous_lateral_error_ = 0.0;
 
+  // lateral dynamic variables for computing the differential valute to
+  // estimate acceleration and jerk
+  double previous_lateral_acceleration_ = 0.0;
+
+  double previous_heading_rate_ = 0.0;
+  double previous_ref_heading_rate_ = 0.0;
+
+  double previous_heading_acceleration_ = 0.0;
+  double previous_ref_heading_acceleration_ = 0.0;
+
+  // longitudinal dynamic variables for computing the differential valute to
+  // estimate acceleration and jerk
+  double previous_acceleration_ = 0.0;
+  double previous_acceleration_reference_ = 0.0;
+
   // parameters for mpc solver; number of iterations
   int mpc_max_iteration_ = 0;
   // parameters for mpc solver; threshold for computation
@@ -231,9 +247,9 @@ class MPCController : public Controller {
 
   double standstill_acceleration_ = 0.0;
 
-  double throttle_deadzone_ = 0.0;
+  double throttle_lowerbound_ = 0.0;
 
-  double brake_deadzone_ = 0.0;
+  double brake_lowerbound_ = 0.0;
 
   double steer_angle_feedforwardterm_ = 0.0;
 
@@ -250,6 +266,14 @@ class MPCController : public Controller {
   common::MeanFilter heading_error_filter_;
 
   double minimum_speed_protection_ = 0.1;
+
+  // Enable the feedback-gain-related compensation components in the feedfoward
+  // term for steering control
+  bool enable_mpc_feedforward_compensation_ = false;
+
+  // Limitation for judging if the unconstraint analytical control is close
+  // enough to the the solver's output with constraint
+  double unconstraint_control_diff_limit_ = 5.0;
 };
 
 }  // namespace control

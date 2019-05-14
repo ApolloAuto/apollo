@@ -6,32 +6,56 @@ cc_library(
     name = "decider",
     srcs = [
         "decider_creep.cc",
-        "decider_rule_based_stop.cc",
-        "path_bounds_decider.cc",
-        "side_pass_path_decider.cc",
-        "side_pass_safety.cc",
     ],
     hdrs = [
         "decider_creep.h",
-        "decider_rule_based_stop.h",
-        "path_bounds_decider.h",
-        "side_pass_path_decider.h",
-        "side_pass_safety.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
         ":open_space_fallback_decider",
+        ":open_space_pre_stop_decider",
         ":open_space_roi_decider",
         "//modules/perception/proto:perception_proto",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
         "//modules/planning/common:st_graph_data",
-        "//modules/planning/math/finite_element_qp:fem_1d_qp_problem",
-        "//modules/planning/scenarios/util:util_lib",
+        "//modules/planning/common/util:common_lib",
+        "//modules/planning/common/util:util_lib",
+        "//modules/planning/math/piecewise_jerk:piecewise_jerk_path_problem",
+        "//modules/planning/scenarios/util:scenario_util_lib",
         "//modules/planning/tasks/deciders/speed_bounds_decider",
         "//modules/planning/tasks/deciders/speed_bounds_decider:st_boundary_mapper",
+    ],
+)
+
+cc_library(
+    name = "open_space_pre_stop_decider",
+    srcs = [
+        "open_space_pre_stop_decider.cc",
+    ],
+    hdrs = [
+        "open_space_pre_stop_decider.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        ":decider_base",
+        "//modules/planning/common:reference_line_info",
+        "//modules/planning/common/util:common_lib",
+    ],
+)
+
+cc_library(
+    name = "path_decider_obstacle_utils",
+    srcs = [
+        "path_decider_obstacle_utils.cc",
+    ],
+    hdrs = [
+        "path_decider_obstacle_utils.h",
+    ],
+    deps = [
+        "//modules/planning/common:frame",
     ],
 )
 
@@ -62,6 +86,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":decider_base",
+        "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
     ],
@@ -103,19 +128,6 @@ cc_test(
     ],
     deps = [
         ":open_space_roi_decider",
-        "@gtest//:main",
-    ],
-)
-
-cc_test(
-    name = "side_pass_decider_test",
-    size = "small",
-    srcs = [
-        "side_pass_path_decider_test.cc",
-        "side_pass_safety_test.cc",
-    ],
-    deps = [
-        ":decider",
         "@gtest//:main",
     ],
 )
