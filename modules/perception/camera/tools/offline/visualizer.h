@@ -178,6 +178,7 @@ class Visualizer {
   bool show_polygon_ = true;
   bool show_text_ = false;
   bool show_help_text_ = false;
+  bool manual_calibration_mode_ = false;
   std::string help_str_;
   // color
   cv::Scalar color_cipv_ = cv::Scalar(255, 255, 255);

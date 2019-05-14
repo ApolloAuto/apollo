@@ -21,6 +21,7 @@
 
 #include "cyber/common/file.h"
 #include "cyber/common/log.h"
+#include "modules/perception/camera/tools/offline/keycode.h"
 
 namespace apollo {
 namespace perception {
@@ -370,6 +371,7 @@ bool Visualizer::reset_key() {
   show_polygon_ = true;
   show_text_ = false;
   show_help_text_ = false;
+  manual_calibration_mode_ = false;
   return true;
 }
 
@@ -605,105 +607,116 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     return false;
   }
   switch (key) {
-    case 48:  // 0
+    case KEY_0:
       show_associate_color_ = !show_associate_color_;
       break;
-    case 50:  // 2
+    case KEY_2:
       show_camera_box2d_ = !show_camera_box2d_;
       break;
-    case 51:  // 3
+    case KEY_3:
       show_camera_box3d_ = !show_camera_box3d_;
       break;
-    case 65: case 97:  // 'A' 'a'
+    case KEY_UPPER_A: case KEY_LOWER_A:
       capture_video_ = !capture_video_;
       break;
-    case 66: case 98:  // 'B' 'b'
+    case KEY_UPPER_B: case KEY_LOWER_B:
       show_box_ = (show_box_ + 1) % 2;
       break;
-    case 67: case 99:  // 'C' 'd'
+    case KEY_UPPER_C: case KEY_LOWER_C:
       use_class_color_ = !use_class_color_;
       break;
-    case 68: case 100:  // 'D' 'd'
+    case KEY_UPPER_D: case KEY_LOWER_D:
       show_radar_pc_ = !show_radar_pc_;
       break;
-    case 69: case 101:  // 'E' 'e'
+    case KEY_UPPER_E: case KEY_LOWER_E:
       draw_lane_objects_ = !draw_lane_objects_;
       break;
-    case 70: case 102:  // 'F' 'f'
+    case KEY_UPPER_F: case KEY_LOWER_F:
       show_fusion_ = !show_fusion_;
       break;
-    case 71: case 103:  // 'G' 'g'
+    case KEY_UPPER_G: case KEY_LOWER_G:
       show_vp_grid_ = !show_vp_grid_;
       break;
-    case 72: case 104:  // 'H' 'h'
+    case KEY_UPPER_H: case KEY_LOWER_H:
       show_help_text_ = !show_help_text_;
       break;
-    case 73: case 105:  // 'I' 'i'
+    case KEY_UPPER_I: case KEY_LOWER_I:
       show_type_id_label_ = !show_type_id_label_;
       break;
-    case 76: case 108:  // 'L' 'l'
+    case KEY_UPPER_L: case KEY_LOWER_L:
       show_verbose_ = !show_verbose_;
       break;
-    case 79: case 111:  // 'O' 'o'
+    case KEY_UPPER_O: case KEY_LOWER_O:
       show_camera_bdv_ = !show_camera_bdv_;
       break;
-    case 81: case 113:  // 'Q' 'q'
+    case KEY_UPPER_Q: case KEY_LOWER_Q:
       show_lane_ = !show_lane_;
       break;
-    case 82: case 114:  // 'R' 'r'
+    case KEY_UPPER_R: case KEY_LOWER_R:
       reset_key();
       break;
-    case 83: case 115:  // 'S' 's'
+    case KEY_UPPER_S: case KEY_LOWER_S:
       capture_screen_ = true;
       break;
-    case 84: case 116:  // 'T' 't'
+    case KEY_UPPER_T: case KEY_LOWER_T:
       show_trajectory_ = !show_trajectory_;
       break;
-    case 86: case 118:  // 'V' 'v'
+    case KEY_UPPER_V: case KEY_LOWER_V:
       show_velocity_ = (show_velocity_ + 1) % 2;
       break;
-    case 65362:  // Up_Arrow
-      if (pitch_adj_degree_ + 0.05 <= max_pitch_degree_) {
+    case KEY_UP_NUM_LOCK_ON: case KEY_UP:
+      if (manual_calibration_mode_ &&
+          pitch_adj_degree_ + 0.05 <= max_pitch_degree_) {
         pitch_adj_degree_ -= 0.05;
       }
       AINFO << "Current pitch: " << pitch_adj_degree_;
       break;
-    case 65364:  // Down_Arrow
-      if (pitch_adj_degree_ - 0.05 >= min_pitch_degree_) {
+    case KEY_DOWN_NUM_LOCK_ON: case KEY_DOWN:
+      if (manual_calibration_mode_ &&
+          pitch_adj_degree_ - 0.05 >= min_pitch_degree_) {
         pitch_adj_degree_ += 0.05;
       }
       AINFO << "Current pitch: " << pitch_adj_degree_;
       break;
-    case 65363:  // Right_Arrow
-      if (yaw_adj_degree_ + 0.05 <= max_yaw_degree_) {
+    case KEY_RIGHT_NUM_LOCK_ON: case KEY_RIGHT:
+      if (manual_calibration_mode_ &&
+          yaw_adj_degree_ + 0.05 <= max_yaw_degree_) {
         yaw_adj_degree_ -= 0.05;
       }
       AINFO << "Current yaw: " << yaw_adj_degree_;
       break;
-    case 65361:  // Left_Arrow
-      if (yaw_adj_degree_ - 0.05 >= min_yaw_degree_) {
+    case KEY_LEFT_NUM_LOCK_ON: case KEY_LEFT:
+      if (manual_calibration_mode_ &&
+          yaw_adj_degree_ - 0.05 >= min_yaw_degree_) {
         yaw_adj_degree_ += 0.05;
       }
       AINFO << "Current yaw: " << yaw_adj_degree_;
       break;
-    case 130899:  // SHIFT + Right_Arrow
-      if (roll_adj_degree_ + 0.05 <= max_roll_degree_) {
+    case KEY_SHIFT_LEFT_NUM_LOCK_ON: case KEY_SHIFT_RIGHT:
+      if (manual_calibration_mode_ &&
+          roll_adj_degree_ + 0.05 <= max_roll_degree_) {
         roll_adj_degree_ -= 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_;
       break;
-    case 130897:  // SHIFT + Left_Arrow
-      if (roll_adj_degree_ - 0.05 >= min_roll_degree_) {
+    case KEY_SHIFT_RIGHT_NUM_LOCK_ON: case KEY_SHIFT_LEFT:
+      if (manual_calibration_mode_ &&
+          roll_adj_degree_ - 0.05 >= min_roll_degree_) {
         roll_adj_degree_ += 0.05;
       }
       AINFO << "Current roll: " << roll_adj_degree_;
       break;
-    case 262259:  // CTRL + S
-      save_manual_calibration_parameter(camera_name, pitch_adj_degree_,
-                                        yaw_adj_degree_, roll_adj_degree_);
-      AINFO << "Saved calibration parameters(pyr): (" << pitch_adj_degree_
-            << ", " << yaw_adj_degree_ << ", " << roll_adj_degree_ << ")";
+    case KEY_CTRL_S_NUM_LOCK_ON:  case KEY_CTRL_S:
+      if (manual_calibration_mode_) {
+        save_manual_calibration_parameter(camera_name, pitch_adj_degree_,
+                                          yaw_adj_degree_, roll_adj_degree_);
+        AINFO << "Saved calibration parameters(pyr): (" << pitch_adj_degree_
+              << ", " << yaw_adj_degree_ << ", " << roll_adj_degree_ << ")";
+      }
       break;
+    case KEY_ALT_C_NUM_LOCK_ON: case KEY_ALT_C:
+      manual_calibration_mode_ = !manual_calibration_mode_;
+
     default:
       break;
   }
@@ -745,18 +758,26 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
     if (show_verbose_) help_str_ += " (ON)";
   }
   switch (key) {
-    case 65362:   // Up_Arrow
-    case 65361:   // Left_Arrow
-    case 65363:   // Right_Arrow
-    case 65364:   // Down_Arrow
-    case 130897:  // ALT + Left_Arrow
-    case 130899:  // ALT + Right_Arrow
-      adjust_angles(camera_name, pitch_adj_degree_, yaw_adj_degree_,
-                    roll_adj_degree_);
-      if (show_help_text_) {
-        help_str_ += "\nAdjusted Pitch: " + std::to_string(pitch_adj_degree_);
-        help_str_ += "\nAdjusted Yaw: " + std::to_string(yaw_adj_degree_);
-        help_str_ += "\nAdjusted Roll: " + std::to_string(roll_adj_degree_);
+    case KEY_UP_NUM_LOCK_ON:
+    case KEY_DOWN_NUM_LOCK_ON:
+    case KEY_RIGHT_NUM_LOCK_ON:
+    case KEY_LEFT_NUM_LOCK_ON:
+    case KEY_SHIFT_LEFT_NUM_LOCK_ON:
+    case KEY_SHIFT_RIGHT_NUM_LOCK_ON:
+    case KEY_UP:
+    case KEY_LEFT:
+    case KEY_RIGHT:
+    case KEY_DOWN:
+    case KEY_SHIFT_LEFT:
+    case KEY_SHIFT_RIGHT:
+      if (manual_calibration_mode_) {
+        adjust_angles(camera_name, pitch_adj_degree_, yaw_adj_degree_,
+                      roll_adj_degree_);
+        if (show_help_text_) {
+          help_str_ += "\nAdjusted Pitch: " + std::to_string(pitch_adj_degree_);
+          help_str_ += "\nAdjusted Yaw: " + std::to_string(yaw_adj_degree_);
+          help_str_ += "\nAdjusted Roll: " + std::to_string(roll_adj_degree_);
+        }
       }
   }
   return true;
@@ -1099,6 +1120,14 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
   int line_pos = 0;
   cv::Mat image = img.clone();
   std::string camera_name = frame.data_provider->sensor_name();
+  if (manual_calibration_mode_) {
+    line_pos += 50;
+    cv::putText(
+      image,
+      "Manual Calibration: Pitch(up/down) Yaw(left/right) Roll(SH+left/right)",
+      cv::Point(10, line_pos), cv::FONT_HERSHEY_DUPLEX, 1.3,
+      cv::Scalar(0, 0, 255), 3);
+  }
   line_pos += 50;
   cv::putText(image, camera_name, cv::Point(10, line_pos),
               cv::FONT_HERSHEY_DUPLEX, 1.3, cv::Scalar(0, 0, 255), 3);
