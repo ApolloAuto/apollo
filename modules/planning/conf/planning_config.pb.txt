@@ -47,7 +47,7 @@ default_task_config: {
     default_obstacle_cost: 1e3
 
     default_speed_cost: 1.0e3
-    exceed_speed_penalty: 10.0
+    exceed_speed_penalty: 1.0e3
     low_speed_penalty: 10.0
     reference_speed_penalty: 10.0
     keep_clear_low_speed_penalty: 10.0
