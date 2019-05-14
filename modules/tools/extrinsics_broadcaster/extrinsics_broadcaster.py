@@ -24,16 +24,12 @@ from subprocess import call
 import sys
 import yaml
 
-def main():
+def main(extrinsic_file):
     """Main function.
 
     Reading transform info from a yaml file and publish to tf2
     """
-    if len(sys.argv) < 2:
-        print('Usage: %s extrinsic_example.yaml' % sys.argv[0])
-        sys.exit(1)
-
-    with open(sys.argv[1]) as fp:
+    with open(extrinsic_file) as fp:
         transform_stamped = yaml.safe_load(fp)
         command = 'rosrun tf2_ros static_transform_publisher ' \
                   '%f %f %f %f %f %f %f %s %s' % \
@@ -46,7 +42,6 @@ def main():
                    transform_stamped['transform']['rotation']['w'],
                    transform_stamped['header']['frame_id'],
                    transform_stamped['child_frame_id'])
-
     print(command)
 
     try:
@@ -54,5 +49,10 @@ def main():
     except OSError as e:
         print(e)
 
+
 if __name__ == '__main__':
-    main()
+    if len(sys.argv) < 2:
+        print('Usage: %s extrinsic_example.yaml' % sys.argv[0])
+        sys.exit(0)
+
+    main(sys.argv[1])
