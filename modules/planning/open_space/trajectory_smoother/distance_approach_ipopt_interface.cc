@@ -1399,11 +1399,13 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   }
   // memory deallocation of ADOL-C variables
   delete[] obj_lam;
-  free(rind_g);
-  free(cind_g);
+  if (enable_jacobian_ad_) {
+    free(rind_g);
+    free(cind_g);
+    free(jacval);
+  }
   free(rind_L);
   free(cind_L);
-  free(jacval);
   free(hessval);
 }
 

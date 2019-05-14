@@ -108,6 +108,18 @@ class OpenSpaceTrajectoryOptimizer {
       Eigen::MatrixXd* time_result_ds, Eigen::MatrixXd* dual_l_result_ds,
       Eigen::MatrixXd* dual_n_result_ds);
 
+  bool GenerateDistanceApproachTraj(
+      const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+    const std::vector<double>& XYbounds,
+    const Eigen::MatrixXi& obstacles_edges_num,
+    const Eigen::MatrixXd& obstacles_A, const Eigen::MatrixXd& obstacles_b,
+    const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
+    const Eigen::MatrixXd& last_time_u, const double init_v,
+    Eigen::MatrixXd* state_result_ds, Eigen::MatrixXd* control_result_ds,
+    Eigen::MatrixXd* time_result_ds, Eigen::MatrixXd* l_warm_up,
+    Eigen::MatrixXd* n_warm_up, Eigen::MatrixXd* dual_l_result_ds,
+    Eigen::MatrixXd* dual_n_result_ds);
+
  private:
   OpenSpaceTrajectoryOptimizerConfig config_;
 
