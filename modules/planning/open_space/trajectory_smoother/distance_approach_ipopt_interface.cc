@@ -67,9 +67,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   l_start_index_ = time_start_index_ + (horizon_ + 1);
   n_start_index_ = l_start_index_ + obstacles_edges_sum_ * (horizon_ + 1);
 
-  planner_open_space_config_.CopyFrom(planner_open_space_config);
   distance_approach_config_ =
-      planner_open_space_config_.distance_approach_config();
+      planner_open_space_config.distance_approach_config();
   weight_state_x_ = distance_approach_config_.weight_x();
   weight_state_y_ = distance_approach_config_.weight_y();
   weight_state_phi_ = distance_approach_config_.weight_phi();
@@ -103,6 +102,7 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   wheelbase_ = vehicle_param_.wheel_base();
   enable_constraint_check_ =
       distance_approach_config_.enable_constraint_check();
+  enable_jacobian_ad_ = distance_approach_config_.enable_jacobian_ad();
 }
 
 bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
@@ -147,17 +147,18 @@ bool DistanceApproachIPOPTInterface::get_nlp_info(int& n, int& m,
   ADEBUG << "num_of_constraints_ " << num_of_constraints_;
 
   generate_tapes(n, m, &nnz_jac_g, &nnz_h_lag);
-  // TODO(Jinyun): evaluate original problem formulation
   // number of nonzero in Jacobian.
-  // int tmp = 0;
-  // for (int i = 0; i < horizon_ + 1; ++i) {
-  //   for (int j = 0; j < obstacles_num_; ++j) {
-  //     int current_edges_num = obstacles_edges_num_(j, 0);
-  //     tmp += current_edges_num * 4 + 9 + 4;
-  //   }
-  // }
-  // nnz_jac_g = 24 * horizon_ + 3 * horizon_ + 2 * horizon_ + tmp - 1 +
-  //             (num_of_variables_ - (horizon_ + 1) + 2);
+  if (!enable_jacobian_ad_) {
+    int tmp = 0;
+    for (int i = 0; i < horizon_ + 1; ++i) {
+      for (int j = 0; j < obstacles_num_; ++j) {
+        int current_edges_num = obstacles_edges_num_(j, 0);
+        tmp += current_edges_num * 4 + 9 + 4;
+      }
+    }
+    nnz_jac_g = 24 * horizon_ + 3 * horizon_ + 2 * horizon_ + tmp - 1 +
+                (num_of_variables_ - (horizon_ + 1) + 2);
+  }
 
   index_style = IndexStyleEnum::C_STYLE;
   return true;
@@ -453,22 +454,25 @@ bool DistanceApproachIPOPTInterface::eval_jac_g(int n, const double* x,
                                                 bool new_x, int m, int nele_jac,
                                                 int* iRow, int* jCol,
                                                 double* values) {
-  if (values == nullptr) {
-    // return the structure of the jacobian
-    for (int idx = 0; idx < nnz_jac; idx++) {
-      iRow[idx] = rind_g[idx];
-      jCol[idx] = cind_g[idx];
+  if (enable_jacobian_ad_) {
+    if (values == nullptr) {
+      // return the structure of the jacobian
+      for (int idx = 0; idx < nnz_jac; idx++) {
+        iRow[idx] = rind_g[idx];
+        jCol[idx] = cind_g[idx];
+      }
+    } else {
+      // return the values of the jacobian of the constraints
+      sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval,
+                 options_g);
+      for (int idx = 0; idx < nnz_jac; idx++) {
+        values[idx] = jacval[idx];
+      }
     }
+    return true;
   } else {
-    // return the values of the jacobian of the constraints
-    sparse_jac(tag_g, m, n, 1, x, &nnz_jac, &rind_g, &cind_g, &jacval,
-               options_g);
-    for (int idx = 0; idx < nnz_jac; idx++) {
-      values[idx] = jacval[idx];
-    }
+    return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
   }
-  return true;
-  // return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
 }
 
 bool DistanceApproachIPOPTInterface::eval_jac_g_ser(int n, const double* x,
@@ -1928,23 +1932,26 @@ void DistanceApproachIPOPTInterface::generate_tapes(int n, int m,
 
   trace_off();
 
-  rind_g = nullptr;
-  cind_g = nullptr;
+  if (enable_jacobian_ad_) {
+    rind_g = nullptr;
+    cind_g = nullptr;
+    jacval = nullptr;
+    options_g[0] = 0; /* sparsity pattern by index domains (default) */
+    options_g[1] = 0; /*                         safe mode (default) */
+    options_g[2] = 0;
+    options_g[3] = 0; /*                column compression (default) */
+
+    sparse_jac(tag_g, m, n, 0, &xp[0], &nnz_jac, &rind_g, &cind_g, &jacval,
+               options_g);
+    *nnz_jac_g = nnz_jac;
+  }
+
   rind_L = nullptr;
   cind_L = nullptr;
-  jacval = nullptr;
   hessval = nullptr;
-
-  options_g[0] = 0; /* sparsity pattern by index domains (default) */
-  options_g[1] = 0; /*                         safe mode (default) */
-  options_g[2] = 0;
-  options_g[3] = 0; /*                column compression (default) */
-  sparse_jac(tag_g, m, n, 0, &xp[0], &nnz_jac, &rind_g, &cind_g, &jacval,
-             options_g);
-  *nnz_jac_g = nnz_jac;
-
   options_L[0] = 0;
   options_L[1] = 1;
+
   sparse_hess(tag_L, n, 0, &xp[0], &nnz_L, &rind_L, &cind_L, &hessval,
               options_L);
   *nnz_h_lag = nnz_L;
