@@ -41,8 +41,6 @@ cc_library(
         "//modules/planning/tasks/deciders/open_space_decider:open_space_fallback_decider",
         "//modules/planning/tasks/deciders/open_space_decider:open_space_pre_stop_decider",
         "//modules/planning/tasks/deciders/open_space_decider:open_space_roi_decider",
-        "//modules/planning/tasks/deciders/path_assessment_decider:path_assessment_decider",
-        "//modules/planning/tasks/deciders/path_bounds_decider:path_bounds_decider",
         "//modules/planning/tasks/deciders/path_assessment_decider",
         "//modules/planning/tasks/deciders/path_bounds_decider",
         "//modules/planning/tasks/deciders/path_lane_borrow_decider",
