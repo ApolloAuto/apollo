@@ -22,13 +22,12 @@
 
 #include <vector>
 
-#include "modules/planning/proto/planning_internal.pb.h"
-
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
-#include "modules/planning/tasks/optimizers/path_time_heuristic/dp_st_graph.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/gridded_path_time_graph.h"
+#include "modules/planning/proto/planning_internal.pb.h"
 
 namespace apollo {
 namespace planning {
@@ -47,9 +46,10 @@ PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
 }
 
 bool PathTimeHeuristicOptimizer::SearchStGraph(SpeedData* speed_data) const {
-  DpStGraph st_graph(reference_line_info_->st_graph_data(), dp_st_speed_config_,
-                     reference_line_info_->path_decision()->obstacles().Items(),
-                     init_point_, adc_sl_boundary_);
+  GriddedPathTimeGraph st_graph(
+      reference_line_info_->st_graph_data(), dp_st_speed_config_,
+      reference_line_info_->path_decision()->obstacles().Items(), init_point_,
+      adc_sl_boundary_);
 
   if (!st_graph.Search(speed_data).ok()) {
     AERROR << "failed to search graph with dynamic programming.";

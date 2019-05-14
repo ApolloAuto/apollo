@@ -37,12 +37,12 @@ cc_library(
 )
 
 cc_library(
-    name = "dp_st_graph",
+    name = "gridded_path_time_graph",
     srcs = [
-        "dp_st_graph.cc",
+        "gridded_path_time_graph.cc",
     ],
     hdrs = [
-        "dp_st_graph.h",
+        "gridded_path_time_graph.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
@@ -74,7 +74,7 @@ cc_library(
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
         ":dp_st_cost",
-        ":dp_st_graph",
+        ":gridded_path_time_graph",
         "//modules/common/configs:vehicle_config_helper",
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/localization/proto:localization_proto",
@@ -87,16 +87,16 @@ cc_library(
 )
 
 cc_test(
-    name = "dp_st_graph_test",
+    name = "gridded_path_time_graph_test",
     size = "small",
     srcs = [
-        "dp_st_graph_test.cc",
+        "gridded_path_time_graph_test.cc",
     ],
     data = [
         "//modules/planning:planning_conf",
     ],
     deps = [
-        ":dp_st_graph",
+        ":gridded_path_time_graph",
         "//modules/planning/proto:planning_config_proto",
         "@gtest//:main",
     ],

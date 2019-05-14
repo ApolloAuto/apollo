@@ -15,10 +15,10 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_graph.cc
+ * @file gridded_path_time_graph.cc
  **/
 
-#include "modules/planning/tasks/optimizers/path_time_heuristic/dp_st_graph.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/gridded_path_time_graph.h"
 
 #include <algorithm>
 #include <limits>
@@ -42,8 +42,6 @@ using apollo::common::Status;
 
 namespace {
 
-constexpr double kInf = std::numeric_limits<double>::infinity();
-
 bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
   const common::math::LineSegment2d seg(p1.point(), p2.point());
@@ -59,7 +57,7 @@ bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
 }
 }  // namespace
 
-DpStGraph::DpStGraph(const StGraphData& st_graph_data,
+GriddedPathTimeGraph::GriddedPathTimeGraph(const StGraphData& st_graph_data,
                      const DpStSpeedConfig& dp_config,
                      const std::vector<const Obstacle*>& obstacles,
                      const common::TrajectoryPoint& init_point,
@@ -77,7 +75,7 @@ DpStGraph::DpStGraph(const StGraphData& st_graph_data,
             (dp_st_speed_config_.matrix_dimension_t() - 1);
 }
 
-Status DpStGraph::Search(SpeedData* const speed_data) {
+Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
   constexpr double kBounadryEpsilon = 1e-2;
   for (const auto& boundary : st_graph_data_.st_boundaries()) {
     if (boundary->boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
@@ -139,7 +137,7 @@ Status DpStGraph::Search(SpeedData* const speed_data) {
   return Status::OK();
 }
 
-Status DpStGraph::InitCostTable() {
+Status GriddedPathTimeGraph::InitCostTable() {
   uint32_t dim_s = dp_st_speed_config_.matrix_dimension_s();
   uint32_t dim_t = dp_st_speed_config_.matrix_dimension_t();
   DCHECK_GT(dim_s, 2);
@@ -158,7 +156,7 @@ Status DpStGraph::InitCostTable() {
   return Status::OK();
 }
 
-Status DpStGraph::CalculateTotalCost() {
+Status GriddedPathTimeGraph::CalculateTotalCost() {
   // col and row are for STGraph
   // t corresponding to col
   // s corresponding to row
@@ -177,7 +175,7 @@ Status DpStGraph::CalculateTotalCost() {
         auto msg = std::make_shared<StGraphMessage>(c, r);
         if (FLAGS_enable_multi_thread_in_dp_st_graph) {
           results.push_back(
-              cyber::Async(&DpStGraph::CalculateCostAt, this, msg));
+              cyber::Async(&GriddedPathTimeGraph::CalculateCostAt, this, msg));
         } else {
           CalculateCostAt(msg);
         }
@@ -206,8 +204,8 @@ Status DpStGraph::CalculateTotalCost() {
   return Status::OK();
 }
 
-void DpStGraph::GetRowRange(const StGraphPoint& point, size_t* next_highest_row,
-                            size_t* next_lowest_row) {
+void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
+    size_t* next_highest_row, size_t* next_lowest_row) {
   double v0 = 0.0;
   if (!point.pre_point()) {
     v0 = init_point_.v();
@@ -240,7 +238,8 @@ void DpStGraph::GetRowRange(const StGraphPoint& point, size_t* next_highest_row,
   }
 }
 
-void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
+void GriddedPathTimeGraph::CalculateCostAt(
+    const std::shared_ptr<StGraphMessage>& msg) {
   const uint32_t c = msg->c;
   const uint32_t r = msg->r;
   auto& cost_cr = cost_table_[c][r];
@@ -357,7 +356,7 @@ void DpStGraph::CalculateCostAt(const std::shared_ptr<StGraphMessage>& msg) {
   }
 }
 
-Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
+Status GriddedPathTimeGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   double min_cost = std::numeric_limits<double>::infinity();
   const StGraphPoint* best_end_point = nullptr;
   for (const StGraphPoint& cur_point : cost_table_.back()) {
@@ -412,16 +411,16 @@ Status DpStGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   return Status::OK();
 }
 
-double DpStGraph::CalculateEdgeCost(const STPoint& first, const STPoint& second,
-                                    const STPoint& third, const STPoint& forth,
-                                    const double speed_limit,
-                                    const double soft_speed_limit) {
+double GriddedPathTimeGraph::CalculateEdgeCost(
+    const STPoint& first, const STPoint& second,
+    const STPoint& third, const STPoint& forth,
+    const double speed_limit, const double soft_speed_limit) {
   return dp_st_cost_.GetSpeedCost(third, forth, speed_limit, soft_speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
-double DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
+double GriddedPathTimeGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
                                                 const double speed_limit,
                                                 const double soft_speed_limit) {
   double init_speed = init_point_.v();
@@ -436,10 +435,9 @@ double DpStGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
                                             curr_point);
 }
 
-double DpStGraph::CalculateEdgeCostForThirdCol(const uint32_t curr_row,
-                                               const uint32_t pre_row,
-                                               const double speed_limit,
-                                               const double soft_speed_limit) {
+double GriddedPathTimeGraph::CalculateEdgeCostForThirdCol(
+    const uint32_t curr_row, const uint32_t pre_row, const double speed_limit,
+    const double soft_speed_limit) {
   double init_speed = init_point_.v();
   const STPoint& first = cost_table_[0][0].point();
   const STPoint& second = cost_table_[1][pre_row].point();

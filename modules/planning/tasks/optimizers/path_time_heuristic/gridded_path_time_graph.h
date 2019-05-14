@@ -15,7 +15,7 @@
  *****************************************************************************/
 
 /**
- * @file dp_st_graph.h
+ * @file gridded_path_time_graph.h
  **/
 
 #pragma once
@@ -41,21 +41,22 @@
 namespace apollo {
 namespace planning {
 
-class DpStGraph {
+class GriddedPathTimeGraph {
  public:
-  DpStGraph(const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
-            const std::vector<const Obstacle*>& obstacles,
-            const common::TrajectoryPoint& init_point,
-            const SLBoundary& adc_sl_boundary);
+  GriddedPathTimeGraph(const StGraphData& st_graph_data,
+      const DpStSpeedConfig& dp_config,
+      const std::vector<const Obstacle*>& obstacles,
+      const common::TrajectoryPoint& init_point,
+      const SLBoundary& adc_sl_boundary);
 
-  apollo::common::Status Search(SpeedData* const speed_data);
+  common::Status Search(SpeedData* const speed_data);
 
  private:
-  apollo::common::Status InitCostTable();
+  common::Status InitCostTable();
 
-  apollo::common::Status RetrieveSpeedProfile(SpeedData* const speed_data);
+  common::Status RetrieveSpeedProfile(SpeedData* const speed_data);
 
-  apollo::common::Status CalculateTotalCost();
+  common::Status CalculateTotalCost();
 
   // defined for cyber task
   struct StGraphMessage {
