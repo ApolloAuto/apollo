@@ -53,7 +53,9 @@ typedef Eigen::Vector2d Point2Dd;
 
 // This should be from lane detector
 struct LaneLineSimple {
-  LaneLineSimple() : line_point(100) {}
+  LaneLineSimple() {
+    line_point.reserve(100);
+  }
   int type;   // solid, broken, double, zigzag, boundary, implicit
   int color;  // yellow, white
   //    eastl::fixed_vector<Point2Df, MAX_LANE_LINE_POINT> line_point;
