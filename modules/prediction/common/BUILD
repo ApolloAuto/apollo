@@ -242,6 +242,7 @@ cc_library(
         "//modules/prediction/container:container_manager",
         "//modules/prediction/container/pose:pose_container",
         "//modules/prediction/proto:feature_proto",
+        "//modules/prediction/proto:semantic_map_config_proto",
     ],
 )
 

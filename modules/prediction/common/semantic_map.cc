@@ -32,11 +32,16 @@ namespace prediction {
 SemanticMap::SemanticMap() {}
 
 void SemanticMap::Init() {
-  const std::string file_path =
-      apollo::common::util::StrCat(FLAGS_map_dir, "/base_map.png");
-  if (cyber::common::PathExists(file_path)) {
-    base_img_ = cv::imread(file_path, CV_LOAD_IMAGE_COLOR);
+  const std::string semantic_map_path =
+      apollo::common::util::StrCat(FLAGS_map_dir, "/semantic_map.png");
+  if (cyber::common::PathExists(semantic_map_path)) {
+    base_img_ = cv::imread(semantic_map_path, CV_LOAD_IMAGE_COLOR);
+    AINFO << "Load semantic_map from: " << semantic_map_path;
   }
+  const std::string config_path =
+      apollo::common::util::StrCat(FLAGS_map_dir,
+                                   "/semantic_map_config.pb.txt");
+  cyber::common::GetProtoFromFile(config_path, &config_);
   curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
 }
 
@@ -45,12 +50,14 @@ void SemanticMap::RunCurrFrame(
   // TODO(Hongyi): moving all these magic numbers to conf
   const Feature& ego_feature = obstacle_id_history_map.at(-1).feature(0);
   curr_timestamp_ = ego_feature.timestamp();
-  curr_base_x_ = ego_feature.position().x() - 100.0;
-  curr_base_y_ = ego_feature.position().y() - 100.0;
+  curr_base_x_ = ego_feature.position().x() - config_.observation_range();
+  curr_base_y_ = ego_feature.position().y() - config_.observation_range();
   cv::Rect rect(
-      static_cast<int>((curr_base_x_ - 585950.0) / 0.1),
-      static_cast<int>(18000 - (curr_base_y_ - 4140000.0) / 0.1) - 2000, 2000,
-      2000);
+      static_cast<int>((curr_base_x_ - config_.base_point().x()) /
+                       config_.resolution()),
+      static_cast<int>(config_.dim_y() -
+                       (curr_base_y_ - config_.base_point().y()) /
+                       config_.resolution()) - 2000, 2000, 2000);
   base_img_(rect).copyTo(curr_img_);
 
   // Draw all obstacles_history
