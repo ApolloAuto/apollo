@@ -50,29 +50,6 @@ function check_agreement() {
   fi
 }
 
-function check_host_environment() {
-  if ! [ -x "$(command -v git-lfs)" ]; then
-    echo 'git-lfs is required to work with apollo.'
-    echo 'Check https://git-lfs.github.com for more information.'
-    exit 1
-  fi
-
-  # Fetch lfs managed files for current HEAD.
-  git lfs install && git lfs fetch
-  if [ $? -ne 0 ]; then
-    echo 'Failed to fetch LFS objects. Please retry command'
-    echo '    git lfs install && git lfs fetch && echo Succeeded'
-    exit 1
-  fi
-
-  if ! [ -d ${APOLLO_ROOT_DIR}/.git/lfs/objects ]; then
-    echo 'You need to install and run git-lfs when working with apollo.'
-    echo 'New versions of git manage it automotically, but old versions may '
-    echo 'need to run `git lfs clone` and `git lfs pull`.'
-    exit 1
-  fi
-}
-
 function show_usage()
 {
 cat <<EOF
@@ -117,7 +94,6 @@ fi
 
 source ${APOLLO_ROOT_DIR}/scripts/apollo_base.sh
 check_agreement
-check_host_environment
 
 VOLUME_VERSION="latest"
 DEFAULT_MAPS=(
