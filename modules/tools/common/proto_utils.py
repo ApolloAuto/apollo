@@ -88,7 +88,7 @@ def flatten(pb_value, selectors):
         return val
 
     # Return the single result for single selector.
-    if type(selectors) is str:
+    if isinstance(selectors, str):
         return __select(pb_value, selectors)
     # Return tuple result for multiple selectors.
     return tuple((__select(pb_value, selector) for selector in selectors))
