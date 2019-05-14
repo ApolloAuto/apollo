@@ -1,0 +1,11 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/bridge/libbridge_control_component.so"
+    timer_components {
+        class_name : "BridgeControlComponent"
+        config {
+            name: "control"
+            flag_file_path: "/apollo/modules/bridge/conf/control.conf"
+            interval: 10
+      }
+   }
+}
