@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) {
   std::vector<apollo::cyber::proto::RoleAttributes> role_attr_vec;
   channelManager->GetWriters(&role_attr_vec);
   for (auto& role_attr : role_attr_vec) {
-    w.FindNewWriter(role_attr);
+    w.AddNewWriter(role_attr);
   }
 
   w.show();

@@ -153,7 +153,7 @@ Status ChangeLane::ApplyRule(Frame* const frame,
     auto* path_decision = reference_line_info->path_decision();
     const auto& reference_line = reference_line_info->reference_line();
     for (const auto* obstacle : overtake_obstacles_) {
-      auto overtake = CreateOvertakeDecision(reference_line, obstacle);
+      auto overtake = CreateOvertakeDecision(reference_line, *obstacle);
       path_decision->AddLongitudinalDecision(
           TrafficRuleConfig::RuleId_Name(Id()), obstacle->Id(), overtake);
     }
@@ -162,14 +162,14 @@ Status ChangeLane::ApplyRule(Frame* const frame,
 }
 
 ObjectDecisionType ChangeLane::CreateOvertakeDecision(
-    const ReferenceLine& reference_line, const Obstacle* obstacle) const {
+    const ReferenceLine& reference_line, const Obstacle& obstacle) const {
   ObjectDecisionType overtake;
   overtake.mutable_overtake();
   double distance =
-      std::max(obstacle->speed() * config_.change_lane().min_overtake_time(),
+      std::max(obstacle.speed() * config_.change_lane().min_overtake_time(),
                config_.change_lane().min_overtake_distance());
   overtake.mutable_overtake()->set_distance_s(distance);
-  double fence_s = obstacle->PerceptionSLBoundary().end_s() + distance;
+  double fence_s = obstacle.PerceptionSLBoundary().end_s() + distance;
   auto point = reference_line.GetReferencePoint(fence_s);
   overtake.mutable_overtake()->set_time_buffer(
       config_.change_lane().min_overtake_time());

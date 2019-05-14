@@ -288,8 +288,9 @@ bool WithinOverlap(const hdmap::PathOverlap& overlap, double s) {
 
 void ReferenceLineInfo::SetJunctionRightOfWay(const double junction_s,
                                               const bool is_protected) const {
-  auto* right_of_way =
-      PlanningContext::MutablePlanningStatus()->mutable_right_of_way();
+  auto* right_of_way = PlanningContext::Instance()
+                           ->mutable_planning_status()
+                           ->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (WithinOverlap(overlap, junction_s)) {
@@ -299,8 +300,9 @@ void ReferenceLineInfo::SetJunctionRightOfWay(const double junction_s,
 }
 
 ADCTrajectory::RightOfWayStatus ReferenceLineInfo::GetRightOfWayStatus() const {
-  auto* right_of_way =
-      PlanningContext::MutablePlanningStatus()->mutable_right_of_way();
+  auto* right_of_way = PlanningContext::Instance()
+                           ->mutable_planning_status()
+                           ->mutable_right_of_way();
   auto* junction_right_of_way = right_of_way->mutable_junction();
   for (const auto& overlap : reference_line_.map_path().junction_overlaps()) {
     if (overlap.end_s < sl_boundary_info_.adc_sl_boundary_.start_s()) {
@@ -427,7 +429,7 @@ Obstacle* ReferenceLineInfo::AddObstacle(const Obstacle* obstacle) {
     ADEBUG << "obstacle [" << obstacle->Id() << "] is NOT lane blocking.";
   }
 
-  if (IsUnrelaventObstacle(mutable_obstacle)) {
+  if (IsIrrelevantObstacle(*mutable_obstacle)) {
     ObjectDecisionType ignore;
     ignore.mutable_ignore();
     path_decision_.AddLateralDecision("reference_line_filter", obstacle->Id(),
@@ -475,18 +477,18 @@ bool ReferenceLineInfo::AddObstacles(
   return true;
 }
 
-bool ReferenceLineInfo::IsUnrelaventObstacle(const Obstacle* obstacle) {
-  if (obstacle->IsCautionLevelObstacle()) {
+bool ReferenceLineInfo::IsIrrelevantObstacle(const Obstacle& obstacle) {
+  if (obstacle.IsCautionLevelObstacle()) {
     return false;
   }
   // if adc is on the road, and obstacle behind adc, ignore
-  if (obstacle->PerceptionSLBoundary().end_s() > reference_line_.Length()) {
+  const auto& obstacle_boundary = obstacle.PerceptionSLBoundary();
+  if (obstacle_boundary.end_s() > reference_line_.Length()) {
     return true;
   }
   if (is_on_reference_line_ &&
-      obstacle->PerceptionSLBoundary().end_s() <
-          sl_boundary_info_.adc_sl_boundary_.end_s() &&
-      reference_line_.IsOnLane(obstacle->PerceptionSLBoundary())) {
+      obstacle_boundary.end_s() < sl_boundary_info_.adc_sl_boundary_.end_s() &&
+      reference_line_.IsOnLane(obstacle_boundary)) {
     return true;
   }
   return false;
@@ -718,7 +720,8 @@ void ReferenceLineInfo::MakeMainMissionCompleteDecision(
   auto mission_complete =
       decision_result->mutable_main_decision()->mutable_mission_complete();
   if (ReachedDestination()) {
-    PlanningContext::MutablePlanningStatus()
+    PlanningContext::Instance()
+        ->mutable_planning_status()
         ->mutable_destination()
         ->set_has_passed_destination(true);
   } else {
@@ -803,8 +806,9 @@ void ReferenceLineInfo::SetObjectDecisions(
 
 void ReferenceLineInfo::ExportEngageAdvice(EngageAdvice* engage_advice) const {
   constexpr double kMaxAngleDiff = M_PI / 6.0;
-  auto* prev_advice =
-      PlanningContext::MutablePlanningStatus()->mutable_engage_advice();
+  auto* prev_advice = PlanningContext::Instance()
+                          ->mutable_planning_status()
+                          ->mutable_engage_advice();
   if (!prev_advice->has_advice()) {
     prev_advice->set_advice(EngageAdvice::DISALLOW_ENGAGE);
   }

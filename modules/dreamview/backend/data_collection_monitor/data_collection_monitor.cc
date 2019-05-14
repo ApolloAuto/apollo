@@ -29,64 +29,40 @@ namespace dreamview {
 
 using apollo::canbus::Chassis;
 using apollo::common::VehicleConfigHelper;
+using google::protobuf::FieldDescriptor;
 using Json = nlohmann::json;
-
 namespace {
 
-bool IsValidProtobufConversionInput(
-    const google::protobuf::Descriptor* descriptor,
-    const google::protobuf::Reflection* reflection,
-    const std::string& field_name,
-    google::protobuf::FieldDescriptor::CppType cpp_type) {
+/*
+ * For simplicity, we are converting all supporting cpp types to float.
+ * It is okay to lost precision since this conversion is used
+ * for criteria comparison.
+ */
+bool GetProtobufFloatByFieldName(const google::protobuf::Message& message,
+                                 const google::protobuf::Descriptor* descriptor,
+                                 const google::protobuf::Reflection* reflection,
+                                 const std::string& field_name, float* value) {
   if (!descriptor) {
     AERROR << "Protobuf descriptor not found";
     return false;
   }
 
   const auto* field_descriptor = descriptor->FindFieldByName(field_name);
-  if (!field_descriptor) {
-    AERROR << field_name << " not found in " << descriptor->name();
+  const auto cpp_type = field_descriptor->cpp_type();
+  if (cpp_type == FieldDescriptor::CppType::CPPTYPE_FLOAT) {
+    *value = reflection->GetFloat(message, field_descriptor);
+  } else if (cpp_type == FieldDescriptor::CppType::CPPTYPE_DOUBLE) {
+    double value_in_double = reflection->GetDouble(message, field_descriptor);
+    *value = static_cast<float>(value_in_double);
+  } else if (cpp_type == FieldDescriptor::CppType::CPPTYPE_ENUM) {
+    int value_in_int = reflection->GetEnumValue(message, field_descriptor);
+    *value = static_cast<float>(value_in_int);
+  } else {
+    AERROR << field_name << " has unsupported conversion type: "
+           << field_descriptor->cpp_type();
     return false;
   }
 
-  if (field_descriptor->is_repeated() ||
-      field_descriptor->cpp_type() != cpp_type) {
-    AWARN << field_name << " has unsupported conversion type: "
-          << field_descriptor->cpp_type();
-    return false;
-  }
-
-  return true;
-}
-
-bool GetProtobufDoubleByFieldName(
-    const google::protobuf::Message& message,
-    const google::protobuf::Descriptor* descriptor,
-    const google::protobuf::Reflection* reflection,
-    const std::string& field_name, double* value) {
-  if (!IsValidProtobufConversionInput(
-          descriptor, reflection, field_name,
-          google::protobuf::FieldDescriptor::CppType::CPPTYPE_DOUBLE)) {
-    return false;
-  }
-
-  const auto* field_descriptor = descriptor->FindFieldByName(field_name);
-  *value = reflection->GetDouble(message, field_descriptor);
-  return true;
-}
-
-bool GetProtobufFloatByFieldName(const google::protobuf::Message& message,
-                                 const google::protobuf::Descriptor* descriptor,
-                                 const google::protobuf::Reflection* reflection,
-                                 const std::string& field_name, float* value) {
-  if (!IsValidProtobufConversionInput(
-          descriptor, reflection, field_name,
-          google::protobuf::FieldDescriptor::CppType::CPPTYPE_FLOAT)) {
-    return false;
-  }
-
-  const auto* field_descriptor = descriptor->FindFieldByName(field_name);
-  *value = reflection->GetFloat(message, field_descriptor);
   return true;
 }
 
@@ -95,7 +71,8 @@ bool IsCompliedWithCriterion(float actual_value,
                              float target_value) {
   switch (comparison_operator) {
     case ComparisonOperator::EQUAL:
-      return (actual_value == target_value);
+      return std::fabs(actual_value - target_value) <
+             common::math::kMathEpsilon;
     case ComparisonOperator::GREATER_THAN:
       return (actual_value > target_value);
     case ComparisonOperator::GREATER_THAN_OR_EQUAL:
@@ -229,21 +206,18 @@ bool DataCollectionMonitor::IsCompliedWithCriteria(
     float target_value;
     if (criterion.has_value()) {
       target_value = criterion.value();
-    } else {
-      double target_value_in_double;
-      if (!GetProtobufDoubleByFieldName(
-              vehicle_param, vehicle_param_descriptor, vehicle_param_reflection,
-              criterion.vehicle_config(), &target_value_in_double)) {
-        continue;
-      }
-      target_value = static_cast<float>(target_value_in_double);
+    } else if (!GetProtobufFloatByFieldName(
+                   vehicle_param, vehicle_param_descriptor,
+                   vehicle_param_reflection, criterion.vehicle_config(),
+                   &target_value)) {
+      return false;
     }
 
     float actual_value;
     if (!GetProtobufFloatByFieldName(*chassis, chassis_descriptor,
                                      chassis_reflection, criterion.field(),
                                      &actual_value)) {
-      continue;
+      return false;
     }
 
     if (!IsCompliedWithCriterion(actual_value, criterion.comparison_operator(),

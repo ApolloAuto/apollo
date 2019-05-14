@@ -30,14 +30,14 @@ const colorMapping = {
 };
 
 const TRAFFIC_LIGHT_SCALE = 0.006;
-const trafficLightScales = {
+export const trafficLightScales = {
     x: TRAFFIC_LIGHT_SCALE,
     y: TRAFFIC_LIGHT_SCALE,
     z: TRAFFIC_LIGHT_SCALE
 };
 
 const STOP_SIGN_SCALE = 0.01;
-const stopSignScales = {
+export const stopSignScales = {
     x: STOP_SIGN_SCALE,
     y: STOP_SIGN_SCALE,
     z: STOP_SIGN_SCALE
@@ -169,8 +169,11 @@ export default class Map {
         const text = this.textRender.drawText(
             lane.id.id, scene, colorMapping.WHITE, TEXT_ALIGN.LEFT);
         if (text) {
-            text.position.set(position.x, position.y, position.z);
-            text.rotation.set(rotation.x, rotation.y, rotation.z);
+            const textPosition = position || _.get(points, '[0]');
+            if (textPosition) {
+                text.position.set(textPosition.x, textPosition.y, textPosition.z);
+                text.rotation.set(rotation.x, rotation.y, rotation.z);
+            }
             text.visible = false;
             scene.add(text);
         }

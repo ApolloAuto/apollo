@@ -22,4 +22,20 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "common_lib",
+    srcs = [
+        "common.cc",
+    ],
+    hdrs = [
+        "common.h",
+    ],
+    deps = [
+        "//cyber/common:log",
+        "//modules/common/util",
+        "//modules/planning/common:frame",
+        "//modules/planning/common:reference_line_info",
+    ],
+)
+
 cpplint()

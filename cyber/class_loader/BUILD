@@ -33,7 +33,7 @@ cc_library(
         "class_loader_manager.h",
     ],
     deps = [
-        "class_loader",
+        ":class_loader",
     ],
 )
 

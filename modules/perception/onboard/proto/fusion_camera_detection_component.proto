@@ -28,4 +28,11 @@ message FusionCameraDetection {
     optional string visual_debug_folder = 23 [default = "/apollo/debug_output"];
     optional string visual_camera = 24 [default = "front_6mm"];
     optional bool write_visual_img = 25 [default = false];
+    optional double min_laneline_length_for_cipv = 26 [default = 2];
+    optional double average_lane_width_in_meter = 27 [default = 3.7];
+    optional double max_vehicle_width_in_meter = 28 [default = 2.5];
+    optional double average_frame_rate = 29 [default = 0.05];
+    optional bool image_based_cipv = 30 [default = false];
+    optional int32 debug_level = 31 [default = 0];
+    optional bool enable_cipv = 32 [default = false];
 }

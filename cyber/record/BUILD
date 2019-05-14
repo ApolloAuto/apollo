@@ -5,9 +5,9 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "record",
     deps = [
-        "record_reader",
-        "record_viewer",
-        "record_writer",
+        ":record_reader",
+        ":record_viewer",
+        ":record_writer",
     ],
 )
 
@@ -26,8 +26,8 @@ cc_library(
     srcs = ["file/record_file_reader.cc"],
     hdrs = ["file/record_file_reader.h"],
     deps = [
-        "record_file_base",
-        "section",
+        ":record_file_base",
+        ":section",
         "//cyber/common:file",
         "//cyber/time",
         "@com_google_protobuf//:protobuf",
@@ -39,8 +39,8 @@ cc_library(
     srcs = ["file/record_file_writer.cc"],
     hdrs = ["file/record_file_writer.h"],
     deps = [
-        "record_file_base",
-        "section",
+        ":record_file_base",
+        ":section",
         "//cyber/common:file",
         "//cyber/time",
         "@com_google_protobuf//:protobuf",
@@ -90,9 +90,9 @@ cc_library(
     srcs = ["record_reader.cc"],
     hdrs = ["record_reader.h"],
     deps = [
-        "record_base",
-        "record_file_reader",
-        "record_message",
+        ":record_base",
+        ":record_file_reader",
+        ":record_message",
     ],
 )
 
@@ -112,8 +112,8 @@ cc_library(
     srcs = ["record_viewer.cc"],
     hdrs = ["record_viewer.h"],
     deps = [
-        "record_message",
-        "record_reader",
+        ":record_message",
+        ":record_reader",
     ],
 )
 
@@ -133,9 +133,9 @@ cc_library(
     srcs = ["record_writer.cc"],
     hdrs = ["record_writer.h"],
     deps = [
-        "header_builder",
-        "record_base",
-        "record_file_writer",
+        ":header_builder",
+        ":record_base",
+        ":record_file_writer",
         "//cyber/message:raw_message",
         "//cyber/proto:record_cc_proto",
     ],

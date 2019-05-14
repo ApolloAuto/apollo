@@ -132,7 +132,7 @@ void ObstaclesPrioritizer::AssignIgnoreLevel() {
 
   const auto& obstacle_ids =
       obstacles_container->curr_frame_movable_obstacle_ids();
-  for (const int& obstacle_id : obstacle_ids) {
+  for (const int obstacle_id : obstacle_ids) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(obstacle_id);
     if (obstacle_ptr->history_size() == 0) {
       AERROR << "Obstacle [" << obstacle_ptr->id() << "] has no feature.";

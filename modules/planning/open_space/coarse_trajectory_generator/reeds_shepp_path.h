@@ -98,8 +98,7 @@ class ReedShepp {
   // setRSP parallel version
   bool SetRSPPar(const int size, const double* lengths,
                  const std::string& types,
-                 std::vector<ReedSheppPath>* all_possible_paths,
-                 const int idx);
+                 std::vector<ReedSheppPath>* all_possible_paths, const int idx);
   // Six different combination of motion primitive in Reed Shepp path used in
   // GenerateRSP()
   bool SCS(const double x, const double y, const double phi,
@@ -115,24 +114,15 @@ class ReedShepp {
   bool CCSCC(const double x, const double y, const double phi,
              std::vector<ReedSheppPath>* all_possible_paths);
   // different options for different combination of motion primitives
-  void LSL(const double x, const double y, const double phi,
-           RSPParam* param);
-  void LSR(const double x, const double y, const double phi,
-           RSPParam* param);
-  void LRL(const double x, const double y, const double phi,
-           RSPParam* param);
-  void SLS(const double x, const double y, const double phi,
-           RSPParam* param);
-  void LRLRn(const double x, const double y, const double phi,
-             RSPParam* param);
-  void LRLRp(const double x, const double y, const double phi,
-             RSPParam* param);
-  void LRSR(const double x, const double y, const double phi,
-            RSPParam* param);
-  void LRSL(const double x, const double y, const double phi,
-            RSPParam* param);
-  void LRSLR(const double x, const double y, const double phi,
-             RSPParam* param);
+  void LSL(const double x, const double y, const double phi, RSPParam* param);
+  void LSR(const double x, const double y, const double phi, RSPParam* param);
+  void LRL(const double x, const double y, const double phi, RSPParam* param);
+  void SLS(const double x, const double y, const double phi, RSPParam* param);
+  void LRLRn(const double x, const double y, const double phi, RSPParam* param);
+  void LRLRp(const double x, const double y, const double phi, RSPParam* param);
+  void LRSR(const double x, const double y, const double phi, RSPParam* param);
+  void LRSL(const double x, const double y, const double phi, RSPParam* param);
+  void LRSLR(const double x, const double y, const double phi, RSPParam* param);
   std::pair<double, double> calc_tau_omega(const double u, const double v,
                                            const double xi, const double eta,
                                            const double phi);

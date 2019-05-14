@@ -187,6 +187,11 @@ class ReferenceLineInfo {
     blocking_obstacle_id_ = blocking_obstacle_id;
   }
 
+  bool is_path_lane_borrow() const { return is_path_lane_borrow_; }
+  void set_is_path_lane_borrow(bool is_path_lane_borrow) {
+    is_path_lane_borrow_ = is_path_lane_borrow;
+  }
+
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
 
   uint32_t GetPriority() const { return reference_line_.GetPriority(); }
@@ -232,7 +237,7 @@ class ReferenceLineInfo {
 
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
-  bool IsUnrelaventObstacle(const Obstacle* obstacle);
+  bool IsIrrelevantObstacle(const Obstacle& obstacle);
 
   void MakeDecision(DecisionResult* decision_result) const;
 
@@ -298,6 +303,8 @@ class ReferenceLineInfo {
   bool is_on_reference_line_ = false;
 
   bool is_safe_to_change_lane_ = false;
+
+  bool is_path_lane_borrow_ = false;
 
   ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
 

@@ -38,6 +38,13 @@ DECLARE_string(pointcloud_raw_topic);
 DECLARE_string(velodyne_raw_topic);
 DECLARE_string(pointcloud_fusion_topic);
 DECLARE_string(vlp16_pointcloud_topic);
+DECLARE_string(lidar_16_front_center_topic);
+DECLARE_string(lidar_16_front_up_topic);
+DECLARE_string(lidar_16_rear_left_topic);
+DECLARE_string(lidar_16_rear_right_topic);
+DECLARE_string(lidar_16_fusion_topic);
+DECLARE_string(lidar_16_fusion_compensator_topic);
+DECLARE_string(lidar_128_topic);
 DECLARE_string(prediction_topic);
 DECLARE_string(perception_obstacle_topic);
 DECLARE_string(drive_event_topic);
@@ -57,12 +64,19 @@ DECLARE_string(delphi_esr_topic);
 DECLARE_string(conti_radar_topic);
 DECLARE_string(racobit_radar_topic);
 DECLARE_string(ultrasonic_radar_topic);
+DECLARE_string(front_radar_topic);
+DECLARE_string(rear_radar_topic);
 DECLARE_string(compressed_image_topic);
 DECLARE_string(image_front_topic);
 DECLARE_string(image_short_topic);
 DECLARE_string(image_long_topic);
 DECLARE_string(camera_image_long_topic);
 DECLARE_string(camera_image_short_topic);
+DECLARE_string(camera_front_6mm_compressed_topic);
+DECLARE_string(camera_front_12mm_compressed_topic);
+DECLARE_string(camera_left_fisheye_compressed_topic);
+DECLARE_string(camera_right_fisheye_compressed_topic);
+DECLARE_string(camera_rear_6mm_compressed_topic);
 DECLARE_string(gnss_rtk_obs_topic);
 DECLARE_string(gnss_rtk_eph_topic);
 DECLARE_string(gnss_best_pose_topic);
@@ -94,3 +108,7 @@ DECLARE_string(guardian_topic);
 
 // Data topic
 DECLARE_string(data_topic);
+
+// Transform topic
+DECLARE_string(tf_topic);
+DECLARE_string(tf_static_topic);

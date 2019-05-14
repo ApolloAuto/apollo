@@ -149,10 +149,23 @@ cc_test(
 )
 
 cc_test(
-    name = "scheduler_policy_test",
+    name = "scheduler_classic_test",
     size = "small",
     srcs = [
-        "scheduler_policy_test.cc",
+        "scheduler_classic_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "//cyber/scheduler:scheduler_factory",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "scheduler_choreo_test",
+    size = "small",
+    srcs = [
+        "scheduler_choreo_test.cc",
     ],
     deps = [
         "//cyber",

@@ -25,6 +25,8 @@
 
 #include "modules/planning/proto/planning.pb.h"
 
+#include "modules/common/math/box2d.h"
+#include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 
@@ -66,7 +68,7 @@ class TrajectoryAnalyzer {
   unsigned int seq_num() { return seq_num_; }
 
   /**
-   * @brief query a point of trajectery that its absolute time is closest
+   * @brief query a point of trajectory that its absolute time is closest
    * to the give time.
    * @param t absolute time for query
    * @return a point of trajectory
@@ -74,7 +76,7 @@ class TrajectoryAnalyzer {
   common::TrajectoryPoint QueryNearestPointByAbsoluteTime(const double t) const;
 
   /**
-   * @brief query a point of trajectery that its relative time is closest
+   * @brief query a point of trajectory that its relative time is closest
    * to the give time. The time is relative to the first pointof trajectory
    * @param t relative time for query
    * @return a point of trajectory
@@ -82,7 +84,7 @@ class TrajectoryAnalyzer {
   common::TrajectoryPoint QueryNearestPointByRelativeTime(const double t) const;
 
   /**
-   * @brief query a point of trajectery that its position is closest
+   * @brief query a point of trajectory that its position is closest
    * to the given position.
    * @param x value of x-coordination in the given position
    * @param y value of y-coordination in the given position
@@ -92,7 +94,7 @@ class TrajectoryAnalyzer {
                                                       const double y) const;
 
   /**
-   * @brief query a point on trajectery that its position is closest
+   * @brief query a point on trajectory that its position is closest
    * to the given position.
    * @param x value of x-coordination in the given position
    * @param y value of y-coordination in the given position
@@ -118,6 +120,26 @@ class TrajectoryAnalyzer {
                          const double v, const common::PathPoint &matched_point,
                          double *ptr_s, double *ptr_s_dot, double *ptr_d,
                          double *ptr_d_dot) const;
+
+  /**
+   * @brief Transform the current trajectory points to the center of mass(COM)
+   * of the vehicle, given the distance from rear wheels to the center of mass.
+   * @param rear_to_com_distance Distance from rear wheels to
+   *        the vehicle's center of mass.
+   */
+  void TrajectoryTransformToCOM(const double rear_to_com_distance);
+
+  /**
+   * @brief Compute the position of center of mass(COM) of the vehicle,
+   *        given the distance from rear wheels to the center of mass.
+   * @param rear_to_com_distance Distance from rear wheels to
+   *        the vehicle's center of mass.
+   * @param path_point PathPoint along the published planning trajectory.
+   * @return The position of the vehicle's center of mass.
+   */
+  common::math::Vec2d ComputeCOMPosition(
+      const double rear_to_com_distance,
+      const common::PathPoint &path_point) const;
 
   /**
    * @brief get all points of the trajectory

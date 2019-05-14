@@ -39,9 +39,8 @@ TrafficLightUnprotectedRightTurnStageIntersectionCruise::Process(
   }
 
   bool stage_done = stage_impl_.CheckDone(
-      *frame,
-      ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN,
-      config_, false);
+      *frame, ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN, config_,
+      false);
   if (stage_done) {
     return FinishStage();
   }

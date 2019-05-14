@@ -27,7 +27,6 @@ export default class PlanningData {
       thetaGraph: {},
       kappaGraph: {},
       dkappaGraph: {},
-      dpPolyGraph: {},
     };
   }
 
@@ -203,23 +202,6 @@ export default class PlanningData {
     }
   }
 
-  updateDpPolyGraph(dpPolyData) {
-    const graph = this.data.dpPolyGraph;
-
-    if (dpPolyData.sampleLayer) {
-      graph.sampleLayer = [];
-      for (const sample of dpPolyData.sampleLayer) {
-        sample.slPoint.map(({s, l}) => {
-          graph.sampleLayer.push({x:s, y:l});
-        });
-      }
-    }
-
-    if (dpPolyData.minCostPoint) {
-      graph.minCostPoint = this.extractDataPoints(dpPolyData.minCostPoint, 's', 'l');
-    }
-  }
-
   updateScenario(newScenario, newTime) {
     if (!newScenario) {
       return;
@@ -288,10 +270,6 @@ export default class PlanningData {
         this.updateKappaGraph(planningData.path);
         this.updateDkappaGraph(planningData.path);
         this.updateThetaGraph(planningData.path);
-      }
-
-      if (planningData.dpPolyGraph) {
-        this.updateDpPolyGraph(planningData.dpPolyGraph);
       }
 
       this.updatePlanningTime(newPlanningTime);

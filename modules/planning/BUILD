@@ -38,13 +38,11 @@ cc_library(
     srcs = [
         "navi_planning.cc",
         "on_lane_planning.cc",
-        "open_space_planning.cc",
         "planning_base.cc",
     ],
     hdrs = [
         "navi_planning.h",
         "on_lane_planning.h",
-        "open_space_planning.h",
         "planning_base.h",
     ],
     copts = [

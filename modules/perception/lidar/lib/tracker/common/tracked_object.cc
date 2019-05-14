@@ -72,7 +72,7 @@ void TrackedObject::AttachObject(base::ObjectPtr obj_ptr,
     for (size_t i = 0; i < cloud.size(); ++i) {
       cloud_world.SetPointHeight(i, cloud.points_height(i));
     }
-    // other belief infomation keep as Reset()
+    // other belief information keep as Reset()
     selected_measured_velocity = Eigen::Vector3d::Zero();
     selected_measured_acceleration = Eigen::Vector3d::Zero();
     belief_anchor_point = barycenter;

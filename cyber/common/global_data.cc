@@ -102,7 +102,7 @@ bool GlobalData::IsRealityMode() const { return is_reality_mode_; }
 
 void GlobalData::InitHostInfo() {
   char host_name[1024];
-  gethostname(host_name, 1024);
+  gethostname(host_name, sizeof(host_name));
   host_name_ = host_name;
 
   host_ip_ = "127.0.0.1";

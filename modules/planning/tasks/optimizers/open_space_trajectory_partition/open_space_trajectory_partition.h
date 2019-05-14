@@ -45,8 +45,9 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
  private:
   common::Status Process() override;
 
-  void InterpolateTrajectory(const DiscretizedTrajectory& trajectory,
-                             DiscretizedTrajectory* interpolated_trajectory);
+  void InterpolateTrajectory(
+      const DiscretizedTrajectory& stitched_trajectory_result,
+      DiscretizedTrajectory* interpolated_trajectory);
 
   void UpdateVehicleInfo();
 
@@ -58,8 +59,9 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
 
   void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
 
-  void PartitionTrajectory(DiscretizedTrajectory* interpolated_trajectory,
-                           std::vector<TrajGearPair>* paritioned_trajectories);
+  void PartitionTrajectory(
+      DiscretizedTrajectory* interpolated_trajectory_result_ptr,
+      std::vector<TrajGearPair>* paritioned_trajectories);
 
   bool CheckReachTrajectoryEnd(const DiscretizedTrajectory& trajectory,
                                const canbus::Chassis::GearPosition& gear,

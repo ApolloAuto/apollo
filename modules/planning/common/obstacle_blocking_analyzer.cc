@@ -32,7 +32,7 @@ using apollo::common::VehicleConfigHelper;
 using apollo::hdmap::HDMapUtil;
 
 constexpr double kAdcDistanceThreshold = 35.0;  // unit: m
-constexpr double kObstaclesDistanceThreshold = 5.0;
+constexpr double kObstaclesDistanceThreshold = 15.0;
 
 bool IsNonmovableObstacle(const ReferenceLineInfo& reference_line_info,
                           const Obstacle& obstacle) {
@@ -191,11 +191,10 @@ bool IsBlockingDrivingPathObstacle(const ReferenceLine& reference_line,
     // side_pass_context_.scenario_config_.min_l_nudge_buffer()
     ADEBUG << "It is NOT blocking our path.";
     return false;
-  } else {
-    ADEBUG << "It is blocking our path.";
-    return true;
   }
-  return false;
+
+  ADEBUG << "It is blocking our path.";
+  return true;
 }
 
 bool IsParkedVehicle(const ReferenceLine& reference_line,
@@ -228,7 +227,7 @@ bool IsParkedVehicle(const ReferenceLine& reference_line,
   }
 
   bool is_parked = is_on_parking_lane || is_at_road_edge;
-  return (is_parked && obstacle->IsStatic());
+  return is_parked && obstacle->IsStatic();
 }
 
 }  // namespace planning

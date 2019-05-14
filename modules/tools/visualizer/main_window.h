@@ -49,7 +49,7 @@ class MainWindow : public QMainWindow {
   ~MainWindow();
 
   void TopologyChanged(const apollo::cyber::proto::ChangeMsg& change_msg);
-  void FindNewWriter(const apollo::cyber::proto::RoleAttributes& role);
+  void AddNewWriter(const apollo::cyber::proto::RoleAttributes& role);
 
  protected:
   void resizeEvent(QResizeEvent*) override;

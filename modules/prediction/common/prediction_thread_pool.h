@@ -28,28 +28,26 @@
 #include <utility>
 #include <vector>
 
-#include "boost/asio.hpp"
-#include "boost/thread.hpp"
-
+#include "cyber/base/bounded_queue.h"
 #include "cyber/common/log.h"
 
 namespace apollo {
 namespace prediction {
 
-class PredictionThreadPool {
+class BaseThreadPool {
  public:
-  PredictionThreadPool(int thread_num, int thread_pool_index);
+  BaseThreadPool(int thread_num, int next_thread_pool_level);
 
-  ~PredictionThreadPool() = default;
+  void Stop();
 
-  template<typename InputIter, typename F>
+  ~BaseThreadPool();
+
+  template <typename InputIter, typename F>
   void ForEach(InputIter begin, InputIter end, F f) {
     std::vector<std::future<void>> futures;
     for (auto iter = begin; iter != end; ++iter) {
       auto& elem = *iter;
-      futures.emplace_back(this->Post([&]{
-        f(elem);
-      }));
+      futures.emplace_back(this->Post([&] { f(elem); }));
     }
     for (auto& future : futures) {
       if (future.valid()) {
@@ -60,7 +58,7 @@ class PredictionThreadPool {
     }
   }
 
-  template<typename FuncType>
+  template <typename FuncType>
   std::future<typename std::result_of<FuncType()>::type> Post(FuncType&& func) {
     typedef typename std::result_of<FuncType()>::type ReturnType;
     typedef typename std::packaged_task<ReturnType()> TaskType;
@@ -72,16 +70,46 @@ class PredictionThreadPool {
     std::future<ReturnType> returned_future = task->get_future();
 
     // Note: variables eg. `task` must be copied here because of the lifetime
-    io_service_.post([=]{
-      (*task)();
-    });
+    if (stopped_) {
+      return std::future<ReturnType>();
+    }
+    task_queue_.Enqueue([task]() { (*task)(); });
     return returned_future;
   }
 
+  static std::vector<int> THREAD_POOL_CAPACITY;
+
  private:
-  boost::thread_group thread_group_;
-  boost::asio::io_service io_service_;
-  boost::asio::io_service::work work_;
+  std::vector<std::thread> workers_;
+  apollo::cyber::base::BoundedQueue<std::function<void()>> task_queue_;
+  std::atomic_bool stopped_;
+};
+
+template <int LEVEL>
+class LevelThreadPool : public BaseThreadPool {
+ public:
+  static LevelThreadPool* Instance() {
+    static LevelThreadPool<LEVEL> pool;
+    return &pool;
+  }
+
+ private:
+  LevelThreadPool() : BaseThreadPool(THREAD_POOL_CAPACITY[LEVEL], LEVEL + 1) {
+    ADEBUG << "Level = " << LEVEL
+           << "; thread pool capacity = " << THREAD_POOL_CAPACITY[LEVEL];
+  }
+};
+
+class PredictionThreadPool {
+ public:
+  static BaseThreadPool* Instance();
+
+  static thread_local int s_thread_pool_level;
+
+  template <typename InputIter, typename F>
+  static void ForEach(InputIter begin, InputIter end, F f) {
+    Instance()->ForEach(begin, end, f);
+  }
 };
 
 }  // namespace prediction

@@ -44,7 +44,7 @@ double ComputeMean(const std::vector<double>& nums, size_t start, size_t end) {
 
 MLPEvaluator::MLPEvaluator() { LoadModel(FLAGS_evaluator_vehicle_mlp_file); }
 
-void MLPEvaluator::Clear() { obstacle_feature_values_map_.clear(); }
+void MLPEvaluator::Clear() {}
 
 void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   Clear();
@@ -75,11 +75,33 @@ void MLPEvaluator::Evaluate(Obstacle* obstacle_ptr) {
     return;
   }
 
+  std::vector<double> obstacle_feature_values;
+  SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
+  if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
+    ADEBUG << "Obstacle [" << id << "] has fewer than "
+           << "expected obstacle feature_values "
+           << obstacle_feature_values.size() << ".";
+    return;
+  }
+
   for (int i = 0; i < lane_graph_ptr->lane_sequence_size(); ++i) {
     LaneSequence* lane_sequence_ptr = lane_graph_ptr->mutable_lane_sequence(i);
     CHECK(lane_sequence_ptr != nullptr);
+    std::vector<double> lane_feature_values;
+    SetLaneFeatureValues(obstacle_ptr, lane_sequence_ptr, &lane_feature_values);
+    if (lane_feature_values.size() != LANE_FEATURE_SIZE) {
+      ADEBUG << "Obstacle [" << id << "] has fewer than "
+             << "expected lane feature_values" << lane_feature_values.size()
+             << ".";
+      continue;
+    }
+
     std::vector<double> feature_values;
-    ExtractFeatureValues(obstacle_ptr, lane_sequence_ptr, &feature_values);
+    feature_values.insert(feature_values.end(), obstacle_feature_values.begin(),
+                          obstacle_feature_values.end());
+    feature_values.insert(feature_values.end(), lane_feature_values.begin(),
+                          lane_feature_values.end());
+
     // Insert features to DataForLearning
     if (FLAGS_prediction_offline_mode == 2 && !obstacle_ptr->IsNearJunction()) {
       FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
@@ -103,13 +125,7 @@ void MLPEvaluator::ExtractFeatureValues(Obstacle* obstacle_ptr,
   int id = obstacle_ptr->id();
   std::vector<double> obstacle_feature_values;
 
-  auto it = obstacle_feature_values_map_.find(id);
-  if (it == obstacle_feature_values_map_.end()) {
-    SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
-    obstacle_feature_values_map_[id] = obstacle_feature_values;
-  } else {
-    obstacle_feature_values = it->second;
-  }
+  SetObstacleFeatureValues(obstacle_ptr, &obstacle_feature_values);
 
   if (obstacle_feature_values.size() != OBSTACLE_FEATURE_SIZE) {
     ADEBUG << "Obstacle [" << id << "] has fewer than "

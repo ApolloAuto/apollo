@@ -54,7 +54,7 @@ Status ProceedWithCautionSpeedGenerator::Process(
   speed_data->clear();
 
   // auto proceed_param =
-  //      PlanningContext::GetScenarioInfo()->proceed_with_caution_speed;
+  //      PlanningContext::Instance()->GetScenarioInfo()->proceed_with_caution_speed;
   // const bool is_fixed_distance = proceed_param.is_fixed_distance;
   // double proceed_distance = is_fixed_distance
   //                               ? proceed_param.distance

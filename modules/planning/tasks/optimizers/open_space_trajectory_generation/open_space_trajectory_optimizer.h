@@ -101,6 +101,13 @@ class OpenSpaceTrajectoryOptimizer {
                       const Eigen::MatrixXd& control_result_ds,
                       const Eigen::MatrixXd& time_result_ds);
 
+  void UseWarmStartAsResult(
+      const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
+      const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
+      Eigen::MatrixXd* state_result_ds, Eigen::MatrixXd* control_result_ds,
+      Eigen::MatrixXd* time_result_ds, Eigen::MatrixXd* dual_l_result_ds,
+      Eigen::MatrixXd* dual_n_result_ds);
+
  private:
   OpenSpaceTrajectoryOptimizerConfig config_;
 

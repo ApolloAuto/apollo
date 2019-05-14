@@ -44,17 +44,14 @@ class Visualizer {
       const double roll_adj,
       const int image_height,
       const int image_width);
-  bool adjust_angles(
-      const std::string &camera_name,
-      const double pitch_adj,
-      const double yaw_adj,
-      const double roll_adj);
+  bool adjust_angles(const std::string &camera_name, const double pitch_adj,
+                     const double yaw_adj, const double roll_adj);
   bool SetDirectory(const std::string &path);
   void ShowResult(const cv::Mat &img, const CameraFrame &frame);
   void Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame);
-  void ShowResult_all_info_single_camera(const cv::Mat &img,
-                                     const CameraFrame &frame,
-                                     const base::MotionBufferPtr motion_buffer);
+  void ShowResult_all_info_single_camera(
+      const cv::Mat &img, const CameraFrame &frame,
+      const base::MotionBufferPtr motion_buffer);
   void Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
                                           const CameraFrame &frame,
                                           Eigen::Matrix3d intrinsic,
@@ -174,6 +171,8 @@ class Visualizer {
   bool show_text_ = false;
   bool show_help_text_ = false;
   std::string help_str_;
+  // color
+  cv::Scalar color_cipv_ = cv::Scalar(255, 255, 255);
 };
 
 }  // namespace camera
