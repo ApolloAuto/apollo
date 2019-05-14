@@ -34,19 +34,19 @@ using apollo::common::math::Vec2d;
 // const double kSegmentationEpsilon = 0.2;
 
 // Minimum distance to remove duplicated points.
-const double kDuplicatedPointsEpsilon = 1e-7;
+constexpr double kDuplicatedPointsEpsilon = 1e-7;
 
 // Margin for comparation
-const double kEpsilon = 0.1;
+constexpr double kEpsilon = 0.1;
 
 // Maximum x-coordinate of utm
 // const double kMaxXCoordinate = 834000;
 // Minimum x-coordinate of utm
-const double kMinXCoordinate = 166000;
+// const double kMinXCoordinate = 166000;
 // Maximum y-coordinate of utm
-const double kMaxYCoordinate = 10000000;
+// const double kMaxYCoordinate = 10000000;
 // Minimum y-coordinate of utm
-const double kMinYCoordinate = 0;
+// const double kMinYCoordinate = 0;
 
 bool IsPointValid(const PointENU &point) {
   /* if (point.x() > kMaxXCoordinate || point.x() < kMinXCoordinate) {
@@ -168,7 +168,7 @@ void LaneInfo::Init() {
 
   if (lane_.has_type()) {
     if (lane_.type() == Lane::CITY_DRIVING) {
-      const double kMinHalfWidth = 1.05;
+      constexpr double kMinHalfWidth = 1.05;
       for (const auto &p : sampled_left_width_) {
         if (p.second < kMinHalfWidth) {
           AERROR
@@ -188,10 +188,10 @@ void LaneInfo::Init() {
         }
       }
     } else if (lane_.type() == Lane::NONE) {
-      AERROR << "lane_[id = " << lane_.id().DebugString() << " type is NONE.";
+      AERROR << "lane_[id = " << lane_.id().DebugString() << "] type is NONE.";
     }
   } else {
-    AERROR << "lane_[id = " << lane_.id().DebugString() << "has NO type.";
+    AERROR << "lane_[id = " << lane_.id().DebugString() << "] has NO type.";
   }
 
   sampled_left_road_width_.clear();
@@ -231,10 +231,9 @@ double LaneInfo::Heading(const double s) const {
   int index = static_cast<int>(std::distance(accumulated_s_.begin(), iter));
   if (index == 0 || *iter - s <= common::math::kMathEpsilon) {
     return headings_[index];
-  } else {
-    return common::math::slerp(headings_[index - 1], accumulated_s_[index - 1],
-                               headings_[index], accumulated_s_[index], s);
   }
+  return common::math::slerp(headings_[index - 1], accumulated_s_[index - 1],
+                             headings_[index], accumulated_s_[index], s);
 }
 
 double LaneInfo::Curvature(const double s) const {
@@ -261,10 +260,9 @@ double LaneInfo::Curvature(const double s) const {
   if (index == 0) {
     ADEBUG << "Reach the beginning of lane";
     return 0.0;
-  } else {
-    return (headings_[index] - headings_[index - 1]) /
-           (accumulated_s_[index] - accumulated_s_[index - 1] + kEpsilon);
   }
+  return (headings_[index] - headings_[index - 1]) /
+         (accumulated_s_[index] - accumulated_s_[index - 1] + kEpsilon);
 }
 
 double LaneInfo::GetWidth(const double s) const {

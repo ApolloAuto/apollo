@@ -76,7 +76,7 @@ class PointCloud {
   // @brief reserve function wrapper of vector
   inline virtual void reserve(size_t size) { points_.reserve(size); }
   // @brief empty function wrapper of vector
-  inline bool empty() { return points_.empty(); }
+  inline bool empty() const { return points_.empty(); }
   // @brief resize function wrapper of vector
   inline virtual void resize(size_t size) {
     points_.resize(size);

@@ -27,7 +27,7 @@ namespace prediction {
 class SequencePredictorTest : public KMLMapBasedTest {
  public:
   virtual void SetUp() {
-    std::string file =
+    const std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     cyber::common::GetProtoFromFile(file, &perception_obstacles_);
   }
@@ -47,11 +47,11 @@ TEST_F(SequencePredictorTest, General) {
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   mlp_evaluator.Evaluate(obstacle_ptr);
   SequencePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(), 0);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 0);
   LaneSequence* lane_seq = obstacle_ptr->mutable_latest_feature()
                                ->mutable_lane()
                                ->mutable_lane_graph()

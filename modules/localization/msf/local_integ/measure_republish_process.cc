@@ -322,16 +322,13 @@ void MeasureRepublishProcess::GnssLocalProcess(
 void MeasureRepublishProcess::IntegPvaProcess(const InsPva& inspva_msg) {
   const InsPva& integ_pva = inspva_msg;
 
-  integ_pva_mutex_.lock();
+  std::lock_guard<std::mutex> lock(integ_pva_mutex_);
   if (integ_pva_list_.size() < pva_buffer_size_) {
     integ_pva_list_.push_back(integ_pva);
   } else {
     integ_pva_list_.pop_front();
     integ_pva_list_.push_back(integ_pva);
   }
-  integ_pva_mutex_.unlock();
-
-  return;
 }
 
 bool MeasureRepublishProcess::LidarLocalProcess(
@@ -399,13 +396,8 @@ bool MeasureRepublishProcess::LidarLocalProcess(
 }
 
 bool MeasureRepublishProcess::IsSinsAlign() {
-  integ_pva_mutex_.lock();
-  bool is_sins_align = false;
-  if (!integ_pva_list_.empty()) {
-    is_sins_align = integ_pva_list_.back().init_and_alignment;
-  }
-  integ_pva_mutex_.unlock();
-  return is_sins_align;
+  std::lock_guard<std::mutex> lock(integ_pva_mutex_);
+  return !integ_pva_list_.empty() && integ_pva_list_.back().init_and_alignment;
 }
 
 void MeasureRepublishProcess::TransferXYZFromBestgnsspose(
@@ -524,7 +516,7 @@ bool MeasureRepublishProcess::CalculateVelFromBestgnsspose(
       delta_yaw = delta_yaw + rad_round;
     }
 
-    AINFO << "yaw caculated from position difference: "
+    AINFO << "yaw calculated from position difference: "
           << yaw_from_vel * RAD_TO_DEG;
     constexpr double rad_5deg = 5 * DEG_TO_RAD;
     if (delta_yaw > rad_5deg || delta_yaw < -rad_5deg) {

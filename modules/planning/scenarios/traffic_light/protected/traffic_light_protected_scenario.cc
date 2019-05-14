@@ -25,8 +25,8 @@
 #include "cyber/common/log.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/traffic_light/protected/stage_approach.h"
 #include "modules/planning/scenarios/traffic_light/protected/stage_intersection_cruise.h"
-#include "modules/planning/scenarios/traffic_light/protected/stage_stop.h"
 
 namespace apollo {
 namespace planning {
@@ -48,23 +48,28 @@ void TrafficLightProtectedScenario::Init() {
     return;
   }
 
-  if (PlanningContext::GetScenarioInfo()
-      ->current_traffic_light_overlaps.empty()) {
-    AERROR << "Could not find traffic-ligh(s)";
+  const auto& traffic_light_status =
+      PlanningContext::Instance()->planning_status().traffic_light();
+
+  if (traffic_light_status.current_traffic_light_overlap_id_size() == 0) {
+    AERROR << "Could not find traffic-light(s)";
     return;
   }
 
-  for (const auto& traffic_light_overlap :
-       PlanningContext::GetScenarioInfo()->current_traffic_light_overlaps) {
+  context_.current_traffic_light_overlap_ids.clear();
+  for (int i = 0;
+       i < traffic_light_status.current_traffic_light_overlap_id_size(); i++) {
     const std::string traffic_light_overlap_id =
-        traffic_light_overlap.object_id;
+        traffic_light_status.current_traffic_light_overlap_id(i);
     hdmap::SignalInfoConstPtr traffic_light =
         HDMapUtil::BaseMap().GetSignalById(
             hdmap::MakeMapId(traffic_light_overlap_id));
     if (!traffic_light) {
       AERROR << "Could not find traffic light: " << traffic_light_overlap_id;
     }
-    return;
+
+    context_.current_traffic_light_overlap_ids.push_back(
+        traffic_light_overlap_id);
   }
 
   init_ = true;
@@ -80,9 +85,9 @@ void TrafficLightProtectedScenario::RegisterStages() {
     s_stage_factory_.Clear();
   }
   s_stage_factory_.Register(
-      ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_STOP,
+      ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_APPROACH,
       [](const ScenarioConfig::StageConfig& config) -> Stage* {
-        return new TrafficLightProtectedStageStop(config);
+        return new TrafficLightProtectedStageApproach(config);
       });
   s_stage_factory_.Register(
       ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE,
@@ -102,11 +107,6 @@ std::unique_ptr<Stage> TrafficLightProtectedScenario::CreateStage(
     ptr->SetContext(&context_);
   }
   return ptr;
-}
-
-bool TrafficLightProtectedScenario::IsTransferable(
-    const Scenario& current_scenario, const Frame& frame) {
-  return false;
 }
 
 /*

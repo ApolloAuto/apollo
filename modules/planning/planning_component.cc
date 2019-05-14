@@ -25,7 +25,6 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/navi_planning.h"
 #include "modules/planning/on_lane_planning.h"
-#include "modules/planning/open_space_planning.h"
 
 namespace apollo {
 namespace planning {
@@ -38,15 +37,12 @@ using apollo::routing::RoutingRequest;
 using apollo::routing::RoutingResponse;
 
 bool PlanningComponent::Init() {
-  if (FLAGS_open_space_planner_switchable) {
-    planning_base_ = std::make_unique<OpenSpacePlanning>();
+  if (FLAGS_use_navigation_mode) {
+    planning_base_ = std::make_unique<NaviPlanning>();
   } else {
-    if (FLAGS_use_navigation_mode) {
-      planning_base_ = std::make_unique<NaviPlanning>();
-    } else {
-      planning_base_ = std::make_unique<OnLanePlanning>();
-    }
+    planning_base_ = std::make_unique<OnLanePlanning>();
   }
+
   CHECK(apollo::cyber::common::GetProtoFromFile(FLAGS_planning_config_file,
                                                 &config_))
       << "failed to load planning config file " << FLAGS_planning_config_file;
@@ -120,9 +116,6 @@ bool PlanningComponent::Proc(
         hdmap::PncMap::IsNewRouting(*local_view_.routing, routing_)) {
       local_view_.routing =
           std::make_shared<routing::RoutingResponse>(routing_);
-      local_view_.is_new_routing = true;
-    } else {
-      local_view_.is_new_routing = false;
     }
   }
   {
@@ -152,8 +145,9 @@ bool PlanningComponent::Proc(
 }
 
 void PlanningComponent::CheckRerouting() {
-  auto* rerouting =
-      PlanningContext::MutablePlanningStatus()->mutable_rerouting();
+  auto* rerouting = PlanningContext::Instance()
+                        ->mutable_planning_status()
+                        ->mutable_rerouting();
   if (!rerouting->need_rerouting()) {
     return;
   }

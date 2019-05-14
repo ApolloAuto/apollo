@@ -41,7 +41,7 @@ void ObstacleClusters::Clear() {
 void ObstacleClusters::Init() { Clear(); }
 
 const LaneGraph& ObstacleClusters::GetLaneGraph(
-    const double start_s, const double length,
+    const double start_s, const double length, const bool is_on_lane,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
   std::string lane_id = lane_info_ptr->id().id();
   if (lane_graphs_.find(lane_id) != lane_graphs_.end()) {
@@ -63,7 +63,7 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
   } else {
     // If this lane_segment has not been used for constructing LaneGraph,
     // construct the LaneGraph and return.
-    RoadGraph road_graph(start_s, length, lane_info_ptr);
+    RoadGraph road_graph(start_s, length, is_on_lane, lane_info_ptr);
     LaneGraph lane_graph;
     road_graph.BuildLaneGraph(&lane_graph);
     lane_graphs_[lane_id] = std::move(lane_graph);
@@ -72,9 +72,9 @@ const LaneGraph& ObstacleClusters::GetLaneGraph(
 }
 
 LaneGraph ObstacleClusters::GetLaneGraphWithoutMemorizing(
-    const double start_s, const double length,
+    const double start_s, const double length, bool is_on_lane,
     std::shared_ptr<const LaneInfo> lane_info_ptr) {
-  RoadGraph road_graph(start_s, length, lane_info_ptr);
+  RoadGraph road_graph(start_s, length, true, lane_info_ptr);
   LaneGraph lane_graph;
   road_graph.BuildLaneGraph(&lane_graph);
   return lane_graph;

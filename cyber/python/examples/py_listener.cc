@@ -18,11 +18,12 @@
 #include "cyber/proto/unit_test.pb.h"
 #include "cyber/py_wrapper/py_node.h"
 
-apollo::cyber::PyReader *pr = NULL;
+apollo::cyber::PyReader *pr = nullptr;
 
 int cbfun(const char *channel_name) {
   AINFO << "recv->[ " << channel_name << " ]";
   if (pr) AINFO << "read->[ " << pr->read() << " ]";
+  return 1;
 }
 
 int main(int argc, char *argv[]) {

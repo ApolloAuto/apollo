@@ -40,7 +40,7 @@ cc_binary(
   )
 ```
 We can find the mapping easily from the 2 file snippets. For example, `pb_talker` and `src/talker.cpp` in cmake `add_executable` setting map to `name = "talker"` and `srcs = ["talker.cc"]` in BUILD file `cc_binary`.
-###Proto
+### Proto
 Apollo ROS has customized to support proto message formate that a separate section `add_proto_files` and projectName_proto(`pb_msgs_example_proto`) in `target_link_libraries` are required to send message in proto formate. For config proto message in Cyber-RT, it's as simple as adding the target proto file path concantenated with name of `cc_proto_library` in `deps` setting. The `cc_proto_library` is set up in BUILD file under proto folder. 
 
 ```C
@@ -63,7 +63,7 @@ The package definition has also changed in Cyber-RT. In Apollo ROS a fixed packa
 ## Folder structure
 As shown below, Cyber-RT remove the src folder and pull all source code in the same folder as BUILD file. BUILD file plays the same role as CMakeLists.txt plus package.xml. Both Cyber-RT and Apollo ROS talker/listener example have a proto folder for message proto files but Cyber-RT requires a separate BUILD file for proto folder to set up the proto library.
  
-###Apollo ROS
+### Apollo ROS
 - CMakeLists.txt
 - package.xml
 - proto
@@ -74,7 +74,7 @@ As shown below, Cyber-RT remove the src folder and pull all source code in the s
 
 ### Cyber-RT
 - BUILD
-- listener.ccc
+- listener.cc
 - talker.cc
 - proto
   - BUILD
@@ -136,7 +136,7 @@ You can see easily from the two listener code above that Cyber-RT provides very 
       listener_node->CreateReader("channel/chatter", MessageCallback);`
 - `ros::spin();` --> `apollo::cyber::WaitForShutdown();`
 
-Note: for Cyber-RT, a listener node has to use node->CreateReader<messageType>(channelName, callback) to read data from channel.
+Note: for Cyber-RT, a listener node has to use `node->CreateReader<messageType>(channelName, callback)` to read data from channel.
 
 ### Talker
 

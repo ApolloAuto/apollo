@@ -87,8 +87,8 @@ class OfflineLidarObstaclePerception {
       return false;
     }
 
-    if (!common::SensorManager::Instance()->GetSensorInfo(
-        FLAGS_sensor_name, &sensor_info_)) {
+    if (!common::SensorManager::Instance()->GetSensorInfo(FLAGS_sensor_name,
+                                                          &sensor_info_)) {
       AERROR << "Failed to get sensor info, sensor name: " << FLAGS_sensor_name;
       return false;
     }
@@ -202,8 +202,10 @@ class OfflineLidarObstaclePerception {
           filtered_objects.push_back(object);
         }
       }
-      if (!WriteObjectsForNewBenchmark(i, filtered_objects,
-          apollo::common::util::StrCat(output_path, "/", file_name, ".pcd"))) {
+      if (!WriteObjectsForNewBenchmark(
+              i, filtered_objects,
+              apollo::common::util::StrCat(output_path, "/", file_name,
+                                           ".pcd"))) {
         return false;
       }
     }
@@ -239,7 +241,7 @@ class OfflineLidarObstaclePerception {
         type = "nonMot";
       }
 
-      double yaw = atan2(object->direction[1], object->direction[0]);
+      double yaw = atan2(object->direction(1), object->direction(0));
       auto& object_cloud = object->lidar_supplement.cloud;
 
       fout << type << " " << object->center(0) << " " << object->center(1)
@@ -328,7 +330,7 @@ class OfflineLidarObstaclePerception {
 }  // namespace perception
 }  // namespace apollo
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   FLAGS_alsologtostderr = 1;
   google::ParseCommandLineFlags(&argc, &argv, true);
   google::InitGoogleLogging(argv[0]);

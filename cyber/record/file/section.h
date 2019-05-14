@@ -23,7 +23,7 @@ namespace record {
 
 struct Section {
   SectionType type;
-  uint64_t size;
+  int64_t size;
 };
 
 }  // namespace record

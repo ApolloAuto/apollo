@@ -24,15 +24,16 @@ from cyber_py import record
 
 TEST_RECORD_FILE = "trans_ret.record"
 
+
 def test_record_trans(reader_path):
     """
-    record trans.
+    Record trans.
     """
     fwriter = record.RecordWriter()
     if not fwriter.open(TEST_RECORD_FILE):
-        print "writer open failed!"
+        print('Failed to open record writer!')
         return
-    print "+++ begin to trans..."
+    print('+++ Begin to trans +++')
 
     fread = record.RecordReader(reader_path)
     count = 0
@@ -41,16 +42,19 @@ def test_record_trans(reader_path):
         desc = fread.get_protodesc(channelname)
         fwriter.write_channel(channelname, datatype, desc)
         fwriter.write_message(channelname, msg, timestamp)
-        count = count + 1
-    print "-"*80
-    print "message count is ", count
-    print "channel info:"
+        count += 1
+    print('-' * 80)
+    print('Message count: %d' % count)
+    print('Channel info: ')
     channel_list = fread.get_channellist()
-    print "channel count is ", len(channel_list)
-    print channel_list
+    print('Channel count: %d' % len(channel_list))
+    print(channel_list)
 
 if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print('Usage: %s record_file' % sys.argv[0])
+        sys.exit(0)
+
     cyber.init()
     test_record_trans(sys.argv[1])
     cyber.shutdown()
-

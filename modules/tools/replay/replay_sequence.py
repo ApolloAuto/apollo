@@ -28,16 +28,9 @@ from google.protobuf import text_format
 import common.message_manager as message_manager
 
 
-def generate_message(filename, pb_type):
-    f_handle = file(filename, 'r')
-    message = pb_type()
-    text_format.Merge(f_handle.read(), message)
-    f_handle.close()
-    return message
-
-
 def seq_publisher(seq_num, period):
     """publisher"""
+
     rospy.init_node('replay_node', anonymous=True)
     messages = {}
     for msg in message_manager.topic_pb_list:
@@ -46,12 +39,12 @@ def seq_publisher(seq_num, period):
         msg_type = msg.msg_type
         messages[topic] = {}
         filename = str(seq_num) + "_" + name + ".pb.txt"
-        print "trying to load pb file:", filename
+        print('trying to load pb file: %s' % filename)
         messages[topic]["publisher"] = rospy.Publisher(
             topic, msg_type, queue_size=1)
         pb_msg = msg.parse_file(filename)
         if not pb_msg:
-            print topic, " pb is none"
+            print('%s pb is none' % topic)
             # continue
         messages[topic]["value"] = pb_msg
 
@@ -59,10 +52,9 @@ def seq_publisher(seq_num, period):
     while not rospy.is_shutdown():
         for topic in messages:
             if messages[topic]["value"] is not None:
-                print "publish: ", topic
+                print('publish: %s' % topic)
                 messages[topic]["publisher"].publish(messages[topic]["value"])
         rate.sleep()
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -84,4 +76,4 @@ if __name__ == '__main__':
         seq_publisher(args.seq, args.period)
 
     except rospy.ROSInterruptException:
-        print "failed to replay message"
+        print('Failed to replay message.')

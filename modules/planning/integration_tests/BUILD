@@ -23,7 +23,6 @@ cc_library(
         "//modules/common/vehicle_state:vehicle_state_provider",
         "//modules/planning:planning_component_lib",
         "//modules/planning:planning_lib",
-        "//modules/planning/proto:dp_poly_path_config_proto",
         "//modules/planning/proto:dp_st_speed_config_proto",
         "@gtest",
     ],

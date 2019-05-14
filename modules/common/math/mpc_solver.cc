@@ -35,7 +35,9 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
                     const Matrix &matrix_upper,
                     const Matrix &matrix_initial_state,
                     const std::vector<Matrix> &reference, const double eps,
-                    const int max_iter, std::vector<Matrix> *control) {
+                    const int max_iter, std::vector<Matrix> *control,
+                    std::vector<Matrix> *control_gain,
+                    std::vector<Matrix> *addition_gain) {
   if (matrix_a.rows() != matrix_a.cols() ||
       matrix_b.rows() != matrix_a.rows() ||
       matrix_lower.rows() != matrix_upper.rows()) {
@@ -122,11 +124,17 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
             matrix_c;
   }
 
-  // Update matrix_m1, matrix_m2, convert MPC problem to QP problem done
+  // Update matrix_m1, matrix_m2, convert MPC problem to QP problem
   const Matrix matrix_m1 = static_cast<Matrix>(
       matrix_k.transpose() * matrix_qq * matrix_k + matrix_rr);
   const Matrix matrix_m2 = static_cast<Matrix>(
       matrix_k.transpose() * matrix_qq * (matrix_m + matrix_cc - matrix_t));
+  // Update matrix_m0, matrix_ctrl_gain, matrix_add_gain, obtain the analytical
+  // control gain matrix, corresponding to the unconstraint QP problem
+  const Matrix matrix_m0 = static_cast<Matrix>(
+      -1 * matrix_m1.inverse() * matrix_k.transpose() * matrix_qq);
+  const Matrix matrix_ctrl_gain = static_cast<Matrix>(matrix_m0 * matrix_aa);
+  const Matrix matrix_add_gain = static_cast<Matrix>(matrix_m0 * matrix_cc);
 
   // Format in qp_solver
   /**
@@ -168,6 +176,18 @@ bool SolveLinearMPC(const Matrix &matrix_a, const Matrix &matrix_b,
     (*control)[i] =
         matrix_v.block(i * (*control)[0].rows(), 0, (*control)[0].rows(), 1);
   }
+
+  for (size_t i = 0; i < horizon; ++i) {
+    (*control_gain)[i] = matrix_ctrl_gain.block(i * (*control_gain)[0].rows(),
+                                                0, (*control_gain)[0].rows(),
+                                                (*control_gain)[0].cols());
+  }
+
+  for (size_t i = 0; i < horizon; ++i) {
+    (*addition_gain)[i] = matrix_add_gain.block(
+        i * (*addition_gain)[0].rows(), 0, (*addition_gain)[0].rows(), 1);
+  }
+
   return true;
 }
 

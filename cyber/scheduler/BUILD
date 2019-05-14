@@ -40,8 +40,8 @@ cc_library(
     ],
     deps = [
         "//cyber/croutine",
-        "//cyber/scheduler:processor",
         "//cyber/scheduler:mutex_wrapper",
+        "//cyber/scheduler:processor",
     ],
 )
 
@@ -129,9 +129,9 @@ cc_library(
     deps = [
         "//cyber/croutine",
         "//cyber/proto:classic_conf_cc_proto",
-        "//cyber/scheduler:processor",
-        "//cyber/scheduler:mutex_wrapper",
         "//cyber/scheduler:cv_wrapper",
+        "//cyber/scheduler:mutex_wrapper",
+        "//cyber/scheduler:processor",
     ],
 )
 
@@ -149,10 +149,23 @@ cc_test(
 )
 
 cc_test(
-    name = "scheduler_policy_test",
+    name = "scheduler_classic_test",
     size = "small",
     srcs = [
-        "scheduler_policy_test.cc",
+        "scheduler_classic_test.cc",
+    ],
+    deps = [
+        "//cyber",
+        "//cyber/scheduler:scheduler_factory",
+        "@gtest//:main",
+    ],
+)
+
+cc_test(
+    name = "scheduler_choreo_test",
+    size = "small",
+    srcs = [
+        "scheduler_choreo_test.cc",
     ],
     deps = [
         "//cyber",

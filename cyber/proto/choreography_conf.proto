@@ -2,13 +2,6 @@ syntax = "proto2";
 
 package apollo.cyber.proto;
 
-message InnerThread {
-  optional string name = 1;
-  optional string cpuset = 2;
-  optional string policy = 3;
-  optional uint32 prio = 4 [default = 1];
-}
-
 message ChoreographyTask {
   optional string name = 1;
   optional int32 processor = 2;
@@ -25,7 +18,6 @@ message ChoreographyConf {
   optional string pool_affinity = 7;
   optional string pool_processor_policy = 8;
   optional int32 pool_processor_prio = 9;
-  optional string pool_cpuset = 10; 
+  optional string pool_cpuset = 10;
   repeated ChoreographyTask tasks = 11;
-  repeated InnerThread threads = 12;
 }

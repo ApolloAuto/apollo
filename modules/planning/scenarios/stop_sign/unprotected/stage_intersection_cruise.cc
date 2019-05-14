@@ -21,18 +21,14 @@
 #include "modules/planning/scenarios/stop_sign/unprotected/stage_intersection_cruise.h"
 
 #include "cyber/common/log.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace stop_sign {
 
-using common::TrajectoryPoint;
-
 Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
@@ -41,12 +37,11 @@ Stage::StageStatus StopSignUnprotectedStageIntersectionCruise::Process(
     AERROR << "StopSignUnprotectedStageIntersectionCruise plan error";
   }
 
-  // check pass pnc_junction
-  const auto& reference_line_info = frame->reference_line_info().front();
-  if (!scenario::CheckInsidePnCJunction(reference_line_info)) {
+  bool stage_done = stage_impl_.CheckDone(
+      *frame, ScenarioConfig::STOP_SIGN_UNPROTECTED, config_, false);
+  if (stage_done) {
     return FinishStage();
   }
-
   return Stage::RUNNING;
 }
 

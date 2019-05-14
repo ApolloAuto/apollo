@@ -52,14 +52,36 @@ OpenSpaceTrajectoryProvider::~OpenSpaceTrajectoryProvider() {
 }
 
 void OpenSpaceTrajectoryProvider::Stop() {
-  is_stop_ = true;
   if (FLAGS_enable_open_space_planner_thread) {
-    task_future_.get();
+    is_generation_thread_stop_.store(true);
+    if (thread_init_flag_) {
+      task_future_.get();
+    }
+    trajectory_updated_.store(false);
+    trajectory_error_.store(false);
+    trajectory_skipped_.store(false);
+    optimizer_thread_counter = 0;
   }
 }
 
-Status OpenSpaceTrajectoryProvider::Process(
-    DiscretizedTrajectory* const trajectory_data) {
+void OpenSpaceTrajectoryProvider::Restart() {
+  if (FLAGS_enable_open_space_planner_thread) {
+    is_generation_thread_stop_.store(true);
+    if (thread_init_flag_) {
+      task_future_.get();
+    }
+    is_generation_thread_stop_.store(false);
+    thread_init_flag_ = false;
+    trajectory_updated_.store(false);
+    trajectory_error_.store(false);
+    trajectory_skipped_.store(false);
+    optimizer_thread_counter = 0;
+  }
+}
+
+Status OpenSpaceTrajectoryProvider::Process() {
+  auto trajectory_data =
+      frame_->mutable_open_space_info()->mutable_stitched_trajectory_result();
   // Start thread when getting in Process() for the first time
   if (FLAGS_enable_open_space_planner_thread && !thread_init_flag_) {
     task_future_ = cyber::Async(
@@ -67,23 +89,44 @@ Status OpenSpaceTrajectoryProvider::Process(
     thread_init_flag_ = true;
   }
   // Get stitching trajectory from last frame
-  const double start_timestamp = Clock::NowInSeconds();
   const common::VehicleState vehicle_state = frame_->vehicle_state();
-  const double planning_cycle_time = FLAGS_open_space_planning_period;
-  std::string replan_reason;
-  auto previous_frame = FrameHistory::Instance()->Latest();
-  const auto& previous_planning =
-      previous_frame->current_frame_planned_trajectory();
-  PublishableTrajectory last_frame_publishable_trajectory(previous_planning);
-  auto stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
-      vehicle_state, start_timestamp, planning_cycle_time,
-      &last_frame_publishable_trajectory, &replan_reason);
-
+  auto* previous_frame = FrameHistory::Instance()->Latest();
+  // Use complete raw trajectory from last frame for stitching purpose
+  std::vector<TrajectoryPoint> stitching_trajectory;
+  if (!IsVehicleStopDueToFallBack(
+          previous_frame->open_space_info().fallback_flag(), vehicle_state)) {
+    const auto& previous_planning =
+        previous_frame->open_space_info().stitched_trajectory_result();
+    const auto& previous_planning_header =
+        previous_frame->current_frame_planned_trajectory()
+            .header()
+            .timestamp_sec();
+    const double planning_cycle_time = FLAGS_open_space_planning_period;
+    PublishableTrajectory last_frame_complete_trajectory(
+        previous_planning_header, previous_planning);
+    std::string replan_reason;
+    const double start_timestamp = Clock::NowInSeconds();
+    stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
+        vehicle_state, start_timestamp, planning_cycle_time,
+        FLAGS_open_space_trajectory_stitching_preserved_length,
+        &last_frame_complete_trajectory, &replan_reason);
+  } else {
+    ADEBUG << "Replan due to fallback stop";
+    const double planning_cycle_time =
+        1.0 / static_cast<double>(FLAGS_planning_loop_rate);
+    stitching_trajectory = TrajectoryStitcher::ComputeReinitStitchingTrajectory(
+        planning_cycle_time, vehicle_state);
+  }
   // Get open_space_info from current frame
   const auto& open_space_info = frame_->open_space_info();
 
   if (FLAGS_enable_open_space_planner_thread) {
     ADEBUG << "Open space plan in multi-threads mode";
+
+    if (is_generation_thread_stop_) {
+      GenerateStopTrajectory(trajectory_data);
+      return Status(ErrorCode::OK, "Parking finished");
+    }
 
     {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
@@ -97,6 +140,7 @@ Status OpenSpaceTrajectoryProvider::Process(
       thread_data_.obstacles_vertices_vec =
           open_space_info.obstacles_vertices_vec();
       thread_data_.XYbounds = open_space_info.ROI_xy_boundary();
+      data_ready_.store(true);
     }
 
     // Check vehicle state
@@ -104,6 +148,7 @@ Status OpenSpaceTrajectoryProvider::Process(
             vehicle_state, open_space_info.open_space_end_pose(),
             open_space_info.origin_heading(), open_space_info.origin_point())) {
       GenerateStopTrajectory(trajectory_data);
+      is_generation_thread_stop_.store(true);
       return Status(ErrorCode::OK, "Vehicle is near to destination");
     }
 
@@ -111,14 +156,29 @@ Status OpenSpaceTrajectoryProvider::Process(
     if (trajectory_updated_) {
       std::lock_guard<std::mutex> lock(open_space_mutex_);
       LoadResult(trajectory_data);
+      if (FLAGS_enable_record_debug) {
+        // call merge debug ptr, open_space_trajectory_optimizer_
+        auto* ptr_debug = frame_->mutable_open_space_info()->mutable_debug();
+        open_space_trajectory_optimizer_->UpdateDebugInfo(
+            ptr_debug->mutable_planning_data()->mutable_open_space());
+
+        // sync debug instance
+        frame_->mutable_open_space_info()->sync_debug_instance();
+      }
       trajectory_updated_.store(false);
+      data_ready_.store(false);
       return Status::OK();
     }
 
     if (trajectory_error_) {
       ++optimizer_thread_counter;
+      std::lock_guard<std::mutex> lock(open_space_mutex_);
       trajectory_error_.store(false);
-      if (optimizer_thread_counter > 5) {
+      // TODO(Jinyun) Use other fallback mechanism when last iteration smoothing
+      // result has out of bound pathpoint which is not allowed for next
+      // iteration hybrid astar algorithm which requires start position to be
+      // strictly in bound
+      if (optimizer_thread_counter > 1000) {
         return Status(ErrorCode::PLANNING_ERROR,
                       "open_space_optimizer failed too many times");
       }
@@ -126,6 +186,11 @@ Status OpenSpaceTrajectoryProvider::Process(
 
     if (previous_frame->open_space_info().open_space_provider_success()) {
       ReuseLastFrameResult(previous_frame, trajectory_data);
+      if (FLAGS_enable_record_debug) {
+        // copy previous debug to current frame
+        ReuseLastFrameDebug(previous_frame);
+      }
+      // reuse last frame debug when use last frame traj
       return Status(ErrorCode::OK,
                     "Waiting for open_space_trajectory_optimizer in "
                     "open_space_trajectory_provider");
@@ -169,28 +234,28 @@ Status OpenSpaceTrajectoryProvider::Process(
 }
 
 void OpenSpaceTrajectoryProvider::GenerateTrajectoryThread() {
-  while (!is_stop_) {
-    OpenSpaceTrajectoryThreadData thread_data;
-    {
-      std::lock_guard<std::mutex> lock(open_space_mutex_);
-      thread_data = thread_data_;
-    }
-    if (!trajectory_updated_) {
+  while (!is_generation_thread_stop_) {
+    if (!trajectory_updated_ && data_ready_) {
+      OpenSpaceTrajectoryThreadData thread_data;
+      {
+        std::lock_guard<std::mutex> lock(open_space_mutex_);
+        thread_data = thread_data_;
+      }
       Status status = open_space_trajectory_optimizer_->Plan(
           thread_data.stitching_trajectory, thread_data.end_pose,
           thread_data.XYbounds, thread_data.rotate_angle,
           thread_data.translate_origin, thread_data.obstacles_edges_num,
           thread_data.obstacles_A, thread_data.obstacles_b,
-          thread_data_.obstacles_vertices_vec);
+          thread_data.obstacles_vertices_vec);
       if (status == Status::OK()) {
+        std::lock_guard<std::mutex> lock(open_space_mutex_);
         trajectory_updated_.store(true);
       } else {
-        AERROR_EVERY(200) << "open_space_trajectory_optimizer not returning "
-                             "OK() with status: "
-                          << status.ToString();
         if (status.ok()) {
+          std::lock_guard<std::mutex> lock(open_space_mutex_);
           trajectory_skipped_.store(true);
         } else {
+          std::lock_guard<std::mutex> lock(open_space_mutex_);
           trajectory_error_.store(true);
         }
       }
@@ -218,7 +283,22 @@ bool OpenSpaceTrajectoryProvider::IsVehicleNearDestination(
                                 .open_space_trajectory_optimizer_config()
                                 .is_near_destination_threshold()) {
     ADEBUG << "vehicle reach end_pose";
-    *(frame_->mutable_open_space_info()->mutable_destination_reached()) = true;
+    frame_->mutable_open_space_info()->set_destination_reached(true);
+    return true;
+  }
+  return false;
+}
+
+bool OpenSpaceTrajectoryProvider::IsVehicleStopDueToFallBack(
+    const bool is_on_fallback, const common::VehicleState& vehicle_state) {
+  if (!is_on_fallback) {
+    return false;
+  }
+  constexpr double kEpsilon = 1.0e-1;
+  const double adc_speed = vehicle_state.linear_velocity();
+  const double adc_acceleration = vehicle_state.linear_acceleration();
+  if (std::abs(adc_speed) < kEpsilon && std::abs(adc_acceleration) < kEpsilon) {
+    ADEBUG << "ADC stops due to fallback trajectory";
     return true;
   }
   return false;
@@ -234,7 +314,7 @@ void OpenSpaceTrajectoryProvider::GenerateStopTrajectory(
   for (size_t i = 0; i < stop_trajectory_length; i++) {
     TrajectoryPoint point;
     point.mutable_path_point()->set_x(frame_->vehicle_state().x());
-    point.mutable_path_point()->set_y(frame_->vehicle_state().x());
+    point.mutable_path_point()->set_y(frame_->vehicle_state().y());
     point.mutable_path_point()->set_theta(frame_->vehicle_state().heading());
     point.mutable_path_point()->set_s(0.0);
     point.mutable_path_point()->set_kappa(0.0);
@@ -249,6 +329,7 @@ void OpenSpaceTrajectoryProvider::GenerateStopTrajectory(
 void OpenSpaceTrajectoryProvider::LoadResult(
     DiscretizedTrajectory* const trajectory_data) {
   // Load unstitched two trajectories into frame for debug
+  trajectory_data->clear();
   auto optimizer_trajectory_ptr =
       frame_->mutable_open_space_info()->mutable_optimizer_trajectory_data();
   auto stitching_trajectory_ptr =
@@ -271,20 +352,33 @@ void OpenSpaceTrajectoryProvider::LoadResult(
         optimizer_trajectory_ptr->at(i).path_point().s() +
         stitching_point_relative_s);
   }
-
   *(trajectory_data) = *(optimizer_trajectory_ptr);
 
+  // Last point in stitching trajectory is already in optimized trajectory, so
+  // it is deleted
+  frame_->mutable_open_space_info()
+      ->mutable_stitching_trajectory_data()
+      ->pop_back();
   trajectory_data->PrependTrajectoryPoints(
       frame_->open_space_info().stitching_trajectory_data());
-
-  *(frame_->mutable_open_space_info()->mutable_open_space_provider_success()) =
-      true;
+  frame_->mutable_open_space_info()->set_open_space_provider_success(true);
 }
 
 void OpenSpaceTrajectoryProvider::ReuseLastFrameResult(
     const Frame* last_frame, DiscretizedTrajectory* const trajectory_data) {
   *(trajectory_data) =
       last_frame->open_space_info().stitched_trajectory_result();
+  frame_->mutable_open_space_info()->set_open_space_provider_success(true);
+}
+
+void OpenSpaceTrajectoryProvider::ReuseLastFrameDebug(const Frame* last_frame) {
+  // reuse last frame's instance
+  auto* ptr_debug = frame_->mutable_open_space_info()->mutable_debug_instance();
+  ptr_debug->mutable_planning_data()->mutable_open_space()->MergeFrom(
+      last_frame->open_space_info()
+          .debug_instance()
+          .planning_data()
+          .open_space());
 }
 
 }  // namespace planning

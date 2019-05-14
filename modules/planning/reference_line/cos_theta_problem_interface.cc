@@ -48,16 +48,20 @@ bool CosThetaProbleminterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
   m = static_cast<int>(num_of_points_ << 1);
   num_of_constraints_ = m;
 
-  // number of nonzero constraint jacobian.
-  nnz_jac_g = static_cast<int>(num_of_points_ << 1);
-  nnz_jac_g_ = nnz_jac_g;
+  if (use_automatic_differentiation_) {
+    generate_tapes(n, m, &nnz_jac_g, &nnz_h_lag);
+  } else {
+    // number of nonzero constraint jacobian.
+    nnz_jac_g = static_cast<int>(num_of_points_ << 1);
+    nnz_jac_g_ = nnz_jac_g;
 
-  // number of nonzero hessian and lagrangian.
-  nnz_h_lag = static_cast<int>(num_of_points_ * 11 - 12);
-  nnz_h_lag_ = nnz_h_lag;
+    // number of nonzero hessian and lagrangian.
+    nnz_h_lag = static_cast<int>(num_of_points_ * 11 - 12);
+    nnz_h_lag_ = nnz_h_lag;
 
-  // load hessian structure
-  hessian_strcuture();
+    // load hessian structure
+    hessian_strcuture();
+  }
 
   index_style = IndexStyleEnum::C_STYLE;
   return true;
@@ -72,35 +76,13 @@ bool CosThetaProbleminterface::get_bounds_info(int n, double* x_l, double* x_u,
   // a. for x, y
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    double x_lower = 0.0;
-    double x_upper = 0.0;
-    double y_lower = 0.0;
-    double y_upper = 0.0;
-    double bound = std::min(lateral_bounds_[i], default_max_point_deviation_);
-
-    if (i == 0 && has_fixed_start_point_) {
-      x_lower = start_x_ - relax_;
-      x_upper = start_x_ + relax_;
-      y_lower = start_y_ - relax_;
-      y_upper = start_y_ + relax_;
-    } else if (i + 1 == num_of_points_ && has_fixed_end_point_) {
-      x_lower = end_x_ - relax_;
-      x_upper = end_x_ + relax_;
-      y_lower = end_y_ - relax_;
-      y_upper = end_y_ + relax_;
-    } else {
-      x_lower = init_points_[i].x() - bound;
-      x_upper = init_points_[i].x() + bound;
-      y_lower = init_points_[i].y() - bound;
-      y_upper = init_points_[i].y() + bound;
-    }
     // x
-    x_l[index] = x_lower;
-    x_u[index] = x_upper;
+    x_l[index] = -1e20;
+    x_u[index] = 1e20;
 
     // y
-    x_l[index + 1] = y_lower;
-    x_u[index + 1] = y_upper;
+    x_l[index + 1] = -1e20;
+    x_u[index + 1] = 1e20;
   }
 
   // constraints
@@ -163,6 +145,11 @@ bool CosThetaProbleminterface::get_starting_point(int n, bool init_x, double* x,
 bool CosThetaProbleminterface::eval_f(int n, const double* x, bool new_x,
                                       double& obj_value) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
+  if (use_automatic_differentiation_) {
+    eval_obj(n, x, &obj_value);
+    return true;
+  }
+
   obj_value = 0.0;
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
@@ -192,8 +179,13 @@ bool CosThetaProbleminterface::eval_f(int n, const double* x, bool new_x,
 bool CosThetaProbleminterface::eval_grad_f(int n, const double* x, bool new_x,
                                            double* grad_f) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
-  std::fill(grad_f, grad_f + n, 0.0);
 
+  if (use_automatic_differentiation_) {
+    gradient(tag_f, n, x, grad_f);
+    return true;
+  }
+
+  std::fill(grad_f, grad_f + n, 0.0);
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
     grad_f[index] = x[index] * 2 - init_points_[i].x() * 2;
@@ -253,6 +245,11 @@ bool CosThetaProbleminterface::eval_g(int n, const double* x, bool new_x, int m,
                                       double* g) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<size_t>(m), num_of_constraints_);
+
+  if (use_automatic_differentiation_) {
+    eval_constraints(n, x, m, g);
+    return true;
+  }
   // fill in the positional deviation constraints
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
@@ -267,6 +264,28 @@ bool CosThetaProbleminterface::eval_jac_g(int n, const double* x, bool new_x,
                                           int* jCol, double* values) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<size_t>(m), num_of_constraints_);
+
+  if (use_automatic_differentiation_) {
+    if (values == nullptr) {
+      // return the structure of the jacobian
+      for (int idx = 0; idx < nnz_jac_; idx++) {
+        iRow[idx] = rind_g_[idx];
+        jCol[idx] = cind_g_[idx];
+      }
+    } else {
+      // return the values of the jacobian of the constraints
+      // auto* rind_g = &rind_g_[0];
+      // auto* cind_g = &cind_g_[0];
+      // auto* jacval = &jacval_[0];
+      sparse_jac(tag_g, m, n, 1, x, &nnz_jac_, &rind_g_, &cind_g_, &jacval_,
+                 options_g_);
+      for (int idx = 0; idx < nnz_jac_; idx++) {
+        values[idx] = jacval_[idx];
+      }
+    }
+    return true;
+  }
+
   if (values == nullptr) {
     // positional deviation constraints
     for (int i = 0; i < static_cast<int>(num_of_variables_); ++i) {
@@ -288,6 +307,35 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
                                       const double* lambda, bool new_lambda,
                                       int nele_hess, int* iRow, int* jCol,
                                       double* values) {
+  if (use_automatic_differentiation_) {
+    if (values == nullptr) {
+      // return the structure. This is a symmetric matrix, fill the lower left
+      // triangle only.
+      for (int idx = 0; idx < nnz_L_; idx++) {
+        iRow[idx] = rind_L_[idx];
+        jCol[idx] = cind_L_[idx];
+      }
+    } else {
+      // return the values. This is a symmetric matrix, fill the lower left
+      // triangle only
+      obj_lam_[0] = obj_factor;
+      for (int idx = 0; idx < m; idx++) {
+        obj_lam_[1 + idx] = lambda[idx];
+      }
+      // auto* rind_L = &rind_L_[0];
+      // auto* cind_L = &cind_L_[0];
+      // auto* hessval = &hessval_[0];
+      set_param_vec(tag_L, m + 1, &obj_lam_[0]);
+      sparse_hess(tag_L, n, 1, const_cast<double*>(x), &nnz_L_, &rind_L_,
+                  &cind_L_, &hessval_, options_L_);
+
+      for (int idx = 0; idx < nnz_L_; idx++) {
+        values[idx] = hessval_[idx];
+      }
+    }
+    return true;
+  }
+
   if (values == nullptr) {
     int index = 0;
     for (int i = 0; i < 6; ++i) {
@@ -498,6 +546,14 @@ void CosThetaProbleminterface::finalize_solution(
     opt_x_.emplace_back(x[index]);
     opt_y_.emplace_back(x[index + 1]);
   }
+  if (use_automatic_differentiation_) {
+    free(rind_g_);
+    free(cind_g_);
+    free(rind_L_);
+    free(cind_L_);
+    free(jacval_);
+    free(hessval_);
+  }
 }
 
 void CosThetaProbleminterface::set_default_max_point_deviation(
@@ -507,6 +563,11 @@ void CosThetaProbleminterface::set_default_max_point_deviation(
 
 void CosThetaProbleminterface::set_relax_end_constraint(const double relax) {
   relax_ = relax;
+}
+
+void CosThetaProbleminterface::set_automatic_differentiation_flag(
+    const bool use_ad) {
+  use_automatic_differentiation_ = use_ad;
 }
 
 void CosThetaProbleminterface::set_start_point(const double x, const double y) {
@@ -524,6 +585,15 @@ void CosThetaProbleminterface::set_end_point(const double x, const double y) {
 void CosThetaProbleminterface::set_weight_cos_included_angle(
     const double weight_cos_included_angle) {
   weight_cos_included_angle_ = weight_cos_included_angle;
+}
+
+void CosThetaProbleminterface::set_weight_anchor_points(
+    const double weight_anchor_points) {
+  weight_anchor_points_ = weight_anchor_points;
+}
+
+void CosThetaProbleminterface::set_weight_length(const double weight_length) {
+  weight_length_ = weight_length;
 }
 
 void CosThetaProbleminterface::hessian_strcuture() {
@@ -555,5 +625,221 @@ void CosThetaProbleminterface::hessian_strcuture() {
     }
   }
 }
+
+//***************    start ADOL-C part ***********************************
+
+/** Template to return the objective value */
+template <class T>
+bool CosThetaProbleminterface::eval_obj(int n, const T* x, T* obj_value) {
+  *obj_value = 0.0;
+  for (size_t i = 0; i < num_of_points_; ++i) {
+    size_t index = i << 1;
+    *obj_value +=
+        weight_anchor_points_ *
+        ((x[index] - init_points_[i].x()) * (x[index] - init_points_[i].x()) +
+         (x[index + 1] - init_points_[i].y()) *
+             (x[index + 1] - init_points_[i].y()));
+  }
+  for (size_t i = 0; i < num_of_points_ - 2; ++i) {
+    size_t findex = i << 1;
+    size_t mindex = findex + 2;
+    size_t lindex = mindex + 2;
+
+    // TODO(Jinyun): Numerically Evaluate the performance of different smoothing
+    // objectives
+
+    // Costheta term
+    // *obj_value -=
+    //     weight_cos_included_angle_ *
+    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
+    //      1])))
+    //      /
+    //     (sqrt((x[mindex] - x[findex]) * (x[mindex] - x[findex]) +
+    //           (x[mindex + 1] - x[findex + 1]) *
+    //               (x[mindex + 1] - x[findex + 1])) *
+    //      sqrt((x[lindex] - x[mindex]) * (x[lindex] - x[mindex]) +
+    //           (x[lindex + 1] - x[mindex + 1]) *
+    //               (x[lindex + 1] - x[mindex + 1])));
+
+    // Use last iteration in Denomiator of costheta term
+    // *obj_value -=
+    //     weight_cos_included_angle_ *
+    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
+    //      1])))
+    //      /
+    //     (sqrt((init_points_[i + 1].x() - init_points_[i].x()) *
+    //               (init_points_[i + 1].x() - init_points_[i].x()) +
+    //           (init_points_[i + 1].y() - init_points_[i].y()) *
+    //               (init_points_[i + 1].y() - init_points_[i].y())) *
+    //      sqrt((init_points_[i + 2].x() - init_points_[i + 1].x()) *
+    //               (init_points_[i + 2].x() - init_points_[i + 1].x()) +
+    //           (init_points_[i + 2].y() - init_points_[i + 1].y()) *
+    //               (init_points_[i + 2].y() - init_points_[i + 1].y())));
+
+    // Denominator numerically protected
+    // *obj_value +=
+    //     weight_cos_included_angle_ *
+    //     acos(
+    //         (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+    //          ((x[mindex + 1] - x[findex + 1]) *
+    //           (x[lindex + 1] - x[mindex + 1]))) /
+    //         (1e-8 + sqrt((x[mindex] - x[findex]) * (x[mindex] -
+    //         x[findex]) +
+    //                      (x[mindex + 1] - x[findex + 1]) *
+    //                          (x[mindex + 1] - x[findex + 1])) *
+    //                     sqrt((x[lindex] - x[mindex]) * (x[lindex] -
+    //                     x[mindex]) +
+    //                          (x[lindex + 1] - x[mindex + 1]) *
+    //                              (x[lindex + 1] - x[mindex + 1]))));
+
+    // InnerProd
+    // *obj_value -=
+    //     weight_cos_included_angle_ *
+    //     (((x[mindex] - x[findex]) * (x[lindex] - x[mindex])) +
+    //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
+    //      1])));
+
+    // CrossProd
+    // *obj_value += weight_cos_included_angle_ *
+    //              (((x[findex] - x[mindex]) * (x[lindex + 1] - x[mindex +
+    //              1]))
+    //              -
+    //               ((x[lindex] - x[mindex]) * (x[findex + 1] - x[mindex +
+    //               1]))) *
+    //              (((x[findex] - x[mindex]) * (x[lindex + 1] - x[mindex +
+    //              1]))
+    //              -
+    //               ((x[lindex] - x[mindex]) * (x[findex + 1] - x[mindex +
+    //               1])));
+
+    // Midpoint distance
+    *obj_value += weight_cos_included_angle_ *
+                  (((x[findex] + x[lindex]) / 2.0 - x[mindex]) *
+                       ((x[findex] + x[lindex]) / 2.0 - x[mindex]) +
+                   ((x[findex + 1] + x[lindex + 1]) / 2.0 - x[mindex + 1]) *
+                       ((x[findex + 1] + x[lindex + 1]) / 2.0 - x[mindex + 1]));
+  }
+
+  // Total length
+  for (size_t i = 0; i < num_of_points_ - 1; ++i) {
+    size_t findex = i << 1;
+    size_t nindex = findex + 2;
+    *obj_value +=
+        weight_length_ *
+        ((x[findex] - x[nindex]) * (x[findex] - x[nindex]) +
+         (x[findex + 1] - x[nindex + 1]) * (x[findex + 1] - x[nindex + 1]));
+  }
+  return true;
+}
+
+/** Template to compute contraints */
+template <class T>
+bool CosThetaProbleminterface::eval_constraints(int n, const T* x, int m,
+                                                T* g) {
+  // fill in the positional deviation constraints
+  for (size_t i = 0; i < num_of_points_; ++i) {
+    size_t index = i << 1;
+    g[index] = x[index];
+    g[index + 1] = x[index + 1];
+  }
+  return true;
+}
+
+/** Method to generate the required tapes */
+void CosThetaProbleminterface::generate_tapes(int n, int m, int* nnz_jac_g,
+                                              int* nnz_h_lag) {
+  std::vector<double> xp(n, 0.0);
+  std::vector<double> lamp(m, 0.0);
+  std::vector<double> zl(m, 0.0);
+  std::vector<double> zu(m, 0.0);
+  std::vector<adouble> xa(n, 0.0);
+  std::vector<adouble> g(m, 0.0);
+  std::vector<double> lam(m, 0.0);
+
+  double sig;
+  adouble obj_value;
+
+  double dummy;
+  obj_lam_.clear();
+  obj_lam_.resize(m + 1, 0.0);
+  get_starting_point(n, 1, &xp[0], 0, &zl[0], &zu[0], m, 0, &lamp[0]);
+
+  // Trace on Objectives
+  trace_on(tag_f);
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  eval_obj(n, &xa[0], &obj_value);
+  obj_value >>= dummy;
+  trace_off();
+
+  // Trace on Jacobian
+  trace_on(tag_g);
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  eval_constraints(n, &xa[0], m, &g[0]);
+  for (int idx = 0; idx < m; idx++) {
+    g[idx] >>= dummy;
+  }
+  trace_off();
+
+  // Trace on Hessian
+  trace_on(tag_L);
+  for (int idx = 0; idx < n; idx++) {
+    xa[idx] <<= xp[idx];
+  }
+  for (int idx = 0; idx < m; idx++) {
+    lam[idx] = 1.0;
+  }
+  sig = 1.0;
+  eval_obj(n, &xa[0], &obj_value);
+  obj_value *= mkparam(sig);
+  eval_constraints(n, &xa[0], m, &g[0]);
+  for (int idx = 0; idx < m; idx++) {
+    obj_value += g[idx] * mkparam(lam[idx]);
+  }
+  obj_value >>= dummy;
+  trace_off();
+
+  // rind_g_.clear();
+  // cind_g_.clear();
+  // rind_L_.clear();
+  // cind_L_.clear();
+  rind_g_ = nullptr;
+  cind_g_ = nullptr;
+  rind_L_ = nullptr;
+  cind_L_ = nullptr;
+
+  options_g_[0] = 0; /* sparsity pattern by index domains (default) */
+  options_g_[1] = 0; /*                         safe mode (default) */
+  options_g_[2] = 0;
+  options_g_[3] = 0; /*                column compression (default) */
+
+  // jacval_.clear();
+  // hessval_.clear();
+  jacval_ = nullptr;
+  hessval_ = nullptr;
+
+  // auto* rind_g = &rind_g_[0];
+  // auto* cind_g = &cind_g_[0];
+  // auto* jacval = &jacval_[0];
+  // auto* rind_L = &rind_L_[0];
+  // auto* cind_L = &cind_L_[0];
+  // auto* hessval = &hessval_[0];
+
+  sparse_jac(tag_g, m, n, 0, &xp[0], &nnz_jac_, &rind_g_, &cind_g_, &jacval_,
+             options_g_);
+  *nnz_jac_g = nnz_jac_;
+  options_L_[0] = 0;
+  options_L_[1] = 1;
+  sparse_hess(tag_L, n, 0, &xp[0], &nnz_L_, &rind_L_, &cind_L_, &hessval_,
+              options_L_);
+  *nnz_h_lag = nnz_L_;
+}
+
+//***************    end   ADOL-C part ***********************************
 }  // namespace planning
 }  // namespace apollo

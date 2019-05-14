@@ -100,11 +100,11 @@ grpc::Status GrpcServerImpl::SendV2xTrafficLight(
 void GrpcServerImpl::GetMsgFromGrpc(
     const std::shared_ptr<PerceptionObstacles>& ptr) {
   if (latest_obstacles_.perception_obstacle_size() == 0) {
-    AERROR << "GetMsgFromGrpc PerceptionObstacles is invaild";
+    AERROR << "GetMsgFromGrpc PerceptionObstacles is invalid";
     return;
   }
   if (!latest_obstacles_.has_header()) {
-    AERROR << "GetMsgFromGrpc PerceptionObstacles is invaild";
+    AERROR << "GetMsgFromGrpc PerceptionObstacles is invalid";
     return;
   }
   std::lock_guard<std::mutex> guard(obstacles_mutex_);
@@ -114,11 +114,11 @@ void GrpcServerImpl::GetMsgFromGrpc(
 void GrpcServerImpl::GetMsgFromGrpc(
     const std::shared_ptr<IntersectionTrafficLightData>& ptr) {
   if (!latest_trafficlight_.has_current_lane_trafficlight()) {
-    AERROR << "GetMsgFromGrpc IntersectionTrafficLightData is invaild";
+    AERROR << "GetMsgFromGrpc IntersectionTrafficLightData is invalid";
     return;
   }
   if (!latest_trafficlight_.has_header()) {
-    AERROR << "GetMsgFromGrpc IntersectionTrafficLightData is invaild";
+    AERROR << "GetMsgFromGrpc IntersectionTrafficLightData is invalid";
     return;
   }
   std::lock_guard<std::mutex> guard(traffic_light_mutex_);

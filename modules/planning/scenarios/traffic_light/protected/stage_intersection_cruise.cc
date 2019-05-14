@@ -21,19 +21,14 @@
 #include "modules/planning/scenarios/traffic_light/protected/stage_intersection_cruise.h"
 
 #include "cyber/common/log.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using common::TrajectoryPoint;
-using hdmap::PathOverlap;
-
 Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
@@ -42,12 +37,11 @@ Stage::StageStatus TrafficLightProtectedStageIntersectionCruise::Process(
     AERROR << "TrafficLightProtectedStageIntersectionCruise plan error";
   }
 
-  // check pass pnc_junction
-  const auto& reference_line_info = frame->reference_line_info().front();
-  if (!scenario::CheckInsidePnCJunction(reference_line_info)) {
+  bool stage_done = stage_impl_.CheckDone(
+      *frame, ScenarioConfig::TRAFFIC_LIGHT_PROTECTED, config_, true);
+  if (stage_done) {
     return FinishStage();
   }
-
   return Stage::RUNNING;
 }
 

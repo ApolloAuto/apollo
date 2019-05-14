@@ -27,11 +27,11 @@
 DEFINE_string(test_list, "full_test_list.txt", "test image list");
 DEFINE_string(image_root, "", "root dir of images");
 DEFINE_string(image_ext, ".jpg", "extension of image name");
-DEFINE_string(det_dir, "/tmp", "output dir");
+DEFINE_string(dest_dir, "/tmp", "output dir");
 DEFINE_string(vis_dir, "", "output dir");
 DEFINE_string(pre_detected_dir, "", "pre-detected obstacles (skip Detect)");
-DEFINE_int32(height, 1080, "output dir");
-DEFINE_int32(width, 1920, "output dir");
+DEFINE_int32(height, 1080, "image height");
+DEFINE_int32(width, 1920, "image width");
 DEFINE_string(detector, "YoloObstacleDetector", "detector");
 DEFINE_string(transformer, "MultiCueObstacleTransformer", "transformer");
 DEFINE_string(detector_root, "./data/yolo", "detector data root");
@@ -64,9 +64,7 @@ static const cv::Scalar kFaceColorMap[] = {
 };
 
 base::ObjectSubType GetObjectSubType(const std::string &type_name) {
-  if (type_name == "") {
-    return base::ObjectSubType::UNKNOWN;
-  } else if (type_name == "car") {
+  if (type_name == "car") {
     return base::ObjectSubType::CAR;
   } else if (type_name == "van") {
     return base::ObjectSubType::VAN;
@@ -85,6 +83,7 @@ base::ObjectSubType GetObjectSubType(const std::string &type_name) {
   } else if (type_name == "trafficcone") {
     return base::ObjectSubType::TRAFFICCONE;
   } else {
+    // type_name is "" or unknown
     return base::ObjectSubType::UNKNOWN;
   }
 }
@@ -92,8 +91,8 @@ base::ObjectSubType GetObjectSubType(const std::string &type_name) {
 bool LoadFromKitti(const std::string &kitti_path, CameraFrame *frame) {
   frame->detected_objects.clear();
   FILE *fp = fopen(kitti_path.c_str(), "r");
-  if (!fp) {
-    std::cout << "load obj file: " << kitti_path << " failed!" << std::endl;
+  if (fp == nullptr) {
+    AERROR << "Failed to load object file: " << kitti_path;
     return false;
   }
   while (!feof(fp)) {
@@ -210,7 +209,7 @@ int main() {
     AINFO << "image: " << image_name;
     std::string image_path =
         FLAGS_image_root + "/" + image_name + FLAGS_image_ext;
-    std::string result_path = FLAGS_det_dir + "/" + image_name + ".txt";
+    std::string result_path = FLAGS_dest_dir + "/" + image_name + ".txt";
 
     auto cv_img = cv::imread(image_path, CV_LOAD_IMAGE_COLOR);
 
@@ -237,8 +236,8 @@ int main() {
     EXPECT_TRUE(transformer->Transform(transformer_options, &frame));
 
     FILE *fp = fopen(result_path.c_str(), "w");
-    if (fp == NULL) {
-      AINFO << "Failed to open " << result_path;
+    if (fp == nullptr) {
+      AINFO << "Failed to open result path: " << result_path;
       return -1;
     }
     int obj_id = 0;
@@ -268,7 +267,7 @@ int main() {
             cv::Scalar(0, 0, 0), 8);
         float xmid = (box.xmin + box.xmax) / 2;
         CHECK(area_id > 0 && area_id < 9);
-        if (area_id % 2 == 1) {
+        if (area_id & 1) {
           cv::rectangle(
               cv_img,
               cv::Point(static_cast<int>(box.xmin), static_cast<int>(box.ymin)),

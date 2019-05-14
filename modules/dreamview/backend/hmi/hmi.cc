@@ -31,11 +31,13 @@ namespace dreamview {
 using apollo::common::util::JsonUtil;
 using Json = WebSocketHandler::Json;
 
-HMI::HMI(WebSocketHandler* websocket, MapService* map_service)
+HMI::HMI(WebSocketHandler* websocket, MapService* map_service,
+         DataCollectionMonitor* data_collection_monitor)
     : hmi_worker_(new HMIWorker()),
       monitor_log_buffer_(apollo::common::monitor::MonitorMessageItem::HMI),
       websocket_(websocket),
-      map_service_(map_service) {
+      map_service_(map_service),
+      data_collection_monitor_(data_collection_monitor) {
   if (websocket_) {
     RegisterMessageHandlers();
   }
@@ -85,6 +87,7 @@ void HMI::RegisterMessageHandlers() {
         HMIAction hmi_action;
         if (!HMIAction_Parse(action, &hmi_action)) {
           AERROR << "Invalid HMIAction string: " << action;
+          return;
         }
         std::string value;
         if (JsonUtil::GetStringFromJson(json, "value", &value)) {
@@ -102,6 +105,13 @@ void HMI::RegisterMessageHandlers() {
           // Reload lidar params for point cloud service.
           PointCloudUpdater::LoadLidarHeight(FLAGS_lidar_height_yaml);
           SendVehicleParam();
+        } else if (hmi_action == HMIAction::CHANGE_MODE) {
+          static constexpr char kCalibrationMode[] = "Vehicle Calibration";
+          if (value == kCalibrationMode) {
+            data_collection_monitor_->Start();
+          } else {
+            data_collection_monitor_->Stop();
+          }
         }
       });
 

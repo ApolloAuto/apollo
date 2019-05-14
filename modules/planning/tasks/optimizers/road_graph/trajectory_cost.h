@@ -39,14 +39,14 @@ namespace planning {
 class TrajectoryCost {
  public:
   TrajectoryCost() = default;
-  explicit TrajectoryCost(const DpPolyPathConfig &config,
-                          const ReferenceLine &reference_line,
-                          const bool is_change_lane_path,
-                          const std::vector<const Obstacle *> &obstacles,
-                          const common::VehicleParam &vehicle_param,
-                          const SpeedData &heuristic_speed_data,
-                          const common::SLPoint &init_sl_point,
-                          const SLBoundary &adc_sl_boundary);
+  TrajectoryCost(const DpPolyPathConfig &config,
+                 const ReferenceLine &reference_line,
+                 const bool is_change_lane_path,
+                 const std::vector<const Obstacle *> &obstacles,
+                 const common::VehicleParam &vehicle_param,
+                 const SpeedData &heuristic_speed_data,
+                 const common::SLPoint &init_sl_point,
+                 const SLBoundary &adc_sl_boundary);
   ComparableCost Calculate(const QuinticPolynomialCurve1d &curve,
                            const double start_s, const double end_s,
                            const uint32_t curr_level,

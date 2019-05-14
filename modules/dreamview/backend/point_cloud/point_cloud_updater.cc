@@ -154,13 +154,13 @@ void PointCloudUpdater::UpdatePointCloud(
     pcl_ptr->width = point_cloud->width();
     pcl_ptr->height = point_cloud->height();
     pcl_ptr->is_dense = false;
-    pcl_ptr->points.resize(pcl_ptr->width * pcl_ptr->height);
 
-    if (pcl_ptr->width == 0 || pcl_ptr->height == 0) {
+    if (point_cloud->width() * point_cloud->height() !=
+        static_cast<unsigned int>(point_cloud->point_size())) {
       pcl_ptr->width = 1;
       pcl_ptr->height = point_cloud->point_size();
-      pcl_ptr->points.resize(point_cloud->point_size());
     }
+    pcl_ptr->points.resize(point_cloud->point_size());
 
     for (size_t i = 0; i < pcl_ptr->points.size(); ++i) {
       const auto &point = point_cloud->point(static_cast<int>(i));

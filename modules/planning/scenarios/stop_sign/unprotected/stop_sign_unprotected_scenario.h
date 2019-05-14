@@ -40,8 +40,10 @@ namespace stop_sign {
 // stage context
 struct StopSignUnprotectedContext {
   ScenarioStopSignUnprotectedConfig scenario_config;
+  std::string current_stop_sign_overlap_id;
   double stop_start_time = 0.0;
   double creep_start_time = 0.0;
+  // watch_vehicle: <lane_id, perception_obstacle_ids>
   std::unordered_map<std::string, std::vector<std::string>> watch_vehicles;
   std::vector<std::pair<hdmap::LaneInfoConstPtr, hdmap::OverlapInfoConstPtr>>
       associated_lanes;
@@ -49,8 +51,8 @@ struct StopSignUnprotectedContext {
 
 class StopSignUnprotectedScenario : public Scenario {
  public:
-  explicit StopSignUnprotectedScenario(const ScenarioConfig& config,
-                                       const ScenarioContext* context)
+  StopSignUnprotectedScenario(const ScenarioConfig& config,
+                              const ScenarioContext* context)
       : Scenario(config, context) {}
 
   void Init() override;
@@ -58,21 +60,18 @@ class StopSignUnprotectedScenario : public Scenario {
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config);
 
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
-
   StopSignUnprotectedContext* GetContext() { return &context_; }
 
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
+
+ private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
-
- private:
   bool init_ = false;
   StopSignUnprotectedContext context_;
 };

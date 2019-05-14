@@ -18,6 +18,8 @@ cc_library(
     deps = [
         ":transform_server",
         "//modules/perception/camera/common",
+        "//modules/perception/onboard/proto:motion_service_proto",
+        "//modules/perception/proto:perception_proto",
     ],
 )
 
@@ -55,6 +57,8 @@ cc_binary(
         "//modules/perception/base",
         "//modules/perception/camera/app:obstacle_camera_perception",
         "//modules/perception/camera/common",
+        "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
+        "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
         "//modules/perception/lib/utils",
     ],
 )

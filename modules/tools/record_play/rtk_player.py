@@ -28,6 +28,7 @@ import time
 import math
 
 from cyber_py import cyber
+from cyber_py import cyber_time
 import scipy.signal as signal
 from logger import Logger
 from numpy import genfromtxt
@@ -59,7 +60,7 @@ class RtkPlayer(object):
         self.logger.info("Load record file from: %s" % record_file)
         try:
             file_handler = open(record_file, 'r')
-        except:
+        except IOError:
             self.logger.error("Cannot find file: " + record_file)
             file_handler.close()
             sys.exit(0)
@@ -97,7 +98,7 @@ class RtkPlayer(object):
 
         vehicle_config = vehicle_config_pb2.VehicleConfig()
         proto_utils.get_pb_from_text_file(
-        "/apollo/modules/common/data/vehicle_param.pb.txt", vehicle_config)
+            "/apollo/modules/common/data/vehicle_param.pb.txt", vehicle_config)
         self.vehicle_param = vehicle_config.vehicle_param
 
     def localization_callback(self, data):
@@ -135,7 +136,7 @@ class RtkPlayer(object):
 
         self.closestpoint = self.closest_dist()
         self.start = max(self.closestpoint - 100, 0)
-        self.starttime = time.time()
+        self.starttime = cyber_time.Time.now().to_sec()
         self.end = min(self.start + 1000, len(self.data) - 1)
         self.logger.info("finish replan at time %s, self.closestpoint=%s" %
                          (self.starttime, self.closestpoint))
@@ -155,7 +156,7 @@ class RtkPlayer(object):
         return start
 
     def closest_time(self):
-        time_elapsed = time.time() - self.starttime
+        time_elapsed = cyber_time.Time.now().to_sec() - self.starttime
         closest_time = self.start
         time_diff = self.data['time'][closest_time] - \
             self.data['time'][self.closestpoint]
@@ -177,14 +178,14 @@ class RtkPlayer(object):
             return
 
         planningdata = planning_pb2.ADCTrajectory()
-        now = time.time()
+        now = cyber_time.Time.now().to_sec()
         planningdata.header.timestamp_sec = now
         planningdata.header.module_name = "planning"
         planningdata.header.sequence_num = self.sequence_num
         self.sequence_num = self.sequence_num + 1
 
         self.logger.debug(
-            "publish_planningmsg: before adjust start: self.start = %s, self.end=%s"
+            "publish_planningmsg: before adjust start: self.start=%s, self.end=%s"
             % (self.start, self.end))
         if self.replan or self.sequence_num <= 1 or not self.automode:
             self.logger.info(
@@ -208,7 +209,7 @@ class RtkPlayer(object):
             self.end = len(self.data) - 1
 
         self.logger.debug(
-            "publish_planningmsg: after adjust start: self.start = %s, self.end=%s"
+            "publish_planningmsg: after adjust start: self.start=%s, self.end=%s"
             % (self.start, self.end))
 
         planningdata.total_path_length = self.data['s'][self.end] - \
@@ -318,9 +319,9 @@ def main():
                        player.padmsg_callback)
 
     while not cyber.is_shutdown():
-        now = time.time()
+        now = cyber_time.Time.now().to_sec()
         player.publish_planningmsg()
-        sleep_time = 0.1 - (time.time() - now)
+        sleep_time = 0.1 - (cyber_time.Time.now().to_sec() - now)
         if sleep_time > 0:
             time.sleep(sleep_time)
 

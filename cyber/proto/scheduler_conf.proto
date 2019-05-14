@@ -5,10 +5,18 @@ package apollo.cyber.proto;
 import "cyber/proto/classic_conf.proto";
 import "cyber/proto/choreography_conf.proto";
 
+message InnerThread {
+  optional string name = 1;
+  optional string cpuset = 2;
+  optional string policy = 3;
+  optional uint32 prio = 4 [default = 1];
+}
+
 message SchedulerConf {
   optional string policy = 1;
   optional uint32 routine_num = 2;
   optional uint32 default_proc_num = 3;
-  optional ClassicConf classic_conf = 4;
-  optional ChoreographyConf choreography_conf = 5;
+  repeated InnerThread threads = 4;
+  optional ClassicConf classic_conf = 5;
+  optional ChoreographyConf choreography_conf = 6;
 }

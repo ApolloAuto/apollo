@@ -44,8 +44,8 @@ STBoundary::STBoundary(
     upper_points_.emplace_back(item.second.s(), t);
   }
 
-  for (auto it = lower_points_.begin(); it != lower_points_.end(); ++it) {
-    points_.emplace_back(it->t(), it->s());
+  for (const auto& point : lower_points_) {
+    points_.emplace_back(point.t(), point.s());
   }
   for (auto rit = upper_points_.rbegin(); rit != upper_points_.rend(); ++rit) {
     points_.emplace_back(rit->t(), rit->s());
@@ -379,7 +379,7 @@ STBoundary STBoundary::CreateInstance(
   }
 
   std::vector<std::pair<STPoint, STPoint>> point_pairs;
-  for (size_t i = 0; i < lower_points.size() && i < upper_points.size(); ++i) {
+  for (size_t i = 0; i < lower_points.size(); ++i) {
     point_pairs.emplace_back(
         STPoint(lower_points.at(i).s(), lower_points.at(i).t()),
         STPoint(upper_points.at(i).s(), upper_points.at(i).t()));

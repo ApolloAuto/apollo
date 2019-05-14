@@ -88,3 +88,8 @@ DEFINE_string(lidar_height_yaml,
 
 DEFINE_int32(monitor_msg_pending_queue_size, 10,
              "Max monitor message pending queue size");
+
+DEFINE_string(
+    data_collection_config_path,
+    "/apollo/modules/dreamview/conf/mkz7_data_collection_table.pb.txt",
+    "Data collection table config path.");

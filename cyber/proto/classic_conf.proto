@@ -11,7 +11,7 @@ message ClassicTask {
 message SchedGroup {
   required string name = 1 [default = "default_grp"];
   optional uint32 processor_num = 2;
-  optional string affinity = 3; 
+  optional string affinity = 3;
   optional string cpuset = 4;
   optional string processor_policy = 5;
   optional int32 processor_prio = 6 [default = 0];

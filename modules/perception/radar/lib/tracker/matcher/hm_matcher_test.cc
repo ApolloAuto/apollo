@@ -30,11 +30,9 @@ namespace radar {
 
 TEST(HMMatcherTest, hm_matcher_init_test) {
   BaseMatcher* matcher = new HMMatcher();
-  EXPECT_TRUE(matcher != nullptr);
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "radar/matcher";
-  EXPECT_EQ(matcher->Init(), true);
+  EXPECT_NE(matcher, nullptr);
+  FLAGS_work_root = "/apollo/modules/perception/testdata/radar/matcher";
+  EXPECT_TRUE(matcher->Init());
   delete matcher;
 }
 
@@ -61,11 +59,9 @@ TEST(HMMatcherTest, hm_matcher_propterty_match_test) {
 
 TEST(HMMatcherTest, hm_matcher_test) {
   BaseMatcher* matcher = new HMMatcher();
-  EXPECT_TRUE(matcher != nullptr);
-  FLAGS_work_root =
-      "/apollo/modules/perception/testdata/"
-      "radar/matcher";
-  EXPECT_EQ(matcher->Init(), true);
+  EXPECT_NE(matcher, nullptr);
+  FLAGS_work_root = "/apollo/modules/perception/testdata/radar/matcher";
+  EXPECT_TRUE(matcher->Init());
   EXPECT_EQ(matcher->Name(), "HMMatcher");
   double match_distance = 2.5;
   BaseMatcher::SetMaxMatchDistance(match_distance);
@@ -122,7 +118,7 @@ TEST(HMMatcherTest, hm_matcher_test) {
   EXPECT_EQ(assignments.size(), 2);
   EXPECT_EQ(unassigned_tracks.size(), 1);
   EXPECT_EQ(unassigned_objects.size(), 1);
-  EXPECT_EQ(match_state, true);
+  EXPECT_TRUE(match_state);
   delete matcher;
 }
 

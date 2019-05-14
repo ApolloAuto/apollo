@@ -20,25 +20,27 @@ import sys
 
 sys.path.append("../")
 from cyber_py import cyber
-from modules.common.util.testdata.simple_pb2 import SimpleMessage
+from cyber.proto.unit_test_pb2 import ChatterBenchmark
+
 
 def callback(data):
     """
-    reader message callback.
+    Reader message callback.
     """
-    print "="*80
+    print "=" * 80
     print "py:reader callback msg->:"
     print data
-    print "="*80
+    print "=" * 80
+
 
 def test_listener_class():
     """
-    reader message.
+    Reader message.
     """
     print "=" * 120
     test_node = cyber.Node("listener")
     test_node.create_reader("channel/chatter",
-            SimpleMessage, callback)
+                            ChatterBenchmark, callback)
     test_node.spin()
 
 if __name__ == '__main__':

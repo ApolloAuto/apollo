@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
@@ -32,7 +33,7 @@ class InteractionPredictor : public SequencePredictor {
   /**
    * @brief Constructor
    */
-  InteractionPredictor() = default;
+  InteractionPredictor();
 
   /**
    * @brief Destructor
@@ -44,6 +45,41 @@ class InteractionPredictor : public SequencePredictor {
    * @param Obstacle pointer
    */
   void Predict(Obstacle* obstacle) override;
+
+ private:
+  void Clear();
+
+  void BuildADCTrajectory(const double time_resolution);
+
+  bool DrawTrajectory(
+      const Obstacle& obstacle, const LaneSequence& lane_sequence,
+      const double lon_acceleration, const double total_time,
+      const double period,
+      std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
+
+  double ComputeTrajectoryCost(const Obstacle& obstacle,
+                               const LaneSequence& lane_sequence,
+                               const double acceleration);
+
+  double LongitudinalAccelerationCost(const double acceleration);
+
+  double CentripetalAccelerationCost(const LaneSequence& lane_sequence,
+                                     const double speed,
+                                     const double acceleration);
+
+  double CollisionWithEgoVehicleCost(const LaneSequence& lane_sequence,
+                                     const double speed,
+                                     const double acceleration);
+
+  bool LowerRightOfWayThanEgo(const Obstacle& obstacle,
+                              const LaneSequence& lane_sequence);
+
+  double ComputeLikelihood(const double cost);
+
+  double ComputePosterior(const double prior, const double likelihood);
+
+ private:
+  std::vector<apollo::common::TrajectoryPoint> adc_trajectory_;
 };
 
 }  // namespace prediction

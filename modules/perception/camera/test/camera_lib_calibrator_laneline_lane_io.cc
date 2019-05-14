@@ -42,11 +42,11 @@ bool ParseOneLaneLine(const std::string &s, LaneLine *lane_line) {
       Eigen::Vector2f pt;
       ss_temp << x;
       ss_temp >> pt(0);
-      assert(ss_temp.fail() == false);
+      assert(!ss_temp.fail());
       ss_temp.clear();
       ss_temp << y;
       ss_temp >> pt(1);
-      assert(ss_temp.fail() == false);
+      assert(!ss_temp.fail());
       ss_temp.clear();
       lane_line->lane_point.push_back(pt);
       i = j + 1;
@@ -165,7 +165,7 @@ bool LoadCamera2WorldTfs(const std::string &filename,
       float val = 0.0f;
       ss_temp << tf_info[i];
       ss_temp >> val;
-      assert(ss_temp.fail() == false);
+      assert(!ss_temp.fail());
       ss_temp.clear();
       tf(r, c) = val;
       // std::cout << val << std::endl;

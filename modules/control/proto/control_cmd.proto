@@ -94,6 +94,14 @@ message SimpleLongitudinalDebug {
   optional double path_remain = 21;
   optional int32 pid_saturation_status = 22;
   optional int32 leadlag_saturation_status = 23;
+  optional double speed_offset = 24;
+  optional double current_speed = 25;
+  optional double acceleration_reference = 26;
+  optional double current_acceleration = 27;
+  optional double acceleration_error = 28;
+  optional double jerk_reference = 29;
+  optional double current_jerk = 30;
+  optional double jerk_error = 31;
 }
 
 message SimpleLateralDebug {
@@ -114,6 +122,26 @@ message SimpleLateralDebug {
   optional double steering_position = 15;
   optional double ref_speed = 16;
   optional double steer_angle_limited = 17;
+
+  // time derivative of lateral error rate, in m/s^2
+  optional double lateral_acceleration = 18;
+  // second time derivative of lateral error rate, in m/s^3
+  optional double lateral_jerk = 19;
+
+  optional double ref_heading_rate = 20;
+  optional double heading_rate = 21;
+
+  // heading_acceleration, as known as yaw acceleration, is the time derivative
+  // of heading rate,  in rad/s^2
+  optional double ref_heading_acceleration = 22;
+  optional double heading_acceleration = 23;
+  optional double heading_error_acceleration = 24;
+
+  // heading_jerk, as known as yaw jerk, is the second time derivative of
+  // heading rate, in rad/s^3
+  optional double ref_heading_jerk = 25;
+  optional double heading_jerk = 26;
+  optional double heading_error_jerk = 27;
 }
 
 message SimpleMPCDebug {
@@ -147,14 +175,43 @@ message SimpleMPCDebug {
   optional double acceleration_lookup = 28;
   optional double speed_lookup = 29;
   optional double calibration_value = 30;
-  repeated double matrix_q_updated = 31;  // matrix_q_updated_ size = 6
-  repeated double matrix_r_updated = 32;  // matrix_r_updated_ size = 2
+  optional double steer_unconstraint_control_diff = 31;
+  optional double steer_angle_feedforward_compensation = 32;
+  repeated double matrix_q_updated = 33;  // matrix_q_updated_ size = 6
+  repeated double matrix_r_updated = 34;  // matrix_r_updated_ size = 2
+
+  // time derivative of lateral error rate, in m/s^2
+  optional double lateral_acceleration = 35;
+  // second time derivative of lateral error rate, in m/s^3
+  optional double lateral_jerk = 36;
+
+  optional double ref_heading_rate = 37;
+  optional double heading_rate = 38;
+
+  // heading_acceleration, as known as yaw acceleration, is the time derivative
+  // of heading rate,  in rad/s^2
+  optional double ref_heading_acceleration = 39;
+  optional double heading_acceleration = 40;
+  optional double heading_error_acceleration = 41;
+
+  // heading_jerk, as known as yaw jerk, is the second time derivative of
+  // heading rate, in rad/s^3
+  optional double ref_heading_jerk = 42;
+  optional double heading_jerk = 43;
+  optional double heading_error_jerk = 44;
+
+  optional double acceleration_feedback = 45;
+  optional double acceleration_error = 46;
+  optional double jerk_reference = 47;
+  optional double jerk_feedback = 48;
+  optional double jerk_error = 49;
 }
 
 message InputDebug {
   optional apollo.common.Header localization_header = 1;
   optional apollo.common.Header canbus_header = 2;
   optional apollo.common.Header trajectory_header = 3;
+  optional apollo.common.Header latest_replan_trajectory_header = 4;
 }
 
 message Debug {

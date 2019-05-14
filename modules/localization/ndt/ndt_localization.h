@@ -65,7 +65,7 @@ class NDTLocalization {
   void GetLocalizationStatus(LocalizationStatus* localization_status) const;
   /**@brief get zone id */
   inline int GetZoneId() const { return zone_id_; }
-  /**@brief get online resolution for ndt localizaiton*/
+  /**@brief get online resolution for ndt localization*/
   inline double GetOnlineResolution() const { return online_resolution_; }
 
  private:
@@ -79,9 +79,9 @@ class NDTLocalization {
   bool LoadLidarHeight(const std::string& file_path, LidarHeight* height);
   /**@brief load zone id from map folder */
   bool LoadZoneIdFromFolder(const std::string& folder_path, int* zone_id);
-  /**@brief query forcast pose from tf2 according to timestamp*/
+  /**@brief query forecast pose from tf2 according to timestamp*/
   bool QueryPoseFromTF(double time, Eigen::Affine3d* pose);
-  /**@brief query forcast pose from odometry buffer, in case fail to get pose
+  /**@brief query forecast pose from odometry buffer, in case fail to get pose
    * from tf*/
   bool QueryPoseFromBuffer(double time, Eigen::Affine3d* pose);
   /**@brief check if odometry message is zero*/

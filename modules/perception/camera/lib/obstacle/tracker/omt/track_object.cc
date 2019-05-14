@@ -26,7 +26,7 @@ namespace camera {
 //   capacity_ = capacity;
 // }
 // void TrackObjectPool::NewObject(TrackObjectPtr *ptr) {
-//   if (data_.size() == 0) {
+//   if (data_.empty()) {
 //     for (size_t i = 0; i < capacity_; ++i) {
 //       data_.push(std::make_shared<TrackObject>());
 //     }

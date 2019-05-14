@@ -68,6 +68,7 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
    */
   std::string Name() const;
 
+ private:
   /**
    * @brief module initialization function
    * @return initialization status
@@ -79,7 +80,11 @@ class CanbusComponent final : public apollo::cyber::TimerComponent {
    */
   bool Proc() override;
 
- private:
+  /**
+   * @brief module cleanup function
+   */
+  void Clear() override;
+
   void PublishChassis();
   void PublishChassisDetail();
   void OnControlCommand(const apollo::control::ControlCommand &control_command);

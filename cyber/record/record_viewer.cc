@@ -28,8 +28,11 @@ namespace record {
 RecordViewer::RecordViewer(const RecordReaderPtr& reader, uint64_t begin_time,
                            uint64_t end_time,
                            const std::set<std::string>& channels)
-    : begin_time_(begin_time), end_time_(end_time), channels_(channels) {
-  readers_.emplace_back(reader);
+    : begin_time_(begin_time),
+      end_time_(end_time),
+      channels_(channels),
+      readers_({reader}) {
+  Init();
   UpdateTime();
 }
 
@@ -40,7 +43,7 @@ RecordViewer::RecordViewer(const std::vector<RecordReaderPtr>& readers,
       end_time_(end_time),
       channels_(channels),
       readers_(readers) {
-  Sort();
+  Init();
   UpdateTime();
 }
 
@@ -55,7 +58,7 @@ bool RecordViewer::IsValid() const {
 
 bool RecordViewer::Update(RecordMessage* message) {
   bool find = false;
-  while (!find) {
+  do {
     if (msg_buffer_.empty() && !FillBuffer()) {
       break;
     }
@@ -65,7 +68,8 @@ bool RecordViewer::Update(RecordMessage* message) {
       find = true;
     }
     msg_buffer_.erase(msg_buffer_.begin());
-  }
+  } while (!find);
+
   return find;
 }
 
@@ -74,23 +78,24 @@ uint64_t RecordViewer::begin_time() const { return begin_time_; }
 uint64_t RecordViewer::end_time() const { return end_time_; }
 
 std::set<std::string> RecordViewer::GetChannelList() const {
-  std::set<std::string> channel_list;
-
-  for (auto& reader : readers_) {
-    auto all_channel = reader->GetChannelList();
-    std::set_intersection(all_channel.begin(), all_channel.end(),
-                          channels_.begin(), channels_.end(),
-                          std::inserter(channel_list, channel_list.end()));
-  }
-
-  return channel_list;
+  return channel_list_;
 }
 
 RecordViewer::Iterator RecordViewer::begin() { return Iterator(this); }
 
 RecordViewer::Iterator RecordViewer::end() { return Iterator(this, true); }
 
-void RecordViewer::Sort() {
+void RecordViewer::Init() {
+  // Init the channel list
+  for (auto& reader : readers_) {
+    auto all_channel = reader->GetChannelList();
+    std::set_intersection(all_channel.begin(), all_channel.end(),
+                          channels_.begin(), channels_.end(),
+                          std::inserter(channel_list_, channel_list_.end()));
+  }
+  readers_finished_.resize(readers_.size(), false);
+
+  // Sort the readers
   std::sort(readers_.begin(), readers_.end(),
             [](const RecordReaderPtr& lhs, const RecordReaderPtr& rhs) {
               const auto& lhs_header = lhs->header();
@@ -106,6 +111,7 @@ void RecordViewer::Reset() {
   for (auto& reader : readers_) {
     reader->Reset();
   }
+  std::fill(readers_finished_.begin(), readers_finished_.end(), false);
   curr_begin_time_ = begin_time_;
   msg_buffer_.clear();
 }
@@ -146,7 +152,19 @@ bool RecordViewer::FillBuffer() {
       this_end_time = end_time_;
     }
 
-    for (auto& reader : readers_) {
+    for (size_t i = 0; i < readers_.size(); ++i) {
+      if (!readers_finished_[i] &&
+          readers_[i]->header().end_time() < this_begin_time) {
+        readers_finished_[i] = true;
+        readers_[i]->Reset();
+      }
+    }
+
+    for (size_t i = 0; i < readers_.size(); ++i) {
+      if (readers_finished_[i]) {
+        continue;
+      }
+      auto& reader = readers_[i];
       while (true) {
         auto record_msg = std::make_shared<RecordMessage>();
         if (!reader->ReadMessage(record_msg.get(), this_begin_time,
@@ -170,12 +188,8 @@ RecordViewer::Iterator::Iterator(RecordViewer* viewer, bool end)
     return;
   }
   viewer_->Reset();
-  if (!viewer_->IsValid()) {
+  if (!viewer_->IsValid() || !viewer_->Update(&message_instance_)) {
     end_ = true;
-  } else {
-    if (!viewer_->Update(&message_instance_)) {
-      end_ = true;
-    }
   }
 }
 

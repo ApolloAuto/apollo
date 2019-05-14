@@ -53,7 +53,8 @@ class StopSignUnprotectedStagePreStop : public Stage {
   int AddWatchVehicle(const Obstacle& obstacle,
                       std::unordered_map<std::string, std::vector<std::string>>*
                           watch_vehicles);
-  bool CheckADCStop(const ReferenceLineInfo& reference_line_info);
+
+  bool CheckADCStop(const double adc_front_edge_s, const double stop_line_s);
 
  private:
   Stage::StageStatus FinishStage();

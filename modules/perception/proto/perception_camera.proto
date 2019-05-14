@@ -62,12 +62,12 @@ message CameraLaneLine {
     repeated common.Point3D curve_camera_point_set = 5;
     // @brief curve image point set
     repeated common.Point2D curve_image_point_set = 6;
-    
+
     // @brief image end point set
     repeated EndPoints image_end_point_set = 7;
     // @brief track id
     optional int32 track_id = 8;
-    // @brief confidence for lane line 
+    // @brief confidence for lane line
     optional float confidence = 9;
 
     optional LaneLineUseType use_type = 10;
@@ -105,6 +105,6 @@ message CameraDebug {
     optional string source_topic = 2;                               // which topic to get the frame
     optional CameraErrorCode error_code = 3 [default = ERROR_NONE]; // error code
     optional CameraCalibrator camera_calibrator = 4;
-    repeated CameraLaneLine camera_laneline = 5; 
+    repeated CameraLaneLine camera_laneline = 5;
     repeated CameraObstacle camera_obstacle = 6;                    // an array of obstacles
 }

@@ -34,7 +34,7 @@ namespace radar {
 
 class RadarTrack {
  public:
-  explicit RadarTrack(const base::ObjectPtr &obs, const double timestamp);
+  RadarTrack(const base::ObjectPtr &obs, const double timestamp);
   ~RadarTrack() {}
   // update the object after association with a radar obervation
   void UpdataObsRadar(const base::ObjectPtr &obs_radar, const double timestamp);
@@ -46,9 +46,7 @@ class RadarTrack {
   double GetTrackingTime();
   bool IsDead() { return is_dead_; }
   void SetDead() { is_dead_ = true; }
-  bool ConfirmTrack() {
-    return (tracked_times_ > s_tracked_times_threshold_) ? true : false;
-  }
+  bool ConfirmTrack() { return tracked_times_ > s_tracked_times_threshold_; }
   static void SetTrackedTimesThreshold(const int &threshold) {
     s_tracked_times_threshold_ = threshold;
   }

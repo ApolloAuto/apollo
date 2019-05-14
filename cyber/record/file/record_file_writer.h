@@ -56,7 +56,7 @@ struct Chunk {
     std::lock_guard<std::mutex> lock(mutex_);
     SingleMessage* p_message = body_.add_messages();
     *p_message = message;
-    if (0 == header_.begin_time()) {
+    if (header_.begin_time() == 0) {
       header_.set_begin_time(message.time());
     }
     if (header_.begin_time() > message.time()) {
@@ -120,10 +120,10 @@ bool RecordFileWriter::WriteSection(const T& message) {
   } else if (std::is_same<T, Index>::value) {
     type = SectionType::SECTION_INDEX;
   } else {
-    AERROR << "Do not support is template typename.";
+    AERROR << "Do not support this template typename.";
     return false;
   }
-  Section section = {type, (uint64_t)message.ByteSize()};
+  Section section = {type, message.ByteSize()};
   ssize_t count = write(fd_, &section, sizeof(section));
   if (count < 0) {
     AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;

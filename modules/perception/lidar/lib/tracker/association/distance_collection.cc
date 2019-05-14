@@ -208,8 +208,7 @@ float BboxIouDistance(const TrackedObjectConstPtr& last_object,
       (last_object->object_ptr->lidar_supplement).cloud_world.size());
   int cur_obj_num_pts = static_cast<int>(
       (new_object->object_ptr->lidar_supplement).cloud_world.size());
-  bool change_cur_obj_bbox =
-      last_object_num_pts > cur_obj_num_pts ? true : false;
+  bool change_cur_obj_bbox = last_object_num_pts > cur_obj_num_pts;
   float minimum_edge_length = 0.01f;
   base::PointDCloud& cloud =
       (new_object->object_ptr->lidar_supplement).cloud_world;

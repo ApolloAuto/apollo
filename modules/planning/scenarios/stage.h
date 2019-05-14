@@ -47,13 +47,15 @@ class Stage {
 
   explicit Stage(const ScenarioConfig::StageConfig& config);
 
+  virtual ~Stage() = default;
+
   const ScenarioConfig::StageConfig& config() const { return config_; }
 
   ScenarioConfig::StageType stage_type() const { return config_.stage_type(); }
 
   /**
    * @brief Each stage does its business logic inside Process function.
-   * If the stage want to transite to a different stage after finish,
+   * If the stage want to transit to a different stage after finish,
    * it should set the type of 'next_stage_'.
    */
   virtual StageStatus Process(
@@ -82,6 +84,8 @@ class Stage {
   bool ExecuteTaskOnReferenceLine(
       const common::TrajectoryPoint& planning_start_point, Frame* frame);
 
+  bool ExecuteTaskOnOpenSpace(Frame* frame);
+
   virtual Stage::StageStatus FinishScenario();
 
  protected:
@@ -89,7 +93,7 @@ class Stage {
   std::vector<Task*> task_list_;
   ScenarioConfig::StageConfig config_;
   ScenarioConfig::StageType next_stage_;
-  void* context_;
+  void* context_ = nullptr;
   std::string name_;
 };
 

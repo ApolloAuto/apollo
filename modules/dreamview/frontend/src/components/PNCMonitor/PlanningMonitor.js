@@ -10,7 +10,7 @@ import { timestampMsToTimeString } from "utils/misc";
 export default class PlanningMonitor extends React.Component {
     generateStGraph(stGraph) {
         const graphs = [];
-        const names = ['DpStSpeedOptimizer', 'QpSplineStSpeedOptimizer'];
+        const names = ['DpStSpeedOptimizer', 'PiecewiseJerkSpeedOptimizer'];
         for (const name of names) {
             const graph = stGraph[name];
             const polygons = graph ? graph.obstaclesBoundary : [];
@@ -48,11 +48,10 @@ export default class PlanningMonitor extends React.Component {
                 {generateScatterGraph(SETTING.accelerationGraph, data.accelerationGraph)}
                 {generateScatterGraph(SETTING.thetaGraph, data.thetaGraph)}
                 {generateScatterGraph(SETTING.kappaGraph, data.kappaGraph)}
-                {generateScatterGraph(SETTING.dpPolyGraph, data.dpPolyGraph)}
                 {this.generateStGraph(data.stGraph)}
                 {generateScatterGraph(
                     SETTING.stSpeedGraph,
-                    data.stSpeedGraph.QpSplineStSpeedOptimizer
+                    data.stSpeedGraph.PiecewiseJerkSpeedOptimizer
                 )}
                 {generateScatterGraph(SETTING.dkappaGraph, data.dkappaGraph)}
             </div>

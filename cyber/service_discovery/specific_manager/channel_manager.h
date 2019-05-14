@@ -49,6 +49,7 @@ class ChannelManager : public Manager {
 
   void GetChannelNames(std::vector<std::string>* channels);
   void GetProtoDesc(const std::string& channel_name, std::string* proto_desc);
+  void GetMsgType(const std::string& channel_name, std::string* msg_type);
 
   bool HasWriter(const std::string& channel_name);
   void GetWriters(RoleAttrVec* writers);

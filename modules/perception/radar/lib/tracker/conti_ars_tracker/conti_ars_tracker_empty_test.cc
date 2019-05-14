@@ -24,12 +24,11 @@ namespace perception {
 namespace radar {
 
 TEST(ContiArsTrackerTest, conti_ars_tracker_empty_init_test) {
-  BaseTracker* tracker = new ContiArsTracker();
+  std::unique_ptr<BaseTracker> tracker(new ContiArsTracker());
   FLAGS_work_root =
       "/apollo/modules/perception/testdata/"
       "radar/conti_ars_tracker/empty";
-  EXPECT_EQ(tracker->Init(), false);
-  delete tracker;
+  EXPECT_FALSE(tracker->Init());
 }
 
 }  // namespace radar

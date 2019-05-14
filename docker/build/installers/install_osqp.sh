@@ -27,8 +27,9 @@ wget https://github.com/ApolloAuto/osqp-contrib/archive/master.zip
 unzip master.zip
 
 pushd osqp-contrib-master
-
-cp -r ./osqp /usr/local/include/
+  mkdir -p /usr/local/include/osqp
+  cp -r osqp/include /usr/local/include/osqp/
+  cp osqp/libosqp.so /usr/local/lib/
 popd
 
 rm -fr master.zip osqp-contrib-master

@@ -22,28 +22,32 @@
 #include "modules/canbus/vehicle/lincoln/lincoln_vehicle_factory.h"
 #include "modules/canbus/vehicle/transit/transit_vehicle_factory.h"
 #include "modules/canbus/vehicle/wey/wey_vehicle_factory.h"
+#include "modules/canbus/vehicle/zhongyun/zhongyun_vehicle_factory.h"
 
 namespace apollo {
 namespace canbus {
 
 void VehicleFactory::RegisterVehicleFactory() {
-  Register(VehicleParameter::LINCOLN_MKZ, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::LINCOLN_MKZ, []() -> AbstractVehicleFactory * {
     return new LincolnVehicleFactory();
   });
-  Register(VehicleParameter::GEM, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::GEM, []() -> AbstractVehicleFactory * {
     return new GemVehicleFactory();
   });
-  Register(VehicleParameter::LEXUS, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::LEXUS, []() -> AbstractVehicleFactory * {
     return new LexusVehicleFactory();
   });
-  Register(VehicleParameter::TRANSIT, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::TRANSIT, []() -> AbstractVehicleFactory * {
     return new TransitVehicleFactory();
   });
-  Register(VehicleParameter::GE3, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::GE3, []() -> AbstractVehicleFactory * {
     return new Ge3VehicleFactory();
   });
-  Register(VehicleParameter::WEY, []() -> AbstractVehicleFactory * {
+  Register(apollo::common::WEY, []() -> AbstractVehicleFactory * {
     return new WeyVehicleFactory();
+  });
+  Register(apollo::common::ZHONGYUN, []() -> AbstractVehicleFactory * {
+    return new ZhongyunVehicleFactory();
   });
 }
 

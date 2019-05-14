@@ -57,7 +57,7 @@ void LoadPlanes(std::string path, GroundNode* node_ptr) {
   while (file.good()) {
     std::string buf;
     getline(file, buf);
-    if (buf.size() == 0) {
+    if (buf.empty()) {
       continue;
     }
     std::stringstream ss;
@@ -79,7 +79,7 @@ void LoadPoints(const std::string path, std::vector<std::vector<double>>* pts,
     pt.clear();
     std::string buf;
     getline(file, buf);
-    if (buf.size() == 0) {
+    if (buf.empty()) {
       continue;
     }
     std::stringstream ss;
@@ -98,7 +98,7 @@ TEST_F(LidarLibSceneManagerTest, lidar_lib_scene_manager_test) {
   EXPECT_TRUE(SceneManager::Instance().Init());
   EXPECT_TRUE(SceneManager::Instance().Reset());
   EXPECT_TRUE(SceneManager::Instance().Init());
-  EXPECT_TRUE((SceneManager::Instance().GetServiceNum() > 0));
+  EXPECT_GT(SceneManager::Instance().GetServiceNum(), 0);
 }
 
 TEST_F(LidarLibSceneManagerTest, lidar_lib_scene_manager_ground_service_test) {

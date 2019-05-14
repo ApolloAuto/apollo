@@ -27,30 +27,49 @@
 #include "modules/common/math/angle.h"
 #include "modules/common/math/quaternion.h"
 #include "modules/common/util/util.h"
+#include "modules/common/vehicle_model/vehicle_model.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
 namespace planning {
 
 using apollo::common::TrajectoryPoint;
+using apollo::common::VehicleModel;
 using apollo::common::VehicleState;
 using apollo::common::math::Vec2d;
 
+TrajectoryPoint TrajectoryStitcher::ComputeTrajectoryPointFromVehicleState(
+    const VehicleState& vehicle_state) {
+  TrajectoryPoint point;
+  point.mutable_path_point()->set_s(0.0);
+  point.mutable_path_point()->set_x(vehicle_state.x());
+  point.mutable_path_point()->set_y(vehicle_state.y());
+  point.mutable_path_point()->set_z(vehicle_state.z());
+  point.mutable_path_point()->set_theta(vehicle_state.heading());
+  point.mutable_path_point()->set_kappa(vehicle_state.kappa());
+  point.set_v(vehicle_state.linear_velocity());
+  point.set_a(vehicle_state.linear_acceleration());
+  point.set_relative_time(0.0);
+  return point;
+}
+
 std::vector<TrajectoryPoint>
 TrajectoryStitcher::ComputeReinitStitchingTrajectory(
-    const VehicleState& vehicle_state) {
-  TrajectoryPoint init_point;
-  init_point.mutable_path_point()->set_s(0.0);
-  init_point.mutable_path_point()->set_x(vehicle_state.x());
-  init_point.mutable_path_point()->set_y(vehicle_state.y());
-  init_point.mutable_path_point()->set_z(vehicle_state.z());
-  init_point.mutable_path_point()->set_theta(vehicle_state.heading());
-  init_point.mutable_path_point()->set_kappa(vehicle_state.kappa());
-  init_point.set_v(vehicle_state.linear_velocity());
-  init_point.set_a(vehicle_state.linear_acceleration());
-  init_point.set_relative_time(0.0);
+    const double planning_cycle_time, const VehicleState& vehicle_state) {
+  TrajectoryPoint reinit_point;
+  constexpr double kEpsilon = 1e-2;
+  if (std::abs(vehicle_state.linear_velocity()) < kEpsilon &&
+      std::abs(vehicle_state.linear_acceleration()) < kEpsilon) {
+    reinit_point = ComputeTrajectoryPointFromVehicleState(vehicle_state);
+  } else {
+    VehicleState predicted_vehicle_state;
+    predicted_vehicle_state =
+        VehicleModel::Predict(planning_cycle_time, vehicle_state);
+    reinit_point =
+        ComputeTrajectoryPointFromVehicleState(predicted_vehicle_state);
+  }
 
-  return std::vector<TrajectoryPoint>(1, init_point);
+  return std::vector<TrajectoryPoint>(1, reinit_point);
 }
 
 // only used in navigation mode
@@ -93,20 +112,20 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
 */
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const VehicleState& vehicle_state, const double current_timestamp,
-    const double planning_cycle_time,
+    const double planning_cycle_time, const size_t preserved_points_num,
     const PublishableTrajectory* prev_trajectory, std::string* replan_reason) {
   if (!FLAGS_enable_trajectory_stitcher) {
     *replan_reason = "stitch is disabled by gflag.";
-    return ComputeReinitStitchingTrajectory(vehicle_state);
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
   if (!prev_trajectory) {
     *replan_reason = "replan for no previous trajectory.";
-    return ComputeReinitStitchingTrajectory(vehicle_state);
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
   if (vehicle_state.driving_mode() != canbus::Chassis::COMPLETE_AUTO_DRIVE) {
     *replan_reason = "replan for manual mode.";
-    return ComputeReinitStitchingTrajectory(vehicle_state);
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
   size_t prev_trajectory_size = prev_trajectory->NumOfPoints();
@@ -116,7 +135,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
            << "] size is zero! Previous planning not exist or failed. Use "
               "origin car status instead.";
     *replan_reason = "replan for empty previous trajectory.";
-    return ComputeReinitStitchingTrajectory(vehicle_state);
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
   const double veh_rel_time =
@@ -131,13 +150,13 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     *replan_reason =
         "replan for current time smaller than the previous trajectory's first "
         "time.";
-    return ComputeReinitStitchingTrajectory(vehicle_state);
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
   if (time_matched_index + 1 >= prev_trajectory_size) {
     AWARN << "current time beyond the previous trajectory's last time";
     *replan_reason =
         "replan for current time beyond the previous trajectory's last time";
-    return ComputeReinitStitchingTrajectory(vehicle_state);
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
   auto time_matched_point = prev_trajectory->TrajectoryPointAt(
@@ -145,7 +164,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   if (!time_matched_point.has_path_point()) {
     *replan_reason = "replan for previous trajectory missed path point";
-    return ComputeReinitStitchingTrajectory(vehicle_state);
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
   size_t position_matched_index = prev_trajectory->QueryNearestPointWithBuffer(
@@ -169,7 +188,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
         std::to_string(lat_diff));
     AERROR << msg;
     *replan_reason = msg;
-    return ComputeReinitStitchingTrajectory(vehicle_state);
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
   if (std::fabs(lon_diff) > FLAGS_replan_longitudinal_distance_threshold) {
@@ -179,7 +198,7 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
         std::to_string(lon_diff));
     AERROR << msg;
     *replan_reason = msg;
-    return ComputeReinitStitchingTrajectory(vehicle_state);
+    return ComputeReinitStitchingTrajectory(planning_cycle_time, vehicle_state);
   }
 
   double forward_rel_time =
@@ -196,10 +215,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   auto matched_index = std::min(time_matched_index, position_matched_index);
 
-  constexpr size_t kNumPreCyclePoint = 20;
   std::vector<TrajectoryPoint> stitching_trajectory(
       prev_trajectory->begin() +
-          std::max(0, static_cast<int>(matched_index - kNumPreCyclePoint)),
+          std::max(0, static_cast<int>(matched_index - preserved_points_num)),
       prev_trajectory->begin() + forward_time_index + 1);
   ADEBUG << "stitching_trajectory size: " << stitching_trajectory.size();
 
@@ -207,7 +225,8 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
   for (auto& tp : stitching_trajectory) {
     if (!tp.has_path_point()) {
       *replan_reason = "replan for previous trajectory missed path point";
-      return ComputeReinitStitchingTrajectory(vehicle_state);
+      return ComputeReinitStitchingTrajectory(planning_cycle_time,
+                                              vehicle_state);
     }
     tp.set_relative_time(tp.relative_time() + prev_trajectory->header_time() -
                          current_timestamp);

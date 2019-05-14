@@ -24,15 +24,20 @@ DECLARE_double(test_duration);
 DECLARE_string(planning_config_file);
 
 // scenarios related
+DECLARE_string(scenario_bare_intersection_unprotected_config_file);
 DECLARE_string(scenario_lane_follow_config_file);
+DECLARE_string(scenario_narrow_street_u_turn_config_file);
+DECLARE_string(scenario_pull_over_config_file);
 DECLARE_string(scenario_side_pass_config_file);
 DECLARE_string(scenario_stop_sign_unprotected_config_file);
 DECLARE_string(scenario_traffic_light_protected_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_left_turn_config_file);
 DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
+DECLARE_string(scenario_traffic_light_unprotected_right_turn_config_file);
 DECLARE_string(scenario_valet_parking_config_file);
-DECLARE_string(scenario_narrow_street_u_turn_config_file);
 
+DECLARE_bool(enable_scenario_bare_intersection);
+DECLARE_bool(enable_scenario_pull_over);
 DECLARE_bool(enable_scenario_side_pass);
 DECLARE_double(side_pass_min_signal_intersection_distance);
 DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
@@ -43,7 +48,6 @@ DECLARE_string(traffic_rule_config_filename);
 DECLARE_string(smoother_config_filename);
 DECLARE_string(reopt_smoother_config_filename);
 DECLARE_int32(planning_loop_rate);
-DECLARE_bool(enable_collision_detection);
 DECLARE_string(rtk_trajectory_filename);
 DECLARE_uint64(rtk_trajectory_forward);
 DECLARE_double(rtk_trajectory_resolution);
@@ -94,10 +98,10 @@ DECLARE_double(speed_upper_bound);
 DECLARE_double(longitudinal_acceleration_lower_bound);
 DECLARE_double(longitudinal_acceleration_upper_bound);
 
-DECLARE_double(lateral_jerk_bound);
-
 DECLARE_double(longitudinal_jerk_lower_bound);
 DECLARE_double(longitudinal_jerk_upper_bound);
+DECLARE_double(longitudinal_jerk_bound);
+DECLARE_double(lateral_jerk_bound);
 
 DECLARE_double(dl_bound);
 DECLARE_double(kappa_bound);
@@ -110,6 +114,7 @@ DECLARE_double(st_max_t);
 // Decision Part
 DECLARE_bool(enable_nudge_decision);
 DECLARE_bool(enable_nudge_slowdown);
+DECLARE_bool(enable_alwasy_stop_for_pedestrian);
 DECLARE_double(static_decision_nudge_l_buffer);
 DECLARE_double(lateral_ignore_buffer);
 DECLARE_double(min_stop_distance_obstacle);
@@ -124,6 +129,7 @@ DECLARE_double(follow_min_time_sec);
 DECLARE_double(stop_line_stop_distance);
 DECLARE_double(max_stop_speed);
 DECLARE_double(signal_light_min_pass_s_distance);
+DECLARE_double(signal_expire_time_sec);
 DECLARE_bool(enable_side_radar);
 
 DECLARE_string(destination_obstacle_id);
@@ -210,6 +216,7 @@ DECLARE_double(nudge_buffer);
 DECLARE_bool(use_planning_fallback);
 DECLARE_double(fallback_total_time);
 DECLARE_double(fallback_time_unit);
+DECLARE_double(fallback_distance_buffer);
 DECLARE_double(polynomial_speed_fallback_velocity);
 
 DECLARE_double(speed_bump_speed_limit);
@@ -225,9 +232,17 @@ DECLARE_double(open_space_planning_period);
 DECLARE_double(open_space_prediction_time_horizon);
 DECLARE_bool(enable_perception_obstacles);
 DECLARE_bool(enable_open_space_planner_thread);
-DECLARE_bool(open_space_planner_switchable);
 DECLARE_bool(use_dual_variable_warm_start);
 DECLARE_bool(use_gear_shift_trajectory);
+DECLARE_uint32(open_space_trajectory_stitching_preserved_length);
+DECLARE_bool(enable_smoother_failsafe);
+DECLARE_bool(use_s_curve_speed_smooth);
+DECLARE_bool(enable_parallel_trajectory_smoothing);
+
+// pull-over
+DECLARE_double(destination_to_adc_buffer);
+DECLARE_double(destination_to_pathend_buffer);
+DECLARE_double(pull_over_road_edge_buffer);
 
 DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
@@ -240,6 +255,7 @@ DECLARE_double(default_front_clear_distance);
 DECLARE_double(max_trajectory_len);
 DECLARE_bool(enable_rss_fallback);
 DECLARE_bool(enable_rss_info);
+DECLARE_double(rss_max_front_obstacle_distance);
 
 DECLARE_bool(enable_planning_smoother);
 DECLARE_double(smoother_stop_distance);
@@ -255,5 +271,17 @@ DECLARE_bool(side_pass_use_actual_laneinfo_for_path_generation);
 DECLARE_double(side_pass_driving_width_l_buffer);
 
 DECLARE_bool(enable_parallel_hybrid_a);
-DECLARE_bool(enable_parallel_open_space_smoother);
+
+DECLARE_double(vehicle_low_speed_threshold);
+
 DECLARE_bool(enable_cuda);
+
+DECLARE_bool(enable_nonscenario_side_pass);
+DECLARE_bool(enable_soft_speed_limit);
+DECLARE_bool(enable_dp_reference_speed);
+
+DECLARE_double(message_latency_threshold);
+DECLARE_bool(enable_lane_change_urgency_checking);
+DECLARE_double(short_path_length_threshold);
+
+DECLARE_uint32(trajectory_stitching_preserved_length);

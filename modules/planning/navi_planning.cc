@@ -31,11 +31,11 @@
 #include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/trajectory_stitcher.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/planner/navi/navi_planner.h"
 #include "modules/planning/planner/rtk/rtk_replay_planner.h"
 #include "modules/planning/reference_line/reference_line_provider.h"
 #include "modules/planning/traffic_rules/traffic_decider.h"
-#include "modules/planning/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -53,7 +53,7 @@ NaviPlanning::~NaviPlanning() {
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->mutable_planning_status()->Clear();
 }
 
 std::string NaviPlanning::Name() const { return "navi_planning"; }
@@ -75,7 +75,7 @@ Status NaviPlanning::Init(const PlanningConfig& config) {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->mutable_planning_status()->Clear();
 
   planner_ = planner_dispatcher_->DispatchPlanner();
   if (!planner_) {
@@ -174,11 +174,13 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
                         ->mutable_main_decision()
                         ->mutable_not_ready();
 
-  if (!status.ok() || !IsVehicleStateValid(vehicle_state)) {
+  if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
     std::string msg("Update VehicleStateProvider failed");
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
+    // TODO(all): integrate reverse gear
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
     FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
@@ -189,6 +191,7 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   std::string replan_reason;
   stitching_trajectory = TrajectoryStitcher::ComputeStitchingTrajectory(
       vehicle_state, start_timestamp, planning_cycle_time,
+      FLAGS_trajectory_stitching_preserved_length,
       last_publishable_trajectory_.get(), &replan_reason);
 
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
@@ -199,6 +202,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
     AERROR << msg;
     not_ready->set_reason(msg);
     status.Save(trajectory_pb->mutable_header()->mutable_status());
+    // TODO(all): integrate reverse gear
+    trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
     FillPlanningPb(start_timestamp, trajectory_pb);
     return;
   }
@@ -222,6 +227,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
       estop->set_is_estop(true);
       estop->set_reason(status.error_message());
       status.Save(estop_trajectory.mutable_header()->mutable_status());
+      // TODO(all): integrate reverse gear
+      trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
       FillPlanningPb(start_timestamp, &estop_trajectory);
     } else {
       trajectory_pb->mutable_decision()
@@ -229,6 +236,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
           ->mutable_not_ready()
           ->set_reason(status.ToString());
       status.Save(trajectory_pb->mutable_header()->mutable_status());
+      // TODO(all): integrate reverse gear
+      trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
       FillPlanningPb(start_timestamp, trajectory_pb);
     }
 
@@ -287,6 +296,8 @@ void NaviPlanning::RunOnce(const LocalView& local_view,
   }
 
   trajectory_pb->set_is_replan(stitching_trajectory.size() == 1);
+  // TODO(all): integrate reverse gear
+  trajectory_pb->set_gear(canbus::Chassis::GEAR_DRIVE);
   FillPlanningPb(start_timestamp, trajectory_pb);
   ADEBUG << "Planning pb:" << trajectory_pb->header().DebugString();
 
@@ -566,7 +577,7 @@ Status NaviPlanning::Plan(
   frame_.reset(nullptr);
   planner_.reset(nullptr);
   FrameHistory::Instance()->Clear();
- PlanningContext::MutablePlanningStatus()->Clear();
+ PlanningContext::Instance()->mutable_planning_status()->Clear();
 }*/
 
 NaviPlanning::VehicleConfig NaviPlanning::ComputeVehicleConfigFromLocalization(

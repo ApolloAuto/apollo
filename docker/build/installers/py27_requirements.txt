@@ -2,9 +2,6 @@
 #    sudo apt-get install python-numpy python-scipy python-matplotlib
 #    sudo pip install -r py27_requirements.txt
 
-# system utils
-supervisor
-
 # Google infras.
 glog
 protobuf == 3.1
@@ -13,17 +10,16 @@ python-gflags
 # Web utils.
 flask
 flask-cors
-gunicorn
 requests >= 2.18
 simplejson
 
 # Python tools
-pymongo
-pyproj
+pyproj == 1.9.6
 shapely
 
 # Data format
 PyYAML
 h5py
+pypcd
 pytz
 utm

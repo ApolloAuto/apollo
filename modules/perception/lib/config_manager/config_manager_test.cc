@@ -50,8 +50,6 @@ TEST_F(ConfigManagerTest, TestInit) {
   EXPECT_TRUE(config_manager_->Init());
   EXPECT_TRUE(config_manager_->Reset());
   EXPECT_EQ(config_manager_->NumModels(), 2u);
-  EXPECT_EQ(config_manager_->get_env(""), "");
-  config_manager_->get_env("PATH");
   ConfigManager config_manager;
   config_manager.set_work_root("");
   EXPECT_EQ(config_manager.work_root(), "");
@@ -68,7 +66,7 @@ TEST_F(ConfigManagerTest, TestGetModelConfig) {
   // not exist model.
   model_config = nullptr;
   EXPECT_FALSE(config_manager_->GetModelConfig("noexist", &model_config));
-  EXPECT_TRUE(model_config == nullptr);
+  EXPECT_EQ(model_config, nullptr);
 }
 
 TEST_F(ConfigManagerTest, TestModelConfig) {
@@ -102,9 +100,9 @@ TEST_F(ConfigManagerTest, TestModelConfig) {
 
   bool bool_value = false;
   EXPECT_TRUE(model_config->get_value("bool_value_true", &bool_value));
-  EXPECT_EQ(bool_value, true);
+  EXPECT_TRUE(bool_value);
   EXPECT_TRUE(model_config->get_value("bool_value_false", &bool_value));
-  EXPECT_EQ(bool_value, false);
+  EXPECT_FALSE(bool_value);
 
   std::vector<int> int_list;
   EXPECT_TRUE(model_config->get_value("array_p1", &int_list));
@@ -124,7 +122,7 @@ TEST_F(ConfigManagerTest, TestModelConfig) {
   std::vector<bool> bool_list;
   EXPECT_TRUE(model_config->get_value("array_bool", &bool_list));
   EXPECT_EQ(bool_list.size(), 4u);
-  EXPECT_EQ(bool_list[2], true);
+  EXPECT_TRUE(bool_list[2]);
 
   // not exist
   EXPECT_FALSE(model_config->get_value("array_p3", &double_list));

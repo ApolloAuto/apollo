@@ -50,8 +50,9 @@ MAP_COLLECTION_DATA_TOPICS = [
     '/apollo/sensor/camera/front_12mm/image/compressed',
     '/apollo/sensor/camera/front_6mm/image/compressed',
     '/apollo/sensor/lidar16/front/up/Scan',
+    '/apollo/sensor/lidar16/front/up/PointCloud2',
     '/apollo/sensor/lidar16/front/up/compensator/PointCloud2',
-    '/apollo/sensor/lidar128/Scan',
+    '/apollo/sensor/lidar128/PointCloud2',
     '/apollo/sensor/lidar128/compensator/PointCloud2',
 ]
 

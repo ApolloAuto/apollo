@@ -1,0 +1,20 @@
+triggers {
+  trigger_name: "DriveEventTrigger"
+  enabled: true
+  backward_time: 30.0
+  forward_time: 5.0
+}
+
+triggers {
+  trigger_name: "EmergencyModeTrigger"
+  enabled: true
+  backward_time: 25.0
+  forward_time: 5.0
+}
+
+triggers {
+  trigger_name: "SmallTopicsTrigger"
+  enabled: true
+  backward_time: 0
+  forward_time: 0
+}

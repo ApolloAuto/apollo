@@ -156,7 +156,7 @@ bool CanbusComponent::Init() {
   }
 
   // 4. start controller
-  if (vehicle_controller_->Start() == false) {
+  if (!vehicle_controller_->Start()) {
     AERROR << "Failed to start vehicle controller.";
     return false;
   }
@@ -164,6 +164,14 @@ bool CanbusComponent::Init() {
   monitor_logger_buffer_.INFO("Canbus is started.");
 
   return true;
+}
+
+void CanbusComponent::Clear() {
+  can_sender_.Stop();
+  can_receiver_.Stop();
+  can_client_->Stop();
+  vehicle_controller_->Stop();
+  AINFO << "Cleanup Canbus component";
 }
 
 void CanbusComponent::PublishChassis() {

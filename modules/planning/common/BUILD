@@ -121,6 +121,18 @@ cc_library(
 )
 
 cc_library(
+    name = "path_boundary",
+    srcs = [
+        "path_boundary.cc",
+    ],
+    hdrs = [
+        "path_boundary.h",
+    ],
+    deps = [
+    ],
+)
+
+cc_library(
     name = "planning_context",
     srcs = [
         "planning_context.cc",
@@ -135,6 +147,8 @@ cc_library(
         ":planning_gflags",
         "//cyber/common:log",
         "//modules/map/pnc_map:path",
+        "//modules/planning/common/path:path_data",
+        "//modules/planning/proto:path_decider_info_proto",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",
@@ -188,8 +202,10 @@ cc_library(
     ],
     deps = [
         ":ego_info",
+        ":path_boundary",
         ":path_decision",
         ":planning_gflags",
+        ":st_graph_data",
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
         "//modules/common/vehicle_state:vehicle_state_provider",
@@ -201,7 +217,6 @@ cc_library(
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/proto:lattice_structure_proto",
         "//modules/planning/reference_line",
-        "//modules/planning/tasks/optimizers/st_graph:st_graph_data",
         "@eigen",
     ],
 )
@@ -238,6 +253,7 @@ cc_library(
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
+        "//modules/planning/math/piecewise_jerk:piecewise_jerk_speed_problem",
         "//modules/planning/proto:planning_config_proto",
     ],
 )
@@ -251,25 +267,6 @@ cc_test(
     deps = [
         ":speed_profile_generator",
         "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "change_lane_decider",
-    srcs = [
-        "change_lane_decider.cc",
-    ],
-    hdrs = [
-        "change_lane_decider.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        ":planning_gflags",
-        ":reference_line_info",
-        "//modules/map/pnc_map:route_segments",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 
@@ -304,7 +301,6 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        ":change_lane_decider",
         ":indexed_queue",
         ":local_view",
         ":obstacle",
@@ -318,6 +314,7 @@ cc_library(
         "//modules/map/pnc_map",
         "//modules/planning/common/trajectory:discretized_trajectory",
         "//modules/planning/common/trajectory:publishable_trajectory",
+        "//modules/planning/common/util:util_lib",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line:reference_line_provider",
@@ -418,6 +415,7 @@ cc_library(
         ":frame",
         ":planning_gflags",
         ":speed_limit",
+        ":st_graph_data",
         "//cyber/common:log",
         "//modules/localization/common:localization_common",
         "//modules/localization/proto:localization_proto",
@@ -436,6 +434,7 @@ cc_library(
     deps = [
         "//cyber/common:log",
         "//modules/common/proto:pnc_point_proto",
+        "//modules/common/vehicle_model",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:publishable_trajectory",
         "//modules/planning/reference_line",
@@ -460,8 +459,9 @@ cc_library(
         "//modules/planning/common:obstacle",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/common/trajectory:publishable_trajectory",
         "@eigen",
-     ],
+    ],
 )
 
 cc_test(
@@ -472,6 +472,37 @@ cc_test(
     ],
     deps = [
         "open_space_info",
+        "@gtest//:main",
+    ],
+)
+
+cc_library(
+    name = "st_graph_data",
+    srcs = [
+        "st_graph_data.cc",
+    ],
+    hdrs = [
+        "st_graph_data.h",
+    ],
+    copts = ["-DMODULE_NAME=\\\"planning\\\""],
+    deps = [
+        ":planning_gflags",
+        ":speed_limit",
+        "//modules/planning/common/speed:st_boundary",
+    ],
+)
+
+cc_test(
+    name = "st_graph_data_test",
+    size = "small",
+    srcs = [
+        "st_graph_data_test.cc",
+    ],
+    deps = [
+        ":st_graph_data",
+        "//cyber/common:log",
+        "//modules/common/time",
+        "//modules/common/util",
         "@gtest//:main",
     ],
 )

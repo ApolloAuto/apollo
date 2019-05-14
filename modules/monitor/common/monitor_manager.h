@@ -49,7 +49,7 @@ class MonitorManager {
   SystemStatus* GetStatus() { return &status_; }
   apollo::common::monitor::MonitorLogBuffer& LogBuffer() { return log_buffer_; }
 
-  // Cyber reader / writer creater.
+  // Cyber reader / writer creator.
   template <class T>
   std::shared_ptr<cyber::Reader<T>> CreateReader(const std::string& channel) {
     if (readers_.find(channel) == readers_.end()) {

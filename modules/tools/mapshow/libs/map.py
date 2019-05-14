@@ -88,24 +88,8 @@ class Map:
 
     def _draw_lane_id(self, lane, ax, color_val):
         """draw lane id"""
-        labelxys = []
-        labelxys.append((40, -40))
-        labelxys.append((-40, -40))
-        labelxys.append((40, 40))
-        labelxys.append((-40, 40))
-        has = ['right', 'left', 'right', 'left']
-        vas = ['bottom', 'bottom', 'top', 'top']
-
-        idx = random.randint(0, 3)
-        lxy = labelxys[idx]
         x, y = self._find_lane_central_point(lane)
-        plt.annotate(
-            lane.id.id,
-            xy=(x, y), xytext=lxy,
-            textcoords='offset points', ha=has[idx], va=vas[idx],
-            bbox=dict(boxstyle='round,pad=0.5', fc=color_val, alpha=0.5),
-            arrowprops=dict(arrowstyle='-|>', connectionstyle='arc3,rad=-0.2',
-                            fc=color_val, ec=color_val, alpha=0.5))
+        self._draw_label(lane.id.id, (x, y), ax, color_val);
 
     def _draw_lane_details(self, lane, ax, color_val):
         """draw lane id"""
@@ -142,6 +126,53 @@ class Map:
         plt.annotate(
             details,
             xy=(x, y), xytext=lxy,
+            textcoords='offset points', ha=has[idx], va=vas[idx],
+            bbox=dict(boxstyle='round,pad=0.5', fc=color_val, alpha=0.5),
+            arrowprops=dict(arrowstyle='-|>', connectionstyle='arc3,rad=-0.2',
+                            fc=color_val, ec=color_val, alpha=0.5))
+
+    def draw_pnc_junctions(self, ax):
+        cnt = 1
+        for pnc_junction in self.map_pb.pnc_junction:
+            color_val = self.colors[cnt % len(self.colors)]
+            self._draw_polygon_boundary(pnc_junction.polygon, ax, color_val)
+            self._draw_pnc_junction_id(pnc_junction, ax, color_val)
+            cnt += 1
+
+    def _draw_pnc_junction_id(self, pnc_junction, ax, color_val):
+        x = pnc_junction.polygon.point[0].x
+        y = pnc_junction.polygon.point[0].y
+        self._draw_label(pnc_junction.id.id, (x, y), ax, color_val);
+
+    def draw_crosswalks(self, ax):
+        cnt = 1
+        for crosswalk in self.map_pb.crosswalk:
+            color_val = self.colors[cnt % len(self.colors)]
+            self._draw_polygon_boundary(crosswalk.polygon, ax, color_val)
+            self._draw_crosswalk_id(crosswalk, ax, color_val)
+            cnt += 1
+
+    def _draw_crosswalk_id(self, crosswalk, ax, color_val):
+        x = crosswalk.polygon.point[0].x
+        y = crosswalk.polygon.point[0].y
+        self._draw_label(crosswalk.id.id, (x, y), ax, color_val);
+
+    @staticmethod
+    def _draw_label(label_id, point, ax, color_val):
+        """draw label id"""
+        labelxys = []
+        labelxys.append((40, -40))
+        labelxys.append((-40, -40))
+        labelxys.append((40, 40))
+        labelxys.append((-40, 40))
+        has = ['right', 'left', 'right', 'left']
+        vas = ['bottom', 'bottom', 'top', 'top']
+
+        idx = random.randint(0, 3)
+        lxy = labelxys[idx]
+        plt.annotate(
+            label_id,
+            xy=(point[0], point[1]), xytext=lxy,
             textcoords='offset points', ha=has[idx], va=vas[idx],
             bbox=dict(boxstyle='round,pad=0.5', fc=color_val, alpha=0.5),
             arrowprops=dict(arrowstyle='-|>', connectionstyle='arc3,rad=-0.2',
@@ -206,6 +237,16 @@ class Map:
                     px.append(float(p.x))
                     py.append(float(p.y))
                 ax.plot(px, py, ls=':', c=color_val, alpha=0.5)
+
+    @staticmethod
+    def _draw_polygon_boundary(polygon, ax, color_val):
+        """draw polygon boundary"""
+        px = []
+        py = []
+        for point in polygon.point:
+            px.append(point.x)
+            py.append(point.y)
+        ax.plot(px, py, ls='-', c=color_val, alpha=0.5)
 
     def draw_signal_lights(self, ax):
         """draw_signal_lights"""

@@ -27,12 +27,11 @@ from modules.planning.proto import planner_open_space_config_pb2
 
 
 random.seed(99999)
-rand_num = 100
+rand_num = 1000
 original_file_path = "/apollo/modules/planning/conf/planner_open_space_config.pb.txt"
-optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config.pb.txt"
+optimal_file_path = "/apollo/modules/planning/conf/optimal_planner_open_space_config_-8_4.pb.txt"
 # tunning_object = "coarse_trajectory"
 tunning_object = "smooth_trajectory"
-
 
 def load_open_space_protobuf(filename):
     open_space_params = planner_open_space_config_pb2.PlannerOpenSpaceConfig()

@@ -58,9 +58,9 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
   if (coefficients.size() != 3) {
     return -1;
   }
-  const double& a = coefficients[0];
-  const double& b = coefficients[1];
-  const double& c = coefficients[2];
+  const double a = coefficients[0];
+  const double b = coefficients[1];
+  const double c = coefficients[2];
   if (std::fabs(a) <= std::numeric_limits<double>::epsilon()) {
     return -1;
   }
@@ -210,6 +210,16 @@ double EvaluateCubicPolynomial(const std::array<double, 4>& coefs,
     default:
       return 0.0;
   }
+}
+
+double GetSByConstantAcceleration(const double v0, const double acceleration,
+                                  const double t) {
+  if (acceleration > -FLAGS_double_precision) {
+    return v0 * t + 0.5 * acceleration * t * t;
+  }
+  double t_stop = v0 / (-acceleration);
+  double t_actual = std::min(t, t_stop);
+  return v0 * t_actual + 0.5 * acceleration * t_actual * t_actual;
 }
 
 }  // namespace math_util

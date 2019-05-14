@@ -23,7 +23,7 @@ before you proceed.
 ## Hardware and Software Installation
 
 Please refer to
-[Apollo master Hardware and System Installation Guide](apollo_master_hardware_system_installation_guide.md)
+[Apollo master Hardware and System Installation Guide](apollo_3_5_hardware_system_installation_guide.md)
 for the steps to install the hardware components and the system software, as well as
 [Apollo Software Installation Guide](apollo_software_installation_guide.md).
 

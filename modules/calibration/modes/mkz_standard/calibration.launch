@@ -22,7 +22,7 @@
 
 	<module>
 		<name>camera</name>
-		<dag_conf>/apollo/modules/drivers/camera/dag/camera.dag</dag_conf>
+		<dag_conf>/apollo/modules/drivers/camera/dag/camera_no_compress.dag</dag_conf>
 		<process_name>compute</process_name>
 		<sched_name>CYBER_COMPUTE</sched_name>
 		<version>1.0.0</version>

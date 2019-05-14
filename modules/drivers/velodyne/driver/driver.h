@@ -36,6 +36,7 @@ constexpr double PACKET_RATE_HDL64E_S2 = 3472.17;
 constexpr double PACKET_RATE_HDL64E_S3S = 3472.17;
 constexpr double PACKET_RATE_HDL64E_S3D = 5789;
 constexpr double PACKET_RATE_VLS128 = 6250.0;
+constexpr double PACKET_RATE_VLP32C = 1507.0;
 
 class VelodyneDriver {
  public:

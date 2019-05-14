@@ -132,11 +132,6 @@ void System(const std::string& cmd) {
   }
 }
 
-std::string GetDockerImage() {
-  const char* docker_image = std::getenv("DOCKER_IMG");
-  return docker_image != nullptr ? std::string(docker_image) : std::string("");
-}
-
 }  // namespace
 
 HMIWorker::HMIWorker(const std::shared_ptr<Node>& node)
@@ -217,7 +212,8 @@ HMIMode HMIWorker::LoadMode(const std::string& mode_config_path) {
 }
 
 void HMIWorker::InitStatus() {
-  status_.set_docker_image(GetDockerImage());
+  static const std::string kDockerImageEnv = "DOCKER_IMG";
+  status_.set_docker_image(cyber::common::GetEnv(kDockerImageEnv));
   status_.set_utm_zone_id(FLAGS_local_utm_zone_id);
 
   // Populate modes and current_mode.

@@ -270,9 +270,9 @@ class Box2d {
 
   std::vector<Vec2d> corners_;
 
-  double max_x_ = std::numeric_limits<double>::min();
+  double max_x_ = std::numeric_limits<double>::lowest();
   double min_x_ = std::numeric_limits<double>::max();
-  double max_y_ = std::numeric_limits<double>::min();
+  double max_y_ = std::numeric_limits<double>::lowest();
   double min_y_ = std::numeric_limits<double>::max();
 };
 

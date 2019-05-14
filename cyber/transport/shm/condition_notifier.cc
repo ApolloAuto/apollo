@@ -16,7 +16,6 @@
 
 #include "cyber/transport/shm/condition_notifier.h"
 
-#include <pthread.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <thread>
@@ -37,8 +36,11 @@ ConditionNotifier::ConditionNotifier() {
 
   if (!Init()) {
     AERROR << "fail to init condition notifier.";
-    is_shutdown_.exchange(true);
+    is_shutdown_.store(true);
+    return;
   }
+  next_seq_ = indicator_->next_seq.load();
+  ADEBUG << "next_seq: " << next_seq_;
 }
 
 ConditionNotifier::~ConditionNotifier() { Shutdown(); }
@@ -48,7 +50,6 @@ void ConditionNotifier::Shutdown() {
     return;
   }
 
-  indicator_->cv.notify_all();
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   Reset();
 }
@@ -59,14 +60,10 @@ bool ConditionNotifier::Notify(const ReadableInfo& info) {
     return false;
   }
 
-  {
-    std::unique_lock<std::mutex> lck(indicator_->mtx);
-    auto idx = indicator_->written_info_num % kBufLength;
-    indicator_->infos[idx] = info;
-    ++indicator_->written_info_num;
-  }
-
-  indicator_->cv.notify_all();
+  uint64_t seq = indicator_->next_seq.fetch_add(1);
+  uint64_t idx = seq % kBufLength;
+  indicator_->infos[idx] = info;
+  indicator_->seqs[idx] = seq;
 
   return true;
 }
@@ -82,33 +79,28 @@ bool ConditionNotifier::Listen(int timeout_ms, ReadableInfo* info) {
     return false;
   }
 
-  std::unique_lock<std::mutex> lck(indicator_->mtx);
-  if (next_listen_num_ >= indicator_->written_info_num) {
-    uint64_t target = next_listen_num_;
-    if (!indicator_->cv.wait_for(
-            lck, std::chrono::milliseconds(timeout_ms), [target, this]() {
-              return this->indicator_->written_info_num > target ||
-                     this->is_shutdown_.load();
-            })) {
-      ADEBUG << "timeout";
-      return false;
+  int timeout_us = timeout_ms * 1000;
+  while (!is_shutdown_.load()) {
+    uint64_t seq = indicator_->next_seq.load();
+    if (seq != next_seq_) {
+      auto idx = next_seq_ % kBufLength;
+      if (indicator_->seqs[idx] == next_seq_) {
+        *info = indicator_->infos[idx];
+        ++next_seq_;
+        return true;
+      } else {
+        ADEBUG << "seq[" << next_seq_ << "] is writing, can not read now.";
+      }
     }
 
-    if (is_shutdown_.load()) {
-      AINFO << "notifier is shutdown.";
+    if (timeout_us > 0) {
+      std::this_thread::sleep_for(std::chrono::microseconds(50));
+      timeout_us -= 50;
+    } else {
       return false;
     }
   }
-
-  if (next_listen_num_ == 0) {
-    next_listen_num_ = indicator_->written_info_num - 1;
-  }
-
-  auto idx = next_listen_num_ % kBufLength;
-  *info = indicator_->infos[idx];
-  next_listen_num_ += 1;
-
-  return true;
+  return false;
 }
 
 bool ConditionNotifier::Init() { return OpenOrCreate(); }
@@ -158,16 +150,6 @@ bool ConditionNotifier::OpenOrCreate() {
     shmctl(shmid, IPC_RMID, 0);
     return false;
   }
-
-  pthread_mutexattr_t mtx_attr;
-  pthread_mutexattr_init(&mtx_attr);
-  pthread_mutexattr_setpshared(&mtx_attr, PTHREAD_PROCESS_SHARED);
-  pthread_mutex_init(indicator_->mtx.native_handle(), &mtx_attr);
-
-  pthread_condattr_t cond_attr;
-  pthread_condattr_init(&cond_attr);
-  pthread_condattr_setpshared(&cond_attr, PTHREAD_PROCESS_SHARED);
-  pthread_cond_init(indicator_->cv.native_handle(), &cond_attr);
 
   ADEBUG << "open or create true.";
   return true;

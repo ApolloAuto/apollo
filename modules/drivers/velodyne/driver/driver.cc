@@ -254,6 +254,11 @@ VelodyneDriver* VelodyneDriverFactory::CreateDriver(const Config& config) {
       driver->SetPacketRate(PACKET_RATE_HDL32E);
       break;
     }
+    case VLP32C: {
+      driver = new VelodyneDriver(config);
+      driver->SetPacketRate(PACKET_RATE_VLP32C);
+      break;
+    }
     case VLP16: {
       driver = new VelodyneDriver(config);
       driver->SetPacketRate(PACKET_RATE_VLP16);

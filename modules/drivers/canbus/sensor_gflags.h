@@ -32,3 +32,6 @@ DECLARE_double(sensor_freq);
 
 // System gflags
 DECLARE_string(sensor_node_name);
+
+// esd Can Extended frame supported or not
+DECLARE_bool(esd_can_extended_frame);

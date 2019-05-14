@@ -40,11 +40,12 @@ class ObstacleClusters {
    * @brief Obtain a lane graph given a lane info and s
    * @param lane start s
    * @param lane total length
+   * @param if the obstacle is on lane
    * @param lane info
    * @return a corresponding lane graph
    */
   static const LaneGraph& GetLaneGraph(
-      const double start_s, const double length,
+      const double start_s, const double length, const bool is_on_lane,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
   /**
@@ -52,11 +53,12 @@ class ObstacleClusters {
    *        memorize it.
    * @param lane start s
    * @param lane total length
+   * @param if the obstacle is on lane
    * @param lane info
    * @return a corresponding lane graph
    */
   static LaneGraph GetLaneGraphWithoutMemorizing(
-      const double start_s, const double length,
+      const double start_s, const double length, const bool is_on_lane,
       std::shared_ptr<const apollo::hdmap::LaneInfo> lane_info_ptr);
 
   /**
@@ -119,7 +121,9 @@ class ObstacleClusters {
   static StopSign QueryStopSignByLaneId(const std::string& lane_id);
 
   static std::unordered_map<std::string, std::vector<LaneObstacle>>&
-      GetLaneObstacles() { return lane_obstacles_; }
+  GetLaneObstacles() {
+    return lane_obstacles_;
+  }
 
  private:
   ObstacleClusters() = delete;

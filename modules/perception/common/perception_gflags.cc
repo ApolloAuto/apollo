@@ -20,10 +20,13 @@ namespace apollo {
 namespace perception {
 
 // sensor_manager
-DEFINE_string(obs_sensor_intrinsic_path, "/home/caros/cybertron/params",
+DEFINE_string(obs_sensor_intrinsic_path,
+              "/apollo/modules/perception/data/params",
               "The intrinsics/extrinsics dir.");
 
-DEFINE_string(obs_sensor_meta_path, "./data/perception/common/sensor_meta.pt",
+DEFINE_string(obs_sensor_meta_path,
+              "/apollo/modules/perception/production"
+              "/data/perception/common/sensor_meta.pt",
               "The SensorManager config file.");
 
 DEFINE_bool(enable_base_object_pool, false, "Enable base object pool.");

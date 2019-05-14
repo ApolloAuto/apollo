@@ -24,6 +24,7 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -33,12 +34,14 @@
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
+#include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
+#include "modules/planning/common/st_graph_data.h"
 #include "modules/planning/common/trajectory/discretized_trajectory.h"
-#include "modules/planning/tasks/optimizers/st_graph/st_graph_data.h"
 
 namespace apollo {
 namespace planning {
@@ -49,7 +52,9 @@ namespace planning {
  */
 class ReferenceLineInfo {
  public:
+  enum class LaneType { LeftForward, LeftReverse, RightForward, RightReverse };
   ReferenceLineInfo() = default;
+
   explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
                              const common::TrajectoryPoint& adc_planning_point,
                              const ReferenceLine& reference_line,
@@ -57,22 +62,22 @@ class ReferenceLineInfo {
 
   bool Init(const std::vector<const Obstacle*>& obstacles);
 
-  bool IsInited() const;
-
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   Obstacle* AddObstacle(const Obstacle* obstacle);
 
+  const common::VehicleState& vehicle_state() { return vehicle_state_; }
+
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
+
   const ReferenceLine& reference_line() const;
+  ReferenceLine* mutable_reference_line();
 
   double SDistanceToDestination() const;
   bool ReachedDestination() const;
 
   void SetTrajectory(const DiscretizedTrajectory& trajectory);
-
   const DiscretizedTrajectory& trajectory() const;
-  double TrajectoryLength() const;
 
   double Cost() const { return cost_; }
   void AddCost(double cost) { cost_ += cost; }
@@ -83,6 +88,12 @@ class ReferenceLineInfo {
   void SetStopPoint(const StopPoint& stop_point);
   void SetCruiseSpeed(double speed);
   const PlanningTarget& planning_target() const { return planning_target_; }
+
+  hdmap::LaneInfoConstPtr LocateLaneInfo(const double s) const;
+
+  bool GetNeighborLaneInfo(const ReferenceLineInfo::LaneType lane_type,
+                           const double s, hdmap::Id* ptr_lane_id,
+                           double* ptr_lane_width) const;
 
   /**
    * @brief check if current reference line is started from another reference
@@ -99,9 +110,12 @@ class ReferenceLineInfo {
   const LatencyStats& latency_stats() const { return latency_stats_; }
 
   const PathData& path_data() const;
+  const PathData& fallback_path_data() const;
   const SpeedData& speed_data() const;
   PathData* mutable_path_data();
+  PathData* mutable_fallback_path_data();
   SpeedData* mutable_speed_data();
+
   const RSSInfo& rss_info() const;
   RSSInfo* mutable_rss_info();
   // aggregate final result together by some configuration
@@ -141,11 +155,15 @@ class ReferenceLineInfo {
 
   void ExportDecision(DecisionResult* decision_result) const;
 
-  void SetJunctionRightOfWay(double junction_s, bool is_protected);
+  void SetJunctionRightOfWay(const double junction_s,
+                             const bool is_protected) const;
 
   ADCTrajectory::RightOfWayStatus GetRightOfWayStatus() const;
 
-  const hdmap::Lane::LaneTurn& GetPathTurnType() const;
+  const hdmap::Lane::LaneTurn& GetPathTurnType(const double s) const;
+
+  const bool GetIntersectionRightofWayStatus(
+      const hdmap::PathOverlap& pnc_junction_overlap) const;
 
   double OffsetToOtherReferenceLine() const {
     return offset_to_other_reference_line_;
@@ -154,25 +172,27 @@ class ReferenceLineInfo {
     offset_to_other_reference_line_ = offset;
   }
 
-  void GetPathBoundaries(
-      std::vector<std::pair<double, double>>* const ptr_path_boundaries,
-      double* const ptr_start_s, double* const ptr_resolution_s) {
-    *ptr_path_boundaries = path_boundaries_;
-    *ptr_start_s = path_boundaries_s_start_;
-    *ptr_resolution_s = path_boundaries_s_resolution_;
+  const std::vector<PathBoundary>& GetCandidatePathBoundaries() const;
+
+  void SetCandidatePathBoundaries(
+      std::vector<PathBoundary> candidate_path_boundaries);
+
+  const std::vector<PathData>& GetCandidatePathData() const;
+
+  void SetCandidatePathData(std::vector<PathData> candidate_path_data);
+
+  std::string GetBlockingObstacleId() const { return blocking_obstacle_id_; }
+
+  void SetBlockingObstacleId(const std::string& blocking_obstacle_id) {
+    blocking_obstacle_id_ = blocking_obstacle_id;
   }
 
-  void SetPathBoundaries(
-      const std::vector<std::pair<double, double>>& path_boundaries,
-      const double start_s, const double resolution_s) {
-    path_boundaries_ = path_boundaries;
-    path_boundaries_s_start_ = start_s;
-    path_boundaries_s_resolution_ = resolution_s;
+  bool is_path_lane_borrow() const { return is_path_lane_borrow_; }
+  void set_is_path_lane_borrow(bool is_path_lane_borrow) {
+    is_path_lane_borrow_ = is_path_lane_borrow;
   }
 
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
-
-  void InitFirstOverlaps();
 
   uint32_t GetPriority() const { return reference_line_.GetPriority(); }
 
@@ -199,6 +219,7 @@ class ReferenceLineInfo {
     PNC_JUNCTION = 4,
     SIGNAL = 5,
     STOP_SIGN = 6,
+    YIELD_SIGN = 7,
   };
 
   const std::vector<std::pair<OverlapType, hdmap::PathOverlap>>&
@@ -210,11 +231,13 @@ class ReferenceLineInfo {
                      hdmap::PathOverlap* pnc_junction_overlap) const;
 
  private:
+  void InitFirstOverlaps();
+
   bool CheckChangeLane() const;
 
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
-  bool IsUnrelaventObstacle(const Obstacle* obstacle);
+  bool IsIrrelevantObstacle(const Obstacle& obstacle);
 
   void MakeDecision(DecisionResult* decision_result) const;
 
@@ -231,8 +254,6 @@ class ReferenceLineInfo {
   bool GetFirstOverlap(const std::vector<hdmap::PathOverlap>& path_overlaps,
                        hdmap::PathOverlap* path_overlap);
 
-  void SetPathTurnType();
-
  private:
   const common::VehicleState vehicle_state_;
   const common::TrajectoryPoint adc_planning_point_;
@@ -244,17 +265,17 @@ class ReferenceLineInfo {
    */
   double cost_ = 0.0;
 
-  bool is_inited_ = false;
-
   bool is_drivable_ = true;
 
   PathDecision path_decision_;
 
-  std::vector<std::pair<double, double>> path_boundaries_;
-  double path_boundaries_s_start_ = 0.0;
-  double path_boundaries_s_resolution_ = 0.1;
+  std::string blocking_obstacle_id_ = "";
+
+  std::vector<PathBoundary> candidate_path_boundaries_;
+  std::vector<PathData> candidate_path_data_;
 
   PathData path_data_;
+  PathData fallback_path_data_;
   SpeedData speed_data_;
 
   DiscretizedTrajectory discretized_trajectory_;
@@ -283,6 +304,8 @@ class ReferenceLineInfo {
 
   bool is_safe_to_change_lane_ = false;
 
+  bool is_path_lane_borrow_ = false;
+
   ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
 
   double offset_to_other_reference_line_ = 0.0;
@@ -300,10 +323,8 @@ class ReferenceLineInfo {
   std::vector<std::pair<OverlapType, hdmap::PathOverlap>>
       first_encounter_overlaps_;
 
-  hdmap::Lane::LaneTurn path_turn_type_;
-
   /**
-   * Data generated by speed_bounds_decider for constructing st_graph for
+   * @brief Data generated by speed_bounds_decider for constructing st_graph for
    * different st optimizer
    */
   StGraphData st_graph_data_;

@@ -54,10 +54,11 @@ class MPCControllerTest : public ::testing::Test, MPCController {
 
   void ComputeLateralErrors(const double x, const double y, const double theta,
                             const double linear_v, const double angular_v,
+                            const double linear_a,
                             const TrajectoryAnalyzer &trajectory_analyzer,
                             SimpleMPCDebug *debug) {
     MPCController::ComputeLateralErrors(x, y, theta, linear_v, angular_v,
-                                        trajectory_analyzer, debug);
+                                        linear_a, trajectory_analyzer, debug);
   }
 
  protected:
@@ -111,7 +112,7 @@ TEST_F(MPCControllerTest, ComputeLateralErrors) {
   ComputeLateralErrors(
       vehicle_state->x(), vehicle_state->y(), vehicle_state->heading(),
       vehicle_state->linear_velocity(), vehicle_state->angular_velocity(),
-      trajectory_analyzer, debug);
+      vehicle_state->linear_acceleration(), trajectory_analyzer, debug);
 
   double theta_error_expected = -0.03549;
   double theta_error_dot_expected = 0.0044552856731;

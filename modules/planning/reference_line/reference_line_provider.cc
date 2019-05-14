@@ -188,7 +188,7 @@ void ReferenceLineProvider::GenerateThread() {
   while (!is_stop_) {
     constexpr int32_t kSleepTime = 50;  // milliseconds
     cyber::SleepFor(std::chrono::milliseconds(kSleepTime));
-    double start_time = Clock::NowInSeconds();
+    const double start_time = Clock::NowInSeconds();
     if (!has_routing_) {
       AERROR << "Routing is not ready.";
       continue;
@@ -200,7 +200,7 @@ void ReferenceLineProvider::GenerateThread() {
       continue;
     }
     UpdateReferenceLine(reference_lines, segments);
-    double end_time = Clock::NowInSeconds();
+    const double end_time = Clock::NowInSeconds();
     std::lock_guard<std::mutex> lock(reference_lines_mutex_);
     last_calculation_time_ = end_time - start_time;
   }
@@ -239,26 +239,28 @@ bool ReferenceLineProvider::GetReferenceLines(
       reference_lines->assign(reference_lines_.begin(), reference_lines_.end());
       segments->assign(route_segments_.begin(), route_segments_.end());
       return true;
-    } else {
-      AWARN << "Reference line is NOT ready.";
-      if (reference_line_history_.empty()) {
-        return false;
-      }
-      reference_lines->assign(reference_line_history_.back().begin(),
-                              reference_line_history_.back().end());
-      segments->assign(route_segments_history_.back().begin(),
-                       route_segments_history_.back().end());
     }
   } else {
     double start_time = Clock::NowInSeconds();
-    if (!CreateReferenceLine(reference_lines, segments)) {
-      AERROR << "Failed to create reference line";
-      return false;
+    if (CreateReferenceLine(reference_lines, segments)) {
+      UpdateReferenceLine(*reference_lines, *segments);
+      double end_time = Clock::NowInSeconds();
+      last_calculation_time_ = end_time - start_time;
+      return true;
     }
-    UpdateReferenceLine(*reference_lines, *segments);
-    double end_time = Clock::NowInSeconds();
-    last_calculation_time_ = end_time - start_time;
   }
+
+  AWARN << "Reference line is NOT ready.";
+  if (reference_line_history_.empty()) {
+    AERROR << "Failed to use reference line latest history";
+    return false;
+  }
+
+  reference_lines->assign(reference_line_history_.back().begin(),
+                          reference_line_history_.back().end());
+  segments->assign(route_segments_history_.back().begin(),
+                   route_segments_history_.back().end());
+  AWARN << "Use reference line from history!";
   return true;
 }
 
@@ -312,13 +314,13 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
     return false;
   }
   const std::string adc_lane_id = adc_lane_way_point.lane->id().id();
-  auto adc_navigation_path = relative_map_->navigation_path().find(adc_lane_id);
-  if (adc_navigation_path == relative_map_->navigation_path().end()) {
+  auto *adc_navigation_path = apollo::common::util::FindOrNull(
+      relative_map_->navigation_path(), adc_lane_id);
+  if (adc_navigation_path == nullptr) {
     AERROR << "adc lane cannot be found in relative_map_->navigation_path";
     return false;
   }
-  const uint32_t adc_lane_priority =
-      adc_navigation_path->second.path_priority();
+  const uint32_t adc_lane_priority = adc_navigation_path->path_priority();
   // get adc left neighbor lanes
   std::vector<std::string> left_neighbor_lane_ids;
   auto left_lane_ptr = adc_lane_way_point.lane;

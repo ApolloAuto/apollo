@@ -7,12 +7,13 @@ import Header from "components/Header";
 import MainView from "components/Layouts/MainView";
 import ToolView from "components/Layouts/ToolView";
 import PNCMonitor from "components/PNCMonitor";
+import DataCollectionMonitor from "components/DataCollectionMonitor";
 import SideBar from "components/SideBar";
 import AudioCapture from "components/AudioCapture";
 import { CameraVideo } from "components/Tasks/SensorCamera";
 
 import HOTKEYS_CONFIG from "store/config/hotkeys.yml";
-import WS, {MAP_WS, POINT_CLOUD_WS} from "store/websocket";
+import WS, { MAP_WS, POINT_CLOUD_WS } from "store/websocket";
 
 
 @inject("store") @observer
@@ -26,7 +27,7 @@ export default class Dreamview extends React.Component {
 
     handleDrag(masterViewWidth) {
         const { options } = this.props.store;
-        if (options.showPNCMonitor) {
+        if (options.showMonitor) {
             this.props.store.updateWidthInPercentage(
                 Math.min(1.00, masterViewWidth / window.innerWidth));
         }
@@ -75,9 +76,9 @@ export default class Dreamview extends React.Component {
                 <Header />
                 <div className="pane-container">
                     <SplitPane split="vertical"
-                           size={dimension.width}
-                           onChange={this.handleDrag}
-                           allowResize={options.showPNCMonitor}>
+                        size={dimension.width}
+                        onChange={this.handleDrag}
+                        allowResize={options.showMonitor}>
                         <div className="left-pane">
                             <SideBar />
                             <div className="dreamview-body">
@@ -92,7 +93,13 @@ export default class Dreamview extends React.Component {
                                     <CameraVideo />
                                 </div>
                             }
-                            {options.showPNCMonitor && <PNCMonitor options={options}/>}
+                            {options.showPNCMonitor && <PNCMonitor options={options} />}
+                            {options.showDataCollectionMonitor &&
+                                <DataCollectionMonitor
+                                    dataCollectionUpdateStatus={hmi.dataCollectionUpdateStatus}
+                                    dataCollectionProgress={hmi.dataCollectionProgress}
+                                />
+                            }
                         </div>
                     </SplitPane>
                 </div>

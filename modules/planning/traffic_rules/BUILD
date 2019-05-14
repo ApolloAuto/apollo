@@ -5,17 +5,17 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "traffic_rules",
     srcs = [
+        # TODO(all): Split to separate targets to gain better building cache.
         "backside_vehicle.cc",
         "change_lane.cc",
         "crosswalk.cc",
         "destination.cc",
         "keep_clear.cc",
         "object_priority.cc",
-        "pull_over.cc",
         "reference_line_end.cc",
         "rerouting.cc",
-        "signal_light.cc",
-        "util.cc",
+        "stop_sign.cc",
+        "traffic_light.cc",
     ],
     hdrs = [
         "backside_vehicle.h",
@@ -24,12 +24,11 @@ cc_library(
         "destination.h",
         "keep_clear.h",
         "object_priority.h",
-        "pull_over.h",
         "reference_line_end.h",
         "rerouting.h",
-        "signal_light.h",
+        "stop_sign.h",
+        "traffic_light.h",
         "traffic_rule.h",
-        "util.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
@@ -40,6 +39,7 @@ cc_library(
         "//modules/planning/common:planning_context",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/common:reference_line_info",
+        "//modules/planning/common/util:common_lib",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:traffic_rule_config_proto",

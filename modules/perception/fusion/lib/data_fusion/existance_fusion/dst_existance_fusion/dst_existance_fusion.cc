@@ -176,7 +176,7 @@ double DstExistanceFusion::ComputeDistDecay(base::ObjectConstPtr obj,
   Eigen::Affine3d sensor2world_pose;
   bool status = SensorDataManager::Instance()->GetPose(sensor_id, timestamp,
                                                        &sensor2world_pose);
-  if (status == false) {
+  if (!status) {
     AERROR << "Failed to get pose";
     return dist_decay;
   }

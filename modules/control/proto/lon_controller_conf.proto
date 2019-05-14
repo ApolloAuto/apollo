@@ -13,9 +13,8 @@ message FilterConf {
 // controller param
 message LonControllerConf {
   optional double ts = 1;  // longitudinal controller sampling time
-
-  optional double brake_deadzone = 2;
-  optional double throttle_deadzone = 3;
+  optional double brake_minimum_action = 2;
+  optional double throttle_minimum_action = 3;
   optional double speed_controller_input_limit = 4;
   optional double station_error_limit = 5;
   optional double preview_window = 6;

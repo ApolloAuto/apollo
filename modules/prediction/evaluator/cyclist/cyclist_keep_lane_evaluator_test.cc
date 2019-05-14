@@ -26,7 +26,7 @@ namespace prediction {
 class CyclistKeepLaneEvaluatorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    std::string file =
+    const std::string file =
         "modules/prediction/testdata/single_perception_cyclist_onlane.pb.txt";
     CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
@@ -45,7 +45,7 @@ TEST_F(CyclistKeepLaneEvaluatorTest, OnLaneCase) {
   ObstaclesContainer container;
   container.Insert(perception_obstacles_);
   Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   cyclist_keep_lane_evaluator.Evaluate(obstacle_ptr);
   const Feature& feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();

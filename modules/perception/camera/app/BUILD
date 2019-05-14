@@ -104,14 +104,39 @@ cc_library(
         "//modules/perception/camera/lib/calibration_service/online_calibration_service",
         "//modules/perception/camera/lib/calibrator/laneline:laneline_calibrator",
         "//modules/perception/camera/lib/interface",
-        "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/detector/darkSCNN:darkSCNN_lane_detector",
-        "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
+        "//modules/perception/camera/lib/lane/detector/denseline:denseline_lane_detector",
         "//modules/perception/camera/lib/lane/postprocessor/darkSCNN:darkSCNN_lane_postprocessor",
+        "//modules/perception/camera/lib/lane/postprocessor/denseline:denseline_lane_postprocessor",
         "//modules/perception/inference/utils:inference_cuda_util_lib",
         "//modules/perception/inference/utils:inference_util_lib",
         "//modules/perception/lib/utils",
         "@yaml_cpp//:yaml",
+    ],
+)
+
+cc_library(
+    name = "cipv_camera",
+    srcs = [
+        "cipv_camera.cc",
+    ],
+    hdrs = [
+        "cipv_camera.h",
+    ],
+    deps = [
+        ":camera_app_lib_proto",
+        "//cyber",
+        "//modules/common/configs:vehicle_config_helper",
+        "//modules/common/configs/proto:vehicle_config_proto",
+        "//modules/common/math:geometry",
+        "//modules/common/proto:error_code_proto",
+        "//modules/common/proto:geometry_proto",
+        "//modules/common/proto:header_proto",
+        "//modules/common/proto:pnc_point_proto",
+        "//modules/perception/base",
+        "//modules/perception/camera/common:lane_object",
+        "//modules/perception/camera/lib/interface",
+        "//modules/perception/lib/utils",
     ],
 )
 

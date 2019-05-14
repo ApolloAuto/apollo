@@ -36,8 +36,7 @@ class TrajectoryOptimizer : public Task {
   apollo::common::Status Execute(Frame *frame) override;
 
  protected:
-  virtual apollo::common::Status Process(
-      DiscretizedTrajectory *const trajectory_data) = 0;
+  virtual apollo::common::Status Process() = 0;
 };
 
 }  // namespace planning

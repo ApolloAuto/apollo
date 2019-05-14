@@ -36,6 +36,8 @@ sys.path.append(CYBER_PATH + "/lib/")
 sys.path.append(CYBER_PATH + "/python/cyber")
 sys.path.append(CYBER_PATH + "/python/cyber_py")
 
+sys.path.append(CYBER_PATH + "/lib/python/")
+
 sys.path.append(CYBER_DIR + "/python/")
 sys.path.append(CYBER_DIR + "/cyber/")
 
@@ -79,7 +81,9 @@ def waitforshutdown():
 
 # //////////////////////////////class//////////////////////////////
 
+
 class Writer(object):
+
     """
     Class for cyber writer wrapper.
     """
@@ -97,6 +101,7 @@ class Writer(object):
 
 
 class Reader(object):
+
     """
     Class for cyber reader wrapper.
     """
@@ -108,6 +113,7 @@ class Reader(object):
 
 
 class Client(object):
+
     """
     Class for cyber service client wrapper.
     """
@@ -134,6 +140,7 @@ class Client(object):
 
 
 class Node(object):
+
     """
     Class for cyber Node wrapper.
     """
@@ -144,15 +151,22 @@ class Node(object):
         self.list_reader = []
         self.subs = {}
         self.pubs = {}
+        self.list_client = []
+        self.list_service = []
         self.mutex = threading.Lock()
         self.callbacks = {}
+        self.services = {}
 
     def __del__(self):
-        #print("+++ node __del___")
+        # print("+++ node __del___")
         for writer in self.list_writer:
             _CYBER_NODE.delete_PyWriter(writer)
         for reader in self.list_reader:
             _CYBER_NODE.delete_PyReader(reader)
+        for c in self.list_client:
+            _CYBER_NODE.delete_PyClient(c)
+        for s in self.list_service:
+            _CYBER_NODE.delete_PyService(s)
         _CYBER_NODE.delete_PyNode(self.node)
 
     def register_message(self, file_desc):
@@ -177,7 +191,7 @@ class Node(object):
         self.register_message(data_type.DESCRIPTOR.file)
         datatype = data_type.DESCRIPTOR.full_name
         writer = _CYBER_NODE.PyNode_create_writer(self.node, name,
-            datatype, qos_depth)
+                                                  datatype, qos_depth)
         self.list_writer.append(writer)
         return Writer(name, writer, datatype)
 
@@ -188,9 +202,13 @@ class Node(object):
         sub = self.subs[name]
         msg_str = _CYBER_NODE.PyReader_read(sub[0], False)
         if len(msg_str) > 0:
-            proto = sub[3]()
-            proto.ParseFromString(msg_str)
-            # response = None
+            if sub[3] != "RawData":
+                proto = sub[3]()
+                proto.ParseFromString(msg_str)
+            else:
+                # print "read rawdata-> ",sub[3]
+                proto = msg_str
+
             if sub[2] is None:
                 sub[1](proto)
             else:
@@ -233,6 +251,52 @@ class Node(object):
 
         return Reader(name, reader, data_type)
 
+    def create_rawdata_reader(self, name, callback, args=None):
+        """
+        Create RawData reader:listener RawMessage
+        """
+        return self.create_reader(name, "RawData", callback, args)
+
+    def create_client(self, name, request_data_type, response_data_type):
+        datatype = request_data_type.DESCRIPTOR.full_name
+        c = _CYBER_NODE.PyNode_create_client(self.node, name,
+                                             str(datatype))
+        self.list_client.append(c)
+        return Client(c, response_data_type)
+
+    def service_callback(self, name):
+        v = self.services[name]
+        msg_str = _CYBER_NODE.PyService_read(v[0])
+        if (len(msg_str) > 0):
+            proto = v[3]()
+            proto.ParseFromString(msg_str)
+            response = None
+            if v[2] is None:
+                response = v[1](proto)
+            else:
+                response = v[1](proto, v[2])
+            _CYBER_NODE.PyService_write(v[0], response.SerializeToString())
+        return 0
+
+    def create_service(self, name, req_data_type, res_data_type, callback, args=None):
+        self.mutex.acquire()
+        if name in self.services.keys():
+            self.mutex.release()
+            return None
+        self.mutex.release()
+        datatype = req_data_type.DESCRIPTOR.full_name
+        s = _CYBER_NODE.PyNode_create_service(self.node, name, str(datatype))
+        self.list_service.append(s)
+        v = (s, callback, args, req_data_type, False)
+        self.mutex.acquire()
+        self.services[name] = v
+        self.mutex.release()
+        f = PY_CALLBACK_TYPE(self.service_callback)
+        self.callbacks[name] = f
+        f_ptr = ctypes.cast(f, ctypes.c_void_p).value
+        _CYBER_NODE.PyService_register_func(s, f_ptr)
+        return s
+
     def spin(self):
         """
         spin in wait and process message.
@@ -240,27 +304,42 @@ class Node(object):
         """
         while not _CYBER_INIT.py_is_shutdown():
             time.sleep(0.002)
-            self.do_executable()
 
-    def do_executable(self):
+
+class ChannelUtils(object):
+
+    @staticmethod
+    def get_debugstring_rawmsgdata(msg_type, rawmsgdata):
         """
-        process received message.
-        @param self
+        Parse rawmsg from rawmsg data
+        Input: message type; rawmsg data
+        Output: a human readable form of this message.for debugging and other purposes.
         """
-        self.mutex.acquire()
-        for _, item in self.subs.items():
-            msg_str = _CYBER_NODE.PyReader_read(item[0], False)
-            if len(msg_str) > 0:
-                if item[4]:
-                    if item[2] is None:
-                        item[1](msg_str)
-                    else:
-                        item[1](msg_str, item[2])
-                else:
-                    proto = item[3]()
-                    proto.ParseFromString(msg_str)
-                    if item[2] is None:
-                        item[1](proto)
-                    else:
-                        item[1](proto, item[2])
-        self.mutex.release()
+        return _CYBER_NODE.PyChannelUtils_get_debugstring_by_msgtype_rawmsgdata(msg_type, rawmsgdata)
+
+    @staticmethod
+    def get_msgtype(channel_name, sleep_s=2):
+        """
+        Parse rawmsg from rawmsg data
+        Input: channel name, wait for topo discovery
+        Output: the corresponding message type of this channel in topo.
+        """
+        return _CYBER_NODE.PyChannelUtils_get_msg_type(channel_name, sleep_s)
+
+    @staticmethod
+    def get_channels(sleep_s=2):
+        """
+        Get active channels name
+        Input: wait for topo discovery
+        Output: all active channels
+        """
+        return _CYBER_NODE.PyChannelUtils_get_active_channels(sleep_s)
+
+    @staticmethod
+    def get_channels_info(sleep_s=2):
+        """
+        Get active channel info
+        Input: wait for topo discovery
+        Output: {'channel1':[], 'channel2':[]} .channels info
+        """
+        return _CYBER_NODE.PyChannelUtils_get_channels_info(sleep_s)

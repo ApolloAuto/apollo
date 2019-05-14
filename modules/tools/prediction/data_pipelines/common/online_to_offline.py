@@ -154,7 +154,7 @@ class LabelGenerator(object):
     @input idx_curr: The index of the current Feature to be labelled.
                      We will look at the subsequent Features following this
                      one to complete labeling.
-    @output: All saved as class variables in observation_dict, 
+    @output: All saved as class variables in observation_dict,
              including: its trajectory info and its lane changing info.
     '''
     def ObserveFeatureSequence(self, feature_sequence, idx_curr):
@@ -200,9 +200,12 @@ class LabelGenerator(object):
             #####################################################################
             # Update the obstacle trajectory:
             # Only update for consecutive (sampling rate = 0.1sec) points.
-            obs_traj.append((feature_sequence[j].position.x,\
-                             feature_sequence[j].position.y,\
-                             feature_sequence[j].velocity_heading,\
+            obs_traj.append((feature_sequence[j].position.x,
+                             feature_sequence[j].position.y,
+                             feature_sequence[j].velocity_heading,
+                             feature_sequence[j].speed,
+                             feature_sequence[j].length,
+                             feature_sequence[j].width,
                              feature_sequence[j].timestamp))
 
             #####################################################################
@@ -381,7 +384,7 @@ class LabelGenerator(object):
                                 lane_sequence.label = -1
                                 lane_sequence.time_to_lane_edge = -1.0
                                 lane_sequence.time_to_lane_center = -1.0
-                
+
                 for lane_sequence in feature.lane.lane_graph.lane_sequence:
                     lane_sequence_dict[lane_sequence.lane_sequence_id] = [lane_sequence.label, \
                    lane_sequence.time_to_lane_center, lane_sequence.time_to_lane_edge]
@@ -433,6 +436,7 @@ class LabelGenerator(object):
                 # Construct dictionary of all exit with dict[exit_lane_id] = np.array(exit_position)
                 exit_dict = dict()
                 exit_pos_dict = dict()
+                mask = [0] * 12
                 for junction_exit in fea.junction_feature.junction_exit:
                     if junction_exit.HasField('exit_lane_id'):
                         exit_dict[junction_exit.exit_lane_id] = \
@@ -441,8 +445,13 @@ class LabelGenerator(object):
                                           junction_exit.exit_heading,
                                           0.01,
                                           junction_exit.exit_width)
-                        exit_pos_dict[junction_exit.exit_lane_id] = np.array(
-                            [junction_exit.exit_position.x, junction_exit.exit_position.y])
+                        exit_pos = np.array([junction_exit.exit_position.x, junction_exit.exit_position.y])
+                        exit_pos_dict[junction_exit.exit_lane_id] = exit_pos
+                        delta_pos = exit_pos - curr_pos
+                        angle = math.atan2(delta_pos[1], delta_pos[0]) - heading
+                        d_idx = int((angle / (2.0 * np.pi) + 1.0 / 24) * 12 % 12)
+                        mask[d_idx] = 1
+
                 # Searching for up to 100 frames (10 seconds)
                 for j in range(i, min(i + 100, feature_seq_len)):
                     car_bounding = BoundingRectangle(feature_sequence[j].position.x,
@@ -457,11 +466,11 @@ class LabelGenerator(object):
                             delta_pos = exit_pos - curr_pos
                             angle = math.atan2(
                                 delta_pos[1], delta_pos[0]) - heading
-                            d_idx = int((angle / (2.0 * np.pi)) * 12 % 12)
-                            label = [0 for idx in range(12)]
+                            d_idx = int((angle / (2.0 * np.pi) + 1.0 / 24) * 12 % 12)
+                            label = [0] * 12
                             label[d_idx] = 1
                             fea.junction_feature.junction_mlp_label.extend(label)
-                            self.junction_label_dict["{}@{:.3f}".format(fea.id, fea.timestamp)] = label
+                            self.junction_label_dict["{}@{:.3f}".format(fea.id, fea.timestamp)] = label + mask
                             break  # actually break two level
                     else:
                         continue

@@ -176,7 +176,7 @@ void NDTLocalization::LidarCallback(
   Eigen::Affine3d odometry_pose = Eigen::Affine3d::Identity();
   if (!QueryPoseFromBuffer(time_stamp, &odometry_pose)) {
     if (!QueryPoseFromTF(time_stamp, &odometry_pose)) {
-      AERROR << "Can not query forcast pose";
+      AERROR << "Can not query forecast pose";
       return;
     }
     AINFO << "Query pose from TF";
@@ -398,7 +398,7 @@ void NDTLocalization::ComposeLocalizationStatus(
   } else {
     localization_status->set_fusion_status(MeasureState::WARNNING);
     localization_status->set_state_message(
-        "Warnning: Current Localization Is Unstable.");
+        "Warning: Current Localization Is Unstable.");
   }
 }
 
@@ -496,7 +496,7 @@ void NDTLocalization::LidarMsgTransfer(
       }
     }
   } else {
-    AINFO << "Receiving un-origanized-point-cloud, width " << msg->width()
+    AINFO << "Receiving un-organized-point-cloud, width " << msg->width()
           << " height " << msg->height() << "size " << msg->point_size();
     for (int i = 0; i < msg->point_size(); ++i) {
       Eigen::Vector3f pt3d;

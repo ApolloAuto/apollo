@@ -29,10 +29,10 @@
 #include "modules/planning/traffic_rules/crosswalk.h"
 #include "modules/planning/traffic_rules/destination.h"
 #include "modules/planning/traffic_rules/keep_clear.h"
-#include "modules/planning/traffic_rules/pull_over.h"
 #include "modules/planning/traffic_rules/reference_line_end.h"
 #include "modules/planning/traffic_rules/rerouting.h"
-#include "modules/planning/traffic_rules/signal_light.h"
+#include "modules/planning/traffic_rules/stop_sign.h"
+#include "modules/planning/traffic_rules/traffic_light.h"
 
 namespace apollo {
 namespace planning {
@@ -64,10 +64,6 @@ void TrafficDecider::RegisterRules() {
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new KeepClear(config);
                           });
-  s_rule_factory.Register(TrafficRuleConfig::PULL_OVER,
-                          [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new PullOver(config);
-                          });
   s_rule_factory.Register(TrafficRuleConfig::REFERENCE_LINE_END,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new ReferenceLineEnd(config);
@@ -76,9 +72,13 @@ void TrafficDecider::RegisterRules() {
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
                             return new Rerouting(config);
                           });
-  s_rule_factory.Register(TrafficRuleConfig::SIGNAL_LIGHT,
+  s_rule_factory.Register(TrafficRuleConfig::STOP_SIGN,
                           [](const TrafficRuleConfig &config) -> TrafficRule * {
-                            return new SignalLight(config);
+                            return new StopSign(config);
+                          });
+  s_rule_factory.Register(TrafficRuleConfig::TRAFFIC_LIGHT,
+                          [](const TrafficRuleConfig &config) -> TrafficRule * {
+                            return new TrafficLight(config);
                           });
 }
 

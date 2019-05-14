@@ -33,17 +33,15 @@ static const char DEFAULT_sched_name_[] = "CYBER_DEFAULT";
 
 class ModuleArgument {
  public:
-  ModuleArgument();
-  virtual ~ModuleArgument();
+  ModuleArgument() = default;
+  virtual ~ModuleArgument() = default;
   void DisplayUsage();
   void ParseArgument(int argc, char* const argv[]);
   void GetOptions(const int argc, char* const argv[]);
-  inline std::string GetBinaryName() const { return binary_name_; }
-  inline std::string GetProcessGroup() const { return process_group_; }
-  inline std::string GetSchedName() const { return sched_name_; }
-  inline std::list<std::string> GetDAGConfList() const {
-    return dag_conf_list_;
-  }
+  const std::string& GetBinaryName() const;
+  const std::string& GetProcessGroup() const;
+  const std::string& GetSchedName() const;
+  const std::list<std::string>& GetDAGConfList() const;
 
  private:
   std::list<std::string> dag_conf_list_;
@@ -51,6 +49,22 @@ class ModuleArgument {
   std::string process_group_;
   std::string sched_name_;
 };
+
+inline const std::string& ModuleArgument::GetBinaryName() const {
+  return binary_name_;
+}
+
+inline const std::string& ModuleArgument::GetProcessGroup() const {
+  return process_group_;
+}
+
+inline const std::string& ModuleArgument::GetSchedName() const {
+  return sched_name_;
+}
+
+inline const std::list<std::string>& ModuleArgument::GetDAGConfList() const {
+  return dag_conf_list_;
+}
 
 }  // namespace mainboard
 }  // namespace cyber

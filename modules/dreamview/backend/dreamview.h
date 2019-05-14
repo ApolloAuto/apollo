@@ -22,6 +22,7 @@
 #include "CivetServer.h"
 #include "cyber/cyber.h"
 #include "modules/common/status/status.h"
+#include "modules/dreamview/backend/data_collection_monitor/data_collection_monitor.h"
 #include "modules/dreamview/backend/handlers/image_handler.h"
 #include "modules/dreamview/backend/handlers/websocket_handler.h"
 #include "modules/dreamview/backend/hmi/hmi.h"
@@ -60,6 +61,7 @@ class Dreamview {
   std::unique_ptr<ImageHandler> image_;
   std::unique_ptr<MapService> map_service_;
   std::unique_ptr<HMI> hmi_;
+  std::unique_ptr<DataCollectionMonitor> data_collection_monitor_;
 };
 
 }  // namespace dreamview

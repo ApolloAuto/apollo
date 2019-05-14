@@ -10,6 +10,7 @@ cc_library(
         "//modules/prediction/scenario/analyzer:scenario_analyzer",
         "//modules/prediction/scenario/feature_extractor",
         "//modules/prediction/scenario/prioritization:obstacles_prioritizer",
+        "//modules/prediction/scenario/right_of_way",
     ],
 )
 

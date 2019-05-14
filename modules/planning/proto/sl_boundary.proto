@@ -2,6 +2,8 @@ syntax = "proto2";
 
 package apollo.planning;
 
+import "modules/common/proto/pnc_point.proto";
+
 /////////////////////////////////////////////////////////////////
 // The start_s and end_s are longitudinal values.
 // start_s <= end_s.
@@ -24,4 +26,5 @@ message SLBoundary {
   optional double end_s = 2;
   optional double start_l = 3;
   optional double end_l = 4;
+  repeated apollo.common.SLPoint boundary_point = 5;
 }

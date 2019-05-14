@@ -337,8 +337,7 @@ bool DenselineLanePostprocessor::MaxScorePoint(const float* score_pointer,
   }
   int max_x = large_index[0];
   float max_score = score_pointer[large_index[0]];
-  flag = (max_score > laneline_point_score_thresh_) ? true : false;
-  if (!flag) {
+  if (max_score <= laneline_point_score_thresh_) {
     return false;
   }
   (*point_info).x =
@@ -762,6 +761,12 @@ void DenselineLanePostprocessor::PolyFitCameraLaneline(CameraFrame* frame) {
     lane_objects[line_index].curve_camera_coord.d = camera_coeff(0, 0);
     lane_objects[line_index].curve_camera_coord.x_start = x_start;
     lane_objects[line_index].curve_camera_coord.x_end = x_end;
+    lane_objects[line_index].curve_car_coord.a = -camera_coeff(3, 0);
+    lane_objects[line_index].curve_car_coord.b = -camera_coeff(2, 0);
+    lane_objects[line_index].curve_car_coord.c = -camera_coeff(1, 0);
+    lane_objects[line_index].curve_car_coord.d = -camera_coeff(0, 0);
+    lane_objects[line_index].curve_car_coord.x_start = x_start;
+    lane_objects[line_index].curve_car_coord.x_end = x_end;
     lane_objects[line_index].use_type = base::LaneLineUseType::REAL;
   }
   return;

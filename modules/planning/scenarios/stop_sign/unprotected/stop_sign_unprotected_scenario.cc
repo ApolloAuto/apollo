@@ -62,8 +62,10 @@ void StopSignUnprotectedScenario::Init() {
     return;
   }
 
-  const std::string stop_sign_overlap_id =
-      PlanningContext::GetScenarioInfo()->current_stop_sign_overlap.object_id;
+  const std::string stop_sign_overlap_id = PlanningContext::Instance()
+                                               ->planning_status()
+                                               .stop_sign()
+                                               .current_stop_sign_overlap_id();
   if (stop_sign_overlap_id.empty()) {
     AERROR << "Could not find stop sign";
     return;
@@ -74,6 +76,8 @@ void StopSignUnprotectedScenario::Init() {
     AERROR << "Could not find stop sign: " << stop_sign_overlap_id;
     return;
   }
+
+  context_.current_stop_sign_overlap_id = stop_sign_overlap_id;
   context_.watch_vehicles.clear();
 
   GetAssociatedLanes(*stop_sign);
@@ -118,11 +122,6 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
     ptr->SetContext(&context_);
   }
   return ptr;
-}
-
-bool StopSignUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario, const Frame& frame) {
-  return false;
 }
 
 /*

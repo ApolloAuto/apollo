@@ -29,16 +29,17 @@ g_args = None
 
 g_delta_t = 0.5  # 1 second approximate time match region.
 
-
 def write_to_file(file_path, topic_pb):
-    """write pb message to file"""
-    f = file(file_path, 'w')
-    f.write(str(topic_pb))
-    f.close()
-
+    """
+    write pb message to file
+    """
+    with open(file_path, 'w') as fp:
+        f.write(str(topic_pb))
 
 def dump_bag(in_bag, out_dir):
-    """out_bag = in_bag + routing_bag"""
+    """
+    out_bag = in_bag + routing_bag
+    """
     reader = RecordReader(in_bag)
     seq = 0
     global g_args
@@ -59,7 +60,7 @@ def dump_bag(in_bag, out_dir):
         msg = message
         record_num += 1
         if record_num % 1000 == 0:
-            print "Processing record_num:", record_num
+            print('Processing record_num: %d' % record_num)
         if first_time is None:
             first_time = t
         if channel not in topic_name_map:
@@ -69,12 +70,12 @@ def dump_bag(in_bag, out_dir):
         relative_time = (dt1 - dt2).seconds - g_args.start_time
         print "relative_time", relative_time
         if ((g_args.time_duration > 0) and
-                (relative_time < 0 or relative_time > g_args.time_duration)):
+            (relative_time < 0 or relative_time > g_args.time_duration)):
             continue
-        if channel == "/apollo/planning":
+        if channel == '/apollo/planning':
             seq += 1
             topic_name_map[channel][1] = msg
-            print "Generating seq:", seq
+            print('Generating seq: %d' % seq)
             for t, name_pb in topic_name_map.iteritems():
                 if name_pb[1] is None:
                     continue
@@ -83,8 +84,7 @@ def dump_bag(in_bag, out_dir):
                 write_to_file(file_path, name_pb[1])
         topic_name_map[channel][1] = msg
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description="A tool to dump the protobuf messages according to the planning message"
         "Usage: python dump_planning.py bag_file save_directory")

@@ -38,7 +38,13 @@ class Decider : public Task {
 
  protected:
   virtual apollo::common::Status Process(
-      Frame* frame, ReferenceLineInfo* reference_line_info) = 0;
+      Frame* frame, ReferenceLineInfo* reference_line_info) {
+    return apollo::common::Status::OK();
+  }
+
+  virtual apollo::common::Status Process(Frame* frame) {
+    return apollo::common::Status::OK();
+  }
 };
 
 }  // namespace planning

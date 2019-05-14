@@ -38,6 +38,11 @@ DEFINE_string(vehicle_config_path,
               "/apollo/modules/common/data/vehicle_param.pb.txt",
               "the file path of vehicle config file");
 
+DEFINE_string(
+    vehicle_model_config_filename,
+    "/apollo/modules/common/vehicle_model/conf/vehicle_model_config.pb.txt",
+    "the file path of vehicle model config file");
+
 DEFINE_bool(use_cyber_time, false,
             "Whether Clock::Now() gets time from system_clock::now() or from "
             "Cyber.");
@@ -61,3 +66,7 @@ DEFINE_bool(use_sim_time, false, "Use bag time in mock time mode.");
 
 DEFINE_bool(reverse_heading_vehicle_state, false,
             "test flag for reverse driving.");
+
+DEFINE_bool(coordinate_transform_to_com, false,
+            "Enable coordinate transformation from center of rear-axis to "
+            "center of mass");

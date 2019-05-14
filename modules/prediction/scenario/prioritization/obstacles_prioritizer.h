@@ -15,7 +15,11 @@
  *****************************************************************************/
 
 #include <memory>
+#include <string>
+#include <unordered_set>
 #include <vector>
+
+#include "cyber/common/macros.h"
 
 #include "modules/prediction/container/obstacles/obstacles_container.h"
 #include "modules/prediction/scenario/scenario_features/cruise_scenario_features.h"
@@ -26,41 +30,40 @@ namespace prediction {
 
 class ObstaclesPrioritizer {
  public:
-  ObstaclesPrioritizer() = delete;
+  void PrioritizeObstacles();
 
-  static void PrioritizeObstacles(
-      const EnvironmentFeatures& environment_features,
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
+  void AssignIgnoreLevel();
+
+  void AssignCautionLevel();
 
  private:
-  static void AssignIgnoreLevel(
-      const EnvironmentFeatures& environment_features,
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
+  void AssignCautionLevelCruiseKeepLane();
 
-  static void AssignCautionLevel(
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
+  void AssignCautionLevelCruiseChangeLane();
 
-  static void AssignCautionLevelInCruise(
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
+  void AssignCautionLevelByEgoReferenceLine();
 
-  static void AssignCautionLevelCruiseKeepLane();
+  void AssignCautionByMerge(
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+      std::unordered_set<std::string>* const visited_lanes);
 
-  static void AssignCautionLevelCruiseChangeLane();
+  void AssignCautionByOverlap(
+      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr,
+      std::unordered_set<std::string>* const visited_lanes);
 
-  static void AssignCautionLevelInJunction(
-      const std::shared_ptr<ScenarioFeatures> scenario_features);
+  void SetCautionBackward(
+      std::shared_ptr<const hdmap::LaneInfo> start_lane_info_ptr,
+      const double distance,
+      std::unordered_set<std::string>* const visited_lanes);
 
-  static void AssignCautionLevelByEgoReferenceLine();
+ private:
+  std::unordered_set<std::string> ego_back_lane_id_set_;
 
-  static void AssignCautionByMerge(
-      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
+  std::string ego_lane_id_ = "";
 
-  static void AssignCautionByOverlap(
-      std::shared_ptr<const hdmap::LaneInfo> lane_info_ptr);
+  double ego_lane_s_ = 0.0;
 
-  static void SetCautionBackward(
-    std::shared_ptr<const hdmap::LaneInfo> start_lane_info_ptr,
-    const double distance);
+  DECLARE_SINGLETON(ObstaclesPrioritizer)
 };
 
 }  // namespace prediction

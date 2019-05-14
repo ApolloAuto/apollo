@@ -45,7 +45,7 @@ using apollo::cyber::Writer;
 /**
  * @class Control
  *
- * @brief control module main class, it processes localization, chasiss, and
+ * @brief control module main class, it processes localization, chassis, and
  * pad data to compute throttle, brake and steer values.
  */
 class ControlComponent final : public apollo::cyber::TimerComponent {
@@ -93,6 +93,7 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   canbus::Chassis latest_chassis_;
   planning::ADCTrajectory latest_trajectory_;
   PadMessage pad_msg_;
+  common::Header latest_replan_trajectory_header_;
 
   ControllerAgent controller_agent_;
 

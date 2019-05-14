@@ -16,6 +16,8 @@
 
 #include "modules/planning/common/planning_gflags.h"
 
+#include <limits>
+
 DEFINE_bool(planning_test_mode, false, "Enable planning test mode.");
 
 DEFINE_double(test_duration, -1.0,
@@ -24,18 +26,26 @@ DEFINE_double(test_duration, -1.0,
 
 DEFINE_int32(planning_loop_rate, 10, "Loop rate for planning node");
 
-// TODO(all) enable this when perception issue is fixed.
-DEFINE_bool(enable_collision_detection, false,
-            "enable collision detection in planning");
-
 // scenario related
-DEFINE_string(
-    scenario_lane_follow_config_file,
-    "/apollo/modules/planning/conf/scenario/lane_follow_config.pb.txt",
-    "The lane follow scenario configuration file");
+DEFINE_string(scenario_bare_intersection_unprotected_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/bare_intersection_unprotected_config.pb.txt",
+              "The bare_intersection_unprotected scenario configuration file");
+DEFINE_string(scenario_lane_follow_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/lane_follow_config.pb.txt",
+              "The lane_follow scenario configuration file");
+DEFINE_string(scenario_narrow_street_u_turn_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/narrow_street_u_turn_config.pb.txt",
+              "narrow_street_u_turn scenario config file");
+DEFINE_string(scenario_pull_over_config_file,
+              "/apollo/modules/planning/conf/"
+              "scenario/pull_over_config.pb.txt",
+              "The pull_over scenario configuration file");
 DEFINE_string(scenario_side_pass_config_file,
               "/apollo/modules/planning/conf/scenario/side_pass_config.pb.txt",
-              "side pass scenario configuration file");
+              "side_pass scenario configuration file");
 DEFINE_string(scenario_stop_sign_unprotected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/stop_sign_unprotected_config.pb.txt",
@@ -43,23 +53,25 @@ DEFINE_string(scenario_stop_sign_unprotected_config_file,
 DEFINE_string(scenario_traffic_light_protected_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_protected_config.pb.txt",
-              "scenario_traffic_light_protected config file");
+              "traffic_light_protected scenario config file");
 DEFINE_string(scenario_traffic_light_unprotected_left_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_unprotected_left_turn_config.pb.txt",
-              "scenario_traffic_light_unprotected_left_turn config file");
+              "traffic_light_unprotected_left_turn scenario config file");
 DEFINE_string(scenario_traffic_light_unprotected_right_turn_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/traffic_light_unprotected_right_turn_config.pb.txt",
-              "scenario_traffic_light_unprotected_right_turn config file");
+              "traffic_light_unprotected_right_turn scenario config file");
 DEFINE_string(scenario_valet_parking_config_file,
               "/apollo/modules/planning/conf/"
               "scenario/valet_parking_config.pb.txt",
-              "scenario_valet_parking config file");
-DEFINE_string(scenario_narrow_street_u_turn_config_file,
-              "/apollo/modules/planning/conf/"
-              "scenario/narrow_street_u_turn_config.pb.txt",
-              "scenario_narrow_street_u_turn config file");
+              "valet_parking scenario config file");
+
+DEFINE_bool(enable_scenario_bare_intersection, false,
+            "enable bare_intersection scenarios in planning");
+
+DEFINE_bool(enable_scenario_pull_over, false,
+            "enable side pass scenario in planning");
 
 DEFINE_bool(enable_scenario_side_pass, true,
             "enable side pass scenario in planning");
@@ -72,7 +84,8 @@ DEFINE_bool(enable_scenario_side_pass_multiple_parked_obstacles, true,
 
 DEFINE_bool(enable_scenario_stop_sign, true,
             "enable stop_sign scenarios in planning");
-DEFINE_bool(enable_scenario_traffic_light, false,
+
+DEFINE_bool(enable_scenario_traffic_light, true,
             "enable traffic_light scenarios in planning");
 
 DEFINE_string(traffic_rule_config_filename,
@@ -194,6 +207,8 @@ DEFINE_double(longitudinal_jerk_lower_bound, -4.0,
               "The lower bound of longitudinal jerk.");
 DEFINE_double(longitudinal_jerk_upper_bound, 4.0,
               "The upper bound of longitudinal jerk.");
+DEFINE_double(longitudinal_jerk_bound, 4.0,
+              "Bound of longitudinal jerk; symmetric for front and back");
 DEFINE_double(lateral_jerk_bound, 4.0,
               "Bound of lateral jerk; symmetric for left and right");
 
@@ -211,6 +226,8 @@ DEFINE_double(st_max_t, 8, "the maximum t of st boundary");
 DEFINE_bool(enable_nudge_decision, true, "enable nudge decision");
 DEFINE_bool(enable_nudge_slowdown, true,
             "True to slow down when nudge obstacles.");
+DEFINE_bool(enable_alwasy_stop_for_pedestrian, true,
+            "True to always STOP for pedestrian when path cross");
 
 DEFINE_bool(enable_side_radar, false,
             "If there is no radar on the side,ignore it");
@@ -242,7 +259,8 @@ DEFINE_double(max_stop_speed, 0.2, "max speed(m/s) to be considered as a stop");
 DEFINE_double(signal_light_min_pass_s_distance, 4.0,
               "min s_distance for adc to be considered "
               "have passed signal_light (stop_line_end_s)");
-
+DEFINE_double(signal_expire_time_sec, 5.0,
+              "traffic light signal info read expire time in sec");
 DEFINE_string(destination_obstacle_id, "DEST",
               "obstacle id for converting destination to an obstacle");
 DEFINE_double(destination_check_distance, 5.0,
@@ -339,7 +357,7 @@ DEFINE_uint32(num_sample_follow_per_timestamp, 3,
 DEFINE_double(weight_lon_objective, 10.0, "Weight of longitudinal travel cost");
 DEFINE_double(weight_lon_jerk, 1.0, "Weight of longitudinal jerk cost");
 DEFINE_double(weight_lon_collision, 5.0,
-              "Weight of logitudinal collision cost");
+              "Weight of longitudinal collision cost");
 DEFINE_double(weight_lat_offset, 2.0, "Weight of lateral offset cost");
 DEFINE_double(weight_lat_comfort, 10.0, "Weight of lateral comfort cost");
 DEFINE_double(weight_centripetal_acceleration, 1.5,
@@ -358,7 +376,7 @@ DEFINE_double(lon_collision_yield_buffer, 1.0,
 DEFINE_double(lon_collision_overtake_buffer, 5.0,
               "Longitudinal collision buffer for overtake");
 DEFINE_double(lon_collision_cost_std, 0.5,
-              "The standard deviation of logitudinal collision cost function");
+              "The standard deviation of longitudinal collision cost function");
 DEFINE_double(default_lon_buffer, 5.0,
               "Default longitudinal buffer to sample path-time points.");
 DEFINE_double(time_min_density, 1.0,
@@ -403,6 +421,9 @@ DEFINE_bool(use_planning_fallback, true,
 DEFINE_double(fallback_total_time, 3.0, "total fallback trajectory time");
 DEFINE_double(fallback_time_unit, 0.02,
               "fallback trajectory unit time in seconds");
+DEFINE_double(
+    fallback_distance_buffer, 0.5,
+    "fallback distance to end buffer when doing fixed distance speed fallback");
 DEFINE_double(polynomial_speed_fallback_velocity, 3.5,
               "velocity to use polynomial speed fallback.");
 
@@ -436,15 +457,41 @@ DEFINE_bool(enable_perception_obstacles, true,
 DEFINE_bool(enable_open_space_planner_thread, true,
             "Enable thread in open space planner for trajectory publish.");
 
-DEFINE_bool(open_space_planner_switchable, false,
-            "true for std planning being able to switch to open space planner "
-            "when close enough to target parking spot");
-
 DEFINE_bool(use_dual_variable_warm_start, true,
             "whether or not enable dual variable warm start ");
 
-DEFINE_bool(use_gear_shift_trajectory, true,
+DEFINE_bool(use_gear_shift_trajectory, false,
             "allow some time for the vehicle to shift gear");
+
+DEFINE_uint32(open_space_trajectory_stitching_preserved_length,
+              std::numeric_limits<uint32_t>::infinity(),
+              "preserved points number in trajectory stitching for open space "
+              "trajectory");
+DEFINE_bool(
+    enable_smoother_failsafe, false,
+    "whether to use warm start result as final output when smoother fails");
+
+DEFINE_bool(use_s_curve_speed_smooth, false,
+            "Whether use s-curve (piecewise_jerk) for smoothing Hybrid Astar "
+            "speed/acceleration.");
+
+// pull-over
+DEFINE_double(destination_to_adc_buffer, 10.0,
+              "If the destination is within this distance from ADC, "
+              "then don't search for pull-over position.");
+
+DEFINE_double(destination_to_pathend_buffer, 10.0,
+              "If the destination is within this distance to path-end, "
+              "then don't search for pull-over position. Wait until "
+              "destination gets closer.");
+
+DEFINE_double(pull_over_road_edge_buffer, 0.15,
+              "If the available path boundary's edge is not within this "
+              "distance from the road edge, then this position is not "
+              "qualified for being a pull-over position.");
+DEFINE_bool(
+    enable_parallel_trajectory_smoothing, false,
+    "Whether to partition the trajectory first and do smoothing in parallel");
 
 DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
             "Use OSQP optimizer for QpSt speed optimization.");
@@ -465,9 +512,11 @@ DEFINE_double(max_trajectory_len, 1000.0,
               "(unit: meter) max possible trajectory length.");
 DEFINE_bool(enable_rss_fallback, false, "trigger rss fallback");
 DEFINE_bool(enable_rss_info, true, "enable rss_info in trajectory_pb");
+DEFINE_double(rss_max_front_obstacle_distance, 3000.0,
+              "(unit: meter) for max front obstacle distance.");
 
 DEFINE_bool(
-    enable_planning_smoother, true,
+    enable_planning_smoother, false,
     "True to enable planning smoother among different planning cycles.");
 DEFINE_double(smoother_stop_distance, 10.0,
               "(unit: meter) for ADC stop, if it is close to the stop point "
@@ -495,7 +544,25 @@ DEFINE_double(side_pass_driving_width_l_buffer, 0.1,
 
 DEFINE_bool(enable_parallel_hybrid_a, false,
             "True to enable hybrid a* parallel implementation.");
-DEFINE_bool(enable_parallel_open_space_smoother, false,
-            "True to enable open space smoother parallel implementation.");
-DEFINE_bool(enable_cuda, false,
-            "True to enable cuda parallel implementation.");
+
+DEFINE_double(vehicle_low_speed_threshold, 1.0, "Vehicle low speed threshold.");
+
+DEFINE_bool(enable_cuda, false, "True to enable cuda parallel implementation.");
+
+DEFINE_bool(enable_nonscenario_side_pass, false,
+            "True to enable side pass without scenario management");
+
+DEFINE_bool(enable_soft_speed_limit, false,
+            "True to set soft speed limit guided by path optimization result");
+
+DEFINE_bool(enable_dp_reference_speed, true,
+            "True to penalize dp result towards default cruise speed");
+
+DEFINE_double(message_latency_threshold, 0.02, "Threshold for message delay");
+DEFINE_bool(enable_lane_change_urgency_checking, true,
+            "True to check the urgency of lane changing");
+DEFINE_double(short_path_length_threshold, 20.0,
+              "Threshold for too short path length");
+
+DEFINE_uint32(trajectory_stitching_preserved_length, 20,
+              "preserved points number in trajectory stitching");

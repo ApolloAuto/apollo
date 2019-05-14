@@ -1,17 +1,18 @@
-/* Copyright 2018 The Apollo Authors. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
+/******************************************************************************
+ * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *****************************************************************************/
 
 #include "modules/canbus/vehicle/gem/gem_controller.h"
 
@@ -39,6 +40,7 @@ namespace {
 const int32_t kMaxFailAttempt = 10;
 const int32_t CHECK_RESPONSE_STEER_UNIT_FLAG = 1;
 const int32_t CHECK_RESPONSE_SPEED_UNIT_FLAG = 2;
+
 }  // namespace
 
 ErrorCode GemController::Init(
@@ -46,7 +48,7 @@ ErrorCode GemController::Init(
     CanSender<::apollo::canbus::ChassisDetail>* const can_sender,
     MessageManager<::apollo::canbus::ChassisDetail>* const message_manager) {
   if (is_initialized_) {
-    AINFO << "GemController has already been initiated.";
+    AINFO << "GemController has already been initialized.";
     return ErrorCode::CANBUS_ERROR;
   }
   vehicle_params_.CopyFrom(
@@ -63,12 +65,12 @@ ErrorCode GemController::Init(
   can_sender_ = can_sender;
 
   if (message_manager == nullptr) {
-    AERROR << "protocol manager is null.";
+    AERROR << "Protocol manager is null.";
     return ErrorCode::CANBUS_ERROR;
   }
   message_manager_ = message_manager;
 
-  // sender part
+  // Sender part
   brake_cmd_6b_ = dynamic_cast<Brakecmd6b*>(
       message_manager_->GetMutableProtocolDataById(Brakecmd6b::ID));
   if (brake_cmd_6b_ == nullptr) {
@@ -116,7 +118,7 @@ ErrorCode GemController::Init(
   can_sender_->AddMessage(Turncmd63::ID, turn_cmd_63_, false);
   can_sender_->AddMessage(Globalcmd69::ID, global_cmd_69_, false);
 
-  // need sleep to ensure all messages received
+  // Need to sleep to ensure all messages received.
   AINFO << "GemController is initialized.";
 
   is_initialized_ = true;
@@ -270,10 +272,10 @@ Chassis GemController::chassis() {
     chassis_.set_chassis_error_mask(chassis_error_mask_);
   }
 
-  // give engage_advice based on error_code and canbus feedback
+  // Give engage_advice based on error_code and canbus feedback
   if (!chassis_error_mask_ && !chassis_.parking_brake() &&
-      (chassis_.throttle_percentage() == 0.0) &&
-      (chassis_.brake_percentage() != 0.0)) {
+      chassis_.throttle_percentage() == 0.0 &&
+      chassis_.brake_percentage() != 0.0) {
     chassis_.mutable_engage_advice()->set_advice(
         apollo::common::EngageAdvice::READY_TO_ENGAGE);
   } else {
@@ -294,7 +296,7 @@ void GemController::Emergency() {
 
 ErrorCode GemController::EnableAutoMode() {
   if (driving_mode() == Chassis::COMPLETE_AUTO_DRIVE) {
-    AINFO << "already in COMPLETE_AUTO_DRIVE mode";
+    AINFO << "Already in COMPLETE_AUTO_DRIVE mode";
     return ErrorCode::OK;
   }
 
@@ -311,11 +313,10 @@ ErrorCode GemController::EnableAutoMode() {
     Emergency();
     set_chassis_error_code(Chassis::CHASSIS_ERROR);
     return ErrorCode::CANBUS_ERROR;
-  } else {
-    set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
-    AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
-    return ErrorCode::OK;
   }
+  set_driving_mode(Chassis::COMPLETE_AUTO_DRIVE);
+  AINFO << "Switch to COMPLETE_AUTO_DRIVE mode ok.";
+  return ErrorCode::OK;
 }
 
 ErrorCode GemController::DisableAutoMode() {
@@ -339,9 +340,9 @@ ErrorCode GemController::EnableSpeedOnlyMode() {
 
 // NEUTRAL, REVERSE, DRIVE
 void GemController::Gear(Chassis::GearPosition gear_position) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
-    AINFO << "this drive mode no need to set gear.";
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
+    AINFO << "This drive mode no need to set gear.";
     return;
   }
 
@@ -378,8 +379,8 @@ void GemController::Gear(Chassis::GearPosition gear_position) {
 void GemController::Brake(double pedal) {
   // double real_value = params_.max_acc() * acceleration / 100;
   // TODO(QiL) Update brake value based on mode
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -390,8 +391,8 @@ void GemController::Brake(double pedal) {
 // drive with old acceleration
 // gas:0.00~99.99 unit:
 void GemController::Throttle(double pedal) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -402,8 +403,8 @@ void GemController::Throttle(double pedal) {
 // drive with acceleration/deceleration
 // acc:-7.0 ~ 5.0, unit:m/s^2
 void GemController::Acceleration(double acc) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_SPEED_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_SPEED_ONLY) {
     AINFO << "The current drive mode does not need to set acceleration.";
     return;
   }
@@ -415,8 +416,8 @@ void GemController::Acceleration(double acc) {
 // steering with old angle speed
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 void GemController::Steer(double angle) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -430,8 +431,8 @@ void GemController::Steer(double angle) {
 // angle:-99.99~0.00~99.99, unit:, left:-, right:+
 // angle_spd:0.00~99.99, unit:deg/s
 void GemController::Steer(double angle, double angle_spd) {
-  if (!(driving_mode() == Chassis::COMPLETE_AUTO_DRIVE ||
-        driving_mode() == Chassis::AUTO_STEER_ONLY)) {
+  if (driving_mode() != Chassis::COMPLETE_AUTO_DRIVE &&
+      driving_mode() != Chassis::AUTO_STEER_ONLY) {
     AINFO << "The current driving mode does not need to set steer.";
     return;
   }
@@ -496,7 +497,7 @@ void GemController::SecurityDogThreadFunc() {
   int32_t horizontal_ctrl_fail = 0;
 
   if (can_sender_ == nullptr) {
-    AERROR << "Fail to run SecurityDogThreadFunc() because can_sender_ is "
+    AERROR << "Failed to run SecurityDogThreadFunc() because can_sender_ is "
               "nullptr.";
     return;
   }
@@ -516,7 +517,7 @@ void GemController::SecurityDogThreadFunc() {
     // 1. horizontal control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_STEER_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_STEER_UNIT_FLAG, false)) {
       ++horizontal_ctrl_fail;
       if (horizontal_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;
@@ -529,7 +530,7 @@ void GemController::SecurityDogThreadFunc() {
     // 2. vertical control check
     if ((mode == Chassis::COMPLETE_AUTO_DRIVE ||
          mode == Chassis::AUTO_SPEED_ONLY) &&
-        CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false) == false) {
+        !CheckResponse(CHECK_RESPONSE_SPEED_UNIT_FLAG, false)) {
       ++vertical_ctrl_fail;
       if (vertical_ctrl_fail >= kMaxFailAttempt) {
         emergency_mode = true;

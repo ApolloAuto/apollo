@@ -53,12 +53,13 @@ Status ProceedWithCautionSpeedGenerator::Process(
 
   speed_data->clear();
 
-  auto proceed_param =
-      PlanningContext::GetScenarioInfo()->proceed_with_caution_speed;
-  const bool is_fixed_distance = proceed_param.is_fixed_distance;
-  double proceed_distance = is_fixed_distance
-                                ? proceed_param.distance
-                                : path_data.discretized_path().Length();
+  // auto proceed_param =
+  //      PlanningContext::Instance()->GetScenarioInfo()->proceed_with_caution_speed;
+  // const bool is_fixed_distance = proceed_param.is_fixed_distance;
+  // double proceed_distance = is_fixed_distance
+  //                               ? proceed_param.distance
+  //                               : path_data.discretized_path().Length();
+  double proceed_distance = path_data.discretized_path().Length();
   proceed_distance =
       std::min(proceed_distance,
                config_.proceed_with_caution_speed_config().max_distance());

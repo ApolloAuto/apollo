@@ -10,7 +10,7 @@ There are 3 main driving scenarios that we will focus on in Apollo 3.5, namely:
 
 ### Lane Follow - Default
 
-As seen in the figure below, the lane-follow scenario, our default driving scenario, includes but is not limited to driving in a single lane (like cruising) or changing lane, following basic traffic convention or basic turning. 
+As seen in the figure below, the lane-follow scenario, our default driving scenario, includes but is not limited to driving in a single lane (like cruising) or changing lane, following basic traffic convention or basic turning.
 
    ![](images/Planning_default.png)
 
@@ -31,7 +31,7 @@ In this scenario, if there is a static vehicle or a static obstacle in the lane 
 
 There are two separate driving scenarios for STOP signs:
 
-- Unprotected: In this scenario, the car is expected to navigate through a crossroad having a two-way STOP. Our ADC therefore has to creep through and gauge the crossroad's traffic density before continuing onto its path. 
+- Unprotected: In this scenario, the car is expected to navigate through a crossroad having a two-way STOP. Our ADC therefore has to creep through and gauge the crossroad's traffic density before continuing onto its path.
 
      ![](images/unprotected1.png)
 
@@ -43,19 +43,19 @@ There are two separate driving scenarios for STOP signs:
 
 In order to safely pass through a STOP sign, both protected and unprotected, the following steps are performed:
 
-- Arriving at the STOP sign: Perceive all other cars or obstacles that are currently waiting at the other stop signs 
+- Arriving at the STOP sign: Perceive all other cars or obstacles that are currently waiting at the other stop signs
 - Come to a complete stop: Monitor to see if the cars that were previously stationary at other STOP signs have moved or not. It is essential that the cars that arrived before have all left
 - Move forward slightly (Creep): Check to see if any other car is moving or in the case of unprotected stop, check to see if there are any oncoming vehicles on either side of the lane
 - Safely move through the crossroad
 
 ```
-Note: The team is working to add additional driving scenarios into our planner. One such example is handling Traffic Lights. 
+Note: The team is working to add additional driving scenarios into our planner. One such example is handling Traffic Lights.
 ```
 
 ## Planning Module Architecture
 
 The architecture of the planning module has changed in Apollo 3.5 to reflect our modular approach towards different driving scenarios.
-As seen in the figure below, in the planner, are individual driving scenarios discussed above along with their handlers. 
+As seen in the figure below, in the planner, are individual driving scenarios discussed above along with their handlers.
 Each driving scenario has its set of driving parameters that are unique to that scenario making it safer, efficient, easier to customize and debug and more flexible. Each stage is also configurable as it is divided into tasks and each task can be moved or created by editing the `config` file of that scenario.
 
 Some of the key features include:

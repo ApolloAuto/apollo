@@ -198,16 +198,18 @@ Status ControlComponent::ProduceControlCommand(
                : local_view_.trajectory.estop().is_estop();
 
   if (local_view_.trajectory.estop().is_estop()) {
-    estop_reason_ = "estop from planning";
+    estop_ = true;
+    estop_reason_ = "estop from planning : ";
+    estop_reason_ += local_view_.trajectory.estop().reason();
   }
 
   if (local_view_.trajectory.trajectory_point_size() == 0) {
     AWARN_EVERY(100) << "planning has no trajectory point. ";
     estop_ = true;
-    estop_reason_ = "estop for empty planning trajectory";
+    estop_reason_ = "estop for empty planning trajectory, planning headers: " +
+                    local_view_.trajectory.header().ShortDebugString();
   }
 
-  // if planning set estop, then no control process triggered
   if (!estop_) {
     if (local_view_.chassis.driving_mode() == Chassis::COMPLETE_MANUAL) {
       controller_agent_.Reset();
@@ -220,6 +222,16 @@ Status ControlComponent::ProduceControlCommand(
     debug->mutable_canbus_header()->CopyFrom(local_view_.chassis.header());
     debug->mutable_trajectory_header()->CopyFrom(
         local_view_.trajectory.header());
+
+    if (local_view_.trajectory.is_replan()) {
+      latest_replan_trajectory_header_.CopyFrom(
+          local_view_.trajectory.header());
+    }
+
+    if (latest_replan_trajectory_header_.has_sequence_num()) {
+      debug->mutable_latest_replan_trajectory_header()->CopyFrom(
+          latest_replan_trajectory_header_);
+    }
 
     Status status_compute = controller_agent_.ComputeControlCommand(
         &local_view_.localization, &local_view_.chassis,
@@ -239,7 +251,7 @@ Status ControlComponent::ProduceControlCommand(
       status = status_compute;
     }
   }
-
+  // if planning set estop, then no control process triggered
   if (estop_) {
     AWARN_EVERY(100) << "Estop triggered! No control core method executed!";
     // set Estop command
@@ -313,7 +325,7 @@ bool ControlComponent::Proc() {
   const double time_diff_ms = (end_timestamp - start_timestamp) * 1000;
   control_command.mutable_latency_stats()->set_total_time_ms(time_diff_ms);
   control_command.mutable_latency_stats()->set_total_time_exceeded(
-      time_diff_ms < control_conf_.control_period());
+      time_diff_ms > control_conf_.control_period());
   ADEBUG << "control cycle time is: " << time_diff_ms << " ms.";
   status.Save(control_command.mutable_header()->mutable_status());
 

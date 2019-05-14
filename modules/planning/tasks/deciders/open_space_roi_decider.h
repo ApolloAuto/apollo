@@ -19,7 +19,6 @@
  **/
 
 #pragma once
-#pragma once
 
 #include <algorithm>
 #include <memory>
@@ -46,87 +45,75 @@ namespace apollo {
 namespace planning {
 class OpenSpaceRoiDecider : public Decider {
  public:
-  explicit OpenSpaceRoiDecider(const TaskConfig& config);
+  explicit OpenSpaceRoiDecider(const TaskConfig &config);
 
  private:
-  apollo::common::Status Process(
-      Frame* frame, ReferenceLineInfo* reference_line_info) override;
-
-  apollo::common::Status Process(Frame* frame);
+  apollo::common::Status Process(Frame *frame) override;
 
  private:
-  // private functions copied from open_space_ROI.h
-  // @brief main process to compute and load info needed by open space planner
-  bool GetOpenSpaceInfo();
+  // @brief "Region of Interest", load map boundary for parking scenario
+  bool GetParkingBoundary(Frame *const frame,
+                          std::vector<std::vector<common::math::Vec2d>>
+                              *const roi_parking_boundary);
 
   // @brief generate the path by vehicle location and return the target parking
   // spot on that path
-  bool GetMapInfo(hdmap::ParkingSpaceInfoConstPtr *target_parking_spot,
-                  std::shared_ptr<hdmap::Path> *nearby_path);
+  bool GetParkingSpotFromMap(
+      Frame *const frame, hdmap::ParkingSpaceInfoConstPtr *target_parking_spot,
+      std::shared_ptr<hdmap::Path> *nearby_path);
 
   // @brief search target parking spot on the path by vehicle location, if
   // no return a nullptr in target_parking_spot
   void SearchTargetParkingSpotOnPath(
-      std::shared_ptr<hdmap::Path> *nearby_path,
+      const hdmap::Path &nearby_path,
       hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
 
   // @brief if not close enough to parking spot, return false
   bool CheckDistanceToParkingSpot(
-      std::shared_ptr<hdmap::Path> *nearby_path,
-      hdmap::ParkingSpaceInfoConstPtr *target_parking_spot);
+      const hdmap::Path &nearby_path,
+      const hdmap::ParkingSpaceInfoConstPtr &target_parking_spot);
 
-  // @brief "Region of Interest", load open space xy boundary and parking
-  // space boundary from pnc map (only for T shape parking space) to
-  // ROI_xy_boundary_ and ROI_parking_boundary_
-  bool GetOpenSpaceROI();
+  // @brief Helper function for fuse line segments into convex vertices set
+  bool FuseLineSegments(
+      std::vector<std::vector<common::math::Vec2d>> *line_segments_vec);
+
+  // @brief main process to compute and load info needed by open space planner
+  bool FormulateBoundaryConstraints(
+      const std::vector<std::vector<common::math::Vec2d>> &roi_parking_boundary,
+      Frame *const frame);
 
   // @brief Represent the obstacles in vertices and load it into
   // obstacles_vertices_vec_ in clock wise order. Take different approach
   // towards warm start and distance approach
-  bool VPresentationObstacle();
+  bool LoadObstacleInVertices(
+      const std::vector<std::vector<common::math::Vec2d>> &roi_parking_boundary,
+      Frame *const frame);
+
+  bool FilterOutObstacle(const Frame &frame, const Obstacle &obstacle);
 
   // @brief Transform the vertice presentation of the obstacles into linear
   // inequality as Ax>b
-  bool HPresentationObstacle();
+  bool LoadObstacleInHyperPlanes(Frame *const frame);
 
-  // @brief Helper function for HPresentationObstacle()
-  bool ObsHRep(const size_t &obstacles_num,
-               const Eigen::MatrixXi &obstacles_edges_num,
-               const std::vector<std::vector<common::math::Vec2d>>
-                   &obstacles_vertices_vec,
-               Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all);
+  // @brief Helper function for LoadObstacleInHyperPlanes()
+  bool GetHyperPlanes(const size_t &obstacles_num,
+                      const Eigen::MatrixXi &obstacles_edges_num,
+                      const std::vector<std::vector<common::math::Vec2d>>
+                          &obstacles_vertices_vec,
+                      Eigen::MatrixXd *A_all, Eigen::MatrixXd *b_all);
 
  private:
-  ThreadSafeIndexedObstacles *obstacles_by_frame_;
-
-  apollo::common::VehicleParam vehicle_params_;
-
-  common::VehicleState vehicle_state_;
+  // @brief parking_spot_id from routing
+  std::string target_parking_spot_id_;
 
   const hdmap::HDMap *hdmap_ = nullptr;
 
-  // @brief vectors in the order of left parking bound, parking end bound, right
-  // parking bound, opposite lane. And the vertices order is counter-clockwise
-  // the viewing angle and the vertice sequence
-  //
-  //                     8------------------------7   <-  up_boundary
-  //
-  //  left_boundary  |-> 1-------2      5----------6   <-|  right_boundary
-  //                 |->         |      |            <-|
-  //                             |      |
-  //                             |      |
-  //                            |3------4|
-  //                                ^
-  //                          down_boundary
-  // ROI_parking_boundary_ in form of {{1,2,3},{3,4},{4,5,6},{7,8}}
-  std::vector<std::vector<common::math::Vec2d>> ROI_parking_boundary_;
+  apollo::common::VehicleParam vehicle_params_;
 
-  // @brief parking_spot_heading_ is heading the direction pointing away from
-  // the lane
-  double parking_spot_heading_ = 0.0;
+  ThreadSafeIndexedObstacles *obstacles_by_frame_;
 
-  // @brief parking_spot_id from routing
-  std::string target_parking_spot_id_ = "";
+  common::VehicleState vehicle_state_;
 };
+
 }  // namespace planning
 }  // namespace apollo

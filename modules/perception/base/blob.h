@@ -92,8 +92,8 @@ class Blob {
         use_cuda_host_malloc_(use_cuda_host_malloc) {}
 
   /// @brief Deprecated; use <code>Blob(const std::vector<int>& shape)</code>.
-  explicit Blob(const int num, const int channels, const int height,
-                const int width, const bool use_cuda_host_malloc = false);
+  Blob(const int num, const int channels, const int height, const int width,
+       const bool use_cuda_host_malloc = false);
   explicit Blob(const std::vector<int>& shape,
                 const bool use_cuda_host_malloc = false);
 

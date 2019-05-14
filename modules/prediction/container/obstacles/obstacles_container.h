@@ -100,16 +100,27 @@ class ObstaclesContainer : public Container {
       const int id);
 
   /**
-   * @brief Get predictable obstacle IDs in the current frame
-   * @return Predictable obstacle IDs in the current frame
+   * @brief Get movable obstacle IDs in the current frame
+   * @return Movable obstacle IDs in the current frame
    */
-  const std::vector<int>& curr_frame_predictable_obstacle_ids();
+  const std::vector<int>& curr_frame_movable_obstacle_ids();
 
   /**
-   * @brief Get non-predictable obstacle IDs in the current frame
-   * @return Non-predictable obstacle IDs in the current frame
+   * @brief Get unmovable obstacle IDs in the current frame
+   * @return unmovable obstacle IDs in the current frame
    */
-  const std::vector<int>& curr_frame_non_predictable_obstacle_ids();
+  const std::vector<int>& curr_frame_unmovable_obstacle_ids();
+
+  /**
+   * @brief Get non-ignore obstacle IDs in the current frame
+   * @return Non-ignore obstacle IDs in the current frame
+   */
+  const std::vector<int>& curr_frame_considered_obstacle_ids();
+
+  /*
+   * @brief Set non-ignore obstacle IDs in the current frame
+   */
+  void SetConsideredObstacleIds();
 
   /**
    * @brief Get current frame obstacle IDs in the current frame
@@ -131,11 +142,11 @@ class ObstaclesContainer : public Container {
                      Obstacle* obstacle_ptr);
 
   /**
-   * @brief Check if an obstacle is predictable
+   * @brief Check if an obstacle is movable
    * @param An obstacle
-   * @return True if the obstacle is predictable; otherwise false;
+   * @return True if the obstacle is movable; otherwise false;
    */
-  bool IsPredictable(const perception::PerceptionObstacle& perception_obstacle);
+  bool IsMovable(const perception::PerceptionObstacle& perception_obstacle);
 
   int PerceptionIdToPredictionId(const int perception_id);
 
@@ -144,8 +155,9 @@ class ObstaclesContainer : public Container {
   common::util::LRUCache<int, std::unique_ptr<Obstacle>> ptr_obstacles_;
   // an id_mapping from perception_id to prediction_id
   common::util::LRUCache<int, int> id_mapping_;
-  std::vector<int> curr_frame_predictable_obstacle_ids_;
-  std::vector<int> curr_frame_non_predictable_obstacle_ids_;
+  std::vector<int> curr_frame_movable_obstacle_ids_;
+  std::vector<int> curr_frame_unmovable_obstacle_ids_;
+  std::vector<int> curr_frame_considered_obstacle_ids_;
   // perception_id -> prediction_id
   std::unordered_map<int, int> curr_frame_id_mapping_;
   // prediction_id -> perception_obstacle

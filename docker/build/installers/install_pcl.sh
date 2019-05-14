@@ -21,12 +21,14 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-wget https://apollocache.blob.core.windows.net/apollo-docker/pcl-1.7_x86.tar.gz
-tar xzf pcl-1.7_x86.tar.gz
-mkdir -p /usr/local/include/pcl-1.7
-mv pcl-1.7_x86/include/pcl /usr/local/include/pcl-1.7/
-mv pcl-1.7_x86/lib/* /usr/local/lib/
-mv pcl-1.7_x86/share/pcl-1.7 /usr/local/share/
+wget https://github.com/PointCloudLibrary/pcl/archive/pcl-1.7.2.tar.gz
 
-# Clean up.
-rm -fr pcl-1.7_x86.tar.gz pcl-1.7_x86
+tar xzvf pcl-1.7.2.tar.gz
+
+cd pcl-pcl-1.7.2/
+
+export TASK=build
+export CC=gcc
+bash .travis.sh
+cd build
+sudo make install

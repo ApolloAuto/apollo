@@ -145,21 +145,13 @@ bool PathExists(const std::string &path) {
 
 bool DirectoryExists(const std::string &directory_path) {
   struct stat info;
-  if (stat(directory_path.c_str(), &info) != 0) {
-    return false;
-  }
-
-  if (info.st_mode & S_IFDIR) {
-    return true;
-  }
-
-  return false;
+  return stat(directory_path.c_str(), &info) == 0 && (info.st_mode & S_IFDIR);
 }
 
 std::vector<std::string> Glob(const std::string &pattern) {
   glob_t globs = {};
   std::vector<std::string> results;
-  if (0 == glob(pattern.c_str(), GLOB_TILDE, nullptr, &globs)) {
+  if (glob(pattern.c_str(), GLOB_TILDE, nullptr, &globs) == 0) {
     for (size_t i = 0; i < globs.gl_pathc; ++i) {
       results.emplace_back(globs.gl_pathv[i]);
     }
@@ -318,11 +310,7 @@ std::string GetFileName(const std::string &path, const bool remove_extension) {
 
 std::string GetCurrentPath() {
   char tmp[PATH_MAX];
-  if (getcwd(tmp, sizeof(tmp)) != NULL) {
-    return std::string(tmp);
-  } else {
-    return std::string("");
-  }
+  return getcwd(tmp, sizeof(tmp)) ? std::string(tmp) : std::string("");
 }
 
 }  // namespace common

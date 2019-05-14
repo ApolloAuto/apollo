@@ -20,7 +20,7 @@ For each new file, please include a license at the top of the file.
 
 * C++ code License example [util.h](modules/common/util/util.h);
 
-* Python code License example [process.py](modules/tools/calibration/process.py);
+* Python code License example [process.py](modules/tools/vehicle_calibration/process.py);
 
 * Bash code License example [apollo_base.sh](scripts/apollo_base.sh);
 
@@ -38,7 +38,11 @@ You can use command `bash apollo.sh test` to run all unit tests.
 
 * **Python coding style**:  Apollo adopted the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html). You can use the  [yapf](https://github.com/google/yapf) command `yapf -i --style='{based_on_style: google}' foo.py` to format a file foo.py.
 
+* **Apollo best coding practice**: Please also refer to [Apollo Best Coding Practice](docs/technical_tutorial/best_coding_practice.md) for more coding practice disciplines.
+
 * **BUILD coding style** : you can use command `bash apollo.sh buildify` to format your BUILD files before you submit.
+
+* **Best coding practice**: Follow [this guide](docs/technical_tutorial/best_coding_practice.md)
 
 #### Documentation
 

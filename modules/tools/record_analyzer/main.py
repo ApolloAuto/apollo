@@ -61,7 +61,7 @@ def process(control_analyzer, planning_analyzer, lidar_endtoend_analyzer,
             adc_trajectory.ParseFromString(msg.message)
             planning_analyzer.put(adc_trajectory)
             lidar_endtoend_analyzer.put_planning(adc_trajectory)
-            
+
             if plot_planning_path:
                 planning_analyzer.plot_path(plt, adc_trajectory)
             if plot_planning_refpath:
@@ -100,10 +100,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "-f", "--file", action="store", type=str, required=True,
         help="Specify the record file for analysis.")
- 
+
     parser.add_argument(
-        "-s", "--simulation", action="store_const", const=True,
-        help="For simulation API call")
+        "-sim", "--simulation", action="store_const", const=True,
+        help="For dreamland API call")
+
     parser.add_argument(
         "-path", "--planningpath", action="store_const", const=True,
         help="plot planing paths in cartesian coordinate.")
@@ -111,17 +112,22 @@ if __name__ == "__main__":
     parser.add_argument(
         "-refpath", "--planningrefpath", action="store_const", const=True,
         help="plot planing reference paths in cartesian coordinate.")
- 
+
     parser.add_argument(
         "-a", "--alldata", action="store_const", const=True,
         help="Analyze all data (both auto and manual), otherwise auto data only without this option.")
+
+    parser.add_argument(
+        "-acc", "--showacc", action="store_const", const=True,
+        help="Analyze all data (both auto and manual), otherwise auto data only without this option.")
+
     args = parser.parse_args()
 
     record_file = args.file
     reader = RecordReader(record_file)
 
     control_analyzer = ControlAnalyzer()
-    planning_analyzer = PlannigAnalyzer(args.simulation)
+    planning_analyzer = PlannigAnalyzer(args)
     lidar_endtoend_analyzer = LidarEndToEndAnalyzer()
 
     process(control_analyzer, planning_analyzer,
@@ -129,7 +135,7 @@ if __name__ == "__main__":
             args.planningrefpath, args.alldata)
 
     if args.simulation:
-        planning_analyzer.print_simulation_results()
+        planning_analyzer.print_sim_results()
     elif args.planningpath or args.planningrefpath:
         plt.axis('equal')
         plt.show()

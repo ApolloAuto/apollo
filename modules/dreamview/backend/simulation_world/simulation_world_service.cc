@@ -144,7 +144,7 @@ void SetObstacleType(const PerceptionObstacle &obstacle, Object *world_object) {
       world_object->set_type(Object_Type_VIRTUAL);
   }
 
-    world_object->set_sub_type(obstacle.sub_type());
+  world_object->set_sub_type(obstacle.sub_type());
 }
 
 void SetStopReason(const StopReasonCode &reason_code, Decision *decision) {
@@ -452,19 +452,29 @@ void SimulationWorldService::UpdateSimulationWorld(
 
 template <>
 void SimulationWorldService::UpdateSimulationWorld(const Gps &gps) {
-  Object *gps_position = world_.mutable_gps();
-  gps_position->set_timestamp_sec(gps.header().timestamp_sec());
+  if (gps.header().module_name() == "ShadowLocalization") {
+    Object *shadow_localization_position = world_.mutable_shadow_localization();
+    const auto &pose = gps.localization();
+    shadow_localization_position->set_position_x(pose.position().x() +
+                                                 map_service_->GetXOffset());
+    shadow_localization_position->set_position_y(pose.position().y() +
+                                                 map_service_->GetYOffset());
+    shadow_localization_position->set_heading(pose.heading());
+  } else {
+    Object *gps_position = world_.mutable_gps();
+    gps_position->set_timestamp_sec(gps.header().timestamp_sec());
 
-  const auto &pose = gps.localization();
-  gps_position->set_position_x(pose.position().x() +
-                               map_service_->GetXOffset());
-  gps_position->set_position_y(pose.position().y() +
-                               map_service_->GetYOffset());
+    const auto &pose = gps.localization();
+    gps_position->set_position_x(pose.position().x() +
+                                 map_service_->GetXOffset());
+    gps_position->set_position_y(pose.position().y() +
+                                 map_service_->GetYOffset());
 
-  double heading = apollo::common::math::QuaternionToHeading(
-      pose.orientation().qw(), pose.orientation().qx(), pose.orientation().qy(),
-      pose.orientation().qz());
-  gps_position->set_heading(heading);
+    double heading = apollo::common::math::QuaternionToHeading(
+        pose.orientation().qw(), pose.orientation().qx(),
+        pose.orientation().qy(), pose.orientation().qz());
+    gps_position->set_heading(heading);
+  }
 }
 
 template <>

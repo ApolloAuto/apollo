@@ -20,6 +20,9 @@
 #include <string>
 #include <vector>
 
+#include "torch/script.h"
+#include "torch/torch.h"
+
 #include "modules/prediction/evaluator/evaluator.h"
 
 namespace apollo {
@@ -68,6 +71,11 @@ class LaneScanningEvaluator : public Evaluator {
 
  private:
   /**
+   * @brief Load model from file
+   */
+  void LoadModel();
+
+  /**
    * @brief Extract the features for obstacles
    * @param Obstacle pointer
    *        A vector of doubles to be filled up with extracted features
@@ -84,11 +92,22 @@ class LaneScanningEvaluator : public Evaluator {
                                 const LaneGraph* lane_graph_ptr,
                                 std::vector<double>* feature_values);
 
+  void ModelInference(
+      const std::vector<torch::jit::IValue>& torch_inputs,
+      std::shared_ptr<torch::jit::script::Module> torch_model_ptr,
+      Feature* feature_ptr);
+
  private:
   static const size_t OBSTACLE_FEATURE_SIZE = 5 * 9;
   static const size_t INTERACTION_FEATURE_SIZE = 8;
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
   static const size_t LANE_POINTS_SIZE = 100;  // (100 * 0.2m = 20m)
+  static const size_t MAX_NUM_LANE = 10;
+  static const size_t SHORT_TERM_TRAJECTORY_SIZE = 10;
+
+  std::shared_ptr<torch::jit::script::Module> torch_lane_scanning_model_ptr_ =
+      nullptr;
+  torch::Device device_;
 };
 
 }  // namespace prediction

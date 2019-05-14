@@ -49,6 +49,9 @@ class Renderer {
         // The car that projects the starting point of the planning trajectory
         this.planningAdc = OFFLINE_PLAYBACK ? null : new AutoDrivingCar('planningAdc', this.scene);
 
+        // The shadow localization
+        this.shadowAdc = new AutoDrivingCar('shadowAdc', this.scene);
+
         // The planning trajectory.
         this.planningTrajectory = new PlanningTrajectory();
 
@@ -151,8 +154,8 @@ class Renderer {
         this.controls.enabled = true;
         this.controls.enableRotate = false;
         this.controls.reset();
-        this.controls.minDistance = 20;
-        this.controls.maxDistance = 1000;
+        this.controls.minDistance = 4;
+        this.controls.maxDistance = 4000;
         this.controls.target.set(carPosition.x, carPosition.y, 0);
 
         this.camera.position.set(carPosition.x, carPosition.y, 50);
@@ -254,9 +257,12 @@ class Renderer {
     disableRouteEditing() {
         this.routingEditor.disableEditingMode(this.scene);
 
-        document.getElementById(this.canvasId).removeEventListener('mousedown',
-                                                                   this.onMouseDownHandler,
-                                                                   false);
+        const element = document.getElementById(this.canvasId);
+        if (element) {
+            element.removeEventListener('mousedown',
+                                        this.onMouseDownHandler,
+                                        false);
+        }
     }
 
     addDefaultEndPoint(points) {
@@ -343,7 +349,13 @@ class Renderer {
     }
 
     updateWorld(world) {
-        this.adc.update(this.coordinates, world.autoDrivingCar);
+        const adcPose = world.autoDrivingCar;
+        this.adc.update(this.coordinates, adcPose);
+        if (!_.isNumber(adcPose.positionX) || !_.isNumber(adcPose.positionY)) {
+            console.error(`Invalid ego car position: ${adcPose.positionX}, ${adcPose.positionY}!`);
+            return;
+        }
+
         this.adc.updateRssMarker(world.isRssSafe);
         this.ground.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, world.planningData, this.coordinates, this.scene);
@@ -363,6 +375,16 @@ class Renderer {
                 heading: planningAdcPose.theta,
             };
             this.planningAdc.update(this.coordinates, pose);
+        }
+
+        const shadowLocalizationPose = world.shadowLocalization;
+        if (shadowLocalizationPose) {
+            const shadowAdcPose = {
+                positionX: shadowLocalizationPose.positionX,
+                positionY: shadowLocalizationPose.positionY,
+                heading: shadowLocalizationPose.heading,
+            };
+            this.shadowAdc.update(this.coordinates, shadowAdcPose);
         }
     }
 

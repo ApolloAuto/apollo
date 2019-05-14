@@ -60,6 +60,43 @@ cc_library(
 )
 
 cc_binary(
+    name = "_cyber_time.so",
+    linkshared = True,
+    deps = [
+        ":py_time",
+    ],
+)
+
+cc_library(
+    name = "py_time",
+    srcs = ["cyber_time_wrap.cc"],
+    hdrs = ["py_time.h"],
+    deps = [
+        "//cyber:cyber_core",
+        "@fastrtps",
+        "@python27",
+    ],
+)
+
+cc_binary(
+    name = "_cyber_timer.so",
+    linkshared = True,
+    deps = [
+        ":py_timer",
+    ],
+)
+
+cc_library(
+    name = "py_timer",
+    srcs = ["cyber_timer_wrap.cc"],
+    hdrs = ["py_timer.h"],
+    deps = [
+        "//cyber:cyber_core",
+        "@python27",
+    ],
+)
+
+cc_binary(
     name = "_cyber_topology_manager.so",
     linkshared = True,
     linkstatic = False,
@@ -73,9 +110,10 @@ cc_library(
     srcs = ["cyber_topology_manager_wrap.cc"],
     hdrs = ["py_topology_manager.h"],
     deps = [
-        "//cyber/service_discovery:topology_manager",
         "//cyber:cyber_core",
+        "//cyber/service_discovery:topology_manager",
         "@python27",
     ],
 )
+
 cpplint()

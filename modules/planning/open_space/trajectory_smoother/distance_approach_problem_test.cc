@@ -56,7 +56,7 @@ class DistanceApproachProblemTest : public ::testing::Test {
   Eigen::MatrixXi obstacles_edges_num = Eigen::MatrixXi::Zero(1, horizon_ + 1);
   Eigen::MatrixXd obstacles_A = Eigen::MatrixXd::Ones(4, 1);
   Eigen::MatrixXd obstacles_b = Eigen::MatrixXd::Ones(4, 1);
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
 TEST_F(DistanceApproachProblemTest, initilization) {

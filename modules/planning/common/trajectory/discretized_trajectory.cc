@@ -130,12 +130,16 @@ TrajectoryPoint DiscretizedTrajectory::StartPoint() const {
 }
 
 double DiscretizedTrajectory::GetTemporalLength() const {
-  CHECK(!empty());
+  if (empty()) {
+    return 0.0;
+  }
   return back().relative_time() - front().relative_time();
 }
 
 double DiscretizedTrajectory::GetSpatialLength() const {
-  CHECK(!empty());
+  if (empty()) {
+    return 0.0;
+  }
   return back().path_point().s() - front().path_point().s();
 }
 

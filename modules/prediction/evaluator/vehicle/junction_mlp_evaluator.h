@@ -20,8 +20,10 @@
 #include <string>
 #include <vector>
 
+#include "torch/script.h"
+#include "torch/torch.h"
+
 #include "modules/prediction/evaluator/evaluator.h"
-#include "modules/prediction/proto/fnn_vehicle_model.pb.h"
 
 namespace apollo {
 namespace prediction {
@@ -89,15 +91,8 @@ class JunctionMLPEvaluator : public Evaluator {
 
   /**
    * @brief Load mode file
-   * @param Model file name
    */
-  void LoadModel(const std::string& model_file);
-
-  /**
-   * @brief Compute probability of a junction exit
-   */
-  std::vector<double> ComputeProbability(
-      const std::vector<double>& feature_values);
+  void LoadModel();
 
  private:
   // obstacle feature with 4 basic features and 5 frames of history posotion
@@ -107,7 +102,8 @@ class JunctionMLPEvaluator : public Evaluator {
   // junction feature on 12 fan area 8 dim each
   static const size_t JUNCTION_FEATURE_SIZE = 12 * 8;
 
-  std::unique_ptr<FnnVehicleModel> model_ptr_;
+  std::shared_ptr<torch::jit::script::Module> torch_model_ptr_ = nullptr;
+  torch::Device device_;
 };
 
 }  // namespace prediction

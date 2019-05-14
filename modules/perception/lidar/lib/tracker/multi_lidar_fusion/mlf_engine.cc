@@ -57,7 +57,7 @@ bool MlfEngine::Init(const MultiTargetTrackerInitOptions& options) {
   background_objects_.clear();
   foreground_track_data_.clear();
   background_track_data_.clear();
-  if (main_sensor_.size() == 0) {
+  if (main_sensor_.empty()) {
     main_sensor_.emplace("velodyne64");  // default value
   }
 
@@ -80,8 +80,7 @@ bool MlfEngine::Track(const MultiTargetTrackerOptions& options,
     }
   }
   // 1. add global offset to pose (only when no track exists)
-  if (foreground_track_data_.size() == 0 &&
-      background_track_data_.size() == 0) {
+  if (foreground_track_data_.empty() && background_track_data_.empty()) {
     global_to_local_offset_ = -frame->lidar2world_pose.translation();
   }
   sensor_to_local_pose_ = frame->lidar2world_pose;
@@ -156,8 +155,8 @@ void MlfEngine::TrackObjectMatchAndAssign(
         << " unassigned_objects " << unassigned_objects.size();
   // 1. for assignment, push object to cache of track_data
   for (auto& pair : assignments) {
-    const size_t& track_id = pair.first;
-    const size_t& object_id = pair.second;
+    const size_t track_id = pair.first;
+    const size_t object_id = pair.second;
     tracks->at(track_id)->PushTrackedObjectToCache(objects[object_id]);
   }
   // 2. for unassigned_objects, create new tracks
@@ -177,7 +176,7 @@ void MlfEngine::TrackStateFilter(const std::vector<MlfTrackDataPtr>& tracks,
     for (auto& obj : objects) {
       tracker_->UpdateTrackDataWithObject(track_data, obj);
     }
-    if (objects.size() == 0) {
+    if (objects.empty()) {
       tracker_->UpdateTrackDataWithoutObject(frame_timestamp, track_data);
     }
   }
