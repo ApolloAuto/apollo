@@ -32,13 +32,13 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/hdmap/hdmap.h"
 #include "modules/map/hdmap/hdmap_common.h"
-#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/ego_info.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/constraint_checker/constraint_checker.h"
-#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
+#include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 #include "modules/planning/tasks/optimizers/speed_decider/speed_decider.h"
 
 namespace apollo {
@@ -128,7 +128,7 @@ Stage::StageStatus LaneFollowStage::Process(
       if (reference_line_info.IsChangeLanePath()) {
         ADEBUG << "reference line is lane change ref.";
         if (reference_line_info.Cost() < kStraightForwardLineCost &&
-            ChangeLaneDecider::IsClearToChangeLane(&reference_line_info)) {
+            LaneChangeDecider::IsClearToChangeLane(&reference_line_info)) {
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
           AERROR << "\tclear for lane change";
@@ -156,18 +156,8 @@ Status LaneFollowStage::PlanOnReferenceLine(
     reference_line_info->AddCost(kStraightForwardLineCost);
   }
   ADEBUG << "planning start point:" << planning_start_point.DebugString();
-  auto* heuristic_speed_data = reference_line_info->mutable_speed_data();
-  auto speed_profile = SpeedProfileGenerator::GenerateInitSpeedProfile(
-      planning_start_point, reference_line_info);
-  if (speed_profile.empty()) {
-    speed_profile =
-        SpeedProfileGenerator::GenerateSpeedHotStart(planning_start_point);
-    ADEBUG << "Using dummy hot start for speed vector";
-  }
-  *heuristic_speed_data = SpeedData(speed_profile);
 
   auto ret = Status::OK();
-
   for (auto* optimizer : task_list_) {
     const double start_timestamp = Clock::NowInSeconds();
     ret = optimizer->Execute(frame, reference_line_info);
@@ -344,14 +334,9 @@ bool LaneFollowStage::RetrieveLastFramePathProfile(
         << "Last frame doesn't succeed, fail to retrieve last frame path data";
     return false;
   }
-  const auto& last_frame_trajectory_pb =
-      ptr_last_frame->current_frame_planned_trajectory();
 
-  DiscretizedPath last_frame_discretized_path;
-  for (const auto& trajectory_point :
-       last_frame_trajectory_pb.trajectory_point()) {
-    last_frame_discretized_path.push_back(trajectory_point.path_point());
-  }
+  const auto& last_frame_discretized_path =
+      ptr_last_frame->current_frame_planned_path();
 
   path_data->SetDiscretizedPath(last_frame_discretized_path);
   const auto adc_frenet_frame_point_ =

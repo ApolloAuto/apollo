@@ -32,7 +32,7 @@ cc_library(
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/optimizers:path_optimizer",
         "//modules/planning/tasks/optimizers:speed_optimizer",
-        "//modules/planning/tasks/optimizers/dp_st_speed:dp_st_speed_optimizer",
+        "//modules/planning/tasks/optimizers/path_time_heuristic:path_time_heuristic_optimizer",
         "//modules/planning/tasks/optimizers/path_decider",
         "//modules/planning/tasks/optimizers/speed_decider",
         "@eigen",

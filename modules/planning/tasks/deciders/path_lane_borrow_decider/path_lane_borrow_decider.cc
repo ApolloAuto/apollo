@@ -52,29 +52,37 @@ Status PathLaneBorrowDecider::Process(
 
 bool PathLaneBorrowDecider::IsNecessaryToBorrowLane(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
-  if (PlanningContext::Instance()->is_in_path_lane_borrow_scenario()) {
+  if (PlanningContext::Instance()->path_decider_info().
+          is_in_path_lane_borrow_scenario()) {
     // If originally borrowing neighbor lane:
-    if (PlanningContext::Instance()->able_to_use_self_lane_counter() >= 3) {
+    if (PlanningContext::Instance()->path_decider_info().
+            able_to_use_self_lane_counter() >= 6) {
       // If have been able to use self-lane for some time, then switch to
       // non-lane-borrowing.
-      PlanningContext::Instance()->set_is_in_path_lane_borrow_scenario(false);
+      PlanningContext::Instance()->mutable_path_decider_info()->
+          set_is_in_path_lane_borrow_scenario(false);
+      PlanningContext::Instance()->mutable_path_decider_info()->
+          set_decided_side_pass_direction(0);
       AINFO << "Switch from LANE-BORROW path to SELF-LANE path.";
     }
   } else {
     // If originally not borrowing neighbor lane:
     ADEBUG << "Blocking obstacle ID = "
-           << PlanningContext::Instance()->front_static_obstacle_id();
+           << PlanningContext::Instance()->path_decider_info().
+                  front_static_obstacle_id();
     if (HasSingleReferenceLine(frame) && IsWithinSidePassingSpeedADC(frame) &&
         IsBlockingObstacleFarFromIntersection(reference_line_info) &&
         IsLongTermBlockingObstacle() &&
         IsBlockingObstacleWithinDestination(reference_line_info) &&
         IsSidePassableObstacle(reference_line_info)) {
       // Satisfying the above condition will it switch to lane-borrowing.
-      PlanningContext::Instance()->set_is_in_path_lane_borrow_scenario(true);
+      PlanningContext::Instance()->mutable_path_decider_info()->
+          set_is_in_path_lane_borrow_scenario(true);
       AINFO << "Switch from SELF-LANE path to LANE-BORROW path.";
     }
   }
-  return PlanningContext::Instance()->is_in_path_lane_borrow_scenario();
+  return PlanningContext::Instance()->path_decider_info().
+             is_in_path_lane_borrow_scenario();
 }
 
 // This function is to prevent lane-borrowing during lane-changing.
@@ -89,7 +97,8 @@ bool PathLaneBorrowDecider::IsWithinSidePassingSpeedADC(const Frame& frame) {
 }
 
 bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
-  if (PlanningContext::Instance()->front_static_obstacle_cycle_counter() >= 3) {
+  if (PlanningContext::Instance()->path_decider_info().
+          front_static_obstacle_cycle_counter() >= 3) {
     ADEBUG << "The blocking obstacle is long-term existing.";
     return true;
   } else {
@@ -101,7 +110,8 @@ bool PathLaneBorrowDecider::IsLongTermBlockingObstacle() {
 bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
     const ReferenceLineInfo& reference_line_info) {
   std::string blocking_obstacle_id =
-      PlanningContext::Instance()->front_static_obstacle_id();
+      PlanningContext::Instance()->path_decider_info().
+          front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {
     ADEBUG << "There is no blocking obstacle.";
     return true;
@@ -131,7 +141,8 @@ bool PathLaneBorrowDecider::IsBlockingObstacleWithinDestination(
 bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
     const ReferenceLineInfo& reference_line_info) {
   std::string blocking_obstacle_id =
-      PlanningContext::Instance()->front_static_obstacle_id();
+      PlanningContext::Instance()->path_decider_info().
+          front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {
     ADEBUG << "There is no blocking obstacle.";
     return true;
@@ -184,7 +195,8 @@ bool PathLaneBorrowDecider::IsBlockingObstacleFarFromIntersection(
 bool PathLaneBorrowDecider::IsSidePassableObstacle(
     const ReferenceLineInfo& reference_line_info) {
   std::string blocking_obstacle_id =
-      PlanningContext::Instance()->front_static_obstacle_id();
+      PlanningContext::Instance()->path_decider_info().
+          front_static_obstacle_id();
   if (blocking_obstacle_id.empty()) {
     ADEBUG << "There is no blocking obstacle.";
     return false;

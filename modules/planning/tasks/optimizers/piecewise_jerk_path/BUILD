@@ -32,7 +32,7 @@ cc_library(
         "//modules/planning/math:polynomial_xd",
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
-        "//modules/planning/math/piecewise_jerk:fem_1d_qp_problem",
+        "//modules/planning/math/piecewise_jerk:piecewise_jerk_path_problem",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/reference_line",
         "//modules/planning/tasks/optimizers:path_optimizer",

@@ -41,7 +41,6 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
-#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
@@ -131,6 +130,15 @@ class Frame {
     return current_frame_planned_trajectory_;
   }
 
+  void set_current_frame_planned_path(
+      DiscretizedPath current_frame_planned_path) {
+    current_frame_planned_path_ = std::move(current_frame_planned_path);
+  }
+
+  const DiscretizedPath &current_frame_planned_path() const {
+    return current_frame_planned_path_;
+  }
+
   const bool is_near_destination() const { return is_near_destination_; }
 
   /**
@@ -193,8 +201,11 @@ class Frame {
   std::unordered_map<std::string, const perception::TrafficLight *>
       traffic_lights_;
 
-  ChangeLaneDecider change_lane_decider_;
-  ADCTrajectory current_frame_planned_trajectory_;  // last published trajectory
+  // current frame published trajectory
+  ADCTrajectory current_frame_planned_trajectory_;
+
+  // current frame path for future possible speed fallback
+  DiscretizedPath current_frame_planned_path_;
 
   const ReferenceLineProvider *reference_line_provider_ = nullptr;
 

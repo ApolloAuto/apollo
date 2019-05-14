@@ -24,17 +24,18 @@
 
 #include "modules/common/status/status.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
+#include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/deciders/open_space_fallback_decider.h"
 #include "modules/planning/tasks/deciders/open_space_pre_stop_decider.h"
 #include "modules/planning/tasks/deciders/open_space_roi_decider.h"
-#include "modules/planning/tasks/deciders/path_assessment_decider.h"
-#include "modules/planning/tasks/deciders/path_bounds_decider.h"
+#include "modules/planning/tasks/deciders/path_assessment_decider/path_assessment_decider.h"
+#include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
-#include "modules/planning/tasks/optimizers/dp_st_speed/dp_st_speed_optimizer.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
 #include "modules/planning/tasks/optimizers/path_decider/path_decider.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/path_time_heuristic_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_path/piecewise_jerk_path_optimizer.h"
 #include "modules/planning/tasks/optimizers/piecewise_jerk_speed/piecewise_jerk_speed_optimizer.h"
 #include "modules/planning/tasks/optimizers/proceed_with_caution_speed/proceed_with_caution_speed_generator.h"
@@ -55,6 +56,10 @@ std::unordered_map<TaskConfig::TaskType, TaskConfig, std::hash<int>>
     TaskFactory::default_task_configs_;
 
 void TaskFactory::Init(const PlanningConfig& config) {
+  task_factory_.Register(TaskConfig::LANE_CHANGE_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new LaneChangeDecider(config);
+                         });
   task_factory_.Register(TaskConfig::PATH_LANE_BORROW_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathLaneBorrowDecider(config);
@@ -77,7 +82,7 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          });
   task_factory_.Register(TaskConfig::DP_ST_SPEED_OPTIMIZER,
                          [](const TaskConfig& config) -> Task* {
-                           return new DpStSpeedOptimizer(config);
+                           return new PathTimeHeuristicOptimizer(config);
                          });
   task_factory_.Register(TaskConfig::PATH_DECIDER,
                          [](const TaskConfig& config) -> Task* {

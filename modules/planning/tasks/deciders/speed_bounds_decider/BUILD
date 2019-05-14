@@ -20,6 +20,7 @@ cc_library(
         "//modules/planning/common/util:common_lib",
         "//modules/planning/tasks:task",
         "//modules/planning/tasks/deciders:decider_base",
+        "//modules/planning/tasks/deciders/lane_change_decider",
     ],
 )
 

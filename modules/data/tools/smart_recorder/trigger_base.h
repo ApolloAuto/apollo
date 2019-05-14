@@ -46,15 +46,7 @@ class TriggerBase {
   // Decide if the current message needs to be restored
   virtual bool ShouldRestore(const RecordMessage& msg) const = 0;
 
-  // Getters
-  const std::unordered_map<std::string, std::string>& GetChannelTypes() const {
-    return channels_types_map_;
-  }
   const std::string& GetTriggerName() const { return trigger_name_; }
-
-  void InsertChannelType(const std::string& channel, const std::string& type) {
-    channels_types_map_.insert({channel, type});
-  }
 
   virtual ~TriggerBase() = default;
 
@@ -66,8 +58,6 @@ class TriggerBase {
 
  private:
   void LockTrigger(const SmartRecordTrigger& trigger_conf);
-
-  std::unordered_map<std::string, std::string> channels_types_map_;
 };
 
 }  // namespace data
