@@ -15,6 +15,11 @@ cc_library(
         "ndt_localization_component.h",
     ],
     copts = ["-DMODULE_NAME=\\\"NDTlocalization\\\""],
+    linkopts = [
+        "-lboost_filesystem",
+        "-lboost_system",
+        "-lboost_program_options",
+    ],
     deps = [
         "//cyber",
         "//modules/common/adapters:adapter_gflags",

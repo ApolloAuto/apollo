@@ -152,9 +152,9 @@ bool Obstacle::Insert(const PerceptionObstacle& perception_obstacle,
   if (!SetId(perception_obstacle, &feature, prediction_obstacle_id)) {
     return false;
   }
-  if (!SetType(perception_obstacle, &feature)) {
-    return false;
-  }
+
+  SetType(perception_obstacle, &feature);
+
   SetStatus(perception_obstacle, timestamp, &feature);
 
   // Set obstacle observation for KF tracking
@@ -411,12 +411,11 @@ bool Obstacle::SetId(const PerceptionObstacle& perception_obstacle,
   return true;
 }
 
-bool Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
+void Obstacle::SetType(const PerceptionObstacle& perception_obstacle,
                        Feature* feature) {
   type_ = perception_obstacle.type();
   ADEBUG << "Obstacle [" << id_ << "] has type [" << type_ << "].";
   feature->set_type(type_);
-  return true;
 }
 
 void Obstacle::SetTimestamp(const PerceptionObstacle& perception_obstacle,
@@ -1081,8 +1080,7 @@ void Obstacle::SetLaneSequenceStopSign(LaneSequence* lane_sequence_ptr) {
 
 void Obstacle::GetNeighborLaneSegments(
     std::shared_ptr<const LaneInfo> center_lane_info,
-    bool is_left,
-    int recursion_depth,
+    bool is_left, int recursion_depth,
     std::list<std::string>* const lane_ids_ordered,
     std::unordered_set<std::string>* const existing_lane_ids) {
   // Exit recursion if reached max num of allowed search depth.
@@ -1149,13 +1147,13 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
     ADEBUG << "Don't build lane graph for an old obstacle.";
     return;
   }
-  double speed = feature->speed();
-  double road_graph_search_distance =
-      std::fmax(speed * FLAGS_prediction_trajectory_time_length +
-                    0.5 * FLAGS_vehicle_max_linear_acc *
-                        FLAGS_prediction_trajectory_time_length *
-                        FLAGS_prediction_trajectory_time_length,
-                FLAGS_min_prediction_trajectory_spatial_length);
+  // double speed = feature->speed();
+  double road_graph_search_distance = 60.0;  // (45mph for 3sec)
+  // std::fmax(speed * FLAGS_prediction_trajectory_time_length +
+  //               0.5 * FLAGS_vehicle_max_linear_acc *
+  //               FLAGS_prediction_trajectory_time_length *
+  //               FLAGS_prediction_trajectory_time_length,
+  //           FLAGS_min_prediction_trajectory_spatial_length);
 
   // Treat the most probable lane_segment as the center, put its left
   // and right neighbors into a vector following the left-to-right order.
@@ -1167,11 +1165,11 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   std::list<std::string> lane_ids_ordered_list;
   std::unordered_set<std::string> existing_lane_ids;
   GetNeighborLaneSegments(
-      center_lane_info, true, 5, &lane_ids_ordered_list, &existing_lane_ids);
+      center_lane_info, true, 2, &lane_ids_ordered_list, &existing_lane_ids);
   lane_ids_ordered_list.push_back(feature->lane().lane_feature().lane_id());
   existing_lane_ids.insert(feature->lane().lane_feature().lane_id());
   GetNeighborLaneSegments(
-      center_lane_info, false, 5, &lane_ids_ordered_list, &existing_lane_ids);
+      center_lane_info, false, 2, &lane_ids_ordered_list, &existing_lane_ids);
 
   const std::vector<std::string> lane_ids_ordered(lane_ids_ordered_list.begin(),
                                                   lane_ids_ordered_list.end());
@@ -1205,7 +1203,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
 
   // Build lane_points.
   if (feature->has_lane() && feature->lane().has_lane_graph()) {
-    SetLanePoints(feature, FLAGS_dense_lane_gap, 100,
+    SetLanePoints(feature, 0.5, 120,
                   feature->mutable_lane()->mutable_lane_graph_ordered());
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
   }

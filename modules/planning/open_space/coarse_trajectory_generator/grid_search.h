@@ -106,20 +106,20 @@ class GridSearch {
   explicit GridSearch(const PlannerOpenSpaceConfig& open_space_conf);
   virtual ~GridSearch() = default;
   bool GenerateAStarPath(
-      const double& sx, const double& sy, const double& ex, const double& ey,
+      const double sx, const double sy, const double ex, const double ey,
       const std::vector<double>& XYbounds,
       const std::vector<std::vector<common::math::LineSegment2d>>&
           obstacles_linesegments_vec,
       GridAStartResult* result);
   bool GenerateDpMap(
-      const double& ex, const double& ey, const std::vector<double>& XYbounds,
+      const double ex, const double ey, const std::vector<double>& XYbounds,
       const std::vector<std::vector<common::math::LineSegment2d>>&
           obstacles_linesegments_vec);
-  double CheckDpMap(const double& sx, const double& sy);
+  double CheckDpMap(const double sx, const double sy);
 
  private:
-  double EuclidDistance(const double& x1, const double& y1, const double& x2,
-                        const double& y2);
+  double EuclidDistance(const double x1, const double y1, const double x2,
+                        const double y2);
   std::vector<std::shared_ptr<Node2d>> GenerateNextNodes(
       std::shared_ptr<Node2d> node);
   bool CheckConstraints(std::shared_ptr<Node2d> node);

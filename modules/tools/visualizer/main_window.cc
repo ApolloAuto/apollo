@@ -1129,11 +1129,11 @@ void MainWindow::TopologyChanged(
           changeMsg.change_type() &&
       apollo::cyber::proto::RoleType::ROLE_WRITER == changeMsg.role_type() &&
       apollo::cyber::proto::OperateType::OPT_JOIN == changeMsg.operate_type()) {
-    FindNewWriter(changeMsg.role_attr());
+    AddNewWriter(changeMsg.role_attr());
   }
 }
 
-void MainWindow::FindNewWriter(
+void MainWindow::AddNewWriter(
     const apollo::cyber::proto::RoleAttributes& role) {
   const std::string& channelName = role.channel_name();
   if (_channelName2TypeMap.find(channelName) != _channelName2TypeMap.end()) {
@@ -1144,8 +1144,7 @@ void MainWindow::FindNewWriter(
 
   QTreeWidgetItem* child = new QTreeWidgetItem();
   if (child == nullptr) {
-    QMessageBox::warning(this, tr("Error"),
-                         tr("No Enough for New Channel!!!\nPlease Select it!"),
+    QMessageBox::warning(this, tr("Error"), tr("No Enough for New Channel!!!"),
                          QMessageBox::Ok);
     return;
   }
@@ -1167,7 +1166,8 @@ void MainWindow::FindNewWriter(
   }
   ui_->treeWidget->setRootIsDecorated(true);
 
-  if (str.contains("camera", Qt::CaseInsensitive)) {
+  QString msgType(msgTypeName.c_str());
+  if (msgType.contains("camera", Qt::CaseInsensitive)) {
     for (VideoImgProxy* item : video_image_viewer_list_) {
       item->channel_name_combobox_.addItem(str);
     }
@@ -1177,11 +1177,11 @@ void MainWindow::FindNewWriter(
     }
   }
 
-  if (str.contains("pointcloud", Qt::CaseInsensitive)) {
+  if (msgType.contains("pointcloud", Qt::CaseInsensitive)) {
     pointcloud_comboBox_->addItem(str);
   }
 
-  if (str.contains("radar", Qt::CaseInsensitive)) {
+  if (msgType.contains("radar", Qt::CaseInsensitive)) {
     for (RadarData* item : radarData_list_) {
       item->channel_name_combobox_.addItem(str);
     }

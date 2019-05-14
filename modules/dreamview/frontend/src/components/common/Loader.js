@@ -6,7 +6,6 @@ import RENDERER from "renderer";
 import loaderImg from "assets/images/logo_apollo.png";
 import loaderGif from "assets/images/loader_apollo.gif";
 
-
 export default class Loader extends React.Component {
     render() {
         const { height, extraClasses, offlineViewErr } = this.props;

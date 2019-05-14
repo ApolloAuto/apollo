@@ -50,8 +50,7 @@ TEST(MessageManagerTest, GetMutableProtocolDataById) {
   MockMessageManager manager;
   manager.Parse(MockProtocolData::ID, &mock_data, 8);
   manager.ResetSendMessages();
-  EXPECT_TRUE(manager.GetMutableProtocolDataById(MockProtocolData::ID) !=
-              nullptr);
+  EXPECT_NE(manager.GetMutableProtocolDataById(MockProtocolData::ID), nullptr);
 
   ::apollo::canbus::ChassisDetail chassis_detail;
   chassis_detail.set_car_type(::apollo::canbus::ChassisDetail::QIRUI_EQ_15);

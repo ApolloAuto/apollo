@@ -8,7 +8,7 @@ cc_library(
         "component.h",
     ],
     deps = [
-        "component_base",
+        ":component_base",
         "//cyber/scheduler",
     ],
 )
@@ -34,7 +34,7 @@ cc_library(
         "timer_component.h",
     ],
     deps = [
-        "component_base",
+        ":component_base",
         "//cyber/blocker:blocker_manager",
         "//cyber/timer",
         "//cyber/transport:history",

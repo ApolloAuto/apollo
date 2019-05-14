@@ -11,7 +11,7 @@ cc_library(
         "blocker_manager.h",
     ],
     deps = [
-        "blocker",
+        ":blocker",
     ],
 )
 
@@ -54,7 +54,7 @@ cc_library(
         "intra_reader.h",
     ],
     deps = [
-        "blocker_manager",
+        ":blocker_manager",
     ],
 )
 
@@ -64,7 +64,7 @@ cc_library(
         "intra_writer.h",
     ],
     deps = [
-        "blocker_manager",
+        ":blocker_manager",
     ],
 )
 

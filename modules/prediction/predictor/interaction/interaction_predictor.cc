@@ -20,9 +20,12 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "modules/common/adapters/proto/adapter_config.pb.h"
+#include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_util.h"
 #include "modules/prediction/container/adc_trajectory/adc_trajectory_container.h"
 #include "modules/prediction/container/container_manager.h"
@@ -49,12 +52,13 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 
   Feature* feature_ptr = obstacle->mutable_latest_feature();
 
-  if (!feature_ptr->has_lane() || !feature_ptr->lane().has_lane_graph()) {
+  if (!feature_ptr->lane().has_lane_graph()) {
     AERROR << "Obstacle [" << obstacle->id() << "] has no lane graph.";
     return;
   }
+  auto* lane_graph = feature_ptr->mutable_lane()->mutable_lane_graph();
 
-  int num_lane_sequence = feature_ptr->lane().lane_graph().lane_sequence_size();
+  int num_lane_sequence = lane_graph->lane_sequence_size();
   std::vector<double> best_lon_accelerations(num_lane_sequence, 0.0);
   std::vector<double> candidate_lon_accelerations =
       {0.0, -0.5, -1.0, -1.5, -2.0, -2.5, -3.0};
@@ -62,8 +66,7 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
   std::vector<double> posteriors(num_lane_sequence, 0.0);
   double posterior_sum = 0.0;
   for (int i = 0; i < num_lane_sequence; ++i) {
-    const LaneSequence& lane_sequence =
-        feature_ptr->lane().lane_graph().lane_sequence(i);
+    const LaneSequence& lane_sequence = lane_graph->lane_sequence(i);
     for (const double lon_acceleration : candidate_lon_accelerations) {
       double cost =
           ComputeTrajectoryCost(*obstacle, lane_sequence, lon_acceleration);
@@ -82,15 +85,11 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
 
   int best_seq_idx = 0;
   double largest_posterior = 0.0;
-  CHECK_EQ(posteriors.size(),
-           feature_ptr->lane().lane_graph().lane_sequence_size());
+  CHECK_EQ(posteriors.size(), lane_graph->lane_sequence_size());
   for (int i = 0; i < num_lane_sequence; ++i) {
     double normalized_posterior =
         posteriors[i] / (posterior_sum + FLAGS_double_precision);
-    feature_ptr->mutable_lane()
-        ->mutable_lane_graph()
-        ->mutable_lane_sequence(i)
-        ->set_probability(normalized_posterior);
+    lane_graph->mutable_lane_sequence(i)->set_probability(normalized_posterior);
     if (normalized_posterior > largest_posterior) {
       largest_posterior = normalized_posterior;
       best_seq_idx = i;
@@ -100,8 +99,7 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
   double probability_threshold = 0.5;
   if (largest_posterior > probability_threshold) {
     for (int i = 0; i < num_lane_sequence; ++i) {
-      const LaneSequence& lane_sequence =
-          feature_ptr->lane().lane_graph().lane_sequence(i);
+      const LaneSequence& lane_sequence = lane_graph->lane_sequence(i);
       if (lane_sequence.probability() < probability_threshold) {
         continue;
       }
@@ -116,16 +114,16 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
       }
       std::vector<TrajectoryPoint> points;
       DrawTrajectory(*obstacle, lane_sequence,
-          best_lon_acceleration,
-          FLAGS_prediction_trajectory_time_length,
-          FLAGS_prediction_trajectory_time_resolution,
-          &points);
+                     best_lon_acceleration,
+                     FLAGS_prediction_trajectory_time_length,
+                     FLAGS_prediction_trajectory_time_resolution,
+                     &points);
       Trajectory trajectory = GenerateTrajectory(points);
-      trajectories_.push_back(std::move(trajectory));
+      obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+          trajectory);
     }
   } else {
-    const LaneSequence& sequence =
-        feature_ptr->lane().lane_graph().lane_sequence(best_seq_idx);
+    const LaneSequence& sequence = lane_graph->lane_sequence(best_seq_idx);
     double best_lon_acceleration = best_lon_accelerations[best_seq_idx];
     if (sequence.has_stop_sign()) {
       double stop_distance =
@@ -133,14 +131,14 @@ void InteractionPredictor::Predict(Obstacle* obstacle) {
       SupposedToStop(*feature_ptr, stop_distance, &best_lon_acceleration);
     }
     std::vector<TrajectoryPoint> points;
-    DrawTrajectory(*obstacle,
-        feature_ptr->lane().lane_graph().lane_sequence(best_seq_idx),
-        best_lon_acceleration,
-        FLAGS_prediction_trajectory_time_length,
-        FLAGS_prediction_trajectory_time_resolution,
-        &points);
+    DrawTrajectory(*obstacle, lane_graph->lane_sequence(best_seq_idx),
+                   best_lon_acceleration,
+                   FLAGS_prediction_trajectory_time_length,
+                   FLAGS_prediction_trajectory_time_resolution,
+                   &points);
     Trajectory trajectory = GenerateTrajectory(points);
-    trajectories_.push_back(std::move(trajectory));
+    obstacle->mutable_latest_feature()->add_predicted_trajectory()->CopyFrom(
+        trajectory);
   }
 }
 
@@ -242,19 +240,36 @@ bool InteractionPredictor::DrawTrajectory(
 double InteractionPredictor::ComputeTrajectoryCost(const Obstacle& obstacle,
     const LaneSequence& lane_sequence, const double acceleration) {
   CHECK_GT(obstacle.history_size(), 0);
-  double centri_acc_weight = FLAGS_centripedal_acceleration_cost_weight;
-  double collision_weight = FLAGS_collision_cost_weight;
   double speed = obstacle.latest_feature().speed();
   double total_cost = 0.0;
+
+  double lon_acc_cost = LongitudinalAccelerationCost(acceleration);
+  total_cost += FLAGS_longitudinal_acceleration_cost_weight * lon_acc_cost;
+
   double centri_acc_cost =
       CentripetalAccelerationCost(lane_sequence, speed, acceleration);
-  total_cost += centri_acc_weight * centri_acc_cost;
+  total_cost += FLAGS_centripedal_acceleration_cost_weight * centri_acc_cost;
+
+  double collision_cost = 0.0;
   if (LowerRightOfWayThanEgo(obstacle, lane_sequence)) {
-    double collision_cost =
+    collision_cost =
         CollisionWithEgoVehicleCost(lane_sequence, speed, acceleration);
-    total_cost += collision_weight * collision_cost;
   }
+  total_cost += FLAGS_collision_cost_weight * collision_cost;
+
+  if (FLAGS_prediction_offline_mode == 5) {
+    std::vector<double> cost_values = {lon_acc_cost, centri_acc_cost,
+                                       collision_cost};
+    FeatureOutput::InsertDataForTuning(
+        obstacle.latest_feature(), cost_values, "interaction", lane_sequence);
+  }
+
   return total_cost;
+}
+
+double InteractionPredictor::LongitudinalAccelerationCost(
+    const double acceleration) {
+  return acceleration * acceleration;
 }
 
 double InteractionPredictor::CentripetalAccelerationCost(
@@ -289,8 +304,8 @@ double InteractionPredictor::CollisionWithEgoVehicleCost(
 
   for (const TrajectoryPoint& adc_trajectory_point : adc_trajectory_) {
     double relative_time = adc_trajectory_point.relative_time();
-    double curr_s = GetSByConstantAcceleration(
-        speed, acceleration, relative_time);
+    double curr_s =
+        GetSByConstantAcceleration(speed, acceleration, relative_time);
     double delta_s = curr_s - prev_s;
     remained_s += delta_s;
     while (lane_seg_idx < num_lane_segment) {

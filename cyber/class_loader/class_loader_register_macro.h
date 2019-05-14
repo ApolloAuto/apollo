@@ -19,15 +19,15 @@
 
 #include "cyber/class_loader/utility/class_loader_utility.h"
 
-#define CLASS_LOADER_REGISTER_CLASS_INTERNAL(Derived, Base, UniqueID)         \
-  namespace {                                                                 \
-  struct ProxyType##UniqueID {                                                \
-    ProxyType##UniqueID() {                                                   \
+#define CLASS_LOADER_REGISTER_CLASS_INTERNAL(Derived, Base, UniqueID)     \
+  namespace {                                                             \
+  struct ProxyType##UniqueID {                                            \
+    ProxyType##UniqueID() {                                               \
       apollo::cyber::class_loader::utility::RegisterClass<Derived, Base>( \
-          #Derived, #Base);                                                   \
-    }                                                                         \
-  };                                                                          \
-  static ProxyType##UniqueID g_register_class_##UniqueID;                     \
+          #Derived, #Base);                                               \
+    }                                                                     \
+  };                                                                      \
+  static ProxyType##UniqueID g_register_class_##UniqueID;                 \
   }
 
 #define CLASS_LOADER_REGISTER_CLASS_INTERNAL_1(Derived, Base, UniqueID) \

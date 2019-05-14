@@ -3,18 +3,10 @@ syntax = "proto2";
 package apollo.canbus;
 
 import "modules/canbus/proto/chassis.proto";
+import "modules/common/configs/proto/vehicle_config.proto";
 
 message VehicleParameter {
-  enum VehicleBrand {
-    LINCOLN_MKZ = 0;
-    GEM = 1;
-    LEXUS = 2;
-    TRANSIT = 3;
-    GE3 = 4;
-    WEY = 5;
-  }
-
-  optional VehicleBrand brand = 1;
+  optional apollo.common.VehicleBrand brand = 1;
   optional double max_engine_pedal = 2;
   optional int32 max_enable_fail_attempt = 3;
   optional Chassis.DrivingMode driving_mode = 4;

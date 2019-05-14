@@ -467,7 +467,24 @@ bool ReferenceLine::GetLaneWidth(const double s, double* const lane_left_width,
   if (map_path_.path_points().empty()) {
     return false;
   }
-  return map_path_.GetLaneWidth(s, lane_left_width, lane_right_width);
+
+  if (!map_path_.GetLaneWidth(s, lane_left_width, lane_right_width)) {
+    return false;
+  }
+  return true;
+}
+
+bool ReferenceLine::GetOffsetToMap(const double s, double* l_offset) const {
+  if (map_path_.path_points().empty()) {
+    return false;
+  }
+
+  auto ref_point = GetNearestReferencePoint(s);
+  if (ref_point.lane_waypoints().empty()) {
+    return false;
+  }
+  *l_offset = ref_point.lane_waypoints().front().l;
+  return true;
 }
 
 bool ReferenceLine::GetRoadWidth(const double s, double* const road_left_width,
@@ -631,14 +648,6 @@ bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
              << " on reference line.";
       return false;
     }
-
-    // TODO(all): move the boundary finding to the end of function,
-    // It is not accurate to check only vertices.
-    start_s = std::fmin(start_s, sl_point.s());
-    end_s = std::fmax(end_s, sl_point.s());
-    start_l = std::fmin(start_l, sl_point.l());
-    end_l = std::fmax(end_l, sl_point.l());
-
     sl_corners.push_back(std::move(sl_point));
   }
 
@@ -668,6 +677,13 @@ bool ReferenceLine::GetSLBoundary(const common::math::Box2d& box,
     if (v0.CrossProd(v1) < 0.0) {
       *sl_boundary->add_boundary_point() = sl_point_mid;
     }
+  }
+
+  for (const auto& sl_point : sl_boundary->boundary_point()) {
+    start_s = std::fmin(start_s, sl_point.s());
+    end_s = std::fmax(end_s, sl_point.s());
+    start_l = std::fmin(start_l, sl_point.l());
+    end_l = std::fmax(end_l, sl_point.l());
   }
 
   sl_boundary->set_start_s(start_s);

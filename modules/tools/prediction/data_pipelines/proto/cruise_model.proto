@@ -85,12 +85,12 @@ message RegressParameter {
   optional ActivationParameter activation_7 = 6;
   optional DenseParameter linear_9 = 7;
   optional ActivationParameter activation_10 = 8;
-}  
+}
 
 
 // Final model
 
-// next id = 
+// next id =
 message CruiseModelParameter {
   optional LaneFeatureConvParameter lane_feature_conv = 1;
   optional MaxPool1dParameter lane_feature_maxpool = 2;

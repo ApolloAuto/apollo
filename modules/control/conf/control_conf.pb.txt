@@ -103,8 +103,6 @@ lat_controller_conf {
 }
 lon_controller_conf {
   ts: 0.01
-  brake_deadzone: 15.5
-  throttle_deadzone: 18.0
   brake_minimum_action: 0.0
   throttle_minimum_action: 0.0
   speed_controller_input_limit: 2.0
@@ -136,16 +134,16 @@ lon_controller_conf {
   switch_speed: 2.0
   reverse_station_pid_conf {
     integrator_enable: false
-    integrator_saturation_level: 0.3
-    kp: 0.2
-    ki: 0.0
+    integrator_saturation_level: 0.5
+    kp: 0.4
+    ki: 0.2
     kd: 0.0
   }
   reverse_speed_pid_conf {
     integrator_enable: true
-    integrator_saturation_level: 0.1
-    kp: 0.05
-    ki: 0.0
+    integrator_saturation_level: 0.5
+    kp: 2.0
+    ki: 0.3
     kd: 0.0
   }
   reverse_station_leadlag_conf {
@@ -6673,8 +6671,6 @@ mpc_controller_conf {
   max_iteration: 150
   max_lateral_acceleration: 5.0
   standstill_acceleration: -3.0
-  brake_deadzone: 15.5
-  throttle_deadzone: 18.0
   brake_minimum_action: 0.0
   throttle_minimum_action: 0.0
   enable_mpc_feedforward_compensation: false

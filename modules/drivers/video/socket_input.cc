@@ -37,7 +37,7 @@ namespace video {
 ////////////////////////////////////////////////////////////////////////
 
 /** @brief constructor
-
+ *
  *  @param private_nh private node handle for driver
  *  @param udpport UDP port number to connect
  */
@@ -48,9 +48,13 @@ SocketInput::SocketInput() : sockfd_(-1), port_(0) {
 }
 
 /** @brief destructor */
-SocketInput::~SocketInput(void) {
-  if (buf_) delete[] buf_;
-  if (pdu_) delete[] pdu_;
+SocketInput::~SocketInput() {
+  if (buf_) {
+    delete[] buf_;
+  }
+  if (pdu_) {
+    delete[] pdu_;
+  }
   (void)close(sockfd_);
 }
 
@@ -59,54 +63,49 @@ void SocketInput::Init(uint32_t port) {
     (void)close(sockfd_);
   }
 
-  // connect to camera UDP port
-  AINFO << "Opening UDP socket: port " << uint16_t(port);
-  port_ = port;
   sockfd_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (sockfd_ < 0) {
-    AERROR << "create socket error.";
+    AERROR << "Failed to create socket fd.";
     return;
   }
 
-  if (sockfd_ == -1) {
-    AERROR << "Init socket failed, UDP port is " << port;
-  }
-
-  sockaddr_in my_addr;                       // my address information
-  memset(&my_addr, 0, sizeof(my_addr));      // initialize to zeros
-  my_addr.sin_family = AF_INET;              // host byte order
-  my_addr.sin_port = htons(uint16_t(port));  // short, in network byte order
-  my_addr.sin_addr.s_addr = INADDR_ANY;      // automatically fill in my IP
-
+  // Connect to camera UDP port
+  AINFO << "Opening UDP socket on port: " << uint16_t(port);
+  port_ = port;
+  sockaddr_in my_addr;
+  memset(&my_addr, '\0', sizeof(my_addr));
+  my_addr.sin_family = AF_INET;
+  my_addr.sin_port = htons(uint16_t(port));
+  my_addr.sin_addr.s_addr = INADDR_ANY;
   if (bind(sockfd_, reinterpret_cast<sockaddr *>(&my_addr),
-           sizeof(sockaddr_in)) == -1) {
-    AERROR << "Socket bind failed! Port " << port_;
+           sizeof(sockaddr_in)) < 0) {
+    AERROR << "Failed to bind socket on local address.";
   }
 
   if (fcntl(sockfd_, F_SETFL, O_NONBLOCK | FASYNC) < 0) {
-    AERROR << "non-block! Port " << port_;
+    AERROR << "Failed to enable non-blocking I/O.";
   }
 
-  const int nRecvBuf = 4 * 1024 * 1024;
-  if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVBUF, &nRecvBuf, sizeof(int))) {
-    AERROR << "set socket recieve buff error";
+  const int rbuf = 4 * 1024 * 1024;
+  if (setsockopt(sockfd_, SOL_SOCKET, SO_RCVBUF, &rbuf, sizeof(int)) < 0) {
+    AERROR << "Failed to enable socket recieve buffer.";
   }
 
   int enable = 1;
   if (setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
-    AERROR << "set socket reuse addr error";
+    AERROR << "Failed to enable socket reuseable address.";
   }
 
   buf_ = new uint8_t[H265_FRAME_PACKAGE_SIZE];
   if (!buf_) {
-    AERROR << "error alloc buf failed";
+    AERROR << "Failed to allocate H265 frame package buffer.";
   }
   pdu_ = new uint8_t[H265_PDU_SIZE];
   if (!pdu_) {
-    AERROR << "error alloc buf failed";
+    AERROR << "Failed to allocate H265 PDU buffer.";
   }
   // _metric_controller->Init();
-  AINFO << "camera socket fd is " << sockfd_ << ", port " << port_;
+  AINFO << "Camera socket fd: " << sockfd_ << ", port: " << port_;
 }
 
 /** @brief Get one camera packet. */
@@ -118,44 +117,43 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
   size_t frame_len = 0;
   uint16_t pre_seq = 0;
 
-  while (true) {
+  do {
     if (!InputAvailable(POLL_TIMEOUT)) {
       return SOCKET_TIMEOUT;
     }
-    // Receive packets that should now be available from the
-    // socket using a blocking read.
+    // Receive packets that should now be available from the socket using
+    // a blocking read.
     ssize_t pdu_len = recvfrom(sockfd_, pdu_data, H265_PDU_SIZE, 0, NULL, NULL);
-
     if (pdu_len < 0) {
       if (errno != EWOULDBLOCK) {
-        AERROR << "recvfail from port " << port_;
+        AERROR << "Failed to receive package from port: " << port_;
         return RECIEVE_FAIL;
       }
     }
 
-    // AINFO << "recive " << pdu_len << " from port " << port_;
+    AINFO << "Recived pdu length: " << pdu_len << " from port: " << port_;
     HwPduPacket *pdu_pkg = reinterpret_cast<HwPduPacket *>(&pdu_[0]);
     uint16_t local_seq = ntohs(pdu_pkg->rtp_header.seq);
-    // AINFO << "package seq number " << local_seq;
-    if (local_seq - pre_seq != 1 && (pre_seq > 1) && (local_seq > 0)) {
-      AERROR << "error: port " << port_
-             << " package sequence is wrong, curent/pre " << local_seq << "/"
+    AINFO << "Package seq number: " << local_seq;
+    if (local_seq - pre_seq != 1 && pre_seq > 1 && local_seq > 0) {
+      AERROR << "Error! port: " << port_
+             << ", package sequence is wrong. curent/pre " << local_seq << "/"
              << pre_seq;
     }
     pre_seq = local_seq;
 
     if (ntohl(pdu_pkg->header.magic0) == HW_CAMERA_MAGIC0 &&
         ntohl(pdu_pkg->header.magic1) == HW_CAMERA_MAGIC1) {
-      // receive camera frame head
+      // Receive camera frame head
       if (total) {
-        AERROR << "error: lost package for last frame, left bytes = " << total;
+        AERROR << "Error! lost package for last frame, left bytes: " << total;
       }
-      // AINFO << "receive new frame from " << port_;
+      AINFO << "Received new frame from port: " << port_;
 
       uint32_t frame_id = ntohl(pdu_pkg->header.frame_id);
       if (frame_id - frame_id_ != 1 && frame_id_ > 1 && frame_id > 1) {
-        AERROR << "error: port " << port_
-               << " Frame losing, pre_frame_id/frame_id " << frame_id_ << "/"
+        AERROR << "Error! port: " << port_
+               << ", lose Frame. pre_frame_id/frame_id " << frame_id_ << "/"
                << frame_id;
       }
       frame_id_ = frame_id;
@@ -169,40 +167,37 @@ int SocketInput::GetFramePacket(std::shared_ptr<CompressedImage> h265Pb) {
       h265Pb->set_measurement_time(image_time.ToSecond());
       h265Pb->set_format("h265");
       h265Pb->set_frame_type(static_cast<int>(pdu_pkg->header.frame_type));
-      AINFO << "port " << port_
-            << ", receive frameSize = " << ntohl(pdu_pkg->header.frame_size)
-            << " frame type = " << static_cast<int>(pdu_pkg->header.frame_type)
-            << " PhyNo = " << static_cast<int>(pdu_pkg->header.PhyNo)
-            << " frame_id = " << frame_id;
+      AINFO << "Port: " << port_
+            << ", received frame size: " << ntohl(pdu_pkg->header.frame_size)
+            << ", frame type: " << static_cast<int>(pdu_pkg->header.frame_type)
+            << ", PhyNo: " << static_cast<int>(pdu_pkg->header.PhyNo)
+            << ", frame id: " << frame_id;
 
       frame_len = ntohl(pdu_pkg->header.frame_size);
       total = static_cast<int>(frame_len);
       frame_data = &buf_[0];
       continue;
-    } else {
-      // receive camera frame data
-      if (total > 0) {
-        pkg_len = static_cast<int>(pdu_len - sizeof(RtpHeader));
-        memcpy(frame_data, pdu_data + sizeof(RtpHeader), pkg_len);
-        total -= pkg_len;
-        frame_data += pkg_len;
-        // AINFO << "receive pkg data " << pkg_len << "/" << total << "/"
-        // << frame_len;
-      }
-      if (total <= 0) {
-        total = 0;
-        // AINFO << "receive frame data " << pkg_len << "/" << total << "/"
-        // << frame_len;
-        if (frame_len > 0) {
-          h265Pb->set_data(buf_, frame_len);
-          break;
-        } else {
-          AERROR << "error: frame info is error, frame len = " << frame_len;
-          continue;
-        }
-      }
     }
-  }
+    // Receive camera frame data
+    if (total > 0) {
+      pkg_len = static_cast<int>(pdu_len - sizeof(RtpHeader));
+      memcpy(frame_data, pdu_data + sizeof(RtpHeader), pkg_len);
+      total -= pkg_len;
+      frame_data += pkg_len;
+      // AINFO << "receive pkg data " << pkg_len << "/" << total << "/"
+      // << frame_len;
+    }
+    if (total <= 0) {
+      total = 0;
+      // AINFO << "receive frame data " << pkg_len << "/" << total << "/"
+      // << frame_len;
+      if (frame_len > 0) {
+        h265Pb->set_data(buf_, frame_len);
+        break;
+      }
+      AERROR << "Error! frame info is wrong. frame length: " << frame_len;
+    }
+  } while (true);
 
   return 0;
 }
@@ -217,40 +212,38 @@ bool SocketInput::InputAvailable(int timeout) {
   // which would cause this method to hang if the device is not
   // providing data.  We poll() the device first to make sure
   // the recvfrom() will not block.
-  // Note, however, that there is a known Linux kernel bug:
-  //   Under Linux, select() may report a socket file descriptor
-  //   as "ready for reading", while nevertheless a subsequent
-  //   read blocks.  This could for example happen when data has
-  //   arrived but upon examination has wrong checksum and is
-  //   discarded.  There may be other circumstances in which a
-  //   file descriptor is spuriously reported as ready.  Thus it
-  //   may be safer to use O_NONBLOCK on sockets that should not
-  //   block.
+  // Note that, however, there is a known Linux kernel bug:
+  // Under Linux, select() may report a socket file descriptor
+  // as "ready for reading", while nevertheless a subsequent
+  // read blocks.  This could for example happen when data has
+  // arrived but upon examination has wrong checksum and is
+  // discarded.  There may be other circumstances in which a
+  // file descriptor is spuriously reported as ready.  Thus it
+  // may be safer to use O_NONBLOCK on sockets that should not
+  // block.
 
   // poll() until input available
-
   do {
-    int retval = poll(fds, 1, POLL_TIMEOUT);
-
-    if (retval < 0) {  // poll() error?
+    int ret = poll(fds, 1, POLL_TIMEOUT);
+    if (ret < 0) {
       if (errno != EINTR) {
-        AERROR << "hwcamera h265 port " << port_
+        AERROR << "H265 camera port: " << port_
                << "poll() error: " << strerror(errno);
       }
       return false;
     }
 
-    if (retval == 0) {  // poll() timeout?
+    // Timeout
+    if (ret == 0) {
       return false;
     }
 
     if ((fds[0].revents & POLLERR) || (fds[0].revents & POLLHUP) ||
-        (fds[0].revents & POLLNVAL)) {  // device error?
-      AERROR << "h265 camera port " << port_
-             << "poll() reports h265camera error";
+        (fds[0].revents & POLLNVAL)) {
+      AERROR << "Error! poll failed on H265 camera port: " << port_;
       return false;
     }
-  } while ((fds[0].revents & POLLIN) == 0);
+  } while (!(fds[0].revents & POLLIN));
 
   return true;
 }

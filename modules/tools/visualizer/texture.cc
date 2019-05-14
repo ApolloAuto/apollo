@@ -28,8 +28,6 @@ Texture::Texture()
       data_(nullptr) {}
 
 bool Texture::UpdateData(const QImage& img) {
-  std::cout << "Image: ImageSize = " << img.byteCount()
-            << ", data_size_ = " << data_size_;
   if (data_size_ < img.byteCount()) {
     if (!data_) {
       delete[] data_;
@@ -72,21 +70,10 @@ bool Texture::UpdateData(
     is_size_changed_ = true;
   }
 
+  texture_format_ = GL_RGB;
   if (imgData->encoding() == std::string("yuyv")) {
     const GLubyte* src =
         reinterpret_cast<const GLubyte*>(imgData->data().c_str());
-
-    auto clamp = [](int v) -> GLubyte {
-      int ret = v;
-      if (v < 0) {
-        ret = 0;
-      }
-      if (v > 255) {
-        ret = 255;
-      }
-
-      return static_cast<GLubyte>(ret);
-    };
 
     GLubyte* dst = data_;
     for (std::size_t i = 0; i < imgData->data().size(); i += 4) {
@@ -99,19 +86,23 @@ bool Texture::UpdateData(
       u *= 100;
       v *= 409;
 
-      *dst++ = clamp((y + v + 128) >> 8);
-      *dst++ = clamp((y - u - v1 + 128) >> 8);
-      *dst++ = clamp((y + u1 + 128) >> 8);
+#define CLAMP(v) static_cast<GLubyte>((v) > 255 ? 255 : ((v) < 0 ? 0 : v))
+      *dst++ = CLAMP((y + v + 128) >> 8);
+      *dst++ = CLAMP((y - u - v1 + 128) >> 8);
+      *dst++ = CLAMP((y + u1 + 128) >> 8);
 
       y = 298 * (src[i + 2] - 16);
 
-      *dst++ = clamp((y + v + 128) >> 8);
-      *dst++ = clamp((y - u - v1 + 128) >> 8);
-      *dst++ = clamp((y + u1 + 128) >> 8);
+      *dst++ = CLAMP((y + v + 128) >> 8);
+      *dst++ = CLAMP((y - u - v1 + 128) >> 8);
+      *dst++ = CLAMP((y + u1 + 128) >> 8);
+#undef CLAMP
     }
-
   } else if (imgData->encoding() == std::string("rgb8")) {
     memcpy(data_, imgData->data().c_str(), imgSize);
+  } else if (imgData->encoding() == std::string("bgr8")) {
+    memcpy(data_, imgData->data().c_str(), imgSize);
+    texture_format_ = GL_BGR;
   } else {
     memset(data_, 0, imgSize);
     std::cerr << "Cannot support this format (" << imgData->encoding()
@@ -122,6 +113,5 @@ bool Texture::UpdateData(
   image_height_ = imgData->height();
   image_width_ = imgData->width();
 
-  texture_format_ = GL_RGB;
   return true;
 }

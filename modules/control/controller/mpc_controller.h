@@ -47,7 +47,7 @@ namespace control {
 /**
  * @class MPCController
  *
- * @brief MPCController, combined lateral and logitudinal controllers
+ * @brief MPCController, combined lateral and longitudinal controllers
  */
 class MPCController : public Controller {
  public:

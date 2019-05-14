@@ -37,11 +37,11 @@ cc_library(
         "message_traits.h",
     ],
     deps = [
-        "intra_message",
-        "message_header",
-        "protobuf_traits",
-        "py_message_traits",
-        "raw_message_traits",
+        ":intra_message",
+        ":message_header",
+        ":protobuf_traits",
+        ":py_message_traits",
+        ":raw_message_traits",
         "//cyber/base:macros",
     ],
 )
@@ -80,7 +80,7 @@ cc_library(
         "protobuf_traits.h",
     ],
     deps = [
-        "protobuf_factory",
+        ":protobuf_factory",
     ],
 )
 
@@ -90,7 +90,7 @@ cc_library(
         "py_message.h",
     ],
     deps = [
-        "protobuf_factory",
+        ":protobuf_factory",
     ],
 )
 
@@ -100,8 +100,8 @@ cc_library(
         "py_message_traits.h",
     ],
     deps = [
-        "protobuf_factory",
-        "py_message",
+        ":protobuf_factory",
+        ":py_message",
     ],
 )
 
@@ -111,7 +111,7 @@ cc_library(
         "raw_message.h",
     ],
     deps = [
-        "protobuf_factory",
+        ":protobuf_factory",
     ],
 )
 
@@ -146,8 +146,8 @@ cc_library(
         "raw_message_traits.h",
     ],
     deps = [
-        "protobuf_factory",
-        "raw_message",
+        ":protobuf_factory",
+        ":raw_message",
     ],
 )
 

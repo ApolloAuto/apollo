@@ -54,10 +54,6 @@ namespace canbus {
 namespace gem {
 
 class GemMessageManagerTest : public ::testing::Test {
- public:
-  GemMessageManagerTest() : manager_() {}
-  virtual void SetUp() {}
-
  protected:
   GemMessageManager manager_;
 };
@@ -66,49 +62,40 @@ TEST_F(GemMessageManagerTest, GetSendProtocols) {
   EXPECT_NE(manager_.GetMutableProtocolDataById(Accelcmd67::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Brakecmd6b::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Globalcmd69::ID), nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Headlightcmd76::ID) !=
-              nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Headlightcmd76::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Horncmd78::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Shiftcmd65::ID), nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Steeringcmd6d::ID) !=
-              nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringcmd6d::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Turncmd63::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Wipercmd90::ID), nullptr);
 }
 
 TEST_F(GemMessageManagerTest, GetRecvProtocols) {
   EXPECT_NE(manager_.GetMutableProtocolDataById(Accelrpt68::ID), nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Brakemotorrpt170::ID) !=
-              nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Brakemotorrpt271::ID) !=
-              nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Brakemotorrpt372::ID) !=
-              nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Brakemotorrpt170::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Brakemotorrpt271::ID), nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Brakemotorrpt372::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Brakerpt6c::ID), nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Datetimerpt83::ID) !=
-              nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Datetimerpt83::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Globalrpt6a::ID), nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Headlightrpt77::ID) !=
-              nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Headlightrpt77::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Hornrpt79::ID), nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Latlonheadingrpt82::ID) !=
-              nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(
-                  Parkingbrakestatusrpt80::ID) != nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Latlonheadingrpt82::ID),
+            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Parkingbrakestatusrpt80::ID),
+            nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Shiftrpt66::ID), nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Steeringmotorrpt173::ID) !=
-              nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Steeringmotorrpt274::ID) !=
-              nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Steeringmotorrpt375::ID) !=
-              nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Steeringrpt16e::ID) !=
-              nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringmotorrpt173::ID),
+            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringmotorrpt274::ID),
+            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringmotorrpt375::ID),
+            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Steeringrpt16e::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Turnrpt64::ID), nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Vehiclespeedrpt6f::ID) !=
-              nullptr);
-  EXPECT_TRUE(manager_.GetMutableProtocolDataById(Wheelspeedrpt7a::ID) !=
-              nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Vehiclespeedrpt6f::ID),
+            nullptr);
+  EXPECT_NE(manager_.GetMutableProtocolDataById(Wheelspeedrpt7a::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Wiperrpt91::ID), nullptr);
   EXPECT_NE(manager_.GetMutableProtocolDataById(Yawraterpt81::ID), nullptr);
 }

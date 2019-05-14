@@ -24,7 +24,7 @@ usermod -aG sudo "$DOCKER_USER"
 echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 cp -r /etc/skel/. /home/${DOCKER_USER}
 echo '
-export PATH=${PATH}:/apollo/scripts:/usr/local/miniconda2/bin
+export PATH=${PATH}:/apollo/scripts:/usr/local/miniconda/bin
 
 if [ -e "/apollo/scripts/apollo_base.sh" ]; then
   source /apollo/scripts/apollo_base.sh
@@ -51,6 +51,9 @@ if [ -e /dev/novatel1 ]; then
 fi
 if [ -e /dev/novatel2 ]; then
   chmod a+rw /dev/novatel2
+fi
+if [ -e /dev/ttyACM0 ]; then
+  chmod a+rw /dev/ttyACM0
 fi
 
 # setup camera device

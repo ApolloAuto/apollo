@@ -1,6 +1,9 @@
 import React from "react";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { observer } from "mobx-react";
-import classNames from "classnames";
+
+import ScenarioCollectionMonitor from "components/DataCollectionMonitor/ScenarioCollectionMonitor";
+
 @observer
 export default class DataCollectionMonitor extends React.Component {
     render() {
@@ -10,57 +13,26 @@ export default class DataCollectionMonitor extends React.Component {
             return <div className="no-data">No Data Found</div>;
         }
 
-        let overallResult = null;
-        if (dataCollectionProgress.has('Overall')) {
-            overallResult = (
-                <div key="Overall" className="category">
-                    <div className="category-progress-background overall-progress">
-                        <span className="category-progress"
-                            style={{ width: dataCollectionProgress.get('Overall') + "%" }} />
-                    </div>
-                </div>
-            );
-        }
+        const tabs = [];
+        const tabPanels = [];
+        dataCollectionProgress.entries().forEach(([scenarioName, categories]) => {
+            tabs.push(<Tab key={scenarioName}>{scenarioName}</Tab>);
 
-        const inProgressCategories = [];
-        const completedCategories = [];
-        dataCollectionUpdateStatus.forEach((isUpdated, description) => {
-            if (description === 'Overall') {
-                return;
-            }
-
-            const progressInPercentage = dataCollectionProgress.get(description);
-            const element = (
-                <div key={description} className="category">
-                    <div className={classNames({
-                        "category-description": true,
-                        "category-updated": isUpdated,
-                    })}>{`${description}:`}</div>
-                    <div className="category-progress-background">
-                        <span className="category-progress"
-                            style={{ width: progressInPercentage + "%" }} />
-                    </div>
-                </div>
+            tabPanels.push(
+                <TabPanel key={scenarioName}>
+                    <ScenarioCollectionMonitor
+                        statusMap={dataCollectionUpdateStatus.get(scenarioName)}
+                        progressMap={categories} />
+                </TabPanel>
             );
-            if (progressInPercentage >= 100.0) {
-                completedCategories.push(element);
-            } else {
-                inProgressCategories.push(element);
-            }
         });
 
         return (
             <div className="monitor data-collection-monitor">
-                <hr className="section-divider" data-content="Overall Progress" />
-                {overallResult}
-                {inProgressCategories.length > 0 &&
-                    <hr className="section-divider" data-content="Collecting Categories" />
-                }
-                {inProgressCategories}
-                {completedCategories.length > 0 &&
-                    <hr className="section-divider" data-content="Completed Categories" />
-                }
-                {completedCategories}
+                <Tabs>
+                    <TabList>{tabs}</TabList>
+                    {tabPanels}
+                </Tabs>
             </div>
         );
     }

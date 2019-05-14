@@ -18,7 +18,8 @@
 #include <algorithm>
 #include <map>
 
-#include "modules/common/util/file.h"
+#include "cyber/common/file.h"
+
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/inference/inference_factory.h"
 #include "modules/perception/inference/utils/resize.h"
@@ -28,10 +29,11 @@ namespace perception {
 namespace camera {
 
 using apollo::cyber::common::GetAbsolutePath;
+using apollo::cyber::common::GetProtoFromFile;
 
 bool DarkSCNNLaneDetector::Init(const LaneDetectorInitOptions &options) {
   std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);
-  if (!apollo::common::util::GetProtoFromFile(proto_path, &darkscnn_param_)) {
+  if (!GetProtoFromFile(proto_path, &darkscnn_param_)) {
     AINFO << "load proto param failed, root dir: " << options.root_dir;
     return false;
   }

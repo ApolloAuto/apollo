@@ -37,6 +37,7 @@ namespace traffic_light {
 
 using common::TrajectoryPoint;
 using common::time::Clock;
+using hdmap::HDMapUtil;
 using hdmap::PathOverlap;
 using perception::TrafficLight;
 
@@ -60,6 +61,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
 
   bool traffic_light_all_stop = true;
   bool traffic_light_all_green = true;
+  bool traffic_light_no_right_turn_on_red = false;
 
   for (const auto& traffic_light_overlap_id :
        GetContext()->current_traffic_light_overlap_ids) {
@@ -95,6 +97,8 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
     // check on traffic light color
     if (signal_color != TrafficLight::GREEN) {
       traffic_light_all_green = false;
+      traffic_light_no_right_turn_on_red =
+          CheckTrafficLightNoRightTurnOnRed(traffic_light_overlap_id);
       break;
     }
   }
@@ -103,20 +107,22 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
     return FinishStage(true);
   }
 
-  // when right_turn_on_red is enabled
-  if (scenario_config_.enable_right_turn_on_red()) {
-    // check on wait-time
-    if (traffic_light_all_stop && !traffic_light_all_green) {
-      if (GetContext()->stop_start_time == 0.0) {
-        GetContext()->stop_start_time = Clock::NowInSeconds();
-      } else {
-        auto start_time = GetContext()->stop_start_time;
-        const double wait_time = Clock::NowInSeconds() - start_time;
-        ADEBUG << "stop_start_time[" << start_time << "] wait_time["
-               << wait_time << "]";
-        if (wait_time >
-            scenario_config_.red_light_right_turn_stop_duration_sec()) {
-          return FinishStage(false);
+  if (!traffic_light_no_right_turn_on_red) {
+    // when right_turn_on_red is enabled
+    if (scenario_config_.enable_right_turn_on_red()) {
+      // check on wait-time
+      if (traffic_light_all_stop && !traffic_light_all_green) {
+        if (GetContext()->stop_start_time == 0.0) {
+          GetContext()->stop_start_time = Clock::NowInSeconds();
+        } else {
+          auto start_time = GetContext()->stop_start_time;
+          const double wait_time = Clock::NowInSeconds() - start_time;
+          ADEBUG << "stop_start_time[" << start_time << "] wait_time["
+                 << wait_time << "]";
+          if (wait_time >
+              scenario_config_.red_light_right_turn_stop_duration_sec()) {
+            return FinishStage(false);
+          }
         }
       }
     }
@@ -125,8 +131,26 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::Process(
   return Stage::RUNNING;
 }
 
+bool TrafficLightUnprotectedRightTurnStageStop::
+    CheckTrafficLightNoRightTurnOnRed(const std::string& traffic_light_id) {
+  hdmap::SignalInfoConstPtr traffic_light_ptr =
+      HDMapUtil::BaseMap().GetSignalById(hdmap::MakeMapId(traffic_light_id));
+  if (!traffic_light_ptr) {
+    return false;
+  }
+
+  const auto& signal = traffic_light_ptr->signal();
+  for (int i = 0; i < signal.sign_info_size(); i++) {
+    if (signal.sign_info(i).type() == hdmap::SignInfo::NO_RIGHT_TURN_ON_RED) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishScenario() {
-  PlanningContext::MutablePlanningStatus()->clear_traffic_light();
+  PlanningContext::Instance()->mutable_planning_status()->clear_traffic_light();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
@@ -141,13 +165,15 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageStop::FinishStage(
   } else {
     // creep
     // update PlanningContext
-    PlanningContext::MutablePlanningStatus()
+    PlanningContext::Instance()
+        ->mutable_planning_status()
         ->mutable_traffic_light()
         ->mutable_done_traffic_light_overlap_id()
         ->Clear();
     for (const auto& traffic_light_overlap_id :
          GetContext()->current_traffic_light_overlap_ids) {
-      PlanningContext::MutablePlanningStatus()
+      PlanningContext::Instance()
+          ->mutable_planning_status()
           ->mutable_traffic_light()
           ->add_done_traffic_light_overlap_id(traffic_light_overlap_id);
     }

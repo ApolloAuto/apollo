@@ -82,8 +82,7 @@ TEST(DistortionModelTest, omnidirectional_model_get_set_test) {
       pinhole_camera_model->get_intrinsic_params();
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
-      EXPECT_TRUE(fabs(intrinsic_params(i, j) - ret_intrinsic_mat(i, j)) <
-                  1.0e-6);
+      EXPECT_LT(fabs(intrinsic_params(i, j) - ret_intrinsic_mat(i, j)), 1.0e-6);
     }
   }
 }

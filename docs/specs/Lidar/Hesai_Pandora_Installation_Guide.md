@@ -32,8 +32,6 @@ Each Pandora includes a cable connection box and a corresponding cable bundle to
 
    On the interface box, a GPS port (SM06B-SRSS-TB) is provided to send the GPS signals as an input to the LiDAR. The detailed pinout is shown in the image below. 
     
-![Pinout_table](images/Pandora_pinout_table.png)
-
    | Pin # | Input/output | Comment                                         |
    | ----- | ------------ | ----------------------------------------------- |
    | 1     | Input        | PPS signal (3.3V)                               |

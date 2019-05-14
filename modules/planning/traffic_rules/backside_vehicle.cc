@@ -77,8 +77,8 @@ Status BacksideVehicle::ApplyRule(
     Frame* const, ReferenceLineInfo* const reference_line_info) {
   auto* path_decision = reference_line_info->path_decision();
   const auto& adc_sl_boundary = reference_line_info->AdcSlBoundary();
-  if (reference_line_info->Lanes()
-          .IsOnSegment()) {  // The lane keeping reference line.
+  // The lane keeping reference line.
+  if (reference_line_info->Lanes().IsOnSegment()) {
     MakeLaneKeepingObstacleDecision(adc_sl_boundary, path_decision);
   }
   return Status::OK();

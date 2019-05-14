@@ -33,7 +33,7 @@ bool TrafficLightCameraPerception::Init(
     const CameraPerceptionInitOptions &options) {
   std::string work_root = "";
   if (options.use_cyber_work_root) {
-    GetCyberWorkRoot(&work_root);
+    work_root = GetCyberWorkRoot();
   }
   std::string proto_path = GetAbsolutePath(options.root_dir, options.conf_file);
   proto_path = GetAbsolutePath(work_root, proto_path);

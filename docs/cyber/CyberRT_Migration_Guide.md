@@ -74,7 +74,7 @@ As shown below, Cyber-RT remove the src folder and pull all source code in the s
 
 ### Cyber-RT
 - BUILD
-- listener.ccc
+- listener.cc
 - talker.cc
 - proto
   - BUILD

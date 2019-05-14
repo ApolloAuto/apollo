@@ -47,8 +47,8 @@ double ComputePtsBoxLocationSimilarity(const ProjectionCachePtr& cache,
   }
   Eigen::Vector2d mean_pixel_dist(0.0, 0.0);
   // calculate mean x y pixel distance
-  const size_t& start_ind = object->GetStartInd();
-  const size_t& end_ind = object->GetEndInd();
+  const size_t start_ind = object->GetStartInd();
+  const size_t end_ind = object->GetEndInd();
   if (end_ind - start_ind >= check_augmented_iou_minimum_pts_num) {
     base::BBox2DF velo_bbox = object->GetBox();
     float augmented_iou =
