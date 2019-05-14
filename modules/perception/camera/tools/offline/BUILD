@@ -8,6 +8,7 @@ cc_library(
         "visualizer.cc",
     ],
     hdrs = [
+        "keycode.h",
         "visualizer.h",
     ],
     linkopts = [
