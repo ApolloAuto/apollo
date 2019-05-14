@@ -47,7 +47,12 @@ class ScenarioManager final {
 
   void RegisterScenarios();
 
+  ScenarioConfig::ScenarioType SelectBareIntersectionScenario(
+      const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap);
+
   ScenarioConfig::ScenarioType SelectChangeLaneScenario(const Frame& frame);
+
+  ScenarioConfig::ScenarioType SelectPullOverScenario(const Frame& frame);
 
   ScenarioConfig::ScenarioType SelectStopSignScenario(
       const Frame& frame, const hdmap::PathOverlap& stop_sign_overlap);
@@ -55,14 +60,10 @@ class ScenarioManager final {
   ScenarioConfig::ScenarioType SelectTrafficLightScenario(
       const Frame& frame, const hdmap::PathOverlap& traffic_light_overlap);
 
+  ScenarioConfig::ScenarioType SelectValetParkingScenario(const Frame& frame);
+
   ScenarioConfig::ScenarioType SelectYieldSignScenario(
       const Frame& frame, const hdmap::PathOverlap& yield_sign_overlap);
-
-  ScenarioConfig::ScenarioType SelectBareIntersectionScenario(
-      const Frame& frame, const hdmap::PathOverlap& pnc_junction_overlap);
-
-  ScenarioConfig::ScenarioType SelectSidePassScenario(const Frame& frame);
-  ScenarioConfig::ScenarioType SelectValetParkingScenario(const Frame& frame);
 
   // functions for scenario voter implementation
   // do NOT delete the code yet
@@ -77,12 +78,17 @@ class ScenarioManager final {
   void ScenarioDispatch(const common::TrajectoryPoint& ego_point,
                         const Frame& frame);
 
+  bool IsBareIntersectionScenario(
+      const ScenarioConfig::ScenarioType& scenario_type);
   bool IsStopSignScenario(const ScenarioConfig::ScenarioType& scenario_type);
   bool IsTrafficLightScenario(
       const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContext(const Frame& frame,
                              const ScenarioConfig::ScenarioType& scenario_type);
+
+  void UpdatePlanningContextBareIntersectionScenario(
+      const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);
 
   void UpdatePlanningContextStopSignScenario(
       const Frame& frame, const ScenarioConfig::ScenarioType& scenario_type);

@@ -242,7 +242,7 @@ class Obstacle {
   bool SetId(const perception::PerceptionObstacle& perception_obstacle,
              Feature* feature, const int prediction_id = -1);
 
-  bool SetType(const perception::PerceptionObstacle& perception_obstacle,
+  void SetType(const perception::PerceptionObstacle& perception_obstacle,
                Feature* feature);
 
   void SetIsNearJunction(
@@ -316,8 +316,7 @@ class Obstacle {
 
   void GetNeighborLaneSegments(
       std::shared_ptr<const apollo::hdmap::LaneInfo> center_lane_info,
-      bool is_left,
-      int recursion_depth,
+      bool is_left, int recursion_depth,
       std::list<std::string>* const lane_ids_ordered,
       std::unordered_set<std::string>* const existing_lane_ids);
 

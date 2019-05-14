@@ -62,9 +62,10 @@ void StopSignUnprotectedScenario::Init() {
     return;
   }
 
-  const std::string stop_sign_overlap_id =
-      PlanningContext::Planningstatus().stop_sign()
-        .current_stop_sign_overlap_id();
+  const std::string stop_sign_overlap_id = PlanningContext::Instance()
+                                               ->planning_status()
+                                               .stop_sign()
+                                               .current_stop_sign_overlap_id();
   if (stop_sign_overlap_id.empty()) {
     AERROR << "Could not find stop sign";
     return;
@@ -121,11 +122,6 @@ std::unique_ptr<Stage> StopSignUnprotectedScenario::CreateStage(
     ptr->SetContext(&context_);
   }
   return ptr;
-}
-
-bool StopSignUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario, const Frame& frame) {
-  return false;
 }
 
 /*

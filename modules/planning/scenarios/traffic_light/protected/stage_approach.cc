@@ -58,13 +58,12 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
 
   bool traffic_light_all_done = true;
   for (const auto& traffic_light_overlap_id :
-      GetContext()->current_traffic_light_overlap_ids) {
+       GetContext()->current_traffic_light_overlap_ids) {
     // get overlap along reference line
     PathOverlap* current_traffic_light_overlap =
-      scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          traffic_light_overlap_id,
-          ReferenceLineInfo::SIGNAL);
+        scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                  traffic_light_overlap_id,
+                                                  ReferenceLineInfo::SIGNAL);
     if (!current_traffic_light_overlap) {
       continue;
     }
@@ -76,8 +75,7 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
     const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
     const double distance_adc_to_stop_line =
         current_traffic_light_overlap->start_s - adc_front_edge_s;
-    auto signal_color =
-        frame->GetSignal(traffic_light_overlap_id).color();
+    auto signal_color = frame->GetSignal(traffic_light_overlap_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
            << "] start_s[" << current_traffic_light_overlap->start_s
            << "] distance_adc_to_stop_line[" << distance_adc_to_stop_line
@@ -105,19 +103,20 @@ Stage::StageStatus TrafficLightProtectedStageApproach::Process(
 }
 
 Stage::StageStatus TrafficLightProtectedStageApproach::FinishScenario() {
-  PlanningContext::MutablePlanningStatus()->clear_traffic_light();
+  PlanningContext::Instance()->mutable_planning_status()->clear_traffic_light();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
 }
 
 Stage::StageStatus TrafficLightProtectedStageApproach::FinishStage() {
-  PlanningContext::MutablePlanningStatus()->mutable_traffic_light()
-      ->mutable_done_traffic_light_overlap_id()->Clear();
+  auto* traffic_light = PlanningContext::Instance()
+                            ->mutable_planning_status()
+                            ->mutable_traffic_light();
+  traffic_light->clear_done_traffic_light_overlap_id();
   for (const auto& traffic_light_overlap_id :
-      GetContext()->current_traffic_light_overlap_ids) {
-    PlanningContext::MutablePlanningStatus()->mutable_traffic_light()
-        ->add_done_traffic_light_overlap_id(traffic_light_overlap_id);
+       GetContext()->current_traffic_light_overlap_ids) {
+    traffic_light->add_done_traffic_light_overlap_id(traffic_light_overlap_id);
   }
 
   next_stage_ = ScenarioConfig::TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE;

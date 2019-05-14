@@ -20,5 +20,6 @@ shapely
 # Data format
 PyYAML
 h5py
+pypcd
 pytz
 utm

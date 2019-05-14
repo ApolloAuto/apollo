@@ -38,7 +38,7 @@ TEST(KalmanTest, copy_test) {
     kf.Correct(measure);
   }
   KalmanFilterConstVelocity kf2 = kf;
-  EXPECT_TRUE(kf2.get_state() == kf.get_state());
+  EXPECT_EQ(kf2.get_state(), kf.get_state());
 }
 
 TEST(KalmanTest, zero_test) {
@@ -53,7 +53,7 @@ TEST(KalmanTest, zero_test) {
   for (int i = 0; i < 10; ++i) {
     kf.Predict(10);
     kf.Correct(measure);
-    EXPECT_TRUE(state == kf.get_state());
+    EXPECT_EQ(state, kf.get_state());
   }
 }
 
@@ -77,10 +77,10 @@ TEST(KalmanTest, kalman_test) {
     kf.Correct(z);
     Eigen::Vector4d state = kf.get_state();
     if (i > 10) {
-      EXPECT_TRUE(std::fabs(state[2] - speed[0]) < 0.05);
-      EXPECT_TRUE(std::fabs(state[3] - speed[1]) < 0.05);
-      EXPECT_TRUE(std::fabs(state[0] - x[0]) < 0.05);
-      EXPECT_TRUE(std::fabs(state[1] - x[1]) < 0.05);
+      EXPECT_LT(std::fabs(state[2] - speed[0]), 0.05);
+      EXPECT_LT(std::fabs(state[3] - speed[1]), 0.05);
+      EXPECT_LT(std::fabs(state[0] - x[0]), 0.05);
+      EXPECT_LT(std::fabs(state[1] - x[1]), 0.05);
     }
   }
 }
@@ -289,7 +289,7 @@ TEST(KalmanConstTest, const_filter_test) {
       filter.Correct(param);
 
       auto state = filter.get_state();
-      EXPECT_TRUE(std::fabs(state(0, 0)) < 1.0);
+      EXPECT_LT(std::fabs(state(0, 0)), 1.0);
     }
   }
 
@@ -299,7 +299,7 @@ TEST(KalmanConstTest, const_filter_test) {
     param << 0.0;
     EXPECT_FALSE(filter.Predict(1.0));
     filter.Correct(param);
-    EXPECT_TRUE((filter.get_state() - param).norm() < 1e-4);
+    EXPECT_LT((filter.get_state() - param).norm(), 1e-4);
   }
 }
 

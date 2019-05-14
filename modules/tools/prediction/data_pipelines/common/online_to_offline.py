@@ -154,7 +154,7 @@ class LabelGenerator(object):
     @input idx_curr: The index of the current Feature to be labelled.
                      We will look at the subsequent Features following this
                      one to complete labeling.
-    @output: All saved as class variables in observation_dict, 
+    @output: All saved as class variables in observation_dict,
              including: its trajectory info and its lane changing info.
     '''
     def ObserveFeatureSequence(self, feature_sequence, idx_curr):
@@ -384,7 +384,7 @@ class LabelGenerator(object):
                                 lane_sequence.label = -1
                                 lane_sequence.time_to_lane_edge = -1.0
                                 lane_sequence.time_to_lane_center = -1.0
-                
+
                 for lane_sequence in feature.lane.lane_graph.lane_sequence:
                     lane_sequence_dict[lane_sequence.lane_sequence_id] = [lane_sequence.label, \
                    lane_sequence.time_to_lane_center, lane_sequence.time_to_lane_edge]

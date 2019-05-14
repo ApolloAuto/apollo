@@ -67,7 +67,7 @@ TEST(ShmDispatcherTest, on_message) {
   auto transmitter =
       Transport::Instance()->CreateTransmitter<message::RawMessage>(
           oppo_attr, proto::OptionalMode::SHM);
-  EXPECT_TRUE(transmitter != nullptr);
+  EXPECT_NE(transmitter, nullptr);
 
   auto send_msg = std::make_shared<message::RawMessage>("raw_message");
   transmitter->Transmit(send_msg);

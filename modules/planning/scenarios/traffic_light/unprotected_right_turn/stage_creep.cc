@@ -71,13 +71,12 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
   PathOverlap* traffic_light = nullptr;
   bool traffic_light_all_green = true;
   for (const auto& traffic_light_overlap_id :
-      GetContext()->current_traffic_light_overlap_ids) {
+       GetContext()->current_traffic_light_overlap_ids) {
     // get overlap along reference line
     PathOverlap* current_traffic_light_overlap =
-      scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          traffic_light_overlap_id,
-          ReferenceLineInfo::SIGNAL);
+        scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                  traffic_light_overlap_id,
+                                                  ReferenceLineInfo::SIGNAL);
     if (!current_traffic_light_overlap) {
       continue;
     }
@@ -86,8 +85,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
     reference_line_info.SetJunctionRightOfWay(
         current_traffic_light_overlap->start_s, false);
 
-    auto signal_color =
-        frame->GetSignal(traffic_light_overlap_id).color();
+    auto signal_color = frame->GetSignal(traffic_light_overlap_id).color();
     ADEBUG << "traffic_light_overlap_id[" << traffic_light_overlap_id
            << "] start_s[" << current_traffic_light_overlap->start_s
            << "] color[" << signal_color << "]";
@@ -131,7 +129,7 @@ Stage::StageStatus TrafficLightUnprotectedRightTurnStageCreep::Process(
 
 Stage::StageStatus
 TrafficLightUnprotectedRightTurnStageCreep::FinishScenario() {
-  PlanningContext::MutablePlanningStatus()->clear_traffic_light();
+  PlanningContext::Instance()->mutable_planning_status()->clear_traffic_light();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;

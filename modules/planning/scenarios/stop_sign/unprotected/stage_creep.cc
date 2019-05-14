@@ -30,8 +30,8 @@
 #include "modules/map/pnc_map/path.h"
 #include "modules/planning/common/frame.h"
 #include "modules/planning/common/planning_context.h"
-#include "modules/planning/common/util/util.h"
 #include "modules/planning/common/speed_profile_generator.h"
+#include "modules/planning/common/util/util.h"
 #include "modules/planning/scenarios/util/util.h"
 #include "modules/planning/tasks/deciders/decider_creep.h"
 
@@ -66,10 +66,9 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
 
   // get overlap along reference line
   PathOverlap* current_stop_sign_overlap =
-      scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          stop_sign_overlap_id,
-          ReferenceLineInfo::STOP_SIGN);
+      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                stop_sign_overlap_id,
+                                                ReferenceLineInfo::STOP_SIGN);
   if (!current_stop_sign_overlap) {
     return FinishScenario();
   }
@@ -84,6 +83,11 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
   const double timeout_sec = scenario_config_.creep_timeout_sec();
   auto* task = dynamic_cast<DeciderCreep*>(FindTask(TaskConfig::DECIDER_CREEP));
 
+  if (task == nullptr) {
+    AERROR << "task is nullptr";
+    return FinishStage();
+  }
+
   double creep_stop_s =
       stop_sign_end_s + task->FindCreepDistance(*frame, reference_line_info);
   const double distance =
@@ -94,8 +98,8 @@ Stage::StageStatus StopSignUnprotectedStageCreep::Process(
         SpeedProfileGenerator::GenerateFixedDistanceCreepProfile(0.0, 0);
   }
 
-  if (task && task->CheckCreepDone(*frame, reference_line_info, stop_sign_end_s,
-                                   wait_time, timeout_sec)) {
+  if (task->CheckCreepDone(*frame, reference_line_info, stop_sign_end_s,
+                           wait_time, timeout_sec)) {
     return FinishStage();
   }
 

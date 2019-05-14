@@ -86,16 +86,15 @@ message GnssBestPose {
   optional float differential_age = 14;   // differential position age (sec)
   optional float solution_age = 15;       // solution age (sec)
   optional uint32 num_sats_tracked = 16;  // number of satellites tracked
-  optional uint32 num_sats_in_solution =
-      17;  // number of satellites used in solution
-  optional uint32 num_sats_l1 =
-      18;  // number of L1/E1/B1 satellites used in solution
-  optional uint32 num_sats_multi =
-      19;  // number of multi-frequency satellites used in solution
+  // number of satellites used in solution
+  optional uint32 num_sats_in_solution = 17;
+  // number of L1/E1/B1 satellites used in solution
+  optional uint32 num_sats_l1 = 18;
+  // number of multi-frequency satellites used in solution
+  optional uint32 num_sats_multi = 19;
   optional uint32 reserved = 20;  // reserved
-  optional uint32 extended_solution_status =
-      21;  // extended solution status - OEMV and
-           // greater only
+  // extended solution status - OEMV and greater only
+  optional uint32 extended_solution_status = 21;
   optional uint32 galileo_beidou_used_mask = 22;
   optional uint32 gps_glonass_used_mask = 23;
 }

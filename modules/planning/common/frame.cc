@@ -44,12 +44,10 @@ namespace planning {
 
 using apollo::common::ErrorCode;
 using apollo::common::Status;
-using apollo::common::time::Clock;
 using apollo::common::math::Box2d;
 using apollo::common::math::Polygon2d;
+using apollo::common::time::Clock;
 using apollo::prediction::PredictionObstacles;
-
-constexpr double kMathEpsilon = 1e-8;
 
 FrameHistory::FrameHistory()
     : IndexedQueue<uint32_t, Frame>(FLAGS_max_history_frame_num) {}
@@ -124,14 +122,11 @@ bool Frame::Rerouting() {
     return false;
   }
 
-  PlanningContext::MutablePlanningStatus()
-      ->mutable_rerouting()
-      ->set_need_rerouting(true);
-
-  PlanningContext::MutablePlanningStatus()
-      ->mutable_rerouting()
-      ->mutable_routing_request()
-      ->CopyFrom(request);
+  auto *rerouting = PlanningContext::Instance()
+                        ->mutable_planning_status()
+                        ->mutable_rerouting();
+  rerouting->set_need_rerouting(true);
+  *rerouting->mutable_routing_request() = request;
 
   monitor_logger_buffer_.INFO("Planning send Rerouting request");
   return true;
@@ -175,12 +170,6 @@ bool Frame::CreateReferenceLineInfo(
                                       *ref_line_iter, *segments_iter);
     ++ref_line_iter;
     ++segments_iter;
-  }
-
-  if (FLAGS_enable_change_lane_decider &&
-      !change_lane_decider_.Apply(&reference_line_info_)) {
-    AERROR << "Failed to apply change lane decider";
-    return false;
   }
 
   if (reference_line_info_.size() == 2) {
@@ -334,6 +323,7 @@ Status Frame::Init(
     const std::list<ReferenceLine> &reference_lines,
     const std::list<hdmap::RouteSegments> &segments,
     const std::vector<routing::LaneWaypoint> &future_route_waypoints) {
+  // TODO(QiL): refactor this to avoid redundant nullptr checks in scenarios.
   auto status = InitFrameData();
   if (!status.ok()) {
     AERROR << "failed to init frame:" << status.ToString();
@@ -345,9 +335,6 @@ Status Frame::Init(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   future_route_waypoints_ = future_route_waypoints;
-
-  open_space_info_ = std::make_unique<OpenSpaceInfo>();
-
   return Status::OK();
 }
 
@@ -373,7 +360,7 @@ Status Frame::InitFrameData() {
        Obstacle::CreateObstacles(*local_view_.prediction_obstacles)) {
     AddObstacle(*ptr);
   }
-  if (FLAGS_enable_collision_detection && planning_start_point_.v() < 1e-3) {
+  if (planning_start_point_.v() < 1e-3) {
     const auto *collision_obstacle = FindCollisionObstacle();
     if (collision_obstacle != nullptr) {
       std::string err_str =
@@ -490,14 +477,14 @@ void Frame::ReadTrafficLights() {
            << " seconds.";
     return;
   }
-  for (const auto& traffic_light : traffic_light_detection->traffic_light()) {
+  for (const auto &traffic_light : traffic_light_detection->traffic_light()) {
     traffic_lights_[traffic_light.id()] = &traffic_light;
   }
 }
 
 perception::TrafficLight Frame::GetSignal(
-    const std::string& traffic_light_id) const {
-  const auto* result =
+    const std::string &traffic_light_id) const {
+  const auto *result =
       apollo::common::util::FindPtrOrNull(traffic_lights_, traffic_light_id);
   if (result == nullptr) {
     perception::TrafficLight traffic_light;

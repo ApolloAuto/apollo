@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "modules/prediction/predictor/sequence/sequence_predictor.h"
 
@@ -47,63 +47,29 @@ class InteractionPredictor : public SequencePredictor {
   void Predict(Obstacle* obstacle) override;
 
  private:
-  class LatLonPolynomialBundle {
-   public:
-    LatLonPolynomialBundle() = default;
-    ~LatLonPolynomialBundle() = default;
-    LatLonPolynomialBundle(
-        const std::array<double, 6>& lat_polynomial_coeffs,
-        const std::array<double, 5>& lon_polynomial_coeffs,
-        const double lat_end_t,
-        const double lon_end_t,
-        const double lon_end_v) :
-      lat_polynomial_coeffs_(lat_polynomial_coeffs),
-      lon_polynomial_coeffs_(lon_polynomial_coeffs),
-      lat_end_t_(lat_end_t),
-      lon_end_t_(lon_end_t),
-      lon_end_v_(lon_end_v) {}
-
-    std::array<double, 6> lat_polynomial_coeffs() const {
-      return lat_polynomial_coeffs_;
-    }
-    std::array<double, 5> lon_polynomial_coeffs() const {
-      return lon_polynomial_coeffs_;
-    }
-    double lat_end_t() const { return lat_end_t_; }
-    double lon_end_t() const { return lon_end_t_; }
-    double lon_end_v() const { return lon_end_v_; }
-
-   private:
-    std::array<double, 6> lat_polynomial_coeffs_;
-    std::array<double, 5> lon_polynomial_coeffs_;
-    double lat_end_t_;
-    double lon_end_t_;
-    double lon_end_v_;
-  };
-
   void Clear();
 
   void BuildADCTrajectory(const double time_resolution);
 
   bool DrawTrajectory(
-    const Obstacle& obstacle,
-    const LaneSequence& lane_sequence,
-    const double lon_acceleration,
-    const double total_time, const double period,
-    std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
+      const Obstacle& obstacle, const LaneSequence& lane_sequence,
+      const double lon_acceleration, const double total_time,
+      const double period,
+      std::vector<apollo::common::TrajectoryPoint>* trajectory_points);
 
-  double ComputeTrajectoryCost(
-      const Obstacle& obstacle,
-      const LaneSequence& lane_sequence,
-      const double acceleration);
+  double ComputeTrajectoryCost(const Obstacle& obstacle,
+                               const LaneSequence& lane_sequence,
+                               const double acceleration);
 
-  double CentripetalAccelerationCost(
-      const LaneSequence& lane_sequence,
-      const double speed, const double acceleration);
+  double LongitudinalAccelerationCost(const double acceleration);
 
-  double CollisionWithEgoVehicleCost(
-      const LaneSequence& lane_sequence,
-      const double speed, const double acceleration);
+  double CentripetalAccelerationCost(const LaneSequence& lane_sequence,
+                                     const double speed,
+                                     const double acceleration);
+
+  double CollisionWithEgoVehicleCost(const LaneSequence& lane_sequence,
+                                     const double speed,
+                                     const double acceleration);
 
   bool LowerRightOfWayThanEgo(const Obstacle& obstacle,
                               const LaneSequence& lane_sequence);

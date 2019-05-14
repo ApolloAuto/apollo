@@ -54,7 +54,7 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
   }
 
   const auto& traffic_light_status =
-      PlanningContext::Planningstatus().traffic_light();
+      PlanningContext::Instance()->planning_status().traffic_light();
 
   if (traffic_light_status.current_traffic_light_overlap_id_size() == 0) {
     AERROR << "Could not find traffic-light(s)";
@@ -63,7 +63,7 @@ void TrafficLightUnprotectedRightTurnScenario::Init() {
 
   context_.current_traffic_light_overlap_ids.clear();
   for (int i = 0;
-      i < traffic_light_status.current_traffic_light_overlap_id_size(); i++) {
+       i < traffic_light_status.current_traffic_light_overlap_id_size(); i++) {
     const std::string traffic_light_overlap_id =
         traffic_light_status.current_traffic_light_overlap_id(i);
     hdmap::SignalInfoConstPtr traffic_light =
@@ -118,11 +118,6 @@ std::unique_ptr<Stage> TrafficLightUnprotectedRightTurnScenario::CreateStage(
     ptr->SetContext(&context_);
   }
   return ptr;
-}
-
-bool TrafficLightUnprotectedRightTurnScenario::IsTransferable(
-    const Scenario& current_scenario, const Frame& frame) {
-  return false;
 }
 
 /*

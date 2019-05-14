@@ -37,9 +37,6 @@ class NarrowStreetUTurnScenario : public Scenario {
 
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
-
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
 };
 
 }  // namespace narrow_street_u_turn

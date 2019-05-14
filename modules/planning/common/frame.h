@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -40,7 +41,6 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/status/status.h"
-#include "modules/planning/common/change_lane_decider.h"
 #include "modules/planning/common/indexed_queue.h"
 #include "modules/planning/common/local_view.h"
 #include "modules/planning/common/obstacle.h"
@@ -130,24 +130,13 @@ class Frame {
     return current_frame_planned_trajectory_;
   }
 
-  // TODO(Qi, Jinyun): check the usage in open space planner
-  //                   and remove it from frame
-  planning_internal::OpenSpaceDebug *mutable_open_space_debug() {
-    return &open_space_debug_;
+  void set_current_frame_planned_path(
+      DiscretizedPath current_frame_planned_path) {
+    current_frame_planned_path_ = std::move(current_frame_planned_path);
   }
 
-  const planning_internal::OpenSpaceDebug &open_space_debug() {
-    return open_space_debug_;
-  }
-
-  // TODO(Qi, Jinyun): check the usage in open space planner
-  //                   and remove it from frame
-  std::vector<common::TrajectoryPoint> *mutable_last_stitching_trajectory() {
-    return &stitching_trajectory_;
-  }
-
-  const std::vector<common::TrajectoryPoint> &last_stitching_trajectory() {
-    return stitching_trajectory_;
+  const DiscretizedPath &current_frame_planned_path() const {
+    return current_frame_planned_path_;
   }
 
   const bool is_near_destination() const { return is_near_destination_; }
@@ -163,12 +152,11 @@ class Frame {
 
   ThreadSafeIndexedObstacles *GetObstacleList() { return &obstacles_; }
 
-  const OpenSpaceInfo &open_space_info() const { return *open_space_info_; }
+  const OpenSpaceInfo &open_space_info() const { return open_space_info_; }
 
-  OpenSpaceInfo *mutable_open_space_info() { return open_space_info_.get(); }
+  OpenSpaceInfo *mutable_open_space_info() { return &open_space_info_; }
 
-  perception::TrafficLight GetSignal(
-      const std::string& traffic_light_id) const;
+  perception::TrafficLight GetSignal(const std::string &traffic_light_id) const;
 
  private:
   common::Status InitFrameData();
@@ -210,24 +198,24 @@ class Frame {
   const ReferenceLineInfo *drive_reference_line_info_ = nullptr;
 
   ThreadSafeIndexedObstacles obstacles_;
-  std::unordered_map<std::string, const perception::TrafficLight*>
+  std::unordered_map<std::string, const perception::TrafficLight *>
       traffic_lights_;
 
-  ChangeLaneDecider change_lane_decider_;
-  ADCTrajectory current_frame_planned_trajectory_;  // last published trajectory
+  // current frame published trajectory
+  ADCTrajectory current_frame_planned_trajectory_;
 
-  // debug info for open space planner
-  planning_internal::OpenSpaceDebug open_space_debug_;
-  // stitching trajectory for open space planner
-  std::vector<common::TrajectoryPoint> stitching_trajectory_;
+  // current frame path for future possible speed fallback
+  DiscretizedPath current_frame_planned_path_;
 
   const ReferenceLineProvider *reference_line_provider_ = nullptr;
 
-  std::unique_ptr<OpenSpaceInfo> open_space_info_;
+  OpenSpaceInfo open_space_info_;
 
   std::vector<routing::LaneWaypoint> future_route_waypoints_;
 
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
+
+  std::tuple<bool, double, double, double> pull_over_info_;
 };
 
 class FrameHistory : public IndexedQueue<uint32_t, Frame> {

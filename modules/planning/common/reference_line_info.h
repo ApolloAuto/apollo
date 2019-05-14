@@ -34,8 +34,10 @@
 #include "modules/planning/proto/lattice_structure.pb.h"
 #include "modules/planning/proto/planning.pb.h"
 
+#include "modules/map/hdmap/hdmap_common.h"
 #include "modules/map/pnc_map/pnc_map.h"
 #include "modules/planning/common/path/path_data.h"
+#include "modules/planning/common/path_boundary.h"
 #include "modules/planning/common/path_decision.h"
 #include "modules/planning/common/speed/speed_data.h"
 #include "modules/planning/common/st_graph_data.h"
@@ -50,20 +52,15 @@ namespace planning {
  */
 class ReferenceLineInfo {
  public:
-  enum class PathDataType {
-    REGULAR_PATH,
-    FALLBACK_PATH,
-    REFERENCE_LINE_PATH,
-  };
+  enum class LaneType { LeftForward, LeftReverse, RightForward, RightReverse };
   ReferenceLineInfo() = default;
-  ReferenceLineInfo(const common::VehicleState& vehicle_state,
-                    const common::TrajectoryPoint& adc_planning_point,
-                    const ReferenceLine& reference_line,
-                    const hdmap::RouteSegments& segments);
+
+  explicit ReferenceLineInfo(const common::VehicleState& vehicle_state,
+                             const common::TrajectoryPoint& adc_planning_point,
+                             const ReferenceLine& reference_line,
+                             const hdmap::RouteSegments& segments);
 
   bool Init(const std::vector<const Obstacle*>& obstacles);
-
-  bool IsInited() const;
 
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   Obstacle* AddObstacle(const Obstacle* obstacle);
@@ -72,15 +69,15 @@ class ReferenceLineInfo {
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
+
   const ReferenceLine& reference_line() const;
+  ReferenceLine* mutable_reference_line();
 
   double SDistanceToDestination() const;
   bool ReachedDestination() const;
 
   void SetTrajectory(const DiscretizedTrajectory& trajectory);
-
   const DiscretizedTrajectory& trajectory() const;
-  double TrajectoryLength() const;
 
   double Cost() const { return cost_; }
   void AddCost(double cost) { cost_ += cost; }
@@ -91,6 +88,12 @@ class ReferenceLineInfo {
   void SetStopPoint(const StopPoint& stop_point);
   void SetCruiseSpeed(double speed);
   const PlanningTarget& planning_target() const { return planning_target_; }
+
+  hdmap::LaneInfoConstPtr LocateLaneInfo(const double s) const;
+
+  bool GetNeighborLaneInfo(const ReferenceLineInfo::LaneType lane_type,
+                           const double s, hdmap::Id* ptr_lane_id,
+                           double* ptr_lane_width) const;
 
   /**
    * @brief check if current reference line is started from another reference
@@ -106,8 +109,6 @@ class ReferenceLineInfo {
   LatencyStats* mutable_latency_stats() { return &latency_stats_; }
   const LatencyStats& latency_stats() const { return latency_stats_; }
 
-  void SetFeasiblePathData(PathDataType tag) { feasible_path_data_ = tag; }
-  PathDataType GetFeasiblePathData() { return feasible_path_data_; }
   const PathData& path_data() const;
   const PathData& fallback_path_data() const;
   const SpeedData& speed_data() const;
@@ -161,7 +162,7 @@ class ReferenceLineInfo {
 
   const hdmap::Lane::LaneTurn& GetPathTurnType(const double s) const;
 
-  const bool GetIntersectionRighoffRoad(
+  const bool GetIntersectionRightofWayStatus(
       const hdmap::PathOverlap& pnc_junction_overlap) const;
 
   double OffsetToOtherReferenceLine() const {
@@ -171,42 +172,24 @@ class ReferenceLineInfo {
     offset_to_other_reference_line_ = offset;
   }
 
-  void GetPathBoundaries(
-      std::vector<std::pair<double, double>>* const ptr_path_boundaries,
-      double* const ptr_start_s, double* const ptr_resolution_s) {
-    *ptr_path_boundaries = path_boundaries_;
-    *ptr_start_s = path_boundaries_s_start_;
-    *ptr_resolution_s = path_boundaries_s_resolution_;
-  }
+  const std::vector<PathBoundary>& GetCandidatePathBoundaries() const;
 
-  void SetPathBoundaries(
-      const std::vector<std::pair<double, double>>& path_boundaries,
-      const double start_s, const double resolution_s) {
-    path_boundaries_ = path_boundaries;
-    path_boundaries_s_start_ = start_s;
-    path_boundaries_s_resolution_ = resolution_s;
-  }
+  void SetCandidatePathBoundaries(
+      std::vector<PathBoundary> candidate_path_boundaries);
+
+  const std::vector<PathData>& GetCandidatePathData() const;
+
+  void SetCandidatePathData(std::vector<PathData> candidate_path_data);
 
   std::string GetBlockingObstacleId() const { return blocking_obstacle_id_; }
 
-  void GetFallbackPathBoundaries(
-      std::vector<std::pair<double, double>>* const ptr_path_boundaries,
-      double* const ptr_start_s, double* const ptr_resolution_s) {
-    *ptr_path_boundaries = fallback_path_boundaries_;
-    *ptr_start_s = fallback_path_boundaries_s_start_;
-    *ptr_resolution_s = fallback_path_boundaries_s_resolution_;
-  }
-
-  void SetFallbackPathBoundaries(
-      const std::vector<std::pair<double, double>>& path_boundaries,
-      const double start_s, const double resolution_s) {
-    fallback_path_boundaries_ = path_boundaries;
-    fallback_path_boundaries_s_start_ = start_s;
-    fallback_path_boundaries_s_resolution_ = resolution_s;
-  }
-
   void SetBlockingObstacleId(const std::string& blocking_obstacle_id) {
     blocking_obstacle_id_ = blocking_obstacle_id;
+  }
+
+  bool is_path_lane_borrow() const { return is_path_lane_borrow_; }
+  void set_is_path_lane_borrow(bool is_path_lane_borrow) {
+    is_path_lane_borrow_ = is_path_lane_borrow;
   }
 
   void set_is_on_reference_line() { is_on_reference_line_ = true; }
@@ -254,7 +237,7 @@ class ReferenceLineInfo {
 
   void ExportTurnSignal(common::VehicleSignal* signal) const;
 
-  bool IsUnrelaventObstacle(const Obstacle* obstacle);
+  bool IsIrrelevantObstacle(const Obstacle& obstacle);
 
   void MakeDecision(DecisionResult* decision_result) const;
 
@@ -282,22 +265,15 @@ class ReferenceLineInfo {
    */
   double cost_ = 0.0;
 
-  bool is_inited_ = false;
-
   bool is_drivable_ = true;
 
   PathDecision path_decision_;
 
-  std::vector<std::pair<double, double>> path_boundaries_;
-  double path_boundaries_s_start_ = 0.0;
-  double path_boundaries_s_resolution_ = 0.1;
   std::string blocking_obstacle_id_ = "";
 
-  std::vector<std::pair<double, double>> fallback_path_boundaries_;
-  double fallback_path_boundaries_s_start_ = 0.0;
-  double fallback_path_boundaries_s_resolution_ = 0.1;
+  std::vector<PathBoundary> candidate_path_boundaries_;
+  std::vector<PathData> candidate_path_data_;
 
-  PathDataType feasible_path_data_ = PathDataType::REGULAR_PATH;
   PathData path_data_;
   PathData fallback_path_data_;
   SpeedData speed_data_;
@@ -327,6 +303,8 @@ class ReferenceLineInfo {
   bool is_on_reference_line_ = false;
 
   bool is_safe_to_change_lane_ = false;
+
+  bool is_path_lane_borrow_ = false;
 
   ADCTrajectory::RightOfWayStatus status_ = ADCTrajectory::UNPROTECTED;
 

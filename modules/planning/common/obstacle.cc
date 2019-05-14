@@ -425,11 +425,11 @@ bool Obstacle::BuildTrajectoryStBoundary(const ReferenceLine& reference_line,
             kSkipLDistanceFactor +
         adc_width / 2.0;
 
-    if (!IsCautionLevelObstacle() && (
-        std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
-            skip_l_distance ||
-        std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
-            -skip_l_distance)) {
+    if (!IsCautionLevelObstacle() &&
+        (std::fmin(object_boundary.start_l(), object_boundary.end_l()) >
+             skip_l_distance ||
+         std::fmax(object_boundary.start_l(), object_boundary.end_l()) <
+             -skip_l_distance)) {
       continue;
     }
 

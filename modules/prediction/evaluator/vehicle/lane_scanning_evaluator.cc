@@ -34,9 +34,9 @@
 namespace apollo {
 namespace prediction {
 
+using apollo::common::TrajectoryPoint;
 using apollo::common::adapter::AdapterConfig;
 using apollo::common::math::Vec2d;
-using apollo::common::TrajectoryPoint;
 using apollo::cyber::common::GetProtoFromFile;
 
 LaneScanningEvaluator::LaneScanningEvaluator() : device_(torch::kCPU) {
@@ -83,7 +83,7 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   std::vector<double> labels = {0.0};
   if (FLAGS_prediction_offline_mode == 2) {
     FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         "cruise");
+                                         "cruise", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
     return;
   }
@@ -315,8 +315,8 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
     }
   }
 
-  size_t max_feature_size = LANE_POINTS_SIZE * SINGLE_LANE_FEATURE_SIZE *
-                            MAX_NUM_LANE;
+  size_t max_feature_size =
+      LANE_POINTS_SIZE * SINGLE_LANE_FEATURE_SIZE * MAX_NUM_LANE;
   while (feature_values->size() < max_feature_size) {
     feature_values->push_back(0.0);
   }
@@ -344,8 +344,8 @@ void LaneScanningEvaluator::ModelInference(
   for (size_t i = 0; i < SHORT_TERM_TRAJECTORY_SIZE; ++i) {
     TrajectoryPoint point;
     double dx = static_cast<double>(torch_output[0][0][i]);
-    double dy = static_cast<double>(
-        torch_output[0][0][i + SHORT_TERM_TRAJECTORY_SIZE]);
+    double dy =
+        static_cast<double>(torch_output[0][0][i + SHORT_TERM_TRAJECTORY_SIZE]);
     Vec2d offset(dx, dy);
     Vec2d rotated_offset = offset.rotate(feature_ptr->velocity_heading());
     double point_x = feature_ptr->position().x() + rotated_offset.x();
@@ -353,9 +353,8 @@ void LaneScanningEvaluator::ModelInference(
     point.mutable_path_point()->set_x(point_x);
     point.mutable_path_point()->set_y(point_y);
     point.set_relative_time(static_cast<double>(i) *
-        FLAGS_prediction_trajectory_time_resolution);
-    feature_ptr->add_short_term_predicted_trajectory_points()
-               ->CopyFrom(point);
+                            FLAGS_prediction_trajectory_time_resolution);
+    feature_ptr->add_short_term_predicted_trajectory_points()->CopyFrom(point);
   }
 }
 

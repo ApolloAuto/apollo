@@ -24,7 +24,7 @@ namespace radar {
 
 TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   BaseFilter* filter = new AdaptiveKalmanFilter();
-  EXPECT_TRUE(filter != nullptr);
+  EXPECT_NE(filter, nullptr);
   EXPECT_EQ(filter->Name(), "AdaptiveKalmanFilter");
   const double time_diff = 0.074;
   base::Object object;
@@ -46,10 +46,10 @@ TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   result[1] = object.anchor_point(1) + object.velocity(1) * time_diff;
   result[2] = object.velocity(0);
   result[3] = object.velocity(1);
-  EXPECT_TRUE(std::fabs(predict_state(0) - result(0)) < 1e-5);
-  EXPECT_TRUE(std::fabs(predict_state(1) - result(1)) < 1e-5);
-  EXPECT_TRUE(std::fabs(predict_state(2) - result(2)) < 1e-5);
-  EXPECT_TRUE(std::fabs(predict_state(3) - result(3)) < 1e-5);
+  EXPECT_LT(std::fabs(predict_state(0) - result(0)), 1e-5);
+  EXPECT_LT(std::fabs(predict_state(1) - result(1)), 1e-5);
+  EXPECT_LT(std::fabs(predict_state(2) - result(2)), 1e-5);
+  EXPECT_LT(std::fabs(predict_state(3) - result(3)), 1e-5);
   // update (predict & correct)
   base::Object object2;
   object2.velocity << 3.01f, 3.99f, 0.0f;
@@ -61,17 +61,17 @@ TEST(AdaptiveKalmanFilterTest, adaptive_kalman_filter_test) {
   Eigen::Vector3d anchor_point;
   Eigen::Vector3d velocity;
   filter->GetState(&anchor_point, &velocity);
-  EXPECT_TRUE((update_result.head(2) - anchor_point.head(2)).norm() < 1e-5);
-  EXPECT_TRUE((update_result.tail(2) - velocity.head(2)).norm() < 1e-5);
+  EXPECT_LT((update_result.head(2) - anchor_point.head(2)).norm(), 1e-5);
+  EXPECT_LT((update_result.tail(2) - velocity.head(2)).norm(), 1e-5);
   AINFO << "upate_result:" << std::setprecision(12) << update_result;
   result[0] = 0.02361;
   result[1] = 0.03146;
   result[2] = 3.00875;
   result[3] = 3.99082;
-  EXPECT_TRUE(std::fabs(update_result(0) - result(0)) < 1e-3);
-  EXPECT_TRUE(std::fabs(update_result(1) - result(1)) < 1e-3);
-  EXPECT_TRUE(std::fabs(update_result(2) - result(2)) < 1e-3);
-  EXPECT_TRUE(std::fabs(update_result(3) - result(3)) < 1e-3);
+  EXPECT_LT(std::fabs(update_result(0) - result(0)), 1e-3);
+  EXPECT_LT(std::fabs(update_result(1) - result(1)), 1e-3);
+  EXPECT_LT(std::fabs(update_result(2) - result(2)), 1e-3);
+  EXPECT_LT(std::fabs(update_result(3) - result(3)), 1e-3);
   delete filter;
 }
 

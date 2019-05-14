@@ -16,7 +16,6 @@
 # -*- coding: utf-8 -*-
 """Module for test node."""
 
-import sys
 import unittest
 import time
 
@@ -26,15 +25,13 @@ from cyber_py import cyber_timer
 global count
 count = 0
 
-
-def fun():
+def func():
     global count
-    print "cb fun is called: ", count
-    count = count + 1
+    print('Callback function is called [%d] times.' % count)
+    count += 1
 
 
 class TestNode(unittest.TestCase):
-
     """
     Class for node unit test.
     """
@@ -48,14 +45,14 @@ class TestNode(unittest.TestCase):
 
     def test_timer(self):
         cyber.init()
-        ct = cyber_timer.Timer(100, fun, 0)  # 100ms
+        ct = cyber_timer.Timer(100, func, 0)  # 100ms
         ct.start()
         time.sleep(1)  # 1s
         ct.stop()
 
-        print "+" * 80, "test set_option"
+        print('+' * 40 + 'test set_option' + '+' * 40)
         ct2 = cyber_timer.Timer()  # 10ms
-        ct2.set_option(100, fun, 0)
+        ct2.set_option(100, func, 0)
         ct2.start()
         time.sleep(1)  # 1s
         ct2.stop()

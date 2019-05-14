@@ -355,6 +355,10 @@ Status LatController::ComputeControlCommand(
   trajectory_analyzer_ =
       std::move(TrajectoryAnalyzer(&target_tracking_trajectory));
 
+  if ((vehicle_state->gear() == canbus::Chassis::GEAR_REVERSE)) {
+    trajectory_analyzer_.TrajectoryTransformToCOM(lr_);
+  }
+
   UpdateDrivingOrientation();
 
   SimpleLateralDebug *debug = cmd->mutable_debug()->mutable_simple_lat_debug();
@@ -493,13 +497,14 @@ void LatController::UpdateState(SimpleLateralDebug *debug) {
   if (FLAGS_use_navigation_mode) {
     ComputeLateralErrors(
         0.0, 0.0, driving_orientation_, vehicle_state->linear_velocity(),
-        vehicle_state->angular_velocity(), trajectory_analyzer_, debug);
+        vehicle_state->angular_velocity(), vehicle_state->linear_acceleration(),
+        trajectory_analyzer_, debug);
   } else {
     const auto &com = vehicle_state->ComputeCOMPosition(lr_);
-    ComputeLateralErrors(com.x(), com.y(), driving_orientation_,
-                         vehicle_state->linear_velocity(),
-                         vehicle_state->angular_velocity(),
-                         trajectory_analyzer_, debug);
+    ComputeLateralErrors(
+        com.x(), com.y(), driving_orientation_,
+        vehicle_state->linear_velocity(), vehicle_state->angular_velocity(),
+        vehicle_state->linear_acceleration(), trajectory_analyzer_, debug);
   }
 
   // State matrix update;
@@ -576,8 +581,8 @@ double LatController::ComputeFeedForward(double ref_curvature) const {
 
 void LatController::ComputeLateralErrors(
     const double x, const double y, const double theta, const double linear_v,
-    const double angular_v, const TrajectoryAnalyzer &trajectory_analyzer,
-    SimpleLateralDebug *debug) {
+    const double angular_v, const double linear_a,
+    const TrajectoryAnalyzer &trajectory_analyzer, SimpleLateralDebug *debug) {
   TrajectoryPoint target_point;
   if (FLAGS_use_navigation_mode &&
       !FLAGS_enable_navigation_mode_position_update) {
@@ -602,28 +607,53 @@ void LatController::ComputeLateralErrors(
 
   debug->set_lateral_error(lateral_error);
 
+  debug->set_ref_heading(target_point.path_point().theta());
   double heading_error =
-      common::math::NormalizeAngle(theta - target_point.path_point().theta());
+      common::math::NormalizeAngle(theta - debug->ref_heading());
   if (FLAGS_enable_navigation_mode_error_filter) {
     heading_error = heading_error_filter_.Update(heading_error);
   }
   debug->set_heading_error(heading_error);
 
   auto lateral_error_dot = linear_v * std::sin(heading_error);
-
+  auto lateral_error_dot_dot = linear_a * std::sin(heading_error);
   if (FLAGS_reverse_heading_control) {
     if (VehicleStateProvider::Instance()->gear() ==
         canbus::Chassis::GEAR_REVERSE) {
       lateral_error_dot = -lateral_error_dot;
+      lateral_error_dot_dot = -lateral_error_dot_dot;
     }
   }
   debug->set_lateral_error_rate(lateral_error_dot);
+  debug->set_lateral_acceleration(lateral_error_dot_dot);
+  debug->set_lateral_jerk(
+      (debug->lateral_acceleration() - previous_lateral_acceleration_) / ts_);
+  previous_lateral_acceleration_ = debug->lateral_acceleration();
 
-  auto heading_error_rate =
-      angular_v - target_point.path_point().kappa() * target_point.v();
-  debug->set_heading_error_rate(heading_error_rate);
+  debug->set_heading_rate(angular_v);
+  debug->set_ref_heading_rate(target_point.path_point().kappa() *
+                              target_point.v());
+  debug->set_heading_error_rate(debug->heading_rate() -
+                                debug->ref_heading_rate());
 
-  debug->set_ref_heading(target_point.path_point().theta());
+  debug->set_heading_acceleration(
+      (debug->heading_rate() - previous_heading_rate_) / ts_);
+  debug->set_ref_heading_acceleration(
+      (debug->ref_heading_rate() - previous_ref_heading_rate_) / ts_);
+  debug->set_heading_error_acceleration(debug->heading_acceleration() -
+                                        debug->ref_heading_acceleration());
+  previous_heading_rate_ = debug->heading_rate();
+  previous_ref_heading_rate_ = debug->ref_heading_rate();
+
+  debug->set_heading_jerk(
+      (debug->heading_acceleration() - previous_heading_acceleration_) / ts_);
+  debug->set_ref_heading_jerk(
+      (debug->ref_heading_acceleration() - previous_ref_heading_acceleration_) /
+      ts_);
+  debug->set_heading_error_jerk(debug->heading_jerk() -
+                                debug->ref_heading_jerk());
+  previous_heading_acceleration_ = debug->heading_acceleration();
+  previous_ref_heading_acceleration_ = debug->ref_heading_acceleration();
 
   debug->set_curvature(target_point.path_point().kappa());
 }
@@ -643,5 +673,6 @@ void LatController::UpdateDrivingOrientation() {
     }
   }
 }
+
 }  // namespace control
 }  // namespace apollo

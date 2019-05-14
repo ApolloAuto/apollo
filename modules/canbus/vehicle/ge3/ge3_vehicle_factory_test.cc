@@ -25,7 +25,7 @@ class Ge3VehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::GE3);
+    parameter.set_brand(apollo::common::GE3);
     ge3_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}
@@ -35,11 +35,11 @@ class Ge3VehicleFactoryTest : public ::testing::Test {
 };
 
 TEST_F(Ge3VehicleFactoryTest, InitVehicleController) {
-  EXPECT_TRUE(ge3_factory_.CreateVehicleController() != nullptr);
+  EXPECT_NE(ge3_factory_.CreateVehicleController(), nullptr);
 }
 
 TEST_F(Ge3VehicleFactoryTest, InitMessageManager) {
-  EXPECT_TRUE(ge3_factory_.CreateMessageManager() != nullptr);
+  EXPECT_NE(ge3_factory_.CreateMessageManager(), nullptr);
 }
 
 }  // namespace canbus

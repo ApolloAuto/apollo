@@ -58,7 +58,7 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedSpeed) {
       proceed_with_caution_speed_config);
   ProceedWithCautionSpeedGenerator test_obj(scenario_task_config);
 
-  // PlanningContext::GetScenarioInfo()
+  // PlanningContext::Instance()->GetScenarioInfo()
   //    ->proceed_with_caution_speed.is_fixed_distance = false;
 
   // Set up testing for ProceedWithCautionSpeedGenerator::Process
@@ -113,9 +113,10 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedDistance) {
       proceed_with_caution_speed_config);
   ProceedWithCautionSpeedGenerator test_obj(scenario_task_config);
 
-  PlanningContext::GetScenarioInfo()
+  PlanningContext::Instance()->GetScenarioInfo()
       ->proceed_with_caution_speed.is_fixed_distance = true;
-  PlanningContext::GetScenarioInfo()->proceed_with_caution_speed.distance = 5.0;
+  PlanningContext::Instance()->GetScenarioInfo()->proceed_with_caution_speed.distance
+= 5.0;
 
   // Set up testing for ProceedWithCautionSpeedGenerator::Process
   std::vector<common::PathPoint> path_points;

@@ -24,45 +24,57 @@ message Extrinsics {
 // Vehicle parameters shared among several modules.
 // By default, all are measured with the SI units (meters, meters per second,
 // etc.).
-message VehicleParam {
-  enum VehicleBrand {
-    LINCOLN_MKZ = 0;
-    GEM = 1;
-  }
 
+enum VehicleBrand {
+  LINCOLN_MKZ = 0;
+  GEM = 1;
+  LEXUS = 2;
+  TRANSIT = 3;
+  GE3 = 4;
+  WEY = 5;
+  ZHONGYUN = 6;
+  CH = 7;
+}
+
+message VehicleParam {
   optional VehicleBrand brand = 1;
   // Car center point is car reference point, i.e., center of rear axle.
-  optional double front_edge_to_center = 2;
-  optional double back_edge_to_center = 3;
-  optional double left_edge_to_center = 4;
-  optional double right_edge_to_center = 5;
+  optional double front_edge_to_center = 2 [default = nan];
+  optional double back_edge_to_center = 3 [default = nan];
+  optional double left_edge_to_center = 4 [default = nan];
+  optional double right_edge_to_center = 5 [default = nan];
 
-  optional double length = 6;
-  optional double width = 7;
-  optional double height = 8;
+  optional double length = 6 [default = nan];
+  optional double width = 7 [default = nan];
+  optional double height = 8 [default = nan];
 
-  optional double min_turn_radius = 9;
-  optional double max_acceleration = 10;
-  optional double max_deceleration = 11;
+  optional double min_turn_radius = 9 [default = nan];
+  optional double max_acceleration = 10 [default = nan];
+  optional double max_deceleration = 11 [default = nan];
 
   // The following items are used to compute trajectory constraints in
   // planning/control/canbus,
   // vehicle max steer angle
-  optional double max_steer_angle = 12;
+  optional double max_steer_angle = 12 [default = nan];
   // vehicle max steer rate; how fast can the steering wheel turn.
-  optional double max_steer_angle_rate = 13;
+  optional double max_steer_angle_rate = 13 [default = nan];
   // vehicle min steer rate;
-  optional double min_steer_angle_rate = 14;
+  optional double min_steer_angle_rate = 14 [default = nan];
   // ratio between the turn of steering wheel and the turn of wheels
-  optional double steer_ratio = 15;
+  optional double steer_ratio = 15 [default = nan];
   // the distance between the front and back wheels
-  optional double wheel_base = 16;
+  optional double wheel_base = 16 [default = nan];
   // Tire effective rolling radius (vertical distance between the wheel center
   // and the ground).
-  optional double wheel_rolling_radius = 17;
+  optional double wheel_rolling_radius = 17 [default = nan];
 
   // minimum differentiable vehicle speed, in m/s
-  optional float max_abs_speed_when_stopped = 18;
+  optional float max_abs_speed_when_stopped = 18 [default = nan];
+
+  // minimum value get from chassis.brake, in percentage
+  optional double brake_deadzone = 19 [default = nan];
+  // minimum value get from chassis.throttle, in percentage
+  optional double throttle_deadzone = 20 [default = nan];
 }
 
 message VehicleConfig {

@@ -47,6 +47,25 @@ void BareIntersectionUnprotectedScenario::Init() {
     return;
   }
 
+  const std::string& pnc_junction_overlap_id =
+      PlanningContext::Instance()
+          ->planning_status()
+          .bare_intersection()
+          .current_pnc_junction_overlap_id();
+  if (pnc_junction_overlap_id.empty()) {
+    AERROR << "Could not find pnc_junction";
+    return;
+  }
+  hdmap::PNCJunctionInfoConstPtr pnc_junction =
+      HDMapUtil::BaseMap().GetPNCJunctionById(
+          hdmap::MakeMapId(pnc_junction_overlap_id));
+  if (!pnc_junction) {
+    AERROR << "Could not find pnc_junction: " << pnc_junction_overlap_id;
+    return;
+  }
+
+  context_.current_pnc_junction_overlap_id = pnc_junction_overlap_id;
+
   init_ = true;
 }
 
@@ -82,11 +101,6 @@ std::unique_ptr<Stage> BareIntersectionUnprotectedScenario::CreateStage(
     ptr->SetContext(&context_);
   }
   return ptr;
-}
-
-bool BareIntersectionUnprotectedScenario::IsTransferable(
-    const Scenario& current_scenario, const Frame& frame) {
-  return false;
 }
 
 /*

@@ -72,6 +72,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--loc", action="store", type=str, required=False,
         help="Specify the localization pb file in txt format")
+    parser.add_argument(
+        "--position", action="store", type=str, required=False,
+        help="Plot the x,y coordination in string format, e.g., 343.02,332.01")
+
     # driving path data files are text files with data format of
     # t,x,y,heading,speed
     parser.add_argument(
@@ -98,5 +102,9 @@ if __name__ == "__main__":
         localization.load(args.loc)
         localization.plot_vehicle(plt)
 
+    if args.position is not None:
+        x, y = args.position.split(",")
+        x, y = float(x), float(y)
+        plt.plot([x], [y], 'bo')
     plt.axis('equal')
     plt.show()

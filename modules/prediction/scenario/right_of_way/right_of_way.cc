@@ -121,7 +121,7 @@ void RightOfWay::Analyze() {
 
   // then loop through all obstacle vehicles
   for (const int id :
-       obstacles_container->curr_frame_predictable_obstacle_ids()) {
+       obstacles_container->curr_frame_considered_obstacle_ids()) {
     Obstacle* obstacle_ptr = obstacles_container->GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       continue;
@@ -133,10 +133,9 @@ void RightOfWay::Analyze() {
     ADEBUG << "RightOfWay for obstacle [" << latest_feature_ptr->id() << "], "
            << "with lane_sequence_size: "
            << latest_feature_ptr->lane().lane_graph().lane_sequence_size();
-    for (auto& lane_sequence :
-        *latest_feature_ptr->mutable_lane()
-                           ->mutable_lane_graph()
-                           ->mutable_lane_sequence()) {
+    for (auto& lane_sequence : *latest_feature_ptr->mutable_lane()
+                                    ->mutable_lane_graph()
+                                    ->mutable_lane_sequence()) {
       accumulated_s = 0.0;
       for (auto lane_segment : lane_sequence.lane_segment()) {
         accumulated_s += lane_segment.end_s() - lane_segment.start_s();

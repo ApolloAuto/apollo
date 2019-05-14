@@ -338,33 +338,8 @@ double SequencePredictor::GetLaneSequenceCurvatureByS(
       return lane_info_ptr->Curvature(lane_s);
     }
   }
-  AERROR << "Cannot find curvature by lane s";
+  ADEBUG << "Outside lane sequence range, use 0.0 to approximate.";
   return 0.0;
-}
-
-Point3D SequencePredictor::GetPositionByLaneSequenceS(
-    const LaneSequence& lane_sequence, const double s) {
-  CHECK_GT(lane_sequence.lane_segment_size(), 0);
-  Point3D position;
-  double lane_s = s + lane_sequence.lane_segment(0).start_s();
-  for (const LaneSegment& lane_segment : lane_sequence.lane_segment()) {
-    std::string lane_id = lane_segment.lane_id();
-    std::shared_ptr<const LaneInfo> lane_info_ptr =
-        PredictionMap::LaneById(lane_id);
-    double lane_length = lane_info_ptr->total_length();
-    if (lane_s > lane_length + FLAGS_double_precision) {
-      lane_s -= lane_length;
-    } else {
-      apollo::common::PointENU point_enu =
-          lane_info_ptr->GetSmoothPoint(lane_s);
-      position.set_x(point_enu.x());
-      position.set_y(point_enu.y());
-      position.set_z(point_enu.z());
-      return position;
-    }
-  }
-  AERROR << "Cannot find position by lane s";
-  return position;
 }
 
 bool SequencePredictor::GetLongitudinalPolynomial(
@@ -414,7 +389,7 @@ bool SequencePredictor::GetLongitudinalPolynomial(
 
 bool SequencePredictor::GetLateralPolynomial(
     const Obstacle& obstacle, const LaneSequence& lane_sequence,
-    const double time_to_end_state, std::array<double, 6>* coefficients) {
+    const double time_to_end_state, std::array<double, 4>* coefficients) {
   // Sanity check.
   CHECK_NOTNULL(coefficients);
   CHECK_GT(obstacle.history_size(), 0);
@@ -443,24 +418,20 @@ bool SequencePredictor::GetLateralPolynomial(
   // Set the initial conditions for solving diff. eqn.
   double l0 = (cross_prod > 0) ? shift : -shift;
   double dl0 = v * std::sin(theta - start_lane_point.heading());
-  double ddl0 = 0.0;
   double l1 = 0.0;
   double dl1 = 0.0;
-  double ddl1 = 0.0;
 
   // Solve for the coefficients.
   coefficients->operator[](0) = l0;
   coefficients->operator[](1) = dl0;
-  coefficients->operator[](2) = ddl0 / 2.0;
   double p = time_to_end_state;
   double p2 = p * p;
   double p3 = p2 * p;
-  double c0 = (l1 - 0.5 * p2 * ddl0 - dl0 * p - l0) / p3;
-  double c1 = (dl1 - ddl0 * p - dl0) / p2;
-  double c2 = (ddl1 - ddl0) / p;
-  coefficients->operator[](3) = 0.5 * (20.0 * c0 - 8.0 * c1 + c2);
-  coefficients->operator[](4) = (-15.0 * c0 + 7.0 * c1 - c2) / p;
-  coefficients->operator[](5) = (6.0 * c0 - 3.0 * c1 + 0.5 * c2) / p2;
+  double tmp_var1 = (l1 - dl0) * p;
+  double tmp_var2 = dl1 - l0 - dl0 * p;
+  coefficients->operator[](2) = (3.0 * tmp_var2 - tmp_var1) / p2;
+  coefficients->operator[](3) = (tmp_var1 - 2.0 * tmp_var2) / p3;
+
   return true;
 }
 

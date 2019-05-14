@@ -258,7 +258,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
                                                      int nele_jac, int* iRow,
                                                      int* jCol,
                                                      double* values) {
-  // if (values == NULL) {
+  // if (values == nullptr) {
   //   // return the structure of the jacobian
 
   //   for (int idx = 0; idx < nnz_jac; idx++) {
@@ -409,7 +409,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         Eigen::MatrixXd bj =
             obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
-        // TODO(QiL) : Remove redudant calculation
+        // TODO(QiL) : Remove redundant calculation
         double tmp1 = 0;
         double tmp2 = 0;
         for (int k = 0; k < current_edges_num; ++k) {
@@ -524,7 +524,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_h(int n, const double* x,
                                                  bool new_lambda, int nele_hess,
                                                  int* iRow, int* jCol,
                                                  double* values) {
-  if (values == NULL) {
+  if (values == nullptr) {
     // return the structure. This is a symmetric matrix, fill the lower left
     // triangle only.
     for (int idx = 0; idx < nnz_L; idx++) {
@@ -756,10 +756,10 @@ void DualVariableWarmStartIPOPTInterface::generate_tapes(int n, int m,
 
   trace_off();
 
-  rind_L = NULL;
-  cind_L = NULL;
+  rind_L = nullptr;
+  cind_L = nullptr;
 
-  hessval = NULL;
+  hessval = nullptr;
 
   options_L[0] = 0;
   options_L[1] = 1;

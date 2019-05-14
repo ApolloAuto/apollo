@@ -469,7 +469,7 @@ if __name__ == '__main__':
         type=str,
         default=None,
         help="""\
-            If not set, the data format best for the training device is used. 
+            If not set, the data format best for the training device is used.
             Allowed values: channels_first (NCHW) channels_last (NHWC).\
             """)
     parser.add_argument(

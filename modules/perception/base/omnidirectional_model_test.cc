@@ -72,18 +72,17 @@ TEST(DistortionModelTest, omnidirectional_model_get_set_test) {
   EXPECT_TRUE(distortion_model.set_params(w, h, params));
   std::shared_ptr<BaseCameraModel> camera_model =
       distortion_model.get_camera_model();
-  EXPECT_TRUE(camera_model != nullptr);
+  EXPECT_NE(camera_model, nullptr);
   std::shared_ptr<PinholeCameraModel> pinhole_camera_model =
       std::static_pointer_cast<PinholeCameraModel>(camera_model);
-  EXPECT_TRUE(pinhole_camera_model != nullptr);
-  EXPECT_TRUE(pinhole_camera_model->get_width() == w);
-  EXPECT_TRUE(pinhole_camera_model->get_height() == h);
+  EXPECT_NE(pinhole_camera_model, nullptr);
+  EXPECT_EQ(pinhole_camera_model->get_width(), w);
+  EXPECT_EQ(pinhole_camera_model->get_height(), h);
   Eigen::Matrix3f ret_intrinsic_mat =
       pinhole_camera_model->get_intrinsic_params();
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
-      EXPECT_TRUE(fabs(intrinsic_params(i, j) - ret_intrinsic_mat(i, j)) <
-                  1.0e-6);
+      EXPECT_LT(fabs(intrinsic_params(i, j) - ret_intrinsic_mat(i, j)), 1.0e-6);
     }
   }
 }
@@ -130,12 +129,12 @@ TEST(DistortionModelTest, distortion_model_project_test) {
 
   std::shared_ptr<BaseCameraModel> camera_model =
       distortion_model.get_camera_model();
-  EXPECT_TRUE(camera_model != nullptr);
+  EXPECT_NE(camera_model, nullptr);
   std::shared_ptr<PinholeCameraModel> pinhole_camera_model =
       std::static_pointer_cast<PinholeCameraModel>(camera_model);
-  EXPECT_TRUE(pinhole_camera_model != nullptr);
-  EXPECT_TRUE(pinhole_camera_model->get_width() == w);
-  EXPECT_TRUE(pinhole_camera_model->get_height() == h);
+  EXPECT_NE(pinhole_camera_model, nullptr);
+  EXPECT_EQ(pinhole_camera_model->get_width(), w);
+  EXPECT_EQ(pinhole_camera_model->get_height(), h);
 
   Eigen::Vector3f pt3d(0, 0, 50);
   Eigen::Vector2f pt2d(943.844226, 559.892944);

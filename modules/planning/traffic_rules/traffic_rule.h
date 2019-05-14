@@ -20,9 +20,6 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/proto/traffic_rule_config.pb.h"
 
 #include "modules/planning/common/frame.h"
@@ -39,15 +36,6 @@ class TrafficRule {
   const TrafficRuleConfig& GetConfig() const { return config_; }
   virtual common::Status ApplyRule(
       Frame* const frame, ReferenceLineInfo* const reference_line_info) = 0;
-
- protected:
-  int BuildStopDecision(const std::string& stop_wall_id,
-                        const double stop_line_s,
-                        const double stop_distance,
-                        const StopReasonCode& stop_reason_code,
-                        const std::vector<std::string>& wait_for_obstacles,
-                        Frame* const frame,
-                        ReferenceLineInfo* const reference_line_info);
 
  protected:
   TrafficRuleConfig config_;

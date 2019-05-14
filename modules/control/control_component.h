@@ -93,6 +93,7 @@ class ControlComponent final : public apollo::cyber::TimerComponent {
   canbus::Chassis latest_chassis_;
   planning::ADCTrajectory latest_trajectory_;
   PadMessage pad_msg_;
+  common::Header latest_replan_trajectory_header_;
 
   ControllerAgent controller_agent_;
 

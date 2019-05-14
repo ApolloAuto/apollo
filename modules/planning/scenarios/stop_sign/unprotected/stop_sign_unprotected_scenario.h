@@ -60,21 +60,18 @@ class StopSignUnprotectedScenario : public Scenario {
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config);
 
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
-
   StopSignUnprotectedContext* GetContext() { return &context_; }
 
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
   int GetAssociatedLanes(const hdmap::StopSignInfo& stop_sign_info);
+
+ private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
-
- private:
   bool init_ = false;
   StopSignUnprotectedContext context_;
 };

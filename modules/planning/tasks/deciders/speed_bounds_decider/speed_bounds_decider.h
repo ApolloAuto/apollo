@@ -38,8 +38,21 @@ class SpeedBoundsDecider : public Decider {
       Frame* const frame,
       ReferenceLineInfo* const reference_line_info) override;
 
+  void AddPathEndStop(Frame* const frame,
+                      ReferenceLineInfo* const reference_line_info);
+
+  void CheckLaneChangeUrgency(Frame* const frame);
+
+  double SetSpeedFallbackDistance(PathDecision* const path_decision);
+
+  // @brief Rule-based stop for side pass on reverse lane
+  void StopOnSidePass(Frame* const frame,
+                      ReferenceLineInfo* const reference_line_info);
+
   // @brief Check if necessary to set stop fence used for nonscenario side pass
-  bool CheckSidePassStop(const PathData& path_data, double* stop_s_on_pathdata);
+  bool CheckSidePassStop(const PathData& path_data,
+                         const ReferenceLineInfo& reference_line_info,
+                         double* stop_s_on_pathdata);
 
   // @brief Set stop fence for side pass
   bool BuildSidePassStopFence(const PathData& path_data,
@@ -48,9 +61,17 @@ class SpeedBoundsDecider : public Decider {
                               Frame* const frame,
                               ReferenceLineInfo* const reference_line_info);
 
+  bool BuildSidePassStopFence(const common::PathPoint& stop_point,
+                              Frame* const frame,
+                              ReferenceLineInfo* const reference_line_info);
+
   // @brief Check if ADV stop at a stop fence
   bool CheckADCStop(const ReferenceLineInfo& reference_line_info,
                     const common::PathPoint& stop_point);
+
+  // @brief Check if needed to check clear again for side pass
+  bool CheckClearDone(const ReferenceLineInfo& reference_line_info,
+                      const common::PathPoint& stop_point);
 
   void RecordSTGraphDebug(
       const StGraphData& st_graph_data,
@@ -58,6 +79,7 @@ class SpeedBoundsDecider : public Decider {
 
  private:
   SpeedBoundsDeciderConfig speed_bounds_config_;
+  bool is_clear_to_change_lane_ = false;
 };
 
 }  // namespace planning

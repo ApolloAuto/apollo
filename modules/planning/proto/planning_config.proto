@@ -3,22 +3,20 @@ syntax = "proto2";
 package apollo.planning;
 
 import "modules/planning/proto/decider_config.proto";
-import "modules/planning/proto/dp_poly_path_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
+import "modules/planning/proto/lane_change_decider_config.proto";
 import "modules/planning/proto/open_space_fallback_decider_config.proto";
 import "modules/planning/proto/open_space_roi_decider_config.proto";
 import "modules/planning/proto/open_space_trajectory_provider_config.proto";
 import "modules/planning/proto/open_space_trajectory_partition_config.proto";
-import "modules/planning/proto/path_bound_decider_config.proto";
+import "modules/planning/proto/path_assessment_decider_config.proto";
+import "modules/planning/proto/path_bounds_decider_config.proto";
+import "modules/planning/proto/path_lane_borrow_decider_config.proto";
 import "modules/planning/proto/piecewise_jerk_path_config.proto";
+import "modules/planning/proto/piecewise_jerk_speed_config.proto";
 import "modules/planning/proto/proceed_with_caution_speed_config.proto";
 import "modules/planning/proto/planner_open_space_config.proto";
-// import "modules/planning/proto/poly_vt_speed_config.proto";
-import "modules/planning/proto/qp_piecewise_jerk_path_config.proto";
-import "modules/planning/proto/qp_spline_path_config.proto";
-import "modules/planning/proto/qp_st_speed_config.proto";
 import "modules/planning/proto/speed_bounds_decider_config.proto";
-import "modules/planning/proto/side_pass_path_decider_config.proto";
 import "modules/planning/proto/navi_path_decider_config.proto";
 import "modules/planning/proto/navi_speed_decider_config.proto";
 import "modules/planning/proto/navi_obstacle_decider_config.proto";
@@ -34,53 +32,47 @@ message PathDeciderConfig {
 // tasks are shared among all scenarios and stages.
 message TaskConfig {
   enum TaskType {
-    DP_POLY_PATH_OPTIMIZER = 0;
     DP_ST_SPEED_OPTIMIZER = 1;
-    QP_SPLINE_PATH_OPTIMIZER = 2;
-    QP_SPLINE_ST_SPEED_OPTIMIZER = 3;
     PATH_DECIDER = 4;
     SPEED_DECIDER = 5;
-    POLY_ST_SPEED_OPTIMIZER = 6;
     NAVI_PATH_DECIDER = 7;
     NAVI_SPEED_DECIDER = 8;
     NAVI_OBSTACLE_DECIDER = 9;
-    QP_PIECEWISE_JERK_PATH_OPTIMIZER = 10;
     DECIDER_CREEP = 11;
-    DECIDER_RULE_BASED_STOP = 12;
-    SIDE_PASS_PATH_DECIDER = 13;
-    SIDE_PASS_SAFETY = 14;
+    OPEN_SPACE_PRE_STOP_DECIDER = 12;
     PROCEED_WITH_CAUTION_SPEED = 15;
     DECIDER_RSS = 16;
     SPEED_BOUNDS_PRIORI_DECIDER = 17;
     SPEED_BOUNDS_FINAL_DECIDER = 18;
     PIECEWISE_JERK_PATH_OPTIMIZER = 19;
-    PATH_BOUND_DECIDER = 20;
+    PATH_BOUNDS_DECIDER = 20;
     OPEN_SPACE_ROI_DECIDER = 21;
     OPEN_SPACE_TRAJECTORY_PROVIDER = 22;
     OPEN_SPACE_TRAJECTORY_PARTITION = 23;
     OPEN_SPACE_FALLBACK_DECIDER = 24;
+    PATH_ASSESSMENT_DECIDER = 25;
+    PATH_LANE_BORROW_DECIDER = 26;
+    PIECEWISE_JERK_SPEED_OPTIMIZER = 27;
+    LANE_CHANGE_DECIDER = 28;
   };
   optional TaskType task_type = 1;
   oneof task_config {
-    DpPolyPathConfig dp_poly_path_config = 2;
     DpStSpeedConfig dp_st_speed_config = 3;
-    QpSplinePathConfig qp_spline_path_config = 4;
-    QpStSpeedConfig qp_st_speed_config = 5;
     PathDeciderConfig path_decider_config = 7;
     ProceedWithCautionSpeedConfig proceed_with_caution_speed_config = 8;
-    QpPiecewiseJerkPathConfig qp_piecewise_jerk_path_config = 9;
     DeciderCreepConfig decider_creep_config = 10;
-    DeciderRuleBasedStopConfig decider_rule_based_stop_config = 11;
-    SidePassSafetyConfig side_pass_safety_config = 12;
-    SidePassPathDeciderConfig side_pass_path_decider_config = 13;
-    // PolyVTSpeedConfig poly_vt_speed_config = 14;
+    OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config = 11;
     SpeedBoundsDeciderConfig speed_bounds_decider_config = 15;
     PiecewiseJerkPathConfig piecewise_jerk_path_config = 16;
-    PathBoundDeciderConfig path_bound_decider_config = 17;
+    PathBoundsDeciderConfig path_bounds_decider_config = 17;
     OpenSpaceFallBackDeciderConfig open_space_fallback_decider_config = 18;
     OpenSpaceRoiDeciderConfig open_space_roi_decider_config = 19;
     OpenSpaceTrajectoryProviderConfig open_space_trajectory_provider_config = 20;
     OpenSpaceTrajectoryPartitionConfig open_space_trajectory_partition_config = 21;
+    PathAssessmentDeciderConfig path_assessment_decider_config = 22;
+    PiecewiseJerkSpeedConfig piecewise_jerk_speed_config = 23;
+    PathLaneBorrowDeciderConfig path_lane_borrow_decider_config = 24;
+    LaneChangeDeciderConfig lane_change_decider_config = 25;
   }
 }
 
@@ -102,10 +94,16 @@ message ScenarioSidePassConfig {
 }
 
 message ScenarioBareIntersectionUnprotectedConfig {
-  optional double start_bare_intersection_scenario_distance = 1 [default = 40.0];  // meter
-  optional double min_pass_s_distance = 2 [default = 3.0];  // meter
-  optional float stop_timeout_sec = 3 [default = 8.0];  // sec
-  optional float creep_timeout_sec = 4 [default = 10.0];  // sec
+  optional double start_bare_intersection_scenario_distance = 1 [default = 25.0];  // meter
+  // explicit stop while waiting
+  optional bool enable_explicit_stop = 2 [default = false];
+  optional double min_pass_s_distance = 3 [default = 3.0];  // meter
+  // speed limit while approaching bare intersection with caution
+  // default to 15 mph
+  optional double approach_speed_limit = 4 [default = 6.7056]; // meter/sec
+  optional double stop_distance = 5 [default = 0.5];  // meter
+  optional float stop_timeout_sec = 6 [default = 8.0];  // sec
+  optional float creep_timeout_sec = 7 [default = 10.0];  // sec
 }
 
 message ScenarioStopSignUnprotectedConfig {
@@ -145,6 +143,10 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
 
 }
 
+message ScenarioPullOverConfig {
+  optional double start_pull_over_scenario_distance = 1 [default = 50.0];  // meter
+}
+
 message ScenarioValetParkingConfig {
   optional double parking_spot_range_to_start = 1 [default = 20.0];
   optional double max_valid_stop_distance = 2 [default = 1.0];  // meter
@@ -170,10 +172,11 @@ message ScenarioConfig {
     YIELD_SIGN_UNPROTECTED = 9;
 
     // parking
-    VALET_PARKING = 10;
+    PULL_OVER = 10;
+    VALET_PARKING = 11;
 
     // misc
-    NARROW_STREET_U_TURN = 11;
+    NARROW_STREET_U_TURN = 12;
   }
 
   // StageType is a superset of stages from all scenarios.
@@ -183,34 +186,45 @@ message ScenarioConfig {
 
     LANE_FOLLOW_DEFAULT_STAGE = 1;
 
+    // side_pass scenario
     SIDE_PASS_APPROACH_OBSTACLE = 100;
     SIDE_PASS_GENERATE_PATH= 101;
     SIDE_PASS_STOP_ON_WAITPOINT = 102;
     SIDE_PASS_DETECT_SAFETY = 103;
     SIDE_PASS_PASS_OBSTACLE = 104;
     SIDE_PASS_BACKUP = 105;
+    SIDE_PASS_DEFAULT_STAGE = 106;
 
+    // bare_intersection_unprotected scenario
     BARE_INTERSECTION_UNPROTECTED_APPROACH = 200;
     BARE_INTERSECTION_UNPROTECTED_CREEP = 201 ;
     BARE_INTERSECTION_UNPROTECTED_INTERSECTION_CRUISE = 202;
 
+    // stop_sign_unprotected scenario
     STOP_SIGN_UNPROTECTED_PRE_STOP = 300;
     STOP_SIGN_UNPROTECTED_STOP = 301;
     STOP_SIGN_UNPROTECTED_CREEP = 302 ;
     STOP_SIGN_UNPROTECTED_INTERSECTION_CRUISE = 303;
 
+    // traffic_light_protected scenario
     TRAFFIC_LIGHT_PROTECTED_APPROACH = 400;
     TRAFFIC_LIGHT_PROTECTED_INTERSECTION_CRUISE = 401;
 
+    // traffic_light_unprotected_left_turn scenario
     TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_CREEP = 410 ;
     TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN_INTERSECTION_CRUISE = 411;
 
+    // traffic_light_unprotected_right_turn scenario
     TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_STOP = 420;
     TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_CREEP = 421 ;
     TRAFFIC_LIGHT_UNPROTECTED_RIGHT_TURN_INTERSECTION_CRUISE = 422;
 
-    VALET_PARKING_APPROACHING_PARKING_SPOT = 501;
-    VALET_PARKING_PARKING = 502;
+    // pull_over scenario
+    PULL_OVER_APPROACH = 500;
+
+    // valet parking scenario
+    VALET_PARKING_APPROACHING_PARKING_SPOT = 510;
+    VALET_PARKING_PARKING = 511;
   };
 
   message StageConfig {
@@ -231,13 +245,14 @@ message ScenarioConfig {
     ScenarioTrafficLightProtectedConfig traffic_light_protected_config = 6;
     ScenarioTrafficLightUnprotectedRightTurnConfig traffic_light_unprotected_right_turn_config = 7;
     ScenarioTrafficLightUnprotectedLeftTurnConfig traffic_light_unprotected_left_turn_config = 8;
-    ScenarioValetParkingConfig valet_parking_config = 9;
-    ScenarioNarrowStreetUTurnConfig narrow_street_u_turn_config = 10;
+    ScenarioPullOverConfig pull_over_config = 9;
+    ScenarioValetParkingConfig valet_parking_config = 10;
+    ScenarioNarrowStreetUTurnConfig narrow_street_u_turn_config = 11;
   }
   // a list of stages that are used at runtime.  The first one is default stage.
-  repeated StageType stage_type = 11;
+  repeated StageType stage_type = 12;
   // an unordered list of stage configs.
-  repeated StageConfig stage_config = 12;
+  repeated StageConfig stage_config = 13;
 }
 
 message PlannerPublicRoadConfig {
@@ -255,9 +270,8 @@ message PlannerNaviConfig {
 enum PlannerType {
   RTK = 0;
   PUBLIC_ROAD = 1;  // public road planner
-  OPEN_SPACE = 2;   // open space planner
-  NAVI = 3;         // navigation planner
-  LATTICE = 4;      // lattice planner
+  NAVI = 2;         // navigation planner
+  LATTICE = 3;      // lattice planner
 }
 
 message RtkPlanningConfig {
@@ -274,17 +288,11 @@ message NavigationPlanningConfig {
   optional PlannerNaviConfig planner_navi_config = 4;
 }
 
-message OpenSpacePlanningConfig {
-  repeated PlannerType planner_type = 1;  // supported planners
-  optional PlannerOpenSpaceConfig planner_open_space_config = 2;
-}
-
 message PlanningConfig {
   oneof planning_config {
     RtkPlanningConfig rtk_planning_config = 1;
     StandardPlanningConfig standard_planning_config = 2;
     NavigationPlanningConfig navigation_planning_config = 3;
-    OpenSpacePlanningConfig open_space_planning_config = 4;
   }
 
   // default task config, it will be used if there is no scenario-specific

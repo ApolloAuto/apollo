@@ -44,8 +44,6 @@ DECLARE_int32(road_graph_max_search_horizon);
 
 // Scenario
 DECLARE_double(junction_distance_threshold);
-DECLARE_bool(enable_prioritize_obstacles);
-DECLARE_bool(enable_junction_feature);
 DECLARE_bool(enable_all_junction);
 DECLARE_double(caution_search_distance_ahead);
 DECLARE_double(caution_search_distance_backward_for_merge);
@@ -70,8 +68,10 @@ DECLARE_int32(min_still_obstacle_history_length);
 DECLARE_int32(max_still_obstacle_history_length);
 DECLARE_double(still_obstacle_speed_threshold);
 DECLARE_double(still_pedestrian_speed_threshold);
+DECLARE_double(still_unknown_speed_threshold);
 DECLARE_double(still_obstacle_position_std);
 DECLARE_double(still_pedestrian_position_std);
+DECLARE_double(still_unknown_position_std);
 DECLARE_double(max_history_time);
 DECLARE_double(target_lane_gap);
 DECLARE_double(dense_lane_gap);
@@ -150,6 +150,7 @@ DECLARE_bool(use_bell_curve_for_cost_function);
 
 // interaction predictor
 DECLARE_double(collision_cost_time_resolution);
+DECLARE_double(longitudinal_acceleration_cost_weight);
 DECLARE_double(centripedal_acceleration_cost_weight);
 DECLARE_double(collision_cost_weight);
 DECLARE_double(collision_cost_exp_coefficient);

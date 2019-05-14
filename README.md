@@ -46,7 +46,7 @@ for information about migrating to the updated Apollo master from an old version
 
 * Vehicle equipped with by-wire system, including but not limited to brake by-wire, steering by-wire, throttle by-wire and shift by-wire (Apollo is currently tested on Lincoln MKZ)
 
-* A machine with a 4-core processor and 6GB memory minimum
+* A machine with a 4-core processor and 8GB memory minimum (16GB for Apollo 3.5)
 
 * Ubuntu 14.04
 
@@ -58,9 +58,6 @@ for information about migrating to the updated Apollo master from an old version
  The reason behind this recommendation is that you need to confirm whether individual hardware components 
  and modules are functioning correctly and clear various version test cases,
  before progressing to a higher more capable version for your safety and the safety of those around you.
-
- - Please note, if you do not have a vehicle, proceed to the [Installation - Without Hardware](#without-hardware) 
-
 
 #### Individual Version Requirements:
 
@@ -220,7 +217,7 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 
 * **Software Overview - Navigation Mode**
 
-![image alt text](docs/specs/images/Apollo_3.0_SW.png)
+![image alt text](docs/demo_guide/images/Apollo_3_5_software_architecture.png)
 
 ## Installation
 
@@ -230,7 +227,7 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 
 * [Launch and Run Apollo](docs/howto/how_to_launch_Apollo.md)
 
-If at this point, you do not have a Hardware setup, please go to [Without Hardware](#without-hardware). 
+Congratulations! You have successfully built out Apollo without Hardware. If you do have a vehicle and hardware setup for a particular version, please pick the Quickstart guide most relevant to your setup:
 
 ### With Hardware:
 
@@ -246,20 +243,15 @@ If at this point, you do not have a Hardware setup, please go to [Without Hardwa
 
 * [Apollo 3.5 QuickStart Guide](docs/quickstart/apollo_3_5_quick_start.md)
 
-
-### Without Hardware:
-
-* [How to Build Apollo ](https://github.com/ApolloAuto/apollo/tree/master/docs/demo_guide)
-
 ## Documents
 
-* [Technical Tutorial](https://github.com/ApolloAuto/apollo/tree/master/docs/technical_tutorial): Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
+* [Technical Tutorial](docs/technical_tutorial/README.md): Everything you need to know about Apollo. Written as individual versions with links to every document related to that version.
 
-* [HowTo](https://github.com/ApolloAuto/apollo/tree/master/docs/howto): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform 
+* [HowTo](docs/howto/README.md): Brief technical solutions to common problems that developers face during the installation and use of the Apollo platform 
 
-* [Specs](https://github.com/ApolloAuto/apollo/tree/master/docs/specs): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo) 
+* [Specs](docs/specs/README.md): A Deep dive into Apollo's Hardware and Software specifications (only recommended for expert level developers that have successfully installed and launched Apollo) 
 
-* [FAQs](https://github.com/ApolloAuto/apollo/tree/master/docs/FAQs) 
+* [FAQs](docs/FAQs/README.md) 
 
 ## Questions
 
@@ -267,7 +259,7 @@ You are welcome to submit questions and bug reports as [GitHub Issues](https://g
 
 ## Copyright and License
 
-Apollo is provided under the [Apache-2.0 license](https://github.com/natashadsouza/apollo/blob/master/LICENSE).
+Apollo is provided under the [Apache-2.0 license](https://github.com/ApolloAuto/apollo/blob/master/LICENSE).
 
 ## Disclaimer
 

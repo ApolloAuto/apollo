@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "cyber/component/component.h"
+#include "modules/common/util/util.h"
 #include "modules/drivers/proto/sensor_image.pb.h"
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
@@ -41,7 +42,6 @@
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
 #include "modules/perception/proto/motion_service.pb.h"
 #include "modules/perception/proto/perception_lane.pb.h"
-#include "modules/common/util/util.h"
 
 typedef std::shared_ptr<apollo::perception::Motion_Service>
     MotionServiceMsgType;
@@ -64,7 +64,7 @@ class LaneDetectionComponent : public apollo::cyber::Component<> {
 
   bool Init() override;
 
-  template<typename T>
+  template <typename T>
   friend class FunctionInfo;
 
  private:

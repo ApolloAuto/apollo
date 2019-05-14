@@ -73,7 +73,7 @@ TEST(RtpsDispatcherTest, on_message) {
 
   auto transmitter = Transport::Instance()->CreateTransmitter<proto::Chatter>(
       self_attr, proto::OptionalMode::RTPS);
-  EXPECT_TRUE(transmitter != nullptr);
+  EXPECT_NE(transmitter, nullptr);
 
   auto send_msg = std::make_shared<proto::Chatter>();
   send_msg->set_timestamp(123);

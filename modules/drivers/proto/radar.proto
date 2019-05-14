@@ -25,22 +25,24 @@ message RadarObstacle {
     NONE = 3;
   }
 
-  optional int32 id = 1;  // obstacle ID.
-  optional apollo.common.Point2D relative_position =
-      2;  // obstacle position in the sl coordinate system.
-  optional apollo.common.Point2D relative_velocity =
-      3;                    // obstacle relative velocity.
-  optional double rcs = 4;  // radar signal intensity.
-  optional MovingStatus moving_status =
-      5;  // whether this obstacle is able to move.
+  // obstacle ID.
+  optional int32 id = 1;
+  // obstacle position in the sl coordinate system.
+  optional apollo.common.Point2D relative_position = 2;
+  // obstacle relative velocity.
+  optional apollo.common.Point2D relative_velocity = 3;
+  // radar signal intensity.
+  optional double rcs = 4;
+  // whether this obstacle is able to move.
+  optional MovingStatus moving_status = 5;
   optional double width = 6;
   optional double length = 7;
   optional double height = 8;
   optional double theta = 9;
-  optional apollo.common.Point2D absolute_position =
-      10;  // obstacle position in map coordinate system
-  optional apollo.common.Point2D absolute_velocity =
-      11;  // obstacle position in map coordinate system
+  // obstacle position in map coordinate system
+  optional apollo.common.Point2D absolute_position = 10;
+  // obstacle position in map coordinate system
+  optional apollo.common.Point2D absolute_velocity = 11;
   optional int32 count = 12;
   optional int32 moving_frames_count = 13;
   optional Status status = 14;

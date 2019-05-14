@@ -26,7 +26,7 @@ namespace prediction {
 class CruiseMLPEvaluatorTest : public KMLMapBasedTest {
  public:
   void SetUp() override {
-    std::string file =
+    const std::string file =
         "modules/prediction/testdata/single_perception_vehicle_onlane.pb.txt";
     CHECK(cyber::common::GetProtoFromFile(file, &perception_obstacles_));
   }
@@ -46,7 +46,7 @@ TEST_F(CruiseMLPEvaluatorTest, OnLaneCase) {
   container.Insert(perception_obstacles_);
   container.BuildLaneGraph();
   Obstacle* obstacle_ptr = container.GetObstacle(1);
-  EXPECT_TRUE(obstacle_ptr != nullptr);
+  EXPECT_NE(obstacle_ptr, nullptr);
   cruise_mlp_evaluator.Evaluate(obstacle_ptr);
   const Feature& feature = obstacle_ptr->latest_feature();
   const LaneGraph& lane_graph = feature.lane().lane_graph();

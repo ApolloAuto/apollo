@@ -36,6 +36,7 @@ namespace bare_intersection {
 // stage context
 struct BareIntersectionUnprotectedContext {
   ScenarioBareIntersectionUnprotectedConfig scenario_config;
+  std::string current_pnc_junction_overlap_id;
 };
 
 class BareIntersectionUnprotectedScenario : public Scenario {
@@ -49,20 +50,17 @@ class BareIntersectionUnprotectedScenario : public Scenario {
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config);
 
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
-
   BareIntersectionUnprotectedContext* GetContext() { return &context_; }
 
  private:
   static void RegisterStages();
   bool GetScenarioConfig();
+
+ private:
   static apollo::common::util::Factory<
       ScenarioConfig::StageType, Stage,
       Stage* (*)(const ScenarioConfig::StageConfig& stage_config)>
       s_stage_factory_;
-
- private:
   bool init_ = false;
   BareIntersectionUnprotectedContext context_;
 };

@@ -223,6 +223,16 @@ Status ControlComponent::ProduceControlCommand(
     debug->mutable_trajectory_header()->CopyFrom(
         local_view_.trajectory.header());
 
+    if (local_view_.trajectory.is_replan()) {
+      latest_replan_trajectory_header_.CopyFrom(
+          local_view_.trajectory.header());
+    }
+
+    if (latest_replan_trajectory_header_.has_sequence_num()) {
+      debug->mutable_latest_replan_trajectory_header()->CopyFrom(
+          latest_replan_trajectory_header_);
+    }
+
     Status status_compute = controller_agent_.ComputeControlCommand(
         &local_view_.localization, &local_view_.chassis,
         &local_view_.trajectory, control_command);

@@ -49,7 +49,8 @@ class ExtrapolationPredictor : public SequencePredictor {
   void Predict(Obstacle* obstacle) override;
 
  private:
-  void DrawShortTermTrajectory(const Feature& feature,
+  void DrawShortTermTrajectory(
+      const Feature& feature,
       std::vector<apollo::common::TrajectoryPoint>* points);
 };
 

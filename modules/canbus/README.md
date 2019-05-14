@@ -17,15 +17,15 @@ The major components in canbus module are:
 
   * **CAN Client** - CAN client has been moved to `/modules/drivers/canbus` since it is shared by different sensors utilizing the canbus protocol
 
-You can implement your own CAN client in the folder `can_client` by inheriting from the `CanClient` class. 
-  
+You can implement your own CAN client in the folder `can_client` by inheriting from the `CanClient` class.
+
 ```
 Note:
 Do not forget to register your CAN client in `CanClientFactory`.
 ```
 
-You can also implement your own vehicle controller and message manager in the folder `vehicle` by inheriting from `VehicleController` and `MessageManager`. 
-  
+You can also implement your own vehicle controller and message manager in the folder `vehicle` by inheriting from `VehicleController` and `MessageManager`.
+
 ```
 Note:
 Do not forget to register your vehicle in `VehicleFactory`.

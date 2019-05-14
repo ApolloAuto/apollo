@@ -21,6 +21,7 @@
 
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
@@ -30,6 +31,7 @@ namespace prediction {
 
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::prediction::PredictionConstants;
 
 ObstaclesContainer::ObstaclesContainer()
     : ptr_obstacles_(FLAGS_max_num_obstacles),
@@ -40,8 +42,9 @@ ObstaclesContainer::ObstaclesContainer()
 void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   // Clean up the history and get the PerceptionObstacles
   curr_frame_id_mapping_.clear();
-  curr_frame_predictable_obstacle_ids_.clear();
-  curr_frame_non_predictable_obstacle_ids_.clear();
+  curr_frame_movable_obstacle_ids_.clear();
+  curr_frame_unmovable_obstacle_ids_.clear();
+  curr_frame_considered_obstacle_ids_.clear();
   curr_frame_id_perception_obstacle_map_.clear();
 
   PerceptionObstacles perception_obstacles;
@@ -98,6 +101,13 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
       }
       break;
     }
+    case 5: {
+      if (std::fabs(timestamp - timestamp_) > FLAGS_replay_timestamp_gap ||
+          FeatureOutput::SizeOfFrameEnv() > FLAGS_max_num_dump_feature) {
+        FeatureOutput::WriteDataForTuning();
+      }
+      break;
+    }
     default: {
       // No data dump
       break;
@@ -127,15 +137,6 @@ void ObstaclesContainer::Insert(const ::google::protobuf::Message& message) {
   }
   // 3. Sort the Obstacles
   ObstacleClusters::SortObstacles();
-
-  // 4. Deduct the NearbyObstacles info. from the sorted Obstacles
-  for (const int id : curr_frame_predictable_obstacle_ids_) {
-    Obstacle* obstacle_ptr = GetObstacle(id);
-    if (obstacle_ptr == nullptr) {
-      continue;
-    }
-    obstacle_ptr->SetNearbyObstacles();
-  }
 }
 
 Obstacle* ObstaclesContainer::GetObstacle(const int id) {
@@ -167,21 +168,41 @@ const PerceptionObstacle& ObstaclesContainer::GetPerceptionObstacle(
   return curr_frame_id_perception_obstacle_map_[id];
 }
 
-const std::vector<int>&
-ObstaclesContainer::curr_frame_predictable_obstacle_ids() {
-  return curr_frame_predictable_obstacle_ids_;
+const std::vector<int>& ObstaclesContainer::curr_frame_movable_obstacle_ids() {
+  return curr_frame_movable_obstacle_ids_;
 }
 
 const std::vector<int>&
-ObstaclesContainer::curr_frame_non_predictable_obstacle_ids() {
-  return curr_frame_non_predictable_obstacle_ids_;
+ObstaclesContainer::curr_frame_unmovable_obstacle_ids() {
+  return curr_frame_unmovable_obstacle_ids_;
+}
+
+const std::vector<int>&
+ObstaclesContainer::curr_frame_considered_obstacle_ids() {
+  return curr_frame_considered_obstacle_ids_;
+}
+
+void ObstaclesContainer::SetConsideredObstacleIds() {
+  curr_frame_considered_obstacle_ids_.clear();
+  for (const int id : curr_frame_movable_obstacle_ids_) {
+    Obstacle* obstacle_ptr = GetObstacle(id);
+    if (obstacle_ptr == nullptr) {
+      AERROR << "Null obstacle found.";
+      continue;
+    }
+    if (obstacle_ptr->ToIgnore()) {
+      ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
+      continue;
+    }
+    curr_frame_considered_obstacle_ids_.push_back(id);
+  }
 }
 
 std::vector<int> ObstaclesContainer::curr_frame_obstacle_ids() {
-  std::vector<int> curr_frame_obs_ids = curr_frame_predictable_obstacle_ids_;
+  std::vector<int> curr_frame_obs_ids = curr_frame_movable_obstacle_ids_;
   curr_frame_obs_ids.insert(curr_frame_obs_ids.end(),
-                            curr_frame_non_predictable_obstacle_ids_.begin(),
-                            curr_frame_non_predictable_obstacle_ids_.end());
+                            curr_frame_unmovable_obstacle_ids_.begin(),
+                            curr_frame_unmovable_obstacle_ids_.end());
   return curr_frame_obs_ids;
 }
 
@@ -198,10 +219,10 @@ void ObstaclesContainer::InsertPerceptionObstacle(
     AERROR << "Invalid ID [" << id << "]";
     return;
   }
-  if (!IsPredictable(perception_obstacle)) {
+  if (!IsMovable(perception_obstacle)) {
     ADEBUG << "Perception obstacle [" << perception_obstacle.id()
-           << "] is not predictable.";
-    curr_frame_non_predictable_obstacle_ids_.push_back(id);
+           << "] is unmovable.";
+    curr_frame_unmovable_obstacle_ids_.push_back(id);
     return;
   }
 
@@ -221,8 +242,9 @@ void ObstaclesContainer::InsertPerceptionObstacle(
   }
 
   if (id != -1) {
-    curr_frame_predictable_obstacle_ids_.push_back(id);
+    curr_frame_movable_obstacle_ids_.push_back(id);
   }
+  SetConsideredObstacleIds();
 }
 
 void ObstaclesContainer::InsertFeatureProto(const Feature& feature) {
@@ -318,20 +340,23 @@ int ObstaclesContainer::PerceptionIdToPredictionId(const int perception_id) {
 void ObstaclesContainer::BuildLaneGraph() {
   // Go through every obstacle in the current frame, after some
   // sanity checks, build lane graph for non-junction cases.
-  for (const int id : curr_frame_predictable_obstacle_ids_) {
+  for (const int id : curr_frame_considered_obstacle_ids_) {
     Obstacle* obstacle_ptr = GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Null obstacle found.";
       continue;
     }
-    if (obstacle_ptr->ToIgnore()) {
-      ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
-      continue;
+    if (FLAGS_prediction_offline_mode !=
+            PredictionConstants::kDumpFeatureProto &&
+        FLAGS_prediction_offline_mode !=
+            PredictionConstants::kDumpDataForLearning) {
+      ADEBUG << "Building Lane Graph.";
+      obstacle_ptr->BuildLaneGraph();
+    } else {
+      ADEBUG << "Building ordered Lane Graph.";
+      obstacle_ptr->BuildLaneGraphFromLeftToRight();
     }
-    ADEBUG << "Building Lane Graph.";
-    obstacle_ptr->BuildLaneGraph();
-    ADEBUG << "Building ordered Lane Graph.";
-    // obstacle_ptr->BuildLaneGraphFromLeftToRight();
+    obstacle_ptr->SetNearbyObstacles();
   }
 
   Obstacle* ego_vehicle_ptr = GetObstacle(FLAGS_ego_vehicle_id);
@@ -346,14 +371,10 @@ void ObstaclesContainer::BuildLaneGraph() {
 void ObstaclesContainer::BuildJunctionFeature() {
   // Go through every obstacle in the current frame, after some
   // sanity checks, build junction features for those that are in junction.
-  for (const int id : curr_frame_predictable_obstacle_ids_) {
+  for (const int id : curr_frame_considered_obstacle_ids_) {
     Obstacle* obstacle_ptr = GetObstacle(id);
     if (obstacle_ptr == nullptr) {
       AERROR << "Null obstacle found.";
-      continue;
-    }
-    if (obstacle_ptr->ToIgnore()) {
-      ADEBUG << "Ignore obstacle [" << obstacle_ptr->id() << "]";
       continue;
     }
     const std::string& junction_id = JunctionAnalyzer::GetJunctionId();
@@ -397,7 +418,7 @@ bool ObstaclesContainer::AdaptTracking(
   return false;
 }
 
-bool ObstaclesContainer::IsPredictable(
+bool ObstaclesContainer::IsMovable(
     const PerceptionObstacle& perception_obstacle) {
   if (!perception_obstacle.has_type() ||
       perception_obstacle.type() == PerceptionObstacle::UNKNOWN_UNMOVABLE) {

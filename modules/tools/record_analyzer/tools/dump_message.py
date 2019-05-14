@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     record_file = args.file
     reader = RecordReader(record_file)
-    
+
     for msg in reader.read_messages():
         timestamp = msg.timestamp / float(1e9)
         if msg.topic == args.message and abs(timestamp - args.timestamp) <=1:
@@ -55,6 +55,6 @@ if __name__ == "__main__":
                     perception_obstacle_pb2.PerceptionObstacles()
                 perception_obstacles.ParseFromString(msg.message)
                 with open('perception_obstacles.txt', 'w') as f:
-                    f.write(str(perception_obstacles))  
-                print str(perception_obstacles) 
+                    f.write(str(perception_obstacles))
+                print str(perception_obstacles)
                 break

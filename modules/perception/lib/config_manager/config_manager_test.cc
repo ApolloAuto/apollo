@@ -66,7 +66,7 @@ TEST_F(ConfigManagerTest, TestGetModelConfig) {
   // not exist model.
   model_config = nullptr;
   EXPECT_FALSE(config_manager_->GetModelConfig("noexist", &model_config));
-  EXPECT_TRUE(model_config == nullptr);
+  EXPECT_EQ(model_config, nullptr);
 }
 
 TEST_F(ConfigManagerTest, TestModelConfig) {

@@ -21,7 +21,6 @@
 #include "modules/planning/scenarios/lane_follow/lane_follow_scenario.h"
 
 #include "cyber/common/log.h"
-#include "modules/planning/common/frame.h"
 #include "modules/planning/scenarios/lane_follow/lane_follow_stage.h"
 
 namespace apollo {
@@ -37,16 +36,6 @@ std::unique_ptr<Stage> LaneFollowScenario::CreateStage(
     return nullptr;
   }
   return std::unique_ptr<Stage>(new LaneFollowStage(stage_config));
-}
-
-bool LaneFollowScenario::IsTransferable(const Scenario& current_scenario,
-                                        const Frame& frame) {
-  // implement here
-  if (current_scenario.scenario_type() == ScenarioConfig::LANE_FOLLOW) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 }  // namespace lane_follow

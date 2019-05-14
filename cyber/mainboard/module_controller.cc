@@ -26,12 +26,6 @@ namespace apollo {
 namespace cyber {
 namespace mainboard {
 
-ModuleController::ModuleController(const ModuleArgument& args) { args_ = args; }
-
-ModuleController::~ModuleController() {}
-
-bool ModuleController::Init() { return LoadAll(); }
-
 void ModuleController::Clear() {
   for (auto& component : component_list_) {
     component->Shutdown();

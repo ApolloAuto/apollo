@@ -43,6 +43,7 @@ std::shared_ptr<CRoutine> ChoreographyContext::NextRoutine() {
   for (auto it = cr_queue_.begin(); it != cr_queue_.end();) {
     auto cr = it->second;
     if (!cr->Acquire()) {
+      ++it;
       continue;
     }
 
@@ -90,8 +91,6 @@ void ChoreographyContext::RemoveCRoutine(uint64_t crid) {
       cr->Release();
       return;
     }
-
-    cr->Release();
     ++it;
   }
 }

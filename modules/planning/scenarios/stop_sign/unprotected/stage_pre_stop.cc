@@ -69,10 +69,9 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
 
   // get overlap along reference line
   PathOverlap* current_stop_sign_overlap =
-      scenario::util::GetOverlapOnReferenceLine(
-          reference_line_info,
-          stop_sign_overlap_id,
-          ReferenceLineInfo::STOP_SIGN);
+      scenario::util::GetOverlapOnReferenceLine(reference_line_info,
+                                                stop_sign_overlap_id,
+                                                ReferenceLineInfo::STOP_SIGN);
   if (!current_stop_sign_overlap) {
     return FinishScenario();
   }
@@ -113,7 +112,9 @@ Stage::StageStatus StopSignUnprotectedStagePreStop::Process(
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
   for (const auto& perception_obstacle_id : watch_vehicle_ids) {
-    PlanningContext::MutablePlanningStatus()->mutable_stop_sign()
+    PlanningContext::Instance()
+        ->mutable_planning_status()
+        ->mutable_stop_sign()
         ->add_wait_for_obstacle_id(perception_obstacle_id);
   }
 
@@ -210,8 +211,8 @@ int StopSignUnprotectedStagePreStop::AddWatchVehicle(
       vehicles.end()) {
     ADEBUG << "AddWatchVehicle: lane[" << obstacle_lane->id().id()
            << "] obstacle_id[" << perception_obstacle_id << "]";
-    (*watch_vehicles)[obstacle_lane->id().id()]
-                      .push_back(perception_obstacle_id);
+    (*watch_vehicles)[obstacle_lane->id().id()].push_back(
+        perception_obstacle_id);
   }
 
   return 0;

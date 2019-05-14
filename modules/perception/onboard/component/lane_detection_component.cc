@@ -49,12 +49,11 @@ FunInfoType LaneDetectionComponent::init_func_arry_[] = {
     {&LaneDetectionComponent::InitCameraFrames, "InitCameraFrames"},
     {&LaneDetectionComponent::InitProjectMatrix, "InitProjectMatrix"},
     {&LaneDetectionComponent::InitMotionService, "InitMotionService"},
-    {&LaneDetectionComponent::InitCameraListeners, "InitCameraListeners"} };
+    {&LaneDetectionComponent::InitCameraListeners, "InitCameraListeners"}};
 
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
-  std::string work_root = "";
-  camera::GetCyberWorkRoot(&work_root);
+  std::string work_root = camera::GetCyberWorkRoot();
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
@@ -190,7 +189,7 @@ bool LaneDetectionComponent::Init() {
 
   writer_ = node_->CreateWriter<PerceptionLanes>(output_lanes_channel_name_);
   if (!EXEC_ALL_FUNS(LaneDetectionComponent, this,
-    LaneDetectionComponent::init_func_arry_)) {
+                     LaneDetectionComponent::init_func_arry_)) {
     return false;
   }
   SetCameraHeightAndPitch();
@@ -675,7 +674,8 @@ int LaneDetectionComponent::InternalProc(
       camera_frame.data_provider->GetImage(image_options, &out_image);
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame);
+      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                   mot_buffer_);
     }
   }
 

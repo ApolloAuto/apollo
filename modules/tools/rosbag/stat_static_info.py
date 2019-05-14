@@ -43,7 +43,7 @@ class StaticInfoCalculator(object):
 
     def process_file(self, record_file):
         """
-        Extract information from record file. 
+        Extract information from record file.
         Return True if we are done collecting all information.
         """
         try:

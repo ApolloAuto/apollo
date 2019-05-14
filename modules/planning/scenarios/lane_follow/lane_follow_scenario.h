@@ -27,6 +27,7 @@
 
 #include "modules/common/status/status.h"
 #include "modules/common/util/factory.h"
+#include "modules/planning/common/frame.h"
 #include "modules/planning/common/reference_line_info.h"
 #include "modules/planning/common/speed_profile_generator.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -48,9 +49,6 @@ class LaneFollowScenario : public Scenario {
 
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
-
-  bool IsTransferable(const Scenario& current_scenario,
-                      const Frame& frame) override;
 };
 
 }  // namespace lane_follow

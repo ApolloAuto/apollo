@@ -47,8 +47,7 @@ const Obstacle *PathDecision::Find(const std::string &object_id) const {
 const perception::PerceptionObstacle *PathDecision::FindPerceptionObstacle(
     const std::string &perception_obstacle_id) const {
   for (const auto *obstacle : obstacles_.Items()) {
-    if (std::to_string(obstacle->Perception().id()) ==
-        perception_obstacle_id) {
+    if (std::to_string(obstacle->Perception().id()) == perception_obstacle_id) {
       return &(obstacle->Perception());
     }
   }
