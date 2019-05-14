@@ -75,7 +75,7 @@ default_task_config: {
     high_speed_threshold: 12.58
     low_speed_threshold: 7.5
     minimal_kappa: 0.00001
-    point_extension: 1.0
+    point_extension: 0.0
     lowest_speed: 2.5
     num_points_to_avg_kappa: 2
     static_obs_nudge_speed_ratio: 0.6
@@ -95,7 +95,7 @@ default_task_config: {
     high_speed_threshold: 12.58
     low_speed_threshold: 7.5
     minimal_kappa: 0.00001
-    point_extension: 1.0
+    point_extension: 0.0
     lowest_speed: 2.5
     num_points_to_avg_kappa: 2
     static_obs_nudge_speed_ratio: 0.6

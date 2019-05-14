@@ -384,8 +384,7 @@ Status StBoundaryMapper::MapWithDecision(
         diff_s / diff_t * (planning_time_ - lower_points.front().t()) +
         lower_points.front().s();
     const double extend_upper_s =
-        extend_lower_s + (upper_points.back().s() - lower_points.back().s()) +
-        1.0;
+        extend_lower_s + (upper_points.back().s() - lower_points.back().s());
     upper_points.emplace_back(extend_upper_s, planning_time_);
     lower_points.emplace_back(extend_lower_s, planning_time_);
   }
