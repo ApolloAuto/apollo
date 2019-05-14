@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-#include "modules/planning/tasks/optimizers/path_time_heuristic/dp_st_graph.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/gridded_path_time_graph.h"
 
 #include "gtest/gtest.h"
 
@@ -139,8 +139,8 @@ TEST_F(DpStGraphTest, simple) {
   adc_sl_boundary_.set_start_l(-1.1);
   adc_sl_boundary_.set_end_l(1.1);
 
-  DpStGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_, init_point_,
-                        adc_sl_boundary_);
+  GriddedPathTimeGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_,
+      init_point_, adc_sl_boundary_);
 
   SpeedData speed_data;
   auto ret = dp_st_graph.Search(&speed_data);
