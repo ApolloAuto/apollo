@@ -48,7 +48,7 @@ class HybridATest : public ::testing::Test {
 
  protected:
   std::unique_ptr<HybridAStar> hybrid_test;
-  apollo::planning::PlannerOpenSpaceConfig planner_open_space_config_;
+  PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
 TEST_F(HybridATest, test1) {

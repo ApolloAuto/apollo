@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -44,13 +45,23 @@ class OpenSpaceTrajectoryPartition : public TrajectoryOptimizer {
  private:
   common::Status Process() override;
 
-  void InterpolateTrajectory(const DiscretizedTrajectory& trajectory,
-                             DiscretizedTrajectory* interpolated_trajectory);
+  void InterpolateTrajectory(
+      const DiscretizedTrajectory& stitched_trajectory_result,
+      DiscretizedTrajectory* interpolated_trajectory);
 
   void UpdateVehicleInfo();
 
-  void PartitionTrajectory(DiscretizedTrajectory* interpolated_trajectory,
-                           std::vector<TrajGearPair>* paritioned_trajectories);
+  bool EncodeTrajectory(const DiscretizedTrajectory& trajectory,
+                        std::string* const encoding);
+
+  bool CheckTrajTraversed(
+      const std::string& trajectory_encoding_to_check) const;
+
+  void UpdateTrajHistory(const std::string& chosen_trajectory_encoding);
+
+  void PartitionTrajectory(
+      DiscretizedTrajectory* interpolated_trajectory_result_ptr,
+      std::vector<TrajGearPair>* paritioned_trajectories);
 
   bool CheckReachTrajectoryEnd(const DiscretizedTrajectory& trajectory,
                                const canbus::Chassis::GearPosition& gear,

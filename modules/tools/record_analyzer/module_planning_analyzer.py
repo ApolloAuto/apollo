@@ -16,6 +16,7 @@
 # limitations under the License.
 ###############################################################################
 
+import sys
 import json
 import numpy as np
 from shapely.geometry import LineString, Point
@@ -32,7 +33,7 @@ from common.frechet_distance import frechet_distance
 class PlannigAnalyzer:
     """planning analyzer"""
 
-    def __init__(self, is_simulation, is_sim):
+    def __init__(self, arguments):
         """init"""
         self.module_latency = []
         self.trajectory_type_dist = {}
@@ -41,8 +42,7 @@ class PlannigAnalyzer:
         self.error_msg_analyzer = ErrorMsgAnalyzer()
         self.last_adc_trajectory = None
         self.frechet_distance_list = []
-        self.is_simulation = is_simulation
-        self.is_sim = is_sim
+        self.is_sim = arguments.simulation
         self.hard_break_list = []
         self.total_cycle_num = 0
 
@@ -58,6 +58,8 @@ class PlannigAnalyzer:
         self.centripetal_jerk_list = []
         self.centripetal_accel_list = []
         self.jerk_list = []
+
+        self.latency_list = []
 
         # [2, 4) unit m/s^2
         self.ACCEL_M_LB = 2
@@ -113,9 +115,20 @@ class PlannigAnalyzer:
         self.LAT_JERK_H_UB_N = -1
         self.lat_jerk_high_cnt = 0
 
+        self.bag_start_time_t = None
+        self.print_acc = arguments.showacc
+
+        self.rl_is_offroad_cnt = 0
+        self.rl_minimum_boundary = sys.float_info.max
+        self.rl_kappa_rms_list = []
+        self.rl_dkappa_rms_list = []
+        self.rl_kappa_max_abs_list = []
+        self.rl_dkappa_max_abs_list = []
+
+
     def put(self, adc_trajectory):
         self.total_cycle_num += 1
-        if not self.is_simulation and not self.is_sim:
+        if not self.is_sim:
             latency = adc_trajectory.latency_stats.total_time_ms
             self.module_latency.append(latency)
 
@@ -133,7 +146,24 @@ class PlannigAnalyzer:
                     self.estop_reason_dist.get(
                         adc_trajectory.estop.reason, 0) + 1
 
-        if self.is_simulation or self.is_sim:
+        if self.is_sim:
+            self.latency_list.append(adc_trajectory.latency_stats.total_time_ms)
+
+            for ref_line_debug in adc_trajectory.debug.planning_data.reference_line:
+                if ref_line_debug.HasField("is_offroad") and ref_line_debug.is_offroad:
+                    self.rl_is_offroad_cnt += 1
+                if ref_line_debug.HasField("minimum_boundary") and \
+                    ref_line_debug.minimum_boundary < self.rl_minimum_boundary:
+                    self.rl_minimum_boundary = ref_line_debug.minimum_boundary
+                if ref_line_debug.HasField("kappa_rms"):
+                    self.rl_kappa_rms_list.append(ref_line_debug.kappa_rms)
+                if ref_line_debug.HasField("dkappa_rms"):
+                    self.rl_dkappa_rms_list.append(ref_line_debug.dkappa_rms)
+                if ref_line_debug.HasField("kappa_max_abs"):
+                    self.rl_kappa_max_abs_list.append(ref_line_debug.kappa_max_abs)
+                if ref_line_debug.HasField("dkappa_max_abs"):
+                    self.rl_dkappa_max_abs_list.append(ref_line_debug.dkappa_max_abs)
+
             if not adc_trajectory.debug.planning_data.HasField('init_point'):
                 return
 
@@ -144,6 +174,9 @@ class PlannigAnalyzer:
 
             t = adc_trajectory.header.timestamp_sec + init_point.relative_time
 
+            if self.bag_start_time_t is None:
+                self.bag_start_time_t = t
+
             accel = None
             jerk = None
             duration = 0
@@ -151,6 +184,9 @@ class PlannigAnalyzer:
                 duration = t - self.last_init_point_t
             if self.last_init_point is not None and duration > 0.03:
                 accel = (init_point.v - self.last_init_point.v) / duration
+                if self.print_acc and abs(accel) > 4:
+                    print("---------------")
+                    print(t - self.bag_start_time_t, "acc = ", accel)
                 if accel > 0:
                     self.init_point_accel.append(accel)
                 elif accel < 0:
@@ -300,64 +336,6 @@ class PlannigAnalyzer:
             PrintColors.ENDC
         StatisticalAnalyzer().print_statistical_results(self.frechet_distance_list)
 
-    def print_simulation_results(self):
-        results = {}
-
-        if len(self.init_point_accel) > 0:
-            results["accel_max"] = max(self.init_point_accel)
-            results["accel_avg"] = np.average(self.init_point_accel)
-        else:
-            results["accel_max"] = 0.0
-            results["accel_avg"] = 0.0
-
-        results['accel_medium_cnt'] = self.accel_medium_cnt
-        results['accel_high_cnt'] = self.accel_high_cnt
-
-        if len(self.init_point_decel) > 0:
-            results["decel_max"] = max(self.init_point_decel)
-            results["decel_avg"] = np.average(self.init_point_decel)
-        else:
-            results["decel_max"] = 0.0
-            results["decel_avg"] = 0.0
-
-        results['decel_medium_cnt'] = self.decel_medium_cnt
-        results['decel_high_cnt'] = self.decel_high_cnt
-
-        if len(self.jerk_list) > 0:
-            results["jerk_max"] = max(self.jerk_list, key=abs)
-            jerk_avg = np.average(np.absolute(self.jerk_list))
-            results["jerk_avg"] = jerk_avg
-        else:
-            results["jerk_max"] = 0
-            results["jerk_avg"] = 0
-
-        results['jerk_medium_cnt'] = self.jerk_medium_cnt
-        results['jerk_high_cnt'] = self.jerk_high_cnt
-
-        if len(self.centripetal_jerk_list) > 0:
-            results["lat_jerk_max"] = max(self.centripetal_jerk_list, key=abs)
-            jerk_avg = np.average(np.absolute(self.centripetal_jerk_list))
-            results["lat_jerk_avg"] = jerk_avg
-        else:
-            results["lat_jerk_max"] = 0
-            results["lat_jerk_avg"] = 0
-
-        results['lat_jerk_medium_cnt'] = self.lat_jerk_medium_cnt
-        results['lat_jerk_high_cnt'] = self.lat_jerk_high_cnt
-
-        if len(self.centripetal_accel_list) > 0:
-            results["lat_accel_max"] = max(self.centripetal_accel_list, key=abs)
-            accel_avg = np.average(np.absolute(self.centripetal_accel_list))
-            results["lat_accel_avg"] = accel_avg
-        else:
-            results["lat_accel_max"] = 0
-            results["lat_accel_avg"] = 0
-
-        results['lat_accel_medium_cnt'] = self.lat_accel_medium_cnt
-        results['lat_accel_high_cnt'] = self.lat_accel_high_cnt
-
-        print json.dumps(results)
-
     def print_sim_results(self):
         """
         dreamland metrics for planning v2
@@ -422,6 +400,44 @@ class PlannigAnalyzer:
         v2_results["lat_accel"]["medium_cnt"] = self.lat_accel_medium_cnt
         v2_results["lat_accel"]["high_cnt"] = self.lat_accel_high_cnt
 
+        # latency
+        if len(self.latency_list) > 0:
+            v2_results["planning_latency"] = {
+                "max" : max(self.latency_list),
+                "min" : min(self.latency_list),
+                "avg" : np.average(self.latency_list)
+            }
+
+        # reference line
+        kappa_rms = 0
+        if len(self.rl_kappa_rms_list) > 0:
+            kappa_rms = np.average(self.rl_kappa_rms_list)
+
+        dkappa_rms = 0
+        if len(self.rl_dkappa_rms_list) > 0:
+            dkappa_rms = np.average(self.rl_dkappa_rms_list)
+
+        if self.rl_minimum_boundary > 999:
+            self.rl_minimum_boundary = 0
+
+        kappa_max_abs = 0
+        if len(self.rl_kappa_max_abs_list) > 0:
+            kappa_max_abs = max(self.rl_kappa_max_abs_list)
+
+        dkappa_max_abs = 0
+        if len(self.rl_dkappa_max_abs_list) > 0:
+            dkappa_max_abs = max(self.rl_dkappa_max_abs_list)
+
+        v2_results["reference_line"] = {
+            "is_offroad" : self.rl_is_offroad_cnt,
+            "minimum_boundary" : self.rl_minimum_boundary,
+            "kappa_rms" : kappa_rms,
+            "dkappa_rms" : dkappa_rms,
+            "kappa_max_abs" : kappa_max_abs,
+            "dkappa_max_abs" : dkappa_max_abs
+        }
+
+        # output final reuslts
         print json.dumps(v2_results)
 
     def plot_path(self, plt, adc_trajectory):

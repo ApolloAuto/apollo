@@ -6,7 +6,7 @@ The Perception module has been upgraded completely to handle comprehensive senso
 Apollo Perception has following new features:
 
  * **Support for VLS-128 Line LiDAR**
- * **Obstacle detection though multiple cameras**
+ * **Obstacle detection through multiple cameras**
  * **Advanced traffic light detection**
  * **Configurable sensor fusion**
 

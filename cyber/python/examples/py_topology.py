@@ -17,12 +17,12 @@
 """Module for example of topology manager."""
 
 import sys
-
-sys.path.append("../")
 from cyber_py import topology_manager
 
+sys.path.append("../")
 
-class Test_Topology_Manager(object):
+
+class TestTopologyManager(object):
 
     """
     Class for cyber Node wrapper.
@@ -32,19 +32,19 @@ class Test_Topology_Manager(object):
         """
         Init Topology Manager.
         """
-        print("init test topology successful")
+        print('Init test topology successful')
         self.test_topology_manager = topology_manager.Topology_Manager()
 
     def test_has_node(self, node_name):
         """
         Test Has Specific Node.
         """
-        print("node name:", node_name)
+        print('Node name: %s' % node_name)
         flag = self.test_topology_manager.has_node(node_name)
-        if(flag is True):
-            print("node {} exist.".format(node_name))
+        if flag:
+            print("Node {} exist.".format(node_name))
         else:
-            print("node {} not exist.".format(node_name))
+            print("Node {} does not exist.".format(node_name))
 
     def test_get_node_list(self):
         """
@@ -52,87 +52,85 @@ class Test_Topology_Manager(object):
         """
         node_list = self.test_topology_manager.get_node_list()
         print(len(node_list))
-        if(len(node_list) != 0):
+        if node_list:
             for node in node_list:
                 print(node)
         else:
-            print("get all nodes failed")
+            print('Failed to get all nodes.')
 
     def test_show_node_info(self, node_name):
         """
         Test Show Node Info.
         """
         ret = self.test_topology_manager.show_node_info(node_name)
-        if(len(ret) != 0):
-            for item in ret:
-                print item
+        for item in ret:
+            print(item)
 
     def test_get_channel_list(self):
         """
         Test Get Channel List Info.
         """
         channel_list = self.test_topology_manager.get_channel_list()
-        if(len(channel_list) != 0):
+        if channel_list:
             for channel in channel_list:
                 print(channel)
         else:
-            print("get all channels failed")
+            print('Failed to get all channels.')
 
     def test_get_reader_list(self):
         """
         Test Get Reader List.
         """
         reader_list = self.test_topology_manager.get_reader_list()
-        if(len(reader_list) != 0):
+        if reader_list:
             for reader in reader_list:
                 print(reader)
         else:
-            print("get all reader failed")
+            print('Failed to get all reader.')
 
     def test_get_writer_list(self):
         """
         Test Get Writer List.
         """
         writer_list = self.test_topology_manager.get_writer_list()
-        if(len(writer_list) != 0):
+        if writer_list:
             for writer in writer_list:
                 print(writer)
         else:
-            print("get all writer failed")
+            print('Failed to get all writer.')
 
     def test_get_node_writes(self, node_name):
         """
         Test Get Node Writes.
         """
         node_writers = self.test_topology_manager.get_node_writes(node_name)
-        if(len(node_writers) != 0):
+        if node_writers:
             for node_writer in node_writers:
                 print(node_writer)
         else:
-            print("get all writers of node :{} failed".format(node_name))
+            print('Get all writers of node :{} failed'.format(node_name))
 
     def test_get_node_readers(self, node_name):
         """
         Test Get Node Readers.
         """
         node_readers = self.test_topology_manager.get_node_readers(node_name)
-        if(len(node_readers) != 0):
+        if node_readers:
             for node_reader in node_readers:
                 print(node_reader)
         else:
-            print("get all readers of node :{} failed".format(node_name))
+            print('Get all readers of node :{} failed'.format(node_name))
 
     def test_show_channel_info(self, channel_name):
         """
         Test Show Channel Info.
         """
         ret = self.test_topology_manager.show_channel_info(channel_name)
-        if(len(ret) != 0):
-            for item in ret:
-                print item
+        for item in ret:
+            print(item)
 
 if __name__ == "__main__":
-    topology_manager_instance = Test_Topology_Manager()
+    topology_manager_instance = TestTopologyManager()
     # topology_manager_instance.test_has_node("monitor")
     # topology_manager_instance.test_get_node_list()
     # topology_manager_instance.test_get_channel_list()

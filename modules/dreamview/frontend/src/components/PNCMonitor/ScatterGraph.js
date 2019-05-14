@@ -143,9 +143,10 @@ export default class ScatterGraph extends React.Component {
                 display: options.legend.display,
                 labels: {
                     filter: (legendItem, data) => {
-                        // skip label that starts with 'skip_',
-                        // such as the one for car's bounding box
-                        return !legendItem.text.startsWith('skip_');
+                        const hideLabel = _.get(data,
+                            `datasets[${legendItem.datasetIndex}].hideLabelInLegend`, false);
+
+                        return !hideLabel;
                     }
                 }
             },
@@ -201,12 +202,12 @@ export default class ScatterGraph extends React.Component {
     }
 
     updateData(idx, name, properties, data) {
-        const trimmedLabel = name.substring(0, 5);
         if (this.chart.data.datasets[idx] === undefined) {
             // basic properties
             const config = {
-                label: trimmedLabel, //legend
-                showText: properties.showLabel,
+                label: name, //legend
+                hideLabelInLegend: properties.hideLabelInLegend,
+                showText: properties.showText,
                 text: name, // text in the graph
 
                 backgroundColor: properties.color,
@@ -230,7 +231,7 @@ export default class ScatterGraph extends React.Component {
     updateCar(name, point, properties) {
         // draw heading arrow
         {
-            const arrowName = name + '_arrow';
+            const arrowName = name;
             if (this.name2idx[arrowName] === undefined) {
                 this.name2idx[arrowName] = this.chart.data.datasets.length;
             }
@@ -244,7 +245,7 @@ export default class ScatterGraph extends React.Component {
 
         // draw ego-vehicle bounding box
         {
-            const polygonName = 'skip_legend_' + name + '_car_bounding_box';
+            const polygonName = name + '_car_bounding_box';
             if (this.name2idx[polygonName] === undefined) {
                 this.name2idx[polygonName] = this.chart.data.datasets.length;
             }
@@ -257,6 +258,7 @@ export default class ScatterGraph extends React.Component {
                 showLine: true,
                 fill: false,
                 lineTension: 0,
+                hideLabelInLegend: true,
             };
             this.updateData(idx2, polygonName, polygonProperties, polygon);
         }
@@ -270,8 +272,9 @@ export default class ScatterGraph extends React.Component {
 
         // Draw cars
         for (const name in props.properties.cars) {
-            const point = _.get(datasets, `cars[${name}]`, {});
-            const properties = _.get(props, `properties.cars[${name}]`, {});
+            const nameInString = JSON.stringify(name);
+            const point = _.get(datasets, `cars[${nameInString}]`, {});
+            const properties = _.get(props, `properties.cars[${nameInString}]`, {});
             this.updateCar(name, point, properties);
         }
 
@@ -281,8 +284,9 @@ export default class ScatterGraph extends React.Component {
                 this.name2idx[name] = this.chart.data.datasets.length;
             }
             const idx = this.name2idx[name];
-            const properties = _.get(props, `properties.lines[${name}]`, {});
-            const points = _.get(datasets, `lines[${name}]`, []);
+            const nameInString = JSON.stringify(name);
+            const properties = _.get(props, `properties.lines[${nameInString}]`, {});
+            const points = _.get(datasets, `lines[${nameInString}]`, []);
             this.updateData(idx, name, properties, points);
         };
 
@@ -290,13 +294,14 @@ export default class ScatterGraph extends React.Component {
         let idx = Object.keys(this.name2idx).length;
         if (datasets.polygons) {
             for (const name in datasets.polygons) {
-                const points = _.get(datasets, `polygons[${name}]`);
+                const nameInString = JSON.stringify(name);
+                const points = _.get(datasets, `polygons[${nameInString}]`);
                 if (!points) {
                     continue;
                 }
 
                 const properties =
-                    _.get(props, `properties.polygons[${name}]`, defaultPolygonProperties);
+                    _.get(props, `properties.polygons[${nameInString}]`, defaultPolygonProperties);
 
                 this.updateData(idx, name, properties, points);
                 idx++;

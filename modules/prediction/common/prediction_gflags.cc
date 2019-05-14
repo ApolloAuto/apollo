@@ -96,7 +96,7 @@ DEFINE_int32(min_still_obstacle_history_length, 4,
              "Min # historical frames for still obstacles");
 DEFINE_int32(max_still_obstacle_history_length, 10,
              "Min # historical frames for still obstacles");
-DEFINE_double(still_obstacle_speed_threshold, 1.8,
+DEFINE_double(still_obstacle_speed_threshold, 0.99,
               "Speed threshold for still obstacles");
 DEFINE_double(still_pedestrian_speed_threshold, 0.2,
               "Speed threshold for still pedestrians");
@@ -138,10 +138,10 @@ DEFINE_string(torch_vehicle_junction_mlp_file,
               "Vehicle junction MLP model file");
 DEFINE_string(torch_vehicle_cruise_go_file,
               "/apollo/modules/prediction/data/cruise_go_vehicle_model.pt",
-              "Vehicle cruise cutin model file");
+              "Vehicle cruise go model file");
 DEFINE_string(torch_vehicle_cruise_cutin_file,
               "/apollo/modules/prediction/data/cruise_cutin_vehicle_model.pt",
-              "Vehicle cruise go model file");
+              "Vehicle cruise cutin model file");
 DEFINE_string(torch_vehicle_lane_scanning_file,
               "/apollo/modules/prediction/data/lane_scanning_vehicle_model.pt",
               "Vehicle lane scanning model file");
@@ -214,7 +214,7 @@ DEFINE_bool(enable_trim_prediction_trajectory, true,
             "protected adc planning trajectory.");
 DEFINE_double(adc_trajectory_search_length, 10.0,
               "How far to search junction along adc planning trajectory");
-DEFINE_double(virtual_lane_radius, 0.5, "Radius to search virtual lanes");
+DEFINE_double(virtual_lane_radius, 2.0, "Radius to search virtual lanes");
 DEFINE_double(default_lateral_approach_speed, 0.5,
               "Default lateral speed approaching to center of lane");
 DEFINE_double(centripedal_acc_threshold, 2.0,
@@ -256,6 +256,8 @@ DEFINE_bool(use_bell_curve_for_cost_function, false,
 // interaction predictor
 DEFINE_double(collision_cost_time_resolution, 1.0,
               "The time resolution used to compute the collision cost");
+DEFINE_double(longitudinal_acceleration_cost_weight, 0.0,
+              "The weight of longitudinal acceleration cost");
 DEFINE_double(centripedal_acceleration_cost_weight, 0.0,
               "The weight of the cost related to centripedal acceleration");
 DEFINE_double(collision_cost_weight, 1.0,

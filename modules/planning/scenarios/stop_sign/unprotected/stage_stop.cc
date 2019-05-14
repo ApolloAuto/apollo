@@ -116,6 +116,12 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
     ADEBUG << "watch_vehicles: lane_id[" << associated_lane_id << "] vehicle["
            << s << "]";
   }
+
+  // remove duplicates (caused when same vehicle on mutiple lanes)
+  watch_vehicle_ids.erase(
+      unique(watch_vehicle_ids.begin(), watch_vehicle_ids.end()),
+      watch_vehicle_ids.end());
+
   if (watch_vehicle_ids.empty()) {
     return FinishStage();
   }
@@ -123,7 +129,8 @@ Stage::StageStatus StopSignUnprotectedStageStop::Process(
   // pass vehicles being watched to DECIDER_RULE_BASED_STOP task
   // for visualization
   for (const auto& perception_obstacle_id : watch_vehicle_ids) {
-    PlanningContext::MutablePlanningStatus()
+    PlanningContext::Instance()
+        ->mutable_planning_status()
         ->mutable_stop_sign()
         ->add_wait_for_obstacle_id(perception_obstacle_id);
   }
@@ -185,8 +192,8 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
       const PerceptionObstacle* perception_obstacle =
           path_decision.FindPerceptionObstacle(perception_obstacle_id);
       if (!perception_obstacle) {
-        ADEBUG << "mark ERASE obstacle_id["
-               << perception_obstacle_id << "] not exist";
+        ADEBUG << "mark ERASE obstacle_id[" << perception_obstacle_id
+               << "] not exist";
         remove_vehicles.push_back(perception_obstacle_id);
         continue;
       }
@@ -222,7 +229,7 @@ int StopSignUnprotectedStageStop::RemoveWatchVehicle(
 }
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
-  PlanningContext::MutablePlanningStatus()->clear_stop_sign();
+  PlanningContext::Instance()->mutable_planning_status()->clear_stop_sign();
 
   next_stage_ = ScenarioConfig::NO_STAGE;
   return Stage::FINISHED;
@@ -230,11 +237,13 @@ Stage::StageStatus StopSignUnprotectedStageStop::FinishScenario() {
 
 Stage::StageStatus StopSignUnprotectedStageStop::FinishStage() {
   // update PlanningContext
-  PlanningContext::MutablePlanningStatus()
+  PlanningContext::Instance()
+      ->mutable_planning_status()
       ->mutable_stop_sign()
       ->set_done_stop_sign_overlap_id(
           GetContext()->current_stop_sign_overlap_id);
-  PlanningContext::MutablePlanningStatus()
+  PlanningContext::Instance()
+      ->mutable_planning_status()
       ->mutable_stop_sign()
       ->clear_wait_for_obstacle_id();
 

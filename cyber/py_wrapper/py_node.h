@@ -25,7 +25,9 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include "cyber/cyber.h"
 #include "cyber/init.h"
@@ -35,6 +37,7 @@
 #include "cyber/node/node.h"
 #include "cyber/node/reader.h"
 #include "cyber/node/writer.h"
+#include "cyber/service_discovery/specific_manager/node_manager.h"
 
 namespace apollo {
 namespace cyber {
@@ -67,11 +70,11 @@ class PyWriter {
         data_type_(type),
         qos_depth_(qos_depth),
         node_(node) {
-    std::string proto_desc("");
+    std::string proto_desc;
     message::ProtobufFactory::Instance()->GetDescriptorString(type,
                                                               &proto_desc);
     if (proto_desc.empty()) {
-      AWARN << "cpp cann't find proto_desc msgtyp->" << data_type_;
+      AWARN << "cpp can't find proto_desc msgtype->" << data_type_;
       return;
     }
     proto::RoleAttributes role_attr;
@@ -100,15 +103,24 @@ class PyWriter {
   std::shared_ptr<Writer<message::PyMessageWrap>> writer_;
 };
 
+const char RAWDATATYPE[] = "RawData";
 class PyReader {
  public:
   PyReader(const std::string& channel, const std::string& type, Node* node)
       : channel_name_(channel), data_type_(type), node_(node), func_(nullptr) {
-    auto f =
-        [this](const std::shared_ptr<const message::PyMessageWrap>& request) {
-          this->cb(request);
-        };
-    reader_ = node_->CreateReader<message::PyMessageWrap>(channel, f);
+    if (data_type_.compare(RAWDATATYPE) == 0) {
+      auto f =
+          [this](const std::shared_ptr<const message::PyMessageWrap>& request) {
+            this->cb(request);
+          };
+      reader_ = node_->CreateReader<message::PyMessageWrap>(channel, f);
+    } else {
+      auto f =
+          [this](const std::shared_ptr<const message::RawMessage>& request) {
+            this->cb_rawmsg(request);
+          };
+      reader_rawmsg_ = node_->CreateReader<message::RawMessage>(channel, f);
+    }
   }
 
   ~PyReader() {}
@@ -148,14 +160,27 @@ class PyReader {
     msg_cond_.notify_one();
   }
 
+  void cb_rawmsg(const std::shared_ptr<const message::RawMessage>& message) {
+    {
+      std::lock_guard<std::mutex> lg(msg_lock_);
+      cache_.push_back(message->message);
+    }
+    if (func_) {
+      func_(channel_name_.c_str());
+    }
+    msg_cond_.notify_one();
+  }
+
   std::string channel_name_;
   std::string data_type_;
   Node* node_ = nullptr;
   int (*func_)(const char*) = nullptr;
-  std::shared_ptr<Reader<message::PyMessageWrap>> reader_;
+  std::shared_ptr<Reader<message::PyMessageWrap>> reader_ = nullptr;
   std::deque<std::string> cache_;
   std::mutex msg_lock_;
   std::condition_variable msg_cond_;
+
+  std::shared_ptr<Reader<message::RawMessage>> reader_rawmsg_ = nullptr;
 };
 
 using PyMsgWrapPtr = std::shared_ptr<message::PyMessageWrap>;
@@ -312,6 +337,98 @@ class PyNode {
   std::string node_name_;
   std::unique_ptr<Node> node_ = nullptr;
 };
+
+class PyChannelUtils {
+ public:
+  // Get debugstring of rawmsgdata
+  // Pls make sure the msg_type of rawmsg is matching
+  // Used in cyber_channel echo command
+  static std::string get_debugstring_by_msgtype_rawmsgdata(
+      const std::string& msg_type, const std::string& rawmsgdata) {
+    if (msg_type.empty()) {
+      AERROR << "parse rawmessage the msg_type is null";
+      return "";
+    }
+    if (rawmsgdata.empty()) {
+      AERROR << "parse rawmessage the rawmsgdata is null";
+      return "";
+    }
+
+    if (raw_msg_class_ == nullptr) {
+      auto rawFactory = apollo::cyber::message::ProtobufFactory::Instance();
+      raw_msg_class_ = rawFactory->GenerateMessageByType(msg_type);
+    }
+
+    if (raw_msg_class_ == nullptr) {
+      AERROR << "raw_msg_class_  is null";
+      return "";
+    }
+
+    if (!raw_msg_class_->ParseFromString(rawmsgdata)) {
+      AERROR << "Cannot parse the msg [ " << msg_type << " ]";
+      return "";
+    }
+
+    return raw_msg_class_->DebugString();
+  }
+
+  static std::string get_msgtype_by_channelname(const std::string& channel_name,
+                                                uint8_t sleep_s = 0) {
+    if (channel_name.empty()) {
+      AERROR << "channel_name is null";
+      return "";
+    }
+    auto topology =
+        apollo::cyber::service_discovery::TopologyManager::Instance();
+    sleep(sleep_s);
+    auto channel_manager = topology->channel_manager();
+    std::string msg_type("");
+    channel_manager->GetMsgType(channel_name, &msg_type);
+    return msg_type;
+  }
+
+  static std::vector<std::string> get_active_channels(uint8_t sleep_s = 2) {
+    auto topology =
+        apollo::cyber::service_discovery::TopologyManager::Instance();
+    sleep(sleep_s);
+    auto channel_manager = topology->channel_manager();
+    std::vector<std::string> channels;
+    channel_manager->GetChannelNames(&channels);
+    return channels;
+  }
+
+  static std::unordered_map<std::string, std::vector<std::string>>
+  get_channels_info(uint8_t sleep_s = 2) {
+    auto topology =
+        apollo::cyber::service_discovery::TopologyManager::Instance();
+    sleep(sleep_s);
+    std::vector<apollo::cyber::proto::RoleAttributes> tmpVec;
+    topology->channel_manager()->GetWriters(&tmpVec);
+    std::unordered_map<std::string, std::vector<std::string>> roles_info;
+
+    for (auto& attr : tmpVec) {
+      std::string channel_name = attr.channel_name();
+      std::string msgdata;
+      attr.SerializeToString(&msgdata);
+      roles_info[channel_name].emplace_back(msgdata);
+    }
+
+    tmpVec.clear();
+    topology->channel_manager()->GetReaders(&tmpVec);
+    for (auto& attr : tmpVec) {
+      std::string channel_name = attr.channel_name();
+      std::string msgdata;
+      attr.SerializeToString(&msgdata);
+      roles_info[channel_name].emplace_back(msgdata);
+    }
+    return roles_info;
+  }
+
+ private:
+  static google::protobuf::Message* raw_msg_class_;
+};
+
+google::protobuf::Message* PyChannelUtils::raw_msg_class_ = nullptr;
 
 }  // namespace cyber
 }  // namespace apollo

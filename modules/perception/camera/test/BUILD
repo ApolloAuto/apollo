@@ -781,4 +781,25 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "camera_app_cipv_camera_test",
+    size = "small",
+    srcs = [
+        "camera_app_cipv_camera_test.cc",
+    ],
+    linkopts = [
+        "-lopencv_core",
+        "-lnvinfer_plugin",
+        "-lopencv_imgproc",
+        "-lopencv_highgui",
+    ],
+    deps = [
+        "//cyber",
+        "//modules/perception/base:distortion_model",
+        "//modules/perception/camera/app:cipv_camera",
+        "//modules/perception/common/io:io_util",
+        "@gtest//:main",
+    ],
+)
+
 cpplint()

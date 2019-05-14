@@ -94,7 +94,7 @@ void ShmDispatcher::OnMessage(uint64_t channel_id,
         *handler_base);
     handler->Run(rb, msg_info);
   } else {
-    AERROR << "Cant find " << GlobalData::GetChannelById(channel_id)
+    AERROR << "Cannot find " << GlobalData::GetChannelById(channel_id)
            << "'s handler.";
   }
 }
@@ -107,8 +107,7 @@ void ShmDispatcher::ThreadFunc() {
       continue;
     }
 
-    uint64_t host_id = readable_info.host_id();
-    if (host_id != host_id_) {
+    if (readable_info.host_id() != host_id_) {
       ADEBUG << "shm readable info from other host.";
       continue;
     }

@@ -52,9 +52,9 @@ class Node3d {
   double GetCost() const { return traj_cost_ + heuristic_cost_; }
   double GetTrajCost() const { return traj_cost_; }
   double GetHeuCost() const { return heuristic_cost_; }
-  size_t GetGridX() const { return x_grid_; }
-  size_t GetGridY() const { return y_grid_; }
-  size_t GetGridPhi() const { return phi_grid_; }
+  int GetGridX() const { return x_grid_; }
+  int GetGridY() const { return y_grid_; }
+  int GetGridPhi() const { return phi_grid_; }
   double GetX() const { return x_; }
   double GetY() const { return y_; }
   double GetPhi() const { return phi_; }
@@ -67,7 +67,6 @@ class Node3d {
   const std::vector<double>& GetXs() const { return traversed_x_; }
   const std::vector<double>& GetYs() const { return traversed_y_; }
   const std::vector<double>& GetPhis() const { return traversed_phi_; }
-  size_t GetSize() const;
   void SetPre(std::shared_ptr<Node3d> pre_node) { pre_node_ = pre_node; }
   void SetDirec(bool direction) { direction_ = direction; }
   void SetTrajCost(double cost) { traj_cost_ = cost; }
@@ -75,8 +74,7 @@ class Node3d {
   void SetSteer(double steering) { steering_ = steering; }
 
  private:
-  static std::string ComputeStringIndex(size_t x_grid, size_t y_grid,
-                                        size_t phi_grid);
+  static std::string ComputeStringIndex(int x_grid, int y_grid, int phi_grid);
 
  private:
   double x_ = 0.0;
@@ -86,9 +84,9 @@ class Node3d {
   std::vector<double> traversed_x_;
   std::vector<double> traversed_y_;
   std::vector<double> traversed_phi_;
-  size_t x_grid_ = 0;
-  size_t y_grid_ = 0;
-  size_t phi_grid_ = 0;
+  int x_grid_ = 0;
+  int y_grid_ = 0;
+  int phi_grid_ = 0;
   std::string index_;
   double traj_cost_ = 0.0;
   double heuristic_cost_ = 0.0;

@@ -21,8 +21,8 @@
 #pragma once
 
 #include "modules/planning/scenarios/bare_intersection/unprotected/bare_intersection_unprotected_scenario.h"
-
 #include "modules/planning/scenarios/stage.h"
+#include "modules/planning/scenarios/stage_intersection_cruise_impl.h"
 
 namespace apollo {
 namespace planning {
@@ -45,11 +45,11 @@ class BareIntersectionUnprotectedStageIntersectionCruise : public Stage {
     return GetContextAs<BareIntersectionUnprotectedContext>();
   }
 
- private:
   Stage::StageStatus FinishStage();
 
  private:
   ScenarioBareIntersectionUnprotectedConfig scenario_config_;
+  StageIntersectionCruiseImpl stage_impl_;
 };
 
 }  // namespace bare_intersection

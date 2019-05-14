@@ -59,6 +59,26 @@ DEFINE_string(pointcloud_fusion_topic,
 DEFINE_string(vlp16_pointcloud_topic,
               "/apollo/sensor/velodyne16/compensator/PointCloud2",
               "16 beam Lidar pointcloud topic name");
+DEFINE_string(lidar_16_front_center_topic,
+              "/apollo/sensor/lidar16/front/center/PointCloud2",
+              "front center 16 beam lidar topic name");
+DEFINE_string(lidar_16_front_up_topic,
+              "/apollo/sensor/lidar16/front/up/PointCloud2",
+              "front up 16 beam lidar topic name");
+DEFINE_string(lidar_16_rear_left_topic,
+              "/apollo/sensor/lidar16/rear/left/PointCloud2",
+              "rear left 16 beam lidar topic name");
+DEFINE_string(lidar_16_rear_right_topic,
+              "/apollo/sensor/lidar16/rear/right/PointCloud2",
+              "rear right 16 beam lidar topic name");
+DEFINE_string(lidar_16_fusion_topic,
+              "/apollo/sensor/lidar16/fusion/PointCloud2",
+              "16 beam lidar fusion topic name");
+DEFINE_string(lidar_16_fusion_compensator_topic,
+              "/apollo/sensor/lidar16/fusion/compensator/PointCloud2",
+              "16 beam lidar fusion compensator topic name");
+DEFINE_string(lidar_128_topic, "/apollo/sensor/lidar128/PointCloud2",
+              "128 beam lidar topic name");
 DEFINE_string(prediction_topic, "/apollo/prediction", "prediction topic name");
 DEFINE_string(perception_obstacle_topic, "/apollo/perception/obstacles",
               "perception obstacle topic name");
@@ -97,6 +117,10 @@ DEFINE_string(racobit_radar_topic, "/apollo/sensor/racobit_radar",
               "racobit radar topic name");
 DEFINE_string(ultrasonic_radar_topic, "/apollo/sensor/ultrasonic_radar",
               "ultrasonic esr radar topic name");
+DEFINE_string(front_radar_topic, "/apollo/sensor/radar/front",
+              "front radar topic name");
+DEFINE_string(rear_radar_topic, "/apollo/sensor/radar/rear",
+              "rear radar topic name");
 // TODO(Authors): Change the topic name
 DEFINE_string(compressed_image_topic, "camera/image_raw",
               "CompressedImage topic name");
@@ -113,6 +137,21 @@ DEFINE_string(camera_image_long_topic, "/apollo/sensor/camera/image_long",
               "long camera image topic name");
 DEFINE_string(camera_image_short_topic, "/apollo/sensor/camera/image_short",
               "short camera image topic name");
+DEFINE_string(camera_front_6mm_compressed_topic,
+              "/apollo/sensor/camera/front_6mm/image/compressed",
+              "front 6mm camera compressed topic name");
+DEFINE_string(camera_front_12mm_compressed_topic,
+              "/apollo/sensor/camera/front_12mm/image/compressed",
+              "front 12mm camera compressed topic name");
+DEFINE_string(camera_left_fisheye_compressed_topic,
+              "/apollo/sensor/camera/left_fisheye/image/compressed",
+              "left fisheye camera compressed topic name");
+DEFINE_string(camera_right_fisheye_compressed_topic,
+              "/apollo/sensor/camera/right_fisheye/image/compressed",
+              "right fisheye camera compressed topic name");
+DEFINE_string(camera_rear_6mm_compressed_topic,
+              "/apollo/sensor/camera/rear_6mm/image/compressed",
+              "front 6mm camera compressed topic name");
 DEFINE_string(gnss_rtk_obs_topic, "/apollo/sensor/gnss/rtk_obs",
               "Gnss rtk observation topic name");
 DEFINE_string(gnss_rtk_eph_topic, "/apollo/sensor/gnss/rtk_eph",
@@ -167,3 +206,5 @@ DEFINE_string(heading_topic, "/apollo/sensor/gnss/heading",
 DEFINE_string(rtcm_data_topic, "/apollo/sensor/gnss/rtcm_data",
               "gnss rtcm data topic name");
 DEFINE_string(data_topic, "/apollo/data", "Data topic.");
+DEFINE_string(tf_topic, "/tf", "Transform topic.");
+DEFINE_string(tf_static_topic, "/tf_static", "Transform static topic.");

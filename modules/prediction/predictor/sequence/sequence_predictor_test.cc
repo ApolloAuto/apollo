@@ -51,7 +51,7 @@ TEST_F(SequencePredictorTest, General) {
   mlp_evaluator.Evaluate(obstacle_ptr);
   SequencePredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(), 0);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 0);
   LaneSequence* lane_seq = obstacle_ptr->mutable_latest_feature()
                                ->mutable_lane()
                                ->mutable_lane_graph()

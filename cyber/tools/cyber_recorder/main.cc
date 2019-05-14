@@ -55,7 +55,7 @@ void DisplayUsage(const std::string& binary, const std::string& command,
 void DisplayUsage(const std::string& binary) {
   std::cout << "usage: " << binary << " <command> [<args>]\n"
             << "The " << binary << " commands are:\n"
-            << "\tinfo\tShow infomation of an exist record.\n"
+            << "\tinfo\tShow information of an exist record.\n"
             << "\tplay\tPlay an exist record.\n"
             << "\trecord\tRecord same topic.\n"
             << "\tsplit\tSplit an exist record.\n"

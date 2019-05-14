@@ -184,7 +184,7 @@ The Planning/Control tab from the monitor plots various graphs to reflect the in
 2. X/Y axis: [**chart.proto** ](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/proto/chart.proto) has "Options" that you could set for axis which include 
     * min/max: minimum/maximum number for the scale
     * label_string: axis label
-    * legend_display: to show or hide a chart legend. If set to true, only the first 5 characters of the data label are shown.
+    * legend_display: to show or hide a chart legend.
         <img src="images/dreamview_usage_table/pncmonitor_options.png" width="600" height="300" />
 3. Dataset: 
     * Type: each graph can have multiple lines, polygons, and/or car markers defined in [**chart.proto**](https://github.com/ApolloAuto/apollo/blob/master/modules/dreamview/proto/chart.proto): 

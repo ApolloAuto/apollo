@@ -112,7 +112,7 @@ void TrajectoryStitcher::TransformLastPublishedTrajectory(
 */
 std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
     const VehicleState& vehicle_state, const double current_timestamp,
-    const double planning_cycle_time,
+    const double planning_cycle_time, const size_t preserved_points_num,
     const PublishableTrajectory* prev_trajectory, std::string* replan_reason) {
   if (!FLAGS_enable_trajectory_stitcher) {
     *replan_reason = "stitch is disabled by gflag.";
@@ -215,10 +215,9 @@ std::vector<TrajectoryPoint> TrajectoryStitcher::ComputeStitchingTrajectory(
 
   auto matched_index = std::min(time_matched_index, position_matched_index);
 
-  constexpr size_t kNumPreCyclePoint = 20;
   std::vector<TrajectoryPoint> stitching_trajectory(
       prev_trajectory->begin() +
-          std::max(0, static_cast<int>(matched_index - kNumPreCyclePoint)),
+          std::max(0, static_cast<int>(matched_index - preserved_points_num)),
       prev_trajectory->begin() + forward_time_index + 1);
   ADEBUG << "stitching_trajectory size: " << stitching_trajectory.size();
 

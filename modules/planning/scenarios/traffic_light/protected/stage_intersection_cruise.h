@@ -21,6 +21,7 @@
 #pragma once
 
 #include "modules/planning/scenarios/stage.h"
+#include "modules/planning/scenarios/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/traffic_light/protected/traffic_light_protected_scenario.h"
 
 namespace apollo {
@@ -44,11 +45,11 @@ class TrafficLightProtectedStageIntersectionCruise : public Stage {
     return GetContextAs<TrafficLightProtectedContext>();
   }
 
- private:
   Stage::StageStatus FinishStage();
 
  private:
   ScenarioTrafficLightProtectedConfig scenario_config_;
+  StageIntersectionCruiseImpl stage_impl_;
 };
 
 }  // namespace traffic_light

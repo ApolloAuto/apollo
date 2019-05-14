@@ -25,6 +25,7 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
+#include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 #include "modules/perception/camera/app/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
@@ -34,8 +35,12 @@
 #include "modules/perception/onboard/inner_component_messages/inner_component_messages.h"
 #include "modules/perception/onboard/proto/fusion_camera_detection_component.pb.h"
 #include "modules/perception/onboard/transform_wrapper/transform_wrapper.h"
+#include "modules/perception/proto/motion_service.pb.h"
 #include "modules/perception/proto/perception_camera.pb.h"
 #include "modules/perception/proto/perception_obstacle.pb.h"
+
+typedef std::shared_ptr<apollo::perception::Motion_Service>
+    MotionServiceMsgType;
 
 namespace apollo {
 namespace perception {
@@ -62,7 +67,9 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
   int InitCameraFrames();
   int InitProjectMatrix();
   int InitCameraListeners();
+  int InitMotionService();
   void SetCameraHeightAndPitch();
+  void OnMotionService(const MotionServiceMsgType& message);
 
   int InternalProc(
       const std::shared_ptr<apollo::drivers::Image const>& in_message,
@@ -72,6 +79,7 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
 
   int MakeProtobufMsg(double msg_timestamp, int seq_num,
                       const std::vector<base::ObjectPtr>& objects,
+                      const std::vector<base::LaneLine>& lane_objects,
                       const apollo::common::ErrorCode error_code,
                       apollo::perception::PerceptionObstacles* obstacles);
 
@@ -182,6 +190,20 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
       apollo::cyber::Writer<apollo::perception::camera::CameraDebug>>
       camera_debug_writer_;
 
+  // variable for motion service
+  base::MotionBufferPtr motion_buffer_;
+  const int motion_buffer_size_ = 100;
+
+  // // variables for CIPV
+  bool enable_cipv_ = false;
+  Cipv cipv_;
+  float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
+  float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
+  float max_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter;
+  float average_frame_rate_ = kAverageFrameRate;
+  bool image_based_cipv_ = false;
+  int debug_level_ = 0;
+  // variables for visualization
   camera::Visualizer visualize_;
   bool write_visual_img_;
 };

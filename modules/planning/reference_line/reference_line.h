@@ -120,6 +120,8 @@ class ReferenceLine {
   bool GetLaneWidth(const double s, double* const lane_left_width,
                     double* const lane_right_width) const;
 
+  bool GetOffsetToMap(const double s, double* l_offset) const;
+
   bool GetRoadWidth(const double s, double* const road_left_width,
                     double* const road_right_width) const;
 

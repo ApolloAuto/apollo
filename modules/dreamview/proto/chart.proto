@@ -18,34 +18,45 @@ message Options {
     optional bool legend_display = 1 [default = true];
     optional Axis x = 2;
     optional Axis y = 3;
+
+    // This is the aspect ratio (width/height) of the entire chart.
+    optional double aspect_ratio = 4;
+
+    // Same window size for x-Axis and y-Axis. It is
+    // effective only if x/y window_size is NOT set.
+    optional bool sync_xy_window_size = 5 [default = false];
 }
 
 message Line {
     optional string label = 1;
-    repeated apollo.common.Point2D point = 2;
+    optional bool hide_label_in_legend = 2  [default = false];
+    repeated apollo.common.Point2D point = 3;
 
     // If the 'color' property is undefined, a random one will be assigned.
     // See http://www.chartjs.org/docs/latest/charts/line.html
     // for all supported properties from chart.js
-    map<string, string> properties = 3;
+    map<string, string> properties = 4;
 }
 
 message Polygon {
     optional string label = 1;
-    repeated apollo.common.Point2D point = 2;
+    optional bool hide_label_in_legend = 2  [default = false];
+    repeated apollo.common.Point2D point = 3;
 
     // If the 'color' property is undefined, a random one will be assigned.
     // See http://www.chartjs.org/docs/latest/charts/line.html
     // for all supported properties from chart.js
-    map<string, string> properties = 3;
+    map<string, string> properties = 4;
 }
 
 message Car {
     optional string label = 1;
-    optional double x = 2;
-    optional double y = 3;
-    optional double heading = 4;
-    optional string color = 5;
+    optional bool hide_label_in_legend = 2  [default = false];
+
+    optional double x = 3;
+    optional double y = 4;
+    optional double heading = 5;
+    optional string color = 6;
 }
 
 message Chart {

@@ -18,8 +18,7 @@
  * @log
  */
 
-#ifndef CYBER_COMMON_LOG_H_
-#define CYBER_COMMON_LOG_H_
+#pragma once
 
 #include <stdarg.h>
 
@@ -35,7 +34,7 @@
 #endif
 
 #define ADEBUG_MODULE(module) \
-  VLOG(4) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET << "[DEBUG] "
+  VLOG(4) << LEFT_BRACKET << module << RIGHT_BRACKET << "[DEBUG] "
 #define ADEBUG ADEBUG_MODULE(MODULE_NAME)
 #define AINFO ALOG_MODULE(MODULE_NAME, INFO)
 #define AWARN ALOG_MODULE(MODULE_NAME, WARN)
@@ -70,6 +69,7 @@
 #define AINFO_IF(cond) ALOG_IF(INFO, cond, MODULE_NAME)
 #define AWARN_IF(cond) ALOG_IF(WARN, cond, MODULE_NAME)
 #define AERROR_IF(cond) ALOG_IF(ERROR, cond, MODULE_NAME)
+#define AFATAL_IF(cond) ALOG_IF(FATAL, cond, MODULE_NAME)
 #define ALOG_IF(severity, cond, module) \
   !(cond) ? (void)0                     \
           : google::LogMessageVoidify() & ALOG_MODULE(module, severity)
@@ -106,5 +106,3 @@
     AWARN << #condition << " is not met."; \
     return val;                            \
   }
-
-#endif  // CYBER_COMMON_LOG_H_

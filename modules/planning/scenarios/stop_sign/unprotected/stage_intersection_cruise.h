@@ -21,6 +21,7 @@
 #pragma once
 
 #include "modules/planning/scenarios/stage.h"
+#include "modules/planning/scenarios/stage_intersection_cruise_impl.h"
 #include "modules/planning/scenarios/stop_sign/unprotected/stop_sign_unprotected_scenario.h"
 
 namespace apollo {
@@ -44,11 +45,11 @@ class StopSignUnprotectedStageIntersectionCruise : public Stage {
     return GetContextAs<StopSignUnprotectedContext>();
   }
 
- private:
   Stage::StageStatus FinishStage();
 
  private:
   ScenarioStopSignUnprotectedConfig scenario_config_;
+  StageIntersectionCruiseImpl stage_impl_;
 };
 
 }  // namespace stop_sign

@@ -20,9 +20,12 @@
 
 #pragma once
 
+#include <algorithm>
+#include <iterator>
 #include <memory>
 #include <queue>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -54,6 +57,7 @@ struct HybridAStartResult {
   std::vector<double> v;
   std::vector<double> a;
   std::vector<double> steer;
+  std::vector<double> accumulated_s;
 };
 
 class HybridAStar {
@@ -65,6 +69,8 @@ class HybridAStar {
             const std::vector<std::vector<common::math::Vec2d>>&
                 obstacles_vertices_vec,
             HybridAStartResult* result);
+  bool TrajectoryPartition(const HybridAStartResult& result,
+                           std::vector<HybridAStartResult>* partitioned_result);
 
  private:
   bool AnalyticExpansion(std::shared_ptr<Node3d> current_node);
@@ -84,7 +90,9 @@ class HybridAStar {
                   std::shared_ptr<Node3d> next_node);
   double HoloObstacleHeuristic(std::shared_ptr<Node3d> next_node);
   bool GetResult(HybridAStartResult* result);
+  bool GetTemporalProfile(HybridAStartResult* result);
   bool GenerateSpeedAcceleration(HybridAStartResult* result);
+  bool GenerateSCurveSpeedAcceleration(HybridAStartResult* result);
 
  private:
   PlannerOpenSpaceConfig planner_open_space_config_;

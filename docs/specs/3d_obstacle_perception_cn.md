@@ -37,10 +37,10 @@ Apollo采用网格显示查找表（LUT），将ROI量化为俯视图2D网格，
 
 如图1所示，该LUT覆盖了一个矩形区域，该区域位于高精地图边界上方，以普通视图周围的预定义空间范围为边界。它代表了与ROI关联网格的每个单元格（如用1/0表示在ROI的内部/外部）。 为了计算效率，Apollo使用 **扫描线算法**和 **位图编码**来构建ROI LUT。
 
-<img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/specs/images/3d_obstacle_perception/roi_lookup_table.png">
+<img src="images/3d_obstacle_perception/roi_lookup_table.png">
 <div align=center>图 1 ROI显示查找表（LUT）</div>
 
-蓝色线条标出了高精地图ROI的边界，包含路表与路口。红色加粗点表示对应于激光雷达传感器位置的地方坐标系原始位置。2D网格由8*8个绿色正方形组成，在ROI中的单元格，为蓝色填充的正方形，而之外的是黄色填充的正方形。
+蓝色线条标出了高精地图ROI的边界，包含路标与路口。红色加粗点表示对应于激光雷达传感器位置的地方坐标系原始位置。2D网格由8*8个绿色正方形组成，在ROI中的单元格，为蓝色填充的正方形，而之外的是黄色填充的正方形。
 
 ### ROI LUT点查询
 
@@ -105,7 +105,7 @@ Apollo 使用深度卷积神经网络提高障碍物识别与分割的精度，�
 
 特征编码器将通道特征图像作为输入，并且随着特征抽取的增加而连续**下采样**其空间分辨率。 然后特征解码器逐渐对特征图像 **上采样**到输入2D网格的空间分辨率，可以恢复特征图像的空间细节，以促进单元格方向的障碍物位置、速度属性预测。 根据具有非线性激活（即ReLu）层的堆叠卷积/分散层来实现 **下采样**和 **上采样**操作。
 
-<div align=center><img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/specs/images/3d_obstacle_perception/FCNN.png" width="99%"></div>
+<div align=center><img src="images/3d_obstacle_perception/FCNN.png" width="99%"></div>
 
 <div align=center>图 2 FCNN在单元格方向上的障碍物预测</div>
 
@@ -123,7 +123,7 @@ Apollo 使用深度卷积神经网络提高障碍物识别与分割的精度，�
 
 如图3，Apollo采用压缩的联合查找算法（Union Find algorithm ）有效查找连接组件，每个组件都是候选障碍物对象集群。对象是单个单元格成为有效对象的概率。因此，Apollo将非对象单元定义为目标小于0.5的单元格。因此，Apollo过滤出每个候选对象集群的空单元格和非对象集。
 
-<div align=center><img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/specs/images/3d_obstacle_perception/obstacle_clustering.png" width="99%"></div>
+<div align=center><img src="images/3d_obstacle_perception/obstacle_clustering.png" width="99%"></div>
 
 <div align=center>图 3 障碍聚类</div>
 
@@ -166,7 +166,7 @@ MinBox 障碍物边框构建
 
 算法背后的想法是找到给定多边形点边缘的所有区域。在以下示例中，如果AB是边缘，则Apollo将其他多边形点投影到AB上，并建立具有最大距离的交点对，这是属于边框的边缘之一。然后直接获得边界框的另一边。通过迭代多边形中的所有边，在以下图4所示，Apollo确定了一个6边界边框，将选择具有最小面积的方案作为最终的边界框。
 
-<div align=center><img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/specs/images/3d_obstacle_perception/object_building.png"></div>
+<div align=center><img src="images/3d_obstacle_perception/object_building.png"></div>
 
 <div align=center>图 4 MinBox 对象构建</div>
 
@@ -197,7 +197,7 @@ HM对象跟踪器跟踪分段检测到的障碍物。通常，它通过将当前
 
 给定关联距离矩阵，如图5所示，Apollo构造了一个二分图，并使用 **匈牙利算法**通过最小化距离成本找到最佳的检测跟踪匹配。它解决了O(n\^3)时间复杂度中的赋值问题。 为了提高其计算性能，通过删除距离大于合理的最大距离阈值的顶点，将原始的二分图切割成子图后实现了匈牙利算法。
 
-<div align=center><img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/specs/images/3d_obstacle_perception/bipartite_graph_matching.png"></div>
+<div align=center><img src="images/3d_obstacle_perception/bipartite_graph_matching.png"></div>
 
 <div align=center>图 5 二分图匹配（Bipartite Graph Matching）</div>
 
@@ -219,7 +219,7 @@ HM对象跟踪器跟踪分段检测到的障碍物。通常，它通过将当前
 
 HM对象跟踪器的高级工作流程如图6所示。
 
-<div align=center><img src="https://raw.githubusercontent.com/ApolloAuto/apollo/master/docs/specs/images/3d_obstacle_perception/hm_object_tracker.png"></div>
+<div align=center><img src="images/3d_obstacle_perception/hm_object_tracker.png"></div>
 
 <div align=center>图 6 HM对象跟踪器工作流</div>
 

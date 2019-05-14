@@ -108,7 +108,7 @@ double NormalizeAngle(const double angle);
  * @brief Calculate the difference between angle from and to
  * @param from the start angle
  * @param from the end angle
- * @return The difference between from and to. The range is between [0, PI).
+ * @return The difference between from and to. The range is between [-PI, PI).
  */
 double AngleDiff(const double from, const double to);
 

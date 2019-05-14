@@ -72,7 +72,8 @@ class Scheduler {
   virtual bool NotifyProcessor(uint64_t crid) = 0;
   virtual bool RemoveCRoutine(uint64_t crid) = 0;
 
-  void SetInnerThreadConfs(std::unordered_map<std::string, InnerThread> confs) {
+  void SetInnerThreadConfs(
+      const std::unordered_map<std::string, InnerThread>& confs) {
     inner_thr_confs_ = confs;
   }
 

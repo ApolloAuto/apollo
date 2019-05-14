@@ -60,11 +60,11 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  const std::vector<std::string> pcd_folder_pathes =
+  const std::vector<std::string> pcd_folder_paths =
       boost_args["pcd_folders"].as<std::vector<std::string>>();
   const std::vector<std::string> pose_files =
       boost_args["pose_files"].as<std::vector<std::string>>();
-  if (pcd_folder_pathes.size() != pose_files.size()) {
+  if (pcd_folder_paths.size() != pose_files.size()) {
     std::cerr << "the count of pcd folders is not equal pose files"
               << std::endl;
     return -1;
@@ -78,7 +78,7 @@ int main(int argc, char** argv) {
       boost_args["resolution_type"].as<std::string>();
   if (strcasecmp(resolution_type.c_str(), "single") != 0 &&
       strcasecmp(resolution_type.c_str(), "multi") != 0) {
-    std::cerr << "map resolution type invalide. (single or multi)" << std::endl;
+    std::cerr << "map resolution type invalid. (single or multi)" << std::endl;
     return -1;
   }
 
@@ -102,9 +102,9 @@ int main(int argc, char** argv) {
             << std::endl;
 
   // load all poses
-  std::vector<std::vector<Eigen::Affine3d>> pcd_poses(pcd_folder_pathes.size());
-  std::vector<std::vector<double>> time_stamps(pcd_folder_pathes.size());
-  std::vector<std::vector<unsigned int>> pcd_indices(pcd_folder_pathes.size());
+  std::vector<std::vector<Eigen::Affine3d>> pcd_poses(pcd_folder_paths.size());
+  std::vector<std::vector<double>> time_stamps(pcd_folder_paths.size());
+  std::vector<std::vector<unsigned int>> pcd_indices(pcd_folder_paths.size());
   for (std::size_t i = 0; i < pose_files.size(); ++i) {
     apollo::localization::msf::velodyne::LoadPcdPoses(
         pose_files[i], &pcd_poses[i], &time_stamps[i], &pcd_indices[i]);
@@ -133,8 +133,8 @@ int main(int argc, char** argv) {
   ndt_map_config.map_node_size_y_ = node_size;
 
   ndt_map_config.map_datasets_.insert(ndt_map_config.map_datasets_.end(),
-                                      pcd_folder_pathes.begin(),
-                                      pcd_folder_pathes.end());
+                                      pcd_folder_paths.begin(),
+                                      pcd_folder_paths.end());
   char file_buf[1024];
   snprintf(file_buf, sizeof(file_buf), "%s/config.xml",
            map_base_folder.c_str());
@@ -153,7 +153,7 @@ int main(int argc, char** argv) {
   // Plane extractor
   apollo::localization::msf::FeatureXYPlane plane_extractor;
 
-  for (unsigned int i = 0; i < pcd_folder_pathes.size(); ++i) {
+  for (unsigned int i = 0; i < pcd_folder_paths.size(); ++i) {
     const std::vector<Eigen::Affine3d>& pcd_poses_i = pcd_poses[i];
     for (unsigned int frame_idx = 0; frame_idx < pcd_poses_i.size();
          ++frame_idx) {
@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
       std::string pcd_file_path;
       std::ostringstream ss;
       ss << pcd_indices[i][frame_idx];
-      pcd_file_path = pcd_folder_pathes[i] + "/" + ss.str() + ".pcd";
+      pcd_file_path = pcd_folder_paths[i] + "/" + ss.str() + ".pcd";
       Eigen::Affine3d pcd_pose = pcd_poses_i[frame_idx];
       // Load pcd
       apollo::localization::msf::velodyne::LoadPcds(
