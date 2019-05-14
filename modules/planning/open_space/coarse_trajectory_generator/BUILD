@@ -74,10 +74,10 @@ cc_library(
         "open_space_utils",
         "//cyber/common:log",
         "//modules/common/configs:vehicle_config_helper",
-        "//modules/planning/common:planning_gflags",
         "//modules/planning/common:obstacle",
+        "//modules/planning/common:planning_gflags",
+        "//modules/planning/math/piecewise_jerk:piecewise_jerk_speed_problem",
         "//modules/planning/proto:planner_open_space_config_proto",
-        "//modules/planning/math/piecewise_jerk:path_time_qp_problem",
     ],
 )
 

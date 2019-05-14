@@ -16,6 +16,7 @@
 
 #include "modules/planning/on_lane_planning.h"
 
+#include <algorithm>
 #include <limits>
 #include <list>
 #include <utility>
@@ -377,20 +378,30 @@ void OnLanePlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
     rl_debug->set_is_protected(reference_line_info.GetRightOfWayStatus() ==
                                ADCTrajectory::PROTECTED);
 
-    // average kappa and dkappa for performance evaluation
+    // store kappa and dkappa for performance evaluation
     const auto& reference_points =
         reference_line_info.reference_line().reference_points();
-    double total_kappa = 0.0;
-    double total_dkappa = 0.0;
-    size_t reference_points_size = reference_points.size();
+    double kappa_rms = 0.0;
+    double dkappa_rms = 0.0;
+    double kappa_max_abs = std::numeric_limits<double>::lowest();
+    double dkappa_max_abs = std::numeric_limits<double>::lowest();
     for (const auto& reference_point : reference_points) {
-      total_kappa += reference_point.kappa();
-      total_dkappa += reference_point.dkappa();
+      double kappa_sq = reference_point.kappa() * reference_point.kappa();
+      double dkappa_sq = reference_point.dkappa() * reference_point.dkappa();
+      kappa_rms += kappa_sq;
+      dkappa_rms += dkappa_sq;
+      kappa_max_abs = kappa_max_abs < kappa_sq ? kappa_sq : kappa_max_abs;
+      dkappa_max_abs = dkappa_max_abs < dkappa_sq ? dkappa_sq : dkappa_max_abs;
     }
-    rl_debug->set_average_kappa(total_kappa /
-                                static_cast<double>(reference_points_size));
-    rl_debug->set_average_dkappa(total_dkappa /
-                                 static_cast<double>(reference_points_size));
+    double reference_points_size = static_cast<double>(reference_points.size());
+    kappa_rms /= reference_points_size;
+    dkappa_rms /= reference_points_size;
+    kappa_rms = std::sqrt(kappa_rms);
+    dkappa_rms = std::sqrt(dkappa_rms);
+    rl_debug->set_kappa_rms(kappa_rms);
+    rl_debug->set_dkappa_rms(dkappa_rms);
+    rl_debug->set_kappa_max_abs(kappa_max_abs);
+    rl_debug->set_dkappa_max_abs(dkappa_max_abs);
 
     bool is_off_road = false;
     double minimum_boundary = std::numeric_limits<double>::infinity();
@@ -476,6 +487,17 @@ Status OnLanePlanning::Plan(
       }
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    // Store current frame stitched path for possible speed fallback in next
+    // frames
+    DiscretizedPath current_frame_planned_path;
+    for (const auto& trajectory_point : stitching_trajectory) {
+      current_frame_planned_path.push_back(trajectory_point.path_point());
+    }
+    const auto& best_ref_path = best_ref_info->path_data().discretized_path();
+    std::copy(best_ref_path.begin() + 1, best_ref_path.end(),
+              std::back_inserter(current_frame_planned_path));
+    frame_->set_current_frame_planned_path(current_frame_planned_path);
+
     if (FLAGS_export_chart) {
       ExportOnLaneChart(best_ref_info->debug(), ptr_debug);
     } else {

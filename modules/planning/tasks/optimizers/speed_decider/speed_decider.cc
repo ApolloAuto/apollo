@@ -38,9 +38,9 @@ namespace planning {
 
 using common::ErrorCode;
 using common::Status;
-using common::time::Clock;
 using common::VehicleConfigHelper;
 using common::math::Vec2d;
+using common::time::Clock;
 using perception::PerceptionObstacle;
 
 SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {
@@ -544,14 +544,14 @@ bool SpeedDecider::CheckStopForPedestrian(
           pedestrian_stop_times->end()) {
         // add timestamp
         (*pedestrian_stop_times)[obstacle_id] = Clock::NowInSeconds();
-        ADEBUG << "add timestamp: obstacle_id[" << obstacle_id
-               << "] timestamp[" << Clock::NowInSeconds() << "]";
+        ADEBUG << "add timestamp: obstacle_id[" << obstacle_id << "] timestamp["
+               << Clock::NowInSeconds() << "]";
       } else {
         // check timeout
-        double stop_time = Clock::NowInSeconds() -
-            (*pedestrian_stop_times)[obstacle_id];
-        ADEBUG << "stop_time: obstacle_id[" << obstacle_id
-               << "] stop_time[" << stop_time << "]";
+        double stop_time =
+            Clock::NowInSeconds() - (*pedestrian_stop_times)[obstacle_id];
+        ADEBUG << "stop_time: obstacle_id[" << obstacle_id << "] stop_time["
+               << stop_time << "]";
         if (stop_time >= kPedestrianStopTimeout) {
           return false;
         }
@@ -561,7 +561,6 @@ bool SpeedDecider::CheckStopForPedestrian(
 
   return true;
 }
-
 
 }  // namespace planning
 }  // namespace apollo

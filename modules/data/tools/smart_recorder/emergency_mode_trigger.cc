@@ -19,7 +19,6 @@
 #include "cyber/common/log.h"
 #include "modules/common/adapters/adapter_gflags.h"
 #include "modules/control/proto/control_cmd.pb.h"
-#include "modules/localization/proto/localization.pb.h"
 
 namespace apollo {
 namespace data {
@@ -28,15 +27,6 @@ using apollo::canbus::Chassis;
 
 EmergencyModeTrigger::EmergencyModeTrigger() {
   trigger_name_ = "EmergencyModeTrigger";
-}
-
-bool EmergencyModeTrigger::Init(const SmartRecordTrigger& trigger_conf) {
-  // Have to instantiate the wanted classes here that do nothing but
-  // register themselves to global factory which then provides reflections later
-  apollo::canbus::Chassis chassis_instance;
-  apollo::control::ControlCommand control_instance;
-  apollo::localization::LocalizationEstimate pose_instance;
-  return TriggerBase::Init(trigger_conf);
 }
 
 void EmergencyModeTrigger::Pull(const RecordMessage& msg) {

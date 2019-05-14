@@ -88,7 +88,7 @@ class DistanceApproachIPOPTCUDAInterface : public DistanceApproachInterface {
   /** Method to return the constraint residuals */
   bool eval_g(int n, const double* x, bool new_x, int m, double* g) override;
 
-  /** Check unfeasible constraints for futher study**/
+  /** Check unfeasible constraints for further study**/
   bool check_g(int n, const double* x, int m, const double* g);
 
   /** Method to return:

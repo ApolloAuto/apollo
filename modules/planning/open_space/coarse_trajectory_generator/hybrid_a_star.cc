@@ -20,7 +20,7 @@
 
 #include "modules/planning/open_space/coarse_trajectory_generator/hybrid_a_star.h"
 
-#include "modules/planning/math/piecewise_jerk/path_time_qp_problem.h"
+#include "modules/planning/math/piecewise_jerk/piecewise_jerk_speed_problem.h"
 
 namespace apollo {
 namespace planning {
@@ -187,7 +187,7 @@ std::shared_ptr<Node3d> HybridAStar::Next_node_generator(
       new Node3d(intermediate_x, intermediate_y, intermediate_phi, XYbounds_,
                  planner_open_space_config_));
   next_node->SetPre(current_node);
-  next_node->SetDirec(traveled_distance > 0);
+  next_node->SetDirec(traveled_distance > 0.0);
   next_node->SetSteer(steering);
   return next_node;
 }
@@ -240,6 +240,10 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
       AERROR << "result size check failed";
       return false;
     }
+    if (x.size() != y.size() || x.size() != phi.size()) {
+      AERROR << "states sizes are not equal";
+      return false;
+    }
     std::reverse(x.begin(), x.end());
     std::reverse(y.begin(), y.end());
     std::reverse(phi.begin(), phi.end());
@@ -261,16 +265,9 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
   (*result).y = hybrid_a_y;
   (*result).phi = hybrid_a_phi;
 
-  if (FLAGS_use_s_curve_speed_smooth) {
-    if (!GenerateSCurveSpeedAcceleration(result)) {
-      AERROR << "GenerateSCurveSpeedAcceleration fail";
-      return false;
-    }
-  } else {
-    if (!GenerateSpeedAcceleration(result)) {
-      AERROR << "GenerateSpeedAcceleration fail";
-      return false;
-    }
+  if (!GetTemporalProfile(result)) {
+    AERROR << "GetSpeedProfile from Hybrid Astar path fails";
+    return false;
   }
 
   if (result->x.size() != result->y.size() ||
@@ -294,25 +291,37 @@ bool HybridAStar::GetResult(HybridAStartResult* result) {
 }
 
 bool HybridAStar::GenerateSpeedAcceleration(HybridAStartResult* result) {
+  // Sanity Check
   if (result->x.size() < 2 || result->y.size() < 2 || result->phi.size() < 2) {
     AERROR << "result size check when generating speed and acceleration fail";
     return false;
   }
   const size_t x_size = result->x.size();
+
   // load velocity from position
-  for (size_t i = 0; i + 1 < x_size; ++i) {
-    const double discrete_v = ((result->x[i + 1] - result->x[i]) / delta_t_) *
-                                  std::cos(result->phi[i]) +
-                              ((result->y[i + 1] - result->y[i]) / delta_t_) *
-                                  std::sin(result->phi[i]);
+  // initial and end speed are set to be zeros
+  result->v.push_back(0.0);
+  for (size_t i = 1; i + 1 < x_size; ++i) {
+    double discrete_v = (((result->x[i + 1] - result->x[i]) / delta_t_) *
+                             std::cos(result->phi[i]) +
+                         ((result->x[i] - result->x[i - 1]) / delta_t_) *
+                             std::cos(result->phi[i])) /
+                            2.0 +
+                        (((result->y[i + 1] - result->y[i]) / delta_t_) *
+                             std::sin(result->phi[i]) +
+                         ((result->y[i] - result->y[i - 1]) / delta_t_) *
+                             std::sin(result->phi[i])) /
+                            2.0;
     result->v.push_back(discrete_v);
   }
   result->v.push_back(0.0);
+
   // load acceleration from velocity
   for (size_t i = 0; i + 1 < x_size; ++i) {
     const double discrete_a = (result->v[i + 1] - result->v[i]) / delta_t_;
     result->a.push_back(discrete_a);
   }
+
   // load steering from phi
   for (size_t i = 0; i + 1 < x_size; ++i) {
     double discrete_steer = (result->phi[i + 1] - result->phi[i]) *
@@ -370,22 +379,6 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   result->v[x_size - 1] = 0.0;
 
-  std::array<double, 5> w = {planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .s_weight(),
-                             planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .velocity_weight(),
-                             planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .acc_weight(),
-                             planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .jerk_weight(),
-                             planner_open_space_config_.warm_start_config()
-                                 .s_curve_config()
-                                 .ref_weight()};
-
   std::array<double, 3> init_s = {result->accumulated_s[0], result->v[0],
                                   (result->v[1] - result->v[0]) / delta_t_};
 
@@ -397,28 +390,34 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
   ADEBUG << "end_s: " << result->accumulated_s[x_size - 1] << " " << 0.0 << " "
          << 0.0;
-  std::unique_ptr<PathTimeQpProblem> path_time_qp(new PathTimeQpProblem());
-  path_time_qp->InitProblem(x_size, delta_t_, w, init_s, end_s);
 
-  path_time_qp->SetZeroOrderBounds(
+  const size_t num_of_knots = x_size - 1;
+
+  PiecewiseJerkSpeedProblem path_time_qp(num_of_knots, delta_t_, init_s);
+  auto s_curve_config =
+      planner_open_space_config_.warm_start_config().s_curve_config();
+  path_time_qp.set_weight_ddx(s_curve_config.acc_weight());
+  path_time_qp.set_weight_dddx(s_curve_config.jerk_weight());
+
+  path_time_qp.set_x_bounds(
       *(std::min_element(std::begin(result->accumulated_s),
                          std::end(result->accumulated_s))) -
           10,
       *(std::max_element(std::begin(result->accumulated_s),
                          std::end(result->accumulated_s))) +
           10);
-  path_time_qp->SetFirstOrderBounds(
+  path_time_qp.set_dx_bounds(
       *(std::min_element(std::begin(result->v), std::end(result->v)) - 10),
       *(std::max_element(std::begin(result->v), std::end(result->v))) + 10);
   // TODO(QiL): load this from configs
-  path_time_qp->SetSecondOrderBounds(-4.4, 10.0);
-  path_time_qp->SetThirdOrderBound(FLAGS_longitudinal_jerk_bound);
-  path_time_qp->SetDesireDerivative(0.0);
+  path_time_qp.set_ddx_bounds(-4.4, 10.0);
+  path_time_qp.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
 
-  path_time_qp->SetZeroOrderReference(result->accumulated_s);
+  path_time_qp.set_x_ref(s_curve_config.ref_s_weight(), result->accumulated_s);
+  path_time_qp.set_end_state_ref({1.0, 1.0, 0.0}, end_s);
 
-  // Sovle the problem
-  if (!path_time_qp->Optimize()) {
+  // Solve the problem
+  if (!path_time_qp.Optimize()) {
     std::string msg("Piecewise jerk speed optimizer failed!");
     AERROR << msg;
     return false;
@@ -427,9 +426,9 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   // Extract output
   result->v.clear();
   result->accumulated_s.clear();
-  result->accumulated_s = path_time_qp->x();
-  result->v = path_time_qp->x_derivative();
-  result->a = path_time_qp->x_second_order_derivative();
+  result->accumulated_s = path_time_qp.opt_x();
+  result->v = path_time_qp.opt_dx();
+  result->a = path_time_qp.opt_ddx();
   result->a.pop_back();
 
   // load steering from phi
@@ -444,6 +443,97 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
     result->steer.push_back(discrete_steer);
   }
 
+  return true;
+}
+
+bool HybridAStar::TrajectoryPartition(
+    const HybridAStartResult& result,
+    std::vector<HybridAStartResult>* partitioned_result) {
+  const auto& x = result.x;
+  const auto& y = result.y;
+  const auto& phi = result.phi;
+  if (x.size() != y.size() || x.size() != phi.size()) {
+    AERROR << "states sizes are not equal when do trajectory partitioning of "
+              "Hybrid A Star result";
+    return false;
+  }
+
+  size_t horizon = x.size();
+  partitioned_result->clear();
+  partitioned_result->emplace_back();
+  auto* current_traj = &(partitioned_result->back());
+  double heading_angle = phi.front();
+  const Vec2d init_tracking_vector(x[1] - x[0], y[1] - y[0]);
+  double tracking_angle = init_tracking_vector.Angle();
+  bool current_gear =
+      std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
+      (M_PI_2);
+  for (size_t i = 0; i < horizon - 1; ++i) {
+    heading_angle = phi[i];
+    const Vec2d tracking_vector(x[i + 1] - x[i], y[i + 1] - y[i]);
+    tracking_angle = tracking_vector.Angle();
+    bool gear =
+        std::abs(common::math::NormalizeAngle(tracking_angle - heading_angle)) <
+        (M_PI_2);
+    if (gear != current_gear) {
+      current_traj->x.push_back(x[i]);
+      current_traj->y.push_back(y[i]);
+      current_traj->phi.push_back(phi[i]);
+      partitioned_result->emplace_back();
+      current_traj = &(partitioned_result->back());
+      current_gear = gear;
+    }
+    current_traj->x.push_back(x[i]);
+    current_traj->y.push_back(y[i]);
+    current_traj->phi.push_back(phi[i]);
+  }
+  current_traj->x.push_back(x.back());
+  current_traj->y.push_back(y.back());
+  current_traj->phi.push_back(phi.back());
+
+  // Retrieve v, a and steer from path
+  for (auto& result : *partitioned_result) {
+    if (FLAGS_use_s_curve_speed_smooth) {
+      if (!GenerateSCurveSpeedAcceleration(&result)) {
+        AERROR << "GenerateSCurveSpeedAcceleration fail";
+        return false;
+      }
+    } else {
+      if (!GenerateSpeedAcceleration(&result)) {
+        AERROR << "GenerateSpeedAcceleration fail";
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+bool HybridAStar::GetTemporalProfile(HybridAStartResult* result) {
+  std::vector<HybridAStartResult> partitioned_results;
+  if (!TrajectoryPartition(*result, &partitioned_results)) {
+    AERROR << "TrajectoryPartition fail";
+    return false;
+  }
+  HybridAStartResult stitched_result;
+  for (const auto& result : partitioned_results) {
+    std::copy(result.x.begin(), result.x.end() - 1,
+              std::back_inserter(stitched_result.x));
+    std::copy(result.y.begin(), result.y.end() - 1,
+              std::back_inserter(stitched_result.y));
+    std::copy(result.phi.begin(), result.phi.end() - 1,
+              std::back_inserter(stitched_result.phi));
+    std::copy(result.v.begin(), result.v.end() - 1,
+              std::back_inserter(stitched_result.v));
+    std::copy(result.a.begin(), result.a.end(),
+              std::back_inserter(stitched_result.a));
+    std::copy(result.steer.begin(), result.steer.end(),
+              std::back_inserter(stitched_result.steer));
+  }
+  stitched_result.x.push_back(partitioned_results.back().x.back());
+  stitched_result.y.push_back(partitioned_results.back().y.back());
+  stitched_result.phi.push_back(partitioned_results.back().phi.back());
+  stitched_result.v.push_back(partitioned_results.back().v.back());
+  *result = stitched_result;
   return true;
 }
 

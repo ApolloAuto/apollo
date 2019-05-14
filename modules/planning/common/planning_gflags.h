@@ -237,6 +237,7 @@ DECLARE_bool(use_gear_shift_trajectory);
 DECLARE_uint32(open_space_trajectory_stitching_preserved_length);
 DECLARE_bool(enable_smoother_failsafe);
 DECLARE_bool(use_s_curve_speed_smooth);
+DECLARE_bool(enable_parallel_trajectory_smoothing);
 
 // pull-over
 DECLARE_double(destination_to_adc_buffer);

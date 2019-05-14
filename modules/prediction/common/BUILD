@@ -89,6 +89,8 @@ cc_library(
     hdrs = ["road_graph.h"],
     deps = [
         ":prediction_map",
+        "//modules/prediction/common:prediction_constants",
+        "//modules/prediction/common:prediction_gflags",
         "//modules/prediction/proto:lane_graph_proto",
     ],
 )
@@ -230,6 +232,7 @@ cc_library(
     linkopts = [
         "-lopencv_core",
         "-lopencv_highgui",
+        "-lopencv_imgproc",
     ],
     deps = [
         ":prediction_gflags",
@@ -240,6 +243,11 @@ cc_library(
         "//modules/prediction/container/pose:pose_container",
         "//modules/prediction/proto:feature_proto",
     ],
+)
+
+cc_library(
+    name = "prediction_constants",
+    hdrs = ["prediction_constants.h"],
 )
 
 cpplint()

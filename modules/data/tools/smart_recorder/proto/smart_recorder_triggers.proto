@@ -11,10 +11,6 @@ message Trigger {
   optional bool enabled = 2;
   optional double backward_time = 3;
   optional double forward_time = 4;
-
-  // Messages we need to capture when trigger is set
-  // It's a map of channel names and message types
-  map<string, string> wanted_channel_types = 5;
 }
 
 message SmartRecordTrigger {

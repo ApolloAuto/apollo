@@ -19,7 +19,9 @@
 #include <algorithm>
 #include <utility>
 
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
+#include "modules/prediction/common/prediction_system_gflags.h"
 
 namespace apollo {
 namespace prediction {
@@ -185,10 +187,18 @@ void RoadGraph::ComputeLaneSequence(
       if (consider_divide) {
         if (successor_lanes.size() > 1) {
           // Run recursion function to perform DFS.
-          for (size_t i = 0; i < successor_lanes.size(); ++i) {
-            ComputeLaneSequence(successor_accumulated_s, 0.0,
-                                successor_lanes[i], graph_search_horizon - 1,
-                                false, lane_segments, lane_graph_ptr);
+          for (const auto& successor_lane : successor_lanes) {
+            bool consider_divide_further = false;
+            if (FLAGS_prediction_offline_mode ==
+                    PredictionConstants::kDumpFeatureProto ||
+                FLAGS_prediction_offline_mode ==
+                    PredictionConstants::kDumpDataForLearning) {
+              consider_divide_further = true;
+            }
+            ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lane,
+                                graph_search_horizon - 1,
+                                consider_divide_further, lane_segments,
+                                lane_graph_ptr);
           }
         } else {
           ComputeLaneSequence(successor_accumulated_s, 0.0, successor_lanes[0],

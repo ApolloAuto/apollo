@@ -24,6 +24,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "cyber/common/macros.h"
@@ -66,7 +67,9 @@ class EvaluatorManager {
   void EvaluateObstacle(Obstacle* obstacle);
 
  private:
-  void BuildCurrentFrameEnv();
+  void BuildObstacleIdHistoryMap();
+
+  void DumpCurrentFrameEnv();
 
   /**
    * @brief Register an evaluator by type
@@ -99,10 +102,13 @@ class EvaluatorManager {
   ObstacleConf::EvaluatorType cyclist_on_lane_evaluator_ =
       ObstacleConf::CYCLIST_KEEP_LANE_EVALUATOR;
 
+  ObstacleConf::EvaluatorType pedestrian_evaluator_ =
+      ObstacleConf::PEDESTRIAN_INTERACTION_EVALUATOR;
+
   ObstacleConf::EvaluatorType default_on_lane_evaluator_ =
       ObstacleConf::MLP_EVALUATOR;
 
-  FrameEnv curr_frame_env_;
+  std::unordered_map<int, ObstacleHistory> obstacle_id_history_map_;
 
   DECLARE_SINGLETON(EvaluatorManager)
 };

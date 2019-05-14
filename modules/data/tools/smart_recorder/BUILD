@@ -16,6 +16,7 @@ cc_library(
     srcs = ["record_processor.cc"],
     hdrs = ["record_processor.h"],
     deps = [
+        ":channel_pool",
         ":drive_event_trigger",
         ":emergency_mode_trigger",
         ":small_topics_trigger",
@@ -44,8 +45,6 @@ cc_library(
         ":trigger_base",
         "//modules/common/adapters:adapter_gflags",
         "//modules/common/proto:drive_event_proto",
-        "//modules/drivers/proto:sensor_proto",
-        "//modules/localization/proto:localization_proto",
     ],
 )
 
@@ -58,7 +57,6 @@ cc_library(
         "//modules/canbus/proto:canbus_proto",
         "//modules/common/adapters:adapter_gflags",
         "//modules/control/proto:control_proto",
-        "//modules/localization/proto:localization_proto",
     ],
 )
 
@@ -67,9 +65,8 @@ cc_library(
     srcs = ["small_topics_trigger.cc"],
     hdrs = ["small_topics_trigger.h"],
     deps = [
+        ":channel_pool",
         ":trigger_base",
-        "//modules/drivers/gnss/proto:gnss_proto",
-        "//modules/transform/proto:transform_proto",
     ],
 )
 
@@ -90,6 +87,16 @@ cc_library(
     hdrs = ["interval_pool.h"],
     deps = [
         "//cyber/common:log",
+        "//modules/common/util",
+    ],
+)
+
+cc_library(
+    name = "channel_pool",
+    srcs = ["channel_pool.cc"],
+    hdrs = ["channel_pool.h"],
+    deps = [
+        "//modules/common/adapters:adapter_gflags",
         "//modules/common/util",
     ],
 )

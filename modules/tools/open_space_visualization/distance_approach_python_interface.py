@@ -23,8 +23,7 @@ from ctypes import POINTER
 import math
 
 lib = cdll.LoadLibrary(
-    '/apollo/bazel-bin/modules/tools/open_space_visualization/distance_approach_problem_wrapper_lib.so')
-
+    '/apollo/bazel-bin/modules/planning/open_space/tools/distance_approach_problem_wrapper_lib.so')
 
 class DistancePlanner(object):
     def __init__(self):
