@@ -34,7 +34,7 @@ TEST(GrpcServerImplTest, Construct) {
   EXPECT_TRUE(init_succ);
   auto ptr = std::make_shared<IntersectionTrafficLightData>();
   grpc_server.GetMsgFromGrpc(ptr);
-  EXPECT_TRUE(!ptr->has_current_lane_trafficlight());
+  EXPECT_FALSE(ptr->has_current_lane_trafficlight());
 }
 }  // namespace v2x
 }  // namespace apollo

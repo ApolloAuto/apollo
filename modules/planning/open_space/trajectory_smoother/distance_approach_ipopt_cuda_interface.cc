@@ -54,10 +54,6 @@ DistanceApproachIPOPTCUDAInterface::DistanceApproachIPOPTCUDAInterface(
   CHECK(obstacles_num < std::numeric_limits<int>::max())
       << "Invalid cast on obstacles_num in open space planner";
 
-  if (FLAGS_enable_parallel_open_space_smoother) {
-    ADEBUG << "parallel jacobian ...";
-  }
-
   obstacles_num_ = static_cast<int>(obstacles_num);
   w_ev_ = ego_(1, 0) + ego_(3, 0);
   l_ev_ = ego_(0, 0) + ego_(2, 0);
@@ -449,26 +445,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_f(int n, const double* x,
 bool DistanceApproachIPOPTCUDAInterface::eval_grad_f(int n, const double* x,
                                                      bool new_x,
                                                      double* grad_f) {
-  if (distance_approach_config_.enable_hand_derivative()) {
-    eval_grad_f_hand(n, x, new_x, grad_f);
-    if (distance_approach_config_.enable_derivative_check()) {
-      // check gradients
-      int kN = n;
-      double grad_f_check[kN];
-      std::fill(grad_f_check, grad_f_check + n, 0.0);
-      gradient(tag_f, n, x, grad_f_check);
-      double delta_v = 1e-6;
-      for (int i = 0; i < n; ++i) {
-        if (std::abs(grad_f_check[i] - grad_f[i]) > delta_v) {
-          AERROR << "cost gradient not match at: " << i
-                 << ", grad by hand: " << grad_f[i]
-                 << ", grad by adolc: " << grad_f_check[i];
-        }
-      }
-    }
-  } else {
-    gradient(tag_f, n, x, grad_f);
-  }
+  gradient(tag_f, n, x, grad_f);
   return true;
 }
 
@@ -578,11 +555,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g(int n, const double* x,
                                                     bool new_x, int m,
                                                     int nele_jac, int* iRow,
                                                     int* jCol, double* values) {
-  if (!FLAGS_enable_parallel_open_space_smoother) {
-    return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
-  } else {
-    return eval_jac_g_par(n, x, new_x, m, nele_jac, iRow, jCol, values);
-  }
+  return eval_jac_g_ser(n, x, new_x, m, nele_jac, iRow, jCol, values);
 }
 
 bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
@@ -1285,7 +1258,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_par(int n, const double* x,
       Eigen::MatrixXd bj =
           obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
-      // TODO(QiL) : Remove redudant calculation
+      // TODO(QiL) : Remove redundant calculation
       double tmp1 = 0;
       double tmp2 = 0;
       for (int k = 0; k < current_edges_num; ++k) {
@@ -2115,7 +2088,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_jac_g_ser(int n, const double* x,
         Eigen::MatrixXd bj =
             obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
-        // TODO(QiL) : Remove redudant calculation
+        // TODO(QiL) : Remove redundant calculation
         double tmp1 = 0;
         double tmp2 = 0;
         for (int k = 0; k < current_edges_num; ++k) {
@@ -2747,7 +2720,7 @@ bool DistanceApproachIPOPTCUDAInterface::eval_constraints(int n, const T* x,
 }
 
 bool DistanceApproachIPOPTCUDAInterface::check_g(int n, const double* x, int m,
-                                                 double* g) {
+                                                 const double* g) {
   int kN = n;
   int kM = m;
   double x_u_tmp[kN];

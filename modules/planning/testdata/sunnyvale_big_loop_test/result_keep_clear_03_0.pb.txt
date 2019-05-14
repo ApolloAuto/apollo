@@ -20,11 +20,11 @@ decision {
         follow {
           distance_s: -3
           fence_point {
-            x: 586436.26475142757
-            y: 4140725.6605456178
+            x: 586436.73277672951
+            y: 4140727.4729266441
             z: 0
           }
-          fence_heading: 1.3183887244443382
+          fence_heading: 1.3179028672254074
         }
       }
     }
@@ -90,5 +90,5 @@ lane_id {
 engage_advice {
   advice: READY_TO_ENGAGE
 }
-trajectory_type: NORMAL
+trajectory_type: SPEED_FALLBACK
 replan_reason: "replan for no previous trajectory."

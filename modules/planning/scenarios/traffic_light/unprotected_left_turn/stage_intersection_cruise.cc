@@ -18,32 +18,18 @@
  * @file
  **/
 
-#include <string>
-#include <vector>
-
 #include "modules/planning/scenarios/traffic_light/unprotected_left_turn/stage_intersection_cruise.h"
 
-#include "modules/perception/proto/perception_obstacle.pb.h"
-
 #include "cyber/common/log.h"
-#include "modules/common/time/time.h"
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
-#include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace traffic_light {
 
-using common::TrajectoryPoint;
-using hdmap::PathOverlap;
-
 Stage::StageStatus
 TrafficLightUnprotectedLeftTurnStageIntersectionCruise::Process(
-
-    const TrajectoryPoint& planning_init_point, Frame* frame) {
+    const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   ADEBUG << "stage: IntersectionCruise";
   CHECK_NOTNULL(frame);
 
@@ -53,8 +39,12 @@ TrafficLightUnprotectedLeftTurnStageIntersectionCruise::Process(
            << "plan error";
   }
 
-  // TODO(all): to be added
-
+  bool stage_done = stage_impl_.CheckDone(
+      *frame, ScenarioConfig::TRAFFIC_LIGHT_UNPROTECTED_LEFT_TURN, config_,
+      true);
+  if (stage_done) {
+    return FinishStage();
+  }
   return Stage::RUNNING;
 }
 

@@ -96,7 +96,7 @@ DEFINE_int32(min_still_obstacle_history_length, 4,
              "Min # historical frames for still obstacles");
 DEFINE_int32(max_still_obstacle_history_length, 10,
              "Min # historical frames for still obstacles");
-DEFINE_double(still_obstacle_speed_threshold, 1.8,
+DEFINE_double(still_obstacle_speed_threshold, 0.99,
               "Speed threshold for still obstacles");
 DEFINE_double(still_pedestrian_speed_threshold, 0.2,
               "Speed threshold for still pedestrians");
@@ -256,6 +256,8 @@ DEFINE_bool(use_bell_curve_for_cost_function, false,
 // interaction predictor
 DEFINE_double(collision_cost_time_resolution, 1.0,
               "The time resolution used to compute the collision cost");
+DEFINE_double(longitudinal_acceleration_cost_weight, 0.0,
+              "The weight of longitudinal acceleration cost");
 DEFINE_double(centripedal_acceleration_cost_weight, 0.0,
               "The weight of the cost related to centripedal acceleration");
 DEFINE_double(collision_cost_weight, 1.0,

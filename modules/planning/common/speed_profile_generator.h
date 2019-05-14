@@ -37,14 +37,9 @@ class SpeedProfileGenerator {
   SpeedProfileGenerator() = delete;
   ~SpeedProfileGenerator() = delete;
 
-  static std::vector<common::SpeedPoint> GenerateInitSpeedProfile(
-      const common::TrajectoryPoint& planning_init_point,
-      const ReferenceLineInfo* reference_line_info);
-
-  static std::vector<common::SpeedPoint> GenerateSpeedHotStart(
-      const common::TrajectoryPoint& planning_init_point);
-
   static SpeedData GenerateFallbackSpeed(const double stop_distance = 0.0);
+
+  static void FillEnoughSpeedPoints(SpeedData* const speed_data);
 
   static SpeedData GenerateFallbackSpeedProfile();
 
@@ -53,9 +48,6 @@ class SpeedProfileGenerator {
 
   static SpeedData GenerateFixedDistanceCreepProfile(const double distance,
                                                      const double max_speed);
-
-  static SpeedData GenerateFixedSpeedCreepProfile(const double distance,
-                                                  const double max_speed);
 
  private:
   static SpeedData GenerateStopProfile(const double init_speed,

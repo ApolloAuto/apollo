@@ -94,8 +94,8 @@ bool ConfigManager::InitInternal() {
 
         AINFO << "load ModelConfig succ. name: " << model_config->name();
 
-        auto result = model_config_map_.emplace(model_config->name(),
-                                                model_config);
+        auto result =
+            model_config_map_.emplace(model_config->name(), model_config);
         if (!result.second) {
           AWARN << "duplicate ModelConfig, name: " << model_config->name();
           return false;

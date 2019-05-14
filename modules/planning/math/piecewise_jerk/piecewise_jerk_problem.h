@@ -48,82 +48,49 @@ namespace planning {
 
 class PiecewiseJerkProblem {
  public:
-  PiecewiseJerkProblem() = default;
+  PiecewiseJerkProblem(const size_t num_of_knots, const double delta_s,
+                       const std::array<double, 3>& x_init);
 
   virtual ~PiecewiseJerkProblem() = default;
 
-  /*
-   * @param
-   * x_init: the init status of x, x', x''
-   * delta_s: s(k) - s(k-1)
-   * x_bounds: x_bounds[i].first < x(i) < x_bounds[i].second
-   * w: weight array
-   * -- w[0]: x^2 term weight
-   * -- w[1]: (x')^2 term weight
-   * -- w[2]: (x'')^2 term weight
-   * -- w[3]: (x''')^2 term weight
-   * -- w[4]: default reference line weight, (x_bounds[k].first +
-   * x_bounds[k].second)/2
-   */
-  virtual void InitProblem(
-      const size_t num_var, const double delta_s,
-      const std::array<double, 5>& w, const double max_x_third_order_derivative,
-      const std::array<double, 3>& x_init = {0.0, 0.0, 0.0},
-      const std::array<double, 3>& x_end = {0.0, 0.0, 0.0});
+  void set_x_bounds(std::vector<std::pair<double, double>> x_bounds);
 
-  virtual void ResetInitConditions(const std::array<double, 3>& x_init) {
-    x_init_ = x_init;
-  }
+  void set_x_bounds(const double x_lower_bound, const double x_upper_bound);
 
-  virtual void ResetEndConditions(const std::array<double, 3>& x_end) {
-    x_end_ = x_end;
-  }
+  void set_dx_bounds(std::vector<std::pair<double, double>> dx_bounds);
 
-  void SetZeroOrderBounds(std::vector<std::pair<double, double>> x_bounds);
+  void set_dx_bounds(const double dx_lower_bound, const double dx_upper_bound);
 
-  void SetFirstOrderBounds(std::vector<std::pair<double, double>> dx_bounds);
+  void set_ddx_bounds(std::vector<std::pair<double, double>> ddx_bounds);
 
-  void SetSecondOrderBounds(std::vector<std::pair<double, double>> d2x_bounds);
+  void set_ddx_bounds(const double ddx_lower_bound,
+                      const double ddx_upper_bound);
 
-  void SetZeroOrderBounds(const double x_lower_bound,
-                          const double x_upper_bound);
+  void set_dddx_bound(const double dddx_bound) { dddx_bound_ = dddx_bound; }
 
-  void SetFirstOrderBounds(const double dx_lower_bound,
-                           const double dx_upper_bound);
+  void set_weight_x(const double weight_x) { weight_x_ = weight_x; }
 
-  void SetSecondOrderBounds(const double ddx_lower_bound,
-                            const double ddx_upper_bound);
+  void set_weight_dx(const double weight_dx) { weight_dx_ = weight_dx; }
 
-  // x_bounds: tuple(s, lower_bounds, upper_bounds)
-  // s doesn't need to be sorted
-  virtual void SetVariableBounds(
-      const std::vector<std::tuple<double, double, double>>& x_bounds);
+  void set_weight_ddx(const double weight_ddx) { weight_ddx_ = weight_ddx; }
 
-  // dx_bounds: tuple(s, lower_bounds, upper_bounds)
-  // s doesn't need to be sorted
-  virtual void SetVariableDerivativeBounds(
-      const std::vector<std::tuple<double, double, double>>& dx_bounds);
-
-  // ddx_bounds: tuple(s, lower_bounds, upper_bounds)
-  // s doesn't need to be sorted
-  virtual void SetVariableSecondOrderDerivativeBounds(
-      const std::vector<std::tuple<double, double, double>>& ddx_bounds);
+  void set_weight_dddx(const double weight_dddx) { weight_dddx_ = weight_dddx; }
 
   virtual bool Optimize(const int max_iter = 4000);
 
-  const std::vector<double>& x() const { return x_; }
+  const std::vector<double>& opt_x() const { return x_; }
 
-  const std::vector<double>& x_derivative() const { return dx_; }
+  const std::vector<double>& opt_dx() const { return dx_; }
 
-  const std::vector<double>& x_second_order_derivative() const { return ddx_; }
+  const std::vector<double>& opt_ddx() const { return ddx_; }
 
  protected:
   // naming convention follows osqp solver.
   virtual void CalculateKernel(std::vector<c_float>* P_data,
                                std::vector<c_int>* P_indices,
-                               std::vector<c_int>* P_indptr);
+                               std::vector<c_int>* P_indptr) = 0;
 
-  virtual void CalculateOffset(std::vector<c_float>* q);
+  virtual void CalculateOffset(std::vector<c_float>* q) = 0;
 
   virtual void CalculateAffineConstraint(std::vector<c_float>* A_data,
                                          std::vector<c_int>* A_indices,
@@ -141,10 +108,6 @@ class PiecewiseJerkProblem {
       std::vector<c_float>& q, OSQPData* data, OSQPWorkspace** work,  // NOLINT
       OSQPSettings* settings);
 
-  virtual void ProcessBound(
-      const std::vector<std::tuple<double, double, double>>& src,
-      std::vector<std::pair<double, double>>* dst);
-
  protected:
   size_t num_of_knots_ = 0;
 
@@ -154,23 +117,18 @@ class PiecewiseJerkProblem {
   std::vector<double> ddx_;
 
   std::array<double, 3> x_init_;
-  std::array<double, 3> x_end_;
+
   std::vector<std::pair<double, double>> x_bounds_;
   std::vector<std::pair<double, double>> dx_bounds_;
   std::vector<std::pair<double, double>> ddx_bounds_;
+  double dddx_bound_ = 0.0;
 
-  struct {
-    double x_w = 0.0;
-    double x_derivative_w = 0.0;
-    double x_second_order_derivative_w = 0.0;
-    double x_third_order_derivative_w = 0.0;
-    double x_mid_line_w = 0.0;
-  } weight_;
-
-  double max_x_third_order_derivative_ = 0.0;
+  double weight_x_ = 0.0;
+  double weight_dx_ = 0.0;
+  double weight_ddx_ = 0.0;
+  double weight_dddx_ = 0.0;
 
   double delta_s_ = 1.0;
-  double delta_s_sq_ = 1.0;
 };
 
 }  // namespace planning

@@ -9,13 +9,13 @@ import "modules/prediction/proto/lane_graph.proto";
 import "modules/prediction/proto/prediction_point.proto";
 
 message Lane {
-  // Features of all possible current lanes
+  // Features of all possible current lanes.
   repeated LaneFeature current_lane_feature = 1;
 
-  // Features of the most possible current lane
+  // Features of the most possible current lane.
   optional LaneFeature lane_feature = 2;
 
-  // Features of all nearby lanes
+  // Features of all nearby lanes.
   repeated LaneFeature nearby_lane_feature = 3;
 
   // Lane graph
@@ -64,7 +64,12 @@ message ObstaclePriority {
   optional Priority priority = 25 [default = NORMAL];
 }
 
-// next id = 33
+message Trajectory {
+  optional double probability = 1;  // probability of this trajectory
+  repeated apollo.common.TrajectoryPoint trajectory_point = 2;
+}
+
+// next id = 35
 message Feature {
   // Obstacle ID
   optional int32 id = 1;
@@ -111,6 +116,12 @@ message Feature {
 
   // Obstacle short-term predicted trajectory points
   repeated common.TrajectoryPoint short_term_predicted_trajectory_points = 32;
+
+  // Obstacle predicted trajectories
+  repeated Trajectory predicted_trajectory = 33;
+
+  // ADC trajectory in the same frame
+  repeated common.TrajectoryPoint adc_trajectory_point = 34;
 }
 
 message ObstacleHistory {

@@ -150,6 +150,7 @@ DECLARE_bool(use_bell_curve_for_cost_function);
 
 // interaction predictor
 DECLARE_double(collision_cost_time_resolution);
+DECLARE_double(longitudinal_acceleration_cost_weight);
 DECLARE_double(centripedal_acceleration_cost_weight);
 DECLARE_double(collision_cost_weight);
 DECLARE_double(collision_cost_exp_coefficient);

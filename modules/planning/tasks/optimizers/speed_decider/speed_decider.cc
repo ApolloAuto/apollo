@@ -28,7 +28,9 @@
 
 #include "cyber/common/log.h"
 #include "modules/common/configs/vehicle_config_helper.h"
+#include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
+#include "modules/planning/common/planning_context.h"
 #include "modules/planning/common/planning_gflags.h"
 
 namespace apollo {
@@ -38,6 +40,7 @@ using common::ErrorCode;
 using common::Status;
 using common::VehicleConfigHelper;
 using common::math::Vec2d;
+using common::time::Clock;
 using perception::PerceptionObstacle;
 
 SpeedDecider::SpeedDecider(const TaskConfig& config) : Task(config) {
@@ -189,6 +192,16 @@ Status SpeedDecider::MakeObjectDecision(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
+  // read pedestrian_stop_timer from saved status
+  std::unordered_map<std::string, double> pedestrian_stop_times;
+  auto* mutable_pedestrian_status = PlanningContext::Instance()
+                                        ->mutable_planning_status()
+                                        ->mutable_pedestrian();
+  for (const auto& stop_time : mutable_pedestrian_status->stop_time()) {
+    pedestrian_stop_times.emplace(stop_time.obstacle_id(),
+                                  stop_time.obstacle_stop_timestamp());
+  }
+
   for (const auto* obstacle : path_decision->obstacles().Items()) {
     auto* mutable_obstacle = path_decision->Find(obstacle->Id());
     const auto& boundary = mutable_obstacle->st_boundary();
@@ -201,6 +214,17 @@ Status SpeedDecider::MakeObjectDecision(
     }
     if (obstacle->HasLongitudinalDecision()) {
       AppendIgnoreDecision(mutable_obstacle);
+      continue;
+    }
+
+    // always STOP for pedestrian
+    if (CheckStopForPedestrian(*mutable_obstacle, &pedestrian_stop_times)) {
+      ObjectDecisionType stop_decision;
+      if (CreateStopDecision(*mutable_obstacle, &stop_decision,
+                             -FLAGS_min_stop_distance_obstacle)) {
+        mutable_obstacle->AddLongitudinalDecision("dp_st_graph/pedestrian",
+                                                  stop_decision);
+      }
       continue;
     }
 
@@ -287,6 +311,17 @@ Status SpeedDecider::MakeObjectDecision(
     }
     AppendIgnoreDecision(mutable_obstacle);
   }
+
+  // update PedestrianStatus to record stop_timer
+  mutable_pedestrian_status->Clear();
+  for (const auto& pedestrian_stop_time : pedestrian_stop_times) {
+    auto* stop_time = mutable_pedestrian_status->add_stop_time();
+    stop_time->set_obstacle_id(pedestrian_stop_time.first);
+    stop_time->set_obstacle_stop_timestamp(pedestrian_stop_time.second);
+    ADEBUG << "UPDATE stop_time: obstacle_id[" << pedestrian_stop_time.first
+           << "] stop_timestamp[" << pedestrian_stop_time.second << "]";
+  }
+
   return Status::OK();
 }
 
@@ -475,6 +510,55 @@ bool SpeedDecider::CheckIsFollowByT(const STBoundary& boundary) const {
       boundary.max_t() < kFollowTimeEpsilon) {
     return false;
   }
+  return true;
+}
+
+bool SpeedDecider::CheckStopForPedestrian(
+    const Obstacle& obstacle,
+    std::unordered_map<std::string, double>* pedestrian_stop_times) const {
+  CHECK_NOTNULL(pedestrian_stop_times);
+
+  if (!FLAGS_enable_alwasy_stop_for_pedestrian) {
+    return false;
+  }
+
+  const auto& perception_obstacle = obstacle.Perception();
+  if (perception_obstacle.type() != PerceptionObstacle::PEDESTRIAN) {
+    return false;
+  }
+
+  const std::string& obstacle_id = obstacle.Id();
+
+  // update stop timestamp on static pedestrian for watch timer
+  // check on stop timer for static pedestrians
+  constexpr double kSDistanceStartTimer = 10.0;
+  constexpr double kMaxStopSpeed = 0.3;
+  constexpr double kPedestrianStopTimeout = 4.0;
+  if (obstacle.st_boundary().min_s() < kSDistanceStartTimer) {
+    const auto obstacle_speed = std::hypot(perception_obstacle.velocity().x(),
+                                           perception_obstacle.velocity().y());
+    if (obstacle_speed > kMaxStopSpeed) {
+      (*pedestrian_stop_times).erase(obstacle_id);
+    } else {
+      if (pedestrian_stop_times->find(obstacle_id) ==
+          pedestrian_stop_times->end()) {
+        // add timestamp
+        (*pedestrian_stop_times)[obstacle_id] = Clock::NowInSeconds();
+        ADEBUG << "add timestamp: obstacle_id[" << obstacle_id << "] timestamp["
+               << Clock::NowInSeconds() << "]";
+      } else {
+        // check timeout
+        double stop_time =
+            Clock::NowInSeconds() - (*pedestrian_stop_times)[obstacle_id];
+        ADEBUG << "stop_time: obstacle_id[" << obstacle_id << "] stop_time["
+               << stop_time << "]";
+        if (stop_time >= kPedestrianStopTimeout) {
+          return false;
+        }
+      }
+    }
+  }
+
   return true;
 }
 

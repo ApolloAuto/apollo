@@ -1,4 +1,5 @@
 vehicle_param {
+  brand: GEM
   front_edge_to_center: 3.12
   back_edge_to_center: 0.49
   left_edge_to_center: 0.7

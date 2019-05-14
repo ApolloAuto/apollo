@@ -59,9 +59,9 @@ double NaviObstacleDecider::GetMinLaneWidth(
   double lane_left_width = 0.0;
   double lane_right_width = 0.0;
   for (const auto& path_data_point : path_data_points) {
-    bool bRet = reference_line.GetLaneWidth(
-        path_data_point.s(), &lane_left_width, &lane_right_width);
-    if (bRet) {
+    bool ret = reference_line.GetLaneWidth(path_data_point.s(),
+                                           &lane_left_width, &lane_right_width);
+    if (ret) {
       double lane_width = lane_left_width + lane_right_width;
       if (lane_width < min_lane_width) {
         min_lane_width = lane_width;
@@ -168,8 +168,8 @@ void NaviObstacleDecider::ProcessObstacle(
         (config_.max_nudge_distance() + current_obstacle->Perception().width() +
          VehicleParam().left_edge_to_center())) {
       auto proj_len = projection_point.s();
-      if ((std::fabs(proj_len) <= kEpislon) ||
-          (proj_len >= path_data_points.back().s())) {
+      if (std::fabs(proj_len) <= kEpislon ||
+          proj_len >= path_data_points.back().s()) {
         continue;
       }
       AddObstacleOffsetDirection(projection_point, path_data_points,
@@ -204,7 +204,7 @@ double NaviObstacleDecider::GetObstacleActualOffsetDistance(
     }
   }
 
-  if ((0 != last_lane_obstacles_num_) && (0 == *lane_obstacles_num) &&
+  if ((last_lane_obstacles_num_ != 0) && (*lane_obstacles_num == 0) &&
       (!is_obstacle_stable_)) {
     is_obstacle_stable_ = true;
     statist_count_ = 0;
@@ -212,7 +212,7 @@ double NaviObstacleDecider::GetObstacleActualOffsetDistance(
   }
 
   if (is_obstacle_stable_) {
-    statist_count_ = statist_count_ + 1;
+    ++statist_count_;
     if (statist_count_ > config_.cycles_number()) {
       is_obstacle_stable_ = false;
     } else {
@@ -235,7 +235,7 @@ void NaviObstacleDecider::RecordLastNudgeDistance(const double nudge_dist) {
     }
     no_nudge_num_ = 0;
   } else {
-    no_nudge_num_ = no_nudge_num_ + 1;
+    ++no_nudge_num_;
   }
 
   if (no_nudge_num_ >= config_.cycles_number()) {
@@ -247,7 +247,7 @@ void NaviObstacleDecider::SmoothNudgeDistance(
     const common::VehicleState& vehicle_state, double* nudge_dist) {
   CHECK_NOTNULL(nudge_dist);
   if (vehicle_state.linear_velocity() < config_.max_allow_nudge_speed()) {
-    limit_speed_num_ = limit_speed_num_ + 1;
+    ++limit_speed_num_;
   } else {
     limit_speed_num_ = 0;
   }
@@ -255,7 +255,7 @@ void NaviObstacleDecider::SmoothNudgeDistance(
     *nudge_dist = 0;
   }
   if (std::fabs(*nudge_dist) > config_.nudge_allow_tolerance()) {
-    eliminate_clutter_num_ = eliminate_clutter_num_ + 1;
+    ++eliminate_clutter_num_;
   } else {
     eliminate_clutter_num_ = 0;
   }
@@ -301,12 +301,12 @@ double NaviObstacleDecider::GetNudgeDistance(
   ProcessObstacle(obstacles, path_data_points, path_decision, min_lane_width,
                   vehicle_state);
   for (auto iter = obstacle_lat_dist_.begin(); iter != obstacle_lat_dist_.end();
-       iter++) {
+       ++iter) {
     auto actual_dist = GetObstacleActualOffsetDistance(
         iter, right_nudge_lane, left_nudge_lane, lane_obstacles_num);
     auto lat_dist = iter->second;
-    if ((actual_dist > config_.min_nudge_distance()) &&
-        (actual_dist < config_.max_nudge_distance())) {
+    if (actual_dist > config_.min_nudge_distance() &&
+        actual_dist < config_.max_nudge_distance()) {
       auto need_nudge_dist = config_.max_nudge_distance() - actual_dist;
       if (lat_dist >= 0.0) {
         right_nudge_obstacle =
@@ -323,11 +323,11 @@ double NaviObstacleDecider::GetNudgeDistance(
          << "get right_nudge_obstacle : " << right_nudge_obstacle;
   // Get the appropriate value of the nudge distance
   double nudge_dist = 0.0;
-  if ((std::fabs(left_nudge_obstacle) > kEpislon) &&
-      (std::fabs(right_nudge_obstacle) <= kEpislon)) {
+  if (std::fabs(left_nudge_obstacle) > kEpislon &&
+      std::fabs(right_nudge_obstacle) <= kEpislon) {
     nudge_dist = std::min(left_nudge_lane, left_nudge_obstacle);
-  } else if ((std::fabs(right_nudge_obstacle) > kEpislon) &&
-             (std::fabs(left_nudge_obstacle) <= kEpislon)) {
+  } else if (std::fabs(right_nudge_obstacle) > kEpislon &&
+             std::fabs(left_nudge_obstacle) <= kEpislon) {
     nudge_dist = std::max(right_nudge_lane, right_nudge_obstacle);
   }
 
@@ -342,14 +342,14 @@ double NaviObstacleDecider::GetNudgeDistance(
 
 void NaviObstacleDecider::KeepNudgePosition(const double nudge_dist,
                                             int* lane_obstacles_num) {
-  if ((std::fabs(nudge_dist) > config_.nudge_allow_tolerance()) &&
-      (std::fabs(last_nudge_dist_) < config_.nudge_allow_tolerance()) &&
-      (!keep_nudge_flag_)) {
+  if (std::fabs(nudge_dist) > config_.nudge_allow_tolerance() &&
+      std::fabs(last_nudge_dist_) < config_.nudge_allow_tolerance() &&
+      !keep_nudge_flag_) {
     cycles_count_ = 0;
     keep_nudge_flag_ = true;
   }
   if (keep_nudge_flag_) {
-    cycles_count_ = cycles_count_ + 1;
+    ++cycles_count_;
     if (cycles_count_ > config_.max_keep_nudge_cycles()) {
       *lane_obstacles_num = 0;
       keep_nudge_flag_ = false;
@@ -390,16 +390,12 @@ void NaviObstacleDecider::GetUnsafeObstaclesInfo(
   PathPoint vehicle_projection_point =
       PathMatcher::MatchToPath(path_data_points, 0, 0);
   for (const auto& iter : obstacles) {
-    double obstacle_y = iter->Perception().position().y();
-    if (((obstacle_y > unsafe_range.first) &&
-         (obstacle_y < unsafe_range.second)) ||
-        (iter->Perception().velocity().y() >
-         config_.lateral_velocity_value()) ||
-        (iter->Perception().velocity().y() <
-         -1.0 * config_.lateral_velocity_value())) {
+    const double obstacle_y = iter->Perception().position().y();
+    if ((obstacle_y > unsafe_range.first && obstacle_y < unsafe_range.second) ||
+        std::abs(iter->Perception().velocity().y()) >
+            config_.lateral_velocity_value()) {
       auto projection_point = PathMatcher::MatchToPath(
-          path_data_points, iter->Perception().position().x(),
-          iter->Perception().position().y());
+          path_data_points, iter->Perception().position().x(), obstacle_y);
       if (vehicle_projection_point.s() >= projection_point.s()) {
         continue;
       }

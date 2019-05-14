@@ -57,6 +57,9 @@ class OpenSpaceFallbackDecider : public Decider {
       const std::vector<std::vector<common::math::Box2d>>&
           predicted_bounding_rectangles,
       size_t* current_idx, size_t* first_collision_idx);
+
+  bool QuardraticFormulaLowerSolution(const double a, const double b,
+                                      const double c, double* sol);
 };
 
 }  // namespace planning

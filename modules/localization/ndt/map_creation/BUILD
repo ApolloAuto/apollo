@@ -11,6 +11,9 @@ cc_binary(
         "-lboost_filesystem",
         "-lboost_system",
         "-lboost_program_options",
+        "-lopencv_core",
+        "-lopencv_highgui",
+        "-lopencv_imgproc",
     ],
     linkstatic = 0,
     deps = [

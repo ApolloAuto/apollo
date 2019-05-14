@@ -25,6 +25,7 @@
 #include "modules/perception/base/object.h"
 #include "modules/perception/base/object_types.h"
 #include "modules/perception/base/point.h"
+#include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/app/obstacle_camera_perception.h"
 #include "modules/perception/camera/app/perception.pb.h"
 #include "modules/perception/camera/common/util.h"
@@ -78,6 +79,7 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
 
   int MakeProtobufMsg(double msg_timestamp, int seq_num,
                       const std::vector<base::ObjectPtr>& objects,
+                      const std::vector<base::LaneLine>& lane_objects,
                       const apollo::common::ErrorCode error_code,
                       apollo::perception::PerceptionObstacles* obstacles);
 
@@ -189,9 +191,18 @@ class FusionCameraDetectionComponent : public apollo::cyber::Component<> {
       camera_debug_writer_;
 
   // variable for motion service
-  base::MotionBufferPtr mot_buffer_;
+  base::MotionBufferPtr motion_buffer_;
   const int motion_buffer_size_ = 100;
 
+  // // variables for CIPV
+  bool enable_cipv_ = false;
+  Cipv cipv_;
+  float min_laneline_length_for_cipv_ = kMinLaneLineLengthForCIPV;
+  float average_lane_width_in_meter_ = kAverageLaneWidthInMeter;
+  float max_vehicle_width_in_meter_ = kMaxVehicleWidthInMeter;
+  float average_frame_rate_ = kAverageFrameRate;
+  bool image_based_cipv_ = false;
+  int debug_level_ = 0;
   // variables for visualization
   camera::Visualizer visualize_;
   bool write_visual_img_;

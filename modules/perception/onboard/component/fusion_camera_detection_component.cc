@@ -35,10 +35,19 @@ namespace onboard {
 
 using apollo::cyber::common::GetAbsolutePath;
 
+static void fill_lane_msg(const base::LaneLineCubicCurve &curve_coord,
+                          apollo::perception::LaneMarker *lane_marker) {
+  lane_marker->set_c0_position(curve_coord.d);
+  lane_marker->set_c1_heading_angle(curve_coord.c);
+  lane_marker->set_c2_curvature(curve_coord.b);
+  lane_marker->set_c3_curvature_derivative(curve_coord.a);
+  lane_marker->set_longitude_start(curve_coord.x_start);
+  lane_marker->set_longitude_end(curve_coord.x_end);
+}
+
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
-  std::string work_root = "";
-  camera::GetCyberWorkRoot(&work_root);
+  std::string work_root = camera::GetCyberWorkRoot();
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
@@ -232,6 +241,12 @@ bool FusionCameraDetectionComponent::Init() {
   homography_im2car_ = visualize_.homography_im2car();
   camera_obstacle_pipeline_->SetIm2CarHomography(homography_im2car_);
 
+  if (enable_cipv_) {
+    cipv_.Init(homography_im2car_, min_laneline_length_for_cipv_,
+               average_lane_width_in_meter_, max_vehicle_width_in_meter_,
+               average_frame_rate_, image_based_cipv_, debug_level_);
+  }
+
   if (enable_visualization_) {
     if (write_visual_img_) {
       visualize_.write_out_img_ = true;
@@ -282,8 +297,8 @@ void FusionCameraDetectionComponent::OnReceiveImage(
   if (InternalProc(message, camera_name, &error_code, prefused_message.get(),
                    out_message.get()) != cyber::SUCC) {
     AERROR << "InternalProc failed, error_code: " << error_code;
-    if (MakeProtobufMsg(msg_timestamp, seq_num_, std::vector<base::ObjectPtr>(),
-                        error_code, out_message.get()) != cyber::SUCC) {
+    if (MakeProtobufMsg(msg_timestamp, seq_num_, {}, {}, error_code,
+                        out_message.get()) != cyber::SUCC) {
       AERROR << "MakeProtobufMsg failed";
       return;
     }
@@ -373,6 +388,21 @@ int FusionCameraDetectionComponent::InitConfig() {
       fusion_camera_detection_param.camera_debug_channel_name();
   ts_diff_ = fusion_camera_detection_param.ts_diff();
   write_visual_img_ = fusion_camera_detection_param.write_visual_img();
+
+  min_laneline_length_for_cipv_ = static_cast<float>(
+      fusion_camera_detection_param.min_laneline_length_for_cipv());
+  average_lane_width_in_meter_ = static_cast<float>(
+      fusion_camera_detection_param.average_lane_width_in_meter());
+  max_vehicle_width_in_meter_ = static_cast<float>(
+      fusion_camera_detection_param.max_vehicle_width_in_meter());
+  average_frame_rate_ =
+      static_cast<float>(fusion_camera_detection_param.average_frame_rate());
+
+  image_based_cipv_ =
+      static_cast<float>(fusion_camera_detection_param.image_based_cipv());
+
+  debug_level_ = static_cast<int>(fusion_camera_detection_param.debug_level());
+  enable_cipv_ = fusion_camera_detection_param.enable_cipv();
 
   std::string format_str = R"(
       FusionCameraDetectionComponent InitConfig success
@@ -572,10 +602,10 @@ int FusionCameraDetectionComponent::InitMotionService() {
   auto motion_service_reader =
       node_->CreateReader(channel_name_local, motion_service_callback);
   // initialize motion buffer
-  if (mot_buffer_ == nullptr) {
-    mot_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
+  if (motion_buffer_ == nullptr) {
+    motion_buffer_ = std::make_shared<base::MotionBuffer>(motion_buffer_size_);
   } else {
-    mot_buffer_->set_capacity(motion_buffer_size_);
+    motion_buffer_->set_capacity(motion_buffer_size_);
   }
   return cyber::SUCC;
 }
@@ -616,8 +646,7 @@ void FusionCameraDetectionComponent::OnMotionService(
   motion_2d(3, 3) = message->vehicle_status()[0].motion().m33();
   vehicledata.motion = motion_2d;
 
-  mot_buffer_->push_back(vehicledata);
-
+  motion_buffer_->push_back(vehicledata);
   // TODO(@yg13): output motion in text file
 }
 
@@ -707,7 +736,8 @@ int FusionCameraDetectionComponent::InternalProc(
   // process success, make pb msg
   if (output_final_obstacles_ &&
       MakeProtobufMsg(msg_timestamp, seq_num_, camera_frame.tracked_objects,
-                      *error_code, out_message) != cyber::SUCC) {
+                      camera_frame.lane_objects, *error_code,
+                      out_message) != cyber::SUCC) {
     AERROR << "MakeProtobufMsg failed"
            << " ts: " << std::to_string(msg_timestamp);
     *error_code = apollo::common::ErrorCode::PERCEPTION_ERROR_UNKNOWN;
@@ -727,6 +757,34 @@ int FusionCameraDetectionComponent::InternalProc(
     camera_frame.data_provider->GetImageBlob(
         image_options,
         prefused_message->frame_->camera_frame_supplement.image_blob.get());
+  }
+
+  //  Determine CIPV
+  if (enable_cipv_) {
+    CipvOptions cipv_options;
+    if (motion_buffer_ != nullptr) {
+      if (motion_buffer_->size() == 0) {
+        AWARN << "motion_buffer_ is empty";
+        cipv_options.velocity = 5.0f;
+        cipv_options.yaw_rate = 0.0f;
+      } else {
+        cipv_options.velocity = motion_buffer_->back().velocity;
+        cipv_options.yaw_rate = motion_buffer_->back().yaw_rate;
+      }
+      ADEBUG << "[CIPV] velocity " << cipv_options.velocity
+             << ", yaw rate: " << cipv_options.yaw_rate;
+      cipv_.DetermineCipv(camera_frame.lane_objects, cipv_options,
+                          &camera_frame.tracked_objects);
+
+      // TODO(techoe): Activate CollectDrops after test
+      // // Get Drop points
+      // // motion_buffer_ = motion_service_->GetMotionBuffer();
+      // if (motion_buffer_->size() > 0) {
+      //  cipv_.CollectDrops(motion_buffer_, &camera_frame.tracked_objects);
+      // } else {
+      //   AWARN << "motion_buffer is empty";
+      // }
+    }
   }
 
   // Send msg for visualization
@@ -753,7 +811,7 @@ int FusionCameraDetectionComponent::InternalProc(
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
       visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
-                                                   mot_buffer_);
+                                                   motion_buffer_);
     }
   }
 
@@ -776,6 +834,7 @@ int FusionCameraDetectionComponent::InternalProc(
 int FusionCameraDetectionComponent::MakeProtobufMsg(
     double msg_timestamp, int seq_num,
     const std::vector<base::ObjectPtr> &objects,
+    const std::vector<base::LaneLine> &lane_objects,
     const apollo::common::ErrorCode error_code,
     apollo::perception::PerceptionObstacles *obstacles) {
   double publish_time = apollo::cyber::Time::Now().ToSecond();
@@ -789,6 +848,7 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
   header->set_camera_timestamp(static_cast<uint64_t>(msg_timestamp * 1e9));
   // header->set_radar_timestamp(0);
 
+  // write out obstacles in world coordinates
   obstacles->set_error_code(error_code);
   for (const auto &obj : objects) {
     apollo::perception::PerceptionObstacle *obstacle =
@@ -798,6 +858,40 @@ int FusionCameraDetectionComponent::MakeProtobufMsg(
       return cyber::FAIL;
     }
   }
+
+  // write out lanes in ego coordinates
+  apollo::perception::LaneMarkers *lane_markers =
+      obstacles->mutable_lane_marker();
+  apollo::perception::LaneMarker *lane_marker_l0 =
+      lane_markers->mutable_left_lane_marker();
+  apollo::perception::LaneMarker *lane_marker_r0 =
+      lane_markers->mutable_right_lane_marker();
+  apollo::perception::LaneMarker *lane_marker_l1 =
+      lane_markers->add_next_left_lane_marker();
+  apollo::perception::LaneMarker *lane_marker_r1 =
+      lane_markers->add_next_right_lane_marker();
+
+  for (const auto &lane : lane_objects) {
+    base::LaneLineCubicCurve curve_coord = lane.curve_car_coord;
+
+    switch (lane.pos_type) {
+      case base::LaneLinePositionType::EGO_LEFT:
+        fill_lane_msg(curve_coord, lane_marker_l0);
+        break;
+      case base::LaneLinePositionType::EGO_RIGHT:
+        fill_lane_msg(curve_coord, lane_marker_r0);
+        break;
+      case base::LaneLinePositionType::ADJACENT_LEFT:
+        fill_lane_msg(curve_coord, lane_marker_l1);
+        break;
+      case base::LaneLinePositionType::ADJACENT_RIGHT:
+        fill_lane_msg(curve_coord, lane_marker_r1);
+        break;
+      default:
+        break;
+    }
+  }
+
   return cyber::SUCC;
 }
 

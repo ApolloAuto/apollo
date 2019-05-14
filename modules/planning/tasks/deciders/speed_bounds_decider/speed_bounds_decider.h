@@ -38,7 +38,12 @@ class SpeedBoundsDecider : public Decider {
       Frame* const frame,
       ReferenceLineInfo* const reference_line_info) override;
 
+  void AddPathEndStop(Frame* const frame,
+                      ReferenceLineInfo* const reference_line_info);
+
   void CheckLaneChangeUrgency(Frame* const frame);
+
+  double SetSpeedFallbackDistance(PathDecision* const path_decision);
 
   // @brief Rule-based stop for side pass on reverse lane
   void StopOnSidePass(Frame* const frame,

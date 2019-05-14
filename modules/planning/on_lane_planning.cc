@@ -16,6 +16,8 @@
 
 #include "modules/planning/on_lane_planning.h"
 
+#include <algorithm>
+#include <limits>
 #include <list>
 #include <utility>
 
@@ -63,7 +65,7 @@ OnLanePlanning::~OnLanePlanning() {
   }
   planner_->Stop();
   FrameHistory::Instance()->Clear();
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->mutable_planning_status()->Clear();
   last_routing_.Clear();
   EgoInfo::Instance()->Clear();
 }
@@ -87,7 +89,7 @@ Status OnLanePlanning::Init(const PlanningConfig& config) {
       << FLAGS_traffic_rule_config_filename;
 
   // clear planning status
-  PlanningContext::MutablePlanningStatus()->Clear();
+  PlanningContext::Instance()->mutable_planning_status()->Clear();
 
   // load map
   hdmap_ = HDMapUtil::BaseMapPtr();
@@ -182,6 +184,10 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
                              ADCTrajectory* const ptr_trajectory_pb) {
   local_view_ = local_view;
   const double start_timestamp = Clock::NowInSeconds();
+  const double start_system_timestamp =
+      std::chrono::duration<double>(
+          std::chrono::system_clock::now().time_since_epoch())
+          .count();
 
   // localization
   ADEBUG << "Get localization:"
@@ -193,11 +199,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   Status status = VehicleStateProvider::Instance()->Update(
       *local_view_.localization_estimate, *local_view_.chassis);
 
-  VehicleState received_vehicle_state =
+  VehicleState vehicle_state =
       VehicleStateProvider::Instance()->vehicle_state();
-  DCHECK_GE(start_timestamp, received_vehicle_state.timestamp());
+  const double vehicle_state_timestamp = vehicle_state.timestamp();
+  DCHECK_GE(start_timestamp, vehicle_state_timestamp);
 
-  if (!status.ok() || !util::IsVehicleStateValid(received_vehicle_state)) {
+  if (!status.ok() || !util::IsVehicleStateValid(vehicle_state)) {
     std::string msg(
         "Update VehicleStateProvider failed "
         "or the vehicle state is out dated.");
@@ -214,17 +221,20 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
     return;
   }
 
-  auto aligned_vehicle_state =
-      AlignTimeStamp(received_vehicle_state, start_timestamp);
+  if (FLAGS_estimate_current_vehicle_state &&
+      start_timestamp - vehicle_state_timestamp <
+          FLAGS_message_latency_threshold) {
+    vehicle_state = AlignTimeStamp(vehicle_state, start_timestamp);
+  }
 
   if (util::IsDifferentRouting(last_routing_, *local_view_.routing)) {
     last_routing_ = *local_view_.routing;
-    PlanningContext::MutablePlanningStatus()->Clear();
+    PlanningContext::Instance()->mutable_planning_status()->Clear();
     reference_line_provider_->UpdateRoutingResponse(*local_view_.routing);
   }
 
   // Update reference line provider and reset pull over if necessary
-  reference_line_provider_->UpdateVehicleState(aligned_vehicle_state);
+  reference_line_provider_->UpdateVehicleState(vehicle_state);
 
   // planning is triggered by prediction data, but we can still use an estimated
   // cycle time for stitching
@@ -234,14 +244,13 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   std::string replan_reason;
   std::vector<TrajectoryPoint> stitching_trajectory =
       TrajectoryStitcher::ComputeStitchingTrajectory(
-          aligned_vehicle_state, start_timestamp, planning_cycle_time,
+          vehicle_state, start_timestamp, planning_cycle_time,
+          FLAGS_trajectory_stitching_preserved_length,
           last_publishable_trajectory_.get(), &replan_reason);
 
-  EgoInfo::Instance()->Update(stitching_trajectory.back(),
-                              aligned_vehicle_state);
+  EgoInfo::Instance()->Update(stitching_trajectory.back(), vehicle_state);
   const uint32_t frame_num = static_cast<uint32_t>(seq_num_++);
-  status =
-      InitFrame(frame_num, stitching_trajectory.back(), aligned_vehicle_state);
+  status = InitFrame(frame_num, stitching_trajectory.back(), vehicle_state);
 
   if (status.ok()) {
     EgoInfo::Instance()->CalculateFrontObstacleClearDistance(
@@ -298,7 +307,12 @@ void OnLanePlanning::RunOnce(const LocalView& local_view,
   for (const auto& p : ptr_trajectory_pb->trajectory_point()) {
     ADEBUG << p.DebugString();
   }
-  const auto time_diff_ms = (Clock::NowInSeconds() - start_timestamp) * 1000;
+  const auto end_system_timestamp =
+      std::chrono::duration<double>(
+          std::chrono::system_clock::now().time_since_epoch())
+          .count();
+  const auto time_diff_ms =
+      (end_system_timestamp - start_system_timestamp) * 1000;
   ADEBUG << "total planning time spend: " << time_diff_ms << " ms.";
 
   ptr_trajectory_pb->mutable_latency_stats()->set_total_time_ms(time_diff_ms);
@@ -363,6 +377,57 @@ void OnLanePlanning::ExportReferenceLineDebug(planning_internal::Debug* debug) {
     rl_debug->set_is_drivable(reference_line_info.IsDrivable());
     rl_debug->set_is_protected(reference_line_info.GetRightOfWayStatus() ==
                                ADCTrajectory::PROTECTED);
+
+    // store kappa and dkappa for performance evaluation
+    const auto& reference_points =
+        reference_line_info.reference_line().reference_points();
+    double kappa_rms = 0.0;
+    double dkappa_rms = 0.0;
+    double kappa_max_abs = std::numeric_limits<double>::lowest();
+    double dkappa_max_abs = std::numeric_limits<double>::lowest();
+    for (const auto& reference_point : reference_points) {
+      double kappa_sq = reference_point.kappa() * reference_point.kappa();
+      double dkappa_sq = reference_point.dkappa() * reference_point.dkappa();
+      kappa_rms += kappa_sq;
+      dkappa_rms += dkappa_sq;
+      kappa_max_abs = kappa_max_abs < kappa_sq ? kappa_sq : kappa_max_abs;
+      dkappa_max_abs = dkappa_max_abs < dkappa_sq ? dkappa_sq : dkappa_max_abs;
+    }
+    double reference_points_size = static_cast<double>(reference_points.size());
+    kappa_rms /= reference_points_size;
+    dkappa_rms /= reference_points_size;
+    kappa_rms = std::sqrt(kappa_rms);
+    dkappa_rms = std::sqrt(dkappa_rms);
+    rl_debug->set_kappa_rms(kappa_rms);
+    rl_debug->set_dkappa_rms(dkappa_rms);
+    rl_debug->set_kappa_max_abs(kappa_max_abs);
+    rl_debug->set_dkappa_max_abs(dkappa_max_abs);
+
+    bool is_off_road = false;
+    double minimum_boundary = std::numeric_limits<double>::infinity();
+
+    const double adc_half_width =
+        common::VehicleConfigHelper::GetConfig().vehicle_param().width() / 2.0;
+    const auto& reference_line_path =
+        reference_line_info.reference_line().GetMapPath();
+    const auto sample_s = 0.1;
+    const auto reference_line_length =
+        reference_line_info.reference_line().Length();
+    for (double s = 0.0; s < reference_line_length; s += sample_s) {
+      double left_width = reference_line_path.GetLaneLeftWidth(s);
+      double right_width = reference_line_path.GetLaneRightWidth(s);
+      if (left_width < adc_half_width || right_width < adc_half_width) {
+        is_off_road = true;
+      }
+      if (left_width < minimum_boundary) {
+        minimum_boundary = left_width;
+      }
+      if (right_width < minimum_boundary) {
+        minimum_boundary = right_width;
+      }
+    }
+    rl_debug->set_is_offroad(is_off_road);
+    rl_debug->set_minimum_boundary(minimum_boundary);
   }
 }
 
@@ -422,6 +487,17 @@ Status OnLanePlanning::Plan(
       }
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+    // Store current frame stitched path for possible speed fallback in next
+    // frames
+    DiscretizedPath current_frame_planned_path;
+    for (const auto& trajectory_point : stitching_trajectory) {
+      current_frame_planned_path.push_back(trajectory_point.path_point());
+    }
+    const auto& best_ref_path = best_ref_info->path_data().discretized_path();
+    std::copy(best_ref_path.begin() + 1, best_ref_path.end(),
+              std::back_inserter(current_frame_planned_path));
+    frame_->set_current_frame_planned_path(current_frame_planned_path);
+
     if (FLAGS_export_chart) {
       ExportOnLaneChart(best_ref_info->debug(), ptr_debug);
     } else {
@@ -654,9 +730,9 @@ void OnLanePlanning::AddOpenSpaceOptimizerResult(
   smoothed_line->set_label("Smooth");
   size_t adc_label = 0;
   for (const auto& point : smoothed_trajectory.vehicle_motion_point()) {
-    const auto& x = point.trajectory_point().path_point().x();
-    const auto& y = point.trajectory_point().path_point().y();
-    const auto& heading = point.trajectory_point().path_point().theta();
+    const auto x = point.trajectory_point().path_point().x();
+    const auto y = point.trajectory_point().path_point().y();
+    const auto heading = point.trajectory_point().path_point().theta();
 
     // Draw vehicle shape along the trajectory
     auto* adc_shape = chart->add_car();
@@ -721,6 +797,8 @@ void OnLanePlanning::AddPartitionedTrajectory(
   auto* options = chart->mutable_options();
   options->mutable_x()->set_label_string("x (meter)");
   options->mutable_y()->set_label_string("y (meter)");
+  options->set_sync_xy_window_size(true);
+  options->set_aspect_ratio(0.9);
 
   // Draw vehicle state
   auto* adc_shape = chart->add_car();
@@ -768,8 +846,41 @@ void OnLanePlanning::AddPartitionedTrajectory(
     (*partition_properties)["showLine"] = "true";
   }
 
-  // Draw fallback trajectory compared with the partitioned
+  // Draw trajectory stitching point (line with only one point)
+  auto* stitching_line = chart->add_line();
+  stitching_line->set_label("TrajectoryStitchingPoint");
+  auto* trajectory_stitching_point = stitching_line->add_point();
+  trajectory_stitching_point->set_x(
+      open_space_debug.trajectory_stitching_point().path_point().x());
+  trajectory_stitching_point->set_y(
+      open_space_debug.trajectory_stitching_point().path_point().y());
+  // Set chartJS's dataset properties
+  auto* stitching_properties = stitching_line->mutable_properties();
+  (*stitching_properties)["borderWidth"] = "3";
+  (*stitching_properties)["pointRadius"] = "5";
+  (*stitching_properties)["lineTension"] = "0";
+  (*stitching_properties)["fill"] = "true";
+  (*stitching_properties)["showLine"] = "true";
+
+  // Draw fallback trajectory compared with the partitioned and potential
+  // collision_point (line with only one point)
   if (open_space_debug.is_fallback_trajectory()) {
+    auto* collision_line = chart->add_line();
+    collision_line->set_label("FutureCollisionPoint");
+    auto* future_collision_point = collision_line->add_point();
+    future_collision_point->set_x(
+        open_space_debug.future_collision_point().path_point().x());
+    future_collision_point->set_y(
+        open_space_debug.future_collision_point().path_point().y());
+    // Set chartJS's dataset properties
+    auto* collision_properties = collision_line->mutable_properties();
+    (*collision_properties)["borderWidth"] = "3";
+    (*collision_properties)["pointRadius"] = "8";
+    (*collision_properties)["lineTension"] = "0";
+    (*collision_properties)["fill"] = "true";
+    (*stitching_properties)["showLine"] = "true";
+    (*stitching_properties)["pointStyle"] = "cross";
+
     const auto& fallback_trajectories =
         open_space_debug.fallback_trajectory().trajectory();
     if (fallback_trajectories.empty() ||

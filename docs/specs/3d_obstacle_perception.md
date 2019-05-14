@@ -1,5 +1,4 @@
-3D Obstacle Perception
-===================
+# 3D Obstacle Perception
 
 There are three main components of 3D obstacle perception:
 
@@ -9,7 +8,7 @@ There are three main components of 3D obstacle perception:
 
 
 
-## **LiDAR Obstacle Perception**
+## LiDAR Obstacle Perception
 
 The following sections describe the obstacle perception pipeline given input as 3D point cloud data from the LiDAR sensor that are resolved by Apollo:
 
@@ -19,8 +18,7 @@ The following sections describe the obstacle perception pipeline given input as 
 - HM ObjectTracker
 - Sequential TypeFusion
 
-HDMap Region of Interest (ROI) Filter
--------------------------------------
+### HDMap Region of Interest (ROI) Filter
 
 The Region of Interest (ROI) specifies the drivable area that includes road surfaces and junctions that are retrieved from the HD (high-resolution) map. The HDMap ROI filter processes LiDAR points that are outside the ROI, removing background objects, e.g., buildings and trees around the road. What remains is the point cloud in the ROI for subsequent processing.
 
@@ -42,11 +40,11 @@ The Apollo HDMap ROI filter generally consists of three successive steps:
 - Point inquiry with ROI LUT.
 
 
-### Coordinate Transformation
+#### Coordinate Transformation
 
 For the HDMap ROI filter, the data interface for HDMap is defined by a set of polygons, each of which is actually an ordered set of points in the world coordinate system. Running an inquiry on the points with the HDMap ROI requires that the point cloud and polygons are represented in the same coordinate system. For this purpose, Apollo transforms the points of the input point cloud and the HDMap polygons into a local coordinate system that originates from the LiDAR sensor’s location.
 
-### ROI LUT Construction
+#### ROI LUT Construction
 
 To determine an input point, whether inside or outside the ROI, Apollo adopts a grid-wise LUT that quantifies the ROI into a birds-eye view 2D grid. As shown in Figure 1, this LUT covers a rectangle region, bounded by a predefined spatial range around the general view from above in the boundary of HDMap. Then it represents the affiliation with the ROI for each cell of the grid (i.e., 1/0 represents it is inside/outside the ROI). For computational efficiency, Apollo uses a scan line algorithm and bitmap encoding to construct the ROI LUT.
 
@@ -55,7 +53,7 @@ To determine an input point, whether inside or outside the ROI, Apollo adopts a 
 
 The blue lines indicate the boundary of HDMap ROI, including road surfaces and junctions. The red solid dot represents the origin of the local coordinate system corresponding to the LiDAR sensor location. The 2D grid is composed of 8×8 cells that are shown as green squares. The cells inside the ROI are blue-filled squares while the ones outside the ROI are yellow-filled squares.
 
-### Point Inquiry with ROI LUT
+#### Point Inquiry with ROI LUT
 
 Based on the ROI LUT, the affiliation of each input point is queried using a two-step verification. Then, Apollo conducts data compilation and output as described below. For the point inquiry process, Apollo:
 
@@ -78,8 +76,7 @@ The table below describes the usage of parameters for HDMap ROI Filter.
 | no_edge_table  | use edge_table for polygon mask generation. | false   |
 | set_roi_service| enable roi_service to perception lidar modules. | true   |
 
-Convolutional Neural Networks (CNN) Segmentation
-------------------------------------------------
+### Convolutional Neural Networks (CNN) Segmentation
 
 After identifying the surrounding environment using the HDMap ROI filter, Apollo obtains the filtered point cloud that includes *only* the points inside the ROI (i.e., the drivable road and junction areas). Most of the background obstacles, such as buildings and trees around the road region, have been removed, and the point cloud inside the ROI is fed into the segmentation module. This process detects and segments out foreground obstacles, e.g., cars, trucks, bicycles, and pedestrians.
 
@@ -101,7 +98,7 @@ Apollo uses a deep CNN for accurate obstacle detection and segmentation. The Apo
 
 The following sections describe the deep CNN in detail.
 
-### Channel Feature Extraction
+#### Channel Feature Extraction
 
 Given a point cloud frame, Apollo builds a birds-eye view (i.e., projected to the X-Y plane) that is a 2D grid in the local coordinate system. Each point within a predefined range with respect to the origin (i.e., the LiDAR sensor) is quantized into one cell of the 2D grid based on its X and Y coordinates. After quantization, Apollo computes 8 statistical measurements of the points for each cell of the grid, which will be the input channel features fed into the CNN in the subsequent step. The statistical measurements computed are the:
 
@@ -122,7 +119,7 @@ Given a point cloud frame, Apollo builds a birds-eye view (i.e., projected to th
 - Binary value indicating whether the cell is empty or occupied.
 
 
-### CNN-Based Obstacle Prediction
+#### CNN-Based Obstacle Prediction
 
 Based on the channel features described above, Apollo uses a deep fully-convolutional neural network (FCNN) to predict the cell-wise obstacle attributes including the offset displacement with respect to the potential object center — called center offset, (see Figure 2 below), objectness, positiveness, and object height. As shown in Figure 2, the input of the network is a *W*×*H*×*C* channel image where:
 
@@ -147,7 +144,7 @@ feature image to the spatial resolution of the input 2D grid, which can recover 
 
 <div align=center>Figure 2 The FCNN for cell-wise obstacle prediction</div>
 
-### Obstacle Clustering
+#### Obstacle Clustering
 
 After the CNN-based prediction step, Apollo obtains prediction information for individual cells. Apollo utilizes five cell object attribute images that contain the:
 
@@ -176,7 +173,7 @@ One candidate object cluster can be composed of multiple neighboring connected c
 
 The class probabilities are summed up over the nodes (cells) within the object cluster for each candidate obstacle type, including vehicle, pedestrian, bicyclist and unknown. The obstacle type corresponding to the maximum-averaged probability is the final classification result of the object cluster.
 
-### Post-processing
+#### Post-processing
 
 After clustering, Apollo obtains a set of candidate object clusters each of which includes several cells. In the post-processing step, Apollo first computes the detection confidence score and object height for each candidate cluster by averaging the positiveness and object height values of its involved cells respectively. Then, Apollo removes the points that are too high with respect to the predicted object height and collects the points of valid cells for each candidate cluster. Finally, Apollo removes the candidate clusters that have either a very low confidence score or a small number of points, to output the final obstacle clusters/segments.
 
@@ -281,9 +278,9 @@ The main points in an HM object tracker workflow are:
 
 To smooth the obstacle type and reduce the type switch over the entire trajectory, Apollo utilizes a sequential type fusion algorithm based on a linear-chain Conditional Random Field (CRF), which can be formulated as follows:
 
-![CRF_eq1](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/3d_obstacle_perception/CRF_eq1.png)
+![CRF_eq1](images/3d_obstacle_perception/CRF_eq1.png)
 
-![CRF_eq2](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/3d_obstacle_perception/CRF_eq2.png)
+![CRF_eq2](images/3d_obstacle_perception/CRF_eq2.png)
 
 where the unary term acts on each single node, while the binary one acts on each edge. 
 
@@ -291,7 +288,7 @@ The probability in the unary term is the class probability output by the CNN-bas
 
 Using the Viterbi algorithm, the sequential obstacle type is optimized by solving the following problem:
 
-![CRF_eq3](https://github.com/ApolloAuto/apollo/blob/master/docs/specs/images/3d_obstacle_perception/CRF_eq3.png)
+![CRF_eq3](images/3d_obstacle_perception/CRF_eq3.png)
 
 ## Radar Detector
 

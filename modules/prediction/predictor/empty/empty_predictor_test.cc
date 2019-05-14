@@ -51,7 +51,7 @@ TEST_F(EmptyPredictorTest, General) {
   evaluator.Evaluate(obstacle_ptr);
   EmptyPredictor predictor;
   predictor.Predict(obstacle_ptr);
-  EXPECT_EQ(predictor.NumOfTrajectories(), 0);
+  EXPECT_EQ(predictor.NumOfTrajectories(*obstacle_ptr), 0);
 }
 
 }  // namespace prediction

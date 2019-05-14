@@ -70,37 +70,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "dp_poly_path_config_proto",
-    deps = [
-        ":dp_poly_path_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "dp_poly_path_config_proto_lib",
-    srcs = [
-        "dp_poly_path_config.proto",
-    ],
-    deps = [
-        ":waypoint_sampler_config_proto_lib",
-    ],
-)
-
-cc_proto_library(
-    name = "waypoint_sampler_config_proto",
-    deps = [
-        ":waypoint_sampler_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "waypoint_sampler_config_proto_lib",
-    srcs = [
-        "waypoint_sampler_config.proto",
-    ],
-)
-
-cc_proto_library(
     name = "dp_st_speed_config_proto",
     deps = [
         ":dp_st_speed_config_proto_lib",
@@ -184,26 +153,23 @@ proto_library(
     ],
     deps = [
         ":decider_config_proto_lib",
-        ":dp_poly_path_config_proto_lib",
         ":dp_st_speed_config_proto_lib",
+        ":lane_change_decider_config_proto_lib",
         ":navi_obstacle_decider_config_proto_lib",
         ":navi_path_decider_config_proto_lib",
         ":navi_speed_decider_config_proto_lib",
         ":open_space_fallback_decider_config_proto_lib",
         ":open_space_roi_decider_config_proto_lib",
-        ":open_space_trajectory_provider_config_proto_lib",
         ":open_space_trajectory_partition_config_proto_lib",
-        ":planner_open_space_config_proto_lib",
-        # ":poly_vt_speed_config_proto_lib",
-        ":proceed_with_caution_speed_config_proto_lib",
+        ":open_space_trajectory_provider_config_proto_lib",
         ":path_assessment_decider_config_proto_lib",
         ":path_bounds_decider_config_proto_lib",
+        ":path_lane_borrow_decider_config_proto_lib",
         ":piecewise_jerk_path_config_proto_lib",
-        ":qp_piecewise_jerk_path_config_proto_lib",
-        ":qp_spline_path_config_proto_lib",
-        ":qp_st_speed_config_proto_lib",
+        ":piecewise_jerk_speed_config_proto_lib",
+        ":planner_open_space_config_proto_lib",
+        ":proceed_with_caution_speed_config_proto_lib",
         ":reference_line_smoother_config_proto_lib",
-        ":side_pass_path_decider_config_proto_lib",
         ":speed_bounds_decider_config_proto_lib",
     ],
 )
@@ -243,13 +209,6 @@ proto_library(
     ],
 )
 
-proto_library(
-    name = "qp_spline_path_config_proto_lib",
-    srcs = [
-        "qp_spline_path_config.proto",
-    ],
-)
-
 cc_proto_library(
     name = "reference_line_smoother_config_proto",
     deps = [
@@ -261,20 +220,6 @@ proto_library(
     name = "reference_line_smoother_config_proto_lib",
     srcs = [
         "reference_line_smoother_config.proto",
-    ],
-)
-
-cc_proto_library(
-    name = "qp_st_speed_config_proto",
-    deps = [
-        ":qp_st_speed_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "qp_st_speed_config_proto_lib",
-    srcs = [
-        "qp_st_speed_config.proto",
     ],
 )
 
@@ -303,20 +248,6 @@ proto_library(
 )
 
 cc_proto_library(
-    name = "qp_piecewise_jerk_path_config_proto",
-    deps = [
-        ":qp_piecewise_jerk_path_config_proto_lib",
-    ],
-)
-
-proto_library(
-    name = "qp_piecewise_jerk_path_config_proto_lib",
-    srcs = [
-        "qp_piecewise_jerk_path_config.proto",
-    ],
-)
-
-cc_proto_library(
     name = "piecewise_jerk_path_config_proto",
     deps = [
         ":piecewise_jerk_path_config_proto_lib",
@@ -327,6 +258,20 @@ proto_library(
     name = "piecewise_jerk_path_config_proto_lib",
     srcs = [
         "piecewise_jerk_path_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "piecewise_jerk_speed_config_proto",
+    deps = [
+        ":piecewise_jerk_speed_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "piecewise_jerk_speed_config_proto_lib",
+    srcs = [
+        "piecewise_jerk_speed_config.proto",
     ],
 )
 
@@ -355,6 +300,34 @@ proto_library(
     name = "path_assessment_decider_config_proto_lib",
     srcs = [
         "path_assessment_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "path_lane_borrow_decider_config_proto",
+    deps = [
+        ":path_lane_borrow_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "path_lane_borrow_decider_config_proto_lib",
+    srcs = [
+        "path_lane_borrow_decider_config.proto",
+    ],
+)
+
+cc_proto_library(
+    name = "lane_change_decider_config_proto",
+    deps = [
+        ":lane_change_decider_config_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "lane_change_decider_config_proto_lib",
+    srcs = [
+        "lane_change_decider_config.proto",
     ],
 )
 
@@ -433,6 +406,9 @@ proto_library(
     srcs = [
         "planner_open_space_config.proto",
     ],
+    deps = [
+        ":piecewise_jerk_speed_config_proto_lib",
+    ],
 )
 
 cc_proto_library(
@@ -484,20 +460,6 @@ proto_library(
     name = "qp_problem_lib",
     srcs = [
         "qp_problem.proto",
-    ],
-)
-
-proto_library(
-    name = "side_pass_path_decider_config_proto_lib",
-    srcs = [
-        "side_pass_path_decider_config.proto",
-    ],
-)
-
-cc_proto_library(
-    name = "side_pass_path_decider_config_proto",
-    deps = [
-        ":side_pass_path_decider_config_proto_lib",
     ],
 )
 
@@ -571,6 +533,20 @@ cc_proto_library(
     name = "open_space_trajectory_partition_config_proto",
     deps = [
         ":open_space_trajectory_partition_config_proto_lib",
+    ],
+)
+
+cc_proto_library(
+    name = "path_decider_info_proto",
+    deps = [
+        ":path_decider_info_proto_lib",
+    ],
+)
+
+proto_library(
+    name = "path_decider_info_proto_lib",
+    srcs = [
+        "path_decider_info.proto",
     ],
 )
 

@@ -44,7 +44,7 @@ Once this stage is complete, the output is directly sent to the Control module t
 
 As the algorithm is currently in development, it is currently used for reverse parking, but can also be implemented in scenarios that involve tight U-turns. The main aim of scenario-based planning is to ensure efficient planning of the car's trajectory using targeted algorithms for individual scenarios just like with Open Space Planning for reverse parking.
 
-
+## References
 
 [1]:  Dolgov, Dmitri, et al. "Path Planning for Autonomous Vehicles in Unknown Semi-Structured Environments." The International Journal of Robotics Research, vol. 29, no. 5, 2010, pp. 485-501., doi:10.1177/0278364909359210.
 

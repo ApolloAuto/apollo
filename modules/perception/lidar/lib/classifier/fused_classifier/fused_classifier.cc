@@ -79,7 +79,7 @@ bool FusedClassifier::Classify(const ClassifierOptions& options,
             1.0;
         continue;
       }
-      const int& track_id = object->track_id;
+      const int track_id = object->track_id;
       sequence_.GetTrackInTemporalWindow(track_id, &tracked_objects,
                                          temporal_window_);
       if (tracked_objects.empty()) {

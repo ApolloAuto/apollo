@@ -278,6 +278,15 @@ class OpenSpaceInfo {
     return publishable_trajectory_data_;
   }
 
+  // TODO(QiL, Jinyun) refactor and merge this with debug
+  common::TrajectoryPoint *mutable_future_collision_point() {
+    return &future_collision_point_;
+  }
+
+  const common::TrajectoryPoint &future_collision_point() const {
+    return future_collision_point_;
+  }
+
   // TODO(QiL, Jinyun): refactor open_space_info vs debug
 
   apollo::planning_internal::Debug *mutable_debug() { return debug_; }
@@ -365,6 +374,8 @@ class OpenSpaceInfo {
   bool fallback_flag_ = true;
 
   TrajGearPair fallback_trajectory_;
+
+  common::TrajectoryPoint future_collision_point_;
 
   std::pair<PublishableTrajectory, canbus::Chassis::GearPosition>
       publishable_trajectory_data_;

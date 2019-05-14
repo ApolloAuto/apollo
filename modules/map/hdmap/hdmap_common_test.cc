@@ -388,8 +388,8 @@ TEST_F(HDMapCommonTestSuite, PointIsOnLane) {
 
   EXPECT_TRUE(lane_info.IsOnLane({170001.5, 1.5}));
   EXPECT_TRUE(lane_info.IsOnLane({170001.5, 0.5}));
-  EXPECT_TRUE(!lane_info.IsOnLane({170000.5, 1.5}));
-  EXPECT_TRUE(!lane_info.IsOnLane({170001.5, 3}));
+  EXPECT_FALSE(lane_info.IsOnLane({170000.5, 1.5}));
+  EXPECT_FALSE(lane_info.IsOnLane({170001.5, 3}));
 }
 
 TEST_F(HDMapCommonTestSuite, BoxIsOnLane) {
@@ -403,7 +403,7 @@ TEST_F(HDMapCommonTestSuite, BoxIsOnLane) {
 
   apollo::common::math::Box2d target_out_box(
       apollo::common::math::LineSegment2d({170002, 1}, {170003, 1}), 4);
-  EXPECT_TRUE(!lane_info.IsOnLane(target_out_box));
+  EXPECT_FALSE(lane_info.IsOnLane(target_out_box));
 }
 
 TEST_F(HDMapCommonTestSuite, GetSmoothPoint) {

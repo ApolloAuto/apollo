@@ -120,6 +120,8 @@ function parseChartDataFromProtoBuf(protobuf) {
             x: protobuf.options.x,
             y: protobuf.options.y,
         },
+        syncXYWindowSize: protobuf.options.syncXyWindowSize,
+        aspectRatio: protobuf.options.aspectRatio,
     };
 
     const { properties, data } = parseDataset(protobuf.line, protobuf.polygon, protobuf.car);
