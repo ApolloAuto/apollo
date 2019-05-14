@@ -21,6 +21,7 @@
 
 #include "modules/prediction/common/feature_output.h"
 #include "modules/prediction/common/junction_analyzer.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/obstacles/obstacle_clusters.h"
@@ -30,6 +31,7 @@ namespace prediction {
 
 using apollo::perception::PerceptionObstacle;
 using apollo::perception::PerceptionObstacles;
+using apollo::prediction::PredictionConstants;
 
 ObstaclesContainer::ObstaclesContainer()
     : ptr_obstacles_(FLAGS_max_num_obstacles),
@@ -344,10 +346,16 @@ void ObstaclesContainer::BuildLaneGraph() {
       AERROR << "Null obstacle found.";
       continue;
     }
-    ADEBUG << "Building Lane Graph.";
-    obstacle_ptr->BuildLaneGraph();
-    ADEBUG << "Building ordered Lane Graph.";
-    // obstacle_ptr->BuildLaneGraphFromLeftToRight();
+    if (FLAGS_prediction_offline_mode !=
+            PredictionConstants::kDumpFeatureProto &&
+        FLAGS_prediction_offline_mode !=
+            PredictionConstants::kDumpDataForLearning) {
+      ADEBUG << "Building Lane Graph.";
+      obstacle_ptr->BuildLaneGraph();
+    } else {
+      ADEBUG << "Building ordered Lane Graph.";
+      obstacle_ptr->BuildLaneGraphFromLeftToRight();
+    }
     obstacle_ptr->SetNearbyObstacles();
   }
 

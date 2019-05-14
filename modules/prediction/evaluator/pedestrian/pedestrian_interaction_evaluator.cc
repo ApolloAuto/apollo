@@ -48,8 +48,8 @@ void PedestrianInteractionEvaluator::Evaluate(Obstacle* obstacle_ptr) {
   std::vector<double> feature_values;
   ExtractFeatures(obstacle_ptr, &feature_values);
   if (FLAGS_prediction_offline_mode == 2) {
-    FeatureOutput::InsertDataForLearning(
-        *latest_feature_ptr, feature_values, "pedestrian", nullptr);
+    FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
+                                         "pedestrian", nullptr);
     ADEBUG << "Saving extracted features for learning locally.";
     return;
   }

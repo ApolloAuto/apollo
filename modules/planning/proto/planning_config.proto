@@ -4,6 +4,7 @@ package apollo.planning;
 
 import "modules/planning/proto/decider_config.proto";
 import "modules/planning/proto/dp_st_speed_config.proto";
+import "modules/planning/proto/lane_change_decider_config.proto";
 import "modules/planning/proto/open_space_fallback_decider_config.proto";
 import "modules/planning/proto/open_space_roi_decider_config.proto";
 import "modules/planning/proto/open_space_trajectory_provider_config.proto";
@@ -52,6 +53,7 @@ message TaskConfig {
     PATH_ASSESSMENT_DECIDER = 25;
     PATH_LANE_BORROW_DECIDER = 26;
     PIECEWISE_JERK_SPEED_OPTIMIZER = 27;
+    LANE_CHANGE_DECIDER = 28;
   };
   optional TaskType task_type = 1;
   oneof task_config {
@@ -70,6 +72,7 @@ message TaskConfig {
     PathAssessmentDeciderConfig path_assessment_decider_config = 22;
     PiecewiseJerkSpeedConfig piecewise_jerk_speed_config = 23;
     PathLaneBorrowDeciderConfig path_lane_borrow_decider_config = 24;
+    LaneChangeDeciderConfig lane_change_decider_config = 25;
   }
 }
 

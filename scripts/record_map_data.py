@@ -152,7 +152,8 @@ class Recorder(object):
         log_file = '/apollo/data/log/apollo_record.out'
         topics_str = ' -c '.join(topics)
 
-        os.makedirs(task_dir)
+        if not os.path.exists(task_dir):
+            os.makedirs(task_dir)
         cmd = '''
             cd "{}"
             source /apollo/scripts/apollo_base.sh

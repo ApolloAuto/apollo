@@ -40,23 +40,16 @@ struct Interval {
 class IntervalPool {
  public:
   void AddInterval(const Interval interval) { pool_.push_back(interval); }
-  void AddInterval(
-      const uint64_t begin_time, const uint64_t end_time,
-      const std::unordered_map<std::string, std::string>& channels);
+  void AddInterval(const uint64_t begin_time, const uint64_t end_time);
   void ReorgIntervals();
-  bool MessageFallIntoRange(const std::string& msg_channel,
-                            const uint64_t msg_time);
+  bool MessageFallIntoRange(const uint64_t msg_time);
   void Reset();
   void PrintIntervals() const;
 
  private:
-  void AddNewIntervalChannels(const std::set<std::string>& channels);
-  void EraseOldIntervalChannels(const std::set<std::string>& channels);
-
   std::vector<Interval> pool_;
   std::vector<Interval>::const_iterator pool_iter_;
-  std::multimap<uint64_t, Interval> accu_intervals_;
-  std::unordered_map<std::string, int> accu_channels_;
+  std::set<uint64_t> accu_end_values_;
 
   DECLARE_SINGLETON(IntervalPool)
 };

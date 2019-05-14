@@ -63,6 +63,8 @@ message KeepClearConfig {
   optional bool enable_keep_clear_zone = 1 [default = true];
   optional bool enable_junction = 2 [default = true];
   optional double min_pass_s_distance = 3 [default = 2.0];  // meter
+  // tolerance distance to align pnc_junction boundary with stop_line of traffic sign(s)
+  optional double align_with_traffic_sign_tolerance = 4 [default = 4.5];  // meter
 }
 
 message ReferenceLineEndConfig {
