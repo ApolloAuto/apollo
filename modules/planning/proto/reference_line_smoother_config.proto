@@ -40,23 +40,38 @@ message SpiralSmootherConfig {
 }
 
 message CosThetaSmootherConfig {
+  // Print level of Ipopt 0~15
+  optional int32 print_level = 1 [default = 0];
+
   // The max deviation of cosTheta reference line smoother.
-  optional double max_point_deviation = 1 [default = 5.0];
+  optional double max_point_deviation = 2 [default = 5.0];
 
   // The number of iteration in optimization
-  optional int32 num_of_iteration = 2 [default = 10000];
+  optional int32 max_num_of_iterations = 3 [default = 10000];
 
   // The weight of cosine of included angle between points
-  optional double weight_cos_included_angle = 3 [default = 10000.0];
+  optional double weight_cos_included_angle = 4 [default = 10000.0];
 
-  // The tolerance of optimization
-  optional double acceptable_tol = 4 [default = 1e-1];
+  // The weight of cosine of included angle between points
+  optional double weight_anchor_points = 5 [default = 1.0];
+
+  // The weight of cosine of included angle between points
+  optional double weight_length = 6 [default = 1.0];
+
+  // The terminating tolerance of optimization
+  optional double tol = 7 [default = 1e-8];
+
+  // The acceptable tolerance of optimization
+  optional double acceptable_tol = 8 [default = 1e-6];
+
+  // The acceptable convergence tol for spiral opt
+  optional int32 acceptable_num_of_iterations = 9 [default = 15];
 
   // Relax constraint on end condition
-  optional double relax = 5 [default = 0.2];
+  optional double relax = 10 [default = 0.2];
 
-  // Reopt bound for anchor points
-  optional double reopt_qp_bound = 6 [default = 0.05];
+  // Use third party package to do automatic differentiation
+  optional bool use_automatic_differentiation = 11 [default = false];
 }
 
 message ReferenceLineSmootherConfig {

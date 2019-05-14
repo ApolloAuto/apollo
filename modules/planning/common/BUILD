@@ -148,6 +148,7 @@ cc_library(
         "//cyber/common:log",
         "//modules/map/pnc_map:path",
         "//modules/planning/common/path:path_data",
+        "//modules/planning/proto:path_decider_info_proto",
         "//modules/planning/proto:planning_config_proto",
         "//modules/planning/proto:planning_proto",
         "//modules/planning/proto:planning_status_proto",
@@ -252,7 +253,7 @@ cc_library(
         "//modules/planning/math/curve1d:polynomial_curve1d",
         "//modules/planning/math/curve1d:quartic_polynomial_curve1d",
         "//modules/planning/math/curve1d:quintic_polynomial_curve1d",
-        "//modules/planning/math/piecewise_jerk:path_time_qp_problem",
+        "//modules/planning/math/piecewise_jerk:piecewise_jerk_speed_problem",
         "//modules/planning/proto:planning_config_proto",
     ],
 )
@@ -266,25 +267,6 @@ cc_test(
     deps = [
         ":speed_profile_generator",
         "@gtest//:main",
-    ],
-)
-
-cc_library(
-    name = "change_lane_decider",
-    srcs = [
-        "change_lane_decider.cc",
-    ],
-    hdrs = [
-        "change_lane_decider.h",
-    ],
-    copts = [
-        "-DMODULE_NAME=\\\"planning\\\"",
-    ],
-    deps = [
-        ":planning_gflags",
-        ":reference_line_info",
-        "//modules/map/pnc_map:route_segments",
-        "//modules/planning/proto:planning_proto",
     ],
 )
 
@@ -319,7 +301,6 @@ cc_library(
         "-DMODULE_NAME=\\\"planning\\\"",
     ],
     deps = [
-        ":change_lane_decider",
         ":indexed_queue",
         ":local_view",
         ":obstacle",

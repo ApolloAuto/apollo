@@ -41,6 +41,7 @@ class Decider : public Task {
       Frame* frame, ReferenceLineInfo* reference_line_info) {
     return apollo::common::Status::OK();
   }
+
   virtual apollo::common::Status Process(Frame* frame) {
     return apollo::common::Status::OK();
   }

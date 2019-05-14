@@ -290,7 +290,7 @@ TEST_F(HDMapImplTestSuite, GetRoads) {
   EXPECT_EQ(1, roads.size());
 
   EXPECT_EQ(roads[0]->id().id(), "773");
-  EXPECT_TRUE(!roads[0]->has_junction_id());
+  EXPECT_FALSE(roads[0]->has_junction_id());
 
   EXPECT_EQ(1, roads[0]->sections().size());
   const apollo::hdmap::RoadSection& section = roads[0]->sections()[0];

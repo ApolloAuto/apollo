@@ -74,6 +74,7 @@
 - [How to update vehicle calibration](how_to_update_vehicle_calibration.md)
 - [How to do performance profiling](how_to_do_performance_profiling.md)
 - [How to run Offline Perception Visualizer for Apollo 2.5](how_to_run_apollo_2.5_perception_visualizer.md)
+- [How to use Common Cyber Commands - Basic guide](how_to_use_cyber_commands.md)
 
 ### Chinese versions
 - [How to run offline perception visualizer](how_to_run_offline_perception_visualizer_cn.md)

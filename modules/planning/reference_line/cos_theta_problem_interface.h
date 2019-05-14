@@ -20,6 +20,10 @@
 #include <utility>
 #include <vector>
 
+#include "adolc/adolc.h"
+#include "adolc/adolc_sparse.h"
+#include "adolc/adouble.h"
+
 #include "Eigen/Dense"
 
 #include "IpIpoptCalculatedQuantities.hpp"
@@ -28,6 +32,11 @@
 #include "IpTNLP.hpp"
 #include "IpTNLPAdapter.hpp"
 #include "IpTypes.hpp"
+
+#define tag_f 1
+#define tag_g 2
+#define tag_L 3
+#define HPOFF 30
 
 namespace apollo {
 namespace planning {
@@ -47,7 +56,13 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
 
   void set_weight_cos_included_angle(const double weight_cos_included_angle);
 
+  void set_weight_anchor_points(const double weight_anchor_points);
+
+  void set_weight_length(const double weight_length);
+
   void set_relax_end_constraint(const double relax);
+
+  void set_automatic_differentiation_flag(const bool use_ad);
 
   void get_optimization_results(std::vector<double>* ptr_x,
                                 std::vector<double>* ptr_y) const;
@@ -99,6 +114,21 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
                          double obj_value, const Ipopt::IpoptData* ip_data,
                          Ipopt::IpoptCalculatedQuantities* ip_cq) override;
 
+  //***************    start ADOL-C part ***********************************
+
+  /** Template to return the objective value */
+  template <class T>
+  bool eval_obj(int n, const T* x, T* obj_value);
+
+  /** Template to compute contraints */
+  template <class T>
+  bool eval_constraints(int n, const T* x, int m, T* g);
+
+  /** Method to generate the required tapes */
+  virtual void generate_tapes(int n, int m, int* nnz_jac_g, int* nnz_h_lag);
+
+  //***************    end   ADOL-C part ***********************************
+
  private:
   std::vector<Eigen::Vector2d> init_points_;
 
@@ -138,7 +168,45 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
 
   double relax_ = 0.2;
 
-  double weight_cos_included_angle_ = 1.0;
+  double weight_cos_included_angle_ = 0.0;
+
+  double weight_anchor_points_ = 0.0;
+
+  double weight_length_ = 0.0;
+
+  //***************    start ADOL-C part ***********************************
+
+  bool use_automatic_differentiation_ = false;
+  /**@name Methods to block default compiler methods.
+   */
+  CosThetaProbleminterface(const CosThetaProbleminterface&);
+  CosThetaProbleminterface& operator=(const CosThetaProbleminterface&);
+
+  std::vector<double> obj_lam_;
+
+  // TODO(Jinyun): Not changed to std::vector yet, need further debug
+  //** variables for sparsity exploitation
+  // std::vector<unsigned int> rind_g_; /* row indices    */
+  // std::vector<unsigned int> cind_g_; /* column indices */
+  // std::vector<double> jacval_;       /* values         */
+  // std::vector<unsigned int> rind_L_; /* row indices    */
+  // std::vector<unsigned int> cind_L_; /* column indices */
+  // std::vector<double> hessval_;      /* values */
+
+  //** variables for sparsity exploitation
+  unsigned int* rind_g_; /* row indices    */
+  unsigned int* cind_g_; /* column indices */
+  double* jacval_;       /* values         */
+  unsigned int* rind_L_; /* row indices    */
+  unsigned int* cind_L_; /* column indices */
+  double* hessval_;      /* values */
+
+  int nnz_jac_;
+  int nnz_L_;
+  int options_g_[4];
+  int options_L_[4];
+
+  //***************    end   ADOL-C part ***********************************
 };
 
 }  // namespace planning

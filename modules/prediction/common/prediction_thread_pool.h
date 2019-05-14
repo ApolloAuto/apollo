@@ -28,9 +28,7 @@
 #include <utility>
 #include <vector>
 
-#include "boost/asio.hpp"
-#include "boost/thread.hpp"
-
+#include "cyber/base/bounded_queue.h"
 #include "cyber/common/log.h"
 
 namespace apollo {
@@ -40,7 +38,9 @@ class BaseThreadPool {
  public:
   BaseThreadPool(int thread_num, int next_thread_pool_level);
 
-  ~BaseThreadPool() = default;
+  void Stop();
+
+  ~BaseThreadPool();
 
   template <typename InputIter, typename F>
   void ForEach(InputIter begin, InputIter end, F f) {
@@ -70,19 +70,22 @@ class BaseThreadPool {
     std::future<ReturnType> returned_future = task->get_future();
 
     // Note: variables eg. `task` must be copied here because of the lifetime
-    io_service_.post([=] { (*task)(); });
+    if (stopped_) {
+      return std::future<ReturnType>();
+    }
+    task_queue_.Enqueue([task]() { (*task)(); });
     return returned_future;
   }
 
   static std::vector<int> THREAD_POOL_CAPACITY;
 
  private:
-  boost::thread_group thread_group_;
-  boost::asio::io_service io_service_;
-  boost::asio::io_service::work work_;
+  std::vector<std::thread> workers_;
+  apollo::cyber::base::BoundedQueue<std::function<void()>> task_queue_;
+  std::atomic_bool stopped_;
 };
 
-template<int LEVEL>
+template <int LEVEL>
 class LevelThreadPool : public BaseThreadPool {
  public:
   static LevelThreadPool* Instance() {
@@ -92,8 +95,8 @@ class LevelThreadPool : public BaseThreadPool {
 
  private:
   LevelThreadPool() : BaseThreadPool(THREAD_POOL_CAPACITY[LEVEL], LEVEL + 1) {
-    ADEBUG << "Level = " << LEVEL << "; thread pool capacity = "
-           << THREAD_POOL_CAPACITY[LEVEL];
+    ADEBUG << "Level = " << LEVEL
+           << "; thread pool capacity = " << THREAD_POOL_CAPACITY[LEVEL];
   }
 };
 
@@ -103,7 +106,7 @@ class PredictionThreadPool {
 
   static thread_local int s_thread_pool_level;
 
-  template<typename InputIter, typename F>
+  template <typename InputIter, typename F>
   static void ForEach(InputIter begin, InputIter end, F f) {
     Instance()->ForEach(begin, end, f);
   }

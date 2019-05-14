@@ -409,7 +409,7 @@ bool DualVariableWarmStartIPOPTInterface::eval_jac_g(int n, const double* x,
         Eigen::MatrixXd bj =
             obstacles_b_.block(edges_counter, 0, current_edges_num, 1);
 
-        // TODO(QiL) : Remove redudant calculation
+        // TODO(QiL) : Remove redundant calculation
         double tmp1 = 0;
         double tmp2 = 0;
         for (int k = 0; k < current_edges_num; ++k) {

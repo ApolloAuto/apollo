@@ -229,14 +229,12 @@ def print_dist(label):
 # ========================================================================
 # Data Loading and preprocessing (Non Data-Loader case)
 
-'''
-Load the data from h5 file to the numpy format.
-(Only for non data-loader case)
-'''
-
 
 def load_data(filename):
-
+    '''
+    Load the data from h5 file to the numpy format.
+    (Only for non data-loader case)
+    '''
     if not (os.path.exists(filename)):
         logging.error("file: {}, does not exist".format(filename))
         os._exit(1)
@@ -253,23 +251,30 @@ def load_data(filename):
     return samples['data']
 
 
-'''
-Preprocess the data.
-(Only for non data-loader case)
-    - separate input X and output y
-    - process output label from {-1,0,1,2,3,4} to {0,1}
-    - Take out only those meaningful features
-    - shuffle data
-'''
+def load_npy_data(dir):
+    '''
+    Load all .npy files under a certain dir;
+    merge them together into one;
+    return.
+    '''
+
 
 
 def data_preprocessing(data):
+    '''
+    Preprocess the data.
+    (Only for non data-loader case)
+        - separate input X and output y
+        - process output label from {-1,0,1,2,3,4} to {0,1}
+        - Take out only those meaningful features
+        - shuffle data
+    '''
     # Various input features separation
     X_obs_old_features = data[:, 0:23]
-    X_surround_obs = data[:, 68:76]
+    X_surround_obs = data[:, -dim_output-8:-dim_output]
     X_obs_now = data[:, 23:32]
     X_obs_hist_5 = data[:, 23:68]
-    X_lane = data[:, 76:-dim_output]
+    X_lane = data[:, 68:-dim_output-8]
 
     # mask out those that don't have any history
     # mask5 = (data[:,53] != 100)

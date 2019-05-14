@@ -155,11 +155,12 @@ bool ResizeCPU(const base::Blob<uint8_t> &src_blob,
   return true;
 }
 
-void GetCyberWorkRoot(std::string *work_root) {
-  *work_root = cyber::common::GetEnv("MODULE_PATH");
-  if (work_root->empty()) {
-    *work_root = cyber::common::GetEnv("CYBER_PATH");
+std::string GetCyberWorkRoot() {
+  std::string work_root = cyber::common::GetEnv("MODULE_PATH");
+  if (work_root.empty()) {
+    work_root = cyber::common::GetEnv("CYBER_PATH");
   }
+  return work_root;
 }
 
 void FillObjectPolygonFromBBox3D(base::Object *object_ptr) {

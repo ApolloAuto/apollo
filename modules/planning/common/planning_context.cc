@@ -21,10 +21,10 @@
 namespace apollo {
 namespace planning {
 
-PlanningStatus PlanningContext::planning_status_;
-PlanningContext::SidePassInfo PlanningContext::side_pass_info_;
-PlanningContext::FallBackInfo PlanningContext::fallback_info_;
-PlanningContext::OpenSpaceInfo PlanningContext::open_space_info_;
+// PlanningContext::PlanningStatus PlanningContext::planning_status_;
+// PlanningContext::SidePassInfo PlanningContext::side_pass_info_;
+// PlanningContext::FallBackInfo PlanningContext::fallback_info_;
+// PlanningContext::OpenSpaceInfo PlanningContext::open_space_info_;
 
 PlanningContext::PlanningContext() {}
 
@@ -36,9 +36,6 @@ void PlanningContext::Clear() {
   fallback_info_ = {};
   open_space_info_ = {};
 }
-
-int PlanningContext::front_static_obstacle_cycle_counter_ = 0;
-int PlanningContext::able_to_use_self_lane_counter_ = 0;
 
 }  // namespace planning
 }  // namespace apollo

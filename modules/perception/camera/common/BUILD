@@ -125,12 +125,20 @@ cc_library(
 )
 
 cc_library(
+    name = "lane_object",
+    hdrs = [
+        "lane_object.h",
+    ],
+)
+
+cc_library(
     name = "common",
     deps = [
         ":camera_frame",
         ":camera_ground_plane",
         ":data_provider",
         ":global_config",
+        #        ":lane_object",
         ":math_functions",
         ":object_template_manager",
         ":timer",

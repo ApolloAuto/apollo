@@ -217,7 +217,7 @@ Apollo 3.5 is capable of navigating through complex driving scenarios such as re
 
 * **Software Overview - Navigation Mode**
 
-![image alt text](docs/specs/images/Apollo_3.0_SW.png)
+![image alt text](docs/demo_guide/images/Apollo_3_5_software_architecture.png)
 
 ## Installation
 

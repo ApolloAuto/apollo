@@ -25,10 +25,7 @@ namespace canbus {
 
 class VehicleFactoryTest : public ::testing::Test {
  public:
-  VehicleFactoryTest() : factory_() {}
-
   virtual void SetUp() { factory_.RegisterVehicleFactory(); }
-  virtual void TearDown() {}
 
  protected:
   VehicleFactory factory_;
@@ -47,6 +44,9 @@ TEST_F(VehicleFactoryTest, CreateVehicle) {
   EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 
   parameter.set_brand(apollo::common::WEY);
+  EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
+
+  parameter.set_brand(apollo::common::ZHONGYUN);
   EXPECT_NE(factory_.CreateVehicle(parameter), nullptr);
 }
 

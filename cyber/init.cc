@@ -31,7 +31,7 @@
 #include "cyber/scheduler/scheduler.h"
 #include "cyber/service_discovery/topology_manager.h"
 #include "cyber/task/task.h"
-#include "cyber/timer/timer_manager.h"
+#include "cyber/timer/timing_wheel.h"
 #include "cyber/transport/transport.h"
 
 namespace apollo {
@@ -114,7 +114,7 @@ void Clear() {
     return;
   }
   TaskManager::CleanUp();
-  TimerManager::CleanUp();
+  TimingWheel::CleanUp();
   scheduler::CleanUp();
   service_discovery::TopologyManager::CleanUp();
   transport::Transport::CleanUp();

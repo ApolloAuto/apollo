@@ -52,6 +52,10 @@ void ImageHandler::OnImage(const std::shared_ptr<Image> &image) {
 template <>
 void ImageHandler::OnImage(
     const std::shared_ptr<CompressedImage> &compressed_image) {
+  if (requests_ == 0) {
+    return;
+  }
+
   std::vector<uint8_t> compressed_raw_data(compressed_image->data().begin(),
                                            compressed_image->data().end());
   cv::Mat mat_image = cv::imdecode(compressed_raw_data, CV_LOAD_IMAGE_COLOR);

@@ -57,7 +57,7 @@ class ChangeLane : public TrafficRule {
    * @brief create overtake decision for the give path obstacle
    */
   ObjectDecisionType CreateOvertakeDecision(const ReferenceLine& reference_line,
-                                            const Obstacle* obstacle) const;
+                                            const Obstacle& obstacle) const;
 
   std::vector<const Obstacle*> guard_obstacles_;
   std::vector<const Obstacle*> overtake_obstacles_;

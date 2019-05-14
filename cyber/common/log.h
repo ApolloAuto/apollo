@@ -18,8 +18,7 @@
  * @log
  */
 
-#ifndef CYBER_COMMON_LOG_H_
-#define CYBER_COMMON_LOG_H_
+#pragma once
 
 #include <stdarg.h>
 
@@ -35,7 +34,7 @@
 #endif
 
 #define ADEBUG_MODULE(module) \
-  VLOG(4) << LEFT_BRACKET << MODULE_NAME << RIGHT_BRACKET << "[DEBUG] "
+  VLOG(4) << LEFT_BRACKET << module << RIGHT_BRACKET << "[DEBUG] "
 #define ADEBUG ADEBUG_MODULE(MODULE_NAME)
 #define AINFO ALOG_MODULE(MODULE_NAME, INFO)
 #define AWARN ALOG_MODULE(MODULE_NAME, WARN)
@@ -107,5 +106,3 @@
     AWARN << #condition << " is not met."; \
     return val;                            \
   }
-
-#endif  // CYBER_COMMON_LOG_H_

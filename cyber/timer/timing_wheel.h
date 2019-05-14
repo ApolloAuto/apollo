@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,74 +17,68 @@
 #ifndef CYBER_TIMER_TIMING_WHEEL_H_
 #define CYBER_TIMER_TIMING_WHEEL_H_
 
-#include <algorithm>
-#include <functional>
-#include <iostream>
+#include <future>
 #include <list>
-#include <map>
 #include <memory>
-#include <mutex>
 #include <thread>
-#include <unordered_map>
-#include <utility>
-#include <vector>
 
-#include "cyber/base/bounded_queue.h"
-#include "cyber/time/duration.h"
-#include "cyber/timer/timing_slot.h"
+#include "cyber/common/log.h"
+#include "cyber/common/macros.h"
+#include "cyber/scheduler/scheduler_factory.h"
+#include "cyber/time/rate.h"
+#include "cyber/timer/timer_bucket.h"
 
 namespace apollo {
 namespace cyber {
 
-using apollo::cyber::base::BoundedQueue;
-using CallHandler = std::function<void()>;
+struct TimerTask;
 
-static const int TIMING_WHEEL_SIZE = 128;
-static const int THREAD_POOL_SIZE = 4;
-static const uint64_t BOUNDED_QUEUE_SIZE = 200;
-static const int TIMER_TASK_MAX_INTERVAL = 1000;
-
-class TimerTask;
+static const uint64_t WORK_WHEEL_SIZE = 512;
+static const uint64_t ASSISTANT_WHEEL_SIZE = 64;
+static const uint64_t TIMER_RESOLUTION_MS = 1;
+static const uint64_t TIMER_MAX_INTERVAL_MS =
+    WORK_WHEEL_SIZE * ASSISTANT_WHEEL_SIZE;
 
 class TimingWheel {
  public:
-  TimingWheel();
-  explicit TimingWheel(const Duration& tick_duration);
-  ~TimingWheel() = default;
+  ~TimingWheel() {
+    if (running_) {
+      Shutdown();
+    }
+  }
 
-  uint64_t StartTimer(uint64_t interval, CallHandler handler, bool oneshot);
+  void Start();
 
-  void StopTimer(uint64_t timer_id);
+  void Shutdown();
 
-  void Step();
+  void Tick();
+
+  void AddTask(const std::shared_ptr<TimerTask>& task);
+
+  void AddTask(const std::shared_ptr<TimerTask>& task,
+               const uint64_t current_work_wheel_index);
+
+  void Cascade(const uint64_t assistant_wheel_index);
+
+  void TickFunc();
 
  private:
-  void FillAddSlot();
-  void FillRepeatSlot();
-  void FillSlot(const std::shared_ptr<TimerTask>& task);
+  uint64_t GetWorkWheelIndex(const uint64_t index) {
+    return index & (WORK_WHEEL_SIZE - 1);
+  }
+  uint64_t GetAssistantWheelIndex(const uint64_t index) {
+    return index & (ASSISTANT_WHEEL_SIZE - 1);
+  }
 
-  void RemoveCancelledTasks(uint64_t slot_index);
+  bool running_ = false;
+  std::mutex running_mutex_;
+  TimerBucket work_wheel_[WORK_WHEEL_SIZE];
+  TimerBucket assistant_wheel_[ASSISTANT_WHEEL_SIZE];
+  uint64_t current_work_wheel_index_ = 0;
+  uint64_t current_assistant_wheel_index_ = 0;
+  std::thread tick_thread_;
 
-  uint64_t id_counter_ = 0;
-
-  uint64_t tick_ = 0;
-
-  uint64_t start_time_ = 0;
-
-  TimingSlot time_slots_[TIMING_WHEEL_SIZE];
-
-  uint64_t mask_ = TIMING_WHEEL_SIZE - 1;
-
-  uint64_t tick_duration_ = 10 * 1000 * 1000;  // 10ms
-  uint64_t resolution_ = 10;                   // 10ms
-
-  // we need implement a lock-free high performance concurrent queue.
-  // Now, just a blocking-queue just for works.
-  std::list<uint64_t> cancelled_list_;
-  std::mutex cancelled_mutex_;
-  BoundedQueue<std::shared_ptr<TimerTask>> add_queue_;
-  BoundedQueue<std::shared_ptr<TimerTask>> repeat_queue_;
-  BoundedQueue<HandlePackage> handler_queue_;
+  DECLARE_SINGLETON(TimingWheel)
 };
 
 }  // namespace cyber

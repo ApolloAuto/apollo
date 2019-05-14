@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "modules/planning/proto/decider_config.pb.h"
+#include "modules/planning/proto/planning_config.pb.h"
 #include "modules/planning/tasks/deciders/decider.h"
 
 namespace apollo {
@@ -32,6 +34,23 @@ class PathLaneBorrowDecider : public Decider {
  private:
   common::Status Process(Frame* frame,
                          ReferenceLineInfo* reference_line_info) override;
+
+  bool IsNecessaryToBorrowLane(const Frame& frame,
+                               const ReferenceLineInfo& reference_line_info);
+
+  bool HasSingleReferenceLine(const Frame& frame);
+
+  bool IsWithinSidePassingSpeedADC(const Frame& frame);
+
+  bool IsLongTermBlockingObstacle();
+
+  bool IsBlockingObstacleWithinDestination(
+      const ReferenceLineInfo& reference_line_info);
+
+  bool IsBlockingObstacleFarFromIntersection(
+      const ReferenceLineInfo& reference_line_info);
+
+  bool IsSidePassableObstacle(const ReferenceLineInfo& reference_line_info);
 };
 
 }  // namespace planning
