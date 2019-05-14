@@ -15,7 +15,7 @@ camera包是基于V4L USB相机设备实现封装，提供图像采集及发布�
 ```bash
 # in docker
 bash /apollo/scripts/camera.sh
-# or 
+# or
 cd /apollo && cyber_launch start modules/drivers/camera/launch/camera.launch
 ```
 

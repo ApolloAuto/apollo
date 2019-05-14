@@ -27,21 +27,21 @@ bool DataProvider::Init(const DataProvider::InitOptions &options) {
   device_id_ = options.device_id;
 
   if (cudaSetDevice(device_id_) != cudaSuccess) {
-    AERROR << "Failed to set device to " << device_id_;
+    AERROR << "Failed to set device to: " << device_id_;
     return false;
   }
 
-  // init uint8 blobs
+  // Initialize uint8 blobs
   gray_.reset(new base::Image8U(src_height_, src_width_, base::Color::GRAY));
   rgb_.reset(new base::Image8U(src_height_, src_width_, base::Color::RGB));
   bgr_.reset(new base::Image8U(src_height_, src_width_, base::Color::BGR));
 
-  // allocate CPU memory for uint8 blobs
+  // Allocate CPU memory for uint8 blobs
   gray_->cpu_data();
   rgb_->cpu_data();
   bgr_->cpu_data();
 
-  // allocate GPU memory for uint8 blobs
+  // Allocate GPU memory for uint8 blobs
   gray_->gpu_data();
   rgb_->gpu_data();
   bgr_->gpu_data();
@@ -51,7 +51,7 @@ bool DataProvider::Init(const DataProvider::InitOptions &options) {
     if (!handler_->Init(options.sensor_name, device_id_)) {
       return false;
     }
-    // init uint8 blobs
+    // Initialize uint8 blobs
     ori_gray_.reset(
         new base::Image8U(src_height_, src_width_, base::Color::GRAY));
     ori_rgb_.reset(
@@ -59,18 +59,18 @@ bool DataProvider::Init(const DataProvider::InitOptions &options) {
     ori_bgr_.reset(
         new base::Image8U(src_height_, src_width_, base::Color::BGR));
 
-    // allocate CPU memory for uint8 blobs
+    // Allocate CPU memory for uint8 blobs
     ori_gray_->cpu_data();
     ori_rgb_->cpu_data();
     ori_bgr_->cpu_data();
 
-    // allocate GPU memory for uint8 blobs
+    // Allocate GPU memory for uint8 blobs
     ori_gray_->gpu_data();
     ori_rgb_->gpu_data();
     ori_bgr_->gpu_data();
   }
 
-  // warm up nppi functions
+  // Warm up nppi functions
   {
     bgr_ready_ = false;
     rgb_ready_ = true;
@@ -111,7 +111,7 @@ bool DataProvider::Init(const DataProvider::InitOptions &options) {
 bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
                                  const std::string &encoding) {
   if (cudaSetDevice(device_id_) != cudaSuccess) {
-    AERROR << "Failed to set device to " << device_id_;
+    AERROR << "Failed to set device to: " << device_id_;
     return false;
   }
 
@@ -124,7 +124,7 @@ bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
 #ifdef PERCEPTION_CPU_ONLY  // copy to host memory
   AINFO << "Fill in CPU mode ...";
   if (handler_ != nullptr) {
-    AERROR << "Undistortion DONOT support CPU mode!";
+    AERROR << "Undistortion DO NOT support CPU mode!";
     return false;
   }
   if (encoding == "rgb8") {
@@ -140,7 +140,6 @@ bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
     gray_ready_ = true;
     success = true;
   } else {
-    success = false;
     AERROR << "Unrecognized image encoding: " << encoding;
   }
 #else  // copy to device memory directly
@@ -180,10 +179,10 @@ bool DataProvider::FillImageData(int rows, int cols, const uint8_t *data,
     }
     gray_ready_ = true;
   } else {
-    success = false;
     AERROR << "Unrecognized image encoding: " << encoding;
   }
 #endif
+
   AINFO << "Done! (" << success << ")";
   return success;
 }
@@ -216,8 +215,7 @@ bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
 bool DataProvider::GetImageBlob(const DataProvider::ImageOptions &options,
                                 base::Blob<uint8_t> *blob) {
   base::Image8U image;
-  bool status = GetImage(options, &image);
-  if (!status) {
+  if (!GetImage(options, &image)) {
     return false;
   }
 
@@ -259,7 +257,6 @@ bool DataProvider::GetImage(const DataProvider::ImageOptions &options,
       *image = (*gray_);
       break;
     default:
-      success = false;
       AERROR << "Unsupported Color: "
              << static_cast<uint8_t>(options.target_color);
   }

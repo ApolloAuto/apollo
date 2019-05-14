@@ -53,9 +53,9 @@ void SolveLQRProblem(const Matrix &A, const Matrix &B, const Matrix &Q,
   }
 
   if (num_iteration >= max_num_iteration) {
-    AWARN << "LQR solver cannot converge to a solution, "
-             "last consecutive result diff. is:"
-          << diff;
+    ADEBUG << "LQR solver cannot converge to a solution, "
+              "last consecutive result diff is: "
+           << diff;
   } else {
     ADEBUG << "LQR solver converged at iteration: " << num_iteration
            << ", max consecutive result diff.: " << diff;

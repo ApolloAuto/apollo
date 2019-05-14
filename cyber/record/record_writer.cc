@@ -107,7 +107,7 @@ bool RecordWriter::WriteChannel(const std::string& channel_name,
     channel.set_message_type(message_type);
     channel.set_proto_desc(proto_desc);
     if (!file_writer_->WriteChannel(channel)) {
-      AERROR << "Write channel is failed.";
+      AERROR << "Failed to write channel: " << channel_name;
       return false;
     }
   } else {
@@ -166,11 +166,8 @@ bool RecordWriter::SetIntervalOfFileSegmentation(uint64_t time_sec) {
 }
 
 bool RecordWriter::IsNewChannel(const std::string& channel_name) {
-  auto search = channel_message_number_map_.find(channel_name);
-  if (search == channel_message_number_map_.end()) {
-    return true;
-  }
-  return false;
+  return channel_message_number_map_.find(channel_name) ==
+         channel_message_number_map_.end();
 }
 
 void RecordWriter::OnNewChannel(const std::string& channel_name,
@@ -184,8 +181,8 @@ void RecordWriter::OnNewChannel(const std::string& channel_name,
 }
 
 void RecordWriter::OnNewMessage(const std::string& channel_name) {
-  auto search = channel_message_number_map_.find(channel_name);
-  if (search != channel_message_number_map_.end()) {
+  if (channel_message_number_map_.find(channel_name) !=
+      channel_message_number_map_.end()) {
     channel_message_number_map_[channel_name]++;
   }
 }

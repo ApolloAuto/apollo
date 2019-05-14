@@ -34,6 +34,7 @@ export default class AutoDrivingCar {
         this.mesh = null;
         this.name = name;
         this.rssUnsafeMarker = RSS_UNSAFE_MESH;
+        this.rssUnsafeMarker.visible = false;
         scene.add(this.rssUnsafeMarker);
 
         const properties = CAR_PROPERTIES[name];

@@ -50,6 +50,7 @@ class BareIntersectionUnprotectedStageApproach : public Stage {
 
  private:
   ScenarioBareIntersectionUnprotectedConfig scenario_config_;
+  static uint32_t clear_counter_;
 };
 
 }  // namespace bare_intersection

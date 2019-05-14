@@ -53,8 +53,7 @@ FunInfoType LaneDetectionComponent::init_func_arry_[] = {
 
 static int GetGpuId(const camera::CameraPerceptionInitOptions &options) {
   camera::app::PerceptionParam perception_param;
-  std::string work_root = "";
-  camera::GetCyberWorkRoot(&work_root);
+  std::string work_root = camera::GetCyberWorkRoot();
   std::string config_file =
       GetAbsolutePath(options.root_dir, options.conf_file);
   config_file = GetAbsolutePath(work_root, config_file);
@@ -675,7 +674,8 @@ int LaneDetectionComponent::InternalProc(
       camera_frame.data_provider->GetImage(image_options, &out_image);
       memcpy(output_image.data, out_image.cpu_data(),
              out_image.total() * sizeof(uint8_t));
-      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame);
+      visualize_.ShowResult_all_info_single_camera(output_image, camera_frame,
+                                                   mot_buffer_);
     }
   }
 

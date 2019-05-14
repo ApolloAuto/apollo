@@ -16,7 +16,7 @@ message TargetParam {
     optional int32 world_lhw_history = 6 [default = 15];
     optional float height_diff_ratio = 7 [default = 0.1];
 
-    // params for checking static obstacles 
+    // params for checking static obstacles
     optional int32 world_state_history = 8 [default = 30];
     optional int32 min_cached_world_state_history_size = 9 [default = 5];
     optional int32 min_cached_velocity_size = 10 [default = 10];

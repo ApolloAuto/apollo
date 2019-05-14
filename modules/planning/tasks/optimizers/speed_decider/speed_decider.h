@@ -20,6 +20,9 @@
 
 #pragma once
 
+#include <string>
+#include <unordered_map>
+
 #include "modules/planning/proto/dp_st_speed_config.pb.h"
 
 #include "modules/planning/tasks/task.h"
@@ -60,6 +63,10 @@ class SpeedDecider : public Task {
    *         false otherwise.
    **/
   bool CheckIsFollowByT(const STBoundary& boundary) const;
+
+  bool CheckStopForPedestrian(
+      const Obstacle& obstacle,
+      std::unordered_map<std::string, double>* pedestrian_stop_times) const;
 
   bool CreateStopDecision(const Obstacle& obstacle,
                           ObjectDecisionType* const stop_decision,

@@ -349,7 +349,13 @@ class Renderer {
     }
 
     updateWorld(world) {
-        this.adc.update(this.coordinates, world.autoDrivingCar);
+        const adcPose = world.autoDrivingCar;
+        this.adc.update(this.coordinates, adcPose);
+        if (!_.isNumber(adcPose.positionX) || !_.isNumber(adcPose.positionY)) {
+            console.error(`Invalid ego car position: ${adcPose.positionX}, ${adcPose.positionY}!`);
+            return;
+        }
+
         this.adc.updateRssMarker(world.isRssSafe);
         this.ground.update(world, this.coordinates, this.scene);
         this.planningTrajectory.update(world, world.planningData, this.coordinates, this.scene);

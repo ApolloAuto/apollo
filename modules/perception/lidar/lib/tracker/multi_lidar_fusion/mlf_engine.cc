@@ -155,8 +155,8 @@ void MlfEngine::TrackObjectMatchAndAssign(
         << " unassigned_objects " << unassigned_objects.size();
   // 1. for assignment, push object to cache of track_data
   for (auto& pair : assignments) {
-    const size_t& track_id = pair.first;
-    const size_t& object_id = pair.second;
+    const size_t track_id = pair.first;
+    const size_t object_id = pair.second;
     tracks->at(track_id)->PushTrackedObjectToCache(objects[object_id]);
   }
   // 2. for unassigned_objects, create new tracks

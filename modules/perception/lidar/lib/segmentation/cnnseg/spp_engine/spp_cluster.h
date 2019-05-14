@@ -83,7 +83,7 @@ struct SppCluster {
     std::vector<int> indices(points.size(), 0);
     std::iota(indices.begin(), indices.end(), 0);
     std::sort(indices.begin(), indices.end(),
-              [&](const int& lhs, const int& rhs) {
+              [&](const int lhs, const int rhs) {
                 return points[lhs].z < points[rhs].z;
               });
     std::vector<SppPoint> points_target(points.size());

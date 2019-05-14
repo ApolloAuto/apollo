@@ -16,12 +16,17 @@
 
 #include "modules/drivers/video/video_driver_component.h"
 
+#include "cyber/common/file.h"
+
 namespace apollo {
 namespace drivers {
 namespace video {
 
+using cyber::common::EnsureDirectory;
+
 bool CompCameraH265Compressed::Init() {
-  AINFO << "video driver component init";
+  AINFO << "Initialize video driver component.";
+
   CameraH265Config video_config;
   if (!GetProtoConfig(&video_config)) {
     return false;
@@ -36,14 +41,12 @@ bool CompCameraH265Compressed::Init() {
     // Use current directory to save record file if H265_SAVE_FOLDER environment
     // is not set.
     record_folder_ = cyber::common::GetEnv("H265_SAVE_FOLDER", ".");
-    AINFO << "record_folder is " << record_folder_;
+    AINFO << "Record folder: " << record_folder_;
 
-    struct stat st = {0};
-    if (stat(record_folder_.c_str(), &st) == -1) {
-      char cmd[256];
-      snprintf(cmd, sizeof(cmd), "mkdir -p %s", record_folder_.c_str());
-      int ret = system(cmd);
-      AINFO_IF(ret == 0) << "Command execute sucessfuly";
+    struct stat st;
+    if (stat(record_folder_.c_str(), &st) < 0) {
+      bool ret = EnsureDirectory(record_folder_);
+      AINFO_IF(ret) << "Record folder is created successfully.";
     }
   }
   pb_image_.reset(new CompressedImage);
@@ -66,20 +69,22 @@ void CompCameraH265Compressed::VideoPoll() {
     char name[256];
     snprintf(name, sizeof(name), "%s/encode_%d.h265", record_folder_.c_str(),
              camera_deivce_->Port());
-    AINFO << "output name " << name;
+    AINFO << "Output file: " << name;
     fout.open(name, std::ios::binary);
-    if (!fout) AERROR << "open " << name << "  fail";
+    if (!fout.good()) {
+      AERROR << "Failed to open output file: " << name;
+    }
   }
+
   while (!apollo::cyber::IsShutdown()) {
-    if (camera_deivce_->Poll(pb_image_)) {
-      pb_image_->mutable_header()->set_timestamp_sec(
-          cyber::Time::Now().ToSecond());
-      AINFO << "Send CompressedImage";
-      writer_->Write(pb_image_);
-    } else {
-      AERROR << "port " << camera_deivce_->Port() << " h265 poll fail....";
+    if (!camera_deivce_->Poll(pb_image_)) {
+      AERROR << "H265 poll failed on port: " << camera_deivce_->Port();
       continue;
     }
+    pb_image_->mutable_header()->set_timestamp_sec(
+        cyber::Time::Now().ToSecond());
+    AINFO << "Send compressed image.";
+    writer_->Write(pb_image_);
 
     if (camera_deivce_->Record()) {
       fout.write(pb_image_->data().c_str(), pb_image_->data().size());

@@ -41,22 +41,18 @@ class PiecewiseJerkPathOptimizer : public PathOptimizer {
                          PathData* const path_data) override;
 
   bool OptimizePath(
-      const std::pair<const std::array<double, 3>, const std::array<double, 3>>&
-          init_state,
-      const double delta_s,
+      const std::array<double, 3>& init_state,
+      const std::array<double, 3>& end_state, const double delta_s,
       const std::vector<std::pair<double, double>>& lat_boundaries,
       const std::array<double, 5>& w, std::vector<double>* ptr_x,
-      std::vector<double>* ptr_dx, std::vector<double>* ptr_ddx);
+      std::vector<double>* ptr_dx, std::vector<double>* ptr_ddx,
+      const int max_iter);
 
   FrenetFramePath ToPiecewiseJerkPath(const std::vector<double>& l,
                                       const std::vector<double>& dl,
                                       const std::vector<double>& ddl,
                                       const double delta_s,
                                       const double start_s) const;
-
-  double AdjustLateralDerivativeBounds(const double s_dot, const double dl,
-                                       const double ddl,
-                                       const double l_dot_bounds) const;
 };
 
 }  // namespace planning

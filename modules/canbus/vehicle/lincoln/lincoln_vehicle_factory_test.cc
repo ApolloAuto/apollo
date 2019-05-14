@@ -27,7 +27,7 @@ class LincolnVehicleFactoryTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     VehicleParameter parameter;
-    parameter.set_brand(VehicleParameter::LINCOLN_MKZ);
+    parameter.set_brand(apollo::common::LINCOLN_MKZ);
     lincoln_factory_.SetVehicleParameter(parameter);
   }
   virtual void TearDown() {}

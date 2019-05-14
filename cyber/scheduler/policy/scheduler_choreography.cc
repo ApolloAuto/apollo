@@ -99,9 +99,9 @@ void SchedulerChoreography::CreateProcessor() {
   }
 
   for (uint32_t i = 0; i < task_pool_size_; i++) {
+    auto proc = std::make_shared<Processor>();
     auto ctx = std::make_shared<ClassicContext>();
 
-    auto proc = std::make_shared<Processor>();
     proc->BindContext(ctx);
     proc->SetAffinity(pool_cpuset_, pool_affinity_, i);
     proc->SetSchedPolicy(pool_processor_policy_, pool_processor_prio_);
@@ -177,6 +177,7 @@ bool SchedulerChoreography::RemoveTask(const std::string& name) {
   auto crid = GlobalData::GenerateHashId(name);
   return RemoveCRoutine(crid);
 }
+
 bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   // we use multi-key mutex to prevent race condition
   // when del && add cr with same crid
@@ -204,6 +205,7 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
       auto cr = p->second;
       prio = cr->priority();
       pid = cr->processor_id();
+      group_name = cr->group_name();
       id_cr_[crid]->Stop();
       id_cr_.erase(crid);
     } else {
@@ -215,13 +217,13 @@ bool SchedulerChoreography::RemoveCRoutine(uint64_t crid) {
   if (pid == -1) {
     WriteLockGuard<AtomicRWLock> lk(
         ClassicContext::rq_locks_[group_name].at(prio));
-    for (auto it = ClassicContext::cr_group_[group_name].at(prio).begin();
-         it != ClassicContext::cr_group_[group_name].at(prio).end(); ++it) {
+    auto& croutines = ClassicContext::cr_group_[group_name].at(prio);
+    for (auto it = croutines.begin(); it != croutines.end(); ++it) {
       if ((*it)->id() == crid) {
         auto cr = *it;
 
         cr->Stop();
-        ClassicContext::cr_group_[group_name].at(prio).erase(it);
+        croutines.erase(it);
         cr->Release();
         return true;
       }

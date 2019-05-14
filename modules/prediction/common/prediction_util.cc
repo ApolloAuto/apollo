@@ -58,9 +58,9 @@ int SolveQuadraticEquation(const std::vector<double>& coefficients,
   if (coefficients.size() != 3) {
     return -1;
   }
-  const double& a = coefficients[0];
-  const double& b = coefficients[1];
-  const double& c = coefficients[2];
+  const double a = coefficients[0];
+  const double b = coefficients[1];
+  const double c = coefficients[2];
   if (std::fabs(a) <= std::numeric_limits<double>::epsilon()) {
     return -1;
   }

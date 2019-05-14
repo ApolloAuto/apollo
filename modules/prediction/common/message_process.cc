@@ -27,6 +27,7 @@
 #include "modules/prediction/common/junction_analyzer.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
+#include "modules/prediction/common/semantic_map.h"
 #include "modules/prediction/common/validation_checker.h"
 #include "modules/prediction/evaluator/evaluator_manager.h"
 #include "modules/prediction/predictor/predictor_manager.h"
@@ -73,6 +74,7 @@ bool MessageProcess::Init() {
   ContainerManager::Instance()->Init(adapter_conf);
   EvaluatorManager::Instance()->Init(prediction_conf);
   PredictorManager::Instance()->Init(prediction_conf);
+  SemanticMap::Instance()->Init();
 
   if (!FLAGS_use_navigation_mode && !PredictionMap::Ready()) {
     AERROR << "Map cannot be loaded.";
@@ -123,7 +125,7 @@ void MessageProcess::OnPerception(
   ptr_obstacles_container->Insert(perception_obstacles);
 
   // Ignore some obstacles
-  ObstaclesPrioritizer::AssignIgnoreLevel();
+  ObstaclesPrioritizer::Instance()->AssignIgnoreLevel();
 
   // Scenario analysis
   ScenarioManager::Instance()->Run();
@@ -139,7 +141,7 @@ void MessageProcess::OnPerception(
   ptr_obstacles_container->BuildLaneGraph();
 
   // Assign CautionLevel for obstacles
-  ObstaclesPrioritizer::AssignCautionLevel();
+  ObstaclesPrioritizer::Instance()->AssignCautionLevel();
 
   // Analyze RightOfWay for the caution obstacles
   RightOfWay::Analyze();
@@ -152,10 +154,13 @@ void MessageProcess::OnPerception(
       if (obstacle_ptr == nullptr) {
         AERROR << "Null obstacle found.";
         continue;
-      } else if (!obstacle_ptr->latest_feature().IsInitialized()) {
-        AERROR << "Obstacle [" << id << "] has no latest feature.";
-        return;
       }
+      if (!obstacle_ptr->latest_feature().IsInitialized()) {
+        AERROR << "Obstacle [" << id << "] has no latest feature.";
+        continue;
+      }
+      *obstacle_ptr->mutable_latest_feature()->mutable_adc_trajectory_point() =
+          ptr_ego_trajectory_container->adc_trajectory().trajectory_point();
       FeatureOutput::InsertFeatureProto(obstacle_ptr->latest_feature());
       ADEBUG << "Insert feature into feature output";
     }
@@ -166,6 +171,9 @@ void MessageProcess::OnPerception(
   // Make evaluations
   EvaluatorManager::Instance()->Run();
 
+  if (FLAGS_prediction_offline_mode == 2) {
+    return;
+  }
   // Make predictions
   PredictorManager::Instance()->Run();
 

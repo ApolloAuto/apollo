@@ -87,6 +87,7 @@ void HMI::RegisterMessageHandlers() {
         HMIAction hmi_action;
         if (!HMIAction_Parse(action, &hmi_action)) {
           AERROR << "Invalid HMIAction string: " << action;
+          return;
         }
         std::string value;
         if (JsonUtil::GetStringFromJson(json, "value", &value)) {

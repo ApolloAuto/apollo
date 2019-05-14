@@ -47,8 +47,9 @@ Status RTKReplayPlanner::Plan(const TrajectoryPoint& planning_start_point,
       [](const ReferenceLineInfo& ref) { return ref.IsChangeLanePath(); });
   if (it != frame->mutable_reference_line_info()->end()) {
     status = PlanOnReferenceLine(planning_start_point, frame, &(*it));
-    has_plan = (it->IsDrivable() && it->IsChangeLanePath() &&
-                it->TrajectoryLength() > FLAGS_change_lane_min_length);
+    has_plan =
+        (it->IsDrivable() && it->IsChangeLanePath() &&
+         it->trajectory().GetSpatialLength() > FLAGS_change_lane_min_length);
     if (!has_plan) {
       AERROR << "Fail to plan for lane change.";
     }

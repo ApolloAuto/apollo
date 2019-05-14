@@ -122,7 +122,7 @@ ProjectionCacheObject* TrackObjectDistance::BuildProjectionCacheObject(
       lidar->GetBaseObject()->lidar_supplement.cloud;
   double width = static_cast<double>(camera_model->get_width());
   double height = static_cast<double>(camera_model->get_height());
-  const int& lidar_object_id = lidar->GetBaseObject()->id;
+  const int lidar_object_id = lidar->GetBaseObject()->id;
   ProjectionCacheObject* cache_object = projection_cache_.BuildObject(
       measurement_sensor_id, measurement_timestamp, projection_sensor_id,
       projection_timestamp, lidar_object_id);
@@ -204,13 +204,13 @@ ProjectionCacheObject* TrackObjectDistance::QueryProjectionCacheObject(
   // 1. try to query existed projection cache object
   const std::string& measurement_sensor_id =
       measurement_is_lidar ? lidar->GetSensorId() : camera->GetSensorId();
-  const double& measurement_timestamp =
+  const double measurement_timestamp =
       measurement_is_lidar ? lidar->GetTimestamp() : camera->GetTimestamp();
   const std::string& projection_sensor_id =
       measurement_is_lidar ? camera->GetSensorId() : lidar->GetSensorId();
-  const double& projection_timestamp =
+  const double projection_timestamp =
       measurement_is_lidar ? camera->GetTimestamp() : lidar->GetTimestamp();
-  const int& lidar_object_id = lidar->GetBaseObject()->id;
+  const int lidar_object_id = lidar->GetBaseObject()->id;
   ProjectionCacheObject* cache_object = projection_cache_.QueryObject(
       measurement_sensor_id, measurement_timestamp, projection_sensor_id,
       projection_timestamp, lidar_object_id);

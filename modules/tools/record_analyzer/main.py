@@ -102,10 +102,7 @@ if __name__ == "__main__":
         help="Specify the record file for analysis.")
 
     parser.add_argument(
-        "-s", "--simulation", action="store_const", const=True,
-        help="For simulation API call")
-    parser.add_argument(
-        "-sim", "--simulation2", action="store_const", const=True,
+        "-sim", "--simulation", action="store_const", const=True,
         help="For dreamland API call")
 
     parser.add_argument(
@@ -119,13 +116,18 @@ if __name__ == "__main__":
     parser.add_argument(
         "-a", "--alldata", action="store_const", const=True,
         help="Analyze all data (both auto and manual), otherwise auto data only without this option.")
+
+    parser.add_argument(
+        "-acc", "--showacc", action="store_const", const=True,
+        help="Analyze all data (both auto and manual), otherwise auto data only without this option.")
+
     args = parser.parse_args()
 
     record_file = args.file
     reader = RecordReader(record_file)
 
     control_analyzer = ControlAnalyzer()
-    planning_analyzer = PlannigAnalyzer(args.simulation, args.simulation2)
+    planning_analyzer = PlannigAnalyzer(args)
     lidar_endtoend_analyzer = LidarEndToEndAnalyzer()
 
     process(control_analyzer, planning_analyzer,
@@ -133,8 +135,6 @@ if __name__ == "__main__":
             args.planningrefpath, args.alldata)
 
     if args.simulation:
-        planning_analyzer.print_simulation_results()
-    elif args.simulation2:
         planning_analyzer.print_sim_results()
     elif args.planningpath or args.planningrefpath:
         plt.axis('equal')

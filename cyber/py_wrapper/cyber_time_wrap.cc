@@ -36,11 +36,13 @@ PyObject* cyber_new_PyTime(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, const_cast<char*>("K:cyber_new_PyTime"),
                         &nanoseconds)) {
     AERROR << "cyber_new_PyTime parsetuple failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
   apollo::cyber::PyTime* pytime = new apollo::cyber::PyTime(nanoseconds);
-  PyObject* pyobj_time = PyCapsule_New(pytime, "apollo_cybertron_pytime", NULL);
+  PyObject* pyobj_time =
+      PyCapsule_New(pytime, "apollo_cybertron_pytime", nullptr);
   return pyobj_time;
 }
 
@@ -48,6 +50,7 @@ PyObject* cyber_delete_PyTime(PyObject* self, PyObject* args) {
   PyObject* pyobj_time = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char*>("O:cyber_delete_PyTime"),
                         &pyobj_time)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -55,9 +58,11 @@ PyObject* cyber_delete_PyTime(PyObject* self, PyObject* args) {
       pyobj_time, "apollo_cybertron_pytime");
   if (nullptr == pytime) {
     AINFO << "cyber_delete_PyTime:time ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   delete pytime;
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -105,6 +110,7 @@ PyObject* cyber_PyTime_sleep_until(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, const_cast<char*>("OK:cyber_PyTime_sleep_until"),
                         &pyobj_time, &nanoseconds)) {
     AERROR << "cyber_PyTime_sleep_until:PyArg_ParseTuple failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -112,10 +118,12 @@ PyObject* cyber_PyTime_sleep_until(PyObject* self, PyObject* args) {
       pyobj_time, "apollo_cybertron_pytime");
   if (nullptr == pytime) {
     AINFO << "cyber_PyTime_sleep_until ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
   pytime->sleep_until(nanoseconds);
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -135,13 +143,14 @@ PyObject* cyber_new_PyDuration(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, const_cast<char*>("L:cyber_new_PyDuration"),
                         &nanoseconds)) {
     AERROR << "cyber_new_PyDuration parsetuple failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
   apollo::cyber::PyDuration* pyduration =
       new apollo::cyber::PyDuration(nanoseconds);
   PyObject* pyobj_duration =
-      PyCapsule_New(pyduration, "apollo_cybertron_pyduration", NULL);
+      PyCapsule_New(pyduration, "apollo_cybertron_pyduration", nullptr);
   return pyobj_duration;
 }
 
@@ -149,6 +158,7 @@ PyObject* cyber_delete_PyDuration(PyObject* self, PyObject* args) {
   PyObject* pyobj_duration = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char*>("O:cyber_delete_PyDuration"),
                         &pyobj_duration)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -156,9 +166,11 @@ PyObject* cyber_delete_PyDuration(PyObject* self, PyObject* args) {
       pyobj_duration, "apollo_cybertron_pyduration");
   if (nullptr == pyduration) {
     AINFO << "cyber_delete_PyDuration:pyduration ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   delete pyduration;
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -166,6 +178,7 @@ PyObject* cyber_PyDuration_sleep(PyObject* self, PyObject* args) {
   PyObject* pyobj_duration = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char*>("O:cyber_PyDuration_sleep"),
                         &pyobj_duration)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -173,9 +186,11 @@ PyObject* cyber_PyDuration_sleep(PyObject* self, PyObject* args) {
       pyobj_duration, "apollo_cybertron_pyduration");
   if (nullptr == pyduration) {
     AINFO << "cyber_PyDuration_sleep:pyduration ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   pyduration->sleep();
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -185,11 +200,13 @@ PyObject* cyber_new_PyRate(PyObject* self, PyObject* args) {
   if (!PyArg_ParseTuple(args, const_cast<char*>("L:cyber_new_PyRate"),
                         &nanoseconds)) {
     AERROR << "cyber_new_PyRate parsetuple failed!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
   apollo::cyber::PyRate* pyrate = new apollo::cyber::PyRate(nanoseconds);
-  PyObject* pyobj_rate = PyCapsule_New(pyrate, "apollo_cybertron_pyrate", NULL);
+  PyObject* pyobj_rate =
+      PyCapsule_New(pyrate, "apollo_cybertron_pyrate", nullptr);
   return pyobj_rate;
 }
 
@@ -197,6 +214,7 @@ PyObject* cyber_delete_PyRate(PyObject* self, PyObject* args) {
   PyObject* pyobj_rate = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char*>("O:cyber_delete_PyRate"),
                         &pyobj_rate)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -204,9 +222,11 @@ PyObject* cyber_delete_PyRate(PyObject* self, PyObject* args) {
       pyobj_rate, "apollo_cybertron_pyrate");
   if (nullptr == pyrate) {
     AINFO << "cyber_delete_PyRate:rate ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   delete pyrate;
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -214,6 +234,7 @@ PyObject* cyber_PyRate_sleep(PyObject* self, PyObject* args) {
   PyObject* pyobj_rate = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char*>("O:cyber_PyRate_sleep"),
                         &pyobj_rate)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -221,9 +242,11 @@ PyObject* cyber_PyRate_sleep(PyObject* self, PyObject* args) {
       pyobj_rate, "apollo_cybertron_pyrate");
   if (nullptr == pyrate) {
     AINFO << "cyber_PyRate_sleep:rate ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   pyrate->sleep();
+  Py_INCREF(Py_None);
   return Py_None;
 }
 
@@ -231,6 +254,7 @@ PyObject* cyber_PyRate_reset(PyObject* self, PyObject* args) {
   PyObject* pyobj_rate = nullptr;
   if (!PyArg_ParseTuple(args, const_cast<char*>("O:cyber_PyRate_reset"),
                         &pyobj_rate)) {
+    Py_INCREF(Py_None);
     return Py_None;
   }
 
@@ -238,9 +262,11 @@ PyObject* cyber_PyRate_reset(PyObject* self, PyObject* args) {
       pyobj_rate, "apollo_cybertron_pyrate");
   if (nullptr == pyrate) {
     AINFO << "cyber_PyRate_reset:rate ptr is null!";
+    Py_INCREF(Py_None);
     return Py_None;
   }
   pyrate->reset();
+  Py_INCREF(Py_None);
   return Py_None;
 }
 

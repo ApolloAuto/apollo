@@ -30,20 +30,21 @@ const colorMapping = {
 };
 
 const TRAFFIC_LIGHT_SCALE = 0.006;
-const trafficLightScales = {
+export const trafficLightScales = {
     x: TRAFFIC_LIGHT_SCALE,
     y: TRAFFIC_LIGHT_SCALE,
     z: TRAFFIC_LIGHT_SCALE
 };
 
 const STOP_SIGN_SCALE = 0.01;
-const stopSignScales = {
+export const stopSignScales = {
     x: STOP_SIGN_SCALE,
     y: STOP_SIGN_SCALE,
     z: STOP_SIGN_SCALE
 };
 
 const EPSILON = 1e-9;
+const Z_OFFSET = 0.5;
 
 export default class Map {
     constructor() {
@@ -86,31 +87,31 @@ export default class Map {
         switch (laneType) {
             case "DOTTED_YELLOW":
                 return drawDashedLineFromPoints(
-                    points, colorMapping.YELLOW, 4, 3, 3, 1, 1, false);
+                    points, colorMapping.YELLOW, 4, 3, 3, Z_OFFSET, 1, false);
             case "DOTTED_WHITE":
                 return drawDashedLineFromPoints(
-                    points, colorMapping.WHITE, 2, 0.5, 0.25, 1, 0.4, false);
+                    points, colorMapping.WHITE, 2, 0.5, 0.25, Z_OFFSET, 0.4, false);
             case "SOLID_YELLOW":
                 return drawSegmentsFromPoints(
-                    points, colorMapping.YELLOW, 3, 1, false);
+                    points, colorMapping.YELLOW, 3, Z_OFFSET, false);
             case "SOLID_WHITE":
                 return drawSegmentsFromPoints(
-                    points, colorMapping.WHITE, 3, 1, false);
+                    points, colorMapping.WHITE, 3, Z_OFFSET, false);
             case "DOUBLE_YELLOW":
                 const left = drawSegmentsFromPoints(
-                    points, colorMapping.YELLOW, 2, 1, false);
+                    points, colorMapping.YELLOW, 2, Z_OFFSET, false);
                 const right = drawSegmentsFromPoints(
                     points.map(point =>
                         new THREE.Vector3(point.x + 0.3, point.y + 0.3, point.z)),
-                    colorMapping.YELLOW, 3, 1, false);
+                    colorMapping.YELLOW, 3, Z_OFFSET, false);
                 left.add(right);
                 return left;
             case "CURB":
                 return drawSegmentsFromPoints(
-                    points, colorMapping.CORAL, 3, 1, false);
+                    points, colorMapping.CORAL, 3, Z_OFFSET, false);
             default:
                 return drawSegmentsFromPoints(
-                    points, colorMapping.DEFAULT, 3, 1, false);
+                    points, colorMapping.DEFAULT, 3, Z_OFFSET, false);
         }
     }
 
@@ -121,7 +122,7 @@ export default class Map {
         centralLine.forEach(segment => {
             const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
             const centerLine =
-                drawSegmentsFromPoints(points, colorMapping.GREEN, 1, 1, false);
+                drawSegmentsFromPoints(points, colorMapping.GREEN, 1, Z_OFFSET, false);
             centerLine.name = "CentralLine-" + lane.id.id;
             scene.add(centerLine);
             drewObjects.push(centerLine);
@@ -168,8 +169,11 @@ export default class Map {
         const text = this.textRender.drawText(
             lane.id.id, scene, colorMapping.WHITE, TEXT_ALIGN.LEFT);
         if (text) {
-            text.position.set(position.x, position.y, position.z);
-            text.rotation.set(rotation.x, rotation.y, rotation.z);
+            const textPosition = position || _.get(points, '[0]');
+            if (textPosition) {
+                text.position.set(textPosition.x, textPosition.y, textPosition.z);
+                text.rotation.set(rotation.x, rotation.y, rotation.z);
+            }
             text.visible = false;
             scene.add(text);
         }
@@ -202,7 +206,7 @@ export default class Map {
         border.push(border[0]);
 
         const mesh = drawSegmentsFromPoints(
-            border, color, 2, 0, true, false, 1.0);
+            border, color, 2, Z_OFFSET, true, false, 1.0);
         scene.add(mesh);
         drewObjects.push(mesh);
 
@@ -226,7 +230,7 @@ export default class Map {
         drewObjects.push(zoneShape);
 
         const mesh = drawSegmentsFromPoints(
-            border, color, 2, 0, true, false, 1.0);
+            border, color, 2, Z_OFFSET, true, false, 1.0);
         scene.add(mesh);
         drewObjects.push(mesh);
 
@@ -238,7 +242,7 @@ export default class Map {
         lines.forEach(line => {
             line.segment.forEach(segment => {
                 const points = coordinates.applyOffsetToArray(segment.lineSegment.point);
-                const mesh = drawSegmentsFromPoints(points, color, 5, 3, false);
+                const mesh = drawSegmentsFromPoints(points, color, 5, Z_OFFSET + 1, false);
                 scene.add(mesh);
                 drewObjects.push(mesh);
             });

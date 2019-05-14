@@ -29,8 +29,8 @@ GridSearch::GridSearch(const PlannerOpenSpaceConfig& open_space_conf) {
   node_radius_ = open_space_conf.warm_start_config().node_radius();
 }
 
-double GridSearch::EuclidDistance(const double& x1, const double& y1,
-                                  const double& x2, const double& y2) {
+double GridSearch::EuclidDistance(const double x1, const double y1,
+                                  const double x2, const double y2) {
   return std::sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 }
 
@@ -100,7 +100,7 @@ std::vector<std::shared_ptr<Node2d>> GridSearch::GenerateNextNodes(
 }
 
 bool GridSearch::GenerateAStarPath(
-    const double& sx, const double& sy, const double& ex, const double& ey,
+    const double sx, const double sy, const double ex, const double ey,
     const std::vector<double>& XYbounds,
     const std::vector<std::vector<common::math::LineSegment2d>>&
         obstacles_linesegments_vec,
@@ -164,7 +164,7 @@ bool GridSearch::GenerateAStarPath(
 }
 
 bool GridSearch::GenerateDpMap(
-    const double& ex, const double& ey, const std::vector<double>& XYbounds,
+    const double ex, const double ey, const std::vector<double>& XYbounds,
     const std::vector<std::vector<common::math::LineSegment2d>>&
         obstacles_linesegments_vec) {
   std::priority_queue<std::pair<std::string, double>,
@@ -216,7 +216,7 @@ bool GridSearch::GenerateDpMap(
   return true;
 }
 
-double GridSearch::CheckDpMap(const double& sx, const double& sy) {
+double GridSearch::CheckDpMap(const double sx, const double sy) {
   std::string index = Node2d::CalcIndex(sx, sy, xy_grid_resolution_, XYbounds_);
   if (dp_map_.find(index) != dp_map_.end()) {
     return dp_map_[index]->GetCost() * xy_grid_resolution_;
