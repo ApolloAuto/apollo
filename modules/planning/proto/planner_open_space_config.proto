@@ -98,7 +98,7 @@ message DistanceApproachConfig {
   // True to enable derivative check inside open space planner
   optional bool enable_initial_final_check = 25 [default = false];
   optional DistanceApproachMode distance_approach_mode = 26;
-  optional bool enable_jacobian_ad = 27;
+  optional bool enable_jacobian_ad = 27 [default = false];
 }
 
 message IpoptConfig {
