@@ -55,6 +55,9 @@ class DualVariableWarmStartIPOPTQPInterface : public Ipopt::TNLP {
   void get_optimization_results(Eigen::MatrixXd* l_warm_up,
                                 Eigen::MatrixXd* n_warm_up) const;
 
+  void check_solution(const Eigen::MatrixXd& l_warm_up,
+                      const Eigen::MatrixXd& n_warm_up);
+
   /** Method to return some info about the nlp */
   bool get_nlp_info(int& n, int& m, int& nnz_jac_g, int& nnz_h_lag,
                     IndexStyleEnum& index_style) override;
@@ -155,7 +158,7 @@ class DualVariableWarmStartIPOPTQPInterface : public Ipopt::TNLP {
   // states of warm up stage
   Eigen::MatrixXd xWS_;
 
-  double weight_d_;
+  double min_safety_distance_;
 
   //***************    start ADOL-C part ***********************************
   double* obj_lam;
