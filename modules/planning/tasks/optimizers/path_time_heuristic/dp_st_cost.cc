@@ -36,7 +36,7 @@ DpStCost::DpStCost(const DpStSpeedConfig& config, const double total_time,
                    const common::TrajectoryPoint& init_point)
     : config_(config), obstacles_(obstacles), init_point_(init_point) {
   int index = 0;
-  for (auto& obstacle : obstacles) {
+  for (const auto& obstacle : obstacles) {
     boundary_map_[obstacle->st_boundary().id()] = index++;
   }
   unit_t_ = total_time / config_.matrix_dimension_t();
@@ -91,9 +91,6 @@ void DpStCost::SortAndMergeRange(
 }
 
 bool DpStCost::InKeepClearRange(double s) const {
-  if (keep_clear_range_.empty()) {
-    return false;
-  }
   for (const auto& p : keep_clear_range_) {
     if (p.first <= s && p.second >= s) {
       return true;
@@ -113,6 +110,7 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     }
 
     auto boundary = obstacle->st_boundary();
+    // TODO(all): merge this parameter with existing parameter
     const double kIgnoreDistance = 200.0;
     if (boundary.min_s() > kIgnoreDistance) {
       continue;
@@ -120,8 +118,7 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
     if (t < boundary.min_t() || t > boundary.max_t()) {
       continue;
     }
-    if (obstacle->IsBlockingObstacle() &&
-        boundary.IsPointInBoundary(STPoint(s, t))) {
+    if (boundary.IsPointInBoundary(st_graph_point.point())) {
       return kInf;
     }
     double s_upper = 0.0;
@@ -137,21 +134,24 @@ double DpStCost::GetObstacleCost(const StGraphPoint& st_graph_point) {
       s_lower = boundary_cost_[boundary_index][st_graph_point.index_t()].second;
     }
     if (s < s_lower) {
+      // TODO(all): merge this parameter with existing parameter
       constexpr double kSafeTimeBuffer = 3.0;
-      const double len = obstacle->speed() * kSafeTimeBuffer;
-      if (s + len < s_lower) {
+      const double follow_distance_s = obstacle->speed() * kSafeTimeBuffer;
+      if (s + follow_distance_s < s_lower) {
         continue;
       } else {
+        auto s_diff = follow_distance_s - s_lower + s;
         cost += config_.obstacle_weight() * config_.default_obstacle_cost() *
-                std::pow((len - s_lower + s), 2);
+                s_diff * s_diff;
       }
     } else if (s > s_upper) {
       const double kSafeDistance = 20.0;  // or calculated from velocity
       if (s > s_upper + kSafeDistance) {
         continue;
       } else {
+        auto s_diff = kSafeDistance + s_upper - s;
         cost += config_.obstacle_weight() * config_.default_obstacle_cost() *
-                std::pow((kSafeDistance + s_upper - s), 2);
+                s_diff * s_diff;
       }
     }
   }
