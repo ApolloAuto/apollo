@@ -1,6 +1,6 @@
-max_constraint_interval : 0.25
+max_constraint_interval : 0.05
 longitudinal_boundary_bound : 2.0
-lateral_boundary_bound : 0.25
+lateral_boundary_bound : 0.5
 num_of_total_points : 500
 curb_shift : 0.2
 driving_side : RIGHT
@@ -14,7 +14,7 @@ cos_theta {
   max_num_of_iterations: 500
   acceptable_tol: 1e-1
   acceptable_num_of_iterations: 15
-  weight_cos_included_angle: 1e5
+  weight_cos_included_angle: 1e10
   weight_anchor_points: 1.0
   weight_length: 1.0
   relax: 0.25

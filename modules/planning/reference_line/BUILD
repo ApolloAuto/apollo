@@ -111,12 +111,12 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        ":qp_spline_reference_line_smoother",
         ":reference_line",
         ":reference_line_smoother",
         "//modules/common/math",
         "//modules/planning/common:planning_gflags",
         "//modules/planning/math:curve_math",
+        "//modules/planning/math/discretized_points_smoothing:fem_pos_deviation_smoother",
         "//modules/planning/proto:planning_proto",
         "@adolc",
         "@eigen",

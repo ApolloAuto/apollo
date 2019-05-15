@@ -27,9 +27,8 @@
 #include "modules/common/time/time.h"
 #include "modules/common/util/util.h"
 #include "modules/planning/common/planning_gflags.h"
-#include "modules/planning/math/smoothing_spline/spline_2d_solver.h"
+#include "modules/planning/math/discretized_points_smoothing/fem_pos_deviation_smoother.h"
 #include "modules/planning/reference_line/cos_theta_problem_interface.h"
-#include "modules/planning/reference_line/qp_spline_reference_line_smoother.h"
 
 namespace apollo {
 namespace planning {
@@ -88,12 +87,15 @@ bool CosThetaReferenceLineSmoother::Smooth(
 
   const auto start_timestamp = std::chrono::system_clock::now();
 
+  // bool status =
+  //     CosThetaSmooth(raw_point2d, anchorpoints_lateralbound,
+  //     &smoothed_point2d);
   bool status =
-      CosThetaSmooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
+      FemPosSmooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
 
   const auto end_timestamp = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_timestamp - start_timestamp;
-  ADEBUG << "cos_theta reference line smoother time: " << diff.count() * 1000.0
+  AERROR << "cos_theta reference line smoother time: " << diff.count() * 1000.0
          << " ms.";
 
   if (!status) {
@@ -182,6 +184,50 @@ bool CosThetaReferenceLineSmoother::CosThetaSmooth(
     ptr_smoothed_point2d->emplace_back(x[i], y[i]);
   }
 
+  return true;
+}
+
+bool CosThetaReferenceLineSmoother::FemPosSmooth(
+    const std::vector<Eigen::Vector2d>& point2d,
+    const std::vector<double>& lateral_bounds,
+    std::vector<Eigen::Vector2d>* ptr_smoothed_point2d) {
+  FemPosDeviationSmoother fem_pos_smoother;
+  std::vector<std::pair<double, double>> ref_points;
+  // TODO(Jinyun): unify input data form
+  for (const auto& ref_point : point2d) {
+    ref_points.emplace_back(ref_point.x(), ref_point.y());
+  }
+  fem_pos_smoother.set_ref_points(ref_points);
+
+  // tmp
+  auto lateral_bounds_fixed = lateral_bounds;
+  lateral_bounds_fixed.front() = 0.0;
+  lateral_bounds_fixed.back() = 0.0;
+  fem_pos_smoother.set_x_bounds_around_refs(lateral_bounds_fixed);
+  fem_pos_smoother.set_y_bounds_around_refs(lateral_bounds_fixed);
+  // TODO(Jinyun): move to conf
+  fem_pos_smoother.set_weight_fem_pose_deviation(weight_cos_included_angle_);
+  fem_pos_smoother.set_weight_path_length(weight_length_);
+  fem_pos_smoother.set_weight_ref_deviation(weight_anchor_points_);
+
+  OsqpSettings osqp_settings;
+
+  fem_pos_smoother.Optimize(osqp_settings);
+
+  const auto& opt_x = fem_pos_smoother.opt_x();
+  const auto& opt_y = fem_pos_smoother.opt_y();
+
+  if (opt_x.size() < 2 || opt_y.size() < 2) {
+    AERROR << "Return by IPOPT is wrong. Size smaller than 2 ";
+    return false;
+  }
+
+  CHECK_EQ(opt_x.size(), opt_y.size());
+
+  size_t point_size = opt_x.size();
+  for (size_t i = 0; i < point_size; ++i) {
+    ptr_smoothed_point2d->emplace_back(opt_x[i], opt_y[i]);
+  }
   return true;
 }
 
