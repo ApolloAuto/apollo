@@ -51,7 +51,7 @@ bool FemPosDeviationSmoother::Optimize(const OsqpSettings& solver_settings) {
   }
 
   num_of_points_ = static_cast<int>(ref_points_.size());
-  num_of_variables_ = num_of_variables_ * 2;
+  num_of_variables_ = num_of_points_ * 2;
   num_of_constraints_ = num_of_variables_;
 
   // Calculate kernel
@@ -226,8 +226,10 @@ void FemPosDeviationSmoother::CalculateKernel(std::vector<c_float>* P_data,
 }
 
 void FemPosDeviationSmoother::CalculateOffset(std::vector<c_float>* q) {
-  for (int i = 0; i < num_of_variables_; ++i) {
-    q->push_back(-2.0 * weight_ref_deviation_);
+  for (int i = 0; i < num_of_points_; ++i) {
+    const auto& ref_point_xy = ref_points_[i];
+    q->push_back(-2.0 * weight_ref_deviation_ * ref_point_xy.first);
+    q->push_back(-2.0 * weight_ref_deviation_ * ref_point_xy.second);
   }
 }
 

@@ -74,13 +74,15 @@ bool QpSplineReferenceLineSmoother::Smooth(
     return false;
   }
 
-  auto start = Clock::NowInSeconds();
+  auto start = std::chrono::system_clock::now();
   if (!Solve()) {
     AERROR << "Solve spline smoother problem failed";
   }
-  auto end = Clock::NowInSeconds();
+  auto end = std::chrono::system_clock::now();
+
+  std::chrono::duration<double> diff = end - start;
   ADEBUG << "QpSplineReferenceLineSmoother solve time is "
-         << (end - start) * 1000 << " ms.";
+         << diff.count() * 1000.0 << " ms.";
 
   // mapping spline to reference line point
   const double start_t = t_knots_.front();

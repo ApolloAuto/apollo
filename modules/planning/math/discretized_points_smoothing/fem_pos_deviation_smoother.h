@@ -54,7 +54,7 @@ struct OsqpSettings {
 
 class FemPosDeviationSmoother {
  public:
-  FemPosDeviationSmoother();
+  FemPosDeviationSmoother() = default;
 
   virtual ~FemPosDeviationSmoother() = default;
 

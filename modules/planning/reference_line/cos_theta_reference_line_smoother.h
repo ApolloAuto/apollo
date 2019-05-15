@@ -22,7 +22,6 @@
 
 #include "Eigen/Dense"
 
-#include "modules/planning/math/curve_math.h"
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
 #include "modules/planning/reference_line/reference_line_smoother.h"
@@ -45,6 +44,10 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
  private:
   bool CosThetaSmooth(const std::vector<Eigen::Vector2d>& point2d,
+                      const std::vector<double>& lateral_bounds,
+                      std::vector<Eigen::Vector2d>* ptr_smoothed_point2d);
+
+  bool FemPosSmooth(const std::vector<Eigen::Vector2d>& point2d,
                       const std::vector<double>& lateral_bounds,
                       std::vector<Eigen::Vector2d>* ptr_smoothed_point2d);
 
