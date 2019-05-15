@@ -57,6 +57,14 @@ class DualVariableWarmStartOSQPInterface {
                            std::vector<c_int>* A_indices,
                            std::vector<c_int>* A_indptr);
 
+  void assembleA(const int r, const int c,
+                 const std::vector<c_float>& P_data,
+                 const std::vector<c_int>& P_indices,
+                 const std::vector<c_int>& P_indptr);
+
+  void check_solution(const Eigen::MatrixXd& l_warm_up,
+                      const Eigen::MatrixXd& n_warm_up);
+
  private:
   int num_of_variables_;
   int num_of_constraints_;
@@ -94,6 +102,11 @@ class DualVariableWarmStartOSQPInterface {
 
   // states of warm up stage
   Eigen::MatrixXd xWS_;
+
+  // constraint A matrix in eigen format
+  Eigen::MatrixXf constraint_A_;
+
+  bool check_mode_;
 };
 
 }  // namespace planning
