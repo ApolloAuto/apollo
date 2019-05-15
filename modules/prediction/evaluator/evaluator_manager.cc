@@ -22,6 +22,7 @@
 
 #include "modules/common/configs/vehicle_config_helper.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/common/prediction_thread_pool.h"
@@ -113,6 +114,11 @@ void EvaluatorManager::Init(const PredictionConf& config) {
         case PerceptionObstacle::VEHICLE: {
           if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
             vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
+            if (FLAGS_prediction_offline_mode ==
+                    PredictionConstants::kDumpDataForLearning) {
+              vehicle_on_lane_evaluator_ =
+                  ObstacleConf::LANE_SCANNING_EVALUATOR;
+            }
           }
           if (obstacle_conf.obstacle_status() == ObstacleConf::IN_JUNCTION) {
             vehicle_in_junction_evaluator_ = obstacle_conf.evaluator_type();
