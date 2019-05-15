@@ -80,10 +80,14 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   //  - if in online mode, pass it through trained model to evaluate.
   std::vector<double> feature_values;
   ExtractFeatures(obstacle_ptr, lane_graph_ptr, &feature_values);
+  std::vector<std::string> string_feature_values;
+  ExtractStringFeatures(*lane_graph_ptr, &string_feature_values);
+
   std::vector<double> labels = {0.0};
   if (FLAGS_prediction_offline_mode == 2) {
-    FeatureOutput::InsertDataForLearning(*latest_feature_ptr, feature_values,
-                                         "cruise", nullptr);
+    FeatureOutput::InsertDataForLearning(
+        *latest_feature_ptr, feature_values, string_feature_values,
+        "cruise", nullptr);
     ADEBUG << "Save extracted features for learning locally.";
     return;
   }
@@ -99,6 +103,18 @@ void LaneScanningEvaluator::Evaluate(Obstacle* obstacle_ptr,
   torch_inputs.push_back(std::move(torch_input));
   ModelInference(torch_inputs, torch_lane_scanning_model_ptr_,
                  latest_feature_ptr);
+}
+
+bool LaneScanningEvaluator::ExtractStringFeatures(
+    const LaneGraph& lane_graph,
+    std::vector<std::string>* const string_feature_values) {
+  for (const LaneSequence& lane_sequence : lane_graph.lane_sequence()) {
+    string_feature_values->push_back("|");
+    for (const LaneSegment& lane_segment : lane_sequence.lane_segment()) {
+      string_feature_values->push_back(lane_segment.lane_id());
+    }
+  }
+  return true;
 }
 
 bool LaneScanningEvaluator::ExtractFeatures(
@@ -149,6 +165,7 @@ bool LaneScanningEvaluator::ExtractObstacleFeatures(
   // Sanity checks.
   CHECK_NOTNULL(obstacle_ptr);
   feature_values->clear();
+  FLAGS_cruise_historical_frame_length = 20;
   std::vector<double> has_history(FLAGS_cruise_historical_frame_length, 1.0);
   std::vector<std::pair<double, double>> pos_history(
       FLAGS_cruise_historical_frame_length, std::make_pair(0.0, 0.0));

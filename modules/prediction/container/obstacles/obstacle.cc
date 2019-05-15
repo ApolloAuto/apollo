@@ -1202,7 +1202,7 @@ void Obstacle::BuildLaneGraphFromLeftToRight() {
   }
 
   // Build lane_points.
-  if (feature->has_lane() && feature->lane().has_lane_graph()) {
+  if (feature->lane().has_lane_graph_ordered()) {
     SetLanePoints(feature, 0.5, 120,
                   feature->mutable_lane()->mutable_lane_graph_ordered());
     SetLaneSequencePath(feature->mutable_lane()->mutable_lane_graph_ordered());
@@ -1223,6 +1223,7 @@ void Obstacle::SetLanePoints(const Feature* feature,
                              const double lane_point_spacing,
                              const uint64_t max_num_lane_point,
                              LaneGraph* const lane_graph) {
+  ADEBUG << "Spacing = " << lane_point_spacing;
   // Sanity checks.
   if (feature == nullptr || !feature->has_velocity_heading()) {
     AERROR << "Null feature or no velocity heading.";
@@ -1251,6 +1252,7 @@ void Obstacle::SetLanePoints(const Feature* feature,
       if (lane_seg_s > lane_segment->end_s()) {
         // If already exceeds the current lane_segment, then go to the
         // next following one.
+        ADEBUG << "Move on to the next lane-segment.";
         start_s = lane_seg_s - lane_segment->end_s();
         lane_seg_s = start_s;
         ++lane_index;
@@ -1263,12 +1265,14 @@ void Obstacle::SetLanePoints(const Feature* feature,
         // Otherwise, update lane_graph:
         // 1. Sanity checks.
         std::string lane_id = lane_segment->lane_id();
+        ADEBUG << "Currently on " << lane_id;
         std::shared_ptr<const LaneInfo> lane_info =
             PredictionMap::LaneById(lane_id);
         if (lane_info == nullptr) {
           break;
         }
         // 2. Get the closeset lane_point
+        ADEBUG << "Lane-segment s = " << lane_seg_s;
         Eigen::Vector2d lane_point_pos =
             PredictionMap::PositionOnLane(lane_info, lane_seg_s);
         double lane_point_heading =
@@ -1279,6 +1283,7 @@ void Obstacle::SetLanePoints(const Feature* feature,
             common::math::AngleDiff(lane_point_heading, heading);
 
         // 3. Update it into the lane_graph
+        ADEBUG << lane_point_pos[0] << "    " << lane_point_pos[1];
         LanePoint lane_point;
         lane_point.mutable_position()->set_x(lane_point_pos[0]);
         lane_point.mutable_position()->set_y(lane_point_pos[1]);
