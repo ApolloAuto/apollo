@@ -37,7 +37,7 @@ Status SpeedOptimizer::Execute(Frame* frame,
   Task::Execute(frame, reference_line_info);
 
   auto ret = Process(
-      reference_line_info->AdcSlBoundary(), reference_line_info->path_data(),
+      reference_line_info->path_data(),
       frame->PlanningStartPoint(), reference_line_info->reference_line(),
       *reference_line_info->mutable_speed_data(),
       reference_line_info->path_decision(),

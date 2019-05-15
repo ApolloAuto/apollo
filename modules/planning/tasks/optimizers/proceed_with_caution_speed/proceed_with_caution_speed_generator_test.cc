@@ -42,8 +42,6 @@ class ProceedWithCautionSpeedGeneratorTest : public ::testing::Test {
 
  protected:
   DpStSpeedConfig dp_config_;
-
-  SLBoundary adc_sl_boundary_;
   PathData path_data_;
   common::TrajectoryPoint init_point_;
   PathDecision path_decision_;
@@ -88,7 +86,7 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedSpeed) {
   SpeedData speed_data1;
   SpeedData speed_data2;
   common::Status process_status = test_obj.Process(
-      adc_sl_boundary_, path_data_, init_point_, reference_line_, speed_data1,
+      path_data_, init_point_, reference_line_, speed_data1,
       &path_decision_, &speed_data2);
   EXPECT_EQ(process_status, common::Status::OK());
 

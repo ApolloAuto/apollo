@@ -90,7 +90,6 @@ class DpStGraphTest : public ::testing::Test {
   DpStSpeedConfig dp_config_;
 
   common::TrajectoryPoint init_point_;
-  SLBoundary adc_sl_boundary_;
 };
 
 TEST_F(DpStGraphTest, simple) {
@@ -133,14 +132,8 @@ TEST_F(DpStGraphTest, simple) {
   st_graph_data_.LoadData(boundaries, 30.0, init_point_, speed_limit_,
                           path_data_length, 120, 7.0, &st_graph_debug);
 
-  // adc_sl_boundary_
-  adc_sl_boundary_.set_start_s(15.0);
-  adc_sl_boundary_.set_end_s(20.0);
-  adc_sl_boundary_.set_start_l(-1.1);
-  adc_sl_boundary_.set_end_l(1.1);
-
   GriddedPathTimeGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_,
-      init_point_, adc_sl_boundary_);
+      init_point_);
 
   SpeedData speed_data;
   auto ret = dp_st_graph.Search(&speed_data);
