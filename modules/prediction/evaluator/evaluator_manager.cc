@@ -168,10 +168,11 @@ void EvaluatorManager::Run() {
 
   if (FLAGS_enable_semantic_map) {
     BuildObstacleIdHistoryMap();
-    SemanticMap::Instance()->RunCurrFrame(obstacle_id_history_map_);
     if (FLAGS_prediction_offline_mode == 4) {
       DumpCurrentFrameEnv();
+      return;
     }
+    SemanticMap::Instance()->RunCurrFrame(obstacle_id_history_map_);
   }
 
   std::vector<Obstacle*> dynamic_env;
