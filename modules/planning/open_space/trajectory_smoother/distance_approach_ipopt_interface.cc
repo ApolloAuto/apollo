@@ -59,8 +59,8 @@ DistanceApproachIPOPTInterface::DistanceApproachIPOPTInterface(
   state_result_ = Eigen::MatrixXd::Zero(4, horizon_ + 1);
   dual_l_result_ = Eigen::MatrixXd::Zero(obstacles_edges_sum_, horizon_ + 1);
   dual_n_result_ = Eigen::MatrixXd::Zero(4 * obstacles_num_, horizon_ + 1);
-  control_result_ = Eigen::MatrixXd::Zero(2, horizon_ + 1);
-  time_result_ = Eigen::MatrixXd::Zero(1, horizon_ + 1);
+  control_result_ = Eigen::MatrixXd::Zero(2, horizon_);
+  time_result_ = Eigen::MatrixXd::Zero(1, horizon_);
   state_start_index_ = 0;
   control_start_index_ = 4 * (horizon_ + 1);
   time_start_index_ = control_start_index_ + 2 * horizon_;
@@ -1367,7 +1367,7 @@ void DistanceApproachIPOPTInterface::finalize_solution(
     state_result_(3, i) = x[state_index + 3];
     control_result_(0, i) = x[control_index];
     control_result_(1, i) = x[control_index + 1];
-    time_result_(0, i) = x[time_index];
+    time_result_(0, i) = ts_ * x[time_index];
     for (int j = 0; j < obstacles_edges_sum_; ++j) {
       dual_l_result_(j, i) = x[dual_l_index + j];
     }
@@ -1384,13 +1384,12 @@ void DistanceApproachIPOPTInterface::finalize_solution(
   state_result_(1, 0) = x0_(1, 0);
   state_result_(2, 0) = x0_(2, 0);
   state_result_(3, 0) = x0_(3, 0);
-  // push back last horizon for state and time variables
+  // push back last horizon for states
   state_result_(0, horizon_) = xf_(0, 0);
   state_result_(1, horizon_) = xf_(1, 0);
   state_result_(2, horizon_) = xf_(2, 0);
   state_result_(3, horizon_) = xf_(3, 0);
-  time_result_(0, horizon_) = x[time_index];
-  time_result_ = ts_ * time_result_;
+
   for (int j = 0; j < obstacles_edges_sum_; ++j) {
     dual_l_result_(j, horizon_) = x[dual_l_index + j];
   }
@@ -1432,6 +1431,7 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
   }
 
   // 2. control variable initialization, 2 * horizon_
+  CHECK_EQ(control_result_.cols(), uWS_.cols());
   CHECK_EQ(control_result_.rows(), uWS_.rows());
   double control_diff_max = 0.0;
   for (int i = 0; i < horizon_; ++i) {
@@ -1441,7 +1441,7 @@ void DistanceApproachIPOPTInterface::get_optimization_results(
                                 control_diff_max);
   }
 
-  // 2. time scale variable initialization, horizon_ + 1, no
+  // 2. time scale variable initialization, horizon_ + 1
 
   // 3. lagrange constraint l, obstacles_edges_sum_ * (horizon_+1)
   CHECK_EQ(dual_l_result_.cols(), l_warm_up_.cols());
