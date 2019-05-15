@@ -18,9 +18,12 @@
  * @file
  **/
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface.h"
+#include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h"
 
 #include "cyber/common/file.h"
 #include "gtest/gtest.h"
+#include "IpIpoptApplication.hpp"
+#include "IpSolveStatistics.hpp"
 
 #include "modules/planning/common/planning_gflags.h"
 
@@ -62,6 +65,7 @@ class DualVariableWarmStartOSQPInterfaceTest : public ::testing::Test {
   int num_of_constraints_ = 0;
 
   std::unique_ptr<DualVariableWarmStartOSQPInterface> ptop_ = nullptr;
+  DualVariableWarmStartIPOPTQPInterface* pt_gt_ = nullptr;
   PlannerOpenSpaceConfig planner_open_space_config_;
 };
 
@@ -72,6 +76,9 @@ void DualVariableWarmStartOSQPInterfaceTest::ProblemSetup() {
   ptop_.reset(new DualVariableWarmStartOSQPInterface(
       horizon_, ts_, ego_, obstacles_edges_num_, obstacles_num_, obstacles_A_,
       obstacles_b_, xWS, planner_open_space_config_));
+  pt_gt_ = new DualVariableWarmStartIPOPTQPInterface(
+      horizon_, ts_, ego_, obstacles_edges_num_, obstacles_num_, obstacles_A_,
+      obstacles_b_, xWS, planner_open_space_config_);
 }
 
 TEST_F(DualVariableWarmStartOSQPInterfaceTest, initilization) {
@@ -85,16 +92,87 @@ TEST_F(DualVariableWarmStartOSQPInterfaceTest, optimize) {
 
   bool res = ptop_->optimize();
   EXPECT_TRUE(res);
-
   ptop_->get_optimization_results(&l_warm_up, &n_warm_up);
+
+  // regard ipopt_qp as ground truth result
+  Eigen::MatrixXd l_warm_up_gt(obstacles_edges_sum, horizon_ + 1);
+  Eigen::MatrixXd n_warm_up_gt(4 * obstacles_num_, horizon_ + 1);
+
+  Ipopt::SmartPtr<Ipopt::TNLP> problem = pt_gt_;
+  // Create an instance of the IpoptApplication
+  Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+
+  app->Options()->SetIntegerValue(
+      "print_level",
+      planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .ipopt_print_level());
+  app->Options()->SetIntegerValue(
+      "mumps_mem_percent",
+      planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .mumps_mem_percent());
+  app->Options()->SetNumericValue(
+      "mumps_pivtol",
+      planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .mumps_pivtol());
+  app->Options()->SetIntegerValue(
+      "max_iter", planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .ipopt_max_iter());
+  app->Options()->SetNumericValue(
+      "tol", planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .ipopt_tol());
+  app->Options()->SetNumericValue(
+      "acceptable_constr_viol_tol",
+      planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .ipopt_acceptable_constr_viol_tol());
+  app->Options()->SetNumericValue(
+      "min_hessian_perturbation",
+      planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .ipopt_min_hessian_perturbation());
+  app->Options()->SetNumericValue(
+      "jacobian_regularization_value",
+      planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .ipopt_jacobian_regularization_value());
+  app->Options()->SetStringValue(
+      "print_timing_statistics",
+      planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .ipopt_print_timing_statistics());
+  app->Options()->SetStringValue(
+      "alpha_for_y",
+      planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .ipopt_alpha_for_y());
+  app->Options()->SetStringValue(
+      "recalc_y", planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config()
+          .ipopt_recalc_y());
+
+  app->Options()->SetStringValue("mehrotra_algorithm", "yes");
+  app->Initialize();
+  app->OptimizeTNLP(problem);
+
+  // Retrieve some statistics about the solve
+  pt_gt_->get_optimization_results(&l_warm_up_gt, &n_warm_up_gt);
+
+  // compare ipopt_qp and osqp results
   for (int r = 0; r < obstacles_edges_sum; ++r) {
     for (int c = 0; c < static_cast<int>(horizon_) + 1; ++c) {
-      EXPECT_EQ(l_warm_up(r, c), 0.0);
+      EXPECT_NEAR(l_warm_up(r, c), l_warm_up_gt(r, c), 1e-6)
+          << "r: " << r << ", c: " << c;
     }
   }
   for (int r = 0; r < 4 * static_cast<int>(obstacles_num_); ++r) {
     for (int c = 0; c < static_cast<int>(horizon_) + 1; ++c) {
-      EXPECT_EQ(n_warm_up(r, c), 0.0);
+      EXPECT_NEAR(n_warm_up(r, c), n_warm_up_gt(r, c), 1e-6)
+          << "r: " << r << ",c: " << c;
     }
   }
 }
