@@ -51,10 +51,9 @@ PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
 }
 
 Status PiecewiseJerkSpeedOptimizer::Process(
-    const PathData& path_data,
-    const TrajectoryPoint& init_point, const ReferenceLine& reference_line,
-    const SpeedData& reference_speed_data, PathDecision* const path_decision,
-    SpeedData* const speed_data) {
+    const PathData& path_data, const TrajectoryPoint& init_point,
+    const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
+    PathDecision* const path_decision, SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
   }

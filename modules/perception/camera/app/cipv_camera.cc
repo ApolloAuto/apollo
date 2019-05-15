@@ -157,8 +157,8 @@ bool Cipv::MakeVirtualLane(const LaneLineSimple &ref_lane_line,
       //     ref_lane_line.line_point[i](0),
       //     ref_lane_line.line_point[i](1) + offset_distance);
       virtual_lane_line->line_point.emplace_back(
-        ref_lane_line.line_point[i](0),
-        ref_lane_line.line_point[i](1) + offset_distance);
+          ref_lane_line.line_point[i](0),
+          ref_lane_line.line_point[i](1) + offset_distance);
     }
   } else {
     // Image based extension requires to reproject virtual laneline points to
@@ -358,8 +358,7 @@ bool Cipv::FindClosestEdgeOfObjectImage(
 // to decide CIPV.
 bool Cipv::FindClosestEdgeOfObjectGround(
     const std::shared_ptr<base::Object> &object, const EgoLane &egolane_ground,
-    const Eigen::Affine3d world2camera,
-    LineSegment2Df *closted_object_edge) {
+    const Eigen::Affine3d world2camera, LineSegment2Df *closted_object_edge) {
   if (debug_level_ >= 2) {
     AINFO << "object->track_id = " << object->track_id;
   }
@@ -394,9 +393,11 @@ bool Cipv::FindClosestEdgeOfObjectGround(
           << object->camera_supplement.box.xmin << ", "
           << object->camera_supplement.box.ymin << ", "
           << object->camera_supplement.box.xmax -
-             object->camera_supplement.box.xmin << ", "
+                 object->camera_supplement.box.xmin
+          << ", "
           << object->camera_supplement.box.ymax -
-             object->camera_supplement.box.ymin << ");";
+                 object->camera_supplement.box.ymin
+          << ");";
 
     AINFO << "object.center(0) = " << object->center(0) << ";";
     AINFO << "object.center(1) = " << object->center(1) << ";";
@@ -413,8 +414,7 @@ bool Cipv::FindClosestEdgeOfObjectGround(
     AINFO << "theta_ray = " << theta_ray << ";";
     AINFO << "object->camera_supplement.alpha = "
           << object->camera_supplement.alpha << ";";
-    AINFO << "theta = "
-          << theta << ";";
+    AINFO << "theta = " << theta << ";";
     AINFO << "object.anchor_point(0) = " << object->anchor_point(0) << ";";
     AINFO << "object.anchor_point(1) = " << object->anchor_point(1) << ";";
     AINFO << "object.anchor_point(2) = " << object->anchor_point(2) << ";";
@@ -615,7 +615,7 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
   int closest_index = -1;
   // Find closest edge of a given object bounding box
   float b_valid_object = FindClosestEdgeOfObjectGround(
-          object, egolane_ground, world2camera, &closted_object_edge);
+      object, egolane_ground, world2camera, &closted_object_edge);
   if (!b_valid_object) {
     if (debug_level_ >= 1) {
       ADEBUG << "The closest edge of an object is not available";
@@ -722,8 +722,8 @@ bool Cipv::IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
   if (b_image_based_cipv_) {
     return IsObjectInTheLaneImage(object, egolane_image, distance);
   } else {
-    return IsObjectInTheLaneGround(object, egolane_ground,
-                                   world2camera, distance);
+    return IsObjectInTheLaneGround(object, egolane_ground, world2camera,
+                                   distance);
   }
 }
 
@@ -754,8 +754,8 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
   // Get ego lanes (in both image and ground coordinate)
   GetEgoLane(lane_objects, &egolane_image, &egolane_ground, &b_left_valid,
              &b_right_valid);
-  ElongateEgoLane(lane_objects, b_left_valid, b_right_valid,
-    options.yaw_rate, options.velocity, &egolane_image, &egolane_ground);
+  ElongateEgoLane(lane_objects, b_left_valid, b_right_valid, options.yaw_rate,
+                  options.velocity, &egolane_image, &egolane_ground);
 
   float min_distance = std::numeric_limits<float>::max();
   float distance;

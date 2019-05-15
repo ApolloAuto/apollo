@@ -85,9 +85,9 @@ TEST_F(ProceedWithCautionSpeedGeneratorTest, FixedSpeed) {
 
   SpeedData speed_data1;
   SpeedData speed_data2;
-  common::Status process_status = test_obj.Process(
-      path_data_, init_point_, reference_line_, speed_data1,
-      &path_decision_, &speed_data2);
+  common::Status process_status =
+      test_obj.Process(path_data_, init_point_, reference_line_, speed_data1,
+                       &path_decision_, &speed_data2);
   EXPECT_EQ(process_status, common::Status::OK());
 
   int num_speed_points = static_cast<int>(speed_data2.size());

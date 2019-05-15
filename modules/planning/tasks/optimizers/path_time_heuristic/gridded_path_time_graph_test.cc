@@ -133,7 +133,7 @@ TEST_F(DpStGraphTest, simple) {
                           path_data_length, 120, 7.0, &st_graph_debug);
 
   GriddedPathTimeGraph dp_st_graph(st_graph_data_, dp_config_, obstacles_,
-      init_point_);
+                                   init_point_);
 
   SpeedData speed_data;
   auto ret = dp_st_graph.Search(&speed_data);

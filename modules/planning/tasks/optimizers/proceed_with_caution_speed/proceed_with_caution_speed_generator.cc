@@ -41,10 +41,9 @@ ProceedWithCautionSpeedGenerator::ProceedWithCautionSpeedGenerator(
 }
 
 Status ProceedWithCautionSpeedGenerator::Process(
-    const PathData& path_data,
-    const TrajectoryPoint& init_point, const ReferenceLine& reference_line,
-    const SpeedData& reference_speed_data, PathDecision* const path_decision,
-    SpeedData* const speed_data) {
+    const PathData& path_data, const TrajectoryPoint& init_point,
+    const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
+    PathDecision* const path_decision, SpeedData* const speed_data) {
   if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");
     AERROR << msg;

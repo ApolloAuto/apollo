@@ -56,10 +56,10 @@ bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
 }
 }  // namespace
 
-GriddedPathTimeGraph::GriddedPathTimeGraph(const StGraphData& st_graph_data,
-                     const DpStSpeedConfig& dp_config,
-                     const std::vector<const Obstacle*>& obstacles,
-                     const common::TrajectoryPoint& init_point)
+GriddedPathTimeGraph::GriddedPathTimeGraph(
+    const StGraphData& st_graph_data, const DpStSpeedConfig& dp_config,
+    const std::vector<const Obstacle*>& obstacles,
+    const common::TrajectoryPoint& init_point)
     : st_graph_data_(st_graph_data),
       gridded_path_time_graph_config_(dp_config),
       obstacles_(obstacles),
@@ -202,7 +202,8 @@ Status GriddedPathTimeGraph::CalculateTotalCost() {
 }
 
 void GriddedPathTimeGraph::GetRowRange(const StGraphPoint& point,
-    size_t* next_highest_row, size_t* next_lowest_row) {
+                                       size_t* next_highest_row,
+                                       size_t* next_lowest_row) {
   double v0 = 0.0;
   if (!point.pre_point()) {
     v0 = init_point_.v();
@@ -408,18 +409,20 @@ Status GriddedPathTimeGraph::RetrieveSpeedProfile(SpeedData* const speed_data) {
   return Status::OK();
 }
 
-double GriddedPathTimeGraph::CalculateEdgeCost(
-    const STPoint& first, const STPoint& second,
-    const STPoint& third, const STPoint& forth,
-    const double speed_limit, const double soft_speed_limit) {
+double GriddedPathTimeGraph::CalculateEdgeCost(const STPoint& first,
+                                               const STPoint& second,
+                                               const STPoint& third,
+                                               const STPoint& forth,
+                                               const double speed_limit,
+                                               const double soft_speed_limit) {
   return dp_st_cost_.GetSpeedCost(third, forth, speed_limit, soft_speed_limit) +
          dp_st_cost_.GetAccelCostByThreePoints(second, third, forth) +
          dp_st_cost_.GetJerkCostByFourPoints(first, second, third, forth);
 }
 
-double GriddedPathTimeGraph::CalculateEdgeCostForSecondCol(const uint32_t row,
-                                                const double speed_limit,
-                                                const double soft_speed_limit) {
+double GriddedPathTimeGraph::CalculateEdgeCostForSecondCol(
+    const uint32_t row, const double speed_limit,
+    const double soft_speed_limit) {
   double init_speed = init_point_.v();
   double init_acc = init_point_.a();
   const STPoint& pre_point = cost_table_[0][0].point();

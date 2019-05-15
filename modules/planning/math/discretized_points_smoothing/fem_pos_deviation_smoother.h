@@ -48,8 +48,8 @@ struct OsqpSettings {
  * |________________________________________________________ X
  *
  *
- * Given an initial set of points from 0 to k-1,  The goal is to find a set of points
- * which makes the line P(start), P0, P(1) ... P(k-1) "smooth".
+ * Given an initial set of points from 0 to k-1,  The goal is to find a set of
+ * points which makes the line P(start), P0, P(1) ... P(k-1) "smooth".
  */
 
 class FemPosDeviationSmoother {
