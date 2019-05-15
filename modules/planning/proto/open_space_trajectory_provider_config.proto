@@ -50,6 +50,7 @@ message DualVariableConfig {
   optional IpoptSolverConfig ipopt_config = 2;
   optional DualVariableMode qp_format = 3;
   optional double min_safety_distance = 4 [default = 0.0];
+  optional bool debug_osqp = 5 [default = false];
 }
 
 // Distance approach trajectory smoothing configs

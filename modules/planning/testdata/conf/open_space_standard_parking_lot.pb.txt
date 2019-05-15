@@ -38,6 +38,8 @@ dual_variable_warm_start_config : {
     ipopt_alpha_for_y : "min"
     ipopt_recalc_y : "yes"
   }
+  qp_format: OSQP
+  min_safety_distance: 0.0
 }
 
 distance_approach_config : {

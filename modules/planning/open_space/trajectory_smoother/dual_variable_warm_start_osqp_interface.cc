@@ -72,7 +72,7 @@ DualVariableWarmStartOSQPInterface::DualVariableWarmStartOSQPInterface(
           .min_safety_distance();
   check_mode_ =
       planner_open_space_config.dual_variable_warm_start_config()
-          .check_osqp();
+          .debug_osqp();
 }
 
 void printMatrix(const int r, const int c,
