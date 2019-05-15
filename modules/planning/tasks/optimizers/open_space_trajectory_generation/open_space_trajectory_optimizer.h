@@ -101,6 +101,9 @@ class OpenSpaceTrajectoryOptimizer {
                       const Eigen::MatrixXd& control_result_ds,
                       const Eigen::MatrixXd& time_result_ds);
 
+  void LoadHybridAstarResultInEigen(HybridAStartResult* result,
+                                    Eigen::MatrixXd* xWS, Eigen::MatrixXd* uWS);
+
   void UseWarmStartAsResult(
       const Eigen::MatrixXd& xWS, const Eigen::MatrixXd& uWS,
       const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up,
@@ -116,6 +119,22 @@ class OpenSpaceTrajectoryOptimizer {
       const std::vector<std::vector<common::math::Vec2d>>&
           obstacles_vertices_vec,
       const Eigen::MatrixXd& last_time_u, const double init_v,
+      Eigen::MatrixXd* state_result_ds, Eigen::MatrixXd* control_result_ds,
+      Eigen::MatrixXd* time_result_ds, Eigen::MatrixXd* l_warm_up,
+      Eigen::MatrixXd* n_warm_up, Eigen::MatrixXd* dual_l_result_ds,
+      Eigen::MatrixXd* dual_n_result_ds);
+
+  void CombineTrajectories(
+      const std::vector<Eigen::MatrixXd>& xWS_vec,
+      const std::vector<Eigen::MatrixXd>& uWS_vec,
+      const std::vector<Eigen::MatrixXd>& state_result_ds_vec,
+      const std::vector<Eigen::MatrixXd>& control_result_ds_vec,
+      const std::vector<Eigen::MatrixXd>& time_result_ds_vec,
+      const std::vector<Eigen::MatrixXd>& l_warm_up_vec,
+      const std::vector<Eigen::MatrixXd>& n_warm_up_vec,
+      const std::vector<Eigen::MatrixXd>& dual_l_result_ds_vec,
+      const std::vector<Eigen::MatrixXd>& dual_n_result_ds_vec,
+      Eigen::MatrixXd* xWS, Eigen::MatrixXd* uWS,
       Eigen::MatrixXd* state_result_ds, Eigen::MatrixXd* control_result_ds,
       Eigen::MatrixXd* time_result_ds, Eigen::MatrixXd* l_warm_up,
       Eigen::MatrixXd* n_warm_up, Eigen::MatrixXd* dual_l_result_ds,
