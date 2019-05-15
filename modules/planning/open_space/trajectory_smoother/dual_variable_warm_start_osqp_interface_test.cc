@@ -101,61 +101,39 @@ TEST_F(DualVariableWarmStartOSQPInterfaceTest, optimize) {
   Ipopt::SmartPtr<Ipopt::TNLP> problem = pt_gt_;
   // Create an instance of the IpoptApplication
   Ipopt::SmartPtr<Ipopt::IpoptApplication> app = IpoptApplicationFactory();
+  auto ipopt_config_tmp =
+      planner_open_space_config_.dual_variable_warm_start_config()
+          .ipopt_config();
 
   app->Options()->SetIntegerValue(
-      "print_level",
-      planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .ipopt_print_level());
+      "print_level", ipopt_config_tmp.ipopt_print_level());
   app->Options()->SetIntegerValue(
-      "mumps_mem_percent",
-      planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .mumps_mem_percent());
+      "mumps_mem_percent", ipopt_config_tmp.mumps_mem_percent());
   app->Options()->SetNumericValue(
-      "mumps_pivtol",
-      planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .mumps_pivtol());
+      "mumps_pivtol", ipopt_config_tmp.mumps_pivtol());
   app->Options()->SetIntegerValue(
-      "max_iter", planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .ipopt_max_iter());
+      "max_iter", ipopt_config_tmp.ipopt_max_iter());
   app->Options()->SetNumericValue(
-      "tol", planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .ipopt_tol());
+      "tol", ipopt_config_tmp.ipopt_tol());
   app->Options()->SetNumericValue(
       "acceptable_constr_viol_tol",
-      planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .ipopt_acceptable_constr_viol_tol());
+      ipopt_config_tmp.ipopt_acceptable_constr_viol_tol());
   app->Options()->SetNumericValue(
       "min_hessian_perturbation",
-      planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .ipopt_min_hessian_perturbation());
+      ipopt_config_tmp.ipopt_min_hessian_perturbation());
   app->Options()->SetNumericValue(
       "jacobian_regularization_value",
-      planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .ipopt_jacobian_regularization_value());
+      ipopt_config_tmp.ipopt_jacobian_regularization_value());
   app->Options()->SetStringValue(
       "print_timing_statistics",
-      planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .ipopt_print_timing_statistics());
+      ipopt_config_tmp.ipopt_print_timing_statistics());
   app->Options()->SetStringValue(
       "alpha_for_y",
-      planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .ipopt_alpha_for_y());
+      ipopt_config_tmp.ipopt_alpha_for_y());
   app->Options()->SetStringValue(
-      "recalc_y", planner_open_space_config_.dual_variable_warm_start_config()
-          .ipopt_config()
-          .ipopt_recalc_y());
-
+      "recalc_y", ipopt_config_tmp.ipopt_recalc_y());
   app->Options()->SetStringValue("mehrotra_algorithm", "yes");
+
   app->Initialize();
   app->OptimizeTNLP(problem);
 

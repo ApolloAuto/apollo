@@ -381,7 +381,7 @@ bool DistanceApproachIPOPTFixedTsInterface::get_starting_point(
   if (enable_constraint_check_) {
     int kM = m;
     double g[kM];
-    AINFO << "initial points constraint checking";
+    ADEBUG << "initial points constraint checking";
     eval_constraints(n, x, m, g);
     check_g(n, x, m, g);
   }

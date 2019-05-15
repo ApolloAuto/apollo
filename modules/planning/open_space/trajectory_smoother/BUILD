@@ -278,7 +278,9 @@ cc_test(
     ],
     deps = [
         ":dual_variable_warm_start_osqp_interface",
+        ":dual_variable_warm_start_ipopt_qp_interface",
         "@gtest//:main",
+        "@ipopt",
     ],
 )
 

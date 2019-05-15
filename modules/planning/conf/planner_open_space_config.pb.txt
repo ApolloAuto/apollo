@@ -40,6 +40,7 @@ dual_variable_warm_start_config {
   }
   qp_format: OSQP
   min_safety_distance: 0.0
+  debug_osqp: false
 }
 distance_approach_config {
   weight_steer: 0.3

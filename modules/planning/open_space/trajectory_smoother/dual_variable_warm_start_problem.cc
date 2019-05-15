@@ -57,6 +57,7 @@ bool DualVariableWarmStartProblem::Solve(
       auto t_end = cyber::Time::Now().ToSecond();
       ADEBUG << "Dual variable warm start solving time in second : "
              << t_end - t_start;
+
       return true;
     }
 
