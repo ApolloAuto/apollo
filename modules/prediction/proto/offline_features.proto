@@ -21,6 +21,7 @@ message DataForLearning {
   optional double timestamp = 2;
   // The features for learning algorithms:
   repeated double features_for_learning = 3;
+  repeated string string_features_for_learning = 7;
   // The ground-truth labels:
   repeated double labels = 4;
   // The lane sequence id if associated with a lane
