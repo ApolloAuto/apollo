@@ -48,8 +48,7 @@ PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
 bool PathTimeHeuristicOptimizer::SearchStGraph(SpeedData* speed_data) const {
   GriddedPathTimeGraph st_graph(
       reference_line_info_->st_graph_data(), dp_st_speed_config_,
-      reference_line_info_->path_decision()->obstacles().Items(), init_point_,
-      adc_sl_boundary_);
+      reference_line_info_->path_decision()->obstacles().Items(), init_point_);
 
   if (!st_graph.Search(speed_data).ok()) {
     AERROR << "failed to search graph with dynamic programming.";
@@ -59,12 +58,11 @@ bool PathTimeHeuristicOptimizer::SearchStGraph(SpeedData* speed_data) const {
 }
 
 Status PathTimeHeuristicOptimizer::Process(
-    const SLBoundary& adc_sl_boundary, const PathData& path_data,
+    const PathData& path_data,
     const common::TrajectoryPoint& init_point,
     const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
     PathDecision* const path_decision, SpeedData* const speed_data) {
   init_point_ = init_point;
-  adc_sl_boundary_ = adc_sl_boundary;
 
   if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");

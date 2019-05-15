@@ -33,12 +33,12 @@ class SpeedOptimizer : public Task {
   explicit SpeedOptimizer(const TaskConfig& config);
 
   virtual ~SpeedOptimizer() = default;
-  apollo::common::Status Execute(
+  common::Status Execute(
       Frame* frame, ReferenceLineInfo* reference_line_info) override;
 
  protected:
-  virtual apollo::common::Status Process(
-      const SLBoundary& adc_sl_boundary, const PathData& path_data,
+  virtual common::Status Process(
+      const PathData& path_data,
       const common::TrajectoryPoint& init_point,
       const ReferenceLine& reference_line,
       const SpeedData& reference_speed_data, PathDecision* const path_decision,

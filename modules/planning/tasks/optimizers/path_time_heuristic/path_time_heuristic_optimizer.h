@@ -40,8 +40,7 @@ class PathTimeHeuristicOptimizer : public SpeedOptimizer {
   explicit PathTimeHeuristicOptimizer(const TaskConfig& config);
 
  private:
-  common::Status Process(const SLBoundary& adc_sl_boundary,
-                         const PathData& path_data,
+  common::Status Process(const PathData& path_data,
                          const common::TrajectoryPoint& init_point,
                          const ReferenceLine& reference_line,
                          const SpeedData& reference_speed_data,

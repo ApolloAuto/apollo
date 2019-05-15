@@ -32,9 +32,8 @@ class PiecewiseJerkSpeedOptimizer : public SpeedOptimizer {
   virtual ~PiecewiseJerkSpeedOptimizer() = default;
 
  private:
-  common::Status Process(const SLBoundary& adc_sl_boundary,
-                         const PathData& path_data,
-                         const apollo::common::TrajectoryPoint& init_point,
+  common::Status Process(const PathData& path_data,
+                         const common::TrajectoryPoint& init_point,
                          const ReferenceLine& reference_line,
                          const SpeedData& reference_speed_data,
                          PathDecision* const path_decision,

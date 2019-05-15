@@ -46,8 +46,7 @@ class GriddedPathTimeGraph {
   GriddedPathTimeGraph(const StGraphData& st_graph_data,
       const DpStSpeedConfig& dp_config,
       const std::vector<const Obstacle*>& obstacles,
-      const common::TrajectoryPoint& init_point,
-      const SLBoundary& adc_sl_boundary);
+      const common::TrajectoryPoint& init_point);
 
   common::Status Search(SpeedData* const speed_data);
 
@@ -85,7 +84,7 @@ class GriddedPathTimeGraph {
   const StGraphData& st_graph_data_;
 
   // dp st configuration
-  DpStSpeedConfig dp_st_speed_config_;
+  DpStSpeedConfig gridded_path_time_graph_config_;
 
   // obstacles based on the current reference line
   const std::vector<const Obstacle*>& obstacles_;
@@ -99,8 +98,6 @@ class GriddedPathTimeGraph {
 
   // cost utility with configuration;
   DpStCost dp_st_cost_;
-
-  const SLBoundary& adc_sl_boundary_;
 
   double unit_s_ = 0.0;
   double unit_t_ = 0.0;

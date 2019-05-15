@@ -44,12 +44,11 @@ namespace {
 
 bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
                              const StGraphPoint& p1, const StGraphPoint& p2) {
-  const common::math::LineSegment2d seg(p1.point(), p2.point());
   for (const auto* boundary : boundaries) {
     if (boundary->boundary_type() == STBoundary::BoundaryType::KEEP_CLEAR) {
       continue;
     }
-    if (boundary->HasOverlap(seg)) {
+    if (boundary->HasOverlap({p1.point(), p2.point()})) {
       return true;
     }
   }
@@ -60,19 +59,17 @@ bool CheckOverlapOnDpStGraph(const std::vector<const STBoundary*>& boundaries,
 GriddedPathTimeGraph::GriddedPathTimeGraph(const StGraphData& st_graph_data,
                      const DpStSpeedConfig& dp_config,
                      const std::vector<const Obstacle*>& obstacles,
-                     const common::TrajectoryPoint& init_point,
-                     const SLBoundary& adc_sl_boundary)
+                     const common::TrajectoryPoint& init_point)
     : st_graph_data_(st_graph_data),
-      dp_st_speed_config_(dp_config),
+      gridded_path_time_graph_config_(dp_config),
       obstacles_(obstacles),
       init_point_(init_point),
       dp_st_cost_(dp_config, st_graph_data_.total_time_by_conf(), obstacles,
-                  init_point_),
-      adc_sl_boundary_(adc_sl_boundary) {
+                  init_point_) {
   unit_s_ = st_graph_data_.path_length() /
-            (dp_st_speed_config_.matrix_dimension_s() - 1);
+            (gridded_path_time_graph_config_.matrix_dimension_s() - 1);
   unit_t_ = st_graph_data_.total_time_by_conf() /
-            (dp_st_speed_config_.matrix_dimension_t() - 1);
+            (gridded_path_time_graph_config_.matrix_dimension_t() - 1);
 }
 
 Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
@@ -86,7 +83,7 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
          std::fabs(boundary->min_s()) < kBounadryEpsilon)) {
       std::vector<SpeedPoint> speed_profile;
       double t = 0.0;
-      for (int i = 0; i <= dp_st_speed_config_.matrix_dimension_t();
+      for (int i = 0; i <= gridded_path_time_graph_config_.matrix_dimension_t();
            ++i, t += unit_t_) {
         SpeedPoint speed_point;
         speed_point.set_s(0.0);
@@ -138,8 +135,8 @@ Status GriddedPathTimeGraph::Search(SpeedData* const speed_data) {
 }
 
 Status GriddedPathTimeGraph::InitCostTable() {
-  uint32_t dim_s = dp_st_speed_config_.matrix_dimension_s();
-  uint32_t dim_t = dp_st_speed_config_.matrix_dimension_t();
+  uint32_t dim_s = gridded_path_time_graph_config_.matrix_dimension_s();
+  uint32_t dim_t = gridded_path_time_graph_config_.matrix_dimension_t();
   DCHECK_GT(dim_s, 2);
   DCHECK_GT(dim_t, 2);
   cost_table_ = std::vector<std::vector<StGraphPoint>>(
@@ -264,8 +261,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
 
   if (c == 1) {
     const double acc = (r * unit_s_ / unit_t_ - init_point_.v()) / unit_t_;
-    if (acc < dp_st_speed_config_.max_deceleration() ||
-        acc > dp_st_speed_config_.max_acceleration()) {
+    if (acc < gridded_path_time_graph_config_.max_deceleration() ||
+        acc > gridded_path_time_graph_config_.max_acceleration()) {
       return;
     }
 
@@ -292,8 +289,8 @@ void GriddedPathTimeGraph::CalculateCostAt(
     for (uint32_t r_pre = r_low; r_pre <= r; ++r_pre) {
       const double acc =
           (r * unit_s_ - 2 * r_pre * unit_s_) / (unit_t_ * unit_t_);
-      if (acc < dp_st_speed_config_.max_deceleration() ||
-          acc > dp_st_speed_config_.max_acceleration()) {
+      if (acc < gridded_path_time_graph_config_.max_deceleration() ||
+          acc > gridded_path_time_graph_config_.max_acceleration()) {
         continue;
       }
 
