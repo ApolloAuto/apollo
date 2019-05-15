@@ -391,9 +391,7 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   ADEBUG << "end_s: " << result->accumulated_s[x_size - 1] << " " << 0.0 << " "
          << 0.0;
 
-  const size_t num_of_knots = x_size - 1;
-
-  PiecewiseJerkSpeedProblem path_time_qp(num_of_knots, delta_t_, init_s);
+  PiecewiseJerkSpeedProblem path_time_qp(x_size, delta_t_, init_s);
   auto s_curve_config =
       planner_open_space_config_.warm_start_config().s_curve_config();
   path_time_qp.set_weight_ddx(s_curve_config.acc_weight());
