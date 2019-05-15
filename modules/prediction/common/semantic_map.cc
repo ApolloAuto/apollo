@@ -38,9 +38,8 @@ void SemanticMap::Init() {
     base_img_ = cv::imread(semantic_map_path, CV_LOAD_IMAGE_COLOR);
     AINFO << "Load semantic_map from: " << semantic_map_path;
   }
-  const std::string config_path =
-      apollo::common::util::StrCat(FLAGS_map_dir,
-                                   "/semantic_map_config.pb.txt");
+  const std::string config_path = apollo::common::util::StrCat(
+      FLAGS_map_dir, "/semantic_map_config.pb.txt");
   cyber::common::GetProtoFromFile(config_path, &config_);
   curr_img_ = cv::Mat(2000, 2000, CV_8UC3, cv::Scalar(0, 0, 0));
 }
@@ -52,12 +51,13 @@ void SemanticMap::RunCurrFrame(
   curr_timestamp_ = ego_feature.timestamp();
   curr_base_x_ = ego_feature.position().x() - config_.observation_range();
   curr_base_y_ = ego_feature.position().y() - config_.observation_range();
-  cv::Rect rect(
-      static_cast<int>((curr_base_x_ - config_.base_point().x()) /
-                       config_.resolution()),
-      static_cast<int>(config_.dim_y() -
-                       (curr_base_y_ - config_.base_point().y()) /
-                       config_.resolution()) - 2000, 2000, 2000);
+  cv::Rect rect(static_cast<int>((curr_base_x_ - config_.base_point().x()) /
+                                 config_.resolution()),
+                static_cast<int>(config_.dim_y() -
+                                 (curr_base_y_ - config_.base_point().y()) /
+                                     config_.resolution()) -
+                    2000,
+                2000, 2000);
   base_img_(rect).copyTo(curr_img_);
 
   // Draw all obstacles_history

@@ -101,8 +101,7 @@ class Cipv {
   // Get closest edge of an object in ground coordinate
   bool FindClosestEdgeOfObjectGround(
       const std::shared_ptr<base::Object> &object,
-      const EgoLane &egolane_ground,
-      const Eigen::Affine3d world2camera,
+      const EgoLane &egolane_ground, const Eigen::Affine3d world2camera,
       LineSegment2Df *closted_object_edge);
 
   // Check if the distance between lane and object are OK
@@ -131,8 +130,7 @@ class Cipv {
   bool IsObjectInTheLane(const std::shared_ptr<base::Object> &object,
                          const EgoLane &egolane_image,
                          const EgoLane &egolane_ground,
-                         const Eigen::Affine3d world2camera,
-                         float *distance);
+                         const Eigen::Affine3d world2camera, float *distance);
 
   // Check if a point is left of a line segment
   bool IsPointLeftOfLine(const Point2Df &point,

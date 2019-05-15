@@ -127,8 +127,8 @@ bool FemPosDeviationSmoother::Optimize(const OsqpSettings& solver_settings) {
 }
 
 void FemPosDeviationSmoother::CalculateKernel(std::vector<c_float>* P_data,
-                                               std::vector<c_int>* P_indices,
-                                               std::vector<c_int>* P_indptr) {
+                                              std::vector<c_int>* P_indices,
+                                              std::vector<c_int>* P_indptr) {
   CHECK_GT(num_of_variables_, 4);
 
   // Three quadratic penalties are involved:

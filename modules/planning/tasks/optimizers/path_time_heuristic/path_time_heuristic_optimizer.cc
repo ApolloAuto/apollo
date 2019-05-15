@@ -26,8 +26,8 @@
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/planning_gflags.h"
 #include "modules/planning/common/st_graph_data.h"
-#include "modules/planning/tasks/optimizers/path_time_heuristic/gridded_path_time_graph.h"
 #include "modules/planning/proto/planning_internal.pb.h"
+#include "modules/planning/tasks/optimizers/path_time_heuristic/gridded_path_time_graph.h"
 
 namespace apollo {
 namespace planning {
@@ -58,8 +58,7 @@ bool PathTimeHeuristicOptimizer::SearchStGraph(SpeedData* speed_data) const {
 }
 
 Status PathTimeHeuristicOptimizer::Process(
-    const PathData& path_data,
-    const common::TrajectoryPoint& init_point,
+    const PathData& path_data, const common::TrajectoryPoint& init_point,
     const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
     PathDecision* const path_decision, SpeedData* const speed_data) {
   init_point_ = init_point;
