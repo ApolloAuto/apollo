@@ -94,6 +94,9 @@ function check_esd_files() {
 function generate_build_targets() {
   COMMON_TARGETS="//cyber/... union //modules/common/kv_db/... union //modules/dreamview/..."
   case $BUILD_FILTER in
+  cyber)
+    BUILD_TARGETS=`bazel query //cyber/...`
+    ;;
   control)
     BUILD_TARGETS=`bazel query $COMMON_TARGETS union //modules/control/... `
     ;;
@@ -158,10 +161,18 @@ function build() {
   build_py_proto
 
   # Clear KV DB and update commit_id after compiling.
-  rm -fr data/kv_db*
-  REVISION=$(get_revision)
-  ./bazel-bin/modules/common/kv_db/kv_db_tool --op=put \
-      --key="apollo:data:commit_id" --value="$REVISION"
+  if [ "$BUILD_FILTER" == 'cyber' ]; then
+    info "Skipping revision recording"
+  else
+    bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
+    if [ ${PIPESTATUS[0]} -ne 0 ]; then
+      fail 'Build failed!'
+    fi
+    rm -fr data/kv_db*
+    REVISION=$(get_revision)
+    ./bazel-bin/modules/common/kv_db/kv_db_tool --op=put \
+        --key="apollo:data:commit_id" --value="$REVISION"
+  fi
 
   if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
     cd /apollo-simulator && bash build.sh build
@@ -736,6 +747,10 @@ function main() {
         shift
         apollo_build_dbg $@
       fi
+      ;;
+    build_cyber)
+      BUILD_FILTER="cyber"
+      apollo_build_dbg $@
       ;;
     build_control)
       BUILD_FILTER="control"
