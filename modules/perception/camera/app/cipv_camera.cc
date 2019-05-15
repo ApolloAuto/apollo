@@ -257,7 +257,8 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
                                   &egolane_ground->left_line,
                                   &egolane_ground->right_line);
     if (debug_level_ >= 2) {
-      AINFO << "Made both lane_objects";
+      AINFO << "Made both lane_objects with size of "
+            << egolane_ground->left_line.line_point.size();
     }
   }
 
@@ -265,7 +266,7 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
 }
 
 // Get closest edge of an object in image coordinate
-bool Cipv::FindClosestEdgeOfObjectImage(
+bool Cipv::FindClosestObjectImage(
     const std::shared_ptr<base::Object> &object, const EgoLane &egolane_image,
     LineSegment2Df *closted_object_edge) {
   float size_x = object->size(0);
@@ -356,9 +357,10 @@ bool Cipv::FindClosestEdgeOfObjectImage(
 // Get closest edge of an object in ground coordinate
 // TODO(techoe): This function should be changed to find min-y and max-y edges
 // to decide CIPV.
-bool Cipv::FindClosestEdgeOfObjectGround(
+bool Cipv::FindClosestObjectGround(
     const std::shared_ptr<base::Object> &object, const EgoLane &egolane_ground,
-    const Eigen::Affine3d world2camera, LineSegment2Df *closted_object_edge) {
+    const Eigen::Affine3d world2camera, LineSegment2Df *closted_object_edge,
+    float *distance) {
   if (debug_level_ >= 2) {
     AINFO << "object->track_id = " << object->track_id;
   }
@@ -454,48 +456,54 @@ bool Cipv::FindClosestEdgeOfObjectGround(
   }
 
   float closest_x = kMaxFloat;
-  float second_closest_x = kMaxFloat - 1.0f;
+  float left_y = kMaxFloat;
+  float right_y = -kMaxFloat;
   int32_t closest_index = -1;
-  int32_t second_closest_index = -1;
+  int32_t left_index = -1;
+  int32_t right_index = -1;
   for (int32_t i = 0; i < 4; i++) {
-    if (p[i](0) <= closest_x) {
-      second_closest_index = closest_index;
-      second_closest_x = closest_x;
+    if (p[i](1) <= left_y) {
+      left_index = i;
+      left_y = p[i](1);
+    }
+    if (p[i](1) > right_y) {
+      right_index = i;
+      right_y = p[i](1);
+    }
+    if (p[i](0) < closest_x) {
       closest_index = i;
       closest_x = p[i](0);
-    } else if (p[i](0) <= second_closest_x) {
-      second_closest_index = i;
-      second_closest_x = p[i](0);
     }
   }
-  if (closest_index < 0 || second_closest_index < 0) {
+
+  if (left_index < 0 || right_index < 0 ||
+      left_index == right_index) {
     return false;
   }
 
-  if (p[closest_index](1) >= p[second_closest_index](1)) {
-    closted_object_edge->start_point(0) = p[closest_index](0);
-    closted_object_edge->start_point(1) = p[closest_index](1);
+  closted_object_edge->start_point(0) = p[right_index](0);
+  closted_object_edge->start_point(1) = p[right_index](1);
 
-    closted_object_edge->end_point(0) = p[second_closest_index](0);
-    closted_object_edge->end_point(1) = p[second_closest_index](1);
-  } else {
-    closted_object_edge->start_point(0) = p[second_closest_index](0);
-    closted_object_edge->start_point(1) = p[second_closest_index](1);
-
-    closted_object_edge->end_point(0) = p[closest_index](0);
-    closted_object_edge->end_point(1) = p[closest_index](1);
-  }
+  closted_object_edge->end_point(0) = p[left_index](0);
+  closted_object_edge->end_point(1) = p[left_index](1);
 
   // Added filter to consider an object only in front of ego-car.
-  if (p[closest_index](0) < 0) {
+  if ((p[left_index](0) < 0 && p[right_index](0) < 0) ||
+      (p[closest_index](0) < 0)) {
     return false;
   }
 
+  *distance = static_cast<float>(sqrt(
+    p[closest_index](0) * p[closest_index](0) +
+    p[closest_index](1) * p[closest_index](1)));
   if (debug_level_ >= 2) {
     AINFO << "start(" << closted_object_edge->start_point(0) << ", "
           << closted_object_edge->start_point(1) << ")->";
     AINFO << "end(" << closted_object_edge->end_point(0) << ", "
           << closted_object_edge->end_point(1) << ")";
+    AINFO << "closest distance to p[" << closest_index << "]("
+          << p[closest_index](0) << ", "
+          << p[closest_index](1) << "): " << *distance;
   }
   return true;
 }
@@ -614,14 +622,15 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
 
   int closest_index = -1;
   // Find closest edge of a given object bounding box
-  float b_valid_object = FindClosestEdgeOfObjectGround(
-      object, egolane_ground, world2camera, &closted_object_edge);
+  float b_valid_object = FindClosestObjectGround(
+      object, egolane_ground, world2camera, &closted_object_edge, &distance);
   if (!b_valid_object) {
     if (debug_level_ >= 1) {
       ADEBUG << "The closest edge of an object is not available";
     }
     return false;
   }
+  *object_distance = distance;
 
   if (debug_level_ >= 3) {
     AINFO << "egolane_ground.left_line.line_point.size(): "
@@ -707,9 +716,6 @@ bool Cipv::IsObjectInTheLaneGround(const std::shared_ptr<base::Object> &object,
     }
   }
 
-  *object_distance = std::min(closted_object_edge.start_point(0),
-                              closted_object_edge.end_point(0));
-
   return (b_left_lane_clear && b_right_lane_clear);
 }
 
@@ -735,7 +741,7 @@ bool Cipv::DetermineCipv(const std::vector<base::LaneLine> &lane_objects,
                          std::vector<std::shared_ptr<base::Object>> *objects) {
   if (debug_level_ >= 3) {
     AINFO << "Cipv Got SensorObjects with size of " << objects->size();
-    AINFO << "Cipv Got lane object with size of" << lane_objects.size();
+    AINFO << "Cipv Got lane object with size of " << lane_objects.size();
   }
 
   // float yaw_rate = options.yaw_rate;
