@@ -39,4 +39,4 @@ fi
     --prediction_offline_bags=${SRC_DIR} \
     --prediction_data_dir=${TARGET_DIR} \
     --max_num_dump_feature=1000 \
-    --enable_build_current_frame_env
+    --enable_semantic_map

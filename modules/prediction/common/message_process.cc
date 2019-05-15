@@ -168,8 +168,10 @@ void MessageProcess::OnPerception(
 
   // Make evaluations
   EvaluatorManager::Instance()->Run();
-
-  if (FLAGS_prediction_offline_mode == 2) {
+  // TODO(kechxu) reorder the offline mode indices
+  // TODO(kechxu) use prediction constants to name the magic numbers
+  if (FLAGS_prediction_offline_mode == 2 ||
+      FLAGS_prediction_offline_mode == 4) {
     return;
   }
   // Make predictions
