@@ -64,6 +64,9 @@ class LaneScanningEvaluator : public Evaluator {
                        const LaneGraph* lane_graph_ptr,
                        std::vector<double>* feature_values);
 
+  bool ExtractStringFeatures(const LaneGraph& lane_graph,
+      std::vector<std::string>* const string_feature_values);
+
   /**
    * @brief Get the name of evaluator.
    */
@@ -98,10 +101,10 @@ class LaneScanningEvaluator : public Evaluator {
       Feature* feature_ptr);
 
  private:
-  static const size_t OBSTACLE_FEATURE_SIZE = 5 * 9;
+  static const size_t OBSTACLE_FEATURE_SIZE = 20 * 9;
   static const size_t INTERACTION_FEATURE_SIZE = 8;
   static const size_t SINGLE_LANE_FEATURE_SIZE = 4;
-  static const size_t LANE_POINTS_SIZE = 100;  // (100 * 0.2m = 20m)
+  static const size_t LANE_POINTS_SIZE = 100;  // (100 * 0.5m = 50m)
   static const size_t MAX_NUM_LANE = 10;
   static const size_t SHORT_TERM_TRAJECTORY_SIZE = 10;
 

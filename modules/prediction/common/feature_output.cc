@@ -88,7 +88,7 @@ void FeatureOutput::InsertFeatureProto(const Feature& feature) {
 void FeatureOutput::InsertDataForLearning(
     const Feature& feature, const std::vector<double>& feature_values,
     const std::string& category, const LaneSequence* lane_sequence_ptr) {
-  std::vector<std::string> dummy_string_feature_values;
+  const std::vector<std::string> dummy_string_feature_values;
   InsertDataForLearning(feature, feature_values, dummy_string_feature_values,
                         category, lane_sequence_ptr);
 }
@@ -101,13 +101,10 @@ void FeatureOutput::InsertDataForLearning(const Feature& feature,
       list_data_for_learning_.add_data_for_learning();
   data_for_learning->set_id(feature.id());
   data_for_learning->set_timestamp(feature.timestamp());
-  for (size_t i = 0; i < feature_values.size(); ++i) {
-    data_for_learning->add_features_for_learning(feature_values[i]);
-  }
-  for (size_t i = 0; i < string_feature_values.size(); ++i) {
-    data_for_learning->add_string_features_for_learning(
-        string_feature_values[i]);
-  }
+  *(data_for_learning->mutable_features_for_learning()) = {
+      feature_values.begin(), feature_values.end()};
+  *(data_for_learning->mutable_string_features_for_learning()) = {
+      string_feature_values.begin(), string_feature_values.end()};
   data_for_learning->set_category(category);
   ADEBUG << "Insert [" << category
          << "] data for learning with size = " << feature_values.size();
