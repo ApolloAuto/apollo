@@ -842,13 +842,13 @@ std::vector<ObstacleEdge> PathBoundsDecider::SortObstaclesForSweepLine(
     // start_s; the other at end_s.
     const auto obstacle_sl = obstacle->PerceptionSLBoundary();
     sorted_obstacles.emplace_back(
-        1, obstacle_sl.start_s() - kObstacleStartSBuffer,
-        obstacle_sl.start_l() - kObstacleLBuffer,
-        obstacle_sl.end_l() + kObstacleLBuffer, obstacle->Id());
-    sorted_obstacles.emplace_back(0, obstacle_sl.end_s() + kObstacleEndSBuffer,
-                                  obstacle_sl.start_l() - kObstacleLBuffer,
-                                  obstacle_sl.end_l() + kObstacleLBuffer,
-                                  obstacle->Id());
+        1, obstacle_sl.start_s() - FLAGS_obstacle_lon_start_buffer,
+        obstacle_sl.start_l() - FLAGS_obstacle_lat_buffer,
+        obstacle_sl.end_l() + FLAGS_obstacle_lat_buffer, obstacle->Id());
+    sorted_obstacles.emplace_back(
+        0, obstacle_sl.end_s() + FLAGS_obstacle_lon_end_buffer,
+        obstacle_sl.start_l() - FLAGS_obstacle_lat_buffer,
+        obstacle_sl.end_l() + FLAGS_obstacle_lat_buffer, obstacle->Id());
   }
 
   // Sort.

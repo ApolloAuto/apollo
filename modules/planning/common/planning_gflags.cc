@@ -272,6 +272,15 @@ DEFINE_double(virtual_stop_wall_length, 0.1,
 DEFINE_double(virtual_stop_wall_height, 2.0,
               "virtual stop wall height (meters)");
 
+DEFINE_double(obstacle_lat_buffer, 0.4,
+              "obstacle lateral buffer (meters) for deciding path boundaries");
+DEFINE_double(obstacle_lon_start_buffer, 3.0,
+              "obstacle longitudinal start buffer (meters) for deciding "
+              "path boundaries");
+DEFINE_double(obstacle_lon_end_buffer, 2.0,
+              "obstacle longitudinal end buffer (meters) for deciding "
+              "path boundaries");
+
 // Prediction Part
 DEFINE_double(prediction_total_time, 5.0, "Total prediction time");
 DEFINE_bool(align_prediction_time, false,
