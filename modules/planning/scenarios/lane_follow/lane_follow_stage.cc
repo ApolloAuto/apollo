@@ -131,10 +131,10 @@ Stage::StageStatus LaneFollowStage::Process(
             LaneChangeDecider::IsClearToChangeLane(&reference_line_info)) {
           has_drivable_reference_line = true;
           reference_line_info.SetDrivable(true);
-          AERROR << "\tclear for lane change";
+          ADEBUG << "\tclear for lane change";
         } else {
           reference_line_info.SetDrivable(false);
-          AERROR << "\tlane change failed";
+          ADEBUG << "\tlane change failed";
         }
       } else {
         ADEBUG << "reference line is NOT lane change ref.";
