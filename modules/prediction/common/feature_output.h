@@ -63,8 +63,8 @@ class FeatureOutput {
                                     const std::string& category,
                                     const LaneSequence* lane_sequence_ptr);
 
-  static void InsertDataForLearning(const Feature& feature,
-      const std::vector<double>& feature_values,
+  static void InsertDataForLearning(
+      const Feature& feature, const std::vector<double>& feature_values,
       const std::vector<std::string>& string_feature_values,
       const std::string& category, const LaneSequence* lane_sequence_ptr);
 

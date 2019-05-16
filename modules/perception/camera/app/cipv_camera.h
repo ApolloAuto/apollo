@@ -95,14 +95,15 @@ class Cipv {
 
   // Get closest edge of an object in image coordinate
   bool FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
-                                    const EgoLane &egolane_image,
-                                    LineSegment2Df *closted_object_edge);
+                              const EgoLane &egolane_image,
+                              LineSegment2Df *closted_object_edge);
 
   // Get closest edge of an object in ground coordinate
-  bool FindClosestObjectGround(
-      const std::shared_ptr<base::Object> &object,
-      const EgoLane &egolane_ground, const Eigen::Affine3d world2camera,
-      LineSegment2Df *closted_object_edge, float *distance);
+  bool FindClosestObjectGround(const std::shared_ptr<base::Object> &object,
+                               const EgoLane &egolane_ground,
+                               const Eigen::Affine3d world2camera,
+                               LineSegment2Df *closted_object_edge,
+                               float *distance);
 
   // Check if the distance between lane and object are OK
   bool AreDistancesSane(const float distance_start_point_to_right_lane,

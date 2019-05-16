@@ -162,8 +162,8 @@ common::Status OpenSpaceTrajectoryOptimizer::Plan(
               init_v, &state_result_ds_vec[i], &control_result_ds_vec[i],
               &time_result_ds_vec[i], &l_warm_up_vec[i], &n_warm_up_vec[i],
               &dual_l_result_ds_vec[i], &dual_n_result_ds_vec[i])) {
-        ADEBUG << "Smoother fail at " << i <<"th trajectory";
-        ADEBUG << i <<"th trajectory size is " << xWS_vec[i].cols();
+        ADEBUG << "Smoother fail at " << i << "th trajectory";
+        ADEBUG << i << "th trajectory size is " << xWS_vec[i].cols();
         return Status(ErrorCode::PLANNING_ERROR,
                       "distance approach smoothing problem failed to solve");
       }

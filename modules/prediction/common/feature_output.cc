@@ -93,10 +93,10 @@ void FeatureOutput::InsertDataForLearning(
                         category, lane_sequence_ptr);
 }
 
-void FeatureOutput::InsertDataForLearning(const Feature& feature,
-      const std::vector<double>& feature_values,
-      const std::vector<std::string>& string_feature_values,
-      const std::string& category, const LaneSequence* lane_sequence_ptr) {
+void FeatureOutput::InsertDataForLearning(
+    const Feature& feature, const std::vector<double>& feature_values,
+    const std::vector<std::string>& string_feature_values,
+    const std::string& category, const LaneSequence* lane_sequence_ptr) {
   DataForLearning* data_for_learning =
       list_data_for_learning_.add_data_for_learning();
   data_for_learning->set_id(feature.id());

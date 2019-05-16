@@ -414,7 +414,7 @@ int main(int argc, char** argv) {
       return -1;
     }
     if (opt_output_vec.size() > 1) {
-      std::cout << "TOO many ouput file option (-o)." << std::endl;
+      std::cout << "TOO many output file option (-o)." << std::endl;
       return -1;
     }
     if (opt_output_vec.empty()) {

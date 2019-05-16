@@ -18,8 +18,8 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/reference_line/reference_line.h"

@@ -57,8 +57,7 @@ class DualVariableWarmStartOSQPInterface {
                            std::vector<c_int>* A_indices,
                            std::vector<c_int>* A_indptr);
 
-  void assembleA(const int r, const int c,
-                 const std::vector<c_float>& P_data,
+  void assembleA(const int r, const int c, const std::vector<c_float>& P_data,
                  const std::vector<c_int>& P_indices,
                  const std::vector<c_int>& P_indptr);
 

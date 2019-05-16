@@ -115,7 +115,7 @@ void EvaluatorManager::Init(const PredictionConf& config) {
           if (obstacle_conf.obstacle_status() == ObstacleConf::ON_LANE) {
             vehicle_on_lane_evaluator_ = obstacle_conf.evaluator_type();
             if (FLAGS_prediction_offline_mode ==
-                    PredictionConstants::kDumpDataForLearning) {
+                PredictionConstants::kDumpDataForLearning) {
               vehicle_on_lane_evaluator_ =
                   ObstacleConf::LANE_SCANNING_EVALUATOR;
             }

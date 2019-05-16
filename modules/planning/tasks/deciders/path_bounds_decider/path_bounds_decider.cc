@@ -198,10 +198,10 @@ Status PathBoundsDecider::Process(
         pull_over_info->set_pull_over_theta(
             std::get<4>(pull_over_configuration));
         ADEBUG << "pull over: s[" << std::get<0>(pull_over_configuration)
-            << "] l[" << std::get<1>(pull_over_configuration)
-            << "] x[" << std::get<2>(pull_over_configuration)
-            << "] y[" << std::get<3>(pull_over_configuration)
-            << "] theta[" << std::get<4>(pull_over_configuration) << "]";
+               << "] l[" << std::get<1>(pull_over_configuration) << "] x["
+               << std::get<2>(pull_over_configuration) << "] y["
+               << std::get<3>(pull_over_configuration) << "] theta["
+               << std::get<4>(pull_over_configuration) << "]";
       }
     }
   }
@@ -342,10 +342,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
         PlanningContext::Instance()->planning_status().pull_over();
     if (pull_over_status.exist_pull_over_position()) {
       *pull_over_configuration = std::make_tuple(
-          pull_over_status.pull_over_s(),
-          pull_over_status.pull_over_l(),
-          pull_over_status.pull_over_x(),
-          pull_over_status.pull_over_y(),
+          pull_over_status.pull_over_s(), pull_over_status.pull_over_l(),
+          pull_over_status.pull_over_x(), pull_over_status.pull_over_y(),
           pull_over_status.pull_over_theta());
       return true;
     } else {
@@ -450,11 +448,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
           reference_line.GetReferencePoint(pull_over_s);
       double pull_over_theta = reference_point.heading();
 
-      *pull_over_configuration = std::make_tuple(pull_over_s,
-                                                 pull_over_l,
-                                                 pull_over_x,
-                                                 pull_over_y,
-                                                 pull_over_theta);
+      *pull_over_configuration = std::make_tuple(
+          pull_over_s, pull_over_l, pull_over_x, pull_over_y, pull_over_theta);
       break;
     }
     --i;

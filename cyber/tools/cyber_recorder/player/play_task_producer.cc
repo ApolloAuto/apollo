@@ -209,7 +209,7 @@ bool PlayTaskProducer::CreateWriters() {
       attr.set_message_type(msg_type);
       auto writer = node_->CreateWriter<message::RawMessage>(attr);
       if (writer == nullptr) {
-        AERROR << "create wirter failed. channel name: " << channel_name
+        AERROR << "create writer failed. channel name: " << channel_name
                << ", message type: " << msg_type;
         return false;
       }

@@ -64,7 +64,8 @@ class LaneScanningEvaluator : public Evaluator {
                        const LaneGraph* lane_graph_ptr,
                        std::vector<double>* feature_values);
 
-  bool ExtractStringFeatures(const LaneGraph& lane_graph,
+  bool ExtractStringFeatures(
+      const LaneGraph& lane_graph,
       std::vector<std::string>* const string_feature_values);
 
   /**
