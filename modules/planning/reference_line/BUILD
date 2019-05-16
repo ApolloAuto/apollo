@@ -100,14 +100,12 @@ cc_test(
 )
 
 cc_library(
-    name = "cos_theta_reference_line_smoother",
+    name = "discrete_points_reference_line_smoother",
     srcs = [
-        "cos_theta_problem_interface.cc",
-        "cos_theta_reference_line_smoother.cc",
+        "discrete_points_reference_line_smoother.cc",
     ],
     hdrs = [
-        "cos_theta_problem_interface.h",
-        "cos_theta_reference_line_smoother.h",
+        "discrete_points_reference_line_smoother.h",
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
@@ -115,11 +113,9 @@ cc_library(
         ":reference_line_smoother",
         "//modules/common/math",
         "//modules/planning/common:planning_gflags",
-        "//modules/planning/math:curve_math",
+        "//modules/planning/math/discretized_points_smoothing:cos_theta_smoother",
         "//modules/planning/math/discretized_points_smoothing:fem_pos_deviation_smoother",
         "//modules/planning/proto:planning_proto",
-        "@adolc",
-        "@eigen",
         "@ipopt",
     ],
 )
@@ -142,17 +138,17 @@ cc_test(
 )
 
 cc_test(
-    name = "cos_theta_reference_line_smoother_test",
+    name = "discrete_points_reference_line_smoother_test",
     size = "small",
     srcs = [
-        "cos_theta_reference_line_smoother_test.cc",
+        "discrete_points_reference_line_smoother_test.cc",
     ],
     data = [
         "//modules/planning:planning_conf",
         "//modules/planning:planning_testdata",
     ],
     deps = [
-        ":cos_theta_reference_line_smoother",
+        ":discrete_points_reference_line_smoother",
         "//modules/map/hdmap",
         "@gtest//:main",
     ],
@@ -168,7 +164,7 @@ cc_library(
     ],
     copts = ["-DMODULE_NAME=\\\"planning\\\""],
     deps = [
-        ":cos_theta_reference_line_smoother",
+        ":discrete_points_reference_line_smoother",
         ":qp_spline_reference_line_smoother",
         ":reference_line",
         ":spiral_reference_line_smoother",
@@ -190,7 +186,7 @@ cc_binary(
         "smoother_util.cc",
     ],
     deps = [
-        ":cos_theta_reference_line_smoother",
+        ":discrete_points_reference_line_smoother",
         ":qp_spline_reference_line_smoother",
         ":reference_line",
         ":spiral_reference_line_smoother",

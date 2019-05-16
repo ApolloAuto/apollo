@@ -26,7 +26,8 @@
 
 namespace apollo {
 namespace planning {
-bool FemPosDeviationSmoother::Optimize(const OsqpSettings& solver_settings) {
+bool FemPosDeviationSmoother::Smooth(
+    const FemPosDeviationOsqpSettings& solver_settings) {
   // Sanity Check
   if (ref_points_.empty()) {
     AERROR << "reference points empty, smoother early terminates";
@@ -153,7 +154,7 @@ void FemPosDeviationSmoother::CalculateKernel(std::vector<c_float>* P_data,
   int col_num = 0;
 
   for (int col = 0; col < 2; ++col) {
-    columns[col].emplace_back(col, weight_fem_pose_deviation_ +
+    columns[col].emplace_back(col, weight_fem_pos_deviation_ +
                                        weight_path_length_ +
                                        weight_ref_deviation_);
     ++col_num;
@@ -161,8 +162,8 @@ void FemPosDeviationSmoother::CalculateKernel(std::vector<c_float>* P_data,
 
   for (int col = 2; col < 4; ++col) {
     columns[col].emplace_back(
-        col - 2, -2.0 * weight_fem_pose_deviation_ - weight_path_length_);
-    columns[col].emplace_back(col, 5.0 * weight_fem_pose_deviation_ +
+        col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
+    columns[col].emplace_back(col, 5.0 * weight_fem_pos_deviation_ +
                                        2.0 * weight_path_length_ +
                                        weight_ref_deviation_);
     ++col_num;
@@ -174,13 +175,12 @@ void FemPosDeviationSmoother::CalculateKernel(std::vector<c_float>* P_data,
     int col_index = point_index * 2;
     for (int col = 0; col < 2; ++col) {
       col_index += col;
-      columns[col_index].emplace_back(col_index - 4,
-                                      weight_fem_pose_deviation_);
+      columns[col_index].emplace_back(col_index - 4, weight_fem_pos_deviation_);
       columns[col_index].emplace_back(
           col_index - 2,
-          -4.0 * weight_fem_pose_deviation_ - weight_path_length_);
+          -4.0 * weight_fem_pos_deviation_ - weight_path_length_);
       columns[col_index].emplace_back(
-          col_index, 6.0 * weight_fem_pose_deviation_ +
+          col_index, 6.0 * weight_fem_pos_deviation_ +
                          2.0 * weight_path_length_ + weight_ref_deviation_);
       ++col_num;
     }
@@ -190,20 +190,20 @@ void FemPosDeviationSmoother::CalculateKernel(std::vector<c_float>* P_data,
   int last_point_col_from_last_col = num_of_variables_ - 2;
   for (int col = second_point_col_from_last_col;
        col < last_point_col_from_last_col; ++col) {
-    columns[col].emplace_back(col - 4, weight_fem_pose_deviation_);
+    columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
     columns[col].emplace_back(
-        col - 2, -4.0 * weight_fem_pose_deviation_ - weight_path_length_);
-    columns[col].emplace_back(col, 5.0 * weight_fem_pose_deviation_ +
+        col - 2, -4.0 * weight_fem_pos_deviation_ - weight_path_length_);
+    columns[col].emplace_back(col, 5.0 * weight_fem_pos_deviation_ +
                                        2.0 * weight_path_length_ +
                                        weight_ref_deviation_);
     ++col_num;
   }
 
   for (int col = last_point_col_from_last_col; col < num_of_variables_; ++col) {
-    columns[col].emplace_back(col - 4, weight_fem_pose_deviation_);
+    columns[col].emplace_back(col - 4, weight_fem_pos_deviation_);
     columns[col].emplace_back(
-        col - 2, -2.0 * weight_fem_pose_deviation_ - weight_path_length_);
-    columns[col].emplace_back(col, weight_fem_pose_deviation_ +
+        col - 2, -2.0 * weight_fem_pos_deviation_ - weight_path_length_);
+    columns[col].emplace_back(col, weight_fem_pos_deviation_ +
                                        weight_path_length_ +
                                        weight_ref_deviation_);
     ++col_num;

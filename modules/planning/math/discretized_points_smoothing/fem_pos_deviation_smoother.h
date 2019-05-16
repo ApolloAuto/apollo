@@ -28,7 +28,7 @@
 namespace apollo {
 namespace planning {
 
-struct OsqpSettings {
+struct FemPosDeviationOsqpSettings {
   int max_iter = 4000;
   double time_limit = 0.0;
   bool verbose = true;
@@ -73,8 +73,8 @@ class FemPosDeviationSmoother {
     y_bounds_around_refs_ = y_bounds_around_refs;
   }
 
-  void set_weight_fem_pose_deviation(const double weight_fem_pose_deviation) {
-    weight_fem_pose_deviation_ = weight_fem_pose_deviation;
+  void set_weight_fem_pos_deviation(const double weight_fem_pos_deviation) {
+    weight_fem_pos_deviation_ = weight_fem_pos_deviation;
   }
 
   void set_weight_path_length(const double weight_path_length) {
@@ -85,7 +85,7 @@ class FemPosDeviationSmoother {
     weight_ref_deviation_ = weight_ref_deviation;
   }
 
-  bool Optimize(const OsqpSettings& solver_settings);
+  bool Smooth(const FemPosDeviationOsqpSettings& solver_settings);
 
   const std::vector<double>& opt_x() const { return x_; }
 
@@ -122,7 +122,7 @@ class FemPosDeviationSmoother {
   std::vector<double> y_bounds_around_refs_;
 
   // Weights in optimization cost function
-  double weight_fem_pose_deviation_ = 0.0;
+  double weight_fem_pos_deviation_ = 0.0;
   double weight_path_length_ = 0.0;
   double weight_ref_deviation_ = 0.0;
 
