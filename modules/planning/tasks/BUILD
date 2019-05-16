@@ -50,7 +50,6 @@ cc_library(
         "//modules/planning/tasks/optimizers/path_time_heuristic:path_time_heuristic_optimizer",
         "//modules/planning/tasks/optimizers/piecewise_jerk_path:piecewise_jerk_path_optimizer",
         "//modules/planning/tasks/optimizers/piecewise_jerk_speed:piecewise_jerk_speed_optimizer",
-        "//modules/planning/tasks/optimizers/proceed_with_caution_speed:proceed_with_caution_speed_generator",
         "//modules/planning/tasks/optimizers/speed_decider",
         "//modules/planning/tasks/rss:decider_rss",
     ],
