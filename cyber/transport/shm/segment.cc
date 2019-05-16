@@ -326,7 +326,7 @@ bool Segment::Destroy() {
     AERROR << "exception.";
     return false;
   }
-  ADEBUG << "destory.";
+  ADEBUG << "destroy.";
   return true;
 }
 

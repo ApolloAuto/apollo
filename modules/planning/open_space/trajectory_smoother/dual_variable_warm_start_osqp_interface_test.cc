@@ -20,10 +20,10 @@
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_osqp_interface.h"
 #include "modules/planning/open_space/trajectory_smoother/dual_variable_warm_start_ipopt_qp_interface.h"
 
-#include "cyber/common/file.h"
-#include "gtest/gtest.h"
 #include "IpIpoptApplication.hpp"
 #include "IpSolveStatistics.hpp"
+#include "cyber/common/file.h"
+#include "gtest/gtest.h"
 
 #include "modules/planning/common/planning_gflags.h"
 
@@ -105,16 +105,15 @@ TEST_F(DualVariableWarmStartOSQPInterfaceTest, optimize) {
       planner_open_space_config_.dual_variable_warm_start_config()
           .ipopt_config();
 
-  app->Options()->SetIntegerValue(
-      "print_level", ipopt_config_tmp.ipopt_print_level());
-  app->Options()->SetIntegerValue(
-      "mumps_mem_percent", ipopt_config_tmp.mumps_mem_percent());
-  app->Options()->SetNumericValue(
-      "mumps_pivtol", ipopt_config_tmp.mumps_pivtol());
-  app->Options()->SetIntegerValue(
-      "max_iter", ipopt_config_tmp.ipopt_max_iter());
-  app->Options()->SetNumericValue(
-      "tol", ipopt_config_tmp.ipopt_tol());
+  app->Options()->SetIntegerValue("print_level",
+                                  ipopt_config_tmp.ipopt_print_level());
+  app->Options()->SetIntegerValue("mumps_mem_percent",
+                                  ipopt_config_tmp.mumps_mem_percent());
+  app->Options()->SetNumericValue("mumps_pivtol",
+                                  ipopt_config_tmp.mumps_pivtol());
+  app->Options()->SetIntegerValue("max_iter",
+                                  ipopt_config_tmp.ipopt_max_iter());
+  app->Options()->SetNumericValue("tol", ipopt_config_tmp.ipopt_tol());
   app->Options()->SetNumericValue(
       "acceptable_constr_viol_tol",
       ipopt_config_tmp.ipopt_acceptable_constr_viol_tol());
@@ -127,11 +126,9 @@ TEST_F(DualVariableWarmStartOSQPInterfaceTest, optimize) {
   app->Options()->SetStringValue(
       "print_timing_statistics",
       ipopt_config_tmp.ipopt_print_timing_statistics());
-  app->Options()->SetStringValue(
-      "alpha_for_y",
-      ipopt_config_tmp.ipopt_alpha_for_y());
-  app->Options()->SetStringValue(
-      "recalc_y", ipopt_config_tmp.ipopt_recalc_y());
+  app->Options()->SetStringValue("alpha_for_y",
+                                 ipopt_config_tmp.ipopt_alpha_for_y());
+  app->Options()->SetStringValue("recalc_y", ipopt_config_tmp.ipopt_recalc_y());
   app->Options()->SetStringValue("mehrotra_algorithm", "yes");
 
   app->Initialize();

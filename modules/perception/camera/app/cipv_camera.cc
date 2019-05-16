@@ -266,9 +266,9 @@ bool Cipv::ElongateEgoLane(const std::vector<base::LaneLine> &lane_objects,
 }
 
 // Get closest edge of an object in image coordinate
-bool Cipv::FindClosestObjectImage(
-    const std::shared_ptr<base::Object> &object, const EgoLane &egolane_image,
-    LineSegment2Df *closted_object_edge) {
+bool Cipv::FindClosestObjectImage(const std::shared_ptr<base::Object> &object,
+                                  const EgoLane &egolane_image,
+                                  LineSegment2Df *closted_object_edge) {
   float size_x = object->size(0);
   float size_y = object->size(1);
   float size_z = object->size(2);
@@ -357,10 +357,11 @@ bool Cipv::FindClosestObjectImage(
 // Get closest edge of an object in ground coordinate
 // TODO(techoe): This function should be changed to find min-y and max-y edges
 // to decide CIPV.
-bool Cipv::FindClosestObjectGround(
-    const std::shared_ptr<base::Object> &object, const EgoLane &egolane_ground,
-    const Eigen::Affine3d world2camera, LineSegment2Df *closted_object_edge,
-    float *distance) {
+bool Cipv::FindClosestObjectGround(const std::shared_ptr<base::Object> &object,
+                                   const EgoLane &egolane_ground,
+                                   const Eigen::Affine3d world2camera,
+                                   LineSegment2Df *closted_object_edge,
+                                   float *distance) {
   if (debug_level_ >= 2) {
     AINFO << "object->track_id = " << object->track_id;
   }
@@ -476,8 +477,7 @@ bool Cipv::FindClosestObjectGround(
     }
   }
 
-  if (left_index < 0 || right_index < 0 ||
-      left_index == right_index) {
+  if (left_index < 0 || right_index < 0 || left_index == right_index) {
     return false;
   }
 
@@ -493,17 +493,17 @@ bool Cipv::FindClosestObjectGround(
     return false;
   }
 
-  *distance = static_cast<float>(sqrt(
-    p[closest_index](0) * p[closest_index](0) +
-    p[closest_index](1) * p[closest_index](1)));
+  *distance =
+      static_cast<float>(sqrt(p[closest_index](0) * p[closest_index](0) +
+                              p[closest_index](1) * p[closest_index](1)));
   if (debug_level_ >= 2) {
     AINFO << "start(" << closted_object_edge->start_point(0) << ", "
           << closted_object_edge->start_point(1) << ")->";
     AINFO << "end(" << closted_object_edge->end_point(0) << ", "
           << closted_object_edge->end_point(1) << ")";
     AINFO << "closest distance to p[" << closest_index << "]("
-          << p[closest_index](0) << ", "
-          << p[closest_index](1) << "): " << *distance;
+          << p[closest_index](0) << ", " << p[closest_index](1)
+          << "): " << *distance;
   }
   return true;
 }

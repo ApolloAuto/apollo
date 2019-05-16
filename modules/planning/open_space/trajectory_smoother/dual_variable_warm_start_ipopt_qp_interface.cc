@@ -517,8 +517,7 @@ void DualVariableWarmStartIPOPTQPInterface::get_optimization_results(
 }
 
 void DualVariableWarmStartIPOPTQPInterface::check_solution(
-    const Eigen::MatrixXd& l_warm_up,
-    const Eigen::MatrixXd& n_warm_up) {
+    const Eigen::MatrixXd& l_warm_up, const Eigen::MatrixXd& n_warm_up) {
   // wrap input solution
   int kNumVariables = num_of_variables_;
   double x[kNumVariables];
@@ -550,8 +549,7 @@ void DualVariableWarmStartIPOPTQPInterface::check_solution(
   double x_u[kNumVariables];
   double g_l[kNumConstraint];
   double g_u[kNumConstraint];
-  get_bounds_info(num_of_variables_, x_l, x_u,
-                  num_of_constraints_, g_l, g_u);
+  get_bounds_info(num_of_variables_, x_l, x_u, num_of_constraints_, g_l, g_u);
 
   // compare g with g_l & g_u
   int constraint_index = 0;
@@ -562,23 +560,23 @@ void DualVariableWarmStartIPOPTQPInterface::check_solution(
       if (g_l[constraint_index + 0] > g[constraint_index + 0] ||
           g_u[constraint_index + 0] < g[constraint_index + 0]) {
         AERROR << "G' * mu + R' * A * lambda == 0 constraint fails, "
-            << "constraint_index: " << constraint_index + 0
-            << ", g: " << g[constraint_index + 0];
+               << "constraint_index: " << constraint_index + 0
+               << ", g: " << g[constraint_index + 0];
       }
 
       if (g_l[constraint_index + 1] > g[constraint_index + 1] ||
           g_u[constraint_index + 1] < g[constraint_index + 1]) {
         AERROR << "G' * mu + R' * A * lambda == 0 constraint fails, "
-            << "constraint_index: " << constraint_index + 1
-            << ", g: " << g[constraint_index + 1];
+               << "constraint_index: " << constraint_index + 1
+               << ", g: " << g[constraint_index + 1];
       }
 
       // -g' * mu + (A * t - b) * lambda) >= d_min
       if (g_l[constraint_index + 2] > g[constraint_index + 2] ||
           g_u[constraint_index + 2] < g[constraint_index + 2]) {
         AERROR << "-g' * mu + (A * t - b) * lambda) >= d_min constraint fails, "
-            << "constraint_index: " << constraint_index + 2
-            << ", g: " << g[constraint_index + 2];
+               << "constraint_index: " << constraint_index + 2
+               << ", g: " << g[constraint_index + 2];
       }
 
       // Update index

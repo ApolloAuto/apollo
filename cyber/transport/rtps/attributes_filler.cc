@@ -85,7 +85,7 @@ bool AttributesFiller::FillInPubAttr(
     return false;
   }
 
-  // tranform messages per second to rtps heartbeat
+  // transform messages per second to rtps heartbeat
   // set default heartbeat period
   pub_attr->times.heartbeatPeriod.seconds = 1;
   pub_attr->times.heartbeatPeriod.fraction = 0;
