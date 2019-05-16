@@ -79,13 +79,11 @@ class Timer {
  private:
   bool InitTimerTask();
   uint64_t timer_id_;
-  int64_t target_tick_counts_ = 0;
-  bool compensate_ = false;
   TimerOption timer_opt_;
   TimingWheel* timing_wheel_ = nullptr;
   std::shared_ptr<TimerTask> task_;
   std::atomic<bool> started_ = {false};
-  std::atomic<bool> running_ = {false};
+  int64_t accumulated_error_ns_ = 0;
 };
 
 }  // namespace cyber
