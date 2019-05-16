@@ -41,7 +41,6 @@ class SpeedOptimizer : public Task {
                                  const common::TrajectoryPoint& init_point,
                                  const ReferenceLine& reference_line,
                                  const SpeedData& reference_speed_data,
-                                 PathDecision* const path_decision,
                                  SpeedData* const speed_data) = 0;
 
   void RecordDebugInfo(const SpeedData& speed_data);

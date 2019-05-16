@@ -53,7 +53,7 @@ PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
 Status PiecewiseJerkSpeedOptimizer::Process(
     const PathData& path_data, const TrajectoryPoint& init_point,
     const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
-    PathDecision* const path_decision, SpeedData* const speed_data) {
+    SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
   }
@@ -62,10 +62,6 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     std::string msg("Empty path data");
     AERROR << msg;
     return Status(ErrorCode::PLANNING_ERROR, msg);
-  }
-
-  for (const auto* obstacle : path_decision->obstacles().Items()) {
-    DCHECK(obstacle->HasLongitudinalDecision());
   }
   StGraphData& st_graph_data = *reference_line_info_->mutable_st_graph_data();
 
