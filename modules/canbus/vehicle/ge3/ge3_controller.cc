@@ -321,7 +321,7 @@ Chassis Ge3Controller::chassis() {
   }
 
   // vin number will be written into KVDB once.
-  chassis_.mutable_license()->set_vin("");
+  chassis_.mutable_vehicle_id()->set_vin("");
   if (ge3.has_scu_1_301() && ge3.has_scu_2_302() && ge3.has_scu_3_303()) {
     Scu_1_301 scu_1_301 = ge3.scu_1_301();
     Scu_2_302 scu_2_302 = ge3.scu_2_302();
@@ -359,8 +359,8 @@ Chassis Ge3Controller::chassis() {
       for (int i = 0; i < 17; i++) {
         ch[i] = static_cast<char>(n[i]);
       }
-      if (chassis_.has_license()) {
-        chassis_.mutable_license()->set_vin(ch);
+      if (chassis_.has_vehicle_id()) {
+        chassis_.mutable_vehicle_id()->set_vin(ch);
       }
     }
   }
