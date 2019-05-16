@@ -350,11 +350,11 @@ Chassis LincolnController::chassis() {
   }
 
   // VIN number will be written into KVDB once.
-  if (chassis_detail.license().has_vin()) {
-    chassis_.mutable_license()->set_vin(chassis_detail.license().vin());
+  if (chassis_detail.vehicle_id().has_vin()) {
+    chassis_.mutable_vehicle_id()->set_vin(chassis_detail.vehicle_id().vin());
     if (!received_vin_) {
       apollo::common::KVDB::Put("apollo:canbus:vin",
-                                chassis_detail.license().vin());
+                                chassis_detail.vehicle_id().vin());
       received_vin_ = true;
     }
   }

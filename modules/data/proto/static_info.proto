@@ -21,7 +21,7 @@ message VehicleInfo {
     TRANSIT = 2;
   }
   optional Model model = 3;
-  optional apollo.canbus.License license = 4;
+  optional apollo.canbus.License license = 4 [deprecated = true];
   optional apollo.canbus.CanbusConf canbus_conf = 5;
   optional apollo.common.VehicleConfig vehicle_config = 6;
   optional apollo.control.ControlConf control_config = 7;

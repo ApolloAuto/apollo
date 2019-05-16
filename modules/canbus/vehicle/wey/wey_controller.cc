@@ -386,7 +386,7 @@ Chassis WeyController::chassis() {
       for (int i = 0; i < 17; i++) {
         ch[i] = static_cast<char>(n[i]);
       }
-      chassis_.mutable_license()->set_vin(ch);
+      chassis_.mutable_vehicle_id()->set_vin(ch);
     }
   }
 

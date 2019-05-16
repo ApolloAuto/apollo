@@ -71,7 +71,7 @@ void License7e::Parse(const std::uint8_t* bytes, int length,
 
     if (vin_part0_flag_ && vin_part1_flag_ && vin_part2_flag_) {
       parse_success_ = true;
-      chassis_detail->mutable_license()->set_vin(
+      chassis_detail->mutable_vehicle_id()->set_vin(
           (vin_part0_ + vin_part1_ + vin_part2_));
     }
   }

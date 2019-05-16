@@ -6,6 +6,7 @@ import "modules/common/proto/header.proto";
 import "modules/common/proto/vehicle_signal.proto";
 import "modules/common/proto/drive_state.proto";
 import "modules/common/proto/geometry.proto";
+import "modules/common/configs/proto/vehicle_config.proto";
 
 // next id :31
 message Chassis {
@@ -116,10 +117,12 @@ message Chassis {
   optional Surround surround = 31;
 
   // Vehicle registration information
-  optional License license = 32;
+  optional License license = 32 [deprecated = true];
 
   // Real gear location.
-  // optional int32 gear_location = 10; deprecated use enum replace this [id 23]
+  // optional int32 gear_location = 10 [deprecated = true]; deprecated use enum replace this [id 23]
+
+  optional apollo.common.VehicleID vehicle_id = 33;
 }
 
 message ChassisGPS {
@@ -209,5 +212,5 @@ message Surround {
 }
 
 message License {
-  optional string vin = 1;
+  optional string vin = 1 [deprecated = true];
 }

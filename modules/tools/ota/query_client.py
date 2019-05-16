@@ -61,7 +61,7 @@ def query():
     # setup car info
     brand = VehicleInfo.Brand.Name(vehicle_info.brand)
     model = VehicleInfo.Model.Name(vehicle_info.model)
-    vin = vehicle_info.license.vin
+    vin = vehicle_info.vehicle_config.vehicle_id.vin
     META_FILE = '/apollo/meta.ini'
     config.read(META_FILE)
     car_info = {

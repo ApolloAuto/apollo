@@ -46,7 +46,7 @@ def update():
 
     brand = VehicleInfo.Brand.Name(vehicle_info.brand)
     model = VehicleInfo.Model.Name(vehicle_info.model)
-    vin = vehicle_info.license.vin
+    vin = vehicle_info.vehicle_config.vehicle_id.vin
     car_info = {
         "car_type": brand + "." + model,
         "tag": sys.argv[1],

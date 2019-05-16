@@ -2,6 +2,7 @@ syntax = "proto2";
 
 package apollo.canbus;
 
+import "modules/common/configs/proto/vehicle_config.proto";
 import "modules/canbus/proto/chassis.proto";
 import "modules/canbus/proto/ge3.proto";
 import "modules/canbus/proto/lexus.proto";
@@ -29,7 +30,7 @@ message ChassisDetail {
   optional Light light = 13;                // Light
   optional Battery battery = 14;            // Battery info
   optional CheckResponseSignal check_response = 15;
-  optional License license = 16;    // License info
+  optional License license = 16 [deprecated = true];    // License info
   optional Surround surround = 17;  // Surround information
   optional Gem gem = 18;
   optional Lexus lexus = 19;
@@ -37,6 +38,9 @@ message ChassisDetail {
   optional Ge3 ge3 = 21;
   optional Wey wey = 22;
   optional Zhongyun zhongyun = 23;
+
+  // Reserve fields for other vehicles
+  optional apollo.common.VehicleID vehicle_id = 101;
 }
 
 // CheckResponseSignal
