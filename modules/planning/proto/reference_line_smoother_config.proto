@@ -39,39 +39,35 @@ message SpiralSmootherConfig {
   optional double weight_dkappa = 9 [default = 100.0];
 }
 
-message CosThetaSmootherConfig {
-  // Print level of Ipopt 0~15
-  optional int32 print_level = 1 [default = 0];
+message CosThetaSmoothingConfig {
+  optional bool use_cos_theta = 1;
+  optional double weight_cos_included_angle = 2 [default = 10000.0];
+  optional double weight_anchor_points = 3 [default = 1.0];
+  optional double weight_length = 4 [default = 1.0];
+  optional int32 print_level = 5 [default = 0];
+  optional int32 max_num_of_iterations = 6 [default = 10000];
+  optional int32 acceptable_num_of_iterations = 7 [default = 15];
+  optional double tol = 8 [default = 1e-8];
+  optional double acceptable_tol = 9 [default = 1e-6];
+  optional bool ipopt_use_automatic_differentiation = 10 [default = false];
+}
 
-  // The max deviation of cosTheta reference line smoother.
-  optional double max_point_deviation = 2 [default = 5.0];
+message FemPosSmoothingConfig {
+  optional bool use_fem_pos = 1;
+  optional double weight_fem_pose_deviation = 2 [default = 10000.0];
+  optional double weight_ref_deviation = 3 [default = 1.0];
+  optional double weight_path_length = 4 [default = 1.0];
+  optional int32 max_iter = 5 [default = 4000];
+  // time_limit set to be 0.0 meaning no time limit
+  optional double time_limit = 6 [default = 0.0];
+  optional bool verbose = 7;
+  optional bool scaled_termination = 8;
+  optional bool warm_start = 9;
+}
 
-  // The number of iteration in optimization
-  optional int32 max_num_of_iterations = 3 [default = 10000];
-
-  // The weight of cosine of included angle between points
-  optional double weight_cos_included_angle = 4 [default = 10000.0];
-
-  // The weight of cosine of included angle between points
-  optional double weight_anchor_points = 5 [default = 1.0];
-
-  // The weight of cosine of included angle between points
-  optional double weight_length = 6 [default = 1.0];
-
-  // The terminating tolerance of optimization
-  optional double tol = 7 [default = 1e-8];
-
-  // The acceptable tolerance of optimization
-  optional double acceptable_tol = 8 [default = 1e-6];
-
-  // The acceptable convergence tol for spiral opt
-  optional int32 acceptable_num_of_iterations = 9 [default = 15];
-
-  // Relax constraint on end condition
-  optional double relax = 10 [default = 0.2];
-
-  // Use third party package to do automatic differentiation
-  optional bool use_automatic_differentiation = 11 [default = false];
+message DiscretePointsSmootherConfig {
+  optional CosThetaSmoothingConfig cos_theta_smoothing = 1;
+  optional FemPosSmoothingConfig fem_pos_smoothing = 2;
 }
 
 message ReferenceLineSmootherConfig {
@@ -99,6 +95,6 @@ message ReferenceLineSmootherConfig {
   oneof SmootherConfig {
     QpSplineSmootherConfig qp_spline = 20;
     SpiralSmootherConfig spiral = 21;
-    CosThetaSmootherConfig cos_theta = 22;
+    DiscretePointsSmootherConfig discrete_points = 22;
   }
 }

@@ -1,0 +1,34 @@
+max_constraint_interval : 0.1
+longitudinal_boundary_bound : 2.0
+lateral_boundary_bound : 0.5
+num_of_total_points : 500
+curb_shift : 0.2
+driving_side : RIGHT
+wide_lane_threshold_factor : 2.0
+wide_lane_shift_remain_factor : 0.5
+
+discrete_points {
+  cos_theta_smoothing {
+    use_cos_theta: false
+    weight_cos_included_angle: 1e5
+    weight_anchor_points: 1.0
+    weight_length: 1.0
+    print_level: 0
+    max_num_of_iterations: 500
+    acceptable_num_of_iterations: 15
+    tol: 1e-8
+    acceptable_tol: 1e-1
+    ipopt_use_automatic_differentiation: true
+  }
+  fem_pos_smoothing {
+    use_fem_pos: true
+    weight_fem_pose_deviation: 1e10
+    weight_ref_deviation: 1.0
+    weight_path_length: 1.0
+    max_iter: 500
+    time_limit: 0.0
+    verbose: false
+    scaled_termination: true
+    warm_start: true
+  }
+}

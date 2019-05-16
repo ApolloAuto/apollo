@@ -19,8 +19,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "Eigen/Dense"
+#include <utility>
 
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/planning/reference_line/reference_line.h"
@@ -30,12 +29,12 @@
 namespace apollo {
 namespace planning {
 
-class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
+class DiscretePointsReferenceLineSmoother : public ReferenceLineSmoother {
  public:
-  explicit CosThetaReferenceLineSmoother(
+  explicit DiscretePointsReferenceLineSmoother(
       const ReferenceLineSmootherConfig& config);
 
-  virtual ~CosThetaReferenceLineSmoother() = default;
+  virtual ~DiscretePointsReferenceLineSmoother() = default;
 
   bool Smooth(const ReferenceLine& raw_reference_line,
               ReferenceLine* const smoothed_reference_line) override;
@@ -43,27 +42,41 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
   void SetAnchorPoints(const std::vector<AnchorPoint>&) override;
 
  private:
-  bool CosThetaSmooth(const std::vector<Eigen::Vector2d>& point2d,
-                      const std::vector<double>& lateral_bounds,
-                      std::vector<Eigen::Vector2d>* ptr_smoothed_point2d);
+  bool CosThetaSmooth(
+      const std::vector<std::pair<double, double>>& point2d,
+      const std::vector<double>& lateral_bounds,
+      std::vector<std::pair<double, double>>* ptr_smoothed_point2d);
 
-  bool FemPosSmooth(const std::vector<Eigen::Vector2d>& point2d,
-                      const std::vector<double>& lateral_bounds,
-                      std::vector<Eigen::Vector2d>* ptr_smoothed_point2d);
+  bool FemPosSmooth(
+      const std::vector<std::pair<double, double>>& point2d,
+      const std::vector<double>& lateral_bounds,
+      std::vector<std::pair<double, double>>* ptr_smoothed_point2d);
 
-  void NormalizePoints(std::vector<Eigen::Vector2d>* xy_points);
+  void NormalizePoints(std::vector<std::pair<double, double>>* xy_points);
 
-  void DeNormalizePoints(std::vector<Eigen::Vector2d>* xy_points);
+  void DeNormalizePoints(std::vector<std::pair<double, double>>* xy_points);
 
-  bool GenerateRefPointProfile(const ReferenceLine& raw_reference_line,
-                               const std::vector<Eigen::Vector2d>& xy_points,
-                               std::vector<ReferencePoint>* reference_points);
+  bool GenerateRefPointProfile(
+      const ReferenceLine& raw_reference_line,
+      const std::vector<std::pair<double, double>>& xy_points,
+      std::vector<ReferencePoint>* reference_points);
 
   std::vector<AnchorPoint> anchor_points_;
 
-  size_t print_level_ = 0;
+  double zero_x_ = 0.0;
 
-  double max_point_deviation_ = 0.1;
+  double zero_y_ = 0.0;
+
+  // cos_theta smoothing parameters
+  bool use_cos_theta_ = false;
+
+  double weight_cos_included_angle_ = 0.0;
+
+  double weight_anchor_points_ = 0.0;
+
+  double weight_length_ = 0.0;
+
+  size_t print_level_ = 0;
 
   size_t max_num_of_iterations_ = 500;
 
@@ -73,27 +86,26 @@ class CosThetaReferenceLineSmoother : public ReferenceLineSmoother {
 
   double acceptable_tol_ = 1e-6;
 
-  bool has_start_point_constraint_ = false;
-
-  bool has_end_point_constraint_ = false;
-
-  double start_x_derivative_ = 0.0;
-
-  double start_y_derivative_ = 0.0;
-
-  double weight_cos_included_angle_ = 0.0;
-
-  double weight_anchor_points_ = 0.0;
-
-  double weight_length_ = 0.0;
-
-  double relax_ = 0.2;
-
   bool use_automatic_differentiation_ = false;
 
-  double zero_x_ = 0.0;
+  // fem_pos smoothing parameters
+  bool use_fem_pos_ = false;
 
-  double zero_y_ = 0.0;
+  double weight_fem_pos_deviation_ = 0.0;
+
+  double weight_ref_deviation_ = 0.0;
+
+  double weight_path_length_ = 0.0;
+
+  size_t max_iter_ = 0;
+
+  double time_limit_ = 0.0;
+
+  bool verbose_ = false;
+
+  bool scaled_termination_ = false;
+
+  bool warm_start_ = false;
 };
 
 }  // namespace planning

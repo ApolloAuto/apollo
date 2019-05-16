@@ -14,32 +14,35 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "modules/planning/reference_line/cos_theta_problem_interface.h"
+#include "modules/planning/math/discretized_points_smoothing/cos_theta_smoother.h"
 
 #include <algorithm>
 
+#include "IpIpoptApplication.hpp"
+#include "IpSolveStatistics.hpp"
 #include "cyber/common/log.h"
 
 namespace apollo {
 namespace planning {
 
-CosThetaProbleminterface::CosThetaProbleminterface(
-    std::vector<Eigen::Vector2d> points, std::vector<double> lateral_bounds) {
+CosThetaSmoother::CosThetaSmoother(
+    std::vector<std::pair<double, double>> points,
+    std::vector<double> lateral_bounds) {
   init_points_ = std::move(points);
   num_of_points_ = init_points_.size();
   lateral_bounds_ = std::move(lateral_bounds);
   CHECK_GT(num_of_points_, 1);
 }
 
-void CosThetaProbleminterface::get_optimization_results(
+void CosThetaSmoother::get_optimization_results(
     std::vector<double>* ptr_x, std::vector<double>* ptr_y) const {
   *ptr_x = opt_x_;
   *ptr_y = opt_y_;
 }
 
-bool CosThetaProbleminterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
-                                            int& nnz_h_lag,
-                                            IndexStyleEnum& index_style) {
+bool CosThetaSmoother::get_nlp_info(int& n, int& m, int& nnz_jac_g,
+                                    int& nnz_h_lag,
+                                    IndexStyleEnum& index_style) {
   // number of variables
   n = static_cast<int>(num_of_points_ << 1);
   num_of_variables_ = n;
@@ -67,9 +70,8 @@ bool CosThetaProbleminterface::get_nlp_info(int& n, int& m, int& nnz_jac_g,
   return true;
 }
 
-bool CosThetaProbleminterface::get_bounds_info(int n, double* x_l, double* x_u,
-                                               int m, double* g_l,
-                                               double* g_u) {
+bool CosThetaSmoother::get_bounds_info(int n, double* x_l, double* x_u, int m,
+                                       double* g_l, double* g_u) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<size_t>(m), num_of_constraints_);
   // variables
@@ -93,27 +95,13 @@ bool CosThetaProbleminterface::get_bounds_info(int n, double* x_l, double* x_u,
     double x_upper = 0.0;
     double y_lower = 0.0;
     double y_upper = 0.0;
-    double bound = std::min(lateral_bounds_[i], default_max_point_deviation_);
-    double radius_ratio = std::sqrt(2);
-    double relax_square = relax_ / radius_ratio;
-    double bound_square = bound / radius_ratio;
+    double bound_square = lateral_bounds_[i] / std::sqrt(2.0);
 
-    if (i == 0 && has_fixed_start_point_) {
-      x_lower = start_x_ - relax_square;
-      x_upper = start_x_ + relax_square;
-      y_lower = start_y_ - relax_square;
-      y_upper = start_y_ + relax_square;
-    } else if (i + 1 == num_of_points_ && has_fixed_end_point_) {
-      x_lower = end_x_ - relax_square;
-      x_upper = end_x_ + relax_square;
-      y_lower = end_y_ - relax_square;
-      y_upper = end_y_ + relax_square;
-    } else {
-      x_lower = init_points_[i].x() - bound_square;
-      x_upper = init_points_[i].x() + bound_square;
-      y_lower = init_points_[i].y() - bound_square;
-      y_upper = init_points_[i].y() + bound_square;
-    }
+    x_lower = init_points_[i].first - bound_square;
+    x_upper = init_points_[i].first + bound_square;
+    y_lower = init_points_[i].second - bound_square;
+    y_upper = init_points_[i].second + bound_square;
+
     // x
     g_l[index] = x_lower;
     g_u[index] = x_upper;
@@ -125,25 +113,24 @@ bool CosThetaProbleminterface::get_bounds_info(int n, double* x_l, double* x_u,
   return true;
 }
 
-bool CosThetaProbleminterface::get_starting_point(int n, bool init_x, double* x,
-                                                  bool init_z, double* z_L,
-                                                  double* z_U, int m,
-                                                  bool init_lambda,
-                                                  double* lambda) {
+bool CosThetaSmoother::get_starting_point(int n, bool init_x, double* x,
+                                          bool init_z, double* z_L, double* z_U,
+                                          int m, bool init_lambda,
+                                          double* lambda) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   std::random_device rd;
   std::default_random_engine gen = std::default_random_engine(rd());
   std::normal_distribution<> dis{0, 0.05};
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    x[index] = init_points_[i].x() + dis(gen);
-    x[index + 1] = init_points_[i].y() + dis(gen);
+    x[index] = init_points_[i].first + dis(gen);
+    x[index + 1] = init_points_[i].second + dis(gen);
   }
   return true;
 }
 
-bool CosThetaProbleminterface::eval_f(int n, const double* x, bool new_x,
-                                      double& obj_value) {
+bool CosThetaSmoother::eval_f(int n, const double* x, bool new_x,
+                              double& obj_value) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   if (use_automatic_differentiation_) {
     eval_obj(n, x, &obj_value);
@@ -153,10 +140,10 @@ bool CosThetaProbleminterface::eval_f(int n, const double* x, bool new_x,
   obj_value = 0.0;
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    obj_value +=
-        (x[index] - init_points_[i].x()) * (x[index] - init_points_[i].x()) +
-        (x[index + 1] - init_points_[i].y()) *
-            (x[index + 1] - init_points_[i].y());
+    obj_value += (x[index] - init_points_[i].first) *
+                     (x[index] - init_points_[i].first) +
+                 (x[index + 1] - init_points_[i].second) *
+                     (x[index + 1] - init_points_[i].second);
   }
   for (size_t i = 0; i < num_of_points_ - 2; i++) {
     size_t findex = i << 1;
@@ -176,8 +163,8 @@ bool CosThetaProbleminterface::eval_f(int n, const double* x, bool new_x,
   return true;
 }
 
-bool CosThetaProbleminterface::eval_grad_f(int n, const double* x, bool new_x,
-                                           double* grad_f) {
+bool CosThetaSmoother::eval_grad_f(int n, const double* x, bool new_x,
+                                   double* grad_f) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
 
   if (use_automatic_differentiation_) {
@@ -188,8 +175,8 @@ bool CosThetaProbleminterface::eval_grad_f(int n, const double* x, bool new_x,
   std::fill(grad_f, grad_f + n, 0.0);
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
-    grad_f[index] = x[index] * 2 - init_points_[i].x() * 2;
-    grad_f[index + 1] = x[index + 1] * 2 - init_points_[i].y() * 2;
+    grad_f[index] = x[index] * 2 - init_points_[i].first * 2;
+    grad_f[index + 1] = x[index + 1] * 2 - init_points_[i].second * 2;
   }
 
   for (size_t i = 0; i < num_of_points_ - 2; ++i) {
@@ -241,8 +228,8 @@ bool CosThetaProbleminterface::eval_grad_f(int n, const double* x, bool new_x,
   return true;
 }
 
-bool CosThetaProbleminterface::eval_g(int n, const double* x, bool new_x, int m,
-                                      double* g) {
+bool CosThetaSmoother::eval_g(int n, const double* x, bool new_x, int m,
+                              double* g) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<size_t>(m), num_of_constraints_);
 
@@ -259,9 +246,9 @@ bool CosThetaProbleminterface::eval_g(int n, const double* x, bool new_x, int m,
   return true;
 }
 
-bool CosThetaProbleminterface::eval_jac_g(int n, const double* x, bool new_x,
-                                          int m, int nele_jac, int* iRow,
-                                          int* jCol, double* values) {
+bool CosThetaSmoother::eval_jac_g(int n, const double* x, bool new_x, int m,
+                                  int nele_jac, int* iRow, int* jCol,
+                                  double* values) {
   CHECK_EQ(static_cast<size_t>(n), num_of_variables_);
   CHECK_EQ(static_cast<size_t>(m), num_of_constraints_);
 
@@ -302,11 +289,10 @@ bool CosThetaProbleminterface::eval_jac_g(int n, const double* x, bool new_x,
   return true;
 }
 
-bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
-                                      double obj_factor, int m,
-                                      const double* lambda, bool new_lambda,
-                                      int nele_hess, int* iRow, int* jCol,
-                                      double* values) {
+bool CosThetaSmoother::eval_h(int n, const double* x, bool new_x,
+                              double obj_factor, int m, const double* lambda,
+                              bool new_lambda, int nele_hess, int* iRow,
+                              int* jCol, double* values) {
   if (use_automatic_differentiation_) {
     if (values == nullptr) {
       // return the structure. This is a symmetric matrix, fill the lower left
@@ -534,7 +520,7 @@ bool CosThetaProbleminterface::eval_h(int n, const double* x, bool new_x,
   return true;
 }
 
-void CosThetaProbleminterface::finalize_solution(
+void CosThetaSmoother::finalize_solution(
     Ipopt::SolverReturn status, int n, const double* x, const double* z_L,
     const double* z_U, int m, const double* g, const double* lambda,
     double obj_value, const Ipopt::IpoptData* ip_data,
@@ -556,47 +542,25 @@ void CosThetaProbleminterface::finalize_solution(
   }
 }
 
-void CosThetaProbleminterface::set_default_max_point_deviation(
-    const double max_point_deviation) {
-  default_max_point_deviation_ = max_point_deviation;
-}
-
-void CosThetaProbleminterface::set_relax_end_constraint(const double relax) {
-  relax_ = relax;
-}
-
-void CosThetaProbleminterface::set_automatic_differentiation_flag(
-    const bool use_ad) {
+void CosThetaSmoother::set_automatic_differentiation_flag(const bool use_ad) {
   use_automatic_differentiation_ = use_ad;
 }
 
-void CosThetaProbleminterface::set_start_point(const double x, const double y) {
-  has_fixed_start_point_ = true;
-  start_x_ = x;
-  start_y_ = y;
-}
-
-void CosThetaProbleminterface::set_end_point(const double x, const double y) {
-  has_fixed_end_point_ = true;
-  end_x_ = x;
-  end_y_ = y;
-}
-
-void CosThetaProbleminterface::set_weight_cos_included_angle(
+void CosThetaSmoother::set_weight_cos_included_angle(
     const double weight_cos_included_angle) {
   weight_cos_included_angle_ = weight_cos_included_angle;
 }
 
-void CosThetaProbleminterface::set_weight_anchor_points(
+void CosThetaSmoother::set_weight_anchor_points(
     const double weight_anchor_points) {
   weight_anchor_points_ = weight_anchor_points;
 }
 
-void CosThetaProbleminterface::set_weight_length(const double weight_length) {
+void CosThetaSmoother::set_weight_length(const double weight_length) {
   weight_length_ = weight_length;
 }
 
-void CosThetaProbleminterface::hessian_strcuture() {
+void CosThetaSmoother::hessian_strcuture() {
   size_t index = 0;
   for (size_t i = 0; i < 6; ++i) {
     for (size_t j = 0; j <= i; ++j) {
@@ -630,15 +594,15 @@ void CosThetaProbleminterface::hessian_strcuture() {
 
 /** Template to return the objective value */
 template <class T>
-bool CosThetaProbleminterface::eval_obj(int n, const T* x, T* obj_value) {
+bool CosThetaSmoother::eval_obj(int n, const T* x, T* obj_value) {
   *obj_value = 0.0;
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
     *obj_value +=
-        weight_anchor_points_ *
-        ((x[index] - init_points_[i].x()) * (x[index] - init_points_[i].x()) +
-         (x[index + 1] - init_points_[i].y()) *
-             (x[index + 1] - init_points_[i].y()));
+        weight_anchor_points_ * ((x[index] - init_points_[i].first) *
+                                     (x[index] - init_points_[i].first) +
+                                 (x[index + 1] - init_points_[i].second) *
+                                     (x[index + 1] - init_points_[i].second));
   }
   for (size_t i = 0; i < num_of_points_ - 2; ++i) {
     size_t findex = i << 1;
@@ -669,14 +633,15 @@ bool CosThetaProbleminterface::eval_obj(int n, const T* x, T* obj_value) {
     //      ((x[mindex + 1] - x[findex + 1]) * (x[lindex + 1] - x[mindex +
     //      1])))
     //      /
-    //     (sqrt((init_points_[i + 1].x() - init_points_[i].x()) *
-    //               (init_points_[i + 1].x() - init_points_[i].x()) +
-    //           (init_points_[i + 1].y() - init_points_[i].y()) *
-    //               (init_points_[i + 1].y() - init_points_[i].y())) *
-    //      sqrt((init_points_[i + 2].x() - init_points_[i + 1].x()) *
-    //               (init_points_[i + 2].x() - init_points_[i + 1].x()) +
-    //           (init_points_[i + 2].y() - init_points_[i + 1].y()) *
-    //               (init_points_[i + 2].y() - init_points_[i + 1].y())));
+    //     (sqrt((init_points_[i + 1].first - init_points_[i].first) *
+    //               (init_points_[i + 1].first - init_points_[i].first) +
+    //           (init_points_[i + 1].second - init_points_[i].second) *
+    //               (init_points_[i + 1].second - init_points_[i].second)) *
+    //      sqrt((init_points_[i + 2].first - init_points_[i + 1].first) *
+    //               (init_points_[i + 2].first - init_points_[i + 1].first) +
+    //           (init_points_[i + 2].second - init_points_[i + 1].second) *
+    //               (init_points_[i + 2].second - init_points_[i +
+    //               1].second)));
 
     // Denominator numerically protected
     // *obj_value +=
@@ -736,8 +701,7 @@ bool CosThetaProbleminterface::eval_obj(int n, const T* x, T* obj_value) {
 
 /** Template to compute contraints */
 template <class T>
-bool CosThetaProbleminterface::eval_constraints(int n, const T* x, int m,
-                                                T* g) {
+bool CosThetaSmoother::eval_constraints(int n, const T* x, int m, T* g) {
   // fill in the positional deviation constraints
   for (size_t i = 0; i < num_of_points_; ++i) {
     size_t index = i << 1;
@@ -748,8 +712,8 @@ bool CosThetaProbleminterface::eval_constraints(int n, const T* x, int m,
 }
 
 /** Method to generate the required tapes */
-void CosThetaProbleminterface::generate_tapes(int n, int m, int* nnz_jac_g,
-                                              int* nnz_h_lag) {
+void CosThetaSmoother::generate_tapes(int n, int m, int* nnz_jac_g,
+                                      int* nnz_h_lag) {
   std::vector<double> xp(n, 0.0);
   std::vector<double> lamp(m, 0.0);
   std::vector<double> zl(m, 0.0);

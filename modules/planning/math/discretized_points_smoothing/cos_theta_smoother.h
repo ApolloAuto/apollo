@@ -24,11 +24,11 @@
 #include "adolc/adolc_sparse.h"
 #include "adolc/adouble.h"
 
-#include "Eigen/Dense"
-
+#include "IpIpoptApplication.hpp"
 #include "IpIpoptCalculatedQuantities.hpp"
 #include "IpIpoptData.hpp"
 #include "IpOrigIpoptNLP.hpp"
+#include "IpSolveStatistics.hpp"
 #include "IpTNLP.hpp"
 #include "IpTNLPAdapter.hpp"
 #include "IpTypes.hpp"
@@ -41,26 +41,18 @@
 namespace apollo {
 namespace planning {
 
-class CosThetaProbleminterface : public Ipopt::TNLP {
+class CosThetaSmoother : public Ipopt::TNLP {
  public:
-  explicit CosThetaProbleminterface(std::vector<Eigen::Vector2d> points,
-                                    std::vector<double> lateral_bounds);
+  explicit CosThetaSmoother(std::vector<std::pair<double, double>> points,
+                            std::vector<double> lateral_bounds);
 
-  virtual ~CosThetaProbleminterface() = default;
-
-  void set_default_max_point_deviation(const double point_max_deviation);
-
-  void set_start_point(const double x, const double y);
-
-  void set_end_point(const double x, const double y);
+  virtual ~CosThetaSmoother() = default;
 
   void set_weight_cos_included_angle(const double weight_cos_included_angle);
 
   void set_weight_anchor_points(const double weight_anchor_points);
 
   void set_weight_length(const double weight_length);
-
-  void set_relax_end_constraint(const double relax);
 
   void set_automatic_differentiation_flag(const bool use_ad);
 
@@ -130,7 +122,7 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
   //***************    end   ADOL-C part ***********************************
 
  private:
-  std::vector<Eigen::Vector2d> init_points_;
+  std::vector<std::pair<double, double>> init_points_;
 
   std::vector<double> lateral_bounds_;
 
@@ -152,22 +144,6 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
 
   void hessian_strcuture();
 
-  double default_max_point_deviation_ = 0.0;
-
-  bool has_fixed_start_point_ = false;
-
-  double start_x_ = 0.0;
-
-  double start_y_ = 0.0;
-
-  bool has_fixed_end_point_ = false;
-
-  double end_x_ = 0.0;
-
-  double end_y_ = 0.0;
-
-  double relax_ = 0.2;
-
   double weight_cos_included_angle_ = 0.0;
 
   double weight_anchor_points_ = 0.0;
@@ -179,8 +155,8 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
   bool use_automatic_differentiation_ = false;
   /**@name Methods to block default compiler methods.
    */
-  CosThetaProbleminterface(const CosThetaProbleminterface&);
-  CosThetaProbleminterface& operator=(const CosThetaProbleminterface&);
+  CosThetaSmoother(const CosThetaSmoother&);
+  CosThetaSmoother& operator=(const CosThetaSmoother&);
 
   std::vector<double> obj_lam_;
 
@@ -208,6 +184,5 @@ class CosThetaProbleminterface : public Ipopt::TNLP {
 
   //***************    end   ADOL-C part ***********************************
 };
-
 }  // namespace planning
 }  // namespace apollo

@@ -17,7 +17,7 @@
 /**
  * @file
  **/
-#include "modules/planning/reference_line/cos_theta_reference_line_smoother.h"
+#include "modules/planning/reference_line/discrete_points_reference_line_smoother.h"
 
 #include "gtest/gtest.h"
 
@@ -33,10 +33,13 @@
 namespace apollo {
 namespace planning {
 
-class CosThetaReferenceLineSmootherTest : public ::testing::Test {
+class DiscretePointsReferenceLineSmootherTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    smoother_.reset(new CosThetaReferenceLineSmoother(config_));
+    config_.mutable_discrete_points()
+        ->mutable_fem_pos_smoothing()
+        ->set_use_fem_pos(true);
+    smoother_.reset(new DiscretePointsReferenceLineSmoother(config_));
     hdmap_.LoadMapFromFile(map_file);
     const std::string lane_id = "1_-1";
     lane_info_ptr = hdmap_.GetLaneById(hdmap::MakeMapId(lane_id));
@@ -69,7 +72,7 @@ class CosThetaReferenceLineSmootherTest : public ::testing::Test {
   hdmap::LaneInfoConstPtr lane_info_ptr = nullptr;
 };
 
-TEST_F(CosThetaReferenceLineSmootherTest, smooth) {
+TEST_F(DiscretePointsReferenceLineSmootherTest, smooth) {
   ReferenceLine smoothed_reference_line;
   EXPECT_DOUBLE_EQ(153.87421245682503, reference_line_->Length());
   std::vector<AnchorPoint> anchor_points;
