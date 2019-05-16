@@ -62,16 +62,11 @@ class TimingWheel {
 
   void TickFunc();
 
-  inline uint64_t WorkWheelIndex() { return current_work_wheel_index_; }
-
-  inline uint64_t TickCount() const { return tick_count_; }
-
  private:
-  inline uint64_t GetWorkWheelIndex(const uint64_t index) {
+  uint64_t GetWorkWheelIndex(const uint64_t index) {
     return index & (WORK_WHEEL_SIZE - 1);
   }
-
-  inline uint64_t GetAssistantWheelIndex(const uint64_t index) {
+  uint64_t GetAssistantWheelIndex(const uint64_t index) {
     return index & (ASSISTANT_WHEEL_SIZE - 1);
   }
 
@@ -81,7 +76,6 @@ class TimingWheel {
   TimerBucket assistant_wheel_[ASSISTANT_WHEEL_SIZE];
   uint64_t current_work_wheel_index_ = 0;
   uint64_t current_assistant_wheel_index_ = 0;
-  uint64_t tick_count_ = 0;
   std::thread tick_thread_;
 
   DECLARE_SINGLETON(TimingWheel)

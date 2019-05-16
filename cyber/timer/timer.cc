@@ -69,42 +69,45 @@ bool Timer::InitTimerTask() {
   } else {
     std::weak_ptr<TimerTask> task_weak_ptr = task_;
     task_->callback = [this, task_weak_ptr](const uint64_t index) {
+      auto start = std::chrono::steady_clock::now();
       this->timer_opt_.callback();
-      if (!started_.load()) {
-        return;
-      }
-
-      if (target_tick_counts_ != 0) {
-        target_tick_counts_ += task_->interval_ms;
-      } else {
-        target_tick_counts_ = index;
-      }
-      auto timing_tick_counts = this->timing_wheel_->TickCount();
-      uint64_t target_index = target_tick_counts_ + task_->interval_ms;
+      auto end = std::chrono::steady_clock::now();
+      auto execute_time = end - start;
+      uint64_t execute_time_ms =
+          std::chrono::duration_cast<std::chrono::milliseconds>(execute_time)
+              .count();
+      uint64_t execute_time_ns =
+          std::chrono::duration_cast<std::chrono::nanoseconds>(execute_time)
+              .count();
+      int64_t accumulated_error_ns =
+          execute_time_ns - execute_time_ms * 1000000;
       auto task = task_weak_ptr.lock();
       if (task) {
-        if (target_index <= timing_tick_counts) {
+        if (execute_time_ms >= task->interval_ms) {
           task->next_fire_duration_ms = 1;
-          this->timing_wheel_->AddTask(task,
-                                       this->timing_wheel_->WorkWheelIndex());
-          if (compensate_) {
-            target_tick_counts_ = this->timing_wheel_->TickCount();
-          } else {
-            compensate_ = true;
-          }
+          this->accumulated_error_ns_ +=
+              execute_time_ns + 1000000 - task->interval_ms * 1000000;
         } else {
-          if (compensate_) {
-            task->next_fire_duration_ms = 1;
-            this->timing_wheel_->AddTask(task,
-                                         this->timing_wheel_->WorkWheelIndex());
-            compensate_ = false;
-            target_tick_counts_ = target_index - task_->interval_ms;
+          if (this->accumulated_error_ns_ > 1000000) {
+            if (task->interval_ms - execute_time_ms == 1) {
+              task->next_fire_duration_ms = 1;
+              this->accumulated_error_ns_ += accumulated_error_ns;
+            } else {
+              task->next_fire_duration_ms =
+                  task->interval_ms - execute_time_ms - 1;
+              this->accumulated_error_ns_ -= 1000000 - accumulated_error_ns;
+            }
+
+          } else if (this->accumulated_error_ns_ < -1000000) {
+            task->next_fire_duration_ms =
+                task->interval_ms - execute_time_ms + 1;
+            this->accumulated_error_ns_ += 1000000 + accumulated_error_ns;
           } else {
-            task->next_fire_duration_ms = 0;
-            this->timing_wheel_->AddTask(task,
-                                         target_index & (WORK_WHEEL_SIZE - 1));
+            task->next_fire_duration_ms = task->interval_ms - execute_time_ms;
+            this->accumulated_error_ns_ += accumulated_error_ns;
           }
         }
+        this->timing_wheel_->AddTask(task, index);
       }
     };
   }
@@ -125,7 +128,9 @@ void Timer::Start() {
 
 void Timer::Stop() {
   if (started_.exchange(false)) {
+    ADEBUG << "stop timer ";
     task_.reset();
+    accumulated_error_ns_ = 0;
   }
 }
 
