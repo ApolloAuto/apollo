@@ -94,6 +94,12 @@ function check_esd_files() {
 function generate_build_targets() {
   COMMON_TARGETS="//cyber/... union //modules/common/kv_db/... union //modules/dreamview/..."
   case $BUILD_FILTER in
+  cyber)
+    BUILD_TARGETS=`bazel query //cyber/...`
+    ;;
+  drivers)
+    BUILD_TARGETS=`bazel query //cyber/... union //modules/drivers/... except //modules/drivers/tools/... except //modules/drivers/canbus/... except //modules/drivers/video/...`
+    ;;
   control)
     BUILD_TARGETS=`bazel query $COMMON_TARGETS union //modules/control/... `
     ;;
@@ -156,10 +162,18 @@ function build() {
   build_py_proto
 
   # Clear KV DB and update commit_id after compiling.
-  rm -fr data/kv_db*
-  REVISION=$(get_revision)
-  ./bazel-bin/modules/common/kv_db/kv_db_tool --op=put \
-      --key="apollo:data:commit_id" --value="$REVISION"
+  if [ "$BUILD_FILTER" == 'cyber' ] || [ "$BUILD_FILTER" == 'drivers' ]; then
+    info "Skipping revision recording"
+  else
+    bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
+    if [ ${PIPESTATUS[0]} -ne 0 ]; then
+      fail 'Build failed!'
+    fi
+    rm -fr data/kv_db*
+    REVISION=$(get_revision)
+    ./bazel-bin/modules/common/kv_db/kv_db_tool --op=put \
+        --key="apollo:data:commit_id" --value="$REVISION"
+  fi
 
   if [ -d /apollo-simulator ] && [ -e /apollo-simulator/build.sh ]; then
     cd /apollo-simulator && bash build.sh build
@@ -671,6 +685,8 @@ function print_usage() {
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
+  ${BLUE}build_cyber [dbg|opt]${NONE}: build Cyber RT only
+  ${BLUE}build_drivers [dbg|opt]${NONE}: build drivers only
   ${BLUE}build_planning${NONE}: compile planning and its dependencies.
   ${BLUE}build_control${NONE}: compile control and its dependencies.
   ${BLUE}build_prediction${NONE}: compile prediction and its dependencies.
@@ -729,6 +745,26 @@ function main() {
     build_no_perception)
       DEFINES="${DEFINES} --cxxopt=-DCPU_ONLY"
       BUILD_FILTER="no_perception"
+      if [ "$1" == "opt" ]; then
+        shift
+        apollo_build_opt $@
+      else
+        shift
+        apollo_build_dbg $@
+      fi
+      ;;
+    build_cyber)
+      BUILD_FILTER="cyber"
+      if [ "$1" == "opt" ]; then
+        shift
+        apollo_build_opt $@
+      else
+        shift
+        apollo_build_dbg $@
+      fi
+      ;;
+    build_drivers)
+      BUILD_FILTER="drivers"
       if [ "$1" == "opt" ]; then
         shift
         apollo_build_opt $@
