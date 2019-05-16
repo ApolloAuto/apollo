@@ -43,7 +43,18 @@ class PullOverStageApproach : public Stage {
     return Stage::GetContextAs<PullOverContext>();
   }
 
-  Stage::StageStatus FinishStage();
+  Stage::StageStatus FinishStage(const bool success);
+
+ private:
+  enum PullOverStatus {
+    UNKNOWN = 0,
+    APPOACHING = 1,
+    PARK = 2,
+    STUCK = 3,
+    PASS = 4,
+  };
+
+  PullOverStatus CheckADCStop(const ReferenceLineInfo& reference_line_info);
 
  private:
   ScenarioPullOverConfig scenario_config_;

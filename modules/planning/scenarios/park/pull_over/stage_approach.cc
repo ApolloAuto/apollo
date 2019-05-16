@@ -24,6 +24,7 @@
 
 #include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
@@ -31,6 +32,7 @@ namespace scenario {
 namespace pull_over {
 
 using common::TrajectoryPoint;
+using common::util::DistanceXY;
 
 PullOverStageApproach::PullOverStageApproach(
     const ScenarioConfig::StageConfig& config)
@@ -43,24 +45,73 @@ Stage::StageStatus PullOverStageApproach::Process(
 
   scenario_config_.CopyFrom(GetContext()->scenario_config);
 
-  if (!config_.enabled()) {
-    return FinishStage();
-  }
-
   bool plan_ok = ExecuteTaskOnReferenceLine(planning_init_point, frame);
   if (!plan_ok) {
-    AERROR << "StopSignUnprotectedStageCreep planning error";
+    AERROR << "PullOverStageApproach planning error";
   }
 
-  // TODO(all): to be implemented
-  if (0) {
-    return FinishStage();
+  const auto& reference_line_info = frame->reference_line_info().front();
+  PullOverStatus status = CheckADCStop(reference_line_info);
+  if (status == PASS || status == PARK) {
+    return FinishStage(true);
+  } else if (status == STUCK) {
+    return FinishStage(false);
   }
+
   return StageStatus::RUNNING;
 }
 
-Stage::StageStatus PullOverStageApproach::FinishStage() {
-  return FinishScenario();
+/**
+ * @brief: check adc parked properly
+ */
+PullOverStageApproach::PullOverStatus PullOverStageApproach::CheckADCStop(
+      const ReferenceLineInfo& reference_line_info) {
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const auto& pull_over_status =
+      PlanningContext::Instance()->planning_status().pull_over();
+  double distance = adc_front_edge_s - pull_over_status.pull_over_s();
+  constexpr double kPassDistance = 8.0;  // meter
+  if (distance >= kPassDistance) {
+    ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
+    return PASS;
+  }
+
+  const double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  if (adc_speed > scenario_config_.max_adc_stop_speed()) {
+    ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
+    return APPOACHING;
+  }
+
+  constexpr double kParkCheckRange = 3.0;  // meter
+  if (distance <= -kParkCheckRange) {
+    ADEBUG << "ADC still far: distance[" << distance << "]";
+    return APPOACHING;
+  }
+
+  constexpr double kPositionTolerance = 0.3;  // meter
+  common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  common::math::Vec2d pull_over_position = {
+      pull_over_status.pull_over_x(),
+      pull_over_status.pull_over_y()};
+  distance = DistanceXY(adc_position, pull_over_position);
+  ADEBUG << "adc_position(" << adc_position.x() << ", " << adc_position.y()
+         << ") pull_over_position(" << pull_over_position.x()
+         << ", " << pull_over_position.y()
+         << ") distance[" << distance << "]";
+
+  return distance <= kPositionTolerance ? PARK : STUCK;
+}
+
+Stage::StageStatus PullOverStageApproach::FinishStage(const bool success) {
+  if (success) {
+    return FinishScenario();
+  } else {
+    // next_stage_ = open_space_parking;
+    return Stage::FINISHED;
+  }
 }
 
 }  // namespace pull_over

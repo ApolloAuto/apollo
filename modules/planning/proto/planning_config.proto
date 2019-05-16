@@ -145,6 +145,7 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
 
 message ScenarioPullOverConfig {
   optional double start_pull_over_scenario_distance = 1 [default = 50.0];  // meter
+  optional double max_adc_stop_speed = 2 [default = 0.1];  // m/s
 }
 
 message ScenarioValetParkingConfig {
