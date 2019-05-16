@@ -18,6 +18,8 @@
 
 INCHINA="no"
 LOCAL_IMAGE="no"
+FAST_BUILD_MODE="no"
+FAST_TEST_MODE="no"
 VERSION=""
 ARCH=$(uname -m)
 VERSION_X86_64="dev-x86_64-20190413_1615"
@@ -56,6 +58,8 @@ cat <<EOF
 Usage: $(basename $0) [options] ...
 OPTIONS:
     -C                     Pull docker image from China mirror.
+    -b, --fast-build       Light mode for building without pulling all the map volumes
+    -f, --fast-test        Light mode for testing without pulling limited set of map volumes
     -h, --help             Display this help and exit.
     -t, --tag <version>    Specify which version of a docker image to pull.
     -l, --local            Use local docker image.
@@ -102,7 +106,12 @@ DEFAULT_MAPS=(
   sunnyvale_with_two_offices
   san_mateo
 )
+DEFAULT_TEST_MAPS=(
+  sunnyvale_big_loop
+  sunnyvale_loop
+)
 MAP_VOLUME_CONF=""
+OTHER_VOLUME_CONF=""
 
 while [ $# -gt 0 ]
 do
@@ -127,6 +136,12 @@ do
         VERSION_OPT=$1
         echo -e "\033[93mWarning\033[0m: You are using an old style command line option which may be removed from"
         echo -e "further versoin, please use -t <version> instead.\n"
+        ;;
+    -b|--fast-build)
+        FAST_BUILD_MODE="yes"
+        ;;
+    -f|--fast-test)
+        FAST_TEST_MODE="yes"
         ;;
     -h|--help)
         show_usage
@@ -219,10 +234,36 @@ function main(){
         docker rm -v -f $APOLLO_DEV 1>/dev/null
     fi
 
-    # Included default maps.
-    for map_name in ${DEFAULT_MAPS[@]}; do
-      source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
-    done
+    if [ "$FAST_BUILD_MODE" == "no" ]; then
+        if [ "$FAST_TEST_MODE" == "no" ]; then
+            # Included default maps.
+            for map_name in ${DEFAULT_MAPS[@]}; do
+              source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+            done
+            YOLO3D_VOLUME=apollo_yolo3d_volume_$USER
+            docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
+
+            YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
+            docker pull ${YOLO3D_VOLUME_IMAGE}
+            docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
+
+            OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${YOLO3D_VOLUME}"
+        else
+            # Included default maps.
+            for map_name in ${DEFAULT_TEST_MAPS[@]}; do
+              source ${APOLLO_ROOT_DIR}/docker/scripts/restart_map_volume.sh ${map_name} "${VOLUME_VERSION}"
+            done
+        fi
+    fi
+
+    LOCALIZATION_VOLUME=apollo_localization_volume_$USER
+    docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
+
+    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
+    docker pull ${LOCALIZATION_VOLUME_IMAGE}
+    docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
+
+    OTHER_VOLUME_CONF="${OTHER_VOLUME_CONF} --volumes-from ${LOCALIZATION_VOLUME}"
 
     local display=""
     if [[ -z ${DISPLAY} ]];then
@@ -245,20 +286,6 @@ function main(){
         mkdir "$HOME/.cache"
     fi
 
-    LOCALIZATION_VOLUME=apollo_localization_volume_$USER
-    docker stop ${LOCALIZATION_VOLUME} > /dev/null 2>&1
-
-    LOCALIZATION_VOLUME_IMAGE=${DOCKER_REPO}:localization_volume-${ARCH}-latest
-    docker pull ${LOCALIZATION_VOLUME_IMAGE}
-    docker run -it -d --rm --name ${LOCALIZATION_VOLUME} ${LOCALIZATION_VOLUME_IMAGE}
-
-    YOLO3D_VOLUME=apollo_yolo3d_volume_$USER
-    docker stop ${YOLO3D_VOLUME} > /dev/null 2>&1
-
-    YOLO3D_VOLUME_IMAGE=${DOCKER_REPO}:yolo3d_volume-${ARCH}-latest
-    docker pull ${YOLO3D_VOLUME_IMAGE}
-    docker run -it -d --rm --name ${YOLO3D_VOLUME} ${YOLO3D_VOLUME_IMAGE}
-
     info "Starting docker container \"${APOLLO_DEV}\" ..."
 
     DOCKER_CMD="nvidia-docker"
@@ -273,8 +300,7 @@ function main(){
         --privileged \
         --name $APOLLO_DEV \
         ${MAP_VOLUME_CONF} \
-        --volumes-from ${LOCALIZATION_VOLUME} \
-        --volumes-from ${YOLO3D_VOLUME} \
+        ${OTHER_VOLUME_CONF} \
         -e DISPLAY=$display \
         -e DOCKER_USER=$USER \
         -e USER=$USER \
