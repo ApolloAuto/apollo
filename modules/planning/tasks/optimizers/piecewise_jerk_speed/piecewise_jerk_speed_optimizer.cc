@@ -52,11 +52,13 @@ PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
 
 Status PiecewiseJerkSpeedOptimizer::Process(
     const PathData& path_data, const TrajectoryPoint& init_point,
-    const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
-    SpeedData* const speed_data) {
+    const ReferenceLine& reference_line, SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
   }
+
+  CHECK(speed_data != nullptr);
+  SpeedData reference_speed_data = *speed_data;
 
   if (path_data.discretized_path().empty()) {
     std::string msg("Empty path data");
@@ -152,7 +154,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     // get curvature
     PathPoint path_point;
     path_data.GetPathPointWithPathS(path_s, &path_point);
-    penalty_dx.emplace_back(std::fabs(path_point.kappa()) *
+    penalty_dx.push_back(std::fabs(path_point.kappa()) *
                             piecewise_jerk_speed_config.kappa_penalty_weight());
     // get v_upper_bound
     const double v_lower_bound = 0.0;
