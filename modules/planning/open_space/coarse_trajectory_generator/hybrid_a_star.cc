@@ -347,14 +347,14 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   ADEBUG << "x_size is: " << x_size;
 
   double accumulated_s = 0.0;
-  std::vector<std::tuple<double, double, double>> s_bounds;
-  std::vector<std::tuple<double, double, double>> ds_bounds;
+  std::vector<std::pair<double, double>> x_bounds;
+  std::vector<std::pair<double, double>> dx_bounds;
 
   // Setup for initial point.
   result->accumulated_s.push_back(0.0);
   result->v.push_back(0.0);
-  s_bounds.emplace_back(0.0, -10.0, 10.0);
-  ds_bounds.emplace_back(0.0, -10.0, 10.0);
+  x_bounds.emplace_back(-10.0, 10.0);
+  dx_bounds.emplace_back(-10.0, 10.0);
 
   ADEBUG << "Initial accumulated_s: " << 0.0 << " initial discrete_v: " << 0.0;
 
@@ -368,13 +368,13 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
 
     result->v.push_back(discrete_v);
     result->accumulated_s.push_back(accumulated_s);
-    s_bounds.emplace_back(static_cast<double>(i) * delta_t_, accumulated_s - 10,
-                          accumulated_s + 10);
-    ds_bounds.emplace_back(static_cast<double>(i) * delta_t_, discrete_v - 10,
-                           discrete_v + 10);
+    x_bounds.emplace_back(accumulated_s - 10, accumulated_s + 10);
+    dx_bounds.emplace_back(discrete_v - 10, discrete_v + 10);
 
-    ADEBUG << "Initial accumulated_s: " << accumulated_s
-           << " initial discrete_v: " << discrete_v;
+    ADEBUG << "index: " << i << " accumulated_s: " << accumulated_s
+           << " x_bounds: " << accumulated_s - 10 << " and "
+           << accumulated_s + 10 << ", discrete_v: " << discrete_v
+           << " dx_bounds: " << discrete_v - 10 << " and " << discrete_v + 10;
   }
 
   result->v[x_size - 1] = 0.0;
@@ -397,16 +397,10 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   path_time_qp.set_weight_ddx(s_curve_config.acc_weight());
   path_time_qp.set_weight_dddx(s_curve_config.jerk_weight());
 
-  path_time_qp.set_x_bounds(
-      *(std::min_element(std::begin(result->accumulated_s),
-                         std::end(result->accumulated_s))) -
-          10,
-      *(std::max_element(std::begin(result->accumulated_s),
-                         std::end(result->accumulated_s))) +
-          10);
-  path_time_qp.set_dx_bounds(
-      *(std::min_element(std::begin(result->v), std::end(result->v)) - 10),
-      *(std::max_element(std::begin(result->v), std::end(result->v))) + 10);
+  path_time_qp.set_x_bounds(x_bounds);
+
+  path_time_qp.set_dx_bounds(dx_bounds);
+
   // TODO(QiL): load this from configs
   path_time_qp.set_ddx_bounds(-4.4, 10.0);
   path_time_qp.set_dddx_bound(FLAGS_longitudinal_jerk_bound);
