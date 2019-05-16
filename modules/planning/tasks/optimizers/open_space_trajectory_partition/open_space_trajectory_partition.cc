@@ -489,6 +489,7 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
       traj_end_point_moving_direction - vehicle_moving_direction_));
 
   // If close to the end point, start on the next trajectory
+  double end_point_iou_ratio = 0.0;
   if (distance_to_trajs_end < distance_to_midpoint_ &&
       heading_search_to_trajs_end < heading_search_range_) {
     // get vehicle box and path point box, compare with a threadhold in IOU
@@ -497,7 +498,7 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
     Vec2d shift_vec{shift_distance_ * std::cos(path_end_point_theta),
                     shift_distance_ * std::sin(path_end_point_theta)};
     path_end_point_box.Shift(shift_vec);
-    double end_point_iou_ratio =
+    end_point_iou_ratio =
         Polygon2d(ego_box_).ComputeIoU(Polygon2d(path_end_point_box));
 
     if (end_point_iou_ratio >
@@ -513,6 +514,18 @@ bool OpenSpaceTrajectoryPartition::CheckReachTrajectoryEnd(
       return true;
     }
   }
+
+  ADEBUG << "Vehicle did not reach end of a trajectory with conditions for "
+            "distance_check: "
+         << (distance_to_trajs_end < distance_to_midpoint_)
+         << " and actual distance: " << distance_to_trajs_end
+         << ", heading_check: "
+         << (heading_search_to_trajs_end < heading_search_range_)
+         << " with actual heading: " << heading_search_to_trajs_end
+         << ", iou_check: "
+         << (end_point_iou_ratio > open_space_trajectory_partition_config_
+                                       .vehicle_box_iou_threshold())
+         << " with actual iou: " << end_point_iou_ratio;
   return false;
 }
 
