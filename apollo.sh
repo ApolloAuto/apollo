@@ -97,6 +97,9 @@ function generate_build_targets() {
   cyber)
     BUILD_TARGETS=`bazel query //cyber/...`
     ;;
+  drivers)
+    BUILD_TARGETS=`bazel query //cyber/... union //modules/drivers/... except //modules/drivers/tools/... except //modules/drivers/canbus/... except //modules/drivers/video/...`
+    ;;
   control)
     BUILD_TARGETS=`bazel query $COMMON_TARGETS union //modules/control/... `
     ;;
@@ -159,7 +162,7 @@ function build() {
   build_py_proto
 
   # Clear KV DB and update commit_id after compiling.
-  if [ "$BUILD_FILTER" == 'cyber' ]; then
+  if [ "$BUILD_FILTER" == 'cyber' ] || [ "$BUILD_FILTER" == 'drivers' ]; then
     info "Skipping revision recording"
   else
     bazel build $JOB_ARG $DEFINES -c $@ $BUILD_TARGETS
@@ -682,6 +685,8 @@ function print_usage() {
   ${BLUE}build_gpu${NONE}: run build only with Caffe GPU mode support
   ${BLUE}build_opt_gpu${NONE}: build optimized binary with Caffe GPU mode support
   ${BLUE}build_fe${NONE}: compile frontend javascript code, this requires all the node_modules to be installed already
+  ${BLUE}build_cyber [dbg|opt]${NONE}: build Cyber RT only
+  ${BLUE}build_drivers [dbg|opt]${NONE}: build drivers only
   ${BLUE}build_planning${NONE}: compile planning and its dependencies.
   ${BLUE}build_control${NONE}: compile control and its dependencies.
   ${BLUE}build_prediction${NONE}: compile prediction and its dependencies.
@@ -750,7 +755,23 @@ function main() {
       ;;
     build_cyber)
       BUILD_FILTER="cyber"
-      apollo_build_dbg $@
+      if [ "$1" == "opt" ]; then
+        shift
+        apollo_build_opt $@
+      else
+        shift
+        apollo_build_dbg $@
+      fi
+      ;;
+    build_drivers)
+      BUILD_FILTER="drivers"
+      if [ "$1" == "opt" ]; then
+        shift
+        apollo_build_opt $@
+      else
+        shift
+        apollo_build_dbg $@
+      fi
       ;;
     build_control)
       BUILD_FILTER="control"
