@@ -60,7 +60,7 @@ bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(
 
 Status PathTimeHeuristicOptimizer::Process(
     const PathData& path_data, const common::TrajectoryPoint& init_point,
-    const ReferenceLine& reference_line, SpeedData* const speed_data) {
+    SpeedData* const speed_data) {
   init_point_ = init_point;
 
   if (path_data.discretized_path().empty()) {

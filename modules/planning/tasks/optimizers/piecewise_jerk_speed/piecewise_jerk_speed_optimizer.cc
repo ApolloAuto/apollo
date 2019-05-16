@@ -52,7 +52,7 @@ PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
 
 Status PiecewiseJerkSpeedOptimizer::Process(
     const PathData& path_data, const TrajectoryPoint& init_point,
-    const ReferenceLine& reference_line, SpeedData* const speed_data) {
+    SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
   }
