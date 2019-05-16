@@ -6,7 +6,6 @@ cc_library(
     name = "manual_traffic_light",
     srcs = ["manual_traffic_light.cc"],
     copts = ["-DMODULE_NAME=\\\"manual_traffic_light\\\""],
-    data = ["//modules/map:map_data"],
     deps = [
         "//modules/common/adapters:adapter_gflags",
         "//modules/map/hdmap:hdmap_util",

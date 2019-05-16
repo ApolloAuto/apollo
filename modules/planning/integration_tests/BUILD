@@ -11,7 +11,6 @@ cc_library(
         "planning_test_base.h",
     ],
     data = [
-        "//modules/map:map_data",
         "//modules/planning:planning_conf",
         "//modules/planning:planning_testdata",
     ],
@@ -51,7 +50,7 @@ cc_test(
     ],
     data = [
         "//modules/common/configs:config_gflags",
-        "//modules/map:map_data",
+        "//modules/map/data:map_sunnyvale_loop",
         "//modules/planning:planning_testdata",
     ],
     deps = [
@@ -67,7 +66,7 @@ cc_test(
     ],
     data = [
         "//modules/common/configs:config_gflags",
-        "//modules/map:map_data",
+        "//modules/map/data:map_sunnyvale_big_loop",
         "//modules/planning:planning_testdata",
     ],
     deps = [

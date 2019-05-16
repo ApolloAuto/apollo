@@ -5,7 +5,6 @@ package(default_visibility = ["//visibility:public"])
 cc_binary(
     name = "map_tool",
     srcs = ["map_tool.cc"],
-    data = ["//modules/map:map_data"],
     deps = [
         "//external:gflags",
         "//modules/common",
@@ -19,7 +18,6 @@ cc_binary(
 cc_binary(
     name = "map_xysl",
     srcs = ["map_xysl.cc"],
-    data = ["//modules/map:map_data"],
     deps = [
         "//external:gflags",
         "//modules/common",
@@ -43,7 +41,6 @@ cc_binary(
 cc_binary(
     name = "sim_map_generator",
     srcs = ["sim_map_generator.cc"],
-    data = ["//modules/map:map_data"],
     deps = [
         "//external:gflags",
         "//modules/common",
@@ -59,7 +56,6 @@ cc_binary(
 cc_binary(
     name = "proto_map_generator",
     srcs = ["proto_map_generator.cc"],
-    data = ["//modules/map:map_data"],
     deps = [
         "//external:gflags",
         "//modules/common",
@@ -73,7 +69,6 @@ cc_binary(
 cc_binary(
     name = "bin_map_generator",
     srcs = ["bin_map_generator.cc"],
-    data = ["//modules/map:map_data"],
     deps = [
         "//external:gflags",
         "//modules/common",
