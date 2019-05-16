@@ -582,6 +582,13 @@ bool ReferenceLineProvider::CreateReferenceLine(
         reference_lines->pop_back();
         iter = segments->erase(iter);
       } else {
+        Vec2d vec2d(vehicle_state.x(), vehicle_state.y());
+        common::SLPoint sl;
+        if (!reference_lines->back().XYToSL(vec2d, &sl)) {
+          AWARN << "Failed to project point: " << vec2d.DebugString()
+                << " to stitched reference line";
+        }
+        Shrink(sl, &reference_lines->back(), &(*iter));
         ++iter;
       }
     }

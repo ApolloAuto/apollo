@@ -241,24 +241,24 @@ void DiscretePointsReferenceLineSmoother::NormalizePoints(
   zero_x_ = xy_points->front().first;
   zero_y_ = xy_points->front().second;
   std::for_each(xy_points->begin(), xy_points->end(),
-                [this](std::pair<double, double>& p) {
-                  auto curr_x = p.first;
-                  auto curr_y = p.second;
+                [this](std::pair<double, double>& point) {
+                  auto curr_x = point.first;
+                  auto curr_y = point.second;
                   std::pair<double, double> xy(curr_x - zero_x_,
                                                curr_y - zero_y_);
-                  p = std::move(xy);
+                  point = std::move(xy);
                 });
 }
 
 void DiscretePointsReferenceLineSmoother::DeNormalizePoints(
     std::vector<std::pair<double, double>>* xy_points) {
   std::for_each(xy_points->begin(), xy_points->end(),
-                [this](std::pair<double, double>& p) {
-                  auto curr_x = p.first;
-                  auto curr_y = p.second;
+                [this](std::pair<double, double>& point) {
+                  auto curr_x = point.first;
+                  auto curr_y = point.second;
                   std::pair<double, double> xy(curr_x + zero_x_,
                                                curr_y + zero_y_);
-                  p = std::move(xy);
+                  point = std::move(xy);
                 });
 }
 
