@@ -34,7 +34,6 @@ class PiecewiseJerkSpeedOptimizer : public SpeedOptimizer {
  private:
   common::Status Process(const PathData& path_data,
                          const common::TrajectoryPoint& init_point,
-                         const ReferenceLine& reference_line,
                          SpeedData* const speed_data) override;
 };
 
