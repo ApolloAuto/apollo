@@ -23,6 +23,7 @@ const double PI = 3.1415926535898;
 const int MAX_RADAR_IDX = 2147483647;
 const double CONTI_ARS_INTERVAL = 0.074;
 const int ORIGIN_CONTI_MAX_ID_NUM = 100;
+const double MIN_PROBEXIST = 0.08;
 
 enum ContiObjectType {
   CONTI_POINT = 0,
@@ -59,3 +60,4 @@ enum ContiDynProp {
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
+
