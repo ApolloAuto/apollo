@@ -44,6 +44,7 @@ cc_library(
         "//modules/planning/tasks/deciders/path_assessment_decider",
         "//modules/planning/tasks/deciders/path_bounds_decider",
         "//modules/planning/tasks/deciders/path_lane_borrow_decider",
+        "//modules/planning/tasks/deciders/rule_based_stop_decider",
         "//modules/planning/tasks/optimizers/open_space_trajectory_generation:open_space_trajectory_provider",
         "//modules/planning/tasks/optimizers/open_space_trajectory_partition",
         "//modules/planning/tasks/optimizers/path_decider",
