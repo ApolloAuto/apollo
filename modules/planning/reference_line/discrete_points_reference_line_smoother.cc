@@ -104,10 +104,10 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   }
 
   const auto solver_end_timestamp = std::chrono::system_clock::now();
-  std::chrono::duration<double> diff =
+  std::chrono::duration<double> solver_diff =
       solver_end_timestamp - solver_start_timestamp;
   ADEBUG << "discrete_points reference line smoother solver time: "
-         << diff.count() * 1000.0 << " ms.";
+         << solver_diff.count() * 1000.0 << " ms.";
 
   DeNormalizePoints(&smoothed_point2d);
 
@@ -122,9 +122,9 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
   *smoothed_reference_line = ReferenceLine(ref_points);
 
   const auto end_timestamp = std::chrono::system_clock::now();
-  std::chrono::duration<double> solver_diff = end_timestamp - start_timestamp;
+  std::chrono::duration<double> diff = end_timestamp - start_timestamp;
   ADEBUG << "discrete_points reference line smoother totoal time: "
-         << solver_diff.count() * 1000.0 << " ms.";
+         << diff.count() * 1000.0 << " ms.";
   return true;
 }
 
@@ -240,14 +240,13 @@ void DiscretePointsReferenceLineSmoother::NormalizePoints(
     std::vector<std::pair<double, double>>* xy_points) {
   zero_x_ = xy_points->front().first;
   zero_y_ = xy_points->front().second;
-
   std::for_each(xy_points->begin(), xy_points->end(),
                 [this](std::pair<double, double>& p) {
                   auto curr_x = p.first;
                   auto curr_y = p.second;
                   std::pair<double, double> xy(curr_x - zero_x_,
                                                curr_y - zero_y_);
-                  p = xy;
+                  p = std::move(xy);
                 });
 }
 
@@ -259,7 +258,7 @@ void DiscretePointsReferenceLineSmoother::DeNormalizePoints(
                   auto curr_y = p.second;
                   std::pair<double, double> xy(curr_x + zero_x_,
                                                curr_y + zero_y_);
-                  p = xy;
+                  p = std::move(xy);
                 });
 }
 
