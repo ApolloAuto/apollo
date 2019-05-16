@@ -40,7 +40,6 @@ class SpeedOptimizer : public Task {
   virtual common::Status Process(const PathData& path_data,
                                  const common::TrajectoryPoint& init_point,
                                  const ReferenceLine& reference_line,
-                                 const SpeedData& reference_speed_data,
                                  SpeedData* const speed_data) = 0;
 
   void RecordDebugInfo(const SpeedData& speed_data);
