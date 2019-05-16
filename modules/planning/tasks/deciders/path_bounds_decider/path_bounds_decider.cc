@@ -186,7 +186,8 @@ Status PathBoundsDecider::Process(
       // 'SearchPullOverPosition' and use proto directly
       std::tuple<double, double, double, double, double>
           pull_over_configuration;
-      if (!SearchPullOverPosition(*reference_line_info, regular_self_path_bound,
+      if (!SearchPullOverPosition(*frame, *reference_line_info,
+                                  regular_self_path_bound,
                                   &pull_over_configuration)) {
         pull_over_info->set_exist_pull_over_position(false);
       } else {
@@ -329,20 +330,32 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 }
 
 bool PathBoundsDecider::SearchPullOverPosition(
+    const Frame& frame,
     const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
     std::tuple<double, double, double, double, double>* const
         pull_over_configuration) {
-  double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
-  double destination_s =
-      reference_line_info.SDistanceToDestination() + adc_end_s;
+  // destination_s based on routing_end
+  const auto& reference_line = reference_line_info_->reference_line();
+  common::SLPoint destination_sl;
+  const auto& routing = frame.local_view().routing;
+  const auto& routing_end = *(routing->routing_request().waypoint().rbegin());
+  reference_line.XYToSL({routing_end.pose().x(), routing_end.pose().y()},
+                        &destination_sl);
+  const double destination_s = destination_sl.s();
+  const double adc_end_s = reference_line_info.AdcSlBoundary().end_s();
+
   // Check if destination is some distance away from ADC.
   if (destination_s - adc_end_s < FLAGS_destination_to_adc_buffer) {
     const auto& pull_over_status =
         PlanningContext::Instance()->planning_status().pull_over();
     if (pull_over_status.exist_pull_over_position()) {
+      common::SLPoint pull_over_sl;
+      reference_line.XYToSL(
+          {pull_over_status.pull_over_x(), pull_over_status.pull_over_y()},
+          &pull_over_sl);
       *pull_over_configuration = std::make_tuple(
-          pull_over_status.pull_over_s(), pull_over_status.pull_over_l(),
+          pull_over_sl.s(), pull_over_sl.l(),
           pull_over_status.pull_over_x(), pull_over_status.pull_over_y(),
           pull_over_status.pull_over_theta());
       return true;
@@ -441,12 +454,12 @@ bool PathBoundsDecider::SearchPullOverPosition(
 
       common::math::Vec2d pull_over_xy_point;
       reference_line.SLToXY(pull_over_sl_point, &pull_over_xy_point);
-      double pull_over_x = pull_over_xy_point.x();
-      double pull_over_y = pull_over_xy_point.y();
+      const double pull_over_x = pull_over_xy_point.x();
+      const double pull_over_y = pull_over_xy_point.y();
 
       const auto& reference_point =
           reference_line.GetReferencePoint(pull_over_s);
-      double pull_over_theta = reference_point.heading();
+      const double pull_over_theta = reference_point.heading();
 
       *pull_over_configuration = std::make_tuple(
           pull_over_s, pull_over_l, pull_over_x, pull_over_y, pull_over_theta);
