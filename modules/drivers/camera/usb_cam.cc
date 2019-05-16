@@ -108,7 +108,7 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
 
   avcodec_context_ = avcodec_alloc_context3(avcodec_);
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54,28,1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54, 28, 1)
   avframe_camera_ = av_frame_alloc();
   avframe_rgb_ = av_frame_alloc();
 
@@ -127,7 +127,7 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
   avcodec_context_->height = image_height;
 
 #if LIBAVCODEC_VERSION_MAJOR > 52
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54,28,1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54, 28, 1)
   avcodec_context_->pix_fmt = AV_PIX_FMT_YUV422P;
 #else
   avcodec_context_->pix_fmt = PIX_FMT_YUV422P;
@@ -135,7 +135,7 @@ int UsbCam::init_mjpeg_decoder(int image_width, int image_height) {
   avcodec_context_->codec_type = AVMEDIA_TYPE_VIDEO;
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54,28,1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54, 28, 1)
   avframe_camera_size_ =
       avpicture_get_size(AV_PIX_FMT_YUV422P, image_width, image_height);
   avframe_rgb_size_ =
@@ -195,7 +195,7 @@ void UsbCam::mjpeg2rgb(char* mjpeg_buffer, int len, char* rgb_buffer,
     return;
   }
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54,28,1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54, 28, 1)
   video_sws_ =
       sws_getContext(xsize, ysize, avcodec_context_->pix_fmt, xsize, ysize,
                      AV_PIX_FMT_RGB24, SWS_BILINEAR, nullptr, nullptr, nullptr);
@@ -209,9 +209,10 @@ void UsbCam::mjpeg2rgb(char* mjpeg_buffer, int len, char* rgb_buffer,
             ysize, avframe_rgb_->data, avframe_rgb_->linesize);
   sws_freeContext(video_sws_);
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54,28,1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(54, 28, 1)
   int size = avpicture_layout(
-      reinterpret_cast<AVPicture*>(avframe_rgb_), AV_PIX_FMT_RGB24, xsize, ysize,
+      reinterpret_cast<AVPicture*>(avframe_rgb_), AV_PIX_FMT_RGB24,
+      xsize, ysize,
       reinterpret_cast<uint8_t*>(rgb_buffer), avframe_rgb_size_);
 #else
   int size = avpicture_layout(
