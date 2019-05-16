@@ -66,7 +66,6 @@ cc_test(
         "speed_limit_decider_test.cc",
     ],
     data = [
-        "//modules/map:map_data",
         "//modules/planning:planning_testdata",
     ],
     deps = [
@@ -85,7 +84,6 @@ cc_test(
         "st_boundary_mapper_test.cc",
     ],
     data = [
-        "//modules/map:map_data",
         "//modules/planning:planning_testdata",
     ],
     deps = [
