@@ -44,10 +44,9 @@ class PathTimeHeuristicOptimizer : public SpeedOptimizer {
                          const common::TrajectoryPoint& init_point,
                          const ReferenceLine& reference_line,
                          const SpeedData& reference_speed_data,
-                         PathDecision* const path_decision,
                          SpeedData* const speed_data) override;
 
-  bool SearchStGraph(SpeedData* speed_data) const;
+  bool SearchPathTimeGraph(SpeedData* speed_data) const;
 
  private:
   common::TrajectoryPoint init_point_;

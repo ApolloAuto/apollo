@@ -45,7 +45,7 @@ PathTimeHeuristicOptimizer::PathTimeHeuristicOptimizer(const TaskConfig& config)
   SetName("DpStSpeedOptimizer");
 }
 
-bool PathTimeHeuristicOptimizer::SearchStGraph(SpeedData* speed_data) const {
+bool PathTimeHeuristicOptimizer::SearchPathTimeGraph(SpeedData* speed_data) const {
   GriddedPathTimeGraph st_graph(
       reference_line_info_->st_graph_data(), dp_st_speed_config_,
       reference_line_info_->path_decision()->obstacles().Items(), init_point_);
@@ -60,7 +60,7 @@ bool PathTimeHeuristicOptimizer::SearchStGraph(SpeedData* speed_data) const {
 Status PathTimeHeuristicOptimizer::Process(
     const PathData& path_data, const common::TrajectoryPoint& init_point,
     const ReferenceLine& reference_line, const SpeedData& reference_speed_data,
-    PathDecision* const path_decision, SpeedData* const speed_data) {
+    SpeedData* const speed_data) {
   init_point_ = init_point;
 
   if (path_data.discretized_path().empty()) {
@@ -69,7 +69,7 @@ Status PathTimeHeuristicOptimizer::Process(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
 
-  if (!SearchStGraph(speed_data)) {
+  if (!SearchPathTimeGraph(speed_data)) {
     const std::string msg(Name() +
                           ":Failed to search graph with dynamic programming.");
     AERROR << msg;
