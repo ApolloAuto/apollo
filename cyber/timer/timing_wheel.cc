@@ -53,18 +53,12 @@ void TimingWheel::Tick() {
         auto callback = task->callback;
         cyber::Async([this, callback] {
           if (this->running_) {
-            callback(current_work_wheel_index_);
+            callback();
           }
         });
       }
       ite = bucket.task_list().erase(ite);
     }
-  }
-  current_work_wheel_index_ = GetWorkWheelIndex(current_work_wheel_index_ + 1);
-  if (current_work_wheel_index_ == 0) {
-    current_assistant_wheel_index_ =
-        GetAssistantWheelIndex(current_assistant_wheel_index_ + 1);
-    Cascade(current_assistant_wheel_index_);
   }
 }
 
@@ -119,6 +113,13 @@ void TimingWheel::TickFunc() {
   while (running_) {
     Tick();
     rate.Sleep();
+    current_work_wheel_index_ =
+        GetWorkWheelIndex(current_work_wheel_index_ + 1);
+    if (current_work_wheel_index_ == 0) {
+      current_assistant_wheel_index_ =
+          GetAssistantWheelIndex(current_assistant_wheel_index_ + 1);
+      Cascade(current_assistant_wheel_index_);
+    }
   }
 }
 

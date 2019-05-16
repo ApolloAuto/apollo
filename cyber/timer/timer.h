@@ -84,6 +84,7 @@ class Timer {
   std::shared_ptr<TimerTask> task_;
   std::atomic<bool> started_ = {false};
   int64_t accumulated_error_ns_ = 0;
+  uint64_t last_execute_time_ns_ = 0;
 };
 
 }  // namespace cyber
