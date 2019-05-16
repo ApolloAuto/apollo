@@ -100,8 +100,9 @@ bool Timer::InitTimerTask() {
             compensate_ = false;
             target_tick_counts_ = target_index - task_->interval_ms;
           } else {
-						task->next_fire_duration_ms = task_->interval_ms;
-            this->timing_wheel_->AddTask(task, index);
+            task->next_fire_duration_ms = 0;
+            this->timing_wheel_->AddTask(task,
+                                         target_index & (WORK_WHEEL_SIZE - 1));
           }
         }
       }
