@@ -31,6 +31,7 @@
 #include "modules/planning/tasks/deciders/path_assessment_decider/path_assessment_decider.h"
 #include "modules/planning/tasks/deciders/path_bounds_decider/path_bounds_decider.h"
 #include "modules/planning/tasks/deciders/path_lane_borrow_decider/path_lane_borrow_decider.h"
+#include "modules/planning/tasks/deciders/rule_based_stop_decider/rule_based_stop_decider.h"
 #include "modules/planning/tasks/deciders/speed_bounds_decider/speed_bounds_decider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_generation/open_space_trajectory_provider.h"
 #include "modules/planning/tasks/optimizers/open_space_trajectory_partition/open_space_trajectory_partition.h"
@@ -99,10 +100,9 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new OpenSpacePreStopDecider(config);
                          });
-  task_factory_.Register(TaskConfig::DECIDER_RSS,
-                         [](const TaskConfig& config) -> Task* {
-                           return new RssDecider(config);
-                         });
+  task_factory_.Register(
+      TaskConfig::DECIDER_RSS,
+      [](const TaskConfig& config) -> Task* { return new RssDecider(config); });
   task_factory_.Register(TaskConfig::SPEED_BOUNDS_PRIORI_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new SpeedBoundsDecider(config);
@@ -130,6 +130,10 @@ void TaskFactory::Init(const PlanningConfig& config) {
   task_factory_.Register(TaskConfig::PATH_ASSESSMENT_DECIDER,
                          [](const TaskConfig& config) -> Task* {
                            return new PathAssessmentDecider(config);
+                         });
+  task_factory_.Register(TaskConfig::RULE_BASED_STOP_DECIDER,
+                         [](const TaskConfig& config) -> Task* {
+                           return new RuleBasedStopDecider(config);
                          });
   for (const auto& default_task_config : config.default_task_config()) {
     default_task_configs_[default_task_config.task_type()] =
