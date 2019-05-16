@@ -79,20 +79,6 @@ message TaskConfig {
 message ScenarioLaneFollowConfig {
 }
 
-message ScenarioSidePassConfig {
-  optional double side_pass_exit_distance = 1 [default = 10.0];
-  optional double approach_obstacle_max_stop_speed = 2 [default = 1.0e-5];
-  optional double approach_obstacle_min_stop_distance = 3 [default = 4.0];
-  optional double block_obstacle_min_speed = 4 [default = 0.1]; // m/s
-  // set to false to work around large vehicle splitting issue in perception
-  optional bool enable_obstacle_blocked_check = 5 [default = true];
-  optional uint32 max_backup_stage_cycle_num = 6 [default = 30];
-  optional double min_l_nudge_buffer = 7 [default = 0.5];
-  optional double min_front_obstacle_distance = 8 [default = 0.5];
-  optional double max_front_obstacle_distance = 9 [default = 15.0];
-  optional double stop_fence_distance_to_blocking_obstacle = 10 [default = 6.0];
-}
-
 message ScenarioBareIntersectionUnprotectedConfig {
   optional double start_bare_intersection_scenario_distance = 1 [default = 25.0];  // meter
   // explicit stop while waiting
@@ -161,7 +147,6 @@ message ScenarioConfig {
   enum ScenarioType {
     LANE_FOLLOW = 0;  // default scenario
     CHANGE_LANE = 1;
-    SIDE_PASS = 2;  // go around an object when it blocks the road
 
     // intersection involved
     BARE_INTERSECTION_UNPROTECTED = 3;
@@ -186,15 +171,6 @@ message ScenarioConfig {
     NO_STAGE = 0;
 
     LANE_FOLLOW_DEFAULT_STAGE = 1;
-
-    // side_pass scenario
-    SIDE_PASS_APPROACH_OBSTACLE = 100;
-    SIDE_PASS_GENERATE_PATH= 101;
-    SIDE_PASS_STOP_ON_WAITPOINT = 102;
-    SIDE_PASS_DETECT_SAFETY = 103;
-    SIDE_PASS_PASS_OBSTACLE = 104;
-    SIDE_PASS_BACKUP = 105;
-    SIDE_PASS_DEFAULT_STAGE = 106;
 
     // bare_intersection_unprotected scenario
     BARE_INTERSECTION_UNPROTECTED_APPROACH = 200;
@@ -240,7 +216,6 @@ message ScenarioConfig {
   optional ScenarioType scenario_type = 1;
   oneof scenario_config {
     ScenarioLaneFollowConfig lane_follow_config = 2;
-    ScenarioSidePassConfig side_pass_config = 3;
     ScenarioBareIntersectionUnprotectedConfig bare_intersection_unprotected_config = 4;
     ScenarioStopSignUnprotectedConfig stop_sign_unprotected_config = 5;
     ScenarioTrafficLightProtectedConfig traffic_light_protected_config = 6;

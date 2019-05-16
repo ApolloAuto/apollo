@@ -105,10 +105,6 @@ void ScenarioManager::RegisterScenarios() {
   CHECK(Scenario::LoadConfig(FLAGS_scenario_lane_follow_config_file,
                              &config_map_[ScenarioConfig::LANE_FOLLOW]));
 
-  // side_pass
-  CHECK(Scenario::LoadConfig(FLAGS_scenario_side_pass_config_file,
-                             &config_map_[ScenarioConfig::SIDE_PASS]));
-
   // bare_intersection
   CHECK(Scenario::LoadConfig(
       FLAGS_scenario_bare_intersection_unprotected_config_file,
@@ -181,7 +177,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
       }
       break;
     case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::BARE_INTERSECTION_UNPROTECTED:
     case ScenarioConfig::STOP_SIGN_PROTECTED:
     case ScenarioConfig::STOP_SIGN_UNPROTECTED:
@@ -226,7 +221,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectStopSignScenario(
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::PULL_OVER:
       if (stop_sign_scenario) {
         return stop_sign_all_way ? ScenarioConfig::STOP_SIGN_PROTECTED
@@ -321,7 +315,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectTrafficLightScenario(
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::PULL_OVER:
       if (traffic_light_scenario) {
         const auto& turn_type = reference_line_info.GetPathTurnType(
@@ -396,7 +389,6 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectBareIntersectionScenario(
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
     case ScenarioConfig::CHANGE_LANE:
-    case ScenarioConfig::SIDE_PASS:
     case ScenarioConfig::PULL_OVER:
       if (bare_junction_scenario) {
         return ScenarioConfig::BARE_INTERSECTION_UNPROTECTED;
