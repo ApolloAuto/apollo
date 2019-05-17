@@ -1,0 +1,23 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/bridge/libbridge_control_component.so"
+    components {
+        class_name : "BridgeControlComponent"
+        config {
+            name: "bridge_control"
+            config_file_path: "/apollo/modules/bridge/conf/bridge_control.conf"
+            readers {
+              channel: "/apollo/planning"
+            }
+      }
+   }
+
+    components {
+        class_name : "UDPBridgeComponent"
+        config {
+            name: "bridge"
+            readers {
+              channel: "/apollo/localization/pose"
+            }
+      }
+   }
+}
