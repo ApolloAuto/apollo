@@ -8,7 +8,7 @@ cc_library(
         ".",
     ],
     linkopts = [
-	"-L/usr/local/lib",
+        "-L/usr/local/lib",
         "-lglog",
         "-lgflags",
     ],
