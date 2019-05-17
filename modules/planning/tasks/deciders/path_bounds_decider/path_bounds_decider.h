@@ -41,9 +41,6 @@ constexpr double kPathBoundsDeciderHorizon = 150.0;
 constexpr double kPathBoundsDeciderResolution = 0.5;
 constexpr double kDefaultLaneWidth = 5.0;
 constexpr double kDefaultRoadWidth = 20.0;
-constexpr double kObstacleStartSBuffer = 3.0;
-constexpr double kObstacleEndSBuffer = 2.0;
-constexpr double kObstacleLBuffer = 0.4;
 constexpr int kNumExtraTailBoundPoint = 10;
 
 class PathBoundsDecider : public Decider {
@@ -112,6 +109,7 @@ class PathBoundsDecider : public Decider {
       std::vector<std::tuple<double, double, double>>* const path_bound);
 
   bool SearchPullOverPosition(
+      const Frame& frame,
       const ReferenceLineInfo& reference_line_info,
       const std::vector<std::tuple<double, double, double>>& path_bound,
       std::tuple<double, double, double, double, double>* const

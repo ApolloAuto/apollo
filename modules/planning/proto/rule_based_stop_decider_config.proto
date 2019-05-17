@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package apollo.planning;
+
+message RuleBasedStopDeciderConfig {
+  optional double max_adc_stop_speed = 1 [default = 0.3];
+  optional double max_valid_stop_distance = 2 [default = 0.5];
+  optional double approach_distance_for_lane_change = 3 [default = 80.0];
+  optional double urgent_distance_for_lane_change = 4 [default = 50.0];
+}

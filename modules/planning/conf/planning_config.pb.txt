@@ -65,6 +65,13 @@ default_task_config: {
   task_type: SPEED_DECIDER
 }
 default_task_config: {
+  task_type: RULE_BASED_STOP_DECIDER
+  rule_based_stop_decider_config {
+    max_adc_stop_speed: 0.5
+    max_valid_stop_distance: 0.5
+  }
+}
+default_task_config: {
   task_type: SPEED_BOUNDS_PRIORI_DECIDER
   speed_bounds_decider_config {
     total_path_length: 149
@@ -81,7 +88,6 @@ default_task_config: {
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
     centri_jerk_speed_coeff: 1.0
-    max_valid_stop_distance: 0.5
   }
 }
 default_task_config: {
@@ -101,7 +107,6 @@ default_task_config: {
     static_obs_nudge_speed_ratio: 0.6
     dynamic_obs_nudge_speed_ratio: 0.8
     centri_jerk_speed_coeff: 1.0
-    max_valid_stop_distance: 0.25
   }
 }
 default_task_config: {

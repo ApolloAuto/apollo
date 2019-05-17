@@ -32,9 +32,9 @@ namespace pull_over {
 
 struct PullOverContext;
 
-class PullOverStageApproach : public Stage {
+class PullOverStageRetryParking : public Stage {
  public:
-  explicit PullOverStageApproach(const ScenarioConfig::StageConfig& config);
+  explicit PullOverStageRetryParking(const ScenarioConfig::StageConfig& config);
 
   StageStatus Process(const common::TrajectoryPoint& planning_init_point,
                       Frame* frame) override;
@@ -44,17 +44,6 @@ class PullOverStageApproach : public Stage {
   }
 
   Stage::StageStatus FinishStage(const bool success);
-
- private:
-  enum PullOverStatus {
-    UNKNOWN = 0,
-    APPOACHING = 1,
-    PARK_COMPLETE = 2,
-    PARK_FAIL = 3,
-    PASS_DESTINATION = 4,
-  };
-
-  PullOverStatus CheckADCStop(const ReferenceLineInfo& reference_line_info);
 
  private:
   ScenarioPullOverConfig scenario_config_;
