@@ -67,6 +67,7 @@ default_task_config: {
 default_task_config: {
   task_type: RULE_BASED_STOP_DECIDER
   rule_based_stop_decider_config {
+    max_adc_stop_speed: 0.5
     max_valid_stop_distance: 0.5
   }
 }

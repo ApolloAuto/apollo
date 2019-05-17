@@ -43,20 +43,6 @@ namespace planning {
 
 class PlanningContext {
  public:
-  // TODO(jinyun): to be removed/cleaned up.
-  //               put all of them inside Planningstatus
-  // @brief a container logging the data required for non-scenario side pass
-  // functionality
-  struct SidePassInfo {
-    bool change_lane_stop_flag = false;
-    common::PathPoint change_lane_stop_path_point;
-    bool check_clear_flag = false;
-  };
-
-  const SidePassInfo& side_pass_info() { return side_pass_info_; }
-
-  SidePassInfo* mutable_side_pass_info() { return &side_pass_info_; }
-
   struct FallBackInfo {
     std::string last_successful_path_label;
   };
@@ -87,7 +73,6 @@ class PlanningContext {
 
  private:
   PlanningStatus planning_status_;
-  SidePassInfo side_pass_info_;
   FallBackInfo fallback_info_;
   OpenSpaceInfo open_space_info_;
   PathDeciderInfo path_decider_info_;
