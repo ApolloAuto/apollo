@@ -23,7 +23,6 @@
 #include "Eigen/Core"
 
 #include "cyber/common/log.h"
-#include "modules/common/configs/config_gflags.h"
 #include "modules/common/math/linear_interpolation.h"
 #include "modules/common/math/math_utils.h"
 #include "modules/common/math/search.h"
@@ -251,12 +250,8 @@ common::math::Vec2d TrajectoryAnalyzer::ComputeCOMPosition(
   Eigen::Vector3d v;
   const double cos_heading = std::cos(path_point.theta());
   const double sin_heading = std::sin(path_point.theta());
-  if (FLAGS_coordinate_transform_to_com) {
-    v << rear_to_com_distance * cos_heading, rear_to_com_distance * sin_heading,
-        0.0;
-  } else {
-    v << 0.0, 0.0, 0.0;
-  }
+  v << rear_to_com_distance * cos_heading, rear_to_com_distance * sin_heading,
+      0.0;
   // Original position reference point at center of rear-axis
   Eigen::Vector3d pos_vec(path_point.x(), path_point.y(), path_point.z());
   // Transform original position with vector v

@@ -56,3 +56,12 @@ DEFINE_int32(pad_msg_pending_queue_size, 10,
              "Max pad message pending queue size");
 
 DEFINE_bool(reverse_heading_control, false, "test vehicle reverse control");
+
+DEFINE_bool(
+    trajectory_transform_to_com_reverse, false,
+    "Enable planning trajectory coordinate transformation from center of "
+    "rear-axis to center of mass, during reverse driving");
+DEFINE_bool(
+    trajectory_transform_to_com_drive, false,
+    "Enable planning trajectory coordinate transformation from center of "
+    "rear-axis to center of mass, during forward driving");

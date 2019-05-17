@@ -67,6 +67,9 @@ DEFINE_bool(use_sim_time, false, "Use bag time in mock time mode.");
 DEFINE_bool(reverse_heading_vehicle_state, false,
             "test flag for reverse driving.");
 
-DEFINE_bool(coordinate_transform_to_com, false,
-            "Enable coordinate transformation from center of rear-axis to "
-            "center of mass");
+DEFINE_bool(state_transform_to_com_reverse, false,
+            "Enable vehicle states coordinate transformation from center of "
+            "rear-axis to center of mass, during reverse driving");
+DEFINE_bool(state_transform_to_com_drive, true,
+            "Enable vehicle states coordinate transformation from center of "
+            "rear-axis to center of mass, during forward driving");
