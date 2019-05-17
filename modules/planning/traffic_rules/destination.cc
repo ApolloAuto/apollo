@@ -88,16 +88,15 @@ int Destination::MakeDecisions(Frame* frame,
         pull_over_status.has_pull_over_s()) {
       // build stop decision based on pull-over position
       ADEBUG << "BuildStopDecision: pull-over position";
-      const double stop_line_s = pull_over_status.pull_over_s() +
+      const double stop_line_s =
+          pull_over_status.pull_over_s() +
           VehicleConfigHelper::GetConfig().vehicle_param().length() +
           config_.destination().stop_distance();
-      util::BuildStopDecision(stop_wall_id,
-                              stop_line_s,
-                              config_.destination().stop_distance(),
-                              StopReasonCode::STOP_REASON_PULL_OVER,
-                              wait_for_obstacle_ids,
-                              TrafficRuleConfig::RuleId_Name(config_.rule_id()),
-                              frame, reference_line_info);
+      util::BuildStopDecision(
+          stop_wall_id, stop_line_s, config_.destination().stop_distance(),
+          StopReasonCode::STOP_REASON_PULL_OVER, wait_for_obstacle_ids,
+          TrafficRuleConfig::RuleId_Name(config_.rule_id()), frame,
+          reference_line_info);
       return 0;
     }
   }

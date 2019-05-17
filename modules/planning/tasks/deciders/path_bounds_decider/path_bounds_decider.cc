@@ -330,8 +330,7 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 }
 
 bool PathBoundsDecider::SearchPullOverPosition(
-    const Frame& frame,
-    const ReferenceLineInfo& reference_line_info,
+    const Frame& frame, const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
     std::tuple<double, double, double, double, double>* const
         pull_over_configuration) {
@@ -355,9 +354,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
           {pull_over_status.pull_over_x(), pull_over_status.pull_over_y()},
           &pull_over_sl);
       *pull_over_configuration = std::make_tuple(
-          pull_over_sl.s(), pull_over_sl.l(),
-          pull_over_status.pull_over_x(), pull_over_status.pull_over_y(),
-          pull_over_status.pull_over_theta());
+          pull_over_sl.s(), pull_over_sl.l(), pull_over_status.pull_over_x(),
+          pull_over_status.pull_over_y(), pull_over_status.pull_over_theta());
       return true;
     } else {
       ADEBUG << "Destination is too close to ADC. distance["
