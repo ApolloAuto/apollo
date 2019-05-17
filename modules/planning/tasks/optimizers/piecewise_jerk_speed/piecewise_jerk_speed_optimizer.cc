@@ -50,9 +50,9 @@ PiecewiseJerkSpeedOptimizer::PiecewiseJerkSpeedOptimizer(
   CHECK(config_.has_piecewise_jerk_speed_config());
 }
 
-Status PiecewiseJerkSpeedOptimizer::Process(
-    const PathData& path_data, const TrajectoryPoint& init_point,
-    SpeedData* const speed_data) {
+Status PiecewiseJerkSpeedOptimizer::Process(const PathData& path_data,
+                                            const TrajectoryPoint& init_point,
+                                            SpeedData* const speed_data) {
   if (reference_line_info_->ReachedDestination()) {
     return Status::OK();
   }
@@ -155,7 +155,7 @@ Status PiecewiseJerkSpeedOptimizer::Process(
     PathPoint path_point;
     path_data.GetPathPointWithPathS(path_s, &path_point);
     penalty_dx.push_back(std::fabs(path_point.kappa()) *
-                            piecewise_jerk_speed_config.kappa_penalty_weight());
+                         piecewise_jerk_speed_config.kappa_penalty_weight());
     // get v_upper_bound
     const double v_lower_bound = 0.0;
     double v_upper_bound = FLAGS_planning_upper_speed_limit;
