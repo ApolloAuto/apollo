@@ -2,6 +2,9 @@ scenario_type: PULL_OVER
 pull_over_config: {
   start_pull_over_scenario_distance: 50.0
   max_adc_stop_speed: 0.3
+  max_position_error_to_end_point: 0.3
+  max_theta_error_to_end_point: 0.2
+  pass_destination_threshold: 15.0
 }
 
 stage_type: PULL_OVER_APPROACH

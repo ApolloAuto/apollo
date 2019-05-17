@@ -52,9 +52,9 @@ Stage::StageStatus PullOverStageApproach::Process(
 
   const auto& reference_line_info = frame->reference_line_info().front();
   PullOverStatus status = CheckADCStop(reference_line_info);
-  if (status == PASS || status == PARK) {
+  if (status == PASS_DESTINATION || status == PARK_COMPLETE) {
     return FinishStage(true);
-  } else if (status == STUCK) {
+  } else if (status == PARK_FAIL) {
     return FinishStage(false);
   }
 
@@ -70,10 +70,9 @@ PullOverStageApproach::PullOverStatus PullOverStageApproach::CheckADCStop(
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
   double distance = adc_front_edge_s - pull_over_status.pull_over_s();
-  constexpr double kPassDistance = 8.0;  // meter
-  if (distance >= kPassDistance) {
+  if (distance >= scenario_config_.pass_destination_threshold()) {
     ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
-    return PASS;
+    return PASS_DESTINATION;
   }
 
   const double adc_speed =
@@ -83,13 +82,12 @@ PullOverStageApproach::PullOverStatus PullOverStageApproach::CheckADCStop(
     return APPOACHING;
   }
 
-  constexpr double kParkCheckRange = 3.0;  // meter
-  if (distance <= -kParkCheckRange) {
+  constexpr double kStartParkCheckRange = 3.0;  // meter
+  if (distance <= -kStartParkCheckRange) {
     ADEBUG << "ADC still far: distance[" << distance << "]";
     return APPOACHING;
   }
 
-  constexpr double kPositionTolerance = 0.3;  // meter
   common::math::Vec2d adc_position = {
       common::VehicleStateProvider::Instance()->x(),
       common::VehicleStateProvider::Instance()->y()};
@@ -102,7 +100,16 @@ PullOverStageApproach::PullOverStatus PullOverStageApproach::CheckADCStop(
          << ", " << pull_over_position.y()
          << ") distance[" << distance << "]";
 
-  return distance <= kPositionTolerance ? PARK : STUCK;
+  const double theta_diff = common::math::NormalizeAngle(
+      std::fabs(
+          pull_over_status.pull_over_theta() -
+          common::VehicleStateProvider::Instance()->heading()));
+  if (distance <= scenario_config_.max_position_error_to_end_point() &&
+      theta_diff <= scenario_config_.max_theta_error_to_end_point()) {
+    return PARK_COMPLETE;
+  } else {
+    return PARK_FAIL;
+  }
 }
 
 Stage::StageStatus PullOverStageApproach::FinishStage(const bool success) {

@@ -49,9 +49,9 @@ class PullOverStageApproach : public Stage {
   enum PullOverStatus {
     UNKNOWN = 0,
     APPOACHING = 1,
-    PARK = 2,
-    STUCK = 3,
-    PASS = 4,
+    PARK_COMPLETE = 2,
+    PARK_FAIL = 3,
+    PASS_DESTINATION = 4,
   };
 
   PullOverStatus CheckADCStop(const ReferenceLineInfo& reference_line_info);
