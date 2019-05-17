@@ -132,6 +132,9 @@ message ScenarioTrafficLightUnprotectedRightTurnConfig {
 message ScenarioPullOverConfig {
   optional double start_pull_over_scenario_distance = 1 [default = 50.0];  // meter
   optional double max_adc_stop_speed = 2 [default = 0.1];  // m/s
+  optional double max_position_error_to_end_point = 3 [default = 0.5];
+  optional double max_theta_error_to_end_point = 4 [default = 0.2];
+  optional double pass_destination_threshold = 5 [default = 10.0];
 }
 
 message ScenarioValetParkingConfig {
