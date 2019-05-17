@@ -211,9 +211,8 @@ void UsbCam::mjpeg2rgb(char* mjpeg_buffer, int len, char* rgb_buffer,
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 0, 0)
   int size = avpicture_layout(
-      reinterpret_cast<AVPicture*>(avframe_rgb_), AV_PIX_FMT_RGB24,
-      xsize, ysize,
-      reinterpret_cast<uint8_t*>(rgb_buffer), avframe_rgb_size_);
+      reinterpret_cast<AVPicture*>(avframe_rgb_), AV_PIX_FMT_RGB24, xsize,
+      ysize, reinterpret_cast<uint8_t*>(rgb_buffer), avframe_rgb_size_);
 #else
   int size = avpicture_layout(
       reinterpret_cast<AVPicture*>(avframe_rgb_), PIX_FMT_RGB24, xsize, ysize,
