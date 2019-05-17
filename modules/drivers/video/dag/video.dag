@@ -18,29 +18,29 @@ module_config {
        }
     }
 
-    components {
-      class_name : "CompCameraH265Compressed"
-      config {
-        name : "camera_front_fisheye_compress"
-        config_file_path : "/apollo/modules/drivers/video/conf/video_front_fisheye.pb.txt"
-      }
-    }
+#    components {
+#      class_name : "CompCameraH265Compressed"
+#      config {
+#        name : "camera_front_fisheye_compress"
+#        config_file_path : "/apollo/modules/drivers/video/conf/video_front_fisheye.pb.txt"
+#      }
+#    }
 
-     components {
-       class_name : "CompCameraH265Compressed"
-       config {
-         name : "camera_left_front_compress"
-         config_file_path : "/apollo/modules/drivers/video/conf/video_left_front.pb.txt"
-       }
-     }
+#     components {
+#       class_name : "CompCameraH265Compressed"
+#       config {
+#         name : "camera_left_front_compress"
+#         config_file_path : "/apollo/modules/drivers/video/conf/video_left_front.pb.txt"
+#       }
+#     }
 
-     components {
-       class_name : "CompCameraH265Compressed"
-       config {
-         name : "camera_left_rear_compress"
-         config_file_path : "/apollo/modules/drivers/video/conf/video_left_rear.pb.txt"
-       }
-     }
+#     components {
+#       class_name : "CompCameraH265Compressed"
+#       config {
+#         name : "camera_left_rear_compress"
+#         config_file_path : "/apollo/modules/drivers/video/conf/video_left_rear.pb.txt"
+#       }
+#     }
 
     components {
       class_name : "CompCameraH265Compressed"
@@ -50,21 +50,21 @@ module_config {
       }
     }
 
-    components {
-      class_name : "CompCameraH265Compressed"
-      config {
-        name : "camera_right_front_compress"
-        config_file_path : "/apollo/modules/drivers/video/conf/video_right_front.pb.txt"
-      }
-    }
+#    components {
+#      class_name : "CompCameraH265Compressed"
+#      config {
+#        name : "camera_right_front_compress"
+#        config_file_path : "/apollo/modules/drivers/video/conf/video_right_front.pb.txt"
+#      }
+#    }
 
-    components {
-      class_name : "CompCameraH265Compressed"
-      config {
-        name : "camera_right_rear_compress"
-        config_file_path : "/apollo/modules/drivers/video/conf/video_right_rear.pb.txt"
-      }
-    }
+#    components {
+#      class_name : "CompCameraH265Compressed"
+#      config {
+#        name : "camera_right_rear_compress"
+#        config_file_path : "/apollo/modules/drivers/video/conf/video_right_rear.pb.txt"
+#      }
+#    }
 
     components {
       class_name : "CompCameraH265Compressed"
