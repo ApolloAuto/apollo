@@ -65,7 +65,7 @@ Stage::StageStatus PullOverStageApproach::Process(
  * @brief: check adc parked properly
  */
 PullOverStageApproach::PullOverStatus PullOverStageApproach::CheckADCStop(
-      const ReferenceLineInfo& reference_line_info) {
+    const ReferenceLineInfo& reference_line_info) {
   const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
   const auto& pull_over_status =
       PlanningContext::Instance()->planning_status().pull_over();
@@ -91,19 +91,16 @@ PullOverStageApproach::PullOverStatus PullOverStageApproach::CheckADCStop(
   common::math::Vec2d adc_position = {
       common::VehicleStateProvider::Instance()->x(),
       common::VehicleStateProvider::Instance()->y()};
-  common::math::Vec2d pull_over_position = {
-      pull_over_status.pull_over_x(),
-      pull_over_status.pull_over_y()};
+  common::math::Vec2d pull_over_position = {pull_over_status.pull_over_x(),
+                                            pull_over_status.pull_over_y()};
   distance = DistanceXY(adc_position, pull_over_position);
   ADEBUG << "adc_position(" << adc_position.x() << ", " << adc_position.y()
-         << ") pull_over_position(" << pull_over_position.x()
-         << ", " << pull_over_position.y()
-         << ") distance[" << distance << "]";
+         << ") pull_over_position(" << pull_over_position.x() << ", "
+         << pull_over_position.y() << ") distance[" << distance << "]";
 
-  const double theta_diff = common::math::NormalizeAngle(
-      std::fabs(
-          pull_over_status.pull_over_theta() -
-          common::VehicleStateProvider::Instance()->heading()));
+  const double theta_diff = std::fabs(common::math::NormalizeAngle(
+      pull_over_status.pull_over_theta() -
+      common::VehicleStateProvider::Instance()->heading()));
   if (distance <= scenario_config_.max_position_error_to_end_point() &&
       theta_diff <= scenario_config_.max_theta_error_to_end_point()) {
     return PARK_COMPLETE;
