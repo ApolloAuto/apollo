@@ -47,6 +47,7 @@ Stage::StageStatus PullOverStageApproach::Process(
   if (!plan_ok) {
     AERROR << "PullOverStageApproach planning error";
   }
+
   const auto& reference_line_info = frame->reference_line_info().front();
   scenario::util::PullOverStatus status =
       scenario::util::CheckADCPullOver(reference_line_info, scenario_config_);
