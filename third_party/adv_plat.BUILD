@@ -14,8 +14,7 @@ cc_library(
         "include/linux/bcan_defs.h",
         "include/linux/zynq_api.h",
     ],
-    include_prefix="adv_plat",
+    include_prefix = "adv_plat",
     linkopts = [
     ],
 )
-
