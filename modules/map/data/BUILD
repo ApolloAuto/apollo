@@ -15,4 +15,3 @@ filegroup(
         "sunnyvale_loop/**",
     ]),
 )
-
