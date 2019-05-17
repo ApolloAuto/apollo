@@ -73,8 +73,6 @@ DEFINE_bool(enable_scenario_bare_intersection, false,
 DEFINE_bool(enable_scenario_pull_over, false,
             "enable side pass scenario in planning");
 
-DEFINE_bool(enable_scenario_side_pass, true,
-            "enable side pass scenario in planning");
 DEFINE_double(side_pass_min_signal_intersection_distance, 50.0,
               "meter, for intersection has signal, ADC will enter side pass "
               "scenario only when it is farther than this threshoold");
@@ -331,14 +329,11 @@ DEFINE_uint32(max_planning_thread_pool_size, 15,
               "num of thread used in planning thread pool.");
 DEFINE_bool(use_multi_thread_to_add_obstacles, false,
             "use multiple thread to add obstacles.");
-DEFINE_bool(
-    enable_multi_thread_in_dp_poly_path, false,
-    "Enable multiple thread to calculation curve cost in dp_poly_path.");
 DEFINE_bool(enable_multi_thread_in_dp_st_graph, false,
             "Enable multiple thread to calculation curve cost in dp_st_graph.");
 
 /// Lattice Planner
-DEFINE_double(lattice_epsilon, 1e-6, "Epsilon in lattice planner.");
+DEFINE_double(numerical_epsilon, 1e-6, "Epsilon in lattice planner.");
 DEFINE_double(default_cruise_speed, 5.0, "default cruise speed");
 DEFINE_bool(enable_auto_tuning, false, "enable auto tuning data emission");
 DEFINE_double(trajectory_time_resolution, 0.1,
@@ -502,8 +497,6 @@ DEFINE_bool(
     enable_parallel_trajectory_smoothing, false,
     "Whether to partition the trajectory first and do smoothing in parallel");
 
-DEFINE_bool(use_osqp_optimizer_for_qp_st, false,
-            "Use OSQP optimizer for QpSt speed optimization.");
 DEFINE_bool(use_osqp_optimizer_for_reference_line, true,
             "Use OSQP optimizer for reference line optimization.");
 DEFINE_bool(enable_osqp_debug, false,
