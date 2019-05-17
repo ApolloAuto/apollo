@@ -22,9 +22,8 @@
 
 #include "cyber/common/log.h"
 
-#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/planning/common/frame.h"
-#include "modules/planning/common/planning_context.h"
+#include "modules/planning/scenarios/util/util.h"
 
 namespace apollo {
 namespace planning {
@@ -32,7 +31,6 @@ namespace scenario {
 namespace pull_over {
 
 using common::TrajectoryPoint;
-using common::util::DistanceXY;
 
 PullOverStageApproach::PullOverStageApproach(
     const ScenarioConfig::StageConfig& config)
@@ -49,64 +47,17 @@ Stage::StageStatus PullOverStageApproach::Process(
   if (!plan_ok) {
     AERROR << "PullOverStageApproach planning error";
   }
-
   const auto& reference_line_info = frame->reference_line_info().front();
-  PullOverStatus status = CheckADCStop(reference_line_info);
-  if (status == PASS_DESTINATION || status == PARK_COMPLETE) {
+  scenario::util::PullOverStatus status =
+      scenario::util::CheckADCPullOver(reference_line_info, scenario_config_);
+  if (status == scenario::util::PASS_DESTINATION ||
+      status == scenario::util::PARK_COMPLETE) {
     return FinishStage(true);
-  } else if (status == PARK_FAIL) {
+  } else if (status == scenario::util::PARK_FAIL) {
     return FinishStage(false);
   }
 
   return StageStatus::RUNNING;
-}
-
-/**
- * @brief: check adc parked properly
- */
-PullOverStageApproach::PullOverStatus PullOverStageApproach::CheckADCStop(
-    const ReferenceLineInfo& reference_line_info) {
-  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
-  const auto& pull_over_status =
-      PlanningContext::Instance()->planning_status().pull_over();
-  double distance = adc_front_edge_s - pull_over_status.pull_over_s();
-  if (distance >= scenario_config_.pass_destination_threshold()) {
-    ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
-    return PASS_DESTINATION;
-  }
-
-  const double adc_speed =
-      common::VehicleStateProvider::Instance()->linear_velocity();
-  if (adc_speed > scenario_config_.max_adc_stop_speed()) {
-    ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
-    return APPOACHING;
-  }
-
-  constexpr double kStartParkCheckRange = 3.0;  // meter
-  if (distance <= -kStartParkCheckRange) {
-    ADEBUG << "ADC still far: distance[" << distance << "]";
-    return APPOACHING;
-  }
-
-  common::math::Vec2d adc_position = {
-      common::VehicleStateProvider::Instance()->x(),
-      common::VehicleStateProvider::Instance()->y()};
-  common::math::Vec2d pull_over_position = {pull_over_status.pull_over_x(),
-                                            pull_over_status.pull_over_y()};
-  distance = DistanceXY(adc_position, pull_over_position);
-  ADEBUG << "adc_position(" << adc_position.x() << ", " << adc_position.y()
-         << ") pull_over_position(" << pull_over_position.x() << ", "
-         << pull_over_position.y() << ") distance[" << distance << "]";
-
-  const double theta_diff = std::fabs(common::math::NormalizeAngle(
-      pull_over_status.pull_over_theta() -
-      common::VehicleStateProvider::Instance()->heading()));
-  if (distance <= scenario_config_.max_position_error_to_end_point() &&
-      theta_diff <= scenario_config_.max_theta_error_to_end_point()) {
-    return PARK_COMPLETE;
-  } else {
-    return PARK_FAIL;
-  }
 }
 
 Stage::StageStatus PullOverStageApproach::FinishStage(const bool success) {

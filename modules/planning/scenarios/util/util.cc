@@ -16,17 +16,22 @@
 
 #include "modules/planning/scenarios/util/util.h"
 
+#include "modules/common/util/util.h"
+#include "modules/common/vehicle_state/vehicle_state_provider.h"
 #include "modules/map/pnc_map/path.h"
+#include "modules/planning/common/planning_context.h"
 
 namespace apollo {
 namespace planning {
 namespace scenario {
 namespace util {
 
+using common::util::DistanceXY;
 using hdmap::PathOverlap;
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
-    const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
+    const ReferenceLineInfo& reference_line_info,
+    const std::string& overlap_id,
     const ReferenceLineInfo::OverlapType& overlap_type) {
   if (overlap_type == ReferenceLineInfo::SIGNAL) {
     // traffic_light_overlap
@@ -58,6 +63,55 @@ hdmap::PathOverlap* GetOverlapOnReferenceLine(
   }
 
   return nullptr;
+}
+
+/**
+ * @brief: check adc parked properly
+ */
+PullOverStatus CheckADCPullOver(const ReferenceLineInfo& reference_line_info,
+                                const ScenarioPullOverConfig& scenario_config) {
+  const double adc_front_edge_s = reference_line_info.AdcSlBoundary().end_s();
+  const auto& pull_over_status =
+      PlanningContext::Instance()->planning_status().pull_over();
+  double distance = adc_front_edge_s - pull_over_status.pull_over_s();
+  if (distance >= scenario_config.pass_destination_threshold()) {
+    ADEBUG << "ADC passed pull-over spot: distance[" << distance << "]";
+    return PASS_DESTINATION;
+  }
+
+  const double adc_speed =
+      common::VehicleStateProvider::Instance()->linear_velocity();
+  if (adc_speed > scenario_config.max_adc_stop_speed()) {
+    ADEBUG << "ADC not stopped: speed[" << adc_speed << "]";
+    return APPOACHING;
+  }
+
+  constexpr double kStartParkCheckRange = 3.0;  // meter
+  if (distance <= -kStartParkCheckRange) {
+    ADEBUG << "ADC still far: distance[" << distance << "]";
+    return APPOACHING;
+  }
+
+  common::math::Vec2d adc_position = {
+      common::VehicleStateProvider::Instance()->x(),
+      common::VehicleStateProvider::Instance()->y()};
+  common::math::Vec2d pull_over_position = {pull_over_status.pull_over_x(),
+                                            pull_over_status.pull_over_y()};
+  distance = DistanceXY(adc_position, pull_over_position);
+  const double theta_diff = std::fabs(common::math::NormalizeAngle(
+      pull_over_status.pull_over_theta() -
+      common::VehicleStateProvider::Instance()->heading()));
+  ADEBUG << "adc_position(" << adc_position.x() << ", " << adc_position.y()
+         << ") pull_over_position(" << pull_over_position.x() << ", "
+         << pull_over_position.y() << ") distance[" << distance
+         << "] theta_diff[" << theta_diff << "]";
+
+  if (distance <= scenario_config.max_position_error_to_end_point() &&
+      theta_diff <= scenario_config.max_theta_error_to_end_point()) {
+    return PARK_COMPLETE;
+  } else {
+    return PARK_FAIL;
+  }
 }
 
 }  // namespace util
