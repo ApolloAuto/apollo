@@ -14,7 +14,7 @@ of Apollo 3.0, as they have different commit ID on almost each history commits.
 ```
 Note:
 - Please re-fork and re-clone your repository to sync with the latest changes.
-- Rememeber to make a copy of your work (changes) before re-cloning or you will lose all of it.
+- Remember to make a copy of your work (changes) before re-cloning or you will lose all of it.
 ```
 
 ### Why we are doing this

@@ -38,7 +38,7 @@ namespace can {
 
 /**
  * @class ExampleCanClient
- * @brief The class which defines a Example CAN client which inherits CanClient.
+ * @brief The class which defines an Example CAN client which inherits CanClient.
  */
 class ExampleCanClient : public CanClient {
  public:

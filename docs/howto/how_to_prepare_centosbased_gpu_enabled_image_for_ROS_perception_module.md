@@ -3,7 +3,7 @@
 ## Setup docker image in CentOS based system
 
 ApolloAuto uses Ubuntu partially because of the Linux distribution dependency of ROS indigo. There is a script
-`${apollo\_root}/docker/scirpts/install\_dcoker.sh` inside the docker image involved. Most cloud based servers have already installed docker, hence you can just go ahead without touching it. 
+`${apollo\_root}/docker/scripts/install\_dcoker.sh` inside the docker image involved. Most cloud based servers have already installed docker, hence you can just go ahead without touching it. 
 
 In CentOS, to install docker
 you can either follow [this installation guide](https://docs.docker.com/engine/installation/linux/docker-ce/centos/#os-requirements) 
@@ -86,7 +86,7 @@ You can refer to my [DockerHub](https://hub.docker.com/r/yiakwy/apolloautocentos
 
 ## Troubleshooting
 
-What if you committed incorrect `\*.pd.txt` files and cannot rebase to the lastest developer branch? Try the 
+What if you committed incorrect `\*.pd.txt` files and cannot rebase to the latest developer branch? Try the 
 following commands:
 
 ```
