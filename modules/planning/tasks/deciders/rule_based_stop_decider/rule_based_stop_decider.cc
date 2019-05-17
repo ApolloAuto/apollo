@@ -145,17 +145,17 @@ void RuleBasedStopDecider::StopOnSidePass(
     mutable_side_pass_info->set_check_clear_flag(false);
   }
 
-  if (!LaneChangeDecider::IsPerceptionBlocked(
-          *reference_line_info,
-          rule_based_stop_decider_config_.search_beam_length(),
-          rule_based_stop_decider_config_.search_beam_radius_intensity(),
-          rule_based_stop_decider_config_.search_range(),
-          rule_based_stop_decider_config_.is_block_angle_threshold())) {
-    return;
-  }
-
   if (!side_pass_info.check_clear_flag() &&
       CheckSidePassStop(path_data, *reference_line_info, &stop_s_on_pathdata)) {
+    if (!LaneChangeDecider::IsPerceptionBlocked(
+            *reference_line_info,
+            rule_based_stop_decider_config_.search_beam_length(),
+            rule_based_stop_decider_config_.search_beam_radius_intensity(),
+            rule_based_stop_decider_config_.search_range(),
+            rule_based_stop_decider_config_.is_block_angle_threshold()) &&
+        LaneChangeDecider::IsClearToChangeLane(reference_line_info)) {
+      return;
+    }
     if (!CheckADCStop(path_data, *reference_line_info, stop_s_on_pathdata)) {
       if (!BuildSidePassStopFence(
               path_data, stop_s_on_pathdata,
