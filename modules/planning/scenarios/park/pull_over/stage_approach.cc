@@ -109,7 +109,7 @@ Stage::StageStatus PullOverStageApproach::FinishStage(const bool success) {
   if (success) {
     return FinishScenario();
   } else {
-    // next_stage_ = open_space_parking;
+    next_stage_ = ScenarioConfig::PULL_OVER_RETRY_PARKING;
     return Stage::FINISHED;
   }
 }
