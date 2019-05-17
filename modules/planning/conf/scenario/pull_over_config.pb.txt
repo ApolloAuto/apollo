@@ -5,6 +5,8 @@ pull_over_config: {
 }
 
 stage_type: PULL_OVER_APPROACH
+stage_type: PULL_OVER_RETRY_PARKING
+
 stage_config: {
   stage_type: PULL_OVER_APPROACH
   enabled: true
@@ -57,4 +59,25 @@ stage_config: {
   task_config: {
     task_type: DECIDER_RSS
   }
+}
+
+stage_config: {
+    stage_type: PULL_OVER_RETRY_PARKING
+    enabled: true
+    task_type: OPEN_SPACE_ROI_DECIDER
+    task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+    task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+    task_type: OPEN_SPACE_FALLBACK_DECIDER
+    task_config: {
+        task_type: OPEN_SPACE_ROI_DECIDER
+    }
+    task_config: {
+        task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
+    }
+    task_config: {
+        task_type: OPEN_SPACE_TRAJECTORY_PARTITION
+    }
+    task_config: {
+        task_type: OPEN_SPACE_FALLBACK_DECIDER
+    }
 }
