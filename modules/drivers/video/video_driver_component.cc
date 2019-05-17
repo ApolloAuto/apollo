@@ -80,11 +80,10 @@ void CompCameraH265Compressed::VideoPoll() {
     if (!camera_deivce_->Poll(pb_image_)) {
       AERROR << "H265 poll failed on port: " << camera_deivce_->Port();
       static constexpr int kTolerance = 256;
-      if (poll_failure_number > kTolerance) {
+      if (++poll_failure_number > kTolerance) {
         AERROR << "H265 poll keep failing for " << kTolerance << " times, Exit";
         break;
       }
-      ++poll_failure_number;
       continue;
     }
     poll_failure_number = 0;
