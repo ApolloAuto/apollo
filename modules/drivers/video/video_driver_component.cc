@@ -75,13 +75,13 @@ void CompCameraH265Compressed::VideoPoll() {
       AERROR << "Failed to open output file: " << name;
     }
   }
-  constexpr int kTolerace = 256;
   int poll_failure_number = 0;
   while (!apollo::cyber::IsShutdown()) {
     if (!camera_deivce_->Poll(pb_image_)) {
       AERROR << "H265 poll failed on port: " << camera_deivce_->Port();
-      if (++poll_failure_number > kTolerace) {
-        AERROR << "H265 poll keep failing for " << kTolerace << " times, Exit";
+      static constexpr int kTolerance = 256;
+      if (++poll_failure_number > kTolerance) {
+        AERROR << "H265 poll keep failing for " << kTolerance << " times, Exit";
         break;
       }
       continue;
