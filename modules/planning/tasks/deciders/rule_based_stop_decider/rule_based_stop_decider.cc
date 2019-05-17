@@ -127,71 +127,39 @@ void RuleBasedStopDecider::StopOnSidePass(
     Frame *const frame, ReferenceLineInfo *const reference_line_info) {
   const PathData &path_data = reference_line_info->path_data();
   double stop_s_on_pathdata = 0.0;
-  bool set_stop_fence = false;
-  const auto &side_pass_info = PlanningContext::Instance()->side_pass_info();
-  auto *mutable_side_pass_info =
-      PlanningContext::Instance()->mutable_side_pass_info();
+  const auto &side_pass_info =
+      PlanningContext::Instance()->planning_status().side_pass_stop();
+  auto *mutable_side_pass_info = PlanningContext::Instance()
+                                     ->mutable_planning_status()
+                                     ->mutable_side_pass_stop();
 
   if (path_data.path_label().find("self") != std::string::npos) {
-    mutable_side_pass_info->check_clear_flag = false;
-    mutable_side_pass_info->change_lane_stop_flag = false;
-    mutable_side_pass_info->change_lane_stop_path_point.Clear();
+    mutable_side_pass_info->set_check_clear_flag(false);
+    mutable_side_pass_info->mutable_change_lane_stop_path_point()->Clear();
     return;
   }
 
-  if (side_pass_info.change_lane_stop_flag) {
-    // Check if stop at last frame stop fence
-    ADEBUG << "stop fence is set due to side pass on reverse lane";
-    if (CheckADCStop(*reference_line_info,
-                     side_pass_info.change_lane_stop_path_point)) {
-      ADEBUG << "ADV Stopped due to change lane in side pass";
-      if (LaneChangeDecider::IsClearToChangeLane(reference_line_info)) {
-        ADEBUG << "Environment clear for ADC to change lane in side pass";
-        mutable_side_pass_info->check_clear_flag = true;
-      } else {
-        if (CheckSidePassStop(path_data, *reference_line_info,
-                              &stop_s_on_pathdata) &&
-            BuildSidePassStopFence(
-                path_data, stop_s_on_pathdata,
-                &(mutable_side_pass_info->change_lane_stop_path_point), frame,
-                reference_line_info)) {
-          set_stop_fence = true;
-        } else {
-          set_stop_fence =
-              BuildSidePassStopFence(side_pass_info.change_lane_stop_path_point,
-                                     frame, reference_line_info);
-        }
+  if (side_pass_info.check_clear_flag() &&
+      CheckClearDone(*reference_line_info,
+                     side_pass_info.change_lane_stop_path_point())) {
+    mutable_side_pass_info->set_check_clear_flag(false);
+  }
+
+  if (!side_pass_info.check_clear_flag() &&
+      CheckSidePassStop(path_data, *reference_line_info, &stop_s_on_pathdata)) {
+    if (!CheckADCStop(path_data, *reference_line_info, stop_s_on_pathdata)) {
+      if (!BuildSidePassStopFence(
+              path_data, stop_s_on_pathdata,
+              mutable_side_pass_info->mutable_change_lane_stop_path_point(),
+              frame, reference_line_info)) {
+        AERROR << "Set side pass stop fail";
       }
     } else {
-      if (CheckSidePassStop(path_data, *reference_line_info,
-                            &stop_s_on_pathdata) &&
-          BuildSidePassStopFence(
-              path_data, stop_s_on_pathdata,
-              &(mutable_side_pass_info->change_lane_stop_path_point), frame,
-              reference_line_info)) {
-        set_stop_fence = true;
-      } else {
-        set_stop_fence =
-            BuildSidePassStopFence(side_pass_info.change_lane_stop_path_point,
-                                   frame, reference_line_info);
+      if (LaneChangeDecider::IsClearToChangeLane(reference_line_info)) {
+        mutable_side_pass_info->set_check_clear_flag(true);
       }
     }
-  } else {
-    if (!side_pass_info.check_clear_flag &&
-        CheckSidePassStop(path_data, *reference_line_info,
-                          &stop_s_on_pathdata)) {
-      set_stop_fence = BuildSidePassStopFence(
-          path_data, stop_s_on_pathdata,
-          &(mutable_side_pass_info->change_lane_stop_path_point), frame,
-          reference_line_info);
-    }
-    if (side_pass_info.check_clear_flag &&
-        CheckClearDone(*reference_line_info,
-                       side_pass_info.change_lane_stop_path_point)) {
-      mutable_side_pass_info->check_clear_flag = false;
-    }
   }
-  mutable_side_pass_info->change_lane_stop_flag = set_stop_fence;
 }
 
 // @brief Check if necessary to set stop fence used for nonscenario side pass
@@ -237,46 +205,42 @@ bool RuleBasedStopDecider::CheckSidePassStop(
 // @brief Set stop fence for side pass
 bool RuleBasedStopDecider::BuildSidePassStopFence(
     const PathData &path_data, const double stop_s_on_pathdata,
-    common::PathPoint *stop_pathpoint, Frame *const frame,
+    common::PathPoint *stop_point, Frame *const frame,
     ReferenceLineInfo *const reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
 
-  if (!path_data.GetPathPointWithRefS(stop_s_on_pathdata, stop_pathpoint)) {
+  if (!path_data.GetPathPointWithRefS(stop_s_on_pathdata, stop_point)) {
     AERROR << "Can't get stop point on path data";
     return false;
   }
 
-  return BuildSidePassStopFence(*stop_pathpoint, frame, reference_line_info);
-}
-
-bool RuleBasedStopDecider::BuildSidePassStopFence(
-    const common::PathPoint &stop_point, Frame *const frame,
-    ReferenceLineInfo *const reference_line_info) {
   const std::string stop_wall_id = "Side_Pass_Stop";
-  // TODO(Jinyun) load relavent surrounding obstacles
   std::vector<std::string> wait_for_obstacles;
 
   const auto &nearby_path = reference_line_info->reference_line().map_path();
   double stop_point_s = 0.0;
   double stop_point_l = 0.0;
-  nearby_path.GetNearestPoint({stop_point.x(), stop_point.y()}, &stop_point_s,
+  nearby_path.GetNearestPoint({stop_point->x(), stop_point->y()}, &stop_point_s,
                               &stop_point_l);
 
-  // TODO(Jinyun) move to confs
-  constexpr double stop_buffer = 0.25;
-  util::BuildStopDecision(stop_wall_id, stop_point_s - stop_buffer, 0.0,
+  util::BuildStopDecision(stop_wall_id, stop_point_s, 0.0,
                           StopReasonCode::STOP_REASON_SIDEPASS_SAFETY,
                           wait_for_obstacles, "RuleBasedStopDecider", frame,
                           reference_line_info);
-
   return true;
 }
 
 // @brief Check if ADV stop at a stop fence
 bool RuleBasedStopDecider::CheckADCStop(
-    const ReferenceLineInfo &reference_line_info,
-    const common::PathPoint &stop_point) {
+    const PathData &path_data, const ReferenceLineInfo &reference_line_info,
+    const double stop_s_on_pathdata) {
+  common::PathPoint stop_point;
+  if (!path_data.GetPathPointWithRefS(stop_s_on_pathdata, &stop_point)) {
+    AERROR << "Can't get stop point on path data";
+    return false;
+  }
+
   const double adc_speed =
       common::VehicleStateProvider::Instance()->linear_velocity();
   if (adc_speed > rule_based_stop_decider_config_.max_adc_stop_speed()) {

@@ -32,7 +32,6 @@ void PlanningContext::Init() {}
 
 void PlanningContext::Clear() {
   planning_status_.Clear();
-  side_pass_info_ = {};
   fallback_info_ = {};
   open_space_info_ = {};
 }
