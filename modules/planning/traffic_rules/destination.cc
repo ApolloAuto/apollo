@@ -87,7 +87,7 @@ int Destination::MakeDecisions(Frame* frame,
     if (pull_over_status.exist_pull_over_position() &&
         pull_over_status.has_pull_over_s()) {
       // build stop decision based on pull-over position
-      AERROR << "BuildStopDecision: pull-over position";
+      ADEBUG << "BuildStopDecision: pull-over position";
       const double stop_line_s = pull_over_status.pull_over_s() +
           VehicleConfigHelper::GetConfig().vehicle_param().length() +
           config_.destination().stop_distance();
@@ -103,7 +103,7 @@ int Destination::MakeDecisions(Frame* frame,
   }
 
   // build stop decision
-  AERROR << "BuildStopDecision: destination";
+  ADEBUG << "BuildStopDecision: destination";
   const double dest_lane_s =
       std::fmax(0.0, routing_end.s() - FLAGS_virtual_stop_wall_length -
                          config_.destination().stop_distance());
