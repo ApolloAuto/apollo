@@ -65,7 +65,7 @@ class ReferenceLineInfo {
   bool AddObstacles(const std::vector<const Obstacle*>& obstacles);
   Obstacle* AddObstacle(const Obstacle* obstacle);
 
-  const common::VehicleState& vehicle_state() { return vehicle_state_; }
+  const common::VehicleState& vehicle_state() const { return vehicle_state_; }
 
   PathDecision* path_decision();
   const PathDecision& path_decision() const;
