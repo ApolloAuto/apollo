@@ -153,14 +153,9 @@ bool PiecewiseJerkProblem::Optimize(const int max_iter) {
   CalculateOffset(&q);
 
   OSQPData* data = reinterpret_cast<OSQPData*>(c_malloc(sizeof(OSQPData)));
-  OSQPSettings* settings =
-      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
-  // Define Solver settings
-  osqp_set_default_settings(settings);
+
+  OSQPSettings* settings = SolverDefaultSettings();
   settings->max_iter = max_iter;
-  settings->polish = true;
-  settings->verbose = FLAGS_enable_osqp_debug;
-  settings->scaled_termination = true;
 
   OSQPWorkspace* work = nullptr;
 
@@ -296,6 +291,17 @@ void PiecewiseJerkProblem::CalculateAffineConstraint(
     }
   }
   A_indptr->push_back(ind_p);
+}
+
+OSQPSettings* PiecewiseJerkProblem::SolverDefaultSettings() {
+  // Define Solver default settings
+  OSQPSettings* settings =
+      reinterpret_cast<OSQPSettings*>(c_malloc(sizeof(OSQPSettings)));
+  osqp_set_default_settings(settings);
+  settings->polish = true;
+  settings->verbose = FLAGS_enable_osqp_debug;
+  settings->scaled_termination = true;
+  return settings;
 }
 
 }  // namespace planning

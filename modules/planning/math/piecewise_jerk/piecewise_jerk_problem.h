@@ -98,6 +98,8 @@ class PiecewiseJerkProblem {
                                          std::vector<c_float>* lower_bounds,
                                          std::vector<c_float>* upper_bounds);
 
+  virtual OSQPSettings* SolverDefaultSettings();
+
   bool OptimizeWithOsqp(
       const size_t kernel_dim, const size_t num_affine_constraint,
       std::vector<c_float>& P_data, std::vector<c_int>& P_indices,    // NOLINT
