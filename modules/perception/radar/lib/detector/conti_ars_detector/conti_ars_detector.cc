@@ -103,10 +103,11 @@ void ContiArsDetector::RawObs2Frame(
         static_cast<float>(radar_obs.oritation_angle_rms() / 180.0 * PI);
     radar_object->confidence = static_cast<float>(radar_obs.probexist());
 
-
     int motion_state = radar_obs.dynprop();
     double prob_target = radar_obs.probexist();
-    if ((prob_target > MIN_PROBEXIST) && (motion_state == CONTI_MOVING || motion_state == CONTI_ONCOMING || motion_state == CONTI_CROSSING_MOVING)) {
+    if ((prob_target > MIN_PROBEXIST) &&
+      (motion_state == CONTI_MOVING || motion_state == CONTI_ONCOMING
+      || motion_state == CONTI_CROSSING_MOVING)) {
       radar_object->motion_state = base::MotionState::MOVING;
     } else if (motion_state == CONTI_DYNAMIC_UNKNOWN) {
       radar_object->motion_state = base::MotionState::UNKNOWN;
@@ -114,8 +115,6 @@ void ContiArsDetector::RawObs2Frame(
       radar_object->motion_state = base::MotionState::STATIONARY;
       radar_object->velocity.setZero();
     }
-
-
 
     int cls = radar_obs.obstacle_class();
     if (cls == CONTI_CAR || cls == CONTI_TRUCK) {
