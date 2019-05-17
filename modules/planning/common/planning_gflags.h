@@ -38,7 +38,6 @@ DECLARE_string(scenario_valet_parking_config_file);
 
 DECLARE_bool(enable_scenario_bare_intersection);
 DECLARE_bool(enable_scenario_pull_over);
-DECLARE_bool(enable_scenario_side_pass);
 DECLARE_double(side_pass_min_signal_intersection_distance);
 DECLARE_bool(enable_scenario_side_pass_multiple_parked_obstacles);
 DECLARE_bool(enable_scenario_stop_sign);
@@ -162,11 +161,9 @@ DECLARE_bool(enable_sqp_solver);
 /// thread pool
 DECLARE_uint32(max_planning_thread_pool_size);
 DECLARE_bool(use_multi_thread_to_add_obstacles);
-DECLARE_bool(enable_multi_thread_in_dp_poly_path);
 DECLARE_bool(enable_multi_thread_in_dp_st_graph);
 
-// lattice planner
-DECLARE_double(lattice_epsilon);
+DECLARE_double(numerical_epsilon);
 DECLARE_double(default_cruise_speed);
 
 DECLARE_bool(enable_auto_tuning);
@@ -248,7 +245,6 @@ DECLARE_double(destination_to_adc_buffer);
 DECLARE_double(destination_to_pathend_buffer);
 DECLARE_double(pull_over_road_edge_buffer);
 
-DECLARE_bool(use_osqp_optimizer_for_qp_st);
 DECLARE_bool(use_osqp_optimizer_for_reference_line);
 DECLARE_bool(enable_osqp_debug);
 DECLARE_bool(export_chart);

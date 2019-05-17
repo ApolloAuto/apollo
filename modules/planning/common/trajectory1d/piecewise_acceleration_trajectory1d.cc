@@ -45,13 +45,13 @@ void PiecewiseAccelerationTrajectory1d::AppendSegment(const double a,
   double t0 = t_.back();
 
   double v1 = v0 + a * t_duration;
-  CHECK(v1 >= -FLAGS_lattice_epsilon);
+  CHECK(v1 >= -FLAGS_numerical_epsilon);
 
   double delta_s = (v0 + v1) * t_duration * 0.5;
   double s1 = s0 + delta_s;
   double t1 = t0 + t_duration;
 
-  CHECK(s1 >= s0 - FLAGS_lattice_epsilon);
+  CHECK(s1 >= s0 - FLAGS_numerical_epsilon);
   s1 = std::max(s1, s0);
   s_.push_back(s1);
   v_.push_back(v1);

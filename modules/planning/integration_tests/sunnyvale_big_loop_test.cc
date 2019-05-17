@@ -49,9 +49,7 @@ class SunnyvaleBigLoopTest : public PlanningTestBase {
     FLAGS_test_base_map_filename = "base_map.bin";
     FLAGS_test_data_dir = "modules/planning/testdata/sunnyvale_big_loop_test";
     FLAGS_planning_upper_speed_limit = 12.5;
-    FLAGS_enable_multi_thread_in_dp_poly_path = false;
 
-    FLAGS_enable_scenario_side_pass = false;
     FLAGS_enable_scenario_stop_sign = false;
     FLAGS_enable_scenario_traffic_light = false;
     FLAGS_enable_rss_info = false;

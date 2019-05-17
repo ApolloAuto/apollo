@@ -179,7 +179,7 @@ double TrajectoryEvaluator::LatOffsetCost(
       cost_abs_sum += std::fabs(cost) * FLAGS_weight_same_side_offset;
     }
   }
-  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_numerical_epsilon);
 }
 
 double TrajectoryEvaluator::LatComfortCost(
@@ -212,7 +212,7 @@ double TrajectoryEvaluator::LonComfortCost(
     cost_sqr_sum += cost * cost;
     cost_abs_sum += std::fabs(cost);
   }
-  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_numerical_epsilon);
 }
 
 double TrajectoryEvaluator::LonObjectiveCost(
@@ -232,7 +232,7 @@ double TrajectoryEvaluator::LonObjectiveCost(
     speed_cost_weight_sum += t * t;
   }
   double speed_cost =
-      speed_cost_sqr_sum / (speed_cost_weight_sum + FLAGS_lattice_epsilon);
+      speed_cost_sqr_sum / (speed_cost_weight_sum + FLAGS_numerical_epsilon);
   double dist_travelled_cost = 1.0 / (1.0 + dist_s);
   return (speed_cost * FLAGS_weight_target_speed +
           dist_travelled_cost * FLAGS_weight_dist_travelled) /
@@ -266,7 +266,7 @@ double TrajectoryEvaluator::LonCollisionCost(
       cost_abs_sum += cost;
     }
   }
-  return cost_sqr_sum / (cost_abs_sum + FLAGS_lattice_epsilon);
+  return cost_sqr_sum / (cost_abs_sum + FLAGS_numerical_epsilon);
 }
 
 double TrajectoryEvaluator::CentripetalAccelerationCost(
@@ -286,7 +286,7 @@ double TrajectoryEvaluator::CentripetalAccelerationCost(
   }
 
   return centripetal_acc_sqr_sum /
-         (centripetal_acc_sum + FLAGS_lattice_epsilon);
+         (centripetal_acc_sum + FLAGS_numerical_epsilon);
 }
 
 std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
@@ -298,7 +298,7 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
   if (!planning_target.has_stop_point()) {
     PiecewiseAccelerationTrajectory1d lon_traj(init_s_[0], cruise_v);
     lon_traj.AppendSegment(
-        0.0, FLAGS_trajectory_time_length + +FLAGS_lattice_epsilon);
+        0.0, FLAGS_trajectory_time_length + FLAGS_numerical_epsilon);
 
     for (double t = 0.0; t < FLAGS_trajectory_time_length;
          t += FLAGS_trajectory_time_resolution) {
@@ -306,10 +306,10 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
     }
   } else {
     double dist_s = planning_target.stop_point().s() - init_s_[0];
-    if (dist_s < FLAGS_lattice_epsilon) {
+    if (dist_s < FLAGS_numerical_epsilon) {
       PiecewiseAccelerationTrajectory1d lon_traj(init_s_[0], 0.0);
       lon_traj.AppendSegment(
-          0.0, FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
+          0.0, FLAGS_trajectory_time_length + FLAGS_numerical_epsilon);
 
       for (double t = 0.0; t < FLAGS_trajectory_time_length;
            t += FLAGS_trajectory_time_resolution) {
@@ -327,7 +327,7 @@ std::vector<double> TrajectoryEvaluator::ComputeLongitudinalGuideVelocity(
         PiecewiseBrakingTrajectoryGenerator::Generate(
             planning_target.stop_point().s(), init_s_[0],
             planning_target.cruise_speed(), init_s_[1], a_comfort, d_comfort,
-            FLAGS_trajectory_time_length + FLAGS_lattice_epsilon);
+            FLAGS_trajectory_time_length + FLAGS_numerical_epsilon);
 
     for (double t = 0.0; t < FLAGS_trajectory_time_length;
          t += FLAGS_trajectory_time_resolution) {
