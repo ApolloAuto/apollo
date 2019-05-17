@@ -1,0 +1,22 @@
+module_config {
+    module_library : "/apollo/bazel-bin/modules/bridge/libudp_bridge_component.so"
+    components {
+        class_name : "UDPBridgeComponent<planning::ADCTrajectory>"
+        config {
+            name: "bridge_ADCTrajectory"
+            readers {
+              channel: "/apollo/planning"
+            }
+      }
+   }
+
+    components {
+        class_name : "UDPBridgeComponent<LocalizationEstimate>"
+        config {
+            name: "bridge_LocalizationEstimate"
+            readers {
+              channel: "/apollo/localization/pose"
+            }
+      }
+   }
+}
