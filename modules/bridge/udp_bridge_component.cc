@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2018 The Apollo Authors. All Rights Reserved.
+ * Copyright 2019 The Apollo Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,15 +28,31 @@ namespace bridge {
     arry = nullptr;     \
   }
 
+using apollo::cyber::io::Session;
+using apollo::localization::LocalizationEstimate;
+using apollo::bridge::UDPBridgeRemoteInfo;
+
 template<typename T>
 bool UDPBridgeComponent<T>::Init() {
-  AINFO << "UDP bridge init, starting ...";
+  AINFO << "UDP bridge init, startin..";
+  apollo::bridge::UDPBridgeRemoteInfo udp_bridge_remote;
+  if (!this->GetProtoConfig(&udp_bridge_remote)) {
+    AINFO << "load udp bridge component proto param failed";
+    return false;
+  }
+  remote_ip_ = udp_bridge_remote.remote_ip();
+  remote_port_ = udp_bridge_remote.remote_port();
+  AINFO << "UDP Bridge remote ip is : "<< remote_ip_;
+  AINFO << "UDP Bridge remote port is : "<< remote_port_;
   return true;
 }
 
 template<typename T>
-bool UDPBridgeComponent<T>::Proc(
-    const std::shared_ptr<T> &pb_msg) {
+bool UDPBridgeComponent<T>::Proc( const std::shared_ptr<T> &pb_msg) {
+  if (remote_port_ == 0 || remote_ip_.empty()) {
+    AERROR << "remote info is invalid!";
+    return false;
+  }
 
   if (pb_msg== nullptr) {
     AERROR << "proto msg is not ready!";
@@ -44,11 +60,11 @@ bool UDPBridgeComponent<T>::Proc(
   }
 
   apollo::cyber::scheduler::Instance()->CreateTask(
-      [&pb_msg]() {
+      [this, &pb_msg]() {
         struct sockaddr_in server_addr;
-        server_addr.sin_addr.s_addr = inet_addr(FLAGS_remote_ip.c_str());
+        server_addr.sin_addr.s_addr = inet_addr(remote_ip_.c_str());
         server_addr.sin_family = AF_INET;
-        server_addr.sin_port = htons((uint16_t)FLAGS_remote_port);
+        server_addr.sin_port = htons((uint16_t)remote_port_);
 
         Session session;
         session.Socket(AF_INET, SOCK_DGRAM, 0);

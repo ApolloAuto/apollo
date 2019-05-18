@@ -3,9 +3,7 @@ load("//tools:cpplint.bzl", "cpplint")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "bridge_lib",
-    srcs = [
-    ],
+    name = "udp_bridge",
     copts = ['-DMODULE_NAME=\\"bridge\\"'],
     deps = [
         "//cyber",
@@ -17,6 +15,7 @@ cc_library(
         "//modules/common/util",
         "//modules/planning/proto:planning_proto",
         "//modules/bridge/common:bridge_gflags",
+        "//modules/bridge/proto:udp_bridge_remote_info_proto",
     ],
 )
 
@@ -30,7 +29,7 @@ cc_library(
     ],
     copts = ['-DMODULE_NAME=\\"bridge\\"'],
     deps = [
-        ":bridge_lib",
+        ":udp_bridge",
     ],
 )
 

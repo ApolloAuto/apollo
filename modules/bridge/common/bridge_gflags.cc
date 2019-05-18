@@ -16,11 +16,4 @@
 
 #include "modules/bridge/common/bridge_gflags.h"
 
-DEFINE_string(bridge_module_name,
-              "Bridge",
-              "Bridge module name");
-DEFINE_string(remote_ip,
-              "127.0.0.1",
-              "remote ip");
-DEFINE_int32(remote_port, 8900,
-             "remote port");
+DEFINE_string(bridge_module_name, "Bridge", "Bridge module name");
