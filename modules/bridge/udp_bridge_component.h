@@ -29,21 +29,16 @@
 #include "cyber/init.h"
 #include "cyber/io/session.h"
 #include "cyber/scheduler/scheduler_factory.h"
-
 #include "cyber/class_loader/class_loader.h"
 #include "cyber/component/component.h"
-
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/planning/proto/planning.pb.h"
-
 #include "modules/common/util/util.h"
 #include "modules/bridge/common/bridge_gflags.h"
+#include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 
 namespace apollo {
 namespace bridge {
-
-using apollo::cyber::io::Session;
-using apollo::localization::LocalizationEstimate;
 
 template<typename T>
 class UDPBridgeComponent final
@@ -61,10 +56,12 @@ class UDPBridgeComponent final
 
  private:
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
+  unsigned int remote_port_ = 0;
+  std::string remote_ip_ = "";
 };
 
 CYBER_REGISTER_COMPONENT(UDPBridgeComponent<planning::ADCTrajectory>)
-CYBER_REGISTER_COMPONENT(UDPBridgeComponent<LocalizationEstimate>)
+CYBER_REGISTER_COMPONENT(UDPBridgeComponent<localization::LocalizationEstimate>)
 
 }  // namespace bridge
 }  // namespace apollo

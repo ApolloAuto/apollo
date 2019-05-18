@@ -19,5 +19,3 @@
 #include "gflags/gflags.h"
 
 DECLARE_string(bridge_module_name);
-DECLARE_string(remote_ip);
-DECLARE_int32(remote_port);

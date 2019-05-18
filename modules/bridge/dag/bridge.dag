@@ -4,6 +4,7 @@ module_config {
         class_name : "UDPBridgeComponent<planning::ADCTrajectory>"
         config {
             name: "bridge_ADCTrajectory"
+            config_file_path: "/apollo/modules/bridge/conf/udp_bridge_adctrajectory.pb.txt"
             readers {
               channel: "/apollo/planning"
             }
@@ -11,9 +12,10 @@ module_config {
    }
 
     components {
-        class_name : "UDPBridgeComponent<LocalizationEstimate>"
+        class_name : "UDPBridgeComponent<localization::LocalizationEstimate>"
         config {
             name: "bridge_LocalizationEstimate"
+            config_file_path: "/apollo/modules/bridge/conf/udp_bridge_localization.pb.txt"
             readers {
               channel: "/apollo/localization/pose"
             }
