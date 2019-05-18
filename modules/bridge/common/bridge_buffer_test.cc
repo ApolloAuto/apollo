@@ -24,7 +24,7 @@ namespace apollo {
 namespace bridge {
 
 TEST(BridgeBufferTest, bridge_buf_test) {
-  BridgeBuffer buf;
+  BridgeBuffer<char> buf;
   char *p = buf;
   EXPECT_EQ(0, buf.capacity());
   EXPECT_EQ(0, buf.size());

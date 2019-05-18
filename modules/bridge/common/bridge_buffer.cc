@@ -20,12 +20,19 @@
 namespace apollo {
 namespace bridge {
 
-BridgeBuffer::BridgeBuffer() {}
-BridgeBuffer::BridgeBuffer(unsigned int size) {
+#define BRIDGE_IMPL(type) \
+  template class BridgeBuffer<type>
+
+template<typename T>
+BridgeBuffer<T>::BridgeBuffer() {}
+
+template<typename T>
+BridgeBuffer<T>::BridgeBuffer(unsigned int size) {
   reset(size);
 }
 
-BridgeBuffer::~BridgeBuffer() {
+template<typename T>
+BridgeBuffer<T>::~BridgeBuffer() {
   std::lock_guard<std::mutex> lg(mutex_);
   if (buf_) {
     delete [] buf_;
@@ -35,22 +42,29 @@ BridgeBuffer::~BridgeBuffer() {
   capacity_ = 0;
 }
 
-BridgeBuffer::operator char* () {
+template<typename T>
+BridgeBuffer<T>::operator T* () {
   return buf_;
 }
 
-void BridgeBuffer::reset(unsigned int size) {
+template<typename T>
+void BridgeBuffer<T>::reset(unsigned int size) {
   std::lock_guard<std::mutex> lg(mutex_);
   if (capacity_ < size) {
     if (buf_) {
       delete [] buf_;
     }
     capacity_ = size;
-    buf_ = new char[capacity_];
+    buf_ = new T[capacity_];
   }
   size_ = size;
-  memset(buf_, 0, sizeof(char)*capacity_);
+  memset(buf_, 0, sizeof(T)*capacity_);
 }
+
+BRIDGE_IMPL(char);
+BRIDGE_IMPL(int);
+BRIDGE_IMPL(double);
+
 
 }  // namespace bridge
 }  // namespace apollo

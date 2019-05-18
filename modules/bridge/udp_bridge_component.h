@@ -59,7 +59,7 @@ class UDPBridgeComponent final
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   unsigned int remote_port_ = 0;
   std::string remote_ip_ = "";
-  BridgeBuffer buf_;
+  BridgeBuffer<char> buf_;
 };
 
 CYBER_REGISTER_COMPONENT(UDPBridgeComponent<planning::ADCTrajectory>)
