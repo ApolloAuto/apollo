@@ -203,6 +203,8 @@ Status PathBoundsDecider::Process(
                << std::get<2>(pull_over_configuration) << "] y["
                << std::get<3>(pull_over_configuration) << "] theta["
                << std::get<4>(pull_over_configuration) << "]";
+        // Trim the path bound based on the pull-over s.
+        // TODO(jiacheng): implement this.
       }
     }
   }
