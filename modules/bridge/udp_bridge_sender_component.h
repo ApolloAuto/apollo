@@ -33,6 +33,7 @@
 #include "cyber/scheduler/scheduler_factory.h"
 #include "modules/bridge/common/bridge_buffer.h"
 #include "modules/bridge/common/bridge_gflags.h"
+#include "modules/bridge/common/bridge_buffer.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 #include "modules/common/monitor_log/monitor_log_buffer.h"
 #include "modules/common/util/util.h"
