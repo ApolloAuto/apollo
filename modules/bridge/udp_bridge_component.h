@@ -35,6 +35,7 @@
 #include "modules/planning/proto/planning.pb.h"
 #include "modules/common/util/util.h"
 #include "modules/bridge/common/bridge_gflags.h"
+#include "modules/bridge/common/bridge_buffer.h"
 #include "modules/bridge/proto/udp_bridge_remote_info.pb.h"
 
 namespace apollo {
@@ -58,6 +59,7 @@ class UDPBridgeComponent final
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   unsigned int remote_port_ = 0;
   std::string remote_ip_ = "";
+  BridgeBuffer buf_;
 };
 
 CYBER_REGISTER_COMPONENT(UDPBridgeComponent<planning::ADCTrajectory>)

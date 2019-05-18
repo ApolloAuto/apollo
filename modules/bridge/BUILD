@@ -15,6 +15,7 @@ cc_library(
         "//modules/common/util",
         "//modules/planning/proto:planning_proto",
         "//modules/bridge/common:bridge_gflags",
+        "//modules/bridge/common:bridge_buffer",
         "//modules/bridge/proto:udp_bridge_remote_info_proto",
     ],
 )
