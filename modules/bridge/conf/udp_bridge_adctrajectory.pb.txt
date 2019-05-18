@@ -1,2 +1,3 @@
-remote_ip : "127.0.0.2"
-remote_port : 8901
+remote_ip: "127.0.0.2"
+remote_port: 8901
+proto_name: "ADCTrajectory"
