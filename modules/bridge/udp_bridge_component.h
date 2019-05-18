@@ -1,9 +1,5 @@
 /******************************************************************************
-<<<<<<< HEAD
  * Copyright 2019 The Apollo Authors. All Rights Reserved.
-=======
- * Copyright 2017 The Apollo Authors. All Rights Reserved.
->>>>>>> bridge: add test case and clean code
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
