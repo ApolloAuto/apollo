@@ -33,19 +33,20 @@ namespace bridge {
   DISABLE_COPY(TypeName);                 \
   DISABLE_ASSIGN(TypeName)
 
+template<typename T>
 class BridgeBuffer {
  public:
   BridgeBuffer();
   explicit BridgeBuffer(unsigned int size);
   virtual ~BridgeBuffer();
 
-  operator char* ();
+  operator T* ();
   void reset(unsigned int size);
   unsigned int size() const { return size_;}
   unsigned int capacity() const { return capacity_;}
 
  private:
-  char *buf_ = nullptr;
+  T *buf_ = nullptr;
   unsigned int size_ = 0;
   unsigned int capacity_ = 0;
   std::mutex mutex_;
