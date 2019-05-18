@@ -22,11 +22,12 @@ namespace bridge {
 #define BRIDGE_IMPL(pb_msg)    \
   template class UDPBridgeComponent<pb_msg>
 
-#define FREE_ARRY(arry) \
+/*#define FREE_ARRY(arry) \
   if (arry) {           \
     delete [] arry;     \
     arry = nullptr;     \
-  }
+  }*/
+#define _1K    1024
 
 using apollo::cyber::io::Session;
 using apollo::localization::LocalizationEstimate;
@@ -35,6 +36,7 @@ using apollo::bridge::UDPBridgeRemoteInfo;
 template<typename T>
 bool UDPBridgeComponent<T>::Init() {
   AINFO << "UDP bridge init, startin..";
+  buf_.reset(_1K);
   apollo::bridge::UDPBridgeRemoteInfo udp_bridge_remote;
   if (!this->GetProtoConfig(&udp_bridge_remote)) {
     AINFO << "load udp bridge component proto param failed";
@@ -76,15 +78,13 @@ bool UDPBridgeComponent<T>::Proc( const std::shared_ptr<T> &pb_msg) {
         }
 
         unsigned int msg_len = pb_msg->ByteSize();
-        char *buf = new char[msg_len];
-        memset(buf, 0, msg_len);
+        buf_.reset(msg_len);
+        char *buf = buf_;
         pb_msg->SerializeToArray(buf, msg_len);
         if (session.Send(buf, msg_len, 0) < 0) {
           std::cout << "send message failed." << std::endl;
-          FREE_ARRY(buf)
           return;
         }
-        FREE_ARRY(buf)
       },
       "bridge_client");
 
