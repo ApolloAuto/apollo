@@ -39,8 +39,10 @@ bool UDPBridgeComponent<T>::Init() {
   }
   remote_ip_ = udp_bridge_remote.remote_ip();
   remote_port_ = udp_bridge_remote.remote_port();
-  AINFO << "UDP Bridge remote ip is : "<< remote_ip_;
-  AINFO << "UDP Bridge remote port is : "<< remote_port_;
+  proto_name_ = udp_bridge_remote.proto_name();
+  AINFO << "UDP Bridge remote ip is: "<< remote_ip_;
+  AINFO << "UDP Bridge remote port is: "<< remote_port_;
+  AINFO << "UDP Bridge for Proto is: "<< proto_name_;
   return true;
 }
 

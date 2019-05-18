@@ -59,6 +59,7 @@ class UDPBridgeComponent final
   common::monitor::MonitorLogBuffer monitor_logger_buffer_;
   unsigned int remote_port_ = 0;
   std::string remote_ip_ = "";
+  std::string proto_name_ = "";
   BridgeBuffer<char> buf_;
 };
 
