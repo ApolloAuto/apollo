@@ -48,7 +48,7 @@ bool UDPBridgeComponent<T>::Init() {
 }
 
 template<typename T>
-bool UDPBridgeComponent<T>::Proc( const std::shared_ptr<T> &pb_msg) {
+bool UDPBridgeComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
   if (remote_port_ == 0 || remote_ip_.empty()) {
     AERROR << "remote info is invalid!";
     return false;
