@@ -22,11 +22,6 @@ namespace bridge {
 #define BRIDGE_IMPL(pb_msg)    \
   template class UDPBridgeComponent<pb_msg>
 
-/*#define FREE_ARRY(arry) \
-  if (arry) {           \
-    delete [] arry;     \
-    arry = nullptr;     \
-  }*/
 #define _1K    1024
 
 using apollo::cyber::io::Session;
