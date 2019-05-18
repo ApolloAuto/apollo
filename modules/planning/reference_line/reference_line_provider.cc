@@ -392,6 +392,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
                   target_lane_pair.first)) {
       // take the id of the first adjacent lane on the left of adc as
       // the nearest_neighbor_lane_id
+      lane_change_type = routing::LEFT;
       nearest_neighbor_lane_id =
           adc_lane_way_point.lane->lane().left_neighbor_forward_lane_id(0).id();
     } else if (right_neighbor_lane_ids.end() !=
@@ -401,6 +402,7 @@ bool ReferenceLineProvider::GetReferenceLinesFromRelativeMap(
       // target lane on the right of adc
       // take the id  of the first adjacent lane on the right of adc as
       // the nearest_neighbor_lane_id
+      lane_change_type = routing::RIGHT;
       nearest_neighbor_lane_id = adc_lane_way_point.lane->lane()
                                      .right_neighbor_forward_lane_id(0)
                                      .id();
