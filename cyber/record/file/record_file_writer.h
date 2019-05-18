@@ -123,7 +123,10 @@ bool RecordFileWriter::WriteSection(const T& message) {
     AERROR << "Do not support this template typename.";
     return false;
   }
-  Section section = {type, message.ByteSize()};
+  Section section;
+  /// zero out whole struct even if padded
+  memset(&section, 0, sizeof(section));
+  section = {type, static_cast<int64_t>(message.ByteSize())};
   ssize_t count = write(fd_, &section, sizeof(section));
   if (count < 0) {
     AERROR << "Write fd failed, fd: " << fd_ << ", errno: " << errno;
@@ -153,6 +156,7 @@ bool RecordFileWriter::WriteSection(const T& message) {
     }
   }
   header_.set_size(CurrentPosition());
+  ACHECK(0 == fsync(fd_));
   return true;
 }
 
