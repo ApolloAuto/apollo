@@ -25,6 +25,17 @@ namespace data {
 
 IntervalPool::IntervalPool() {}
 
+void IntervalPool::AddInterval(const Interval interval) {
+  if (pool_.empty() || interval.begin_time > pool_iter_->end_time) {
+    pool_.push_back(interval);
+    pool_iter_ = std::prev(pool_.end());
+    return;
+  }
+  pool_iter_->begin_time =
+      std::min(interval.begin_time, pool_iter_->begin_time);
+  pool_iter_->end_time = std::max(interval.end_time, pool_iter_->end_time);
+}
+
 void IntervalPool::AddInterval(const uint64_t begin_time,
                                const uint64_t end_time) {
   struct Interval interval;
@@ -73,6 +84,16 @@ void IntervalPool::PrintIntervals() const {
     AINFO << "Interval " << ++idx << ": " << interval.begin_time << " - "
           << interval.end_time;
   }
+}
+
+Interval IntervalPool::GetNextInterval() const {
+  if (pool_.empty()) {
+    struct Interval interval;
+    interval.begin_time = 0;
+    interval.end_time = 0;
+    return interval;
+  }
+  return *pool_iter_;
 }
 
 }  // namespace data

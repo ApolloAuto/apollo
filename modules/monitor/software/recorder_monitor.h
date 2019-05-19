@@ -13,46 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
 #pragma once
 
-#include <map>
-#include <set>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include "cyber/common/macros.h"
+#include "modules/monitor/common/recurrent_runner.h"
 
 namespace apollo {
-namespace data {
+namespace monitor {
 
-struct Interval {
-  uint64_t begin_time;
-  uint64_t end_time;
-};
-
-/**
- * @class IntervalPool
- * @brief The intervals collection class that organizes the intervals
- */
-class IntervalPool {
+class RecorderMonitor : public RecurrentRunner {
  public:
-  void AddInterval(const Interval interval);
-  void AddInterval(const uint64_t begin_time, const uint64_t end_time);
-  void ReorgIntervals();
-  bool MessageFallIntoRange(const uint64_t msg_time);
-  void Reset();
-  void PrintIntervals() const;
-  Interval GetNextInterval() const;
-
- private:
-  std::vector<Interval> pool_;
-  std::vector<Interval>::iterator pool_iter_;
-  std::set<uint64_t> accu_end_values_;
-
-  DECLARE_SINGLETON(IntervalPool)
+  RecorderMonitor();
+  void RunOnce(const double current_time) override;
 };
 
-}  // namespace data
+}  // namespace monitor
 }  // namespace apollo

@@ -23,6 +23,7 @@ cc_binary(
         "//modules/monitor/software:functional_safety_monitor",
         "//modules/monitor/software:localization_monitor",
         "//modules/monitor/software:process_monitor",
+        "//modules/monitor/software:recorder_monitor",
         "//modules/monitor/software:summary_monitor",
     ],
 )

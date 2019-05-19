@@ -112,3 +112,6 @@ DECLARE_string(data_topic);
 // Transform topic
 DECLARE_string(tf_topic);
 DECLARE_string(tf_static_topic);
+
+// Recorder status topic
+DECLARE_string(recorder_status_topic);
