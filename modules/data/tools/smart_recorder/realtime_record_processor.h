@@ -54,7 +54,7 @@ class RealtimeRecordProcessor : public RecordProcessor {
   virtual ~RealtimeRecordProcessor() = default;
 
  private:
-  bool GetNextValidRecord(std::string* const record_path) const;
+  bool GetNextValidRecord(std::string* record_path) const;
   void RestoreMessage(const uint64_t message_time);
   void PublishStatus(const RecordingState state,
                      const std::string& message) const;

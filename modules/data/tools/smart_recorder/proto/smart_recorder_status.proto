@@ -5,9 +5,9 @@ package apollo.data;
 import "modules/common/proto/header.proto";
 
 enum RecordingState {
-  RECORDING = 0;
-  TERMINATING = 1;
-  STOPPED = 2;
+  STOPPED = 0;
+  RECORDING = 1;
+  TERMINATING = 2;
 }
 
 message SmartRecorderStatus {
@@ -15,3 +15,4 @@ message SmartRecorderStatus {
   optional RecordingState recording_state = 2;
   optional string state_message = 3;
 }
+
