@@ -25,7 +25,7 @@ namespace data {
 
 IntervalPool::IntervalPool() {}
 
-void IntervalPool::AddInterval(const Interval interval) {
+void IntervalPool::AddInterval(const Interval& interval) {
   if (pool_.empty() || interval.begin_time > pool_iter_->end_time) {
     pool_.push_back(interval);
     pool_iter_ = std::prev(pool_.end());

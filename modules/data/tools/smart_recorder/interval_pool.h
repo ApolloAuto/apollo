@@ -38,7 +38,7 @@ struct Interval {
  */
 class IntervalPool {
  public:
-  void AddInterval(const Interval interval);
+  void AddInterval(const Interval& interval);
   void AddInterval(const uint64_t begin_time, const uint64_t end_time);
   void ReorgIntervals();
   bool MessageFallIntoRange(const uint64_t msg_time);

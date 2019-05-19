@@ -38,6 +38,8 @@
 namespace apollo {
 namespace data {
 
+namespace {
+
 using apollo::common::Header;
 using apollo::common::util::StrCat;
 using cyber::common::EnsureDirectory;
@@ -50,8 +52,6 @@ using cyber::record::RecordMessage;
 using cyber::record::RecordFileReader;
 using cyber::record::RecordReader;
 using cyber::record::RecordViewer;
-
-namespace {
 
 std::string GetNextRecordFileName(const std::string& record_path) {
   constexpr int kSuffixLen = 5;
@@ -202,7 +202,7 @@ void RealtimeRecordProcessor::PublishStatus(const RecordingState state,
 }
 
 bool RealtimeRecordProcessor::GetNextValidRecord(
-    std::string* const record_path) const {
+    std::string* record_path) const {
   *record_path = StrCat(source_record_dir_, "/", default_output_filename_, ".",
                         GetNextRecordFileName(*record_path));
   while (!is_terminating_ && !IsRecordValid(*record_path)) {
