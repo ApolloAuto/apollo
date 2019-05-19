@@ -16,42 +16,33 @@
 
 #pragma once
 
-#include <map>
-#include <set>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
-#include "cyber/common/macros.h"
+#include "modules/data/tools/smart_recorder/proto/smart_recorder_triggers.pb.h"
+#include "modules/data/tools/smart_recorder/record_processor.h"
 
 namespace apollo {
 namespace data {
 
-struct Interval {
-  uint64_t begin_time;
-  uint64_t end_time;
-};
-
 /**
- * @class IntervalPool
- * @brief The intervals collection class that organizes the intervals
+ * @class PostRecordProcessor
+ * @brief Post processor against recorded tasks that have been completed
  */
-class IntervalPool {
+class PostRecordProcessor : public RecordProcessor {
  public:
-  void AddInterval(const Interval interval);
-  void AddInterval(const uint64_t begin_time, const uint64_t end_time);
-  void ReorgIntervals();
-  bool MessageFallIntoRange(const uint64_t msg_time);
-  void Reset();
-  void PrintIntervals() const;
-  Interval GetNextInterval() const;
+  PostRecordProcessor(const std::string& source_record_dir,
+                      const std::string& restored_output_dir)
+      : RecordProcessor(source_record_dir, restored_output_dir) {}
+  bool Init(const SmartRecordTrigger& trigger_conf) override;
+  bool Process() override;
+  std::string GetDefaultOutputFile() const override;
+  virtual ~PostRecordProcessor() = default;
 
  private:
-  std::vector<Interval> pool_;
-  std::vector<Interval>::iterator pool_iter_;
-  std::set<uint64_t> accu_end_values_;
+  void LoadSourceRecords();
 
-  DECLARE_SINGLETON(IntervalPool)
+  std::vector<std::string> source_record_files_;
 };
 
 }  // namespace data

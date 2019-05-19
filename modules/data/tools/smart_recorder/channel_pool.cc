@@ -60,7 +60,8 @@ ChannelPool::ChannelPool() {
                      FLAGS_heading_topic,
                      FLAGS_mobileye_topic,
                      FLAGS_tf_topic,
-                     FLAGS_tf_static_topic};
+                     FLAGS_tf_static_topic,
+                     FLAGS_recorder_status_topic};
   large_channels_ = {FLAGS_camera_front_12mm_compressed_topic,
                      FLAGS_camera_front_6mm_compressed_topic,
                      FLAGS_camera_left_fisheye_compressed_topic,

@@ -25,6 +25,7 @@
 #include "modules/monitor/software/functional_safety_monitor.h"
 #include "modules/monitor/software/localization_monitor.h"
 #include "modules/monitor/software/process_monitor.h"
+#include "modules/monitor/software/recorder_monitor.h"
 #include "modules/monitor/software/summary_monitor.h"
 
 DEFINE_bool(enable_functional_safety, true,
@@ -51,6 +52,8 @@ bool Monitor::Init() {
   runners_.emplace_back(new ChannelMonitor());
   // Monitor if resources are sufficient.
   runners_.emplace_back(new ResourceMonitor());
+  // Monitor if recorder is recording.
+  runners_.emplace_back(new RecorderMonitor());
 
   // Monitor all changes made by each sub-monitor, and summarize to a final
   // overall status.

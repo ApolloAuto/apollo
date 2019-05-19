@@ -208,3 +208,5 @@ DEFINE_string(rtcm_data_topic, "/apollo/sensor/gnss/rtcm_data",
 DEFINE_string(data_topic, "/apollo/data", "Data topic.");
 DEFINE_string(tf_topic, "/tf", "Transform topic.");
 DEFINE_string(tf_static_topic, "/tf_static", "Transform static topic.");
+DEFINE_string(recorder_status_topic, "/apollo/recorder/status",
+              "Recorder status topic.");

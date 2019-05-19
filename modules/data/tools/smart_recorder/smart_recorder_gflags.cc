@@ -22,3 +22,4 @@ DEFINE_string(smart_recorder_config_filename,
               "/apollo/modules/data/tools/smart_recorder/conf/"
               "smart_recorder_config.pb.txt",
               "The config file.");
+DEFINE_bool(real_time_trigger, true, "Whether to use realtime trigger.");

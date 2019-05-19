@@ -21,3 +21,4 @@
 DECLARE_string(source_records_dir);
 DECLARE_string(restored_output_dir);
 DECLARE_string(smart_recorder_config_filename);
+DECLARE_bool(real_time_trigger);
