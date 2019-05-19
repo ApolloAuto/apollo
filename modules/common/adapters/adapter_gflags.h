@@ -106,9 +106,6 @@ DECLARE_string(rtcm_data_topic);
 // Guardian topic
 DECLARE_string(guardian_topic);
 
-// Data topic
-DECLARE_string(data_topic);
-
 // Transform topic
 DECLARE_string(tf_topic);
 DECLARE_string(tf_static_topic);
