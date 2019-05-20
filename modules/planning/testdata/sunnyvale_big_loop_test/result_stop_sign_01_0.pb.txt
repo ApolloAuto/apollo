@@ -21,6 +21,21 @@ decision {
   }
   object_decision {
     decision {
+      id: "14468_1"
+      perception_id: 14468
+      object_decision {
+        overtake {
+          distance_s: 35.892199589078807
+          fence_point {
+            x: 586398.97588402568
+            y: 4140141.0409952919
+            z: 0
+          }
+          fence_heading: -0.68579296965487413
+        }
+      }
+    }
+    decision {
       id: "SS_1017"
       perception_id: -911148558
       object_decision {
