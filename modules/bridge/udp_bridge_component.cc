@@ -19,7 +19,7 @@
 namespace apollo {
 namespace bridge {
 
-#define BRIDGE_IMPL(pb_msg)    \
+#define BRIDGE_IMPL(pb_msg) \
   template class UDPBridgeComponent<pb_msg>
 
 #define _1K 1024
