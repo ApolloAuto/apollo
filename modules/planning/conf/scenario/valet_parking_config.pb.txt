@@ -73,6 +73,9 @@ stage_config: {
     task_type: OPEN_SPACE_FALLBACK_DECIDER
     task_config: {
         task_type: OPEN_SPACE_ROI_DECIDER
+        open_space_roi_decider_config {
+            roi_type: PULL_OVER
+        }
     }
     task_config: {
         task_type: OPEN_SPACE_TRAJECTORY_PROVIDER
