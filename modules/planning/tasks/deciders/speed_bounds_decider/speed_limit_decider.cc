@@ -47,6 +47,7 @@ SpeedLimitDecider::SpeedLimitDecider(const SLBoundary& adc_sl_boundary,
       vehicle_param_(common::VehicleConfigHelper::GetConfig().vehicle_param()) {
 }
 
+// TODO(all): remove the code; use kappa from path point directly.
 void SpeedLimitDecider::GetAvgKappa(
     const std::vector<common::PathPoint>& path_points,
     std::vector<double>* kappa) const {
@@ -99,25 +100,26 @@ Status SpeedLimitDecider::GetSpeedLimits(
 
   for (uint32_t i = 0; i < discretized_path.size(); ++i) {
     const double path_s = discretized_path.at(i).s();
-    const double frenet_point_s = frenet_path.at(i).s();
-    if (frenet_point_s > reference_line_.Length()) {
-      AWARN << "path length [" << frenet_point_s
+    const double reference_line_s = frenet_path.at(i).s();
+    if (reference_line_s > reference_line_.Length()) {
+      AWARN << "path w.r.t. reference line at [" << reference_line_s
             << "] is LARGER than reference_line_ length ["
             << reference_line_.Length() << "]. Please debug before proceeding.";
       break;
     }
 
     // (1) speed limit from map
-    double speed_limit_on_reference_line =
-        reference_line_.GetSpeedLimitFromS(frenet_point_s);
+    double speed_limit_from_reference_line =
+        reference_line_.GetSpeedLimitFromS(reference_line_s);
 
     // (2) speed limit from path curvature
     //  -- 2.1: limit by centripetal force (acceleration)
-    const double centri_acc_speed_limit =
+    const double speed_limit_from_centripetal_acc =
         std::sqrt(GetCentricAccLimit(std::fabs(avg_kappa[i])) /
                   std::fmax(std::fabs(avg_kappa[i]),
                             speed_bounds_config_.minimal_kappa()));
 
+    // TODO(all): remove this; this is not necessary nor making sense.
     // -- 2.2: limit by centripetal jerk
     double centri_jerk_speed_limit = std::numeric_limits<double>::max();
     if (i + 1 < discretized_path.size()) {
@@ -132,14 +134,17 @@ Status SpeedLimitDecider::GetSpeedLimits(
     }
 
     // (3) speed limit from nudge obstacles
-    double nudge_obstacle_speed_limit = std::numeric_limits<double>::max();
+    // TODO(all): in future, expand the speed limit not only to obstacles with
+    // nudge decisions.
+    double speed_limit_from_nearby_obstacles =
+        std::numeric_limits<double>::max();
     const double collision_safety_range =
         speed_bounds_config_.collision_safety_range();
-    for (const auto* const_obstacle : obstacles.Items()) {
-      if (const_obstacle->IsVirtual()) {
+    for (const auto* ptr_obstacle : obstacles.Items()) {
+      if (ptr_obstacle->IsVirtual()) {
         continue;
       }
-      if (!const_obstacle->LateralDecision().has_nudge()) {
+      if (!ptr_obstacle->LateralDecision().has_nudge()) {
         continue;
       }
 
@@ -149,14 +154,17 @@ Status SpeedLimitDecider::GetSpeedLimits(
        * ------|  adc   |---------------
        * ------------|  obstacle |------
        */
+
+      // TODO(all): potential problem here;
+      // frenet and cartesian coordinates are mixed.
       const double vehicle_front_s =
-          frenet_point_s + vehicle_param_.front_edge_to_center();
+          reference_line_s + vehicle_param_.front_edge_to_center();
       const double vehicle_back_s =
-          frenet_point_s - vehicle_param_.back_edge_to_center();
+          reference_line_s - vehicle_param_.back_edge_to_center();
       const double obstacle_front_s =
-          const_obstacle->PerceptionSLBoundary().end_s();
+          ptr_obstacle->PerceptionSLBoundary().end_s();
       const double obstacle_back_s =
-          const_obstacle->PerceptionSLBoundary().start_s();
+          ptr_obstacle->PerceptionSLBoundary().start_s();
 
       if (FLAGS_enable_soft_speed_limit) {
         if (vehicle_front_s + collision_safety_range < obstacle_back_s ||
@@ -177,71 +185,70 @@ Status SpeedLimitDecider::GetSpeedLimits(
         // speed limit generated from sl information from reference line
         if (std::get<2>(path_point_decision_guide.at(i)) <
             collision_safety_range) {
-          if (const_obstacle->IsStatic()) {
+          if (ptr_obstacle->IsStatic()) {
             collision_avoidance_speed_ratio =
                 speed_bounds_config_.static_obs_nudge_speed_ratio();
           } else {
             collision_avoidance_speed_ratio =
                 speed_bounds_config_.dynamic_obs_nudge_speed_ratio();
           }
-          nudge_obstacle_speed_limit =
-              collision_avoidance_speed_ratio * speed_limit_on_reference_line;
+          speed_limit_from_nearby_obstacles =
+              collision_avoidance_speed_ratio * speed_limit_from_reference_line;
         }
       } else {
-        const auto& nudge = const_obstacle->LateralDecision().nudge();
+        const auto& nudge_decision = ptr_obstacle->LateralDecision().nudge();
 
         // Please notice the differences between adc_l and frenet_point_l
         const double frenet_point_l = frenet_path.at(i).l();
 
         // obstacle is on the right of ego vehicle (at path point i)
         bool is_close_on_left =
-            (nudge.type() == ObjectNudge::LEFT_NUDGE) &&
+            (nudge_decision.type() == ObjectNudge::LEFT_NUDGE) &&
             (frenet_point_l - vehicle_param_.right_edge_to_center() -
                  collision_safety_range <
-             const_obstacle->PerceptionSLBoundary().end_l());
+             ptr_obstacle->PerceptionSLBoundary().end_l());
 
         // obstacle is on the left of ego vehicle (at path point i)
         bool is_close_on_right =
-            (nudge.type() == ObjectNudge::RIGHT_NUDGE) &&
-            (const_obstacle->PerceptionSLBoundary().start_l() -
+            (nudge_decision.type() == ObjectNudge::RIGHT_NUDGE) &&
+            (ptr_obstacle->PerceptionSLBoundary().start_l() -
                  collision_safety_range <
              frenet_point_l + vehicle_param_.left_edge_to_center());
 
+        // TODO(all): dynamic obstacles do not have nudge decision
         if (is_close_on_left || is_close_on_right) {
           double nudge_speed_ratio = 1.0;
-          if (const_obstacle->IsStatic()) {
+          if (ptr_obstacle->IsStatic()) {
             nudge_speed_ratio =
                 speed_bounds_config_.static_obs_nudge_speed_ratio();
           } else {
             nudge_speed_ratio =
                 speed_bounds_config_.dynamic_obs_nudge_speed_ratio();
           }
-          nudge_obstacle_speed_limit =
-              nudge_speed_ratio * speed_limit_on_reference_line;
+          speed_limit_from_nearby_obstacles =
+              nudge_speed_ratio * speed_limit_from_reference_line;
           break;
         }
       }
     }
     double curr_speed_limit = 0.0;
     if (FLAGS_enable_nudge_slowdown && !FLAGS_enable_soft_speed_limit) {
-      curr_speed_limit =
-          std::fmax(speed_bounds_config_.lowest_speed(),
-                    common::util::MinElement(std::vector<double>{
-                        speed_limit_on_reference_line, centri_acc_speed_limit,
-                        centri_jerk_speed_limit, nudge_obstacle_speed_limit}));
+      curr_speed_limit = std::fmax(speed_bounds_config_.lowest_speed(),
+          common::util::MinElement(std::vector<double> {
+              speed_limit_from_reference_line, speed_limit_from_centripetal_acc,
+              centri_jerk_speed_limit, speed_limit_from_nearby_obstacles }));
     } else {
-      curr_speed_limit =
-          std::fmax(speed_bounds_config_.lowest_speed(),
-                    common::util::MinElement(std::vector<double>{
-                        speed_limit_on_reference_line, centri_acc_speed_limit,
-                        centri_jerk_speed_limit}));
+      curr_speed_limit = std::fmax(speed_bounds_config_.lowest_speed(),
+          common::util::MinElement(std::vector<double> {
+              speed_limit_from_reference_line, speed_limit_from_centripetal_acc,
+              centri_jerk_speed_limit }));
     }
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
 
     double curr_soft_speed_limit = 0.0;
     if (FLAGS_enable_soft_speed_limit) {
       curr_soft_speed_limit = std::fmax(speed_bounds_config_.lowest_speed(),
-                                        nudge_obstacle_speed_limit);
+                                        speed_limit_from_nearby_obstacles);
       speed_limit_data->AppendSoftSpeedLimit(path_s, curr_soft_speed_limit);
     }
   }
@@ -254,11 +261,12 @@ double SpeedLimitDecider::GetCentricAccLimit(const double kappa) const {
 
   // suppose acc = k1 * v + k2
   // consider acc = v ^ 2 * kappa
-  // we determine acc by the two functions above, with uppper and lower speed
+  // we determine acc by the two functions above, with upper and lower speed
   // bounds
   const double v_high = speed_bounds_config_.high_speed_threshold();
   const double v_low = speed_bounds_config_.low_speed_threshold();
 
+  // TODO(all): remove this; use a unified centripetal acceleration limit
   const double h_v_acc =
       speed_bounds_config_.high_speed_centric_acceleration_limit();
   const double l_v_acc =
