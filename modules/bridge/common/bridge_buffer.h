@@ -33,17 +33,17 @@ namespace bridge {
   DISABLE_COPY(TypeName);                 \
   DISABLE_ASSIGN(TypeName)
 
-template<typename T>
+template <typename T>
 class BridgeBuffer {
  public:
   BridgeBuffer();
   explicit BridgeBuffer(unsigned int size);
   virtual ~BridgeBuffer();
 
-  operator T* ();
+  operator T *();
   void reset(unsigned int size);
-  unsigned int size() const { return size_;}
-  unsigned int capacity() const { return capacity_;}
+  unsigned int size() const { return size_; }
+  unsigned int capacity() const { return capacity_; }
 
  private:
   T *buf_ = nullptr;

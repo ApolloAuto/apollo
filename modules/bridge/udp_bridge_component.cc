@@ -19,16 +19,15 @@
 namespace apollo {
 namespace bridge {
 
-#define BRIDGE_IMPL(pb_msg) \
-  template class UDPBridgeComponent<pb_msg>
+#define BRIDGE_IMPL(pb_msg) template class UDPBridgeComponent<pb_msg>
 
 #define _1K 1024
 
+using apollo::bridge::UDPBridgeRemoteInfo;
 using apollo::cyber::io::Session;
 using apollo::localization::LocalizationEstimate;
-using apollo::bridge::UDPBridgeRemoteInfo;
 
-template<typename T>
+template <typename T>
 bool UDPBridgeComponent<T>::Init() {
   AINFO << "UDP bridge init, startin..";
   buf_.reset(_1K);
@@ -40,20 +39,20 @@ bool UDPBridgeComponent<T>::Init() {
   remote_ip_ = udp_bridge_remote.remote_ip();
   remote_port_ = udp_bridge_remote.remote_port();
   proto_name_ = udp_bridge_remote.proto_name();
-  AINFO << "UDP Bridge remote ip is: "<< remote_ip_;
-  AINFO << "UDP Bridge remote port is: "<< remote_port_;
-  AINFO << "UDP Bridge for Proto is: "<< proto_name_;
+  AINFO << "UDP Bridge remote ip is: " << remote_ip_;
+  AINFO << "UDP Bridge remote port is: " << remote_port_;
+  AINFO << "UDP Bridge for Proto is: " << proto_name_;
   return true;
 }
 
-template<typename T>
+template <typename T>
 bool UDPBridgeComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
   if (remote_port_ == 0 || remote_ip_.empty()) {
     AERROR << "remote info is invalid!";
     return false;
   }
 
-  if (pb_msg== nullptr) {
+  if (pb_msg == nullptr) {
     AERROR << "proto msg is not ready!";
     return false;
   }
@@ -67,7 +66,7 @@ bool UDPBridgeComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
 
         Session session;
         session.Socket(AF_INET, SOCK_DGRAM, 0);
-        if (session.Connect((struct sockaddr*)&server_addr,
+        if (session.Connect((struct sockaddr *)&server_addr,
                             sizeof(server_addr)) < 0) {
           std::cout << "connect to server failed, " << strerror(errno)
                     << std::endl;

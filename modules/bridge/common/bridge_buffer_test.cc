@@ -14,11 +14,10 @@
  * limitations under the License.
  *****************************************************************************/
 
-
-#include <stdio.h>
-#include <gtest/gtest.h>
-#include <string>
 #include "modules/bridge/common/bridge_buffer.h"
+#include <gtest/gtest.h>
+#include <stdio.h>
+#include <string>
 
 namespace apollo {
 namespace bridge {
@@ -38,7 +37,7 @@ TEST(BridgeBufferTest, bridge_buf_test) {
   EXPECT_FALSE((buf == nullptr));
 
   std::string str("hello world");
-  snprintf(buf, str.length()+1, "%s", str.c_str());
+  snprintf(buf, str.length() + 1, "%s", str.c_str());
   EXPECT_STREQ(buf, str.c_str());
 
   buf.reset(80);
@@ -49,7 +48,7 @@ TEST(BridgeBufferTest, bridge_buf_test) {
   EXPECT_FALSE((buf == nullptr));
 
   std::string str1("hi world");
-  snprintf(buf, str1.length()+1, "%s", str1.c_str());
+  snprintf(buf, str1.length() + 1, "%s", str1.c_str());
   EXPECT_STREQ(buf, str1.c_str());
 }
 
