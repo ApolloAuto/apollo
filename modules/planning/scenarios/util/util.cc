@@ -30,8 +30,7 @@ using common::util::DistanceXY;
 using hdmap::PathOverlap;
 
 hdmap::PathOverlap* GetOverlapOnReferenceLine(
-    const ReferenceLineInfo& reference_line_info,
-    const std::string& overlap_id,
+    const ReferenceLineInfo& reference_line_info, const std::string& overlap_id,
     const ReferenceLineInfo::OverlapType& overlap_type) {
   if (overlap_type == ReferenceLineInfo::SIGNAL) {
     // traffic_light_overlap

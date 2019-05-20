@@ -106,8 +106,8 @@ void ContiArsDetector::RawObs2Frame(
     int motion_state = radar_obs.dynprop();
     double prob_target = radar_obs.probexist();
     if ((prob_target > MIN_PROBEXIST) &&
-      (motion_state == CONTI_MOVING || motion_state == CONTI_ONCOMING
-      || motion_state == CONTI_CROSSING_MOVING)) {
+        (motion_state == CONTI_MOVING || motion_state == CONTI_ONCOMING ||
+         motion_state == CONTI_CROSSING_MOVING)) {
       radar_object->motion_state = base::MotionState::MOVING;
     } else if (motion_state == CONTI_DYNAMIC_UNKNOWN) {
       radar_object->motion_state = base::MotionState::UNKNOWN;
