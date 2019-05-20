@@ -76,6 +76,7 @@ bool UDPBridgeComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
 
         unsigned int msg_len = pb_msg->ByteSize();
         buf_.reset(msg_len);
+        std::lock_guard<std::mutex> lg(mutex_);
         char *buf = buf_;
         pb_msg->SerializeToArray(buf, msg_len);
         if (session.Send(buf, msg_len, 0) < 0) {

@@ -65,6 +65,5 @@ BRIDGE_IMPL(char);
 BRIDGE_IMPL(int);
 BRIDGE_IMPL(double);
 
-
 }  // namespace bridge
 }  // namespace apollo
