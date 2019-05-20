@@ -60,4 +60,3 @@ enum ContiDynProp {
 }  // namespace radar
 }  // namespace perception
 }  // namespace apollo
-

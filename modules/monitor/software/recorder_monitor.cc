@@ -33,8 +33,8 @@ namespace apollo {
 namespace monitor {
 
 using apollo::common::util::StrCat;
-using apollo::data::SmartRecorderStatus;
 using apollo::data::RecordingState;
+using apollo::data::SmartRecorderStatus;
 
 RecorderMonitor::RecorderMonitor()
     : RecurrentRunner(FLAGS_recorder_monitor_name,

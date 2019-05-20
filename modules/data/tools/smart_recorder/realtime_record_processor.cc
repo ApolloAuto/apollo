@@ -42,14 +42,14 @@ namespace {
 
 using apollo::common::Header;
 using apollo::common::util::StrCat;
+using cyber::CreateNode;
 using cyber::common::EnsureDirectory;
 using cyber::common::GetFileName;
 using cyber::common::PathExists;
-using cyber::CreateNode;
 using cyber::record::HeaderBuilder;
 using cyber::record::Recorder;
-using cyber::record::RecordMessage;
 using cyber::record::RecordFileReader;
+using cyber::record::RecordMessage;
 using cyber::record::RecordReader;
 using cyber::record::RecordViewer;
 
