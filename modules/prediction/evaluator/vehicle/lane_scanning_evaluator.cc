@@ -26,6 +26,7 @@
 #include "modules/common/math/vec2d.h"
 #include "modules/common/proto/pnc_point.pb.h"
 #include "modules/prediction/common/feature_output.h"
+#include "modules/prediction/common/prediction_constants.h"
 #include "modules/prediction/common/prediction_gflags.h"
 #include "modules/prediction/common/prediction_system_gflags.h"
 #include "modules/prediction/container/container_manager.h"
@@ -330,6 +331,12 @@ bool LaneScanningEvaluator::ExtractStaticEnvFeatures(
       feature_values->push_back(0.0);
       count += 4;
     }
+  }
+
+  if (FLAGS_prediction_offline_mode ==
+          PredictionConstants::kDumpDataForLearning) {
+    // Early exit without appending zero for offline_dataforlearn_dump
+    return true;
   }
 
   size_t max_feature_size =
