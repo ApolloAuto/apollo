@@ -3,7 +3,7 @@ a: brake = 40.0
 a: steering_target = 0.0
 a: throttle = 0.0
 c: vehicle_speed == 0.0
-t: 2.0 
+t: 2.0
 a: brake = 0.0
 a: throttle = 20.0
 c: vehicle_speed >= 10.0
