@@ -27,7 +27,7 @@ git lfs uninstall
 2. Sync with our most up-to-date Apollo repo:
 
 ```bash
-git pull — rebase upstream master #where “upstream” is your defined alias of our Apollo repo
+git pull --rebase upstream master #where “upstream” is your defined alias of our Apollo repo
 ```
 
 3. Hard reset your forked repo:
