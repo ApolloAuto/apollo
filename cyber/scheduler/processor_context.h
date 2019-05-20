@@ -30,8 +30,6 @@ namespace scheduler {
 
 using croutine::CRoutine;
 
-class Processor;
-
 class ProcessorContext {
  public:
   virtual void Shutdown();

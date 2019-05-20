@@ -48,6 +48,10 @@ SchedulerClassic::SchedulerClassic() {
 
   apollo::cyber::proto::CyberConfig cfg;
   if (PathExists(cfg_file) && GetProtoFromFile(cfg_file, &cfg)) {
+    for (auto& thr : cfg.scheduler_conf().threads()) {
+      inner_thr_confs_[thr.name()] = thr;
+    }
+
     classic_conf_ = cfg.scheduler_conf().classic_conf();
     for (auto& group : classic_conf_.groups()) {
       auto& group_name = group.name();
