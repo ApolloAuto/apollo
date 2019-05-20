@@ -238,9 +238,9 @@ bool NaviPathDecider::GetBasicPathData(
   CHECK_NOTNULL(path_points);
 
   double min_path_len = config_.min_path_length();
-  // get min path plan lenth s = v0 * t + 1 / 2.0 * a * t^2
+  // get min path plan length s = v0 * t + 1 / 2.0 * a * t^2
   double path_len = start_plan_v_ * config_.min_look_forward_time() +
-                    start_plan_a_ * pow(0.1, 2) / 2.0;
+                    start_plan_a_ * pow(config_.min_look_forward_time(), 2) / 2.0;
   path_len = std::max(path_len, min_path_len);
 
   const double reference_line_len = reference_line.Length();
