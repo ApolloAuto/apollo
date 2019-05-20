@@ -22,7 +22,7 @@ namespace bridge {
 #define BRIDGE_IMPL(pb_msg)    \
   template class UDPBridgeComponent<pb_msg>
 
-#define _1K    1024
+#define _1K 1024
 
 using apollo::cyber::io::Session;
 using apollo::localization::LocalizationEstimate;
