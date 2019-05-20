@@ -54,7 +54,7 @@ class ObstacleContainer {
   bool HPresentationObstacle() {
     obstacles_A_ = Eigen::MatrixXd::Zero(obstacles_edges_num_.sum(), 2);
     obstacles_b_ = Eigen::MatrixXd::Zero(obstacles_edges_num_.sum(), 1);
-    // vertices using H-represetntation
+    // vertices using H-representation
     if (!ObsHRep(obstacles_num_, obstacles_edges_num_, obstacles_vertices_vec_,
                  &obstacles_A_, &obstacles_b_)) {
       AINFO << "Fail to present obstacle in hyperplane";
