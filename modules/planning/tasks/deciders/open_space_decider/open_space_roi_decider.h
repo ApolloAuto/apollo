@@ -51,16 +51,37 @@ class OpenSpaceRoiDecider : public Decider {
   apollo::common::Status Process(Frame *frame) override;
 
  private:
-  // @brief "Region of Interest", load map boundary for parking scenario
-  bool GetParkingBoundary(Frame *const frame,
-                          std::vector<std::vector<common::math::Vec2d>>
-                              *const roi_parking_boundary);
+  // @brief "Region of Interest", load map boundary for open space scenario
+  // @param vertices is an array consisting four points describing the boundary
+  // of spot in box. Four points are in sequence of left_top, left_down,
+  // right_down, right_top
+  // ------------------------------------------------------------------
+  //
+  //                     --> lane_direction
+  //
+  // ----------------left_top        right_top--------------------------
+  //                -                  -
+  //                -                  -
+  //                -                  -
+  //                -                  -
+  //                left_down-------right_down
+
+  bool GetBoundary(Frame *const frame,
+                   const std::array<common::math::Vec2d, 4> &vertices,
+                   const hdmap::Path &nearby_path,
+                   std::vector<std::vector<common::math::Vec2d>>
+                       *const roi_parking_boundary);
 
   // @brief generate the path by vehicle location and return the target parking
   // spot on that path
-  bool GetParkingSpotFromMap(
-      Frame *const frame, hdmap::ParkingSpaceInfoConstPtr *target_parking_spot,
-      std::shared_ptr<hdmap::Path> *nearby_path);
+  bool GetParkingSpot(Frame *const frame,
+                      std::array<common::math::Vec2d, 4> *vertices,
+                      hdmap::Path *nearby_path);
+
+  // @brief get path from reference line and return vertices of pullover spot
+  bool GetPullOverSpot(Frame *const frame,
+                       std::array<common::math::Vec2d, 4> *vertices,
+                       hdmap::Path *nearby_path);
 
   // @brief search target parking spot on the path by vehicle location, if
   // no return a nullptr in target_parking_spot
