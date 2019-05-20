@@ -1,7 +1,7 @@
 module_config {
-    module_library : "/apollo/bazel-bin/modules/bridge/libudp_bridge_component.so"
+    module_library: "/apollo/bazel-bin/modules/bridge/libudp_bridge_component.so"
     components {
-        class_name : "UDPBridgeComponent<planning::ADCTrajectory>"
+        class_name: "UDPBridgeComponent<planning::ADCTrajectory>"
         config {
             name: "bridge_ADCTrajectory"
             config_file_path: "/apollo/modules/bridge/conf/udp_bridge_adctrajectory.pb.txt"
@@ -12,7 +12,7 @@ module_config {
    }
 
     components {
-        class_name : "UDPBridgeComponent<localization::LocalizationEstimate>"
+        class_name: "UDPBridgeComponent<localization::LocalizationEstimate>"
         config {
             name: "bridge_LocalizationEstimate"
             config_file_path: "/apollo/modules/bridge/conf/udp_bridge_localization.pb.txt"
