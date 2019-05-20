@@ -21,7 +21,14 @@
 namespace apollo {
 namespace bridge {
 
+<<<<<<< HEAD:modules/bridge/udp_bridge_component.cc
+#define BRIDGE_IMPL(pb_msg)    \
+  template class UDPBridgeComponent<pb_msg>
+
+#define _1K    1024
+=======
 #define BRIDGE_IMPL(pb_msg) template class UDPBridgeSenderComponent<pb_msg>
+>>>>>>> bridge: add bridge receiver:modules/bridge/udp_bridge_sender_component.cc~HEAD
 
 using apollo::bridge::UDPBridgeSenderRemoteInfo;
 using apollo::cyber::io::Session;
@@ -45,8 +52,13 @@ bool UDPBridgeSenderComponent<T>::Init() {
   return true;
 }
 
+<<<<<<< HEAD:modules/bridge/udp_bridge_component.cc
+template<typename T>
+bool UDPBridgeComponent<T>::Proc( const std::shared_ptr<T> &pb_msg) {
+=======
 template <typename T>
 bool UDPBridgeSenderComponent<T>::Proc(const std::shared_ptr<T> &pb_msg) {
+>>>>>>> bridge: add bridge receiver:modules/bridge/udp_bridge_sender_component.cc~HEAD
   if (remote_port_ == 0 || remote_ip_.empty()) {
     AERROR << "remote info is invalid!";
     return false;
