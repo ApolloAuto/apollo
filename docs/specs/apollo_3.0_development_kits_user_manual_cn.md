@@ -594,21 +594,15 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
  - GPS授时接口：需要将GPS的授时接口与激光雷达接口盒的授时接口进行连接。
  
 ### 激光雷达的配置及启动
-
- - 设置激光雷达ip和IPC的ip处在相同号段：雷达出厂默认ip地址为192.168.1.201，将IPC的ip地址修改为静态ip且与雷达ip地址处于相同的号段，例如192.168.1.xxx，如下图所示：
- 
-![图片](images/lidar_ip.png)
-
- - 激光雷达的相关参数配置：当激光雷达与IPC的ip处在相同的号段后，将激光雷达上电且通过以太网线缆与IPC相连接后，在IPC的浏览器内输入激光雷达的ip地址，会显示激光雷达的各项参数，如下图所示，将`NetWork(Sensor)`选项卡下的`Data Port`修改为2369，将`Telemetry Port`修改为8309，点击`set` 按键、`Save Configuration`按键使配置生效。
- 
+ - 激光雷达的相关参数配置：雷达出厂默认ip地址为192.168.1.201，在浏览器中输入激光雷达ip地址，打开配置界面，将激光雷达的ip地址修改为与IPC的ip地址处于相同号段， 将`NetWork(Sensor)`选项卡下的`Data Port`修改为2369，将`Telemetry Port`修改为8309，点击`set` 按键、`Save Configuration`按键使配置生效。
 ![图片](images/lidar_config.png)
 
 ### 激光雷达数据的验证
 
  在完成上述配置后，可以使用以下方法验证激光雷达能否正常工作：
  
- - 查看是否能ping通激光雷达：在正确进行配置后，可以使用`ping`指令，查看是否能与激光雷达通信，正确结果如下图所示，如果不能ping通，请检查激光雷达及ipc的ip地址设置。
- 
+ - 查看雷达是否接收到GPS设备的PPS信号：在浏览器中输入雷达ip地址，打开配置界面，如果`GPS`选项卡中的`Position`有数据且`PPS`显示为`Locked`，则代表雷达收到了PPS信号。
+ - 查看是否能ping通激光雷达：在正确进行配置后，可以使用`ping`指令，查看是否能与激光雷达通信，正确结果如下图所示，如果不能ping通，请检查激光雷达及IPC的ip地址设置。
 ![图片](images/lidar_ping.png)
 
  - 使用VeloView查看点云数据：使用Velodyne官网提供的VeloView软件，在线查看点云数据，点击软件的`Sensor Stream`按钮，选择传感器型号为`VLP-16`，`LIDAR Port`为2369，`GPS Port`为8309，如果一切正常，则可以显示点云信息，如下图所示：
