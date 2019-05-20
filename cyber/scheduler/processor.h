@@ -27,12 +27,11 @@
 
 #include "cyber/croutine/croutine.h"
 #include "cyber/proto/scheduler_conf.pb.h"
+#include "cyber/scheduler/processor_context.h"
 
 namespace apollo {
 namespace cyber {
 namespace scheduler {
-
-class ProcessorContext;
 
 using croutine::CRoutine;
 
