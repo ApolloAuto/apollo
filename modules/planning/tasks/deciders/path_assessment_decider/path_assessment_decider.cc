@@ -60,7 +60,7 @@ Status PathAssessmentDecider::Process(
   } else {
     ADEBUG << "There are " << candidate_path_data.size() << " candidate paths";
   }
-  auto end_time0 = std::chrono::system_clock::now();
+  const auto& end_time0 = std::chrono::system_clock::now();
 
   // 1. Remove invalid path.
   std::vector<PathData> valid_path_data;
@@ -77,7 +77,7 @@ Status PathAssessmentDecider::Process(
       }
     }
   }
-  auto end_time1 = std::chrono::system_clock::now();
+  const auto& end_time1 = std::chrono::system_clock::now();
   std::chrono::duration<double> diff = end_time1 - end_time0;
   ADEBUG << "Time for path validity checking: " << diff.count() * 1000
          << " msec.";
@@ -105,7 +105,7 @@ Status PathAssessmentDecider::Process(
     return Status(ErrorCode::PLANNING_ERROR, msg);
   }
   ADEBUG << "There are " << valid_path_data.size() << " valid path data.";
-  auto end_time2 = std::chrono::system_clock::now();
+  const auto& end_time2 = std::chrono::system_clock::now();
   diff = end_time2 - end_time1;
   ADEBUG << "Time for path info labeling: " << diff.count() * 1000
          << " msec.";
@@ -217,7 +217,7 @@ Status PathAssessmentDecider::Process(
   *(reference_line_info->mutable_path_data()) = valid_path_data.front();
   reference_line_info->SetBlockingObstacleId(
       valid_path_data.front().blocking_obstacle_id());
-  auto end_time3 = std::chrono::system_clock::now();
+  const auto& end_time3 = std::chrono::system_clock::now();
   diff = end_time3 - end_time2;
   ADEBUG << "Time for optimal path selection: " << diff.count() * 1000
          << " msec.";
@@ -303,7 +303,7 @@ Status PathAssessmentDecider::Process(
           ->set_decided_side_pass_direction(-1);
     }
   }
-  auto end_time4 = std::chrono::system_clock::now();
+  const auto& end_time4 = std::chrono::system_clock::now();
   diff = end_time4 - end_time3;
   ADEBUG << "Time for FSM state updating: " << diff.count() * 1000
          << " msec.";

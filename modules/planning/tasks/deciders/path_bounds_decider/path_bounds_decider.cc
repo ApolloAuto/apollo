@@ -198,6 +198,15 @@ Status PathBoundsDecider::Process(
         pull_over_info->set_pull_over_y(std::get<3>(pull_over_configuration));
         pull_over_info->set_pull_over_theta(
             std::get<4>(pull_over_configuration));
+        // TODO(jiacheng): find-tune this.
+        pull_over_info->set_pull_over_length_front(
+            VehicleConfigHelper::GetConfig().vehicle_param().length());
+        pull_over_info->set_pull_over_length_back(
+            VehicleConfigHelper::GetConfig().vehicle_param().length());
+        pull_over_info->set_pull_over_width_left(
+            VehicleConfigHelper::GetConfig().vehicle_param().width() + 0.5);
+        pull_over_info->set_pull_over_width_right(
+            VehicleConfigHelper::GetConfig().vehicle_param().width());
         ADEBUG << "pull over: s[" << std::get<0>(pull_over_configuration)
                << "] l[" << std::get<1>(pull_over_configuration) << "] x["
                << std::get<2>(pull_over_configuration) << "] y["
