@@ -385,7 +385,7 @@ double Visualizer::regularize_angle(const double radian_angle) {
 }
 
 // ZYX Euler angles to quaternion
-bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quarternion,
+bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quaternion,
                                      const double pitch_radian,
                                      const double yaw_radian,
                                      const double roll_radian) {
@@ -397,16 +397,16 @@ bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quarternion,
   // double cr = cos(roll_radian * 0.5);
   // double sr = sin(roll_radian * 0.5);
 
-  // quarternion(0) = sy * cp * cr - cy * sp * sr;  // Q.x
-  // quarternion(1) = cy * sp * cr + sy * cp * sr;  // Q.y
-  // quarternion(2) = cy * cp * sr - sy * sp * cr;  // Q.z
-  // quarternion(3) = cy * cp * cr + sy * sp * sr;  // Q.w
+  // quaternion(0) = sy * cp * cr - cy * sp * sr;  // Q.x
+  // quaternion(1) = cy * sp * cr + sy * cp * sr;  // Q.y
+  // quaternion(2) = cy * cp * sr - sy * sp * cr;  // Q.z
+  // quaternion(3) = cy * cp * cr + sy * sp * sr;  // Q.w
 
-  // AINFO << "fast quarternion(x, y, z, w): ("
-  //       << quarternion(0) << ", "
-  //       << quarternion(1) << ", "
-  //       << quarternion(2) << ", "
-  //       << quarternion(3) << ")";
+  // AINFO << "fast quaternion(x, y, z, w): ("
+  //       << quaternion(0) << ", "
+  //       << quaternion(1) << ", "
+  //       << quaternion(2) << ", "
+  //       << quaternion(3) << ")";
 
   // Option 2. Rotation matrix to quaternion
   Eigen::Matrix3d Rx;  // pitch
@@ -426,30 +426,30 @@ bool Visualizer::euler_to_quaternion(Eigen::Vector4d *quarternion,
   AINFO << "Rotation matrix R: " << R;
   double qw = 0.5 * sqrt(1.0 + R(0, 0) + R(1, 1) + R(2, 2));
   if (fabs(qw) > 1.0e-6) {
-    (*quarternion)(0) = 0.25 * (R(2, 1) - R(1, 2)) / qw;  // Q.x
-    (*quarternion)(1) = 0.25 * (R(0, 2) - R(2, 0)) / qw;  // Q.y
-    (*quarternion)(2) = 0.25 * (R(1, 0) - R(0, 1)) / qw;  // Q.z
-    (*quarternion)(3) = qw;  // Q.w
-    AINFO << "quarternion(x, y, z, w): ("
-          << (*quarternion)(0) << ", "
-          << (*quarternion)(1) << ", "
-          << (*quarternion)(2) << ", "
-          << (*quarternion)(3) << ")";
+    (*quaternion)(0) = 0.25 * (R(2, 1) - R(1, 2)) / qw;  // Q.x
+    (*quaternion)(1) = 0.25 * (R(0, 2) - R(2, 0)) / qw;  // Q.y
+    (*quaternion)(2) = 0.25 * (R(1, 0) - R(0, 1)) / qw;  // Q.z
+    (*quaternion)(3) = qw;  // Q.w
+    AINFO << "quaternion(x, y, z, w): ("
+          << (*quaternion)(0) << ", "
+          << (*quaternion)(1) << ", "
+          << (*quaternion)(2) << ", "
+          << (*quaternion)(3) << ")";
   } else {
     double qx = 0.5 * sqrt(1.0 + R(0, 0) - R(1, 1) - R(2, 2));
     if (fabs(qx) < 1.0e-6) {
-      AWARN << "quarternion is degenerate qw: " << qw << "qx: " << qx;
+      AWARN << "quaternion is degenerate qw: " << qw << "qx: " << qx;
       return false;
     }
-    (*quarternion)(0) = qx;                               // Q.x
-    (*quarternion)(1) = 0.25 * (R(0, 1) + R(1, 0)) / qx;  // Q.y
-    (*quarternion)(2) = 0.25 * (R(0, 2) + R(2, 0)) / qx;  // Q.z
-    (*quarternion)(3) = 0.25 * (R(2, 1) - R(1, 2)) / qx;  // Q.w
-    AINFO << "second quarternion(x, y, z, w): ("
-          << (*quarternion)(0) << ", "
-          << (*quarternion)(1) << ", "
-          << (*quarternion)(2) << ", "
-          << (*quarternion)(3) << ")";
+    (*quaternion)(0) = qx;                               // Q.x
+    (*quaternion)(1) = 0.25 * (R(0, 1) + R(1, 0)) / qx;  // Q.y
+    (*quaternion)(2) = 0.25 * (R(0, 2) + R(2, 0)) / qx;  // Q.z
+    (*quaternion)(3) = 0.25 * (R(2, 1) - R(1, 2)) / qx;  // Q.w
+    AINFO << "second quaternion(x, y, z, w): ("
+          << (*quaternion)(0) << ", "
+          << (*quaternion)(1) << ", "
+          << (*quaternion)(2) << ", "
+          << (*quaternion)(3) << ")";
   }
   return true;
 }
@@ -480,7 +480,7 @@ bool Visualizer::copy_backup_file(const std::string &filename) {
 
 bool Visualizer::save_extrinsic_in_yaml(const std::string &camera_name,
                                         const Eigen::Matrix4d &extrinsic,
-                                        const Eigen::Vector4d &quarternion,
+                                        const Eigen::Vector4d &quaternion,
                                         const double pitch_radian,
                                         const double yaw_radian,
                                         const double roll_radian) {
@@ -508,10 +508,10 @@ bool Visualizer::save_extrinsic_in_yaml(const std::string &camera_name,
   y_file << "    y: " << extrinsic(1, 3) << "\n";
   y_file << "    z: " << extrinsic(2, 3) << "\n";
   y_file << "  rotation:\n";
-  y_file << "     x: " << quarternion(0) << "\n";
-  y_file << "     y: " << quarternion(1) << "\n";
-  y_file << "     z: " << quarternion(2) << "\n";
-  y_file << "     w: " << quarternion(3) << "\n";
+  y_file << "     x: " << quaternion(0) << "\n";
+  y_file << "     y: " << quaternion(1) << "\n";
+  y_file << "     z: " << quaternion(2) << "\n";
+  y_file << "     w: " << quaternion(3) << "\n";
   y_file << "  euler_angles_degree:\n";
   y_file << "     pitch: " << pitch_radian * radian_to_degree_factor_ << "\n";
   y_file << "     yaw: " << yaw_radian * radian_to_degree_factor_ << "\n";
@@ -526,10 +526,10 @@ bool Visualizer::save_extrinsic_in_yaml(const std::string &camera_name,
   //     return false;
   //   }
   //   // Replace rotation only
-  //   node["transform"]["rotation"]["x"].as<double>() = quarternion(0);
-  //   node["transform"]["rotation"]["y"].as<double>() = quarternion(1);
-  //   node["transform"]["rotation"]["z"].as<double>() = quarternion(2);
-  //   node["transform"]["rotation"]["w"].as<double>() = quarternion(3);
+  //   node["transform"]["rotation"]["x"].as<double>() = quaternion(0);
+  //   node["transform"]["rotation"]["y"].as<double>() = quaternion(1);
+  //   node["transform"]["rotation"]["z"].as<double>() = quaternion(2);
+  //   node["transform"]["rotation"]["w"].as<double>() = quaternion(3);
   //
   //   node.SaveFile(yaml_file);
   //   if (node.IsNull()) {
@@ -588,14 +588,14 @@ bool Visualizer::save_manual_calibration_parameter(
   AINFO << "New yaw: " << new_yaw_radian * radian_to_degree_factor_;
   AINFO << "New roll: " << new_roll_radian * radian_to_degree_factor_;
 
-  Eigen::Vector4d quarternion;
-  euler_to_quaternion(&quarternion, new_pitch_radian, new_roll_radian,
+  Eigen::Vector4d quaternion;
+  euler_to_quaternion(&quaternion, new_pitch_radian, new_roll_radian,
                       new_yaw_radian);
-  AINFO << "Quarternion X: " << quarternion(0) << ", Y: " << quarternion(1)
-        << ", Z: " << quarternion(2) << ", W: " << quarternion(3);
+  AINFO << "Quaternion X: " << quaternion(0) << ", Y: " << quaternion(1)
+        << ", Z: " << quaternion(2) << ", W: " << quaternion(3);
   // Save the file
   // Yaw and Roll are swapped.
-  save_extrinsic_in_yaml(camera_name, ex_camera2lidar_, quarternion,
+  save_extrinsic_in_yaml(camera_name, ex_camera2lidar_, quaternion,
                          new_pitch_radian, new_yaw_radian, new_roll_radian);
 
   return true;

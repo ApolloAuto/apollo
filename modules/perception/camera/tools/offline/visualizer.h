@@ -76,7 +76,7 @@ class Visualizer {
     roi_height_ = crop_height;
     roi_width_ = crop_width;
   }
-  bool euler_to_quaternion(Eigen::Vector4d *quarternion,
+  bool euler_to_quaternion(Eigen::Vector4d *quaternion,
                            const double pitch_radian, const double yaw_radian,
                            const double roll_radian);
   bool save_manual_calibration_parameter(const std::string &camera_name,
@@ -85,7 +85,7 @@ class Visualizer {
                                          const double roll_adj_degree);
   bool save_extrinsic_in_yaml(const std::string &camera_name,
                               const Eigen::Matrix4d &extrinsic,
-                              const Eigen::Vector4d &quarternion,
+                              const Eigen::Vector4d &quaternion,
                               const double pitch_radian,
                               const double yaw_radian,
                               const double roll_radian);
