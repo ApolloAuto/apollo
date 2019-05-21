@@ -165,11 +165,30 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
          << "] destination_s[" << dest_sl.s() << "] adc_front_edge_s["
          << adc_front_edge_s << "]";
 
-  const bool pull_over_scenario =
+  bool pull_over_scenario =
       (frame.reference_line_info().size() == 1 &&  // NO, while changing lane
        adc_distance_to_dest > 0 &&
        adc_distance_to_dest <=
            scenario_config.start_pull_over_scenario_distance());
+
+  // check around junction
+  if (pull_over_scenario) {
+    constexpr double kDisanceToAvoidJunction = 8.0;  // meter
+    for (const auto& overlap : first_encountered_overlap_map_) {
+      if (overlap.first == ReferenceLineInfo::PNC_JUNCTION ||
+          overlap.first == ReferenceLineInfo::SIGNAL ||
+          overlap.first == ReferenceLineInfo::STOP_SIGN ||
+          overlap.first == ReferenceLineInfo::YIELD_SIGN) {
+        const double distance_to = overlap.second.start_s - dest_sl.s();
+        const double distance_passed = dest_sl.s() - overlap.second.end_s;
+        if (distance_to > 0 && distance_to < kDisanceToAvoidJunction ||
+            distance_passed > 0 && distance_passed < kDisanceToAvoidJunction) {
+          pull_over_scenario = false;
+          break;
+        }
+      }
+    }
+  }
 
   switch (current_scenario_->scenario_type()) {
     case ScenarioConfig::LANE_FOLLOW:
