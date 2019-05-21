@@ -215,7 +215,7 @@ Status PathBoundsDecider::Process(
         // Trim the path bound based on the pull-over s.
         int pull_over_pos_idx =
             std::max(std::get<5>(pull_over_configuration),
-            kNumExtraTailBoundPoint);
+                     kNumExtraTailBoundPoint) + kNumExtraTailBoundPoint;
         for (auto& path_boundary : candidate_path_boundaries) {
           if (path_boundary.label().find("regular") != std::string::npos) {
             std::vector<std::pair<double, double>> new_path_boundary_pair;
