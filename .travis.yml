@@ -22,6 +22,12 @@ jobs:
       env:
         - JOB=lint
       script:
+        - |
+          git diff --name-only --diff-filter=AM HEAD...$TRAVIS_BRANCH | \
+              grep -e '.cc$' -e '.h$' -e '/BUILD$'
+          if [ $? -ne 0 ]; then
+            exit 0
+          fi
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20190413_1615 --fast-build
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
