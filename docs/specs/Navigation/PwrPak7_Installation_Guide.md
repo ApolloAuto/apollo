@@ -34,7 +34,7 @@ Follow these steps:
 
 * Before taking the measurement, turn on the IPC.
 * When the PwrPak7 and the GPS Antenna are in position, the distance from the PwrPak7 to the GPS Antenna must be measured. The center of the PwrPak7 IMU and the center of the antenna are labeled on the exterior of the devices.
-* The distance should be measured as: X offset, Y offset, and Z offset. The axis should be determined by the IMU. The error of offset must be within one centimeter to achieve high accuracy in positioning and localization. 
+* The distance should be measured as: X offset, Y offset, and Z offset. The axis should be determined by the IMU. The error of offset must be within one centimeter to achieve high accuracy in positioning and localization.
 
 ### Configuring the PwrPak7
 
@@ -96,7 +96,7 @@ For example:
 SETINSTRANSLATION ANT1 -0.05 0.5 0.8 0.05 0.05 0.08
 ```
 
-The first 3 numbers indicate the result of the lever arm distance measurement. The last 3 numbers are the uncertainty of the measurement. 
+The first 3 numbers indicate the result of the lever arm distance measurement. The last 3 numbers are the uncertainty of the measurement.
 
 ### References
 
