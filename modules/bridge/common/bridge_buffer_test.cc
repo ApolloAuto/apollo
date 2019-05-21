@@ -27,14 +27,14 @@ TEST(BridgeBufferTest, bridge_buf_test) {
   char *p = buf;
   EXPECT_EQ(0, buf.capacity());
   EXPECT_EQ(0, buf.size());
-  EXPECT_TRUE((buf == nullptr));
+  EXPECT_EQ((buf, nullptr));
 
   buf.reset(100);
   char *p1 = buf;
   EXPECT_EQ(100, buf.capacity());
   EXPECT_EQ(100, buf.size());
-  EXPECT_FALSE((p == p1));
-  EXPECT_FALSE((buf == nullptr));
+  EXPECT_NE((p, p1));
+  EXPECT_NE((buf, nullptr));
 
   std::string str("hello world");
   snprintf(buf, str.length() + 1, "%s", str.c_str());
@@ -44,8 +44,8 @@ TEST(BridgeBufferTest, bridge_buf_test) {
   char *p2 = buf;
   EXPECT_EQ(100, buf.capacity());
   EXPECT_EQ(80, buf.size());
-  EXPECT_FALSE((p2 != p1));
-  EXPECT_FALSE((buf == nullptr));
+  EXPECT_EQ((p2, p1));
+  EXPECT_NE((buf, nullptr));
 
   std::string str1("hi world");
   snprintf(buf, str1.length() + 1, "%s", str1.c_str());
