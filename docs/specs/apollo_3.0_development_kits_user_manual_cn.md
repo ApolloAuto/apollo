@@ -1,4 +1,5 @@
-教学套件使用手册
+开发套件使用手册
+===================
 
 # 目录
       
@@ -232,7 +233,7 @@ a.从CAN卡供应商那里拿到CAN卡的驱动安装包esdcan-pcie4.2-linux-2.6
 c.编译安装CAN卡驱动，在终端执行以下命令：
 ```
 cd src/
-make -C /lib/modules/`uname -f`/build M=`pwd`
+make -C /lib/modules/`uname -r`/build M=`pwd`
 sudo make -C /lib/modules/`uname -r`/build M=`pwd` modules_install
 ```
 d.CAN卡驱动esdcan-pcie402.ko可以在/lib/modules/4.4.32-apollo-2-RT/extra/文件夹下找到。
@@ -568,32 +569,50 @@ rostopic echo /apollo/sensor/camera/traffic/image_short
 ![图片](images/radar_parameter_value.png)
 	
 
-## 激光雷达安装与配置
+## 激光雷达安装与数据验证
+ - 激光雷达型号：80-VLP-16（velodyne 16线激光雷达）
+ - 更多详细参数可参考：[https://velodynelidar.com/vlp-16.html](https://velodynelidar.com/vlp-16.html)
+ 
+![图片](images/lidar_look.png)
 
-![图片](images/lidar_look.jpeg)
+### 激光雷达的安装固定
+ - 16线激光雷达及接口盒要牢靠固定在车身上，连接到接口盒上的接头要牢靠接插。水平安装在车顶部，对地高度1.5米，水平放置，精度在2度以内。连接线缆带屏蔽，接口镀金， 网线两头需贴上标签注明设备名称。安装位置如下图：
+ 
+![图片](images/lidar_installation_position.png)
 
-**激光雷达型号**：80-VLP-16（velodyne 16线激光雷达）
+ - 安装激光雷达时线缆方向朝向车辆的后方。
 
-**更多详细参数可参考**：[https://velodynelidar.com/vlp-16.html](https://velodynelidar.com/vlp-16.html)
+### 激光雷达与车辆的接线
 
-安装要求：16线激光雷达及控制盒要牢靠固定在车身上，连接到控制盒上的接头要牢靠接插。水平安装在车顶部，对地高度1.5米，水平放置，精度在2度以内。连接线缆带屏蔽，接口镀金，可参考京东线缆购买网址：[https://item.jd.com/1342004.html](https://item.jd.com/1342004.html) 网线两头需贴上标签注明设备名称。安装位置如下图：
+ - 激光雷达的接口盒有三个接口，分别为数据口(以太网接口)、12V电源接口、GPS授时接口，如下图所示：
+ 
+![图片](images/lidar_socket.jpeg)
 
-![图片](images/lidar_install_position.png)
+ - 数据口：通过以太网线缆将接口盒连接到IPC。
+ - 12V电源接口：可以使用雷达自带的12V适配器进行供电或者使用自己的电源线连接12V电源供电。
+ - GPS授时接口：需要将GPS的授时接口与激光雷达接口盒的授时接口进行连接。
+ 
+### 激光雷达的配置及启动
+ - 激光雷达的相关参数配置：雷达出厂默认ip地址为192.168.1.201，在浏览器中输入激光雷达ip地址，打开配置界面，将激光雷达的ip地址修改为与IPC的ip地址处于相同号段， 将`NetWork(Sensor)`选项卡下的`Data Port`修改为2369，将`Telemetry Port`修改为8309，点击`set` 按键、`Save Configuration`按键使配置生效。
+![图片](images/lidar_config.png)
 
-**设备连接说明**：数据输出端口通过以太网连接到工控机以太网口。
+### 激光雷达数据的验证
 
-控制盒接口如图所示：
+ 在完成上述配置后，可以使用以下方法验证激光雷达能否正常工作：
+ 
+ - 查看雷达是否接收到GPS设备的PPS信号：在浏览器中输入雷达ip地址，打开配置界面，如果`GPS`选项卡中的`Position`有数据且`PPS`显示为`Locked`，则代表雷达收到了PPS信号。
+ - 查看是否能ping通激光雷达：在正确进行配置后，可以使用`ping`指令，查看是否能与激光雷达通信，正确结果如下图所示，如果不能ping通，请检查激光雷达及IPC的ip地址设置。
+![图片](images/lidar_ping.png)
 
-![图片](images/lidar_look2.jpeg)
+ - 使用VeloView查看点云数据：使用Velodyne官网提供的VeloView软件，在线查看点云数据，点击软件的`Sensor Stream`按钮，选择传感器型号为`VLP-16`，`LIDAR Port`为2369，`GPS Port`为8309，如果一切正常，则可以显示点云信息，如下图所示：
+ 
+![图片](images/lidar_sensor.png)
 
-GPS授时接口改造：裸线对应的PPS信号，GPRMC信号，地，分别压入黑色控制盒PCB板上面对应的三个螺丝下面。信号对应关系和实际连接图如下所示：
+![图片](images/lidar_picture.png)
 
-![图片](images/lidar_slot.jpeg)
-
-![图片](images/lidar_signal.jpeg)
-
-**配置检查**：设备连接完成后，给激光雷达供电，修改激光雷达的默认ip地址，使激光雷达和IPC在一个网段内，velodyne 16线激光雷达的出厂默认IP地址为：192.168.1.201，修改成192.168.20.13即可。
-
+ - 在Apollo启动后，在`docker`环境内，启动`dreamview`后，执行`bash /apollo/scripts/velodyne_16.sh`，出现如下图所示的`topic`，如下图所示，打印这三个`topic`，如果数据能正常输出，则代表激光雷达运行正常。
+ 
+![图片](images/lidar_topic.png)
 
 
 # 油门刹车标定
@@ -939,7 +958,7 @@ rostopic echo /apollo/sensor/gnss/imu
 ```
  bash bootstrap.sh start 
 ```
-然后在网页中输入http://IP_ADDRESS:8888(如果在本地机器可以用http://localhost:8888)即可以打开dreamview界面，该界面可以控制和监测车辆自动驾驶动作和效果。选择左侧的modules conttroller，可以出现很多模块，我们点击localization使它变成蓝色即可以打开localization模块，接着在命令行，就可以用命令rostopic echo /apollo/localization/pose观察localization的效果，dreamview和localization topic的效果如下图所示：
+然后在网页中输入http://IP_ADDRESS:8888(如果在本地机器可以用http://localhost:8888 )即可以打开dreamview界面，该界面可以控制和监测车辆自动驾驶动作和效果。选择左侧的modules conttroller，可以出现很多模块，我们点击localization使它变成蓝色即可以打开localization模块，接着在命令行，就可以用命令rostopic echo /apollo/localization/pose观察localization的效果，dreamview和localization topic的效果如下图所示：
 
 ![图片](images/debug_dreamview_localization.png)
  
