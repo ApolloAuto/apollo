@@ -581,6 +581,59 @@ bool OpenSpaceRoiDecider::GetParkingSpot(Frame *const frame,
 bool OpenSpaceRoiDecider::GetPullOverSpot(
     Frame *const frame, std::array<common::math::Vec2d, 4> *vertices,
     hdmap::Path *nearby_path) {
+  const auto &pull_over_info =
+      PlanningContext::Instance()->planning_status()->pull_over();
+  if (!pull_over_info.exist_pull_over_position()) {
+    AERROR << "Pull over position not set in planning context";
+    return false;
+  }
+
+  if (frame->reference_line_info().size() > 1) {
+    AERROR << "Should not be in pull over when changing lane in open space "
+              "planning";
+    return false;
+  }
+
+  *nearby_path =
+      frame->reference_line_info().front().reference_line().GetMapPath();
+
+  // Construct left_top, left_down, right_down, right_top points
+  double pull_over_x = pull_over_info.pull_over_x();
+  double pull_over_y = pull_over_info.pull_over_y();
+  const double pull_over_theta = pull_over_info.pull_over_theta();
+  const double pull_over_length_front = pull_over_info.pull_over_length_front();
+  const double pull_over_length_back = pull_over_info.pull_over_length_back();
+  const double pull_over_width_left = pull_over_info.pull_over_width_left();
+  const double pull_over_width_right = pull_over_info.pull_over_width_right();
+
+  Vec2d center_shift_vec((pull_over_length_front - pull_over_length_back) * 0.5,
+                         (pull_over_width_left - pull_over_width_right) * 0.5);
+  center_shift_vec.SelfRotate(pull_over_theta);
+  pull_over_x += center_shift_vec.x();
+  pull_over_y += center_shift_vec.y();
+
+  const double half_length =
+      (pull_over_length_front + pull_over_length_back) / 2.0;
+  const double half_width = (pull_over_width_left + pull_over_width_right) /
+                            2.0 const double dx1 = cos_heading * half_length;
+
+  const double cos_heading = std::cos(pull_over_theta);
+  const double sin_heading = std::sin(pull_over_theta);
+
+  const double dx1 = cos_heading * half_length;
+  const double dy1 = sin_heading * half_length;
+  const double dx2 = sin_heading * half_width;
+  const double dy2 = -cos_heading * half_width;
+
+  Vec2d left_top(pull_over_x - dx1 + dx2, pull_over_y - dy1 + dy2);
+  Vec2d left_down(pull_over_x - dx1 - dx2, pull_over_y - dy1 - dy2);
+  Vec2d right_down(pull_over_x + dx1 - dx2, pull_over_y + dy1 - dy2);
+  Vec2d right_top(pull_over_x + dx1 + dx2, pull_over_y + dy1 + dy2);
+
+  std::array<Vec2d, 4> pull_over_vertices{left_top, left_down, right_down,
+                                          right_top};
+  *vertices = std::move(pull_over_vertices);
+
   return true;
 }
 
