@@ -97,6 +97,10 @@ common::Status PiecewiseJerkPathOptimizer::Process(
         path_boundary.boundary(), w, &opt_l, &opt_dl, &opt_ddl, max_iter);
 
     if (res_opt) {
+      for (size_t i = 0; i < path_boundary.boundary().size(); i+=4) {
+        ADEBUG << "for s[" << static_cast<double>(i) * path_boundary.delta_s()
+               << "], l = " << opt_l[i] << ", dl = " << opt_dl[i];
+      }
       auto frenet_frame_path =
           ToPiecewiseJerkPath(opt_l, opt_dl, opt_ddl, path_boundary.delta_s(),
                               path_boundary.start_s());
@@ -128,7 +132,12 @@ bool PiecewiseJerkPathOptimizer::OptimizePath(
   PiecewiseJerkPathProblem piecewise_jerk_problem(lat_boundaries.size(),
                                                   delta_s, init_state);
 
+  // TODO(Hongyi): update end_state settings
   piecewise_jerk_problem.set_end_state_ref({1000.0, 0.0, 0.0}, end_state);
+  if (end_state[0] != 0) {
+    std::vector<double> x_ref(lat_boundaries.size(), end_state[0]);
+    piecewise_jerk_problem.set_x_ref(10.0, x_ref);
+  }
 
   piecewise_jerk_problem.set_weight_x(w[0]);
   piecewise_jerk_problem.set_weight_dx(w[1]);
