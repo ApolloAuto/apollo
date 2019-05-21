@@ -166,7 +166,8 @@ ScenarioConfig::ScenarioType ScenarioManager::SelectPullOverScenario(
          << adc_front_edge_s << "]";
 
   const bool pull_over_scenario =
-      (adc_distance_to_dest > 0 &&
+      (frame.reference_line_info().size() == 1 &&  // NO, while changing lane
+       adc_distance_to_dest > 0 &&
        adc_distance_to_dest <=
            scenario_config.start_pull_over_scenario_distance());
 
