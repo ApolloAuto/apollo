@@ -233,15 +233,17 @@ Status SpeedLimitDecider::GetSpeedLimits(
     }
     double curr_speed_limit = 0.0;
     if (FLAGS_enable_nudge_slowdown && !FLAGS_enable_soft_speed_limit) {
-      curr_speed_limit = std::fmax(speed_bounds_config_.lowest_speed(),
-          common::util::MinElement(std::vector<double> {
+      curr_speed_limit = std::fmax(
+          speed_bounds_config_.lowest_speed(),
+          common::util::MinElement(std::vector<double>{
               speed_limit_from_reference_line, speed_limit_from_centripetal_acc,
-              centri_jerk_speed_limit, speed_limit_from_nearby_obstacles }));
+              centri_jerk_speed_limit, speed_limit_from_nearby_obstacles}));
     } else {
-      curr_speed_limit = std::fmax(speed_bounds_config_.lowest_speed(),
-          common::util::MinElement(std::vector<double> {
+      curr_speed_limit = std::fmax(
+          speed_bounds_config_.lowest_speed(),
+          common::util::MinElement(std::vector<double>{
               speed_limit_from_reference_line, speed_limit_from_centripetal_acc,
-              centri_jerk_speed_limit }));
+              centri_jerk_speed_limit}));
     }
     speed_limit_data->AppendSpeedLimit(path_s, curr_speed_limit);
 

@@ -107,8 +107,7 @@ Status PathAssessmentDecider::Process(
   ADEBUG << "There are " << valid_path_data.size() << " valid path data.";
   const auto& end_time2 = std::chrono::system_clock::now();
   diff = end_time2 - end_time1;
-  ADEBUG << "Time for path info labeling: " << diff.count() * 1000
-         << " msec.";
+  ADEBUG << "Time for path info labeling: " << diff.count() * 1000 << " msec.";
 
   // 3. Pick the optimal path.
   std::sort(valid_path_data.begin(), valid_path_data.end(),
@@ -305,8 +304,7 @@ Status PathAssessmentDecider::Process(
   }
   const auto& end_time4 = std::chrono::system_clock::now();
   diff = end_time4 - end_time3;
-  ADEBUG << "Time for FSM state updating: " << diff.count() * 1000
-         << " msec.";
+  ADEBUG << "Time for FSM state updating: " << diff.count() * 1000 << " msec.";
 
   // Plot the path in simulator for debug purpose.
   RecordDebugInfo(reference_line_info->path_data(), "Planning PathData",
