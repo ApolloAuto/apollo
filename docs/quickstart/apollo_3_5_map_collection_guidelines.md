@@ -120,6 +120,13 @@ The only special case is that the additional front lidar 16 (which is facing upw
 -	Check whether the IMU coordinates are correct and not rotated on a different axis `cyber_monitor`
 - **[IMPORTANT]** If data is collected for the first time, or the extrinsic parameters between multiple-lidars and GNSS are changed or if a new vehicle is used to install Apollo 3.5 and data is being collected on this new vehicle, we would need to verify your map data. In order to verify your data, we would need you to collect the data of a small route and upload it as mentioned in the steps above.
 
+## Data Size Management 
+
+1. Set your camera frame rate to 10Hz (this will drastically lower the data size)
+2. For Lidar topics:
+    - For the vehicles that are needed for map data verification, all the LiDAR related point cloud topics (velodynescan, pointcloud2, compenstator/pointcloud2) must be saved and sent to us
+    - After the vehicle passes the map verification, only velodynescan & pointcloud2 are needed for map creation
+
 ## Data Upload
 
 The collected map data is placed in the */apollo/data/bag/(start time of collection, e.g.,2018-04-14-21-20-24)* directory by default, package the data as tar.gz compressed file and upload them to the [Apollo Data Official Website](http://data.apollo.auto/hd_map_intro/?locale=en-us).
