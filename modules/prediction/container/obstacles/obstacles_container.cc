@@ -347,8 +347,6 @@ void ObstaclesContainer::BuildLaneGraph() {
       continue;
     }
     if (FLAGS_prediction_offline_mode !=
-            PredictionConstants::kDumpFeatureProto &&
-        FLAGS_prediction_offline_mode !=
             PredictionConstants::kDumpDataForLearning) {
       ADEBUG << "Building Lane Graph.";
       obstacle_ptr->BuildLaneGraph();
