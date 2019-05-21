@@ -37,6 +37,7 @@ class PathBoundary {
 
   double delta_s() const;
 
+  void set_boundary(const std::vector<std::pair<double, double>>& boundary);
   const std::vector<std::pair<double, double>>& boundary() const;
 
   void set_label(const std::string& label);
