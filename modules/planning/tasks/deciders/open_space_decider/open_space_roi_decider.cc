@@ -22,6 +22,8 @@
 
 #include <utility>
 
+#include "modules/planning/common/planning_context.h"
+
 namespace apollo {
 namespace planning {
 
@@ -78,12 +80,20 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+
+    SetOrigin(frame, spot_vertices);
+
+    SetParkingSpotEndPose(frame, spot_vertices);
   } else if (roi_type == OpenSpaceRoiDeciderConfig::PULL_OVER) {
     if (!GetPullOverSpot(frame, &spot_vertices, &nearby_path)) {
       const std::string msg = "Fail to get parking boundary from map";
       AERROR << msg;
       return Status(ErrorCode::PLANNING_ERROR, msg);
     }
+
+    SetOrigin(frame, spot_vertices);
+
+    SetPullOverSpotEndPose(frame);
   } else {
     const std::string msg =
         "chosen open space roi secenario type not implemented";
@@ -94,7 +104,6 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
   // @brief vector of different obstacle consisting of vertice points.The
   // obstacle and the vertices order are in counter-clockwise order
   std::vector<std::vector<common::math::Vec2d>> roi_boundary;
-
   if (!GetBoundary(frame, spot_vertices, nearby_path, &roi_boundary)) {
     const std::string msg = "Fail to get parking boundary from map";
     AERROR << msg;
@@ -108,6 +117,111 @@ Status OpenSpaceRoiDecider::Process(Frame *frame) {
   }
 
   return Status::OK();
+}
+
+void OpenSpaceRoiDecider::SetOrigin(
+    Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices) {
+  auto left_top = vertices[0];
+  auto right_top = vertices[3];
+  // rotate the points to have the lane to be horizontal to x axis positive
+  // direction and scale them base on the origin point
+  Vec2d heading_vec = right_top - left_top;
+  frame->mutable_open_space_info()->set_origin_heading(heading_vec.Angle());
+  frame->mutable_open_space_info()->mutable_origin_point()->set_x(left_top.x());
+  frame->mutable_open_space_info()->mutable_origin_point()->set_y(left_top.y());
+}
+
+void OpenSpaceRoiDecider::SetParkingSpotEndPose(
+    Frame *const frame, const std::array<common::math::Vec2d, 4> &vertices) {
+  auto left_top = vertices[0];
+  auto left_down = vertices[1];
+  auto right_down = vertices[2];
+  auto right_top = vertices[3];
+
+  const auto &origin_point = frame->open_space_info().origin_point();
+  const auto &origin_heading = frame->open_space_info().origin_heading();
+
+  // End pose is set in normalized boundary
+  left_top -= origin_point;
+  left_top.SelfRotate(-origin_heading);
+  left_down -= origin_point;
+  left_down.SelfRotate(-origin_heading);
+  right_top -= origin_point;
+  right_top.SelfRotate(-origin_heading);
+  right_down -= origin_point;
+  right_down.SelfRotate(-origin_heading);
+
+  // TODO(Jinyun): adjust end pose setting for more parking spot configurations
+  double parking_spot_heading = (left_down - left_top).Angle();
+  double end_x = (left_top.x() + right_top.x()) / 2.0;
+  double end_y = 0.0;
+  const double parking_depth_buffer =
+      config_.open_space_roi_decider_config().parking_depth_buffer();
+  CHECK_GE(parking_depth_buffer, 0.0);
+  const bool parking_inwards =
+      config_.open_space_roi_decider_config().parking_inwards();
+  const double top_to_down_distance = left_top.y() - left_down.y();
+  if (parking_spot_heading > common::math::kMathEpsilon) {
+    if (parking_inwards) {
+      end_y =
+          left_down.y() - (std::max(3.0 * -top_to_down_distance / 4.0,
+                                    vehicle_params_.front_edge_to_center()) +
+                           parking_depth_buffer);
+
+    } else {
+      end_y = left_down.y() - (std::max(-top_to_down_distance / 4.0,
+                                        vehicle_params_.back_edge_to_center()) +
+                               parking_depth_buffer);
+    }
+  } else {
+    if (parking_inwards) {
+      end_y =
+          left_down.y() + (std::max(3.0 * top_to_down_distance / 4.0,
+                                    vehicle_params_.front_edge_to_center()) +
+                           parking_depth_buffer);
+    } else {
+      end_y = left_down.y() + (std::max(top_to_down_distance / 4.0,
+                                        vehicle_params_.back_edge_to_center()) +
+                               parking_depth_buffer);
+    }
+  }
+
+  auto *end_pose =
+      frame->mutable_open_space_info()->mutable_open_space_end_pose();
+  end_pose->push_back(end_x);
+  end_pose->push_back(end_y);
+  if (config_.open_space_roi_decider_config().parking_inwards()) {
+    end_pose->push_back(parking_spot_heading);
+  } else {
+    end_pose->push_back(
+        common::math::NormalizeAngle(parking_spot_heading + M_PI));
+  }
+  end_pose->push_back(0.0);
+}
+
+void OpenSpaceRoiDecider::SetPullOverSpotEndPose(Frame *const frame) {
+  const auto &pull_over_info =
+      PlanningContext::Instance()->planning_status().pull_over();
+  double pull_over_x = pull_over_info.pull_over_x();
+  double pull_over_y = pull_over_info.pull_over_y();
+  double pull_over_theta = pull_over_info.pull_over_theta();
+
+  // Normalize according to origin_point and origin_heading
+  const auto &origin_point = frame->open_space_info().origin_point();
+  const auto &origin_heading = frame->open_space_info().origin_heading();
+  Vec2d center(pull_over_x, pull_over_y);
+  center -= origin_point;
+  center.SelfRotate(-origin_heading);
+  pull_over_theta =
+      common::math::NormalizeAngle(pull_over_theta - origin_heading);
+
+  auto *end_pose =
+      frame->mutable_open_space_info()->mutable_open_space_end_pose();
+  end_pose->push_back(center.x());
+  end_pose->push_back(center.y());
+  end_pose->push_back(pull_over_theta);
+  // end pose velocity set to be zero
+  end_pose->push_back(0.0);
 }
 
 bool OpenSpaceRoiDecider::GetBoundary(
@@ -199,12 +313,6 @@ bool OpenSpaceRoiDecider::GetBoundary(
     last_check_point_heading = check_point_heading;
   }
 
-  // rotate the points to have the lane to be horizontal to x axis positive
-  // direction and scale them base on the origin point
-  Vec2d heading_vec = right_top - left_top;
-  frame->mutable_open_space_info()->set_origin_heading(heading_vec.Angle());
-  frame->mutable_open_space_info()->mutable_origin_point()->set_x(left_top.x());
-  frame->mutable_open_space_info()->mutable_origin_point()->set_y(left_top.y());
   const auto &origin_point = frame->open_space_info().origin_point();
   const auto &origin_heading = frame->open_space_info().origin_heading();
 
@@ -433,54 +541,6 @@ bool OpenSpaceRoiDecider::GetBoundary(
     AERROR << "vehicle outside of xy boundary of parking ROI";
     return false;
   }
-
-  // Get end_pose of the parking spot
-  double parking_spot_heading = (left_down - left_top).Angle();
-  double end_x = (left_top.x() + right_top.x()) / 2.0;
-  double end_y = 0.0;
-  const double parking_depth_buffer =
-      config_.open_space_roi_decider_config().parking_depth_buffer();
-  CHECK_GE(parking_depth_buffer, 0.0);
-  const bool parking_inwards =
-      config_.open_space_roi_decider_config().parking_inwards();
-  const double top_to_down_distance = left_top.y() - left_down.y();
-  if (parking_spot_heading > common::math::kMathEpsilon) {
-    if (parking_inwards) {
-      end_y =
-          left_down.y() - (std::max(3.0 * -top_to_down_distance / 4.0,
-                                    vehicle_params_.front_edge_to_center()) +
-                           parking_depth_buffer);
-
-    } else {
-      end_y = left_down.y() - (std::max(-top_to_down_distance / 4.0,
-                                        vehicle_params_.back_edge_to_center()) +
-                               parking_depth_buffer);
-    }
-  } else {
-    if (parking_inwards) {
-      end_y =
-          left_down.y() + (std::max(3.0 * top_to_down_distance / 4.0,
-                                    vehicle_params_.front_edge_to_center()) +
-                           parking_depth_buffer);
-    } else {
-      end_y = left_down.y() + (std::max(top_to_down_distance / 4.0,
-                                        vehicle_params_.back_edge_to_center()) +
-                               parking_depth_buffer);
-    }
-  }
-
-  auto *end_pose =
-      frame->mutable_open_space_info()->mutable_open_space_end_pose();
-  end_pose->push_back(end_x);
-  end_pose->push_back(end_y);
-  if (config_.open_space_roi_decider_config().parking_inwards()) {
-    end_pose->push_back(parking_spot_heading);
-  } else {
-    end_pose->push_back(
-        common::math::NormalizeAngle(parking_spot_heading + M_PI));
-  }
-  end_pose->push_back(0.0);
-
   return true;
 }
 
@@ -582,7 +642,7 @@ bool OpenSpaceRoiDecider::GetPullOverSpot(
     Frame *const frame, std::array<common::math::Vec2d, 4> *vertices,
     hdmap::Path *nearby_path) {
   const auto &pull_over_info =
-      PlanningContext::Instance()->planning_status()->pull_over();
+      PlanningContext::Instance()->planning_status().pull_over();
   if (!pull_over_info.exist_pull_over_position()) {
     AERROR << "Pull over position not set in planning context";
     return false;
@@ -614,8 +674,8 @@ bool OpenSpaceRoiDecider::GetPullOverSpot(
 
   const double half_length =
       (pull_over_length_front + pull_over_length_back) / 2.0;
-  const double half_width = (pull_over_width_left + pull_over_width_right) /
-                            2.0 const double dx1 = cos_heading * half_length;
+  const double half_width =
+      (pull_over_width_left + pull_over_width_right) / 2.0;
 
   const double cos_heading = std::cos(pull_over_theta);
   const double sin_heading = std::sin(pull_over_theta);
