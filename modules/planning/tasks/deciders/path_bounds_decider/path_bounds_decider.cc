@@ -184,7 +184,7 @@ Status PathBoundsDecider::Process(
     } else {
       // TODO(QiL, Jiacheng): simplify the interface for
       // 'SearchPullOverPosition' and use proto directly
-      std::tuple<double, double, double, double, double>
+      std::tuple<double, double, double, double, double, int>
           pull_over_configuration;
       if (!SearchPullOverPosition(*frame, *reference_line_info,
                                   regular_self_path_bound,
@@ -213,7 +213,19 @@ Status PathBoundsDecider::Process(
                << std::get<3>(pull_over_configuration) << "] theta["
                << std::get<4>(pull_over_configuration) << "]";
         // Trim the path bound based on the pull-over s.
-        // TODO(jiacheng): implement this.
+        int pull_over_pos_idx =
+            std::max(std::get<5>(pull_over_configuration),
+            kNumExtraTailBoundPoint);
+        for (auto& path_boundary : candidate_path_boundaries) {
+          if (path_boundary.label().find("regular") != std::string::npos) {
+            std::vector<std::pair<double, double>> new_path_boundary_pair;
+            for (size_t i = 0;
+                 i <= static_cast<size_t>(pull_over_pos_idx); ++i) {
+              new_path_boundary_pair.push_back(path_boundary.boundary()[i]);
+            }
+            path_boundary.set_boundary(new_path_boundary_pair);
+          }
+        }
       }
     }
   }
@@ -343,7 +355,7 @@ std::string PathBoundsDecider::GenerateFallbackPathBound(
 bool PathBoundsDecider::SearchPullOverPosition(
     const Frame& frame, const ReferenceLineInfo& reference_line_info,
     const std::vector<std::tuple<double, double, double>>& path_bound,
-    std::tuple<double, double, double, double, double>* const
+    std::tuple<double, double, double, double, double, int>* const
         pull_over_configuration) {
   // destination_s based on routing_end
   const auto& reference_line = reference_line_info_->reference_line();
@@ -364,9 +376,18 @@ bool PathBoundsDecider::SearchPullOverPosition(
       reference_line.XYToSL(
           {pull_over_status.pull_over_x(), pull_over_status.pull_over_y()},
           &pull_over_sl);
+      int pull_over_idx = 0;
+      for (const auto& path_bound_point : path_bound) {
+        if (std::get<0>(path_bound_point) < pull_over_sl.s()) {
+          ++pull_over_idx;
+        } else {
+          break;
+        }
+      }
       *pull_over_configuration = std::make_tuple(
           pull_over_sl.s(), pull_over_sl.l(), pull_over_status.pull_over_x(),
-          pull_over_status.pull_over_y(), pull_over_status.pull_over_theta());
+          pull_over_status.pull_over_y(), pull_over_status.pull_over_theta(),
+          pull_over_idx);
       return true;
     } else {
       ADEBUG << "Destination is too close to ADC. distance["
@@ -471,7 +492,8 @@ bool PathBoundsDecider::SearchPullOverPosition(
       const double pull_over_theta = reference_point.heading();
 
       *pull_over_configuration = std::make_tuple(
-          pull_over_s, pull_over_l, pull_over_x, pull_over_y, pull_over_theta);
+          pull_over_s, pull_over_l, pull_over_x, pull_over_y,
+          pull_over_theta, (i + j) / 2);
       break;
     }
     --i;
