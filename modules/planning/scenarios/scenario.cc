@@ -63,6 +63,26 @@ void Scenario::Init() {
   current_stage_ = CreateStage(*stage_config_map_[config_.stage_type(0)]);
 }
 
+ScenarioConfig::ScenarioType Scenario::UpdateScenarioType(
+    const common::TrajectoryPoint& ego_point, const Frame& frame,
+    const ScenarioConfigMap& config_map,
+    const PathOverlapMap& first_encountered_overlap_map) const {
+  UNUSED(ego_point);
+  UNUSED(frame);
+  UNUSED(config_map);
+  UNUSED(first_encountered_overlap_map);
+
+  // default: LANE_FOLLOW
+  ScenarioConfig::ScenarioType scenario_type = ScenarioConfig::LANE_FOLLOW;
+
+  // Must wait for the current scene to be completed
+  if (scenario_status_ != Scenario::ScenarioStatus::STATUS_DONE) {
+    scenario_type = this->scenario_type();
+  }
+
+  return scenario_type;
+}
+
 Scenario::ScenarioStatus Scenario::Process(
     const common::TrajectoryPoint& planning_init_point, Frame* frame) {
   if (current_stage_ == nullptr) {

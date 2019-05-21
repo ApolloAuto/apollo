@@ -49,6 +49,11 @@ class LaneFollowScenario : public Scenario {
 
   std::unique_ptr<Stage> CreateStage(
       const ScenarioConfig::StageConfig& stage_config) override;
+
+  ScenarioConfig::ScenarioType UpdateScenarioType(
+      const common::TrajectoryPoint& ego_point, const Frame& frame,
+      const ScenarioConfigMap& config_map,
+      const PathOverlapMap& first_encountered_overlap_map) const override;
 };
 
 }  // namespace lane_follow

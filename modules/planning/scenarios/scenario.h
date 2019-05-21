@@ -36,6 +36,14 @@ namespace apollo {
 namespace planning {
 namespace scenario {
 
+using PathOverlapMap = std::unordered_map<ReferenceLineInfo::OverlapType,
+                                          hdmap::PathOverlap, std::hash<int>>;
+using ScenarioConfigMap = std::unordered_map<ScenarioConfig::ScenarioType,
+                                             ScenarioConfig, std::hash<int>>;
+using StageConfigMap =
+    std::unordered_map<ScenarioConfig::StageType,
+                       const ScenarioConfig::StageConfig*, std::hash<int>>;
+
 struct ScenarioContext {};
 
 class Scenario {
@@ -73,6 +81,11 @@ class Scenario {
     return true;
   }
 
+  virtual ScenarioConfig::ScenarioType UpdateScenarioType(
+      const common::TrajectoryPoint& ego_point, const Frame& frame,
+      const ScenarioConfigMap& config_map,
+      const PathOverlapMap& first_encountered_overlap_map) const;
+
   ScenarioStatus Process(const common::TrajectoryPoint& planning_init_point,
                          Frame* frame);
 
@@ -92,9 +105,7 @@ class Scenario {
   ScenarioStatus scenario_status_ = STATUS_UNKNOWN;
   std::unique_ptr<Stage> current_stage_;
   ScenarioConfig config_;
-  std::unordered_map<ScenarioConfig::StageType,
-                     const ScenarioConfig::StageConfig*, std::hash<int>>
-      stage_config_map_;
+  StageConfigMap stage_config_map_;
   const ScenarioContext* scenario_context_ = nullptr;
   std::string name_;
   std::string msg_;  // debug msg
