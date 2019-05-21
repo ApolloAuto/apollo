@@ -22,6 +22,15 @@ jobs:
       env:
         - JOB=lint
       script:
+        - |  # Lint only when C/C++ files changed.
+          git diff --name-only HEAD...$TRAVIS_BRANCH
+          exit 0
+
+          git diff --name-only HEAD...$TRAVIS_BRANCH | \
+              grep -e '.cc$' -e '.h$' -e '/BUILD$'
+          if [ $? -ne 0 ]; then
+            exit 0
+          fi
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20190413_1615 --fast-build
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
@@ -31,6 +40,12 @@ jobs:
       env:
         - JOB=cibuild
       script:
+        - |  # Build only when C/C++ files changed.
+          git diff --name-only HEAD...$TRAVIS_BRANCH | \
+              grep -e '.c$' -e '.cc$' -e '.cpp$' -e '.h$' -e '/BUILD$'
+          if [ $? -ne 0 ]; then
+            exit 0
+          fi
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20190413_1615 --fast-build
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
@@ -39,6 +54,12 @@ jobs:
       env:
         - JOB=cibuild_extended
       script:
+        - |  # Build only when C/C++ files changed.
+          git diff --name-only HEAD...$TRAVIS_BRANCH | \
+              grep -e '.c$' -e '.cc$' -e '.cpp$' -e '.h$' -e '/BUILD$'
+          if [ $? -ne 0 ]; then
+            exit 0
+          fi
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20190413_1615 --fast-build
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
@@ -47,6 +68,13 @@ jobs:
       env:
         - JOB=citest_basic
       script:
+        - |  # Ignore test-irrelevant files.
+          git diff --name-only HEAD...$TRAVIS_BRANCH | \
+              grep -v '.md$' | \
+              grep -v '.py$'
+          if [ $? -ne 0 ]; then
+            exit 0
+          fi
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20190413_1615 --fast-test
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
@@ -55,6 +83,13 @@ jobs:
       env:
         - JOB=citest_extended
       script:
+        - |  # Ignore test-irrelevant files.
+          git diff --name-only HEAD...$TRAVIS_BRANCH | \
+              grep -v '.md$' | \
+              grep -v '.py$'
+          if [ $? -ne 0 ]; then
+            exit 0
+          fi
         - ./docker/scripts/dev_start.sh -t dev-x86_64-20190413_1615 --fast-test
         - ./apollo_docker.sh ${JOB}
         - rm -rf "${HOME}/.cache/bazel/_bazel_${USER}/install"
