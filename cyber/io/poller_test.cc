@@ -14,12 +14,13 @@
  * limitations under the License.
  *****************************************************************************/
 
-#include "cyber/io/poller.h"
-
 #include <fcntl.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
 #include <thread>
+
+#include "cyber/init.h"
+#include "cyber/io/poller.h"
 
 namespace apollo {
 namespace cyber {
@@ -103,5 +104,6 @@ TEST(PollerTest, operation) {
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
+  apollo::cyber::Init("poller_test");
   return RUN_ALL_TESTS();
 }

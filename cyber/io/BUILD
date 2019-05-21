@@ -49,6 +49,7 @@ cc_test(
     srcs = ["poller_test.cc"],
     deps = [
         ":poller",
+        "//cyber",
         "@gtest",
     ],
 )
