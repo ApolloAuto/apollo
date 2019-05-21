@@ -438,6 +438,56 @@ bool HybridAStar::GenerateSCurveSpeedAcceleration(HybridAStartResult* result) {
   return true;
 }
 
+bool HybridAStar::CombinePathAndSpeedProfile(const PathData& path_data,
+                                             const SpeedData& speed_data,
+                                             HybridAStartResult* result) {
+  CHECK(result != nullptr);
+
+  // Clear the result
+  result->x.clear();
+  result->y.clear();
+  result->phi.clear();
+  result->v.clear();
+  result->a.clear();
+  result->steer.clear();
+  result->accumulated_s.clear();
+
+  if (path_data.discretized_path().empty()) {
+    AWARN << "path data is empty";
+    return false;
+  }
+
+  // TODO(QiL): load 0.05 from configs
+  for (double cur_rel_time = 0.0; cur_rel_time < speed_data.TotalTime();
+       cur_rel_time += 0.05) {
+    common::SpeedPoint speed_point;
+    if (!speed_data.EvaluateByTime(cur_rel_time, &speed_point)) {
+      AERROR << "Fail to get speed point with relative time " << cur_rel_time;
+      return false;
+    }
+
+    if (speed_point.s() > path_data.discretized_path().Length()) {
+      break;
+    }
+    common::PathPoint path_point;
+    if (!path_data.GetPathPointWithPathS(speed_point.s(), &path_point)) {
+      AERROR << "Fail to get path data with s " << speed_point.s()
+             << "path total length " << path_data.discretized_path().Length();
+      return false;
+    }
+    path_point.set_s(path_point.s());
+
+    result->x.push_back(path_point.x());
+    result->y.push_back(path_point.y());
+    result->phi.push_back(path_point.theta());
+    result->v.push_back(speed_point.v());
+    result->a.push_back(speed_point.a());
+    // TODO(QiL): update steer.
+    result->accumulated_s.push_back(speed_point.s());
+  }
+  return true;
+}
+
 bool HybridAStar::TrajectoryPartition(
     const HybridAStartResult& result,
     std::vector<HybridAStartResult>* partitioned_result) {
@@ -488,6 +538,15 @@ bool HybridAStar::TrajectoryPartition(
     if (FLAGS_use_s_curve_speed_smooth) {
       if (!GenerateSCurveSpeedAcceleration(&result)) {
         AERROR << "GenerateSCurveSpeedAcceleration fail";
+        return false;
+      }
+      // TODO: generate PathData and SpeedData from results and combine
+      // profiles.
+
+      PathData path_data;
+      SpeedData speed_data;
+      DiscretizedTrajectory discretized_trajectory;
+      if (!CombinePathAndSpeedProfile(path_data, speed_data, &result)) {
         return false;
       }
     } else {
