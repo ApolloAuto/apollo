@@ -18,6 +18,7 @@ cc_library(
     ],
     deps = [
         ":transform_server",
+        "//modules/perception/camera/app:cipv_camera",
         "//modules/perception/camera/common",
         "//modules/perception/onboard/proto:motion_service_proto",
         "//modules/perception/proto:perception_proto",

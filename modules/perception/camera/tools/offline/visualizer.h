@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "modules/perception/camera/app/cipv_camera.h"
 #include "modules/perception/camera/common/camera_frame.h"
 #include "modules/perception/camera/common/util.h"
 #include "modules/perception/camera/tools/offline/transform_server.h"
@@ -169,6 +170,7 @@ class Visualizer {
   bool show_camera_box2d_ = true;
   bool show_camera_box3d_ = true;
   bool show_camera_bdv_ = true;
+  bool show_virtual_egolane_ = true;
   bool show_radar_pc_ = true;
   bool show_fusion_ = false;
   bool show_associate_color_ = false;
@@ -187,10 +189,12 @@ class Visualizer {
   std::string help_str_;
   // color
   cv::Scalar color_cipv_ = cv::Scalar(255, 255, 255);
+  cv::Scalar virtual_lane_color_ = cv::Scalar(0, 0, 255);
   int line_thickness_ = 2;
   int cipv_line_thickness_ = 6;
   int trajectory_line_thickness_ = 1;
-  double speed_limit_ = 1.5;
+  double speed_limit_ = 1.0;  // in m/s
+  Cipv cipv_;
 };
 
 }  // namespace camera
