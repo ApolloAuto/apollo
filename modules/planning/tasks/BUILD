@@ -36,7 +36,7 @@ cc_library(
     deps = [
         ":task",
         "//modules/planning/proto:planning_config_proto",
-        "//modules/planning/tasks/deciders:decider",
+        "//modules/planning/tasks/deciders/creep_decider",
         "//modules/planning/tasks/deciders/lane_change_decider",
         "//modules/planning/tasks/deciders/open_space_decider:open_space_fallback_decider",
         "//modules/planning/tasks/deciders/open_space_decider:open_space_pre_stop_decider",
@@ -45,6 +45,7 @@ cc_library(
         "//modules/planning/tasks/deciders/path_bounds_decider",
         "//modules/planning/tasks/deciders/path_lane_borrow_decider",
         "//modules/planning/tasks/deciders/rule_based_stop_decider",
+        "//modules/planning/tasks/deciders/speed_bounds_decider",
         "//modules/planning/tasks/optimizers/open_space_trajectory_generation:open_space_trajectory_provider",
         "//modules/planning/tasks/optimizers/open_space_trajectory_partition",
         "//modules/planning/tasks/optimizers/path_decider",

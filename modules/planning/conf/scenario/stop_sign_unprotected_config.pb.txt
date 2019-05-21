@@ -115,7 +115,7 @@ stage_config: {
 stage_config: {
   stage_type: STOP_SIGN_UNPROTECTED_CREEP
   enabled: true
-  task_type: DECIDER_CREEP
+  task_type: CREEP_DECIDER
   task_type: PATH_LANE_BORROW_DECIDER
   task_type: PATH_BOUNDS_DECIDER
   task_type: PIECEWISE_JERK_PATH_OPTIMIZER
@@ -129,8 +129,8 @@ stage_config: {
   task_type: PIECEWISE_JERK_SPEED_OPTIMIZER
   # task_type: PROCEED_WITH_CAUTION_SPEED
   task_config: {
-    task_type: DECIDER_CREEP
-    decider_creep_config: {
+    task_type: CREEP_DECIDER
+    creep_decider_config: {
       stop_distance: 0.3
       speed_limit: 1.0
       max_valid_stop_distance: 0.4

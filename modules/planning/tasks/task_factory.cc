@@ -23,7 +23,7 @@
 #include "modules/planning/proto/planning_config.pb.h"
 
 #include "modules/common/status/status.h"
-#include "modules/planning/tasks/deciders/decider_creep.h"
+#include "modules/planning/tasks/deciders/creep_decider/creep_decider.h"
 #include "modules/planning/tasks/deciders/lane_change_decider/lane_change_decider.h"
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_fallback_decider.h"
 #include "modules/planning/tasks/deciders/open_space_decider/open_space_pre_stop_decider.h"
@@ -92,9 +92,9 @@ void TaskFactory::Init(const PlanningConfig& config) {
                          [](const TaskConfig& config) -> Task* {
                            return new SpeedDecider(config);
                          });
-  task_factory_.Register(TaskConfig::DECIDER_CREEP,
+  task_factory_.Register(TaskConfig::CREEP_DECIDER,
                          [](const TaskConfig& config) -> Task* {
-                           return new DeciderCreep(config);
+                           return new CreepDecider(config);
                          });
   task_factory_.Register(TaskConfig::OPEN_SPACE_PRE_STOP_DECIDER,
                          [](const TaskConfig& config) -> Task* {

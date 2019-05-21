@@ -2,7 +2,7 @@ syntax = "proto2";
 
 package apollo.planning;
 
-message DeciderCreepConfig {
+message CreepDeciderConfig {
   // stop distance(m) to the creeping stop fence while creeping
   optional double stop_distance = 1 [default = 0.5];  // meter
   optional double speed_limit = 2 [default = 1.0];    // m/s
