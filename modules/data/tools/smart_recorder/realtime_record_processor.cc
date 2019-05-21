@@ -42,14 +42,14 @@ namespace {
 
 using apollo::common::Header;
 using apollo::common::util::StrCat;
-using cyber::CreateNode;
 using cyber::common::EnsureDirectory;
 using cyber::common::GetFileName;
 using cyber::common::PathExists;
+using cyber::CreateNode;
 using cyber::record::HeaderBuilder;
 using cyber::record::Recorder;
-using cyber::record::RecordFileReader;
 using cyber::record::RecordMessage;
+using cyber::record::RecordFileReader;
 using cyber::record::RecordReader;
 using cyber::record::RecordViewer;
 
@@ -202,7 +202,7 @@ void RealtimeRecordProcessor::PublishStatus(const RecordingState state,
 }
 
 bool RealtimeRecordProcessor::GetNextValidRecord(
-    std::string* record_path) const {
+    std::string* const record_path) const {
   *record_path = StrCat(source_record_dir_, "/", default_output_filename_, ".",
                         GetNextRecordFileName(*record_path));
   while (!is_terminating_ && !IsRecordValid(*record_path)) {
@@ -223,12 +223,13 @@ void RealtimeRecordProcessor::RestoreMessage(const uint64_t message_time) {
   const uint64_t target_end = std::max(
       interval.end_time,
       message_time - static_cast<uint64_t>(max_backward_time_ * 1000000000UL));
-  if (target_end <=
-      restore_reader_time_ +
-          static_cast<uint64_t>(min_restore_chunk_ * 1000000000UL)) {
+  const bool small_channels_only = restore_reader_time_ >= interval.end_time;
+  if (small_channels_only &&
+      target_end <=
+          restore_reader_time_ +
+              static_cast<uint64_t>(min_restore_chunk_ * 1000000000UL)) {
     return;
   }
-  const bool small_channels_only = interval.end_time == 0;
   do {
     if (!IsRecordValid(restore_path_)) {
       AWARN << "invalid restore path " << restore_path_ << ", exit";
