@@ -479,7 +479,7 @@ bool OpenSpaceRoiDecider::GetParkingSpotFromMap(
   LaneInfoConstPtr nearest_lane;
   double vehicle_lane_s = 0.0;
   double vehicle_lane_l = 0.0;
-  // Check if last frame lane is avaiable
+  // Check if last frame lane is available
   const auto &ptr_last_frame = FrameHistory::Instance()->Latest();
 
   if (ptr_last_frame == nullptr) {
@@ -785,7 +785,7 @@ bool OpenSpaceRoiDecider::LoadObstacleInHyperPlanes(Frame *const frame) {
   *(frame->mutable_open_space_info()->mutable_obstacles_b()) =
       Eigen::MatrixXd::Zero(
           frame->open_space_info().obstacles_edges_num().sum(), 1);
-  // vertices using H-represetntation
+  // vertices using H-representation
   if (!GetHyperPlanes(
           frame->open_space_info().obstacles_num(),
           frame->open_space_info().obstacles_edges_num(),

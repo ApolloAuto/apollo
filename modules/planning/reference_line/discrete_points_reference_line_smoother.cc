@@ -94,7 +94,7 @@ bool DiscretePointsReferenceLineSmoother::Smooth(
     status =
         FemPosSmooth(raw_point2d, anchorpoints_lateralbound, &smoothed_point2d);
   } else {
-    AERROR << "no smoothing method choosen";
+    AERROR << "no smoothing method chosen";
     return false;
   }
 

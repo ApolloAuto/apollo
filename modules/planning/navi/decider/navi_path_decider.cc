@@ -238,7 +238,7 @@ bool NaviPathDecider::GetBasicPathData(
   CHECK_NOTNULL(path_points);
 
   double min_path_len = config_.min_path_length();
-  // get min path plan lenth s = v0 * t + 1 / 2.0 * a * t^2
+  // get min path plan length s = v0 * t + 1 / 2.0 * a * t^2
   double path_len = start_plan_v_ * config_.min_look_forward_time() +
                     start_plan_a_ * pow(0.1, 2) / 2.0;
   path_len = std::max(path_len, min_path_len);
@@ -250,7 +250,7 @@ bool NaviPathDecider::GetBasicPathData(
     return false;
   }
 
-  // get the start plan point project s on refernce line and get the length of
+  // get the start plan point project s on reference line and get the length of
   // reference line
   auto start_plan_point_project = reference_line.GetReferencePoint(
       start_plan_point_.x(), start_plan_point_.y());

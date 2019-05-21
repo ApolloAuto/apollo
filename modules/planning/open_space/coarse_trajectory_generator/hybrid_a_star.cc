@@ -590,7 +590,7 @@ bool HybridAStar::Plan(
     const std::string current_id = open_pq_.top().first;
     open_pq_.pop();
     std::shared_ptr<Node3d> current_node = open_set_[current_id];
-    // check if a analystic curve could be connected from current
+    // check if an analystic curve could be connected from current
     // configuration to the end configuration without collision. if so, search
     // ends.
     start_time = Clock::NowInSeconds();
