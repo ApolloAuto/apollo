@@ -27,10 +27,6 @@ Object::Object() {
   type_probs.resize(static_cast<int>(ObjectType::MAX_OBJECT_TYPE), 0);
   sub_type_probs.resize(static_cast<int>(ObjectSubType::MAX_OBJECT_TYPE), 0.0f);
   b_cipv = false;
-
-  // drops.clear();
-  // drops.set_capacity(100);
-  // drops.resize(100, Eigen::Vector3d(.0, .0, .0));
 }
 
 void Object::Reset() {

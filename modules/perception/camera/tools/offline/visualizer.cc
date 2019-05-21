@@ -15,6 +15,7 @@
  *****************************************************************************/
 #include "modules/perception/camera/tools/offline/visualizer.h"
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -783,6 +784,36 @@ bool Visualizer::key_handler(const std::string &camera_name, const int key) {
   return true;
 }
 
+// Draw trajectory of each object
+bool Visualizer::DrawTrajectories(
+  const base::ObjectPtr &object,
+  const base::MotionBufferPtr motion_buffer) {
+  if (object->drop_num == 0 || motion_buffer->size() == 0) {
+    return false;
+  }
+  std::size_t count = std::min(object->drop_num, motion_buffer->size());
+
+  Eigen::Vector4f start_point;
+  start_point << static_cast<float>(object->drops[0](0)),
+                 static_cast<float>(object->drops[0](1)), 0, 1;
+  start_point = (*motion_buffer)[0].motion * start_point;
+  cv::circle(world_image_, world_point_to_bigimg(start_point), 3,
+    cv::Scalar(127, 127, 127));
+
+  for (size_t i = 1; i < count; i++) {
+    Eigen::Vector4f end_point;
+    end_point << static_cast<float>(object->drops[i](0)),
+                 static_cast<float>(object->drops[i](1)), 0, 1;
+    cv::circle(world_image_, world_point_to_bigimg(end_point), 3,
+      cv::Scalar(127, 127, 127));
+    cv::line(world_image_, world_point_to_bigimg(start_point),
+             world_point_to_bigimg(end_point),
+             cv::Scalar(127, 127, 127), trajectory_line_thickness_);
+    start_point = end_point;
+  }
+  return true;
+}
+
 void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
   cv::Mat image = img.clone();
   Eigen::Affine3d pose;
@@ -797,12 +828,8 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     base::RectF rect(object->camera_supplement.box);
     cv::Rect r(static_cast<int>(rect.x), static_cast<int>(rect.y),
                static_cast<int>(rect.width), static_cast<int>(rect.height));
-    cv::Scalar color;
-    if (object->b_cipv) {
-      color = color_cipv_;
-    } else {
-      color = colorlistobj[object->track_id % colorlistobj.size()];
-    }
+    cv::Scalar color = colorlistobj[object->track_id % colorlistobj.size()];
+
     cv::rectangle(image, r, color, 2);
     cv::putText(image, std::to_string(object->track_id),
                 cv::Point(static_cast<int>(rect.x), static_cast<int>(rect.y)),
@@ -837,16 +864,29 @@ void Visualizer::Draw2Dand3D(const cv::Mat &img, const CameraFrame &frame) {
     p4 << object->size(0) * 0.5, -object->size(1) * 0.5;
     p4 = rotate * p4 + pos_2d;
 
+    if (object->b_cipv) {
+      cv::line(world_image_, world_point_to_bigimg(p1),
+               world_point_to_bigimg(p2), color_cipv_, cipv_line_thickness_);
+      cv::line(world_image_, world_point_to_bigimg(p2),
+               world_point_to_bigimg(p3), color_cipv_, cipv_line_thickness_);
+      cv::line(world_image_, world_point_to_bigimg(p3),
+               world_point_to_bigimg(p4), color_cipv_, cipv_line_thickness_);
+      cv::line(world_image_, world_point_to_bigimg(p4),
+               world_point_to_bigimg(p1), color_cipv_, cipv_line_thickness_);
+      // cv::line(world_image_, world_point_to_bigimg(pos_2d),
+      //          world_point_to_bigimg(v_2d), color_cipv_,
+      //          cipv_line_thickness_);
+    }
     cv::line(world_image_, world_point_to_bigimg(p1), world_point_to_bigimg(p2),
-             color, 2);
+             color_cipv_, line_thickness_);
     cv::line(world_image_, world_point_to_bigimg(p2), world_point_to_bigimg(p3),
-             color, 2);
+             color_cipv_, line_thickness_);
     cv::line(world_image_, world_point_to_bigimg(p3), world_point_to_bigimg(p4),
-             color, 2);
+             color_cipv_, line_thickness_);
     cv::line(world_image_, world_point_to_bigimg(p4), world_point_to_bigimg(p1),
-             color, 2);
-    cv::line(world_image_, world_point_to_bigimg(pos_2d),
-             world_point_to_bigimg(v_2d), color, 2);
+             color_cipv_, line_thickness_);
+    // cv::line(world_image_, world_point_to_bigimg(pos_2d),
+    //          world_point_to_bigimg(v_2d), color_cipv_, line_thickness_);
   }
   last_timestamp_ = frame.timestamp;
   camera_image_[frame.data_provider->sensor_name()] = image;
@@ -893,9 +933,10 @@ void Visualizer::ShowResult(const cv::Mat &img, const CameraFrame &frame) {
 void Visualizer::Draw2Dand3D_all_info_single_camera(
     const cv::Mat &img,
     const CameraFrame &frame,
-    const Eigen::Matrix3d intrinsic,
-    const Eigen::Matrix4d extrinsic,
-    const Eigen::Affine3d &world2camera) {
+    const Eigen::Matrix3d &intrinsic,
+    const Eigen::Matrix4d &extrinsic,
+    const Eigen::Affine3d &world2camera,
+    const base::MotionBufferPtr motion_buffer) {
 
   cv::Mat image_2D = img.clone();  // All clone should be replaced with global
   cv::Mat image_3D = img.clone();  // variable and allocated at Init..
@@ -947,7 +988,7 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
       p_cur.y = static_cast<int>(object.curve_image_point_set[i].y);
       Eigen::Vector2d p_cur_ground = image2ground(p_cur);
 
-      cv::line(image_3D, p_prev, p_cur, lane_color, 2);
+      cv::line(image_3D, p_prev, p_cur, lane_color, line_thickness_);
       cv::line(world_image_, world_point_to_bigimg(p_prev_ground),
                world_point_to_bigimg(p_cur_ground), lane_color, 2);
       p_prev = p_cur;
@@ -961,11 +1002,10 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
     base::RectF rect(object->camera_supplement.box);
     cv::Rect r(static_cast<int>(rect.x), static_cast<int>(rect.y),
                static_cast<int>(rect.width), static_cast<int>(rect.height));
-    cv::Scalar color;
+    cv::Scalar color = colorlistobj[object->track_id % colorlistobj.size()];;
+
     if (object->b_cipv) {
-      color = color_cipv_;
-    } else {
-      color = colorlistobj[object->track_id % colorlistobj.size()];
+      cv::rectangle(image_2D, r, color_cipv_, cipv_line_thickness_);
     }
     cv::rectangle(image_2D, r, color, 2);
     cv::putText(image_2D, std::to_string(object->track_id),
@@ -983,7 +1023,6 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
     Eigen::Vector3d pos;
 
     ADEBUG << "object->track_id: " << object->track_id;
-    int line_thickness = 2;
     // Draw camera and lidar
     for (int method = GROUND; method <= GROUND; method++) {
       double theta_ray;
@@ -1008,7 +1047,6 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
                object->camera_supplement.local_center(2);
         ADEBUG << "Camera pos: ("
               << pos(0) << ", " << pos(1) << ", " << pos(2) <<")";
-        line_thickness = 1;
         theta_ray = atan2(pos(0), pos(2));
         theta = object->camera_supplement.alpha + theta_ray;
         // compute obstacle center in lidar ground
@@ -1058,44 +1096,99 @@ void Visualizer::Draw2Dand3D_all_info_single_camera(
           p_proj[i].y = static_cast<int>(proj[i](1) / proj[i](2));
         }
       }
+      if (object->b_cipv) {
+        cv::line(image_3D, p_proj[0], p_proj[1], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[1], p_proj[2], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[2], p_proj[3], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[3], p_proj[0], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[4], p_proj[5], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[5], p_proj[6], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[6], p_proj[7], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[7], p_proj[4], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[0], p_proj[4], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[1], p_proj[5], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[2], p_proj[6], color_cipv_,
+                 cipv_line_thickness_);
+        cv::line(image_3D, p_proj[3], p_proj[7], color_cipv_,
+                 cipv_line_thickness_);
+      }
 
-      cv::line(image_3D, p_proj[0], p_proj[1], color, line_thickness);
-      cv::line(image_3D, p_proj[1], p_proj[2], color, line_thickness);
-      cv::line(image_3D, p_proj[2], p_proj[3], color, line_thickness);
-      cv::line(image_3D, p_proj[3], p_proj[0], color, line_thickness);
-      cv::line(image_3D, p_proj[4], p_proj[5], color, line_thickness);
-      cv::line(image_3D, p_proj[5], p_proj[6], color, line_thickness);
-      cv::line(image_3D, p_proj[6], p_proj[7], color, line_thickness);
-      cv::line(image_3D, p_proj[7], p_proj[4], color, line_thickness);
-      cv::line(image_3D, p_proj[0], p_proj[4], color, line_thickness);
-      cv::line(image_3D, p_proj[1], p_proj[5], color, line_thickness);
-      cv::line(image_3D, p_proj[2], p_proj[6], color, line_thickness);
-      cv::line(image_3D, p_proj[3], p_proj[7], color, line_thickness);
+      cv::line(image_3D, p_proj[0], p_proj[1], color, line_thickness_);
+      cv::line(image_3D, p_proj[1], p_proj[2], color, line_thickness_);
+      cv::line(image_3D, p_proj[2], p_proj[3], color, line_thickness_);
+      cv::line(image_3D, p_proj[3], p_proj[0], color, line_thickness_);
+      cv::line(image_3D, p_proj[4], p_proj[5], color, line_thickness_);
+      cv::line(image_3D, p_proj[5], p_proj[6], color, line_thickness_);
+      cv::line(image_3D, p_proj[6], p_proj[7], color, line_thickness_);
+      cv::line(image_3D, p_proj[7], p_proj[4], color, line_thickness_);
+      cv::line(image_3D, p_proj[0], p_proj[4], color, line_thickness_);
+      cv::line(image_3D, p_proj[1], p_proj[5], color, line_thickness_);
+      cv::line(image_3D, p_proj[2], p_proj[6], color, line_thickness_);
+      cv::line(image_3D, p_proj[3], p_proj[7], color, line_thickness_);
 
       // plot obstacles on ground plane in lidar coordinates
       Eigen::Matrix2d rotate_rz;
       theta = theta - M_PI_2;
-      rotate_rz << cos(theta), sin(theta), -sin(theta), cos(theta);
-      Eigen::Vector2d p1_l;
-      p1_l << object->size(0) * 0.5, object->size(1) * 0.5;
-      p1_l = rotate_rz * p1_l + c_2D_l;
-      Eigen::Vector2d p2_l;
-      p2_l << -object->size(0) * 0.5, object->size(1) * 0.5;
-      p2_l = rotate_rz * p2_l + c_2D_l;
-      Eigen::Vector2d p3_l;
-      p3_l << -object->size(0) * 0.5, -object->size(1) * 0.5;
-      p3_l = rotate_rz * p3_l + c_2D_l;
-      Eigen::Vector2d p4_l;
-      p4_l << object->size(0) * 0.5, -object->size(1) * 0.5;
-      p4_l = rotate_rz * p4_l + c_2D_l;
-      cv::line(world_image_, world_point_to_bigimg(p1_l),
-               world_point_to_bigimg(p2_l), color, line_thickness);
-      cv::line(world_image_, world_point_to_bigimg(p2_l),
-               world_point_to_bigimg(p3_l), color, line_thickness);
-      cv::line(world_image_, world_point_to_bigimg(p3_l),
-               world_point_to_bigimg(p4_l), color, line_thickness);
-      cv::line(world_image_, world_point_to_bigimg(p4_l),
-               world_point_to_bigimg(p1_l), color, line_thickness);
+      rotate_rz  << cos(theta), sin(theta), -sin(theta), cos(theta);
+      Eigen::Vector2d p1;
+      p1 << object->size(0) * 0.5, object->size(1) * 0.5;
+      p1 = rotate_rz * p1 + c_2D_l;
+      Eigen::Vector2d p2;
+      p2 << -object->size(0) * 0.5, object->size(1) * 0.5;
+      p2 = rotate_rz * p2 + c_2D_l;
+      Eigen::Vector2d p3;
+      p3 << -object->size(0) * 0.5, -object->size(1) * 0.5;
+      p3 = rotate_rz * p3 + c_2D_l;
+      Eigen::Vector2d p4;
+      p4 << object->size(0) * 0.5, -object->size(1) * 0.5;
+      p4 = rotate_rz * p4 + c_2D_l;
+
+      Eigen::Vector2d pos_2d;
+      pos_2d << c_2D_l(0), c_2D_l(1);
+      Eigen::Vector3d v;
+      v << object->velocity(0), object->velocity(1), object->velocity(2);
+      v = world2camera.linear() * v;
+      Eigen::Vector2d v_2d;
+      v_2d << v(0) + pos_2d(0), v(1) + pos_2d(1);
+
+      AINFO << "v.norm: " << v.norm();
+      if (show_trajectory_ &&  motion_buffer != nullptr &&
+          motion_buffer->size() > 0 && v.norm() > speed_limit_) {
+        DrawTrajectories(object, motion_buffer);
+      }
+      if (object->b_cipv) {
+        cv::line(world_image_, world_point_to_bigimg(p1),
+                 world_point_to_bigimg(p2), color_cipv_, cipv_line_thickness_);
+        cv::line(world_image_, world_point_to_bigimg(p2),
+                 world_point_to_bigimg(p3), color_cipv_, cipv_line_thickness_);
+        cv::line(world_image_, world_point_to_bigimg(p3),
+                 world_point_to_bigimg(p4), color_cipv_, cipv_line_thickness_);
+        cv::line(world_image_, world_point_to_bigimg(p4),
+                 world_point_to_bigimg(p1), color_cipv_, cipv_line_thickness_);
+        // cv::line(world_image_, world_point_to_bigimg(pos_2d),
+        //          world_point_to_bigimg(v_2d), color_cipv_,
+        //          cipv_line_thickness_);
+      }
+      cv::line(world_image_, world_point_to_bigimg(p1),
+               world_point_to_bigimg(p2), color, line_thickness_);
+      cv::line(world_image_, world_point_to_bigimg(p2),
+               world_point_to_bigimg(p3), color, line_thickness_);
+      cv::line(world_image_, world_point_to_bigimg(p3),
+               world_point_to_bigimg(p4), color, line_thickness_);
+      cv::line(world_image_, world_point_to_bigimg(p4),
+               world_point_to_bigimg(p1), color, line_thickness_);
+      // cv::line(world_image_, world_point_to_bigimg(pos_2d),
+      //          world_point_to_bigimg(v_2d), color, line_thickness_);
     }
   }
 
@@ -1169,7 +1262,7 @@ void Visualizer::ShowResult_all_info_single_camera(const cv::Mat &img,
       extrinsic_map_.find(camera_name) != extrinsic_map_.end()) {
     Draw2Dand3D_all_info_single_camera(
         image, frame, intrinsic_map_.at(camera_name).cast<double>(),
-        extrinsic_map_.at(camera_name), world2camera);
+        extrinsic_map_.at(camera_name), world2camera, motion_buffer);
   } else {
     AERROR << "Failed to find necessuary intrinsic or extrinsic params.";
   }
@@ -1220,6 +1313,13 @@ cv::Point Visualizer::world_point_to_bigimg(const Eigen::Vector2d &p) {
   cv::Point point;
   point.x = static_cast<int>(-p(1) * m2pixel_ + wide_pixel_ * 0.5);
   point.y = static_cast<int>(world_h_ - p(0) * m2pixel_);
+  return point;
+}
+cv::Point Visualizer::world_point_to_bigimg(const Eigen::Vector4f &p) {
+  cv::Point point;
+  point.x = (wide_pixel_ >> 1) -
+            static_cast<int>(p(1) * static_cast<float>(m2pixel_));
+  point.y = world_h_ - static_cast<int>(p(0) * static_cast<float>(m2pixel_));
   return point;
 }
 
