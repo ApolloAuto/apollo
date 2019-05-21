@@ -3,9 +3,9 @@ syntax = "proto2";
 package apollo.data;
 
 message RecordSegmentSetting {
-  // Segmentation of restored records in size or time, default is by size 200MB
-  optional int32 size_segment = 1 [default = 200];
-  optional int32 time_segment = 2;
+  // Segmentation of restored records in size or time
+  optional int32 size_segment = 1 [default = 500];
+  optional int32 time_segment = 2 [default = 180];
 }
 
 message Trigger {
