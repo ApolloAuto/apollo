@@ -42,14 +42,14 @@ namespace {
 
 using apollo::common::Header;
 using apollo::common::util::StrCat;
+using cyber::CreateNode;
 using cyber::common::EnsureDirectory;
 using cyber::common::GetFileName;
 using cyber::common::PathExists;
-using cyber::CreateNode;
 using cyber::record::HeaderBuilder;
 using cyber::record::Recorder;
-using cyber::record::RecordMessage;
 using cyber::record::RecordFileReader;
+using cyber::record::RecordMessage;
 using cyber::record::RecordReader;
 using cyber::record::RecordViewer;
 
@@ -202,7 +202,7 @@ void RealtimeRecordProcessor::PublishStatus(const RecordingState state,
 }
 
 bool RealtimeRecordProcessor::GetNextValidRecord(
-    std::string* const record_path) const {
+    std::string* record_path) const {
   *record_path = StrCat(source_record_dir_, "/", default_output_filename_, ".",
                         GetNextRecordFileName(*record_path));
   while (!is_terminating_ && !IsRecordValid(*record_path)) {
