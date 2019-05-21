@@ -21,4 +21,15 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "creep_decider_test",
+    size = "small",
+    srcs = [
+        "creep_decider_test.cc",
+    ],
+    deps = [
+        "creep_decider",
+        "@gtest//:main",
+    ],
+)
 cpplint()

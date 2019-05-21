@@ -39,7 +39,6 @@ uint32_t CreepDecider::creep_clear_counter_ = 0;
 
 CreepDecider::CreepDecider(const TaskConfig& config) : Decider(config) {
   CHECK(config_.has_creep_decider_config());
-  SetName("CreepDecider");
 }
 
 Status CreepDecider::Process(Frame* frame,
