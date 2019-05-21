@@ -194,6 +194,24 @@ cc_library(
     ],
 )
 
+cc_library (
+    name = "iterative_anchoring_smoother",
+    srcs = [
+        "iterative_anchoring_smoother.cc",
+    ],
+    hdrs = [
+        "iterative_anchoring_smoother.h",
+    ],
+    deps = [
+        "//modules/common/math",
+        "//modules/planning/common/path:discretized_path",
+        "//modules/planning/common/speed:speed_data",
+        "//modules/planning/common/trajectory:discretized_trajectory",
+        "//modules/planning/math/discretized_points_smoothing:fem_pos_deviation_smoother",
+        "@eigen",
+    ],
+)
+
 cuda_library(
     name = "planning_block",
     srcs = [
@@ -295,5 +313,7 @@ cc_test(
         "@gtest//:main",
     ],
 )
+
+
 
 cpplint()

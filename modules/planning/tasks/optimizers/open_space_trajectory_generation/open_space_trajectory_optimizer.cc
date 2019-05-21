@@ -759,5 +759,27 @@ void OpenSpaceTrajectoryOptimizer::CombineTrajectories(
   *dual_n_result_ds = std::move(dual_n_result_ds_);
 }
 
+bool OpenSpaceTrajectoryOptimizer::GenerateDecoupledTraj(
+    const Eigen::MatrixXd& xWS, const double init_a, const double init_v,
+    const std::vector<std::vector<common::math::Vec2d>>& obstacles_vertices_vec,
+    Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
+    Eigen::MatrixXd* time_result_dc) {
+  IterativeAnchoringSmoother iterative_anchoring_smoother;
+  DiscretizedTrajectory smoothed_trajectory;
+  if (!iterative_anchoring_smoother.Smooth(
+          xWS, init_a, init_v, obstacles_vertices_vec, &smoothed_trajectory)) {
+    return false;
+  }
+
+  LoadResult(smoothed_trajectory, state_result_dc, control_result_dc,
+             time_result_dc);
+  return true;
+}
+
+void OpenSpaceTrajectoryOptimizer::LoadResult(
+    const DiscretizedTrajectory& discretized_trajectory,
+    Eigen::MatrixXd* state_result_dc, Eigen::MatrixXd* control_result_dc,
+    Eigen::MatrixXd* time_result_dc) {}
+
 }  // namespace planning
 }  // namespace apollo
