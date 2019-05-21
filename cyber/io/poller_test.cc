@@ -14,13 +14,14 @@
  * limitations under the License.
  *****************************************************************************/
 
+#include "cyber/io/poller.h"
+
 #include <fcntl.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
 #include <thread>
 
 #include "cyber/init.h"
-#include "cyber/io/poller.h"
 
 namespace apollo {
 namespace cyber {
