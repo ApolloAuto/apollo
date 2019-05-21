@@ -39,7 +39,7 @@ message TaskConfig {
     NAVI_PATH_DECIDER = 7;
     NAVI_SPEED_DECIDER = 8;
     NAVI_OBSTACLE_DECIDER = 9;
-    DECIDER_CREEP = 11;
+    CREEP_DECIDER = 11;
     OPEN_SPACE_PRE_STOP_DECIDER = 12;
     PROCEED_WITH_CAUTION_SPEED = 15;
     DECIDER_RSS = 16;
@@ -62,7 +62,7 @@ message TaskConfig {
     DpStSpeedConfig dp_st_speed_config = 3;
     PathDeciderConfig path_decider_config = 7;
     ProceedWithCautionSpeedConfig proceed_with_caution_speed_config = 8;
-    DeciderCreepConfig decider_creep_config = 10;
+    CreepDeciderConfig creep_decider_config = 10;
     OpenSpacePreStopDeciderConfig open_space_pre_stop_decider_config = 11;
     SpeedBoundsDeciderConfig speed_bounds_decider_config = 15;
     PiecewiseJerkPathConfig piecewise_jerk_path_config = 16;

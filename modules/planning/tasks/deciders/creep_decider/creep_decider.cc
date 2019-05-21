@@ -18,7 +18,7 @@
  * @file
  **/
 
-#include "modules/planning/tasks/deciders/decider_creep.h"
+#include "modules/planning/tasks/deciders/creep_decider/creep_decider.h"
 
 #include <string>
 #include <vector>
@@ -35,14 +35,14 @@ namespace planning {
 using common::Status;
 using hdmap::PathOverlap;
 
-uint32_t DeciderCreep::creep_clear_counter_ = 0;
+uint32_t CreepDecider::creep_clear_counter_ = 0;
 
-DeciderCreep::DeciderCreep(const TaskConfig& config) : Decider(config) {
-  CHECK(config_.has_decider_creep_config());
-  SetName("DeciderCreep");
+CreepDecider::CreepDecider(const TaskConfig& config) : Decider(config) {
+  CHECK(config_.has_creep_decider_config());
+  SetName("CreepDecider");
 }
 
-Status DeciderCreep::Process(Frame* frame,
+Status CreepDecider::Process(Frame* frame,
                              ReferenceLineInfo* reference_line_info) {
   CHECK_NOTNULL(frame);
   CHECK_NOTNULL(reference_line_info);
@@ -90,27 +90,27 @@ Status DeciderCreep::Process(Frame* frame,
         stop_line_s + FindCreepDistance(*frame, *reference_line_info);
     const std::vector<std::string> wait_for_obstacles;
     util::BuildStopDecision(virtual_obstacle_id, creep_stop_s,
-                            config_.decider_creep_config().stop_distance(),
+                            config_.creep_decider_config().stop_distance(),
                             StopReasonCode::STOP_REASON_CREEPER,
-                            wait_for_obstacles, "DeciderCreep", frame,
+                            wait_for_obstacles, "CreepDecider", frame,
                             reference_line_info);
   }
 
   return Status::OK();
 }
 
-double DeciderCreep::FindCreepDistance(
+double CreepDecider::FindCreepDistance(
     const Frame& frame, const ReferenceLineInfo& reference_line_info) {
   // more delicate design of creep distance
   return 2.0;
 }
 
-bool DeciderCreep::CheckCreepDone(const Frame& frame,
+bool CreepDecider::CheckCreepDone(const Frame& frame,
                                   const ReferenceLineInfo& reference_line_info,
                                   const double stop_sign_overlap_end_s,
                                   const double wait_time_sec,
                                   const double timeout_sec) {
-  const auto& creep_config = config_.decider_creep_config();
+  const auto& creep_config = config_.creep_decider_config();
   bool creep_done = false;
   double creep_stop_s =
       stop_sign_overlap_end_s + FindCreepDistance(frame, reference_line_info);
