@@ -59,12 +59,17 @@ class Visualizer {
       const CameraFrame &frame,
       const base::MotionBufferPtr motion_buffer,
       const Eigen::Affine3d &world2camera);
-  void Draw2Dand3D_all_info_single_camera(const cv::Mat &img,
-                                          const CameraFrame &frame,
-                                          const Eigen::Matrix3d intrinsic,
-                                          const Eigen::Matrix4d extrinsic,
-                                          const Eigen::Affine3d &world2camera);
+  void Draw2Dand3D_all_info_single_camera(
+      const cv::Mat &img,
+      const CameraFrame &frame,
+      const Eigen::Matrix3d &intrinsic,
+      const Eigen::Matrix4d &extrinsic,
+      const Eigen::Affine3d &world2camera,
+      const base::MotionBufferPtr motion_buffer);
+  bool DrawTrajectories(const base::ObjectPtr &object,
+      const base::MotionBufferPtr motion_buffer);
   cv::Point world_point_to_bigimg(const Eigen::Vector2d &p);
+  cv::Point world_point_to_bigimg(const Eigen::Vector4f &p);
   Eigen::Vector2d image2ground(cv::Point p_img);
   cv::Point ground2image(Eigen::Vector2d p_ground);
   std::string type_to_string(const apollo::perception::base::ObjectType type);
@@ -182,6 +187,10 @@ class Visualizer {
   std::string help_str_;
   // color
   cv::Scalar color_cipv_ = cv::Scalar(255, 255, 255);
+  int line_thickness_ = 2;
+  int cipv_line_thickness_ = 6;
+  int trajectory_line_thickness_ = 1;
+  double speed_limit_ = 1.5;
 };
 
 }  // namespace camera

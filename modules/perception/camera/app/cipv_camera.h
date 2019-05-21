@@ -73,6 +73,7 @@ class Cipv {
 
   // Collect drops for tailgating
   bool CollectDrops(const base::MotionBufferPtr &motion_buffer,
+                    const Eigen::Affine3d &world2camera,
                     std::vector<std::shared_ptr<base::Object>> *objects);
 
  private:
