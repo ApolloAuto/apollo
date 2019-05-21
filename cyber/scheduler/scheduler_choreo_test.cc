@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 #include <algorithm>
+
 #include "cyber/common/global_data.h"
 #include "cyber/cyber.h"
 #include "cyber/scheduler/policy/choreography_context.h"
@@ -45,6 +46,7 @@ TEST(SchedulerChoreoTest, choreo) {
 TEST(SchedulerChoreoTest, sched_choreo) {
   GlobalData::Instance()->SetProcessGroup("example_sched_choreography");
   auto sched = dynamic_cast<SchedulerChoreography*>(scheduler::Instance());
+  cyber::Init("SchedulerChoreoTest");
   std::shared_ptr<CRoutine> cr = std::make_shared<CRoutine>(func);
   cr->set_id(GlobalData::RegisterTaskName("sched_choreo"));
   cr->set_name("sched_choreo");
